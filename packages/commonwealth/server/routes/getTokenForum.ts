@@ -16,15 +16,15 @@ const getTokenForum = async (models: DB, req: Request, res: Response) => {
   }
 
   // default to mainnet
-  const chain_id = +req.query.chain_id || 1;
+  const eth_chain_id = +req.query.eth_chain_id || 1;
   const token = await models.Token.findOne({
     where: {
       address: { [Op.iLike]: address },
-      chain_id,
+      eth_chain_id,
     },
   });
   const node = await models.ChainNode.scope('withPrivateData').findOne({
-    where: { eth_chain_id: chain_id },
+    where: { eth_chain_id },
   });
   let url = node?.url;
   if (!url) {

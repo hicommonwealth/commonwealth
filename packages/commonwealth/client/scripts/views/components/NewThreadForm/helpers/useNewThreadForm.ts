@@ -13,21 +13,22 @@ type NewThreadDraft = {
   body: DeltaStatic;
 };
 
-const useNewThreadForm = (chainId: string, topicsForSelector: Topic[]) => {
+const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
   const [searchParams] = useSearchParams();
   const topicIdFromUrl: number = parseInt(searchParams.get('topic') || '0');
 
   const { saveDraft, restoreDraft, clearDraft } = useDraft<NewThreadDraft>(
-    `new-thread-${chainId}-info`,
+    `new-thread-${communityId}-info`,
   );
+  const [canShowGatingBanner, setCanShowGatingBanner] = useState(true);
 
   // get restored draft on init
   const restoredDraft: NewThreadDraft | null = useMemo(() => {
-    if (!topicsForSelector.length) {
+    if (!topicsForSelector.length || topicIdFromUrl === 0) {
       return null;
     }
     return restoreDraft();
-  }, [restoreDraft, topicsForSelector]);
+  }, [restoreDraft, topicsForSelector, topicIdFromUrl]);
 
   const defaultTopic = useMemo(() => {
     return (
@@ -39,7 +40,7 @@ const useNewThreadForm = (chainId: string, topicsForSelector: Topic[]) => {
       topicsForSelector.find((t) => t.name.includes('General')) ||
       null
     );
-  }, [restoredDraft, topicsForSelector]);
+  }, [restoredDraft, topicsForSelector, topicIdFromUrl]);
 
   const [threadKind, setThreadKind] = useState<ThreadKind>(
     ThreadKind.Discussion,
@@ -80,16 +81,8 @@ const useNewThreadForm = (chainId: string, topicsForSelector: Topic[]) => {
       return;
     }
     saveDraft(draft);
-  }, [saveDraft, threadTopic, threadTitle, threadContentDelta]);
 
-  useEffect(() => {
-    if (!threadTopic && defaultTopic) {
-      setThreadTopic(defaultTopic);
-    }
-  }, [defaultTopic, threadTopic]);
-
-  useEffect(() => {
-    if (threadTopic?.defaultOffchainTemplate) {
+    if (!threadContentDelta && threadTopic?.defaultOffchainTemplate) {
       try {
         const template = JSON.parse(
           threadTopic.defaultOffchainTemplate,
@@ -99,7 +92,11 @@ const useNewThreadForm = (chainId: string, topicsForSelector: Topic[]) => {
         console.log(e);
       }
     }
-  }, [threadTopic]);
+
+    if (!threadTopic && defaultTopic) {
+      setThreadTopic(defaultTopic);
+    }
+  }, [saveDraft, threadTopic, threadTitle, threadContentDelta, defaultTopic]);
 
   return {
     threadKind,
@@ -116,6 +113,8 @@ const useNewThreadForm = (chainId: string, topicsForSelector: Topic[]) => {
     setIsSaving,
     isDisabled,
     clearDraft,
+    canShowGatingBanner,
+    setCanShowGatingBanner,
   };
 };
 

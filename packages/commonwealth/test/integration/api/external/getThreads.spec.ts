@@ -1,7 +1,7 @@
 import chai from 'chai';
 import 'chai/register-should';
-import type { GetThreadsReq } from 'common-common/src/api/extApiTypes';
-import { OrderByOptions } from 'common-common/src/api/extApiTypes';
+import type { GetThreadsReq } from 'server/api/extApiTypes';
+import { OrderByOptions } from 'server/api/extApiTypes';
 import type { ThreadAttributes } from 'server/models/thread';
 import { get } from 'test/integration/api/external/appHook.spec';
 import 'test/integration/api/external/dbEntityHooks.spec';

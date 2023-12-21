@@ -1,8 +1,11 @@
-import { NotificationCategories, ProposalType } from 'common-common/src/types';
+import {
+  NotificationCategories,
+  ProposalType,
+  SupportedNetwork,
+} from 'common-common/src/types';
 import { NotificationDataAndCategory, WebhookCategory } from 'types';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import { SupportedNetwork } from '../../shared/chain/types/types';
 import models from '../database';
 import { WebhookInstance } from '../models/webhook';
 import { dispatchWebhooks } from '../util/webhooks/dispatchWebhook';
@@ -62,7 +65,7 @@ async function main() {
     );
   }
 
-  const chain = await models.Community.findOne({
+  const community = await models.Community.findOne({
     where: {
       id: 'dydx',
     },
@@ -71,7 +74,7 @@ async function main() {
   let url: string;
   const webhooks: WebhookInstance[] = [];
   const genericWebhookOptions = {
-    community_id: chain.id,
+    community_id: community.id,
     categories: [argv.notificationCategory],
   };
   if (argv.url) {
@@ -126,13 +129,13 @@ async function main() {
           kind: 'proposal-created',
         },
         network: SupportedNetwork.Aave,
-        chain: chain.id,
+        chain: community.id,
       },
     };
   } else {
     const thread = await models.Thread.findOne({
       where: {
-        community_id: chain.id,
+        community_id: community.id,
       },
       include: {
         model: models.Address,
@@ -164,7 +167,7 @@ async function main() {
     ) {
       const [comment] = await models.Comment.findOrCreate({
         where: {
-          chain: chain.id,
+          chain: community.id,
           thread_id: thread.id,
         },
         defaults: {
@@ -186,12 +189,12 @@ async function main() {
     ) {
       const anotherAddress = await models.Address.findOne({
         where: {
-          community_id: chain.id,
+          community_id: community.id,
         },
       });
       await models.Reaction.findOrCreate({
         where: {
-          chain: chain.id,
+          chain: community.id,
           thread_id: thread.id,
           address_id: anotherAddress.id,
           reaction: 'like',

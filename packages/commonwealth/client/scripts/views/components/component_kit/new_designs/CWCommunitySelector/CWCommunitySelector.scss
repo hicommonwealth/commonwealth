@@ -1,0 +1,44 @@
+@import '../../../../../../styles/shared';
+
+.CommunitySelector {
+  display: flex;
+  max-width: 774px;
+  width: 100%;
+  padding: 24px;
+  align-items: center;
+  gap: 16px;
+  border-radius: 12px;
+  border: 1px solid $neutral-300;
+  background-color: $white;
+  cursor: pointer;
+  transition: border, background-color 0.3s;
+
+  &:hover {
+    border: 1px solid $neutral-200;
+    background-color: $neutral-100;
+  }
+
+  @include extraSmall {
+    flex-direction: column;
+    align-items: start;
+  }
+
+  .chain-logo-container {
+    img {
+      width: 48px;
+      height: 48px;
+    }
+  }
+  .content-container {
+    .title-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .description {
+      color: $neutral-500;
+      margin-top: 8px;
+    }
+  }
+}

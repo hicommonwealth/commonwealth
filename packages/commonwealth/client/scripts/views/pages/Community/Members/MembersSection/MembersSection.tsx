@@ -1,12 +1,9 @@
-import { featureFlags } from 'helpers/feature-flags';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Permissions from 'utils/Permissions';
 import { Avatar } from 'views/components/Avatar';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
-import { MixpanelPageViewEvent } from '../../../../../../../shared/analytics/types';
 import './MembersSection.scss';
 
 type Member = {
@@ -30,16 +27,12 @@ const columns = [
     numeric: false,
     sortable: true,
   },
-  ...(featureFlags.gatingEnabled
-    ? [
-        {
-          key: 'groups',
-          header: 'Groups',
-          numeric: false,
-          sortable: true,
-        },
-      ]
-    : []),
+  {
+    key: 'groups',
+    header: 'Groups',
+    numeric: false,
+    sortable: true,
+  },
 ];
 
 const MembersSection = ({
@@ -47,10 +40,6 @@ const MembersSection = ({
   onLoadMoreMembers,
   isLoadingMoreMembers,
 }: MembersSectionProps) => {
-  useBrowserAnalyticsTrack({
-    payload: { event: MixpanelPageViewEvent.MEMBERS_PAGE_VIEW },
-  });
-
   return (
     <div className="MembersSection">
       <CWTable

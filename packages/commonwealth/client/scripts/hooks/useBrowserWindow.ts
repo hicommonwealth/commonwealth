@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   isWindowExtraSmall,
   isWindowLarge,
@@ -31,7 +31,7 @@ const useBrowserWindow = ({
     isWindowMedium: isWindowMedium(windowSize),
     isWindowMediumSmallInclusive: isWindowMediumSmallInclusive(windowSize),
     isWindowMediumSmall: isWindowMediumSmall(windowSize),
-    isWindowSmallInclusive: isWindowSmallInclusive(windowSize),
+    isWindowSmallInclusive: isWindowSmallInclusive(windowSize), // We are using this one for mobile
     isWindowSmall: isWindowSmall(windowSize),
   };
   useEffect(() => {
@@ -42,6 +42,11 @@ const useBrowserWindow = ({
       window.removeEventListener('resize', _onResize);
     };
   }, []);
+
+  const dependencyArray = useMemo(
+    () => [...resizeListenerUpdateDeps],
+    [resizeListenerUpdateDeps],
+  );
 
   /**
    * Resize listener
@@ -54,7 +59,7 @@ const useBrowserWindow = ({
       // eslint-disable-next-line no-restricted-globals
       onResize && window.removeEventListener('resize', onResize);
     };
-  }, resizeListenerUpdateDeps);
+  }, [onResize, dependencyArray]);
 
   return {
     // window sizes

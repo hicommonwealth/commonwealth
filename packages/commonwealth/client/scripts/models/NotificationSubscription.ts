@@ -67,7 +67,7 @@ class NotificationSubscription {
     Chain?,
     comment?: CommentT<IUniqueId>,
     thread?: ThreadT,
-    snapshotId?: string
+    snapshotId?: string,
   ) {
     this.id = id;
     this.category = category;
@@ -90,7 +90,7 @@ class NotificationSubscription {
       json.Chain,
       json.Comment,
       json.Thread,
-      json.snapshot_id
+      json.snapshot_id,
     );
   }
 }
@@ -140,7 +140,7 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
     Chain,
     modeledComment,
     modeledThread,
-    snapshot_id
+    snapshot_id,
   );
 };
 

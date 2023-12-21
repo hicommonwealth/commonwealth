@@ -63,7 +63,7 @@ export const ERC721Form = ({
 
     const args = {
       address: ethCommunityFormFields.address,
-      chain_id: ethCommunityFormFields.ethChainId,
+      eth_chain_id: ethCommunityFormFields.ethChainId,
       url: ethCommunityFormFields.nodeUrl,
     };
 

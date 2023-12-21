@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useRefreshMembershipQuery } from 'state/api/groups';
+import Permissions from 'utils/Permissions';
 import { isHot } from 'views/pages/discussions/helpers';
 import Account from '../../../../models/Account';
 import AddressInfo from '../../../../models/AddressInfo';
@@ -121,9 +122,18 @@ export const CWContentPage = ({
     address: app?.user?.activeAccount?.address,
   });
 
-  const restrictedTopicIds = (memberships || [])
-    .filter((x) => x.rejectReason)
-    .map((x) => parseInt(`${x.topicId}`));
+  const isTopicGated = !!(memberships || []).find((membership) =>
+    membership.topicIds.includes(thread?.topic?.id),
+  );
+
+  const isActionAllowedInGatedTopic = !!(memberships || []).find(
+    (membership) =>
+      membership.topicIds.includes(thread?.topic?.id) && membership.isAllowed,
+  );
+
+  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
+  const isRestrictedMembership =
+    !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
   const tabSelected = useMemo(() => {
     const tab = Object.fromEntries(urlQueryParams.entries())?.tab;
@@ -190,7 +200,7 @@ export const CWContentPage = ({
     isCommunityMember: !!hasJoinedCommunity,
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
-    isThreadTopicGated: restrictedTopicIds.includes(thread?.topic?.id),
+    isThreadTopicGated: isRestrictedMembership,
   });
 
   const mainBody = (
@@ -280,7 +290,7 @@ export const CWContentPage = ({
           {sidebarComponents?.length >= 2 &&
             tabSelected === 2 &&
             sidebarComponents[1].item}
-          {sidebarComponents?.length === 3 &&
+          {sidebarComponents?.length >= 3 &&
             tabSelected === 3 &&
             sidebarComponents[2].item}
         </div>

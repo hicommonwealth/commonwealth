@@ -8,7 +8,6 @@ import { ServerError } from 'common-common/src/errors';
 import type { Request, Response } from 'express';
 import { Op, QueryTypes } from 'sequelize';
 import type { CommunityContractTemplateInstance } from 'server/models/community_contract_template';
-import { TopicInstance } from 'server/models/topic';
 import type { DB } from '../models';
 import type { CommunityBannerInstance } from '../models/community_banner';
 import type { ContractInstance } from '../models/contract';
@@ -33,7 +32,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
     totalThreads,
     communityBanner,
     contractsWithTemplatesData,
-    topics,
   ] = await (<
     Promise<
       [
@@ -47,7 +45,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
           ccts: Array<CommunityContractTemplateInstance>;
           hasGlobalTemplate: boolean;
         }>,
-        TopicInstance[],
       ]
     >
   >Promise.all([
@@ -196,21 +193,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
         reject(new ServerError('Could not fetch contracts'));
       }
     }),
-    models.Topic.findAll({
-      where: {
-        chain_id: chain.id,
-        token_threshold: {
-          [Op.and]: [
-            {
-              [Op.not]: '0',
-            },
-            {
-              [Op.not]: null,
-            },
-          ],
-        },
-      },
-    }),
   ]));
 
   const numVotingThreads = threadsInVoting.filter(
@@ -218,15 +200,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
   ).length;
 
   const numTotalThreads = parseInt(totalThreads[0].count);
-  const gateStrategies = topics.map((topic) => {
-    return {
-      id: topic.id,
-      type: 'token',
-      data: {
-        threshold: topic.token_threshold,
-      },
-    };
-  });
 
   return res.json({
     status: 'Success',
@@ -243,7 +216,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
           hasGlobalTemplate: c.hasGlobalTemplate,
         };
       }),
-      gateStrategies,
     },
   });
 };

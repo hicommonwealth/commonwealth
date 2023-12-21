@@ -1,9 +1,6 @@
-import type {
-  GetThreadsReq,
-  GetThreadsResp,
-} from 'common-common/src/api/extApiTypes';
 import { query, validationResult } from 'express-validator';
 import Sequelize, { WhereOptions } from 'sequelize';
+import type { GetThreadsReq, GetThreadsResp } from '../../api/extApiTypes';
 import type { DB } from '../../models';
 import { ThreadAttributes } from '../../models/thread';
 import type { TypedRequestQuery, TypedResponse } from '../../types';

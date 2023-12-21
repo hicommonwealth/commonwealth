@@ -1,7 +1,25 @@
 import { Op } from 'sequelize';
 import type { DB } from '../models';
+import type { AddressInstance } from '../models/address';
 
-export async function getActivityFeed(models: DB, id = 0) {
+export type GlobalActivity = Array<{
+  category_id: string;
+  comment_count: string;
+  last_activity: string;
+  notification_data: string; // actually object but stringified
+  reaction_count: string;
+  thread_id: string;
+  view_count: number;
+  commenters: {
+    id: number;
+    Addresses: AddressInstance[];
+  }[];
+}>;
+
+export async function getActivityFeed(
+  models: DB,
+  id = 0,
+): Promise<GlobalActivity> {
   /**
    * Last 50 updated threads
    */

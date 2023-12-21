@@ -24,11 +24,14 @@ const RequirementSubForm = ({
 }: RequirementSubFormType) => {
   const [requirementType, setRequirementType] = useState('');
   const isTokenRequirement = Object.values(TOKENS).includes(requirementType);
+  const is1155Requirement = requirementType === SPECIFICATIONS.ERC_1155;
   const isCosmosRequirement = requirementType === TOKENS.COSMOS_TOKEN;
-  const isERC20orEVMRequirement = [
-    TOKENS.EVM_TOKEN,
-    SPECIFICATIONS.ERC_20,
-  ].includes(requirementType);
+  const helperTextForAmount = {
+    [TOKENS.EVM_TOKEN]: 'Using 18 decimal precision',
+    [TOKENS.COSMOS_TOKEN]: 'Using 6 decimal precision',
+    [SPECIFICATIONS.ERC_20]: 'Using 18 decimal precision',
+    [SPECIFICATIONS.ERC_721]: '',
+  };
 
   useEffect(() => {
     defaultValues?.requirementType?.value &&
@@ -84,13 +87,16 @@ const RequirementSubForm = ({
           className={getClasses<{
             'cols-3'?: boolean;
             'cols-4'?: boolean;
-          }>(
-            {
-              'cols-3': isTokenRequirement,
-              'cols-4': !isTokenRequirement,
-            },
-            `row-2`,
-          )}
+            'cols-5'?: boolean;
+            'row-1': boolean;
+            'row-2': boolean;
+          }>({
+            'cols-3': isTokenRequirement,
+            'cols-4': !isTokenRequirement && !is1155Requirement,
+            'cols-5': !isTokenRequirement && is1155Requirement,
+            'row-1': !isTokenRequirement && is1155Requirement,
+            'row-2': !(!isTokenRequirement && is1155Requirement),
+          })}
         >
           <CWSelectList
             key={defaultValues?.requirementChain?.value}
@@ -165,11 +171,7 @@ const RequirementSubForm = ({
             name="requirementAmount"
             alignLabelToRight
             label="Amount"
-            instructionalMessage={
-              isERC20orEVMRequirement
-                ? 'Integer will be converted to decimal'
-                : ''
-            }
+            instructionalMessage={helperTextForAmount[requirementType]}
             placeholder="Enter an integer"
             {...(defaultValues.requirementAmount && {
               defaultValue: defaultValues.requirementAmount,
@@ -182,6 +184,24 @@ const RequirementSubForm = ({
             customError={errors.requirementAmount}
             fullWidth
           />
+          {is1155Requirement && (
+            <CWTextInput
+              key={defaultValues.requirementTokenId}
+              name="requirementTokenId"
+              label="ID"
+              placeholder="ID"
+              {...(defaultValues.requirementTokenId && {
+                defaultValue: defaultValues.requirementTokenId,
+              })}
+              onInput={(e) => {
+                onChange({
+                  requirementTokenId: (e.target as any).value,
+                });
+              }}
+              customError={errors.requirementTokenId}
+              fullWidth
+            />
+          )}
         </div>
       )}
     </div>

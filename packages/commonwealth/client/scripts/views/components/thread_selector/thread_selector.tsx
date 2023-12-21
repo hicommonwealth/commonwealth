@@ -28,7 +28,7 @@ export const ThreadSelector = ({
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
   const sharedQueryOptions = {
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     searchTerm: debouncedSearchTerm,
     limit: 5,
     orderBy: APIOrderBy.Rank,

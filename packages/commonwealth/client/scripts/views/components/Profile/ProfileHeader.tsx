@@ -1,15 +1,16 @@
+import jdenticon from 'jdenticon';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import jdenticon from 'jdenticon';
 
 import 'components/Profile/ProfileHeader.scss';
 
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { renderQuillDeltaToText } from '../../../../../shared/utils';
 import type NewProfile from '../../../models/NewProfile';
 import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
-import { SocialAccounts } from '../social_accounts';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { QuillRenderer } from '../react_quill_editor/quill_renderer';
+import { SocialAccounts } from '../social_accounts';
 
 type ProfileHeaderProps = {
   profile: NewProfile;
@@ -24,6 +25,14 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
   const { bio, name } = profile;
 
   const isCurrentUser = isLoggedIn && isOwner;
+  const hasBio = () => {
+    try {
+      if (!bio || bio.trim().length === 0) return false;
+      return renderQuillDeltaToText(JSON.parse(decodeURIComponent(bio)));
+    } catch {
+      return true;
+    }
+  };
 
   return (
     <div className="ProfileHeader">
@@ -43,7 +52,7 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
         ) : (
           <img
             src={`data:image/svg+xml;utf8,${encodeURIComponent(
-              jdenticon.toSvg(profile.id, 90)
+              jdenticon.toSvg(profile.id, 90),
             )}`}
           />
         )}
@@ -53,10 +62,12 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
           {name || 'Anonymous user'}
         </CWText>
         <SocialAccounts profile={profile} />
-        {bio && (
+        {hasBio() && (
           <div>
             <CWText type="h4">Bio</CWText>
-            <CWText className="bio">{<QuillRenderer doc={bio} />}</CWText>
+            <CWText className="bio">
+              <QuillRenderer doc={bio} />
+            </CWText>
           </div>
         )}
       </div>

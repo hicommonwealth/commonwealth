@@ -10,7 +10,7 @@ export const handlePollVote = async (
   poll: Poll,
   option: string,
   isSelected: boolean,
-  callback: () => any
+  callback: () => any,
 ) => {
   const { activeAccount } = app.user;
 
@@ -38,7 +38,7 @@ export const handlePollVote = async (
             })
             .catch(() => {
               notifyError(
-                'Error submitting vote. Maybe the poll has already ended?'
+                'Error submitting vote. Maybe the poll has already ended?',
               );
             });
         },

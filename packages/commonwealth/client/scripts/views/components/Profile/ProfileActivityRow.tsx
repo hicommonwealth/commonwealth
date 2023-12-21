@@ -9,8 +9,8 @@ import withRouter, {
   useCommonNavigate,
 } from 'navigation/helpers';
 import app from 'state';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIconButton } from '../component_kit/cw_icon_button';
-import { PopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../component_kit/cw_text';
 import { CWTag } from '../component_kit/new_designs/CWTag';
 import { QuillRenderer } from '../react_quill_editor/quill_renderer';
@@ -23,16 +23,15 @@ type ProfileActivityRowProps = {
 const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
   const navigate = useCommonNavigate();
   const { createdAt, author, title, id, body } = activity;
-  let chain: string;
+  let communityId: string;
   if (activity instanceof Thread) {
-    chain = activity.community_id;
+    communityId = activity.community_id;
   } else {
-    chain = activity.chain;
+    communityId = activity.chain;
   }
-
   const isThread = !!(activity as Thread).kind;
   const comment = activity as CommentWithAssociatedThread;
-  const { iconUrl } = app.config.chains.getById(chain);
+  const { iconUrl } = app.config.chains.getById(communityId);
   const domain = document.location.origin;
   let decodedTitle: string;
 
@@ -74,10 +73,14 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              navigateToCommunity({ navigate, path: `/discussions`, chain });
+              navigateToCommunity({
+                navigate,
+                path: `/discussions`,
+                chain: communityId,
+              });
             }}
           >
-            {chain}
+            {communityId}
           </a>
         </CWText>
         <div className="dot">.</div>
@@ -103,7 +106,7 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
                 navigateToCommunity({
                   navigate,
                   path: `/discussion/${id}`,
-                  chain,
+                  chain: communityId,
                 });
               }}
             >
@@ -117,7 +120,7 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
                 navigateToCommunity({
                   navigate,
                   path: `/discussion/${comment.thread?.id}?comment=${comment.id}`,
-                  chain,
+                  chain: communityId,
                 });
               }}
             >
@@ -141,12 +144,12 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
                 onClick: async () => {
                   if (isThread) {
                     await navigator.clipboard.writeText(
-                      `${domain}/${chain}/discussion/${id}`,
+                      `${domain}/${communityId}/discussion/${id}`,
                     );
                     return;
                   }
                   await navigator.clipboard.writeText(
-                    `${domain}/${chain}/discussion/${comment.thread?.id}?comment=${comment.id}`,
+                    `${domain}/${communityId}/discussion/${comment.thread?.id}?comment=${comment.id}`,
                   );
                 },
               },
@@ -157,13 +160,13 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
                 onClick: async () => {
                   if (isThread) {
                     await window.open(
-                      `https://twitter.com/intent/tweet?text=${domain}/${chain}/discussion/${id}`,
+                      `https://twitter.com/intent/tweet?text=${domain}/${communityId}/discussion/${id}`,
                       '_blank',
                     );
                     return;
                   }
                   await window.open(
-                    `https://twitter.com/intent/tweet?text=${domain}/${chain}/discussion/${comment.thread?.id}
+                    `https://twitter.com/intent/tweet?text=${domain}/${communityId}/discussion/${comment.thread?.id}
                       ?comment=${comment.id}`,
                     '_blank',
                   );

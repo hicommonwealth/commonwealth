@@ -28,6 +28,15 @@ export const requirementSubFormValidationSchema = z.object({
       },
       { message: VALIDATION_MESSAGES.INVALID_INPUT },
     ),
+  requirementTokenId: z
+    .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+    .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
+    .refine(
+      (value) => {
+        return !isNaN(Number(value));
+      },
+      { message: VALIDATION_MESSAGES.INVALID_INPUT },
+    ),
 });
 
 export const groupValidationSchema = z.object({

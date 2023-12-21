@@ -57,6 +57,7 @@ const createMockedGroupsController = () => {
       findAll: async (): Promise<TopicAttributes[]> => {
         return topics;
       },
+      findByPk: async (id: number) => topics.find((t) => t.id === id),
       update: async () => {},
     },
     Group: {
@@ -124,6 +125,7 @@ const createMockedGroupsController = () => {
   const controller = new ServerGroupsController(
     db,
     tokenBalanceCache,
+    tokenBalanceCache,
     banCache,
   );
   return controller;
@@ -151,7 +153,8 @@ describe('ServerGroupsController', () => {
       address,
       topicId: 1,
     });
-    expect(results[0]).to.have.property('topicId');
+    expect(results[0]).to.have.property('groupId');
+    expect(results[0]).to.have.property('topicIds');
     expect(results[0]).to.have.property('allowed');
     expect(results[0]).to.have.property('rejectReason', null);
   });
@@ -191,7 +194,6 @@ describe('ServerGroupsController', () => {
     expect(analytics).to.eql({
       event: 'Create New Group',
       community: chain.id,
-      isCustomDomain: null,
       userId: user.id,
     });
   });
@@ -236,7 +238,6 @@ describe('ServerGroupsController', () => {
     expect(analytics).to.eql({
       event: 'Update Group',
       community: chain.id,
-      isCustomDomain: null,
       userId: user.id,
     });
   });

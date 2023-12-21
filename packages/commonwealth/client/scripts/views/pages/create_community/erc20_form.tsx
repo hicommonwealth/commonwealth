@@ -66,7 +66,7 @@ export const ERC20Form = ({
 
     const args = {
       address: ethChainFormFields.address,
-      chain_id: ethChainFormFields.ethChainId,
+      eth_chain_id: ethChainFormFields.ethChainId,
       url: ethChainFormFields.nodeUrl,
     };
 

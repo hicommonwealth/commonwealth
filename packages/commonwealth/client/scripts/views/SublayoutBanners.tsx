@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 
-import app from 'state';
+import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { isNonEmptyString } from 'helpers/typeGuards';
-import ITokenAdapter from '../models/ITokenAdapter';
+import app from 'state';
 import ChainInfo from '../models/ChainInfo';
 import {
-  Old_CWBanner,
   CWMessageBanner,
+  Old_CWBanner,
 } from './components/component_kit/cw_banner';
 import { TermsBanner } from './components/terms_banner';
 
 type SublayoutBannersProps = {
   banner?: string;
-  chain: ChainInfo;
+  chain: ChainInfo | null;
   terms?: string;
 };
 
@@ -24,7 +24,7 @@ export const SublayoutBanners = ({
   const bannerLocalStorageId = `${app.activeChainId()}-banner`;
 
   const [bannerStatus, setBannerStatus] = useState(
-    localStorage.getItem(bannerLocalStorageId)
+    localStorage.getItem(bannerLocalStorageId),
   );
 
   const handleDismissBanner = () => {
@@ -37,8 +37,11 @@ export const SublayoutBanners = ({
       {banner && bannerStatus !== 'off' && (
         <CWMessageBanner bannerContent={banner} onClose={handleDismissBanner} />
       )}
-      {app.isLoggedIn() &&
-        ITokenAdapter.instanceOf(app.chain) &&
+      {!!chain &&
+        app.isLoggedIn() &&
+        ([ChainNetwork.Aave, ChainNetwork.Compound].includes(chain.network) ||
+          chain.base === ChainBase.CosmosSDK) &&
+        [ChainType.DAO, ChainType.Chain].includes(chain.type as ChainType) &&
         !app.user.activeAccount && (
           <Old_CWBanner
             bannerContent={`Link an address that holds ${chain.default_symbol} to participate in governance.`}
