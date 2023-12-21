@@ -48,7 +48,6 @@ class DashboardActivityNotification {
     updatedAt?: string;
     eventNetwork?: SupportedNetwork;
     chain?: string;
-    iconUrl?: string;
     commenters?: ProfileWithAddress[];
     chainId?: string;
   }) {

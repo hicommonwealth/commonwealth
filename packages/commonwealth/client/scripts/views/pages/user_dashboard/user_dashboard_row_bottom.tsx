@@ -22,6 +22,7 @@ type UserDashboardRowBottomProps = {
   communityId: string;
   commentId?: string;
   commenters: ProfileWithAddress[];
+  totalProfiles?: number;
   showSkeleton?: boolean;
 };
 
@@ -32,6 +33,7 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
     commentId,
     communityId,
     commenters,
+    totalProfiles,
     showSkeleton,
   } = props;
   const forceRerender = useForceRerender();
@@ -82,7 +84,11 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
           </CWText>
         </div>
         <div>
-          <CWAvatarGroup profiles={commenters} communityId={communityId} />
+          <CWAvatarGroup
+            profiles={commenters}
+            communityId={communityId}
+            totalProfiles={commentCount}
+          />
         </div>
       </div>
       <div
