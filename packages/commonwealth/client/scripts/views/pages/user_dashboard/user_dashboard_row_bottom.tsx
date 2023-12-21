@@ -22,7 +22,6 @@ type UserDashboardRowBottomProps = {
   communityId: string;
   commentId?: string;
   commenters: ProfileWithAddress[];
-  totalProfiles?: number;
   showSkeleton?: boolean;
 };
 
@@ -33,7 +32,6 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
     commentId,
     communityId,
     commenters,
-    totalProfiles,
     showSkeleton,
   } = props;
   const forceRerender = useForceRerender();
