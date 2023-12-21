@@ -4,275 +4,17 @@ import React from 'react';
 
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
-import ElevationsShowcase from 'views/pages/ComponentsShowcase/components/Elevations.showcase';
-import TooltipsShowcase from 'views/pages/ComponentsShowcase/components/Tooltips.showcase';
-import ButtonsShowcase from './components/Buttons.showcase';
-import CheckboxShowcase from './components/Checkbox.showcase';
 
+import { componentItems } from './componentsList';
 import './ComponentsShowcase.scss';
 
 const NAVBAR_HEIGHT = 56;
 const BODY_CLASS_NAME = 'page-body';
 
-export const ComponentPageName = {
-  Buttons: 'Buttons',
-  Checkbox: 'Checkbox',
-  Tooltips: 'Tooltips',
-  Elevations: 'Elevations',
-};
+type Item = typeof componentItems[0];
 
-export const ComponentType = {
-  Foundations: 'Foundations',
-  Components: 'Components',
-};
-
-const alphabetically = (a, b) => a.displayName.localeCompare(b.displayName);
-
-const componentItems = groupBy(
-  [
-    {
-      ComponentPage: ButtonsShowcase,
-      displayName: ComponentPageName.Buttons,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: CheckboxShowcase,
-      displayName: ComponentPageName.Checkbox,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: TooltipsShowcase,
-      displayName: ComponentPageName.Tooltips,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: ElevationsShowcase,
-      displayName: ComponentPageName.Elevations,
-      type: ComponentType.Foundations,
-    },
-    {
-      ComponentPage: ButtonsShowcase,
-      displayName: ComponentPageName.Buttons,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: CheckboxShowcase,
-      displayName: ComponentPageName.Checkbox,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: TooltipsShowcase,
-      displayName: ComponentPageName.Tooltips,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: ElevationsShowcase,
-      displayName: ComponentPageName.Elevations,
-      type: ComponentType.Foundations,
-    },
-    {
-      ComponentPage: ButtonsShowcase,
-      displayName: ComponentPageName.Buttons,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: CheckboxShowcase,
-      displayName: ComponentPageName.Checkbox,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: TooltipsShowcase,
-      displayName: ComponentPageName.Tooltips,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: ElevationsShowcase,
-      displayName: ComponentPageName.Elevations,
-      type: ComponentType.Foundations,
-    },
-    {
-      ComponentPage: ButtonsShowcase,
-      displayName: ComponentPageName.Buttons,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: CheckboxShowcase,
-      displayName: ComponentPageName.Checkbox,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: TooltipsShowcase,
-      displayName: ComponentPageName.Tooltips,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: ElevationsShowcase,
-      displayName: ComponentPageName.Elevations,
-      type: ComponentType.Foundations,
-    },
-    {
-      ComponentPage: ButtonsShowcase,
-      displayName: ComponentPageName.Buttons,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: CheckboxShowcase,
-      displayName: ComponentPageName.Checkbox,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: TooltipsShowcase,
-      displayName: ComponentPageName.Tooltips,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: ElevationsShowcase,
-      displayName: ComponentPageName.Elevations,
-      type: ComponentType.Foundations,
-    },
-    {
-      ComponentPage: ButtonsShowcase,
-      displayName: ComponentPageName.Buttons,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: CheckboxShowcase,
-      displayName: ComponentPageName.Checkbox,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: TooltipsShowcase,
-      displayName: ComponentPageName.Tooltips,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: ElevationsShowcase,
-      displayName: ComponentPageName.Elevations,
-      type: ComponentType.Foundations,
-    },
-    {
-      ComponentPage: ButtonsShowcase,
-      displayName: ComponentPageName.Buttons,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: CheckboxShowcase,
-      displayName: ComponentPageName.Checkbox,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: TooltipsShowcase,
-      displayName: ComponentPageName.Tooltips,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: ElevationsShowcase,
-      displayName: ComponentPageName.Elevations,
-      type: ComponentType.Foundations,
-    },
-    {
-      ComponentPage: ButtonsShowcase,
-      displayName: ComponentPageName.Buttons,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: CheckboxShowcase,
-      displayName: ComponentPageName.Checkbox,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: TooltipsShowcase,
-      displayName: ComponentPageName.Tooltips,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: ElevationsShowcase,
-      displayName: ComponentPageName.Elevations,
-      type: ComponentType.Foundations,
-    },
-    {
-      ComponentPage: ButtonsShowcase,
-      displayName: ComponentPageName.Buttons,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: CheckboxShowcase,
-      displayName: ComponentPageName.Checkbox,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: TooltipsShowcase,
-      displayName: ComponentPageName.Tooltips,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: ElevationsShowcase,
-      displayName: ComponentPageName.Elevations,
-      type: ComponentType.Foundations,
-    },
-    {
-      ComponentPage: ButtonsShowcase,
-      displayName: ComponentPageName.Buttons,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: CheckboxShowcase,
-      displayName: ComponentPageName.Checkbox,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: TooltipsShowcase,
-      displayName: ComponentPageName.Tooltips,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: ElevationsShowcase,
-      displayName: ComponentPageName.Elevations,
-      type: ComponentType.Foundations,
-    },
-    {
-      ComponentPage: ButtonsShowcase,
-      displayName: ComponentPageName.Buttons,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: CheckboxShowcase,
-      displayName: ComponentPageName.Checkbox,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: TooltipsShowcase,
-      displayName: ComponentPageName.Tooltips,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: ElevationsShowcase,
-      displayName: ComponentPageName.Elevations,
-      type: ComponentType.Foundations,
-    },
-    {
-      ComponentPage: ButtonsShowcase,
-      displayName: ComponentPageName.Buttons,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: CheckboxShowcase,
-      displayName: ComponentPageName.Checkbox,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: TooltipsShowcase,
-      displayName: ComponentPageName.Tooltips,
-      type: ComponentType.Components,
-    },
-    {
-      ComponentPage: ElevationsShowcase,
-      displayName: ComponentPageName.Elevations,
-      type: ComponentType.Foundations,
-    },
-  ].sort(alphabetically),
-  ({ type }) => type,
-);
+const alphabetically = (a: Item, b: Item) =>
+  a.displayName.localeCompare(b.displayName);
 
 const ComponentsShowcase = () => {
   const handleClick = (itemId: string) => {
@@ -285,27 +27,27 @@ const ComponentsShowcase = () => {
     }
   };
 
+  const sortedComponentItems = componentItems.sort(alphabetically);
+  const groupedComponentItems = groupBy(
+    sortedComponentItems,
+    ({ type }) => type,
+  );
   // Reversed, because first goes "Foundations", then "Components"
-  const componentTypesKeys = Object.keys(componentItems).reverse();
+  const componentTypesKeys = Object.keys(groupedComponentItems).reverse();
 
   return (
     <div className="ComponentsShowcase">
       {/* Sidebar */}
       <div className="page-sidebar">
         {componentTypesKeys.map((key) => (
-          <>
+          <React.Fragment key={key}>
             {/* List Headers */}
-            <CWText
-              key={key}
-              type="caption"
-              fontWeight="medium"
-              className="list-header"
-            >
+            <CWText type="caption" fontWeight="medium" className="list-header">
               {key}
             </CWText>
 
             {/* List Items */}
-            {componentItems[key].map(({ displayName }) => (
+            {groupedComponentItems[key].map(({ displayName }) => (
               <CWText
                 key={displayName}
                 className="list-item"
@@ -316,34 +58,36 @@ const ComponentsShowcase = () => {
             ))}
 
             <CWDivider className="showcase-sidebar-divider" />
-          </>
+          </React.Fragment>
         ))}
       </div>
 
       {/* Body */}
       <div className={BODY_CLASS_NAME}>
         {componentTypesKeys.map((key) => (
-          <>
+          <React.Fragment key={key}>
             <div className="page-header">
               <CWText type="h3">{key}</CWText>
               <CWText>Our collection of reusable {key.toLowerCase()}</CWText>
               <CWDivider className="showcase-body-divider" />
             </div>
 
-            {componentItems[key].map(({ displayName, ComponentPage }) => (
-              <div key={displayName} id={displayName}>
-                <CWText className="component-header" type="h4">
-                  {displayName}
-                </CWText>
+            {groupedComponentItems[key].map(
+              ({ displayName, ComponentPage }) => (
+                <div key={displayName} id={displayName}>
+                  <CWText className="component-header" type="h4">
+                    {displayName}
+                  </CWText>
 
-                <div className={clsx(displayName, 'component-content')}>
-                  <ComponentPage />
+                  <div className={clsx(displayName, 'component-content')}>
+                    <ComponentPage />
+                  </div>
+
+                  <CWDivider className="showcase-body-divider" />
                 </div>
-
-                <CWDivider className="showcase-body-divider" />
-              </div>
-            ))}
-          </>
+              ),
+            )}
+          </React.Fragment>
         ))}
       </div>
     </div>
