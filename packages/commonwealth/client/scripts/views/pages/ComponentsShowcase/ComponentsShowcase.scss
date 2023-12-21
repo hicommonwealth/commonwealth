@@ -8,6 +8,7 @@
     width: 224px;
     padding: 24px;
     overflow-y: auto;
+    box-shadow: 0 0 10px 0 $neutral-200;
 
     @include extraSmall {
       display: none;
@@ -39,6 +40,17 @@
 
     .showcase-body-divider {
       margin-block: 40px;
+    }
+
+    .component-header {
+      margin-bottom: 16px;
+    }
+
+    .component-content {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: start;
     }
   }
 }
