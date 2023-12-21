@@ -18,6 +18,21 @@ export type ActivityRow = {
 
 export type GlobalActivity = Array<ActivityRow>;
 
+export async function getTopThreadIds(models: DB): Promise<number[]> {
+  const ids = await models.Thread.findAll({
+    attributes: ['id'],
+    where: {
+      max_notif_id: {
+        [Op.ne]: null,
+      },
+    },
+    order: [['max_notif_id', 'DESC']],
+    limit: 50,
+  });
+
+  return ids.map((t) => t.id);
+}
+
 export async function getActivityFeed(
   models: DB,
   id = 0,

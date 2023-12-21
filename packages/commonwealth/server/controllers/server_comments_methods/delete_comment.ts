@@ -3,6 +3,7 @@ import { AppError } from '../../../../common-common/src/errors';
 import { AddressInstance } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
 import { UserInstance } from '../../models/user';
+import { getTopThreadIds } from '../../util/activityQuery';
 import { findOneRole } from '../../util/roles';
 import { ServerCommentsController } from '../server_comments_controller';
 
@@ -97,4 +98,13 @@ export async function __deleteComment(
 
   // actually delete
   await comment.destroy();
+
+  // use callbacks so route returns and this completes in the background
+  if (this.globalActivityCache) {
+    getTopThreadIds(this.models).then((topThreadIds) => {
+      if (topThreadIds.includes(parseInt(comment.thread_id, 10))) {
+        this.globalActivityCache.refreshGlobalActivity();
+      }
+    });
+  }
 }
