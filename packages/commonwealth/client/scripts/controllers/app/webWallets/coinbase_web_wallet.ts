@@ -13,8 +13,8 @@ import { hexToNumber } from 'web3-utils';
 
 import type { SessionPayload } from '@canvas-js/interfaces';
 
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
 import { createSiweMessage } from 'adapters/chain/ethereum/keys';
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
 import app from 'state';
 

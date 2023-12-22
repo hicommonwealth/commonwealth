@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import React, { useEffect, useState } from 'react';
 
-import { ChainBase, ChainType } from 'common-common/src/types';
+import { ChainBase, ChainType } from '@hicommonwealth/core';
 import { notifyError } from 'controllers/app/notifications';
 import { initAppState } from 'state';
 

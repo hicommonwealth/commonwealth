@@ -2,7 +2,7 @@ import {
   ChainBase,
   ChainCategoryType,
   ChainNetwork,
-} from 'common-common/src/types';
+} from '@hicommonwealth/core';
 import numeral from 'numeral';
 import 'pages/communities.scss';
 import React from 'react';

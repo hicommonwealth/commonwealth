@@ -1,21 +1,21 @@
-import models from '../../../server/database';
 import {
   BalanceType,
   ChainBase,
   ChainNetwork,
   ChainType,
-} from 'common-common/src/types';
+} from '@hicommonwealth/core';
+import models from '../../../server/database';
+import { hashAbi } from '../../../server/util/abiValidation';
+import {
+  rawAaveAbi,
+  rawDydxAbi,
+} from '../../../server/workers/evmChainEvents/hardCodedAbis';
 import {
   aavePropCreatedSignature,
   aavePropQueuedSignature,
   localRpc,
   sdk,
 } from '../../devnet/evm/evmChainEvents/util';
-import {
-  rawAaveAbi,
-  rawDydxAbi,
-} from '../../../server/workers/evmChainEvents/hardCodedAbis';
-import { hashAbi } from '../../../server/util/abiValidation';
 
 export const testChainId = 'aave-test';
 export const testChainIdV2 = 'dydx-test';
@@ -32,7 +32,7 @@ export async function getTestChainNode(version?: 'v1' | 'v2') {
     name = 'Test Node 2';
   }
 
-  const [chainNode, created] = await models.ChainNode.findOrCreate({
+  const [chainNode] = await models.ChainNode.findOrCreate({
     where: {
       url: rpc,
       balance_type: BalanceType.Ethereum,
@@ -123,10 +123,11 @@ export async function getTestContract(version?: 'v1' | 'v2') {
     address = '0x7E9B1672616FF6D6629Ef2879419aaE79A9018D2';
   }
 
-  const [contract, created] = await models.Contract.findOrCreate({
+  const [contract] = await models.Contract.findOrCreate({
     where: {
       address,
       chain_node_id: chainNode.id,
+      type: 'erc20',
     },
   });
 
@@ -137,20 +138,19 @@ export async function getTestCommunityContract(version?: 'v1' | 'v2') {
   const contract = await getTestContract(version);
   const chain = await getTestChain(version);
 
-  const [communityContract, created] =
-    await models.CommunityContract.findOrCreate({
-      where: {
-        chain_id: chain.id,
-        contract_id: contract.id,
-      },
-    });
+  const [communityContract] = await models.CommunityContract.findOrCreate({
+    where: {
+      chain_id: chain.id,
+      contract_id: contract.id,
+    },
+  });
 
   communityContract.Contract = contract;
   return communityContract;
 }
 
 export async function getTestUser() {
-  const [user, created] = await models.User.findOrCreate({
+  const [user] = await models.User.findOrCreate({
     where: {
       email: 'test@gmail.com',
     },
@@ -193,7 +193,7 @@ export async function getTestSignatures(version?: 'v1' | 'v2') {
   }
 
   // signatures are the same for v1 and v2
-  const [es1, es1Created] = await models.EvmEventSource.findOrCreate({
+  const [es1] = await models.EvmEventSource.findOrCreate({
     where: {
       chain_node_id: chainNode.id,
       contract_address: contractAddress,
@@ -202,7 +202,7 @@ export async function getTestSignatures(version?: 'v1' | 'v2') {
     },
   });
 
-  const [es2, es2Created] = await models.EvmEventSource.findOrCreate({
+  const [es2] = await models.EvmEventSource.findOrCreate({
     where: {
       chain_node_id: chainNode.id,
       contract_address: contractAddress,

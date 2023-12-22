@@ -1,4 +1,5 @@
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
+/* eslint-disable react/no-multi-comp */
+import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
 import { featureFlags } from 'helpers/feature-flags';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
@@ -128,8 +129,12 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
 
   const getUniversalCreateItems = (): PopoverMenuItem[] => [
     {
-      label: 'New Community',
-      iconLeft: 'people',
+      label: featureFlags.newCreateCommunity
+        ? 'Create community'
+        : 'New Community',
+      isButton: featureFlags.newCreateCommunity,
+      iconLeft: featureFlags.newCreateCommunity ? 'peopleNew' : 'people',
+      ...(featureFlags.newCreateCommunity && { iconLeftWeight: 'bold' }),
       onClick: (e) => {
         e?.preventDefault();
         resetSidebarState();

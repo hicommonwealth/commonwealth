@@ -5,8 +5,8 @@ import { isAddress } from 'web3-utils';
 
 import 'pages/create_community.scss';
 
+import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/core';
 import { IERC721Metadata__factory } from 'common-common/src/eth/types';
-import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { useCommonNavigate } from 'navigation/helpers';
 import app, { initAppState } from 'state';

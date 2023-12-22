@@ -1,12 +1,13 @@
-import { DB } from '../models';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { NotificationCategories } from '@hicommonwealth/core';
 import { NextFunction, Request, Response } from 'express';
-import { NotificationCategories } from 'common-common/src/types';
+import { DB } from '../models';
 
 const viewChainActivity = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const ceNotifs = await models.Notification.findAll({
     where: {

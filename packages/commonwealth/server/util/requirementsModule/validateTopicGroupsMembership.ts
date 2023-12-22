@@ -6,10 +6,10 @@ import { FEATURE_FLAG_GROUP_CHECK_ENABLED } from '../../config';
 import { DB } from '../../models';
 import { AddressAttributes } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
+import { MembershipRejectReason } from '../../models/membership';
 import { TokenBalanceCache as TokenBalanceCacheV2 } from '../tokenBalanceCache/tokenBalanceCache';
 import validateTopicThreshold from '../validateTopicThreshold';
-import { makeGetBalancesOptions } from './makeGetBalancesOptions';
-import validateGroupMembership from './validateGroupMembership';
+import { refreshMembershipsForAddress } from './refreshMembershipsForAddress';
 
 export const Errors = {
   InsufficientTokenBalance: 'Insufficient token balance',
@@ -57,31 +57,21 @@ export async function validateTopicGroupsMembership(
 
     // check membership for all groups of topic
     let numValidGroups = 0;
-    const allErrorMessages: string[] = [];
+    const allErrorMessages: MembershipRejectReason[] = [];
 
-    const getBalancesOptions = makeGetBalancesOptions(groups, [address]);
-    const balances = await Promise.all(
-      getBalancesOptions.map(async (options) => {
-        return {
-          options,
-          balances: await tokenBalanceCacheV2.getBalances(options),
-        };
-      }),
+    const memberships = await refreshMembershipsForAddress(
+      models,
+      tokenBalanceCacheV2,
+      address,
+      groups,
+      false, // use cached balances
     );
 
-    for (const { metadata, requirements } of groups) {
-      const { isValid, messages } = await validateGroupMembership(
-        address.address,
-        requirements,
-        balances,
-        metadata.required_requirements || 0,
-      );
-      if (isValid) {
-        numValidGroups++;
+    for (const membership of memberships) {
+      if (membership.reject_reason) {
+        allErrorMessages.push(membership.reject_reason);
       } else {
-        for (const message of messages) {
-          allErrorMessages.push(JSON.stringify(message));
-        }
+        numValidGroups++;
       }
     }
 

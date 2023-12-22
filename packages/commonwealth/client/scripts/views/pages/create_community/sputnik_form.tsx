@@ -6,7 +6,7 @@ import $ from 'jquery';
 
 import 'pages/create_community.scss';
 
-import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/core';
 import { notifyError } from 'controllers/app/notifications';
 import app from 'state';
 import { InputRow, ToggleRow } from 'views/components/metadata_rows';

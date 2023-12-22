@@ -1,5 +1,7 @@
+import { Log } from '@ethersproject/providers';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import models from '../../../../server/database';
 import {
   getEvents,
   getLogs,
@@ -11,6 +13,7 @@ import {
   EvmSource,
   RawEvmEvent,
 } from '../../../../server/workers/evmChainEvents/types';
+import { AbiType } from '../../../../shared/types';
 import {
   aavePropCreatedSignature,
   aavePropQueuedSignature,
@@ -18,9 +21,6 @@ import {
   localRpc,
   sdk,
 } from './util';
-import models from '../../../../server/database';
-import { AbiType } from '../../../../shared/types';
-import { Log } from '@ethersproject/providers';
 
 chai.use(chaiAsPromised);
 
@@ -80,7 +80,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
         .to.eventually.be.rejected.and.be.an.instanceof(Error)
         .and.have.property(
           'message',
-          'could not detect network (event="noNetwork", code=NETWORK_ERROR, version=providers/5.7.2)'
+          'could not detect network (event="noNetwork", code=NETWORK_ERROR, version=providers/5.7.2)',
         );
     });
 
@@ -154,7 +154,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
       const { logs } = await getLogs(
         evmSource,
         null,
-        currentBlockNum - propCreatedResult.block + 5
+        currentBlockNum - propCreatedResult.block + 5,
       );
       expect(logs.length).to.equal(1);
       propCreatedLog = logs[0];
@@ -173,7 +173,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
 
       propQueuedResult = await sdk.queueProposal(
         propCreatedResult.proposalId,
-        'aave'
+        'aave',
       );
 
       // fetch logs
@@ -205,11 +205,11 @@ describe('EVM Chain Events Log Processing Tests', () => {
     before(() => {
       expect(
         propCreatedLog,
-        'Must have fetched the proposal created log to run this test'
+        'Must have fetched the proposal created log to run this test',
       ).to.not.be.undefined;
       expect(
         propQueuedLog,
-        'Must have fetched the proposal queued log to run this test'
+        'Must have fetched the proposal queued log to run this test',
       ).to.not.be.undefined;
     });
 
@@ -312,11 +312,11 @@ describe('EVM Chain Events Log Processing Tests', () => {
 
       expect(events.length).to.equal(1);
       expect(events[0].contractAddress).to.equal(
-        sdk.contractAddrs.aave.governance
+        sdk.contractAddrs.aave.governance,
       );
       expect(events[0].kind).to.equal('proposal-created');
       expect(events[0].blockNumber).to.equal(
-        parseInt(propCreatedLog.blockNumber.toString())
+        parseInt(propCreatedLog.blockNumber.toString()),
       );
       expect(events[0].args).to.exist;
     });
@@ -345,11 +345,11 @@ describe('EVM Chain Events Log Processing Tests', () => {
       ]);
       expect(events.length).to.equal(1);
       expect(events[0].contractAddress).to.equal(
-        sdk.contractAddrs.aave.governance
+        sdk.contractAddrs.aave.governance,
       );
       expect(events[0].kind).to.equal('proposal-queued');
       expect(events[0].blockNumber).to.equal(
-        parseInt(propQueuedLog.blockNumber.toString(), 16)
+        parseInt(propQueuedLog.blockNumber.toString(), 16),
       );
       expect(events[0].args).to.exist;
     });
@@ -362,7 +362,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
       expectAbi();
       expect(
         propCreatedResult,
-        'Must have created a proposal to run these test'
+        'Must have created a proposal to run these test',
       ).to.not.be.undefined;
       expect(propQueuedResult, 'Must have queued a proposal to run these test')
         .to.not.be.undefined;
@@ -392,31 +392,31 @@ describe('EVM Chain Events Log Processing Tests', () => {
       const { events } = await getEvents(
         evmSource,
         null,
-        currentBlockNum - propCreatedResult.block + 5
+        currentBlockNum - propCreatedResult.block + 5,
       );
       expect(events.length).to.equal(2);
 
       const propCreatedEvent = events.find(
-        (e) => e.kind === 'proposal-created'
+        (e) => e.kind === 'proposal-created',
       );
       expect(propCreatedEvent).to.exist;
       expect(propCreatedEvent.contractAddress).to.equal(
-        sdk.contractAddrs.aave.governance
+        sdk.contractAddrs.aave.governance,
       );
       expect(propCreatedEvent.kind).to.equal('proposal-created');
       expect(propCreatedEvent.blockNumber).to.equal(
-        parseInt(propCreatedLog.blockNumber.toString())
+        parseInt(propCreatedLog.blockNumber.toString()),
       );
       expect(propCreatedEvent.args).to.exist;
 
       const propQueuedEvent = events.find((e) => e.kind === 'proposal-queued');
       expect(propQueuedEvent).to.exist;
       expect(propQueuedEvent.contractAddress).to.equal(
-        sdk.contractAddrs.aave.governance
+        sdk.contractAddrs.aave.governance,
       );
       expect(propQueuedEvent.kind).to.equal('proposal-queued');
       expect(propQueuedEvent.blockNumber).to.equal(
-        parseInt(propQueuedLog.blockNumber.toString())
+        parseInt(propQueuedLog.blockNumber.toString()),
       );
       expect(propQueuedEvent.args).to.exist;
     });
@@ -424,19 +424,4 @@ describe('EVM Chain Events Log Processing Tests', () => {
 
   // this cleans up the proposal cycle by executing the proposal
   // and advancing the chain 501 blocks past the max EVM CE range
-  after(async () => {
-    expect(propCreatedResult, 'Must have created a proposal to run these test')
-      .to.not.be.undefined;
-    expect(propQueuedResult, 'Must have queued a proposal to run these test').to
-      .not.be.undefined;
-    const { blocks } = getEvmSecondsAndBlocks(3);
-    await sdk.safeAdvanceTime(blocks + propQueuedResult.block);
-    const result = await sdk.executeProposal(
-      propCreatedResult.proposalId,
-      'aave'
-    );
-    expect(result).to.exist;
-    expect(result.block).to.exist;
-    await sdk.safeAdvanceTime(result.block + 501);
-  });
 });

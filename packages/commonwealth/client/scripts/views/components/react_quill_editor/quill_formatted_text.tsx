@@ -1,16 +1,16 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
-import 'components/quill/quill_formatted_text.scss';
+import 'components/react_quill/quill_formatted_text.scss';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { getClasses } from '../component_kit/helpers';
 
-import { renderQuillDelta } from './render_quill_delta';
 import { useCommonNavigate } from 'navigation/helpers';
 import { DeltaStatic } from 'quill';
+import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 import { renderTruncatedHighlights } from './highlighter';
 import { QuillRendererProps } from './quill_renderer';
+import { renderQuillDelta } from './render_quill_delta';
 import { countLinesQuill, getTextFromDelta } from './utils';
-import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 
 type QuillFormattedTextProps = Omit<QuillRendererProps, 'doc'> & {
   doc: DeltaStatic;
@@ -64,7 +64,7 @@ export const QuillFormattedText = ({
         hideFormatting,
         false,
         openLinksInNewTab,
-        navigate
+        navigate,
       );
     }
 
@@ -75,7 +75,7 @@ export const QuillFormattedText = ({
      * @returns {child is React.ReactElement<TextWithHighlightsProps>} - True if the element is a TextWithHighlights element, false otherwise.
      */
     const isTextWithHighlights = (
-      child: React.ReactElement
+      child: React.ReactElement,
     ): child is React.ReactElement<TextWithHighlightsProps> => {
       return (
         React.isValidElement(child) &&
@@ -86,7 +86,7 @@ export const QuillFormattedText = ({
 
     // Function to process individual elements
     const processElements = (
-      elements: TextWithHighlightsArray | Array<React.ReactElement<LinkProps>>
+      elements: TextWithHighlightsArray | Array<React.ReactElement<LinkProps>>,
     ) =>
       elements.map((el, i: number) => {
         if (el.type === 'a') {
@@ -126,12 +126,12 @@ export const QuillFormattedText = ({
         if (
           Array.isArray(child.props.children) &&
           child.props.children.every(
-            (el) => React.isValidElement(el) && typeof el.type !== 'string'
+            (el) => React.isValidElement(el) && typeof el.type !== 'string',
           )
         ) {
           // Handle a group of elements (e.g., a line of text)
           const processedChildren = processElements(
-            child.props.children as TextWithHighlightsArray
+            child.props.children as TextWithHighlightsArray,
           );
           return React.cloneElement(child, null, processedChildren);
         }
@@ -149,7 +149,7 @@ export const QuillFormattedText = ({
       <div
         className={getClasses<{ collapsed?: boolean }>(
           { collapsed: isTruncated },
-          'MarkdownFormattedText'
+          'MarkdownFormattedText',
         )}
       >
         {finalDoc}

@@ -4,8 +4,8 @@ import { isAddress } from 'web3-utils';
 
 import 'pages/create_community.scss';
 
+import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/core';
 import { IAaveGovernanceV2__factory } from 'common-common/src/eth/types';
-import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { notifyError } from 'controllers/app/notifications';
