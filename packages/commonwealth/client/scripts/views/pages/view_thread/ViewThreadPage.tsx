@@ -14,7 +14,9 @@ import { getProposalUrlPath } from 'identifiers';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/view_thread/index.scss';
-import React, { useEffect, useState } from 'react';
+import React, { ComponentProps, useEffect, useState } from 'react';
+import Drawer from 'react-modern-drawer';
+import 'react-modern-drawer/dist/index.css';
 import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
@@ -80,10 +82,56 @@ type ViewThreadPageProps = {
   identifier: string;
 };
 
+type CWDrawerProps = Omit<ComponentProps<typeof Drawer>, 'direction'> & {
+  direction?: 'left' | 'right' | 'top' | 'bottom';
+};
+
+const CWDrawer = ({
+  direction,
+  duration,
+  size,
+  open,
+  onClose,
+  children,
+}: CWDrawerProps) => {
+  const { isWindowExtraSmall } = useBrowserWindow({});
+  const [fullscreen, setFullscreen] = useState(false);
+
+  const toggleDrawerFullscreen = () => {
+    setFullscreen((prevState) => !prevState);
+  };
+
+  return (
+    <Drawer
+      duration={duration}
+      size={isWindowExtraSmall || fullscreen ? '100vw' : size || '35%'}
+      open={open}
+      onClose={onClose}
+      direction={direction || 'right'}
+    >
+      <div>
+        <CWIcon iconName="caretDoubleRight" onClick={onClose} />
+        {!isWindowExtraSmall && (
+          <CWIcon
+            iconName={fullscreen ? 'arrowsIn' : 'arrowsOutSimple'}
+            onClick={toggleDrawerFullscreen}
+          />
+        )}
+      </div>
+      {children}
+    </Drawer>
+  );
+};
+
 const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const threadId = identifier.split('-')[0];
 
   const navigate = useCommonNavigate();
+
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const toggleDrawer = () => {
+    setIsDrawerOpen((prevState) => !prevState);
+  };
 
   const { isLoggedIn } = useUserLoggedIn();
   const [isEditingBody, setIsEditingBody] = useState(false);
@@ -392,6 +440,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   return (
     // TODO: the editing experience can be improved (we can remove a stale code and make it smooth) - create a ticket
     <>
+      <button onClick={toggleDrawer}>Show</button>
+      <CWDrawer open={isDrawerOpen} onClose={toggleDrawer}>
+        Content
+      </CWDrawer>
+
       <CWContentPage
         showTabs={isCollapsedSize && tabsShouldBePresent}
         contentBodyLabel="Thread"
