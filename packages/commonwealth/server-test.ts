@@ -34,10 +34,13 @@ import {
   lookupKeyDurationInReq,
 } from '../common-common/src/cacheKeyUtils';
 
-import { factory, formatFilename } from '@hicommonwealth/core';
+import {
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import { RedisCache } from 'common-common/src/redisCache';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 require('express-async-errors');
 

@@ -1,4 +1,7 @@
-import { factory, formatFilename } from '@hicommonwealth/core';
+import {
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import {
   RabbitMQController,
   getRabbitMQConfig,
@@ -23,7 +26,7 @@ import {
 import v8 from 'v8';
 import { DISCORD_TOKEN, RABBITMQ_URI } from '../utils/config';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 let isServiceHealthy = false;
 

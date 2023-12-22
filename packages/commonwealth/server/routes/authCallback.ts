@@ -1,4 +1,7 @@
-import { factory, formatFilename } from '@hicommonwealth/core';
+import {
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { DISCORD_BOT_SUCCESS_URL } from '../config';
 import type { DB } from '../models';
@@ -6,7 +9,7 @@ import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 import { decryptWithJWE, encryptWithJWE } from '../util/jwe';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   // TODO: write unit tests

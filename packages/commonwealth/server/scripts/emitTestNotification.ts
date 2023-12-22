@@ -1,8 +1,4 @@
-import {
-  NotificationCategories,
-  factory,
-  formatFilename,
-} from '@hicommonwealth/core';
+import { NotificationCategories, formatFilename } from '@hicommonwealth/core';
 import Sequelize, { Transaction } from 'sequelize';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
@@ -11,7 +7,7 @@ import { NotificationInstance } from '../models/notification';
 import { SubscriptionInstance } from '../models/subscription';
 import emitNotifications from '../util/emitNotifications';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 enum SupportedNotificationChains {
   dydx = 'dydx',

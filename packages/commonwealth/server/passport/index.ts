@@ -1,4 +1,4 @@
-import { StatsDController } from '@hicommonwealth/core';
+import { StatsDController } from '@hicommonwealth/core/build/platform';
 import passport from 'passport';
 import passportJWT from 'passport-jwt';
 import { JWT_SECRET } from '../config';

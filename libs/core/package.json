@@ -3,7 +3,7 @@
   "private": "true",
   "version": "0.1.0",
   "description": "Core Model",
-  "main": "build/index",
+  "main": "build/types",
   "scripts": {
     "build": "rm -rf build && npx tsc",
     "test": "NODE_ENV=test ts-mocha '__tests__/**/*.spec.ts'"
@@ -12,7 +12,7 @@
     "build"
   ],
   "dependencies": {
-    "hot-shots": "^9.3.0",
+    "hot-shots": "^10.0.0",
     "typescript-logging": "^0.6.4",
     "zod": "^3.22.4"
   }

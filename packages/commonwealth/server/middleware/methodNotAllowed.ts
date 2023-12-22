@@ -1,4 +1,4 @@
-import { StatsDController } from '@hicommonwealth/core';
+import { StatsDController } from '@hicommonwealth/core/build/platform';
 import { HttpMethod } from 'aws-sdk/clients/appmesh';
 import {
   NextFunction,

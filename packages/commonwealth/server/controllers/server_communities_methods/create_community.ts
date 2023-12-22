@@ -7,22 +7,20 @@ import {
   DefaultPage,
   NotificationCategories,
 } from '@hicommonwealth/core';
+import { CreateCommunity } from '@hicommonwealth/core/build/community';
 import type { Cluster } from '@solana/web3.js';
 import * as solw3 from '@solana/web3.js';
+import axios from 'axios';
 import BN from 'bn.js';
 import { AppError } from 'common-common/src/errors';
 import { Op } from 'sequelize';
 import Web3 from 'web3';
 import { bech32ToHex, urlHasValidHTTPPrefix } from '../../../shared/utils';
-
 import { COSMOS_REGISTRY_API } from '../../config';
 import type { AddressInstance } from '../../models/address';
 import type { ChainNodeAttributes } from '../../models/chain_node';
 import type { CommunityAttributes } from '../../models/community';
 import type { RoleAttributes } from '../../models/role';
-
-import { CreateCommunity } from '@hicommonwealth/core';
-import axios from 'axios';
 import { UserInstance } from '../../models/user';
 import { RoleInstanceWithPermission } from '../../util/roles';
 import testSubstrateSpec from '../../util/testSubstrateSpec';

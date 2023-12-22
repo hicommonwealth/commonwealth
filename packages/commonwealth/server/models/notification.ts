@@ -1,8 +1,8 @@
 import {
   StatsDController,
-  factory,
   formatFilename,
-} from '@hicommonwealth/core';
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type {
@@ -10,7 +10,7 @@ import type {
   NotificationsReadInstance,
 } from './notifications_read';
 import type { ModelInstance, ModelStatic } from './types';
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 export type NotificationAttributes = {
   id: number;

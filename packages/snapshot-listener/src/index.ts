@@ -1,9 +1,5 @@
 import type { ISnapshotNotification } from '@hicommonwealth/core';
-import {
-  StatsDController,
-  factory,
-  formatFilename,
-} from '@hicommonwealth/core';
+import { StatsDController, formatFilename } from '@hicommonwealth/core';
 import {
   RabbitMQController,
   getRabbitMQConfig,
@@ -35,7 +31,7 @@ startHealthCheckLoop({
   },
 });
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 log.info(
   `Node Option max-old-space-size set to: ${JSON.stringify(
@@ -99,7 +95,7 @@ registerRoute(app, 'post', '/snapshot', async (req: Request, res: Response) => {
 app.use(methodNotAllowedMiddleware());
 
 app.listen(port, async () => {
-  const log = factory.getLogger(formatFilename(__filename));
+  const log = loggerFactory.getLogger(formatFilename(__filename));
   log.info(`⚡️[server]: Server is running at https://localhost:${port}`);
 
   try {

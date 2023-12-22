@@ -3,13 +3,16 @@ import type { Express } from 'express-serve-static-core';
 import http from 'http';
 import type Rollbar from 'rollbar';
 
-import { factory, formatFilename } from '@hicommonwealth/core';
+import {
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import { cacheDecorator } from 'common-common/src/cacheDecorator';
 import { RedisCache } from 'common-common/src/redisCache';
 import { PORT } from '../config';
 import type { DB } from '../models';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 const setupServer = (
   app: Express,

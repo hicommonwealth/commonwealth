@@ -1,4 +1,5 @@
-import { NotificationCategories, StatsDController } from '@hicommonwealth/core';
+import { NotificationCategories } from '@hicommonwealth/core';
+import { StatsDController } from '@hicommonwealth/core/build/platform';
 import type { Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';

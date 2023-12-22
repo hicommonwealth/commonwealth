@@ -1,10 +1,10 @@
 import { fromBech32, toBech32 } from '@cosmjs/encoding';
+import { RedisNamespaces } from '@hicommonwealth/core';
 import {
-  RedisNamespaces,
   StatsDController,
-  factory,
   formatFilename,
-} from '@hicommonwealth/core';
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import { RedisCache } from 'common-common/src/redisCache';
 import Web3 from 'web3';
 import { DB } from '../../models';
@@ -23,7 +23,7 @@ import {
   GetEvmBalancesOptions,
 } from './types';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 export class TokenBalanceCache {
   constructor(

@@ -1,9 +1,5 @@
 import { Log } from '@ethersproject/providers';
-import {
-  StatsDController,
-  factory,
-  formatFilename,
-} from '@hicommonwealth/core';
+import { StatsDController, formatFilename } from '@hicommonwealth/core';
 import { ethers } from 'ethers';
 import { rollbar } from '../../util/rollbar';
 import {
@@ -13,7 +9,7 @@ import {
   RawEvmEvent,
 } from './types';
 
-const logger = factory.getLogger(formatFilename(__filename));
+const logger = loggerFactory.getLogger(formatFilename(__filename));
 
 /**
  * Converts a string or integer number into a hexadecimal string that adheres to the following guidelines

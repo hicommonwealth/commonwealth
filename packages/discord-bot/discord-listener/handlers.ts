@@ -1,7 +1,6 @@
 import {
   DiscordAction,
   IDiscordMessage,
-  factory,
   formatFilename,
 } from '@hicommonwealth/core';
 import { RabbitMQController } from 'common-common/src/rabbitmq';
@@ -11,7 +10,7 @@ import { Client, Message, ThreadChannel } from 'discord.js';
 import { rollbar } from '../utils/rollbar';
 import { getForumLinkedTopic } from '../utils/util';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 export async function handleMessage(
   controller: RabbitMQController,

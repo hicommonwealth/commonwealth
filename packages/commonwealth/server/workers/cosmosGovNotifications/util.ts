@@ -2,7 +2,6 @@ import {
   ChainBase,
   NotificationCategories,
   SupportedNetwork,
-  factory,
   formatFilename,
 } from '@hicommonwealth/core';
 import { fromTimestamp } from 'common-common/src/cosmos-ts/src/codegen/helpers';
@@ -12,7 +11,7 @@ import { DB } from '../../models';
 import emitNotifications from '../../util/emitNotifications';
 import { AllCosmosProposals } from './proposalFetching/types';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 export async function fetchCosmosNotifChains(models: DB) {
   const chainIds = await models.Subscription.findAll({

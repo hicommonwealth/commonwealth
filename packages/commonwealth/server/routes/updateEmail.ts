@@ -1,4 +1,8 @@
-import { WalletId, factory, formatFilename } from '@hicommonwealth/core';
+import { WalletId } from '@hicommonwealth/core';
+import {
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import sgMail from '@sendgrid/mail';
 import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
@@ -8,7 +12,7 @@ import { DynamicTemplate } from '../../shared/types';
 import { LOGIN_RATE_LIMIT_MINS, SENDGRID_API_KEY, SERVER_URL } from '../config';
 import type { DB } from '../models';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 sgMail.setApiKey(SENDGRID_API_KEY);
 

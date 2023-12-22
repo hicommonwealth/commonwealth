@@ -1,10 +1,10 @@
 import {
   StatsDController,
-  factory,
   formatFilename,
-} from '@hicommonwealth/core';
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 const PING_INTERVAL = 1_000 * 20;
 

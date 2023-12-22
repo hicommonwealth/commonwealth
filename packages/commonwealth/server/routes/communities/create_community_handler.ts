@@ -1,4 +1,4 @@
-import { CreateCommunitySchema } from '@hicommonwealth/core';
+import { CreateCommunitySchema } from '@hicommonwealth/core/build/community';
 import { AppError } from 'common-common/src/errors';
 import { MixpanelCommunityCreationEvent } from '../../../shared/analytics/types';
 import {

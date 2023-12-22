@@ -1,4 +1,7 @@
-import { factory, formatFilename } from '@hicommonwealth/core';
+import {
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import { CommunityInstance } from '../../../models/community';
 
 import { AllCosmosProposals } from './types';
@@ -16,7 +19,7 @@ import {
   fetchUpToLatestCosmosProposalV1,
 } from './v1ProposalFetching';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 /**
  * Fetches all proposals from the given proposal ids to the latest proposal for each chain. Works for both v1 and

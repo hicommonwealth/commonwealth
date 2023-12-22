@@ -1,10 +1,13 @@
 import type { RegisteredTypes } from '@polkadot/types/types';
 import { AppError, ServerError } from 'common-common/src/errors';
 
-import { factory, formatFilename } from '@hicommonwealth/core';
+import {
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import { constructSubstrateUrl } from '../../shared/substrate';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 const testSubstrateSpec = async (specString: string, nodeUrl: string) => {
   // test out spec

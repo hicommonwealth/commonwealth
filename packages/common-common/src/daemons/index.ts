@@ -1,5 +1,8 @@
-import { factory, formatFilename } from '@hicommonwealth/core';
-const log = factory.getLogger(formatFilename(__filename));
+import {
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 type DaemonTask = () => void;
 export class Daemons {

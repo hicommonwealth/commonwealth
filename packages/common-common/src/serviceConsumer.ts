@@ -1,4 +1,4 @@
-import { addPrefix, factory, formatFilename } from '@hicommonwealth/core';
+import { addPrefix, formatFilename } from '@hicommonwealth/core/build/platform';
 import crypto from 'crypto';
 import type Rollbar from 'rollbar';
 import type { Logger } from 'typescript-logging';
@@ -39,7 +39,7 @@ export class ServiceConsumer {
     this.subscriptions = _subscriptions;
 
     // setup logger
-    this.log = factory.getLogger(
+    this.log = loggerFactory.getLogger(
       addPrefix(formatFilename(__filename), [this.serviceName, this.serviceId]),
     );
 

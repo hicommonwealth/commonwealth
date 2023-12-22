@@ -1,4 +1,7 @@
-import { factory, formatFilename } from '@hicommonwealth/core';
+import {
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import type { Express } from 'express';
 import express from 'express';
 import useragent from 'express-useragent';
@@ -195,7 +198,7 @@ export type ServerControllers = {
   topics: ServerTopicsController;
 };
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 function setupRouter(
   endpoint: string,

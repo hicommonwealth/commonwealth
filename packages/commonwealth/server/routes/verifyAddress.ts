@@ -1,15 +1,16 @@
-import { Op } from 'sequelize';
-
 import {
   ChainBase,
   NotificationCategories,
   WalletId,
   WalletSsoSource,
-  factory,
-  formatFilename,
 } from '@hicommonwealth/core';
+import {
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
+import { Op } from 'sequelize';
 
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { DynamicTemplate } from '../../shared/types';
@@ -22,7 +23,7 @@ import verifySessionSignature from '../util/verifySessionSignature';
 
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');

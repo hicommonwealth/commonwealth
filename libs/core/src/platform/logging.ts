@@ -28,7 +28,7 @@ export const addPrefix = (filename: string, prefixes?: string[]) => {
   return finalPrefix;
 };
 
-export const factory = LFService.createNamedLoggerFactory(
+export const loggerFactory = LFService.createNamedLoggerFactory(
   'Commonwealth',
   options,
 );

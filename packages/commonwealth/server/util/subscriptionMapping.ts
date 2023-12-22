@@ -1,11 +1,11 @@
+import { NotificationCategories } from '@hicommonwealth/core';
 import {
-  NotificationCategories,
-  factory,
   formatFilename,
-} from '@hicommonwealth/core';
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import { NotificationDataAndCategory } from '../../shared/types';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 /**
  * This function maps fields from the different notification data objects to Subscription model fields. It returns an

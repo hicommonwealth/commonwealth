@@ -1,4 +1,7 @@
-import { factory, formatFilename } from '@hicommonwealth/core';
+import {
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import * as Rascal from 'rascal';
 import type Rollbar from 'rollbar';
 import type { Sequelize } from 'sequelize';
@@ -10,7 +13,7 @@ import type {
 } from './types';
 import { AbstractRabbitMQController, RmqMsgFormatError } from './types';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 export class RabbitMQControllerError extends Error {
   constructor(msg: string) {

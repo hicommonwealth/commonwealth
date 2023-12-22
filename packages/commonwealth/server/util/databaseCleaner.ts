@@ -1,4 +1,8 @@
-import { RedisNamespaces, factory, formatFilename } from '@hicommonwealth/core';
+import { RedisNamespaces } from '@hicommonwealth/core';
+import {
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import { RedisCache } from 'common-common/src/redisCache';
 import Rollbar from 'rollbar';
 import { QueryTypes } from 'sequelize';
@@ -11,7 +15,7 @@ import type { DB } from '../models';
  * class uses UTC so that deployments/execution in various timezones does not affect functionality.
  */
 export default class DatabaseCleaner {
-  private readonly log = factory.getLogger(formatFilename(__filename));
+  private readonly log = loggerFactory.getLogger(formatFilename(__filename));
   private _models: DB;
   private _redisCache: RedisCache;
   private _rollbar?: Rollbar;

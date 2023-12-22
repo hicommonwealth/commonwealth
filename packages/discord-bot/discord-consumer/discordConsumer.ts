@@ -3,7 +3,6 @@ import {
   IDiscordMessage,
   StatsDController,
   ThreadDiscordActions,
-  factory,
   formatFilename,
 } from '@hicommonwealth/core';
 import {
@@ -39,7 +38,7 @@ startHealthCheckLoop({
   },
 });
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 log.info(
   `Node Option max-old-space-size set to: ${JSON.stringify(

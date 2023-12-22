@@ -1,4 +1,8 @@
-import { ChainNetwork, factory, formatFilename } from '@hicommonwealth/core';
+import { ChainNetwork } from '@hicommonwealth/core';
+import {
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import BN from 'bn.js';
 import JobRunner from 'common-common/src/cacheJobRunner';
 import { Client } from 'pg';
@@ -14,7 +18,7 @@ import type {
 } from './types';
 import { FetchTokenBalanceErrors } from './types';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 async function queryChainNodesFromDB(
   lastQueryUnixTime: number,

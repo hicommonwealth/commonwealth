@@ -5,9 +5,11 @@ import {
   NotificationCategories,
   WalletId,
   WalletSsoSource,
-  factory,
-  formatFilename,
 } from '@hicommonwealth/core';
+import {
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
 import { ServerError } from 'common-common/src/errors';
 import { verify } from 'jsonwebtoken';
@@ -29,7 +31,7 @@ import { UserAttributes, UserInstance } from '../models/user';
 import { TypedRequestBody } from '../types';
 import { createRole } from '../util/roles';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 type MagicLoginContext = {
   models: DB;

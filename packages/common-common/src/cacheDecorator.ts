@@ -1,4 +1,8 @@
-import { RedisNamespaces, factory, formatFilename } from '@hicommonwealth/core';
+import { RedisNamespaces } from '@hicommonwealth/core';
+import {
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import { Request, RequestHandler, Response } from 'express';
 import {
   CacheKeyDuration,
@@ -7,7 +11,7 @@ import {
 } from './cacheKeyUtils';
 import { RedisCache } from './redisCache';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 const XCACHE_HEADER = 'X-Cache';
 export enum XCACHE_VALUES {
