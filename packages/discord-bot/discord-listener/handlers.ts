@@ -1,8 +1,8 @@
+import { DiscordAction, IDiscordMessage } from '@hicommonwealth/core';
 import {
-  DiscordAction,
-  IDiscordMessage,
   formatFilename,
-} from '@hicommonwealth/core';
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import { RabbitMQController } from 'common-common/src/rabbitmq';
 import { RascalPublications } from 'common-common/src/rabbitmq/types';
 import { getImageUrls } from 'discord-bot/discord-listener/util';

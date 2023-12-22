@@ -1,10 +1,13 @@
 import {
   CommentDiscordActions,
   IDiscordMessage,
-  StatsDController,
   ThreadDiscordActions,
-  formatFilename,
 } from '@hicommonwealth/core';
+import {
+  StatsDController,
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import {
   RabbitMQController,
   getRabbitMQConfig,
