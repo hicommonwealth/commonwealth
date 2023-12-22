@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/core';
+import type { ChainBase } from '@hicommonwealth/core';
 import { CommunityType } from 'views/components/component_kit/new_designs/CWCommunitySelector';
 
 export const communityTypeOptions = [

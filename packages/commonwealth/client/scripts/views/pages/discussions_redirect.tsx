@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { NavigateOptions } from 'react-router-dom';
 
-import { DefaultPage } from '@hicommonwealth/core';
+import type { DefaultPage } from '@hicommonwealth/core';
 import { featureFlags } from 'helpers/feature-flags';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';

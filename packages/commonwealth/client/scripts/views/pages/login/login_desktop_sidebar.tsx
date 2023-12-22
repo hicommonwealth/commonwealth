@@ -1,4 +1,4 @@
-import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
+import type { ChainBase, ChainNetwork } from '@hicommonwealth/core';
 import 'pages/login/login_desktop_sidebar.scss';
 import React from 'react';
 import app from 'state';

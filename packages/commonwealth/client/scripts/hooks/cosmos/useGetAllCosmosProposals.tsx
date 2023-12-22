@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { IApp } from 'state';
 
-import { ChainBase } from '@hicommonwealth/core';
+import type { ChainBase } from '@hicommonwealth/core';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import {
   useActiveCosmosProposalsQuery,

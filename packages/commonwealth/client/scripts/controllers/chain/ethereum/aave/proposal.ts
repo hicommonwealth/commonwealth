@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ProposalType } from '@hicommonwealth/core';
+import type { ProposalType } from '@hicommonwealth/core';
 import type {
   IAaveProposalResponse,
   IAaveVoteResponse,

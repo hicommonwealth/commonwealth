@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/core';
+import type { ChainBase } from '@hicommonwealth/core';
 import 'components/user/user.scss';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';

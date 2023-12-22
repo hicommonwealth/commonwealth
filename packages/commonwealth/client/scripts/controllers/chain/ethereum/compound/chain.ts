@@ -1,4 +1,4 @@
-import { ContractType } from '@hicommonwealth/core';
+import type { ContractType } from '@hicommonwealth/core';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import BN from 'bn.js';
 import type { ERC20Votes } from 'common-common/src/eth/types';

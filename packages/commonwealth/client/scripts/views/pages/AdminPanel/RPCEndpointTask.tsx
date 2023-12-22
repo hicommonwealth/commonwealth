@@ -1,4 +1,4 @@
-import { BalanceType } from '@hicommonwealth/core';
+import type { BalanceType } from '@hicommonwealth/core';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { detectURL } from 'helpers/threads';
 import CommunityInfo from 'models/ChainInfo';

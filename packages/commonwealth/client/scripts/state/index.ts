@@ -1,5 +1,5 @@
 import { Capacitor } from '@capacitor/core';
-import { ChainCategoryType } from '@hicommonwealth/core';
+import type { ChainCategoryType } from '@hicommonwealth/core';
 import axios from 'axios';
 import { updateActiveUser } from 'controllers/app/login';
 import RecentActivityController from 'controllers/app/recent_activity';

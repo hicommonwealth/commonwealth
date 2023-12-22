@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/core';
+import type { ChainBase } from '@hicommonwealth/core';
 import IWebWallet from 'client/scripts/models/IWebWallet';
 import WebWalletController from 'controllers/app/web_wallets';
 import Web3 from 'web3';

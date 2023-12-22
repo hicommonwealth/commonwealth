@@ -1,4 +1,4 @@
-import {
+import type {
   ChainBase,
   NotificationCategories,
   SupportedNetwork,

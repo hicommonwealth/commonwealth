@@ -1,4 +1,4 @@
-import { ChainCategoryType } from '@hicommonwealth/core';
+import type { ChainCategoryType } from '@hicommonwealth/core';
 import axios from 'axios';
 import app from 'state';
 import { AccessLevel } from '../../../../../shared/permissions';

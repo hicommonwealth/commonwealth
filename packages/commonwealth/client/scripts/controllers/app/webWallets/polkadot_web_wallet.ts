@@ -7,7 +7,7 @@ import { stringToHex } from '@polkadot/util';
 
 import type { SessionPayload } from '@canvas-js/interfaces';
 
-import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
+import type { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
 import { addressSwapper } from 'utils';
 
 import app from 'state';

@@ -1,4 +1,4 @@
-import { ChainNetwork } from '@hicommonwealth/core';
+import type { ChainNetwork } from '@hicommonwealth/core';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import useForceRerender from 'hooks/useForceRerender';

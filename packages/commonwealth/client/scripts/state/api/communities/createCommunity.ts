@@ -1,4 +1,4 @@
-import { ChainBase, ChainType } from '@hicommonwealth/core';
+import type { ChainBase, ChainType } from '@hicommonwealth/core';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';

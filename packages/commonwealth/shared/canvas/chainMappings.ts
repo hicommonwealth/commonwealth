@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/core';
+import type { ChainBase } from '@hicommonwealth/core';
 
 export function chainBaseToCaip2(chainBase: ChainBase): string {
   // Translate Commonwealth ChainBase names to CAIP-2 Chain names.

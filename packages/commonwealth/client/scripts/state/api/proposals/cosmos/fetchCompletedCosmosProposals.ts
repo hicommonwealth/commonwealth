@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/core';
+import type { ChainBase } from '@hicommonwealth/core';
 import { useQuery } from '@tanstack/react-query';
 import Cosmos from 'controllers/chain/cosmos/adapter';
 import { getCompletedProposals } from 'controllers/chain/cosmos/gov/utils';

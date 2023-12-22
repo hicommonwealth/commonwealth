@@ -1,5 +1,5 @@
 import type { MsgDepositEncodeObject } from '@cosmjs/stargate';
-import { ProposalType } from '@hicommonwealth/core';
+import type { ProposalType } from '@hicommonwealth/core';
 import BN from 'bn.js';
 import type {
   CosmosProposalState,

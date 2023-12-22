@@ -1,4 +1,4 @@
-import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
+import type { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
 import type Account from '../../../models/Account';
 import type IWebWallet from '../../../models/IWebWallet';
 

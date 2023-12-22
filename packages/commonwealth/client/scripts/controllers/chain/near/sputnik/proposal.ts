@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { ProposalType } from '@hicommonwealth/core';
+import type { ProposalType } from '@hicommonwealth/core';
 import type { NearToken } from 'adapters/chain/near/types';
 import BN from 'bn.js';
 import type { NearAccount, NearAccounts } from 'controllers/chain/near/account';

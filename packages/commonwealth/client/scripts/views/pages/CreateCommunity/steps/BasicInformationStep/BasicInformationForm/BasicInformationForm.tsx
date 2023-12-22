@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { slugifyPreserveDashes } from 'utils';
 
-import { ChainBase } from '@hicommonwealth/core';
+import type { ChainBase } from '@hicommonwealth/core';
 import { notifyError } from 'controllers/app/notifications';
 import useCreateCommunityMutation from 'state/api/communities/createCommunity';
 import {

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import app, { initAppState } from 'state';
 import { User } from 'views/components/user/user';
 
-import { WalletSsoSource } from '@hicommonwealth/core';
+import type { WalletSsoSource } from '@hicommonwealth/core';
 import clsx from 'clsx';
 import { setActiveAccount } from 'controllers/app/login';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -24,7 +24,7 @@ import './UserDropdown.scss';
 import { UserDropdownItem } from './UserDropdownItem';
 
 /* used for logout */
-import { WalletId } from '@hicommonwealth/core';
+import type { WalletId } from '@hicommonwealth/core';
 import axios from 'axios';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import WebWalletController from 'controllers/app/web_wallets';

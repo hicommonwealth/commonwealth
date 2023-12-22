@@ -1,7 +1,7 @@
-import type { SupportedNetwork } from '@hicommonwealth/core';
-import {
+import type {
   NotificationCategories,
   NotificationCategory,
+  SupportedNetwork,
 } from '@hicommonwealth/core';
 import type { AccessLevel } from './permissions';
 

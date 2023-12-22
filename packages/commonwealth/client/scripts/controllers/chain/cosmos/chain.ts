@@ -8,7 +8,7 @@ import type {
   StdFee,
 } from '@cosmjs/stargate';
 import type { Event, Tendermint34Client } from '@cosmjs/tendermint-rpc';
-import { ChainNetwork, WalletId } from '@hicommonwealth/core';
+import type { ChainNetwork, WalletId } from '@hicommonwealth/core';
 import BN from 'bn.js';
 
 import { CosmosToken } from 'controllers/chain/cosmos/types';

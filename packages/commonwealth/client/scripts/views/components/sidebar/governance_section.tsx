@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/core';
+import type { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/core';
 
 import 'components/sidebar/index.scss';
 import { handleRedirectClicks } from 'helpers';

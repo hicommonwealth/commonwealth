@@ -1,4 +1,4 @@
-import { ProposalType } from '@hicommonwealth/core';
+import type { ProposalType } from '@hicommonwealth/core';
 import type moment from 'moment';
 import type Topic from './Topic';
 import type { IUniqueId } from './interfaces';

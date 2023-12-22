@@ -2,7 +2,7 @@
 
 import type { SessionPayload } from '@canvas-js/interfaces';
 
-import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
+import type { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 

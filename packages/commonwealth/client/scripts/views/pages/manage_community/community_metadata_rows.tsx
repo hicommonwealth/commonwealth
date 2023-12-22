@@ -1,4 +1,4 @@
-import { ChainBase, DefaultPage } from '@hicommonwealth/core';
+import type { ChainBase, DefaultPage } from '@hicommonwealth/core';
 import axios from 'axios';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { featureFlags } from 'helpers/feature-flags';

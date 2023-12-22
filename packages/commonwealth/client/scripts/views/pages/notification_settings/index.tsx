@@ -1,4 +1,4 @@
-import { NotificationCategories } from '@hicommonwealth/core';
+import type { NotificationCategories } from '@hicommonwealth/core';
 import { getMultipleSpacesById } from 'helpers/snapshot_utils';
 import useForceRerender from 'hooks/useForceRerender';
 import moment from 'moment';

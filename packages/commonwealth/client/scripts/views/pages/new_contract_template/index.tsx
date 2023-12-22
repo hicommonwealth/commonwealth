@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ChainBase } from '@hicommonwealth/core';
+import type { ChainBase } from '@hicommonwealth/core';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'new_contract_template/new_contract_template_page.scss';
 import React from 'react';

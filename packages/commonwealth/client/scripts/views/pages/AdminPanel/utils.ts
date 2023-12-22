@@ -1,4 +1,4 @@
-import { BalanceType } from '@hicommonwealth/core';
+import type { BalanceType } from '@hicommonwealth/core';
 import axios from 'axios';
 import app from 'state';
 
