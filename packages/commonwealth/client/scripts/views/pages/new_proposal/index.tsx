@@ -1,4 +1,4 @@
-import { ChainNetwork, ProposalType } from 'common-common/src/types';
+import { ChainNetwork, ProposalType } from '@hicommonwealth/core';
 import useForceRerender from 'hooks/useForceRerender';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 import {

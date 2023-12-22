@@ -1,5 +1,5 @@
+import { NotificationCategories } from '@hicommonwealth/core';
 import { expect } from 'chai';
-import { NotificationCategories } from 'common-common/src/types';
 import sinon from 'sinon';
 import models from '../../../../server/database';
 import { ContractInstance } from '../../../../server/models/contract';

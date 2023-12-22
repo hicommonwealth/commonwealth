@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import app, { initAppState } from 'state';
 import { User } from 'views/components/user/user';
 
+import { WalletSsoSource } from '@hicommonwealth/core';
 import clsx from 'clsx';
-import { WalletSsoSource } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
 import { useCommonNavigate } from 'navigation/helpers';
 import useCheckAuthenticatedAddresses from 'views/components/Header/UserDropdown/useCheckAuthenticatedAddresses';
@@ -24,8 +24,8 @@ import './UserDropdown.scss';
 import { UserDropdownItem } from './UserDropdownItem';
 
 /* used for logout */
+import { WalletId } from '@hicommonwealth/core';
 import axios from 'axios';
-import { WalletId } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import WebWalletController from 'controllers/app/web_wallets';
 import { setDarkMode } from 'helpers/darkMode';

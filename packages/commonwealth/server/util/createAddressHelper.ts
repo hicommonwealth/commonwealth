@@ -1,11 +1,11 @@
-import { bech32 } from 'bech32';
-import { AppError } from 'common-common/src/errors';
 import {
   ChainBase,
   ChainNetwork,
   WalletId,
   WalletSsoSource,
-} from 'common-common/src/types';
+} from '@hicommonwealth/core';
+import { bech32 } from 'bech32';
+import { AppError } from 'common-common/src/errors';
 import crypto from 'crypto';
 import type { NextFunction } from 'express';
 import { Op } from 'sequelize';

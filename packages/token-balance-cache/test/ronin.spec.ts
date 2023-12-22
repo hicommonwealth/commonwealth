@@ -1,7 +1,8 @@
-import { assert, expect, use as chaiUse } from 'chai';
-import { BalanceType } from 'common-common/src/types';
-import { BigNumber, BigNumberish, CallOverrides } from 'ethers';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { BalanceType } from '@hicommonwealth/core';
+import { assert, use as chaiUse, expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import { BigNumber, BigNumberish, CallOverrides } from 'ethers';
 import RoninBalanceProvider from '../src/providers/ronin';
 import type { IChainNode } from '../src/types';
 
@@ -11,7 +12,7 @@ class MockProvider {
   public async balanceOf(
     account: string,
     id: BigNumberish,
-    overrides?: CallOverrides
+    overrides?: CallOverrides,
   ): Promise<BigNumber> {
     return BigNumber.from('1');
   }
@@ -66,7 +67,7 @@ describe('ERC1155 BP unit tests', () => {
     const roninBp: MockRoninBalanceProvider = new MockRoninBalanceProvider();
     const balance = await roninBp.getBalance(
       await mockNodesProvider()[0],
-      '0x71C7656EC7ab88b098defB751B7401B5f6d8976F'
+      '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
     );
 
     assert.equal(balance, '2');
@@ -76,7 +77,7 @@ describe('ERC1155 BP unit tests', () => {
     const roninBp: MockRoninBalanceProvider = new MockRoninBalanceProvider();
 
     return expect(
-      roninBp.getBalance(await mockNodesProvider()[0], 'abcd')
+      roninBp.getBalance(await mockNodesProvider()[0], 'abcd'),
     ).to.be.rejectedWith('Invalid address');
   });
 });

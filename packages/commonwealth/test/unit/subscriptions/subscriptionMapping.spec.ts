@@ -1,9 +1,6 @@
+import { NotificationCategories, SupportedNetwork } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import {
-  NotificationCategories,
-  SupportedNetwork,
-} from 'common-common/src/types';
 import {
   IBaseForumNotificationData,
   NotificationDataAndCategory,

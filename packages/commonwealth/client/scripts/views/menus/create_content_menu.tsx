@@ -1,4 +1,5 @@
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
+/* eslint-disable react/no-multi-comp */
+import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { uuidv4 } from 'lib/util';
