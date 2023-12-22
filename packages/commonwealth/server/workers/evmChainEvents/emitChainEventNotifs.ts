@@ -1,8 +1,8 @@
+import { NotificationCategories, SupportedNetwork } from '@hicommonwealth/core';
 import {
-  NotificationCategories,
-  SupportedNetwork,
   formatFilename,
-} from '@hicommonwealth/core';
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import { QueryTypes } from 'sequelize';
 import { NotificationDataAndCategory } from 'types';
 import models from '../../database';

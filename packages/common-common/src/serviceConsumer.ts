@@ -1,4 +1,8 @@
-import { addPrefix, formatFilename } from '@hicommonwealth/core/build/platform';
+import {
+  addPrefix,
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import crypto from 'crypto';
 import type Rollbar from 'rollbar';
 import type { Logger } from 'typescript-logging';
