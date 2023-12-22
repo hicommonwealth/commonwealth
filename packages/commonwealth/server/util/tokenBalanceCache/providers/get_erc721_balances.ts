@@ -1,4 +1,4 @@
-import { factory, formatFilename } from 'common-common/src/logging';
+import { factory, formatFilename } from '@hicommonwealth/core';
 import AbiCoder from 'web3-eth-abi';
 import { ChainNodeInstance } from '../../../models/chain_node';
 import { rollbar } from '../../rollbar';

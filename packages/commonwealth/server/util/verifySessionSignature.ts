@@ -26,7 +26,7 @@ import type { AddressInstance } from '../models/address';
 import type { CommunityInstance } from '../models/community';
 import type { ProfileAttributes } from '../models/profile';
 
-import { factory, formatFilename } from 'common-common/src/logging';
+import { factory, formatFilename } from '@hicommonwealth/core';
 const log = factory.getLogger(formatFilename(__filename));
 
 const sortedStringify = configureStableStringify({

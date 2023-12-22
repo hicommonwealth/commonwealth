@@ -1,7 +1,7 @@
 import { DataTypes, Sequelize } from 'sequelize';
 import { DATABASE_URI } from './config';
 
-import { factory, formatFilename } from 'common-common/src/logging';
+import { factory, formatFilename } from '@hicommonwealth/core';
 import type { DB, Models } from './models';
 import AddressFactory from './models/address';
 import BanFactory from './models/ban';

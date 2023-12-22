@@ -1,4 +1,4 @@
-import { factory, formatFilename } from 'common-common/src/logging';
+import { factory, formatFilename } from '@hicommonwealth/core';
 import { databaseCleaner } from 'commonwealth/server/util/databaseCleaner';
 import models from '../database';
 

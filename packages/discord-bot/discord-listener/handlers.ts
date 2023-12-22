@@ -1,5 +1,9 @@
-import { DiscordAction, IDiscordMessage } from '@hicommonwealth/core';
-import { factory, formatFilename } from 'common-common/src/logging';
+import {
+  DiscordAction,
+  IDiscordMessage,
+  factory,
+  formatFilename,
+} from '@hicommonwealth/core';
 import { RabbitMQController } from 'common-common/src/rabbitmq';
 import { RascalPublications } from 'common-common/src/rabbitmq/types';
 import { getImageUrls } from 'discord-bot/discord-listener/util';

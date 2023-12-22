@@ -1,19 +1,17 @@
-import { factory, formatFilename } from 'common-common/src/logging';
+import { factory, formatFilename } from '@hicommonwealth/core';
 import type { Express } from 'express';
 import express from 'express';
 import useragent from 'express-useragent';
 import passport from 'passport';
-
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
-import { TokenBalanceCache as NewTokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
-
 import {
   methodNotAllowedMiddleware,
   registerRoute,
 } from '../middleware/methodNotAllowed';
-import { getRelatedCommunitiesHandler } from '../routes/communities/get_related_communities_handler';
-
 import adminAnalytics from '../routes/adminAnalytics';
+import clearNotifications from '../routes/clearNotifications';
+import clearReadNotifications from '../routes/clearReadNotifications';
+import { getRelatedCommunitiesHandler } from '../routes/communities/get_related_communities_handler';
 import communityStats from '../routes/communityStats';
 import createContract from '../routes/contracts/createContract';
 import createAddress from '../routes/createAddress';
@@ -28,25 +26,15 @@ import getAddressProfile, {
   getAddressProfileValidation,
 } from '../routes/getAddressProfile';
 import getAddressStatus from '../routes/getAddressStatus';
+import getProfileNew from '../routes/getNewProfile';
 import linkExistingAddressToChain from '../routes/linkExistingAddressToChain';
+import markNotificationsRead from '../routes/markNotificationsRead';
 import reactionsCounts from '../routes/reactionsCounts';
 import selectChain from '../routes/selectChain';
+import setDefaultRole from '../routes/setDefaultRole';
 import starCommunity from '../routes/starCommunity';
 import startEmailLogin from '../routes/startEmailLogin';
 import { status } from '../routes/status';
-import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
-import updateBanner from '../routes/updateBanner';
-import updateEmail from '../routes/updateEmail';
-import updateSiteAdmin from '../routes/updateSiteAdmin';
-import verifyAddress from '../routes/verifyAddress';
-import viewComments from '../routes/viewComments';
-import viewCount from '../routes/viewCount';
-
-import clearNotifications from '../routes/clearNotifications';
-import clearReadNotifications from '../routes/clearReadNotifications';
-import getProfileNew from '../routes/getNewProfile';
-import markNotificationsRead from '../routes/markNotificationsRead';
-import setDefaultRole from '../routes/setDefaultRole';
 import createSubscription from '../routes/subscription/createSubscription';
 import deleteSubscription from '../routes/subscription/deleteSubscription';
 import disableImmediateEmails from '../routes/subscription/disableImmediateEmails';
@@ -54,14 +42,22 @@ import disableSubscriptions from '../routes/subscription/disableSubscriptions';
 import enableImmediateEmails from '../routes/subscription/enableImmediateEmails';
 import enableSubscriptions from '../routes/subscription/enableSubscriptions';
 import viewSubscriptions from '../routes/subscription/viewSubscriptions';
+import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
+import updateBanner from '../routes/updateBanner';
+import updateEmail from '../routes/updateEmail';
+import updateSiteAdmin from '../routes/updateSiteAdmin';
 import upgradeMember, {
   upgradeMemberValidation,
 } from '../routes/upgradeMember';
+import verifyAddress from '../routes/verifyAddress';
+import viewComments from '../routes/viewComments';
+import viewCount from '../routes/viewCount';
 import viewGlobalActivity from '../routes/viewGlobalActivity';
 import viewNotifications, {
   RouteNotificationCategories,
 } from '../routes/viewNotifications';
 import viewUserActivity from '../routes/viewUserActivity';
+import { TokenBalanceCache as NewTokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
 
 import getUploadSignature from '../routes/getUploadSignature';
 

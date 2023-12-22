@@ -1,5 +1,4 @@
-import { RedisNamespaces } from '@hicommonwealth/core';
-import { factory, formatFilename } from 'common-common/src/logging';
+import { RedisNamespaces, factory, formatFilename } from '@hicommonwealth/core';
 import { RedisCache } from 'common-common/src/redisCache';
 import Rollbar from 'rollbar';
 import { QueryTypes } from 'sequelize';

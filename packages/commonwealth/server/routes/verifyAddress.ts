@@ -5,9 +5,10 @@ import {
   NotificationCategories,
   WalletId,
   WalletSsoSource,
+  factory,
+  formatFilename,
 } from '@hicommonwealth/core';
 import { AppError } from 'common-common/src/errors';
-import { factory, formatFilename } from 'common-common/src/logging';
 import type { NextFunction, Request, Response } from 'express';
 
 import { MixpanelLoginEvent } from '../../shared/analytics/types';

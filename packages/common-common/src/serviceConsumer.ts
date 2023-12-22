@@ -1,12 +1,9 @@
+import { addPrefix, factory, formatFilename } from '@hicommonwealth/core';
 import crypto from 'crypto';
-import { addPrefix, factory, formatFilename } from './logging';
-import type {
-  RascalSubscriptions,
-  TRmqMessages,
-} from './rabbitmq/types';
 import type Rollbar from 'rollbar';
 import type { Logger } from 'typescript-logging';
-import {AbstractRabbitMQController} from "./rabbitmq/types";
+import type { RascalSubscriptions, TRmqMessages } from './rabbitmq/types';
+import { AbstractRabbitMQController } from './rabbitmq/types';
 
 export type RabbitMQSubscription = {
   messageProcessor: (data: TRmqMessages, ...args: any) => Promise<void>;
@@ -34,7 +31,7 @@ export class ServiceConsumer {
     _serviceName: string,
     _rabbitmqController: AbstractRabbitMQController,
     _subscriptions: RabbitMQSubscription[],
-    rollbar?: Rollbar
+    rollbar?: Rollbar,
   ) {
     this.serviceName = _serviceName;
     // TODO: make this deterministic somehow
@@ -43,7 +40,7 @@ export class ServiceConsumer {
 
     // setup logger
     this.log = factory.getLogger(
-      addPrefix(formatFilename(__filename), [this.serviceName, this.serviceId])
+      addPrefix(formatFilename(__filename), [this.serviceName, this.serviceId]),
     );
 
     this.rabbitMQController = _rabbitmqController;
@@ -52,7 +49,7 @@ export class ServiceConsumer {
 
   public async init(): Promise<void> {
     this.log.info(
-      `Initializing service-consumer: ${this.serviceName}-${this.serviceId}`
+      `Initializing service-consumer: ${this.serviceName}-${this.serviceId}`,
     );
 
     if (!this.rabbitMQController.initialized) {
@@ -70,23 +67,23 @@ export class ServiceConsumer {
         await this.rabbitMQController.startSubscription(
           sub.messageProcessor,
           sub.subscriptionName,
-          sub.msgProcessorContext
+          sub.msgProcessorContext,
         );
         console.log('subscribed to', sub.subscriptionName);
       } catch (e) {
         this.log.error(
           `Failed to start the '${sub.subscriptionName}' subscription with the '${sub.messageProcessor}' ` +
             `processor function using context: ${JSON.stringify(
-              sub.msgProcessorContext
+              sub.msgProcessorContext,
             )}`,
-          e
+          e,
         );
         this.rollbar?.critical(
           `Failed to start the '${sub.subscriptionName}' subscription with the '${sub.messageProcessor}' ` +
             `processor function using context: ${JSON.stringify(
-              sub.msgProcessorContext
+              sub.msgProcessorContext,
             )}`,
-          e
+          e,
         );
       }
     }
@@ -95,7 +92,7 @@ export class ServiceConsumer {
 
   public async shutdown(): Promise<void> {
     this.log.info(
-      `Service Consumer ${this.serviceName}:${this.serviceId} shutting down...`
+      `Service Consumer ${this.serviceName}:${this.serviceId} shutting down...`,
     );
     if (this.rabbitMQController.initialized) {
       this.log.info('Attempting to shutdown RabbitMQ Broker...');
@@ -106,7 +103,7 @@ export class ServiceConsumer {
 
     this._initialized = false;
     this.log.info(
-      `Service Consumer ${this.serviceName}:${this.serviceId} shut down successful`
+      `Service Consumer ${this.serviceName}:${this.serviceId} shut down successful`,
     );
   }
 

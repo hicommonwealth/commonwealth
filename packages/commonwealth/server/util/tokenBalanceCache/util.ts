@@ -1,4 +1,4 @@
-import { factory, formatFilename } from 'common-common/src/logging';
+import { factory, formatFilename } from '@hicommonwealth/core';
 import AbiCoder from 'web3-eth-abi';
 import { toBN } from 'web3-utils';
 import { ChainNodeAttributes } from '../../models/chain_node';

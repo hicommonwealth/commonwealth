@@ -1,5 +1,8 @@
-import { StatsDController } from '../../src/statsd';
-import { factory, formatFilename } from '../../src/logging';
+import {
+  StatsDController,
+  factory,
+  formatFilename,
+} from '@hicommonwealth/core';
 
 const log = factory.getLogger(formatFilename(__filename));
 

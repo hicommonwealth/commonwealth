@@ -3,8 +3,8 @@ import type { Express } from 'express-serve-static-core';
 import http from 'http';
 import type Rollbar from 'rollbar';
 
+import { factory, formatFilename } from '@hicommonwealth/core';
 import { cacheDecorator } from 'common-common/src/cacheDecorator';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { RedisCache } from 'common-common/src/redisCache';
 import { PORT } from '../config';
 import type { DB } from '../models';

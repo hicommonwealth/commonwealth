@@ -1,13 +1,14 @@
+import {
+  IDiscordMeta,
+  StatsDController,
+  factory,
+  formatFilename,
+} from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-
-import { StatsDController } from 'common-common/src/statsd';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
-
-import { IDiscordMeta } from '@hicommonwealth/core';
-import { factory, formatFilename } from 'common-common/src/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export type CommentAttributes = {

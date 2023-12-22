@@ -1,4 +1,4 @@
-import { factory, formatFilename } from 'common-common/src/logging';
+import { factory, formatFilename } from '@hicommonwealth/core';
 import moment from 'moment';
 import { Op, Sequelize } from 'sequelize';
 import {

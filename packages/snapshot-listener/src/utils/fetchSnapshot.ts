@@ -1,6 +1,6 @@
-import fetch from 'node-fetch';
+import { factory, formatFilename } from '@hicommonwealth/core';
 import dotenv from 'dotenv';
-import { factory, formatFilename } from 'common-common/src/logging';
+import fetch from 'node-fetch';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -8,7 +8,7 @@ dotenv.config();
 
 export default async function fetchNewSnapshotProposal(
   id: string,
-  eventType: string
+  eventType: string,
 ) {
   try {
     const environment = process.env.NODE_ENV || 'development';

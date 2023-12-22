@@ -1,8 +1,11 @@
 import { Label as ChainEventLabel } from '../../shared/chain/labelers/util';
 import type { CWEvent } from '../../shared/chain/types/types';
 
-import { NotificationCategories } from '@hicommonwealth/core';
-import { factory, formatFilename } from 'common-common/src/logging';
+import {
+  NotificationCategories,
+  factory,
+  formatFilename,
+} from '@hicommonwealth/core';
 import { capitalize } from 'lodash';
 import { Op, WhereOptions } from 'sequelize';
 import type {

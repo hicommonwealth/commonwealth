@@ -1,6 +1,10 @@
-import { NotificationCategories, WalletId } from '@hicommonwealth/core';
+import {
+  NotificationCategories,
+  WalletId,
+  factory,
+  formatFilename,
+} from '@hicommonwealth/core';
 import { AppError, ServerError } from 'common-common/src/errors';
-import { factory, formatFilename } from 'common-common/src/logging';
 import * as jwt from 'jsonwebtoken';
 import { isAddress, toChecksumAddress } from 'web3-utils';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';

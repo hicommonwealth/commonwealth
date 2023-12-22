@@ -12,6 +12,8 @@
     "build"
   ],
   "dependencies": {
+    "hot-shots": "^9.3.0",
+    "typescript-logging": "^0.6.4",
     "zod": "^3.22.4"
   }
 }

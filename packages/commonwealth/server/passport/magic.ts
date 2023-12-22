@@ -1,23 +1,23 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Session } from '@canvas-js/interfaces';
-import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
-import { verify } from 'jsonwebtoken';
-import passport from 'passport';
-import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
-import { Op, Transaction } from 'sequelize';
-import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
-import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
-
 import {
   ChainBase,
   NotificationCategories,
   WalletId,
   WalletSsoSource,
+  factory,
+  formatFilename,
 } from '@hicommonwealth/core';
+import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
 import { ServerError } from 'common-common/src/errors';
-import { factory, formatFilename } from 'common-common/src/logging';
+import { verify } from 'jsonwebtoken';
+import passport from 'passport';
+import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
+import { Op, Transaction } from 'sequelize';
+import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { verify as verifyCanvas } from '../../shared/canvas/verify';
 import { JWT_SECRET, MAGIC_API_KEY } from '../config';
+import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { sequelize } from '../database';
 import { validateCommunity } from '../middleware/validateCommunity';
 import type { DB } from '../models';

@@ -1,10 +1,10 @@
-import type { LogGroupControlSettings } from 'typescript-logging';
 import {
-  LoggerFactoryOptions,
   LFService,
   LogGroupRule,
   LogLevel,
+  LoggerFactoryOptions,
   getLogControl,
+  type LogGroupControlSettings,
 } from 'typescript-logging';
 
 const options = new LoggerFactoryOptions()
@@ -12,7 +12,7 @@ const options = new LoggerFactoryOptions()
   .addLogGroupRule(new LogGroupRule(new RegExp('route.+'), LogLevel.Debug))
   .addLogGroupRule(new LogGroupRule(new RegExp('.+'), LogLevel.Info));
 
-export const formatFilename = (name) => {
+export const formatFilename = (name: string) => {
   const t = name.split('/');
   return t[t.length - 1];
 };
@@ -30,7 +30,7 @@ export const addPrefix = (filename: string, prefixes?: string[]) => {
 
 export const factory = LFService.createNamedLoggerFactory(
   'Commonwealth',
-  options
+  options,
 );
 
 const control = getLogControl();

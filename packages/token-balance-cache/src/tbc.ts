@@ -1,10 +1,7 @@
-import { Client } from 'pg';
-
-import { ChainNetwork } from '@hicommonwealth/core';
+import { ChainNetwork, factory, formatFilename } from '@hicommonwealth/core';
 import BN from 'bn.js';
 import JobRunner from 'common-common/src/cacheJobRunner';
-import { factory, formatFilename } from 'common-common/src/logging';
-
+import { Client } from 'pg';
 import { TbcStatsDSender } from './tbcStatsDSender';
 import type {
   BalanceProvider,

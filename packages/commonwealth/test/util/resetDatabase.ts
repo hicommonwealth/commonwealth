@@ -4,8 +4,9 @@ import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
+  factory,
+  formatFilename,
 } from '@hicommonwealth/core';
-import { factory, formatFilename } from 'common-common/src/logging';
 import models from '../../server/database';
 import { ChainNodeAttributes } from '../../server/models/chain_node';
 

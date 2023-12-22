@@ -1,5 +1,5 @@
+import { factory, formatFilename } from '@hicommonwealth/core';
 import bodyParser from 'body-parser';
-import { factory, formatFilename } from 'common-common/src/logging';
 import {
   RabbitMQController,
   getRabbitMQConfig,
@@ -10,7 +10,6 @@ import {
   ServiceKey,
   startHealthCheckLoop,
 } from 'common-common/src/scripts/startHealthCheckLoop';
-import { StatsDController } from 'common-common/src/statsd';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
@@ -191,7 +190,7 @@ async function main() {
 
     // add other middlewares
     app.use(logger('dev'));
-    app.use(expressStatsdInit(StatsDController.get()));
+    app.use(expressStatsdInit());
     app.use(bodyParser.json({ limit: '1mb' }));
     app.use(bodyParser.urlencoded({ limit: '1mb', extended: false }));
     app.use(cookieParser());

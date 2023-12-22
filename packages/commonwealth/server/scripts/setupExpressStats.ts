@@ -1,15 +1,14 @@
 // Adapted from:
 // https://github.com/uber-archive/express-statsd/blob/master/lib/express-statsd.js
 
-import { ProjectTag } from 'common-common/src/statsd';
+import { ProjectTag, StatsDController } from '@hicommonwealth/core';
 import type { NextFunction, Request, Response } from 'express';
-import type { StatsD } from 'hot-shots';
 
-export default function expressStatsdInit(client: StatsD) {
+export default function expressStatsdInit() {
   return function expressStatsd(
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     const startTime = new Date().getTime();
 
@@ -26,7 +25,7 @@ export default function expressStatsdInit(client: StatsD) {
 
       // Response Time
       const duration = new Date().getTime() - startTime;
-      client.timing('express.response_time', duration, tags);
+      StatsDController.get().timing('express.response_time', duration, tags);
 
       // eslint-disable-next-line no-use-before-define
       cleanup();

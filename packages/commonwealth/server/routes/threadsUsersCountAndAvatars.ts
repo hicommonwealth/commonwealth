@@ -1,9 +1,9 @@
+import { factory, formatFilename } from '@hicommonwealth/core';
 import type { Request, Response } from 'express';
-import { QueryTypes } from 'sequelize';
 import { groupBy } from 'lodash';
-import { factory, formatFilename } from 'common-common/src/logging';
-import type { DB } from '../models';
+import { QueryTypes } from 'sequelize';
 import { sequelize } from '../database';
+import type { DB } from '../models';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -16,7 +16,7 @@ type UniqueAddresses = {
 
 const fetchUniqueAddressesByThreadIds = async (
   models: DB,
-  { chain, thread_ids }
+  { chain, thread_ids },
 ) => {
   return sequelize.query<UniqueAddresses>(
     `
@@ -34,7 +34,7 @@ const fetchUniqueAddressesByThreadIds = async (
         thread_ids,
         chain,
       },
-    }
+    },
   );
 };
 
@@ -49,7 +49,7 @@ is wildly unclear and wildly inconsistent. We should standardize + clarify.
 const threadsUsersCountAndAvatar = async (
   models: DB,
   req: Request,
-  res: Response
+  res: Response,
 ) => {
   const { chain, threads = [] } = req.body;
   try {
@@ -57,11 +57,11 @@ const threadsUsersCountAndAvatar = async (
       const thread_ids = threads.map(({ thread_id }) => thread_id);
       const uniqueAddressesByRootIds = await fetchUniqueAddressesByThreadIds(
         models,
-        { chain, thread_ids }
+        { chain, thread_ids },
       );
       const uniqueAddressesByThread = groupBy<UniqueAddresses>(
         uniqueAddressesByRootIds,
-        ({ thread_id }) => thread_id
+        ({ thread_id }) => thread_id,
       );
       return res.json(
         threads.map(({ thread_id: thread_id, author: authorAddress }) => {
@@ -83,7 +83,7 @@ const threadsUsersCountAndAvatar = async (
             addresses,
             count: addressesCount > 2 ? addressesCount - 2 : 0,
           };
-        })
+        }),
       );
     }
     return res.json([]);

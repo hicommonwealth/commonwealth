@@ -1,5 +1,9 @@
 import type { ISnapshotNotification } from '@hicommonwealth/core';
-import { factory, formatFilename } from 'common-common/src/logging';
+import {
+  StatsDController,
+  factory,
+  formatFilename,
+} from '@hicommonwealth/core';
 import {
   RabbitMQController,
   getRabbitMQConfig,
@@ -10,7 +14,6 @@ import {
   ServiceKey,
   startHealthCheckLoop,
 } from 'common-common/src/scripts/startHealthCheckLoop';
-import { StatsDController } from 'common-common/src/statsd';
 import type { Request, Response } from 'express';
 import express from 'express';
 import v8 from 'v8';
