@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
-import type Webhook from '../../models/Webhook';
 import {
   ChainBase,
   ChainNetwork,
   NotificationCategories,
-} from 'common-common/src/types';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
+} from '@hicommonwealth/core';
+import React, { useState } from 'react';
+import type Webhook from '../../models/Webhook';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWText } from '../components/component_kit/cw_text';
 import {
@@ -13,10 +12,11 @@ import {
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
 
-import '../../../styles/modals/webhook_settings_modal.scss';
 import app from 'state';
 import { WebhookCategory } from 'types';
+import '../../../styles/modals/webhook_settings_modal.scss';
 
 type WebhookSettingsModalProps = {
   onModalClose: () => void;
@@ -47,7 +47,7 @@ export const WebhookSettingsModal = ({
 
   const row = (label: string, values: WebhookCategory[]) => {
     const allValuesPresent = values.every((v) =>
-      selectedCategories.includes(v)
+      selectedCategories.includes(v),
     );
 
     const someValuesPresent =
@@ -64,7 +64,7 @@ export const WebhookSettingsModal = ({
         onChange={() => {
           if (allValuesPresent) {
             setSelectedCategories((prevState) =>
-              prevState.filter((v) => !values.includes(v))
+              prevState.filter((v) => !values.includes(v)),
             );
           } else {
             values.forEach((v) => {

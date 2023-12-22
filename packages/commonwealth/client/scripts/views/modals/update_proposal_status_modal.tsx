@@ -10,8 +10,8 @@ import type Thread from '../../models/Thread';
 import { ThreadStage } from '../../models/types';
 import { SelectList } from '../components/component_kit/cw_select_list';
 
+import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { filterLinks, getAddedAndDeleted } from 'helpers/threads';

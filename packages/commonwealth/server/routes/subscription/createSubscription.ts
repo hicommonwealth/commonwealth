@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { NotificationCategories } from '@hicommonwealth/core';
 import { AppError } from 'common-common/src/errors';
-import { NotificationCategories } from 'common-common/src/types';
 import type { NextFunction, Request, Response } from 'express';
 import { WhereOptions } from 'sequelize';
 import { SubscriptionAttributes } from 'server/models/subscription';

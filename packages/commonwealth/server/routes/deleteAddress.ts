@@ -1,5 +1,5 @@
+import { WalletId } from '@hicommonwealth/core';
 import { AppError, ServerError } from 'common-common/src/errors';
-import { WalletId } from 'common-common/src/types';
 import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../models';
 
@@ -15,7 +15,7 @@ const deleteAddress = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.user) {
     return next(new AppError(Errors.NotLoggedIn));

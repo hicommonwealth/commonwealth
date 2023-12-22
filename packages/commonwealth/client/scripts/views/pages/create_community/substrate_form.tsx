@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 
 import 'pages/create_community.scss';
 
-import { ChainBase, ChainType } from 'common-common/src/types';
+import { ChainBase, ChainType } from '@hicommonwealth/core';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useCommonNavigate } from 'navigation/helpers';

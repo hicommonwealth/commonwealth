@@ -1,11 +1,11 @@
-import { hideBin } from 'yargs/helpers';
-import yargs from 'yargs';
-import models from '../database';
-import { NotificationCategories } from 'common-common/src/types';
+import { NotificationCategories } from '@hicommonwealth/core';
+import { factory, formatFilename } from 'common-common/src/logging';
 import Sequelize, { Transaction } from 'sequelize';
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
+import models from '../database';
 import { NotificationInstance } from '../models/notification';
 import { SubscriptionInstance } from '../models/subscription';
-import { factory, formatFilename } from 'common-common/src/logging';
 import emitNotifications from '../util/emitNotifications';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -23,7 +23,7 @@ enum SupportedNotificationSpaces {
 function getMockNotification(
   randomData: boolean,
   chain?: string,
-  snapshot?: string
+  snapshot?: string,
 ) {
   const constantBlockNumber = 987654321;
   const constantPropId = 999999999;
@@ -85,7 +85,8 @@ function getMockNotification(
   const startTime = randomInt();
   const randomString = Array.from(
     { length: 64 },
-    () => 'abcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random() * 36)]
+    () =>
+      'abcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random() * 36)],
   ).join('');
 
   const snapshotNotifications = {
@@ -113,7 +114,7 @@ function getMockNotification(
 async function getExistingNotifications(
   transaction: Transaction,
   chainId?: string,
-  snapshotId?: string
+  snapshotId?: string,
 ): Promise<NotificationInstance[]> {
   let existingNotifications: NotificationInstance[];
   if (chainId) {
@@ -134,7 +135,7 @@ async function getExistingNotifications(
         category_id: NotificationCategories.SnapshotProposal,
         [Sequelize.Op.and]: [
           Sequelize.literal(
-            `notification_data::jsonb ->> 'space' = '${snapshotId}'`
+            `notification_data::jsonb ->> 'space' = '${snapshotId}'`,
           ),
         ],
       },
@@ -152,7 +153,7 @@ async function setupNotification(
   mockNotification: boolean,
   dontReplace: boolean,
   chainId?: string,
-  snapshotId?: string
+  snapshotId?: string,
 ): Promise<string> {
   if (!chainId && !snapshotId) {
     throw new Error('Must provide either a chainId or a snapshotId');
@@ -170,7 +171,7 @@ async function setupNotification(
         chain_event_id: mockNotif.id || null,
         [Sequelize.Op.and]: [
           Sequelize.literal(
-            `notification_data::jsonb -> 'event_data' ->> 'id' = '${mockNotif.event_data.id}'`
+            `notification_data::jsonb -> 'event_data' ->> 'id' = '${mockNotif.event_data.id}'`,
           ),
         ],
       },
@@ -182,7 +183,7 @@ async function setupNotification(
     } else return JSON.stringify(mockNotif);
   } else if (mockNotification && snapshotId) {
     return JSON.stringify(
-      getMockNotification(!dontReplace, undefined, snapshotId)
+      getMockNotification(!dontReplace, undefined, snapshotId),
     );
   }
 
@@ -190,7 +191,7 @@ async function setupNotification(
     existingNotifications = await getExistingNotifications(
       transaction,
       chainId,
-      snapshotId
+      snapshotId,
     );
   }
 
@@ -286,25 +287,25 @@ async function main() {
       if (argv.chain_id) {
         if (
           !Object.values(SupportedNotificationChains).includes(
-            argv.chain_id as SupportedNotificationChains
+            argv.chain_id as SupportedNotificationChains,
           )
         ) {
           throw new Error(
             `Chain id must be one of ${Object.values(
-              SupportedNotificationChains
-            )}`
+              SupportedNotificationChains,
+            )}`,
           );
         }
       } else if (argv.snapshot_id) {
         if (
           !Object.values(SupportedNotificationSpaces).includes(
-            argv.snapshot_id as SupportedNotificationSpaces
+            argv.snapshot_id as SupportedNotificationSpaces,
           )
         ) {
           throw new Error(
             `Snapshot id must be one of ${Object.values(
-              SupportedNotificationSpaces
-            )}`
+              SupportedNotificationSpaces,
+            )}`,
           );
         }
       }
@@ -329,7 +330,7 @@ async function main() {
       if (!address) {
         log.error(
           'Wallet address not found. ' +
-            'Make sure the given address is an address you have used to sign in before.'
+            'Make sure the given address is an address you have used to sign in before.',
         );
         process.exit(1);
       } else {
@@ -364,7 +365,7 @@ async function main() {
       argv.mock_notification,
       argv.dont_replace,
       argv.chain_id,
-      argv.snapshot_id
+      argv.snapshot_id,
     );
 
     await transaction.commit();

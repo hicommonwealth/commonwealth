@@ -1,19 +1,26 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
+import { ProposalType } from '@hicommonwealth/core';
 import type { NearToken } from 'adapters/chain/near/types';
 import BN from 'bn.js';
-import { ProposalType } from 'common-common/src/types';
 import type { NearAccount, NearAccounts } from 'controllers/chain/near/account';
 import type NearChain from 'controllers/chain/near/chain';
-import type { ITXModalData } from '../../../../models/interfaces';
-import Proposal from '../../../../models/Proposal';
-import type { ProposalEndTime } from '../../../../models/types';
-import { ProposalStatus, VotingType, VotingUnit } from '../../../../models/types';
 import moment from 'moment';
 import type { Near as NearApi } from 'near-api-js';
+import Proposal from '../../../../models/Proposal';
+import type { ITXModalData } from '../../../../models/interfaces';
+import type { ProposalEndTime } from '../../../../models/types';
+import {
+  ProposalStatus,
+  VotingType,
+  VotingUnit,
+} from '../../../../models/types';
 import type NearSputnikDao from './dao';
 import type { INearSputnikProposal, VotePolicy } from './types';
 import {
+  NearSputnikProposalStatus,
+  NearSputnikVote,
+  WeightKind,
   getTotalSupply,
   getUserRoles,
   getVotePolicy,
@@ -24,9 +31,6 @@ import {
   isRemoveMemberFromRole,
   isTransfer,
   isWeight,
-  NearSputnikProposalStatus,
-  NearSputnikVote,
-  WeightKind,
 } from './types';
 
 export default class NearSputnikProposal extends Proposal<
@@ -136,7 +140,7 @@ export default class NearSputnikProposal extends Proposal<
     Chain: NearChain,
     Accounts: NearAccounts,
     Dao: NearSputnikDao,
-    data: INearSputnikProposal
+    data: INearSputnikProposal,
   ) {
     super(ProposalType.SputnikProposal, data);
     this._Chain = Chain;
@@ -148,16 +152,16 @@ export default class NearSputnikProposal extends Proposal<
     this._totalSupply = getTotalSupply(
       Dao.policy,
       this._votePolicy,
-      Dao.tokenSupply
+      Dao.tokenSupply,
     );
 
     const periodS = +this._Dao.policy.proposal_period.slice(
       0,
-      this._Dao.policy.proposal_period.length - 9
+      this._Dao.policy.proposal_period.length - 9,
     );
     const submissionTimeS = +this.data.submission_time.slice(
       0,
-      this.data.submission_time.length - 9
+      this.data.submission_time.length - 9,
     );
     this._endTimeS = submissionTimeS + periodS;
     const nowS = moment.now() / 1000;
@@ -167,7 +171,7 @@ export default class NearSputnikProposal extends Proposal<
       console.log(
         `Marking proposal ${this.identifier} expired, by ${
           nowS - this._endTimeS
-        } seconds.`
+        } seconds.`,
       );
       // special case for expiration that hasn't yet been triggered
       data.status = NearSputnikProposalStatus.Expired;
@@ -176,7 +180,7 @@ export default class NearSputnikProposal extends Proposal<
     // TODO: fetch weights for each voter? is this necessary?
     for (const [voter, choice] of Object.entries(data.votes)) {
       this.addOrUpdateVote(
-        new NearSputnikVote(this._Accounts.get(voter), choice)
+        new NearSputnikVote(this._Accounts.get(voter), choice),
       );
     }
     this._Dao.store.add(this);
@@ -226,7 +230,7 @@ export default class NearSputnikProposal extends Proposal<
         // weight threshold: must have enough votes
         threshold = BN.min(
           this._totalSupply,
-          new BN(this._votePolicy.threshold)
+          new BN(this._votePolicy.threshold),
         );
       } else {
         // ratio threshold: must have sufficient proportion
@@ -236,7 +240,7 @@ export default class NearSputnikProposal extends Proposal<
             .muln(+numerator)
             .divn(+denominator)
             .addn(1),
-          this._totalSupply
+          this._totalSupply,
         );
       }
       const [yes, no, remove] = this._getVoteCounts();
@@ -272,7 +276,7 @@ export default class NearSputnikProposal extends Proposal<
       methodName,
       args,
       undefined,
-      window.location.href
+      window.location.href,
     );
   }
 

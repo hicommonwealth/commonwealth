@@ -1,5 +1,5 @@
+import { ChainBase, ChainType } from '@hicommonwealth/core';
 import { assert } from 'chai';
-import { ChainBase, ChainType } from 'common-common/src/types';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 import models from '../../../server/database';
 import { CommunityAttributes } from '../../../server/models/community';

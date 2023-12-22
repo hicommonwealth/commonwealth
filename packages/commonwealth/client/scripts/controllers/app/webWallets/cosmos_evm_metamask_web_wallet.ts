@@ -1,5 +1,5 @@
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
 import { bech32 } from 'bech32';
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
 
 import app from 'state';
