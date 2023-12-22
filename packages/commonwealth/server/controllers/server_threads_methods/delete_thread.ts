@@ -1,7 +1,6 @@
 import { AppError } from '../../../../common-common/src/errors';
 import { AddressInstance } from '../../models/address';
 import { UserInstance } from '../../models/user';
-import { getTopThreadIds } from '../../util/activityQuery';
 import deleteThreadFromDb from '../../util/deleteThread';
 import { validateOwner } from '../../util/validateOwner';
 import { ServerThreadsController } from '../server_threads_controller';
@@ -78,10 +77,6 @@ export async function __deleteThread(
 
   // use callbacks so route returns and this completes in the background
   if (this.globalActivityCache) {
-    getTopThreadIds(this.models).then((topThreadIds) => {
-      if (topThreadIds.includes(thread.id)) {
-        this.globalActivityCache.refreshGlobalActivity();
-      }
-    });
+    this.globalActivityCache.deleteActivityFromCache(thread.id);
   }
 }

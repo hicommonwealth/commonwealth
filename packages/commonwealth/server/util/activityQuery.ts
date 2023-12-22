@@ -1,35 +1,20 @@
-import { Op, QueryTypes } from 'sequelize';
+import { QueryTypes } from 'sequelize';
 import type { DB } from '../models';
 import type { AddressInstance } from '../models/address';
 
 export type ActivityRow = {
   category_id: string;
-  comment_count: string;
+  comment_count: number;
   last_activity: string;
   notification_data: string; // actually object but stringified
-  reaction_count: string;
-  thread_id: string;
+  reaction_count: number;
+  thread_id: number;
   commenters: {
     Addresses: AddressInstance[];
   }[];
 };
 
 export type GlobalActivity = Array<ActivityRow>;
-
-export async function getTopThreadIds(models: DB): Promise<number[]> {
-  const ids = await models.Thread.findAll({
-    attributes: ['id'],
-    where: {
-      max_notif_id: {
-        [Op.ne]: null,
-      },
-    },
-    order: [['max_notif_id', 'DESC']],
-    limit: 50,
-  });
-
-  return ids.map((t) => t.id);
-}
 
 export async function getActivityFeed(
   models: DB,
