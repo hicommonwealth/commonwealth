@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
 import cheerio from 'cheerio';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { DEFAULT_COMMONWEALTH_LOGO } from '../config';
 import type { DB } from '../models';
 import type { CommunityInstance } from '../models/community';
@@ -76,7 +77,7 @@ const setupAppRoutes = (app, models: DB, templateFile, sendFile) => {
     const metadataHtml: string = $tmpl.html();
     const twitterSafeHtml = metadataHtml.replace(
       /<meta name="twitter:image:src" content="(.*?)">/g,
-      '<meta name="twitter:image" content="$1">'
+      '<meta name="twitter:image" content="$1">',
     );
 
     res.send(twitterSafeHtml);
@@ -157,7 +158,7 @@ const setupAppRoutes = (app, models: DB, templateFile, sendFile) => {
     scope: string,
     req,
     res,
-    chain?: CommunityInstance
+    chain?: CommunityInstance,
   ) => {
     // Retrieve title, description, and author from the database
     chain = chain || (await getChain(req, scope));
@@ -237,7 +238,9 @@ const setupAppRoutes = (app, models: DB, templateFile, sendFile) => {
   async function getChain(req, scope: string) {
     return scope
       ? await models.Community.findOne({ where: { id: scope } })
-      : await models.Community.findOne({ where: { custom_domain: req.hostname } });
+      : await models.Community.findOne({
+          where: { custom_domain: req.hostname },
+        });
   }
 
   app.get('/:scope?', renderGeneralPage);

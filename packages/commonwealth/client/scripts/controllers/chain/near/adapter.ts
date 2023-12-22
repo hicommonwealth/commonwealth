@@ -1,5 +1,5 @@
+import { ChainBase } from '@hicommonwealth/core';
 import type { NearToken } from 'adapters/chain/near/types';
-import { ChainBase } from 'common-common/src/types';
 import type { IApp } from 'state';
 import type ChainInfo from '../../../models/ChainInfo';
 import IChainAdapter from '../../../models/IChainAdapter';

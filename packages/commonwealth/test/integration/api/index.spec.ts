@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-expressions */
+import { ChainBase } from '@hicommonwealth/core';
 import { personalSign } from '@metamask/eth-sig-util';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
@@ -7,7 +8,6 @@ import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
 import { bech32ToHex } from 'shared/utils';
 import * as siwe from 'siwe';
-import { ChainBase } from '../../../../common-common/src/types';
 import app, { resetDatabase } from '../../../server-test';
 import {
   TEST_BLOCK_INFO_BLOCKHASH,

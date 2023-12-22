@@ -1,4 +1,4 @@
-import { IDiscordMeta } from 'common-common/src/types';
+import { IDiscordMeta } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';

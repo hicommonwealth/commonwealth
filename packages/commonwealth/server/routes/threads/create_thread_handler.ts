@@ -1,4 +1,4 @@
-import { IDiscordMeta } from 'common-common/src/types';
+import { IDiscordMeta } from '@hicommonwealth/core';
 import { verifyThread } from '../../../shared/canvas/serverVerify';
 import { ThreadAttributes } from '../../models/thread';
 import { ServerControllers } from '../../routing/router';

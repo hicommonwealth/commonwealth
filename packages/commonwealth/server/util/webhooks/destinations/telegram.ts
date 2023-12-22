@@ -1,12 +1,12 @@
-import { NotificationCategories } from 'common-common/src/types';
+import { NotificationCategories } from '@hicommonwealth/core';
+import request from 'superagent';
+import { SERVER_URL, TELEGRAM_BOT_TOKEN } from '../../../config';
 import {
   ChainEventWebhookData,
   ForumWebhookData,
   WebhookDataByCategory,
 } from '../types';
 import { REGEX_EMOJI } from '../util';
-import request from 'superagent';
-import { SERVER_URL, TELEGRAM_BOT_TOKEN } from '../../../config';
 
 type TelegramWebhookMessage = {
   chat_id: string;
@@ -19,8 +19,8 @@ type TelegramWebhookMessage = {
         {
           text: 'Read more on Commonwealth';
           url: string;
-        }
-      ]
+        },
+      ],
     ];
   };
 };
@@ -31,7 +31,7 @@ type TelegramWebhookMessage = {
 function formatTelegramMessage<C extends NotificationCategories>(
   category: C,
   data: WebhookDataByCategory<C>,
-  channelId: string
+  channelId: string,
 ): TelegramWebhookMessage {
   let text: string;
   let chatUrl: string;
@@ -77,7 +77,7 @@ export async function sendTelegramWebhook(
   //  telegram webhooks should not have urls but channel ids instead
   webhookUrl: string,
   category: NotificationCategories,
-  data: ForumWebhookData | ChainEventWebhookData
+  data: ForumWebhookData | ChainEventWebhookData,
 ) {
   // telegram API does not allow localhost urls in messages so replace them with Commonwealth url
   if (SERVER_URL.includes('localhost')) {
@@ -91,7 +91,7 @@ export async function sendTelegramWebhook(
       if (data[key]) {
         data[key] = data[key].replace(
           'http://localhost:8080',
-          'https://commonwealth.im'
+          'https://commonwealth.im',
         );
       }
     }

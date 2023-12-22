@@ -3,7 +3,7 @@ import {
   ChainBase,
   ChainNetwork,
   ChainType,
-} from 'common-common/src/types';
+} from '@hicommonwealth/core';
 import models from '../../../server/database';
 import { hashAbi } from '../../../server/util/abiValidation';
 import {

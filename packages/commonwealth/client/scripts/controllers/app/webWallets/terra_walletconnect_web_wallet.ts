@@ -1,10 +1,10 @@
+import type { SessionPayload } from '@canvas-js/interfaces';
 import type {
   ConnectedWallet,
   WalletController,
 } from '@terra-money/wallet-controller';
-import type { SessionPayload } from '@canvas-js/interfaces';
 
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
 import app from 'state';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
@@ -63,19 +63,19 @@ class TerraWalletConnectWebWalletController
       hash: blockInfo.block.header.data_hash,
       // seconds since epoch
       timestamp: Math.floor(
-        new Date(blockInfo.block.header.time).getTime() / 1000
+        new Date(blockInfo.block.header.time).getTime() / 1000,
       ),
     };
   }
 
   public async signCanvasMessage(
     account: Account,
-    canvasSessionPayload: SessionPayload
+    canvasSessionPayload: SessionPayload,
   ): Promise<string> {
     const canvas = await import('@canvas-js/interfaces');
     try {
       const result = await this._wallet.signBytes(
-        Buffer.from(canvas.serializeSessionPayload(canvasSessionPayload))
+        Buffer.from(canvas.serializeSessionPayload(canvasSessionPayload)),
       );
       if (!result.success) {
         throw new Error('SignBytes unsuccessful');
