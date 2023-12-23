@@ -43,7 +43,7 @@
     "start-android": "npx cap run android",
     "start-ci": "FETCH_INTERVAL_MS=500 ts-node --project tsconfig.json server.ts",
     "start-consumer": "ts-node --project tsconfig.worker.json server/workers/commonwealthConsumer/commonwealthConsumer.ts run-as-script",
-    "start-external-webpack": "NODE_ENV=production NO_PRERENDER=true NO_SSL=true ts-node -P tsconfig.server.json -T ./server.ts",
+    "start-external-webpack": "NODE_ENV=production NO_PRERENDER=true NO_SSL=true ts-node -r tsconfig-paths/register -P tsconfig.server.json -T ./server.ts",
     "start-ios": "npx cap run ios",
     "stylelint": "stylelint client/styles/*",
     "test": "nyc ts-mocha --project tsconfig.json './test/**/*.spec.ts'",
