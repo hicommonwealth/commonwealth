@@ -1,10 +1,7 @@
 // Adapted from:
 // https://github.com/uber-archive/express-statsd/blob/master/lib/express-statsd.js
 
-import {
-  ProjectTag,
-  StatsDController,
-} from '@hicommonwealth/core/build/platform';
+import { ProjectTag, StatsDController } from '@hicommonwealth/core/platform';
 import type { NextFunction, Request, Response } from 'express';
 
 export default function expressStatsdInit() {

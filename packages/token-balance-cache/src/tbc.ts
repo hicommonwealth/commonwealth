@@ -1,8 +1,5 @@
 import { ChainNetwork } from '@hicommonwealth/core';
-import {
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/core/build/platform';
+import { formatFilename, loggerFactory } from '@hicommonwealth/core/platform';
 import BN from 'bn.js';
 import JobRunner from 'common-common/src/cacheJobRunner';
 import { Client } from 'pg';

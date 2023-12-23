@@ -1,7 +1,4 @@
-import {
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/core/build/platform';
+import { formatFilename, loggerFactory } from '@hicommonwealth/core/platform';
 import * as Rascal from 'rascal';
 import type Rollbar from 'rollbar';
 import type { Sequelize } from 'sequelize';

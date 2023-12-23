@@ -1,10 +1,7 @@
 import type { RegisteredTypes } from '@polkadot/types/types';
 import { AppError, ServerError } from 'common-common/src/errors';
 
-import {
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/core/build/platform';
+import { formatFilename, loggerFactory } from '@hicommonwealth/core/platform';
 import { constructSubstrateUrl } from '../../shared/substrate';
 
 const log = loggerFactory.getLogger(formatFilename(__filename));

@@ -1,7 +1,4 @@
-import {
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/core/build/platform';
+import { formatFilename, loggerFactory } from '@hicommonwealth/core/platform';
 import { PageRequest } from 'common-common/src/cosmos-ts/src/codegen/cosmos/base/query/v1beta1/pagination';
 import {
   ProposalSDKType,

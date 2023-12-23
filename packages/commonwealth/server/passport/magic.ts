@@ -6,10 +6,7 @@ import {
   WalletId,
   WalletSsoSource,
 } from '@hicommonwealth/core';
-import {
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/core/build/platform';
+import { formatFilename, loggerFactory } from '@hicommonwealth/core/platform';
 import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
 import { ServerError } from 'common-common/src/errors';
 import { verify } from 'jsonwebtoken';

@@ -2,7 +2,7 @@ import {
   StatsDController,
   formatFilename,
   loggerFactory,
-} from '@hicommonwealth/core/build/platform';
+} from '@hicommonwealth/core/platform';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type {

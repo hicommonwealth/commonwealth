@@ -2,10 +2,7 @@ import axios from 'axios';
 import bodyParser from 'body-parser';
 import _ from 'lodash';
 
-import {
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/core/build/platform';
+import { formatFilename, loggerFactory } from '@hicommonwealth/core/platform';
 import { cacheDecorator } from 'common-common/src/cacheDecorator';
 import { lookupKeyDurationInReq } from 'common-common/src/cacheKeyUtils';
 import { AppError } from 'common-common/src/errors';

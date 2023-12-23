@@ -1,7 +1,4 @@
-import {
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/core/build/platform';
+import { formatFilename, loggerFactory } from '@hicommonwealth/core/platform';
 const log = loggerFactory.getLogger(formatFilename(__filename));
 
 type DaemonTask = () => void;

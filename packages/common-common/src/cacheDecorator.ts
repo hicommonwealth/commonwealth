@@ -1,8 +1,5 @@
 import { RedisNamespaces } from '@hicommonwealth/core';
-import {
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/core/build/platform';
+import { formatFilename, loggerFactory } from '@hicommonwealth/core/platform';
 import { Request, RequestHandler, Response } from 'express';
 import {
   CacheKeyDuration,

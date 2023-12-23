@@ -1,7 +1,4 @@
-import {
-  ProjectTag,
-  StatsDController,
-} from '@hicommonwealth/core/build/platform';
+import { ProjectTag, StatsDController } from '@hicommonwealth/core/platform';
 import type { BalanceProvider } from './types';
 
 // Class with Helper functions to send statsD

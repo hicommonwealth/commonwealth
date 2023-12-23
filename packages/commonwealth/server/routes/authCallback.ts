@@ -1,7 +1,4 @@
-import {
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/core/build/platform';
+import { formatFilename, loggerFactory } from '@hicommonwealth/core/platform';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { DISCORD_BOT_SUCCESS_URL } from '../config';
 import type { DB } from '../models';

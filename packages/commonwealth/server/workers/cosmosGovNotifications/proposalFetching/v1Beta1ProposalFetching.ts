@@ -1,7 +1,4 @@
-import {
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/core/build/platform';
+import { formatFilename, loggerFactory } from '@hicommonwealth/core/platform';
 import { ProposalStatus } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
 import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import { CommunityInstance } from '../../../models/community';

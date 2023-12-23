@@ -3,9 +3,11 @@
   "private": "true",
   "version": "0.1.0",
   "description": "Core Model",
-  "main": "build/types",
+  "main": "build/index",
+  "types": "build/index",
   "scripts": {
-    "build": "rm -rf build && npx tsc",
+    "clean": "rm -rf build",
+    "build": "tsc",
     "test": "NODE_ENV=test ts-mocha '__tests__/**/*.spec.ts'"
   },
   "files": [

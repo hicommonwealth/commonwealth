@@ -1,8 +1,5 @@
 import { NotificationCategories } from '@hicommonwealth/core';
-import {
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/core/build/platform';
+import { formatFilename, loggerFactory } from '@hicommonwealth/core/platform';
 import Sequelize, { Transaction } from 'sequelize';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';

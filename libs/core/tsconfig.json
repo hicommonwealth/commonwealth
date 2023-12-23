@@ -1,19 +1,20 @@
 {
   "compilerOptions": {
-    "strict": true,
     "module": "CommonJS",
     "target": "ESNext",
-    "noImplicitAny": true,
-    "noUnusedLocals": true,
-    "preserveConstEnums": true,
-    "esModuleInterop": true,
-    "sourceMap": true,
-    "sourceRoot": "src",
     "outDir": "build",
+
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "preserveConstEnums": true,
+
+    "esModuleInterop": true,
     "skipLibCheck": true,
+    "resolveJsonModule": true,
+
+    "sourceMap": true,
     "declaration": true,
-    "declarationMap": true,
-    "resolveJsonModule": true
+    "declarationMap": true
   },
   "include": ["src"]
 }

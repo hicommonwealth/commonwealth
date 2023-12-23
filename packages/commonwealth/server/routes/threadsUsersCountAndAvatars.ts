@@ -1,7 +1,4 @@
-import {
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/core/build/platform';
+import { formatFilename, loggerFactory } from '@hicommonwealth/core/platform';
 import type { Request, Response } from 'express';
 import { groupBy } from 'lodash';
 import { QueryTypes } from 'sequelize';

@@ -3,7 +3,7 @@ import {
   StatsDController,
   formatFilename,
   loggerFactory,
-} from '@hicommonwealth/core/build/platform';
+} from '@hicommonwealth/core/platform';
 import { ethers } from 'ethers';
 import { rollbar } from '../../util/rollbar';
 import {

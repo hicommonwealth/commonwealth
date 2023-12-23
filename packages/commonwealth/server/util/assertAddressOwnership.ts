@@ -1,7 +1,4 @@
-import {
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/core/build/platform';
+import { formatFilename, loggerFactory } from '@hicommonwealth/core/platform';
 import { ServerError } from 'common-common/src/errors';
 import { Op } from 'sequelize';
 import type { DB } from '../models';

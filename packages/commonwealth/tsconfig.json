@@ -3,14 +3,14 @@
   "compilerOptions": {
     "jsx": "react",
     "outDir": "./build",
-    "baseUrl": ".",
     "skipLibCheck": true,
     "paths": {
-      "common-common": ["../../packages/common-common"],
-      "common-common/*": ["../../packages/common-common/*"],
-      "token-balance-cache": ["../../packages/token-balance-cache"],
-      "token-balance-cache/*": ["../../packages/token-balance-cache/*"],
-      "*": ["./*", "shared/*", "client/scripts/*"]
+      "@hicommonwealth/core/*": ["libs/core/src/*"],
+      "*": [
+        "packages/commonwealth/*",
+        "packages/commonwealth/shared/*",
+        "packages/commonwealth/client/scripts/*"
+      ]
     }
   },
   "include": [
