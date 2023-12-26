@@ -24,7 +24,7 @@
     "stylelint": "stylelint packages/commonwealth/client/styles/*",
     "chromatic": "chromatic --exit-zero-on-changes",
     "prepare": "husky install & yarn workspace @hicommonwealth/core build",
-    "dev": "nodemon --watch './libs/core/src/**' --ext 'ts,tsx' --ignore './libs/**/*.spec.ts' --exec 'yarn workspace @hicommonwealth/core build && yarn workspace commonwealth start'",
+    "dev": "nodemon --watch './libs/core/src/**' --ext 'ts' --ignore '*.spec.ts' --exec 'yarn workspace @hicommonwealth/core build && yarn workspace commonwealth start'",
     "sanity": "chmod u+x scripts/sanity.sh && ./scripts/sanity.sh"
   },
   "engines": {

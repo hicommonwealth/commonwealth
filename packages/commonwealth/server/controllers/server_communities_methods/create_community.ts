@@ -7,7 +7,7 @@ import {
   DefaultPage,
   NotificationCategories,
 } from '@hicommonwealth/core';
-import { CreateCommunity } from '@hicommonwealth/core/build/community';
+import { CreateCommunity } from '@hicommonwealth/core/community';
 import type { Cluster } from '@solana/web3.js';
 import * as solw3 from '@solana/web3.js';
 import axios from 'axios';
