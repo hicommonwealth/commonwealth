@@ -8,7 +8,7 @@
     "lint-all": "eslint './**/*.ts'",
     "check-types": "tsc --project tsconfig.json --noEmit",
     "start": "ts-node-dev --max-old-space-size=4096 --respawn -r tsconfig-paths/register src/index.ts",
-    "test": "ts-mocha -p tsconfig.json --exit './test/**/*.spec.ts'"
+    "test": "ts-mocha --paths -p tsconfig.json --exit './test/**/*.spec.ts'"
   },
   "engines": {
     "node": "18.x"
