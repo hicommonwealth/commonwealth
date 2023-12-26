@@ -6,6 +6,7 @@
     "skipLibCheck": true,
     "paths": {
       "@hicommonwealth/core/*": ["libs/core/src/*"],
+      "common-common/*": ["packages/common-common/*"],
       "*": [
         "packages/commonwealth/*",
         "packages/commonwealth/shared/*",
