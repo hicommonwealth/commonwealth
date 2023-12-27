@@ -520,7 +520,7 @@ jobs:
       - name: Start EVM testing app
         run: >
           cd packages/commonwealth/test/util/evm-chain-testing
-          && CE_CI_TESTING=true RPC_HOST=ganache yarn start &
+          && CHAIN_PORT=3000 CE_CI_TESTING=true RPC_HOST=ganache yarn start &
 
       - name: Wait for EVM testing app
         run: PORT=3000 yarn --cwd packages/commonwealth wait-server
