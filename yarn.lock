@@ -11786,13 +11786,6 @@ eth-sig-util@2.1.2:
     tweetnacl "^1.0.0"
     tweetnacl-util "^0.15.0"
 
-ethereum-block-by-date@^1.2.2:
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/ethereum-block-by-date/-/ethereum-block-by-date-1.2.2.tgz"
-  integrity sha512-2a3Ll/798vqzB7CH3dMBCHsAMgJk/bNR1YvRj3sCxwWMxH4znA2ZRxLwx/MZY/hBAYrWf/GIg49dVG1uSqVdkw==
-  dependencies:
-    moment "^2.25.0"
-
 ethereum-bloom-filters@^1.0.6:
   version "1.0.6"
   resolved "https://registry.npmjs.org/ethereum-bloom-filters/-/ethereum-bloom-filters-1.0.6.tgz"
@@ -17269,7 +17262,7 @@ moment-timezone@^0.5.43:
   dependencies:
     moment "^2.29.4"
 
-moment@*, "moment@>= 2.9.0", moment@^2.10.2, moment@^2.23.0, moment@^2.25.0, moment@^2.29.1:
+moment@*, "moment@>= 2.9.0", moment@^2.10.2, moment@^2.23.0, moment@^2.29.1:
   version "2.29.1"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.1.tgz#b2be769fa31940be9eeea6469c075e35006fa3d3"
   integrity sha512-kHmoybcPV8Sqy59DwNDY3Jefr64lK/by/da0ViFcuA4DH0vQg5Q6Ze5VimxkfQNSC+Mls/Kx53s7TjP1RhFEDQ==
