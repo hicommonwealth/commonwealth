@@ -510,9 +510,9 @@ jobs:
       - name: Start EVM Testnet
         run: |
           /usr/bin/docker pull trufflesuite/ganache;
-          network_name=$(docker inspect -f '{{.HostConfig.NetworkMode}}' ${{ job.services.evm_test_app.id }})
-          echo "Network name: $network_name"
-          /usr/bin/docker run -d --name chain --network $network_name --network-alias chain -p 8545:8545 -e GITHUB_ACTIONS=true -e CI=true trufflesuite/ganache --fork --miner.blockTime 12 --wallet.unlockedAccounts 0xF977814e90dA44bFA03b6295A0616a897441aceC --wallet.unlockedAccounts 0xfA9b5f7fDc8AB34AAf3099889475d47febF830D7 --wallet.unlockedAccounts 0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8;
+          echo "CE_CI_TESTING: $CE_CI_TESTING"
+          echo "RPC_HOST: $RPC_HOST"
+          /usr/bin/docker run -d --name chain -p 8545:8545 -e GITHUB_ACTIONS=true -e CI=true trufflesuite/ganache --fork --miner.blockTime 12 --wallet.unlockedAccounts 0xF977814e90dA44bFA03b6295A0616a897441aceC --wallet.unlockedAccounts 0xfA9b5f7fDc8AB34AAf3099889475d47febF830D7 --wallet.unlockedAccounts 0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8;
 
       - name: Run Token Balance Cache Unit Tests
         run: yarn --cwd packages/token-balance-cache test --forbid-only
@@ -520,7 +520,7 @@ jobs:
       - name: Run EVM Devnet tests
         run: >
           cd packages/commonwealth/test/util/evm-chain-testing
-          && yarn start
+          && CE_CI_TESTING=true RPC_HOST=ganache yarn start
           & (PORT=3000 yarn --cwd packages/commonwealth wait-server
           && yarn --cwd packages/commonwealth test-devnet evm --forbid-only)
 
