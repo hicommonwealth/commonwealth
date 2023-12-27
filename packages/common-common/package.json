@@ -15,7 +15,7 @@
     "lint": "../../scripts/lint-new-work.sh",
     "lint-all": "eslint './**/*.ts'",
     "check-types": "tsc --noEmit",
-    "publish-rmq-msg": "ts-node --project tsconfig.json src/rabbitmq/scripts/publishRmqMessageScript.ts"
+    "publish-rmq-msg": "ts-node --project tsconfig.json -r tsconfig-paths/register src/rabbitmq/scripts/publishRmqMessageScript.ts"
   },
   "dependencies": {
     "async-rwlock": "^1.1.1",
