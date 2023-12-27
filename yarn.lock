@@ -23164,11 +23164,6 @@ thread-stream@^0.15.1:
   dependencies:
     real-require "^0.1.0"
 
-throttled-queue@^1.0.7:
-  version "1.0.7"
-  resolved "https://registry.npmjs.org/throttled-queue/-/throttled-queue-1.0.7.tgz"
-  integrity sha512-/HT49S7m+NvdyJMoMRzIYlawKjeHn8jEc8TZaGmFi5IBu09hIiU/QoP1zcrB9X2qsVC11PgfRfqd8zEQs7PlEA==
-
 through2@^2.0.0:
   version "2.0.5"
   resolved "https://registry.npmjs.org/through2/-/through2-2.0.5.tgz"
