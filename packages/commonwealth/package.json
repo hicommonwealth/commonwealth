@@ -191,7 +191,6 @@
     "parchment": "^1.1.4",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
-    "passport-local": "^1.0.0",
     "passport-magic": "^1.0.0",
     "path-browserify": "^1.0.1",
     "prerender": "^5.6.0",
