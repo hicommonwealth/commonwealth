@@ -226,7 +226,6 @@
     "sass": "^1.55.0",
     "sequelize-cli": "^6.2.0",
     "serve-favicon": "^2.5.0",
-    "sharp": "^0.31.2",
     "siwe": "^2.1.4",
     "sleep-promise": "^8.0.1",
     "smart-truncate": "^1.0.1",
