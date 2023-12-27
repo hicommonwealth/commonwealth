@@ -105,7 +105,7 @@ Contributor: Kurtis Assad
 
 ## clean-db
 
-Definition: `ts-node --project tsconfig.json server/scripts/cleanDb.ts`
+Definition: `ts-node -r tsconfig-paths/register --project tsconfig.json server/scripts/cleanDb.ts`
 
 Description: This executes series of 'cleaner' functions that delete unnecessary data from the database, particularly notification and subscription data. For more documentation, see databaseCleaner.ts. On prod, the cleaner functions run daily.
 
@@ -319,7 +319,7 @@ Contributor: Nakul Manchanda
 
 ## send-cosmos-notifs
 
-Definition: `ts-node --project tsconfig.json server/cosmosGovNotifications/generateCosmosGovNotifications.ts`
+Definition: `ts-node -r tsconfig-paths/register --project tsconfig.json server/cosmosGovNotifications/generateCosmosGovNotifications.ts`
 
 Description: Generates Cosmos v1 and v1beta1 governance notifications by polling relevant Cosmos chains.
 
@@ -327,7 +327,7 @@ Contributor: Timothee Legros
 
 ## send-notification-digest-emails
 
-Definition: `SEND_EMAILS=true ts-node --project tsconfig.json server.ts`
+Definition: `SEND_EMAILS=true ts-node -r tsconfig-paths/register --project tsconfig.json server.ts`
 
 Description: Schedules a daily task for sending notification email digests.
 
@@ -343,7 +343,7 @@ Contributor: Kurtis Assad
 
 ## emit-notification
 
-Definition: `ts-node --project tsconfig.json server/scripts/emitTestNotification.ts`
+Definition: `ts-node -r tsconfig-paths/register --project tsconfig.json server/scripts/emitTestNotification.ts`
 
 Description: Emits a chain-event or snapshot notification. Run `yarn emit-notification --help` to see options.
 
@@ -475,13 +475,13 @@ Description:  Runs webpack-bundle-analyzer library to display breakdown of bundl
 
 ## listen
 
-Definition: `RUN_AS_LISTENER=true ts-node --project tsconfig.json server.ts`
+Definition: `RUN_AS_LISTENER=true ts-node -r tsconfig-paths/register --project tsconfig.json server.ts`
 
 Description: Runs ts-node, a TypeScript execution engine for NodeJS, in listening mode for changes, following tsconfig.json and using [server.ts](../packages/commonwealth/server.ts) as the entry file.
 
 ## start
 
-Definition: `ts-node-dev --max-old-space-size=4096 --respawn --transpile-only --project tsconfig.json server.ts`
+Definition: `ts-node-dev -r tsconfig-paths/register --max-old-space-size=4096 --respawn --transpile-only --project tsconfig.json server.ts`
 
 Description: Windows-compatible start script. Used to start the Commonwealth app in development.
 
@@ -493,13 +493,13 @@ Description: Runs `yarn start` and `yarn start-consumer` (i.e., the main app ser
 
 ## start-consumer
 
-Definition: `ts-node --project tsconfig.worker.json server/workers/commonwealthConsumer/commonwealthConsumer.ts run-as-script`
+Definition: `ts-node -r tsconfig-paths/register --project tsconfig.worker.json server/workers/commonwealthConsumer/commonwealthConsumer.ts run-as-script`
 
 Description: Runs `CommonwealthConsumer.ts` script, which consumes & processes RabbitMQ messages from external apps and services. See script file for more complete documentation.
 
 ## start-evm-ce
 
-Definition: `ts-node ./server/workers/evmChainEvents/startEvmPolling.ts`
+Definition: `ts-node -r tsconfig-paths/register ./server/workers/evmChainEvents/startEvmPolling.ts`
 
 Description: Runs `startEvmPolling.ts` script, which polls Ethereum chains for events in order to generate notifications.
 
