@@ -519,7 +519,8 @@ jobs:
 
       - name: Run EVM Devnet tests
         run: >
-          cd packages/commonwealth/test/util/evm-chain-testing start
+          cd packages/commonwealth/test/util/evm-chain-testing
+          && yarn start
           & (PORT=3000 yarn --cwd packages/commonwealth wait-server
           && yarn --cwd packages/commonwealth test-devnet evm --forbid-only)
 
