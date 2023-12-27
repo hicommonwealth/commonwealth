@@ -529,7 +529,7 @@ jobs:
         run: yarn --cwd packages/token-balance-cache test --forbid-only
 
       - name: Run EVM Devnet tests
-        run: yarn --cwd packages/commonwealth test-devnet evm --forbid-only)
+        run: yarn --cwd packages/commonwealth test-devnet evm --forbid-only
 
       - name: Stop EVM Chain
         run: docker stop chain
