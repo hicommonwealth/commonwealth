@@ -1,10 +1,10 @@
-import type { RegisteredTypes } from '@polkadot/types/types';
 import type {
   ChainBase,
   ChainNetwork,
   ChainType,
   DefaultPage,
-} from 'common-common/src/types';
+} from '@hicommonwealth/core';
+import type { RegisteredTypes } from '@polkadot/types/types';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
 import type { AddressAttributes, AddressInstance } from './address';

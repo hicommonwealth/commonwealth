@@ -1,4 +1,4 @@
-import type { ChainBase, WalletId } from 'common-common/src/types';
+import type { ChainBase, WalletId } from '@hicommonwealth/core';
 import $ from 'jquery';
 import app from 'state';
 import Account from '../../models/Account';

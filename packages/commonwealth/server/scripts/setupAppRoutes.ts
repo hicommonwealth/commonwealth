@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
 import cheerio from 'cheerio';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { DEFAULT_COMMONWEALTH_LOGO } from '../config';
 import type { DB } from '../models';
 import type { CommunityInstance } from '../models/community';

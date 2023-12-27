@@ -1,4 +1,5 @@
-import { ChainBase } from 'common-common/src/types';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { ChainBase } from '@hicommonwealth/core';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'new_contract_template/new_contract_template_page.scss';
 import React from 'react';
@@ -36,7 +37,7 @@ const NewContractTemplatePage = () => {
       </CWText>
       <div className="CommunityInfo">
         <CWText className="label" type="b2">
-          {'Created in'}
+          Created in
         </CWText>
         <CWCommunityAvatar community={app.chain.meta} size="small" />
         <CWText type="b2" fontWeight="medium">

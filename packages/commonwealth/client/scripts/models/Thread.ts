@@ -1,4 +1,4 @@
-import { ProposalType } from 'common-common/src/types';
+import { ProposalType } from '@hicommonwealth/core';
 import type MinimumProfile from 'models/MinimumProfile';
 import moment, { Moment } from 'moment';
 import type { ReactionType } from './Reaction';

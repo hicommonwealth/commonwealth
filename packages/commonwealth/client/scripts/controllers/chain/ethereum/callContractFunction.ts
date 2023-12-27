@@ -1,12 +1,12 @@
-import { ChainBase } from 'common-common/src/types';
+import { ChainBase } from '@hicommonwealth/core';
+import { ethers } from 'ethers';
 import { processAbiInputsToDataTypes } from 'helpers/abi_form_helpers';
+import type Contract from 'models/Contract';
+import type IWebWallet from 'models/IWebWallet';
 import app from 'state';
 import type Web3 from 'web3';
 import type { TransactionConfig, TransactionReceipt } from 'web3-core/types';
 import type { AbiItem } from 'web3-utils';
-import type Contract from 'models/Contract';
-import type IWebWallet from 'models/IWebWallet';
-import { ethers } from 'ethers';
 import WebWalletController from '../../app/web_wallets';
 
 async function sendFunctionCall({
@@ -81,7 +81,7 @@ export async function callContractFunction({
   // get querying wallet
   const signingWallet = await WebWalletController.Instance.locateWallet(
     sender,
-    ChainBase.Ethereum
+    ChainBase.Ethereum,
   );
   if (!signingWallet.api) {
     throw new Error('Web3 Api Not Initialized');
@@ -108,7 +108,7 @@ export async function callContractFunction({
     tx_options,
   };
   const txReceipt: TransactionReceipt | any = await sendFunctionCall(
-    functionConfig
+    functionConfig,
   );
   return txReceipt;
 }

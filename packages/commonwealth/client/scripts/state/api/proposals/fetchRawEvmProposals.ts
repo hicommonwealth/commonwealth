@@ -1,8 +1,8 @@
+import { ChainNetwork } from '@hicommonwealth/core';
 import { useQuery } from '@tanstack/react-query';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
 import axios from 'axios';
-import { ChainNetwork } from 'common-common/src/types';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 

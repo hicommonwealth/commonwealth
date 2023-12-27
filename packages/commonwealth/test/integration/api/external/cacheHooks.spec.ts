@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { BalanceType } from '@hicommonwealth/core';
 import type BN from 'bn.js';
-import { BalanceType } from 'common-common/src/types';
 import type { IChainNode } from 'token-balance-cache/src';
 import { BalanceProvider, TokenBalanceCache } from 'token-balance-cache/src';
 
@@ -20,7 +21,7 @@ class MockTokenBalanceProvider extends BalanceProvider<
 
   public getExternalProvider(
     node: IChainNode,
-    opts: { tokenAddress: string; contractType: string }
+    opts: { tokenAddress: string; contractType: string },
   ): Promise<any> {
     return;
   }
@@ -28,7 +29,7 @@ class MockTokenBalanceProvider extends BalanceProvider<
   public async getBalance(
     node: IChainNode,
     address: string,
-    opts: { tokenAddress: string; contractType: string }
+    opts: { tokenAddress: string; contractType: string },
   ): Promise<string> {
     if (this.balanceFn) {
       const bal = await this.balanceFn(opts.tokenAddress, address);
@@ -58,7 +59,7 @@ before(async () => {
     0,
     0,
     [tokenProvider],
-    (_: number) => new Promise((res) => res(node))
+    (_: number) => new Promise((res) => res(node)),
   );
   await tokenBalanceCache.start();
 });

@@ -1,6 +1,6 @@
+import { BalanceType } from '@hicommonwealth/core';
 import axios from 'axios';
 import app from 'state';
-import { BalanceType } from '../../../../../../common-common/src/types';
 
 export const createChainNode = async ({
   url,

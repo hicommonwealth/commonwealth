@@ -1,6 +1,6 @@
+import { NotificationCategory } from '@hicommonwealth/core';
 import moment from 'moment';
 import ChainEvent from './ChainEvent';
-import { NotificationCategory } from 'common-common/src/types';
 
 export class Notification {
   public readonly id: number;
@@ -23,7 +23,7 @@ export class Notification {
     isRead: boolean,
     createdAt: string,
     subscriptionId: number,
-    chainEvent?
+    chainEvent?,
   ) {
     this.id = id;
     this.categoryId = categoryId;
@@ -50,7 +50,7 @@ export class Notification {
       json.is_read,
       json.created_at,
       json.subscription_id,
-      json?.ChainEvent ? ChainEvent.fromJSON(json.ChainEvent) : undefined
+      json?.ChainEvent ? ChainEvent.fromJSON(json.ChainEvent) : undefined,
     );
   }
 }

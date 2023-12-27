@@ -1,7 +1,7 @@
-import { ProposalType } from 'common-common/src/types';
+import { ProposalType } from '@hicommonwealth/core';
 import type moment from 'moment';
-import type { IUniqueId } from './interfaces';
 import type Topic from './Topic';
+import type { IUniqueId } from './interfaces';
 
 class AbridgedThread implements IUniqueId {
   public readonly id: number;
@@ -32,7 +32,7 @@ class AbridgedThread implements IUniqueId {
     chain: string,
     topic: any,
     pinned?: boolean,
-    url?: string
+    url?: string,
   ) {
     this.id = id;
     this.identifier = `${id}`;

@@ -1,4 +1,4 @@
-import type { WalletSsoSource } from 'common-common/src/types';
+import type { WalletSsoSource } from '@hicommonwealth/core';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 import type { ProfileRowProps } from '../../components/component_kit/cw_profiles_list';
