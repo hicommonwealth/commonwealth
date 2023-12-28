@@ -198,7 +198,7 @@ async function main() {
     app.use(sessionParser);
     app.use(passport.initialize());
     app.use(passport.session());
-    app.use(prerenderNode.set('prerenderServiceUrl', 'http://localhost:3000'));
+    app.use(prerenderNode.set('prerenderToken', process.env.PRERENDER_TOKEN));
   };
 
   const templateFile = (() => {
