@@ -365,11 +365,8 @@ jobs:
           GITHUB_BASE_REF: ${{ github.base_ref }}
         run: yarn lint-branch
 
-      - name: Commonwealth Typecheck
-        run: yarn --cwd packages/commonwealth check-types
-
-      - name: Dicsord-Bot Typecheck
-        run: yarn --cwd packages/discord-bot check-types
+      - name: Workspace typechecks
+        run: yarn workspaces run check-types
 
   # These tests run quickly, so run them in a separate job
   commonwealth-unit-integration:

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "lint-all": "eslint './**/*.ts'",
     "check-types": "tsc --noEmit",
     "start": "ts-node-dev --max-old-space-size=4096 --respawn -r tsconfig-paths/register src/index.ts",

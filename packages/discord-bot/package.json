@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "start": "ts-node -r tsconfig-paths/register discord-listener/discordListener.ts",
     "start-consumer": "ts-node -r tsconfig-paths/register discord-consumer/discordConsumer.ts",
     "check-types": "tsc --noEmit",
