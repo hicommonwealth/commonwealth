@@ -283,7 +283,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   if (
     (!isLoading && !thread) ||
     fetchThreadError ||
-    thread.community_id !== app.activeChainId()
+    thread.communityId !== app.activeChainId()
   ) {
     return <PageNotFound />;
   }

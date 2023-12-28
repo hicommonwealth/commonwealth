@@ -25,7 +25,7 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
   const { createdAt, author, title, id, body } = activity;
   let communityId: string;
   if (activity instanceof Thread) {
-    communityId = activity.community_id;
+    communityId = activity.communityId;
   } else {
     communityId = activity.chain;
   }

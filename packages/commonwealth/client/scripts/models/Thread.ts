@@ -137,7 +137,7 @@ export class Thread implements IUniqueId {
   public readonly slug = ProposalType.Thread;
   public readonly url: string;
   public readonly versionHistory: VersionHistory[];
-  public readonly community_id: string;
+  public readonly communityId: string;
   public readonly lastEdited: Moment;
 
   public markedAsSpamAt: Moment;
@@ -235,7 +235,7 @@ export class Thread implements IUniqueId {
     this.authorChain = Address.community_id;
     this.pinned = pinned;
     this.url = url;
-    this.community_id = community_id;
+    this.communityId = community_id;
     this.readOnly = read_only;
     this.collaborators = collaborators || [];
     this.lastCommentedOn = last_commented_on ? moment(last_commented_on) : null;

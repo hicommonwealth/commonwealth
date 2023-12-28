@@ -63,7 +63,7 @@ export const LinkedProposalsCard = ({
       const proposal = initialSnapshotLinks[0];
       if (proposal.identifier.includes('/')) {
         setSnapshotUrl(
-          `${app.isCustomDomain() ? '' : `/${thread.community_id}`}/snapshot/${
+          `${app.isCustomDomain() ? '' : `/${thread.communityId}`}/snapshot/${
             proposal.identifier
           }`,
         );
@@ -77,7 +77,7 @@ export const LinkedProposalsCard = ({
               setSnapshotTitle(matchingSnapshot.title);
               setSnapshotUrl(
                 `${
-                  app.isCustomDomain() ? '' : `/${thread.community_id}`
+                  app.isCustomDomain() ? '' : `/${thread.communityId}`
                 }/snapshot/${_space.id}/${matchingSnapshot.id}`,
               );
               break;
@@ -87,7 +87,7 @@ export const LinkedProposalsCard = ({
       }
       setSnapshotProposalsLoaded(true);
     }
-  }, [initialSnapshotLinks, thread.community_id]);
+  }, [initialSnapshotLinks, thread.communityId]);
 
   const showSnapshot =
     initialSnapshotLinks.length > 0 && snapshotProposalsLoaded;
@@ -112,7 +112,7 @@ export const LinkedProposalsCard = ({
                           <ReactRouterLink
                             key={l.identifier}
                             to={getThreadLink({
-                              threadChain: thread.community_id,
+                              threadChain: thread.communityId,
                               identifier: l.identifier,
                             })}
                           >
