@@ -1,5 +1,9 @@
 import type { ISnapshotNotification } from '@hicommonwealth/core';
-import { StatsDController, formatFilename } from '@hicommonwealth/core';
+import {
+  StatsDController,
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/platform';
 import {
   RabbitMQController,
   getRabbitMQConfig,

@@ -20,7 +20,9 @@ export const defaultKeyGenerator = (req: Request) => {
   return req.originalUrl;
 };
 
-export const defaultUserKeyGenerator = (req: Request) => {
+export const defaultUserKeyGenerator = (
+  req: Request & { user: { id: string } },
+) => {
   const user = req.user;
   if (user && user.id) {
     return `user:${user.id}_${req.originalUrl}`;
@@ -29,7 +31,7 @@ export const defaultUserKeyGenerator = (req: Request) => {
 };
 
 export function lookupKeyDurationInReq(
-  req: CustomRequest
+  req: CustomRequest,
 ): CacheKeyDuration | null {
   let cacheKey = null;
   let cacheDuration = null;

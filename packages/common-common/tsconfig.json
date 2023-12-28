@@ -5,5 +5,12 @@
     "skipLibCheck": true
   },
   "include": ["src", "test", "./hardhat.config.ts"],
-  "exclude": ["./node_modules", "node_modules", "./test", "build", "dist"]
+  "exclude": [
+    "./node_modules",
+    "node_modules",
+    "./test",
+    "build",
+    "dist",
+    "src/cosmos-ts"
+  ]
 }

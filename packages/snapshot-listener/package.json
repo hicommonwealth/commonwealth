@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc --project tsconfig.json && tsc-alias",
+    "build": "tsc",
     "lint-all": "eslint './**/*.ts'",
-    "check-types": "tsc --project tsconfig.json --noEmit",
+    "check-types": "tsc --noEmit",
     "start": "ts-node-dev --max-old-space-size=4096 --respawn -r tsconfig-paths/register src/index.ts",
     "test": "ts-mocha --paths -p tsconfig.json --exit './test/**/*.spec.ts'"
   },

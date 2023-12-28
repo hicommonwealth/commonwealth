@@ -35,10 +35,7 @@
   },
   "keywords": [],
   "workspaces": [
-    "packages/common-common",
-    "packages/token-balance-cache",
-    "packages/commonwealth",
-    "packages/discord-bot",
+    "packages/*",
     "libs/*"
   ],
   "dependencies": {
