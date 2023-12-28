@@ -8,6 +8,7 @@
       "@hicommonwealth/core": ["libs/core/src/index"],
       "@hicommonwealth/core/*": ["libs/core/src/*"],
       "common-common/*": ["packages/common-common/*"],
+      "token-balance-cache/*": ["packages/token-balance-cache/*"],
       "*": [
         "packages/commonwealth/*",
         "packages/commonwealth/shared/*",
