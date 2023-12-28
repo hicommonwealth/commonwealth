@@ -101,8 +101,8 @@ describe('EVM Chain Events End to End Tests', () => {
     await getTestSignatures();
 
     // create proposal notification
-    await sdk.getVotingPower(1, '400000', 'aave');
-    propCreatedResult = await sdk.createProposal(1, 'aave');
+    await sdk.getVotingPower(1, '400000');
+    propCreatedResult = await sdk.createProposal(1);
     console.log(
       `Proposal created at block ${propCreatedResult.block} with id ${propCreatedResult.proposalId}`,
     );
