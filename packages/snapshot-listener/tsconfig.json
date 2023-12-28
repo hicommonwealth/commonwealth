@@ -6,6 +6,5 @@
     "skipLibCheck": true,
     "outDir": "./build"
   },
-  "include": ["src"],
-  "exclude": ["./node_modules", "node_modules", "build", "dist", "test"]
+  "include": ["src"]
 }

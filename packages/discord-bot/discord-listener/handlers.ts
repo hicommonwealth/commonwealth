@@ -2,10 +2,10 @@ import { DiscordAction, IDiscordMessage } from '@hicommonwealth/core';
 import { formatFilename, loggerFactory } from '@hicommonwealth/core/platform';
 import { RabbitMQController } from 'common-common/src/rabbitmq';
 import { RascalPublications } from 'common-common/src/rabbitmq/types';
-import { getImageUrls } from 'discord-bot/discord-listener/util';
 import { Client, Message, ThreadChannel } from 'discord.js';
 import { rollbar } from '../utils/rollbar';
 import { getForumLinkedTopic } from '../utils/util';
+import { getImageUrls } from './util';
 
 const log = loggerFactory.getLogger(formatFilename(__filename));
 

@@ -6,6 +6,5 @@
     "skipLibCheck": true,
     "outDir": "./build"
   },
-  "include": ["discord-consumer", "discord-listener", "utils"],
-  "exclude": ["./node_modules", "node_modules", "build"]
+  "include": ["discord-consumer", "discord-listener", "utils"]
 }

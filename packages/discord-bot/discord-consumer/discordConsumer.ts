@@ -21,14 +21,11 @@ import {
   ServiceKey,
   startHealthCheckLoop,
 } from 'common-common/src/scripts/startHealthCheckLoop';
-import {
-  handleCommentMessages,
-  handleThreadMessages,
-} from 'discord-bot/discord-consumer/handlers';
-import { rollbar } from 'discord-bot/utils/rollbar';
-import { getForumLinkedTopic } from 'discord-bot/utils/util';
 import v8 from 'v8';
 import { CW_BOT_KEY, DISCOBOT_ADDRESS, RABBITMQ_URI } from '../utils/config';
+import { rollbar } from '../utils/rollbar';
+import { getForumLinkedTopic } from '../utils/util';
+import { handleCommentMessages, handleThreadMessages } from './handlers';
 
 let isServiceHealthy = false;
 
