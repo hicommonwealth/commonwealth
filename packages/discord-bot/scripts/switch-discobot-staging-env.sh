@@ -24,7 +24,7 @@ update_env_vars() {
         heroku config:set "$var=$value" -a "$target_app"
     done
 
-    SERVER_URL=$(heroku info -s -a "$app_name" | grep web_url | cut -d= -f2)
+    SERVER_URL=$(heroku info -s -a "$app_name" | grep web_url | cut -d= -f2 | sed 's:/*$::')
     heroku config:set SERVER_URL="$SERVER_URL" -a "$target_app"
 
     echo "Environment variables updated successfully."
