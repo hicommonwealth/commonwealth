@@ -1,6 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "include": [
+    "server.ts",
     "server/workers/commonwealthConsumer/commonwealthConsumer.ts",
     "server/workers/evmChainEvents/startEvmPolling.ts"
   ]

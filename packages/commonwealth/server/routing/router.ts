@@ -1,4 +1,7 @@
-import { formatFilename, loggerFactory } from '@hicommonwealth/core/platform';
+import {
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import type { Express } from 'express';
 import express from 'express';
 import useragent from 'express-useragent';

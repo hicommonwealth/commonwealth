@@ -1,5 +1,8 @@
 import { NotificationCategories } from '@hicommonwealth/core';
-import { formatFilename, loggerFactory } from '@hicommonwealth/core/platform';
+import {
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import { Op } from 'sequelize';
 import { NotificationDataAndCategory } from '../../../shared/types';
 import { slugify } from '../../../shared/utils';

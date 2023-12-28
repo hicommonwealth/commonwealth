@@ -1,4 +1,7 @@
-import { formatFilename, loggerFactory } from '@hicommonwealth/core/platform';
+import {
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import { AppError, ServerError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import request from 'superagent';

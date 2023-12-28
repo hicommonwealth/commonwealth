@@ -3,7 +3,7 @@ import {
   StatsDController,
   formatFilename,
   loggerFactory,
-} from '@hicommonwealth/core/platform';
+} from '@hicommonwealth/core/build/platform';
 import {
   RabbitMQController,
   getRabbitMQConfig,

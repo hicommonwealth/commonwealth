@@ -2,7 +2,7 @@ import {
   StatsDController,
   formatFilename,
   loggerFactory,
-} from '@hicommonwealth/core/platform';
+} from '@hicommonwealth/core/build/platform';
 
 const log = loggerFactory.getLogger(formatFilename(__filename));
 

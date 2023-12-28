@@ -1,4 +1,4 @@
-import { StatsDController } from '@hicommonwealth/core/platform';
+import { StatsDController } from '@hicommonwealth/core/build/platform';
 import type { Request, Response } from 'express';
 import type { DB } from '../models';
 

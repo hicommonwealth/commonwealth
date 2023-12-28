@@ -5,7 +5,10 @@ import {
   ChainType,
   NotificationCategories,
 } from '@hicommonwealth/core';
-import { formatFilename, loggerFactory } from '@hicommonwealth/core/platform';
+import {
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import models from '../../server/database';
 import { ChainNodeAttributes } from '../../server/models/chain_node';
 

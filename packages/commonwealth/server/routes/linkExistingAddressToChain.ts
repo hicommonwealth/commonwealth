@@ -1,5 +1,8 @@
 import { ChainBase } from '@hicommonwealth/core';
-import { formatFilename, loggerFactory } from '@hicommonwealth/core/platform';
+import {
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import { AppError } from 'common-common/src/errors';
 import crypto from 'crypto';
 import type { NextFunction, Request, Response } from 'express';

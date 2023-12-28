@@ -3,7 +3,7 @@ import {
   StatsDController,
   formatFilename,
   loggerFactory,
-} from '@hicommonwealth/core/platform';
+} from '@hicommonwealth/core/build/platform';
 import { NotificationDataAndCategory } from '../../../shared/types';
 import models from '../../database';
 import { CommunityInstance } from '../../models/community';

@@ -10,10 +10,8 @@
     "traceResolution": false,
     "baseUrl": ".",
     "paths": {
-      "@hicommonwealth/core": ["libs/core/src/index"],
-      "@hicommonwealth/core/*": ["libs/core/src/*"],
       "common-common/*": ["packages/common-common/*"]
     }
   },
-  "include": []
+  "include": ["libs/core/src"]
 }

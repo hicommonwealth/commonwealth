@@ -1,4 +1,7 @@
-import { formatFilename, loggerFactory } from '@hicommonwealth/core/platform';
+import {
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import { rollbar } from '../../util/rollbar';
 import { processChainNode, scheduleNodeProcessing } from './nodeProcessing';
 

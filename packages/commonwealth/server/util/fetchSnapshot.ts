@@ -1,4 +1,7 @@
-import { formatFilename, loggerFactory } from '@hicommonwealth/core/platform';
+import {
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import fetch from 'node-fetch';
 import type { DB } from '../models';
 

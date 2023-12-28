@@ -4,7 +4,7 @@ import {
   StatsDController,
   formatFilename,
   loggerFactory,
-} from '@hicommonwealth/core/platform';
+} from '@hicommonwealth/core/build/platform';
 import { RedisCache } from 'common-common/src/redisCache';
 import Web3 from 'web3';
 import { DB } from '../../models';

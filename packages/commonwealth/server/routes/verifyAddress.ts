@@ -4,7 +4,10 @@ import {
   WalletId,
   WalletSsoSource,
 } from '@hicommonwealth/core';
-import { formatFilename, loggerFactory } from '@hicommonwealth/core/platform';
+import {
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import { Op } from 'sequelize';

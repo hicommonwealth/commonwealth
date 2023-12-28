@@ -34,7 +34,10 @@ import {
   lookupKeyDurationInReq,
 } from '../common-common/src/cacheKeyUtils';
 
-import { formatFilename, loggerFactory } from '@hicommonwealth/core/platform';
+import {
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import { RedisCache } from 'common-common/src/redisCache';
 
 const log = loggerFactory.getLogger(formatFilename(__filename));

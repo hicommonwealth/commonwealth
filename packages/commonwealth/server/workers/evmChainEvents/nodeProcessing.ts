@@ -2,7 +2,7 @@ import {
   formatFilename,
   loggerFactory,
   StatsDController,
-} from '@hicommonwealth/core/platform';
+} from '@hicommonwealth/core/build/platform';
 import models from '../../database';
 import { NotificationInstance } from '../../models/notification';
 import { rollbar } from '../../util/rollbar';

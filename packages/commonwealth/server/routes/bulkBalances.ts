@@ -1,4 +1,7 @@
-import { formatFilename, loggerFactory } from '@hicommonwealth/core/platform';
+import {
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import BN from 'bn.js';
 import { AppError } from 'common-common/src/errors';
 import { QueryTypes } from 'sequelize';

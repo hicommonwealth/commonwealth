@@ -1,4 +1,7 @@
-import { formatFilename, loggerFactory } from '@hicommonwealth/core/platform';
+import {
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import { toBN } from 'web3-utils';
 import { ChainNodeInstance } from '../../../models/chain_node';
 import { rollbar } from '../../rollbar';

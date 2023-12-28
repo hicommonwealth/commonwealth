@@ -1,5 +1,5 @@
 import { NotificationCategories } from '@hicommonwealth/core';
-import { StatsDController } from '@hicommonwealth/core/platform';
+import { StatsDController } from '@hicommonwealth/core/build/platform';
 import axios from 'axios';
 import { RmqSnapshotNotification } from 'common-common/src/rabbitmq/types/snapshotNotification';
 import { SnapshotEventType } from 'types';

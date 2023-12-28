@@ -7,7 +7,10 @@ import {
   setupStakingExtension,
 } from '@cosmjs/stargate';
 import { HttpBatchClient, Tendermint34Client } from '@cosmjs/tendermint-rpc';
-import { formatFilename, loggerFactory } from '@hicommonwealth/core/platform';
+import {
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import { ChainNodeInstance } from '../../../models/chain_node';
 import { rollbar } from '../../rollbar';
 import { Balances } from '../types';

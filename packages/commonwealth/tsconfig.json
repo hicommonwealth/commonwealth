@@ -5,8 +5,6 @@
     "outDir": "./build",
     "skipLibCheck": true,
     "paths": {
-      "@hicommonwealth/core": ["libs/core/src/index"],
-      "@hicommonwealth/core/*": ["libs/core/src/*"],
       "common-common/*": ["packages/common-common/*"],
       "token-balance-cache/*": ["packages/token-balance-cache/*"],
       "*": [
@@ -17,14 +15,12 @@
     }
   },
   "include": [
+    "server.ts",
     "./client",
     "./client/scripts",
     "./shared",
-    "./test",
     "./globals.d.ts",
     "./server",
-    "./server.ts",
     "./scripts"
-  ],
-  "exclude": ["./node_modules"]
+  ]
 }

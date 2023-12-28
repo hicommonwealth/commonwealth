@@ -1,5 +1,8 @@
 import type { RedisNamespaces } from '@hicommonwealth/core';
-import { formatFilename, loggerFactory } from '@hicommonwealth/core/platform';
+import {
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 import {
   ConnectionTimeoutError,
   ReconnectStrategyError,

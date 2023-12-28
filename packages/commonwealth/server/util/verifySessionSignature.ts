@@ -26,7 +26,10 @@ import type { AddressInstance } from '../models/address';
 import type { CommunityInstance } from '../models/community';
 import type { ProfileAttributes } from '../models/profile';
 
-import { formatFilename, loggerFactory } from '@hicommonwealth/core/platform';
+import {
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/core/build/platform';
 const log = loggerFactory.getLogger(formatFilename(__filename));
 
 const sortedStringify = configureStableStringify({
