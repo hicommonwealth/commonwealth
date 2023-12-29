@@ -1,0 +1,5 @@
+{
+  "watch": ["libs/core/src"],
+  "ext": "ts",
+  "ignore": ["*.spec.ts"]
+}

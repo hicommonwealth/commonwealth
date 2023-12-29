@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "start": "yarn --cwd packages/commonwealth start",
+    "start": "nodemon --exec 'yarn workspace @hicommonwealth/core build && yarn workspace commonwealth start'",
     "build": "chmod u+x scripts/build.sh && ./scripts/build.sh",
     "clean": "find . -name node_modules -exec rm -rf {} \\;; yarn --ignore-engines",
     "heroku-prebuild": "yarn global add node-gyp",
@@ -72,6 +72,7 @@
     "eslint-import-resolver-typescript": "^3.5.2",
     "eslint-import-resolver-webpack": "^0.13.2",
     "husky": "^8.0.0",
+    "nodemon": "^3.0.2",
     "prettier": "2.7.1",
     "prettier-plugin-organize-imports": "^3.2.3",
     "stylelint": "^14.14.1",
