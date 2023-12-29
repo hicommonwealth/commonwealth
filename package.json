@@ -5,6 +5,7 @@
     "build": "chmod u+x scripts/build.sh && ./scripts/build.sh",
     "clean": "find . -name node_modules -exec rm -rf {} \\;; yarn --ignore-engines",
     "heroku-prebuild": "yarn global add node-gyp",
+    "heroku-postbuild": "chmod u+x scripts/heroku-post-build.sh && ./scripts/heroku-post-build.sh",
     "psql": "yarn --cwd packages/commonwealth psql",
     "test-api": "yarn --cwd packages/commonwealth test-api",
     "dump-db": "yarn --cwd packages/commonwealth dump-db",
@@ -23,7 +24,7 @@
     "lint-branch-warnings": "FAIL_WARNINGS=1 ./scripts/lint-branch.sh",
     "stylelint": "stylelint packages/commonwealth/client/styles/*",
     "chromatic": "chromatic --exit-zero-on-changes",
-    "prepare": "husky install & yarn workspace @hicommonwealth/core build",
+    "prepare": "husky install",
     "sanity": "chmod u+x scripts/sanity.sh && ./scripts/sanity.sh"
   },
   "engines": {

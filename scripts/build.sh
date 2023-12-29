@@ -1,3 +1,9 @@
+#! /bin/bash
+ 
+# build libs
+ yarn workspace @hicommonwealth/core build
+
+# build heroku app 
 if [ "$CW_BUILD" = true ]; then
   yarn --cwd packages/commonwealth build-all
 elif [ "$SL_BUILD" = true ]; then
