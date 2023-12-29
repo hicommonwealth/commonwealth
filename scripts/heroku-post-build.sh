@@ -1,5 +1,8 @@
 #! /bin/bash
  
+# build app
+yarn build
+
 # clean other heroku apps - should we only keep /build folders?
 if [ "$CW_BUILD" = true ]; then
   rm -rf packages/discord-bot
