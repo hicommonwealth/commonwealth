@@ -2,11 +2,12 @@
   "name": "discord-bot",
   "version": "1.0.0",
   "description": "",
+  "private": true,
   "scripts": {
     "build": "tsc && tsc-alias",
+    "check-types": "tsc --noEmit",
     "start": "ts-node -r tsconfig-paths/register discord-listener/discordListener.ts",
     "start-consumer": "ts-node -r tsconfig-paths/register discord-consumer/discordConsumer.ts",
-    "check-types": "tsc --noEmit",
     "start-prod-consumer": "node build/discord-bot/discord-consumer/discordConsumer.js",
     "start-prod-listener": "node build/discord-bot/discord-listener/discordListener.js"
   },
