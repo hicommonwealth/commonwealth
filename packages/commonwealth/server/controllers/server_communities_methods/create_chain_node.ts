@@ -1,5 +1,5 @@
+import { AppError } from '@hicommonwealth/common-common';
 import { BalanceType } from '@hicommonwealth/core';
-import { AppError } from 'common-common/src/errors';
 import { UserInstance } from 'server/models/user';
 import { ServerCommunitiesController } from '../server_communities_controller';
 

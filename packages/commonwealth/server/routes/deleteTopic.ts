@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-syntax */
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError, ServerError } from '@hicommonwealth/common-common';
 import type { NextFunction, Response } from 'express';
 import { QueryTypes } from 'sequelize';
 import type { DB } from '../models';
@@ -16,7 +16,7 @@ const deleteTopic = async (
   models: DB,
   req,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const chain = req.chain;
   if (!req.user) {

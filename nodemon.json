@@ -1,5 +1,5 @@
 {
-  "watch": ["libs/core/src"],
+  "watch": ["libs/core/src", "libs/adapters/src", "libs/common-common/src"],
   "ext": "ts",
   "ignore": ["*.spec.ts"]
 }

@@ -1,7 +1,7 @@
 #! /bin/bash
  
 # build libs
- yarn workspace @hicommonwealth/core build
+ yarn build-libs
 
 # build heroku app 
 if [ "$CW_BUILD" = true ]; then

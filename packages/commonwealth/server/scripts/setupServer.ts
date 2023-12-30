@@ -1,14 +1,9 @@
-import type { RabbitMQController } from 'common-common/src/rabbitmq';
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
+import type { RabbitMQController } from '@hicommonwealth/common-common';
+import { RedisCache, cacheDecorator } from '@hicommonwealth/common-common';
 import type { Express } from 'express-serve-static-core';
 import http from 'http';
 import type Rollbar from 'rollbar';
-
-import {
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/core/build/platform';
-import { cacheDecorator } from 'common-common/src/cacheDecorator';
-import { RedisCache } from 'common-common/src/redisCache';
 import { PORT } from '../config';
 import type { DB } from '../models';
 
@@ -32,12 +27,10 @@ const setupServer = (
     switch (error.code) {
       case 'EACCES':
         log.error('Port requires elevated privileges');
-        process.exit(1);
-        break;
+        return process.exit(1);
       case 'EADDRINUSE':
         log.error(`Port ${PORT} is already in use`);
-        process.exit(1);
-        break;
+        return process.exit(1);
       default:
         throw error;
     }

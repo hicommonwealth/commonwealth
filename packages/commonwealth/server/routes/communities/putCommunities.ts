@@ -1,7 +1,7 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/common-common';
 import type { NextFunction } from 'express';
 import { body, validationResult } from 'express-validator';
-import type { TokenBalanceCache } from 'token-balance-cache/src';
+import type { TokenBalanceCache } from '../../../token-balance-cache/src';
 import type {
   PutCommunitiesReq,
   PutCommunitiesResp,

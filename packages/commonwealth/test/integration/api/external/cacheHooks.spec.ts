@@ -1,8 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { BalanceType } from '@hicommonwealth/core';
 import type BN from 'bn.js';
-import type { IChainNode } from 'token-balance-cache/src';
-import { BalanceProvider, TokenBalanceCache } from 'token-balance-cache/src';
+import type { IChainNode } from '../../../../token-balance-cache/src';
+import {
+  BalanceProvider,
+  TokenBalanceCache,
+} from '../../../../token-balance-cache/src';
 
 class MockTokenBalanceProvider extends BalanceProvider<
   any,
@@ -23,7 +26,7 @@ class MockTokenBalanceProvider extends BalanceProvider<
     node: IChainNode,
     opts: { tokenAddress: string; contractType: string },
   ): Promise<any> {
-    return;
+    return Promise.resolve();
   }
 
   public async getBalance(

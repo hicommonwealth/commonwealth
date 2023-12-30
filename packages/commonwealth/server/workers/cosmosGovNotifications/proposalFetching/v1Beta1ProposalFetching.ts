@@ -1,9 +1,6 @@
-import {
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/core/build/platform';
-import { ProposalStatus } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
+import { ProposalStatus } from 'protocol/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
 import { CommunityInstance } from '../../../models/community';
 import { getCosmosClient } from './getCosmosClient';
 import { GovV1Beta1ClientType } from './types';

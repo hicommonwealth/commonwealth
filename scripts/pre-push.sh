@@ -16,7 +16,7 @@ then
     echo "$FILES" | tr ' ' '\n' | xargs -I {} echo "- {}"
     echo -e $NC
 
-    lint=$(NODE_OPTIONS="--max-old-space-size=8192" npx eslint $FILES | grep -E 'problems')
+    lint=$(npx eslint $FILES | grep -E 'problems')
     if [ -n "$lint" ]
     then
         echo -e "[eslint] ${RED}${lint}${NC}"

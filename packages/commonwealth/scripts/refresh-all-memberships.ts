@@ -1,12 +1,12 @@
+import { RedisCache } from '@hicommonwealth/common-common';
 import * as dotenv from 'dotenv';
-import { RedisCache } from '../../common-common/src/redisCache';
-import { TokenBalanceCache as TokenBalanceCacheV1 } from '../../token-balance-cache/src';
 import { REDIS_URL } from '../server/config';
 import { ServerCommunitiesController } from '../server/controllers/server_communities_controller';
 import { ServerGroupsController } from '../server/controllers/server_groups_controller';
 import db from '../server/database';
 import BanCache from '../server/util/banCheckCache';
 import { TokenBalanceCache as TokenBalanceCacheV2 } from '../server/util/tokenBalanceCache/tokenBalanceCache';
+import { TokenBalanceCache as TokenBalanceCacheV1 } from '../token-balance-cache/src';
 
 dotenv.config();
 

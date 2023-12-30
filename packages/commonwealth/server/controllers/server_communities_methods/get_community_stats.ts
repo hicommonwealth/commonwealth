@@ -1,6 +1,6 @@
+import { AppError } from '@hicommonwealth/common-common';
 import { Op } from 'sequelize';
 import { UserInstance } from 'server/models/user';
-import { AppError } from '../../../../common-common/src/errors';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 export const Errors = {
@@ -24,7 +24,7 @@ export type GetCommunityStatsResult = {
 
 export async function __getCommunityStats(
   this: ServerCommunitiesController,
-  { user, communityId }: GetCommunityStatsOptions
+  { user, communityId }: GetCommunityStatsOptions,
 ): Promise<GetCommunityStatsResult> {
   if (!user.isAdmin) {
     throw new AppError(Errors.NotAdmin);

@@ -4,7 +4,13 @@
     "lib": ["es2020"],
     "typeRoots": ["./node_modules/@types"],
     "skipLibCheck": true,
-    "outDir": "./build"
+    "rootDir": "src",
+    "outDir": "build"
   },
-  "include": ["discord-consumer", "discord-listener", "utils"]
+  "include": ["src"],
+  "references": [
+    { "path": "../../libs/core" },
+    { "path": "../../libs/adapters" },
+    { "path": "../../libs/common-common" }
+  ]
 }

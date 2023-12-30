@@ -1,13 +1,13 @@
+import { AppError } from '@hicommonwealth/common-common';
 import axios from 'axios';
-import { AppError } from 'common-common/src/errors';
-import type { DB } from '../models';
-import type { TypedRequestBody, TypedResponse } from '../types';
-import { success } from '../types';
+import { NextFunction } from 'express';
 import { ETHERSCAN_JS_API_KEY } from '../config';
+import type { DB } from '../models';
 import type { ContractAttributes } from '../models/contract';
 import type { ContractAbiAttributes } from '../models/contract_abi';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { success } from '../types';
 import validateAbi, { hashAbi } from '../util/abiValidation';
-import { NextFunction } from 'express';
 
 export enum Network {
   Mainnet = 'Mainnet',
@@ -45,7 +45,7 @@ type FetchEtherscanContractResp = {
 export const fetchEtherscanContract = async (
   models: DB,
   req: TypedRequestBody<FetchEtherscanContractReq>,
-  res: TypedResponse<FetchEtherscanContractResp>
+  res: TypedResponse<FetchEtherscanContractResp>,
 ) => {
   if (!ETHERSCAN_JS_API_KEY) {
     throw new AppError(Errors.NoEtherscanApiKey);
@@ -137,7 +137,7 @@ export const fetchEtherscanContractAbi = async (
   models: DB,
   req: TypedRequestBody<FetchEtherscanContractAbiReq>,
   res: TypedResponse<FetchEtherscanContractAbiResp>,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!ETHERSCAN_JS_API_KEY) {
     throw new AppError(Errors.NoEtherscanApiKey);

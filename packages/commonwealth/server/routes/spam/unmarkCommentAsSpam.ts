@@ -1,7 +1,7 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/common-common';
 import type { Request, Response } from 'express';
-import type { DB } from '../../models';
 import { Op } from 'sequelize';
+import type { DB } from '../../models';
 import { success } from '../../types';
 import { findAllRoles } from '../../util/roles';
 
@@ -39,7 +39,7 @@ export default async (models: DB, req: Request, res: Response) => {
       models,
       { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
       comment.chain,
-      ['admin', 'moderator']
+      ['admin', 'moderator'],
     );
     const role = roles.find((r) => {
       return r.chain_id === comment.chain;

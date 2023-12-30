@@ -1,5 +1,5 @@
+import { AppError } from '@hicommonwealth/common-common';
 import { QueryTypes } from 'sequelize';
-import { AppError } from '../../../../common-common/src/errors';
 import { CommunityInstance } from '../../models/community';
 import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
@@ -23,7 +23,7 @@ export type DeleteTopicResult = void;
 
 export async function __deleteTopic(
   this: ServerTopicsController,
-  { user, community, topicId }: DeleteTopicOptions
+  { user, community, topicId }: DeleteTopicOptions,
 ): Promise<DeleteTopicResult> {
   const isAdmin = validateOwner({
     models: this.models,
@@ -53,7 +53,7 @@ export async function __deleteTopic(
         },
         type: QueryTypes.UPDATE,
         transaction,
-      }
+      },
     );
     await topic.destroy({ transaction });
   });

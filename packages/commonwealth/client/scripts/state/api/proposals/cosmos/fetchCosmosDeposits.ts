@@ -1,11 +1,11 @@
 import { ChainBase } from '@hicommonwealth/core';
 import { useQuery } from '@tanstack/react-query';
-import type { QueryDepositsResponseSDKType } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/query';
 import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import type { QueryDepositsResponse } from 'cosmjs-types/cosmos/gov/v1beta1/query';
 import _ from 'lodash';
 import { AnyProposal } from 'models/types';
+import type { QueryDepositsResponseSDKType } from 'protocol/cosmos-ts/src/codegen/cosmos/gov/v1/query';
 import app from 'state';
 
 const DEPOSITS_CACHE_TIME = 1000 * 60 * 60;

@@ -1,7 +1,7 @@
 // import { describe, it, beforeEach, afterEach } from 'mocha';
+import { Daemons } from '@hicommonwealth/common-common';
 import { expect } from 'chai';
 import sinon from 'sinon';
-import { Daemons } from 'common-common/src/daemons';
 
 describe('Daemon', () => {
   let clock;

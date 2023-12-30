@@ -1,7 +1,4 @@
-import {
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/core/build/platform';
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import { CommunityInstance } from '../../../models/community';
 
 import { AllCosmosProposals } from './types';

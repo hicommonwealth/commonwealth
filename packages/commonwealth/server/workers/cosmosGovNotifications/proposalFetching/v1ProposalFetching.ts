@@ -1,14 +1,11 @@
-import {
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/core/build/platform';
-import { PageRequest } from 'common-common/src/cosmos-ts/src/codegen/cosmos/base/query/v1beta1/pagination';
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
+import { PageRequest } from 'protocol/cosmos-ts/src/codegen/cosmos/base/query/v1beta1/pagination';
 import {
   ProposalSDKType,
   ProposalStatus,
-} from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
-import { LCDQueryClient as GovV1Client } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/query.lcd';
-import { numberToLong } from 'common-common/src/cosmos-ts/src/codegen/helpers';
+} from 'protocol/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
+import { LCDQueryClient as GovV1Client } from 'protocol/cosmos-ts/src/codegen/cosmos/gov/v1/query.lcd';
+import { numberToLong } from 'protocol/cosmos-ts/src/codegen/helpers';
 import { CommunityInstance } from '../../../models/community';
 import { getCosmosClient } from './getCosmosClient';
 import { numberToUint8ArrayBE, uint8ArrayToNumberBE } from './util';

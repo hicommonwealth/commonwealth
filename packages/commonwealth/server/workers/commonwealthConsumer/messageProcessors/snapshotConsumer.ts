@@ -1,7 +1,7 @@
+import { StatsDController } from '@hicommonwealth/adapters';
+import { RmqSnapshotNotification } from '@hicommonwealth/common-common';
 import { NotificationCategories } from '@hicommonwealth/core';
-import { StatsDController } from '@hicommonwealth/core/build/platform';
 import axios from 'axios';
-import { RmqSnapshotNotification } from 'common-common/src/rabbitmq/types/snapshotNotification';
 import { SnapshotEventType } from 'types';
 import type { Logger } from 'typescript-logging';
 import type { DB } from '../../../models';

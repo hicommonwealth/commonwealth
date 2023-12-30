@@ -8,26 +8,26 @@ import {
   ChainType,
 } from '@hicommonwealth/core';
 import { expect } from 'chai';
-import {
-  ProposalSDKType,
-  ProposalStatusSDKType,
-} from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
-import {
-  QueryProposalRequest,
-  QueryProposalResponseSDKType,
-  QueryProposalsRequest,
-  QueryProposalsResponseSDKType,
-} from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/query';
-import { LCDQueryClient as GovV1Client } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/query.lcd';
-import {
-  numberToLong,
-  toTimestamp,
-} from 'common-common/src/cosmos-ts/src/codegen/helpers';
 import { Proposal, ProposalStatus } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import {
   QueryProposalResponse,
   QueryProposalsResponse,
 } from 'cosmjs-types/cosmos/gov/v1beta1/query';
+import {
+  ProposalSDKType,
+  ProposalStatusSDKType,
+} from 'protocol/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
+import {
+  QueryProposalRequest,
+  QueryProposalResponseSDKType,
+  QueryProposalsRequest,
+  QueryProposalsResponseSDKType,
+} from 'protocol/src/cosmos-ts/src/codegen/cosmos/gov/v1/query';
+import { LCDQueryClient as GovV1Client } from 'protocol/src/cosmos-ts/src/codegen/cosmos/gov/v1/query.lcd';
+import {
+  numberToLong,
+  toTimestamp,
+} from 'protocol/src/cosmos-ts/src/codegen/helpers';
 import { resetDatabase } from '../../server-test';
 import models from '../../server/database';
 import { generateCosmosGovNotifications } from '../../server/workers/cosmosGovNotifications/generateCosmosGovNotifications';

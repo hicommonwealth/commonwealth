@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "ESNext",
+    "baseUrl": ".",
+
+    "forceConsistentCasingInFileNames": true,
+    "preserveConstEnums": true,
+
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+
+    "paths": {
+      "@hicommonwealth/*": ["libs/*/src"]
+    }
+  },
+  "exclude": ["**/build", "**/__tests__", "**/__mocks__"]
+}

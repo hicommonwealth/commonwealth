@@ -5,13 +5,13 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import jwt from 'jsonwebtoken';
-import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import {
   getMockBalanceProvider,
   getTokenBalanceCache,
   resetDatabase,
 } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
+import type { TokenBalanceCache } from '../../../token-balance-cache/src/index';
 import { markdownComment } from '../../util/fixtures/markdownComment';
 import * as modelUtils from '../../util/modelUtils';
 

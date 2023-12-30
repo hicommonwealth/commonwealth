@@ -8,10 +8,10 @@ import type { EthereumCoin } from 'adapters/chain/ethereum/types';
 import BN from 'bn.js';
 
 import { ProposalType } from '@hicommonwealth/core';
-import type { GovernorCompatibilityBravo } from 'common-common/src/eth/types';
-import { GovernorMock__factory } from 'common-common/src/eth/types';
 import type { ContractTransaction } from 'ethers';
 import { BigNumber, utils } from 'ethers';
+import type { GovernorCompatibilityBravo } from 'protocol/eth/types';
+import { GovernorMock__factory } from 'protocol/eth/types';
 
 import moment from 'moment';
 import type ChainEvent from '../../../../models/ChainEvent';

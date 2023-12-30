@@ -1,5 +1,5 @@
+import { AppError } from '@hicommonwealth/common-common';
 import { Op } from 'sequelize';
-import { AppError } from '../../../../common-common/src/errors';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { sequelize } from '../../database';
 import { AddressInstance } from '../../models/address';

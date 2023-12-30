@@ -1,9 +1,7 @@
-import { AppError } from 'common-common/src/errors';
-import type { NextFunction } from 'express';
+import { Op } from 'sequelize';
 import { DB } from 'server/models';
 import { AddressInstance } from 'server/models/address';
 import { findAllRoles } from './roles';
-import { Op } from 'sequelize';
 
 export const Errors = {
   NoThread: 'Cannot find thread',
@@ -18,7 +16,7 @@ export const isAuthorOrAdmin = async (
   models: DB,
   address: AddressInstance[],
   address_id: number,
-  chain: string
+  chain: string,
 ) => {
   const userOwnedAddressIds = address
     .filter((addr) => !!addr.verified)
@@ -29,7 +27,7 @@ export const isAuthorOrAdmin = async (
       models,
       { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
       chain,
-      ['admin', 'moderator']
+      ['admin', 'moderator'],
     );
     if (roles.length === 0) return false;
     const role = roles.find((r) => {

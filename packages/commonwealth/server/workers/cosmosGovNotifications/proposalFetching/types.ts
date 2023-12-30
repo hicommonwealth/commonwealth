@@ -1,7 +1,7 @@
 import { GovExtension, QueryClient } from '@cosmjs/stargate';
-import { ProposalSDKType } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
 import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
-import { LCDQueryClient as GovV1Client } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/query.lcd';
+import { ProposalSDKType } from 'protocol/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
+import { LCDQueryClient as GovV1Client } from 'protocol/cosmos-ts/src/codegen/cosmos/gov/v1/query.lcd';
 
 export type AllCosmosProposals = {
   v1: { [chainId: string]: ProposalSDKType[] };

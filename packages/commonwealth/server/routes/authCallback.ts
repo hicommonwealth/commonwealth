@@ -1,8 +1,5 @@
-import {
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/core/build/platform';
-import { AppError, ServerError } from 'common-common/src/errors';
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
+import { AppError, ServerError } from '@hicommonwealth/common-common';
 import { DISCORD_BOT_SUCCESS_URL } from '../config';
 import type { DB } from '../models';
 import type { TypedRequestQuery, TypedResponse } from '../types';

@@ -1,19 +1,17 @@
-import type { ISnapshotNotification } from '@hicommonwealth/core';
 import {
+  ServiceKey,
   StatsDController,
   formatFilename,
   loggerFactory,
-} from '@hicommonwealth/core/build/platform';
+  startHealthCheckLoop,
+} from '@hicommonwealth/adapters';
 import {
   RabbitMQController,
+  RascalConfigServices,
+  RascalPublications,
   getRabbitMQConfig,
-} from 'common-common/src/rabbitmq';
-import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
-import { RascalPublications } from 'common-common/src/rabbitmq/types';
-import {
-  ServiceKey,
-  startHealthCheckLoop,
-} from 'common-common/src/scripts/startHealthCheckLoop';
+} from '@hicommonwealth/common-common';
+import type { ISnapshotNotification } from '@hicommonwealth/core';
 import type { Request, Response } from 'express';
 import express from 'express';
 import v8 from 'v8';

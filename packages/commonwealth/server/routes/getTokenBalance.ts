@@ -2,7 +2,7 @@ import { query, validationResult } from 'express-validator';
 import type {
   TokenBalanceCache,
   TokenBalanceResp,
-} from 'token-balance-cache/src';
+} from '../../token-balance-cache/src';
 import type { GetTokenBalanceReq } from '../api/extApiTypes';
 import type { DB } from '../models';
 import type { TypedRequestQuery, TypedResponse } from '../types';

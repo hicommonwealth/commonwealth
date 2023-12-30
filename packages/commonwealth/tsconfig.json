@@ -2,16 +2,36 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "jsx": "react",
-    "outDir": "./build",
+    "rootDir": ".",
+    "outDir": "build",
     "skipLibCheck": true,
+    "baseUrl": ".",
     "paths": {
-      "common-common/*": ["packages/common-common/*"],
-      "token-balance-cache/*": ["packages/token-balance-cache/*"],
-      "*": [
-        "packages/commonwealth/*",
-        "packages/commonwealth/shared/*",
-        "packages/commonwealth/client/scripts/*"
-      ]
+      "protocol/*": ["protocol/*"],
+      "client/*": ["./client/*"],
+      "server/*": ["./server/*"],
+      "adapters/*": ["./shared/adapters/*"],
+      "chain/*": ["./shared/chain/*"],
+      "types": ["./shared/types"],
+      "utils": ["./shared/utils"],
+      "abi_utils": ["./shared/abi_utils"],
+      "canvas": ["./shared/canvas"],
+      "permissions": ["./shared/permissions"],
+      "state": ["./client/scripts/state"],
+      "identifiers": ["./client/scripts/identifiers"],
+      "helpers": ["./client/scripts/helpers"],
+      "canvas/*": ["./client/scripts/helpers/canvas"],
+      "stores": ["./client/scripts/stores"],
+      "state/*": ["./client/scripts/state/*"],
+      "models/*": ["./client/scripts/models/*"],
+      "views/*": ["./client/scripts/views/*"],
+      "controllers/*": ["./client/scripts/controllers/*"],
+      "stores/*": ["./client/scripts/stores/*"],
+      "hooks/*": ["./client/scripts/hooks/*"],
+      "navigation/*": ["./client/scripts/navigation/*"],
+      "helpers/*": ["./client/scripts/helpers/*"],
+      "utils/*": ["./client/scripts/utils/*"],
+      "lib/*": ["./client/scripts/lib/*"]
     }
   },
   "include": [
@@ -22,5 +42,10 @@
     "./globals.d.ts",
     "./server",
     "./scripts"
+  ],
+  "references": [
+    { "path": "../../libs/core" },
+    { "path": "../../libs/adapters" },
+    { "path": "../../libs/common-common" }
   ]
 }

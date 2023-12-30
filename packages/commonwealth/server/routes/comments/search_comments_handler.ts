@@ -1,5 +1,5 @@
+import { AppError } from '@hicommonwealth/common-common';
 import { SearchCommentsResult } from 'server/controllers/server_comments_methods/search_comments';
-import { AppError } from '../../../../common-common/src/errors';
 import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
 import { ServerControllers } from '../../routing/router';
 import {

@@ -1,9 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import { NotificationCategories } from '@hicommonwealth/core';
-import {
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/core/build/platform';
 import request from 'superagent';
 import { ChainEventWebhookData, ForumWebhookData } from '../types';
 

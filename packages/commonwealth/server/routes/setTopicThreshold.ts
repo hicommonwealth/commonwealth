@@ -1,4 +1,4 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/common-common';
 import type { NextFunction, Response } from 'express';
 
 export const Errors = {
@@ -12,7 +12,7 @@ const setTopicThreshold = async (
   models,
   req,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.user) return next(new AppError(Errors.NotLoggedIn));
   if (!req.body.topic_id || req.body.token_threshold === undefined) {
@@ -39,7 +39,7 @@ const setTopicThreshold = async (
       where: {
         id: req.body.topic_id,
       },
-    }
+    },
   );
 
   return res.json({ status: 'Success' });

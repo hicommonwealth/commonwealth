@@ -1,9 +1,6 @@
-import {
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/core/build/platform';
-import { ProposalSDKType } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
+import { ProposalSDKType } from 'protocol/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
 import { COSMOS_GOV_V1_CHAIN_IDS } from '../../../config';
 import { CommunityInstance } from '../../../models/community';
 import { rollbar } from '../../../util/rollbar';

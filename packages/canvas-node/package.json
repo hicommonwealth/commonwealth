@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "echo 'canvas-node noop'",
+    "clean": "echo 'canvas-node noop'",
     "check-types": "echo 'canvas-node noop'",
     "start": "node ./node_modules/@canvas-js/cli/dist/index.js run contract.js --chain eip155:* --chain cosmos:* --chain solana:* --chain substrate:* --chain near:* --syncModule $PWD/syncModule.js",
     "dev": "$(which -a canvas | tail -1) run contract.js --chain eip155:* --chain cosmos:* --chain solana:* --chain substrate:* --chain near:* --syncModule $PWD/syncModule.js"

@@ -64,7 +64,7 @@ jobs:
         run: yarn --ignore-engines
 
       - name: Build libs
-        run: yarn workspace @hicommonwealth/core build  
+        run: yarn build-libs  
 
       - name: Init Db
         run: cd packages/commonwealth && npx sequelize db:migrate
@@ -164,7 +164,7 @@ jobs:
         run: yarn --ignore-engines
 
       - name: Build libs
-        run: yarn workspace @hicommonwealth/core build 
+        run: yarn build-libs 
 
       - name: Init Db
         run: cd packages/commonwealth && npx sequelize db:migrate
@@ -263,7 +263,7 @@ jobs:
         run: yarn --ignore-engines
 
       - name: Build libs
-        run: yarn workspace @hicommonwealth/core build 
+        run: yarn build-libs 
 
       - name: Init Db
         run: cd packages/commonwealth && npx sequelize db:migrate
@@ -326,7 +326,7 @@ jobs:
         run: yarn --ignore-engines
 
       - name: Build libs
-        run: yarn workspace @hicommonwealth/core build 
+        run: yarn build-libs 
 
       - name: Run linter
         env:
@@ -366,7 +366,7 @@ jobs:
         run: yarn --ignore-engines
 
       - name: Build libs
-        run: yarn workspace @hicommonwealth/core build         
+        run: yarn build-libs         
 
       - name: Assert yarn.lock is correct
         run: |
@@ -436,7 +436,7 @@ jobs:
         run: yarn --ignore-engines
 
       - name: Build libs
-        run: yarn workspace @hicommonwealth/core build 
+        run: yarn build-libs 
 
       - name: Init Db
         run: cd packages/commonwealth && npx sequelize db:migrate
@@ -523,7 +523,7 @@ jobs:
         run: yarn --ignore-engines
 
       - name: Build libs
-        run: yarn workspace @hicommonwealth/core build 
+        run: yarn build-libs 
         
       - name: Init Db
         run: cd packages/commonwealth && npx sequelize db:migrate

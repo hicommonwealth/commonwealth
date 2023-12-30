@@ -1,12 +1,9 @@
-import {
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/core/build/platform';
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import type { Express } from 'express';
 import express from 'express';
 import useragent from 'express-useragent';
 import passport from 'passport';
-import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import { TokenBalanceCache } from '../../token-balance-cache/src/index';
 import {
   methodNotAllowedMiddleware,
   registerRoute,
@@ -97,7 +94,7 @@ import updateAddress from '../routes/updateAddress';
 import viewChainIcons from '../routes/viewChainIcons';
 import type BanCache from '../util/banCheckCache';
 
-import { RedisCache } from 'common-common/src/redisCache';
+import { RedisCache } from '@hicommonwealth/common-common';
 import type DatabaseValidationService from '../middleware/databaseValidationService';
 import createDiscordBotConfig from '../routes/createDiscordBotConfig';
 import generateImage from '../routes/generateImage';

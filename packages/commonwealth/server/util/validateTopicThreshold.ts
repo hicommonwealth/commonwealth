@@ -2,7 +2,7 @@ import BN from 'bn.js';
 import {
   FetchTokenBalanceErrors,
   TokenBalanceCache,
-} from 'token-balance-cache/src/index';
+} from '../../token-balance-cache/src/index';
 
 import type { DB } from '../models';
 

@@ -1,4 +1,4 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/common-common';
 import type { NextFunction, Request, Response } from 'express';
 import { CommunityInstance } from 'server/models/community';
 import { CW_BOT_KEY } from '../config';

@@ -2,7 +2,7 @@ import type { Express } from 'express';
 import express from 'express';
 import type Router from 'express/lib/router/index';
 import passport from 'passport';
-import type { TokenBalanceCache } from 'token-balance-cache/src';
+import type { TokenBalanceCache } from '../../token-balance-cache/src';
 import type {
   PostReactionsReq,
   PostTopicsReq,

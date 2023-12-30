@@ -1,10 +1,7 @@
 import { DataTypes, Sequelize } from 'sequelize';
 import { DATABASE_URI } from './config';
 
-import {
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/core/build/platform';
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import type { DB, Models } from './models';
 import AddressFactory from './models/address';
 import BanFactory from './models/ban';

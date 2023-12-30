@@ -10,8 +10,8 @@
     "traceResolution": false,
     "baseUrl": ".",
     "paths": {
-      "common-common/*": ["packages/common-common/*"]
+      "@hicommonwealth/*": ["libs/*/src"]
     }
   },
-  "include": ["libs/core/src"]
+  "exclude": ["**/build", "**/__tests__", "**/__mocks__"]
 }

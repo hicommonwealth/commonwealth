@@ -1,4 +1,4 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/common-common';
 import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../models';
 import { getLastEdited } from '../util/getLastEdited';
@@ -11,7 +11,7 @@ const viewComments = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const chain = req.chain;
 

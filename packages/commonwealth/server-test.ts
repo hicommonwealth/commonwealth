@@ -1,6 +1,13 @@
 /* eslint-disable dot-notation */
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
+import {
+  CustomRequest,
+  RedisCache,
+  ServerError,
+  cacheDecorator,
+  lookupKeyDurationInReq,
+} from '@hicommonwealth/common-common';
 import bodyParser from 'body-parser';
-import setupErrorHandlers from 'common-common/src/scripts/setupErrorHandlers';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
 import type { Express } from 'express';
@@ -10,10 +17,6 @@ import http from 'http';
 import passport from 'passport';
 import Rollbar from 'rollbar';
 import favicon from 'serve-favicon';
-import { TokenBalanceCache } from 'token-balance-cache/src/index';
-import setupAPI from './server/routing/router'; // performance note: this takes 15 seconds
-
-import setupCosmosProxy from 'server/util/cosmosProxy';
 import {
   ROLLBAR_ENV,
   ROLLBAR_SERVER_TOKEN,
@@ -22,23 +25,13 @@ import {
 import models from './server/database';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
+import setupAPI from './server/routing/router'; // performance note: this takes 15 seconds
 import BanCache from './server/util/banCheckCache';
+import setupCosmosProxy from './server/util/cosmosProxy';
 import GlobalActivityCache from './server/util/globalActivityCache';
 import ViewCountCache from './server/util/viewCountCache';
 import { MockTokenBalanceProvider } from './test/util/modelUtils';
-
-import { ServerError } from 'common-common/src/errors';
-import { cacheDecorator } from '../common-common/src/cacheDecorator';
-import {
-  CustomRequest,
-  lookupKeyDurationInReq,
-} from '../common-common/src/cacheKeyUtils';
-
-import {
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/core/build/platform';
-import { RedisCache } from 'common-common/src/redisCache';
+import { TokenBalanceCache } from './token-balance-cache/src/index';
 
 const log = loggerFactory.getLogger(formatFilename(__filename));
 
@@ -96,11 +89,9 @@ const setupServer = () => {
       case 'EACCES':
         console.error('Port requires elevated privileges');
         process.exit(1);
-        break;
       case 'EADDRINUSE':
         console.error(`Port ${port} already in use`);
         process.exit(1);
-        break;
       default:
         throw error;
     }

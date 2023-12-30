@@ -1,19 +1,17 @@
 import {
   formatFilename,
   loggerFactory,
-} from '@hicommonwealth/core/build/platform';
-import {
-  RabbitMQController,
-  getRabbitMQConfig,
-} from 'common-common/src/rabbitmq';
-import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
-import { RascalSubscriptions } from 'common-common/src/rabbitmq/types';
-import {
   ServiceKey,
   startHealthCheckLoop,
-} from 'common-common/src/scripts/startHealthCheckLoop';
-import type { RabbitMQSubscription } from 'common-common/src/serviceConsumer';
-import { ServiceConsumer } from 'common-common/src/serviceConsumer';
+} from '@hicommonwealth/adapters';
+import type { RabbitMQSubscription } from '@hicommonwealth/common-common';
+import {
+  getRabbitMQConfig,
+  RabbitMQController,
+  RascalConfigServices,
+  RascalSubscriptions,
+  ServiceConsumer,
+} from '@hicommonwealth/common-common';
 import type { BrokerConfig } from 'rascal';
 import Rollbar from 'rollbar';
 import { RABBITMQ_URI, ROLLBAR_ENV, ROLLBAR_SERVER_TOKEN } from '../../config';

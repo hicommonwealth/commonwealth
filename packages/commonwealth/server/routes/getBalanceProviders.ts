@@ -1,6 +1,6 @@
 import { query, validationResult } from 'express-validator';
 import type { DB } from 'server/models';
-import type { TokenBalanceCache } from 'token-balance-cache/src';
+import type { TokenBalanceCache } from '../../token-balance-cache/src';
 import type {
   GetBalanceProvidersReq,
   GetBalanceProvidersResp,

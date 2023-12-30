@@ -1,7 +1,7 @@
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
 
-import { TokenBalanceCache as TokenBalanceCacheV1 } from '../../../token-balance-cache/src';
+import { TokenBalanceCache as TokenBalanceCacheV1 } from '../../token-balance-cache/src';
 import { TokenBalanceCache as TokenBalanceCacheV2 } from '../util/tokenBalanceCache/tokenBalanceCache';
 import {
   CreateThreadOptions,

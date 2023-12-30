@@ -15,33 +15,29 @@ import {
 } from '@metamask/eth-sig-util';
 import { Keyring } from '@polkadot/api';
 import { stringToU8a } from '@polkadot/util';
+import { mnemonicGenerate } from '@polkadot/util-crypto';
 import type BN from 'bn.js';
 import chai from 'chai';
 import 'chai/register-should';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
-import { createRole, findOneRole } from 'server/util/roles';
 import * as siwe from 'siwe';
-
-import type { IChainNode } from 'token-balance-cache/src/index';
-import { BalanceProvider } from 'token-balance-cache/src/index';
-
-import { createCanvasSessionPayload } from '../../shared/canvas';
-
-import { mnemonicGenerate } from '@polkadot/util-crypto';
 import Web3 from 'web3-utils';
 import app from '../../server-test';
 import models from '../../server/database';
 import type { Role } from '../../server/models/role';
-
-import { Link, LinkSource } from 'server/models/thread';
+import { Link, LinkSource } from '../../server/models/thread';
+import { createRole, findOneRole } from '../../server/util/roles';
 import {
   TEST_BLOCK_INFO_BLOCKHASH,
   TEST_BLOCK_INFO_STRING,
   createSiweMessage,
   getEIP712SignableAction,
 } from '../../shared/adapters/chain/ethereum/keys';
+import { createCanvasSessionPayload } from '../../shared/canvas';
+import type { IChainNode } from '../../token-balance-cache/src/index';
+import { BalanceProvider } from '../../token-balance-cache/src/index';
 
 const sortedStringify = configureStableStringify({
   bigint: false,
@@ -246,7 +242,7 @@ export const createThread = async (args: ThreadArgs) => {
     callArgs: {
       community: chainId || '',
       title: encodeURIComponent(title),
-      body: encodeURIComponent(body),
+      body: encodeURIComponent(body!),
       link: url || '',
       topic: topicId || '',
     },
@@ -273,7 +269,7 @@ export const createThread = async (args: ThreadArgs) => {
       chain: chainId,
       address,
       title: encodeURIComponent(title),
-      body: encodeURIComponent(body),
+      body: encodeURIComponent(body!),
       kind,
       topic_name: topicName,
       topic_id: topicId,
@@ -446,7 +442,7 @@ export const createReaction = async (args: CreateReactionArgs) => {
     app: session.payload.app,
     block: session.payload.block,
     call: 'reactComment',
-    callArgs: { comment_id, value: reaction },
+    callArgs: { comment_id: comment_id!, value: reaction },
     chain: 'eip155:1',
     from: session.payload.from,
     timestamp: Date.now(),
@@ -508,7 +504,7 @@ export const createThreadReaction = async (args: CreateThreadReactionArgs) => {
     app: session.payload.app,
     block: session.payload.block,
     call: 'reactThread',
-    callArgs: { thread_id, value: reaction },
+    callArgs: { thread_id: thread_id!, value: reaction },
     chain: 'eip155:1',
     from: session.payload.from,
     timestamp: Date.now(),

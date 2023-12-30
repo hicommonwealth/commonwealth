@@ -1,6 +1,6 @@
 import { ContractType } from '@hicommonwealth/core';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
-import { IAaveGovernanceV2__factory } from 'common-common/src/eth/types';
+import { IAaveGovernanceV2__factory } from 'protocol/eth/types';
 import type ChainInfo from '../../../../models/ChainInfo';
 import EthereumChain from '../chain';
 import AaveApi from './api';

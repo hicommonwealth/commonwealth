@@ -1,17 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Session } from '@canvas-js/interfaces';
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
+import { ServerError } from '@hicommonwealth/common-common';
 import {
   ChainBase,
   NotificationCategories,
   WalletId,
   WalletSsoSource,
 } from '@hicommonwealth/core';
-import {
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/core/build/platform';
 import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
-import { ServerError } from 'common-common/src/errors';
 import { verify } from 'jsonwebtoken';
 import passport from 'passport';
 import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';

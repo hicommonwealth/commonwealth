@@ -1,7 +1,4 @@
-import {
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/core/build/platform';
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import models from '../../database';
 import { rollbar } from '../../util/rollbar';
 import {

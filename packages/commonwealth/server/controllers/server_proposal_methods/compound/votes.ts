@@ -1,16 +1,16 @@
+import { RedisCache } from '@hicommonwealth/common-common';
+import { ICompoundVoteResponse } from 'adapters/chain/compound/types';
 import { BigNumber, providers } from 'ethers';
-import { getCompoundGovContractAndVersion } from './compoundVersion';
-import { CompoundVoteEvents, GovVersion } from './types';
 import {
   GovernorAlpha,
   GovernorBravoDelegate,
   GovernorCompatibilityBravo,
-} from 'common-common/src/eth/types';
-import { ICompoundVoteResponse } from 'adapters/chain/compound/types';
-import { RedisCache } from 'common-common/src/redisCache';
+} from 'protocol/eth/types';
+import { getCompoundGovContractAndVersion } from './compoundVersion';
+import { CompoundVoteEvents, GovVersion } from './types';
 
 export function formatCompoundProposalVote(
-  vote: CompoundVoteEvents
+  vote: CompoundVoteEvents,
 ): ICompoundVoteResponse {
   return {
     voter: vote.voter,
@@ -25,13 +25,13 @@ export async function getCompoundProposalVotes(
   compoundGovAddress: string,
   provider: providers.Web3Provider,
   proposalId: string,
-  redisCache: RedisCache
+  redisCache: RedisCache,
 ): Promise<CompoundVoteEvents[]> {
   const { contract, version: govVersion } =
     await getCompoundGovContractAndVersion(
       redisCache,
       compoundGovAddress,
-      provider
+      provider,
     );
 
   let events;
@@ -41,7 +41,7 @@ export async function getCompoundProposalVotes(
     events = await typedContract.queryFilter(
       typedContract.filters.VoteCast(null, null, null, null),
       +proposal.startBlock,
-      +proposal.endBlock
+      +proposal.endBlock,
     );
     events = events.map((e) => {
       return {
@@ -57,7 +57,7 @@ export async function getCompoundProposalVotes(
     events = await typedContract.queryFilter(
       typedContract.filters.VoteCast(null, null, null, null, null),
       +proposal.startBlock,
-      +proposal.endBlock
+      +proposal.endBlock,
     );
     events = events.map((e) => {
       return {
@@ -74,7 +74,7 @@ export async function getCompoundProposalVotes(
     events = await typedContract.queryFilter(
       typedContract.filters.VoteCast(null, null, null, null, null),
       +proposal.startBlock,
-      +proposal.endBlock
+      +proposal.endBlock,
     );
     events = events.map((e) => {
       return {

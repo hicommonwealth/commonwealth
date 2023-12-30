@@ -1,10 +1,10 @@
+import ContractApi from 'controllers/chain/ethereum/contractApi';
 import type {
   AaveTokenV2,
   Executor,
   IAaveGovernanceV2,
-} from 'common-common/src/eth/types';
-import { Executor__factory } from 'common-common/src/eth/types';
-import ContractApi from 'controllers/chain/ethereum/contractApi';
+} from 'protocol/eth/types';
+import { Executor__factory } from 'protocol/eth/types';
 
 export interface AaveExecutor {
   contract: Executor;
@@ -41,7 +41,7 @@ export default class AaveApi extends ContractApi<IAaveGovernanceV2> {
       if (isValid) {
         const executor = Executor__factory.connect(
           address,
-          this.Contract.provider
+          this.Contract.provider,
         );
         await executor.deployed();
 
@@ -68,12 +68,12 @@ export default class AaveApi extends ContractApi<IAaveGovernanceV2> {
       return this.deployedExecutors[executorAddress];
     } else {
       const isValid = await this.Governance.isExecutorAuthorized(
-        executorAddress
+        executorAddress,
       );
       if (isValid) {
         const executor = Executor__factory.connect(
           executorAddress,
-          this.Contract.provider
+          this.Contract.provider,
         );
         const deployedExecutor = await executor.deployed();
         this.deployedExecutors[executorAddress] = deployedExecutor;

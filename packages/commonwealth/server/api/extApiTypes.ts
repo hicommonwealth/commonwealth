@@ -3,7 +3,7 @@
 import type {
   BalanceProviderResp,
   ChainNodeResp,
-} from 'token-balance-cache/src';
+} from '../../token-balance-cache/src';
 import type { CommentAttributes } from '../models/comment';
 import type { CommunityAttributes } from '../models/community';
 import type { ProfileAttributes } from '../models/profile';

@@ -2,11 +2,6 @@ import type { MsgDepositEncodeObject } from '@cosmjs/stargate';
 import { longify } from '@cosmjs/stargate/build/queryclient';
 import { ProposalType } from '@hicommonwealth/core';
 import BN from 'bn.js';
-import {
-  QueryDepositsResponseSDKType,
-  QueryTallyResultResponseSDKType,
-  QueryVotesResponseSDKType,
-} from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/query';
 import type {
   CosmosProposalState,
   CosmosToken,
@@ -14,6 +9,11 @@ import type {
   ICosmosProposal,
 } from 'controllers/chain/cosmos/types';
 import moment from 'moment';
+import {
+  QueryDepositsResponseSDKType,
+  QueryTallyResultResponseSDKType,
+  QueryVotesResponseSDKType,
+} from 'protocol/cosmos-ts/src/codegen/cosmos/gov/v1/query';
 
 import Proposal from 'models/Proposal';
 import { ITXModalData } from 'models/interfaces';

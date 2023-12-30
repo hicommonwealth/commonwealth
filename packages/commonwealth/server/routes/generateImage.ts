@@ -1,9 +1,8 @@
+import { AppError } from '@hicommonwealth/common-common';
 import AWS from 'aws-sdk';
 import fetch from 'node-fetch';
 import { Configuration, OpenAIApi } from 'openai';
 import { v4 as uuidv4 } from 'uuid';
-
-import { AppError } from '../../../common-common/src/errors';
 import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';

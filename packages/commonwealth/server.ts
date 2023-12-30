@@ -1,18 +1,17 @@
 import {
   formatFilename,
   loggerFactory,
-} from '@hicommonwealth/core/build/platform';
-import bodyParser from 'body-parser';
-import {
-  RabbitMQController,
-  getRabbitMQConfig,
-} from 'common-common/src/rabbitmq';
-import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
-import { RedisCache } from 'common-common/src/redisCache';
-import {
   ServiceKey,
   startHealthCheckLoop,
-} from 'common-common/src/scripts/startHealthCheckLoop';
+} from '@hicommonwealth/adapters';
+import {
+  getRabbitMQConfig,
+  RabbitMQController,
+  RascalConfigServices,
+  RedisCache,
+  setupErrorHandlers,
+} from '@hicommonwealth/common-common';
+import bodyParser from 'body-parser';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
@@ -26,9 +25,7 @@ import prerenderNode from 'prerender-node';
 import type { BrokerConfig } from 'rascal';
 import Rollbar from 'rollbar';
 import favicon from 'serve-favicon';
-import { TokenBalanceCache } from 'token-balance-cache/src/index';
 import * as v8 from 'v8';
-import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers';
 import {
   DATABASE_CLEAN_HOUR,
   RABBITMQ_URI,
@@ -55,6 +52,7 @@ import { databaseCleaner } from './server/util/databaseCleaner';
 import GlobalActivityCache from './server/util/globalActivityCache';
 import setupIpfsProxy from './server/util/ipfsProxy';
 import ViewCountCache from './server/util/viewCountCache';
+import { TokenBalanceCache } from './token-balance-cache/src/index';
 
 let isServiceHealthy = false;
 

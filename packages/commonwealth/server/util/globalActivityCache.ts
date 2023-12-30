@@ -1,4 +1,4 @@
-import JobRunner from 'common-common/src/cacheJobRunner';
+import { JobRunner } from '@hicommonwealth/common-common';
 import type { DB } from '../models';
 import { getActivityFeed, type GlobalActivity } from './activityQuery';
 

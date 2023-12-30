@@ -1,4 +1,4 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/common-common';
 import type { NextFunction } from 'express';
 import {
   MixpanelCommunityInteractionEvent,

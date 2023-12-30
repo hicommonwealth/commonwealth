@@ -10,9 +10,7 @@ if [ "$CW_BUILD" = true ]; then
 elif [ "$SL_BUILD" = true ]; then
   rm -rf packages/commonwealth
   rm -rf packages/discord-bot
-  rm -rf packages/token-balance-cache
 elif [ "$DL_BUILD" = true ]; then
   rm -rf packages/commonwealth
   rm -rf packages/snapshot-listener
-  rm -rf packages/token-balance-cache
 fi

@@ -2,11 +2,6 @@ import { isDeliverTxSuccess } from '@cosmjs/stargate';
 import chai from 'chai';
 
 import { longify } from '@cosmjs/stargate/build/queryclient';
-import {
-  ProposalStatus as ProposalStatusV1,
-  VoteOption as VoteOptionV1,
-  voteOptionToJSON,
-} from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
 import { getLCDClient } from 'controllers/chain/cosmos/chain.utils';
 import {
   getActiveProposalsV1,
@@ -18,6 +13,11 @@ import {
   encodeMsgVote,
   encodeTextProposal,
 } from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
+import {
+  ProposalStatus as ProposalStatusV1,
+  VoteOption as VoteOptionV1,
+  voteOptionToJSON,
+} from 'protocol/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
 import { LCD } from '../../../shared/chain/types/cosmos';
 import {
   deposit,

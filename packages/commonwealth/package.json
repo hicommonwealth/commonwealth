@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "tsc --project tsconfig.server.json",
+    "build": "tsc --build",
+    "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
     "build-android": "NODE_ENV=mobile webpack --config webpack/webpack.config.mobile.js --progress && NODE_ENV=mobile npx cap sync android",
     "build-all": "NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.prod.config.js --progress && yarn build-consumer",
@@ -89,6 +90,8 @@
     "@ethersproject/wallet": "^5.7.0",
     "@glidejs/glide": "^3.6.0",
     "@hicommonwealth/core": "*",
+    "@hicommonwealth/adapters": "*",
+    "@hicommonwealth/common-common": "*",
     "@hookform/resolvers": "^3.3.1",
     "@keplr-wallet/types": "^0.12.23",
     "@keplr-wallet/unit": "^0.12.23",

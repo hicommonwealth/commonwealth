@@ -2,14 +2,12 @@
  * @file Manages logged-in user accounts and local storage.
  */
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/core';
-import { chainBaseToCanvasChainId } from 'canvas/chainMappings';
 import { notifyError } from 'controllers/app/notifications';
 import { signSessionWithMagic } from 'controllers/server/sessions';
 import { isSameAccount } from 'helpers';
 import $ from 'jquery';
-import { initAppState } from 'state';
-
-import app from 'state';
+import { chainBaseToCanvasChainId } from 'shared/canvas/chainMappings';
+import app, { initAppState } from 'state';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import type BlockInfo from '../../models/BlockInfo';
