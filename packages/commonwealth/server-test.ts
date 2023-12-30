@@ -6,6 +6,7 @@ import {
   ServerError,
   cacheDecorator,
   lookupKeyDurationInReq,
+  setupErrorHandlers,
 } from '@hicommonwealth/common-common';
 import bodyParser from 'body-parser';
 import SessionSequelizeStore from 'connect-session-sequelize';
@@ -89,9 +90,11 @@ const setupServer = () => {
       case 'EACCES':
         console.error('Port requires elevated privileges');
         process.exit(1);
+      // eslint-disable-next-line no-fallthrough
       case 'EADDRINUSE':
         console.error(`Port ${port} already in use`);
         process.exit(1);
+      // eslint-disable-next-line no-fallthrough
       default:
         throw error;
     }

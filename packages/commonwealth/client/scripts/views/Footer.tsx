@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-target-blank */
 import 'Footer.scss';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';

@@ -1,12 +1,12 @@
+import { StrictModeDroppable } from 'lib/react-beautiful-dnd';
 import React, { useEffect, useState } from 'react';
-import { Virtuoso } from 'react-virtuoso';
 import type { DraggableProvided } from 'react-beautiful-dnd';
 import { DragDropContext, Draggable } from 'react-beautiful-dnd';
-import { StrictModeDroppable } from 'lib/react-beautiful-dnd';
+import { Virtuoso } from 'react-virtuoso';
 
-import type Topic from '../../../models/Topic';
-import { CWText } from 'views/components/component_kit/cw_text';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { CWText } from 'views/components/component_kit/cw_text';
+import type Topic from '../../../models/Topic';
 
 const reorder = (list: Topic[], startIndex, endIndex): Topic[] => {
   const result = Array.from(list);
@@ -17,8 +17,10 @@ const reorder = (list: Topic[], startIndex, endIndex): Topic[] => {
 };
 
 // This component handles fixed size of the item in the list
+// eslint-disable-next-line react/prop-types
 const HeightPreservingItem = ({ children, ...props }) => {
   const [size, setSize] = useState(0);
+  // eslint-disable-next-line react/prop-types
   const knownSize = props['data-known-size'];
 
   useEffect(() => {
@@ -78,7 +80,7 @@ const DraggableTopicsList = ({
     }
 
     setTopics((items) =>
-      reorder(items, result.source.index, result.destination.index)
+      reorder(items, result.source.index, result.destination.index),
     );
   };
 

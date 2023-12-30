@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/why_commonwealth.scss';
 import React from 'react';

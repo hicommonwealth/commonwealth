@@ -42,6 +42,7 @@ export default class evmBalanceProvider extends BalanceProvider<Web3> {
     opts: EthBPOpts,
   ): Promise<string> {
     const { tokenAddress, contractType } = opts;
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     const Web3 = (await import('web3')).default;
     const api = await this.getExternalProvider(node, opts);
     if (!tokenAddress && !contractType) {

@@ -1,3 +1,5 @@
+/* eslint-disable react/jsx-curly-brace-presence */
+/* eslint-disable react/prop-types */
 import React from 'react';
 import { Skeleton } from 'views/components/Skeleton';
 import './ThreadCard.scss';

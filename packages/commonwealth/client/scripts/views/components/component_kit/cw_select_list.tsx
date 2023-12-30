@@ -1,3 +1,4 @@
+/* eslint-disable react/no-children-prop */
 import React from 'react';
 import type { GroupBase, OptionProps, Props } from 'react-select';
 import Select, { components } from 'react-select';
@@ -6,7 +7,7 @@ import 'components/component_kit/cw_select_list.scss';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 
 const CustomOption = (
-  props: OptionProps & { disabledOptionTooltipText?: string }
+  props: OptionProps & { disabledOptionTooltipText?: string },
 ) => {
   if ((props.data as any)?.disabled) {
     return (
@@ -43,9 +44,9 @@ interface SelectListProps {
 export const SelectList = <
   Option,
   IsMulti extends boolean = false,
-  Group extends GroupBase<Option> = GroupBase<Option>
+  Group extends GroupBase<Option> = GroupBase<Option>,
 >(
-  props: Props<Option, IsMulti, Group> & SelectListProps
+  props: Props<Option, IsMulti, Group> & SelectListProps,
 ) => {
   return (
     <Select

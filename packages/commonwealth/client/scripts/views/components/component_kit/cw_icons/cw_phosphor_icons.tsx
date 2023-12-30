@@ -1,3 +1,5 @@
+/* eslint-disable react/display-name */
+/* eslint-disable react/function-component-definition */
 /* eslint-disable max-len */
 import { Icon as PhosphorIcon } from '@phosphor-icons/react';
 import 'components/component_kit/cw_icon.scss';
@@ -22,7 +24,7 @@ export const withPhosphorIcon = (Icon: PhosphorIcon) => (props: IconProps) => {
     <Icon
       className={getClasses<IconStyleProps>(
         { className, disabled, iconButtonTheme, iconSize, selected },
-        componentType
+        componentType,
       )}
       onClick={otherProps.onClick}
       onMouseEnter={otherProps.onMouseEnter}

@@ -1,10 +1,13 @@
+/* eslint-disable react/display-name */
+/* eslint-disable react/no-multi-comp */
+/* eslint-disable react/function-component-definition */
 import React from 'react';
-import type { To, NavigateOptions } from 'react-router-dom';
+import type { NavigateOptions, To } from 'react-router-dom';
 import {
-  useParams,
-  useNavigate,
-  useLocation,
   Navigate as ReactNavigate,
+  useLocation,
+  useNavigate,
+  useParams,
 } from 'react-router-dom';
 import app from 'state';
 
@@ -84,7 +87,7 @@ interface NavigateToCommunityProps {
   navigate: (
     url: To,
     options?: NavigateOptions,
-    prefix?: null | string
+    prefix?: null | string,
   ) => void;
   path: string;
   chain: string;

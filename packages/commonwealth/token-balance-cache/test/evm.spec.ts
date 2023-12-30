@@ -1,6 +1,6 @@
 import { BalanceType } from '@hicommonwealth/core';
 import { assert } from 'chai';
-import { ChainTesting } from '../../commonwealth/test/util/evm-chain-testing/sdk/chainTesting';
+import { ChainTesting } from '../../test/util/evm-chain-testing/sdk/chainTesting';
 import { default as evmBalanceProvider } from '../src/providers/ethToken';
 import { TokenBalanceCache } from '../src/tbc';
 import { IChainNode } from '../src/types';

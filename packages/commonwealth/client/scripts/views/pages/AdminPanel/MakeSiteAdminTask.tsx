@@ -1,13 +1,15 @@
-import { notifySuccess, notifyError } from 'controllers/app/notifications';
+/* eslint-disable react/no-unescaped-entities */
+/* eslint-disable max-len */
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import 'pages/AdminPanel.scss';
 import React, { useState } from 'react';
 import { isAddress } from 'web3-utils';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
 import { openConfirmation } from '../../modals/confirmation_modal';
 import { updateSiteAdmin } from './utils';
-import 'pages/AdminPanel.scss';
-import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
 
 const MakeSiteAdminTask = () => {
   const [address, setAddress] = useState<string>('');
