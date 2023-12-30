@@ -24,8 +24,10 @@
     "publish-rmq-msg": "ts-node --project tsconfig.json -r tsconfig-paths/register src/rabbitmq/scripts/publishRmqMessageScript.ts"
   },
   "dependencies": {
+    "@hicommonwealth/core": "*",
+    "@hicommonwealth/adapters": "*",
     "async-rwlock": "^1.1.1",
-    "@hicommonwealth/core": "*"
+    "redis": "4.2.0"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
