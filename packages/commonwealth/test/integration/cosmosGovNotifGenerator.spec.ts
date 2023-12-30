@@ -16,18 +16,18 @@ import {
 import {
   ProposalSDKType,
   ProposalStatusSDKType,
-} from 'protocol/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
+} from '../../protocol/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
 import {
   QueryProposalRequest,
   QueryProposalResponseSDKType,
   QueryProposalsRequest,
   QueryProposalsResponseSDKType,
-} from 'protocol/src/cosmos-ts/src/codegen/cosmos/gov/v1/query';
-import { LCDQueryClient as GovV1Client } from 'protocol/src/cosmos-ts/src/codegen/cosmos/gov/v1/query.lcd';
+} from '../../protocol/cosmos-ts/src/codegen/cosmos/gov/v1/query';
+import { LCDQueryClient as GovV1Client } from '../../protocol/cosmos-ts/src/codegen/cosmos/gov/v1/query.lcd';
 import {
   numberToLong,
   toTimestamp,
-} from 'protocol/src/cosmos-ts/src/codegen/helpers';
+} from '../../protocol/cosmos-ts/src/codegen/helpers';
 import { resetDatabase } from '../../server-test';
 import models from '../../server/database';
 import { generateCosmosGovNotifications } from '../../server/workers/cosmosGovNotifications/generateCosmosGovNotifications';

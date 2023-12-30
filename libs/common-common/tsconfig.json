@@ -7,6 +7,5 @@
     "tsBuildInfoFile": "build/.tsbuildinfo"
   },
   "include": ["src"],
-  "exclude": ["../../packages/commonwealth/protocol/cosmos-ts"],
   "references": [{ "path": "../core" }, { "path": "../adapters" }]
 }

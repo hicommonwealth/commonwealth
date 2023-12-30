@@ -2,22 +2,22 @@ import { isDeliverTxSuccess } from '@cosmjs/stargate';
 import chai from 'chai';
 
 import { longify } from '@cosmjs/stargate/build/queryclient';
-import { getLCDClient } from 'controllers/chain/cosmos/chain.utils';
+import { getLCDClient } from '../../../client/scripts/controllers/chain/cosmos/chain.utils';
 import {
   getActiveProposalsV1,
   getCompletedProposalsV1,
-} from 'controllers/chain/cosmos/gov/v1/utils-v1';
+} from '../../../client/scripts/controllers/chain/cosmos/gov/v1/utils-v1';
 import {
   encodeCommunitySpend,
   encodeMsgSubmitProposal,
   encodeMsgVote,
   encodeTextProposal,
-} from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
+} from '../../../client/scripts/controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
 import {
   ProposalStatus as ProposalStatusV1,
   VoteOption as VoteOptionV1,
   voteOptionToJSON,
-} from 'protocol/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
+} from '../../../protocol/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
 import { LCD } from '../../../shared/chain/types/cosmos';
 import {
   deposit,
