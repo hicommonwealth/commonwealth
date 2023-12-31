@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as _m0 from 'protobufjs/minimal';
 import { Long, base64FromBytes, bytesFromBase64, isSet } from '../../helpers';
 export enum FieldDescriptorProto_Type {

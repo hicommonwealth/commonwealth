@@ -4,13 +4,13 @@ import type {
   GovernorAlpha,
   GovernorCompatibilityBravo,
   MPond,
-} from 'protocol/eth/types';
+} from '@hicommonwealth/chains';
 import {
   ERC20VotesComp__factory,
   GovernorAlpha__factory,
   GovernorCompatibilityBravo__factory,
   MPond__factory,
-} from 'protocol/eth/types';
+} from '@hicommonwealth/chains';
 
 import type ContractApi from 'controllers/chain/ethereum/contractApi';
 import { utils } from 'ethers';

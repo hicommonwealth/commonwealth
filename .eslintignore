@@ -17,4 +17,5 @@ capacitor.config.ts
 *contractTypes
 *factories
 *.nyc_output
-packages/commonwealth/protocol/cosmos-ts
+libs/chains/src/cosmos-ts
+packages/commonwealth/protocol/**

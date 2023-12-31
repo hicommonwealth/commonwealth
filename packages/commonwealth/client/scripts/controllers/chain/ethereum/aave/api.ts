@@ -1,10 +1,10 @@
-import ContractApi from 'controllers/chain/ethereum/contractApi';
 import type {
   AaveTokenV2,
   Executor,
   IAaveGovernanceV2,
-} from 'protocol/eth/types';
-import { Executor__factory } from 'protocol/eth/types';
+} from '@hicommonwealth/chains';
+import { Executor__factory } from '@hicommonwealth/chains';
+import ContractApi from 'controllers/chain/ethereum/contractApi';
 
 export interface AaveExecutor {
   contract: Executor;

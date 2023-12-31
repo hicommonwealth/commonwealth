@@ -1,3 +1,4 @@
+import type { QueryTallyResultResponseSDKType } from '@hicommonwealth/chains';
 import { ChainBase } from '@hicommonwealth/core';
 import { useQuery } from '@tanstack/react-query';
 import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
@@ -5,7 +6,6 @@ import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1
 import type { QueryTallyResultResponse } from 'cosmjs-types/cosmos/gov/v1beta1/query';
 import _ from 'lodash';
 import { AnyProposal } from 'models/types';
-import type { QueryTallyResultResponseSDKType } from 'protocol/cosmos-ts/src/codegen/cosmos/gov/v1/query';
 import app from 'state';
 
 const TALLY_CACHE_TIME = 1000 * 60 * 60;

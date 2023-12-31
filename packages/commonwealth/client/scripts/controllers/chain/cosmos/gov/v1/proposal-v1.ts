@@ -1,5 +1,10 @@
 import type { MsgDepositEncodeObject } from '@cosmjs/stargate';
 import { longify } from '@cosmjs/stargate/build/queryclient';
+import {
+  QueryDepositsResponseSDKType,
+  QueryTallyResultResponseSDKType,
+  QueryVotesResponseSDKType,
+} from '@hicommonwealth/chains';
 import { ProposalType } from '@hicommonwealth/core';
 import BN from 'bn.js';
 import type {
@@ -9,11 +14,6 @@ import type {
   ICosmosProposal,
 } from 'controllers/chain/cosmos/types';
 import moment from 'moment';
-import {
-  QueryDepositsResponseSDKType,
-  QueryTallyResultResponseSDKType,
-  QueryVotesResponseSDKType,
-} from 'protocol/cosmos-ts/src/codegen/cosmos/gov/v1/query';
 
 import Proposal from 'models/Proposal';
 import { ITXModalData } from 'models/interfaces';

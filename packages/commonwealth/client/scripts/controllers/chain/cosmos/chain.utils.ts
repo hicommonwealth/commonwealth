@@ -30,9 +30,7 @@ export const getRPCClient = async (
 };
 
 export const getLCDClient = async (lcdUrl: string): Promise<LCD> => {
-  const { createLCDClient } = await import(
-    'protocol/cosmos-ts/src/codegen/cosmos/lcd'
-  );
+  const { createLCDClient } = await import('@hicommonwealth/chains');
 
   return await createLCDClient({
     restEndpoint: lcdUrl,

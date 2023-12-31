@@ -2,6 +2,17 @@
 /* eslint-disable max-len */
 import { GovProposalId } from '@cosmjs/stargate/build/modules/gov/queries';
 import {
+  GovV1Client,
+  ProposalSDKType,
+  ProposalStatusSDKType,
+  QueryProposalRequest,
+  QueryProposalResponseSDKType,
+  QueryProposalsRequest,
+  QueryProposalsResponseSDKType,
+  numberToLong,
+  toTimestamp,
+} from '@hicommonwealth/chains';
+import {
   BalanceType,
   ChainBase,
   ChainNetwork,
@@ -13,23 +24,9 @@ import {
   QueryProposalResponse,
   QueryProposalsResponse,
 } from 'cosmjs-types/cosmos/gov/v1beta1/query';
-import {
-  ProposalSDKType,
-  ProposalStatusSDKType,
-} from '../../protocol/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
-import {
-  QueryProposalRequest,
-  QueryProposalResponseSDKType,
-  QueryProposalsRequest,
-  QueryProposalsResponseSDKType,
-} from '../../protocol/cosmos-ts/src/codegen/cosmos/gov/v1/query';
-import { LCDQueryClient as GovV1Client } from '../../protocol/cosmos-ts/src/codegen/cosmos/gov/v1/query.lcd';
-import {
-  numberToLong,
-  toTimestamp,
-} from '../../protocol/cosmos-ts/src/codegen/helpers';
 import { resetDatabase } from '../../server-test';
 import models from '../../server/database';
+
 import { generateCosmosGovNotifications } from '../../server/workers/cosmosGovNotifications/generateCosmosGovNotifications';
 import { CosmosClients } from '../../server/workers/cosmosGovNotifications/proposalFetching/getCosmosClient';
 import {

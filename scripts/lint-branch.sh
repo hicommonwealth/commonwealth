@@ -10,7 +10,8 @@ if [ -n "$GITHUB_BASE_REF" ]; then
 fi
 
 # Get a list of changed .ts files
-LINES=$(git diff origin/$BASE_BRANCH...HEAD --name-only --diff-filter=d | grep \\.ts)
+#LINES=$(git diff origin/$BASE_BRANCH...HEAD --name-only --diff-filter=d | grep \\.ts)
+LINES=$(git diff --name-only --diff-filter=d | grep \\.ts)
 
 if [ -z "$LINES" ]
 then
@@ -18,7 +19,7 @@ then
 else
     echo $LINES
     if [ -n "$FAIL_WARNINGS" ]; then
-        NODE_OPTIONS="--max-old-space-size=8192" eslint --max-warnings=0 $LINES
+        NODE_OPTIONS="--max-old-space-size=8192" eslint --max-warnings=0 $LINES --no-ignore
     else
         NODE_OPTIONS="--max-old-space-size=8192" eslint $LINES
     fi

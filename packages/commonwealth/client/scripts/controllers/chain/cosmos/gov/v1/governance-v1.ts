@@ -1,9 +1,8 @@
+import { Any, numberToLong } from '@hicommonwealth/chains';
 import type { ICosmosProposal } from 'controllers/chain/cosmos/types';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 import ProposalModule from 'models/ProposalModule';
 import type { ITXModalData } from 'models/interfaces';
-import { Any } from 'protocol/cosmos-ts/src/codegen/google/protobuf/any';
-import { numberToLong } from 'protocol/cosmos-ts/src/codegen/helpers';
 import type CosmosAccount from '../../account';
 import type CosmosAccounts from '../../accounts';
 import type CosmosChain from '../../chain';

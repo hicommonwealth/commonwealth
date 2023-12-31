@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import type { ERC20 } from '@hicommonwealth/chains';
+import { ERC20__factory } from '@hicommonwealth/chains';
 import { BalanceType } from '@hicommonwealth/core';
 import BN from 'bn.js';
 import { providers } from 'ethers';
-import type { ERC20 } from 'protocol/eth/types';
-import { ERC20__factory } from 'protocol/eth/types';
 import Web3 from 'web3';
 import type { HttpProvider } from 'web3-core';
 import type { Contract } from 'web3-eth-contract';

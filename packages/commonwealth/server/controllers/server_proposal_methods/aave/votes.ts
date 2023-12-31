@@ -1,6 +1,6 @@
+import { IAaveGovernanceV2__factory } from '@hicommonwealth/chains';
 import { IAaveVoteResponse } from 'adapters/chain/aave/types';
 import { BigNumber, providers } from 'ethers';
-import { IAaveGovernanceV2__factory } from 'protocol/eth/types';
 
 type VoteEventArgsArray = [BigNumber, string, boolean, BigNumber];
 type VoteEventArgsObject = {

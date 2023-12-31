@@ -1,6 +1,3 @@
-import { RedisCache } from '@hicommonwealth/common-common';
-import { RedisNamespaces } from '@hicommonwealth/core';
-import { providers } from 'ethers';
 import {
   GovernorAlpha,
   GovernorAlpha__factory,
@@ -8,7 +5,10 @@ import {
   GovernorBravoDelegate__factory,
   GovernorCompatibilityBravo,
   GovernorCompatibilityBravo__factory,
-} from 'protocol/eth/types';
+} from '@hicommonwealth/chains';
+import { RedisCache } from '@hicommonwealth/common-common';
+import { RedisNamespaces } from '@hicommonwealth/core';
+import { providers } from 'ethers';
 import { GovVersion } from './types';
 
 type ContractAndVersion = {

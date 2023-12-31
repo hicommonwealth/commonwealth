@@ -1,0 +1,34 @@
+{
+  "name": "@hicommonwealth/chains",
+  "private": "true",
+  "version": "0.1.0",
+  "description": "Protocol team library",
+  "files": [
+    "build"
+  ],
+  "main": "build/index",
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "rm -rf build",
+    "check-types": "tsc --noEmit",
+    "test": "NODE_ENV=test ts-mocha '__tests__/**/*.spec.ts'"
+  },
+  "dependencies": {
+    "@canvas-js/interfaces": "^0.5.0-alpha4",
+    "@cosmjs/amino": "^0.31.0",
+    "@cosmjs/proto-signing": "^0.31.0",
+    "@cosmjs/stargate": "^0.31.0",
+    "@cosmjs/tendermint-rpc": "^0.31.0",
+    "@ethersproject/abi": "^5.7.0",
+    "@ethersproject/address": "^5.7.0",
+    "@ethersproject/bytes": "^5.7.0",
+    "@ethersproject/constants": "^5.7.0",
+    "@ethersproject/contracts": "^5.7.0",
+    "@ethersproject/hash": "^5.7.0",
+    "@ethersproject/providers": "^5.7.2",
+    "@ethersproject/strings": "^5.7.0",
+    "@ethersproject/units": "^5.7.0",
+    "@ethersproject/wallet": "^5.7.0",
+    "ethers": "5.7.2"
+  }
+}

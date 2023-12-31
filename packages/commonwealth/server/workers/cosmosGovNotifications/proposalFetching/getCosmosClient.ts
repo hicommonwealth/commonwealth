@@ -1,7 +1,6 @@
 import { QueryClient, setupGovExtension } from '@cosmjs/stargate';
 import * as tm from '@cosmjs/tendermint-rpc';
-import { LCDQueryClient as GovV1Client } from 'protocol/cosmos-ts/src/codegen/cosmos/gov/v1/query.lcd';
-import { createLCDClient } from 'protocol/cosmos-ts/src/codegen/cosmos/lcd';
+import { GovV1Client, createLCDClient } from '@hicommonwealth/chains';
 import { COSMOS_GOV_V1_CHAIN_IDS } from '../../../config';
 import { CommunityInstance } from '../../../models/community';
 import { CosmosClientType, GovV1Beta1ClientType } from './types';

@@ -5,7 +5,7 @@ import {
   ProposalSDKType,
   ProposalStatus,
   TallyResultSDKType,
-} from 'protocol/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
+} from '@hicommonwealth/chains';
 import type { LCD } from '../../../../../../../shared/chain/types/cosmos';
 import type {
   CosmosProposalState,

@@ -1,10 +1,10 @@
+import type { GovernorCompatibilityBravo } from '@hicommonwealth/chains';
 import type { ICompoundProposalResponse } from 'adapters/chain/compound/types';
 import axios from 'axios';
 import Compound from 'controllers/chain/ethereum/compound/adapter';
 import { deserializeBigNumbers } from 'controllers/chain/ethereum/util';
 import type { BigNumberish, ContractTransaction } from 'ethers';
 import { BigNumber } from 'ethers';
-import type { GovernorCompatibilityBravo } from 'protocol/eth/types';
 import type { IApp } from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import ProposalModule from '../../../../models/ProposalModule';

@@ -1,6 +1,8 @@
+import {
+  IGovernanceV2Helper,
+  IGovernanceV2Helper__factory,
+} from '@hicommonwealth/chains';
 import { ethers, providers } from 'ethers';
-import { IGovernanceV2Helper } from 'protocol/eth/types/IGovernanceV2Helper';
-import { IGovernanceV2Helper__factory } from 'protocol/eth/types/factories/IGovernanceV2Helper__factory';
 import { IAaveProposalResponse } from '../../../../shared/adapters/chain/aave/types';
 import { ProposalState } from '../../../../shared/chain/types/aave';
 

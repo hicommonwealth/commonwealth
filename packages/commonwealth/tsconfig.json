@@ -7,7 +7,6 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "protocol/*": ["protocol/*"],
       "client/*": ["./client/*"],
       "server/*": ["./server/*"],
       "adapters/*": ["./shared/adapters/*"],
@@ -46,6 +45,7 @@
   "references": [
     { "path": "../../libs/core" },
     { "path": "../../libs/adapters" },
-    { "path": "../../libs/common-common" }
+    { "path": "../../libs/common-common" },
+    { "path": "../../libs/chains" }
   ]
 }

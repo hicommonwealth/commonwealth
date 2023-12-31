@@ -1,12 +1,12 @@
-import { RedisCache } from '@hicommonwealth/common-common';
-import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
-import { ethers, providers, utils } from 'ethers';
 import {
   GovernorAlpha,
   GovernorBravoDelegate,
   GovernorCompatibilityBravo,
-} from 'protocol/eth/types';
-import { TypedEvent } from 'protocol/eth/types/commons';
+  TypedEvent,
+} from '@hicommonwealth/chains';
+import { RedisCache } from '@hicommonwealth/common-common';
+import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
+import { ethers, providers, utils } from 'ethers';
 import { ProposalState } from '../../../../shared/chain/types/compound';
 import { getCompoundGovContractAndVersion } from './compoundVersion';
 import {
@@ -224,7 +224,7 @@ async function getProposalCreatedEvents(
   fromBlock = 0,
   toBlock: number | 'latest' = 'latest',
 ): Promise<ProposalCreatedEventArgsObject[]> {
-  const events = await contract.queryFilter<ProposalCreatedEventArgsArray, any>(
+  const events = await contract.queryFilter(
     contract.filters.ProposalCreated(
       null,
       null,
