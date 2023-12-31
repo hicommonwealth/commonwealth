@@ -7,7 +7,6 @@ android
 *.github
 *.env
 *node_modules
-**/cosmos-ts
 capacitor.config.ts
 *.mocharc.json
 *.nycrc
@@ -18,3 +17,4 @@ capacitor.config.ts
 *contractTypes
 *factories
 *.nyc_output
+packages/commonwealth/protocol/cosmos-ts
