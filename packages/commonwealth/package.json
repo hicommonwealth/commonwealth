@@ -146,7 +146,6 @@
     "buffer": "^6.0.3",
     "chart.js": "^2.8.0",
     "cheerio": "1.0.0-rc.3",
-    "chromium": "^3.0.3",
     "clipboard-polyfill": "^2.8.6",
     "clsx": "^1.2.1",
     "compression": "^1.7.4",
