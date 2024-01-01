@@ -11,6 +11,7 @@ const run = (server) => {
 };
 
 const setupPrerenderServer = () => {
+  console.log('\n\n>>>>>>>>>>>>>>>>>> SETTING UP PRERENDER SERVER!!!\n\n');
   const isMac = process.platform === 'darwin';
   const isLinux = process.platform === 'linux';
   if (isLinux) {
