@@ -2,6 +2,7 @@
 import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
 import cheerio from 'cheerio';
 import { factory, formatFilename } from 'common-common/src/logging';
+import prerenderNode from 'prerender-node';
 import { DEFAULT_COMMONWEALTH_LOGO } from '../config';
 import type { DB } from '../models';
 import type { CommunityInstance } from '../models/community';
@@ -177,6 +178,12 @@ const setupAppRoutes = (app, models: DB, templateFile, sendFile) => {
   };
 
   async function renderGeneralPage(req, res) {
+    console.log(
+      `\n\n>>>>>>>>>>>>>>>> PRERENDER GETTING URL: ${prerenderNode.buildApiUrl(
+        req,
+      )}\n\n`,
+    );
+
     // Retrieve chain
     const scope = req.params.scope;
     const chain = await getChain(req, scope);
