@@ -46,7 +46,6 @@ import setupAPI from './server/routing/router';
 import { sendBatchedNotificationEmails } from './server/scripts/emails';
 import setupAppRoutes from './server/scripts/setupAppRoutes';
 import expressStatsdInit from './server/scripts/setupExpressStats';
-import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import setupServer from './server/scripts/setupServer';
 import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
@@ -106,7 +105,6 @@ async function main() {
     process.exit(rc);
   }
 
-  const WITH_PRERENDER = process.env.WITH_PRERENDER;
   const NO_PRERENDER = process.env.NO_PRERENDER || NO_CLIENT_SERVER;
 
   const SequelizeStore = SessionSequelizeStore(session.Store);
@@ -199,7 +197,12 @@ async function main() {
     app.use(sessionParser);
     app.use(passport.initialize());
     app.use(passport.session());
-    app.use(prerenderNode.set('prerenderToken', PRERENDER_TOKEN));
+
+    if (DEV && process.env.WITH_PRERENDER) {
+      app.use(prerenderNode.set('prerenderToken', PRERENDER_TOKEN));
+    } else if (!DEV && !NO_PRERENDER) {
+      app.use(prerenderNode.set('prerenderToken', PRERENDER_TOKEN));
+    }
   };
 
   const templateFile = (() => {
@@ -211,14 +214,6 @@ async function main() {
   })();
 
   const sendFile = (res) => res.sendFile(`${__dirname}/build/index.html`);
-
-  // Only run prerender in DEV environment if the WITH_PRERENDER flag is provided.
-  // On the other hand, run prerender by default on production.
-  if (DEV) {
-    if (WITH_PRERENDER) setupPrerenderServer();
-  } else {
-    if (!NO_PRERENDER) setupPrerenderServer();
-  }
 
   setupMiddleware();
   setupPassport(models);
