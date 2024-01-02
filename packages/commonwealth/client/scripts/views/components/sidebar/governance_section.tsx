@@ -1,11 +1,15 @@
 import React from 'react';
 
-import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/core';
 
 import 'components/sidebar/index.scss';
 import { handleRedirectClicks } from 'helpers';
 
+import { useCommonNavigate } from 'navigation/helpers';
+import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
+import { sidebarStore } from 'state/ui/sidebar';
+import { isWindowSmallInclusive } from '../component_kit/helpers';
 import { verifyCachedToggleTree } from './helpers';
 import { SidebarSectionGroup } from './sidebar_section';
 import type {
@@ -13,10 +17,6 @@ import type {
   SidebarSectionAttrs,
   ToggleTree,
 } from './types';
-import { useCommonNavigate } from 'navigation/helpers';
-import { matchRoutes, useLocation } from 'react-router-dom';
-import { sidebarStore } from 'state/ui/sidebar';
-import { isWindowSmallInclusive } from '../component_kit/helpers';
 
 const resetSidebarState = () => {
   if (isWindowSmallInclusive(window.innerWidth)) {
@@ -28,7 +28,7 @@ const resetSidebarState = () => {
 
 function setGovernanceToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
-    localStorage[`${app.activeChainId()}-governance-toggle-tree`]
+    localStorage[`${app.activeChainId()}-governance-toggle-tree`],
   );
 
   const split = path.split('.');
@@ -123,27 +123,27 @@ export const GovernanceSection = () => {
   }
 
   const toggleTreeState = JSON.parse(
-    localStorage[`${app.activeChainId()}-governance-toggle-tree`]
+    localStorage[`${app.activeChainId()}-governance-toggle-tree`],
   );
 
   const matchesSnapshotProposalRoute = matchRoutes(
     [{ path: '/snapshot/:space' }, { path: ':scope/snapshot/:space' }],
-    location
+    location,
   );
 
   const matchesProposalRoute = matchRoutes(
     [{ path: '/proposals' }, { path: ':scope/proposals' }],
-    location
+    location,
   );
 
   const matchesDelegateRoute = matchRoutes(
     [{ path: '/delegate' }, { path: ':scope/delegate' }],
-    location
+    location,
   );
 
   const matchesMembersRoute = matchRoutes(
     [{ path: '/members' }, { path: ':scope/members' }],
-    location
+    location,
   );
 
   // ---------- Build Section Props ---------- //
@@ -188,7 +188,7 @@ export const GovernanceSection = () => {
           e,
           '/multiple-snapshots?action=select-space',
           app.activeChainId(),
-          null
+          null,
         );
       } else {
         if (snapshotSpaces[0].lastIndexOf('/') > -1) {
@@ -199,7 +199,7 @@ export const GovernanceSection = () => {
               .slice(snapshotSpaces[0].lastIndexOf('/') + 1)
               .trim()}`,
             app.activeChainId(),
-            null
+            null,
           );
         } else {
           handleRedirectClicks(
@@ -207,7 +207,7 @@ export const GovernanceSection = () => {
             e,
             `/snapshot/${snapshotSpaces}`,
             app.activeChainId(),
-            null
+            null,
           );
         }
       }
@@ -232,7 +232,7 @@ export const GovernanceSection = () => {
         app.activeChainId(),
         () => {
           setGovernanceToggleTree('children.Proposals.toggledState', toggle);
-        }
+        },
       );
     },
     isVisible: showProposals,
@@ -260,7 +260,7 @@ export const GovernanceSection = () => {
         app.activeChainId(),
         () => {
           setGovernanceToggleTree('children.Delegate.toggledState', toggle);
-        }
+        },
       );
     },
     displayData: null,

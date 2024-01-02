@@ -1,5 +1,5 @@
+import { NotificationCategories } from '@hicommonwealth/core';
 import { expect } from 'chai';
-import { NotificationCategories } from 'common-common/src/types';
 import { ServerCommentsController } from 'server/controllers/server_comments_controller';
 import { SearchCommentsOptions } from 'server/controllers/server_comments_methods/search_comments';
 import Sinon from 'sinon';

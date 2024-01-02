@@ -1,14 +1,15 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { BalanceType } from '@hicommonwealth/core';
 import BN from 'bn.js';
-import type { StateMutabilityType, AbiType } from 'web3-utils';
-import type { Contract } from 'web3-eth-contract';
-import type { HttpProvider } from 'web3-core';
-import { providers } from 'ethers';
 import type { ERC20 } from 'common-common/src/eth/types';
 import { ERC20__factory } from 'common-common/src/eth/types';
+import { providers } from 'ethers';
+import Web3 from 'web3';
+import type { HttpProvider } from 'web3-core';
+import type { Contract } from 'web3-eth-contract';
+import type { AbiType, StateMutabilityType } from 'web3-utils';
 import type { IChainNode } from '../types';
 import { BalanceProvider } from '../types';
-import { BalanceType } from 'common-common/src/types';
-import Web3 from 'web3';
 
 export default class RoninBalanceProvider extends BalanceProvider<
   [ERC20, Contract]
@@ -18,7 +19,7 @@ export default class RoninBalanceProvider extends BalanceProvider<
   public validBases = [BalanceType.AxieInfinity];
   // TODO graceful handling when the provider breaks or throw error
   public async getExternalProvider(
-    node: IChainNode
+    node: IChainNode,
   ): Promise<[api: ERC20, stakingContract: Contract]> {
     // TODO: make configurable
     const rpcUrl = 'https://api.roninchain.com/rpc';
@@ -28,7 +29,7 @@ export default class RoninBalanceProvider extends BalanceProvider<
     const axsStakingPoolAddress = '05b0bb3c1c320b280501b86706c3551995bc8571';
     const axsApi = ERC20__factory.connect(
       axsAddress,
-      new providers.Web3Provider(provider as any)
+      new providers.Web3Provider(provider as any),
     );
     await axsApi.deployed();
 
@@ -57,7 +58,7 @@ export default class RoninBalanceProvider extends BalanceProvider<
     ];
     const axsStakingPoolContract = new web3.eth.Contract(
       axsStakingAbi,
-      axsStakingPoolAddress
+      axsStakingPoolAddress,
     );
 
     return [axsApi, axsStakingPoolContract];
@@ -69,7 +70,7 @@ export default class RoninBalanceProvider extends BalanceProvider<
     }
 
     const [axsApi, axsStakingPoolContract] = await this.getExternalProvider(
-      node
+      node,
     );
 
     const axsBalanceBigNum = await axsApi.balanceOf(address);

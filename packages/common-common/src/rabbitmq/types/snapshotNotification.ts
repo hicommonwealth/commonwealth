@@ -1,13 +1,13 @@
+import type { ISnapshotNotification } from '@hicommonwealth/core';
 import type { RmqMsgNamespace } from 'common-common/src/rabbitmq/types';
 import { RmqMsgFormatError } from 'common-common/src/rabbitmq/types';
-import type { ISnapshotNotification } from '../../types';
 
 export const RmqSnapshotNotification: RmqMsgNamespace<ISnapshotNotification> = {
   getInvalidFormatError(notif: any): RmqMsgFormatError {
     return new RmqMsgFormatError(
       `The following Snapshot Notification is improperly formatted: ${JSON.stringify(
-        notif
-      )}`
+        notif,
+      )}`,
     );
   },
 
@@ -31,8 +31,8 @@ export const RmqSnapshotNotification: RmqMsgNamespace<ISnapshotNotification> = {
     if (!valid) {
       console.log(
         `The following Snapshot Notification is improperly formatted: ${JSON.stringify(
-          data
-        )}`
+          data,
+        )}`,
       );
       throw this.getInvalidFormatError(data);
     }

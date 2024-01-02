@@ -1,9 +1,9 @@
-import { AppError } from '../../../../common-common/src/errors';
 import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
-} from '../../../../common-common/src/types';
+} from '@hicommonwealth/core';
+import { AppError } from '../../../../common-common/src/errors';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { AddressInstance } from '../../models/address';
 import { CommunityInstance } from '../../models/community';

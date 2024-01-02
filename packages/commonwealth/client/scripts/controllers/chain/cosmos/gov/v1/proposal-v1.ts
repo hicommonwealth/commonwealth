@@ -1,12 +1,12 @@
 import type { MsgDepositEncodeObject } from '@cosmjs/stargate';
 import { longify } from '@cosmjs/stargate/build/queryclient';
+import { ProposalType } from '@hicommonwealth/core';
 import BN from 'bn.js';
 import {
   QueryDepositsResponseSDKType,
   QueryTallyResultResponseSDKType,
   QueryVotesResponseSDKType,
 } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/query';
-import { ProposalType } from 'common-common/src/types';
 import type {
   CosmosProposalState,
   CosmosToken,
@@ -99,7 +99,7 @@ export class CosmosProposalV1 extends Proposal<
   public get depositorsAsVotes(): Array<DepositVote<CosmosToken>> {
     return this.data.state.depositors.map(
       ([a, n]) =>
-        new DepositVote(this._Accounts.fromAddress(a), this._Chain.coins(n))
+        new DepositVote(this._Accounts.fromAddress(a), this._Chain.coins(n)),
     );
   }
 
@@ -116,7 +116,7 @@ export class CosmosProposalV1 extends Proposal<
     ChainInfo: CosmosChain,
     Accounts: CosmosAccounts,
     Governance: CosmosGovernanceV1,
-    data: ICosmosProposal
+    data: ICosmosProposal,
   ) {
     super(ProposalType.CosmosProposal, data);
     this._Chain = ChainInfo;
@@ -200,11 +200,11 @@ export class CosmosProposalV1 extends Proposal<
         if (vote) {
           this.data.state.voters.push([voter.voter, vote]);
           this.addOrUpdateVote(
-            new CosmosVote(this._Accounts.fromAddress(voter.voter), vote)
+            new CosmosVote(this._Accounts.fromAddress(voter.voter), vote),
           );
         } else {
           console.error(
-            `voter: ${voter.voter} has invalid vote option: ${voter.options[0].option}`
+            `voter: ${voter.voter} has invalid vote option: ${voter.options[0].option}`,
           );
         }
       }
@@ -322,7 +322,7 @@ export class CosmosProposalV1 extends Proposal<
     const msg = encodeMsgVote(
       vote.account.address,
       this.data.identifier,
-      vote.option
+      vote.option,
     );
 
     await this._Chain.sendTx(vote.account, msg);

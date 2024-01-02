@@ -1,5 +1,5 @@
+import { ChainBase, DefaultPage } from '@hicommonwealth/core';
 import axios from 'axios';
-import { ChainBase, DefaultPage } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { featureFlags } from 'helpers/feature-flags';
 import { uuidv4 } from 'lib/util';
