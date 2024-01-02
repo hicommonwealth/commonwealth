@@ -80,7 +80,7 @@ export async function __updateGroup(
         id: {
           [Op.in]: topics || [],
         },
-        chain_id: community.id,
+        community_id: community.id,
       },
     });
     if (topics?.length > 0 && topics.length !== topicsToAssociate.length) {

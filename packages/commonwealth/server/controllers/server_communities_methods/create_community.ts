@@ -399,7 +399,7 @@ export async function __createCommunity(
   delete nodeJSON.private_url;
 
   await this.models.Topic.create({
-    chain_id: createdCommunity.id,
+    community_id: createdCommunity.id,
     name: 'General',
     featured_in_sidebar: true,
   });

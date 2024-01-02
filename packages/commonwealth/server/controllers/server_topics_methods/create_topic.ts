@@ -65,13 +65,13 @@ export async function __createTopic(
     featured_in_sidebar,
     featured_in_new_post,
     default_offchain_template: default_offchain_template || '',
-    chain_id: community.id,
+    community_id: community.id,
   };
 
   const [newTopic] = await this.models.Topic.findOrCreate({
     where: {
       name,
-      chain_id: community.id,
+      community_id: community.id,
     },
     defaults: options,
   });

@@ -61,7 +61,7 @@ export async function __getGroups(
   if (includeTopics) {
     const topics = await this.models.Topic.findAll({
       where: {
-        chain_id: community.id,
+        community_id: community.id,
         group_ids: {
           [Op.overlap]: groupsResult.map(({ id }) => id),
         },
