@@ -23,6 +23,9 @@ If you add a new environment variable, you must add documentation here. Please d
 - [DATABASE_CLEAN_HOUR](#database_clean_hour)
 - [DATABASE_URI](#database_uri)
 - [DATABASE_URL](#database_url)
+- [DD_AGENT_MAJOR_VERSION](#dd_agent_major_version)
+- [DD_API_KEY](#dd_api_key)
+- [DD_DYNO_HOST](#dd_dyno_host)
 - [DD_ENABLE_HEROKU_POSTGRES](#dd_enable_heroku_postgres)
 - [DD_ENABLE_HEROKU_REDIS](#dd_enable_heroku_redis)
 - [DD_DISABLE_HOST_METRICS](#dd_disable_host_metrics)
@@ -142,17 +145,29 @@ Used to initialize connections to the database. By default, set to `postgresql:/
 
 Required in production. This value is usually set automatically by Heroku when a Heroku Postgres instance is attached to an app.
 
+## DD_AGENT_MAJOR_VERSION
+
+Set in our Heroku `commonwealthapp` pipeline, selecting our Datadog version. As of 240101, we use version `7`.
+
+## DD_API_KEY
+
+Secret Datadog account key. Set in our Heroku `commonwealthapp` pipeline. See [DataDog.md](../knowledge_base/Datadog.md) for more info.
+
+## DD_DYNO_HOST
+
+Boolean set in our Heroku `commonwealthapp` pipeline, in order to scope the buildpack to a dyno. See [DataDog.md](../knowledge_base/Datadog.md) for more info.
+
 ## DD_ENABLE_HEROKU_POSTGRES
 
-Set in our Heroku `commonwealthapp` pipeline to enable PSQL analytics through DataDog. See [DataDog.md](../knowledge_base/Datadog.md) for more info.
+Boolean set in our Heroku `commonwealthapp` pipeline to enable PSQL analytics through DataDog. See [DataDog.md](../knowledge_base/Datadog.md) for more info.
 
 ## DD_ENABLE_HEROKU_REDIS
 
-Set in our Heroku `commonwealthapp` pipeline to enable Redis analytics through DataDog. See [DataDog.md](../knowledge_base/Datadog.md) for more info.
+Boolean set in our Heroku `commonwealthapp` pipeline to enable Redis analytics through DataDog. See [DataDog.md](../knowledge_base/Datadog.md) for more info.
 
 ## DD_DISABLE_HOST_METRICS
 
-Set in our Heroku `commonwealthapp` pipeline to disable metrics that are not presently useful to us. See [DataDog.md](../knowledge_base/Datadog.md) for more info.
+Boolean in our Heroku `commonwealthapp` pipeline to disable metrics that are not presently useful to us. As of 240101, should be disabled (i.e. `true`). See [DataDog.md](../knowledge_base/Datadog.md) for more info.
 
 ## DD_LOG_LEVEL
 
@@ -324,11 +339,11 @@ The number of minutes the ChainSubscriber should wait between requests to the CW
 
 ## ROLLBAR_ENV
 
-A tag used to identify Rollbar reports by environment, such that we can easily filter on the Rollbar dashboard. In staging and demo apps, we set it to the name of the app. For local production, it should be set to some custom value such as your name in lowercase. It should NEVER be set to `production`.
+A tag (string) used to identify Rollbar reports by environment, such that we can easily filter on the Rollbar dashboard. In staging and demo apps, we set it to the name of the app. For local production, it should be set to some custom value such as your name in lowercase. It should NEVER be set to `production`.
 
 ## ROLLBAR_SERVER_TOKEN
 
-Required in production; used for real-time error tracking. In local environments and in staging (i.e. non-prod) environments (such as frick, frack, demo, experimental), should be set to the CommonwealthDev token (found on our Rollbar dashboard or by contacting Timothee Legros). Only our production environment uses the CommonwealthProject token.
+Refers to a specific project on Rollbar. Local and staging (i.e. non-prod) environments should always use the `CommonwealthDev` token, which may be obtained from the Rollbar dashboard, Timothee Legros or an engineering lead. Only prod uses the `CommonwealthProject` token.
 
 ## RPC_HOST
 

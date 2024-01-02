@@ -60,7 +60,7 @@ A buildpack is a collection of scripts which collectively transform deployed cod
 
 ## Release phases
 
-The release phase allows processes (e.g. database migrations) to run prior to the deployment of a new app version. A re-release may need to be triggered for migrations to run; one way to force a re-release is to create a new temporary environmental variable. Rollbacks, pipeline promotions, and the provisioning of new add-ons may also be used to trigger a release. See [dedicated Heroku documentation](https://devcenter.heroku.com/articles/release-phase) for a more detailed guide.
+The release phase allows processes (e.g. database migrations) to run prior to the deployment of a new app version. A re-release may need to be triggered for migrations to run; one way to force a re-release is to create a new temporary environment variable. Rollbacks, pipeline promotions, and the provisioning of new add-ons may also be used to trigger a release. See [dedicated Heroku documentation](https://devcenter.heroku.com/articles/release-phase) for a more detailed guide.
 
 ## Downloading Production Databases
 
