@@ -11,7 +11,6 @@ import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import type Thread from '../../../models/Thread';
 import type Topic from '../../../models/Topic';
-import GatingGrowl from '../../components/GatingGrowl/GatingGrowl';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -78,7 +77,6 @@ const OverviewPage = () => {
     <PageLoading />
   ) : (
     <div className="OverviewPage">
-      <GatingGrowl />
       <div className="header-row">
         <div className="header-row-left">
           <CWText type="h3" fontWeight="semiBold">

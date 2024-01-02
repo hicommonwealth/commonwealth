@@ -1,18 +1,18 @@
-import type { ContractType } from 'common-common/src/types';
+import type { ContractType } from '@hicommonwealth/core';
 import { AppError } from 'common-common/src/errors';
+import { Transaction } from 'sequelize';
+import type { ContractAbiInstance } from 'server/models/contract_abi';
+import { AbiType } from '../../../shared/types';
 import type { DB } from '../../models';
+import type { ChainNodeAttributes } from '../../models/chain_node';
 import type {
   ContractAttributes,
   ContractInstance,
 } from '../../models/contract';
-import type { ChainNodeAttributes } from '../../models/chain_node';
 import type { TypedRequestBody, TypedResponse } from '../../types';
 import { success } from '../../types';
 import validateAbi, { hashAbi } from '../../util/abiValidation';
-import type { ContractAbiInstance } from 'server/models/contract_abi';
 import { validateOwner } from '../../util/validateOwner';
-import { AbiType } from '../../../shared/types';
-import { Transaction } from 'sequelize';
 
 export const Errors = {
   NoType: 'Must provide contract type',
@@ -56,7 +56,7 @@ export type CreateContractResp = {
 async function findOrCreateAbi(
   abi: AbiType,
   models: DB,
-  t?: Transaction
+  t?: Transaction,
 ): Promise<ContractAbiInstance> {
   let contractAbi: ContractAbiInstance;
   const abiHash = hashAbi(abi);
@@ -73,7 +73,7 @@ async function findOrCreateAbi(
         abi: abi,
         abi_hash: abiHash,
       },
-      { transaction: t }
+      { transaction: t },
     );
   }
 
@@ -83,7 +83,7 @@ async function findOrCreateAbi(
 const createContract = async (
   models: DB,
   req: TypedRequestBody<CreateContractReq>,
-  res: TypedResponse<CreateContractResp>
+  res: TypedResponse<CreateContractResp>,
 ) => {
   const {
     address,
@@ -193,7 +193,7 @@ const createContract = async (
           chain_id,
           contract_id: contract.id,
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
 
@@ -226,7 +226,7 @@ const createContract = async (
           chain_id,
           contract_id: contract.id,
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
 

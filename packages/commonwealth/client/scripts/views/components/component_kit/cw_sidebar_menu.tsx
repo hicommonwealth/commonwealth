@@ -11,6 +11,7 @@ import { User } from '../user/user';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';
 import { getClasses, isWindowSmallInclusive } from './helpers';
+import { CWButton } from './new_designs/cw_button';
 import type { MenuItem } from './types';
 import { ComponentType } from './types';
 
@@ -36,8 +37,33 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
   const { mutateAsync: toggleCommunityStar } = useToggleCommunityStarMutation();
 
   if (props.type === 'default') {
-    const { disabled, iconLeft, iconRight, isSecondary, label, onClick } =
-      props;
+    const {
+      disabled,
+      iconLeft,
+      iconLeftWeight,
+      iconRight,
+      isSecondary,
+      label,
+      onClick,
+      isButton,
+      className,
+    } = props;
+
+    if (isButton) {
+      return (
+        <CWButton
+          containerClassName={`${className} px-16 no-outline`}
+          key={label as string}
+          label={label}
+          buttonHeight="sm"
+          buttonWidth="full"
+          iconLeft={iconLeft}
+          iconLeftWeight={iconLeftWeight}
+          disabled={disabled}
+          onClick={onClick}
+        />
+      );
+    }
 
     return (
       <div

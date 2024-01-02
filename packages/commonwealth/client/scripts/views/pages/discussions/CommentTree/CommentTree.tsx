@@ -451,9 +451,7 @@ export const CommentTree = ({
                   maxReplyLimitReached={comment.maxReplyLimitReached}
                   canReact={
                     !thread.archivedAt &&
-                    (!!hasJoinedCommunity ||
-                      isAdmin ||
-                      !app.chain.isGatedTopic(thread?.topic?.id)) &&
+                    (!!hasJoinedCommunity || isAdmin) &&
                     canReact
                   }
                   canEdit={

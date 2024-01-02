@@ -31,6 +31,7 @@
     color: $white;
     top: 1rem;
     right: 0rem;
+    z-index: 2;
 
     &:hover {
       color: $neutral-400;
@@ -44,6 +45,7 @@
     border-top-left-radius: 0.3125rem;
     border-top-right-radius: 0.3125rem;
     overflow: hidden;
+    z-index: 1;
   }
 
   .checkbox {
