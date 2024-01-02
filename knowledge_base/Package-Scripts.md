@@ -313,7 +313,7 @@ Contributor: Dillon Chen
 
 Definition: `chmod u+x scripts/setup-datadog-postgres.sh && ./scripts/setup-datadog-postgres.sh`
 
-Description: Helper script to complete DataDog Postgres account setup, scripts, and required config. Allows us Heroku database monitoring and stats. See [ReadMe](../packages/commonwealth/README.md) for more information on using DataDog.
+Description: Helper script to complete Datadog Postgres account setup, scripts, and required config. Allows us Heroku database monitoring and stats. See [ReadMe](../packages/commonwealth/README.md) for more information on using Datadog.
 
 Contributor: Nakul Manchanda
 
