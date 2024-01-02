@@ -34,6 +34,7 @@ If you add a new environment variable, you must add documentation here. Please d
 - [DISCORD_BOT_URL](#discord_bot_url)
 - [DISCORD_CLIENT_ID](#discord_client_id)
 - [DISCORD_WEBHOOK_URL_DEV](#discord_webhook_url_dev)
+- [DL_BUILD](#dl_build)
 - [ENFORCE_SESSION_KEYS](#enforce_session_keys)
 - [ETH_ALCHEMY_API_KEY](#eth_alchemy_api_key)
 - [ETH_RPC](#eth_rpc)
@@ -185,6 +186,10 @@ For local testing, we use the staging Discord app/bot. The client ID can therefo
 
 Connects to the #webhook-testing Discord channel on the Commond Protocol Discord server. Required to use the emit-webhook script to send Discord webhooks. More info at [Webhooks.md](./Webhooks.md).
 
+## DL_BUILD
+
+Boolean which ensures that Heroku only builds the Discobot package and related code when deploying.
+
 ## ENFORCE_SESSION_KEYS
 
 Boolean feature flag for server-side enforcement of Canvas session keys; by default, `false`.
@@ -203,7 +208,7 @@ Owner: Kurtis Assad.
 
 ## ETHERSCAN_JS_API_KEY
 
-<!-- In need of documentation; if you have information about this token, please contribute. -->
+API key for Ethereum data.
 
 ## FLAG_COMMUNITY_HOMEPAGE
 
@@ -315,7 +320,7 @@ Location to host a local Redis instance. By default `redis://localhost:6379`.
 
 ## REPEAT_TIME
 
-The number of minutes the ChainSubscriber should wait between requests to the CW app to retrieve the chains it should be listening to. It is currently set to `10` (minutes) which means every 10 minutes the ChainSubscriber will query the CW App and retrieve all chains that have `has_chain_events_listener` set to True in the `Chains` model.
+The number of minutes the ChainSubscriber should wait between requests to the CW app to retrieve the chains it should be listening to. It is currently set to `10`, meaning every 10 minutes the ChainSubscriber will query the CW App and retrieve all chains that have `has_chain_events_listener` set to True in the `Chains` model.
 
 ## ROLLBAR_ENV
 
@@ -327,15 +332,11 @@ Required in production; used for real-time error tracking. In local environments
 
 ## RPC_HOST
 
-Used in chain testing; for more information, see [Chain-Testing-Overview.md](../knowledge_base/Chain-Testing-Overview.md).
-
-Default value: `ganache`
+Used in chain testing; for more information, see [Chain-Testing-Overview.md](../knowledge_base/Chain-Testing-Overview.md). By default, we use the value `ganache`.
 
 ## SEND_WEBHOOKS_EMAILS
 
-Default value: `false`
-
-Enables Webhook and email dispatching in production when set to `true`. Should be `false` or undefined elsewhere, to prevent Webhooks and emails from being sent in non-production environments.
+Enables Webhook and email dispatching in production when set to `true`. Should be `false` or undefined elsewhere, to prevent Webhooks and emails from being sent in non-production environments. 
 
 ## SENDGRID_API_KEY
 
@@ -353,15 +354,11 @@ By default, this is set in our `commonwealth/server/config` file to `https://com
 
 ## SL_BUILD
 
-Default value: `true`
-
 Boolean triggering our `snapshot-listener` package to build.
 
 ## SL_PORT
 
-Default value: `8001`
-
-Port used for the `snapshot-listener` package.
+Port used for the `snapshot-listener` package. We use the default value `8001`.
 
 ## SLACK_FEEDBACK_WEBHOOK
 
@@ -375,9 +372,7 @@ Connects to the #testing-webhooks Slack channel on the Common workspace. Require
 
 ## SNAPSHOT_HUB_URL
 
-Snapshot Hub URL used for Snapshot API requests.
-
-Default value: `https://hub.snapshot.org`
+Snapshot Hub URL used for Snapshot API requests. As of 231201 the default value is `https://hub.snapshot.org`.
 
 ## TELEGRAM_BOT_TOKEN_DEV
 
@@ -398,8 +393,6 @@ A unique ID that is generated to distinguish your remote docker containers from 
 ## WITH_PRERENDER
 
 In a development environment, prerender is only run from `commonwealth/server.ts` if this flag is provided.
-
-Default value: `false`
 
 ## ZAPIER_WEBHOOK_URL_DEV
 
