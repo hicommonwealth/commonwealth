@@ -531,7 +531,7 @@ jobs:
       # We only run Cosmos devnet tests if any files in the following folders changes
       - name: Get changed Cosmos devnet-related files
         id: changed-files-specific
-        uses: tj-actions/changed-files@v35
+        uses: tj-actions/changed-files@v41
         with:
           files: |
             packages/commonwealth/test/devnet/cosmos/**/*
