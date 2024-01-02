@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "build-libs": "yarn && tsc -b packages/commonwealth",
+    "build-libs": "tsc -b packages/commonwealth",
     "start": "concurrently -n watcher,server -c red,green 'tsc -b -w packages/commonwealth' 'yarn workspace commonwealth start'",
     "build": "chmod u+x scripts/build.sh && ./scripts/build.sh",
     "clean": "find . -name node_modules -exec rm -rf {} \\;; yarn --ignore-engines",
