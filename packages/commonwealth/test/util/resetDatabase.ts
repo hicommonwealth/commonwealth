@@ -36,10 +36,10 @@ export const resetDatabase = (debug = false): Promise<void> => {
           eth_chain_id: 1,
           balance_type: BalanceType.Ethereum,
         },
-        ropsten: {
-          url: 'https://eth-ropsten.alchemyapi.io/v2/dummy_key',
-          name: 'Ropsten Testnet',
-          eth_chain_id: 3,
+        goerli: {
+          url: 'https://eth-goerli.alchemyapi.io/v2/dummy_key',
+          name: 'Goerli Testnet',
+          eth_chain_id: 5,
           balance_type: BalanceType.Ethereum,
         },
         osmosis: {
