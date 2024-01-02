@@ -1,5 +1,8 @@
-import { SupportedNetwork } from '../../shared/chain/types/types';
-import { NotificationCategories, ProposalType } from 'common-common/src/types';
+import {
+  NotificationCategories,
+  ProposalType,
+  SupportedNetwork,
+} from '@hicommonwealth/core';
 import { NotificationDataAndCategory, WebhookCategory } from 'types';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
@@ -43,7 +46,7 @@ async function main() {
     .check((args) => {
       if (!args.url && !args.destination) {
         throw new Error(
-          'Must provide either a webhook url or a destination flag.'
+          'Must provide either a webhook url or a destination flag.',
         );
       }
       return true;
@@ -58,7 +61,7 @@ async function main() {
   ) {
     throw new Error(
       'Must have DISCORD_WEBHOOK_URL_DEV, SLACK_WEBHOOK_URL_DEV, ' +
-        'ZAPIER_WEBHOOK_URL_DEV, and TELEGRAM_BOT_TOKEN_DEV set in .env'
+        'ZAPIER_WEBHOOK_URL_DEV, and TELEGRAM_BOT_TOKEN_DEV set in .env',
     );
   }
 
@@ -101,7 +104,7 @@ async function main() {
       models.Webhook.build({
         url: process.env.ZAPIER_WEBHOOK_URL_DEV,
         ...genericWebhookOptions,
-      })
+      }),
     );
   } else {
     throw new Error(`Invalid webhook destination: ${argv.destination}`);
@@ -112,7 +115,7 @@ async function main() {
       models.Webhook.build({
         url,
         ...genericWebhookOptions,
-      })
+      }),
     );
   }
 

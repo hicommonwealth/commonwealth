@@ -5,23 +5,13 @@ import {
   APIOrderDirection,
 } from 'client/scripts/helpers/constants';
 import app from 'state';
+import { ReplyResult } from 'views/pages/search/helpers';
 import { ApiEndpoints } from '../config';
 
 const SEARCH_COMMENTS_STALE_TIME = 60 * 1_000; // 60 s
 
 export type SearchCommentsResponse = {
-  results: {
-    id: number;
-    proposalid: number;
-    chain: string;
-    community: string;
-    title: string;
-    text: string;
-    address_id: number;
-    address: string;
-    address_chain: string;
-    created_at: string;
-  }[];
+  results: ReplyResult[];
   limit: number;
   page: number;
   totalPages: number;
@@ -29,7 +19,7 @@ export type SearchCommentsResponse = {
 };
 
 interface SearchCommentsProps {
-  chainId: string;
+  communityId: string;
   searchTerm: string;
   limit: number;
   orderBy: APIOrderBy;
@@ -39,7 +29,7 @@ interface SearchCommentsProps {
 
 const searchComments = async ({
   pageParam = 1,
-  chainId,
+  communityId,
   searchTerm,
   limit,
   orderBy,
@@ -54,7 +44,7 @@ const searchComments = async ({
         'Content-Type': 'application/json',
       },
       params: {
-        community_id: chainId,
+        community_id: communityId,
         search: searchTerm,
         limit: limit.toString(),
         page: pageParam.toString(),
@@ -67,7 +57,7 @@ const searchComments = async ({
 };
 
 const useSearchCommentsQuery = ({
-  chainId,
+  communityId,
   searchTerm,
   limit,
   orderBy,
@@ -77,7 +67,7 @@ const useSearchCommentsQuery = ({
   const key = [
     ApiEndpoints.searchComments(searchTerm),
     {
-      chainId,
+      communityId,
       orderBy,
       orderDirection,
     },
@@ -87,7 +77,7 @@ const useSearchCommentsQuery = ({
     ({ pageParam }) =>
       searchComments({
         pageParam,
-        chainId,
+        communityId,
         searchTerm,
         limit,
         orderBy,

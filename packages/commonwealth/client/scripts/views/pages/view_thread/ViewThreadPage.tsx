@@ -57,13 +57,13 @@ import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
 import ViewTemplate from '../view_template/view_template';
 import { LinkedUrlCard } from './LinkedUrlCard';
 import { TemplateActionCard } from './TemplateActionCard';
+import { ThreadPollCard } from './ThreadPollCard';
+import { ThreadPollEditorCard } from './ThreadPollEditorCard';
 import { ViewTemplateFormCard } from './ViewTemplateFormCard';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { LockMessage } from './lock_message';
-import { ThreadPollCard } from './ThreadPollCard';
-import { ThreadPollEditorCard } from './ThreadPollEditorCard';
 import { SnapshotCreationCard } from './snapshot_creation_card';
 
 export type ThreadPrefetch = {
@@ -112,7 +112,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const shouldFocusCommentEditor = !!searchParams.get('focusEditor');
 
   const { data: groups = [] } = useFetchGroupsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     includeTopics: true,
   });
 
@@ -128,9 +128,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const thread = data?.[0];
 
+  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
+
   const { data: comments = [], error: fetchCommentsError } =
     useFetchCommentsQuery({
-      chainId: app.activeChainId(),
+      communityId: app.activeChainId(),
       threadId: parseInt(`${threadId}`),
     });
 
@@ -153,7 +155,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       membership.topicIds.includes(thread?.topic?.id) && membership.isAllowed,
   );
 
-  const isRestrictedMembership = isTopicGated && !isActionAllowedInGatedTopic;
+  const isRestrictedMembership =
+    !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
   useEffect(() => {
     if (fetchCommentsError) notifyError('Failed to load comments');
@@ -288,7 +291,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   // Original posters have full editorial control, while added collaborators
   // merely have access to the body and title
   const isAuthor = Permissions.isThreadAuthor(thread);
-  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
   const isAdminOrMod = isAdmin || Permissions.isCommunityModerator();
 
   const linkedSnapshots = filterLinks(thread.links, LinkSource.Snapshot);
@@ -318,10 +320,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const hasWebLinks = thread.links.find((x) => x.source === 'web');
 
-  const canComment =
-    (!!hasJoinedCommunity ||
-      (!isAdminOrMod && app.chain.isGatedTopic(thread?.topic?.id))) &&
-    !isRestrictedMembership;
+  const canComment = !!hasJoinedCommunity && !isRestrictedMembership;
 
   const handleNewSnapshotChange = async ({
     id,
@@ -410,7 +409,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               onInput={(e) => {
                 setDraftTitle(e.target.value);
               }}
-              defaultValue={thread.title}
+              value={draftTitle || thread.title}
             />
           ) : (
             thread.title
@@ -532,9 +531,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       shouldFocusEditor={shouldFocusCommentEditor}
                       tooltipText={disabledActionsTooltipText}
                     />
-                    {featureFlags.gatingEnabled &&
-                      foundGatedTopic &&
-                      !hideGatingBanner && (
+                    {foundGatedTopic &&
+                      !hideGatingBanner &&
+                      isRestrictedMembership && (
                         <CWGatedTopicBanner
                           groupNames={gatedGroupsMatchingTopic.map(
                             (g) => g.name,
@@ -678,6 +677,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                               poll={poll}
                               key={poll.id}
                               onVote={() => setInitializedPolls(false)}
+                              isTopicMembershipRestricted={
+                                isRestrictedMembership
+                              }
                               showDeleteButton={isAuthor || isAdmin}
                               onDelete={() => {
                                 setInitializedPolls(false);

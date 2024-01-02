@@ -1,12 +1,12 @@
 import moment from 'moment';
 
-import { AppError } from '../../../../common-common/src/errors';
 import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
   ProposalType,
-} from '../../../../common-common/src/types';
+} from '@hicommonwealth/core';
+import { AppError } from '../../../../common-common/src/errors';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import { AddressInstance } from '../../models/address';
@@ -179,7 +179,8 @@ export async function __createThread(
         if (!isAdmin) {
           const { isValid, message } = await validateTopicGroupsMembership(
             this.models,
-            this.tokenBalanceCache,
+            this.tokenBalanceCacheV1,
+            this.tokenBalanceCacheV2,
             topicId,
             community,
             address,

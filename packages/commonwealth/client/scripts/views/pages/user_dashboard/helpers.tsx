@@ -1,4 +1,4 @@
-import { NotificationCategories } from 'common-common/src/types';
+import { NotificationCategories } from '@hicommonwealth/core';
 import { notifySuccess } from 'controllers/app/notifications';
 import getFetch from 'helpers/getFetch';
 import $ from 'jquery';

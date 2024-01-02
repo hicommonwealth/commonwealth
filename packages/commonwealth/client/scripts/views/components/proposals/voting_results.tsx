@@ -10,7 +10,7 @@ import type NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
 import type { AnyProposal } from '../../../models/types';
 import { VotingType } from '../../../models/types';
 
-import { ChainNetwork } from 'common-common/src/types';
+import { ChainNetwork } from '@hicommonwealth/core';
 import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
 import useForceRerender from 'hooks/useForceRerender';
 import app from 'state';
@@ -34,7 +34,7 @@ export const VotingResults = (props: VotingResultsProps) => {
   const { proposal } = props;
   const forceRerender = useForceRerender();
   const [isLoading, setLoading] = useState(
-    !app.chain || !app.chain.loaded || !app.chain.apiInitialized
+    !app.chain || !app.chain.loaded || !app.chain.apiInitialized,
   );
 
   useEffect(() => {
@@ -56,13 +56,13 @@ export const VotingResults = (props: VotingResultsProps) => {
 
   const { data: aaveVotes } = useAaveProposalVotesQuery({
     moduleReady: app.chain?.network === ChainNetwork.Aave && !isLoading,
-    chainId: app.chain?.id,
+    communityId: app.chain?.id,
     proposalId: proposal.identifier,
   });
 
   const { data: compoundVotes } = useCompoundProposalVotesQuery({
     moduleReady: app.chain?.network === ChainNetwork.Compound && !isLoading,
-    chainId: app.chain?.id,
+    communityId: app.chain?.id,
     proposalId: proposal.data.id,
     proposalIdentifier: proposal.identifier,
   });
@@ -123,22 +123,22 @@ export const VotingResults = (props: VotingResultsProps) => {
 
     const yesBalance = yesVotes.reduce(
       (total, v) => total.add(v.power),
-      new BN(0)
+      new BN(0),
     );
 
     const yesBalanceString = `${formatNumberLong(
-      +Web3.fromWei(yesBalance.toString())
+      +Web3.fromWei(yesBalance.toString()),
     )} ${app.chain.meta.default_symbol}`;
 
     const noVotes: AaveProposalVote[] = votes.filter((v) => !v.choice);
 
     const noBalance = noVotes.reduce(
       (total, v) => total.add(v.power),
-      new BN(0)
+      new BN(0),
     );
 
     const noBalanceString = `${formatNumberLong(
-      +Web3.fromWei(noBalance.toString())
+      +Web3.fromWei(noBalance.toString()),
     )} ${app.chain.meta.default_symbol}`;
 
     return (

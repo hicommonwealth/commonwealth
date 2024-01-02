@@ -1,19 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-import BN from 'bn.js';
-
 import { notifyError } from 'controllers/app/notifications';
 import type { DeltaStatic } from 'quill';
 import Thread from '../../../models/Thread';
 
 import { SessionKeyError } from 'controllers/server/sessions';
-import { getTokenBalance } from 'helpers/token_balance_helper';
 import { useDraft } from 'hooks/useDraft';
 import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
 import { ContentType } from 'types';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
-import Permissions from '../../../utils/Permissions';
 import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
 import { createDeltaFromText, getTextFromDelta } from '../react_quill_editor';
 import { serializeDelta } from '../react_quill_editor/utils';
@@ -40,7 +36,7 @@ export const CreateComment = ({
   const { saveDraft, restoreDraft, clearDraft } = useDraft<DeltaStatic>(
     !parentCommentId
       ? `new-thread-comment-${rootThread.id}`
-      : `new-comment-reply-${parentCommentId}`
+      : `new-comment-reply-${parentCommentId}`,
   );
 
   // get restored draft on init
@@ -53,35 +49,12 @@ export const CreateComment = ({
 
   const [sendingComment, setSendingComment] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [tokenPostingThreshold, setTokenPostingThreshold] = useState(
-    new BN('0')
-  );
-  const [userBalance, setUserBalance] = useState(new BN('0'));
-  const [balanceLoading, setBalanceLoading] = useState(false);
+
   const editorValue = getTextFromDelta(contentDelta);
 
   const author = app.user.activeAccount;
 
   const parentType = parentCommentId ? ContentType.Comment : ContentType.Thread;
-  const activeTopic = rootThread instanceof Thread ? rootThread?.topic : null;
-
-  useEffect(() => {
-    activeTopic?.id &&
-      setTokenPostingThreshold(app.chain.getTopicThreshold(activeTopic?.id));
-  }, [activeTopic]);
-
-  useEffect(() => {
-    if (!tokenPostingThreshold.isZero() && !balanceLoading) {
-      setBalanceLoading(true);
-      if (!app.user.activeAccount?.tokenBalance) {
-        getTokenBalance().then(() => {
-          setUserBalance(app.user.activeAccount?.tokenBalance);
-        });
-      } else {
-        setUserBalance(app.user.activeAccount?.tokenBalance);
-      }
-    }
-  }, [tokenPostingThreshold]);
 
   const {
     mutateAsync: createComment,
@@ -89,7 +62,7 @@ export const CreateComment = ({
     reset: resetCreateCommentMutation,
   } = useCreateCommentMutation({
     threadId: rootThread.id,
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     existingNumberOfComments: rootThread.numberOfComments || 0,
   });
 
@@ -102,12 +75,12 @@ export const CreateComment = ({
     setErrorMsg(null);
     setSendingComment(true);
 
-    const chainId = app.activeChainId();
+    const communityId = app.activeChainId();
 
     try {
       const newComment: any = await createComment({
         threadId: rootThread.id,
-        chainId: chainId,
+        communityId,
         address: app.user.activeAccount.address,
         parentCommentId: parentCommentId,
         unescapedText: serializeDelta(contentDelta),
@@ -144,13 +117,7 @@ export const CreateComment = ({
     }
   };
 
-  const userFailsThreshold = app.chain.isGatedTopic(activeTopic?.id);
-  const isAdmin = Permissions.isCommunityAdmin();
-  const disabled =
-    editorValue.length === 0 ||
-    sendingComment ||
-    userFailsThreshold ||
-    !canComment;
+  const disabled = editorValue.length === 0 || sendingComment;
 
   const handleCancel = (e) => {
     e.preventDefault();
@@ -177,12 +144,8 @@ export const CreateComment = ({
             errorMsg={errorMsg}
             contentDelta={contentDelta}
             setContentDelta={setContentDelta}
-            tokenPostingThreshold={tokenPostingThreshold}
-            topicName={activeTopic?.name}
-            userBalance={userBalance}
             disabled={disabled}
             onCancel={handleCancel}
-            isAdmin={isAdmin}
             author={author}
             editorValue={editorValue}
             shouldFocus={shouldFocusEditor}

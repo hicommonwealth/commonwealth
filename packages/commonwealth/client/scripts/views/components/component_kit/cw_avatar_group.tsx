@@ -17,12 +17,10 @@ export type ProfileWithAddress = MinimumProfile & {
 
 type AvatarGroupProps = {
   profiles: ProfileWithAddress[];
-  chainId: string;
+  communityId: string;
 };
 
-export const CWAvatarGroup = (props: AvatarGroupProps) => {
-  const { profiles, chainId } = props;
-
+export const CWAvatarGroup = ({ profiles, communityId }: AvatarGroupProps) => {
   if (!profiles || profiles?.filter((p) => !!p && p.Addresses).length === 0)
     return;
 
@@ -54,7 +52,7 @@ export const CWAvatarGroup = (props: AvatarGroupProps) => {
             );
           } else {
             const address = profile.Addresses.find((addr) => {
-              return addr.community_id == chainId;
+              return addr.community_id == communityId;
             });
 
             // some old posts are broken = have no address in the specified community.

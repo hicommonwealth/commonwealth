@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import moment from 'moment';
-import type Poll from '../../../models/Poll';
-import 'pages/view_thread/poll_cards.scss';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import moment from 'moment';
+import 'pages/view_thread/poll_cards.scss';
+import React, { useState } from 'react';
 import app from 'state';
+import type Poll from '../../../models/Poll';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { PollCard } from '../../components/poll_card';
 import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
@@ -14,6 +14,7 @@ type ThreadPollCardProps = {
   onVote: () => void;
   showDeleteButton?: boolean;
   onDelete?: () => void;
+  isTopicMembershipRestricted?: boolean;
 };
 
 export const ThreadPollCard = ({
@@ -21,8 +22,16 @@ export const ThreadPollCard = ({
   onVote,
   showDeleteButton,
   onDelete,
+  isTopicMembershipRestricted = false,
 }: ThreadPollCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const getTooltipErrorMessage = () => {
+    if (!app.user.activeAccount)
+      return 'Error: You must join this community to vote.';
+    if (isTopicMembershipRestricted) return 'Error: Topic is gated.';
+    return '';
+  };
 
   return (
     <>
@@ -33,20 +42,22 @@ export const ThreadPollCard = ({
           app.user.activeAccount &&
           !!poll.getUserVote(
             app.user.activeAccount?.community?.id,
-            app.user.activeAccount?.address
+            app.user.activeAccount?.address,
           )
         }
-        disableVoteButton={!app.user.activeAccount}
+        disableVoteButton={
+          !app.user.activeAccount || isTopicMembershipRestricted
+        }
         votedFor={
           poll.getUserVote(
             app.user.activeAccount?.community?.id,
-            app.user.activeAccount?.address
+            app.user.activeAccount?.address,
           )?.option
         }
         proposalTitle={poll.prompt}
         timeRemaining={getPollTimestamp(
           poll,
-          poll.endsAt && poll.endsAt?.isBefore(moment().utc())
+          poll.endsAt && poll.endsAt?.isBefore(moment().utc()),
         )}
         totalVoteCount={poll.votes?.length}
         voteInformation={poll.options.map((option) => {
@@ -58,11 +69,7 @@ export const ThreadPollCard = ({
         })}
         incrementalVoteCast={1}
         isPreview={false}
-        tooltipErrorMessage={
-          app.user.activeAccount
-            ? null
-            : 'You must join this community to vote.'
-        }
+        tooltipErrorMessage={getTooltipErrorMessage()}
         onVoteCast={(option, isSelected) => {
           handlePollVote(poll, option, isSelected, onVote);
         }}
@@ -79,7 +86,7 @@ export const ThreadPollCard = ({
               threadId: poll.threadId,
               pollId: poll.id,
               address: app.user.activeAccount.address,
-              authorChain: app.user.activeAccount.community.id,
+              authorCommunity: app.user.activeAccount.community.id,
             });
             if (onDelete) onDelete();
             notifySuccess('Poll deleted');

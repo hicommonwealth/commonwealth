@@ -3,6 +3,7 @@ import AbiCoder from 'web3-eth-abi';
 import { ChainNodeInstance } from '../../../models/chain_node';
 import { rollbar } from '../../rollbar';
 import { Balances } from '../types';
+import { evmRpcRequest } from '../util';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -11,6 +12,7 @@ export type GetErc1155BalancesOptions = {
   addresses: string[];
   contractAddress: string;
   tokenId: number;
+  batchSize?: number;
 };
 
 export async function __getErc1155Balances(options: GetErc1155BalancesOptions) {
@@ -34,6 +36,7 @@ export async function __getErc1155Balances(options: GetErc1155BalancesOptions) {
       options.contractAddress,
       options.tokenId,
       options.addresses,
+      options.batchSize,
     );
   }
 }
@@ -44,16 +47,16 @@ async function getOnChainBatchErc1155Balances(
   contractAddress: string,
   tokenId: number,
   addresses: string[],
+  batchSize = 1000,
 ): Promise<Balances> {
-  const BATCH_SIZE = 1000;
   const rpcRequests = [];
 
   for (
     let startIndex = 0;
     startIndex < addresses.length;
-    startIndex += BATCH_SIZE
+    startIndex += batchSize
   ) {
-    const endIndex = Math.min(startIndex + BATCH_SIZE, addresses.length);
+    const endIndex = Math.min(startIndex + batchSize, addresses.length);
     const batchAddresses = addresses.slice(startIndex, endIndex);
 
     const calldata =
@@ -77,22 +80,18 @@ async function getOnChainBatchErc1155Balances(
     });
   }
 
-  // returns an array of responses where each responses data contains an array of balances
-  const response = await fetch(rpcEndpoint, {
-    method: 'POST',
-    body: JSON.stringify(rpcRequests),
-    headers: { 'Content-Type': 'application/json' },
-  });
+  const errorMsg =
+    `On-chain batch request failed ` +
+    `with batch size ${batchSize} on evm chain id ${evmChainId} for contract ${contractAddress}.`;
 
-  const datas = await response.json();
+  const datas = await evmRpcRequest(rpcEndpoint, rpcRequests, errorMsg);
+  if (!datas) return {};
+
   const addressBalanceMap = {};
 
   if (datas.error) {
-    const msg =
-      `On-chain batch request failed ` +
-      `with batch size ${BATCH_SIZE} on evm chain id ${evmChainId} for contract ${contractAddress}.`;
-    rollbar.error(msg, datas.error);
-    log.error(msg, datas.error);
+    rollbar.error(errorMsg, datas.error);
+    log.error(errorMsg, datas.error);
     return {};
   } else {
     for (const data of datas) {
@@ -105,8 +104,8 @@ async function getOnChainBatchErc1155Balances(
       const balances = AbiCoder.decodeParameter('uint256[]', data.result);
       // this replicates the batches used when creating the requests
       // note -> data.id is the startIndex defined in the loop above
-      const endIndex = Math.min(data.id + BATCH_SIZE, addresses.length);
-      const relevantAddresses = addresses.splice(data.id, endIndex);
+      const endIndex = Math.min(data.id + batchSize, addresses.length);
+      const relevantAddresses = addresses.slice(data.id, endIndex);
       relevantAddresses.forEach(
         (key, i) => (addressBalanceMap[key] = balances[i]),
       );
@@ -141,19 +140,17 @@ async function getErc1155Balance(
     id: 1,
     jsonrpc: '2.0',
   };
-  const response = await fetch(rpcEndpoint, {
-    method: 'POST',
-    body: JSON.stringify(requestBody),
-    headers: { 'Content-Type': 'application/json' },
-  });
-  const data = await response.json();
+
+  const errorMsg =
+    `ERC1155 balance fetch failed for address ${address} ` +
+    `on evm chain id ${evmChainId} on contract ${contractAddress}.`;
+
+  const data = await evmRpcRequest(rpcEndpoint, requestBody, errorMsg);
+  if (!data) return {};
 
   if (data.error) {
-    const msg =
-      `ERC1155 balance fetch failed for address ${address} ` +
-      `on evm chain id ${evmChainId} on contract ${contractAddress}.`;
-    rollbar.error(msg, data.error);
-    log.error(msg, data.error);
+    rollbar.error(errorMsg, data.error);
+    log.error(errorMsg, data.error);
     return {};
   } else {
     return {

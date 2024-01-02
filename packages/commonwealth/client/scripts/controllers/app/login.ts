@@ -1,8 +1,8 @@
 /**
  * @file Manages logged-in user accounts and local storage.
  */
+import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/core';
 import { chainBaseToCanvasChainId } from 'canvas/chainMappings';
-import { ChainBase, WalletId, WalletSsoSource } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { signSessionWithMagic } from 'controllers/server/sessions';
 import { isSameAccount } from 'helpers';
@@ -14,18 +14,15 @@ import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import type BlockInfo from '../../models/BlockInfo';
 import type ChainInfo from '../../models/ChainInfo';
-import SocialAccount from '../../models/SocialAccount';
-
-import { getTokenBalance } from 'helpers/token_balance_helper';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
-  chain: string,
+  community: string,
   originChain: string,
 ) {
   return $.post(`${app.serverUrl()}/linkExistingAddressToChain`, {
     address,
-    chain,
+    chain: community,
     originChain,
     jwt: app.user.jwt,
   });
@@ -35,8 +32,8 @@ export async function setActiveAccount(
   account: Account,
   shouldRedraw = true,
 ): Promise<void> {
-  const chain = app.activeChainId();
-  const role = app.roles.getRoleInCommunity({ account, chain });
+  const community = app.activeChainId();
+  const role = app.roles.getRoleInCommunity({ account, community });
 
   if (!role) {
     app.user.ephemerallySetActiveAccount(account);
@@ -67,12 +64,12 @@ export async function setActiveAccount(
     const response = await $.post(`${app.serverUrl()}/setDefaultRole`, {
       address: account.address,
       author_chain: account.community.id,
-      chain,
+      chain: community,
       jwt: app.user.jwt,
       auth: true,
     });
 
-    app.roles.getAllRolesInCommunity({ chain }).forEach((r) => {
+    app.roles.getAllRolesInCommunity({ community }).forEach((r) => {
       r.is_user_default = false;
     });
     role.is_user_default = true;
@@ -122,12 +119,12 @@ export async function completeClientLogin(account: Account) {
         if (
           !app.roles.getRoleInCommunity({
             account,
-            chain: app.activeChainId(),
+            community: app.activeChainId(),
           })
         ) {
           await app.roles.createRole({
             address: addressInfo,
-            chain: app.activeChainId(),
+            community: app.activeChainId(),
           });
         }
       } catch (e) {
@@ -166,11 +163,9 @@ export async function updateActiveAddresses({
     shouldRedraw,
   );
 
-  getTokenBalance();
-
   // select the address that the new chain should be initialized with
   const memberAddresses = app.user.activeAccounts.filter((account) => {
-    return app.roles.isMember({ chain: chain.id, account });
+    return app.roles.isMember({ community: chain.id, account });
   });
 
   if (memberAddresses.length === 1) {
@@ -180,7 +175,7 @@ export async function updateActiveAddresses({
     // no addresses - preview the community
   } else {
     const existingAddress = app.roles.getDefaultAddressInCommunity({
-      chain: chain.id,
+      community: chain.id,
     });
 
     if (existingAddress) {
@@ -196,7 +191,6 @@ export async function updateActiveAddresses({
 }
 
 // called from the server, which returns public keys
-// creates SubstrateAccount with associated SocialAccounts
 export function updateActiveUser(data) {
   if (!data || data.loggedIn === false) {
     app.user.setEmail(null);
@@ -205,7 +199,6 @@ export function updateActiveUser(data) {
     app.user.setJWT(null);
 
     app.user.setAddresses([]);
-    app.user.setSocialAccounts([]);
 
     app.user.setSiteAdmin(false);
     app.user.setDisableRichText(false);
@@ -231,11 +224,6 @@ export function updateActiveUser(data) {
             walletSsoSource: a.wallet_sso_source,
             ghostAddress: a.ghost_address,
           }),
-      ),
-    );
-    app.user.setSocialAccounts(
-      data.socialAccounts.map(
-        (sa) => new SocialAccount(sa.provider, sa.provider_username),
       ),
     );
 

@@ -1,7 +1,7 @@
-import BN from 'bn.js';
-import axios from 'axios';
-import { BalanceType } from 'common-common/src/types';
 import { fromBech32, toBech32 } from '@cosmjs/encoding';
+import { BalanceType } from '@hicommonwealth/core';
+import axios from 'axios';
+import BN from 'bn.js';
 import type { IChainNode } from '../types';
 import { BalanceProvider } from '../types';
 
@@ -17,7 +17,7 @@ export default class TerraBalanceProvider extends BalanceProvider<
   public validBases = [BalanceType.Terra];
 
   public getExternalProvider(
-    node: IChainNode
+    node: IChainNode,
   ): Promise<[TerraBalanceFn, StakedBalanceFn]> {
     async function getTerraBalance(encodedAddress: string): Promise<BN> {
       // make balance query
@@ -62,7 +62,7 @@ export default class TerraBalanceProvider extends BalanceProvider<
         for (const delegation of delegations) {
           if (delegation?.balance && delegation.balance.denom === 'uluna') {
             stakedBalance = stakedBalance.add(
-              new BN(delegation.balance.amount)
+              new BN(delegation.balance.amount),
             );
           }
         }
@@ -84,7 +84,7 @@ export default class TerraBalanceProvider extends BalanceProvider<
     const encodedAddress = toBech32(node.bech32, data);
 
     const [terraBalanceFn, stakedBalanceFn] = await this.getExternalProvider(
-      node
+      node,
     );
 
     let bankBalance = new BN(0);

@@ -1,13 +1,13 @@
-import React from 'react';
 import { X } from '@phosphor-icons/react';
+import React from 'react';
 
+import ChainInfo from '../../../../models/ChainInfo';
+import { CWCommunityAvatar } from '../cw_community_avatar';
 import { CWIcon } from '../cw_icons/cw_icon';
 import type { IconName } from '../cw_icons/cw_icon_lookup';
 import { CWText } from '../cw_text';
 import { getClasses } from '../helpers';
 import { ComponentType } from '../types';
-import ChainInfo from '../../../../models/ChainInfo';
-import { CWCommunityAvatar } from '../cw_community_avatar';
 
 import 'components/component_kit/new_designs/CWTag.scss';
 
@@ -25,7 +25,8 @@ type TagType =
   | 'disabled'
   | 'login'
   | 'input'
-  | 'address';
+  | 'address'
+  | 'group';
 
 export type TagProps = {
   iconName?: IconName;
@@ -64,7 +65,7 @@ export const CWTag = ({
     <div
       className={`${getClasses<{ type?: TagType }>(
         { type },
-        ComponentType.Tag
+        ComponentType.Tag,
       )} ${classNames || ''}`}
       onClick={onClick}
     >

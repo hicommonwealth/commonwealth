@@ -3,12 +3,11 @@ import type { Express } from 'express-serve-static-core';
 import http from 'http';
 import type Rollbar from 'rollbar';
 
-import { PORT } from '../config';
-import type { DB } from '../models';
-import { setupWebSocketServer } from '../socket';
+import { cacheDecorator } from 'common-common/src/cacheDecorator';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { RedisCache } from 'common-common/src/redisCache';
-import { cacheDecorator } from 'common-common/src/cacheDecorator';
+import { PORT } from '../config';
+import type { DB } from '../models';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -17,11 +16,10 @@ const setupServer = (
   rollbar: Rollbar,
   models: DB,
   rabbitMQController: RabbitMQController,
-  redisCache: RedisCache
+  redisCache: RedisCache,
 ) => {
   app.set('port', PORT);
   const server = http.createServer(app);
-  setupWebSocketServer(server, rollbar, models, rabbitMQController);
   cacheDecorator.setCache(redisCache);
 
   const onError = (error) => {

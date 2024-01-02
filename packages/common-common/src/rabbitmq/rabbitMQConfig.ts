@@ -1,4 +1,5 @@
 import type * as Rascal from 'rascal';
+import { getAllRascalConfigs } from './configuration/rascalConfig';
 import {
   RascalBindings,
   RascalExchanges,
@@ -6,7 +7,6 @@ import {
   RascalQueues,
   RascalSubscriptions,
 } from './types';
-import { getAllRascalConfigs } from './configuration/rascalConfig';
 
 export enum RascalConfigServices {
   CommonwealthService = 'commonwealth',
@@ -21,7 +21,7 @@ export enum RascalConfigServices {
  */
 export function getRabbitMQConfig(
   rabbitmq_uri: string,
-  service: RascalConfigServices
+  service: RascalConfigServices,
 ): Rascal.BrokerConfig {
   let vhost: string, purge: boolean;
 
@@ -44,7 +44,7 @@ export function getRabbitMQConfig(
       purge = true;
     } else {
       throw new Error(
-        "Can't create Rascal RabbitMQ Config with an invalid URI!"
+        "Can't create Rascal RabbitMQ Config with an invalid URI!",
       );
     }
   }
@@ -64,27 +64,22 @@ export function getRabbitMQConfig(
   const vhostConfig = config.vhosts[vhost];
   if (service === RascalConfigServices.CommonwealthService) {
     copyConfigs(allExchanges, vhostConfig.exchanges, [
-      RascalExchanges.Notifications,
       RascalExchanges.SnapshotListener,
       RascalExchanges.Discobot,
     ]);
     copyConfigs(allQueues, vhostConfig.queues, [
-      RascalQueues.ChainEventNotifications,
       RascalQueues.SnapshotListener,
       RascalQueues.DiscordListener,
     ]);
     copyConfigs(allBindings, vhostConfig.bindings, [
-      RascalBindings.ChainEventNotifications,
       RascalBindings.SnapshotListener,
       RascalBindings.DiscordListener,
     ]);
     copyConfigs(allPublications, vhostConfig.publications, [
-      RascalPublications.ChainEventNotifications,
       RascalPublications.SnapshotListener,
       RascalPublications.DiscordListener,
     ]);
     copyConfigs(allSubscriptions, vhostConfig.subscriptions, [
-      RascalSubscriptions.ChainEventNotifications,
       RascalSubscriptions.SnapshotListener,
       RascalSubscriptions.DiscordListener,
     ]);

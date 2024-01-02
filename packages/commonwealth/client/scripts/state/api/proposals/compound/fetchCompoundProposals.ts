@@ -13,13 +13,13 @@ const fetchCompoundProposals = async () => {
 
 const useCompoundProposalsQuery = ({
   moduleReady,
-  chainId,
+  communityId,
 }: {
   moduleReady: boolean;
-  chainId: string;
+  communityId: string;
 }) => {
   return useQuery({
-    queryKey: [ApiEndpoints.FETCH_PROPOSALS, chainId],
+    queryKey: [ApiEndpoints.FETCH_PROPOSALS, communityId],
     queryFn: fetchCompoundProposals,
     enabled: moduleReady,
     staleTime: PROPOSAL_STALE_TIME,

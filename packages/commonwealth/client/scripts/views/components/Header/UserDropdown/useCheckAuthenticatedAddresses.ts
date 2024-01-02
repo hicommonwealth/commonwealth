@@ -1,7 +1,7 @@
+import { ChainBase } from '@hicommonwealth/core';
+import { chainBaseToCanvasChainId } from 'canvas';
 import { useEffect, useState } from 'react';
 import app from 'state';
-import { chainBaseToCanvasChainId } from 'canvas';
-import { ChainBase } from 'common-common/src/types';
 
 interface UseCheckAuthenticatedAddressesProps {
   recheck: boolean;
@@ -26,7 +26,7 @@ const useCheckAuthenticatedAddresses = ({
     const promises = userActiveAccounts.map(async (activeAccount) => {
       const isAuth = await app.sessions
         .getSessionController(chainBase)
-        .hasAuthenticatedSession(canvasChainId, activeAccount.address);
+        ?.hasAuthenticatedSession(canvasChainId, activeAccount.address);
 
       return {
         [activeAccount.address]: isAuth,

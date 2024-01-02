@@ -1,8 +1,6 @@
-import type {
-  IChainEventData,
-  SupportedNetwork,
-} from '../../../shared/chain/types/types';
+import type { SupportedNetwork } from '@hicommonwealth/core';
 import moment from 'moment';
+import type { IChainEventData } from '../../../shared/chain/types/types';
 import { ProfileWithAddress } from '../views/components/component_kit/cw_avatar_group';
 
 class DashboardActivityNotification {

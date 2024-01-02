@@ -1,6 +1,6 @@
+import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
 import type { Coin } from 'adapters/currency';
 import BigNumber from 'bignumber.js';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import moment from 'moment';
 import React from 'react';
 import app from 'state';

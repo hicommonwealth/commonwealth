@@ -4,25 +4,14 @@ import {
   APIOrderBy,
   APIOrderDirection,
 } from 'client/scripts/helpers/constants';
+import { MemberResult } from 'client/scripts/views/pages/search/helpers';
 import app from 'state';
 import { ApiEndpoints } from '../config';
 
 const SEARCH_PROFILES_STALE_TIME = 60 * 1_000; // 60 s
 
 export type SearchProfilesResponse = {
-  results: {
-    id: number;
-    user_id: string;
-    profile_name: string;
-    avatar_url: string;
-    group_ids?: [];
-    addresses: {
-      id: number;
-      chain: string;
-      address: string;
-    }[];
-    roles?: any[];
-  }[];
+  results: MemberResult[];
   limit: number;
   page: number;
   totalPages: number;
@@ -30,7 +19,7 @@ export type SearchProfilesResponse = {
 };
 
 interface SearchProfilesProps {
-  chainId: string;
+  communityId: string;
   searchTerm: string;
   limit: number;
   orderBy: APIOrderBy;
@@ -43,7 +32,7 @@ interface SearchProfilesProps {
 
 const searchProfiles = async ({
   pageParam = 1,
-  chainId,
+  communityId,
   searchTerm,
   limit,
   orderBy,
@@ -61,7 +50,7 @@ const searchProfiles = async ({
         'Content-Type': 'application/json',
       },
       params: {
-        community_id: chainId,
+        community_id: communityId,
         search: searchTerm,
         limit: limit.toString(),
         page: pageParam.toString(),
@@ -77,7 +66,7 @@ const searchProfiles = async ({
 };
 
 const useSearchProfilesQuery = ({
-  chainId,
+  communityId,
   searchTerm,
   limit,
   orderBy,
@@ -90,7 +79,7 @@ const useSearchProfilesQuery = ({
   const key = [
     ApiEndpoints.searchProfiles(searchTerm),
     {
-      chainId,
+      communityId,
       orderBy,
       orderDirection,
       includeRoles,
@@ -103,7 +92,7 @@ const useSearchProfilesQuery = ({
     ({ pageParam }) =>
       searchProfiles({
         pageParam,
-        chainId,
+        communityId,
         searchTerm,
         limit,
         orderBy,

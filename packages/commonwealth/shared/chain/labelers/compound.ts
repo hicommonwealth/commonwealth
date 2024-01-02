@@ -1,7 +1,7 @@
+import { SupportedNetwork } from '@hicommonwealth/core';
 import type { IEventData } from '../types/compound';
 import { EventKind } from '../types/compound';
 import { IEventLabel, LabelerFilter } from './util';
-import { SupportedNetwork } from '../types/types';
 
 /**
  * This a labeler function, which takes event data and describes it in "plain english",
@@ -10,7 +10,7 @@ import { SupportedNetwork } from '../types/types';
 export const Label: LabelerFilter = (
   chainId: string,
   data: IEventData,
-  chain?: string
+  chain?: string,
 ): IEventLabel => {
   switch (data.kind) {
     case EventKind.ProposalCanceled: {
@@ -68,7 +68,7 @@ export const Label: LabelerFilter = (
       throw new Error(
         `[${SupportedNetwork.Compound}${
           chain ? `::${chain}` : ''
-        }]: Unknown event type`
+        }]: Unknown event type`,
       );
     }
   }

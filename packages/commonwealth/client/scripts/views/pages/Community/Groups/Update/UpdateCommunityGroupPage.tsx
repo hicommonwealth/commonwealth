@@ -1,5 +1,4 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { featureFlags } from 'helpers/feature-flags';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import _ from 'lodash';
 import Group from 'models/Group';
@@ -33,7 +32,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
     chainId: app.activeChainId(),
   });
   const { data: groups = [], isLoading } = useFetchGroupsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     includeTopics: true,
   });
   const foundGroup: Group = groups.find(
@@ -45,7 +44,6 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   });
 
   if (
-    !featureFlags.gatingEnabled ||
     !app.isLoggedIn() ||
     !(Permissions.isCommunityAdmin() || Permissions.isSiteAdmin())
   ) {

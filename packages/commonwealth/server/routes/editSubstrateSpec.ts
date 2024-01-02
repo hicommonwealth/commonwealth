@@ -1,5 +1,5 @@
+import { ChainBase } from '@hicommonwealth/core';
 import { AppError } from 'common-common/src/errors';
-import { ChainBase } from 'common-common/src/types';
 import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../models';
 import { findAllRoles } from '../util/roles';
@@ -10,7 +10,7 @@ const editSubstrateSpec = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const chain = req.chain;
   if (!chain) return next(new AppError('Unknown chain.'));
@@ -27,7 +27,7 @@ const editSubstrateSpec = async (
     models,
     { where: { address_id: adminAddress.id } },
     chain.id,
-    ['admin']
+    ['admin'],
   );
   if (!requesterIsAdmin && !req.user.isAdmin)
     return next(new AppError('Must be admin to edit'));

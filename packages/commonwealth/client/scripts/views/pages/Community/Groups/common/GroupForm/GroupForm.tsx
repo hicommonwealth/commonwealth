@@ -121,11 +121,13 @@ const getRequirementSubFormSchema = (
   const schema = isTokenRequirement
     ? requirementSubFormValidationSchema.omit({
         requirementContractAddress: true,
-        requirementTokenId: true
+        requirementTokenId: true,
       })
-    : !is1155Requirement ? requirementSubFormValidationSchema.omit({
-      requirementTokenId: true
-    }) :requirementSubFormValidationSchema;
+    : !is1155Requirement
+    ? requirementSubFormValidationSchema.omit({
+        requirementTokenId: true,
+      })
+    : requirementSubFormValidationSchema;
   return schema;
 };
 
@@ -137,11 +139,11 @@ const GroupForm = ({
 }: GroupFormProps) => {
   const navigate = useCommonNavigate();
   const { data: topics } = useFetchTopicsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const { data: groups = [] } = useFetchGroupsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const takenGroupNames = groups.map(({ name }) => name.toLowerCase());
@@ -172,7 +174,7 @@ const GroupForm = ({
         requirementCondition: AMOUNT_CONDITIONS.MORE,
         requirementContractAddress: '',
         requirementType: '',
-        requirementTokenId: ''
+        requirementTokenId: '',
       },
       errors: {},
     },
@@ -194,7 +196,7 @@ const GroupForm = ({
             requirementCondition: AMOUNT_CONDITIONS.MORE,
             requirementContractAddress: x?.requirementContractAddress || '',
             requirementType: x?.requirementType?.value || '',
-            requirementTokenId: x?.requirementTokenId || ''
+            requirementTokenId: x?.requirementTokenId || '',
           },
           errors: {},
         })),
@@ -235,7 +237,7 @@ const GroupForm = ({
           requirementCondition: AMOUNT_CONDITIONS.MORE,
           requirementContractAddress: '',
           requirementType: '',
-          requirementTokenId: ''
+          requirementTokenId: '',
         },
         errors: {},
       },
@@ -582,8 +584,8 @@ const GroupForm = ({
                   Gate topics
                 </CWText>
                 <CWText type="b2">
-                  Add topics to gate to auto-lock it for group members who
-                  satisfy the requirements above
+                  Add topics that only group members who satisfy the
+                  requirements above can participate in.
                 </CWText>
               </div>
 

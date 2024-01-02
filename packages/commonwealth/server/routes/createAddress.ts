@@ -1,4 +1,4 @@
-import type { WalletId, WalletSsoSource } from 'common-common/src/types';
+import type { WalletId, WalletSsoSource } from '@hicommonwealth/core';
 import type { NextFunction } from 'express';
 import type { DB } from '../models';
 import type { AddressAttributes } from '../models/address';

@@ -1,5 +1,5 @@
+import { ChainBase } from '@hicommonwealth/core';
 import { useQuery } from '@tanstack/react-query';
-import { ChainBase } from 'common-common/src/types';
 import Cosmos from 'controllers/chain/cosmos/adapter';
 import { getActiveProposals } from 'controllers/chain/cosmos/gov/utils';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
@@ -18,9 +18,9 @@ interface ActiveProposalsProps {
 const useActiveCosmosProposalsQuery = ({
   isApiReady,
 }: ActiveProposalsProps) => {
-  const chainId = app.activeChainId();
+  const communityId = app.activeChainId();
   return useQuery({
-    queryKey: ['activeProposals', chainId],
+    queryKey: ['activeProposals', communityId],
     queryFn: fetchActiveProposals,
     enabled: app.chain?.base === ChainBase.CosmosSDK && isApiReady,
     retry: 5, // these can be problematic, so we retry

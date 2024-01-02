@@ -1,4 +1,4 @@
-import { SupportedNetwork } from '../types/types';
+import { SupportedNetwork } from '@hicommonwealth/core';
 import type { CWEvent, IChainEventData } from '../types/types';
 import { Label as AaveLabel } from './aave';
 import { Label as CompoundLabel } from './compound';
@@ -21,7 +21,7 @@ export type LabelerFilter = (
 
 export function Label(
   chain: string,
-  event: Omit<CWEvent, 'blockNumber'>
+  event: Omit<CWEvent, 'blockNumber'>,
 ): IEventLabel {
   switch (event.network) {
     case SupportedNetwork.Aave:

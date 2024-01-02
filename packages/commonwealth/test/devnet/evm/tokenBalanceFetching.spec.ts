@@ -1,33 +1,70 @@
+import { BalanceType } from '@hicommonwealth/core';
 import BN from 'bn.js';
 import { expect } from 'chai';
 import { RedisCache } from 'common-common/src/redisCache';
-import { BalanceType } from 'common-common/src/types';
 import Web3 from 'web3';
 import { toWei } from 'web3-utils';
 import models from '../../../server/database';
 import { BalanceSourceType } from '../../../server/util/requirementsModule/requirementsTypes';
 import { TokenBalanceCache } from '../../../server/util/tokenBalanceCache/tokenBalanceCache';
+import { Balances } from '../../../server/util/tokenBalanceCache/types';
 import { delay } from '../../util/delayUtils';
 import { ChainTesting } from '../../util/evm-chain-testing/sdk/chainTesting';
 import { ERC1155 } from '../../util/evm-chain-testing/sdk/erc1155';
 import { ERC721 } from '../../util/evm-chain-testing/sdk/nft';
 
 async function resetChainNode(ethChainId: number) {
-  await models.ChainNode.destroy({
+  const ganacheChainNode = await models.ChainNode.findOne({
     where: {
       url: 'http://localhost:8545',
     },
   });
-  await models.ChainNode.create({
-    url: 'http://localhost:8545',
-    eth_chain_id: ethChainId,
-    balance_type: BalanceType.Ethereum,
-    name: 'Local EVM Chain',
-  });
+
+  if (ganacheChainNode) {
+    await models.ChainNode.update(
+      {
+        eth_chain_id: ethChainId,
+        balance_type: BalanceType.Ethereum,
+        name: 'Local EVM Chain',
+      },
+      {
+        where: {
+          url: 'http://localhost:8545',
+        },
+      },
+    );
+  } else {
+    await models.ChainNode.create({
+      url: 'http://localhost:8545',
+      eth_chain_id: ethChainId,
+      balance_type: BalanceType.Ethereum,
+      name: 'Local EVM Chain',
+    });
+  }
+}
+
+function generateEVMAddresses(count: number): string[] {
+  const web3 = new Web3();
+  const addresses: string[] = [];
+
+  for (let i = 0; i < count; i++) {
+    const account = web3.eth.accounts.create();
+    addresses.push(account.address);
+  }
+
+  return addresses;
+}
+
+function checkZeroBalances(balances: Balances, skipAddress: string[]) {
+  for (const [address, balance] of Object.entries(balances)) {
+    if (!skipAddress.includes(address)) {
+      expect(balance).to.equal('0');
+    }
+  }
 }
 
 describe('Token Balance Cache EVM Tests', function () {
-  this.timeout(80000);
+  this.timeout(160000);
 
   let tbc: TokenBalanceCache;
   let redisCache: RedisCache;
@@ -36,6 +73,11 @@ describe('Token Balance Cache EVM Tests', function () {
   const addressOne = '0xCEB3C3D4B78d5d10bd18930DC0757ddB588A862a';
   const addressTwo = '0xD54f2E2173D0a5eA8e0862Aed18b270aFF08389e';
   const discobotAddress = '0xdiscordbot';
+
+  const bulkAddresses = generateEVMAddresses(20);
+  bulkAddresses.splice(4, 0, addressOne);
+  bulkAddresses.splice(5, 0, addressTwo);
+  const totalBulkAddresses = 22;
 
   // ganache chain id
   const ethChainId = 1337;
@@ -150,6 +192,24 @@ describe('Token Balance Cache EVM Tests', function () {
         expect(balances[addressOne]).to.equal(finalAddressOneBalance);
         expect(balances[addressTwo]).to.equal(finalAddressTwoBalance);
       });
+
+      it('should correctly batch balance requests', async () => {
+        const balances = await tbc.getBalances({
+          balanceSourceType: BalanceSourceType.ERC20,
+          addresses: bulkAddresses,
+          sourceOptions: {
+            evmChainId: ethChainId,
+            contractAddress: chainLinkAddress,
+          },
+          cacheRefresh: true,
+          batchSize: 5,
+        });
+
+        expect(Object.keys(balances).length).to.equal(totalBulkAddresses);
+        expect(balances[addressOne]).to.equal(finalAddressOneBalance);
+        expect(balances[addressTwo]).to.equal(finalAddressTwoBalance);
+        checkZeroBalances(balances, [addressOne, addressTwo]);
+      });
     });
 
     describe('off-chain batching', () => {
@@ -198,6 +258,24 @@ describe('Token Balance Cache EVM Tests', function () {
         expect(Object.keys(balances).length).to.equal(2);
         expect(balances[addressOne]).to.equal(finalAddressOneBalance);
         expect(balances[addressTwo]).to.equal(finalAddressTwoBalance);
+        checkZeroBalances(balances, [addressOne, addressTwo]);
+      });
+
+      it('should correctly batch balance requests', async () => {
+        const balances = await tbc.getBalances({
+          balanceSourceType: BalanceSourceType.ERC20,
+          addresses: bulkAddresses,
+          sourceOptions: {
+            evmChainId: newEthChainId,
+            contractAddress: chainLinkAddress,
+          },
+          cacheRefresh: true,
+          batchSize: 5,
+        });
+
+        expect(Object.keys(balances).length).to.equal(totalBulkAddresses);
+        expect(balances[addressOne]).to.equal(finalAddressOneBalance);
+        expect(balances[addressTwo]).to.equal(finalAddressTwoBalance);
       });
     });
   });
@@ -214,11 +292,6 @@ describe('Token Balance Cache EVM Tests', function () {
       );
       originalAddressOneBalance = await web3.eth.getBalance(addressOne);
       originalAddressTwoBalance = await web3.eth.getBalance(addressTwo);
-      console.log(
-        'Original balances:',
-        originalAddressOneBalance,
-        originalAddressTwoBalance,
-      );
       await sdk.getETH(addressOne, transferAmount);
       await sdk.getETH(addressTwo, transferAmount);
       const transferAmountBN = new BN(toWei(transferAmount));
@@ -228,11 +301,6 @@ describe('Token Balance Cache EVM Tests', function () {
       finalAddressTwoBalance = new BN(originalAddressTwoBalance)
         .add(transferAmountBN)
         .toString(10);
-      console.log(
-        'Final balances:',
-        finalAddressOneBalance,
-        finalAddressTwoBalance,
-      );
     });
 
     describe('Single address', () => {
@@ -271,7 +339,6 @@ describe('Token Balance Cache EVM Tests', function () {
           cacheRefresh: true,
         });
 
-        console.log('Balances:', balance);
         expect(Object.keys(balance).length).to.equal(1);
         expect(balance[addressOne]).to.equal(finalAddressOneBalance);
       });
@@ -306,6 +373,23 @@ describe('Token Balance Cache EVM Tests', function () {
         expect(Object.keys(balances).length).to.equal(2);
         expect(balances[addressOne]).to.equal(finalAddressOneBalance);
         expect(balances[addressTwo]).to.equal(finalAddressTwoBalance);
+      });
+
+      it('should correctly batch balance requests', async () => {
+        const balances = await tbc.getBalances({
+          balanceSourceType: BalanceSourceType.ETHNative,
+          addresses: bulkAddresses,
+          sourceOptions: {
+            evmChainId: ethChainId,
+          },
+          cacheRefresh: true,
+          batchSize: 5,
+        });
+
+        expect(Object.keys(balances).length).to.equal(totalBulkAddresses);
+        expect(balances[addressOne]).to.equal(finalAddressOneBalance);
+        expect(balances[addressTwo]).to.equal(finalAddressTwoBalance);
+        checkZeroBalances(balances, [addressOne, addressTwo]);
       });
     });
 
@@ -354,6 +438,23 @@ describe('Token Balance Cache EVM Tests', function () {
         expect(balances[addressOne]).to.equal(finalAddressOneBalance);
         expect(balances[addressTwo]).to.equal(finalAddressTwoBalance);
       });
+
+      it('should correctly batch balance requests', async () => {
+        const balances = await tbc.getBalances({
+          balanceSourceType: BalanceSourceType.ETHNative,
+          addresses: bulkAddresses,
+          sourceOptions: {
+            evmChainId: newEthChainId,
+          },
+          cacheRefresh: true,
+          batchSize: 5,
+        });
+
+        expect(Object.keys(balances).length).to.equal(totalBulkAddresses);
+        expect(balances[addressOne]).to.equal(finalAddressOneBalance);
+        expect(balances[addressTwo]).to.equal(finalAddressTwoBalance);
+        checkZeroBalances(balances, [addressOne, addressTwo]);
+      });
     });
   });
 
@@ -365,6 +466,7 @@ describe('Token Balance Cache EVM Tests', function () {
       nft = await sdk.deployNFT();
       await nft.mint('1', 1);
       await nft.mint('2', 2);
+      await nft.mint('3', 2);
       const addresses = await sdk.getAccounts();
       addressOne721 = addresses[1];
       addressTwo721 = addresses[2];
@@ -429,7 +531,7 @@ describe('Token Balance Cache EVM Tests', function () {
 
         expect(Object.keys(balances).length).to.equal(2);
         expect(balances[addressOne721]).to.equal('1');
-        expect(balances[addressTwo721]).to.equal('1');
+        expect(balances[addressTwo721]).to.equal('2');
       });
 
       it('should not throw if a single address fails', async () => {
@@ -445,7 +547,29 @@ describe('Token Balance Cache EVM Tests', function () {
 
         expect(Object.keys(balances).length).to.equal(2);
         expect(balances[addressOne721]).to.equal('1');
-        expect(balances[addressTwo721]).to.equal('1');
+        expect(balances[addressTwo721]).to.equal('2');
+      });
+
+      it('should correctly batch balance requests', async () => {
+        const bulkAddresses721 = generateEVMAddresses(20);
+        bulkAddresses721.splice(4, 0, addressOne721);
+        bulkAddresses721.splice(5, 0, addressTwo721);
+
+        const balances = await tbc.getBalances({
+          balanceSourceType: BalanceSourceType.ERC721,
+          addresses: bulkAddresses721,
+          sourceOptions: {
+            evmChainId: ethChainId,
+            contractAddress: nft.address,
+          },
+          cacheRefresh: true,
+          batchSize: 22,
+        });
+
+        expect(Object.keys(balances).length).to.equal(totalBulkAddresses);
+        expect(balances[addressOne721]).to.equal('1');
+        expect(balances[addressTwo721]).to.equal('2');
+        checkZeroBalances(balances, [addressOne721, addressTwo721]);
       });
     });
   });
@@ -533,6 +657,7 @@ describe('Token Balance Cache EVM Tests', function () {
             contractAddress: erc1155.address,
             tokenId: 1,
           },
+          cacheRefresh: true,
         });
 
         expect(Object.keys(balances).length).to.equal(2);
@@ -549,11 +674,31 @@ describe('Token Balance Cache EVM Tests', function () {
             contractAddress: erc1155.address,
             tokenId: 1,
           },
+          cacheRefresh: true,
         });
 
         expect(Object.keys(balances).length).to.equal(2);
         expect(balances[addressOne]).to.equal('10');
         expect(balances[addressTwo]).to.equal('20');
+      });
+
+      it('should correctly batch balance requests', async () => {
+        const balances = await tbc.getBalances({
+          balanceSourceType: BalanceSourceType.ERC1155,
+          addresses: bulkAddresses,
+          sourceOptions: {
+            evmChainId: ethChainId,
+            contractAddress: erc1155.address,
+            tokenId: 1,
+          },
+          cacheRefresh: true,
+          batchSize: 5,
+        });
+
+        expect(Object.keys(balances).length).to.equal(totalBulkAddresses);
+        expect(balances[addressOne]).to.equal('10');
+        expect(balances[addressTwo]).to.equal('20');
+        checkZeroBalances(balances, [addressOne, addressTwo]);
       });
     });
   });

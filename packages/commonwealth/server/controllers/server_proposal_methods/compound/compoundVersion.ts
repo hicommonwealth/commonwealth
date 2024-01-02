@@ -1,3 +1,4 @@
+import { RedisNamespaces } from '@hicommonwealth/core';
 import {
   GovernorAlpha,
   GovernorAlpha__factory,
@@ -9,7 +10,6 @@ import {
   GovernorCountingSimple__factory,
 } from 'common-common/src/eth/types';
 import { RedisCache } from 'common-common/src/redisCache';
-import { RedisNamespaces } from 'common-common/src/types';
 import { providers } from 'ethers';
 import { GovVersion } from './types';
 

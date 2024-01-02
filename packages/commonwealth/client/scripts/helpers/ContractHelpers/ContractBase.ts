@@ -1,8 +1,8 @@
+import { ChainBase } from '@hicommonwealth/core';
 import IWebWallet from 'client/scripts/models/IWebWallet';
 import WebWalletController from 'controllers/app/web_wallets';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
-import { ChainBase } from '../../../../../common-common/src/types';
 
 abstract class ContractBase {
   protected contract;
@@ -13,7 +13,7 @@ abstract class ContractBase {
   constructor(contractAddress: string, abi: any) {
     this.contractAddress = contractAddress;
     this.wallet = WebWalletController.Instance.availableWallets(
-      ChainBase.Ethereum
+      ChainBase.Ethereum,
     )[0];
 
     this.wallet.enable().then(() => {
@@ -23,7 +23,7 @@ abstract class ContractBase {
       this.web3 = this.wallet.api;
       this.contract = new this.web3.eth.Contract(
         abi as AbiItem[],
-        contractAddress
+        contractAddress,
       );
     });
   }

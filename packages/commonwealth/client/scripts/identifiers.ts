@@ -1,4 +1,4 @@
-import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, ProposalType } from '@hicommonwealth/core';
 import type { ProposalStore } from 'stores';
 import { slugify } from 'utils';
 import type ChainInfo from './models/ChainInfo';
@@ -12,7 +12,7 @@ export const getProposalUrlPath = (
   type: ProposalType,
   id: string,
   omitActiveId = true,
-  chainId?: string
+  chainId?: string,
 ): string => {
   let basePath: string;
   if (type === ProposalType.Thread) {
@@ -28,12 +28,12 @@ export const getProposalUrlPath = (
 };
 
 export const getNotificationUrlPath = (
-  subscription: NotificationSubscription
+  subscription: NotificationSubscription,
 ): string => {
   const community = subscription.chainId;
   const type = subscription.Thread.slug;
   const id = `${subscription.Thread.identifier}-${slugify(
-    subscription.Thread.title
+    subscription.Thread.title,
   )}`;
 
   return `/${community}/${type}/${id}`;
