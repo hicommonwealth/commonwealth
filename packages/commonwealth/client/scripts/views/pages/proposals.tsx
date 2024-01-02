@@ -1,39 +1,39 @@
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
 import type Aave from 'controllers/chain/ethereum/aave/adapter';
+import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import type Compound from 'controllers/chain/ethereum/compound/adapter';
+import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
 import type NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 import 'pages/proposals.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
-import { ProposalCard } from 'views/components/ProposalCard';
-import { PageNotFound } from 'views/pages/404';
-import { PageLoading } from 'views/pages/loading';
-import ErrorPage from 'views/pages/error';
-import { CardsCollection } from '../components/cards_collection';
-import { CWSpinner } from '../components/component_kit/cw_spinner';
-import { getStatusText } from '../components/ProposalCard/helpers';
-import { AaveProposalCardDetail } from '../components/proposals/aave_proposal_card_detail';
-import { CWText } from '../components/component_kit/cw_text';
-import { CompoundProposalStats } from '../components/proposals/proposals_explainers';
-import {
-  useActiveCosmosProposalsQuery,
-  useCompletedCosmosProposalsQuery,
-  useAaveProposalsQuery,
-  useCompoundProposalsQuery,
-} from 'state/api/proposals';
-import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
-import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
-import useManageDocumentTitle from '../../hooks/useManageDocumentTitle';
 import {
   useDepositParamsQuery,
   usePoolParamsQuery,
   useStakingParamsQuery,
 } from 'state/api/chainParams';
+import {
+  useAaveProposalsQuery,
+  useActiveCosmosProposalsQuery,
+  useCompletedCosmosProposalsQuery,
+  useCompoundProposalsQuery,
+} from 'state/api/proposals';
+import { ProposalCard } from 'views/components/ProposalCard';
+import { PageNotFound } from 'views/pages/404';
+import ErrorPage from 'views/pages/error';
+import { PageLoading } from 'views/pages/loading';
+import useManageDocumentTitle from '../../hooks/useManageDocumentTitle';
+import { getStatusText } from '../components/ProposalCard/helpers';
+import { CardsCollection } from '../components/cards_collection';
+import { CWSpinner } from '../components/component_kit/cw_spinner';
+import { CWText } from '../components/component_kit/cw_text';
+import { AaveProposalCardDetail } from '../components/proposals/aave_proposal_card_detail';
+import { CompoundProposalStats } from '../components/proposals/proposals_explainers';
 
 const ProposalsPage = () => {
   const [isLoading, setLoading] = useState(
-    !app.chain || !app.chain.loaded || !app.chain.apiInitialized
+    !app.chain || !app.chain.loaded || !app.chain.apiInitialized,
   );
   useInitChainIfNeeded(app); // if chain is selected, but data not loaded, initialize it
 
@@ -45,13 +45,13 @@ const ProposalsPage = () => {
   const { data: cachedAaveProposals, isError: isAaveError } =
     useAaveProposalsQuery({
       moduleReady: app.chain?.network === ChainNetwork.Aave && !isLoading,
-      chainId: app.chain?.id,
+      communityId: app.chain?.id,
     });
 
   const { data: cachedCompoundProposals, isError: isCompoundError } =
     useCompoundProposalsQuery({
       moduleReady: app.chain?.network === ChainNetwork.Compound && !isLoading,
-      chainId: app.chain?.id,
+      communityId: app.chain?.id,
     });
 
   useEffect(() => {
@@ -157,7 +157,7 @@ const ProposalsPage = () => {
       .concat(
         (activeCompoundProposals || []).map((proposal, i) => (
           <ProposalCard key={i} proposal={proposal} />
-        ))
+        )),
       )
       .concat(
         (activeAaveProposals || []).map((proposal, i) => (
@@ -171,12 +171,12 @@ const ProposalsPage = () => {
               />
             }
           />
-        ))
+        )),
       )
       .concat(
         (activeSputnikProposals || []).map((proposal, i) => (
           <ProposalCard key={i} proposal={proposal} />
-        ))
+        )),
       )
   );
 
@@ -218,12 +218,12 @@ const ProposalsPage = () => {
       .concat(
         (inactiveCosmosProposals || []).map((proposal) => (
           <ProposalCard key={proposal.identifier} proposal={proposal} />
-        ))
+        )),
       )
       .concat(
         (inactiveCompoundProposals || []).map((proposal, i) => (
           <ProposalCard key={i} proposal={proposal} />
-        ))
+        )),
       )
       .concat(
         (inactiveAaveProposals || []).map((proposal, i) => (
@@ -237,12 +237,12 @@ const ProposalsPage = () => {
               />
             }
           />
-        ))
+        )),
       )
       .concat(
         (inactiveSputnikProposals || []).map((proposal, i) => (
           <ProposalCard key={i} proposal={proposal} />
-        ))
+        )),
       )
   );
 

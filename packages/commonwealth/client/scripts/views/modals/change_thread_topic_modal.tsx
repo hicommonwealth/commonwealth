@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import Permissions from 'utils/Permissions';
 import type Thread from '../../models/Thread';
 import type Topic from '../../models/Topic';
 import app from '../../state';
@@ -25,21 +24,12 @@ export const ChangeThreadTopicModal = ({
 }: ChangeThreadTopicModalProps) => {
   const [activeTopic, setActiveTopic] = useState<Topic>(thread.topic);
   const { data: topics } = useFetchTopicsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
-  const isAdmin = Permissions.isCommunityAdmin();
   const topicsForSelector = topics?.reduce(
     (acc, t) => {
-      if (
-        isAdmin ||
-        t.tokenThreshold.isZero() ||
-        !app.chain.isGatedTopic(t.id)
-      ) {
-        acc.enabledTopics.push(t);
-      } else {
-        acc.disabledTopics.push(t);
-      }
+      acc.enabledTopics.push(t);
       return acc;
     },
     { enabledTopics: [], disabledTopics: [] },

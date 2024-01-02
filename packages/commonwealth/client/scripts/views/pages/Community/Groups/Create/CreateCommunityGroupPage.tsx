@@ -1,5 +1,4 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { featureFlags } from 'helpers/feature-flags';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
@@ -26,7 +25,6 @@ const CreateCommunityGroupPage = () => {
   });
 
   if (
-    !featureFlags.gatingEnabled ||
     !app.isLoggedIn() ||
     !(Permissions.isCommunityAdmin() || Permissions.isSiteAdmin())
   ) {

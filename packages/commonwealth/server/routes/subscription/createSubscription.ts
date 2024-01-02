@@ -1,20 +1,21 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { NotificationCategories } from '@hicommonwealth/core';
 import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
-import type { DB } from '../../models';
-import Errors from './errors';
-import { CommunityInstance } from '../../models/community';
-import { supportedSubscriptionCategories } from '../../util/subscriptionMapping';
-import { NotificationCategories } from 'common-common/src/types';
-import { CommentInstance } from '../../models/comment';
-import { ThreadInstance } from '../../models/thread';
 import { WhereOptions } from 'sequelize';
 import { SubscriptionAttributes } from 'server/models/subscription';
+import type { DB } from '../../models';
+import { CommentInstance } from '../../models/comment';
+import { CommunityInstance } from '../../models/community';
+import { ThreadInstance } from '../../models/thread';
+import { supportedSubscriptionCategories } from '../../util/subscriptionMapping';
+import Errors from './errors';
 
 export default async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.user) {
     return next(new AppError(Errors.NotLoggedIn));

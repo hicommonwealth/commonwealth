@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from 'react';
 
+import { NotificationCategories } from '@hicommonwealth/core';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import moment from 'moment';
 import 'pages/snapshot_proposals.scss';
 import app from 'state';
-import { NotificationCategories } from '../../../../../../common-common/src/types';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import useNecessaryEffect from '../../../hooks/useNecessaryEffect';
 import { CardsCollection } from '../../components/cards_collection';

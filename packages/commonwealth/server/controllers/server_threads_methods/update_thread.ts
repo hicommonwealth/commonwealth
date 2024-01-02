@@ -1,11 +1,8 @@
+import { NotificationCategories, ProposalType } from '@hicommonwealth/core';
 import { uniq } from 'lodash';
 import moment from 'moment';
 import { Op, Sequelize, Transaction } from 'sequelize';
 import { AppError, ServerError } from '../../../../common-common/src/errors';
-import {
-  NotificationCategories,
-  ProposalType,
-} from '../../../../common-common/src/types';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText, validURL } from '../../../shared/utils';
 import { DB } from '../../models';
@@ -113,7 +110,13 @@ export async function __updateThread(
     throw new AppError(`Ban error: ${banError}`);
   }
 
-  const thread = await this.models.Thread.findByPk(threadId);
+  const thread = await this.models.Thread.findByPk(threadId, {
+    include: {
+      model: this.models.Address,
+      as: 'collaborators',
+      required: false,
+    },
+  });
   if (!thread) {
     throw new AppError(`${Errors.ThreadNotFound}: ${threadId}`);
   }
@@ -129,6 +132,9 @@ export async function __updateThread(
     ['moderator', 'admin'],
   );
 
+  const isCollaborator = !!thread.collaborators?.find(
+    (a) => a.address === address.address,
+  );
   const isThreadOwner = userOwnedAddressIds.includes(thread.address_id);
   const isMod = !!roles.find(
     (r) => r.chain_id === community.id && r.permission === 'moderator',
@@ -137,7 +143,13 @@ export async function __updateThread(
     (r) => r.chain_id === community.id && r.permission === 'admin',
   );
   const isSuperAdmin = user.isAdmin;
-  if (!isThreadOwner && !isMod && !isAdmin && !isSuperAdmin) {
+  if (
+    !isThreadOwner &&
+    !isMod &&
+    !isAdmin &&
+    !isSuperAdmin &&
+    !isCollaborator
+  ) {
     throw new AppError(Errors.Unauthorized);
   }
   const permissions = {
@@ -145,6 +157,7 @@ export async function __updateThread(
     isMod,
     isAdmin,
     isSuperAdmin,
+    isCollaborator,
   };
 
   const now = new Date();
@@ -357,6 +370,7 @@ export type UpdateThreadPermissions = {
   isMod: boolean;
   isAdmin: boolean;
   isSuperAdmin: boolean;
+  isCollaborator: boolean;
 };
 
 /**
@@ -367,7 +381,13 @@ export function validatePermissions(
   permissions: UpdateThreadPermissions,
   flags: Partial<UpdateThreadPermissions>,
 ) {
-  const keys = ['isThreadOwner', 'isMod', 'isAdmin', 'isSuperAdmin'];
+  const keys = [
+    'isThreadOwner',
+    'isMod',
+    'isAdmin',
+    'isSuperAdmin',
+    'isCollaborator',
+  ];
   for (const k of keys) {
     if (flags[k] && permissions[k]) {
       // at least one flag is satisfied
@@ -413,6 +433,7 @@ async function setThreadAttributes(
       isMod: true,
       isAdmin: true,
       isSuperAdmin: true,
+      isCollaborator: true,
     });
 
     // title

@@ -33,7 +33,6 @@ import type { SubscriptionModelStatic } from './models/subscription';
 import type { TaggedThreadModelStatic } from './models/tagged_threads';
 import type { TemplateModelStatic } from './models/template';
 import type { ThreadModelStatic } from './models/thread';
-import type { TokenModelStatic } from './models/token';
 import type { TopicModelStatic } from './models/topic';
 import type { UserModelStatic } from './models/user';
 import type { VoteModelStatic } from './models/vote';
@@ -74,7 +73,6 @@ export type Models = {
   SnapshotProposal: SnapshotProposalModelStatic;
   Subscription: SubscriptionModelStatic;
   SnapshotSpace: SnapshotSpaceModelStatic;
-  Token: TokenModelStatic;
   TaggedThread: TaggedThreadModelStatic;
   User: UserModelStatic;
   Webhook: WebhookModelStatic;

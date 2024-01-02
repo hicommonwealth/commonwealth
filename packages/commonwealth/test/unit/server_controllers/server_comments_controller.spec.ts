@@ -1,6 +1,6 @@
+import { NotificationCategories } from '@hicommonwealth/core';
 import BN from 'bn.js';
 import { expect } from 'chai';
-import { NotificationCategories } from 'common-common/src/types';
 import { ServerCommentsController } from 'server/controllers/server_comments_controller';
 import { SearchCommentsOptions } from 'server/controllers/server_comments_methods/search_comments';
 import Sinon from 'sinon';
@@ -68,6 +68,7 @@ describe('ServerCommentsController', () => {
 
       const serverCommentsController = new ServerCommentsController(
         db as any,
+        tokenBalanceCache as any,
         tokenBalanceCache as any,
         banCache as any,
       );
@@ -182,6 +183,7 @@ describe('ServerCommentsController', () => {
       const serverCommentsController = new ServerCommentsController(
         db as any,
         tokenBalanceCache as any,
+        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -250,6 +252,7 @@ describe('ServerCommentsController', () => {
 
       const serverCommentsController = new ServerCommentsController(
         db as any,
+        tokenBalanceCache as any,
         tokenBalanceCache as any,
         banCache as any,
       );
@@ -324,6 +327,7 @@ describe('ServerCommentsController', () => {
 
       const serverCommentsController = new ServerCommentsController(
         db as any,
+        tokenBalanceCache as any,
         tokenBalanceCache as any,
         banCache as any,
       );
@@ -423,6 +427,7 @@ describe('ServerCommentsController', () => {
       const serverCommentsController = new ServerCommentsController(
         db as any,
         tokenBalanceCache as any,
+        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -457,6 +462,7 @@ describe('ServerCommentsController', () => {
 
       const serverCommentsController = new ServerCommentsController(
         db as any,
+        tokenBalanceCache as any,
         tokenBalanceCache as any,
         banCache as any,
       );
@@ -518,6 +524,7 @@ describe('ServerCommentsController', () => {
 
       const serverCommentsController = new ServerCommentsController(
         db as any,
+        tokenBalanceCache as any,
         tokenBalanceCache as any,
         banCache as any,
       );
@@ -620,6 +627,7 @@ describe('ServerCommentsController', () => {
       const serverCommentsController = new ServerCommentsController(
         db as any,
         tokenBalanceCache as any,
+        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -680,6 +688,7 @@ describe('ServerCommentsController', () => {
       const serverCommentsController = new ServerCommentsController(
         db as any,
         tokenBalanceCache as any,
+        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -729,6 +738,7 @@ describe('ServerCommentsController', () => {
 
       const serverCommentsController = new ServerCommentsController(
         db as any,
+        tokenBalanceCache as any,
         tokenBalanceCache as any,
         banCache as any,
       );

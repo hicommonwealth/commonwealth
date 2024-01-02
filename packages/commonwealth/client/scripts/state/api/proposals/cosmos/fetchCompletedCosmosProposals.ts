@@ -1,9 +1,9 @@
-import app from 'state';
+import { ChainBase } from '@hicommonwealth/core';
 import { useQuery } from '@tanstack/react-query';
 import Cosmos from 'controllers/chain/cosmos/adapter';
 import { getCompletedProposals } from 'controllers/chain/cosmos/gov/utils';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
-import { ChainBase } from 'common-common/src/types';
+import app from 'state';
 
 // completed proposals never change, so we can cache
 // the old ones forever. React Query will load new
@@ -23,9 +23,9 @@ interface CompletedProposalsProps {
 const useCompletedCosmosProposalsQuery = ({
   isApiReady,
 }: CompletedProposalsProps) => {
-  const chainId = app.activeChainId();
+  const communityId = app.activeChainId();
   return useQuery({
-    queryKey: ['completedProposals', chainId],
+    queryKey: ['completedProposals', communityId],
     queryFn: fetchCompletedProposals,
     enabled: app.chain?.base === ChainBase.CosmosSDK && isApiReady,
     retry: 3,

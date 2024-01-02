@@ -12,6 +12,7 @@ import { Footer } from './Footer';
 import { SublayoutBanners } from './SublayoutBanners';
 import { SublayoutHeader } from './SublayoutHeader';
 import { Breadcrumbs } from './components/Breadcrumbs';
+import GatingGrowl from './components/GatingGrowl/GatingGrowl';
 
 type SublayoutProps = {
   hideFooter?: boolean;
@@ -98,6 +99,7 @@ const Sublayout = ({
             )}
           </div>
         </div>
+        {hasCommunitySidebar && <GatingGrowl />}
       </div>
     </div>
   );

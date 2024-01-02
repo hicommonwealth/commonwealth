@@ -1,5 +1,5 @@
+import { ChainBase, DefaultPage } from '@hicommonwealth/core';
 import axios from 'axios';
-import { ChainBase, DefaultPage } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { featureFlags } from 'helpers/feature-flags';
 import { uuidv4 } from 'lib/util';
@@ -45,7 +45,7 @@ export const CommunityMetadataRows = ({
   );
 
   const { data: topics, refetch: refetchTopics } = useFetchTopicsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const { data: discordChannels } = useFetchDiscordChannelsQuery({
@@ -152,12 +152,18 @@ export const CommunityMetadataRows = ({
     } catch (err) {
       console.log(err);
     }
-    const socialLinks: string[] = [website, discord, element, telegram, github];
+    const social_links: string[] = [
+      website,
+      discord,
+      element,
+      telegram,
+      github,
+    ];
     try {
       await community.updateChainData({
         name,
         description,
-        socialLinks,
+        social_links,
         stagesEnabled,
         customStages,
         customDomain,

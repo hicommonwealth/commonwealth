@@ -1,3 +1,4 @@
+import { BalanceType } from '@hicommonwealth/core';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { detectURL } from 'helpers/threads';
 import CommunityInfo from 'models/ChainInfo';
@@ -5,7 +6,6 @@ import NodeInfo from 'models/NodeInfo';
 import 'pages/AdminPanel.scss';
 import React, { useState } from 'react';
 import app from 'state';
-import { BalanceType } from '../../../../../../common-common/src/types';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWText } from '../../components/component_kit/cw_text';

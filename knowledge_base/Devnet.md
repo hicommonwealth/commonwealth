@@ -26,7 +26,7 @@ Note: Currently, the sandbox communities csdk, csdk-beta, and evmos-dev are on a
 
 See: <https://dashboard.heroku.com/apps/cosmos-devnet/deploy/heroku-container>
 
-1. In terminal go to packages/chain-events/cosmos-chain-testing/v1 directory
+1. In terminal go to packages/commonwealth/test/util/cosmos-chain-testing/v1 directory
 2. `heroku git:remote -a cosmos-devnet`
 3. `heroku login`
 4. `heroku container:login`
@@ -38,7 +38,7 @@ Note: If you get error "No images to push," make sure Dockerfile is capitalized
 ### Deploying Updates to a CI Deployment
 
 1. Create a remote Docker Hub repo called (for ex) "csdk-v1"
-2. In terminal go to packages/chain-events/cosmos-chain-testing/v1 directory
+2. In terminal go to packages/commonwealth/test/util/cosmos-chain-testing/v1 directory
 3. `docker build -t {your-docker-remote-hub}/csdk-v1 .`
 4. `docker push {your-docker-remote-hub}/csdk-v1`
 5. If you use a new docker remote, update the reference for tests in CI.yml
@@ -152,6 +152,7 @@ CI community (ephemeral spin-up for automated tests):
 
 ## Change Log
 
+- 231211: Updated directory of devnet files.
 - 231031: Flagged by Timothee Legros as needing EVM documentation similar to current CSDK info.
 - 231031: Flagged by Graham Johnson; `chain-events` package references are obsolete.
 - 230727: Updated with Cosmos SDK info by Mark Hagelberg.

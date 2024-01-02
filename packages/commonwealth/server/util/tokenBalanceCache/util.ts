@@ -74,7 +74,7 @@ export async function evmOffChainRpcBatching(
   const chainNodeErrorMsg =
     `${failingChainNodeError} RPC batch request failed for method '${rpc.method}' ` +
     `with batch size ${rpc.batchSize} on evm chain id ${source.evmChainId}${
-      source.contractAddress ? `for token ${source.contractAddress}` : ''
+      source.contractAddress ? ` for token ${source.contractAddress}` : ''
     }.`;
   responses.forEach((res, index) => {
     // handle a failed batch request

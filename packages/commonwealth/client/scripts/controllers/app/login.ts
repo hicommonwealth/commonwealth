@@ -1,8 +1,8 @@
 /**
  * @file Manages logged-in user accounts and local storage.
  */
+import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/core';
 import { chainBaseToCanvasChainId } from 'canvas/chainMappings';
-import { ChainBase, WalletId, WalletSsoSource } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { signSessionWithMagic } from 'controllers/server/sessions';
 import { isSameAccount } from 'helpers';
@@ -14,8 +14,6 @@ import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import type BlockInfo from '../../models/BlockInfo';
 import type ChainInfo from '../../models/ChainInfo';
-
-import { getTokenBalance } from 'helpers/token_balance_helper';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
@@ -164,8 +162,6 @@ export async function updateActiveAddresses({
       .filter((addr) => addr),
     shouldRedraw,
   );
-
-  getTokenBalance();
 
   // select the address that the new chain should be initialized with
   const memberAddresses = app.user.activeAccounts.filter((account) => {

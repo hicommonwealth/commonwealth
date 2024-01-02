@@ -2,21 +2,21 @@ declare let window: any;
 
 import $ from 'jquery';
 
+import type Web3 from 'web3';
 import type Account from '../../../models/Account';
 import type BlockInfo from '../../../models/BlockInfo';
 import type IWebWallet from '../../../models/IWebWallet';
-import type Web3 from 'web3';
 
+import * as siwe from 'siwe';
 import type { provider } from 'web3-core';
 import { hexToNumber } from 'web3-utils';
-import * as siwe from 'siwe';
 
 import type { SessionPayload } from '@canvas-js/interfaces';
 
-import app from 'state';
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { setActiveAccount } from 'controllers/app/login';
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
 import { createSiweMessage } from 'adapters/chain/ethereum/keys';
+import { setActiveAccount } from 'controllers/app/login';
+import app from 'state';
 
 class MetamaskWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
@@ -77,7 +77,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
 
   public async signCanvasMessage(
     account: Account,
-    sessionPayload: SessionPayload
+    sessionPayload: SessionPayload,
   ): Promise<string> {
     const nonce = siwe.generateNonce();
     // this must be open-ended, because of custom domains
@@ -106,9 +106,20 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       // ensure we're on the correct chain
 
       const Web3 = (await import('web3')).default;
+
+      let ethereum = window.ethereum;
+
+      if (window.ethereum.providers?.length) {
+        window.ethereum.providers.forEach(async (p) => {
+          if (p.isMetaMask) ethereum = p;
+        });
+      }
+
       this._web3 =
         process.env.ETH_RPC !== 'e2e-test'
-          ? new Web3((window as any).ethereum)
+          ? {
+              givenProvider: ethereum,
+            }
           : {
               givenProvider: window.ethereum,
               eth: {
@@ -158,7 +169,13 @@ class MetamaskWebWalletController implements IWebWallet<string> {
         }
       }
       // fetch active accounts
-      this._accounts = await this._web3.eth.getAccounts();
+      this._accounts = (
+        await this._web3.givenProvider.request({
+          method: 'eth_requestAccounts',
+        })
+      ).map((addr) => {
+        return Web3.utils.toChecksumAddress(addr);
+      });
       this._provider = this._web3.currentProvider;
       if (this._accounts.length === 0) {
         throw new Error('Metamask fetched no accounts');
@@ -183,11 +200,11 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       'accountsChanged',
       async (accounts: string[]) => {
         const updatedAddress = app.user.activeAccounts.find(
-          (addr) => addr.address === accounts[0]
+          (addr) => addr.address === accounts[0],
         );
         if (!updatedAddress) return;
         await setActiveAccount(updatedAddress);
-      }
+      },
     );
     // TODO: chainChanged, disconnect events
   }

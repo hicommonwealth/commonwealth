@@ -35,7 +35,7 @@ dasel put -t string -r json -f $GENESIS -v "ustake" '.app_state.crisis.constant_
 dasel put -t string -r json -f $GENESIS -v "ustake" '.app_state.mint.params.mint_denom'
 
 # Update gov module
-dasel put -t string -r json -f $GENESIS -v "90s" '.app_state.gov.voting_params.voting_period'
+dasel put -t string -r json -f $GENESIS -v "180s" '.app_state.gov.voting_params.voting_period'
 dasel put -t string -r json -f $GENESIS -v "2000000" '.app_state.gov.deposit_params.min_deposit.[0].amount'
 dasel put -t string -r json -f $GENESIS -v "ustake" '.app_state.gov.deposit_params.min_deposit.[0].denom'
 

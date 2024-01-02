@@ -1,7 +1,16 @@
-import type { LoginActiveStep } from './types';
+import type { LoginActiveStep, LoginSidebarType } from './types';
 
-export const getLoginText = (activeStep: LoginActiveStep) => {
-  if (activeStep === 'walletList') {
+export const getLoginText = (
+  activeStep: LoginActiveStep,
+  sidebarType: LoginSidebarType,
+) => {
+  if (activeStep === 'walletList' && sidebarType === 'createCommunityLogin') {
+    return {
+      headerText: 'Sign in to create your community',
+      bodyText:
+        'To launch your community choose a sign-in option that is compatible with the ecosystem you selected.',
+    };
+  } else if (activeStep === 'walletList') {
     return {
       headerText: 'Sign in to Commonwealth',
       bodyText: `Many communities require different wallets 

@@ -11,6 +11,7 @@ export enum ComponentType {
   Button = 'Button',
   Card = 'Card',
   Checkbox = 'Checkbox',
+  CircleButton = 'CircleButton',
   Collapsible = 'Collapsible',
   CommunityAvatar = 'CommunityAvatar',
   CommunitySelector = 'CommunitySelector',
@@ -53,6 +54,7 @@ export enum ComponentType {
   TypeaheadSelectList = 'TypeaheadSelectList',
   Upvote = 'Upvote',
   ValidationText = 'ValidationText',
+  VoteWeightModule = 'VoteWeightModule',
   WalletOptionRow = 'WalletOptionRow',
   SelectList = 'SelectList',
 }
@@ -83,6 +85,7 @@ export type DefaultMenuItem = {
   type?: 'default';
   className?: string;
   preventClosing?: boolean;
+  isButton?: boolean;
 };
 
 type NotificationMenuItem = {

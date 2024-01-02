@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { NotificationCategories } from 'common-common/src/types';
+import { NotificationCategories } from '@hicommonwealth/core';
 import { isNotUndefined } from 'helpers/typeGuards';
 
 import app from 'state';
@@ -13,7 +13,7 @@ export const SubscriptionButton = () => {
     options: { chainId: app.activeChainId() },
   });
   const [notificationsOn, setNotificationsOn] = useState<boolean>(
-    isNotUndefined(communitySubscription)
+    isNotUndefined(communitySubscription),
   );
 
   return (

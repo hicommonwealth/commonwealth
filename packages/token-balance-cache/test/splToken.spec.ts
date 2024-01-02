@@ -1,18 +1,18 @@
-import { assert, expect, use as chaiUse } from 'chai';
-import { BalanceType } from 'common-common/src/types';
-import { BigNumber, BigNumberish, CallOverrides } from 'ethers';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { BalanceType } from '@hicommonwealth/core';
+import { assert, use as chaiUse, expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import SplTokenBalanceProvider from '../src/providers/splToken';
 
 chaiUse(chaiAsPromised);
 
-import type { IChainNode } from '../src/types';
 import { PublicKey, TokenAccountsFilter } from '@solana/web3.js';
+import type { IChainNode } from '../src/types';
 
 class MockProvider {
   public async getParsedTokenAccountsByOwner(
     ownerAddress: PublicKey,
-    filter: TokenAccountsFilter
+    filter: TokenAccountsFilter,
   ): Promise<any> {
     return {
       value: [
@@ -62,7 +62,7 @@ describe('SplBp BP unit tests', () => {
       'xzaSRbYFi2x4rQFtcVzbjUwJ7t7qRsfoFGTJTaFMJ3e',
       {
         tokenAddress: 'xzaSRbYFi2x4rQFtcVzbjUwJ7t7qRsfoFGTJTaFMJ3e',
-      }
+      },
     );
 
     assert.equal(balance, '12345678912345678910');
@@ -78,8 +78,8 @@ describe('SplBp BP unit tests', () => {
         'xzaSRbYFi2x4rQFtcVzbjUwJ7t7qRsfoFGTJTaFMJ3e',
         {
           tokenAddress: '123',
-        }
-      )
+        },
+      ),
     ).to.be.rejectedWith('Invalid public key input');
   });
 });
