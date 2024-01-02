@@ -30,6 +30,7 @@
 - [Discobot](Discobot.md)
 - [EVM Overview and Docs](Chain-Testing-Overview.md)
 - [Package.json Scripts](Package-Scripts.md)
+- [Rollbar](Rollbar.md)
 - [Testing Environments](Testing-Environments.md)
 - [Wallet Support](Wallet-Support.md)
 
