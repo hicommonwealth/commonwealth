@@ -1,4 +1,4 @@
-import { Op, QueryTypes } from 'sequelize';
+import { Op, QueryTypes, WhereOptions } from 'sequelize';
 import { AppError } from '../../../../common-common/src/errors';
 import { CommunityAttributes } from '../../models/community';
 import { UserInstance } from '../../models/user';
@@ -60,8 +60,17 @@ export async function __getStats(
       [Op.gte]: oneMonthAgo,
     },
   };
-  const whereChain: any = { ...where };
-  const whereCommunityId: any = { ...where };
+  const whereChain: WhereOptions<{
+    created_at: any;
+    chain: string;
+  }> = {
+    ...where,
+  };
+  const whereCommunityId: WhereOptions<{
+    created_at: any;
+    community_id: string;
+  }> = { ...where };
+
   if (community) {
     whereChain.chain = communityId;
     whereCommunityId.community_id = communityId;
