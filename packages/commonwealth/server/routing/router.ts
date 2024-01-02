@@ -90,9 +90,6 @@ import bulkBalances from '../routes/bulkBalances';
 import editSubstrateSpec from '../routes/editSubstrateSpec';
 import finishSsoLogin from '../routes/finishSsoLogin';
 import getBannedAddresses from '../routes/getBannedAddresses';
-import getSupportedEthChains from '../routes/getSupportedEthChains';
-import getTokenForum from '../routes/getTokenForum';
-import ipfsPin from '../routes/ipfsPin';
 import setAddressWallet from '../routes/setAddressWallet';
 import { sendMessage } from '../routes/snapshotAPI';
 import startSsoLogin from '../routes/startSsoLogin';
@@ -146,6 +143,7 @@ import { ServerReactionsController } from '../controllers/server_reactions_contr
 import { ServerThreadsController } from '../controllers/server_threads_controller';
 import { ServerTopicsController } from '../controllers/server_topics_controller';
 
+import { TBC_BALANCE_TTL_SECONDS } from '../config';
 import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
 import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_handler';
 import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
@@ -216,7 +214,11 @@ function setupRouter(
 ) {
   // controllers
 
-  const tokenBalanceCacheV2 = new NewTokenBalanceCache(models, redisCache);
+  const tokenBalanceCacheV2 = new NewTokenBalanceCache(
+    models,
+    redisCache,
+    TBC_BALANCE_TTL_SECONDS,
+  );
 
   const serverControllers: ServerControllers = {
     threads: new ServerThreadsController(
@@ -285,14 +287,6 @@ function setupRouter(
   );
   registerRoute(router, 'get', '/domain', domain.bind(this, models));
   registerRoute(router, 'get', '/status', status.bind(this, models));
-  registerRoute(
-    router,
-    'post',
-    '/ipfsPin',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    ipfsPin.bind(this, models),
-  );
   registerRoute(
     router,
     'post',
@@ -447,18 +441,6 @@ function setupRouter(
     'post',
     '/bulkBalances',
     bulkBalances.bind(this, models, tokenBalanceCacheV1),
-  );
-  registerRoute(
-    router,
-    'get',
-    '/getTokenForum',
-    getTokenForum.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'get',
-    '/getSupportedEthChains',
-    getSupportedEthChains.bind(this, models),
   );
 
   registerRoute(

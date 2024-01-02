@@ -1,13 +1,13 @@
+import { WalletId } from '@hicommonwealth/core';
 import sgMail from '@sendgrid/mail';
 import { AppError } from 'common-common/src/errors';
-import { WalletId } from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
 import Sequelize from 'sequelize';
 import { DynamicTemplate } from '../../shared/types';
 import { LOGIN_RATE_LIMIT_MINS, SENDGRID_API_KEY, SERVER_URL } from '../config';
 import type { DB } from '../models';
-import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -26,7 +26,7 @@ const updateEmail = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.body.email) return next(new AppError(Errors.NoEmail));
   const { email } = req.body;

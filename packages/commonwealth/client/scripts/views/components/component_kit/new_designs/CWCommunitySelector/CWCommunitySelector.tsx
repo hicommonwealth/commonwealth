@@ -5,7 +5,7 @@ import { ComponentType } from '../../types';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 
-import { ChainBase } from 'common-common/src/types';
+import { ChainBase } from '@hicommonwealth/core';
 import './CWCommunitySelector.scss';
 
 export enum CommunityType {
@@ -30,7 +30,6 @@ interface CWCommunitySelectorProps {
 
 const CWCommunitySelector = ({
   type,
-  // chainBase,
   title,
   isRecommended,
   description,
@@ -39,7 +38,7 @@ const CWCommunitySelector = ({
   return (
     <div className={ComponentType.CommunitySelector} onClick={onClick}>
       <div className="chain-logo-container">
-        <img src={`static/img/communitySelector/${type}.svg`} alt={title} />
+        <img src={`/static/img/communitySelector/${type}.svg`} alt={title} />
       </div>
       <div className="content-container">
         <div className="title-row">

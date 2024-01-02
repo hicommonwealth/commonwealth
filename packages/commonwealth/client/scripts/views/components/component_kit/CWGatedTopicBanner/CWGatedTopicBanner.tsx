@@ -45,7 +45,13 @@ const CWGatedTopicBanner = ({
             navigate('/members?tab=groups');
           },
         },
-        { label: 'Learn more about gating' },
+        {
+          label: 'Learn more about gating',
+          onClick: () =>
+            window.open(
+              `https://blog.commonwealth.im/introducing-common-groups/`,
+            ),
+        },
       ]}
       onClose={onClose}
     />

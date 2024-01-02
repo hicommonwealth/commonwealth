@@ -1,4 +1,4 @@
-import { SupportedNetwork } from 'common-common/src/types';
+import { SupportedNetwork } from '@hicommonwealth/core';
 import type { CWEvent, IChainEventData } from '../types/types';
 import { Label as AaveLabel } from './aave';
 import { Label as CompoundLabel } from './compound';

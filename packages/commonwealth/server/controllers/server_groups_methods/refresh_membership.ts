@@ -1,4 +1,5 @@
 import { Op } from 'sequelize';
+import { MembershipRejectReason } from 'server/models/membership';
 import { AppError } from '../../../../common-common/src/errors';
 import { AddressInstance } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
@@ -19,7 +20,7 @@ export type RefreshMembershipOptions = {
 export type RefreshMembershipResult = {
   topicId?: number;
   allowed: boolean;
-  rejectReason?: string;
+  rejectReason?: MembershipRejectReason;
 }[];
 
 export async function __refreshMembership(
@@ -47,6 +48,7 @@ export async function __refreshMembership(
     this.tokenBalanceCacheV2,
     address,
     groups,
+    true, // use fresh balances
   );
 
   const topics = await this.models.Topic.findAll({

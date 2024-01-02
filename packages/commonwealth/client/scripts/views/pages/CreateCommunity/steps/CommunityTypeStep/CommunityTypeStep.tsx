@@ -95,15 +95,17 @@ const CommunityTypeStep = ({
       <div className="advanced-options-container">
         <CWText type="h4">Advanced Options</CWText>
 
-        {advancedOptions.map(({ type, chainBase, title, description }) => (
-          <CWCommunitySelector
-            key={type}
-            type={type}
-            title={title}
-            description={description}
-            onClick={() => handleCommunitySelection({ type, chainBase })}
-          />
-        ))}
+        {advancedOptions
+          .filter(({ isHidden }) => !isHidden)
+          .map(({ type, chainBase, title, description }) => (
+            <CWCommunitySelector
+              key={type}
+              type={type}
+              title={title}
+              description={description}
+              onClick={() => handleCommunitySelection({ type, chainBase })}
+            />
+          ))}
       </div>
       <CWModal
         size="small"
@@ -120,8 +122,10 @@ const CommunityTypeStep = ({
         open={isNewCommunityAdminModalOpen}
       />
       <CWModal
+        rootClassName="CreateCommunityLoginModal"
         content={
           <LoginModal
+            initialSidebar="createCommunityLogin"
             initialWallets={availableWallets}
             onModalClose={() => setIsLoginModalOpen(false)}
             onSuccess={() => {

@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
 import { slugifyPreserveDashes } from 'utils';
+
+import { ChainBase } from '@hicommonwealth/core';
+import { notifyError } from 'controllers/app/notifications';
+import useCreateCommunityMutation from 'state/api/communities/createCommunity';
 import {
   CWCoverImageUploader,
   ImageBehavior,
@@ -7,41 +11,51 @@ import {
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
+import { CommunityType } from 'views/components/component_kit/new_designs/CWCommunitySelector';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
-import { ZodError } from 'zod';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 import './BasicInformationForm.scss';
 import {
-  POLOGON_CHAIN_OPTION,
+  ETHEREUM_MAINNET_ID,
+  OSMOSIS_ID,
+  POLYGON_ETH_CHAIN_ID,
   chainTypes,
   existingCommunityNames,
 } from './constants';
-import {
-  BasicInformationFormProps,
-  FormSubmitValues,
-  SocialLinkField,
-} from './types';
-import {
-  basicInformationFormValidationSchema,
-  socialLinkValidation,
-} from './validation';
+import { BasicInformationFormProps, FormSubmitValues } from './types';
+import { basicInformationFormValidationSchema } from './validation';
+
+import useSocialLinks from './useSocialLinks';
+
+const socialLinksDisplay = false; // TODO: Set this when design figures out how we will integrate the social links
 
 const BasicInformationForm = ({
-  chainEcosystem,
+  selectedAddress,
+  selectedCommunity,
   onSubmit,
   onCancel,
 }: BasicInformationFormProps) => {
   const [communityName, setCommunityName] = useState('');
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
     useState(false);
-  const [socialLinks, setSocialLinks] = useState<SocialLinkField[]>([
-    {
-      value: '',
-      error: '',
-    },
-  ]);
+
+  const {
+    socialLinks,
+    addLink,
+    removeLinkAtIndex,
+    validateSocialLinks,
+    updateAndValidateSocialLinkAtIndex,
+  } = useSocialLinks();
+
+  const {
+    mutateAsync: createCommunityMutation,
+    isLoading: createCommunityLoading,
+  } = useCreateCommunityMutation();
+
+  const communityId = slugifyPreserveDashes(communityName.toLowerCase());
   const isCommunityNameTaken = existingCommunityNames.find(
     (name) => name === communityName.trim().toLowerCase(),
   );
@@ -49,13 +63,18 @@ const BasicInformationForm = ({
   const getChainOptions = () => {
     // Since we are treating polygon as an ecosystem, we will only have a single option, which will be
     // preselected and further input's will be disabled
-    if (chainEcosystem === 'polygon') {
-      return [POLOGON_CHAIN_OPTION];
+    if (selectedCommunity.type === CommunityType.Polygon) {
+      return chainTypes
+        .filter((chainType) => chainType.value === POLYGON_ETH_CHAIN_ID)
+        .map((chainType) => ({
+          label: chainType.label,
+          value: `${chainType.value}`,
+        }));
     }
 
-    if (chainEcosystem === 'solana') {
+    if (selectedCommunity.type === CommunityType.Solana) {
       return chainTypes
-        .filter((x) => x.chainBase === 'solana')
+        .filter((chainType) => chainType.chainBase === CommunityType.Solana)
         .map((chainType) => ({
           label: chainType.label,
           value: `${chainType.value}`,
@@ -64,8 +83,11 @@ const BasicInformationForm = ({
 
     return chainTypes
       .filter(
-        (x) =>
-          x.chainBase === (chainEcosystem === 'cosmos' ? 'cosmos' : 'ethereum'),
+        (chainType) =>
+          chainType.chainBase ===
+          (selectedCommunity.type === CommunityType.Cosmos
+            ? CommunityType.Cosmos
+            : CommunityType.Ethereum),
       )
       .map((chainType) => ({
         label: chainType.label,
@@ -73,76 +95,77 @@ const BasicInformationForm = ({
       }));
   };
 
-  const addLink = () => {
-    setSocialLinks((x) => [...(x || []), { value: '', error: '' }]);
-  };
-
-  const removeLinkAtIndex = (index: number) => {
-    const updatedSocialLinks = [...socialLinks];
-    updatedSocialLinks.splice(index, 1);
-    setSocialLinks([...updatedSocialLinks]);
-  };
-
-  const validateSocialLinks = (): boolean => {
-    const updatedSocialLinks = [...socialLinks];
-    socialLinks.map((link, index) => {
-      try {
-        const schema = socialLinkValidation;
-        if (link.value.trim() !== '') {
-          schema.parse(link.value);
-        }
-
-        updatedSocialLinks[index] = {
-          ...updatedSocialLinks[index],
-          error: '',
+  const getInitialValue = () => {
+    switch (selectedCommunity.type) {
+      case CommunityType.Ethereum:
+        return {
+          chain: getChainOptions()?.find(
+            (o) => o.value === ETHEREUM_MAINNET_ID,
+          ),
         };
-      } catch (e: any) {
-        const zodError = e as ZodError;
-        updatedSocialLinks[index] = {
-          ...updatedSocialLinks[index],
-          error: zodError.errors[0].message,
+      case CommunityType.Cosmos:
+        return {
+          chain: getChainOptions()?.find((o) => o.value === OSMOSIS_ID),
         };
-      }
-    });
-
-    setSocialLinks([...updatedSocialLinks]);
-
-    return !!updatedSocialLinks.find((x) => x.error);
-  };
-
-  const updateAndValidateSocialLinkAtIndex = (value: string, index: number) => {
-    const updatedSocialLinks = [...socialLinks];
-    updatedSocialLinks[index] = {
-      ...updatedSocialLinks[index],
-      value,
-    };
-    try {
-      const schema = socialLinkValidation;
-      if (updatedSocialLinks[index].value.trim() !== '') {
-        schema.parse(updatedSocialLinks[index].value);
-      }
-
-      updatedSocialLinks[index] = {
-        ...updatedSocialLinks[index],
-        error: '',
-      };
-    } catch (e: any) {
-      const zodError = e as ZodError;
-      updatedSocialLinks[index] = {
-        ...updatedSocialLinks[index],
-        error: zodError.errors[0].message,
-      };
+      case CommunityType.Polygon:
+      case CommunityType.Solana:
+        return { chain: getChainOptions()?.[0] };
     }
-    setSocialLinks([...updatedSocialLinks]);
   };
 
   const handleSubmit = async (values: FormSubmitValues) => {
     const hasLinksError = validateSocialLinks();
-    if (isCommunityNameTaken || hasLinksError) return;
 
+    if (isCommunityNameTaken || hasLinksError) return;
     values.links = socialLinks.map((link) => link.value).filter(Boolean);
 
-    await onSubmit(values);
+    const selectedChainNode = chainTypes.find(
+      (chain) => String(chain.value) === values.chain.value,
+    );
+
+    try {
+      await createCommunityMutation({
+        id: communityId,
+        name: values.communityName,
+        chainBase: selectedCommunity.chainBase,
+        description: values.communityDescription,
+        iconUrl: values.communityProfileImageURL,
+        socialLinks: values.links,
+        nodeUrl: selectedChainNode.nodeUrl,
+        altWalletUrl: selectedChainNode.altWalletUrl,
+        userAddress: selectedAddress.address,
+        ...(selectedCommunity.chainBase === ChainBase.Ethereum && {
+          ethChainId: values.chain.value,
+        }),
+        ...(selectedCommunity.chainBase === ChainBase.CosmosSDK && {
+          cosmosChainId: values.chain.value,
+          bech32Prefix: selectedChainNode.bech32Prefix,
+        }),
+      });
+      onSubmit(communityId);
+    } catch (err) {
+      notifyError(err.response?.data?.error);
+    }
+  };
+
+  const handleCancel = () => {
+    openConfirmation({
+      title: 'Are you sure you want to cancel?',
+      description: 'Your details will not be saved. Cancel create community?',
+      buttons: [
+        {
+          label: 'Yes, cancel',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
+          onClick: onCancel,
+        },
+        {
+          label: 'No, continue',
+          buttonType: 'primary',
+          buttonHeight: 'sm',
+        },
+      ],
+    });
   };
 
   return (
@@ -150,18 +173,8 @@ const BasicInformationForm = ({
       validationSchema={basicInformationFormValidationSchema}
       onSubmit={handleSubmit}
       className="BasicInformationForm"
-      initialValues={{
-        ...(chainEcosystem === 'polygon' && { chain: POLOGON_CHAIN_OPTION }),
-        ...(chainEcosystem === 'solana' && { chain: getChainOptions()?.[0] }),
-      }}
+      initialValues={getInitialValue()}
     >
-      <section className="header">
-        <CWText type="h2">Tell us about your community</CWText>
-        <CWText type="b1" className="description">
-          Let’s start with some basic information about your community
-        </CWText>
-      </section>
-
       {/* Form fields */}
       <CWTextInput
         name="communityName"
@@ -181,7 +194,10 @@ const BasicInformationForm = ({
         isClearable={false}
         label="Select chain"
         placeholder="Select chain"
-        isDisabled={chainEcosystem === 'polygon' || chainEcosystem === 'solana'}
+        isDisabled={
+          selectedCommunity.type === CommunityType.Polygon ||
+          selectedCommunity.type === CommunityType.Solana
+        }
         options={getChainOptions()}
       />
 
@@ -190,13 +206,7 @@ const BasicInformationForm = ({
         placeholder="URL will appear when you name your community"
         fullWidth
         disabled
-        value={
-          communityName
-            ? `${window.location.origin}/${slugifyPreserveDashes(
-                communityName.toLowerCase(),
-              )}`
-            : ''
-        }
+        value={communityName ? `${window.location.origin}/${communityId}` : ''}
       />
 
       <CWTextArea
@@ -218,53 +228,60 @@ const BasicInformationForm = ({
         enableGenerativeAI
       />
 
-      <section className="header">
-        <CWText type="h4">
-          Community Links{' '}
-          <CWText type="b1" className="optional-label">
-            &#40;Optional&#41;
-          </CWText>
-        </CWText>
-        <CWText type="b1" className="description">
-          Add your Discord, Twitter (X), Telegram, Website, etc.
-        </CWText>
-      </section>
+      {socialLinksDisplay ? (
+        <>
+          <section className="header">
+            <CWText type="h4">
+              Community Links{' '}
+              <CWText type="b1" className="optional-label">
+                &#40;Optional&#41;
+              </CWText>
+            </CWText>
+            <CWText type="b1" className="description">
+              Add your Discord, Twitter (X), Telegram, Website, etc.
+            </CWText>
+          </section>
 
-      {/* Social links */}
-      <section className="social-links">
-        <CWText type="caption">Social Links</CWText>
+          <section className="social-links">
+            <CWText type="caption">Social Links</CWText>
 
-        {socialLinks.map((x, index) => (
-          <div className="link-input-container" key={index}>
-            <CWTextInput
-              containerClassName="w-full"
-              placeholder="https://example.com"
-              fullWidth
-              value={x.value}
-              customError={x.error}
-              onInput={(e) =>
-                updateAndValidateSocialLinkAtIndex(
-                  e.target.value?.trim(),
-                  index,
-                )
-              }
-              onBlur={() => updateAndValidateSocialLinkAtIndex(x.value, index)}
-              onFocus={() => updateAndValidateSocialLinkAtIndex(x.value, index)}
-            />
-            <CWIconButton
-              iconButtonTheme="neutral"
-              iconName="trash"
-              iconSize="large"
-              onClick={() => removeLinkAtIndex(index)}
-              disabled={socialLinks.length === 1}
-            />
-          </div>
-        ))}
+            {socialLinks.map((socialLink, index) => (
+              <div className="link-input-container" key={index}>
+                <CWTextInput
+                  containerClassName="w-full"
+                  placeholder="https://example.com"
+                  fullWidth
+                  value={socialLink.value}
+                  customError={socialLink.error}
+                  onInput={(e) =>
+                    updateAndValidateSocialLinkAtIndex(
+                      e.target.value?.trim(),
+                      index,
+                    )
+                  }
+                  onBlur={() =>
+                    updateAndValidateSocialLinkAtIndex(socialLink.value, index)
+                  }
+                  onFocus={() =>
+                    updateAndValidateSocialLinkAtIndex(socialLink.value, index)
+                  }
+                />
+                <CWIconButton
+                  iconButtonTheme="neutral"
+                  iconName="trash"
+                  iconSize="large"
+                  onClick={() => removeLinkAtIndex(index)}
+                  disabled={socialLinks.length === 1}
+                />
+              </div>
+            ))}
 
-        <button type="button" className="add-link-button" onClick={addLink}>
-          + Add social link
-        </button>
-      </section>
+            <button type="button" className="add-link-button" onClick={addLink}>
+              + Add social link
+            </button>
+          </section>
+        </>
+      ) : null}
 
       {/* Action buttons */}
       <section className="action-buttons">
@@ -273,13 +290,13 @@ const BasicInformationForm = ({
           label="Cancel"
           buttonWidth="wide"
           buttonType="secondary"
-          onClick={onCancel}
+          onClick={handleCancel}
         />
         <CWButton
           type="submit"
           buttonWidth="wide"
           label="Launch Community"
-          disabled={isProcessingProfileImage}
+          disabled={createCommunityLoading || isProcessingProfileImage}
         />
       </section>
     </CWForm>

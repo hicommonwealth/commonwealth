@@ -1,5 +1,5 @@
+import { ChainBase } from '@hicommonwealth/core';
 import { useQuery } from '@tanstack/react-query';
-import { ChainBase } from 'common-common/src/types';
 import Cosmos from 'controllers/chain/cosmos/adapter';
 import {
   CosmosDepositParams,

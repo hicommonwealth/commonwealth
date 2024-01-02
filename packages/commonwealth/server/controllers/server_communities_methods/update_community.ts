@@ -1,6 +1,6 @@
 /* eslint-disable no-continue */
+import { ChainBase } from '@hicommonwealth/core';
 import { AppError } from 'common-common/src/errors';
-import { ChainBase } from 'common-common/src/types';
 import { Op } from 'sequelize';
 import type { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
 import { UserInstance } from 'server/models/user';
@@ -102,10 +102,11 @@ export async function __updateCommunity(
     snapshot = [];
   }
 
-  const invalidSocialLinks = social_links?.filter(
+  const nonEmptySocialLinks = social_links?.filter((s) => s && s !== '');
+  const invalidSocialLinks = nonEmptySocialLinks?.filter(
     (s) => !urlHasValidHTTPPrefix(s),
   );
-  if (social_links && invalidSocialLinks.length > 0) {
+  if (nonEmptySocialLinks && invalidSocialLinks.length > 0) {
     throw new AppError(`${invalidSocialLinks[0]}: ${Errors.InvalidSocialLink}`);
   } else if (custom_domain && custom_domain.includes('commonwealth')) {
     throw new AppError(Errors.InvalidCustomDomain);
@@ -175,8 +176,8 @@ export async function __updateCommunity(
   if (icon_url) chain.icon_url = icon_url;
   if (active !== undefined) chain.active = active;
   if (type) chain.type = type;
-  if (social_links !== undefined && social_links.length > 0)
-    chain.social_links = social_links;
+  if (nonEmptySocialLinks !== undefined && nonEmptySocialLinks.length > 0)
+    chain.social_links = nonEmptySocialLinks;
   if (hide_projects) chain.hide_projects = hide_projects;
   if (stages_enabled) chain.stages_enabled = stages_enabled;
   if (custom_stages) chain.custom_stages = custom_stages;

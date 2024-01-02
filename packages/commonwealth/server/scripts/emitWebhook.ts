@@ -2,7 +2,7 @@ import {
   NotificationCategories,
   ProposalType,
   SupportedNetwork,
-} from 'common-common/src/types';
+} from '@hicommonwealth/core';
 import { NotificationDataAndCategory, WebhookCategory } from 'types';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';

@@ -1,6 +1,6 @@
-import { assert, expect, use as chaiUse } from 'chai';
-import { BalanceType } from 'common-common/src/types';
-import { BigNumber, BigNumberish, CallOverrides } from 'ethers';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { BalanceType } from '@hicommonwealth/core';
+import { assert, use as chaiUse, expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import CosmosBalanceProvider from '../src/providers/cosmos';
 import type { IChainNode } from '../src/types';
@@ -61,7 +61,7 @@ describe('Cosmos BP unit tests', () => {
     const nodes = await mockNodesProvider();
     const balance = await cosmosBp.getBalance(
       nodes[0],
-      'cosmos1tn4hpcgfxxjhs3y06g5je0cg6tn3xqrkh99z7e'
+      'cosmos1tn4hpcgfxxjhs3y06g5je0cg6tn3xqrkh99z7e',
     );
 
     assert.equal(balance, '12345678912345678910');
@@ -73,8 +73,8 @@ describe('Cosmos BP unit tests', () => {
     return expect(
       cosmosBp.getBalance(
         nodes[1],
-        'cosmos1tn4hpcgfxxjhs3y06g5je0cg6tn3xqrkh99z7e'
-      )
+        'cosmos1tn4hpcgfxxjhs3y06g5je0cg6tn3xqrkh99z7e',
+      ),
     ).to.be.rejectedWith('No cosmos prefix found!');
   });
 });
