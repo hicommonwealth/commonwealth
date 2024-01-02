@@ -1,12 +1,13 @@
 import fs from 'fs';
 import prerender from 'prerender';
+import prerenderCache from 'prerender-memory-cache';
 
 const run = (server) => {
   server.use(prerender.sendPrerenderHeader());
   // server.use(prerender.blockResources());
   server.use(prerender.removeScriptTags());
   server.use(prerender.httpHeaders());
-
+  server.use(prerenderCache);
   server.start();
 };
 
@@ -16,6 +17,7 @@ const setupPrerenderServer = () => {
   const isLinux = process.platform === 'linux';
   if (isLinux) {
     if (fs.existsSync('/app/.apt/usr/bin/google-chrome')) {
+      console.log('\n\nUSING LINUX GOOGLE CHROME!!!\n\n');
       const server = prerender({
         chromeLocation: '/app/.apt/usr/bin/google-chrome',
         port: 3000,
