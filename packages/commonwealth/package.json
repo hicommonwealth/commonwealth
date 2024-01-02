@@ -7,7 +7,7 @@
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
     "build-android": "NODE_ENV=mobile webpack --config webpack/webpack.config.mobile.js --progress && NODE_ENV=mobile npx cap sync android",
-    "build-all": "NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.prod.config.js --progress && yarn build",
+    "build-all": "NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.prod.config.js --progress",
     "build-consumer": "tsc --project tsconfig.worker.json && tsc-alias --project tsconfig.worker.json",
     "build-ios": "NODE_ENV=mobile webpack --config webpack/webpack.config.mobile.js --progress && NODE_ENV=mobile npx cap sync ios",
     "bundle-report": "webpack-bundle-analyzer --port 4200 build/stats.json",
