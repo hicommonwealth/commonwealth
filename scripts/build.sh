@@ -1,8 +1,5 @@
 #! /bin/bash
  
-# install 
-yarn
-
 # build libs
 yarn build-libs
 
