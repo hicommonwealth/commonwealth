@@ -10,38 +10,32 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
 
+type Stats = {
+  numCommentsLastMonth: number;
+  numThreadsLastMonth: number;
+  numPollsLastMonth: number;
+  numReactionsLastMonth: number;
+  numProposalVotesLastMonth: number;
+  numMembersLastMonth: number;
+  numGroupsLastMonth: number;
+};
+
 const Analytics = () => {
   const [initialized, setInitialized] = useState<boolean>(false);
   const [lastMonthNewCommunties, setLastMonthNewCommunities] = useState<
     string[]
   >([]);
-  const [globalStats, setGlobalStats] = useState<{
-    numCommentsLastMonth: number;
-    numThreadsLastMonth: number;
-    numPollsLastMonth: number;
-    numReactionsLastMonth: number;
-    numProposalVotesLastMonth: number;
-    numMembersLastMonth: number;
-    numGroupsLastMonth: number;
-  }>();
+  const [globalStats, setGlobalStats] = useState<Stats>();
   const [communityLookupValue, setCommunityLookupValue] = useState<string>('');
   const [communityLookupValidated, setCommunityLookupValidated] =
     useState<boolean>(false);
   const [communityLookupCompleted, setCommunityLookupCompleted] =
     useState<boolean>(false);
-  const [communityAnalytics, setCommunityAnalytics] = useState<{
-    numCommentsLastMonth: number;
-    numThreadsLastMonth: number;
-    numPollsLastMonth: number;
-    numReactionsLastMonth: number;
-    numProposalVotesLastMonth: number;
-    numMembersLastMonth: number;
-    numGroupsLastMonth: number;
-  }>();
+  const [communityAnalytics, setCommunityAnalytics] = useState<Stats>();
 
   const getCommunityAnalytics = async (communityId: string) => {
     axios
-      .get(`${app.serverUrl()}/communities/${communityId}/stats`, {
+      .get(`${app.serverUrl()}/admin/analytics?community_id=${communityId}`, {
         params: {
           auth: true,
           jwt: app.user.jwt,
@@ -61,9 +55,10 @@ const Analytics = () => {
     // Fetch global analytics on load
     const fetchAnalytics = async () => {
       axios
-        .get(`${app.serverUrl()}/adminAnalytics`, {
-          headers: {
-            'content-type': 'application/json',
+        .get(`${app.serverUrl()}/admin/analytics`, {
+          params: {
+            auth: true,
+            jwt: app.user.jwt,
           },
         })
         .then((response) => {
