@@ -5,9 +5,9 @@ import {
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
+import { SERVER_URL } from '../server/config';
 import { AccessLevel } from './permissions';
 import type { RoleObject } from './types';
-import { SERVER_URL } from 'server/config';
 
 export const slugify = (str: string): string => {
   // Remove any character that isn't a alphanumeric character or a
@@ -68,7 +68,7 @@ export const getThreadUrlWithoutObject = (
 };
 
 export const getCommunityUrl = (community: string): string => {
-  return `${SERVER_URL}/${community}`
+  return `${SERVER_URL}/${community}`;
 };
 
 export const smartTrim = (text, maxLength = 200) => {
