@@ -30,7 +30,7 @@ For more complete Heroku documentation, see our dedicated [knowledge base entry]
 
 ### Postgres Metrics
 
-To enable Postgres Metrics, the env var `DD_ENABLE_HEROKU_POSTGRES` must be set to `true`. 
+To enable Postgres Metrics, the env var `DD_ENABLE_HEROKU_POSTGRES` must be set to `true`.
 
 For a list of available `postgresql` metrics, see <https://docs.datadoghq.com/integrations/postgres/?tab=host#metrics>. Because we host through Heroku, not all these metrics will be reported; the only way to know is to create a metric and find out.
 
@@ -45,24 +45,48 @@ To enable Postgres Metrics, the env var `DD_ENABLE_HEROKU_REDIS` must be set to 
 
 To set up the RabbitMQ metrics, navigate to "Resources" from the Heroku dashboard. Then pull up CloudAMQP, navigate to the "Integrations" tab listed in the sidebar. Navigate to "Logs & Metrics"; from the Metrics section, add DataDog v2 integration.
 
-For a list of the metrics available on `rabbitmq`, see >https://docs.datadoghq.com/integrations/rabbitmq/?tab=host#metrics>. Because we host through Heroku, not all these metrics will be reported; the only way to know is to create a metric and find out.
+For a list of the metrics available on `rabbitmq`, see <https://docs.datadoghq.com/integrations/rabbitmq/?tab=host#metrics>. Because we host through Heroku, not all these metrics will be reported; the only way to know is to create a metric and find out.
 
 For more complete RabbitMQ documentation, see our dedicated [knowledge base entry](./RabbitMQ.md).
 
-## Environment Variables
+## Configuration Prerequisites
 
-Set the following environment variables:
+These steps detail our Datadog-Heroku setup, in case it needs to be redone.
 
-```bash
-  DD_AGENT_MAJOR_VERSION=7
-  DD_API_KEY=<SECRET-DATADOG-ACCOUNT-KEY>
-  DD_DYNO_HOST=true
-  DD_LOG_LEVEL=WARN
-  DD_SITE=us5.datadoghq.com
-  DD_ENABLE_HEROKU_POSTGRES=true
-  DD_ENABLE_HEROKU_REDIS=true
-  DD_DISABLE_HOST_METRICS=true
-```
+`Warning:` Following steps below may lead your app to restart several times; please choose an appropriate maintainance window.
+
+See also Datadog's [Heroku Agent Guide](https://docs.datadoghq.com/agent/basic_agent_usage/heroku/).
+
+1. Set the following environment variables:
+
+    ```bash
+      DD_AGENT_MAJOR_VERSION=7
+      DD_API_KEY=<SECRET-DATADOG-ACCOUNT-KEY>
+      DD_DYNO_HOST=true
+      DD_LOG_LEVEL=WARN
+      DD_SITE=us5.datadoghq.com
+      DD_ENABLE_HEROKU_POSTGRES=true
+      DD_ENABLE_HEROKU_REDIS=true
+    ```
+
+2. Install the Datadog buildpack. Copy the following URL on Heroku App settings page using `Add Buildpack` button: <https://github.com/Datadog/heroku-buildpack-datadog.git>.
+
+3. Configure Postgres. Place the following Postgres Datadog config file in root folder of a Heroku app, `datadog/conf.d/postgres.yaml`. Leave the file generic; parameters will be replaced by `prerun.sh` on runtime if available.
+
+    ```yaml
+    init_config:
+
+    instances:
+      - dbm: true
+        host: <YOUR HOSTNAME>
+        port: <YOUR PORT>
+        username: <YOUR USERNAME>
+        password: <YOUR PASSWORD>
+        dbname: <YOUR DBNAME>
+        ssl: True
+    ```
+
+4. Verify on Datadog. Visit <https://us5.datadoghq.com/dashboard/lists> for all available dashboards. If the Datadog agent successfully picked up the Postgres config, you will see your app database name in the top dropdown in Postgres dashboards.
 
 ## Change Log
 
