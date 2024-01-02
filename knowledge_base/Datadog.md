@@ -92,5 +92,5 @@ See also Datadog's [Heroku Agent Guide](https://docs.datadoghq.com/agent/basic_a
 
 ## Change Log
 
-- 240102: Rewritten by Graham Johnson with assistance of Timothee Legros.
-- 231031: Split off by Graham Johnson from `commonwealth/README.md`. Flagged for overhaul.
+- 240102: Rewritten by Graham Johnson with assistance of Timothee Legros (#6183).
+- 231031: Split off by Graham Johnson from `commonwealth/README.md` (#5521). Flagged for overhaul.
