@@ -43,7 +43,7 @@ const Analytics = () => {
       })
       .then((response) => {
         setCommunityLookupCompleted(true);
-        setCommunityAnalytics(response.data.result);
+        setCommunityAnalytics(response.data.result.totalStats);
       })
       .catch((error) => {
         console.log(error);

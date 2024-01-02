@@ -15,14 +15,16 @@ export type GetStatsOptions = {
 };
 
 export type GetStatsResult = {
-  newCommunities: Array<{ id: string }> | null;
-  numCommentsLastMonth: number;
-  numThreadsLastMonth: number;
-  numPollsLastMonth: number;
-  numReactionsLastMonth: number;
-  numProposalVotesLastMonth: number;
-  numMembersLastMonth: number;
-  numGroupsLastMonth: number;
+  lastMonthNewCommunities: Array<{ id: string }>;
+  totalStats: {
+    numCommentsLastMonth: number;
+    numThreadsLastMonth: number;
+    numPollsLastMonth: number;
+    numReactionsLastMonth: number;
+    numProposalVotesLastMonth: number;
+    numMembersLastMonth: number;
+    numGroupsLastMonth: number;
+  };
 };
 
 export async function __getStats(
@@ -42,9 +44,9 @@ export async function __getStats(
     }
   }
 
-  let newCommunities: Array<{ id: string }> | null = null;
+  let lastMonthNewCommunities: Array<{ id: string }> = [];
   if (!community) {
-    newCommunities = await this.models.sequelize.query(
+    lastMonthNewCommunities = await this.models.sequelize.query(
       `SELECT id FROM "Communities" WHERE created_at >= NOW() - INTERVAL '30 days'`,
       { type: QueryTypes.SELECT },
     );
@@ -94,13 +96,15 @@ export async function __getStats(
   });
 
   return {
-    newCommunities,
-    numCommentsLastMonth,
-    numThreadsLastMonth,
-    numReactionsLastMonth,
-    numProposalVotesLastMonth,
-    numPollsLastMonth,
-    numMembersLastMonth,
-    numGroupsLastMonth,
+    lastMonthNewCommunities,
+    totalStats: {
+      numCommentsLastMonth,
+      numThreadsLastMonth,
+      numReactionsLastMonth,
+      numProposalVotesLastMonth,
+      numPollsLastMonth,
+      numMembersLastMonth,
+      numGroupsLastMonth,
+    },
   };
 }

@@ -1,20 +1,20 @@
 import { GetStatsResult } from '../../controllers/server_admin_methods/get_stats';
 import { ServerControllers } from '../../routing/router';
-import { TypedRequestParams, TypedResponse, success } from '../../types';
+import { TypedRequestQuery, TypedResponse, success } from '../../types';
 
-type GetStatsRequestParams = {
-  communityId: string;
+type GetStatsRequestQuery = {
+  community_id: string;
 };
 type GetStatsResponse = GetStatsResult;
 
 export const getStatsHandler = async (
   controllers: ServerControllers,
-  req: TypedRequestParams<GetStatsRequestParams>,
+  req: TypedRequestQuery<GetStatsRequestQuery>,
   res: TypedResponse<GetStatsResponse>,
 ) => {
   const stats = await controllers.admin.getStats({
     user: req.user,
-    communityId: req.params.communityId,
+    communityId: req.query.community_id,
   });
   return success(res, stats);
 };
