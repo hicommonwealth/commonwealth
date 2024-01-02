@@ -22,7 +22,7 @@ export type TopicAttributes = {
   group_ids: number[];
 
   // associations
-  chain?: CommunityAttributes;
+  community?: CommunityAttributes;
   threads?: ThreadAttributes[] | TopicAttributes['id'][];
 };
 

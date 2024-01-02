@@ -30,7 +30,7 @@ const getCommunityQuery = (
             model: models.Topic,
             as: 'topics',
             required: false,
-            attributes: ['id', 'name', 'chain_id'],
+            attributes: ['id', 'name', 'community_id'],
           },
         ]
       : []),

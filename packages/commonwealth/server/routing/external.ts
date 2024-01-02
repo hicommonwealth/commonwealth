@@ -141,7 +141,7 @@ export function addExternalRoutes(
   router.delete(
     '/topics',
     onlyIds,
-    deleteEntities.bind(this, 'chain_id', models, models.Topic),
+    deleteEntities.bind(this, 'community_id', models, models.Topic),
   );
 
   router.get(
