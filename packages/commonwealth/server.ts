@@ -29,6 +29,7 @@ import * as v8 from 'v8';
 import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers';
 import {
   DATABASE_CLEAN_HOUR,
+  PRERENDER_TOKEN,
   RABBITMQ_URI,
   REDIS_URL,
   ROLLBAR_ENV,
@@ -198,8 +199,7 @@ async function main() {
     app.use(sessionParser);
     app.use(passport.initialize());
     app.use(passport.session());
-    // app.use(prerenderNode.set('prerenderToken', process.env.PRERENDER_TOKEN));
-    app.use(prerenderNode.set('prerenderServiceUrl', 'http://127.0.0.1:3000'));
+    app.use(prerenderNode.set('prerenderToken', PRERENDER_TOKEN));
   };
 
   const templateFile = (() => {
