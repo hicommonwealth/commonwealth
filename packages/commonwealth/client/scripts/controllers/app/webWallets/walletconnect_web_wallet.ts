@@ -21,7 +21,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   private _web3: Web3;
 
   public readonly name = WalletId.WalletConnect;
-  public readonly label = 'WalletConnect';
+  public readonly label = 'EVM Broswer Wallets';
   public readonly chain = ChainBase.Ethereum;
   public readonly available = true;
   public readonly defaultNetwork = ChainNetwork.Ethereum;
@@ -96,42 +96,31 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     this._enabled = false;
   }
 
-  public async enable() {
+  public async enable(modal: any) {
     console.log('Attempting to enable WalletConnect');
-    this._enabling = true;
-    // try {
-    // Create WalletConnect Provider
-    this._chainInfo =
-      app.chain?.meta || app.config.chains.getById(this.defaultNetwork);
-    const chainId = this._chainInfo.node?.ethChainId || 1;
-    const EthereumProvider = (await import('@walletconnect/ethereum-provider'))
-      .default;
-    this._provider = await EthereumProvider.init({
-      projectId: '927f4643b1e10ad3dbdbdbdaf9c5fbbe',
-      chains: [chainId],
-      optionalMethods: ['eth_getBlockByNumber', 'eth_sendTransaction'],
-      showQrModal: true,
-    });
 
-    await this._provider.connect({
-      chains: [chainId], // OPTIONAL chain ids
-    });
-    // destroy pre-existing session if exists
-    if (this._provider.wc?.connected) {
-      await this._provider.wc.killSession();
+    if (modal.getIsConnected()) {
+      this._enabling = true;
+      // try {
+      // Create WalletConnect Provider
+      this._chainInfo =
+        app.chain?.meta || app.config.chains.getById(this.defaultNetwork);
+      const chainId = this._chainInfo.node?.ethChainId || 1;
+      this._provider = modal.getWalletProvider();
+
+      const Web3 = (await import('web3')).default;
+      this._web3 = new Web3(this._provider as any);
+      this._accounts = await this._web3.eth.getAccounts();
+      console.log(this._accounts);
+      if (this._accounts.length === 0) {
+        throw new Error('WalletConnect fetched no accounts.');
+      }
+
+      await this.initAccountsChanged();
+      this._enabled = true;
+      this._enabling = false;
+      console.log('WalletConnect enabled');
     }
-
-    const Web3 = (await import('web3')).default;
-    this._web3 = new Web3(this._provider as any);
-    this._accounts = await this._web3.eth.getAccounts();
-    if (this._accounts.length === 0) {
-      throw new Error('WalletConnect fetched no accounts.');
-    }
-
-    await this.initAccountsChanged();
-    this._enabled = true;
-    this._enabling = false;
-    console.log('WalletConnect enabled');
     // } catch (error) {
     //   this._enabling = false;
     //   throw new Error(`Failed to enable WalletConnect: ${error.message}`);

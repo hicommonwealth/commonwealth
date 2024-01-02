@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import type { SessionPayload } from '@canvas-js/interfaces';
 import { ChainBase, WalletSsoSource } from '@hicommonwealth/core';
+import { createWeb3Modal, defaultConfig } from '@web3modal/ethers/react';
 import 'components/component_kit/cw_wallets_list.scss';
 import {
   completeClientLogin,
@@ -85,7 +86,9 @@ const useWallets = (walletProps: IuseWalletProps) => {
   const [signerAccount, setSignerAccount] = useState<Account>(null);
   const [isNewlyCreated, setIsNewlyCreated] = useState<boolean>(false);
   const [isLinkingOnMobile, setIsLinkingOnMobile] = useState<boolean>(false);
-
+  const [web3Modal, setWeb3Modal] = useState(null);
+  const [web3ModalOpen, setWeb3ModalOpen] = useState<boolean>(false);
+  console.log(web3ModalOpen);
   const isWalletConnectEnabled = _.some(
     wallets,
     (w) =>
@@ -171,7 +174,57 @@ const useWallets = (walletProps: IuseWalletProps) => {
     if (walletProps.initialWallets) {
       setWallets(walletProps.initialWallets);
     }
+    //Web3Modal init
+    // 1. Get projectId at https://cloud.walletconnect.com
+    const projectId = '927f4643b1e10ad3dbdbdbdaf9c5fbbe';
+
+    // 2. Set chains
+    const mainnet = {
+      chainId: 1,
+      name: 'Ethereum',
+      currency: 'ETH',
+      explorerUrl: 'https://etherscan.io',
+      rpcUrl:
+        'https://eth-mainnet.g.alchemy.com/v2/pZsX6R3wGdnwhUJHlVmKg4QqsiS32Qm4',
+    };
+
+    // 3. Create modal
+    const metadata = {
+      name: 'Commonwealth',
+      description: 'My Website description',
+      url: 'https://commonwealth.im',
+      icons: ['https://avatars.mywebsite.com/'],
+    };
+
+    const Modal = createWeb3Modal({
+      ethersConfig: defaultConfig({ metadata }),
+      chains: [mainnet],
+      projectId,
+    });
+    setWeb3Modal(Modal);
   }, []);
+
+  useEffect(() => {
+    if (wallets && web3Modal) {
+      web3Modal.subscribeState((modalState) => {
+        console.log('in modal event', modalState.open);
+        if (!modalState.open) {
+          onW3ModalClose();
+        }
+      });
+    }
+  }, [wallets, web3Modal, web3ModalOpen]);
+
+  const onW3ModalClose = async () => {
+    if (web3ModalOpen) {
+      const wallet = wallets.find(
+        (w) => w instanceof WalletConnectWebWalletController,
+      );
+      await wallet.enable(web3Modal);
+      await walletLogin(wallet);
+      setWeb3ModalOpen(false);
+    }
+  };
 
   // Handles Magic Link Login
   const onEmailLogin = async () => {
@@ -501,10 +554,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
     await wallet.reset();
   };
-
-  const onWalletSelect = async (wallet: IWebWallet<any>) => {
-    await wallet.enable();
-
+  const walletLogin = async (wallet: IWebWallet<any>) => {
     if (activeStep === 'selectPrevious') {
       setSelectedLinkingWallet(wallet);
     } else {
@@ -523,6 +573,15 @@ const useWallets = (walletProps: IuseWalletProps) => {
       } else {
         await onNormalWalletLogin(wallet, selectedAddress);
       }
+    }
+  };
+  const onWalletSelect = async (wallet: IWebWallet<any>) => {
+    if (!(wallet instanceof WalletConnectWebWalletController)) {
+      await wallet.enable();
+      await walletLogin(wallet);
+    } else {
+      setWeb3ModalOpen(true);
+      await web3Modal.open();
     }
   };
 
@@ -729,3 +788,6 @@ const useWallets = (walletProps: IuseWalletProps) => {
 };
 
 export default useWallets;
+function useEffectAsync(arg0: () => Promise<void>, arg1: any[]) {
+  throw new Error('Function not implemented.');
+}

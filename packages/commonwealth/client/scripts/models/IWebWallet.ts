@@ -12,7 +12,7 @@ interface IWebWallet<AccountT extends { address: string } | string> {
   enabling: boolean;
   accounts: readonly AccountT[];
   api?: any;
-  enable: () => Promise<void>;
+  enable: (modal?: any) => Promise<void>;
   reset?: () => Promise<void>;
 
   getChainId(): string | null;

@@ -46,7 +46,7 @@ export const verify = async ({
   if (chainBase === ChainBase.Ethereum) {
     // verify ethereum signature
     if (action) {
-      const ethersUtils = (await import('ethers')).utils;
+      const ethersUtils = await import('ethers');
       const { domain, types, message } = getEIP712SignableAction(actionPayload);
       delete types.EIP712Domain;
       const recoveredAddr = ethersUtils.verifyTypedData(
@@ -68,7 +68,7 @@ export const verify = async ({
 
       const siweMessage = createSiweMessage(sessionPayload, domain, nonce);
 
-      const ethersUtils = (await import('ethers')).utils;
+      const ethersUtils = await import('ethers');
       const recoveredAddr = ethersUtils.verifyMessage(
         siweMessage,
         signatureData,
