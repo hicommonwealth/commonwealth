@@ -1,4 +1,4 @@
-import { Op } from 'sequelize';
+import { Op, QueryTypes } from 'sequelize';
 import { AppError } from '../../../../common-common/src/errors';
 import { CommunityAttributes } from '../../models/community';
 import { UserInstance } from '../../models/user';
@@ -15,6 +15,7 @@ export type GetStatsOptions = {
 };
 
 export type GetStatsResult = {
+  newCommunities: Array<{ id: string }> | null;
   numCommentsLastMonth: number;
   numThreadsLastMonth: number;
   numPollsLastMonth: number;
@@ -39,6 +40,14 @@ export async function __getStats(
     if (!community) {
       throw new AppError(Errors.CommunityNotFound);
     }
+  }
+
+  let newCommunities: Array<{ id: string }> | null = null;
+  if (!community) {
+    newCommunities = await this.models.sequelize.query(
+      `SELECT id FROM "Communities" WHERE created_at >= NOW() - INTERVAL '30 days'`,
+      { type: QueryTypes.SELECT },
+    );
   }
 
   const oneMonthAgo = new Date();
@@ -85,6 +94,7 @@ export async function __getStats(
   });
 
   return {
+    newCommunities,
     numCommentsLastMonth,
     numThreadsLastMonth,
     numReactionsLastMonth,
