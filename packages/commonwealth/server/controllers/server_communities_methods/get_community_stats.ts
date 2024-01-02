@@ -20,11 +20,12 @@ export type GetCommunityStatsResult = {
   numReactionsLastMonth: number;
   numProposalVotesLastMonth: number;
   numMembersLastMonth: number;
+  numGroupsLastMonth: number;
 };
 
 export async function __getCommunityStats(
   this: ServerCommunitiesController,
-  { user, communityId }: GetCommunityStatsOptions
+  { user, communityId }: GetCommunityStatsOptions,
 ): Promise<GetCommunityStatsResult> {
   if (!user.isAdmin) {
     throw new AppError(Errors.NotAdmin);
@@ -98,6 +99,15 @@ export async function __getCommunityStats(
     },
   });
 
+  const numGroupsLastMonth = await this.models.Group.count({
+    where: {
+      created_at: {
+        [Op.gte]: oneMonthAgo,
+      },
+      community_id: community.id,
+    },
+  });
+
   // Aggregate results
 
   return {
@@ -107,5 +117,6 @@ export async function __getCommunityStats(
     numProposalVotesLastMonth,
     numPollsLastMonth,
     numMembersLastMonth,
+    numGroupsLastMonth,
   };
 }

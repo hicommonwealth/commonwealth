@@ -22,6 +22,7 @@ const Analytics = () => {
     numReactionsLastMonth: number;
     numProposalVotesLastMonth: number;
     numMembersLastMonth: number;
+    numGroupsLastMonth: number;
   }>();
   const [communityLookupValue, setCommunityLookupValue] = useState<string>('');
   const [communityLookupValidated, setCommunityLookupValidated] =
@@ -35,6 +36,7 @@ const Analytics = () => {
     numReactionsLastMonth: number;
     numProposalVotesLastMonth: number;
     numMembersLastMonth: number;
+    numGroupsLastMonth: number;
   }>();
 
   const getCommunityAnalytics = async (communityId: string) => {
@@ -149,6 +151,12 @@ const Analytics = () => {
                   {globalStats?.numMembersLastMonth}
                 </CWText>
               </div>
+              <div className="Stat">
+                <CWText fontWeight="medium">Total New Groups</CWText>
+                <CWText className="StatValue">
+                  {globalStats?.numGroupsLastMonth}
+                </CWText>
+              </div>
             </div>
           </div>
           <div className="AnalyticsSection">
@@ -208,6 +216,12 @@ const Analytics = () => {
                   <CWText fontWeight="medium">Total New Addresses</CWText>
                   <CWText className="StatValue">
                     {communityAnalytics?.numMembersLastMonth}
+                  </CWText>
+                </div>
+                <div className="Stat">
+                  <CWText fontWeight="medium">Total New Groups</CWText>
+                  <CWText className="StatValue">
+                    {communityAnalytics?.numGroupsLastMonth}
                   </CWText>
                 </div>
               </div>

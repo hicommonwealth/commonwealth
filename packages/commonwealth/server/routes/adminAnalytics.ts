@@ -19,13 +19,14 @@ type AdminAnalyticsResp = {
     numReactionsLastMonth: number;
     numProposalVotesLastMonth: number;
     numMembersLastMonth: number;
+    numGroupsLastMonth: number;
   };
 };
 
 const adminAnalytics = async (
   models: DB,
   req: TypedRequestBody<AdminAnalyticsReq>,
-  res: TypedResponse<AdminAnalyticsResp>
+  res: TypedResponse<AdminAnalyticsResp>,
 ) => {
   if (!req.user.isAdmin) {
     throw new AppError(Errors.NotAdmin);
@@ -35,7 +36,7 @@ const adminAnalytics = async (
     // New Communities
     const newCommunites: Array<{ id: string }> = await models.sequelize.query(
       `SELECT id FROM "Communities" WHERE created_at >= NOW() - INTERVAL '30 days'`,
-      { type: QueryTypes.SELECT }
+      { type: QueryTypes.SELECT },
     );
 
     // Community Stats
@@ -95,6 +96,14 @@ const adminAnalytics = async (
       },
     });
 
+    const numGroupsLastMonth = await models.Group.count({
+      where: {
+        created_at: {
+          [Op.gte]: oneMonthAgo,
+        },
+      },
+    });
+
     // Aggregate results
     const totalStats = {
       numCommentsLastMonth,
@@ -103,117 +112,13 @@ const adminAnalytics = async (
       numProposalVotesLastMonth,
       numPollsLastMonth,
       numMembersLastMonth,
+      numGroupsLastMonth,
     };
 
     return success(res, {
       lastMonthNewCommunities: newCommunites.map((c) => c.id),
       totalStats: totalStats,
     });
-  } catch (e) {
-    console.log(e);
-    throw new AppError(e);
-  }
-};
-
-type CommunitySpecificAnalyticsReq = {
-  chain: string;
-};
-
-type CommunitySpecificAnalyticsResp = {
-  numCommentsLastMonth: number;
-  numThreadsLastMonth: number;
-  numPollsLastMonth: number;
-  numReactionsLastMonth: number;
-  numProposalVotesLastMonth: number;
-  numMembersLastMonth: number;
-};
-
-export const communitySpecificAnalytics = async (
-  models: DB,
-  req: TypedRequestBody<CommunitySpecificAnalyticsReq>,
-  res: TypedResponse<CommunitySpecificAnalyticsResp>
-) => {
-  if (!req.user.isAdmin) {
-    throw new AppError(Errors.NotAdmin);
-  }
-
-  const chainId = req.chain.id;
-
-  try {
-    // Community Stats
-    const oneMonthAgo = new Date();
-    oneMonthAgo.setDate(oneMonthAgo.getDate() - 30);
-
-    // Count for Comments
-    const numCommentsLastMonth = await models.Comment.count({
-      where: {
-        created_at: {
-          [Op.gte]: oneMonthAgo,
-        },
-        chain: chainId,
-      },
-    });
-
-    // Count for Threads
-    const numThreadsLastMonth = await models.Thread.count({
-      where: {
-        created_at: {
-          [Op.gte]: oneMonthAgo,
-        },
-        chain: chainId,
-      },
-    });
-
-    // Count for Reactions
-    const numReactionsLastMonth = await models.Reaction.count({
-      where: {
-        created_at: {
-          [Op.gte]: oneMonthAgo,
-        },
-        chain: chainId,
-      },
-    });
-
-    // Count for Votes
-    const numProposalVotesLastMonth = await models.Vote.count({
-      where: {
-        created_at: {
-          [Op.gte]: oneMonthAgo,
-        },
-        community_id: chainId,
-      },
-    });
-
-    // Count for Polls
-    const numPollsLastMonth = await models.Poll.count({
-      where: {
-        created_at: {
-          [Op.gte]: oneMonthAgo,
-        },
-        community_id: chainId,
-      },
-    });
-
-    const numMembersLastMonth = await models.Address.count({
-      where: {
-        created_at: {
-          [Op.gte]: oneMonthAgo,
-        },
-        community_id: chainId,
-      },
-    });
-
-    // Aggregate results
-    const communityStats = {
-      numCommentsLastMonth,
-      numThreadsLastMonth,
-      numReactionsLastMonth,
-      numProposalVotesLastMonth,
-      numPollsLastMonth,
-      numMembersLastMonth,
-    };
-
-    return success(res, { ...communityStats });
   } catch (e) {
     console.log(e);
     throw new AppError(e);
