@@ -140,12 +140,10 @@ export default (
       paranoid: true,
       indexes: [
         { fields: ['id'] },
-        { fields: ['chain', 'thread_id'] },
         { fields: ['address_id'] },
-        { fields: ['chain', 'created_at'] },
-        { fields: ['chain', 'updated_at'] },
+        { fields: ['community_id', 'created_at'] },
+        { fields: ['community_id', 'updated_at'] },
         { fields: ['thread_id'] },
-        { fields: ['canvas_hash'] },
       ],
     },
   );
