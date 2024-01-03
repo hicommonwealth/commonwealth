@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { Op, Sequelize } from 'sequelize';
+import { FindOptions, Op, Sequelize } from 'sequelize';
 import { MEMBERSHIP_REFRESH_TTL_SECONDS } from '../../config';
 import { DB } from '../../models';
 import { AddressAttributes } from '../../models/address';
@@ -28,7 +28,7 @@ export async function refreshMembershipsForAddress(
   groups: GroupAttributes[],
   cacheRefresh: boolean,
 ): Promise<MembershipInstance[]> {
-  const findAllQuery = {
+  const findAllQuery: FindOptions<MembershipAttributes> = {
     where: {
       group_id: {
         [Op.in]: groups.map((g) => g.id),
