@@ -80,7 +80,6 @@ If you add a new environment variable, you must add documentation here. Please d
 - [SNAPSHOT_HUB_URL](#snapshot_hub_url)
 - [TELEGRAM_BOT_TOKEN_DEV](#telegram_bot_token_dev)
 - [TEST_ENV](#test_env)
-- [UNIQUE_DOCKER_CONTAINER_ID](#unique_docker_container_id)
 - [WITH_PRERENDER](#with_prerender)
 - [ZAPIER_WEBHOOK_URL_DEV](#zapier_webhook_url_dev)
 
