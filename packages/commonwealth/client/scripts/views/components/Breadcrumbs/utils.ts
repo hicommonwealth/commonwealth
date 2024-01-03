@@ -91,6 +91,8 @@ export const generateBreadcrumbs = (
         ? matchedBreadcrumb.breadcrumb
         : removedThreadId;
 
+    console.log('label', label, pathSegments, matchedBreadcrumb);
+
     if (pathSegments[0] === 'profile' && index === 1) {
       label = 'Edit Profile';
     }

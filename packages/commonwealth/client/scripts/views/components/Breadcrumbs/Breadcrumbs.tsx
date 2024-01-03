@@ -43,10 +43,10 @@ export const Breadcrumbs = () => {
     'createCommunity',
   ];
 
-  //Checks if the current page is a standalone page or if it contains the profileId.
+  //Checks if the current page is a standalone page or if it contains the /profile/id.
   if (
     standalonePaths.includes(location.pathname.split('/')[1]) ||
-    location.pathname.includes(String(profileId))
+    location.pathname.includes('/profile/id')
   ) {
     standalone = true;
   }
