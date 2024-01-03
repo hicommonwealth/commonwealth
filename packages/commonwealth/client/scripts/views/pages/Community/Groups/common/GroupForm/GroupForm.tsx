@@ -1,4 +1,5 @@
 /* eslint-disable react/no-multi-comp */
+import { isValidCosmosAddress, isValidEthAddress } from 'helpers/validateTypes';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import app from 'state';
@@ -296,6 +297,28 @@ const GroupForm = ({
           [key]: message,
         },
       };
+    }
+
+    // Validate if contract address is valid based on the selected requirement type
+    if (val.requirementContractAddress) {
+      const isInvalidEthAddress =
+        [...Object.values(SPECIFICATIONS), TOKENS.EVM_TOKEN].includes(
+          allRequirements[index].values.requirementType,
+        ) && !isValidEthAddress(val.requirementContractAddress);
+
+      const isInvalidCosmosAddress =
+        TOKENS.COSMOS_TOKEN === allRequirements[index].values.requirementType &&
+        !isValidCosmosAddress(val.requirementContractAddress);
+
+      if (isInvalidEthAddress || isInvalidCosmosAddress) {
+        allRequirements[index] = {
+          ...allRequirements[index],
+          errors: {
+            ...allRequirements[index].errors,
+            [key]: VALIDATION_MESSAGES.INVALID_INPUT,
+          },
+        };
+      }
     }
 
     setRequirementSubForms([...allRequirements]);
