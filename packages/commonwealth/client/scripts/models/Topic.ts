@@ -1,3 +1,17 @@
+export type TopicAttributes = {
+  name: string;
+  id: number;
+  description: string;
+  telegram?: string;
+  community_id?: string;
+  featured_in_sidebar?: boolean;
+  featured_in_new_post?: boolean;
+  order?: number;
+  default_offchain_template?: string;
+  total_threads: number;
+  channel_id?: string;
+};
+
 class Topic {
   public readonly name: string;
   public readonly id: number;
@@ -23,19 +37,7 @@ class Topic {
     default_offchain_template,
     total_threads,
     channel_id,
-  }: {
-    name: string;
-    id: number;
-    description: string;
-    telegram?: string;
-    community_id?: string;
-    featured_in_sidebar?: boolean;
-    featured_in_new_post?: boolean;
-    order?: number;
-    default_offchain_template?: string;
-    total_threads: number;
-    channel_id?: string;
-  }) {
+  }: TopicAttributes) {
     this.name = name;
     this.id = id;
     this.description = description;
