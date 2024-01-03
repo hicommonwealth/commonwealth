@@ -104,7 +104,7 @@ export class MockRabbitMQController extends AbstractRabbitMQController {
     publishData: TRmqMessages,
     objectId: number | string,
     publication: RascalPublications,
-    DB?: any,
+    // DB?: any,
   ) {
     await this.publish(publishData, publication);
   }
