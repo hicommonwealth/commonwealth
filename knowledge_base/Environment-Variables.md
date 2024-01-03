@@ -231,7 +231,7 @@ Boolean toggle to display site-wide discussions homepage sidebar. Temporary flag
 
 ## HEROKU_APP_NAME
 
-Set in Heroku; the respective app name. Required when using the DataDog PSQL integration.
+Automatically in Heroku; the respective app name. Required when using the DataDog PSQL integration.
 
 ## IS_CI
 
