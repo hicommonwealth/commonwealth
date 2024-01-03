@@ -132,7 +132,7 @@ export function addExternalRoutes(
     postTopicsValidation,
     addEntities.bind(
       this,
-      'chain_id',
+      'community_id',
       models,
       (a) => models.Topic.bulkCreate(a),
       (req: TypedRequest<PostTopicsReq>) => req.body.topics,
