@@ -87,6 +87,7 @@ type ColumnDescriptor = {
   numeric: boolean;
   sortable: boolean;
   customElementKey?: string;
+  hasCustomSortValue?: boolean;
 };
 
 type RowData = {
@@ -124,9 +125,22 @@ export const CWTable = ({
         return {
           accessorKey: col.key,
           header: col.header,
+          ...(col?.hasCustomSortValue && {
+            // implement custom sorting function, if we have custom sorting value.
+            sortingFn: (rowA, rowB, columnId) => {
+              return rowA.original[columnId].sortValue <
+                rowB.original[columnId].sortValue
+                ? 1
+                : -1;
+            },
+          }),
           cell: (info) => {
             const currentRow = info.row.original as RowData;
             const avatarUrl = currentRow.avatars?.[col.key];
+
+            if (currentRow[col.key]?.customElement) {
+              return currentRow[col.key].customElement;
+            }
 
             if (col.customElementKey) {
               return currentRow[col.customElementKey];
@@ -152,7 +166,7 @@ export const CWTable = ({
           isNumeric: col.numeric,
         };
       }),
-    [columnInfo]
+    [columnInfo],
   );
 
   const table = useReactTable({
@@ -169,7 +183,7 @@ export const CWTable = ({
 
   const displaySortIcon = (
     sortDirection: string,
-    sortHandler: (event: unknown) => void
+    sortHandler: (event: unknown) => void,
   ) => {
     const sortDirections = {
       asc: (
@@ -242,21 +256,21 @@ export const CWTable = ({
                             {
                               numeric: (header.column.columnDef as any)
                                 .isNumeric,
-                            }
+                            },
                           ),
                         }}
                       >
                         <span className="header-text">
                           {flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                         </span>
 
                         {header.column.getCanSort()
                           ? displaySortIcon(
                               header.column.getIsSorted() as string,
-                              header.column.getToggleSortingHandler()
+                              header.column.getToggleSortingHandler(),
                             ) ?? null
                           : null}
                       </div>
@@ -276,7 +290,7 @@ export const CWTable = ({
                     <td key={cell.id} className="data-container">
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </td>
                   );
