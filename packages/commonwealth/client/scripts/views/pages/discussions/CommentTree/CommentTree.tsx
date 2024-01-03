@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import { SessionKeyError } from 'controllers/server/sessions';
-import { featureFlags } from 'helpers/feature-flags';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { CommentsFeaturedFilterTypes } from 'models/types';
@@ -452,10 +451,7 @@ export const CommentTree = ({
                   maxReplyLimitReached={comment.maxReplyLimitReached}
                   canReact={
                     !thread.archivedAt &&
-                    (!!hasJoinedCommunity ||
-                      isAdmin ||
-                      (!app.chain.isGatedTopic(thread?.topic?.id) &&
-                        !featureFlags.newGatingEnabled)) &&
+                    (!!hasJoinedCommunity || isAdmin) &&
                     canReact
                   }
                   canEdit={

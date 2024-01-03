@@ -41,7 +41,6 @@ If you add a script to the package.json, you must add documentation here, descri
   - [datadog-db-setup](#datadog-db-setup)
   - [send-cosmos-notifs](#send-cosmos-notifs)
   - [send-notification-digest-emails](#send-notification-digest-emails)
-  - [storybook](#storybook)
 - [Playwright](#playwright)
   - [e2e-start-server](#e2e-start-server)
   - [test-e2e](#test-e2e)
@@ -331,14 +330,6 @@ Contributor: Timothee Legros
 Definition: `SEND_EMAILS=true ts-node --project tsconfig.json server.ts`
 
 Description: Schedules a daily task for sending notification email digests.
-
-## storybook
-
-Definition: `storybook dev -p 6006`
-
-Description: Compiles and serves a development build of Storybook reflecting source code changes in-browser in real time, at localhost:6006.
-
-Contributor: Daniel Martins
 
 # Playwright
 

@@ -1,13 +1,13 @@
+import { BalanceType } from '@hicommonwealth/core';
 import axios from 'axios';
 import app from 'state';
-import { BalanceType } from '../../../../../../common-common/src/types';
 
 export const createChainNode = async ({
   url,
   name,
   bech32,
   balance_type,
-  eth_chain_id
+  eth_chain_id,
 }: {
   url: string;
   name: string;

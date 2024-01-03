@@ -320,12 +320,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const hasWebLinks = thread.links.find((x) => x.source === 'web');
 
-  const canComment =
-    (!!hasJoinedCommunity ||
-      (!isAdminOrMod &&
-        app.chain.isGatedTopic(thread?.topic?.id) &&
-        !featureFlags.newGatingEnabled)) &&
-    !isRestrictedMembership;
+  const canComment = !!hasJoinedCommunity && !isRestrictedMembership;
 
   const handleNewSnapshotChange = async ({
     id,
@@ -536,8 +531,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       shouldFocusEditor={shouldFocusCommentEditor}
                       tooltipText={disabledActionsTooltipText}
                     />
-                    {featureFlags.newGatingEnabled &&
-                      foundGatedTopic &&
+                    {foundGatedTopic &&
                       !hideGatingBanner &&
                       isRestrictedMembership && (
                         <CWGatedTopicBanner

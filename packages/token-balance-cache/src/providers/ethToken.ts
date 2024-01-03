@@ -1,9 +1,10 @@
-import { validateOpts } from '../util/validateOpts';
-import type { EthBPOpts, IChainNode } from '../types';
-import { BalanceProvider } from '../types';
-import { BalanceType } from 'common-common/src/types';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { BalanceType } from '@hicommonwealth/core';
 import Web3 from 'web3';
 import type { WebsocketProvider } from 'web3-core';
+import type { EthBPOpts, IChainNode } from '../types';
+import { BalanceProvider } from '../types';
+import { validateOpts } from '../util/validateOpts';
 
 export default class evmBalanceProvider extends BalanceProvider<Web3> {
   public name = 'eth-token';
@@ -25,7 +26,7 @@ export default class evmBalanceProvider extends BalanceProvider<Web3> {
 
   public async getExternalProvider(
     node: IChainNode,
-    opts: EthBPOpts
+    opts: EthBPOpts,
   ): Promise<Web3> {
     const node_url = node.private_url || node.url;
     const provider =
@@ -38,7 +39,7 @@ export default class evmBalanceProvider extends BalanceProvider<Web3> {
   public async getBalance(
     node: IChainNode,
     address: string,
-    opts: EthBPOpts
+    opts: EthBPOpts,
   ): Promise<string> {
     const { tokenAddress, contractType } = opts;
     const Web3 = (await import('web3')).default;
@@ -77,7 +78,7 @@ export default class evmBalanceProvider extends BalanceProvider<Web3> {
       data: calldata,
     });
     if (api.currentProvider instanceof Web3.providers.WebsocketProvider)
-        (api.currentProvider as WebsocketProvider).disconnect(1000, 'finished');
+      (api.currentProvider as WebsocketProvider).disconnect(1000, 'finished');
     return api.eth.abi.decodeParameter('uint256', result).toString();
   }
 }

@@ -66,7 +66,6 @@ export async function refreshMembershipsForAddress(
     // membership exists
 
     if (!cacheRefresh) {
-      console.log('NOT cache refresh');
       const expiresAt = moment(membership.last_checked).add(
         MEMBERSHIP_REFRESH_TTL_SECONDS,
         'seconds',
@@ -77,8 +76,6 @@ export async function refreshMembershipsForAddress(
         continue;
       }
     }
-
-    console.log('YES cache refresh');
 
     // membership is stale
     membershipsToUpdate.push(membership);

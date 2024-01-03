@@ -1,7 +1,8 @@
-import { assert, expect, use as chaiUse } from 'chai';
-import { BalanceType } from 'common-common/src/types';
-import { BigNumber, BigNumberish, CallOverrides } from 'ethers';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { BalanceType } from '@hicommonwealth/core';
+import { assert, use as chaiUse, expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import { BigNumber, BigNumberish, CallOverrides } from 'ethers';
 import EthTokenBalanceProvider from '../src/providers/ethToken';
 
 import type { IChainNode } from '../src/types';
@@ -19,7 +20,7 @@ class MockProvider {
     getBalance: (
       account: string,
       id: BigNumberish,
-      overrides?: CallOverrides
+      overrides?: CallOverrides,
     ) => {
       return BigNumber.from('12345678912345678910');
     },
@@ -56,7 +57,7 @@ describe('Eth Token BP unit tests', () => {
     const balance = await ethTokenBp.getBalance(
       await mockNodesProvider()[0],
       '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
-      {}
+      {},
     );
 
     assert.equal(balance, '12345678912345678910');
@@ -66,7 +67,7 @@ describe('Eth Token BP unit tests', () => {
     const ethTokenBp: MockEthTokenBalanceProvider =
       new MockEthTokenBalanceProvider();
     return expect(
-      ethTokenBp.getBalance(await mockNodesProvider()[0], 'abcd', {})
+      ethTokenBp.getBalance(await mockNodesProvider()[0], 'abcd', {}),
     ).to.be.rejectedWith('Invalid address');
   });
 });

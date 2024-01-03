@@ -62,20 +62,12 @@ module.exports = {
       ),
     }),
     new webpack.DefinePlugin({
-      'process.env.FLAG_NEW_CREATE_COMMUNITY': JSON.stringify(
-        process.env.FLAG_NEW_CREATE_COMMUNITY,
-      ),
-    }),
-    new webpack.DefinePlugin({
       'process.env.FLAG_PROPOSAL_TEMPLATES': JSON.stringify(
         process.env.FLAG_PROPOSAL_TEMPLATES,
       ),
     }),
     new webpack.DefinePlugin({
       'process.env.ETH_RPC': JSON.stringify(process.env.ETH_RPC),
-    }),
-    new webpack.DefinePlugin({
-      'process.env.FLAG_GATING_ENABLED': process.env.FLAG_GATING_ENABLED,
     }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../client/index.html'),

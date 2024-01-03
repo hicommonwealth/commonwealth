@@ -1,3 +1,8 @@
+import {
+  CommentDiscordActions,
+  IDiscordMessage,
+  ThreadDiscordActions,
+} from '@hicommonwealth/core';
 import { factory, formatFilename } from 'common-common/src/logging';
 import {
   RabbitMQController,
@@ -13,11 +18,6 @@ import {
   startHealthCheckLoop,
 } from 'common-common/src/scripts/startHealthCheckLoop';
 import { StatsDController } from 'common-common/src/statsd';
-import {
-  CommentDiscordActions,
-  IDiscordMessage,
-  ThreadDiscordActions,
-} from 'common-common/src/types';
 import {
   handleCommentMessages,
   handleThreadMessages,

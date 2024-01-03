@@ -12,6 +12,7 @@ import CWPopover, {
 import { CWIcon } from '../cw_icons/cw_icon';
 import { CWText } from '../cw_text';
 import { getClasses } from '../helpers';
+import { CWButton } from '../new_designs/cw_button';
 import type {
   DefaultMenuItem,
   DividerMenuItem,
@@ -84,7 +85,36 @@ export const PopoverMenu = ({
                     iconLeftSize,
                     label,
                     onClick,
+                    isButton,
                   } = item;
+
+                  const clickHandler = (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    onClick(e);
+
+                    if (item.type === 'default' && item.preventClosing) {
+                      return;
+                    }
+
+                    handleInteraction(e);
+                  };
+
+                  if (isButton) {
+                    return (
+                      <CWButton
+                        containerClassName={`${className} m-auto no-outline`}
+                        key={label as string}
+                        label={label}
+                        buttonHeight="sm"
+                        iconLeft={iconLeft}
+                        iconLeftWeight={iconLeftWeight}
+                        disabled={disabled}
+                        onClick={clickHandler}
+                      />
+                    );
+                  }
+
                   return (
                     <div
                       className={getClasses<{
@@ -94,17 +124,7 @@ export const PopoverMenu = ({
                         { disabled, isSecondary },
                         `PopoverMenuItem ${item.className}`,
                       )}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        onClick(e);
-
-                        if (item.type === 'default' && item.preventClosing) {
-                          return;
-                        }
-
-                        handleInteraction(e);
-                      }}
+                      onClick={clickHandler}
                       key={i}
                     >
                       {iconLeft && (

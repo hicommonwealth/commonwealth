@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import type {
   ICompoundProposalResponse,
   ICompoundVoteResponse,
@@ -6,37 +7,37 @@ import type {
 import type { EthereumCoin } from 'adapters/chain/ethereum/types';
 import BN from 'bn.js';
 
+import { ProposalType } from '@hicommonwealth/core';
 import type { GovernorCompatibilityBravo } from 'common-common/src/eth/types';
 import { GovernorMock__factory } from 'common-common/src/eth/types';
-import { ProposalType } from 'common-common/src/types';
 import type { ContractTransaction } from 'ethers';
 import { BigNumber, utils } from 'ethers';
 
+import moment from 'moment';
 import type ChainEvent from '../../../../models/ChainEvent';
-import type { ITXModalData, IVote } from '../../../../models/interfaces';
 import Proposal from '../../../../models/Proposal';
+import type { ITXModalData, IVote } from '../../../../models/interfaces';
 import type { ProposalEndTime } from '../../../../models/types';
 import {
   ProposalStatus,
   VotingType,
   VotingUnit,
 } from '../../../../models/types';
-import moment from 'moment';
 import type EthereumAccount from '../account';
 import type EthereumAccounts from '../accounts';
 import { attachSigner } from '../contractApi';
 
-import type CompoundAPI from './api';
-import { GovernorType } from './api';
-import type CompoundChain from './chain';
-import type CompoundGovernance from './governance';
+import axios from 'axios';
+import Compound from 'controllers/chain/ethereum/compound/adapter';
+import { ApiEndpoints } from 'state/api/config';
 import {
   EventKind,
   ProposalState,
 } from '../../../../../../shared/chain/types/compound';
-import Compound from 'controllers/chain/ethereum/compound/adapter';
-import axios from 'axios';
-import { ApiEndpoints } from 'state/api/config';
+import type CompoundAPI from './api';
+import { GovernorType } from './api';
+import type CompoundChain from './chain';
+import type CompoundGovernance from './governance';
 
 export enum BravoVote {
   NO = 0,
@@ -239,7 +240,7 @@ export default class CompoundProposal extends Proposal<
     Accounts: EthereumAccounts,
     Chain: CompoundChain,
     Gov: CompoundGovernance,
-    data: ICompoundProposalResponse
+    data: ICompoundProposalResponse,
   ) {
     // must set identifier before super() because of how response object is named
     super(ProposalType.CompoundProposal, data);
@@ -256,7 +257,7 @@ export default class CompoundProposal extends Proposal<
   static async fetchVotes(
     proposalId: string,
     proposalIdentifier: string,
-    compoundChain: Compound
+    compoundChain: Compound,
   ) {
     const { chain, accounts, governance, meta } = compoundChain;
 
@@ -273,7 +274,7 @@ export default class CompoundProposal extends Proposal<
           chainId: meta.id,
           proposalId,
         },
-      }
+      },
     );
 
     const votes: ICompoundVoteResponse[] = res.data.result.votes;
@@ -283,7 +284,7 @@ export default class CompoundProposal extends Proposal<
       const compoundVote = new CompoundProposalVote(
         accounts.get(vote.voter),
         vote.support,
-        power
+        power,
       );
       proposalInstance.addOrUpdateVote(compoundVote);
     }
@@ -301,7 +302,7 @@ export default class CompoundProposal extends Proposal<
         const vote = new CompoundProposalVote(
           this._Accounts.get(e.data.voter),
           e.data.support,
-          power
+          power,
         );
         this.addOrUpdateVote(vote);
         break;
@@ -328,11 +329,11 @@ export default class CompoundProposal extends Proposal<
     let tx: ContractTransaction;
     const contract = await attachSigner(
       this._Gov.app.user.activeAccount,
-      this._Gov.api.Contract
+      this._Gov.api.Contract,
     );
     try {
       const gasLimit = await contract.estimateGas['cancel(uint256)'](
-        this.data.identifier
+        this.data.identifier,
       );
       tx = await contract['cancel(uint256)'](this.data.identifier, {
         gasLimit,
@@ -342,28 +343,28 @@ export default class CompoundProposal extends Proposal<
       // uses GovernorMock because it supports the proper cancel ABI vs BravoCompat
       const contractNoSigner = GovernorMock__factory.connect(
         this._Gov.api.contractAddress,
-        this._Gov.api.Provider
+        this._Gov.api.Provider,
       );
       const ozContract = await attachSigner(
         this._Gov.app.user.activeAccount,
-        contractNoSigner
+        contractNoSigner,
       );
       const descriptionHash = utils.keccak256(
-        utils.toUtf8Bytes(this.data.description)
+        utils.toUtf8Bytes(this.data.description),
       );
       try {
         const gasLimit = await ozContract.estimateGas.cancel(
           this.data.targets,
           this.data.values,
           this.data.calldatas,
-          descriptionHash
+          descriptionHash,
         );
         tx = await ozContract.cancel(
           this.data.targets,
           this.data.values,
           this.data.calldatas,
           descriptionHash,
-          { gasLimit }
+          { gasLimit },
         );
       } catch (eInner) {
         // both errored out -- fail
@@ -388,13 +389,13 @@ export default class CompoundProposal extends Proposal<
 
     const contract = await attachSigner(
       this._Gov.app.user.activeAccount,
-      this._Gov.api.Contract
+      this._Gov.api.Contract,
     );
 
     let tx: ContractTransaction;
     if (this._Gov.api.govType === GovernorType.Oz) {
       const descriptionHash = utils.keccak256(
-        utils.toUtf8Bytes(this.data.description)
+        utils.toUtf8Bytes(this.data.description),
       );
       const gasLimit = await (
         contract as GovernorCompatibilityBravo
@@ -402,7 +403,7 @@ export default class CompoundProposal extends Proposal<
         this.data.targets,
         this.data.values,
         this.data.calldatas,
-        descriptionHash
+        descriptionHash,
       );
       tx = await (contract as GovernorCompatibilityBravo)[
         'queue(address[],uint256[],bytes[],bytes32)'
@@ -411,11 +412,11 @@ export default class CompoundProposal extends Proposal<
         this.data.values,
         this.data.calldatas,
         descriptionHash,
-        { gasLimit }
+        { gasLimit },
       );
     } else {
       const gasLimit = await contract.estimateGas['queue(uint256)'](
-        this.data.identifier
+        this.data.identifier,
       );
       tx = await contract['queue(uint256)'](this.data.identifier, { gasLimit });
     }
@@ -433,13 +434,13 @@ export default class CompoundProposal extends Proposal<
 
     const contract = await attachSigner(
       this._Gov.app.user.activeAccount,
-      this._Gov.api.Contract
+      this._Gov.api.Contract,
     );
 
     let tx: ContractTransaction;
     if (this._Gov.api.govType === GovernorType.Oz) {
       const descriptionHash = utils.keccak256(
-        utils.toUtf8Bytes(this.data.description)
+        utils.toUtf8Bytes(this.data.description),
       );
       const gasLimit = await (
         contract as GovernorCompatibilityBravo
@@ -447,7 +448,7 @@ export default class CompoundProposal extends Proposal<
         this.data.targets,
         this.data.values,
         this.data.calldatas,
-        descriptionHash
+        descriptionHash,
       );
       tx = await (contract as GovernorCompatibilityBravo)[
         'execute(address[],uint256[],bytes[],bytes32)'
@@ -456,11 +457,11 @@ export default class CompoundProposal extends Proposal<
         this.data.values,
         this.data.calldatas,
         descriptionHash,
-        { gasLimit }
+        { gasLimit },
       );
     } else {
       const gasLimit = await contract.estimateGas['execute(uint256)'](
-        this.data.identifier
+        this.data.identifier,
       );
       tx = await contract['execute(uint256)'](this.data.identifier, {
         gasLimit,
@@ -494,7 +495,7 @@ export default class CompoundProposal extends Proposal<
       const voteBool = vote.choice === BravoVote.YES;
       const gasLimit = await contract.estimateGas.castVote(
         this.data.identifier,
-        voteBool
+        voteBool,
       );
       tx = await contract.castVote(this.data.identifier, voteBool, {
         gasLimit,
@@ -502,7 +503,7 @@ export default class CompoundProposal extends Proposal<
     } else {
       const gasLimit = await contract.estimateGas.castVote(
         this.data.identifier,
-        +vote.choice
+        +vote.choice,
       );
       tx = await contract.castVote(this.data.identifier, +vote.choice, {
         gasLimit,

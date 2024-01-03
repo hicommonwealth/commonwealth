@@ -10,7 +10,6 @@ interface CreateTopicProps {
   telegram?: string;
   featuredInSidebar: boolean;
   featuredInNewPost: boolean;
-  tokenThreshold: string;
   defaultOffchainTemplate: string;
 }
 
@@ -20,7 +19,6 @@ const createTopic = async ({
   telegram,
   featuredInSidebar,
   featuredInNewPost,
-  tokenThreshold,
   defaultOffchainTemplate,
 }: CreateTopicProps) => {
   const response = await axios.post(`${app.serverUrl()}/topics`, {
@@ -29,7 +27,6 @@ const createTopic = async ({
     telegram,
     featured_in_sidebar: featuredInSidebar,
     featured_in_new_post: featuredInNewPost,
-    token_threshold: tokenThreshold || '0',
     default_offchain_template: defaultOffchainTemplate,
     jwt: app.user.jwt,
     community_id: app.activeChainId(),

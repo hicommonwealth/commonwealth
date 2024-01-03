@@ -1,4 +1,4 @@
-import type { BalanceType } from 'common-common/src/types';
+import type { BalanceType } from '@hicommonwealth/core';
 
 // map of addresses to balances
 export interface ICache {
@@ -37,7 +37,7 @@ export type ChainNodeResp = {
 
 export abstract class BalanceProvider<
   ExternalProviderT,
-  OptT extends Record<string, unknown> = Record<string, unknown>
+  OptT extends Record<string, unknown> = Record<string, unknown>,
 > {
   public readonly name: string;
   public readonly opts: Record<keyof OptT, string>;
@@ -51,12 +51,12 @@ export abstract class BalanceProvider<
   public abstract getBalance(
     node: IChainNode,
     address: string,
-    opts: OptT
+    opts: OptT,
   ): Promise<string>;
 
   public abstract getExternalProvider(
     node: IChainNode,
-    opts: OptT
+    opts: OptT,
   ): Promise<ExternalProviderT>;
 }
 
@@ -77,7 +77,7 @@ export type ITokenBalanceCache = {
     nodeId: number,
     addresses: string[],
     balanceProvider: string,
-    opts: Record<string, string> // TODO: if we want, we can add ts overrides
+    opts: Record<string, string>, // TODO: if we want, we can add ts overrides
   ): Promise<TokenBalanceResp>;
 };
 
