@@ -30,8 +30,6 @@ export const Breadcrumbs = () => {
     topicURL: `/discussions/${encodeURI(linkedThreads?.[0]?.topic.name)}`,
   };
 
-  console.log('currentTopic', linkedThreads?.[0].title);
-
   let standalone = false;
 
   /**
@@ -55,7 +53,6 @@ export const Breadcrumbs = () => {
 
   const pathnames = generateBreadcrumbs(
     location.pathname,
-    breadCrumbURLS,
     profileId,
     navigate,
     currentDiscussion,
@@ -85,29 +82,24 @@ export const Breadcrumbs = () => {
 
   //Gets the tooltip copy based on the current page.
   const getToolTipCopy = () => {
-    const pathSegments = location.pathname.split('/');
-    const lastPathSegment = pathSegments[pathSegments.length - 1];
+    const lastPathSegment = location.pathname.split('/').pop();
 
     const tooltips = {
       admin: 'This is a section, not a selectable page.',
       discussionsGovernance: 'This is an app, not a selectable page.',
     };
 
-    const isAdmin = breadCrumbURLS.find(
+    const isAdminOrGovernance = breadCrumbURLS.find(
       (breadcrumbItem) =>
-        breadcrumbItem.url === lastPathSegment && breadcrumbItem.isAdmin,
+        breadcrumbItem.url === lastPathSegment &&
+        (breadcrumbItem.isAdmin || breadcrumbItem.isGovernance),
     );
 
-    const isGovernance = breadCrumbURLS.find(
-      (breadcrumbItem) =>
-        breadcrumbItem.url === lastPathSegment && breadcrumbItem.isGovernance,
-    );
-
-    if (isAdmin) {
-      return tooltips.admin;
-    } else if (isGovernance) {
-      return tooltips.discussionsGovernance;
-    }
+    return isAdminOrGovernance
+      ? tooltips[
+          isAdminOrGovernance.isAdmin ? 'admin' : 'discussionsGovernance'
+        ]
+      : undefined;
   };
 
   return (

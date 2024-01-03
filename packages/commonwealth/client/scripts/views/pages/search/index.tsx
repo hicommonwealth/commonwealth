@@ -8,7 +8,7 @@ import {
 } from 'models/SearchQuery';
 import 'pages/search/index.scss';
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import app from 'state';
@@ -57,6 +57,7 @@ const SearchPage = () => {
   const [urlQueryParams] = useSearchParams();
   const [bottomRef, bottomInView] = useInView();
 
+  //TODO revisit to add hook
   const [toggleMobileView, setToggleMobileView] = useState(
     location.pathname.includes('search') && window.innerWidth <= 425,
   );

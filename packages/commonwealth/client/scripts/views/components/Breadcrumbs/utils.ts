@@ -7,37 +7,51 @@ type currentDiscussion = {
   topicURL: string;
 };
 
+const segmentMapping = {
+  proposals: 'Proposals',
+  members: 'Members',
+  snapshot: 'Snapshots',
+};
+
+const findMatchedBreadcrumb = (index: number, pathSegments: Array<string>) => {
+  const breadcrumbData = breadCrumbURLS;
+
+  return breadcrumbData.find((breadcrumbItem) => {
+    return (
+      !breadcrumbItem.url ||
+      index >= pathSegments.length ||
+      breadcrumbItem.url ===
+        pathSegments.slice(index, breadcrumbData.length - 1).join('/')
+    );
+  });
+};
+
 export const generateBreadcrumbs = (
   locationPath: string,
-  breadcrumbData: typeof breadCrumbURLS,
   profileId: number,
   navigate: (val: To) => void,
   currentDiscussion?: currentDiscussion,
 ) => {
   let link: string;
+  let label: string;
+  let isParent: boolean;
   const pathSegments = locationPath
     .split('/')
     .filter((segment) => segment.length > 0);
 
-  console.log('TOPIC:', currentDiscussion);
+  const governanceSegment = segmentMapping[pathSegments[1]];
 
   const breadcrumbs = pathSegments.map((pathSegment, index) => {
     //Checks to see if it's an easy page so we match with the data file & early return out.
-    const matchedBreadcrumb = breadcrumbData.find((breadcrumbItem) => {
-      return (
-        !breadcrumbItem.url ||
-        index >= pathSegments.length ||
-        breadcrumbItem.url ===
-          pathSegments.slice(index, breadcrumbData.length - 1).join('/')
-      );
-    });
+    const matchedBreadcrumb = findMatchedBreadcrumb(index, pathSegments);
 
     // Generate the link based on the current path segment.
     switch (pathSegment) {
       case 'profile':
         // Remove 'profile' segment and generate the link.
-        pathSegments.splice(index + 1, 2);
-        link = `id/${profileId}`;
+        // pathSegments.splice(index + 1, 2);
+
+        link = `profile/id/${profileId}`;
         break;
       case 'snapshot':
         //Match the header on the snapshots page
@@ -73,22 +87,55 @@ export const generateBreadcrumbs = (
       '',
     );
 
-    let label =
+    label =
       index === pathSegments.length - 1 && !!currentDiscussion.currentThreadName
         ? currentDiscussion.currentThreadName
         : matchedBreadcrumb
         ? matchedBreadcrumb.breadcrumb
         : removedThreadId;
 
-    //Handles the unique logic of the discussions section
-    if (pathSegments[1] === 'discussions' || pathSegments[1] === 'discussion') {
+    if (pathSegments[0] === 'profile') {
+      label = 'Profile';
+      if (index === 1) {
+        label = 'Edit Profile';
+      }
+    }
+
+    if (locationPath.includes('new/discussion') && label !== 'Create Thread') {
+      label = 'Discussions';
+    }
+
+    if (['manage', 'analytics'].includes(pathSegments[1]) && index === 0) {
+      label = 'Admin Capabilities';
+    }
+
+    // Handles the unique logic of the discussions section
+    if (
+      !locationPath.includes('new/discussion') &&
+      (pathSegments[1] === 'discussions' || pathSegments[1] === 'discussion')
+    ) {
       label = 'Discussions';
 
       if (pathSegments.length > 2) {
         pathSegments.splice(0, 1);
+        // after splice set discussion to parent for tooltip
+        isParent = ['discussions', 'discussion'].includes(pathSegments[index]);
       }
-    } else if (pathSegments[1] === 'overview' && label !== 'Overview') {
+    } else if (
+      ['Overview', 'archived'].includes(pathSegments[1]) &&
+      label !== pathSegments[1]
+    ) {
       label = 'Discussions';
+    } else {
+      // Reset derived state: isParent
+      isParent = false;
+    }
+
+    if (
+      governanceSegment &&
+      label.toLowerCase() !== governanceSegment.toLowerCase()
+    ) {
+      label = 'Governance';
     }
 
     // Create the breadcrumb object.
@@ -97,7 +144,9 @@ export const generateBreadcrumbs = (
       path: link ? `/${link}` : locationPath,
       navigate: (val: To) => navigate(val),
       isParent:
-        matchedBreadcrumb?.isParent || pathSegments[0] === splitLinks[index],
+        isParent ||
+        matchedBreadcrumb?.isParent ||
+        pathSegments[0] === splitLinks[index],
     };
   });
 
@@ -109,6 +158,5 @@ export const generateBreadcrumbs = (
       isParent: false,
     });
 
-  console.log('bread', breadcrumbs);
   return breadcrumbs.filter((val) => val !== undefined);
 };

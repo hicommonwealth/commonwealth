@@ -1,5 +1,10 @@
 export const breadCrumbURLS = [
   {
+    url: 'new/discussion',
+    breadcrumb: 'Create Thread',
+    className: 'new-thread',
+  },
+  {
     url: 'dashboard',
     breadcrumb: 'Dashboard',
     className: 'dashboard',
@@ -14,17 +19,13 @@ export const breadCrumbURLS = [
     className: 'new-proposal',
   },
   {
-    url: 'new/discussion',
-    breadcrumb: 'New Thread',
-    className: 'new-thread',
-  },
-  {
     url: 'profile/edit',
     breadcrumb: 'Edit Profile',
     className: 'editProfile',
+    isParent: false,
   },
   {
-    url: 'createCommunity/starter',
+    url: 'createCommunity',
     breadcrumb: 'New Commonwealth Community',
     className: 'create-community',
     isParent: true,
@@ -37,7 +38,7 @@ export const breadCrumbURLS = [
   },
   {
     url: 'manage',
-    breadcrumb: 'Manage',
+    breadcrumb: 'Manage Community',
     isAdmin: true,
     className: 'admin',
   },
@@ -55,7 +56,7 @@ export const breadCrumbURLS = [
     url: 'members',
     breadcrumb: 'Members',
     isGovernance: true,
-    className: 'governance',
+    className: 'members',
   },
   {
     url: 'proposals',
@@ -71,12 +72,19 @@ export const breadCrumbURLS = [
     url: 'snapshot',
     breadcrumb: 'Snapshots',
     className: 'governance',
+    isGovernance: true,
   },
   {
     url: 'discussions',
     className: 'discussions',
     breadcrumb: 'All Discussions',
     isParent: false,
+  },
+  {
+    url: 'discussion',
+    className: 'discussion',
+    breadcrumb: 'All Discussions',
+    isParent: true,
   },
   {
     url: 'notification-settings',

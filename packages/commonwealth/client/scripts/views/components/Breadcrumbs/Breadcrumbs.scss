@@ -4,16 +4,19 @@
   align-items: center;
   font-size: 0.875rem;
   color: $neutral-400;
-  min-height: 8px;
+  background-color: $white;
+  min-height: 40px;
   padding: 2px 0px;
   position: fixed;
   width: 100%;
+  margin-top: -16px;
   overflow: auto;
   z-index: 3;
 
   @include extraSmall {
     position: static;
     min-height: 40px;
+    margin-top: 0px;
   }
 
   .disable-active-cursor {
@@ -105,6 +108,28 @@
     }
   }
 
+  .discussion {
+    display: flex;
+    flex-direction: row;
+    padding-left: 36px;
+
+    @include large {
+      padding-left: 40px;
+    }
+
+    @include medium {
+      padding-left: 40px;
+    }
+
+    @include small {
+      padding-left: 16px;
+    }
+
+    @include extraSmall {
+      padding-left: 16px;
+    }
+  }
+
   .discussions {
     display: flex;
     flex-direction: row;
@@ -119,11 +144,33 @@
     }
 
     @include small {
-      padding-left: 26px;
+      padding-left: 24px;
     }
 
     @include extraSmall {
-      padding-left: 26px;
+      padding-left: 24px;
+    }
+  }
+
+  .members {
+    display: flex;
+    padding-left: 40px;
+    flex-direction: row;
+
+    @include large {
+      padding-left: 40px;
+    }
+
+    @include medium {
+      padding-left: 40px;
+    }
+
+    @include small {
+      padding-left: 16px;
+    }
+
+    @include extraSmall {
+      padding-left: 16px;
     }
   }
 
@@ -159,8 +206,12 @@
     display: flex;
     align-items: center;
     flex-direction: row;
-    padding-left: 24px;
+    padding-left: 72px;
     padding-top: 16px;
+
+    @include extraSmall {
+      padding-left: 16px;
+    }
   }
 
   .notifications {
@@ -172,7 +223,6 @@
   .viewProfile {
     display: flex;
     flex-direction: row;
-    margin-bottom: 24px;
 
     @include large {
       padding-left: 80px;
