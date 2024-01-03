@@ -32,7 +32,6 @@ If you add a new environment variable, you must add documentation here. Please d
 - [DD_LOG_LEVEL](#dd_log_level)
 - [DD_SITE](#dd_site)
 - [DISABLE_CACHE](#disable_cache)
-- [DISCORD_BOT_SUCCESS_URL](#discord_bot_success_url)
 - [DISCORD_BOT_TOKEN](#discord_bot_token)
 - [DISCORD_BOT_URL](#discord_bot_url)
 - [DISCORD_CLIENT_ID](#discord_client_id)
@@ -60,7 +59,6 @@ If you add a new environment variable, you must add documentation here. Please d
 - [NO_GLOBAL_ACTIVITY_CACHE](#no_global_activity_cache)
 - [NO_PRERENDER](#no_prerender)
 - [NO_SSL](#no_ssl)
-- [NO_TOKEN_BALANCE_CACHE](#no_token_balance_cache)
 - [NODE_ENV](#node_env)
 - [PGPASSWORD](#pgpassword)
 - [PORT](#port)
@@ -68,7 +66,6 @@ If you add a new environment variable, you must add documentation here. Please d
 - [RABBITMQ_API_URI](#rabbitmq_api_uri)
 - [RABBITMQ_URI](#rabbitmq_uri)
 - [REDIS_URL](#redis_url)
-- [REPEAT_TIME](#repeat_time)
 - [ROLLBAR_ENV](#rollbar_env)
 - [ROLLBAR_SERVER_TOKEN](#rollbar_server_token)
 - [RPC_HOST](#rpc_host)
@@ -181,10 +178,6 @@ DataDog configuration token in our Heroku pipeline, specifying our DataDog site 
 
 If `true`, disables Redis caching middleware.
 
-## DISCORD_BOT_SUCCESS_URL
-
-Used to construct callback URLs for the `/authCallback` route, used in user sign-in flow. By default, expects `http://localhost:3000`.
-
 ## DISCORD_BOT_TOKEN
 
 This value should mirror the value of `DISCORD_TOKEN` in the Discobot .env file.
@@ -195,7 +188,7 @@ This value should mirror the value of `DISCORD_TOKEN` in the Discobot .env file.
 
 ## DISCORD_CLIENT_ID
 
-For local testing, we use the staging Discord app/bot. The client ID can therefore be found on the [developer dashboard](https://discord.com/developers/applications/1027997517964644453/oauth2/general) or by contacting Jake or Timothee..
+For local testing, we use the staging Discord app/bot. The client ID can therefore be found on the [developer dashboard](https://discord.com/developers/applications/1027997517964644453/oauth2/general) or by contacting Jake or Timothee.
 
 ## DISCORD_WEBHOOK_URL_DEV
 
@@ -299,13 +292,11 @@ In a production environment, prerender is only run from `commonwealth/server.ts`
 
 Used and defined on-the-fly for the `start-external-webpack` package.json script.
 
-## NO_TOKEN_BALANCE_CACHE
-
-If `true`, the token balance cache is not initialized.
-
 ## NODE_ENV
 
-The current environment; set to `production` or `development`. Upstream of how we handle several other env vars.
+The current environment; set to either `production` or `development`. NB: `NODE_ENV` does not indicate whether the app is *actually* in production; the server may be run locally with `NODE_ENV=production` to test building and compiling.
+
+As of 240101, this variable is upstream of how we handle several other environment variables. This is under consideration and will likely be changed soon, with `SERVER_ENV` proposed as a possible replacement.
 
 ## PGPASSWORD
 
@@ -317,33 +308,27 @@ Localhost port location, default value `8080`.
 
 ## PROCFILE
 
-Set in all of our Heroku apps that use a separate procfile. Specifies the path from the root of the repo to the Procfile to use for the deployed app. It is never needed locally but it must be set manually on Heroku and is required in production. Presently set to `packages/chain-events/Procfile`
+Set in all of our Heroku apps that use a separate procfile. Specifies the path from the root of the repo to the Procfile to use for the deployed app. It is never needed locally but it must be set manually on Heroku and is required in production. In the production commonwealth app it is set to `packages/commonwealth/Procfile`.
 
 ## RABBITMQ_API_URI
 
-<!-- In need of documentation; if you have information about this token, please contribute. -->
+This variable will default to the URI of a local RabbitMQ API server. This allows the use of the message publishing script to publish a message to a local RabbitMQ instance.
 
 ## RABBITMQ_URI
 
-<!-- In need of documentation; if you have information about this token, please contribute. -->
-
-Should be set if running in the local environment.
+The URI of the RabbitMQ instance. On any Heroku app that has the CloudAMQP add-on (RabbitMQ provider), this is equal to CLOUDAMQP_URL. Locally, this variable defaults to the URI of a local RabbitMQ instance (Dockerized or native). Does not need to be set in a local environment unless you are spinning up multiple the Discobot or Snapshot listener as well.
 
 ## REDIS_URL
 
 Location to host a local Redis instance. By default `redis://localhost:6379`.
 
-## REPEAT_TIME
-
-The number of minutes the ChainSubscriber should wait between requests to the CW app to retrieve the chains it should be listening to. It is currently set to `10`, meaning every 10 minutes the ChainSubscriber will query the CW App and retrieve all chains that have `has_chain_events_listener` set to True in the `Chains` model.
-
 ## ROLLBAR_ENV
 
-A tag (string) used to identify Rollbar reports by environment, such that we can easily filter on the Rollbar dashboard. In staging and demo apps, we set it to the name of the app. For local production, it should be set to some custom value such as your name in lowercase. It should NEVER be set to `production`.
+A tag (string) used to identify Rollbar reports by environment, such that we can easily filter on the Rollbar dashboard. In staging and demo apps, we set it to the name of the app. Locally, it should be set to some custom value such as your name in lowercase. It should NEVER be set to `production`.
 
 ## ROLLBAR_SERVER_TOKEN
 
-Refers to a specific project on Rollbar. Local and staging (i.e. non-prod) environments should always use the `CommonwealthDev` token, which may be obtained from the Rollbar dashboard, Timothee Legros or an engineering lead. Only prod uses the `CommonwealthProject` token.
+Refers to a specific project on Rollbar. Local and staging (i.e. non-prod) environments should always use the `CommonwealthDev` token, which may be obtained from the Rollbar dashboard, Timothee Legros or an engineering lead. Only prod uses the `Commonwealth` project token.
 
 ## RPC_HOST
 
@@ -358,8 +343,6 @@ Enables Webhook and email dispatching in production when set to `true`. Should b
 Used in email-based communications (notifications, digests, login).
 
 ## SERVER_URL
-
-Default value: `https://commonwealth.im`
 
 By default, this is set in our `commonwealth/server/config` file to `https://commonwealth.im` if in production, and `http://localhost:8080` otherwise.
 
@@ -383,7 +366,7 @@ Allows Slack users to send feedback via webhook.
 
 ## SLACK_WEBHOOK_URL_DEV
 
-Connects to the #testing-webhooks Slack channel on the Common workspace. Required to use the `emit-webhook` script to send Slack webhooks. This webhook url can be found here: <https://api.slack.com/apps/A05UQUGRWGH/install-on-team>. More info at [Webhooks.md](./Webhooks.md)..
+Connects to the #testing-webhooks Slack channel on the Common workspace. Required to use the `emit-webhook` script to send Slack webhooks. This webhook url can be found here: <https://api.slack.com/apps/A05UQUGRWGH/install-on-team>. More info at [Webhooks.md](./Webhooks.md).
 
 ## SNAPSHOT_HUB_URL
 
@@ -391,7 +374,7 @@ Snapshot Hub URL used for Snapshot API requests. As of 231201 the default value 
 
 ## TELEGRAM_BOT_TOKEN_DEV
 
-Connects to the CommonWebhooksDev Telegram Bot. Required to use the `emit-webhook` script to send Telegram webhooks. Contact Timothee Legros for an invitation to the channel. More info at [Webhooks.md](./Webhooks.md)..
+Connects to the CommonWebhooksDev Telegram Bot. Required to use the `emit-webhook` script to send Telegram webhooks. Contact Timothee Legros for an invitation to the channel. More info at [Webhooks.md](./Webhooks.md).
 
 Owner: Timothee Legros.
 
@@ -401,16 +384,12 @@ Used and defined on-the-fly in Playwright scripts.
 
 Owner: Kurtis Assad.
 
-## UNIQUE_DOCKER_CONTAINER_ID
-
-A unique ID that is generated to distinguish your remote docker containers from other users.
-
 ## WITH_PRERENDER
 
 In a development environment, prerender is only run from `commonwealth/server.ts` if this flag is provided.
 
 ## ZAPIER_WEBHOOK_URL_DEV
 
-Connects to the Common Webhooks Dev Zap on Zapier. Required to use the `emit-webhook`script to send Zapier webhooks. The webhook url can be found by contacting Timothee or by viewing the Zap's settings [here](https://zapier.com/editor/209598943/published/209598943/setup) (requires Zapier account access). More info at [Webhooks.md](./Webhooks.md)..
+Connects to the Common Webhooks Dev Zap on Zapier. Required to use the `emit-webhook`script to send Zapier webhooks. The webhook url can be found by contacting Timothee or by viewing the Zap's settings [here](https://zapier.com/editor/209598943/published/209598943/setup) (requires Zapier account access). More info at [Webhooks.md](./Webhooks.md).
 
 Owner: Timothee Legros.
