@@ -15,7 +15,7 @@ export type GetStatsOptions = {
 };
 
 export type GetStatsResult = {
-  lastMonthNewCommunities: Array<{ id: string }>;
+  lastMonthNewCommunities: Array<string>;
   totalStats: {
     numCommentsLastMonth: number;
     numThreadsLastMonth: number;
@@ -106,7 +106,7 @@ export async function __getStats(
   ]);
 
   return {
-    lastMonthNewCommunities,
+    lastMonthNewCommunities: lastMonthNewCommunities.map(({ id }) => id),
     totalStats: {
       numCommentsLastMonth,
       numThreadsLastMonth,
