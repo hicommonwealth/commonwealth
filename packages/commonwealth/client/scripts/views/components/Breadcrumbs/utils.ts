@@ -48,9 +48,6 @@ export const generateBreadcrumbs = (
     // Generate the link based on the current path segment.
     switch (pathSegment) {
       case 'profile':
-        // Remove 'profile' segment and generate the link.
-        // pathSegments.splice(index + 1, 2);
-
         link = `profile/id/${profileId}`;
         break;
       case 'snapshot':
@@ -94,11 +91,8 @@ export const generateBreadcrumbs = (
         ? matchedBreadcrumb.breadcrumb
         : removedThreadId;
 
-    if (pathSegments[0] === 'profile') {
-      label = 'Profile';
-      if (index === 1) {
-        label = 'Edit Profile';
-      }
+    if (pathSegments[0] === 'profile' && index === 1) {
+      label = 'Edit Profile';
     }
 
     if (locationPath.includes('new/discussion') && label !== 'Create Thread') {
@@ -122,8 +116,8 @@ export const generateBreadcrumbs = (
         isParent = ['discussions', 'discussion'].includes(pathSegments[index]);
       }
     } else if (
-      ['Overview', 'archived'].includes(pathSegments[1]) &&
-      label !== pathSegments[1]
+      ['overview', 'archived'].includes(pathSegments[1]) &&
+      label.toLowerCase() !== pathSegments[1]
     ) {
       label = 'Discussions';
     } else {

@@ -20,7 +20,7 @@ export const breadCrumbURLS = [
   },
   {
     url: 'profile/edit',
-    breadcrumb: 'Edit Profile',
+    breadcrumb: 'Profile',
     className: 'editProfile',
     isParent: false,
   },
