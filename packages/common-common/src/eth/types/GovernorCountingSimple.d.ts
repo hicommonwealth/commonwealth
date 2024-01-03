@@ -34,7 +34,10 @@ interface GovernorCountingSimpleInterface extends ethers.utils.Interface {
     "name()": FunctionFragment;
     "proposalDeadline(uint256)": FunctionFragment;
     "proposalSnapshot(uint256)": FunctionFragment;
+    "proposalProposer(uint256)": FunctionFragment;
+    "proposalEta(uint256)": FunctionFragment;
     "proposalVotes(uint256)": FunctionFragment;
+    "proposalThreshold(uint256)": FunctionFragment;
     "propose(address[],uint256[],bytes[],string)": FunctionFragment;
     "quorum(uint256)": FunctionFragment;
     "state(uint256)": FunctionFragment;
@@ -88,6 +91,18 @@ interface GovernorCountingSimpleInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "proposalSnapshot",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "proposalProposer",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "proposalEta",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "proposalThreshold",
+    values: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "proposalVotes",
@@ -149,6 +164,18 @@ interface GovernorCountingSimpleInterface extends ethers.utils.Interface {
     functionFragment: "proposalSnapshot",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "proposalProposer",
+    data: BytesLike
+  ): Result
+  decodeFunctionResult(
+    functionFragment: "proposalEta",
+    data: BytesLike
+  ): Result
+  decodeFunctionResult(
+    functionFragment: "proposalThreshold",
+    data: BytesLike
+  ): Result
   decodeFunctionResult(
     functionFragment: "proposalVotes",
     data: BytesLike
@@ -346,6 +373,34 @@ export class GovernorCountingSimple extends Contract {
 
     "proposalDeadline(uint256)"(
       proposalId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    proposalProposer(
+      proposalId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+  
+    "proposalProposer(uint256)"(
+      proposalId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+  
+    proposalEta(
+      proposalId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+  
+    "proposalEta(uint256)"(
+      proposalId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    proposalThreshold(
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+  
+    "proposalThreshold()"(
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
@@ -562,6 +617,34 @@ export class GovernorCountingSimple extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
+  proposalProposer(
+    proposalId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "proposalProposer(uint256)"(
+    proposalId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  proposalEta(
+    proposalId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "proposalEta(uint256)"(
+    proposalId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  proposalThreshold(
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "proposalThreshold()"(
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   proposalSnapshot(
     proposalId: BigNumberish,
     overrides?: CallOverrides
@@ -769,6 +852,34 @@ export class GovernorCountingSimple extends Contract {
 
     "proposalDeadline(uint256)"(
       proposalId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    proposalProposer(
+      proposalId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+  
+    "proposalProposer(uint256)"(
+      proposalId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+  
+    proposalEta(
+      proposalId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+  
+    "proposalEta(uint256)"(
+      proposalId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    proposalThreshold(
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+  
+    "proposalThreshold()"(
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1045,6 +1156,34 @@ export class GovernorCountingSimple extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    proposalProposer(
+      proposalId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+  
+    "proposalProposer(uint256)"(
+      proposalId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+  
+    proposalEta(
+      proposalId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+  
+    "proposalEta(uint256)"(
+      proposalId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    proposalThreshold(
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+  
+    "proposalThreshold()"(
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     proposalSnapshot(
       proposalId: BigNumberish,
       overrides?: CallOverrides
@@ -1246,6 +1385,34 @@ export class GovernorCountingSimple extends Contract {
 
     "proposalDeadline(uint256)"(
       proposalId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    proposalProposer(
+      proposalId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+  
+    "proposalProposer(uint256)"(
+      proposalId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+  
+    proposalEta(
+      proposalId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+  
+    "proposalEta(uint256)"(
+      proposalId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    proposalThreshold(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+  
+    "proposalThreshold()"(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

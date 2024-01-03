@@ -7,7 +7,8 @@ import { ApiEndpoints } from 'state/api/config';
 const PROPOSAL_STALE_TIME = 30000; // 30 seconds
 
 const fetchCompoundProposals = async () => {
-  return CompoundGovernance.getProposals(app.chain as Compound);
+  const proposals = CompoundGovernance.getProposals(app.chain as Compound);
+  return proposals;
 };
 
 const useCompoundProposalsQuery = ({
