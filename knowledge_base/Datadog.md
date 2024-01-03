@@ -84,22 +84,7 @@ See also Datadog's [Heroku Agent Guide](https://docs.datadoghq.com/agent/basic_a
 
 2. Install the Datadog buildpack. Copy the following URL on Heroku App settings page using `Add Buildpack` button: <https://github.com/Datadog/heroku-buildpack-datadog.git>.
 
-3. Configure Postgres. Place the following Postgres Datadog config file in root folder of a Heroku app, `datadog/conf.d/postgres.yaml`. Leave the file generic; parameters will be replaced by `prerun.sh` on runtime if available.
-
-    ```yaml
-    init_config:
-
-    instances:
-      - dbm: true
-        host: <YOUR HOSTNAME>
-        port: <YOUR PORT>
-        username: <YOUR USERNAME>
-        password: <YOUR PASSWORD>
-        dbname: <YOUR DBNAME>
-        ssl: True
-    ```
-
-4. Verify on Datadog. Visit <https://us5.datadoghq.com/dashboard/lists> for all available dashboards. If the Datadog agent has successfully picked up the Postgres config, you will see your app database name in the top dropdown of the Postgres dashboards.
+3. Verify on Datadog. Visit <https://us5.datadoghq.com/dashboard/lists> for all available dashboards. If the Datadog agent has successfully picked up the Postgres config, you will see your app database name in the top dropdown of the Postgres dashboards.
 
 ## Change Log
 
