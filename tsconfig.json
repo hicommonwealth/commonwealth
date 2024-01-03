@@ -10,6 +10,7 @@
     "downlevelIteration": true,
     "traceResolution": false,
     "paths": {
+      "@hicommonwealth/*": ["libs/*/src"],
       "common-common": ["./packages/common-common"],
       "common-common/*": ["./packages/common-common/*"],
       "chain-testing/*": [
