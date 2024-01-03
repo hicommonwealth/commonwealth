@@ -35,7 +35,7 @@ To set up dyno-scoped metrics on Datadog:
 
 1. Enable Heroku Labs Dyno Metadata and Heroku Labs Log Runtime metrics. Heroku will log dyno metrics directly into our regular log feed.
 
-2. Set up Datadog to parse these logs and extract the data we need from them. Datadog ingests logs from Heroku in raw format and passes them through a pipeline which parses and remaps the log metrics. (Heroku buildpack takes care of this pipeline for us.) To display these metrics on the main dashboard, we need to create a Datadog Measure. A Datadog Measure is a key-value pair consisting of a number and reference string (name). To create a new Measure from the dashboard, select the parsed value from the event attributes, navigate to “Create Measure,” name it, and click "Add."
+2. Set up Datadog to parse these logs and extract the data we need from them. Datadog ingests logs from Heroku in raw format and passes them through a pipeline which parses and remaps the log metrics. (Heroku buildpack takes care of this pipeline for us.) To display these metrics on the main dashboard, we need to create a Datadog Measure. A Datadog Measure is a key-value pair consisting of a number and reference string (name). To create a new Measure from the dashboard, select a log from the log feed, open the event attributes tab, select the parsed value from the available event attributes, navigate to “Create Measure,” name it, and click "Add."
 
 For general Heroku documentation, see our dedicated [knowledge base entry](./Heroku.md).
 
