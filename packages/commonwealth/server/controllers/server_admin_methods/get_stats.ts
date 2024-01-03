@@ -76,33 +76,37 @@ export async function __getStats(
     whereCommunityId.community_id = communityId;
   }
 
-  const numCommentsLastMonth = await this.models.Comment.count({
-    where: whereChain,
-  });
-
-  const numThreadsLastMonth = await this.models.Thread.count({
-    where: whereChain,
-  });
-
-  const numReactionsLastMonth = await this.models.Reaction.count({
-    where: whereChain,
-  });
-
-  const numProposalVotesLastMonth = await this.models.Vote.count({
-    where: whereCommunityId,
-  });
-
-  const numPollsLastMonth = await this.models.Poll.count({
-    where: whereCommunityId,
-  });
-
-  const numMembersLastMonth = await this.models.Address.count({
-    where: whereCommunityId,
-  });
-
-  const numGroupsLastMonth = await this.models.Group.count({
-    where: whereCommunityId,
-  });
+  const [
+    numCommentsLastMonth,
+    numThreadsLastMonth,
+    numReactionsLastMonth,
+    numProposalVotesLastMonth,
+    numPollsLastMonth,
+    numMembersLastMonth,
+    numGroupsLastMonth,
+  ] = await Promise.all([
+    this.models.Comment.count({
+      where: whereChain,
+    }),
+    this.models.Thread.count({
+      where: whereChain,
+    }),
+    this.models.Reaction.count({
+      where: whereChain,
+    }),
+    this.models.Vote.count({
+      where: whereCommunityId,
+    }),
+    this.models.Poll.count({
+      where: whereCommunityId,
+    }),
+    this.models.Address.count({
+      where: whereCommunityId,
+    }),
+    this.models.Group.count({
+      where: whereCommunityId,
+    }),
+  ]);
 
   return {
     lastMonthNewCommunities,
