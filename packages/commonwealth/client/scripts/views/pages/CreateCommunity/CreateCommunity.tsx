@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-
-import './CreateCommunity.scss';
-
 import AddressInfo from 'models/AddressInfo';
+import React, { useState } from 'react';
 import { SelectedCommunity } from 'views/components/component_kit/new_designs/CWCommunitySelector';
 import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps';
+import { MixpanelCommunityCreationEvent } from '../../../../../shared/analytics/types';
+import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
+
+import './CreateCommunity.scss';
 import BasicInformationStep from './steps/BasicInformationStep';
 import CommunityTypeStep from './steps/CommunityTypeStep';
 import SuccessStep from './steps/SuccessStep';
@@ -18,6 +19,10 @@ const CreateCommunity = () => {
   );
   const [selectedAddress, setSelectedAddress] = useState<AddressInfo>(null);
   const [createdCommunityId, setCreatedCommunityId] = useState('');
+
+  useBrowserAnalyticsTrack({
+    payload: { event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_VISITED },
+  });
 
   const handleChangeStep = (action: number) => {
     setCreateCommunityStep((prevState) => prevState + action);

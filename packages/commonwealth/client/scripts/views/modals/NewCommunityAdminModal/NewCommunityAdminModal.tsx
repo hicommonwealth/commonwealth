@@ -12,6 +12,12 @@ import {
 } from 'views/components/component_kit/new_designs/CWModal';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import {
+  BaseMixpanelPayload,
+  MixpanelCommunityCreationEvent,
+  MixpanelLoginPayload,
+} from '../../../../../shared/analytics/types';
+import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
 import './NewCommunityAdminModal.scss';
 
 interface NewCommunityAdminModalProps {
@@ -30,6 +36,12 @@ const NewCommunityAdminModal = ({
   const availableAddressesOnSelectedChain = app.user?.addresses?.filter(
     (addressInfo) => addressInfo.community.base === selectedCommunity.chainBase,
   );
+
+  const { trackAnalytics } = useBrowserAnalyticsTrack<
+    MixpanelLoginPayload | BaseMixpanelPayload
+  >({
+    onAction: true,
+  });
 
   const availableAddresses = uniqBy(
     availableAddressesOnSelectedChain,
@@ -80,7 +92,13 @@ const NewCommunityAdminModal = ({
             <CWButton
               label="Connect New Wallet"
               buttonType="secondary"
-              onClick={handleClickConnectNewWallet}
+              onClick={() => {
+                trackAnalytics({
+                  event:
+                    MixpanelCommunityCreationEvent.CONNECT_NEW_WALLET_PRESSED,
+                });
+                handleClickConnectNewWallet();
+              }}
             />
             <CWButton
               label="Continue"
