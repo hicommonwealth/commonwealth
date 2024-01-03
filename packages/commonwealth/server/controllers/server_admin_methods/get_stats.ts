@@ -44,14 +44,6 @@ export async function __getStats(
     }
   }
 
-  let lastMonthNewCommunities: Array<{ id: string }> = [];
-  if (!community) {
-    lastMonthNewCommunities = await this.models.sequelize.query(
-      `SELECT id FROM "Communities" WHERE created_at >= NOW() - INTERVAL '30 days'`,
-      { type: QueryTypes.SELECT },
-    );
-  }
-
   const oneMonthAgo = new Date();
   oneMonthAgo.setDate(oneMonthAgo.getDate() - 30);
 
@@ -77,6 +69,7 @@ export async function __getStats(
   }
 
   const [
+    lastMonthNewCommunities,
     numCommentsLastMonth,
     numThreadsLastMonth,
     numReactionsLastMonth,
@@ -85,6 +78,10 @@ export async function __getStats(
     numMembersLastMonth,
     numGroupsLastMonth,
   ] = await Promise.all([
+    this.models.sequelize.query<{ id: string }>(
+      `SELECT id FROM "Communities" WHERE created_at >= NOW() - INTERVAL '30 days'`,
+      { type: QueryTypes.SELECT },
+    ),
     this.models.Comment.count({
       where: whereChain,
     }),
