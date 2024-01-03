@@ -34,4 +34,4 @@ To start the app, run `yarn start`.
 
 Create a `.env` file at the `package/commonwealth` level to store minimum security environment variables. Higher security secrets should be stored inside an `.auth` file.
 
-Use the [.env.defaults](../../.env.defaults) file to get yourself set up.
+Use the [.env.example](../../.env.example) file to get yourself set up.

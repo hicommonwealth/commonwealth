@@ -1,13 +1,12 @@
 import chai, { expect } from 'chai';
-import chaiHttp = require('chai-http');
-import { DEFAULT_PORT } from '../src/config';
 import * as dotenv from 'dotenv';
+import chaiHttp = require('chai-http');
 dotenv.config();
 
 chai.use(chaiHttp);
 
 describe('Snapshot Listener API', () => {
-  const localhost = 'http://localhost:' + (process.env.SL_PORT || DEFAULT_PORT);
+  const localhost = 'http://localhost:' + process.env.PORT;
 
   it('/ should return OK', async () => {
     const res = await chai.request(localhost).get('/');
