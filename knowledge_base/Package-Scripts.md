@@ -73,6 +73,16 @@ If you add a script to the package.json, you must add documentation here, descri
 
 # Build Scripts
 
+## build-project
+
+Definition: `yarn global add node-gyp && yarn --ignore-engines && yarn workspace @hicommonwealth/core build && yarn workspace commonwealth migrate-db`
+
+Description: Temporary placeholder for common script used by the CI pipeline to:
+
+- Install dependencies
+- Incrementally build project with references (tsc -b)
+- Migrate DB
+
 ## build-all
 
 Definition: `NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.prod.config.js --progress && yarn build-consumer`

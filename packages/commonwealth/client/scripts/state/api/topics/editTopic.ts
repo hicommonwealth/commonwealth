@@ -12,7 +12,7 @@ interface EditTopicProps {
 const editTopic = async ({ topic, featuredOrder }: EditTopicProps) => {
   const response = await axios.patch(`${app.serverUrl()}/topics/${topic.id}`, {
     id: topic.id,
-    community_id: topic.chainId,
+    community_id: topic.communityId,
     name: topic.name,
     description: topic.description,
     telegram: topic.telegram,
@@ -32,7 +32,7 @@ const useEditTopicMutation = () => {
     mutationFn: editTopic,
     onSuccess: async (data, variables) => {
       await queryClient.invalidateQueries({
-        queryKey: [ApiEndpoints.BULK_TOPICS, variables.topic.chainId],
+        queryKey: [ApiEndpoints.BULK_TOPICS, variables.topic.communityId],
       });
     },
   });

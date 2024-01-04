@@ -255,7 +255,7 @@ export async function createTestEntities() {
           where: {
             id: -1,
             name: 'testTopic',
-            chain_id: 'cmntest',
+            community_id: 'cmntest',
           },
         })
       )[0],
@@ -264,7 +264,7 @@ export async function createTestEntities() {
           where: {
             id: -2,
             name: 'testTopic2',
-            chain_id: 'cmntest',
+            community_id: 'cmntest',
           },
         })
       )[0],

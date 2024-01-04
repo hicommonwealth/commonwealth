@@ -89,7 +89,7 @@ export async function __getBulkThreads(
           as threads_total_likes,
         threads.links as links,
         topics.id AS topic_id, topics.name AS topic_name, topics.description AS topic_description,
-        topics.chain_id AS topic_chain,
+        topics.community_id AS topic_community_id,
         topics.telegram AS topic_telegram,
         collaborators
       FROM "Addresses" AS addr
@@ -219,7 +219,7 @@ export async function __getBulkThreads(
         id: t.topic_id,
         name: t.topic_name,
         description: t.topic_description,
-        chainId: t.topic_chain,
+        chainId: t.topic_community_id,
         telegram: t.telegram,
       };
     }
