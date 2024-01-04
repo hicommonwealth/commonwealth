@@ -401,6 +401,14 @@ describe('ServerThreadsController', () => {
             last_checked: new Date(),
             reject_reason: fakeMembershipReject,
           }),
+          findAll: sandbox.stub().resolves([
+            {
+              group_id: 1,
+              last_checked: new Date(),
+              reject_reason: fakeMembershipReject,
+            },
+          ]),
+          bulkCreate: sandbox.stub().resolves([]),
         },
       };
       const tokenBalanceCache = {

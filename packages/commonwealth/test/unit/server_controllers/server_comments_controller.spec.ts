@@ -436,6 +436,8 @@ describe('ServerCommentsController', () => {
             last_checked: new Date(),
             reject_reason: 'filler',
           }),
+          findAll: sandbox.stub().resolves([]),
+          bulkCreate: sandbox.stub().resolves([]),
         },
       };
       const tokenBalanceCache = {
