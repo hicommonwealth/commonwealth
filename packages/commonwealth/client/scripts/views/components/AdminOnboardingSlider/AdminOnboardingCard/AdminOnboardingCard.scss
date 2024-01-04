@@ -1,0 +1,53 @@
+@import '../../../../../styles/shared';
+
+.AdminOnboardingCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 6px;
+  border: 1px solid $neutral-200;
+  background: white;
+  min-width: 250px;
+  width: 250px;
+  max-width: 250px;
+
+  .circle-btn-border {
+    border: none !important;
+    padding: 0 !important;
+
+    .CircleButton {
+      padding: 10px !important;
+
+      svg {
+        height: 24px !important;
+        width: 24px !important;
+      }
+    }
+  }
+
+  .content {
+    .h4 {
+      font-weight: 600 !important;
+    }
+
+    .b2 {
+      margin-top: 4px;
+      color: $neutral-500 !important;
+    }
+  }
+
+  .cta-button {
+    margin-top: auto;
+    padding-left: 0 !important;
+
+    &:focus-within {
+      border-color: transparent !important;
+    }
+
+    button {
+      padding-left: 0 !important;
+    }
+  }
+}
