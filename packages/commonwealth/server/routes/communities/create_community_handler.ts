@@ -1,4 +1,4 @@
-import { CreateCommunitySchema } from '@hicommonwealth/core';
+import { Community } from '@hicommonwealth/core';
 import { AppError } from 'common-common/src/errors';
 import { MixpanelCommunityCreationEvent } from '../../../shared/analytics/types';
 import {
@@ -23,7 +23,9 @@ export const createCommunityHandler = async (
     }
   }
 
-  const validationResult = await CreateCommunitySchema.safeParseAsync(req.body);
+  const validationResult = await Community.CreateCommunitySchema.safeParseAsync(
+    req.body,
+  );
 
   if (validationResult.success === false) {
     throw new AppError(formatErrorPretty(validationResult));
