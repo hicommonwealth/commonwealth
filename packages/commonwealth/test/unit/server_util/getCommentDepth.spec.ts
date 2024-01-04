@@ -27,14 +27,17 @@ const COMMENTS = {
 
 describe('getCommentDepth', () => {
   it('should correctly calculate comment depth (recursion terminated naturally)', async () => {
+    const maxIterations = 5;
     const sandbox = Sinon.createSandbox();
     const db = {
       Comment: {
         findOne: sandbox.fake(async ({ where: { id } }) => COMMENTS[id]),
       },
+      sequelize: {
+        query: async () => [{ max_depth_reached: false, comment_depth: 3 }],
+      },
     };
     const comment = COMMENTS['4'] as unknown as CommentInstance;
-    const maxIterations = 5;
     const [exceeded, depth] = await getCommentDepth(
       db as any,
       comment,
@@ -42,18 +45,22 @@ describe('getCommentDepth', () => {
     );
     expect(exceeded).to.be.false;
     expect(depth).to.equal(3);
-    expect(db.Comment.findOne.callCount).to.equal(3);
   });
 
   it('should correctly calculate comment depth (recursion depth exceeded)', async () => {
+    const maxIterations = 2;
     const sandbox = Sinon.createSandbox();
     const db = {
       Comment: {
         findOne: sandbox.fake(async ({ where: { id } }) => COMMENTS[id]),
       },
+      sequelize: {
+        query: async () => [
+          { max_depth_reached: true, comment_depth: maxIterations },
+        ],
+      },
     };
     const comment = COMMENTS['4'] as unknown as CommentInstance;
-    const maxIterations = 2;
     const [exceeded, depth] = await getCommentDepth(
       db as any,
       comment,
@@ -61,6 +68,5 @@ describe('getCommentDepth', () => {
     );
     expect(exceeded).to.be.true;
     expect(depth).to.equal(2);
-    expect(db.Comment.findOne.callCount).to.equal(2);
   });
 });

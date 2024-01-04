@@ -962,6 +962,7 @@ describe('ServerThreadsController', () => {
             rollback: async () => ({}),
             commit: async () => ({}),
           }),
+          query: async () => [{ max_depth_reached: true, comment_depth: 8 }],
         },
         Comment: {
           create: async () => ({}),
