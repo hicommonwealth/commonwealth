@@ -44,7 +44,7 @@ export const digestLevels = {
 
 // TODO: CHANGE TO 1 WEEK
 export const getTopThreads = async (
-  communityId: string
+  communityId: string,
 ): Promise<ThreadData[]> => {
   const res = await models.sequelize.query(`SELECT 
         t.title,
@@ -76,7 +76,7 @@ export const getTopThreads = async (
         row.author_address,
         communityId,
         false,
-        4
+        4,
       );
 
       const addressData = await models.Address.findOne({
@@ -98,7 +98,7 @@ export const getTopThreads = async (
           'missing profile for ',
           row.author_address,
           ' in ',
-          communityId
+          communityId,
         );
       }
 
@@ -123,7 +123,7 @@ export const getTopThreads = async (
 };
 
 const getCommunityActivityScore = async (
-  communityId: string
+  communityId: string,
 ): Promise<number> => {
   const activityScore = await models.sequelize.query(`SELECT 
           0.4 * COUNT(DISTINCT t.id) +
@@ -147,7 +147,7 @@ const getActivityCounts = async (communityId: string) => {
               COUNT(DISTINCT c.id) AS comment_count
               FROM "Comments" c
               WHERE
-              c.chain='${communityId}' AND
+              c.community_id='${communityId}' AND
               c.created_at > NOW() - INTERVAL '1 WEEK'`);
 
   const totalComments = (commentCounts[1] as any)?.rows?.[0]
@@ -168,7 +168,7 @@ const getActivityCounts = async (communityId: string) => {
 
 export const emailDigestBuilder = async (
   digestLevel: number,
-  confirmationEmail: string
+  confirmationEmail: string,
 ) => {
   // Go through each community on CW
   const communities = await models.Community.findAll();
@@ -188,7 +188,7 @@ export const emailDigestBuilder = async (
       const activityScore = await getCommunityActivityScore(community.id);
 
       const { totalComments, totalThreads } = await getActivityCounts(
-        community.id
+        community.id,
       );
 
       communityDigestInfo[community.id] = {

@@ -69,7 +69,7 @@ export async function __deleteCommunity(
           await sequelize.query(
             `UPDATE "Comments" SET
                 created_by = (SELECT address FROM "Addresses" WHERE "Comments".address_id = "Addresses".id)
-             WHERE chain = '${community.id}'`,
+             WHERE community_id = '${community.id}'`,
             { transaction: t },
           );
 

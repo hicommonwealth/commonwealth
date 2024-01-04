@@ -85,7 +85,7 @@ const deleteChain = async (
                     SELECT address
                     FROM "Addresses"
                     WHERE "Comments".address_id = "Addresses".id)
-                 WHERE chain = '${chain.id}'`,
+                 WHERE community_id = '${chain.id}'`,
             { transaction: t },
           );
 
