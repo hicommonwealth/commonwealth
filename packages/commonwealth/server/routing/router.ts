@@ -69,7 +69,6 @@ import getUploadSignature from '../routes/getUploadSignature';
 import bulkOffchain from '../routes/bulkOffchain';
 import logout from '../routes/logout';
 import sendFeedback from '../routes/sendFeedback';
-import setTopicThreshold from '../routes/setTopicThreshold';
 import updateProfileNew from '../routes/updateNewProfile';
 import writeUserSetting from '../routes/writeUserSetting';
 
@@ -87,14 +86,12 @@ import type ViewCountCache from '../util/viewCountCache';
 import type { DB } from '../models';
 import authCallback from '../routes/authCallback';
 import banAddress from '../routes/banAddress';
-import bulkBalances from '../routes/bulkBalances';
 import editSubstrateSpec from '../routes/editSubstrateSpec';
 import finishSsoLogin from '../routes/finishSsoLogin';
 import getBannedAddresses from '../routes/getBannedAddresses';
 import setAddressWallet from '../routes/setAddressWallet';
 import { sendMessage } from '../routes/snapshotAPI';
 import startSsoLogin from '../routes/startSsoLogin';
-import tokenBalance from '../routes/tokenBalance';
 import updateAddress from '../routes/updateAddress';
 import viewChainIcons from '../routes/viewChainIcons';
 import type BanCache from '../util/banCheckCache';
@@ -425,19 +422,6 @@ function setupRouter(
     databaseValidationService.validateCommunity,
     starCommunity.bind(this, models),
   );
-  registerRoute(
-    router,
-    'post',
-    '/tokenBalance',
-    databaseValidationService.validateCommunity,
-    tokenBalance.bind(this, models, tokenBalanceCacheV1),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/bulkBalances',
-    bulkBalances.bind(this, models, tokenBalanceCacheV1),
-  );
 
   registerRoute(
     router,
@@ -767,13 +751,6 @@ function setupRouter(
     '/topics' /* OLD: /bulkTopics */,
     databaseValidationService.validateCommunity,
     getTopicsHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/setTopicThreshold',
-    passport.authenticate('jwt', { session: false }),
-    setTopicThreshold.bind(this, models),
   );
 
   // reactions

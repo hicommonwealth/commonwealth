@@ -55,7 +55,7 @@
     "test-integration-util": "NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integration/*.spec.ts",
     "test-select": "NODE_ENV=test nyc ts-mocha --project tsconfig.json",
     "test-suite": "NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/**/*.spec.ts'",
-    "unit-test": "NODE_ENV=test ts-mocha --project tsconfig.json './test/unit/**/*.spec.ts'",
+    "unit-test": "NODE_ENV=test FEATURE_FLAG_GROUP_CHECK_ENABLED=true ts-mocha --project tsconfig.json './test/unit/**/*.spec.ts'",
     "unit-test:watch": "NODE_ENV=test ts-mocha --project tsconfig.json --opts test/mocha-dev.opts './test/unit/**/*.spec.ts' -w --watch-files '**/*.ts'",
     "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh",
     "refresh-all-memberships": "npx ts-node -T ./scripts/refresh-all-memberships.ts",

@@ -25,7 +25,6 @@ const createMockedGroupsController = () => {
     {
       id: 1,
       community_id: 'ethereum',
-      token_threshold: '1000',
       name: 'hello',
       featured_in_sidebar: false,
       featured_in_new_post: false,
