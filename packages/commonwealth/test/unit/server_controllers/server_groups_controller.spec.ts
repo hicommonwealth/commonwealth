@@ -99,6 +99,7 @@ const createMockedGroupsController = () => {
       },
       count: async () => memberships.length,
       destroy: async () => {},
+      bulkCreate: async () => {},
     },
     CommunityRole: {
       findAll: async () => [
