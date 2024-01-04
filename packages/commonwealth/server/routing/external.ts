@@ -92,7 +92,7 @@ export function addExternalRoutes(
     postReactionsValidation,
     addEntities.bind(
       this,
-      'chain',
+      'community_id',
       models,
       (a) => models.Reaction.bulkCreate(a),
       (req: TypedRequest<PostReactionsReq>) => req.body.reactions,
@@ -102,7 +102,7 @@ export function addExternalRoutes(
     '/reactions',
     passport.authenticate('jwt', { session: false }),
     onlyIds,
-    deleteEntities.bind(this, 'chain', models, models.Reaction),
+    deleteEntities.bind(this, 'community_id', models, models.Reaction),
   );
 
   router.get(
