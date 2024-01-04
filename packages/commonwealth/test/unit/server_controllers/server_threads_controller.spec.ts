@@ -351,7 +351,7 @@ describe('ServerThreadsController', () => {
         // for validateTopicThreshold
         Topic: {
           findOne: sandbox.stub().resolves({
-            chain: {
+            community: {
               ChainNode: {
                 id: 99,
               },

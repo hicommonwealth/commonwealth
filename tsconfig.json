@@ -10,6 +10,7 @@
     "downlevelIteration": true,
     "traceResolution": false,
     "paths": {
+      "@hicommonwealth/*": ["libs/*/src"],
       "common-common": ["./packages/common-common"],
       "common-common/*": ["./packages/common-common/*"],
       "chain-testing/*": [
@@ -20,5 +21,8 @@
       "discord-bot": ["./packages/discord-bot"],
       "discord-bot/*": ["./packages/discord-bot/*"]
     }
+  },
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
   }
 }

@@ -2,7 +2,7 @@ import type { DeltaStatic } from 'quill';
 import React, { useState } from 'react';
 
 import { pluralizeWithoutNumberPrefix } from 'helpers';
-import Topic from '../../models/Topic';
+import Topic, { TopicAttributes } from '../../models/Topic';
 import { useCommonNavigate } from '../../navigation/helpers';
 import app from '../../state';
 import {
@@ -77,11 +77,11 @@ export const EditTopicModal = ({
       return;
     }
 
-    const topicInfo = {
+    const topicInfo: TopicAttributes = {
       id,
       description: description,
       name: name,
-      chain_id: app.activeChainId(),
+      community_id: app.activeChainId(),
       telegram: null,
       featured_in_sidebar: featuredInSidebar,
       featured_in_new_post: featuredInNewPost,
