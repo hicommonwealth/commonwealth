@@ -74,7 +74,7 @@ export async function __deleteCommunity(
           );
 
           await this.models.Comment.destroy({
-            where: { chain: community.id },
+            where: { community_id: community.id },
             transaction: t,
           });
 

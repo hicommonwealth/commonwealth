@@ -1,7 +1,6 @@
 import Sequelize from 'sequelize';
 import models from 'server/database';
 import type { AddressInstance } from 'server/models/address';
-import type { CommunityInstance } from '../../../server/models/community';
 import type { ChainNodeAttributes } from 'server/models/chain_node';
 import type { CollaborationAttributes } from 'server/models/collaboration';
 import type { CommentInstance } from 'server/models/comment';
@@ -9,6 +8,7 @@ import type { ReactionAttributes } from 'server/models/reaction';
 import type { ThreadInstance } from 'server/models/thread';
 import type { TopicAttributes } from 'server/models/topic';
 import type { UserInstance } from 'server/models/user';
+import type { CommunityInstance } from '../../../server/models/community';
 import { ProfileAttributes } from '../../../server/models/profile';
 import { testAddress } from '../utils/e2eUtils';
 
@@ -163,8 +163,8 @@ export async function createTestEntities() {
                 isAdmin: true,
               },
             })
-          )[0]
-      )
+          )[0],
+      ),
     );
 
     testProfiles = await Promise.all(
@@ -180,8 +180,8 @@ export async function createTestEntities() {
                 user_id: -i - 1,
               },
             })
-          )[0]
-      )
+          )[0],
+      ),
     );
 
     testChainNodes = [
@@ -291,8 +291,8 @@ export async function createTestEntities() {
                 profile_id: i < 2 ? -1 : -2,
               },
             })
-          )[0]
-      )
+          )[0],
+      ),
     );
 
     testThreads = await Promise.all(
@@ -310,8 +310,8 @@ export async function createTestEntities() {
                 kind: 'discussion',
               },
             })
-          )[0]
-      )
+          )[0],
+      ),
     );
 
     testThreads.push(
@@ -330,9 +330,9 @@ export async function createTestEntities() {
                   kind: 'discussion',
                 },
               })
-            )[0]
-        )
-      ))
+            )[0],
+        ),
+      )),
     );
 
     testCollaborations = await Promise.all(
@@ -345,8 +345,8 @@ export async function createTestEntities() {
                 address_id: -i - 1,
               },
             })
-          )[0]
-      )
+          )[0],
+      ),
     );
 
     testComments = await Promise.all(
@@ -356,15 +356,15 @@ export async function createTestEntities() {
             await models.Comment.findOrCreate({
               where: {
                 id: -i - 1,
-                chain: 'cmntest',
+                community_id: 'cmntest',
                 address_id: -1,
                 text: '',
                 thread_id: -1,
                 plaintext: '',
               },
             })
-          )[0]
-      )
+          )[0],
+      ),
     );
 
     testComments.push(
@@ -375,16 +375,16 @@ export async function createTestEntities() {
               await models.Comment.findOrCreate({
                 where: {
                   id: -i - 1 - 2,
-                  chain: 'cmntest',
+                  community_id: 'cmntest',
                   address_id: -2,
                   text: '',
                   thread_id: -2,
                   plaintext: '',
                 },
               })
-            )[0]
-        )
-      ))
+            )[0],
+        ),
+      )),
     );
 
     testReactions = await Promise.all(
@@ -400,8 +400,8 @@ export async function createTestEntities() {
                 chain: 'cmntest',
               },
             })
-          )[0]
-      )
+          )[0],
+      ),
     );
 
     testReactions.push(
@@ -418,9 +418,9 @@ export async function createTestEntities() {
                   chain: 'cmntest',
                 },
               })
-            )[0]
-        )
-      ))
+            )[0],
+        ),
+      )),
     );
   } catch (e) {
     console.log(e);

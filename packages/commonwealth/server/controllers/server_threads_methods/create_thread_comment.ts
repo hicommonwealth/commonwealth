@@ -103,7 +103,7 @@ export async function __createThreadComment(
     parentComment = await this.models.Comment.findOne({
       where: {
         id: parentId,
-        chain: community.id,
+        community_id: community.id,
       },
       include: [this.models.Address],
     });
@@ -197,7 +197,7 @@ export async function __createThreadComment(
       {
         subscriber_id: user.id,
         category_id: NotificationCategories.NewReaction,
-        chain_id: finalComment.chain || null,
+        chain_id: finalComment.community_id || null,
         comment_id: finalComment.id,
         is_active: true,
       },
@@ -207,7 +207,7 @@ export async function __createThreadComment(
       {
         subscriber_id: user.id,
         category_id: NotificationCategories.NewComment,
-        chain_id: finalComment.chain || null,
+        chain_id: finalComment.community_id || null,
         comment_id: finalComment.id,
         is_active: true,
       },
@@ -268,7 +268,7 @@ export async function __createThreadComment(
         root_type: ProposalType.Thread,
         comment_id: +finalComment.id,
         comment_text: finalComment.text,
-        chain_id: finalComment.chain,
+        chain_id: finalComment.community_id,
         author_address: finalComment.Address.address,
         author_chain: finalComment.Address.community_id,
       },
@@ -290,7 +290,7 @@ export async function __createThreadComment(
           comment_text: finalComment.text,
           parent_comment_id: +parentId,
           parent_comment_text: parentComment.text,
-          chain_id: finalComment.chain,
+          chain_id: finalComment.community_id,
           author_address: finalComment.Address.address,
           author_chain: finalComment.Address.community_id,
         },
@@ -317,7 +317,7 @@ export async function __createThreadComment(
                 root_type: ProposalType.Thread,
                 comment_id: +finalComment.id,
                 comment_text: finalComment.text,
-                chain_id: finalComment.chain,
+                chain_id: finalComment.community_id,
                 author_address: finalComment.Address.address,
                 author_chain: finalComment.Address.community_id,
               },

@@ -30,7 +30,7 @@ export const getComments = async (
 
   const { community_id, addresses, thread_ids, count_only } = req.query;
 
-  const where: WhereOptions<CommentAttributes> = { chain: community_id };
+  const where: WhereOptions<CommentAttributes> = { community_id: community_id };
 
   // if address is included, find which addressIds they correspond to.
   if (addresses) {

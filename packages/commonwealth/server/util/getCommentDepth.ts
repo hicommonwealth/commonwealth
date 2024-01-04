@@ -6,7 +6,7 @@ export const getCommentDepth = async (
   models: DB,
   comment,
   maxIterations: number,
-  n?: number
+  n?: number,
 ): Promise<[exceeded: boolean, depth: number]> => {
   if (!n) {
     n = 0;
@@ -22,7 +22,7 @@ export const getCommentDepth = async (
   const parentComment = await models.Comment.findOne({
     where: {
       id: comment.parent_id,
-      chain: comment.chain,
+      community_id: comment.chain,
     },
   });
   return getCommentDepth(models, parentComment, maxIterations, n + 1);

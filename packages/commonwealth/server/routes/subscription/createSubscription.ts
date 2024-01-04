@@ -85,7 +85,10 @@ export default async (
           where: { id: req.body.comment_id },
         });
         if (!comment) return next(new AppError(Errors.NoComment));
-        obj = { comment_id: req.body.comment_id, chain_id: comment.chain };
+        obj = {
+          comment_id: req.body.comment_id,
+          chain_id: comment.community_id,
+        };
       }
       break;
     }

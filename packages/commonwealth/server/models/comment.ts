@@ -16,7 +16,7 @@ export type CommentAttributes = {
   text: string;
   plaintext: string;
   id?: number;
-  chain: string;
+  community_id: string;
   parent_id?: string;
   version_history?: string[];
 
@@ -50,7 +50,7 @@ export default (
     'Comment',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      chain: { type: dataTypes.STRING, allowNull: false },
+      community_id: { type: dataTypes.STRING, allowNull: false },
       thread_id: {
         type: dataTypes.INTEGER,
         allowNull: false,
@@ -150,7 +150,7 @@ export default (
 
   Comment.associate = (models) => {
     models.Comment.belongsTo(models.Community, {
-      foreignKey: 'chain',
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
     models.Comment.belongsTo(models.Address, {

@@ -123,7 +123,7 @@ describe('getThreads Tests', () => {
 
     resp = await get(
       '/api/threads',
-      { community_id: testComments[0].chain, count_only: 3 },
+      { community_id: testComments[0].community_id, count_only: 3 },
       true,
     );
 
