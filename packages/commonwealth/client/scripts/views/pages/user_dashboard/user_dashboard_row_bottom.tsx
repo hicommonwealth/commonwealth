@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { NotificationCategories } from 'common-common/src/types';
+import { NotificationCategories } from '@hicommonwealth/core';
 
 import 'pages/user_dashboard/user_dashboard_row_bottom.scss';
 

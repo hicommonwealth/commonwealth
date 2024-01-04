@@ -7,6 +7,7 @@
     "build-all": "NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.prod.config.js --progress && yarn build-consumer",
     "build-consumer": "tsc --project tsconfig.worker.json && tsc-alias --project tsconfig.worker.json",
     "build-ios": "NODE_ENV=mobile webpack --config webpack/webpack.config.mobile.js --progress && NODE_ENV=mobile npx cap sync ios",
+    "build-server": "tsc --project tsconfig.server.json",
     "bundle-report": "webpack-bundle-analyzer --port 4200 build/stats.json",
     "check-types": "tsc --noEmit",
     "clean-db": "ts-node --project tsconfig.json server/scripts/cleanDb.ts",
@@ -88,6 +89,7 @@
     "@ethersproject/units": "^5.7.0",
     "@ethersproject/wallet": "^5.7.0",
     "@glidejs/glide": "^3.6.0",
+    "@hicommonwealth/core": "*",
     "@hookform/resolvers": "^3.3.1",
     "@keplr-wallet/types": "^0.12.23",
     "@keplr-wallet/unit": "^0.12.23",
@@ -255,7 +257,7 @@
     "vm-browserify": "^1.1.2",
     "ws": "^7.4.6",
     "yargs": "^17.7.2",
-    "zod": "^3.22.2",
+    "zod": "^3.22.4",
     "zustand": "^4.3.8"
   },
   "devDependencies": {
@@ -326,7 +328,6 @@
     "webpack-cli": "^4.10.0",
     "webpack-deduplication-plugin": "^0.0.8",
     "webpack-dev-middleware": "^5.3.3",
-    "webpack-dev-server": "^3.1.14",
     "webpack-hot-middleware": "^2.25.2",
     "webpack-merge": "^5.8.0"
   },

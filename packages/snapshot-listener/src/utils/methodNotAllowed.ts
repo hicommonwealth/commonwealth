@@ -1,12 +1,11 @@
+import { HttpMethod } from '@hicommonwealth/core';
 import {
   Express,
   NextFunction,
   Request,
   RequestHandler,
   Response,
-  Router,
 } from 'express';
-import { HttpMethod } from 'common-common/src/types';
 
 const routesMethods: { [key: string]: string[] } = {};
 

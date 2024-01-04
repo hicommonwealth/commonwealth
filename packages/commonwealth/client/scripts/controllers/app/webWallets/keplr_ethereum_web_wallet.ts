@@ -2,7 +2,7 @@ import type { SessionPayload } from '@canvas-js/interfaces';
 import type { AccountData, OfflineDirectSigner } from '@cosmjs/proto-signing';
 import type { ChainInfo, Window as KeplrWindow } from '@keplr-wallet/types';
 
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
 import app from 'state';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';

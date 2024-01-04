@@ -2,7 +2,7 @@ import {
   NotificationCategories,
   ProposalType,
   SupportedNetwork,
-} from 'common-common/src/types';
+} from '@hicommonwealth/core';
 import { getProposalUrlPath } from 'identifiers';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';

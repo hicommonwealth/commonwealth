@@ -1,16 +1,17 @@
-import { BigNumber, providers } from 'ethers';
-import { getCompoundGovContractAndVersion } from './compoundVersion';
-import { CompoundVoteEvents, GovVersion } from './types';
+import { ICompoundVoteResponse } from 'adapters/chain/compound/types';
 import {
   GovernorAlpha,
   GovernorBravoDelegate,
   GovernorCompatibilityBravo,
+  GovernorCountingSimple,
 } from 'common-common/src/eth/types';
-import { ICompoundVoteResponse } from 'adapters/chain/compound/types';
 import { RedisCache } from 'common-common/src/redisCache';
+import { BigNumber, providers } from 'ethers';
+import { getCompoundGovContractAndVersion } from './compoundVersion';
+import { CompoundVoteEvents, GovVersion } from './types';
 
 export function formatCompoundProposalVote(
-  vote: CompoundVoteEvents
+  vote: CompoundVoteEvents,
 ): ICompoundVoteResponse {
   return {
     voter: vote.voter,
@@ -25,13 +26,13 @@ export async function getCompoundProposalVotes(
   compoundGovAddress: string,
   provider: providers.Web3Provider,
   proposalId: string,
-  redisCache: RedisCache
+  redisCache: RedisCache,
 ): Promise<CompoundVoteEvents[]> {
   const { contract, version: govVersion } =
     await getCompoundGovContractAndVersion(
       redisCache,
       compoundGovAddress,
-      provider
+      provider,
     );
 
   let events;
@@ -41,7 +42,7 @@ export async function getCompoundProposalVotes(
     events = await typedContract.queryFilter(
       typedContract.filters.VoteCast(null, null, null, null),
       +proposal.startBlock,
-      +proposal.endBlock
+      +proposal.endBlock,
     );
     events = events.map((e) => {
       return {
@@ -57,7 +58,28 @@ export async function getCompoundProposalVotes(
     events = await typedContract.queryFilter(
       typedContract.filters.VoteCast(null, null, null, null, null),
       +proposal.startBlock,
-      +proposal.endBlock
+      +proposal.endBlock,
+    );
+    events = events.map((e) => {
+      return {
+        voter: e.args[0],
+        proposalId: e.args[1],
+        support: e.args[2],
+        votes: e.args[3],
+        reason: e.args[4],
+      };
+    });
+  } else if (govVersion === GovVersion.OzCountSimple) {
+    const typedContract = <GovernorCountingSimple>contract;
+    const [proposalStart, proposalEnd] = await Promise.all([
+      typedContract.proposalSnapshot(proposalId),
+      typedContract.proposalDeadline(proposalId),
+    ]);
+
+    events = await typedContract.queryFilter(
+      typedContract.filters.VoteCast(null, null, null, null, null),
+      +proposalStart,
+      +proposalEnd,
     );
     events = events.map((e) => {
       return {
@@ -74,7 +96,7 @@ export async function getCompoundProposalVotes(
     events = await typedContract.queryFilter(
       typedContract.filters.VoteCast(null, null, null, null, null),
       +proposal.startBlock,
-      +proposal.endBlock
+      +proposal.endBlock,
     );
     events = events.map((e) => {
       return {

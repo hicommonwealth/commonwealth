@@ -36,7 +36,6 @@ import SubscriptionFactory from './models/subscription';
 import TaggedThreadFactory from './models/tagged_threads';
 import TemplateFactory from './models/template';
 import ThreadFactory from './models/thread';
-import TokenFactory from './models/token';
 import TopicFactory from './models/topic';
 import UserModelFactory from './models/user';
 import VoteFactory from './models/vote';
@@ -109,7 +108,6 @@ const models: Models = {
   SnapshotProposal: SnapshotProposalFactory(sequelize, DataTypes),
   SnapshotSpace: SnapshotSpaceFactory(sequelize, DataTypes),
   Subscription: SubscriptionFactory(sequelize, DataTypes),
-  Token: TokenFactory(sequelize, DataTypes),
   TaggedThread: TaggedThreadFactory(sequelize, DataTypes),
   User: UserModelFactory(sequelize, DataTypes),
   Webhook: WebhookFactory(sequelize, DataTypes),

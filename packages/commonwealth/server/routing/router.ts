@@ -90,8 +90,6 @@ import bulkBalances from '../routes/bulkBalances';
 import editSubstrateSpec from '../routes/editSubstrateSpec';
 import finishSsoLogin from '../routes/finishSsoLogin';
 import getBannedAddresses from '../routes/getBannedAddresses';
-import getSupportedEthChains from '../routes/getSupportedEthChains';
-import getTokenForum from '../routes/getTokenForum';
 import setAddressWallet from '../routes/setAddressWallet';
 import { sendMessage } from '../routes/snapshotAPI';
 import startSsoLogin from '../routes/startSsoLogin';
@@ -445,18 +443,6 @@ function setupRouter(
     'post',
     '/bulkBalances',
     bulkBalances.bind(this, models, tokenBalanceCacheV1),
-  );
-  registerRoute(
-    router,
-    'get',
-    '/getTokenForum',
-    getTokenForum.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'get',
-    '/getSupportedEthChains',
-    getSupportedEthChains.bind(this, models),
   );
 
   registerRoute(

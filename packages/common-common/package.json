@@ -21,7 +21,8 @@
     "async-rwlock": "^1.1.1",
     "pg": "^8.8.0",
     "rascal": "^14.4.5",
-    "typescript-logging": "^0.6.4"
+    "typescript-logging": "^0.6.4",
+    "@hicommonwealth/core": "*"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",

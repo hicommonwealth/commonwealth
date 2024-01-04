@@ -1,4 +1,4 @@
-import { NotificationCategories } from 'common-common/src/types';
+import { NotificationCategories } from '@hicommonwealth/core';
 import { notifySuccess } from 'controllers/app/notifications';
 import moment from 'moment';
 import { Dispatch, SetStateAction } from 'react';

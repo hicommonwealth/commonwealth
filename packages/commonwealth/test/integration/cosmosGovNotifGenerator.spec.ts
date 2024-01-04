@@ -1,47 +1,49 @@
-import { resetDatabase } from '../../server-test';
-import models from '../../server/database';
-import { expect } from 'chai';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable max-len */
+import { GovProposalId } from '@cosmjs/stargate/build/modules/gov/queries';
 import {
   BalanceType,
   ChainBase,
   ChainNetwork,
   ChainType,
-} from 'common-common/src/types';
-import {
-  fetchLatestNotifProposalIds,
-  filterProposals,
-} from '../../server/workers/cosmosGovNotifications/util';
+} from '@hicommonwealth/core';
+import { expect } from 'chai';
 import {
   ProposalSDKType,
   ProposalStatusSDKType,
 } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
+import {
+  QueryProposalRequest,
+  QueryProposalResponseSDKType,
+  QueryProposalsRequest,
+  QueryProposalsResponseSDKType,
+} from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/query';
+import { LCDQueryClient as GovV1Client } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/query.lcd';
 import {
   numberToLong,
   toTimestamp,
 } from 'common-common/src/cosmos-ts/src/codegen/helpers';
 import { Proposal, ProposalStatus } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import {
-  QueryProposalRequest,
-  QueryProposalsRequest,
-  QueryProposalResponseSDKType,
-  QueryProposalsResponseSDKType,
-} from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/query';
-import { LCDQueryClient as GovV1Client } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/query.lcd';
-import {
   QueryProposalResponse,
   QueryProposalsResponse,
 } from 'cosmjs-types/cosmos/gov/v1beta1/query';
-import { GovProposalId } from '@cosmjs/stargate/build/modules/gov/queries';
+import { resetDatabase } from '../../server-test';
+import models from '../../server/database';
 import { generateCosmosGovNotifications } from '../../server/workers/cosmosGovNotifications/generateCosmosGovNotifications';
 import { CosmosClients } from '../../server/workers/cosmosGovNotifications/proposalFetching/getCosmosClient';
 import {
   AllCosmosProposals,
   GovV1Beta1ClientType,
 } from '../../server/workers/cosmosGovNotifications/proposalFetching/types';
+import {
+  fetchLatestNotifProposalIds,
+  filterProposals,
+} from '../../server/workers/cosmosGovNotifications/util';
 
 async function createFakeProposalNotification(
   proposalId: string,
-  chainId: string
+  chainId: string,
 ): Promise<{ event_data: { id: string } }> {
   const notifData = {
     event_data: {
@@ -73,7 +75,7 @@ type GovTypeMapping = {
 function createFakeProposal<T extends keyof GovTypeMapping>(
   govType: T,
   proposalId: number = 1,
-  submitTimeMs: number = Date.now()
+  submitTimeMs: number = Date.now(),
 ): GovTypeMapping[T] {
   const submitTime = new Date(submitTimeMs);
 
@@ -113,7 +115,7 @@ function createFakeProposal<T extends keyof GovTypeMapping>(
       submitTime: toTimestamp(submitTime),
       depositEndTime: toTimestamp(new Date(submitTime.getTime() + 86400000)),
       votingStartTime: toTimestamp(
-        new Date(submitTime.getTime() + 86400000 * 2)
+        new Date(submitTime.getTime() + 86400000 * 2),
       ),
       votingEndTime: toTimestamp(new Date(submitTime.getTime() + 86400000 * 3)),
       totalDeposit: [{ denom: 'random', amount: '1' }],
@@ -126,11 +128,11 @@ function createMockClients(
   v1Proposals: ProposalSDKType[] = [],
   v1Beta1Proposals: Proposal[] = [],
   v1Chain: string = 'kyve',
-  v1Beta1Chain: string = 'osmosis'
+  v1Beta1Chain: string = 'osmosis',
 ) {
   CosmosClients[v1Chain] = {
     async proposal(
-      params: QueryProposalRequest
+      params: QueryProposalRequest,
     ): Promise<QueryProposalResponseSDKType> {
       return {
         proposal: v1Proposals.find((p) => p.id.eq(params.proposalId)),
@@ -139,11 +141,11 @@ function createMockClients(
 
     // voter and depositor are not available in proposal objects (?) so only matching by proposal status
     async proposals(
-      params: QueryProposalsRequest
+      params: QueryProposalsRequest,
     ): Promise<QueryProposalsResponseSDKType> {
       return {
         proposals: v1Proposals.filter(
-          (p) => p.status === (params.proposalStatus as any)
+          (p) => p.status === (params.proposalStatus as any),
         ),
       };
     },
@@ -152,11 +154,11 @@ function createMockClients(
   CosmosClients[v1Beta1Chain] = {
     gov: {
       async proposal(
-        proposalId: GovProposalId
+        proposalId: GovProposalId,
       ): Promise<QueryProposalResponse> {
         return {
           proposal: v1Beta1Proposals.find((p) =>
-            p.proposalId.eq(Number(proposalId))
+            p.proposalId.eq(Number(proposalId)),
           ),
         };
       },
@@ -166,11 +168,11 @@ function createMockClients(
         proposalStatus: ProposalStatus,
         depositor?: string,
         voter?: string,
-        paginationKey?: Uint8Array
+        paginationKey?: Uint8Array,
       ): Promise<QueryProposalsResponse> {
         return {
           proposals: v1Beta1Proposals.filter(
-            (p) => p.status === proposalStatus
+            (p) => p.status === proposalStatus,
           ),
         };
       },
@@ -208,7 +210,7 @@ export async function createCosmosChains() {
         chain_node_id: kyveNode.id,
         default_symbol: 'KYVE',
       },
-      { transaction }
+      { transaction },
     );
 
     await models.Community.create(
@@ -222,7 +224,7 @@ export async function createCosmosChains() {
         chain_node_id: osmosisNode.id,
         default_symbol: 'OSMO',
       },
-      { transaction }
+      { transaction },
     );
   });
 }
@@ -237,12 +239,12 @@ describe('Cosmos Governance Notification Generator', () => {
       await createFakeProposalNotification('1', 'edgeware');
       const latestEdgewareProposal = await createFakeProposalNotification(
         '2',
-        'edgeware'
+        'edgeware',
       );
       await createFakeProposalNotification('1', 'ethereum');
       const latestEthereumProposal = await createFakeProposalNotification(
         '2',
-        'ethereum'
+        'ethereum',
       );
 
       const result = await fetchLatestNotifProposalIds(models, [
@@ -252,13 +254,13 @@ describe('Cosmos Governance Notification Generator', () => {
       expect(result).to.have.property('edgeware');
       expect(String(result.edgeware)).to.not.equal('1');
       expect(String(result.edgeware)).to.equal(
-        latestEdgewareProposal.event_data.id
+        latestEdgewareProposal.event_data.id,
       );
 
       expect(result).to.have.property('ethereum');
       expect(String(result.ethereum)).to.not.equal('1');
       expect(String(result.ethereum)).to.equal(
-        latestEthereumProposal.event_data.id
+        latestEthereumProposal.event_data.id,
       );
     });
 
@@ -311,7 +313,7 @@ describe('Cosmos Governance Notification Generator', () => {
             category_id: 'chain-event',
           },
         });
-      }
+      },
     );
 
     it('should not generate notifications if there are no cosmos chains', async () => {
@@ -323,7 +325,7 @@ describe('Cosmos Governance Notification Generator', () => {
 
       createMockClients(
         [createFakeProposal('v1', 4), createFakeProposal('v1', 5)],
-        [createFakeProposal('v1Beta1', 7), createFakeProposal('v1Beta1', 8)]
+        [createFakeProposal('v1Beta1', 7), createFakeProposal('v1Beta1', 8)],
       );
 
       await generateCosmosGovNotifications();
@@ -370,7 +372,7 @@ describe('Cosmos Governance Notification Generator', () => {
     it('should generate notifications for recent proposals even if there are no existing notifications', async () => {
       createMockClients(
         [createFakeProposal('v1', 4), createFakeProposal('v1', 5)],
-        [createFakeProposal('v1Beta1', 7), createFakeProposal('v1Beta1', 8)]
+        [createFakeProposal('v1Beta1', 7), createFakeProposal('v1Beta1', 8)],
       );
 
       await generateCosmosGovNotifications();
@@ -409,7 +411,7 @@ describe('Cosmos Governance Notification Generator', () => {
 
       createMockClients(
         [createFakeProposal('v1', v1ExistingNotifPropId + 1)],
-        [createFakeProposal('v1Beta1', v1Beta1ExistingNotifPropId + 1)]
+        [createFakeProposal('v1Beta1', v1Beta1ExistingNotifPropId + 1)],
       );
       await generateCosmosGovNotifications();
       const notifications = await models.Notification.findAll({

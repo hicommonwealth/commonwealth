@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-
-import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/core';
 import { isNonEmptyString } from 'helpers/typeGuards';
+import React, { useState } from 'react';
 import app from 'state';
 import ChainInfo from '../models/ChainInfo';
 import {

@@ -1,4 +1,4 @@
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
 import {
   linkExistingAddressToChainOrCommunity,
   setActiveAccount,

@@ -1,5 +1,5 @@
+import { BalanceType } from '@hicommonwealth/core';
 import { assert } from 'chai';
-import { BalanceType } from 'common-common/src/types';
 import Web3 from 'web3';
 
 import { TokenBalanceCache } from '../src/tbc';
@@ -19,7 +19,7 @@ class MockErc1155BalanceProvider extends BalanceProvider<{
   public async getBalance(
     _node: IChainNode,
     address: string,
-    opts: { testBalance: string; testTokenId?: string; contractType?: string }
+    opts: { testBalance: string; testTokenId?: string; contractType?: string },
   ): Promise<string> {
     const { testBalance, testTokenId, contractType } = opts;
     if (Web3.utils.isAddress(address)) {
@@ -40,7 +40,7 @@ class MockBalanceProvider extends BalanceProvider<{ testBalance: string }> {
   public async getBalance(
     _node: IChainNode,
     address: string,
-    opts: { testBalance: string }
+    opts: { testBalance: string },
   ): Promise<string> {
     if (Web3.utils.isAddress(address)) {
       return opts.testBalance;
@@ -68,7 +68,7 @@ describe('TBC unit tests', () => {
       0,
       0,
       [new MockBalanceProvider()],
-      mockNodesProvider
+      mockNodesProvider,
     );
     await tbc.start();
     const nodes = await tbc.getChainNodes();
@@ -89,7 +89,7 @@ describe('TBC unit tests', () => {
       0,
       0,
       [new MockBalanceProvider()],
-      mockNodesProvider
+      mockNodesProvider,
     );
     await tbc.start();
     const bps = await tbc.getBalanceProviders(1);
@@ -107,7 +107,7 @@ describe('TBC unit tests', () => {
       0,
       0,
       [new MockErc1155BalanceProvider()],
-      mockNodesProvider
+      mockNodesProvider,
     );
     await tbc.start();
     const bps = await tbc.getBalanceProviders(1);
@@ -129,7 +129,7 @@ describe('TBC unit tests', () => {
       0,
       0,
       [new MockBalanceProvider()],
-      mockNodesProvider
+      mockNodesProvider,
     );
     await tbc.start();
     try {
@@ -148,7 +148,7 @@ describe('TBC unit tests', () => {
       0,
       0,
       [new MockBalanceProvider()],
-      mockNodesProvider
+      mockNodesProvider,
     );
     await tbc.start();
     const addresses = ['abcd', '0x71C7656EC7ab88b098defB751B7401B5f6d8976F'];
@@ -157,7 +157,7 @@ describe('TBC unit tests', () => {
       1,
       addresses,
       'test-provider',
-      { testBalance }
+      { testBalance },
     );
     assert.deepEqual(tokenBalances, {
       balances: {
@@ -175,7 +175,7 @@ describe('TBC unit tests', () => {
       0,
       0,
       [new MockErc1155BalanceProvider()],
-      mockNodesProvider
+      mockNodesProvider,
     );
     await tbc.start();
     const addresses = ['abcd', '0x71C7656EC7ab88b098defB751B7401B5f6d8976F'];
@@ -185,7 +185,7 @@ describe('TBC unit tests', () => {
       1,
       addresses,
       'test-provider',
-      { testBalance, testTokenId }
+      { testBalance, testTokenId },
     );
     assert.deepEqual(tokenBalances, {
       balances: {

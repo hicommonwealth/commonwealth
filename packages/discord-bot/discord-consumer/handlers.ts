@@ -1,9 +1,9 @@
-import axios from 'axios';
 import {
   CommentDiscordActions,
   IDiscordMessage,
   ThreadDiscordActions,
-} from 'common-common/src/types';
+} from '@hicommonwealth/core';
+import axios from 'axios';
 import { TopicAttributes } from 'commonwealth/server/models/topic';
 import { SERVER_URL } from 'discord-bot/utils/config';
 import { sequelize } from 'discord-bot/utils/database';

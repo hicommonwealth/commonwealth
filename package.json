@@ -1,6 +1,7 @@
 {
   "private": true,
   "scripts": {
+    "build-project": "yarn global add node-gyp && yarn --ignore-engines && yarn workspace @hicommonwealth/core build && yarn workspace commonwealth migrate-db",
     "start": "yarn --cwd packages/commonwealth start",
     "build": "chmod u+x scripts/build.sh && ./scripts/build.sh",
     "clean": "find . -name node_modules -exec rm -rf {} \\;; yarn --ignore-engines",
@@ -23,7 +24,10 @@
     "lint-branch-warnings": "FAIL_WARNINGS=1 ./scripts/lint-branch.sh",
     "stylelint": "stylelint packages/commonwealth/client/styles/*",
     "chromatic": "chromatic --exit-zero-on-changes",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "watch-core": "tsc --watch --project libs/core/tsconfig.json",
+    "dev-server": "yarn workspace commonwealth start",
+    "dev": "concurrently -k -c 'auto' -n 'core,server' 'yarn watch-core' 'yarn dev-server'"
   },
   "engines": {
     "node": "18.x"
@@ -37,7 +41,8 @@
     "packages/common-common",
     "packages/token-balance-cache",
     "packages/commonwealth",
-    "packages/discord-bot"
+    "packages/discord-bot",
+    "libs/*"
   ],
   "dependencies": {
     "@capacitor/android": "^4.3.0",
@@ -73,7 +78,9 @@
     "prettier-plugin-organize-imports": "^3.2.3",
     "stylelint": "^14.14.1",
     "stylelint-config-prettier": "^9.0.4",
-    "stylelint-config-standard": "^29.0.0"
+    "stylelint-config-standard": "^29.0.0",
+    "tsconfig-paths": "^4.2.0",
+    "tsconfig-paths-webpack-plugin": "^4.1.0"
   },
   "resolutions": {
     "quill": "^1.3.6",

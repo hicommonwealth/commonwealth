@@ -1,6 +1,5 @@
 import type { DeltaStatic } from 'quill';
 import React, { useEffect } from 'react';
-
 import { pluralizeWithoutNumberPrefix } from '../../helpers';
 import { useCommonNavigate } from '../../navigation/helpers';
 import app from '../../state';
