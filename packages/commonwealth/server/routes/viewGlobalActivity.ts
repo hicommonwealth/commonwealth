@@ -10,7 +10,7 @@ const viewGlobalActivity = async (
   req: TypedRequestBody<Record<string, never>>,
   res: TypedResponse<GlobalActivity>,
 ) => {
-  const activity = await globalActivityCache.globalActivity();
+  const activity = await globalActivityCache.getGlobalActivity();
   return success(res, activity);
 };
 

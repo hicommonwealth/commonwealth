@@ -130,6 +130,7 @@
     "@types/react-router": "^5.1.20",
     "@types/react-router-dom": "^5.3.3",
     "@types/underscore": "^1.9.4",
+    "@types/uuid": "^9.0.7",
     "@walletconnect/ethereum-provider": "^2.10.1",
     "@walletconnect/modal": "^2.4.6",
     "ajv": "^8.12.0",
