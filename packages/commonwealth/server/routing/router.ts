@@ -12,7 +12,6 @@ import {
 } from '../middleware/methodNotAllowed';
 import { getRelatedCommunitiesHandler } from '../routes/communities/get_related_communities_handler';
 
-import adminAnalytics from '../routes/adminAnalytics';
 import communityStats from '../routes/communityStats';
 import createContract from '../routes/contracts/createContract';
 import createAddress from '../routes/createAddress';
@@ -87,8 +86,6 @@ import banAddress from '../routes/banAddress';
 import editSubstrateSpec from '../routes/editSubstrateSpec';
 import finishSsoLogin from '../routes/finishSsoLogin';
 import getBannedAddresses from '../routes/getBannedAddresses';
-import getSupportedEthChains from '../routes/getSupportedEthChains';
-import getTokenForum from '../routes/getTokenForum';
 import setAddressWallet from '../routes/setAddressWallet';
 import { sendMessage } from '../routes/snapshotAPI';
 import startSsoLogin from '../routes/startSsoLogin';
@@ -129,6 +126,7 @@ import markCommentAsSpam from '../routes/spam/markCommentAsSpam';
 import unmarkCommentAsSpam from '../routes/spam/unmarkCommentAsSpam';
 import viewChainActivity from '../routes/viewChainActivity';
 
+import { ServerAdminController } from '../controllers/server_admin_controller';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { ServerCommentsController } from '../controllers/server_comments_controller';
 import { ServerCommunitiesController } from '../controllers/server_communities_controller';
@@ -141,6 +139,7 @@ import { ServerReactionsController } from '../controllers/server_reactions_contr
 import { ServerThreadsController } from '../controllers/server_threads_controller';
 import { ServerTopicsController } from '../controllers/server_topics_controller';
 
+import { getStatsHandler } from '../routes/admin/get_stats_handler';
 import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
 import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_handler';
 import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
@@ -151,7 +150,6 @@ import { createCommunityHandler } from '../routes/communities/create_community_h
 import { deleteCommunityHandler } from '../routes/communities/delete_community_handler';
 import { getChainNodesHandler } from '../routes/communities/get_chain_nodes_handler';
 import { getCommunitiesHandler } from '../routes/communities/get_communities_handler';
-import { getCommunityStatsHandler } from '../routes/communities/get_community_stats_handler';
 import { updateCommunityHandler } from '../routes/communities/update_community_handler';
 import exportMembersList from '../routes/exportMembersList';
 import { createGroupHandler } from '../routes/groups/create_group_handler';
@@ -194,6 +192,7 @@ export type ServerControllers = {
   polls: ServerPollsController;
   groups: ServerGroupsController;
   topics: ServerTopicsController;
+  admin: ServerAdminController;
 };
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -222,6 +221,7 @@ function setupRouter(
     proposals: new ServerProposalsController(models, redisCache),
     groups: new ServerGroupsController(models, tokenBalanceCache, banCache),
     topics: new ServerTopicsController(models, banCache),
+    admin: new ServerAdminController(models),
   };
 
   // ---
@@ -342,13 +342,6 @@ function setupRouter(
   registerRoute(
     router,
     'get',
-    '/communities/:communityId/stats' /* prev: POST /communitySpecificAnalytics */,
-    passport.authenticate('jwt', { session: false }),
-    getCommunityStatsHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'get',
     '/nodes',
     getChainNodesHandler.bind(this, serverControllers),
   );
@@ -396,24 +389,13 @@ function setupRouter(
     databaseValidationService.validateCommunity,
     starCommunity.bind(this, models),
   );
-  registerRoute(
-    router,
-    'get',
-    '/getTokenForum',
-    getTokenForum.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'get',
-    '/getSupportedEthChains',
-    getSupportedEthChains.bind(this, models),
-  );
 
   registerRoute(
     router,
     'get',
-    '/adminAnalytics',
-    adminAnalytics.bind(this, models),
+    '/admin/analytics',
+    passport.authenticate('jwt', { session: false }),
+    getStatsHandler.bind(this, serverControllers),
   );
 
   // threads

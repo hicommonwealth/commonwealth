@@ -1,6 +1,6 @@
+import { ChainBase } from '@hicommonwealth/core';
 import { AppError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { ChainBase } from 'common-common/src/types';
 import crypto from 'crypto';
 import type { NextFunction, Request, Response } from 'express';
 import Sequelize from 'sequelize';

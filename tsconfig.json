@@ -10,13 +10,19 @@
     "downlevelIteration": true,
     "traceResolution": false,
     "paths": {
+      "@hicommonwealth/*": ["libs/*/src"],
       "common-common": ["./packages/common-common"],
       "common-common/*": ["./packages/common-common/*"],
-      "chain-testing/*": ["./packages/commonwealth/test/util/evm-chain-testing/*"],
+      "chain-testing/*": [
+        "./packages/commonwealth/test/util/evm-chain-testing/*"
+      ],
       "token-balance-cache": ["./packages/token-balance-cache"],
       "token-balance-cache/*": ["./packages/token-balance-cache/*"],
       "discord-bot": ["./packages/discord-bot"],
-      "discord-bot/*": ["./packages/discord-bot/*"],
+      "discord-bot/*": ["./packages/discord-bot/*"]
     }
+  },
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
   }
 }

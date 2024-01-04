@@ -1,5 +1,5 @@
+import { BalanceType } from '@hicommonwealth/core';
 import { assert, expect } from 'chai';
-import { BalanceType } from 'common-common/src/types';
 import { resetDatabase } from 'server-test';
 import models from 'server/database';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';

@@ -1,4 +1,4 @@
-import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/core';
 import { updateActiveAddresses } from 'controllers/app/login';
 import app, { ApiStatus } from 'state';
 import ChainInfo from '../models/ChainInfo';

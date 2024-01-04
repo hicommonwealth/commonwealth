@@ -1,3 +1,8 @@
+import {
+  CommentDiscordActions,
+  IDiscordMessage,
+  ThreadDiscordActions,
+} from '@hicommonwealth/core';
 import { factory, formatFilename } from 'common-common/src/logging';
 import {
   RabbitMQController,
@@ -13,11 +18,6 @@ import {
   startHealthCheckLoop,
 } from 'common-common/src/scripts/startHealthCheckLoop';
 import { StatsDController } from 'common-common/src/statsd';
-import {
-  CommentDiscordActions,
-  IDiscordMessage,
-  ThreadDiscordActions,
-} from 'common-common/src/types';
 import {
   handleCommentMessages,
   handleThreadMessages,
@@ -58,9 +58,9 @@ async function processMessage(data: TRmqMessages) {
         channel_id: parsedMessage.parent_channel_id,
         user: parsedMessage.user,
       },
-      author_chain: topic.chain_id,
+      author_chain: topic.community_id,
       address: DISCOBOT_ADDRESS,
-      chain: topic.chain_id,
+      chain: topic.community_id,
     };
 
     if (
@@ -86,7 +86,7 @@ async function processMessage(data: TRmqMessages) {
     }
 
     StatsDController.get().increment('cw.discobot_message_processed', 1, {
-      chain: topic.chain_id,
+      chain: topic.community_id,
       action: action,
     });
   } catch (error) {

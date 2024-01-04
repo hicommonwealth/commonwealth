@@ -1,0 +1,19 @@
+{
+  "name": "@hicommonwealth/core",
+  "private": "true",
+  "version": "0.1.0",
+  "description": "Core Model",
+  "files": [
+    "build"
+  ],
+  "main": "build/index",
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "rm -rf build",
+    "check-types": "tsc --noEmit",
+    "test": "NODE_ENV=test ts-mocha '__tests__/**/*.spec.ts'"
+  },
+  "dependencies": {
+    "zod": "^3.22.4"
+  }
+}

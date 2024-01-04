@@ -1,7 +1,7 @@
+import { WalletId } from '@hicommonwealth/core';
 import sgMail from '@sendgrid/mail';
 import { AppError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { WalletId } from 'common-common/src/types';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
 import { DynamicTemplate } from '../../shared/types';

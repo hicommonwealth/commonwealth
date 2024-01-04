@@ -1,10 +1,13 @@
 /* eslint-disable no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import type {
   Action,
   ActionPayload,
   Session,
   SessionPayload,
 } from '@canvas-js/interfaces';
+import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
 import {
   SignTypedDataVersion,
   personalSign,
@@ -14,7 +17,6 @@ import { Keyring } from '@polkadot/api';
 import { stringToU8a } from '@polkadot/util';
 import chai from 'chai';
 import 'chai/register-should';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
 import { configure as configureStableStringify } from 'safe-stable-stringify';

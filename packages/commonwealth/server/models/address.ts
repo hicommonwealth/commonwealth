@@ -1,4 +1,4 @@
-import { WalletId, WalletSsoSource } from 'common-common/src/types';
+import { WalletId, WalletSsoSource } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { CommunityAttributes, CommunityInstance } from './community';

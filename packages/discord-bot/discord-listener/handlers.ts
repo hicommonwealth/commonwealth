@@ -1,7 +1,7 @@
+import { DiscordAction, IDiscordMessage } from '@hicommonwealth/core';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { RabbitMQController } from 'common-common/src/rabbitmq';
 import { RascalPublications } from 'common-common/src/rabbitmq/types';
-import { DiscordAction, IDiscordMessage } from 'common-common/src/types';
 import { getImageUrls } from 'discord-bot/discord-listener/util';
 import { Client, Message, ThreadChannel } from 'discord.js';
 import { rollbar } from '../utils/rollbar';

@@ -1,5 +1,5 @@
+import { ChainBase } from '@hicommonwealth/core';
 import { chainBaseToCanvasChainId } from 'canvas';
-import { ChainBase } from 'common-common/src/types';
 import { useEffect, useState } from 'react';
 import app from 'state';
 
