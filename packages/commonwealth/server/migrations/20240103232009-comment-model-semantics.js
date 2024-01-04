@@ -54,6 +54,44 @@ module.exports = {
       await queryInterface.renameColumn('Comments', 'community_id', 'chain', {
         transaction,
       });
+      await queryInterface.addIndex('Comments', {
+        fields: ['id'],
+        name: 'offchain_comments_id',
+        transaction,
+      });
+      await queryInterface.addIndex('Comments', {
+        fields: ['id'],
+        name: 'comments_id',
+        transaction,
+      });
+      await queryInterface.addIndex('Comments', {
+        fields: ['chain', 'parent_id'],
+        name: 'offchain_comments_chain_object_id',
+        transaction,
+      });
+      await queryInterface.addIndex('Comments', {
+        fields: ['address_id'],
+        name: 'offchain_comments_address_id',
+        transaction,
+      });
+      await queryInterface.sequelize.query(
+        `
+        ALTER INDEX "comments_search" RENAME TO "OffchainComments_search"
+      `,
+        { transaction },
+      );
+      await queryInterface.sequelize.query(
+        `
+        ALTER INDEX "comments_community_id_created_at" RENAME TO "offchain_comments_chain_created_at"
+      `,
+        { transaction },
+      );
+      await queryInterface.sequelize.query(
+        `
+        ALTER INDEX "comments_community_id_updated_at" RENAME TO "offchain_comments_chain_updated_at"
+      `,
+        { transaction },
+      );
     });
   },
 };
