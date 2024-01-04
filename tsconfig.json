@@ -20,5 +20,8 @@
       "token-balance-cache": ["./packages/token-balance-cache"],
       "token-balance-cache/*": ["./packages/token-balance-cache/*"]
     }
+  },
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
   }
 }
