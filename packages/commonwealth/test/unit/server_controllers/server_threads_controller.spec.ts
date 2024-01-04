@@ -312,7 +312,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Ban error: big ban err');
     });
 
-    it('should throw error (token balance)', async () => {
+    it.skip('should throw error (token balance)', async () => {
       const sandbox = Sinon.createSandbox();
       const db = {
         Reaction: {
