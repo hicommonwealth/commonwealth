@@ -132,7 +132,7 @@ export function addExternalRoutes(
     postTopicsValidation,
     addEntities.bind(
       this,
-      'chain_id',
+      'community_id',
       models,
       (a) => models.Topic.bulkCreate(a),
       (req: TypedRequest<PostTopicsReq>) => req.body.topics,
@@ -141,7 +141,7 @@ export function addExternalRoutes(
   router.delete(
     '/topics',
     onlyIds,
-    deleteEntities.bind(this, 'chain_id', models, models.Topic),
+    deleteEntities.bind(this, 'community_id', models, models.Topic),
   );
 
   router.get(
