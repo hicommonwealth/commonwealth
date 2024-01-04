@@ -1,6 +1,7 @@
 {
   "private": true,
   "scripts": {
+    "build-project": "yarn global add node-gyp && yarn --ignore-engines && yarn workspace @hicommonwealth/core build && yarn workspace commonwealth migrate-db",
     "start": "yarn --cwd packages/commonwealth start",
     "build": "chmod u+x scripts/build.sh && ./scripts/build.sh",
     "clean": "find . -name node_modules -exec rm -rf {} \\;; yarn --ignore-engines",
@@ -23,7 +24,7 @@
     "lint-branch-warnings": "FAIL_WARNINGS=1 ./scripts/lint-branch.sh",
     "stylelint": "stylelint packages/commonwealth/client/styles/*",
     "chromatic": "chromatic --exit-zero-on-changes",
-    "prepare": "husky install & yarn workspace @hicommonwealth/core build",
+    "prepare": "husky install",
     "watch-core": "tsc --watch --project libs/core/tsconfig.json",
     "dev-server": "yarn workspace commonwealth start",
     "dev": "concurrently -k -c 'auto' -n 'core,server' 'yarn watch-core' 'yarn dev-server'"
