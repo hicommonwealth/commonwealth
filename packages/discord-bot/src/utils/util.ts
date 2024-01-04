@@ -5,7 +5,7 @@ import { sequelize } from './database';
  * Searches the Commonwealth database Topics table for any topics that are linked to the given Discord Forum
  */
 export async function getForumLinkedTopic(forumId: string): Promise<any> {
-  const result: any[] = await sequelize.query(
+  const result = await sequelize.query(
     `
     SELECT * FROM "Topics" WHERE channel_id = :forumId AND deleted_at IS NULL LIMIT 1;
   `,
