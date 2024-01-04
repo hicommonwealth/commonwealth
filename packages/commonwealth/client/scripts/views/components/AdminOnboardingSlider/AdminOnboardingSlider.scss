@@ -12,6 +12,12 @@
     align-items: center;
     gap: 32px;
     width: 100%;
+
+    .dismissBtn {
+      &:focus-within {
+        border-color: transparent !important;
+      }
+    }
   }
 
   .cards {
