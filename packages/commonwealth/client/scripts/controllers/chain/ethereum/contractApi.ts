@@ -5,7 +5,6 @@ import type {
   Web3Provider,
 } from '@ethersproject/providers';
 import { ChainBase } from '@hicommonwealth/core';
-import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import WebWalletController from 'controllers/app/web_wallets';
 import type { Contract } from 'ethers';
@@ -26,10 +25,7 @@ export async function attachSigner<CT extends Contract>(
     ChainBase.Ethereum,
   );
   let signer: JsonRpcSigner;
-  if (
-    signingWallet instanceof MetamaskWebWalletController ||
-    signingWallet instanceof WalletConnectWebWalletController
-  ) {
+  if (signingWallet instanceof WalletConnectWebWalletController) {
     const walletProvider = new ethers.providers.Web3Provider(
       signingWallet.provider as any,
     );
