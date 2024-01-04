@@ -19,7 +19,7 @@ const validateTopicThreshold = async (
       {
         model: models.Community,
         required: true,
-        as: 'chain',
+        as: 'community',
         include: [
           {
             model: models.ChainNode,
@@ -29,7 +29,7 @@ const validateTopicThreshold = async (
       },
     ],
   });
-  if (!topic?.chain?.ChainNode?.id) {
+  if (!topic?.community?.ChainNode?.id) {
     // if we have no node, always approve
     return true;
   }
@@ -42,14 +42,14 @@ const validateTopicThreshold = async (
   // TODO: @JAKE in the future, we will have more than one contract,
   // need to handle this through the TBC Rule, passing in associated Contract.id
   const communityContracts = await models.CommunityContract.findOne({
-    where: { chain_id: topic.chain.id },
+    where: { chain_id: topic.community.id },
     include: [{ model: models.Contract, required: true }],
   });
 
   try {
     const balance = await tbc.fetchUserBalance(
-      topic.chain.network,
-      topic.chain.ChainNode.id,
+      topic.community.network,
+      topic.community.ChainNode.id,
       userAddress,
       communityContracts?.Contract?.address,
     );
