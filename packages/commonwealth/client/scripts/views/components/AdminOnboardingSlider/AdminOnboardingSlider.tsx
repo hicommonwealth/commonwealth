@@ -1,8 +1,10 @@
+import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import { useFetchThreadsQuery } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
+import useNewTopicModalMutationStore from 'state/ui/newTopicModal';
 import Permissions from 'utils/Permissions';
 import { CWText } from '../component_kit/cw_text';
 import { CWButton } from '../component_kit/new_designs/cw_button';
@@ -21,7 +23,9 @@ export const AdminOnboardingSlider = () => {
     integrations.discodBot ||
     integrations.discordBotWebhooksEnabled;
 
+  const navigate = useCommonNavigate();
   const [isVisible, setIsVisible] = useState(false);
+  const { setIsNewTopicModalOpen } = useNewTopicModalMutationStore();
   const { data: topics = [], isLoading: isLoadingTopics = false } =
     useFetchTopicsQuery({
       communityId: app.activeChainId(),
@@ -37,6 +41,14 @@ export const AdminOnboardingSlider = () => {
       page: 1,
       limit: 20,
     });
+
+  const redirectToPage = (
+    pageName: 'create-group' | 'create-thread' | 'manage-community',
+  ) => {
+    pageName === 'create-group' && navigate(`/members/groups/create`);
+    pageName === 'create-thread' && navigate(`/new/discussion`);
+    pageName === 'manage-community' && navigate(`/manage`);
+  };
 
   useEffect(() => {
     if (
@@ -86,22 +98,26 @@ export const AdminOnboardingSlider = () => {
         <AdminOnboardingCard
           cardType="create-topic"
           isActionCompleted={topics.length > 0}
-          onCTAClick={() => {}}
+          // TODO: after https://github.com/hicommonwealth/commonwealth/issues/6026,
+          // redirect to specific section on the manage community page
+          onCTAClick={() => setIsNewTopicModalOpen(true)}
         />
         <AdminOnboardingCard
           cardType="make-group"
           isActionCompleted={groups.length > 0}
-          onCTAClick={() => {}}
+          onCTAClick={() => redirectToPage('create-group')}
         />
         <AdminOnboardingCard
           cardType="enable-integrations"
           isActionCompleted={hasAnyIntegration}
-          onCTAClick={() => {}}
+          // TODO: after https://github.com/hicommonwealth/commonwealth/issues/6024,
+          // redirect to specific section on the manage community page
+          onCTAClick={() => redirectToPage('manage-community')}
         />
         <AdminOnboardingCard
           cardType="create-thread"
           isActionCompleted={threads.length > 0}
-          onCTAClick={() => {}}
+          onCTAClick={() => redirectToPage('create-thread')}
         />
       </div>
     </section>
