@@ -20,5 +20,8 @@
       "discord-bot": ["./packages/discord-bot"],
       "discord-bot/*": ["./packages/discord-bot/*"]
     }
+  },
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
   }
 }
