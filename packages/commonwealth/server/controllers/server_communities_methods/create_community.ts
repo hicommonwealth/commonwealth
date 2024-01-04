@@ -4,6 +4,7 @@ import {
   ChainBase,
   ChainNetwork,
   ChainType,
+  Community,
   DefaultPage,
   NotificationCategories,
 } from '@hicommonwealth/core';
@@ -21,7 +22,6 @@ import type { ChainNodeAttributes } from '../../models/chain_node';
 import type { CommunityAttributes } from '../../models/community';
 import type { RoleAttributes } from '../../models/role';
 
-import { CreateCommunity } from '@hicommonwealth/core';
 import axios from 'axios';
 import { UserInstance } from '../../models/user';
 import { RoleInstanceWithPermission } from '../../util/roles';
@@ -67,7 +67,7 @@ export const Errors = {
 
 export type CreateCommunityOptions = {
   user: UserInstance;
-  community: CreateCommunity;
+  community: Community.CreateCommunity;
 };
 
 export type CreateCommunityResult = {
