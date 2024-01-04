@@ -81,8 +81,8 @@ const Profile = ({ profileId }: ProfileProps) => {
       setIsOwner(result.isOwner);
     } catch (err) {
       if (
-        err.status === 500 &&
-        err.responseJSON.error === NoProfileFoundError
+        err.response.status === 500 &&
+        err.response.data.error === NoProfileFoundError
       ) {
         setError(ProfileError.NoProfileFound);
       }
