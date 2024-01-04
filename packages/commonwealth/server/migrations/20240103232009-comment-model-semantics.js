@@ -14,14 +14,12 @@ module.exports = {
         transaction,
       });
 
-      // unused indexes on (chain, parent_id)
+      // unused index on (chain, parent_id)
       await queryInterface.removeIndex(
         'Comments',
         'offchain_comments_chain_object_id',
         { transaction },
       );
-      // TODO: is this really unused?
-      // await queryInterface.removeIndex('Comments', 'comments_chain_object_id', { transaction });
 
       // duplicate of 'comments_address_id' index on Comments.address_id
       await queryInterface.removeIndex(
