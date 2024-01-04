@@ -5,14 +5,14 @@ import type {
   GovernorCompatibilityBravo,
   GovernorCountingSimple,
   MPond,
-} from 'common-common/src/eth/types';
+} from '@hicommonwealth/chains';
 import {
   ERC20VotesComp__factory,
   GovernorAlpha__factory,
   GovernorCompatibilityBravo__factory,
   GovernorCountingSimple__factory,
   MPond__factory,
-} from 'common-common/src/eth/types';
+} from '@hicommonwealth/chains';
 
 import type ContractApi from 'controllers/chain/ethereum/contractApi';
 import { utils } from 'ethers';

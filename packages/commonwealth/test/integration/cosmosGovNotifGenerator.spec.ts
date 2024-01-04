@@ -2,27 +2,23 @@
 /* eslint-disable max-len */
 import { GovProposalId } from '@cosmjs/stargate/build/modules/gov/queries';
 import {
+  GovV1Client,
+  ProposalSDKType,
+  ProposalStatusSDKType,
+  QueryProposalRequest,
+  QueryProposalResponseSDKType,
+  QueryProposalsRequest,
+  QueryProposalsResponseSDKType,
+  numberToLong,
+  toTimestamp,
+} from '@hicommonwealth/chains';
+import {
   BalanceType,
   ChainBase,
   ChainNetwork,
   ChainType,
 } from '@hicommonwealth/core';
 import { expect } from 'chai';
-import {
-  ProposalSDKType,
-  ProposalStatusSDKType,
-} from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
-import {
-  QueryProposalRequest,
-  QueryProposalResponseSDKType,
-  QueryProposalsRequest,
-  QueryProposalsResponseSDKType,
-} from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/query';
-import { LCDQueryClient as GovV1Client } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/query.lcd';
-import {
-  numberToLong,
-  toTimestamp,
-} from 'common-common/src/cosmos-ts/src/codegen/helpers';
 import { Proposal, ProposalStatus } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import {
   QueryProposalResponse,

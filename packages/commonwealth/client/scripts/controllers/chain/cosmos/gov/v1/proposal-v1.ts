@@ -1,20 +1,18 @@
 import type { MsgDepositEncodeObject } from '@cosmjs/stargate';
 import { longify } from '@cosmjs/stargate/build/queryclient';
-import { ProposalType } from '@hicommonwealth/core';
-import BN from 'bn.js';
-import {
+import type {
   QueryDepositsResponseSDKType,
   QueryTallyResultResponseSDKType,
   QueryVotesResponseSDKType,
-} from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/query';
+} from '@hicommonwealth/chains';
+import { ProposalType } from '@hicommonwealth/core';
+import BN from 'bn.js';
 import type {
   CosmosProposalState,
   CosmosToken,
   CosmosVoteChoice,
   ICosmosProposal,
 } from 'controllers/chain/cosmos/types';
-import moment from 'moment';
-
 import Proposal from 'models/Proposal';
 import { ITXModalData } from 'models/interfaces';
 import {
@@ -24,6 +22,7 @@ import {
   VotingUnit,
 } from 'models/types';
 import { DepositVote } from 'models/votes';
+import moment from 'moment';
 import CosmosAccount from '../../account';
 import type CosmosAccounts from '../../accounts';
 import type CosmosChain from '../../chain';
