@@ -8,7 +8,7 @@ const communityStats = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const chain = req.chain;
 
@@ -24,7 +24,7 @@ const communityStats = async (
     models,
     { where: { address_id: { [Op.in]: userAddressIds } } },
     chain.id,
-    ['admin', 'moderator']
+    ['admin', 'moderator'],
   );
   if (!req.user.isAdmin && adminRoles.length === 0) {
     return next(new AppError('Must be admin'));
@@ -44,7 +44,7 @@ ORDER BY seq.date DESC;`,
       {
         type: QueryTypes.SELECT,
         replacements: { chainOrCommunity: chain.id, chainName: chainName },
-      }
+      },
     );
   };
   const roles = await newObjectsQuery('"Addresses"', 'community_id');
@@ -58,7 +58,7 @@ ORDER BY seq.date DESC;`,
       {
         type: QueryTypes.SELECT,
         replacements: { chainOrCommunity: chain.id },
-      }
+      },
     );
   };
   const totalRoles = await totalObjectsQuery('"Addresses"', 'community_id');
@@ -78,7 +78,7 @@ LEFT JOIN (
     AND ${chain ? 'chain' : 'community'} = :chainOrCommunity
   UNION
   SELECT address_id, created_at FROM "Reactions" WHERE created_at > CURRENT_DATE - ${numberOfPrevDays}
-    AND ${chain ? 'chain' : 'community'} = :chainOrCommunity
+    AND community_id = :chainOrCommunity
 ) objs
 ON objs.created_at::date = seq.date
 GROUP BY seq.date
@@ -87,7 +87,7 @@ ORDER BY seq.date DESC;
     {
       type: QueryTypes.SELECT,
       replacements: { chainOrCommunity: chain.id },
-    }
+    },
   );
 
   return res.json({

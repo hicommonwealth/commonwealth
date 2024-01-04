@@ -23,7 +23,7 @@ const exportMembersList = async (
   models: DB,
   req: TypedRequestBody<exportMembersListReq>,
   res: TypedResponse<exportMembersListResp>,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.user.isAdmin) {
     return next(new AppError(Errors.NotAdmin));
@@ -59,7 +59,7 @@ const exportMembersList = async (
       LEFT JOIN 
           "Comments" "c" ON "a"."id" = "c"."address_id" AND "c"."chain" = :chainId
       LEFT JOIN 
-          "Reactions" "r" ON "a"."id" = "r"."address_id" AND "r"."chain" = :chainId
+          "Reactions" "r" ON "a"."id" = "r"."address_id" AND "r"."community_id" = :chainId
       WHERE 
           "a"."community_id" = :chainId
       GROUP BY 
@@ -67,7 +67,7 @@ const exportMembersList = async (
     `,
       {
         replacements: { chainId },
-      }
+      },
     );
 
     return success(res, { data });
