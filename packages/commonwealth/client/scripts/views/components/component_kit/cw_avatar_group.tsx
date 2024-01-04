@@ -39,7 +39,7 @@ export const CWAvatarGroup = ({
   const count = profiles.length - 4;
   let countText;
 
-  if (totalProfiles && totalProfiles > maxProfileAvatars) {
+  if (totalProfiles > maxProfileAvatars) {
     countText = `+${totalProfiles - maxProfileAvatars} others`;
   } else if (count > maxProfileAvatars + 1) {
     countText = `+${count} others`;
