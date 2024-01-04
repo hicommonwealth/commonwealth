@@ -4,11 +4,11 @@
   "description": "",
   "scripts": {
     "build": "tsc --project tsconfig.json && tsc-alias",
-    "start": "ts-node discord-listener/discordListener.ts",
-    "start-consumer": "ts-node discord-consumer/discordConsumer.ts",
+    "start": "ts-node src/discord-listener/discordListener.ts",
+    "start-consumer": "ts-node src/discord-consumer/discordConsumer.ts",
     "check-types": "tsc --noEmit",
-    "start-prod-consumer": "node build/discord-bot/discord-consumer/discordConsumer.js",
-    "start-prod-listener": "node build/discord-bot/discord-listener/discordListener.js"
+    "start-prod-consumer": "node build/discord-consumer/discordConsumer.js",
+    "start-prod-listener": "node build/discord-listener/discordListener.js"
   },
   "keywords": [],
   "author": "",
