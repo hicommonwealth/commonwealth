@@ -10,7 +10,6 @@
     "downlevelIteration": true,
     "traceResolution": false,
     "baseUrl": ".",
-
     "paths": {
       "common-common": ["packages/common-common"],
       "common-common/*": ["packages/common-common/*"],

@@ -1,2 +1,2 @@
-listener: node --max_old_space_size=$(./scripts/get-max-old-space-size.sh) packages/discord-bot/build/discord-listener/discordListener.js
-consumer: node --max_old_space_size=$(./scripts/get-max-old-space-size.sh) packages/discord-bot/build/discord-consumer/discordConsumer.js
+listener: node --max_old_space_size=$(./scripts/get-max-old-space-size.sh) packages/discord-bot/build/discord-bot/src/discord-listener/discordListener.js
+consumer: node --max_old_space_size=$(./scripts/get-max-old-space-size.sh) packages/discord-bot/build/discord-bot/src/discord-consumer/discordConsumer.js
