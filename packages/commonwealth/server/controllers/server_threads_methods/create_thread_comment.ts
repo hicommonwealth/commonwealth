@@ -165,18 +165,19 @@ export async function __createThreadComment(
     body: decodeURIComponent(text),
   };
   const version_history: string[] = [JSON.stringify(firstVersion)];
-  const commentContent = {
+  const commentContent: CommentAttributes = {
     thread_id: `${threadId}`,
     text,
     plaintext,
     version_history,
     address_id: address.id,
-    chain: community.id,
+    community_id: community.id,
     parent_id: null,
     canvas_action: canvasAction,
     canvas_session: canvasSession,
     canvas_hash: canvasHash,
     discord_meta: discordMeta,
+    reaction_count: 0,
   };
   if (parentId) {
     Object.assign(commentContent, { parent_id: parentId });

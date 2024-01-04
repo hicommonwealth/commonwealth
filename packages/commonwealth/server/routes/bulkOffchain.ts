@@ -68,7 +68,10 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
         };
 
         const monthlyComments = await models.Comment.findAll({
-          where,
+          where: {
+            updated_at: { [Op.gt]: thirtyDaysAgo },
+            community_id: chain.id,
+          },
           include: [models.Address],
         });
         const monthlyThreads = await models.Thread.findAll({
