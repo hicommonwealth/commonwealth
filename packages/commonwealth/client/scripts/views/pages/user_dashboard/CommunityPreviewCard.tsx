@@ -16,7 +16,6 @@ const CommunityPreviewCard = ({ community }: CommunityPreviewCardProps) => {
 
   const { unseenPosts } = app.user;
   const visitedChain = !!unseenPosts[community.id];
-  const updatedThreads = unseenPosts[community.id]?.activePosts || 0;
   const monthlyThreadCount = app.recentActivity.getCommunityThreadCount(
     community.id,
   );
@@ -45,7 +44,7 @@ const CommunityPreviewCard = ({ community }: CommunityPreviewCardProps) => {
         {community.description}
       </CWText>
       {/* if no recently active threads, hide this module altogether */}
-      {!!monthlyThreadCount && (
+      {!monthlyThreadCount && (
         <>
           <CWText className="card-subtext" type="b2" fontWeight="medium">
             {`${pluralize(monthlyThreadCount, 'new thread')} this month`}
@@ -54,11 +53,6 @@ const CommunityPreviewCard = ({ community }: CommunityPreviewCardProps) => {
             <>
               {app.isLoggedIn() && !visitedChain && (
                 <CWText className="new-activity-tag">New</CWText>
-              )}
-              {updatedThreads > 0 && (
-                <CWText className="new-activity-tag">
-                  {updatedThreads} new
-                </CWText>
               )}
             </>
           )}
