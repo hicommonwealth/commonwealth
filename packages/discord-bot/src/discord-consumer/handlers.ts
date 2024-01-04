@@ -10,7 +10,7 @@ import { sequelize } from '../utils/database';
 export async function handleThreadMessages(
   action: ThreadDiscordActions,
   message: IDiscordMessage,
-  topic: any,
+  topic: { id: string; name: string },
   sharedReqData: Record<string, any>,
 ): Promise<void> {
   switch (action) {
