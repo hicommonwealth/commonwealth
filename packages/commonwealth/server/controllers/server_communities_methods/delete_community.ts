@@ -61,7 +61,7 @@ export async function __deleteCommunity(
           );
 
           await this.models.Reaction.destroy({
-            where: { chain: community.id },
+            where: { community_id: community.id },
             transaction: t,
           });
 

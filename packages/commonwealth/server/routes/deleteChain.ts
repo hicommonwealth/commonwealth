@@ -74,7 +74,7 @@ const deleteChain = async (
           );
 
           await models.Reaction.destroy({
-            where: { chain: chain.id },
+            where: { community_id: chain.id },
             transaction: t,
           });
 

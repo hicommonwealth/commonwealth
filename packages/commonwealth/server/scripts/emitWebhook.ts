@@ -194,7 +194,7 @@ async function main() {
       });
       await models.Reaction.findOrCreate({
         where: {
-          chain: chain.id,
+          community_id: chain.id,
           thread_id: thread.id,
           address_id: anotherAddress.id,
           reaction: 'like',

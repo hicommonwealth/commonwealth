@@ -104,7 +104,7 @@ describe('emitNotifications tests', () => {
 
     //reaction = await models.Reaction.create({
     await models.Reaction.create({
-      chain,
+      community_id: chain,
       thread_id: thread.id,
       address_id: userAddressId,
       reaction: 'like',
