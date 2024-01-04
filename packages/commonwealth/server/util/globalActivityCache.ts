@@ -1,6 +1,6 @@
+import { RedisNamespaces } from '@hicommonwealth/core';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { RedisCache } from 'common-common/src/redisCache';
-import { RedisNamespaces } from 'common-common/src/types';
 import { v4 as uuidv4 } from 'uuid';
 import type { DB } from '../models';
 import { AddressAttributes } from '../models/address';
