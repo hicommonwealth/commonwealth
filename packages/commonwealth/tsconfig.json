@@ -6,6 +6,7 @@
     "baseUrl": ".",
     "skipLibCheck": true,
     "paths": {
+      "@hicommonwealth/*": ["../../libs/*/src"],
       "common-common": ["../../packages/common-common"],
       "common-common/*": ["../../packages/common-common/*"],
       "token-balance-cache": ["../../packages/token-balance-cache"],

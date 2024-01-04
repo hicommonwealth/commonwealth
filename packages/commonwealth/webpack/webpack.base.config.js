@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackInjectAttributesPlugin = require('html-webpack-inject-attributes-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 require('dotenv').config();
 
@@ -145,6 +146,7 @@ module.exports = {
     },
   },
   resolve: {
+    plugins: [new TsconfigPathsPlugin({})],
     extensions: ['.ts', '.tsx', '.mjs', '.js', '.jsx', '.svg'],
     modules: [
       '../client/scripts',
@@ -153,14 +155,6 @@ module.exports = {
       'node_modules', // local node modules
       '../node_modules', // global node modules
     ],
-    alias: {
-      'common-common': path.resolve(__dirname, '../../common-common'),
-      'chain-events': path.resolve(__dirname, '../../chain-events'),
-      'token-balance-cache': path.resolve(
-        __dirname,
-        '../../token-balance-cache',
-      ),
-    },
     fallback: {
       fs: false,
       net: false,
@@ -179,13 +173,7 @@ module.exports = {
       {
         // ignore ".spec.ts" test files in build
         test: /^(?!.*\.spec\.ts$).*(?:\.ts)$/,
-        include: [
-          path.resolve(__dirname, '../client'),
-          path.resolve(__dirname, '../shared'),
-          path.resolve(__dirname, '../../common-common'),
-          path.resolve(__dirname, '../../chain-events'),
-          path.resolve(__dirname, '../../token-balance-cache'),
-        ],
+
         loader: 'esbuild-loader',
         options: {
           loader: 'ts',
