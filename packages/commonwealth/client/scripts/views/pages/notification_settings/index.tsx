@@ -473,11 +473,11 @@ const NotificationSettingsPage = () => {
                               userCommunityId={sub.Thread.chain}
                             />
                           );
-                        } else if (sub.Comment?.chain) {
+                        } else if (sub.Comment?.communityId) {
                           return (
                             <User
                               userAddress={sub.Comment.author}
-                              userCommunityId={sub.Comment.chain}
+                              userCommunityId={sub.Comment.communityId}
                             />
                           );
                         } else {
