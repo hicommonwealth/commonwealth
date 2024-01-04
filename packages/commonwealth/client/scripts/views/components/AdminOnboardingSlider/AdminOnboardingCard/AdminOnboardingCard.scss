@@ -20,6 +20,14 @@
     .CircleButton {
       padding: 10px !important;
 
+      &:disabled {
+        background-color: $neutral-400;
+
+        svg {
+          color: white !important;
+        }
+      }
+
       svg {
         height: 24px !important;
         width: 24px !important;
@@ -30,11 +38,19 @@
   .content {
     .h4 {
       font-weight: 600 !important;
+
+      &:disabled {
+        color: $neutral-500;
+      }
     }
 
     .b2 {
       margin-top: 4px;
       color: $neutral-500 !important;
+
+      &:disabled {
+        color: $neutral-500;
+      }
     }
   }
 

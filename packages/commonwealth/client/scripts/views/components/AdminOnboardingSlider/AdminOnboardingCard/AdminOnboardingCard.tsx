@@ -33,23 +33,34 @@ const CARD_TYPES = {
 
 type AdminOnboardingCardProps = {
   cardType: keyof typeof CARD_TYPES;
+  isActionCompleted?: boolean;
   onCTAClick: () => any;
 };
 
 export const AdminOnboardingCard = ({
   cardType,
+  isActionCompleted,
   onCTAClick,
 }: AdminOnboardingCardProps) => {
   return (
     <section className="AdminOnboardingCard">
       <CWCircleButton
+        disabled={isActionCompleted}
         buttonType="primary"
         onClick={(e) => e.preventDefault()}
-        iconName={CARD_TYPES[cardType].iconName as any}
+        iconName={
+          isActionCompleted
+            ? 'checkNew'
+            : (CARD_TYPES[cardType].iconName as any)
+        }
       />
       <div className="content">
-        <CWText type="h4">{CARD_TYPES[cardType].title}</CWText>
-        <CWText type="b2">{CARD_TYPES[cardType].description}</CWText>
+        <CWText type="h4" disabled={isActionCompleted}>
+          {CARD_TYPES[cardType].title}
+        </CWText>
+        <CWText type="b2" disabled={isActionCompleted}>
+          {CARD_TYPES[cardType].description}
+        </CWText>
       </div>
       <CWButton
         containerClassName="cta-button"
