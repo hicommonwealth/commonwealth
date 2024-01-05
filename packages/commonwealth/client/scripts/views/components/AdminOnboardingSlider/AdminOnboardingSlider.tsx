@@ -1,10 +1,11 @@
 import { featureFlags } from 'helpers/feature-flags';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import app from 'state';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import { useFetchThreadsQuery } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
+import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
 import useNewTopicModalMutationStore from 'state/ui/newTopicModal';
 import Permissions from 'utils/Permissions';
 import { CWText } from '../component_kit/cw_text';
@@ -27,8 +28,10 @@ export const AdminOnboardingSlider = () => {
     integrations.discordBotWebhooksEnabled;
 
   const navigate = useCommonNavigate();
-  const isClosedByUser = useRef(false);
-  const [isVisible, setIsVisible] = useState(false);
+  const {
+    shouldHideAdminOnboardingCardsForCommunities,
+    setShouldHideAdminOnboardingCardsForCommunity,
+  } = useAdminOnboardingSliderMutationStore();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { setIsNewTopicModalOpen } = useNewTopicModalMutationStore();
   const { data: topics = [], isLoading: isLoadingTopics = false } =
@@ -55,35 +58,17 @@ export const AdminOnboardingSlider = () => {
     pageName === 'manage-community' && navigate(`/manage`);
   };
 
-  useEffect(() => {
-    if (
-      !isClosedByUser.current &&
-      !isLoadingTopics &&
-      !isLoadingGroups &&
-      !isLoadingThreads &&
-      (topics.length === 0 ||
-        groups.length === 0 ||
-        threads.length === 0 ||
-        !hasAnyIntegration)
-    ) {
-      setIsVisible(true);
-    } else {
-      setIsVisible(false);
-    }
-  }, [
-    topics,
-    isLoadingTopics,
-    groups,
-    isLoadingGroups,
-    threads,
-    isLoadingThreads,
-    hasAnyIntegration,
-  ]);
-
   if (
-    !isVisible ||
+    isLoadingTopics ||
+    isLoadingGroups ||
+    isLoadingThreads ||
+    (topics.length > 0 &&
+      groups.length > 0 &&
+      threads.length > 0 &&
+      hasAnyIntegration) ||
     !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin()) ||
-    !featureFlags.newAdminOnboardingEnabled
+    !featureFlags.newAdminOnboardingEnabled ||
+    shouldHideAdminOnboardingCardsForCommunities.includes(app.activeChainId())
   ) {
     return;
   }
@@ -137,10 +122,12 @@ export const AdminOnboardingSlider = () => {
         content={
           <DismissModal
             onModalClose={() => setIsModalVisible(false)}
-            onDismiss={() => {
+            onDismiss={(shouldDismissPermanently) => {
               setIsModalVisible(false);
-              isClosedByUser.current = true;
-              setIsVisible(false);
+              setShouldHideAdminOnboardingCardsForCommunity(
+                app.activeChainId(),
+                shouldDismissPermanently,
+              );
             }}
           />
         }
