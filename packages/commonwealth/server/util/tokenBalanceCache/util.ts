@@ -240,12 +240,8 @@ export function mapNodeToBalanceFetcherContract(
     case 1: // Ethereum Mainnet
     case 1337: // Local Ganache - assuming fork of mainnet
       return '0xb1f8e55c7f64d203c1400b9d8555d050f94adf39';
-    case 3: // Ropsten
-      return '0x8D9708f3F514206486D7E988533f770a16d074a7';
     case 5: // Goerli
       return '0x9788C4E93f9002a7ad8e72633b11E8d1ecd51f9b';
-    case 4: // Rinkeby
-      return '0x3183B673f4816C94BeF53958BaF93C671B7F8Cf2';
     case 56: // BSC
     case 97: // BSC Testnet
       return '0x2352c63A83f9Fd126af8676146721Fa00924d7e4';
@@ -253,7 +249,6 @@ export function mapNodeToBalanceFetcherContract(
     case 80001: // Polygon Mumbai
       return '0x2352c63A83f9Fd126af8676146721Fa00924d7e4';
     case 10: // Optimism Mainnet
-    case 69: // Optimism Kovan
       return '0xB1c568e9C3E6bdaf755A60c7418C269eb11524FC';
     case 42161: // Arbitrum One
       return '0x151E24A486D7258dd7C33Fb67E4bB01919B7B32c';

@@ -1,11 +1,13 @@
-import { ethers, providers, utils } from 'ethers';
+import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
 import {
   GovernorAlpha,
   GovernorBravoDelegate,
   GovernorCompatibilityBravo,
+  GovernorCountingSimple,
 } from 'common-common/src/eth/types';
 import { TypedEvent } from 'common-common/src/eth/types/commons';
-import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
+import { RedisCache } from 'common-common/src/redisCache';
+import { ethers, providers, utils } from 'ethers';
 import { ProposalState } from '../../../../shared/chain/types/compound';
 import { getCompoundGovContractAndVersion } from './compoundVersion';
 import {
@@ -16,10 +18,9 @@ import {
   ProposalDataType,
   ResolvedProposalPromises,
 } from './types';
-import { RedisCache } from 'common-common/src/redisCache';
 
 export function formatCompoundBravoProposal(
-  proposalData: ProposalDataType
+  proposalData: ProposalDataType,
 ): ICompoundProposalResponse {
   return {
     identifier:
@@ -30,7 +31,7 @@ export function formatCompoundBravoProposal(
     values: proposalData.proposalCreatedEvent.values.map((v) => v.toString()),
     signatures: proposalData.proposalCreatedEvent.signatures,
     calldatas: proposalData.proposalCreatedEvent.calldatas.map((c) =>
-      ethers.utils.hexlify(c)
+      ethers.utils.hexlify(c),
     ),
     startBlock: +proposalData.rawProposal.startBlock,
     endBlock: +proposalData.rawProposal.endBlock,
@@ -51,13 +52,13 @@ export function formatCompoundBravoProposal(
 export async function getCompoundProposals(
   compoundGovAddress: string,
   provider: providers.Web3Provider,
-  redisCache: RedisCache
+  redisCache: RedisCache,
 ): Promise<ProposalDataType[]> {
   const { contract, version: govVersion } =
     await getCompoundGovContractAndVersion(
       redisCache,
       compoundGovAddress,
-      provider
+      provider,
     );
 
   await contract.deployed();
@@ -68,19 +69,24 @@ export async function getCompoundProposals(
       initialProposalId = 1;
       proposalArrays = await getProposalAsync(
         <GovernorAlpha>contract,
-        initialProposalId
+        initialProposalId,
       );
       break;
     case GovVersion.Bravo:
       initialProposalId = +(await contract.initialProposalId());
       proposalArrays = await getProposalAsync(
         <GovernorBravoDelegate>contract,
-        initialProposalId
+        initialProposalId,
       );
       break;
     case GovVersion.OzBravo:
       proposalArrays = await getProposalDataSequentially(
-        <GovernorCompatibilityBravo>contract
+        <GovernorCompatibilityBravo>contract,
+      );
+      break;
+    case GovVersion.OzCountSimple:
+      proposalArrays = await getProposalDataFieldsSequentially(
+        <GovernorCountingSimple>contract,
       );
       break;
     default:
@@ -95,7 +101,7 @@ export async function getCompoundProposals(
       rawProposal: proposals[i],
       proposalState: proposalStates[i],
       proposalCreatedEvent: proposalCreatedEvents.find((p) =>
-        p.id.eq(proposals[i].id)
+        p.id.eq(proposals[i].id),
       ),
     });
   }
@@ -118,7 +124,7 @@ export async function getCompoundProposals(
  */
 async function getProposalAsync(
   contract: GovernorAlpha | GovernorBravoDelegate,
-  initialProposalId: number
+  initialProposalId: number,
 ): Promise<ResolvedProposalPromises> {
   console.log('Fetching proposal data asynchronously');
   const proposalCreatedEventsPromise = getProposalCreatedEvents(contract);
@@ -146,7 +152,7 @@ async function getProposalAsync(
  * @param contract
  */
 async function getProposalDataSequentially(
-  contract: GovernorCompatibilityBravo | GovernorBravoDelegate
+  contract: GovernorCompatibilityBravo | GovernorBravoDelegate,
 ): Promise<ResolvedProposalPromises> {
   console.log('Fetching proposal data sequentially');
   const proposalCreatedEvents = await getProposalCreatedEvents(contract);
@@ -166,6 +172,51 @@ async function getProposalDataSequentially(
   return [proposalCreatedEvents, proposals, proposalStates];
 }
 
+async function getProposalDataFieldsSequentially(
+  contract: GovernorCountingSimple,
+): Promise<ResolvedProposalPromises> {
+  console.log('Fetching proposal data fields sequentially');
+  const proposalCreatedEvents = await getProposalCreatedEvents(contract);
+
+  const proposalDataPromises: Promise<CompoundProposalType>[] = [];
+  const proposalStatePromises: Promise<number>[] = [];
+  for (const propCreatedEvent of proposalCreatedEvents) {
+    // Construct big promise
+    const proposalDataFieldPromises: Promise<any>[] = [
+      contract.proposalEta(propCreatedEvent.id),
+      contract.proposalVotes(propCreatedEvent.id),
+      contract.state(propCreatedEvent.id),
+    ];
+
+    const proposalDataPromise = Promise.all(proposalDataFieldPromises).then(
+      (values) => {
+        return {
+          id: propCreatedEvent.id,
+          proposer: propCreatedEvent.proposer,
+          eta: values[0],
+          startBlock: propCreatedEvent.startBlock,
+          endBlock: propCreatedEvent.endBlock,
+          forVotes: values[1].forVotes,
+          againstVotes: values[1].againstVotes,
+          abstainVotes: values[1]?.abstainVotes,
+          canceled: values[2] == 7,
+          executed: values[2] == 2,
+        };
+      },
+    );
+
+    proposalDataPromises.push(proposalDataPromise);
+    proposalStatePromises.push(contract.state(propCreatedEvent.id));
+  }
+
+  const [proposals, proposalStates] = await Promise.all([
+    Promise.all(proposalDataPromises),
+    Promise.all(proposalStatePromises),
+  ]);
+
+  return [proposalCreatedEvents, proposals, proposalStates];
+}
+
 /**
  * This function is used to map a Compound compatible event arg array to a fully functional event arg object.
  * Uses:
@@ -174,7 +225,7 @@ async function getProposalDataSequentially(
  * @param event A Compound compatible proposal created event
  */
 export function mapProposalCreatedEvent(
-  event: TypedEvent<ProposalCreatedEventArgsArray & any>
+  event: TypedEvent<ProposalCreatedEventArgsArray & any>,
 ): ProposalCreatedEventArgsObject {
   const result = utils.defaultAbiCoder.decode(
     [
@@ -188,7 +239,7 @@ export function mapProposalCreatedEvent(
       'uint',
       'bytes',
     ],
-    event.data
+    event.data,
   );
   const [
     id,
@@ -203,7 +254,7 @@ export function mapProposalCreatedEvent(
   ] = result;
   const description = utils.toUtf8String(
     descriptionBytes,
-    utils.Utf8ErrorFuncs.ignore
+    utils.Utf8ErrorFuncs.ignore,
   );
 
   return {
@@ -220,9 +271,13 @@ export function mapProposalCreatedEvent(
 }
 
 async function getProposalCreatedEvents(
-  contract: GovernorAlpha | GovernorBravoDelegate | GovernorCompatibilityBravo,
+  contract:
+    | GovernorAlpha
+    | GovernorBravoDelegate
+    | GovernorCompatibilityBravo
+    | GovernorCountingSimple,
   fromBlock = 0,
-  toBlock: number | 'latest' = 'latest'
+  toBlock: number | 'latest' = 'latest',
 ): Promise<ProposalCreatedEventArgsObject[]> {
   const events = await contract.queryFilter<ProposalCreatedEventArgsArray, any>(
     contract.filters.ProposalCreated(
@@ -234,10 +289,10 @@ async function getProposalCreatedEvents(
       null,
       null,
       null,
-      null
+      null,
     ),
     fromBlock,
-    toBlock
+    toBlock,
   );
 
   return events.map((e) => mapProposalCreatedEvent(e));
