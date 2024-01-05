@@ -4,7 +4,7 @@ import models from '../../server/database';
 import { CommentInstance } from '../../server/models/comment';
 import { resetDatabase } from '../util/resetDatabase';
 
-describe.only('getCommentDepth', () => {
+describe('getCommentDepth', () => {
   const community_id = 'ethereum';
   const comments: CommentInstance[] = [];
   const maxDepth = 8;
