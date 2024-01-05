@@ -58,7 +58,7 @@ describe('Thread Patch Update', () => {
 
     const topic = await models.Topic.findOne({
       where: {
-        chain_id: chain,
+        community_id: chain,
         group_ids: [],
       },
     });

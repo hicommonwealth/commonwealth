@@ -64,7 +64,7 @@ describe('Topic Tests', () => {
 
       const topicInstance = await models.Topic.findOne({
         where: {
-          chain_id: chain,
+          community_id: chain,
           group_ids: [],
         },
       });

@@ -4,7 +4,7 @@ import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from 'server/config';
-import { LinkSource, ThreadInstance } from 'server/models/thread';
+import { LinkSource, ThreadAttributes } from 'server/models/thread';
 import { Errors } from 'server/util/linkingValidationHelper';
 import * as modelUtils from 'test/util/modelUtils';
 import { resetDatabase } from '../../../server-test';
@@ -34,8 +34,8 @@ describe('Linking Tests', () => {
       session: Session;
       sign: (payload: ActionPayload) => string;
     },
-    thread1: ThreadInstance,
-    thread2: ThreadInstance;
+    thread1: ThreadAttributes,
+    thread2: ThreadAttributes;
 
   const link1 = {
     source: LinkSource.Snapshot,
@@ -52,7 +52,7 @@ describe('Linking Tests', () => {
 
     const topic = await models.Topic.findOne({
       where: {
-        chain_id: chain,
+        community_id: chain,
         group_ids: [],
       },
     });

@@ -54,7 +54,7 @@ describe('createReaction Integration Tests', () => {
 
     const topic = await models.Topic.findOne({
       where: {
-        chain_id: communityId,
+        community_id: communityId,
         group_ids: [],
       },
     });

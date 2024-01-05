@@ -42,7 +42,7 @@ describe('User Dashboard API', () => {
 
     const topic = await models.Topic.findOne({
       where: {
-        chain_id: chain,
+        community_id: chain,
         group_ids: [],
       },
     });
@@ -51,7 +51,7 @@ describe('User Dashboard API', () => {
     const topic2 = await models.Topic.create({
       name: 'Test Topic',
       description: 'A topic made for testing',
-      chain_id: chain2,
+      community_id: chain2,
     });
     topicId2 = topic2.id;
 
