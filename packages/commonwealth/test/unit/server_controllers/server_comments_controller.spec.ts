@@ -46,7 +46,7 @@ describe('ServerCommentsController', () => {
           findOne: sandbox.stub().resolves({
             id: 4,
             title: 'Big Thread!',
-            chain: 'ethereum',
+            community_id: 'ethereum',
           }),
         },
       };
@@ -67,7 +67,6 @@ describe('ServerCommentsController', () => {
 
       const serverCommentsController = new ServerCommentsController(
         db as any,
-        tokenBalanceCache as any,
         tokenBalanceCache as any,
         banCache as any,
       );
@@ -160,7 +159,7 @@ describe('ServerCommentsController', () => {
           findOne: sandbox.stub().resolves({
             id: 4,
             title: 'Big Thread!',
-            chain: 'ethereum',
+            community_id: 'ethereum',
           }),
         },
       };
@@ -180,7 +179,6 @@ describe('ServerCommentsController', () => {
 
       const serverCommentsController = new ServerCommentsController(
         db as any,
-        tokenBalanceCache as any,
         tokenBalanceCache as any,
         banCache as any,
       );
@@ -251,7 +249,6 @@ describe('ServerCommentsController', () => {
       const serverCommentsController = new ServerCommentsController(
         db as any,
         tokenBalanceCache as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -304,7 +301,7 @@ describe('ServerCommentsController', () => {
           findOne: sandbox.stub().resolves({
             id: 4,
             title: 'Big Thread!',
-            chain: 'ethereum',
+            community_id: 'ethereum',
           }),
         },
       };
@@ -325,7 +322,6 @@ describe('ServerCommentsController', () => {
 
       const serverCommentsController = new ServerCommentsController(
         db as any,
-        tokenBalanceCache as any,
         tokenBalanceCache as any,
         banCache as any,
       );
@@ -379,7 +375,7 @@ describe('ServerCommentsController', () => {
           findOne: sandbox.stub().resolves({
             id: 4,
             title: 'Big Thread!',
-            chain: 'ethereum',
+            community_id: 'ethereum',
             topic_id: 77,
           }),
         },
@@ -463,7 +459,6 @@ describe('ServerCommentsController', () => {
       const serverCommentsController = new ServerCommentsController(
         db as any,
         tokenBalanceCache as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -498,7 +493,6 @@ describe('ServerCommentsController', () => {
 
       const serverCommentsController = new ServerCommentsController(
         db as any,
-        tokenBalanceCache as any,
         tokenBalanceCache as any,
         banCache as any,
       );
@@ -550,7 +544,7 @@ describe('ServerCommentsController', () => {
           findOne: async () => ({
             id: 1,
             address: '0x123',
-            chain: 'ethereum',
+            community_id: 'ethereum',
             title: 'Big Thread!',
           }),
         },
@@ -560,7 +554,6 @@ describe('ServerCommentsController', () => {
 
       const serverCommentsController = new ServerCommentsController(
         db as any,
-        tokenBalanceCache as any,
         tokenBalanceCache as any,
         banCache as any,
       );
@@ -650,7 +643,7 @@ describe('ServerCommentsController', () => {
           findOne: async () => ({
             id: 1,
             address: '0x123',
-            chain: 'ethereum',
+            community_id: 'ethereum',
             title: 'Big Thread!',
           }),
         },
@@ -662,7 +655,6 @@ describe('ServerCommentsController', () => {
 
       const serverCommentsController = new ServerCommentsController(
         db as any,
-        tokenBalanceCache as any,
         tokenBalanceCache as any,
         banCache as any,
       );
@@ -724,7 +716,6 @@ describe('ServerCommentsController', () => {
       const serverCommentsController = new ServerCommentsController(
         db as any,
         tokenBalanceCache as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -774,7 +765,6 @@ describe('ServerCommentsController', () => {
 
       const serverCommentsController = new ServerCommentsController(
         db as any,
-        tokenBalanceCache as any,
         tokenBalanceCache as any,
         banCache as any,
       );

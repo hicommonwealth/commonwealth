@@ -3,7 +3,7 @@ import React from 'react';
 import 'components/Profile/ProfileActivityRow.scss';
 import moment from 'moment';
 
-import type Thread from 'models/Thread';
+import Thread from 'models/Thread';
 import withRouter, {
   navigateToCommunity,
   useCommonNavigate,
@@ -22,12 +22,18 @@ type ProfileActivityRowProps = {
 
 const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
   const navigate = useCommonNavigate();
-  const { chain: communityId, createdAt, author, title, id, body } = activity;
+  const { createdAt, author, title, id, body } = activity;
+  let communityId: string;
+  if (activity instanceof Thread) {
+    communityId = activity.communityId;
+  } else {
+    communityId = activity.chain;
+  }
   const isThread = !!(activity as Thread).kind;
   const comment = activity as CommentWithAssociatedThread;
   const { iconUrl } = app.config.chains.getById(communityId);
   const domain = document.location.origin;
-  let decodedTitle;
+  let decodedTitle: string;
 
   try {
     if (isThread) {

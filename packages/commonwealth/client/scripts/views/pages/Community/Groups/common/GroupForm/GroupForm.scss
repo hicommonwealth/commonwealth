@@ -54,7 +54,7 @@
     align-items: baseline;
     gap: 8px;
 
-    @include extraSmall{
+    @include extraSmall {
       justify-content: flex-end;
     }
   }

@@ -1,11 +1,11 @@
 import type { NextFunction } from 'express';
 import { Op } from 'sequelize';
-import type { TypedRequestQuery, TypedResponse } from '../types';
+import type { ProfileInstance } from '..//models/profile';
 import type { DB } from '../models';
 import type { AddressAttributes } from '../models/address';
 import type { CommentAttributes } from '../models/comment';
 import type { ThreadAttributes } from '../models/thread';
-import type { ProfileInstance } from '..//models/profile';
+import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 
 export const Errors = {
@@ -29,7 +29,7 @@ const getNewProfile = async (
   models: DB,
   req: TypedRequestQuery<GetNewProfileReq>,
   res: TypedResponse<GetNewProfileResp>,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { profileId } = req.query;
   let profile: ProfileInstance;
@@ -69,7 +69,12 @@ const getNewProfile = async (
     },
     include: [
       { model: models.Address, as: 'Address' },
-      { model: models.Community, required: true, where: { active: true } },
+      {
+        model: models.Community,
+        as: 'Community',
+        required: true,
+        where: { active: true },
+      },
     ],
   });
 
@@ -97,6 +102,7 @@ const getNewProfile = async (
     include: [
       {
         model: models.Community,
+        as: 'Community',
         required: true,
         where: { active: true },
       },
