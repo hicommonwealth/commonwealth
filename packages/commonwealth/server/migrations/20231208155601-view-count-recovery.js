@@ -23,11 +23,6 @@ module.exports = {
         },
         { transaction: t },
       );
-
-      await queryInterface.sequelize.query(
-        `UPDATE "Threads" SET new_view_count = view_count;`,
-        { transaction: t },
-      );
     });
   },
 

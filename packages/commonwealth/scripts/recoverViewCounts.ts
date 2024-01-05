@@ -1,6 +1,7 @@
 //TODO: This should be deleted after view counts are recovered.
 import dotenv from 'dotenv';
 import { Client } from 'pg';
+import { exit } from 'yargs';
 import models from '../server/database';
 
 dotenv.config();
@@ -30,7 +31,8 @@ async function run() {
 
     const batchedQuery = (batchedViewCounts) => `
         UPDATE "Threads"
-        SET new_view_count = CASE 
+        SET view_count_recovered = true,
+        new_view_count = CASE 
             ${batchedViewCounts
               .map(
                 (count) =>
@@ -39,10 +41,9 @@ async function run() {
               .join(' ')}
         ELSE new_view_count
         END
-        view_count_recovered = true
         WHERE id IN (${batchedViewCounts
           .map((count) => count.object_id)
-          .join(', ')}) 
+          .join(', ')})
         AND view_count_recovered = false;
         `;
 
@@ -51,12 +52,16 @@ async function run() {
       await models.sequelize.query(
         batchedQuery(viewCounts.rows.slice(i, endIndex)),
       );
+      console.log(`recovered view counts for threads ${endIndex}/${totalRows}`);
     }
   } catch (error) {
     console.error('Error:', error.message);
+    exit(1, error);
   } finally {
     await recoveryClient.end();
   }
+
+  exit(0, null);
 }
 
 run();
