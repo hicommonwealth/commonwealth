@@ -33,6 +33,7 @@ import {
   REDIS_URL,
   ROLLBAR_ENV,
   ROLLBAR_SERVER_TOKEN,
+  SERVER_URL,
   SESSION_SECRET,
   TBC_BALANCE_TTL_SECONDS,
   VULTR_IP,
@@ -196,7 +197,7 @@ async function main() {
     app.use(passport.initialize());
     app.use(passport.session());
 
-    if (!DEV && !NO_PRERENDER) {
+    if (!DEV && !NO_PRERENDER && SERVER_URL.includes('commonwealth.im')) {
       app.use(prerenderNode.set('prerenderToken', PRERENDER_TOKEN));
     }
   };
