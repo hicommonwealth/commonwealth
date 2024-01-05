@@ -37,7 +37,7 @@
         color: $primary-500;
         width: 100%;
       }
-      
+
       .threads-count-text.Text {
         color: $neutral-500;
         width: 100%;
@@ -120,6 +120,18 @@
       .thread-preview {
         @include multiline-text-ellipsis(2);
         word-break: break-word;
+
+        .MarkdownFormattedText {
+          @include caption;
+
+          h1,
+          h2,
+          h3,
+          h4,
+          h5 {
+            font-size: 12px;
+          }
+        }
       }
 
       .row-bottom {
