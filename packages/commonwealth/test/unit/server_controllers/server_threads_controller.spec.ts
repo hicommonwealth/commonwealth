@@ -307,7 +307,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Ban error: big ban err');
     });
 
-    it.skip('should throw error (token balance)', async () => {
+    it('should throw error (token balance)', async () => {
       const sandbox = Sinon.createSandbox();
       const fakeMembershipReject = 'fake membership rejection message';
       const db = {
