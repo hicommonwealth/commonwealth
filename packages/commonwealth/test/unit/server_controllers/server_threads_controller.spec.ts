@@ -11,7 +11,7 @@ describe('ServerThreadsController', () => {
         Reaction: {
           findOne: sandbox.stub().resolves({
             id: 2,
-            chain: 'ethereum',
+            community_id: 'ethereum',
             Address: {
               address: '0x123',
               community_id: 'ethereum',
@@ -22,7 +22,7 @@ describe('ServerThreadsController', () => {
           findOrCreate: sandbox.stub().resolves([
             {
               id: 2,
-              chain: 'ethereum',
+              community_id: 'ethereum',
               Address: {
                 address: '0x123',
                 community_id: 'ethereum',

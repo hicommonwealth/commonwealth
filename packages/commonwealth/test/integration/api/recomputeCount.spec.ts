@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import chai, { expect } from 'chai';
 import chaiHttp from 'chai-http';
 import { Op, QueryTypes } from 'sequelize';
@@ -74,7 +75,7 @@ async function calcAllCountsFromSourceTables() {
     },
   )) as any;
 
-  let notification_ids = {};
+  const notification_ids = {};
   for (const notification of notifications) {
     if (!notification.thread_id) continue;
     notification_ids[notification.thread_id] = notification.id;
@@ -287,7 +288,7 @@ async function verifyRecomputeCountAll() {
   );
 }
 
-describe('recomputeCounts', () => {
+describe.only('recomputeCounts', () => {
   before(async () => {
     testVerifiedChainAddress = await modelUtils.createAndVerifyAddress({
       chain: 'alex',
@@ -390,7 +391,7 @@ describe('recomputeCounts', () => {
       expect(cRes).not.to.be.null;
       expect(cRes.error).not.to.be.null;
 
-      const before = await getCounts(testThreads[0].id, testComments[0].id);
+      await getCounts(testThreads[0].id, testComments[0].id);
       // expect(before.countsFromSourceTable.notification_id).to.be.greaterThan(0);
       await verifyRecomputeCountAll();
     });

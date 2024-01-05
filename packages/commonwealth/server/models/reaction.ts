@@ -84,7 +84,8 @@ export default (
             }
           } catch (error) {
             log.error(
-              `incrementing thread reaction count afterCreate: thread_id ${thread_id} comment_id ${comment_id} ${error}`,
+              `incrementing thread reaction count ` +
+                `afterCreate: thread_id ${thread_id} comment_id ${comment_id} ${error}`,
             );
             StatsDController.get().increment('cw.reaction-count-error', {
               thread_id: String(thread_id),
@@ -122,7 +123,8 @@ export default (
             }
           } catch (error) {
             log.error(
-              `incrementing thread reaction count afterDestroy: thread_id ${thread_id} comment_id ${comment_id} ${error}`,
+              `incrementing thread reaction count afterDestroy: ` +
+                `thread_id ${thread_id} comment_id ${comment_id} ${error}`,
             );
             StatsDController.get().increment('cw.hook.reaction-count-error', {
               thread_id: String(thread_id),
