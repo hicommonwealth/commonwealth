@@ -85,8 +85,8 @@ describe('Thread Patch Update', () => {
         .patch(`/api/threads/${thread.id}`)
         .set('Accept', 'application/json')
         .send({
-          author_chain: thread.chain,
-          chain: thread.chain,
+          author_chain: thread.community_id,
+          chain: thread.community_id,
           address: userAddress,
           jwt: userJWT,
           title: 'newTitle',
@@ -100,7 +100,7 @@ describe('Thread Patch Update', () => {
       expect(res.status).to.equal(200);
       expect(res.body.result).to.contain({
         id: thread.id,
-        chain: 'ethereum',
+        community_id: 'ethereum',
         title: 'newTitle',
         body: 'newBody',
         stage: 'voting',
@@ -130,8 +130,8 @@ describe('Thread Patch Update', () => {
           .patch(`/api/threads/${thread.id}`)
           .set('Accept', 'application/json')
           .send({
-            author_chain: thread.chain,
-            chain: thread.chain,
+            author_chain: thread.community_id,
+            chain: thread.community_id,
             address: userAddress,
             jwt: userJWT,
             pinned: true,
@@ -145,8 +145,8 @@ describe('Thread Patch Update', () => {
           .patch(`/api/threads/${thread.id}`)
           .set('Accept', 'application/json')
           .send({
-            author_chain: thread.chain,
-            chain: thread.chain,
+            author_chain: thread.community_id,
+            chain: thread.community_id,
             address: userAddress,
             jwt: userJWT,
             spam: true,
@@ -177,8 +177,8 @@ describe('Thread Patch Update', () => {
           .patch(`/api/threads/${thread.id}`)
           .set('Accept', 'application/json')
           .send({
-            author_chain: thread.chain,
-            chain: thread.chain,
+            author_chain: thread.community_id,
+            chain: thread.community_id,
             address: adminAddress,
             jwt: adminJWT,
             pinned: true,
@@ -194,8 +194,8 @@ describe('Thread Patch Update', () => {
           .patch(`/api/threads/${thread.id}`)
           .set('Accept', 'application/json')
           .send({
-            author_chain: thread.chain,
-            chain: thread.chain,
+            author_chain: thread.community_id,
+            chain: thread.community_id,
             address: adminAddress,
             jwt: adminJWT,
             spam: true,

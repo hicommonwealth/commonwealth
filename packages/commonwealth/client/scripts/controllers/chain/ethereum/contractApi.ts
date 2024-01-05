@@ -4,31 +4,34 @@ import type {
   Provider,
   Web3Provider,
 } from '@ethersproject/providers';
-import { ChainBase } from 'common-common/src/types';
-import WebWalletController from 'controllers/app/web_wallets';
+import { ChainBase } from '@hicommonwealth/core';
 import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
+import WebWalletController from 'controllers/app/web_wallets';
 import type { Contract } from 'ethers';
 import { ethers } from 'ethers';
 import Account from '../../../models/Account';
 
 export type ContractFactoryT<ContractT> = (
   address: string,
-  provider: Provider
+  provider: Provider,
 ) => ContractT;
 
 export async function attachSigner<CT extends Contract>(
   sender: Account,
-  contract: CT
+  contract: CT,
 ): Promise<CT> {
-  const signingWallet = await WebWalletController.Instance.locateWallet(sender, ChainBase.Ethereum);
+  const signingWallet = await WebWalletController.Instance.locateWallet(
+    sender,
+    ChainBase.Ethereum,
+  );
   let signer: JsonRpcSigner;
   if (
     signingWallet instanceof MetamaskWebWalletController ||
     signingWallet instanceof WalletConnectWebWalletController
   ) {
     const walletProvider = new ethers.providers.Web3Provider(
-      signingWallet.provider as any
+      signingWallet.provider as any,
     );
     // 12s minute polling interval (default is 4s)
     walletProvider.pollingInterval = 12000;
@@ -55,7 +58,7 @@ abstract class ContractApi<ContractT extends Contract> {
   constructor(
     factory: ContractFactoryT<ContractT>,
     contractAddress: string,
-    web3Provider: ExternalProvider
+    web3Provider: ExternalProvider,
   ) {
     this.contractAddress = contractAddress;
     this.Provider = new ethers.providers.Web3Provider(web3Provider);

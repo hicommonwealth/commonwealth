@@ -57,14 +57,8 @@ jobs:
           path: '**/node_modules'
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Add node-gyp
-        run: yarn global add node-gyp
-
-      - name: Install dependencies
-        run: yarn --ignore-engines
-
-      - name: Init Db
-        run: cd packages/commonwealth && npx sequelize db:migrate
+      - name: Build project
+        run: yarn build-project
 
       - name: Cache browsers
         id: playwright-cache
@@ -154,14 +148,8 @@ jobs:
           path: '**/node_modules'
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Add node-gyp
-        run: yarn global add node-gyp
-
-      - name: Install dependencies
-        run: yarn --ignore-engines
-
-      - name: Init Db
-        run: cd packages/commonwealth && npx sequelize db:migrate
+      - name: Build project
+        run: yarn build-project
 
       - name: Cache browsers
         id: playwright-cache
@@ -250,14 +238,8 @@ jobs:
           path: '**/node_modules'
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Add node-gyp
-        run: yarn global add node-gyp
-
-      - name: Install dependencies
-        run: yarn --ignore-engines
-
-      - name: Init Db
-        run: cd packages/commonwealth && npx sequelize db:migrate
+      - name: Build project
+        run: yarn build-project
 
       - name: Cache browsers
         id: playwright-cache
@@ -360,6 +342,9 @@ jobs:
             exit 1
           fi
 
+      - name: Build libs
+        run: yarn workspace @hicommonwealth/core build
+
       - name: Run linter
         env:
           GITHUB_BASE_REF: ${{ github.base_ref }}
@@ -368,7 +353,7 @@ jobs:
       - name: Commonwealth Typecheck
         run: yarn --cwd packages/commonwealth check-types
 
-      - name: Dicsord-Bot Typecheck
+      - name: Discord-Bot Typecheck
         run: yarn --cwd packages/discord-bot check-types
 
   # These tests run quickly, so run them in a separate job
@@ -417,14 +402,8 @@ jobs:
           path: '**/node_modules'
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Add node-gyp
-        run: yarn global add node-gyp
-
-      - name: Install dependencies
-        run: yarn --ignore-engines
-
-      - name: Init Db
-        run: cd packages/commonwealth && npx sequelize db:migrate
+      - name: Build project
+        run: yarn build-project
 
       - name: Run unit tests
         run: yarn --cwd packages/commonwealth unit-test --forbid-only
@@ -501,14 +480,8 @@ jobs:
           path: '**/node_modules'
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Add node-gyp
-        run: yarn global add node-gyp
-
-      - name: Install dependencies
-        run: yarn --ignore-engines
-
-      - name: Init Db
-        run: cd packages/commonwealth && npx sequelize db:migrate
+      - name: Build project
+        run: yarn build-project
 
       ## EVM Section:
       - name: Start EVM Testnet

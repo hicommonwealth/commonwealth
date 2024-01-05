@@ -1,3 +1,4 @@
+import type { RedisNamespaces } from '@hicommonwealth/core';
 import { factory, formatFilename } from 'common-common/src/logging';
 import {
   ConnectionTimeoutError,
@@ -6,7 +7,6 @@ import {
   createClient,
 } from 'redis';
 import type Rollbar from 'rollbar';
-import type { RedisNamespaces } from './types';
 
 const log = factory.getLogger(formatFilename(__filename));
 

@@ -35,7 +35,7 @@ import {
 
 import { factory, formatFilename } from 'common-common/src/logging';
 import { RedisCache } from 'common-common/src/redisCache';
-import { TokenBalanceCache as NewTokenBalanceCache } from './server/util/tokenBalanceCache/tokenBalanceCache';
+import { TokenBalanceCache } from './server/util/tokenBalanceCache/tokenBalanceCache';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -45,7 +45,7 @@ const app = express();
 const SequelizeStore = SessionSequelizeStore(session.Store);
 // set cache TTL to 1 second to test invalidation
 const viewCountCache = new ViewCountCache(1, 10 * 60);
-const tokenBalanceCache = new NewTokenBalanceCache(
+const tokenBalanceCache = new TokenBalanceCache(
   models,
   null as RedisCache,
   TBC_BALANCE_TTL_SECONDS,
@@ -190,9 +190,9 @@ export const setupCacheTestEndpoints = (appAttach: Express) => {
 };
 
 const banCache = new BanCache(models);
-const globalActivityCache = new GlobalActivityCache(models);
-globalActivityCache.start();
 const redisCache = new RedisCache();
+const globalActivityCache = new GlobalActivityCache(models, redisCache);
+globalActivityCache.start();
 
 setupPassport(models);
 setupAPI(

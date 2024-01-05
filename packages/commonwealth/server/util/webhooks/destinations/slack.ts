@@ -1,17 +1,17 @@
-import { NotificationCategories } from 'common-common/src/types';
+import { NotificationCategories } from '@hicommonwealth/core';
+import request from 'superagent';
 import {
   ChainEventWebhookData,
   ForumWebhookData,
   WebhookDataByCategory,
 } from '../types';
-import request from 'superagent';
 
 type ContextElements =
   | [
       {
         type: 'mrkdwn';
         text: string;
-      }
+      },
     ]
   | [
       {
@@ -22,13 +22,13 @@ type ContextElements =
         type: 'image';
         image_url: string;
         alt_text: 'Actor:';
-      }
+      },
     ]
   | [
       {
         type: 'plain_text';
         text: string;
-      }
+      },
     ];
 
 type SlackWebhookMessage = {
@@ -48,13 +48,13 @@ type SlackWebhookMessage = {
         image_url: string;
         alt_text: string;
       };
-    }
+    },
   ];
 };
 
 function formatSlackMessage<C extends NotificationCategories>(
   category: C,
-  data: WebhookDataByCategory<C>
+  data: WebhookDataByCategory<C>,
 ): SlackWebhookMessage {
   let textPrefix = '';
   if (process.env.NODE_ENV !== 'production') {
@@ -138,7 +138,7 @@ function formatSlackMessage<C extends NotificationCategories>(
 export async function sendSlackWebhook(
   webhookUrl: string,
   category: NotificationCategories,
-  data: ForumWebhookData | ChainEventWebhookData
+  data: ForumWebhookData | ChainEventWebhookData,
 ) {
   const slackMessage = formatSlackMessage(category, data);
   return request.post(webhookUrl).send(slackMessage);

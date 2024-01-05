@@ -1,10 +1,13 @@
 /* eslint-disable no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import type {
   Action,
   ActionPayload,
   Session,
   SessionPayload,
 } from '@canvas-js/interfaces';
+import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
 import {
   SignTypedDataVersion,
   personalSign,
@@ -14,7 +17,6 @@ import { Keyring } from '@polkadot/api';
 import { stringToU8a } from '@polkadot/util';
 import chai from 'chai';
 import 'chai/register-should';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
@@ -29,7 +31,7 @@ import app from '../../server-test';
 import models from '../../server/database';
 import type { Role } from '../../server/models/role';
 
-import { Link, LinkSource } from 'server/models/thread';
+import { Link, LinkSource, ThreadAttributes } from 'server/models/thread';
 import {
   TEST_BLOCK_INFO_BLOCKHASH,
   TEST_BLOCK_INFO_STRING,
@@ -212,7 +214,9 @@ export interface ThreadArgs {
   sign: (actionPayload: ActionPayload) => string;
 }
 
-export const createThread = async (args: ThreadArgs) => {
+export const createThread = async (
+  args: ThreadArgs,
+): Promise<{ status: string; result?: ThreadAttributes; error?: Error }> => {
   const {
     chainId,
     address,
@@ -676,6 +680,7 @@ export interface JoinCommunityArgs {
   chain: string;
   originChain: string;
 }
+
 export const joinCommunity = async (args: JoinCommunityArgs) => {
   const { jwt, address, chain, originChain, address_id } = args;
   try {

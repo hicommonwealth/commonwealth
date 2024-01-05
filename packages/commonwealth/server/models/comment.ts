@@ -6,8 +6,8 @@ import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
 
+import { IDiscordMeta } from '@hicommonwealth/core';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { IDiscordMeta } from 'common-common/src/types';
 const log = factory.getLogger(formatFilename(__filename));
 
 export type CommentAttributes = {

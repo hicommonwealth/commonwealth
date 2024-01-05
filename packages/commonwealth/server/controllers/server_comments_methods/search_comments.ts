@@ -93,7 +93,7 @@ export async function __searchComments(
       "Addresses".address,
       "Addresses".community_id as address_chain,
       "Comments".created_at,
-      "Threads".chain as community_id,
+      "Threads".community_id as community_id,
       ts_rank_cd("Comments"._search, query) as rank
     FROM "Comments"
     JOIN "Threads" ON "Comments".thread_id = "Threads".id

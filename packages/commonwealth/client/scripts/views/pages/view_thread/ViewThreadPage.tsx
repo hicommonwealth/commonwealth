@@ -283,7 +283,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   if (
     (!isLoading && !thread) ||
     fetchThreadError ||
-    thread.chain !== app.activeChainId()
+    thread.communityId !== app.activeChainId()
   ) {
     return <PageNotFound />;
   }
@@ -400,7 +400,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           showLinkedThreadOptions ||
           polls?.length > 0 ||
           isAuthor ||
-          hasWebLinks
+          !!hasWebLinks
         }
         isSpamThread={!!thread.markedAsSpamAt}
         title={

@@ -1,6 +1,6 @@
 import { Capacitor } from '@capacitor/core';
+import { ChainCategoryType } from '@hicommonwealth/core';
 import axios from 'axios';
-import { ChainCategoryType } from 'common-common/src/types';
 import { updateActiveUser } from 'controllers/app/login';
 import RecentActivityController from 'controllers/app/recent_activity';
 import CosmosAccount from 'controllers/chain/cosmos/account';

@@ -1,5 +1,5 @@
+import type { ChainBase } from '@hicommonwealth/core';
 import type { Coin } from 'adapters/currency';
-import type { ChainBase } from 'common-common/src/types';
 import $ from 'jquery';
 
 import moment from 'moment';

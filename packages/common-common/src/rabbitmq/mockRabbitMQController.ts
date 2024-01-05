@@ -1,5 +1,5 @@
-import { RabbitMQControllerError } from './rabbitMQController';
 import type * as Rascal from 'rascal';
+import { RabbitMQControllerError } from './rabbitMQController';
 import type {
   RascalPublications,
   RascalSubscriptions,
@@ -24,7 +24,7 @@ export class MockRabbitMQController extends AbstractRabbitMQController {
   public async init(): Promise<void> {
     if (this._initialized === true) {
       throw new RabbitMQControllerError(
-        'RabbitMQController is already initialized!'
+        'RabbitMQController is already initialized!',
       );
     }
 
@@ -49,11 +49,11 @@ export class MockRabbitMQController extends AbstractRabbitMQController {
   public async startSubscription(
     messageProcessor: (data: TRmqMessages, ...args: any) => Promise<void>,
     subscriptionName: RascalSubscriptions,
-    msgProcessorContext?: { [key: string]: any }
+    msgProcessorContext?: { [key: string]: any },
   ): Promise<any> {
     if (!this._initialized) {
       throw new RabbitMQControllerError(
-        'RabbitMQController is not initialized!'
+        'RabbitMQController is not initialized!',
       );
     }
 
@@ -61,7 +61,7 @@ export class MockRabbitMQController extends AbstractRabbitMQController {
     await this.runMessageProcessor(
       messageProcessor,
       this._queuedMessages[subscriptionName],
-      msgProcessorContext
+      msgProcessorContext,
     );
 
     const checkQueues = async () => {
@@ -69,7 +69,7 @@ export class MockRabbitMQController extends AbstractRabbitMQController {
         await this.runMessageProcessor(
           messageProcessor,
           this._queuedMessages[subscriptionName],
-          msgProcessorContext
+          msgProcessorContext,
         );
       }
     };
@@ -88,11 +88,11 @@ export class MockRabbitMQController extends AbstractRabbitMQController {
 
   public async publish(
     data: TRmqMessages,
-    publisherName: RascalPublications
+    publisherName: RascalPublications,
   ): Promise<any> {
     if (!this._initialized) {
       throw new RabbitMQControllerError(
-        'RabbitMQController is not initialized!'
+        'RabbitMQController is not initialized!',
       );
     }
     const subscription = this.routeMessage(publisherName);
@@ -104,7 +104,7 @@ export class MockRabbitMQController extends AbstractRabbitMQController {
     publishData: TRmqMessages,
     objectId: number | string,
     publication: RascalPublications,
-    DB?: any
+    // DB?: any,
   ) {
     await this.publish(publishData, publication);
   }
@@ -130,12 +130,12 @@ export class MockRabbitMQController extends AbstractRabbitMQController {
     const { exchange, routingKey } = config.publications[publication];
     const queue = Object.values(config.bindings).find(
       (binding) =>
-        binding.source === exchange && binding.bindingKey === routingKey
+        binding.source === exchange && binding.bindingKey === routingKey,
     ).destination;
 
     if (!queue) {
       throw new Error(
-        'Routing Failed: Could not find a queue that matches the given publication'
+        'Routing Failed: Could not find a queue that matches the given publication',
       );
     }
 
@@ -144,14 +144,14 @@ export class MockRabbitMQController extends AbstractRabbitMQController {
     }
 
     throw new Error(
-      'Routing Failed: Could not find a subscription that matches the given publication'
+      'Routing Failed: Could not find a subscription that matches the given publication',
     );
   }
 
   private async runMessageProcessor(
     messageProcessor: (data: TRmqMessages, ...args: any) => Promise<void>,
     messages: any[],
-    msgProcessorContext?: { [key: string]: any }
+    msgProcessorContext?: { [key: string]: any },
   ) {
     const numMessages = messages.length;
     for (let i = 0; i < numMessages; i++) {
@@ -159,7 +159,7 @@ export class MockRabbitMQController extends AbstractRabbitMQController {
       try {
         await messageProcessor.call(
           { rmqController: this, ...msgProcessorContext },
-          message
+          message,
         );
       } catch (e) {
         const errorMsg = `
@@ -170,11 +170,11 @@ export class MockRabbitMQController extends AbstractRabbitMQController {
         // message to avoid re-queuing the message multiple times
         if (e instanceof RmqMsgFormatError) {
           throw new Error(
-            `Negative Acknowledgement: Invalid Message Format Error - ${errorMsg}`
+            `Negative Acknowledgement: Invalid Message Format Error - ${errorMsg}`,
           );
         } else {
           throw new Error(
-            `Negative Acknowledgement: Unknown Error - Message would be re-queued in production`
+            `Negative Acknowledgement: Unknown Error - Message would be re-queued in production`,
           );
         }
       }

@@ -37,7 +37,7 @@ describe('ServerThreadsController', () => {
           findOne: sandbox.stub().resolves({
             id: 4,
             title: 'Big Thread!',
-            chain: 'ethereum',
+            community_id: 'ethereum',
           }),
         },
       };
@@ -202,7 +202,7 @@ describe('ServerThreadsController', () => {
           findOne: sandbox.stub().resolves({
             id: 4,
             title: 'Big Thread!',
-            chain: 'ethereum',
+            community_id: 'ethereum',
             archived_at: Date.now(),
           }),
         },
@@ -271,7 +271,7 @@ describe('ServerThreadsController', () => {
           findOne: sandbox.stub().resolves({
             id: 4,
             title: 'Big Thread!',
-            chain: 'ethereum',
+            community_id: 'ethereum',
           }),
         },
       };
@@ -340,14 +340,14 @@ describe('ServerThreadsController', () => {
           findOne: sandbox.stub().resolves({
             id: 4,
             title: 'Big Thread!',
-            chain: 'ethereum',
+            community_id: 'ethereum',
             topic_id: 77,
           }),
         },
         // for validateTopicThreshold
         Topic: {
           findOne: sandbox.stub().resolves({
-            chain: {
+            community: {
               ChainNode: {
                 id: 99,
               },
@@ -397,6 +397,14 @@ describe('ServerThreadsController', () => {
             last_checked: new Date(),
             reject_reason: fakeMembershipReject,
           }),
+          findAll: sandbox.stub().resolves([
+            {
+              group_id: 1,
+              last_checked: new Date(),
+              reject_reason: fakeMembershipReject,
+            },
+          ]),
+          bulkCreate: sandbox.stub().resolves([]),
         },
       };
       const tokenBalanceCache = {
@@ -1065,7 +1073,7 @@ describe('ServerThreadsController', () => {
         Thread: {
           findOne: async () => ({
             id: 1,
-            chain: 'ethereum',
+            community_id: 'ethereum',
             address_id: 1,
             Address: {
               id: 1,

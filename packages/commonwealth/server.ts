@@ -267,7 +267,7 @@ async function main() {
   );
 
   const banCache = new BanCache(models);
-  const globalActivityCache = new GlobalActivityCache(models);
+  const globalActivityCache = new GlobalActivityCache(models, redisCache);
 
   // initialize async to avoid blocking startup
   if (!NO_GLOBAL_ACTIVITY_CACHE) globalActivityCache.start();

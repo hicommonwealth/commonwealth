@@ -26,7 +26,7 @@ describe('Polls', () => {
 
     const topic = await models.Topic.findOne({
       where: {
-        chain_id: chain,
+        community_id: chain,
         group_ids: [],
       },
     });
@@ -89,14 +89,14 @@ describe('Polls', () => {
       .post(`/api/threads/${thread.id}/polls`)
       .set('Accept', 'application/json')
       .send({
-        author_chain: thread.chain,
-        chain: thread.chain,
+        author_chain: thread.community_id,
+        chain: thread.community_id,
         address: userAddress,
         jwt: userJWT,
         ...data,
       });
 
-    expect(res.status).to.equal(200);
+    expect(res.status, JSON.stringify(res)).to.equal(200);
     expect(res.body.result).to.contain({
       prompt: data.prompt,
       options: JSON.stringify(data.options),

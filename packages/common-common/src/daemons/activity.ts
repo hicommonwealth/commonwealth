@@ -1,4 +1,4 @@
-import { RedisNamespaces } from '../types';
+import { RedisNamespaces } from '@hicommonwealth/core';
 import {
   CacheDecorator,
   cacheDecorator as cacheDecoratorInstance,
@@ -16,7 +16,7 @@ export class Activity<T extends (...args: any[]) => any> {
     private cacheKey: KeyFunction<T>,
     private cacheDuration: number,
     private cacheNamespace: RedisNamespaces,
-    private cacheDecorator: CacheDecorator = cacheDecoratorInstance
+    private cacheDecorator: CacheDecorator = cacheDecoratorInstance,
   ) {
     this.queryWithCache = this.cacheWrapHelper(false);
     this.queryWithCacheOverride = this.cacheWrapHelper(true);
@@ -28,7 +28,7 @@ export class Activity<T extends (...args: any[]) => any> {
       this.query,
       this.cacheKey,
       this.cacheDuration,
-      this.cacheNamespace
+      this.cacheNamespace,
     ) as unknown as T;
   }
 
@@ -37,7 +37,7 @@ export class Activity<T extends (...args: any[]) => any> {
       const jobId = daemon.startTask(
         this.label,
         async () => await this.queryWithCacheOverride(...args),
-        this.cacheDuration
+        this.cacheDuration,
       );
       return jobId;
     } catch (err) {

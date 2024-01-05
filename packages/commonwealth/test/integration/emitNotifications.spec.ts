@@ -1,10 +1,10 @@
-import chai from 'chai';
-import chaiHttp from 'chai-http';
 import {
   NotificationCategories,
   ProposalType,
   SupportedNetwork,
-} from 'common-common/src/types';
+} from '@hicommonwealth/core';
+import chai from 'chai';
+import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { NotificationDataAndCategory, SnapshotEventType } from 'types';
 import { resetDatabase } from '../../server-test';
@@ -88,7 +88,7 @@ describe('emitNotifications tests', () => {
 
     // create a thread manually to bypass emitNotifications in-route
     thread = await models.Thread.create({
-      chain: chain,
+      community_id: chain,
       address_id: userAddressId2,
       title,
       plaintext: '',

@@ -28,7 +28,7 @@ export async function validateTopicGroupsMembership(
   // get all groups of topic
   const topic = await models.Topic.findOne({
     where: {
-      chain_id: chain.id,
+      community_id: chain.id,
       id: topicId,
     },
   });

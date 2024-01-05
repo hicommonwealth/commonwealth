@@ -1,5 +1,5 @@
+import { NotificationCategories } from '@hicommonwealth/core';
 import { expect } from 'chai';
-import { NotificationCategories } from 'common-common/src/types';
 import { ServerCommentsController } from 'server/controllers/server_comments_controller';
 import { SearchCommentsOptions } from 'server/controllers/server_comments_methods/search_comments';
 import Sinon from 'sinon';
@@ -46,7 +46,7 @@ describe('ServerCommentsController', () => {
           findOne: sandbox.stub().resolves({
             id: 4,
             title: 'Big Thread!',
-            chain: 'ethereum',
+            community_id: 'ethereum',
           }),
         },
       };
@@ -159,7 +159,7 @@ describe('ServerCommentsController', () => {
           findOne: sandbox.stub().resolves({
             id: 4,
             title: 'Big Thread!',
-            chain: 'ethereum',
+            community_id: 'ethereum',
           }),
         },
       };
@@ -301,7 +301,7 @@ describe('ServerCommentsController', () => {
           findOne: sandbox.stub().resolves({
             id: 4,
             title: 'Big Thread!',
-            chain: 'ethereum',
+            community_id: 'ethereum',
           }),
         },
       };
@@ -375,14 +375,14 @@ describe('ServerCommentsController', () => {
           findOne: sandbox.stub().resolves({
             id: 4,
             title: 'Big Thread!',
-            chain: 'ethereum',
+            community_id: 'ethereum',
             topic_id: 77,
           }),
         },
         // for validateTopicThreshold
         Topic: {
           findOne: sandbox.stub().resolves({
-            chain: {
+            community: {
               ChainNode: {
                 id: 99,
               },
@@ -432,6 +432,8 @@ describe('ServerCommentsController', () => {
             last_checked: new Date(),
             reject_reason: 'filler',
           }),
+          findAll: sandbox.stub().resolves([]),
+          bulkCreate: sandbox.stub().resolves([]),
         },
       };
       const tokenBalanceCache = {
@@ -542,7 +544,7 @@ describe('ServerCommentsController', () => {
           findOne: async () => ({
             id: 1,
             address: '0x123',
-            chain: 'ethereum',
+            community_id: 'ethereum',
             title: 'Big Thread!',
           }),
         },
@@ -641,7 +643,7 @@ describe('ServerCommentsController', () => {
           findOne: async () => ({
             id: 1,
             address: '0x123',
-            chain: 'ethereum',
+            community_id: 'ethereum',
             title: 'Big Thread!',
           }),
         },

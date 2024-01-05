@@ -26,11 +26,6 @@ import {
   GetCommunitiesResult,
 } from './server_communities_methods/get_communities';
 import {
-  __getCommunityStats,
-  GetCommunityStatsOptions,
-  GetCommunityStatsResult,
-} from './server_communities_methods/get_community_stats';
-import {
   __getRelatedCommunities,
   GetRelatedCommunitiesQuery,
   GetRelatedCommunitiesResult,
@@ -80,12 +75,6 @@ export class ServerCommunitiesController {
     options: DeleteCommunityOptions,
   ): Promise<DeleteCommunityResult> {
     return __deleteCommunity.call(this, options);
-  }
-
-  async getCommunityStats(
-    options: GetCommunityStatsOptions,
-  ): Promise<GetCommunityStatsResult> {
-    return __getCommunityStats.call(this, options);
   }
 
   async getChainNodes(

@@ -11,9 +11,6 @@ const CommunitiesPage = lazy(() => import('views/pages/communities'));
 const SearchPage = lazy(() => import('views/pages/search'));
 const Web3LoginPage = lazy(() => import('views/pages/web3login'));
 
-const OldCreateCommunityPage = lazy(
-  () => import('views/pages/create_community'),
-);
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(
@@ -100,28 +97,11 @@ const CommonDomainRoutes = () => [
       type: 'blank',
     })}
   />,
-  ...[
-    featureFlags.newCreateCommunity ? (
-      <Route
-        key="/createCommunity"
-        path="/createCommunity"
-        element={withLayout(CreateCommunityPage, { type: 'common' })}
-      />
-    ) : (
-      [
-        <Route
-          key="/createCommunity"
-          path="/createCommunity"
-          element={withLayout(OldCreateCommunityPage, { type: 'common' })}
-        />,
-        <Route
-          key="/createCommunity/:type"
-          path="/createCommunity/:type"
-          element={withLayout(OldCreateCommunityPage, { type: 'common' })}
-        />,
-      ]
-    ),
-  ],
+  <Route
+    key="/createCommunity"
+    path="/createCommunity"
+    element={withLayout(CreateCommunityPage, { type: 'common' })}
+  />,
   <Route
     key="/whyCommonwealth"
     path="/whyCommonwealth"

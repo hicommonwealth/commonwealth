@@ -1,5 +1,5 @@
-import type { WalletId, WalletSsoSource } from 'common-common/src/types';
-import { ChainType } from 'common-common/src/types';
+import type { WalletId, WalletSsoSource } from '@hicommonwealth/core';
+import { ChainType } from '@hicommonwealth/core';
 import $ from 'jquery';
 import app from 'state';
 import NewProfilesController from '../controllers/server/newProfiles';

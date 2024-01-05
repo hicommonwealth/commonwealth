@@ -1,10 +1,10 @@
-import type { RegisteredTypes } from '@polkadot/types/types';
 import type {
   ChainBase,
   ChainNetwork,
   ChainType,
   DefaultPage,
-} from 'common-common/src/types';
+} from '@hicommonwealth/core';
+import type { RegisteredTypes } from '@polkadot/types/types';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
 import type { AddressAttributes, AddressInstance } from './address';
@@ -177,9 +177,9 @@ export default (
     models.Community.hasMany(models.Notification, { foreignKey: 'chain_id' });
     models.Community.hasMany(models.Topic, {
       as: 'topics',
-      foreignKey: 'chain_id',
+      foreignKey: 'community_id',
     });
-    models.Community.hasMany(models.Thread, { foreignKey: 'chain' });
+    models.Community.hasMany(models.Thread, { foreignKey: 'community_id' });
     models.Community.hasMany(models.Comment, { foreignKey: 'chain' });
     models.Community.hasMany(models.StarredCommunity, { foreignKey: 'chain' });
     models.Community.belongsToMany(models.Contract, {
