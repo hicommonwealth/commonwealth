@@ -4,16 +4,8 @@
     "lib": ["es2020"],
     "typeRoots": ["./node_modules/@types"],
     "skipLibCheck": true,
-    "outDir": "./build",
-    "baseUrl": "."
+    // TODO: "rootDir": "src",
+    "outDir": "build"
   },
-  "paths": {
-    "@hicommonwealth/*": ["../../libs/*/src"],
-    "common-common": ["../../packages/common-common"],
-    "common-common/*": ["../../packages/common-common/*"],
-    "commonwealth": ["../../packages/commonwealth"],
-    "commonwealth/*": ["../../packages/commonwealth/*"]
-  },
-  "include": ["discord-consumer", "discord-listener", "utils"],
-  "exclude": ["./node_modules", "node_modules", "build"]
+  "include": ["src"]
 }
