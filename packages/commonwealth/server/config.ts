@@ -131,3 +131,5 @@ export const MEMBERSHIP_REFRESH_TTL_SECONDS = process.env
 export const TBC_BALANCE_TTL_SECONDS = process.env.TBC_BALANCE_TTL_SECONDS
   ? parseInt(process.env.TBC_BALANCE_TTL_SECONDS, 10)
   : 300;
+
+export const PRERENDER_TOKEN = process.env.PRERENDER_TOKEN;
