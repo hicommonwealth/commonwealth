@@ -1,6 +1,6 @@
 import { featureFlags } from 'helpers/feature-flags';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import app from 'state';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import { useFetchThreadsQuery } from 'state/api/threads';
@@ -8,9 +8,11 @@ import { useFetchTopicsQuery } from 'state/api/topics';
 import useNewTopicModalMutationStore from 'state/ui/newTopicModal';
 import Permissions from 'utils/Permissions';
 import { CWText } from '../component_kit/cw_text';
+import { CWModal } from '../component_kit/new_designs/CWModal';
 import { CWButton } from '../component_kit/new_designs/cw_button';
 import { AdminOnboardingCard } from './AdminOnboardingCard/AdminOnboardingCard';
 import './AdminOnboardingSlider.scss';
+import { DismissModal } from './DismissModal';
 
 export const AdminOnboardingSlider = () => {
   const community = app.config.chains.getById(app.activeChainId());
@@ -25,7 +27,9 @@ export const AdminOnboardingSlider = () => {
     integrations.discordBotWebhooksEnabled;
 
   const navigate = useCommonNavigate();
+  const isClosedByUser = useRef(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const { setIsNewTopicModalOpen } = useNewTopicModalMutationStore();
   const { data: topics = [], isLoading: isLoadingTopics = false } =
     useFetchTopicsQuery({
@@ -53,6 +57,7 @@ export const AdminOnboardingSlider = () => {
 
   useEffect(() => {
     if (
+      !isClosedByUser.current &&
       !isLoadingTopics &&
       !isLoadingGroups &&
       !isLoadingThreads &&
@@ -84,44 +89,64 @@ export const AdminOnboardingSlider = () => {
   }
 
   return (
-    <section className="AdminOnboardingSlider">
-      <div className="header">
-        <CWText type="h4">Finish setting up your community</CWText>
+    <>
+      <section className="AdminOnboardingSlider">
+        <div className="header">
+          <CWText type="h4">Finish setting up your community</CWText>
 
-        <CWButton
-          containerClassName="dismissBtn"
-          buttonType="tertiary"
-          buttonWidth="narrow"
-          onClick={() => setIsVisible(false)}
-          label="Dismiss"
-        />
-      </div>
-      <div className="cards">
-        <AdminOnboardingCard
-          cardType="create-topic"
-          isActionCompleted={topics.length > 0}
-          // TODO: after https://github.com/hicommonwealth/commonwealth/issues/6026,
-          // redirect to specific section on the manage community page
-          onCTAClick={() => setIsNewTopicModalOpen(true)}
-        />
-        <AdminOnboardingCard
-          cardType="make-group"
-          isActionCompleted={groups.length > 0}
-          onCTAClick={() => redirectToPage('create-group')}
-        />
-        <AdminOnboardingCard
-          cardType="enable-integrations"
-          isActionCompleted={hasAnyIntegration}
-          // TODO: after https://github.com/hicommonwealth/commonwealth/issues/6024,
-          // redirect to specific section on the manage community page
-          onCTAClick={() => redirectToPage('manage-community')}
-        />
-        <AdminOnboardingCard
-          cardType="create-thread"
-          isActionCompleted={threads.length > 0}
-          onCTAClick={() => redirectToPage('create-thread')}
-        />
-      </div>
-    </section>
+          <CWButton
+            containerClassName="dismissBtn"
+            buttonType="tertiary"
+            buttonWidth="narrow"
+            onClick={() => {
+              setIsModalVisible(true);
+            }}
+            label="Dismiss"
+          />
+        </div>
+        <div className="cards">
+          <AdminOnboardingCard
+            cardType="create-topic"
+            isActionCompleted={topics.length > 0}
+            // TODO: after https://github.com/hicommonwealth/commonwealth/issues/6026,
+            // redirect to specific section on the manage community page
+            onCTAClick={() => setIsNewTopicModalOpen(true)}
+          />
+          <AdminOnboardingCard
+            cardType="make-group"
+            isActionCompleted={groups.length > 0}
+            onCTAClick={() => redirectToPage('create-group')}
+          />
+          <AdminOnboardingCard
+            cardType="enable-integrations"
+            isActionCompleted={hasAnyIntegration}
+            // TODO: after https://github.com/hicommonwealth/commonwealth/issues/6024,
+            // redirect to specific section on the manage community page
+            onCTAClick={() => redirectToPage('manage-community')}
+          />
+          <AdminOnboardingCard
+            cardType="create-thread"
+            isActionCompleted={threads.length > 0}
+            onCTAClick={() => redirectToPage('create-thread')}
+          />
+        </div>
+      </section>
+      <CWModal
+        size="small"
+        visibleOverflow
+        content={
+          <DismissModal
+            onModalClose={() => setIsModalVisible(false)}
+            onDismiss={() => {
+              setIsModalVisible(false);
+              isClosedByUser.current = true;
+              setIsVisible(false);
+            }}
+          />
+        }
+        onClose={() => setIsModalVisible(false)}
+        open={isModalVisible}
+      />
+    </>
   );
 };
