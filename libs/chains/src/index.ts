@@ -1,20 +1,20 @@
 export * from './cosmos-ts';
 export {
-  ProposalSDKType,
-  ProposalStatus,
-  ProposalStatusSDKType,
-  TallyResultSDKType,
-  VoteOption,
   voteOptionToJSON,
+  type ProposalSDKType,
+  type ProposalStatus,
+  type ProposalStatusSDKType,
+  type TallyResultSDKType,
+  type VoteOption,
 } from './cosmos-ts/src/codegen/cosmos/gov/v1/gov';
 export {
-  QueryDepositsResponseSDKType,
-  QueryProposalRequest,
-  QueryProposalResponseSDKType,
-  QueryProposalsRequest,
-  QueryProposalsResponseSDKType,
-  QueryTallyResultResponseSDKType,
-  QueryVotesResponseSDKType,
+  type QueryDepositsResponseSDKType,
+  type QueryProposalRequest,
+  type QueryProposalResponseSDKType,
+  type QueryProposalsRequest,
+  type QueryProposalsResponseSDKType,
+  type QueryTallyResultResponseSDKType,
+  type QueryVotesResponseSDKType,
 } from './cosmos-ts/src/codegen/cosmos/gov/v1/query';
 export { LCDQueryClient as GovV1Client } from './cosmos-ts/src/codegen/cosmos/gov/v1/query.lcd';
 export { createLCDClient } from './cosmos-ts/src/codegen/cosmos/lcd';
