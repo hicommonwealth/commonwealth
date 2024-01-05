@@ -10,8 +10,7 @@
   border: 1px solid $neutral-200;
   background: white;
   min-width: 250px;
-  width: 250px;
-  max-width: 250px;
+  flex: 1;
 
   .circle-btn-border {
     border: none !important;
