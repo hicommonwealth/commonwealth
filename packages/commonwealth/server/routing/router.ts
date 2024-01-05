@@ -4,10 +4,7 @@ import express from 'express';
 import useragent from 'express-useragent';
 import passport from 'passport';
 
-import { TBC_BALANCE_TTL_SECONDS } from '../config';
-
-import { TokenBalanceCache } from 'token-balance-cache/src/index';
-import { TokenBalanceCache as NewTokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
+import { TokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
 
 import {
   methodNotAllowedMiddleware,
@@ -205,32 +202,23 @@ function setupRouter(
   app: Express,
   models: DB,
   viewCountCache: ViewCountCache,
-  tokenBalanceCacheV1: TokenBalanceCache,
+  tokenBalanceCache: TokenBalanceCache,
   banCache: BanCache,
   globalActivityCache: GlobalActivityCache,
   databaseValidationService: DatabaseValidationService,
   redisCache: RedisCache,
 ) {
   // controllers
-
-  const tokenBalanceCacheV2 = new NewTokenBalanceCache(
-    models,
-    redisCache,
-    TBC_BALANCE_TTL_SECONDS,
-  );
-
   const serverControllers: ServerControllers = {
     threads: new ServerThreadsController(
       models,
-      tokenBalanceCacheV1,
-      tokenBalanceCacheV2,
+      tokenBalanceCache,
       banCache,
       globalActivityCache,
     ),
     comments: new ServerCommentsController(
       models,
-      tokenBalanceCacheV1,
-      tokenBalanceCacheV2,
+      tokenBalanceCache,
       banCache,
       globalActivityCache,
     ),
@@ -238,23 +226,10 @@ function setupRouter(
     notifications: new ServerNotificationsController(models),
     analytics: new ServerAnalyticsController(),
     profiles: new ServerProfilesController(models),
-    communities: new ServerCommunitiesController(
-      models,
-      tokenBalanceCacheV1,
-      banCache,
-    ),
-    polls: new ServerPollsController(
-      models,
-      tokenBalanceCacheV1,
-      tokenBalanceCacheV2,
-    ),
+    communities: new ServerCommunitiesController(models, banCache),
+    polls: new ServerPollsController(models, tokenBalanceCache),
     proposals: new ServerProposalsController(models, redisCache),
-    groups: new ServerGroupsController(
-      models,
-      tokenBalanceCacheV1,
-      tokenBalanceCacheV2,
-      banCache,
-    ),
+    groups: new ServerGroupsController(models, tokenBalanceCache, banCache),
     topics: new ServerTopicsController(models, banCache),
     admin: new ServerAdminController(models),
   };

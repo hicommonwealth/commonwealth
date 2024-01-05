@@ -7,7 +7,7 @@ import type {
   Session,
   SessionPayload,
 } from '@canvas-js/interfaces';
-import { BalanceType, ChainBase, ChainNetwork } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
 import {
   SignTypedDataVersion,
   personalSign,
@@ -15,7 +15,6 @@ import {
 } from '@metamask/eth-sig-util';
 import { Keyring } from '@polkadot/api';
 import { stringToU8a } from '@polkadot/util';
-import type BN from 'bn.js';
 import chai from 'chai';
 import 'chai/register-should';
 import wallet from 'ethereumjs-wallet';
@@ -23,9 +22,6 @@ import { ethers } from 'ethers';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
 import { createRole, findOneRole } from 'server/util/roles';
 import * as siwe from 'siwe';
-
-import type { IChainNode } from 'token-balance-cache/src/index';
-import { BalanceProvider } from 'token-balance-cache/src/index';
 
 import { createCanvasSessionPayload } from '../../shared/canvas';
 
@@ -67,7 +63,6 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .set('Accept', 'application/json')
       .send({ address, chain, wallet_id, block_info: TEST_BLOCK_INFO_STRING });
     const address_id = res.body.result.id;
-    const token = res.body.result.verification_token;
     const chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
     const sessionWallet = ethers.Wallet.createRandom();
     const timestamp = 1665083987891;
@@ -115,14 +110,11 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       email,
       session,
       sign: (actionPayload: ActionPayload) => {
-        const { types, primaryType, domain, message } =
-          getEIP712SignableAction(actionPayload);
-        const signature = signTypedData({
+        return signTypedData({
           privateKey: Buffer.from(sessionWallet.privateKey.slice(2), 'hex'),
           data: getEIP712SignableAction(actionPayload),
           version: SignTypedDataVersion.V4,
         });
-        return signature;
       },
     };
   }
@@ -184,8 +176,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
         const signatureBytes = sessionWallet.sign(
           stringToU8a(sortedStringify(actionPayload)),
         );
-        const signature = new Buffer(signatureBytes).toString('hex');
-        return signature;
+        return new Buffer(signatureBytes).toString('hex');
       },
     };
   }
@@ -681,43 +672,6 @@ export const createCommunity = async (args: CommunityArgs) => {
   const community = res.body.result;
   return community;
 };
-
-// always prune both token and non-token holders asap
-export class MockTokenBalanceProvider extends BalanceProvider<
-  any,
-  {
-    tokenAddress: string;
-    contractType: string;
-  }
-> {
-  public name = 'eth-token';
-  public opts = {
-    tokenAddress: 'string',
-    contractType: 'string',
-  };
-  public validBases = [BalanceType.Ethereum];
-  public balanceFn: (tokenAddress: string, userAddress: string) => Promise<BN>;
-
-  public async getExternalProvider(
-    node: IChainNode,
-    opts: { tokenAddress: string; contractType: string },
-  ): Promise<any> {
-    return;
-  }
-
-  public async getBalance(
-    node: IChainNode,
-    address: string,
-    opts: { tokenAddress: string; contractType: string },
-  ): Promise<string> {
-    if (this.balanceFn) {
-      const bal = await this.balanceFn(opts.tokenAddress, address);
-      return bal.toString();
-    } else {
-      throw new Error('unable to fetch token balance');
-    }
-  }
-}
 
 export interface JoinCommunityArgs {
   jwt: string;

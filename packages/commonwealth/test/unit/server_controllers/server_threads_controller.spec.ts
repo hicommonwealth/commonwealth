@@ -56,7 +56,6 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db as any,
         tokenBalanceCache as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -157,7 +156,6 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db as any,
         tokenBalanceCache as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -227,7 +225,6 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db as any,
         tokenBalanceCache as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -295,7 +292,6 @@ describe('ServerThreadsController', () => {
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         tokenBalanceCache as any,
         banCache as any,
       );
@@ -434,7 +430,6 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db as any,
         tokenBalanceCache as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -534,7 +529,6 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db as any,
         tokenBalanceCache as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -625,7 +619,6 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db as any,
         tokenBalanceCache as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -702,7 +695,6 @@ describe('ServerThreadsController', () => {
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         tokenBalanceCache as any,
         banCache as any,
       );
@@ -811,7 +803,6 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db as any,
         tokenBalanceCache as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -874,7 +865,6 @@ describe('ServerThreadsController', () => {
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         tokenBalanceCache as any,
         banCache as any,
       );
@@ -961,7 +951,6 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db as any,
         tokenBalanceCache as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -1042,7 +1031,6 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db as any,
         tokenBalanceCache as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -1116,7 +1104,6 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db as any,
         tokenBalanceCache as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
       const user = {
@@ -1164,7 +1151,6 @@ describe('ServerThreadsController', () => {
       };
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         tokenBalanceCache as any,
         banCache as any,
       );
@@ -1214,7 +1200,6 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db as any,
         tokenBalanceCache as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
       const user = {
@@ -1261,7 +1246,6 @@ describe('ServerThreadsController', () => {
       };
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         tokenBalanceCache as any,
         banCache as any,
       );
@@ -1347,7 +1331,6 @@ describe('ServerThreadsController', () => {
       const banCache = BAN_CACHE_MOCK_FN('ethereum');
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         tokenBalanceCache as any,
         banCache as any,
       );
