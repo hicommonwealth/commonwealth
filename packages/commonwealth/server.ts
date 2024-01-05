@@ -196,9 +196,7 @@ async function main() {
     app.use(passport.initialize());
     app.use(passport.session());
 
-    if (DEV && process.env.WITH_PRERENDER) {
-      app.use(prerenderNode.set('prerenderToken', PRERENDER_TOKEN));
-    } else if (!DEV && !NO_PRERENDER) {
+    if (!DEV && !NO_PRERENDER) {
       app.use(prerenderNode.set('prerenderToken', PRERENDER_TOKEN));
     }
   };
