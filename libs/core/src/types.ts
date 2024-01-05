@@ -150,6 +150,7 @@ export enum RedisNamespaces {
   Database_Cleaner = 'database_cleaner',
   Compound_Gov_Version = 'compound_gov_version',
   Token_Balance = 'token_balance',
+  Activity_Cache = 'activity_cache',
 }
 
 export interface ISnapshotNotification {

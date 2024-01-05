@@ -1,7 +1,9 @@
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
 
+import GlobalActivityCache from '../util/globalActivityCache';
 import { TokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
+
 import {
   CreateThreadOptions,
   CreateThreadResult,
@@ -66,6 +68,7 @@ export class ServerThreadsController {
     public models: DB,
     public tokenBalanceCache: TokenBalanceCache,
     public banCache: BanCache,
+    public globalActivityCache?: GlobalActivityCache,
   ) {}
 
   async createThreadReaction(

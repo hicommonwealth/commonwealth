@@ -9,11 +9,6 @@ import {
   startHealthCheckLoop,
 } from 'common-common/src/scripts/startHealthCheckLoop';
 import {
-  handleMessage,
-  handleThreadChannel,
-} from 'discord-bot/discord-listener/handlers';
-import { rollbar } from 'discord-bot/utils/rollbar';
-import {
   Client,
   IntentsBitField,
   Message,
@@ -21,7 +16,12 @@ import {
   ThreadChannel,
 } from 'discord.js';
 import v8 from 'v8';
+import {
+  handleMessage,
+  handleThreadChannel,
+} from '../discord-listener/handlers';
 import { DISCORD_TOKEN, RABBITMQ_URI } from '../utils/config';
+import { rollbar } from '../utils/rollbar';
 
 const log = factory.getLogger(formatFilename(__filename));
 

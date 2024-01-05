@@ -210,8 +210,18 @@ function setupRouter(
 ) {
   // controllers
   const serverControllers: ServerControllers = {
-    threads: new ServerThreadsController(models, tokenBalanceCache, banCache),
-    comments: new ServerCommentsController(models, tokenBalanceCache, banCache),
+    threads: new ServerThreadsController(
+      models,
+      tokenBalanceCache,
+      banCache,
+      globalActivityCache,
+    ),
+    comments: new ServerCommentsController(
+      models,
+      tokenBalanceCache,
+      banCache,
+      globalActivityCache,
+    ),
     reactions: new ServerReactionsController(models, banCache),
     notifications: new ServerNotificationsController(models),
     analytics: new ServerAnalyticsController(),
