@@ -1,11 +1,11 @@
 export * from './cosmos-ts';
 export {
+  ProposalStatus,
+  ProposalStatusSDKType,
+  VoteOption,
   voteOptionToJSON,
   type ProposalSDKType,
-  type ProposalStatus,
-  type ProposalStatusSDKType,
   type TallyResultSDKType,
-  type VoteOption,
 } from './cosmos-ts/src/codegen/cosmos/gov/v1/gov';
 export {
   type QueryDepositsResponseSDKType,
