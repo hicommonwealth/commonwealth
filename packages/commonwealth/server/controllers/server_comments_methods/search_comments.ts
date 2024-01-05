@@ -79,7 +79,7 @@ export async function __searchComments(
   }
 
   const communityWhere = bind.community
-    ? '"Comments".chain = $community AND'
+    ? '"Comments".community_id = $community AND'
     : '';
 
   const sqlBaseQuery = `

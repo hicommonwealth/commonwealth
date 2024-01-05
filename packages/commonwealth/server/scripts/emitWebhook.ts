@@ -167,7 +167,7 @@ async function main() {
     ) {
       const [comment] = await models.Comment.findOrCreate({
         where: {
-          chain: community.id,
+          community_id: community.id,
           thread_id: thread.id,
         },
         defaults: {
