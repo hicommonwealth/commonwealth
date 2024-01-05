@@ -5,13 +5,11 @@ import app from 'state';
 import { updateThreadInAllCaches } from './helpers/cache';
 
 interface DeleteThreadLinksProps {
-  chainId: string;
   threadId: number;
   links: Link[];
 }
 
 const deleteThreadLinks = async ({
-  chainId,
   threadId,
   links,
 }: DeleteThreadLinksProps) => {
@@ -23,25 +21,25 @@ const deleteThreadLinks = async ({
         links,
         jwt: app.user.jwt,
       },
-    }
+    },
   );
 
   return new Thread(response.data.result);
 };
 
 interface DeleteThreadLinksMutationProps {
-  chainId: string;
+  communityId: string;
   threadId: number;
 }
 
 const useDeleteThreadLinksMutation = ({
-  chainId,
+  communityId,
   threadId,
 }: DeleteThreadLinksMutationProps) => {
   return useMutation({
     mutationFn: deleteThreadLinks,
     onSuccess: async (updatedThread) => {
-      updateThreadInAllCaches(chainId, threadId, updatedThread);
+      updateThreadInAllCaches(communityId, threadId, updatedThread);
       return updatedThread;
     },
   });

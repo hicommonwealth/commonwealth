@@ -6,14 +6,14 @@ import { ApiEndpoints } from 'state/api/config';
 const CHANNELS_STALE_TIME = 30 * 1_000; // 30 s
 
 interface FetchDiscordChannelsProps {
-  chainId: string;
+  communityId: string;
 }
 
-const fetchChannels = async ({ chainId }: FetchDiscordChannelsProps) => {
+const fetchChannels = async ({ communityId }: FetchDiscordChannelsProps) => {
   const response = await axios.post(
     `${app.serverUrl()}${ApiEndpoints.DISCORD_CHANNELS}`,
     {
-      community_id: chainId || app.activeChainId(),
+      community_id: communityId || app.activeChainId(),
       jwt: app.user.jwt,
     },
   );
@@ -26,11 +26,11 @@ const fetchChannels = async ({ chainId }: FetchDiscordChannelsProps) => {
 };
 
 const useFetchDiscordChannelsQuery = ({
-  chainId,
+  communityId,
 }: FetchDiscordChannelsProps) => {
   return useQuery({
-    queryKey: [ApiEndpoints.DISCORD_CHANNELS, chainId],
-    queryFn: () => fetchChannels({ chainId }),
+    queryKey: [ApiEndpoints.DISCORD_CHANNELS, communityId],
+    queryFn: () => fetchChannels({ communityId }),
     staleTime: CHANNELS_STALE_TIME,
   });
 };

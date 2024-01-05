@@ -49,7 +49,7 @@ export const CommunityMetadataRows = ({
   });
 
   const { data: discordChannels } = useFetchDiscordChannelsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const {

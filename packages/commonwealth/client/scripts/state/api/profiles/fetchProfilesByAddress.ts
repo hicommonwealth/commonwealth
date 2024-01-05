@@ -23,7 +23,7 @@ const fetchProfilesByAddress = async ({
       addresses: profileAddresses,
       chains: profileChainIds,
       jwt: app.user.jwt,
-    }
+    },
   );
 
   return response.data.result.map((t) => {
@@ -34,7 +34,7 @@ const fetchProfilesByAddress = async ({
       t.avatarUrl,
       t.profileId,
       currentChainId,
-      t.lastActive
+      t.lastActive,
     );
     return profile;
   });
@@ -80,19 +80,19 @@ const useFetchProfilesByAddressesQuery = ({
 // TODO: After account controller is de-side-effected (all api calls removed). Then we would be in a better
 // position to remove this discouraged method
 export const DISCOURAGED_NONREACTIVE_fetchProfilesByAddress = (
-  chainId: string,
-  address: string
+  communityId: string,
+  address: string,
 ) => {
   return queryClient.fetchQuery(
-    [ApiEndpoints.FETCH_PROFILES, chainId, address],
+    [ApiEndpoints.FETCH_PROFILES, communityId, address],
     {
       queryFn: () =>
         fetchProfilesByAddress({
-          currentChainId: chainId,
-          profileChainIds: [chainId],
+          currentChainId: communityId,
+          profileChainIds: [communityId],
           profileAddresses: [address],
         }),
-    }
+    },
   );
 };
 

@@ -5,7 +5,7 @@ import { updateThreadInAllCaches } from './helpers/cache';
 
 interface IuseCreateThreadReactionMutation {
   threadId: number;
-  chainId: string;
+  communityId: string;
 }
 interface CreateReactionProps extends IuseCreateThreadReactionMutation {
   address: string;
@@ -13,7 +13,6 @@ interface CreateReactionProps extends IuseCreateThreadReactionMutation {
 }
 
 const createReaction = async ({
-  chainId,
   address,
   reactionType = 'like',
   threadId,
@@ -41,7 +40,7 @@ const createReaction = async ({
 };
 
 const useCreateThreadReactionMutation = ({
-  chainId,
+  communityId,
   threadId,
 }: IuseCreateThreadReactionMutation) => {
   return useMutation({
@@ -53,7 +52,7 @@ const useCreateThreadReactionMutation = ({
         type: 'like',
       };
       updateThreadInAllCaches(
-        chainId,
+        communityId,
         threadId,
         { associatedReactions: [reaction] },
         'combineAndRemoveDups',
