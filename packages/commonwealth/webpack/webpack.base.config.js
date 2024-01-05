@@ -69,6 +69,11 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env.ETH_RPC': JSON.stringify(process.env.ETH_RPC),
     }),
+    new webpack.DefinePlugin({
+      'process.env.FLAG_NEW_ADMIN_ONBOARDING': JSON.stringify(
+        process.env.FLAG_NEW_ADMIN_ONBOARDING,
+      ),
+    }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../client/index.html'),
       attributes: {

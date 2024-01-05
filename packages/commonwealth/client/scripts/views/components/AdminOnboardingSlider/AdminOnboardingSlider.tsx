@@ -1,3 +1,4 @@
+import { featureFlags } from 'helpers/feature-flags';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
@@ -76,7 +77,8 @@ export const AdminOnboardingSlider = () => {
 
   if (
     !isVisible ||
-    !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin())
+    !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin()) ||
+    !featureFlags.newAdminOnboardingEnabled
   ) {
     return;
   }
