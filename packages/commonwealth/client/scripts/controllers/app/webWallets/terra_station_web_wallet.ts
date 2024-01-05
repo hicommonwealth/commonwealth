@@ -1,4 +1,4 @@
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
 import type Account from '../../../models/Account';
 import type IWebWallet from '../../../models/IWebWallet';
 
@@ -84,14 +84,14 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
       hash: blockInfo.block.header.data_hash,
       // seconds since epoch
       timestamp: Math.floor(
-        new Date(blockInfo.block.header.time).getTime() / 1000
+        new Date(blockInfo.block.header.time).getTime() / 1000,
       ),
     };
   }
 
   public async signCanvasMessage(
     account: Account,
-    canvasSessionPayload: SessionPayload
+    canvasSessionPayload: SessionPayload,
   ): Promise<string> {
     // timeout?
     const canvas = await import('@canvas-js/interfaces');
@@ -103,7 +103,7 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
       try {
         this._extension.signBytes({
           bytes: Buffer.from(
-            canvas.serializeSessionPayload(canvasSessionPayload)
+            canvas.serializeSessionPayload(canvasSessionPayload),
           ),
         });
       } catch (error) {

@@ -1,4 +1,4 @@
-import { ChainBase } from 'common-common/src/types';
+import { ChainBase } from '@hicommonwealth/core';
 import { CommunityType } from 'views/components/component_kit/new_designs/CWCommunitySelector';
 
 export const communityTypeOptions = [
@@ -11,6 +11,7 @@ export const communityTypeOptions = [
       'Tokens built on the ERC20 protocol are fungible, meaning they are interchangeable. ' +
       'Select this community type if you have minted a token on the Ethereum blockchain.',
   },
+
   {
     type: CommunityType.Cosmos,
     chainBase: ChainBase.CosmosSDK,
@@ -34,6 +35,7 @@ export const communityTypeOptions = [
     chainBase: ChainBase.Solana,
     title: 'Solana',
     isRecommended: false,
+    isHidden: true,
     description:
       'Solana is a rapidly growing technology due to its speed and scale. ' +
       'Our integration with Solana allows you to create a community for your project with just a click!',

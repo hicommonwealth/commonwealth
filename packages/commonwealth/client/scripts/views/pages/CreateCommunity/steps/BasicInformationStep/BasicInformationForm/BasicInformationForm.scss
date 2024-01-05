@@ -5,14 +5,7 @@
   flex-direction: column;
   gap: 24px;
   width: 100%;
-
-  .header {
-    width: 100%;
-
-    .description {
-      color: $neutral-500;
-    }
-  }
+  max-width: 596px;
 
   .optional-label {
     font-family: $font-family-silka;

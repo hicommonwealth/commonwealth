@@ -39,7 +39,7 @@ const refreshMembership = async ({
     groupId: r.groupId,
     topicIds: r.topicIds,
     isAllowed: r.allowed,
-    rejectReason: r.rejectReason ? JSON.parse(r.rejectReason) : null,
+    rejectReason: r.rejectReason,
   }));
 };
 

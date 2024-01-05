@@ -1,7 +1,7 @@
+import type { ChainNetwork, DefaultPage } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/core';
 import type { RegisteredTypes } from '@polkadot/types/types';
 import axios from 'axios';
-import type { ChainNetwork, DefaultPage } from 'common-common/src/types';
-import { ChainBase } from 'common-common/src/types';
 import { COSMOS_EVM_CHAINS } from 'controllers/app/webWallets/keplr_ethereum_web_wallet';
 import app from 'state';
 import type NodeInfo from './NodeInfo';
@@ -320,19 +320,21 @@ class ChainInfo {
       remainingLinks: [],
     };
 
-    this.socialLinks.forEach((link) => {
-      if (link.includes('://discord.com') || link.includes('://discord.gg')) {
-        categorizedLinks.discords.push(link);
-      } else if (link.includes('://github.com')) {
-        categorizedLinks.githubs.push(link);
-      } else if (link.includes('://t.me')) {
-        categorizedLinks.telegrams.push(link);
-      } else if (link.includes('://matrix.to')) {
-        categorizedLinks.elements.push(link);
-      } else {
-        categorizedLinks.remainingLinks.push(link);
-      }
-    });
+    this.socialLinks
+      .filter((link) => !!link)
+      .forEach((link) => {
+        if (link.includes('://discord.com') || link.includes('://discord.gg')) {
+          categorizedLinks.discords.push(link);
+        } else if (link.includes('://github.com')) {
+          categorizedLinks.githubs.push(link);
+        } else if (link.includes('://t.me')) {
+          categorizedLinks.telegrams.push(link);
+        } else if (link.includes('://matrix.to')) {
+          categorizedLinks.elements.push(link);
+        } else {
+          categorizedLinks.remainingLinks.push(link);
+        }
+      });
 
     return categorizedLinks;
   }

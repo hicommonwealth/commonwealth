@@ -1,10 +1,9 @@
-import type { WalletId, WalletSsoSource } from 'common-common/src/types';
-import { ChainType } from 'common-common/src/types';
+import type { WalletId, WalletSsoSource } from '@hicommonwealth/core';
+import { ChainType } from '@hicommonwealth/core';
 import $ from 'jquery';
 import app from 'state';
 import NewProfilesController from '../controllers/server/newProfiles';
 
-import BN from 'bn.js';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import type ChainInfo from './ChainInfo';
 import MinimumProfile from './MinimumProfile';
@@ -25,8 +24,6 @@ class Account {
   private _walletSsoSource?: WalletSsoSource;
 
   private _profile?: MinimumProfile;
-
-  private _tokenBalance?: BN;
 
   public get profile() {
     return this._profile;
@@ -160,14 +157,6 @@ class Account {
 
   public setSessionPublicAddress(sessionPublicAddress: string) {
     this._sessionPublicAddress = sessionPublicAddress;
-  }
-
-  get tokenBalance(): BN {
-    return this._tokenBalance;
-  }
-
-  public setTokenBalance(balance: BN) {
-    this._tokenBalance = balance;
   }
 
   public async validate(

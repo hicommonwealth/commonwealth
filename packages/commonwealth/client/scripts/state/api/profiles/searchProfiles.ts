@@ -4,25 +4,14 @@ import {
   APIOrderBy,
   APIOrderDirection,
 } from 'client/scripts/helpers/constants';
+import { MemberResult } from 'client/scripts/views/pages/search/helpers';
 import app from 'state';
 import { ApiEndpoints } from '../config';
 
 const SEARCH_PROFILES_STALE_TIME = 60 * 1_000; // 60 s
 
 export type SearchProfilesResponse = {
-  results: {
-    id: number;
-    user_id: string;
-    profile_name: string;
-    avatar_url: string;
-    group_ids?: [];
-    addresses: {
-      id: number;
-      chain: string;
-      address: string;
-    }[];
-    roles?: any[];
-  }[];
+  results: MemberResult[];
   limit: number;
   page: number;
   totalPages: number;

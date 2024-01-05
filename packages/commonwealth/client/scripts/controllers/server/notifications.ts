@@ -8,7 +8,7 @@ import NotificationSubscription, {
 
 import app from 'state';
 
-import { NotificationCategories } from 'common-common/src/types';
+import { NotificationCategories } from '@hicommonwealth/core';
 import { findSubscription, SubUniqueData } from 'helpers/findSubscription';
 import { SubscriptionInstance } from 'server/models/subscription';
 import { NotificationStore } from 'stores';

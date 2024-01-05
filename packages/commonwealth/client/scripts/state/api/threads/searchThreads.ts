@@ -5,21 +5,13 @@ import {
   APIOrderDirection,
 } from 'client/scripts/helpers/constants';
 import app from 'state';
+import { ThreadResult } from 'views/pages/search/helpers';
 import { ApiEndpoints } from '../config';
 
 const SEARCH_THREADS_STALE_TIME = 10 * 1_000; // 10 s
 
 export type SearchThreadsResponse = {
-  results: {
-    id: number;
-    chain: string;
-    title: string;
-    body: string;
-    address_id: number;
-    address: string;
-    address_chain: string;
-    created_at: string;
-  }[];
+  results: ThreadResult[];
   limit: number;
   page: number;
   totalPages: number;

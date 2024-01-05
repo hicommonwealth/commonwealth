@@ -1,10 +1,10 @@
-import { fromTimestamp } from 'common-common/src/cosmos-ts/src/codegen/helpers';
-import { factory, formatFilename } from 'common-common/src/logging';
 import {
   ChainBase,
   NotificationCategories,
   SupportedNetwork,
-} from 'common-common/src/types';
+} from '@hicommonwealth/core';
+import { fromTimestamp } from 'common-common/src/cosmos-ts/src/codegen/helpers';
+import { factory, formatFilename } from 'common-common/src/logging';
 import Rollbar from 'rollbar';
 import { EventKind, coinToCoins } from '../../../shared/chain/types/cosmos';
 import { DB } from '../../models';

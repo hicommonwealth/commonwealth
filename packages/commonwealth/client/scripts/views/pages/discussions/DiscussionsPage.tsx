@@ -25,7 +25,7 @@ import { sortByFeaturedFilter, sortPinned } from './helpers';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
-import GatingGrowl from 'views/components/GatingGrowl/GatingGrowl';
+import Permissions from 'utils/Permissions';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 
 type DiscussionsPageProps = {
@@ -49,6 +49,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const { data: topics } = useFetchTopicsQuery({
     communityId: app.activeChainId(),
   });
+
+  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const topicId = (topics || []).find(({ name }) => name === topicName)?.id;
 
@@ -98,7 +100,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   return (
     <div className="DiscussionsPage">
-      <GatingGrowl />
       <Virtuoso
         className="thread-list"
         style={{ height: '100%', width: '100%' }}
@@ -119,11 +120,14 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               membership.isAllowed,
           );
 
+          const isRestrictedMembership =
+            !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
+
           const disabledActionsTooltipText = getThreadActionTooltipText({
             isCommunityMember: !!hasJoinedCommunity,
             isThreadArchived: !!thread?.archivedAt,
             isThreadLocked: !!thread?.lockedAt,
-            isThreadTopicGated: isTopicGated && !isActionAllowedInGatedTopic,
+            isThreadTopicGated: isRestrictedMembership,
           });
 
           return (

@@ -14,7 +14,9 @@
     "test": "ts-mocha --config ./.mocharc.json ./test/*.spec.ts",
     "check-types": "tsc --noEmit"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@hicommonwealth/core": "*"
+  },
   "devDependencies": {
     "@types/chai": "^4.3.4",
     "@types/chai-as-promised": "^7.1.5",

@@ -41,13 +41,13 @@ const GatingGrowl = () => {
           className="closeButton"
           onClick={handleExit}
         />
-        <img src="../../static/img/groupGrowl.png" alt="" className="img" />
+        <img src="../../../static/img/groupGrowl.png" alt="" className="img" />
         <div className="container">
           <CWText type="h1" fontWeight="semiBold" isCentered>
             Introducing Groups
           </CWText>
           <CWText type="b1" fontWeight="regular" isCentered>
-            Gate topics by token threasholds using Groups.
+            Gate topics by token thresholds using Groups.
           </CWText>
           <CWButton
             className="latest-button"

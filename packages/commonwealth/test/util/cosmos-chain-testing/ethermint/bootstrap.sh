@@ -34,7 +34,7 @@ dasel put -t string -r json -f $GENESIS -v "aevmos" '.app_state.txfees.basedenom
 dasel put -t string -r json -f $GENESIS -v "aevmos" '.app_state.mint.params.mint_denom'
 
 # Update gov module
-dasel put -r json -t string -f $GENESIS -v "90s" '.app_state.gov.voting_params.voting_period'
+dasel put -r json -t string -f $GENESIS -v "180s" '.app_state.gov.voting_params.voting_period'
 # 20 EVMOS deposit:
 dasel put -r json -t string -f $GENESIS -v "20000000000000000000" '.app_state.gov.deposit_params.min_deposit.index(0).amount'
 dasel put -r json -t string -f $GENESIS -v "aevmos" '.app_state.gov.deposit_params.min_deposit.index(0).denom'

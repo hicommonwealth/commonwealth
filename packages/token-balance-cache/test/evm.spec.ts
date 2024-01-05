@@ -1,9 +1,9 @@
+import { BalanceType } from '@hicommonwealth/core';
 import { assert } from 'chai';
-import { BalanceType } from 'common-common/src/types';
-import { IChainNode } from '../src/types';
-import { TokenBalanceCache } from '../src/tbc';
-import { default as evmBalanceProvider } from '../src/providers/ethToken';
 import { ChainTesting } from '../../commonwealth/test/util/evm-chain-testing/sdk/chainTesting';
+import { default as evmBalanceProvider } from '../src/providers/ethToken';
+import { TokenBalanceCache } from '../src/tbc';
+import { IChainNode } from '../src/types';
 
 async function mockNodesProvider(): Promise<IChainNode[]> {
   return [
@@ -33,7 +33,7 @@ describe('EVM Token BP unit tests', () => {
       1,
       [accounts[0]],
       'eth-token',
-      { contractType: 'erc20', tokenAddress: token }
+      { contractType: 'erc20', tokenAddress: token },
     );
     amt *= 1e18;
     assert.equal(balance.balances[accounts[0]], amt.toString());
@@ -48,7 +48,7 @@ describe('EVM Token BP unit tests', () => {
       1,
       [accounts[0]],
       'eth-token',
-      { contractType: 'erc721', tokenAddress: token }
+      { contractType: 'erc721', tokenAddress: token },
     );
     assert.equal(balance.balances[accounts[0]], '1');
   });

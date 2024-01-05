@@ -1,4 +1,4 @@
-import { NotificationCategories } from 'common-common/src/types';
+import { NotificationCategories } from '@hicommonwealth/core';
 import type { DataTypes } from 'sequelize';
 import Sequelize from 'sequelize';
 import emitNotifications from '../util/emitNotifications';

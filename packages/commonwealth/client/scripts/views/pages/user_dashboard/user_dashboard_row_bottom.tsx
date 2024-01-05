@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { NotificationCategories } from 'common-common/src/types';
+import { NotificationCategories } from '@hicommonwealth/core';
 
 import 'pages/user_dashboard/user_dashboard_row_bottom.scss';
 
@@ -82,7 +82,11 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
           </CWText>
         </div>
         <div>
-          <CWAvatarGroup profiles={commenters} communityId={communityId} />
+          <CWAvatarGroup
+            profiles={commenters}
+            communityId={communityId}
+            totalProfiles={commentCount}
+          />
         </div>
       </div>
       <div

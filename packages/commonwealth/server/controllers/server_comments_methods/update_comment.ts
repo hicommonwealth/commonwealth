@@ -1,11 +1,8 @@
 import moment from 'moment';
 import { Op } from 'sequelize';
 
+import { NotificationCategories, ProposalType } from '@hicommonwealth/core';
 import { AppError } from '../../../../common-common/src/errors';
-import {
-  NotificationCategories,
-  ProposalType,
-} from '../../../../common-common/src/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import { AddressInstance } from '../../models/address';
 import { CommentAttributes } from '../../models/comment';
@@ -42,7 +39,7 @@ export async function __updateComment(
     commentId,
     commentBody,
     discordMeta,
-  }: UpdateCommentOptions
+  }: UpdateCommentOptions,
 ): Promise<UpdateCommentResult> {
   if (!commentId && !discordMeta) {
     throw new AppError(Errors.NoId);
@@ -105,7 +102,7 @@ export async function __updateComment(
   comment.plaintext = (() => {
     try {
       return renderQuillDeltaToText(
-        JSON.parse(decodeURIComponent(commentBody))
+        JSON.parse(decodeURIComponent(commentBody)),
       );
     } catch (e) {
       return decodeURIComponent(commentBody);
@@ -143,7 +140,7 @@ export async function __updateComment(
   try {
     const previousDraftMentions = parseUserMentions(latestVersion);
     const currentDraftMentions = parseUserMentions(
-      decodeURIComponent(commentBody)
+      decodeURIComponent(commentBody),
     );
     mentions = currentDraftMentions.filter((addrArray) => {
       let alreadyExists = false;
@@ -171,7 +168,7 @@ export async function __updateComment(
           include: [this.models.User],
         });
         return mentionedUser;
-      })
+      }),
     );
     // filter null results
     mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);

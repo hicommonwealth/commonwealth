@@ -4,11 +4,21 @@ import { AddressAttributes } from './address';
 import { GroupAttributes } from './group';
 import { ModelInstance, ModelStatic } from './types';
 
+export type MembershipRejectReason =
+  | {
+      message: string;
+      requirement: {
+        data: any;
+        rule: string;
+      };
+    }[]
+  | null;
+
 export type MembershipAttributes = {
   id?: number;
   group_id: number;
   address_id: number;
-  reject_reason?: string;
+  reject_reason?: MembershipRejectReason;
   last_checked: Date;
 
   // associations
@@ -29,7 +39,7 @@ export default (
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       group_id: { type: dataTypes.INTEGER, allowNull: false },
       address_id: { type: dataTypes.INTEGER, allowNull: false },
-      reject_reason: { type: dataTypes.STRING, allowNull: true },
+      reject_reason: { type: dataTypes.JSONB, allowNull: true },
       last_checked: { type: dataTypes.DATE, allowNull: false },
     },
     {

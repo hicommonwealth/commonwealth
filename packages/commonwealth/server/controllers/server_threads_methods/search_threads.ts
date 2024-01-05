@@ -20,9 +20,13 @@ export type SearchThreadsOptions = {
   orderDirection?: 'ASC' | 'DESC';
 };
 
+type ThreadSearchData = Omit<ThreadAttributes, 'chain'> & {
+  community_id: string;
+};
+
 export type SearchThreadsResult =
-  | TypedPaginatedResult<ThreadAttributes[]>
-  | ThreadAttributes[];
+  | TypedPaginatedResult<ThreadSearchData[]>
+  | ThreadSearchData[];
 
 export async function __searchThreads(
   this: ServerThreadsController,
@@ -34,7 +38,7 @@ export async function __searchThreads(
     page,
     orderBy,
     orderDirection,
-  }: SearchThreadsOptions
+  }: SearchThreadsOptions,
 ): Promise<SearchThreadsResult> {
   // sort by rank by default
   let sortOptions: PaginationSqlOptions = {
@@ -92,7 +96,7 @@ export async function __searchThreads(
       "Addresses".address,
       "Addresses".community_id as address_chain,
       "Threads".created_at,
-      "Threads".chain,
+      "Threads".chain as community_id,
       ts_rank_cd("Threads"._search, query) as rank
     FROM "Threads"
     JOIN "Addresses" ON "Threads".address_id = "Addresses".id,
@@ -100,7 +104,7 @@ export async function __searchThreads(
     WHERE
       ${communityWhere}
       "Threads".deleted_at IS NULL AND
-      ${searchWhere}
+      (${searchWhere})
     ${paginationSort}
   `;
 

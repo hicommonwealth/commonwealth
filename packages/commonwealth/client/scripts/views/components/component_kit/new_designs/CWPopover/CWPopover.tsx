@@ -33,7 +33,7 @@ type ComponentInteriorProps =
     }
   | {
       content?: never;
-      title?: string;
+      title?: string | React.ReactNode;
       body: React.ReactNode;
     };
 

@@ -1,5 +1,5 @@
+import { BalanceType } from '@hicommonwealth/core';
 import * as solw3 from '@solana/web3.js';
-import { BalanceType } from 'common-common/src/types';
 
 import type { IChainNode } from '../types';
 import { BalanceProvider } from '../types';
@@ -21,13 +21,13 @@ export default class SplTokenBalanceProvider extends BalanceProvider<
   public getCacheKey(
     node: IChainNode,
     address: string,
-    opts: SplTokenBPOpts
+    opts: SplTokenBPOpts,
   ): string {
     return `${address}-${node.url as solw3.Cluster}-${opts.tokenAddress}`;
   }
 
   public async getExternalProvider(
-    node: IChainNode
+    node: IChainNode,
   ): Promise<solw3.Connection> {
     const url = solw3.clusterApiUrl(node.url as solw3.Cluster);
     const connection = new solw3.Connection(url);
@@ -37,7 +37,7 @@ export default class SplTokenBalanceProvider extends BalanceProvider<
   public async getBalance(
     node: IChainNode,
     address: string,
-    opts: SplTokenBPOpts
+    opts: SplTokenBPOpts,
   ): Promise<string> {
     const mintKey = new solw3.PublicKey(opts.tokenAddress);
     if (mintKey.toBase58() !== opts.tokenAddress) {
@@ -53,7 +53,7 @@ export default class SplTokenBalanceProvider extends BalanceProvider<
     const connection = await this.getExternalProvider(node);
     const { value } = await connection.getParsedTokenAccountsByOwner(
       userPubKey,
-      { mint: mintPubKey }
+      { mint: mintPubKey },
     );
     const amount: string =
       value[0]?.account?.data?.parsed?.info?.tokenAmount?.amount;

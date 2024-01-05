@@ -1,7 +1,7 @@
 @import '../../../../../../styles/shared';
 
 .SuccessStep {
-  margin: auto;
+  margin: 40px auto 0;
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
@@ -10,22 +10,31 @@
   text-align: center;
   max-width: 600px;
   gap: 12px;
-  padding: 24px;
+  will-change: opacity;
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    .description {
+      color: $neutral-500;
+    }
+
+    .cta-btn {
+      min-width: 328px;
+
+      @include extraSmall {
+        min-width: auto;
+        width: 100%;
+      }
+    }
+  }
 
   .img {
     width: 140px;
     height: 140px;
-  }
-
-  .description {
-    color: $neutral-500;
-  }
-
-  .cta-btn {
-    min-width: 328px;
-
-    @include extraSmall {
-      min-width: auto;
-    }
   }
 }

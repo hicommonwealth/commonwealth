@@ -21,6 +21,7 @@ import {
   Flag,
   Heart,
   ImageSquare,
+  Lightbulb,
   Link,
   LockKey,
   LockKeyOpen,
@@ -37,6 +38,7 @@ import {
   Trash,
   TwitterLogo,
   Users,
+  UsersThree,
 } from '@phosphor-icons/react';
 import * as CustomIcons from './cw_custom_icons';
 import * as Icons from './cw_icons';
@@ -131,6 +133,7 @@ export const iconLookup = {
   imageSquare: withPhosphorIcon(ImageSquare),
   jar: Icons.CWJar,
   link: Icons.CWLink,
+  lightbulb: withPhosphorIcon(Lightbulb),
   linkPhosphor: withPhosphorIcon(Link),
   lock: Icons.CWLock,
   logout: Icons.CWLogout,
@@ -142,6 +145,7 @@ export const iconLookup = {
   notepad: withPhosphorIcon(Notepad),
   paperPlaneTilt: withPhosphorIcon(PaperPlaneTilt),
   people: Icons.CWPeople,
+  peopleNew: withPhosphorIcon(UsersThree),
   person: Icons.CWPerson,
   // pin: Icons.CWPin,
   pin: withPhosphorIcon(PushPin),
@@ -207,6 +211,7 @@ export const customIconLookup = {
   unreads: CustomIcons.CWUnreads,
   walletconnect: CustomIcons.CWWalletConnect,
   'terra-walletconnect': CustomIcons.CWWalletConnect,
+  coinbase: CustomIcons.CWCoinbase,
 };
 
 export type IconName = keyof typeof iconLookup;

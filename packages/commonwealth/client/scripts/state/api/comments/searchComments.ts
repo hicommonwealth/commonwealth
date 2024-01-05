@@ -5,23 +5,13 @@ import {
   APIOrderDirection,
 } from 'client/scripts/helpers/constants';
 import app from 'state';
+import { ReplyResult } from 'views/pages/search/helpers';
 import { ApiEndpoints } from '../config';
 
 const SEARCH_COMMENTS_STALE_TIME = 60 * 1_000; // 60 s
 
 export type SearchCommentsResponse = {
-  results: {
-    id: number;
-    proposalid: number;
-    chain: string;
-    community: string;
-    title: string;
-    text: string;
-    address_id: number;
-    address: string;
-    address_chain: string;
-    created_at: string;
-  }[];
+  results: ReplyResult[];
   limit: number;
   page: number;
   totalPages: number;

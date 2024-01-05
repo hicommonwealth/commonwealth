@@ -1,11 +1,11 @@
-import moment from 'moment';
-import { AppError } from '../../../../common-common/src/errors';
 import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
   ProposalType,
-} from '../../../../common-common/src/types';
+} from '@hicommonwealth/core';
+import moment from 'moment';
+import { AppError } from '../../../../common-common/src/errors';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import { AddressInstance } from '../../models/address';
@@ -138,7 +138,6 @@ export async function __createThreadComment(
     if (!isAdmin) {
       const { isValid, message } = await validateTopicGroupsMembership(
         this.models,
-        this.tokenBalanceCacheV1,
         this.tokenBalanceCacheV2,
         thread.topic_id,
         community,

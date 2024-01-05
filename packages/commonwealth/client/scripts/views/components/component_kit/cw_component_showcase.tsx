@@ -69,6 +69,7 @@ import { CWTag } from './new_designs/CWTag';
 import { CWTextInput } from './new_designs/CWTextInput';
 import { CWTooltip } from './new_designs/CWTooltip';
 import { CWTypeaheadSelectList } from './new_designs/CWTypeaheadSelectList';
+import CWVoteWeightModule from './new_designs/CWVoteWeightModule';
 import { createColumnInfo, makeData, optionList } from './showcase_helpers';
 
 const displayIcons = (icons) => {
@@ -2154,6 +2155,15 @@ export const ComponentShowcase = () => {
             { label: 'Second Step', state: 'active' },
             { label: 'Third Step', state: 'inactive' },
           ]}
+        />
+      </div>
+      <div>
+        <CWText type="h3">Vote Weight Module</CWText>
+        <CWVoteWeightModule
+          voteWeight={100}
+          stakeNumber={1}
+          stakeValue={0.072}
+          denomination="ETH"
         />
       </div>
     </div>

@@ -1,12 +1,12 @@
-import { RequestHandler, Request, Response } from 'express';
-import { RedisNamespaces } from './types';
-import { RedisCache } from './redisCache';
+import { RedisNamespaces } from '@hicommonwealth/core';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { Request, RequestHandler, Response } from 'express';
 import {
-  defaultKeyGenerator,
   CacheKeyDuration,
+  defaultKeyGenerator,
   isCacheKeyDuration,
 } from './cacheKeyUtils';
-import { factory, formatFilename } from 'common-common/src/logging';
+import { RedisCache } from './redisCache';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -56,7 +56,7 @@ export class CacheDecorator {
     fn: T,
     key: KeyFunction<T>,
     duration: seconds,
-    namespace: RedisNamespaces = RedisNamespaces.Function_Response
+    namespace: RedisNamespaces = RedisNamespaces.Function_Response,
   ) {
     return async (...args: Parameters<T>): Promise<ReturnType<T>> => {
       try {
@@ -70,7 +70,7 @@ export class CacheDecorator {
         const { cacheKey, cacheDuration } = this.computeCacheKeyAndDuration(
           key,
           duration,
-          ...args
+          ...args,
         );
 
         // If cache key is null
@@ -97,7 +97,7 @@ export class CacheDecorator {
           cacheKey,
           cacheDuration,
           namespace,
-          ...args
+          ...args,
         );
         return result;
       } catch (error) {
@@ -137,7 +137,7 @@ export class CacheDecorator {
 
   private async getCachedValue(
     cacheKey: string,
-    namespace: RedisNamespaces
+    namespace: RedisNamespaces,
   ): Promise<any> {
     let cachedValue;
     try {
@@ -149,14 +149,14 @@ export class CacheDecorator {
         } catch (error) {
           // If parsing fails, return the raw cached value
           log.warn(
-            `Failed to parse cached value for ${cacheKey} as JSON, returning raw value. Error: ${error}`
+            `Failed to parse cached value for ${cacheKey} as JSON, returning raw value. Error: ${error}`,
           );
         }
       }
     } catch (error) {
       // If parsing fails, return the raw cached value
       log.error(
-        `Failed to fetch cached value for ${cacheKey} as JSON, ${error}`
+        `Failed to fetch cached value for ${cacheKey} as JSON, ${error}`,
       );
     }
     return null;
@@ -192,7 +192,7 @@ export class CacheDecorator {
           cacheKey,
           JSON.stringify(result),
           cacheDuration,
-          namespace
+          namespace,
         );
         //log.debug(`cacheWrap: SET ${cacheKey}`);
         if (!ret) throw new Error('Unable to set redis key returned false');
@@ -210,9 +210,9 @@ export class CacheDecorator {
   public cacheMiddleware(
     duration: seconds,
     keyGenerator: (
-      req: Request
+      req: Request,
     ) => string | CacheKeyDuration = defaultKeyGenerator,
-    namespace: RedisNamespaces = RedisNamespaces.Route_Response
+    namespace: RedisNamespaces = RedisNamespaces.Route_Response,
   ): RequestHandler {
     return async function cache(req, res, next) {
       let isNextCalled = false;
@@ -236,7 +236,7 @@ export class CacheDecorator {
         const { cacheKey, cacheDuration } = CacheDecorator.calcCacheKeyDuration(
           req,
           keyGenerator,
-          duration
+          duration,
         );
         if (!cacheKey) {
           log.trace(`Cache key not found for ${req.originalUrl}`);
@@ -249,7 +249,7 @@ export class CacheDecorator {
         const found = await this.checkCacheAndSendResponseIfFound(
           res,
           cacheKey,
-          namespace
+          namespace,
         );
         if (found) {
           return;
@@ -263,7 +263,7 @@ export class CacheDecorator {
           namespace,
           cacheDuration,
           originalSend,
-          res
+          res,
         );
         isNextCalled = true;
         return next();
@@ -283,7 +283,7 @@ export class CacheDecorator {
   public async checkCacheAndSendResponseIfFound(
     res: Response,
     cacheKey: string,
-    namespace: RedisNamespaces = RedisNamespaces.Route_Response
+    namespace: RedisNamespaces = RedisNamespaces.Route_Response,
   ): Promise<boolean> {
     if (!cacheKey) {
       log.trace(`Cache key not found for ${res.req.originalUrl}`);
@@ -313,7 +313,7 @@ export class CacheDecorator {
     cacheKey: string,
     valueToCache: string,
     duration: number,
-    namespace: RedisNamespaces = RedisNamespaces.Route_Response
+    namespace: RedisNamespaces = RedisNamespaces.Route_Response,
   ): Promise<boolean> {
     if (!this.isEnabled()) return false;
 
@@ -321,14 +321,14 @@ export class CacheDecorator {
       namespace,
       cacheKey,
       valueToCache,
-      duration
+      duration,
     );
   }
 
   // Check if the response is already cached, if yes, return it
   public async checkCache(
     cacheKey: string,
-    namespace: RedisNamespaces = RedisNamespaces.Route_Response
+    namespace: RedisNamespaces = RedisNamespaces.Route_Response,
   ): Promise<string> {
     const ret = await this.redisCache.getKey(namespace, cacheKey);
     if (ret) {
@@ -342,7 +342,7 @@ export class CacheDecorator {
     namespace: RedisNamespaces,
     duration: number,
     originalSend,
-    res
+    res,
   ) {
     return async function resSendInterceptor(body: any) {
       try {
@@ -354,23 +354,23 @@ export class CacheDecorator {
               cacheKey,
               body,
               duration,
-              namespace
+              namespace,
             );
             if (ret) {
               log.trace(`SET: ${cacheKey}`);
             } else {
               log.warn(
-                `NOSET: Unable to set redis key returned false ${cacheKey} ${ret}`
+                `NOSET: Unable to set redis key returned false ${cacheKey} ${ret}`,
               );
             }
           } else {
             log.warn(
-              `NOSET: ${cacheKey} Response status code is not 200 but ${res.statusCode}, skip writing cache`
+              `NOSET: ${cacheKey} Response status code is not 200 but ${res.statusCode}, skip writing cache`,
             );
           }
         } catch (error) {
           log.warn(
-            `SETERR: Error writing cache ${cacheKey} skip writing cache`
+            `SETERR: Error writing cache ${cacheKey} skip writing cache`,
           );
         }
       } catch (err) {
@@ -401,7 +401,7 @@ export class CacheDecorator {
     }
 
     log.trace(
-      `req: ${req.originalUrl}, cacheKey: ${cacheKey}, cacheDuration: ${cacheDuration}`
+      `req: ${req.originalUrl}, cacheKey: ${cacheKey}, cacheDuration: ${cacheDuration}`,
     );
     return { cacheKey, cacheDuration };
   }

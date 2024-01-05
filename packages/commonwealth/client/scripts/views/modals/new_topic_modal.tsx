@@ -1,7 +1,5 @@
 import type { DeltaStatic } from 'quill';
 import React, { useEffect } from 'react';
-
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { pluralizeWithoutNumberPrefix } from '../../helpers';
 import { useCommonNavigate } from '../../navigation/helpers';
 import app from '../../state';
@@ -10,7 +8,6 @@ import {
   useFetchTopicsQuery,
 } from '../../state/api/topics';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
-import { CWLabel } from '../components/component_kit/cw_label';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
 import {
@@ -25,9 +22,7 @@ import {
   getTextFromDelta,
 } from '../components/react_quill_editor';
 import { serializeDelta } from '../components/react_quill_editor/utils';
-import { TokenDecimalInput } from '../components/token_decimal_input';
 
-import { featureFlags } from 'helpers/feature-flags';
 import '../../../styles/modals/new_topic_modal.scss';
 
 type NewTopicModalProps = {
@@ -53,7 +48,6 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
   const [featuredInSidebar, setFeaturedInSidebar] =
     React.useState<boolean>(false);
   const [name, setName] = React.useState<string>('');
-  const [tokenThreshold, setTokenThreshold] = React.useState<string>('0');
 
   const editorText = getTextFromDelta(contentDelta);
 
@@ -68,15 +62,6 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
     }
     setErrorMsg(null);
   }, [name, featuredInNewPost, editorText]);
-
-  const decimals = app.chain?.meta?.decimals
-    ? app.chain.meta.decimals
-    : app.chain.network === ChainNetwork.ERC721 ||
-      app.chain.network === ChainNetwork.ERC1155
-    ? 0
-    : app.chain.base === ChainBase.CosmosSDK
-    ? 6
-    : 18;
 
   return (
     <div className="NewTopicModal">
@@ -128,20 +113,6 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
             setDescription(e.target.value);
           }}
         />
-        {!featureFlags.gatingEnabled && app.activeChainId() && (
-          <React.Fragment>
-            <CWLabel
-              label={`Number of tokens needed to post (${app.chain?.meta.default_symbol})`}
-            />
-            <TokenDecimalInput
-              decimals={decimals}
-              defaultValueInWei="0"
-              onInputChange={(newValue: string) => {
-                setTokenThreshold(newValue);
-              }}
-            />
-          </React.Fragment>
-        )}
         <div className="checkboxes">
           <CWCheckbox
             label="Featured in Sidebar"
@@ -188,7 +159,6 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
                   description,
                   featuredInSidebar,
                   featuredInNewPost,
-                  tokenThreshold,
                   defaultOffchainTemplate: serializeDelta(contentDelta),
                 });
                 navigate(`/discussions/${encodeURI(name.toString().trim())}`);

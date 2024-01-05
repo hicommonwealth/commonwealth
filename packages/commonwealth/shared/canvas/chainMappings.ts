@@ -1,4 +1,4 @@
-import { ChainBase } from 'common-common/src/types';
+import { ChainBase } from '@hicommonwealth/core';
 
 export function chainBaseToCaip2(chainBase: ChainBase): string {
   // Translate Commonwealth ChainBase names to CAIP-2 Chain names.
@@ -36,7 +36,7 @@ export function caip2ToChainBase(caip2: string): ChainBase {
 
 export function chainBaseToCanvasChainId(
   chainBase: ChainBase,
-  idOrPrefix: string | number
+  idOrPrefix: string | number,
 ): string {
   // The Canvas chain id is a stringified ETH chain ID, or Cosmos bech32 prefix, or equivalent.
   if (chainBase === ChainBase.CosmosSDK) {

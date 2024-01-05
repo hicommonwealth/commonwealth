@@ -1,8 +1,8 @@
-import type { SupportedNetwork } from 'common-common/src/types';
+import type { SupportedNetwork } from '@hicommonwealth/core';
 import {
   NotificationCategories,
   NotificationCategory,
-} from 'common-common/src/types';
+} from '@hicommonwealth/core';
 import type { AccessLevel } from './permissions';
 
 export type SnapshotProposalAttributes = {

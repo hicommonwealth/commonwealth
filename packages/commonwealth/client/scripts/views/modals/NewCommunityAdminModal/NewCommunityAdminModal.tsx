@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { formatAddressShort } from 'helpers';
 import { uniqBy } from 'lodash';
@@ -44,6 +44,12 @@ const NewCommunityAdminModal = ({
   const [tempAddress, setTempAddress] = useState(addressOptions?.[0]);
   const walletsAvailable = availableAddresses?.length > 0;
 
+  useEffect(() => {
+    if (!tempAddress) {
+      setTempAddress(addressOptions?.[0]);
+    }
+  }, [addressOptions, tempAddress]);
+
   return (
     <div className="NewCommunityAdminModal">
       <CWModalHeader label="New community admin" onModalClose={onModalClose} />
@@ -78,7 +84,7 @@ const NewCommunityAdminModal = ({
             />
             <CWButton
               label="Continue"
-              onClick={() => handleClickContinue(tempAddress.value)}
+              onClick={() => handleClickContinue(tempAddress?.value)}
             />
           </>
         ) : (
