@@ -47,6 +47,50 @@
     }
   }
 
+  .contracts {
+    display: flex;
+    flex-direction: row;
+    padding-left: 38px;
+
+    @include large {
+      padding-left: calc(20% - 14px);
+    }
+
+    @include medium {
+      padding-left: 72px;
+    }
+
+    @include small {
+      padding-left: 42px;
+    }
+
+    @include extraSmall {
+      padding-left: 26px;
+    }
+  }
+
+  .newContract {
+    display: flex;
+    flex-direction: row;
+    padding-left: 38px;
+
+    @include large {
+      padding-left: 24%;
+    }
+
+    @include medium {
+      padding-left: 160.5px;
+    }
+
+    @include small {
+      padding-left: 24px;
+    }
+
+    @include extraSmall {
+      padding-left: 24px;
+    }
+  }
+
   .dashboard {
     display: flex;
     flex-direction: row;

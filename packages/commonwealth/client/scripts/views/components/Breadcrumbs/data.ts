@@ -65,10 +65,6 @@ export const breadCrumbURLS = [
     className: 'governance',
   },
   {
-    url: 'proposal/:id',
-    breadcrumb: 'Proposal/:id',
-  },
-  {
     url: 'snapshot',
     breadcrumb: 'Snapshots',
     className: 'governance',
@@ -100,5 +96,15 @@ export const breadCrumbURLS = [
     url: 'search',
     className: 'search',
     breadcrumb: 'Search',
+  },
+  {
+    url: 'contracts',
+    className: 'contracts',
+    breadcrumb: 'Contract Actions',
+  },
+  {
+    url: 'new/contract',
+    className: 'newContract',
+    breadcrumb: 'Contract Actions',
   },
 ];

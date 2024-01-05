@@ -91,17 +91,24 @@ export const generateBreadcrumbs = (
         ? matchedBreadcrumb.breadcrumb
         : removedThreadId;
 
-    console.log('label', label, pathSegments, matchedBreadcrumb);
-
     if (pathSegments[0] === 'profile' && index === 1) {
       label = 'Edit Profile';
+    }
+
+    if (pathSegments[1] === 'search' && index === 0) {
+      pathSegments.splice(0, 1);
+      label = 'Search';
     }
 
     if (locationPath.includes('new/discussion') && label !== 'Create Thread') {
       label = 'Discussions';
     }
 
-    if (['manage', 'analytics'].includes(pathSegments[1]) && index === 0) {
+    if (
+      pathSegments[pathSegments.length - 1] === 'contract' ||
+      (['manage', 'analytics', 'contracts'].includes(pathSegments[1]) &&
+        index === 0)
+    ) {
       label = 'Admin Capabilities';
     }
 
