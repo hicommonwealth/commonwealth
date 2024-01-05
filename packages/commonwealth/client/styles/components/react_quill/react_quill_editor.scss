@@ -165,9 +165,11 @@
 
     .inner-circle {
       border-radius: inherit;
-      background-image: conic-gradient(#fff,
-          rgba(80, 200, 120, 0.3),
-          rgb(80, 200, 120));
+      background-image: conic-gradient(
+        #fff,
+        rgba(80, 200, 120, 0.3),
+        rgb(80, 200, 120)
+      );
       position: absolute;
       z-index: -1;
       margin: auto;

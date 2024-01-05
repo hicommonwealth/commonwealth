@@ -343,7 +343,7 @@ jobs:
           fi
 
       - name: Build libs
-        run: yarn workspace @hicommonwealth/core build
+        run: yarn build-libs
 
       - name: Run linter
         env:

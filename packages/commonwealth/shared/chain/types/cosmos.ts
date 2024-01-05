@@ -1,6 +1,6 @@
-import type { TallyResult } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import type { Coin } from '@cosmjs/stargate';
-import { LCDQueryClient as GovV1Client } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/query.lcd';
+import { GovV1Client } from '@hicommonwealth/chains';
+import type { TallyResult } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 
 // currently just used for gov v1, but this can be expanded
 export type LCD = {

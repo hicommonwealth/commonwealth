@@ -1,7 +1,8 @@
 {
   "private": true,
   "scripts": {
-    "build-project": "yarn global add node-gyp && yarn --ignore-engines && yarn workspace @hicommonwealth/core build && yarn workspace commonwealth migrate-db",
+    "build-libs": "yarn workspace @hicommonwealth/core build && yarn workspace @hicommonwealth/chains build",
+    "build-project": "yarn global add node-gyp && yarn --ignore-engines && yarn build-libs && yarn workspace commonwealth migrate-db",
     "start": "yarn --cwd packages/commonwealth start",
     "build": "chmod u+x scripts/build.sh && ./scripts/build.sh",
     "clean": "find . -name node_modules -exec rm -rf {} \\;; yarn --ignore-engines",

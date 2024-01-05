@@ -73,9 +73,15 @@ If you add a script to the package.json, you must add documentation here, descri
 
 # Build Scripts
 
+## build-libs
+
+Definition: `yarn workspace @hicommonwealth/core build && yarn workspace @hicommonwealth/chains build`
+
+Description: Builds lib workspaces
+
 ## build-project
 
-Definition: `yarn global add node-gyp && yarn --ignore-engines && yarn workspace @hicommonwealth/core build && yarn workspace commonwealth migrate-db`
+Definition: `yarn global add node-gyp && yarn --ignore-engines && yarn build-libs && yarn workspace commonwealth migrate-db`
 
 Description: Temporary placeholder for common script used by the CI pipeline to:
 
