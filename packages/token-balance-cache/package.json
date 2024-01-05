@@ -11,8 +11,9 @@
   },
   "keywords": [],
   "scripts": {
-    "test": "ts-mocha --config ./.mocharc.json ./test/*.spec.ts",
-    "check-types": "tsc --noEmit"
+    "clean": "rm -rf build",
+    "check-types": "tsc --noEmit",
+    "test": "ts-mocha --config ./.mocharc.json ./test/*.spec.ts"
   },
   "dependencies": {
     "@hicommonwealth/core": "*"

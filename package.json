@@ -1,12 +1,12 @@
 {
   "private": true,
   "scripts": {
-    "build-libs": "yarn workspace @hicommonwealth/core build && yarn workspace @hicommonwealth/chains build",
-    "build-project": "yarn global add node-gyp && yarn --ignore-engines && yarn build-libs && yarn workspace commonwealth migrate-db",
-    "start": "yarn --cwd packages/commonwealth start",
     "build": "chmod u+x scripts/build.sh && ./scripts/build.sh",
+    "build-ci": "yarn global add node-gyp && yarn --ignore-engines && yarn build && yarn workspace commonwealth migrate-db",
+    "start": "concurrently -n watcher,server -c red,green 'tsc -b -w packages/commonwealth' 'yarn workspace commonwealth start'",
     "clean": "find . -name node_modules -exec rm -rf {} \\;; yarn --ignore-engines",
     "heroku-prebuild": "yarn global add node-gyp",
+    "heroku-postbuild": "chmod u+x scripts/heroku-build.sh && ./scripts/heroku-build.sh",
     "psql": "yarn --cwd packages/commonwealth psql",
     "test-api": "yarn --cwd packages/commonwealth test-api",
     "dump-db": "yarn --cwd packages/commonwealth dump-db",
@@ -25,10 +25,7 @@
     "lint-branch-warnings": "FAIL_WARNINGS=1 ./scripts/lint-branch.sh",
     "stylelint": "stylelint packages/commonwealth/client/styles/*",
     "chromatic": "chromatic --exit-zero-on-changes",
-    "prepare": "husky install",
-    "watch-core": "tsc --watch --project libs/core/tsconfig.json",
-    "dev-server": "yarn workspace commonwealth start",
-    "dev": "concurrently -k -c 'auto' -n 'core,server' 'yarn watch-core' 'yarn dev-server'"
+    "prepare": "husky install"
   },
   "engines": {
     "node": "18.x"
@@ -39,10 +36,9 @@
   },
   "keywords": [],
   "workspaces": [
-    "packages/common-common",
-    "packages/token-balance-cache",
     "packages/commonwealth",
     "packages/discord-bot",
+    "packages/snapshot-listener",
     "libs/*"
   ],
   "dependencies": {
@@ -58,12 +54,15 @@
     "axios": "^1.3.4",
     "ethers": "5.7.2",
     "moment": "^2.23.0",
-    "pg": "^8.7.1",
     "sequelize": "^6.28.2",
     "typescript": "^5.0.0",
     "web3": "1.8.2",
     "web3-core": "1.8.2",
-    "web3-utils": "1.8.2"
+    "web3-utils": "1.8.2",
+    "async-rwlock": "^1.1.1",
+    "pg": "^8.8.0",
+    "rascal": "^14.4.5",
+    "typescript-logging": "^0.6.4"
   },
   "devDependencies": {
     "@osmonauts/lcd": "^0.10.0",
@@ -80,6 +79,7 @@
     "stylelint": "^14.14.1",
     "stylelint-config-prettier": "^9.0.4",
     "stylelint-config-standard": "^29.0.0",
+    "tsc-alias": "^1.8.8",
     "tsconfig-paths": "^4.2.0",
     "tsconfig-paths-webpack-plugin": "^4.1.0"
   },
