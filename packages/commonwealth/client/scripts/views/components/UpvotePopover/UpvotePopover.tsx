@@ -1,6 +1,8 @@
 import React from 'react';
+import { isMobile } from 'react-device-detect';
 import app from 'state';
 import { CWText } from '../component_kit/cw_text';
+import CWIconButton from '../component_kit/new_designs/CWIconButton';
 import CWPopover, {
   UsePopoverProps,
 } from '../component_kit/new_designs/CWPopover/CWPopover';
@@ -55,7 +57,20 @@ export const UpvotePopover = ({
       {upvoters.length > 0 && (
         <CWPopover
           className="UpvotePopover"
-          title="Recent Upvotes"
+          title={
+            <>
+              Recent Upvotes
+              {isMobile && (
+                <div className="close">
+                  <CWIconButton
+                    iconName="close"
+                    buttonSize="sm"
+                    onClick={popoverProps.handleInteraction}
+                  />
+                </div>
+              )}
+            </>
+          }
           body={createUpvoterList(upvoters)}
           {...popoverProps}
         />
