@@ -51,7 +51,7 @@ export async function __deleteThread(
   if (address) {
     // check ban
     const [canInteract, banError] = await this.banCache.checkBan({
-      communityId: thread.chain,
+      communityId: thread.community_id,
       address: address.address,
     });
     if (!canInteract) {
@@ -63,7 +63,7 @@ export async function __deleteThread(
   const isOwnerOrAdmin = await validateOwner({
     models: this.models,
     user,
-    communityId: thread.chain,
+    communityId: thread.community_id,
     entity: thread,
     allowMod: true,
     allowAdmin: true,

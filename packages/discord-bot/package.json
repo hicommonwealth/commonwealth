@@ -4,11 +4,11 @@
   "description": "",
   "scripts": {
     "build": "tsc --project tsconfig.json && tsc-alias",
-    "start": "ts-node discord-listener/discordListener.ts",
-    "start-consumer": "ts-node discord-consumer/discordConsumer.ts",
+    "start": "ts-node src/discord-listener/discordListener.ts",
+    "start-consumer": "ts-node src/discord-consumer/discordConsumer.ts",
     "check-types": "tsc --noEmit",
-    "start-prod-consumer": "node build/discord-bot/discord-consumer/discordConsumer.js",
-    "start-prod-listener": "node build/discord-bot/discord-listener/discordListener.js",
+    "start-prod-consumer": "node build/packages/discord-bot/src/discord-consumer/discordConsumer.js",
+    "start-prod-listener": "node build/packages/discord-bot/src/discord-listener/discordListener.js",
     "switch-staging-app": "chmod u+x scripts/switch-discobot-staging-env.sh && ./scripts/switch-discobot-staging-env.sh"
   },
   "keywords": [],

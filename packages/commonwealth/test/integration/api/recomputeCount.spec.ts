@@ -220,7 +220,7 @@ async function getCountsAll() {
 }
 
 async function createCommentRaw() {
-  const chain = testThreads[0].chain;
+  const chain = testThreads[0].community_id;
   await models.sequelize.query(`
     INSERT INTO "Comments" ("id", "chain", "address_id", "text", "thread_id", "plaintext", "created_at", "updated_at")
     VALUES
@@ -231,7 +231,7 @@ async function createCommentRaw() {
 }
 
 async function createThreadReactionRaw() {
-  const chain = testThreads[0].chain;
+  const chain = testThreads[0].community_id;
   const canvas_hash =
     '0x0000000000000000000000000000000000000000000000000000000000000000';
   await models.sequelize.query(`
@@ -243,7 +243,7 @@ async function createThreadReactionRaw() {
 }
 
 async function createCommentReactionRaw() {
-  const chain = testThreads[0].chain;
+  const chain = testThreads[0].community_id;
   const canvas_hash =
     '0x0000000000000000000000000000000000000000000000000000000000000000';
   await models.sequelize.query(`
@@ -379,7 +379,7 @@ describe.only('recomputeCounts', () => {
   describe('notification should be correct on recompute count', () => {
     it('add comment from api, notification id is non zero', async () => {
       const cRes = await modelUtils.createComment({
-        chain: testThreads[0].chain,
+        chain: testThreads[0].community_id,
         address: testAddresses[0].address,
         jwt: testJwtToken,
         text: 'test comment',
@@ -398,7 +398,7 @@ describe.only('recomputeCounts', () => {
 
     it('add reaction to thread from api, notification id is still zero', async () => {
       const cRes = await modelUtils.createReaction({
-        chain: testThreads[0].chain,
+        chain: testThreads[0].community_id,
         address: testAddresses[0].address,
         jwt: testJwtToken,
         reaction: 'like',
@@ -418,7 +418,7 @@ describe.only('recomputeCounts', () => {
 
     it('add reaction to comment from api, notification id is still zero', async () => {
       const cRes = await modelUtils.createReaction({
-        chain: testThreads[0].chain,
+        chain: testThreads[0].community_id,
         address: testAddresses[0].address,
         jwt: testJwtToken,
         reaction: 'like',

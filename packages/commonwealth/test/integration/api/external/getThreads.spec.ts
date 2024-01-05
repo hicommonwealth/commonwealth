@@ -12,7 +12,7 @@ import {
 
 describe('getThreads Tests', () => {
   it('should return threads with specified community_id correctly', async () => {
-    const r: GetThreadsReq = { community_id: testThreads[0].chain };
+    const r: GetThreadsReq = { community_id: testThreads[0].community_id };
     const resp = await get('/api/threads', r);
 
     chai.assert.lengthOf(resp.result.threads, 5);
@@ -20,7 +20,7 @@ describe('getThreads Tests', () => {
 
   it('should return threads with specified address_ids correctly', async () => {
     const r: GetThreadsReq = {
-      community_id: testThreads[0].chain,
+      community_id: testThreads[0].community_id,
       address_ids: ['-1'],
     };
     let resp = await get('/api/threads', r);
@@ -35,7 +35,7 @@ describe('getThreads Tests', () => {
 
   it('should return threads with specified addresses correctly', async () => {
     const r: GetThreadsReq = {
-      community_id: testThreads[0].chain,
+      community_id: testThreads[0].community_id,
       addresses: ['testAddress-1'],
     };
     let resp = await get('/api/threads', r);
@@ -50,7 +50,7 @@ describe('getThreads Tests', () => {
 
   it('should return threads with specified topic_id correctly', async () => {
     const r: GetThreadsReq = {
-      community_id: testThreads[0].chain,
+      community_id: testThreads[0].community_id,
       topic_id: -1,
     };
     let resp = await get('/api/threads', r);
@@ -65,7 +65,7 @@ describe('getThreads Tests', () => {
 
   it('should paginate correctly', async () => {
     const r: GetThreadsReq = {
-      community_id: testThreads[0].chain,
+      community_id: testThreads[0].community_id,
       address_ids: ['-2'],
       limit: 2,
     };
@@ -86,7 +86,7 @@ describe('getThreads Tests', () => {
 
   it('should order correctly', async () => {
     const r: GetThreadsReq = {
-      community_id: testThreads[0].chain,
+      community_id: testThreads[0].community_id,
       address_ids: ['-2'],
       sort: OrderByOptions.CREATED,
     };
@@ -134,7 +134,7 @@ describe('getThreads Tests', () => {
 
   it('Should return sensible default for thread with no associated comment', async () => {
     let resp = await get('/api/threads', {
-      community_id: testThreads[0].chain,
+      community_id: testThreads[0].community_id,
       include_comments: true,
       topic_id: -1,
     });
@@ -147,7 +147,7 @@ describe('getThreads Tests', () => {
     chai.assert.equal(sortedByLength[1].Comments.length, 3);
 
     resp = await get('/api/threads', {
-      community_id: testThreads[0].chain,
+      community_id: testThreads[0].community_id,
       include_comments: true,
       topic_id: -2,
     });
@@ -158,7 +158,7 @@ describe('getThreads Tests', () => {
     chai.assert.equal(resp.result.threads[2].Comments.length, 0);
 
     resp = await get('/api/threads', {
-      community_id: testThreads[0].chain,
+      community_id: testThreads[0].community_id,
       include_comments: false,
       topic_id: -2,
     });

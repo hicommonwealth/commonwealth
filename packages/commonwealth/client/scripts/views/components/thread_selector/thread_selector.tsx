@@ -49,13 +49,13 @@ export const ThreadSelector = ({
         new Thread({
           id: t.id,
           title: t.title,
-          chain: t.community_id,
+          community_id: t.community_id,
           Address: new AddressInfo({
             id: t.address_id,
             address: t.address,
             chainId: t.address_chain,
           }),
-        } as any),
+        } as ConstructorParameters<typeof Thread>[0]),
     );
   }, [threadsData]);
 

@@ -86,7 +86,7 @@ export async function __getStats(
       where: whereChain,
     }),
     this.models.Thread.count({
-      where: whereChain,
+      where: whereCommunityId,
     }),
     this.models.Reaction.count({
       where: whereCommunityId,

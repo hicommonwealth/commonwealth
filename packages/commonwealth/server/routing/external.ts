@@ -2,7 +2,6 @@ import type { Express } from 'express';
 import express from 'express';
 import type Router from 'express/lib/router/index';
 import passport from 'passport';
-import type { TokenBalanceCache } from 'token-balance-cache/src';
 import type {
   PostReactionsReq,
   PostTopicsReq,
@@ -17,19 +16,7 @@ import {
 import getCommunities, {
   getCommunitiesValidation,
 } from '../routes/communities/getCommunities';
-import {
-  putCommunities,
-  putCommunitiesValidation,
-} from '../routes/communities/putCommunities';
 import { deleteEntities } from '../routes/deleteEntities';
-import {
-  getBalanceProviders,
-  getBalanceProvidersValidation,
-} from '../routes/getBalanceProviders';
-import {
-  getChainNodes,
-  getChainNodesValidation,
-} from '../routes/getChainNodes';
 import getProfiles, {
   getProfilesValidation,
 } from '../routes/profiles/getProfiles';
@@ -51,7 +38,6 @@ export function addExternalRoutes(
   endpoint: string,
   app: Express,
   models: DB,
-  tokenBalanceCache: TokenBalanceCache,
 ): Router {
   const router = express.Router();
 
@@ -110,11 +96,6 @@ export function addExternalRoutes(
     getCommunitiesValidation,
     getCommunities.bind(this, models),
   );
-  router.put(
-    '/communities',
-    putCommunitiesValidation,
-    putCommunities.bind(this, models, tokenBalanceCache),
-  );
 
   router.get(
     '/profiles',
@@ -138,17 +119,6 @@ export function addExternalRoutes(
     '/topics',
     onlyIds,
     deleteEntities.bind(this, 'community_id', models, models.Topic),
-  );
-
-  router.get(
-    '/chainNodes',
-    getChainNodesValidation,
-    getChainNodes.bind(this, models, tokenBalanceCache),
-  );
-  router.get(
-    '/balanceProviders',
-    getBalanceProvidersValidation,
-    getBalanceProviders.bind(this, models, tokenBalanceCache),
   );
 
   app.use(endpoint, router);

@@ -21,15 +21,15 @@ export const Errors = {};
 const bulkOffchain = async (models: DB, req: Request, res: Response) => {
   const chain = req.chain;
   // globally shared SQL replacements
-  const communityOptions = 'chain = :chain';
-  const replacements = { chain: chain.id };
+  const communityOptions = 'community_id = :community_id';
+  const replacements = { community_id: chain.id };
 
   // parallelized queries
   const [
     admins,
     mostActiveUsers,
     threadsInVoting,
-    totalThreads,
+    numTotalThreads,
     communityBanner,
     contractsWithTemplatesData,
   ] = await (<
@@ -38,7 +38,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
         RoleInstanceWithPermission[],
         unknown,
         ThreadInstance[],
-        [{ count: string }],
+        number,
         CommunityBannerInstance,
         Array<{
           contract: ContractInstance;
@@ -62,17 +62,19 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
           (new Date() as any) - 1000 * 24 * 60 * 60 * 30,
         );
         const activeUsers = {};
-        const where = {
-          updated_at: { [Op.gt]: thirtyDaysAgo },
-          chain: chain.id,
-        };
 
         const monthlyComments = await models.Comment.findAll({
-          where,
+          where: {
+            updated_at: { [Op.gt]: thirtyDaysAgo },
+            chain: chain.id,
+          },
           include: [models.Address],
         });
         const monthlyThreads = await models.Thread.findAll({
-          where,
+          where: {
+            updated_at: { [Op.gt]: thirtyDaysAgo },
+            community_id: chain.id,
+          },
           attributes: { exclude: ['version_history'] },
           include: [{ model: models.Address, as: 'Address' }],
         });
@@ -104,39 +106,12 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
         type: QueryTypes.SELECT,
       },
     ),
-    await models.sequelize.query(
-      `
-      SELECT 
-        COUNT(*) 
-      FROM 
-        "Addresses" AS addr 
-        RIGHT JOIN (
-          SELECT 
-            t.id AS thread_id, 
-            t.address_id, 
-            t.topic_id 
-          FROM 
-            "Threads" t 
-          WHERE 
-            t.deleted_at IS NULL 
-            AND t.chain = $chain 
-            AND (
-              t.pinned = true 
-              OR (
-                COALESCE(
-                  t.last_commented_on, t.created_at
-                ) < $created_at 
-                AND t.pinned = false
-              )
-            )
-        ) threads ON threads.address_id = addr.id 
-        LEFT JOIN "Topics" topics ON threads.topic_id = topics.id
-      `,
-      {
-        bind: { chain: chain.id, created_at: new Date().toISOString() },
-        type: QueryTypes.SELECT,
+    await models.Thread.count({
+      where: {
+        community_id: chain.id,
+        marked_as_spam_at: null,
       },
-    ),
+    }),
     models.CommunityBanner.findOne({
       where: {
         chain_id: chain.id,
@@ -196,8 +171,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
   const numVotingThreads = threadsInVoting.filter(
     (t) => t.stage === 'voting',
   ).length;
-
-  const numTotalThreads = parseInt(totalThreads[0].count);
 
   return res.json({
     status: 'Success',
