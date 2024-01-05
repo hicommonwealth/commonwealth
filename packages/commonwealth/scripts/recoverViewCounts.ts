@@ -39,9 +39,11 @@ async function run() {
               .join(' ')}
         ELSE new_view_count
         END
+        view_count_recovered = true
         WHERE id IN (${batchedViewCounts
           .map((count) => count.object_id)
-          .join(', ')});
+          .join(', ')}) 
+        AND view_count_recovered = false;
         `;
 
     for (let i = 0; i < totalRows; i += batchSize) {
