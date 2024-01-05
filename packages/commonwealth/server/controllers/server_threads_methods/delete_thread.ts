@@ -74,4 +74,9 @@ export async function __deleteThread(
   }
 
   await deleteThreadFromDb(this.models, thread.id);
+
+  // use callbacks so route returns and this completes in the background
+  if (this.globalActivityCache) {
+    this.globalActivityCache.deleteActivityFromCache(thread.id);
+  }
 }

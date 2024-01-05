@@ -4,14 +4,13 @@ import {
   ThreadDiscordActions,
 } from '@hicommonwealth/core';
 import axios from 'axios';
-import { TopicAttributes } from 'commonwealth/server/models/topic';
-import { SERVER_URL } from 'discord-bot/utils/config';
-import { sequelize } from 'discord-bot/utils/database';
+import { SERVER_URL } from '../utils/config';
+import { sequelize } from '../utils/database';
 
 export async function handleThreadMessages(
   action: ThreadDiscordActions,
   message: IDiscordMessage,
-  topic: TopicAttributes,
+  topic: { id: string; name: string },
   sharedReqData: Record<string, any>,
 ): Promise<void> {
   switch (action) {

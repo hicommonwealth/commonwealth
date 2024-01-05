@@ -18,14 +18,14 @@ import {
   startHealthCheckLoop,
 } from 'common-common/src/scripts/startHealthCheckLoop';
 import { StatsDController } from 'common-common/src/statsd';
+import v8 from 'v8';
 import {
   handleCommentMessages,
   handleThreadMessages,
-} from 'discord-bot/discord-consumer/handlers';
-import { rollbar } from 'discord-bot/utils/rollbar';
-import { getForumLinkedTopic } from 'discord-bot/utils/util';
-import v8 from 'v8';
+} from '../discord-consumer/handlers';
 import { CW_BOT_KEY, DISCOBOT_ADDRESS, RABBITMQ_URI } from '../utils/config';
+import { rollbar } from '../utils/rollbar';
+import { getForumLinkedTopic } from '../utils/util';
 
 let isServiceHealthy = false;
 
@@ -58,9 +58,9 @@ async function processMessage(data: TRmqMessages) {
         channel_id: parsedMessage.parent_channel_id,
         user: parsedMessage.user,
       },
-      author_chain: topic.chain_id,
+      author_chain: topic.community_id,
       address: DISCOBOT_ADDRESS,
-      chain: topic.chain_id,
+      chain: topic.community_id,
     };
 
     if (
@@ -86,7 +86,7 @@ async function processMessage(data: TRmqMessages) {
     }
 
     StatsDController.get().increment('cw.discobot_message_processed', 1, {
-      chain: topic.chain_id,
+      chain: topic.community_id,
       action: action,
     });
   } catch (error) {
