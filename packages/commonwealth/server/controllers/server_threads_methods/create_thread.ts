@@ -149,7 +149,7 @@ export async function __createThread(
         const [topic] = await this.models.Topic.findOrCreate({
           where: {
             name: topicName,
-            chain_id: community?.id || null,
+            community_id: community?.id || null,
           },
           transaction,
         });
@@ -179,7 +179,6 @@ export async function __createThread(
         if (!isAdmin) {
           const { isValid, message } = await validateTopicGroupsMembership(
             this.models,
-            this.tokenBalanceCacheV1,
             this.tokenBalanceCacheV2,
             topicId,
             community,

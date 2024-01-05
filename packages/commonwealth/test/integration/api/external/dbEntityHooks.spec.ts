@@ -4,7 +4,6 @@ import * as process from 'process';
 import Sequelize from 'sequelize';
 import models from 'server/database';
 import type { AddressInstance } from 'server/models/address';
-import type { CommunityInstance } from '../../../../server/models/community';
 import type { ChainNodeAttributes } from 'server/models/chain_node';
 import type { CollaborationAttributes } from 'server/models/collaboration';
 import type { CommentInstance } from 'server/models/comment';
@@ -13,6 +12,7 @@ import type { ThreadInstance } from 'server/models/thread';
 import type { TopicAttributes } from 'server/models/topic';
 import type { UserInstance } from 'server/models/user';
 import { JWT_SECRET } from '../../../../server/config';
+import type { CommunityInstance } from '../../../../server/models/community';
 import type { ProfileAttributes } from '../../../../server/models/profile';
 
 const Op = Sequelize.Op;
@@ -80,8 +80,8 @@ export async function createTestEntities() {
               isAdmin: true,
             },
           })
-        )[0]
-    )
+        )[0],
+    ),
   );
 
   testProfiles = await Promise.all(
@@ -97,8 +97,8 @@ export async function createTestEntities() {
               user_id: -i - 1,
             },
           })
-        )[0]
-    )
+        )[0],
+    ),
   );
 
   testChainNodes = [
@@ -172,7 +172,7 @@ export async function createTestEntities() {
         where: {
           id: -1,
           name: 'testTopic',
-          chain_id: 'cmntest',
+          community_id: 'cmntest',
         },
       })
     )[0],
@@ -181,7 +181,7 @@ export async function createTestEntities() {
         where: {
           id: -2,
           name: 'testTopic2',
-          chain_id: 'cmntest',
+          community_id: 'cmntest',
         },
       })
     )[0],
@@ -202,8 +202,8 @@ export async function createTestEntities() {
               verified: moment.now(),
             },
           })
-        )[0]
-    )
+        )[0],
+    ),
   );
 
   testThreads = await Promise.all(
@@ -221,8 +221,8 @@ export async function createTestEntities() {
               kind: 'discussion',
             },
           })
-        )[0]
-    )
+        )[0],
+    ),
   );
 
   testThreads.push(
@@ -241,9 +241,9 @@ export async function createTestEntities() {
                 kind: 'discussion',
               },
             })
-          )[0]
-      )
-    ))
+          )[0],
+      ),
+    )),
   );
 
   testCollaborations = await Promise.all(
@@ -256,8 +256,8 @@ export async function createTestEntities() {
               address_id: -i - 1,
             },
           })
-        )[0]
-    )
+        )[0],
+    ),
   );
 
   testComments = await Promise.all(
@@ -274,8 +274,8 @@ export async function createTestEntities() {
               plaintext: '',
             },
           })
-        )[0]
-    )
+        )[0],
+    ),
   );
 
   testComments.push(
@@ -293,9 +293,9 @@ export async function createTestEntities() {
                 plaintext: '',
               },
             })
-          )[0]
-      )
-    ))
+          )[0],
+      ),
+    )),
   );
 
   testReactions = await Promise.all(
@@ -311,8 +311,8 @@ export async function createTestEntities() {
               chain: 'cmntest',
             },
           })
-        )[0]
-    )
+        )[0],
+    ),
   );
 
   testReactions.push(
@@ -329,14 +329,14 @@ export async function createTestEntities() {
                 chain: 'cmntest',
               },
             })
-          )[0]
-      )
-    ))
+          )[0],
+      ),
+    )),
   );
 
   testJwtToken = jwt.sign(
     { id: testUsers[0].id, email: testUsers[0].email },
-    JWT_SECRET
+    JWT_SECRET,
   );
 }
 

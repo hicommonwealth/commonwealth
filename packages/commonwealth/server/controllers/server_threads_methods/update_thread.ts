@@ -642,7 +642,7 @@ async function setThreadTopic(
       const [topic] = await models.Topic.findOrCreate({
         where: {
           name: topicName,
-          chain_id: thread.chain,
+          community_id: thread.chain,
         },
       });
       toUpdate.topic_id = topic.id;
