@@ -60,7 +60,7 @@ export const getTopThreads = async (
         LEFT JOIN "Reactions" r ON t.id = r.thread_id
         INNER JOIN "Addresses" a ON t.address_id = a.id
       WHERE 
-        t.chain='${communityId}' AND c.created_at > NOW() - INTERVAL '1 WEEK' AND r.created_at > NOW() - INTERVAL '1 WEEK'
+        t.community_id='${communityId}' AND c.created_at > NOW() - INTERVAL '1 WEEK' AND r.created_at > NOW() - INTERVAL '1 WEEK'
       GROUP BY 
         t.id, a.address
       ORDER BY 
@@ -134,7 +134,7 @@ const getCommunityActivityScore = async (
           LEFT JOIN "Comments" c ON t.id = c.thread_id
           LEFT JOIN "Reactions" r ON t.id = r.thread_id
         WHERE 
-          t.chain='${communityId}' AND
+          t.community_id='${communityId}' AND
           (t.created_at > NOW() - INTERVAL '1 WEEK' OR
           c.created_at > NOW() - INTERVAL '1 WEEK' OR
           r.created_at > NOW() - INTERVAL '1 WEEK')`);
@@ -157,7 +157,7 @@ const getActivityCounts = async (communityId: string) => {
               COUNT(DISTINCT t.id) AS thread_count
               FROM "Threads" t
               WHERE
-              t.chain='${communityId}' AND
+              t.community_id='${communityId}' AND
               t.created_at > NOW() - INTERVAL '1 WEEK'`);
 
   const totalThreads = (threadCounts[1] as any)?.rows?.[0]

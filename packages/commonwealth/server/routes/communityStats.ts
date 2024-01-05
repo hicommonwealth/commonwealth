@@ -48,7 +48,7 @@ ORDER BY seq.date DESC;`,
     );
   };
   const roles = await newObjectsQuery('"Addresses"', 'community_id');
-  const threads = await newObjectsQuery('"Threads"', 'chain');
+  const threads = await newObjectsQuery('"Threads"', 'community_id');
   const comments = await newObjectsQuery('"Comments"', 'community_id');
 
   // get total number of roles, threads, and comments
@@ -62,7 +62,7 @@ ORDER BY seq.date DESC;`,
     );
   };
   const totalRoles = await totalObjectsQuery('"Addresses"', 'community_id');
-  const totalThreads = await totalObjectsQuery('"Threads"', 'chain');
+  const totalThreads = await totalObjectsQuery('"Threads"', 'community_id');
   const totalComments = await totalObjectsQuery('"Comments"', 'community_id');
 
   // get number of active accounts by day
@@ -72,7 +72,7 @@ SELECT seq.date, COUNT(DISTINCT objs.address_id) AS new_items
 FROM ( SELECT CURRENT_DATE - seq.date AS date FROM generate_series(0, ${numberOfPrevDays}) AS seq(date) ) seq
 LEFT JOIN (
   SELECT address_id, created_at FROM "Threads" WHERE created_at > CURRENT_DATE - ${numberOfPrevDays}
-    AND ${chain ? 'chain' : 'community'} = :chainOrCommunity
+    AND community_id = :chainOrCommunity
   UNION
   SELECT address_id, created_at FROM "Comments" WHERE created_at > CURRENT_DATE - ${numberOfPrevDays}
     AND community_id = :chainOrCommunity

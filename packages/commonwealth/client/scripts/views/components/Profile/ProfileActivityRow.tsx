@@ -22,20 +22,17 @@ type ProfileActivityRowProps = {
 
 const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
   const navigate = useCommonNavigate();
-  const { createdAt, author, id } = activity;
-  let communityId: string, title: string, body: string;
+  const { communityId, createdAt, author, id } = activity;
+  let title: string, body: string;
   if (activity instanceof Thread) {
-    communityId = activity.chain;
     title = activity.title;
     body = activity.body;
-  } else {
-    communityId = activity.communityId;
   }
   const isThread = !!(activity as Thread).kind;
   const comment = activity as CommentWithAssociatedThread;
   const { iconUrl } = app.config.chains.getById(communityId);
   const domain = document.location.origin;
-  let decodedTitle;
+  let decodedTitle: string;
 
   try {
     if (isThread) {

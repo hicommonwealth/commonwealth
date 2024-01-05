@@ -4,10 +4,7 @@ import express from 'express';
 import useragent from 'express-useragent';
 import passport from 'passport';
 
-import { TBC_BALANCE_TTL_SECONDS } from '../config';
-
-import { TokenBalanceCache } from 'token-balance-cache/src/index';
-import { TokenBalanceCache as NewTokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
+import { TokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
 
 import {
   methodNotAllowedMiddleware,
@@ -69,7 +66,6 @@ import getUploadSignature from '../routes/getUploadSignature';
 import bulkOffchain from '../routes/bulkOffchain';
 import logout from '../routes/logout';
 import sendFeedback from '../routes/sendFeedback';
-import setTopicThreshold from '../routes/setTopicThreshold';
 import updateProfileNew from '../routes/updateNewProfile';
 import writeUserSetting from '../routes/writeUserSetting';
 
@@ -87,14 +83,12 @@ import type ViewCountCache from '../util/viewCountCache';
 import type { DB } from '../models';
 import authCallback from '../routes/authCallback';
 import banAddress from '../routes/banAddress';
-import bulkBalances from '../routes/bulkBalances';
 import editSubstrateSpec from '../routes/editSubstrateSpec';
 import finishSsoLogin from '../routes/finishSsoLogin';
 import getBannedAddresses from '../routes/getBannedAddresses';
 import setAddressWallet from '../routes/setAddressWallet';
 import { sendMessage } from '../routes/snapshotAPI';
 import startSsoLogin from '../routes/startSsoLogin';
-import tokenBalance from '../routes/tokenBalance';
 import updateAddress from '../routes/updateAddress';
 import viewChainIcons from '../routes/viewChainIcons';
 import type BanCache from '../util/banCheckCache';
@@ -208,54 +202,34 @@ function setupRouter(
   app: Express,
   models: DB,
   viewCountCache: ViewCountCache,
-  tokenBalanceCacheV1: TokenBalanceCache,
+  tokenBalanceCache: TokenBalanceCache,
   banCache: BanCache,
   globalActivityCache: GlobalActivityCache,
   databaseValidationService: DatabaseValidationService,
   redisCache: RedisCache,
 ) {
   // controllers
-
-  const tokenBalanceCacheV2 = new NewTokenBalanceCache(
-    models,
-    redisCache,
-    TBC_BALANCE_TTL_SECONDS,
-  );
-
   const serverControllers: ServerControllers = {
     threads: new ServerThreadsController(
       models,
-      tokenBalanceCacheV1,
-      tokenBalanceCacheV2,
+      tokenBalanceCache,
       banCache,
+      globalActivityCache,
     ),
     comments: new ServerCommentsController(
       models,
-      tokenBalanceCacheV1,
-      tokenBalanceCacheV2,
+      tokenBalanceCache,
       banCache,
+      globalActivityCache,
     ),
     reactions: new ServerReactionsController(models, banCache),
     notifications: new ServerNotificationsController(models),
     analytics: new ServerAnalyticsController(),
     profiles: new ServerProfilesController(models),
-    communities: new ServerCommunitiesController(
-      models,
-      tokenBalanceCacheV1,
-      banCache,
-    ),
-    polls: new ServerPollsController(
-      models,
-      tokenBalanceCacheV1,
-      tokenBalanceCacheV2,
-    ),
+    communities: new ServerCommunitiesController(models, banCache),
+    polls: new ServerPollsController(models, tokenBalanceCache),
     proposals: new ServerProposalsController(models, redisCache),
-    groups: new ServerGroupsController(
-      models,
-      tokenBalanceCacheV1,
-      tokenBalanceCacheV2,
-      banCache,
-    ),
+    groups: new ServerGroupsController(models, tokenBalanceCache, banCache),
     topics: new ServerTopicsController(models, banCache),
     admin: new ServerAdminController(models),
   };
@@ -424,19 +398,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateCommunity,
     starCommunity.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/tokenBalance',
-    databaseValidationService.validateCommunity,
-    tokenBalance.bind(this, models, tokenBalanceCacheV1),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/bulkBalances',
-    bulkBalances.bind(this, models, tokenBalanceCacheV1),
   );
 
   registerRoute(
@@ -767,13 +728,6 @@ function setupRouter(
     '/topics' /* OLD: /bulkTopics */,
     databaseValidationService.validateCommunity,
     getTopicsHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/setTopicThreshold',
-    passport.authenticate('jwt', { session: false }),
-    setTopicThreshold.bind(this, models),
   );
 
   // reactions

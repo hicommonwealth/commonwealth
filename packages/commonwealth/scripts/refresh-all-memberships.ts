@@ -1,12 +1,11 @@
 import * as dotenv from 'dotenv';
 import { RedisCache } from '../../common-common/src/redisCache';
-import { TokenBalanceCache as TokenBalanceCacheV1 } from '../../token-balance-cache/src';
 import { REDIS_URL } from '../server/config';
 import { ServerCommunitiesController } from '../server/controllers/server_communities_controller';
 import { ServerGroupsController } from '../server/controllers/server_groups_controller';
 import db from '../server/database';
 import BanCache from '../server/util/banCheckCache';
-import { TokenBalanceCache as TokenBalanceCacheV2 } from '../server/util/tokenBalanceCache/tokenBalanceCache';
+import { TokenBalanceCache } from '../server/util/tokenBalanceCache/tokenBalanceCache';
 
 dotenv.config();
 
@@ -16,22 +15,16 @@ async function main() {
   await redisCache.init(REDIS_URL);
   const banCache = new BanCache(models);
 
-  const tokenBalanceCacheV1 = new TokenBalanceCacheV1();
-  await tokenBalanceCacheV1.initBalanceProviders();
-  await tokenBalanceCacheV1.start();
-
-  const tokenBalanceCacheV2 = new TokenBalanceCacheV2(models, redisCache);
+  const tokenBalanceCache = new TokenBalanceCache(models, redisCache);
 
   const communitiesController = new ServerCommunitiesController(
     models,
-    tokenBalanceCacheV1,
     banCache,
   );
 
   const groupsController = new ServerGroupsController(
     models,
-    tokenBalanceCacheV1,
-    tokenBalanceCacheV2,
+    tokenBalanceCache,
     banCache,
   );
 

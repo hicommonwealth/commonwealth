@@ -24,7 +24,6 @@ import prerenderNode from 'prerender-node';
 import type { BrokerConfig } from 'rascal';
 import Rollbar from 'rollbar';
 import favicon from 'serve-favicon';
-import { TokenBalanceCache } from 'token-balance-cache/src/index';
 import * as v8 from 'v8';
 import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers';
 import {
@@ -34,6 +33,7 @@ import {
   ROLLBAR_ENV,
   ROLLBAR_SERVER_TOKEN,
   SESSION_SECRET,
+  TBC_BALANCE_TTL_SECONDS,
   VULTR_IP,
 } from './server/config';
 import models from './server/database';
@@ -52,6 +52,7 @@ import setupCosmosProxy from './server/util/cosmosProxy';
 import { databaseCleaner } from './server/util/databaseCleaner';
 import GlobalActivityCache from './server/util/globalActivityCache';
 import setupIpfsProxy from './server/util/ipfsProxy';
+import { TokenBalanceCache } from './server/util/tokenBalanceCache/tokenBalanceCache';
 import ViewCountCache from './server/util/viewCountCache';
 
 let isServiceHealthy = false;
@@ -85,7 +86,6 @@ async function main() {
   const SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS =
     process.env.SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS === 'true';
 
-  const NO_TOKEN_BALANCE_CACHE = process.env.NO_TOKEN_BALANCE_CACHE === 'true';
   const NO_GLOBAL_ACTIVITY_CACHE =
     process.env.NO_GLOBAL_ACTIVITY_CACHE === 'true';
   const NO_CLIENT_SERVER =
@@ -93,8 +93,6 @@ async function main() {
     SHOULD_SEND_EMAILS ||
     SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS;
 
-  const tokenBalanceCache = new TokenBalanceCache();
-  await tokenBalanceCache.initBalanceProviders();
   let rc = null;
   if (SHOULD_SEND_EMAILS) {
     rc = await sendBatchedNotificationEmails(models);
@@ -262,9 +260,14 @@ async function main() {
   const redisCache = new RedisCache();
   await redisCache.init(REDIS_URL, VULTR_IP);
 
-  if (!NO_TOKEN_BALANCE_CACHE) await tokenBalanceCache.start();
+  const tokenBalanceCache = new TokenBalanceCache(
+    models,
+    redisCache,
+    TBC_BALANCE_TTL_SECONDS,
+  );
+
   const banCache = new BanCache(models);
-  const globalActivityCache = new GlobalActivityCache(models);
+  const globalActivityCache = new GlobalActivityCache(models, redisCache);
 
   // initialize async to avoid blocking startup
   if (!NO_GLOBAL_ACTIVITY_CACHE) globalActivityCache.start();
@@ -287,7 +290,7 @@ async function main() {
   );
 
   // new API
-  addExternalRoutes('/external', app, models, tokenBalanceCache);
+  addExternalRoutes('/external', app, models);
   addSwagger('/docs', app);
 
   setupCosmosProxy(app, models);

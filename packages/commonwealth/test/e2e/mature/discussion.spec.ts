@@ -14,14 +14,14 @@ test.describe('Discussion Page Tests', () => {
   test.beforeEach(async ({ page }) => {
     threadId = (
       await testDb.query(`
-        INSERT INTO "Threads" (address_id, title, body, chain, topic_id, kind, created_at, updated_at)
+        INSERT INTO "Threads" (address_id, title, body, community_id, topic_id, kind, created_at, updated_at)
         VALUES (-1, 'Example Title', 'Example Body', 'cmntest', -1, 'discussion', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         RETURNING id;
     `)
     )[0][0]['id'];
 
     await page.goto(
-      `http://localhost:${PORT}/${testChains[0].id}/discussion/${threadId}`
+      `http://localhost:${PORT}/${testChains[0].id}/discussion/${threadId}`,
     );
     await addAddressIfNone(testChains[0].id);
     await login(page);
@@ -46,7 +46,7 @@ test.describe('Discussion Page Tests', () => {
 
     // The 3 dots below the comment doesn't have a clear unique identifier.
     let commentOptionButton = await page.locator(
-      'xpath=(//div[@class="comment-footer"]//button[@class="ThreadAction"])[4]'
+      'xpath=(//div[@class="comment-footer"]//button[@class="ThreadAction"])[4]',
     );
     await commentOptionButton.click();
     await page.locator('div.PopoverMenuItem').first().click();
@@ -63,7 +63,7 @@ test.describe('Discussion Page Tests', () => {
 
     // The 3 dots below the comment doesn't have a clear unique identifier.
     commentOptionButton = await page.locator(
-      'xpath=(//div[@class="comment-footer"]//button[@class="ThreadAction"])[4]'
+      'xpath=(//div[@class="comment-footer"]//button[@class="ThreadAction"])[4]',
     );
     await commentOptionButton.click();
     await page.locator('div.PopoverMenuItem').nth(2).click();
@@ -96,12 +96,12 @@ async function fillQuillTextBox(page, commentText) {
 async function performUpvote(page, parentClass: string) {
   const amountOfThreadLikes = await page
     .locator(
-      `xpath=(//div[@class="${parentClass}"]//button[contains(@class,"ThreadAction")])[1]//div`
+      `xpath=(//div[@class="${parentClass}"]//button[contains(@class,"ThreadAction")])[1]//div`,
     )
     .textContent();
 
   let threadLikeButton = await page.locator(
-    `xpath=(//div[@class="${parentClass}"]//button[contains(@class,"ThreadAction")])[1]`
+    `xpath=(//div[@class="${parentClass}"]//button[contains(@class,"ThreadAction")])[1]`,
   );
   await threadLikeButton.click();
 
@@ -110,14 +110,14 @@ async function performUpvote(page, parentClass: string) {
     expect(
       await page
         .locator(
-          `xpath=(//div[@class="${parentClass}"]//button[contains(@class,"ThreadAction")])[1]//div`
+          `xpath=(//div[@class="${parentClass}"]//button[contains(@class,"ThreadAction")])[1]//div`,
         )
-        .textContent()
+        .textContent(),
     ).toEqual((parseInt(amountOfThreadLikes) + 1).toString());
   }).toPass();
 
   threadLikeButton = await page.locator(
-    `xpath=(//div[@class="${parentClass}"]//button[contains(@class,"ThreadAction")])[1]`
+    `xpath=(//div[@class="${parentClass}"]//button[contains(@class,"ThreadAction")])[1]`,
   );
   await threadLikeButton.click();
 
@@ -125,9 +125,9 @@ async function performUpvote(page, parentClass: string) {
     expect(
       await page
         .locator(
-          `xpath=(//div[@class="${parentClass}"]//button[contains(@class,"ThreadAction")])[1]//div`
+          `xpath=(//div[@class="${parentClass}"]//button[contains(@class,"ThreadAction")])[1]//div`,
         )
-        .textContent()
+        .textContent(),
     ).toEqual(amountOfThreadLikes);
   }).toPass();
 }
