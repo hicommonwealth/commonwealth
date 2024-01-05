@@ -12,7 +12,9 @@ interface GetThreadsByLinkProps {
   enabled: boolean;
 }
 
-const getThreadsByLink = async ({ link }: GetThreadsByLinkProps) => {
+const getThreadsByLink = async ({
+  link,
+}: GetThreadsByLinkProps): Promise<{ id: number; title: string }[]> => {
   const response = await axios.post(`${app.serverUrl()}/linking/getLinks`, {
     link,
     jwt: app.user.jwt,

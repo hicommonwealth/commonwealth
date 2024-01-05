@@ -1,11 +1,13 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import app, { resetDatabase } from '../../../server-test';
-import * as modelUtils from '../../util/modelUtils';
 import jwt from 'jsonwebtoken';
+import { Op } from 'sequelize';
+import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import models from '../../../server/database';
-import { Op } from 'sequelize';
+import { ThreadAttributes } from '../../../server/models/thread';
+import { attributesOf } from '../../../server/util/sequelizeHelpers';
+import * as modelUtils from '../../util/modelUtils';
 import { JoinCommunityArgs, ThreadArgs } from '../../util/modelUtils';
 
 chai.use(chaiHttp);
@@ -144,7 +146,7 @@ describe('User Dashboard API', () => {
 
       const threadIds = res.body.result.map((a) => a.thread_id);
       const chains = await models.Thread.findAll({
-        attributes: ['chain'],
+        attributes: attributesOf<ThreadAttributes>('community_id'),
         where: {
           id: {
             [Op.in]: threadIds,
@@ -152,7 +154,7 @@ describe('User Dashboard API', () => {
         },
         raw: true,
       });
-      expect(chains).to.deep.equal([{ chain: 'ethereum' }]);
+      expect(chains).to.deep.equal([{ community_id: 'ethereum' }]);
     });
 
     it('should return user activity for newly joined communities', async () => {
@@ -180,7 +182,7 @@ describe('User Dashboard API', () => {
 
       const threadIds = res.body.result.map((a) => a.thread_id);
       const chains = await models.Thread.findAll({
-        attributes: ['chain'],
+        attributes: attributesOf<ThreadAttributes>('community_id'),
         where: {
           id: {
             [Op.in]: threadIds,
@@ -188,7 +190,10 @@ describe('User Dashboard API', () => {
         },
         raw: true,
       });
-      expect(chains).to.deep.equal([{ chain: 'alex' }, { chain: 'ethereum' }]);
+      expect(chains).to.deep.equal([
+        { community_id: 'alex' },
+        { community_id: 'ethereum' },
+      ]);
     });
     it('should return correctly ranked user activity', async () => {
       for (let i = 0; i < 48; i++) {
@@ -223,7 +228,7 @@ describe('User Dashboard API', () => {
       const threadIds = res.body.result.map((a) => a.thread_id);
       const chains = (
         await models.Thread.findAll({
-          attributes: ['chain'],
+          attributes: attributesOf<ThreadAttributes>('community_id'),
           where: {
             id: {
               [Op.in]: threadIds,
@@ -231,7 +236,7 @@ describe('User Dashboard API', () => {
           },
           raw: true,
         })
-      ).map((x) => x.chain);
+      ).map((x) => x.community_id);
       expect(chains.includes(threadOne.chainId)).to.be.false;
     });
   });

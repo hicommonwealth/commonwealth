@@ -53,7 +53,7 @@ const addThreadLink = async (
     models,
     await req.user.getAddresses(),
     thread.address_id,
-    thread.chain,
+    thread.community_id,
   );
   if (!isAuth && !req.user.isAdmin)
     return next(new AppError(Errors.NotAdminOrOwner));
@@ -101,7 +101,7 @@ const addThreadLink = async (
     {
       event: event,
       userId: req.user.id,
-      community: thread.chain,
+      community: thread.community_id,
       proposalType: source,
     },
     req,

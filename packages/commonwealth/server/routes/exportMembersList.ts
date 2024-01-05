@@ -23,7 +23,7 @@ const exportMembersList = async (
   models: DB,
   req: TypedRequestBody<exportMembersListReq>,
   res: TypedResponse<exportMembersListResp>,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.user.isAdmin) {
     return next(new AppError(Errors.NotAdmin));
@@ -55,7 +55,7 @@ const exportMembersList = async (
       LEFT JOIN 
           "Profiles" "p" ON "a"."profile_id" = "p"."id"
       LEFT JOIN 
-          "Threads" "t" ON "a"."id" = "t"."address_id" AND "t"."chain" = :chainId
+          "Threads" "t" ON "a"."id" = "t"."address_id" AND "t"."community_id" = :chainId
       LEFT JOIN 
           "Comments" "c" ON "a"."id" = "c"."address_id" AND "c"."chain" = :chainId
       LEFT JOIN 
@@ -67,7 +67,7 @@ const exportMembersList = async (
     `,
       {
         replacements: { chainId },
-      }
+      },
     );
 
     return success(res, { data });
