@@ -101,7 +101,7 @@ export async function __getBulkThreads(
           t.archived_at,
           t.updated_at AS thread_updated,
           t.locked_at AS thread_locked,
-          t.chain AS thread_chain, t.read_only, t.body, t.discord_meta, t.comment_count AS number_of_comments,
+          t.community_id AS thread_chain, t.read_only, t.body, t.discord_meta, t.comment_count AS number_of_comments,
           reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted, t.reaction_count AS total_likes,
           t.has_poll,
           t.plaintext,
@@ -122,7 +122,7 @@ export async function __getBulkThreads(
             STRING_AGG(r.id::text, ',') AS reaction_ids
             FROM "Reactions" as r
             JOIN "Threads" t2
-            ON r.thread_id = t2.id and t2.chain = $community_id ${
+            ON r.thread_id = t2.id and t2.community_id = $community_id ${
               topicId ? ` AND t2.topic_id = $topic_id ` : ''
             }
             LEFT JOIN "Addresses" ad
@@ -132,7 +132,7 @@ export async function __getBulkThreads(
         ) reactions
         ON t.id = reactions.thread_id
         WHERE t.deleted_at IS NULL
-          ${community ? ` AND t.chain = $community_id` : ''}
+          ${community ? ` AND t.community_id = $community_id` : ''}
           ${topicId ? ` AND t.topic_id = $topic_id ` : ''}
           ${stage ? ` AND t.stage = $stage ` : ''}
           ${archived ? ` AND t.archived_at IS NOT NULL ` : ''}
@@ -228,7 +228,7 @@ export async function __getBulkThreads(
 
   const numVotingThreads = await this.models.Thread.count({
     where: {
-      chain: community?.id,
+      community_id: community?.id,
       stage: 'voting',
     },
   });

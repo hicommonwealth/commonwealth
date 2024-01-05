@@ -79,7 +79,7 @@ export default async (
           where: { id: req.body.thread_id },
         });
         if (!thread) return next(new AppError(Errors.NoThread));
-        obj = { thread_id: req.body.thread_id, chain_id: thread.chain };
+        obj = { thread_id: req.body.thread_id, chain_id: thread.community_id };
       } else if (req.body.comment_id) {
         comment = await models.Comment.findOne({
           where: { id: req.body.comment_id },

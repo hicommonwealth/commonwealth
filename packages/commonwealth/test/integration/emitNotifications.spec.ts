@@ -88,7 +88,7 @@ describe('emitNotifications tests', () => {
 
     // create a thread manually to bypass emitNotifications in-route
     thread = await models.Thread.create({
-      chain: chain,
+      community_id: chain,
       address_id: userAddressId2,
       title,
       plaintext: '',

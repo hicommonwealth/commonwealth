@@ -44,7 +44,7 @@ export const digestLevels = {
 
 // TODO: CHANGE TO 1 WEEK
 export const getTopThreads = async (
-  communityId: string
+  communityId: string,
 ): Promise<ThreadData[]> => {
   const res = await models.sequelize.query(`SELECT 
         t.title,
@@ -60,7 +60,7 @@ export const getTopThreads = async (
         LEFT JOIN "Reactions" r ON t.id = r.thread_id
         INNER JOIN "Addresses" a ON t.address_id = a.id
       WHERE 
-        t.chain='${communityId}' AND c.created_at > NOW() - INTERVAL '1 WEEK' AND r.created_at > NOW() - INTERVAL '1 WEEK'
+        t.community_id='${communityId}' AND c.created_at > NOW() - INTERVAL '1 WEEK' AND r.created_at > NOW() - INTERVAL '1 WEEK'
       GROUP BY 
         t.id, a.address
       ORDER BY 
@@ -76,7 +76,7 @@ export const getTopThreads = async (
         row.author_address,
         communityId,
         false,
-        4
+        4,
       );
 
       const addressData = await models.Address.findOne({
@@ -98,7 +98,7 @@ export const getTopThreads = async (
           'missing profile for ',
           row.author_address,
           ' in ',
-          communityId
+          communityId,
         );
       }
 
@@ -123,7 +123,7 @@ export const getTopThreads = async (
 };
 
 const getCommunityActivityScore = async (
-  communityId: string
+  communityId: string,
 ): Promise<number> => {
   const activityScore = await models.sequelize.query(`SELECT 
           0.4 * COUNT(DISTINCT t.id) +
@@ -134,7 +134,7 @@ const getCommunityActivityScore = async (
           LEFT JOIN "Comments" c ON t.id = c.thread_id
           LEFT JOIN "Reactions" r ON t.id = r.thread_id
         WHERE 
-          t.chain='${communityId}' AND
+          t.community_id='${communityId}' AND
           (t.created_at > NOW() - INTERVAL '1 WEEK' OR
           c.created_at > NOW() - INTERVAL '1 WEEK' OR
           r.created_at > NOW() - INTERVAL '1 WEEK')`);
@@ -157,7 +157,7 @@ const getActivityCounts = async (communityId: string) => {
               COUNT(DISTINCT t.id) AS thread_count
               FROM "Threads" t
               WHERE
-              t.chain='${communityId}' AND
+              t.community_id='${communityId}' AND
               t.created_at > NOW() - INTERVAL '1 WEEK'`);
 
   const totalThreads = (threadCounts[1] as any)?.rows?.[0]
@@ -168,7 +168,7 @@ const getActivityCounts = async (communityId: string) => {
 
 export const emailDigestBuilder = async (
   digestLevel: number,
-  confirmationEmail: string
+  confirmationEmail: string,
 ) => {
   // Go through each community on CW
   const communities = await models.Community.findAll();
@@ -188,7 +188,7 @@ export const emailDigestBuilder = async (
       const activityScore = await getCommunityActivityScore(community.id);
 
       const { totalComments, totalThreads } = await getActivityCounts(
-        community.id
+        community.id,
       );
 
       communityDigestInfo[community.id] = {

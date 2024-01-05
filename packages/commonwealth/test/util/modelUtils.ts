@@ -31,7 +31,7 @@ import app from '../../server-test';
 import models from '../../server/database';
 import type { Role } from '../../server/models/role';
 
-import { Link, LinkSource } from 'server/models/thread';
+import { Link, LinkSource, ThreadAttributes } from 'server/models/thread';
 import {
   TEST_BLOCK_INFO_BLOCKHASH,
   TEST_BLOCK_INFO_STRING,
@@ -214,7 +214,9 @@ export interface ThreadArgs {
   sign: (actionPayload: ActionPayload) => string;
 }
 
-export const createThread = async (args: ThreadArgs) => {
+export const createThread = async (
+  args: ThreadArgs,
+): Promise<{ status: string; result?: ThreadAttributes; error?: Error }> => {
   const {
     chainId,
     address,
@@ -680,6 +682,7 @@ export interface JoinCommunityArgs {
   chain: string;
   originChain: string;
 }
+
 export const joinCommunity = async (args: JoinCommunityArgs) => {
   const { jwt, address, chain, originChain, address_id } = args;
   try {

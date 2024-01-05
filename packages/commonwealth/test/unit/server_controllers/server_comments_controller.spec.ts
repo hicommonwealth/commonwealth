@@ -46,7 +46,7 @@ describe('ServerCommentsController', () => {
           findOne: sandbox.stub().resolves({
             id: 4,
             title: 'Big Thread!',
-            chain: 'ethereum',
+            community_id: 'ethereum',
           }),
         },
       };
@@ -159,7 +159,7 @@ describe('ServerCommentsController', () => {
           findOne: sandbox.stub().resolves({
             id: 4,
             title: 'Big Thread!',
-            chain: 'ethereum',
+            community_id: 'ethereum',
           }),
         },
       };
@@ -301,7 +301,7 @@ describe('ServerCommentsController', () => {
           findOne: sandbox.stub().resolves({
             id: 4,
             title: 'Big Thread!',
-            chain: 'ethereum',
+            community_id: 'ethereum',
           }),
         },
       };
@@ -375,7 +375,7 @@ describe('ServerCommentsController', () => {
           findOne: sandbox.stub().resolves({
             id: 4,
             title: 'Big Thread!',
-            chain: 'ethereum',
+            community_id: 'ethereum',
             topic_id: 77,
           }),
         },
@@ -544,7 +544,7 @@ describe('ServerCommentsController', () => {
           findOne: async () => ({
             id: 1,
             address: '0x123',
-            chain: 'ethereum',
+            community_id: 'ethereum',
             title: 'Big Thread!',
           }),
         },
@@ -643,7 +643,7 @@ describe('ServerCommentsController', () => {
           findOne: async () => ({
             id: 1,
             address: '0x123',
-            chain: 'ethereum',
+            community_id: 'ethereum',
             title: 'Big Thread!',
           }),
         },

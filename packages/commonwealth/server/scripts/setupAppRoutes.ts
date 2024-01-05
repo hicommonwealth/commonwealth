@@ -119,10 +119,11 @@ const setupAppRoutes = (app, models: DB, templateFile, sendFile) => {
   const renderThread = async (scope: string, threadId: string, req, res) => {
     // Retrieve discussions
     const thread = await models.Thread.findOne({
-      where: scope ? { id: threadId, chain: scope } : { id: threadId },
+      where: scope ? { id: threadId, community_id: scope } : { id: threadId },
       include: [
         {
           model: models.Community,
+          as: 'Community',
           where: scope ? null : { custom_domain: req.hostname },
           attributes: ['custom_domain', 'icon_url'],
         },
@@ -142,8 +143,8 @@ const setupAppRoutes = (app, models: DB, templateFile, sendFile) => {
 
     const title = thread ? decodeTitle(thread.title) : '';
     const description = thread ? thread.plaintext : '';
-    const image = thread?.Chain?.icon_url
-      ? `${thread.Chain.icon_url}`
+    const image = thread?.Community?.icon_url
+      ? `${thread.Community.icon_url}`
       : DEFAULT_COMMONWEALTH_LOGO;
 
     const author = thread?.Address?.Profile?.profile_name
