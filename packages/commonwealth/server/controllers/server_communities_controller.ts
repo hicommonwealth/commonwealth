@@ -1,4 +1,3 @@
-import { TokenBalanceCache } from '../../../token-balance-cache/src';
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
 import {
@@ -46,11 +45,7 @@ import {
  * Implements methods related to communities
  */
 export class ServerCommunitiesController {
-  constructor(
-    public models: DB,
-    public tokenBalanceCache: TokenBalanceCache,
-    public banCache: BanCache,
-  ) {}
+  constructor(public models: DB, public banCache: BanCache) {}
 
   async searchCommunities(
     options: SearchCommunitiesOptions,

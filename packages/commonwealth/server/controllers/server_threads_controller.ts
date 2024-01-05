@@ -1,9 +1,9 @@
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
 
-import { TokenBalanceCache as TokenBalanceCacheV1 } from '../../../token-balance-cache/src';
 import GlobalActivityCache from '../util/globalActivityCache';
-import { TokenBalanceCache as TokenBalanceCacheV2 } from '../util/tokenBalanceCache/tokenBalanceCache';
+import { TokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
+
 import {
   CreateThreadOptions,
   CreateThreadResult,
@@ -66,8 +66,7 @@ import {
 export class ServerThreadsController {
   constructor(
     public models: DB,
-    public tokenBalanceCacheV1: TokenBalanceCacheV1,
-    public tokenBalanceCacheV2: TokenBalanceCacheV2,
+    public tokenBalanceCache: TokenBalanceCache,
     public banCache: BanCache,
     public globalActivityCache?: GlobalActivityCache,
   ) {}

@@ -92,11 +92,6 @@ module.exports = {
       chunks: 'all',
       // TODO: Commented out packages need to be code split. Commented out for now so that webpack can tree shake the imports
       cacheGroups: {
-        bitcoin: {
-          test: /[\\/]node_modules[\\/](bip39)[\\/]/,
-          name: 'bitcoin',
-          chunks: 'all',
-        },
         ethersAsync: {
           test: /[\\/]node_modules[\\/](ethers)[\\/]/,
           name: 'ethersAsync',
