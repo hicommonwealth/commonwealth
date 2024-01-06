@@ -1,5 +1,5 @@
-import { StatsDController } from '../../src/statsd';
 import { factory, formatFilename } from '../../src/logging';
+import { StatsDController } from '../../src/statsd';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -41,7 +41,7 @@ export function startHealthCheckLoop({
       await checkFn();
       status = 1;
     } catch (err) {
-      log.error(err);
+      log.error(err.message);
     }
     StatsDController.get().gauge(stat, status);
     const durationUntilNextCheck = nextCheckAt - Date.now();

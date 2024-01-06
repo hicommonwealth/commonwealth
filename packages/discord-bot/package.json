@@ -6,6 +6,7 @@
     "build": "tsc -b && tsc-alias",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
+    "dev": "concurrently -n watcher,listener,consumer -c red,green,yellow 'tsc -b -w' 'yarn start' 'yarn start-consumer'",
     "start": "ts-node src/discord-listener/discordListener.ts",
     "start-consumer": "ts-node src/discord-consumer/discordConsumer.ts",
     "start-prod-consumer": "node build/discord-bot/src/discord-consumer/discordConsumer.js",
