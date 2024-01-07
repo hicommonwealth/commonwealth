@@ -25,6 +25,7 @@
 ## Services & Tooling
 
 - [Analytics (Mixpanel)](Analytics.md)
+- [Datadog](Datadog.md)
 - [Custom Domains](Custom-Domains.md)
 - [Devnet (Cosmos)](Devnet.md)
 - [Discobot](Discobot.md)
