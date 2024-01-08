@@ -288,7 +288,7 @@ async function verifyRecomputeCountAll() {
   );
 }
 
-describe.only('recomputeCounts', () => {
+describe('recomputeCounts', () => {
   before(async () => {
     testVerifiedChainAddress = await modelUtils.createAndVerifyAddress({
       chain: 'alex',
