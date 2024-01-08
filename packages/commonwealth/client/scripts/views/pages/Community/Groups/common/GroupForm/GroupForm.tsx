@@ -139,7 +139,7 @@ const GroupForm = ({
 }: GroupFormProps) => {
   const navigate = useCommonNavigate();
   const { data: topics } = useFetchTopicsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const { data: groups = [] } = useFetchGroupsQuery({
@@ -584,8 +584,8 @@ const GroupForm = ({
                   Gate topics
                 </CWText>
                 <CWText type="b2">
-                  Add topics to gate to auto-lock it for group members who
-                  satisfy the requirements above
+                  Add topics that only group members who satisfy the
+                  requirements above can participate in.
                 </CWText>
               </div>
 

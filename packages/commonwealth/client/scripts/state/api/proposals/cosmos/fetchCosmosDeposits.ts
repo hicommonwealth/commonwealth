@@ -1,18 +1,18 @@
-import app from 'state';
+import type { QueryDepositsResponseSDKType } from '@hicommonwealth/chains';
+import { ChainBase } from '@hicommonwealth/core';
 import { useQuery } from '@tanstack/react-query';
-import _ from 'lodash';
-import type { QueryDepositsResponse } from 'cosmjs-types/cosmos/gov/v1beta1/query';
-import type { QueryDepositsResponseSDKType } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/query';
-import { ChainBase } from 'common-common/src/types';
-import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
+import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
+import type { QueryDepositsResponse } from 'cosmjs-types/cosmos/gov/v1beta1/query';
+import _ from 'lodash';
 import { AnyProposal } from 'models/types';
+import app from 'state';
 
 const DEPOSITS_CACHE_TIME = 1000 * 60 * 60;
 const DEPOSITS_STALE_TIME = 1000 * 30;
 
 const fetchCosmosDeposits = async (
-  proposal: AnyProposal
+  proposal: AnyProposal,
 ): Promise<QueryDepositsResponse | QueryDepositsResponseSDKType> => {
   if (
     proposal instanceof CosmosProposalV1 ||
@@ -26,7 +26,7 @@ const fetchCosmosDeposits = async (
 
 const getCosmosDepositsQueryKey = (
   proposal: AnyProposal,
-  poolParams: number
+  poolParams: number,
 ) => {
   return [
     'cosmosDeposits',
@@ -39,7 +39,7 @@ const getCosmosDepositsQueryKey = (
 
 const useCosmosProposalDepositsQuery = (
   proposal: AnyProposal,
-  poolParams: number
+  poolParams: number,
 ) => {
   return useQuery({
     queryKey: getCosmosDepositsQueryKey(proposal, poolParams),

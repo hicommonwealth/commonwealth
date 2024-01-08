@@ -71,6 +71,11 @@ export async function evmOffChainRpcBatching(
   let failedAddresses: string[] = [];
   const jsonPromises = [];
   const responses = await Promise.allSettled(batchRequestPromises);
+  const chainNodeErrorMsg =
+    `${failingChainNodeError} RPC batch request failed for method '${rpc.method}' ` +
+    `with batch size ${rpc.batchSize} on evm chain id ${source.evmChainId}${
+      source.contractAddress ? ` for token ${source.contractAddress}` : ''
+    }.`;
   responses.forEach((res, index) => {
     // handle a failed batch request
     if (res.status === 'rejected') {
@@ -80,20 +85,25 @@ export async function evmOffChainRpcBatching(
         Math.min(startIndex + rpc.batchSize, addresses.length),
       );
       failedAddresses = [...failedAddresses, ...relevantAddresses];
-
-      const msg =
-        `RPC batch request failed for method '${rpc.method}' ` +
-        `with batch size ${rpc.batchSize} on evm chain id ${source.evmChainId}${
-          source.contractAddress ? `for token ${source.contractAddress}` : ''
-        }.`;
-      rollbar.error(msg, res.reason);
-      log.error(msg, res.reason);
+      rollbar.critical(chainNodeErrorMsg, res.reason);
+      log.fatal(chainNodeErrorMsg, res.reason);
     } else {
       jsonPromises.push(res.value.json());
     }
   });
 
-  const datas = (await Promise.all(jsonPromises)).flat();
+  let datas;
+  try {
+    datas = (await Promise.all(jsonPromises)).flat();
+  } catch (e) {
+    rollbar.critical(chainNodeErrorMsg, e);
+    log.fatal(chainNodeErrorMsg, e);
+    return {
+      balances: {},
+      failedAddresses: addresses,
+    };
+  }
+
   const balances = {};
   for (const data of datas) {
     if (data.error) {
@@ -169,25 +179,25 @@ export async function evmBalanceFetcherBatching(
     });
   }
 
-  // returns an array of responses where each responses data contains an array of balances
-  const response = await fetch(source.url, {
-    method: 'POST',
-    body: JSON.stringify(rpcRequests),
-    headers: { 'Content-Type': 'application/json' },
-  });
+  const errorMsg =
+    `On-chain batch request failed ` +
+    `with batch size ${rpc.batchSize} on evm chain id ${source.evmChainId}${
+      source.contractAddress ? `for token ${source.contractAddress}` : ''
+    }.`;
 
-  const datas = await response.json();
+  const datas = await evmRpcRequest(source.url, rpcRequests, errorMsg);
+  if (!datas)
+    return {
+      balances: {},
+      failedAddresses: addresses,
+    };
+
   const addressBalanceMap = {};
   let failedAddresses: string[] = [];
 
   if (datas.error) {
-    const msg =
-      `On-chain batch request failed ` +
-      `with batch size ${rpc.batchSize} on evm chain id ${source.evmChainId}${
-        source.contractAddress ? `for token ${source.contractAddress}` : ''
-      }.`;
-    rollbar.error(msg, datas.error);
-    log.error(msg, datas.error);
+    rollbar.error(errorMsg, datas.error);
+    log.error(errorMsg, datas.error);
     return { balances: {}, failedAddresses: addresses };
   } else {
     for (const data of datas) {
@@ -230,12 +240,8 @@ export function mapNodeToBalanceFetcherContract(
     case 1: // Ethereum Mainnet
     case 1337: // Local Ganache - assuming fork of mainnet
       return '0xb1f8e55c7f64d203c1400b9d8555d050f94adf39';
-    case 3: // Ropsten
-      return '0x8D9708f3F514206486D7E988533f770a16d074a7';
     case 5: // Goerli
       return '0x9788C4E93f9002a7ad8e72633b11E8d1ecd51f9b';
-    case 4: // Rinkeby
-      return '0x3183B673f4816C94BeF53958BaF93C671B7F8Cf2';
     case 56: // BSC
     case 97: // BSC Testnet
       return '0x2352c63A83f9Fd126af8676146721Fa00924d7e4';
@@ -243,7 +249,6 @@ export function mapNodeToBalanceFetcherContract(
     case 80001: // Polygon Mumbai
       return '0x2352c63A83f9Fd126af8676146721Fa00924d7e4';
     case 10: // Optimism Mainnet
-    case 69: // Optimism Kovan
       return '0xB1c568e9C3E6bdaf755A60c7418C269eb11524FC';
     case 42161: // Arbitrum One
       return '0x151E24A486D7258dd7C33Fb67E4bB01919B7B32c';
@@ -278,4 +283,28 @@ export function mapNodeToBalanceFetcherContract(
     case 11155111: // Sepolia
       return '0xBfbCed302deD369855fc5f7668356e123ca4B329';
   }
+}
+
+export const failingChainNodeError = 'FAILING OR RATE LIMITED CHAIN NODE:';
+
+export async function evmRpcRequest(
+  rpcEndpoint: string,
+  rawRequestBody: Record<string, unknown> | Array<Record<string, unknown>>,
+  errorMsg: string,
+) {
+  let data;
+  try {
+    const response = await fetch(rpcEndpoint, {
+      method: 'POST',
+      body: JSON.stringify(rawRequestBody),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    data = await response.json();
+  } catch (e) {
+    const augmentedMsg = `${failingChainNodeError} ${errorMsg}`;
+    log.fatal(augmentedMsg, e);
+    rollbar.critical(augmentedMsg, e);
+  }
+
+  return data;
 }

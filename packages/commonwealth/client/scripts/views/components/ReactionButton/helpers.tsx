@@ -23,7 +23,7 @@ export const getDisplayedReactorsForPopup = ({
           <CWText noWrap>
             <User
               userAddress={reactorAddress}
-              userChainId={app.chain.id}
+              userCommunityId={app.chain.id}
               shouldLinkProfile
             />
           </CWText>

@@ -25,7 +25,11 @@ export const SearchBarMemberPreviewRow: FC<SearchBarMemberPreviewRowProps> = ({
 
   return (
     <div className="SearchBarMemberPreviewRow" onClick={handleClick}>
-      <User userAddress={address} userChainId={community} shouldLinkProfile />
+      <User
+        userAddress={address}
+        userCommunityId={community}
+        shouldLinkProfile
+      />
     </div>
   );
 };

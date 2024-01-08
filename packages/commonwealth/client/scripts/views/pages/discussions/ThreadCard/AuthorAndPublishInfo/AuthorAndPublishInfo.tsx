@@ -81,7 +81,7 @@ export const AuthorAndPublishInfo = ({
       <User
         avatarSize={24}
         userAddress={authorAddress}
-        userChainId={authorChainId}
+        userCommunityId={authorChainId}
         shouldShowPopover
         shouldLinkProfile
         shouldShowAddressWithDisplayName={
@@ -126,7 +126,7 @@ export const AuthorAndPublishInfo = ({
                         shouldLinkProfile
                         key={address}
                         userAddress={address}
-                        userChainId={community_id}
+                        userCommunityId={community_id}
                       />
                     );
                   })}

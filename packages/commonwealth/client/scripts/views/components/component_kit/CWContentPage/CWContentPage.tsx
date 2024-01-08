@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useRefreshMembershipQuery } from 'state/api/groups';
+import Permissions from 'utils/Permissions';
 import { isHot } from 'views/pages/discussions/helpers';
 import Account from '../../../../models/Account';
 import AddressInfo from '../../../../models/AddressInfo';
@@ -130,7 +131,9 @@ export const CWContentPage = ({
       membership.topicIds.includes(thread?.topic?.id) && membership.isAllowed,
   );
 
-  const isRestrictedMembership = isTopicGated && !isActionAllowedInGatedTopic;
+  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
+  const isRestrictedMembership =
+    !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
   const tabSelected = useMemo(() => {
     const tab = Object.fromEntries(urlQueryParams.entries())?.tab;

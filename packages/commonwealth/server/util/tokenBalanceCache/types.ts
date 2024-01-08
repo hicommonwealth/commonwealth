@@ -2,6 +2,11 @@ import { BalanceSourceType } from '../requirementsModule/requirementsTypes';
 
 export type Balances = { [address: string]: string };
 
+export type OptionsWithBalances = {
+  options: GetBalancesOptions;
+  balances: Balances;
+};
+
 type TbcConfigOptions = {
   cacheRefresh?: boolean;
   batchSize?: number;
@@ -25,22 +30,26 @@ type GetErc721BalanceOptions = GetEvmBalancesBase & {
     contractAddress: string;
   };
 };
-type GetErc1155BalanceOptions = GetEvmBalancesBase & {
+export type GetErc1155BalanceOptions = GetEvmBalancesBase & {
   balanceSourceType: BalanceSourceType.ERC1155;
   sourceOptions: {
     contractAddress: string;
     tokenId: number;
   };
 };
-type GetEthNativeBalanceOptions = GetEvmBalancesBase & {
+
+export type GetEthNativeBalanceOptions = GetEvmBalancesBase & {
   balanceSourceType: BalanceSourceType.ETHNative;
 };
 
-export type GetEvmBalancesOptions =
-  | GetEthNativeBalanceOptions
+export type GetErcBalanceOptions =
   | GetErc20BalanceOptions
   | GetErc721BalanceOptions
   | GetErc1155BalanceOptions;
+
+export type GetEvmBalancesOptions =
+  | GetErcBalanceOptions
+  | GetEthNativeBalanceOptions;
 
 export type GetCosmosBalancesOptions = {
   balanceSourceType: BalanceSourceType.CosmosNative;

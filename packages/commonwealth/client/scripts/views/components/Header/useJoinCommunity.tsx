@@ -1,11 +1,10 @@
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
 import {
   linkExistingAddressToChainOrCommunity,
   setActiveAccount,
 } from 'controllers/app/login';
 import { isSameAccount } from 'helpers';
 import AddressInfo from 'models/AddressInfo';
-import ITokenAdapter from 'models/ITokenAdapter';
 import React, { useState } from 'react';
 import app from 'state';
 import { addressSwapper } from 'utils';
@@ -26,7 +25,7 @@ const useJoinCommunity = () => {
   const activeChainInfo = app.chain?.meta;
   const activeBase = activeChainInfo?.base;
   const hasTermsOfService = !!activeChainInfo?.terms;
-  const activeChainId = activeChainInfo?.id;
+  const activeCommunityId = activeChainInfo?.id;
 
   const samebaseAddresses = app.user.addresses.filter((a, idx) => {
     // if no active chain, add all addresses
@@ -105,13 +104,14 @@ const useJoinCommunity = () => {
 
     if (originAddressInfo) {
       try {
-        const targetChain = activeChainId || originAddressInfo.community.id;
+        const targetCommunity =
+          activeCommunityId || originAddressInfo.community.id;
 
         const address = originAddressInfo.address;
 
         const res = await linkExistingAddressToChainOrCommunity(
           address,
-          targetChain,
+          targetCommunity,
           originAddressInfo.community.id,
         );
 
@@ -130,7 +130,8 @@ const useJoinCommunity = () => {
           );
           const addressInfo = app.user.addresses.find(
             (a) =>
-              a.address === encodedAddress && a.community.id === targetChain,
+              a.address === encodedAddress &&
+              a.community.id === targetCommunity,
           );
 
           const account = app.chain.accounts.get(
@@ -142,15 +143,15 @@ const useJoinCommunity = () => {
             console.log('setting validation token');
           }
           if (
-            activeChainId &&
+            activeCommunityId &&
             !app.roles.getRoleInCommunity({
               account,
-              community: activeChainId,
+              community: activeCommunityId,
             })
           ) {
             await app.roles.createRole({
               address: addressInfo,
-              community: activeChainId,
+              community: activeCommunityId,
             });
           }
           await setActiveAccount(account);
@@ -164,11 +165,6 @@ const useJoinCommunity = () => {
           }
         } else {
           // Todo: handle error
-        }
-
-        // If token forum make sure has token and add to app.chain obj
-        if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
-          await app.chain.activeAddressHasToken(app.user.activeAccount.address);
         }
       } catch (err) {
         console.error(err);

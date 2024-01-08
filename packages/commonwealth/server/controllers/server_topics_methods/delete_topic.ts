@@ -1,4 +1,3 @@
-import { QueryTypes } from 'sequelize';
 import { AppError } from '../../../../common-common/src/errors';
 import { CommunityInstance } from '../../models/community';
 import { UserInstance } from '../../models/user';
@@ -23,7 +22,7 @@ export type DeleteTopicResult = void;
 
 export async function __deleteTopic(
   this: ServerTopicsController,
-  { user, community, topicId }: DeleteTopicOptions
+  { user, community, topicId }: DeleteTopicOptions,
 ): Promise<DeleteTopicResult> {
   const isAdmin = validateOwner({
     models: this.models,
@@ -44,16 +43,17 @@ export async function __deleteTopic(
 
   // remove topic from threads, then delete topic
   await this.models.sequelize.transaction(async (transaction) => {
-    await this.models.sequelize.query(
-      `UPDATE "Threads" SET topic_id=null WHERE topic_id = $id AND chain = $chain;`,
+    await this.models.Thread.update(
       {
-        bind: {
-          id: topicId,
-          chain: community.id,
+        topic_id: null,
+      },
+      {
+        where: {
+          topic_id: topicId,
+          community_id: community.id,
         },
-        type: QueryTypes.UPDATE,
         transaction,
-      }
+      },
     );
     await topic.destroy({ transaction });
   });

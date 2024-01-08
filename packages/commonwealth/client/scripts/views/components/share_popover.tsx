@@ -19,9 +19,9 @@ export const SharePopover = ({
   const domain = document.location.origin;
   const { pathname: currentRoute } = useLocation();
 
-  const defaultRenderTrigger = (onClick) => (
-    <CWThreadAction action="share" onClick={onClick} />
-  );
+  const defaultRenderTrigger = (
+    onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
+  ) => <CWThreadAction action="share" onClick={onClick} />;
 
   return (
     <PopoverMenu
@@ -45,8 +45,8 @@ export const SharePopover = ({
               if (app.isCustomDomain()) {
                 urlToCopy = `${domain}${discussionLink}`;
               } else {
-                const chainId = urlParts[1];
-                urlToCopy = `${domain}/${chainId}${discussionLink}`;
+                const communityId = urlParts[1];
+                urlToCopy = `${domain}/${communityId}${discussionLink}`;
               }
             }
 

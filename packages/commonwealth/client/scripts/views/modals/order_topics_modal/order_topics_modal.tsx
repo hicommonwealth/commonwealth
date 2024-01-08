@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 
-import app from '../../../state';
 import { notifyError } from '../../../controllers/app/notifications';
 import type Topic from '../../../models/Topic';
-import DraggableTopicsList from './draggable_topics_list';
+import app from '../../../state';
 import {
   useFetchTopicsQuery,
   useUpdateFeaturedTopicsOrderMutation,
 } from '../../../state/api/topics';
-import { CWButton } from '../../components/component_kit/new_designs/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from '../../components/component_kit/new_designs/CWModal';
+import { CWButton } from '../../components/component_kit/new_designs/cw_button';
+import DraggableTopicsList from './draggable_topics_list';
 
 import '../../../../styles/modals/order_topics_modal.scss';
 
@@ -42,14 +42,14 @@ const getFilteredTopics = (rawTopics: Topic[]): Topic[] => {
 
 export const OrderTopicsModal = ({ onModalClose }: OrderTopicsModalProps) => {
   const { data: rawTopics } = useFetchTopicsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const { mutateAsync: updateFeaturedTopicsOrder } =
     useUpdateFeaturedTopicsOrderMutation();
 
   const [topics, setTopics] = useState<Topic[]>(() =>
-    getFilteredTopics(rawTopics)
+    getFilteredTopics(rawTopics),
   );
 
   const handleSave = async () => {

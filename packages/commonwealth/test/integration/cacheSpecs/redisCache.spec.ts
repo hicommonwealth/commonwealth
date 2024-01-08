@@ -1,13 +1,16 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable dot-notation */
+/* eslint-disable no-unused-expressions */
 const chai = require('chai');
 const expect = chai.expect;
+import { RedisNamespaces } from '@hicommonwealth/core';
 import { RedisCache } from 'common-common/src/redisCache';
-import { RedisNamespaces } from 'common-common/src/types';
-import { connectToRedis } from '../../util/redisUtils';
 import { delay } from '../../util/delayUtils';
+import { connectToRedis } from '../../util/redisUtils';
 
 async function addRandomKeys(
   redisCache: RedisCache,
-  test_namespace: RedisNamespaces
+  test_namespace: RedisNamespaces,
 ) {
   const random = Math.random();
   const key1 = `testKey${random}`;
@@ -28,7 +31,7 @@ async function addRandomKeys(
 
 export async function testExpiry(
   redisCache: RedisCache,
-  test_namespace: RedisNamespaces
+  test_namespace: RedisNamespaces,
 ) {
   const random = Math.random();
   const key = `testKey${random}`;

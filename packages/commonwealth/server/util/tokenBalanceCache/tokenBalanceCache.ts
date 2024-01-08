@@ -1,8 +1,8 @@
 import { fromBech32, toBech32 } from '@cosmjs/encoding';
+import { RedisNamespaces } from '@hicommonwealth/core';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { RedisCache } from 'common-common/src/redisCache';
 import { StatsDController } from 'common-common/src/statsd';
-import { RedisNamespaces } from 'common-common/src/types';
 import Web3 from 'web3';
 import { DB } from '../../models';
 import { BalanceSourceType } from '../requirementsModule/requirementsTypes';
@@ -16,6 +16,7 @@ import {
   Balances,
   GetBalancesOptions,
   GetCosmosBalancesOptions,
+  GetErcBalanceOptions,
   GetEvmBalancesOptions,
 } from './types';
 
@@ -35,12 +36,37 @@ export class TokenBalanceCache {
   public async getBalances(options: GetBalancesOptions): Promise<Balances> {
     if (options.addresses.length === 0) return {};
 
-    let balances: Balances;
+    let balances: Balances = {};
 
-    if (options.balanceSourceType === BalanceSourceType.CosmosNative) {
-      balances = await this.getCosmosBalances(options);
-    } else {
-      balances = await this.getEvmBalances(options);
+    try {
+      if (options.balanceSourceType === BalanceSourceType.CosmosNative) {
+        balances = await this.getCosmosBalances(options);
+      } else {
+        balances = await this.getEvmBalances(options);
+      }
+    } catch (e) {
+      let chainId: string;
+      if ((options as GetEvmBalancesOptions).sourceOptions.evmChainId) {
+        chainId = `evm chain id ${
+          (options as GetEvmBalancesOptions).sourceOptions.evmChainId
+        }`;
+      } else {
+        chainId = `cosmos chain id ${
+          (options as GetCosmosBalancesOptions).sourceOptions.cosmosChainId
+        }`;
+      }
+
+      let contractAddress: string = '';
+      if ((options as GetErcBalanceOptions).sourceOptions.contractAddress) {
+        contractAddress = ` for contract address ${
+          (options as GetErcBalanceOptions).sourceOptions.contractAddress
+        }`;
+      }
+      const msg =
+        `Failed to fetch balance(s) for ${options.addresses.length}` +
+        ` address(es) on ${chainId}${contractAddress}`;
+      log.error(msg, e);
+      rollbar.error(msg, e);
     }
 
     StatsDController.get().increment(

@@ -50,6 +50,7 @@ export const LoginMobile = ({
   isNewlyCreated,
   isLinkingOnMobile,
   onNavigateToWalletList,
+  sidebarType,
 }: LoginProps) => {
   const hasBoilerplate =
     activeStep === 'walletList' ||
@@ -57,7 +58,7 @@ export const LoginMobile = ({
     activeStep === 'ethWalletList';
 
   const hasCreationButtons = activeStep === 'selectAccountType';
-  const { headerText, bodyText } = getLoginText(activeStep);
+  const { headerText, bodyText } = getLoginText(activeStep, sidebarType);
 
   return (
     <div className="LoginMobile">
@@ -69,7 +70,7 @@ export const LoginMobile = ({
             const wallet = wallets.find(
               (w) =>
                 w instanceof WalletConnectWebWalletController ||
-                w instanceof TerraWalletConnectWebWalletController
+                w instanceof TerraWalletConnectWebWalletController,
             );
 
             await wallet.reset();
@@ -112,7 +113,7 @@ export const LoginMobile = ({
                 onAccountVerified(
                   signerAccount,
                   isNewlyCreated,
-                  isLinkingOnMobile
+                  isLinkingOnMobile,
                 );
               }}
             />

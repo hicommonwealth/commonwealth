@@ -1,15 +1,18 @@
+import {
+  NotificationCategories,
+  ProposalType,
+  SupportedNetwork,
+} from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
+import jwt from 'jsonwebtoken';
+import { NotificationDataAndCategory, SnapshotEventType } from 'types';
 import { resetDatabase } from '../../server-test';
+import { JWT_SECRET } from '../../server/config';
+import models from '../../server/database';
+import emitNotifications from '../../server/util/emitNotifications';
 import * as modelUtils from '../util/modelUtils';
 import { JoinCommunityArgs } from '../util/modelUtils';
-import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from '../../server/config';
-import emitNotifications from '../../server/util/emitNotifications';
-import models from '../../server/database';
-import { NotificationCategories, ProposalType } from 'common-common/src/types';
-import { NotificationDataAndCategory, SnapshotEventType } from 'types';
-import { SupportedNetwork } from '../../shared/chain/types/types';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -21,11 +24,12 @@ describe('emitNotifications tests', () => {
   // author_chain, which is required for authorship lookup.
   // Therefore, a valid chain MUST be included alongside
   // communityId, unlike in non-test thread creation
-  let thread, comment, reaction;
+  let thread, comment;
+  //reaction;
   const title = 'test title';
-  const body = 'test body';
+  // const body = 'test body';
   const commentBody = 'test';
-  const topicName = 'test topic';
+  // const topicName = 'test topic';
   const kind = 'discussion';
 
   let userJWT;
@@ -84,7 +88,7 @@ describe('emitNotifications tests', () => {
 
     // create a thread manually to bypass emitNotifications in-route
     thread = await models.Thread.create({
-      chain: chain,
+      community_id: chain,
       address_id: userAddressId2,
       title,
       plaintext: '',
@@ -95,10 +99,11 @@ describe('emitNotifications tests', () => {
       thread_id: thread.id,
       address_id: userAddressId2,
       text: commentBody,
-      chain,
+      community_id: chain,
     });
 
-    reaction = await models.Reaction.create({
+    //reaction = await models.Reaction.create({
+    await models.Reaction.create({
       chain,
       thread_id: thread.id,
       address_id: userAddressId,
@@ -140,7 +145,7 @@ describe('emitNotifications tests', () => {
       expect(notif).to.not.be.null;
       expect(notif.thread_id).to.equal(thread.id);
       expect(notif.toJSON().notification_data).to.deep.equal(
-        JSON.stringify(notification_data)
+        JSON.stringify(notification_data),
       );
 
       const notifRead = await models.NotificationsRead.findOne({
@@ -195,7 +200,7 @@ describe('emitNotifications tests', () => {
       expect(notif).to.not.be.null;
       expect(notif.thread_id).to.equal(thread.id);
       expect(notif.toJSON().notification_data).to.deep.equal(
-        JSON.stringify(notifData)
+        JSON.stringify(notifData),
       );
 
       const notifRead = await models.NotificationsRead.findOne({
@@ -255,7 +260,7 @@ describe('emitNotifications tests', () => {
       expect(notif).to.not.be.null;
       expect(notif.thread_id).to.equal(thread.id);
       expect(notif.toJSON().notification_data).to.deep.equal(
-        JSON.stringify(notification_data)
+        JSON.stringify(notification_data),
       );
 
       const notifRead = await models.NotificationsRead.findOne({
@@ -381,7 +386,7 @@ describe('emitNotifications tests', () => {
         expire: String(1680869325),
       };
 
-      const eventType: SnapshotEventType = SnapshotEventType.Created;
+      // const eventType: SnapshotEventType = SnapshotEventType.Created;
       const notififcation_data: NotificationDataAndCategory = {
         categoryId: NotificationCategories.SnapshotProposal,
         data: {

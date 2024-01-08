@@ -4,20 +4,14 @@ import {
   APIOrderBy,
   APIOrderDirection,
 } from 'client/scripts/helpers/constants';
+import { CommunityResult } from 'client/scripts/views/pages/search/helpers';
 import app from 'state';
 import { ApiEndpoints } from '../config';
 
 const SEARCH_CHAINS_STALE_TIME = 2 * 60 * 60 * 1_000; // 2 h
 
 export type SearchChainsResponse = {
-  results: {
-    id: string;
-    name: string;
-    default_symbol: string;
-    type: string;
-    icon_url: string;
-    created_at: string | null;
-  }[];
+  results: CommunityResult[];
   limit: number;
   page: number;
   totalPages: number;

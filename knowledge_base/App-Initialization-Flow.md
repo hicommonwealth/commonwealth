@@ -14,7 +14,7 @@ The goal of this document is to describe the current state of the app initializa
     2. When the `/status` fetch is finished, app `isLoading` state is set to false.
 5. The `/status` endpoint is divided into two main data-fetches, `getChainStatus()` and `getUserStatus()`. `getChainStatus()` is always called; `getUserStatus()` is only called if a `user` object has been passed with the request.
     1. `getChainStatus()`: Grabs ChainStore, ChainNodes, NotificationCategories, and CommunitySnapshotSpaces, and threadCountQueryData entries.
-    2. `getUserStatus`: Grabs user associations (e.g. selected chain instance, social accounts, addresses). Once addresses have been grabbed, various rows associated with those addresses (e.g. discussion drafts, roles) are requested in turn.
+    2. `getUserStatus`: Grabs user associations (e.g. selected chain instance, addresses). Once addresses have been grabbed, various rows associated with those addresses (e.g. discussion drafts, roles) are requested in turn.
 6. Once the `/status` data is received on callback, `initAppState()` clears and repopulates app state.
     1. Relevant controllers (e.g. user, config) are cleared.
     2. Nodes, recent activity, snapshot chains, roles, chain categories, notification categories, and notification category types are all repopulated.

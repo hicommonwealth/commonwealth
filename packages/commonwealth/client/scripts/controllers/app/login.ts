@@ -1,8 +1,8 @@
 /**
  * @file Manages logged-in user accounts and local storage.
  */
+import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/core';
 import { chainBaseToCanvasChainId } from 'canvas/chainMappings';
-import { ChainBase, WalletId, WalletSsoSource } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { signSessionWithMagic } from 'controllers/server/sessions';
 import { isSameAccount } from 'helpers';
@@ -14,9 +14,6 @@ import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import type BlockInfo from '../../models/BlockInfo';
 import type ChainInfo from '../../models/ChainInfo';
-import SocialAccount from '../../models/SocialAccount';
-
-import { getTokenBalance } from 'helpers/token_balance_helper';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
@@ -166,8 +163,6 @@ export async function updateActiveAddresses({
     shouldRedraw,
   );
 
-  getTokenBalance();
-
   // select the address that the new chain should be initialized with
   const memberAddresses = app.user.activeAccounts.filter((account) => {
     return app.roles.isMember({ community: chain.id, account });
@@ -196,7 +191,6 @@ export async function updateActiveAddresses({
 }
 
 // called from the server, which returns public keys
-// creates SubstrateAccount with associated SocialAccounts
 export function updateActiveUser(data) {
   if (!data || data.loggedIn === false) {
     app.user.setEmail(null);
@@ -205,7 +199,6 @@ export function updateActiveUser(data) {
     app.user.setJWT(null);
 
     app.user.setAddresses([]);
-    app.user.setSocialAccounts([]);
 
     app.user.setSiteAdmin(false);
     app.user.setDisableRichText(false);
@@ -231,11 +224,6 @@ export function updateActiveUser(data) {
             walletSsoSource: a.wallet_sso_source,
             ghostAddress: a.ghost_address,
           }),
-      ),
-    );
-    app.user.setSocialAccounts(
-      data.socialAccounts.map(
-        (sa) => new SocialAccount(sa.provider, sa.provider_username),
       ),
     );
 

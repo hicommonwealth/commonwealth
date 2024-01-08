@@ -92,7 +92,10 @@ export const CWSelectList = <
           props?.onChange?.(newValue, actionMeta);
           if (hookToForm) {
             formContext.setValue(name, newValue);
-            newValue?.length && formContext.setError(name, null);
+            (newValue?.length ||
+              (typeof newValue === 'object' &&
+                Object.keys(newValue).length > 0)) &&
+              formContext.setError(name, null);
           }
         }}
         styles={{

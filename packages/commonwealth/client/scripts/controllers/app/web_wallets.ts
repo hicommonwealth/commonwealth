@@ -1,8 +1,9 @@
-import type { ChainBase, WalletId } from 'common-common/src/types';
+import type { ChainBase, WalletId } from '@hicommonwealth/core';
 import $ from 'jquery';
 import app from 'state';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
+import CoinbaseWebWalletController from './webWallets/coinbase_web_wallet';
 import CosmosEvmMetamaskWalletController from './webWallets/cosmos_evm_metamask_web_wallet';
 import KeplrEthereumWalletController from './webWallets/keplr_ethereum_web_wallet';
 import KeplrWebWalletController from './webWallets/keplr_web_wallet';
@@ -115,6 +116,7 @@ export default class WebWalletController {
       new PhantomWebWalletController(),
       new RoninWebWalletController(),
       new TerraWalletConnectWebWalletController(),
+      new CoinbaseWebWalletController(),
     ];
   }
 }

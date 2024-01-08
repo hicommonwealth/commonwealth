@@ -14,6 +14,7 @@ type ThreadPollCardProps = {
   onVote: () => void;
   showDeleteButton?: boolean;
   onDelete?: () => void;
+  isTopicMembershipRestricted?: boolean;
 };
 
 export const ThreadPollCard = ({
@@ -21,8 +22,16 @@ export const ThreadPollCard = ({
   onVote,
   showDeleteButton,
   onDelete,
+  isTopicMembershipRestricted = false,
 }: ThreadPollCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const getTooltipErrorMessage = () => {
+    if (!app.user.activeAccount)
+      return 'Error: You must join this community to vote.';
+    if (isTopicMembershipRestricted) return 'Error: Topic is gated.';
+    return '';
+  };
 
   return (
     <>
@@ -36,7 +45,9 @@ export const ThreadPollCard = ({
             app.user.activeAccount?.address,
           )
         }
-        disableVoteButton={!app.user.activeAccount}
+        disableVoteButton={
+          !app.user.activeAccount || isTopicMembershipRestricted
+        }
         votedFor={
           poll.getUserVote(
             app.user.activeAccount?.community?.id,
@@ -58,11 +69,7 @@ export const ThreadPollCard = ({
         })}
         incrementalVoteCast={1}
         isPreview={false}
-        tooltipErrorMessage={
-          app.user.activeAccount
-            ? null
-            : 'You must join this community to vote.'
-        }
+        tooltipErrorMessage={getTooltipErrorMessage()}
         onVoteCast={(option, isSelected) => {
           handlePollVote(poll, option, isSelected, onVote);
         }}

@@ -24,8 +24,7 @@ const createMockedGroupsController = () => {
   const topics: TopicAttributes[] = [
     {
       id: 1,
-      chain_id: 'ethereum',
-      token_threshold: '1000',
+      community_id: 'ethereum',
       name: 'hello',
       featured_in_sidebar: false,
       featured_in_new_post: false,
@@ -99,6 +98,7 @@ const createMockedGroupsController = () => {
       },
       count: async () => memberships.length,
       destroy: async () => {},
+      bulkCreate: async () => {},
     },
     CommunityRole: {
       findAll: async () => [

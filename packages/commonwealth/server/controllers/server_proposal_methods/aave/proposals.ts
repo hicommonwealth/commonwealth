@@ -1,8 +1,10 @@
-import { ProposalState } from '../../../../shared/chain/types/aave';
-import { IGovernanceV2Helper } from 'common-common/src/eth/types/IGovernanceV2Helper';
+import {
+  IGovernanceV2Helper,
+  IGovernanceV2Helper__factory,
+} from '@hicommonwealth/chains';
 import { ethers, providers } from 'ethers';
-import { IGovernanceV2Helper__factory } from 'common-common/src/eth/types/factories/IGovernanceV2Helper__factory';
 import { IAaveProposalResponse } from '../../../../shared/adapters/chain/aave/types';
+import { ProposalState } from '../../../../shared/chain/types/aave';
 
 type UnwrapPromise<T> = T extends Promise<infer U> ? U : T;
 
@@ -15,7 +17,7 @@ export type AaveContractProposalType = UnwrapPromise<
 >;
 
 export function formatAaveProposal(
-  proposal: AaveContractProposalType
+  proposal: AaveContractProposalType,
 ): IAaveProposalResponse {
   const aaveResponse: IAaveProposalResponse = {
     identifier: proposal.id.toString(),
@@ -53,19 +55,19 @@ export function formatAaveProposal(
 
 export async function getEthereumAaveProposals(
   aaveGovAddress: string,
-  provider: providers.Web3Provider
+  provider: providers.Web3Provider,
 ): Promise<AaveContractProposalsType> {
   // GovernanceV2Helper contract address on Ethereum
   const aaveGovHelperAddress = '0x16ff7583ea21055Bf5F929Ec4b896D997Ff35847';
   const govHelper = IGovernanceV2Helper__factory.connect(
     aaveGovHelperAddress,
-    provider
+    provider,
   );
 
   // TODO: @Timothee - add Redis caching - skip number of inactive/completed proposals that are cached
   return await govHelper.getProposals(
     0,
     ethers.constants.MaxUint256,
-    aaveGovAddress
+    aaveGovAddress,
   );
 }

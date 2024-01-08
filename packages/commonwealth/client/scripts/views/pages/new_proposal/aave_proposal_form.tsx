@@ -62,7 +62,7 @@ export const AaveProposalForm = () => {
         <CWLabel label="Proposer (you)" />
         <User
           userAddress={author.address}
-          userChainId={author.community?.id || author.profile?.chain}
+          userCommunityId={author.community?.id || author.profile?.chain}
           shouldLinkProfile
           shouldShowPopover
           shouldShowAddressWithDisplayName

@@ -1,4 +1,4 @@
-import { ChainNetwork } from 'common-common/src/types';
+import { ChainNetwork } from '@hicommonwealth/core';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import useForceRerender from 'hooks/useForceRerender';
@@ -104,7 +104,7 @@ const ViewProposalPage = ({
   const { data: cachedAaveProposals, isLoading: aaveProposalsLoading } =
     useAaveProposalsQuery({
       moduleReady: fetchAaveData,
-      chainId: app.chain?.id,
+      communityId: app.chain?.id,
     });
 
   const onCompound = app.chain?.network === ChainNetwork.Compound;
@@ -112,25 +112,25 @@ const ViewProposalPage = ({
   const { data: cachedCompoundProposals, isLoading: compoundProposalsLoading } =
     useCompoundProposalsQuery({
       moduleReady: fetchCompoundData,
-      chainId: app.chain?.id,
+      communityId: app.chain?.id,
     });
 
   useEffect(() => {
     if (!aaveProposalsLoading && fetchAaveData && !proposal) {
       const foundProposal = cachedAaveProposals?.find(
-        (p) => p.identifier === proposalId
+        (p) => p.identifier === proposalId,
       );
 
       if (!foundProposal?.ipfsData) {
         foundProposal.ipfsDataReady.once('ready', () =>
-          setProposal(foundProposal)
+          setProposal(foundProposal),
         );
       } else {
         setProposal(foundProposal);
       }
     } else if (!compoundProposalsLoading && fetchCompoundData && !proposal) {
       const foundProposal = cachedCompoundProposals?.find(
-        (p) => p.identifier === proposalId
+        (p) => p.identifier === proposalId,
       );
       setProposal(foundProposal);
     }
@@ -186,7 +186,7 @@ const ViewProposalPage = ({
       const newPath = getProposalUrlPath(
         proposal.slug,
         `${proposalId}-${slugTitle}`,
-        true
+        true,
       );
       navigate(newPath, { replace: true });
     }

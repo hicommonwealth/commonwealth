@@ -38,10 +38,8 @@ If you add a script to the package.json, you must add documentation here, descri
   - [start-android](#start-android)
   - [start-ios](#start-ios)
 - [Other Services](#other-services)
-  - [datadog-db-setup](#datadog-db-setup)
   - [send-cosmos-notifs](#send-cosmos-notifs)
   - [send-notification-digest-emails](#send-notification-digest-emails)
-  - [storybook](#storybook)
 - [Playwright](#playwright)
   - [e2e-start-server](#e2e-start-server)
   - [test-e2e](#test-e2e)
@@ -73,6 +71,22 @@ If you add a script to the package.json, you must add documentation here, descri
   - [cosmos:stop](#cosmos:stop)
 
 # Build Scripts
+
+## build-libs
+
+Definition: `yarn workspace @hicommonwealth/core build && yarn workspace @hicommonwealth/chains build`
+
+Description: Builds lib workspaces
+
+## build-project
+
+Definition: `yarn global add node-gyp && yarn --ignore-engines && yarn build-libs && yarn workspace commonwealth migrate-db`
+
+Description: Temporary placeholder for common script used by the CI pipeline to:
+
+- Install dependencies
+- Incrementally build project with references (tsc -b)
+- Migrate DB
 
 ## build-app
     
@@ -130,9 +144,9 @@ Contributor: Kurtis Assad
 
 ## dump-db
 
-Definition: `pg_dump $(heroku config:get CW_READ_DB -a commonwealth-beta) --verbose --exclude-table-data=\"public.\\\"Subscriptions\\\"\" --exclude-table-data=\"public.\\\"Sessions\\\"\" --exclude-table-data=\"public.\\\"DiscussionDrafts\\\"\" --exclude-table-data=\"public.\\\"LoginTokens\\\"\" --exclude-table-data=\"public.\\\"Notifications\\\"\" --exclude-table-data=\"public.\\\"SocialAccounts\\\"\" --exclude-table-data=\"public.\\\"Webhooks\\\"\" --exclude-table-data=\"public.\\\"NotificationsRead\\\"\" --no-privileges --no-owner -f latest.dump`
+Definition: `pg_dump $(heroku config:get CW_READ_DB -a commonwealth-beta) --verbose --exclude-table-data=\"public.\\\"Subscriptions\\\"\" --exclude-table-data=\"public.\\\"Sessions\\\"\" --exclude-table-data=\"public.\\\"DiscussionDrafts\\\"\" --exclude-table-data=\"public.\\\"LoginTokens\\\"\" --exclude-table-data=\"public.\\\"Notifications\\\"\" --exclude-table-data=\"public.\\\"Webhooks\\\"\" --exclude-table-data=\"public.\\\"NotificationsRead\\\"\" --no-privileges --no-owner -f latest.dump`
 
-Description: Creates a database dump file, `latest.dump`, from Heroku's commonwealth-beta db, excluding several tables such as DiscussionDrafts, Subscriptions, Notifications, and SocialAccounts.
+Description: Creates a database dump file, `latest.dump`, from Heroku's commonwealth-beta db, excluding several tables such as DiscussionDrafts, Subscriptions, and Notifications.
 
 ## dump-db-limit
 
@@ -310,14 +324,6 @@ Contributor: Dillon Chen
 
 # Other services
 
-## datadog-db-setup
-
-Definition: `chmod u+x scripts/setup-datadog-postgres.sh && ./scripts/setup-datadog-postgres.sh`
-
-Description: Helper script to complete DataDog Postgres account setup, scripts, and required config. Allows us Heroku database monitoring and stats. See [ReadMe](../packages/commonwealth/README.md) for more information on using DataDog.
-
-Contributor: Nakul Manchanda
-
 ## send-cosmos-notifs
 
 Definition: `ts-node --project tsconfig.json server/cosmosGovNotifications/generateCosmosGovNotifications.ts`
@@ -331,14 +337,6 @@ Contributor: Timothee Legros
 Definition: `SEND_EMAILS=true ts-node --project tsconfig.json server.ts`
 
 Description: Schedules a daily task for sending notification email digests.
-
-## storybook
-
-Definition: `storybook dev -p 6006`
-
-Description: Compiles and serves a development build of Storybook reflecting source code changes in-browser in real time, at localhost:6006.
-
-Contributor: Daniel Martins
 
 # Playwright
 

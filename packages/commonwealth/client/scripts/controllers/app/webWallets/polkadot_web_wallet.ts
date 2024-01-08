@@ -7,7 +7,7 @@ import { stringToHex } from '@polkadot/util';
 
 import type { SessionPayload } from '@canvas-js/interfaces';
 
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
 import { addressSwapper } from 'utils';
 
 import app from 'state';
@@ -69,11 +69,11 @@ class PolkadotWebWalletController
   // ACTIONS
   public async signCanvasMessage(
     account: Account,
-    canvasSessionPayload: SessionPayload
+    canvasSessionPayload: SessionPayload,
   ): Promise<string> {
     const canvas = await import('@canvas-js/interfaces');
     const message = stringToHex(
-      canvas.serializeSessionPayload(canvasSessionPayload)
+      canvas.serializeSessionPayload(canvasSessionPayload),
     );
 
     const signer = await this.getSigner(account.address);

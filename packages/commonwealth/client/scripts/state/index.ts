@@ -1,6 +1,6 @@
 import { Capacitor } from '@capacitor/core';
+import { ChainCategoryType } from '@hicommonwealth/core';
 import axios from 'axios';
-import { ChainCategoryType } from 'common-common/src/types';
 import { updateActiveUser } from 'controllers/app/login';
 import RecentActivityController from 'controllers/app/recent_activity';
 import CosmosAccount from 'controllers/chain/cosmos/account';
@@ -15,7 +15,6 @@ import PollsController from 'controllers/server/polls';
 import { RolesController } from 'controllers/server/roles';
 import SearchController from 'controllers/server/search';
 import SessionsController from 'controllers/server/sessions';
-import { WebSocketController } from 'controllers/server/socket';
 import { UserController } from 'controllers/server/user';
 import { EventEmitter } from 'events';
 import ChainInfo from 'models/ChainInfo';
@@ -37,7 +36,6 @@ export const enum LoginState {
 }
 
 export interface IApp {
-  socket: WebSocketController;
   chain: IChainAdapter<
     any,
     | CosmosAccount
@@ -131,7 +129,6 @@ const roles = new RolesController(user);
 
 // INITIALIZE MAIN APP
 const app: IApp = {
-  socket: new WebSocketController(),
   chain: null,
   activeChainId: () => app.chain?.id,
 
@@ -291,22 +288,12 @@ export async function initAppState(
       : LoginState.LoggedOut;
 
     if (app.loginState === LoginState.LoggedIn) {
-      console.log('Initializing socket connection with JTW:', app.user.jwt);
-      // init the websocket connection and the chain-events namespace
-      app.socket.init(app.user.jwt);
-      app.user.notifications.refresh(); // TODO: redraw if needed
+      app.user.notifications.refresh();
       if (shouldRedraw) {
         app.loginStateEmitter.emit('redraw');
       }
-    } else if (
-      app.loginState === LoginState.LoggedOut &&
-      app.socket.isConnected
-    ) {
-      // TODO: create global deinit function
-      app.socket.disconnect();
-      if (shouldRedraw) {
-        app.loginStateEmitter.emit('redraw');
-      }
+    } else if (app.loginState === LoginState.LoggedOut && shouldRedraw) {
+      app.loginStateEmitter.emit('redraw');
     }
 
     app.user.setStarredCommunities(

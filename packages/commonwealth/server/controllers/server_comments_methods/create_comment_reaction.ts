@@ -1,16 +1,16 @@
-import { AppError, ServerError } from '../../../../common-common/src/errors';
 import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
-} from '../../../../common-common/src/types';
+} from '@hicommonwealth/core';
+import { AppError, ServerError } from '../../../../common-common/src/errors';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { AddressInstance } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
 import { ReactionAttributes } from '../../models/reaction';
 import { UserInstance } from '../../models/user';
+import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { findAllRoles } from '../../util/roles';
-import validateTopicThreshold from '../../util/validateTopicThreshold';
 import { TrackOptions } from '../server_analytics_methods/track';
 import { ServerCommentsController } from '../server_comments_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
@@ -93,14 +93,16 @@ export async function __createCommentReaction(
     const isGodMode = user.isAdmin;
     const hasAdminRole = addressAdminRoles.length > 0;
     if (!isGodMode && !hasAdminRole) {
-      let canReact;
+      let canReact = false;
       try {
-        canReact = await validateTopicThreshold(
-          this.tokenBalanceCache,
+        const { isValid } = await validateTopicGroupsMembership(
           this.models,
+          this.tokenBalanceCache,
           thread.topic_id,
-          address.address,
+          community,
+          address,
         );
+        canReact = isValid;
       } catch (e) {
         throw new ServerError(`${Errors.BalanceCheckFailed}: ${e.message}`);
       }

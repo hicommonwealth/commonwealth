@@ -8,7 +8,6 @@ import app from 'state';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import ChainInfo from '../../models/ChainInfo';
-import SocialAccount from '../../models/SocialAccount';
 import StarredCommunity from '../../models/StarredCommunity';
 import { notifyError } from '../app/notifications';
 
@@ -85,15 +84,6 @@ export class UserController {
     if (shouldRedraw) {
       this.isFetched.emit('redraw');
     }
-  }
-
-  private _socialAccounts: SocialAccount[] = [];
-  public get socialAccounts(): SocialAccount[] {
-    return this._socialAccounts;
-  }
-
-  private _setSocialAccounts(socialAccounts: SocialAccount[]): void {
-    this._socialAccounts = socialAccounts;
   }
 
   private _selectedChain: ChainInfo;
@@ -232,21 +222,6 @@ export class UserController {
   public removeActiveAddress(address: Account): void {
     this._activeAccounts.splice(
       this._activeAccounts.findIndex((a) => a.address === address.address),
-      1,
-    );
-  }
-
-  public setSocialAccounts(socialAccounts: SocialAccount[]): void {
-    this._setSocialAccounts(socialAccounts);
-  }
-
-  public addSocialAccount(social: SocialAccount): void {
-    this._socialAccounts.push(social);
-  }
-
-  public removeSocialAccount(social: SocialAccount): void {
-    this._socialAccounts.splice(
-      this._socialAccounts.findIndex((s) => s.username === social.username),
       1,
     );
   }

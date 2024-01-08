@@ -22,7 +22,7 @@ export type UserAttrs = {
   // user: Account | AddressInfo | MinimumProfile | undefined;
   // role?: { permission: string };
   userAddress: string;
-  userChainId: string;
+  userCommunityId: string;
   shouldShowAsDeleted?: boolean;
   shouldShowRole?: boolean;
   shouldHideAvatar?: boolean;

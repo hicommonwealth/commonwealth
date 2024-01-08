@@ -1,11 +1,11 @@
+import { ActionArgument } from '@canvas-js/interfaces';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from '../../../server/config';
-import app, { resetDatabase } from '../../../server-test';
 import * as modelUtils from 'test/util/modelUtils';
-import { ActionArgument } from '@canvas-js/interfaces';
+import app, { resetDatabase } from '../../../server-test';
+import { JWT_SECRET } from '../../../server/config';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -31,7 +31,7 @@ describe('Polls', () => {
     userAddressId = userRes.address_id;
     userJWT = jwt.sign(
       { id: userRes.user_id, email: userRes.email },
-      JWT_SECRET
+      JWT_SECRET,
     );
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;
@@ -84,21 +84,21 @@ describe('Polls', () => {
       .post(`/api/threads/${thread.id}/polls`)
       .set('Accept', 'application/json')
       .send({
-        author_chain: thread.chain,
-        chain: thread.chain,
+        author_chain: thread.community_id,
+        chain: thread.community_id,
         address: userAddress,
         jwt: userJWT,
         ...data,
       });
 
-    expect(res.status).to.equal(200);
+    expect(res.status, JSON.stringify(res)).to.equal(200);
     expect(res.body.result).to.contain({
       prompt: data.prompt,
       options: JSON.stringify(data.options),
     });
 
     threadId = thread.id;
-    threadChain = thread.chain;
+    threadChain = thread.community_id;
     pollId = res.body.result.id;
   });
 
@@ -160,7 +160,7 @@ describe('Polls', () => {
     expect(res.body.result[0].votes[0]).to.have.property('option', 'optionA');
     expect(res.body.result[0].votes[0]).to.have.property(
       'address',
-      userAddress
+      userAddress,
     );
   });
 
@@ -200,7 +200,7 @@ describe('Polls', () => {
     expect(res.body.result[0].votes[0]).to.have.property('option', 'optionB');
     expect(res.body.result[0].votes[0]).to.have.property(
       'address',
-      userAddress
+      userAddress,
     );
   });
 

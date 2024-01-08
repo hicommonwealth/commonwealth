@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackInjectAttributesPlugin = require('html-webpack-inject-attributes-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 require('dotenv').config();
 
@@ -62,20 +63,12 @@ module.exports = {
       ),
     }),
     new webpack.DefinePlugin({
-      'process.env.FLAG_NEW_CREATE_COMMUNITY': JSON.stringify(
-        process.env.FLAG_NEW_CREATE_COMMUNITY,
-      ),
-    }),
-    new webpack.DefinePlugin({
       'process.env.FLAG_PROPOSAL_TEMPLATES': JSON.stringify(
         process.env.FLAG_PROPOSAL_TEMPLATES,
       ),
     }),
     new webpack.DefinePlugin({
       'process.env.ETH_RPC': JSON.stringify(process.env.ETH_RPC),
-    }),
-    new webpack.DefinePlugin({
-      'process.env.GATING_API_ENABLED': process.env.GATING_API_ENABLED,
     }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../client/index.html'),
@@ -99,11 +92,6 @@ module.exports = {
       chunks: 'all',
       // TODO: Commented out packages need to be code split. Commented out for now so that webpack can tree shake the imports
       cacheGroups: {
-        bitcoin: {
-          test: /[\\/]node_modules[\\/](bip39)[\\/]/,
-          name: 'bitcoin',
-          chunks: 'all',
-        },
         ethersAsync: {
           test: /[\\/]node_modules[\\/](ethers)[\\/]/,
           name: 'ethersAsync',
@@ -158,6 +146,7 @@ module.exports = {
     },
   },
   resolve: {
+    plugins: [new TsconfigPathsPlugin({})],
     extensions: ['.ts', '.tsx', '.mjs', '.js', '.jsx', '.svg'],
     modules: [
       '../client/scripts',
@@ -166,14 +155,6 @@ module.exports = {
       'node_modules', // local node modules
       '../node_modules', // global node modules
     ],
-    alias: {
-      'common-common': path.resolve(__dirname, '../../common-common'),
-      'chain-events': path.resolve(__dirname, '../../chain-events'),
-      'token-balance-cache': path.resolve(
-        __dirname,
-        '../../token-balance-cache',
-      ),
-    },
     fallback: {
       fs: false,
       net: false,
@@ -192,13 +173,7 @@ module.exports = {
       {
         // ignore ".spec.ts" test files in build
         test: /^(?!.*\.spec\.ts$).*(?:\.ts)$/,
-        include: [
-          path.resolve(__dirname, '../client'),
-          path.resolve(__dirname, '../shared'),
-          path.resolve(__dirname, '../../common-common'),
-          path.resolve(__dirname, '../../chain-events'),
-          path.resolve(__dirname, '../../token-balance-cache'),
-        ],
+
         loader: 'esbuild-loader',
         options: {
           loader: 'ts',

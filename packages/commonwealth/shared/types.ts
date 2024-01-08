@@ -1,37 +1,20 @@
-import type { SnapshotProposalAttributes } from '../server/models/snapshot_proposal';
-import type { AccessLevel } from './permissions';
+import type { SupportedNetwork } from '@hicommonwealth/core';
 import {
-  ChainEventAttributes,
   NotificationCategories,
   NotificationCategory,
-} from 'common-common/src/types';
-import type { SupportedNetwork } from '../shared/chain/types/types';
+} from '@hicommonwealth/core';
+import type { AccessLevel } from './permissions';
 
-export enum WebsocketMessageNames {
-  ChainEventNotification = 'chain-event-notification',
-  SnapshotProposalNotification = 'snapshot-proposal-notification',
-  SnapshotListener = 'snapshot-listener',
-  NewSubscriptions = 'new-subscriptions',
-  DeleteSubscriptions = 'delete-subscriptions',
-  Error = 'exception',
-}
-
-export type SnapshotProposalNotification = {
+export type SnapshotProposalAttributes = {
   id: string;
-  category_id: 'snapshot-proposal';
-  chain_id: string;
-  SnapshotProposal: SnapshotProposalAttributes;
-};
-
-export type ChainEventNotification = {
-  id: number;
-  notification_data: string;
-  chain_event_id: number;
-  category_id: 'chain-event';
-  chain_id: string;
-  updated_at: Date;
-  created_at: Date;
-  ChainEvent: ChainEventAttributes;
+  title?: string;
+  body?: string;
+  choices?: string[];
+  space: string;
+  event: string;
+  start?: string;
+  expire: string;
+  is_upstream_deleted?: boolean;
 };
 
 export const enum SnapshotEventType {
@@ -39,17 +22,6 @@ export const enum SnapshotEventType {
   Deleted = 'proposal/deleted',
   Ended = 'proposal/end',
   Started = 'proposal/start',
-}
-
-export enum WebsocketNamespaces {
-  SnapshotProposals = 'snapshot-proposals',
-  ChainEvents = 'chain-events',
-  SnapshotListener = 'snapshot-listener',
-}
-
-export enum WebsocketEngineEvents {
-  CreateRoom = 'create-room',
-  DeleteRoom = 'delete-room',
 }
 
 export interface ISnapshotNotificationData {

@@ -1,5 +1,4 @@
-import { NotificationCategories } from 'common-common/src/types';
-import { mapNotificationsDataToSubscriptions } from '../../../server/util/subscriptionMapping';
+import { NotificationCategories, SupportedNetwork } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import {
@@ -7,7 +6,7 @@ import {
   NotificationDataAndCategory,
   SnapshotEventType,
 } from 'types';
-import { SupportedNetwork } from '../../../shared/chain/types/types';
+import { mapNotificationsDataToSubscriptions } from '../../../server/util/subscriptionMapping';
 
 chai.use(chaiHttp);
 const { expect } = chai;

@@ -99,7 +99,7 @@ export const TemplateDisplayTab = ({
                 <div className="table-column">
                   <User
                     userAddress={creator.address}
-                    userChainId={
+                    userCommunityId={
                       creator.community?.id || creator?.profile?.chain
                     }
                     shouldShowAddressWithDisplayName

@@ -1,5 +1,5 @@
+import { NotificationCategories } from '@hicommonwealth/core';
 import NotificationSubscription from 'models/NotificationSubscription';
-import { NotificationCategories } from 'common-common/src/types';
 
 export type SubUniqueData =
   | {
@@ -39,7 +39,7 @@ export type SubUniqueData =
  */
 export function findSubscription(
   findOptions: SubUniqueData,
-  subs: NotificationSubscription[]
+  subs: NotificationSubscription[],
 ): NotificationSubscription {
   const categoryId = findOptions.categoryId;
   if (
@@ -48,13 +48,14 @@ export function findSubscription(
   ) {
     if (!findOptions.options.chainId) {
       console.error(
-        `Must provide the chain id to find a ${categoryId} subscription`
+        `Must provide the chain id to find a ${categoryId} subscription`,
       );
       return;
     }
     return subs.find(
       (s) =>
-        s.categoryId === categoryId && s.chainId === findOptions.options.chainId
+        s.categoryId === categoryId &&
+        s.chainId === findOptions.options.chainId,
     );
   } else if (
     categoryId === NotificationCategories.NewCollaboration ||
@@ -67,14 +68,14 @@ export function findSubscription(
   ) {
     if (!findOptions.options.threadId && !findOptions.options.commentId) {
       console.error(
-        `Must provide a thread id or comment id to find a ${categoryId} subscription`
+        `Must provide a thread id or comment id to find a ${categoryId} subscription`,
       );
       return;
     }
 
     if (findOptions.options.threadId && findOptions.options.commentId) {
       console.error(
-        `Cannot provide both a thread id and comment id to find a ${categoryId} subscription`
+        `Cannot provide both a thread id and comment id to find a ${categoryId} subscription`,
       );
       return;
     }
@@ -95,14 +96,14 @@ export function findSubscription(
   } else if (categoryId === NotificationCategories.SnapshotProposal) {
     if (!findOptions.options.snapshotId) {
       console.error(
-        'Must provide a snapshot space id to find a snapshot-proposal subscription'
+        'Must provide a snapshot space id to find a snapshot-proposal subscription',
       );
       return;
     }
     return subs.find(
       (s) =>
         s.categoryId === categoryId &&
-        s.snapshotId === findOptions.options.snapshotId
+        s.snapshotId === findOptions.options.snapshotId,
     );
   } else {
     console.error('Searching for an unsupported subscription category!');

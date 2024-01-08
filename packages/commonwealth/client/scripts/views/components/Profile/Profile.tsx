@@ -47,7 +47,7 @@ const Profile = ({ profileId }: ProfileProps) => {
       const responseComments = result.comments.map((c) => new Comment(c));
       const commentsWithAssociatedThread = responseComments.map((c) => {
         const thread = result.commentThreads.find(
-          (t) => t.id === parseInt(c.threadId, 10)
+          (t) => t.id === parseInt(c.threadId, 10),
         );
         return { ...c, thread };
       });
@@ -68,7 +68,7 @@ const Profile = ({ profileId }: ProfileProps) => {
             console.error(`Could not return AddressInfo: "${err}"`);
             return null;
           }
-        })
+        }),
       );
       setIsOwner(result.isOwner);
     } catch (err) {
@@ -137,7 +137,9 @@ const Profile = ({ profileId }: ProfileProps) => {
       >
         <div className="header">
           <CWText type="h2" fontWeight="medium">
-            {`${profile.name}'s Profile`}
+            {profile.name
+              ? `${profile.name}'s Profile`
+              : `Anonymous user's Profile`}
           </CWText>
         </div>
         <div

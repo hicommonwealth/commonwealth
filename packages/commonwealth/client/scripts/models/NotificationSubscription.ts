@@ -1,8 +1,7 @@
 import moment from 'moment';
 
-import type { SubscriptionInstance } from 'server/models/subscription';
 import type ChainInfo from './ChainInfo';
-import { default as CommentT } from './Comment';
+import { Comment as CommentT } from './Comment';
 import { Thread as ThreadT } from './Thread';
 import type { IUniqueId } from './interfaces';
 
@@ -67,7 +66,7 @@ class NotificationSubscription {
     Chain?,
     comment?: CommentT<IUniqueId>,
     thread?: ThreadT,
-    snapshotId?: string
+    snapshotId?: string,
   ) {
     this.id = id;
     this.category = category;
@@ -90,12 +89,12 @@ class NotificationSubscription {
       json.Chain,
       json.Comment,
       json.Thread,
-      json.snapshot_id
+      json.snapshot_id,
     );
   }
 }
 
-export const modelFromServer = (subscription: SubscriptionInstance) => {
+export const modelFromServer = (subscription) => {
   const {
     id,
     category_id,
@@ -125,7 +124,7 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
 
   if (Comment) {
     try {
-      modeledComment = new CommentT({ ...Comment } as any);
+      modeledComment = new CommentT({ ...Comment });
     } catch (e) {
       console.log('error', e);
     }
@@ -140,7 +139,7 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
     Chain,
     modeledComment,
     modeledThread,
-    snapshot_id
+    snapshot_id,
   );
 };
 

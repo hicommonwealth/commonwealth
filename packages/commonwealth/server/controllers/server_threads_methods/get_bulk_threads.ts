@@ -2,7 +2,7 @@ import moment from 'moment';
 import { QueryTypes } from 'sequelize';
 import { ServerError } from '../../../../common-common/src/errors';
 import { CommunityInstance } from '../../models/community';
-import { ThreadAttributes, ThreadInstance } from '../../models/thread';
+import { ThreadAttributes } from '../../models/thread';
 import { getLastEdited } from '../../util/getLastEdited';
 import { ServerThreadsController } from '../server_threads_controller';
 
@@ -39,7 +39,7 @@ export async function __getBulkThreads(
     fromDate,
     toDate,
     archived,
-  }: GetBulkThreadsOptions
+  }: GetBulkThreadsOptions,
 ): Promise<GetBulkThreadsResult> {
   // query params that bind to sql query
   const bind = (() => {
@@ -89,7 +89,7 @@ export async function __getBulkThreads(
           as threads_total_likes,
         threads.links as links,
         topics.id AS topic_id, topics.name AS topic_name, topics.description AS topic_description,
-        topics.chain_id AS topic_chain,
+        topics.community_id AS topic_community_id,
         topics.telegram AS topic_telegram,
         collaborators
       FROM "Addresses" AS addr
@@ -101,7 +101,7 @@ export async function __getBulkThreads(
           t.archived_at,
           t.updated_at AS thread_updated,
           t.locked_at AS thread_locked,
-          t.chain AS thread_chain, t.read_only, t.body, t.discord_meta, t.comment_count AS number_of_comments,
+          t.community_id AS thread_chain, t.read_only, t.body, t.discord_meta, t.comment_count AS number_of_comments,
           reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted, t.reaction_count AS total_likes,
           t.has_poll,
           t.plaintext,
@@ -122,7 +122,7 @@ export async function __getBulkThreads(
             STRING_AGG(r.id::text, ',') AS reaction_ids
             FROM "Reactions" as r
             JOIN "Threads" t2
-            ON r.thread_id = t2.id and t2.chain = $community_id ${
+            ON r.thread_id = t2.id and t2.community_id = $community_id ${
               topicId ? ` AND t2.topic_id = $topic_id ` : ''
             }
             LEFT JOIN "Addresses" ad
@@ -132,7 +132,7 @@ export async function __getBulkThreads(
         ) reactions
         ON t.id = reactions.thread_id
         WHERE t.deleted_at IS NULL
-          ${community ? ` AND t.chain = $community_id` : ''}
+          ${community ? ` AND t.community_id = $community_id` : ''}
           ${topicId ? ` AND t.topic_id = $topic_id ` : ''}
           ${stage ? ` AND t.stage = $stage ` : ''}
           ${archived ? ` AND t.archived_at IS NOT NULL ` : ''}
@@ -164,7 +164,7 @@ export async function __getBulkThreads(
       {
         bind,
         type: QueryTypes.SELECT,
-      }
+      },
     );
   } catch (e) {
     console.error(e);
@@ -219,29 +219,19 @@ export async function __getBulkThreads(
         id: t.topic_id,
         name: t.topic_name,
         description: t.topic_description,
-        chainId: t.topic_chain,
+        chainId: t.topic_community_id,
         telegram: t.telegram,
       };
     }
     return data;
   });
 
-  const countsQuery = `
-     SELECT id, title, stage FROM "Threads"
-     WHERE ${
-       community ? 'chain = $community_id AND' : ''
-     } (stage = 'proposal_in_review' OR stage = 'voting')`;
-
-  const threadsInVoting: ThreadInstance[] = await this.models.sequelize.query(
-    countsQuery,
-    {
-      bind,
-      type: QueryTypes.SELECT,
-    }
-  );
-  const numVotingThreads = threadsInVoting.filter(
-    (t) => t.stage === 'voting'
-  ).length;
+  const numVotingThreads = await this.models.Thread.count({
+    where: {
+      community_id: community?.id,
+      stage: 'voting',
+    },
+  });
 
   threads = await Promise.all(threads);
 

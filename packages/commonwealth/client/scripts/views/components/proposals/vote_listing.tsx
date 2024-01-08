@@ -70,7 +70,7 @@ export const VoteListing = (props: VoteListingProps) => {
 
   if (proposal instanceof AaveProposal) {
     (sortedVotes as AaveProposalVote[]).sort((v1, v2) =>
-      v2.power.cmp(v1.power)
+      v2.power.cmp(v1.power),
     );
   }
 
@@ -84,7 +84,7 @@ export const VoteListing = (props: VoteListingProps) => {
     return (
       <User
         userAddress={voter.address}
-        userChainId={voter.community?.id || voter.profile?.chain}
+        userCommunityId={voter.community?.id || voter.profile?.chain}
         shouldLinkProfile
         shouldShowPopover={shouldShowPopover}
       />

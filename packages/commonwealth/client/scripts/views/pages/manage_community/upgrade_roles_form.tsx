@@ -54,7 +54,7 @@ export const UpgradeRolesForm = ({
       <MembersSearchBar
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
-        chainName={app.activeChainId()}
+        communityName={app.activeChainId()}
       />
       <div className="members-container">
         <CWRadioGroup

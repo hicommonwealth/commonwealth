@@ -1,0 +1,20 @@
+{
+  "name": "@hicommonwealth/adapters",
+  "private": "true",
+  "version": "0.1.0",
+  "description": "External adapters",
+  "files": [
+    "build"
+  ],
+  "main": "build/index",
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "rm -rf build",
+    "check-types": "tsc --noEmit",
+    "test": "NODE_ENV=test ts-mocha '__tests__/**/*.spec.ts'"
+  },
+  "dependencies": {
+    "hot-shots": "^9",
+    "typescript-logging": "^0.6.4"
+  }
+}

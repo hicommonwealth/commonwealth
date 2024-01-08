@@ -1,3 +1,4 @@
+import type { RedisNamespaces } from '@hicommonwealth/core';
 import { factory, formatFilename } from 'common-common/src/logging';
 import {
   ConnectionTimeoutError,
@@ -6,7 +7,6 @@ import {
   createClient,
 } from 'redis';
 import type Rollbar from 'rollbar';
-import type { RedisNamespaces } from './types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -117,11 +117,12 @@ export class RedisCache {
   /**
    * This function facilitates setting a key-value pair in Redis. Since Redis has a single keyspace we include a prefix
    * to simulate many keyspaces. That is, all key-value pairs for a specific functionality should use a matching prefix.
-   * For example, for the chat WebSockets we store user_id => address key-value pairs. Since we may want to store other
-   * data in which the key would be the user_id we use the 'chat_socket' prefix for all key-pairs pertaining to the
-   * chat websocket. The resulting key would thus be 'chat_socket_[user_id]'. The prefix can be thought of as the
+   * For example, for if we had chat WebSockets we store user_id => address key-value pairs. Since we may want to store
+   * other data in which the key would be the user_id we use the 'chat_socket' prefix for all key-pairs pertaining to
+   * the chat websocket. The resulting key would thus be 'chat_socket_[user_id]'. The prefix can be thought of as the
    * namespace of the data that you are trying to store.
-   * @param namespace The prefix to append to the dynamic key i.e. the namespace. An instance of the RedisNamespaces enum.
+   * @param namespace The prefix to append to the dynamic key i.e. the namespace. An instance of the
+   * RedisNamespaces enum.
    * @param key The actual key you want to store (can be any valid string).
    * @param value The value to associate with the namespace and key
    * @param duration The number of seconds after which the key should be automatically 'deleted' by Redis i.e. TTL

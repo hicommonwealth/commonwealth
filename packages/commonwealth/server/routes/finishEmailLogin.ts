@@ -1,5 +1,5 @@
+import { NotificationCategories } from '@hicommonwealth/core';
 import { StatsDController } from 'common-common/src/statsd';
-import { NotificationCategories } from 'common-common/src/types';
 import type { Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
@@ -69,26 +69,16 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
           `Could not sign in with user at ${email}`,
         );
       // If the user is currently in a partly-logged-in state, merge their
-      // social accounts over to the newly found user
+      // addresses over to the newly found user
       if (previousUser && previousUser.id !== existingUser.id) {
-        const [
-          oldSocialAccounts,
-          oldAddresses,
-          newSocialAccounts,
-          newAddresses,
-        ] = await Promise.all([
-          previousUser.getSocialAccounts(),
+        const [oldAddresses, newAddresses] = await Promise.all([
           (
             await previousUser.getAddresses()
           ).filter((address) => !!address.verified),
-          existingUser.getSocialAccounts(),
           (
             await existingUser.getAddresses()
           ).filter((address) => !!address.verified),
         ]);
-        await existingUser.setSocialAccounts(
-          oldSocialAccounts.concat(newSocialAccounts),
-        );
         await existingUser.setAddresses(oldAddresses.concat(newAddresses));
       }
       if (!existingUser.emailVerified) {

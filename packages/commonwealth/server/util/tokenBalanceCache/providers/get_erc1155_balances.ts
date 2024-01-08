@@ -3,6 +3,7 @@ import AbiCoder from 'web3-eth-abi';
 import { ChainNodeInstance } from '../../../models/chain_node';
 import { rollbar } from '../../rollbar';
 import { Balances } from '../types';
+import { evmRpcRequest } from '../util';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -79,22 +80,18 @@ async function getOnChainBatchErc1155Balances(
     });
   }
 
-  // returns an array of responses where each responses data contains an array of balances
-  const response = await fetch(rpcEndpoint, {
-    method: 'POST',
-    body: JSON.stringify(rpcRequests),
-    headers: { 'Content-Type': 'application/json' },
-  });
+  const errorMsg =
+    `On-chain batch request failed ` +
+    `with batch size ${batchSize} on evm chain id ${evmChainId} for contract ${contractAddress}.`;
 
-  const datas = await response.json();
+  const datas = await evmRpcRequest(rpcEndpoint, rpcRequests, errorMsg);
+  if (!datas) return {};
+
   const addressBalanceMap = {};
 
   if (datas.error) {
-    const msg =
-      `On-chain batch request failed ` +
-      `with batch size ${batchSize} on evm chain id ${evmChainId} for contract ${contractAddress}.`;
-    rollbar.error(msg, datas.error);
-    log.error(msg, datas.error);
+    rollbar.error(errorMsg, datas.error);
+    log.error(errorMsg, datas.error);
     return {};
   } else {
     for (const data of datas) {
@@ -143,19 +140,17 @@ async function getErc1155Balance(
     id: 1,
     jsonrpc: '2.0',
   };
-  const response = await fetch(rpcEndpoint, {
-    method: 'POST',
-    body: JSON.stringify(requestBody),
-    headers: { 'Content-Type': 'application/json' },
-  });
-  const data = await response.json();
+
+  const errorMsg =
+    `ERC1155 balance fetch failed for address ${address} ` +
+    `on evm chain id ${evmChainId} on contract ${contractAddress}.`;
+
+  const data = await evmRpcRequest(rpcEndpoint, requestBody, errorMsg);
+  if (!data) return {};
 
   if (data.error) {
-    const msg =
-      `ERC1155 balance fetch failed for address ${address} ` +
-      `on evm chain id ${evmChainId} on contract ${contractAddress}.`;
-    rollbar.error(msg, data.error);
-    log.error(msg, data.error);
+    rollbar.error(errorMsg, data.error);
+    log.error(errorMsg, data.error);
     return {};
   } else {
     return {

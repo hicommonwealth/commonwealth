@@ -30,6 +30,31 @@ describe('validateRequirements', () => {
     expect(err).to.be.null;
   });
 
+  it('should pass as valid for ERC721 ContractSource', () => {
+    const requirements: Requirement[] = [
+      {
+        rule: 'threshold',
+        data: {
+          threshold: '1000',
+          source: {
+            source_type: BalanceSourceType.ERC721,
+            evm_chain_id: 1,
+            contract_address: '0x0000000000000000000000000000000000000000',
+            token_id: '1',
+          },
+        },
+      },
+      {
+        rule: 'allow',
+        data: {
+          allow: ['0x0000000000000000000000000000000000000000'],
+        },
+      },
+    ];
+    const err = validateRequirements(requirements);
+    expect(err).to.be.null;
+  });
+
   it('should pass as valid for ERC1155 ContractSource', () => {
     const requirements: Requirement[] = [
       {

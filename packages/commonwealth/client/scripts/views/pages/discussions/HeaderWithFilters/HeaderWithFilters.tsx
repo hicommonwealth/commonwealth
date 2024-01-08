@@ -89,7 +89,7 @@ export const HeaderWithFilters = ({
   const { stagesEnabled, customStages } = app.chain?.meta || {};
 
   const { data: topics } = useFetchTopicsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const featuredTopics = (topics || [])

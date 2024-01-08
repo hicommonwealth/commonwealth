@@ -21,24 +21,23 @@ type CardStyleProps = {
 
 type CardProps = {
   onClick?: (e: React.MouseEvent<HTMLElement>) => void;
-  onmouseover?: (e: React.MouseEvent<HTMLElement>) => void;
+  onMouseOver?: (e: React.MouseEvent<HTMLElement>) => void;
   onMouseEnter?: (e: React.MouseEvent<HTMLElement>) => void;
   onMouseLeave?: (e: React.MouseEvent<HTMLElement>) => void;
 } & CardStyleProps &
   React.PropsWithChildren;
 
-export const CWCard = (props: CardProps) => {
-  const {
-    className,
-    elevation,
-    fullWidth,
-    interactive = false,
-    onClick,
-    onMouseEnter,
-    onMouseLeave,
-    onmouseover,
-  } = props;
-
+export const CWCard = ({
+  className,
+  elevation,
+  fullWidth,
+  interactive = false,
+  onClick,
+  onMouseEnter,
+  onMouseLeave,
+  onMouseOver,
+  children,
+}: CardProps) => {
   return (
     <div
       className={getClasses<CardStyleProps>(
@@ -48,14 +47,14 @@ export const CWCard = (props: CardProps) => {
           interactive,
           className,
         },
-        ComponentType.Card
+        ComponentType.Card,
       )}
       onClick={onClick}
-      onMouseOver={onmouseover}
+      onMouseOver={onMouseOver}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      {props.children}
+      {children}
     </div>
   );
 };

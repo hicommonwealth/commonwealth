@@ -39,7 +39,7 @@ const OverviewPage = () => {
   }, [forceRerender]);
 
   const { data: topics = [] } = useFetchTopicsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const anyTopicsFeatured = topics.some((t) => t.featuredInSidebar);

@@ -5,7 +5,6 @@ import { JWT_SECRET } from '../config';
 import type { DB } from '../models';
 import '../types';
 import { initMagicAuth } from './magic';
-import { initSocialAccountAuth } from './socialAccount';
 
 const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
@@ -36,14 +35,13 @@ function initDefaultUserAuth(models: DB) {
         } catch (err) {
           done(err);
         }
-      }
-    )
+      },
+    ),
   );
 }
 
 export function setupPassport(models: DB) {
   initDefaultUserAuth(models);
-  initSocialAccountAuth(models);
   initMagicAuth(models);
 
   passport.serializeUser<any>((user, done) => {

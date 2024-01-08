@@ -56,13 +56,17 @@
 
     .comment-text {
       div,
-      span,
       p {
         font-size: 16px !important;
         line-height: 24px !important;
         /* identical to box height, or 143% */
-
         letter-spacing: 0.16px !important;
+      }
+      h1 {
+        font-size: 24px !important;
+      }
+      h2 {
+        font-size: 20px !important;
       }
     }
 

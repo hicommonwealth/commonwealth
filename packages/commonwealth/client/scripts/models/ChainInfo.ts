@@ -1,7 +1,7 @@
+import type { ChainNetwork, DefaultPage } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/core';
 import type { RegisteredTypes } from '@polkadot/types/types';
 import axios from 'axios';
-import type { ChainNetwork, DefaultPage } from 'common-common/src/types';
-import { ChainBase } from 'common-common/src/types';
 import { COSMOS_EVM_CHAINS } from 'controllers/app/webWallets/keplr_ethereum_web_wallet';
 import app from 'state';
 import type NodeInfo from './NodeInfo';
@@ -235,7 +235,7 @@ class ChainInfo {
   public async updateChainData({
     name,
     description,
-    socialLinks,
+    social_links,
     stagesEnabled,
     customStages,
     customDomain,
@@ -253,7 +253,7 @@ class ChainInfo {
   }: {
     name?: string;
     description?: string;
-    socialLinks?: string[];
+    social_links?: string[];
     discord?: string;
     stagesEnabled?: boolean;
     customStages?: string;
@@ -275,7 +275,7 @@ class ChainInfo {
       id,
       name,
       description,
-      socialLinks,
+      social_links,
       stages_enabled: stagesEnabled,
       custom_stages: customStages,
       custom_domain: customDomain,
@@ -295,7 +295,7 @@ class ChainInfo {
     const updatedChain = r.data.result;
     this.name = updatedChain.name;
     this.description = updatedChain.description;
-    this.socialLinks = updatedChain.socialLinks;
+    this.socialLinks = updatedChain.social_links;
     this.stagesEnabled = updatedChain.stages_enabled;
     this.customStages = updatedChain.custom_stages;
     this.customDomain = updatedChain.custom_domain;
@@ -320,19 +320,21 @@ class ChainInfo {
       remainingLinks: [],
     };
 
-    this.socialLinks.forEach((link) => {
-      if (link.includes('://discord.com') || link.includes('://discord.gg')) {
-        categorizedLinks.discords.push(link);
-      } else if (link.includes('://github.com')) {
-        categorizedLinks.githubs.push(link);
-      } else if (link.includes('://t.me')) {
-        categorizedLinks.telegrams.push(link);
-      } else if (link.includes('://matrix.to')) {
-        categorizedLinks.elements.push(link);
-      } else {
-        categorizedLinks.remainingLinks.push(link);
-      }
-    });
+    this.socialLinks
+      .filter((link) => !!link)
+      .forEach((link) => {
+        if (link.includes('://discord.com') || link.includes('://discord.gg')) {
+          categorizedLinks.discords.push(link);
+        } else if (link.includes('://github.com')) {
+          categorizedLinks.githubs.push(link);
+        } else if (link.includes('://t.me')) {
+          categorizedLinks.telegrams.push(link);
+        } else if (link.includes('://matrix.to')) {
+          categorizedLinks.elements.push(link);
+        } else {
+          categorizedLinks.remainingLinks.push(link);
+        }
+      });
 
     return categorizedLinks;
   }

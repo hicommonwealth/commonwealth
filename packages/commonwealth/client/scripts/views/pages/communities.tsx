@@ -2,7 +2,7 @@ import {
   ChainBase,
   ChainCategoryType,
   ChainNetwork,
-} from 'common-common/src/types';
+} from '@hicommonwealth/core';
 import numeral from 'numeral';
 import 'pages/communities.scss';
 import React from 'react';
@@ -129,7 +129,7 @@ const CommunitiesPage = () => {
         return threadCountB - threadCountA;
       })
       .map((community: CommunityInfo, i) => {
-        return <CommunityCard key={i} chain={community} />;
+        return <CommunityCard key={i} community={community} />;
       });
 
     return res;

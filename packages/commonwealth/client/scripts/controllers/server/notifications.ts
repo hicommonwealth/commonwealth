@@ -8,7 +8,7 @@ import NotificationSubscription, {
 
 import app from 'state';
 
-import { NotificationCategories } from 'common-common/src/types';
+import { NotificationCategories } from '@hicommonwealth/core';
 import { findSubscription, SubUniqueData } from 'helpers/findSubscription';
 import { SubscriptionInstance } from 'server/models/subscription';
 import { NotificationStore } from 'stores';
@@ -128,10 +128,6 @@ class NotificationsController {
         },
         (result: SubscriptionInstance) => {
           const newSubscription = modelFromServer(result);
-          if (newSubscription.category === 'chain-event')
-            app.socket.chainEventsNs.addChainEventSubscriptions([
-              newSubscription.chainId,
-            ]);
           this._subscriptions.push(newSubscription);
         },
       );
@@ -146,12 +142,9 @@ class NotificationsController {
         'subscription_ids[]': subscriptions.map((n) => n.id),
       },
       () => {
-        const ceSubs = [];
         for (const s of subscriptions) {
           s.enable();
-          if (s.category === 'chain-event') ceSubs.push(s.chainId);
         }
-        app.socket.chainEventsNs.addChainEventSubscriptions(ceSubs);
       },
     );
   }
@@ -169,7 +162,6 @@ class NotificationsController {
           s.disable();
           if (s.category === 'chain-event') ceSubs.push(s);
         }
-        app.socket.chainEventsNs.deleteChainEventSubscriptions(ceSubs);
       },
     );
   }
@@ -217,10 +209,6 @@ class NotificationsController {
           throw new Error('subscription not found!');
         }
         this._subscriptions.splice(idx, 1);
-        if (subscription.category === 'chain-event')
-          app.socket.chainEventsNs.deleteChainEventSubscriptions([
-            subscription,
-          ]);
       },
     );
   }
@@ -303,9 +291,6 @@ class NotificationsController {
   }
 
   public clearSubscriptions() {
-    app.socket?.chainEventsNs.deleteChainEventSubscriptions(
-      this._subscriptions,
-    );
     this._subscriptions = [];
   }
 
@@ -359,8 +344,6 @@ class NotificationsController {
   }
 
   private parseNotifications(subscriptions) {
-    const ceSubs: string[] = [];
-
     for (const subscriptionJSON of subscriptions) {
       const subscriptionId = subscriptionJSON.subscription_id;
       const categoryId = subscriptionJSON.category_id;
@@ -382,9 +365,7 @@ class NotificationsController {
             this._discussionStore.add(notification);
         }
       }
-      if (categoryId === 'chain-event') ceSubs.push(subscriptionJSON.chain_id);
     }
-    app.socket.chainEventsNs.addChainEventSubscriptions(ceSubs);
   }
 
   public getSubscriptions() {

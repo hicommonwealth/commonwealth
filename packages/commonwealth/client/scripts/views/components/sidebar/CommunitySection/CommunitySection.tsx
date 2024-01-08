@@ -45,7 +45,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
         />
       )}
 
-      {featureFlags.newCreateCommunity && <CreateCommunityButton />}
+      <CreateCommunityButton />
 
       {showAdmin && (
         <>

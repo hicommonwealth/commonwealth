@@ -1,5 +1,5 @@
+import { BalanceType } from '@hicommonwealth/core';
 import { assert, expect } from 'chai';
-import { BalanceType } from 'common-common/src/types';
 import { resetDatabase } from 'server-test';
 import models from 'server/database';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
@@ -12,7 +12,7 @@ describe('ChainNode Tests', () => {
   });
 
   it('Creates new ChainNode when', async () => {
-    const controller = new ServerCommunitiesController(models, null, null);
+    const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
       userAttributes: { email: '', id: 1, isAdmin: true },

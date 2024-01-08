@@ -22,7 +22,7 @@ class RoleInfo {
     permission: AccessLevel,
     allow: number,
     deny: number,
-    is_user_default: boolean
+    is_user_default: boolean,
   ) {
     this.id = id;
     this.address_id = address_id;

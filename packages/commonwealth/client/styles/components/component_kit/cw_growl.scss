@@ -9,6 +9,11 @@ $growl-outside-right-padding: 32px; // accounts for scrollbar width
   display: flex;
   position: fixed;
 
+  @include smallInclusive {
+    max-width: 400px;
+    max-height: 100%;
+  }
+
   &.bottom-left {
     left: $growl-outside-left-padding;
   }

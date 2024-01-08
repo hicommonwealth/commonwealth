@@ -36,7 +36,7 @@ export const CommentReactionButton = ({
   } = useCreateCommentReactionMutation({
     threadId: comment.threadId,
     commentId: comment.id,
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
   const {
     mutateAsync: deleteCommentReaction,
@@ -44,7 +44,7 @@ export const CommentReactionButton = ({
     reset: resetDeleteCommentReaction,
   } = useDeleteCommentReactionMutation({
     commentId: comment.id,
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: comment.threadId,
   });
 
@@ -77,7 +77,7 @@ export const CommentReactionButton = ({
         return r.author === activeAddress;
       });
       deleteCommentReaction({
-        chainId: app.activeChainId(),
+        communityId: app.activeChainId(),
         address: app.user.activeAccount.address,
         canvasHash: foundReaction.canvasHash,
         reactionId: foundReaction.id,
@@ -92,7 +92,7 @@ export const CommentReactionButton = ({
       createCommentReaction({
         address: activeAddress,
         commentId: comment.id,
-        chainId: app.activeChainId(),
+        communityId: app.activeChainId(),
         threadId: comment.threadId,
       }).catch((err) => {
         if (err instanceof SessionKeyError) {

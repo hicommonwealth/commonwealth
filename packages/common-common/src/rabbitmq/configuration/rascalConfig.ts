@@ -1,12 +1,4 @@
 import {
-  RascalBindings,
-  RascalExchanges,
-  RascalPublications,
-  RascalQueues,
-  RascalRoutingKeys,
-  RascalSubscriptions,
-} from '../types';
-import {
   BindingConfig,
   BrokerConfig,
   ConnectionConfig,
@@ -15,6 +7,14 @@ import {
   QueueConfig,
   SubscriptionConfig,
 } from 'rascal';
+import {
+  RascalBindings,
+  RascalExchanges,
+  RascalPublications,
+  RascalQueues,
+  RascalRoutingKeys,
+  RascalSubscriptions,
+} from '../types';
 
 type RascalExchangesType = {
   [K in RascalExchanges]: string;
@@ -55,7 +55,7 @@ type getAllRascalConfigsType = {
 export function getAllRascalConfigs(
   rabbitmq_uri: string,
   vhost: string,
-  purge: boolean
+  purge: boolean,
 ): getAllRascalConfigsType {
   const queueConfig = {
     assert: true,
@@ -95,10 +95,6 @@ export function getAllRascalConfigs(
       type: 'fanout',
       ...exchangeConfig,
     },
-    [RascalExchanges.Notifications]: {
-      type: 'topic',
-      ...exchangeConfig,
-    },
     [RascalExchanges.Discobot]: {
       type: 'fanout',
       ...exchangeConfig,
@@ -106,15 +102,6 @@ export function getAllRascalConfigs(
   };
 
   const allQueues: Record<keyof OmittedRascalQueue, QueueConfig> = {
-    [RascalQueues.ChainEventNotifications]: {
-      ...queueConfig,
-      options: {
-        arguments: {
-          ...queueOptions,
-          'x-message-ttl': 600000,
-        },
-      },
-    },
     [RascalQueues.SnapshotListener]: {
       ...queueConfig,
       options: {
@@ -130,12 +117,6 @@ export function getAllRascalConfigs(
   };
 
   const allBindings: Record<keyof OmittedRascalBindings, BindingConfig> = {
-    [RascalBindings.ChainEventNotifications]: {
-      source: RascalExchanges.Notifications,
-      destination: RascalQueues.ChainEventNotifications,
-      destinationType: 'queue',
-      bindingKey: RascalBindings.ChainEventNotifications,
-    },
     [RascalBindings.SnapshotListener]: {
       source: RascalExchanges.SnapshotListener,
       destination: RascalQueues.SnapshotListener,
@@ -151,11 +132,6 @@ export function getAllRascalConfigs(
   };
 
   const allPublications: Record<RascalPublications, PublicationConfig> = {
-    [RascalPublications.ChainEventNotifications]: {
-      exchange: RascalExchanges.Notifications,
-      routingKey: RascalRoutingKeys.ChainEventNotifications,
-      ...publicationConfig,
-    },
     [RascalPublications.SnapshotListener]: {
       exchange: RascalExchanges.SnapshotListener,
       routingKey: RascalRoutingKeys.SnapshotListener,
@@ -169,10 +145,6 @@ export function getAllRascalConfigs(
   };
 
   const allSubscriptions: Record<RascalSubscriptions, SubscriptionConfig> = {
-    [RascalSubscriptions.ChainEventNotifications]: {
-      queue: RascalQueues.ChainEventNotifications,
-      ...subscriptionConfig,
-    },
     [RascalSubscriptions.SnapshotListener]: {
       queue: RascalQueues.SnapshotListener,
       ...subscriptionConfig,

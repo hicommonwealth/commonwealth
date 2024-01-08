@@ -1,5 +1,6 @@
+/* eslint-disable react/no-multi-comp */
 /* eslint-disable no-script-url */
-import { WalletId } from 'common-common/src/types';
+import { WalletId } from '@hicommonwealth/core';
 import 'components/user/user.scss';
 import { capitalize } from 'lodash';
 import React from 'react';
@@ -15,7 +16,7 @@ export const formatAddress = (address: string) => {
   return `${address.slice(0, 8)}...${address.slice(-5)}`;
 };
 
-export const UserBlock = (props: {
+type UserProps = {
   avatarSize?: number;
   compact?: boolean;
   hideOnchainRole?: boolean;
@@ -23,21 +24,21 @@ export const UserBlock = (props: {
   searchTerm?: string;
   selected?: boolean;
   showAddressWithDisplayName?: boolean;
-  showChainName?: boolean;
+  showCommunityName?: boolean;
   showRole?: boolean;
   showLoginMethod?: boolean;
   user: Account | AddressInfo | MinimumProfile;
   hideAvatar?: boolean;
-}) => {
-  const {
-    compact,
-    searchTerm,
-    showChainName,
-    showLoginMethod,
-    user,
-    selected,
-  } = props;
+};
 
+export const UserBlock = ({
+  compact,
+  searchTerm,
+  showCommunityName,
+  showLoginMethod,
+  user,
+  selected,
+}: UserProps) => {
   let userCommunityId: string;
   if (user instanceof MinimumProfile) {
     userCommunityId = user.chain;
@@ -86,13 +87,13 @@ export const UserBlock = (props: {
             {highlightSearchTerm
               ? highlightedAddress
               : `${profile?.address.slice(0, 8)}...${profile?.address.slice(
-                  -5
+                  -5,
                 )}`}
           </div>
-          {profile?.address && showChainName && (
+          {profile?.address && showCommunityName && (
             <div className="address-divider"> · </div>
           )}
-          {showChainName && (
+          {showCommunityName && (
             <div>
               {user instanceof MinimumProfile
                 ? capitalize(user.chain)
@@ -128,7 +129,8 @@ const UserLoginBadge = ({ user }: { user: Account | AddressInfo }) => {
 
   React.useEffect(() => {
     const matchingAddress = app.user.addresses.find(
-      (a) => a.community.id === user.community?.id && a.address === user.address
+      (a) =>
+        a.community.id === user.community?.id && a.address === user.address,
     );
     if (matchingAddress) {
       setAddress(matchingAddress);
