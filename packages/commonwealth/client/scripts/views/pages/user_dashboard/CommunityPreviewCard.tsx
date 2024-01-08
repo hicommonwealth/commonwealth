@@ -44,7 +44,7 @@ const CommunityPreviewCard = ({ community }: CommunityPreviewCardProps) => {
         {community.description}
       </CWText>
       {/* if no recently active threads, hide this module altogether */}
-      {!monthlyThreadCount && (
+      {!!monthlyThreadCount && (
         <>
           <CWText className="card-subtext" type="b2" fontWeight="medium">
             {`${pluralize(monthlyThreadCount, 'new thread')} this month`}
