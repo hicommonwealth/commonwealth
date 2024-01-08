@@ -28,7 +28,7 @@ import getAddressProfile, {
 import getAddressStatus from '../routes/getAddressStatus';
 import linkExistingAddressToChain from '../routes/linkExistingAddressToChain';
 import reactionsCounts from '../routes/reactionsCounts';
-import selectChain from '../routes/selectChain';
+import selectCommunity from '../routes/selectCommunity';
 import starCommunity from '../routes/starCommunity';
 import startEmailLogin from '../routes/startEmailLogin';
 import { status } from '../routes/status';
@@ -71,9 +71,9 @@ import writeUserSetting from '../routes/writeUserSetting';
 
 import { getCanvasData, postCanvasData } from '../routes/canvas';
 
-import updateChainCategory from '../routes/updateChainCategory';
 import updateChainCustomDomain from '../routes/updateChainCustomDomain';
 import updateChainPriority from '../routes/updateChainPriority';
+import updateCommunityCategory from '../routes/updateCommunityCategory';
 import createWebhook from '../routes/webhooks/createWebhook';
 import deleteWebhook from '../routes/webhooks/deleteWebhook';
 import getWebhooks from '../routes/webhooks/getWebhooks';
@@ -316,37 +316,37 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/selectChain',
+    '/selectCommunity',
     passport.authenticate('jwt', { session: false }),
-    selectChain.bind(this, models),
+    selectCommunity.bind(this, models),
   );
 
   // communities
   registerRoute(
     router,
     'post',
-    '/communities' /* prev: POST /createChain */,
+    '/communities',
     passport.authenticate('jwt', { session: false }),
     createCommunityHandler.bind(this, serverControllers),
   );
   registerRoute(
     router,
     'delete',
-    '/communities/:communityId' /* prev: POST /deleteChain */,
+    '/communities/:communityId',
     passport.authenticate('jwt', { session: false }),
     deleteCommunityHandler.bind(this, serverControllers),
   );
   registerRoute(
     router,
     'patch',
-    '/communities/:communityId' /* prev: POST /updateChain */,
+    '/communities/:communityId',
     passport.authenticate('jwt', { session: false }),
     updateCommunityHandler.bind(this, serverControllers),
   );
   registerRoute(
     router,
     'get',
-    '/communities' /* prev: GET /chains */,
+    '/communities',
     getCommunitiesHandler.bind(this, serverControllers),
   );
   registerRoute(
@@ -358,7 +358,7 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/nodes' /* prev: POST /createChainNode */,
+    '/nodes',
     passport.authenticate('jwt', { session: false }),
     createChainNodeHandler.bind(this, serverControllers),
   );
@@ -1012,9 +1012,9 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/updateChainCategory',
+    '/updateCommunityCategory',
     passport.authenticate('jwt', { session: false }),
-    updateChainCategory.bind(this, models),
+    updateCommunityCategory.bind(this, models),
   );
 
   // signed data

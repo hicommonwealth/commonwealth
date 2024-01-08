@@ -1,5 +1,5 @@
 import { Capacitor } from '@capacitor/core';
-import { ChainCategoryType } from '@hicommonwealth/core';
+import { CommunityCategoryType } from '@hicommonwealth/core';
 import axios from 'axios';
 import { updateActiveUser } from 'controllers/app/login';
 import RecentActivityController from 'controllers/app/recent_activity';
@@ -93,7 +93,7 @@ export interface IApp {
     defaultChain: string;
     evmTestEnv?: string;
     enforceSessionKeys?: boolean;
-    chainCategoryMap?: { [chain: string]: ChainCategoryType[] };
+    chainCategoryMap?: { [chain: string]: CommunityCategoryType[] };
   };
 
   loginStatusLoaded(): boolean;

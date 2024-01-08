@@ -231,7 +231,7 @@ export class UserController {
   }
 
   public selectChain(options: { chain: string }): JQueryPromise<void> {
-    return $.post(`${app.serverUrl()}/selectChain`, {
+    return $.post(`${app.serverUrl()}/selectCommunity`, {
       chain: options.chain,
       auth: true,
       jwt: this._jwt,

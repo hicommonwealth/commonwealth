@@ -1,4 +1,4 @@
-import { ChainCategoryType } from '@hicommonwealth/core';
+import { CommunityCategoryType } from '@hicommonwealth/core';
 import axios from 'axios';
 import app from 'state';
 import { AccessLevel } from '../../../../../shared/permissions';
@@ -25,11 +25,11 @@ export const setCommunityCategories = async (
       jwt: app.user.jwt,
     };
     axios
-      .post(`${app.serverUrl()}/updateChainCategory`, params)
+      .post(`${app.serverUrl()}/updateCommunityCategory`, params)
       .then((response) => {
         if (response?.data.result) {
           const newMap = response.data.result;
-          app.config.chainCategoryMap[newMap.chain] = newMap.tags;
+          app.config.chainCategoryMap[newMap.community] = newMap.tags;
         }
         resolve();
       })
@@ -41,10 +41,10 @@ export const setCommunityCategories = async (
 
 export const setSelectedTags = (community: string) => {
   const chainToCategoriesMap: {
-    [community: string]: ChainCategoryType[];
+    [community: string]: CommunityCategoryType[];
   } = app.config.chainCategoryMap;
 
-  const types = Object.keys(ChainCategoryType);
+  const types = Object.keys(CommunityCategoryType);
   const selectedTags = {};
 
   for (const type of types) {
