@@ -15,6 +15,7 @@
   width: 100%;
 
   p {
+    @include b2;
     display: block;
     margin-block-start: 1em;
     margin-block-end: 1em;
@@ -71,16 +72,29 @@
     }
   }
 
-  ul {
+  ul,
+  ol {
+    @include b2;
+
     &:has(li p input[type='checkbox']),
     &:has(li input[type='checkbox']) {
       list-style: none;
-      padding-left: 16px;
+      padding-left: 0;
     }
 
     li:has(p input[type='checkbox']),
     li:has(input[type='checkbox']) {
       list-style-type: none;
+      display: flex;
+      align-items: center;
+    }
+
+    li {
+      input[type='checkbox'] {
+        height: 20px;
+        width: 20px;
+        margin-right: 6px;
+      }
     }
   }
 
