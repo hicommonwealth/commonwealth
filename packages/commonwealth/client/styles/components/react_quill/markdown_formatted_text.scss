@@ -113,5 +113,6 @@
   blockquote {
     @include b2;
     border-left: 2px solid $neutral-200;
+    padding-left: 24px;
   }
 }
