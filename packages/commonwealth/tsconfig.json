@@ -9,8 +9,6 @@
       "@hicommonwealth/*": ["../../libs/*/src"],
       "common-common": ["../common-common"],
       "common-common/*": ["../common-common/*"],
-      "token-balance-cache": ["../token-balance-cache"],
-      "token-balance-cache/*": ["../token-balance-cache/*"],
       "*": ["./*", "shared/*", "client/scripts/*"]
     }
   },

@@ -33,7 +33,7 @@ import {
   lookupKeyDurationInReq,
 } from '../common-common/src/cacheKeyUtils';
 
-import { factory, formatFilename } from 'common-common/src/logging';
+import { factory, formatFilename } from '@hicommonwealth/adapters';
 import { RedisCache } from 'common-common/src/redisCache';
 import { TokenBalanceCache } from './server/util/tokenBalanceCache/tokenBalanceCache';
 

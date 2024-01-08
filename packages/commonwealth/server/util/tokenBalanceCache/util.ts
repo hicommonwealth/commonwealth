@@ -1,11 +1,11 @@
-import { factory, formatFilename } from 'common-common/src/logging';
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import AbiCoder from 'web3-eth-abi';
 import { toBN } from 'web3-utils';
 import { ChainNodeAttributes } from '../../models/chain_node';
 import { rollbar } from '../rollbar';
 import { Balances } from './types';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 /**
  * This function batches hundreds of RPC requests (1 per address) into a few batched RPC requests.

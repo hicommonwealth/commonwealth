@@ -184,7 +184,6 @@
     "quill-image-uploader": "^1.0.2",
     "quill-magic-url": "^4.2.0",
     "quill-mention": "^2.2.7",
-    "rascal": "^13.1.0",
     "react": "^18.2.0",
     "react-beautiful-dnd": "^13.1.1",
     "react-device-detect": "^2.2.3",

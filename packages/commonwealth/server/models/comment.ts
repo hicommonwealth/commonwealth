@@ -6,9 +6,9 @@ import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
 
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import { IDiscordMeta } from '@hicommonwealth/core';
-import { factory, formatFilename } from 'common-common/src/logging';
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 export type CommentAttributes = {
   thread_id: string;

@@ -1,5 +1,5 @@
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import type { RedisNamespaces } from '@hicommonwealth/core';
-import { factory, formatFilename } from 'common-common/src/logging';
 import {
   ConnectionTimeoutError,
   ReconnectStrategyError,
@@ -8,7 +8,7 @@ import {
 } from 'redis';
 import type Rollbar from 'rollbar';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 export function redisRetryStrategy(retries: number) {
   if (retries > 5) {

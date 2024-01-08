@@ -1,4 +1,4 @@
-import { factory, formatFilename } from 'common-common/src/logging';
+import { factory, formatFilename } from '@hicommonwealth/adapters';
 const log = factory.getLogger(formatFilename(__filename));
 
 type DaemonTask = () => void;

@@ -8,6 +8,7 @@ import { Op, Transaction } from 'sequelize';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import {
   ChainBase,
   NotificationCategories,
@@ -15,7 +16,6 @@ import {
   WalletSsoSource,
 } from '@hicommonwealth/core';
 import { ServerError } from 'common-common/src/errors';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { verify as verifyCanvas } from '../../shared/canvas/verify';
 import { JWT_SECRET, MAGIC_API_KEY } from '../config';
 import { sequelize } from '../database';
@@ -29,7 +29,7 @@ import { UserAttributes, UserInstance } from '../models/user';
 import { TypedRequestBody } from '../types';
 import { createRole } from '../util/roles';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 type MagicLoginContext = {
   models: DB;

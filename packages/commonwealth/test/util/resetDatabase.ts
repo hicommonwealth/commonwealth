@@ -1,3 +1,4 @@
+import { factory, formatFilename } from '@hicommonwealth/adapters';
 import {
   BalanceType,
   ChainBase,
@@ -5,7 +6,6 @@ import {
   ChainType,
   NotificationCategories,
 } from '@hicommonwealth/core';
-import { factory, formatFilename } from 'common-common/src/logging';
 import models from '../../server/database';
 import { ChainNodeAttributes } from '../../server/models/chain_node';
 

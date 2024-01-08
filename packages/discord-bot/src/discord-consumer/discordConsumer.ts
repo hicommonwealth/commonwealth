@@ -1,18 +1,17 @@
 import {
+  RabbitMQController,
+  RascalConfigServices,
+  RascalSubscriptions,
+  TRmqMessages,
+  formatFilename,
+  getRabbitMQConfig,
+  loggerFactory,
+} from '@hicommonwealth/adapters';
+import {
   CommentDiscordActions,
   IDiscordMessage,
   ThreadDiscordActions,
 } from '@hicommonwealth/core';
-import { factory, formatFilename } from 'common-common/src/logging';
-import {
-  RabbitMQController,
-  getRabbitMQConfig,
-} from 'common-common/src/rabbitmq';
-import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
-import {
-  RascalSubscriptions,
-  TRmqMessages,
-} from 'common-common/src/rabbitmq/types';
 import {
   ServiceKey,
   startHealthCheckLoop,
@@ -38,7 +37,7 @@ startHealthCheckLoop({
   },
 });
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 log.info(
   `Node Option max-old-space-size set to: ${JSON.stringify(

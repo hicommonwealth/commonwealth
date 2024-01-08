@@ -1,12 +1,12 @@
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { DISCORD_BOT_SUCCESS_URL } from '../config';
 import type { DB } from '../models';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 import { decryptWithJWE, encryptWithJWE } from '../util/jwe';
-import { factory, formatFilename } from 'common-common/src/logging';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   // TODO: write unit tests
@@ -21,7 +21,7 @@ const TOKEN_EXPIRATION = 5 * 60 * 1000; // 5 minutes
 const authCallback = async (
   models: DB,
   req: TypedRequestQuery<AuthCallbackReq>,
-  res: TypedResponse<AuthCallbackResp>
+  res: TypedResponse<AuthCallbackResp>,
 ) => {
   // 1. fetch addresses associated with selected profile
   if (!req.user?.id) {
