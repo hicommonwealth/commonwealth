@@ -34,9 +34,6 @@
     "@types/node": "^18.11.8",
     "chai": "^4.3.6",
     "chai-http": "^4.3.0",
-    "concurrently": "^7.5.0",
-    "nodemon": "^2.0.20",
-    "ts-mocha": "^10.0.0",
-    "ts-node-dev": "^2.0.0"
+    "concurrently": "^7.5.0"
   }
 }
