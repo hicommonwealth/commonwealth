@@ -1,7 +1,7 @@
 import { ActionArgument } from '@canvas-js/interfaces';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import 'chai/register-should';
+
 import jwt from 'jsonwebtoken';
 import * as modelUtils from 'test/util/modelUtils';
 import app, { resetDatabase } from '../../../server-test';
