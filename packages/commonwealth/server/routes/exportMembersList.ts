@@ -57,7 +57,7 @@ const exportMembersList = async (
       LEFT JOIN 
           "Threads" "t" ON "a"."id" = "t"."address_id" AND "t"."community_id" = :chainId
       LEFT JOIN 
-          "Comments" "c" ON "a"."id" = "c"."address_id" AND "c"."chain" = :chainId
+          "Comments" "c" ON "a"."id" = "c"."address_id" AND "c"."community_id" = :chainId
       LEFT JOIN 
           "Reactions" "r" ON "a"."id" = "r"."address_id" AND "r"."chain" = :chainId
       WHERE 

@@ -38,7 +38,6 @@ If you add a script to the package.json, you must add documentation here, descri
   - [start-android](#start-android)
   - [start-ios](#start-ios)
 - [Other Services](#other-services)
-  - [datadog-db-setup](#datadog-db-setup)
   - [send-cosmos-notifs](#send-cosmos-notifs)
   - [send-notification-digest-emails](#send-notification-digest-emails)
 - [Playwright](#playwright)
@@ -332,14 +331,6 @@ Description: Uses the Capacitor tool to build and run the app's iOS project with
 Contributor: Dillon Chen
 
 # Other services
-
-## datadog-db-setup
-
-Definition: `chmod u+x scripts/setup-datadog-postgres.sh && ./scripts/setup-datadog-postgres.sh`
-
-Description: Helper script to complete DataDog Postgres account setup, scripts, and required config. Allows us Heroku database monitoring and stats. See [ReadMe](../packages/commonwealth/README.md) for more information on using DataDog.
-
-Contributor: Nakul Manchanda
 
 ## send-cosmos-notifs
 

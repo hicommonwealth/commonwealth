@@ -99,7 +99,7 @@ describe('emitNotifications tests', () => {
       thread_id: thread.id,
       address_id: userAddressId2,
       text: commentBody,
-      chain,
+      community_id: chain,
     });
 
     //reaction = await models.Reaction.create({

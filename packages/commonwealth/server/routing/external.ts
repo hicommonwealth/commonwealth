@@ -54,7 +54,7 @@ export function addExternalRoutes(
     putCommentsValidation,
     addEntities.bind(
       this,
-      'chain',
+      'community_id',
       models,
       (a) => models.Comment.bulkCreate(a),
       (req: TypedRequest<PutCommentsReq>) => req.body.comments,
@@ -64,7 +64,7 @@ export function addExternalRoutes(
     '/comments',
     passport.authenticate('jwt', { session: false }),
     onlyIds,
-    deleteEntities.bind(this, 'chain', models, models.Comment),
+    deleteEntities.bind(this, 'community_id', models, models.Comment),
   );
 
   router.get(

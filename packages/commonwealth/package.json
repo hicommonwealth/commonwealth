@@ -12,7 +12,6 @@
     "bundle-report": "webpack-bundle-analyzer --port 4200 build/stats.json",
     "clean-db": "ts-node -r tsconfig-paths/register server/scripts/cleanDb.ts",
     "create-migration": "npx sequelize migration:generate --name",
-    "datadog-db-setup": "chmod u+x scripts/setup-datadog-postgres.sh && ./scripts/setup-datadog-postgres.sh",
     "db-all": "yarn reset-db && yarn load-db && yarn migrate-db",
     "db-doc": "chmod u+x scripts/gen-mermaid-erd.sh && ./scripts/gen-mermaid-erd.sh > ../../knowledge_base/Database-ERD.md",
     "dump-db": "pg_dump $(heroku config:get CW_READ_DB -a commonwealth-beta) --verbose --exclude-table-data=\"public.\\\"Subscriptions\\\"\" --exclude-table-data=\"public.\\\"Sessions\\\"\" --exclude-table-data=\"public.\\\"LoginTokens\\\"\" --exclude-table-data=\"public.\\\"Notifications\\\"\" --exclude-table-data=\"public.\\\"Webhooks\\\"\" --exclude-table-data=\"public.\\\"NotificationsRead\\\"\" --no-privileges --no-owner -f latest.dump",

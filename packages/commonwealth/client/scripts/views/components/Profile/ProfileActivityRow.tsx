@@ -22,12 +22,11 @@ type ProfileActivityRowProps = {
 
 const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
   const navigate = useCommonNavigate();
-  const { createdAt, author, title, id, body } = activity;
-  let communityId: string;
+  const { communityId, createdAt, author, id } = activity;
+  let title: string, body: string;
   if (activity instanceof Thread) {
-    communityId = activity.communityId;
-  } else {
-    communityId = activity.chain;
+    title = activity.title;
+    body = activity.body;
   }
   const isThread = !!(activity as Thread).kind;
   const comment = activity as CommentWithAssociatedThread;

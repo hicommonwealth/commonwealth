@@ -267,7 +267,7 @@ export async function createTestEntities() {
           await models.Comment.findOrCreate({
             where: {
               id: -i - 1,
-              chain: 'cmntest',
+              community_id: 'cmntest',
               address_id: -1,
               text: '',
               thread_id: -1,
@@ -286,7 +286,7 @@ export async function createTestEntities() {
             await models.Comment.findOrCreate({
               where: {
                 id: -i - 1 - 2,
-                chain: 'cmntest',
+                community_id: 'cmntest',
                 address_id: -2,
                 text: '',
                 thread_id: -2,
