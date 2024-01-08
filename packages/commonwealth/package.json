@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "build": "tsc -b ./tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
     "bundle": "webpack --config webpack/webpack.prod.config.js --progress",
