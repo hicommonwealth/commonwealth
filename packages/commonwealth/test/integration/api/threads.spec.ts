@@ -778,7 +778,7 @@ describe('Thread Tests', () => {
           .request(app)
           .post('/api/viewCount')
           .set('Accept', 'application/json')
-          .send({ chain, object_id });
+          .send({ community_id: chain, object_id });
         expect(res.status).to.equal(200);
         expect(res.body).to.not.be.null;
         expect(res.body.status).to.equal('Success');
@@ -790,7 +790,7 @@ describe('Thread Tests', () => {
           .request(app)
           .post('/api/viewCount')
           .set('Accept', 'application/json')
-          .send({ chain, object_id });
+          .send({ community_id: chain, object_id });
         expect(res.status).to.equal(200);
         expect(res.body).to.not.be.null;
         expect(res.body.status).to.equal('Success');
@@ -803,7 +803,7 @@ describe('Thread Tests', () => {
           .request(app)
           .post('/api/viewCount')
           .set('Accept', 'application/json')
-          .send({ chain, object_id });
+          .send({ community_id: chain, object_id });
         expect(res.status).to.equal(200);
         expect(res.body).to.not.be.null;
         expect(res.body.status).to.equal('Success');
@@ -832,7 +832,7 @@ describe('Thread Tests', () => {
           .request(app)
           .post('/api/viewCount')
           .set('Accept', 'application/json')
-          .send({ chain, object_id });
+          .send({ community_id: chain, object_id });
         expect(res.status).to.equal(200);
         expect(res.body).to.not.be.null;
         expect(res.body.status).to.equal('Success');
@@ -845,7 +845,7 @@ describe('Thread Tests', () => {
           .request(app)
           .post('/api/viewCount')
           .set('Accept', 'application/json')
-          .send({ chain });
+          .send({ community_id: chain });
         expect(res.status).to.equal(400);
         expect(res.body).to.not.be.null;
         expect(res.body.error).to.equal(ViewCountErrors.NoObjectId);
@@ -859,7 +859,7 @@ describe('Thread Tests', () => {
           .send({ object_id: '9999' });
         expect(res.status).to.equal(400);
         expect(res.body).to.not.be.null;
-        expect(res.body.error).to.equal(ViewCountErrors.NoChainOrComm);
+        expect(res.body.error).to.equal(ViewCountErrors.NoCommunity);
       });
 
       it('should not track views with invalid chain or community', async () => {
@@ -867,10 +867,10 @@ describe('Thread Tests', () => {
           .request(app)
           .post('/api/viewCount')
           .set('Accept', 'application/json')
-          .send({ chain: 'adkgjkjgda', object_id: '9999' });
+          .send({ community_id: 'adkgjkjgda', object_id: '9999' });
         expect(res.status).to.equal(400);
         expect(res.body).to.not.be.null;
-        expect(res.body.error).to.equal(ViewCountErrors.InvalidChainOrComm);
+        expect(res.body.error).to.equal(ViewCountErrors.CommunityNotFound);
       });
 
       it('should not track views with invalid object_id', async () => {
@@ -878,7 +878,7 @@ describe('Thread Tests', () => {
           .request(app)
           .post('/api/viewCount')
           .set('Accept', 'application/json')
-          .send({ chain, object_id: '9999' });
+          .send({ community_id: chain, object_id: '9999' });
         expect(res.status).to.equal(400);
         expect(res.body).to.not.be.null;
         expect(res.body.error).to.equal(ViewCountErrors.InvalidThread);

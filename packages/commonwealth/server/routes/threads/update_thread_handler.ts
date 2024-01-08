@@ -35,7 +35,7 @@ export const updateThreadHandler = async (
   req: TypedRequest<UpdateThreadRequestBody, null, { id: string }>,
   res: TypedResponse<UpdateThreadResponse>,
 ) => {
-  const { user, address, chain: community } = req;
+  const { user, address, community } = req;
   const { id } = req.params;
   const {
     title,

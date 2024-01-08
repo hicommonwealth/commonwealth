@@ -13,14 +13,14 @@ const viewComments = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const chain = req.chain;
+  const { community } = req;
 
   if (!req.query.thread_id) {
     return next(new AppError(Errors.NoRootId));
   }
 
   const comments = await models.Comment.findAll({
-    where: { community_id: chain.id, thread_id: req.query.thread_id },
+    where: { community_id: community.id, thread_id: req.query.thread_id },
     include: [
       models.Address,
       {
