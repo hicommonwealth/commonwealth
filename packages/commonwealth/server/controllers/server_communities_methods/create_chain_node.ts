@@ -1,5 +1,5 @@
+import { BalanceType } from '@hicommonwealth/core';
 import { AppError } from 'common-common/src/errors';
-import { BalanceType } from 'common-common/src/types';
 import { UserInstance } from 'server/models/user';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
@@ -21,7 +21,14 @@ export type CreateChainNodeResult = { node_id: number };
 
 export async function __createChainNode(
   this: ServerCommunitiesController,
-  { user, url, name, bech32, balanceType, eth_chain_id }: CreateChainNodeOptions,
+  {
+    user,
+    url,
+    name,
+    bech32,
+    balanceType,
+    eth_chain_id,
+  }: CreateChainNodeOptions,
 ): Promise<CreateChainNodeResult> {
   if (!user.isAdmin) {
     throw new AppError(Errors.NotAdmin);
@@ -44,7 +51,7 @@ export async function __createChainNode(
     name,
     balance_type: balanceType as BalanceType,
     bech32,
-    eth_chain_id
+    eth_chain_id,
   });
 
   return { node_id: newChainNode.id };

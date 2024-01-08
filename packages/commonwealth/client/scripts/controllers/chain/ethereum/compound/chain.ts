@@ -1,7 +1,7 @@
+import type { ERC20Votes } from '@hicommonwealth/chains';
+import { ContractType } from '@hicommonwealth/core';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import BN from 'bn.js';
-import type { ERC20Votes } from 'common-common/src/eth/types';
-import { ContractType } from 'common-common/src/types';
 import type { BigNumber } from 'ethers';
 import type ChainInfo from '../../../../models/ChainInfo';
 import EthereumChain from '../chain';
@@ -18,7 +18,7 @@ export default class CompoundChain extends EthereumChain {
     return new EthereumCoin(
       this.app?.chain?.meta.default_symbol || '???',
       n,
-      inDollars
+      inDollars,
     );
   }
 
@@ -27,7 +27,7 @@ export default class CompoundChain extends EthereumChain {
     await super.initMetadata();
     // iterate through selectedChain.Contracts for the Compound type and return the address
     const compoundContracts = this.app.contracts.getByType(
-      ContractType.COMPOUND
+      ContractType.COMPOUND,
     );
     if (!compoundContracts || !compoundContracts.length) {
       throw new Error('No Compound contracts found');
@@ -35,7 +35,7 @@ export default class CompoundChain extends EthereumChain {
     const compoundContract = compoundContracts[0];
     this.compoundApi = new CompoundAPI(
       compoundContract.address,
-      this.api.currentProvider as any
+      this.api.currentProvider as any,
     );
     await this.compoundApi.init(selectedChain.tokenName);
   }
@@ -62,7 +62,7 @@ export default class CompoundChain extends EthereumChain {
     try {
       const contract = await attachSigner(
         this.app.user.activeAccount,
-        this.compoundApi.Token
+        this.compoundApi.Token,
       );
       if (this.compoundApi.isTokenMPond(contract)) {
         // automatically delegate all token when using delegation on MPond
@@ -70,7 +70,7 @@ export default class CompoundChain extends EthereumChain {
         console.log(`Delegating ${amount}`);
         const gasLimit = await contract.estimateGas.delegate(
           address,
-          amount.toString()
+          amount.toString(),
         );
         console.log(`Estimated ${gasLimit}`);
         await contract.delegate(address, amount.toString(), { gasLimit });
@@ -96,7 +96,7 @@ export default class CompoundChain extends EthereumChain {
       return null;
     } else {
       const delegate = await token.delegates(
-        this.app.user.activeAccount.address
+        this.app.user.activeAccount.address,
       );
       return delegate;
     }
@@ -112,11 +112,11 @@ export default class CompoundChain extends EthereumChain {
       if (block) {
         voteAmount = await (this.compoundApi.Token as ERC20Votes).getPastVotes(
           address,
-          block
+          block,
         );
       } else {
         voteAmount = await (this.compoundApi.Token as ERC20Votes).getVotes(
-          address
+          address,
         );
       }
     } else {

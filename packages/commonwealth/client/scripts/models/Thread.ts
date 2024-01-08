@@ -1,4 +1,4 @@
-import { ProposalType } from 'common-common/src/types';
+import { ProposalType } from '@hicommonwealth/core';
 import type MinimumProfile from 'models/MinimumProfile';
 import moment, { Moment } from 'moment';
 import type { ReactionType } from './Reaction';
@@ -43,7 +43,7 @@ function processAssociatedReactions(
   reactions: any[],
   reactionIds: any[],
   reactionType: any[],
-  addressesReacted: any[]
+  addressesReacted: any[],
 ) {
   const temp = [];
   const tempReactionIds =
@@ -137,7 +137,7 @@ export class Thread implements IUniqueId {
   public readonly slug = ProposalType.Thread;
   public readonly url: string;
   public readonly versionHistory: VersionHistory[];
-  public readonly chain: string;
+  public readonly communityId: string;
   public readonly lastEdited: Moment;
 
   public markedAsSpamAt: Moment;
@@ -164,7 +164,7 @@ export class Thread implements IUniqueId {
     kind,
     stage,
     version_history,
-    chain,
+    community_id,
     read_only,
     body,
     plaintext,
@@ -194,7 +194,7 @@ export class Thread implements IUniqueId {
     id: number;
     kind: ThreadKind;
     stage: ThreadStage;
-    chain: string;
+    community_id: string;
     url?: string;
     pinned?: boolean;
     links?: Link[];
@@ -235,7 +235,7 @@ export class Thread implements IUniqueId {
     this.authorChain = Address.community_id;
     this.pinned = pinned;
     this.url = url;
-    this.chain = chain;
+    this.communityId = community_id;
     this.readOnly = read_only;
     this.collaborators = collaborators || [];
     this.lastCommentedOn = last_commented_on ? moment(last_commented_on) : null;
@@ -259,7 +259,7 @@ export class Thread implements IUniqueId {
       reactions,
       reactionIds,
       reactionType,
-      addressesReacted
+      addressesReacted,
     );
     this.latestActivity = last_commented_on
       ? moment(last_commented_on)

@@ -1,6 +1,6 @@
+import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
 import type { Coin } from 'adapters/currency';
 import BigNumber from 'bignumber.js';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import moment from 'moment';
 import React from 'react';
 import app from 'state';
@@ -349,3 +349,17 @@ export function getDecimals(chain: IChainAdapter<Coin, Account>): number {
 
   return decimals;
 }
+
+export const shortenIdentifier = (identifer: string) => {
+  // Check if the string is longer than 6 characters
+  if (identifer.length > 6) {
+    // Extract the first three and last three characters
+    const start = identifer.substring(0, 3);
+    const end = identifer.substring(identifer.length - 3);
+    // Return the formatted string
+    return `${start}...${end}`;
+  } else {
+    // Return the original string if it's 6 characters or shorter
+    return identifer;
+  }
+};

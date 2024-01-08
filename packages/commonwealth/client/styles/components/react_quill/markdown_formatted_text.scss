@@ -1,0 +1,89 @@
+@import '../../shared';
+@import 'quill_formatted_text.scss';
+
+.MarkdownFormattedText {
+  @include b2;
+
+  position: relative;
+  word-break: break-word;
+
+  @include formatted-text();
+  @include collapsible();
+  @include hidden-formatting();
+
+  width: 100%;
+
+  p {
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
+  }
+
+  overflow: visible;
+
+  table {
+    width: 100%;
+    overflow-x: auto;
+    display: block;
+    border-collapse: collapse;
+
+    box-shadow: -3px -1px 9px 0px rgba(255, 255, 255, 0.5) inset;
+    -webkit-box-shadow: -3px -1px 9px 0px rgba(255, 255, 255, 0.5) inset;
+    -moz-box-shadow: -3px -1px 9px 0px rgba(255, 255, 255, 0.5) inset;
+
+    thead {
+      border-bottom: 1px solid $black;
+    }
+
+    tr:first-child {
+      td {
+        padding-top: 10px;
+      }
+    }
+
+    th,
+    td {
+      word-break: normal;
+      padding: 5px;
+      text-align: left;
+    }
+
+    th {
+      vertical-align: bottom;
+      border: 1px solid $neutral-200;
+    }
+
+    td {
+      vertical-align: top;
+    }
+
+    th[align='center'],
+    td[align='center'] {
+      text-align: center;
+    }
+
+    th[align='right'],
+    td[align='right'] {
+      text-align: right;
+    }
+  }
+
+  ul {
+    &:has(li p input[type='checkbox']),
+    &:has(li input[type='checkbox']) {
+      list-style: none;
+      padding-left: 16px;
+    }
+
+    li:has(p input[type='checkbox']),
+    li:has(input[type='checkbox']) {
+      list-style-type: none;
+    }
+  }
+
+  mark {
+    background-color: $primary-50;
+  }
+}

@@ -1,4 +1,4 @@
-import type { BalanceType } from 'common-common/src/types';
+import type { BalanceType } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
 import type { ModelInstance, ModelStatic } from './types';
@@ -23,7 +23,7 @@ export type ChainNodeModelStatic = ModelStatic<ChainNodeInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): ChainNodeModelStatic => {
   const ChainNode = <ChainNodeModelStatic>sequelize.define(
     'ChainNode',
@@ -60,7 +60,7 @@ export default (
       scopes: {
         withPrivateData: {},
       },
-    }
+    },
   );
 
   ChainNode.associate = (models) => {

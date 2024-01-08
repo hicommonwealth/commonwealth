@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { NotificationCategories } from '@hicommonwealth/core';
 import { AppError } from 'common-common/src/errors';
-import { NotificationCategories } from 'common-common/src/types';
 import type { NextFunction, Request, Response } from 'express';
 import { WhereOptions } from 'sequelize';
 import { SubscriptionAttributes } from 'server/models/subscription';
@@ -78,13 +79,16 @@ export default async (
           where: { id: req.body.thread_id },
         });
         if (!thread) return next(new AppError(Errors.NoThread));
-        obj = { thread_id: req.body.thread_id, chain_id: thread.chain };
+        obj = { thread_id: req.body.thread_id, chain_id: thread.community_id };
       } else if (req.body.comment_id) {
         comment = await models.Comment.findOne({
           where: { id: req.body.comment_id },
         });
         if (!comment) return next(new AppError(Errors.NoComment));
-        obj = { comment_id: req.body.comment_id, chain_id: comment.chain };
+        obj = {
+          comment_id: req.body.comment_id,
+          chain_id: comment.community_id,
+        };
       }
       break;
     }

@@ -8,11 +8,12 @@ import { uuidv4 } from 'lib/util';
 import { ComponentType } from 'views/components/component_kit/types';
 
 import { CWText } from 'views/components/component_kit/cw_text';
+import { getClasses } from '../../helpers';
 import './CWPopover.scss';
 
 export type AnchorType = HTMLElement | SVGSVGElement;
 
-type UsePopoverProps = {
+export type UsePopoverProps = {
   anchorEl: AnchorType;
   id: string;
   open: boolean;
@@ -32,7 +33,7 @@ type ComponentInteriorProps =
     }
   | {
       content?: never;
-      title?: string;
+      title?: string | React.ReactNode;
       body: React.ReactNode;
     };
 
@@ -40,6 +41,7 @@ type CWPopoverProps = {
   placement?: PopperPlacementType;
   disablePortal?: boolean;
   modifiers?: PopperOwnProps['modifiers'];
+  className?: string;
 } & UsePopoverProps &
   ComponentInteriorProps;
 
@@ -74,6 +76,7 @@ const CWPopover = ({
   content,
   id,
   open,
+  className,
   placement,
   disablePortal,
   modifiers = [],
@@ -81,7 +84,12 @@ const CWPopover = ({
   body,
 }: CWPopoverProps) => {
   const popoverContent = content || (
-    <div className={ComponentType.Popover}>
+    <div
+      className={getClasses<{ className?: string }>(
+        { className },
+        ComponentType.Popover,
+      )}
+    >
       {title && (
         <CWText type="caption" fontWeight="medium" className="popover-title">
           {title}

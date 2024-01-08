@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Session } from '@canvas-js/interfaces';
 import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
 import { verify } from 'jsonwebtoken';
@@ -7,14 +8,14 @@ import { Op, Transaction } from 'sequelize';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 
-import { ServerError } from 'common-common/src/errors';
-import { factory, formatFilename } from 'common-common/src/logging';
 import {
   ChainBase,
   NotificationCategories,
   WalletId,
   WalletSsoSource,
-} from 'common-common/src/types';
+} from '@hicommonwealth/core';
+import { ServerError } from 'common-common/src/errors';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { verify as verifyCanvas } from '../../shared/canvas/verify';
 import { JWT_SECRET, MAGIC_API_KEY } from '../config';
 import { sequelize } from '../database';

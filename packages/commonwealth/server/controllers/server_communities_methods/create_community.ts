@@ -1,20 +1,19 @@
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
-import type { Cluster } from '@solana/web3.js';
-import * as solw3 from '@solana/web3.js';
-import BN from 'bn.js';
-import { AppError } from 'common-common/src/errors';
 import {
   BalanceType,
   ChainBase,
   ChainNetwork,
   ChainType,
+  Community,
   DefaultPage,
   NotificationCategories,
-} from 'common-common/src/types';
+} from '@hicommonwealth/core';
+import type { Cluster } from '@solana/web3.js';
+import * as solw3 from '@solana/web3.js';
+import BN from 'bn.js';
+import { AppError } from 'common-common/src/errors';
 import { Op } from 'sequelize';
 import Web3 from 'web3';
-import { z } from 'zod';
-import { createCommunitySchema } from '../../../shared/schemas/createCommunitySchema';
 import { bech32ToHex, urlHasValidHTTPPrefix } from '../../../shared/utils';
 
 import { COSMOS_REGISTRY_API } from '../../config';
@@ -68,7 +67,7 @@ export const Errors = {
 
 export type CreateCommunityOptions = {
   user: UserInstance;
-  community: z.infer<typeof createCommunitySchema>;
+  community: Community.CreateCommunity;
 };
 
 export type CreateCommunityResult = {
@@ -400,7 +399,7 @@ export async function __createCommunity(
   delete nodeJSON.private_url;
 
   await this.models.Topic.create({
-    chain_id: createdCommunity.id,
+    community_id: createdCommunity.id,
     name: 'General',
     featured_in_sidebar: true,
   });

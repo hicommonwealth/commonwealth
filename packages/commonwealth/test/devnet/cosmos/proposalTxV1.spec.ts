@@ -6,7 +6,7 @@ import {
   ProposalStatus as ProposalStatusV1,
   VoteOption as VoteOptionV1,
   voteOptionToJSON,
-} from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
+} from '@hicommonwealth/chains';
 import { getLCDClient } from 'controllers/chain/cosmos/chain.utils';
 import {
   getActiveProposalsV1,

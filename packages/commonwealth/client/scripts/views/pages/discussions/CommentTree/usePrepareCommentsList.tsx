@@ -1,7 +1,8 @@
 import { commentsByDate } from 'helpers/dates';
+import type { IUniqueId } from 'models/interfaces';
+import { CommentsFeaturedFilterTypes } from 'models/types';
 import app from 'state';
 import type { Comment as CommentType } from '../../../../models/Comment';
-import { CommentsFeaturedFilterTypes } from 'models/types';
 
 const MAX_THREAD_LEVEL = 8;
 
@@ -10,7 +11,7 @@ type ExtendedComment = {
   isCommentAuthor: boolean;
   maxReplyLimitReached: boolean;
   replyBtnVisible: boolean;
-  children: CommentType<any> & ExtendedComment;
+  children: Array<CommentType<IUniqueId> & ExtendedComment>;
 };
 
 interface UsePrepareCommentsListProps {
@@ -39,7 +40,7 @@ const usePrepareCommentsList = ({
 }: UsePrepareCommentsListProps) => {
   const isLivingCommentTree = (
     comment: CommentType<any>,
-    children: Array<CommentType<any>>
+    children: Array<CommentType<any>>,
   ) => {
     if (!comment.deleted) {
       return true;
@@ -57,7 +58,7 @@ const usePrepareCommentsList = ({
         }
 
         const grandchildren = allComments.filter(
-          (c) => c.threadId === threadId && c.parentComment === comment.id
+          (c) => c.threadId === threadId && c.parentComment === comment.id,
         );
 
         for (let j = 0; j < grandchildren.length; j++) {
@@ -79,7 +80,7 @@ const usePrepareCommentsList = ({
   // This functions creates recursively a tree of zero level comments and their nested children (replies)
   const recursivelyGatherComments = (
     _levelZeroComments: Array<CommentType<any>>,
-    threadLevel: number
+    threadLevel: number,
   ): Array<CommentType<any> & ExtendedComment> => {
     const canContinueThreading = threadLevel <= MAX_THREAD_LEVEL;
 
@@ -94,7 +95,7 @@ const usePrepareCommentsList = ({
           const children = allComments
             // take only comments that are direct children of current comment
             .filter(
-              (c) => c.threadId === threadId && c.parentComment === comment.id
+              (c) => c.threadId === threadId && c.parentComment === comment.id,
             )
             // sorts comments and nested comments according to user selection from dropdown
             .sort((a, b) => commentsByDate(a, b, commentSortType));
@@ -134,11 +135,12 @@ const usePrepareCommentsList = ({
   // This functions transforms nested list of comments created by "recursivelyGatherComments"
   // into flat list which is exactly in the order how user would see this in the UI
   const getFlattenComments = (
-    _comments: Array<CommentType<any> & ExtendedComment>
+    _comments: Array<CommentType<IUniqueId> & ExtendedComment>,
   ) => {
-    const flattenedComments: Array<CommentType<any> & ExtendedComment> = [];
+    const flattenedComments: Array<CommentType<IUniqueId> & ExtendedComment> =
+      [];
 
-    const flatten = (comment: CommentType<any> & ExtendedComment) => {
+    const flatten = (comment: CommentType<IUniqueId> & ExtendedComment) => {
       flattenedComments.push(comment);
 
       if (comment.children && comment.children.length > 0) {

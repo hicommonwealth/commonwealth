@@ -32,7 +32,7 @@ const createThread = async ({
   url,
   readOnly,
   authorProfile,
-}: CreateThreadProps) => {
+}: CreateThreadProps): Promise<Thread> => {
   const {
     action = null,
     session = null,

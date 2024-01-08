@@ -4,11 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc --project tsconfig.json && tsc-alias",
+    "build": "tsc -b && tsc-alias",
+    "clean": "rm -rf build",
+    "check-types": "tsc --noEmit",
     "lint-all": "eslint './**/*.ts'",
-    "check-types": "tsc --project tsconfig.json --noEmit",
     "start": "ts-node-dev --max-old-space-size=4096 --respawn src/index.ts",
-    "test": "ts-mocha -p tsconfig.json --exit './test/**/*.spec.ts'"
+    "test": "ts-mocha --exit './test/**/*.spec.ts'"
   },
   "engines": {
     "node": "18.x"
@@ -22,9 +23,9 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "ts-node": "^10.9.1",
-    "tsc-alias": "^1.8.2",
     "tslog": "^3.3.4",
-    "typescript": "^4.8.4"
+    "typescript": "^4.8.4",
+    "@hicommonwealth/core": "*"
   },
   "devDependencies": {
     "@types/amqplib": "^0.8.2",

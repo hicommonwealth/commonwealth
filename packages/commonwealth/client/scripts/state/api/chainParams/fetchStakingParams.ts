@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import app from 'state';
 
-import { ChainBase } from 'common-common/src/types';
+import { ChainBase } from '@hicommonwealth/core';
 import Cosmos from 'controllers/chain/cosmos/adapter';
 
 const STAKING_PARAMS_CACHE_TIME = Infinity;

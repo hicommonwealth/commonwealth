@@ -23,6 +23,7 @@ import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps'
 import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
+
 import {
   createDeltaFromText,
   ReactQuillEditor,
@@ -31,6 +32,7 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { AvatarUpload } from '../Avatar';
 import CommunityStakeBanner from '../CommunityStakeBanner';
+import UpvotePopover from '../UpvotePopover';
 import { CWCard } from './cw_card';
 import { CWCheckbox } from './cw_checkbox';
 import { CWCollapsible } from './cw_collapsible';
@@ -67,6 +69,7 @@ import { CWTag } from './new_designs/CWTag';
 import { CWTextInput } from './new_designs/CWTextInput';
 import { CWTooltip } from './new_designs/CWTooltip';
 import { CWTypeaheadSelectList } from './new_designs/CWTypeaheadSelectList';
+import CWVoteWeightModule from './new_designs/CWVoteWeightModule';
 import { createColumnInfo, makeData, optionList } from './showcase_helpers';
 
 const displayIcons = (icons) => {
@@ -237,6 +240,7 @@ export const ComponentShowcase = () => {
 
   const unstyledPopoverProps = usePopover();
   const styledPopoverProps = usePopover();
+  const upvotePopoverProps = usePopover();
 
   const renderModal = (size?: ModalSize) => {
     return (
@@ -376,6 +380,30 @@ export const ComponentShowcase = () => {
             title="Title"
             body={<div>This is body in styled popover</div>}
             {...styledPopoverProps}
+          />
+        </div>
+      </div>
+      <div className="basic-gallery">
+        <CWText type="h3">Upvote Popover</CWText>
+        <div
+          className="upvote-popover-wrapper"
+          onMouseEnter={upvotePopoverProps.handleInteraction}
+          onMouseLeave={upvotePopoverProps.handleInteraction}
+        >
+          <CWIconButton buttonSize="med" iconName="infoEmpty" />
+          <UpvotePopover
+            upvoters={[
+              '0x4d9E3fEEe018eD9bD86f0F9D61C682E2e97e777F',
+              '0x7C06900b29462995EB25525B87Ff5267016E49E2',
+              '0x6d3735749DfD7dA2A5f6528fC39938aF1760e6a4',
+              '0xe5B4c6C331Bbc6E2a2017a29E8e1D0754354b6cF',
+              '0x7A7C614EDFA324d61F5E897f085c18E007aE3dFf',
+              '0x04eE16f6FFD615eB448e8d939Dbcf28a2e064f0b',
+              '0x8Ae9b627637eaFeF5eC2E39b8A88b40bAA66af81',
+              '0xcB565Ee70934c5887F9459fb0Dcec6ADD7F43CF2',
+              '0xFcC142B9f39A9379B2D3f2621b67e10A907FeFF8',
+            ]}
+            {...upvotePopoverProps}
           />
         </div>
       </div>
@@ -2127,6 +2155,15 @@ export const ComponentShowcase = () => {
             { label: 'Second Step', state: 'active' },
             { label: 'Third Step', state: 'inactive' },
           ]}
+        />
+      </div>
+      <div>
+        <CWText type="h3">Vote Weight Module</CWText>
+        <CWVoteWeightModule
+          voteWeight={100}
+          stakeNumber={1}
+          stakeValue={0.072}
+          denomination="ETH"
         />
       </div>
     </div>

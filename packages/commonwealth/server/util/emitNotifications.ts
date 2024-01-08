@@ -1,5 +1,7 @@
+/* eslint-disable max-len */
+import { NotificationCategories } from '@hicommonwealth/core';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { StatsDController } from 'common-common/src/statsd';
-import { NotificationCategories } from 'common-common/src/types';
 import Sequelize, { QueryTypes } from 'sequelize';
 import type {
   IChainEventNotificationData,
@@ -13,10 +15,9 @@ import {
   createImmediateNotificationEmailObject,
   sendImmediateNotificationEmail,
 } from '../scripts/emails';
-import { factory, formatFilename } from 'common-common/src/logging';
+import { rollbar } from './rollbar';
 import { mapNotificationsDataToSubscriptions } from './subscriptionMapping';
 import { dispatchWebhooks } from './webhooks/dispatchWebhook';
-import { rollbar } from './rollbar';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -26,7 +27,7 @@ export default async function emitNotifications(
   models: DB,
   notification_data_and_category: NotificationDataAndCategory,
   excludeAddresses?: string[],
-  includeAddresses?: string[]
+  includeAddresses?: string[],
 ): Promise<NotificationInstance> {
   const notification_data = notification_data_and_category.data;
   const category_id = notification_data_and_category.categoryId;
@@ -38,7 +39,7 @@ export default async function emitNotifications(
   });
 
   const uniqueOptions = mapNotificationsDataToSubscriptions(
-    notification_data_and_category
+    notification_data_and_category,
   );
   const findOptions: any = {
     [Op.and]: [{ category_id }, { ...uniqueOptions }, { is_active: true }],
@@ -54,7 +55,7 @@ export default async function emitNotifications(
 
   // retrieve distinct user ids given a set of addresses
   const fetchUsersFromAddresses = async (
-    addresses: string[]
+    addresses: string[],
   ): Promise<number[]> => {
     // fetch user ids from address models
     const addressModels = await models.Address.findAll({
@@ -69,7 +70,7 @@ export default async function emitNotifications(
 
       // remove duplicates and null user_ids
       const userIdsDedup = userIds.filter(
-        (a, b) => userIds.indexOf(a) === b && a !== null
+        (a, b) => userIds.indexOf(a) === b && a !== null,
       );
       return userIdsDedup;
     } else {
@@ -139,7 +140,7 @@ export default async function emitNotifications(
       msg = await createImmediateNotificationEmailObject(
         notification_data,
         category_id,
-        models
+        models,
       );
     }
   } catch (e) {
@@ -163,14 +164,14 @@ export default async function emitNotifications(
         notification.id,
         subscription.id,
         false,
-        subscription.subscriber_id
+        subscription.subscriber_id,
       );
     } else {
       // TODO: rollbar reported issue originates from here
       log.info(
         `Subscription: ${JSON.stringify(
-          subscription.toJSON()
-        )}\nNotification_data: ${JSON.stringify(notification_data)}`
+          subscription.toJSON(),
+        )}\nNotification_data: ${JSON.stringify(notification_data)}`,
       );
     }
   }

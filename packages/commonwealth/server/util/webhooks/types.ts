@@ -1,4 +1,4 @@
-import { NotificationCategories } from 'common-common/src/types';
+import { NotificationCategories } from '@hicommonwealth/core';
 
 export enum WebhookDestinations {
   Discord = 'discord',

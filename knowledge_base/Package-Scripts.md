@@ -38,10 +38,8 @@ If you add a script to the package.json, you must add documentation here, descri
   - [start-android](#start-android)
   - [start-ios](#start-ios)
 - [Other Services](#other-services)
-  - [datadog-db-setup](#datadog-db-setup)
   - [send-cosmos-notifs](#send-cosmos-notifs)
   - [send-notification-digest-emails](#send-notification-digest-emails)
-  - [storybook](#storybook)
 - [Playwright](#playwright)
   - [e2e-start-server](#e2e-start-server)
   - [test-e2e](#test-e2e)
@@ -74,23 +72,47 @@ If you add a script to the package.json, you must add documentation here, descri
 
 # Build Scripts
 
-## build-all
+## Application Build
 
-Definition: `NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.prod.config.js --progress && yarn build-consumer`
+Script: `yarn build`
 
-Description: Runs webpack on our front-end code with 4096MB memory allocated to Node. If successful, fires the build-consumer script.
+Definition: `chmod u+x scripts/build.sh && ./scripts/build.sh`
 
-## heroku-postbuild
+Description:
 
-Definition: `NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) webpack --config webpack/webpack.prod.config.js --progress && yarn build-consumer`
+- Default: Runs webpack on our front-end code with 4096MB memory allocated to Node
+- Default: If successful, fires the commonwalth app build script
+- Optional: To build other app workspaces, see `/scripts/build.sh` for configuration options
 
-Description: Builds project on Heroku, using `get-max-old-space-size.sh` to dynamically allocate memory, then running webpack and the [build-consumer](#build-consumer) script
+## CI Build
 
-## heroku-prebuild
+Script: `yarn build-ci`
+
+Definition: `yarn global add node-gyp && yarn --ignore-engines && yarn build && yarn workspace commonwealth migrate-db`
+
+Description:
+
+- Installs node-gyp (a library for compiling dependencies) prior to installing dependencies. Fixes error we get when building dependencies which blocks production releases and fails CI runs.
+- Installs node modules, ignoring engine errors
+- Runs the default application build script (above)
+- Runs db migrations
+
+## Heroku Build
+
+### heroku-prebuild
 
 Definition: `yarn global add node-gyp`
 
 Description: Installs node-gyp (a library for compiling dependencies) prior to installing dependencies. Fixes error we get when building dependencies which blocks production releases and fails CI runs.
+
+### heroku-postbuild
+
+Definition: `chmod u+x scripts/heroku-build.sh && ./scripts/heroku-build.sh`
+
+Description:
+
+- Builds project on Heroku by calling application build script (above), using configuration variables (CW_BUILD, SL_BUILD, DL_BUILD)
+- Cleans other apps and unnecessary code in the monorepo
 
 # CI Scripts
 
@@ -310,14 +332,6 @@ Contributor: Dillon Chen
 
 # Other services
 
-## datadog-db-setup
-
-Definition: `chmod u+x scripts/setup-datadog-postgres.sh && ./scripts/setup-datadog-postgres.sh`
-
-Description: Helper script to complete DataDog Postgres account setup, scripts, and required config. Allows us Heroku database monitoring and stats. See [ReadMe](../packages/commonwealth/README.md) for more information on using DataDog.
-
-Contributor: Nakul Manchanda
-
 ## send-cosmos-notifs
 
 Definition: `ts-node --project tsconfig.json server/cosmosGovNotifications/generateCosmosGovNotifications.ts`
@@ -331,14 +345,6 @@ Contributor: Timothee Legros
 Definition: `SEND_EMAILS=true ts-node --project tsconfig.json server.ts`
 
 Description: Schedules a daily task for sending notification email digests.
-
-## storybook
-
-Definition: `storybook dev -p 6006`
-
-Description: Compiles and serves a development build of Storybook reflecting source code changes in-browser in real time, at localhost:6006.
-
-Contributor: Daniel Martins
 
 # Playwright
 
@@ -462,12 +468,6 @@ Contributor: Ryan Bennett
 
 # TypeScript
 
-## build-consumer
-
-Definition: `tsc --project tsconfig.worker.json && tsc-alias --project tsconfig.worker.json`
-
-Description: Runs a compilation based on tsconfig.worker.json; does not emit files; replaces alias with relative paths post-compilation.
-
 ## check-types
 
 Definition: `tsc --noEmit`
@@ -502,13 +502,13 @@ Description: Runs `yarn start` and `yarn start-consumer` (i.e., the main app ser
 
 ## start-consumer
 
-Definition: `ts-node --project tsconfig.worker.json server/workers/commonwealthConsumer/commonwealthConsumer.ts run-as-script`
+Definition: `ts-node -r tsconfig-paths/register server/workers/commonwealthConsumer/commonwealthConsumer.ts run-as-script`
 
 Description: Runs `CommonwealthConsumer.ts` script, which consumes & processes RabbitMQ messages from external apps and services. See script file for more complete documentation.
 
 ## start-evm-ce
 
-Definition: `ts-node ./server/workers/evmChainEvents/startEvmPolling.ts`
+Definition: `ts-node -r tsconfig-paths/register server/workers/evmChainEvents/startEvmPolling.ts`
 
 Description: Runs `startEvmPolling.ts` script, which polls Ethereum chains for events in order to generate notifications.
 

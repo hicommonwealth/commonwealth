@@ -12,7 +12,7 @@ chai.use(chaiHttp);
 describe('getComments Tests', () => {
   it('should return comments with specified community_id correctly', async () => {
     const r: GetCommentsReq = {
-      community_id: testComments[0].chain,
+      community_id: testComments[0].community_id,
       count_only: false,
     };
     const resp = await get('/api/comments', r);
@@ -22,7 +22,7 @@ describe('getComments Tests', () => {
 
   it('should return count only when specified correctly', async () => {
     const r: GetCommentsReq = {
-      community_id: testComments[0].chain,
+      community_id: testComments[0].community_id,
       count_only: true,
     };
     const resp = await get('/api/comments', r);
@@ -33,7 +33,7 @@ describe('getComments Tests', () => {
 
   it('should return comments with specified addresses correctly', async () => {
     const r: GetCommentsReq = {
-      community_id: testComments[0].chain,
+      community_id: testComments[0].community_id,
       addresses: ['testAddress-1'],
     };
 
@@ -49,7 +49,7 @@ describe('getComments Tests', () => {
 
   it('should return comments with specified thread_id correctly', async () => {
     const r: GetCommentsReq = {
-      community_id: testComments[0].chain,
+      community_id: testComments[0].community_id,
       thread_ids: [parseInt(testComments[0].thread_id)],
     };
 
@@ -65,7 +65,7 @@ describe('getComments Tests', () => {
 
   it('should paginate correctly', async () => {
     const r: GetCommentsReq = {
-      community_id: testComments[0].chain,
+      community_id: testComments[0].community_id,
       addresses: ['testAddress-2'],
       limit: 2,
     };
@@ -86,7 +86,7 @@ describe('getComments Tests', () => {
 
   it('should order correctly', async () => {
     const r: GetCommentsReq = {
-      community_id: testComments[0].chain,
+      community_id: testComments[0].community_id,
       addresses: ['testAddress-2'],
       sort: OrderByOptions.CREATED,
     };
@@ -123,7 +123,7 @@ describe('getComments Tests', () => {
 
     resp = await get(
       '/api/comments',
-      { community_id: testComments[0].chain, count_only: 3 },
+      { community_id: testComments[0].community_id, count_only: 3 },
       true,
     );
 

@@ -1,10 +1,10 @@
 import { BigNumber } from 'ethers';
-import { TypedEvent } from 'common-common/src/eth/types/commons';
 
 export enum GovVersion {
   Alpha = 'alpha',
   Bravo = 'bravo',
   OzBravo = 'oz-bravo',
+  OzCountSimple = 'raw-oz',
 }
 
 export type CompoundProposalType = {
@@ -28,7 +28,7 @@ export type ProposalCreatedEventArgsArray = [
   string[],
   BigNumber,
   BigNumber,
-  string
+  string,
 ];
 
 export type ProposalCreatedEventArgsObject = {
@@ -46,7 +46,7 @@ export type ProposalCreatedEventArgsObject = {
 export type ResolvedProposalPromises = [
   ProposalCreatedEventArgsObject[],
   CompoundProposalType[],
-  number[]
+  number[],
 ];
 
 export type ProposalDataType = {

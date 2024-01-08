@@ -1,4 +1,4 @@
-import { IDiscordMeta } from 'common-common/src/types';
+import { IDiscordMeta } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
@@ -32,7 +32,7 @@ export type ThreadAttributes = {
   url?: string;
   topic_id?: number;
   pinned?: boolean;
-  chain: string;
+  community_id: string;
   view_count: number;
   links: Link[] | null;
 
@@ -56,7 +56,7 @@ export type ThreadAttributes = {
   discord_meta?: IDiscordMeta;
 
   // associations
-  Chain?: CommunityAttributes;
+  Community?: CommunityAttributes;
   Address?: AddressAttributes;
   collaborators?: AddressAttributes[];
   topic?: TopicAttributes;
@@ -102,7 +102,7 @@ export default (
         defaultValue: false,
         allowNull: false,
       },
-      chain: { type: dataTypes.STRING, allowNull: false },
+      community_id: { type: dataTypes.STRING, allowNull: false },
       view_count: {
         type: dataTypes.INTEGER,
         allowNull: false,
@@ -168,11 +168,11 @@ export default (
       paranoid: true,
       indexes: [
         { fields: ['address_id'] },
-        { fields: ['chain'] },
-        { fields: ['chain', 'created_at'] },
-        { fields: ['chain', 'updated_at'] },
-        { fields: ['chain', 'pinned'] },
-        { fields: ['chain', 'has_poll'] },
+        { fields: ['community_id'] },
+        { fields: ['community_id', 'created_at'] },
+        { fields: ['community_id', 'updated_at'] },
+        { fields: ['community_id', 'pinned'] },
+        { fields: ['community_id', 'has_poll'] },
         { fields: ['canvas_hash'] },
       ],
     },
@@ -180,8 +180,9 @@ export default (
 
   Thread.associate = (models) => {
     models.Thread.belongsTo(models.Community, {
-      foreignKey: 'chain',
+      foreignKey: 'community_id',
       targetKey: 'id',
+      as: 'Community',
     });
     models.Thread.belongsTo(models.Address, {
       as: 'Address',
