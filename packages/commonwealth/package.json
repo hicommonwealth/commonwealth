@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "tsc -b && tsc-alias",
+    "build": "exit 2",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
     "bundle": "webpack --config webpack/webpack.prod.config.js --progress",
