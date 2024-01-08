@@ -10,7 +10,6 @@ If you add a new environment variable, you must add documentation here. Please d
 
 ## Contents
 
-- [AIRPLANE_SECRET](#airplane_secret)
 - [AWS_ACCESS_KEY_ID](#aws_access_key_id)
 - [AWS_REGION](#aws_region)
 - [AWS_SECRET_ACCESS_KEY](#aws_secret_access_key)
@@ -83,13 +82,9 @@ If you add a new environment variable, you must add documentation here. Please d
 - [WITH_PRERENDER](#with_prerender)
 - [ZAPIER_WEBHOOK_URL_DEV](#zapier_webhook_url_dev)
 
-## AIRPLANE_SECRET
-
-We use Airplane.dev tasks for our custom domains. See our [Custom-Domains.md](./knowledge_base/Custom-Domains.md) entry for more info.
-
 ## AWS_ACCESS_KEY_ID
 
-AWS access key ID for programmatic requests. Used alongside `AWS_SECRET_ACCESS_KEY`.
+AWS access key ID for programmatic requests. Used alongside `AWS_SECRET_ACCESS_KEY`. Read by our `aws4`, `aws-sdk`, and `rollbar` libraries.
 
 ## AWS_REGION
 
@@ -97,7 +92,7 @@ AWS region used primarily for uploading local image files. Common uses `us-east-
 
 ## AWS_SECRET_ACCESS_KEY
 
-AWS secret used alongside `AWS_ACCESS_KEY_ID`.
+AWS secret used alongside `AWS_ACCESS_KEY_ID`. Read by our `aws4`, `aws-sdk`, and `rollbar` libraries.
 
 ## AXIE_SHARED_SECRET
 
@@ -115,13 +110,13 @@ Required in production. The URI of our RabbitMQ instance. This value is usually 
 
 Comma-separated list (e.g. "kyve,csdk") of Cosmos chains using v1 (not v1beta1). As of 231212, this should be `kyve,csdk,csdk-v1,quicksilver-protocol,juno,regen` by default.
 
-Owner: Mark Hegel.
+Owner: Mark Hagelberg.
 
 ## COSMOS_REGISTRY_API
 
 Community-maintained data source for Cosmos ecosystem blockchains. Pulls from a [GitHub repo](https://github.com/cosmos/chain-registry/) as its source of truth. As of 231212, this should be `https://cosmoschains.thesilverfox.pro` by default.
 
-Owner: Mark Hegel.
+Owner: Mark Hagelberg.
 
 ## CW_BOT_KEY
 
@@ -257,7 +252,7 @@ Publishable API key for Magic login; as of 231212, development uses `pk_live_EF8
 
 ## MAGIC_SUPPORTED_BASES
 
-Chain bases supported for Magic login; as of 231212, we use  `substrate,ethereum`.
+Chain bases supported for Magic login; as of 231212, we use `cosmos,ethereum`.
 
 ## MIXPANEL_DEV_TOKEN
 
