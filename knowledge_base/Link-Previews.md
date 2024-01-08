@@ -9,7 +9,7 @@ To get link previews, you will need to do the following:
 3. Run against the built site in the packages/commonwealth folder with:
 
     ```bash
-    NO_TOKEN_BALANCE_CACHE=true NO_PRERENDER=true NO_CLIENT_SERVER=true MIXPANEL_DEV_TOKEN=foo MIXPANEL_PROD_TOKEN=bar NODE_ENV=production npx ts-node -T -r tsconfig-paths/register server.ts
+    NO_PRERENDER=true NO_CLIENT_SERVER=true MIXPANEL_DEV_TOKEN=foo MIXPANEL_PROD_TOKEN=bar NODE_ENV=production npx ts-node -T -r tsconfig-paths/register server.ts
     ```
 
 4. With the site running, query the link preview with `curl -G http://localhost:8080/<url>`
