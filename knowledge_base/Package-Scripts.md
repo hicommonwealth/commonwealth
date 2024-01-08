@@ -72,39 +72,47 @@ If you add a script to the package.json, you must add documentation here, descri
 
 # Build Scripts
 
-## build-libs
+## Application Build
 
-Definition: `yarn workspace @hicommonwealth/core build && yarn workspace @hicommonwealth/chains build`
+Script: `yarn build`
 
-Description: Builds lib workspaces
+Definition: `chmod u+x scripts/build.sh && ./scripts/build.sh`
 
-## build-project
+Description:
 
-Definition: `yarn global add node-gyp && yarn --ignore-engines && yarn build-libs && yarn workspace commonwealth migrate-db`
+- Default: Runs webpack on our front-end code with 4096MB memory allocated to Node
+- Default: If successful, fires the commonwalth app build script
+- Optional: To build other app workspaces, see `/scripts/build.sh` for configuration options
 
-Description: Temporary placeholder for common script used by the CI pipeline to:
+## CI Build
 
-- Install dependencies
-- Incrementally build project with references (tsc -b)
-- Migrate DB
+Script: `yarn build-ci`
 
-## build-all
+Definition: `yarn global add node-gyp && yarn --ignore-engines && yarn build && yarn workspace commonwealth migrate-db`
 
-Definition: `NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.prod.config.js --progress && yarn build-consumer`
+Description:
 
-Description: Runs webpack on our front-end code with 4096MB memory allocated to Node. If successful, fires the build-consumer script.
+- Installs node-gyp (a library for compiling dependencies) prior to installing dependencies. Fixes error we get when building dependencies which blocks production releases and fails CI runs.
+- Installs node modules, ignoring engine errors
+- Runs the default application build script (above)
+- Runs db migrations
 
-## heroku-postbuild
+## Heroku Build
 
-Definition: `NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) webpack --config webpack/webpack.prod.config.js --progress && yarn build-consumer`
-
-Description: Builds project on Heroku, using `get-max-old-space-size.sh` to dynamically allocate memory, then running webpack and the [build-consumer](#build-consumer) script
-
-## heroku-prebuild
+### heroku-prebuild
 
 Definition: `yarn global add node-gyp`
 
 Description: Installs node-gyp (a library for compiling dependencies) prior to installing dependencies. Fixes error we get when building dependencies which blocks production releases and fails CI runs.
+
+### heroku-postbuild
+
+Definition: `chmod u+x scripts/heroku-build.sh && ./scripts/heroku-build.sh`
+
+Description:
+
+- Builds project on Heroku by calling application build script (above), using configuration variables (CW_BUILD, SL_BUILD, DL_BUILD)
+- Cleans other apps and unnecessary code in the monorepo
 
 # CI Scripts
 
@@ -460,12 +468,6 @@ Contributor: Ryan Bennett
 
 # TypeScript
 
-## build-consumer
-
-Definition: `tsc --project tsconfig.worker.json && tsc-alias --project tsconfig.worker.json`
-
-Description: Runs a compilation based on tsconfig.worker.json; does not emit files; replaces alias with relative paths post-compilation.
-
 ## check-types
 
 Definition: `tsc --noEmit`
@@ -500,13 +502,13 @@ Description: Runs `yarn start` and `yarn start-consumer` (i.e., the main app ser
 
 ## start-consumer
 
-Definition: `ts-node --project tsconfig.worker.json server/workers/commonwealthConsumer/commonwealthConsumer.ts run-as-script`
+Definition: `ts-node -r tsconfig-paths/register server/workers/commonwealthConsumer/commonwealthConsumer.ts run-as-script`
 
 Description: Runs `CommonwealthConsumer.ts` script, which consumes & processes RabbitMQ messages from external apps and services. See script file for more complete documentation.
 
 ## start-evm-ce
 
-Definition: `ts-node ./server/workers/evmChainEvents/startEvmPolling.ts`
+Definition: `ts-node -r tsconfig-paths/register server/workers/evmChainEvents/startEvmPolling.ts`
 
 Description: Runs `startEvmPolling.ts` script, which polls Ethereum chains for events in order to generate notifications.
 

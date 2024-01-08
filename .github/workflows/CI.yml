@@ -57,8 +57,8 @@ jobs:
           path: '**/node_modules'
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Build project
-        run: yarn build-project
+      - name: Build CI
+        run: yarn build-ci
 
       - name: Cache browsers
         id: playwright-cache
@@ -148,8 +148,8 @@ jobs:
           path: '**/node_modules'
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Build project
-        run: yarn build-project
+      - name: Build CI
+        run: yarn build-ci
 
       - name: Cache browsers
         id: playwright-cache
@@ -238,8 +238,8 @@ jobs:
           path: '**/node_modules'
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Build project
-        run: yarn build-project
+      - name: Build CI
+        run: yarn build-ci
 
       - name: Cache browsers
         id: playwright-cache
@@ -342,8 +342,8 @@ jobs:
             exit 1
           fi
 
-      - name: Build libs
-        run: yarn build-libs
+      - name: Build
+        run: yarn build
 
       - name: Run linter
         env:
@@ -402,8 +402,8 @@ jobs:
           path: '**/node_modules'
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Build project
-        run: yarn build-project
+      - name: Build CI
+        run: yarn build-ci
 
       - name: Run unit tests
         run: yarn --cwd packages/commonwealth unit-test --forbid-only
@@ -480,8 +480,8 @@ jobs:
           path: '**/node_modules'
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Build project
-        run: yarn build-project
+      - name: Build CI
+        run: yarn build-ci
 
       ## EVM Section:
       - name: Start EVM Testnet
