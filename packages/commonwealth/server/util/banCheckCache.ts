@@ -14,7 +14,7 @@ export default class BanCache extends JobRunner<CacheT> {
   constructor(
     private _models: DB,
     private _ttlS: number = 60 * 15, // 10 minutes
-    _pruningJobTimeS: number = 60 * 5 // 5 minutes
+    _pruningJobTimeS: number = 60 * 5, // 5 minutes
   ) {
     super({}, _pruningJobTimeS);
     this.start();
@@ -66,7 +66,7 @@ export default class BanCache extends JobRunner<CacheT> {
 
     const ban = await this._models.Ban.findOne({
       where: {
-        chain_id: communityId,
+        community_id: communityId,
         address,
       },
     });

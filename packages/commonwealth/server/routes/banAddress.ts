@@ -21,7 +21,7 @@ type BanAddressResp = BanAttributes;
 const banAddress = async (
   models: DB,
   req: TypedRequestBody<BanAddressReq>,
-  res: TypedResponse<BanAddressResp>
+  res: TypedResponse<BanAddressResp>,
 ) => {
   const chain = req.chain;
 
@@ -43,11 +43,11 @@ const banAddress = async (
   // find or create Ban
   const [ban] = await models.Ban.findOrCreate({
     where: {
-      chain_id: chain.id,
+      community_id: chain.id,
       address,
     },
     defaults: {
-      chain_id: chain.id,
+      community_id: chain.id,
       address,
     },
   });
