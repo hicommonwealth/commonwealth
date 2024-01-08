@@ -3,6 +3,7 @@
 
 .MarkdownFormattedText {
   @include b2;
+  letter-spacing: 0.01em;
 
   position: relative;
   word-break: break-word;
@@ -85,5 +86,32 @@
 
   mark {
     background-color: $primary-50;
+  }
+
+  hr {
+    margin: 12px 0;
+    color: $neutral-200;
+  }
+
+  strong,
+  em,
+  del,
+  ins {
+    letter-spacing: 0.02em;
+  }
+
+  strong {
+    font-weight: 700;
+  }
+
+  em,
+  del,
+  ins {
+    font-weight: 400;
+  }
+
+  blockquote {
+    @include b2;
+    border-left: 2px solid $neutral-200;
   }
 }
