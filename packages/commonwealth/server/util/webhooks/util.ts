@@ -26,16 +26,16 @@ export async function fetchWebhooks(
     { categoryId: NotificationCategories.SnapshotProposal }
   >,
 ): Promise<WebhookInstance[]> {
-  let chainId: string;
+  let communityId: string;
   if (notifDataCategory.categoryId === NotificationCategories.ChainEvent) {
-    chainId = notifDataCategory.data.chain;
+    communityId = notifDataCategory.data.chain;
   } else {
-    chainId = notifDataCategory.data.chain_id;
+    communityId = notifDataCategory.data.chain_id;
   }
 
   return await models.Webhook.findAll({
     where: {
-      community_id: chainId,
+      community_id: communityId,
       categories: {
         [Op.contains]: [notifDataCategory.categoryId],
       },
@@ -87,7 +87,7 @@ export async function getPreviewImageUrl(
     NotificationDataAndCategory,
     { categoryId: NotificationCategories.SnapshotProposal }
   >,
-  chain?: CommunityInstance,
+  community?: CommunityInstance,
 ): Promise<{ previewImageUrl: string; previewAltText: string }> {
   // case 1: embedded imaged in thread body
   if (
@@ -102,12 +102,12 @@ export async function getPreviewImageUrl(
     }
   }
 
-  // case 2: chain icon
-  if (chain?.icon_url) {
-    const previewImageUrl = chain.icon_url.match(`^(http|https)://`)
-      ? chain.icon_url
-      : `https://commonwealth.im${chain.icon_url}`;
-    const previewAltText = `${chain.name}`;
+  // case 2: community icon
+  if (community?.icon_url) {
+    const previewImageUrl = community.icon_url.match(`^(http|https)://`)
+      ? community.icon_url
+      : `https://commonwealth.im${community.icon_url}`;
+    const previewAltText = `${community.name}`;
     return { previewImageUrl, previewAltText };
   }
 

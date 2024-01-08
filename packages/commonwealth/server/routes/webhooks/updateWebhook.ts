@@ -7,9 +7,9 @@ const updateWebhook = async (
   models,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
-  const chain = req.chain;
+  const { community } = req;
   // only admins should be able to update webhooks
   if (!req.user) return next(new AppError(Errors.NotLoggedIn));
 
@@ -24,8 +24,8 @@ const updateWebhook = async (
           .map((addr) => addr.id),
       },
     },
-    chain.id,
-    ['admin']
+    community.id,
+    ['admin'],
   );
 
   if (!req.user.isAdmin && adminRoles.length === 0) {

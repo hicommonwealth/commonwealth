@@ -36,20 +36,23 @@ export async function dispatchWebhooks(
     webhooks = await fetchWebhooks(notification);
   }
 
-  let chainId: string;
+  let communityId: string;
   if (notification.categoryId === NotificationCategories.ChainEvent) {
-    chainId = notification.data.chain;
+    communityId = notification.data.chain;
   } else {
-    chainId = notification.data.chain_id;
+    communityId = notification.data.chain_id;
   }
 
-  const chain: CommunityInstance | undefined = await models.Community.findOne({
-    where: {
-      id: chainId,
-    },
-  });
+  const community: CommunityInstance | undefined =
+    await models.Community.findOne({
+      where: {
+        id: communityId,
+      },
+    });
 
-  const webhookData = Object.freeze(await getWebhookData(notification, chain));
+  const webhookData = Object.freeze(
+    await getWebhookData(notification, community),
+  );
 
   const webhookPromises = [];
   for (const webhook of webhooks) {
@@ -62,7 +65,7 @@ export async function dispatchWebhooks(
             {
               ...webhookData,
             },
-            chain,
+            community,
           ),
         );
         break;

@@ -7,9 +7,9 @@ const getWebhooks = async (
   models,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
-  const chain = req.chain;
+  const { community } = req;
 
   // only admins should be able to get webhooks
   if (!req.user) return next(new AppError(Errors.NotLoggedIn));
@@ -23,14 +23,14 @@ const getWebhooks = async (
           .map((addr) => addr.id),
       },
     },
-    chain.id,
-    ['admin']
+    community.id,
+    ['admin'],
   );
   if (!req.user.isAdmin && adminRoles.length === 0)
     return next(new AppError(Errors.NotAdmin));
   // fetch webhooks
   const webhooks = await models.Webhook.findAll({
-    where: { community_id: chain.id },
+    where: { community_id: community.id },
   });
   return res.json({
     status: 'Success',
