@@ -18,7 +18,7 @@ export const updateGroupHandler = async (
   req: TypedRequest<UpdateGroupBody, null, UpdateGroupParams>,
   res: TypedResponse<UpdateGroupResponse>,
 ) => {
-  const { user, address, chain: community } = req;
+  const { user, address, community } = req;
 
   const schema = z.object({
     params: z.object({
