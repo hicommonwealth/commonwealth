@@ -17,9 +17,9 @@ type UpdateTopicChannelResponse = void;
 export const updateTopicChannelHandler = async (
   controllers: ServerControllers,
   req: TypedRequestParams<UpdateTopicChannelRequestParams>,
-  res: TypedResponse<UpdateTopicChannelResponse>
+  res: TypedResponse<UpdateTopicChannelResponse>,
 ) => {
-  const { user, chain: community } = req;
+  const { user, community } = req;
   const { topicId, channelId } = req.params;
 
   const validationSchema = z.object({
@@ -32,7 +32,7 @@ export const updateTopicChannelHandler = async (
   });
   if (validationResult.success === false) {
     throw new AppError(
-      `${Errors.ValidationError}: ${validationResult.error.message}`
+      `${Errors.ValidationError}: ${validationResult.error.message}`,
     );
   }
 

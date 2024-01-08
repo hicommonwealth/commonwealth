@@ -17,7 +17,7 @@ export const createTopicHandler = async (
   req: TypedRequestBody<CreateTopicRequestBody>,
   res: TypedResponse<CreateTopicResponse>,
 ) => {
-  const { user, chain: community, body } = req;
+  const { user, community, body } = req;
 
   const validationSchema = z.object({
     name: z.string().optional(),
@@ -26,7 +26,6 @@ export const createTopicHandler = async (
     featured_in_sidebar: z.coerce.boolean().optional(),
     featured_in_new_post: z.coerce.boolean().optional(),
     default_offchain_template: z.string().optional(),
-    chain_id: z.string().optional(),
   });
 
   const validationResult = validationSchema.safeParse(body);
