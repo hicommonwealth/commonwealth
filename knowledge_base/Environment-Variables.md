@@ -312,7 +312,7 @@ This variable will default to the URI of a local RabbitMQ API server. This allow
 
 ## RABBITMQ_URI
 
-The URI of the RabbitMQ instance. On any Heroku app that has the CloudAMQP add-on (RabbitMQ provider), this is equal to CLOUDAMQP_URL. Locally, this variable defaults to the URI of a local RabbitMQ instance (Dockerized or native). Does not need to be set in a local environment unless you are spinning up multiple the Discobot or Snapshot listener as well.
+The URI of the RabbitMQ instance. On any Heroku app that has the CloudAMQP add-on (RabbitMQ provider), this is equal to CLOUDAMQP_URL. Locally, this variable defaults to the URI of a local RabbitMQ instance (Dockerized or native). Does not need to be set in a local environment unless you are spinning up the Discobot or Snapshot listener as well.
 
 ## REDIS_URL
 
