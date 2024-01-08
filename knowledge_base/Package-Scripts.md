@@ -2,7 +2,7 @@
 
 This entry documents [the Commonwealth package.json file](../packages/commonwealth/package.json). `Package.json` scripts should always be organized alphabetically.
 
-If you add a script to the package.json, you must add documentation. As with [all documentation](./_README.md#updating-the-docs-how--when), this should be included in the PR alongside the script addition. Script aliases serve as headers and should be furnished with a *definition* (the bash code executed by a script alias) and a *description* detailing (1) what the script does (2) when engineers might want or need to use it.
+If you add a script to the `package.json` file, please add documentation for it here. As with [all documentation](./_README.md#updating-the-docs-how--when), this should be included in the PR alongside the script addition. Script aliases serve as headers and should be furnished with a *definition* (the bash code executed by a script alias) and a *description* detailing (1) what the script does (2) when engineers might want or need to use it. Finally, list the new sub-section in the table of contents below.
 
 ## Contents
 
