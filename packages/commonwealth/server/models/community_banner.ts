@@ -5,7 +5,7 @@ import type { ModelInstance, ModelStatic } from './types';
 export type CommunityBannerAttributes = {
   id?: number;
   banner_text: string;
-  chain_id: string;
+  community_id: string;
   created_at?: Date;
   updated_at?: Date;
 };
@@ -16,14 +16,14 @@ export type CommunityBannerModelStatic = ModelStatic<CommunityBannerInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): CommunityBannerModelStatic => {
   const CommunityBanner = <CommunityBannerModelStatic>sequelize.define(
     'CommunityBanner',
     {
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       banner_text: { type: dataTypes.TEXT, allowNull: false },
-      chain_id: { type: dataTypes.STRING, allowNull: false },
+      community_id: { type: dataTypes.STRING, allowNull: false },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
     },
@@ -33,7 +33,7 @@ export default (
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       timestamps: true,
-    }
+    },
   );
 
   CommunityBanner.associate = (models) => {
