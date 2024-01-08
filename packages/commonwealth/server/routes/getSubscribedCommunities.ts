@@ -6,7 +6,7 @@ export const Errors = {
   InvalidSecret: 'Must provide a valid secret to use this route',
 };
 
-export const getSubscribedChains = async (
+export const getSubscribedCommunities = async (
   models: DB,
   req: Request,
   res: Response,

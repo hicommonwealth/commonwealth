@@ -71,9 +71,9 @@ import writeUserSetting from '../routes/writeUserSetting';
 
 import { getCanvasData, postCanvasData } from '../routes/canvas';
 
-import updateChainCustomDomain from '../routes/updateChainCustomDomain';
-import updateChainPriority from '../routes/updateChainPriority';
 import updateCommunityCategory from '../routes/updateCommunityCategory';
+import updateCommunityCustomDomain from '../routes/updateCommunityCustomDomain';
+import updateCommunityPriority from '../routes/updateCommunityPriority';
 import createWebhook from '../routes/webhooks/createWebhook';
 import deleteWebhook from '../routes/webhooks/deleteWebhook';
 import getWebhooks from '../routes/webhooks/getWebhooks';
@@ -99,7 +99,7 @@ import createDiscordBotConfig from '../routes/createDiscordBotConfig';
 import generateImage from '../routes/generateImage';
 import getDiscordChannels from '../routes/getDiscordChannels';
 import getSnapshotProposal from '../routes/getSnapshotProposal';
-import { getSubscribedChains } from '../routes/getSubscribedChains';
+import { getSubscribedCommunities } from '../routes/getSubscribedCommunities';
 import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 import type GlobalActivityCache from '../util/globalActivityCache';
 
@@ -1060,8 +1060,8 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/updateChainCustomDomain',
-    updateChainCustomDomain.bind(this, models),
+    '/updateCommunityCustomDomain',
+    updateCommunityCustomDomain.bind(this, models),
   );
 
   // Discord Bot
@@ -1090,8 +1090,8 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/updateChainPriority',
-    updateChainPriority.bind(this, models),
+    '/updateCommunityPriority',
+    updateCommunityPriority.bind(this, models),
   );
 
   registerRoute(
@@ -1207,8 +1207,8 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/getSubscribedChains',
-    getSubscribedChains.bind(this, models),
+    '/getSubscribedCommunities',
+    getSubscribedCommunities.bind(this, models),
   );
 
   // Proposal routes
