@@ -206,7 +206,9 @@ Owner: Kurtis Assad.
 
 ## ETH_RPC
 
-<!-- In need of documentation; if you have information about this token, please contribute. -->
+If set to `e2e-test`, the app will bypass usage of real ETH RPCs and use the mock Metamask RPC instead.
+
+Owner: Ian Rowan
 
 ## ETHERSCAN_JS_API_KEY
 
