@@ -11,17 +11,14 @@
   },
   "keywords": [],
   "scripts": {
+    "clean": "rm -rf build",
+    "check-types": "tsc --noEmit",
     "build-contracts": "npx hardhat compile",
     "lint": "../../scripts/lint-new-work.sh",
     "lint-all": "eslint './**/*.ts'",
-    "check-types": "tsc --noEmit",
-    "publish-rmq-msg": "ts-node --project tsconfig.json src/rabbitmq/scripts/publishRmqMessageScript.ts"
+    "publish-rmq-msg": "ts-node -r tsconfig-paths/register src/rabbitmq/scripts/publishRmqMessageScript.ts"
   },
   "dependencies": {
-    "async-rwlock": "^1.1.1",
-    "pg": "^8.8.0",
-    "rascal": "^14.4.5",
-    "typescript-logging": "^0.6.4",
     "@hicommonwealth/core": "*"
   },
   "devDependencies": {

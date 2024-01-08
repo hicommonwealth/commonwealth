@@ -49,7 +49,7 @@ ORDER BY seq.date DESC;`,
   };
   const roles = await newObjectsQuery('"Addresses"', 'community_id');
   const threads = await newObjectsQuery('"Threads"', 'community_id');
-  const comments = await newObjectsQuery('"Comments"', 'chain');
+  const comments = await newObjectsQuery('"Comments"', 'community_id');
 
   // get total number of roles, threads, and comments
   const totalObjectsQuery = async (table, chainName) => {
@@ -63,7 +63,7 @@ ORDER BY seq.date DESC;`,
   };
   const totalRoles = await totalObjectsQuery('"Addresses"', 'community_id');
   const totalThreads = await totalObjectsQuery('"Threads"', 'community_id');
-  const totalComments = await totalObjectsQuery('"Comments"', 'chain');
+  const totalComments = await totalObjectsQuery('"Comments"', 'community_id');
 
   // get number of active accounts by day
   const activeAccounts = await models.sequelize.query(
@@ -75,7 +75,7 @@ LEFT JOIN (
     AND community_id = :chainOrCommunity
   UNION
   SELECT address_id, created_at FROM "Comments" WHERE created_at > CURRENT_DATE - ${numberOfPrevDays}
-    AND ${chain ? 'chain' : 'community'} = :chainOrCommunity
+    AND community_id = :chainOrCommunity
   UNION
   SELECT address_id, created_at FROM "Reactions" WHERE created_at > CURRENT_DATE - ${numberOfPrevDays}
     AND community_id = :chainOrCommunity

@@ -1,11 +1,11 @@
-import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
 import {
   GovernorAlpha,
   GovernorBravoDelegate,
   GovernorCompatibilityBravo,
   GovernorCountingSimple,
-} from 'common-common/src/eth/types';
-import { TypedEvent } from 'common-common/src/eth/types/commons';
+  TypedEvent,
+} from '@hicommonwealth/chains';
+import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
 import { RedisCache } from 'common-common/src/redisCache';
 import { ethers, providers, utils } from 'ethers';
 import { ProposalState } from '../../../../shared/chain/types/compound';

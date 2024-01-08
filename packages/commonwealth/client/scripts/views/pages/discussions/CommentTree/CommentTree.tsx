@@ -172,7 +172,7 @@ export const CommentTree = ({
             try {
               await deleteComment({
                 commentId: comment.id,
-                canvasHash: comment.canvas_hash,
+                canvasHash: comment.canvasHash,
                 communityId: app.activeChainId(),
                 address: app.user.activeAccount.address,
                 existingNumberOfComments: thread.numberOfComments,

@@ -83,7 +83,7 @@ export async function __getStats(
       { type: QueryTypes.SELECT },
     ),
     this.models.Comment.count({
-      where: whereChain,
+      where: whereCommunityId,
     }),
     this.models.Thread.count({
       where: whereCommunityId,

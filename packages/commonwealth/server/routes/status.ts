@@ -200,12 +200,12 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     // add the chain and timestamp to replacements so that we can safely populate the query with dynamic parameters
     replacements.push(name, date);
     // append the SELECT query
-    query += `SELECT thread_id, chain FROM "Comments" WHERE chain = ? AND created_at > ?`;
+    query += `SELECT thread_id, community_id FROM "Comments" WHERE community_id = ? AND created_at > ?`;
     if (i === commsAndChains.length - 1) query += ';';
   }
 
   // populate query and execute
-  const commentNum: { thread_id: string; chain: string }[] = <any>(
+  const commentNum: { thread_id: string; community_id: string }[] = <any>(
     await sequelize.query(query, {
       raw: true,
       type: QueryTypes.SELECT,
@@ -215,14 +215,15 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
 
   // iterates through the retrieved comments and adds each thread id to the activePosts set
   for (const comment of commentNum) {
-    if (!unseenPosts[comment.chain]) unseenPosts[comment.chain] = {};
+    if (!unseenPosts[comment.community_id])
+      unseenPosts[comment.community_id] = {};
     const id = comment.thread_id;
-    unseenPosts[comment.chain].activePosts
-      ? unseenPosts[comment.chain].activePosts.add(id)
-      : (unseenPosts[comment.chain].activePosts = new Set([id]));
-    unseenPosts[comment.chain].comments
-      ? unseenPosts[comment.chain].comments++
-      : (unseenPosts[comment.chain].comments = 1);
+    unseenPosts[comment.community_id].activePosts
+      ? unseenPosts[comment.community_id].activePosts.add(id)
+      : (unseenPosts[comment.community_id].activePosts = new Set([id]));
+    unseenPosts[comment.community_id].comments
+      ? unseenPosts[comment.community_id].comments++
+      : (unseenPosts[comment.community_id].comments = 1);
   }
 
   // set the activePosts to num in set

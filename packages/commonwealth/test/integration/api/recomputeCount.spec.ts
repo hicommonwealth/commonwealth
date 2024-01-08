@@ -222,7 +222,7 @@ async function getCountsAll() {
 async function createCommentRaw() {
   const chain = testThreads[0].community_id;
   await models.sequelize.query(`
-    INSERT INTO "Comments" ("id", "chain", "address_id", "text", "thread_id", "plaintext", "created_at", "updated_at")
+    INSERT INTO "Comments" ("id", "community_id", "address_id", "text", "thread_id", "plaintext", "created_at", "updated_at")
     VALUES
         (-300, '${chain}', '${testAddresses[0].id}', '', ${testThreads[0].id}, '',now(),now()),
         (-400, '${chain}', '${testAddresses[0].id}', '', ${testThreads[0].id}, '',now(),now()),

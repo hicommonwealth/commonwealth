@@ -62,19 +62,17 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
           (new Date() as any) - 1000 * 24 * 60 * 60 * 30,
         );
         const activeUsers = {};
+        const where = {
+          updated_at: { [Op.gt]: thirtyDaysAgo },
+          community_id: chain.id,
+        };
 
         const monthlyComments = await models.Comment.findAll({
-          where: {
-            updated_at: { [Op.gt]: thirtyDaysAgo },
-            chain: chain.id,
-          },
+          where,
           include: [models.Address],
         });
         const monthlyThreads = await models.Thread.findAll({
-          where: {
-            updated_at: { [Op.gt]: thirtyDaysAgo },
-            community_id: chain.id,
-          },
+          where,
           attributes: { exclude: ['version_history'] },
           include: [{ model: models.Address, as: 'Address' }],
         });
