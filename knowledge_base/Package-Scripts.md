@@ -38,7 +38,6 @@ If you add a script to the package.json, you must add documentation here, descri
   - [start-android](#start-android)
   - [start-ios](#start-ios)
 - [Other Services](#other-services)
-  - [datadog-db-setup](#datadog-db-setup)
   - [send-cosmos-notifs](#send-cosmos-notifs)
   - [send-notification-digest-emails](#send-notification-digest-emails)
 - [Playwright](#playwright)
@@ -72,6 +71,22 @@ If you add a script to the package.json, you must add documentation here, descri
   - [cosmos:stop](#cosmos:stop)
 
 # Build Scripts
+
+## build-libs
+
+Definition: `yarn workspace @hicommonwealth/core build && yarn workspace @hicommonwealth/chains build`
+
+Description: Builds lib workspaces
+
+## build-project
+
+Definition: `yarn global add node-gyp && yarn --ignore-engines && yarn build-libs && yarn workspace commonwealth migrate-db`
+
+Description: Temporary placeholder for common script used by the CI pipeline to:
+
+- Install dependencies
+- Incrementally build project with references (tsc -b)
+- Migrate DB
 
 ## build-all
 
@@ -308,14 +323,6 @@ Description: Uses the Capacitor tool to build and run the app's iOS project with
 Contributor: Dillon Chen
 
 # Other services
-
-## datadog-db-setup
-
-Definition: `chmod u+x scripts/setup-datadog-postgres.sh && ./scripts/setup-datadog-postgres.sh`
-
-Description: Helper script to complete DataDog Postgres account setup, scripts, and required config. Allows us Heroku database monitoring and stats. See [ReadMe](../packages/commonwealth/README.md) for more information on using DataDog.
-
-Contributor: Nakul Manchanda
 
 ## send-cosmos-notifs
 

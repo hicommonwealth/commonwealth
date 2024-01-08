@@ -12,6 +12,12 @@ import CWCommunitySelector, {
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import NewCommunityAdminModal from 'views/modals/NewCommunityAdminModal';
 import { LoginModal } from 'views/modals/login_modal';
+import {
+  BaseMixpanelPayload,
+  MixpanelCommunityCreationEvent,
+  MixpanelLoginPayload,
+} from '../../../../../../../shared/analytics/types';
+import { useBrowserAnalyticsTrack } from '../../../../../hooks/useBrowserAnalyticsTrack';
 import { communityTypeOptions } from './helpers';
 
 import './CommunityTypeStep.scss';
@@ -35,10 +41,22 @@ const CommunityTypeStep = ({
 
   const { isLoggedIn } = useUserLoggedIn();
 
+  const { trackAnalytics } = useBrowserAnalyticsTrack<
+    MixpanelLoginPayload | BaseMixpanelPayload
+  >({
+    onAction: true,
+  });
+
   const handleCommunitySelection = ({
     type: selectedType,
     chainBase: selectedChainBase,
   }: SelectedCommunity) => {
+    trackAnalytics({
+      event: MixpanelCommunityCreationEvent.COMMUNITY_TYPE_CHOSEN,
+      communityType: selectedType,
+      chainBase: selectedChainBase,
+    });
+
     setSelectedCommunity({ type: selectedType, chainBase: selectedChainBase });
 
     if (!isLoggedIn) {

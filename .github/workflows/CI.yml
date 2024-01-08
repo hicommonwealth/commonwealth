@@ -57,14 +57,8 @@ jobs:
           path: '**/node_modules'
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Add node-gyp
-        run: yarn global add node-gyp
-
-      - name: Install dependencies
-        run: yarn --ignore-engines
-
-      - name: Init Db
-        run: cd packages/commonwealth && npx sequelize db:migrate
+      - name: Build project
+        run: yarn build-project
 
       - name: Cache browsers
         id: playwright-cache
@@ -154,14 +148,8 @@ jobs:
           path: '**/node_modules'
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Add node-gyp
-        run: yarn global add node-gyp
-
-      - name: Install dependencies
-        run: yarn --ignore-engines
-
-      - name: Init Db
-        run: cd packages/commonwealth && npx sequelize db:migrate
+      - name: Build project
+        run: yarn build-project
 
       - name: Cache browsers
         id: playwright-cache
@@ -250,14 +238,8 @@ jobs:
           path: '**/node_modules'
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Add node-gyp
-        run: yarn global add node-gyp
-
-      - name: Install dependencies
-        run: yarn --ignore-engines
-
-      - name: Init Db
-        run: cd packages/commonwealth && npx sequelize db:migrate
+      - name: Build project
+        run: yarn build-project
 
       - name: Cache browsers
         id: playwright-cache
@@ -360,6 +342,9 @@ jobs:
             exit 1
           fi
 
+      - name: Build libs
+        run: yarn build-libs
+
       - name: Run linter
         env:
           GITHUB_BASE_REF: ${{ github.base_ref }}
@@ -368,7 +353,7 @@ jobs:
       - name: Commonwealth Typecheck
         run: yarn --cwd packages/commonwealth check-types
 
-      - name: Dicsord-Bot Typecheck
+      - name: Discord-Bot Typecheck
         run: yarn --cwd packages/discord-bot check-types
 
   # These tests run quickly, so run them in a separate job
@@ -417,14 +402,8 @@ jobs:
           path: '**/node_modules'
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Add node-gyp
-        run: yarn global add node-gyp
-
-      - name: Install dependencies
-        run: yarn --ignore-engines
-
-      - name: Init Db
-        run: cd packages/commonwealth && npx sequelize db:migrate
+      - name: Build project
+        run: yarn build-project
 
       - name: Run unit tests
         run: yarn --cwd packages/commonwealth unit-test --forbid-only
@@ -501,14 +480,8 @@ jobs:
           path: '**/node_modules'
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Add node-gyp
-        run: yarn global add node-gyp
-
-      - name: Install dependencies
-        run: yarn --ignore-engines
-
-      - name: Init Db
-        run: cd packages/commonwealth && npx sequelize db:migrate
+      - name: Build project
+        run: yarn build-project
 
       ## EVM Section:
       - name: Start EVM Testnet
@@ -517,9 +490,6 @@ jobs:
           network_name=$(docker inspect -f '{{.HostConfig.NetworkMode}}' ${{ job.services.evm_test_app.id }})
           echo "Network name: $network_name"
           /usr/bin/docker run -d --name chain --network $network_name --network-alias chain -p 8545:8545 -e GITHUB_ACTIONS=true -e CI=true trufflesuite/ganache --fork --miner.blockTime 12 --wallet.unlockedAccounts 0xF977814e90dA44bFA03b6295A0616a897441aceC --wallet.unlockedAccounts 0xfA9b5f7fDc8AB34AAf3099889475d47febF830D7 --wallet.unlockedAccounts 0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8;
-
-      - name: Run Token Balance Cache Unit Tests
-        run: yarn --cwd packages/token-balance-cache test --forbid-only
 
       - name: Run EVM Devnet tests
         run: yarn --cwd packages/commonwealth test-devnet evm --forbid-only

@@ -1,4 +1,3 @@
-import { RedisNamespaces } from '@hicommonwealth/core';
 import {
   GovernorAlpha,
   GovernorAlpha__factory,
@@ -6,14 +5,21 @@ import {
   GovernorBravoDelegate__factory,
   GovernorCompatibilityBravo,
   GovernorCompatibilityBravo__factory,
-} from 'common-common/src/eth/types';
+  GovernorCountingSimple,
+  GovernorCountingSimple__factory,
+} from '@hicommonwealth/chains';
+import { RedisNamespaces } from '@hicommonwealth/core';
 import { RedisCache } from 'common-common/src/redisCache';
 import { providers } from 'ethers';
 import { GovVersion } from './types';
 
 type ContractAndVersion = {
   version: GovVersion;
-  contract: GovernorAlpha | GovernorBravoDelegate | GovernorCompatibilityBravo;
+  contract:
+    | GovernorAlpha
+    | GovernorBravoDelegate
+    | GovernorCompatibilityBravo
+    | GovernorCountingSimple;
 };
 
 /**
@@ -44,16 +50,26 @@ async function deriveCompoundGovContractAndVersion(
       return { version: GovVersion.Bravo, contract };
     } catch (e1) {
       try {
-        const contract = GovernorCompatibilityBravo__factory.connect(
+        const contract = GovernorCountingSimple__factory.connect(
           compoundGovAddress,
           provider,
         );
         await contract.COUNTING_MODE();
-        return { version: GovVersion.OzBravo, contract };
+        await contract.proposalVotes(1);
+        return { version: GovVersion.OzCountSimple, contract };
       } catch (e2) {
-        throw new Error(
-          `Failed to find Compound contract version at ${compoundGovAddress}`,
-        );
+        try {
+          const contract = GovernorCompatibilityBravo__factory.connect(
+            compoundGovAddress,
+            provider,
+          );
+          await contract.COUNTING_MODE();
+          return { version: GovVersion.OzBravo, contract };
+        } catch (e3) {
+          throw new Error(
+            `Failed to find Compound contract version at ${compoundGovAddress}`,
+          );
+        }
       }
     }
   }
@@ -74,6 +90,11 @@ function getCompoundGovContract(
       );
     case GovVersion.OzBravo:
       return GovernorCompatibilityBravo__factory.connect(
+        compoundGovAddress,
+        provider,
+      );
+    case GovVersion.OzCountSimple:
+      return GovernorCountingSimple__factory.connect(
         compoundGovAddress,
         provider,
       );

@@ -12,7 +12,10 @@ interface GetThreadsByIdProps {
   apiCallEnabled?: boolean;
 }
 
-const getThreadsById = async ({ chainId, ids }: GetThreadsByIdProps) => {
+const getThreadsById = async ({
+  chainId,
+  ids,
+}: GetThreadsByIdProps): Promise<Thread[]> => {
   const response = await axios.get(
     `${app.serverUrl()}${ApiEndpoints.FETCH_THREADS}`,
     {

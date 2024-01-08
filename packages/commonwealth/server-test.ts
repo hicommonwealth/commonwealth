@@ -11,12 +11,13 @@ import passport from 'passport';
 import Rollbar from 'rollbar';
 import favicon from 'serve-favicon';
 import setupAPI from './server/routing/router'; // performance note: this takes 15 seconds
-import { TokenBalanceCache } from 'token-balance-cache/src/index';
 
+import setupCosmosProxy from 'server/util/cosmosProxy';
 import {
   ROLLBAR_ENV,
   ROLLBAR_SERVER_TOKEN,
   SESSION_SECRET,
+  TBC_BALANCE_TTL_SECONDS,
 } from './server/config';
 import models from './server/database';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
@@ -24,18 +25,17 @@ import setupPassport from './server/passport';
 import BanCache from './server/util/banCheckCache';
 import GlobalActivityCache from './server/util/globalActivityCache';
 import ViewCountCache from './server/util/viewCountCache';
-import { MockTokenBalanceProvider } from './test/util/modelUtils';
-import setupCosmosProxy from 'server/util/cosmosProxy';
 
-import { cacheDecorator } from '../common-common/src/cacheDecorator';
 import { ServerError } from 'common-common/src/errors';
+import { cacheDecorator } from '../common-common/src/cacheDecorator';
 import {
-  lookupKeyDurationInReq,
   CustomRequest,
+  lookupKeyDurationInReq,
 } from '../common-common/src/cacheKeyUtils';
 
 import { factory, formatFilename } from 'common-common/src/logging';
 import { RedisCache } from 'common-common/src/redisCache';
+import { TokenBalanceCache } from './server/util/tokenBalanceCache/tokenBalanceCache';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -45,10 +45,11 @@ const app = express();
 const SequelizeStore = SessionSequelizeStore(session.Store);
 // set cache TTL to 1 second to test invalidation
 const viewCountCache = new ViewCountCache(1, 10 * 60);
-const mockTokenBalanceProvider = new MockTokenBalanceProvider();
-const tokenBalanceCache = new TokenBalanceCache(0, 0, [
-  mockTokenBalanceProvider,
-]);
+const tokenBalanceCache = new TokenBalanceCache(
+  models,
+  null as RedisCache,
+  TBC_BALANCE_TTL_SECONDS,
+);
 const databaseValidationService = new DatabaseValidationService(models);
 let server;
 
@@ -133,7 +134,7 @@ export const setupCacheTestEndpoints = (appAttach: Express) => {
     async (req, res) => {
       log.info(`${CACHE_ENDPOINTS.BROKEN_4XX} called`);
       res.status(400).json({ message: 'cachedummy 400 response' });
-    }
+    },
   );
 
   appAttach.get(
@@ -142,7 +143,7 @@ export const setupCacheTestEndpoints = (appAttach: Express) => {
     async (req, res) => {
       log.info(`${CACHE_ENDPOINTS.JSON} called`);
       res.json({ message: 'cachedummy response' });
-    }
+    },
   );
 
   appAttach.post(
@@ -160,7 +161,7 @@ export const setupCacheTestEndpoints = (appAttach: Express) => {
     cacheDecorator.cacheMiddleware(3, lookupKeyDurationInReq),
     async (req, res) => {
       res.json(req.body);
-    }
+    },
   );
 
   // Uncomment the following lines if you want to use the /cachedummy/json route
@@ -174,7 +175,7 @@ export const setupCacheTestEndpoints = (appAttach: Express) => {
     async function cacheTextEndpoint(req, res) {
       log.info(`${CACHE_ENDPOINTS.TEXT} called`);
       res.send('cachedummy response');
-    }
+    },
   );
 
   appAttach.get(
@@ -184,14 +185,14 @@ export const setupCacheTestEndpoints = (appAttach: Express) => {
       log.info(`${CACHE_ENDPOINTS.BROKEN_5XX} called`);
       const err = new Error('route error');
       return next(new ServerError('broken route', err));
-    }
+    },
   );
 };
 
 const banCache = new BanCache(models);
-const globalActivityCache = new GlobalActivityCache(models);
-globalActivityCache.start();
 const redisCache = new RedisCache();
+const globalActivityCache = new GlobalActivityCache(models, redisCache);
+globalActivityCache.start();
 
 setupPassport(models);
 setupAPI(
@@ -203,7 +204,7 @@ setupAPI(
   banCache,
   globalActivityCache,
   databaseValidationService,
-  redisCache
+  redisCache,
 );
 setupCosmosProxy(app, models);
 setupCacheTestEndpoints(app);
@@ -219,8 +220,5 @@ setupErrorHandlers(app, rollbar);
 setupServer();
 
 export { resetDatabase } from './test/util/resetDatabase';
-export const getTokenBalanceCache = () => tokenBalanceCache;
-export const getBanCache = () => banCache;
-export const getMockBalanceProvider = () => mockTokenBalanceProvider;
 
 export default app;

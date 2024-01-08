@@ -177,10 +177,10 @@ export default (
     models.Community.hasMany(models.Notification, { foreignKey: 'chain_id' });
     models.Community.hasMany(models.Topic, {
       as: 'topics',
-      foreignKey: 'chain_id',
+      foreignKey: 'community_id',
     });
-    models.Community.hasMany(models.Thread, { foreignKey: 'chain' });
-    models.Community.hasMany(models.Comment, { foreignKey: 'chain' });
+    models.Community.hasMany(models.Thread, { foreignKey: 'community_id' });
+    models.Community.hasMany(models.Comment, { foreignKey: 'community_id' });
     models.Community.hasMany(models.StarredCommunity, { foreignKey: 'chain' });
     models.Community.belongsToMany(models.Contract, {
       through: models.CommunityContract,

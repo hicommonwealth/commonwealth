@@ -1,8 +1,9 @@
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
 
-import { TokenBalanceCache as TokenBalanceCacheV1 } from '../../../token-balance-cache/src';
-import { TokenBalanceCache as TokenBalanceCacheV2 } from '../util/tokenBalanceCache/tokenBalanceCache';
+import GlobalActivityCache from '../util/globalActivityCache';
+import { TokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
+
 import {
   CreateCommentReactionOptions,
   CreateCommentReactionResult,
@@ -31,9 +32,9 @@ import {
 export class ServerCommentsController {
   constructor(
     public models: DB,
-    public tokenBalanceCacheV1: TokenBalanceCacheV1,
-    public tokenBalanceCacheV2: TokenBalanceCacheV2,
+    public tokenBalanceCache: TokenBalanceCache,
     public banCache: BanCache,
+    public globalActivityCache?: GlobalActivityCache,
   ) {}
 
   /**

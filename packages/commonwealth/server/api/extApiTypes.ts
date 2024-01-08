@@ -1,14 +1,9 @@
 // contains types for external api
 
-import type {
-  BalanceProviderResp,
-  ChainNodeResp,
-} from 'token-balance-cache/src';
 import type { CommentAttributes } from '../models/comment';
 import type { CommunityAttributes } from '../models/community';
 import type { ProfileAttributes } from '../models/profile';
 import type { ReactionAttributes } from '../models/reaction';
-import type { RoleAttributes } from '../models/role';
 import type { ThreadAttributes } from '../models/thread';
 import type { TopicAttributes } from '../models/topic';
 
@@ -76,14 +71,6 @@ export type GetCommunitiesReq = {
   page?: number;
 };
 
-export type PutCommunitiesReq = {
-  community: CommunityAttributes;
-  contract: { token_type: string; address: string };
-  admin_addresses: string[];
-};
-
-export type PutCommunitiesResp = { url: string; error?: string };
-
 export type GetCommunitiesResp = {
   communities?: CommunityAttributes[];
   count: number;
@@ -95,34 +82,7 @@ export type GetProfilesReq = {
   count_only?: boolean;
 } & IPagination;
 
-export type PostProfilesReq = {
-  profiles: (ProfileAttributes[] & { community_id: string })[];
-};
-
 export type GetProfilesResp = { profiles?: ProfileAttributes[]; count: number };
-
-export type GetChainNodesReq = {
-  chain_node_ids?: number[];
-  names?: string[];
-} & IPagination;
-
-export type GetChainNodesResp = { chain_nodes: ChainNodeResp[]; count: number };
-
-export type GetBalanceProvidersReq = {
-  chain_node_ids: number[];
-};
-
-export type GetBalanceProvidersResp = {
-  balance_providers: BalanceProviderResp[];
-  count: number;
-};
-
-export type GetTokenBalanceReq = {
-  chain_node_id: number;
-  addresses: string[];
-  balance_provider: string;
-  opts: Record<string, string | undefined>;
-};
 
 export type GetTopicsReq = {
   community_id: string;
@@ -134,19 +94,6 @@ export type PostTopicsReq = {
 };
 
 export type GetTopicsResp = { topics?: TopicAttributes[]; count: number };
-
-export type GetRolesReq = {
-  community_id: string;
-  addresses?: string[];
-  count_only?: boolean;
-  permissions?: string[];
-} & IPagination;
-
-export type GetRolesResp = { roles?: RoleAttributes[]; count: number };
-
-export type PostRolesReq = {
-  roles: (RoleAttributes & { community_id: string })[];
-};
 
 export type OnlyErrorResp = { error?: string | object };
 

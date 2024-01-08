@@ -1,3 +1,4 @@
+import { QuillRenderer } from 'client/scripts/views/components/react_quill_editor/quill_renderer';
 import { isDefaultStage, threadStageToLabel } from 'helpers';
 import { filterLinks } from 'helpers/threads';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
@@ -80,7 +81,7 @@ export const ThreadCard = ({
 
   const discussionLink = getProposalUrlPath(
     thread.slug,
-    `${thread.identifier}-${slugify(thread.title)}`
+    `${thread.identifier}-${slugify(thread.title)}`,
   );
 
   const isStageDefault = isDefaultStage(thread.stage);
@@ -94,7 +95,7 @@ export const ThreadCard = ({
         to={threadHref}
         className={getClasses<{ isPinned?: boolean }>(
           { isPinned: thread.pinned },
-          'ThreadCard'
+          'ThreadCard',
         )}
         onClick={() => onBodyClick && onBodyClick()}
         key={thread.id}
@@ -151,7 +152,7 @@ export const ThreadCard = ({
               )}
             </div>
             <CWText type="caption" className="content-body">
-              {thread.plaintext}
+              <QuillRenderer doc={thread.plaintext} />
             </CWText>
           </div>
           {isTagsRowVisible && (
