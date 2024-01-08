@@ -1,4 +1,4 @@
-import ModalUnstyled from '@mui/base/Modal';
+import { Modal as ModalUnstyled } from '@mui/base/Modal';
 import React, { FC } from 'react';
 
 import { getClasses } from '../../helpers';

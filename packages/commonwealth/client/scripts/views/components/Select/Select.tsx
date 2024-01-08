@@ -1,4 +1,4 @@
-import ClickAwayListener from '@mui/base/ClickAwayListener';
+import { ClickAwayListener } from '@mui/base/ClickAwayListener';
 import type { Placement } from '@popperjs/core/lib';
 import React from 'react';
 import CWPopover, {

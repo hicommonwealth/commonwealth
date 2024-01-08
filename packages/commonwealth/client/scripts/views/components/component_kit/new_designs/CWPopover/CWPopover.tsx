@@ -1,6 +1,7 @@
-import PopperUnstyled, {
+import {
   PopperOwnProps,
   PopperPlacementType,
+  Popper as PopperUnstyled,
 } from '@mui/base/Popper';
 import React from 'react';
 

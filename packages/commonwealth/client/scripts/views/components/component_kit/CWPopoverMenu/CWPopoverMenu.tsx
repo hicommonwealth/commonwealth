@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import ClickAwayListener from '@mui/base/ClickAwayListener';
+import { ClickAwayListener } from '@mui/base/ClickAwayListener';
 import { PopperOwnProps, PopperPlacementType } from '@mui/base/Popper';
 
 import './CWPopoverMenu.scss';

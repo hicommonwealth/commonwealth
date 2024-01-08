@@ -1,4 +1,4 @@
-import ClickAwayListener from '@mui/base/ClickAwayListener';
+import { ClickAwayListener } from '@mui/base/ClickAwayListener';
 import React, { useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 
