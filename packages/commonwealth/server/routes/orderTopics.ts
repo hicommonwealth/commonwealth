@@ -1,5 +1,5 @@
 /* eslint-disable quotes */
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError, ServerError } from '@hicommonwealth/adapters';
 import type { NextFunction, Response } from 'express';
 import type { TopicInstance } from 'server/models/topic';
 import type { DB } from '../models';
@@ -19,7 +19,7 @@ const OrderTopics = async (
   models: DB,
   req,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const chain = req.chain;
 
@@ -61,7 +61,7 @@ const OrderTopics = async (
           await topic.save();
           return topic;
         })();
-      })
+      }),
     );
 
     return res.json({

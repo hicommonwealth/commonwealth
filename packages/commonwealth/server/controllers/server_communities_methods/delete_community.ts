@@ -1,4 +1,4 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import { Op } from 'sequelize';
 import { UserInstance } from 'server/models/user';
 import { sequelize } from '../../database';

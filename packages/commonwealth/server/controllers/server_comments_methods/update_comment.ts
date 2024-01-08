@@ -1,8 +1,8 @@
 import moment from 'moment';
 import { Op } from 'sequelize';
 
+import { AppError } from '@hicommonwealth/adapters';
 import { NotificationCategories, ProposalType } from '@hicommonwealth/core';
-import { AppError } from '../../../../common-common/src/errors';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import { AddressInstance } from '../../models/address';
 import { CommentAttributes } from '../../models/comment';

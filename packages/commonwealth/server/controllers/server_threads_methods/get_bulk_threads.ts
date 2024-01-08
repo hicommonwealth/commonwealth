@@ -1,6 +1,6 @@
+import { ServerError } from '@hicommonwealth/adapters';
 import moment from 'moment';
 import { QueryTypes } from 'sequelize';
-import { ServerError } from '../../../../common-common/src/errors';
 import { CommunityInstance } from '../../models/community';
 import { ThreadAttributes } from '../../models/thread';
 import { getLastEdited } from '../../util/getLastEdited';
