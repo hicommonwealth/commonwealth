@@ -84,6 +84,7 @@ export default (
             }
           } catch (error) {
             log.error(
+              // eslint-disable-next-line max-len
               `incrementing thread reaction count afterCreate: thread_id ${thread_id} comment_id ${comment_id} ${error}`,
             );
             StatsDController.get().increment('cw.reaction-count-error', {
@@ -122,6 +123,7 @@ export default (
             }
           } catch (error) {
             log.error(
+              // eslint-disable-next-line max-len
               `incrementing thread reaction count afterDestroy: thread_id ${thread_id} comment_id ${comment_id} ${error}`,
             );
             StatsDController.get().increment('cw.hook.reaction-count-error', {
