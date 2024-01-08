@@ -1,4 +1,4 @@
-import { factory, formatFilename } from '@hicommonwealth/adapters';
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import {
   BalanceType,
   ChainBase,
@@ -9,7 +9,7 @@ import {
 import models from '../../server/database';
 import { ChainNodeAttributes } from '../../server/models/chain_node';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 export const resetDatabase = (debug = false): Promise<void> => {
   if (debug) log.info('Resetting database...');

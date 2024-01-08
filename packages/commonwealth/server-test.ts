@@ -12,7 +12,6 @@ import Rollbar from 'rollbar';
 import favicon from 'serve-favicon';
 import setupAPI from './server/routing/router'; // performance note: this takes 15 seconds
 
-import setupCosmosProxy from 'server/util/cosmosProxy';
 import {
   ROLLBAR_ENV,
   ROLLBAR_SERVER_TOKEN,
@@ -23,21 +22,20 @@ import models from './server/database';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
 import BanCache from './server/util/banCheckCache';
+import setupCosmosProxy from './server/util/cosmosProxy';
 import GlobalActivityCache from './server/util/globalActivityCache';
 import ViewCountCache from './server/util/viewCountCache';
 
-import { ServerError } from 'common-common/src/errors';
-import { cacheDecorator } from '../common-common/src/cacheDecorator';
 import {
   CustomRequest,
   lookupKeyDurationInReq,
 } from '../common-common/src/cacheKeyUtils';
 
-import { factory, formatFilename } from '@hicommonwealth/adapters';
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import { RedisCache } from 'common-common/src/redisCache';
 import { TokenBalanceCache } from './server/util/tokenBalanceCache/tokenBalanceCache';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 require('express-async-errors');
 
@@ -94,11 +92,11 @@ const setupServer = () => {
       case 'EACCES':
         console.error('Port requires elevated privileges');
         process.exit(1);
-        break;
+      // eslint-disable-next-line no-fallthrough
       case 'EADDRINUSE':
         console.error(`Port ${port} already in use`);
         process.exit(1);
-        break;
+      // eslint-disable-next-line no-fallthrough
       default:
         throw error;
     }
