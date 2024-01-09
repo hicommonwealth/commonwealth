@@ -1,5 +1,5 @@
 /* eslint-disable react/no-multi-comp */
-import { isValidCosmosAddress, isValidEthAddress } from 'helpers/validateTypes';
+import { isValidEthAddress } from 'helpers/validateTypes';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import app from 'state';
@@ -306,11 +306,7 @@ const GroupForm = ({
           allRequirements[index].values.requirementType,
         ) && !isValidEthAddress(val.requirementContractAddress);
 
-      const isInvalidCosmosAddress =
-        TOKENS.COSMOS_TOKEN === allRequirements[index].values.requirementType &&
-        !isValidCosmosAddress(val.requirementContractAddress);
-
-      if (isInvalidEthAddress || isInvalidCosmosAddress) {
+      if (isInvalidEthAddress) {
         allRequirements[index] = {
           ...allRequirements[index],
           errors: {
