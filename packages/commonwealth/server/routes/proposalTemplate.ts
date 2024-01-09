@@ -311,7 +311,7 @@ export async function deleteCommunityContractTemplate(
       return success(res, {
         metadata: null,
         cct: null,
-        deletedContract: shouldDeleteCommunityContract,
+        deletedContract: Boolean(shouldDeleteCommunityContract),
       });
     }
 
@@ -335,7 +335,7 @@ export async function deleteCommunityContractTemplate(
       return success(res, {
         metadata: null,
         cct: null,
-        deletedContract: shouldDeleteCommunityContract,
+        deletedContract: Boolean(shouldDeleteCommunityContract),
       });
     }
 
@@ -361,7 +361,7 @@ export async function deleteCommunityContractTemplate(
     return success(res, {
       metadata: cctmd,
       cct,
-      deletedContract: shouldDeleteCommunityContract,
+      deletedContract: Boolean(shouldDeleteCommunityContract),
     });
   } catch (err) {
     console.log(err);

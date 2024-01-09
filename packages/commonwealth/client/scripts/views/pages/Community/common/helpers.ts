@@ -1,5 +1,5 @@
 import { tokensToWei, weiToTokens } from 'helpers';
-import { SPECIFICATIONS, TOKENS } from './constants';
+import { ERC_SPECIFICATIONS, TOKENS } from './constants';
 
 const converter = (
   requirementType: 'erc20' | 'erc721' | 'eth_native' | 'cosmos_native',
@@ -12,7 +12,7 @@ const converter = (
 
   if (
     requirementType === TOKENS.EVM_TOKEN ||
-    requirementType === SPECIFICATIONS.ERC_20
+    requirementType === ERC_SPECIFICATIONS.ERC_20
   ) {
     return converterFunc(amount, 18);
   }

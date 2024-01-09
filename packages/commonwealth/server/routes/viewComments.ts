@@ -20,7 +20,7 @@ const viewComments = async (
   }
 
   const comments = await models.Comment.findAll({
-    where: { community_id: chain.id, thread_id: req.query.thread_id },
+    where: { community_id: chain.id, thread_id: req.query.thread_id as string },
     include: [
       models.Address,
       {
