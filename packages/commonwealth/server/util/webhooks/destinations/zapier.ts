@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import { NotificationCategories } from '@hicommonwealth/core';
-import { factory, formatFilename } from 'common-common/src/logging';
 import request from 'superagent';
 import { ChainEventWebhookData, ForumWebhookData } from '../types';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 type ZapierWebhookMessage = {
   event: NotificationCategories;

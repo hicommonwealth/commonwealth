@@ -1,9 +1,9 @@
 import { Op, QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from 'server/types';
 
+import { AppError } from '@hicommonwealth/adapters';
 import { flatten, uniq } from 'lodash';
 import { CommunityInstance } from 'server/models/community';
-import { AppError } from '../../../../common-common/src/errors';
 import {
   PaginationSqlOptions,
   buildPaginatedResponse,

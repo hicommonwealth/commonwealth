@@ -1,6 +1,9 @@
+import {
+  AppError,
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/adapters';
 import { ChainBase } from '@hicommonwealth/core';
-import { AppError } from 'common-common/src/errors';
-import { factory, formatFilename } from 'common-common/src/logging';
 import crypto from 'crypto';
 import type { NextFunction, Request, Response } from 'express';
 import Sequelize from 'sequelize';
@@ -12,7 +15,7 @@ import type { DB } from '../models';
 import assertAddressOwnership from '../util/assertAddressOwnership';
 import { createRole, findOneRole } from '../util/roles';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 const { Op } = Sequelize;
 

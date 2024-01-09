@@ -1,7 +1,10 @@
+import {
+  AppError,
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/adapters';
 import { WalletId } from '@hicommonwealth/core';
 import sgMail from '@sendgrid/mail';
-import { AppError } from 'common-common/src/errors';
-import { factory, formatFilename } from 'common-common/src/logging';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
 import { DynamicTemplate } from '../../shared/types';
@@ -15,7 +18,7 @@ import {
 import { validateCommunity } from '../middleware/validateCommunity';
 import type { DB } from '../models';
 sgMail.setApiKey(SENDGRID_API_KEY);
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   AlreadyLoggedIn: 'Already signed in',

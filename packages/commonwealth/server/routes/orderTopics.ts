@@ -1,5 +1,5 @@
 /* eslint-disable quotes */
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError, ServerError } from '@hicommonwealth/adapters';
 import type { NextFunction, Response } from 'express';
 import type { TopicInstance } from 'server/models/topic';
 import type { DB } from '../models';

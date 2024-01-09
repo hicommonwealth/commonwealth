@@ -1,5 +1,5 @@
 /* eslint-disable no-async-promise-executor */
-import { ServerError } from 'common-common/src/errors';
+import { ServerError } from '@hicommonwealth/adapters';
 //
 // The async promise syntax, new Promise(async (resolve, reject) => {}), should usually be avoided
 // because it's easy to miss catching errors inside the promise executor, but we use it in this file

@@ -1,3 +1,4 @@
+import { RedisCache } from '@hicommonwealth/adapters';
 import {
   GovernorAlpha,
   GovernorBravoDelegate,
@@ -5,7 +6,6 @@ import {
   GovernorCountingSimple,
 } from '@hicommonwealth/chains';
 import { ICompoundVoteResponse } from 'adapters/chain/compound/types';
-import { RedisCache } from 'common-common/src/redisCache';
 import { BigNumber, providers } from 'ethers';
 import { getCompoundGovContractAndVersion } from './compoundVersion';
 import { CompoundVoteEvents, GovVersion } from './types';

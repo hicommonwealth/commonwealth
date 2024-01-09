@@ -1,3 +1,4 @@
+import { AppError } from '@hicommonwealth/adapters';
 import {
   ChainNetwork,
   ChainType,
@@ -5,7 +6,6 @@ import {
   ProposalType,
 } from '@hicommonwealth/core';
 import moment from 'moment';
-import { AppError } from '../../../../common-common/src/errors';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import { AddressInstance } from '../../models/address';

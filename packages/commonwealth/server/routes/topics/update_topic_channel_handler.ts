@@ -1,5 +1,5 @@
+import { AppError } from '@hicommonwealth/adapters';
 import z from 'zod';
-import { AppError } from '../../../../common-common/src/errors';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestParams, TypedResponse, success } from '../../types';
 

@@ -20,8 +20,8 @@ import 'chai/register-should';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
-import { createRole, findOneRole } from 'server/util/roles';
 import * as siwe from 'siwe';
+import { createRole, findOneRole } from '../../server/util/roles';
 
 import { createCanvasSessionPayload } from '../../shared/canvas';
 
@@ -31,7 +31,7 @@ import app from '../../server-test';
 import models from '../../server/database';
 import type { Role } from '../../server/models/role';
 
-import { Link, LinkSource, ThreadAttributes } from 'server/models/thread';
+import { Link, LinkSource, ThreadAttributes } from '../../server/models/thread';
 import {
   TEST_BLOCK_INFO_BLOCKHASH,
   TEST_BLOCK_INFO_STRING,

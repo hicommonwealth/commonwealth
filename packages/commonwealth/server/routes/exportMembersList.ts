@@ -1,4 +1,4 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import type { NextFunction } from 'express';
 import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
