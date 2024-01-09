@@ -1,6 +1,9 @@
 import { Log } from '@ethersproject/providers';
-import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
-import { StatsDController } from 'common-common/src/statsd';
+import {
+  StatsDController,
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/adapters';
 import { ethers } from 'ethers';
 import { rollbar } from '../../util/rollbar';
 import {

@@ -93,7 +93,7 @@ import updateAddress from '../routes/updateAddress';
 import viewChainIcons from '../routes/viewChainIcons';
 import type BanCache from '../util/banCheckCache';
 
-import { RedisCache } from 'common-common/src/redisCache';
+import { RedisCache } from '@hicommonwealth/adapters';
 import type DatabaseValidationService from '../middleware/databaseValidationService';
 import createDiscordBotConfig from '../routes/createDiscordBotConfig';
 import generateImage from '../routes/generateImage';

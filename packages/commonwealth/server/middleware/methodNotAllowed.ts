@@ -1,3 +1,5 @@
+import { StatsDController } from '@hicommonwealth/adapters';
+import { HttpMethod } from 'aws-sdk/clients/appmesh';
 import {
   NextFunction,
   Request,
@@ -5,9 +7,7 @@ import {
   Response,
   Router,
 } from 'express';
-import { HttpMethod } from 'aws-sdk/clients/appmesh';
 import { ValidationChain } from 'express-validator';
-import { StatsDController } from '../../../common-common/src/statsd';
 
 const routesMethods: { [key: string]: string[] } = {};
 

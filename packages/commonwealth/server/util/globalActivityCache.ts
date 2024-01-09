@@ -1,6 +1,9 @@
-import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
+import {
+  RedisCache,
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/adapters';
 import { RedisNamespaces } from '@hicommonwealth/core';
-import { RedisCache } from 'common-common/src/redisCache';
 import { v4 as uuidv4 } from 'uuid';
 import type { DB } from '../models';
 import { AddressAttributes } from '../models/address';

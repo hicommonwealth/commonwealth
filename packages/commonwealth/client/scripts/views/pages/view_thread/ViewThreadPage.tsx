@@ -154,6 +154,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const { data: memberships = [] } = useRefreshMembershipQuery({
     chainId: app.activeChainId(),
     address: app?.user?.activeAccount?.address,
+    apiEnabled: !!app?.user?.activeAccount?.address,
   });
 
   const isTopicGated = !!(memberships || []).find((membership) =>

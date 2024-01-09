@@ -1,14 +1,12 @@
 import {
   RabbitMQController,
   RascalConfigServices,
+  ServiceKey,
   formatFilename,
   getRabbitMQConfig,
   loggerFactory,
-} from '@hicommonwealth/adapters';
-import {
-  ServiceKey,
   startHealthCheckLoop,
-} from 'common-common/src/scripts/startHealthCheckLoop';
+} from '@hicommonwealth/adapters';
 import {
   Client,
   IntentsBitField,

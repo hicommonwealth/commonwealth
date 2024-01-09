@@ -2,21 +2,19 @@ import {
   RabbitMQController,
   RascalConfigServices,
   RascalSubscriptions,
+  ServiceKey,
+  StatsDController,
   TRmqMessages,
   formatFilename,
   getRabbitMQConfig,
   loggerFactory,
+  startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import {
   CommentDiscordActions,
   IDiscordMessage,
   ThreadDiscordActions,
 } from '@hicommonwealth/core';
-import {
-  ServiceKey,
-  startHealthCheckLoop,
-} from 'common-common/src/scripts/startHealthCheckLoop';
-import { StatsDController } from 'common-common/src/statsd';
 import v8 from 'v8';
 import {
   handleCommentMessages,
