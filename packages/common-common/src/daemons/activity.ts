@@ -1,9 +1,9 @@
-import { RedisNamespaces } from '@hicommonwealth/core';
 import {
   CacheDecorator,
   cacheDecorator as cacheDecoratorInstance,
   KeyFunction,
-} from 'common-common/src/cacheDecorator';
+} from '@hicommonwealth/adapters';
+import { RedisNamespaces } from '@hicommonwealth/core';
 import { daemon } from '.';
 
 export class Activity<T extends (...args: any[]) => any> {

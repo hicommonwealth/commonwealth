@@ -1,5 +1,5 @@
+import { AppError, ServerError } from '@hicommonwealth/adapters';
 import { WalletId } from '@hicommonwealth/core';
-import { AppError, ServerError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../models';
 

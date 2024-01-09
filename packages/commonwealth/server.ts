@@ -1,16 +1,16 @@
-import bodyParser from 'body-parser';
-import { factory, formatFilename } from 'common-common/src/logging';
 import {
   RabbitMQController,
-  getRabbitMQConfig,
-} from 'common-common/src/rabbitmq';
-import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
-import { RedisCache } from 'common-common/src/redisCache';
-import {
+  RascalConfigServices,
+  RedisCache,
   ServiceKey,
+  StatsDController,
+  formatFilename,
+  getRabbitMQConfig,
+  loggerFactory,
+  setupErrorHandlers,
   startHealthCheckLoop,
-} from 'common-common/src/scripts/startHealthCheckLoop';
-import { StatsDController } from 'common-common/src/statsd';
+} from '@hicommonwealth/adapters';
+import bodyParser from 'body-parser';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
@@ -25,7 +25,6 @@ import type { BrokerConfig } from 'rascal';
 import Rollbar from 'rollbar';
 import favicon from 'serve-favicon';
 import * as v8 from 'v8';
-import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers';
 import {
   DATABASE_CLEAN_HOUR,
   PRERENDER_TOKEN,
@@ -67,7 +66,7 @@ startHealthCheckLoop({
   },
 });
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 // set up express async error handling hack
 require('express-async-errors');
 

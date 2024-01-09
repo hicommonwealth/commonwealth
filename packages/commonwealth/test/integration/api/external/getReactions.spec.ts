@@ -1,5 +1,5 @@
 import chai from 'chai';
-import 'chai/register-should';
+
 import type { GetReactionsReq } from 'server/api/extApiTypes';
 import { OrderByOptions } from 'server/api/extApiTypes';
 import type { ReactionAttributes } from 'server/models/reaction';

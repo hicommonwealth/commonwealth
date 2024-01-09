@@ -1,4 +1,5 @@
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
+import { AppError } from '@hicommonwealth/adapters';
 import {
   BalanceType,
   ChainBase,
@@ -11,7 +12,6 @@ import {
 import type { Cluster } from '@solana/web3.js';
 import * as solw3 from '@solana/web3.js';
 import BN from 'bn.js';
-import { AppError } from 'common-common/src/errors';
 import { Op } from 'sequelize';
 import Web3 from 'web3';
 import { bech32ToHex, urlHasValidHTTPPrefix } from '../../../shared/utils';
@@ -363,37 +363,6 @@ export async function __createCommunity(
     default_page: DefaultPage.Homepage,
     has_homepage: true,
   });
-
-  if (community.address) {
-    const erc20Abi = await this.models.ContractAbi.findOne({
-      where: {
-        nickname: 'erc20',
-      },
-    });
-
-    const [contract] = await this.models.Contract.findOrCreate({
-      where: {
-        address: community.address,
-        chain_node_id: node.id,
-      },
-      defaults: {
-        address: community.address,
-        chain_node_id: node.id,
-        decimals: community.decimals,
-        token_name: createdCommunity.token_name,
-        symbol: createdCommunity.default_symbol,
-        type: createdCommunity.network,
-        abi_id: createdCommunity.network === 'erc20' ? erc20Abi?.id : null,
-      },
-    });
-
-    await this.models.CommunityContract.create({
-      chain_id: createdCommunity.id,
-      contract_id: contract.id,
-    });
-
-    createdCommunity.Contract = contract;
-  }
 
   const nodeJSON = node.toJSON();
   delete nodeJSON.private_url;

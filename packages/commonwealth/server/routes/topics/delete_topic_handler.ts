@@ -1,8 +1,8 @@
-import { AppError } from '../../../../common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
+import z from 'zod';
 import { TopicAttributes } from '../../models/topic';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
-import z from 'zod';
 
 const Errors = {
   ValidationError: 'Validation error',
@@ -18,16 +18,16 @@ type DeleteTopicResponse = void;
 export const deleteTopicHandler = async (
   controllers: ServerControllers,
   req: TypedRequest<DeleteTopicRequestBody, any, DeleteTopicRequestParams>,
-  res: TypedResponse<DeleteTopicResponse>
+  res: TypedResponse<DeleteTopicResponse>,
 ) => {
-  const { user, chain: community } = req;
+  const { user, community } = req;
   const { topicId } = req.params;
 
   const validationSchema = z.coerce.number();
   const validationResult = validationSchema.safeParse(topicId);
   if (validationResult.success === false) {
     throw new AppError(
-      `${Errors.ValidationError}: ${validationResult.error.message}`
+      `${Errors.ValidationError}: ${validationResult.error.message}`,
     );
   }
 

@@ -1,11 +1,11 @@
-import { factory, formatFilename } from 'common-common/src/logging';
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import AbiCoder from 'web3-eth-abi';
 import { ChainNodeInstance } from '../../../models/chain_node';
 import { rollbar } from '../../rollbar';
 import { Balances } from '../types';
 import { evmRpcRequest } from '../util';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 export type GetErc1155BalancesOptions = {
   chainNode: ChainNodeInstance;

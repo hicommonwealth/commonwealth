@@ -1,7 +1,7 @@
+import { AppError } from '@hicommonwealth/adapters';
 import { Op } from 'sequelize';
 import { AddressInstance } from 'server/models/address';
 import { UserInstance } from 'server/models/user';
-import { AppError } from '../../../../common-common/src/errors';
 import { ServerReactionsController } from '../server_reactions_controller';
 
 const Errors = {

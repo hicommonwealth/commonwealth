@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useEffect } from 'react';
 import app, { initAppState } from 'state';
+import useAdminOnboardingSliderMutationStore from '../state/ui/adminOnboardingCards';
 import useGroupMutationBannerStore from '../state/ui/group';
 
 const useInitApp = () => {
@@ -8,10 +9,15 @@ const useInitApp = () => {
   const [customDomain, setCustomDomain] = React.useState('');
   const { readFromStorageAndSetGatingGroupBannerForCommunities } =
     useGroupMutationBannerStore();
+  const { readFromStorageAndSetAdminOnboardingCardVisibilityForCommunities } =
+    useAdminOnboardingSliderMutationStore();
 
   useEffect(() => {
     // read localstorage and set informational banner for gated communities on the members page group section
     readFromStorageAndSetGatingGroupBannerForCommunities();
+
+    // read localstorage and set visibility for admin onboarding cards on all page
+    readFromStorageAndSetAdminOnboardingCardVisibilityForCommunities();
 
     Promise.all([axios.get(`${app.serverUrl()}/domain`), initAppState()])
       .then(([domainResp]) => {

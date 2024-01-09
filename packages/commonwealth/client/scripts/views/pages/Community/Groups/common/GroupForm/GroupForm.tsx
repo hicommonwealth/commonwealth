@@ -17,7 +17,7 @@ import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_rad
 import { ZodError, ZodObject } from 'zod';
 import {
   AMOUNT_CONDITIONS,
-  SPECIFICATIONS,
+  ERC_SPECIFICATIONS,
   TOKENS,
   conditionTypes,
 } from '../../../common/constants';
@@ -116,7 +116,7 @@ const getRequirementSubFormSchema = (
   requirementType: string,
 ): ZodObject<any> => {
   const isTokenRequirement = Object.values(TOKENS).includes(requirementType);
-  const is1155Requirement = requirementType === SPECIFICATIONS.ERC_1155;
+  const is1155Requirement = requirementType === ERC_SPECIFICATIONS.ERC_1155;
 
   const schema = isTokenRequirement
     ? requirementSubFormValidationSchema.omit({
@@ -147,7 +147,9 @@ const GroupForm = ({
   });
 
   const takenGroupNames = groups.map(({ name }) => name.toLowerCase());
-  const sortedTopics = (topics || []).sort((a, b) => a?.name?.localeCompare(b));
+  const sortedTopics = (topics || []).sort((a, b) =>
+    a?.name?.localeCompare(b.name),
+  );
 
   const [isNameTaken, setIsNameTaken] = useState(false);
   const [

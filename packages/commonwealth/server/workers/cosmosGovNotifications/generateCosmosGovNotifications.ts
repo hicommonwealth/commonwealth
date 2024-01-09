@@ -1,18 +1,18 @@
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
+import models from '../../database';
+import { rollbar } from '../../util/rollbar';
 import {
   fetchLatestProposals,
   fetchUpToLatestCosmosProposals,
 } from './proposalFetching/allProposalFetching';
-import { factory, formatFilename } from 'common-common/src/logging';
 import {
   emitProposalNotifications,
   fetchCosmosNotifChains,
   fetchLatestNotifProposalIds,
   filterProposals,
 } from './util';
-import models from '../../database';
-import { rollbar } from '../../util/rollbar';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 /**
  * Entry-point to generate Cosmos proposal notifications. Uses a polling scheme to fetch created proposals.
@@ -29,12 +29,12 @@ export async function generateCosmosGovNotifications() {
   // fetch proposal id of the latest proposal notification for each chain
   const latestProposalIds = await fetchLatestNotifProposalIds(
     models,
-    chains.map((c) => c.id)
+    chains.map((c) => c.id),
   );
   log.info(
     `Fetched the following latest proposal ids: ${JSON.stringify(
-      latestProposalIds
-    )}`
+      latestProposalIds,
+    )}`,
   );
 
   // fetch new proposals for each chain
@@ -42,7 +42,7 @@ export async function generateCosmosGovNotifications() {
   if (chainsWithPropId.length > 0) {
     const newProposals: any = await fetchUpToLatestCosmosProposals(
       chainsWithPropId,
-      latestProposalIds
+      latestProposalIds,
     );
     // filter proposals e.g. proposals that happened long ago, proposals that don't have full deposits, etc
     const filteredProposals = filterProposals(newProposals);

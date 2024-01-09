@@ -1,4 +1,4 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import type { NextFunction, Request, Response } from 'express';
 import { findAllRoles } from '../../util/roles';
 import Errors from './errors';
@@ -7,7 +7,7 @@ const getWebhooks = async (
   models,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const chain = req.chain;
 
@@ -24,7 +24,7 @@ const getWebhooks = async (
       },
     },
     chain.id,
-    ['admin']
+    ['admin'],
   );
   if (!req.user.isAdmin && adminRoles.length === 0)
     return next(new AppError(Errors.NotAdmin));
