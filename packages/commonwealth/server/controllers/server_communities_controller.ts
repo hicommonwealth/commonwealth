@@ -31,6 +31,11 @@ import {
   GetRelatedCommunitiesResult,
 } from './server_communities_methods/get_related_communities';
 import {
+  __putCommunityStake,
+  PutCommunityStakeOptions,
+  PutCommunityStakeResult,
+} from './server_communities_methods/put_community_stake';
+import {
   __searchCommunities,
   SearchCommunitiesOptions,
   SearchCommunitiesResult,
@@ -93,5 +98,11 @@ export class ServerCommunitiesController {
     options: GetRelatedCommunitiesQuery,
   ): Promise<GetRelatedCommunitiesResult> {
     return __getRelatedCommunities.call(this, options);
+  }
+
+  async putCommunityStake(
+    options: PutCommunityStakeOptions,
+  ): Promise<PutCommunityStakeResult> {
+    return __putCommunityStake.call(this, options);
   }
 }

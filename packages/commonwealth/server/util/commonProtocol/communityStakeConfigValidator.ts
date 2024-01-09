@@ -5,7 +5,7 @@ import { AppError } from '../../../../common-common/src/errors';
 import { factoryContracts, validChains } from './chainConfig';
 import { getNamespace } from './contractHelpers';
 
-export const validateCommunitStakeConfig = async (
+export const validateCommunityStakeConfig = async (
   model: DB,
   namespace: string,
   id: number,

@@ -1,3 +1,4 @@
+import { CommunityStakeAttributes } from '@hicommonwealth/core/build/community/index';
 import type { Sequelize } from 'sequelize';
 
 import type { AddressModelStatic } from './models/address';
@@ -34,6 +35,7 @@ import type { TaggedThreadModelStatic } from './models/tagged_threads';
 import type { TemplateModelStatic } from './models/template';
 import type { ThreadModelStatic } from './models/thread';
 import type { TopicModelStatic } from './models/topic';
+import { ModelStatic } from './models/types';
 import type { UserModelStatic } from './models/user';
 import type { VoteModelStatic } from './models/vote';
 import type { WebhookModelStatic } from './models/webhook';
@@ -48,6 +50,7 @@ export type Models = {
   CommunityContract: CommunityContractModelStatic;
   CommunityContractTemplate: CommunityContractTemplateStatic;
   CommunityContractTemplateMetadata: CommunityContractTemplateMetadataStatic;
+  CommunityStake: ModelStatic<CommunityStakeAttributes>;
   Template: TemplateModelStatic;
   CommunitySnapshotSpaces: CommunitySnapshotSpaceModelStatic;
   Collaboration: CollaborationModelStatic;
