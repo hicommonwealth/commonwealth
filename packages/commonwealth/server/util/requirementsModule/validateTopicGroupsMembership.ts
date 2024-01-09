@@ -14,7 +14,7 @@ import { refreshMembershipsForAddress } from './refreshMembershipsForAddress';
  * @param models DB handle
  * @param tokenBalanceCache Token balance cache handle (new implementation)
  * @param topicId ID of the topic
- * @param chain Chain of the groups
+ * @param community Community of the groups
  * @param address Address to check against requirements
  * @returns validity with optional error message
  */
@@ -22,7 +22,7 @@ export async function validateTopicGroupsMembership(
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
   topicId: number,
-  chain: CommunityInstance,
+  community: CommunityInstance,
   address: AddressAttributes,
 ): Promise<{ isValid: boolean; message?: string }> {
   if (!FEATURE_FLAG_GROUP_CHECK_ENABLED) {
@@ -34,7 +34,7 @@ export async function validateTopicGroupsMembership(
   // get all groups of topic
   const topic = await models.Topic.findOne({
     where: {
-      community_id: chain.id,
+      community_id: community.id,
       id: topicId,
     },
   });

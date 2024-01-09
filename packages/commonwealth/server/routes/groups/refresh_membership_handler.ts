@@ -14,7 +14,7 @@ export const refreshMembershipHandler = async (
   req: TypedRequestBody<RefreshMembershipBody>,
   res: TypedResponse<RefreshMembershipResponse>,
 ) => {
-  const { user, address, chain: community } = req;
+  const { user, address, community } = req;
 
   const schema = z.object({
     body: z.object({
