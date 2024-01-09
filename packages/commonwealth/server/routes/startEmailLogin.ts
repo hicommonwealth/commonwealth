@@ -1,6 +1,6 @@
+import { AppError } from '@hicommonwealth/adapters';
 import { WalletId } from '@hicommonwealth/core';
 import sgMail from '@sendgrid/mail';
-import { AppError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';

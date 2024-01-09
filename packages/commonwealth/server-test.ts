@@ -26,7 +26,7 @@ import BanCache from './server/util/banCheckCache';
 import GlobalActivityCache from './server/util/globalActivityCache';
 import ViewCountCache from './server/util/viewCountCache';
 
-import { ServerError } from 'common-common/src/errors';
+import { ServerError } from '@hicommonwealth/adapters';
 import { cacheDecorator } from '../common-common/src/cacheDecorator';
 import {
   CustomRequest,

@@ -1,7 +1,7 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import type { NextFunction, Request, Response } from 'express';
-import { getActivityFeed } from '../util/activityQuery';
 import type { DB } from '../models';
+import { getActivityFeed } from '../util/activityQuery';
 
 export const Errors = {
   NotLoggedIn: 'Must be signed in to view user dashboard',
@@ -11,7 +11,7 @@ export default async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.user) {
     return next(new AppError(Errors.NotLoggedIn));

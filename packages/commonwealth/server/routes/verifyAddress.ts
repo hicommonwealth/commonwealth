@@ -1,12 +1,12 @@
 import { Op } from 'sequelize';
 
+import { AppError } from '@hicommonwealth/adapters';
 import {
   ChainBase,
   NotificationCategories,
   WalletId,
   WalletSsoSource,
 } from '@hicommonwealth/core';
-import { AppError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
 import type { NextFunction, Request, Response } from 'express';
 

@@ -8,13 +8,13 @@ import { Op, Transaction } from 'sequelize';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 
+import { ServerError } from '@hicommonwealth/adapters';
 import {
   ChainBase,
   NotificationCategories,
   WalletId,
   WalletSsoSource,
 } from '@hicommonwealth/core';
-import { ServerError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { verify as verifyCanvas } from '../../shared/canvas/verify';
 import { JWT_SECRET, MAGIC_API_KEY } from '../config';
