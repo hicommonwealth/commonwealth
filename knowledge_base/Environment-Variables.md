@@ -266,11 +266,11 @@ Mixpanel analytics tracking token for our live production site.
 
 ## NEXT_PUBLIC_RSA_PRIVATE_KEY
 
-<!-- Introduced in #2096 but never documented. If you have information about this token, please contribute. Otherwise, this entry is flagged for removal, and the referrent code for refactoring. -->
+<!-- Likely deprecated; flagged for removal with closing of #6185. -->
 
 ## NEXT_PUBLIC_RSA_PUBLIC_KEY
 
-<!-- Introduced in #2096 but never documented. If you have information about this token, please contribute. Otherwise, this entry is flagged for removal, and the referrent code for refactoring. -->
+<!-- Likely deprecated; flagged for removal with closing of #6185. -->
 
 ## NO_CLIENT
 
@@ -344,7 +344,9 @@ By default, this is set in our `commonwealth/server/config` file to `https://com
 
 ## SESSION_SECRET
 
-<!-- In need of documentation; if you have information about this token, please contribute. -->
+<!-- In need of documentation improvements; if you have information about this token, please contribute. -->
+
+Equivalent to JWT Secret, but used in testing.
 
 ## SL_BUILD
 
@@ -356,9 +358,7 @@ Port used for the `snapshot-listener` package. We use the default value `8001`.
 
 ## SLACK_FEEDBACK_WEBHOOK
 
-<!-- In need of documentation; if you have information about this token, please contribute. -->
-
-Allows Slack users to send feedback via webhook.
+Enables Common users to share feedback on the app to our Slack. As of 240109, we still hook into the previous Commonwealth Slack, but this is liable to change soon.
 
 ## SLACK_WEBHOOK_URL_DEV
 
