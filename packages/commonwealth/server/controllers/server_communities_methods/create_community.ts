@@ -364,37 +364,6 @@ export async function __createCommunity(
     has_homepage: true,
   });
 
-  if (community.address) {
-    const erc20Abi = await this.models.ContractAbi.findOne({
-      where: {
-        nickname: 'erc20',
-      },
-    });
-
-    const [contract] = await this.models.Contract.findOrCreate({
-      where: {
-        address: community.address,
-        chain_node_id: node.id,
-      },
-      defaults: {
-        address: community.address,
-        chain_node_id: node.id,
-        decimals: community.decimals,
-        token_name: createdCommunity.token_name,
-        symbol: createdCommunity.default_symbol,
-        type: createdCommunity.network,
-        abi_id: createdCommunity.network === 'erc20' ? erc20Abi?.id : null,
-      },
-    });
-
-    await this.models.CommunityContract.create({
-      community_id: createdCommunity.id,
-      contract_id: contract.id,
-    });
-
-    createdCommunity.Contract = contract;
-  }
-
   const nodeJSON = node.toJSON();
   delete nodeJSON.private_url;
 
