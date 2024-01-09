@@ -3,10 +3,8 @@
 /* eslint-disable no-unused-expressions */
 const chai = require('chai');
 const expect = chai.expect;
-import { RedisCache } from '@hicommonwealth/adapters';
+import { RedisCache, connectToRedis, delay } from '@hicommonwealth/adapters';
 import { RedisNamespaces } from '@hicommonwealth/core';
-import { delay } from '../../util/delayUtils';
-import { connectToRedis } from '../../util/redisUtils';
 
 async function addRandomKeys(
   redisCache: RedisCache,

@@ -8,14 +8,13 @@ import {
   setupStakingExtension,
 } from '@cosmjs/stargate';
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
-import { RedisCache } from '@hicommonwealth/adapters';
+import { RedisCache, delay } from '@hicommonwealth/adapters';
 import BN from 'bn.js';
 import { use as chaiUse, expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import models from '../../../server/database';
 import { BalanceSourceType } from '../../../server/util/requirementsModule/requirementsTypes';
 import { TokenBalanceCache } from '../../../server/util/tokenBalanceCache/tokenBalanceCache';
-import { delay } from '../../util/delayUtils';
 
 chaiUse(chaiAsPromised);
 

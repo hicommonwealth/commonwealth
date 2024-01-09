@@ -10,12 +10,12 @@ const expect = chai.expect;
 
 import {
   cacheDecorator,
+  connectToRedis,
   RedisCache,
   XCACHE_VALUES,
 } from '@hicommonwealth/adapters';
 import { RedisNamespaces } from '@hicommonwealth/core';
 import app, { CACHE_ENDPOINTS } from '../../../server-test';
-import { connectToRedis } from '../../util/redisUtils';
 
 const content_type = {
   json: 'application/json; charset=utf-8',
