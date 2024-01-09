@@ -9,17 +9,18 @@ import chaiHttp from 'chai-http';
 chai.use(chaiHttp);
 const expect = chai.expect;
 
+import {
+  RedisCache,
+  cacheDecorator,
+  connectToRedis,
+} from '@hicommonwealth/adapters';
 import { RedisNamespaces } from '@hicommonwealth/core';
-import { cacheDecorator } from 'common-common/src/cacheDecorator';
-import { RedisCache } from 'common-common/src/redisCache';
 import {
   cosmosLCDDuration,
   cosmosRPCDuration,
   cosmosRPCKey,
 } from 'server/util/cosmosCache';
 import app, { resetDatabase } from '../../../server-test';
-import { connectToRedis } from '../../util/redisUtils';
-
 const v1beta1ChainId = 'csdk-beta';
 const v1ChainId = 'csdk';
 

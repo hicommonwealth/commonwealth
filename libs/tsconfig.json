@@ -19,5 +19,5 @@
       "@hicommonwealth/*": ["libs/*/src"]
     }
   },
-  "exclude": ["**/build", "**/__tests__", "**/__mocks__"]
+  "exclude": ["build", "__tests__", "__mocks__"]
 }

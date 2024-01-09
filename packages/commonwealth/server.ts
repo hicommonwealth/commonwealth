@@ -1,12 +1,12 @@
 import {
   RabbitMQController,
   RascalConfigServices,
+  RedisCache,
   formatFilename,
   getRabbitMQConfig,
   loggerFactory,
 } from '@hicommonwealth/adapters';
 import bodyParser from 'body-parser';
-import { RedisCache } from 'common-common/src/redisCache';
 import {
   ServiceKey,
   startHealthCheckLoop,
