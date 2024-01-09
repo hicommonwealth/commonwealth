@@ -7,9 +7,9 @@ import {
   formatFilename,
   loggerFactory,
   lookupKeyDurationInReq,
+  setupErrorHandlers,
 } from '@hicommonwealth/adapters';
 import bodyParser from 'body-parser';
-import setupErrorHandlers from 'common-common/src/scripts/setupErrorHandlers';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
 import type { Express } from 'express';
