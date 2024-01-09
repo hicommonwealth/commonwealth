@@ -26,7 +26,7 @@ module.exports = {
       );
 
       await queryInterface.addIndex('StarredCommunities', {
-        fields: ['community_id', 'user_id'],
+        fields: ['user_id', 'community_id'],
         unique: true,
         name: 'starred_communities_community_id_user_id',
         transaction,
