@@ -39,7 +39,7 @@ export default (
       underscored: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-      indexes: [{ fields: ['user_id'] }, { fields: ['community_id'] }],
+      indexes: [{ fields: ['user_id', 'community_id'], unique: true }],
     },
   );
 
