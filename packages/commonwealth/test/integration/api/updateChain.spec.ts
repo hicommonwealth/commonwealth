@@ -5,6 +5,7 @@ import { Errors } from '../../../server/controllers/server_communities_methods/u
 import models from '../../../server/database';
 import { CommunityAttributes } from '../../../server/models/community';
 import { UserInstance } from '../../../server/models/user';
+import { TokenBalanceCache } from '../../../server/util/tokenBalanceCache/tokenBalanceCache';
 import { buildUser } from '../../unit/unitHelpers';
 import { resetDatabase } from '../../util/resetDatabase';
 
@@ -114,13 +115,21 @@ describe('UpdateChain Tests', () => {
   });
 
   it('Correctly updates namespace', async () => {
-    const controller = new ServerCommunitiesController(models, null, null);
+    const tbc = {
+      getBalances: async (_: any) => {
+        return { '0x42D6716549A78c05FD8EF1f999D52751Bbf9F46a': '1' };
+      },
+    };
+
+    const controller = new ServerCommunitiesController(
+      models,
+      tbc as unknown as TokenBalanceCache,
+      null,
+    );
     const user: UserInstance = buildUser({
       models,
       userAttributes: { email: '', id: 2, isAdmin: true },
     }) as UserInstance;
-
-    // const temp = .models.Address.findAll({ where: { user_id: 2 } })
 
     const response = await controller.updateCommunity({
       ...baseRequest,

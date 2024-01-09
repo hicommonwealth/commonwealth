@@ -24,7 +24,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         isAdmin: true,
       });
 
-      const temp = await models.User.create({
+      await models.User.create({
         email: 'temp@gmail.com',
         emailVerified: true,
         isAdmin: true,
@@ -43,6 +43,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
           balance_type: BalanceType.Ethereum,
         },
         goerli: {
+          id: 1263,
           url: 'https://rpc.ankr.com/eth_goerli',
           name: 'Goerli Testnet',
           eth_chain_id: 5,

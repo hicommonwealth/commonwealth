@@ -158,6 +158,7 @@ export default (
         allowNull: true,
         defaultValue: null,
       },
+      namespace: { type: dataTypes.STRING, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: true },
       updated_at: { type: dataTypes.DATE, allowNull: true },
     },
