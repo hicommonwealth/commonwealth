@@ -232,6 +232,10 @@ export async function __updateCommunity(
       throw new AppError(Errors.InvalidTransactionHash);
     }
 
+    if (!ownerOfChain) {
+      throw new AppError(Errors.NotAdmin);
+    }
+
     // TODO: Dirty hack. Namespace chain_node_id error checking should be runtime, not static time error check.
     //  Refactor with validateNamespace and generalize when we have more time or support more chains
     if (chain.chain_node_id !== 1263) {

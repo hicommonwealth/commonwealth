@@ -42,7 +42,7 @@ export const validateNamespace = async (
   if (!txReceipt.status) {
     throw new AppError('tx failed');
   }
-  if (txReceipt.from !== address) {
+  if (txReceipt.from.toLowerCase() !== address.toLowerCase()) {
     throw new AppError('Attested sender did not tx sender');
   }
 
