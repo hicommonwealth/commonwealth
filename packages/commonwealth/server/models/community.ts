@@ -184,6 +184,7 @@ export default (
     models.Community.hasMany(models.StarredCommunity, { foreignKey: 'chain' });
     models.Community.belongsToMany(models.Contract, {
       through: models.CommunityContract,
+      foreignKey: 'community_id',
     });
     models.Community.hasMany(models.Group, { foreignKey: 'community_id' });
   };
