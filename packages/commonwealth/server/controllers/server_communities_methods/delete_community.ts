@@ -137,7 +137,7 @@ export async function __deleteCommunity(
           });
 
           await this.models.StarredCommunity.destroy({
-            where: { chain: community.id },
+            where: { community_id: community.id },
             transaction: t,
           });
 
