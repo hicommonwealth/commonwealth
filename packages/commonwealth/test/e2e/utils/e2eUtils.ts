@@ -17,8 +17,8 @@ export async function login(page) {
   }).toPass();
 
   // Basic idea is that we lazily load the metamask mock (otherwise it will include ethereum to our initial bundle)
-  // As a result, the metamask button will not appear right away, because the lazy loading is initialized on login screen
-  // Therefore we need to re-open the login screen a few times waiting for it to finish lazy loading.
+  // As a result, the metamask button will not appear right away, because the lazy loading is initialized on
+  // login screen. Therefore, we need to re-open the login screen a few times waiting for it to finish lazy loading.
   await expect(async () => {
     await page.mouse.click(0, 0);
     button = await page.locator('.LoginSelector button');
@@ -160,6 +160,7 @@ export async function createAddress(chain, profileId, userId) {
       false,
       ${profileId},
       'metamask',
+      // eslint-disable-next-line max-len
       '{"number":17693949,"hash":"0x26664b8151811ad3a2c4fc9091d248e5105950c91b87d71ca7a1d30cfa0cbede", "timestamp":1689365027}',
       false,
       'member'
