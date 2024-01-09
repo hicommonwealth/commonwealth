@@ -125,12 +125,12 @@ describe('UpdateChain Tests', () => {
     const response = await controller.updateCommunity({
       ...baseRequest,
       user: user,
-      namespace: 'tempNamespace',
+      namespace: 'IanSpace',
       transactionHash:
         '0x474369b51a06b06327b292f25679dcc8765113e002689616e6ab02fa6332690b',
       chain_node_id: 1263,
     });
 
-    assert.equal(response.namespace, 'tempNamespace');
+    assert.equal(response.namespace, 'IanSpace');
   });
 });

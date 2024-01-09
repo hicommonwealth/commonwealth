@@ -7,25 +7,27 @@ export const getNamespace = async (
   factoryAddress: string,
 ): Promise<string> => {
   const factory = new web3.eth.Contract(
-    {
-      inputs: [
-        {
-          internalType: 'bytes32',
-          name: '',
-          type: 'bytes32',
-        },
-      ],
-      stateMutability: 'view',
-      type: 'function',
-      name: 'getNamespace',
-      outputs: [
-        {
-          internalType: 'address',
-          name: '',
-          type: 'address',
-        },
-      ],
-    } as AbiItem,
+    [
+      {
+        inputs: [
+          {
+            internalType: 'bytes32',
+            name: '',
+            type: 'bytes32',
+          },
+        ],
+        stateMutability: 'view',
+        type: 'function',
+        name: 'getNamespace',
+        outputs: [
+          {
+            internalType: 'address',
+            name: '',
+            type: 'address',
+          },
+        ],
+      },
+    ] as AbiItem[],
     factoryAddress,
   );
 
