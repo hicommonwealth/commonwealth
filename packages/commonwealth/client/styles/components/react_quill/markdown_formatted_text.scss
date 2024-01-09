@@ -28,37 +28,34 @@
   table {
     width: 100%;
     overflow-x: auto;
-    display: block;
     border-collapse: collapse;
-
-    box-shadow: -3px -1px 9px 0px rgba(255, 255, 255, 0.5) inset;
-    -webkit-box-shadow: -3px -1px 9px 0px rgba(255, 255, 255, 0.5) inset;
-    -moz-box-shadow: -3px -1px 9px 0px rgba(255, 255, 255, 0.5) inset;
+    border-radius: $border-radius-corners-wider;
 
     thead {
-      border-bottom: 1px solid $black;
-    }
-
-    tr:first-child {
-      td {
-        padding-top: 10px;
+      tr {
+        th {
+          @include b2;
+          letter-spacing: 0.02em;
+          font-weight: 700;
+          padding: 16px;
+          border: 1px solid $neutral-200;
+          // border-radius: 6px;
+          background-color: $neutral-50;
+        }
       }
     }
 
-    th,
-    td {
-      word-break: normal;
-      padding: 5px;
-      text-align: left;
-    }
-
-    th {
-      vertical-align: bottom;
-      border: 1px solid $neutral-200;
-    }
-
-    td {
-      vertical-align: top;
+    tbody {
+      tr {
+        td {
+          @include b2;
+          letter-spacing: 0.01em;
+          font-weight: 400;
+          padding: 16px;
+          border: 1px solid $neutral-200;
+          background-color: $white;
+        }
+      }
     }
 
     th[align='center'],
@@ -69,6 +66,11 @@
     th[align='right'],
     td[align='right'] {
       text-align: right;
+    }
+
+    th[align='left'],
+    td[align='left'] {
+      text-align: left;
     }
   }
 
