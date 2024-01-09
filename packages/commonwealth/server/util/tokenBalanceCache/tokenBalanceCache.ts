@@ -1,11 +1,11 @@
 import { fromBech32, toBech32 } from '@cosmjs/encoding';
 import {
   RedisCache,
+  StatsDController,
   formatFilename,
   loggerFactory,
 } from '@hicommonwealth/adapters';
 import { RedisNamespaces } from '@hicommonwealth/core';
-import { StatsDController } from 'common-common/src/statsd';
 import Web3 from 'web3';
 import { DB } from '../../models';
 import { BalanceSourceType } from '../requirementsModule/requirementsTypes';

@@ -1,11 +1,13 @@
-import { StatsDController } from 'common-common/src/statsd';
+import {
+  StatsDController,
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/adapters';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
-
-import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 const log = loggerFactory.getLogger(formatFilename(__filename));
 
 export type ReactionAttributes = {
