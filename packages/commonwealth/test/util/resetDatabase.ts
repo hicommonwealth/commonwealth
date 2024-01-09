@@ -158,7 +158,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         chain_node_id: testnetNode.id,
       });
       await models.CommunityContract.create({
-        chain_id: alex.id,
+        community_id: alex.id,
         contract_id: alexContract.id,
       });
       const yearn = await models.Community.create({
@@ -181,7 +181,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         chain_node_id: mainnetNode.id,
       });
       await models.CommunityContract.create({
-        chain_id: yearn.id,
+        community_id: yearn.id,
         contract_id: yearnContract.id,
       });
       const sushi = await models.Community.create({
@@ -205,7 +205,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         chain_node_id: mainnetNode.id,
       });
       await models.CommunityContract.create({
-        chain_id: sushi.id,
+        community_id: sushi.id,
         contract_id: sushiContract.id,
       });
 

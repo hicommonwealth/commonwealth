@@ -142,7 +142,7 @@ const createContract = async (
     // contract already exists so attempt to add it to the community if it's not already there
     await models.CommunityContract.findOrCreate({
       where: {
-        chain_id,
+        community_id: chain_id,
         contract_id: oldContract.id,
       },
     });
@@ -190,7 +190,7 @@ const createContract = async (
 
       await models.CommunityContract.create(
         {
-          chain_id,
+          community_id: chain_id,
           contract_id: contract.id,
         },
         { transaction: t },
@@ -223,7 +223,7 @@ const createContract = async (
       });
       await models.CommunityContract.create(
         {
-          chain_id,
+          community_id: chain_id,
           contract_id: contract.id,
         },
         { transaction: t },

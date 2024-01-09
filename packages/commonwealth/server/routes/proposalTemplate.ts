@@ -73,7 +73,7 @@ export async function createCommunityContractTemplateAndMetadata(
   }
 
   const communityContract = await models.CommunityContract.findOne({
-    where: { contract_id: contract_id, chain_id },
+    where: { contract_id: contract_id, community_id: chain_id },
   });
 
   if (!communityContract) {
@@ -281,7 +281,7 @@ export async function deleteCommunityContractTemplate(
     const contractTemplate: CommunityContractTemplateAttributes = req.body;
 
     const communityContract = await models.CommunityContract.findOne({
-      where: { contract_id, chain_id },
+      where: { contract_id, community_id: chain_id },
     });
 
     const communityContractId = communityContract.id;
