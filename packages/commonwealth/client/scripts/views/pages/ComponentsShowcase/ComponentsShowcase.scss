@@ -32,6 +32,10 @@
     overflow-y: auto;
     scroll-behavior: smooth;
 
+    & > .CWBanner {
+      margin-bottom: 16px;
+    }
+
     .page-header {
       display: flex;
       flex-direction: column;
@@ -78,6 +82,13 @@
     .MessageBanner,
     .TermsBanner {
       width: 100%;
+    }
+
+    .MessageBanner,
+    .TermsBanner {
+      width: 100%;
+      margin-left: unset !important;
+      padding-left: 16px !important;
     }
   }
 

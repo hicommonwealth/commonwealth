@@ -101,14 +101,17 @@ const BannersAndAlertsShowcase = () => {
       </div>
 
       <CWText type="h5">Message Banner</CWText>
-      {bannerStatus !== 'off' ? (
-        <CWMessageBanner
-          bannerContent="This is banner content"
-          onClose={handleDismissBanner}
-        />
-      ) : (
-        'Banner closed'
-      )}
+
+      <div className="flex-column">
+        {bannerStatus !== 'off' ? (
+          <CWMessageBanner
+            bannerContent="This is banner content"
+            onClose={handleDismissBanner}
+          />
+        ) : (
+          'Banner closed'
+        )}
+      </div>
 
       <CWText type="h5">Banner (Old)</CWText>
       <div className="flex-column">

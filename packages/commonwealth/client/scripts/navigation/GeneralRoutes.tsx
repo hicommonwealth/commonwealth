@@ -27,8 +27,8 @@ const GeneralRoutes = () => [
     element={withLayout(OldTermsPage, { type: 'blank' })}
   />,
   <Route
-    key="/components2"
-    path="/components2"
+    key="/components-old"
+    path="/components-old"
     element={withLayout(ComponentsPage, { type: 'common' })}
   />,
   <Route
