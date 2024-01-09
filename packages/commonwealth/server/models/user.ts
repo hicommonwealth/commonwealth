@@ -133,7 +133,10 @@ export default (
     });
     models.User.hasMany(models.Address);
     models.User.hasMany(models.Profile);
-    models.User.hasMany(models.StarredCommunity);
+    models.User.hasMany(models.StarredCommunity, {
+      foreignKey: 'user_id',
+      sourceKey: 'id',
+    });
   };
 
   return User;

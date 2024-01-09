@@ -112,14 +112,14 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
     }),
     models.CommunityBanner.findOne({
       where: {
-        chain_id: chain.id,
+        community_id: chain.id,
       },
     }),
     new Promise(async (resolve, reject) => {
       try {
         const communityContracts = await models.CommunityContract.findAll({
           where: {
-            chain_id: chain.id,
+            community_id: chain.id,
           },
         });
         const contractsWithTemplates: Array<{

@@ -35,7 +35,7 @@ export type ContractModelStatic = ModelStatic<ContractInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): ContractModelStatic => {
   const Contract = <ContractModelStatic>sequelize.define(
     'Contract',
@@ -68,12 +68,13 @@ export default (
       underscored: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-    }
+    },
   );
 
   Contract.associate = (models) => {
     models.Contract.belongsToMany(models.Community, {
       through: models.CommunityContract,
+      foreignKey: 'community_id',
     });
     models.Contract.belongsTo(models.ChainNode, {
       foreignKey: 'chain_node_id',

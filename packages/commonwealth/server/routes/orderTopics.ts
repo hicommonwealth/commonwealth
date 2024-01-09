@@ -8,7 +8,7 @@ import { validateOwner } from '../util/validateOwner';
 enum OrderTopicsErrors {
   NoUser = 'Not signed in',
   NoIds = 'Must supply ordered array of topic IDs',
-  NoChain = 'Must supply a chain ID',
+  NoCommunity = 'Must supply a community ID',
   NoPermission = `You do not have permission to order topics`,
   InvalidTopic = 'Passed topics may not all be featured, or may include an invalid ID',
 }
@@ -21,16 +21,16 @@ const OrderTopics = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const chain = req.chain;
-
   if (!req.user) {
     return next(new AppError(OrderTopicsErrors.NoUser));
   }
 
+  const { community } = req;
+
   const isAdminOrMod = await validateOwner({
     models: models,
     user: req.user,
-    communityId: chain.id,
+    communityId: community.id,
     allowMod: true,
     allowAdmin: true,
     allowGodMode: true,

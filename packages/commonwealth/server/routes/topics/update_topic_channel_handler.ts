@@ -19,7 +19,7 @@ export const updateTopicChannelHandler = async (
   req: TypedRequestParams<UpdateTopicChannelRequestParams>,
   res: TypedResponse<UpdateTopicChannelResponse>,
 ) => {
-  const { user, chain: community } = req;
+  const { user, community } = req;
   const { topicId, channelId } = req.params;
 
   const validationSchema = z.object({

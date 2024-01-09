@@ -66,7 +66,7 @@ export default class BanCache extends JobRunner<CacheT> {
 
     const ban = await this._models.Ban.findOne({
       where: {
-        chain_id: communityId,
+        community_id: communityId,
         address,
       },
     });

@@ -34,7 +34,7 @@ export const createThreadCommentHandler = async (
   req: TypedRequest<CreateThreadCommentRequestBody, null, { id: string }>,
   res: TypedResponse<CreateThreadCommentResponse>,
 ) => {
-  const { user, address, chain: community } = req;
+  const { user, address, community } = req;
   const { id: threadId } = req.params;
   const {
     parent_id: parentId,

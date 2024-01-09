@@ -43,11 +43,11 @@ const banAddress = async (
   // find or create Ban
   const [ban] = await models.Ban.findOrCreate({
     where: {
-      chain_id: chain.id,
+      community_id: chain.id,
       address,
     },
     defaults: {
-      chain_id: chain.id,
+      community_id: chain.id,
       address,
     },
   });

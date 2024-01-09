@@ -19,9 +19,15 @@ export type CosmosSource = {
   token_symbol: string;
 };
 
+export type CosmosContractSource = {
+  source_type: BalanceSourceType.CW721;
+  cosmos_chain_id: string;
+  contract_address: string;
+};
+
 export type ThresholdData = {
   threshold: string;
-  source: ContractSource | NativeSource | CosmosSource;
+  source: ContractSource | NativeSource | CosmosSource | CosmosContractSource;
 };
 
 export type AllowlistData = {
@@ -44,4 +50,5 @@ export enum BalanceSourceType {
   ERC721 = 'erc721',
   ERC1155 = 'erc1155',
   CosmosNative = 'cosmos_native',
+  CW721 = 'cw721',
 }

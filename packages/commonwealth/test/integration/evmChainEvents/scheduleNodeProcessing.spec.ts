@@ -1,6 +1,7 @@
 import { expect } from 'chai';
-import { scheduleNodeProcessing } from '../../../server/workers/evmChainEvents/nodeProcessing';
 import sinon from 'sinon';
+import { scheduleNodeProcessing } from '../../../server/workers/evmChainEvents/nodeProcessing';
+import { resetDatabase } from '../../util/resetDatabase';
 import {
   getTestAbi,
   getTestCommunityContract,
@@ -8,7 +9,6 @@ import {
   getTestSignatures,
   getTestSubscription,
 } from './util';
-import { resetDatabase } from '../../util/resetDatabase';
 
 describe.only('scheduleNodeProcessing', () => {
   const sandbox = sinon.createSandbox();

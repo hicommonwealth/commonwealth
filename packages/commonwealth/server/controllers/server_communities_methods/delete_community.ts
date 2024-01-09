@@ -90,7 +90,7 @@ export async function __deleteCommunity(
 
           await this.models.CommunityContract.destroy({
             where: {
-              chain_id: community.id,
+              community_id: community.id,
             },
             transaction: t,
           });
@@ -137,7 +137,7 @@ export async function __deleteCommunity(
           });
 
           await this.models.StarredCommunity.destroy({
-            where: { chain: community.id },
+            where: { community_id: community.id },
             transaction: t,
           });
 
@@ -146,7 +146,7 @@ export async function __deleteCommunity(
           });
 
           await this.models.CommunityBanner.destroy({
-            where: { chain_id: community.id },
+            where: { community_id: community.id },
             transaction: t,
           });
 
@@ -155,6 +155,49 @@ export async function __deleteCommunity(
             where: { chain_id: community.id },
             transaction: t,
           });
+
+          await this.models.sequelize.query(
+            `
+            WITH addresses_to_delete AS (
+                SELECT id 
+                FROM "Addresses"
+                WHERE community_id = :community_id
+            ) DELETE FROM "Memberships" M
+            USING addresses_to_delete atd
+            WHERE atd.id = M.address_id;
+          `,
+            {
+              transaction: t,
+              replacements: {
+                community_id: community.id,
+              },
+            },
+          );
+
+          await this.models.Group.destroy({
+            where: {
+              community_id: community.id,
+            },
+            transaction: t,
+          });
+
+          await this.models.sequelize.query(
+            `
+            WITH addresses_to_delete AS (
+                SELECT id 
+                FROM "Addresses"
+                WHERE community_id = :community_id
+            ) DELETE FROM "Collaborations" C
+            USING addresses_to_delete atd
+            WHERE atd.id = C.address_id;
+          `,
+            {
+              transaction: t,
+              replacements: {
+                community_id: community.id,
+              },
+            },
+          );
 
           await this.models.Address.destroy({
             where: { community_id: community.id },

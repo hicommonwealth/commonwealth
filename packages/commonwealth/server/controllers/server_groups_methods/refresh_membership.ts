@@ -27,7 +27,7 @@ export async function __refreshMembership(
   this: ServerGroupsController,
   { community, address, topicId }: RefreshMembershipOptions,
 ): Promise<RefreshMembershipResult> {
-  // get all groups in the chain
+  // get all groups in the community
   let groups = await this.models.Group.findAll({
     where: {
       community_id: community.id,
