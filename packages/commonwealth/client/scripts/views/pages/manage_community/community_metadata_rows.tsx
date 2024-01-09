@@ -544,7 +544,9 @@ export const CommunityMetadataRows = ({
                           await refetchTopics();
                           notifySuccess(
                             `#${channel.name} connected to ${
-                              topics.find((topic) => topic.id === topicId)?.name
+                              topics.find(
+                                (topic) => topic.id === Number(topicId),
+                              )?.name
                             }!`,
                           );
                         } catch (e) {
@@ -554,7 +556,11 @@ export const CommunityMetadataRows = ({
                       },
                     };
                   })}
-                  topics={topics}
+                  topics={topics.map((topic) => ({
+                    name: topic.name,
+                    id: `${topic.id}`,
+                    channelId: topic.channelId,
+                  }))}
                   refetchTopics={async () => {
                     await refetchTopics();
                   }}
