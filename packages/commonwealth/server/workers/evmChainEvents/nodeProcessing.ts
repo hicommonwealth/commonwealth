@@ -1,5 +1,8 @@
-import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
-import { StatsDController } from 'common-common/src/statsd';
+import {
+  StatsDController,
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/adapters';
 import models from '../../database';
 import { NotificationInstance } from '../../models/notification';
 import { rollbar } from '../../util/rollbar';

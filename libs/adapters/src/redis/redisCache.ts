@@ -1,4 +1,3 @@
-import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import type { RedisNamespaces } from '@hicommonwealth/core';
 import {
   ConnectionTimeoutError,
@@ -7,6 +6,7 @@ import {
   createClient,
 } from 'redis';
 import type Rollbar from 'rollbar';
+import { formatFilename, loggerFactory } from '../typescript-logging';
 
 const log = loggerFactory.getLogger(formatFilename(__filename));
 
@@ -114,6 +114,14 @@ export class RedisCache {
     this._initialized = !!this._client.isOpen;
   }
 
+  private initialized() {
+    if (!this._initialized) {
+      log.warn('Redis client is not initialized. Run RedisCache.init() first!');
+      return false;
+    }
+    return true;
+  }
+
   /**
    * This function facilitates setting a key-value pair in Redis. Since Redis has a single keyspace we include a prefix
    * to simulate many keyspaces. That is, all key-value pairs for a specific functionality should use a matching prefix.
@@ -137,25 +145,21 @@ export class RedisCache {
   ): Promise<boolean> {
     let res;
     try {
-      if (!this._initialized) {
-        log.warn(
-          'Redis client is not initialized. Run RedisCache.init() first!',
-        );
-        return false;
-      }
-      const finalKey = RedisCache.getNamespaceKey(namespace, key);
-      if (typeof value !== 'string') {
-        value = JSON.stringify(value);
-      }
-      if (duration > 0) {
-        res = await this._client.set(finalKey, value, {
-          EX: duration,
-          NX: notExists,
-        });
-      } else {
-        res = await this._client.set(finalKey, value, {
-          NX: notExists,
-        });
+      if (this.initialized()) {
+        const finalKey = RedisCache.getNamespaceKey(namespace, key);
+        if (typeof value !== 'string') {
+          value = JSON.stringify(value);
+        }
+        if (duration > 0) {
+          res = await this._client.set(finalKey, value, {
+            EX: duration,
+            NX: notExists,
+          });
+        } else {
+          res = await this._client.set(finalKey, value, {
+            NX: notExists,
+          });
+        }
       }
     } catch (e) {
       log.error(
@@ -174,14 +178,10 @@ export class RedisCache {
     key: string,
   ): Promise<string> {
     try {
-      if (!this._initialized) {
-        log.warn(
-          'Redis client is not initialized. Run RedisCache.init() first!',
-        );
-        return;
+      if (this.initialized()) {
+        const finalKey = RedisCache.getNamespaceKey(namespace, key);
+        return await this._client.get(finalKey);
       }
-      const finalKey = RedisCache.getNamespaceKey(namespace, key);
-      return await this._client.get(finalKey);
     } catch (e) {
       log.error(
         `An error occurred while getting the following key '${key}'`,
@@ -207,48 +207,43 @@ export class RedisCache {
     duration = 0,
     transaction = true,
   ): Promise<false | Array<'OK' | null>> {
-    if (!this._initialized) {
-      log.error(
-        'Redis client is not initialized. Run RedisCache.init() first!',
-      );
-      return false;
-    }
-
-    // add the namespace prefix to all keys
-    const transformedData = Object.keys(data).reduce((result, key) => {
-      result[RedisCache.getNamespaceKey(namespace, key)] = data[key];
-      return result;
-    }, {});
-
-    if (duration > 0) {
-      // MSET doesn't support setting TTL, so we need use
-      // a multi-exec to process many SET commands
-      const multi = this._client.multi();
-      for (const key of Object.keys(transformedData)) {
-        multi.set(key, transformedData[key], { EX: duration });
-      }
-
-      try {
-        let result: Array<'OK' | null>;
-        if (transaction) result = await multi.exec();
-        else result = await multi.execAsPipeline();
+    if (this.initialized()) {
+      // add the namespace prefix to all keys
+      const transformedData = Object.keys(data).reduce((result, key) => {
+        result[RedisCache.getNamespaceKey(namespace, key)] = data[key];
         return result;
-      } catch (e) {
-        const msg =
-          `Error occurred while setting multiple keys ` +
-          `${transaction ? 'in a transaction' : 'in a pipeline'}`;
-        log.error(msg, e);
-        this._rollbar.error(msg, e);
-        return false;
-      }
-    } else {
-      try {
-        return await this._client.MSET(transformedData);
-      } catch (e) {
-        const msg = 'Error occurred while setting multiple keys';
-        log.error(msg, e);
-        this._rollbar.error(msg, e);
-        return false;
+      }, {});
+
+      if (duration > 0) {
+        // MSET doesn't support setting TTL, so we need use
+        // a multi-exec to process many SET commands
+        const multi = this._client.multi();
+        for (const key of Object.keys(transformedData)) {
+          multi.set(key, transformedData[key], { EX: duration });
+        }
+
+        try {
+          let result: Array<'OK' | null>;
+          if (transaction) result = await multi.exec();
+          else result = await multi.execAsPipeline();
+          return result;
+        } catch (e) {
+          const msg =
+            `Error occurred while setting multiple keys ` +
+            `${transaction ? 'in a transaction' : 'in a pipeline'}`;
+          log.error(msg, e);
+          this._rollbar.error(msg, e);
+          return false;
+        }
+      } else {
+        try {
+          return await this._client.MSET(transformedData);
+        } catch (e) {
+          const msg = 'Error occurred while setting multiple keys';
+          log.error(msg, e);
+          this._rollbar.error(msg, e);
+          return false;
+        }
       }
     }
   }
@@ -257,32 +252,27 @@ export class RedisCache {
     namespace: RedisNamespaces,
     keys: string[],
   ): Promise<false | Record<string, unknown>> {
-    if (!this._initialized) {
-      log.error(
-        'Redis client is not initialized. Run RedisCache.init() first!',
+    if (this.initialized()) {
+      const transformedKeys = keys.map((k) =>
+        RedisCache.getNamespaceKey(namespace, k),
       );
-      return false;
+      let result: Record<string, unknown>;
+      try {
+        const values = await this._client.MGET(transformedKeys);
+        result = transformedKeys.reduce((obj, key, index) => {
+          if (values[index] !== null) {
+            obj[key] = values[index];
+          }
+          return obj;
+        }, {});
+      } catch (e) {
+        const msg = 'An error occurred while getting many keys';
+        log.error(msg, e);
+        this._rollbar.error(msg, e);
+        return false;
+      }
+      return result;
     }
-
-    const transformedKeys = keys.map((k) =>
-      RedisCache.getNamespaceKey(namespace, k),
-    );
-    let result: Record<string, unknown>;
-    try {
-      const values = await this._client.MGET(transformedKeys);
-      result = transformedKeys.reduce((obj, key, index) => {
-        if (values[index] !== null) {
-          obj[key] = values[index];
-        }
-        return obj;
-      }, {});
-    } catch (e) {
-      const msg = 'An error occurred while getting many keys';
-      log.error(msg, e);
-      this._rollbar.error(msg, e);
-      return false;
-    }
-    return result;
   }
 
   /**
@@ -294,28 +284,21 @@ export class RedisCache {
     namespace: RedisNamespaces,
     maxResults = 1000,
   ): Promise<{ [key: string]: string } | boolean> {
-    if (!this._initialized) {
-      log.error(
-        'Redis client is not initialized. Run RedisCache.init() first!',
-      );
-      return false;
-    }
-
     const keys = [];
     const data = {};
     try {
-      for await (const key of this._client.scanIterator({
-        MATCH: `${namespace}*`,
-        COUNT: maxResults,
-      })) {
-        keys.push(key);
+      if (this.initialized()) {
+        for await (const key of this._client.scanIterator({
+          MATCH: `${namespace}*`,
+          COUNT: maxResults,
+        })) {
+          keys.push(key);
+        }
+        for (const key of keys) {
+          data[key] = await this._client.get(key);
+        }
+        return data;
       }
-
-      for (const key of keys) {
-        data[key] = await this._client.get(key);
-      }
-
-      return data;
     } catch (e) {
       log.error(e);
       return false;
@@ -377,13 +360,9 @@ export class RedisCache {
   ): Promise<number> {
     const finalKey = RedisCache.getNamespaceKey(namespace, key);
     try {
-      if (!this._initialized) {
-        log.warn(
-          'Redis client is not initialized. Run RedisCache.init() first!',
-        );
-        return 0;
+      if (this.initialized()) {
+        return this._client.del(finalKey);
       }
-      return this._client.del(finalKey);
     } catch (e) {
       log.error(
         `An error occurred while deleting the following key: ${finalKey}`,

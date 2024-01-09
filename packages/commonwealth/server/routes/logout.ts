@@ -1,4 +1,4 @@
-import { StatsDController } from 'common-common/src/statsd';
+import { StatsDController } from '@hicommonwealth/adapters';
 import type { Request, Response } from 'express';
 import type { DB } from '../models';
 

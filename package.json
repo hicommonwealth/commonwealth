@@ -60,7 +60,6 @@
     "web3": "1.8.2",
     "web3-core": "1.8.2",
     "web3-utils": "1.8.2",
-    "async-rwlock": "^1.1.1",
     "pg": "^8.8.0",
     "typescript-logging": "^0.6.4"
   },

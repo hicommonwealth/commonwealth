@@ -1,7 +1,10 @@
 /* eslint-disable max-len */
-import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
+import {
+  StatsDController,
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/adapters';
 import { NotificationCategories } from '@hicommonwealth/core';
-import { StatsDController } from 'common-common/src/statsd';
 import Sequelize, { QueryTypes } from 'sequelize';
 import type {
   IChainEventNotificationData,

@@ -1,5 +1,5 @@
-import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
-import { StatsDController } from '../../src/statsd';
+import { StatsDController } from '../hot-shots';
+import { formatFilename, loggerFactory } from '../typescript-logging';
 
 const log = loggerFactory.getLogger(formatFilename(__filename));
 
