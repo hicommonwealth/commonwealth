@@ -13,6 +13,7 @@
   @include hidden-formatting();
 
   width: 100%;
+  overflow: visible;
 
   p {
     @include b2;
@@ -23,7 +24,10 @@
     margin-inline-end: 0;
   }
 
-  overflow: visible;
+  a {
+    @include b2;
+    color: $primary-500;
+  }
 
   table {
     width: 100%;
