@@ -1,12 +1,12 @@
-import { AppError, ServerError } from '@hicommonwealth/adapters';
 import type { Express, Request, Response } from 'express';
 import type Rollbar from 'rollbar';
+import { AppError, ServerError } from '../errors';
 
 // Handle server and application errors.
 // 401 Unauthorized errors are handled by Express' middleware and returned
 // before this handler. Errors that hit the final condition should be either
 // (1) thrown as ServerErrors or AppErrors or (2) triaged as a critical bug.
-const setupErrorHandlers = (app: Express, rollbar: Rollbar) => {
+export const setupErrorHandlers = (app: Express, rollbar: Rollbar) => {
   // Handle 404 errors
   app.use((req: Request, res: Response) => {
     res.status(404);
@@ -49,5 +49,3 @@ const setupErrorHandlers = (app: Express, rollbar: Rollbar) => {
     }
   });
 };
-
-export default setupErrorHandlers;

@@ -2,16 +2,15 @@ import {
   RabbitMQController,
   RascalConfigServices,
   RedisCache,
+  ServiceKey,
   StatsDController,
   formatFilename,
   getRabbitMQConfig,
   loggerFactory,
+  setupErrorHandlers,
+  startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import bodyParser from 'body-parser';
-import {
-  ServiceKey,
-  startHealthCheckLoop,
-} from 'common-common/src/scripts/startHealthCheckLoop';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
@@ -26,7 +25,6 @@ import type { BrokerConfig } from 'rascal';
 import Rollbar from 'rollbar';
 import favicon from 'serve-favicon';
 import * as v8 from 'v8';
-import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers';
 import {
   DATABASE_CLEAN_HOUR,
   PRERENDER_TOKEN,
