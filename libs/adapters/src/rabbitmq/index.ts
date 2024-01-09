@@ -6,5 +6,6 @@ export {
   RabbitMQControllerError,
 } from './rabbitMQController';
 export { RepublishFailedMessages } from './republishFailedMessages';
+export * from './serviceConsumer';
 export * from './types';
 export * from './util';

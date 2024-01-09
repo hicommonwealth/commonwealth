@@ -47,6 +47,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
           name: 'Osmosis',
           balance_type: BalanceType.Cosmos,
           cosmos_chain_id: 'osmosis',
+          bech32: 'osmo',
         },
         csdkBeta: {
           url: 'https://cosmos-devnet-beta.herokuapp.com/rpc',
@@ -54,6 +55,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
           balance_type: BalanceType.Cosmos,
           alt_wallet_url: 'https://cosmos-devnet-beta.herokuapp.com/lcd/',
           cosmos_chain_id: 'csdkbetaci',
+          bech32: 'cosmos',
         },
         csdkV1: {
           url: 'https://cosmos-devnet.herokuapp.com/rpc',
@@ -61,6 +63,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
           balance_type: BalanceType.Cosmos,
           alt_wallet_url: 'https://cosmos-devnet.herokuapp.com/lcd/',
           cosmos_chain_id: 'csdkv1',
+          bech32: 'cosmos',
         },
       };
 
@@ -158,7 +161,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         chain_node_id: testnetNode.id,
       });
       await models.CommunityContract.create({
-        chain_id: alex.id,
+        community_id: alex.id,
         contract_id: alexContract.id,
       });
       const yearn = await models.Community.create({
@@ -181,7 +184,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         chain_node_id: mainnetNode.id,
       });
       await models.CommunityContract.create({
-        chain_id: yearn.id,
+        community_id: yearn.id,
         contract_id: yearnContract.id,
       });
       const sushi = await models.Community.create({
@@ -205,7 +208,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         chain_node_id: mainnetNode.id,
       });
       await models.CommunityContract.create({
-        chain_id: sushi.id,
+        community_id: sushi.id,
         contract_id: sushiContract.id,
       });
 

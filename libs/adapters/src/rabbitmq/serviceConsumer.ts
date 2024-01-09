@@ -1,16 +1,16 @@
+import crypto from 'crypto';
+import Rollbar from 'rollbar';
+import { Logger } from 'typescript-logging';
 import type {
+  AbstractRabbitMQController,
   RascalSubscriptions,
   TRmqMessages,
-} from '@hicommonwealth/adapters';
+} from '.';
 import {
-  AbstractRabbitMQController,
   addPrefix,
   formatFilename,
   loggerFactory,
-} from '@hicommonwealth/adapters';
-import crypto from 'crypto';
-import type Rollbar from 'rollbar';
-import type { Logger } from 'typescript-logging';
+} from '../typescript-logging';
 
 export type RabbitMQSubscription = {
   messageProcessor: (data: TRmqMessages, ...args: any) => Promise<void>;

@@ -34,7 +34,7 @@ const getBannedAddresses = async (
     throw new AppError(GetBannedAddressesErrors.NoPermission);
   }
 
-  const bans = await models.Ban.findAll({ where: { chain_id: chain.id } });
+  const bans = await models.Ban.findAll({ where: { community_id: chain.id } });
   return success(
     res,
     bans.map((b) => b.toJSON()),
