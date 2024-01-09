@@ -388,7 +388,7 @@ export async function __createCommunity(
     });
 
     await this.models.CommunityContract.create({
-      chain_id: createdCommunity.id,
+      community_id: createdCommunity.id,
       contract_id: contract.id,
     });
 

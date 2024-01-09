@@ -18,6 +18,12 @@ module.exports = {
       `,
         { transaction },
       );
+      await queryInterface.addIndex('CommunityContracts', {
+        fields: ['community_id'],
+        name: 'community_contracts_community_id',
+        unique: true,
+        transaction,
+      });
     });
   },
 

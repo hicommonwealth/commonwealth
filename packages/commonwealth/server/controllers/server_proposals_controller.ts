@@ -51,7 +51,7 @@ export class ServerProposalsController {
   private async getContractInfo(chainId: string): Promise<ContractInfo> {
     const contract = await this.models.CommunityContract.findOne({
       where: {
-        chain_id: chainId,
+        community_id: chainId,
       },
       attributes: [],
       include: [
