@@ -51,6 +51,7 @@ export type CommunityAttributes = {
   discord_bot_webhooks_enabled?: boolean;
   directory_page_enabled?: boolean;
   directory_page_chain_node_id?: number;
+  namespace?: string;
 
   // associations
   ChainNode?: ChainNodeAttributes;

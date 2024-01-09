@@ -8,8 +8,8 @@ import { buildUser } from '../../unit/unitHelpers';
 import { resetDatabase } from '../../util/resetDatabase';
 
 const baseRequest: CommunityAttributes = {
-  id: 'edgeware',
-  name: 'Edgeware',
+  id: 'ethereum',
+  name: 'ethereum',
   chain_node_id: 1,
   default_symbol: 'EDG',
   network: null,
@@ -26,7 +26,7 @@ describe('UpdateChain Tests', () => {
   });
 
   it('Correctly updates chain', async () => {
-    const controller = new ServerCommunitiesController(models, null);
+    const controller = new ServerCommunitiesController(models, null, null);
     const user: UserInstance = buildUser({
       models,
       userAttributes: { email: '', id: 1, isAdmin: true },
@@ -51,5 +51,23 @@ describe('UpdateChain Tests', () => {
 
     assert.equal(response.directory_page_enabled, false);
     assert.equal(response.directory_page_chain_node_id, null);
+  });
+
+  it('Correctly updates namespace', async () => {
+    const controller = new ServerCommunitiesController(models, null, null);
+    const user: UserInstance = buildUser({
+      models,
+      userAttributes: { email: '', id: 1, isAdmin: true },
+    }) as UserInstance;
+
+    const response = await controller.updateCommunity({
+      ...baseRequest,
+      user: user,
+      namespace: 'tempNamespace',
+      transactionHash: '0x1234',
+      chain_node_id: 1263,
+    });
+
+    assert.equal(response.namespace, 'tempNamespace');
   });
 });

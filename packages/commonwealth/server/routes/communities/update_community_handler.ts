@@ -7,6 +7,7 @@ type UpdateCommunityRequestBody = CommunityAttributes & {
   id: string;
   'featured_topics[]'?: string[];
   'snapshot[]'?: string[];
+  transactionHash?: string; // necessary for namespace update
 };
 type UpdateCommunityResponse = UpdateCommunityResult;
 

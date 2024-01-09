@@ -8,6 +8,8 @@ import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/typ
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';
 import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
 import type { CommunityAttributes } from '../../models/community';
+import { validChains } from '../../util/commonProtocol/chainConfig';
+import { validateNamespace } from '../../util/commonProtocol/newNamespaceValidator';
 import { findOneRole } from '../../util/roles';
 import { TrackOptions } from '../server_analytics_methods/track';
 import { ServerCommunitiesController } from '../server_communities_controller';
@@ -26,12 +28,15 @@ export const Errors = {
     'Snapshot data may only be added to chains with Ethereum base',
   InvalidTerms: 'Terms of Service must begin with https://',
   InvalidDefaultPage: 'Default page does not exist',
+  InvalidTransactionHash: 'Valid transaction hash required to verify namespace',
+  NamespaceNotSupportedOnChain: 'Namespace not supported on selected chain',
 };
 
 export type UpdateCommunityOptions = CommunityAttributes & {
   user: UserInstance;
   featuredTopics?: string[];
   snapshot?: string[];
+  transactionHash?: string;
 };
 export type UpdateCommunityResult = CommunityAttributes & {
   snapshot: string[];
@@ -56,12 +61,14 @@ export async function __updateCommunity(
   }
 
   const chain = await this.models.Community.findOne({ where: { id: id } });
+  let ownerOfChain;
   if (!chain) {
     throw new AppError(Errors.NoCommunityFound);
   } else {
-    const userAddressIds = (await user.getAddresses())
-      .filter((addr) => !!addr.verified)
-      .map((addr) => addr.id);
+    const addresses = (await user.getAddresses()).filter(
+      (addr) => !!addr.verified,
+    );
+    const userAddressIds = addresses.map((addr) => addr.id);
     const userMembership = await findOneRole(
       this.models,
       { where: { address_id: { [Op.in]: userAddressIds } } },
@@ -71,6 +78,9 @@ export async function __updateCommunity(
     if (!user.isAdmin && !userMembership) {
       throw new AppError(Errors.NotAdmin);
     }
+    ownerOfChain = addresses.filter(
+      (a) => a.community_id === chain.id && a.role === 'admin',
+    )[0];
   }
 
   const {
@@ -92,6 +102,8 @@ export async function __updateCommunity(
     chain_node_id,
     directory_page_enabled,
     directory_page_chain_node_id,
+    namespace,
+    transactionHash,
   } = rest;
 
   // Handle single string case and undefined case
@@ -214,6 +226,28 @@ export async function __updateCommunity(
   }
   if (directory_page_chain_node_id !== undefined) {
     chain.directory_page_chain_node_id = directory_page_chain_node_id;
+  }
+  if (namespace !== undefined) {
+    if (!transactionHash) {
+      throw new AppError(Errors.InvalidTransactionHash);
+    }
+
+    // TODO: Dirty hack. Namespace chain_node_id error checking should be runtime, not static time error check.
+    //  Refactor with validateNamespace and generalize when we have more time or support more chains
+    if (chain.chain_node_id !== 1263) {
+      throw new AppError(Errors.NamespaceNotSupportedOnChain);
+    }
+
+    await validateNamespace(
+      this.models,
+      this.tokenBalanceCache,
+      namespace,
+      transactionHash,
+      ownerOfChain.address,
+      validChains.Goerli,
+    );
+
+    chain.namespace = namespace;
   }
 
   // TODO Graham 3/31/22: Will this potentially lead to undesirable effects if toggle

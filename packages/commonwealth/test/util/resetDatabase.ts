@@ -219,6 +219,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
           verified: new Date(),
+          role: 'admin',
         },
         {
           address: '5DJA5ZCobDS3GVn8D2E5YRiotDqGkR2FN1bg6LtfNUmuadwX',

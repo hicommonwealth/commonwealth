@@ -12,7 +12,7 @@ describe('ChainNode Tests', () => {
   });
 
   it('Creates new ChainNode when', async () => {
-    const controller = new ServerCommunitiesController(models, null);
+    const controller = new ServerCommunitiesController(models, null, null);
     const user: UserInstance = buildUser({
       models,
       userAttributes: { email: '', id: 1, isAdmin: true },

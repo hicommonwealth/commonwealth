@@ -1,5 +1,6 @@
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
+import { TokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
 import {
   __createChainNode,
   CreateChainNodeOptions,
@@ -45,7 +46,11 @@ import {
  * Implements methods related to communities
  */
 export class ServerCommunitiesController {
-  constructor(public models: DB, public banCache: BanCache) {}
+  constructor(
+    public models: DB,
+    public tokenBalanceCache: TokenBalanceCache,
+    public banCache: BanCache,
+  ) {}
 
   async searchCommunities(
     options: SearchCommunitiesOptions,

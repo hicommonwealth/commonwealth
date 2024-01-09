@@ -40,10 +40,10 @@ export const validateNamespace = async (
   //tx data validation
   const txReceipt = await web3.eth.getTransactionReceipt(txHash);
   if (!txReceipt.status) {
-    return new AppError('tx failed');
+    throw new AppError('tx failed');
   }
   if (txReceipt.from !== address) {
-    return new AppError('Attested sender did not tx sender');
+    throw new AppError('Attested sender did not tx sender');
   }
 
   //validate contract data
@@ -53,7 +53,7 @@ export const validateNamespace = async (
     factoryData.factory,
   );
   if (activeNamespace !== txReceipt.contractAddress) {
-    return new AppError('Invalid tx hash for namespace creation');
+    throw new AppError('Invalid tx hash for namespace creation');
   }
 
   // Validate User as admin
@@ -68,6 +68,6 @@ export const validateNamespace = async (
     cacheRefresh: true,
   });
   if (balance[address] !== '1') {
-    return new AppError('User not admin of namespace');
+    throw new AppError('User not admin of namespace');
   }
 };
