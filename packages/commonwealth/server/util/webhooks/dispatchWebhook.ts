@@ -1,6 +1,9 @@
-import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
+import {
+  StatsDController,
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/adapters';
 import { NotificationCategories } from '@hicommonwealth/core';
-import { StatsDController } from 'common-common/src/statsd';
 import { NotificationDataAndCategory } from '../../../shared/types';
 import models from '../../database';
 import { CommunityInstance } from '../../models/community';

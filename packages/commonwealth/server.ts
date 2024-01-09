@@ -2,6 +2,7 @@ import {
   RabbitMQController,
   RascalConfigServices,
   RedisCache,
+  StatsDController,
   formatFilename,
   getRabbitMQConfig,
   loggerFactory,
@@ -11,7 +12,6 @@ import {
   ServiceKey,
   startHealthCheckLoop,
 } from 'common-common/src/scripts/startHealthCheckLoop';
-import { StatsDController } from 'common-common/src/statsd';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';

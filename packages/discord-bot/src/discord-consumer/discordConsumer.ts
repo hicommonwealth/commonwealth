@@ -2,6 +2,7 @@ import {
   RabbitMQController,
   RascalConfigServices,
   RascalSubscriptions,
+  StatsDController,
   TRmqMessages,
   formatFilename,
   getRabbitMQConfig,
@@ -16,7 +17,6 @@ import {
   ServiceKey,
   startHealthCheckLoop,
 } from 'common-common/src/scripts/startHealthCheckLoop';
-import { StatsDController } from 'common-common/src/statsd';
 import v8 from 'v8';
 import {
   handleCommentMessages,

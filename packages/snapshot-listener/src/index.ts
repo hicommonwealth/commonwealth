@@ -2,6 +2,7 @@ import {
   RabbitMQController,
   RascalConfigServices,
   RascalPublications,
+  StatsDController,
   formatFilename,
   getRabbitMQConfig,
   loggerFactory,
@@ -11,7 +12,6 @@ import {
   ServiceKey,
   startHealthCheckLoop,
 } from 'common-common/src/scripts/startHealthCheckLoop';
-import { StatsDController } from 'common-common/src/statsd';
 import type { Request, Response } from 'express';
 import express from 'express';
 import v8 from 'v8';
