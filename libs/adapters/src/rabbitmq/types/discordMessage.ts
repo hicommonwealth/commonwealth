@@ -1,6 +1,6 @@
 import type { IDiscordMessage } from '@hicommonwealth/core';
-import type { RmqMsgNamespace } from 'common-common/src/rabbitmq/types';
-import { RmqMsgFormatError } from 'common-common/src/rabbitmq/types';
+import type { RmqMsgNamespace } from '../types';
+import { RmqMsgFormatError } from '../types';
 
 export const rmqDiscordMessage: RmqMsgNamespace<IDiscordMessage> = {
   getInvalidFormatError(event: any): RmqMsgFormatError {

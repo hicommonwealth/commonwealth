@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import type { RascalQueues, RascalExchanges, RascalRoutingKeys } from './types';
+import type { RascalExchanges, RascalQueues, RascalRoutingKeys } from './types';
 
 /*
 For more information on any of these routes and their behaviour/return values check:
@@ -20,7 +20,7 @@ export async function publishRmqMsg(
   rabbitMQUri: string,
   exchangeName: RascalExchanges,
   routingKey: RascalRoutingKeys,
-  data: any
+  data: any,
 ): Promise<{ routed: boolean }> {
   const publishBody = JSON.stringify({
     properties: { content_type: 'application/json' },
@@ -37,7 +37,7 @@ export async function publishRmqMsg(
       method: 'post',
       body: publishBody,
       headers: { 'Content-Type': 'application/json' },
-    }
+    },
   );
   return await publishResult.json();
 }
@@ -50,7 +50,7 @@ export async function publishRmqMsg(
  */
 export async function getQueueStats(
   rabbitMQUri: string,
-  queueName: RascalQueues
+  queueName: RascalQueues,
 ): Promise<any> {
   const result = await fetch(`${rabbitMQUri}/queues/%2f/${queueName}`);
   return await result.json();
@@ -68,7 +68,7 @@ export async function getRmqMessage(
   rabbitMQUri: string,
   queueName: RascalQueues,
   requeue = true,
-  numMessages = 1
+  numMessages = 1,
 ): Promise<any[]> {
   let body: any;
   if (requeue)

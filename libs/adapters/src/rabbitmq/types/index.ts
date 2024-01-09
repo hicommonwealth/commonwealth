@@ -2,6 +2,8 @@ import { ModelStatic, Sequelize } from 'sequelize';
 import { RmqDiscordMessage } from './discordMessage';
 import type { RmqSnapshotNotification } from './snapshotNotification';
 
+export * from './snapshotNotification';
+
 /**
  * This error type should be used in tandem with isRmqMsg functions. If this error type is thrown, RabbitMQ
  * will immediately dead-letter the message in question instead of using the requeue strategy.

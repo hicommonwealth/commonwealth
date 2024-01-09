@@ -8,6 +8,8 @@ import {
   RascalSubscriptions,
 } from './types';
 
+// TODO: Move configs to specific services
+
 export enum RascalConfigServices {
   CommonwealthService = 'commonwealth',
   SnapshotService = 'snapshot',

@@ -1,5 +1,5 @@
+import { AppError } from '@hicommonwealth/adapters';
 import z from 'zod';
-import { AppError } from '../../../../common-common/src/errors';
 import { GetGroupsResult } from '../../controllers/server_groups_methods/get_groups';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestQuery, TypedResponse, success } from '../../types';

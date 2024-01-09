@@ -1,3 +1,4 @@
+import { AppError } from '@hicommonwealth/adapters';
 import {
   ChainBase,
   ChainNetwork,
@@ -5,7 +6,6 @@ import {
   WalletSsoSource,
 } from '@hicommonwealth/core';
 import { bech32 } from 'bech32';
-import { AppError } from 'common-common/src/errors';
 import crypto from 'crypto';
 import type { NextFunction } from 'express';
 import { Op } from 'sequelize';

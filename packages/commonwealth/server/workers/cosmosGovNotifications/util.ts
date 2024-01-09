@@ -1,17 +1,17 @@
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import { fromTimestamp } from '@hicommonwealth/chains';
 import {
   ChainBase,
   NotificationCategories,
   SupportedNetwork,
 } from '@hicommonwealth/core';
-import { factory, formatFilename } from 'common-common/src/logging';
 import Rollbar from 'rollbar';
 import { EventKind, coinToCoins } from '../../../shared/chain/types/cosmos';
 import { DB } from '../../models';
 import emitNotifications from '../../util/emitNotifications';
 import { AllCosmosProposals } from './proposalFetching/types';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 export async function fetchCosmosNotifChains(models: DB) {
   const chainIds = await models.Subscription.findAll({
