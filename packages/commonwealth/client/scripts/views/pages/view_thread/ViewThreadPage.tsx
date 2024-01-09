@@ -126,16 +126,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     apiCallEnabled: !!threadId, // only call the api if we have thread id
   });
 
-  console.log('enabled: ', !!threadId);
-
-  console.log({
-    chain: app.activeChainId(),
-    data,
-    fetchThreadError,
-    isLoading,
-    threadId,
-  });
-
   const thread = data?.[0];
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
