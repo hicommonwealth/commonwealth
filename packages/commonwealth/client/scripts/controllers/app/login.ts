@@ -217,6 +217,7 @@ export async function updateActiveAddresses({
           a.address === addressToUse.address
         );
       });
+
       if (account) await setActiveAccount(account, shouldRedraw);
     }
   }
@@ -323,9 +324,8 @@ async function constructMagic(isCosmos: boolean, chain?: string) {
           new OAuthExtension(),
           new CosmosExtension({
             // Magic has a strict cross-origin policy that restricts rpcs to whitelisted URLs,
-            // so we can't use app.chain.meta?.node?.url
+            // so make sure cosmoshub's ChainNode url is whitelisted in Magic dashboard.
             rpcUrl: `${document.location.origin}/magicCosmosAPI/${chain}`,
-            // rpcUrl: app.chain?.meta?.node?.url || app.config.chains.getById('osmosis').node.url,
           }),
         ],
   });
@@ -352,6 +352,7 @@ export async function startLoginWithMagicLink({
     // email-based login
     const bearer = await magic.auth.loginWithMagicLink({ email });
     const address = await handleSocialLoginCallback({ bearer, isEmail: true });
+
     return { bearer, address };
   } else {
     const params = `?redirectTo=${
@@ -453,24 +454,8 @@ export async function handleSocialLoginCallback({
   try {
     // Sign a session
     if (isCosmos && desiredChain) {
-      // Not every chain prefix will succeed, so Magic defaults to osmo... as the Cosmos prefix
-      const bech32Prefix = desiredChain.bech32Prefix;
-      try {
-        magicAddress = await magic.cosmos.changeAddress(bech32Prefix);
-      } catch (err) {
-        console.error(
-          `Error changing address to ${bech32Prefix}. Keeping default cosmos prefix and moving on. Error: ${err}`,
-        );
-      }
-
-      // Request the cosmos chain ID, since this is used by Magic to generate
-      // the signed message. The API is already used by the Magic iframe,
-      // but they don't expose the results.
-      const nodeInfo = await $.get(
-        `${document.location.origin}/magicCosmosAPI/${desiredChain.id}/node_info`,
-      );
-      const chainId = nodeInfo.node_info.network;
-
+      // always use cosmos, for simplicity (cosmos_chain_id = 'cosmoshub')
+      const chainId = ChainBase.CosmosSDK;
       const timestamp = +new Date();
 
       const signer = { signMessage: magic.cosmos.sign };
@@ -484,7 +469,7 @@ export async function handleSocialLoginCallback({
       signature.signatures[0].chain_id = chainId;
       await app.sessions.authSession(
         ChainBase.CosmosSDK, // could be desiredChain.base in the future?
-        chainBaseToCanvasChainId(ChainBase.CosmosSDK, bech32Prefix), // not the cosmos chain id, since that might change
+        chainId,
         magicAddress,
         sessionPayload,
         JSON.stringify(signature.signatures[0]),

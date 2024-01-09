@@ -417,7 +417,7 @@ async function magicLoginRoute(
           },
         ],
       });
-      log.trace(
+      log.info(
         `DECODED LOGGED IN USER: ${JSON.stringify(loggedInUser, null, 2)}`,
       );
       if (!loggedInUser) {
@@ -431,18 +431,23 @@ async function magicLoginRoute(
   const magicUserMetadata = await magic.users.getMetadataByIssuer(
     decodedMagicToken.issuer,
   );
+
   log.trace(
     `MAGIC USER METADATA: ${JSON.stringify(magicUserMetadata, null, 2)}`,
   );
 
   // the user should have signed a sessionPayload with the client-side
   // magic address. validate the signature and add that address
+  let session: Session;
   try {
-    const session: Session = {
+    session = {
       type: 'session',
-      signature: req.body.signature,
-      payload: JSON.parse(req.body.sessionPayload),
+      signature: req.body?.signature,
+      payload: req.body?.sessionPayload
+        ? JSON.parse(req.body.sessionPayload)
+        : undefined,
     };
+
     if (process.env.ENFORCE_SESSION_KEYS === 'true') {
       if (req.body.magicAddress !== session.payload.from) {
         throw new Error(
@@ -454,34 +459,32 @@ async function magicLoginRoute(
         throw new Error('sessionPayload signed with invalid signature');
       }
     }
-    if (chainToJoin) {
-      if (
-        chainToJoin.base === ChainBase.CosmosSDK &&
-        session.payload.chain.startsWith('cosmos:')
-      ) {
-        generatedAddresses.push({
-          address: req.body.magicAddress,
-          chain: chainToJoin.id,
-        });
-      } else if (
-        chainToJoin.base === ChainBase.Ethereum &&
-        session.payload.chain.startsWith('eip155:')
-      ) {
-        generatedAddresses.push({
-          address: req.body.magicAddress,
-          chain: chainToJoin.id,
-        });
-      } else {
-        // ignore invalid chain base
-        log.warn(
-          `Cannot create magic account on chain ${chainToJoin.id}. Ignoring.`,
-        );
-      }
-    }
   } catch (err) {
     log.warn(
       `Could not set up a valid client-side magic address ${req.body.magicAddress}`,
     );
+  }
+
+  if (chainToJoin) {
+    if (chainToJoin.base === ChainBase.CosmosSDK) {
+      generatedAddresses.push({
+        address: req.body.magicAddress,
+        chain: chainToJoin.id,
+      });
+    } else if (
+      chainToJoin.base === ChainBase.Ethereum &&
+      session.payload.chain.startsWith('eip155:')
+    ) {
+      generatedAddresses.push({
+        address: req.body.magicAddress,
+        chain: chainToJoin.id,
+      });
+    } else {
+      // ignore invalid chain base
+      log.warn(
+        `Cannot create magic account on chain ${chainToJoin.id}. Ignoring.`,
+      );
+    }
   }
 
   // attempt to locate an existing magic user by canonical address.

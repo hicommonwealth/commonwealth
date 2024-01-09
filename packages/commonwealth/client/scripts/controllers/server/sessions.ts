@@ -85,7 +85,7 @@ export async function signSessionWithMagic(
 ) {
   const idOrPrefix =
     walletChain === ChainBase.CosmosSDK
-      ? app.chain?.meta.bech32Prefix || 'cosmos'
+      ? 'cosmos'
       : app.chain?.meta.node?.ethChainId || 1;
   const canvasChainId = chainBaseToCanvasChainId(walletChain, idOrPrefix);
   const sessionPublicAddress = await app.sessions.getOrCreateAddress(

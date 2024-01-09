@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { useCommonNavigate } from 'navigation/helpers';
-import { PageLoading } from 'views/pages/loading';
-import ErrorPage from 'views/pages/error';
 import { handleSocialLoginCallback } from 'controllers/app/login';
+import { useCommonNavigate } from 'navigation/helpers';
+import React, { useEffect, useState } from 'react';
 import app, { initAppState } from 'state';
+import ErrorPage from 'views/pages/error';
+import { PageLoading } from 'views/pages/loading';
 
 const validate = async (setRoute) => {
   const params = new URLSearchParams(window.location.search);

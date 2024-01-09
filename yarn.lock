@@ -3944,16 +3944,16 @@
     "@lit-labs/ssr-dom-shim" "^1.0.0"
 
 "@magic-ext/cosmos@^12.1.3":
-  version "12.1.3"
-  resolved "https://registry.yarnpkg.com/@magic-ext/cosmos/-/cosmos-12.1.3.tgz#4e7eed788d0611129cd6aeafa3d334a64623a1fd"
-  integrity sha512-tsCKMF+GTMd9jfdhm6VN9zXR/XrIoTzpa8Y0j74iFGiISm8PyHfyT4Sp+Y5KXP6E29dOBCaZfslK/rzHpn0SHA==
+  version "12.4.0"
+  resolved "https://registry.yarnpkg.com/@magic-ext/cosmos/-/cosmos-12.4.0.tgz#9ceed13209aa56ae6b744fc42e3fbd798310ae45"
+  integrity sha512-WfLlUzkKVfqO9vv+h8fA7z/KAcBL6tbLjSPHZCr8WbBUL/Me86Pmx8g8Zftb19oaGmYM+XkPVli7h20zBRE2oA==
 
 "@magic-ext/oauth@^11.1.1":
-  version "11.2.0"
-  resolved "https://registry.yarnpkg.com/@magic-ext/oauth/-/oauth-11.2.0.tgz#21b5d8f7a58463f324db2d7315f065fcec3c2046"
-  integrity sha512-F308JC5+dVOutsLtBJBdPshDGPOlchAlcedJoqcBie/NBr8VRq0eI3+cRWcvz6LFHnn6nD83g5FIOYS1C8X4KA==
+  version "11.4.0"
+  resolved "https://registry.yarnpkg.com/@magic-ext/oauth/-/oauth-11.4.0.tgz#a14df3195d3936c5626a21efa55113b0806ff555"
+  integrity sha512-BDgQolLq6ck5JkFFH0eIs81NOaMQYmr/p4wBrRdxwBBIQtYg3FF5qLPsOoppdEO7BifNhrEKKWkyNzH//Eafmw==
   dependencies:
-    "@magic-sdk/types" "^15.2.0"
+    "@magic-sdk/types" "^15.4.0"
 
 "@magic-sdk/admin@^0.1.0-beta.8":
   version "0.1.0-beta.10"
@@ -3966,38 +3966,33 @@
     node-fetch "^2.6.0"
 
 "@magic-sdk/admin@^1.10.0":
-  version "1.10.0"
-  resolved "https://registry.yarnpkg.com/@magic-sdk/admin/-/admin-1.10.0.tgz#9c5e17f65fe136ba670446e2513d64f80e1544fe"
-  integrity sha512-byPp3DPpGyl+/71zN7lyKlLFEJuP944hI0NArHkJkCDsZBcSZ+6X3T9ipetnKz8MM2eCVTQB+HkYeNDd9lct2Q==
+  version "1.10.1"
+  resolved "https://registry.yarnpkg.com/@magic-sdk/admin/-/admin-1.10.1.tgz#f8881928a9ee49816008ef7e51dcd1217fdef74b"
+  integrity sha512-Ju+HoXJPEkFOTf52TMAO4L0+CXPthlGSJIjV+D5xvvhcab3Ddm6ykMzApoF9i3p7K/MM06SmS+SMM9z6b4JRQg==
   dependencies:
     "@types/atob" "^2.1.2"
     atob "^2.1.2"
     ethereum-cryptography "^1.0.1"
     node-fetch "^2.6.0"
 
-"@magic-sdk/commons@^13.1.3":
-  version "13.1.3"
-  resolved "https://registry.yarnpkg.com/@magic-sdk/commons/-/commons-13.1.3.tgz#c7a60970f1e8fb67b6e3ad8b0668c3135fff728b"
-  integrity sha512-4cdQz81G/W3TjxnR1YAlKQslXr1BpyAjmv+VbhtrUzcIAJGKZXFQ8hbpkOPauK5qc+isHJPbEQ2Qj/BNn0R7Sg==
+"@magic-sdk/commons@^13.4.0":
+  version "13.4.0"
+  resolved "https://registry.yarnpkg.com/@magic-sdk/commons/-/commons-13.4.0.tgz#6217fd8e7346f5029c7c584d98578c36d26ec3db"
+  integrity sha512-F6XG0r0XEZmGB8OTPNFrRz6IgDhb39YxUrG2n/4hajb0vJuA28QjoexG/d7f6Rklvxq9oIBR1wMuqUzGs3oSnA==
 
-"@magic-sdk/provider@^17.1.3":
-  version "17.1.3"
-  resolved "https://registry.yarnpkg.com/@magic-sdk/provider/-/provider-17.1.3.tgz#a5e708b0385c7b0d9b5d75523c9e7a39fffd7a54"
-  integrity sha512-1Bhu09EQmeNtBu4LwsYxaXOtbPvDRlzyMqCOlVls3pz1O0JZNoVGuDe4RBH4nLS6+3kTIIpyh+iAz4MLaVctnA==
+"@magic-sdk/provider@^17.4.0":
+  version "17.4.0"
+  resolved "https://registry.yarnpkg.com/@magic-sdk/provider/-/provider-17.4.0.tgz#f22174899f36664fcebd47781b3c497479abe671"
+  integrity sha512-DvroR5qCumGtS8TY8wr/4bI9bvkUD222ghbNTsu9MFAgybksc6/ARUX8ttjFZVQXMIIe07PpZroxnxI+ih5mlA==
   dependencies:
-    "@magic-sdk/types" "^15.1.3"
+    "@magic-sdk/types" "^15.4.0"
     eventemitter3 "^4.0.4"
     web3-core "1.5.2"
 
-"@magic-sdk/types@^15.1.3":
-  version "15.1.3"
-  resolved "https://registry.yarnpkg.com/@magic-sdk/types/-/types-15.1.3.tgz#57f8c814e5b8a9a16349e13b19cb981e69dc6671"
-  integrity sha512-ee0pIHoJkm3BX3WiunJYdQwqP0PNK46Rnelhc7RYq+pG46SuWAUGrJo2dzT7+RYJNo7dRqKNnVJ/WahPSLvkuQ==
-
-"@magic-sdk/types@^15.2.0":
-  version "15.2.0"
-  resolved "https://registry.yarnpkg.com/@magic-sdk/types/-/types-15.2.0.tgz#b0f1fa352b2cdbd4b1ba2a3666407900e41fc311"
-  integrity sha512-oS6yShBsBWWhTsEZtEPqJ2cY+b/7iQlqh36eeySKlWFPXQXbakTx20Tbr6CI0svFWQNDgX240hfHbyF2PRClxQ==
+"@magic-sdk/types@^15.4.0":
+  version "15.8.0"
+  resolved "https://registry.yarnpkg.com/@magic-sdk/types/-/types-15.8.0.tgz#d54dc8221bb0f69c74ff96d486535ce150c2c04b"
+  integrity sha512-xLQsBAg2JXUn39dRfZW6Z3LUT50qz/3pg6R658oVBr4LbJd/L8iAR0zCRmjLLNXzfYm1RkJYZWuHaxjJgKlkSA==
 
 "@metamask/detect-provider@^2.0.0":
   version "2.0.0"
@@ -5393,9 +5388,9 @@
     "@types/node" "*"
 
 "@types/atob@^2.1.2":
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/@types/atob/-/atob-2.1.2.tgz#157eb0cc46264a8c55f2273a836c7a1a644fb820"
-  integrity sha512-8GAYQ1jDRUQkSpHzJUqXwAkYFOxuWAOGLhIR4aPd/Y/yL12Q/9m7LsKpHKlfKdNE/362Hc9wPI1Yh6opDfxVJg==
+  version "2.1.4"
+  resolved "https://registry.yarnpkg.com/@types/atob/-/atob-2.1.4.tgz#50bb756a99bbdba6995f2d10a134d21a881323b3"
+  integrity sha512-FisOhG87cCFqzCgq6FUtSYsTMOHCB/p28zJbSN1QBo4ZGJfg9PEhMjdIV++NDeOnloUUe0Gz6jwBV+L1Ac00Mw==
 
 "@types/better-sqlite3@^7.6.4":
   version "7.6.4"
@@ -7678,7 +7673,7 @@ at-least-node@^1.0.0:
 
 atob@^2.1.2:
   version "2.1.2"
-  resolved "https://registry.npmjs.org/atob/-/atob-2.1.2.tgz"
+  resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.2.tgz#6d9517eb9e030d2436666651e86bd9f6f13533c9"
   integrity sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==
 
 atomic-sleep@^1.0.0:
@@ -15648,13 +15643,13 @@ ltgt@~2.2.0:
   integrity sha1-81ypHEk/e3PaDgdJUwTxezH4fuU=
 
 magic-sdk@^17.1.4:
-  version "17.1.4"
-  resolved "https://registry.yarnpkg.com/magic-sdk/-/magic-sdk-17.1.4.tgz#353fcbbca06e462d896058c8ca7f4108c3b6244e"
-  integrity sha512-VNRVIEiC+RH2l8U3XGMrJiPhTA7bpfen7cEqe25p/jCl6fPXxd9ISN1ZJN5ypj2KO8obbllY0evgkm6UgDi5zg==
+  version "17.4.0"
+  resolved "https://registry.yarnpkg.com/magic-sdk/-/magic-sdk-17.4.0.tgz#ed5a71c1308b484b2e7615eb39d10194907ac6ed"
+  integrity sha512-oIsj0D01pSDhiuscZ4KCUcT07pWlg2+wsqZHzs5IAYbd1d4PM6+ZvYjTeob9W0Cl5FB8NNE0W8GUumvTd4fqqA==
   dependencies:
-    "@magic-sdk/commons" "^13.1.3"
-    "@magic-sdk/provider" "^17.1.3"
-    "@magic-sdk/types" "^15.1.3"
+    "@magic-sdk/commons" "^13.4.0"
+    "@magic-sdk/provider" "^17.4.0"
+    "@magic-sdk/types" "^15.4.0"
     localforage "^1.7.4"
 
 make-dir@^2.0.0, make-dir@^2.1.0:

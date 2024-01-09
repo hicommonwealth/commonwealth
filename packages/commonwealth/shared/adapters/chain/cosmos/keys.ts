@@ -1,8 +1,8 @@
 // Cosmos cannot sign arbitrary blobs, but they can sign transactions. So, as a hack around that,
 // we insert our account registration token into a proposal message, and then verify against the
 // generated signature. But first we need the message to insert.
-import type { AminoMsg, StdFee, StdSignDoc } from '@cosmjs/amino';
 import type { ActionPayload } from '@canvas-js/interfaces';
+import type { AminoMsg, StdFee, StdSignDoc } from '@cosmjs/amino';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
 
 const sortedStringify = configureStableStringify({
@@ -14,7 +14,7 @@ const sortedStringify = configureStableStringify({
 
 export const getADR036SignableAction = async (
   actionPayload: ActionPayload,
-  address: string
+  address: string,
 ): Promise<StdSignDoc> => {
   const accountNumber = 0;
   const sequence = 0;
@@ -39,7 +39,7 @@ export const getADR036SignableAction = async (
     chainId,
     memo,
     accountNumber,
-    sequence
+    sequence,
   );
   return signDoc;
 };
@@ -47,7 +47,7 @@ export const getADR036SignableAction = async (
 export const getADR036SignableSession = async (
   token: Uint8Array,
   address: string,
-  chainId = ''
+  chainId = '',
 ): Promise<StdSignDoc> => {
   const accountNumber = 0;
   const sequence = 0;
@@ -72,7 +72,7 @@ export const getADR036SignableSession = async (
     chainId,
     memo,
     accountNumber,
-    sequence
+    sequence,
   );
   return signDoc;
 };

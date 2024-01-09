@@ -36,12 +36,12 @@ export function caip2ToChainBase(caip2: string): ChainBase {
 
 export function chainBaseToCanvasChainId(
   chainBase: ChainBase,
-  idOrPrefix: string | number,
+  idOrPrefix?: string | number,
 ): string {
   // The Canvas chain id is a stringified ETH chain ID, or Cosmos bech32 prefix, or equivalent.
   if (chainBase === ChainBase.CosmosSDK) {
-    // Temporarily locked to cosmoshub-1, since we don't have the live chain ID for cosmos chains
-    return 'cosmoshub-1';
+    // Temporarily locked to cosmoshub-4, since we don't have the live chain ID for cosmos chains
+    return 'cosmoshub-4';
   } else if (chainBase === ChainBase.Ethereum) {
     return idOrPrefix.toString();
   } else if (chainBase === ChainBase.NEAR) {
