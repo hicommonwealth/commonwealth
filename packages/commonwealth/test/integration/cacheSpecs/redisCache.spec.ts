@@ -3,8 +3,8 @@
 /* eslint-disable no-unused-expressions */
 const chai = require('chai');
 const expect = chai.expect;
+import { RedisCache } from '@hicommonwealth/adapters';
 import { RedisNamespaces } from '@hicommonwealth/core';
-import { RedisCache } from 'common-common/src/redisCache';
 import { delay } from '../../util/delayUtils';
 import { connectToRedis } from '../../util/redisUtils';
 

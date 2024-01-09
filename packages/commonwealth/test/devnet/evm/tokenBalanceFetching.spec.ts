@@ -1,7 +1,7 @@
+import { RedisCache } from '@hicommonwealth/adapters';
 import { BalanceType } from '@hicommonwealth/core';
 import BN from 'bn.js';
 import { expect } from 'chai';
-import { RedisCache } from 'common-common/src/redisCache';
 import Web3 from 'web3';
 import { toWei } from 'web3-utils';
 import models from '../../../server/database';

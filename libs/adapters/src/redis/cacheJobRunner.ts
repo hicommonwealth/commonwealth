@@ -2,7 +2,7 @@ import RWLock from 'async-rwlock';
 
 // Maintains a cache with periodic, atomic jobs that also permits direct,
 // non-atomic, write access to the cache.
-export default abstract class JobRunner<CacheT> {
+export abstract class JobRunner<CacheT> {
   private _timeoutHandle: NodeJS.Timeout;
 
   // we use a mutex here to avoid updating views while pruning, as it could cause errors
@@ -14,14 +14,14 @@ export default abstract class JobRunner<CacheT> {
   constructor(
     private _cache: CacheT,
     private _jobTimeS: number,
-    private _writelockOnRun = false
+    private _writelockOnRun = false,
   ) {}
 
   public start() {
     if (this._jobTimeS > 0) {
       this._timeoutHandle = global.setInterval(
         () => this.run(),
-        this._jobTimeS * 1000
+        this._jobTimeS * 1000,
       );
     }
   }
@@ -33,7 +33,7 @@ export default abstract class JobRunner<CacheT> {
 
   // viewFn may manipulate the cache, but it must do so atomically
   protected async access<ReturnT>(
-    viewFn: (c: CacheT) => Promise<ReturnT>
+    viewFn: (c: CacheT) => Promise<ReturnT>,
   ): Promise<ReturnT> {
     await this._lock.readLock();
     const result = await viewFn(this._cache);
@@ -42,7 +42,7 @@ export default abstract class JobRunner<CacheT> {
   }
 
   protected async write<ReturnT>(
-    writeFn: (c: CacheT) => Promise<ReturnT>
+    writeFn: (c: CacheT) => Promise<ReturnT>,
   ): Promise<ReturnT> {
     await this._lock.writeLock();
     const result = await writeFn(this._cache);

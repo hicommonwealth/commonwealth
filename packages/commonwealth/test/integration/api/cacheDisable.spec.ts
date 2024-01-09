@@ -8,12 +8,12 @@ import chaiHttp from 'chai-http';
 chai.use(chaiHttp);
 const expect = chai.expect;
 
-import { RedisNamespaces } from '@hicommonwealth/core';
 import {
   cacheDecorator,
+  RedisCache,
   XCACHE_VALUES,
-} from 'common-common/src/cacheDecorator';
-import { RedisCache } from 'common-common/src/redisCache';
+} from '@hicommonwealth/adapters';
+import { RedisNamespaces } from '@hicommonwealth/core';
 import app, { CACHE_ENDPOINTS } from '../../../server-test';
 import { connectToRedis } from '../../util/redisUtils';
 

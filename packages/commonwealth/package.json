@@ -201,7 +201,6 @@
     "react-select": "^5.7.0",
     "react-toastify": "^9.1.1",
     "react-virtuoso": "^4.1.0",
-    "redis": "4.2.0",
     "remove-markdown": "^0.5.0",
     "rollbar": "^2.6.1",
     "safe-stable-stringify": "^2.4.2",

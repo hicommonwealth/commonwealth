@@ -1,11 +1,14 @@
 /* eslint-disable dot-notation */
 import {
+  CustomRequest,
+  RedisCache,
   ServerError,
+  cacheDecorator,
   formatFilename,
   loggerFactory,
+  lookupKeyDurationInReq,
 } from '@hicommonwealth/adapters';
 import bodyParser from 'body-parser';
-import { RedisCache } from 'common-common/src/redisCache';
 import setupErrorHandlers from 'common-common/src/scripts/setupErrorHandlers';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
@@ -16,11 +19,6 @@ import http from 'http';
 import passport from 'passport';
 import Rollbar from 'rollbar';
 import favicon from 'serve-favicon';
-import { cacheDecorator } from '../common-common/src/cacheDecorator';
-import {
-  CustomRequest,
-  lookupKeyDurationInReq,
-} from '../common-common/src/cacheKeyUtils';
 import {
   ROLLBAR_ENV,
   ROLLBAR_SERVER_TOKEN,

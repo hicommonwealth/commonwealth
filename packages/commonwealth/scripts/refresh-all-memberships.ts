@@ -1,5 +1,5 @@
+import { RedisCache } from '@hicommonwealth/adapters';
 import * as dotenv from 'dotenv';
-import { RedisCache } from '../../common-common/src/redisCache';
 import { REDIS_URL } from '../server/config';
 import { ServerCommunitiesController } from '../server/controllers/server_communities_controller';
 import { ServerGroupsController } from '../server/controllers/server_groups_controller';

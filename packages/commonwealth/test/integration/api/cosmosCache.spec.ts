@@ -9,9 +9,8 @@ import chaiHttp from 'chai-http';
 chai.use(chaiHttp);
 const expect = chai.expect;
 
+import { RedisCache, cacheDecorator } from '@hicommonwealth/adapters';
 import { RedisNamespaces } from '@hicommonwealth/core';
-import { cacheDecorator } from 'common-common/src/cacheDecorator';
-import { RedisCache } from 'common-common/src/redisCache';
 import {
   cosmosLCDDuration,
   cosmosRPCDuration,

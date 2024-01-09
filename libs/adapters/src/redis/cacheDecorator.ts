@@ -1,11 +1,11 @@
-import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import { RedisNamespaces } from '@hicommonwealth/core';
 import { Request, RequestHandler, Response } from 'express';
+import { formatFilename, loggerFactory } from '../typescript-logging';
 import {
   CacheKeyDuration,
   defaultKeyGenerator,
   isCacheKeyDuration,
-} from './cacheKeyUtils';
+} from '../utils/cacheKeyUtils';
 import { RedisCache } from './redisCache';
 
 const log = loggerFactory.getLogger(formatFilename(__filename));
