@@ -1,5 +1,5 @@
 // Helper function to look up a scope, i.e. a chain XOR community.
-import JobRunner from 'common-common/src/cacheJobRunner';
+import { JobRunner } from '@hicommonwealth/adapters';
 // If a community is found, also check that the user is allowed to see it.
 import type { DB } from '../models';
 
@@ -14,7 +14,7 @@ export default class BanCache extends JobRunner<CacheT> {
   constructor(
     private _models: DB,
     private _ttlS: number = 60 * 15, // 10 minutes
-    _pruningJobTimeS: number = 60 * 5 // 5 minutes
+    _pruningJobTimeS: number = 60 * 5, // 5 minutes
   ) {
     super({}, _pruningJobTimeS);
     this.start();

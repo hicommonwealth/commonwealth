@@ -1,6 +1,6 @@
+import { AppError } from '@hicommonwealth/adapters';
 import { GroupAttributes, GroupMetadata } from 'server/models/group';
 import z from 'zod';
-import { AppError } from '../../../../common-common/src/errors';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 import { Requirement } from '../../util/requirementsModule/requirementsTypes';

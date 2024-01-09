@@ -1,12 +1,14 @@
+import {
+  StatsDController,
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/adapters';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
-import { StatsDController } from 'common-common/src/statsd';
-
-import { factory, formatFilename } from 'common-common/src/logging';
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 export type ReactionAttributes = {
   address_id: number;
@@ -34,7 +36,7 @@ export type ReactionModelStatic = ModelStatic<ReactionInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): ReactionModelStatic => {
   const Reaction = <ReactionModelStatic>sequelize.define(
     'Reaction',
@@ -84,7 +86,8 @@ export default (
             }
           } catch (error) {
             log.error(
-              `incrementing thread reaction count afterCreate: thread_id ${thread_id} comment_id ${comment_id} ${error}`
+              // eslint-disable-next-line max-len
+              `incrementing thread reaction count afterCreate: thread_id ${thread_id} comment_id ${comment_id} ${error}`,
             );
             StatsDController.get().increment('cw.reaction-count-error', {
               thread_id: String(thread_id),
@@ -122,7 +125,8 @@ export default (
             }
           } catch (error) {
             log.error(
-              `incrementing thread reaction count afterDestroy: thread_id ${thread_id} comment_id ${comment_id} ${error}`
+              // eslint-disable-next-line max-len
+              `incrementing thread reaction count afterDestroy: thread_id ${thread_id} comment_id ${comment_id} ${error}`,
             );
             StatsDController.get().increment('cw.hook.reaction-count-error', {
               thread_id: String(thread_id),
@@ -153,7 +157,7 @@ export default (
         { fields: ['chain', 'comment_id'] },
         { fields: ['canvas_hash'] },
       ],
-    }
+    },
   );
 
   Reaction.associate = (models) => {

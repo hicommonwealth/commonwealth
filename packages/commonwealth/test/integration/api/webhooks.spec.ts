@@ -4,7 +4,7 @@
 require('dotenv').config();
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import 'chai/register-should';
+
 import faker from 'faker';
 import jwt from 'jsonwebtoken';
 import app, { resetDatabase } from '../../../server-test';
@@ -49,7 +49,7 @@ describe('Webhook Tests', () => {
     loggedInSession = { session: result.session, sign: result.sign };
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
-      JWT_SECRET
+      JWT_SECRET,
     );
     await modelUtils.updateRole({
       address_id: result.address_id,
@@ -64,7 +64,7 @@ describe('Webhook Tests', () => {
     loggedInNotAdminAddr = result.address;
     notAdminJWT = jwt.sign(
       { id: result.user_id, email: result.email },
-      JWT_SECRET
+      JWT_SECRET,
     );
   });
 
@@ -208,7 +208,7 @@ describe('Webhook Tests', () => {
             .set('Accept', 'application/json')
             .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
           return webhookUrl;
-        })
+        }),
       );
       expect(urls).to.have.length(5);
       const res = await chai.request
@@ -229,7 +229,7 @@ describe('Webhook Tests', () => {
             .set('Accept', 'application/json')
             .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
           return webhookUrl;
-        })
+        }),
       );
       expect(urls).to.have.length(5);
       const errorRes = await chai.request

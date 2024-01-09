@@ -4,8 +4,12 @@
     "lib": ["es2020"],
     "typeRoots": ["./node_modules/@types"],
     "skipLibCheck": true,
-    // TODO: "rootDir": "src",
+    // TODO: "rootDir": "src", -- after decoupling from common-common (outside root)
     "outDir": "build"
   },
-  "include": ["src"]
+  "include": ["src"],
+  "references": [
+    { "path": "../../libs/adapters" },
+    { "path": "../../libs/core" }
+  ]
 }

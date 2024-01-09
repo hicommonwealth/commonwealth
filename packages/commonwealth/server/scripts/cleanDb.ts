@@ -1,8 +1,8 @@
-import { factory, formatFilename } from 'common-common/src/logging';
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import { databaseCleaner } from 'commonwealth/server/util/databaseCleaner';
 import models from '../database';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 databaseCleaner.init(models);
 databaseCleaner
   .executeQueries()

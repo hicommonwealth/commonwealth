@@ -1,7 +1,7 @@
 // Adapted from:
 // https://github.com/uber-archive/express-statsd/blob/master/lib/express-statsd.js
 
-import { ProjectTag } from 'common-common/src/statsd';
+import { ProjectTag } from '@hicommonwealth/adapters';
 import type { NextFunction, Request, Response } from 'express';
 import type { StatsD } from 'hot-shots';
 
@@ -9,7 +9,7 @@ export default function expressStatsdInit(client: StatsD) {
   return function expressStatsd(
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     const startTime = new Date().getTime();
 

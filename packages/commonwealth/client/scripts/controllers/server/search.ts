@@ -31,7 +31,7 @@ class SearchController {
       return this.getByQuery(searchQuery);
     }
     const searchCache = this._store.getOrAdd(searchQuery);
-    const { searchTerm, chainScope, isSearchPreview, sort } = searchQuery;
+    const { searchTerm, communityScope, isSearchPreview, sort } = searchQuery;
     const pageSize = isSearchPreview ? SEARCH_PREVIEW_SIZE : SEARCH_PAGE_SIZE;
     const scope = searchQuery.getSearchScope();
 
@@ -42,7 +42,7 @@ class SearchController {
       ) {
         const discussions = await this.searchDiscussions(searchTerm, {
           pageSize,
-          chainScope,
+          communityScope,
           sort,
         });
 
@@ -58,7 +58,7 @@ class SearchController {
       if (scope.includes(SearchScope.Replies)) {
         const comments = await this.searchComments(searchTerm, {
           pageSize,
-          chainScope,
+          communityScope,
           sort,
         });
 
@@ -90,7 +90,7 @@ class SearchController {
       if (scope.includes(SearchScope.Members)) {
         const { profiles } = await this.searchMentionableProfiles(
           searchTerm,
-          chainScope,
+          communityScope,
         );
 
         searchCache.results[SearchScope.Members] = profiles
@@ -143,10 +143,10 @@ class SearchController {
     page: number,
     pageSize: number,
   ) {
-    const { searchTerm, chainScope, sort } = searchQuery;
+    const { searchTerm, communityScope, sort } = searchQuery;
     const searchParams = {
       pageSize,
-      chainScope,
+      communityScope,
       sort,
     };
     switch (tab) {
@@ -188,10 +188,10 @@ class SearchController {
     params: SearchParams,
     page?: number,
   ) => {
-    const { pageSize, chainScope, communityScope, sort } = params;
+    const { pageSize, communityScope, sort } = params;
     try {
       const queryParams = {
-        chain: chainScope,
+        chain: communityScope,
         community: communityScope,
         search: searchTerm,
         page_size: pageSize,
@@ -218,10 +218,10 @@ class SearchController {
     params: SearchParams,
     page?: number,
   ) => {
-    const { pageSize, chainScope, communityScope, sort } = params;
+    const { pageSize, communityScope, sort } = params;
     try {
       const queryParams = {
-        chain: chainScope,
+        chain: communityScope,
         community: communityScope,
         search: searchTerm,
         page_size: pageSize,
@@ -247,11 +247,11 @@ class SearchController {
     searchTerm: string,
     params: SearchParams,
   ): Promise<Thread[]> => {
-    const { pageSize, chainScope, communityScope } = params;
+    const { pageSize, communityScope } = params;
     try {
       const response = await axios.get(`${app.serverUrl()}/threads`, {
         params: {
-          chain: chainScope,
+          chain: communityScope,
           community: communityScope,
           search: searchTerm,
           results_size: pageSize,
@@ -272,14 +272,14 @@ class SearchController {
 
   public searchMentionableProfiles = async (
     searchTerm: string,
-    chainScope: string,
+    communityScope: string,
     pageSize?: number,
     page?: number,
     includeRoles?: boolean,
   ) => {
     const response = await axios.get(`${app.serverUrl()}/profiles`, {
       params: {
-        chain: chainScope,
+        chain: communityScope,
         search: searchTerm,
         page_size: pageSize,
         page,

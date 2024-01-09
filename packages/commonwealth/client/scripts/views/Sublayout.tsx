@@ -10,17 +10,18 @@ import { AppMobileMenus } from './AppMobileMenus';
 import { Footer } from './Footer';
 import { SublayoutBanners } from './SublayoutBanners';
 import { SublayoutHeader } from './SublayoutHeader';
+import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import GatingGrowl from './components/GatingGrowl/GatingGrowl';
 
 type SublayoutProps = {
   hideFooter?: boolean;
-  hasCommunitySidebar?: boolean;
+  isInsideCommunity?: boolean;
 } & React.PropsWithChildren;
 
 const Sublayout = ({
   children,
   hideFooter = true,
-  hasCommunitySidebar,
+  isInsideCommunity,
 }: SublayoutProps) => {
   const forceRerender = useForceRerender();
   const { menuVisible, mobileMenuName, setMenu, menuName } = useSidebarStore();
@@ -77,7 +78,7 @@ const Sublayout = ({
       <div className="header-and-body-container">
         <SublayoutHeader onMobile={isWindowSmallInclusive} />
         <div className="sidebar-and-body-container">
-          <Sidebar isInsideCommunity={hasCommunitySidebar} />
+          <Sidebar isInsideCommunity={isInsideCommunity} />
           <div
             className={clsx(
               'body-and-sticky-headers-container',
@@ -87,7 +88,7 @@ const Sublayout = ({
                 'quick-switcher-visible':
                   menuName === 'exploreCommunities' ||
                   menuName === 'createContent' ||
-                  hasCommunitySidebar,
+                  isInsideCommunity,
               },
               resizing,
             )}
@@ -98,13 +99,14 @@ const Sublayout = ({
               <AppMobileMenus />
             ) : (
               <div className="Body">
+                {isInsideCommunity && <AdminOnboardingSlider />}
                 {children}
                 {!app.isCustomDomain() && !hideFooter && <Footer />}
               </div>
             )}
           </div>
         </div>
-        {hasCommunitySidebar && <GatingGrowl />}
+        {isInsideCommunity && <GatingGrowl />}
       </div>
     </div>
   );
