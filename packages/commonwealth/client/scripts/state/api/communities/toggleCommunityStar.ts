@@ -5,20 +5,15 @@ import app from 'state';
 
 interface ToggleCommunityStarProps {
   community: string;
-  isAlreadyStarred: boolean; // TODO: rename to `shouldStar`
 }
 
-const toggleCommunityStar = async ({
-  community,
-  isAlreadyStarred,
-}: ToggleCommunityStarProps) => {
+const toggleCommunityStar = async ({ community }: ToggleCommunityStarProps) => {
   // TODO: the endpoint is really a toggle to star/unstar a community, migrate
   // this to use the new restful standard
   const response = await axios.post(`${app.serverUrl()}/starCommunity`, {
     chain: community,
     auth: true,
     jwt: app.user.jwt,
-    isAlreadyStarred: isAlreadyStarred + '', // backend expects a string
   });
 
   return {
@@ -43,9 +38,9 @@ const useToggleCommunityStarMutation = () => {
         );
       } else {
         const star = app.user.starredCommunities.find((c) => {
-          return c.chain === community;
+          return c.community_id === community;
         });
-        app.user.removeStarredCommunity(star.chain, star.user_id);
+        app.user.removeStarredCommunity(star.community_id, star.user_id);
       }
     },
   });
