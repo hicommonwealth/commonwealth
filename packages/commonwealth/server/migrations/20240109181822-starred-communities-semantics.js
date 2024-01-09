@@ -11,6 +11,26 @@ module.exports = {
           transaction,
         },
       );
+
+      // remove duplicates
+      await queryInterface.sequelize.query(
+        `
+        DELETE FROM "StarredCommunities"
+        WHERE id NOT IN (
+            SELECT MIN(id)
+            FROM "StarredCommunities"
+            GROUP BY community_id, user_id
+        );
+      `,
+        { transaction },
+      );
+
+      await queryInterface.addIndex('StarredCommunities', {
+        fields: ['community_id', 'user_id'],
+        unique: true,
+        name: 'starred_communities_community_id_user_id',
+        transaction,
+      });
     });
   },
 
@@ -20,6 +40,13 @@ module.exports = {
         'StarredCommunities',
         'community_id',
         'chain',
+        {
+          transaction,
+        },
+      );
+      await queryInterface.removeIndex(
+        'StarredCommunities',
+        'starred_communities_community_id_user_id',
         {
           transaction,
         },
