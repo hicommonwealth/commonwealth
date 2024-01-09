@@ -21,6 +21,7 @@ import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
 import NodeInfo from 'models/NodeInfo';
 import NotificationCategory from 'models/NotificationCategory';
+import StarredCommunity from 'models/StarredCommunity';
 import { ChainStore, NodeStore } from 'stores';
 
 export enum ApiStatus {
@@ -103,6 +104,7 @@ export interface IApp {
   isProduction(): boolean;
 
   isDesktopApp(win): boolean;
+
   isNative(win): boolean;
 
   serverUrl(): string;
@@ -297,7 +299,11 @@ export async function initAppState(
     }
 
     app.user.setStarredCommunities(
-      statusRes.result.user ? statusRes.result.user.starredCommunities : [],
+      statusRes.result.user?.starredCommunities
+        ? statusRes.result.user?.starredCommunities.map(
+            (c) => new StarredCommunity(c),
+          )
+        : [],
     );
     // update the selectedChain, unless we explicitly want to avoid
     // changing the current state (e.g. when logging in through link_new_address_modal)

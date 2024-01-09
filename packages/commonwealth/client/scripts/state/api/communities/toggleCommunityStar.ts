@@ -30,12 +30,7 @@ const useToggleCommunityStarMutation = () => {
       const starredCommunity = response.data.result;
 
       if (starredCommunity) {
-        app.user.addStarredCommunity(
-          new StarredCommunity(
-            starredCommunity.chain,
-            starredCommunity.user_id,
-          ),
-        );
+        app.user.addStarredCommunity(new StarredCommunity(starredCommunity));
       } else {
         const star = app.user.starredCommunities.find((c) => {
           return c.community_id === community;
