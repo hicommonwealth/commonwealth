@@ -7,8 +7,6 @@
     "baseUrl": ".",
     "paths": {
       "@hicommonwealth/*": ["../../libs/*/src"],
-      "common-common": ["../common-common"],
-      "common-common/*": ["../common-common/*"],
       "*": ["./*", "shared/*", "client/scripts/*"]
     }
   },

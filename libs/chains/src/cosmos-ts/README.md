@@ -2,10 +2,9 @@
 
 This package was generated using [Telescope](https://docs.osmosis.zone/telescope/).
 
-It is currently used as a patch to support `gov` module `v1`, as cosmJS does not yet support it. Once 
+It is currently used as a patch to support `gov` module `v1`, as cosmJS does not yet support it. Once
 [this issue in cosmjs-types](https://github.com/confio/cosmjs-types/issues/32) is completed, we can re-assess.
 We may be able to delete this cosm-ts package and go back to only using cosmJS.
-
 
 # If you need to regenerate these types
 
@@ -95,6 +94,7 @@ telescope({
     process.exit(1);
   });
 ```
+
 then,
 `yarn codegen`
 
@@ -104,6 +104,6 @@ This gives you all the Cosmos modules, but we only need `gov` and its dependenci
 
 1. In ./src/codegen/cosmos, delete every folder except `base` and `gov/v1`
 2. In client.ts and bundle.ts, delete unneeded imports and exports.
-3. Copy './src/codegen` and paste into `common-common/src/cosmos-ts`
+3. Copy './src/codegen` and paste into `libs/chains/src/cosmos-ts`
 
 Again, we should only need _these_ files, in order to instantiate the LCD client, and use gov v1.
