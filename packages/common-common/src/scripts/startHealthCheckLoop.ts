@@ -1,7 +1,7 @@
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import { StatsDController } from '../../src/statsd';
-import { factory, formatFilename } from '../../src/logging';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 const PING_INTERVAL = 1_000 * 20;
 
@@ -41,7 +41,7 @@ export function startHealthCheckLoop({
       await checkFn();
       status = 1;
     } catch (err) {
-      log.error(err);
+      log.error(err.message);
     }
     StatsDController.get().gauge(stat, status);
     const durationUntilNextCheck = nextCheckAt - Date.now();

@@ -1,10 +1,11 @@
-import bodyParser from 'body-parser';
-import { factory, formatFilename } from 'common-common/src/logging';
 import {
   RabbitMQController,
+  RascalConfigServices,
+  formatFilename,
   getRabbitMQConfig,
-} from 'common-common/src/rabbitmq';
-import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
+  loggerFactory,
+} from '@hicommonwealth/adapters';
+import bodyParser from 'body-parser';
 import { RedisCache } from 'common-common/src/redisCache';
 import {
   ServiceKey,
@@ -67,7 +68,7 @@ startHealthCheckLoop({
   },
 });
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 // set up express async error handling hack
 require('express-async-errors');
 

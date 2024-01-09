@@ -1,15 +1,15 @@
-import type { RabbitMQController } from 'common-common/src/rabbitmq';
+import type { RabbitMQController } from '@hicommonwealth/adapters';
 import type { Express } from 'express-serve-static-core';
 import http from 'http';
 import type Rollbar from 'rollbar';
 
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import { cacheDecorator } from 'common-common/src/cacheDecorator';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { RedisCache } from 'common-common/src/redisCache';
 import { PORT } from '../config';
 import type { DB } from '../models';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 const setupServer = (
   app: Express,

@@ -1,5 +1,5 @@
 import chai from 'chai';
-import 'chai/register-should';
+
 import type { GetThreadsReq } from 'server/api/extApiTypes';
 import { OrderByOptions } from 'server/api/extApiTypes';
 import type { ThreadAttributes } from 'server/models/thread';

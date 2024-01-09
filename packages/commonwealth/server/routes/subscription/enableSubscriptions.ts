@@ -1,4 +1,4 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import type { NextFunction, Request, Response } from 'express';
 import Sequelize from 'sequelize';
 import { sequelize } from '../../database';
@@ -10,7 +10,7 @@ export default async (
   models,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.user) {
     return next(new AppError(Errors.NotLoggedIn));
@@ -42,7 +42,7 @@ export default async (
       subscriptions.map((s) => {
         s.is_active = true;
         return s.save({ transaction: t });
-      })
+      }),
     );
   });
 

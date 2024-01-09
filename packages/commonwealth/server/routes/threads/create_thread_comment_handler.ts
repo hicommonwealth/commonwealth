@@ -1,4 +1,4 @@
-import { AppError } from '../../../../common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import { verifyComment } from '../../../shared/canvas/serverVerify';
 import { CommentInstance } from '../../models/comment';
 import { ServerControllers } from '../../routing/router';

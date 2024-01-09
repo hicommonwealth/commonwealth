@@ -6,7 +6,7 @@ export abstract class RepublishFailedMessages<DB> {
   protected constructor(
     protected readonly _rmqController: RabbitMQController,
     protected readonly _models: DB,
-    private readonly _intervalMS: number
+    private readonly _intervalMS: number,
   ) {
     if (_intervalMS <= 0) {
       throw new Error('Interval (in milliseconds) must be greater than 0');
@@ -21,7 +21,7 @@ export abstract class RepublishFailedMessages<DB> {
   public run() {
     this._timeoutHandle = global.setInterval(
       () => this.job(),
-      this._intervalMS
+      this._intervalMS,
     );
   }
 

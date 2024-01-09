@@ -1,6 +1,6 @@
+import { AppError } from '@hicommonwealth/adapters';
 import { Op } from 'sequelize';
 import { MembershipRejectReason } from 'server/models/membership';
-import { AppError } from '../../../../common-common/src/errors';
 import { AddressInstance } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
 import { UserInstance } from '../../models/user';

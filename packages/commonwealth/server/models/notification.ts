@@ -1,3 +1,4 @@
+import { StatsDController } from 'common-common/src/statsd';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type {
@@ -5,10 +6,9 @@ import type {
   NotificationsReadInstance,
 } from './notifications_read';
 import type { ModelInstance, ModelStatic } from './types';
-import { StatsDController } from 'common-common/src/statsd';
 
-import { factory, formatFilename } from 'common-common/src/logging';
-const log = factory.getLogger(formatFilename(__filename));
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 export type NotificationAttributes = {
   id: number;
@@ -31,7 +31,7 @@ export type NotificationModelStatic = ModelStatic<NotificationInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): NotificationModelStatic => {
   const Notification = <NotificationModelStatic>sequelize.define(
     'Notification',
@@ -40,6 +40,7 @@ export default (
       notification_data: { type: dataTypes.TEXT, allowNull: false },
       chain_event_id: { type: dataTypes.INTEGER, allowNull: true },
       entity_id: { type: dataTypes.INTEGER, allowNull: true },
+      // eslint-disable-next-line max-len
       chain_id: { type: dataTypes.STRING, allowNull: true }, // for backwards compatibility of threads associated with OffchainCommunities rather than a proper chain
       category_id: { type: dataTypes.STRING, allowNull: false },
       thread_id: { type: dataTypes.INTEGER, allowNull: true },
@@ -53,13 +54,13 @@ export default (
             ({ id, category_id, thread_id } = notification);
             if (
               ['new-thread-creation', 'new-comment-creation'].includes(
-                category_id
+                category_id,
               ) &&
               thread_id
             ) {
               await Thread.update(
                 { max_notif_id: id },
-                { where: { id: thread_id } }
+                { where: { id: thread_id } },
               );
               StatsDController.get().increment('cw.hook.thread-notif-update', {
                 thread_id: String(thread_id),
@@ -67,7 +68,7 @@ export default (
             }
           } catch (error) {
             log.error(
-              `incrementing thread notif for thread ${thread_id} afterCreate: ${error}`
+              `incrementing thread notif for thread ${thread_id} afterCreate: ${error}`,
             );
             StatsDController.get().increment('cw.hook.thread-notif-error', {
               thread_id: String(thread_id),
@@ -80,7 +81,7 @@ export default (
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       indexes: [{ fields: ['chain_event_id'], prefix: 'new' }],
-    }
+    },
   );
 
   Notification.associate = (models) => {

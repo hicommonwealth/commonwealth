@@ -3,10 +3,7 @@ import { isNonEmptyString } from 'helpers/typeGuards';
 import React, { useState } from 'react';
 import app from 'state';
 import ChainInfo from '../models/ChainInfo';
-import {
-  CWMessageBanner,
-  Old_CWBanner,
-} from './components/component_kit/cw_banner';
+import { CWMessageBanner } from './components/component_kit/cw_banner';
 import { TermsBanner } from './components/terms_banner';
 
 type SublayoutBannersProps = {
@@ -40,12 +37,7 @@ export const SublayoutBanners = ({
         app.isLoggedIn() &&
         ([ChainNetwork.Aave, ChainNetwork.Compound].includes(chain.network) ||
           chain.base === ChainBase.CosmosSDK) &&
-        [ChainType.DAO, ChainType.Chain].includes(chain.type as ChainType) &&
-        !app.user.activeAccount && (
-          <Old_CWBanner
-            bannerContent={`Link an address that holds ${chain.default_symbol} to participate in governance.`}
-          />
-        )}
+        [ChainType.DAO, ChainType.Chain].includes(chain.type as ChainType)}
       {isNonEmptyString(terms) && <TermsBanner terms={terms} />}
     </>
   );

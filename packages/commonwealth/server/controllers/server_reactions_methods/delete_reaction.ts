@@ -1,8 +1,8 @@
+import { AppError } from '@hicommonwealth/adapters';
+import { Op } from 'sequelize';
+import { AddressInstance } from 'server/models/address';
 import { UserInstance } from 'server/models/user';
 import { ServerReactionsController } from '../server_reactions_controller';
-import { Op } from 'sequelize';
-import { AppError } from '../../../../common-common/src/errors';
-import { AddressInstance } from 'server/models/address';
 
 const Errors = {
   ReactionNotFound: 'Reaction not found',
@@ -19,7 +19,7 @@ export type DeleteReactionResult = void;
 
 export async function __deleteReaction(
   this: ServerReactionsController,
-  { user, address, reactionId }: DeleteReactionOptions
+  { user, address, reactionId }: DeleteReactionOptions,
 ): Promise<DeleteReactionResult> {
   const userOwnedAddressIds = (await user.getAddresses())
     .filter((addr) => !!addr.verified)

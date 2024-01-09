@@ -1,0 +1,33 @@
+@import '../../../../styles/shared';
+
+.AdminOnboardingSlider {
+  width: 100%;
+  display: flex;
+  gap: 16px;
+  flex-direction: column;
+  padding: 40px;
+  padding-bottom: 0px;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 32px;
+    width: 100%;
+
+    .dismissBtn {
+      &:focus-within {
+        border-color: transparent !important;
+      }
+    }
+  }
+
+  .cards {
+    display: flex;
+    overflow: scroll;
+    margin: 0 auto;
+    gap: 16px;
+    width: 100%;
+    padding-bottom: 8px;
+  }
+}

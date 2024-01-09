@@ -1,4 +1,7 @@
 import * as Rascal from 'rascal';
+import type Rollbar from 'rollbar';
+import type { Sequelize } from 'sequelize';
+import { formatFilename, loggerFactory } from '../typescript-logging';
 import type {
   RascalPublications,
   RascalSubscriptions,
@@ -6,11 +9,8 @@ import type {
   TRmqMessages,
 } from './types';
 import { AbstractRabbitMQController, RmqMsgFormatError } from './types';
-import type Rollbar from 'rollbar';
-import type { Sequelize } from 'sequelize';
-import { factory, formatFilename } from 'common-common/src/logging';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 export class RabbitMQControllerError extends Error {
   constructor(msg: string) {
@@ -40,7 +40,7 @@ export class RabbitMQController extends AbstractRabbitMQController {
 
   constructor(
     protected readonly _rabbitMQConfig: Rascal.BrokerConfig,
-    rollbar?: Rollbar
+    rollbar?: Rollbar,
   ) {
     super();
 
@@ -61,28 +61,28 @@ export class RabbitMQController extends AbstractRabbitMQController {
     log.info(`Rascal connecting to RabbitMQ: ${this._rawVhost.connection}`);
 
     this.broker = await Rascal.BrokerAsPromised.create(
-      Rascal.withDefaultConfig(this._rabbitMQConfig)
+      Rascal.withDefaultConfig(this._rabbitMQConfig),
     );
 
     this.broker.on('error', (err, { vhost, connectionUrl }) => {
       log.error(
         `Broker error on vhost: ${vhost} using url: ${connectionUrl}`,
-        err
+        err,
       );
     });
     this.broker.on('vhost_initialized', ({ vhost, connectionUrl }) => {
       log.info(
-        `Vhost: ${vhost} was initialised using connection: ${connectionUrl}`
+        `Vhost: ${vhost} was initialised using connection: ${connectionUrl}`,
       );
     });
     this.broker.on('blocked', (reason, { vhost, connectionUrl }) => {
       log.warn(
-        `Vhost: ${vhost} was blocked using connection: ${connectionUrl}. Reason: ${reason}`
+        `Vhost: ${vhost} was blocked using connection: ${connectionUrl}. Reason: ${reason}`,
       );
     });
     this.broker.on('unblocked', ({ vhost, connectionUrl }) => {
       log.info(
-        `Vhost: ${vhost} was unblocked using connection: ${connectionUrl}.`
+        `Vhost: ${vhost} was unblocked using connection: ${connectionUrl}.`,
       );
     });
 
@@ -99,11 +99,11 @@ export class RabbitMQController extends AbstractRabbitMQController {
   public async startSubscription(
     messageProcessor: (data: TRmqMessages, ...args: any) => Promise<void>,
     subscriptionName: RascalSubscriptions,
-    msgProcessorContext?: { [key: string]: any }
+    msgProcessorContext?: { [key: string]: any },
   ): Promise<any> {
     if (!this._initialized) {
       throw new RabbitMQControllerError(
-        'RabbitMQController is not initialized!'
+        'RabbitMQController is not initialized!',
       );
     }
 
@@ -162,11 +162,11 @@ export class RabbitMQController extends AbstractRabbitMQController {
   //      if a message is successfully published to a particular queue then the callback is executed
   public async publish(
     data: TRmqMessages,
-    publisherName: RascalPublications
+    publisherName: RascalPublications,
   ): Promise<any> {
     if (!this._initialized) {
       throw new RabbitMQControllerError(
-        'RabbitMQController is not initialized!'
+        'RabbitMQController is not initialized!',
       );
     }
 
@@ -186,7 +186,7 @@ export class RabbitMQController extends AbstractRabbitMQController {
       if (err instanceof PublishError) throw err;
       else
         throw new RabbitMQControllerError(
-          `Rascal config error: ${err.message}`
+          `Rascal config error: ${err.message}`,
         );
     }
   }
@@ -208,11 +208,11 @@ export class RabbitMQController extends AbstractRabbitMQController {
     publishData: TRmqMessages,
     objectId: number | string,
     publication: RascalPublications,
-    DB: { sequelize: Sequelize; model: SafeRmqPublishSupported }
+    DB: { sequelize: Sequelize; model: SafeRmqPublishSupported },
   ) {
     if (!this._initialized) {
       throw new RabbitMQControllerError(
-        'RabbitMQController is not initialized!'
+        'RabbitMQController is not initialized!',
       );
     }
 
@@ -231,7 +231,7 @@ export class RabbitMQController extends AbstractRabbitMQController {
               id: objectId,
             },
             transaction: t,
-          }
+          },
         );
         await this.publish(publishData, publication);
       });
@@ -239,26 +239,26 @@ export class RabbitMQController extends AbstractRabbitMQController {
       if (e instanceof RabbitMQControllerError) {
         log.error(
           `RepublishMessages job failure for message: ${JSON.stringify(
-            publishData
+            publishData,
           )} to ${publication}.`,
-          e
+          e,
         );
         // if this fails once not much damage is done since the message is re-queued later again anyway
         (<any>await DB.model).increment('queued', { where: { id: objectId } });
         this.rollbar?.warn(
           `RepublishMessages job failure for message: ${JSON.stringify(
-            publishData
+            publishData,
           )} to ${publication}.`,
-          e
+          e,
         );
       } else {
         log.error(
           `Sequelize error occurred while setting queued to -1 for ${DB.model.getTableName()} with id: ${objectId}`,
-          e
+          e,
         );
         this.rollbar?.warn(
           `Sequelize error occurred while setting queued to -1 for ${DB.model.getTableName()} with id: ${objectId}`,
-          e
+          e,
         );
       }
     }

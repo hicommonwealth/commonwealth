@@ -147,7 +147,9 @@ const GroupForm = ({
   });
 
   const takenGroupNames = groups.map(({ name }) => name.toLowerCase());
-  const sortedTopics = (topics || []).sort((a, b) => a?.name?.localeCompare(b));
+  const sortedTopics = (topics || []).sort((a, b) =>
+    a?.name?.localeCompare(b.name),
+  );
 
   const [isNameTaken, setIsNameTaken] = useState(false);
   const [

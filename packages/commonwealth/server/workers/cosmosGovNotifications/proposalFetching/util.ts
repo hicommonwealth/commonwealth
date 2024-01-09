@@ -1,12 +1,12 @@
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import { ProposalSDKType } from '@hicommonwealth/chains';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import { COSMOS_GOV_V1_CHAIN_IDS } from '../../../config';
 import { CommunityInstance } from '../../../models/community';
 import { rollbar } from '../../../util/rollbar';
 import { AllCosmosProposals } from './types';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 export function uint8ArrayToNumberBE(bytes) {
   if (!bytes) return 0;
