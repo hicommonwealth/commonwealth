@@ -1,8 +1,8 @@
+import { AppError, ServerError } from '@hicommonwealth/adapters';
 import { NotificationCategories, ProposalType } from '@hicommonwealth/core';
 import { uniq } from 'lodash';
 import moment from 'moment';
 import { Op, Sequelize, Transaction } from 'sequelize';
-import { AppError, ServerError } from '../../../../common-common/src/errors';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText, validURL } from '../../../shared/utils';
 import { DB } from '../../models';

@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-syntax */
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import type { NextFunction } from 'express';
 import type { DB } from '../models';
 import type { TopicAttributes } from '../models/topic';
@@ -40,7 +40,7 @@ const editTopic = async (
   models: DB,
   req: TypedRequestBody<EditTopicReq>,
   res: TypedResponse<EditTopicResp>,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const chain = req.chain;
   if (!req.body.id) {

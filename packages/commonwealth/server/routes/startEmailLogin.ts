@@ -1,7 +1,10 @@
-import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
+import {
+  AppError,
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/adapters';
 import { WalletId } from '@hicommonwealth/core';
 import sgMail from '@sendgrid/mail';
-import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
 import { DynamicTemplate } from '../../shared/types';

@@ -1,6 +1,9 @@
-import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
+import {
+  AppError,
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/adapters';
 import { ChainBase } from '@hicommonwealth/core';
-import { AppError } from 'common-common/src/errors';
 import crypto from 'crypto';
 import type { NextFunction, Request, Response } from 'express';
 import Sequelize from 'sequelize';

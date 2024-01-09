@@ -1,6 +1,10 @@
-import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
+import {
+  AppError,
+  ServerError,
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/adapters';
 import { NotificationCategories, WalletId } from '@hicommonwealth/core';
-import { AppError, ServerError } from 'common-common/src/errors';
 import * as jwt from 'jsonwebtoken';
 import { isAddress, toChecksumAddress } from 'web3-utils';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';

@@ -1,4 +1,4 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import type { DB } from '../models';
 import type { BanAttributes } from '../models/ban';
 import type { TypedRequestQuery, TypedResponse } from '../types';
@@ -19,7 +19,7 @@ type GetBannedAddressesResp = BanAttributes[];
 const getBannedAddresses = async (
   models: DB,
   req: TypedRequestQuery<GetBannedAddressesReq>,
-  res: TypedResponse<GetBannedAddressesResp>
+  res: TypedResponse<GetBannedAddressesResp>,
 ) => {
   const chain = req.chain;
 
@@ -37,7 +37,7 @@ const getBannedAddresses = async (
   const bans = await models.Ban.findAll({ where: { chain_id: chain.id } });
   return success(
     res,
-    bans.map((b) => b.toJSON())
+    bans.map((b) => b.toJSON()),
   );
 };
 

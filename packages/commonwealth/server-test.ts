@@ -1,5 +1,11 @@
 /* eslint-disable dot-notation */
+import {
+  ServerError,
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/adapters';
 import bodyParser from 'body-parser';
+import { RedisCache } from 'common-common/src/redisCache';
 import setupErrorHandlers from 'common-common/src/scripts/setupErrorHandlers';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
@@ -10,8 +16,11 @@ import http from 'http';
 import passport from 'passport';
 import Rollbar from 'rollbar';
 import favicon from 'serve-favicon';
-import setupAPI from './server/routing/router'; // performance note: this takes 15 seconds
-
+import { cacheDecorator } from '../common-common/src/cacheDecorator';
+import {
+  CustomRequest,
+  lookupKeyDurationInReq,
+} from '../common-common/src/cacheKeyUtils';
 import {
   ROLLBAR_ENV,
   ROLLBAR_SERVER_TOKEN,
@@ -21,21 +30,12 @@ import {
 import models from './server/database';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
+import setupAPI from './server/routing/router'; // performance note: this takes 15 seconds
 import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
 import GlobalActivityCache from './server/util/globalActivityCache';
-import ViewCountCache from './server/util/viewCountCache';
-
-import {
-  CustomRequest,
-  lookupKeyDurationInReq,
-} from '../common-common/src/cacheKeyUtils';
-
-import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
-import { cacheDecorator } from 'common-common/src/cacheDecorator';
-import { ServerError } from 'common-common/src/errors';
-import { RedisCache } from 'common-common/src/redisCache';
 import { TokenBalanceCache } from './server/util/tokenBalanceCache/tokenBalanceCache';
+import ViewCountCache from './server/util/viewCountCache';
 
 const log = loggerFactory.getLogger(formatFilename(__filename));
 
