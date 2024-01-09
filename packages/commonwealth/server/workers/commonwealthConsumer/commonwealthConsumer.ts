@@ -1,15 +1,15 @@
 import {
   RabbitMQController,
+  RabbitMQSubscription,
   RascalConfigServices,
   RascalSubscriptions,
+  ServiceConsumer,
   ServiceKey,
   formatFilename,
   getRabbitMQConfig,
   loggerFactory,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import type { RabbitMQSubscription } from 'common-common/src/serviceConsumer';
-import { ServiceConsumer } from 'common-common/src/serviceConsumer';
 import type { BrokerConfig } from 'rascal';
 import Rollbar from 'rollbar';
 import { RABBITMQ_URI, ROLLBAR_ENV, ROLLBAR_SERVER_TOKEN } from '../../config';
