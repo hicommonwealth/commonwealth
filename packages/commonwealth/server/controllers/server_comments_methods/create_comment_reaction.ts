@@ -1,9 +1,9 @@
-import { AppError, ServerError } from '../../../../common-common/src/errors';
 import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
-} from '../../../../common-common/src/types';
+} from '@hicommonwealth/core';
+import { AppError, ServerError } from '../../../../common-common/src/errors';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { AddressInstance } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
@@ -97,8 +97,7 @@ export async function __createCommentReaction(
       try {
         const { isValid } = await validateTopicGroupsMembership(
           this.models,
-          this.tokenBalanceCacheV1,
-          this.tokenBalanceCacheV2,
+          this.tokenBalanceCache,
           thread.topic_id,
           community,
           address,

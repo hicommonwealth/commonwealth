@@ -1,5 +1,6 @@
+/* eslint-disable react/no-multi-comp */
 /* eslint-disable no-script-url */
-import { WalletId } from 'common-common/src/types';
+import { WalletId } from '@hicommonwealth/core';
 import 'components/user/user.scss';
 import { capitalize } from 'lodash';
 import React from 'react';

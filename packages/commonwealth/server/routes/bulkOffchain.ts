@@ -7,14 +7,13 @@ import { ServerError } from 'common-common/src/errors';
 //
 import type { Request, Response } from 'express';
 import { Op, QueryTypes } from 'sequelize';
+import type { CommunityContractTemplateInstance } from 'server/models/community_contract_template';
 import type { DB } from '../models';
 import type { CommunityBannerInstance } from '../models/community_banner';
 import type { ContractInstance } from '../models/contract';
-import type { CommunityContractTemplateInstance } from 'server/models/community_contract_template';
 import type { ThreadInstance } from '../models/thread';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
-import { TopicInstance } from 'server/models/topic';
 
 export const Errors = {};
 
@@ -22,32 +21,30 @@ export const Errors = {};
 const bulkOffchain = async (models: DB, req: Request, res: Response) => {
   const chain = req.chain;
   // globally shared SQL replacements
-  const communityOptions = 'chain = :chain';
-  const replacements = { chain: chain.id };
+  const communityOptions = 'community_id = :community_id';
+  const replacements = { community_id: chain.id };
 
   // parallelized queries
   const [
     admins,
     mostActiveUsers,
     threadsInVoting,
-    totalThreads,
+    numTotalThreads,
     communityBanner,
     contractsWithTemplatesData,
-    topics,
   ] = await (<
     Promise<
       [
         RoleInstanceWithPermission[],
         unknown,
         ThreadInstance[],
-        [{ count: string }],
+        number,
         CommunityBannerInstance,
         Array<{
           contract: ContractInstance;
           ccts: Array<CommunityContractTemplateInstance>;
           hasGlobalTemplate: boolean;
         }>,
-        TopicInstance[]
       ]
     >
   >Promise.all([
@@ -56,18 +53,18 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
       models,
       { include: [models.Address], order: [['created_at', 'DESC']] },
       chain.id,
-      ['admin', 'moderator']
+      ['admin', 'moderator'],
     ),
     // most active users
     new Promise(async (resolve, reject) => {
       try {
         const thirtyDaysAgo = new Date(
-          (new Date() as any) - 1000 * 24 * 60 * 60 * 30
+          (new Date() as any) - 1000 * 24 * 60 * 60 * 30,
         );
         const activeUsers = {};
         const where = {
           updated_at: { [Op.gt]: thirtyDaysAgo },
-          chain: chain.id,
+          community_id: chain.id,
         };
 
         const monthlyComments = await models.Comment.findAll({
@@ -105,41 +102,14 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
       {
         replacements,
         type: QueryTypes.SELECT,
-      }
+      },
     ),
-    await models.sequelize.query(
-      `
-      SELECT 
-        COUNT(*) 
-      FROM 
-        "Addresses" AS addr 
-        RIGHT JOIN (
-          SELECT 
-            t.id AS thread_id, 
-            t.address_id, 
-            t.topic_id 
-          FROM 
-            "Threads" t 
-          WHERE 
-            t.deleted_at IS NULL 
-            AND t.chain = $chain 
-            AND (
-              t.pinned = true 
-              OR (
-                COALESCE(
-                  t.last_commented_on, t.created_at
-                ) < $created_at 
-                AND t.pinned = false
-              )
-            )
-        ) threads ON threads.address_id = addr.id 
-        LEFT JOIN "Topics" topics ON threads.topic_id = topics.id
-      `,
-      {
-        bind: { chain: chain.id, created_at: new Date().toISOString() },
-        type: QueryTypes.SELECT,
-      }
-    ),
+    await models.Thread.count({
+      where: {
+        community_id: chain.id,
+        marked_as_spam_at: null,
+      },
+    }),
     models.CommunityBanner.findOne({
       where: {
         chain_id: chain.id,
@@ -194,37 +164,11 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
         reject(new ServerError('Could not fetch contracts'));
       }
     }),
-    models.Topic.findAll({
-      where: {
-        chain_id: chain.id,
-        token_threshold: {
-          [Op.and]: [
-            {
-              [Op.not]: '0',
-            },
-            {
-              [Op.not]: null,
-            },
-          ],
-        },
-      },
-    }),
   ]));
 
   const numVotingThreads = threadsInVoting.filter(
-    (t) => t.stage === 'voting'
+    (t) => t.stage === 'voting',
   ).length;
-
-  const numTotalThreads = parseInt(totalThreads[0].count);
-  const gateStrategies = topics.map((topic) => {
-    return {
-      id: topic.id,
-      type: 'token',
-      data: {
-        threshold: topic.token_threshold,
-      },
-    };
-  });
 
   return res.json({
     status: 'Success',
@@ -241,7 +185,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
           hasGlobalTemplate: c.hasGlobalTemplate,
         };
       }),
-      gateStrategies,
     },
   });
 };

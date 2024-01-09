@@ -62,7 +62,7 @@ export async function __refreshCommunityMemberships(
       getBalancesOptions.map(async (options) => {
         let result: Balances = {};
         try {
-          result = await this.tokenBalanceCacheV2.getBalances({
+          result = await this.tokenBalanceCache.getBalances({
             ...options,
             cacheRefresh: false, // get cached balances
           });

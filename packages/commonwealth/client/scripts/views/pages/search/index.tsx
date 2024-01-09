@@ -317,7 +317,7 @@ const SearchPage = () => {
                 )}
               <div className="search-results-list">
                 {renderSearchResults(
-                  results as any,
+                  results,
                   queryParams.q,
                   activeTab,
                   commonNavigate,

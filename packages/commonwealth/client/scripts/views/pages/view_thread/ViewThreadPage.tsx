@@ -283,7 +283,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   if (
     (!isLoading && !thread) ||
     fetchThreadError ||
-    thread.chain !== app.activeChainId()
+    thread.communityId !== app.activeChainId()
   ) {
     return <PageNotFound />;
   }
@@ -320,12 +320,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const hasWebLinks = thread.links.find((x) => x.source === 'web');
 
-  const canComment =
-    (!!hasJoinedCommunity ||
-      (!isAdminOrMod &&
-        app.chain.isGatedTopic(thread?.topic?.id) &&
-        !featureFlags.newGatingEnabled)) &&
-    !isRestrictedMembership;
+  const canComment = !!hasJoinedCommunity && !isRestrictedMembership;
 
   const handleNewSnapshotChange = async ({
     id,
@@ -405,7 +400,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           showLinkedThreadOptions ||
           polls?.length > 0 ||
           isAuthor ||
-          hasWebLinks
+          !!hasWebLinks
         }
         isSpamThread={!!thread.markedAsSpamAt}
         title={
@@ -536,8 +531,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       shouldFocusEditor={shouldFocusCommentEditor}
                       tooltipText={disabledActionsTooltipText}
                     />
-                    {featureFlags.newGatingEnabled &&
-                      foundGatedTopic &&
+                    {foundGatedTopic &&
                       !hideGatingBanner &&
                       isRestrictedMembership && (
                         <CWGatedTopicBanner

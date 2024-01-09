@@ -1,9 +1,9 @@
-import type { Request, Response } from 'express';
-import { QueryTypes } from 'sequelize';
-import { groupBy } from 'lodash';
 import { factory, formatFilename } from 'common-common/src/logging';
-import type { DB } from '../models';
+import type { Request, Response } from 'express';
+import { groupBy } from 'lodash';
+import { QueryTypes } from 'sequelize';
 import { sequelize } from '../database';
+import type { DB } from '../models';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -16,15 +16,15 @@ type UniqueAddresses = {
 
 const fetchUniqueAddressesByThreadIds = async (
   models: DB,
-  { chain, thread_ids }
+  { chain, thread_ids },
 ) => {
   return sequelize.query<UniqueAddresses>(
     `
-    SELECT distinct cts.address_id, address, thread_id, cts.chain
+    SELECT distinct cts.address_id, address, thread_id, cts.community_id
     FROM "Comments" cts INNER JOIN "Addresses" adr
     ON adr.id = cts.address_id
     WHERE thread_id = ANY($thread_ids)
-    AND cts.chain = $chain
+    AND cts.community_id = $chain
     AND deleted_at IS NULL
     ORDER BY thread_id
   `,
@@ -34,7 +34,7 @@ const fetchUniqueAddressesByThreadIds = async (
         thread_ids,
         chain,
       },
-    }
+    },
   );
 };
 
@@ -49,7 +49,7 @@ is wildly unclear and wildly inconsistent. We should standardize + clarify.
 const threadsUsersCountAndAvatar = async (
   models: DB,
   req: Request,
-  res: Response
+  res: Response,
 ) => {
   const { chain, threads = [] } = req.body;
   try {
@@ -57,11 +57,11 @@ const threadsUsersCountAndAvatar = async (
       const thread_ids = threads.map(({ thread_id }) => thread_id);
       const uniqueAddressesByRootIds = await fetchUniqueAddressesByThreadIds(
         models,
-        { chain, thread_ids }
+        { chain, thread_ids },
       );
       const uniqueAddressesByThread = groupBy<UniqueAddresses>(
         uniqueAddressesByRootIds,
-        ({ thread_id }) => thread_id
+        ({ thread_id }) => thread_id,
       );
       return res.json(
         threads.map(({ thread_id: thread_id, author: authorAddress }) => {
@@ -83,7 +83,7 @@ const threadsUsersCountAndAvatar = async (
             addresses,
             count: addressesCount > 2 ? addressesCount - 2 : 0,
           };
-        })
+        }),
       );
     }
     return res.json([]);

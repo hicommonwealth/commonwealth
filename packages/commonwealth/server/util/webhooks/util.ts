@@ -1,5 +1,5 @@
+import { NotificationCategories } from '@hicommonwealth/core';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { NotificationCategories } from 'common-common/src/types';
 import { Op } from 'sequelize';
 import { NotificationDataAndCategory } from '../../../shared/types';
 import { slugify } from '../../../shared/utils';
@@ -24,7 +24,7 @@ export async function fetchWebhooks(
   notifDataCategory: Exclude<
     NotificationDataAndCategory,
     { categoryId: NotificationCategories.SnapshotProposal }
-  >
+  >,
 ): Promise<WebhookInstance[]> {
   let chainId: string;
   if (notifDataCategory.categoryId === NotificationCategories.ChainEvent) {
@@ -51,7 +51,7 @@ export async function getActorProfile(
   notif: Exclude<
     NotificationDataAndCategory,
     { categoryId: NotificationCategories.SnapshotProposal }
-  >
+  >,
 ): Promise<ProfileAttributes | null> {
   if (notif.categoryId === NotificationCategories.ChainEvent) {
     return null;
@@ -68,7 +68,7 @@ export async function getActorProfile(
   if (!address) {
     // TODO: rollbar
     log.error(
-      `Could not find address for notification ${JSON.stringify(notif)}`
+      `Could not find address for notification ${JSON.stringify(notif)}`,
     );
     return null;
   }
@@ -87,7 +87,7 @@ export async function getPreviewImageUrl(
     NotificationDataAndCategory,
     { categoryId: NotificationCategories.SnapshotProposal }
   >,
-  chain?: CommunityInstance
+  chain?: CommunityInstance,
 ): Promise<{ previewImageUrl: string; previewAltText: string }> {
   // case 1: embedded imaged in thread body
   if (
@@ -125,7 +125,7 @@ export function getThreadUrlFromNotification(
     | { categoryId: NotificationCategories.SnapshotProposal }
     | { categoryId: NotificationCategories.ThreadEdit }
     | { categoryId: NotificationCategories.CommentEdit }
-  >
+  >,
 ): string {
   let commentId = '';
   if (notification.categoryId === NotificationCategories.NewComment) {
@@ -134,7 +134,7 @@ export function getThreadUrlFromNotification(
 
   const data = notification.data;
   return `${SERVER_URL}/${data.chain_id}/discussion/${data.thread_id}-${slugify(
-    data.root_title
+    data.root_title,
   )}${commentId}`;
 }
 

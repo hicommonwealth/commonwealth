@@ -4,7 +4,7 @@ import React from 'react';
 
 import 'pages/notifications/notification_row.scss';
 
-import { NotificationCategories, ProposalType } from 'common-common/src/types';
+import { NotificationCategories, ProposalType } from '@hicommonwealth/core';
 import type { IForumNotificationData } from 'types';
 
 import { pluralize } from 'helpers';

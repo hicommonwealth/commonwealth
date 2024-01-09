@@ -1,12 +1,12 @@
 import moment from 'moment';
 
-import { AppError } from '../../../../common-common/src/errors';
 import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
   ProposalType,
-} from '../../../../common-common/src/types';
+} from '@hicommonwealth/core';
+import { AppError } from '../../../../common-common/src/errors';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import { AddressInstance } from '../../models/address';
@@ -123,7 +123,7 @@ export async function __createThread(
   const version_history: string[] = [JSON.stringify(firstVersion)];
 
   const threadContent: Partial<ThreadAttributes> = {
-    chain: community.id,
+    community_id: community.id,
     address_id: address.id,
     title,
     body,
@@ -149,7 +149,7 @@ export async function __createThread(
         const [topic] = await this.models.Topic.findOrCreate({
           where: {
             name: topicName,
-            chain_id: community?.id || null,
+            community_id: community?.id || null,
           },
           transaction,
         });
@@ -179,8 +179,7 @@ export async function __createThread(
         if (!isAdmin) {
           const { isValid, message } = await validateTopicGroupsMembership(
             this.models,
-            this.tokenBalanceCacheV1,
-            this.tokenBalanceCacheV2,
+            this.tokenBalanceCache,
             topicId,
             community,
             address,
@@ -223,14 +222,14 @@ export async function __createThread(
     subscriber_id: user.id,
     category_id: NotificationCategories.NewComment,
     thread_id: finalThread.id,
-    chain_id: finalThread.chain,
+    chain_id: finalThread.community_id,
     is_active: true,
   });
   await this.models.Subscription.create({
     subscriber_id: user.id,
     category_id: NotificationCategories.NewReaction,
     thread_id: finalThread.id,
-    chain_id: finalThread.chain,
+    chain_id: finalThread.community_id,
     is_active: true,
   });
 
@@ -273,7 +272,7 @@ export async function __createThread(
         root_type: ProposalType.Thread,
         root_title: finalThread.title,
         comment_text: finalThread.body,
-        chain_id: finalThread.chain,
+        chain_id: finalThread.community_id,
         author_address: finalThread.Address.address,
         author_chain: finalThread.Address.community_id,
       },
@@ -297,7 +296,7 @@ export async function __createThread(
             root_type: ProposalType.Thread,
             root_title: finalThread.title,
             comment_text: finalThread.body,
-            chain_id: finalThread.chain,
+            chain_id: finalThread.community_id,
             author_address: finalThread.Address.address,
             author_chain: finalThread.Address.community_id,
           },

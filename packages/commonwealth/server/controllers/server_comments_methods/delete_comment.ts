@@ -97,4 +97,12 @@ export async function __deleteComment(
 
   // actually delete
   await comment.destroy();
+
+  // use callbacks so route returns and this completes in the background
+  if (this.globalActivityCache) {
+    this.globalActivityCache.deleteActivityFromCache(
+      parseInt(comment.thread_id, 10),
+      comment.id,
+    );
+  }
 }

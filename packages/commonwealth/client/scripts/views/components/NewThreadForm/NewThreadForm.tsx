@@ -2,7 +2,6 @@ import 'components/NewThreadForm.scss';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { parseCustomStages } from 'helpers';
-import { featureFlags } from 'helpers/feature-flags';
 import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
@@ -46,25 +45,10 @@ export const NewThreadForm = () => {
   const hasTopics = topics?.length;
   const isAdmin = Permissions.isCommunityAdmin() || Permissions.isSiteAdmin();
 
-  const topicsForSelector = topics?.reduce(
-    (acc, t) => {
-      if (featureFlags.newGatingEnabled) {
-        acc?.enabledTopics?.push(t);
-      } else {
-        if (
-          isAdmin ||
-          t.tokenThreshold.isZero() ||
-          !app.chain.isGatedTopic(t.id)
-        ) {
-          acc?.enabledTopics?.push(t);
-        } else {
-          acc?.disabledTopics?.push(t);
-        }
-      }
-      return acc;
-    },
-    { enabledTopics: [], disabledTopics: [] },
-  );
+  const topicsForSelector = {
+    enabledTopics: hasTopics ? topics : [],
+    disabledTopics: [],
+  };
 
   const {
     threadTitle,
@@ -273,16 +257,14 @@ export const NewThreadForm = () => {
               />
             )}
 
-            {featureFlags.newGatingEnabled &&
-              isRestrictedMembership &&
-              canShowGatingBanner && (
-                <div>
-                  <CWGatedTopicBanner
-                    groupNames={gatedGroupNames}
-                    onClose={() => setCanShowGatingBanner(false)}
-                  />
-                </div>
-              )}
+            {isRestrictedMembership && canShowGatingBanner && (
+              <div>
+                <CWGatedTopicBanner
+                  groupNames={gatedGroupNames}
+                  onClose={() => setCanShowGatingBanner(false)}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>

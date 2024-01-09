@@ -1,4 +1,4 @@
-import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, ProposalType } from '@hicommonwealth/core';
 import type { ProposalStore } from 'stores';
 import { slugify } from 'utils';
 import type ChainInfo from './models/ChainInfo';
@@ -10,7 +10,7 @@ import app from './state';
 // custom domain prefixes as well.
 export const getProposalUrlPath = (
   type: ProposalType,
-  id: string,
+  id: number | string,
   omitActiveId = true,
   chainId?: string,
 ): string => {

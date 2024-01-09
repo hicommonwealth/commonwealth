@@ -1,9 +1,9 @@
-import { CommunityInstance } from '../../../models/community';
-import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
-import { ProposalStatus } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
-import { GovV1Beta1ClientType } from './types';
-import { getCosmosClient } from './getCosmosClient';
+import { ProposalStatus } from '@hicommonwealth/chains';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
+import { CommunityInstance } from '../../../models/community';
+import { getCosmosClient } from './getCosmosClient';
+import { GovV1Beta1ClientType } from './types';
 import { numberToUint8ArrayBE, uint8ArrayToNumberBE } from './util';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -13,7 +13,7 @@ const log = factory.getLogger(formatFilename(__filename));
  * @param chain
  */
 export async function fetchLatestCosmosProposalV1Beta1(
-  chain: CommunityInstance
+  chain: CommunityInstance,
 ): Promise<Proposal[]> {
   const client = await getCosmosClient<GovV1Beta1ClientType>(chain);
   let nextKey: Uint8Array, finalProposalsPage: Proposal[];
@@ -22,7 +22,7 @@ export async function fetchLatestCosmosProposalV1Beta1(
       ProposalStatus.PROPOSAL_STATUS_UNSPECIFIED,
       '',
       '',
-      nextKey
+      nextKey,
     );
     if (!result) {
       console.error(`Result is undefined for ${chain.id}`);
@@ -31,7 +31,7 @@ export async function fetchLatestCosmosProposalV1Beta1(
     if (result?.pagination) {
       if (!result.pagination?.total.isZero()) {
         const newNextKey = numberToUint8ArrayBE(
-          result.pagination.total.toNumber()
+          result.pagination.total.toNumber(),
         );
         if (nextKey != newNextKey) {
           nextKey = newNextKey;
@@ -46,7 +46,7 @@ export async function fetchLatestCosmosProposalV1Beta1(
     log.info(
       `Fetched proposal ${finalProposalsPage[
         finalProposalsPage.length - 1
-      ].proposalId.toNumber()} from ${chain.id}`
+      ].proposalId.toNumber()} from ${chain.id}`,
     );
     return [finalProposalsPage[finalProposalsPage.length - 1]];
   } else return [];
@@ -58,10 +58,10 @@ export async function fetchLatestCosmosProposalV1Beta1(
  */
 export async function fetchUpToLatestCosmosProposalV1Beta1(
   proposalId: number,
-  chain: CommunityInstance
+  chain: CommunityInstance,
 ): Promise<Proposal[]> {
   log.info(
-    `Fetching proposals from '${chain.id}' starting at proposal id ${proposalId}`
+    `Fetching proposals from '${chain.id}' starting at proposal id ${proposalId}`,
   );
   const client = await getCosmosClient<GovV1Beta1ClientType>(chain);
 

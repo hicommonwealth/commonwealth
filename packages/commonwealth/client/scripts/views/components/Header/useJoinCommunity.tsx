@@ -1,12 +1,10 @@
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
 import {
   linkExistingAddressToChainOrCommunity,
   setActiveAccount,
 } from 'controllers/app/login';
 import { isSameAccount } from 'helpers';
-import { featureFlags } from 'helpers/feature-flags';
 import AddressInfo from 'models/AddressInfo';
-import ITokenAdapter from 'models/ITokenAdapter';
 import React, { useState } from 'react';
 import app from 'state';
 import { addressSwapper } from 'utils';
@@ -167,15 +165,6 @@ const useJoinCommunity = () => {
           }
         } else {
           // Todo: handle error
-        }
-
-        // If token forum make sure has token and add to app.chain obj
-        if (
-          app.chain &&
-          ITokenAdapter.instanceOf(app.chain) &&
-          !featureFlags.newGatingEnabled
-        ) {
-          await app.chain.activeAddressHasToken(app.user.activeAccount.address);
         }
       } catch (err) {
         console.error(err);

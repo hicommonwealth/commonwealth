@@ -1,10 +1,10 @@
+import { ChainBase } from '@hicommonwealth/core';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { getClasses } from 'views/components/component_kit/helpers';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import { ChainBase } from '../../../../../../../../../../common-common/src/types';
 import {
   SPECIFICATIONS,
   TOKENS,

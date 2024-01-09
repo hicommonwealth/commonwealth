@@ -34,7 +34,7 @@ To start the app, run `yarn start`.
 
 Create a `.env` file at the `package/commonwealth` level to store minimum security environment variables. Higher security secrets should be stored inside an `.auth` file.
 
-The following environmental variables should allow you to get started:
+The following environment variables should allow you to get started:
 
 ```sh
 DATABASE_URI=postgresql://commonwealth:edgeware@localhost/commonwealth
