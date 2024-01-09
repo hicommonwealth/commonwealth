@@ -1,5 +1,5 @@
 [WIP]
-More RabbitMQ info can be found in the README located at [`libs/adapters/README.md`][2]
+More RabbitMQ info can be found in the README located at [`libs/adapters/src/rabbitmq/README.md`][2]
 
 # Important Definitions
 
@@ -33,10 +33,10 @@ To ensure consistent data sharing over queues, every message that is sent to a q
 In order to manage RabbitMQ configuration and connections we use [Rascal][1]. The current Rascal/RabbitMQ configuration can be found [here][4].
 
 [1]: https://www.npmjs.com/package/rascal
-[2]: https://github.com/hicommonwealth/commonwealth/tree/master/libs/adapters
+[2]: https://github.com/hicommonwealth/commonwealth/tree/master/libs/adapters/src/rabbitmq
 [3]: https://github.com/hicommonwealth/commonwealth/wiki/RabbitMQ%20Preventing%20Data%20Loss
-[4]: https://github.com/hicommonwealth/commonwealth/blob/master/libs/adapters/rabbitMQConfig.ts
-[5]: https://github.com/hicommonwealth/commonwealth/tree/master/libs/adapters
+[4]: https://github.com/hicommonwealth/commonwealth/blob/master/libs/adapters/src/rabbitmq/rabbitMQConfig.ts
+[5]: https://github.com/hicommonwealth/commonwealth/tree/master/libs/adapters/src/rabbitmq
 
 ## Change Log
 

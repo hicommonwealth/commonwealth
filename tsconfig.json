@@ -13,8 +13,7 @@
     "paths": {
       "@hicommonwealth/*": ["libs/*/src"],
       "common-common": ["packages/common-common"],
-      "common-common/*": ["packages/common-common/*"],
-      "chain-testing/*": ["packages/commonwealth/test/util/evm-chain-testing/*"]
+      "common-common/*": ["packages/common-common/*"]
     }
   },
   "include": [],
