@@ -1,5 +1,5 @@
+import { AppError, ServerError } from '@hicommonwealth/adapters';
 import { ChainNetwork } from '@hicommonwealth/core';
-import { AppError, ServerError } from 'common-common/src/errors';
 import { RedisCache } from 'common-common/src/redisCache';
 import { providers } from 'ethers';
 import { DB } from '../models';

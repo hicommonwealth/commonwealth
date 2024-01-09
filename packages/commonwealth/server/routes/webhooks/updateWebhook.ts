@@ -1,4 +1,4 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import type { NextFunction, Request, Response } from 'express';
 import { findAllRoles } from '../../util/roles';
 import Errors from './errors';
@@ -7,7 +7,7 @@ const updateWebhook = async (
   models,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const chain = req.chain;
   // only admins should be able to update webhooks
@@ -25,7 +25,7 @@ const updateWebhook = async (
       },
     },
     chain.id,
-    ['admin']
+    ['admin'],
   );
 
   if (!req.user.isAdmin && adminRoles.length === 0) {

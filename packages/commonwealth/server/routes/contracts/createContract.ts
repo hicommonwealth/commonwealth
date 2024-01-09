@@ -1,5 +1,5 @@
+import { AppError } from '@hicommonwealth/adapters';
 import type { ContractType } from '@hicommonwealth/core';
-import { AppError } from 'common-common/src/errors';
 import { Transaction } from 'sequelize';
 import type { ContractAbiInstance } from 'server/models/contract_abi';
 import { AbiType } from '../../../shared/types';

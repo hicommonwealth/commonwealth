@@ -1,8 +1,8 @@
+import { AppError, ServerError } from '@hicommonwealth/adapters';
 import type { RegisteredTypes } from '@polkadot/types/types';
-import { AppError, ServerError } from 'common-common/src/errors';
 
-import { constructSubstrateUrl } from '../../shared/substrate';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { constructSubstrateUrl } from '../../shared/substrate';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -28,7 +28,7 @@ const testSubstrateSpec = async (specString: string, nodeUrl: string) => {
   const polkadot = await import('@polkadot/api');
   const provider = new polkadot.WsProvider(
     constructSubstrateUrl(nodeUrl),
-    false
+    false,
   );
   try {
     await provider.connect();
@@ -46,7 +46,7 @@ const testSubstrateSpec = async (specString: string, nodeUrl: string) => {
     log.info(
       `Fetched version: ${version.specName}:${
         version.specVersion
-      } and properties ${JSON.stringify(props)}`
+      } and properties ${JSON.stringify(props)}`,
     );
     log.info('Disconnecting from chain...');
     await api.disconnect();

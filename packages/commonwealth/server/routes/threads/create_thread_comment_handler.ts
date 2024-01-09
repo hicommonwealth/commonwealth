@@ -1,8 +1,8 @@
-import { TypedRequest, TypedResponse, success } from '../../types';
-import { ServerControllers } from '../../routing/router';
-import { CommentInstance } from '../../models/comment';
-import { AppError } from '../../../../common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import { verifyComment } from '../../../shared/canvas/serverVerify';
+import { CommentInstance } from '../../models/comment';
+import { ServerControllers } from '../../routing/router';
+import { TypedRequest, TypedResponse, success } from '../../types';
 
 export const Errors = {
   MissingThreadId: 'Must provide valid thread_id',
@@ -32,7 +32,7 @@ type CreateThreadCommentResponse = CommentInstance;
 export const createThreadCommentHandler = async (
   controllers: ServerControllers,
   req: TypedRequest<CreateThreadCommentRequestBody, null, { id: string }>,
-  res: TypedResponse<CreateThreadCommentResponse>
+  res: TypedResponse<CreateThreadCommentResponse>,
 ) => {
   const { user, address, chain: community } = req;
   const { id: threadId } = req.params;

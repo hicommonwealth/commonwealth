@@ -1,4 +1,4 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import type { Request, Response } from 'express';
 import type { DB } from '../models';
 import type { CommunityContractTemplateMetadataAttributes } from '../models/community_contract_metadata';

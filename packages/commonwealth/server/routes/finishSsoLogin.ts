@@ -1,5 +1,5 @@
+import { AppError, ServerError } from '@hicommonwealth/adapters';
 import { NotificationCategories, WalletId } from '@hicommonwealth/core';
-import { AppError, ServerError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
 import * as jwt from 'jsonwebtoken';
 import { isAddress, toChecksumAddress } from 'web3-utils';

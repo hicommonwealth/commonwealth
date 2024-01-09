@@ -1,9 +1,9 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import type { Response } from 'express';
+import { Op } from 'sequelize';
 import type { DB } from '../models';
 import type { TypedRequestBody } from '../types';
 import { success } from '../types';
-import { Op } from 'sequelize';
 
 enum PromoteUserErrors {
   NoUser = 'Must supply a user address',
@@ -18,7 +18,7 @@ type PromoteUserReq = {
 const updateSiteAdmin = async (
   models: DB,
   req: TypedRequestBody<PromoteUserReq>,
-  res: Response
+  res: Response,
 ) => {
   const { address, siteAdmin } = req.body;
 
