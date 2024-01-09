@@ -1,4 +1,4 @@
-import type { LogGroupControlSettings } from 'typescript-logging';
+import type { LogGroupControlSettings, Logger } from 'typescript-logging';
 import {
   LFService,
   LogGroupRule,
@@ -6,6 +6,9 @@ import {
   LoggerFactoryOptions,
   getLogControl,
 } from 'typescript-logging';
+
+// TODO: Is this the port interface?
+export interface ILogger extends Logger {}
 
 const options = new LoggerFactoryOptions()
   .addLogGroupRule(new LogGroupRule(new RegExp('model.+'), LogLevel.Debug))
