@@ -2,8 +2,9 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "jsx": "react",
-    "outDir": "build",
     "skipLibCheck": true,
+    "rootDir": ".",
+    "outDir": "build",
     "baseUrl": ".",
     "paths": {
       "@hicommonwealth/*": ["../../libs/*/src"],
