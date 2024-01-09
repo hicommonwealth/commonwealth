@@ -59,8 +59,9 @@
   table {
     width: 100%;
     overflow-x: auto;
-    border-collapse: collapse;
+    border-spacing: 0;
     border-radius: $border-radius-corners-wider;
+    border: 1px solid $neutral-200;
 
     thead {
       tr {
@@ -69,9 +70,16 @@
           letter-spacing: 0.02em;
           font-weight: 700;
           padding: 16px;
-          border: 1px solid $neutral-200;
-          // border-radius: 6px;
           background-color: $neutral-50;
+          border-bottom: 1px solid $neutral-200;
+
+          &:first-child {
+            border-top-left-radius: $border-radius-corners-wider;
+          }
+
+          &:last-child {
+            border-top-right-radius: $border-radius-corners-wider;
+          }
         }
       }
     }
@@ -83,25 +91,37 @@
           letter-spacing: 0.01em;
           font-weight: 400;
           padding: 16px;
-          border: 1px solid $neutral-200;
           background-color: $white;
+        }
+
+        &:last-child {
+          td {
+            &:first-child {
+              border-bottom-left-radius: $border-radius-corners-wider;
+            }
+
+            &:last-child {
+              border-bottom-right-radius: $border-radius-corners-wider;
+            }
+          }
+        }
+
+        &:not(:last-child) {
+          th,
+          td {
+            border-bottom: 1px solid $neutral-200;
+          }
         }
       }
     }
 
-    th[align='center'],
-    td[align='center'] {
-      text-align: center;
-    }
-
-    th[align='right'],
-    td[align='right'] {
-      text-align: right;
-    }
-
-    th[align='left'],
-    td[align='left'] {
-      text-align: left;
+    tr {
+      th,
+      td {
+        &:not(:last-child) {
+          border-right: 1px solid $neutral-200;
+        }
+      }
     }
   }
 
