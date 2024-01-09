@@ -37,7 +37,10 @@ export default (
   );
 
   CommunityBanner.associate = (models) => {
-    models.CommunityBanner.belongsTo(models.Community);
+    models.CommunityBanner.belongsTo(models.Community, {
+      foreignKey: 'community_id',
+      targetKey: 'id',
+    });
   };
 
   return CommunityBanner;
