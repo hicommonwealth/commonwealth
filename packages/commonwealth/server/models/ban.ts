@@ -37,7 +37,10 @@ export default (
   );
 
   Ban.associate = (models) => {
-    models.Ban.belongsTo(models.Community);
+    models.Ban.belongsTo(models.Community, {
+      foreignKey: 'community_id',
+      targetKey: 'id',
+    });
   };
 
   return Ban;
