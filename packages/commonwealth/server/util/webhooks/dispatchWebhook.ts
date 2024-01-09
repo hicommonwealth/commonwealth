@@ -1,5 +1,5 @@
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import { NotificationCategories } from '@hicommonwealth/core';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { StatsDController } from 'common-common/src/statsd';
 import { NotificationDataAndCategory } from '../../../shared/types';
 import models from '../../database';
@@ -14,7 +14,7 @@ import { getWebhookData } from './getWebhookData';
 import { WebhookDestinations } from './types';
 import { fetchWebhooks, getWebhookDestination } from './util';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 // TODO: @Timothee disable/deprecate a webhook ulr if it fails too many times (remove dead urls)
 export async function dispatchWebhooks(

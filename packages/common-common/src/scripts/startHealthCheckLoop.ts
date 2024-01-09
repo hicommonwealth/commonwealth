@@ -1,7 +1,7 @@
-import { factory, formatFilename } from '../../src/logging';
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import { StatsDController } from '../../src/statsd';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 const PING_INTERVAL = 1_000 * 20;
 

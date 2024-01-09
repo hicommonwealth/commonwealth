@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import 'chai/register-should';
 import { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';
 

@@ -1,6 +1,6 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import 'chai/register-should';
+
 import type { GetCommentsReq } from 'server/api/extApiTypes';
 import { OrderByOptions } from 'server/api/extApiTypes';
 import type { CommentAttributes } from 'server/models/comment';

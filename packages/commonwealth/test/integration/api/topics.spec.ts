@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable global-require */
 /* eslint-disable no-unused-expressions */
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import 'chai/register-should';
 import jwt from 'jsonwebtoken';
+import { ApiEndpoints } from 'state/api/config';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
-import { ApiEndpoints } from 'state/api/config';
 
 chai.use(chaiHttp);
 const { expect } = chai;

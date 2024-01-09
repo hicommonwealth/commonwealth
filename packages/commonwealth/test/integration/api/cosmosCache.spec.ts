@@ -5,7 +5,7 @@
 require('dotenv').config();
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import 'chai/register-should';
+
 chai.use(chaiHttp);
 const expect = chai.expect;
 

@@ -14,7 +14,11 @@
     "test": "NODE_ENV=test ts-mocha '__tests__/**/*.spec.ts'"
   },
   "dependencies": {
+    "amqplib": "^0.10.3",
     "hot-shots": "^9",
+    "rascal": "^14.4.5",
+    "rollbar": "^2.6.1",
+    "sequelize": "^6.32.1",
     "typescript-logging": "^0.6.4"
   }
 }

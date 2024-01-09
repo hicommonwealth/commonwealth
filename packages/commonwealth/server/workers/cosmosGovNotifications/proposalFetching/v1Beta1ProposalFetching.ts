@@ -1,12 +1,12 @@
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import { ProposalStatus } from '@hicommonwealth/chains';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import { CommunityInstance } from '../../../models/community';
 import { getCosmosClient } from './getCosmosClient';
 import { GovV1Beta1ClientType } from './types';
 import { numberToUint8ArrayBE, uint8ArrayToNumberBE } from './util';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 /**
  * See {@Link fetchLatestCosmosProposalV1}. Same logic applies, but for Cosmos chains that use the v1beta1 gov module.

@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable global-require */
 /* eslint-disable no-unused-expressions */
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import 'chai/register-should';
+
 import jwt from 'jsonwebtoken';
 import moment from 'moment';
 import { JWT_SECRET } from 'server/config';

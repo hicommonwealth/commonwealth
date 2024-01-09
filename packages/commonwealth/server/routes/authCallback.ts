@@ -1,12 +1,16 @@
-import { AppError, ServerError } from '@hicommonwealth/adapters';
-import { factory, formatFilename } from 'common-common/src/logging';
+import {
+  AppError,
+  ServerError,
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/adapters';
 import { DISCORD_BOT_SUCCESS_URL } from '../config';
 import type { DB } from '../models';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 import { decryptWithJWE, encryptWithJWE } from '../util/jwe';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   // TODO: write unit tests

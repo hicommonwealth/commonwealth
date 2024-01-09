@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
 import cheerio from 'cheerio';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { DEFAULT_COMMONWEALTH_LOGO } from '../config';
 import type { DB } from '../models';
 import type { CommunityInstance } from '../models/community';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true';
 const DEV = process.env.NODE_ENV !== 'production';

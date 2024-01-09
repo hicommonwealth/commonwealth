@@ -1,9 +1,9 @@
 import type { LogGroupControlSettings } from 'typescript-logging';
 import {
-  LoggerFactoryOptions,
   LFService,
   LogGroupRule,
   LogLevel,
+  LoggerFactoryOptions,
   getLogControl,
 } from 'typescript-logging';
 
@@ -28,9 +28,9 @@ export const addPrefix = (filename: string, prefixes?: string[]) => {
   return finalPrefix;
 };
 
-export const factory = LFService.createNamedLoggerFactory(
+export const loggerFactory = LFService.createNamedLoggerFactory(
   'Commonwealth',
-  options
+  options,
 );
 
 const control = getLogControl();
