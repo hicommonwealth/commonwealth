@@ -18,6 +18,20 @@ module.exports = {
       `,
         { transaction },
       );
+
+      // remove duplicate community contracts
+      await queryInterface.sequelize.query(
+        `
+        DELETE FROM "CommunityContracts"
+        WHERE id NOT IN (
+            SELECT MIN(id)
+            FROM "CommunityContracts"
+            GROUP BY community_id
+        );
+      `,
+        { transaction },
+      );
+
       await queryInterface.addIndex('CommunityContracts', {
         fields: ['community_id'],
         name: 'community_contracts_community_id',
@@ -42,6 +56,11 @@ module.exports = {
         ALTER TABLE "CommunityContracts"
         RENAME CONSTRAINT "CommunityContracts_community_id_fkey" TO "CommunityContracts_chain_id_fkey"
       `,
+        { transaction },
+      );
+      await queryInterface.removeIndex(
+        'CommunityContracts',
+        'community_contracts_community_id',
         { transaction },
       );
     });
