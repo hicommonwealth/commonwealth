@@ -11,7 +11,7 @@ export type CommunityContractAttributes = {
 
   // Associations
   Contract?: ContractAttributes;
-  Chain?: CommunityAttributes;
+  Community?: CommunityAttributes;
 };
 
 export type CommunityContractInstance =
