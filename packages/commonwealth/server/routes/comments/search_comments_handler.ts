@@ -27,13 +27,13 @@ export const searchCommentsHandler = async (
   res: TypedResponse<SearchCommentsResponse>,
 ) => {
   const options = req.query;
-  if (!req.chain && options.community_id !== ALL_COMMUNITIES) {
+  if (!req.community && options.community_id !== ALL_COMMUNITIES) {
     // if no chain resolved, ensure that client explicitly requested all communities
     throw new AppError(Errors.NoCommunity);
   }
 
   const commentSearchResults = await controllers.comments.searchComments({
-    community: req.chain,
+    community: req.community,
     search: options.search,
     limit: parseInt(options.limit, 10) || 0,
     page: parseInt(options.page, 10) || 0,
