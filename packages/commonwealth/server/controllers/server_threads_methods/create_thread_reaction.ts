@@ -9,6 +9,7 @@ import { AddressInstance } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
 import { ReactionAttributes } from '../../models/reaction';
 import { UserInstance } from '../../models/user';
+import { getBalanceForAddress } from '../../util/getBalanceForAddress';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_methods/track';
@@ -87,7 +88,7 @@ export async function __createThreadReaction(
     const isAdmin = await validateOwner({
       models: this.models,
       user,
-      communityId: community.id,
+      communityId: community.id!,
       entity: thread,
       allowAdmin: true,
       allowGodMode: true,
@@ -96,7 +97,7 @@ export async function __createThreadReaction(
       const { isValid, message } = await validateTopicGroupsMembership(
         this.models,
         this.tokenBalanceCache,
-        thread.topic_id,
+        thread.topic_id!,
         community,
         address,
       );
@@ -106,12 +107,23 @@ export async function __createThreadReaction(
     }
   }
 
+  const contractAddress = ''; // TODO: get 1155 contract address
+  const tokenId = 1; // TODO: get token ID
+  const stakeBalance = await getBalanceForAddress(
+    address.address,
+    contractAddress,
+    tokenId,
+  );
+  const stakeWeight = 5; // TODO: get stake weight from community.stakeWeight
+  const calculatedVotingWeight = stakeBalance * stakeWeight;
+
   // create the reaction
   const reactionData: ReactionAttributes = {
     reaction,
-    address_id: address.id,
-    chain: community.id,
+    address_id: address.id!,
+    chain: community.id!,
     thread_id: thread.id,
+    calculated_voting_weight: calculatedVotingWeight,
     canvas_action: canvasAction,
     canvas_session: canvasSession,
     canvas_hash: canvasHash,
@@ -130,6 +142,10 @@ export async function __createThreadReaction(
       })
     : foundOrCreatedReaction;
 
+  if (!finalReaction) {
+    throw new AppError(Errors.FailedCreateReaction);
+  }
+
   // build notification options
   const notificationOptions: EmitOptions = {
     notification: {
@@ -140,11 +156,11 @@ export async function __createThreadReaction(
         root_title: thread.title,
         root_type: 'discussion',
         chain_id: finalReaction.chain,
-        author_address: finalReaction.Address.address,
-        author_chain: finalReaction.Address.community_id,
+        author_address: finalReaction.Address!.address,
+        author_chain: finalReaction.Address!.community_id,
       },
     },
-    excludeAddresses: [finalReaction.Address.address],
+    excludeAddresses: [finalReaction.Address!.address],
   };
 
   // build analytics options

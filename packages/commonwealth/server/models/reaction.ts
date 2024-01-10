@@ -19,6 +19,8 @@ export type ReactionAttributes = {
   proposal_id?: number;
   comment_id?: number;
 
+  calculated_voting_weight: number;
+
   canvas_action: string;
   canvas_session: string;
   canvas_hash: string;
@@ -48,6 +50,7 @@ export default (
       comment_id: { type: dataTypes.INTEGER, allowNull: true },
       address_id: { type: dataTypes.INTEGER, allowNull: false },
       reaction: { type: dataTypes.STRING, allowNull: false },
+      calculated_voting_weight: { type: dataTypes.INTEGER, allowNull: true },
       // signed data
       canvas_action: { type: dataTypes.JSONB, allowNull: true },
       canvas_session: { type: dataTypes.JSONB, allowNull: true },

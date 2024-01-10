@@ -9,6 +9,7 @@ import { AddressInstance } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
 import { ReactionAttributes } from '../../models/reaction';
 import { UserInstance } from '../../models/user';
+import { getBalanceForAddress } from '../../util/getBalanceForAddress';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { findAllRoles } from '../../util/roles';
 import { TrackOptions } from '../server_analytics_methods/track';
@@ -21,6 +22,7 @@ const Errors = {
   BanError: 'Ban error',
   InsufficientTokenBalance: 'Insufficient token balance',
   BalanceCheckFailed: 'Could not verify user token balance',
+  FailedCreateReaction: 'Failed to create reaction',
 };
 
 export type CreateCommentReactionOptions = {
@@ -98,7 +100,7 @@ export async function __createCommentReaction(
         const { isValid } = await validateTopicGroupsMembership(
           this.models,
           this.tokenBalanceCache,
-          thread.topic_id,
+          thread.topic_id!,
           community,
           address,
         );
@@ -112,12 +114,23 @@ export async function __createCommentReaction(
     }
   }
 
+  const contractAddress = ''; // TODO: get 1155 contract address
+  const tokenId = 1; // TODO: get token ID
+  const stakeBalance = await getBalanceForAddress(
+    address.address,
+    contractAddress,
+    tokenId,
+  );
+  const stakeWeight = 5; // TODO: get stake weight from community.stakeWeight
+  const calculatedVotingWeight = stakeBalance * stakeWeight;
+
   // create the reaction
   const reactionData: ReactionAttributes = {
     reaction,
-    address_id: address.id,
-    chain: community.id,
+    address_id: address.id!,
+    chain: community.id!,
     comment_id: comment.id,
+    calculated_voting_weight: calculatedVotingWeight,
     canvas_action: canvasAction,
     canvas_session: canvasSession,
     canvas_hash: canvasHash,
@@ -136,6 +149,10 @@ export async function __createCommentReaction(
       })
     : foundOrCreatedReaction;
 
+  if (!finalReaction) {
+    throw new AppError(Errors.FailedCreateReaction);
+  }
+
   // build notification options
   const allNotificationOptions: EmitOptions[] = [];
 
@@ -150,11 +167,11 @@ export async function __createCommentReaction(
         root_title: thread.title,
         root_type: null, // What is this for?
         chain_id: finalReaction.chain,
-        author_address: finalReaction.Address.address,
-        author_chain: finalReaction.Address.community_id,
+        author_address: finalReaction.Address!.address,
+        author_chain: finalReaction.Address!.community_id,
       },
     },
-    excludeAddresses: [finalReaction.Address.address],
+    excludeAddresses: [finalReaction.Address!.address],
   });
 
   // build analytics options
