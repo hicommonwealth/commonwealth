@@ -8,6 +8,22 @@ describe('ServerThreadsController', () => {
     it('should create a thread reaction (new reaction)', async () => {
       const sandbox = Sinon.createSandbox();
       const db = {
+        // for findAllRoles
+        Address: {
+          findAll: async () => [
+            {
+              toJSON: () => ({}),
+            },
+          ],
+        },
+        Group: {
+          findAll: async () => [],
+        },
+        Topic: {
+          findOne: async () => ({
+            group_ids: [],
+          }),
+        },
         Reaction: {
           findOne: sandbox.stub().resolves({
             id: 2,
@@ -1295,8 +1311,14 @@ describe('ServerThreadsController', () => {
           },
           query: async () => ({}),
         },
+        Group: {
+          findAll: async () => [],
+        },
         Topic: {
           findOrCreate: async () => ({}),
+          findOne: async () => ({
+            group_ids: [],
+          }),
         },
         Thread: {
           findOne: async () => ({
@@ -1351,7 +1373,6 @@ describe('ServerThreadsController', () => {
       const kind = 'discussion';
       const readOnly = false;
       const topicId = 1;
-      const topicName = undefined;
       const title = 'mythread';
       const stage = 'stage';
       const url = 'http://blah';
@@ -1369,7 +1390,6 @@ describe('ServerThreadsController', () => {
           kind,
           readOnly,
           topicId,
-          topicName,
           stage,
           url,
           canvasAction,
@@ -1390,7 +1410,6 @@ describe('ServerThreadsController', () => {
           kind,
           readOnly,
           topicId,
-          topicName,
           stage,
           url,
           canvasAction,

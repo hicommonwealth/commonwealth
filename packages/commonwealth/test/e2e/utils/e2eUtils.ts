@@ -17,8 +17,8 @@ export async function login(page) {
   }).toPass();
 
   // Basic idea is that we lazily load the metamask mock (otherwise it will include ethereum to our initial bundle)
-  // As a result, the metamask button will not appear right away, because the lazy loading is initialized on login screen
-  // Therefore we need to re-open the login screen a few times waiting for it to finish lazy loading.
+  // As a result, the metamask button will not appear right away, because the lazy loading is initialized on
+  // login screen. Therefore, we need to re-open the login screen a few times waiting for it to finish lazy loading.
   await expect(async () => {
     await page.mouse.click(0, 0);
     button = await page.locator('.LoginSelector button');
@@ -45,10 +45,10 @@ export async function addAlchemyKey() {
 
   // If chainNode for eth doesn't exist, add it and add key.
   const ethChainNodeExists = await testDb.query(
-    'SELECT url FROM "ChainNodes" WHERE eth_chain_id = 1 OR id = 37'
+    'SELECT url FROM "ChainNodes" WHERE eth_chain_id = 1 OR id = 37',
   );
   const polygonChainNodeExists = await testDb.query(
-    'SELECT url FROM "ChainNodes" WHERE eth_chain_id = 137 OR id = 56'
+    'SELECT url FROM "ChainNodes" WHERE eth_chain_id = 137 OR id = 56',
   );
   if (ethChainNodeExists[0].length === 0) {
     try {
@@ -96,7 +96,7 @@ export async function addAlchemyKey() {
 // removes default user from the db. Subsequent login will need to go through the profile creation screen
 export async function removeUser() {
   const userExists = await testDb.query(
-    `select 1 from "Addresses" where address = '${testAddress}'`
+    `select 1 from "Addresses" where address = '${testAddress}'`,
   );
 
   if (userExists[0].length === 0) return;
@@ -128,6 +128,9 @@ export async function removeUser() {
 }
 
 export async function createAddress(chain, profileId, userId) {
+  const blockInfo =
+    '{"number":17693949,"hash":' +
+    '"0x26664b8151811ad3a2c4fc9091d248e5105950c91b87d71ca7a1d30cfa0cbede", "timestamp":1689365027}';
   await testDb.query(`
     INSERT INTO "Addresses" (
       address,
@@ -160,7 +163,7 @@ export async function createAddress(chain, profileId, userId) {
       false,
       ${profileId},
       'metamask',
-      '{"number":17693949,"hash":"0x26664b8151811ad3a2c4fc9091d248e5105950c91b87d71ca7a1d30cfa0cbede", "timestamp":1689365027}',
+      '${blockInfo}',
       false,
       'member'
     ) ON CONFLICT DO NOTHING
@@ -169,7 +172,7 @@ export async function createAddress(chain, profileId, userId) {
 
 export async function createInitialUser() {
   const userExists = await testDb.query(
-    `select 1 from "Addresses" where address = '${testAddress}' and community_id = 'ethereum'`
+    `select 1 from "Addresses" where address = '${testAddress}' and community_id = 'ethereum'`,
   );
 
   if (userExists[0].length > 0) return;
@@ -182,7 +185,7 @@ export async function createInitialUser() {
         "isAdmin",
         "disableRichText",
         "emailVerified",
-        selected_chain_id,
+        selected_community_id,
         "emailNotificationInterval"
       ) VALUES (
         NULL,
@@ -219,7 +222,7 @@ export async function createInitialUser() {
 // adds user if it doesn't exist. Subsequent login will not need to go through the profile creation screen
 export async function addAddressIfNone(chain) {
   const addresses = await testDb.query(
-    `select * from "Addresses" where address = '${testAddress}'`
+    `select * from "Addresses" where address = '${testAddress}'`,
   );
 
   // address already exists
@@ -228,6 +231,6 @@ export async function addAddressIfNone(chain) {
   await createAddress(
     chain,
     addresses[0][0]['profile_id'],
-    addresses[0][0]['user_id']
+    addresses[0][0]['user_id'],
   );
 }

@@ -29,7 +29,8 @@ export const AdminOnboardingSlider = () => {
 
   const navigate = useCommonNavigate();
   const {
-    shouldHideAdminOnboardingCardsForCommunities,
+    shouldHideAdminCardsTemporary,
+    shouldHideAdminCardsPermanently,
     setShouldHideAdminOnboardingCardsForCommunity,
   } = useAdminOnboardingSliderMutationStore();
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -37,10 +38,12 @@ export const AdminOnboardingSlider = () => {
   const { data: topics = [], isLoading: isLoadingTopics = false } =
     useFetchTopicsQuery({
       communityId: app.activeChainId(),
+      apiEnabled: !!app.activeChainId(),
     });
   const { data: groups = [], isLoading: isLoadingGroups = false } =
     useFetchGroupsQuery({
       communityId: app.activeChainId(),
+      enabled: !!app.activeChainId(),
     });
   const { data: threads = [], isLoading: isLoadingThreads = false } =
     useFetchThreadsQuery({
@@ -48,6 +51,7 @@ export const AdminOnboardingSlider = () => {
       queryType: 'bulk',
       page: 1,
       limit: 20,
+      apiEnabled: !!app.activeChainId(),
     });
 
   const redirectToPage = (
@@ -59,6 +63,7 @@ export const AdminOnboardingSlider = () => {
   };
 
   if (
+    !app.activeChainId() ||
     isLoadingTopics ||
     isLoadingGroups ||
     isLoadingThreads ||
@@ -68,7 +73,10 @@ export const AdminOnboardingSlider = () => {
       hasAnyIntegration) ||
     !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin()) ||
     !featureFlags.newAdminOnboardingEnabled ||
-    shouldHideAdminOnboardingCardsForCommunities.includes(app.activeChainId())
+    [
+      ...shouldHideAdminCardsTemporary,
+      ...shouldHideAdminCardsPermanently,
+    ].includes(app.activeChainId())
   ) {
     return;
   }

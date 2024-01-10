@@ -9,6 +9,7 @@ enum BanAddressErrors {
   NoChain = 'Must supply a chain ID',
   NoAddress = 'Must supply an address',
   NoPermission = 'You do not have permission to ban an address',
+  AlreadyExists = 'Ban for this address already exists',
 }
 
 type BanAddressReq = Omit<BanInstance, 'id'> & {
@@ -41,7 +42,7 @@ const banAddress = async (
   }
 
   // find or create Ban
-  const [ban] = await models.Ban.findOrCreate({
+  const [ban, created] = await models.Ban.findOrCreate({
     where: {
       community_id: chain.id,
       address,
@@ -51,6 +52,10 @@ const banAddress = async (
       address,
     },
   });
+
+  if (!created) {
+    throw new AppError(BanAddressErrors.AlreadyExists);
+  }
 
   return success(res, ban.toJSON());
 };

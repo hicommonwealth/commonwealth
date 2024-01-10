@@ -11,9 +11,7 @@
     "traceResolution": false,
     "baseUrl": ".",
     "paths": {
-      "@hicommonwealth/*": ["libs/*/src"],
-      "common-common": ["packages/common-common"],
-      "common-common/*": ["packages/common-common/*"]
+      "@hicommonwealth/*": ["libs/*/src"]
     }
   },
   "include": [],

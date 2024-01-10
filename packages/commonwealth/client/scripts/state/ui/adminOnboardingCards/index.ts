@@ -1,2 +1,2 @@
-import useAdminOnboardingSliderMutationStore from './adminOnboardingCards';
-export default useAdminOnboardingSliderMutationStore;
+import useAdminActionCardsStore from './adminOnboardingCards';
+export default useAdminActionCardsStore;

@@ -1,9 +1,5 @@
 import { AppError, ServerError } from '@hicommonwealth/adapters';
-import {
-  ChainNetwork,
-  ChainType,
-  NotificationCategories,
-} from '@hicommonwealth/core';
+import { NotificationCategories } from '@hicommonwealth/core';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { AddressInstance } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
@@ -79,36 +75,30 @@ export async function __createCommentReaction(
   }
 
   // check balance (bypass for admin)
-  if (
-    community &&
-    (community.type === ChainType.Token ||
-      community.network === ChainNetwork.Ethereum)
-  ) {
-    const addressAdminRoles = await findAllRoles(
-      this.models,
-      { where: { address_id: address.id } },
-      community.id,
-      ['admin'],
-    );
-    const isGodMode = user.isAdmin;
-    const hasAdminRole = addressAdminRoles.length > 0;
-    if (!isGodMode && !hasAdminRole) {
-      let canReact = false;
-      try {
-        const { isValid } = await validateTopicGroupsMembership(
-          this.models,
-          this.tokenBalanceCache,
-          thread.topic_id,
-          community,
-          address,
-        );
-        canReact = isValid;
-      } catch (e) {
-        throw new ServerError(`${Errors.BalanceCheckFailed}: ${e.message}`);
-      }
-      if (!canReact) {
-        throw new AppError(Errors.InsufficientTokenBalance);
-      }
+  const addressAdminRoles = await findAllRoles(
+    this.models,
+    { where: { address_id: address.id } },
+    community.id,
+    ['admin'],
+  );
+  const isGodMode = user.isAdmin;
+  const hasAdminRole = addressAdminRoles.length > 0;
+  if (!isGodMode && !hasAdminRole) {
+    let canReact = false;
+    try {
+      const { isValid } = await validateTopicGroupsMembership(
+        this.models,
+        this.tokenBalanceCache,
+        thread.topic_id,
+        community,
+        address,
+      );
+      canReact = isValid;
+    } catch (e) {
+      throw new ServerError(`${Errors.BalanceCheckFailed}: ${e.message}`);
+    }
+    if (!canReact) {
+      throw new AppError(Errors.InsufficientTokenBalance);
     }
   }
 
