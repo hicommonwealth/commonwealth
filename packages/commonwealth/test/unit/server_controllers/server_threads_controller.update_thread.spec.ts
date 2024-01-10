@@ -112,6 +112,11 @@ describe('ServerThreadsController', () => {
             toJSON: () => ({}),
           }),
         },
+        Topic: {
+          findOne: async () => ({
+            id: 1,
+          }),
+        },
         // for findAllRoles
         Address: {
           findAll: async () => [address],

@@ -54,7 +54,7 @@ export const createThreadCommentHandler = async (
 
   if (process.env.ENFORCE_SESSION_KEYS === 'true') {
     await verifyComment(canvasAction, canvasSession, canvasHash, {
-      thread_id: parseInt(threadId, 10),
+      thread_id: parseInt(threadId, 10) || undefined,
       text,
       address: address.address,
       chain: community.id,
@@ -68,7 +68,7 @@ export const createThreadCommentHandler = async (
       address,
       community,
       parentId,
-      threadId: parseInt(threadId, 10),
+      threadId: parseInt(threadId, 10) || undefined,
       text,
       canvasAction,
       canvasSession,
