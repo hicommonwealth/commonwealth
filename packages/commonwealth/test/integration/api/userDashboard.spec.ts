@@ -22,11 +22,9 @@ describe('User Dashboard API', () => {
   // communityId, unlike in non-test thread creation
   const title = 'test title';
   const body = 'test body';
-  const topicName = 'test topic';
   const kind = 'discussion';
 
   let userJWT;
-  let userSession;
   let userId;
   let userAddress;
   let userAddressId;
@@ -36,17 +34,20 @@ describe('User Dashboard API', () => {
   let userAddress2;
   let userAddressId2;
   let threadOne;
+  let topicId;
+  let topicId2;
 
   before('Reset database', async () => {
     await resetDatabase();
 
+    topicId = await modelUtils.getTopicId({ chain });
+    topicId2 = await modelUtils.getTopicId({ chain: chain2 });
     // creates 2 ethereum users
     const firstUser = await modelUtils.createAndVerifyAddress({ chain });
     userId = firstUser.user_id;
     userAddress = firstUser.address;
     userAddressId = firstUser.address_id;
     userJWT = jwt.sign({ id: userId, email: firstUser.email }, JWT_SECRET);
-    userSession = { session: firstUser.session, sign: firstUser.sign };
     expect(userId).to.not.be.null;
     expect(userAddress).to.not.be.null;
     expect(userAddressId).to.not.be.null;
@@ -77,7 +78,7 @@ describe('User Dashboard API', () => {
     expect(res).to.equal(true);
 
     // sets user-2 to be admin of the alex community
-    let isAdmin = await modelUtils.updateRole({
+    const isAdmin = await modelUtils.updateRole({
       address_id: userAddressId2,
       chainOrCommObj: { chain_id: chain2 },
       role: 'admin',
@@ -92,9 +93,9 @@ describe('User Dashboard API', () => {
       body,
       readOnly: false,
       kind,
-      topicName,
       session: userSession2.session,
       sign: userSession2.sign,
+      topicId: topicId2,
     };
     threadOne = await modelUtils.createThread(threadOneArgs);
     expect(threadOne.status).to.equal('Success');
@@ -108,9 +109,9 @@ describe('User Dashboard API', () => {
       body,
       readOnly: false,
       kind,
-      topicName,
       session: userSession2.session,
       sign: userSession2.sign,
+      topicId,
     };
     //
     // // create a thread in both 'ethereum' and 'alex' communities
@@ -205,9 +206,9 @@ describe('User Dashboard API', () => {
           body,
           readOnly: false,
           kind,
-          topicName,
           session: userSession2.session,
           sign: userSession2.sign,
+          topicId,
         };
         const res = await modelUtils.createThread(threadArgs);
         expect(res.status).to.equal('Success');

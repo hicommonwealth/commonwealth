@@ -39,7 +39,7 @@ export async function __deleteReaction(
 
   // check if author is banned
   const [canInteract, banError] = await this.banCache.checkBan({
-    communityId: reaction.chain,
+    communityId: reaction.community_id,
     address: address.address,
   });
   if (!canInteract) {
