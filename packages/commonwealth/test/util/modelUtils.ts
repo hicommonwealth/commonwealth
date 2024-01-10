@@ -58,7 +58,7 @@ export const getTopicId = async ({ chain }) => {
     .agent(app)
     .get('/api/topics')
     .set('Accept', 'application/json')
-    .send({
+    .query({
       community_id: chain,
     });
   const topicId = res.body.result[0].id;

@@ -34,10 +34,14 @@ describe('User Dashboard API', () => {
   let userAddress2;
   let userAddressId2;
   let threadOne;
+  let topicId;
+  let topicId2;
 
   before('Reset database', async () => {
     await resetDatabase();
 
+    topicId = await modelUtils.getTopicId({ chain });
+    topicId2 = await modelUtils.getTopicId({ chain: chain2 });
     // creates 2 ethereum users
     const firstUser = await modelUtils.createAndVerifyAddress({ chain });
     userId = firstUser.user_id;
@@ -91,6 +95,7 @@ describe('User Dashboard API', () => {
       kind,
       session: userSession2.session,
       sign: userSession2.sign,
+      topicId: topicId2,
     };
     threadOne = await modelUtils.createThread(threadOneArgs);
     expect(threadOne.status).to.equal('Success');
@@ -106,6 +111,7 @@ describe('User Dashboard API', () => {
       kind,
       session: userSession2.session,
       sign: userSession2.sign,
+      topicId,
     };
     //
     // // create a thread in both 'ethereum' and 'alex' communities
@@ -202,6 +208,7 @@ describe('User Dashboard API', () => {
           kind,
           session: userSession2.session,
           sign: userSession2.sign,
+          topicId,
         };
         const res = await modelUtils.createThread(threadArgs);
         expect(res.status).to.equal('Success');
