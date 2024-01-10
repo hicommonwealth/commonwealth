@@ -1079,7 +1079,7 @@ describe('Subscriptions Tests', () => {
         expect.fail(subscriptionCreateErrMsg);
       } catch (e) {
         expect(e.message).to.be.equal(
-          `${sequelizeErrMsg}${SubscriptionValidationErrors.NoChainId}`,
+          `${sequelizeErrMsg}${SubscriptionValidationErrors.NoCommunityId}`,
         );
       }
     });
@@ -1094,7 +1094,7 @@ describe('Subscriptions Tests', () => {
         expect.fail(subscriptionCreateErrMsg);
       } catch (e) {
         expect(e.message).to.be.equal(
-          `${sequelizeErrMsg}${SubscriptionValidationErrors.NoChainId}`,
+          `${sequelizeErrMsg}${SubscriptionValidationErrors.NoCommunityId}`,
         );
       }
     });
@@ -1110,7 +1110,7 @@ describe('Subscriptions Tests', () => {
           expect.fail(subscriptionCreateErrMsg);
         } catch (e) {
           expect(e.message).to.be.equal(
-            `${sequelizeErrMsg}${SubscriptionValidationErrors.NoChainId}`,
+            `${sequelizeErrMsg}${SubscriptionValidationErrors.NoCommunityId}`,
           );
         }
       });
@@ -1121,7 +1121,7 @@ describe('Subscriptions Tests', () => {
           await models.Subscription.create({
             subscriber_id: userId,
             category_id,
-            chain_id: chain,
+            community_id: chain,
             thread_id: 1,
             comment_id: 1,
           });
@@ -1139,7 +1139,7 @@ describe('Subscriptions Tests', () => {
           await models.Subscription.create({
             subscriber_id: userId,
             category_id,
-            chain_id: chain,
+            community_id: chain,
           });
           expect.fail(subscriptionCreateErrMsg);
         } catch (e) {
@@ -1161,7 +1161,7 @@ describe('Subscriptions Tests', () => {
           expect.fail(subscriptionCreateErrMsg);
         } catch (e) {
           expect(e.message).to.be.equal(
-            `${sequelizeErrMsg}${SubscriptionValidationErrors.NoChainId}`,
+            `${sequelizeErrMsg}${SubscriptionValidationErrors.NoCommunityId}`,
           );
         }
       });
@@ -1172,7 +1172,7 @@ describe('Subscriptions Tests', () => {
           await models.Subscription.create({
             subscriber_id: userId,
             category_id,
-            chain_id: chain,
+            community_id: chain,
             thread_id: 1,
             comment_id: 1,
           });
@@ -1190,7 +1190,7 @@ describe('Subscriptions Tests', () => {
           await models.Subscription.create({
             subscriber_id: userId,
             category_id,
-            chain_id: chain,
+            community_id: chain,
           });
           expect.fail(subscriptionCreateErrMsg);
         } catch (e) {

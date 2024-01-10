@@ -505,7 +505,7 @@ export async function __createCommunity(
       where: {
         subscriber_id: user.id,
         category_id: NotificationCategories.NewThread,
-        chain_id: createdCommunity.id,
+        community_id: createdCommunity.id,
         is_active: true,
       },
     });

@@ -167,7 +167,7 @@ export async function getTestSubscription(version?: 'v1' | 'v2') {
     where: {
       subscriber_id: user.id,
       category_id: 'chain-event',
-      chain_id: chain.id,
+      community_id: chain.id,
     },
     defaults: {
       is_active: true,

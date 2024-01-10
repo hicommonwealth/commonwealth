@@ -1,14 +1,14 @@
+import { isDeliverTxSuccess } from '@cosmjs/stargate';
 import chai from 'chai';
-import { deposit, sendTx, setupTestSigner } from './utils/helpers';
-import models from '../../../server/database';
 import {
   encodeMsgSubmitProposal,
   encodeTextProposal,
 } from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
 import { Any } from 'cosmjs-types/google/protobuf/any';
-import { isDeliverTxSuccess } from '@cosmjs/stargate';
-import { generateCosmosGovNotifications } from '../../../server/workers/cosmosGovNotifications/generateCosmosGovNotifications';
 import sinon from 'sinon';
+import models from '../../../server/database';
+import { generateCosmosGovNotifications } from '../../../server/workers/cosmosGovNotifications/generateCosmosGovNotifications';
+import { deposit, sendTx, setupTestSigner } from './utils/helpers';
 
 const { expect, assert } = chai;
 
@@ -20,7 +20,7 @@ const v1Beta1ChainId = 'csdk-beta-ci';
 const v1Beta1RpcUrl = `http://localhost:8080/cosmosAPI/${v1Beta1ChainId}`;
 const v1Beta1Content = encodeTextProposal(
   `beta text title`,
-  `beta text description`
+  `beta text description`,
 );
 
 async function createTestProposal(rpcUrl: string, content: Any) {
@@ -54,7 +54,7 @@ async function enableChains(chains: string[]) {
       await models.Subscription.findOrCreate({
         where: {
           subscriber_id: user.id,
-          chain_id: id,
+          community_id: id,
           category_id: 'chain-event',
         },
       });
@@ -62,7 +62,7 @@ async function enableChains(chains: string[]) {
       await models.Subscription.destroy({
         where: {
           subscriber_id: user.id,
-          chain_id: id,
+          community_id: id,
         },
       });
     }

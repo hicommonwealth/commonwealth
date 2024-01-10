@@ -84,7 +84,7 @@ export async function __deleteCommunity(
           });
 
           await this.models.Subscription.destroy({
-            where: { chain_id: community.id },
+            where: { community_id: community.id },
             transaction: t,
           });
 

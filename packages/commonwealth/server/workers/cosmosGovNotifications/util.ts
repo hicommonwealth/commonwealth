@@ -28,7 +28,7 @@ export async function fetchCosmosNotifChains(models: DB) {
 
   const result = await models.Community.findAll({
     where: {
-      id: chainIds.map((c) => c.chain_id),
+      id: chainIds.map((c) => c.community_id),
       base: ChainBase.CosmosSDK,
     },
     include: [

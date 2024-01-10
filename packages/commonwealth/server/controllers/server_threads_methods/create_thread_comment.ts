@@ -1,10 +1,10 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError, ServerError } from '@hicommonwealth/adapters';
 import { NotificationCategories, ProposalType } from '@hicommonwealth/core';
 import moment from 'moment';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import { AddressInstance } from '../../models/address';
-import { CommentAttributes } from '../../models/comment';
+import { CommentAttributes, CommentInstance } from '../../models/comment';
 import { CommunityInstance } from '../../models/community';
 import { UserInstance } from '../../models/user';
 import { getCommentDepth } from '../../util/getCommentDepth';
@@ -171,43 +171,34 @@ export async function __createThreadComment(
     Object.assign(commentContent, { parent_id: parentId });
   }
 
-  const comment = await this.models.Comment.create(commentContent);
-
-  // fetch attached objects to return to user
-  const finalComment = await this.models.Comment.findOne({
-    where: { id: comment.id },
-    include: [this.models.Address],
-  });
-
-  const transaction = await this.models.sequelize.transaction();
+  let comment: CommentInstance;
   try {
-    // auto-subscribe comment author to reactions & child comments
-    await this.models.Subscription.create(
-      {
-        subscriber_id: user.id,
-        category_id: NotificationCategories.NewReaction,
-        chain_id: finalComment.community_id || null,
-        comment_id: finalComment.id,
-        is_active: true,
-      },
-      { transaction },
-    );
-    await this.models.Subscription.create(
-      {
-        subscriber_id: user.id,
-        category_id: NotificationCategories.NewComment,
-        chain_id: finalComment.community_id || null,
-        comment_id: finalComment.id,
-        is_active: true,
-      },
-      { transaction },
-    );
-
-    await transaction.commit();
-  } catch (err) {
-    await transaction.rollback();
-    await finalComment.destroy();
-    throw err;
+    await this.models.sequelize.transaction(async (transaction) => {
+      comment = await this.models.Comment.create(commentContent, {
+        transaction,
+      });
+      await this.models.Subscription.bulkCreate(
+        [
+          {
+            subscriber_id: user.id,
+            category_id: NotificationCategories.NewReaction,
+            community_id: comment.community_id || null,
+            comment_id: comment.id,
+            is_active: true,
+          },
+          {
+            subscriber_id: user.id,
+            category_id: NotificationCategories.NewComment,
+            community_id: comment.community_id || null,
+            comment_id: comment.id,
+            is_active: true,
+          },
+        ],
+        { transaction },
+      );
+    });
+  } catch (e) {
+    throw new ServerError('Failed to create comment', e);
   }
 
   // grab mentions to notify tagged users
@@ -235,7 +226,7 @@ export async function __createThreadComment(
   }
 
   const excludedAddrs = (mentionedAddresses || []).map((addr) => addr.address);
-  excludedAddrs.push(finalComment.Address.address);
+  excludedAddrs.push(address.address);
 
   const rootNotifExcludeAddresses = [...excludedAddrs];
   if (parentComment && parentComment.Address) {
@@ -255,11 +246,11 @@ export async function __createThreadComment(
         thread_id: threadId,
         root_title,
         root_type: ProposalType.Thread,
-        comment_id: +finalComment.id,
-        comment_text: finalComment.text,
-        chain_id: finalComment.community_id,
-        author_address: finalComment.Address.address,
-        author_chain: finalComment.Address.community_id,
+        comment_id: +comment.id,
+        comment_text: comment.text,
+        chain_id: comment.community_id,
+        author_address: address.address,
+        author_chain: address.community_id,
       },
     },
     excludeAddresses: rootNotifExcludeAddresses,
@@ -275,13 +266,13 @@ export async function __createThreadComment(
           thread_id: +threadId,
           root_title,
           root_type: ProposalType.Thread,
-          comment_id: +finalComment.id,
-          comment_text: finalComment.text,
+          comment_id: +comment.id,
+          comment_text: comment.text,
           parent_comment_id: +parentId,
           parent_comment_text: parentComment.text,
-          chain_id: finalComment.community_id,
-          author_address: finalComment.Address.address,
-          author_chain: finalComment.Address.community_id,
+          chain_id: comment.community_id,
+          author_address: address.address,
+          author_chain: address.community_id,
         },
       },
       excludeAddresses: excludedAddrs,
@@ -304,14 +295,14 @@ export async function __createThreadComment(
                 thread_id: +threadId,
                 root_title,
                 root_type: ProposalType.Thread,
-                comment_id: +finalComment.id,
-                comment_text: finalComment.text,
-                chain_id: finalComment.community_id,
-                author_address: finalComment.Address.address,
-                author_chain: finalComment.Address.community_id,
+                comment_id: +comment.id,
+                comment_text: comment.text,
+                chain_id: comment.community_id,
+                author_address: address.address,
+                author_chain: address.community_id,
               },
             },
-            excludeAddresses: [finalComment.Address.address],
+            excludeAddresses: [address.address],
           });
         }
       });
@@ -332,5 +323,5 @@ export async function __createThreadComment(
     userId: user.id,
   };
 
-  return [finalComment.toJSON(), allNotificationOptions, analyticsOptions];
+  return [comment.toJSON(), allNotificationOptions, analyticsOptions];
 }
