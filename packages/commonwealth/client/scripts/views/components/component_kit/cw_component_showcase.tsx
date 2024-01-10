@@ -56,6 +56,7 @@ import { CWThreadAction } from './new_designs/cw_thread_action';
 import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
 import { CWUpvote } from './new_designs/cw_upvote';
 import { CWCircleButton } from './new_designs/CWCircleButton/CWCircleButton';
+import CWDrawer from './new_designs/CWDrawer';
 import { CWForm } from './new_designs/CWForm';
 import CWIconButton from './new_designs/CWIconButton';
 import { CWModal, CWModalBody, CWModalHeader } from './new_designs/CWModal';
@@ -241,6 +242,7 @@ export const ComponentShowcase = () => {
   const unstyledPopoverProps = usePopover();
   const styledPopoverProps = usePopover();
   const upvotePopoverProps = usePopover();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const renderModal = (size?: ModalSize) => {
     return (
@@ -2165,6 +2167,18 @@ export const ComponentShowcase = () => {
           stakeValue={0.072}
           denomination="ETH"
         />
+      </div>
+      <div className="drawer-container">
+        <CWButton
+          buttonHeight="sm"
+          label="Open Drawer"
+          onClick={() => setIsDrawerOpen(true)}
+        />
+
+        <CWDrawer
+          open={isDrawerOpen}
+          onClose={() => setIsDrawerOpen(false)}
+        ></CWDrawer>
       </div>
     </div>
   );
