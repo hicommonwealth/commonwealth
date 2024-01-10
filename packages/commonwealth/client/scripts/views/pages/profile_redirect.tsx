@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
@@ -27,16 +27,18 @@ const ProfileRedirect = (props: ProfileRedirectProps) => {
     apiCallEnabled: !!address && !!communityId,
   });
 
+  useEffect(() => {
+    if (!isError && users && users[0].id) {
+      navigate(`/profile/id/${users[0].id}`, {}, null);
+    }
+  }, [isError, users]);
+
   if (isLoading) {
     return <PageLoading />;
   }
 
   if (isError) {
     return <PageNotFound message="There was an error loading this profile." />;
-  }
-
-  if (!isError && users && users[0].id) {
-    navigate(`/profile/id/${users[0].id}`, {}, null);
   }
 };
 
