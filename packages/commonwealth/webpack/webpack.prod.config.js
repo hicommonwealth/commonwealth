@@ -4,6 +4,7 @@ const { merge } = require('webpack-merge');
 const common = require('./webpack.base.config.js');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const { WebpackDeduplicationPlugin } = require('webpack-deduplication-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = merge(common, {
   mode: 'production',
@@ -21,6 +22,14 @@ module.exports = merge(common, {
     }),
     new WebpackDeduplicationPlugin({
       cacheDir: './cache',
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: path.resolve(__dirname, '../favicon.ico'),
+          to: path.resolve(__dirname, '../build/favicon.ico'),
+        },
+      ],
     }),
     new BundleAnalyzerPlugin({
       analyzerMode: 'disabled',

@@ -209,7 +209,7 @@ async function main() {
     }
   })();
 
-  const sendFile = (res) => res.sendFile(`${__dirname}/build/index.html`);
+  const sendFile = (res) => res.sendFile(`${__dirname}/index.html`);
 
   setupMiddleware();
   setupPassport(models);
