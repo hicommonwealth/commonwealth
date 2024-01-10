@@ -11,6 +11,9 @@ describe('ServerCommentsController', () => {
     it('should create a comment reaction (new reaction)', async () => {
       const sandbox = Sinon.createSandbox();
       const db = {
+        Address: {
+          findAll: async () => [{}], // used in findOneRole
+        },
         Reaction: {
           findOne: sandbox.stub().resolves({
             id: 2,
