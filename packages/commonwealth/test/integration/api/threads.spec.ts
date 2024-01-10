@@ -30,8 +30,7 @@ describe('Thread Tests', () => {
   const title = 'test title';
   const body = 'test body';
   const bodyWithMentions = 'test body [@Tagged Member](/edgeware/npRis4Nb)';
-  const topicName = 'test topic';
-  const topicId = undefined;
+  let topicId;
   const kind = 'discussion';
   const stage = 'discussion';
 
@@ -57,6 +56,7 @@ describe('Thread Tests', () => {
 
   before(async () => {
     await resetDatabase();
+    topicId = await modelUtils.getTopicId({ chain });
     let res = await modelUtils.createAndVerifyAddress({ chain });
     adminAddress = res.address;
     adminAddressId = res.address_id;
@@ -99,7 +99,6 @@ describe('Thread Tests', () => {
           stage,
           chainId: chain,
           title,
-          topicName,
           topicId,
           body,
           jwt: userJWT,
@@ -118,7 +117,6 @@ describe('Thread Tests', () => {
           stage,
           chainId: chain,
           title: '',
-          topicName,
           topicId,
           body,
           jwt: userJWT,
@@ -139,7 +137,6 @@ describe('Thread Tests', () => {
           stage,
           chainId: chain,
           title: '',
-          topicName,
           topicId,
           body,
           url: 'http://commonwealth.im',
@@ -161,7 +158,6 @@ describe('Thread Tests', () => {
           stage,
           chainId: chain,
           title,
-          topicName,
           topicId,
           body,
           url: null,
@@ -183,7 +179,6 @@ describe('Thread Tests', () => {
           stage,
           chainId: chain,
           title,
-          topicName,
           topicId,
           body,
           readOnly,
@@ -208,34 +203,6 @@ describe('Thread Tests', () => {
         expect(cRes.error).not.to.be.null;
       });
 
-      it.skip('should successfully create a thread without a topic name (if the community lacks topics)', async () => {
-        const communityArgs: modelUtils.CommunityArgs = {
-          jwt: adminJWT,
-          id: 'test',
-          name: 'test',
-          creator_address: adminAddress,
-          creator_chain: chain,
-          description: 'test enabled community',
-          default_chain: chain,
-          isAuthenticatedForum: 'false',
-          privacyEnabled: 'false',
-        };
-        const c = await modelUtils.createCommunity(communityArgs);
-        const tRes = await modelUtils.createThread({
-          address: adminAddress,
-          kind,
-          stage,
-          chainId: chain,
-          title,
-          body,
-          jwt: adminJWT,
-          session: adminSession.session,
-          sign: adminSession.sign,
-        });
-        expect(tRes.status).to.equal('Success');
-        expect(tRes.result).to.not.be.null;
-      });
-
       it('should create a discussion thread', async () => {
         const res = await modelUtils.createThread({
           address: userAddress,
@@ -243,7 +210,6 @@ describe('Thread Tests', () => {
           stage,
           chainId: chain,
           title,
-          topicName,
           topicId,
           body,
           jwt: userJWT,
@@ -281,7 +247,6 @@ describe('Thread Tests', () => {
           stage,
           chainId: chain,
           title,
-          topicName,
           topicId,
           body: bodyWithMentions,
           jwt: userJWT,
@@ -303,7 +268,6 @@ describe('Thread Tests', () => {
           stage,
           chainId: chain2,
           title,
-          topicName,
           topicId,
           body,
           jwt: userJWT2,
@@ -367,7 +331,6 @@ describe('Thread Tests', () => {
           stage,
           chainId: chain,
           title,
-          topicName,
           topicId,
           body,
           jwt: userJWT,
@@ -502,7 +465,6 @@ describe('Thread Tests', () => {
           stage,
           chainId: chain,
           title,
-          topicName,
           topicId,
           body,
           jwt: adminJWT,
@@ -656,7 +618,6 @@ describe('Thread Tests', () => {
           stage,
           chainId: chain,
           title,
-          topicName,
           topicId,
           body,
           jwt: userJWT,
@@ -725,7 +686,6 @@ describe('Thread Tests', () => {
           jwt: userJWT,
           title,
           body,
-          topicName,
           topicId,
           kind,
           stage,
@@ -764,7 +724,6 @@ describe('Thread Tests', () => {
           stage,
           chainId: chain,
           title,
-          topicName,
           topicId,
           body,
           jwt: userJWT,
@@ -818,7 +777,6 @@ describe('Thread Tests', () => {
           stage,
           chainId: chain,
           title,
-          topicName,
           topicId,
           body,
           jwt: userJWT,
@@ -894,7 +852,6 @@ describe('Thread Tests', () => {
           stage,
           chainId: chain,
           title,
-          topicName,
           topicId,
           body,
           jwt: userJWT,

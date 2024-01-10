@@ -22,7 +22,6 @@ describe('User Dashboard API', () => {
   // communityId, unlike in non-test thread creation
   const title = 'test title';
   const body = 'test body';
-  const topicName = 'test topic';
   const kind = 'discussion';
 
   let userJWT;
@@ -92,7 +91,6 @@ describe('User Dashboard API', () => {
       body,
       readOnly: false,
       kind,
-      topicName,
       session: userSession2.session,
       sign: userSession2.sign,
     };
@@ -108,7 +106,6 @@ describe('User Dashboard API', () => {
       body,
       readOnly: false,
       kind,
-      topicName,
       session: userSession2.session,
       sign: userSession2.sign,
     };
@@ -205,7 +202,6 @@ describe('User Dashboard API', () => {
           body,
           readOnly: false,
           kind,
-          topicName,
           session: userSession2.session,
           sign: userSession2.sign,
         };

@@ -24,8 +24,11 @@ describe('Thread Patch Update', () => {
   let userAddressId;
   let userSession;
 
+  let topicId;
+
   before(async () => {
     await resetDatabase();
+    topicId = await modelUtils.getTopicId({ chain });
     const adminRes = await modelUtils.createAndVerifyAddress({ chain });
     {
       adminAddress = adminRes.address;
@@ -71,8 +74,7 @@ describe('Thread Patch Update', () => {
         body: 'body1',
         kind: 'discussion',
         stage: 'discussion',
-        topicName: 't1',
-        topicId: undefined,
+        topicId,
         session: userSession.session,
         sign: userSession.sign,
       });
@@ -91,7 +93,6 @@ describe('Thread Patch Update', () => {
           stage: 'voting',
           locked: true,
           archived: true,
-          topicName: 'newTopic',
         });
 
       expect(res.status).to.equal(200);
@@ -116,8 +117,7 @@ describe('Thread Patch Update', () => {
         body: 'body2',
         kind: 'discussion',
         stage: 'discussion',
-        topicName: 't2',
-        topicId: undefined,
+        topicId,
         session: userSession.session,
         sign: userSession.sign,
       });
@@ -163,8 +163,7 @@ describe('Thread Patch Update', () => {
         body: 'body2',
         kind: 'discussion',
         stage: 'discussion',
-        topicName: 't2',
-        topicId: undefined,
+        topicId,
         session: userSession.session,
         sign: userSession.sign,
       });

@@ -18,13 +18,14 @@ describe('Polls', () => {
   let userAddress;
   let userAddressId;
 
+  let topicId;
   let threadId = 0;
-  let threadChain = '';
   let pollId = 0;
 
   before(async () => {
     await resetDatabase();
 
+    topicId = await modelUtils.getTopicId({ chain });
     const userRes = await modelUtils.createAndVerifyAddress({ chain });
     userAddress = userRes.address;
     userId = userRes.user_id;
@@ -46,8 +47,7 @@ describe('Polls', () => {
       body: 'body1',
       kind: 'discussion',
       stage: 'discussion',
-      topicName: 't1',
-      topicId: undefined,
+      topicId,
       session: {
         type: 'session',
         signature: '',
@@ -98,7 +98,6 @@ describe('Polls', () => {
     });
 
     threadId = thread.id;
-    threadChain = thread.community_id;
     pollId = res.body.result.id;
   });
 

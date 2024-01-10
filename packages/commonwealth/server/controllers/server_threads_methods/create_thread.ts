@@ -40,7 +40,6 @@ export type CreateThreadOptions = {
   kind: string;
   readOnly: boolean;
   topicId?: number;
-  topicName?: string;
   stage?: string;
   url?: string;
   canvasAction?: any;
@@ -66,7 +65,6 @@ export async function __createThread(
     kind,
     readOnly,
     topicId,
-    topicName,
     stage,
     url,
     canvasAction,
@@ -137,59 +135,39 @@ export async function __createThread(
     canvas_session: canvasSession,
     canvas_hash: canvasHash,
     discord_meta: discordMeta,
+    topic_id: +topicId,
   };
+
+  if (
+    community &&
+    (community.type === ChainType.Token ||
+      community.network === ChainNetwork.Ethereum)
+  ) {
+    // skip check for admins
+    const isAdmin = await validateOwner({
+      models: this.models,
+      user,
+      communityId: community.id,
+      allowAdmin: true,
+      allowGodMode: true,
+    });
+    if (!isAdmin) {
+      const { isValid, message } = await validateTopicGroupsMembership(
+        this.models,
+        this.tokenBalanceCache,
+        topicId,
+        community,
+        address,
+      );
+      if (!isValid) {
+        throw new AppError(`${Errors.FailedCreateThread}: ${message}`);
+      }
+    }
+  }
 
   // begin essential database changes within transaction
   const newThreadId = await this.models.sequelize.transaction(
     async (transaction) => {
-      // New Topic table entries created
-      if (topicId) {
-        threadContent.topic_id = +topicId;
-      } else if (topicName) {
-        const [topic] = await this.models.Topic.findOrCreate({
-          where: {
-            name: topicName,
-            community_id: community?.id || null,
-          },
-          transaction,
-        });
-        threadContent.topic_id = topic.id;
-        topicId = topic.id;
-      } else {
-        if (community.topics?.length) {
-          throw new AppError(
-            'Must pass a topic_name string and/or a numeric topic_id',
-          );
-        }
-      }
-
-      if (
-        community &&
-        (community.type === ChainType.Token ||
-          community.network === ChainNetwork.Ethereum)
-      ) {
-        // skip check for admins
-        const isAdmin = await validateOwner({
-          models: this.models,
-          user,
-          communityId: community.id,
-          allowAdmin: true,
-          allowGodMode: true,
-        });
-        if (!isAdmin) {
-          const { isValid, message } = await validateTopicGroupsMembership(
-            this.models,
-            this.tokenBalanceCache,
-            topicId,
-            community,
-            address,
-          );
-          if (!isValid) {
-            throw new AppError(`${Errors.FailedCreateThread}: ${message}`);
-          }
-        }
-      }
-
       const thread = await this.models.Thread.create(threadContent, {
         transaction,
       });

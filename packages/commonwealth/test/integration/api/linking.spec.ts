@@ -16,8 +16,6 @@ describe('Linking Tests', () => {
 
   const title = 'test title';
   const body = 'test body';
-  const topicName = 'test topic';
-  const topicId = undefined;
   const kind = 'discussion';
   const stage = 'discussion';
 
@@ -30,6 +28,7 @@ describe('Linking Tests', () => {
   let userAddress;
   let userAddressId;
   let userSession;
+  let topicId;
   let thread1: ThreadAttributes;
   let thread2: ThreadAttributes;
   const link1 = {
@@ -44,6 +43,7 @@ describe('Linking Tests', () => {
 
   before(async () => {
     await resetDatabase();
+    topicId = await modelUtils.getTopicId({ chain });
     let res = await modelUtils.createAndVerifyAddress({ chain });
     adminAddress = res.address;
     adminAddressId = res.address_id;
@@ -74,7 +74,6 @@ describe('Linking Tests', () => {
         stage,
         chainId: chain,
         title,
-        topicName,
         topicId,
         body,
         jwt: userJWT,
@@ -90,7 +89,6 @@ describe('Linking Tests', () => {
         stage,
         chainId: chain,
         title,
-        topicName,
         topicId,
         body,
         jwt: adminJWT,

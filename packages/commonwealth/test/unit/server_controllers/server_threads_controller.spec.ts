@@ -1351,7 +1351,6 @@ describe('ServerThreadsController', () => {
       const kind = 'discussion';
       const readOnly = false;
       const topicId = 1;
-      const topicName = undefined;
       const title = 'mythread';
       const stage = 'stage';
       const url = 'http://blah';
@@ -1369,7 +1368,6 @@ describe('ServerThreadsController', () => {
           kind,
           readOnly,
           topicId,
-          topicName,
           stage,
           url,
           canvasAction,
@@ -1390,7 +1388,6 @@ describe('ServerThreadsController', () => {
           kind,
           readOnly,
           topicId,
-          topicName,
           stage,
           url,
           canvasAction,

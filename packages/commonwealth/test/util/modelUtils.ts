@@ -53,6 +53,18 @@ export const generateEthAddress = () => {
   return { keypair, address };
 };
 
+export const getTopicId = async ({ chain }) => {
+  const res = await chai.request
+    .agent(app)
+    .get('/api/topics')
+    .set('Accept', 'application/json')
+    .send({
+      community_id: chain,
+    });
+  const topicId = res.body.result[0].id;
+  return topicId;
+};
+
 export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
   if (chain === 'ethereum' || chain === 'alex') {
     const wallet_id = 'metamask';
@@ -205,7 +217,6 @@ export interface ThreadArgs {
   stage?: string;
   chainId: string;
   title: string;
-  topicName?: string;
   topicId?: number;
   body?: string;
   url?: string;
@@ -223,7 +234,6 @@ export const createThread = async (
     jwt,
     title,
     body,
-    topicName,
     topicId,
     readOnly,
     kind,
@@ -268,7 +278,6 @@ export const createThread = async (
       title: encodeURIComponent(title),
       body: encodeURIComponent(body),
       kind,
-      topic_name: topicName,
       topic_id: topicId,
       url,
       readOnly: readOnly || false,

@@ -46,7 +46,6 @@ export type UpdateThreadOptions = {
   archived?: boolean;
   spam?: boolean;
   topicId?: number;
-  topicName?: string;
   collaborators?: {
     toAdd?: number[];
     toRemove?: number[];
@@ -79,7 +78,6 @@ export async function __updateThread(
     archived,
     spam,
     topicId,
-    topicName,
     collaborators,
     canvasSession,
     canvasAction,
@@ -220,14 +218,7 @@ export async function __updateThread(
       toUpdate,
     );
 
-    await setThreadTopic(
-      permissions,
-      thread,
-      topicId,
-      topicName,
-      this.models,
-      toUpdate,
-    );
+    await setThreadTopic(permissions, topicId, this.models, toUpdate);
 
     await thread.update(
       {
@@ -618,36 +609,21 @@ async function setThreadStage(
  */
 async function setThreadTopic(
   permissions: UpdateThreadPermissions,
-  thread: ThreadInstance,
-  topicId: number | undefined,
-  topicName: string | undefined,
+  topicId: number,
   models: DB,
   toUpdate: Partial<ThreadAttributes>,
 ) {
-  if (typeof topicId !== 'undefined' || typeof topicName !== 'undefined') {
-    validatePermissions(permissions, {
-      isThreadOwner: true,
-      isMod: true,
-      isAdmin: true,
-      isSuperAdmin: true,
-    });
-
-    if (typeof topicId !== 'undefined') {
-      const topic = await models.Topic.findByPk(topicId);
-      if (!topic) {
-        throw new AppError(Errors.InvalidTopic);
-      }
-      toUpdate.topic_id = topic.id;
-    } else if (typeof topicName !== 'undefined') {
-      const [topic] = await models.Topic.findOrCreate({
-        where: {
-          name: topicName,
-          community_id: thread.community_id,
-        },
-      });
-      toUpdate.topic_id = topic.id;
-    }
+  validatePermissions(permissions, {
+    isThreadOwner: true,
+    isMod: true,
+    isAdmin: true,
+    isSuperAdmin: true,
+  });
+  const topic = await models.Topic.findByPk(topicId);
+  if (!topic) {
+    throw new AppError(Errors.InvalidTopic);
   }
+  toUpdate.topic_id = topic.id;
 }
 
 /**
