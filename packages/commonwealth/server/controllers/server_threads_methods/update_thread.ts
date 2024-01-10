@@ -227,6 +227,7 @@ export async function __updateThread(
       topicName,
       this.models,
       toUpdate,
+      transaction,
     );
 
     await thread.update(
@@ -623,6 +624,7 @@ async function setThreadTopic(
   topicName: string | undefined,
   models: DB,
   toUpdate: Partial<ThreadAttributes>,
+  transaction: Transaction,
 ) {
   if (typeof topicId !== 'undefined' || typeof topicName !== 'undefined') {
     validatePermissions(permissions, {
@@ -644,6 +646,7 @@ async function setThreadTopic(
           name: topicName,
           community_id: thread.community_id,
         },
+        transaction,
       });
       toUpdate.topic_id = topic.id;
     }
