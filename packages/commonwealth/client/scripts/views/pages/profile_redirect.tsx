@@ -28,7 +28,7 @@ const ProfileRedirect = (props: ProfileRedirectProps) => {
   });
 
   useEffect(() => {
-    if (!isError && users && users[0].id) {
+    if (!isError && users && Array.isArray(users) && users[0]?.id) {
       navigate(`/profile/id/${users[0].id}`, {}, null);
     }
   }, [isError, users]);
