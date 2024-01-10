@@ -34,12 +34,4 @@ To start the app, run `yarn start`.
 
 Create a `.env` file at the `package/commonwealth` level to store minimum security environment variables. Higher security secrets should be stored inside an `.auth` file.
 
-The following environment variables should allow you to get started:
-
-```sh
-DATABASE_URI=postgresql://commonwealth:edgeware@localhost/commonwealth
-ENTITIES_URL=https://chain-events.herokuapp.com/api
-MAGIC_DEFAULT_CHAIN='ethereum'
-REDIS_URL=redis://localhost:6379
-SERVER_URL=https://commonwealth.im
-```
+Use the [.env.example](../../.env.example) file to get yourself set up.

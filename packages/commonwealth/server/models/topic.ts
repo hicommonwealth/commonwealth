@@ -5,20 +5,20 @@ import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type TopicAttributes = {
-  name: string;
-  featured_in_sidebar: boolean;
-  featured_in_new_post: boolean;
-  order?: number;
   id?: number;
-  community_id: string;
+  name: string;
   description?: string;
-  telegram?: string;
+  community_id: string;
+  featured_in_sidebar?: boolean;
+  featured_in_new_post?: boolean;
+  order?: number;
   channel_id?: string;
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
   default_offchain_template?: string;
-  group_ids: number[];
+  group_ids?: number[];
+  telegram?: string;
 
   // associations
   community?: CommunityAttributes;
@@ -41,11 +41,6 @@ export default (
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       name: { type: dataTypes.STRING, allowNull: false },
       description: { type: dataTypes.TEXT, allowNull: false, defaultValue: '' },
-      telegram: { type: dataTypes.STRING, allowNull: true },
-      community_id: { type: dataTypes.STRING, allowNull: false },
-      created_at: { type: dataTypes.DATE, allowNull: false },
-      updated_at: { type: dataTypes.DATE, allowNull: false },
-      deleted_at: { type: dataTypes.DATE, allowNull: true },
       featured_in_sidebar: {
         type: dataTypes.BOOLEAN,
         allowNull: true,
@@ -56,6 +51,10 @@ export default (
         allowNull: true,
         defaultValue: false,
       },
+      community_id: { type: dataTypes.STRING, allowNull: false },
+      created_at: { type: dataTypes.DATE, allowNull: false },
+      updated_at: { type: dataTypes.DATE, allowNull: false },
+      deleted_at: { type: dataTypes.DATE, allowNull: true },
       order: { type: dataTypes.INTEGER, allowNull: true },
       default_offchain_template: {
         type: dataTypes.TEXT,
@@ -68,6 +67,7 @@ export default (
         allowNull: false,
         defaultValue: [],
       },
+      telegram: { type: dataTypes.STRING, allowNull: true },
     },
     {
       timestamps: true,

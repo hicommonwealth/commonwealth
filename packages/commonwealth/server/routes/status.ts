@@ -99,7 +99,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
           !!address.verified &&
           chains.map((c) => c.id).includes(address.community_id),
       ),
-      user.getSelectedChain(),
+      user.getSelectedCommunity(),
       user.isAdmin,
       user.disableRichText,
     ]);

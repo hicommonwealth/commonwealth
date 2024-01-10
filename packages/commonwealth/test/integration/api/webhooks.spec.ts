@@ -35,14 +35,15 @@ describe('Webhook Tests', () => {
   let loggedInSession;
   let notAdminJWT;
   const chain = 'ethereum';
-  const topicName = 'test';
-  const topicId = 0;
+  let topicId;
 
   before('reset database', async () => {
     await resetDatabase();
   });
 
   beforeEach(async () => {
+    // get topic
+    topicId = await modelUtils.getTopicId({ chain });
     // get logged in address/user with JWT
     let result = await modelUtils.createAndVerifyAddress({ chain });
     loggedInAddr = result.address;
@@ -255,7 +256,6 @@ describe('Webhook Tests', () => {
       });
       await modelUtils.createThread({
         chainId: chain,
-        topicName,
         topicId,
         address: loggedInAddr,
         jwt: jwtToken,
@@ -279,7 +279,6 @@ describe('Webhook Tests', () => {
       // expect(res.statusCode).to.be.equal(200);
       await modelUtils.createThread({
         chainId: chain,
-        topicName,
         topicId,
         address: loggedInAddr,
         jwt: jwtToken,
