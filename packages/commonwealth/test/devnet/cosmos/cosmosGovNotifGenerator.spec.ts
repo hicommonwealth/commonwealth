@@ -7,10 +7,11 @@ import {
 import { Any } from 'cosmjs-types/google/protobuf/any';
 import sinon from 'sinon';
 import models from '../../../server/database';
+// eslint-disable-next-line max-len
 import { generateCosmosGovNotifications } from '../../../server/workers/cosmosGovNotifications/generateCosmosGovNotifications';
 import { deposit, sendTx, setupTestSigner } from './utils/helpers';
 
-const { expect, assert } = chai;
+const { expect } = chai;
 
 const v1ChainId = 'csdk-v1';
 const v1RpcUrl = `http://localhost:8080/cosmosAPI/${v1ChainId}`;
@@ -143,6 +144,7 @@ describe('Cosmos Governance Notification Generator with real proposals', () => {
       await createTestProposal(v1Beta1RpcUrl, v1Beta1Content);
     });
 
+    // eslint-disable-next-line max-len
     it('should generate a single cosmos gov v1beta1 notification when there are no existing notifications', async () => {
       await generateCosmosGovNotifications();
       const notifications = await models.Notification.findAll({
@@ -200,6 +202,7 @@ describe('Cosmos Governance Notification Generator with real proposals', () => {
       await enableChains([v1ChainId, v1Beta1ChainId]);
     });
 
+    // eslint-disable-next-line max-len
     it('should generate notifications for all v1 and v1beta1 proposals proposals since the last known notification', async () => {
       await generateCosmosGovNotifications();
       await createTestProposal(v1Beta1RpcUrl, v1Beta1Content);
