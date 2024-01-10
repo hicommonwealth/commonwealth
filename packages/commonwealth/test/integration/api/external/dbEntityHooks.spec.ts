@@ -308,7 +308,7 @@ export async function createTestEntities() {
               reaction: 'like',
               address_id: -1,
               thread_id: -1,
-              chain: 'cmntest',
+              community_id: 'cmntest',
             },
           })
         )[0],
@@ -326,7 +326,7 @@ export async function createTestEntities() {
                 reaction: 'like',
                 address_id: -2,
                 comment_id: -2,
-                chain: 'cmntest',
+                community_id: 'cmntest',
               },
             })
           )[0],
