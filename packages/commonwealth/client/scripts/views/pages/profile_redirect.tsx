@@ -18,15 +18,15 @@ const ProfileRedirect = (props: ProfileRedirectProps) => {
   const [error, setError] = useState<boolean>(false);
   const navigate = useCommonNavigate();
 
-  const getProfileId = async (address, community) => {
+  const getProfileId = async (addresses: string[], community: string[]) => {
     setLoading(true);
     try {
       const res = await $.post(`${app.serverUrl()}/getAddressProfile`, {
-        address,
-        community,
+        addresses,
+        chains: community,
       });
       if (res.status === 'Success' && res.result) {
-        setProfileId(res.result.profileId);
+        setProfileId(res.result[0].profileId);
       }
     } catch (err) {
       setError(true);
@@ -46,7 +46,7 @@ const ProfileRedirect = (props: ProfileRedirectProps) => {
   if (!address) address = app.user.activeAccount?.address;
   if (!scope) scope = app.activeChainId();
 
-  if (address && scope && !profileId) getProfileId(address, scope);
+  if (address && scope && !profileId) getProfileId([address], [scope]);
 
   if (profileId) {
     navigate(`/profile/id/${profileId}`, {}, null);
