@@ -323,5 +323,7 @@ export async function __createThreadComment(
     userId: user.id,
   };
 
-  return [comment.toJSON(), allNotificationOptions, analyticsOptions];
+  const commentJson = comment.toJSON();
+  commentJson.Address = address.toJSON();
+  return [commentJson, allNotificationOptions, analyticsOptions];
 }
