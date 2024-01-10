@@ -47,7 +47,7 @@ export async function clearTestEntities() {
       where: {
         [Op.or]: [
           { id: { [Op.lt]: 0 } },
-          { selected_chain_id: { [Op.in]: ['cmntest', 'cmntest2'] } },
+          { selected_community_id: { [Op.in]: ['cmntest', 'cmntest2'] } },
         ],
       },
     });

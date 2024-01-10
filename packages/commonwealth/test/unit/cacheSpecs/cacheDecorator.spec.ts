@@ -9,8 +9,8 @@ import {
 import { RedisNamespaces } from '@hicommonwealth/core';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { Activity } from 'common-common/src/daemons/activity';
 import sinon from 'sinon';
+import { Activity } from '../daemons/activity';
 chai.use(chaiAsPromised);
 
 describe('CacheDecorator', () => {

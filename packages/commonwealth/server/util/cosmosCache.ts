@@ -16,7 +16,7 @@ export function calcCosmosRPCCacheKeyDuration(req, res, next) {
 }
 
 export function cosmosLCDDuration(req) {
-  // Matches ProposalStatus from common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov.ts
+  // Matches ProposalStatus from libs/chains/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov.ts
   const activeProposalCodes = [1, 2]; // ['DepositPeriod', 'VotingPeriod']
   const completedProposalCodes = [3, 4, 5]; // ['Passed', 'Rejected', 'Failed']
   const url = req.url;
