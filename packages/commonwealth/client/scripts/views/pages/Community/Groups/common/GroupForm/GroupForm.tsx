@@ -304,7 +304,7 @@ const GroupForm = ({
     // Validate if contract address is valid based on the selected requirement type
     if (val.requirementContractAddress) {
       const isInvalidEthAddress =
-        [...Object.values(SPECIFICATIONS), TOKENS.EVM_TOKEN].includes(
+        [...Object.values(ERC_SPECIFICATIONS), TOKENS.EVM_TOKEN].includes(
           allRequirements[index].values.requirementType,
         ) && !isValidEthAddress(val.requirementContractAddress);
 
