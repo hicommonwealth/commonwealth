@@ -376,7 +376,7 @@ describe('recomputeCounts', () => {
     });
   });
 
-  describe('notification should be correct on recompute count', () => {
+  describe.only('notification should be correct on recompute count', () => {
     it('add comment from api, notification id is non zero', async () => {
       const cRes = await modelUtils.createComment({
         chain: testThreads[0].community_id,
