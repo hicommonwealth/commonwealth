@@ -21,12 +21,9 @@ describe('Linking Tests', () => {
 
   let adminJWT;
   let adminAddress;
-  let adminAddressId;
   let adminSession;
   let userJWT;
-  let userId;
   let userAddress;
-  let userAddressId;
   let userSession;
   let topicId;
   let thread1: ThreadAttributes;
@@ -46,7 +43,6 @@ describe('Linking Tests', () => {
     topicId = await modelUtils.getTopicId({ chain });
     let res = await modelUtils.createAndVerifyAddress({ chain });
     adminAddress = res.address;
-    adminAddressId = res.address_id;
     adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
     const isAdmin = await modelUtils.updateRole({
       address_id: res.address_id,
@@ -60,8 +56,6 @@ describe('Linking Tests', () => {
 
     res = await modelUtils.createAndVerifyAddress({ chain });
     userAddress = res.address;
-    userId = res.user_id;
-    userAddressId = res.address_id;
     userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
     userSession = { session: res.session, sign: res.sign };
     expect(userAddress).to.not.be.null;

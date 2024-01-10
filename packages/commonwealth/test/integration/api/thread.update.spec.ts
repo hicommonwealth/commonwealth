@@ -13,15 +13,10 @@ describe('Thread Patch Update', () => {
   const chain = 'ethereum';
 
   let adminJWT;
-  let adminUserId;
   let adminAddress;
-  let adminAddressId;
-  let adminSession;
 
   let userJWT;
-  let userId;
   let userAddress;
-  let userAddressId;
   let userSession;
 
   let topicId;
@@ -32,8 +27,6 @@ describe('Thread Patch Update', () => {
     const adminRes = await modelUtils.createAndVerifyAddress({ chain });
     {
       adminAddress = adminRes.address;
-      adminUserId = adminRes.user_id;
-      adminAddressId = adminRes.address_id;
       adminJWT = jwt.sign(
         { id: adminRes.user_id, email: adminRes.email },
         JWT_SECRET,
@@ -43,7 +36,6 @@ describe('Thread Patch Update', () => {
         chainOrCommObj: { chain_id: chain },
         role: 'admin',
       });
-      adminSession = { session: adminRes.session, sign: adminRes.sign };
       expect(adminAddress).to.not.be.null;
       expect(adminJWT).to.not.be.null;
       expect(isAdmin).to.not.be.null;
@@ -52,8 +44,6 @@ describe('Thread Patch Update', () => {
     const userRes = await modelUtils.createAndVerifyAddress({ chain });
     {
       userAddress = userRes.address;
-      userId = userRes.user_id;
-      userAddressId = userRes.address_id;
       userJWT = jwt.sign(
         { id: userRes.user_id, email: userRes.email },
         JWT_SECRET,

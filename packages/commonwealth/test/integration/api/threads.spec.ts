@@ -5,7 +5,6 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import jwt from 'jsonwebtoken';
-import moment from 'moment';
 import { JWT_SECRET } from 'server/config';
 import { Errors as CreateThreadErrors } from 'server/controllers/server_threads_methods/create_thread';
 import { Errors as EditThreadErrors } from 'server/controllers/server_threads_methods/update_thread';
@@ -34,22 +33,16 @@ describe('Thread Tests', () => {
   const kind = 'discussion';
   const stage = 'discussion';
 
-  const markdownThread = require('../../util/fixtures/markdownThread');
   let adminJWT;
   let adminAddress;
-  let adminAddressId;
   let adminSession;
 
   let userJWT;
-  let userId;
   let userAddress;
-  let userAddressId;
   let userSession;
 
   let userJWT2;
-  let userId2;
   let userAddress2;
-  let userAddressId2;
   let userSession2;
 
   let thread;
@@ -59,7 +52,6 @@ describe('Thread Tests', () => {
     topicId = await modelUtils.getTopicId({ chain });
     let res = await modelUtils.createAndVerifyAddress({ chain });
     adminAddress = res.address;
-    adminAddressId = res.address_id;
     adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
     const isAdmin = await modelUtils.updateRole({
       address_id: res.address_id,
@@ -73,8 +65,6 @@ describe('Thread Tests', () => {
 
     res = await modelUtils.createAndVerifyAddress({ chain });
     userAddress = res.address;
-    userId = res.user_id;
-    userAddressId = res.address_id;
     userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
     userSession = { session: res.session, sign: res.sign };
     expect(userAddress).to.not.be.null;
@@ -82,8 +72,6 @@ describe('Thread Tests', () => {
 
     res = await modelUtils.createAndVerifyAddress({ chain: chain2 });
     userAddress2 = res.address;
-    userId2 = res.user_id;
-    userAddressId2 = res.address_id;
     userJWT2 = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
     userSession2 = { session: res.session, sign: res.sign };
     expect(userAddress2).to.not.be.null;
@@ -319,7 +307,7 @@ describe('Thread Tests', () => {
           default_chain: chain,
         };
 
-        const testCommunity = await modelUtils.createCommunity(communityArgs);
+        await modelUtils.createCommunity(communityArgs);
       });
     });
 
@@ -477,11 +465,8 @@ describe('Thread Tests', () => {
       });
 
       it("should fail to edit an admin's post as a user", async () => {
-        const thread_id = thread.id;
         const thread_kind = thread.kind;
         const thread_stage = thread.stage;
-        const recentEdit: any = { timestamp: moment(), body: thread.body };
-        const versionHistory = JSON.stringify(recentEdit);
         const readOnly = false;
         const res = await chai
           .request(app)
@@ -504,8 +489,6 @@ describe('Thread Tests', () => {
       it('should fail to edit a thread without passing a thread id', async () => {
         const thread_kind = thread.kind;
         const thread_stage = thread.stage;
-        const recentEdit: any = { timestamp: moment(), body: thread.body };
-        const versionHistory = JSON.stringify(recentEdit);
         const readOnly = false;
         const res = await chai
           .request(app)
@@ -533,8 +516,6 @@ describe('Thread Tests', () => {
         const thread_id = thread.id;
         const thread_kind = thread.kind;
         const thread_stage = thread.stage;
-        const recentEdit: any = { timestamp: moment(), body: thread.body };
-        const versionHistory = JSON.stringify(recentEdit);
         const readOnly = false;
         const res = await chai
           .request(app)

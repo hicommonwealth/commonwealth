@@ -1,4 +1,3 @@
-import { ActionArgument } from '@canvas-js/interfaces';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
@@ -14,9 +13,7 @@ describe('Polls', () => {
   const chain = 'ethereum';
 
   let userJWT;
-  let userId;
   let userAddress;
-  let userAddressId;
 
   let topicId;
   let threadId = 0;
@@ -28,8 +25,6 @@ describe('Polls', () => {
     topicId = await modelUtils.getTopicId({ chain });
     const userRes = await modelUtils.createAndVerifyAddress({ chain });
     userAddress = userRes.address;
-    userId = userRes.user_id;
-    userAddressId = userRes.address_id;
     userJWT = jwt.sign(
       { id: userRes.user_id, email: userRes.email },
       JWT_SECRET,
@@ -61,15 +56,7 @@ describe('Polls', () => {
           block: '',
         },
       },
-      sign: function (actionPayload: {
-        app: string;
-        chain: string;
-        from: string;
-        call: string;
-        callArgs: Record<string, ActionArgument>;
-        timestamp: number;
-        block: string;
-      }): string {
+      sign: function (): string {
         return '';
       },
     });
