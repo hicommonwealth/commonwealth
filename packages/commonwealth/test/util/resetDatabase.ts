@@ -87,6 +87,10 @@ export const resetDatabase = (debug = false): Promise<void> => {
         has_chain_events_listener: false,
         chain_node_id: edgewareNode.id,
       });
+      await models.Topic.create({
+        community_id: 'edgeware',
+        name: 'General',
+      });
       await models.Community.create({
         id: 'ethereum',
         network: ChainNetwork.Ethereum,
@@ -99,6 +103,10 @@ export const resetDatabase = (debug = false): Promise<void> => {
         has_chain_events_listener: false,
         chain_node_id: mainnetNode.id,
       });
+      await models.Topic.create({
+        community_id: 'ethereum',
+        name: 'General',
+      });
       const alex = await models.Community.create({
         id: 'alex',
         network: ChainNetwork.ERC20,
@@ -110,6 +118,10 @@ export const resetDatabase = (debug = false): Promise<void> => {
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
         chain_node_id: testnetNode.id,
+      });
+      await models.Topic.create({
+        community_id: 'alex',
+        name: 'General',
       });
       await models.Community.create({
         id: 'osmosis',
@@ -124,6 +136,10 @@ export const resetDatabase = (debug = false): Promise<void> => {
         chain_node_id: osmosisNode.id,
         bech32_prefix: 'osmo',
       });
+      await models.Topic.create({
+        community_id: 'osmosis',
+        name: 'General',
+      });
       await models.Community.create({
         id: 'csdk-beta',
         network: ChainNetwork.Osmosis,
@@ -137,6 +153,10 @@ export const resetDatabase = (debug = false): Promise<void> => {
         chain_node_id: csdkBetaNode.id,
         bech32_prefix: 'cosmos',
       });
+      await models.Topic.create({
+        community_id: 'csdk-beta',
+        name: 'General',
+      });
       await models.Community.create({
         id: 'csdk',
         network: ChainNetwork.Osmosis,
@@ -149,6 +169,10 @@ export const resetDatabase = (debug = false): Promise<void> => {
         has_chain_events_listener: true,
         chain_node_id: csdkV1Node.id,
         bech32_prefix: 'cosmos',
+      });
+      await models.Topic.create({
+        community_id: 'csdk',
+        name: 'General',
       });
       const alexContract = await models.Contract.create({
         address: '0xFab46E002BbF0b4509813474841E0716E6730136',
@@ -173,6 +197,10 @@ export const resetDatabase = (debug = false): Promise<void> => {
         has_chain_events_listener: false,
         chain_node_id: mainnetNode.id,
       });
+      await models.Topic.create({
+        community_id: 'yearn',
+        name: 'General',
+      });
       const yearnContract = await models.Contract.create({
         address: '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e',
         token_name: 'yearn',
@@ -196,6 +224,10 @@ export const resetDatabase = (debug = false): Promise<void> => {
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
         chain_node_id: mainnetNode.id,
+      });
+      await models.Topic.create({
+        community_id: 'sushi',
+        name: 'General',
       });
       const sushiContract = await models.Contract.create({
         address: '0x6b3595068778dd592e39a122f4f5a5cf09c90fe2',

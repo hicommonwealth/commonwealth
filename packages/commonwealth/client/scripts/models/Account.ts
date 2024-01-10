@@ -1,5 +1,4 @@
 import type { WalletId, WalletSsoSource } from '@hicommonwealth/core';
-import { ChainType } from '@hicommonwealth/core';
 import $ from 'jquery';
 import app from 'state';
 import NewProfilesController from '../controllers/server/newProfiles';
@@ -173,7 +172,6 @@ class Account {
       address: this.address,
       chain: this.community.id,
       chain_id: chainId,
-      isToken: this.community.type === ChainType.Token,
       jwt: app.user.jwt,
       signature,
       wallet_id: this.walletId,
