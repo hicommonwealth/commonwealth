@@ -48,6 +48,6 @@ module.exports = {
       ],
     };
 
-    return queryInterface.bulkDelete('ChainNodes', conditions, { transaction });
+    return queryInterface.bulkDelete('ChainNodes', conditions);
   },
 };
