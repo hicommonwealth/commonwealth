@@ -510,7 +510,7 @@ jobs:
             packages/commonwealth/server/util/cosmosProxy.ts
             packages/commonwealth/client/scripts/controllers/chain/cosmos/gov/**/*
             packages/commonwealth/test/util/cosmos-chain-testing/**/*
-            packages/common-common/src/cosmos-ts/**/*
+            libs/chains/src/cosmos-ts/**/*
 
       - name: Run following steps if any file(s) in the Cosmos folders change
         if: steps.changed-files-specific.outputs.all_changed_files
