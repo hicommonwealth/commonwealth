@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
@@ -12,6 +12,7 @@ type ProfileRedirectProps = {
 };
 
 const ProfileRedirect = (props: ProfileRedirectProps) => {
+  const [profileNotFound, setProfileNotFound] = useState<boolean>(false);
   const navigate = useCommonNavigate();
 
   const { address, scope } = props;
@@ -30,6 +31,8 @@ const ProfileRedirect = (props: ProfileRedirectProps) => {
   useEffect(() => {
     if (!isError && users && Array.isArray(users) && users[0]?.id) {
       navigate(`/profile/id/${users[0].id}`, {}, null);
+    } else {
+      setProfileNotFound(true);
     }
   }, [isError, users]);
 
@@ -39,6 +42,10 @@ const ProfileRedirect = (props: ProfileRedirectProps) => {
 
   if (isError) {
     return <PageNotFound message="There was an error loading this profile." />;
+  }
+
+  if (profileNotFound) {
+    return <PageNotFound message="Profile not found" />;
   }
 };
 
