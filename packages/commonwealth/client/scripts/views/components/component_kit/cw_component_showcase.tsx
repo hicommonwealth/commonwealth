@@ -2177,8 +2177,19 @@ export const ComponentShowcase = () => {
 
         <CWDrawer
           open={isDrawerOpen}
+          header="Lorem Ipsum"
           onClose={() => setIsDrawerOpen(false)}
-        ></CWDrawer>
+        >
+          <div>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis
+            porttitor vel erat nec eleifend. Nullam sit amet dui et eros luctus
+            facilisis et id eros. In a lacus in nisl facilisis euismod. In non
+            congue sapien. Donec quis lorem libero. Nunc malesuada nunc ac eros
+            sodales sodales. Nullam tempus justo ut consectetur lacinia.
+            Vestibulum non dui vel ante molestie gravida. Maecenas sed consequat
+            tellus, ac fermentum ex.
+          </div>
+        </CWDrawer>
       </div>
     </div>
   );

@@ -1,1 +1,35 @@
 @import '../../../../../../styles/shared.scss';
+
+.Drawer {
+  padding-bottom: 46px;
+
+  .drawer-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 16px 56px 12px 56px;
+
+    .Icon {
+      stroke: currentColor;
+    }
+  }
+
+  .content-container {
+    padding: 20px 56px;
+  }
+}
+
+@include extraSmall {
+  .Drawer {
+    padding-bottom: 0px;
+
+    .drawer-actions {
+      gap: 4px;
+      padding: 16px 16px 12px 16px;
+    }
+
+    .content-container {
+      padding: 0px 16px;
+    }
+  }
+}
