@@ -29,7 +29,7 @@ describe('Topic Tests', () => {
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result).to.not.be.null;
-      expect(res.body.result.length).to.be.equal(1);
+      expect(res.body.result.length).to.be.equal(2);
     });
   });
 });
