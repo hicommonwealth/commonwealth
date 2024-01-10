@@ -56,7 +56,7 @@ export const getNamespaceBalance = async (
   chain: validChains,
   address: string,
   model: DB,
-) => {
+): Promise<string> => {
   const factoryData = factoryContracts[chain];
   const node = await model.ChainNode.findOne({
     where: {
