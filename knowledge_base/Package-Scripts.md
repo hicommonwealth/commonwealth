@@ -65,6 +65,7 @@ If you add a script to the `package.json` file, please add documentation for it 
   - [unit-test:watch](#unit-testwatch)
 - [TypeScript](#typescript)
   - [check-types](#check-types)
+  - [sanity](#sanity)
 - [Webpack & TSNode](#webpack--tsnode)
   - [bundle-report](#bundle-report)
   - [listen](#listen)
@@ -472,6 +473,12 @@ Contributor: Ryan Bennett
 Definition: `tsc --noEmit`
 
 Description: Runs a compilation of TypeScript files based on tsconfig.json; does not emit files.
+
+### sanity
+
+Definition: `chmod u+x scripts/sanity.sh && ./scripts/sanity.sh`
+
+Description: Sanity scripts developers should run locally before pushing code
 
 ## Webpack && TSNode
 
