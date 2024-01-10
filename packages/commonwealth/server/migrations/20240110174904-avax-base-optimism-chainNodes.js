@@ -28,7 +28,7 @@ module.exports = {
       name: 'Avalanche',
     };
 
-    queryInterface.bulkInsert('ChainNodes', [
+    await queryInterface.bulkInsert('ChainNodes', [
       baseChainNode,
       optimismChainNode,
       avaxChainNode,
