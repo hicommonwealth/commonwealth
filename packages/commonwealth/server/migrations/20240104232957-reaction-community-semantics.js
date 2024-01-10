@@ -14,13 +14,13 @@ module.exports = {
       );
       await queryInterface.sequelize.query(
         `
-        ALTER TABLE "Reactions" RENAME CONSTRAINT "OffchainReactions_comment_id_fkey" TO "reactions_comment_id_fkey";
+        ALTER TABLE "Reactions" RENAME CONSTRAINT "OffchainReactions_comment_id_fkey" TO "Reactions_comment_id_fkey";
       `,
         { transaction },
       );
       await queryInterface.sequelize.query(
         `
-        ALTER TABLE "Reactions" RENAME CONSTRAINT "OffchainReactions_thread_id_fkey" TO "reactions_thread_id_fkey";
+        ALTER TABLE "Reactions" RENAME CONSTRAINT "OffchainReactions_thread_id_fkey" TO "Reactions_thread_id_fkey";
       `,
         { transaction },
       );
@@ -70,13 +70,13 @@ module.exports = {
       );
       await queryInterface.sequelize.query(
         `
-        ALTER TABLE "Reactions" RENAME CONSTRAINT "reactions_comment_id_fkey" TO "OffchainReactions_comment_id_fkey";
+        ALTER TABLE "Reactions" RENAME CONSTRAINT "Reactions_comment_id_fkey" TO "OffchainReactions_comment_id_fkey";
       `,
         { transaction },
       );
       await queryInterface.sequelize.query(
         `
-        ALTER TABLE "Reactions" RENAME CONSTRAINT "reactions_thread_id_fkey" TO "OffchainReactions_thread_id_fkey";
+        ALTER TABLE "Reactions" RENAME CONSTRAINT "Reactions_thread_id_fkey" TO "OffchainReactions_thread_id_fkey";
       `,
         { transaction },
       );
