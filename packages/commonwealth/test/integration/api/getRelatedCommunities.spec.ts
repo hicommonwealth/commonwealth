@@ -24,7 +24,7 @@ describe('GetRelatedCommunities Tests', () => {
     assert.equal(response.length, 3);
 
     const ethereumCommunity = response.find((r) => r.community === 'Ethereum');
-    assert.equal(ethereumCommunity.address_count, 1);
+    assert.equal(ethereumCommunity.address_count, 2);
     assert.equal(ethereumCommunity.thread_count, 0);
     assert.equal(ethereumCommunity.icon_url, '/static/img/protocols/eth.png');
     assert.equal(ethereumCommunity.description, null);

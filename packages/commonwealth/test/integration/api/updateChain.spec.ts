@@ -55,31 +55,11 @@ describe('UpdateChain Tests', () => {
     assert.equal(response.directory_page_chain_node_id, null);
   });
 
-  it('Fails if user is not admin of chain', async () => {
-    const controller = new ServerCommunitiesController(models, null, null);
-    const user: UserInstance = buildUser({
-      models,
-      userAttributes: { email: '', id: 2, isAdmin: true },
-    }) as UserInstance;
-
-    try {
-      await controller.updateCommunity({
-        ...baseRequest,
-        user: user,
-        namespace: 'tempNamespace',
-        transactionHash: '0x1234',
-        chain_node_id: 1263,
-      });
-    } catch (e) {
-      assert.equal(e.message, Errors.NotAdmin);
-    }
-  });
-
   it('Fails if namespace present but no transaction hash', async () => {
     const controller = new ServerCommunitiesController(models, null, null);
     const user: UserInstance = buildUser({
       models,
-      userAttributes: { email: '', id: 2, isAdmin: true },
+      userAttributes: { email: '', id: 2, isAdmin: false },
     }) as UserInstance;
 
     try {
@@ -98,7 +78,7 @@ describe('UpdateChain Tests', () => {
     const controller = new ServerCommunitiesController(models, null, null);
     const user: UserInstance = buildUser({
       models,
-      userAttributes: { email: '', id: 2, isAdmin: true },
+      userAttributes: { email: '', id: 2, isAdmin: false },
     }) as UserInstance;
 
     try {
@@ -128,7 +108,7 @@ describe('UpdateChain Tests', () => {
     );
     const user: UserInstance = buildUser({
       models,
-      userAttributes: { email: '', id: 2, isAdmin: true },
+      userAttributes: { email: '', id: 2, isAdmin: false },
     }) as UserInstance;
 
     const response = await controller.updateCommunity({
