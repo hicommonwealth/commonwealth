@@ -218,7 +218,13 @@ export async function __updateThread(
       toUpdate,
     );
 
-    await setThreadTopic(permissions, topicId, this.models, toUpdate);
+    await setThreadTopic(
+      permissions,
+      community,
+      topicId,
+      this.models,
+      toUpdate,
+    );
 
     await thread.update(
       {
@@ -609,6 +615,7 @@ async function setThreadStage(
  */
 async function setThreadTopic(
   permissions: UpdateThreadPermissions,
+  community: CommunityInstance,
   topicId: number,
   models: DB,
   toUpdate: Partial<ThreadAttributes>,
@@ -619,7 +626,13 @@ async function setThreadTopic(
     isAdmin: true,
     isSuperAdmin: true,
   });
-  const topic = await models.Topic.findByPk(topicId);
+  const topic = await models.Topic.findOne({
+    where: {
+      id: topicId,
+      community_id: community.id,
+    },
+  });
+
   if (!topic) {
     throw new AppError(Errors.InvalidTopic);
   }
