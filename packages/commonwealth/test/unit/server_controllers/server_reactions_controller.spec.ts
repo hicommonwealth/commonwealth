@@ -11,7 +11,7 @@ describe('ServerReactionsController', () => {
         Reaction: {
           findOne: sandbox.stub().resolves({
             id: 777,
-            chain: 'ethereum',
+            community_id: 'ethereum',
             Address: {
               address: '0x123',
             },
@@ -29,7 +29,7 @@ describe('ServerReactionsController', () => {
       };
       const serverReactionsController = new ServerReactionsController(
         db as any,
-        banCache as any
+        banCache as any,
       );
       await serverReactionsController.deleteReaction({
         user: user as any,
@@ -45,7 +45,7 @@ describe('ServerReactionsController', () => {
             ...(address as any),
             address: '0xbanned',
           },
-        })
+        }),
       ).to.be.rejectedWith('Ban error: banned');
     });
 
@@ -68,14 +68,14 @@ describe('ServerReactionsController', () => {
       };
       const serverReactionsController = new ServerReactionsController(
         db as any,
-        banCache as any
+        banCache as any,
       );
       expect(
         serverReactionsController.deleteReaction({
           user: user as any,
           reactionId: 888,
           address: address as any,
-        })
+        }),
       ).to.be.rejectedWith(`Reaction not found: 888`);
     });
 
@@ -85,7 +85,7 @@ describe('ServerReactionsController', () => {
         Reaction: {
           findOne: sandbox.stub().resolves({
             id: 999,
-            chain: 'ethereum',
+            community_id: 'ethereum',
             Address: {
               address: '0x123',
             },
@@ -105,14 +105,14 @@ describe('ServerReactionsController', () => {
       };
       const serverReactionsController = new ServerReactionsController(
         db as any,
-        banCache as any
+        banCache as any,
       );
       expect(
         serverReactionsController.deleteReaction({
           user: user as any,
           reactionId: 999,
           address: address as any,
-        })
+        }),
       ).to.be.rejectedWith('Ban error: big ban err');
     });
   });

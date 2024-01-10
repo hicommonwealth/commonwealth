@@ -3,6 +3,7 @@
   "compilerOptions": {
     "jsx": "react",
     "skipLibCheck": true,
+    "sourceMap": true,
     "rootDir": ".",
     "outDir": "build",
     "baseUrl": ".",
