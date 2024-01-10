@@ -44,7 +44,6 @@ module.exports = merge(common, {
         include: [
           path.resolve(__dirname, '../client'),
           path.resolve(__dirname, '../shared'),
-          path.resolve(__dirname, '../../chain-events'),
         ],
         exclude: /\/node_modules\//,
         use: {
