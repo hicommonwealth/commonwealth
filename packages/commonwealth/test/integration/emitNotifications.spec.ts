@@ -25,11 +25,8 @@ describe('emitNotifications tests', () => {
   // Therefore, a valid chain MUST be included alongside
   // communityId, unlike in non-test thread creation
   let thread, comment;
-  //reaction;
   const title = 'test title';
-  // const body = 'test body';
   const commentBody = 'test';
-  // const topicName = 'test topic';
   const kind = 'discussion';
 
   let userJWT;

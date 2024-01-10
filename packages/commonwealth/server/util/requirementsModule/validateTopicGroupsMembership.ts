@@ -38,6 +38,9 @@ export async function validateTopicGroupsMembership(
       id: topicId,
     },
   });
+  if (!topic) {
+    return { isValid: false, message: 'Topic not found' };
+  }
   const groups = await models.Group.findAll({
     where: {
       id: { [Op.in]: topic.group_ids },

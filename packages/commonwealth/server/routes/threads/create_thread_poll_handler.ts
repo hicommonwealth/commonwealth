@@ -39,7 +39,7 @@ export const createThreadPollHandler = async (
   const [poll, analyticsOptions] = await controllers.threads.createThreadPoll({
     user: req.user,
     community,
-    threadId: parseInt(threadId, 10),
+    threadId: parseInt(threadId, 10) || undefined,
     prompt,
     options,
     customDuration:
