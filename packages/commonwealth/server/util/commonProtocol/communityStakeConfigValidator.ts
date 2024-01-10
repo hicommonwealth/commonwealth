@@ -1,7 +1,7 @@
+import { AppError } from '@hicommonwealth/adapters';
 import { DB } from 'server/models';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
-import { AppError } from '../../../../common-common/src/errors';
 import { factoryContracts, validChains } from './chainConfig';
 import { getNamespace } from './contractHelpers';
 

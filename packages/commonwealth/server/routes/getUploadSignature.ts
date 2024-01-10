@@ -1,5 +1,5 @@
+import { AppError } from '@hicommonwealth/adapters';
 import AWS from 'aws-sdk';
-import { AppError } from 'common-common/src/errors';
 
 import type { NextFunction, Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
@@ -19,7 +19,7 @@ const getUploadSignature = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.user) {
     return next(new AppError(Errors.NotLoggedIn));
@@ -32,7 +32,7 @@ const getUploadSignature = async (
   const contentType = req.body.mimetype;
   if (
     ['image/gif', 'image/png', 'image/jpeg', 'image/webp'].indexOf(
-      contentType
+      contentType,
     ) === -1
   ) {
     return next(new AppError(Errors.ImageType));

@@ -1,8 +1,8 @@
-import { factory, formatFilename } from 'common-common/src/logging';
-import { processChainNode, scheduleNodeProcessing } from './nodeProcessing';
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import { rollbar } from '../../util/rollbar';
+import { processChainNode, scheduleNodeProcessing } from './nodeProcessing';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 /**
  * Starts an infinite loop that periodically fetches and parses blocks from
@@ -13,24 +13,24 @@ const log = factory.getLogger(formatFilename(__filename));
  * is 120_000 ms (120 seconds) to avoid issues with public EVM nodes rate limiting requests.
  */
 export async function startEvmPolling(
-  interval: number
+  interval: number,
 ): Promise<NodeJS.Timeout> {
   log.info(`Starting EVM poller`);
   if (interval > 500_000) {
     throw new Error(
-      `Interval for EVM polling must be at least 500_000 ms (500 seconds)`
+      `Interval for EVM polling must be at least 500_000 ms (500 seconds)`,
     );
   }
 
   log.info(
-    `All chains will be polled for events every ${interval / 1000} seconds`
+    `All chains will be polled for events every ${interval / 1000} seconds`,
   );
   await scheduleNodeProcessing(interval, processChainNode);
   return setInterval(
     scheduleNodeProcessing,
     interval,
     interval,
-    processChainNode
+    processChainNode,
   );
 }
 

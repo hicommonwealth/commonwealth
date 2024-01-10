@@ -1,5 +1,5 @@
+import { ServerError } from '@hicommonwealth/adapters';
 import type { ChainCategoryType } from '@hicommonwealth/core';
-import { ServerError } from 'common-common/src/errors';
 import jwt from 'jsonwebtoken';
 import { Op, QueryTypes } from 'sequelize';
 import type { AddressInstance } from 'server/models/address';

@@ -1,4 +1,4 @@
-import { factory, formatFilename } from 'common-common/src/logging';
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import { toBN } from 'web3-utils';
 import { ChainNodeInstance } from '../../../models/chain_node';
 import { rollbar } from '../../rollbar';
@@ -10,7 +10,7 @@ import {
   mapNodeToBalanceFetcherContract,
 } from '../util';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 export type GetEthBalancesOptions = {
   chainNode: ChainNodeInstance;

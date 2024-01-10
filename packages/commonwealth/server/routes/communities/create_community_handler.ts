@@ -1,5 +1,5 @@
+import { AppError } from '@hicommonwealth/adapters';
 import { Community } from '@hicommonwealth/core';
-import { AppError } from 'common-common/src/errors';
 import { MixpanelCommunityCreationEvent } from '../../../shared/analytics/types';
 import {
   CreateCommunityOptions,

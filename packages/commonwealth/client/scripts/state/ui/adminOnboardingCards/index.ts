@@ -1,0 +1,2 @@
+import useAdminOnboardingSliderMutationStore from './adminOnboardingCards';
+export default useAdminOnboardingSliderMutationStore;

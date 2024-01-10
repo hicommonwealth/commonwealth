@@ -1,8 +1,8 @@
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import fetch from 'node-fetch';
 import type { DB } from '../models';
-import { factory, formatFilename } from 'common-common/src/logging';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 async function createSnapshotProposal(res: any, models: DB) {
   try {
