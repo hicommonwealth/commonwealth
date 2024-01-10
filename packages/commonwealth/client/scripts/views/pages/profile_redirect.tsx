@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
-
-import $ from 'jquery';
+import React from 'react';
 
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
+import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
 import { PageNotFound } from './404';
 import { PageLoading } from './loading';
 
@@ -13,43 +12,31 @@ type ProfileRedirectProps = {
 };
 
 const ProfileRedirect = (props: ProfileRedirectProps) => {
-  const [profileId, setProfileId] = useState<number>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<boolean>(false);
   const navigate = useCommonNavigate();
 
-  const getProfileId = async (addresses: string[], community: string[]) => {
-    setLoading(true);
-    try {
-      const res = await $.post(`${app.serverUrl()}/getAddressProfile`, {
-        addresses,
-        chains: community,
-      });
-      if (res.status === 'Success' && res.result) {
-        setProfileId(res.result[0].profileId);
-      }
-    } catch (err) {
-      setError(true);
-    }
-    setLoading(false);
-  };
+  const { address, scope } = props;
+  const communityId = scope || app.activeChainId();
+  const {
+    data: users,
+    isError,
+    isLoading,
+  } = useFetchProfilesByAddressesQuery({
+    profileChainIds: [communityId],
+    profileAddresses: [address || app.user.activeAccount?.address],
+    currentChainId: communityId,
+    apiCallEnabled: !!address && !!communityId,
+  });
 
-  if (loading) {
+  if (isLoading) {
     return <PageLoading />;
   }
 
-  if (error) {
+  if (isError) {
     return <PageNotFound message="There was an error loading this profile." />;
   }
 
-  let { address, scope } = props;
-  if (!address) address = app.user.activeAccount?.address;
-  if (!scope) scope = app.activeChainId();
-
-  if (address && scope && !profileId) getProfileId([address], [scope]);
-
-  if (profileId) {
-    navigate(`/profile/id/${profileId}`, {}, null);
+  if (!isError && users && users[0].id) {
+    navigate(`/profile/id/${users[0].id}`, {}, null);
   }
 };
 
