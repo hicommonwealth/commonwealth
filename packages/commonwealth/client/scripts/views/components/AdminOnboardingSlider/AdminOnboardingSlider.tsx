@@ -29,7 +29,8 @@ export const AdminOnboardingSlider = () => {
 
   const navigate = useCommonNavigate();
   const {
-    shouldHideAdminOnboardingCardsForCommunities,
+    shouldHideAdminCardsTemporary,
+    shouldHideAdminCardsPermanently,
     setShouldHideAdminOnboardingCardsForCommunity,
   } = useAdminOnboardingSliderMutationStore();
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -68,7 +69,10 @@ export const AdminOnboardingSlider = () => {
       hasAnyIntegration) ||
     !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin()) ||
     !featureFlags.newAdminOnboardingEnabled ||
-    shouldHideAdminOnboardingCardsForCommunities.includes(app.activeChainId())
+    [
+      ...shouldHideAdminCardsTemporary,
+      ...shouldHideAdminCardsPermanently,
+    ].includes(app.activeChainId())
   ) {
     return;
   }
