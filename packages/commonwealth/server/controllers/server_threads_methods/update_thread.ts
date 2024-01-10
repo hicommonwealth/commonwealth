@@ -620,23 +620,25 @@ async function setThreadTopic(
   models: DB,
   toUpdate: Partial<ThreadAttributes>,
 ) {
-  validatePermissions(permissions, {
-    isThreadOwner: true,
-    isMod: true,
-    isAdmin: true,
-    isSuperAdmin: true,
-  });
-  const topic = await models.Topic.findOne({
-    where: {
-      id: topicId,
-      community_id: community.id,
-    },
-  });
+  if (typeof topicId !== 'undefined') {
+    validatePermissions(permissions, {
+      isThreadOwner: true,
+      isMod: true,
+      isAdmin: true,
+      isSuperAdmin: true,
+    });
+    const topic = await models.Topic.findOne({
+      where: {
+        id: topicId,
+        community_id: community.id,
+      },
+    });
 
-  if (!topic) {
-    throw new AppError(Errors.InvalidTopic);
+    if (!topic) {
+      throw new AppError(Errors.InvalidTopic);
+    }
+    toUpdate.topic_id = topic.id;
   }
-  toUpdate.topic_id = topic.id;
 }
 
 /**
