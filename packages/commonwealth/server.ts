@@ -35,7 +35,6 @@ import {
   SERVER_URL,
   SESSION_SECRET,
   TBC_BALANCE_TTL_SECONDS,
-  VULTR_IP,
 } from './server/config';
 import models from './server/database';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
@@ -251,8 +250,8 @@ async function main() {
     // TODO: this requires an immediate response if in production
   }
 
-  const redisCache = new RedisCache();
-  await redisCache.init(REDIS_URL, VULTR_IP);
+  const redisCache = new RedisCache(rollbar);
+  await redisCache.init(REDIS_URL);
 
   const tokenBalanceCache = new TokenBalanceCache(
     models,
