@@ -11,10 +11,13 @@ describe('ServerCommentsController', () => {
     it('should create a comment reaction (new reaction)', async () => {
       const sandbox = Sinon.createSandbox();
       const db = {
+        Address: {
+          findAll: async () => [{}], // used in findOneRole
+        },
         Reaction: {
           findOne: sandbox.stub().resolves({
             id: 2,
-            chain: 'ethereum',
+            community_id: 'ethereum',
             Address: {
               address: '0x123',
               community_id: 'ethereum',
@@ -25,7 +28,7 @@ describe('ServerCommentsController', () => {
           findOrCreate: sandbox.stub().resolves([
             {
               id: 2,
-              chain: 'ethereum',
+              community_id: 'ethereum',
               Address: {
                 address: '0x123',
                 community_id: 'ethereum',
@@ -526,7 +529,7 @@ describe('ServerCommentsController', () => {
         thread_id: 2,
         text: 'Wasup',
         version_history: ['{"body":""}'],
-        chain: 'ethereum',
+        community_id: 'ethereum',
         Address: {
           address: '0x123',
           community_id: 'ethereum',
@@ -625,7 +628,7 @@ describe('ServerCommentsController', () => {
         thread_id: 2,
         text: 'Wasup',
         version_history: ['{"body":""}'],
-        chain: 'ethereum',
+        community_id: 'ethereum',
         Address: {
           address: '0x123',
           community_id: 'ethereum',
@@ -690,7 +693,7 @@ describe('ServerCommentsController', () => {
         thread_id: 2,
         text: 'Wasup',
         version_history: ['{"body":""}'],
-        chain: 'ethereum',
+        community_id: 'ethereum',
         Address: {
           address: '0x123',
           community_id: 'ethereum',

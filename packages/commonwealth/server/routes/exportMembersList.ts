@@ -1,4 +1,4 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import type { NextFunction } from 'express';
 import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
@@ -57,9 +57,9 @@ const exportMembersList = async (
       LEFT JOIN 
           "Threads" "t" ON "a"."id" = "t"."address_id" AND "t"."community_id" = :chainId
       LEFT JOIN 
-          "Comments" "c" ON "a"."id" = "c"."address_id" AND "c"."chain" = :chainId
+          "Comments" "c" ON "a"."id" = "c"."address_id" AND "c"."community_id" = :chainId
       LEFT JOIN 
-          "Reactions" "r" ON "a"."id" = "r"."address_id" AND "r"."chain" = :chainId
+          "Reactions" "r" ON "a"."id" = "r"."address_id" AND "r"."community_id" = :chainId
       WHERE 
           "a"."community_id" = :chainId
       GROUP BY 

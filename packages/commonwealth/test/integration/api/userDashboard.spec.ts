@@ -106,9 +106,9 @@ describe('User Dashboard API', () => {
       body,
       readOnly: false,
       kind,
-      topicId: topicId2,
       session: userSession2.session,
       sign: userSession2.sign,
+      topicId: topicId2,
     };
     threadOne = await modelUtils.createThread(threadOneArgs);
     expect(threadOne.status).to.equal('Success');
@@ -122,9 +122,9 @@ describe('User Dashboard API', () => {
       body,
       readOnly: false,
       kind,
-      topicId,
       session: userSession2.session,
       sign: userSession2.sign,
+      topicId,
     };
     //
     // // create a thread in both 'ethereum' and 'alex' communities
@@ -219,9 +219,9 @@ describe('User Dashboard API', () => {
           body,
           readOnly: false,
           kind,
-          topicId,
           session: userSession2.session,
           sign: userSession2.sign,
+          topicId,
         };
         const res = await modelUtils.createThread(threadArgs);
         expect(res.status).to.equal('Success');

@@ -78,6 +78,7 @@ export const NewThreadForm = () => {
   const { data: memberships = [] } = useRefreshMembershipQuery({
     chainId: app.activeChainId(),
     address: app?.user?.activeAccount?.address,
+    apiEnabled: !!app?.user?.activeAccount?.address,
   });
 
   const {

@@ -25,11 +25,8 @@ describe('emitNotifications tests', () => {
   // Therefore, a valid chain MUST be included alongside
   // communityId, unlike in non-test thread creation
   let thread, comment;
-  //reaction;
   const title = 'test title';
-  // const body = 'test body';
   const commentBody = 'test';
-  // const topicName = 'test topic';
   const kind = 'discussion';
 
   let userJWT;
@@ -99,12 +96,12 @@ describe('emitNotifications tests', () => {
       thread_id: thread.id,
       address_id: userAddressId2,
       text: commentBody,
-      chain,
+      community_id: chain,
     });
 
     //reaction = await models.Reaction.create({
     await models.Reaction.create({
-      chain,
+      community_id: chain,
       thread_id: thread.id,
       address_id: userAddressId,
       reaction: 'like',

@@ -1,6 +1,6 @@
+import { ServerError } from '@hicommonwealth/adapters';
 import moment from 'moment';
 import { QueryTypes } from 'sequelize';
-import { ServerError } from '../../../../common-common/src/errors';
 import { CommunityInstance } from '../../models/community';
 import { ThreadAttributes } from '../../models/thread';
 import { getLastEdited } from '../../util/getLastEdited';
@@ -127,7 +127,7 @@ export async function __getBulkThreads(
             }
             LEFT JOIN "Addresses" ad
             ON r.address_id = ad.id
-            where r.chain = $community_id
+            where r.community_id = $community_id
             GROUP BY thread_id
         ) reactions
         ON t.id = reactions.thread_id

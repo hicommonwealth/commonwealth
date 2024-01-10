@@ -3,6 +3,7 @@ import { GroupAttributes } from 'server/models/group';
 import {
   GetBalancesOptions,
   GetCosmosBalancesOptions,
+  GetCw721BalanceOptions,
   GetErc1155BalanceOptions,
   GetErcBalanceOptions,
   GetEthNativeBalanceOptions,
@@ -10,6 +11,7 @@ import {
 import {
   BalanceSourceType,
   ContractSource,
+  CosmosContractSource,
   CosmosSource,
   NativeSource,
 } from './requirementsTypes';
@@ -118,6 +120,32 @@ export function makeGetBalancesOptions(
               allOptions.push({
                 balanceSourceType: BalanceSourceType.CosmosNative,
                 sourceOptions: {
+                  cosmosChainId: castedSource.cosmos_chain_id,
+                },
+                addresses: addressStrings,
+              });
+            }
+            break;
+          }
+          // CosmosContractSource
+          case BalanceSourceType.CW721: {
+            const castedSource = requirement.data
+              .source as CosmosContractSource;
+            const existingOptions = allOptions.find((opt) => {
+              const castedOpt = opt as GetCw721BalanceOptions;
+              return (
+                castedOpt.balanceSourceType === castedSource.source_type &&
+                castedOpt.sourceOptions.cosmosChainId ===
+                  castedSource.cosmos_chain_id &&
+                castedOpt.sourceOptions.contractAddress ===
+                  castedSource.contract_address
+              );
+            });
+            if (!existingOptions) {
+              allOptions.push({
+                balanceSourceType: BalanceSourceType.CW721,
+                sourceOptions: {
+                  contractAddress: castedSource.contract_address,
                   cosmosChainId: castedSource.cosmos_chain_id,
                 },
                 addresses: addressStrings,

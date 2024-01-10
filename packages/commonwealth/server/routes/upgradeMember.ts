@@ -1,4 +1,4 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import type { NextFunction, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { Op } from 'sequelize';
@@ -25,7 +25,7 @@ const upgradeMember = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const errors = validationResult(req).array();
   if (errors.length !== 0) {

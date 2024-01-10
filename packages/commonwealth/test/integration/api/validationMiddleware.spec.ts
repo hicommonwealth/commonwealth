@@ -1,8 +1,9 @@
 /* eslint-disable global-require */
 /* eslint-disable no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import 'chai/register-should';
+
 import jwt from 'jsonwebtoken';
 import MockExpressRequest from 'mock-express-request';
 import { resetDatabase } from '../../../server-test';

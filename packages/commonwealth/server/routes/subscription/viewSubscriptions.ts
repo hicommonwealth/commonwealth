@@ -1,4 +1,4 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import type { NextFunction, Request, Response } from 'express';
 
 export const Errors = {
@@ -9,7 +9,7 @@ export default async (
   models,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.user) {
     return next(new AppError(Errors.NotLoggedIn));

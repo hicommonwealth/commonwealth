@@ -1,9 +1,9 @@
-import type { ICompoundProposalResponse } from 'adapters/chain/compound/types';
-import axios from 'axios';
 import type {
   GovernorCompatibilityBravo,
   GovernorCountingSimple,
-} from 'common-common/src/eth/types';
+} from '@hicommonwealth/chains';
+import type { ICompoundProposalResponse } from 'adapters/chain/compound/types';
+import axios from 'axios';
 import Compound from 'controllers/chain/ethereum/compound/adapter';
 import { deserializeBigNumbers } from 'controllers/chain/ethereum/util';
 import type { BigNumberish, ContractTransaction } from 'ethers';

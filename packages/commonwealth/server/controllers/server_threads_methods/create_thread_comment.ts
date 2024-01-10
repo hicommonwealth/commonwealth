@@ -1,11 +1,6 @@
-import {
-  ChainNetwork,
-  ChainType,
-  NotificationCategories,
-  ProposalType,
-} from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/adapters';
+import { NotificationCategories, ProposalType } from '@hicommonwealth/core';
 import moment from 'moment';
-import { AppError } from '../../../../common-common/src/errors';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import { AddressInstance } from '../../models/address';
@@ -103,7 +98,7 @@ export async function __createThreadComment(
     parentComment = await this.models.Comment.findOne({
       where: {
         id: parentId,
-        chain: community.id,
+        community_id: community.id,
       },
       include: [this.models.Address],
     });
@@ -122,30 +117,24 @@ export async function __createThreadComment(
   }
 
   // check balance (bypass for admin)
-  if (
-    community &&
-    (community.type === ChainType.Token ||
-      community.network === ChainNetwork.Ethereum)
-  ) {
-    const isAdmin = await validateOwner({
-      models: this.models,
-      user,
-      communityId: community.id,
-      entity: thread,
-      allowAdmin: true,
-      allowGodMode: true,
-    });
-    if (!isAdmin) {
-      const { isValid, message } = await validateTopicGroupsMembership(
-        this.models,
-        this.tokenBalanceCache,
-        thread.topic_id,
-        community,
-        address,
-      );
-      if (!isValid) {
-        throw new AppError(`${Errors.FailedCreateComment}: ${message}`);
-      }
+  const isAdmin = await validateOwner({
+    models: this.models,
+    user,
+    communityId: community.id,
+    entity: thread,
+    allowAdmin: true,
+    allowGodMode: true,
+  });
+  if (!isAdmin) {
+    const { isValid, message } = await validateTopicGroupsMembership(
+      this.models,
+      this.tokenBalanceCache,
+      thread.topic_id,
+      community,
+      address,
+    );
+    if (!isValid) {
+      throw new AppError(`${Errors.FailedCreateComment}: ${message}`);
     }
   }
 
@@ -164,18 +153,19 @@ export async function __createThreadComment(
     body: decodeURIComponent(text),
   };
   const version_history: string[] = [JSON.stringify(firstVersion)];
-  const commentContent = {
+  const commentContent: CommentAttributes = {
     thread_id: `${threadId}`,
     text,
     plaintext,
     version_history,
     address_id: address.id,
-    chain: community.id,
+    community_id: community.id,
     parent_id: null,
     canvas_action: canvasAction,
     canvas_session: canvasSession,
     canvas_hash: canvasHash,
     discord_meta: discordMeta,
+    reaction_count: 0,
   };
   if (parentId) {
     Object.assign(commentContent, { parent_id: parentId });
@@ -196,7 +186,7 @@ export async function __createThreadComment(
       {
         subscriber_id: user.id,
         category_id: NotificationCategories.NewReaction,
-        chain_id: finalComment.chain || null,
+        chain_id: finalComment.community_id || null,
         comment_id: finalComment.id,
         is_active: true,
       },
@@ -206,7 +196,7 @@ export async function __createThreadComment(
       {
         subscriber_id: user.id,
         category_id: NotificationCategories.NewComment,
-        chain_id: finalComment.chain || null,
+        chain_id: finalComment.community_id || null,
         comment_id: finalComment.id,
         is_active: true,
       },
@@ -267,7 +257,7 @@ export async function __createThreadComment(
         root_type: ProposalType.Thread,
         comment_id: +finalComment.id,
         comment_text: finalComment.text,
-        chain_id: finalComment.chain,
+        chain_id: finalComment.community_id,
         author_address: finalComment.Address.address,
         author_chain: finalComment.Address.community_id,
       },
@@ -289,7 +279,7 @@ export async function __createThreadComment(
           comment_text: finalComment.text,
           parent_comment_id: +parentId,
           parent_comment_text: parentComment.text,
-          chain_id: finalComment.chain,
+          chain_id: finalComment.community_id,
           author_address: finalComment.Address.address,
           author_chain: finalComment.Address.community_id,
         },
@@ -316,7 +306,7 @@ export async function __createThreadComment(
                 root_type: ProposalType.Thread,
                 comment_id: +finalComment.id,
                 comment_text: finalComment.text,
-                chain_id: finalComment.chain,
+                chain_id: finalComment.community_id,
                 author_address: finalComment.Address.address,
                 author_chain: finalComment.Address.community_id,
               },

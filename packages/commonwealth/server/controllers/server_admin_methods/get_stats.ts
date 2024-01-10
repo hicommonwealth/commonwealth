@@ -1,5 +1,5 @@
+import { AppError } from '@hicommonwealth/adapters';
 import { Op, QueryTypes, WhereOptions } from 'sequelize';
-import { AppError } from '../../../../common-common/src/errors';
 import { CommunityAttributes } from '../../models/community';
 import { UserInstance } from '../../models/user';
 import { ServerAdminController } from '../server_admin_controller';
@@ -83,13 +83,13 @@ export async function __getStats(
       { type: QueryTypes.SELECT },
     ),
     this.models.Comment.count({
-      where: whereChain,
+      where: whereCommunityId,
     }),
     this.models.Thread.count({
       where: whereCommunityId,
     }),
     this.models.Reaction.count({
-      where: whereChain,
+      where: whereCommunityId,
     }),
     this.models.Vote.count({
       where: whereCommunityId,

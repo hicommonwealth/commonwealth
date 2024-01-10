@@ -1,18 +1,21 @@
+import {
+  StatsDController,
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/adapters';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
-import { StatsDController } from 'common-common/src/statsd';
 
-import { factory, formatFilename } from 'common-common/src/logging';
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 export type ReactionAttributes = {
   address_id: number;
   reaction: string;
   id?: number;
-  chain: string;
+  community_id: string;
   thread_id?: number;
   proposal_id?: number;
   comment_id?: number;
@@ -34,13 +37,13 @@ export type ReactionModelStatic = ModelStatic<ReactionInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): ReactionModelStatic => {
   const Reaction = <ReactionModelStatic>sequelize.define(
     'Reaction',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      chain: { type: dataTypes.STRING, allowNull: false },
+      community_id: { type: dataTypes.STRING, allowNull: false },
       thread_id: { type: dataTypes.INTEGER, allowNull: true },
       proposal_id: { type: dataTypes.STRING, allowNull: true },
       comment_id: { type: dataTypes.INTEGER, allowNull: true },
@@ -84,7 +87,8 @@ export default (
             }
           } catch (error) {
             log.error(
-              `incrementing thread reaction count afterCreate: thread_id ${thread_id} comment_id ${comment_id} ${error}`
+              `incrementing thread reaction count ` +
+                `afterCreate: thread_id ${thread_id} comment_id ${comment_id} ${error}`,
             );
             StatsDController.get().increment('cw.reaction-count-error', {
               thread_id: String(thread_id),
@@ -122,7 +126,8 @@ export default (
             }
           } catch (error) {
             log.error(
-              `incrementing thread reaction count afterDestroy: thread_id ${thread_id} comment_id ${comment_id} ${error}`
+              `incrementing thread reaction count afterDestroy: ` +
+                `thread_id ${thread_id} comment_id ${comment_id} ${error}`,
             );
             StatsDController.get().increment('cw.hook.reaction-count-error', {
               thread_id: String(thread_id),
@@ -135,12 +140,10 @@ export default (
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       indexes: [
-        { fields: ['id'] },
-        { fields: ['chain', 'thread_id', 'proposal_id', 'comment_id'] },
         { fields: ['address_id'] },
         {
           fields: [
-            'chain',
+            'community_id',
             'address_id',
             'thread_id',
             'proposal_id',
@@ -149,16 +152,15 @@ export default (
           ],
           unique: true,
         },
-        { fields: ['chain', 'thread_id'] },
-        { fields: ['chain', 'comment_id'] },
-        { fields: ['canvas_hash'] },
+        { fields: ['community_id', 'thread_id'] },
+        { fields: ['community_id', 'comment_id'] },
       ],
-    }
+    },
   );
 
   Reaction.associate = (models) => {
     models.Reaction.belongsTo(models.Community, {
-      foreignKey: 'chain',
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
     models.Reaction.belongsTo(models.Address, {

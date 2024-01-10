@@ -76,7 +76,7 @@ const getTextRows = (
             <User
               shouldHideAvatar
               userAddress={subscription.Comment.author}
-              userCommunityId={subscription.Comment.chain}
+              userCommunityId={subscription.Comment.communityId}
             />
             &apos;
           </CWText>

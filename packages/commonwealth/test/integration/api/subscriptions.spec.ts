@@ -3,7 +3,7 @@
 import { NotificationCategories } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import 'chai/register-should';
+
 import jwt from 'jsonwebtoken';
 import type NotificationSubscription from '../../../client/scripts/models/NotificationSubscription';
 import app, { resetDatabase } from '../../../server-test';

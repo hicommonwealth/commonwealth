@@ -1,7 +1,6 @@
-import { ActionArgument } from '@canvas-js/interfaces';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import 'chai/register-should';
+
 import jwt from 'jsonwebtoken';
 import * as modelUtils from 'test/util/modelUtils';
 import app, { resetDatabase } from '../../../server-test';
@@ -17,9 +16,9 @@ describe('Polls', () => {
   let userJWT: string;
   let userAddress: string;
 
+  let topicId;
   let threadId = 0;
   let pollId = 0;
-  let topicId: number;
 
   before(async () => {
     await resetDatabase();
@@ -51,7 +50,6 @@ describe('Polls', () => {
       body: 'body1',
       kind: 'discussion',
       stage: 'discussion',
-      topicName: 't1',
       topicId,
       session: {
         type: 'session',
@@ -66,15 +64,7 @@ describe('Polls', () => {
           block: '',
         },
       },
-      sign: function (_actionPayload: {
-        app: string;
-        chain: string;
-        from: string;
-        call: string;
-        callArgs: Record<string, ActionArgument>;
-        timestamp: number;
-        block: string;
-      }): string {
+      sign: function (): string {
         return '';
       },
     });

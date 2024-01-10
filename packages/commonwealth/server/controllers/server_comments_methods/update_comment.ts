@@ -1,8 +1,8 @@
 import moment from 'moment';
 import { Op } from 'sequelize';
 
+import { AppError } from '@hicommonwealth/adapters';
 import { NotificationCategories, ProposalType } from '@hicommonwealth/core';
-import { AppError } from '../../../../common-common/src/errors';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import { AddressInstance } from '../../models/address';
 import { CommentAttributes } from '../../models/comment';
@@ -128,7 +128,7 @@ export async function __updateComment(
         root_type: ProposalType.Thread,
         comment_id: +finalComment.id,
         comment_text: finalComment.text,
-        chain_id: finalComment.chain,
+        chain_id: finalComment.community_id,
         author_address: finalComment.Address.address,
         author_chain: finalComment.Address.community_id,
       },
@@ -191,7 +191,7 @@ export async function __updateComment(
             root_type: ProposalType.Thread,
             comment_id: +finalComment.id,
             comment_text: finalComment.text,
-            chain_id: finalComment.chain,
+            chain_id: finalComment.community_id,
             author_address: finalComment.Address.address,
             author_chain: finalComment.Address.community_id,
           },

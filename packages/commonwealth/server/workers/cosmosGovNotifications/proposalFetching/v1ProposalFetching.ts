@@ -1,16 +1,16 @@
-import { PageRequest } from 'common-common/src/cosmos-ts/src/codegen/cosmos/base/query/v1beta1/pagination';
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import {
+  GovV1Client,
+  PageRequest,
   ProposalSDKType,
   ProposalStatus,
-} from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
-import { LCDQueryClient as GovV1Client } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/query.lcd';
-import { numberToLong } from 'common-common/src/cosmos-ts/src/codegen/helpers';
-import { factory, formatFilename } from 'common-common/src/logging';
+} from '@hicommonwealth/chains';
+import { numberToLong } from '../../../../../../libs/chains/src/cosmos-ts/src/codegen/helpers';
 import { CommunityInstance } from '../../../models/community';
 import { getCosmosClient } from './getCosmosClient';
 import { numberToUint8ArrayBE, uint8ArrayToNumberBE } from './util';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 /**
  * Fetches the most recent (latest) proposal from a Cosmos chain that uses the v1 gov module. Depending on the

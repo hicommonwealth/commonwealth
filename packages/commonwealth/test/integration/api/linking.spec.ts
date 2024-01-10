@@ -1,7 +1,7 @@
 import { ActionPayload, Session } from '@canvas-js/interfaces';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import 'chai/register-should';
+
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from 'server/config';
 import { LinkSource, ThreadAttributes } from 'server/models/thread';

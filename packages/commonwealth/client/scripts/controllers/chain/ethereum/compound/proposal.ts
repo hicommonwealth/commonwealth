@@ -7,9 +7,9 @@ import type {
 import type { EthereumCoin } from 'adapters/chain/ethereum/types';
 import BN from 'bn.js';
 
+import type { GovernorCompatibilityBravo } from '@hicommonwealth/chains';
+import { GovernorMock__factory } from '@hicommonwealth/chains';
 import { ProposalType } from '@hicommonwealth/core';
-import type { GovernorCompatibilityBravo } from 'common-common/src/eth/types';
-import { GovernorMock__factory } from 'common-common/src/eth/types';
 import type { ContractTransaction } from 'ethers';
 import { BigNumber, utils } from 'ethers';
 

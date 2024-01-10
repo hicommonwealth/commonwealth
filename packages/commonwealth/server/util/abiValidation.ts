@@ -1,7 +1,7 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
+import { hasher } from 'node-object-hash';
 import type { AbiItem } from 'web3-utils';
 import { parseAbiItemsFromABI } from '../../shared/abi_utils';
-import { hasher } from 'node-object-hash';
 import { AbiType } from '../../shared/types';
 
 export const Errors = {

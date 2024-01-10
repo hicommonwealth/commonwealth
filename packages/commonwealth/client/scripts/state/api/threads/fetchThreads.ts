@@ -24,6 +24,7 @@ const queryTypeToRQMap = {
 interface CommonProps {
   queryType: typeof QueryTypes[keyof typeof QueryTypes];
   chainId: string;
+  apiEnabled?: boolean;
 }
 
 interface FetchBulkThreadsProps extends CommonProps {
@@ -186,6 +187,8 @@ const fetchActiveThreads = (props) => {
 const useFetchThreadsQuery = (
   props: FetchBulkThreadsProps | FetchActiveThreadsProps,
 ) => {
+  const { apiEnabled = true } = props; // destruct to assign default value
+
   // better to use this in case someone updates this props, we wont reflect those changes
   const [queryType] = useState(props.queryType);
 
@@ -204,6 +207,7 @@ const useFetchThreadsQuery = (
     })(),
     staleTime: THREADS_STALE_TIME,
     keepPreviousData: true,
+    enabled: apiEnabled,
   });
 
   if (isFetchBulkThreadsProps(props)) {

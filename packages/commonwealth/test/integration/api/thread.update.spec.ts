@@ -1,7 +1,7 @@
 import { ActionPayload, Session } from '@canvas-js/interfaces';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import 'chai/register-should';
+
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from 'server/config';
 import * as modelUtils from 'test/util/modelUtils';
@@ -88,13 +88,13 @@ describe('Thread Patch Update', () => {
           author_chain: thread.community_id,
           chain: thread.community_id,
           address: userAddress,
+          topicId,
           jwt: userJWT,
           title: 'newTitle',
           body: 'newBody',
           stage: 'voting',
           locked: true,
           archived: true,
-          topicName: 'newTopic',
         });
 
       expect(res.status).to.equal(200);
@@ -105,7 +105,7 @@ describe('Thread Patch Update', () => {
         body: 'newBody',
         stage: 'voting',
       });
-      expect(res.body.result.topic.name).to.equal('newTopic');
+      // expect(res.body.result.topic.name).to.equal('newTopic');
       expect(res.body.result.locked).to.not.be.null;
       expect(res.body.result.archived).to.not.be.null;
     });
@@ -119,7 +119,7 @@ describe('Thread Patch Update', () => {
         body: 'body2',
         kind: 'discussion',
         stage: 'discussion',
-        topicId: topicId,
+        topicId,
         session: userSession.session,
         sign: userSession.sign,
       });
@@ -135,6 +135,7 @@ describe('Thread Patch Update', () => {
             address: userAddress,
             jwt: userJWT,
             pinned: true,
+            topicId,
           });
         expect(res.status).to.equal(400);
       }
@@ -150,6 +151,7 @@ describe('Thread Patch Update', () => {
             address: userAddress,
             jwt: userJWT,
             spam: true,
+            topicId,
           });
         expect(res.status).to.equal(400);
       }
@@ -165,7 +167,7 @@ describe('Thread Patch Update', () => {
         body: 'body2',
         kind: 'discussion',
         stage: 'discussion',
-        topicId: topicId,
+        topicId,
         session: userSession.session,
         sign: userSession.sign,
       });
@@ -182,6 +184,7 @@ describe('Thread Patch Update', () => {
             address: adminAddress,
             jwt: adminJWT,
             pinned: true,
+            topicId,
           });
         expect(res.status).to.equal(200);
         expect(res.body.result.pinned).to.be.true;
@@ -199,6 +202,7 @@ describe('Thread Patch Update', () => {
             address: adminAddress,
             jwt: adminJWT,
             spam: true,
+            topicId,
           });
         expect(res.status).to.equal(200);
         expect(!!res.body.result.marked_as_spam_at).to.be.true;

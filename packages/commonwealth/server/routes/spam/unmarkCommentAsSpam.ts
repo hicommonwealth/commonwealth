@@ -1,7 +1,7 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import type { Request, Response } from 'express';
-import type { DB } from '../../models';
 import { Op } from 'sequelize';
+import type { DB } from '../../models';
 import { success } from '../../types';
 import { findAllRoles } from '../../util/roles';
 
@@ -38,11 +38,11 @@ export default async (models: DB, req: Request, res: Response) => {
     const roles = await findAllRoles(
       models,
       { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
-      comment.chain,
-      ['admin', 'moderator']
+      comment.community_id,
+      ['admin', 'moderator'],
     );
     const role = roles.find((r) => {
-      return r.chain_id === comment.chain;
+      return r.chain_id === comment.community_id;
     });
     if (!role) {
       throw new AppError(Errors.NotAdmin);

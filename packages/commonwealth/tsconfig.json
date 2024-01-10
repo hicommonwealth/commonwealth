@@ -2,21 +2,18 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "jsx": "react",
-    "outDir": "./build",
-    "baseUrl": ".",
     "skipLibCheck": true,
+    "sourceMap": true,
+    "rootDir": ".",
+    "outDir": "build",
+    "baseUrl": ".",
     "paths": {
       "@hicommonwealth/*": ["../../libs/*/src"],
-      "common-common": ["../../packages/common-common"],
-      "common-common/*": ["../../packages/common-common/*"],
-      "token-balance-cache": ["../../packages/token-balance-cache"],
-      "token-balance-cache/*": ["../../packages/token-balance-cache/*"],
       "*": ["./*", "shared/*", "client/scripts/*"]
     }
   },
   "include": [
     "./client",
-    "./client/scripts",
     "./shared",
     "./test",
     "./globals.d.ts",
@@ -24,5 +21,9 @@
     "./server.ts",
     "./scripts"
   ],
-  "exclude": ["./node_modules"]
+  "references": [
+    { "path": "../../libs/adapters" },
+    { "path": "../../libs/chains" },
+    { "path": "../../libs/core" }
+  ]
 }

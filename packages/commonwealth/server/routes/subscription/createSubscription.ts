@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { AppError } from '@hicommonwealth/adapters';
 import { NotificationCategories } from '@hicommonwealth/core';
-import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import { WhereOptions } from 'sequelize';
 import { SubscriptionAttributes } from 'server/models/subscription';
@@ -85,7 +85,10 @@ export default async (
           where: { id: req.body.comment_id },
         });
         if (!comment) return next(new AppError(Errors.NoComment));
-        obj = { comment_id: req.body.comment_id, chain_id: comment.chain };
+        obj = {
+          comment_id: req.body.comment_id,
+          chain_id: comment.community_id,
+        };
       }
       break;
     }

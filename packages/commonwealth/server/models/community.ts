@@ -180,10 +180,13 @@ export default (
       foreignKey: 'community_id',
     });
     models.Community.hasMany(models.Thread, { foreignKey: 'community_id' });
-    models.Community.hasMany(models.Comment, { foreignKey: 'chain' });
-    models.Community.hasMany(models.StarredCommunity, { foreignKey: 'chain' });
+    models.Community.hasMany(models.Comment, { foreignKey: 'community_id' });
+    models.Community.hasMany(models.StarredCommunity, {
+      foreignKey: 'community_id',
+    });
     models.Community.belongsToMany(models.Contract, {
       through: models.CommunityContract,
+      foreignKey: 'community_id',
     });
     models.Community.hasMany(models.Group, { foreignKey: 'community_id' });
   };

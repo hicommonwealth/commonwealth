@@ -1,14 +1,13 @@
+import { RedisCache, delay } from '@hicommonwealth/adapters';
 import { BalanceType } from '@hicommonwealth/core';
 import BN from 'bn.js';
 import { expect } from 'chai';
-import { RedisCache } from 'common-common/src/redisCache';
 import Web3 from 'web3';
 import { toWei } from 'web3-utils';
 import models from '../../../server/database';
 import { BalanceSourceType } from '../../../server/util/requirementsModule/requirementsTypes';
 import { TokenBalanceCache } from '../../../server/util/tokenBalanceCache/tokenBalanceCache';
 import { Balances } from '../../../server/util/tokenBalanceCache/types';
-import { delay } from '../../util/delayUtils';
 import { ChainTesting } from '../../util/evm-chain-testing/sdk/chainTesting';
 import { ERC1155 } from '../../util/evm-chain-testing/sdk/erc1155';
 import { ERC721 } from '../../util/evm-chain-testing/sdk/nft';

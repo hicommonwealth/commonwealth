@@ -1,6 +1,6 @@
+import type { QueryTallyResultResponseSDKType } from '@hicommonwealth/chains';
 import { ChainBase } from '@hicommonwealth/core';
 import { useQuery } from '@tanstack/react-query';
-import type { QueryTallyResultResponseSDKType } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/query';
 import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import type { QueryTallyResultResponse } from 'cosmjs-types/cosmos/gov/v1beta1/query';

@@ -1,5 +1,5 @@
+import { AppError } from '@hicommonwealth/adapters';
 import moment from 'moment';
-import { AppError } from '../../../../common-common/src/errors';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { CommunityInstance } from '../../models/community';
 import { PollAttributes } from '../../models/poll';

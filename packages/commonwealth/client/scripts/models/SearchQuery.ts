@@ -24,7 +24,6 @@ export enum SearchSort {
 
 export interface SearchParams {
   communityScope?: string;
-  chainScope?: string;
   isSearchPreview?: boolean;
   searchScope?: Array<SearchScope>;
   sort?: SearchSort;
@@ -33,7 +32,7 @@ export interface SearchParams {
 
 export default class SearchQuery implements SearchParams {
   public searchTerm: Lowercase<string>;
-  public chainScope?: string;
+  public communityScope?: string;
   public isSearchPreview?: boolean;
   public searchScope: Array<SearchScope>;
   public sort: SearchSort;
@@ -41,7 +40,7 @@ export default class SearchQuery implements SearchParams {
   constructor(searchTerm = '', params?: SearchParams) {
     this.searchTerm = <Lowercase<string>>searchTerm.toLowerCase();
     this.searchScope = params?.searchScope || [SearchScope.All];
-    this.chainScope = params?.chainScope;
+    this.communityScope = params?.communityScope;
     this.isSearchPreview = !!params?.isSearchPreview;
     this.sort = params?.sort || SearchSort.Best;
   }
@@ -49,7 +48,7 @@ export default class SearchQuery implements SearchParams {
   public toEncodedString() {
     let encodedString =
       this.searchTerm.trim().replace(/\s+/g, '%20') +
-      (this.chainScope ? ` chainScope=${this.chainScope}` : '') +
+      (this.communityScope ? ` communityScope=${this.communityScope}` : '') +
       (this.isSearchPreview ? ` isSearchPreview=${this.isSearchPreview}` : '') +
       (this.sort ? ` sort=${this.sort}` : '');
 
@@ -107,7 +106,7 @@ export default class SearchQuery implements SearchParams {
 
   public static fromUrlParams(url: Record<string, any>) {
     const sq = new SearchQuery(url['q']);
-    sq.chainScope = url['chainScope'] || undefined;
+    sq.communityScope = url['communityScope'] || undefined;
     sq.isSearchPreview = url['preview'] === 'true';
     sq.sort = url['sort'] || SearchSort.Best;
     sq.searchScope = url['scope'] || [SearchScope.All];

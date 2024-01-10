@@ -12,7 +12,7 @@ import { refreshMembershipsForAddress } from './refreshMembershipsForAddress';
  * @param models DB handle
  * @param tokenBalanceCache Token balance cache handle (new implementation)
  * @param topicId ID of the topic
- * @param chain Chain of the groups
+ * @param community Community of the groups
  * @param address Address to check against requirements
  * @returns validity with optional error message
  */
@@ -20,7 +20,7 @@ export async function validateTopicGroupsMembership(
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
   topicId: number,
-  chain: CommunityInstance,
+  community: CommunityInstance,
   address: AddressAttributes,
 ): Promise<{ isValid: boolean; message?: string }> {
   // check via new TBC with groups
@@ -28,10 +28,13 @@ export async function validateTopicGroupsMembership(
   // get all groups of topic
   const topic = await models.Topic.findOne({
     where: {
-      community_id: chain.id,
+      community_id: community.id,
       id: topicId,
     },
   });
+  if (!topic) {
+    return { isValid: false, message: 'Topic not found' };
+  }
   const groups = await models.Group.findAll({
     where: {
       id: { [Op.in]: topic.group_ids },

@@ -147,7 +147,7 @@ const getActivityCounts = async (communityId: string) => {
               COUNT(DISTINCT c.id) AS comment_count
               FROM "Comments" c
               WHERE
-              c.chain='${communityId}' AND
+              c.community_id='${communityId}' AND
               c.created_at > NOW() - INTERVAL '1 WEEK'`);
 
   const totalComments = (commentCounts[1] as any)?.rows?.[0]
