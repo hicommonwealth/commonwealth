@@ -82,15 +82,11 @@ async function main() {
 
   // CLI parameters for which task to run
   const SHOULD_SEND_EMAILS = process.env.SEND_EMAILS === 'true';
-  const SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS =
-    process.env.SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS === 'true';
 
   const NO_GLOBAL_ACTIVITY_CACHE =
     process.env.NO_GLOBAL_ACTIVITY_CACHE === 'true';
   const NO_CLIENT_SERVER =
-    process.env.NO_CLIENT === 'true' ||
-    SHOULD_SEND_EMAILS ||
-    SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS;
+    process.env.NO_CLIENT === 'true' || SHOULD_SEND_EMAILS;
 
   let rc = null;
   if (SHOULD_SEND_EMAILS) {

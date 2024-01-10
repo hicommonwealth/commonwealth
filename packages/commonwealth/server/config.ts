@@ -71,8 +71,6 @@ export const REDIS_URL = (() => {
 export const LOGIN_RATE_LIMIT_TRIES = 15;
 export const LOGIN_RATE_LIMIT_MINS = 5;
 
-export const MIXPANEL_TOKEN = process.env.MIXPANEL_TOKEN;
-
 export const MAGIC_API_KEY = process.env.MAGIC_API_KEY;
 export const MAGIC_SUPPORTED_BASES = (process.env.MAGIC_SUPPORTED_BASES?.split(
   ',',
