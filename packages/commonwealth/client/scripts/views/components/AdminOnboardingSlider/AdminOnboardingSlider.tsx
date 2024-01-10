@@ -37,10 +37,12 @@ export const AdminOnboardingSlider = () => {
   const { data: topics = [], isLoading: isLoadingTopics = false } =
     useFetchTopicsQuery({
       communityId: app.activeChainId(),
+      apiEnabled: !!app.activeChainId(),
     });
   const { data: groups = [], isLoading: isLoadingGroups = false } =
     useFetchGroupsQuery({
       communityId: app.activeChainId(),
+      enabled: !!app.activeChainId(),
     });
   const { data: threads = [], isLoading: isLoadingThreads = false } =
     useFetchThreadsQuery({
@@ -48,6 +50,7 @@ export const AdminOnboardingSlider = () => {
       queryType: 'bulk',
       page: 1,
       limit: 20,
+      apiEnabled: !!app.activeChainId(),
     });
 
   const redirectToPage = (
@@ -59,6 +62,7 @@ export const AdminOnboardingSlider = () => {
   };
 
   if (
+    !app.activeChainId() ||
     isLoadingTopics ||
     isLoadingGroups ||
     isLoadingThreads ||
