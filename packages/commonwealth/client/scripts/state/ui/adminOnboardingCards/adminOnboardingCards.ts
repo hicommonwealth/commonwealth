@@ -2,7 +2,7 @@ import { createBoundedUseStore } from 'state/ui/utils';
 import { devtools } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 
-interface GroupMutationBannerStore {
+interface AdminActionCardsStore {
   shouldHideAdminOnboardingCardsForCommunities: string[];
   setShouldHideAdminOnboardingCardsForCommunity: (
     communityId: string,
@@ -14,7 +14,7 @@ interface GroupMutationBannerStore {
 
 const STORAGE_KEY = 'adminOnboardingCardsVisibilityForCommunities';
 
-export const GroupMutationBannerStore = createStore<GroupMutationBannerStore>()(
+export const AdminActionCardsStore = createStore<AdminActionCardsStore>()(
   devtools((set) => ({
     shouldHideAdminOnboardingCardsForCommunities: [],
     setShouldHideAdminOnboardingCardsForCommunity: (
@@ -62,8 +62,6 @@ export const GroupMutationBannerStore = createStore<GroupMutationBannerStore>()(
   })),
 );
 
-const useGroupMutationBannerStore = createBoundedUseStore(
-  GroupMutationBannerStore,
-);
+const useAdminActionCardsStore = createBoundedUseStore(AdminActionCardsStore);
 
-export default useGroupMutationBannerStore;
+export default useAdminActionCardsStore;
