@@ -8,6 +8,22 @@ describe('ServerThreadsController', () => {
     it('should create a thread reaction (new reaction)', async () => {
       const sandbox = Sinon.createSandbox();
       const db = {
+        // for findAllRoles
+        Address: {
+          findAll: async () => [
+            {
+              toJSON: () => ({}),
+            },
+          ],
+        },
+        Group: {
+          findAll: async () => [],
+        },
+        Topic: {
+          findOne: async () => ({
+            group_ids: [],
+          }),
+        },
         Reaction: {
           findOne: sandbox.stub().resolves({
             id: 2,
@@ -1295,8 +1311,14 @@ describe('ServerThreadsController', () => {
           },
           query: async () => ({}),
         },
+        Group: {
+          findAll: async () => [],
+        },
         Topic: {
           findOrCreate: async () => ({}),
+          findOne: async () => ({
+            group_ids: [],
+          }),
         },
         Thread: {
           findOne: async () => ({
