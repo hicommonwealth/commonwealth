@@ -87,6 +87,7 @@ export async function __getBulkThreads(
         threads.url, threads.pinned, COALESCE(threads.number_of_comments,0) as threads_number_of_comments,
         threads.reaction_ids, threads.reaction_type, threads.addresses_reacted, COALESCE(threads.total_likes, 0)
           as threads_total_likes,
+        threads.reaction_weights_sum,
         threads.links as links,
         topics.id AS topic_id, topics.name AS topic_name, topics.description AS topic_description,
         topics.community_id AS topic_community_id,
@@ -103,6 +104,7 @@ export async function __getBulkThreads(
           t.locked_at AS thread_locked,
           t.community_id AS thread_chain, t.read_only, t.body, t.discord_meta, t.comment_count AS number_of_comments,
           reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted, t.reaction_count AS total_likes,
+          t.reaction_weights_sum,
           t.has_poll,
           t.plaintext,
           t.stage, t.url, t.pinned, t.topic_id, t.kind, t.links, ARRAY_AGG(DISTINCT
@@ -206,6 +208,7 @@ export async function __getBulkThreads(
       },
       numberOfComments: t.threads_number_of_comments,
       reactionIds: t.reaction_ids ? t.reaction_ids.split(',') : [],
+      reaction_weights_sum: t.reaction_weights_sum,
       addressesReacted: t.addresses_reacted
         ? t.addresses_reacted.split(',')
         : [],
