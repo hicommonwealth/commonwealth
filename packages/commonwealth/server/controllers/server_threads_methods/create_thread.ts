@@ -1,11 +1,6 @@
 import moment from 'moment';
 
-import {
-  ChainNetwork,
-  ChainType,
-  NotificationCategories,
-  ProposalType,
-} from '@hicommonwealth/core';
+import { NotificationCategories, ProposalType } from '@hicommonwealth/core';
 import { AppError } from '../../../../common-common/src/errors';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
@@ -138,30 +133,23 @@ export async function __createThread(
     topic_id: +topicId,
   };
 
-  if (
-    community &&
-    (community.type === ChainType.Token ||
-      community.network === ChainNetwork.Ethereum)
-  ) {
-    // skip check for admins
-    const isAdmin = await validateOwner({
-      models: this.models,
-      user,
-      communityId: community.id,
-      allowAdmin: true,
-      allowGodMode: true,
-    });
-    if (!isAdmin) {
-      const { isValid, message } = await validateTopicGroupsMembership(
-        this.models,
-        this.tokenBalanceCache,
-        topicId,
-        community,
-        address,
-      );
-      if (!isValid) {
-        throw new AppError(`${Errors.FailedCreateThread}: ${message}`);
-      }
+  const isAdmin = await validateOwner({
+    models: this.models,
+    user,
+    communityId: community.id,
+    allowAdmin: true,
+    allowGodMode: true,
+  });
+  if (!isAdmin) {
+    const { isValid, message } = await validateTopicGroupsMembership(
+      this.models,
+      this.tokenBalanceCache,
+      topicId,
+      community,
+      address,
+    );
+    if (!isValid) {
+      throw new AppError(`${Errors.FailedCreateThread}: ${message}`);
     }
   }
 
