@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { AppError } from '@hicommonwealth/adapters';
 import { NotificationCategories } from '@hicommonwealth/core';
 import type { NextFunction, Request, Response } from 'express';
@@ -114,7 +113,7 @@ export default async (
     }
   }
 
-  const [subscription, created] = await models.Subscription.findOrCreate({
+  const [subscription] = await models.Subscription.findOrCreate({
     where: {
       subscriber_id: req.user.id,
       category_id: req.body.category,

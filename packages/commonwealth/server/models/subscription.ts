@@ -134,6 +134,7 @@ export default (
       onDelete: 'cascade',
     });
     models.Subscription.belongsTo(models.Community, {
+      as: 'Community',
       foreignKey: 'community_id',
       targetKey: 'id',
     });
