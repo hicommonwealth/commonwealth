@@ -5,6 +5,7 @@ import {
 } from '@hicommonwealth/adapters';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
+import { getBalanceForAddress } from 'server/util/getBalanceForAddress';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
@@ -58,17 +59,33 @@ export default (
     },
     {
       hooks: {
-        afterCreate: async (reaction: ReactionInstance) => {
+        afterCreate: async (reaction: ReactionInstance, options) => {
           let thread_id = reaction.thread_id;
           const comment_id = reaction.comment_id;
-          const { Thread, Comment } = sequelize.models;
+          const { Thread, Comment, Address } = sequelize.models;
           try {
             if (thread_id) {
               const thread = await Thread.findOne({
                 where: { id: thread_id },
               });
               if (thread) {
-                thread.increment('reaction_count');
+                await thread.increment('reaction_count', {
+                  transaction: options.transaction,
+                });
+
+                const address = await Address.findByPk(reaction.address_id);
+                const contractAddress = ''; // TODO: get 1155 contract address
+                const tokenId = 1; // TODO: get token ID
+                const stakeScaler = 5; // TODO: get stake weight from community.stakeScaler
+                await incrementReactionWeightsSum(
+                  address.toJSON().address,
+                  contractAddress,
+                  tokenId,
+                  stakeScaler,
+                  thread,
+                  options.transaction,
+                );
+
                 StatsDController.get().increment('cw.hook.reaction-count', {
                   thread_id: String(thread_id),
                 });
@@ -80,8 +97,24 @@ export default (
                 where: { id: comment_id },
               });
               if (comment) {
-                comment.increment('reaction_count');
+                await comment.increment('reaction_count', {
+                  transaction: options.transaction,
+                });
                 thread_id = Number(comment.get('thread_id'));
+
+                const address = await Address.findByPk(reaction.address_id);
+                const contractAddress = ''; // TODO: get 1155 contract address
+                const tokenId = 1; // TODO: get token ID
+                const stakeScaler = 5; // TODO: get stake weight from community.stakeScaler
+                await incrementReactionWeightsSum(
+                  address.toJSON().address,
+                  contractAddress,
+                  tokenId,
+                  stakeScaler,
+                  comment,
+                  options.transaction,
+                );
+
                 StatsDController.get().increment('cw.hook.reaction-count', {
                   thread_id: String(thread_id),
                 });
@@ -97,7 +130,7 @@ export default (
             });
           }
         },
-        afterDestroy: async (reaction: ReactionInstance) => {
+        afterDestroy: async (reaction: ReactionInstance, options) => {
           let thread_id = reaction.thread_id;
           const comment_id = reaction.comment_id;
           const { Thread, Comment } = sequelize.models;
@@ -107,7 +140,16 @@ export default (
                 where: { id: thread_id },
               });
               if (thread) {
-                thread.decrement('reaction_count');
+                thread.decrement('reaction_count', {
+                  transaction: options.transaction,
+                });
+
+                await decrementReactionWeightsSum(
+                  reaction.calculated_voting_weight,
+                  thread,
+                  options.transaction,
+                );
+
                 StatsDController.get().decrement('cw.hook.reaction-count', {
                   thread_id: String(thread_id),
                 });
@@ -120,7 +162,16 @@ export default (
               });
               if (comment) {
                 thread_id = Number(comment.get('thread_id'));
-                comment.decrement('reaction_count');
+                comment.decrement('reaction_count', {
+                  transaction: options.transaction,
+                });
+
+                await decrementReactionWeightsSum(
+                  reaction.calculated_voting_weight,
+                  comment,
+                  options.transaction,
+                );
+
                 StatsDController.get().decrement('cw.hook.reaction-count', {
                   thread_id: String(thread_id),
                 });
@@ -184,3 +235,34 @@ export default (
 
   return Reaction;
 };
+
+async function incrementReactionWeightsSum(
+  address: string,
+  contractAddress: string,
+  tokenId: number,
+  stakeScaler: number,
+  entity: Sequelize.Model,
+  transaction?: Sequelize.Transaction,
+) {
+  const stakeBalance = await getBalanceForAddress(
+    address,
+    contractAddress,
+    tokenId,
+  );
+  const calculatedVotingWeight = stakeBalance * stakeScaler;
+  return entity.increment('reaction_weights_sum', {
+    by: calculatedVotingWeight,
+    transaction,
+  });
+}
+
+async function decrementReactionWeightsSum(
+  calculatedVotingWeight: number,
+  entity: Sequelize.Model,
+  transaction?: Sequelize.Transaction,
+) {
+  return entity.decrement('reaction_weights_sum', {
+    by: calculatedVotingWeight,
+    transaction,
+  });
+}

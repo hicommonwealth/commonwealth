@@ -37,6 +37,7 @@ export type CommentAttributes = {
 
   //counts
   reaction_count: number;
+  reaction_weights_sum: number;
 };
 
 export type CommentInstance = ModelInstance<CommentAttributes>;
@@ -87,10 +88,14 @@ export default (
         allowNull: false,
         defaultValue: 0,
       },
+      reaction_weights_sum: {
+        type: dataTypes.INTEGER,
+        allowNull: true,
+      },
     },
     {
       hooks: {
-        afterCreate: async (comment: CommentInstance) => {
+        afterCreate: async (comment: CommentInstance, options) => {
           const { Thread } = sequelize.models;
           const thread_id = comment.thread_id;
           try {
@@ -98,7 +103,9 @@ export default (
               where: { id: thread_id },
             });
             if (thread) {
-              thread.increment('comment_count');
+              await thread.increment('comment_count', {
+                transaction: options.transaction,
+              });
               StatsDController.get().increment('cw.hook.comment-count', {
                 thread_id,
               });
@@ -109,7 +116,7 @@ export default (
             );
           }
         },
-        afterDestroy: async (comment: CommentInstance) => {
+        afterDestroy: async (comment: CommentInstance, options) => {
           const { Thread } = sequelize.models;
           const thread_id = comment.thread_id;
           try {
@@ -117,7 +124,9 @@ export default (
               where: { id: thread_id },
             });
             if (thread) {
-              thread.decrement('comment_count');
+              await thread.decrement('comment_count', {
+                transaction: options.transaction,
+              });
               StatsDController.get().decrement('cw.hook.comment-count', {
                 thread_id,
               });

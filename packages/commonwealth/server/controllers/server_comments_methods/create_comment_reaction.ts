@@ -115,11 +115,13 @@ export async function __createCommentReaction(
   const calculatedVotingWeight = stakeBalance * stakeWeight;
 
   // create the reaction
-  const reactionData: ReactionAttributes = {
+  const reactionWhere: Partial<ReactionAttributes> = {
     reaction,
     address_id: address.id!,
     chain: community.id!,
     comment_id: comment.id,
+  };
+  const reactionData: Partial<ReactionAttributes> = {
     calculated_voting_weight: calculatedVotingWeight,
     canvas_action: canvasAction,
     canvas_session: canvasSession,
@@ -127,14 +129,14 @@ export async function __createCommentReaction(
   };
   const [foundOrCreatedReaction, created] =
     await this.models.Reaction.findOrCreate({
-      where: reactionData,
+      where: reactionWhere,
       defaults: reactionData,
       include: [this.models.Address],
     });
 
   const finalReaction = created
     ? await this.models.Reaction.findOne({
-        where: reactionData,
+        where: reactionWhere,
         include: [this.models.Address],
       })
     : foundOrCreatedReaction;

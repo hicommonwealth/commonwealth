@@ -108,11 +108,14 @@ export async function __createThreadReaction(
   const calculatedVotingWeight = stakeBalance * stakeWeight;
 
   // create the reaction
-  const reactionData: ReactionAttributes = {
+  const reactionWhere: Partial<ReactionAttributes> = {
     reaction,
     address_id: address.id!,
     chain: community.id!,
     thread_id: thread.id,
+  };
+  const reactionData: Partial<ReactionAttributes> = {
+    ...reactionWhere,
     calculated_voting_weight: calculatedVotingWeight,
     canvas_action: canvasAction,
     canvas_session: canvasSession,
@@ -120,14 +123,14 @@ export async function __createThreadReaction(
   };
   const [foundOrCreatedReaction, created] =
     await this.models.Reaction.findOrCreate({
-      where: reactionData,
+      where: reactionWhere,
       defaults: reactionData,
       include: [this.models.Address],
     });
 
   const finalReaction = created
     ? await this.models.Reaction.findOne({
-        where: reactionData,
+        where: reactionWhere,
         include: [this.models.Address],
       })
     : foundOrCreatedReaction;
