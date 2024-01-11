@@ -120,7 +120,6 @@ export function addExternalRoutes(
     onlyIds,
     deleteEntities.bind(this, 'community_id', models, models.Topic),
   );
-
   app.use(endpoint, router);
 
   return router;

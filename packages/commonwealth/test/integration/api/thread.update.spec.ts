@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+import { ActionPayload, Session } from '@canvas-js/interfaces';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 
@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from 'server/config';
 import * as modelUtils from 'test/util/modelUtils';
 import app, { resetDatabase } from '../../../server-test';
+import models from '../../../server/database';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -13,18 +14,19 @@ const { expect } = chai;
 describe('Thread Patch Update', () => {
   const chain = 'ethereum';
 
-  let adminJWT;
-  let adminAddress;
+  let adminJWT: string;
+  let adminAddress: string;
 
-  let userJWT;
-  let userAddress;
-  let userSession;
-
-  let topicId;
+  let userJWT: string;
+  let userAddress: string;
+  let userSession: {
+    session: Session;
+    sign: (payload: ActionPayload) => string;
+  };
+  let topicId: number;
 
   before(async () => {
     await resetDatabase();
-    topicId = await modelUtils.getTopicId({ chain });
     const adminRes = await modelUtils.createAndVerifyAddress({ chain });
     {
       adminAddress = adminRes.address;
@@ -53,6 +55,14 @@ describe('Thread Patch Update', () => {
       expect(userAddress).to.not.be.null;
       expect(userJWT).to.not.be.null;
     }
+
+    const topic = await models.Topic.findOne({
+      where: {
+        community_id: chain,
+        group_ids: [],
+      },
+    });
+    topicId = topic.id;
   });
 
   describe('update thread', () => {
