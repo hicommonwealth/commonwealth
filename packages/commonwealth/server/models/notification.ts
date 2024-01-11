@@ -42,8 +42,7 @@ export default (
       notification_data: { type: dataTypes.TEXT, allowNull: false },
       chain_event_id: { type: dataTypes.INTEGER, allowNull: true },
       entity_id: { type: dataTypes.INTEGER, allowNull: true },
-      // eslint-disable-next-line max-len
-      community_id: { type: dataTypes.STRING, allowNull: true }, // for backwards compatibility of threads associated with OffchainCommunities rather than a proper chain
+      community_id: { type: dataTypes.STRING, allowNull: true },
       category_id: { type: dataTypes.STRING, allowNull: false },
       thread_id: { type: dataTypes.INTEGER, allowNull: true },
     },
