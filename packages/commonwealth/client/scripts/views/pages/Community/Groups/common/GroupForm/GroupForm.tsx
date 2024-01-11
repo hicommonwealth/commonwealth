@@ -157,7 +157,7 @@ const GroupForm = ({
       initialValues?.requirementsToFulfill !== 'ALL',
   );
   const [cwRequiremenetsLabelInputValue, setCwRequiremenetsLabelInputValue] =
-    useState<string>('1');
+    useState('1');
   const [requirementSubForms, setRequirementSubForms] = useState<
     RequirementSubFormsState[]
   >([
