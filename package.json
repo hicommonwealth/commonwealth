@@ -30,6 +30,7 @@
     "prepare": "husky install",
     "psql": "yarn --cwd packages/commonwealth psql",
     "reset-db": "yarn --cwd packages/commonwealth reset-db",
+    "sanity": "chmod u+x scripts/sanity.sh && ./scripts/sanity.sh",
     "start": "concurrently -n watcher,server -c red,green 'tsc -b -w packages/commonwealth' 'yarn workspace commonwealth start'",
     "start-all": "chmod u+x scripts/start.sh && ./scripts/start.sh all",
     "start-apps": "chmod u+x scripts/start.sh && ./scripts/start.sh apps",
