@@ -1,19 +1,19 @@
-import type { OnlyErrorResp } from 'common-common/src/api/extApiTypes';
 import { validationResult } from 'express-validator';
+import type { OnlyErrorResp } from '../api/extApiTypes';
 import { filterAddressOwnedByUser } from '../middleware/lookupAddressIsOwnedByUser';
 import type { DB } from '../models';
 import type { TypedRequest, TypedResponse } from '../types';
 import { failure, success } from '../types';
 
 export async function addEntities<
-  M extends Record<string, unknown> = Record<string, unknown>
+  M extends Record<string, unknown> = Record<string, unknown>,
 >(
   chainIdFieldName: string,
   models: DB,
   bulkCreate: (obj) => Promise<number>,
   entities: (req: TypedRequest<M>) => any,
   req: TypedRequest<M>,
-  res: TypedResponse<OnlyErrorResp>
+  res: TypedResponse<OnlyErrorResp>,
 ) {
   const errors = validationResult(req).array();
   if (errors.length !== 0) {
@@ -29,7 +29,7 @@ export async function addEntities<
       req.user.id,
       entityCopy.map((e) => e.community_id),
       entityCopy.map((e) => e.address),
-      entityCopy.map((e) => e.address_id)
+      entityCopy.map((e) => e.address_id),
     );
 
     if (addresses.unowned.length !== 0) {
@@ -45,8 +45,10 @@ export async function addEntities<
   }
 
   entityCopy.forEach((c) => {
-    c[chainIdFieldName] = c['community_id'];
-    delete c['community_id'];
+    if (chainIdFieldName != 'community_id') {
+      c[chainIdFieldName] = c['community_id'];
+      delete c['community_id'];
+    }
 
     // all the entities use the address_id field. If user passed in address, map it to address_id
     if (addressMap && c.address) {

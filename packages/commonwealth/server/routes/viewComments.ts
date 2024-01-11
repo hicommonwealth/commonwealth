@@ -1,4 +1,4 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../models';
 import { getLastEdited } from '../util/getLastEdited';
@@ -11,7 +11,7 @@ const viewComments = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const chain = req.chain;
 
@@ -20,7 +20,7 @@ const viewComments = async (
   }
 
   const comments = await models.Comment.findAll({
-    where: { chain: chain.id, thread_id: req.query.thread_id },
+    where: { community_id: chain.id, thread_id: req.query.thread_id as string },
     include: [
       models.Address,
       {

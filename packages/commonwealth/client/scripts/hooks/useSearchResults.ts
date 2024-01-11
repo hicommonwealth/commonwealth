@@ -5,9 +5,20 @@ import { APIOrderBy, APIOrderDirection } from '../helpers/constants';
 import { SearchScope } from '../models/SearchQuery';
 import app from '../state';
 import { useSearchChainsQuery } from '../state/api/chains';
+import { SearchChainsResponse } from '../state/api/chains/searchChains';
 import { useSearchCommentsQuery } from '../state/api/comments';
+import { SearchCommentsResponse } from '../state/api/comments/searchComments';
 import { useSearchProfilesQuery } from '../state/api/profiles';
+import { SearchProfilesResponse } from '../state/api/profiles/searchProfiles';
 import { useSearchThreadsQuery } from '../state/api/threads';
+import { SearchThreadsResponse } from '../state/api/threads/searchThreads';
+
+export type SearchResults = {
+  [SearchScope.Threads]: SearchThreadsResponse['results'];
+  [SearchScope.Replies]: SearchCommentsResponse['results'];
+  [SearchScope.Communities]: SearchChainsResponse['results'];
+  [SearchScope.Members]: SearchProfilesResponse['results'];
+};
 
 const NUM_RESULTS_PER_SECTION = 2;
 
@@ -17,12 +28,16 @@ const useSearchResults = (
   searchTerm: string,
   filters: Filter[],
   resultsPerSection?: number,
-) => {
-  const chainId = app.activeChainId() || 'all_communities';
+): {
+  searchResults: SearchResults;
+} => {
+  const communityId = filters.includes('communities')
+    ? 'all_communities'
+    : app.activeChainId();
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
   const sharedQueryOptions = {
-    chainId,
+    communityId,
     searchTerm: debouncedSearchTerm,
     limit: resultsPerSection ? resultsPerSection : NUM_RESULTS_PER_SECTION,
     orderBy: APIOrderBy.Rank,
@@ -40,7 +55,7 @@ const useSearchResults = (
     enabled: queryEnabled && filters.includes('replies'),
   });
 
-  const { data: chainsData } = useSearchChainsQuery({
+  const { data: communityData } = useSearchChainsQuery({
     ...sharedQueryOptions,
     enabled: queryEnabled && filters.includes('communities'),
   });
@@ -55,10 +70,10 @@ const useSearchResults = (
     return {
       [SearchScope.Threads]: threadsData?.pages?.[0]?.results || [],
       [SearchScope.Replies]: commentsData?.pages?.[0]?.results || [],
-      [SearchScope.Communities]: chainsData?.pages?.[0]?.results || [],
+      [SearchScope.Communities]: communityData?.pages?.[0]?.results || [],
       [SearchScope.Members]: profilesData?.pages?.[0]?.results || [],
     };
-  }, [threadsData, chainsData, profilesData, commentsData]);
+  }, [threadsData, communityData, profilesData, commentsData]);
 
   return { searchResults };
 };

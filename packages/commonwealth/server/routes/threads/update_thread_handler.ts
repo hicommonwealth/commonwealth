@@ -1,4 +1,4 @@
-import { IDiscordMeta } from 'common-common/src/types';
+import { IDiscordMeta } from '@hicommonwealth/core';
 import { ThreadAttributes } from '../../models/thread';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
@@ -18,7 +18,6 @@ type UpdateThreadRequestBody = {
   archived?: boolean;
   spam?: boolean;
   topicId?: number;
-  topicName?: string;
   collaborators?: {
     toAdd?: number[];
     toRemove?: number[];
@@ -47,7 +46,6 @@ export const updateThreadHandler = async (
     archived,
     spam,
     topicId,
-    topicName,
     collaborators,
     canvasSession,
     canvasAction,
@@ -74,7 +72,6 @@ export const updateThreadHandler = async (
       archived,
       spam,
       topicId,
-      topicName,
       collaborators,
       canvasSession,
       canvasAction,

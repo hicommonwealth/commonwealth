@@ -1,4 +1,4 @@
-import { IDiscordMeta } from 'common-common/src/types';
+import { IDiscordMeta } from '@hicommonwealth/core';
 import { verifyThread } from '../../../shared/canvas/serverVerify';
 import { ThreadAttributes } from '../../models/thread';
 import { ServerControllers } from '../../routing/router';
@@ -28,7 +28,6 @@ export const createThreadHandler = async (
   const { user, address, chain: community } = req;
   const {
     topic_id: topicId,
-    topic_name: topicName,
     title,
     body,
     kind,
@@ -61,7 +60,6 @@ export const createThreadHandler = async (
       kind,
       readOnly,
       topicId: parseInt(topicId, 10) || undefined,
-      topicName,
       stage,
       url,
       canvasAction,

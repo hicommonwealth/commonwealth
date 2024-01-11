@@ -12,7 +12,7 @@
     &.success > svg {
       color: $green-600;
     }
-    
+
     &.failure > svg {
       color: $rorange-500;
     }
@@ -20,15 +20,15 @@
 
   .feedback-message-text.Text {
     display: grid;
-    align-items: center;
-    justify-content: center;
+    align-items: flex-end;
+    justify-content: flex-end;
     text-align: left;
-    margin-left: 8px;
-    
+    margin-left: 4px;
+
     &.success {
       color: $green-600;
     }
-    
+
     &.failure {
       color: $rorange-500;
     }

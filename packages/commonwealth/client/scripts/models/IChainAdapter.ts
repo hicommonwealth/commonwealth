@@ -1,8 +1,7 @@
+import type { ChainBase } from '@hicommonwealth/core';
 import type { Coin } from 'adapters/currency';
-import type { ChainBase } from 'common-common/src/types';
 import $ from 'jquery';
 
-import BN from 'bn.js';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
@@ -12,12 +11,7 @@ import { EXCEPTION_CASE_threadCountersStore } from '../state/ui/thread';
 import Account from './Account';
 import type ChainInfo from './ChainInfo';
 import ProposalModule from './ProposalModule';
-import type {
-  IAccountsModule,
-  IBlockInfo,
-  IChainModule,
-  IGatedTopic,
-} from './interfaces';
+import type { IAccountsModule, IBlockInfo, IChainModule } from './interfaces';
 
 // Extended by a chain's main implementation. Responsible for module
 // initialization. Saved as `app.chain` in the global object store.
@@ -40,7 +34,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
 
   public abstract chain: IChainModule<C, A>;
   public abstract accounts: IAccountsModule<A>;
-  public readonly communityBanner?: string;
 
   protected _serverLoaded: boolean;
   public get serverLoaded() {
@@ -73,7 +66,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       numTotalThreads,
       communityBanner,
       contractsWithTemplatesData,
-      gateStrategies,
     } = response.result;
     // Update community level thread counters variables (Store in state instead of react query here is an
     // exception case, view the threadCountersStore code for more details)
@@ -84,9 +76,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     this.meta.setAdmins(admins);
     this.meta.setBanner(communityBanner);
     this.app.contracts.initialize(contractsWithTemplatesData, true);
-    if (gateStrategies.length > 0) {
-      this.gatedTopics = gateStrategies;
-    }
 
     this._serverLoaded = true;
     return true;
@@ -104,7 +93,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   public async initApi(): Promise<void> {
     this._apiInitialized = true;
     console.log(
-      `Started API for ${this.meta.id} on node: ${this.meta.node?.url}.`
+      `Started API for ${this.meta.id} on node: ${this.meta.node?.url}.`,
     );
   }
 
@@ -113,7 +102,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     this.app.chainModuleReady.emit('ready');
     this.app.isModuleReady = true;
     console.log(
-      `Loaded data for ${this.meta.id} on node: ${this.meta.node?.url}.`
+      `Loaded data for ${this.meta.id} on node: ${this.meta.node?.url}.`,
     );
   }
 
@@ -139,34 +128,10 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     // TODO: does this need debouncing?
     if (modules.some((mod) => !!mod && !mod.initializing && !mod.ready)) {
       await Promise.all(
-        modules.map((mod) => mod.init(this.chain, this.accounts))
+        modules.map((mod) => mod.init(this.chain, this.accounts)),
       );
       this.app.chainModuleReady.emit('ready');
     }
-  }
-
-  public getTopicThreshold(topicId: number): BN {
-    if (this.gatedTopics?.length > 0 && topicId) {
-      const topicGate = this.gatedTopics.find((i) => i.id === topicId);
-
-      if (!topicGate) return new BN('0', 10);
-
-      return new BN(topicGate.data.threshold);
-    }
-    return new BN('0', 10);
-  }
-
-  public isGatedTopic(topicId: number): boolean {
-    const tokenPostingThreshold = this.getTopicThreshold(topicId);
-    if (
-      !tokenPostingThreshold.isZero() &&
-      !this.app.user.activeAccount?.tokenBalance
-    )
-      return true;
-    return (
-      !tokenPostingThreshold.isZero() &&
-      tokenPostingThreshold.gt(this.app.user.activeAccount.tokenBalance)
-    );
   }
 
   public abstract base: ChainBase;
@@ -177,7 +142,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   public readonly block: IBlockInfo;
 
   public app: IApp;
-  public gatedTopics: IGatedTopic[];
 
   constructor(meta: ChainInfo, app: IApp) {
     this.meta = meta;

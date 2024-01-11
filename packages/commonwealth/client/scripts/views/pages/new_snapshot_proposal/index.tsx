@@ -12,6 +12,7 @@ import { DeltaStatic } from 'quill';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router';
 import app from 'state';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { MixpanelSnapshotEvents } from '../../../../../shared/analytics/types';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -22,7 +23,6 @@ import {
 } from '../../components/react_quill_editor';
 import { createNewProposal } from './helpers';
 import type { ThreadForm } from './types';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
 type NewSnapshotProposalPageProps = {
   snapshotId: string;
@@ -49,7 +49,7 @@ export const NewSnapshotProposalForm = ({
   const [form, setForm] = useState<ThreadForm | null>(null);
   const [members, setMembers] = useState<string[]>([]);
   const [contentDelta, setContentDelta] = useState<DeltaStatic>(
-    createDeltaFromText('')
+    createDeltaFromText(''),
   );
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [, setSnapshotScoresFetched] = useState<boolean>(false);
@@ -68,7 +68,7 @@ export const NewSnapshotProposalForm = ({
 
   const clearLocalStorage = () => {
     localStorage.removeItem(
-      `${app.activeChainId()}-new-snapshot-proposal-name`
+      `${app.activeChainId()}-new-snapshot-proposal-name`,
     );
   };
 
@@ -154,7 +154,7 @@ export const NewSnapshotProposalForm = ({
 
           const delta = createDeltaFromText(
             thread.plaintext + linkMarkdown,
-            true
+            true,
           );
           setContentDelta(delta);
         } else {
@@ -168,7 +168,7 @@ export const NewSnapshotProposalForm = ({
       const snapshotSpace = app.snapshot.space;
       const scoreResponse = await getScore(
         snapshotSpace,
-        app.user.activeAccount.address
+        app.user.activeAccount.address,
       );
       setUserScore(scoreResponse);
       setSpace(snapshotSpace);
@@ -191,7 +191,7 @@ export const NewSnapshotProposalForm = ({
     author &&
     author.address &&
     !!members.find(
-      (member) => member.toLowerCase() === author.address.toLowerCase()
+      (member) => member.toLowerCase() === author.address.toLowerCase(),
     );
 
   const minScoreFromSpace =
@@ -246,7 +246,7 @@ export const NewSnapshotProposalForm = ({
               });
               localStorage.setItem(
                 `${app.activeChainId()}-new-snapshot-proposal-name`,
-                form.name
+                form.name,
               );
             }}
             defaultValue={form.name}
@@ -263,7 +263,7 @@ export const NewSnapshotProposalForm = ({
                   setForm({
                     ...form,
                     choices: form.choices.map((choice, i) =>
-                      i === idx ? e.target.value : choice
+                      i === idx ? e.target.value : choice,
                     ),
                   });
                 }}
@@ -291,7 +291,7 @@ export const NewSnapshotProposalForm = ({
                 setForm({
                   ...form,
                   choices: form.choices.concat(
-                    `Option ${form.choices.length + 1}`
+                    `Option ${form.choices.length + 1}`,
                   ),
                 });
               }}

@@ -70,3 +70,10 @@ export interface erc721MintBurn {
   to: number;
   mint: boolean;
 }
+
+export interface erc1155Mint {
+  contractAddress: string;
+  tokenId: string;
+  to: string;
+  amount: number;
+}

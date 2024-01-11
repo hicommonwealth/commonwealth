@@ -1,8 +1,8 @@
-import AaveGovernance from 'controllers/chain/ethereum/aave/governance';
+import { useQuery } from '@tanstack/react-query';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
+import AaveGovernance from 'controllers/chain/ethereum/aave/governance';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
-import { useQuery } from '@tanstack/react-query';
 
 const PROPOSAL_STALE_TIME = 30000; // 30 seconds
 
@@ -12,13 +12,13 @@ const fetchAaveProposals = async () => {
 
 const useAaveProposalsQuery = ({
   moduleReady,
-  chainId,
+  communityId,
 }: {
   moduleReady: boolean;
-  chainId: string;
+  communityId: string;
 }) => {
   return useQuery({
-    queryKey: [ApiEndpoints.FETCH_PROPOSALS, chainId],
+    queryKey: [ApiEndpoints.FETCH_PROPOSALS, communityId],
     queryFn: fetchAaveProposals,
     enabled: moduleReady,
     staleTime: PROPOSAL_STALE_TIME,

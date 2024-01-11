@@ -1,15 +1,17 @@
+import {
+  ILogger,
+  RmqSnapshotNotification,
+  StatsDController,
+} from '@hicommonwealth/adapters';
+import { NotificationCategories } from '@hicommonwealth/core';
 import axios from 'axios';
-import { StatsDController } from 'common-common/src/statsd';
-import type { Logger } from 'typescript-logging';
-import emitNotifications from '../../../util/emitNotifications';
 import { SnapshotEventType } from 'types';
-import { NotificationCategories } from 'common-common/src/types';
 import type { DB } from '../../../models';
-import { RmqSnapshotNotification } from 'common-common/src/rabbitmq/types/snapshotNotification';
+import emitNotifications from '../../../util/emitNotifications';
 
 export async function processSnapshotMessage(
-  this: { models: DB; log: Logger },
-  data: RmqSnapshotNotification.RmqMsgType
+  this: { models: DB; log: ILogger },
+  data: RmqSnapshotNotification.RmqMsgType,
 ) {
   const { space, id, title, body, choices, start, expire } = data;
 
@@ -119,7 +121,7 @@ export async function processSnapshotMessage(
     });
 
   this.log.info(
-    `Found ${associatedCommunities.length} associated communities for snapshot space ${space} `
+    `Found ${associatedCommunities.length} associated communities for snapshot space ${space} `,
   );
 
   if (associatedCommunities.length > 0) {
@@ -134,7 +136,7 @@ export async function processSnapshotMessage(
   }
 
   for (const community of associatedCommunities) {
-    const communityId = community.chain_id;
+    const communityId = community.community_id;
     const communityDiscordConfig = await this.models.DiscordBotConfig.findAll({
       where: {
         community_id: communityId,
@@ -146,7 +148,7 @@ export async function processSnapshotMessage(
         // Pass data to Discord bot
         try {
           this.log.info(
-            `Sending snapshot notification to discord bot for community ${communityId} and snapshot space ${space} `
+            `Sending snapshot notification to discord bot for community ${communityId} and snapshot space ${space} `,
           );
           await axios.post(
             `${process.env.DISCORD_BOT_URL}/send-snapshot-notification`,
@@ -161,7 +163,7 @@ export async function processSnapshotMessage(
                 'Content-Type': 'application/json',
                 authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
               },
-            }
+            },
           );
         } catch (e) {
           // TODO: should we NACK the message if sending to discord fails or just rollbar report it and continue?

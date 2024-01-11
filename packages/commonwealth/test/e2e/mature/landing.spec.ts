@@ -44,11 +44,11 @@ test.describe('Commonwealth Homepage', () => {
     const landingChunkRegex =
       /client_scripts_views_pages_landing_index_tsx\.[a-fA-F0-9]+\.chunk\.js$/;
     expect(loadedJsBundles[loadedJsBundles.length - 1]).toMatch(
-      landingChunkRegex
+      landingChunkRegex,
     );
 
     await page.waitForTimeout(100);
-    expect(loadedJsBundles.length).toEqual(4);
+    expect(loadedJsBundles.length).toEqual(5);
     expect(apiCalls.length).toEqual(4); // domain, status, chains, nodes
   });
 

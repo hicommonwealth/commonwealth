@@ -23,7 +23,7 @@ export const getDisplayedReactorsForPopup = ({
           <CWText noWrap>
             <User
               userAddress={reactorAddress}
-              userChainId={app.chain.id}
+              userCommunityId={app.chain.id}
               shouldLinkProfile
             />
           </CWText>
@@ -31,10 +31,12 @@ export const getDisplayedReactorsForPopup = ({
       );
     });
 
-  if (slicedReactors.length > MAX_VISIBLE_REACTING_ACCOUNTS) {
-    const diff = slicedReactors.length - MAX_VISIBLE_REACTING_ACCOUNTS;
+  if (reactors.length > MAX_VISIBLE_REACTING_ACCOUNTS) {
+    const diff = reactors.length - MAX_VISIBLE_REACTING_ACCOUNTS;
 
-    slicedReactors.push(<CWText key="final">{`and ${diff} more`}</CWText>);
+    slicedReactors.push(
+      <CWText type="caption" key="final">{`and ${diff} more`}</CWText>,
+    );
   }
 
   return (

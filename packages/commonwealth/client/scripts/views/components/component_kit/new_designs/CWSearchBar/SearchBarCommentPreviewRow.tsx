@@ -23,7 +23,7 @@ export const SearchBarCommentPreviewRow: FC<
   const content = searchResult.text;
 
   const handleClick = () => {
-    const path = `/${searchResult.community}/discussion/${searchResult.proposalid}?comment=${searchResult.id}`;
+    const path = `/${searchResult.community_id}/discussion/${searchResult.proposalid}?comment=${searchResult.id}`;
     navigate(path, {}, null);
   };
 

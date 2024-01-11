@@ -2,7 +2,6 @@ import crypto from 'crypto';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import { LOGIN_TOKEN_EXPIRES_IN } from '../config';
-import type { SocialAccountAttributes } from './social_account';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type LoginTokenAttributes = {
@@ -12,14 +11,10 @@ export type LoginTokenAttributes = {
   email?: string;
   redirect_path?: string;
   domain?: string;
-  social_account?: number;
   used?: Date;
 
   created_at?: Date;
   updated_at?: Date;
-
-  // associations
-  SocialAccounts?: SocialAccountAttributes[];
 };
 
 export type LoginTokenInstance = ModelInstance<LoginTokenAttributes>;
@@ -27,11 +22,7 @@ export type LoginTokenInstance = ModelInstance<LoginTokenAttributes>;
 export type LoginTokenCreationAttributes = LoginTokenAttributes & {
   createForEmail?: (
     email: string,
-    path?: string
-  ) => Promise<LoginTokenInstance>;
-  createForOAuth?: (
-    domain: string,
-    social_account?: number
+    path?: string,
   ) => Promise<LoginTokenInstance>;
 };
 
@@ -40,7 +31,7 @@ export type LoginTokenModelStatic = ModelStatic<LoginTokenInstance> &
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): LoginTokenModelStatic => {
   const LoginToken = <LoginTokenModelStatic>sequelize.define(
     'LoginToken',
@@ -51,7 +42,6 @@ export default (
       expires: { type: dataTypes.DATE, allowNull: false },
       redirect_path: { type: dataTypes.STRING, allowNull: true },
       domain: { type: dataTypes.STRING, allowNull: true },
-      social_account: { type: dataTypes.INTEGER, allowNull: true },
       used: { type: dataTypes.DATE, allowNull: true },
     },
     {
@@ -61,12 +51,12 @@ export default (
       tableName: 'LoginTokens',
       underscored: true,
       indexes: [{ fields: ['token', 'email'] }],
-    }
+    },
   );
 
   LoginToken.createForEmail = async (
     email: string,
-    path?: string
+    path?: string,
   ): Promise<LoginTokenInstance> => {
     const token = crypto.randomBytes(24).toString('hex');
     const expires = new Date(+new Date() + LOGIN_TOKEN_EXPIRES_IN * 60 * 1000);
@@ -77,29 +67,6 @@ export default (
       redirect_path: path,
     });
     return result;
-  };
-
-  // This creates a LoginToken that is tied to no particular email or social account.
-  // It is up to the implementer to store the ID of the generated LoginToken on a SocialAccount
-  // for it to be looked up later.
-  LoginToken.createForOAuth = async (
-    domain: string,
-    social_account?: number
-  ): Promise<LoginTokenInstance> => {
-    const token = crypto.randomBytes(24).toString('hex');
-    const expires = new Date(+new Date() + LOGIN_TOKEN_EXPIRES_IN * 60 * 1000);
-    const result = await LoginToken.create({
-      email: '',
-      expires,
-      token,
-      domain,
-      social_account,
-    });
-    return result;
-  };
-
-  LoginToken.associate = (models) => {
-    models.LoginToken.hasMany(models.SocialAccount);
   };
 
   return LoginToken;

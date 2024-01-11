@@ -1,4 +1,4 @@
-import { AppError } from '../../../../common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import { PollAttributes } from '../../models/poll';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
@@ -36,15 +36,17 @@ export const createThreadPollHandler = async (
     }
   }
 
-  const poll = await controllers.threads.createThreadPoll({
+  const [poll, analyticsOptions] = await controllers.threads.createThreadPoll({
     user: req.user,
     community,
-    threadId: parseInt(threadId, 10),
+    threadId: parseInt(threadId, 10) || undefined,
     prompt,
     options,
     customDuration:
       custom_duration === 'Infinite' ? Infinity : parseInt(custom_duration),
   });
+
+  controllers.analytics.track(analyticsOptions, req).catch(console.error);
 
   return success(res, poll);
 };

@@ -1,8 +1,8 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import type { NextFunction } from 'express';
-import { TypedRequestBody, TypedResponse, success } from '../../types';
-import { Link, LinkSource, ThreadInstance } from '../../models/thread';
 import type { DB } from '../../models';
+import { Link, LinkSource, ThreadInstance } from '../../models/thread';
+import { TypedRequestBody, TypedResponse, success } from '../../types';
 import { Errors, isAuthorOrAdmin } from '../../util/linkingValidationHelper';
 
 type DeleteThreadLinkReq = {
@@ -16,7 +16,7 @@ const deleteThreadLinks = async (
   models: DB,
   req: TypedRequestBody<DeleteThreadLinkReq>,
   res: TypedResponse<DeleteThreadLinkRes>,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { thread_id, links } = req.body;
   if (!links.every((obj) => Object.values(LinkSource).includes(obj.source)))
@@ -30,7 +30,7 @@ const deleteThreadLinks = async (
     models,
     await req.user.getAddresses(),
     thread.address_id,
-    thread.chain
+    thread.community_id,
   );
   if (!isAuth) return next(new AppError(Errors.NotAdminOrOwner));
 
@@ -38,7 +38,7 @@ const deleteThreadLinks = async (
     return !links.some(
       (linkToDelete) =>
         linkToDelete.source === link.source &&
-        linkToDelete.identifier === link.identifier
+        linkToDelete.identifier === link.identifier,
     );
   });
   if (filteredLinks.length == thread.links.length)

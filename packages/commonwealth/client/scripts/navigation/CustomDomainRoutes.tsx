@@ -6,28 +6,28 @@ import { withLayout } from 'views/Layout';
 
 const SearchPage = lazy(() => import('views/pages/search'));
 
-const CreateCommunityPage = lazy(() => import('views/pages/create_community'));
+const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(
-  () => import('views/pages/Community/Members/CommunityMembersPage')
+  () => import('views/pages/Community/Members/CommunityMembersPage'),
 );
 const DirectoryPage = lazy(() => import('views/pages/DirectoryPage'));
 const CreateMembersGroupPage = lazy(
-  () => import('views/pages/Community/Groups/Create')
+  () => import('views/pages/Community/Groups/Create'),
 );
 const UpdateMembersGroupPage = lazy(
-  () => import('views/pages/Community/Groups/Update')
+  () => import('views/pages/Community/Groups/Update'),
 );
 const SputnikDaosPage = lazy(() => import('views/pages/sputnikdaos'));
 const FinishNearLoginPage = lazy(() => import('views/pages/finish_near_login'));
 const FinishAxieLoginPage = lazy(() => import('views/pages/finish_axie_login'));
 const FinishSocialLoginPage = lazy(
-  () => import('views/pages/finish_social_login')
+  () => import('views/pages/finish_social_login'),
 );
 
 const NotificationsPage = lazy(() => import('views/pages/notifications'));
 const NotificationSettingsPage = lazy(
-  () => import('views/pages/notification_settings')
+  () => import('views/pages/notification_settings'),
 );
 
 const ProposalsPage = lazy(() => import('views/pages/proposals'));
@@ -35,45 +35,45 @@ const ViewProposalPage = lazy(() => import('views/pages/view_proposal/index'));
 const NewProposalPage = lazy(() => import('views/pages/new_proposal/index'));
 
 const DiscussionsPage = lazy(
-  () => import('views/pages/discussions/DiscussionsPage')
+  () => import('views/pages/discussions/DiscussionsPage'),
 );
 const ViewThreadPage = lazy(
-  () => import('views/pages/view_thread/ViewThreadPage')
+  () => import('views/pages/view_thread/ViewThreadPage'),
 );
 const NewThreadPage = lazy(() => import('views/pages/new_thread'));
 const DiscussionsRedirectPage = lazy(
-  () => import('views/pages/discussions_redirect')
+  () => import('views/pages/discussions_redirect'),
 );
 const SnapshotProposalLinkRedirectPage = lazy(
-  () => import('views/pages/snapshot_proposal_link_redirect')
+  () => import('views/pages/snapshot_proposal_link_redirect'),
 );
 
 const ContractsPage = lazy(() => import('views/pages/contracts'));
 const NewContractPage = lazy(() => import('views/pages/new_contract'));
 const GeneralContractPage = lazy(() => import('views/pages/general_contract'));
 const NewContractTemplatePage = lazy(
-  () => import('views/pages/new_contract_template')
+  () => import('views/pages/new_contract_template'),
 );
 const ViewTemplatePage = lazy(() => import('views/pages/view_template'));
 
 const ManageCommunityPage = lazy(
-  () => import('views/pages/manage_community/ManageCommunityPage')
+  () => import('views/pages/manage_community/ManageCommunityPage'),
 );
 const DiscordCallbackPage = lazy(
-  () => import('views/pages/manage_community/discord-callback')
+  () => import('views/pages/manage_community/discord-callback'),
 );
 const AnalyticsPage = lazy(() => import('views/pages/stats'));
 const SnapshotProposalPage = lazy(
-  () => import('views/pages/snapshot_proposals')
+  () => import('views/pages/snapshot_proposals'),
 );
 const ViewMultipleSnapshotsPage = lazy(
-  () => import('views/pages/view_multiple_snapshot_spaces')
+  () => import('views/pages/view_multiple_snapshot_spaces'),
 );
 const ViewSnapshotsProposalPage = lazy(
-  () => import('views/pages/view_snapshot_proposal')
+  () => import('views/pages/view_snapshot_proposal'),
 );
 const NewSnapshotProposalPage = lazy(
-  () => import('views/pages/new_snapshot_proposal')
+  () => import('views/pages/new_snapshot_proposal'),
 );
 
 const NewProfilePage = lazy(() => import('views/pages/new_profile'));
@@ -93,18 +93,7 @@ const CustomDomainRoutes = () => {
     <Route
       key="/createCommunity"
       path="/createCommunity"
-      element={withLayout(CreateCommunityPage, {
-        scoped: true,
-        type: 'common',
-      })}
-    />,
-    <Route
-      key="/createCommunity/:type"
-      path="/createCommunity/:type"
-      element={withLayout(CreateCommunityPage, {
-        scoped: true,
-        type: 'common',
-      })}
+      element={withLayout(CreateCommunityPage, { type: 'common' })}
     />,
     <Route key="/home" path="/home" element={<Navigate to="/overview" />} />,
     <Route

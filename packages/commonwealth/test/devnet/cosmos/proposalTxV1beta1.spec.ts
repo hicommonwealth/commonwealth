@@ -1,21 +1,21 @@
-import chai from 'chai';
 import { isDeliverTxSuccess } from '@cosmjs/stargate';
-import {
-  ProposalStatus,
-  VoteOption,
-} from 'cosmjs-types/cosmos/gov/v1beta1/gov';
-import {
-  encodeMsgVote,
-  encodeMsgSubmitProposal,
-  encodeTextProposal,
-  getActiveProposalsV1Beta1,
-  encodeCommunitySpend,
-} from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
+import chai from 'chai';
+import { CosmosApiType } from 'controllers/chain/cosmos/chain';
 import {
   getRPCClient,
   getTMClient,
 } from 'controllers/chain/cosmos/chain.utils';
-import { CosmosApiType } from 'controllers/chain/cosmos/chain';
+import {
+  encodeCommunitySpend,
+  encodeMsgSubmitProposal,
+  encodeMsgVote,
+  encodeTextProposal,
+  getActiveProposalsV1Beta1,
+} from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
+import {
+  ProposalStatus,
+  VoteOption,
+} from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import {
   deposit,
   sendTx,
@@ -43,7 +43,7 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => 
     const { proposals: activeProposals } = await rpc.gov.proposals(
       ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD,
       '',
-      ''
+      '',
     );
     return activeProposals;
   };
@@ -58,7 +58,7 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => 
   const proposalTest = async (
     content: any,
     expectedProposalType: string,
-    isAmino?: boolean
+    isAmino?: boolean,
   ) => {
     const msg = encodeMsgSubmitProposal(signer, deposit, content);
     const resp = await sendTx(rpcUrlBeta, msg, isAmino);
@@ -67,21 +67,26 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => 
     expect(resp.rawLog).to.not.be.undefined;
     expect(isDeliverTxSuccess(resp), 'TX failed').to.be.true;
 
-    await waitOneBlock(rpcUrlBeta);
-    await waitOneBlock(rpcUrlBeta);
-    const activeProposals = await getActiveVotingProposals();
-    const onchainProposal = activeProposals[activeProposals.length - 1];
-    expect(onchainProposal?.content?.typeUrl).to.eql(expectedProposalType);
+    const rawLog = JSON.parse(resp.rawLog);
+
+    const submitProposalEvent = rawLog[0]?.events?.find(
+      (e) => e['type'] === 'submit_proposal',
+    );
+    const proposalType = submitProposalEvent?.attributes.find(
+      (a) => a.key === 'proposal_type',
+    )?.value;
+
+    expect(proposalType).to.eql(expectedProposalType);
   };
 
   const voteTest = async (
     voteOption: number,
-    isAmino?: boolean
+    isAmino?: boolean,
   ): Promise<void> => {
     await waitOneBlock(rpcUrlBeta);
     const activeProposals = await getActiveVotingProposals();
     assert.isAtLeast(activeProposals.length, 1);
-    const proposal = activeProposals[0];
+    const proposal = activeProposals[activeProposals.length - 1];
     const msg = encodeMsgVote(signer, proposal.proposalId, voteOption);
 
     const resp = await sendTx(rpcUrlBeta, msg, isAmino);
@@ -96,9 +101,9 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => 
     it('creates a text proposal', async () => {
       const content = encodeTextProposal(
         `beta text title`,
-        `beta text description`
+        `beta text description`,
       );
-      await proposalTest(content, '/cosmos.gov.v1beta1.TextProposal');
+      await proposalTest(content, 'Text');
     });
     it('votes NO on an active proposal', async () => {
       await voteTest(VoteOption.VOTE_OPTION_NO);
@@ -119,12 +124,9 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => 
         `beta spend description`,
         'cosmos18q3tlnx8vguv2fadqslm7x59ejauvsmnlycckg',
         '5',
-        'ustake'
+        'ustake',
       );
-      await proposalTest(
-        content,
-        '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal'
-      );
+      await proposalTest(content, 'CommunityPoolSpend');
     });
   });
 
@@ -133,9 +135,9 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => 
       await waitOneBlock(rpcUrlBeta);
       const content = encodeTextProposal(
         `beta text title`,
-        `beta text description`
+        `beta text description`,
       );
-      await proposalTest(content, '/cosmos.gov.v1beta1.TextProposal', true);
+      await proposalTest(content, 'Text', true);
     });
     it('votes NO on an active proposal with legacy amino', async () => {
       await voteTest(VoteOption.VOTE_OPTION_NO, true);
@@ -156,13 +158,9 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => 
         `beta spend description amino`,
         'cosmos18q3tlnx8vguv2fadqslm7x59ejauvsmnlycckg',
         '5',
-        'ustake'
+        'ustake',
       );
-      await proposalTest(
-        content,
-        '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal',
-        true
-      );
+      await proposalTest(content, 'CommunityPoolSpend', true);
     });
   });
 });
@@ -172,7 +170,7 @@ describe('Cosmos Governance v1beta1 util Tests', () => {
     it('should fetch active proposals (csdk-beta-ci)', async () => {
       const id = 'csdk-beta-ci'; // CI devnet for v1beta1
       const tmClient = await getTMClient(
-        `http://localhost:8080/cosmosAPI/${id}`
+        `http://localhost:8080/cosmosAPI/${id}`,
       );
       const rpc = await getRPCClient(tmClient);
 

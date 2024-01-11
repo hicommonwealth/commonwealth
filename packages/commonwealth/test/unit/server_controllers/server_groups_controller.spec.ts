@@ -24,8 +24,7 @@ const createMockedGroupsController = () => {
   const topics: TopicAttributes[] = [
     {
       id: 1,
-      chain_id: 'ethereum',
-      token_threshold: '1000',
+      community_id: 'ethereum',
       name: 'hello',
       featured_in_sidebar: false,
       featured_in_new_post: false,
@@ -57,6 +56,7 @@ const createMockedGroupsController = () => {
       findAll: async (): Promise<TopicAttributes[]> => {
         return topics;
       },
+      findByPk: async (id: number) => topics.find((t) => t.id === id),
       update: async () => {},
     },
     Group: {
@@ -98,6 +98,7 @@ const createMockedGroupsController = () => {
       },
       count: async () => memberships.length,
       destroy: async () => {},
+      bulkCreate: async () => {},
     },
     CommunityRole: {
       findAll: async () => [
@@ -151,7 +152,8 @@ describe('ServerGroupsController', () => {
       address,
       topicId: 1,
     });
-    expect(results[0]).to.have.property('topicId');
+    expect(results[0]).to.have.property('groupId');
+    expect(results[0]).to.have.property('topicIds');
     expect(results[0]).to.have.property('allowed');
     expect(results[0]).to.have.property('rejectReason', null);
   });
@@ -172,7 +174,7 @@ describe('ServerGroupsController', () => {
   describe('#createGroup', async () => {
     const controller = createMockedGroupsController();
     const { user, chain, address } = createMockParams();
-    const result = await controller.createGroup({
+    const [result, analytics] = await controller.createGroup({
       user,
       community: chain,
       address,
@@ -187,6 +189,12 @@ describe('ServerGroupsController', () => {
     expect(result).to.have.property('community_id');
     expect(result).to.have.property('metadata');
     expect(result).to.have.property('requirements');
+
+    expect(analytics).to.eql({
+      event: 'Create New Group',
+      community: chain.id,
+      userId: user.id,
+    });
   });
 
   describe('#createGroup (invalid requirements)', async () => {
@@ -210,7 +218,7 @@ describe('ServerGroupsController', () => {
   describe('#updateGroup', async () => {
     const controller = createMockedGroupsController();
     const { user, chain, address } = createMockParams();
-    const result = await controller.updateGroup({
+    const [result, analytics] = await controller.updateGroup({
       user,
       community: chain,
       address,
@@ -225,6 +233,12 @@ describe('ServerGroupsController', () => {
     expect(result).to.have.property('community_id');
     expect(result).to.have.property('metadata');
     expect(result).to.have.property('requirements');
+
+    expect(analytics).to.eql({
+      event: 'Update Group',
+      community: chain.id,
+      userId: user.id,
+    });
   });
 
   describe('#updateGroup (invalid requirements)', async () => {

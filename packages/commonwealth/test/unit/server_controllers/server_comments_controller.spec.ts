@@ -1,6 +1,5 @@
-import BN from 'bn.js';
+import { NotificationCategories } from '@hicommonwealth/core';
 import { expect } from 'chai';
-import { NotificationCategories } from 'common-common/src/types';
 import { ServerCommentsController } from 'server/controllers/server_comments_controller';
 import { SearchCommentsOptions } from 'server/controllers/server_comments_methods/search_comments';
 import Sinon from 'sinon';
@@ -12,10 +11,13 @@ describe('ServerCommentsController', () => {
     it('should create a comment reaction (new reaction)', async () => {
       const sandbox = Sinon.createSandbox();
       const db = {
+        Address: {
+          findAll: async () => [{}], // used in findOneRole
+        },
         Reaction: {
           findOne: sandbox.stub().resolves({
             id: 2,
-            chain: 'ethereum',
+            community_id: 'ethereum',
             Address: {
               address: '0x123',
               community_id: 'ethereum',
@@ -26,7 +28,7 @@ describe('ServerCommentsController', () => {
           findOrCreate: sandbox.stub().resolves([
             {
               id: 2,
-              chain: 'ethereum',
+              community_id: 'ethereum',
               Address: {
                 address: '0x123',
                 community_id: 'ethereum',
@@ -47,7 +49,7 @@ describe('ServerCommentsController', () => {
           findOne: sandbox.stub().resolves({
             id: 4,
             title: 'Big Thread!',
-            chain: 'ethereum',
+            community_id: 'ethereum',
           }),
         },
       };
@@ -69,7 +71,7 @@ describe('ServerCommentsController', () => {
       const serverCommentsController = new ServerCommentsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        banCache as any,
       );
 
       const [newReaction, allNotificationOptions, allAnalyticsOptions] =
@@ -91,7 +93,7 @@ describe('ServerCommentsController', () => {
           community: community as any,
           reaction: reaction as any,
           commentId,
-        })
+        }),
       ).to.be.rejectedWith('Ban error: banned');
 
       expect(newReaction).to.be.ok;
@@ -100,11 +102,10 @@ describe('ServerCommentsController', () => {
       const { notification } = allNotificationOptions[0];
       expect(notification).to.have.property(
         'categoryId',
-        NotificationCategories.NewReaction
+        NotificationCategories.NewReaction,
       );
 
       expect(notification.data).to.have.property('created_at');
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>', notification.data);
       expect(notification.data).to.include({
         thread_id: 4,
         comment_id: 3,
@@ -123,7 +124,6 @@ describe('ServerCommentsController', () => {
       expect(allAnalyticsOptions[0]).to.include({
         event: 'Create New Reaction',
         community: 'ethereum',
-        isCustomDomain: null,
       });
     });
 
@@ -162,7 +162,7 @@ describe('ServerCommentsController', () => {
           findOne: sandbox.stub().resolves({
             id: 4,
             title: 'Big Thread!',
-            chain: 'ethereum',
+            community_id: 'ethereum',
           }),
         },
       };
@@ -183,7 +183,7 @@ describe('ServerCommentsController', () => {
       const serverCommentsController = new ServerCommentsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        banCache as any,
       );
 
       expect(
@@ -193,7 +193,7 @@ describe('ServerCommentsController', () => {
           community: community as any,
           reaction: reaction as any,
           commentId: 123,
-        })
+        }),
       ).to.be.rejectedWith('Comment not found: 123');
     });
 
@@ -252,7 +252,7 @@ describe('ServerCommentsController', () => {
       const serverCommentsController = new ServerCommentsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        banCache as any,
       );
 
       expect(
@@ -262,7 +262,7 @@ describe('ServerCommentsController', () => {
           community: community as any,
           reaction: reaction as any,
           commentId: 123,
-        })
+        }),
       ).to.be.rejectedWith('Thread not found for comment: 123');
     });
 
@@ -304,7 +304,7 @@ describe('ServerCommentsController', () => {
           findOne: sandbox.stub().resolves({
             id: 4,
             title: 'Big Thread!',
-            chain: 'ethereum',
+            community_id: 'ethereum',
           }),
         },
       };
@@ -326,7 +326,7 @@ describe('ServerCommentsController', () => {
       const serverCommentsController = new ServerCommentsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        banCache as any,
       );
 
       expect(
@@ -336,7 +336,7 @@ describe('ServerCommentsController', () => {
           community: community as any,
           reaction: reaction as any,
           commentId,
-        })
+        }),
       ).to.be.rejectedWith('Ban error: big ban err');
     });
 
@@ -378,19 +378,19 @@ describe('ServerCommentsController', () => {
           findOne: sandbox.stub().resolves({
             id: 4,
             title: 'Big Thread!',
-            chain: 'ethereum',
+            community_id: 'ethereum',
             topic_id: 77,
           }),
         },
         // for validateTopicThreshold
         Topic: {
           findOne: sandbox.stub().resolves({
-            chain: {
+            community: {
               ChainNode: {
                 id: 99,
               },
             },
-            token_threshold: 1,
+            group_ids: [1],
           }),
         },
         CommunityContract: {
@@ -400,9 +400,47 @@ describe('ServerCommentsController', () => {
         Address: {
           findAll: sandbox.stub().resolves([]),
         },
+        Group: {
+          findAll: sandbox.stub().resolves([
+            {
+              id: 1,
+              community_id: 'community-trial',
+              metadata: {
+                name: 'TRIAL Holders',
+                description: 'Autogenerated',
+                required_requirements: 1,
+              },
+              requirements: [
+                {
+                  rule: 'threshold',
+                  data: {
+                    threshold: '1',
+                    source: {
+                      source_type: 'erc721',
+                      evm_chain_id: 1,
+                      contract_address:
+                        '0x301A373beBF0160c0583394855D5b10d00a4168a',
+                    },
+                  },
+                },
+              ],
+              created_at: new Date(),
+              updated_at: new Date(),
+            },
+          ]),
+        },
+        Membership: {
+          findOne: sandbox.stub().resolves({
+            group_id: 1,
+            last_checked: new Date(),
+            reject_reason: 'filler',
+          }),
+          findAll: sandbox.stub().resolves([]),
+          bulkCreate: sandbox.stub().resolves([]),
+        },
       };
       const tokenBalanceCache = {
-        fetchUserBalance: sandbox.stub().resolves(new BN(0.5)),
+        getBalances: sandbox.stub().resolves({}),
       };
       const banCache = {
         checkBan: sandbox.stub().resolves([true, null]),
@@ -424,7 +462,7 @@ describe('ServerCommentsController', () => {
       const serverCommentsController = new ServerCommentsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        banCache as any,
       );
 
       expect(
@@ -434,7 +472,7 @@ describe('ServerCommentsController', () => {
           community: community as any,
           reaction: reaction as any,
           commentId,
-        })
+        }),
       ).to.be.rejectedWith('Insufficient token balance');
     });
   });
@@ -459,7 +497,7 @@ describe('ServerCommentsController', () => {
       const serverCommentsController = new ServerCommentsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        banCache as any,
       );
 
       const community = { id: 'ethereum' };
@@ -472,7 +510,7 @@ describe('ServerCommentsController', () => {
         orderDirection: 'DESC',
       };
       const comments = await serverCommentsController.searchComments(
-        searchOptions
+        searchOptions,
       );
       expect(comments.results).to.have.length(5);
       expect(comments.results[0].id).to.equal(1);
@@ -491,7 +529,7 @@ describe('ServerCommentsController', () => {
         thread_id: 2,
         text: 'Wasup',
         version_history: ['{"body":""}'],
-        chain: 'ethereum',
+        community_id: 'ethereum',
         Address: {
           address: '0x123',
           community_id: 'ethereum',
@@ -509,7 +547,7 @@ describe('ServerCommentsController', () => {
           findOne: async () => ({
             id: 1,
             address: '0x123',
-            chain: 'ethereum',
+            community_id: 'ethereum',
             title: 'Big Thread!',
           }),
         },
@@ -520,7 +558,7 @@ describe('ServerCommentsController', () => {
       const serverCommentsController = new ServerCommentsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        banCache as any,
       );
 
       const user = {
@@ -556,7 +594,7 @@ describe('ServerCommentsController', () => {
           community: community as any,
           commentId,
           commentBody,
-        })
+        }),
       ).to.be.rejectedWith('Ban error: banned');
 
       expect(updatedComment).to.include({
@@ -590,7 +628,7 @@ describe('ServerCommentsController', () => {
         thread_id: 2,
         text: 'Wasup',
         version_history: ['{"body":""}'],
-        chain: 'ethereum',
+        community_id: 'ethereum',
         Address: {
           address: '0x123',
           community_id: 'ethereum',
@@ -608,7 +646,7 @@ describe('ServerCommentsController', () => {
           findOne: async () => ({
             id: 1,
             address: '0x123',
-            chain: 'ethereum',
+            community_id: 'ethereum',
             title: 'Big Thread!',
           }),
         },
@@ -621,7 +659,7 @@ describe('ServerCommentsController', () => {
       const serverCommentsController = new ServerCommentsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        banCache as any,
       );
 
       const user = {
@@ -645,7 +683,7 @@ describe('ServerCommentsController', () => {
           community: community as any,
           commentId,
           commentBody,
-        })
+        }),
       ).to.be.rejectedWith('Ban error: banned');
     });
 
@@ -655,7 +693,7 @@ describe('ServerCommentsController', () => {
         thread_id: 2,
         text: 'Wasup',
         version_history: ['{"body":""}'],
-        chain: 'ethereum',
+        community_id: 'ethereum',
         Address: {
           address: '0x123',
           community_id: 'ethereum',
@@ -681,7 +719,7 @@ describe('ServerCommentsController', () => {
       const serverCommentsController = new ServerCommentsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        banCache as any,
       );
 
       const user = {
@@ -705,7 +743,7 @@ describe('ServerCommentsController', () => {
           community: community as any,
           commentId,
           commentBody,
-        })
+        }),
       ).to.be.rejectedWith('Thread not found for comment');
     });
   });
@@ -731,7 +769,7 @@ describe('ServerCommentsController', () => {
       const serverCommentsController = new ServerCommentsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        banCache as any,
       );
 
       const user = {
@@ -759,7 +797,7 @@ describe('ServerCommentsController', () => {
           },
           community: community as any,
           commentId,
-        })
+        }),
       ).to.be.rejectedWith('Ban error: banned');
     });
   });

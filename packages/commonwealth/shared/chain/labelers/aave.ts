@@ -1,9 +1,9 @@
 import moment from 'moment';
 
+import { SupportedNetwork } from '@hicommonwealth/core';
 import type { IEventData } from '../types/aave';
 import { EventKind } from '../types/aave';
 import { IEventLabel, LabelerFilter } from './util';
-import { SupportedNetwork } from '../types/types';
 
 function fmtAddr(addr: string) {
   if (!addr) return '';
@@ -18,7 +18,7 @@ function fmtAddr(addr: string) {
 export const Label: LabelerFilter = (
   chainId: string,
   data: IEventData,
-  chain?: string
+  chain?: string,
 ): IEventLabel => {
   switch (data.kind) {
     case EventKind.ProposalCanceled: {
@@ -75,7 +75,7 @@ export const Label: LabelerFilter = (
       return {
         heading: 'Delegate Changed',
         label: `User ${fmtAddr(data.delegator)} delegated to ${fmtAddr(
-          data.delegatee
+          data.delegatee,
         )}.`,
         linkUrl: chainId ? `/${chainId}/account/${data.delegator}` : null,
         icon: 'delegate',
@@ -109,7 +109,7 @@ export const Label: LabelerFilter = (
       throw new Error(
         `[${SupportedNetwork.Aave}${
           chain ? `::${chain}` : ''
-        }]: Unknown event type!`
+        }]: Unknown event type!`,
       );
     }
   }

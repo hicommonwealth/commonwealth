@@ -11,6 +11,7 @@ import { User } from '../user/user';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';
 import { getClasses, isWindowSmallInclusive } from './helpers';
+import { CWButton } from './new_designs/cw_button';
 import type { MenuItem } from './types';
 import { ComponentType } from './types';
 
@@ -36,14 +37,39 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
   const { mutateAsync: toggleCommunityStar } = useToggleCommunityStarMutation();
 
   if (props.type === 'default') {
-    const { disabled, iconLeft, iconRight, isSecondary, label, onClick } =
-      props;
+    const {
+      disabled,
+      iconLeft,
+      iconLeftWeight,
+      iconRight,
+      isSecondary,
+      label,
+      onClick,
+      isButton,
+      className,
+    } = props;
+
+    if (isButton) {
+      return (
+        <CWButton
+          containerClassName={`${className} px-16 no-outline`}
+          key={label as string}
+          label={label}
+          buttonHeight="sm"
+          buttonWidth="full"
+          iconLeft={iconLeft}
+          iconLeftWeight={iconLeftWeight}
+          disabled={disabled}
+          onClick={onClick}
+        />
+      );
+    }
 
     return (
       <div
         className={getClasses<{ disabled?: boolean; isSecondary?: boolean }>(
           { disabled, isSecondary },
-          'SidebarMenuItem default'
+          'SidebarMenuItem default',
         )}
         onClick={(e) => {
           if (onClick) onClick(e);
@@ -64,12 +90,12 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
     );
   } else if (props.type === 'community') {
     const item = props.community;
-    const roles = app.roles.getAllRolesInCommunity({ chain: item.id });
+    const roles = app.roles.getAllRolesInCommunity({ community: item.id });
     return (
       <div
         className={getClasses<{ isSelected: boolean }>(
           { isSelected: app.activeChainId() === item.id },
-          'SidebarMenuItem community'
+          'SidebarMenuItem community',
         )}
         onClick={(e) => {
           e.preventDefault();
@@ -90,15 +116,14 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
               avatarSize={18}
               shouldShowAvatarOnly
               userAddress={roles[0].address}
-              userChainId={roles[0].address_chain || roles[0].chain_id}
+              userCommunityId={roles[0].address_chain || roles[0].chain_id}
             />
             <div
               className={isStarred ? 'star-filled' : 'star-empty'}
               onClick={async (e) => {
                 e.stopPropagation();
                 await toggleCommunityStar({
-                  chain: item.id,
-                  isAlreadyStarred: app.user.isCommunityStarred(item.id),
+                  community: item.id,
                 });
                 setIsStarred((prevState) => !prevState);
               }}
@@ -125,7 +150,7 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
     <div
       className={getClasses<{ className: string }>(
         { className },
-        ComponentType.SidebarMenu
+        ComponentType.SidebarMenu,
       )}
     >
       <div className="sidebar-top">

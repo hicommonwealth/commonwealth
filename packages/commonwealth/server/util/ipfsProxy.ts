@@ -1,19 +1,24 @@
+import {
+  cacheDecorator,
+  lookupKeyDurationInReq,
+} from '@hicommonwealth/adapters';
 import axios from 'axios';
 import type { Express } from 'express';
-import { cacheDecorator } from 'common-common/src/cacheDecorator';
+
+const defaultCacheDuration = 24 * 60 * 60; // 1 day
 
 function setupIpfsProxy(app: Express) {
-  // using bodyParser here because cosmjs generates text/plain type headers
-  // caching for 1 day
   app.get(
     '/api/ipfsProxy',
+    calcIpfsCacheKeyDuration,
     cacheDecorator.cacheMiddleware(
-      24 * 60 * 60,
-      (req) => `/api/ipfsProxy_${req.query.hash}`
+      defaultCacheDuration,
+      lookupKeyDurationInReq,
     ),
     async function (req, res) {
       try {
         const hash = req.query.hash;
+        const isImageRequest = req.query?.image === 'true';
         const response = await axios.get(
           `https://cloudflare-ipfs.com/ipfs/${hash}#x-ipfs-companion-no-redirect`,
           {
@@ -21,8 +26,8 @@ function setupIpfsProxy(app: Express) {
               origin: 'https://commonwealth.im',
             },
             timeout: 5000,
-            responseType: 'arraybuffer',
-          }
+            responseType: isImageRequest ? 'arraybuffer' : 'json',
+          },
         );
         const contentType = response.headers['content-type'];
         if (contentType) {
@@ -32,8 +37,19 @@ function setupIpfsProxy(app: Express) {
       } catch (err) {
         res.status(500).json({ message: err.message });
       }
-    }
+    },
   );
+}
+
+function calcIpfsCacheKeyDuration(req, res, next) {
+  if (req.query?.image === 'true') {
+    req.cacheDuration = null; // not not cache images
+    return next();
+  }
+
+  req.cacheDuration = 24 * 60 * 60; // cache for 1 day
+  req.cacheKey = `/api/ipfsProxy_${req.query.hash}`;
+  return next();
 }
 
 export default setupIpfsProxy;

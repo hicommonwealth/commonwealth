@@ -1,14 +1,17 @@
-import { ChainBase, NotificationCategories } from 'common-common/src/types';
-import emitNotifications from '../../util/emitNotifications';
-import { SupportedNetwork } from '../../../shared/chain/types/types';
-import { coinToCoins, EventKind } from '../../../shared/chain/types/cosmos';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { fromTimestamp } from 'common-common/src/cosmos-ts/src/codegen/helpers';
-import { DB } from '../../models';
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
+import { fromTimestamp } from '@hicommonwealth/chains';
+import {
+  ChainBase,
+  NotificationCategories,
+  SupportedNetwork,
+} from '@hicommonwealth/core';
 import Rollbar from 'rollbar';
+import { EventKind, coinToCoins } from '../../../shared/chain/types/cosmos';
+import { DB } from '../../models';
+import emitNotifications from '../../util/emitNotifications';
 import { AllCosmosProposals } from './proposalFetching/types';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 export async function fetchCosmosNotifChains(models: DB) {
   const chainIds = await models.Subscription.findAll({
@@ -41,7 +44,7 @@ export async function fetchCosmosNotifChains(models: DB) {
 
 export async function fetchLatestNotifProposalIds(
   models: DB,
-  chainIds: string[]
+  chainIds: string[],
 ): Promise<Record<string, number>> {
   if (chainIds.length === 0) return {};
 
@@ -53,12 +56,12 @@ export async function fetchLatestNotifProposalIds(
     WHERE category_id = 'chain-event' AND chain_id IN (?)
     GROUP BY chain_id;
   `,
-    { raw: true, type: 'SELECT', replacements: [chainIds] }
+    { raw: true, type: 'SELECT', replacements: [chainIds] },
   )) as { chain_id: string; proposal_id: string }[];
 
   return result.reduce(
     (acc, item) => ({ ...acc, [item.chain_id]: +item.proposal_id }),
-    {}
+    {},
   );
 }
 
@@ -103,7 +106,7 @@ function formatProposalDates(date: string | Date): number {
 export async function emitProposalNotifications(
   models: DB,
   proposals: AllCosmosProposals,
-  rollbar?: Rollbar
+  rollbar?: Rollbar,
 ) {
   for (const chainId in proposals.v1) {
     const chainProposals = proposals.v1[chainId];

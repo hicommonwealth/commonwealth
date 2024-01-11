@@ -1,4 +1,7 @@
 import { DB } from 'server/models';
+
+import { TokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
+
 import {
   DeletePollOptions,
   DeletePollResult,
@@ -9,7 +12,6 @@ import {
   GetPollVotesResult,
   __getPollVotes,
 } from './server_polls_methods/get_poll_votes';
-import { TokenBalanceCache } from '../../../token-balance-cache/src';
 import {
   UpdatePollVoteOptions,
   UpdatePollVoteResult,
@@ -28,13 +30,13 @@ export class ServerPollsController {
   }
 
   async getPollVotes(
-    options: GetPollVotesOptions
+    options: GetPollVotesOptions,
   ): Promise<GetPollVotesResult> {
     return __getPollVotes.call(this, options);
   }
 
   async updatePollVote(
-    options: UpdatePollVoteOptions
+    options: UpdatePollVoteOptions,
   ): Promise<UpdatePollVoteResult> {
     return __updatePollVote.call(this, options);
   }

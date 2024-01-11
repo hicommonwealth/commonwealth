@@ -1,6 +1,10 @@
-import { AppError, ServerError } from 'common-common/src/errors';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { NotificationCategories, WalletId } from 'common-common/src/types';
+import {
+  AppError,
+  ServerError,
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/adapters';
+import { NotificationCategories, WalletId } from '@hicommonwealth/core';
 import * as jwt from 'jsonwebtoken';
 import { isAddress, toChecksumAddress } from 'web3-utils';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
@@ -19,7 +23,7 @@ import { createRole } from '../util/roles';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { redirectWithLoginError } from './finishEmailLogin';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');
@@ -68,7 +72,7 @@ type FinishSsoLoginRes = { user?: UserAttributes; address?: AddressAttributes };
 const finishSsoLogin = async (
   models: DB,
   req: TypedRequestBody<FinishSsoLoginReq>,
-  res: TypedResponse<FinishSsoLoginRes>
+  res: TypedResponse<FinishSsoLoginRes>,
 ) => {
   const serverAnalyticsController = new ServerAnalyticsController();
 
@@ -147,7 +151,7 @@ const finishSsoLogin = async (
           required: false,
         },
       ],
-    }
+    },
   );
   if (existingAddress) {
     // TODO: transactionalize
@@ -216,7 +220,7 @@ const finishSsoLogin = async (
         };
         await sgMail.send(msg);
         log.info(
-          `Sent address move email: ${existingAddress} transferred to a new account`
+          `Sent address move email: ${existingAddress} transferred to a new account`,
         );
       } catch (e) {
         log.error(`Could not send address move email for: ${existingAddress}`);
@@ -253,14 +257,14 @@ const finishSsoLogin = async (
           if (err)
             return redirectWithLoginError(
               res,
-              `Could not sign in with ronin wallet`
+              `Could not sign in with ronin wallet`,
             );
           serverAnalyticsController.track(
             {
               event: MixpanelLoginEvent.LOGIN_COMPLETED,
-              isCustomDomain: null,
+              userId: existingUser.id,
             },
-            req
+            req,
           );
         });
         return success(res, { user: existingUser });
@@ -276,22 +280,21 @@ const finishSsoLogin = async (
             serverAnalyticsController.track(
               {
                 event: MixpanelLoginEvent.LOGIN_FAILED,
-                isCustomDomain: null,
               },
-              req
+              req,
             );
             return redirectWithLoginError(
               res,
-              `Could not sign in with ronin wallet`
+              `Could not sign in with ronin wallet`,
             );
           }
 
           serverAnalyticsController.track(
             {
               event: MixpanelLoginEvent.LOGIN_COMPLETED,
-              isCustomDomain: null,
+              userId: newUser.id,
             },
-            req
+            req,
           );
         });
         return success(res, { user: newUser });
@@ -310,7 +313,7 @@ const finishSsoLogin = async (
         user = await models.User.createWithProfile(
           models,
           { email: null },
-          { transaction: t }
+          { transaction: t },
         );
         profile = user.Profiles[0];
       } else {
@@ -335,7 +338,7 @@ const finishSsoLogin = async (
           wallet_id: WalletId.Ronin,
           // wallet_sso_source: null,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await createRole(
@@ -344,7 +347,7 @@ const finishSsoLogin = async (
         AXIE_INFINITY_CHAIN_ID,
         'member',
         false,
-        t
+        t,
       );
 
       // Automatically create subscription to their own mentions
@@ -354,7 +357,7 @@ const finishSsoLogin = async (
           category_id: NotificationCategories.NewMention,
           is_active: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // Automatically create a subscription to collaborations
@@ -364,7 +367,7 @@ const finishSsoLogin = async (
           category_id: NotificationCategories.NewCollaboration,
           is_active: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // populate token
@@ -384,9 +387,9 @@ const finishSsoLogin = async (
       serverAnalyticsController.track(
         {
           event: MixpanelLoginEvent.LOGIN_COMPLETED,
-          isCustomDomain: null,
+          userId: reqUser.id,
         },
-        req
+        req,
       );
       return success(res, { address: newAddress });
     } else {
@@ -402,14 +405,14 @@ const finishSsoLogin = async (
         if (err)
           return redirectWithLoginError(
             res,
-            `Could not sign in with ronin wallet`
+            `Could not sign in with ronin wallet`,
           );
         serverAnalyticsController.track(
           {
             event: MixpanelLoginEvent.LOGIN_COMPLETED,
-            isCustomDomain: null,
+            userId: newUser.id,
           },
-          req
+          req,
         );
       });
       return success(res, { user: newUser });

@@ -1,8 +1,10 @@
-import { AppError } from '../../../../common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { CommunityInstance } from '../../models/community';
 import { TopicAttributes } from '../../models/topic';
 import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
+import { TrackOptions } from '../server_analytics_methods/track';
 import { ServerTopicsController } from '../server_topics_controller';
 
 export const Errors = {
@@ -22,7 +24,7 @@ export type UpdateTopicOptions = {
   body: Partial<TopicAttributes>;
 };
 
-export type UpdateTopicResult = TopicAttributes;
+export type UpdateTopicResult = [TopicAttributes, TrackOptions];
 
 export async function __updateTopic(
   this: ServerTopicsController,
@@ -89,5 +91,11 @@ export async function __updateTopic(
   }
   await topic.save();
 
-  return topic.toJSON();
+  const analyticsOptions = {
+    event: MixpanelCommunityInteractionEvent.UPDATE_TOPIC,
+    community: community.id,
+    userId: user.id,
+  };
+
+  return [topic.toJSON(), analyticsOptions];
 }

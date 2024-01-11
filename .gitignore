@@ -1,13 +1,13 @@
 docker-compose.yaml
 stellar
 node_modules/
-*/build
-*/dist
+**/build
+**/dist
 **/.DS_Store
 *.env
 *.log
-*/build/
 .idea
 .vscode
 *.postgres
 *.rabbitmq
+redis-data

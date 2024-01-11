@@ -1,17 +1,17 @@
 import React from 'react';
 
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
-import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
-import { FeedbackModal } from '../modals/feedback_modal';
-import { CWModal } from '../components/component_kit/new_designs/CWModal';
 import useSidebarStore from 'state/ui/sidebar';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import {
   handleIconClick,
   handleMouseEnter,
   handleMouseLeave,
 } from 'views/menus/utils';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
+import { CWModal } from '../components/component_kit/new_designs/CWModal';
+import { FeedbackModal } from '../modals/feedback_modal';
 
 export const HelpMenu = () => {
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);

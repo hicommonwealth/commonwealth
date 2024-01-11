@@ -55,6 +55,10 @@
       }
     }
 
+    .text-input-icon > svg {
+      fill: $neutral-400;
+    }
+
     .text-input-left-icon > svg {
       @include iconPositionStyles;
       left: 8px;

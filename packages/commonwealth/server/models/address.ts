@@ -1,7 +1,8 @@
-import type { WalletId, WalletSsoSource } from 'common-common/src/types';
+import { WalletId, WalletSsoSource } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { CommunityAttributes, CommunityInstance } from './community';
+import { MembershipAttributes } from './membership';
 import type { ProfileAttributes, ProfileInstance } from './profile';
 import { Role } from './role';
 import type { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
@@ -26,6 +27,10 @@ export type AddressAttributes = {
   is_councillor?: boolean;
   is_validator?: boolean;
   ghost_address?: boolean;
+  // Cosmos self-custodial wallets only.
+  // hex is derived from bech32 address using bech32ToHex function in
+  // packages/commonwealth/shared/utils.ts
+  hex?: string;
   profile_id?: number;
   wallet_id?: WalletId;
   wallet_sso_source?: WalletSsoSource;
@@ -34,6 +39,7 @@ export type AddressAttributes = {
   Profile?: ProfileAttributes;
   User?: UserAttributes;
   SsoToken?: SsoTokenAttributes;
+  Memberships?: MembershipAttributes[];
 };
 
 export type AddressInstance = ModelInstance<AddressAttributes> & {
@@ -47,7 +53,7 @@ export type AddressModelStatic = ModelStatic<AddressInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): AddressModelStatic => {
   const Address: AddressModelStatic = <AddressModelStatic>sequelize.define(
     'Address',
@@ -92,6 +98,27 @@ export default (
       wallet_id: { type: dataTypes.STRING, allowNull: true },
       wallet_sso_source: { type: dataTypes.STRING, allowNull: true },
       block_info: { type: dataTypes.STRING, allowNull: true },
+      hex: {
+        type: dataTypes.STRING,
+        allowNull: true,
+        validate: {
+          isRequiredForCosmos() {
+            if (
+              [
+                WalletId.Keplr,
+                WalletId.Leap,
+                WalletId.KeplrEthereum,
+                WalletId.TerraStation,
+                WalletId.CosmosEvmMetamask,
+              ].includes(this.wallet_id)
+            ) {
+              if (!this.hex) {
+                throw new Error('hex is required for cosmos addresses');
+              }
+            }
+          },
+        },
+      },
     },
     {
       timestamps: true,
@@ -117,7 +144,7 @@ export default (
       scopes: {
         withPrivateData: {},
       },
-    }
+    },
   );
 
   Address.associate = (models) => {
@@ -143,6 +170,10 @@ export default (
       as: 'collaboration',
     });
     models.Address.hasMany(models.Collaboration);
+    models.Address.hasMany(models.Membership, {
+      foreignKey: 'address_id',
+      as: 'Memberships',
+    });
   };
 
   return Address;

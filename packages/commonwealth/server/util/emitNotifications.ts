@@ -1,6 +1,10 @@
-import { factory, formatFilename } from 'common-common/src/logging';
-import { StatsDController } from 'common-common/src/statsd';
-import { NotificationCategories } from 'common-common/src/types';
+/* eslint-disable max-len */
+import {
+  StatsDController,
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/adapters';
+import { NotificationCategories } from '@hicommonwealth/core';
 import Sequelize, { QueryTypes } from 'sequelize';
 import type {
   IChainEventNotificationData,
@@ -15,7 +19,7 @@ import { rollbar } from './rollbar';
 import { mapNotificationsDataToSubscriptions } from './subscriptionMapping';
 import { dispatchWebhooks } from './webhooks/dispatchWebhook';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 const { Op } = Sequelize;
 

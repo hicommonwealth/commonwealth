@@ -1,11 +1,11 @@
 import React from 'react';
 
+import { useFormContext } from 'react-hook-form';
 import type { ValidationStatus } from '../../cw_validation_text';
-import { MessageRow } from './MessageRow';
 import { getClasses } from '../../helpers';
 import { ComponentType } from '../../types';
+import { MessageRow } from './MessageRow';
 import { useTextInputWithValidation } from './useTextInputWithValidation';
-import { useFormContext } from 'react-hook-form';
 
 import './CWTextInput.scss';
 
@@ -33,6 +33,7 @@ export type BaseTextInputProps = {
   tabIndex?: number;
   instructionalMessage?: string;
   manualStatusMessage?: string;
+  inputRef?: any;
 };
 
 type InputStyleProps = {
@@ -43,6 +44,7 @@ type InputStyleProps = {
   fullWidth?: boolean;
   validationStatus?: ValidationStatus;
   displayOnly?: boolean;
+  alignLabelToRight?: boolean;
 };
 
 type InputInternalStyleProps = {
@@ -94,6 +96,9 @@ const CWTextInput = (props: TextInputProps) => {
     instructionalMessage,
     hookToForm,
     customError,
+    inputRef,
+    validationStatus,
+    alignLabelToRight,
   } = props;
 
   const formContext = useFormContext();
@@ -103,6 +108,19 @@ const CWTextInput = (props: TextInputProps) => {
   const formFieldErrorMessage =
     hookToForm && (formContext?.formState?.errors?.[name]?.message as string);
 
+  const validateValue = (inputVal: string) => {
+    if (inputValidationFn) {
+      if (inputVal?.length === 0) {
+        validationProps.setValidationStatus(undefined);
+        validationProps.setStatusMessage(undefined);
+      } else {
+        const result = inputValidationFn(inputVal);
+        validationProps.setValidationStatus(result[0]);
+        validationProps.setStatusMessage(result[1]);
+      }
+    }
+  };
+
   return (
     <div
       className={getClasses<{
@@ -111,14 +129,15 @@ const CWTextInput = (props: TextInputProps) => {
       }>(
         {
           containerClassName,
-          validationStatus: props.validationStatus,
+          validationStatus: validationStatus,
         },
-        ComponentType.TextInput
+        ComponentType.TextInput,
       )}
       onClick={onClick}
     >
       {label && (
         <MessageRow
+          rightAlign={alignLabelToRight}
           label={label}
           statusMessage={manualStatusMessage || validationProps.statusMessage}
           validationStatus={validationProps.validationStatus}
@@ -128,9 +147,10 @@ const CWTextInput = (props: TextInputProps) => {
         {iconLeftonClick && iconLeft ? (
           <div className="text-input-left-onClick-icon">{iconLeft}</div>
         ) : iconLeft ? (
-          <div className="text-input-left-icon">{iconLeft}</div>
+          <div className="text-input-icon text-input-left-icon">{iconLeft}</div>
         ) : null}
         <input
+          ref={inputRef}
           {...formFieldContext}
           autoFocus={autoFocus}
           autoComplete={autoComplete}
@@ -154,37 +174,14 @@ const CWTextInput = (props: TextInputProps) => {
           onInput={(e: any) => {
             if (onInput) onInput(e);
 
-            if (e.target.value?.length === 0) {
-              validationProps.setValidationStatus(undefined);
-              validationProps.setStatusMessage(undefined);
-            } else {
-              e.stopPropagation();
-              clearTimeout(validationProps.inputTimeout);
-              const timeout = e.target.value?.length > 3 ? 250 : 1000;
-              validationProps.setInputTimeout(
-                setTimeout(() => {
-                  if (inputValidationFn && e.target.value?.length > 3) {
-                    const result = inputValidationFn(e.target.value);
-                    validationProps.setValidationStatus(result[0]);
-                    validationProps.setStatusMessage(result[1]);
-                  }
-                }, timeout)
-              );
-            }
+            e.stopPropagation();
+
+            validateValue(e.target.value);
           }}
           onBlur={(e) => {
             if (hookToForm) formFieldContext?.onBlur?.(e);
 
-            if (inputValidationFn) {
-              if (e.target.value?.length === 0) {
-                validationProps.setValidationStatus(undefined);
-                validationProps.setStatusMessage(undefined);
-              } else {
-                const result = inputValidationFn(e.target.value);
-                validationProps.setValidationStatus(result[0]);
-                validationProps.setStatusMessage(result[1]);
-              }
-            }
+            validateValue(e.target.value);
           }}
           onKeyDown={(e) => {
             if (onenterkey && (e.key === 'Enter' || e.keyCode === 13)) {
@@ -197,7 +194,9 @@ const CWTextInput = (props: TextInputProps) => {
         {iconRightonClick && iconRight ? (
           <div className="text-input-right-onClick-icon">{iconRight}</div>
         ) : iconRight ? (
-          <div className="text-input-right-icon">{iconRight}</div>
+          <div className="text-input-icon text-input-right-icon">
+            {iconRight}
+          </div>
         ) : null}
       </div>
       {label && (

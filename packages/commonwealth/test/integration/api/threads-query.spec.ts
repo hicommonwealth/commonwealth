@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import 'chai/register-should';
 import { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';
 
@@ -28,7 +28,7 @@ describe('Thread queries', () => {
     const thread = (
       await models.Thread.findOrCreate({
         where: {
-          chain: chain.id,
+          community_id: chain.id,
           address_id: address.id,
           title: 'title',
           kind: 'kind',

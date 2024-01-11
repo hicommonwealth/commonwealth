@@ -1,10 +1,8 @@
 import React, { FC, useState } from 'react';
 
-import { CWButton } from './component_kit/new_designs/cw_button';
 import { CWCard } from './component_kit/cw_card';
 import { CWCheckbox } from './component_kit/cw_checkbox';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
-import { CWTooltip } from './component_kit/cw_popover/cw_tooltip';
 import { CWProgressBar } from './component_kit/cw_progress_bar';
 import { CWRadioButton } from './component_kit/cw_radio_button';
 import { CWText } from './component_kit/cw_text';
@@ -15,8 +13,10 @@ import {
   CWModalFooter,
   CWModalHeader,
 } from './component_kit/new_designs/CWModal';
+import { CWButton } from './component_kit/new_designs/cw_button';
 
 import 'components/poll_card.scss';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 
 const LIVE_PREVIEW_MAX = 3;
 const ENDED_PREVIEW_MAX = 1;
@@ -102,17 +102,21 @@ export const CastVoteSection = ({
     <div className="CastVoteSection">
       {disableVoteButton ? (
         <CWTooltip
+          placement="top"
           content={tooltipErrorMessage ?? 'Select an option to vote.'}
           renderTrigger={(handleInteraction) => (
-            <CWButton
+            <div
               onMouseEnter={handleInteraction}
               onMouseLeave={handleInteraction}
-              label="Vote"
-              buttonType="primary"
-              buttonHeight="sm"
-              disabled={disableVoteButton}
-              onClick={() => onVoteCast()}
-            />
+            >
+              <CWButton
+                label="Vote"
+                buttonType="primary"
+                buttonHeight="sm"
+                disabled={disableVoteButton}
+                onClick={() => onVoteCast()}
+              />
+            </div>
           )}
         />
       ) : (
@@ -147,7 +151,7 @@ export const VoteDisplay = ({
   isSnapshot,
 }: VoteDisplayProps) => {
   const topResponse = voteInformation.sort(
-    (option1, option2) => option2.voteCount - option1.voteCount
+    (option1, option2) => option2.voteCount - option1.voteCount,
   )[0].label;
 
   return (

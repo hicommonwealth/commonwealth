@@ -1,6 +1,6 @@
-import { TokenBalanceCache } from '../../../token-balance-cache/src';
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
+import { TokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
 import {
   CreateGroupOptions,
   CreateGroupResult,

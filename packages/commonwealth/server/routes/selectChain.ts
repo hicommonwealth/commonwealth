@@ -1,4 +1,4 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../models';
 
@@ -12,7 +12,7 @@ const selectChain = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.user) {
     return next(new AppError(Errors.NotLoggedIn));
@@ -21,11 +21,13 @@ const selectChain = async (
     return next(new AppError(Errors.NoChain));
   }
 
-  const chain = await models.Community.findOne({ where: { id: req.body.chain } });
+  const chain = await models.Community.findOne({
+    where: { id: req.body.chain },
+  });
   if (!chain) {
     return next(new AppError(Errors.ChainNF));
   }
-  req.user.setSelectedChain(chain);
+  req.user.setSelectedCommunity(chain);
   await req.user.save();
   return res.json({ status: 'Success' });
 };

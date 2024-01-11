@@ -1,11 +1,14 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { featureFlags } from 'helpers/feature-flags';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import _ from 'lodash';
 import Group from 'models/Group';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import app from 'state';
 import { useEditGroupMutation, useFetchGroupsQuery } from 'state/api/groups';
+import useGroupMutationBannerStore from 'state/ui/group';
 import Permissions from 'utils/Permissions';
+import { MixpanelPageViewEvent } from '../../../../../../../shared/analytics/types';
 import { PageNotFound } from '../../../404';
 import { PageLoading } from '../../../loading';
 import {
@@ -14,6 +17,7 @@ import {
   conditionTypes,
   requirementTypes,
 } from '../../common/constants';
+import { convertRequirementAmountFromWeiToTokens } from '../../common/helpers';
 import { DeleteGroupModal } from '../DeleteGroupModal';
 import { GroupForm } from '../common/GroupForm';
 import { makeGroupDataBaseAPIPayload } from '../common/helpers';
@@ -21,18 +25,25 @@ import './UpdateCommunityGroupPage.scss';
 
 const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   const navigate = useCommonNavigate();
+  const { setShouldShowGroupMutationBannerForCommunity } =
+    useGroupMutationBannerStore();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { mutateAsync: editGroup } = useEditGroupMutation({
     chainId: app.activeChainId(),
   });
   const { data: groups = [], isLoading } = useFetchGroupsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     includeTopics: true,
   });
-  const foundGroup: Group = groups.find((x) => x.id === parseInt(`${groupId}`));
+  const foundGroup: Group = groups.find(
+    (group) => group.id === parseInt(`${groupId}`),
+  );
+
+  useBrowserAnalyticsTrack({
+    payload: { event: MixpanelPageViewEvent.GROUPS_EDIT_PAGE_VIEW },
+  });
 
   if (
-    !featureFlags.gatingEnabled ||
     !app.isLoggedIn() ||
     !(Permissions.isCommunityAdmin() || Permissions.isSiteAdmin())
   ) {
@@ -50,48 +61,73 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
         initialValues={{
           groupName: foundGroup.name,
           groupDescription: foundGroup.description,
-          requirements: foundGroup.requirements.map((x) => ({
+          requirements: foundGroup.requirements.map((requirement) => ({
             requirementType: {
-              value: x.data.source.source_type,
+              value: requirement.data.source.source_type,
               label: requirementTypes.find(
-                (y) => y.value === x.data.source.source_type,
+                (requirementType) =>
+                  requirementType.value === requirement.data.source.source_type,
               )?.label,
             },
-            requirementAmount: x.data.threshold,
+            requirementTokenId: requirement.data.source.token_id,
+            requirementAmount: convertRequirementAmountFromWeiToTokens(
+              requirement.data.source.source_type,
+              requirement.data.threshold.trim(),
+            ),
             requirementChain: {
               value: `${
-                x.data.source.cosmos_chain_id || x.data.source.evm_chain_id || 0
+                requirement.data.source.cosmos_chain_id ||
+                requirement.data.source.evm_chain_id ||
+                0
               }`,
               label: chainTypes.find(
-                (c) =>
-                  c.value ==
-                  (x.data.source.cosmos_chain_id || x.data.source.evm_chain_id),
+                (chain) =>
+                  chain.value ==
+                  (requirement.data.source.cosmos_chain_id ||
+                    requirement.data.source.evm_chain_id),
               )?.label,
             },
-            requirementContractAddress: x.data.source.contract_address || '',
+            requirementContractAddress:
+              requirement.data.source.contract_address || '',
             // API doesn't return this, api internally uses the "more than" option, so we set it here explicitly
             requirementCondition: conditionTypes.find(
-              (y) => y.value === AMOUNT_CONDITIONS.MORE,
+              (condition) => condition.value === AMOUNT_CONDITIONS.MORE,
             ),
           })),
           requirementsToFulfill:
             foundGroup.requirementsToFulfill === foundGroup.requirements.length
               ? 'ALL'
               : foundGroup.requirementsToFulfill,
-          topics: (foundGroup.topics || []).map((x) => ({
-            label: x.name,
-            value: x.id,
+          topics: (foundGroup.topics || []).map((topic) => ({
+            label: topic.name,
+            value: topic.id,
           })),
         }}
         onSubmit={(values) => {
           const payload = makeGroupDataBaseAPIPayload(values);
-
-          editGroup({
+          const finalPayload = {
             ...payload,
             groupId: groupId,
-          })
+          };
+
+          // if requirements are equal, then don't send them to api
+          const isRequirementsEqual = _.isEqual(
+            foundGroup.requirements,
+            payload.requirements,
+          );
+          if (isRequirementsEqual) {
+            delete finalPayload.requirements;
+          }
+
+          editGroup(finalPayload)
             .then(() => {
               notifySuccess('Group Updated');
+              if (!isRequirementsEqual) {
+                setShouldShowGroupMutationBannerForCommunity(
+                  app.activeChainId(),
+                  true,
+                );
+              }
               navigate(`/members?tab=groups`);
             })
             .catch(() => {
@@ -104,7 +140,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
         isOpen={isDeleteModalOpen}
         groupId={foundGroup.id}
         groupName={foundGroup.name}
-        gatedTopics={(foundGroup?.topics || []).map((x) => x.name)}
+        gatedTopics={(foundGroup?.topics || []).map((topic) => topic.name)}
         onClose={() => setIsDeleteModalOpen(false)}
       />
     </>

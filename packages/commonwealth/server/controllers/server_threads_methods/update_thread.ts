@@ -1,11 +1,8 @@
+import { AppError, ServerError } from '@hicommonwealth/adapters';
+import { NotificationCategories, ProposalType } from '@hicommonwealth/core';
 import { uniq } from 'lodash';
 import moment from 'moment';
 import { Op, Sequelize, Transaction } from 'sequelize';
-import { AppError, ServerError } from '../../../../common-common/src/errors';
-import {
-  NotificationCategories,
-  ProposalType,
-} from '../../../../common-common/src/types';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText, validURL } from '../../../shared/utils';
 import { DB } from '../../models';
@@ -49,7 +46,6 @@ export type UpdateThreadOptions = {
   archived?: boolean;
   spam?: boolean;
   topicId?: number;
-  topicName?: string;
   collaborators?: {
     toAdd?: number[];
     toRemove?: number[];
@@ -82,7 +78,6 @@ export async function __updateThread(
     archived,
     spam,
     topicId,
-    topicName,
     collaborators,
     canvasSession,
     canvasAction,
@@ -113,7 +108,13 @@ export async function __updateThread(
     throw new AppError(`Ban error: ${banError}`);
   }
 
-  const thread = await this.models.Thread.findByPk(threadId);
+  const thread = await this.models.Thread.findByPk(threadId, {
+    include: {
+      model: this.models.Address,
+      as: 'collaborators',
+      required: false,
+    },
+  });
   if (!thread) {
     throw new AppError(`${Errors.ThreadNotFound}: ${threadId}`);
   }
@@ -129,6 +130,9 @@ export async function __updateThread(
     ['moderator', 'admin'],
   );
 
+  const isCollaborator = !!thread.collaborators?.find(
+    (a) => a.address === address.address,
+  );
   const isThreadOwner = userOwnedAddressIds.includes(thread.address_id);
   const isMod = !!roles.find(
     (r) => r.chain_id === community.id && r.permission === 'moderator',
@@ -137,7 +141,13 @@ export async function __updateThread(
     (r) => r.chain_id === community.id && r.permission === 'admin',
   );
   const isSuperAdmin = user.isAdmin;
-  if (!isThreadOwner && !isMod && !isAdmin && !isSuperAdmin) {
+  if (
+    !isThreadOwner &&
+    !isMod &&
+    !isAdmin &&
+    !isSuperAdmin &&
+    !isCollaborator
+  ) {
     throw new AppError(Errors.Unauthorized);
   }
   const permissions = {
@@ -145,6 +155,7 @@ export async function __updateThread(
     isMod,
     isAdmin,
     isSuperAdmin,
+    isCollaborator,
   };
 
   const now = new Date();
@@ -209,9 +220,8 @@ export async function __updateThread(
 
     await setThreadTopic(
       permissions,
-      thread,
+      community,
       topicId,
-      topicName,
       this.models,
       toUpdate,
     );
@@ -273,7 +283,7 @@ export async function __updateThread(
         thread_id: +finalThread.id,
         root_type: ProposalType.Thread,
         root_title: finalThread.title,
-        chain_id: finalThread.chain,
+        chain_id: finalThread.community_id,
         author_address: finalThread.Address.address,
         author_chain: finalThread.Address.community_id,
       },
@@ -337,7 +347,7 @@ export async function __updateThread(
             root_type: ProposalType.Thread,
             root_title: finalThread.title,
             comment_text: finalThread.body,
-            chain_id: finalThread.chain,
+            chain_id: finalThread.community_id,
             author_address: finalThread.Address.address,
             author_chain: finalThread.Address.community_id,
           },
@@ -357,6 +367,7 @@ export type UpdateThreadPermissions = {
   isMod: boolean;
   isAdmin: boolean;
   isSuperAdmin: boolean;
+  isCollaborator: boolean;
 };
 
 /**
@@ -367,7 +378,13 @@ export function validatePermissions(
   permissions: UpdateThreadPermissions,
   flags: Partial<UpdateThreadPermissions>,
 ) {
-  const keys = ['isThreadOwner', 'isMod', 'isAdmin', 'isSuperAdmin'];
+  const keys = [
+    'isThreadOwner',
+    'isMod',
+    'isAdmin',
+    'isSuperAdmin',
+    'isCollaborator',
+  ];
   for (const k of keys) {
     if (flags[k] && permissions[k]) {
       // at least one flag is satisfied
@@ -413,6 +430,7 @@ async function setThreadAttributes(
       isMod: true,
       isAdmin: true,
       isSuperAdmin: true,
+      isCollaborator: true,
     });
 
     // title
@@ -597,35 +615,29 @@ async function setThreadStage(
  */
 async function setThreadTopic(
   permissions: UpdateThreadPermissions,
-  thread: ThreadInstance,
-  topicId: number | undefined,
-  topicName: string | undefined,
+  community: CommunityInstance,
+  topicId: number,
   models: DB,
   toUpdate: Partial<ThreadAttributes>,
 ) {
-  if (typeof topicId !== 'undefined' || typeof topicName !== 'undefined') {
+  if (typeof topicId !== 'undefined') {
     validatePermissions(permissions, {
       isThreadOwner: true,
       isMod: true,
       isAdmin: true,
       isSuperAdmin: true,
     });
+    const topic = await models.Topic.findOne({
+      where: {
+        id: topicId,
+        community_id: community.id,
+      },
+    });
 
-    if (typeof topicId !== 'undefined') {
-      const topic = await models.Topic.findByPk(topicId);
-      if (!topic) {
-        throw new AppError(Errors.InvalidTopic);
-      }
-      toUpdate.topic_id = topic.id;
-    } else if (typeof topicName !== 'undefined') {
-      const [topic] = await models.Topic.findOrCreate({
-        where: {
-          name: topicName,
-          chain_id: thread.chain,
-        },
-      });
-      toUpdate.topic_id = topic.id;
+    if (!topic) {
+      throw new AppError(Errors.InvalidTopic);
     }
+    toUpdate.topic_id = topic.id;
   }
 }
 
@@ -665,7 +677,7 @@ async function updateThreadCollaborators(
     if (toAddUnique.length > 0) {
       const collaboratorAddresses = await models.Address.findAll({
         where: {
-          community_id: thread.chain,
+          community_id: thread.community_id,
           id: {
             [Op.in]: toAddUnique,
           },

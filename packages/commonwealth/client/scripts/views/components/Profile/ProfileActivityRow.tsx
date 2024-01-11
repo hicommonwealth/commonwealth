@@ -1,20 +1,20 @@
 import React from 'react';
 
-import moment from 'moment';
 import 'components/Profile/ProfileActivityRow.scss';
+import moment from 'moment';
 
-import app from 'state';
-import type Thread from 'models/Thread';
+import Thread from 'models/Thread';
 import withRouter, {
   navigateToCommunity,
   useCommonNavigate,
 } from 'navigation/helpers';
+import app from 'state';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
+import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWText } from '../component_kit/cw_text';
 import { CWTag } from '../component_kit/new_designs/CWTag';
-import type { CommentWithAssociatedThread } from './ProfileActivity';
-import { PopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
-import { CWIconButton } from '../component_kit/cw_icon_button';
 import { QuillRenderer } from '../react_quill_editor/quill_renderer';
+import type { CommentWithAssociatedThread } from './ProfileActivity';
 
 type ProfileActivityRowProps = {
   activity: CommentWithAssociatedThread | Thread;
@@ -22,12 +22,17 @@ type ProfileActivityRowProps = {
 
 const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
   const navigate = useCommonNavigate();
-  const { chain, createdAt, author, title, id, body } = activity;
+  const { communityId, createdAt, author, id } = activity;
+  let title: string, body: string;
+  if (activity instanceof Thread) {
+    title = activity.title;
+    body = activity.body;
+  }
   const isThread = !!(activity as Thread).kind;
   const comment = activity as CommentWithAssociatedThread;
-  const { iconUrl } = app.config.chains.getById(chain);
+  const { iconUrl } = app.config.chains.getById(communityId);
   const domain = document.location.origin;
-  let decodedTitle;
+  let decodedTitle: string;
 
   try {
     if (isThread) {
@@ -43,12 +48,12 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
         decodedTitle = decodeURIComponent(encodeURIComponent(title));
       } else {
         decodedTitle = decodeURIComponent(
-          encodeURIComponent(comment.thread?.title)
+          encodeURIComponent(comment.thread?.title),
         );
       }
     } catch (e) {
       console.error(
-        `Could not decode title: "${title ? title : comment.thread?.title}"`
+        `Could not decode title: "${title ? title : comment.thread?.title}"`,
       );
       decodedTitle = title;
     }
@@ -67,10 +72,14 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              navigateToCommunity({ navigate, path: `/discussions`, chain });
+              navigateToCommunity({
+                navigate,
+                path: `/discussions`,
+                chain: communityId,
+              });
             }}
           >
-            {chain}
+            {communityId}
           </a>
         </CWText>
         <div className="dot">.</div>
@@ -96,7 +105,7 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
                 navigateToCommunity({
                   navigate,
                   path: `/discussion/${id}`,
-                  chain,
+                  chain: communityId,
                 });
               }}
             >
@@ -110,7 +119,7 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
                 navigateToCommunity({
                   navigate,
                   path: `/discussion/${comment.thread?.id}?comment=${comment.id}`,
-                  chain,
+                  chain: communityId,
                 });
               }}
             >
@@ -134,12 +143,12 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
                 onClick: async () => {
                   if (isThread) {
                     await navigator.clipboard.writeText(
-                      `${domain}/${chain}/discussion/${id}`
+                      `${domain}/${communityId}/discussion/${id}`,
                     );
                     return;
                   }
                   await navigator.clipboard.writeText(
-                    `${domain}/${chain}/discussion/${comment.thread?.id}?comment=${comment.id}`
+                    `${domain}/${communityId}/discussion/${comment.thread?.id}?comment=${comment.id}`,
                   );
                 },
               },
@@ -150,15 +159,15 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
                 onClick: async () => {
                   if (isThread) {
                     await window.open(
-                      `https://twitter.com/intent/tweet?text=${domain}/${chain}/discussion/${id}`,
-                      '_blank'
+                      `https://twitter.com/intent/tweet?text=${domain}/${communityId}/discussion/${id}`,
+                      '_blank',
                     );
                     return;
                   }
                   await window.open(
-                    `https://twitter.com/intent/tweet?text=${domain}/${chain}/discussion/${comment.thread?.id}
+                    `https://twitter.com/intent/tweet?text=${domain}/${communityId}/discussion/${comment.thread?.id}
                       ?comment=${comment.id}`,
-                    '_blank'
+                    '_blank',
                   );
                 },
               },

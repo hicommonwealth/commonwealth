@@ -1,22 +1,23 @@
-import chai from 'chai';
 import { isDeliverTxSuccess } from '@cosmjs/stargate';
+import chai from 'chai';
 
+import { longify } from '@cosmjs/stargate/build/queryclient';
 import {
   ProposalStatus as ProposalStatusV1,
+  VoteOption as VoteOptionV1,
   voteOptionToJSON,
-} from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
-import { VoteOption as VoteOptionV1 } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
-import {
-  encodeMsgVote,
-  encodeMsgSubmitProposal,
-  encodeTextProposal,
-  encodeCommunitySpend,
-} from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
+} from '@hicommonwealth/chains';
 import { getLCDClient } from 'controllers/chain/cosmos/chain.utils';
 import {
   getActiveProposalsV1,
   getCompletedProposalsV1,
 } from 'controllers/chain/cosmos/gov/v1/utils-v1';
+import {
+  encodeCommunitySpend,
+  encodeMsgSubmitProposal,
+  encodeMsgVote,
+  encodeTextProposal,
+} from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
 import { LCD } from '../../../shared/chain/types/cosmos';
 import {
   deposit,
@@ -49,10 +50,32 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
     return activeProposals;
   };
 
+  const waitForOnchainProposal = async (proposalId: number) => {
+    let newProposal;
+    while (!newProposal) {
+      // Wait for a short period
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      try {
+        const proposalResponse = await lcd.cosmos.gov.v1.proposal({
+          proposalId: longify(proposalId),
+        });
+        newProposal = proposalResponse.proposal;
+      } catch (e) {
+        console.error(
+          `Error fetching proposal by id ${proposalId}. Trying again...`,
+        );
+        newProposal = null;
+      }
+    }
+
+    return newProposal;
+  };
+
   const proposalTest = async (
     content: any,
     expectedProposalType: string,
-    isAmino?: boolean
+    isAmino?: boolean,
   ) => {
     const msg = encodeMsgSubmitProposal(signer, deposit, content);
     const resp = await sendTx(rpcUrl, msg, isAmino);
@@ -60,31 +83,35 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
     expect(resp.transactionHash).to.not.be.undefined;
     expect(resp.rawLog).to.not.be.undefined;
     expect(isDeliverTxSuccess(resp), 'TX failed').to.be.true;
-
-    await waitOneBlock(rpcUrl);
-    await waitOneBlock(rpcUrl);
-    await waitOneBlock(rpcUrl);
-    const activeProposals = await getActiveVotingProposals();
-    const onchainProposal = activeProposals[activeProposals?.length - 1];
-    expect((onchainProposal?.messages?.[0] as any)?.content?.['@type']).to.eql(
-      expectedProposalType
+    const rawLog = JSON.parse(resp.rawLog);
+    const submitProposalEvent = rawLog[0]?.events?.find(
+      (e) => e['type'] === 'submit_proposal',
     );
+    const proposalId = submitProposalEvent?.attributes.find(
+      (a) => a.key === 'proposal_id',
+    )?.value;
+
+    const onChainProposal = await waitForOnchainProposal(proposalId);
+    const messageType = onChainProposal.messages[0]?.content['@type'];
+
+    expect(messageType).to.eql(expectedProposalType);
   };
 
   const voteTest = async (
     voteOption: number,
-    isAmino?: boolean
+    isAmino?: boolean,
   ): Promise<void> => {
     await waitOneBlock(rpcUrl);
     const activeProposals = await getActiveVotingProposals();
     assert.isAtLeast(activeProposals.length, 1);
-    const proposal = activeProposals[0];
-    const msg = encodeMsgVote(signer, proposal.id, voteOption);
+    const latestProposal = activeProposals[activeProposals.length - 1];
+    const msg = encodeMsgVote(signer, latestProposal.id, voteOption);
 
     const resp = await sendTx(rpcUrl, msg, isAmino);
 
     expect(resp.transactionHash).to.not.be.undefined;
     expect(resp.rawLog).to.not.be.undefined;
+    expect(resp.rawLog).to.not.include('failed to execute message');
     expect(resp.rawLog).to.include(voteOptionToJSON(voteOption));
   };
 
@@ -106,17 +133,16 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
       await voteTest(VoteOptionV1.VOTE_OPTION_YES);
     });
     it('creates a community spend proposal', async () => {
-      await waitOneBlock(rpcUrl);
       const content = encodeCommunitySpend(
         `v1 spend title`,
         `v1 spend description`,
         'cosmos18q3tlnx8vguv2fadqslm7x59ejauvsmnlycckg',
         '5',
-        'ustake'
+        'ustake',
       );
       await proposalTest(
         content,
-        '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal'
+        '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal',
       );
     });
   });
@@ -140,18 +166,17 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
     // TODO: Unsupported. Un-skip this in
     // https://github.com/hicommonwealth/commonwealth/issues/4821
     it.skip('creates a community spend proposal with legacy amino', async () => {
-      await waitOneBlock(rpcUrl);
       const content = encodeCommunitySpend(
         `v1 spend title amino`,
         `v1 spend description amino`,
         'cosmos18q3tlnx8vguv2fadqslm7x59ejauvsmnlycckg',
         '5',
-        'ustake'
+        'ustake',
       );
       await proposalTest(
         content,
         '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal',
-        true
+        true,
       );
     });
   });

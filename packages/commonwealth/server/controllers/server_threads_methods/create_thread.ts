@@ -1,12 +1,7 @@
 import moment from 'moment';
 
-import { AppError } from '../../../../common-common/src/errors';
-import {
-  ChainNetwork,
-  ChainType,
-  NotificationCategories,
-  ProposalType,
-} from '../../../../common-common/src/types';
+import { AppError } from '@hicommonwealth/adapters';
+import { NotificationCategories, ProposalType } from '@hicommonwealth/core';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import { AddressInstance } from '../../models/address';
@@ -40,7 +35,6 @@ export type CreateThreadOptions = {
   kind: string;
   readOnly: boolean;
   topicId?: number;
-  topicName?: string;
   stage?: string;
   url?: string;
   canvasAction?: any;
@@ -52,7 +46,7 @@ export type CreateThreadOptions = {
 export type CreateThreadResult = [
   ThreadAttributes,
   EmitOptions[],
-  TrackOptions
+  TrackOptions,
 ];
 
 export async function __createThread(
@@ -66,14 +60,13 @@ export async function __createThread(
     kind,
     readOnly,
     topicId,
-    topicName,
     stage,
     url,
     canvasAction,
     canvasSession,
     canvasHash,
     discordMeta,
-  }: CreateThreadOptions
+  }: CreateThreadOptions,
 ): Promise<CreateThreadResult> {
   if (kind === 'discussion') {
     if (!title || !title.trim()) {
@@ -123,7 +116,7 @@ export async function __createThread(
   const version_history: string[] = [JSON.stringify(firstVersion)];
 
   const threadContent: Partial<ThreadAttributes> = {
-    chain: community.id,
+    community_id: community.id,
     address_id: address.id,
     title,
     body,
@@ -137,59 +130,32 @@ export async function __createThread(
     canvas_session: canvasSession,
     canvas_hash: canvasHash,
     discord_meta: discordMeta,
+    topic_id: +topicId,
   };
+
+  const isAdmin = await validateOwner({
+    models: this.models,
+    user,
+    communityId: community.id,
+    allowAdmin: true,
+    allowGodMode: true,
+  });
+  if (!isAdmin) {
+    const { isValid, message } = await validateTopicGroupsMembership(
+      this.models,
+      this.tokenBalanceCache,
+      topicId,
+      community,
+      address,
+    );
+    if (!isValid) {
+      throw new AppError(`${Errors.FailedCreateThread}: ${message}`);
+    }
+  }
 
   // begin essential database changes within transaction
   const newThreadId = await this.models.sequelize.transaction(
     async (transaction) => {
-      // New Topic table entries created
-      if (topicId) {
-        threadContent.topic_id = +topicId;
-      } else if (topicName) {
-        const [topic] = await this.models.Topic.findOrCreate({
-          where: {
-            name: topicName,
-            chain_id: community?.id || null,
-          },
-          transaction,
-        });
-        threadContent.topic_id = topic.id;
-        topicId = topic.id;
-      } else {
-        if (community.topics?.length) {
-          throw new AppError(
-            'Must pass a topic_name string and/or a numeric topic_id'
-          );
-        }
-      }
-
-      if (
-        community &&
-        (community.type === ChainType.Token ||
-          community.network === ChainNetwork.Ethereum)
-      ) {
-        // skip check for admins
-        const isAdmin = await validateOwner({
-          models: this.models,
-          user,
-          communityId: community.id,
-          allowAdmin: true,
-          allowGodMode: true,
-        });
-        if (!isAdmin) {
-          const { isValid, message } = await validateTopicGroupsMembership(
-            this.models,
-            this.tokenBalanceCache,
-            topicId,
-            community,
-            address
-          );
-          if (!isValid) {
-            throw new AppError(`${Errors.FailedCreateThread}: ${message}`);
-          }
-        }
-      }
-
       const thread = await this.models.Thread.create(threadContent, {
         transaction,
       });
@@ -199,7 +165,7 @@ export async function __createThread(
 
       return thread.id;
       // end of transaction
-    }
+    },
   );
 
   const finalThread = await this.models.Thread.findOne({
@@ -222,14 +188,14 @@ export async function __createThread(
     subscriber_id: user.id,
     category_id: NotificationCategories.NewComment,
     thread_id: finalThread.id,
-    chain_id: finalThread.chain,
+    chain_id: finalThread.community_id,
     is_active: true,
   });
   await this.models.Subscription.create({
     subscriber_id: user.id,
     category_id: NotificationCategories.NewReaction,
     thread_id: finalThread.id,
-    chain_id: finalThread.chain,
+    chain_id: finalThread.community_id,
     is_active: true,
   });
 
@@ -248,7 +214,7 @@ export async function __createThread(
             },
             include: [this.models.User],
           });
-        })
+        }),
       );
       // filter null results
       mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
@@ -272,7 +238,7 @@ export async function __createThread(
         root_type: ProposalType.Thread,
         root_title: finalThread.title,
         comment_text: finalThread.body,
-        chain_id: finalThread.chain,
+        chain_id: finalThread.community_id,
         author_address: finalThread.Address.address,
         author_chain: finalThread.Address.community_id,
       },
@@ -296,7 +262,7 @@ export async function __createThread(
             root_type: ProposalType.Thread,
             root_title: finalThread.title,
             comment_text: finalThread.body,
-            chain_id: finalThread.chain,
+            chain_id: finalThread.community_id,
             author_address: finalThread.Address.address,
             author_chain: finalThread.Address.community_id,
           },
@@ -308,7 +274,7 @@ export async function __createThread(
   const analyticsOptions = {
     event: MixpanelCommunityInteractionEvent.CREATE_THREAD,
     community: community.id,
-    isCustomDomain: null,
+    userId: user.id,
   };
 
   return [finalThread.toJSON(), allNotificationOptions, analyticsOptions];

@@ -1,25 +1,27 @@
+import 'Sublayout.scss';
+import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
-import 'Sublayout.scss';
 import { Sidebar } from 'views/components/sidebar';
 import { AppMobileMenus } from './AppMobileMenus';
 import { Footer } from './Footer';
 import { SublayoutBanners } from './SublayoutBanners';
 import { SublayoutHeader } from './SublayoutHeader';
-import clsx from 'clsx';
+import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
+import GatingGrowl from './components/GatingGrowl/GatingGrowl';
 
 type SublayoutProps = {
   hideFooter?: boolean;
-  hasCommunitySidebar?: boolean;
+  isInsideCommunity?: boolean;
 } & React.PropsWithChildren;
 
 const Sublayout = ({
   children,
   hideFooter = true,
-  hasCommunitySidebar,
+  isInsideCommunity,
 }: SublayoutProps) => {
   const forceRerender = useForceRerender();
   const { menuVisible, mobileMenuName, setMenu, menuName } = useSidebarStore();
@@ -76,7 +78,7 @@ const Sublayout = ({
       <div className="header-and-body-container">
         <SublayoutHeader onMobile={isWindowSmallInclusive} />
         <div className="sidebar-and-body-container">
-          <Sidebar isInsideCommunity={hasCommunitySidebar} />
+          <Sidebar isInsideCommunity={isInsideCommunity} />
           <div
             className={clsx(
               'body-and-sticky-headers-container',
@@ -86,9 +88,9 @@ const Sublayout = ({
                 'quick-switcher-visible':
                   menuName === 'exploreCommunities' ||
                   menuName === 'createContent' ||
-                  hasCommunitySidebar,
+                  isInsideCommunity,
               },
-              resizing
+              resizing,
             )}
           >
             <SublayoutBanners banner={banner} chain={chain} terms={terms} />
@@ -97,12 +99,14 @@ const Sublayout = ({
               <AppMobileMenus />
             ) : (
               <div className="Body">
+                {isInsideCommunity && <AdminOnboardingSlider />}
                 {children}
                 {!app.isCustomDomain() && !hideFooter && <Footer />}
               </div>
             )}
           </div>
         </div>
+        {isInsideCommunity && <GatingGrowl />}
       </div>
     </div>
   );

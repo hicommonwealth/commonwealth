@@ -1,7 +1,7 @@
-import IWebWallet from '../models/IWebWallet';
-import Near from '../controllers/chain/near/adapter';
+import { WalletId } from '@hicommonwealth/core';
 import axios from 'axios';
-import { WalletId } from '../../../../common-common/src/types';
+import Near from '../controllers/chain/near/adapter';
+import IWebWallet from '../models/IWebWallet';
 
 // getWalletName() fetches friendly names for wallets. It is assumed
 // that the user already knows what chain or community they are
@@ -26,6 +26,7 @@ const getWalletName = (walletId: WalletId) => {
     [WalletId.WalletConnect]: 'WalletConnect',
     [WalletId.KeplrEthereum]: 'Keplr',
     [WalletId.Keplr]: 'Keplr',
+    [WalletId.Leap]: 'Leap',
     [WalletId.NearWallet]: 'NEAR Wallet',
     [WalletId.TerraStation]: 'Terra Station',
     [WalletId.TerraWalletConnect]: 'Terra WalletConnect',
@@ -43,7 +44,7 @@ const getAddressFromWallet = (wallet: IWebWallet<any>) => {
     }
 
     if (wallet.defaultNetwork === 'terra') {
-      return wallet.accounts[0]?.address;
+      return wallet.accounts[0];
     }
 
     if (wallet.chain === 'cosmos') {
@@ -82,7 +83,7 @@ const loginToNear = async (activeChain: Near, isCustomDomain: boolean) => {
   }
   const nearWallet = new WalletAccount(
     (activeChain as Near).chain.api,
-    'commonwealth_near'
+    'commonwealth_near',
   );
   if (nearWallet.isSignedIn()) {
     nearWallet.signOut();
@@ -101,4 +102,4 @@ const loginToNear = async (activeChain: Near, isCustomDomain: boolean) => {
   });
 };
 
-export { getWalletName, getAddressFromWallet, loginToAxie, loginToNear };
+export { getAddressFromWallet, getWalletName, loginToAxie, loginToNear };

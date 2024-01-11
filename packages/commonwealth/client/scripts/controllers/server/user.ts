@@ -1,14 +1,13 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/consistent-type-imports */
-import $ from 'jquery';
 import { EventEmitter } from 'events';
+import $ from 'jquery';
 
 import app from 'state';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import ChainInfo from '../../models/ChainInfo';
-import SocialAccount from '../../models/SocialAccount';
 import StarredCommunity from '../../models/StarredCommunity';
 import { notifyError } from '../app/notifications';
 
@@ -79,21 +78,12 @@ export class UserController {
 
   private _setActiveAccounts(
     activeAccounts: Account[],
-    shouldRedraw = true
+    shouldRedraw = true,
   ): void {
     this._activeAccounts = activeAccounts;
     if (shouldRedraw) {
       this.isFetched.emit('redraw');
     }
-  }
-
-  private _socialAccounts: SocialAccount[] = [];
-  public get socialAccounts(): SocialAccount[] {
-    return this._socialAccounts;
-  }
-
-  private _setSocialAccounts(socialAccounts: SocialAccount[]): void {
-    this._socialAccounts = socialAccounts;
   }
 
   private _selectedChain: ChainInfo;
@@ -214,13 +204,13 @@ export class UserController {
   public removeAddress(address: AddressInfo): void {
     this._addresses.splice(
       this._addresses.findIndex((a) => a.address === address.address),
-      1
+      1,
     );
   }
 
   public setActiveAccounts(
     activeAccounts: Account[],
-    shouldRedraw = true
+    shouldRedraw = true,
   ): void {
     this._setActiveAccounts(activeAccounts, shouldRedraw);
   }
@@ -232,22 +222,7 @@ export class UserController {
   public removeActiveAddress(address: Account): void {
     this._activeAccounts.splice(
       this._activeAccounts.findIndex((a) => a.address === address.address),
-      1
-    );
-  }
-
-  public setSocialAccounts(socialAccounts: SocialAccount[]): void {
-    this._setSocialAccounts(socialAccounts);
-  }
-
-  public addSocialAccount(social: SocialAccount): void {
-    this._socialAccounts.push(social);
-  }
-
-  public removeSocialAccount(social: SocialAccount): void {
-    this._socialAccounts.splice(
-      this._socialAccounts.findIndex((s) => s.username === social.username),
-      1
+      1,
     );
   }
 
@@ -289,10 +264,10 @@ export class UserController {
     this._setStarredCommunities(star);
   }
 
-  public isCommunityStarred(chain: string): boolean {
+  public isCommunityStarred(community_id: string): boolean {
     return (
       this._starredCommunities.findIndex((c) => {
-        return c.chain === chain;
+        return c.community_id === community_id;
       }) !== -1
     );
   }
@@ -301,9 +276,9 @@ export class UserController {
     this._starredCommunities.push(star);
   }
 
-  public removeStarredCommunity(chain: string, userId: number): void {
+  public removeStarredCommunity(community_id: string, userId: number): void {
     const index = this._starredCommunities.findIndex(
-      (s) => s.user_id === userId && s.chain === chain
+      (s) => s.user_id === userId && s.community_id === community_id,
     );
     this._starredCommunities.splice(index, 1);
   }

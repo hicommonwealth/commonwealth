@@ -28,7 +28,7 @@ export const ThreadSelector = ({
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
   const sharedQueryOptions = {
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     searchTerm: debouncedSearchTerm,
     limit: 5,
     orderBy: APIOrderBy.Rank,
@@ -49,13 +49,13 @@ export const ThreadSelector = ({
         new Thread({
           id: t.id,
           title: t.title,
-          chain: t.chain,
+          community_id: t.community_id,
           Address: new AddressInfo({
             id: t.address_id,
             address: t.address,
             chainId: t.address_chain,
           }),
-        } as any)
+        } as ConstructorParameters<typeof Thread>[0]),
     );
   }, [threadsData]);
 
@@ -91,7 +91,7 @@ export const ThreadSelector = ({
         />
       );
     },
-    [linkedThreadsToSet, onSelect]
+    [linkedThreadsToSet, onSelect],
   );
 
   const EmptyComponent = () => (

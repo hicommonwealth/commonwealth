@@ -1,5 +1,8 @@
-import { SupportedNetwork } from '../../shared/chain/types/types';
-import { NotificationCategories, ProposalType } from 'common-common/src/types';
+import {
+  NotificationCategories,
+  ProposalType,
+  SupportedNetwork,
+} from '@hicommonwealth/core';
 import { NotificationDataAndCategory, WebhookCategory } from 'types';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
@@ -43,7 +46,7 @@ async function main() {
     .check((args) => {
       if (!args.url && !args.destination) {
         throw new Error(
-          'Must provide either a webhook url or a destination flag.'
+          'Must provide either a webhook url or a destination flag.',
         );
       }
       return true;
@@ -58,11 +61,11 @@ async function main() {
   ) {
     throw new Error(
       'Must have DISCORD_WEBHOOK_URL_DEV, SLACK_WEBHOOK_URL_DEV, ' +
-        'ZAPIER_WEBHOOK_URL_DEV, and TELEGRAM_BOT_TOKEN_DEV set in .env'
+        'ZAPIER_WEBHOOK_URL_DEV, and TELEGRAM_BOT_TOKEN_DEV set in .env',
     );
   }
 
-  const chain = await models.Community.findOne({
+  const community = await models.Community.findOne({
     where: {
       id: 'dydx',
     },
@@ -71,7 +74,7 @@ async function main() {
   let url: string;
   const webhooks: WebhookInstance[] = [];
   const genericWebhookOptions = {
-    community_id: chain.id,
+    community_id: community.id,
     categories: [argv.notificationCategory],
   };
   if (argv.url) {
@@ -101,7 +104,7 @@ async function main() {
       models.Webhook.build({
         url: process.env.ZAPIER_WEBHOOK_URL_DEV,
         ...genericWebhookOptions,
-      })
+      }),
     );
   } else {
     throw new Error(`Invalid webhook destination: ${argv.destination}`);
@@ -112,7 +115,7 @@ async function main() {
       models.Webhook.build({
         url,
         ...genericWebhookOptions,
-      })
+      }),
     );
   }
 
@@ -126,13 +129,13 @@ async function main() {
           kind: 'proposal-created',
         },
         network: SupportedNetwork.Aave,
-        chain: chain.id,
+        chain: community.id,
       },
     };
   } else {
     const thread = await models.Thread.findOne({
       where: {
-        chain: chain.id,
+        community_id: community.id,
       },
       include: {
         model: models.Address,
@@ -146,7 +149,7 @@ async function main() {
       thread_id: thread.id,
       root_title: thread.title,
       root_type: ProposalType.Thread,
-      chain_id: thread.chain,
+      chain_id: thread.community_id,
       author_address: thread.Address.address,
       author_chain: thread.Address.community_id,
     };
@@ -164,7 +167,7 @@ async function main() {
     ) {
       const [comment] = await models.Comment.findOrCreate({
         where: {
-          chain: chain.id,
+          community_id: community.id,
           thread_id: thread.id,
         },
         defaults: {
@@ -186,12 +189,12 @@ async function main() {
     ) {
       const anotherAddress = await models.Address.findOne({
         where: {
-          community_id: chain.id,
+          community_id: community.id,
         },
       });
       await models.Reaction.findOrCreate({
         where: {
-          chain: chain.id,
+          community_id: community.id,
           thread_id: thread.id,
           address_id: anotherAddress.id,
           reaction: 'like',

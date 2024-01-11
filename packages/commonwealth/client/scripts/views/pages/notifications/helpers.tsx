@@ -4,8 +4,8 @@ import React from 'react';
 
 import 'pages/notifications/notification_row.scss';
 
+import { NotificationCategories, ProposalType } from '@hicommonwealth/core';
 import type { IForumNotificationData } from 'types';
-import { NotificationCategories, ProposalType } from 'common-common/src/types';
 
 import { pluralize } from 'helpers';
 import app from 'state';
@@ -16,7 +16,7 @@ import { QuillRenderer } from '../../components/react_quill_editor/quill_rendere
 const jumpHighlightNotification = (
   commentId,
   shouldScroll = true,
-  animationDelayTime = 2000
+  animationDelayTime = 2000,
 ) => {
   const $div =
     commentId === 'parent' || commentId === 'body'
@@ -81,7 +81,7 @@ const getNotificationFields = (category, data: IForumNotificationData) => {
   const actorName = (
     <User
       userAddress={author_address}
-      userChainId={author_chain}
+      userCommunityId={author_chain}
       shouldHideAvatar
     />
   );
@@ -151,7 +151,7 @@ const getNotificationFields = (category, data: IForumNotificationData) => {
 
 export const getBatchNotificationFields = (
   category,
-  data: IForumNotificationData[]
+  data: IForumNotificationData[],
 ) => {
   if (data.length === 1) {
     return getNotificationFields(category, data[0]);
@@ -171,7 +171,7 @@ export const getBatchNotificationFields = (
   } = data[0];
 
   const authorInfo = _.uniq(
-    data.map((d) => `${d.author_chain}#${d.author_address}`)
+    data.map((d) => `${d.author_chain}#${d.author_address}`),
   ).map((u) => u.split('#'));
 
   const length = authorInfo.length - 1;
@@ -192,7 +192,7 @@ export const getBatchNotificationFields = (
   const actorName = (
     <User
       userAddress={author_address}
-      userChainId={author_chain}
+      userCommunityId={author_chain}
       shouldHideAvatar
     />
   );

@@ -1,4 +1,4 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import type { NextFunction, Request, Response } from 'express';
 import { sequelize } from '../database';
 import type { DB } from '../models';
@@ -13,7 +13,7 @@ const updateAddress = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { address, chain } = req.body;
   if (!address) {
@@ -43,19 +43,19 @@ const updateAddress = async (
         // update address in comments
         await models.Comment.update(
           { address_id: newAddressId },
-          { where: { address_id: ghostAddressId }, transaction }
+          { where: { address_id: ghostAddressId }, transaction },
         );
 
         // update address in reactions
         await models.Reaction.update(
           { address_id: newAddressId },
-          { where: { address_id: ghostAddressId }, transaction }
+          { where: { address_id: ghostAddressId }, transaction },
         );
 
         // update address in threads
         await models.Thread.update(
           { address_id: newAddressId },
-          { where: { address_id: ghostAddressId }, transaction }
+          { where: { address_id: ghostAddressId }, transaction },
         );
 
         // delete ghost address from Address

@@ -1,6 +1,7 @@
+import { AppError } from '@hicommonwealth/adapters';
 import { Op } from 'sequelize';
 import { TopicInstance } from 'server/models/topic';
-import { AppError } from '../../../../common-common/src/errors';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { sequelize } from '../../database';
 import { AddressInstance } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
@@ -10,6 +11,7 @@ import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 import validateMetadata from '../../util/requirementsModule/validateMetadata';
 import validateRequirements from '../../util/requirementsModule/validateRequirements';
 import { validateOwner } from '../../util/validateOwner';
+import { TrackOptions } from '../server_analytics_methods/track';
 import { ServerGroupsController } from '../server_groups_controller';
 
 const Errors = {
@@ -30,7 +32,7 @@ export type UpdateGroupOptions = {
   topics?: number[];
 };
 
-export type UpdateGroupResult = GroupAttributes;
+export type UpdateGroupResult = [GroupAttributes, TrackOptions];
 
 export async function __updateGroup(
   this: ServerGroupsController,
@@ -78,7 +80,7 @@ export async function __updateGroup(
         id: {
           [Op.in]: topics || [],
         },
-        chain_id: community.id,
+        community_id: community.id,
       },
     });
     if (topics?.length > 0 && topics.length !== topicsToAssociate.length) {
@@ -169,5 +171,11 @@ export async function __updateGroup(
     }
   });
 
-  return group.toJSON();
+  const analyticsOptions = {
+    event: MixpanelCommunityInteractionEvent.UPDATE_GROUP,
+    community: community.id,
+    userId: user.id,
+  };
+
+  return [group.toJSON(), analyticsOptions];
 }

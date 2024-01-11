@@ -3,12 +3,15 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build": "tsc --project tsconfig.json && tsc-alias",
-    "start": "ts-node discord-listener/discordListener.ts",
-    "start-consumer": "ts-node discord-consumer/discordConsumer.ts",
+    "build": "tsc -b && tsc-alias",
+    "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
-    "start-prod-consumer": "node build/discord-bot/discord-consumer/discordConsumer.js",
-    "start-prod-listener": "node build/discord-bot/discord-listener/discordListener.js"
+    "dev": "concurrently -n watcher,listener,consumer -c red,green,yellow 'tsc -b -w' 'yarn start' 'yarn start-consumer'",
+    "start": "ts-node -T src/discord-listener/discordListener.ts",
+    "start-consumer": "ts-node -T src/discord-consumer/discordConsumer.ts",
+    "start-prod-consumer": "node build/discord-consumer/discordConsumer.js",
+    "start-prod-listener": "node build/discord-listener/discordListener.js",
+    "switch-staging-app": "chmod u+x scripts/switch-discobot-staging-env.sh && ./scripts/switch-discobot-staging-env.sh"
   },
   "keywords": [],
   "author": "",
@@ -16,8 +19,6 @@
   "dependencies": {
     "discord.js": "^14.11.0",
     "rollbar": "^2.6.1",
-    "sequelize": "^6.32.1",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.0.0"
+    "sequelize": "^6.32.1"
   }
 }

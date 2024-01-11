@@ -1,15 +1,16 @@
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // import { describe, it, beforeEach, afterEach } from 'mocha';
-import chai from 'chai';
-import { expect } from 'chai';
+import {
+  CacheDecorator,
+  CacheKeyDuration,
+  RedisCache,
+} from '@hicommonwealth/adapters';
+import { RedisNamespaces } from '@hicommonwealth/core';
+import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
-
-import { CacheDecorator } from 'common-common/src/cacheDecorator';
-import { Activity } from 'common-common/src/daemons/activity';
-import { RedisCache } from 'common-common/src/redisCache';
-import { RedisNamespaces } from 'common-common/src/types';
-import { CacheKeyDuration } from 'common-common/src/cacheKeyUtils';
-
+import { Activity } from '../daemons/activity';
 chai.use(chaiAsPromised);
 
 describe('CacheDecorator', () => {
@@ -49,7 +50,7 @@ describe('CacheDecorator', () => {
             fn,
             key,
             duration,
-            RedisNamespaces.Function_Response
+            RedisNamespaces.Function_Response,
           );
           const result = await wrapFn();
           expect(result).to.equal('test-result');
@@ -71,7 +72,7 @@ describe('CacheDecorator', () => {
             fn,
             key,
             duration,
-            RedisNamespaces.Function_Response
+            RedisNamespaces.Function_Response,
           );
           const result = await wrapFn();
 
@@ -92,7 +93,7 @@ describe('CacheDecorator', () => {
             fn,
             key,
             duration,
-            RedisNamespaces.Function_Response
+            RedisNamespaces.Function_Response,
           );
           const result = await wrapFn();
 
@@ -114,7 +115,7 @@ describe('CacheDecorator', () => {
             fn,
             key,
             duration,
-            RedisNamespaces.Function_Response
+            RedisNamespaces.Function_Response,
           );
           const result = await wrapFn();
 
@@ -134,7 +135,7 @@ describe('CacheDecorator', () => {
             fn,
             key,
             duration,
-            RedisNamespaces.Function_Response
+            RedisNamespaces.Function_Response,
           );
           const result = await wrapFn();
 
@@ -154,7 +155,7 @@ describe('CacheDecorator', () => {
             fn,
             key,
             duration,
-            RedisNamespaces.Function_Response
+            RedisNamespaces.Function_Response,
           );
           const result = await wrapFn();
 
@@ -174,7 +175,7 @@ describe('CacheDecorator', () => {
             fn,
             key,
             duration,
-            RedisNamespaces.Function_Response
+            RedisNamespaces.Function_Response,
           );
           const result = await wrapFn();
 
@@ -195,7 +196,7 @@ describe('CacheDecorator', () => {
             fn,
             key,
             duration,
-            RedisNamespaces.Function_Response
+            RedisNamespaces.Function_Response,
           );
           const result = await wrapFn();
 
@@ -215,7 +216,7 @@ describe('CacheDecorator', () => {
             fn,
             key,
             duration,
-            RedisNamespaces.Function_Response
+            RedisNamespaces.Function_Response,
           );
           const result = await wrapFn();
 
@@ -236,7 +237,7 @@ describe('CacheDecorator', () => {
             fn,
             key,
             duration,
-            RedisNamespaces.Function_Response
+            RedisNamespaces.Function_Response,
           );
           const result = await wrapFn();
 
@@ -251,7 +252,7 @@ describe('CacheDecorator', () => {
       it('key function if returns object with no cacheKey, skip caching', async () => {
         const fn = async () => 'test-result';
         const duration = 60;
-        const key = () => {
+        const keyfn = () => {
           return {} as unknown as CacheKeyDuration;
         };
         mockRedis.isInitialized.returns(true);
@@ -259,9 +260,9 @@ describe('CacheDecorator', () => {
         const wrapFn = cacheDecorator.cacheWrap(
           false,
           fn,
-          key,
+          keyfn,
           duration,
-          RedisNamespaces.Function_Response
+          RedisNamespaces.Function_Response,
         );
         const result = await wrapFn();
 
@@ -283,7 +284,7 @@ describe('CacheDecorator', () => {
           fn,
           key,
           duration,
-          RedisNamespaces.Function_Response
+          RedisNamespaces.Function_Response,
         );
         const result = await wrapFn();
 
@@ -309,7 +310,7 @@ describe('CacheDecorator', () => {
           fn,
           key,
           duration,
-          RedisNamespaces.Function_Response
+          RedisNamespaces.Function_Response,
         );
         const result = await wrapFn();
 
@@ -318,8 +319,8 @@ describe('CacheDecorator', () => {
         expect(
           mockRedis.getKey.calledWith(
             RedisNamespaces.Function_Response,
-            'test-key'
-          )
+            'test-key',
+          ),
         ).to.be.true;
         expect(mockRedis.setKey.called).to.be.false;
       });
@@ -341,7 +342,7 @@ describe('CacheDecorator', () => {
           fn,
           key,
           duration,
-          RedisNamespaces.Function_Response
+          RedisNamespaces.Function_Response,
         );
         const result = await wrapFn();
 
@@ -350,8 +351,8 @@ describe('CacheDecorator', () => {
         expect(
           mockRedis.getKey.calledWith(
             RedisNamespaces.Function_Response,
-            'test-key'
-          )
+            'test-key',
+          ),
         ).to.be.true;
         expect(mockRedis.setKey.called).to.be.true;
         expect(
@@ -359,8 +360,8 @@ describe('CacheDecorator', () => {
             RedisNamespaces.Function_Response,
             'test-key',
             JSON.stringify('new-result'),
-            100
-          )
+            100,
+          ),
         ).to.be.true;
       });
     });
@@ -380,7 +381,7 @@ describe('CacheDecorator', () => {
           fn,
           key,
           duration,
-          RedisNamespaces.Function_Response
+          RedisNamespaces.Function_Response,
         );
         const result = await wrapFn();
 
@@ -404,7 +405,7 @@ describe('CacheDecorator', () => {
           fn,
           key,
           duration,
-          RedisNamespaces.Function_Response
+          RedisNamespaces.Function_Response,
         );
         const result = await wrapFn();
 
@@ -429,7 +430,7 @@ describe('CacheDecorator', () => {
           fn,
           key,
           duration,
-          RedisNamespaces.Function_Response
+          RedisNamespaces.Function_Response,
         );
         await expect(wrapFn()).to.be.rejectedWith('Error: test-error');
 
@@ -479,7 +480,7 @@ describe('CacheDecorator', () => {
           keyGenerator1,
           60,
           RedisNamespaces.Function_Response,
-          cacheDecorator
+          cacheDecorator,
         );
         const wrapFn = activityWrapper.queryWithCache;
         const result = await wrapFn(1, 2, 3);
@@ -487,8 +488,8 @@ describe('CacheDecorator', () => {
         expect(
           mockRedis.getKey.calledWith(
             RedisNamespaces.Function_Response,
-            '1-2-3'
-          )
+            '1-2-3',
+          ),
         ).to.be.true;
         expect(mockRedis.getKey.calledOnce).to.be.true;
         expect(mockRedis.setKey.calledOnce).to.be.true;
@@ -497,8 +498,8 @@ describe('CacheDecorator', () => {
             RedisNamespaces.Function_Response,
             '1-2-3',
             JSON.stringify(6),
-            6
-          )
+            6,
+          ),
         ).to.be.true;
       });
 
@@ -513,7 +514,7 @@ describe('CacheDecorator', () => {
           keyGenerator3,
           60,
           RedisNamespaces.Function_Response,
-          cacheDecorator
+          cacheDecorator,
         );
         const wrapFn = activityWrapper.queryWithCache;
         const result = await wrapFn(1, 2, 3);
@@ -522,8 +523,8 @@ describe('CacheDecorator', () => {
         expect(
           mockRedis.getKey.calledWith(
             RedisNamespaces.Function_Response,
-            'test-key'
-          )
+            'test-key',
+          ),
         ).to.be.true;
         expect(mockRedis.setKey.called).to.be.false;
       });
@@ -538,7 +539,7 @@ describe('CacheDecorator', () => {
           keyGenerator2,
           60,
           RedisNamespaces.Function_Response,
-          cacheDecorator
+          cacheDecorator,
         );
         const wrapFn = activityWrapper.queryWithCacheOverride;
         const result = await wrapFn(1, 2, 3);
@@ -550,8 +551,8 @@ describe('CacheDecorator', () => {
             RedisNamespaces.Function_Response,
             '1-2-3',
             JSON.stringify(6),
-            60
-          )
+            60,
+          ),
         ).to.be.true;
       });
     });

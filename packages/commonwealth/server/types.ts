@@ -20,7 +20,7 @@ export type TypedPaginatedResult<T> = {
 };
 
 export type TypedRequestQuery<
-  Q extends Record<string, unknown> = Record<string, unknown>
+  Q extends Record<string, unknown> = Record<string, unknown>,
 > = Express.Request & {
   user?: Express.User & UserInstance;
   address?: AddressInstance;
@@ -29,7 +29,7 @@ export type TypedRequestQuery<
 };
 
 export type TypedRequestBody<
-  B extends Record<string, unknown> = Record<string, unknown>
+  B extends Record<string, unknown> = Record<string, unknown>,
 > = Express.Request & {
   user?: Express.User & UserInstance;
   address?: AddressInstance;
@@ -38,7 +38,7 @@ export type TypedRequestBody<
 };
 
 export type TypedRequestParams<
-  P extends Record<string, unknown> = Record<string, unknown>
+  P extends Record<string, unknown> = Record<string, unknown>,
 > = Express.Request & {
   user?: Express.User & UserInstance;
   address?: AddressInstance;
@@ -49,7 +49,7 @@ export type TypedRequestParams<
 export type TypedRequest<
   B extends Record<string, unknown> = Record<string, unknown>,
   Q extends Record<string, unknown> = Record<string, unknown>,
-  P extends Record<string, unknown> = Record<string, unknown>
+  P extends Record<string, unknown> = Record<string, unknown>,
 > = Express.Request & {
   user?: Express.User & UserInstance;
   address?: AddressInstance;
@@ -89,6 +89,7 @@ declare global {
       user?: User;
       address?: AddressInstance;
       chain?: CommunityInstance;
+      community?: CommunityInstance;
       // TODO: session is used in logout.ts -> remove?
       session: any;
       sessionID: any;

@@ -1,20 +1,19 @@
 import type { MsgDepositEncodeObject } from '@cosmjs/stargate';
-import BN from 'bn.js';
-import moment from 'moment';
 import { longify } from '@cosmjs/stargate/build/queryclient';
-import {
+import type {
   QueryDepositsResponseSDKType,
   QueryTallyResultResponseSDKType,
   QueryVotesResponseSDKType,
-} from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/query';
-import { ProposalType } from 'common-common/src/types';
+} from '@hicommonwealth/chains';
+import { ProposalType } from '@hicommonwealth/core';
+import BN from 'bn.js';
 import type {
   CosmosProposalState,
   CosmosToken,
   CosmosVoteChoice,
   ICosmosProposal,
 } from 'controllers/chain/cosmos/types';
-
+import Proposal from 'models/Proposal';
 import { ITXModalData } from 'models/interfaces';
 import {
   ProposalEndTime,
@@ -23,15 +22,15 @@ import {
   VotingUnit,
 } from 'models/types';
 import { DepositVote } from 'models/votes';
-import Proposal from 'models/Proposal';
+import moment from 'moment';
 import CosmosAccount from '../../account';
 import type CosmosAccounts from '../../accounts';
 import type CosmosChain from '../../chain';
 import type { CosmosApiType } from '../../chain';
-import { marshalTallyV1 } from './utils-v1';
-import type CosmosGovernanceV1 from './governance-v1';
 import { CosmosVote } from '../v1beta1/proposal-v1beta1';
 import { encodeMsgVote } from '../v1beta1/utils-v1beta1';
+import type CosmosGovernanceV1 from './governance-v1';
+import { marshalTallyV1 } from './utils-v1';
 
 const voteToEnumV1 = (voteOption: number | string): CosmosVoteChoice => {
   switch (voteOption) {
@@ -99,7 +98,7 @@ export class CosmosProposalV1 extends Proposal<
   public get depositorsAsVotes(): Array<DepositVote<CosmosToken>> {
     return this.data.state.depositors.map(
       ([a, n]) =>
-        new DepositVote(this._Accounts.fromAddress(a), this._Chain.coins(n))
+        new DepositVote(this._Accounts.fromAddress(a), this._Chain.coins(n)),
     );
   }
 
@@ -116,7 +115,7 @@ export class CosmosProposalV1 extends Proposal<
     ChainInfo: CosmosChain,
     Accounts: CosmosAccounts,
     Governance: CosmosGovernanceV1,
-    data: ICosmosProposal
+    data: ICosmosProposal,
   ) {
     super(ProposalType.CosmosProposal, data);
     this._Chain = ChainInfo;
@@ -200,11 +199,11 @@ export class CosmosProposalV1 extends Proposal<
         if (vote) {
           this.data.state.voters.push([voter.voter, vote]);
           this.addOrUpdateVote(
-            new CosmosVote(this._Accounts.fromAddress(voter.voter), vote)
+            new CosmosVote(this._Accounts.fromAddress(voter.voter), vote),
           );
         } else {
           console.error(
-            `voter: ${voter.voter} has invalid vote option: ${voter.options[0].option}`
+            `voter: ${voter.voter} has invalid vote option: ${voter.options[0].option}`,
           );
         }
       }
@@ -322,7 +321,7 @@ export class CosmosProposalV1 extends Proposal<
     const msg = encodeMsgVote(
       vote.account.address,
       this.data.identifier,
-      vote.option
+      vote.option,
     );
 
     await this._Chain.sendTx(vote.account, msg);

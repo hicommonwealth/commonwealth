@@ -1,5 +1,5 @@
+import { AppError } from '@hicommonwealth/adapters';
 import { Op } from 'sequelize';
-import { AppError } from '../../../../common-common/src/errors';
 import { AddressInstance } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
 import { UserInstance } from '../../models/user';
@@ -97,4 +97,12 @@ export async function __deleteComment(
 
   // actually delete
   await comment.destroy();
+
+  // use callbacks so route returns and this completes in the background
+  if (this.globalActivityCache) {
+    this.globalActivityCache.deleteActivityFromCache(
+      parseInt(comment.thread_id, 10),
+      comment.id,
+    );
+  }
 }

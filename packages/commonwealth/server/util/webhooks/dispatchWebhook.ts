@@ -1,25 +1,28 @@
+import {
+  StatsDController,
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/adapters';
+import { NotificationCategories } from '@hicommonwealth/core';
 import { NotificationDataAndCategory } from '../../../shared/types';
-import { sendDiscordWebhook } from './destinations/discord';
-import { NotificationCategories } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { fetchWebhooks, getWebhookDestination } from './util';
-import { getWebhookData } from './getWebhookData';
-import { WebhookDestinations } from './types';
-import { sendSlackWebhook } from './destinations/slack';
-import { sendTelegramWebhook } from './destinations/telegram';
-import { WebhookInstance } from '../../models/webhook';
-import { sendZapierWebhook } from './destinations/zapier';
-import { rollbar } from '../rollbar';
-import { StatsDController } from 'common-common/src/statsd';
 import models from '../../database';
 import { CommunityInstance } from '../../models/community';
+import { WebhookInstance } from '../../models/webhook';
+import { rollbar } from '../rollbar';
+import { sendDiscordWebhook } from './destinations/discord';
+import { sendSlackWebhook } from './destinations/slack';
+import { sendTelegramWebhook } from './destinations/telegram';
+import { sendZapierWebhook } from './destinations/zapier';
+import { getWebhookData } from './getWebhookData';
+import { WebhookDestinations } from './types';
+import { fetchWebhooks, getWebhookDestination } from './util';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 // TODO: @Timothee disable/deprecate a webhook ulr if it fails too many times (remove dead urls)
 export async function dispatchWebhooks(
   notification: NotificationDataAndCategory,
-  webhooks?: WebhookInstance[]
+  webhooks?: WebhookInstance[],
 ) {
   if (
     notification.categoryId === NotificationCategories.SnapshotProposal ||
@@ -27,7 +30,7 @@ export async function dispatchWebhooks(
     notification.categoryId === NotificationCategories.CommentEdit
   ) {
     log.warn(
-      `Webhooks not supported for ${notification.categoryId} notifications`
+      `Webhooks not supported for ${notification.categoryId} notifications`,
     );
     return;
   }
@@ -36,20 +39,23 @@ export async function dispatchWebhooks(
     webhooks = await fetchWebhooks(notification);
   }
 
-  let chainId: string;
+  let communityId: string;
   if (notification.categoryId === NotificationCategories.ChainEvent) {
-    chainId = notification.data.chain;
+    communityId = notification.data.chain;
   } else {
-    chainId = notification.data.chain_id;
+    communityId = notification.data.chain_id;
   }
 
-  const chain: CommunityInstance | undefined = await models.Community.findOne({
-    where: {
-      id: chainId,
-    },
-  });
+  const community: CommunityInstance | undefined =
+    await models.Community.findOne({
+      where: {
+        id: communityId,
+      },
+    });
 
-  const webhookData = Object.freeze(await getWebhookData(notification, chain));
+  const webhookData = Object.freeze(
+    await getWebhookData(notification, community),
+  );
 
   const webhookPromises = [];
   for (const webhook of webhooks) {
@@ -62,29 +68,29 @@ export async function dispatchWebhooks(
             {
               ...webhookData,
             },
-            chain
-          )
+            community,
+          ),
         );
         break;
       case WebhookDestinations.Slack:
         webhookPromises.push(
           sendSlackWebhook(webhook.url, notification.categoryId, {
             ...webhookData,
-          })
+          }),
         );
         break;
       case WebhookDestinations.Telegram:
         webhookPromises.push(
           sendTelegramWebhook(webhook.url, notification.categoryId, {
             ...webhookData,
-          })
+          }),
         );
         break;
       case WebhookDestinations.Zapier:
         webhookPromises.push(
           sendZapierWebhook(webhook.url, notification.categoryId, {
             ...webhookData,
-          })
+          }),
         );
         break;
       default:
@@ -108,7 +114,7 @@ export async function dispatchWebhooks(
         `[${formatFilename(__filename)}]: Error sending webhook: ${
           result.reason
         }`,
-        error
+        error,
       );
       // log.error(`Error sending webhook: ${result.reason}`, error);
       rollbar.error(`Error sending webhook: ${result.reason}`, error);

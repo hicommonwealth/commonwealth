@@ -1,13 +1,13 @@
+import { AppError } from '@hicommonwealth/adapters';
+import { GetCommunitiesResult } from 'server/controllers/server_communities_methods/get_communities';
+import { SearchCommunitiesResult } from 'server/controllers/server_communities_methods/search_communities';
+import { ServerControllers } from '../../routing/router';
 import {
   PaginationQueryParams,
   TypedRequestQuery,
   TypedResponse,
   success,
 } from '../../types';
-import { ServerControllers } from '../../routing/router';
-import { GetCommunitiesResult } from 'server/controllers/server_communities_methods/get_communities';
-import { SearchCommunitiesResult } from 'server/controllers/server_communities_methods/search_communities';
-import { AppError } from '../../../../common-common/src/errors';
 
 const Errors = {
   InvalidRequest: 'Invalid request',
@@ -18,12 +18,12 @@ type GetCommunitiesRequestQuery = {
   search?: string;
 } & PaginationQueryParams;
 
-type GetCommunitiesResponse = GetCommunitiesResult | SearchCommunitiesResult
+type GetCommunitiesResponse = GetCommunitiesResult | SearchCommunitiesResult;
 
 export const getCommunitiesHandler = async (
   controllers: ServerControllers,
   req: TypedRequestQuery<GetCommunitiesRequestQuery>,
-  res: TypedResponse<GetCommunitiesResponse>
+  res: TypedResponse<GetCommunitiesResponse>,
 ) => {
   const options = req.query;
 

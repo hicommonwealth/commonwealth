@@ -12,6 +12,7 @@ import Permissions from '../../../../utils/Permissions';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
 import { CWText } from '../../component_kit/cw_text';
 import AccountConnectionIndicator from '../AccountConnectionIndicator';
+import CreateCommunityButton from '../CreateCommunityButton';
 import DirectoryMenuItem from '../DirectoryMenuItem';
 import { AdminSection } from '../admin_section';
 import { DiscussionSection } from '../discussion_section';
@@ -43,7 +44,15 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
           address={activeAccount?.address}
         />
       )}
-      {showAdmin && <AdminSection />}
+
+      <CreateCommunityButton />
+
+      {showAdmin && (
+        <>
+          <CWDivider />
+          <AdminSection />
+        </>
+      )}
       {featureFlags.communityHomepage && app.chain?.meta.hasHomepage && (
         <div
           className={onHomeRoute ? 'home-button active' : 'home-button'}

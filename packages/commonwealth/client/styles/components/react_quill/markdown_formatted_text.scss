@@ -1,0 +1,210 @@
+@import '../../shared';
+@import 'quill_formatted_text.scss';
+
+.MarkdownFormattedText {
+  @include b2;
+  letter-spacing: 0.01em;
+
+  position: relative;
+  word-break: break-word;
+
+  @include formatted-text();
+  @include collapsible();
+  @include hidden-formatting();
+
+  width: 100%;
+  overflow: visible;
+
+  p {
+    @include b2;
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
+  }
+
+  a {
+    @include b2;
+    color: $primary-500;
+  }
+
+  h1 {
+    font-family: $font-family-silka;
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 36px;
+    letter-spacing: -0.24px;
+  }
+
+  h2 {
+    font-family: $font-family-silka;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 28px;
+    letter-spacing: -0.2px;
+  }
+
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: $font-family-silka;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 24px;
+    letter-spacing: -0.19px;
+  }
+
+  table {
+    width: 100%;
+    overflow-x: auto;
+    border-spacing: 0;
+    border-radius: $border-radius-corners-wider;
+    border: 1px solid $neutral-200;
+
+    thead {
+      tr {
+        th {
+          @include b2;
+          letter-spacing: 0.02em;
+          font-weight: 700;
+          padding: 16px;
+          background-color: $neutral-50;
+          border-bottom: 1px solid $neutral-200;
+
+          &:first-child {
+            border-top-left-radius: $border-radius-corners-wider;
+          }
+
+          &:last-child {
+            border-top-right-radius: $border-radius-corners-wider;
+          }
+        }
+      }
+    }
+
+    tbody {
+      tr {
+        td {
+          @include b2;
+          letter-spacing: 0.01em;
+          font-weight: 400;
+          padding: 16px;
+          background-color: $white;
+        }
+
+        &:last-child {
+          td {
+            &:first-child {
+              border-bottom-left-radius: $border-radius-corners-wider;
+            }
+
+            &:last-child {
+              border-bottom-right-radius: $border-radius-corners-wider;
+            }
+          }
+        }
+
+        &:not(:last-child) {
+          th,
+          td {
+            border-bottom: 1px solid $neutral-200;
+          }
+        }
+      }
+    }
+
+    tr {
+      th,
+      td {
+        &:not(:last-child) {
+          border-right: 1px solid $neutral-200;
+        }
+      }
+    }
+  }
+
+  ul,
+  ol {
+    @include b2;
+
+    &:has(li p input[type='checkbox']),
+    &:has(li input[type='checkbox']) {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    li:has(p input[type='checkbox']),
+    li:has(input[type='checkbox']) {
+      list-style-type: none;
+      display: flex;
+      align-items: center;
+    }
+
+    li {
+      input[type='checkbox'] {
+        height: 20px;
+        width: 20px;
+        margin-right: 6px;
+      }
+    }
+  }
+
+  mark {
+    background-color: $primary-50;
+  }
+
+  hr {
+    margin: 12px 0;
+    color: $neutral-200;
+  }
+
+  strong,
+  em,
+  del,
+  ins {
+    letter-spacing: 0.02em;
+  }
+
+  strong {
+    font-weight: 700;
+  }
+
+  em,
+  del,
+  ins {
+    font-weight: 400;
+  }
+
+  blockquote {
+    @include b2;
+    border-left: 2px solid $neutral-200;
+    padding-left: 24px;
+  }
+
+  code {
+    @include b2;
+    background-color: $rorange-50;
+    color: $rorange-800;
+    border-radius: 4px;
+    padding: 0 8px;
+  }
+
+  pre {
+    display: flex;
+    padding: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    border-radius: $border-radius-corners-wider;
+    background-color: $neutral-50;
+    border: 1px solid $neutral-200;
+
+    code {
+      padding: 0;
+      color: $neutral-800;
+      background-color: $neutral-50;
+      font-family: $font-family-monospace;
+    }
+  }
+}

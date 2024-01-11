@@ -1,4 +1,4 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import type { NextFunction, Request, Response } from 'express';
 import { findAllRoles } from '../../util/roles';
 import Errors from './errors';
@@ -7,9 +7,9 @@ const createWebhook = async (
   models,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
-  const chain = req.chain;
+  const { community } = req;
   // if chain is present we know we are dealing with a chain first community
 
   // only admins should be able to get webhooks
@@ -24,8 +24,8 @@ const createWebhook = async (
           .map((addr) => addr.id),
       },
     },
-    chain.id,
-    ['admin']
+    community.id,
+    ['admin'],
   );
   if (!req.user.isAdmin && adminRoles.length === 0)
     return next(new AppError(Errors.NotAdmin));
@@ -33,14 +33,14 @@ const createWebhook = async (
   if (!req.body.webhookUrl) return next(new AppError(Errors.MissingWebhook));
   const existingWebhook = await models.Webhook.findOne({
     where: {
-      community_id: chain.id,
+      community_id: community.id,
       url: req.body.webhookUrl,
     },
   });
   if (existingWebhook) return next(new AppError(Errors.NoDuplicates));
   // create webhook
   const webhook = await models.Webhook.create({
-    community_id: chain.id,
+    community_id: community.id,
     url: req.body.webhookUrl,
   });
   return res.json({ status: 'Success', result: webhook.toJSON() });

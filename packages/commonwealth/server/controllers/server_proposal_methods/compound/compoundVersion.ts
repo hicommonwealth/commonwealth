@@ -1,20 +1,26 @@
-import { providers } from 'ethers';
+import { RedisCache } from '@hicommonwealth/adapters';
 import {
   GovernorAlpha,
-  GovernorBravoDelegate,
-  GovernorCompatibilityBravo,
   GovernorAlpha__factory,
+  GovernorBravoDelegate,
   GovernorBravoDelegate__factory,
+  GovernorCompatibilityBravo,
   GovernorCompatibilityBravo__factory,
-} from 'common-common/src/eth/types';
+  GovernorCountingSimple,
+  GovernorCountingSimple__factory,
+} from '@hicommonwealth/chains';
+import { RedisNamespaces } from '@hicommonwealth/core';
+import { providers } from 'ethers';
 import { GovVersion } from './types';
-import { RedisCache } from 'common-common/src/redisCache';
-import { RedisNamespaces } from 'common-common/src/types';
 
 type ContractAndVersion = {
   version: GovVersion;
-  contract: GovernorAlpha | GovernorBravoDelegate | GovernorCompatibilityBravo;
-}
+  contract:
+    | GovernorAlpha
+    | GovernorBravoDelegate
+    | GovernorCompatibilityBravo
+    | GovernorCountingSimple;
+};
 
 /**
  * This function determines which compound contract version is being used at the given address. Note that the returned
@@ -24,12 +30,12 @@ type ContractAndVersion = {
  */
 async function deriveCompoundGovContractAndVersion(
   compoundGovAddress: string,
-  provider: providers.Web3Provider
+  provider: providers.Web3Provider,
 ): Promise<ContractAndVersion> {
   try {
     const contract = GovernorAlpha__factory.connect(
       compoundGovAddress,
-      provider
+      provider,
     );
     await contract.guardian();
     return { version: GovVersion.Alpha, contract };
@@ -37,23 +43,33 @@ async function deriveCompoundGovContractAndVersion(
     try {
       const contract = GovernorBravoDelegate__factory.connect(
         compoundGovAddress,
-        provider
+        provider,
       );
       await contract.proposalCount();
       await contract.initialProposalId();
       return { version: GovVersion.Bravo, contract };
     } catch (e1) {
       try {
-        const contract = GovernorCompatibilityBravo__factory.connect(
+        const contract = GovernorCountingSimple__factory.connect(
           compoundGovAddress,
-          provider
+          provider,
         );
         await contract.COUNTING_MODE();
-        return { version: GovVersion.OzBravo, contract };
+        await contract.proposalVotes(1);
+        return { version: GovVersion.OzCountSimple, contract };
       } catch (e2) {
-        throw new Error(
-          `Failed to find Compound contract version at ${compoundGovAddress}`
-        );
+        try {
+          const contract = GovernorCompatibilityBravo__factory.connect(
+            compoundGovAddress,
+            provider,
+          );
+          await contract.COUNTING_MODE();
+          return { version: GovVersion.OzBravo, contract };
+        } catch (e3) {
+          throw new Error(
+            `Failed to find Compound contract version at ${compoundGovAddress}`,
+          );
+        }
       }
     }
   }
@@ -62,7 +78,7 @@ async function deriveCompoundGovContractAndVersion(
 function getCompoundGovContract(
   govVersion: GovVersion,
   compoundGovAddress: string,
-  provider: providers.Web3Provider
+  provider: providers.Web3Provider,
 ) {
   switch (govVersion) {
     case GovVersion.Alpha:
@@ -70,12 +86,17 @@ function getCompoundGovContract(
     case GovVersion.Bravo:
       return GovernorBravoDelegate__factory.connect(
         compoundGovAddress,
-        provider
+        provider,
       );
     case GovVersion.OzBravo:
       return GovernorCompatibilityBravo__factory.connect(
         compoundGovAddress,
-        provider
+        provider,
+      );
+    case GovVersion.OzCountSimple:
+      return GovernorCountingSimple__factory.connect(
+        compoundGovAddress,
+        provider,
       );
     default:
       throw new Error(`Invalid Compound contract version: ${govVersion}`);
@@ -85,22 +106,22 @@ function getCompoundGovContract(
 export async function getCompoundGovContractAndVersion(
   redis: RedisCache,
   compoundGovAddress: string,
-  provider: providers.Web3Provider
+  provider: providers.Web3Provider,
 ): Promise<ContractAndVersion> {
-  const govVersion = await redis.getKey(
+  const govVersion = (await redis.getKey(
     RedisNamespaces.Compound_Gov_Version,
-    compoundGovAddress
-  ) as GovVersion | undefined;
+    compoundGovAddress,
+  )) as GovVersion | undefined;
 
   if (!govVersion) {
     const result = await deriveCompoundGovContractAndVersion(
       compoundGovAddress,
-      provider
+      provider,
     );
     await redis.setKey(
       RedisNamespaces.Compound_Gov_Version,
       compoundGovAddress,
-      result.version
+      result.version,
     );
     return result;
   }
@@ -108,7 +129,7 @@ export async function getCompoundGovContractAndVersion(
   const contract = getCompoundGovContract(
     govVersion,
     compoundGovAddress,
-    provider
+    provider,
   );
   return { version: govVersion, contract };
 }

@@ -5,8 +5,8 @@ import { featureFlags } from 'helpers/feature-flags';
 import { useCommonNavigate } from 'navigation/helpers';
 import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
+import useNewTopicModalMutationStore from 'state/ui/newTopicModal';
 import { sidebarStore } from 'state/ui/sidebar';
-import { EditTopicThresholdsModal } from '../../modals/edit_topic_thresholds_modal';
 import { NewTopicModal } from '../../modals/new_topic_modal';
 import { OrderTopicsModal } from '../../modals/order_topics_modal';
 import { isWindowSmallInclusive } from '../component_kit/helpers';
@@ -54,12 +54,10 @@ const AdminSectionComponent = () => {
   const navigate = useCommonNavigate();
   const location = useLocation();
 
-  const [isEditTopicThresholdsModalOpen, setIsEditTopicThresholdsModalOpen] =
-    React.useState<boolean>(false);
   const [isOrderTopicsModalOpen, setIsOrderTopicsModalOpen] =
     React.useState<boolean>(false);
-  const [isNewTopicModalOpen, setIsNewTopicModalOpen] =
-    React.useState<boolean>(false);
+  const { isNewTopicModalOpen, setIsNewTopicModalOpen } =
+    useNewTopicModalMutationStore();
 
   const matchesManageCommunityRoute = matchRoutes(
     [{ path: '/manage' }, { path: ':scope/manage' }],
@@ -173,24 +171,6 @@ const AdminSectionComponent = () => {
         setIsOrderTopicsModalOpen(true);
       },
     },
-    ...(!featureFlags.gatingEnabled
-      ? [
-          {
-            title: 'Edit topic thresholds',
-            isActive: isEditTopicThresholdsModalOpen,
-            isVisible: true,
-            containsChildren: false,
-            displayData: null,
-            isUpdated: false,
-            hasDefaultToggle: false,
-            onClick: (e) => {
-              e.preventDefault();
-              resetSidebarState();
-              setIsEditTopicThresholdsModalOpen(true);
-            },
-          },
-        ]
-      : []),
   ];
 
   // Build Toggle Tree
@@ -247,16 +227,6 @@ const AdminSectionComponent = () => {
         }
         onClose={() => setIsOrderTopicsModalOpen(false)}
         open={isOrderTopicsModalOpen}
-      />
-      <CWModal
-        size="small"
-        content={
-          <EditTopicThresholdsModal
-            onModalClose={() => setIsEditTopicThresholdsModalOpen(false)}
-          />
-        }
-        onClose={() => setIsEditTopicThresholdsModalOpen(false)}
-        open={isEditTopicThresholdsModalOpen}
       />
     </React.Fragment>
   );

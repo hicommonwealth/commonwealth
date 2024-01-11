@@ -1,0 +1,60 @@
+@import '../../../../../../styles/shared';
+
+.FormStep {
+  display: flex;
+  padding: 8px 12px;
+  align-items: center;
+  gap: 8px;
+  border-radius: 6px;
+  cursor: default;
+
+  .index {
+    color: $white;
+    font-size: 14px;
+    border-radius: 50%;
+    background-color: $primary-400;
+    width: 24px;
+    height: 24px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &.completed {
+    background-color: $neutral-100;
+
+    svg {
+      scale: 1.25;
+    }
+
+    .label {
+      font-weight: 400;
+      color: $neutral-400;
+    }
+  }
+
+  &.active {
+    background-color: $primary-50;
+
+    .index {
+      background-color: $primary-400;
+    }
+
+    .label {
+      font-weight: 500;
+      color: $neutral-900;
+    }
+  }
+
+  &.inactive {
+    background-color: $neutral-100;
+
+    .index {
+      background-color: $neutral-400;
+    }
+
+    .label {
+      font-weight: 400;
+      color: $neutral-400;
+    }
+  }
+}

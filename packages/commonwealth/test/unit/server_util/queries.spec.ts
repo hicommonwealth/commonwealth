@@ -1,3 +1,5 @@
+import { expect } from 'chai';
+import { IPagination, OrderByOptions } from '../../../server/api/extApiTypes';
 import {
   PaginationResult,
   PaginationSqlOptions,
@@ -5,11 +7,6 @@ import {
   buildPaginationSql,
   formatPagination,
 } from '../../../server/util/queries';
-import {
-  IPagination,
-  OrderByOptions,
-} from '../../../../common-common/src/api/extApiTypes';
-import { expect } from 'chai';
 
 describe('queries', () => {
   describe('formatPagination', () => {

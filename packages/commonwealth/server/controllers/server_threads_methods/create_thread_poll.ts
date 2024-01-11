@@ -1,9 +1,11 @@
+import { AppError } from '@hicommonwealth/adapters';
 import moment from 'moment';
-import { AppError } from '../../../../common-common/src/errors';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { CommunityInstance } from '../../models/community';
 import { PollAttributes } from '../../models/poll';
 import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
+import { TrackOptions } from '../server_analytics_methods/track';
 import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
@@ -21,7 +23,7 @@ export type CreateThreadPollOptions = {
   options: string[];
   customDuration?: number;
 };
-export type CreateThreadPollResult = PollAttributes;
+export type CreateThreadPollResult = [PollAttributes, TrackOptions];
 
 export async function __createThreadPoll(
   this: ServerThreadsController,
@@ -69,7 +71,7 @@ export async function __createThreadPoll(
   }
 
   // check if admin_only flag is set
-  if (thread.Chain?.admin_only_polling) {
+  if (community.admin_only_polling) {
     const isAdmin = await validateOwner({
       models: this.models,
       user,
@@ -77,7 +79,7 @@ export async function __createThreadPoll(
       allowAdmin: true,
     });
     if (!isAdmin) {
-      new AppError(Errors.MustBeAdmin);
+      throw new AppError(Errors.MustBeAdmin);
     }
   }
 
@@ -87,7 +89,7 @@ export async function __createThreadPoll(
     return this.models.Poll.create(
       {
         thread_id: thread.id,
-        community_id: thread.chain,
+        community_id: thread.community_id,
         prompt,
         options: JSON.stringify(options),
         ends_at,
@@ -96,5 +98,11 @@ export async function __createThreadPoll(
     );
   });
 
-  return poll.toJSON();
+  const analyticsOptions = {
+    event: MixpanelCommunityInteractionEvent.CREATE_POLL,
+    community: community.id,
+    userId: user.id,
+  };
+
+  return [poll.toJSON(), analyticsOptions];
 }

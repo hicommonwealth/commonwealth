@@ -42,6 +42,7 @@ import { CreateComment } from '../../components/Comments/CreateComment';
 import { Select } from '../../components/Select';
 import type { SidebarComponents } from '../../components/component_kit/CWContentPage';
 import { CWContentPage } from '../../components/component_kit/CWContentPage';
+import { CWGatedTopicBanner } from '../../components/component_kit/CWGatedTopicBanner';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -50,20 +51,19 @@ import {
   breakpointFnValidator,
   isWindowMediumSmallInclusive,
 } from '../../components/component_kit/helpers';
-import CWBanner from '../../components/component_kit/new_designs/CWBanner';
-import { CWTag } from '../../components/component_kit/new_designs/CWTag';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
 import ViewTemplate from '../view_template/view_template';
 import { LinkedUrlCard } from './LinkedUrlCard';
 import { TemplateActionCard } from './TemplateActionCard';
+import { ThreadPollCard } from './ThreadPollCard';
+import { ThreadPollEditorCard } from './ThreadPollEditorCard';
 import { ViewTemplateFormCard } from './ViewTemplateFormCard';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { LockMessage } from './lock_message';
-import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { SnapshotCreationCard } from './snapshot_creation_card';
 
 export type ThreadPrefetch = {
@@ -112,8 +112,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const shouldFocusCommentEditor = !!searchParams.get('focusEditor');
 
   const { data: groups = [] } = useFetchGroupsQuery({
-    chainId: app.activeChainId(),
-    includeMembers: true,
+    communityId: app.activeChainId(),
     includeTopics: true,
   });
 
@@ -129,9 +128,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const thread = data?.[0];
 
+  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
+
   const { data: comments = [], error: fetchCommentsError } =
     useFetchCommentsQuery({
-      chainId: app.activeChainId(),
+      communityId: app.activeChainId(),
       threadId: parseInt(`${threadId}`),
     });
 
@@ -143,10 +144,20 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const { data: memberships = [] } = useRefreshMembershipQuery({
     chainId: app.activeChainId(),
     address: app?.user?.activeAccount?.address,
+    apiEnabled: !!app?.user?.activeAccount?.address,
   });
-  const restrictedTopicIds = (memberships || [])
-    .filter((x) => x.rejectReason)
-    .map((x) => parseInt(`${x.topicId}`));
+
+  const isTopicGated = !!(memberships || []).find((membership) =>
+    membership.topicIds.includes(thread?.topic?.id),
+  );
+
+  const isActionAllowedInGatedTopic = !!(memberships || []).find(
+    (membership) =>
+      membership.topicIds.includes(thread?.topic?.id) && membership.isAllowed,
+  );
+
+  const isRestrictedMembership =
+    !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
   useEffect(() => {
     if (fetchCommentsError) notifyError('Failed to load comments');
@@ -187,7 +198,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   });
 
   useBrowserAnalyticsTrack({
-    payload: { event: MixpanelPageViewEvent.THREAD_PAGE_VIEW },
+    payload: {
+      event: MixpanelPageViewEvent.THREAD_PAGE_VIEW,
+    },
   });
 
   useEffect(() => {
@@ -271,7 +284,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   if (
     (!isLoading && !thread) ||
     fetchThreadError ||
-    thread.chain !== app.activeChainId()
+    thread.communityId !== app.activeChainId()
   ) {
     return <PageNotFound />;
   }
@@ -279,7 +292,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   // Original posters have full editorial control, while added collaborators
   // merely have access to the body and title
   const isAuthor = Permissions.isThreadAuthor(thread);
-  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
   const isAdminOrMod = isAdmin || Permissions.isCommunityModerator();
 
   const linkedSnapshots = filterLinks(thread.links, LinkSource.Snapshot);
@@ -309,12 +321,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const hasWebLinks = thread.links.find((x) => x.source === 'web');
 
-  const isRestrictedMembership = restrictedTopicIds.includes(thread?.topic?.id);
-
-  const canComment =
-    (!!hasJoinedCommunity ||
-      (!isAdminOrMod && app.chain.isGatedTopic(thread?.topic?.id))) &&
-    !isRestrictedMembership;
+  const canComment = !!hasJoinedCommunity && !isRestrictedMembership;
 
   const handleNewSnapshotChange = async ({
     id,
@@ -380,7 +387,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     isCommunityMember: !!hasJoinedCommunity,
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
-    isThreadTopicGated: restrictedTopicIds.includes(thread?.topic?.id),
+    isThreadTopicGated: isRestrictedMembership,
   });
 
   return (
@@ -394,7 +401,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           showLinkedThreadOptions ||
           polls?.length > 0 ||
           isAuthor ||
-          hasWebLinks
+          !!hasWebLinks
         }
         isSpamThread={!!thread.markedAsSpamAt}
         title={
@@ -403,7 +410,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               onInput={(e) => {
                 setDraftTitle(e.target.value);
               }}
-              defaultValue={thread.title}
+              value={draftTitle || thread.title}
             />
           ) : (
             thread.title
@@ -525,31 +532,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       shouldFocusEditor={shouldFocusCommentEditor}
                       tooltipText={disabledActionsTooltipText}
                     />
-                    {featureFlags.gatingEnabled &&
-                      foundGatedTopic &&
-                      !hideGatingBanner && (
-                        <CWBanner
-                          title="This topic is gated"
-                          body="Only members within the following group(s) can interact with this topic:"
-                          type="info"
-                          footer={
-                            <div className="gating-tags">
-                              {gatedGroupsMatchingTopic.map((t) => (
-                                <CWTag
-                                  key={t.id}
-                                  label={t.name}
-                                  type="referendum"
-                                />
-                              ))}
-                            </div>
-                          }
-                          buttons={[
-                            {
-                              label: 'See all groups',
-                              onClick: () => navigate('/members?tab=groups'),
-                            },
-                            { label: 'Learn more about gating' },
-                          ]}
+                    {foundGatedTopic &&
+                      !hideGatingBanner &&
+                      isRestrictedMembership && (
+                        <CWGatedTopicBanner
+                          groupNames={gatedGroupsMatchingTopic.map(
+                            (g) => g.name,
+                          )}
                           onClose={() => setHideGatingBanner(true)}
                         />
                       )}
@@ -689,6 +678,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                               poll={poll}
                               key={poll.id}
                               onVote={() => setInitializedPolls(false)}
+                              isTopicMembershipRestricted={
+                                isRestrictedMembership
+                              }
                               showDeleteButton={isAuthor || isAdmin}
                               onDelete={() => {
                                 setInitializedPolls(false);

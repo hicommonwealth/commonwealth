@@ -1,14 +1,15 @@
+import {
+  StatsDController,
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/adapters';
+import { IDiscordMeta } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-
-import { StatsDController } from 'common-common/src/statsd';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
-
-import { factory, formatFilename } from 'common-common/src/logging';
-import { IDiscordMeta } from 'common-common/src/types';
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 export type CommentAttributes = {
   thread_id: string;
@@ -16,7 +17,7 @@ export type CommentAttributes = {
   text: string;
   plaintext: string;
   id?: number;
-  chain: string;
+  community_id: string;
   parent_id?: string;
   version_history?: string[];
 
@@ -50,7 +51,7 @@ export default (
     'Comment',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      chain: { type: dataTypes.STRING, allowNull: false },
+      community_id: { type: dataTypes.STRING, allowNull: false },
       thread_id: {
         type: dataTypes.INTEGER,
         allowNull: false,
@@ -140,19 +141,17 @@ export default (
       paranoid: true,
       indexes: [
         { fields: ['id'] },
-        { fields: ['chain', 'thread_id'] },
         { fields: ['address_id'] },
-        { fields: ['chain', 'created_at'] },
-        { fields: ['chain', 'updated_at'] },
+        { fields: ['community_id', 'created_at'] },
+        { fields: ['community_id', 'updated_at'] },
         { fields: ['thread_id'] },
-        { fields: ['canvas_hash'] },
       ],
     },
   );
 
   Comment.associate = (models) => {
     models.Comment.belongsTo(models.Community, {
-      foreignKey: 'chain',
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
     models.Comment.belongsTo(models.Address, {

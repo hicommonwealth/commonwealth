@@ -1,5 +1,5 @@
-import { AppError } from 'common-common/src/errors';
-import { NotificationCategories } from 'common-common/src/types';
+import { AppError } from '@hicommonwealth/adapters';
+import { NotificationCategories } from '@hicommonwealth/core';
 import type { NextFunction, Request, Response } from 'express';
 import Errors from './errors';
 
@@ -7,7 +7,7 @@ export default async (
   models,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.user) {
     return next(new AppError(Errors.NotLoggedIn));

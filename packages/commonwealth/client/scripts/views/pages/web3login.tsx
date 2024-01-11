@@ -5,9 +5,9 @@ import React from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { CWButton } from '../components/component_kit/cw_button';
-import { CWModal } from '../components/component_kit/new_designs/CWModal';
 import { CWText } from '../components/component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
+import { CWModal } from '../components/component_kit/new_designs/CWModal';
 import { LoginModal } from '../modals/login_modal';
 import { PageNotFound } from './404';
 import { PageLoading } from './loading';
@@ -45,7 +45,7 @@ const Web3LoginPage = () => {
         {
           jwt: app.user.jwt,
           token,
-        }
+        },
       );
 
       if (status === 'Success') {
@@ -56,7 +56,7 @@ const Web3LoginPage = () => {
         console.error('Unknown error occurred', status, result);
       }
     } catch (e) {
-      setErrorMsg(e.responseJSON.error);
+      setErrorMsg(e.response?.data?.error);
     }
   };
 

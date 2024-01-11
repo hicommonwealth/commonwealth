@@ -1,10 +1,10 @@
+import { Dec, IntPretty } from '@keplr-wallet/unit';
 import { isHex, isU8a } from '@polkadot/util';
 import {
   checkAddress,
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
-import { Dec, IntPretty } from '@keplr-wallet/unit';
 import { AccessLevel } from './permissions';
 import type { RoleObject } from './types';
 
@@ -44,7 +44,7 @@ export const getThreadUrl = (
     id?: string | number;
     title?: string;
   },
-  comment?: string | number
+  comment?: string | number,
 ): string => {
   const aId = thread.chain;
   const tId = thread.type_id || thread.id;
@@ -59,7 +59,7 @@ export const getThreadUrl = (
 export const getThreadUrlWithoutObject = (
   proposalCommunity,
   proposalId,
-  comment?
+  comment?,
 ) => {
   const aId = proposalCommunity;
   const tId = proposalId;
@@ -94,7 +94,7 @@ export const validURL = (str) => {
       '(\\:\\d+)?(\\/[-a-z\\d%_.~+:@]*)*' + // port and path
       '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
       '(\\#[-a-z\\d_]*)?$',
-    'i'
+    'i',
   ); // fragment locator
   return !!pattern.test(str);
 };
@@ -188,7 +188,7 @@ export function formatAddressShort(
   chain?: string,
   includeEllipsis?: boolean,
   maxCharLength?: number,
-  prefix?: string
+  prefix?: string,
 ) {
   if (!address) return;
   if (chain === 'near') {
@@ -198,7 +198,7 @@ export function formatAddressShort(
     const totalLength = address.length;
     return `${address.slice(0, prefix.length + 3)}...${address.slice(
       totalLength - 4,
-      totalLength
+      totalLength,
     )}`;
   } else {
     return `${address.slice(0, maxCharLength || 5)}${
@@ -231,7 +231,7 @@ export const addressSwapper = (options: {
   // check if it is valid with the current prefix & reencode if needed
   const [valid, errorMsg] = checkAddress(
     options.address,
-    options.currentPrefix
+    options.currentPrefix,
   );
 
   if (!valid) {
@@ -247,7 +247,7 @@ export const addressSwapper = (options: {
 
 export function aggregatePermissions(
   roles: RoleObject[],
-  chain_permissions: { allow: number; deny: number }
+  chain_permissions: { allow: number; deny: number },
 ) {
   const ORDER: AccessLevel[] = [
     AccessLevel.Member,
@@ -280,11 +280,11 @@ export function aggregatePermissions(
  */
 export function minimalToNaturalDenom(
   amount?: string | number,
-  decimals?: number
+  decimals?: number,
 ): string {
   if (!amount || !decimals) return '0';
   const intPretty = new IntPretty(
-    new Dec(amount.toString())
+    new Dec(amount.toString()),
   ).moveDecimalPointLeft(decimals);
 
   // return full decimal precision and let the UI handle rounding
@@ -299,13 +299,36 @@ export function minimalToNaturalDenom(
  */
 export function naturalDenomToMinimal(
   naturalAmount?: string | number,
-  decimals?: number
+  decimals?: number,
 ): string {
   if (!naturalAmount || !decimals) return '0';
   const intPretty = new IntPretty(
-    new Dec(naturalAmount.toString())
+    new Dec(naturalAmount.toString()),
   ).moveDecimalPointRight(decimals);
 
   // 0 decimal places because this is max precision for the chain
   return intPretty.toDec().toString(0);
+}
+
+/**
+ * Convert Cosmos bech32 address to a hexadecimal string
+ * hex is used as a common identifier for addresses across chains.
+ * This allows us to achieve One Signer, One Account
+ *
+ * Example:
+ * bech32ToHex('osmo18q3tlnx8vguv2fadqslm7x59ejauvsmnhltgq6') => '3822bfccc76238c527ad043fbf1a85ccbbc64373'
+ * bech32ToHex('cosmos18q3tlnx8vguv2fadqslm7x59ejauvsmnlycckg') => '3822bfccc76238c527ad043fbf1a85ccbbc64373' (same)
+ *
+ * Caveat: Ethermint addresses will share a hex, but it will differ from
+ * their siblings on standard Cosmos derivation paths.
+ * e.g. evmos hex != osmo hex, but evmos hex == inj hex
+ */
+export async function bech32ToHex(address: string) {
+  const { toHex, fromBech32 } = await import('@cosmjs/encoding');
+  try {
+    const encodedData = fromBech32(address).data;
+    return toHex(encodedData);
+  } catch (e) {
+    console.log(`Error converting bech32 to hex: ${e}. Hex was not generated.`);
+  }
 }

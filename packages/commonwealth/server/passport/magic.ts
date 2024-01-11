@@ -1,20 +1,25 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Session } from '@canvas-js/interfaces';
-import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
-import { verify } from 'jsonwebtoken';
-import passport from 'passport';
-import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
-import { Op, Transaction } from 'sequelize';
-
-import { ServerError } from 'common-common/src/errors';
-import { factory, formatFilename } from 'common-common/src/logging';
+import {
+  ServerError,
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/adapters';
 import {
   ChainBase,
   NotificationCategories,
   WalletId,
   WalletSsoSource,
-} from 'common-common/src/types';
+} from '@hicommonwealth/core';
+import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
+import { verify } from 'jsonwebtoken';
+import passport from 'passport';
+import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
+import { Op, Transaction } from 'sequelize';
+import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { verify as verifyCanvas } from '../../shared/canvas/verify';
 import { JWT_SECRET, MAGIC_API_KEY } from '../config';
+import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { sequelize } from '../database';
 import { validateCommunity } from '../middleware/validateCommunity';
 import type { DB } from '../models';
@@ -26,7 +31,7 @@ import { UserAttributes, UserInstance } from '../models/user';
 import { TypedRequestBody } from '../types';
 import { createRole } from '../util/roles';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 type MagicLoginContext = {
   models: DB;
@@ -53,6 +58,8 @@ async function createMagicAddressInstances(
   const addressInstances: AddressInstance[] = [];
   const user_id = user.id;
   const profile_id = (user.Profiles[0] as ProfileAttributes).id;
+  const serverAnalyticsController = new ServerAnalyticsController();
+
   for (const { chain, address } of generatedAddresses) {
     const [addressInstance, created] = await models.Address.findOrCreate({
       where: {
@@ -84,6 +91,12 @@ async function createMagicAddressInstances(
     // xx: ?
     if (created) {
       await createRole(models, addressInstance.id, chain, 'member', false, t);
+
+      serverAnalyticsController.track({
+        community: chain,
+        userId: user_id,
+        event: MixpanelCommunityInteractionEvent.JOIN_COMMUNITY,
+      });
     } else if (
       addressInstance.wallet_sso_source === WalletSsoSource.Unknown ||
       // set wallet_sso_source if it was unknown before

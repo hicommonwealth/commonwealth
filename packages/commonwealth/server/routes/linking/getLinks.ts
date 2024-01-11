@@ -1,10 +1,10 @@
-import { AppError } from 'common-common/src/errors';
-import type { NextFunction, Request, Response } from 'express';
-import { TypedRequestBody, TypedResponse, success } from '../../types';
-import { Link, LinkSource } from '../../models/thread';
-import type { DB } from '../../models';
-import { Errors } from '../../util/linkingValidationHelper';
+import { AppError } from '@hicommonwealth/adapters';
+import type { NextFunction } from 'express';
 import { Op } from 'sequelize';
+import type { DB } from '../../models';
+import { Link, LinkSource } from '../../models/thread';
+import { TypedRequestBody, TypedResponse, success } from '../../types';
+import { Errors } from '../../util/linkingValidationHelper';
 
 type GetLinksReq = {
   thread_id?: number;
@@ -24,11 +24,11 @@ const getLinks = async (
   models: DB,
   req: TypedRequestBody<GetLinksReq>,
   res: TypedResponse<GetLinksRes>,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { thread_id, linkType, link } = req.body;
   let links;
-  let threads;
+  let threads: Array<{ id: number; title: string }>;
   if (!link && !thread_id) {
     return next(new AppError(Errors.InvalidParameter));
   }

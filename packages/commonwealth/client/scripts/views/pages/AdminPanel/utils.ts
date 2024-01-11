@@ -1,23 +1,26 @@
+import { BalanceType } from '@hicommonwealth/core';
 import axios from 'axios';
 import app from 'state';
-import { BalanceType } from '../../../../../../common-common/src/types';
 
 export const createChainNode = async ({
   url,
   name,
   bech32,
   balance_type,
+  eth_chain_id,
 }: {
   url: string;
   name: string;
   bech32: string;
   balance_type: BalanceType;
+  eth_chain_id: number;
 }) => {
   return await axios.post(`${app.serverUrl()}/nodes`, {
     url,
     name,
     bech32,
     balance_type,
+    eth_chain_id,
     jwt: app.user.jwt,
   });
 };

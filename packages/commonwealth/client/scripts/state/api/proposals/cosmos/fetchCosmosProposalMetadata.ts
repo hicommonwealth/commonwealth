@@ -1,18 +1,18 @@
 import { useQuery } from '@tanstack/react-query';
-import * as isIPFS from 'is-ipfs';
 import axios from 'axios';
+import * as isIPFS from 'is-ipfs';
 
-import app from 'state';
-import { ChainBase } from 'common-common/src/types';
-import { AnyProposal } from 'models/types';
+import { ChainBase } from '@hicommonwealth/core';
 import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
+import { AnyProposal } from 'models/types';
+import app from 'state';
 
 const PROPOSAL_METADATA_CACHE_TIME = Infinity;
 // onchain metadata URI does not change, but the file it points to might:
 const PROPOSAL_METADATA_STALE_TIME = 1000 * 60 * 30;
 
 const fetchCosmosProposalMetadata = async (
-  proposal: AnyProposal
+  proposal: AnyProposal,
 ): Promise<any> => {
   if (proposal instanceof CosmosProposalV1 && !!proposal?.data?.metadata) {
     const fileURI = proposal.data.metadata.replace('ipfs://', '');
@@ -21,7 +21,7 @@ const fetchCosmosProposalMetadata = async (
     if (!isIPFSFile) {
       // TODO: fetch non-ipfs files. https://github.com/hicommonwealth/commonwealth/issues/4233
       console.error(
-        `Non-IPFS metadata fetching is not yet implemented. Did not fetch ${fileURI}.`
+        `Non-IPFS metadata fetching is not yet implemented. Did not fetch ${fileURI}.`,
       );
       return {};
     }

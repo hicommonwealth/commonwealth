@@ -1,10 +1,10 @@
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import clsx from 'clsx';
-import React, { useState } from 'react';
-import { useDebounce } from 'usehooks-ts';
-
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
+import React, { useState } from 'react';
 import app from 'state';
+import { useDebounce } from 'usehooks-ts';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -15,6 +15,7 @@ import useDirectoryPageData, {
   ViewType,
 } from 'views/pages/DirectoryPage/useDirectoryPageData';
 import ErrorPage from 'views/pages/error';
+import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import './DirectoryPage.scss';
 
 const DirectoryPage = () => {
@@ -24,11 +25,11 @@ const DirectoryPage = () => {
   const communitySearchDebounced = useDebounce<string>(communitySearch, 500);
 
   const directoryPageEnabled = app.config.chains.getById(
-    app.activeChainId()
+    app.activeChainId(),
   )?.directoryPageEnabled;
   const communityDefaultChainNodeId = app.chain.meta.ChainNode.id;
   const selectedChainNodeId = app.config.chains.getById(
-    app.activeChainId()
+    app.activeChainId(),
   )?.directoryPageChainNodeId;
   const defaultChainNodeId = selectedChainNodeId ?? communityDefaultChainNodeId;
   const baseChain = app.config.nodes.getById(defaultChainNodeId);
@@ -46,8 +47,14 @@ const DirectoryPage = () => {
   });
 
   const handleCreateCommunity = () => {
-    navigate('/createCommunity/starter', {}, null);
+    navigate('/createCommunity', {}, null);
   };
+
+  useBrowserAnalyticsTrack({
+    payload: {
+      event: MixpanelPageViewEvent.DIRECTORY_PAGE_VIEW,
+    },
+  });
 
   if (!directoryPageEnabled) {
     return (

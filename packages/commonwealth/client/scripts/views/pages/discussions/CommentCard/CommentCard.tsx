@@ -6,8 +6,8 @@ import app from 'state';
 
 import type Comment from 'models/Comment';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';

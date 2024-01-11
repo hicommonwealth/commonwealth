@@ -1,4 +1,4 @@
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
 import 'pages/login/login_desktop_sidebar.scss';
 import React from 'react';
 import app from 'state';
@@ -60,6 +60,22 @@ export const LoginDesktopSidebar = ({
               }
               bodyText="Many communities require different wallets based
             on the chain they are built on and the types of tokens members hold."
+            />
+          </div>
+        </div>
+      )}
+
+      {sidebarType === 'createCommunityLogin' && (
+        <div className="connect-wallet">
+          <div className="sidebar-content">
+            <LoginText
+              headerText={
+                wallets.length > 0
+                  ? 'Sign in to create your community'
+                  : 'Please Install a Wallet to sign in'
+              }
+              bodyText="To launch your community choose a sign-in option
+              that is compatible with the ecosystem you selected."
             />
           </div>
         </div>

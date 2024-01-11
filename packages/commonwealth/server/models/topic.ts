@@ -5,24 +5,23 @@ import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type TopicAttributes = {
-  name: string;
-  featured_in_sidebar: boolean;
-  featured_in_new_post: boolean;
-  order?: number;
   id?: number;
-  chain_id: string;
+  name: string;
   description?: string;
-  telegram?: string;
+  community_id: string;
+  featured_in_sidebar?: boolean;
+  featured_in_new_post?: boolean;
+  order?: number;
   channel_id?: string;
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
-  token_threshold: string;
   default_offchain_template?: string;
-  group_ids: number[];
+  group_ids?: number[];
+  telegram?: string;
 
   // associations
-  chain?: CommunityAttributes;
+  community?: CommunityAttributes;
   threads?: ThreadAttributes[] | TopicAttributes['id'][];
 };
 
@@ -34,7 +33,7 @@ export type TopicModelStatic = ModelStatic<TopicInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): TopicModelStatic => {
   const Topic = <TopicModelStatic>sequelize.define(
     'Topic',
@@ -42,12 +41,6 @@ export default (
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       name: { type: dataTypes.STRING, allowNull: false },
       description: { type: dataTypes.TEXT, allowNull: false, defaultValue: '' },
-      telegram: { type: dataTypes.STRING, allowNull: true },
-      chain_id: { type: dataTypes.STRING, allowNull: false },
-      created_at: { type: dataTypes.DATE, allowNull: false },
-      updated_at: { type: dataTypes.DATE, allowNull: false },
-      deleted_at: { type: dataTypes.DATE, allowNull: true },
-      token_threshold: { type: dataTypes.STRING, allowNull: true },
       featured_in_sidebar: {
         type: dataTypes.BOOLEAN,
         allowNull: true,
@@ -58,6 +51,10 @@ export default (
         allowNull: true,
         defaultValue: false,
       },
+      community_id: { type: dataTypes.STRING, allowNull: false },
+      created_at: { type: dataTypes.DATE, allowNull: false },
+      updated_at: { type: dataTypes.DATE, allowNull: false },
+      deleted_at: { type: dataTypes.DATE, allowNull: true },
       order: { type: dataTypes.INTEGER, allowNull: true },
       default_offchain_template: {
         type: dataTypes.TEXT,
@@ -70,6 +67,7 @@ export default (
         allowNull: false,
         defaultValue: [],
       },
+      telegram: { type: dataTypes.STRING, allowNull: true },
     },
     {
       timestamps: true,
@@ -84,13 +82,13 @@ export default (
           exclude: ['created_at', 'updated_at', 'deleted_at'],
         },
       },
-    }
+    },
   );
 
   Topic.associate = (models) => {
     models.Topic.belongsTo(models.Community, {
-      as: 'chain',
-      foreignKey: 'chain_id',
+      as: 'community',
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
     models.Topic.hasMany(models.Thread, {

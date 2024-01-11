@@ -9,24 +9,25 @@ import {
   ChainBase,
   NotificationCategories,
   WalletId,
-} from 'common-common/src/types';
+} from '@hicommonwealth/core';
 import * as ethUtil from 'ethereumjs-util';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
+import Sequelize from 'sequelize';
 
-import { createSiweMessage } from '../../shared/adapters/chain/ethereum/keys';
 import { getADR036SignableSession } from '../../shared/adapters/chain/cosmos/keys';
-import { addressSwapper } from '../../shared/utils';
+import { createSiweMessage } from '../../shared/adapters/chain/ethereum/keys';
 import {
-  createCanvasSessionPayload,
   chainBaseToCanvasChainId,
+  createCanvasSessionPayload,
 } from '../../shared/canvas';
+import { addressSwapper } from '../../shared/utils';
 import type { DB } from '../models';
 import type { AddressInstance } from '../models/address';
 import type { CommunityInstance } from '../models/community';
 import type { ProfileAttributes } from '../models/profile';
 
-import { factory, formatFilename } from 'common-common/src/logging';
-const log = factory.getLogger(formatFilename(__filename));
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 const sortedStringify = configureStableStringify({
   bigint: false,
@@ -44,7 +45,7 @@ const verifySessionSignature = async (
   signatureString: string,
   sessionAddress: string | null, // used when signing a block to login
   sessionIssued: string | null, // used when signing a block to login
-  sessionBlockInfo: string | null // used when signing a block to login
+  sessionBlockInfo: string | null, // used when signing a block to login
 ): Promise<boolean> => {
   if (!chain) {
     log.error('no chain provided to verifySignature');
@@ -69,7 +70,7 @@ const verifySessionSignature = async (
       ? addressModel.block_info
         ? JSON.parse(addressModel.block_info).hash
         : null
-      : null
+      : null,
   );
 
   let isValid: boolean;
@@ -90,7 +91,7 @@ const verifySessionSignature = async (
       }
       keyringOptions.ss58Format = chain.ss58_prefix ?? 42;
       const signerKeyring = new polkadot.Keyring(keyringOptions).addFromAddress(
-        address
+        address,
       );
       const message = stringToHex(sortedStringify(canvasSessionPayload));
 
@@ -120,7 +121,7 @@ const verifySessionSignature = async (
       msgHash,
       ethSignatureParams.v,
       ethSignatureParams.r,
-      ethSignatureParams.s
+      ethSignatureParams.s,
     );
 
     const addressBuffer = ethUtil.publicToAddress(publicKey);
@@ -128,11 +129,11 @@ const verifySessionSignature = async (
     try {
       // const ethAddress = Web3.utils.toChecksumAddress(lowercaseAddress);
       const b32AddrBuf = ethUtil.Address.fromString(
-        lowercaseAddress.toString()
+        lowercaseAddress.toString(),
       ).toBuffer();
       const b32Address = bech32.encode(
         chain.bech32_prefix,
-        bech32.toWords(b32AddrBuf)
+        bech32.toWords(b32AddrBuf),
       );
       if (addressModel.address === b32Address) isValid = true;
     } catch (e) {
@@ -163,7 +164,7 @@ const verifySessionSignature = async (
       const cosm = await import('@cosmjs/amino');
       const generatedAddress = cosm.pubkeyToAddress(
         stdSignature.pub_key,
-        bech32Prefix
+        bech32Prefix,
       );
 
       if (generatedAddress === addressModel.address) {
@@ -173,13 +174,13 @@ const verifySessionSignature = async (
           const secpSignature =
             cosmCrypto.Secp256k1Signature.fromFixedLength(signature);
           const messageHash = new cosmCrypto.Sha256(
-            Buffer.from(sortedStringify(canvasSessionPayload))
+            Buffer.from(sortedStringify(canvasSessionPayload)),
           ).digest();
 
           isValid = await cosmCrypto.Secp256k1.verifySignature(
             secpSignature,
             messageHash,
-            pubkey
+            pubkey,
           );
         } catch (e) {
           isValid = false;
@@ -200,11 +201,11 @@ const verifySessionSignature = async (
       const cosm = await import('@cosmjs/amino');
       const generatedAddress = cosm.pubkeyToAddress(
         stdSignature.pub_key,
-        bech32Prefix
+        bech32Prefix,
       );
       const generatedAddressWithCosmosPrefix = cosm.pubkeyToAddress(
         stdSignature.pub_key,
-        'cosmos'
+        'cosmos',
       );
 
       if (
@@ -215,7 +216,7 @@ const verifySessionSignature = async (
           // Generate sign doc from token and verify it against the signature
           const generatedSignDoc = await getADR036SignableSession(
             Buffer.from(sortedStringify(canvasSessionPayload)),
-            generatedAddress
+            generatedAddress,
           );
 
           const { pubkey, signature } = cosm.decodeSignature(stdSignature);
@@ -223,12 +224,12 @@ const verifySessionSignature = async (
           const secpSignature =
             cosmCrypto.Secp256k1Signature.fromFixedLength(signature);
           const messageHash = new cosmCrypto.Sha256(
-            cosm.serializeSignDoc(generatedSignDoc)
+            cosm.serializeSignDoc(generatedSignDoc),
           ).digest();
           isValid = await cosmCrypto.Secp256k1.verifySignature(
             secpSignature,
             messageHash,
-            pubkey
+            pubkey,
           );
           if (!isValid) {
             log.error('Signature mismatch.');
@@ -239,7 +240,7 @@ const verifySessionSignature = async (
         }
       } else {
         log.error(
-          `Address not matched. Generated ${generatedAddress}, found ${addressModel.address}.`
+          `Address not matched. Generated ${generatedAddress}, found ${addressModel.address}.`,
         );
         isValid = false;
       }
@@ -253,20 +254,20 @@ const verifySessionSignature = async (
       const signaturePatternMatch = signaturePattern.exec(signatureString);
       if (signaturePatternMatch === null) {
         throw new Error(
-          `Invalid signature: signature did not match ${signaturePattern}`
+          `Invalid signature: signature did not match ${signaturePattern}`,
         );
       }
-      const [_, domain, nonce, signatureData] = signaturePatternMatch;
+      const [, domain, nonce, signatureData] = signaturePatternMatch;
 
       const siweMessage = createSiweMessage(
         canvasSessionPayload,
         domain,
-        nonce
+        nonce,
       );
 
       if (addressModel.block_info !== sessionBlockInfo) {
         throw new Error(
-          `Eth verification failed for ${addressModel.address}: signed a different block than expected`
+          `Eth verification failed for ${addressModel.address}: signed a different block than expected`,
         );
       }
 
@@ -275,12 +276,12 @@ const verifySessionSignature = async (
       isValid = addressModel.address.toLowerCase() === address.toLowerCase();
       if (!isValid) {
         log.info(
-          `Eth verification failed for ${addressModel.address}: does not match recovered address ${address}`
+          `Eth verification failed for ${addressModel.address}: does not match recovered address ${address}`,
         );
       }
     } catch (e) {
       log.info(
-        `Eth verification failed for ${addressModel.address}: ${e.stack}`
+        `Eth verification failed for ${addressModel.address}: ${e.stack}`,
       );
       isValid = false;
     }
@@ -296,7 +297,7 @@ const verifySessionSignature = async (
     isValid = nacl.sign.detached.verify(
       Buffer.from(sortedStringify(canvasSessionPayload)),
       Buffer.from(sigObj, 'base64'),
-      Buffer.from(publicKey, 'base64')
+      Buffer.from(publicKey, 'base64'),
     );
   } else if (chain.base === ChainBase.Solana) {
     //
@@ -311,7 +312,7 @@ const verifySessionSignature = async (
         isValid = nacl.sign.detached.verify(
           Buffer.from(sortedStringify(canvasSessionPayload)),
           bs58.decode(signatureString),
-          decodedAddress
+          decodedAddress,
         );
       } else {
         isValid = false;
@@ -332,19 +333,32 @@ const verifySessionSignature = async (
     addressModel.verification_token_expires = null;
     addressModel.verified = new Date();
     if (!addressModel.user_id) {
-      const user = await models.User.createWithProfile(models, { email: null });
-      addressModel.profile_id = (user.Profiles[0] as ProfileAttributes).id;
-      await models.Subscription.create({
-        subscriber_id: user.id,
-        category_id: NotificationCategories.NewMention,
-        is_active: true,
+      const existingAddress = await models.Address.findOne({
+        where: {
+          address: addressModel.address,
+          user_id: { [Sequelize.Op.ne]: null },
+        },
       });
-      await models.Subscription.create({
-        subscriber_id: user.id,
-        category_id: NotificationCategories.NewCollaboration,
-        is_active: true,
-      });
-      addressModel.user_id = user.id;
+      if (existingAddress) {
+        addressModel.user_id = existingAddress.user_id;
+        addressModel.profile_id = existingAddress.profile_id;
+      } else {
+        const user = await models.User.createWithProfile(models, {
+          email: null,
+        });
+        addressModel.profile_id = (user.Profiles[0] as ProfileAttributes).id;
+        await models.Subscription.create({
+          subscriber_id: user.id,
+          category_id: NotificationCategories.NewMention,
+          is_active: true,
+        });
+        await models.Subscription.create({
+          subscriber_id: user.id,
+          category_id: NotificationCategories.NewCollaboration,
+          is_active: true,
+        });
+        addressModel.user_id = user.id;
+      }
     }
   } else if (isValid) {
     // mark the address as verified
