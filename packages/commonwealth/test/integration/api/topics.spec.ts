@@ -1,6 +1,5 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import 'chai/register-should';
 import { ApiEndpoints } from 'state/api/config';
 import app, { resetDatabase } from '../../../server-test';
 
