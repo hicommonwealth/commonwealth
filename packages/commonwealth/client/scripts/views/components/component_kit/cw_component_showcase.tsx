@@ -243,6 +243,7 @@ export const ComponentShowcase = () => {
   const styledPopoverProps = usePopover();
   const upvotePopoverProps = usePopover();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isLeftDrawerOpen, setIsLeftDrawerOpen] = useState(false);
 
   const renderModal = (size?: ModalSize) => {
     return (
@@ -2171,7 +2172,7 @@ export const ComponentShowcase = () => {
       <div className="drawer-container">
         <CWButton
           buttonHeight="sm"
-          label="Open Drawer"
+          label="Open Default Drawer"
           onClick={() => setIsDrawerOpen(true)}
         />
 
@@ -2179,6 +2180,28 @@ export const ComponentShowcase = () => {
           open={isDrawerOpen}
           header="Lorem Ipsum"
           onClose={() => setIsDrawerOpen(false)}
+        >
+          <div>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis
+            porttitor vel erat nec eleifend. Nullam sit amet dui et eros luctus
+            facilisis et id eros. In a lacus in nisl facilisis euismod. In non
+            congue sapien. Donec quis lorem libero. Nunc malesuada nunc ac eros
+            sodales sodales. Nullam tempus justo ut consectetur lacinia.
+            Vestibulum non dui vel ante molestie gravida. Maecenas sed consequat
+            tellus, ac fermentum ex.
+          </div>
+        </CWDrawer>
+
+        <CWButton
+          buttonHeight="sm"
+          label="Open Left Drawer"
+          onClick={() => setIsLeftDrawerOpen(true)}
+        />
+        <CWDrawer
+          open={isLeftDrawerOpen}
+          header="Lorem Ipsum"
+          onClose={() => setIsLeftDrawerOpen(false)}
+          direction="left"
         >
           <div>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis
