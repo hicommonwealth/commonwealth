@@ -1,6 +1,6 @@
 import { componentItems } from './componentsList';
 
-type Item = typeof componentItems[0];
+type Item = (typeof componentItems)[0];
 
 export const alphabetically = (a: Item, b: Item) =>
   a.displayName.localeCompare(b.displayName);
