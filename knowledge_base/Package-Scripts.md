@@ -478,7 +478,7 @@ Description: Runs a compilation of TypeScript files based on tsconfig.json; does
 
 Definition: `chmod u+x scripts/sanity.sh && ./scripts/sanity.sh`
 
-Description: Sanity scripts developers should run locally before pushing code
+Description: Sanity scripts developers should run locally before pushing code, comprising a linter, a check-types, and unit tests. Must be run from root.
 
 ## Webpack && TSNode
 
