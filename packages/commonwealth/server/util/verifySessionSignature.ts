@@ -9,6 +9,7 @@ import {
   ChainBase,
   NotificationCategories,
   WalletId,
+  logger,
 } from '@hicommonwealth/core';
 import * as ethUtil from 'ethereumjs-util';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
@@ -26,8 +27,7 @@ import type { AddressInstance } from '../models/address';
 import type { CommunityInstance } from '../models/community';
 import type { ProfileAttributes } from '../models/profile';
 
-import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 const sortedStringify = configureStableStringify({
   bigint: false,

@@ -1,7 +1,7 @@
+import { logger } from '@hicommonwealth/core';
 import { StatsDController } from '../hot-shots';
-import { formatFilename, loggerFactory } from '../typescript-logging';
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 const PING_INTERVAL = 1_000 * 20;
 

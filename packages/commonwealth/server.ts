@@ -4,12 +4,12 @@ import {
   RedisCache,
   ServiceKey,
   StatsDController,
-  formatFilename,
+  TypescriptLoggingLogger,
   getRabbitMQConfig,
-  loggerFactory,
   setupErrorHandlers,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
+import { logger as _logger } from '@hicommonwealth/core';
 import bodyParser from 'body-parser';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
@@ -65,7 +65,8 @@ startHealthCheckLoop({
   },
 });
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = _logger(TypescriptLoggingLogger()).getLogger(__filename);
+
 // set up express async error handling hack
 require('express-async-errors');
 

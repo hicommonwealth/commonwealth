@@ -1,8 +1,8 @@
-import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
+import { logger } from '@hicommonwealth/core';
 import dotenv from 'dotenv';
 import fetch from 'node-fetch';
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 dotenv.config();
 

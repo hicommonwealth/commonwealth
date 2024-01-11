@@ -1,9 +1,5 @@
-import {
-  StatsDController,
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/adapters';
-import { NotificationCategories } from '@hicommonwealth/core';
+import { StatsDController } from '@hicommonwealth/adapters';
+import { NotificationCategories, logger } from '@hicommonwealth/core';
 import { NotificationDataAndCategory } from '../../../shared/types';
 import models from '../../database';
 import { CommunityInstance } from '../../models/community';
@@ -17,7 +13,7 @@ import { getWebhookData } from './getWebhookData';
 import { WebhookDestinations } from './types';
 import { fetchWebhooks, getWebhookDestination } from './util';
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 // TODO: @Timothee disable/deprecate a webhook ulr if it fails too many times (remove dead urls)
 export async function dispatchWebhooks(
@@ -110,12 +106,7 @@ export async function dispatchWebhooks(
       }
 
       // TODO: Issue #5230
-      console.error(
-        `[${formatFilename(__filename)}]: Error sending webhook: ${
-          result.reason
-        }`,
-        error,
-      );
+      log.error(`Error sending webhook: ${result.reason}`, error);
       // log.error(`Error sending webhook: ${result.reason}`, error);
       rollbar.error(`Error sending webhook: ${result.reason}`, error);
     } else {

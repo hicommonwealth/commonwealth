@@ -1,5 +1,8 @@
-import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
-import { NotificationCategories, SupportedNetwork } from '@hicommonwealth/core';
+import {
+  NotificationCategories,
+  SupportedNetwork,
+  logger,
+} from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
 import { NotificationDataAndCategory } from 'types';
 import models from '../../database';
@@ -10,7 +13,7 @@ import emitNotifications from '../../util/emitNotifications';
 import { rollbar } from '../../util/rollbar';
 import { RawEvmEvent } from './types';
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 export async function emitChainEventNotifs(
   chainNodeId: number,

@@ -1,4 +1,3 @@
-import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import type { Express } from 'express';
 import express from 'express';
 import useragent from 'express-useragent';
@@ -139,6 +138,7 @@ import { ServerReactionsController } from '../controllers/server_reactions_contr
 import { ServerThreadsController } from '../controllers/server_threads_controller';
 import { ServerTopicsController } from '../controllers/server_topics_controller';
 
+import { logger } from '@hicommonwealth/core';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
 import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
 import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_handler';
@@ -195,7 +195,7 @@ export type ServerControllers = {
   admin: ServerAdminController;
 };
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 function setupRouter(
   endpoint: string,

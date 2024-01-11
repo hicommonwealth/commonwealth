@@ -4,11 +4,10 @@ import {
   RedisCache,
   ServerError,
   cacheDecorator,
-  formatFilename,
-  loggerFactory,
   lookupKeyDurationInReq,
   setupErrorHandlers,
 } from '@hicommonwealth/adapters';
+import { logger } from '@hicommonwealth/core';
 import bodyParser from 'body-parser';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
@@ -35,7 +34,7 @@ import GlobalActivityCache from './server/util/globalActivityCache';
 import { TokenBalanceCache } from './server/util/tokenBalanceCache/tokenBalanceCache';
 import ViewCountCache from './server/util/viewCountCache';
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 require('express-async-errors');
 

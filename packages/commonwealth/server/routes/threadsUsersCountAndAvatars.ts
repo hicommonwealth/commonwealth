@@ -1,11 +1,11 @@
-import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
+import { logger } from '@hicommonwealth/core';
 import type { Request, Response } from 'express';
 import { groupBy } from 'lodash';
 import { QueryTypes } from 'sequelize';
 import { sequelize } from '../database';
 import type { DB } from '../models';
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 type UniqueAddresses = {
   thread_id: number;

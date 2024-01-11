@@ -1,12 +1,9 @@
-import {
-  ServerError,
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/adapters';
+import { ServerError } from '@hicommonwealth/adapters';
+import { logger } from '@hicommonwealth/core';
 import { Op } from 'sequelize';
 import type { DB } from '../models';
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 export default async function assertAddressOwnership(
   models: DB,

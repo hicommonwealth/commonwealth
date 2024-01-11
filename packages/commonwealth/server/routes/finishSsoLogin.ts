@@ -1,10 +1,5 @@
-import {
-  AppError,
-  ServerError,
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/adapters';
-import { NotificationCategories, WalletId } from '@hicommonwealth/core';
+import { AppError, ServerError } from '@hicommonwealth/adapters';
+import { NotificationCategories, WalletId, logger } from '@hicommonwealth/core';
 import * as jwt from 'jsonwebtoken';
 import { isAddress, toChecksumAddress } from 'web3-utils';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
@@ -23,7 +18,7 @@ import { createRole } from '../util/roles';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { redirectWithLoginError } from './finishEmailLogin';
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');
