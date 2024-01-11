@@ -151,6 +151,10 @@
     }
   }
 
+  dl {
+    margin: revert;
+  }
+
   mark {
     background-color: $primary-50;
   }
