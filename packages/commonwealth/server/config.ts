@@ -111,9 +111,6 @@ export const SEND_WEBHOOKS_EMAILS =
   process.env.NODE_ENV === 'production' &&
   process.env.SEND_WEBHOOKS_EMAILS === 'true';
 
-export const FEATURE_FLAG_GROUP_CHECK_ENABLED =
-  process.env.FEATURE_FLAG_GROUP_CHECK_ENABLED === 'true' || false;
-
 export const MEMBERSHIP_REFRESH_BATCH_SIZE = process.env
   .MEMBERSHIP_REFRESH_BATCH_SIZE
   ? parseInt(process.env.MEMBERSHIP_REFRESH_BATCH_SIZE, 10)
