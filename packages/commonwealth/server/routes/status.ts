@@ -1,4 +1,5 @@
 import { ServerError } from '@hicommonwealth/adapters';
+import { CommunityCategoryType } from '@hicommonwealth/core';
 import jwt from 'jsonwebtoken';
 import { Op, QueryTypes } from 'sequelize';
 import type { AddressInstance } from 'server/models/address';
