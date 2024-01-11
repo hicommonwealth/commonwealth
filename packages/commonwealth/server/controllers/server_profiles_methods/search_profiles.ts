@@ -24,6 +24,7 @@ export type SearchProfilesOptions = {
   orderDirection?: 'ASC' | 'DESC';
   memberships?: string;
   includeGroupIds?: boolean;
+  membersInGroupId?: number;
 };
 
 type Profile = {
@@ -53,6 +54,7 @@ export async function __searchProfiles(
     orderDirection,
     memberships,
     includeGroupIds,
+    membersInGroupId,
   }: SearchProfilesOptions,
 ): Promise<SearchProfilesResult> {
   let sortOptions: PaginationSqlOptions = {
@@ -96,12 +98,15 @@ export async function __searchProfiles(
     ? `"Addresses".community_id = $community_id AND`
     : '';
 
-  let membershipsWhere = memberships
-    ? `SELECT 1 FROM "Memberships"
+  let membershipsWhere =
+    memberships || membersInGroupId
+      ? `SELECT 1 FROM "Memberships"
     JOIN "Groups" ON "Groups".id = "Memberships".group_id
     WHERE "Memberships".address_id = "Addresses".id
-    AND "Groups".community_id = $community_id`
-    : '';
+    AND "Groups".community_id = $community_id
+    ${membersInGroupId ? `AND "Groups".id = ${membersInGroupId}` : ''}
+    `
+      : '';
 
   if (memberships) {
     switch (memberships) {
@@ -114,6 +119,10 @@ export async function __searchProfiles(
       default:
         throw new AppError(`unsupported memberships param: ${memberships}`);
     }
+  }
+
+  if (membersInGroupId) {
+    membershipsWhere = `AND EXISTS (${membershipsWhere} AND "Memberships".reject_reason IS NOT NULL)`;
   }
 
   const sqlWithoutPagination = `

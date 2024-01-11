@@ -27,6 +27,7 @@ interface SearchProfilesProps {
   includeRoles: boolean;
   includeMembershipTypes?: 'in-group' | 'not-in-group';
   includeGroupIds?: boolean;
+  membersInGroup?: number;
   enabled?: boolean;
 }
 
@@ -39,6 +40,7 @@ const searchProfiles = async ({
   orderDirection,
   includeMembershipTypes,
   includeGroupIds,
+  membersInGroup,
   includeRoles,
 }: SearchProfilesProps & { pageParam: number }) => {
   const {
@@ -59,6 +61,7 @@ const searchProfiles = async ({
         include_roles: includeRoles,
         ...(includeMembershipTypes && { memberships: includeMembershipTypes }),
         ...(includeGroupIds && { include_group_ids: includeGroupIds }),
+        ...(membersInGroup && { members_in_group_id: membersInGroup }),
       },
     },
   );
@@ -74,6 +77,7 @@ const useSearchProfilesQuery = ({
   includeRoles,
   includeGroupIds,
   includeMembershipTypes,
+  membersInGroup,
   enabled = true,
 }: SearchProfilesProps) => {
   const key = [
@@ -85,6 +89,7 @@ const useSearchProfilesQuery = ({
       includeRoles,
       includeGroupIds,
       includeMembershipTypes,
+      membersInGroup,
     },
   ];
   return useInfiniteQuery(
@@ -100,6 +105,7 @@ const useSearchProfilesQuery = ({
         includeMembershipTypes,
         includeGroupIds,
         includeRoles,
+        membersInGroup,
       }),
     {
       getNextPageParam: (lastPage) => {
