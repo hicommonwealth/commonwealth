@@ -6,7 +6,7 @@ const getProvider = () => {
     return new Web3(new Web3.providers.HttpProvider(providerUrl));
   }
   return new Web3(
-    new Web3.providers.HttpProvider(String(process.env.RPC_HOST))
+    new Web3.providers.HttpProvider(String(process.env.RPC_HOST)),
   );
 };
 
