@@ -38,7 +38,9 @@ const getUniqueCommentText = async () => {
   return text;
 };
 
-describe('createReaction Integration Tests', () => {
+// this test mixes dbEntityHooks which use "cmntest" with resetDatabase which uses
+// "ethereum" as the test community -- basically unusable, needs a rewrite.
+describe.skip('createReaction Integration Tests', () => {
   let userAddress;
   let userJWT;
   let userSession;

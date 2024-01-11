@@ -31,7 +31,7 @@ const getReactions = async (
   }
   const { community_id, comment_id, addresses, count_only } = req.query;
 
-  const where: WhereOptions<ReactionAttributes> = { chain: community_id };
+  const where: WhereOptions<ReactionAttributes> = { community_id };
   if (comment_id) where.comment_id = comment_id;
 
   // if address is included, find which addressIds they correspond to.

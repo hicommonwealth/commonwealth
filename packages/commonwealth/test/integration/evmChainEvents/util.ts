@@ -140,7 +140,7 @@ export async function getTestCommunityContract(version?: 'v1' | 'v2') {
 
   const [communityContract] = await models.CommunityContract.findOrCreate({
     where: {
-      chain_id: chain.id,
+      community_id: chain.id,
       contract_id: contract.id,
     },
   });

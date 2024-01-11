@@ -33,8 +33,6 @@ export const DATABASE_URI = process.env.USES_DOCKER_DB
   ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
   : process.env.DATABASE_URL;
 
-export const VULTR_IP = process.env.VULTR_IP;
-
 export const RABBITMQ_URI = (() => {
   if (!process.env.CLOUDAMQP_URL || process.env.NODE_ENV === 'development') {
     if (
@@ -72,8 +70,6 @@ export const REDIS_URL = (() => {
 // increased because of chain waitlist registrations
 export const LOGIN_RATE_LIMIT_TRIES = 15;
 export const LOGIN_RATE_LIMIT_MINS = 5;
-
-export const MIXPANEL_TOKEN = process.env.MIXPANEL_TOKEN;
 
 export const MAGIC_API_KEY = process.env.MAGIC_API_KEY;
 export const MAGIC_SUPPORTED_BASES = (process.env.MAGIC_SUPPORTED_BASES?.split(

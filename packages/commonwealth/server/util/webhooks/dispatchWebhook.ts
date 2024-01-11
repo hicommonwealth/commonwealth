@@ -1,6 +1,9 @@
+import {
+  StatsDController,
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/adapters';
 import { NotificationCategories } from '@hicommonwealth/core';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { StatsDController } from 'common-common/src/statsd';
 import { NotificationDataAndCategory } from '../../../shared/types';
 import models from '../../database';
 import { CommunityInstance } from '../../models/community';
@@ -14,7 +17,7 @@ import { getWebhookData } from './getWebhookData';
 import { WebhookDestinations } from './types';
 import { fetchWebhooks, getWebhookDestination } from './util';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 // TODO: @Timothee disable/deprecate a webhook ulr if it fails too many times (remove dead urls)
 export async function dispatchWebhooks(
@@ -36,20 +39,23 @@ export async function dispatchWebhooks(
     webhooks = await fetchWebhooks(notification);
   }
 
-  let chainId: string;
+  let communityId: string;
   if (notification.categoryId === NotificationCategories.ChainEvent) {
-    chainId = notification.data.chain;
+    communityId = notification.data.chain;
   } else {
-    chainId = notification.data.chain_id;
+    communityId = notification.data.chain_id;
   }
 
-  const chain: CommunityInstance | undefined = await models.Community.findOne({
-    where: {
-      id: chainId,
-    },
-  });
+  const community: CommunityInstance | undefined =
+    await models.Community.findOne({
+      where: {
+        id: communityId,
+      },
+    });
 
-  const webhookData = Object.freeze(await getWebhookData(notification, chain));
+  const webhookData = Object.freeze(
+    await getWebhookData(notification, community),
+  );
 
   const webhookPromises = [];
   for (const webhook of webhooks) {
@@ -62,7 +68,7 @@ export async function dispatchWebhooks(
             {
               ...webhookData,
             },
-            chain,
+            community,
           ),
         );
         break;

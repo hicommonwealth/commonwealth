@@ -1,5 +1,5 @@
 /* eslint-disable no-async-promise-executor */
-import { ServerError } from 'common-common/src/errors';
+import { ServerError } from '@hicommonwealth/adapters';
 //
 // The async promise syntax, new Promise(async (resolve, reject) => {}), should usually be avoided
 // because it's easy to miss catching errors inside the promise executor, but we use it in this file
@@ -113,14 +113,14 @@ const bulkOffchain = async (models: DB, req: TypedRequest, res: Response) => {
     }),
     models.CommunityBanner.findOne({
       where: {
-        chain_id: community.id,
+        community_id: community.id,
       },
     }),
     new Promise(async (resolve, reject) => {
       try {
         const communityContracts = await models.CommunityContract.findAll({
           where: {
-            chain_id: community.id,
+            community_id: community.id,
           },
         });
         const contractsWithTemplates: Array<{

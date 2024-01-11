@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { AppError, ServerError } from '../../../../common-common/src/errors';
+import { AppError, ServerError } from '@hicommonwealth/adapters';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { AddressInstance } from '../../models/address';
 import { CommunityInstance } from '../../models/community';

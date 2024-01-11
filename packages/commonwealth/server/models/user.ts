@@ -15,21 +15,21 @@ export type UserAttributes = {
   isAdmin?: boolean;
   disableRichText?: boolean;
   emailNotificationInterval?: EmailNotificationInterval;
-  selected_chain_id?: number | null;
+  selected_community_id?: number | null;
   created_at?: Date;
   updated_at?: Date;
 
   // associations (see https://vivacitylabs.com/setup-typescript-sequelize/)
-  selectedChain?: CommunityAttributes | CommunityAttributes['id'];
+  selectedCommunity?: CommunityAttributes | CommunityAttributes['id'];
   Addresses?: AddressAttributes[] | AddressAttributes['id'][];
   Profiles?: ProfileAttributes[];
-  Chains?: CommunityAttributes[] | CommunityAttributes['id'][];
+  Communities?: CommunityAttributes[] | CommunityAttributes['id'][];
 };
 
 // eslint-disable-next-line no-use-before-define
 export type UserInstance = ModelInstance<UserAttributes> & {
-  getSelectedChain: Sequelize.BelongsToGetAssociationMixin<CommunityInstance>;
-  setSelectedChain: Sequelize.BelongsToSetAssociationMixin<
+  getSelectedCommunity: Sequelize.BelongsToGetAssociationMixin<CommunityInstance>;
+  setSelectedCommunity: Sequelize.BelongsToSetAssociationMixin<
     CommunityInstance,
     CommunityInstance['id']
   >;
@@ -83,7 +83,7 @@ export default (
         defaultValue: false,
         allowNull: false,
       },
-      selected_chain_id: { type: dataTypes.STRING, allowNull: true },
+      selected_community_id: { type: dataTypes.STRING, allowNull: true },
     },
     {
       timestamps: true,
@@ -127,13 +127,16 @@ export default (
 
   User.associate = (models) => {
     models.User.belongsTo(models.Community, {
-      as: 'selectedChain',
-      foreignKey: 'selected_chain_id',
+      as: 'selectedCommunity',
+      foreignKey: 'selected_community_id',
       constraints: false,
     });
     models.User.hasMany(models.Address);
     models.User.hasMany(models.Profile);
-    models.User.hasMany(models.StarredCommunity);
+    models.User.hasMany(models.StarredCommunity, {
+      foreignKey: 'user_id',
+      sourceKey: 'id',
+    });
   };
 
   return User;

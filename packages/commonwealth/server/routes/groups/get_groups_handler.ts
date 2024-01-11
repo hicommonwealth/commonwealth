@@ -1,5 +1,5 @@
+import { AppError } from '@hicommonwealth/adapters';
 import z from 'zod';
-import { AppError } from '../../../../common-common/src/errors';
 import { GetGroupsResult } from '../../controllers/server_groups_methods/get_groups';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestQuery, TypedResponse, success } from '../../types';
@@ -14,6 +14,8 @@ export const getGroupsHandler = async (
   req: TypedRequestQuery<GetGroupsQueryQuery>,
   res: TypedResponse<GetGroupsResponse>,
 ) => {
+  const { community } = req;
+
   const schema = z.object({
     query: z.object({
       address_id: z.coerce.number().optional(),
@@ -30,7 +32,7 @@ export const getGroupsHandler = async (
   } = validationResult.data;
 
   const result = await controllers.groups.getGroups({
-    community: req.chain,
+    community,
     includeMembers: include_members,
     includeTopics: include_topics,
   });

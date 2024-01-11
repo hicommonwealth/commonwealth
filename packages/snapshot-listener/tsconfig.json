@@ -4,14 +4,12 @@
     "lib": ["es2019"],
     "typeRoots": ["./node_modules/@types"],
     "skipLibCheck": true,
-    "outDir": "./build"
-  },
-  "paths": {
-    "common-common": ["../../packages/common-common"],
-    "common-common/*": ["../../packages/common-common/*"],
-    "chain-events": ["../../packages/chain-events"],
-    "chain-events/*": ["../../packages/chain-events/*"]
+    "rootDir": "src",
+    "outDir": "build"
   },
   "include": ["src"],
-  "exclude": ["./node_modules", "node_modules", "build", "dist", "test"]
+  "references": [
+    { "path": "../../libs/adapters" },
+    { "path": "../../libs/core" }
+  ]
 }

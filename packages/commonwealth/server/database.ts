@@ -1,7 +1,7 @@
 import { DataTypes, Sequelize } from 'sequelize';
 import { DATABASE_URI } from './config';
 
-import { factory, formatFilename } from 'common-common/src/logging';
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import type { DB, Models } from './models';
 import AddressFactory from './models/address';
 import BanFactory from './models/ban';
@@ -41,7 +41,7 @@ import UserModelFactory from './models/user';
 import VoteFactory from './models/vote';
 import WebhookFactory from './models/webhook';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 export const sequelize = new Sequelize(DATABASE_URI, {
   // disable string operators (https://github.com/sequelize/sequelize/issues/8417)

@@ -1,6 +1,6 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import 'chai/register-should';
+
 import type { GetTopicsReq } from 'server/api/extApiTypes';
 import { OrderByOptions } from 'server/api/extApiTypes';
 import type { TopicAttributes } from 'server/models/topic';

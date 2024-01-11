@@ -28,7 +28,6 @@ export const createThreadHandler = async (
   const { user, address, community } = req;
   const {
     topic_id: topicId,
-    topic_name: topicName,
     title,
     body,
     kind,
@@ -61,7 +60,6 @@ export const createThreadHandler = async (
       kind,
       readOnly,
       topicId: parseInt(topicId, 10) || undefined,
-      topicName,
       stage,
       url,
       canvasAction,
