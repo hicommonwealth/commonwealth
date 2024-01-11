@@ -85,37 +85,6 @@ const setupAppRoutes = (app, models: DB, templateFile, sendFile) => {
 
   app.get('/:scope?/overview', renderGeneralPage);
 
-  app.get('/:scope?/account/:address', async (req, res) => {
-    // Retrieve title, description, and author from the database
-    let title, description, author, profileData, image;
-    const address = await models.Address.findOne({
-      where: { community_id: req.params.scope, address: req.params.address },
-      include: [models.Profile],
-    });
-    const profile = await address.getProfile();
-    if (address && profile) {
-      try {
-        title = profileData.name;
-        description = profile.bio;
-        image = profile.avatar_url;
-        author = '';
-      } catch (e) {
-        title = '';
-        description = '';
-        image = '';
-        author = '';
-      }
-    } else {
-      title = '';
-      description = '';
-      image = '';
-      author = '';
-    }
-    const url = getUrl(req);
-
-    renderWithMetaTags(res, title, description, author, image, url);
-  });
-
   const renderThread = async (scope: string, threadId: string, req, res) => {
     // Retrieve discussions
     const thread = await models.Thread.findOne({
