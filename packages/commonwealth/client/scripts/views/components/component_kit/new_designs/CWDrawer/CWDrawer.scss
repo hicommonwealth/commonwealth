@@ -13,10 +13,8 @@
   .content-container {
     padding: 20px 56px;
   }
-}
 
-@include extraSmall {
-  .Drawer {
+  @include extraSmall {
     padding-bottom: 0px;
 
     .drawer-actions {
