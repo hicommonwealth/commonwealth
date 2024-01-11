@@ -1,4 +1,4 @@
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError, ServerError } from '@hicommonwealth/adapters';
 import { v4 as uuidv4 } from 'uuid';
 import { AXIE_SHARED_SECRET } from '../config';
 import type { DB } from '../models';
@@ -17,7 +17,7 @@ type StartSsoLoginRes = { stateId: string };
 const startSsoLogin = async (
   models: DB,
   req: TypedRequestBody<StartSsoLoginReq>,
-  res: TypedResponse<StartSsoLoginRes>
+  res: TypedResponse<StartSsoLoginRes>,
 ) => {
   if (req.body.issuer === Issuers.AxieInfinity) {
     if (!AXIE_SHARED_SECRET) {

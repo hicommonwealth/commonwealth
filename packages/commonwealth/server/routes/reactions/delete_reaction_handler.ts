@@ -1,6 +1,6 @@
-import { TypedRequestParams, TypedResponse, success } from '../../types';
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import { ServerControllers } from 'server/routing/router';
+import { TypedRequestParams, TypedResponse, success } from '../../types';
 
 const Errors = {
   InvalidReactionId: 'Invalid reaction ID',
@@ -12,7 +12,7 @@ type DeleteReactionResponse = undefined;
 export const deleteReactionHandler = async (
   controllers: ServerControllers,
   req: TypedRequestParams<DeleteReactionRequest>,
-  res: TypedResponse<DeleteReactionResponse>
+  res: TypedResponse<DeleteReactionResponse>,
 ) => {
   const reactionId = parseInt(req.params.id, 10);
   if (!reactionId) {

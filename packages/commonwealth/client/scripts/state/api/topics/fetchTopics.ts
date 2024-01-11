@@ -10,7 +10,9 @@ interface FetchTopicsProps {
   communityId: string;
 }
 
-const fetchTopics = async ({ communityId }: FetchTopicsProps) => {
+const fetchTopics = async ({
+  communityId,
+}: FetchTopicsProps): Promise<Topic[]> => {
   const response = await axios.get(
     `${app.serverUrl()}${ApiEndpoints.BULK_TOPICS}`,
     {

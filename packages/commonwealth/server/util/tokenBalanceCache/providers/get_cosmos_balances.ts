@@ -6,40 +6,28 @@ import {
   setupBankExtension,
   setupStakingExtension,
 } from '@cosmjs/stargate';
-import { HttpBatchClient, Tendermint34Client } from '@cosmjs/tendermint-rpc';
-import { factory, formatFilename } from 'common-common/src/logging';
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import { ChainNodeInstance } from '../../../models/chain_node';
 import { rollbar } from '../../rollbar';
 import { Balances } from '../types';
+import { getTendermintClient } from '../util';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
-export type GetCosmosBalanceOptions = {
+export type GetCosmosNativeBalanceOptions = {
   chainNode: ChainNodeInstance;
   addresses: string[];
   batchSize?: number;
 };
 
 export async function __getCosmosNativeBalances(
-  options: GetCosmosBalanceOptions,
+  options: GetCosmosNativeBalanceOptions,
 ): Promise<Balances> {
   if (options.addresses.length === 0) return {};
-
-  let tmClient: Tendermint34Client;
-  if (options.addresses.length > 1) {
-    const batchClient = new HttpBatchClient(
-      options.chainNode.private_url || options.chainNode.url,
-      {
-        batchSizeLimit: options.batchSize || 100,
-        dispatchInterval: 10,
-      },
-    );
-    tmClient = await Tendermint34Client.create(batchClient);
-  } else {
-    tmClient = await Tendermint34Client.connect(
-      options.chainNode.private_url || options.chainNode.url,
-    );
-  }
+  const tmClient = await getTendermintClient({
+    chainNode: options.chainNode,
+    batchSize: options.batchSize,
+  });
 
   const api = QueryClient.withExtensions(
     tmClient,
@@ -58,13 +46,17 @@ export async function __getCosmosNativeBalances(
   }
 
   if (options.addresses.length > 1) {
-    return await getOffChainBatchCosmosBalances(api, options.addresses, denom);
+    return await getOffChainBatchCosmosNativeBalances(
+      api,
+      options.addresses,
+      denom,
+    );
   } else {
-    return await getCosmosBalance(api, options.addresses[0], denom);
+    return await getCosmosNativeBalance(api, options.addresses[0], denom);
   }
 }
 
-async function getOffChainBatchCosmosBalances(
+async function getOffChainBatchCosmosNativeBalances(
   api: QueryClient & BankExtension & StakingExtension,
   addresses: string[],
   denom: string,
@@ -96,7 +88,7 @@ async function getOffChainBatchCosmosBalances(
   return result;
 }
 
-async function getCosmosBalance(
+async function getCosmosNativeBalance(
   api: QueryClient & BankExtension & StakingExtension,
   address: string,
   denom: string,

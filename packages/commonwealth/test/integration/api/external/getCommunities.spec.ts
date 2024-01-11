@@ -1,5 +1,5 @@
 import chai from 'chai';
-import 'chai/register-should';
+
 import type { GetCommunitiesReq } from 'server/api/extApiTypes';
 import {
   testChains,

@@ -1,4 +1,4 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import type { Request, Response } from 'express';
 import { Op } from 'sequelize';
 import type { DB } from '../../models';

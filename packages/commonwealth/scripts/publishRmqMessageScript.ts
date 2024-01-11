@@ -1,8 +1,8 @@
 import {
   RascalExchanges,
   RascalRoutingKeys,
-} from 'common-common/src/rabbitmq/types';
-import { publishRmqMsg } from 'common-common/src/rabbitmq/util';
+  publishRmqMsg,
+} from '@hicommonwealth/adapters';
 import { RABBITMQ_API_URI } from '../server/config';
 
 async function publishRmqMessageScript() {
