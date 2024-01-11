@@ -1,13 +1,16 @@
-import { factory, formatFilename } from 'common-common/src/logging';
-import { StatsDController } from 'common-common/src/statsd';
-import { NotificationCategories } from 'common-common/src/types';
+import {
+  StatsDController,
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/adapters';
+import { NotificationCategories } from '@hicommonwealth/core';
 import { NotificationDataAndCategory } from '../../../../shared/types';
 import { SubscriptionInstance } from '../../../models/subscription';
 import { rollbar } from '../../rollbar';
 import { sendEmails } from '../util';
 import { createEmailObject } from './createEmailObject';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 /**
  * This function assumes that the subscriptions provided match the given notification. For example,

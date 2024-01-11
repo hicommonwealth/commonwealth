@@ -1,6 +1,9 @@
+import {
+  NotificationCategories,
+  ProposalType,
+  SupportedNetwork,
+} from '@hicommonwealth/core';
 import sgMail from '@sendgrid/mail';
-import { SupportedNetwork } from 'chain-events/src';
-import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { NotificationDataAndCategory } from 'types';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
@@ -49,7 +52,7 @@ async function main() {
 
   const chain_id = 'dydx';
 
-  const chain = await models.Chain.findOne({
+  const chain = await models.Community.findOne({
     where: {
       id: chain_id,
     },
@@ -82,7 +85,7 @@ async function main() {
   } else {
     const thread = await models.Thread.findOne({
       where: {
-        chain: chain.id,
+        community_id: chain.id,
       },
       include: {
         model: models.Address,
@@ -96,9 +99,9 @@ async function main() {
       thread_id: thread.id,
       root_title: thread.title,
       root_type: ProposalType.Thread,
-      chain_id: thread.chain,
+      chain_id: thread.community_id,
       author_address: thread.Address.address,
-      author_chain: thread.Address.chain,
+      author_chain: thread.Address.community_id,
     };
 
     if (argv.notificationCategory === NotificationCategories.NewThread) {
@@ -114,7 +117,7 @@ async function main() {
     ) {
       const [comment, created] = await models.Comment.findOrCreate({
         where: {
-          chain: chain.id,
+          community_id: chain.id,
           thread_id: thread.id,
         },
         defaults: {
@@ -138,12 +141,12 @@ async function main() {
     ) {
       const anotherAddress = await models.Address.findOne({
         where: {
-          chain: chain.id,
+          community_id: chain.id,
         },
       });
       await models.Reaction.findOrCreate({
         where: {
-          chain: chain.id,
+          community_id: chain.id,
           thread_id: thread.id,
           address_id: anotherAddress.id,
           reaction: 'like',
@@ -168,7 +171,7 @@ async function main() {
     created_at: new Date(),
     updated_at: new Date(),
     emailVerified: false,
-    selected_chain_id: chain_id as unknown as number,
+    selected_community_id: chain_id as unknown as number,
   });
 
   await dispatchImmediateEmails(notification, [subscription]);

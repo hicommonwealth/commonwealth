@@ -1,5 +1,5 @@
+import { NotificationCategories } from '@hicommonwealth/core';
 import { MailDataRequired } from '@sendgrid/helpers/classes/mail';
-import { NotificationCategories } from 'common-common/src/types';
 import {
   DynamicTemplate,
   NotificationDataAndCategory,

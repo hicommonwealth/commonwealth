@@ -1,8 +1,8 @@
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import { MailDataRequired } from '@sendgrid/helpers/classes/mail';
 import sgMail from '@sendgrid/mail';
-import { factory, formatFilename } from 'common-common/src/logging';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 /**
  * This function sends the same email individually to multiple recipients. Note that

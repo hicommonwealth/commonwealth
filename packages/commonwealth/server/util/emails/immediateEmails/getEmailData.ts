@@ -1,7 +1,7 @@
-import { Label as chainEventLabel } from 'chain-events/src';
-import { NotificationCategories } from 'common-common/src/types';
+import { NotificationCategories } from '@hicommonwealth/core';
 import { capitalize } from 'lodash';
 import { NotificationDataAndCategory } from 'types';
+import { Label as chainEventLabel } from '../../../../shared/chain/labelers/util';
 import { formatAddressShort } from '../../../../shared/utils';
 import { SERVER_URL } from '../../../config';
 import models from '../../../database';
@@ -114,7 +114,7 @@ export async function getEmailData(
         actionCopy = null;
     }
 
-    const chain = await models.Chain.findOne({
+    const chain = await models.Community.findOne({
       where: {
         id: notification.data.chain_id,
       },
