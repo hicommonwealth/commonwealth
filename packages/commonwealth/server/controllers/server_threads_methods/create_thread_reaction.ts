@@ -100,7 +100,7 @@ export async function __createThreadReaction(
   const reactionData: ReactionAttributes = {
     reaction,
     address_id: address.id,
-    chain: community.id,
+    community_id: community.id,
     thread_id: thread.id,
     canvas_action: canvasAction,
     canvas_session: canvasSession,
@@ -129,7 +129,7 @@ export async function __createThreadReaction(
         thread_id: thread.id,
         root_title: thread.title,
         root_type: 'discussion',
-        chain_id: finalReaction.chain,
+        chain_id: finalReaction.community_id,
         author_address: finalReaction.Address.address,
         author_chain: finalReaction.Address.community_id,
       },

@@ -78,7 +78,7 @@ LEFT JOIN (
     AND community_id = :chainOrCommunity
   UNION
   SELECT address_id, created_at FROM "Reactions" WHERE created_at > CURRENT_DATE - ${numberOfPrevDays}
-    AND ${chain ? 'chain' : 'community'} = :chainOrCommunity
+    AND community_id = :chainOrCommunity
 ) objs
 ON objs.created_at::date = seq.date
 GROUP BY seq.date
