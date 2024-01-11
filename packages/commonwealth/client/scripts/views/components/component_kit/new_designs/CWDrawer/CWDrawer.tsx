@@ -1,5 +1,5 @@
 import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
-import React, { ComponentProps, useState } from 'react';
+import React, { ComponentProps } from 'react';
 import Drawer from 'react-modern-drawer';
 import 'react-modern-drawer/dist/index.css';
 import { CWIcon } from '../../cw_icons/cw_icon';
@@ -21,16 +21,11 @@ export const CWDrawer = ({
   header,
 }: CWDrawerProps) => {
   const { isWindowExtraSmall } = useBrowserWindow({});
-  const [fullscreen, setFullscreen] = useState(false);
-
-  const toggleDrawerFullscreen = () => {
-    setFullscreen((prevState) => !prevState);
-  };
 
   return (
     <Drawer
       duration={duration}
-      size={fullscreen ? '100vw' : isWindowExtraSmall ? '90vw' : '50vw'}
+      size={isWindowExtraSmall ? '90vw' : '50vw'}
       open={open}
       onClose={onClose}
       direction={direction || 'right'}
@@ -46,13 +41,6 @@ export const CWDrawer = ({
           onClick={onClose}
           iconSize="small"
         />
-        {!isWindowExtraSmall && (
-          <CWIcon
-            iconName={fullscreen ? 'arrowsInSimple' : 'arrowsOutSimple'}
-            onClick={toggleDrawerFullscreen}
-            iconSize="small"
-          />
-        )}
       </div>
       <div className="content-container">
         <CWText type="h3">{header}</CWText>
