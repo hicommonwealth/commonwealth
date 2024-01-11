@@ -35,6 +35,7 @@ const modifyComponentsListFile = (
   const filePath = path.join(process.cwd(), `${PATH}/componentsList.ts`);
   const fileContent = fs.readFileSync(filePath, 'utf-8');
 
+  // eslint-disable-next-line max-len
   const newImportStatement = `import ${displayName}Showcase from 'views/pages/ComponentsShowcase/components/${displayName}.showcase';\n`;
   const contentWithImport = newImportStatement + fileContent;
   const modifiedContent = contentWithImport
@@ -46,7 +47,8 @@ const modifyComponentsListFile = (
     // Add object to componentItems array
     .replace(
       /export const componentItems = \[([^]+)\];/,
-      `export const componentItems = [$1  {\n    ComponentPage: ${displayName}Showcase,\n    displayName: ComponentPageName.${displayName},\n    type: ComponentType.${componentType},\n  },\n]`,
+      // eslint-disable-next-line max-len
+      `export const componentItems = [$1  {\n    ComponentPage: ${displayName}Showcase,\n    displayName: ComponentPageName.${displayName},\n    type: ComponentType.${componentType},\n  },\n];`,
     );
 
   fs.writeFileSync(filePath, modifiedContent);
