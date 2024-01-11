@@ -8,7 +8,8 @@ import app from 'state';
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
-import SubLayout from './Sublayout';
+// import SubLayout from './Sublayout';
+import POCLayout from './components/Sublayout/POCLayout';
 import { CWEmptyState } from './components/component_kit/cw_empty_state';
 import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWText } from './components/component_kit/cw_text';
@@ -122,9 +123,9 @@ const LayoutComponent = ({
         {type === 'blank' ? (
           childToRender()
         ) : (
-          <SubLayout isInsideCommunity={type === 'community'}>
+          <POCLayout isInsideCommunity={type === 'community'}>
             {childToRender()}
-          </SubLayout>
+          </POCLayout>
         )}
       </div>
     </ErrorBoundary>

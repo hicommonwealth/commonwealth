@@ -1,0 +1,69 @@
+@import '../../../../styles/shared.scss';
+
+.Sublayout {
+  display: grid;
+  grid-template-columns: calc(#{$sidebar-width} + (#{$quick-switcher-width})) 1fr;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100vh;
+  width: 100%;
+
+  @include smallInclusive {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  .body-and-sticky-headers-container {
+    height: 100vh;
+    display: grid; // Switched to grid
+    grid-template-rows: auto 1fr; // Added rows for header and content
+    grid-template-columns: 1fr; // Single column for body
+
+    &.resizing {
+      transition: none;
+    }
+
+    &.menu-visible {
+      margin-left: calc(#{$quick-switcher-width} + 1px);
+      transition: margin-left 0.2s ease-in-out;
+      width: calc(100% - (#{$quick-switcher-width} + 1px));
+
+      @include smallInclusive {
+        margin-left: 100vw;
+      }
+    }
+
+    &.quick-switcher-visible {
+      transition: margin-left 0.2s ease-in-out;
+
+      @include smallInclusive {
+        margin-left: 100vw;
+      }
+    }
+
+    &.menu-hidden {
+      width: 100%;
+      margin-left: 0;
+      transition: margin-left 0.2s ease-in-out;
+
+      @include smallInclusive {
+        margin-left: 0;
+      }
+
+      .Banner,
+      .MessageBanner {
+        padding-left: calc(#{$sidebar-width} + 20px);
+        margin-left: calc(-#{$sidebar-width} + 1px);
+      }
+    }
+
+    .Body {
+      display: flex;
+      flex-direction: column;
+      flex-flow: column;
+      height: 100vh;
+      overflow-y: auto;
+      width: 100%;
+    }
+  }
+}
