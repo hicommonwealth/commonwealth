@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "add-component-showcase": "npx ts-node -T ./scripts/add-component-showcase.ts",
     "build": "tsc -b && tsc-alias",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
@@ -233,6 +234,7 @@
     "@types/pg-format": "^1.0.2",
     "@types/rascal": "^10.0.4",
     "@types/react-beautiful-dnd": "^13.1.3",
+    "@types/readline-sync": "^1.4.8",
     "@types/yargs": "^17.0.24",
     "babel-eslint": "^10.0.3",
     "babel-loader": "^8.0.4",
@@ -263,6 +265,7 @@
     "playwright-json-summary-reporter": "^1.0.0",
     "playwright-test": "^8.2.0",
     "process": "^0.11.10",
+    "readline-sync": "^1.4.10",
     "sinon": "^15.0.4",
     "source-map-support": "^0.5.21",
     "style-loader": "^0.23.1",
