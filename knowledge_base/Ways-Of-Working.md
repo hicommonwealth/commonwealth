@@ -45,7 +45,17 @@ Work should not begin on a ticket until (1) an engineer has been assigned to the
 
 Typically, engineers should only be working on one "In Progress" ticket at a time. If blocked, apply the "blocked" project label and move on to next Teed-Up item (which should now be moved to "In Progress").
 
-A "high priority" label may also be added by leads to teed-up tickets; these tickets should jump the queue and be worked on next.
+#### Triage
+
+Tickets for bugs are flagged P0 through P4 (i.e. "priority zero" through "priority four"):
+
+- P0: Considered critical, demanding immediate attention. Reserved for company-threatening issues.
+- P1: Should be fixed day-of report. Reserved for bugs affecting large groups of users.
+- P2: Should be fixed week of report. Typically reserved for bugs affecting small groups of users.
+- P3: Should be fixed within two weeks of report. Typically reserved for minor user inconveniences.
+- P4: Backlogged and fixed as convenient.
+
+A "high priority" label may also be added by leads to teed-up feature tickets; these tickets should jump the queue and be worked on next.
 
 #### Questions
 
@@ -154,15 +164,17 @@ Later on Friday we have our Sprint Planning meeting where we tee up the stories 
 
 ## Agile Release Schedule
 
-Aspirationally, we run an Agile Release Train (aka [ART, from SAFe5](https://v5.scaledagileframework.com/agile-release-train/)) 4 days a week, Monday through Thursday, with deploys performed before 13:00 EST. If necessary, we may also deploy Friday morning before 13:00, provided QA has approved the release; otherwise we wait until Monday.
+We cut releases for hot fixes and new product features on independent schedules.
 
-Leads cut release branches which are manually pushed to our Beta (QA) server. Aspirationally, Beta ships a new release to the live site each morning before the next release is cut. A working session (or "PR Party") may be held to ensure all shippable code will be included in the next day's release.
+Hot fixes (fixes for bugs flagged P0 through P2) are released on a rolling, ad hoc basis.
 
-Currently, Product team is responsible for QA'ing the day's release on Beta before the following morning. As of 230831, we have hired a QA Engineer who will begin taking on this work as well as executing the automation plan; expect this part of process to be in flux.
+New product releases are cut Thursday at 2pm EST, so that new features can be announced by the Growth team Monday morning.
 
-Engineering is responsible for informing Product that release on Beta is ready for QA. Effectively, this means everything that is ready for QA that day has been deployed to Beta.
+Leads cut release branches which are manually pushed to our Beta (QA) server for review. A working session (or "PR Party") may be held to ensure all shippable code will be included in the next day's release. Currently, Product team is responsible for QA'ing new releases on Beta. Engineering is responsible for informing Product that release on Beta is ready for QA. Effectively, this means everything that is ready for QA that day has been deployed to Beta.
 
 Our Beta/QA server can be found at `qa.commonwealth.im`. Custom domains are available at `osmosis.qa.commonwealth.im` and `dydx.qa.commonwealth.im`.
+
+As of 230831, we have hired a QA Engineer who will begin taking on QA work as well as executing the automation plan; expect this part of the process to be in flux.
 
 ### Release & Deploy Procedure
 
