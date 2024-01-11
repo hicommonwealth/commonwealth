@@ -1,6 +1,6 @@
 /* eslint-disable no-continue */
+import { AppError } from '@hicommonwealth/adapters';
 import { ChainBase } from '@hicommonwealth/core';
-import { AppError } from 'common-common/src/errors';
 import { Op } from 'sequelize';
 import type { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
 import { UserInstance } from 'server/models/user';

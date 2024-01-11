@@ -1,16 +1,20 @@
+# Package Scripts
+
 This entry documents [the Commonwealth package.json file](../packages/commonwealth/package.json). `Package.json` scripts should always be organized alphabetically.
 
-If you add a script to the package.json, you must add documentation here, describing (1) what the script does (2) when engineers might want or need to use it. As with [all documentation](./_README.md#updating-the-docs-how--when), this should be included in the PR alongside the script addition.
+If you add a script to the `package.json` file, please add documentation for it here. As with [all documentation](./_README.md#updating-the-docs-how--when), this should be included in the PR alongside the script addition. Script aliases serve as headers and should be furnished with a *definition* (the bash code executed by a script alias) and a *description* detailing (1) what the script does (2) when engineers might want or need to use it. Finally, list the new sub-section in the table of contents below.
 
-# Contents
+## Contents
 
 - [Build Scripts](#build-scripts)
-  - [build-all](#build-all)
+  - [build](#build)
+  - [build-ci](#build-ci)
+- [Build Heroku](#build-heroku)
   - [heroku-postbuild](#heroku-postbuild)
   - [heroku-prebuild](#heroku-prebuild)
-- [CI Scripts](#ci-scripts)
+- [CI/CD](#cicd)
   - [wait-server](#wait-server)
-- [Database Scripts](#database-scripts)
+- [Database](#database)
   - [clean-db](#clean-db)
   - [create-migration](#create-migration)
   - [db-all](#db-all)
@@ -23,6 +27,10 @@ If you add a script to the package.json, you must add documentation here, descri
   - [psql](#psql)
   - [reset-db](#reset-db)
   - [reset-frack-db](#reset-frack-db)
+- [Devnets](#devnets)
+  - [cosmos:build](#cosmosbuild)
+  - [cosmos:start](#cosmosstart)
+  - [cosmos:stop](#cosmosstop)
 - [Linting & Formatting](#linting--formatting)
   - [format](#format)
   - [lint](#lint)
@@ -56,8 +64,8 @@ If you add a script to the package.json, you must add documentation here, descri
   - [unit-test](#unit-test)
   - [unit-test:watch](#unit-testwatch)
 - [TypeScript](#typescript)
-  - [build-consumer](#build-consumer)
   - [check-types](#check-types)
+  - [sanity](#sanity)
 - [Webpack & TSNode](#webpack--tsnode)
   - [bundle-report](#bundle-report)
   - [listen](#listen)
@@ -69,46 +77,52 @@ If you add a script to the package.json, you must add documentation here, descri
   - [cosmos:build](#cosmos:build)
   - [cosmos:start](#cosmos:start)
   - [cosmos:stop](#cosmos:stop)
+- [Util scripts](#util-scripts)
+  - [add-components-showcase](#add-component-showcase)
 
-# Build Scripts
+## Build Scripts
 
-## build-libs
+### build
 
-Definition: `yarn workspace @hicommonwealth/core build && yarn workspace @hicommonwealth/chains build`
+Definition: `chmod u+x scripts/build.sh && ./scripts/build.sh`
 
-Description: Builds lib workspaces
+Description:
 
-## build-project
+- Default: Runs webpack on our front-end code with 4096MB memory allocated to Node
+- Default: If successful, fires the commonwalth app build script
+- Optional: To build other app workspaces, see `/scripts/build.sh` for configuration options
 
-Definition: `yarn global add node-gyp && yarn --ignore-engines && yarn build-libs && yarn workspace commonwealth migrate-db`
+### build-ci
 
-Description: Temporary placeholder for common script used by the CI pipeline to:
+Definition: `yarn global add node-gyp && yarn --ignore-engines && yarn build && yarn workspace commonwealth migrate-db`
 
-- Install dependencies
-- Incrementally build project with references (tsc -b)
-- Migrate DB
+Description:
 
-## build-all
+- Installs node-gyp (a library for compiling dependencies) prior to installing dependencies. Fixes error we get when building dependencies which blocks production releases and fails CI runs.
+- Installs node modules, ignoring engine errors
+- Runs the default application build script (above)
+- Runs db migrations
 
-Definition: `NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.prod.config.js --progress && yarn build-consumer`
+## Build Heroku
 
-Description: Runs webpack on our front-end code with 4096MB memory allocated to Node. If successful, fires the build-consumer script.
-
-## heroku-postbuild
-
-Definition: `NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) webpack --config webpack/webpack.prod.config.js --progress && yarn build-consumer`
-
-Description: Builds project on Heroku, using `get-max-old-space-size.sh` to dynamically allocate memory, then running webpack and the [build-consumer](#build-consumer) script
-
-## heroku-prebuild
+### heroku-prebuild
 
 Definition: `yarn global add node-gyp`
 
 Description: Installs node-gyp (a library for compiling dependencies) prior to installing dependencies. Fixes error we get when building dependencies which blocks production releases and fails CI runs.
 
-# CI Scripts
+### heroku-postbuild
 
-## wait-server
+Definition: `chmod u+x scripts/heroku-build.sh && ./scripts/heroku-build.sh`
+
+Description:
+
+- Builds project on Heroku by calling application build script (above), using configuration variables (CW_BUILD, SL_BUILD, DL_BUILD)
+- Cleans other apps and unnecessary code in the monorepo
+
+## CI/CD
+
+### wait-server
 
 Definition: `chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh`
 
@@ -116,9 +130,9 @@ Description: Used for CI. Waits for the server to be ready (start serving on por
 
 Contributor: Kurtis Assad
 
-# Database Scripts
+## Database
 
-## clean-db
+### clean-db
 
 Definition: `ts-node --project tsconfig.json server/scripts/cleanDb.ts`
 
@@ -128,13 +142,13 @@ Considerations: Engineers will almost never need to use this locally (unless the
 
 Contributor: Timothee Legros
 
-## create-migration
+### create-migration
 
 Definition: `npx sequelize migration:generate --name`
 
 Description: Generates a new database migration file, taking a passed argument in kebab-case as a name (e.g. `yarn create-migration remove-user-last-visited-col`).
 
-## db-all
+### db-all
 
 Definition: `yarn reset-db && yarn load-db && yarn migrate-db`
 
@@ -142,61 +156,61 @@ Description: Resets, loads, and migrates db (composite script).
 
 Contributor: Kurtis Assad
 
-## dump-db
+### dump-db
 
 Definition: `pg_dump $(heroku config:get CW_READ_DB -a commonwealth-beta) --verbose --exclude-table-data=\"public.\\\"Subscriptions\\\"\" --exclude-table-data=\"public.\\\"Sessions\\\"\" --exclude-table-data=\"public.\\\"DiscussionDrafts\\\"\" --exclude-table-data=\"public.\\\"LoginTokens\\\"\" --exclude-table-data=\"public.\\\"Notifications\\\"\" --exclude-table-data=\"public.\\\"Webhooks\\\"\" --exclude-table-data=\"public.\\\"NotificationsRead\\\"\" --no-privileges --no-owner -f latest.dump`
 
 Description: Creates a database dump file, `latest.dump`, from Heroku's commonwealth-beta db, excluding several tables such as DiscussionDrafts, Subscriptions, and Notifications.
 
-## dump-db-limit
+### dump-db-limit
 
 Definition: `yarn run dump-db && psql $(heroku config:get CW_READ_DB -a commonwealth-beta) -a -f limited_dump.sql`
 
 Description: In addition to running the [dump-db](#dump-db) script, this copies a limited set of Notification and Subscription data from the commonwealth-beta Heroku database. Used in conjunction with the [load-db-limit](#load-db-limit) script.
 
-## load-db
+### load-db
 
 Definition: `chmod u+x scripts/load-db.sh && ./scripts/load-db.sh`
 
 Description: Loads database following the `load-db.sh` script. Looks for dump file `latest.dump` by default; if script is called with an argument, the value of DUMP_NAME will be updated to that argument's value.
 
-## load-db-limit
+### load-db-limit
 
 Definition: `yarn run reset-db && yarn run load-db && psql -d commonwealth -U commonwealth -a -f limited_load.sql`
 
 Description: Used in conjunction with [dump-db-limit](#dump-db-limit), this loads a dumped copy of the commonwealth-beta Heroku database alongside a limited, copied set of Notification and Subscription rows.
 
-## migrate-db
+### migrate-db
 
 Definition: `npx sequelize db:migrate`
 
 Description: Migrates database, using migration files in `./server/migration` directory.
 
-## migrate-db-down
+### migrate-db-down
 
 Definition: `npx sequelize db:migrate:undo`
 
 Description: Undoes the last-run Sequelize migration.
 
-## psql
+### psql
 
 Definition: `chmod u+x scripts/start-psql.sh && ./scripts/start-psql.sh`
 
 Description: Start a PostgreSQL instance.
 
-## reset-db
+### reset-db
 
 Definition: `chmod u+x scripts/reset-db.sh && ./scripts/reset-db.sh`
 
 Description: Resets the local database.
 
-## reset-frack-db
+### reset-frack-db
 
 Definition: `heroku pg:copy commonwealth-beta::CW_READ_DB DATABASE_URL --app commonwealth-frack --confirm commonwealth-frack`
 
 Description: Synchronizes `beta-db` (used for QA) against the `frack-db` (used for CDN cache testing). Good for undoing migration script run in previous commit to Frack. See [Testing Environments](./Testing-Environments.md) entry for more info.
 
-## db-doc
+### db-doc
 
 Definition: `chmod u+x scripts/gen-mermaid-erd.sh && ./scripts/gen-mermaid-erd.sh > ../../knowledge_base/wiki/Database-ERD.md`
 
@@ -210,31 +224,31 @@ Considerations:
 
 Contributor: Roger Torres
 
-# Docker
+## Docker
 
-## start-containers
+### start-containers
 
 Definition: `chmod +rx ./scripts/start-docker-containers.sh && ./scripts/start-docker-containers.sh`
 
 Description: Starts remote Docker containers; see [start-docker-containers.sh](../packages/commonwealth/scripts/start-docker-containers.sh) for further documentation.
 
-## start-docker-setup
+### start-docker-setup
 
 Definition: `chmod +rx ./scripts/start-docker-setup-help.sh && ./scripts/start-docker-setup-help.sh`
 
 Description: To be run in a new project or repo when first setting up remote docker containers. See [start-docker-setup-help.sh](../packages/commonwealth/scripts/start-docker-setup-help.sh) for further documentation.
 
-# Linting & Formatting
+## Linting & Formatting
 
 Open considerations: Given our Prettier pre-commit hook, this amount of linting and formatting commands may be unnecessary.
 
-## format
+### format
 
 Definition: `prettier --ignore-path ../../.prettierignore --config ../../.prettierrc.json --write .`
 
 Description: Autoformats files using config `prettierrc.json` config.
 
-## lint
+### lint
 
 Definition: `./scripts/lint-new-work.sh`
 
@@ -242,7 +256,7 @@ Description: Lints new work, according to script file `lint-new-work.sh`.
 
 Considerations: Problematically, only checks .ts files. Name is misleading. Redundancy with [lint-branch](#lint-branch) script. **Flagged for possible removal.**
 
-## lint-all
+### lint-all
 
 Definition: `eslint client/\\**/*.{ts,tsx} server/\\**/*.ts`
 
@@ -250,7 +264,7 @@ Description: Only lints changed files on current branch.
 
 Considerations: May be more clearly renamed "lint-changes".
 
-## lint-branch
+### lint-branch
 
 Definition: `./scripts/lint-branch.sh`
 
@@ -258,13 +272,13 @@ Description: Redundant with [lint](#lint) script, which uses 'git status' instea
 
 Considerations: Recommend eliminating either [lint](#lint) or [lint-branch](#lint-branch) scripts. Problematically, lint-branch only checks .ts files. **Flagged for possible removal.**
 
-## lint-branch-warnings
+### lint-branch-warnings
 
 Definition: `FAIL_WARNINGS=1 ./scripts/lint-branch.sh`
 
 Description: Used in the CI. Lints based on the target branch, fails on linter warnings
 
-## style-lint
+### style-lint
 
 Definition: `stylelint client/styles/*`
 
@@ -272,9 +286,9 @@ Description: Lints SCSS files.
 
 Considerations: Why lint styles separately? Why not just include `.scss` file extension in [lint](#lint) and [lint-all](#lint-all) scripts (which currently only target `.ts` files)? **Flagged for possible removal.**
 
-# Mobile
+## Mobile
 
-## build-android
+### build-android
 
 Definition: `NODE_ENV=mobile webpack --config webpack/webpack.config.mobile.js --progress && NODE_ENV=mobile npx cap sync android`
 
@@ -282,7 +296,7 @@ Description: Uses Capacitor library to build app for Android based on webpack.co
 
 Contributor: Dillon Chen
 
-## build-ios
+### build-ios
 
 Definition: `NODE_ENV=mobile webpack --config webpack/webpack.config.mobile.js --progress && NODE_ENV=mobile npx cap sync ios`
 
@@ -290,7 +304,7 @@ Description: Uses Capacitor library to build app for iOS based on webpack.config
 
 Contributor: Dillon Chen
 
-## open-android
+### open-android
 
 Definition: `NODE_ENV=mobile npx cap open android`
 
@@ -298,7 +312,7 @@ Description: Uses the Capacitor tool to build and run the app's Android project 
 
 Contributor: Dillon Chen
 
-## open-ios
+### open-ios
 
 Definition: `NODE_ENV=mobile npx cap open ios`
 
@@ -306,7 +320,7 @@ Description: Uses the Capacitor tool to build and run the app's iOS project with
 
 Contributor: Dillon Chen
 
-## start-android
+### start-android
 
 Definition: `npx cap run android`
 
@@ -314,7 +328,7 @@ Description: Uses the Capacitor tool to build and run the app's Android project 
 
 Contributor: Dillon Chen
 
-## start-ios
+### start-ios
 
 Definition: `npx cap run ios`
 
@@ -322,9 +336,9 @@ Description: Uses the Capacitor tool to build and run the app's iOS project with
 
 Contributor: Dillon Chen
 
-# Other services
+## Other services
 
-## send-cosmos-notifs
+### send-cosmos-notifs
 
 Definition: `ts-node --project tsconfig.json server/cosmosGovNotifications/generateCosmosGovNotifications.ts`
 
@@ -332,15 +346,15 @@ Description: Generates Cosmos v1 and v1beta1 governance notifications by polling
 
 Contributor: Timothee Legros
 
-## send-notification-digest-emails
+### send-notification-digest-emails
 
 Definition: `SEND_EMAILS=true ts-node --project tsconfig.json server.ts`
 
 Description: Schedules a daily task for sending notification email digests.
 
-# Playwright
+## Playwright
 
-## e2e-start-server
+### e2e-start-server
 
 Definition: `ETH_RPC=e2e-test yarn start`
 
@@ -348,7 +362,7 @@ Description: Starts the app server with the ETH_RPC env variable set to “e2e-t
 
 Contributor: Kurtis Assad
 
-## emit-notification
+### emit-notification
 
 Definition: `ts-node --project tsconfig.json server/scripts/emitTestNotification.ts`
 
@@ -356,7 +370,7 @@ Description: Emits a chain-event or snapshot notification. Run `yarn emit-notifi
 
 Contributor: Timothee Legros
 
-## test-e2e
+### test-e2e
 
 Definition: `TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 2 ./test/e2e/e2eRegular/*`
 
@@ -364,7 +378,7 @@ Description: Runs Playwright tests using the playwright.config.ts file.
 
 Contributor: Kurtis Assad
 
-## test-e2e-serial
+### test-e2e-serial
 
 Definition: `TEST_ENV=playwright npx playwright test --workers 1 ./test/e2e/e2eSerial/*`
 
@@ -372,7 +386,7 @@ Description: Runs e2e tests one at a time, to avoid problems of parallel executi
 
 Contributor: Kurtis Assad
 
-# Testing
+## Testing
 
 Open considerations:
 
@@ -382,7 +396,7 @@ Open considerations:
   - See e.g. [test-select](#test-select)
 - Any test scripts we remove, we should ensure their respective invocations in `CI.yml` are replaced with appropriate definitions.
 
-## integration-test
+### integration-test
 
 Definition: `nyc ts-mocha --project tsconfig.json './test/integration/**/*.spec.ts'`
 
@@ -390,31 +404,31 @@ Description: Runs all tests in our integration folder and its subdirectories.
 
 Considerations: This script breaks our more usual test script syntax, which typically begin with the "test-" prefix followed by the directory tested. We should also keep an eye on similar integration-scoped test scripts; there may be redundancies.
 
-## test
+### test
 
 Definition: `nyc ts-mocha --project tsconfig.json './test/**/*.spec.ts'`
 
 Description: Runs all tests in our /test directory.
 
-## test-api
+### test-api
 
 Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/integration/api/**/*.spec.ts'`
 
 Description: Runs all tests in the /api subfolder of the /integration directory.
 
-## test-devnet
+### test-devnet
 
 Definition: `nyc ts-mocha --project tsconfig.json './test/devnet/${TEST_DIR:-.}/**/*.spec.ts'`
 
 Description: Runs all tests in our `/devnet`` folder.
 
-## test-emit-notif
+### test-emit-notif
 
 Definition `NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/integration/emitNotifications.spec.ts'`
 
 Description: Runs only the `emitNotifications.spec.ts` test, of the three `/integration`` folder "utils."
 
-## test-integration-util
+### test-integration-util
 
 Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/integration/*.spec.ts'`
 
@@ -424,13 +438,13 @@ Considerations: The script name might misleadingly suggest that this script woul
 
 Contributor: Timothee Legros
 
-## test-select
+### test-select
 
 Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json`
 
 Description: Append a path to run specific test files or folders.
 
-## test-suite
+### test-suite
 
 Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/**/*.spec.ts'`
 
@@ -438,7 +452,7 @@ Description: Runs all tests in our /test directory.
 
 Considerations: This is equivalent to our `test` script but with `NODE_ENV=test` added. Why? Do we actually need both versions? **Flagged for possible removal.**
 
-## unit-test
+### unit-test
 
 Definition: `NODE_ENV=test ts-mocha --project tsconfig.json './test/unit/**/*.spec.ts'`
 
@@ -448,7 +462,7 @@ Considerations: This script breaks our more usual test script syntax, which typi
 
 Contributor: Ryan Bennett
 
-## unit-test:watch
+### unit-test:watch
 
 Definition: `NODE_ENV=test ts-mocha --project tsconfig.json --opts test/mocha-dev.opts './test/unit/**/*.spec.ts' -w --watch-files '**/*.ts'`
 
@@ -458,74 +472,82 @@ Considerations: This script breaks our more usual test script syntax, which typi
 
 Contributor: Ryan Bennett
 
-# TypeScript
+## TypeScript
 
-## build-consumer
-
-Definition: `tsc --project tsconfig.worker.json && tsc-alias --project tsconfig.worker.json`
-
-Description: Runs a compilation based on tsconfig.worker.json; does not emit files; replaces alias with relative paths post-compilation.
-
-## check-types
+### check-types
 
 Definition: `tsc --noEmit`
 
 Description: Runs a compilation of TypeScript files based on tsconfig.json; does not emit files.
 
-# Webpack && TSNode
+### sanity
 
-## bundle-report
+Definition: `chmod u+x scripts/sanity.sh && ./scripts/sanity.sh`
+
+Description: Sanity scripts developers should run locally before pushing code, comprising a linter, a check-types, and unit tests. Must be run from root.
+
+## Webpack && TSNode
+
+### bundle-report
 
 Definition: `webpack-bundle-analyzer --port 4200 build/stats.json`
 
 Description:  Runs webpack-bundle-analyzer library to display breakdown of bundle size & makeup, hosted on port 4200 (localhost:4200). To generate a stats.json file, navigate to [webpack.prod.config.js](../packages/commonwealth/webpack/webpack.prod.config.js), set the `generateStatsFile` key to true, run `yarn build` , and finally `yarn bundle-report`.
 
-## listen
+### listen
 
 Definition: `RUN_AS_LISTENER=true ts-node --project tsconfig.json server.ts`
 
 Description: Runs ts-node, a TypeScript execution engine for NodeJS, in listening mode for changes, following tsconfig.json and using [server.ts](../packages/commonwealth/server.ts) as the entry file.
 
-## start
+### start
 
 Definition: `ts-node-dev --max-old-space-size=4096 --respawn --transpile-only --project tsconfig.json server.ts`
 
 Description: Windows-compatible start script. Used to start the Commonwealth app in development.
 
-## start-all
+### start-all
 
 Definition: `concurrently -p '{name}' -c red,green -n app,consumer 'yarn start' 'yarn start-consumer'`
 
 Description: Runs `yarn start` and `yarn start-consumer` (i.e., the main app server, and the CommonwealthConsumer script) concurrently with the `concurrently` package.
 
-## start-consumer
+### start-consumer
 
-Definition: `ts-node --project tsconfig.worker.json server/workers/commonwealthConsumer/commonwealthConsumer.ts run-as-script`
+Definition: `ts-node -r tsconfig-paths/register server/workers/commonwealthConsumer/commonwealthConsumer.ts run-as-script`
 
 Description: Runs `CommonwealthConsumer.ts` script, which consumes & processes RabbitMQ messages from external apps and services. See script file for more complete documentation.
 
-## start-evm-ce
+### start-evm-ce
 
-Definition: `ts-node ./server/workers/evmChainEvents/startEvmPolling.ts`
+Definition: `ts-node -r tsconfig-paths/register server/workers/evmChainEvents/startEvmPolling.ts`
 
 Description: Runs `startEvmPolling.ts` script, which polls Ethereum chains for events in order to generate notifications.
 
-# Devnets
+## Devnets
 
-## cosmos:build
+### cosmos:build
 
 Definition: `chmod u+x test/util/cosmos-chain-testing/v1/start.sh && ./test/util/cosmos-chain-testing/v1/start.sh --build && chmod u+x test/util/cosmos-chain-testing/v1beta1/start.sh && ./test/util/cosmos-chain-testing/v1beta1/start.sh --build && chmod u+x test/util/cosmos-chain-testing/ethermint/start.sh && ./test/util/cosmos-chain-testing/ethermint/start.sh --build`
 
 Description: Fetches Docker images for all Cosmos devnets (evmos, v1beta1, and v1) and starts containers for each.
 
-## cosmos:start
+### cosmos:start
 
 Definition: `chmod u+x test/util/cosmos-chain-testing/v1/start.sh && ./test/util/cosmos-chain-testing/v1/start.sh && chmod u+x test/util/cosmos-chain-testing/v1beta1/start.sh && ./test/util/cosmos-chain-testing/v1beta1/start.sh && chmod u+x test/util/cosmos-chain-testing/ethermint/start.sh && ./test/util/cosmos-chain-testing/ethermint/start.sh`
 
 Description: Starts existing dormant Cosmos devnet containers.
 
-## cosmos:stop
+### cosmos:stop
 
 Definition: `chmod u+x test/util/cosmos-chain-testing/v1/stop.sh && ./test/util/cosmos-chain-testing/v1/stop.sh && chmod u+x test/util/cosmos-chain-testing/v1beta1/stop.sh && ./test/util/cosmos-chain-testing/v1beta1/stop.sh && chmod u+x test/util/cosmos-chain-testing/ethermint/stop.sh && ./test/util/cosmos-chain-testing/ethermint/stop.sh`
 
 Description: Stop all Cosmos devnet containers.
+
+# Util scripts
+
+## add-component-showcase
+
+Definition: `add-component-showcase`
+
+Description: It creates new `tsx` file and modifies `componentsList.ts` file in order to add components to the showcase page easier. Fore more information take a look at [Component-Kit.md](./Component-Kit.md) documentation file.

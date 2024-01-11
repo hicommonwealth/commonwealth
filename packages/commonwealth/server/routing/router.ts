@@ -1,4 +1,4 @@
-import { factory, formatFilename } from 'common-common/src/logging';
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import type { Express } from 'express';
 import express from 'express';
 import useragent from 'express-useragent';
@@ -93,7 +93,7 @@ import updateAddress from '../routes/updateAddress';
 import viewChainIcons from '../routes/viewChainIcons';
 import type BanCache from '../util/banCheckCache';
 
-import { RedisCache } from 'common-common/src/redisCache';
+import { RedisCache } from '@hicommonwealth/adapters';
 import type DatabaseValidationService from '../middleware/databaseValidationService';
 import createDiscordBotConfig from '../routes/createDiscordBotConfig';
 import generateImage from '../routes/generateImage';
@@ -195,7 +195,7 @@ export type ServerControllers = {
   admin: ServerAdminController;
 };
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 function setupRouter(
   endpoint: string,

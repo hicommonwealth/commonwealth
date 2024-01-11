@@ -1,5 +1,5 @@
+import { AppError } from '@hicommonwealth/adapters';
 import { SearchProfilesResult } from 'server/controllers/server_profiles_methods/search_profiles';
-import { AppError } from '../../../../common-common/src/errors';
 import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
 import { ServerControllers } from '../../routing/router';
 import {

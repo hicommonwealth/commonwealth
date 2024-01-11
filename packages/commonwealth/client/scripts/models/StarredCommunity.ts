@@ -1,9 +1,15 @@
 class StarredCommunity {
   user_id: number;
-  chain: string;
+  community_id: string;
 
-  constructor(chain, user_id) {
-    this.chain = chain;
+  constructor({
+    community_id,
+    user_id,
+  }: {
+    community_id: string;
+    user_id: number;
+  }) {
+    this.community_id = community_id;
     this.user_id = user_id;
   }
 }

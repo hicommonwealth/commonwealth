@@ -1,9 +1,9 @@
-import { ServerError } from 'common-common/src/errors';
+import { ServerError } from '@hicommonwealth/adapters';
 import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../models';
 
 export const Errors = {
-  NoStarValue: 'Must pass isAlreadyStarred boolean to set starred status',
+  FailedToToggle: 'Failed to toggle community star',
 };
 
 const starCommunity = async (
@@ -15,21 +15,21 @@ const starCommunity = async (
   const { community } = req;
 
   try {
-    const [star] = await models.StarredCommunity.findOrCreate({
+    const [star, created] = await models.StarredCommunity.findOrCreate({
       where: {
-        chain: community.id,
+        community_id: community.id,
         user_id: req.user.id,
       },
     });
 
-    if (req.body.isAlreadyStarred === 'true') {
+    if (!created) {
       await star.destroy();
       return res.json({ status: 'Success' });
     }
 
     return res.json({ status: 'Success', result: star.toJSON() });
   } catch (err) {
-    return next(new ServerError(Errors.NoStarValue));
+    return next(new ServerError(Errors.FailedToToggle));
   }
 };
 

@@ -1,4 +1,4 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import type { NextFunction, Request, Response } from 'express';
 import { Op, QueryTypes } from 'sequelize';
 import type { DB } from '../models';
@@ -78,7 +78,7 @@ LEFT JOIN (
     AND community_id = :chainOrCommunity
   UNION
   SELECT address_id, created_at FROM "Reactions" WHERE created_at > CURRENT_DATE - ${numberOfPrevDays}
-    AND ${community ? 'chain' : 'community'} = :chainOrCommunity
+    AND community_id = :chainOrCommunity
 ) objs
 ON objs.created_at::date = seq.date
 GROUP BY seq.date

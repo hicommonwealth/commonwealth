@@ -36,6 +36,5 @@ Reset your server and load the app:
 
 ```bash
 commonwealth$ yarn reset-server
-
-commonwealth$ CHAIN_EVENTS=aave,aave-local yarn start
+yarn start
 ```

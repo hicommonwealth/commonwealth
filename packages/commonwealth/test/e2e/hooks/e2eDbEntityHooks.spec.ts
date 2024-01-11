@@ -47,7 +47,7 @@ export async function clearTestEntities() {
       where: {
         [Op.or]: [
           { id: { [Op.lt]: 0 } },
-          { selected_chain_id: { [Op.in]: ['cmntest', 'cmntest2'] } },
+          { selected_community_id: { [Op.in]: ['cmntest', 'cmntest2'] } },
         ],
       },
     });
@@ -397,7 +397,7 @@ export async function createTestEntities() {
                 reaction: 'like',
                 address_id: -1,
                 thread_id: -1,
-                chain: 'cmntest',
+                community_id: 'cmntest',
               },
             })
           )[0],
@@ -415,7 +415,7 @@ export async function createTestEntities() {
                   reaction: 'like',
                   address_id: -2,
                   comment_id: -2,
-                  chain: 'cmntest',
+                  community_id: 'cmntest',
                 },
               })
             )[0],

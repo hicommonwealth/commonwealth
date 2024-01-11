@@ -1,8 +1,8 @@
 import { Label as ChainEventLabel } from '../../shared/chain/labelers/util';
 import type { CWEvent } from '../../shared/chain/types/types';
 
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import { NotificationCategories } from '@hicommonwealth/core';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { capitalize } from 'lodash';
 import { Op, WhereOptions } from 'sequelize';
 import type {
@@ -23,7 +23,7 @@ import { DB } from '../models';
 import { AddressAttributes } from '../models/address';
 import type { UserAttributes } from '../models/user';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');

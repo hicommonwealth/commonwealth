@@ -1,5 +1,5 @@
+import { StatsDController } from '@hicommonwealth/adapters';
 import { NotificationCategories } from '@hicommonwealth/core';
-import { StatsDController } from 'common-common/src/statsd';
 import type { Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
@@ -30,36 +30,20 @@ export const redirectWithLoginError = (res, message) => {
 
 const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
   const previousUser = req.user;
+  const serverAnalyticsController = new ServerAnalyticsController();
   if (req.user && req.user.email && req.user.emailVerified) {
     return redirectWithLoginSuccess(res, req.user.email);
   }
   const token = req.query.token;
   const email = req.query.email;
   const confirmation = req.query.confirmation;
-  if (!token) {
-    return redirectWithLoginError(res, 'Missing token');
-  }
-  if (!email) {
-    return redirectWithLoginError(res, 'Missing email');
-  }
-
-  // Validate login token, and mark as used
-  const tokenObj = await models.LoginToken.findOne({ where: { token, email } });
-  if (!tokenObj) {
-    return redirectWithLoginError(res, 'Invalid token');
-  }
-  if (+new Date() >= +tokenObj.expires) {
-    return redirectWithLoginError(res, 'Token expired');
-  }
-  tokenObj.used = new Date();
-  await tokenObj.save();
-
-  // Log in the user associated with the verified email
-  const existingUser = await models.User.scope('withPrivateData').findOne({
-    where: { email },
+  const tokenObj = await models.LoginToken.findOne({
+    where: { token: token as string, email: email as string },
   });
-
-  const serverAnalyticsController = new ServerAnalyticsController();
+  tokenObj.used = new Date();
+  const existingUser = await models.User.scope('withPrivateData').findOne({
+    where: { email: email as string },
+  });
 
   if (existingUser) {
     req.login(existingUser, async (err) => {
@@ -129,7 +113,7 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
   } else {
     // If the user isn't in a partly-logged-in state, create a new user
     const newUser = await models.User.createWithProfile(models, {
-      email,
+      email: email as string,
       emailVerified: true,
     });
 

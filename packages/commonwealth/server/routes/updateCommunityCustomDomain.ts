@@ -1,4 +1,4 @@
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError, ServerError } from '@hicommonwealth/adapters';
 import { validURL } from '../../shared/utils';
 import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';

@@ -1,4 +1,4 @@
-import { AppError } from '../../../../common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { CommunityInstance } from '../../models/community';
 import { TopicAttributes } from '../../models/topic';

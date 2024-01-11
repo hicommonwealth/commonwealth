@@ -1,4 +1,4 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import type { Response } from 'express';
 import type { DB } from '../models';
 import type { CommunityBannerInstance } from '../models/community_banner';
@@ -19,7 +19,7 @@ type UpdateBannerReq = Omit<CommunityBannerInstance, 'id'> & {
 const updateBanner = async (
   models: DB,
   req: TypedRequestBody<UpdateBannerReq>,
-  res: Response
+  res: Response,
 ) => {
   const chain = req.chain;
 
@@ -39,10 +39,10 @@ const updateBanner = async (
   // find or create
   const [banner] = await models.CommunityBanner.findOrCreate({
     where: {
-      chain_id: chain.id,
+      community_id: chain.id,
     },
     defaults: {
-      chain_id: chain.id,
+      community_id: chain.id,
       banner_text,
     },
   });
