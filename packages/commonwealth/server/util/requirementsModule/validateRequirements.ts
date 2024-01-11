@@ -154,7 +154,7 @@ export default function validateRequirements(
 
         const isContractType = await getEVMContractType(
           contract_address,
-          `rpcURL`,
+          node.url,
         );
         if (
           !isContractType ||
@@ -193,7 +193,7 @@ export default function validateRequirements(
 
         const isContractType = await getCosmosContractType(
           contract_address,
-          `rpcURL`,
+          node.url,
         );
         if (
           !isContractType ||
