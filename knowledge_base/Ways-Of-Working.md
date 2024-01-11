@@ -164,11 +164,7 @@ Later on Friday we have our Sprint Planning meeting where we tee up the stories 
 
 ## Agile Release Schedule
 
-We cut releases for hot fixes and new product features on independent schedules.
-
-Hot fixes (fixes for bugs flagged P0 through P2) are released on a rolling, ad hoc basis.
-
-New product releases are cut Thursday at 2pm EST, so that new features can be announced by the Growth team Monday morning.
+We cut releases for hot fixes and new product features on independent schedules. Hot fixes (fixes for bugs flagged P0 through P2) are released on a rolling, ad hoc basis. New product releases are cut Thursday at 2pm EST, so that new features can be announced by the Growth team Monday morning.
 
 Leads cut release branches which are manually pushed to our Beta (QA) server for review. A working session (or "PR Party") may be held to ensure all shippable code will be included in the next day's release. Currently, Product team is responsible for QA'ing new releases on Beta. Engineering is responsible for informing Product that release on Beta is ready for QA. Effectively, this means everything that is ready for QA that day has been deployed to Beta.
 
@@ -178,21 +174,17 @@ As of 230831, we have hired a QA Engineer who will begin taking on QA work as we
 
 ### Release & Deploy Procedure
 
-We use [GitHub Releases](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository). Releases are bundles of commits organized as tags. Git tags are similar to git branches, insofar as they are versions of the repository, containing a specific iteration in the repo’s history, which may be checked out locally. As of 231016, tags are created from dedicated release branches.
-
-Tags observe the following versioning syntax: `v<MajorVersion>.<CycleNumber>.<IndexNumber>`. As of 230912, our major version is 0, our cycle number is 6, and our index number is 9, thus: `v0.6.9`. For hotfixes to an existing release, an additional suffix should be appended after a hyphen, e.g. `v0.6.9-1`.
-
-Release branches also follow this syntax, but prepend `release/` and append `-x`, e.g. `release/v0.6.9-x`. The `-x` suffix denotes that the branch contains any hot fix releases for that version.
+We use [GitHub Releases](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository) for both feature releases and hotfixes. Releases are bundles of commits organized as tags. Git tags are similar to git branches, insofar as they are versions of the repository, containing a specific iteration in the repo’s history, which may be checked out locally. As of 240111, tags are created from dedicated release branches.
 
 Releases must first be created, then QA’d, then deployed to Heroku. All engineers ought, by default, to possess the GitHub permissions required to draft a release. All engineers ought, by default, to possess the Heroku admin permissions required to deploy a release. If this is not the case, and permissions are required for the task at hand, reach out to a lead.
 
-Procedure for creating a new GitHub Release from a pre-existing release branch, e.g. `release/v0.6.9`:
+The procedure for creating a new GitHub Release from a pre-existing release branch, e.g. `release/v0.6.9`, is:
 
 1. Navigate to the [repo’s Releases page](https://github.com/hicommonwealth/commonwealth/releases).
-2. Click "Draft a new release."
-3. In the "Choose a tag" dropdown, create and select a new tag, following the versioning syntax described above.
+2. Select "Draft a new release."
+3. In the "Choose a tag" dropdown, create and select a new tag, following the versioning syntax described [below](#release-names-and-tags).
 4. Select the relevant release branch as the tag's target.
-5. Title the release after its version number (e.g. `v0.6.9`).
+5. Title the release after its version number (e.g. `v0.6.9`; see [below](#release-names-and-tags) for naming schema).
 6. Before hitting the "Generate release notes" button, manually set the "Previous tag" to the latest deployed version, e.g. `v0.6.8`.
 7. Now hit “Generate release notes” to auto-populate the release description with a list of changes since the previous tag.
 8. Check “Set as a pre-release,” at the bottom of the form.
@@ -215,6 +207,12 @@ Procedure for deploying a GitHub release:
 4. If the git remote for Heroku doesn’t exist, run `heroku git:remote —app commonwealthapp`
 5. Upon deploy, edit the original GitHub release, moving it from “pre-release” to “latest release”
 
+#### Release names and tags
+
+Tag names observe the following versioning syntax: `v<MajorVersion>.<CycleNumber>.<IndexNumber>`. As of 240111, our major version is 0, our cycle number is 6, and our index number is 9, thus: `v0.6.9`. For hotfixes to an existing release, an additional suffix should be appended after a hyphen, e.g. `v0.6.9-1`.
+
+Release branches also follow this syntax, but prepend `release/` and append `-x`, e.g. `release/v0.6.9-x`. The `-x` suffix denotes that the branch contains any hot fix releases for that version.
+
 #### Hotfix procedure
 
 Hotfixes should rolled out to production as follows:
@@ -229,8 +227,8 @@ Alternatively, engineers are welcome to create a new hotfix branch, and cherrypi
 
 ## Change Log
 
-- 231016: Added "Release & Deploy Procedure" section (#5062).
-- 230906: Updated with new requirements for tickets and PRs (#4972).
+- 231016: Updated by Graham Johnson with new "Release & Deploy Procedure" section (#5062).
+- 230906: Updated by Graham Johnson with new requirements for tickets and PRs (#4972).
 - 230831: Merged with Agile-Development.md by Graham Johnson (#4936) and certified fresh.
 - 230823: Migrated from GitHub wiki by Graham Johnson (#4350).
-- 230124: Authored by Forest.
+- 230124: Initial stub authored by Forest.
