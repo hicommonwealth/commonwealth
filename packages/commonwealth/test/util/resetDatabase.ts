@@ -347,6 +347,12 @@ export const resetDatabase = (debug = false): Promise<void> => {
         ).toString(),
       });
 
+      await models.Topic.create({
+        name: 'Test Topic',
+        description: 'A topic made for testing',
+        community_id: 'ethereum',
+      });
+
       if (debug) log.info('Database reset!');
     } catch (error) {
       log.info('error', error);

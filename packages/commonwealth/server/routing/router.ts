@@ -1227,60 +1227,53 @@ function setupRouter(
   );
 
   // Group routes
+  registerRoute(
+    router,
+    'put',
+    '/refresh-membership',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateCommunity,
+    refreshMembershipHandler.bind(this, serverControllers),
+  );
 
-  if (process.env.GATING_API_ENABLED) {
-    log.debug('GATING API ENABLED');
+  registerRoute(
+    router,
+    'get',
+    '/groups',
+    databaseValidationService.validateCommunity,
+    getGroupsHandler.bind(this, serverControllers),
+  );
 
-    registerRoute(
-      router,
-      'put',
-      '/refresh-membership',
-      passport.authenticate('jwt', { session: false }),
-      databaseValidationService.validateAuthor,
-      databaseValidationService.validateCommunity,
-      refreshMembershipHandler.bind(this, serverControllers),
-    );
+  registerRoute(
+    router,
+    'post',
+    '/groups',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateCommunity,
+    createGroupHandler.bind(this, serverControllers),
+  );
 
-    registerRoute(
-      router,
-      'get',
-      '/groups',
-      databaseValidationService.validateCommunity,
-      getGroupsHandler.bind(this, serverControllers),
-    );
+  registerRoute(
+    router,
+    'put',
+    '/groups/:id',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateCommunity,
+    updateGroupHandler.bind(this, serverControllers),
+  );
 
-    registerRoute(
-      router,
-      'post',
-      '/groups',
-      passport.authenticate('jwt', { session: false }),
-      databaseValidationService.validateAuthor,
-      databaseValidationService.validateCommunity,
-      createGroupHandler.bind(this, serverControllers),
-    );
-
-    registerRoute(
-      router,
-      'put',
-      '/groups/:id',
-      passport.authenticate('jwt', { session: false }),
-      databaseValidationService.validateAuthor,
-      databaseValidationService.validateCommunity,
-      updateGroupHandler.bind(this, serverControllers),
-    );
-
-    registerRoute(
-      router,
-      'delete',
-      '/groups/:id',
-      passport.authenticate('jwt', { session: false }),
-      databaseValidationService.validateAuthor,
-      databaseValidationService.validateCommunity,
-      deleteGroupHandler.bind(this, serverControllers),
-    );
-  } else {
-    log.warn('GATING API DISABLED');
-  }
+  registerRoute(
+    router,
+    'delete',
+    '/groups/:id',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateCommunity,
+    deleteGroupHandler.bind(this, serverControllers),
+  );
 
   app.use(endpoint, router);
   app.use(methodNotAllowedMiddleware());

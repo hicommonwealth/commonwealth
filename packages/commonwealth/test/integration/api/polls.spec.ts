@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import * as modelUtils from 'test/util/modelUtils';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
+import models from '../../../server/database';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -12,8 +13,8 @@ const { expect } = chai;
 describe('Polls', () => {
   const chain = 'ethereum';
 
-  let userJWT;
-  let userAddress;
+  let userJWT: string;
+  let userAddress: string;
 
   let topicId;
   let threadId = 0;
@@ -22,7 +23,14 @@ describe('Polls', () => {
   before(async () => {
     await resetDatabase();
 
-    topicId = await modelUtils.getTopicId({ chain });
+    const topic = await models.Topic.findOne({
+      where: {
+        community_id: chain,
+        group_ids: [],
+      },
+    });
+    topicId = topic.id;
+
     const userRes = await modelUtils.createAndVerifyAddress({ chain });
     userAddress = userRes.address;
     userJWT = jwt.sign(
