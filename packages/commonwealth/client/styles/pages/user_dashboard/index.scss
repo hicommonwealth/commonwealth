@@ -1,7 +1,7 @@
 @import '../../shared';
 
 .UserDashboard {
-  display: flex;
+  //display: flex;
   flex: 1;
   justify-content: space-between;
   width: auto;
@@ -9,10 +9,10 @@
   @media (min-width: $breakpoint-medium-min-px) {
     /* CommunityPreviewCard 392px width +
        DashboardCommunitiesPreview 50px right edge */
-    margin-right: 442px;
+    //margin-right: 442px;
   }
 
-  @include contentPadding;
+  //@include contentPadding;
 
   .dashboard-column {
     display: flex;
