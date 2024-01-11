@@ -25,7 +25,8 @@
     "lint-branch-warnings": "FAIL_WARNINGS=1 ./scripts/lint-branch.sh",
     "stylelint": "stylelint packages/commonwealth/client/styles/*",
     "chromatic": "chromatic --exit-zero-on-changes",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "sanity": "chmod u+x scripts/sanity.sh && ./scripts/sanity.sh"
   },
   "engines": {
     "node": "18.x"
