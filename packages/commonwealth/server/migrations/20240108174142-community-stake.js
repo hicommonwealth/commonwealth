@@ -8,11 +8,11 @@ module.exports = {
         id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
         community_id: {
           type: Sequelize.STRING,
-          unique: true,
           references: {
             model: 'Communities',
             key: 'id',
           },
+          allowNull: false,
         },
         stake_id: { type: Sequelize.INTEGER, allowNull: false },
         stake_token: { type: Sequelize.STRING, allowNull: false },

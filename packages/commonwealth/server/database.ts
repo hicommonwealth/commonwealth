@@ -14,6 +14,7 @@ import CommunityContractFactory from './models/community_contract';
 import CommunityContractTemplateMetadataFactory from './models/community_contract_metadata';
 import CommunityContractTemplateFactory from './models/community_contract_template';
 import CommunitySnapshotSpaceFactory from './models/community_snapshot_spaces';
+import CommunityStakeFactory from './models/community_stake';
 import ContractFactory from './models/contract';
 import ContractAbiFactory from './models/contract_abi';
 import DiscordBotConfigFactory from './models/discord_bot_config';
@@ -111,6 +112,7 @@ const models: Models = {
   TaggedThread: TaggedThreadFactory(sequelize, DataTypes),
   User: UserModelFactory(sequelize, DataTypes),
   Webhook: WebhookFactory(sequelize, DataTypes),
+  CommunityStake: CommunityStakeFactory(sequelize, DataTypes),
 };
 
 const db: DB = {

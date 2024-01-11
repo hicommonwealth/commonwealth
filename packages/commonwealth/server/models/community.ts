@@ -186,6 +186,9 @@ export default (
       through: models.CommunityContract,
     });
     models.Community.hasMany(models.Group, { foreignKey: 'community_id' });
+    models.Community.hasMany(models.CommunityStake, {
+      foreignKey: 'community_id',
+    });
   };
 
   return Community;

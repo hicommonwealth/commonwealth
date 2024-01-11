@@ -3,7 +3,7 @@ import type { Express } from 'express';
 import express from 'express';
 import useragent from 'express-useragent';
 import passport from 'passport';
-import { putCommunityStakeHandler } from '../routes/communities/put_community_handler';
+import { putCommunityStakeHandler } from '../routes/communities/put_community_stakes_handler';
 
 import { TokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
 
@@ -373,6 +373,7 @@ function setupRouter(
     router,
     'put',
     '/communityStakes',
+    passport.authenticate('jwt', { session: false }),
     putCommunityStakeHandler.bind(this, serverControllers),
   );
 

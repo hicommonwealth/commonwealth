@@ -7,21 +7,32 @@ import { getNamespace } from './contractHelpers';
 
 export const validateCommunityStakeConfig = async (
   model: DB,
-  namespace: string,
+  communityId: string,
   id: number,
-  chain: validChains,
 ) => {
-  const factoryData = factoryContracts[chain];
-  const node = await model.ChainNode.findOne({
+  const node = await model.Community.findOne({
     where: {
-      eth_chain_id: factoryData.chainId,
+      id: communityId,
     },
-    attributes: ['url'],
+    include: [
+      {
+        model: this.models.ChainNode,
+        required: true,
+        attributes: ['eth_chain_id', 'url'],
+      },
+    ],
+    attributes: ['id', 'namespace'],
   });
+  if (!Object.values(validChains).includes(node.eth_chain_id)) {
+    throw new AppError(
+      "Community Stakes not configured for community's chain node",
+    );
+  }
+  const factoryData = factoryContracts[node.eth_chain_id];
   const web3 = new Web3(node.url);
   const namespaceAddress = await getNamespace(
     web3,
-    namespace,
+    node.namespace,
     factoryData.factory,
   );
   const communityStakes = new web3.eth.Contract(
