@@ -1,4 +1,4 @@
-import { StatsDController } from 'common-common/src/statsd';
+import { StatsDController } from '@hicommonwealth/adapters';
 import passport from 'passport';
 import passportJWT from 'passport-jwt';
 import { JWT_SECRET } from '../config';

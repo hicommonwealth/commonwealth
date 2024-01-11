@@ -1,5 +1,5 @@
 import chai from 'chai';
-import 'chai/register-should';
+
 import type { GetReactionsReq } from 'server/api/extApiTypes';
 import { OrderByOptions } from 'server/api/extApiTypes';
 import type { ReactionAttributes } from 'server/models/reaction';
@@ -11,7 +11,7 @@ import { get } from './appHook.spec';
 
 describe('getReactions Tests', () => {
   it('should return reactions with specified community_id correctly', async () => {
-    const r: GetReactionsReq = { community_id: testReactions[0].chain };
+    const r: GetReactionsReq = { community_id: testReactions[0].community_id };
     const resp = await get('/api/reactions', r, true);
 
     chai.assert.lengthOf(resp.result.reactions, 5);
@@ -19,7 +19,7 @@ describe('getReactions Tests', () => {
 
   it('should return reactions with specified addresses correctly', async () => {
     const r: GetReactionsReq = {
-      community_id: testReactions[0].chain,
+      community_id: testReactions[0].community_id,
       addresses: ['testAddress-1'],
     };
     let resp = await get('/api/reactions', r, true);
@@ -34,7 +34,7 @@ describe('getReactions Tests', () => {
 
   it('should paginate correctly', async () => {
     const r: GetReactionsReq = {
-      community_id: testReactions[0].chain,
+      community_id: testReactions[0].community_id,
       addresses: ['testAddress-2'],
       limit: 2,
     };
@@ -55,7 +55,7 @@ describe('getReactions Tests', () => {
 
   it('should order correctly', async () => {
     const r: GetReactionsReq = {
-      community_id: testReactions[0].chain,
+      community_id: testReactions[0].community_id,
       addresses: ['testAddress-2'],
       sort: OrderByOptions.CREATED,
     };

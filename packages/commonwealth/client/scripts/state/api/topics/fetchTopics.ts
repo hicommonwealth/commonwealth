@@ -8,9 +8,12 @@ const TOPICS_STALE_TIME = 30 * 1_000; // 30 s
 
 interface FetchTopicsProps {
   communityId: string;
+  apiEnabled?: boolean;
 }
 
-const fetchTopics = async ({ communityId }: FetchTopicsProps) => {
+const fetchTopics = async ({
+  communityId,
+}: FetchTopicsProps): Promise<Topic[]> => {
   const response = await axios.get(
     `${app.serverUrl()}${ApiEndpoints.BULK_TOPICS}`,
     {
@@ -23,11 +26,15 @@ const fetchTopics = async ({ communityId }: FetchTopicsProps) => {
   return response.data.result.map((t) => new Topic(t));
 };
 
-const useFetchTopicsQuery = ({ communityId }: FetchTopicsProps) => {
+const useFetchTopicsQuery = ({
+  communityId,
+  apiEnabled = true,
+}: FetchTopicsProps) => {
   return useQuery({
     queryKey: [ApiEndpoints.BULK_TOPICS, communityId],
     queryFn: () => fetchTopics({ communityId }),
     staleTime: TOPICS_STALE_TIME,
+    enabled: apiEnabled,
   });
 };
 

@@ -1,18 +1,18 @@
 import React from 'react';
 
-import app from '../../state';
+import { useBanProfileByAddressMutation } from 'state/api/profiles';
+import { CWText } from 'views/components/component_kit/cw_text';
 import {
   notifyError,
   notifySuccess,
 } from '../../controllers/app/notifications';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
+import app from '../../state';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
-import { useBanProfileByAddressMutation } from 'state/api/profiles';
-import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
 
 type BanUserModalAttrs = {
   onModalClose: () => void;
@@ -40,7 +40,7 @@ export const BanUserModal = ({ address, onModalClose }: BanUserModalAttrs) => {
       onModalClose();
       notifySuccess('Banned Address');
     } catch (e) {
-      notifyError('Ban Address Failed');
+      notifyError(e.response.data.error);
     }
   };
 

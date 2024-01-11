@@ -1,5 +1,5 @@
+import { AppError } from '@hicommonwealth/adapters';
 import { BalanceType } from '@hicommonwealth/core';
-import { AppError } from 'common-common/src/errors';
 import type { DB } from '../models';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 

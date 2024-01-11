@@ -1,6 +1,6 @@
+import { AppError } from '@hicommonwealth/adapters';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestParams, TypedResponse, success } from '../../types';
-import { AppError } from '../../../../common-common/src/errors';
 
 const Errors = {
   InvalidThreadID: 'Invalid thread ID',
@@ -12,7 +12,7 @@ type DeleteThreadResponse = void;
 export const deleteBotThreadHandler = async (
   controllers: ServerControllers,
   req: TypedRequestParams<DeleteBotThreadRequestParams>,
-  res: TypedResponse<DeleteThreadResponse>
+  res: TypedResponse<DeleteThreadResponse>,
 ) => {
   const { user, address } = req;
   const { message_id } = req.params;

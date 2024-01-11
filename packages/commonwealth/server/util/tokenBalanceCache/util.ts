@@ -1,11 +1,12 @@
-import { factory, formatFilename } from 'common-common/src/logging';
+import { HttpBatchClient, Tendermint34Client } from '@cosmjs/tendermint-rpc';
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import AbiCoder from 'web3-eth-abi';
 import { toBN } from 'web3-utils';
 import { ChainNodeAttributes } from '../../models/chain_node';
 import { rollbar } from '../rollbar';
-import { Balances } from './types';
+import { Balances, GetTendermintClientOptions } from './types';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 /**
  * This function batches hundreds of RPC requests (1 per address) into a few batched RPC requests.
@@ -307,4 +308,17 @@ export async function evmRpcRequest(
   }
 
   return data;
+}
+
+export async function getTendermintClient(
+  options: GetTendermintClientOptions,
+): Promise<Tendermint34Client> {
+  const batchClient = new HttpBatchClient(
+    options.chainNode?.private_url || options.chainNode.url,
+    {
+      batchSizeLimit: options.batchSize || 100,
+      dispatchInterval: 10,
+    },
+  );
+  return await Tendermint34Client.create(batchClient);
 }

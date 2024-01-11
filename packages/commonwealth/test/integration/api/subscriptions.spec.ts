@@ -3,7 +3,7 @@
 import { NotificationCategories } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import 'chai/register-should';
+
 import jwt from 'jsonwebtoken';
 import type NotificationSubscription from '../../../client/scripts/models/NotificationSubscription';
 import app, { resetDatabase } from '../../../server-test';
@@ -23,11 +23,13 @@ describe('Subscriptions Tests', () => {
     loggedInSession,
     thread,
     comment,
+    topicId,
     userId: number;
   const chain = 'ethereum';
 
   before('reset database', async () => {
     await resetDatabase();
+    topicId = await modelUtils.getTopicId({ chain });
     // get logged in address/user with JWT
     const result = await modelUtils.createAndVerifyAddress({ chain });
     loggedInAddr = result.address;
@@ -47,8 +49,7 @@ describe('Subscriptions Tests', () => {
       body: 't',
       kind: 'discussion',
       stage: 'discussion',
-      topicName: 't',
-      topicId: undefined,
+      topicId,
       session: loggedInSession.session,
       sign: loggedInSession.sign,
     });

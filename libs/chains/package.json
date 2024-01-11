@@ -8,17 +8,17 @@
   ],
   "main": "build/index",
   "scripts": {
-    "build": "tsc --build",
+    "build": "tsc -b",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
     "test": "NODE_ENV=test ts-mocha '__tests__/**/*.spec.ts'"
   },
   "dependencies": {
-    "@canvas-js/interfaces": "^0.5.0-alpha4",
-    "@cosmjs/amino": "^0.31.0",
-    "@cosmjs/proto-signing": "^0.31.0",
-    "@cosmjs/stargate": "^0.31.0",
-    "@cosmjs/tendermint-rpc": "^0.31.0",
+    "@canvas-js/interfaces": "0.5.0-alpha4",
+    "@cosmjs/amino": "^0.31.3",
+    "@cosmjs/proto-signing": "^0.31.3",
+    "@cosmjs/stargate": "^0.31.3",
+    "@cosmjs/tendermint-rpc": "^0.31.3",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/address": "^5.7.0",
     "@ethersproject/bytes": "^5.7.0",

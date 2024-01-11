@@ -81,6 +81,18 @@
       .content-body {
         @include multiline-text-ellipsis($max-lines: 2);
         word-break: break-word;
+
+        .MarkdownFormattedText {
+          @include caption;
+
+          h1,
+          h2,
+          h3,
+          h4,
+          h5 {
+            font-size: 12px;
+          }
+        }
       }
 
       .content-title {

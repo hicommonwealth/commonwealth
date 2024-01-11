@@ -1,4 +1,4 @@
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError, ServerError } from '@hicommonwealth/adapters';
 import { validURL } from '../../shared/utils';
 import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
@@ -24,7 +24,7 @@ type updateCustomDomainResp = {
 const updateChainCustomDomain = async (
   models: DB,
   req: TypedRequestBody<updateCustomDomainReq>,
-  res: TypedResponse<updateCustomDomainResp>
+  res: TypedResponse<updateCustomDomainResp>,
 ) => {
   // Verify Chain Exists
   const { chain_id, custom_domain, secret } = req.body;
