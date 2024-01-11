@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
@@ -28,7 +29,7 @@ const ProfileRedirect = (props: ProfileRedirectProps) => {
     apiCallEnabled: !!address && !!communityId,
   });
 
-  useEffect(() => {
+  useNecessaryEffect(() => {
     if (!isError && users && Array.isArray(users) && users[0]?.id) {
       navigate(`/profile/id/${users[0].id}`, {}, null);
     } else {
