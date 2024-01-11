@@ -49,7 +49,7 @@ async function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-describe('EVM Chain Events End to End Tests', () => {
+describe.only('EVM Chain Events End to End Tests', () => {
   const sandbox = sinon.createSandbox();
   let clock: sinon.SinonFakeTimers;
   let propCreatedResult: { block: number; proposalId: string };
@@ -120,7 +120,7 @@ describe('EVM Chain Events End to End Tests', () => {
     const notifications = await models.Notification.findAll();
     expect(notifications.length).to.equal(1);
     const notification = notifications[0].toJSON();
-    expect(notification).to.have.own.property('chain_id', testChainId);
+    expect(notification).to.have.own.property('community_id', testChainId);
     expect(notification).to.have.own.property(
       'category_id',
       NotificationCategories.ChainEvent,
