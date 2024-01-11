@@ -122,7 +122,7 @@ async function getExistingNotifications(
     existingNotifications = await models.Notification.findAll({
       where: {
         category_id: NotificationCategories.ChainEvent,
-        chain_id: chainId,
+        community_id: chainId,
       },
       order: Sequelize.literal(`RANDOM()`),
       limit: 1,
@@ -167,7 +167,7 @@ async function setupNotification(
     const existingCeMockNotif = await models.Notification.findAll({
       where: {
         category_id: NotificationCategories.ChainEvent,
-        chain_id: chainId,
+        community_id: chainId,
         chain_event_id: mockNotif.id || null,
         [Sequelize.Op.and]: [
           Sequelize.literal(

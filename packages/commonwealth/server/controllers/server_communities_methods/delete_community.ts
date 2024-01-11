@@ -152,7 +152,7 @@ export async function __deleteCommunity(
 
           // notifications + notifications_read (cascade)
           await this.models.Notification.destroy({
-            where: { chain_id: community.id },
+            where: { community_id: community.id },
             transaction: t,
           });
 

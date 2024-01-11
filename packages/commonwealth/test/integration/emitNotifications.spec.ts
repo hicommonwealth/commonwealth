@@ -134,7 +134,7 @@ describe('emitNotifications tests', () => {
 
       const notif = await models.Notification.findOne({
         where: {
-          chain_id: chain,
+          community_id: chain,
           category_id: NotificationCategories.NewThread,
           thread_id: thread.id,
         },
@@ -190,7 +190,7 @@ describe('emitNotifications tests', () => {
 
       const notif = await models.Notification.findOne({
         where: {
-          chain_id: chain,
+          community_id: chain,
           category_id: NotificationCategories.NewComment,
         },
       });
@@ -249,7 +249,7 @@ describe('emitNotifications tests', () => {
 
       const notif = await models.Notification.findOne({
         where: {
-          chain_id: chain,
+          community_id: chain,
           category_id: NotificationCategories.NewReaction,
           thread_id: thread.id,
         },
@@ -440,7 +440,7 @@ describe('emitNotifications tests', () => {
 
       const notif = await models.Notification.findOne({
         where: {
-          chain_id: chain,
+          community_id: chain,
           category_id: NotificationCategories.ChainEvent,
           chain_event_id: chainEventId,
         },

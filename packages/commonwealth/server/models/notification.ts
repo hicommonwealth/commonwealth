@@ -15,7 +15,7 @@ const log = loggerFactory.getLogger(formatFilename(__filename));
 export type NotificationAttributes = {
   id: number;
   notification_data: string;
-  chain_id?: string;
+  community_id?: string;
   category_id: string;
   chain_event_id?: number;
   entity_id: number;
@@ -43,7 +43,7 @@ export default (
       chain_event_id: { type: dataTypes.INTEGER, allowNull: true },
       entity_id: { type: dataTypes.INTEGER, allowNull: true },
       // eslint-disable-next-line max-len
-      chain_id: { type: dataTypes.STRING, allowNull: true }, // for backwards compatibility of threads associated with OffchainCommunities rather than a proper chain
+      community_id: { type: dataTypes.STRING, allowNull: true }, // for backwards compatibility of threads associated with OffchainCommunities rather than a proper chain
       category_id: { type: dataTypes.STRING, allowNull: false },
       thread_id: { type: dataTypes.INTEGER, allowNull: true },
     },
@@ -82,7 +82,10 @@ export default (
       underscored: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-      indexes: [{ fields: ['chain_event_id'], prefix: 'new' }],
+      indexes: [
+        { fields: ['chain_event_id'], unique: true },
+        { fields: ['thread_id'] },
+      ],
     },
   );
 
@@ -97,7 +100,7 @@ export default (
       targetKey: 'name',
     });
     models.Notification.belongsTo(models.Community, {
-      foreignKey: 'chain_id',
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
     models.Notification.belongsTo(models.Thread, {

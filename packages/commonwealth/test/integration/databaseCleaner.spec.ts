@@ -158,14 +158,14 @@ describe('DatabaseCleaner Tests', () => {
       await models.Notification.create({
         notification_data: 'testing',
         created_at: hundredDaysAgo,
-        chain_id: 'ethereum',
+        community_id: 'ethereum',
         category_id: 'new-thread-creation',
       });
 
       // create new notification
       await models.Notification.create({
         notification_data: 'testing',
-        chain_id: 'ethereum',
+        community_id: 'ethereum',
         created_at: eightyEightDaysAgo,
         category_id: 'new-thread-creation',
       });
