@@ -10,7 +10,7 @@ import {
   getTestSubscription,
 } from './util';
 
-describe.only('scheduleNodeProcessing', () => {
+describe('scheduleNodeProcessing', () => {
   const sandbox = sinon.createSandbox();
   let processChainStub: sinon.SinonSpy;
   let clock: sinon.SinonFakeTimers;
