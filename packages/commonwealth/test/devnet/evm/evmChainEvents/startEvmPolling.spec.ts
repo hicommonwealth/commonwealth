@@ -49,7 +49,7 @@ async function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-describe.only('EVM Chain Events End to End Tests', () => {
+describe('EVM Chain Events End to End Tests', () => {
   const sandbox = sinon.createSandbox();
   let clock: sinon.SinonFakeTimers;
   let propCreatedResult: { block: number; proposalId: string };
