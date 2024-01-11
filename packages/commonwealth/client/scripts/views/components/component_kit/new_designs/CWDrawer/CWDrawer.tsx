@@ -34,7 +34,8 @@ export const CWDrawer = ({
       open={open}
       onClose={onClose}
       direction={direction || 'right'}
-      enableOverlay={false}
+      enableOverlay={true}
+      overlayOpacity={0}
       className={ComponentType.Drawer}
       // moves the drawer below the top navigation bar
       style={{ top: '56px' }}
