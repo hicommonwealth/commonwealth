@@ -45,7 +45,7 @@ const createValidComment = async (threadId, text, jwtToken) => {
 const getUniqueCommentText = async () => {
   const time = new Date().getMilliseconds();
   const text = `testCommentCreated at ${time}`;
-  let comment = await models.Comment.findOne({
+  const comment = await models.Comment.findOne({
     where: { text },
   });
   chai.assert.isNull(comment);
@@ -128,7 +128,7 @@ describe('createComment Integration Tests', () => {
       text,
       jwtTokenUser1,
     );
-    let comment = await models.Comment.findOne({
+    const comment = await models.Comment.findOne({
       where: { text },
     });
     chai.assert.isNotNull(comment);
@@ -137,7 +137,7 @@ describe('createComment Integration Tests', () => {
 
   it('should create and delete comment and verify thread comment counts', async () => {
     const text = await getUniqueCommentText();
-    let beforeCommentCount = await getThreadCommentCount(testThreads[0].id);
+    const beforeCommentCount = await getThreadCommentCount(testThreads[0].id);
 
     const response = await createValidComment(
       testThreads[0].id,
