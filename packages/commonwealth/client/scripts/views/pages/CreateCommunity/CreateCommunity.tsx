@@ -7,6 +7,7 @@ import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrac
 
 import './CreateCommunity.scss';
 import BasicInformationStep from './steps/BasicInformationStep';
+import CommunityStakeStep from './steps/CommunityStakeStep';
 import CommunityTypeStep from './steps/CommunityTypeStep';
 import SuccessStep from './steps/SuccessStep';
 import { CreateCommunityStep, getFormSteps } from './utils';
@@ -54,6 +55,9 @@ const CreateCommunity = () => {
             }}
           />
         );
+
+      case CreateCommunityStep.CommunityStake:
+        return <CommunityStakeStep />;
 
       case CreateCommunityStep.Success:
         return <SuccessStep communityId={createdCommunityId} />;

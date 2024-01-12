@@ -1,0 +1,47 @@
+@import '../../../../../../styles/shared';
+
+.CommunityStakeStep {
+  display: flex;
+
+  .CreateCommunityHint {
+    max-width: 244px;
+  }
+
+  .header {
+    margin-top: 8px;
+    width: 100%;
+    display: flex;
+    gap: 16px;
+    flex-direction: column;
+    max-width: 596px;
+    margin-right: 110px;
+
+    .description {
+      color: $neutral-500;
+    }
+
+    .form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .info {
+      display: inline-block;
+
+      a {
+        margin-left: 4px;
+        color: $primary-600;
+      }
+    }
+
+    .Divider {
+      margin-block: 8px;
+    }
+
+    .action-buttons {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+}
