@@ -177,6 +177,7 @@ export const CommentCard = ({
               {!isThreadArchived && replyBtnVisible && (
                 <CWThreadAction
                   action="reply"
+                  label="Reply"
                   disabled={maxReplyLimitReached || !canReply}
                   tooltipText={
                     disabledActionsTooltipText

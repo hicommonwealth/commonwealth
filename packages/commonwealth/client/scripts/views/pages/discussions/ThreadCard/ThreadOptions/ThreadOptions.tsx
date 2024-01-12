@@ -1,4 +1,3 @@
-import { pluralize } from 'helpers';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import Thread from 'models/Thread';
 import React, { useState } from 'react';
@@ -52,7 +51,7 @@ export const ThreadOptions = ({
   const [isSubscribed, setIsSubscribed] = useState(
     thread &&
       getCommentSubscription(thread)?.isActive &&
-      getReactionSubscription(thread)?.isActive
+      getReactionSubscription(thread)?.isActive,
   );
 
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
@@ -71,7 +70,7 @@ export const ThreadOptions = ({
       getCommentSubscription(thread),
       getReactionSubscription(thread),
       isSubscribed,
-      setIsSubscribed
+      setIsSubscribed,
     );
   };
 
@@ -94,7 +93,7 @@ export const ThreadOptions = ({
 
         {commentBtnVisible && totalComments >= 0 && (
           <CWThreadAction
-            label={`${pluralize(totalComments, 'Comment')}`}
+            label={`${totalComments}`}
             action="comment"
             disabled={!canComment}
             onClick={onCommentBtnClick}
@@ -111,7 +110,6 @@ export const ThreadOptions = ({
           action="subscribe"
           onClick={handleToggleSubscribe}
           selected={!isSubscribed}
-          label={isSubscribed ? 'Unsubscribe' : 'Subscribe'}
           disabled={!hasJoinedCommunity}
         />
 
