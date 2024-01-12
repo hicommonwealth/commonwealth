@@ -1,6 +1,10 @@
 import { fromBech32, toBech32 } from '@cosmjs/encoding';
 import { RedisCache, StatsDController } from '@hicommonwealth/adapters';
-import { RedisNamespaces, logger } from '@hicommonwealth/core';
+import {
+  BalanceSourceType,
+  RedisNamespaces,
+  logger,
+} from '@hicommonwealth/core';
 import Web3 from 'web3';
 import { DB } from '../../models';
 import { rollbar } from '../rollbar';
