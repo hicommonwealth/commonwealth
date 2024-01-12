@@ -5,50 +5,18 @@ import { featureFlags } from 'helpers/feature-flags';
 import { useCommonNavigate } from 'navigation/helpers';
 import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
-import { sidebarStore } from 'state/ui/sidebar';
-import { isWindowSmallInclusive } from '../component_kit/helpers';
-import { verifyCachedToggleTree } from './helpers';
-import { SidebarSectionGroup } from './sidebar_section';
-import type {
-  SectionGroupAttrs,
-  SidebarSectionAttrs,
-  ToggleTree,
-} from './types';
-
-const resetSidebarState = () => {
-  if (isWindowSmallInclusive(window.innerWidth)) {
-    sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
-  } else {
-    sidebarStore.getState().setMenu({ name: 'default', isVisible: true });
-  }
-};
-
-const setAdminToggleTree = (path: string, toggle: boolean) => {
-  let currentTree = JSON.parse(
-    localStorage[`${app.activeChainId()}-admin-toggle-tree`],
-  );
-
-  const split = path.split('.');
-
-  for (const field of split.slice(0, split.length - 1)) {
-    if (Object.prototype.hasOwnProperty.call(currentTree, field)) {
-      currentTree = currentTree[field];
-    } else {
-      return;
-    }
-  }
-
-  currentTree[split[split.length - 1]] = !toggle;
-
-  const newTree = currentTree;
-
-  localStorage[`${app.activeChainId()}-admin-toggle-tree`] =
-    JSON.stringify(newTree);
-};
+import { SidebarSectionGroup } from '../sidebar_section';
+import type { SectionGroupAttrs, SidebarSectionAttrs } from '../types';
+import { useSidebarTreeToggle } from '../useSidebarTreeToggle';
 
 const AdminSection = () => {
   const navigate = useCommonNavigate();
   const location = useLocation();
+  const { resetSidebarState, setToggleTree, toggledTreeState } =
+    useSidebarTreeToggle({
+      treeName: 'admin',
+      localStorageKey: `${app.activeChainId()}-admin-toggle-tree`,
+    });
 
   const matchesCommunityProfileRoute = matchRoutes(
     [{ path: '/community-profile' }, { path: ':scope/community-profile' }],
@@ -99,7 +67,7 @@ const AdminSection = () => {
           `/community-profile`,
           app.activeChainId(),
           () => {
-            setAdminToggleTree(`children.manageCommunity.toggledState`, toggle);
+            setToggleTree(`children.communityProfile.toggledState`, toggle);
           },
         );
       },
@@ -121,7 +89,7 @@ const AdminSection = () => {
           `/community-integrations`,
           app.activeChainId(),
           () => {
-            setAdminToggleTree(`children.manageCommunity.toggledState`, toggle);
+            setToggleTree(`children.integrations.toggledState`, toggle);
           },
         );
       },
@@ -143,7 +111,7 @@ const AdminSection = () => {
           `/community-topics`,
           app.activeChainId(),
           () => {
-            setAdminToggleTree(`children.manageCommunity.toggledState`, toggle);
+            setToggleTree(`children.topics.toggledState`, toggle);
           },
         );
       },
@@ -165,7 +133,7 @@ const AdminSection = () => {
           `/community-moderators`,
           app.activeChainId(),
           () => {
-            setAdminToggleTree(`children.manageCommunity.toggledState`, toggle);
+            setToggleTree(`children.adminsAndModerators.toggledState`, toggle);
           },
         );
       },
@@ -187,7 +155,7 @@ const AdminSection = () => {
           `/members`,
           app.activeChainId(),
           () => {
-            setAdminToggleTree(`children.manageCommunity.toggledState`, toggle);
+            setToggleTree(`children.membersAndGroups.toggledState`, toggle);
           },
         );
       },
@@ -209,7 +177,7 @@ const AdminSection = () => {
           `/analytics`,
           app.activeChainId(),
           () => {
-            setAdminToggleTree(`children.analytics.toggledState`, toggle);
+            setToggleTree(`children.analytics.toggledState`, toggle);
           },
         );
       },
@@ -233,7 +201,7 @@ const AdminSection = () => {
                 `/contracts`,
                 app.activeChainId(),
                 () => {
-                  setAdminToggleTree(`children.contracts.toggledState`, toggle);
+                  setToggleTree(`children.contracts.toggledState`, toggle);
                 },
               );
             },
@@ -242,34 +210,13 @@ const AdminSection = () => {
       : []),
   ];
 
-  // Build Toggle Tree
-  const adminDefaultToggleTree: ToggleTree = {
-    toggledState: false,
-    children: {},
-  };
-
-  // Check if an existing toggle tree is stored
-  if (!localStorage[`${app.activeChainId()}-admin-toggle-tree`]) {
-    localStorage[`${app.activeChainId()}-admin-toggle-tree`] = JSON.stringify(
-      adminDefaultToggleTree,
-    );
-  } else if (!verifyCachedToggleTree('admin', adminDefaultToggleTree)) {
-    localStorage[`${app.activeChainId()}-admin-toggle-tree`] = JSON.stringify(
-      adminDefaultToggleTree,
-    );
-  }
-
-  const toggleTreeState = JSON.parse(
-    localStorage[`${app.activeChainId()}-admin-toggle-tree`],
-  );
-
   const sidebarSectionData: SidebarSectionAttrs = {
     title: 'Admin Capabilities',
     className: 'AdminSection',
-    hasDefaultToggle: toggleTreeState['toggledState'],
+    hasDefaultToggle: toggledTreeState['toggledState'],
     onClick: (e, toggle: boolean) => {
       e.preventDefault();
-      setAdminToggleTree('toggledState', toggle);
+      setToggleTree('toggledState', toggle);
     },
     displayData: adminGroupData,
     isActive: true,
