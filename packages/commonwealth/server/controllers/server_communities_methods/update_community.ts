@@ -16,7 +16,7 @@ export const Errors = {
   NotLoggedIn: 'Not signed in',
   NoCommunityId: 'Must provide community ID',
   ReservedId: 'The id is reserved and cannot be used',
-  CantChangeNetwork: 'Cannot change chain network',
+  CantChangeNetwork: 'Cannot change community network',
   NotAdmin: 'Not an admin',
   NoCommunityFound: 'Community not found',
   InvalidSocialLink: 'Social Link must begin with http(s)://',
@@ -55,8 +55,8 @@ export async function __updateCommunity(
     throw new AppError(Errors.CantChangeNetwork);
   }
 
-  const chain = await this.models.Community.findOne({ where: { id: id } });
-  if (!chain) {
+  const community = await this.models.Community.findOne({ where: { id: id } });
+  if (!community) {
     throw new AppError(Errors.NoCommunityFound);
   } else {
     const userAddressIds = (await user.getAddresses())
@@ -65,7 +65,7 @@ export async function __updateCommunity(
     const userMembership = await findOneRole(
       this.models,
       { where: { address_id: { [Op.in]: userAddressIds } } },
-      chain.id,
+      community.id,
       ['admin'],
     );
     if (!user.isAdmin && !userMembership) {
@@ -119,7 +119,7 @@ export async function __updateCommunity(
     })
   ) {
     throw new AppError(Errors.InvalidSnapshot);
-  } else if (snapshot.length > 0 && chain.base !== ChainBase.Ethereum) {
+  } else if (snapshot.length > 0 && community.base !== ChainBase.Ethereum) {
     throw new AppError(Errors.SnapshotOnlyOnEthereum);
   } else if (terms && !urlHasValidHTTPPrefix(terms)) {
     throw new AppError(Errors.InvalidTerms);
@@ -127,7 +127,7 @@ export async function __updateCommunity(
 
   const snapshotSpaces: CommunitySnapshotSpaceWithSpaceAttached[] =
     await this.models.CommunitySnapshotSpaces.findAll({
-      where: { community_id: chain.id },
+      where: { community_id: community.id },
       include: {
         model: this.models.SnapshotSpace,
         as: 'snapshot_space',
@@ -155,7 +155,7 @@ export async function __updateCommunity(
       // if it isnt, create it
       await this.models.CommunitySnapshotSpaces.create({
         snapshot_space_id: spaceModelInstance[0].snapshot_space,
-        community_id: chain.id,
+        community_id: community.id,
       });
     }
   }
@@ -165,39 +165,39 @@ export async function __updateCommunity(
     await this.models.CommunitySnapshotSpaces.destroy({
       where: {
         snapshot_space_id: removedSpace.snapshot_space_id,
-        community_id: chain.id,
+        community_id: community.id,
       },
     });
   }
 
-  if (name) chain.name = name;
-  if (description) chain.description = description;
-  if (default_symbol) chain.default_symbol = default_symbol;
-  if (icon_url) chain.icon_url = icon_url;
-  if (active !== undefined) chain.active = active;
-  if (type) chain.type = type;
+  if (name) community.name = name;
+  if (description) community.description = description;
+  if (default_symbol) community.default_symbol = default_symbol;
+  if (icon_url) community.icon_url = icon_url;
+  if (active !== undefined) community.active = active;
+  if (type) community.type = type;
   if (nonEmptySocialLinks !== undefined && nonEmptySocialLinks.length > 0)
-    chain.social_links = nonEmptySocialLinks;
-  if (hide_projects) chain.hide_projects = hide_projects;
-  if (stages_enabled) chain.stages_enabled = stages_enabled;
-  if (custom_stages) chain.custom_stages = custom_stages;
-  if (terms) chain.terms = terms;
-  if (has_homepage) chain.has_homepage = has_homepage;
+    community.social_links = nonEmptySocialLinks;
+  if (hide_projects) community.hide_projects = hide_projects;
+  if (stages_enabled) community.stages_enabled = stages_enabled;
+  if (custom_stages) community.custom_stages = custom_stages;
+  if (terms) community.terms = terms;
+  if (has_homepage) community.has_homepage = has_homepage;
   if (default_page) {
     if (!has_homepage) {
       throw new AppError(Errors.InvalidDefaultPage);
     } else {
-      chain.default_page = default_page;
+      community.default_page = default_page;
     }
   }
   if (chain_node_id) {
-    chain.chain_node_id = chain_node_id;
+    community.chain_node_id = chain_node_id;
   }
 
   let mixpanelEvent: MixpanelCommunityInteractionEvent;
   let communitySelected = null;
 
-  if (chain.directory_page_enabled !== directory_page_enabled) {
+  if (community.directory_page_enabled !== directory_page_enabled) {
     mixpanelEvent = directory_page_enabled
       ? MixpanelCommunityInteractionEvent.DIRECTORY_PAGE_ENABLED
       : MixpanelCommunityInteractionEvent.DIRECTORY_PAGE_DISABLED;
@@ -210,15 +210,15 @@ export async function __updateCommunity(
   }
 
   if (directory_page_enabled !== undefined) {
-    chain.directory_page_enabled = directory_page_enabled;
+    community.directory_page_enabled = directory_page_enabled;
   }
   if (directory_page_chain_node_id !== undefined) {
-    chain.directory_page_chain_node_id = directory_page_chain_node_id;
+    community.directory_page_chain_node_id = directory_page_chain_node_id;
   }
 
   // TODO Graham 3/31/22: Will this potentially lead to undesirable effects if toggle
   // is left un-updated? Is there a better approach?
-  chain.default_summary_view = default_summary_view || false;
+  community.default_summary_view = default_summary_view || false;
 
   // Under our current security policy, custom domains must be set by trusted
   // administrators only. Otherwise an attacker could configure a custom domain and
@@ -226,7 +226,7 @@ export async function __updateCommunity(
   //
   // chain.custom_domain = custom_domain;
 
-  await chain.save();
+  await community.save();
 
   // Suggested solution for serializing BigInts
   // https://github.com/GoogleChromeLabs/jsbi/issues/30#issuecomment-1006086291
@@ -236,11 +236,11 @@ export async function __updateCommunity(
 
   const analyticsOptions = {
     event: mixpanelEvent,
-    community: chain.id,
+    community: community.id,
     userId: user.id,
     isCustomDomain: null,
     ...(communitySelected && { communitySelected: communitySelected.id }),
   };
 
-  return { ...chain.toJSON(), snapshot, analyticsOptions };
+  return { ...community.toJSON(), snapshot, analyticsOptions };
 }

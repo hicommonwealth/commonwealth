@@ -1,14 +1,17 @@
-import { NotificationCategories, logger } from '@hicommonwealth/core';
-import { capitalize } from 'lodash';
-import { Op, WhereOptions } from 'sequelize';
-import { Label as ChainEventLabel } from '../../shared/chain/labelers/util';
-import type { CWEvent } from '../../shared/chain/types/types';
 import type {
   IChainEventNotificationData,
   IForumNotificationData,
   ISnapshotNotificationData,
-} from '../../shared/types';
-import { DynamicTemplate } from '../../shared/types';
+} from '@hicommonwealth/core';
+import {
+  DynamicTemplate,
+  NotificationCategories,
+  logger,
+} from '@hicommonwealth/core';
+import { capitalize } from 'lodash';
+import { Op, WhereOptions } from 'sequelize';
+import { Label as ChainEventLabel } from '../../shared/chain/labelers/util';
+import type { CWEvent } from '../../shared/chain/types/types';
 import {
   formatAddressShort,
   getThreadUrl,

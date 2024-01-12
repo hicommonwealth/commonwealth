@@ -1,10 +1,10 @@
 import {
   NotificationCategories,
+  NotificationDataAndCategory,
   SupportedNetwork,
   logger,
 } from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
-import { NotificationDataAndCategory } from 'types';
 import models from '../../database';
 import { CommunityAttributes } from '../../models/community';
 import { ContractAttributes } from '../../models/contract';

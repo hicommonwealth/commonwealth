@@ -2,9 +2,12 @@ import {
   RmqSnapshotNotification,
   StatsDController,
 } from '@hicommonwealth/adapters';
-import { ILogger, NotificationCategories } from '@hicommonwealth/core';
+import {
+  ILogger,
+  NotificationCategories,
+  SnapshotEventType,
+} from '@hicommonwealth/core';
 import axios from 'axios';
-import { SnapshotEventType } from 'types';
 import type { DB } from '../../../models';
 import emitNotifications from '../../../util/emitNotifications';
 

@@ -1,9 +1,8 @@
 import { AppError } from '@hicommonwealth/adapters';
-import { WalletId, logger } from '@hicommonwealth/core';
+import { DynamicTemplate, WalletId, logger } from '@hicommonwealth/core';
 import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
-import { DynamicTemplate } from '../../shared/types';
 import {
   LOGIN_RATE_LIMIT_MINS,
   LOGIN_RATE_LIMIT_TRIES,

@@ -1,6 +1,9 @@
-import { NotificationCategories, logger } from '@hicommonwealth/core';
+import {
+  NotificationCategories,
+  NotificationDataAndCategory,
+  logger,
+} from '@hicommonwealth/core';
 import { Op } from 'sequelize';
-import { NotificationDataAndCategory } from '../../../shared/types';
 import { slugify } from '../../../shared/utils';
 import { DEFAULT_COMMONWEALTH_LOGO, SERVER_URL } from '../../config';
 import models from '../../database';

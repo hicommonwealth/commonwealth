@@ -1,6 +1,9 @@
 import { StatsDController } from '@hicommonwealth/adapters';
-import { NotificationCategories, logger } from '@hicommonwealth/core';
-import { NotificationDataAndCategory } from '../../../shared/types';
+import {
+  NotificationCategories,
+  NotificationDataAndCategory,
+  logger,
+} from '@hicommonwealth/core';
 import models from '../../database';
 import { CommunityInstance } from '../../models/community';
 import { WebhookInstance } from '../../models/webhook';

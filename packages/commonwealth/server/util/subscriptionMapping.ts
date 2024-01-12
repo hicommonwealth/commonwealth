@@ -1,5 +1,8 @@
-import { NotificationCategories, logger } from '@hicommonwealth/core';
-import { NotificationDataAndCategory } from '../../shared/types';
+import {
+  NotificationCategories,
+  NotificationDataAndCategory,
+  logger,
+} from '@hicommonwealth/core';
 
 const log = logger().getLogger(__filename);
 

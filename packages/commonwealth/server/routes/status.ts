@@ -1,5 +1,5 @@
 import { ServerError } from '@hicommonwealth/adapters';
-import type { ChainCategoryType } from '@hicommonwealth/core';
+import { CommunityCategoryType } from '@hicommonwealth/core';
 import jwt from 'jsonwebtoken';
 import { Op, QueryTypes } from 'sequelize';
 import type { AddressInstance } from 'server/models/address';
@@ -43,7 +43,7 @@ type StatusResp = {
   };
   evmTestEnv?: string;
   enforceSessionKeys?: boolean;
-  chainCategoryMap: { [chain: string]: ChainCategoryType[] };
+  chainCategoryMap: { [chain: string]: CommunityCategoryType[] };
 };
 
 const getChainStatus = async (models: DB) => {
@@ -54,10 +54,10 @@ const getChainStatus = async (models: DB) => {
     models.NotificationCategory.findAll(),
   ]);
 
-  const chainCategories: { [chain: string]: ChainCategoryType[] } = {};
+  const chainCategories: { [chain: string]: CommunityCategoryType[] } = {};
   for (const chain of chains) {
     if (chain.category !== null) {
-      chainCategories[chain.id] = chain.category as ChainCategoryType[];
+      chainCategories[chain.id] = chain.category as CommunityCategoryType[];
     }
   }
 
