@@ -30,7 +30,7 @@ export async function getDigestEmailsData(
 ): Promise<DigestEmailsData> {
   let intervalQuery = '24 hours';
   if (interval === 'weekly') {
-    intervalQuery = '60 days';
+    intervalQuery = '7 days';
   }
 
   const notifPerUser = (await models.sequelize.query(
@@ -61,7 +61,6 @@ export async function getDigestEmailsData(
     notifications: NotificationAttributes[];
   }>;
 
-  console.log('>>>>>>>>>>>>>>>>>>', notifPerUser);
   const emailsData: DigestEmailsData = {};
   for (const user of notifPerUser) {
     for (const notif of user.notifications) {
