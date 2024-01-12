@@ -1,3 +1,4 @@
+import { ViewUpvotesDrawer } from 'client/scripts/views/components/view_upvotes_drawer';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import Thread from 'models/Thread';
 import React, { useState } from 'react';
@@ -23,6 +24,7 @@ type OptionsProps = AdminActionsProps & {
   totalComments?: number;
   disabledActionTooltipText?: string;
   onCommentBtnClick?: () => any;
+  upvoteDrawerBtnBelow?: boolean;
 };
 
 export const ThreadOptions = ({
@@ -47,6 +49,7 @@ export const ThreadOptions = ({
   hasPendingEdits,
   disabledActionTooltipText = '',
   onCommentBtnClick = () => null,
+  upvoteDrawerBtnBelow,
 }: OptionsProps) => {
   const [isSubscribed, setIsSubscribed] = useState(
     thread &&
@@ -82,52 +85,58 @@ export const ThreadOptions = ({
           e.preventDefault();
         }}
       >
-        {upvoteBtnVisible && thread && (
-          <ReactionButton
-            thread={thread}
-            size="small"
-            disabled={!canReact}
-            tooltipText={disabledActionTooltipText}
-          />
-        )}
+        <div className="options-container">
+          {upvoteBtnVisible && thread && (
+            <ReactionButton
+              thread={thread}
+              size="small"
+              disabled={!canReact}
+              tooltipText={disabledActionTooltipText}
+            />
+          )}
 
-        {commentBtnVisible && totalComments >= 0 && (
+          {commentBtnVisible && totalComments >= 0 && (
+            <CWThreadAction
+              label={`${totalComments}`}
+              action="comment"
+              disabled={!canComment}
+              onClick={onCommentBtnClick}
+              tooltipText={disabledActionTooltipText}
+            />
+          )}
+
+          <SharePopover
+            // if share endpoint is present it will be used, else the current url will be used
+            discussionLink={shareEndpoint}
+          />
+
           <CWThreadAction
-            label={`${totalComments}`}
-            action="comment"
-            disabled={!canComment}
-            onClick={onCommentBtnClick}
-            tooltipText={disabledActionTooltipText}
+            action="subscribe"
+            onClick={handleToggleSubscribe}
+            selected={!isSubscribed}
+            disabled={!hasJoinedCommunity}
           />
-        )}
 
-        <SharePopover
-          // if share endpoint is present it will be used, else the current url will be used
-          discussionLink={shareEndpoint}
-        />
+          {canUpdateThread && thread && (
+            <AdminActions
+              thread={thread}
+              onLockToggle={onLockToggle}
+              onCollaboratorsEdit={onCollaboratorsEdit}
+              onDelete={onDelete}
+              onEditStart={onEditStart}
+              onEditCancel={onEditCancel}
+              onEditConfirm={onEditConfirm}
+              onPinToggle={onPinToggle}
+              onProposalStageChange={onProposalStageChange}
+              onSnapshotProposalFromThread={onSnapshotProposalFromThread}
+              onSpamToggle={onSpamToggle}
+              hasPendingEdits={hasPendingEdits}
+            />
+          )}
+        </div>
 
-        <CWThreadAction
-          action="subscribe"
-          onClick={handleToggleSubscribe}
-          selected={!isSubscribed}
-          disabled={!hasJoinedCommunity}
-        />
-
-        {canUpdateThread && thread && (
-          <AdminActions
-            thread={thread}
-            onLockToggle={onLockToggle}
-            onCollaboratorsEdit={onCollaboratorsEdit}
-            onDelete={onDelete}
-            onEditStart={onEditStart}
-            onEditCancel={onEditCancel}
-            onEditConfirm={onEditConfirm}
-            onPinToggle={onPinToggle}
-            onProposalStageChange={onProposalStageChange}
-            onSnapshotProposalFromThread={onSnapshotProposalFromThread}
-            onSpamToggle={onSpamToggle}
-            hasPendingEdits={hasPendingEdits}
-          />
+        {upvoteDrawerBtnBelow && (
+          <ViewUpvotesDrawer contentType="thread" content={thread} />
         )}
       </div>
       {thread && <></>}
