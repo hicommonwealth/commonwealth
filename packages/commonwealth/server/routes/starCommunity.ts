@@ -12,12 +12,12 @@ const starCommunity = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const chain = req.chain;
+  const { community } = req;
 
   try {
     const [star, created] = await models.StarredCommunity.findOrCreate({
       where: {
-        community_id: chain.id,
+        community_id: community.id,
         user_id: req.user.id,
       },
     });

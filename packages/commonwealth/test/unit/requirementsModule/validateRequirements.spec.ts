@@ -1,8 +1,5 @@
+import { BalanceSourceType, Requirement } from '@hicommonwealth/core';
 import { expect } from 'chai';
-import {
-  BalanceSourceType,
-  Requirement,
-} from 'server/util/requirementsModule/requirementsTypes';
 import validateRequirements from 'server/util/requirementsModule/validateRequirements';
 
 describe('validateRequirements', () => {

@@ -5,10 +5,9 @@ import {
   formatFilename,
   loggerFactory,
 } from '@hicommonwealth/adapters';
-import { RedisNamespaces } from '@hicommonwealth/core';
+import { BalanceSourceType, RedisNamespaces } from '@hicommonwealth/core';
 import Web3 from 'web3';
 import { DB } from '../../models';
-import { BalanceSourceType } from '../requirementsModule/requirementsTypes';
 import { rollbar } from '../rollbar';
 import { __getCosmosNativeBalances } from './providers/get_cosmos_balances';
 import { __getCw721Balances } from './providers/get_cw721_balances';

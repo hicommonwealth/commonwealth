@@ -83,7 +83,7 @@ export enum WalletSsoSource {
   Unknown = 'unknown', // address created after we launched SSO, before we started recording WalletSsoSource
 }
 
-export enum ChainCategoryType {
+export enum CommunityCategoryType {
   DeFi = 'DeFi',
   DAO = 'DAO',
 }

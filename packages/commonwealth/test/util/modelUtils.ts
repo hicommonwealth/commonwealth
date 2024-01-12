@@ -16,7 +16,6 @@ import {
 import { Keyring } from '@polkadot/api';
 import { stringToU8a } from '@polkadot/util';
 import chai from 'chai';
-import 'chai/register-should';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
