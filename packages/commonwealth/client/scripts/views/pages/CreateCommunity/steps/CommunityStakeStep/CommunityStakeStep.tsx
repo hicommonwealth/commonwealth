@@ -28,6 +28,15 @@ const CommunityStakeStep = () => {
     console.log('cancel');
   };
 
+  const renderHint = (className: string) => (
+    <CreateCommunityHint
+      className={className}
+      title="What is a namespace?"
+      hint="The namespace is an address that represents your community  on-chain.
+          You can purchase additional community namespaces from the admin panel."
+    />
+  );
+
   return (
     <div className="CommunityStakeStep">
       <section className="header">
@@ -40,6 +49,9 @@ const CommunityStakeStep = () => {
           secure community wallet on-chain and can be redistributed if members
           decide to burn their stake.
         </CWText>
+
+        {renderHint('mobile')}
+
         <CWText type="b1" className="description">
           Namespace and symbol must be unique on Common. Edit below.
         </CWText>
@@ -55,7 +67,7 @@ const CommunityStakeStep = () => {
             name="communityNamespace"
             hookToForm
             label="Community Namespace"
-            placeholder="Your community napespace"
+            placeholder="namespace"
             fullWidth
           />
 
@@ -63,7 +75,7 @@ const CommunityStakeStep = () => {
             name="communitySymbol"
             hookToForm
             label="Community Symbol"
-            placeholder="Your community symbol"
+            placeholder="COMM"
             fullWidth
           />
         </CWForm>
@@ -98,11 +110,7 @@ const CommunityStakeStep = () => {
         </section>
       </section>
 
-      <CreateCommunityHint
-        title="What is a namespace?"
-        hint="The namespace is an address that represents your community  on-chain.
-          You can purchase additional community namespaces from the admin panel."
-      />
+      {renderHint('desktop')}
     </div>
   );
 };

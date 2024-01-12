@@ -4,7 +4,21 @@
   display: flex;
 
   .CreateCommunityHint {
-    max-width: 244px;
+    &.mobile {
+      display: none;
+
+      @include smallInclusive {
+        display: block;
+      }
+    }
+
+    &.desktop {
+      max-width: 244px;
+
+      @include smallInclusive {
+        display: none;
+      }
+    }
   }
 
   .header {
@@ -15,6 +29,10 @@
     flex-direction: column;
     max-width: 596px;
     margin-right: 110px;
+
+    @include smallInclusive {
+      margin-right: unset;
+    }
 
     .description {
       color: $neutral-500;

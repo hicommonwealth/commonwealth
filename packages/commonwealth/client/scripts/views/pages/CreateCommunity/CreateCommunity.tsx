@@ -5,16 +5,17 @@ import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps'
 import { MixpanelCommunityCreationEvent } from '../../../../../shared/analytics/types';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
 
-import './CreateCommunity.scss';
 import BasicInformationStep from './steps/BasicInformationStep';
 import CommunityStakeStep from './steps/CommunityStakeStep';
 import CommunityTypeStep from './steps/CommunityTypeStep';
 import SuccessStep from './steps/SuccessStep';
 import { CreateCommunityStep, getFormSteps } from './utils';
 
+import './CreateCommunity.scss';
+
 const CreateCommunity = () => {
   const [createCommunityStep, setCreateCommunityStep] =
-    useState<CreateCommunityStep>(CreateCommunityStep.CommunityTypeSelection);
+    useState<CreateCommunityStep>(CreateCommunityStep.CommunityStake);
   const [selectedCommunity, setSelectedCommunity] = useState<SelectedCommunity>(
     { type: null, chainBase: null },
   );
