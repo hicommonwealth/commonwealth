@@ -1,8 +1,8 @@
 import { AppError } from '@hicommonwealth/adapters';
+import { AbiType } from '@hicommonwealth/core';
 import { hasher } from 'node-object-hash';
 import type { AbiItem } from 'web3-utils';
 import { parseAbiItemsFromABI } from '../../shared/abi_utils';
-import { AbiType } from '../../shared/types';
 
 export const Errors = {
   NoContractId: 'Must provide contract id',

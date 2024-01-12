@@ -4,13 +4,13 @@ import {
   formatFilename,
   loggerFactory,
 } from '@hicommonwealth/adapters';
-import { NotificationCategories } from '@hicommonwealth/core';
-import Sequelize, { QueryTypes } from 'sequelize';
 import type {
   IChainEventNotificationData,
   IForumNotificationData,
   NotificationDataAndCategory,
-} from '../../shared/types';
+} from '@hicommonwealth/core';
+import { NotificationCategories } from '@hicommonwealth/core';
+import Sequelize, { QueryTypes } from 'sequelize';
 import { SEND_WEBHOOKS_EMAILS, SERVER_URL } from '../config';
 import type { DB } from '../models';
 import type { NotificationInstance } from '../models/notification';

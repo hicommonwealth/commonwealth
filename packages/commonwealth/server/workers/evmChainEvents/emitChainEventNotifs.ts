@@ -1,7 +1,10 @@
 import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
-import { NotificationCategories, SupportedNetwork } from '@hicommonwealth/core';
+import {
+  NotificationCategories,
+  NotificationDataAndCategory,
+  SupportedNetwork,
+} from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
-import { NotificationDataAndCategory } from 'types';
 import models from '../../database';
 import { CommunityAttributes } from '../../models/community';
 import { ContractAttributes } from '../../models/contract';

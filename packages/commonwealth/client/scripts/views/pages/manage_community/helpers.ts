@@ -1,7 +1,6 @@
-import { ChainCategoryType } from '@hicommonwealth/core';
+import { AccessLevel, ChainCategoryType } from '@hicommonwealth/core';
 import axios from 'axios';
 import app from 'state';
-import { AccessLevel } from '../../../../../shared/permissions';
 
 export const sortAdminsAndModsFirst = (a, b) => {
   if (a.permission === b.permission)
