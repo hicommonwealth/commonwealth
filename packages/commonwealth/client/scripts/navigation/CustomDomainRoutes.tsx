@@ -63,6 +63,20 @@ const DiscordCallbackPage = lazy(
   () => import('views/pages/manage_community/discord-callback'),
 );
 const AnalyticsPage = lazy(() => import('views/pages/stats'));
+
+const CommunityAdminAndModerators = lazy(
+  () => import('views/pages/CommunityManagement/AdminsAndModerators'),
+);
+const CommunityProfile = lazy(
+  () => import('views/pages/CommunityManagement/CommunityProfile'),
+);
+const CommunityIntegrations = lazy(
+  () => import('views/pages/CommunityManagement/Integrations'),
+);
+const CommunityTopics = lazy(
+  () => import('views/pages/CommunityManagement/Topics'),
+);
+
 const SnapshotProposalPage = lazy(
   () => import('views/pages/snapshot_proposals'),
 );
@@ -307,6 +321,46 @@ const CustomDomainRoutes = () => {
     // CONTRACTS END
 
     // ADMIN
+    ...(featureFlags.newAdminOnboardingEnabled
+      ? [
+          <Route
+            key="/community-profile"
+            path="/community-profile"
+            element={withLayout(CommunityProfile, {
+              scoped: true,
+            })}
+          />,
+          <Route
+            key="/community-integrations"
+            path="/community-integrations"
+            element={withLayout(CommunityIntegrations, {
+              scoped: true,
+            })}
+          />,
+          <Route
+            key="/community-topics"
+            path="/community-topics"
+            element={withLayout(CommunityTopics, {
+              scoped: true,
+            })}
+          />,
+          <Route
+            key="/community-moderators"
+            path="/community-moderators"
+            element={withLayout(CommunityAdminAndModerators, {
+              scoped: true,
+            })}
+          />,
+        ]
+      : [
+          <Route
+            key="/manage"
+            path="/manage"
+            element={withLayout(ManageCommunityPage, {
+              scoped: true,
+            })}
+          />,
+        ]),
     <Route
       key="/manage"
       path="/manage"
