@@ -19,25 +19,19 @@ const AdminSection = () => {
     });
 
   const matchesCommunityProfileRoute = matchRoutes(
-    [{ path: '/community-profile' }, { path: ':scope/community-profile' }],
+    [{ path: '/manage/profile' }, { path: ':scope/manage/profile' }],
     location,
   );
   const matchesCommunityIntegrationsRoute = matchRoutes(
-    [
-      { path: '/community-integrations' },
-      { path: ':scope/community-integrations' },
-    ],
+    [{ path: '/manage/integrations' }, { path: ':scope/manage/integrations' }],
     location,
   );
   const matchesCommunityTopicsRoute = matchRoutes(
-    [{ path: '/community-topics' }, { path: ':scope/community-topics' }],
+    [{ path: '/manage/topics' }, { path: ':scope/manage/topics' }],
     location,
   );
   const matchesCommunityModeratorsRoute = matchRoutes(
-    [
-      { path: '/community-moderators' },
-      { path: ':scope/community-moderators' },
-    ],
+    [{ path: '/manage/moderators' }, { path: ':scope/manage/moderators' }],
     location,
   );
   const matchesAnalyticsRoute = matchRoutes(
@@ -64,7 +58,7 @@ const AdminSection = () => {
         handleRedirectClicks(
           navigate,
           e,
-          `/community-profile`,
+          `/manage/profile`,
           app.activeChainId(),
           () => {
             setToggleTree(`children.communityProfile.toggledState`, toggle);
@@ -86,7 +80,7 @@ const AdminSection = () => {
         handleRedirectClicks(
           navigate,
           e,
-          `/community-integrations`,
+          `/manage/integrations`,
           app.activeChainId(),
           () => {
             setToggleTree(`children.integrations.toggledState`, toggle);
@@ -108,7 +102,7 @@ const AdminSection = () => {
         handleRedirectClicks(
           navigate,
           e,
-          `/community-topics`,
+          `/manage/topics`,
           app.activeChainId(),
           () => {
             setToggleTree(`children.topics.toggledState`, toggle);
@@ -130,7 +124,7 @@ const AdminSection = () => {
         handleRedirectClicks(
           navigate,
           e,
-          `/community-moderators`,
+          `/manage/moderators`,
           app.activeChainId(),
           () => {
             setToggleTree(`children.adminsAndModerators.toggledState`, toggle);

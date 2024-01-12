@@ -324,29 +324,29 @@ const CustomDomainRoutes = () => {
     ...(featureFlags.newAdminOnboardingEnabled
       ? [
           <Route
-            key="/community-profile"
-            path="/community-profile"
+            key="/manage/profile"
+            path="/manage/profile"
             element={withLayout(CommunityProfile, {
               scoped: true,
             })}
           />,
           <Route
-            key="/community-integrations"
-            path="/community-integrations"
+            key="/manage/integrations"
+            path="/manage/integrations"
             element={withLayout(CommunityIntegrations, {
               scoped: true,
             })}
           />,
           <Route
-            key="/community-topics"
-            path="/community-topics"
+            key="/manage/topics"
+            path="/manage/topics"
             element={withLayout(CommunityTopics, {
               scoped: true,
             })}
           />,
           <Route
-            key="/community-moderators"
-            path="/community-moderators"
+            key="/manage/moderators"
+            path="/manage/moderators"
             element={withLayout(CommunityAdminAndModerators, {
               scoped: true,
             })}

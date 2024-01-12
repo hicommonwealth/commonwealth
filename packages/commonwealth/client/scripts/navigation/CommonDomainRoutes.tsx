@@ -415,29 +415,29 @@ const CommonDomainRoutes = () => [
   ...(featureFlags.newAdminOnboardingEnabled
     ? [
         <Route
-          key="/:scope/community-profile"
-          path="/:scope/community-profile"
+          key="/:scope/manage/profile"
+          path="/:scope/manage/profile"
           element={withLayout(CommunityProfile, {
             scoped: true,
           })}
         />,
         <Route
-          key="/:scope/community-integrations"
-          path="/:scope/community-integrations"
+          key="/:scope/manage/integrations"
+          path="/:scope/manage/integrations"
           element={withLayout(CommunityIntegrations, {
             scoped: true,
           })}
         />,
         <Route
-          key="/:scope/community-topics"
-          path="/:scope/community-topics"
+          key="/:scope/manage/topics"
+          path="/:scope/manage/topics"
           element={withLayout(CommunityTopics, {
             scoped: true,
           })}
         />,
         <Route
-          key="/:scope/community-moderators"
-          path="/:scope/community-moderators"
+          key="/:scope/manage/moderators"
+          path="/:scope/manage/moderators"
           element={withLayout(CommunityAdminAndModerators, {
             scoped: true,
           })}
