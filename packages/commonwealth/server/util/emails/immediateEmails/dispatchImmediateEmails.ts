@@ -42,7 +42,7 @@ export async function dispatchImmediateEmails(
 
   try {
     console.log(emailObject);
-    await sendEmails(emailObject);
+    await sendEmails([emailObject]);
     StatsDController.get().increment('emails.immediate.sent');
   } catch (e) {
     const msg = `Failed to send emails for the following notification ${JSON.stringify(
