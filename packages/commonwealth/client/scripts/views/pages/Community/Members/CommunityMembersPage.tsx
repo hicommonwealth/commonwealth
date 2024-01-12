@@ -89,11 +89,10 @@ const CommunityMembersPage = () => {
     ...(searchFilters.groupFilter === 'Ungrouped' && {
       includeMembershipTypes: 'not-in-group',
     }),
-    ...(!['All groups', 'Ungrouped'].includes(
-      `${searchFilters.groupFilter}`,
-    ) && {
-      membersInGroup: parseInt(`${searchFilters.groupFilter}`),
-    }),
+    ...(!['All groups', 'Ungrouped'].includes(`${searchFilters.groupFilter}`) &&
+      searchFilters.groupFilter && {
+        includeMembershipTypes: `in-group:${searchFilters.groupFilter}`,
+      }),
   });
 
   const { data: groups } = useFetchGroupsQuery({

@@ -1,5 +1,8 @@
 import { AppError } from '@hicommonwealth/adapters';
-import { SearchProfilesResult } from 'server/controllers/server_profiles_methods/search_profiles';
+import {
+  MembershipFilters,
+  SearchProfilesResult,
+} from 'server/controllers/server_profiles_methods/search_profiles';
 import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
 import { ServerControllers } from '../../routing/router';
 import {
@@ -20,9 +23,8 @@ type SearchCommentsRequestParams = {
   search: string;
   community_id?: string;
   include_roles?: string;
-  memberships?: string;
+  memberships?: MembershipFilters;
   include_group_ids?: string;
-  members_in_group_id?: number;
 } & PaginationQueryParams;
 
 type SearchCommentsResponse = SearchProfilesResult;
@@ -52,7 +54,6 @@ export const searchProfilesHandler = async (
     orderDirection: options.order_direction as any,
     memberships: options.memberships,
     includeGroupIds: options.include_group_ids === 'true',
-    membersInGroupId: options.members_in_group_id,
   });
 
   return success(res, profileSearchResults);

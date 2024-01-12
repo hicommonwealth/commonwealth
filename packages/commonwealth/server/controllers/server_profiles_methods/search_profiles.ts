@@ -14,6 +14,11 @@ import { ServerProfilesController } from '../server_profiles_controller';
 
 export const Errors = {};
 
+export type MembershipFilters =
+  | 'in-group'
+  | `in-group:${number}`
+  | 'not-in-group';
+
 export type SearchProfilesOptions = {
   community: CommunityInstance;
   search: string;
@@ -22,9 +27,8 @@ export type SearchProfilesOptions = {
   page?: number;
   orderBy?: string;
   orderDirection?: 'ASC' | 'DESC';
-  memberships?: string;
+  memberships?: MembershipFilters;
   includeGroupIds?: boolean;
-  membersInGroupId?: number;
 };
 
 type Profile = {
@@ -54,7 +58,6 @@ export async function __searchProfiles(
     orderDirection,
     memberships,
     includeGroupIds,
-    membersInGroupId,
   }: SearchProfilesOptions,
 ): Promise<SearchProfilesResult> {
   let sortOptions: PaginationSqlOptions = {
@@ -98,19 +101,26 @@ export async function __searchProfiles(
     ? `"Addresses".community_id = $community_id AND`
     : '';
 
-  let membershipsWhere =
-    memberships || membersInGroupId
-      ? `SELECT 1 FROM "Memberships"
+  const groupIdFromMemberships = parseInt(
+    ((memberships || '').match(/in-group:(\d+)/) || [`0`, `0`])[1],
+  );
+  let membershipsWhere = memberships
+    ? `SELECT 1 FROM "Memberships"
     JOIN "Groups" ON "Groups".id = "Memberships".group_id
     WHERE "Memberships".address_id = "Addresses".id
     AND "Groups".community_id = $community_id
-    ${membersInGroupId ? `AND "Groups".id = ${membersInGroupId}` : ''}
+    ${
+      groupIdFromMemberships
+        ? `AND "Groups".id = ${groupIdFromMemberships}`
+        : ''
+    }
     `
-      : '';
+    : '';
 
   if (memberships) {
     switch (memberships) {
       case 'in-group':
+      case `in-group:${groupIdFromMemberships}`:
         membershipsWhere = `AND EXISTS (${membershipsWhere} AND "Memberships".reject_reason IS NULL)`;
         break;
       case 'not-in-group':
@@ -119,10 +129,6 @@ export async function __searchProfiles(
       default:
         throw new AppError(`unsupported memberships param: ${memberships}`);
     }
-  }
-
-  if (membersInGroupId) {
-    membershipsWhere = `AND EXISTS (${membershipsWhere} AND "Memberships".reject_reason IS NOT NULL)`;
   }
 
   const sqlWithoutPagination = `
