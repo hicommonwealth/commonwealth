@@ -1,4 +1,5 @@
 import React from 'react';
+import { z } from 'zod';
 
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -7,7 +8,6 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import CreateCommunityHint from '../../components/CreateCommunityHint';
 
-import { z } from 'zod';
 import './CommunityStakeStep.scss';
 
 const validationSchema = z.object({
@@ -64,6 +64,7 @@ const CommunityStakeStep = () => {
           initialValues={getInitialValue()}
         >
           <CWTextInput
+            rightTextAddon=".common.xyz"
             name="communityNamespace"
             hookToForm
             label="Community Namespace"
