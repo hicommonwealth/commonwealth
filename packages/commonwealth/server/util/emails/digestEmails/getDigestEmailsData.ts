@@ -2,6 +2,7 @@ import {
   NotificationCategories,
   NotificationCategory,
 } from '@hicommonwealth/core';
+import { QueryTypes } from 'sequelize';
 import models from '../../../database';
 import { NotificationAttributes } from '../../../models/notification';
 import { UserInstance } from '../../../models/user';
@@ -10,6 +11,7 @@ import {
   ForumEmailData,
   getEmailData,
 } from '../immediateEmails/getEmailData';
+import { DigestEmailIntervals } from './dispatchDigestEmails';
 
 type DigestEmailData =
   | { type: 'forum'; data: ForumEmailData }
@@ -24,15 +26,21 @@ type DigestEmailsData = {
 
 export async function getDigestEmailsData(
   users: UserInstance[],
+  interval: DigestEmailIntervals,
 ): Promise<DigestEmailsData> {
+  let intervalQuery = '24 hours';
+  if (interval === 'weekly') {
+    intervalQuery = '60 days';
+  }
+
   const notifPerUser = (await models.sequelize.query(
     `
-    SELECT U.email, json_agg(row_to_json(N.*))
+    SELECT U.email, json_agg(row_to_json(N.*)) as notifications
     FROM "Users" U
     JOIN "NotificationsRead" NR ON NR.user_id = U.id
     JOIN "Notifications" N ON N.id = NR.notification_id
     WHERE U.id IN (:users) 
-        AND N.created_at > CURRENT_TIMESTAMP - INTERVAL '24 hours' 
+        AND N.created_at > CURRENT_TIMESTAMP - INTERVAL '${intervalQuery}' 
         AND N.category_id NOT IN (
             '${NotificationCategories.ThreadEdit}', 
             '${NotificationCategories.CommentEdit}',
@@ -41,6 +49,9 @@ export async function getDigestEmailsData(
     GROUP BY U.id;
   `,
     {
+      logging: console.log,
+      raw: true,
+      type: QueryTypes.SELECT,
       replacements: {
         users: users.map((u) => u.id),
       },
@@ -50,6 +61,7 @@ export async function getDigestEmailsData(
     notifications: NotificationAttributes[];
   }>;
 
+  console.log('>>>>>>>>>>>>>>>>>>', notifPerUser);
   const emailsData: DigestEmailsData = {};
   for (const user of notifPerUser) {
     for (const notif of user.notifications) {

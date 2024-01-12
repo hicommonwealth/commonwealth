@@ -175,7 +175,7 @@ export enum SearchContentType {
 
 export const DynamicTemplate = {
   ImmediateEmailNotification: 'd-3f30558a95664528a2427b40292fec51',
-  BatchNotifications: 'd-468624f3c2d7434c86ae0ed0e1d2227e',
+  BatchNotifications: 'd-8b622612b1b04f939a6438f4e06f1b08',
   SignIn: 'd-db52815b5f8647549d1fe6aa703d7274',
   SignUp: 'd-2b00abbf123e4b5981784d17151e86be',
   UpdateEmail: 'd-a0c28546fecc49fb80a3ba9e535bff48',

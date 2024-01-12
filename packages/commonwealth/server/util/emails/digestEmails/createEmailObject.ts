@@ -1,13 +1,15 @@
 import { MailDataRequired } from '@sendgrid/helpers/classes/mail';
 import { DynamicTemplate } from 'types';
 import { UserInstance } from '../../../models/user';
+import { DigestEmailIntervals } from './dispatchDigestEmails';
 import { getDigestEmailsData } from './getDigestEmailsData';
 
 export async function createEmailObjects(
   users: UserInstance[],
+  interval: DigestEmailIntervals,
 ): Promise<MailDataRequired[]> {
   const from = 'Commonwealth <no-reply@commonwealth.im>';
-  const emailsData = await getDigestEmailsData(users);
+  const emailsData = await getDigestEmailsData(users, interval);
   const emailObjects: MailDataRequired[] = [];
 
   for (const [email, userEmailsData] of Object.entries(emailsData)) {

@@ -2,6 +2,7 @@ import {
   formatFilename,
   loggerFactory,
   RedisCache,
+  StatsDController,
 } from '@hicommonwealth/adapters';
 import { RedisNamespaces } from '@hicommonwealth/core';
 import { uuidv4 } from 'lib/util';
@@ -14,7 +15,7 @@ import { createEmailObjects } from './createEmailObject';
 
 const log = loggerFactory.getLogger(formatFilename(__filename));
 
-type DigestEmailIntervals = 'daily' | 'weekly';
+export type DigestEmailIntervals = 'daily' | 'weekly';
 
 /**
  * This function creates and sends notification digest emails.
@@ -28,7 +29,7 @@ export async function dispatchDigestEmails(
   userBatchEmailSize: number,
   redisCache: RedisCache,
 ) {
-  // check lock
+  log.info(`Starting ${interval} digest email dispatch...`);
   try {
     const lockAcquired = await redisCache.setKey(
       RedisNamespaces.Emails,
@@ -48,9 +49,12 @@ export async function dispatchDigestEmails(
     rollbar.error(msg, e);
   }
 
+  log.info(`${interval} digest email lock acquired`);
+
   // if lock is acquired batch fetch users
   let minUserId = 0;
   let users: UserInstance[] = [];
+  let count = 0;
   do {
     users = await models.User.findAll({
       where: {
@@ -61,11 +65,22 @@ export async function dispatchDigestEmails(
       order: [['id', 'ASC']],
     });
 
-    if (users.length === 0) return;
+    if (users.length === 0) break;
 
     minUserId = users[users.length - 1].id;
 
-    const emails = await createEmailObjects(users);
-    await sendEmails(emails);
+    const emails = await createEmailObjects(users, interval);
+    console.log('>>>>> EMAILS:', emails);
+    try {
+      await sendEmails(emails);
+      count += emails.length;
+      StatsDController.get().increment('emails.digest.sent', emails.length);
+    } catch (e) {
+      const msg = `Failed to send digest emails for ${emails.length} users`;
+      log.error(msg, e);
+      rollbar.error(msg, e);
+    }
   } while (users.length < userBatchEmailSize);
+
+  log.info(`${count} ${interval} digest emails sent`);
 }
