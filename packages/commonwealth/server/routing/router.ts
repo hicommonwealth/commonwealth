@@ -27,7 +27,7 @@ import getAddressProfile, {
 import getAddressStatus from '../routes/getAddressStatus';
 import linkExistingAddressToChain from '../routes/linkExistingAddressToChain';
 import reactionsCounts from '../routes/reactionsCounts';
-import selectChain from '../routes/selectChain';
+import selectCommunity from '../routes/selectCommunity';
 import starCommunity from '../routes/starCommunity';
 import startEmailLogin from '../routes/startEmailLogin';
 import { status } from '../routes/status';
@@ -70,9 +70,9 @@ import writeUserSetting from '../routes/writeUserSetting';
 
 import { getCanvasData, postCanvasData } from '../routes/canvas';
 
-import updateChainCategory from '../routes/updateChainCategory';
-import updateChainCustomDomain from '../routes/updateChainCustomDomain';
-import updateChainPriority from '../routes/updateChainPriority';
+import updateCommunityCategory from '../routes/updateCommunityCategory';
+import updateCommunityCustomDomain from '../routes/updateCommunityCustomDomain';
+import updateCommunityPriority from '../routes/updateCommunityPriority';
 import createWebhook from '../routes/webhooks/createWebhook';
 import deleteWebhook from '../routes/webhooks/deleteWebhook';
 import getWebhooks from '../routes/webhooks/getWebhooks';
@@ -98,7 +98,7 @@ import createDiscordBotConfig from '../routes/createDiscordBotConfig';
 import generateImage from '../routes/generateImage';
 import getDiscordChannels from '../routes/getDiscordChannels';
 import getSnapshotProposal from '../routes/getSnapshotProposal';
-import { getSubscribedChains } from '../routes/getSubscribedChains';
+import { getSubscribedCommunities } from '../routes/getSubscribedCommunities';
 import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 import type GlobalActivityCache from '../util/globalActivityCache';
 
@@ -313,37 +313,37 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/selectChain',
+    '/selectCommunity',
     passport.authenticate('jwt', { session: false }),
-    selectChain.bind(this, models),
+    selectCommunity.bind(this, models),
   );
 
   // communities
   registerRoute(
     router,
     'post',
-    '/communities' /* prev: POST /createChain */,
+    '/communities',
     passport.authenticate('jwt', { session: false }),
     createCommunityHandler.bind(this, serverControllers),
   );
   registerRoute(
     router,
     'delete',
-    '/communities/:communityId' /* prev: POST /deleteChain */,
+    '/communities/:communityId',
     passport.authenticate('jwt', { session: false }),
     deleteCommunityHandler.bind(this, serverControllers),
   );
   registerRoute(
     router,
     'patch',
-    '/communities/:communityId' /* prev: POST /updateChain */,
+    '/communities/:communityId',
     passport.authenticate('jwt', { session: false }),
     updateCommunityHandler.bind(this, serverControllers),
   );
   registerRoute(
     router,
     'get',
-    '/communities' /* prev: GET /chains */,
+    '/communities',
     getCommunitiesHandler.bind(this, serverControllers),
   );
   registerRoute(
@@ -355,7 +355,7 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/nodes' /* prev: POST /createChainNode */,
+    '/nodes',
     passport.authenticate('jwt', { session: false }),
     createChainNodeHandler.bind(this, serverControllers),
   );
@@ -1009,9 +1009,9 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/updateChainCategory',
+    '/updateCommunityCategory',
     passport.authenticate('jwt', { session: false }),
-    updateChainCategory.bind(this, models),
+    updateCommunityCategory.bind(this, models),
   );
 
   // signed data
@@ -1057,8 +1057,8 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/updateChainCustomDomain',
-    updateChainCustomDomain.bind(this, models),
+    '/updateCommunityCustomDomain',
+    updateCommunityCustomDomain.bind(this, models),
   );
 
   // Discord Bot
@@ -1087,8 +1087,8 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/updateChainPriority',
-    updateChainPriority.bind(this, models),
+    '/updateCommunityPriority',
+    updateCommunityPriority.bind(this, models),
   );
 
   registerRoute(
@@ -1204,8 +1204,8 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/getSubscribedChains',
-    getSubscribedChains.bind(this, models),
+    '/getSubscribedCommunities',
+    getSubscribedCommunities.bind(this, models),
   );
 
   // Proposal routes

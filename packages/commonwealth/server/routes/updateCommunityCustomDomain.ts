@@ -5,15 +5,15 @@ import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
 enum UpdateCustomDomainErrors {
-  NoChainID = 'No chain_id provided.',
-  NoChain = 'Chain not found.',
+  NoCommunityID = 'No community_id provided.',
+  NoCommunity = 'Community not found.',
   Failed = 'Request Failed.',
   InvalidCustomDomain = 'Invalid custom domain.',
 }
 
 type updateCustomDomainReq = {
   secret: string;
-  chain_id: string;
+  community_id: string;
   custom_domain: string;
 };
 
@@ -21,19 +21,19 @@ type updateCustomDomainResp = {
   result: string;
 };
 
-const updateChainCustomDomain = async (
+const updateCommunityCustomDomain = async (
   models: DB,
   req: TypedRequestBody<updateCustomDomainReq>,
   res: TypedResponse<updateCustomDomainResp>,
 ) => {
-  // Verify Chain Exists
-  const { chain_id, custom_domain, secret } = req.body;
-  if (!chain_id) throw new AppError(UpdateCustomDomainErrors.NoChainID);
+  // Verify Community Exists
+  const { community_id, custom_domain, secret } = req.body;
+  if (!community_id) throw new AppError(UpdateCustomDomainErrors.NoCommunityID);
 
-  const chain = await models.Community.findOne({
-    where: { id: chain_id },
+  const community = await models.Community.findOne({
+    where: { id: community_id },
   });
-  if (!chain) throw new ServerError(UpdateCustomDomainErrors.NoChain);
+  if (!community) throw new ServerError(UpdateCustomDomainErrors.NoCommunity);
 
   if (!process.env.AIRPLANE_SECRET) {
     throw new AppError(UpdateCustomDomainErrors.Failed);
@@ -50,10 +50,10 @@ const updateChainCustomDomain = async (
   }
 
   // Update Custom Domain
-  chain.custom_domain = custom_domain;
-  await chain.save();
+  community.custom_domain = custom_domain;
+  await community.save();
 
   return success(res, { result: 'Updated custom domain.' });
 };
 
-export default updateChainCustomDomain;
+export default updateCommunityCustomDomain;

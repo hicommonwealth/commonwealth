@@ -378,7 +378,7 @@ class NotificationsController {
   }
 
   public getSubscribedChains() {
-    return post('/getSubscribedChains', {}, (result) => {
+    return post('/getSubscribedCommunities', {}, (result) => {
       this._chainEventSubscribedChainIds = result.map((x) => x.id);
     });
   }
