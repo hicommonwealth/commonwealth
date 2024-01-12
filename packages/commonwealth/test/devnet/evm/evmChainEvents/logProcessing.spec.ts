@@ -1,4 +1,5 @@
 import { Log } from '@ethersproject/providers';
+import { AbiType } from '@hicommonwealth/core';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import models from '../../../../server/database';
@@ -13,7 +14,6 @@ import {
   EvmSource,
   RawEvmEvent,
 } from '../../../../server/workers/evmChainEvents/types';
-import { AbiType } from '../../../../shared/types';
 import {
   compoundPropCreatedSignature,
   compoundPropQueuedSignature,

@@ -3,12 +3,11 @@ import {
   formatFilename,
   loggerFactory,
 } from '@hicommonwealth/adapters';
-import { WalletId } from '@hicommonwealth/core';
+import { DynamicTemplate, WalletId } from '@hicommonwealth/core';
 import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
 import Sequelize from 'sequelize';
-import { DynamicTemplate } from '../../shared/types';
 import { LOGIN_RATE_LIMIT_MINS, SENDGRID_API_KEY, SERVER_URL } from '../config';
 import type { DB } from '../models';
 

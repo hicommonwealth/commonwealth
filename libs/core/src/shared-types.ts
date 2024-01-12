@@ -1,9 +1,12 @@
-import type { SupportedNetwork } from '@hicommonwealth/core';
-import {
-  NotificationCategories,
-  NotificationCategory,
-} from '@hicommonwealth/core';
-import type { AccessLevel } from './permissions';
+import type { SupportedNetwork } from './types';
+import { NotificationCategories, NotificationCategory } from './types';
+
+export enum AccessLevel {
+  Admin = 'admin',
+  Moderator = 'moderator',
+  Member = 'member',
+  Everyone = 'everyone',
+}
 
 export type SnapshotProposalAttributes = {
   id: string;

@@ -1,8 +1,8 @@
+import { ContentType } from '@hicommonwealth/core';
 import Account from 'client/scripts/models/Account';
 import clsx from 'clsx';
 import type { DeltaStatic } from 'quill';
 import React from 'react';
-import { ContentType } from 'types';
 import { User } from 'views/components/user/user';
 import { CWText } from '../../component_kit/cw_text';
 import { CWValidationText } from '../../component_kit/cw_validation_text';

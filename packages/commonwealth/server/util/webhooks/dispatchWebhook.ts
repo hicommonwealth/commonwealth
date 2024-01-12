@@ -3,8 +3,10 @@ import {
   formatFilename,
   loggerFactory,
 } from '@hicommonwealth/adapters';
-import { NotificationCategories } from '@hicommonwealth/core';
-import { NotificationDataAndCategory } from '../../../shared/types';
+import {
+  NotificationCategories,
+  NotificationDataAndCategory,
+} from '@hicommonwealth/core';
 import models from '../../database';
 import { CommunityInstance } from '../../models/community';
 import { WebhookInstance } from '../../models/webhook';
