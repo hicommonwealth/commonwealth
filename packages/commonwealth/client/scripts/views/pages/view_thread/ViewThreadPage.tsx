@@ -252,7 +252,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     // load view count
     axios
       .post(`${app.serverUrl()}/viewCount`, {
-        chain: app.activeChainId(),
+        community_id: app.activeChainId(),
         object_id: thread.id,
       })
       .then((response) => {

@@ -5,9 +5,10 @@ import { ServerError } from '@hicommonwealth/adapters';
 // because it's easy to miss catching errors inside the promise executor, but we use it in this file
 // because the bulk offchain queries are heavily optimized so communities can load quickly.
 //
-import type { Request, Response } from 'express';
+import type { Response } from 'express';
 import { Op, QueryTypes } from 'sequelize';
 import type { CommunityContractTemplateInstance } from 'server/models/community_contract_template';
+import { TypedRequest } from 'server/types';
 import type { DB } from '../models';
 import type { CommunityBannerInstance } from '../models/community_banner';
 import type { ContractInstance } from '../models/contract';
@@ -18,11 +19,11 @@ import { findAllRoles } from '../util/roles';
 export const Errors = {};
 
 // Topics, comments, reactions, members+admins, threads
-const bulkOffchain = async (models: DB, req: Request, res: Response) => {
-  const chain = req.chain;
+const bulkOffchain = async (models: DB, req: TypedRequest, res: Response) => {
+  const { community } = req;
   // globally shared SQL replacements
   const communityOptions = 'community_id = :community_id';
-  const replacements = { community_id: chain.id };
+  const replacements = { community_id: community.id };
 
   // parallelized queries
   const [
@@ -52,7 +53,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
     findAllRoles(
       models,
       { include: [models.Address], order: [['created_at', 'DESC']] },
-      chain.id,
+      community.id,
       ['admin', 'moderator'],
     ),
     // most active users
@@ -64,7 +65,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
         const activeUsers = {};
         const where = {
           updated_at: { [Op.gt]: thirtyDaysAgo },
-          community_id: chain.id,
+          community_id: community.id,
         };
 
         const monthlyComments = await models.Comment.findAll({
@@ -106,20 +107,20 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
     ),
     await models.Thread.count({
       where: {
-        community_id: chain.id,
+        community_id: community.id,
         marked_as_spam_at: null,
       },
     }),
     models.CommunityBanner.findOne({
       where: {
-        community_id: chain.id,
+        community_id: community.id,
       },
     }),
     new Promise(async (resolve, reject) => {
       try {
         const communityContracts = await models.CommunityContract.findAll({
           where: {
-            community_id: chain.id,
+            community_id: community.id,
           },
         });
         const contractsWithTemplates: Array<{
