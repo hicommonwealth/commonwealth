@@ -4,31 +4,33 @@ import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
-type UpdateChainCategoryReq = {
+type UpdateCommunityCategoryReq = {
   selected_tags: { [tag: string]: boolean };
   community_id: string;
   auth: string;
   jwt: string;
 };
 
-type UpdateChainCategoryRes = {
-  chain: string;
+type UpdateCommunityCategoryRes = {
+  community_id: string;
   tags: CommunityCategoryType[];
 };
 
-const updateChainCategory = async (
+const updateCommunityCategory = async (
   models: DB,
-  req: TypedRequestBody<UpdateChainCategoryReq>,
-  res: TypedResponse<UpdateChainCategoryRes>,
+  req: TypedRequestBody<UpdateCommunityCategoryReq>,
+  res: TypedResponse<UpdateCommunityCategoryRes>,
 ) => {
-  const chain = await models.Community.findOne({
+  const community = await models.Community.findOne({
     where: {
       id: req.body.community_id,
     },
   });
-  if (!chain) throw new AppError('Invalid Chain Id');
+  if (!community) throw new AppError('Invalid Community Id');
 
-  const existingCategories = chain.category ? (chain.category as string[]) : [];
+  const existingCategories = community.category
+    ? (community.category as string[])
+    : [];
   const updateCategories = Object.keys(req.body.selected_tags).filter((tag) => {
     return (
       req.body.selected_tags[tag] &&
@@ -42,13 +44,13 @@ const updateChainCategory = async (
       (element, index) => element === existingCategories[index],
     )
   ) {
-    chain.category = updateCategories;
-    await chain.save();
+    community.category = updateCategories;
+    await community.save();
   }
   return success(res, {
-    chain: req.body.community_id,
+    community_id: req.body.community_id,
     tags: updateCategories as CommunityCategoryType[],
   });
 };
 
-export default updateChainCategory;
+export default updateCommunityCategory;
