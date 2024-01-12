@@ -11,6 +11,7 @@ import {
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { RedisCache, delay } from '@hicommonwealth/adapters';
 import {
+  BalanceSourceType,
   BalanceType,
   ChainBase,
   ChainNetwork,
@@ -21,7 +22,6 @@ import { use as chaiUse, expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { getTendermintClient } from 'server/util/tokenBalanceCache/util';
 import models from '../../../server/database';
-import { BalanceSourceType } from '../../../server/util/requirementsModule/requirementsTypes';
 import { TokenBalanceCache } from '../../../server/util/tokenBalanceCache/tokenBalanceCache';
 
 chaiUse(chaiAsPromised);
