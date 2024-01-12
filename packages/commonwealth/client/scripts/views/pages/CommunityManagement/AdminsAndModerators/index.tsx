@@ -1,3 +1,3 @@
-import AdminsAndModerators from './AdminAndModerators';
+import AdminsAndModerators from './AdminsAndModerators';
 
 export default AdminsAndModerators;

@@ -46,7 +46,7 @@ const setAdminToggleTree = (path: string, toggle: boolean) => {
     JSON.stringify(newTree);
 };
 
-const AdminSectionComponent = () => {
+const AdminSection = () => {
   const navigate = useCommonNavigate();
   const location = useLocation();
 
@@ -276,11 +276,7 @@ const AdminSectionComponent = () => {
     toggleDisabled: false,
   };
 
-  return (
-    <React.Fragment>
-      <SidebarSectionGroup {...sidebarSectionData} />
-    </React.Fragment>
-  );
+  return <SidebarSectionGroup {...sidebarSectionData} />;
 };
 
-export const AdminSection = AdminSectionComponent;
+export { AdminSection };

@@ -1,3 +1,3 @@
-import CommunityProfile from './Profile';
+import Profile from './Profile';
 
-export default CommunityProfile;
+export default Profile;

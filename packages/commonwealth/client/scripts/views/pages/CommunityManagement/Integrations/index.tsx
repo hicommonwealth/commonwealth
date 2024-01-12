@@ -1,3 +1,3 @@
-import CommunityIntegrations from './Integrations';
+import Integrations from './Integrations';
 
-export default CommunityIntegrations;
+export default Integrations;

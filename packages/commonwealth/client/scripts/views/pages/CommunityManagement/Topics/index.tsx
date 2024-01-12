@@ -1,3 +1,3 @@
-import CommunityTopics from './Topics';
+import Topics from './Topics';
 
-export default CommunityTopics;
+export default Topics;
