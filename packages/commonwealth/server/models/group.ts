@@ -1,6 +1,6 @@
+import { Requirement } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
 import { DataTypes } from 'sequelize';
-import { Requirement } from '../util/requirementsModule/requirementsTypes';
 import { CommunityAttributes } from './community';
 import { ModelInstance, ModelStatic } from './types';
 
@@ -29,7 +29,7 @@ export type GroupModelStatic = ModelStatic<GroupInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): GroupModelStatic => {
   const Group = <GroupModelStatic>sequelize.define(
     'Group',
@@ -49,7 +49,7 @@ export default (
       underscored: true,
       tableName: 'Groups',
       indexes: [{ fields: ['community_id'] }],
-    }
+    },
   );
 
   Group.associate = (models) => {

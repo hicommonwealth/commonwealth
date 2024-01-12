@@ -1,12 +1,12 @@
-import { MembershipRejectReason } from 'server/models/membership';
-import { toBN } from 'web3-utils';
-import { OptionsWithBalances } from '../tokenBalanceCache/types';
 import {
   AllowlistData,
   BalanceSourceType,
   Requirement,
   ThresholdData,
-} from './requirementsTypes';
+} from '@hicommonwealth/core';
+import { MembershipRejectReason } from 'server/models/membership';
+import { toBN } from 'web3-utils';
+import { OptionsWithBalances } from '../tokenBalanceCache/types';
 
 export type ValidateGroupMembershipResponse = {
   isValid: boolean;
