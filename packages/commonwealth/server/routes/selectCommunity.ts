@@ -27,7 +27,7 @@ const selectCommunity = async (
   if (!community) {
     return next(new AppError(Errors.ChainNF));
   }
-  req.user.setSelectedChain(community);
+  req.user.setSelectedCommunity(community);
   await req.user.save();
   return res.json({ status: 'Success' });
 };
