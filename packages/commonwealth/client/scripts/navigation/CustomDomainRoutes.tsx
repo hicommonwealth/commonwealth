@@ -354,6 +354,11 @@ const CustomDomainRoutes = () => {
         ]
       : [
           <Route
+            key="/:scope/manage"
+            path="/:scope/manage"
+            element={<Navigate to="/manage" />}
+          />,
+          <Route
             key="/manage"
             path="/manage"
             element={withLayout(ManageCommunityPage, {
@@ -361,13 +366,6 @@ const CustomDomainRoutes = () => {
             })}
           />,
         ]),
-    <Route
-      key="/manage"
-      path="/manage"
-      element={withLayout(ManageCommunityPage, {
-        scoped: true,
-      })}
-    />,
     <Route
       key="/discord-callback"
       path="/discord-callback"
@@ -617,11 +615,6 @@ const CustomDomainRoutes = () => {
     // TREASURY END
 
     // ADMIN
-    <Route
-      key="/:scope/manage"
-      path="/:scope/manage"
-      element={<Navigate to="/manage" />}
-    />,
     <Route
       key="/:scope/analytics"
       path="/:scope/analytics"
