@@ -1,3 +1,10 @@
+import {
+  BalanceSourceType,
+  ContractSource,
+  CosmosContractSource,
+  CosmosSource,
+  NativeSource,
+} from '@hicommonwealth/core';
 import { AddressAttributes } from 'server/models/address';
 import { GroupAttributes } from 'server/models/group';
 import {
@@ -8,13 +15,6 @@ import {
   GetErcBalanceOptions,
   GetEthNativeBalanceOptions,
 } from '../tokenBalanceCache/types';
-import {
-  BalanceSourceType,
-  ContractSource,
-  CosmosContractSource,
-  CosmosSource,
-  NativeSource,
-} from './requirementsTypes';
 
 export function makeGetBalancesOptions(
   groups: GroupAttributes[],
