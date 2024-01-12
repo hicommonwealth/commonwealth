@@ -69,14 +69,14 @@
       }
     }
 
-  .cwsl__indicators {
-    cursor: pointer;
-    
-    &.searchable {
-      [class$='-control'] {
-        cursor: text !important;
+    .cwsl__indicators {
+      cursor: pointer;
+
+      &.searchable {
+        [class$='-control'] {
+          cursor: text !important;
+        }
       }
-    }
 
       .cwsl__indicator-separator {
         display: none;

@@ -2,13 +2,13 @@ import { NotificationCategories } from '@hicommonwealth/core';
 import { capitalize } from 'lodash';
 import { Label as chainEventLabel } from '../../../shared/chain/labelers/util';
 import { NotificationDataAndCategory } from '../../../shared/types';
-import { renderQuillDeltaToText, smartTrim } from '../../../shared/utils';
 import { SERVER_URL } from '../../config';
 import { CommunityInstance } from '../../models/community';
 import { ChainEventWebhookData, ForumWebhookData } from './types';
 import {
   getActorProfile,
   getPreviewImageUrl,
+  getThreadSummaryFromNotification,
   getThreadUrlFromNotification,
 } from './util';
 
@@ -66,17 +66,7 @@ export async function getWebhookData(
 
     let objectSummary: string;
     if (notification.categoryId !== NotificationCategories.NewReaction) {
-      const bodytext = decodeURIComponent(notification.data.comment_text);
-      try {
-        // parse and use quill document
-        const doc = JSON.parse(bodytext);
-        if (!doc.ops) throw new Error();
-        const text = renderQuillDeltaToText(doc);
-        objectSummary = smartTrim(text);
-      } catch (err) {
-        // use markdown document directly
-        objectSummary = smartTrim(bodytext);
-      }
+      objectSummary = getThreadSummaryFromNotification(notification);
     } else {
       objectSummary = 'New Like';
     }

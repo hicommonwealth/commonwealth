@@ -2,7 +2,11 @@ import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import { NotificationCategories } from '@hicommonwealth/core';
 import { Op } from 'sequelize';
 import { NotificationDataAndCategory } from '../../../shared/types';
-import { slugify } from '../../../shared/utils';
+import {
+  renderQuillDeltaToText,
+  slugify,
+  smartTrim,
+} from '../../../shared/utils';
 import { DEFAULT_COMMONWEALTH_LOGO, SERVER_URL } from '../../config';
 import models from '../../database';
 import { CommunityInstance } from '../../models/community';
@@ -150,4 +154,29 @@ export function getWebhookDestination(webhookUrl: string): WebhookDestinations {
   } else {
     return WebhookDestinations.Unknown;
   }
+}
+
+export function getThreadSummaryFromNotification(
+  notification: Exclude<
+    NotificationDataAndCategory,
+    | { categoryId: NotificationCategories.ChainEvent }
+    | { categoryId: NotificationCategories.SnapshotProposal }
+    | { categoryId: NotificationCategories.ThreadEdit }
+    | { categoryId: NotificationCategories.CommentEdit }
+  >,
+) {
+  let objectSummary: string;
+  const bodytext = decodeURIComponent(notification.data.comment_text);
+  try {
+    // parse and use quill document
+    const doc = JSON.parse(bodytext);
+    if (!doc.ops) throw new Error();
+    const text = renderQuillDeltaToText(doc);
+    objectSummary = smartTrim(text);
+  } catch (err) {
+    // use markdown document directly
+    objectSummary = smartTrim(bodytext);
+  }
+
+  return objectSummary;
 }

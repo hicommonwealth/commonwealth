@@ -153,6 +153,7 @@ export enum RedisNamespaces {
   Compound_Gov_Version = 'compound_gov_version',
   Token_Balance = 'token_balance',
   Activity_Cache = 'activity_cache',
+  Emails = 'emails',
 }
 
 export interface ISnapshotNotification {
