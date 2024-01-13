@@ -1,26 +1,27 @@
 import { ExitCode } from './enums';
-import { Disposable, Disposer } from './interfaces';
+import { AdapterFactory, Disposable, Disposer } from './interfaces';
 
 /**
- * Configured adapters map
+ * Map of disposable adapter instances
  */
 const adapters = new Map<string, Disposable>();
 
 /**
  * Wraps creation of adapters around factory functions
- * @param target the factory function
- * @returns the adapter function
+ * @param factory adapter of T factory function
+ * @returns adapter instance
  */
-export const port =
-  <T extends Disposable>(target: (arg?: T) => T) =>
-  (arg?: T): T => {
-    if (!adapters.has(target.name)) {
-      const adapter = target(arg);
-      adapters.set(target.name, adapter);
-      console.log('[binding adapter]', adapter.name || target.name);
+export function port<T extends Disposable>(factory: AdapterFactory<T>) {
+  return function (adapter?: T) {
+    if (!adapters.has(factory.name)) {
+      const instance = factory(adapter);
+      adapters.set(factory.name, instance);
+      console.log('[binding adapter]', instance.name || factory.name);
+      return instance;
     }
-    return adapters.get(target.name) as T;
+    return adapters.get(factory.name) as T;
   };
+}
 
 /**
  * Register of resource disposers on exit

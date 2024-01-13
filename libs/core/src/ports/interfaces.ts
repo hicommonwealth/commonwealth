@@ -12,6 +12,11 @@ export interface Disposable {
 }
 
 /**
+ * Adapter factory
+ */
+export type AdapterFactory<T extends Disposable> = (adapter?: T) => T;
+
+/**
  * A logger port
  */
 export interface ILogger {
