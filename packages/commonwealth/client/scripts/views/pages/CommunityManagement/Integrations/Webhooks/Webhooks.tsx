@@ -1,8 +1,8 @@
+import { WebhookCategory } from '@hicommonwealth/core';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import Webhook from 'models/Webhook';
 import React, { useState } from 'react';
-import { WebhookCategory } from 'shared/types';
 import app from 'state';
 import {
   useCreateWebhookMutation,
