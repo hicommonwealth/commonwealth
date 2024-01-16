@@ -1,7 +1,6 @@
-import { NotificationCategories } from '@hicommonwealth/core';
+import { EmitNotification, NotificationCategories } from '@hicommonwealth/core';
 import type { DataTypes } from 'sequelize';
 import Sequelize from 'sequelize';
-import emitNotifications from '../util/emitNotifications';
 import type { CommentAttributes } from './comment';
 import type { CommunityAttributes } from './community';
 import type { NotificationCategoryAttributes } from './notification_category';
@@ -47,7 +46,7 @@ export type SubscriptionInstance = ModelInstance<SubscriptionAttributes> & {
 };
 
 export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & {
-  emitNotification?: typeof emitNotifications;
+  emitNotification?: EmitNotification<SubscriptionInstance>;
 };
 
 export default (

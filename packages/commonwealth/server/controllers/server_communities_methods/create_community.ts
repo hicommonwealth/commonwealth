@@ -5,7 +5,6 @@ import {
   ChainBase,
   ChainNetwork,
   ChainType,
-  Community,
   DefaultPage,
   NotificationCategories,
 } from '@hicommonwealth/core';
@@ -22,6 +21,7 @@ import type { ChainNodeAttributes } from '../../models/chain_node';
 import type { CommunityAttributes } from '../../models/community';
 import type { RoleAttributes } from '../../models/role';
 
+import { Community } from '@hicommonwealth/model';
 import axios from 'axios';
 import { UserInstance } from '../../models/user';
 import { RoleInstanceWithPermission } from '../../util/roles';

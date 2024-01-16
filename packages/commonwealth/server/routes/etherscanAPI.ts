@@ -1,4 +1,5 @@
 import { AppError } from '@hicommonwealth/adapters';
+import { hashAbi } from '@hicommonwealth/model';
 import axios from 'axios';
 import { NextFunction } from 'express';
 import { ETHERSCAN_JS_API_KEY } from '../config';
@@ -7,7 +8,7 @@ import type { ContractAttributes } from '../models/contract';
 import type { ContractAbiAttributes } from '../models/contract_abi';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import validateAbi, { hashAbi } from '../util/abiValidation';
+import validateAbi from '../util/abiValidation';
 
 export enum Network {
   Mainnet = 'Mainnet',
