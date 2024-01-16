@@ -3,7 +3,7 @@ import { BalanceSourceType } from '@hicommonwealth/core';
 import { DB } from 'server/models';
 import Web3 from 'web3';
 import { TokenBalanceCache } from '../tokenBalanceCache/tokenBalanceCache';
-import { factoryContracts, validChains } from './chainConfig';
+import { factoryContracts } from './chainConfig';
 import { getNamespace } from './contractHelpers';
 
 /**
@@ -17,7 +17,7 @@ import { getNamespace } from './contractHelpers';
  * @param namespace The namespace name
  * @param txHash transaction hash of creation tx
  * @param address user's address
- * @param chain Select a chain from the validChains enum
+ * @param communityId the id of the community
  * @returns an AppError if any validations fail, else passses
  */
 export const validateNamespace = async (
@@ -26,16 +26,25 @@ export const validateNamespace = async (
   namespace: string,
   txHash: string,
   address: string,
-  chain: validChains,
+  communityId: string,
 ) => {
-  const factoryData = factoryContracts[chain];
-  const node = await model.ChainNode.findOne({
+  const community = await model.Community.findOne({
     where: {
-      eth_chain_id: factoryData.chainId,
+      id: communityId,
     },
-    attributes: ['url'],
+    include: [
+      {
+        model: model.ChainNode,
+        attributes: ['url', 'eth_chain_id'],
+      },
+    ],
+    attributes: ['chain_node_id'],
   });
-  const web3 = new Web3(node.url);
+  const factoryData = factoryContracts[community.ChainNode.eth_chain_id];
+  if (!factoryData) {
+    throw new AppError('Namespace not supported on selected chain');
+  }
+  const web3 = new Web3(community.ChainNode.url);
 
   //tx data validation
   const txReceipt = await web3.eth.getTransactionReceipt(txHash);
@@ -63,7 +72,7 @@ export const validateNamespace = async (
     addresses: [address],
     sourceOptions: {
       contractAddress: activeNamespace,
-      evmChainId: factoryData.chainId,
+      evmChainId: community.ChainNode.eth_chain_id,
       tokenId: 0,
     },
     cacheRefresh: true,

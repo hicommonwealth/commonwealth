@@ -90,7 +90,7 @@ describe('UpdateChain Tests', () => {
         chain_node_id: 100000,
       });
     } catch (e) {
-      assert.equal(e.message, Errors.NamespaceNotSupportedOnChain);
+      assert.equal(e.message, 'Namespace not supported on selected chain');
     }
   });
 
@@ -111,13 +111,19 @@ describe('UpdateChain Tests', () => {
       userAttributes: { email: '', id: 2, isAdmin: false },
     }) as UserInstance;
 
+    // change chain node to one that supports namespace
+    await controller.updateCommunity({
+      ...baseRequest,
+      user: user,
+      chain_node_id: 1263,
+    });
+
     const response = await controller.updateCommunity({
       ...baseRequest,
       user: user,
       namespace: 'IanSpace',
       transactionHash:
         '0x474369b51a06b06327b292f25679dcc8765113e002689616e6ab02fa6332690b',
-      chain_node_id: 1263,
     });
 
     assert.equal(response.namespace, 'IanSpace');

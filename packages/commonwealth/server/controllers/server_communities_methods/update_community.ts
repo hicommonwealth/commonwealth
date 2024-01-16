@@ -8,7 +8,6 @@ import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/typ
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';
 import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
 import type { CommunityAttributes } from '../../models/community';
-import { validChains } from '../../util/commonProtocol/chainConfig';
 import { validateNamespace } from '../../util/commonProtocol/newNamespaceValidator';
 import { findOneRole } from '../../util/roles';
 import { TrackOptions } from '../server_analytics_methods/track';
@@ -29,7 +28,6 @@ export const Errors = {
   InvalidTerms: 'Terms of Service must begin with https://',
   InvalidDefaultPage: 'Default page does not exist',
   InvalidTransactionHash: 'Valid transaction hash required to verify namespace',
-  NamespaceNotSupportedOnChain: 'Namespace not supported on selected chain',
 };
 
 export type UpdateCommunityOptions = CommunityAttributes & {
@@ -61,13 +59,11 @@ export async function __updateCommunity(
   }
 
   const community = await this.models.Community.findOne({ where: { id: id } });
-  let ownerOfChain;
+  let addresses;
   if (!community) {
     throw new AppError(Errors.NoCommunityFound);
   } else {
-    const addresses = (await user.getAddresses()).filter(
-      (addr) => !!addr.verified,
-    );
+    addresses = (await user.getAddresses()).filter((addr) => !!addr.verified);
     const userAddressIds = addresses.map((addr) => addr.id);
     const userMembership = await findOneRole(
       this.models,
@@ -78,9 +74,6 @@ export async function __updateCommunity(
     if (!user.isAdmin && !userMembership) {
       throw new AppError(Errors.NotAdmin);
     }
-    ownerOfChain = addresses.filter(
-      (a) => a.community_id === community.id && a.role === 'admin',
-    )[0];
   }
 
   const {
@@ -232,14 +225,11 @@ export async function __updateCommunity(
       throw new AppError(Errors.InvalidTransactionHash);
     }
 
+    const ownerOfChain = addresses.find(
+      (a) => a.community_id === community.id && a.role === 'admin',
+    );
     if (!ownerOfChain) {
       throw new AppError(Errors.NotAdmin);
-    }
-
-    // TODO: Dirty hack. Namespace chain_node_id error checking should be runtime, not static time error check.
-    //  Refactor with validateNamespace and generalize when we have more time or support more chains
-    if (community.chain_node_id !== 1263) {
-      throw new AppError(Errors.NamespaceNotSupportedOnChain);
     }
 
     await validateNamespace(
@@ -248,7 +238,7 @@ export async function __updateCommunity(
       namespace,
       transactionHash,
       ownerOfChain.address,
-      validChains.Goerli,
+      community.id,
     );
 
     community.namespace = namespace;

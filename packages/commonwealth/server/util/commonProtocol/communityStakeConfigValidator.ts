@@ -2,26 +2,37 @@ import { AppError } from '@hicommonwealth/adapters';
 import { DB } from 'server/models';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
-import { factoryContracts, validChains } from './chainConfig';
+import { factoryContracts } from './chainConfig';
 import { getNamespace } from './contractHelpers';
 
-export const validateCommunitStakeConfig = async (
+export const validateCommunityStakeConfig = async (
   model: DB,
-  namespace: string,
+  communityId: string,
   id: number,
-  chain: validChains,
 ) => {
-  const factoryData = factoryContracts[chain];
-  const node = await model.ChainNode.findOne({
+  const community = await model.Community.findOne({
     where: {
-      eth_chain_id: factoryData.chainId,
+      id: communityId,
     },
-    attributes: ['url'],
+    include: [
+      {
+        model: model.ChainNode,
+        required: true,
+        attributes: ['eth_chain_id', 'url'],
+      },
+    ],
+    attributes: ['id', 'namespace'],
   });
-  const web3 = new Web3(node.url);
+  const factoryData = factoryContracts[community.ChainNode.eth_chain_id];
+  if (!factoryData) {
+    throw new AppError(
+      "Community Stakes not configured for community's chain node",
+    );
+  }
+  const web3 = new Web3(community.ChainNode.url);
   const namespaceAddress = await getNamespace(
     web3,
-    namespace,
+    community.namespace,
     factoryData.factory,
   );
   const communityStakes = new web3.eth.Contract(
