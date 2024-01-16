@@ -7,13 +7,13 @@ import {
 } from '@hicommonwealth/adapters';
 import {
   ChainBase,
+  DynamicTemplate,
   NotificationCategories,
   WalletId,
   WalletSsoSource,
 } from '@hicommonwealth/core';
 import type { NextFunction, Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
-import { DynamicTemplate } from '../../shared/types';
 import { addressSwapper } from '../../shared/utils';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import type { DB } from '../models';

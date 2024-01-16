@@ -89,7 +89,7 @@ export async function __getStats(
       where: whereCommunityId,
     }),
     this.models.Reaction.count({
-      where: whereChain,
+      where: whereCommunityId,
     }),
     this.models.Vote.count({
       where: whereCommunityId,

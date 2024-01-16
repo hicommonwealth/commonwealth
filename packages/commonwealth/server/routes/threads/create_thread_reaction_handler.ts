@@ -27,7 +27,7 @@ export const createThreadReactionHandler = async (
   >,
   res: TypedResponse<CreateThreadReactionResponse>,
 ) => {
-  const { user, address, chain: community } = req;
+  const { user, address, community } = req;
   const {
     reaction,
     canvas_action: canvasAction,

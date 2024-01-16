@@ -34,14 +34,27 @@ describe('User Dashboard API', () => {
   let userAddress2;
   let userAddressId2;
   let threadOne;
-  let topicId;
-  let topicId2;
+  let topicId: number;
+  let topicId2: number;
 
   before('Reset database', async () => {
     await resetDatabase();
 
-    topicId = await modelUtils.getTopicId({ chain });
-    topicId2 = await modelUtils.getTopicId({ chain: chain2 });
+    const topic = await models.Topic.findOne({
+      where: {
+        community_id: chain,
+        group_ids: [],
+      },
+    });
+    topicId = topic.id;
+
+    const topic2 = await models.Topic.create({
+      name: 'Test Topic',
+      description: 'A topic made for testing',
+      community_id: chain2,
+    });
+    topicId2 = topic2.id;
+
     // creates 2 ethereum users
     const firstUser = await modelUtils.createAndVerifyAddress({ chain });
     userId = firstUser.user_id;

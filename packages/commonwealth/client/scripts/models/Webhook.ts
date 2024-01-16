@@ -1,4 +1,4 @@
-import { WebhookCategory } from 'types';
+import { WebhookCategory } from '@hicommonwealth/core';
 
 class Webhook {
   public readonly id: number;
@@ -10,7 +10,7 @@ class Webhook {
     id: number,
     url: string,
     categories: WebhookCategory[],
-    community_id: string
+    community_id: string,
   ) {
     this.id = id;
     this.url = url;

@@ -1,9 +1,9 @@
 import { AppError } from '@hicommonwealth/adapters';
+import { Requirement } from '@hicommonwealth/core';
 import z from 'zod';
 import { GroupAttributes, GroupMetadata } from '../../models/group';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
-import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 
 type CreateGroupBody = {
   metadata: GroupMetadata;

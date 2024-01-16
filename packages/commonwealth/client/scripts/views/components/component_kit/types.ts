@@ -18,6 +18,7 @@ export enum ComponentType {
   ContentPage = 'ContentPage',
   CustomIcon = 'CustomIcon',
   Divider = 'Divider',
+  Drawer = 'Drawer',
   Form = 'Form',
   FormSection = 'FormSection',
   FormSteps = 'FormSteps',

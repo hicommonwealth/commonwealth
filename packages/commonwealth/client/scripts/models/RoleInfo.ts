@@ -1,6 +1,6 @@
+import type { AccessLevel } from '@hicommonwealth/core';
 import type momentType from 'moment';
 import moment from 'moment';
-import type { AccessLevel } from 'permissions';
 import type AddressInfo from './AddressInfo';
 
 class RoleInfo {

@@ -1,4 +1,3 @@
-import 'components/NewThreadForm.scss';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { parseCustomStages } from 'helpers';
@@ -17,20 +16,21 @@ import { useCreateThreadMutation } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
-import { CWTextInput } from 'views/components/component_kit/cw_text_input';
+import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
-import { TopicSelector } from 'views/components/topic_selector';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import { ThreadKind, ThreadStage } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
+import { CWSelectList } from '../component_kit/new_designs/CWSelectList';
 import { ReactQuillEditor } from '../react_quill_editor';
 import {
   createDeltaFromText,
   getTextFromDelta,
   serializeDelta,
 } from '../react_quill_editor/utils';
+import './NewThreadForm.scss';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 
 export const NewThreadForm = () => {
@@ -45,10 +45,7 @@ export const NewThreadForm = () => {
   const hasTopics = topics?.length;
   const isAdmin = Permissions.isCommunityAdmin() || Permissions.isSiteAdmin();
 
-  const topicsForSelector = {
-    enabledTopics: hasTopics ? topics : [],
-    disabledTopics: [],
-  };
+  const topicsForSelector = hasTopics ? topics : [];
 
   const {
     threadTitle,
@@ -65,7 +62,7 @@ export const NewThreadForm = () => {
     clearDraft,
     canShowGatingBanner,
     setCanShowGatingBanner,
-  } = useNewThreadForm(communityId, topicsForSelector.enabledTopics);
+  } = useNewThreadForm(communityId, topicsForSelector);
 
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
@@ -169,9 +166,7 @@ export const NewThreadForm = () => {
   const handleCancel = () => {
     setThreadTitle('');
     setThreadTopic(
-      topicsForSelector?.enabledTopics?.find((t) =>
-        t?.name?.includes('General'),
-      ) || null,
+      topicsForSelector?.find((t) => t?.name?.includes('General')) || null,
     );
     setThreadContentDelta(createDeltaFromText(''));
   };
@@ -185,33 +180,43 @@ export const NewThreadForm = () => {
   return (
     <>
       <div className="NewThreadForm">
-        <div className="header">
-          <CWText type="h2" fontWeight="medium">
-            Create thread
-          </CWText>
-        </div>
+        <CWText type="h2" fontWeight="medium" className="header">
+          Create thread
+        </CWText>
         <div className="new-thread-body">
           <div className="new-thread-form-inputs">
-            <div className="topics-and-title-row">
-              {hasTopics && (
-                <TopicSelector
-                  enabledTopics={topicsForSelector.enabledTopics}
-                  disabledTopics={topicsForSelector.disabledTopics}
-                  value={!!location.search && threadTopic}
-                  onChange={(topic) => {
-                    setCanShowGatingBanner(true);
-                    setThreadTopic(topic);
-                  }}
-                />
-              )}
-              <CWTextInput
-                autoFocus
-                placeholder="Title"
-                value={threadTitle}
-                tabIndex={1}
-                onInput={(e) => setThreadTitle(e.target.value)}
+            <CWTextInput
+              fullWidth
+              autoFocus
+              placeholder="Title"
+              value={threadTitle}
+              tabIndex={1}
+              onInput={(e) => setThreadTitle(e.target.value)}
+            />
+
+            {!!hasTopics && (
+              <CWSelectList
+                options={topics.map((topic) => ({
+                  label: topic?.name,
+                  value: `${topic?.id}`,
+                }))}
+                {...(!!location.search &&
+                  threadTopic?.name &&
+                  threadTopic?.id && {
+                    defaultValue: {
+                      label: threadTopic?.name,
+                      value: `${threadTopic?.id}`,
+                    },
+                  })}
+                placeholder="Select topic"
+                onChange={(topic) => {
+                  setCanShowGatingBanner(true);
+                  setThreadTopic(
+                    topicsForSelector.find((t) => `${t.id}` === topic.value),
+                  );
+                }}
               />
-            </div>
+            )}
 
             {!isDiscussion && (
               <CWTextInput
@@ -231,6 +236,7 @@ export const NewThreadForm = () => {
                   ? 'Join community to submit'
                   : disabledActionsTooltipText
               }
+              placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
             />
 
             <div className="buttons-row">
@@ -240,14 +246,15 @@ export const NewThreadForm = () => {
                   onClick={handleCancel}
                   tabIndex={3}
                   label="Cancel"
+                  containerClassName="no-pad"
                 />
               )}
               <CWButton
-                label="Submit"
+                label="Create thread"
                 disabled={isDisabled || !hasJoinedCommunity}
                 onClick={handleNewThreadCreation}
                 tabIndex={4}
-                buttonWidth="wide"
+                containerClassName="no-pad"
               />
             </div>
 

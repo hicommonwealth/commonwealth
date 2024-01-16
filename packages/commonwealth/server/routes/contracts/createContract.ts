@@ -1,8 +1,8 @@
 import { AppError } from '@hicommonwealth/adapters';
 import type { ContractType } from '@hicommonwealth/core';
+import { AbiType } from '@hicommonwealth/core';
 import { Transaction } from 'sequelize';
 import type { ContractAbiInstance } from 'server/models/contract_abi';
-import { AbiType } from '../../../shared/types';
 import type { DB } from '../../models';
 import type { ChainNodeAttributes } from '../../models/chain_node';
 import type {

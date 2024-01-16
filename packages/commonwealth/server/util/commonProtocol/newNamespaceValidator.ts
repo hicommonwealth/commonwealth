@@ -1,7 +1,7 @@
 import { AppError } from '@hicommonwealth/adapters';
+import { BalanceSourceType } from '@hicommonwealth/core';
 import { DB } from 'server/models';
 import Web3 from 'web3';
-import { BalanceSourceType } from '../requirementsModule/requirementsTypes';
 import { TokenBalanceCache } from '../tokenBalanceCache/tokenBalanceCache';
 import { factoryContracts, validChains } from './chainConfig';
 import { getNamespace } from './contractHelpers';

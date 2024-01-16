@@ -8,7 +8,7 @@ export const Errors = {
   ChainNF: 'Chain not found',
 };
 
-const selectChain = async (
+const selectCommunity = async (
   models: DB,
   req: Request,
   res: Response,
@@ -21,15 +21,15 @@ const selectChain = async (
     return next(new AppError(Errors.NoChain));
   }
 
-  const chain = await models.Community.findOne({
+  const community = await models.Community.findOne({
     where: { id: req.body.chain },
   });
-  if (!chain) {
+  if (!community) {
     return next(new AppError(Errors.ChainNF));
   }
-  req.user.setSelectedChain(chain);
+  req.user.setSelectedCommunity(community);
   await req.user.save();
   return res.json({ status: 'Success' });
 };
 
-export default selectChain;
+export default selectCommunity;

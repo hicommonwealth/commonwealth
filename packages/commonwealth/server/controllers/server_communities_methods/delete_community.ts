@@ -50,18 +50,18 @@ export async function __deleteCommunity(
         await this.models.sequelize.transaction(async (t) => {
           await this.models.User.update(
             {
-              selected_chain_id: null,
+              selected_community_id: null,
             },
             {
               where: {
-                selected_chain_id: community.id,
+                selected_community_id: community.id,
               },
               transaction: t,
             },
           );
 
           await this.models.Reaction.destroy({
-            where: { chain: community.id },
+            where: { community_id: community.id },
             transaction: t,
           });
 

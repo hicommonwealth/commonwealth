@@ -10,7 +10,7 @@ const communityStats = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const chain = req.chain;
+  const { community } = req;
 
   if (!req.user) {
     return next(new AppError('Not signed in'));
@@ -23,7 +23,7 @@ const communityStats = async (
   const adminRoles = await findAllRoles(
     models,
     { where: { address_id: { [Op.in]: userAddressIds } } },
-    chain.id,
+    community.id,
     ['admin', 'moderator'],
   );
   if (!req.user.isAdmin && adminRoles.length === 0) {
@@ -43,7 +43,7 @@ GROUP BY seq.date
 ORDER BY seq.date DESC;`,
       {
         type: QueryTypes.SELECT,
-        replacements: { chainOrCommunity: chain.id, chainName: chainName },
+        replacements: { chainOrCommunity: community.id, chainName: chainName },
       },
     );
   };
@@ -57,7 +57,7 @@ ORDER BY seq.date DESC;`,
       `SELECT COUNT(id) AS new_items FROM ${table} WHERE ${chainName} = :chainOrCommunity;`,
       {
         type: QueryTypes.SELECT,
-        replacements: { chainOrCommunity: chain.id },
+        replacements: { chainOrCommunity: community.id },
       },
     );
   };
@@ -78,7 +78,7 @@ LEFT JOIN (
     AND community_id = :chainOrCommunity
   UNION
   SELECT address_id, created_at FROM "Reactions" WHERE created_at > CURRENT_DATE - ${numberOfPrevDays}
-    AND ${chain ? 'chain' : 'community'} = :chainOrCommunity
+    AND community_id = :chainOrCommunity
 ) objs
 ON objs.created_at::date = seq.date
 GROUP BY seq.date
@@ -86,7 +86,7 @@ ORDER BY seq.date DESC;
 `,
     {
       type: QueryTypes.SELECT,
-      replacements: { chainOrCommunity: chain.id },
+      replacements: { chainOrCommunity: community.id },
     },
   );
 

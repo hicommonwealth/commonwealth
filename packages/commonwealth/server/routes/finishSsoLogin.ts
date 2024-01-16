@@ -4,23 +4,24 @@ import {
   formatFilename,
   loggerFactory,
 } from '@hicommonwealth/adapters';
-import { NotificationCategories, WalletId } from '@hicommonwealth/core';
+import {
+  DynamicTemplate,
+  NotificationCategories,
+  WalletId,
+} from '@hicommonwealth/core';
 import * as jwt from 'jsonwebtoken';
 import { isAddress, toChecksumAddress } from 'web3-utils';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
-import { DynamicTemplate } from '../../shared/types';
 import { AXIE_SHARED_SECRET } from '../config';
+import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { sequelize } from '../database';
 import type { DB } from '../models';
 import type { AddressAttributes } from '../models/address';
 import type { ProfileAttributes } from '../models/profile';
 import type { UserAttributes } from '../models/user';
-
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { createRole } from '../util/roles';
-
-import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { redirectWithLoginError } from './finishEmailLogin';
 
 const log = loggerFactory.getLogger(formatFilename(__filename));

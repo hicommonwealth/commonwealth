@@ -1,9 +1,9 @@
 import { AppError } from '@hicommonwealth/adapters';
+import { Requirement } from '@hicommonwealth/core';
 import { GroupAttributes, GroupMetadata } from 'server/models/group';
 import z from 'zod';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
-import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 
 type UpdateGroupParams = { id: string };
 type UpdateGroupBody = {

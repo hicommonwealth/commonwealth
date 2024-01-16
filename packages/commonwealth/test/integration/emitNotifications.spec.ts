@@ -1,12 +1,13 @@
 import {
   NotificationCategories,
+  NotificationDataAndCategory,
   ProposalType,
+  SnapshotEventType,
   SupportedNetwork,
 } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import { NotificationDataAndCategory, SnapshotEventType } from 'types';
 import { resetDatabase } from '../../server-test';
 import { JWT_SECRET } from '../../server/config';
 import models from '../../server/database';
@@ -101,7 +102,7 @@ describe('emitNotifications tests', () => {
 
     //reaction = await models.Reaction.create({
     await models.Reaction.create({
-      chain,
+      community_id: chain,
       thread_id: thread.id,
       address_id: userAddressId,
       reaction: 'like',
