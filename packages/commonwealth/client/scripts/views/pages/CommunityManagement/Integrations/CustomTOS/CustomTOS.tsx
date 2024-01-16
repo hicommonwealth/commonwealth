@@ -17,7 +17,7 @@ const CustomTOS = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   const onInputChange = useCallback((event) => {
-    const value = event.target.value.trim();
+    const value = event?.target?.value?.trim() || '';
     let error = '';
 
     try {
