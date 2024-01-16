@@ -1,6 +1,7 @@
 import React from 'react';
 import FeatureHint from 'views/components/FeatureHint';
 import { CWText } from 'views/components/component_kit/cw_text';
+import Directory from './Directory';
 import './Integrations.scss';
 
 const Integrations = () => {
@@ -13,6 +14,10 @@ const Integrations = () => {
             Connect your apps to manage your community across channels
           </CWText>
         </div>
+
+        <section className="list">
+          <Directory />
+        </section>
       </section>
 
       <section className="right-section">
