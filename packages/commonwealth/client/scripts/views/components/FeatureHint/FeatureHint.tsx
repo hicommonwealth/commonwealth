@@ -3,16 +3,16 @@ import React from 'react';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 
-import './CreateCommunityHint.scss';
+import './FeatureHint.scss';
 
-interface CreateCommunityHintProps {
+interface FeatureHintProps {
   title: string;
   hint: string;
 }
 
-const CreateCommunityHint = ({ title, hint }: CreateCommunityHintProps) => {
+const FeatureHint = ({ title, hint }: FeatureHintProps) => {
   return (
-    <div className="CreateCommunityHint">
+    <div className="FeatureHint">
       <div className="title-row">
         <CWIcon iconName="lightbulb" />
         <CWText fontWeight="medium">{title}</CWText>
@@ -22,4 +22,4 @@ const CreateCommunityHint = ({ title, hint }: CreateCommunityHintProps) => {
   );
 };
 
-export default CreateCommunityHint;
+export default FeatureHint;
