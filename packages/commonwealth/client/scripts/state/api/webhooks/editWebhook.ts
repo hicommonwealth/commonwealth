@@ -1,7 +1,7 @@
 import { WebhookCategory } from '@hicommonwealth/core';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import Webhook from 'client/scripts/models/Webhook';
+import Webhook from 'models/Webhook';
 import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
 
