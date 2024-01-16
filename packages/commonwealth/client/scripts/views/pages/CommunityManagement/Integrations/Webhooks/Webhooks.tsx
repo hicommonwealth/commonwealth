@@ -16,8 +16,8 @@ import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { WebhookSettingsModal } from 'views/modals/webhook_settings_modal';
+import { linkValidationSchema } from '../common/validation';
 import './Webhooks.scss';
-import { linkValidationSchema } from './validation';
 
 const Webhooks = () => {
   const community = app.config.chains.getById(app.activeChainId());

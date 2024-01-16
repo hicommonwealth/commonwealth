@@ -5,8 +5,8 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { ZodError } from 'zod';
+import { linkValidationSchema } from '../common/validation';
 import './CustomTOS.scss';
-import { linkValidationSchema } from './validation';
 
 const CustomTOS = () => {
   const [community] = useState(app.config.chains.getById(app.activeChainId()));
