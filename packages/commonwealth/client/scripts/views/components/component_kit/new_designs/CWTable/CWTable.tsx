@@ -136,7 +136,9 @@ export const CWTable = ({
           }),
           cell: (info) => {
             const currentRow = info.row.original as RowData;
-            const avatarUrl = currentRow.avatars?.[col.key];
+            const avatarInfo = currentRow.avatars?.[col.key];
+            const avatarUrl = avatarInfo?.avatarUrl;
+            const avatarAddress = avatarInfo?.address;
 
             if (currentRow[col.key]?.customElement) {
               return currentRow[col.key].customElement;
@@ -150,10 +152,10 @@ export const CWTable = ({
               return <div className="numeric">{info.getValue()}</div>;
             }
 
-            if (avatarUrl) {
+            if (avatarUrl || avatarAddress) {
               return (
                 <div className="avatar-cell">
-                  <Avatar url={avatarUrl} size={20} />
+                  <Avatar url={avatarUrl} address={avatarAddress} size={20} />
                   <div className="text">{info.getValue()}</div>
                 </div>
               );

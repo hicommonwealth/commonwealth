@@ -134,9 +134,8 @@ export const ThreadOptions = ({
             />
           )}
         </div>
-
         {upvoteDrawerBtnBelow && (
-          <ViewUpvotesDrawer contentType="thread" content={thread} />
+          <ViewUpvotesDrawer contentType="thread" thread={thread} />
         )}
       </div>
       {thread && <></>}

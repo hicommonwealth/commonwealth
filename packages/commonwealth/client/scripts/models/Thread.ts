@@ -55,6 +55,12 @@ function processAssociatedReactions(
     (reactions
       ? reactions.map((r) => r?.address || r?.Address?.address)
       : addressesReacted) || [];
+  const tempReactionTimestamps = reactions
+    ? reactions.map((r) => r?.updated_at)
+    : [];
+  const allHaveTimestamps =
+    tempReactionTimestamps.length === tempReactionIds.length;
+
   if (
     tempReactionIds.length > 0 &&
     tempReactionIds.length === tempReactionType.length &&
@@ -65,6 +71,7 @@ function processAssociatedReactions(
         id: tempReactionIds[i],
         type: tempReactionType[i],
         address: tempAddressesReacted[i],
+        updated_at: allHaveTimestamps ? tempReactionTimestamps[i] : null,
       });
     }
   }
@@ -86,6 +93,7 @@ export type AssociatedReaction = {
   id: number | string;
   type: ReactionType;
   address: string;
+  updated_at: string;
 };
 
 export enum LinkSource {

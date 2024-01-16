@@ -1,17 +1,44 @@
-import type Thread from 'client/scripts/models/Thread';
-import React, { useState } from 'react';
-import CWDrawer from './component_kit/new_designs/CWDrawer';
-// import { CWTable } from './component_kit/new_designs/CWTable';
+import { getRelativeTimestamp } from 'client/scripts/helpers/dates';
 import Comment from 'client/scripts/models/Comment';
-import { CWThreadAction } from './component_kit/new_designs/cw_thread_action';
+import type Thread from 'client/scripts/models/Thread';
+import { useFetchProfilesByAddressesQuery } from 'client/scripts/state/api/profiles';
+import React, { useState } from 'react';
+import app from 'state';
+import { CWText } from './component_kit/cw_text';
+import CWDrawer from './component_kit/new_designs/CWDrawer';
+import { CWTable } from './component_kit/new_designs/CWTable';
 
 type ViewUpvotesDrawerProps = {
   contentType: 'thread' | 'comment';
-  content: Thread | Comment<any>;
+  thread?: Thread;
+  comment?: Comment<any>;
 };
 
-export const ViewUpvotesDrawer = ({ contentType }: ViewUpvotesDrawerProps) => {
+export const ViewUpvotesDrawer = ({
+  contentType,
+  thread,
+  comment,
+}: ViewUpvotesDrawerProps) => {
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState(false);
+  const reactors = thread?.associatedReactions;
+  const reactorAddresses = reactors?.map((t) => t.address);
+
+  const { data: reactorProfiles } = useFetchProfilesByAddressesQuery({
+    currentChainId: app.activeChainId(),
+    profileAddresses: reactorAddresses,
+    profileChainIds: [app.chain.id],
+  });
+
+  const reactorData = reactorProfiles?.map((profile) => {
+    const reactor = reactors.find((addr) => addr.address === profile.address);
+
+    return {
+      name: profile.name,
+      avatarUrl: profile.avatarUrl,
+      address: profile.address,
+      updated_at: reactor?.updated_at,
+    };
+  });
 
   const getColumnInfo = () => {
     return [
@@ -22,7 +49,7 @@ export const ViewUpvotesDrawer = ({ contentType }: ViewUpvotesDrawerProps) => {
         sortable: true,
       },
       {
-        key: 'vote-weight',
+        key: 'voteWeight',
         header: 'Vote Weight',
         numeric: true,
         sortable: true,
@@ -30,20 +57,42 @@ export const ViewUpvotesDrawer = ({ contentType }: ViewUpvotesDrawerProps) => {
       {
         key: 'timestamp',
         header: 'Timestamp',
-        numberic: true,
+        numeric: true,
         sortable: true,
       },
     ];
   };
 
-  const getRowData = () => {};
+  const voterRow = (voter) => {
+    return {
+      name: voter.name,
+      // TODO: USE ACTUAL VOTE WEIGHT
+      voteWeight: 5,
+      // TODO: SORT BY ACTUAL TIMESTAMP & DISPLAY RELATIVE
+      timestamp: getRelativeTimestamp(voter.updated_at),
+      avatars: {
+        name: {
+          avatarUrl: voter.avatarUrl,
+          address: voter.address,
+        },
+      },
+    };
+  };
 
+  const getRowData = (voters) => {
+    if (voters) {
+      return voters?.map((voter) => {
+        return voterRow(voter);
+      });
+    }
+  };
+
+  // TODO: Add totals
   return (
     <>
-      <CWThreadAction
-        label="View upvotes"
-        onClick={() => setIsUpvoteDrawerOpen(true)}
-      />
+      <CWText type="caption" onClick={() => setIsUpvoteDrawerOpen(true)}>
+        View Upvotes
+      </CWText>
       <CWDrawer
         open={isUpvoteDrawerOpen}
         header={`${
@@ -51,7 +100,18 @@ export const ViewUpvotesDrawer = ({ contentType }: ViewUpvotesDrawerProps) => {
         } upvotes`}
         onClose={() => setIsUpvoteDrawerOpen(false)}
       >
-        {/* <CWTable /> */}
+        {reactorData && (
+          <>
+            <CWTable
+              columnInfo={getColumnInfo()}
+              rowData={getRowData(reactorData)}
+            />
+            <div>
+              <CWText></CWText>
+              <CWText></CWText>
+            </div>
+          </>
+        )}
       </CWDrawer>
     </>
   );

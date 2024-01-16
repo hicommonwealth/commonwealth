@@ -215,9 +215,7 @@ export const CWContentPage = ({
         {!isEditing ? authorAndPublishInfoRow : <></>}
       </div>
       {subHeader}
-
       {isEditing ? authorAndPublishInfoRow : <></>}
-
       {body &&
         body(
           <ThreadOptions
