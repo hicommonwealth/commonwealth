@@ -1,0 +1,27 @@
+@import '../../../../../../styles/shared';
+
+.Snapshots {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+
+  .header {
+    .h4 {
+      color: $neutral-900 !important;
+    }
+
+    .b1 {
+      color: $neutral-500 !important;
+    }
+  }
+
+  .btn-border {
+    margin: 0 !important;
+
+    &:focus-within {
+      border-width: 1px !important;
+      padding: 0px !important;
+    }
+  }
+}
