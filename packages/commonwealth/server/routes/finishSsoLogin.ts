@@ -1,13 +1,9 @@
-import {
-  AppError,
-  ServerError,
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/adapters';
+import { AppError, ServerError } from '@hicommonwealth/adapters';
 import {
   DynamicTemplate,
   NotificationCategories,
   WalletId,
+  logger,
 } from '@hicommonwealth/core';
 import * as jwt from 'jsonwebtoken';
 import { isAddress, toChecksumAddress } from 'web3-utils';
@@ -24,7 +20,7 @@ import { success } from '../types';
 import { createRole } from '../util/roles';
 import { redirectWithLoginError } from './finishEmailLogin';
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');

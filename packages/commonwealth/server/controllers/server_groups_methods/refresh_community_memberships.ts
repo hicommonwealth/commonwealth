@@ -1,4 +1,4 @@
-import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
+import { logger } from '@hicommonwealth/core';
 import moment from 'moment';
 import { Op, Sequelize } from 'sequelize';
 import {
@@ -21,7 +21,7 @@ import {
 } from '../../util/tokenBalanceCache/types';
 import { ServerGroupsController } from '../server_groups_controller';
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 export type RefreshCommunityMembershipsOptions = {
   community: CommunityInstance;

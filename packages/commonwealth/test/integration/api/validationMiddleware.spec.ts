@@ -66,7 +66,7 @@ describe('DatabaseValidationService Tests', () => {
       request.body = resBody;
       request.user = { id: userId };
       expect(
-        databaseValidationService.validateAuthor(models, request, null, () => {
+        databaseValidationService.validateAuthor(request, null, () => {
           return null;
         }),
       ).to.not.throw;
@@ -86,7 +86,7 @@ describe('DatabaseValidationService Tests', () => {
       };
       request.body = resBody;
       request.user = null;
-      databaseValidationService.validateAuthor(models, request, null, () => {
+      databaseValidationService.validateAuthor(request, null, () => {
         return null;
       });
       expect(request.address).to.be.undefined;
@@ -104,7 +104,7 @@ describe('DatabaseValidationService Tests', () => {
       };
       request.body = resBody;
       request.user = { id: userId };
-      databaseValidationService.validateAuthor(models, request, null, () => {
+      databaseValidationService.validateAuthor(request, null, () => {
         return null;
       });
       expect(request.address).to.be.undefined;
@@ -127,14 +127,9 @@ describe('DatabaseValidationService Tests', () => {
       request.body = resBody;
       request.user = { id: userId };
       expect(
-        databaseValidationService.validateCommunity(
-          models,
-          request,
-          null,
-          () => {
-            return null;
-          },
-        ),
+        databaseValidationService.validateCommunity(request, null, () => {
+          return null;
+        }),
       ).to.not.throw;
     });
 
@@ -151,14 +146,9 @@ describe('DatabaseValidationService Tests', () => {
       };
       request.body = resBody;
       request.user = { id: userId };
-      databaseValidationService.validateCommunity(
-        models,
-        request,
-        resBody,
-        () => {
-          return null;
-        },
-      );
+      databaseValidationService.validateCommunity(request, resBody, () => {
+        return null;
+      });
       expect(request.chain).to.be.undefined;
     });
   });

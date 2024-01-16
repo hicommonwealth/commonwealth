@@ -1,7 +1,7 @@
-import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import {
   NotificationCategories,
   NotificationDataAndCategory,
+  logger,
 } from '@hicommonwealth/core';
 import { Op } from 'sequelize';
 import { slugify } from '../../../shared/utils';
@@ -12,7 +12,7 @@ import { ProfileAttributes } from '../../models/profile';
 import { WebhookInstance } from '../../models/webhook';
 import { WebhookDestinations } from './types';
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 export const REGEX_IMAGE =
   /\b(https?:\/\/\S*?\.(?:png|jpe?g|gif)(?:\?(?:(?:(?:[\w_-]+=[\w_-]+)(?:&[\w_-]+=[\w_-]+)*)|(?:[\w_-]+)))?)\b/;

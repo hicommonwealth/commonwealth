@@ -5,15 +5,14 @@ import {
   ServiceKey,
   StatsDController,
   TRmqMessages,
-  formatFilename,
   getRabbitMQConfig,
-  loggerFactory,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import {
   CommentDiscordActions,
   IDiscordMessage,
   ThreadDiscordActions,
+  logger,
 } from '@hicommonwealth/core';
 import v8 from 'v8';
 import {
@@ -35,7 +34,7 @@ startHealthCheckLoop({
   },
 });
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 log.info(
   `Node Option max-old-space-size set to: ${JSON.stringify(

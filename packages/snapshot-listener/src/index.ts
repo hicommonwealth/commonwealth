@@ -4,12 +4,11 @@ import {
   RascalPublications,
   ServiceKey,
   StatsDController,
-  formatFilename,
+  TypescriptLoggingLogger,
   getRabbitMQConfig,
-  loggerFactory,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import type { ISnapshotNotification } from '@hicommonwealth/core';
+import { logger, type ISnapshotNotification } from '@hicommonwealth/core';
 import type { Request, Response } from 'express';
 import express from 'express';
 import v8 from 'v8';
@@ -31,7 +30,7 @@ startHealthCheckLoop({
   },
 });
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger(TypescriptLoggingLogger()).getLogger(__filename);
 
 log.info(
   `Node Option max-old-space-size set to: ${JSON.stringify(
@@ -95,7 +94,7 @@ registerRoute(app, 'post', '/snapshot', async (req: Request, res: Response) => {
 app.use(methodNotAllowedMiddleware());
 
 app.listen(port, async () => {
-  const log = loggerFactory.getLogger(formatFilename(__filename));
+  const log = logger().getLogger(__filename);
   log.info(`⚡️[server]: Server is running at https://localhost:${port}`);
 
   try {

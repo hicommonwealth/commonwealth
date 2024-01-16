@@ -1,8 +1,5 @@
-import {
-  StatsDController,
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/adapters';
+import { StatsDController } from '@hicommonwealth/adapters';
+import { logger } from '@hicommonwealth/core';
 import models from '../../database';
 import { NotificationInstance } from '../../models/notification';
 import { rollbar } from '../../util/rollbar';
@@ -11,7 +8,7 @@ import { getEventSources } from './getEventSources';
 import { getEvents } from './logProcessing';
 import { EvmSource } from './types';
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 /**
  * Given a ChainNode id and event sources, this function fetches all events parsed since

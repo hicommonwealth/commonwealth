@@ -1,9 +1,9 @@
 import {
-  ILogger,
   RmqSnapshotNotification,
   StatsDController,
 } from '@hicommonwealth/adapters';
 import {
+  ILogger,
   NotificationCategories,
   SnapshotEventType,
 } from '@hicommonwealth/core';

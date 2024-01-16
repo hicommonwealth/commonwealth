@@ -1,15 +1,11 @@
 /* eslint-disable max-len */
-import {
-  StatsDController,
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/adapters';
+import { StatsDController } from '@hicommonwealth/adapters';
 import type {
   IChainEventNotificationData,
   IForumNotificationData,
   NotificationDataAndCategory,
 } from '@hicommonwealth/core';
-import { NotificationCategories } from '@hicommonwealth/core';
+import { NotificationCategories, logger } from '@hicommonwealth/core';
 import Sequelize, { QueryTypes } from 'sequelize';
 import { SEND_WEBHOOKS_EMAILS, SERVER_URL } from '../config';
 import type { DB } from '../models';
@@ -22,7 +18,7 @@ import { rollbar } from './rollbar';
 import { mapNotificationsDataToSubscriptions } from './subscriptionMapping';
 import { dispatchWebhooks } from './webhooks/dispatchWebhook';
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 const { Op } = Sequelize;
 
