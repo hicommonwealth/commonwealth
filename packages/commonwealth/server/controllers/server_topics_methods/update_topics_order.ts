@@ -1,4 +1,4 @@
-import { AppError } from '../../../../common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import { CommunityInstance } from '../../models/community';
 import { TopicAttributes, TopicInstance } from '../../models/topic';
 import { UserInstance } from '../../models/user';

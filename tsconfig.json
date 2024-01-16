@@ -11,16 +11,11 @@
     "traceResolution": false,
     "baseUrl": ".",
     "paths": {
-      "@hicommonwealth/*": ["libs/*/src"],
-      "common-common": ["packages/common-common"],
-      "common-common/*": ["packages/common-common/*"],
-      "chain-testing/*": [
-        "packages/commonwealth/test/util/evm-chain-testing/*"
-      ],
-      "token-balance-cache": ["./packages/token-balance-cache"],
-      "token-balance-cache/*": ["./packages/token-balance-cache/*"]
+      "@hicommonwealth/*": ["libs/*/src"]
     }
   },
+  "include": [],
+  "exclude": ["node_modules", "**/build"],
   "ts-node": {
     "require": ["tsconfig-paths/register"]
   }

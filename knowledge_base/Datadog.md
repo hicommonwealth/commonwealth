@@ -19,7 +19,7 @@ As of 240102, only the main dashboard can be trusted for accurate data reports. 
 
 ## Metrics
 
-In our codebase, we use the [StatsDController](../packages/common-common/src/statsd.ts) to increment counters and add tags.
+In our codebase, we use the [StatsDController](../libs/adapters/src/hot-shots/index.ts.ts) to increment counters and add tags.
 
 For instance, every time `TokenBalanceCache` successfully fetches, we call `.increment` on the controller and then tag the count accordingly. Tags allow us to easily locate the relevant metrics from Datadog's dashboard and generate graphic visualizations.
 

@@ -14,7 +14,6 @@ export const SERVER_URL =
 export const SESSION_SECRET = process.env.SESSION_SECRET || 'my secret';
 export const JWT_SECRET = process.env.JWT_SECRET || 'jwt secret';
 
-export const LOGIN_TOKEN_EXPIRES_IN = 30;
 export const ADDRESS_TOKEN_EXPIRES_IN = 10;
 
 export const ROLLBAR_SERVER_TOKEN = process.env.ROLLBAR_SERVER_TOKEN;
@@ -32,8 +31,6 @@ export const DATABASE_URI = process.env.USES_DOCKER_DB
   : !process.env.DATABASE_URL || process.env.NODE_ENV === 'development'
   ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
   : process.env.DATABASE_URL;
-
-export const VULTR_IP = process.env.VULTR_IP;
 
 export const RABBITMQ_URI = (() => {
   if (!process.env.CLOUDAMQP_URL || process.env.NODE_ENV === 'development') {
@@ -72,8 +69,6 @@ export const REDIS_URL = (() => {
 // increased because of chain waitlist registrations
 export const LOGIN_RATE_LIMIT_TRIES = 15;
 export const LOGIN_RATE_LIMIT_MINS = 5;
-
-export const MIXPANEL_TOKEN = process.env.MIXPANEL_TOKEN;
 
 export const MAGIC_API_KEY = process.env.MAGIC_API_KEY;
 export const MAGIC_SUPPORTED_BASES = (process.env.MAGIC_SUPPORTED_BASES?.split(
@@ -114,9 +109,6 @@ export const TELEGRAM_BOT_TOKEN =
 export const SEND_WEBHOOKS_EMAILS =
   process.env.NODE_ENV === 'production' &&
   process.env.SEND_WEBHOOKS_EMAILS === 'true';
-
-export const FEATURE_FLAG_GROUP_CHECK_ENABLED =
-  process.env.FEATURE_FLAG_GROUP_CHECK_ENABLED === 'true' || false;
 
 export const MEMBERSHIP_REFRESH_BATCH_SIZE = process.env
   .MEMBERSHIP_REFRESH_BATCH_SIZE

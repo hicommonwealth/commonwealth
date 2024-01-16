@@ -1,14 +1,18 @@
-import { NotificationCategories } from '@hicommonwealth/core';
+import {
+  ILogger,
+  RmqSnapshotNotification,
+  StatsDController,
+} from '@hicommonwealth/adapters';
+import {
+  NotificationCategories,
+  SnapshotEventType,
+} from '@hicommonwealth/core';
 import axios from 'axios';
-import { RmqSnapshotNotification } from 'common-common/src/rabbitmq/types/snapshotNotification';
-import { StatsDController } from 'common-common/src/statsd';
-import { SnapshotEventType } from 'types';
-import type { Logger } from 'typescript-logging';
 import type { DB } from '../../../models';
 import emitNotifications from '../../../util/emitNotifications';
 
 export async function processSnapshotMessage(
-  this: { models: DB; log: Logger },
+  this: { models: DB; log: ILogger },
   data: RmqSnapshotNotification.RmqMsgType,
 ) {
   const { space, id, title, body, choices, start, expire } = data;

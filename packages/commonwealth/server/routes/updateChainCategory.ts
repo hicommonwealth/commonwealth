@@ -1,5 +1,5 @@
-import { ChainCategoryType } from '@hicommonwealth/core';
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
+import { CommunityCategoryType } from '@hicommonwealth/core';
 import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
@@ -13,7 +13,7 @@ type UpdateChainCategoryReq = {
 
 type UpdateChainCategoryRes = {
   chain: string;
-  tags: ChainCategoryType[];
+  tags: CommunityCategoryType[];
 };
 
 const updateChainCategory = async (
@@ -32,7 +32,7 @@ const updateChainCategory = async (
   const updateCategories = Object.keys(req.body.selected_tags).filter((tag) => {
     return (
       req.body.selected_tags[tag] &&
-      Object.keys(ChainCategoryType).includes(tag)
+      Object.keys(CommunityCategoryType).includes(tag)
     );
   });
 
@@ -47,7 +47,7 @@ const updateChainCategory = async (
   }
   return success(res, {
     chain: req.body.community_id,
-    tags: updateCategories as ChainCategoryType[],
+    tags: updateCategories as CommunityCategoryType[],
   });
 };
 

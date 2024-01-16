@@ -4,20 +4,19 @@
 require('dotenv').config();
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import 'chai/register-should';
+
 chai.use(chaiHttp);
 const expect = chai.expect;
 
-import { RedisNamespaces } from '@hicommonwealth/core';
 import {
   cacheDecorator,
+  connectToRedis,
+  delay,
+  RedisCache,
   XCACHE_VALUES,
-} from 'common-common/src/cacheDecorator';
-import { RedisCache } from 'common-common/src/redisCache';
+} from '@hicommonwealth/adapters';
+import { RedisNamespaces } from '@hicommonwealth/core';
 import app, { CACHE_ENDPOINTS } from '../../../server-test';
-import { delay } from '../../util/delayUtils';
-import { connectToRedis } from '../../util/redisUtils';
-
 const content_type = {
   json: 'application/json; charset=utf-8',
   html: 'text/html; charset=utf-8',

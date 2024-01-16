@@ -1,4 +1,4 @@
-import { AppError } from '../../../../common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import { AddressInstance } from '../../models/address';
 import { UserInstance } from '../../models/user';
 import deleteThreadFromDb from '../../util/deleteThread';

@@ -1,5 +1,5 @@
+import { AppError } from '@hicommonwealth/adapters';
 import axios from 'axios';
-import { AppError } from 'common-common/src/errors';
 import { NextFunction } from 'express';
 import { ETHERSCAN_JS_API_KEY } from '../config';
 import type { DB } from '../models';

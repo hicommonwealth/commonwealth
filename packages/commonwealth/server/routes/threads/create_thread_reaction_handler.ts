@@ -1,8 +1,8 @@
-import { TypedRequest, TypedResponse, success } from '../../types';
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
+import { verifyReaction } from '../../../shared/canvas/serverVerify';
 import { ReactionAttributes } from '../../models/reaction';
 import { ServerControllers } from '../../routing/router';
-import { verifyReaction } from '../../../shared/canvas/serverVerify';
+import { TypedRequest, TypedResponse, success } from '../../types';
 
 const Errors = {
   InvalidReaction: 'Invalid reaction',
@@ -25,9 +25,9 @@ export const createThreadReactionHandler = async (
     any,
     CreateThreadReactionRequestParams
   >,
-  res: TypedResponse<CreateThreadReactionResponse>
+  res: TypedResponse<CreateThreadReactionResponse>,
 ) => {
-  const { user, address, chain: community } = req;
+  const { user, address, community } = req;
   const {
     reaction,
     canvas_action: canvasAction,

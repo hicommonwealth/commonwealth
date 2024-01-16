@@ -16,12 +16,11 @@ import {
 import { Keyring } from '@polkadot/api';
 import { stringToU8a } from '@polkadot/util';
 import chai from 'chai';
-import 'chai/register-should';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
-import { createRole, findOneRole } from 'server/util/roles';
 import * as siwe from 'siwe';
+import { createRole, findOneRole } from '../../server/util/roles';
 
 import { createCanvasSessionPayload } from '../../shared/canvas';
 
@@ -31,7 +30,7 @@ import app from '../../server-test';
 import models from '../../server/database';
 import type { Role } from '../../server/models/role';
 
-import { Link, LinkSource, ThreadAttributes } from 'server/models/thread';
+import { Link, LinkSource, ThreadAttributes } from '../../server/models/thread';
 import {
   TEST_BLOCK_INFO_BLOCKHASH,
   TEST_BLOCK_INFO_STRING,
@@ -51,6 +50,18 @@ export const generateEthAddress = () => {
   const lowercaseAddress = `0x${keypair.getAddress().toString('hex')}`;
   const address = Web3.toChecksumAddress(lowercaseAddress);
   return { keypair, address };
+};
+
+export const getTopicId = async ({ chain }) => {
+  const res = await chai.request
+    .agent(app)
+    .get('/api/topics')
+    .set('Accept', 'application/json')
+    .query({
+      community_id: chain,
+    });
+  const topicId = res.body.result[0].id;
+  return topicId;
 };
 
 export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
@@ -205,7 +216,6 @@ export interface ThreadArgs {
   stage?: string;
   chainId: string;
   title: string;
-  topicName?: string;
   topicId?: number;
   body?: string;
   url?: string;
@@ -223,7 +233,6 @@ export const createThread = async (
     jwt,
     title,
     body,
-    topicName,
     topicId,
     readOnly,
     kind,
@@ -268,7 +277,6 @@ export const createThread = async (
       title: encodeURIComponent(title),
       body: encodeURIComponent(body),
       kind,
-      topic_name: topicName,
       topic_id: topicId,
       url,
       readOnly: readOnly || false,

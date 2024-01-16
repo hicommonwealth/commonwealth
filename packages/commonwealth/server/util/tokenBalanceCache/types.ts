@@ -1,4 +1,5 @@
-import { BalanceSourceType } from '../requirementsModule/requirementsTypes';
+import { BalanceSourceType } from '@hicommonwealth/core';
+import { ChainNodeInstance } from 'server/models/chain_node';
 
 export type Balances = { [address: string]: string };
 
@@ -18,6 +19,14 @@ type GetEvmBalancesBase = {
     evmChainId: number;
   };
 } & TbcConfigOptions;
+
+type GetCosmosBalancesBase = {
+  addresses: string[];
+  sourceOptions: {
+    cosmosChainId: string;
+  };
+} & TbcConfigOptions;
+
 type GetErc20BalanceOptions = GetEvmBalancesBase & {
   balanceSourceType: BalanceSourceType.ERC20;
   sourceOptions: {
@@ -41,6 +50,15 @@ export type GetErc1155BalanceOptions = GetEvmBalancesBase & {
 export type GetEthNativeBalanceOptions = GetEvmBalancesBase & {
   balanceSourceType: BalanceSourceType.ETHNative;
 };
+type GetCosmosNativeBalanceOptions = GetCosmosBalancesBase & {
+  balanceSourceType: BalanceSourceType.CosmosNative;
+};
+export type GetCw721BalanceOptions = GetCosmosBalancesBase & {
+  balanceSourceType: BalanceSourceType.CW721;
+  sourceOptions: {
+    contractAddress: string;
+  };
+};
 
 export type GetErcBalanceOptions =
   | GetErc20BalanceOptions
@@ -51,14 +69,15 @@ export type GetEvmBalancesOptions =
   | GetErcBalanceOptions
   | GetEthNativeBalanceOptions;
 
-export type GetCosmosBalancesOptions = {
-  balanceSourceType: BalanceSourceType.CosmosNative;
-  addresses: string[];
-  sourceOptions: {
-    cosmosChainId: string;
-  };
-} & TbcConfigOptions;
+export type GetCosmosBalancesOptions =
+  | GetCosmosNativeBalanceOptions
+  | GetCw721BalanceOptions;
 
 export type GetBalancesOptions =
   | GetEvmBalancesOptions
   | GetCosmosBalancesOptions;
+
+export type GetTendermintClientOptions = {
+  chainNode: ChainNodeInstance;
+  batchSize?: number;
+};

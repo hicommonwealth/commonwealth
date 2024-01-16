@@ -1,12 +1,12 @@
-import { MembershipRejectReason } from 'server/models/membership';
-import { toBN } from 'web3-utils';
-import { OptionsWithBalances } from '../tokenBalanceCache/types';
 import {
   AllowlistData,
   BalanceSourceType,
   Requirement,
   ThresholdData,
-} from './requirementsTypes';
+} from '@hicommonwealth/core';
+import { MembershipRejectReason } from 'server/models/membership';
+import { toBN } from 'web3-utils';
+import { OptionsWithBalances } from '../tokenBalanceCache/types';
 
 export type ValidateGroupMembershipResponse = {
   isValid: boolean;
@@ -127,6 +127,12 @@ function _thresholdCheck(
         chainId = thresholdData.source.cosmos_chain_id;
         break;
       }
+      case 'cw721': {
+        balanceSourceType = BalanceSourceType.CW721;
+        contractAddress = thresholdData.source.contract_address;
+        chainId = thresholdData.source.cosmos_chain_id;
+        break;
+      }
       default:
         break;
     }
@@ -151,6 +157,11 @@ function _thresholdCheck(
             return b.options.sourceOptions.evmChainId.toString() === chainId;
           case BalanceSourceType.CosmosNative:
             return b.options.sourceOptions.cosmosChainId.toString() === chainId;
+          case BalanceSourceType.CW721:
+            return (
+              b.options.sourceOptions.contractAddress == contractAddress &&
+              b.options.sourceOptions.cosmosChainId.toString() === chainId
+            );
           default:
             return null;
         }

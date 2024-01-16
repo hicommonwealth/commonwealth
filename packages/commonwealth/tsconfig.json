@@ -2,15 +2,13 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "jsx": "react",
-    "outDir": "build",
     "skipLibCheck": true,
+    "sourceMap": true,
+    "rootDir": ".",
+    "outDir": "build",
     "baseUrl": ".",
     "paths": {
       "@hicommonwealth/*": ["../../libs/*/src"],
-      "common-common": ["../common-common"],
-      "common-common/*": ["../common-common/*"],
-      "token-balance-cache": ["../token-balance-cache"],
-      "token-balance-cache/*": ["../token-balance-cache/*"],
       "*": ["./*", "shared/*", "client/scripts/*"]
     }
   },

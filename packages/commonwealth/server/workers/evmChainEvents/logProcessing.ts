@@ -1,16 +1,19 @@
-import { ethers } from 'ethers';
 import { Log } from '@ethersproject/providers';
+import {
+  StatsDController,
+  formatFilename,
+  loggerFactory,
+} from '@hicommonwealth/adapters';
+import { ethers } from 'ethers';
+import { rollbar } from '../../util/rollbar';
 import {
   AbiSignatures,
   ContractSources,
   EvmSource,
   RawEvmEvent,
 } from './types';
-import { StatsDController } from 'common-common/src/statsd';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { rollbar } from '../../util/rollbar';
 
-const logger = factory.getLogger(formatFilename(__filename));
+const logger = loggerFactory.getLogger(formatFilename(__filename));
 
 /**
  * Converts a string or integer number into a hexadecimal string that adheres to the following guidelines
@@ -22,7 +25,7 @@ function decimalToHex(decimal: number | string) {
     return '0x0';
   } else {
     return ethers.utils.hexStripZeros(
-      ethers.BigNumber.from(decimal).toHexString()
+      ethers.BigNumber.from(decimal).toHexString(),
     );
   }
 }
@@ -40,7 +43,7 @@ export function getProvider(rpc: string) {
 export async function getLogs(
   evmSource: EvmSource,
   startingBlockNum?: number,
-  maxOldBlocks = 10
+  maxOldBlocks = 10,
 ): Promise<{ logs: Log[]; lastBlockNum: number }> {
   const provider = getProvider(evmSource.rpc);
   const currentBlockNum = await provider.getBlockNumber();
@@ -74,7 +77,7 @@ export async function getLogs(
 
 export async function parseLogs(
   sources: ContractSources,
-  logs: Log[]
+  logs: Log[],
 ): Promise<RawEvmEvent[]> {
   const events: RawEvmEvent[] = [];
   const interfaces = {};
@@ -82,7 +85,7 @@ export async function parseLogs(
     const address = ethers.utils.getAddress(log.address);
     const data: AbiSignatures = sources[address];
     const signature = data.sources.find(
-      (s) => s.event_signature === log.topics[0]
+      (s) => s.event_signature === log.topics[0],
     );
     if (!signature) continue;
 
@@ -123,12 +126,12 @@ export async function parseLogs(
 export async function getEvents(
   evmSource: EvmSource,
   startingBlockNum?: number,
-  maxOldBlocks?: number
+  maxOldBlocks?: number,
 ): Promise<{ events: RawEvmEvent[]; lastBlockNum: number }> {
   const { logs, lastBlockNum } = await getLogs(
     evmSource,
     startingBlockNum,
-    maxOldBlocks
+    maxOldBlocks,
   );
   const events = await parseLogs(evmSource.contracts, logs);
   return { events, lastBlockNum };

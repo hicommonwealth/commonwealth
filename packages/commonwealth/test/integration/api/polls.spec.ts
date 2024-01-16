@@ -1,11 +1,11 @@
-import { ActionArgument } from '@canvas-js/interfaces';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import 'chai/register-should';
+
 import jwt from 'jsonwebtoken';
 import * as modelUtils from 'test/util/modelUtils';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
+import models from '../../../server/database';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -13,22 +13,26 @@ const { expect } = chai;
 describe('Polls', () => {
   const chain = 'ethereum';
 
-  let userJWT;
-  let userId;
-  let userAddress;
-  let userAddressId;
+  let userJWT: string;
+  let userAddress: string;
 
+  let topicId;
   let threadId = 0;
-  let threadChain = '';
   let pollId = 0;
 
   before(async () => {
     await resetDatabase();
 
+    const topic = await models.Topic.findOne({
+      where: {
+        community_id: chain,
+        group_ids: [],
+      },
+    });
+    topicId = topic.id;
+
     const userRes = await modelUtils.createAndVerifyAddress({ chain });
     userAddress = userRes.address;
-    userId = userRes.user_id;
-    userAddressId = userRes.address_id;
     userJWT = jwt.sign(
       { id: userRes.user_id, email: userRes.email },
       JWT_SECRET,
@@ -46,8 +50,7 @@ describe('Polls', () => {
       body: 'body1',
       kind: 'discussion',
       stage: 'discussion',
-      topicName: 't1',
-      topicId: undefined,
+      topicId,
       session: {
         type: 'session',
         signature: '',
@@ -61,15 +64,7 @@ describe('Polls', () => {
           block: '',
         },
       },
-      sign: function (actionPayload: {
-        app: string;
-        chain: string;
-        from: string;
-        call: string;
-        callArgs: Record<string, ActionArgument>;
-        timestamp: number;
-        block: string;
-      }): string {
+      sign: function (): string {
         return '';
       },
     });
@@ -98,7 +93,6 @@ describe('Polls', () => {
     });
 
     threadId = thread.id;
-    threadChain = thread.community_id;
     pollId = res.body.result.id;
   });
 

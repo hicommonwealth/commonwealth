@@ -1,4 +1,4 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../models';
 import { getLastEdited } from '../util/getLastEdited';
@@ -13,14 +13,15 @@ const viewComments = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const chain = req.chain;
+  const { community } = req;
+  const threadId = req.query.thread_id as string;
 
-  if (!req.query.thread_id) {
+  if (!threadId) {
     return next(new AppError(Errors.NoRootId));
   }
 
   const comments = await models.Comment.findAll({
-    where: { community_id: chain.id, thread_id: req.query.thread_id },
+    where: { community_id: community.id, thread_id: threadId },
     include: [
       models.Address,
       {

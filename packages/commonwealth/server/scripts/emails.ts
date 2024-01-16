@@ -1,29 +1,26 @@
-import { Label as ChainEventLabel } from '../../shared/chain/labelers/util';
-import type { CWEvent } from '../../shared/chain/types/types';
-
-import { NotificationCategories } from '@hicommonwealth/core';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { capitalize } from 'lodash';
-import { Op, WhereOptions } from 'sequelize';
+import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
 import type {
   IChainEventNotificationData,
   IForumNotificationData,
   ISnapshotNotificationData,
-} from '../../shared/types';
+} from '@hicommonwealth/core';
+import { DynamicTemplate, NotificationCategories } from '@hicommonwealth/core';
+import { capitalize } from 'lodash';
+import { Op, WhereOptions } from 'sequelize';
+import { Label as ChainEventLabel } from '../../shared/chain/labelers/util';
+import type { CWEvent } from '../../shared/chain/types/types';
 import {
   formatAddressShort,
   getThreadUrl,
   renderQuillDeltaToText,
   smartTrim,
 } from '../../shared/utils';
-
-import { DynamicTemplate } from '../../shared/types';
 import { SENDGRID_API_KEY } from '../config';
 import { DB } from '../models';
 import { AddressAttributes } from '../models/address';
 import type { UserAttributes } from '../models/user';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = loggerFactory.getLogger(formatFilename(__filename));
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');

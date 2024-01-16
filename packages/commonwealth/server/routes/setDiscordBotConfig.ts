@@ -1,4 +1,4 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import { validateCommunity } from '../middleware/validateCommunity';
 import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
