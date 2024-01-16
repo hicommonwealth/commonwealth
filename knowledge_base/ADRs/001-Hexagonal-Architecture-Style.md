@@ -1,10 +1,11 @@
 # ADR 001: Hexagonal Architecture Style
 
-Date: 2024-01-12
+Implementing hexagonal architecture will give us greater flexibility, testability, and maintainability.
 
 ## Status
 
-Proposed: @Rotorsoft 20240112
+Proposed: 240112 by Roger Torres (@Rotorsoft)
+
 Accepted:
 
 ## Context
@@ -41,4 +42,4 @@ While Hexagonal Architecture provides many benefits, it also introduces some com
 
 - [Alistair Cockburn, "Hexagonal Architecture"](https://alistair.cockburn.us/hexagonal-architecture)
 - [Roman Glushach, "Hexagonal Architecture: The Secret to Scalable and Maintainable Code for Modern Software"](https://medium.com/@romanglushach/hexagonal-architecture-the-secret-to-scalable-and-maintainable-code-for-modern-software-d345fdb47347)
-- [Spike PR - Logging port and adapter](https://github.com/hicommonwealth/commonwealth/pull/6345)
+- [Spike PR #6345: Logging port and adapter](https://github.com/hicommonwealth/commonwealth/pull/6345)
