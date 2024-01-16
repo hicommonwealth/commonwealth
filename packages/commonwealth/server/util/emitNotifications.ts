@@ -1,11 +1,10 @@
 /* eslint-disable max-len */
-import { StatsDController } from '@hicommonwealth/adapters';
 import type {
   IChainEventNotificationData,
   IForumNotificationData,
   NotificationDataAndCategory,
 } from '@hicommonwealth/core';
-import { NotificationCategories, logger } from '@hicommonwealth/core';
+import { NotificationCategories, logger, stats } from '@hicommonwealth/core';
 import Sequelize, { QueryTypes } from 'sequelize';
 import { SEND_WEBHOOKS_EMAILS, SERVER_URL } from '../config';
 import type { DB } from '../models';
@@ -31,7 +30,7 @@ export default async function emitNotifications(
   const notification_data = notification_data_and_category.data;
   const category_id = notification_data_and_category.categoryId;
   // get subscribers to send notifications to
-  StatsDController.get().increment('cw.notifications.created', {
+  stats().increment('cw.notifications.created', {
     category_id,
     chain:
       (notification_data as any).chain || (notification_data as any).chain_id,
@@ -151,7 +150,7 @@ export default async function emitNotifications(
   const replacements = [];
   for (const subscription of subscriptions) {
     if (subscription.subscriber_id) {
-      StatsDController.get().increment('cw.notifications.emitted', {
+      stats().increment('cw.notifications.emitted', {
         category_id,
         chain:
           (notification_data as any).chain ||

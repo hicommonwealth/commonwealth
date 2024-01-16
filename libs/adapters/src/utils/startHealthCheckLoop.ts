@@ -1,7 +1,4 @@
-import { logger } from '@hicommonwealth/core';
-import { StatsDController } from '../hot-shots';
-
-const log = logger().getLogger(__filename);
+import { logger, stats } from '@hicommonwealth/core';
 
 const PING_INTERVAL = 1_000 * 20;
 
@@ -31,19 +28,19 @@ export function startHealthCheckLoop({
   if (!enabled) {
     return;
   }
+  const log = logger().getLogger(__filename);
   log.info(`starting health check loop for ${service}`);
-  const stat = `service.health.${service}`;
-  // perform a loop that invokes 'checkFn' and sends status to StatsD
+  const key = `service.health.${service}`;
+  // perform a loop that invokes 'checkFn' and sends status to stats
   const loop = async () => {
     const nextCheckAt = Date.now() + PING_INTERVAL;
-    let status = 0;
     try {
       await checkFn();
-      status = 1;
+      stats().on(key);
     } catch (err) {
-      log.error(err.message);
+      log.error(`${service}: ${err.message}`);
+      stats().off(key);
     }
-    StatsDController.get().gauge(stat, status);
     const durationUntilNextCheck = nextCheckAt - Date.now();
     setTimeout(loop, durationUntilNextCheck);
   };

@@ -1,5 +1,4 @@
-import { StatsDController } from '@hicommonwealth/adapters';
-import { IDiscordMeta, logger } from '@hicommonwealth/core';
+import { IDiscordMeta, logger, stats } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
@@ -96,7 +95,7 @@ export default (
             });
             if (thread) {
               thread.increment('comment_count');
-              StatsDController.get().increment('cw.hook.comment-count', {
+              stats().increment('cw.hook.comment-count', {
                 thread_id,
               });
             }
@@ -115,7 +114,7 @@ export default (
             });
             if (thread) {
               thread.decrement('comment_count');
-              StatsDController.get().decrement('cw.hook.comment-count', {
+              stats().decrement('cw.hook.comment-count', {
                 thread_id,
               });
             }
@@ -123,7 +122,7 @@ export default (
             log.error(
               `incrementing comment count error for thread ${thread_id} afterDestroy: ${error}`,
             );
-            StatsDController.get().increment('cw.hook.comment-count-error', {
+            stats().increment('cw.hook.comment-count-error', {
               thread_id,
             });
           }

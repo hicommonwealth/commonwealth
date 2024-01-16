@@ -3,7 +3,6 @@ import {
   RascalConfigServices,
   RascalSubscriptions,
   ServiceKey,
-  StatsDController,
   TRmqMessages,
   getRabbitMQConfig,
   startHealthCheckLoop,
@@ -13,6 +12,7 @@ import {
   IDiscordMessage,
   ThreadDiscordActions,
   logger,
+  stats,
 } from '@hicommonwealth/core';
 import v8 from 'v8';
 import {
@@ -81,7 +81,7 @@ async function processMessage(data: TRmqMessages) {
       );
     }
 
-    StatsDController.get().increment('cw.discobot_message_processed', 1, {
+    stats().increment('cw.discobot_message_processed', {
       chain: topic.community_id,
       action: action,
     });
