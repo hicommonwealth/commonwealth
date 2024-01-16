@@ -1,8 +1,8 @@
 import { AppError } from '@hicommonwealth/adapters';
+import { BalanceSourceType } from '@hicommonwealth/core/build/requirements-types';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { DB } from '../../models';
-import { BalanceSourceType } from '../requirementsModule/requirementsTypes';
 import { TokenBalanceCache } from '../tokenBalanceCache/tokenBalanceCache';
 import { factoryContracts, validChains } from './chainConfig';
 
@@ -72,7 +72,7 @@ export const getNamespaceBalance = async (
       factoryData.factory,
     );
     if (activeNamespace === '0x0000000000000000000000000000000000000000') {
-      return new AppError('Namespace not found for this name');
+      throw new AppError('Namespace not found for this name');
     }
     const balance = await tbc.getBalances({
       balanceSourceType: BalanceSourceType.ERC1155,
@@ -86,6 +86,6 @@ export const getNamespaceBalance = async (
     });
     return balance[address];
   } else {
-    return new AppError('ChainNode not found');
+    throw new AppError('ChainNode not found');
   }
 };
