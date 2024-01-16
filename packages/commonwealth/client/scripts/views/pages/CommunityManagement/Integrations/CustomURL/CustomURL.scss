@@ -1,0 +1,28 @@
+@import '../../../../../../styles/shared';
+
+.CustomURL {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+
+  .header {
+    .h4 {
+      color: $neutral-900 !important;
+    }
+  }
+
+  .b1 {
+    color: $neutral-500 !important;
+  }
+
+  .email-link {
+    color: $primary-500 !important;
+
+    &:visited,
+    &:hover,
+    &:active {
+      color: $primary-500 !important;
+    }
+  }
+}

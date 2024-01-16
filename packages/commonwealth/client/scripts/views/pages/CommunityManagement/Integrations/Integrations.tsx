@@ -2,6 +2,7 @@ import React from 'react';
 import FeatureHint from 'views/components/FeatureHint';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CustomTOS from './CustomTOS';
+import CustomURL from './CustomURL';
 import Directory from './Directory';
 import './Integrations.scss';
 import Snapshots from './Snapshots';
@@ -23,6 +24,7 @@ const Integrations = () => {
           <Snapshots />
           <Webhooks />
           <CustomTOS />
+          <CustomURL />
         </section>
       </section>
 
