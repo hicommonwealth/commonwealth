@@ -27,7 +27,7 @@ const useSidebarTreeToggle = ({
   localStorageKey,
 }: SidebarTreeToggleProps) => {
   const toggledTreeState = useMemo(
-    () => JSON.parse(localStorage[localStorageKey]),
+    () => JSON.parse(localStorage[localStorageKey] || `{}`),
     [localStorageKey],
   );
 
