@@ -4,6 +4,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import Directory from './Directory';
 import './Integrations.scss';
 import Snapshots from './Snapshots';
+import Webhooks from './Webhooks';
 
 const Integrations = () => {
   return (
@@ -19,6 +20,7 @@ const Integrations = () => {
         <section className="list">
           <Directory />
           <Snapshots />
+          <Webhooks />
         </section>
       </section>
 
