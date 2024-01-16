@@ -1,12 +1,10 @@
 # ADR 001: Hexagonal Architecture Style
 
-Implementing hexagonal architecture will give us greater flexibility, testability, and maintainability.
+Implementing hexagonal architecture gives us greater flexibility, testability, and maintainability.
 
 ## Status
 
 Proposed: 240112 by Roger Torres (@Rotorsoft)
-
-Accepted:
 
 ## Context
 
