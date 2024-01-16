@@ -69,7 +69,9 @@ const CustomTOS = () => {
         buttonType="secondary"
         label="Save Changes"
         onClick={onSaveChanges}
-        disabled={isSaving || community.terms.trim() === terms.value.trim()}
+        disabled={
+          isSaving || community?.terms?.trim?.() === terms?.value?.trim?.()
+        }
       />
     </section>
   );
