@@ -2,7 +2,7 @@
   "name": "@hicommonwealth/core",
   "private": "true",
   "version": "0.1.0",
-  "description": "Core Abstractions and Utilities",
+  "description": "Core Abstractions and Shared Utilities",
   "files": [
     "build"
   ],
