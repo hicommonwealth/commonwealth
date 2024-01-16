@@ -1,0 +1,18 @@
+@import '../../../../../../styles/shared.scss';
+
+@keyframes spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+.CircleSpinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  svg {
+    fill: $primary-500;
+    animation: spin 1.2s infinite;
+  }
+}
