@@ -125,23 +125,25 @@ const Discord = () => {
               </CWText>
             </div>
 
-            {(discordChannels || true) && (
+            {discordChannels && (
               <div className="channels">
                 <DiscordForumConnections
-                  channels={discordChannels.forumChannels?.map((channel) => {
-                    return {
-                      channelName: channel.name,
-                      channelId: channel.id,
-                      connectedTopicId: '',
-                      onConnect: async (topicId: string) => {
-                        await onConnectDiscordChannel(
-                          channel.id,
-                          channel.name,
-                          topicId,
-                        );
-                      },
-                    };
-                  })}
+                  channels={(discordChannels.forumChannels || [])?.map(
+                    (channel) => {
+                      return {
+                        channelName: channel.name,
+                        channelId: channel.id,
+                        connectedTopicId: '',
+                        onConnect: async (topicId: string) => {
+                          await onConnectDiscordChannel(
+                            channel.id,
+                            channel.name,
+                            topicId,
+                          );
+                        },
+                      };
+                    },
+                  )}
                   topics={topics.map((topic) => ({
                     name: topic.name,
                     id: `${topic.id}`,
