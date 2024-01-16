@@ -1,0 +1,83 @@
+@import '../../../../../../styles/shared';
+
+.Discord {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+
+  .header {
+    .h4,
+    .h5 {
+      color: $neutral-900 !important;
+    }
+
+    .b1 {
+      color: $neutral-500 !important;
+
+      a {
+        color: $primary-500 !important;
+
+        &:visited,
+        &:hover,
+        &:active {
+          color: $primary-500 !important;
+        }
+      }
+    }
+  }
+
+  .connected {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-left: 36px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+
+    .header {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .channels {
+      .DiscordForumConnections {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+
+        .TopicRow {
+          display: grid;
+          grid-template-columns: 1fr 3fr;
+          gap: 8px;
+
+          .ChannelText {
+            display: flex;
+            align-items: center;
+          }
+        }
+      }
+    }
+
+    .webhooks {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+
+      .b2 {
+        color: $neutral-500 !important;
+      }
+    }
+  }
+
+  .btn-border {
+    margin: 0 !important;
+
+    &:focus-within {
+      border-width: 1px !important;
+      padding: 0px !important;
+    }
+  }
+}
