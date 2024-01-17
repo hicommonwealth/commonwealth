@@ -120,7 +120,7 @@ describe('EVM Chain Events End to End Tests', () => {
     const notifications = await models.Notification.findAll();
     expect(notifications.length).to.equal(1);
     const notification = notifications[0].toJSON();
-    expect(notification).to.have.own.property('chain_id', testChainId);
+    expect(notification).to.have.own.property('community_id', testChainId);
     expect(notification).to.have.own.property(
       'category_id',
       NotificationCategories.ChainEvent,

@@ -118,13 +118,13 @@ export default async function emitNotifications(
         notification_data: JSON.stringify(chainEvent),
         chain_event_id: chainEvent.id,
         category_id: 'chain-event',
-        chain_id: chainEvent.chain,
+        community_id: chainEvent.chain,
       });
     } else {
       notification = await models.Notification.create({
         notification_data: JSON.stringify(notification_data),
         category_id,
-        chain_id: (<IForumNotificationData>notification_data).chain_id,
+        community_id: (<IForumNotificationData>notification_data).chain_id,
         thread_id:
           Number((<IForumNotificationData>notification_data).thread_id) ||
           undefined,

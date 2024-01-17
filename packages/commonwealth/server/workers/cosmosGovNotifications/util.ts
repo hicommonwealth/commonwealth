@@ -44,23 +44,23 @@ export async function fetchCosmosNotifChains(models: DB) {
 
 export async function fetchLatestNotifProposalIds(
   models: DB,
-  chainIds: string[],
+  communityIds: string[],
 ): Promise<Record<string, number>> {
-  if (chainIds.length === 0) return {};
+  if (communityIds.length === 0) return {};
 
   const result = (await models.sequelize.query(
     `
     SELECT
-    chain_id, MAX(notification_data::jsonb -> 'event_data' ->> 'id') as proposal_id
+    community_id, MAX(notification_data::jsonb -> 'event_data' ->> 'id') as proposal_id
     FROM "Notifications"
-    WHERE category_id = 'chain-event' AND chain_id IN (?)
-    GROUP BY chain_id;
+    WHERE category_id = 'chain-event' AND community_id IN (?)
+    GROUP BY community_id;
   `,
-    { raw: true, type: 'SELECT', replacements: [chainIds] },
-  )) as { chain_id: string; proposal_id: string }[];
+    { raw: true, type: 'SELECT', replacements: [communityIds] },
+  )) as { community_id: string; proposal_id: string }[];
 
   return result.reduce(
-    (acc, item) => ({ ...acc, [item.chain_id]: +item.proposal_id }),
+    (acc, item) => ({ ...acc, [item.community_id]: +item.proposal_id }),
     {},
   );
 }
