@@ -77,7 +77,6 @@ export const postCanvasData = async (
   req: TypedRequestBody<CanvasPostReq>,
   res: TypedResponse<CanvasPostResp>,
 ) => {
-  const data = {};
   const { canvas_action, canvas_session, canvas_hash } = req.body;
 
   // TODO: Implement verification and call the create
