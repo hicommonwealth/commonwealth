@@ -7,6 +7,11 @@
   padding: 22px 60px;
   padding-bottom: 100px;
 
+  @include extraSmall {
+    padding: 16px;
+    padding-bottom: 50px;
+  }
+
   @include mediumSmallInclusive {
     grid-template-columns: 1fr;
   }
