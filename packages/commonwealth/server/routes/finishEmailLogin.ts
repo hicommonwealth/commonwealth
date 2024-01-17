@@ -1,8 +1,8 @@
 import { NotificationCategories, stats } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import type { Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
-import type { DB } from '../models';
 
 export const redirectWithLoginSuccess = (
   res,

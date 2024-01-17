@@ -1,6 +1,6 @@
 import { AppError } from '@hicommonwealth/adapters';
+import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-import type { DB } from '../models';
 import type ViewCountCache from '../util/viewCountCache';
 
 export const Errors = {

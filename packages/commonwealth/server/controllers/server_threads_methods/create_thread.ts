@@ -2,12 +2,14 @@ import moment from 'moment';
 
 import { AppError } from '@hicommonwealth/adapters';
 import { NotificationCategories, ProposalType } from '@hicommonwealth/core';
+import {
+  AddressInstance,
+  CommunityInstance,
+  ThreadAttributes,
+  UserInstance,
+} from '@hicommonwealth/model';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
-import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/community';
-import { ThreadAttributes } from '../../models/thread';
-import { UserInstance } from '../../models/user';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';

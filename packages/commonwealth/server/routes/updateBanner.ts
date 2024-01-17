@@ -1,7 +1,6 @@
 import { AppError } from '@hicommonwealth/adapters';
+import type { CommunityBannerInstance, DB } from '@hicommonwealth/model';
 import type { Response } from 'express';
-import type { DB } from '../models';
-import type { CommunityBannerInstance } from '../models/community_banner';
 import type { TypedRequestBody } from '../types';
 import { success } from '../types';
 import { validateOwner } from '../util/validateOwner';

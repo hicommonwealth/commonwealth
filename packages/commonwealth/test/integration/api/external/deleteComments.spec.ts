@@ -1,6 +1,6 @@
+import { models } from '@hicommonwealth/model';
 import chai from 'chai';
 import jwt from 'jsonwebtoken';
-import models from 'server/database';
 import { Op } from 'sequelize';
 import { JWT_SECRET } from '../../../../server/config';
 import { del, put } from './appHook.spec';
@@ -19,11 +19,11 @@ describe('deleteComments Tests', () => {
   beforeEach(() => {
     jwtToken = jwt.sign(
       { id: testUsers[0].id, email: testUsers[0].email },
-      JWT_SECRET
+      JWT_SECRET,
     );
     jwtTokenUser2 = jwt.sign(
       { id: testUsers[1].id, email: testUsers[1].email },
-      JWT_SECRET
+      JWT_SECRET,
     );
   });
 
@@ -34,7 +34,7 @@ describe('deleteComments Tests', () => {
       await models.Comment.count({
         where: { id: { [Op.in]: [smallestId - 1, smallestId - 2] } },
       }),
-      0
+      0,
     );
 
     let resp = await put('/api/comments', {
@@ -62,7 +62,7 @@ describe('deleteComments Tests', () => {
       await models.Comment.count({
         where: { id: { [Op.in]: [smallestId - 1, smallestId - 2] } },
       }),
-      2
+      2,
     );
 
     resp = await del('/api/comments', {
@@ -75,7 +75,7 @@ describe('deleteComments Tests', () => {
       await models.Comment.count({
         where: { id: { [Op.in]: [smallestId - 1, smallestId - 2] } },
       }),
-      0
+      0,
     );
   });
 
@@ -86,7 +86,7 @@ describe('deleteComments Tests', () => {
       await models.Comment.count({
         where: { id: { [Op.in]: [smallestId - 3, smallestId - 4] } },
       }),
-      0
+      0,
     );
 
     let resp = await put('/api/comments', {
@@ -114,13 +114,13 @@ describe('deleteComments Tests', () => {
       await models.Comment.count({
         where: { id: { [Op.in]: [smallestId - 3, smallestId - 4] } },
       }),
-      2
+      2,
     );
 
     resp = await del(
       '/api/comments',
       { jwt: jwtTokenUser2, ids: [smallestId - 3, smallestId - 4] },
-      true
+      true,
     );
 
     chai.assert.deepEqual(resp.result.error.unownedAddresses, [
@@ -130,7 +130,7 @@ describe('deleteComments Tests', () => {
       await models.Comment.count({
         where: { id: { [Op.in]: [smallestId - 3, smallestId - 4] } },
       }),
-      2
+      2,
     );
   });
 
@@ -141,7 +141,7 @@ describe('deleteComments Tests', () => {
         jwt: jwtToken,
         comments: [{ bad: 3 }],
       },
-      true
+      true,
     );
 
     chai.assert.equal(resp.status, 'Failure');
@@ -153,7 +153,7 @@ describe('deleteComments Tests', () => {
       {
         comments: [{}],
       },
-      true
+      true,
     );
 
     chai.assert.equal(resp.statusCode, 401);

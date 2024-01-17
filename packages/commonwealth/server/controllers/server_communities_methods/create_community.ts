@@ -15,15 +15,16 @@ import { Op } from 'sequelize';
 import Web3 from 'web3';
 import { bech32ToHex, urlHasValidHTTPPrefix } from '../../../shared/utils';
 
+import type {
+  AddressInstance,
+  ChainNodeAttributes,
+  CommunityAttributes,
+  RoleAttributes,
+} from '@hicommonwealth/model';
 import { COSMOS_REGISTRY_API } from '../../config';
-import type { AddressInstance } from '../../models/address';
-import type { ChainNodeAttributes } from '../../models/chain_node';
-import type { CommunityAttributes } from '../../models/community';
-import type { RoleAttributes } from '../../models/role';
 
-import { Community } from '@hicommonwealth/model';
+import { Community, UserInstance } from '@hicommonwealth/model';
 import axios from 'axios';
-import { UserInstance } from '../../models/user';
 import { RoleInstanceWithPermission } from '../../util/roles';
 import testSubstrateSpec from '../../util/testSubstrateSpec';
 import { ServerCommunitiesController } from '../server_communities_controller';

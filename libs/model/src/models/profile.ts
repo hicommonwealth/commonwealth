@@ -38,7 +38,7 @@ export type ProfileModelStatic = ModelStatic<ProfileInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): ProfileModelStatic => {
   const Profile = <ProfileModelStatic>sequelize.define(
     'Profile',
@@ -68,7 +68,7 @@ export default (
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       indexes: [{ fields: ['user_id'] }],
-    }
+    },
   );
 
   Profile.associate = (models) => {

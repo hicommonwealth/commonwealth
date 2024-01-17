@@ -1,5 +1,5 @@
+import { TopicAttributes } from '@hicommonwealth/model';
 import { Request } from 'express';
-import { TopicAttributes } from '../../models/topic';
 import { ServerControllers } from '../../routing/router';
 import { TypedResponse, success } from '../../types';
 

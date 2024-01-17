@@ -1,5 +1,5 @@
+import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-import type { DB } from '../models';
 
 export const Errors = {
   NeedSecret: 'Must provide the secret to use this route',

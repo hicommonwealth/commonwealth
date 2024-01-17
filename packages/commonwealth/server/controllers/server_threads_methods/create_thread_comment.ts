@@ -1,12 +1,15 @@
 import { AppError, ServerError } from '@hicommonwealth/adapters';
 import { NotificationCategories, ProposalType } from '@hicommonwealth/core';
+import {
+  AddressInstance,
+  CommentAttributes,
+  CommentInstance,
+  CommunityInstance,
+  UserInstance,
+} from '@hicommonwealth/model';
 import moment from 'moment';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
-import { AddressInstance } from '../../models/address';
-import { CommentAttributes, CommentInstance } from '../../models/comment';
-import { CommunityInstance } from '../../models/community';
-import { UserInstance } from '../../models/user';
 import { getCommentDepth } from '../../util/getCommentDepth';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';

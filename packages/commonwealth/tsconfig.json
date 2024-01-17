@@ -19,7 +19,9 @@
     "./globals.d.ts",
     "./server",
     "./server.ts",
-    "./scripts"
+    "./scripts",
+    "../../libs/model/src/models",
+    "../../libs/model/src/database.ts"
   ],
   "references": [
     { "path": "../../libs/adapters" },

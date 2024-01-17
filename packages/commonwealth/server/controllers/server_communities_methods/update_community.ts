@@ -1,13 +1,15 @@
 /* eslint-disable no-continue */
 import { AppError } from '@hicommonwealth/adapters';
 import { ChainBase } from '@hicommonwealth/core';
+import type {
+  CommunityAttributes,
+  CommunitySnapshotSpaceWithSpaceAttached,
+} from '@hicommonwealth/model';
+import { UserInstance } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import type { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
-import { UserInstance } from 'server/models/user';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';
 import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
-import type { CommunityAttributes } from '../../models/community';
 import { findOneRole } from '../../util/roles';
 import { TrackOptions } from '../server_analytics_methods/track';
 import { ServerCommunitiesController } from '../server_communities_controller';

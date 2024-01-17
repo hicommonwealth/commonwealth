@@ -8,6 +8,20 @@ import {
   WalletSsoSource,
   logger,
 } from '@hicommonwealth/core';
+import type {
+  DB,
+  ProfileAttributes,
+  ProfileInstance,
+} from '@hicommonwealth/model';
+import {
+  AddressAttributes,
+  AddressInstance,
+  CommunityInstance,
+  SsoTokenInstance,
+  UserAttributes,
+  UserInstance,
+  sequelize,
+} from '@hicommonwealth/model';
 import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
 import { verify } from 'jsonwebtoken';
 import passport from 'passport';
@@ -17,14 +31,7 @@ import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types'
 import { verify as verifyCanvas } from '../../shared/canvas/verify';
 import { JWT_SECRET, MAGIC_API_KEY } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
-import { sequelize } from '../database';
 import { validateCommunity } from '../middleware/validateCommunity';
-import type { DB } from '../models';
-import { AddressAttributes, AddressInstance } from '../models/address';
-import { CommunityInstance } from '../models/community';
-import type { ProfileAttributes, ProfileInstance } from '../models/profile';
-import { SsoTokenInstance } from '../models/sso_token';
-import { UserAttributes, UserInstance } from '../models/user';
 import { TypedRequestBody } from '../types';
 import { createRole } from '../util/roles';
 

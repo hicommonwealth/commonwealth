@@ -1,6 +1,6 @@
 import { AppError } from '@hicommonwealth/adapters';
 import { BalanceSourceType } from '@hicommonwealth/core';
-import { DB } from 'server/models';
+import { DB } from '@hicommonwealth/model';
 import Web3 from 'web3';
 import { TokenBalanceCache } from '../tokenBalanceCache/tokenBalanceCache';
 import { factoryContracts, validChains } from './chainConfig';

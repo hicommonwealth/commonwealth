@@ -17,7 +17,7 @@ export type NotificationCategoryModelStatic =
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): NotificationCategoryModelStatic => {
   const NotificationCategory = <NotificationCategoryModelStatic>(
     sequelize.define(
@@ -31,7 +31,7 @@ export default (
         underscored: true,
         createdAt: 'created_at',
         updatedAt: 'updated_at',
-      }
+      },
     )
   );
   NotificationCategory.associate = (models) => {

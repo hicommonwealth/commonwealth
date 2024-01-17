@@ -20,7 +20,7 @@ export type DiscordBotConfigModelStatic = ModelStatic<DiscordBotConfigInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): DiscordBotConfigModelStatic => {
   const DiscordBotConfig = <DiscordBotConfigModelStatic>sequelize.define(
     'DiscordBotConfig',
@@ -51,7 +51,7 @@ export default (
       tableName: 'DiscordBotConfig',
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-    }
+    },
   );
 
   DiscordBotConfig.associate = (models) => {

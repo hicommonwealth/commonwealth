@@ -10,6 +10,7 @@ import {
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import { logger as _logger, stats } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import bodyParser from 'body-parser';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
@@ -37,7 +38,6 @@ import {
   SESSION_SECRET,
   TBC_BALANCE_TTL_SECONDS,
 } from './server/config';
-import models from './server/database';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
 import { addSwagger } from './server/routing/addSwagger';

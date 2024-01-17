@@ -1,9 +1,9 @@
+import { models } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import app from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import models from '../../../server/database';
 import { Errors } from '../../../server/routes/threads/create_thread_comment_handler';
 import { del, post } from './external/appHook.spec';
 import {

@@ -1,6 +1,5 @@
 import { logger, stats } from '@hicommonwealth/core';
-import models from '../../database';
-import { NotificationInstance } from '../../models/notification';
+import { NotificationInstance, models } from '@hicommonwealth/model';
 import { rollbar } from '../../util/rollbar';
 import { emitChainEventNotifs } from './emitChainEventNotifs';
 import { getEventSources } from './getEventSources';

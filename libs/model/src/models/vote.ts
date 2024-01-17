@@ -23,7 +23,7 @@ export type VoteModelStatic = ModelStatic<VoteInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): VoteModelStatic => {
   const Vote = <VoteModelStatic>sequelize.define(
     'Vote',
@@ -42,7 +42,7 @@ export default (
       underscored: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-    }
+    },
   );
 
   Vote.associate = (models) => {

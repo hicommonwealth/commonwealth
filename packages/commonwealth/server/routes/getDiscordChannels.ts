@@ -1,5 +1,5 @@
+import type { DB } from '@hicommonwealth/model';
 import axios from 'axios';
-import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 

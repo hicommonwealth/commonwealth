@@ -26,7 +26,7 @@ export type PollModelStatic = ModelStatic<PollInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): PollModelStatic => {
   const Poll = <PollModelStatic>sequelize.define(
     'Poll',
@@ -49,7 +49,7 @@ export default (
       underscored: true,
       tableName: 'Polls',
       indexes: [{ fields: ['thread_id'] }, { fields: ['community_id'] }],
-    }
+    },
   );
 
   Poll.associate = (models) => {

@@ -1,10 +1,12 @@
+import type {
+  AddressAttributes,
+  CommentAttributes,
+  DB,
+  ProfileInstance,
+  ThreadAttributes,
+} from '@hicommonwealth/model';
 import type { NextFunction } from 'express';
 import { Op } from 'sequelize';
-import type { ProfileInstance } from '..//models/profile';
-import type { DB } from '../models';
-import type { AddressAttributes } from '../models/address';
-import type { CommentAttributes } from '../models/comment';
-import type { ThreadAttributes } from '../models/thread';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 

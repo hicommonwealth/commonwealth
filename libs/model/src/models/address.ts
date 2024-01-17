@@ -110,7 +110,7 @@ export default (
                 WalletId.KeplrEthereum,
                 WalletId.TerraStation,
                 WalletId.CosmosEvmMetamask,
-              ].includes(this.wallet_id)
+              ].includes(this.wallet_id as WalletId)
             ) {
               if (!this.hex) {
                 throw new Error('hex is required for cosmos addresses');

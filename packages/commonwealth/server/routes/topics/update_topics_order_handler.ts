@@ -1,4 +1,4 @@
-import { TopicAttributes } from '../../models/topic';
+import { TopicAttributes } from '@hicommonwealth/model';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 

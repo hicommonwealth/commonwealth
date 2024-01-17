@@ -1,7 +1,7 @@
 import { AppError } from '@hicommonwealth/adapters';
 import { NotificationCategories } from '@hicommonwealth/core';
+import { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-import { DB } from '../../models';
 import Errors from './errors';
 
 export default async (

@@ -1,6 +1,5 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import type { SnapshotSpaceAttributes } from './snapshot_spaces';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type TemplateAttributes = {
@@ -22,7 +21,7 @@ export type TemplateModelStatic = ModelStatic<TemplateInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): TemplateModelStatic => {
   const Template = <TemplateModelStatic>sequelize.define(
     'Template',
@@ -41,7 +40,7 @@ export default (
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       underscored: true,
-    }
+    },
   );
 
   Template.associate = (models) => {

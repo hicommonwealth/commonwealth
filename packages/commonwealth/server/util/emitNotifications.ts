@@ -5,10 +5,9 @@ import type {
   NotificationDataAndCategory,
 } from '@hicommonwealth/core';
 import { NotificationCategories, logger, stats } from '@hicommonwealth/core';
+import type { DB, NotificationInstance } from '@hicommonwealth/model';
 import Sequelize, { QueryTypes } from 'sequelize';
 import { SEND_WEBHOOKS_EMAILS, SERVER_URL } from '../config';
-import type { DB } from '../models';
-import type { NotificationInstance } from '../models/notification';
 import {
   createImmediateNotificationEmailObject,
   sendImmediateNotificationEmail,

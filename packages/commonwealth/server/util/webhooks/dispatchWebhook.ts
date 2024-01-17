@@ -4,9 +4,11 @@ import {
   logger,
   stats,
 } from '@hicommonwealth/core';
-import models from '../../database';
-import { CommunityInstance } from '../../models/community';
-import { WebhookInstance } from '../../models/webhook';
+import {
+  CommunityInstance,
+  WebhookInstance,
+  models,
+} from '@hicommonwealth/model';
 import { rollbar } from '../rollbar';
 import { sendDiscordWebhook } from './destinations/discord';
 import { sendSlackWebhook } from './destinations/slack';
