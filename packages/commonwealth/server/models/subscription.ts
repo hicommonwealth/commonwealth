@@ -13,7 +13,7 @@ import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes } from './user';
 
 export enum SubscriptionValidationErrors {
-  NoChainId = 'Must provide a chain_id',
+  NoCommunityId = 'Must provide a community_id',
   NoSnapshotId = 'Must provide a snapshot_id',
   NoThreadOrComment = 'Must provide a thread_id or a comment_id',
   NotBothThreadAndComment = 'Cannot provide both thread_id and comment_id',
@@ -28,7 +28,7 @@ export type SubscriptionAttributes = {
   immediate_email?: boolean;
   created_at?: Date;
   updated_at?: Date;
-  chain_id?: string;
+  community_id?: string;
   thread_id?: number;
   comment_id?: number;
   snapshot_id?: string;
@@ -36,7 +36,7 @@ export type SubscriptionAttributes = {
   User?: UserAttributes;
   NotificationCategory?: NotificationCategoryAttributes;
   NotificationsRead?: NotificationsReadAttributes[];
-  Chain?: CommunityAttributes;
+  Community?: CommunityAttributes;
   Thread?: ThreadAttributes;
   Comment?: CommentAttributes;
 };
@@ -69,7 +69,7 @@ export default (
         defaultValue: false,
         allowNull: false,
       },
-      chain_id: { type: dataTypes.STRING, allowNull: true },
+      community_id: { type: dataTypes.STRING, allowNull: true },
       thread_id: { type: dataTypes.INTEGER, allowNull: true },
       comment_id: { type: dataTypes.INTEGER, allowNull: true },
       snapshot_id: {
@@ -82,11 +82,7 @@ export default (
       underscored: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-      indexes: [
-        { fields: ['subscriber_id'] },
-        { fields: ['category_id', 'is_active'] },
-        { fields: ['thread_id'] },
-      ],
+      indexes: [{ fields: ['subscriber_id'] }, { fields: ['thread_id'] }],
       validate: {
         // The validation checks defined here are replicated exactly at the database level using CONSTRAINTS
         // on the Subscriptions table itself. Any update here MUST be made at the database level too.
@@ -94,8 +90,8 @@ export default (
           switch (this.category_id) {
             case NotificationCategories.ChainEvent:
             case NotificationCategories.NewThread:
-              if (!this.chain_id)
-                throw new Error(SubscriptionValidationErrors.NoChainId);
+              if (!this.community_id)
+                throw new Error(SubscriptionValidationErrors.NoCommunityId);
               break;
             case NotificationCategories.SnapshotProposal:
               if (!this.snapshot_id)
@@ -103,8 +99,8 @@ export default (
               break;
             case NotificationCategories.NewComment:
             case NotificationCategories.NewReaction:
-              if (!this.chain_id)
-                throw new Error(SubscriptionValidationErrors.NoChainId);
+              if (!this.community_id)
+                throw new Error(SubscriptionValidationErrors.NoCommunityId);
               if (!this.thread_id && !this.comment_id)
                 throw new Error(SubscriptionValidationErrors.NoThreadOrComment);
               if (this.thread_id && this.comment_id)
@@ -137,7 +133,8 @@ export default (
       onDelete: 'cascade',
     });
     models.Subscription.belongsTo(models.Community, {
-      foreignKey: 'chain_id',
+      as: 'Community',
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
     models.Subscription.belongsTo(models.Thread, {

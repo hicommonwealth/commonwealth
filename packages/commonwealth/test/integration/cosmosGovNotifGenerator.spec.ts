@@ -341,14 +341,14 @@ describe('Cosmos Governance Notification Generator', () => {
       await models.Subscription.findOrCreate({
         where: {
           subscriber_id: user.id,
-          chain_id: 'osmosis',
+          community_id: 'osmosis',
           category_id: 'chain-event',
         },
       });
       await models.Subscription.findOrCreate({
         where: {
           subscriber_id: user.id,
-          chain_id: 'kyve',
+          community_id: 'kyve',
           category_id: 'chain-event',
         },
       });

@@ -342,7 +342,7 @@ async function main() {
       result = await models.Subscription.findOrCreate({
         where: {
           subscriber_id: userId,
-          chain_id: argv.chain_id,
+          community_id: argv.chain_id,
           category_id: NotificationCategories.ChainEvent,
         },
         transaction,

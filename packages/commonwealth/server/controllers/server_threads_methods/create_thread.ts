@@ -184,20 +184,22 @@ export async function __createThread(
   // -----
 
   // auto-subscribe thread creator to comments & reactions
-  await this.models.Subscription.create({
-    subscriber_id: user.id,
-    category_id: NotificationCategories.NewComment,
-    thread_id: finalThread.id,
-    chain_id: finalThread.community_id,
-    is_active: true,
-  });
-  await this.models.Subscription.create({
-    subscriber_id: user.id,
-    category_id: NotificationCategories.NewReaction,
-    thread_id: finalThread.id,
-    chain_id: finalThread.community_id,
-    is_active: true,
-  });
+  await this.models.Subscription.bulkCreate([
+    {
+      subscriber_id: user.id,
+      category_id: NotificationCategories.NewComment,
+      thread_id: finalThread.id,
+      community_id: finalThread.community_id,
+      is_active: true,
+    },
+    {
+      subscriber_id: user.id,
+      category_id: NotificationCategories.NewReaction,
+      thread_id: finalThread.id,
+      community_id: finalThread.community_id,
+      is_active: true,
+    },
+  ]);
 
   // grab mentions to notify tagged users
   const bodyText = decodeURIComponent(body);
