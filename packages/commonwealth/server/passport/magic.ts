@@ -101,7 +101,7 @@ async function createMagicAddressInstances(
       addressInstance.wallet_sso_source === null
     ) {
       addressInstance.wallet_sso_source = walletSsoSource;
-      addressInstance.save({ transaction: t });
+      await addressInstance.save({ transaction: t });
     }
     addressInstances.push(addressInstance);
   }
