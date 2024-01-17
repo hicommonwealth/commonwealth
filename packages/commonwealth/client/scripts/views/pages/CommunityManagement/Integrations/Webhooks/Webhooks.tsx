@@ -1,5 +1,6 @@
 import { WebhookCategory } from '@hicommonwealth/core';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { pluralizeWithoutNumberPrefix } from 'helpers';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import Webhook from 'models/Webhook';
 import React, { useState } from 'react';
@@ -84,11 +85,17 @@ const Webhooks = () => {
       );
 
       notifySuccess(
-        `Webhook${webhooksToCreate.length > 1 ? '(s)' : ''} created!`,
+        `${pluralizeWithoutNumberPrefix(
+          webhooksToCreate.length,
+          'Webhook',
+        )} created!`,
       );
     } catch {
       notifyError(
-        `Failed to create webhook${webhooksToCreate.length > 1 ? '(s)' : ''}!`,
+        `Failed to create ${pluralizeWithoutNumberPrefix(
+          webhooksToCreate.length,
+          'webhook',
+        )}}!`,
       );
     } finally {
       setLinks(
