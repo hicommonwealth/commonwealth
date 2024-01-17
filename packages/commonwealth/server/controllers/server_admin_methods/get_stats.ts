@@ -24,6 +24,8 @@ export type GetStatsResult = {
     numProposalVotesLastMonth: number;
     numMembersLastMonth: number;
     numGroupsLastMonth: number;
+    averageAddressesPerCommunity: number;
+    populatedCommunities: number;
   };
 };
 
@@ -77,6 +79,8 @@ export async function __getStats(
     numPollsLastMonth,
     numMembersLastMonth,
     numGroupsLastMonth,
+    [{ result: averageAddressesPerCommunity }],
+    [{ result: populatedCommunities }],
   ] = await Promise.all([
     this.models.sequelize.query<{ id: string }>(
       `SELECT id FROM "Communities" WHERE created_at >= NOW() - INTERVAL '30 days'`,
@@ -103,6 +107,30 @@ export async function __getStats(
     this.models.Group.count({
       where: whereCommunityId,
     }),
+    this.models.sequelize.query<{ result: number }>(
+      `
+      SELECT AVG(address_count) as result
+      FROM (
+          SELECT "Communities".id, "Communities".name, COUNT("Addresses".id) as address_count
+          FROM "Communities"
+          JOIN "Addresses" ON "Addresses".community_id = "Communities".id
+          GROUP BY "Communities".id, "Communities".name
+      ) as address_counts;
+    `,
+      { type: QueryTypes.SELECT },
+    ),
+    this.models.sequelize.query<{ result: number }>(
+      `
+        SELECT COUNT(*) as result FROM (
+          SELECT DISTINCT("Communities".id)
+          FROM "Communities"
+          JOIN "Addresses" ON "Addresses".community_id = "Communities".id
+          GROUP BY "Communities".id, "Communities".name
+          HAVING COUNT("Addresses".id) > 2
+        ) as _;
+      `,
+      { type: QueryTypes.SELECT },
+    ),
   ]);
 
   return {
@@ -115,6 +143,8 @@ export async function __getStats(
       numPollsLastMonth,
       numMembersLastMonth,
       numGroupsLastMonth,
+      averageAddressesPerCommunity,
+      populatedCommunities,
     },
   };
 }
