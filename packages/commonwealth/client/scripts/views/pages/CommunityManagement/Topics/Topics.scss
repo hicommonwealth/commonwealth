@@ -1,0 +1,11 @@
+@import '../../../../../styles/shared';
+
+.TopicsPage {
+  padding: 40px;
+
+  main {
+    .subheader {
+      color: $neutral-500;
+    }
+  }
+}
