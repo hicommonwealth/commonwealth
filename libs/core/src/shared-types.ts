@@ -199,3 +199,10 @@ export type WebhookCategory =
   | NotificationCategories.NewThread
   | NotificationCategories.NewComment
   | NotificationCategories.NewReaction;
+
+export type EmitNotification<T> = (
+  models: unknown,
+  notification_data_and_category: NotificationDataAndCategory,
+  excludeAddresses?: string[],
+  includeAddresses?: string[],
+) => Promise<T>;

@@ -4,8 +4,8 @@ import {
   ChainNetwork,
   ChainType,
 } from '@hicommonwealth/core';
+import { hashAbi } from '@hicommonwealth/model';
 import models from '../../../server/database';
-import { hashAbi } from '../../../server/util/abiValidation';
 import {
   rawCompoundAbi,
   rawDydxAbi,

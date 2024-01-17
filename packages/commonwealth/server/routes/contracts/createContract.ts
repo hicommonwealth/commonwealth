@@ -1,6 +1,7 @@
 import { AppError } from '@hicommonwealth/adapters';
 import type { ContractType } from '@hicommonwealth/core';
 import { AbiType } from '@hicommonwealth/core';
+import { hashAbi } from '@hicommonwealth/model';
 import { Transaction } from 'sequelize';
 import type { ContractAbiInstance } from 'server/models/contract_abi';
 import type { DB } from '../../models';
@@ -11,7 +12,7 @@ import type {
 } from '../../models/contract';
 import type { TypedRequestBody, TypedResponse } from '../../types';
 import { success } from '../../types';
-import validateAbi, { hashAbi } from '../../util/abiValidation';
+import validateAbi from '../../util/abiValidation';
 import { validateOwner } from '../../util/validateOwner';
 
 export const Errors = {

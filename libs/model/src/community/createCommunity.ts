@@ -1,5 +1,9 @@
+import {
+  ChainBase,
+  ChainType,
+  CommunityCategoryType,
+} from '@hicommonwealth/core';
 import { z } from 'zod';
-import { ChainBase, ChainType, CommunityCategoryType } from '../types';
 import { checkIconSize } from '../utils/checkIconSize';
 import { ALL_COMMUNITIES } from '../utils/constants';
 
