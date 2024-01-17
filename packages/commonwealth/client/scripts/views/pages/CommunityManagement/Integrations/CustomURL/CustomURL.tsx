@@ -23,9 +23,7 @@ const CustomURL = () => {
 
       <CWText type="b1">
         Email support at:&nbsp;
-        <a href="mailto:support@common.xyz" className="email-link">
-          support@common.xyz
-        </a>
+        <a href="mailto:support@common.xyz">support@common.xyz</a>
       </CWText>
     </section>
   );

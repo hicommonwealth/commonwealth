@@ -28,6 +28,36 @@
       flex-direction: column;
       gap: 48px;
       align-items: flex-start;
+
+      .header {
+        .h4,
+        .h5 {
+          color: $neutral-900 !important;
+        }
+
+        .b1 {
+          color: $neutral-500 !important;
+        }
+      }
+
+      a {
+        color: $primary-500 !important;
+
+        &:visited,
+        &:hover,
+        &:active {
+          color: $primary-500 !important;
+        }
+      }
+
+      .btn-border {
+        margin: 0 !important;
+
+        &:focus-within {
+          border-width: 1px !important;
+          padding: 0px !important;
+        }
+      }
     }
   }
 
