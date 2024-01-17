@@ -115,51 +115,8 @@ const ReactQuillEditor = ({
     return patterns.some((pattern) => pattern.test(text));
   };
 
-  // const handleChange = (value, delta, source, editor: UnprivilegedEditor) => {
-  //   const newContent = convertTwitterLinksToEmbeds(editor.getContents());
-  //   // const edit = editorRef?.current?.getEditor();
-  //
-  //   // if the user is typing ascii art, enable markdown
-  //   const isAsciiArt = isASCIIArt(getTextFromDelta(newContent));
-  //   if (isAsciiArt && !isMarkdownEnabled) {
-  //     setIsMarkdownEnabled(true);
-  //   } else if (isAsciiArt && isMarkdownEnabled) {
-  //     // const selection = edit.getSelection();
-  //     // //
-  //     // if (!selection) {
-  //     //   return;
-  //     // }
-  //     // //
-  //     // const test = edit.getText(selection.index, selection.length);
-  //     //
-  //     //
-  //
-  //     const idk = newContent.ops.forEach((op) => {
-  //       if (op.insert && typeof op.insert === 'string') {
-  //         op.attributes = {
-  //           ...op.attributes,
-  //           'code-block': true
-  //         };
-  //       }
-  //     });
-  //
-  //     // // edit.insertText(selection.length, '```');
-  //     // edit.formatText(0, selection.length, 'bold', true);
-  //
-  //     // editorRef.current?.editor?.format('code-block', true);
-  //     // editorRef.current?.editor?.clipboard.
-  //     // editor.format('code-block', true);
-  //   }
-  //
-  //   setContentDelta({
-  //     ...newContent,
-  //     ___isMarkdown: isMarkdownEnabled
-  //   } as SerializableDeltaStatic);
-  // };
-
   const handleChange = (value, delta, source, editor: UnprivilegedEditor) => {
     const newContent = convertTwitterLinksToEmbeds(editor.getContents());
-    const isAsciiArt = isASCIIArt(getTextFromDelta(contentDelta));
 
     setContentDelta({
       ...newContent,
@@ -219,26 +176,23 @@ const ReactQuillEditor = ({
 
   useEffect(() => {
     const isAsciiArt = isASCIIArt(getTextFromDelta(contentDelta));
-    console.log('content', contentDelta);
-    // Your logic for processing ASCII art and updating content
     const handleAsciiArt = () => {
       if (isAsciiArt && !isMarkdownEnabled) {
-        setIsMarkdownEnabled(true);
-        // editorRef.current?.getEditor().format('code-block', true);
+        setIsMarkdownEnabled(isAsciiArt);
+        refreshQuillComponent();
       } else if (
         isAsciiArt &&
         isMarkdownEnabled &&
         !getTextFromDelta(contentDelta).includes('```')
       ) {
-        console.log('fired');
         const updatedOps = contentDelta.ops?.map((op, index) => {
           if (op.insert && typeof op.insert === 'string') {
             return {
               ...op,
               insert:
-                op.insert.trim().length > 0
+                index === 0 || index === contentDelta.ops.length - 1
                   ? '```\n' + op.insert + '\n```'
-                  : '',
+                  : op.insert,
             };
           }
           return op;
@@ -251,7 +205,7 @@ const ReactQuillEditor = ({
 
         setContentDelta({
           ...updatedContent,
-          ___isMarkdown: isMarkdownEnabled,
+          ___isMarkdown: isAsciiArt,
         } as SerializableDeltaStatic);
       }
     };
