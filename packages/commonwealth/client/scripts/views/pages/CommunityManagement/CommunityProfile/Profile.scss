@@ -1,0 +1,40 @@
+@import '../../../../../styles/shared';
+
+.CommunityProfile {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: 69px;
+  padding: 22px 60px;
+  padding-bottom: 100px;
+
+  @include extraSmall {
+    padding: 16px;
+    padding-bottom: 50px;
+  }
+
+  @include mediumSmallInclusive {
+    grid-template-columns: 1fr;
+  }
+
+  .left-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 32px;
+    width: 100%;
+
+    .header {
+      .b1 {
+        color: $neutral-500 !important;
+      }
+    }
+  }
+
+  .right-section {
+    margin-top: 64px;
+
+    @include mediumSmallInclusive {
+      display: none;
+    }
+  }
+}
