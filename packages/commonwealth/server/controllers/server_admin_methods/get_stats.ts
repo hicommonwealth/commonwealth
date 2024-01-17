@@ -114,20 +114,20 @@ export async function __getStats(
           SELECT "Communities".id, "Communities".name, COUNT("Addresses".id) as address_count
           FROM "Communities"
           JOIN "Addresses" ON "Addresses".community_id = "Communities".id
-          GROUP BY "Communities".id, "Communities".name
-      ) as address_counts;
+          GROUP BY "Communities".id
+      ) as _;
     `,
       { type: QueryTypes.SELECT },
     ),
     this.models.sequelize.query<{ result: number }>(
       `
-        SELECT COUNT(*) as result FROM (
-          SELECT DISTINCT("Communities".id)
+        SELECT COUNT(communities_count) as result FROM (
+          SELECT "Communities".id
           FROM "Communities"
           JOIN "Addresses" ON "Addresses".community_id = "Communities".id
-          GROUP BY "Communities".id, "Communities".name
+          GROUP BY "Communities".id
           HAVING COUNT("Addresses".id) > 2
-        ) as _;
+        ) as communities_count;
       `,
       { type: QueryTypes.SELECT },
     ),
