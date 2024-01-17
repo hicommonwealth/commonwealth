@@ -154,7 +154,7 @@ const BasicInformationForm = ({
           bech32Prefix: selectedChainNode.bech32Prefix,
         }),
       });
-      onSubmit(communityId);
+      onSubmit(communityId, values.communityName);
     } catch (err) {
       notifyError(err.response?.data?.error);
     }

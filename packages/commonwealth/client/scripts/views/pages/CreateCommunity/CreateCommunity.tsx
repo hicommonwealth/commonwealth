@@ -15,12 +15,13 @@ import './CreateCommunity.scss';
 
 const CreateCommunity = () => {
   const [createCommunityStep, setCreateCommunityStep] =
-    useState<CreateCommunityStep>(CreateCommunityStep.CommunityStake);
+    useState<CreateCommunityStep>(CreateCommunityStep.CommunityTypeSelection);
   const [selectedCommunity, setSelectedCommunity] = useState<SelectedCommunity>(
     { type: null, chainBase: null },
   );
   const [selectedAddress, setSelectedAddress] = useState<AddressInfo>(null);
   const [createdCommunityId, setCreatedCommunityId] = useState('');
+  const [createdCommunityName, setCreatedCommunityName] = useState('');
 
   useBrowserAnalyticsTrack({
     payload: { event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_VISITED },
@@ -28,6 +29,15 @@ const CreateCommunity = () => {
 
   const handleChangeStep = (action: number) => {
     setCreateCommunityStep((prevState) => prevState + action);
+  };
+
+  const handleCompleteBasicInformationStep = (
+    communityId: string,
+    communityName: string,
+  ) => {
+    handleChangeStep(1);
+    setCreatedCommunityId(communityId);
+    setCreatedCommunityName(communityName);
   };
 
   const isSuccessStep = createCommunityStep === CreateCommunityStep.Success;
@@ -50,15 +60,17 @@ const CreateCommunity = () => {
             selectedAddress={selectedAddress}
             selectedCommunity={selectedCommunity}
             handleGoBack={() => handleChangeStep(-1)}
-            handleContinue={(communityId) => {
-              handleChangeStep(1);
-              setCreatedCommunityId(communityId);
-            }}
+            handleContinue={handleCompleteBasicInformationStep}
           />
         );
 
       case CreateCommunityStep.CommunityStake:
-        return <CommunityStakeStep />;
+        return (
+          <CommunityStakeStep
+            onOptOutEnablingStake={() => handleChangeStep(1)}
+            createdCommunityName={createdCommunityName}
+          />
+        );
 
       case CreateCommunityStep.Success:
         return <SuccessStep communityId={createdCommunityId} />;

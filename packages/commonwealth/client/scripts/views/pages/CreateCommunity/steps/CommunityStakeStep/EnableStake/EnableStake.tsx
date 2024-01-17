@@ -11,21 +11,41 @@ import CreateCommunityHint from '../../../components/CreateCommunityHint';
 import './EnableStake.scss';
 
 const validationSchema = z.object({
-  communityNamespace: z.string().min(1, 'Namespace is required'),
-  communitySymbol: z.string().min(1, 'Symbol is required'),
+  namespace: z.string().min(1, 'Namespace is required'),
+  symbol: z
+    .string()
+    .min(1, 'Symbol is required')
+    .max(9, 'Symbol should be maximum 9 characters'),
 });
 
-const EnableStake = () => {
-  const handleSubmit = (data) => {
-    console.log('submit', data);
+type StakeData = {
+  symbol: string;
+  namespace: string;
+};
+
+interface EnableStakeProps {
+  onOptOutEnablingStake: () => void;
+  onOptInEnablingStake: ({ namespace, symbol }: StakeData) => void;
+  communityStakeData: StakeData;
+}
+
+const EnableStake = ({
+  onOptOutEnablingStake,
+  onOptInEnablingStake,
+  communityStakeData,
+}: EnableStakeProps) => {
+  const handleSubmit = (data: StakeData) => {
+    onOptInEnablingStake({
+      namespace: data.namespace,
+      symbol: data.symbol,
+    });
   };
 
   const getInitialValue = () => {
-    return {};
-  };
-
-  const handleCancel = () => {
-    console.log('cancel');
+    return {
+      namespace: communityStakeData.namespace,
+      symbol: communityStakeData.symbol,
+    };
   };
 
   const renderHint = (className: string) => (
@@ -65,7 +85,7 @@ const EnableStake = () => {
         >
           <CWTextInput
             rightTextAddon=".common.xyz"
-            name="communityNamespace"
+            name="namespace"
             hookToForm
             label="Community Namespace"
             placeholder="namespace"
@@ -73,7 +93,7 @@ const EnableStake = () => {
           />
 
           <CWTextInput
-            name="communitySymbol"
+            name="symbol"
             hookToForm
             label="Community Symbol"
             placeholder="COMM"
@@ -100,7 +120,7 @@ const EnableStake = () => {
             label="No"
             buttonWidth="wide"
             buttonType="secondary"
-            onClick={handleCancel}
+            onClick={onOptOutEnablingStake}
           />
           <CWButton
             form="communityStakeForm"

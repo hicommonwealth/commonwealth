@@ -28,6 +28,7 @@ export const getFormSteps = (
           ? 'active'
           : 'completed',
     },
+    // TODO When integrating Backend, show only if EVM selected AND Ethereum Mainnet selected
     ...((featureFlags.communityStake
       ? [
           {
