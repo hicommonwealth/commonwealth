@@ -111,7 +111,7 @@ export async function __getStats(
       `
       SELECT AVG(address_count) as result
       FROM (
-          SELECT "Communities".id, "Communities".name, COUNT("Addresses".id) as address_count
+          SELECT "Communities".id, COUNT("Addresses".id) as address_count
           FROM "Communities"
           JOIN "Addresses" ON "Addresses".community_id = "Communities".id
           GROUP BY "Communities".id
