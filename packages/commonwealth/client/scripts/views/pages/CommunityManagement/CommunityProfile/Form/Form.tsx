@@ -155,7 +155,10 @@ const Form = () => {
           ? DefaultPage.Overview
           : DefaultPage.Discussions,
         hasStagesEnabled: community.stagesEnabled,
-        customStages: community.customStages || '',
+        customStages:
+          community.customStages === 'true' || !community.customStages
+            ? ''
+            : community.customStages,
         communityBanner: community.communityBanner || '',
       }}
       validationSchema={communityProfileValidationSchema}
