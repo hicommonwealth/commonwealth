@@ -127,6 +127,7 @@
   .ql-editor {
     min-height: 212px;
     max-height: 512px;
+    min-width: 512px;
 
     &.ql-blank::before {
       font-style: normal;

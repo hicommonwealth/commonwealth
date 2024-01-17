@@ -4,7 +4,7 @@ import ImageUploader from 'quill-image-uploader';
 import MagicUrl from 'quill-magic-url';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import ReactQuill, { Quill } from 'react-quill';
+import ReactQuill, { Quill, UnprivilegedEditor } from 'react-quill';
 
 import { nextTick } from 'process';
 import { openConfirmation } from '../../modals/confirmation_modal';
@@ -109,8 +109,91 @@ const ReactQuillEditor = ({
     });
   };
 
-  const handleChange = (value, delta, source, editor) => {
+  const isASCIIArt = (text: string) => {
+    const patterns = [/[@#S%^&*()\-+=|\\\/]{3,}/, /^\s{2,}/gm];
+
+    return patterns.some((pattern) => pattern.test(text));
+  };
+
+  // const handleChange = (value, delta, source, editor: UnprivilegedEditor) => {
+  //   const newContent = convertTwitterLinksToEmbeds(editor.getContents());
+  //   // const edit = editorRef?.current?.getEditor();
+  //
+  //   // if the user is typing ascii art, enable markdown
+  //   const isAsciiArt = isASCIIArt(getTextFromDelta(newContent));
+  //   if (isAsciiArt && !isMarkdownEnabled) {
+  //     setIsMarkdownEnabled(true);
+  //   } else if (isAsciiArt && isMarkdownEnabled) {
+  //     // const selection = edit.getSelection();
+  //     // //
+  //     // if (!selection) {
+  //     //   return;
+  //     // }
+  //     // //
+  //     // const test = edit.getText(selection.index, selection.length);
+  //     //
+  //     //
+  //
+  //     const idk = newContent.ops.forEach((op) => {
+  //       if (op.insert && typeof op.insert === 'string') {
+  //         op.attributes = {
+  //           ...op.attributes,
+  //           'code-block': true
+  //         };
+  //       }
+  //     });
+  //
+  //     // // edit.insertText(selection.length, '```');
+  //     // edit.formatText(0, selection.length, 'bold', true);
+  //
+  //     // editorRef.current?.editor?.format('code-block', true);
+  //     // editorRef.current?.editor?.clipboard.
+  //     // editor.format('code-block', true);
+  //   }
+  //
+  //   setContentDelta({
+  //     ...newContent,
+  //     ___isMarkdown: isMarkdownEnabled
+  //   } as SerializableDeltaStatic);
+  // };
+
+  const handleChange = (value, delta, source, editor: UnprivilegedEditor) => {
     const newContent = convertTwitterLinksToEmbeds(editor.getContents());
+
+    // if the user is typing ascii art, enable markdown
+    // const isAsciiArt = isASCIIArt(getTextFromDelta(newContent));
+    //
+    // if (isAsciiArt && !isMarkdownEnabled) {
+    //   setIsMarkdownEnabled(true);
+    // } else if (isAsciiArt && isMarkdownEnabled) {
+    //   const updatedOps = newContent.ops.map((op) => {
+    //     if (op.insert && typeof op.insert === 'string') {
+    //       return {
+    //         ...op,
+    //         insert:
+    //           op.insert.trim().length > 0
+    //             ? '```\n' + op.insert.trim() + '\n```'
+    //             : ''
+    //       };
+    //     }
+    //     return op;
+    //   });
+    //
+    //    const updatedContent = {
+    //      ...newContent,
+    //      ops: updatedOps
+    //    };
+    //
+    //    setContentDelta({
+    //      ...updatedContent,
+    //      ___isMarkdown: isMarkdownEnabled
+    //    } as SerializableDeltaStatic);
+    //
+    //
+    //   // You can use the updatedContent as needed
+    //   // For example, set it back to the editor or perform other actions
+    // }
+
     setContentDelta({
       ...newContent,
       ___isMarkdown: isMarkdownEnabled,
@@ -127,10 +210,12 @@ const ReactQuillEditor = ({
     const newMarkdownEnabled = !isMarkdownEnabled;
 
     if (newMarkdownEnabled) {
+      console.log('FIRED');
       const isContentAvailable =
         getTextFromDelta(editor.getContents()).length > 0;
 
       if (isContentAvailable) {
+        console.log('FIRED1');
         openConfirmation({
           title: 'Warning',
           description: <>All formatting and images will be lost. Continue?</>,
@@ -156,6 +241,7 @@ const ReactQuillEditor = ({
           ],
         });
       } else {
+        console.log('FIRED2');
         setIsMarkdownEnabled(newMarkdownEnabled);
       }
     } else {
@@ -166,6 +252,53 @@ const ReactQuillEditor = ({
   const handlePreviewModalClose = () => {
     setIsPreviewVisible(false);
   };
+
+  useMemo(() => {
+    const isAsciiArt = isASCIIArt(getTextFromDelta(contentDelta));
+    // Your logic for processing ASCII art and updating content
+    const handleAsciiArt = () => {
+      if (isAsciiArt && !isMarkdownEnabled) {
+        setIsMarkdownEnabled(true);
+      } else if (
+        isAsciiArt &&
+        isMarkdownEnabled &&
+        !getTextFromDelta(contentDelta).includes('```')
+      ) {
+        const updatedOps = contentDelta.ops?.map((op) => {
+          if (
+            op.insert &&
+            typeof op.insert === 'string' &&
+            // !contentDelta.ops.includes('```')
+            !op.insert.includes('```')
+          ) {
+            return {
+              ...op,
+              insert:
+                op.insert.trim().length > 0
+                  ? '```\n' + op.insert.trim() + '\n```'
+                  : '',
+            };
+          }
+          return op;
+        });
+
+        const updatedContent = {
+          ...contentDelta,
+          ops: updatedOps,
+        };
+
+        setContentDelta({
+          ...updatedContent,
+          ___isMarkdown: isMarkdownEnabled,
+        } as SerializableDeltaStatic);
+      }
+    };
+
+    // Invoke the logic when the component mounts or when necessary dependencies change
+    handleAsciiArt();
+
+    // Add dependencies as needed for the useEffect hook
+  }, [contentDelta]);
 
   // when markdown state is changed, add markdown metadata to delta ops
   // and refresh quill component

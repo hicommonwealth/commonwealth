@@ -1,11 +1,11 @@
-import React from 'react';
 import type { DeltaStatic } from 'quill';
+import React from 'react';
 
-import { QuillRenderer } from '../components/react_quill_editor/quill_renderer';
 import {
   CWModalBody,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
+import { QuillRenderer } from '../components/react_quill_editor/quill_renderer';
 
 import '../../../styles/modals/preview_modal.scss';
 
@@ -20,6 +20,7 @@ export const PreviewModal = ({
   onModalClose,
   title,
 }: PreviewModalProps) => {
+  console.log('doc', JSON.stringify(doc));
   return (
     <div className="PreviewModal">
       <CWModalHeader
