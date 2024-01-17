@@ -53,7 +53,7 @@ const Form = () => {
     useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [initialLinks, setInitialLinks] = useState(
-    community.socialLinks.length > 0
+    (community.socialLinks || []).length > 0
       ? community.socialLinks.map((link) => ({
           value: link,
           canUpdate: true,
@@ -86,7 +86,12 @@ const Form = () => {
   const { mutateAsync: editTags } = useEditCommunityTagsMutation();
 
   const onSubmit = async (values: FormSubmitValues) => {
-    if (isSubmitting || !areLinksValid()) return;
+    if (
+      isSubmitting ||
+      (links.filter((x) => x.value).length > 0 ? !areLinksValid() : false)
+    ) {
+      return;
+    }
 
     try {
       setIsSubmitting(true);
@@ -377,7 +382,8 @@ const Form = () => {
               disabled={
                 !formState.isDirty &&
                 currentCommunityTags.length === selectedCommunityTags.length &&
-                links.length === (community.socialLinks || []).length
+                links.filter((x) => x.value).length ===
+                  (community.socialLinks || []).length
               }
               onClick={() => {
                 reset();
