@@ -1,8 +1,8 @@
-import { StatsDController } from '@hicommonwealth/adapters';
 import {
   NotificationCategories,
   NotificationDataAndCategory,
   logger,
+  stats,
 } from '@hicommonwealth/core';
 import models from '../../database';
 import { CommunityInstance } from '../../models/community';
@@ -100,7 +100,7 @@ export async function dispatchWebhooks(
   const results = await Promise.allSettled(webhookPromises);
   for (const result of results) {
     if (result.status === 'rejected') {
-      StatsDController.get().increment('webhook.error');
+      stats().increment('webhook.error');
       let error;
       if (result.reason instanceof Error) {
         error = result.reason;
@@ -113,7 +113,7 @@ export async function dispatchWebhooks(
       // log.error(`Error sending webhook: ${result.reason}`, error);
       rollbar.error(`Error sending webhook: ${result.reason}`, error);
     } else {
-      StatsDController.get().increment('webhook.success');
+      stats().increment('webhook.success');
     }
   }
 }

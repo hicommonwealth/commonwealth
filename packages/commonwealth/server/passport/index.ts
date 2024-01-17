@@ -1,4 +1,4 @@
-import { StatsDController } from '@hicommonwealth/adapters';
+import { stats } from '@hicommonwealth/core';
 import passport from 'passport';
 import passportJWT from 'passport-jwt';
 import { JWT_SECRET } from '../config';
@@ -45,9 +45,9 @@ export function setupPassport(models: DB) {
   initMagicAuth(models);
 
   passport.serializeUser<any>((user, done) => {
-    StatsDController.get().increment('cw.users.logged_in');
+    stats().increment('cw.users.logged_in');
     if (user?.id) {
-      StatsDController.get().set('cw.users.unique', user.id);
+      stats().set('cw.users.unique', user.id);
     }
     done(null, user.id);
   });

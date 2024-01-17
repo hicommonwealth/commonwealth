@@ -1,5 +1,4 @@
-import { StatsDController } from '@hicommonwealth/adapters';
-import { NotificationCategories } from '@hicommonwealth/core';
+import { NotificationCategories, stats } from '@hicommonwealth/core';
 import type { Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
@@ -14,9 +13,9 @@ export const redirectWithLoginSuccess = (
 ) => {
   // Returns new if we are creating a new account
   if (res?.user?.id) {
-    StatsDController.get().set('cw.users.unique', res.user.id);
+    stats().set('cw.users.unique', res.user.id);
   }
-  StatsDController.get().increment('cw.users.logged_in');
+  stats().increment('cw.users.logged_in');
   const url = `/?loggedin=true&email=${email}&new=${newAcct}${
     path ? `&path=${encodeURIComponent(path)}` : ''
   }${confirmation ? '&confirmation=success' : ''}`;

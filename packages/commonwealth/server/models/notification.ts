@@ -1,5 +1,4 @@
-import { StatsDController } from '@hicommonwealth/adapters';
-import { logger } from '@hicommonwealth/core';
+import { logger, stats } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type {
@@ -62,7 +61,7 @@ export default (
                 { max_notif_id: id },
                 { where: { id: thread_id } },
               );
-              StatsDController.get().increment('cw.hook.thread-notif-update', {
+              stats().increment('cw.hook.thread-notif-update', {
                 thread_id: String(thread_id),
               });
             }
@@ -70,7 +69,7 @@ export default (
             log.error(
               `incrementing thread notif for thread ${thread_id} afterCreate: ${error}`,
             );
-            StatsDController.get().increment('cw.hook.thread-notif-error', {
+            stats().increment('cw.hook.thread-notif-error', {
               thread_id: String(thread_id),
             });
           }
