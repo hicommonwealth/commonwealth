@@ -159,40 +159,7 @@ const ReactQuillEditor = ({
 
   const handleChange = (value, delta, source, editor: UnprivilegedEditor) => {
     const newContent = convertTwitterLinksToEmbeds(editor.getContents());
-
-    // if the user is typing ascii art, enable markdown
-    // const isAsciiArt = isASCIIArt(getTextFromDelta(newContent));
-    //
-    // if (isAsciiArt && !isMarkdownEnabled) {
-    //   setIsMarkdownEnabled(true);
-    // } else if (isAsciiArt && isMarkdownEnabled) {
-    //   const updatedOps = newContent.ops.map((op) => {
-    //     if (op.insert && typeof op.insert === 'string') {
-    //       return {
-    //         ...op,
-    //         insert:
-    //           op.insert.trim().length > 0
-    //             ? '```\n' + op.insert.trim() + '\n```'
-    //             : ''
-    //       };
-    //     }
-    //     return op;
-    //   });
-    //
-    //    const updatedContent = {
-    //      ...newContent,
-    //      ops: updatedOps
-    //    };
-    //
-    //    setContentDelta({
-    //      ...updatedContent,
-    //      ___isMarkdown: isMarkdownEnabled
-    //    } as SerializableDeltaStatic);
-    //
-    //
-    //   // You can use the updatedContent as needed
-    //   // For example, set it back to the editor or perform other actions
-    // }
+    const isAsciiArt = isASCIIArt(getTextFromDelta(contentDelta));
 
     setContentDelta({
       ...newContent,
@@ -210,12 +177,10 @@ const ReactQuillEditor = ({
     const newMarkdownEnabled = !isMarkdownEnabled;
 
     if (newMarkdownEnabled) {
-      console.log('FIRED');
       const isContentAvailable =
         getTextFromDelta(editor.getContents()).length > 0;
 
       if (isContentAvailable) {
-        console.log('FIRED1');
         openConfirmation({
           title: 'Warning',
           description: <>All formatting and images will be lost. Continue?</>,
@@ -241,7 +206,6 @@ const ReactQuillEditor = ({
           ],
         });
       } else {
-        console.log('FIRED2');
         setIsMarkdownEnabled(newMarkdownEnabled);
       }
     } else {
@@ -253,29 +217,27 @@ const ReactQuillEditor = ({
     setIsPreviewVisible(false);
   };
 
-  useMemo(() => {
+  useEffect(() => {
     const isAsciiArt = isASCIIArt(getTextFromDelta(contentDelta));
+    console.log('content', contentDelta);
     // Your logic for processing ASCII art and updating content
     const handleAsciiArt = () => {
       if (isAsciiArt && !isMarkdownEnabled) {
         setIsMarkdownEnabled(true);
+        // editorRef.current?.getEditor().format('code-block', true);
       } else if (
         isAsciiArt &&
         isMarkdownEnabled &&
         !getTextFromDelta(contentDelta).includes('```')
       ) {
-        const updatedOps = contentDelta.ops?.map((op) => {
-          if (
-            op.insert &&
-            typeof op.insert === 'string' &&
-            // !contentDelta.ops.includes('```')
-            !op.insert.includes('```')
-          ) {
+        console.log('fired');
+        const updatedOps = contentDelta.ops?.map((op, index) => {
+          if (op.insert && typeof op.insert === 'string') {
             return {
               ...op,
               insert:
                 op.insert.trim().length > 0
-                  ? '```\n' + op.insert.trim() + '\n```'
+                  ? '```\n' + op.insert + '\n```'
                   : '',
             };
           }
@@ -294,7 +256,6 @@ const ReactQuillEditor = ({
       }
     };
 
-    // Invoke the logic when the component mounts or when necessary dependencies change
     handleAsciiArt();
 
     // Add dependencies as needed for the useEffect hook

@@ -20,7 +20,6 @@ export const PreviewModal = ({
   onModalClose,
   title,
 }: PreviewModalProps) => {
-  console.log('doc', JSON.stringify(doc));
   return (
     <div className="PreviewModal">
       <CWModalHeader
