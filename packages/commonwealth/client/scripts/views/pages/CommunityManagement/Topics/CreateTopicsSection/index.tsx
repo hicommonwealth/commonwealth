@@ -1,3 +1,3 @@
-import { CreateTopicsSection } from './CreateTopicsSection';
+import { CreateTopicSection } from './CreateTopicSection';
 
-export default CreateTopicsSection;
+export default CreateTopicSection;

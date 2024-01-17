@@ -5,7 +5,7 @@ import {
   CWTabsRow,
 } from 'client/scripts/views/components/component_kit/new_designs/CWTabs';
 import React, { useState } from 'react';
-import CreateTopicsSection from './CreateTopicsSection';
+import CreateTopicSection from './CreateTopicsSection';
 import ManageTopicsSection from './ManageTopicsSection';
 import './Topics.scss';
 
@@ -44,7 +44,7 @@ export const Topics = () => {
           ))}
         </CWTabsRow>
         {selectedTab === TABS[0].value ? (
-          <CreateTopicsSection />
+          <CreateTopicSection />
         ) : (
           <ManageTopicsSection />
         )}
