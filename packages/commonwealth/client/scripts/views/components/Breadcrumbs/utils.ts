@@ -13,6 +13,21 @@ const segmentMapping = {
   snapshot: 'Snapshots',
 };
 
+export const truncateText = (str: string) => {
+  // Get the available width of the container or the window
+  const availableWidth = window.innerWidth;
+
+  // Define the maximum allowed width
+  const maxWidth = 0.4 * availableWidth;
+
+  if (str.length > 50 || availableWidth < maxWidth) {
+    const ellipsisWidth = '...'.length * 4;
+    const truncatedLength = Math.floor((maxWidth - ellipsisWidth) / 8);
+    return str.substring(0, truncatedLength) + '...';
+  }
+  return str;
+};
+
 const findMatchedBreadcrumb = (index: number, pathSegments: Array<string>) => {
   const breadcrumbData = breadCrumbURLS;
 
@@ -138,6 +153,9 @@ export const generateBreadcrumbs = (
       governanceSegment &&
       label.toLowerCase() !== governanceSegment.toLowerCase()
     ) {
+      if (pathSegments.length > 3) {
+        pathSegments.splice(2, 2);
+      }
       label = 'Governance';
     }
 

@@ -3,6 +3,7 @@ import React from 'react';
 import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 
 import 'components/component_kit/cw_breadcrumbs.scss';
+import { truncateText } from '../Breadcrumbs/utils';
 import { CWText } from './cw_text';
 
 import { ComponentType } from './types';
@@ -27,23 +28,6 @@ export const CWBreadcrumbs = ({
     <div className={ComponentType.Breadcrumbs}>
       {breadcrumbs.map(({ label, path, navigate, isParent }, index) => {
         const isCurrent = index === breadcrumbs.length - 1;
-
-        const truncate = (str: string) => {
-          // Get the available width of the container or the window
-          const availableWidth = window.innerWidth;
-
-          // Define the maximum allowed width
-          const maxWidth = 0.4 * availableWidth;
-
-          if (str.length > 50 || availableWidth < maxWidth) {
-            const ellipsisWidth = '...'.length * 4;
-            const truncatedLength = Math.floor((maxWidth - ellipsisWidth) / 8);
-            return str.substring(0, truncatedLength) + '...';
-          }
-
-          return str;
-        };
-
         return (
           <React.Fragment key={index}>
             {isParent && breadcrumbs.length !== 1 ? (
@@ -62,7 +46,7 @@ export const CWBreadcrumbs = ({
                       'parent-text': !isCurrent,
                     })}
                   >
-                    {truncate(label)}
+                    {truncateText(label)}
                   </CWText>
                 )}
               />
@@ -73,7 +57,7 @@ export const CWBreadcrumbs = ({
                 className={isCurrent ? 'current-text' : 'parent-text'}
                 onClick={isCurrent ? undefined : () => navigate(path)}
               >
-                {truncate(label)}
+                {truncateText(label)}
               </CWText>
             )}
             {!isCurrent && (
