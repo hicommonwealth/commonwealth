@@ -54,6 +54,23 @@ export const CreateTopicSection = () => {
     setErrorMsg(null);
   }, [name, featuredInNewPost, editorText]);
 
+  const handleCreateTopic = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    try {
+      await createTopic({
+        name,
+        description,
+        featuredInSidebar,
+        featuredInNewPost,
+        defaultOffchainTemplate: serializeDelta(contentDelta),
+      });
+      navigate(`/discussions/${encodeURI(name.toString().trim())}`);
+    } catch (err) {
+      setErrorMsg('Error creating topic');
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="CreateTopicSection">
       <div className="form">
@@ -126,7 +143,6 @@ export const CreateTopicSection = () => {
             onChange={() => {
               setFeaturedInSidebar(!featuredInSidebar);
             }}
-            value=""
           />
           <CWCheckbox
             label="Featured in new post"
@@ -134,7 +150,6 @@ export const CreateTopicSection = () => {
             onChange={() => {
               setFeaturedInNewPost(!featuredInNewPost);
             }}
-            value=""
           />
           {featuredInNewPost && (
             <ReactQuillEditor
@@ -150,22 +165,7 @@ export const CreateTopicSection = () => {
             buttonHeight="med"
             buttonWidth={isWindowExtraSmall ? 'full' : 'wide'}
             disabled={isSaving || !!errorMsg}
-            onClick={async (e: React.MouseEvent<HTMLButtonElement>) => {
-              e.preventDefault();
-              try {
-                await createTopic({
-                  name,
-                  description,
-                  featuredInSidebar,
-                  featuredInNewPost,
-                  defaultOffchainTemplate: serializeDelta(contentDelta),
-                });
-                navigate(`/discussions/${encodeURI(name.toString().trim())}`);
-              } catch (err) {
-                setErrorMsg('Error creating topic');
-                setIsSaving(false);
-              }
-            }}
+            onClick={handleCreateTopic}
           />
 
           {errorMsg && (
