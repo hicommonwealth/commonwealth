@@ -33,4 +33,12 @@
       align-items: flex-end;
     }
   }
+
+  @include extraSmall {
+    .form {
+      .actions {
+        align-items: center;
+      }
+    }
+  }
 }

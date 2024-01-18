@@ -1,4 +1,5 @@
 import { pluralizeWithoutNumberPrefix } from 'client/scripts/helpers';
+import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import { useCommonNavigate } from 'client/scripts/navigation/helpers';
 import app from 'client/scripts/state';
 import {
@@ -38,6 +39,8 @@ export const CreateTopicSection = () => {
   const [featuredInSidebar, setFeaturedInSidebar] =
     React.useState<boolean>(false);
   const [name, setName] = React.useState<string>('');
+
+  const { isWindowExtraSmall } = useBrowserWindow({});
 
   const editorText = getTextFromDelta(contentDelta);
 
@@ -147,7 +150,7 @@ export const CreateTopicSection = () => {
             label="Create topic"
             buttonType="primary"
             buttonHeight="med"
-            buttonWidth="wide"
+            buttonWidth={isWindowExtraSmall ? 'full' : 'wide'}
             disabled={isSaving || !!errorMsg}
             onClick={async (e: React.MouseEvent<HTMLButtonElement>) => {
               e.preventDefault();
