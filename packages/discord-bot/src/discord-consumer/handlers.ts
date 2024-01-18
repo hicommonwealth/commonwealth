@@ -3,6 +3,7 @@ import {
   IDiscordMessage,
   ThreadDiscordActions,
 } from '@hicommonwealth/core';
+import { TopicAttributes } from '@hicommonwealth/model';
 import axios from 'axios';
 import { SERVER_URL } from '../utils/config';
 import { sequelize } from '../utils/database';
@@ -10,7 +11,7 @@ import { sequelize } from '../utils/database';
 export async function handleThreadMessages(
   action: ThreadDiscordActions,
   message: IDiscordMessage,
-  topic: { id: string; name: string },
+  topic: TopicAttributes,
   sharedReqData: Record<string, any>,
 ): Promise<void> {
   switch (action) {
