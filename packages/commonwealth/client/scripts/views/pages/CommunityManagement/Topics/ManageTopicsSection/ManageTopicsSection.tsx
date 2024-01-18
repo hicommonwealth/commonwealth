@@ -21,13 +21,13 @@ export const ManageTopicsSection = () => {
     if (!topics.length) return [];
 
     if (!topics[0].order) {
-      return topics
-        .toSorted((a, b) => a.name.localeCompare(b.name))
+      return [...topics]
+        .sort((a, b) => a.name.localeCompare(b.name))
         .reduce((acc, curr, index) => {
           return [...acc, { ...curr, order: index + 1 }];
         }, []);
     } else {
-      return topics.toSorted((a, b) => a.order - b.order);
+      return [...topics].sort((a, b) => a.order - b.order);
     }
   };
 
