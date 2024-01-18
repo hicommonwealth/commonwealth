@@ -1,14 +1,12 @@
-import { EvmSource, EvmSources } from './types';
-import { StatsDController } from 'common-common/src/statsd';
-import models from '../../database';
-import { getEvents } from './logProcessing';
+import { logger, stats } from '@hicommonwealth/core';
+import { NotificationInstance, models } from '@hicommonwealth/model';
+import { rollbar } from '../../util/rollbar';
 import { emitChainEventNotifs } from './emitChainEventNotifs';
 import { getEventSources } from './getEventSources';
-import { rollbar } from '../../util/rollbar';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { NotificationInstance } from '../../models/notification';
+import { getEvents } from './logProcessing';
+import { EvmSource } from './types';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 /**
  * Given a ChainNode id and event sources, this function fetches all events parsed since
@@ -17,15 +15,15 @@ const log = factory.getLogger(formatFilename(__filename));
  */
 export async function processChainNode(
   chainNodeId: number,
-  evmSource: EvmSource
+  evmSource: EvmSource,
 ): Promise<Promise<void | NotificationInstance>[] | void> {
   try {
     log.info(
       'Processing:\n' +
         `\tchainNodeId: ${chainNodeId}\n` +
-        `\tcontracts: ${JSON.stringify(Object.keys(evmSource.contracts))}`
+        `\tcontracts: ${JSON.stringify(Object.keys(evmSource.contracts))}`,
     );
-    StatsDController.get().increment('ce.evm.chain_node_id', {
+    stats().increment('ce.evm.chain_node_id', {
       chainNodeId: String(chainNodeId),
     });
 
@@ -53,7 +51,7 @@ export async function processChainNode(
     }
 
     log.info(
-      `Processed ${events.length} events for chainNodeId ${chainNodeId}`
+      `Processed ${events.length} events for chainNodeId ${chainNodeId}`,
     );
 
     return promises;
@@ -76,8 +74,8 @@ export async function scheduleNodeProcessing(
   interval: number,
   processFn: (
     chainNodeId: number,
-    sources: EvmSource
-  ) => Promise<Promise<void | NotificationInstance>[] | void>
+    sources: EvmSource,
+  ) => Promise<Promise<void | NotificationInstance>[] | void>,
 ) {
   const evmSources = await getEventSources();
 

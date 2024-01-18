@@ -1,13 +1,15 @@
 import moment from 'moment';
 import { Op } from 'sequelize';
 
+import { AppError } from '@hicommonwealth/adapters';
 import { NotificationCategories, ProposalType } from '@hicommonwealth/core';
-import { AppError } from '../../../../common-common/src/errors';
+import {
+  AddressInstance,
+  CommentAttributes,
+  CommunityInstance,
+  UserInstance,
+} from '@hicommonwealth/model';
 import { renderQuillDeltaToText } from '../../../shared/utils';
-import { AddressInstance } from '../../models/address';
-import { CommentAttributes } from '../../models/comment';
-import { CommunityInstance } from '../../models/community';
-import { UserInstance } from '../../models/user';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { ServerCommentsController } from '../server_comments_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';

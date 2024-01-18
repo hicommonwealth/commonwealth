@@ -29,6 +29,7 @@ import axios from 'axios';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import WebWalletController from 'controllers/app/web_wallets';
 import { setDarkMode } from 'helpers/darkMode';
+import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
 import useGroupMutationBannerStore from 'state/ui/group';
 
 const resetWalletConnectSession = async () => {
@@ -67,6 +68,8 @@ const UserDropdown = () => {
   }>(null);
   const { clearSetGatingGroupBannerForCommunities } =
     useGroupMutationBannerStore();
+  const { clearSetAdminOnboardingCardVisibilityForCommunities } =
+    useAdminOnboardingSliderMutationStore();
 
   const { authenticatedAddresses } = useCheckAuthenticatedAddresses({
     recheck: isOpen,
@@ -87,7 +90,7 @@ const UserDropdown = () => {
         type: 'default',
         label: (
           <UserDropdownItem
-            isSignedIn={true /*signed*/}
+            isSignedIn={signed}
             hasJoinedCommunity={isActive}
             address={account.address}
           />
@@ -163,6 +166,8 @@ const UserDropdown = () => {
             label: 'Sign out',
             onClick: () => {
               clearSetGatingGroupBannerForCommunities();
+              clearSetAdminOnboardingCardVisibilityForCommunities();
+
               handleLogout();
             },
           },

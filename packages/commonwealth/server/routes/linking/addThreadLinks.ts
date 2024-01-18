@@ -1,12 +1,12 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
+import type { DB } from '@hicommonwealth/model';
+import { Link, LinkSource, ThreadInstance } from '@hicommonwealth/model';
 import type { NextFunction } from 'express';
 import {
   MixpanelCommunityInteractionEvent,
   MixpanelErrorCaptureEvent,
 } from '../../../shared/analytics/types';
 import { ServerAnalyticsController } from '../../controllers/server_analytics_controller';
-import type { DB } from '../../models';
-import { Link, LinkSource, ThreadInstance } from '../../models/thread';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 import { Errors, isAuthorOrAdmin } from '../../util/linkingValidationHelper';
 

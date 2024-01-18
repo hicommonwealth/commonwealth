@@ -1,15 +1,15 @@
-import { verify as verifyCanvasSessionSignature } from 'canvas';
 import type { Secp256k1Wallet } from '@cosmjs/amino';
+import { verify as verifyCanvasSessionSignature } from 'canvas';
 
 import type {
   Action,
-  Session,
   ActionArgument,
   ActionPayload,
+  Session,
   SessionPayload,
 } from '@canvas-js/interfaces';
-import { ISessionController, InvalidSession } from '.';
 import { getADR036SignableAction } from 'adapters/chain/cosmos/keys';
+import { ISessionController, InvalidSession } from '.';
 
 export class CosmosSDKSessionController implements ISessionController {
   signers: Record<
@@ -30,7 +30,7 @@ export class CosmosSDKSessionController implements ISessionController {
 
   async hasAuthenticatedSession(
     chainId: string,
-    fromAddress: string
+    fromAddress: string,
   ): Promise<boolean> {
     await this.getOrCreateSigner(chainId, fromAddress);
     return (
@@ -41,7 +41,7 @@ export class CosmosSDKSessionController implements ISessionController {
 
   async getOrCreateAddress(
     chainId: string,
-    fromAddress: string
+    fromAddress: string,
   ): Promise<string> {
     await this.getOrCreateSigner(chainId, fromAddress);
     return this.signers[chainId][fromAddress]?.bech32Address;
@@ -51,7 +51,7 @@ export class CosmosSDKSessionController implements ISessionController {
     chainId: string,
     fromAddress: string,
     payload: SessionPayload,
-    signature: string
+    signature: string,
   ) {
     const valid = await verifyCanvasSessionSignature({
       session: { type: 'session', payload, signature },
@@ -63,8 +63,8 @@ export class CosmosSDKSessionController implements ISessionController {
       throw new Error(
         `Invalid auth: ${payload.sessionAddress} vs. ${this.getAddress(
           chainId,
-          fromAddress
-        )}`
+          fromAddress,
+        )}`,
       );
     }
     this.auths[chainId][fromAddress] = { payload, signature };
@@ -72,13 +72,13 @@ export class CosmosSDKSessionController implements ISessionController {
     const authStorageKey = `CW_SESSIONS-cosmos-${chainId}-${fromAddress}-auth`;
     localStorage.setItem(
       authStorageKey,
-      JSON.stringify(this.auths[chainId][fromAddress])
+      JSON.stringify(this.auths[chainId][fromAddress]),
     );
   }
 
   private async getOrCreateSigner(
     chainId: string,
-    fromAddress: string
+    fromAddress: string,
   ): Promise<{
     signer: Secp256k1Wallet;
     bech32Address: string;
@@ -99,7 +99,7 @@ export class CosmosSDKSessionController implements ISessionController {
       const storage = localStorage.getItem(storageKey);
       const { privkey } = JSON.parse(storage);
       const signer = await cosm.Secp256k1Wallet.fromKey(
-        Buffer.from(privkey, 'hex')
+        Buffer.from(privkey, 'hex'),
       );
       const accounts = await signer.getAccounts();
       const address = accounts[0].address;
@@ -123,13 +123,13 @@ export class CosmosSDKSessionController implements ISessionController {
         if (payload.sessionAddress === this.getAddress(chainId, fromAddress)) {
           console.log(
             'Restored authenticated session:',
-            this.getAddress(chainId, fromAddress)
+            this.getAddress(chainId, fromAddress),
           );
           this.auths[chainId][fromAddress] = { payload, signature };
         } else {
           console.log(
             'Restored signed-out session:',
-            this.getAddress(chainId, fromAddress)
+            this.getAddress(chainId, fromAddress),
           );
         }
       }
@@ -158,7 +158,7 @@ export class CosmosSDKSessionController implements ISessionController {
     chainId: string,
     fromAddress: string,
     call: string,
-    callArgs: Record<string, ActionArgument>
+    callArgs: Record<string, ActionArgument>,
   ): Promise<{ session: Session; action: Action; hash: string }> {
     this.auths[chainId] = this.auths[chainId] ?? {};
     this.signers[chainId] = this.signers[chainId] ?? {};
@@ -192,21 +192,21 @@ export class CosmosSDKSessionController implements ISessionController {
     // don't use signAmino, use Secp256k1.createSignature to get an ExtendedSecp256k1Signature
     const signDoc = await getADR036SignableAction(actionPayload, address);
     const signDocDigest = new cosmCrypto.Sha256(
-      cosm.serializeSignDoc(signDoc)
+      cosm.serializeSignDoc(signDoc),
     ).digest();
     const extendedSignature = await cosmCrypto.Secp256k1.createSignature(
       signDocDigest,
-      Buffer.from(privkey, 'hex')
+      Buffer.from(privkey, 'hex'),
     );
     const signature = Buffer.from(extendedSignature.toFixedLength()).toString(
-      'hex'
+      'hex',
     );
 
     const pubkey = (await signer.getAccounts())[0].pubkey;
     const valid = await cosmCrypto.Secp256k1.verifySignature(
       extendedSignature,
       signDocDigest,
-      pubkey
+      pubkey,
     );
     if (!valid) throw new Error('Invalid signature!');
 

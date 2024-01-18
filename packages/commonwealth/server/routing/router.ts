@@ -1,4 +1,3 @@
-import { factory, formatFilename } from 'common-common/src/logging';
 import type { Express } from 'express';
 import express from 'express';
 import useragent from 'express-useragent';
@@ -29,7 +28,7 @@ import getAddressProfile, {
 import getAddressStatus from '../routes/getAddressStatus';
 import linkExistingAddressToChain from '../routes/linkExistingAddressToChain';
 import reactionsCounts from '../routes/reactionsCounts';
-import selectChain from '../routes/selectChain';
+import selectCommunity from '../routes/selectCommunity';
 import starCommunity from '../routes/starCommunity';
 import startEmailLogin from '../routes/startEmailLogin';
 import { status } from '../routes/status';
@@ -72,16 +71,16 @@ import writeUserSetting from '../routes/writeUserSetting';
 
 import { getCanvasData, postCanvasData } from '../routes/canvas';
 
-import updateChainCategory from '../routes/updateChainCategory';
-import updateChainCustomDomain from '../routes/updateChainCustomDomain';
-import updateChainPriority from '../routes/updateChainPriority';
+import updateCommunityCategory from '../routes/updateCommunityCategory';
+import updateCommunityCustomDomain from '../routes/updateCommunityCustomDomain';
+import updateCommunityPriority from '../routes/updateCommunityPriority';
 import createWebhook from '../routes/webhooks/createWebhook';
 import deleteWebhook from '../routes/webhooks/deleteWebhook';
 import getWebhooks from '../routes/webhooks/getWebhooks';
 import updateWebhook from '../routes/webhooks/updateWebhook';
 import type ViewCountCache from '../util/viewCountCache';
 
-import type { DB } from '../models';
+import type { DB } from '@hicommonwealth/model';
 import authCallback from '../routes/authCallback';
 import banAddress from '../routes/banAddress';
 import editSubstrateSpec from '../routes/editSubstrateSpec';
@@ -94,13 +93,13 @@ import updateAddress from '../routes/updateAddress';
 import viewChainIcons from '../routes/viewChainIcons';
 import type BanCache from '../util/banCheckCache';
 
-import { RedisCache } from 'common-common/src/redisCache';
+import { RedisCache } from '@hicommonwealth/adapters';
 import type DatabaseValidationService from '../middleware/databaseValidationService';
 import createDiscordBotConfig from '../routes/createDiscordBotConfig';
 import generateImage from '../routes/generateImage';
 import getDiscordChannels from '../routes/getDiscordChannels';
 import getSnapshotProposal from '../routes/getSnapshotProposal';
-import { getSubscribedChains } from '../routes/getSubscribedChains';
+import { getSubscribedCommunities } from '../routes/getSubscribedCommunities';
 import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 import type GlobalActivityCache from '../util/globalActivityCache';
 
@@ -195,8 +194,6 @@ export type ServerControllers = {
   topics: ServerTopicsController;
   admin: ServerAdminController;
 };
-
-const log = factory.getLogger(formatFilename(__filename));
 
 function setupRouter(
   endpoint: string,
@@ -317,37 +314,37 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/selectChain',
+    '/selectCommunity',
     passport.authenticate('jwt', { session: false }),
-    selectChain.bind(this, models),
+    selectCommunity.bind(this, models),
   );
 
   // communities
   registerRoute(
     router,
     'post',
-    '/communities' /* prev: POST /createChain */,
+    '/communities',
     passport.authenticate('jwt', { session: false }),
     createCommunityHandler.bind(this, serverControllers),
   );
   registerRoute(
     router,
     'delete',
-    '/communities/:communityId' /* prev: POST /deleteChain */,
+    '/communities/:communityId',
     passport.authenticate('jwt', { session: false }),
     deleteCommunityHandler.bind(this, serverControllers),
   );
   registerRoute(
     router,
     'patch',
-    '/communities/:communityId' /* prev: POST /updateChain */,
+    '/communities/:communityId',
     passport.authenticate('jwt', { session: false }),
     updateCommunityHandler.bind(this, serverControllers),
   );
   registerRoute(
     router,
     'get',
-    '/communities' /* prev: GET /chains */,
+    '/communities',
     getCommunitiesHandler.bind(this, serverControllers),
   );
   registerRoute(
@@ -359,7 +356,7 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/nodes' /* prev: POST /createChainNode */,
+    '/nodes',
     passport.authenticate('jwt', { session: false }),
     createChainNodeHandler.bind(this, serverControllers),
   );
@@ -1020,9 +1017,9 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/updateChainCategory',
+    '/updateCommunityCategory',
     passport.authenticate('jwt', { session: false }),
-    updateChainCategory.bind(this, models),
+    updateCommunityCategory.bind(this, models),
   );
 
   // signed data
@@ -1068,8 +1065,8 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/updateChainCustomDomain',
-    updateChainCustomDomain.bind(this, models),
+    '/updateCommunityCustomDomain',
+    updateCommunityCustomDomain.bind(this, models),
   );
 
   // Discord Bot
@@ -1098,8 +1095,8 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/updateChainPriority',
-    updateChainPriority.bind(this, models),
+    '/updateCommunityPriority',
+    updateCommunityPriority.bind(this, models),
   );
 
   registerRoute(
@@ -1215,8 +1212,8 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/getSubscribedChains',
-    getSubscribedChains.bind(this, models),
+    '/getSubscribedCommunities',
+    getSubscribedCommunities.bind(this, models),
   );
 
   // Proposal routes
@@ -1235,60 +1232,53 @@ function setupRouter(
   );
 
   // Group routes
+  registerRoute(
+    router,
+    'put',
+    '/refresh-membership',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateCommunity,
+    refreshMembershipHandler.bind(this, serverControllers),
+  );
 
-  if (process.env.GATING_API_ENABLED) {
-    log.debug('GATING API ENABLED');
+  registerRoute(
+    router,
+    'get',
+    '/groups',
+    databaseValidationService.validateCommunity,
+    getGroupsHandler.bind(this, serverControllers),
+  );
 
-    registerRoute(
-      router,
-      'put',
-      '/refresh-membership',
-      passport.authenticate('jwt', { session: false }),
-      databaseValidationService.validateAuthor,
-      databaseValidationService.validateCommunity,
-      refreshMembershipHandler.bind(this, serverControllers),
-    );
+  registerRoute(
+    router,
+    'post',
+    '/groups',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateCommunity,
+    createGroupHandler.bind(this, serverControllers),
+  );
 
-    registerRoute(
-      router,
-      'get',
-      '/groups',
-      databaseValidationService.validateCommunity,
-      getGroupsHandler.bind(this, serverControllers),
-    );
+  registerRoute(
+    router,
+    'put',
+    '/groups/:id',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateCommunity,
+    updateGroupHandler.bind(this, serverControllers),
+  );
 
-    registerRoute(
-      router,
-      'post',
-      '/groups',
-      passport.authenticate('jwt', { session: false }),
-      databaseValidationService.validateAuthor,
-      databaseValidationService.validateCommunity,
-      createGroupHandler.bind(this, serverControllers),
-    );
-
-    registerRoute(
-      router,
-      'put',
-      '/groups/:id',
-      passport.authenticate('jwt', { session: false }),
-      databaseValidationService.validateAuthor,
-      databaseValidationService.validateCommunity,
-      updateGroupHandler.bind(this, serverControllers),
-    );
-
-    registerRoute(
-      router,
-      'delete',
-      '/groups/:id',
-      passport.authenticate('jwt', { session: false }),
-      databaseValidationService.validateAuthor,
-      databaseValidationService.validateCommunity,
-      deleteGroupHandler.bind(this, serverControllers),
-    );
-  } else {
-    log.warn('GATING API DISABLED');
-  }
+  registerRoute(
+    router,
+    'delete',
+    '/groups/:id',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateCommunity,
+    deleteGroupHandler.bind(this, serverControllers),
+  );
 
   app.use(endpoint, router);
   app.use(methodNotAllowedMiddleware());

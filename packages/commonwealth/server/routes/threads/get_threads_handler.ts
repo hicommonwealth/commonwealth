@@ -1,4 +1,4 @@
-import { AppError } from '../../../../common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
 import { ServerControllers } from '../../routing/router';
 import {
@@ -55,7 +55,7 @@ export const getThreadsHandler = async (
   >,
   res: TypedResponse<GetThreadsResponse>,
 ) => {
-  const { chain: community } = req;
+  const { community } = req;
   const { thread_ids, bulk, active, search, community_id } = req.query;
 
   // get threads by IDs
@@ -115,8 +115,8 @@ export const getThreadsHandler = async (
     const { thread_title_only, limit, page, order_by, order_direction } =
       req.query as SearchThreadsRequestQuery;
 
-    if (!req.chain && community_id !== ALL_COMMUNITIES) {
-      // if no chain resolved, ensure that client explicitly requested all chains
+    if (!req.community && community_id !== ALL_COMMUNITIES) {
+      // if no community resolved, ensure that client explicitly requested all communities
       throw new AppError(Errors.NoCommunity);
     }
 

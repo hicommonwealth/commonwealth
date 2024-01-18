@@ -1,12 +1,11 @@
 // Helper function to look up a scope, i.e. a chain XOR community.
 // If a community is found, also check that the user is allowed to see it.
 
-import type { DB } from '../models';
-import type { CommunityInstance } from '../models/community';
+import type { CommunityInstance, DB } from '@hicommonwealth/model';
 import { ALL_COMMUNITIES } from './databaseValidationService';
 
 export const CommunityCommunityErrors = {
-  ChainDNE: 'Community does not exist',
+  CommunityDNE: 'Community does not exist',
 };
 
 export type ValidateCommunityParams = {
@@ -16,12 +15,12 @@ export type ValidateCommunityParams = {
 };
 
 const getCommunityQuery = (
-  chain_id: string,
+  communityId: string,
   models: DB,
   includeTopics: boolean,
 ) => ({
   where: {
-    id: chain_id,
+    id: communityId,
   },
   include: [
     ...(includeTopics
@@ -52,16 +51,16 @@ export const validateCommunity = async (
     return [null, null, true];
   }
   if (!communityId) {
-    return [null, CommunityCommunityErrors.ChainDNE, false];
+    return [null, CommunityCommunityErrors.CommunityDNE, false];
   }
-  const chain = await models.Community.findOne(
+  const community = await models.Community.findOne(
     getCommunityQuery(communityId, models, includeTopics),
   );
   // searching for chain that doesn't exist
-  if (!chain) {
-    return [null, CommunityCommunityErrors.ChainDNE, false];
+  if (!community) {
+    return [null, CommunityCommunityErrors.CommunityDNE, false];
   }
-  return [chain, null, false];
+  return [community, null, false];
 };
 
 export const validateCommunityWithTopics = async (

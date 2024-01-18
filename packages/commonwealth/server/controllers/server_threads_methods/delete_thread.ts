@@ -1,6 +1,5 @@
-import { AppError } from '../../../../common-common/src/errors';
-import { AddressInstance } from '../../models/address';
-import { UserInstance } from '../../models/user';
+import { AppError } from '@hicommonwealth/adapters';
+import { AddressInstance, UserInstance } from '@hicommonwealth/model';
 import deleteThreadFromDb from '../../util/deleteThread';
 import { validateOwner } from '../../util/validateOwner';
 import { ServerThreadsController } from '../server_threads_controller';

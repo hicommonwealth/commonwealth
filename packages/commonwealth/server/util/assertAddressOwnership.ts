@@ -1,13 +1,13 @@
-import type { DB } from '../models';
+import { ServerError } from '@hicommonwealth/adapters';
+import { logger } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { ServerError } from 'common-common/src/errors';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 export default async function assertAddressOwnership(
   models: DB,
-  address: string
+  address: string,
 ) {
   const addressUsers = await models.Address.findAll({
     where: {

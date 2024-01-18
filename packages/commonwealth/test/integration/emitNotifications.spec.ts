@@ -1,15 +1,16 @@
 import {
   NotificationCategories,
+  NotificationDataAndCategory,
   ProposalType,
+  SnapshotEventType,
   SupportedNetwork,
 } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import { NotificationDataAndCategory, SnapshotEventType } from 'types';
 import { resetDatabase } from '../../server-test';
 import { JWT_SECRET } from '../../server/config';
-import models from '../../server/database';
 import emitNotifications from '../../server/util/emitNotifications';
 import * as modelUtils from '../util/modelUtils';
 import { JoinCommunityArgs } from '../util/modelUtils';
@@ -25,11 +26,8 @@ describe('emitNotifications tests', () => {
   // Therefore, a valid chain MUST be included alongside
   // communityId, unlike in non-test thread creation
   let thread, comment;
-  //reaction;
   const title = 'test title';
-  // const body = 'test body';
   const commentBody = 'test';
-  // const topicName = 'test topic';
   const kind = 'discussion';
 
   let userJWT;
@@ -104,7 +102,7 @@ describe('emitNotifications tests', () => {
 
     //reaction = await models.Reaction.create({
     await models.Reaction.create({
-      chain,
+      community_id: chain,
       thread_id: thread.id,
       address_id: userAddressId,
       reaction: 'like',
@@ -116,7 +114,7 @@ describe('emitNotifications tests', () => {
       const subscription = await models.Subscription.create({
         subscriber_id: userId,
         category_id: NotificationCategories.NewThread,
-        chain_id: chain,
+        community_id: chain,
       });
 
       const notification_data = {
@@ -137,7 +135,7 @@ describe('emitNotifications tests', () => {
 
       const notif = await models.Notification.findOne({
         where: {
-          chain_id: chain,
+          community_id: chain,
           category_id: NotificationCategories.NewThread,
           thread_id: thread.id,
         },
@@ -171,7 +169,7 @@ describe('emitNotifications tests', () => {
       const subscription = await models.Subscription.create({
         subscriber_id: userId,
         category_id: NotificationCategories.NewComment,
-        chain_id: chain,
+        community_id: chain,
         thread_id: thread.id,
       });
 
@@ -193,7 +191,7 @@ describe('emitNotifications tests', () => {
 
       const notif = await models.Notification.findOne({
         where: {
-          chain_id: chain,
+          community_id: chain,
           category_id: NotificationCategories.NewComment,
         },
       });
@@ -232,7 +230,7 @@ describe('emitNotifications tests', () => {
       const subscription = await models.Subscription.create({
         subscriber_id: userId,
         category_id: NotificationCategories.NewReaction,
-        chain_id: chain,
+        community_id: chain,
         thread_id: thread.id,
       });
 
@@ -252,7 +250,7 @@ describe('emitNotifications tests', () => {
 
       const notif = await models.Notification.findOne({
         where: {
-          chain_id: chain,
+          community_id: chain,
           category_id: NotificationCategories.NewReaction,
           thread_id: thread.id,
         },
@@ -421,7 +419,7 @@ describe('emitNotifications tests', () => {
       const subscription = await models.Subscription.create({
         subscriber_id: userId,
         category_id: NotificationCategories.ChainEvent,
-        chain_id: chain,
+        community_id: chain,
       });
 
       const chainEventId = -1;
@@ -443,7 +441,7 @@ describe('emitNotifications tests', () => {
 
       const notif = await models.Notification.findOne({
         where: {
-          chain_id: chain,
+          community_id: chain,
           category_id: NotificationCategories.ChainEvent,
           chain_event_id: chainEventId,
         },

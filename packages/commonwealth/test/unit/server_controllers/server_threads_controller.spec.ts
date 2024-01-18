@@ -8,10 +8,26 @@ describe('ServerThreadsController', () => {
     it('should create a thread reaction (new reaction)', async () => {
       const sandbox = Sinon.createSandbox();
       const db = {
+        // for findAllRoles
+        Address: {
+          findAll: async () => [
+            {
+              toJSON: () => ({}),
+            },
+          ],
+        },
+        Group: {
+          findAll: async () => [],
+        },
+        Topic: {
+          findOne: async () => ({
+            group_ids: [],
+          }),
+        },
         Reaction: {
           findOne: sandbox.stub().resolves({
             id: 2,
-            chain: 'ethereum',
+            community_id: 'ethereum',
             Address: {
               address: '0x123',
               community_id: 'ethereum',
@@ -22,7 +38,7 @@ describe('ServerThreadsController', () => {
           findOrCreate: sandbox.stub().resolves([
             {
               id: 2,
-              chain: 'ethereum',
+              community_id: 'ethereum',
               Address: {
                 address: '0x123',
                 community_id: 'ethereum',
@@ -458,6 +474,10 @@ describe('ServerThreadsController', () => {
         id: 1,
         address: '0x123',
         save: async () => ({}),
+        toJSON: () => ({
+          id: 1,
+          address: '0x123',
+        }),
       };
       const chain = {
         id: 'ethereum',
@@ -485,34 +505,22 @@ describe('ServerThreadsController', () => {
           ],
         },
         sequelize: {
-          transaction: async () => ({
-            rollback: async () => ({}),
-            commit: async () => ({}),
-          }),
+          transaction: async (callback: () => any) => callback(),
         },
         Comment: {
-          create: async (data) => ({
-            id: 1,
-            ...data,
-          }),
-          findOne: async () => {
-            const data = {
-              id: 1,
-              thread_id: threadId,
-              text,
-              address_id: address.id,
-              chain: chain.id,
-              Address: address,
-            };
+          create: async (data) => {
             return {
+              id: 1,
               ...data,
-              destroy: async () => ({}),
-              toJSON: () => data,
+              toJSON: () => ({
+                id: 1,
+                ...data,
+              }),
             };
           },
         },
         Subscription: {
-          create: async () => ({}),
+          bulkCreate: async () => ({}),
         },
         Topic: {
           findOne: async () => ({
@@ -563,10 +571,10 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Ban error: banned');
 
       expect(newComment).to.include({
-        thread_id: threadId,
+        thread_id: String(threadId),
         text,
         address_id: address.id,
-        chain: chain.id,
+        community_id: chain.id,
       });
       expect(notificationOptions).to.have.length.greaterThan(0);
       expect(analyticsOptions).to.include({
@@ -1295,8 +1303,14 @@ describe('ServerThreadsController', () => {
           },
           query: async () => ({}),
         },
+        Group: {
+          findAll: async () => [],
+        },
         Topic: {
           findOrCreate: async () => ({}),
+          findOne: async () => ({
+            group_ids: [],
+          }),
         },
         Thread: {
           findOne: async () => ({
@@ -1322,7 +1336,7 @@ describe('ServerThreadsController', () => {
           },
         },
         Subscription: {
-          create: async () => ({}),
+          bulkCreate: async () => ({}),
         },
         Address: {
           findAll: async () => [{}], // used in findOneRole
@@ -1351,7 +1365,6 @@ describe('ServerThreadsController', () => {
       const kind = 'discussion';
       const readOnly = false;
       const topicId = 1;
-      const topicName = undefined;
       const title = 'mythread';
       const stage = 'stage';
       const url = 'http://blah';
@@ -1369,7 +1382,6 @@ describe('ServerThreadsController', () => {
           kind,
           readOnly,
           topicId,
-          topicName,
           stage,
           url,
           canvasAction,
@@ -1390,7 +1402,6 @@ describe('ServerThreadsController', () => {
           kind,
           readOnly,
           topicId,
-          topicName,
           stage,
           url,
           canvasAction,

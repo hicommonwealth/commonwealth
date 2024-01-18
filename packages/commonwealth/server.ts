@@ -1,16 +1,17 @@
-import bodyParser from 'body-parser';
-import { factory, formatFilename } from 'common-common/src/logging';
 import {
+  HotShotsStats,
   RabbitMQController,
-  getRabbitMQConfig,
-} from 'common-common/src/rabbitmq';
-import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
-import { RedisCache } from 'common-common/src/redisCache';
-import {
+  RascalConfigServices,
+  RedisCache,
   ServiceKey,
+  TypescriptLoggingLogger,
+  getRabbitMQConfig,
+  setupErrorHandlers,
   startHealthCheckLoop,
-} from 'common-common/src/scripts/startHealthCheckLoop';
-import { StatsDController } from 'common-common/src/statsd';
+} from '@hicommonwealth/adapters';
+import { logger as _logger, stats } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
+import bodyParser from 'body-parser';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
@@ -24,8 +25,8 @@ import prerenderNode from 'prerender-node';
 import type { BrokerConfig } from 'rascal';
 import Rollbar from 'rollbar';
 import favicon from 'serve-favicon';
+import expressStatsInit from 'server/scripts/setupExpressStats';
 import * as v8 from 'v8';
-import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers';
 import {
   DATABASE_CLEAN_HOUR,
   PRERENDER_TOKEN,
@@ -36,9 +37,7 @@ import {
   SERVER_URL,
   SESSION_SECRET,
   TBC_BALANCE_TTL_SECONDS,
-  VULTR_IP,
 } from './server/config';
-import models from './server/database';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
 import { addSwagger } from './server/routing/addSwagger';
@@ -46,7 +45,6 @@ import { addExternalRoutes } from './server/routing/external';
 import setupAPI from './server/routing/router';
 import { sendBatchedNotificationEmails } from './server/scripts/emails';
 import setupAppRoutes from './server/scripts/setupAppRoutes';
-import expressStatsdInit from './server/scripts/setupExpressStats';
 import setupServer from './server/scripts/setupServer';
 import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
@@ -58,6 +56,9 @@ import ViewCountCache from './server/util/viewCountCache';
 
 let isServiceHealthy = false;
 
+const log = _logger(TypescriptLoggingLogger()).getLogger(__filename);
+stats(HotShotsStats());
+
 startHealthCheckLoop({
   service: ServiceKey.Commonwealth,
   checkFn: async () => {
@@ -67,7 +68,6 @@ startHealthCheckLoop({
   },
 });
 
-const log = factory.getLogger(formatFilename(__filename));
 // set up express async error handling hack
 require('express-async-errors');
 
@@ -84,15 +84,11 @@ async function main() {
 
   // CLI parameters for which task to run
   const SHOULD_SEND_EMAILS = process.env.SEND_EMAILS === 'true';
-  const SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS =
-    process.env.SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS === 'true';
 
   const NO_GLOBAL_ACTIVITY_CACHE =
     process.env.NO_GLOBAL_ACTIVITY_CACHE === 'true';
   const NO_CLIENT_SERVER =
-    process.env.NO_CLIENT === 'true' ||
-    SHOULD_SEND_EMAILS ||
-    SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS;
+    process.env.NO_CLIENT === 'true' || SHOULD_SEND_EMAILS;
 
   let rc = null;
   if (SHOULD_SEND_EMAILS) {
@@ -189,7 +185,7 @@ async function main() {
 
     // add other middlewares
     app.use(logger('dev'));
-    app.use(expressStatsdInit(StatsDController.get()));
+    app.use(expressStatsInit());
     app.use(bodyParser.json({ limit: '1mb' }));
     app.use(bodyParser.urlencoded({ limit: '1mb', extended: false }));
     app.use(cookieParser());
@@ -210,7 +206,7 @@ async function main() {
     }
   })();
 
-  const sendFile = (res) => res.sendFile(`${__dirname}/build/index.html`);
+  const sendFile = (res) => res.sendFile(`${__dirname}/index.html`);
 
   setupMiddleware();
   setupPassport(models);
@@ -252,8 +248,8 @@ async function main() {
     // TODO: this requires an immediate response if in production
   }
 
-  const redisCache = new RedisCache();
-  await redisCache.init(REDIS_URL, VULTR_IP);
+  const redisCache = new RedisCache(rollbar);
+  await redisCache.init(REDIS_URL);
 
   const tokenBalanceCache = new TokenBalanceCache(
     models,

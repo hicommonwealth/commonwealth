@@ -1,4 +1,5 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
+import { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 
 export const Errors = {
@@ -6,16 +7,16 @@ export const Errors = {
 };
 
 export default async (
-  models,
+  models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.user) {
     return next(new AppError(Errors.NotLoggedIn));
   }
 
-  const associationParams: any = [
+  const associationParams = [
     {
       model: models.Thread,
       as: 'Thread',
@@ -33,7 +34,7 @@ export default async (
     },
     {
       model: models.Community,
-      as: 'Chain',
+      as: 'Community',
       required: false,
       where: { active: true },
     },

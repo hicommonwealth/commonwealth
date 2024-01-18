@@ -1,20 +1,23 @@
 import { NotificationCategories } from '@hicommonwealth/core';
+import { CommunityInstance } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { ServerCommentsController } from 'server/controllers/server_comments_controller';
 import { SearchCommentsOptions } from 'server/controllers/server_comments_methods/search_comments';
 import Sinon from 'sinon';
 import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
-import { CommunityInstance } from '../../../server/models/community';
 
 describe('ServerCommentsController', () => {
   describe('#createCommentReaction', () => {
     it('should create a comment reaction (new reaction)', async () => {
       const sandbox = Sinon.createSandbox();
       const db = {
+        Address: {
+          findAll: async () => [{}], // used in findOneRole
+        },
         Reaction: {
           findOne: sandbox.stub().resolves({
             id: 2,
-            chain: 'ethereum',
+            community_id: 'ethereum',
             Address: {
               address: '0x123',
               community_id: 'ethereum',
@@ -25,7 +28,7 @@ describe('ServerCommentsController', () => {
           findOrCreate: sandbox.stub().resolves([
             {
               id: 2,
-              chain: 'ethereum',
+              community_id: 'ethereum',
               Address: {
                 address: '0x123',
                 community_id: 'ethereum',

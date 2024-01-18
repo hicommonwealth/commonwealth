@@ -1,3 +1,4 @@
+import type { DB } from '@hicommonwealth/model';
 import type { Express } from 'express';
 import express from 'express';
 import type Router from 'express/lib/router/index';
@@ -7,7 +8,6 @@ import type {
   PostTopicsReq,
   PutCommentsReq,
 } from '../api/extApiTypes';
-import type { DB } from '../models';
 import { addEntities } from '../routes/addEntities';
 import {
   getComments,
@@ -78,7 +78,7 @@ export function addExternalRoutes(
     postReactionsValidation,
     addEntities.bind(
       this,
-      'chain',
+      'community_id',
       models,
       (a) => models.Reaction.bulkCreate(a),
       (req: TypedRequest<PostReactionsReq>) => req.body.reactions,
@@ -88,7 +88,7 @@ export function addExternalRoutes(
     '/reactions',
     passport.authenticate('jwt', { session: false }),
     onlyIds,
-    deleteEntities.bind(this, 'chain', models, models.Reaction),
+    deleteEntities.bind(this, 'community_id', models, models.Reaction),
   );
 
   router.get(
@@ -120,7 +120,6 @@ export function addExternalRoutes(
     onlyIds,
     deleteEntities.bind(this, 'community_id', models, models.Topic),
   );
-
   app.use(endpoint, router);
 
   return router;

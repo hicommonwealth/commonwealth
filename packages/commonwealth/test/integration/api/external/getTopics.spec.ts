@@ -1,9 +1,9 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import 'chai/register-should';
+
+import type { TopicAttributes } from '@hicommonwealth/model';
 import type { GetTopicsReq } from 'server/api/extApiTypes';
 import { OrderByOptions } from 'server/api/extApiTypes';
-import type { TopicAttributes } from 'server/models/topic';
 import { get } from 'test/integration/api/external/appHook.spec';
 import { testTopics } from 'test/integration/api/external/dbEntityHooks.spec';
 

@@ -1,13 +1,11 @@
-import { factory, formatFilename } from 'common-common/src/logging';
 import {
   RabbitMQController,
-  getRabbitMQConfig,
-} from 'common-common/src/rabbitmq';
-import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
-import {
+  RascalConfigServices,
   ServiceKey,
+  getRabbitMQConfig,
   startHealthCheckLoop,
-} from 'common-common/src/scripts/startHealthCheckLoop';
+} from '@hicommonwealth/adapters';
+import { logger } from '@hicommonwealth/core';
 import {
   Client,
   IntentsBitField,
@@ -23,7 +21,7 @@ import {
 import { DISCORD_TOKEN, RABBITMQ_URI } from '../utils/config';
 import { rollbar } from '../utils/rollbar';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 let isServiceHealthy = false;
 

@@ -1,11 +1,10 @@
+import { models, ThreadAttributes } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { Op } from 'sequelize';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import models from '../../../server/database';
-import { ThreadAttributes } from '../../../server/models/thread';
 import { attributesOf } from '../../../server/util/sequelizeHelpers';
 import * as modelUtils from '../../util/modelUtils';
 import { JoinCommunityArgs, ThreadArgs } from '../../util/modelUtils';
@@ -22,11 +21,9 @@ describe('User Dashboard API', () => {
   // communityId, unlike in non-test thread creation
   const title = 'test title';
   const body = 'test body';
-  const topicName = 'test topic';
   const kind = 'discussion';
 
   let userJWT;
-  let userSession;
   let userId;
   let userAddress;
   let userAddressId;
@@ -36,9 +33,26 @@ describe('User Dashboard API', () => {
   let userAddress2;
   let userAddressId2;
   let threadOne;
+  let topicId: number;
+  let topicId2: number;
 
   before('Reset database', async () => {
     await resetDatabase();
+
+    const topic = await models.Topic.findOne({
+      where: {
+        community_id: chain,
+        group_ids: [],
+      },
+    });
+    topicId = topic.id;
+
+    const topic2 = await models.Topic.create({
+      name: 'Test Topic',
+      description: 'A topic made for testing',
+      community_id: chain2,
+    });
+    topicId2 = topic2.id;
 
     // creates 2 ethereum users
     const firstUser = await modelUtils.createAndVerifyAddress({ chain });
@@ -46,7 +60,6 @@ describe('User Dashboard API', () => {
     userAddress = firstUser.address;
     userAddressId = firstUser.address_id;
     userJWT = jwt.sign({ id: userId, email: firstUser.email }, JWT_SECRET);
-    userSession = { session: firstUser.session, sign: firstUser.sign };
     expect(userId).to.not.be.null;
     expect(userAddress).to.not.be.null;
     expect(userAddressId).to.not.be.null;
@@ -77,7 +90,7 @@ describe('User Dashboard API', () => {
     expect(res).to.equal(true);
 
     // sets user-2 to be admin of the alex community
-    let isAdmin = await modelUtils.updateRole({
+    const isAdmin = await modelUtils.updateRole({
       address_id: userAddressId2,
       chainOrCommObj: { chain_id: chain2 },
       role: 'admin',
@@ -92,9 +105,9 @@ describe('User Dashboard API', () => {
       body,
       readOnly: false,
       kind,
-      topicName,
       session: userSession2.session,
       sign: userSession2.sign,
+      topicId: topicId2,
     };
     threadOne = await modelUtils.createThread(threadOneArgs);
     expect(threadOne.status).to.equal('Success');
@@ -108,9 +121,9 @@ describe('User Dashboard API', () => {
       body,
       readOnly: false,
       kind,
-      topicName,
       session: userSession2.session,
       sign: userSession2.sign,
+      topicId,
     };
     //
     // // create a thread in both 'ethereum' and 'alex' communities
@@ -205,9 +218,9 @@ describe('User Dashboard API', () => {
           body,
           readOnly: false,
           kind,
-          topicName,
           session: userSession2.session,
           sign: userSession2.sign,
+          topicId,
         };
         const res = await modelUtils.createThread(threadArgs);
         expect(res.status).to.equal('Success');

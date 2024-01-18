@@ -1,8 +1,7 @@
 /* eslint-disable no-restricted-syntax */
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
+import type { DB, TopicAttributes } from '@hicommonwealth/model';
 import type { NextFunction } from 'express';
-import type { DB } from '../models';
-import type { TopicAttributes } from '../models/topic';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { validateOwner } from '../util/validateOwner';
@@ -40,7 +39,7 @@ const editTopic = async (
   models: DB,
   req: TypedRequestBody<EditTopicReq>,
   res: TypedResponse<EditTopicResp>,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const chain = req.chain;
   if (!req.body.id) {

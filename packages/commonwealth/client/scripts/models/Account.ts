@@ -1,9 +1,10 @@
 import type { WalletId, WalletSsoSource } from '@hicommonwealth/core';
-import { ChainType } from '@hicommonwealth/core';
 import $ from 'jquery';
 import app from 'state';
 import NewProfilesController from '../controllers/server/newProfiles';
 
+import type momentType from 'moment';
+import moment from 'moment';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import type ChainInfo from './ChainInfo';
 import MinimumProfile from './MinimumProfile';
@@ -12,6 +13,7 @@ class Account {
   public readonly address: string;
   public readonly community: ChainInfo;
   public readonly ghostAddress: boolean;
+  public lastActive?: momentType.Moment;
 
   // validation token sent by server
   private _validationToken?: string;
@@ -41,6 +43,7 @@ class Account {
     validationBlockInfo,
     profile,
     ignoreProfile = true,
+    lastActive,
   }: {
     // required args
     community: ChainInfo;
@@ -54,6 +57,7 @@ class Account {
     sessionPublicAddress?: string;
     validationBlockInfo?: string;
     profile?: MinimumProfile;
+    lastActive?: string | momentType.Moment;
 
     // flags
     ghostAddress?: boolean;
@@ -70,6 +74,7 @@ class Account {
     this._sessionPublicAddress = sessionPublicAddress;
     this._validationBlockInfo = validationBlockInfo;
     this.ghostAddress = !!ghostAddress;
+    this.lastActive = lastActive ? moment(lastActive) : null;
     if (profile) {
       this._profile = profile;
     } else if (!ignoreProfile && community?.id) {
@@ -173,7 +178,6 @@ class Account {
       address: this.address,
       chain: this.community.id,
       chain_id: chainId,
-      isToken: this.community.type === ChainType.Token,
       jwt: app.user.jwt,
       signature,
       wallet_id: this.walletId,

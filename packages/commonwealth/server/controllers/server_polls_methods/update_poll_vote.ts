@@ -1,11 +1,13 @@
 import moment from 'moment';
 
-import { AppError, ServerError } from '../../../../common-common/src/errors';
+import { AppError, ServerError } from '@hicommonwealth/adapters';
+import {
+  AddressInstance,
+  CommunityInstance,
+  UserInstance,
+  VoteAttributes,
+} from '@hicommonwealth/model';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/community';
-import { UserInstance } from '../../models/user';
-import { VoteAttributes } from '../../models/vote';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { TrackOptions } from '../server_analytics_methods/track';
 import { ServerPollsController } from '../server_polls_controller';

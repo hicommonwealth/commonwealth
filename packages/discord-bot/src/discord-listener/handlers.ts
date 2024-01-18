@@ -1,13 +1,14 @@
-import { DiscordAction, IDiscordMessage } from '@hicommonwealth/core';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { RabbitMQController } from 'common-common/src/rabbitmq';
-import { RascalPublications } from 'common-common/src/rabbitmq/types';
+import {
+  RabbitMQController,
+  RascalPublications,
+} from '@hicommonwealth/adapters';
+import { DiscordAction, IDiscordMessage, logger } from '@hicommonwealth/core';
 import { Client, Message, ThreadChannel } from 'discord.js';
 import { getImageUrls } from '../discord-listener/util';
 import { rollbar } from '../utils/rollbar';
 import { getForumLinkedTopic } from '../utils/util';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 export async function handleMessage(
   controller: RabbitMQController,

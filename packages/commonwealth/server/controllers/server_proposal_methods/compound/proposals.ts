@@ -1,3 +1,4 @@
+import { RedisCache } from '@hicommonwealth/adapters';
 import {
   GovernorAlpha,
   GovernorBravoDelegate,
@@ -6,7 +7,6 @@ import {
   TypedEvent,
 } from '@hicommonwealth/chains';
 import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
-import { RedisCache } from 'common-common/src/redisCache';
 import { ethers, providers, utils } from 'ethers';
 import { ProposalState } from '../../../../shared/chain/types/compound';
 import { getCompoundGovContractAndVersion } from './compoundVersion';

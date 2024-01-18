@@ -1,8 +1,8 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
+import type { DB } from '@hicommonwealth/model';
+import { Link, LinkSource } from '@hicommonwealth/model';
 import type { NextFunction } from 'express';
 import { Op } from 'sequelize';
-import type { DB } from '../../models';
-import { Link, LinkSource } from '../../models/thread';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 import { Errors } from '../../util/linkingValidationHelper';
 

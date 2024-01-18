@@ -1,8 +1,8 @@
-import { TypedRequest, TypedResponse, success } from '../../types';
-import { AppError } from 'common-common/src/errors';
-import { ReactionAttributes } from '../../models/reaction';
-import { ServerControllers } from '../../routing/router';
+import { AppError } from '@hicommonwealth/adapters';
+import { ReactionAttributes } from '@hicommonwealth/model';
 import { verifyReaction } from '../../../shared/canvas/serverVerify';
+import { ServerControllers } from '../../routing/router';
+import { TypedRequest, TypedResponse, success } from '../../types';
 
 const Errors = {
   InvalidReaction: 'Invalid reaction',
@@ -25,7 +25,7 @@ export const createCommentReactionHandler = async (
     any,
     CreateCommentReactionRequestParams
   >,
-  res: TypedResponse<CreateCommentReactionResponse>
+  res: TypedResponse<CreateCommentReactionResponse>,
 ) => {
   const { user, address, chain: community } = req;
   const {

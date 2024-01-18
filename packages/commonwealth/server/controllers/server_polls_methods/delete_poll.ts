@@ -1,7 +1,9 @@
-import { AppError } from '../../../../common-common/src/errors';
-import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/community';
-import { UserInstance } from '../../models/user';
+import { AppError } from '@hicommonwealth/adapters';
+import {
+  AddressInstance,
+  CommunityInstance,
+  UserInstance,
+} from '@hicommonwealth/model';
 import { validateOwner } from '../../util/validateOwner';
 import { ServerThreadsController } from '../server_threads_controller';
 

@@ -1,7 +1,7 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
+import type { DB } from '@hicommonwealth/model';
 import type { Request, Response } from 'express';
 import { Op, Sequelize } from 'sequelize';
-import type { DB } from '../../models';
 import { success } from '../../types';
 import { findAllRoles } from '../../util/roles';
 
