@@ -18,7 +18,7 @@ import {
 } from 'client/scripts/views/components/react_quill_editor';
 import { serializeDelta } from 'client/scripts/views/components/react_quill_editor/utils';
 import type { DeltaStatic } from 'quill';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import './CreateTopicSection.scss';
 
 export const CreateTopicSection = () => {
@@ -28,17 +28,15 @@ export const CreateTopicSection = () => {
     communityId: app.activeChainId(),
   });
 
-  const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
-  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [contentDelta, setContentDelta] = useState<DeltaStatic>(
     createDeltaFromText(''),
   );
-  const [isSaving, setIsSaving] = React.useState<boolean>(false);
-  const [description, setDescription] = React.useState<string>('');
-  const [featuredInNewPost, setFeaturedInNewPost] =
-    React.useState<boolean>(false);
-  const [featuredInSidebar, setFeaturedInSidebar] =
-    React.useState<boolean>(false);
-  const [name, setName] = React.useState<string>('');
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [description, setDescription] = useState<string>('');
+  const [featuredInNewPost, setFeaturedInNewPost] = useState<boolean>(false);
+  const [featuredInSidebar, setFeaturedInSidebar] = useState<boolean>(false);
+  const [name, setName] = useState<string>('');
 
   const { isWindowExtraSmall } = useBrowserWindow({});
 

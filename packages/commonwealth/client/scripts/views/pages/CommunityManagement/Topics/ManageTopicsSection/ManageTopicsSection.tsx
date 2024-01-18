@@ -1,4 +1,5 @@
 import { notifyError } from 'client/scripts/controllers/app/notifications';
+import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import type Topic from 'client/scripts/models/Topic';
 import app from 'client/scripts/state';
 import {
@@ -29,6 +30,8 @@ export const ManageTopicsSection = () => {
       return topics.sort((a, b) => a.order - b.order);
     }
   };
+
+  const { isWindowExtraSmall } = useBrowserWindow({});
 
   const { data: rawTopics } = useFetchTopicsQuery({
     communityId: app.activeChainId(),
@@ -74,12 +77,14 @@ export const ManageTopicsSection = () => {
         <CWButton
           label="Revert Changes"
           buttonType="tertiary"
+          buttonWidth={isWindowExtraSmall ? 'full' : 'narrow'}
           buttonHeight="med"
           onClick={handleReversion}
         />
         <CWButton
           buttonType="primary"
           buttonHeight="med"
+          buttonWidth={isWindowExtraSmall ? 'full' : 'narrow'}
           onClick={handleSave}
           label="Save Changes"
         />
