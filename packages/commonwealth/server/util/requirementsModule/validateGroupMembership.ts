@@ -4,7 +4,7 @@ import {
   Requirement,
   ThresholdData,
 } from '@hicommonwealth/core';
-import { MembershipRejectReason } from 'server/models/membership';
+import { MembershipRejectReason } from '@hicommonwealth/model';
 import { toBN } from 'web3-utils';
 import { OptionsWithBalances } from '../tokenBalanceCache/types';
 

@@ -55,11 +55,11 @@ export const AdminOnboardingSlider = () => {
     });
 
   const redirectToPage = (
-    pageName: 'create-group' | 'create-thread' | 'manage-community',
+    pageName: 'create-group' | 'create-thread' | 'manage-integrations',
   ) => {
     pageName === 'create-group' && navigate(`/members/groups/create`);
     pageName === 'create-thread' && navigate(`/new/discussion`);
-    pageName === 'manage-community' && navigate(`/manage`);
+    pageName === 'manage-integrations' && navigate(`/manage/integrations`);
   };
 
   if (
@@ -113,9 +113,7 @@ export const AdminOnboardingSlider = () => {
           <AdminOnboardingCard
             cardType="enable-integrations"
             isActionCompleted={hasAnyIntegration}
-            // TODO: after https://github.com/hicommonwealth/commonwealth/issues/6024,
-            // redirect to specific section on the manage community page
-            onCTAClick={() => redirectToPage('manage-community')}
+            onCTAClick={() => redirectToPage('manage-integrations')}
           />
           <AdminOnboardingCard
             cardType="create-thread"

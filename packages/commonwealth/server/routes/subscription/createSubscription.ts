@@ -1,12 +1,14 @@
 import { AppError } from '@hicommonwealth/adapters';
 import { NotificationCategories } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
+import {
+  CommentInstance,
+  CommunityInstance,
+  SubscriptionAttributes,
+  ThreadInstance,
+} from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import { WhereOptions } from 'sequelize';
-import { SubscriptionAttributes } from 'server/models/subscription';
-import type { DB } from '../../models';
-import { CommentInstance } from '../../models/comment';
-import { CommunityInstance } from '../../models/community';
-import { ThreadInstance } from '../../models/thread';
 import { supportedSubscriptionCategories } from '../../util/subscriptionMapping';
 import Errors from './errors';
 

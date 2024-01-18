@@ -1,11 +1,11 @@
 import { RedisCache } from '@hicommonwealth/adapters';
 import { NotificationCategories } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { Sequelize } from 'sequelize';
 import sinon from 'sinon';
 import { resetDatabase } from '../../server-test';
-import models from '../../server/database';
 import DatabaseCleaner from '../../server/util/databaseCleaner';
 
 chai.use(chaiHttp);

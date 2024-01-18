@@ -1,5 +1,4 @@
-import { TypedRequest, TypedResponse } from 'server/types';
-import type { DB } from '../models';
+import type { DB } from '@hicommonwealth/model';
 
 export const Errors = {};
 

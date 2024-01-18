@@ -1,7 +1,7 @@
 import { AppError, RedisCache, ServerError } from '@hicommonwealth/adapters';
 import { ChainNetwork } from '@hicommonwealth/core';
+import { DB } from '@hicommonwealth/model';
 import { providers } from 'ethers';
-import { DB } from '../models';
 import {
   GetProposalVotesOptions,
   GetProposalVotesResult,

@@ -1,15 +1,16 @@
+import type {
+  AddressInstance,
+  ChainNodeAttributes,
+  CollaborationAttributes,
+  CommentInstance,
+  CommunityInstance,
+  ReactionAttributes,
+  ThreadInstance,
+  TopicAttributes,
+  UserInstance,
+} from '@hicommonwealth/model';
+import { ProfileAttributes, models } from '@hicommonwealth/model';
 import Sequelize from 'sequelize';
-import models from 'server/database';
-import type { AddressInstance } from 'server/models/address';
-import type { ChainNodeAttributes } from 'server/models/chain_node';
-import type { CollaborationAttributes } from 'server/models/collaboration';
-import type { CommentInstance } from 'server/models/comment';
-import type { ReactionAttributes } from 'server/models/reaction';
-import type { ThreadInstance } from 'server/models/thread';
-import type { TopicAttributes } from 'server/models/topic';
-import type { UserInstance } from 'server/models/user';
-import type { CommunityInstance } from '../../../server/models/community';
-import { ProfileAttributes } from '../../../server/models/profile';
 import { testAddress } from '../utils/e2eUtils';
 
 const Op = Sequelize.Op;

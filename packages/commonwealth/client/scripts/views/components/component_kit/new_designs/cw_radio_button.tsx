@@ -49,7 +49,7 @@ export const CWRadioButton = (props: RadioButtonProps) => {
   //   hookToForm && (formContext?.formState?.errors?.[name]?.message as string);
 
   return (
-    <div className="container">
+    <label className="container">
       <input
         type="radio"
         className={`radio-button ${disabled ? 'disabled' : ''}`}
@@ -65,6 +65,6 @@ export const CWRadioButton = (props: RadioButtonProps) => {
       <CWText className="label" type="b2" fontWeight="regular">
         {label || value}
       </CWText>
-    </div>
+    </label>
   );
 };

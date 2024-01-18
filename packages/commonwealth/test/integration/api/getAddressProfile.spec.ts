@@ -1,6 +1,5 @@
+import { AddressInstance, models } from '@hicommonwealth/model';
 import chai from 'chai';
-import models from '../../../server/database';
-import { AddressInstance } from '../../../server/models/address';
 import getAddressProfiles, {
   GetAddressProfileReq,
 } from '../../../server/routes/getAddressProfile';

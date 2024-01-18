@@ -18,6 +18,7 @@ import {
   ChainNetwork,
   ChainType,
 } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { Proposal, ProposalStatus } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import {
@@ -25,7 +26,6 @@ import {
   QueryProposalsResponse,
 } from 'cosmjs-types/cosmos/gov/v1beta1/query';
 import { resetDatabase } from '../../server-test';
-import models from '../../server/database';
 import { generateCosmosGovNotifications } from '../../server/workers/cosmosGovNotifications/generateCosmosGovNotifications';
 import { CosmosClients } from '../../server/workers/cosmosGovNotifications/proposalFetching/getCosmosClient';
 import {

@@ -1,8 +1,8 @@
 import { AppError } from '@hicommonwealth/adapters';
+import type { DB } from '@hicommonwealth/model';
+import { CommunityInstance } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-import { CommunityInstance } from 'server/models/community';
 import { CW_BOT_KEY } from '../config';
-import type { DB } from '../models';
 import lookupAddressIsOwnedByUser from './lookupAddressIsOwnedByUser';
 import {
   validateCommunity,

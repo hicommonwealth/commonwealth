@@ -4,11 +4,11 @@ import {
   lookupKeyDurationInReq,
 } from '@hicommonwealth/adapters';
 import { logger } from '@hicommonwealth/core';
+import { DB } from '@hicommonwealth/model';
 import axios from 'axios';
 import bodyParser from 'body-parser';
 import { Express } from 'express';
 import _ from 'lodash';
-import { DB } from 'server/models';
 import {
   calcCosmosLCDCacheKeyDuration,
   calcCosmosRPCCacheKeyDuration,

@@ -1,6 +1,5 @@
 import type { WalletId, WalletSsoSource } from '@hicommonwealth/core';
-import type { DB } from '../models';
-import type { AddressAttributes } from '../models/address';
+import type { AddressAttributes, DB } from '@hicommonwealth/model';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { createAddressHelper } from '../util/createAddressHelper';

@@ -1,7 +1,7 @@
 import { AppError } from '@hicommonwealth/adapters';
 import { WalletId } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-import type { DB } from '../models';
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',

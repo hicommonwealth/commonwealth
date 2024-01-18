@@ -5,7 +5,7 @@ import express from 'express';
 import { validateAgainstSchema, validateSemanticRules } from './middleware'; // This can be a single validation helper? 
 
 import { communityContractTemplateSchema } from './schema';  // How are we consuming our versioned OAS? 
-import type { CommunityContractTemplateInstance } from 'server/models/community_contract_template';
+import type { CommunityContractTemplateInstance } from '@hicommonwealth/model';
 
 
 // Define interfaces for form fields and tx template

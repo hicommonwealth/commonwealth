@@ -1,6 +1,6 @@
+import type { DB } from '@hicommonwealth/model';
 import { body, validationResult } from 'express-validator';
 import { Op } from 'sequelize';
-import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { failure } from '../types';
 

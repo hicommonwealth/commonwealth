@@ -24,13 +24,13 @@ import { createRole, findOneRole } from '../../server/util/roles';
 
 import { createCanvasSessionPayload } from '../../shared/canvas';
 
+import type { Role } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model';
 import { mnemonicGenerate } from '@polkadot/util-crypto';
 import Web3 from 'web3-utils';
 import app from '../../server-test';
-import models from '../../server/database';
-import type { Role } from '../../server/models/role';
 
-import { Link, LinkSource, ThreadAttributes } from '../../server/models/thread';
+import { Link, LinkSource, ThreadAttributes } from '@hicommonwealth/model';
 import {
   TEST_BLOCK_INFO_BLOCKHASH,
   TEST_BLOCK_INFO_STRING,

@@ -1,6 +1,6 @@
+import type { DB } from '@hicommonwealth/model';
+import { sequelize } from '@hicommonwealth/model';
 import type { Request, Response } from 'express';
-import { sequelize } from '../database';
-import type { DB } from '../models';
 
 export const Errors = {
   NoCommunity: 'Must provide community',

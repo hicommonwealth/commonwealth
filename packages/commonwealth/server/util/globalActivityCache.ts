@@ -1,8 +1,8 @@
 import { RedisCache } from '@hicommonwealth/adapters';
 import { logger, RedisNamespaces } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
+import { AddressAttributes } from '@hicommonwealth/model';
 import { v4 as uuidv4 } from 'uuid';
-import type { DB } from '../models';
-import { AddressAttributes } from '../models/address';
 import {
   ActivityRow,
   getActivityFeed,

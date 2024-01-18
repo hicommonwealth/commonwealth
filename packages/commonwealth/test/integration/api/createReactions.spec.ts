@@ -1,10 +1,10 @@
 import { ActionArgument } from '@canvas-js/interfaces';
+import { models } from '@hicommonwealth/model';
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import models from '../../../server/database';
 import * as modelUtils from '../../util/modelUtils';
 
 chai.use(chaiHttp);
