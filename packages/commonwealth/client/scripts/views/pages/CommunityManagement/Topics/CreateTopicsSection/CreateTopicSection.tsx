@@ -71,6 +71,34 @@ export const CreateTopicSection = () => {
     }
   };
 
+  const handleInputValidation = (text: string) => {
+    const currentCommunityTopicNames = topics.map((t) => t.name.toLowerCase());
+
+    if (currentCommunityTopicNames.includes(text.toLowerCase())) {
+      const err = 'Topic name already used within community.';
+      setErrorMsg(err);
+      return ['failure', err];
+    }
+
+    const disallowedCharMatches = text.match(/["<>%{}|\\/^`]/g);
+
+    if (disallowedCharMatches) {
+      const err = `The ${pluralizeWithoutNumberPrefix(
+        disallowedCharMatches.length,
+        'char',
+      )}
+    ${disallowedCharMatches.join(', ')} are not permitted`;
+      setErrorMsg(err);
+      return ['failure', err];
+    }
+
+    if (errorMsg) {
+      setErrorMsg(null);
+    }
+
+    return ['success', 'Valid topic name'];
+  };
+
   return (
     <div className="CreateTopicSection">
       <div className="form">
@@ -82,35 +110,7 @@ export const CreateTopicSection = () => {
             onInput={(e) => {
               setName(e.target.value);
             }}
-            inputValidationFn={(text: string) => {
-              const currentCommunityTopicNames = topics.map((t) =>
-                t.name.toLowerCase(),
-              );
-
-              if (currentCommunityTopicNames.includes(text.toLowerCase())) {
-                const err = 'Topic name already used within community.';
-                setErrorMsg(err);
-                return ['failure', err];
-              }
-
-              const disallowedCharMatches = text.match(/["<>%{}|\\/^`]/g);
-
-              if (disallowedCharMatches) {
-                const err = `The ${pluralizeWithoutNumberPrefix(
-                  disallowedCharMatches.length,
-                  'char',
-                )}
-              ${disallowedCharMatches.join(', ')} are not permitted`;
-                setErrorMsg(err);
-                return ['failure', err];
-              }
-
-              if (errorMsg) {
-                setErrorMsg(null);
-              }
-
-              return ['success', 'Valid topic name'];
-            }}
+            inputValidationFn={handleInputValidation}
             autoFocus
           />
           <CWTextInput

@@ -21,7 +21,9 @@ export type BaseTextInputProps = {
   iconLeftonClick?: () => void;
   iconRight?: JSX.Element;
   iconRightonClick?: () => void;
-  inputValidationFn?: (value: string) => [ValidationStatus, string] | [];
+  inputValidationFn?: (
+    value: string,
+  ) => [ValidationStatus, string] | [] | string[];
   label?: string | React.ReactNode;
   maxLength?: number;
   isCompact?: boolean;
