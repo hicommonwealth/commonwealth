@@ -1,3 +1,4 @@
+import { CommunityInstance } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { ServerThreadsController } from 'server/controllers/server_threads_controller';
 import {
@@ -6,7 +7,6 @@ import {
   validatePermissions,
 } from 'server/controllers/server_threads_methods/update_thread';
 import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
-import { CommunityInstance } from '../../../server/models/community';
 
 describe('ServerThreadsController', () => {
   describe('#validatePermissions', () => {

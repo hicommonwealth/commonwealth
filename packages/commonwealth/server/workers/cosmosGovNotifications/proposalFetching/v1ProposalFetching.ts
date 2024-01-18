@@ -5,8 +5,8 @@ import {
   ProposalStatus,
 } from '@hicommonwealth/chains';
 import { logger } from '@hicommonwealth/core';
+import { CommunityInstance } from '@hicommonwealth/model';
 import { numberToLong } from '../../../../../../libs/chains/src/cosmos-ts/src/codegen/helpers';
-import { CommunityInstance } from '../../../models/community';
 import { getCosmosClient } from './getCosmosClient';
 import { numberToUint8ArrayBE, uint8ArrayToNumberBE } from './util';
 

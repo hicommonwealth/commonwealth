@@ -1,8 +1,8 @@
+import type { DB } from '@hicommonwealth/model';
+import { ProfileAttributes } from '@hicommonwealth/model';
 import type { NextFunction } from 'express';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { failure, success } from '../types';
-import type { DB } from '../models';
-import { ProfileAttributes } from '../models/profile';
 
 export const Errors = {
   NotAuthorized: 'Not authorized',
@@ -30,7 +30,7 @@ const updateNewProfile = async (
   models: DB,
   req: TypedRequestBody<UpdateNewProfileReq>,
   res: TypedResponse<UpdateNewProfileResp>,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const profile = await models.Profile.findOne({
     where: {
@@ -71,7 +71,7 @@ const updateNewProfile = async (
         user_id: req.user.id,
       },
       returning: true,
-    }
+    },
   );
 
   if (!updateStatus || !rows) {

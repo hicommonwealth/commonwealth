@@ -1,6 +1,6 @@
 import { AppError } from '@hicommonwealth/adapters';
+import { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-import { DB } from '../../models';
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',

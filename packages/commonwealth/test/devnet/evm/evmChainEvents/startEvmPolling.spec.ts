@@ -1,8 +1,7 @@
 import { NotificationCategories } from '@hicommonwealth/core';
+import { ContractInstance, models } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import sinon from 'sinon';
-import models from '../../../../server/database';
-import { ContractInstance } from '../../../../server/models/contract';
 import { startEvmPolling } from '../../../../server/workers/evmChainEvents/startEvmPolling';
 import {
   getTestAbi,

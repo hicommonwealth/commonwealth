@@ -1,6 +1,5 @@
+import { CommunityInstance, TopicAttributes } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
-import { CommunityInstance } from '../../models/community';
-import { TopicAttributes } from '../../models/topic';
 import { ServerTopicsController } from '../server_topics_controller';
 
 export type GetTopicsOptions = {

@@ -1,6 +1,6 @@
 import { logger } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import { databaseCleaner } from 'commonwealth/server/util/databaseCleaner';
-import models from '../database';
 
 const log = logger().getLogger(__filename);
 databaseCleaner.init(models);

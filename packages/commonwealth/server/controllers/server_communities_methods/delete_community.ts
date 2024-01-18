@@ -1,7 +1,6 @@
 import { AppError } from '@hicommonwealth/adapters';
+import { UserInstance, sequelize } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import { UserInstance } from 'server/models/user';
-import { sequelize } from '../../database';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 export const Errors = {

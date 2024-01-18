@@ -1,9 +1,9 @@
+import type { DB } from '@hicommonwealth/model';
+import { ProfileAttributes } from '@hicommonwealth/model';
 import { oneOf, query, validationResult } from 'express-validator';
 import Sequelize, { WhereOptions } from 'sequelize';
 import type { GetProfilesReq, GetProfilesResp } from '../../api/extApiTypes';
 import { needParamErrMsg } from '../../api/extApiTypes';
-import type { DB } from '../../models';
-import { ProfileAttributes } from '../../models/profile';
 import type { TypedRequestQuery, TypedResponse } from '../../types';
 import { failure, success } from '../../types';
 import { paginationValidation } from '../../util/helperValidations';

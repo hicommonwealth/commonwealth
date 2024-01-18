@@ -1,6 +1,6 @@
 import { AppError } from '@hicommonwealth/adapters';
+import type { DB } from '@hicommonwealth/model';
 import { validateCommunity } from '../middleware/validateCommunity';
-import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
