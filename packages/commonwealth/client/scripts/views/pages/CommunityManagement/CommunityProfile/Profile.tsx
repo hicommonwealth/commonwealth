@@ -4,7 +4,7 @@ import Permissions from 'utils/Permissions';
 import FeatureHint from 'views/components/FeatureHint';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { PageNotFound } from '../../404';
-import Form from './Form';
+import CommunityProfileForm from './CommunityProfileForm';
 import './Profile.scss';
 
 const CommunityProfile = () => {
@@ -23,7 +23,7 @@ const CommunityProfile = () => {
           <CWText type="b1">Manage the basic details of your community</CWText>
         </div>
 
-        <Form />
+        <CommunityProfileForm />
       </section>
 
       <section className="right-section">

@@ -23,14 +23,14 @@ import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import { getCommunityTags } from '../../../manage_community/helpers';
-import './Form.scss';
+import './CommunityProfileForm.scss';
 import { CommunityTags, FormSubmitValues } from './types';
 import {
   communityProfileValidationSchema,
   linkValidationSchema,
 } from './validation';
 
-const Form = () => {
+const CommunityProfileForm = () => {
   const communityTagOptions: CommunityTags[] = ['DeFi', 'DAO'];
   const community = app.config.chains.getById(app.activeChainId());
 
@@ -146,7 +146,7 @@ const Form = () => {
   return (
     <CWForm
       key={formKey}
-      className="Form"
+      className="CommunityProfileForm"
       initialValues={{
         communityName: community.name,
         communityDescription: community.description,
@@ -408,4 +408,4 @@ const Form = () => {
   );
 };
 
-export default Form;
+export default CommunityProfileForm;
