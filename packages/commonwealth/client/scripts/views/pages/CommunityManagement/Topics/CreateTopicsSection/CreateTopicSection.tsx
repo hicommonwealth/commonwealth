@@ -111,7 +111,7 @@ export const CreateTopicSection = () => {
           <CWCheckbox
             className="sidebar-feature-checkbox"
             label={
-              <>
+              <div>
                 <CWText type="b2">
                   Featured topic in sidebar (recommended)
                 </CWText>
@@ -119,7 +119,7 @@ export const CreateTopicSection = () => {
                   Please note, only sidebar-featured topics show on the Overview
                   page.
                 </CWText>
-              </>
+              </div>
             }
             checked={featuredInSidebar}
             onChange={() => {
