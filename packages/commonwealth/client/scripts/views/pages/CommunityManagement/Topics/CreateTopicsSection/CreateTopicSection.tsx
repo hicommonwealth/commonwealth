@@ -8,7 +8,10 @@ import {
 } from 'client/scripts/state/api/topics';
 import { CWCheckbox } from 'client/scripts/views/components/component_kit/cw_checkbox';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import { CWValidationText } from 'client/scripts/views/components/component_kit/cw_validation_text';
+import {
+  CWValidationText,
+  ValidationStatus,
+} from 'client/scripts/views/components/component_kit/cw_validation_text';
 import { CWTextInput } from 'client/scripts/views/components/component_kit/new_designs/CWTextInput';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/cw_button';
 import {
@@ -71,7 +74,7 @@ export const CreateTopicSection = () => {
     }
   };
 
-  const handleInputValidation = (text: string) => {
+  const handleInputValidation = (text: string): [ValidationStatus, string] => {
     const currentCommunityTopicNames = topics.map((t) => t.name.toLowerCase());
 
     if (currentCommunityTopicNames.includes(text.toLowerCase())) {
