@@ -6,9 +6,12 @@ import {
   useUpdateFeaturedTopicsOrderMutation,
 } from 'client/scripts/state/api/topics';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
+import { CWModal } from 'client/scripts/views/components/component_kit/new_designs/CWModal';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/cw_button';
+import { EditTopicModal } from 'client/scripts/views/modals/edit_topic_modal';
 import DraggableTopicsList from 'client/scripts/views/modals/order_topics_modal/draggable_topics_list';
 import React, { useState } from 'react';
+import './ManageTopicsSection.scss';
 
 export const ManageTopicsSection = () => {
   const getFilteredTopics = (rawTopics: Topic[]): Topic[] => {
@@ -40,6 +43,8 @@ export const ManageTopicsSection = () => {
     getFilteredTopics(rawTopics),
   );
 
+  const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
+
   const handleSave = async () => {
     try {
       await updateFeaturedTopicsOrder({ featuredTopics: topics });
@@ -48,30 +53,51 @@ export const ManageTopicsSection = () => {
     }
   };
 
+  const handleReversion = () => {
+    setTopics(getFilteredTopics(rawTopics));
+  };
+
   return (
-    <div className="OrderTopicsModal">
+    <div className="ManageTopicsSection">
       <div className="content">
         <div className="featured-topic-list">
           {topics.length ? (
-            <DraggableTopicsList topics={topics} setTopics={setTopics} />
+            <DraggableTopicsList
+              topics={topics}
+              setTopics={setTopics}
+              onEdit={setTopicSelectedToEdit}
+            />
           ) : (
             <CWText>No Topics to Reorder</CWText>
           )}
         </div>
       </div>
-      <div className="footer">
+      <div className="actions">
         <CWButton
           label="Revert Changes"
-          buttonType="secondary"
-          buttonHeight="sm"
+          buttonType="tertiary"
+          buttonHeight="med"
+          onClick={handleReversion}
         />
         <CWButton
           buttonType="primary"
-          buttonHeight="sm"
+          buttonHeight="med"
           onClick={handleSave}
-          label="Save"
+          label="Save Changes"
         />
       </div>
+
+      <CWModal
+        size="medium"
+        content={
+          <EditTopicModal
+            topic={topicSelectedToEdit}
+            onModalClose={() => setTopicSelectedToEdit(null)}
+          />
+        }
+        onClose={() => setTopicSelectedToEdit(null)}
+        open={!!topicSelectedToEdit}
+      />
     </div>
   );
 };
