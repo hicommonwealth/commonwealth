@@ -1,11 +1,11 @@
 import { useCommonNavigate } from 'client/scripts/navigation/helpers';
+import FeatureHint from 'client/scripts/views/components/FeatureHint';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import {
   CWTab,
   CWTabsRow,
 } from 'client/scripts/views/components/component_kit/new_designs/CWTabs';
 import React, { useState } from 'react';
-import CreateCommunityHint from '../../CreateCommunity/components/CreateCommunityHint';
 import CreateTopicSection from './CreateTopicsSection';
 import ManageTopicsSection from './ManageTopicsSection';
 import './Topics.scss';
@@ -54,12 +54,12 @@ export const Topics = () => {
         </main>
         <aside>
           {selectedTab === TABS[0].value ? (
-            <CreateCommunityHint
+            <FeatureHint
               title="Topics and Subtopics"
               hint="Top level topics can act as parents to subtopics. Subtopics can not have additional subtopics."
             />
           ) : (
-            <CreateCommunityHint
+            <FeatureHint
               title="Topic Sorting"
               hint="Drag the topics on the left to the order you want them to appear
             on the side panel navigation of your community page. Tap the pencil
