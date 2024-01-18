@@ -22,12 +22,12 @@ export const ManageTopicsSection = () => {
 
     if (!topics[0].order) {
       return topics
-        .sort((a, b) => a.name.localeCompare(b.name))
+        .toSorted((a, b) => a.name.localeCompare(b.name))
         .reduce((acc, curr, index) => {
           return [...acc, { ...curr, order: index + 1 }];
         }, []);
     } else {
-      return topics.sort((a, b) => a.order - b.order);
+      return topics.toSorted((a, b) => a.order - b.order);
     }
   };
 
@@ -95,7 +95,11 @@ export const ManageTopicsSection = () => {
         content={
           <EditTopicModal
             topic={topicSelectedToEdit}
-            onModalClose={() => setTopicSelectedToEdit(null)}
+            onModalClose={() => {
+              setTopicSelectedToEdit(null);
+              setTopics(getFilteredTopics(rawTopics));
+            }}
+            noRedirect={true}
           />
         }
         onClose={() => setTopicSelectedToEdit(null)}
