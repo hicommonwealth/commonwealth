@@ -6,6 +6,7 @@ import {
   useFetchTopicsQuery,
 } from 'client/scripts/state/api/topics';
 import { CWCheckbox } from 'client/scripts/views/components/component_kit/cw_checkbox';
+import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWValidationText } from 'client/scripts/views/components/component_kit/cw_validation_text';
 import { CWTextInput } from 'client/scripts/views/components/component_kit/new_designs/CWTextInput';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/cw_button';
@@ -17,6 +18,7 @@ import {
 import { serializeDelta } from 'client/scripts/views/components/react_quill_editor/utils';
 import type { DeltaStatic } from 'quill';
 import React, { useEffect } from 'react';
+import './CreateTopicSection.scss';
 
 export const CreateTopicSection = () => {
   const { mutateAsync: createTopic } = useCreateTopicMutation();
@@ -52,57 +54,73 @@ export const CreateTopicSection = () => {
   }, [name, featuredInNewPost, editorText]);
 
   return (
-    <div className="CreateTopicsSection">
+    <div className="CreateTopicSection">
       <div className="form">
-        <CWTextInput
-          label="Name"
-          value={name}
-          onInput={(e) => {
-            setName(e.target.value);
-          }}
-          inputValidationFn={(text: string) => {
-            const currentCommunityTopicNames = topics.map((t) =>
-              t.name.toLowerCase(),
-            );
+        <div className="form-inputs">
+          <CWTextInput
+            label="Name (required)"
+            placeholder="Enter a topic name"
+            value={name}
+            onInput={(e) => {
+              setName(e.target.value);
+            }}
+            inputValidationFn={(text: string) => {
+              const currentCommunityTopicNames = topics.map((t) =>
+                t.name.toLowerCase(),
+              );
 
-            if (currentCommunityTopicNames.includes(text.toLowerCase())) {
-              const err = 'Topic name already used within community.';
-              setErrorMsg(err);
-              return ['failure', err];
-            }
+              if (currentCommunityTopicNames.includes(text.toLowerCase())) {
+                const err = 'Topic name already used within community.';
+                setErrorMsg(err);
+                return ['failure', err];
+              }
 
-            const disallowedCharMatches = text.match(/["<>%{}|\\/^`]/g);
+              const disallowedCharMatches = text.match(/["<>%{}|\\/^`]/g);
 
-            if (disallowedCharMatches) {
-              const err = `The ${pluralizeWithoutNumberPrefix(
-                disallowedCharMatches.length,
-                'char',
-              )}
+              if (disallowedCharMatches) {
+                const err = `The ${pluralizeWithoutNumberPrefix(
+                  disallowedCharMatches.length,
+                  'char',
+                )}
               ${disallowedCharMatches.join(', ')} are not permitted`;
-              setErrorMsg(err);
-              return ['failure', err];
-            }
+                setErrorMsg(err);
+                return ['failure', err];
+              }
 
-            if (errorMsg) {
-              setErrorMsg(null);
-            }
+              if (errorMsg) {
+                setErrorMsg(null);
+              }
 
-            return ['success', 'Valid topic name'];
-          }}
-          autoFocus
-        />
-        <CWTextInput
-          label="Description"
-          name="description"
-          tabIndex={2}
-          value={description}
-          onInput={(e) => {
-            setDescription(e.target.value);
-          }}
-        />
-        <div className="checkboxes">
+              return ['success', 'Valid topic name'];
+            }}
+            autoFocus
+          />
+          <CWTextInput
+            label="Description"
+            placeholder="Enter a description"
+            name="description"
+            tabIndex={2}
+            value={description}
+            onInput={(e) => {
+              setDescription(e.target.value);
+            }}
+          />
+          <CWText type="caption">
+            Choose where to feature this topic. Select at least one.
+          </CWText>
           <CWCheckbox
-            label="Featured in Sidebar"
+            className="sidebar-feature-checkbox"
+            label={
+              <>
+                <CWText type="b2">
+                  Featured topic in sidebar (recommended)
+                </CWText>
+                <CWText type="caption" className="checkbox-label-caption">
+                  Please note, only sidebar-featured topics show on the Overview
+                  page.
+                </CWText>
+              </>
+            }
             checked={featuredInSidebar}
             onChange={() => {
               setFeaturedInSidebar(!featuredInSidebar);
@@ -110,27 +128,26 @@ export const CreateTopicSection = () => {
             value=""
           />
           <CWCheckbox
-            label="Featured in New Post"
+            label="Featured in new post"
             checked={featuredInNewPost}
             onChange={() => {
               setFeaturedInNewPost(!featuredInNewPost);
             }}
             value=""
           />
+          {featuredInNewPost && (
+            <ReactQuillEditor
+              contentDelta={contentDelta}
+              setContentDelta={setContentDelta}
+            />
+          )}
         </div>
-        {featuredInNewPost && (
-          <ReactQuillEditor
-            contentDelta={contentDelta}
-            setContentDelta={setContentDelta}
-          />
-        )}
-      </div>
-      <div className="footer">
-        <div className="action-buttons">
+        <div className="actions">
           <CWButton
             label="Create topic"
             buttonType="primary"
-            buttonHeight="sm"
+            buttonHeight="lg"
+            buttonWidth="wide"
             disabled={isSaving || !!errorMsg}
             onClick={async (e: React.MouseEvent<HTMLButtonElement>) => {
               e.preventDefault();
@@ -149,14 +166,15 @@ export const CreateTopicSection = () => {
               }
             }}
           />
+
+          {errorMsg && (
+            <CWValidationText
+              className="validation-text"
+              message={errorMsg}
+              status="failure"
+            />
+          )}
         </div>
-        {errorMsg && (
-          <CWValidationText
-            className="validation-text"
-            message={errorMsg}
-            status="failure"
-          />
-        )}
       </div>
     </div>
   );

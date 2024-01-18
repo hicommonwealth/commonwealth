@@ -5,6 +5,7 @@ import {
   CWTabsRow,
 } from 'client/scripts/views/components/component_kit/new_designs/CWTabs';
 import React, { useState } from 'react';
+import CreateCommunityHint from '../../CreateCommunity/components/CreateCommunityHint';
 import CreateTopicSection from './CreateTopicsSection';
 import ManageTopicsSection from './ManageTopicsSection';
 import './Topics.scss';
@@ -28,10 +29,12 @@ export const Topics = () => {
   return (
     <div className="TopicsPage">
       <main>
-        <CWText type="h2">Topics</CWText>
-        <CWText type="b1" className="subheader">
-          Create topics and sub-topics, and rearrange them in the sidebar
-        </CWText>
+        <header>
+          <CWText type="h2">Topics</CWText>
+          <CWText type="b1" className="subheader">
+            Create topics and sub-topics, and rearrange them in the sidebar
+          </CWText>
+        </header>
 
         <CWTabsRow>
           {TABS.map((tab, index) => (
@@ -49,7 +52,21 @@ export const Topics = () => {
           <ManageTopicsSection />
         )}
       </main>
-      <aside></aside>
+      <aside>
+        {selectedTab === TABS[0].value ? (
+          <CreateCommunityHint
+            title="Topics and Subtopics"
+            hint="Top level topics can act as parents to subtopics. Subtopics can not have additional subtopics."
+          />
+        ) : (
+          <CreateCommunityHint
+            title="Topic Sorting"
+            hint="Drag the topics on the left to the order you want them to appear
+            on the side panel navigation of your community page. Tap the pencil
+            icon to edit the topic or delete the topic."
+          />
+        )}
+      </aside>
     </div>
   );
 };

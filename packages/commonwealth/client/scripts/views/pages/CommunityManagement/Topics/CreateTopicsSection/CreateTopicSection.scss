@@ -1,0 +1,36 @@
+@import '../../../../../../styles/shared';
+
+.CreateTopicSection {
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    .form-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+
+      .TextInput {
+        .input-and-icon-container {
+          width: 100%;
+        }
+      }
+
+      .sidebar-feature-checkbox {
+        align-items: unset;
+
+        .checkbox-label-caption {
+          margin-top: 8px;
+          color: $neutral-700;
+        }
+      }
+    }
+
+    .actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+  }
+}

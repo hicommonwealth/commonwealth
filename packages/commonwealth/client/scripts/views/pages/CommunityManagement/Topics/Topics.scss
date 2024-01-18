@@ -1,11 +1,28 @@
 @import '../../../../../styles/shared';
 
 .TopicsPage {
+  display: flex;
   padding: 40px;
 
   main {
-    .subheader {
-      color: $neutral-500;
+    width: 60%;
+
+    header {
+      margin-bottom: 8px;
+
+      .subheader {
+        color: $neutral-500;
+      }
     }
+
+    .CWTabsRow {
+      width: 100%;
+      margin-bottom: 16px;
+    }
+  }
+
+  aside {
+    width: 40%;
+    padding: 150px 40px 40px 40px;
   }
 }
