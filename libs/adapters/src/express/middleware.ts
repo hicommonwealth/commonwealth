@@ -1,6 +1,6 @@
+import { stats } from '@hicommonwealth/core';
+import { INVALID_INPUT_ERROR } from '@hicommonwealth/model';
 import { NextFunction, Request, Response } from 'express';
-import { StatsDController as stats } from '../../../../../common-common/src/statsd';
-import { INVALID_INPUT_ERROR } from '../../errors';
 import { BadRequest, InternalServerError } from './http';
 
 /**
@@ -13,11 +13,11 @@ export const statsMiddleware = (
 ) => {
   try {
     const path = `${req.method.toUpperCase()} ${req.path}`;
-    stats.get().increment('cw.path.called', { path });
+    stats().increment('cw.path.called', { path });
     const start = Date.now();
     res.on('finish', () => {
       const latency = Date.now() - start;
-      stats.get().histogram(`cw.path.latency`, latency, { path });
+      stats().histogram(`cw.path.latency`, latency, { path });
     });
   } catch (err) {
     console.error(err);

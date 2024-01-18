@@ -1,1 +1,2 @@
-export * from './createCommunity';
+export * from './CreateCommunity.command';
+export * from './SetCommunityNamespace.command';

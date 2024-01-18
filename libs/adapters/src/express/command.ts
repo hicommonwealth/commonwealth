@@ -1,15 +1,11 @@
 import type {
-  Request,
-  RequestHandler,
-  Response,
-} from 'express-serve-static-core';
-import { InvalidInput } from 'server/a-ddd-model/errors';
+  ActorMiddleware,
+  Command,
+  UserAttributes,
+} from '@hicommonwealth/model';
+import { InvalidInput, validate } from '@hicommonwealth/model';
+import type { Request, RequestHandler, Response } from 'express';
 import { ZodError, ZodSchema, z } from 'zod';
-import {
-  validate,
-  type ActorMiddleware,
-} from '../../middleware/actor-middleware';
-import type { Command } from '../../types';
 
 /**
  * Adapts commands to express handlers
@@ -25,7 +21,7 @@ import type { Command } from '../../types';
  * @param middleware actor middleware
  * @returns express command handler
  */
-export const command =
+export const expressCommand =
   <M extends ZodSchema, R>(
     fn: Command<M, R>,
     schema: M,
@@ -47,7 +43,7 @@ export const command =
       const payload = schema.parse(req.body);
       const actor = await validate(
         {
-          user: req.user,
+          user: req.user as UserAttributes,
           address_id: req.body.address_id,
           community_id: req.body.chain_id ?? req.body.community_id,
         },

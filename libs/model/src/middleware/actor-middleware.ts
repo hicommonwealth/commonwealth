@@ -1,5 +1,5 @@
-import { type Actor } from '../actor';
 import { InvalidActor } from '../errors';
+import { type Actor } from '../types';
 
 /**
  * Middleware signature to loads and/or validates actor state in a chain of responsibility pattern

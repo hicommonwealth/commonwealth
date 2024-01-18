@@ -1,4 +1,4 @@
-import db from '../../database'; // TODO: use port/adapter pattern to test in-memory
+import { models } from '../database';
 import type { ActorMiddleware } from './actor-middleware';
 
 export const ALL_COMMUNITIES = 'all_communities';
@@ -15,7 +15,7 @@ export const loadCommunity: ActorMiddleware = async (actor) => {
   if (actor.community_id === ALL_COMMUNITIES) return actor;
 
   // TODO: wrap in cache
-  const community = await db.Community.findOne({
+  const community = await models.Community.findOne({
     where: { id: actor.community_id },
   });
   if (!community) return 'Community not found';

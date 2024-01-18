@@ -4,6 +4,9 @@ import {
   CommunityCategoryType,
 } from '@hicommonwealth/core';
 import { z } from 'zod';
+import { models } from '../database';
+import type { CommunityAttributes } from '../models';
+import type { Command } from '../types';
 import { checkIconSize } from '../utils/checkIconSize';
 import { ALL_COMMUNITIES } from '../utils/constants';
 
@@ -51,3 +54,16 @@ export const CreateCommunitySchema = z.object({
 });
 
 export type CreateCommunity = z.infer<typeof CreateCommunitySchema>;
+
+export const createCommunity: Command<
+  typeof CreateCommunitySchema,
+  CommunityAttributes
+> = async () =>
+  //actor,
+  //id,
+  //payload,
+  {
+    // TODO
+    const community = await models.Community.findOne();
+    return community!;
+  };

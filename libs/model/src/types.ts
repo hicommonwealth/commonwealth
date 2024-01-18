@@ -1,6 +1,9 @@
-import type { AddressAttributes } from '../models/address';
-import type { CommunityAttributes } from '../models/community';
-import type { UserAttributes } from '../models/user';
+import { z, ZodSchema } from 'zod';
+import {
+  AddressAttributes,
+  CommunityAttributes,
+  UserAttributes,
+} from './models';
 
 /**
  * "Core" abstraction representing the "user acting on a system", either invoking a command or query operation
@@ -26,3 +29,15 @@ export type Actor = {
   // flags
   author?: boolean;
 };
+
+/**
+ * Command signature
+ * @param actor the command actor
+ * @param id the aggregate id
+ * @param payload the command payload
+ */
+export type Command<M extends ZodSchema, R> = (
+  actor: Actor,
+  id: string,
+  payload: z.infer<M>,
+) => Promise<R>;

@@ -1,4 +1,4 @@
-import { Actor } from './actor';
+import { Actor } from './types';
 
 export const INVALID_INPUT_ERROR = 'InvalidInputError';
 export class InvalidInput extends Error {

@@ -1,4 +1,4 @@
-import db from '../../database'; // TODO: use port/adapter pattern to test in-memory
+import { models } from '../database'; // TODO: use port/adapter pattern to test in-memory
 import type { ActorMiddleware } from './actor-middleware';
 
 /**
@@ -11,7 +11,7 @@ export const isCommunityAuthor: ActorMiddleware = async (actor) => {
   if (!actor.community) return 'Must load community';
 
   // TODO: wrap in cache
-  const author = await db.Address.findOne({
+  const author = await models.Address.findOne({
     where: {
       user_id: !actor.user.isAdmin && actor.user.id, // TODO: validate this logic
       address: actor.address_id,

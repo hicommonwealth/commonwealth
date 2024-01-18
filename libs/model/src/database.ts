@@ -117,6 +117,7 @@ const _models: Models = {
   Webhook: WebhookFactory(sequelize, DataTypes),
 };
 
+// TODO: use port/adaper pattern to test in-memory
 export const models: DB = {
   sequelize,
   Sequelize,
