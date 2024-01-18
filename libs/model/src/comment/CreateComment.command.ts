@@ -7,7 +7,7 @@ export const CreateCommentSchema = z.object({
   content: z.string(),
 });
 
-export type CreateCommand = z.infer<typeof CreateCommentSchema>;
+export type CreateComment = z.infer<typeof CreateCommentSchema>;
 
 export const createComment: Command<
   typeof CreateCommentSchema,
