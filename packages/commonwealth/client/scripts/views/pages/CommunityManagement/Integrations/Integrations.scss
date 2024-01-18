@@ -1,76 +1,38 @@
 @import '../../../../../styles/shared';
 
 .Integrations {
-  display: grid;
-  grid-template-columns: 3fr 1fr;
-  gap: 69px;
-  padding: 22px 60px;
-  padding-bottom: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  align-items: flex-start;
 
-  @include extraSmall {
-    padding: 16px;
-    padding-bottom: 50px;
-  }
-
-  @include mediumSmallInclusive {
-    grid-template-columns: 1fr;
-  }
-
-  .left-section {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 32px;
-
-    .header {
-      .b1 {
-        color: $neutral-500 !important;
-      }
+  .header {
+    .h4,
+    .h5 {
+      color: $neutral-900 !important;
     }
 
-    .list {
-      display: flex;
-      flex-direction: column;
-      gap: 48px;
-      align-items: flex-start;
-
-      .header {
-        .h4,
-        .h5 {
-          color: $neutral-900 !important;
-        }
-
-        .b1 {
-          color: $neutral-500 !important;
-        }
-      }
-
-      a {
-        color: $primary-500 !important;
-
-        &:visited,
-        &:hover,
-        &:active {
-          color: $primary-500 !important;
-        }
-      }
-
-      .btn-border {
-        margin: 0 !important;
-
-        &:focus-within {
-          border-width: 1px !important;
-          padding: 0px !important;
-        }
-      }
+    .b1 {
+      color: $neutral-500 !important;
     }
   }
 
-  .right-section {
-    margin-top: 64px;
+  a {
+    color: $primary-500 !important;
 
-    @include mediumSmallInclusive {
-      display: none;
+    &:visited,
+    &:hover,
+    &:active {
+      color: $primary-500 !important;
+    }
+  }
+
+  .btn-border {
+    margin: 0 !important;
+
+    &:focus-within {
+      border-width: 1px !important;
+      padding: 0px !important;
     }
   }
 }
