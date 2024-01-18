@@ -1,8 +1,8 @@
 import { AppError } from '@hicommonwealth/adapters';
 import { BalanceSourceType } from '@hicommonwealth/core/build/requirements-types';
+import { DB } from '@hicommonwealth/model';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
-import { DB } from '../../models';
 import { TokenBalanceCache } from '../tokenBalanceCache/tokenBalanceCache';
 import { factoryContracts, validChains } from './chainConfig';
 

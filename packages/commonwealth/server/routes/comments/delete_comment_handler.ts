@@ -1,4 +1,4 @@
-import { CommentAttributes } from '../../models/comment';
+import { CommentAttributes } from '@hicommonwealth/model';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestParams, TypedResponse, success } from '../../types';
 

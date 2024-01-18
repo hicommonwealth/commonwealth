@@ -1,5 +1,5 @@
 import { logger } from '@hicommonwealth/core';
-import { CommunityInstance } from '../../../models/community';
+import { CommunityInstance } from '@hicommonwealth/model';
 
 import { AllCosmosProposals } from './types';
 import {

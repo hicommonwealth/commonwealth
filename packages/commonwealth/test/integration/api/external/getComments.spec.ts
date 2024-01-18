@@ -1,9 +1,9 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 
+import type { CommentAttributes } from '@hicommonwealth/model';
 import type { GetCommentsReq } from 'server/api/extApiTypes';
 import { OrderByOptions } from 'server/api/extApiTypes';
-import type { CommentAttributes } from 'server/models/comment';
 import { get } from 'test/integration/api/external/appHook.spec';
 import { testComments } from 'test/integration/api/external/dbEntityHooks.spec';
 

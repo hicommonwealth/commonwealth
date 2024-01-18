@@ -1,7 +1,5 @@
-import { StatsDController } from '@hicommonwealth/adapters';
-import { logger } from '@hicommonwealth/core';
-import models from '../../database';
-import { NotificationInstance } from '../../models/notification';
+import { logger, stats } from '@hicommonwealth/core';
+import { NotificationInstance, models } from '@hicommonwealth/model';
 import { rollbar } from '../../util/rollbar';
 import { emitChainEventNotifs } from './emitChainEventNotifs';
 import { getEventSources } from './getEventSources';
@@ -25,7 +23,7 @@ export async function processChainNode(
         `\tchainNodeId: ${chainNodeId}\n` +
         `\tcontracts: ${JSON.stringify(Object.keys(evmSource.contracts))}`,
     );
-    StatsDController.get().increment('ce.evm.chain_node_id', {
+    stats().increment('ce.evm.chain_node_id', {
       chainNodeId: String(chainNodeId),
     });
 

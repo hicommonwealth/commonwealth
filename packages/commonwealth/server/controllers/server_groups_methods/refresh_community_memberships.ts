@@ -1,18 +1,18 @@
 import { logger } from '@hicommonwealth/core';
+import {
+  AddressAttributes,
+  CommunityInstance,
+  DB,
+  GroupAttributes,
+  MembershipAttributes,
+  MembershipRejectReason,
+} from '@hicommonwealth/model';
 import moment from 'moment';
 import { Op, Sequelize } from 'sequelize';
 import {
   MEMBERSHIP_REFRESH_BATCH_SIZE,
   MEMBERSHIP_REFRESH_TTL_SECONDS,
 } from '../../config';
-import { DB } from '../../models';
-import { AddressAttributes } from '../../models/address';
-import { CommunityInstance } from '../../models/community';
-import { GroupAttributes } from '../../models/group';
-import {
-  MembershipAttributes,
-  MembershipRejectReason,
-} from '../../models/membership';
 import { makeGetBalancesOptions } from '../../util/requirementsModule/makeGetBalancesOptions';
 import validateGroupMembership from '../../util/requirementsModule/validateGroupMembership';
 import {

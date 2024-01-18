@@ -1,12 +1,12 @@
 import { AppError } from '@hicommonwealth/adapters';
+import { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import Sequelize from 'sequelize';
-import { sequelize } from '../../database';
 import Errors from './errors';
 
 const Op = Sequelize.Op;
 export default async (
-  models,
+  models: DB,
   req: Request,
   res: Response,
   next: NextFunction,
@@ -33,7 +33,7 @@ export default async (
     return next(new AppError(Errors.NotUsersSubscription));
   }
 
-  await sequelize.transaction(async (t) => {
+  await models.sequelize.transaction(async (t) => {
     await Promise.all(
       subscriptions.map((s) => {
         s.is_active = false;

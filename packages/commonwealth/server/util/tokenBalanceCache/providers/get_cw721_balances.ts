@@ -1,7 +1,7 @@
 import { WasmExtension, setupWasmExtension } from '@cosmjs/cosmwasm-stargate';
 import { QueryClient } from '@cosmjs/stargate';
 import { logger } from '@hicommonwealth/core';
-import { ChainNodeInstance } from '../../../models/chain_node';
+import { ChainNodeInstance } from '@hicommonwealth/model';
 import { rollbar } from '../../rollbar';
 import { Balances } from '../types';
 import { getTendermintClient } from '../util';

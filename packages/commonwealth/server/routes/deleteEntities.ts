@@ -1,9 +1,8 @@
+import type { DB, ModelStatic } from '@hicommonwealth/model';
 import { validationResult } from 'express-validator';
 import { Op } from 'sequelize';
 import type { DeleteReq, OnlyErrorResp } from '../api/extApiTypes';
 import { filterAddressOwnedByUser } from '../middleware/lookupAddressIsOwnedByUser';
-import type { DB } from '../models';
-import type { ModelStatic } from '../models/types';
 import type { TypedRequest, TypedResponse } from '../types';
 import { failure, success } from '../types';
 

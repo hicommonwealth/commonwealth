@@ -1,8 +1,8 @@
 import { ProposalSDKType } from '@hicommonwealth/chains';
 import { logger } from '@hicommonwealth/core';
+import { CommunityInstance } from '@hicommonwealth/model';
 import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import { COSMOS_GOV_V1_CHAIN_IDS } from '../../../config';
-import { CommunityInstance } from '../../../models/community';
 import { rollbar } from '../../../util/rollbar';
 import { AllCosmosProposals } from './types';
 

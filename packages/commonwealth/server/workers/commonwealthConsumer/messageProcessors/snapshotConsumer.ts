@@ -1,14 +1,12 @@
-import {
-  RmqSnapshotNotification,
-  StatsDController,
-} from '@hicommonwealth/adapters';
+import { RmqSnapshotNotification } from '@hicommonwealth/adapters';
 import {
   ILogger,
   NotificationCategories,
   SnapshotEventType,
+  stats,
 } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import axios from 'axios';
-import type { DB } from '../../../models';
 import emitNotifications from '../../../util/emitNotifications';
 
 export async function processSnapshotMessage(
@@ -71,7 +69,7 @@ export async function processSnapshotMessage(
     proposal.is_upstream_deleted = true;
     await proposal.save();
 
-    StatsDController.get().increment('cw.deleted_snapshot_proposal_record', 1, {
+    stats().increment('cw.deleted_snapshot_proposal_record', {
       event: eventType,
       space,
     });
@@ -112,7 +110,7 @@ export async function processSnapshotMessage(
     });
   }
 
-  StatsDController.get().increment('cw.created_snapshot_proposal_record', 1, {
+  stats().increment('cw.created_snapshot_proposal_record', {
     event: eventType,
     space,
   });

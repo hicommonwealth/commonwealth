@@ -1,6 +1,6 @@
 import { AppError } from '@hicommonwealth/adapters';
+import { ReactionAttributes } from '@hicommonwealth/model';
 import { verifyReaction } from '../../../shared/canvas/serverVerify';
-import { ReactionAttributes } from '../../models/reaction';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 

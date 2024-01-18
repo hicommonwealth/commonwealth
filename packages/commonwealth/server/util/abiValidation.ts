@@ -1,6 +1,5 @@
 import { AppError } from '@hicommonwealth/adapters';
 import { AbiType } from '@hicommonwealth/core';
-import { hasher } from 'node-object-hash';
 import type { AbiItem } from 'web3-utils';
 import { parseAbiItemsFromABI } from '../../shared/abi_utils';
 
@@ -35,15 +34,4 @@ export default function validateAbi(abiString: string): AbiType {
     throw new AppError(Errors.InvalidABI);
   }
   return abiAsRecord;
-}
-
-export function hashAbi(abi: AbiType): string {
-  const hashInstance = hasher({
-    coerce: true,
-    sort: true,
-    trim: true,
-    alg: 'sha256',
-    enc: 'hex',
-  });
-  return hashInstance.hash(abi);
 }

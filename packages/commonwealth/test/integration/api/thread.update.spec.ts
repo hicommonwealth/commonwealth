@@ -2,11 +2,11 @@ import { ActionPayload, Session } from '@canvas-js/interfaces';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 
+import { models } from '@hicommonwealth/model';
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from 'server/config';
 import * as modelUtils from 'test/util/modelUtils';
 import app, { resetDatabase } from '../../../server-test';
-import models from '../../../server/database';
 
 chai.use(chaiHttp);
 const { expect } = chai;

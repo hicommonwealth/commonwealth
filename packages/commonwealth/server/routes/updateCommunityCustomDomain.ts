@@ -1,6 +1,6 @@
 import { AppError, ServerError } from '@hicommonwealth/adapters';
+import type { DB } from '@hicommonwealth/model';
 import { validURL } from '../../shared/utils';
-import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
