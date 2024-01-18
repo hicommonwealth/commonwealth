@@ -103,16 +103,26 @@ export const CreateTopicSection = () => {
     <div className="CreateTopicSection">
       <div className="form">
         <div className="form-inputs">
-          <CWTextInput
-            label="Name (required)"
-            placeholder="Enter a topic name"
-            value={name}
-            onInput={(e) => {
-              setName(e.target.value);
-            }}
-            inputValidationFn={handleInputValidation}
-            autoFocus
-          />
+          <div>
+            <CWTextInput
+              label="Name (required)"
+              placeholder="Enter a topic name"
+              value={name}
+              onInput={(e) => {
+                setName(e.target.value);
+              }}
+              inputValidationFn={handleInputValidation}
+              autoFocus
+            />
+            {errorMsg && (
+              <CWValidationText
+                className="validation-text"
+                message={errorMsg}
+                status="failure"
+              />
+            )}
+          </div>
+
           <CWTextInput
             label="Description"
             placeholder="Enter a description"
@@ -167,14 +177,6 @@ export const CreateTopicSection = () => {
             disabled={isSaving || !!errorMsg}
             onClick={handleCreateTopic}
           />
-
-          {errorMsg && (
-            <CWValidationText
-              className="validation-text"
-              message={errorMsg}
-              status="failure"
-            />
-          )}
         </div>
       </div>
     </div>
