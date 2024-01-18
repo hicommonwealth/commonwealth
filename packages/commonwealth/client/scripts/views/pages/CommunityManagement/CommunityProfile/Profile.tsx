@@ -1,10 +1,20 @@
 import React from 'react';
+import app from 'state';
+import Permissions from 'utils/Permissions';
 import FeatureHint from 'views/components/FeatureHint';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { PageNotFound } from '../../404';
 import Form from './Form';
 import './Profile.scss';
 
 const CommunityProfile = () => {
+  if (
+    !app?.user?.activeAccount?.address ||
+    !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin())
+  ) {
+    return <PageNotFound />;
+  }
+
   return (
     <section className="CommunityProfile">
       <section className="left-section">
