@@ -33,11 +33,13 @@ import '../../../styles/modals/edit_topic_modal.scss';
 type EditTopicModalProps = {
   onModalClose: () => void;
   topic: Topic;
+  noRedirect?: boolean;
 };
 
 export const EditTopicModal = ({
   topic,
   onModalClose,
+  noRedirect,
 }: EditTopicModalProps) => {
   const {
     defaultOffchainTemplate,
@@ -93,7 +95,11 @@ export const EditTopicModal = ({
 
     try {
       await editTopic({ topic: new Topic(topicInfo) });
-      navigate(`/discussions/${encodeURI(name.toString().trim())}`);
+      if (noRedirect) {
+        onModalClose();
+      } else {
+        navigate(`/discussions/${encodeURI(name.toString().trim())}`);
+      }
     } catch (err) {
       setErrorMsg(err.message || err);
     } finally {
