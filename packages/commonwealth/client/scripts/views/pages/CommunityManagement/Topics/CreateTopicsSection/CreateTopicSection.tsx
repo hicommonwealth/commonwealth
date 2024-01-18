@@ -146,7 +146,7 @@ export const CreateTopicSection = () => {
           <CWButton
             label="Create topic"
             buttonType="primary"
-            buttonHeight="lg"
+            buttonHeight="med"
             buttonWidth="wide"
             disabled={isSaving || !!errorMsg}
             onClick={async (e: React.MouseEvent<HTMLButtonElement>) => {
