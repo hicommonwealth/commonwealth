@@ -10,12 +10,12 @@ import CreateTopicSection from './CreateTopicsSection';
 import ManageTopicsSection from './ManageTopicsSection';
 import './Topics.scss';
 
-export const Topics = () => {
-  const TABS = [
-    { value: 'create-topic', label: 'Create Topic' },
-    { value: 'manage-topics', label: 'Manage Topics' },
-  ];
+const TABS = [
+  { value: 'create-topic', label: 'Create Topic' },
+  { value: 'manage-topics', label: 'Manage Topics' },
+];
 
+export const Topics = () => {
   const navigate = useCommonNavigate();
   const [selectedTab, setSelectedTab] = useState(TABS[0].value);
 
