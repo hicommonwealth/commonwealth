@@ -275,6 +275,7 @@ const CommunityProfileForm = () => {
               onLinkAdd={onLinkAdd}
               onLinkUpdatedAtIndex={onLinkUpdatedAtIndex}
               onLinkRemovedAtIndex={onLinkRemovedAtIndex}
+              canAddLinks={links.length <= 5}
             />
           </section>
 
