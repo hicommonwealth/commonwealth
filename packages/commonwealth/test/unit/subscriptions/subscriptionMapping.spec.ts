@@ -1,11 +1,12 @@
-import { NotificationCategories, SupportedNetwork } from '@hicommonwealth/core';
-import chai from 'chai';
-import chaiHttp from 'chai-http';
 import {
   IBaseForumNotificationData,
+  NotificationCategories,
   NotificationDataAndCategory,
   SnapshotEventType,
-} from 'types';
+  SupportedNetwork,
+} from '@hicommonwealth/core';
+import chai from 'chai';
+import chaiHttp from 'chai-http';
 import { mapNotificationsDataToSubscriptions } from '../../../server/util/subscriptionMapping';
 
 chai.use(chaiHttp);
@@ -36,7 +37,7 @@ describe('Subscription Mapping Tests', () => {
       const uniqueSubData = mapNotificationsDataToSubscriptions(notification);
       expect(uniqueSubData).to.deep.equal({
         category_id: NotificationCategories.NewThread,
-        chain_id: chain,
+        community_id: chain,
       });
     });
 
@@ -172,7 +173,7 @@ describe('Subscription Mapping Tests', () => {
       const uniqueSubData = mapNotificationsDataToSubscriptions(notification);
       expect(uniqueSubData).to.deep.equal({
         category_id: NotificationCategories.ChainEvent,
-        chain_id: chain,
+        community_id: chain,
       });
     });
 

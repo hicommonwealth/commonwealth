@@ -17,6 +17,12 @@ import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelec
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import {
+  BaseMixpanelPayload,
+  MixpanelCommunityCreationEvent,
+  MixpanelLoginPayload,
+} from '../../../../../../../../shared/analytics/types';
+import { useBrowserAnalyticsTrack } from '../../../../../../hooks/useBrowserAnalyticsTrack';
 import './BasicInformationForm.scss';
 import {
   ETHEREUM_MAINNET_ID,
@@ -49,6 +55,12 @@ const BasicInformationForm = ({
     validateSocialLinks,
     updateAndValidateSocialLinkAtIndex,
   } = useSocialLinks();
+
+  const { trackAnalytics } = useBrowserAnalyticsTrack<
+    MixpanelLoginPayload | BaseMixpanelPayload
+  >({
+    onAction: true,
+  });
 
   const {
     mutateAsync: createCommunityMutation,
@@ -149,6 +161,10 @@ const BasicInformationForm = ({
   };
 
   const handleCancel = () => {
+    trackAnalytics({
+      event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_CANCELLED,
+    });
+
     openConfirmation({
       title: 'Are you sure you want to cancel?',
       description: 'Your details will not be saved. Cancel create community?',

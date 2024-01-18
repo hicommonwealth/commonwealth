@@ -1,4 +1,5 @@
 /* eslint-disable react/no-multi-comp */
+import { isValidEthAddress } from 'helpers/validateTypes';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import app from 'state';
@@ -17,7 +18,7 @@ import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_rad
 import { ZodError, ZodObject } from 'zod';
 import {
   AMOUNT_CONDITIONS,
-  SPECIFICATIONS,
+  ERC_SPECIFICATIONS,
   TOKENS,
   conditionTypes,
 } from '../../../common/constants';
@@ -116,7 +117,7 @@ const getRequirementSubFormSchema = (
   requirementType: string,
 ): ZodObject<any> => {
   const isTokenRequirement = Object.values(TOKENS).includes(requirementType);
-  const is1155Requirement = requirementType === SPECIFICATIONS.ERC_1155;
+  const is1155Requirement = requirementType === ERC_SPECIFICATIONS.ERC_1155;
 
   const schema = isTokenRequirement
     ? requirementSubFormValidationSchema.omit({
@@ -147,7 +148,9 @@ const GroupForm = ({
   });
 
   const takenGroupNames = groups.map(({ name }) => name.toLowerCase());
-  const sortedTopics = (topics || []).sort((a, b) => a?.name?.localeCompare(b));
+  const sortedTopics = (topics || []).sort((a, b) =>
+    a?.name?.localeCompare(b.name),
+  );
 
   const [isNameTaken, setIsNameTaken] = useState(false);
   const [
@@ -296,6 +299,24 @@ const GroupForm = ({
           [key]: message,
         },
       };
+    }
+
+    // Validate if contract address is valid based on the selected requirement type
+    if (val.requirementContractAddress) {
+      const isInvalidEthAddress =
+        [...Object.values(ERC_SPECIFICATIONS), TOKENS.EVM_TOKEN].includes(
+          allRequirements[index].values.requirementType,
+        ) && !isValidEthAddress(val.requirementContractAddress);
+
+      if (isInvalidEthAddress) {
+        allRequirements[index] = {
+          ...allRequirements[index],
+          errors: {
+            ...allRequirements[index].errors,
+            [key]: VALIDATION_MESSAGES.INVALID_INPUT,
+          },
+        };
+      }
     }
 
     setRequirementSubForms([...allRequirements]);

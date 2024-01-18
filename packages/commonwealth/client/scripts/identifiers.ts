@@ -10,7 +10,7 @@ import app from './state';
 // custom domain prefixes as well.
 export const getProposalUrlPath = (
   type: ProposalType,
-  id: string,
+  id: number | string,
   omitActiveId = true,
   chainId?: string,
 ): string => {

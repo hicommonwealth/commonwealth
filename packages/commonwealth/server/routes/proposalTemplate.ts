@@ -1,8 +1,10 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
+import type {
+  CommunityContractTemplateAttributes,
+  CommunityContractTemplateMetadataAttributes,
+  DB,
+} from '@hicommonwealth/model';
 import type { Request, Response } from 'express';
-import type { DB } from '../models';
-import type { CommunityContractTemplateAttributes } from '../models/community_contract_template';
-import type { CommunityContractTemplateMetadataAttributes } from '../models/community_contract_metadata';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { validateOwner } from '../util/validateOwner';
@@ -35,7 +37,7 @@ type CommunityContractTemplateRequest = {
 export async function createCommunityContractTemplateAndMetadata(
   models: DB,
   req: TypedRequestBody<CreateCommunityContractTemplateAndMetadataReq>,
-  res: TypedResponse<CommunityContractTemplateAndMetadataResp>
+  res: TypedResponse<CommunityContractTemplateAndMetadataResp>,
 ) {
   const {
     slug,
@@ -62,18 +64,18 @@ export async function createCommunityContractTemplateAndMetadata(
 
   if (!community_id || !contract_id || !template_id) {
     throw new AppError(
-      'Must provide community_id, contract_id, and template_id'
+      'Must provide community_id, contract_id, and template_id',
     );
   }
 
   if (!slug || !nickname || !display_name || !display_options) {
     throw new AppError(
-      'Must provide slug, nickname, display_name, and display_options'
+      'Must provide slug, nickname, display_name, and display_options',
     );
   }
 
   const communityContract = await models.CommunityContract.findOne({
-    where: { contract_id: contract_id, chain_id },
+    where: { contract_id: contract_id, community_id: chain_id },
   });
 
   if (!communityContract) {
@@ -114,7 +116,7 @@ export async function createCommunityContractTemplateAndMetadata(
   } catch (err) {
     console.log('err', err);
     throw new AppError(
-      'Unkown Server error creating community contract template'
+      'Unkown Server error creating community contract template',
     );
   }
 }
@@ -122,7 +124,7 @@ export async function createCommunityContractTemplateAndMetadata(
 export async function getCommunityContractTemplate(
   models: DB,
   req: TypedRequestBody<CommunityContractTemplateRequest>,
-  res: TypedResponse<CommunityContractTemplateAndMetadataResp>
+  res: TypedResponse<CommunityContractTemplateAndMetadataResp>,
 ) {
   try {
     if (!req.body) {
@@ -177,7 +179,7 @@ export async function getCommunityContractTemplate(
 export async function updateCommunityContractTemplate(
   models: DB,
   req: TypedRequestBody<CreateCommunityContractTemplateAndMetadataReq>,
-  res: TypedResponse<CommunityContractTemplateAndMetadataResp>
+  res: TypedResponse<CommunityContractTemplateAndMetadataResp>,
 ) {
   try {
     if (!req.body) {
@@ -211,7 +213,7 @@ export async function updateCommunityContractTemplate(
 
     if (!slug || !nickname || !display_name || !display_options) {
       throw new AppError(
-        'Must provide slug, nickname, display_name, and display_options'
+        'Must provide slug, nickname, display_name, and display_options',
       );
     }
 
@@ -257,7 +259,7 @@ export async function deleteCommunityContractTemplate(
     CommunityContractTemplateAndMetadataResp & {
       deletedContract: boolean;
     }
-  >
+  >,
 ) {
   try {
     if (!req.body) {
@@ -281,7 +283,7 @@ export async function deleteCommunityContractTemplate(
     const contractTemplate: CommunityContractTemplateAttributes = req.body;
 
     const communityContract = await models.CommunityContract.findOne({
-      where: { contract_id, chain_id },
+      where: { contract_id, community_id: chain_id },
     });
 
     const communityContractId = communityContract.id;
@@ -296,7 +298,7 @@ export async function deleteCommunityContractTemplate(
         const metadata = await models.CommunityContractTemplateMetadata.findOne(
           {
             where: { id: cct.cctmd_id },
-          }
+          },
         );
 
         if (metadata) {
@@ -311,7 +313,7 @@ export async function deleteCommunityContractTemplate(
       return success(res, {
         metadata: null,
         cct: null,
-        deletedContract: shouldDeleteCommunityContract,
+        deletedContract: Boolean(shouldDeleteCommunityContract),
       });
     }
 
@@ -335,7 +337,7 @@ export async function deleteCommunityContractTemplate(
       return success(res, {
         metadata: null,
         cct: null,
-        deletedContract: shouldDeleteCommunityContract,
+        deletedContract: Boolean(shouldDeleteCommunityContract),
       });
     }
 
@@ -361,7 +363,7 @@ export async function deleteCommunityContractTemplate(
     return success(res, {
       metadata: cctmd,
       cct,
-      deletedContract: shouldDeleteCommunityContract,
+      deletedContract: Boolean(shouldDeleteCommunityContract),
     });
   } catch (err) {
     console.log(err);
@@ -373,7 +375,7 @@ export async function deleteCommunityContractTemplate(
 export async function getCommunityContractTemplateMetadata(
   models: DB,
   req: Request,
-  res: Response
+  res: Response,
 ) {
   try {
     const { id } = req.body.contractMetadata;
@@ -399,7 +401,7 @@ export async function getCommunityContractTemplateMetadata(
 export async function updateCommunityContractTemplateMetadata(
   models: DB,
   req: Request,
-  res: Response
+  res: Response,
 ) {
   try {
     if (!req.body) {
@@ -460,7 +462,7 @@ export async function updateCommunityContractTemplateMetadata(
 export async function deleteCommunityContractTemplateMetadata(
   models: DB,
   req: Request,
-  res: Response
+  res: Response,
 ) {
   try {
     if (!req.body) {

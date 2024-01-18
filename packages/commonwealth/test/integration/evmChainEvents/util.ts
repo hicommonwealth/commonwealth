@@ -4,8 +4,7 @@ import {
   ChainNetwork,
   ChainType,
 } from '@hicommonwealth/core';
-import models from '../../../server/database';
-import { hashAbi } from '../../../server/util/abiValidation';
+import { hashAbi, models } from '@hicommonwealth/model';
 import {
   rawCompoundAbi,
   rawDydxAbi,
@@ -140,7 +139,7 @@ export async function getTestCommunityContract(version?: 'v1' | 'v2') {
 
   const [communityContract] = await models.CommunityContract.findOrCreate({
     where: {
-      chain_id: chain.id,
+      community_id: chain.id,
       contract_id: contract.id,
     },
   });
@@ -167,7 +166,7 @@ export async function getTestSubscription(version?: 'v1' | 'v2') {
     where: {
       subscriber_id: user.id,
       category_id: 'chain-event',
-      chain_id: chain.id,
+      community_id: chain.id,
     },
     defaults: {
       is_active: true,

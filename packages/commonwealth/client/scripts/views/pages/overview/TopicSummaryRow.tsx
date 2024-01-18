@@ -14,6 +14,7 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
 import { CWTag } from '../../components/component_kit/new_designs/CWTag';
+import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { SharePopover } from '../../components/share_popover';
 import { User } from '../../components/user/user';
 import { getLastUpdated, isHot, isNewThread } from '../discussions/helpers';
@@ -133,7 +134,7 @@ export const TopicSummaryRow = ({
                 </CWText>
 
                 <CWText type="caption" className="thread-preview">
-                  {thread.plaintext}
+                  <QuillRenderer doc={thread.plaintext} />
                 </CWText>
 
                 {isTagsRowVisible && (

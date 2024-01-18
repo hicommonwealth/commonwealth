@@ -1,3 +1,4 @@
+import { ContentType } from '@hicommonwealth/core';
 import clsx from 'clsx';
 import { SessionKeyError } from 'controllers/server/sessions';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
@@ -12,7 +13,6 @@ import {
   useFetchCommentsQuery,
   useToggleCommentSpamStatusMutation,
 } from 'state/api/comments';
-import { ContentType } from 'types';
 import { CreateComment } from 'views/components/Comments/CreateComment';
 import {
   deserializeDelta,
@@ -172,7 +172,7 @@ export const CommentTree = ({
             try {
               await deleteComment({
                 commentId: comment.id,
-                canvasHash: comment.canvas_hash,
+                canvasHash: comment.canvasHash,
                 communityId: app.activeChainId(),
                 address: app.user.activeAccount.address,
                 existingNumberOfComments: thread.numberOfComments,

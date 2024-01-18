@@ -1,7 +1,7 @@
 import { NotificationCategories } from '@hicommonwealth/core';
+import { CommunityInstance } from '@hicommonwealth/model';
 import request from 'superagent';
 import { DEFAULT_COMMONWEALTH_LOGO } from '../../../config';
-import { CommunityInstance } from '../../../models/community';
 import {
   ChainEventWebhookData,
   ForumWebhookData,

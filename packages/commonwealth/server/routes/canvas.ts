@@ -1,12 +1,12 @@
-import type { DB } from '../models';
+import type { DB } from '@hicommonwealth/model';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
 import type { Action, Session } from '@canvas-js/interfaces';
 import {
-  verifyThread,
   verifyComment,
   verifyReaction,
+  verifyThread,
 } from '../../shared/canvas/serverVerify';
 
 type CanvasGetReq = {
@@ -19,7 +19,7 @@ type CanvasGetResp = unknown;
 export const getCanvasData = async (
   models: DB,
   req: TypedRequestBody<CanvasGetReq>,
-  res: TypedResponse<CanvasGetResp>
+  res: TypedResponse<CanvasGetResp>,
 ) => {
   const before = req.body.query?.before ?? null;
 
@@ -38,7 +38,7 @@ UNION
     ORDER BY updated_at DESC LIMIT 50)
 ORDER BY updated_at DESC LIMIT 50;
 `,
-    { replacements: [before, before, before] }
+    { replacements: [before, before, before] },
   );
 
   type QueryResult = {
@@ -75,9 +75,8 @@ type CanvasPostResp = {};
 export const postCanvasData = async (
   models: DB,
   req: TypedRequestBody<CanvasPostReq>,
-  res: TypedResponse<CanvasPostResp>
+  res: TypedResponse<CanvasPostResp>,
 ) => {
-  const data = {};
   const { canvas_action, canvas_session, canvas_hash } = req.body;
 
   // TODO: Implement verification and call the create

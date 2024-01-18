@@ -1,11 +1,13 @@
+import {
+  AddressInstance,
+  CommunityInstance,
+  GroupAttributes,
+  MembershipAttributes,
+  TopicAttributes,
+  UserInstance,
+} from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { ServerGroupsController } from 'server/controllers/server_groups_controller';
-import { AddressInstance } from 'server/models/address';
-import { GroupAttributes } from 'server/models/group';
-import { MembershipAttributes } from 'server/models/membership';
-import { TopicAttributes } from 'server/models/topic';
-import { UserInstance } from 'server/models/user';
-import { CommunityInstance } from '../../../server/models/community';
 
 const INVALID_REQUIREMENTS_NOT_ARRAY = 'no an array' as unknown as [];
 
@@ -24,8 +26,7 @@ const createMockedGroupsController = () => {
   const topics: TopicAttributes[] = [
     {
       id: 1,
-      chain_id: 'ethereum',
-      token_threshold: '1000',
+      community_id: 'ethereum',
       name: 'hello',
       featured_in_sidebar: false,
       featured_in_new_post: false,
@@ -99,6 +100,7 @@ const createMockedGroupsController = () => {
       },
       count: async () => memberships.length,
       destroy: async () => {},
+      bulkCreate: async () => {},
     },
     CommunityRole: {
       findAll: async () => [
@@ -124,7 +126,6 @@ const createMockedGroupsController = () => {
   const banCache: any = {};
   const controller = new ServerGroupsController(
     db,
-    tokenBalanceCache,
     tokenBalanceCache,
     banCache,
   );

@@ -1,7 +1,7 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
+import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import Sequelize from 'sequelize';
-import type { DB } from '../models';
 
 const Op = Sequelize.Op;
 
@@ -15,7 +15,7 @@ const getAddressStatus = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.body.address) {
     return next(new AppError(Errors.NeedAddress));

@@ -1,35 +1,38 @@
 /* eslint-disable no-async-promise-executor */
-import { ServerError } from 'common-common/src/errors';
+import { ServerError } from '@hicommonwealth/adapters';
 //
 // The async promise syntax, new Promise(async (resolve, reject) => {}), should usually be avoided
 // because it's easy to miss catching errors inside the promise executor, but we use it in this file
 // because the bulk offchain queries are heavily optimized so communities can load quickly.
 //
-import type { Request, Response } from 'express';
+import type {
+  CommunityBannerInstance,
+  CommunityContractTemplateInstance,
+  ContractInstance,
+  DB,
+  ThreadInstance,
+} from '@hicommonwealth/model';
+import type { Response } from 'express';
 import { Op, QueryTypes } from 'sequelize';
-import type { CommunityContractTemplateInstance } from 'server/models/community_contract_template';
-import type { DB } from '../models';
-import type { CommunityBannerInstance } from '../models/community_banner';
-import type { ContractInstance } from '../models/contract';
-import type { ThreadInstance } from '../models/thread';
+import { TypedRequest } from 'server/types';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
 
 export const Errors = {};
 
 // Topics, comments, reactions, members+admins, threads
-const bulkOffchain = async (models: DB, req: Request, res: Response) => {
-  const chain = req.chain;
+const bulkOffchain = async (models: DB, req: TypedRequest, res: Response) => {
+  const { community } = req;
   // globally shared SQL replacements
-  const communityOptions = 'chain = :chain';
-  const replacements = { chain: chain.id };
+  const communityOptions = 'community_id = :community_id';
+  const replacements = { community_id: community.id };
 
   // parallelized queries
   const [
     admins,
     mostActiveUsers,
     threadsInVoting,
-    totalThreads,
+    numTotalThreads,
     communityBanner,
     contractsWithTemplatesData,
   ] = await (<
@@ -38,7 +41,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
         RoleInstanceWithPermission[],
         unknown,
         ThreadInstance[],
-        [{ count: string }],
+        number,
         CommunityBannerInstance,
         Array<{
           contract: ContractInstance;
@@ -52,7 +55,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
     findAllRoles(
       models,
       { include: [models.Address], order: [['created_at', 'DESC']] },
-      chain.id,
+      community.id,
       ['admin', 'moderator'],
     ),
     // most active users
@@ -64,7 +67,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
         const activeUsers = {};
         const where = {
           updated_at: { [Op.gt]: thirtyDaysAgo },
-          chain: chain.id,
+          community_id: community.id,
         };
 
         const monthlyComments = await models.Comment.findAll({
@@ -104,49 +107,22 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
         type: QueryTypes.SELECT,
       },
     ),
-    await models.sequelize.query(
-      `
-      SELECT 
-        COUNT(*) 
-      FROM 
-        "Addresses" AS addr 
-        RIGHT JOIN (
-          SELECT 
-            t.id AS thread_id, 
-            t.address_id, 
-            t.topic_id 
-          FROM 
-            "Threads" t 
-          WHERE 
-            t.deleted_at IS NULL 
-            AND t.chain = $chain 
-            AND (
-              t.pinned = true 
-              OR (
-                COALESCE(
-                  t.last_commented_on, t.created_at
-                ) < $created_at 
-                AND t.pinned = false
-              )
-            )
-        ) threads ON threads.address_id = addr.id 
-        LEFT JOIN "Topics" topics ON threads.topic_id = topics.id
-      `,
-      {
-        bind: { chain: chain.id, created_at: new Date().toISOString() },
-        type: QueryTypes.SELECT,
+    await models.Thread.count({
+      where: {
+        community_id: community.id,
+        marked_as_spam_at: null,
       },
-    ),
+    }),
     models.CommunityBanner.findOne({
       where: {
-        chain_id: chain.id,
+        community_id: community.id,
       },
     }),
     new Promise(async (resolve, reject) => {
       try {
         const communityContracts = await models.CommunityContract.findAll({
           where: {
-            chain_id: chain.id,
+            community_id: community.id,
           },
         });
         const contractsWithTemplates: Array<{
@@ -196,8 +172,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
   const numVotingThreads = threadsInVoting.filter(
     (t) => t.stage === 'voting',
   ).length;
-
-  const numTotalThreads = parseInt(totalThreads[0].count);
 
   return res.json({
     status: 'Success',

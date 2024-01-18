@@ -1,8 +1,8 @@
-import models from '../database';
+import { models } from '@hicommonwealth/model';
 import AWS from 'aws-sdk';
-import { Op } from 'sequelize';
 import fs from 'fs';
 import path from 'path';
+import { Op } from 'sequelize';
 
 AWS.config.update({
   signatureVersion: 'v4',
@@ -27,7 +27,7 @@ const staticFileToBucketMigrator = async () => {
     let fileBlob;
     try {
       fileBlob = await fs.promises.readFile(
-        path.join(__dirname, '../..' + iconPath)
+        path.join(__dirname, '../..' + iconPath),
       );
     } catch (e) {
       console.log('error uploading', e);

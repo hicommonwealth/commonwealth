@@ -8,7 +8,7 @@ $form-width: 596px;
   gap: 24px;
   position: relative;
 
-  .CreateCommunityHint {
+  .FeatureHint {
     position: absolute;
     max-width: 244px;
     left: calc($form-width + 100px);
@@ -28,7 +28,7 @@ $form-width: 596px;
     flex-direction: column;
     gap: 16px;
 
-    .CreateCommunityHint {
+    .FeatureHint {
       position: static;
       width: 100%;
       max-width: $form-width;

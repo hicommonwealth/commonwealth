@@ -3,13 +3,12 @@
 import { NotificationCategories } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import 'chai/register-should';
+
+import { models, SubscriptionValidationErrors } from '@hicommonwealth/model';
 import jwt from 'jsonwebtoken';
 import type NotificationSubscription from '../../../client/scripts/models/NotificationSubscription';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import models from '../../../server/database';
-import { SubscriptionValidationErrors } from '../../../server/models/subscription';
 import Errors from '../../../server/routes/subscription/errors';
 import * as modelUtils from '../../util/modelUtils';
 
@@ -17,13 +16,7 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('Subscriptions Tests', () => {
-  let jwtToken,
-    loggedInAddr,
-    loggedInAddrId,
-    loggedInSession,
-    thread,
-    comment,
-    userId: number;
+  let jwtToken, loggedInAddr, loggedInSession, thread, comment, userId: number;
   const chain = 'ethereum';
 
   before('reset database', async () => {
@@ -31,13 +24,19 @@ describe('Subscriptions Tests', () => {
     // get logged in address/user with JWT
     const result = await modelUtils.createAndVerifyAddress({ chain });
     loggedInAddr = result.address;
-    loggedInAddrId = result.address_id;
     loggedInSession = { session: result.session, sign: result.sign };
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
       JWT_SECRET,
     );
     userId = result.user_id;
+
+    const topic = await models.Topic.findOne({
+      where: {
+        community_id: chain,
+        group_ids: [],
+      },
+    });
 
     let res = await modelUtils.createThread({
       chainId: chain,
@@ -47,8 +46,7 @@ describe('Subscriptions Tests', () => {
       body: 't',
       kind: 'discussion',
       stage: 'discussion',
-      topicName: 't',
-      topicId: undefined,
+      topicId: topic.id,
       session: loggedInSession.session,
       sign: loggedInSession.sign,
     });
@@ -83,7 +81,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body).to.not.be.null;
         expect(res.body.status).to.be.equal('Success');
         expect(res.body.result.category_id).to.be.equal(category);
-        expect(res.body.result.chain_id).to.equal(chain);
+        expect(res.body.result.community_id).to.equal(chain);
         expect(res.body.result.is_active).to.be.equal(true);
         expect(res.body.result.thread_id).to.be.null;
       });
@@ -162,7 +160,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body.result.category_id).to.be.equal(category);
         expect(res.body.result.is_active).to.be.equal(true);
         expect(res.body.result.thread_id).to.be.equal(thread.id);
-        expect(res.body.result.chain_id).to.be.equal(chain);
+        expect(res.body.result.community_id).to.be.equal(chain);
         expect(res.body.result.comment_id).to.be.null;
         rootCommmentSubscription = res.body.result;
       });
@@ -185,7 +183,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body.result.category_id).to.be.equal(category);
         expect(res.body.result.is_active).to.be.equal(true);
         expect(res.body.result.thread_id).to.be.null;
-        expect(res.body.result.chain_id).to.be.equal(chain);
+        expect(res.body.result.community_id).to.be.equal(chain);
         expect(res.body.result.comment_id).to.be.equal(comment.id);
         commentSubscription = res.body.result;
       });
@@ -320,7 +318,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body.result.category_id).to.be.equal(category);
         expect(res.body.result.is_active).to.be.equal(true);
         expect(res.body.result.thread_id).to.be.equal(thread.id);
-        expect(res.body.result.chain_id).to.be.equal(chain);
+        expect(res.body.result.community_id).to.be.equal(chain);
         expect(res.body.result.comment_id).to.be.null;
         rootCommmentSubscription = res.body.result;
       });
@@ -343,7 +341,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body.result.category_id).to.be.equal(category);
         expect(res.body.result.is_active).to.be.equal(true);
         expect(res.body.result.thread_id).to.be.null;
-        expect(res.body.result.chain_id).to.be.equal(chain);
+        expect(res.body.result.community_id).to.be.equal(chain);
         expect(res.body.result.comment_id).to.be.equal(comment.id);
         commentSubscription = res.body.result;
       });
@@ -509,7 +507,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body).to.not.be.null;
         expect(res.body.status).to.be.equal('Success');
         expect(res.body.result.category_id).to.be.equal(category);
-        expect(res.body.result.chain_id).to.equal(chain);
+        expect(res.body.result.community_id).to.equal(chain);
         expect(res.body.result.is_active).to.be.equal(true);
         chainSubscription = res.body.result;
       });
@@ -525,7 +523,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body).to.not.be.null;
         expect(res.body.status).to.be.equal('Success');
         expect(res.body.result.category_id).to.be.equal(category);
-        expect(res.body.result.chain_id).to.equal(chain);
+        expect(res.body.result.community_id).to.equal(chain);
         expect(res.body.result.is_active).to.be.equal(true);
         expect(res.body.result.id).to.equal(chainSubscription.id);
       });
@@ -571,7 +569,6 @@ describe('Subscriptions Tests', () => {
       it('should create a snapshot-proposal subscription', async () => {
         const is_active = true;
         const category = NotificationCategories.SnapshotProposal;
-        //const snapshot_id = 'test_space';
         const res = await chai
           .request(app)
           .post('/api/createSubscription')
@@ -588,7 +585,6 @@ describe('Subscriptions Tests', () => {
       it('should not create a duplicate snapshot-proposal subscription', async () => {
         const is_active = true;
         const category = NotificationCategories.SnapshotProposal;
-        //const snapshot_id = 'test_space';
         const res = await chai
           .request(app)
           .post('/api/createSubscription')
@@ -719,7 +715,7 @@ describe('Subscriptions Tests', () => {
         JWT_SECRET,
       );
 
-      const newThreadSub = await modelUtils.createSubscription({
+      await modelUtils.createSubscription({
         jwt: newJWT,
         is_active: true,
         category: NotificationCategories.NewThread,
@@ -1078,7 +1074,7 @@ describe('Subscriptions Tests', () => {
         expect.fail(subscriptionCreateErrMsg);
       } catch (e) {
         expect(e.message).to.be.equal(
-          `${sequelizeErrMsg}${SubscriptionValidationErrors.NoChainId}`,
+          `${sequelizeErrMsg}${SubscriptionValidationErrors.NoCommunityId}`,
         );
       }
     });
@@ -1093,7 +1089,7 @@ describe('Subscriptions Tests', () => {
         expect.fail(subscriptionCreateErrMsg);
       } catch (e) {
         expect(e.message).to.be.equal(
-          `${sequelizeErrMsg}${SubscriptionValidationErrors.NoChainId}`,
+          `${sequelizeErrMsg}${SubscriptionValidationErrors.NoCommunityId}`,
         );
       }
     });
@@ -1109,7 +1105,7 @@ describe('Subscriptions Tests', () => {
           expect.fail(subscriptionCreateErrMsg);
         } catch (e) {
           expect(e.message).to.be.equal(
-            `${sequelizeErrMsg}${SubscriptionValidationErrors.NoChainId}`,
+            `${sequelizeErrMsg}${SubscriptionValidationErrors.NoCommunityId}`,
           );
         }
       });
@@ -1120,7 +1116,7 @@ describe('Subscriptions Tests', () => {
           await models.Subscription.create({
             subscriber_id: userId,
             category_id,
-            chain_id: chain,
+            community_id: chain,
             thread_id: 1,
             comment_id: 1,
           });
@@ -1138,7 +1134,7 @@ describe('Subscriptions Tests', () => {
           await models.Subscription.create({
             subscriber_id: userId,
             category_id,
-            chain_id: chain,
+            community_id: chain,
           });
           expect.fail(subscriptionCreateErrMsg);
         } catch (e) {
@@ -1160,7 +1156,7 @@ describe('Subscriptions Tests', () => {
           expect.fail(subscriptionCreateErrMsg);
         } catch (e) {
           expect(e.message).to.be.equal(
-            `${sequelizeErrMsg}${SubscriptionValidationErrors.NoChainId}`,
+            `${sequelizeErrMsg}${SubscriptionValidationErrors.NoCommunityId}`,
           );
         }
       });
@@ -1171,7 +1167,7 @@ describe('Subscriptions Tests', () => {
           await models.Subscription.create({
             subscriber_id: userId,
             category_id,
-            chain_id: chain,
+            community_id: chain,
             thread_id: 1,
             comment_id: 1,
           });
@@ -1189,7 +1185,7 @@ describe('Subscriptions Tests', () => {
           await models.Subscription.create({
             subscriber_id: userId,
             category_id,
-            chain_id: chain,
+            community_id: chain,
           });
           expect.fail(subscriptionCreateErrMsg);
         } catch (e) {

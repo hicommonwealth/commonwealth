@@ -1,19 +1,22 @@
 // Adapted from:
 // https://github.com/uber-archive/express-statsd/blob/master/lib/express-statsd.js
-
-import { ProjectTag } from 'common-common/src/statsd';
+import { stats } from '@hicommonwealth/core';
 import type { NextFunction, Request, Response } from 'express';
-import type { StatsD } from 'hot-shots';
 
-export default function expressStatsdInit(client: StatsD) {
-  return function expressStatsd(
+export enum ProjectTag {
+  Commonwealth = 'commonwealth',
+  TokenBalanceCache = 'token-balance-cache',
+}
+
+export default function expressStatsInit() {
+  return function expressStats(
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     const startTime = new Date().getTime();
 
-    // Function called on response finish that sends stats to statsd
+    // Function called on response finish that sends stats
     function sendStats() {
       // Status Code
       const statusCode = res.statusCode.toString() || 'unknown_status';
@@ -26,7 +29,7 @@ export default function expressStatsdInit(client: StatsD) {
 
       // Response Time
       const duration = new Date().getTime() - startTime;
-      client.timing('express.response_time', duration, tags);
+      stats().timing('express.response_time', duration, tags);
 
       // eslint-disable-next-line no-use-before-define
       cleanup();

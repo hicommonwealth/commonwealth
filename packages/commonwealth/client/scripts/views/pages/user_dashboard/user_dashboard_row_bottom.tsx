@@ -82,7 +82,11 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
           </CWText>
         </div>
         <div>
-          <CWAvatarGroup profiles={commenters} communityId={communityId} />
+          <CWAvatarGroup
+            profiles={commenters}
+            communityId={communityId}
+            totalProfiles={commentCount}
+          />
         </div>
       </div>
       <div

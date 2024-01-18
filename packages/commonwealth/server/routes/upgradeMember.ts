@@ -1,9 +1,9 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
+import type { DB } from '@hicommonwealth/model';
+import { isRole } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { Op } from 'sequelize';
-import type { DB } from '../models';
-import { isRole } from '../models/role';
 
 export const Errors = {
   InvalidAddress: 'Invalid address',
@@ -25,7 +25,7 @@ const upgradeMember = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const errors = validationResult(req).array();
   if (errors.length !== 0) {

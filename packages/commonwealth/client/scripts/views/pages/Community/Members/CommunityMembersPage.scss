@@ -79,11 +79,16 @@
           margin-left: 0;
         }
       }
-    }
 
-    .select-dropdown {
-      button {
-        width: 100%;
+      .CWSelectList {
+        min-width: 144px;
+
+        .cwsl__menu {
+          min-width: 200px;
+          margin-right: auto;
+          right: 0;
+          left: auto;
+        }
       }
     }
   }

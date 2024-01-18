@@ -1,8 +1,10 @@
+import {
+  CommunityInstance,
+  GroupAttributes,
+  MembershipAttributes,
+  TopicAttributes,
+} from '@hicommonwealth/model';
 import { Op, WhereOptions } from 'sequelize';
-import { GroupAttributes } from 'server/models/group';
-import { MembershipAttributes } from 'server/models/membership';
-import { TopicAttributes } from 'server/models/topic';
-import { CommunityInstance } from '../../models/community';
 import { ServerGroupsController } from '../server_groups_controller';
 
 export type GetGroupsOptions = {
@@ -61,7 +63,7 @@ export async function __getGroups(
   if (includeTopics) {
     const topics = await this.models.Topic.findAll({
       where: {
-        chain_id: community.id,
+        community_id: community.id,
         group_ids: {
           [Op.overlap]: groupsResult.map(({ id }) => id),
         },

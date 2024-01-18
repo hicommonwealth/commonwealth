@@ -1,10 +1,12 @@
-import { NotificationCategories } from '@hicommonwealth/core';
+import {
+  NotificationCategories,
+  NotificationDataAndCategory,
+} from '@hicommonwealth/core';
+import { CommunityInstance } from '@hicommonwealth/model';
 import { capitalize } from 'lodash';
 import { Label as chainEventLabel } from '../../../shared/chain/labelers/util';
-import { NotificationDataAndCategory } from '../../../shared/types';
 import { renderQuillDeltaToText, smartTrim } from '../../../shared/utils';
 import { SERVER_URL } from '../../config';
-import { CommunityInstance } from '../../models/community';
 import { ChainEventWebhookData, ForumWebhookData } from './types';
 import {
   getActorProfile,
@@ -19,7 +21,7 @@ export async function getWebhookData(
     | { categoryId: NotificationCategories.ThreadEdit }
     | { categoryId: NotificationCategories.CommentEdit }
   >,
-  chain?: CommunityInstance,
+  community?: CommunityInstance,
 ): Promise<ForumWebhookData | ChainEventWebhookData> {
   if (notification.categoryId === NotificationCategories.ChainEvent) {
     const event = {
@@ -30,7 +32,7 @@ export async function getWebhookData(
     };
     const eventLabel = chainEventLabel(notification.data.chain, event);
 
-    const previewImage = await getPreviewImageUrl(notification, chain);
+    const previewImage = await getPreviewImageUrl(notification, community);
 
     return {
       title: `${eventLabel.heading} on ${capitalize(notification.data.chain)}`,

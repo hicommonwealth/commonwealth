@@ -1,6 +1,6 @@
+import { AppError } from '@hicommonwealth/adapters';
 import { WalletId } from '@hicommonwealth/core';
-import { AppError } from 'common-common/src/errors';
-import type { DB } from '../models';
+import type { DB } from '@hicommonwealth/model';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 

@@ -1,6 +1,6 @@
+import { AppError } from '@hicommonwealth/adapters';
+import { TopicAttributes } from '@hicommonwealth/model';
 import z from 'zod';
-import { AppError } from '../../../../common-common/src/errors';
-import { TopicAttributes } from '../../models/topic';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -22,7 +22,7 @@ export const updateTopicHandler = async (
 ) => {
   const {
     user,
-    chain: community,
+    community,
     params: { topicId },
     body,
   } = req;
@@ -31,13 +31,11 @@ export const updateTopicHandler = async (
     id: z.coerce.number(),
     name: z.string().optional(),
     description: z.string().optional(),
-    token_threshold: z.string().optional(),
     featured_in_sidebar: z.coerce.boolean().nullable().optional(),
     featured_in_new_post: z.coerce.boolean().optional(),
     default_offchain_template: z.string().nullable().optional(),
     telegram: z.string().nullable().optional(),
     group_ids: z.array(z.number()).optional(),
-    chain_id: z.string().optional(),
   });
 
   const validationResult = validationSchema.safeParse({

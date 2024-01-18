@@ -1,10 +1,10 @@
+import { AccessLevel } from '@hicommonwealth/core';
 import axios from 'axios';
 import useForceRerender from 'hooks/useForceRerender';
 import 'pages/manage_community/index.scss';
 import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useDebounce } from 'usehooks-ts';
-import { AccessLevel } from '../../../../../shared/permissions';
 import {
   APIOrderBy,
   APIOrderDirection,
@@ -95,7 +95,7 @@ const ManageCommunityPage = () => {
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   if (!isAdmin) {
-    return <ErrorPage message={'Must be admin'} />;
+    return <ErrorPage message="Must be admin" />;
   }
 
   const handleRoleUpdate = (oldRole, newRole) => {

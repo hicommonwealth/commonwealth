@@ -1,12 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork, logger } from '@hicommonwealth/core';
+import type { CommunityInstance, DB } from '@hicommonwealth/model';
 import cheerio from 'cheerio';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { DEFAULT_COMMONWEALTH_LOGO } from '../config';
-import type { DB } from '../models';
-import type { CommunityInstance } from '../models/community';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true';
 const DEV = process.env.NODE_ENV !== 'production';
@@ -85,44 +83,14 @@ const setupAppRoutes = (app, models: DB, templateFile, sendFile) => {
 
   app.get('/:scope?/overview', renderGeneralPage);
 
-  app.get('/:scope?/account/:address', async (req, res) => {
-    // Retrieve title, description, and author from the database
-    let title, description, author, profileData, image;
-    const address = await models.Address.findOne({
-      where: { community_id: req.params.scope, address: req.params.address },
-      include: [models.Profile],
-    });
-    const profile = await address.getProfile();
-    if (address && profile) {
-      try {
-        title = profileData.name;
-        description = profile.bio;
-        image = profile.avatar_url;
-        author = '';
-      } catch (e) {
-        title = '';
-        description = '';
-        image = '';
-        author = '';
-      }
-    } else {
-      title = '';
-      description = '';
-      image = '';
-      author = '';
-    }
-    const url = getUrl(req);
-
-    renderWithMetaTags(res, title, description, author, image, url);
-  });
-
   const renderThread = async (scope: string, threadId: string, req, res) => {
     // Retrieve discussions
     const thread = await models.Thread.findOne({
-      where: scope ? { id: threadId, chain: scope } : { id: threadId },
+      where: scope ? { id: threadId, community_id: scope } : { id: threadId },
       include: [
         {
           model: models.Community,
+          as: 'Community',
           where: scope ? null : { custom_domain: req.hostname },
           attributes: ['custom_domain', 'icon_url'],
         },
@@ -142,8 +110,8 @@ const setupAppRoutes = (app, models: DB, templateFile, sendFile) => {
 
     const title = thread ? decodeTitle(thread.title) : '';
     const description = thread ? thread.plaintext : '';
-    const image = thread?.Chain?.icon_url
-      ? `${thread.Chain.icon_url}`
+    const image = thread?.Community?.icon_url
+      ? `${thread.Community.icon_url}`
       : DEFAULT_COMMONWEALTH_LOGO;
 
     const author = thread?.Address?.Profile?.profile_name

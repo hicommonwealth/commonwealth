@@ -1,9 +1,11 @@
+import { AppError } from '@hicommonwealth/adapters';
+import {
+  CommunityInstance,
+  PollAttributes,
+  UserInstance,
+} from '@hicommonwealth/model';
 import moment from 'moment';
-import { AppError } from '../../../../common-common/src/errors';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { CommunityInstance } from '../../models/community';
-import { PollAttributes } from '../../models/poll';
-import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_methods/track';
 import { ServerThreadsController } from '../server_threads_controller';
@@ -89,7 +91,7 @@ export async function __createThreadPoll(
     return this.models.Poll.create(
       {
         thread_id: thread.id,
-        community_id: thread.chain,
+        community_id: thread.community_id,
         prompt,
         options: JSON.stringify(options),
         ends_at,

@@ -111,7 +111,7 @@ const SearchPage = () => {
     SORT_MAP[queryParams.sort] || DEFAULT_SORT_OPTIONS;
 
   const sharedQueryOptions = {
-    communityId: app.activeChainId() || 'all_communities',
+    communityId: community,
     searchTerm: queryParams.q,
     limit: 20,
     orderBy,
@@ -326,7 +326,7 @@ const SearchPage = () => {
                 )}
               <div className="search-results-list">
                 {renderSearchResults(
-                  results as any,
+                  results,
                   queryParams.q,
                   activeTab,
                   commonNavigate,

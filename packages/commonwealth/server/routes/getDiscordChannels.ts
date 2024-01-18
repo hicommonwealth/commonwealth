@@ -1,8 +1,9 @@
+import type { DB } from '@hicommonwealth/model';
 import axios from 'axios';
-import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 enum SetDiscordBotConfigErrors {
   NotAdmin = 'Not an admin',
   CommonbotConnected = 'Discord is already connected to another Commonwealth community',
