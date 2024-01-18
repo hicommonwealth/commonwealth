@@ -15,9 +15,7 @@ import './ManageTopicsSection.scss';
 
 export const ManageTopicsSection = () => {
   const getFilteredTopics = (rawTopics: Topic[]): Topic[] => {
-    const topics = rawTopics
-      .filter((topic) => topic.featuredInSidebar)
-      .map((topic) => ({ ...topic } as Topic));
+    const topics = rawTopics.map((topic) => ({ ...topic } as Topic));
 
     if (!topics.length) return [];
 
