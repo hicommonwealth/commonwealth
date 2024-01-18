@@ -35,6 +35,9 @@ const CommunityProfileForm = () => {
   const communityTagOptions: CommunityTags[] = ['DeFi', 'DAO'];
   const community = app.config.chains.getById(app.activeChainId());
 
+  const [communityId] = useState(
+    slugifyPreserveDashes(community.id.toLowerCase()),
+  );
   const [formKey, setFormKey] = useState(1);
   const [nameFieldDisabledState, setNameFieldDisabledState] = useState({
     isDisabled: true,
@@ -165,7 +168,7 @@ const CommunityProfileForm = () => {
       validationSchema={communityProfileValidationSchema}
       onSubmit={onSubmit}
     >
-      {({ formState, reset, getValues: getFormValues }) => (
+      {({ formState, reset }) => (
         <>
           <section className="base-section">
             <CWTextInput
@@ -208,11 +211,7 @@ const CommunityProfileForm = () => {
               fullWidth
               label="Community URL"
               placeholder="Community URL"
-              value={`${window.location.origin}/${slugifyPreserveDashes(
-                (
-                  getFormValues?.()?.['communityName'] || community.id
-                ).toLowerCase(),
-              )}`}
+              value={`${window.location.origin}/${communityId}`}
             />
             {featureFlags.isCommunityStakesEnabled && (
               <>
