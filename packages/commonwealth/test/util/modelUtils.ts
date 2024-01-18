@@ -104,7 +104,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .set('Accept', 'application/json')
       .send({
         address,
-        chain,
+        community_id: chain,
         chain_id,
         signature,
         wallet_id,
@@ -173,7 +173,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .agent(app)
       .post('/api/verifyAddress')
       .set('Accept', 'application/json')
-      .send({ address, chain, signature, wallet_id });
+      .send({ address, community_id: chain, signature, wallet_id });
     const user_id = res.body.result.user.id;
     const email = res.body.result.user.email;
     return {
@@ -696,11 +696,11 @@ export const joinCommunity = async (args: JoinCommunityArgs) => {
   try {
     await chai.request
       .agent(app)
-      .post('/api/linkExistingAddressToChain')
+      .post('/api/linkExistingAddressToCommunity')
       .set('Accept', 'application/json')
       .send({
         address,
-        chain,
+        community_id: chain,
         originChain,
         jwt,
       });

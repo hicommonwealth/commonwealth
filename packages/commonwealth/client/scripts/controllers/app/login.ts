@@ -20,10 +20,10 @@ export function linkExistingAddressToChainOrCommunity(
   community: string,
   originChain: string,
 ) {
-  return $.post(`${app.serverUrl()}/linkExistingAddressToChain`, {
+  return $.post(`${app.serverUrl()}/linkExistingAddressToCommunity`, {
     address,
-    chain: community,
-    originChain,
+    community_id: community,
+    originChain, // not used
     jwt: app.user.jwt,
   });
 }

@@ -1,55 +1,30 @@
-import { AppError } from '@hicommonwealth/adapters';
-import type { NextFunction, Request, Response } from 'express';
-import Sequelize from 'sequelize';
+import { TypedRequest, TypedResponse } from 'server/types';
 import type { DB } from '../models';
 
-const Op = Sequelize.Op;
+export const Errors = {};
 
-export const Errors = {
-  NeedAddress: 'Must provide address',
-  NeedChain: 'Must provide chain',
-  InvalidChain: 'Invalid chain',
+type GetAddressStatusResponseBody = {
+  exists: boolean;
+  belongsToUser: boolean;
 };
 
 const getAddressStatus = async (
   models: DB,
-  req: Request,
-  res: Response,
-  next: NextFunction,
+  req: TypedRequest<any>,
+  res: TypedResponse<GetAddressStatusResponseBody>,
 ) => {
-  if (!req.body.address) {
-    return next(new AppError(Errors.NeedAddress));
-  }
-  if (!req.body.chain) {
-    return next(new AppError(Errors.NeedChain));
-  }
+  const { user, address } = req;
 
-  const chain = await models.Community.findOne({
-    where: { id: req.body.chain },
-  });
-  if (!chain) {
-    return next(new AppError(Errors.InvalidChain));
-  }
+  let result: GetAddressStatusResponseBody = {
+    exists: false,
+    belongsToUser: false,
+  };
 
-  const existingAddress = await models.Address.findOne({
-    where: {
-      community_id: req.body.chain,
-      address: req.body.address,
-      verified: { [Op.ne]: null },
-    },
-  });
-
-  let result;
-  if (existingAddress) {
-    const belongsToUser = req.user && existingAddress.user_id === req.user.id;
+  if (address) {
+    const belongsToUser = user && address.user_id === user.id;
     result = {
       exists: true,
       belongsToUser,
-    };
-  } else {
-    result = {
-      exists: false,
-      belongsToUser: false,
     };
   }
 

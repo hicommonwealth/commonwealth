@@ -119,7 +119,7 @@ describe('API Tests', () => {
         .set('Accept', 'application/json')
         .send({
           address,
-          chain: community_id,
+          community_id,
           chain_id,
           signature,
           wallet_id,
