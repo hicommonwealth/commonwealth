@@ -3,6 +3,7 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { featureFlags } from 'helpers/feature-flags';
 import getLinkType from 'helpers/linkType';
 import React, { useState } from 'react';
+import { slugifyPreserveDashes } from 'shared/utils';
 import app from 'state';
 import {
   useEditCommunityBannerMutation,
@@ -207,9 +208,11 @@ const CommunityProfileForm = () => {
               fullWidth
               label="Community URL"
               placeholder="Community URL"
-              value={`${window.location.origin}/${
-                getFormValues?.()?.['communityName'] || community.id
-              }`}
+              value={`${window.location.origin}/${slugifyPreserveDashes(
+                (
+                  getFormValues?.()?.['communityName'] || community.id
+                ).toLowerCase(),
+              )}`}
             />
             {featureFlags.isCommunityStakesEnabled && (
               <>
