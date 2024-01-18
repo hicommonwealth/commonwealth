@@ -1,6 +1,9 @@
 import React from 'react';
+import app from 'state';
+import Permissions from 'utils/Permissions';
 import FeatureHint from 'views/components/FeatureHint';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { PageNotFound } from '../../404';
 import CustomTOS from './CustomTOS';
 import CustomURL from './CustomURL';
 import Directory from './Directory';
@@ -10,6 +13,13 @@ import Snapshots from './Snapshots';
 import Webhooks from './Webhooks';
 
 const Integrations = () => {
+  if (
+    !app?.user?.activeAccount?.address ||
+    !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin())
+  ) {
+    return <PageNotFound />;
+  }
+
   return (
     <section className="Integrations">
       <section className="left-section">
