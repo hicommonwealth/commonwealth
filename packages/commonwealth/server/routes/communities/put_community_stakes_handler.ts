@@ -28,7 +28,7 @@ export const putCommunityStakeHandler = async (
 
   const results = await controllers.communities.putCommunityStake({
     user: req.user,
-    communityStakeData: validationResult.data,
+    communityStake: validationResult.data,
   });
 
   return success(res, results);

@@ -1,29 +1,32 @@
 import { Community } from '@hicommonwealth/core';
-import { CommunityStakeAttributes } from '@hicommonwealth/core/build/community/index';
+import { CommunityStakeAttributes } from '../../models/community_stake';
 import { UserInstance } from '../../models/user';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 export type PutCommunityStakeOptions = {
   user: UserInstance;
-  communityStakeData: Community.SetCommunityStake;
+  communityStake: Community.SetCommunityStake;
 };
+
+export type PutCommunityStakeResult = CommunityStakeAttributes;
 
 export async function __putCommunityStake(
   this: ServerCommunitiesController,
-  { communityStakeData }: PutCommunityStakeOptions,
+  { communityStake }: PutCommunityStakeOptions,
 ): Promise<CommunityStakeAttributes> {
-  const { communityStake } = communityStakeData;
-
-  const { community_id, stake_token, stake_scaler, stake_enabled } =
+  const { community_id, stake_token, stake_id, stake_scaler, stake_enabled } =
     communityStake;
 
-  const [newCommunityStake]: CommunityStakeAttributes =
-    await this.models.CommunityStake.upsert({
+  const [newCommunityStake] = await this.models.CommunityStake.findOrCreate({
+    where: { community_id },
+    defaults: {
       community_id,
       stake_token,
+      stake_id,
       stake_scaler,
       stake_enabled,
-    });
+    },
+  });
 
   return newCommunityStake;
 }
