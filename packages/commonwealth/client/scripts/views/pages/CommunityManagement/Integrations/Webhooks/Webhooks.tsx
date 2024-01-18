@@ -1,6 +1,7 @@
 import { WebhookCategory } from '@hicommonwealth/core';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
+import getLinkType from 'helpers/linkType';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import Webhook from 'models/Webhook';
 import React, { useState } from 'react';
@@ -146,13 +147,6 @@ const Webhooks = () => {
     }
   };
 
-  const getLinkType = (link: string) => {
-    if (link.includes('discord.com')) return 'discord';
-    if (link.includes('slack.com')) return 'slack';
-    if (link.includes('telegram.com')) return 'telegram';
-    return '';
-  };
-
   return (
     <>
       <section className="Webhooks">
@@ -179,7 +173,7 @@ const Webhooks = () => {
                   <CWTag
                     label={getLinkType(webhook.value)}
                     type="group"
-                    classNames={getLinkType(webhook.value)}
+                    classNames="link-type"
                   />
                 ) : (
                   ''
