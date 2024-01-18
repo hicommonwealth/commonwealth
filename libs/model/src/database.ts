@@ -1,7 +1,5 @@
-import { DataTypes, Sequelize } from 'sequelize';
-import { DATABASE_URI } from './config';
-
 import { logger } from '@hicommonwealth/core';
+import { DataTypes, Sequelize } from 'sequelize';
 import type { DB, Models } from './models';
 import AddressFactory from './models/address';
 import BanFactory from './models/ban';
@@ -43,6 +41,12 @@ import WebhookFactory from './models/webhook';
 
 const log = logger().getLogger(__filename);
 
+export const DATABASE_URI = process.env.USES_DOCKER_DB
+  ? 'postgresql://commonwealth:edgeware@postgres/commonwealth' // this is because url will be hidden in CI.yaml
+  : !process.env.DATABASE_URL || process.env.NODE_ENV === 'development'
+  ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
+  : process.env.DATABASE_URL;
+
 export const sequelize = new Sequelize(DATABASE_URI, {
   // disable string operators (https://github.com/sequelize/sequelize/issues/8417)
   // operatorsAliases: false,
@@ -67,7 +71,7 @@ export const sequelize = new Sequelize(DATABASE_URI, {
   },
 });
 
-const models: Models = {
+const _models: Models = {
   Address: AddressFactory(sequelize, DataTypes),
   Ban: BanFactory(sequelize, DataTypes),
   Community: ChainFactory(sequelize, DataTypes),
@@ -113,17 +117,14 @@ const models: Models = {
   Webhook: WebhookFactory(sequelize, DataTypes),
 };
 
-const db: DB = {
+export const models: DB = {
   sequelize,
   Sequelize,
-  ...models,
+  ..._models,
 };
 
 // setup associations
-Object.keys(models).forEach((modelName) => {
-  if ('associate' in db[modelName]) {
-    db[modelName].associate(db);
-  }
+Object.keys(_models).forEach((key) => {
+  const model = _models[key as keyof Models];
+  'associate' in model && model.associate(models);
 });
-
-export default db;

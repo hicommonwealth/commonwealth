@@ -8,6 +8,8 @@ import {
   NotificationCategories,
   logger,
 } from '@hicommonwealth/core';
+import type { UserAttributes } from '@hicommonwealth/model';
+import { AddressAttributes, DB } from '@hicommonwealth/model';
 import { capitalize } from 'lodash';
 import { Op, WhereOptions } from 'sequelize';
 import { Label as ChainEventLabel } from '../../shared/chain/labelers/util';
@@ -19,9 +21,6 @@ import {
   smartTrim,
 } from '../../shared/utils';
 import { SENDGRID_API_KEY } from '../config';
-import { DB } from '../models';
-import { AddressAttributes } from '../models/address';
-import type { UserAttributes } from '../models/user';
 
 const log = logger().getLogger(__filename);
 

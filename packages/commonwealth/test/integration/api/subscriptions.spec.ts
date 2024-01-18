@@ -4,12 +4,11 @@ import { NotificationCategories } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 
+import { models, SubscriptionValidationErrors } from '@hicommonwealth/model';
 import jwt from 'jsonwebtoken';
 import type NotificationSubscription from '../../../client/scripts/models/NotificationSubscription';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import models from '../../../server/database';
-import { SubscriptionValidationErrors } from '../../../server/models/subscription';
 import Errors from '../../../server/routes/subscription/errors';
 import * as modelUtils from '../../util/modelUtils';
 

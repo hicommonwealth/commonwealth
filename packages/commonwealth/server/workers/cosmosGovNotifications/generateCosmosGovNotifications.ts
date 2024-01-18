@@ -1,5 +1,5 @@
 import { logger } from '@hicommonwealth/core';
-import models from '../../database';
+import { models } from '@hicommonwealth/model';
 import { rollbar } from '../../util/rollbar';
 import {
   fetchLatestProposals,

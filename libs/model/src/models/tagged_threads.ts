@@ -15,7 +15,7 @@ export type TaggedThreadModelStatic = ModelStatic<TaggedThreadInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): TaggedThreadModelStatic => {
   const TaggedThread = <TaggedThreadModelStatic>sequelize.define(
     'TaggedThread',
@@ -29,7 +29,7 @@ export default (
       underscored: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-    }
+    },
   );
   return TaggedThread;
 };

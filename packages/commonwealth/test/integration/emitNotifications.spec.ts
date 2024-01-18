@@ -5,12 +5,12 @@ import {
   SnapshotEventType,
   SupportedNetwork,
 } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { resetDatabase } from '../../server-test';
 import { JWT_SECRET } from '../../server/config';
-import models from '../../server/database';
 import emitNotifications from '../../server/util/emitNotifications';
 import * as modelUtils from '../util/modelUtils';
 import { JoinCommunityArgs } from '../util/modelUtils';

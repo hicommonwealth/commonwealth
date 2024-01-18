@@ -17,7 +17,7 @@ export type CommunityContractTemplateStatic =
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): CommunityContractTemplateStatic => {
   const CommunityContractTemplate = <CommunityContractTemplateStatic>(
     sequelize.define(
@@ -36,7 +36,7 @@ export default (
         tableName: 'CommunityContractTemplate',
         underscored: true,
         timestamps: false,
-      }
+      },
     )
   );
 
@@ -54,7 +54,7 @@ export default (
       {
         foreignKey: 'cctmd_id',
         targetKey: 'id',
-      }
+      },
     );
   };
 

@@ -14,7 +14,7 @@ export type SnapshotSpaceModelStatic = ModelStatic<SnapshotSpaceInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): SnapshotSpaceModelStatic => {
   const SnapshotSpaces = <SnapshotSpaceModelStatic>sequelize.define(
     'SnapshotSpaces',
@@ -33,7 +33,7 @@ export default (
       underscored: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-    }
+    },
   );
 
   return SnapshotSpaces;

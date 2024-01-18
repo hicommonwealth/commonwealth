@@ -1,4 +1,5 @@
 import { isDeliverTxSuccess } from '@cosmjs/stargate';
+import { models } from '@hicommonwealth/model';
 import chai from 'chai';
 import {
   encodeMsgSubmitProposal,
@@ -6,7 +7,6 @@ import {
 } from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
 import { Any } from 'cosmjs-types/google/protobuf/any';
 import sinon from 'sinon';
-import models from '../../../server/database';
 // eslint-disable-next-line max-len
 import { generateCosmosGovNotifications } from '../../../server/workers/cosmosGovNotifications/generateCosmosGovNotifications';
 import { deposit, sendTx, setupTestSigner } from './utils/helpers';

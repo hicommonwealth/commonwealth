@@ -1,4 +1,4 @@
-import models from '../server/database';
+import { models } from '@hicommonwealth/model';
 
 export async function recomputeCounts() {
   return models.sequelize.transaction(async (t) => {
@@ -17,7 +17,7 @@ export async function recomputeCounts() {
       FROM reactionCntByComment rc
       where rc.comment_id="Comments".id
       `,
-      { raw: true, transaction: t, logging: console.log }
+      { raw: true, transaction: t, logging: console.log },
     );
     console.timeEnd('Add comment reaction count');
 
@@ -37,7 +37,7 @@ export async function recomputeCounts() {
       FROM reactionCntByThread rc
       where rc.thread_id="Threads".id
       `,
-      { raw: true, transaction: t, logging: console.log }
+      { raw: true, transaction: t, logging: console.log },
     );
     console.timeEnd('Add thread reaction count');
 
@@ -57,7 +57,7 @@ export async function recomputeCounts() {
       FROM commentCntByThread cc
       where cc.thread_id="Threads".id
       `,
-      { raw: true, transaction: t, logging: console.log }
+      { raw: true, transaction: t, logging: console.log },
     );
     console.timeEnd('Add thread comment count');
 
@@ -78,7 +78,7 @@ export async function recomputeCounts() {
       where mn.thread_id="Threads".id
       
       `,
-      { raw: true, transaction: t, logging: console.log }
+      { raw: true, transaction: t, logging: console.log },
     );
     console.timeEnd('Add thread max notification id');
   });

@@ -5,9 +5,9 @@ import {
   SupportedNetwork,
   logger,
 } from '@hicommonwealth/core';
+import { DB } from '@hicommonwealth/model';
 import Rollbar from 'rollbar';
 import { EventKind, coinToCoins } from '../../../shared/chain/types/cosmos';
-import { DB } from '../../models';
 import emitNotifications from '../../util/emitNotifications';
 import { AllCosmosProposals } from './proposalFetching/types';
 

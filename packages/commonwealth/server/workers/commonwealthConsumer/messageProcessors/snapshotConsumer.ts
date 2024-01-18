@@ -5,8 +5,8 @@ import {
   SnapshotEventType,
   stats,
 } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import axios from 'axios';
-import type { DB } from '../../../models';
 import emitNotifications from '../../../util/emitNotifications';
 
 export async function processSnapshotMessage(

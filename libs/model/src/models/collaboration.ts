@@ -31,7 +31,7 @@ export type CollaborationModelStatic = ModelStatic<CollaborationInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ) => {
   const Collaboration = <CollaborationModelStatic>sequelize.define(
     'Collaboration',
@@ -55,7 +55,7 @@ export default (
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       underscored: true,
-    }
+    },
   );
 
   Collaboration.associate = (models) => {

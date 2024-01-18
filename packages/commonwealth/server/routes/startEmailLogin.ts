@@ -1,5 +1,6 @@
 import { AppError } from '@hicommonwealth/adapters';
 import { DynamicTemplate, WalletId, logger } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
@@ -11,7 +12,6 @@ import {
   SENDGRID_API_KEY,
 } from '../config';
 import { validateCommunity } from '../middleware/validateCommunity';
-import type { DB } from '../models';
 
 sgMail.setApiKey(SENDGRID_API_KEY);
 const log = logger().getLogger(__filename);

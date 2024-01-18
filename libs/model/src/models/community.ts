@@ -62,7 +62,7 @@ export type CommunityAttributes = {
   Threads?: ThreadAttributes[] | ThreadAttributes['id'][];
   Comments?: CommentAttributes[] | CommentAttributes['id'][];
   Users?: UserAttributes[] | UserAttributes['id'][];
-  ChainObjectVersion?; // TODO
+  ChainObjectVersion?: any; // TODO
   Contract?: ContractInstance;
 
   created_at?: Date;

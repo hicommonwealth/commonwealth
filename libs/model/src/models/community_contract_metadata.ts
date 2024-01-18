@@ -22,7 +22,7 @@ export type CommunityContractTemplateMetadataStatic =
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): CommunityContractTemplateMetadataStatic => {
   const CommunityContractTemplateMetadata = <
     CommunityContractTemplateMetadataStatic
@@ -46,7 +46,7 @@ export default (
       timestamps: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-    }
+    },
   );
 
   return CommunityContractTemplateMetadata;

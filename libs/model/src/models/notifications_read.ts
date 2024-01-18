@@ -21,7 +21,7 @@ export type NotificationsReadModelStatic =
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): NotificationsReadModelStatic => {
   const NotificationsRead = <NotificationsReadModelStatic>sequelize.define(
     'NotificationsRead',
@@ -40,7 +40,7 @@ export default (
       underscored: true,
       timestamps: false,
       indexes: [{ fields: ['subscription_id'] }],
-    }
+    },
   );
 
   NotificationsRead.associate = (models) => {

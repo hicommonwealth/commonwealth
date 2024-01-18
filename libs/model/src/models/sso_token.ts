@@ -21,7 +21,7 @@ export type SsoTokenModelStatic = ModelStatic<SsoTokenInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): SsoTokenModelStatic => {
   const SsoToken = <SsoTokenModelStatic>sequelize.define(
     'SsoToken',
@@ -55,7 +55,7 @@ export default (
       scopes: {
         withPrivateData: {},
       },
-    }
+    },
   );
 
   SsoToken.associate = (models) => {

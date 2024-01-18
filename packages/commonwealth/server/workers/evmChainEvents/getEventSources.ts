@@ -1,9 +1,11 @@
+import {
+  ChainNodeAttributes,
+  ContractAbiAttributes,
+  ContractAttributes,
+  EvmEventSourceAttributes,
+  models,
+} from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
-import models from '../../database';
-import { ChainNodeAttributes } from '../../models/chain_node';
-import { ContractAttributes } from '../../models/contract';
-import { ContractAbiAttributes } from '../../models/contract_abi';
-import { EvmEventSourceAttributes } from '../../models/evmEventSource';
 import { EvmSources } from './types';
 
 /**

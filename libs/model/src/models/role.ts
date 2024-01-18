@@ -1,12 +1,9 @@
-import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
-import type { ModelInstance, ModelStatic } from './types';
 
 export type Role = 'admin' | 'moderator' | 'member';
 
-export function isRole(role): boolean {
+export function isRole(role: Role): boolean {
   return role === 'admin' || role === 'moderator' || role === 'member';
 }
 

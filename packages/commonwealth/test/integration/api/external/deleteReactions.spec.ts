@@ -1,6 +1,6 @@
+import { models } from '@hicommonwealth/model';
 import chai from 'chai';
 import jwt from 'jsonwebtoken';
-import models from 'server/database';
 import { Op } from 'sequelize';
 import { JWT_SECRET } from '../../../../server/config';
 import { del, post } from './appHook.spec';
@@ -18,11 +18,11 @@ describe('deleteReactions Tests', () => {
   beforeEach(() => {
     jwtToken = jwt.sign(
       { id: testUsers[0].id, email: testUsers[0].email },
-      JWT_SECRET
+      JWT_SECRET,
     );
     jwtTokenUser2 = jwt.sign(
       { id: testUsers[1].id, email: testUsers[1].email },
-      JWT_SECRET
+      JWT_SECRET,
     );
   });
 
@@ -33,7 +33,7 @@ describe('deleteReactions Tests', () => {
       await models.Reaction.count({
         where: { id: { [Op.in]: [smallestId - 1, smallestId - 2] } },
       }),
-      0
+      0,
     );
 
     let resp = await post('/api/reactions', {
@@ -59,7 +59,7 @@ describe('deleteReactions Tests', () => {
       await models.Reaction.count({
         where: { id: { [Op.in]: [smallestId - 1, smallestId - 2] } },
       }),
-      2
+      2,
     );
 
     resp = await del('/api/reactions', {
@@ -72,7 +72,7 @@ describe('deleteReactions Tests', () => {
       await models.Reaction.count({
         where: { id: { [Op.in]: [smallestId - 1, smallestId - 2] } },
       }),
-      0
+      0,
     );
   });
 
@@ -83,7 +83,7 @@ describe('deleteReactions Tests', () => {
       await models.Reaction.count({
         where: { id: { [Op.in]: [smallestId - 3, smallestId - 4] } },
       }),
-      0
+      0,
     );
 
     let resp = await post('/api/reactions', {
@@ -109,13 +109,13 @@ describe('deleteReactions Tests', () => {
       await models.Reaction.count({
         where: { id: { [Op.in]: [smallestId - 3, smallestId - 4] } },
       }),
-      2
+      2,
     );
 
     resp = await del(
       '/api/reactions',
       { jwt: jwtTokenUser2, ids: [smallestId - 3, smallestId - 4] },
-      true
+      true,
     );
 
     chai.assert.deepEqual(resp.result.error.unownedAddresses, [
@@ -125,7 +125,7 @@ describe('deleteReactions Tests', () => {
       await models.Reaction.count({
         where: { id: { [Op.in]: [smallestId - 3, smallestId - 4] } },
       }),
-      2
+      2,
     );
   });
 
@@ -136,7 +136,7 @@ describe('deleteReactions Tests', () => {
         jwt: jwtToken,
         reactions: [{ bad: 3 }],
       },
-      true
+      true,
     );
 
     chai.assert.equal(resp.status, 'Failure');
@@ -148,7 +148,7 @@ describe('deleteReactions Tests', () => {
       {
         reactions: [{}],
       },
-      true
+      true,
     );
 
     chai.assert.equal(resp.statusCode, 401);

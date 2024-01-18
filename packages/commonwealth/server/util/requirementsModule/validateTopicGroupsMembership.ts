@@ -1,8 +1,10 @@
+import {
+  AddressAttributes,
+  CommunityInstance,
+  DB,
+  MembershipRejectReason,
+} from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import { DB } from '../../models';
-import { AddressAttributes } from '../../models/address';
-import { CommunityInstance } from '../../models/community';
-import { MembershipRejectReason } from '../../models/membership';
 import { TokenBalanceCache } from '../tokenBalanceCache/tokenBalanceCache';
 import { refreshMembershipsForAddress } from './refreshMembershipsForAddress';
 
