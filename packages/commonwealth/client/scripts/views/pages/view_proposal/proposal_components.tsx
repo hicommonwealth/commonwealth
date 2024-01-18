@@ -71,7 +71,8 @@ type ProposalSubheaderProps = {
 export const ProposalSubheader = (props: ProposalSubheaderProps) => {
   const { onModalClose, proposal, toggleVotingModal, votingModalOpen } = props;
   const forceRerender = useForceRerender();
-  const [linkedThreads, setLinkedThreads] = useState(null);
+  const [linkedThreads, setLinkedThreads] =
+    useState<{ id: number; title: string }[]>(null);
 
   useEffect(() => {
     app.proposalEmitter.on('redraw', forceRerender);

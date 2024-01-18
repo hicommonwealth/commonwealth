@@ -9,16 +9,14 @@
     "esModuleInterop": true,
     "downlevelIteration": true,
     "traceResolution": false,
+    "baseUrl": ".",
     "paths": {
-      "common-common": ["./packages/common-common"],
-      "common-common/*": ["./packages/common-common/*"],
-      "chain-testing/*": [
-        "./packages/commonwealth/test/util/evm-chain-testing/*"
-      ],
-      "token-balance-cache": ["./packages/token-balance-cache"],
-      "token-balance-cache/*": ["./packages/token-balance-cache/*"],
-      "discord-bot": ["./packages/discord-bot"],
-      "discord-bot/*": ["./packages/discord-bot/*"]
+      "@hicommonwealth/*": ["libs/*/src"]
     }
+  },
+  "include": [],
+  "exclude": ["node_modules", "**/build"],
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
   }
 }

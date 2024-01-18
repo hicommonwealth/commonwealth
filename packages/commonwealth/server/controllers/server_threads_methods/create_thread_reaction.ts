@@ -1,14 +1,12 @@
+import { AppError } from '@hicommonwealth/adapters';
+import { NotificationCategories } from '@hicommonwealth/core';
 import {
-  ChainNetwork,
-  ChainType,
-  NotificationCategories,
-} from '@hicommonwealth/core';
-import { AppError } from '../../../../common-common/src/errors';
+  AddressInstance,
+  CommunityInstance,
+  ReactionAttributes,
+  UserInstance,
+} from '@hicommonwealth/model';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/community';
-import { ReactionAttributes } from '../../models/reaction';
-import { UserInstance } from '../../models/user';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_methods/track';
@@ -79,31 +77,24 @@ export async function __createThreadReaction(
   }
 
   // check balance (bypass for admin)
-  if (
-    community &&
-    (community.type === ChainType.Token ||
-      community.network === ChainNetwork.Ethereum)
-  ) {
-    const isAdmin = await validateOwner({
-      models: this.models,
-      user,
-      communityId: community.id,
-      entity: thread,
-      allowAdmin: true,
-      allowGodMode: true,
-    });
-    if (!isAdmin) {
-      const { isValid, message } = await validateTopicGroupsMembership(
-        this.models,
-        this.tokenBalanceCacheV1,
-        this.tokenBalanceCacheV2,
-        thread.topic_id,
-        community,
-        address,
-      );
-      if (!isValid) {
-        throw new AppError(`${Errors.FailedCreateReaction}: ${message}`);
-      }
+  const isAdmin = await validateOwner({
+    models: this.models,
+    user,
+    communityId: community.id,
+    entity: thread,
+    allowAdmin: true,
+    allowGodMode: true,
+  });
+  if (!isAdmin) {
+    const { isValid, message } = await validateTopicGroupsMembership(
+      this.models,
+      this.tokenBalanceCache,
+      thread.topic_id,
+      community,
+      address,
+    );
+    if (!isValid) {
+      throw new AppError(`${Errors.FailedCreateReaction}: ${message}`);
     }
   }
 
@@ -111,7 +102,7 @@ export async function __createThreadReaction(
   const reactionData: ReactionAttributes = {
     reaction,
     address_id: address.id,
-    chain: community.id,
+    community_id: community.id,
     thread_id: thread.id,
     canvas_action: canvasAction,
     canvas_session: canvasSession,
@@ -140,7 +131,7 @@ export async function __createThreadReaction(
         thread_id: thread.id,
         root_title: thread.title,
         root_type: 'discussion',
-        chain_id: finalReaction.chain,
+        chain_id: finalReaction.community_id,
         author_address: finalReaction.Address.address,
         author_chain: finalReaction.Address.community_id,
       },

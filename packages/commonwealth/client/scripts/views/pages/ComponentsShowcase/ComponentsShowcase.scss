@@ -1,0 +1,116 @@
+@import '../../../../styles/shared';
+
+.ComponentsShowcase {
+  display: flex;
+  height: calc(100vh - #{$global-header-height});
+
+  .page-sidebar {
+    width: 224px;
+    padding: 24px;
+    overflow-y: auto;
+    box-shadow: 0 0 10px 0 $neutral-200;
+
+    @include extraSmall {
+      display: none;
+    }
+
+    .list-header {
+      text-transform: uppercase;
+      color: $neutral-400;
+      padding: 6px 12px;
+    }
+
+    .list-item {
+      padding: 6px 12px;
+      font-size: 14px;
+    }
+  }
+
+  .page-body {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+
+    & > .CWBanner {
+      margin-bottom: 16px;
+    }
+
+    .page-header {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .showcase-body-divider {
+      margin-block: 40px;
+    }
+
+    .component-header {
+      margin-bottom: 16px;
+    }
+
+    .component-content {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: start;
+    }
+  }
+
+  .flex-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-block: 8px;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .flex-column {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: center;
+    align-items: start;
+    margin-block: 8px;
+    width: 100%;
+  }
+
+  .BannersAndAlerts {
+    .CWBanner,
+    .MessageBanner,
+    .TermsBanner {
+      width: 100%;
+    }
+
+    .MessageBanner,
+    .TermsBanner {
+      width: 100%;
+      margin-left: unset !important;
+      padding-left: 16px !important;
+    }
+  }
+
+  .Colors {
+    .ColorCard {
+      @include extraSmall {
+        width: 48%;
+      }
+
+      .color-field {
+        height: 80px;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+      }
+
+      .color-info {
+        width: 100%;
+        padding: 12px;
+        box-shadow: 0 4px 6px -2px rgba(16, 24, 40, 0.3);
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+      }
+    }
+  }
+}

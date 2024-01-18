@@ -23,6 +23,7 @@ import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps'
 import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
+
 import {
   createDeltaFromText,
   ReactQuillEditor,
@@ -31,6 +32,7 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { AvatarUpload } from '../Avatar';
 import CommunityStakeBanner from '../CommunityStakeBanner';
+import UpvotePopover from '../UpvotePopover';
 import { CWCard } from './cw_card';
 import { CWCheckbox } from './cw_checkbox';
 import { CWCollapsible } from './cw_collapsible';
@@ -54,6 +56,7 @@ import { CWThreadAction } from './new_designs/cw_thread_action';
 import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
 import { CWUpvote } from './new_designs/cw_upvote';
 import { CWCircleButton } from './new_designs/CWCircleButton/CWCircleButton';
+import CWDrawer from './new_designs/CWDrawer';
 import { CWForm } from './new_designs/CWForm';
 import CWIconButton from './new_designs/CWIconButton';
 import { CWModal, CWModalBody, CWModalHeader } from './new_designs/CWModal';
@@ -238,6 +241,9 @@ export const ComponentShowcase = () => {
 
   const unstyledPopoverProps = usePopover();
   const styledPopoverProps = usePopover();
+  const upvotePopoverProps = usePopover();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isLeftDrawerOpen, setIsLeftDrawerOpen] = useState(false);
 
   const renderModal = (size?: ModalSize) => {
     return (
@@ -377,6 +383,30 @@ export const ComponentShowcase = () => {
             title="Title"
             body={<div>This is body in styled popover</div>}
             {...styledPopoverProps}
+          />
+        </div>
+      </div>
+      <div className="basic-gallery">
+        <CWText type="h3">Upvote Popover</CWText>
+        <div
+          className="upvote-popover-wrapper"
+          onMouseEnter={upvotePopoverProps.handleInteraction}
+          onMouseLeave={upvotePopoverProps.handleInteraction}
+        >
+          <CWIconButton buttonSize="med" iconName="infoEmpty" />
+          <UpvotePopover
+            upvoters={[
+              '0x4d9E3fEEe018eD9bD86f0F9D61C682E2e97e777F',
+              '0x7C06900b29462995EB25525B87Ff5267016E49E2',
+              '0x6d3735749DfD7dA2A5f6528fC39938aF1760e6a4',
+              '0xe5B4c6C331Bbc6E2a2017a29E8e1D0754354b6cF',
+              '0x7A7C614EDFA324d61F5E897f085c18E007aE3dFf',
+              '0x04eE16f6FFD615eB448e8d939Dbcf28a2e064f0b',
+              '0x8Ae9b627637eaFeF5eC2E39b8A88b40bAA66af81',
+              '0xcB565Ee70934c5887F9459fb0Dcec6ADD7F43CF2',
+              '0xFcC142B9f39A9379B2D3f2621b67e10A907FeFF8',
+            ]}
+            {...upvotePopoverProps}
           />
         </div>
       </div>
@@ -2138,6 +2168,51 @@ export const ComponentShowcase = () => {
           stakeValue={0.072}
           denomination="ETH"
         />
+      </div>
+      <div className="drawer-container">
+        <CWButton
+          buttonHeight="sm"
+          label="Open Default Drawer"
+          onClick={() => setIsDrawerOpen(true)}
+        />
+
+        <CWDrawer
+          open={isDrawerOpen}
+          header="Lorem Ipsum"
+          onClose={() => setIsDrawerOpen(false)}
+        >
+          <div>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis
+            porttitor vel erat nec eleifend. Nullam sit amet dui et eros luctus
+            facilisis et id eros. In a lacus in nisl facilisis euismod. In non
+            congue sapien. Donec quis lorem libero. Nunc malesuada nunc ac eros
+            sodales sodales. Nullam tempus justo ut consectetur lacinia.
+            Vestibulum non dui vel ante molestie gravida. Maecenas sed consequat
+            tellus, ac fermentum ex.
+          </div>
+        </CWDrawer>
+
+        <CWButton
+          buttonHeight="sm"
+          label="Open Left Drawer"
+          onClick={() => setIsLeftDrawerOpen(true)}
+        />
+        <CWDrawer
+          open={isLeftDrawerOpen}
+          header="Lorem Ipsum"
+          onClose={() => setIsLeftDrawerOpen(false)}
+          direction="left"
+        >
+          <div>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis
+            porttitor vel erat nec eleifend. Nullam sit amet dui et eros luctus
+            facilisis et id eros. In a lacus in nisl facilisis euismod. In non
+            congue sapien. Donec quis lorem libero. Nunc malesuada nunc ac eros
+            sodales sodales. Nullam tempus justo ut consectetur lacinia.
+            Vestibulum non dui vel ante molestie gravida. Maecenas sed consequat
+            tellus, ac fermentum ex.
+          </div>
+        </CWDrawer>
       </div>
     </div>
   );

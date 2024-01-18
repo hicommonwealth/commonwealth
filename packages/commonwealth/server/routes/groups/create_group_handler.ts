@@ -1,9 +1,9 @@
+import { AppError } from '@hicommonwealth/adapters';
+import { Requirement } from '@hicommonwealth/core';
+import { GroupAttributes, GroupMetadata } from '@hicommonwealth/model';
 import z from 'zod';
-import { AppError } from '../../../../common-common/src/errors';
-import { GroupAttributes, GroupMetadata } from '../../models/group';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
-import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 
 type CreateGroupBody = {
   metadata: GroupMetadata;
@@ -17,7 +17,7 @@ export const createGroupHandler = async (
   req: TypedRequestBody<CreateGroupBody>,
   res: TypedResponse<CreateGroupResponse>,
 ) => {
-  const { user, address, chain: community } = req;
+  const { user, address, community } = req;
 
   const schema = z.object({
     body: z.object({

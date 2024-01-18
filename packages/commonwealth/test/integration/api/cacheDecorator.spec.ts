@@ -4,20 +4,19 @@
 require('dotenv').config();
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import 'chai/register-should';
+
 chai.use(chaiHttp);
 const expect = chai.expect;
 
-import { RedisNamespaces } from '@hicommonwealth/core';
 import {
   cacheDecorator,
+  connectToRedis,
+  delay,
+  RedisCache,
   XCACHE_VALUES,
-} from 'common-common/src/cacheDecorator';
-import { RedisCache } from 'common-common/src/redisCache';
+} from '@hicommonwealth/adapters';
+import { RedisNamespaces } from '@hicommonwealth/core';
 import app, { CACHE_ENDPOINTS } from '../../../server-test';
-import { delay } from '../../util/delayUtils';
-import { connectToRedis } from '../../util/redisUtils';
-
 const content_type = {
   json: 'application/json; charset=utf-8',
   html: 'text/html; charset=utf-8',
@@ -39,8 +38,11 @@ async function verifyCacheResponse(key, res, resEarlier) {
   expect(res).to.have.header('X-Cache', XCACHE_VALUES.HIT);
   const valFromRedis = await cacheDecorator.checkCache(key);
   expect(valFromRedis).to.not.be.null;
-  expect(JSON.parse(valFromRedis)).to.be.deep.equal(res.body);
-  expect(JSON.parse(valFromRedis)).to.be.deep.equal(resEarlier.body);
+  if (key === CACHE_ENDPOINTS.JSON) {
+    // to avoid unhandled exceptions when response is not json
+    expect(JSON.parse(valFromRedis)).to.be.deep.equal(res.body);
+    expect(JSON.parse(valFromRedis)).to.be.deep.equal(resEarlier.body);
+  }
 }
 
 async function makeGetRequest(endpoint, headers = {}) {

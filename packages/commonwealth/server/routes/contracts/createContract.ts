@@ -1,17 +1,18 @@
+import { AppError } from '@hicommonwealth/adapters';
 import type { ContractType } from '@hicommonwealth/core';
-import { AppError } from 'common-common/src/errors';
-import { Transaction } from 'sequelize';
-import type { ContractAbiInstance } from 'server/models/contract_abi';
-import { AbiType } from '../../../shared/types';
-import type { DB } from '../../models';
-import type { ChainNodeAttributes } from '../../models/chain_node';
+import { AbiType } from '@hicommonwealth/core';
 import type {
+  ChainNodeAttributes,
+  ContractAbiInstance,
   ContractAttributes,
   ContractInstance,
-} from '../../models/contract';
+  DB,
+} from '@hicommonwealth/model';
+import { hashAbi } from '@hicommonwealth/model';
+import { Transaction } from 'sequelize';
 import type { TypedRequestBody, TypedResponse } from '../../types';
 import { success } from '../../types';
-import validateAbi, { hashAbi } from '../../util/abiValidation';
+import validateAbi from '../../util/abiValidation';
 import { validateOwner } from '../../util/validateOwner';
 
 export const Errors = {
@@ -142,7 +143,7 @@ const createContract = async (
     // contract already exists so attempt to add it to the community if it's not already there
     await models.CommunityContract.findOrCreate({
       where: {
-        chain_id,
+        community_id: chain_id,
         contract_id: oldContract.id,
       },
     });
@@ -190,7 +191,7 @@ const createContract = async (
 
       await models.CommunityContract.create(
         {
-          chain_id,
+          community_id: chain_id,
           contract_id: contract.id,
         },
         { transaction: t },
@@ -223,7 +224,7 @@ const createContract = async (
       });
       await models.CommunityContract.create(
         {
-          chain_id,
+          community_id: chain_id,
           contract_id: contract.id,
         },
         { transaction: t },

@@ -7,7 +7,7 @@ android
 *.github
 *.env
 *node_modules
-packages/common-common/src/cosmos-ts
+libs/chains/src/cosmos-ts
 capacitor.config.ts
 *.mocharc.json
 *.nycrc

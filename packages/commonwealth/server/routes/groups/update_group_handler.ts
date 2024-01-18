@@ -1,9 +1,9 @@
-import { GroupAttributes, GroupMetadata } from 'server/models/group';
+import { AppError } from '@hicommonwealth/adapters';
+import { Requirement } from '@hicommonwealth/core';
+import { GroupAttributes, GroupMetadata } from '@hicommonwealth/model';
 import z from 'zod';
-import { AppError } from '../../../../common-common/src/errors';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
-import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 
 type UpdateGroupParams = { id: string };
 type UpdateGroupBody = {
@@ -18,7 +18,7 @@ export const updateGroupHandler = async (
   req: TypedRequest<UpdateGroupBody, null, UpdateGroupParams>,
   res: TypedResponse<UpdateGroupResponse>,
 ) => {
-  const { user, address, chain: community } = req;
+  const { user, address, community } = req;
 
   const schema = z.object({
     params: z.object({

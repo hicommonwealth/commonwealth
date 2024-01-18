@@ -1,6 +1,6 @@
 import React from 'react';
 import { getClasses } from 'views/components/component_kit/helpers';
-import { SPECIFICATIONS, TOKENS } from '../../../../common/constants';
+import { ERC_SPECIFICATIONS, TOKENS } from '../../../../common/constants';
 import { InfoBlock } from './InfoBlock';
 import './RequirementCard.scss';
 
@@ -21,7 +21,7 @@ const RequirementCard = ({
   requirementAmount,
   requirementTokenId,
 }: RequirementCardProps) => {
-  const is1155Requirement = requirementType === SPECIFICATIONS.ERC_1155;
+  const is1155Requirement = requirementType === ERC_SPECIFICATIONS.ERC_1155;
   const isTokenRequirement = Object.values(TOKENS).includes(requirementType);
 
   return (

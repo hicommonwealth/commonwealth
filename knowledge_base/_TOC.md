@@ -25,11 +25,13 @@
 ## Services & Tooling
 
 - [Analytics (Mixpanel)](Analytics.md)
+- [Datadog](Datadog.md)
 - [Custom Domains](Custom-Domains.md)
 - [Devnet (Cosmos)](Devnet.md)
 - [Discobot](Discobot.md)
 - [EVM Overview and Docs](Chain-Testing-Overview.md)
 - [Package.json Scripts](Package-Scripts.md)
+- [Rollbar](Rollbar.md)
 - [Testing Environments](Testing-Environments.md)
 - [Wallet Support](Wallet-Support.md)
 

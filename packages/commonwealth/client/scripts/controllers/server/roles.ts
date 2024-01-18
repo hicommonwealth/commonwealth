@@ -1,6 +1,5 @@
+import { AccessLevel } from '@hicommonwealth/core';
 import app from 'state';
-
-import { AccessLevel } from 'permissions';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import RoleInfo from '../../models/RoleInfo';
@@ -27,6 +26,7 @@ export class RolesController {
       if (!roleIds.includes(role.id)) {
         role.address = role.Address.address;
         role.address_chain = role.Address.community_id;
+        role.last_active = role.Address.last_active;
         delete role.Address;
         this._roles.push(role);
       }

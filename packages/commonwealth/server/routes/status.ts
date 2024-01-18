@@ -1,19 +1,18 @@
-import type { ChainCategoryType } from '@hicommonwealth/core';
-import { ServerError } from 'common-common/src/errors';
+import { ServerError } from '@hicommonwealth/adapters';
+import { CommunityCategoryType } from '@hicommonwealth/core';
+import type {
+  AddressInstance,
+  CommunityInstance,
+  DB,
+  EmailNotificationInterval,
+  NotificationCategoryInstance,
+  StarredCommunityAttributes,
+  UserInstance,
+} from '@hicommonwealth/model';
+import { ThreadAttributes, sequelize } from '@hicommonwealth/model';
 import jwt from 'jsonwebtoken';
 import { Op, QueryTypes } from 'sequelize';
-import type { AddressInstance } from 'server/models/address';
-import type { NotificationCategoryInstance } from 'server/models/notification_category';
-import type { StarredCommunityAttributes } from 'server/models/starred_community';
-import type {
-  EmailNotificationInterval,
-  UserInstance,
-} from 'server/models/user';
 import { ETH_RPC, JWT_SECRET } from '../config';
-import { sequelize } from '../database';
-import type { DB } from '../models';
-import type { CommunityInstance } from '../models/community';
-import { ThreadAttributes } from '../models/thread';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 import type { RoleInstanceWithPermission } from '../util/roles';
@@ -43,7 +42,7 @@ type StatusResp = {
   };
   evmTestEnv?: string;
   enforceSessionKeys?: boolean;
-  chainCategoryMap: { [chain: string]: ChainCategoryType[] };
+  chainCategoryMap: { [chain: string]: CommunityCategoryType[] };
 };
 
 const getChainStatus = async (models: DB) => {
@@ -54,10 +53,10 @@ const getChainStatus = async (models: DB) => {
     models.NotificationCategory.findAll(),
   ]);
 
-  const chainCategories: { [chain: string]: ChainCategoryType[] } = {};
+  const chainCategories: { [chain: string]: CommunityCategoryType[] } = {};
   for (const chain of chains) {
     if (chain.category !== null) {
-      chainCategories[chain.id] = chain.category as ChainCategoryType[];
+      chainCategories[chain.id] = chain.category as CommunityCategoryType[];
     }
   }
 
@@ -68,12 +67,11 @@ const getChainStatus = async (models: DB) => {
   const threadCountQueryData: ThreadCountQueryData[] =
     await models.sequelize.query(
       `
-      SELECT "Threads".chain, COUNT("Threads".id)
+      SELECT "Threads".community_id as chain, COUNT("Threads".id)
       FROM "Threads"
       WHERE "Threads".created_at > :thirtyDaysAgo
       AND "Threads".deleted_at IS NULL
-      AND "Threads".chain IS NOT NULL
-      GROUP BY "Threads".chain;
+      GROUP BY "Threads".community_id;
       `,
       { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT },
     );
@@ -100,7 +98,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
           !!address.verified &&
           chains.map((c) => c.id).includes(address.community_id),
       ),
-      user.getSelectedChain(),
+      user.getSelectedCommunity(),
       user.isAdmin,
       user.disableRichText,
     ]);
@@ -147,14 +145,14 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     // add the chain and timestamp to replacements so that we can safely populate the query with dynamic parameters
     replacements.push(name, date);
     // append the SELECT query
-    query += `SELECT id, chain FROM "Threads" WHERE
-    chain = ? AND created_at > ? AND deleted_at IS NULL`;
+    query += `SELECT id, community_id FROM "Threads" WHERE
+    community_id = ? AND created_at > ? AND deleted_at IS NULL`;
     if (i === commsAndChains.length - 1) query += ';';
   }
 
   // populate the query replacements and execute the query
   const threadNumPromise = sequelize.query<
-    Pick<ThreadAttributes, 'id' | 'chain'>
+    Pick<ThreadAttributes, 'id' | 'community_id'>
   >(query, {
     raw: true,
     type: QueryTypes.SELECT,
@@ -172,13 +170,14 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
   // the set of activePosts is used to compare with the comments
   // under threads so that there are no duplicate active threads counted
   for (const thread of threadNum) {
-    if (!unseenPosts[thread.chain]) unseenPosts[thread.chain] = {};
-    unseenPosts[thread.chain].activePosts
-      ? unseenPosts[thread.chain].activePosts.add(thread.id)
-      : (unseenPosts[thread.chain].activePosts = new Set([thread.id]));
-    unseenPosts[thread.chain].threads
-      ? unseenPosts[thread.chain].threads++
-      : (unseenPosts[thread.chain].threads = 1);
+    if (!unseenPosts[thread.community_id])
+      unseenPosts[thread.community_id] = {};
+    unseenPosts[thread.community_id].activePosts
+      ? unseenPosts[thread.community_id].activePosts.add(thread.id)
+      : (unseenPosts[thread.community_id].activePosts = new Set([thread.id]));
+    unseenPosts[thread.community_id].threads
+      ? unseenPosts[thread.community_id].threads++
+      : (unseenPosts[thread.community_id].threads = 1);
   }
 
   // reset var
@@ -200,12 +199,12 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     // add the chain and timestamp to replacements so that we can safely populate the query with dynamic parameters
     replacements.push(name, date);
     // append the SELECT query
-    query += `SELECT thread_id, chain FROM "Comments" WHERE chain = ? AND created_at > ?`;
+    query += `SELECT thread_id, community_id FROM "Comments" WHERE community_id = ? AND created_at > ?`;
     if (i === commsAndChains.length - 1) query += ';';
   }
 
   // populate query and execute
-  const commentNum: { thread_id: string; chain: string }[] = <any>(
+  const commentNum: { thread_id: string; community_id: string }[] = <any>(
     await sequelize.query(query, {
       raw: true,
       type: QueryTypes.SELECT,
@@ -215,14 +214,15 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
 
   // iterates through the retrieved comments and adds each thread id to the activePosts set
   for (const comment of commentNum) {
-    if (!unseenPosts[comment.chain]) unseenPosts[comment.chain] = {};
+    if (!unseenPosts[comment.community_id])
+      unseenPosts[comment.community_id] = {};
     const id = comment.thread_id;
-    unseenPosts[comment.chain].activePosts
-      ? unseenPosts[comment.chain].activePosts.add(id)
-      : (unseenPosts[comment.chain].activePosts = new Set([id]));
-    unseenPosts[comment.chain].comments
-      ? unseenPosts[comment.chain].comments++
-      : (unseenPosts[comment.chain].comments = 1);
+    unseenPosts[comment.community_id].activePosts
+      ? unseenPosts[comment.community_id].activePosts.add(id)
+      : (unseenPosts[comment.community_id].activePosts = new Set([id]));
+    unseenPosts[comment.community_id].comments
+      ? unseenPosts[comment.community_id].comments++
+      : (unseenPosts[comment.community_id].comments = 1);
   }
 
   // set the activePosts to num in set

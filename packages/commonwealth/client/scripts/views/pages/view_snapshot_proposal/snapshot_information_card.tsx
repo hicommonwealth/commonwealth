@@ -53,7 +53,7 @@ const SnapshotInfoLinkRow = (props: SnapshotInfoLinkRowProps) => {
 
 type SnapshotInformationCardProps = {
   proposal: SnapshotProposal;
-  threads: Array<{ id: string; title: string }> | null;
+  threads: Array<{ id: number; title: string }> | null;
 };
 
 export const SnapshotInformationCard = ({

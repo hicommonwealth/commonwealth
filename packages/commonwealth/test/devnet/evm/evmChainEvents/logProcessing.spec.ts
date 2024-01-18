@@ -1,7 +1,8 @@
 import { Log } from '@ethersproject/providers';
+import { AbiType } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import models from '../../../../server/database';
 import {
   getEvents,
   getLogs,
@@ -13,10 +14,9 @@ import {
   EvmSource,
   RawEvmEvent,
 } from '../../../../server/workers/evmChainEvents/types';
-import { AbiType } from '../../../../shared/types';
 import {
-  aavePropCreatedSignature,
-  aavePropQueuedSignature,
+  compoundPropCreatedSignature,
+  compoundPropQueuedSignature,
   getEvmSecondsAndBlocks,
   localRpc,
   sdk,
@@ -39,7 +39,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
   before(async () => {
     const abiRes = await models.ContractAbi.findOne({
       where: {
-        nickname: 'AaveGovernanceV2',
+        nickname: 'FeiDAO',
       },
     });
 
@@ -104,19 +104,19 @@ describe('EVM Chain Events Log Processing Tests', () => {
     it('should restrict the maximum block range fetched to 500 blocks', async () => {
       expectAbi();
 
-      await sdk.getVotingPower(1, '400000', 'aave');
-      propCreatedResult = await sdk.createProposal(1, 'aave');
+      await sdk.getVotingPower(1, '400000');
+      propCreatedResult = await sdk.createProposal(1);
       await sdk.safeAdvanceTime(propCreatedResult.block + 501);
 
       // fetch logs
       const evmSource: EvmSource = {
         rpc: localRpc,
         contracts: {
-          [sdk.contractAddrs.aave.governance]: {
+          [sdk.contractAddrs.compound.governance]: {
             abi,
             sources: [
               {
-                event_signature: aavePropCreatedSignature,
+                event_signature: compoundPropCreatedSignature,
                 kind: 'proposal-created',
               },
             ],
@@ -138,11 +138,11 @@ describe('EVM Chain Events Log Processing Tests', () => {
       const evmSource: EvmSource = {
         rpc: localRpc,
         contracts: {
-          [sdk.contractAddrs.aave.governance]: {
+          [sdk.contractAddrs.compound.governance]: {
             abi,
             sources: [
               {
-                event_signature: aavePropCreatedSignature,
+                event_signature: compoundPropCreatedSignature,
                 kind: 'proposal-created',
               },
             ],
@@ -167,24 +167,21 @@ describe('EVM Chain Events Log Processing Tests', () => {
 
       let res = getEvmSecondsAndBlocks(3);
       await sdk.safeAdvanceTime(propCreatedResult.block + res.blocks);
-      await sdk.castVote(propCreatedResult.proposalId, 1, true, 'aave');
+      await sdk.castVote(propCreatedResult.proposalId, 1, true);
       res = getEvmSecondsAndBlocks(3);
       await sdk.advanceTime(String(res.secs), res.blocks);
 
-      propQueuedResult = await sdk.queueProposal(
-        propCreatedResult.proposalId,
-        'aave',
-      );
+      propQueuedResult = await sdk.queueProposal(propCreatedResult.proposalId);
 
       // fetch logs
       const evmSource: EvmSource = {
         rpc: localRpc,
         contracts: {
-          [sdk.contractAddrs.aave.governance]: {
+          [sdk.contractAddrs.compound.governance]: {
             abi,
             sources: [
               {
-                event_signature: aavePropQueuedSignature,
+                event_signature: compoundPropQueuedSignature,
                 kind: 'proposal-queued',
               },
             ],
@@ -217,10 +214,10 @@ describe('EVM Chain Events Log Processing Tests', () => {
       let evmSource: EvmSource = {
         rpc: localRpc,
         contracts: {
-          [sdk.contractAddrs.aave.governance]: {
+          [sdk.contractAddrs.compound.governance]: {
             sources: [
               {
-                event_signature: aavePropCreatedSignature,
+                event_signature: compoundPropCreatedSignature,
                 kind: 'proposal-created',
               },
             ],
@@ -234,11 +231,11 @@ describe('EVM Chain Events Log Processing Tests', () => {
       evmSource = {
         rpc: localRpc,
         contracts: {
-          [sdk.contractAddrs.aave.governance]: {
+          [sdk.contractAddrs.compound.governance]: {
             abi: 'invalid abi' as unknown as AbiType,
             sources: [
               {
-                event_signature: aavePropCreatedSignature,
+                event_signature: compoundPropCreatedSignature,
                 kind: 'proposal-created',
               },
             ],
@@ -252,11 +249,11 @@ describe('EVM Chain Events Log Processing Tests', () => {
       evmSource = {
         rpc: localRpc,
         contracts: {
-          [sdk.contractAddrs.aave.governance]: {
+          [sdk.contractAddrs.compound.governance]: {
             abi: [],
             sources: [
               {
-                event_signature: aavePropCreatedSignature,
+                event_signature: compoundPropCreatedSignature,
                 kind: 'proposal-created',
               },
             ],
@@ -274,11 +271,11 @@ describe('EVM Chain Events Log Processing Tests', () => {
       const evmSource: EvmSource = {
         rpc: localRpc,
         contracts: {
-          [sdk.contractAddrs.aave.governance]: {
+          [sdk.contractAddrs.compound.governance]: {
             abi,
             sources: [
               {
-                event_signature: aavePropCreatedSignature,
+                event_signature: compoundPropCreatedSignature,
                 kind: 'proposal-created',
               },
             ],
@@ -293,9 +290,9 @@ describe('EVM Chain Events Log Processing Tests', () => {
 
         removed: false,
 
-        address: sdk.contractAddrs.aave.governance.toLowerCase(),
+        address: sdk.contractAddrs.compound.governance.toLowerCase(),
         data: '0x1',
-        topics: [aavePropCreatedSignature],
+        topics: [compoundPropCreatedSignature],
         transactionHash: '0x1',
         logIndex: 1,
       };
@@ -312,7 +309,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
 
       expect(events.length).to.equal(1);
       expect(events[0].contractAddress).to.equal(
-        sdk.contractAddrs.aave.governance,
+        sdk.contractAddrs.compound.governance,
       );
       expect(events[0].kind).to.equal('proposal-created');
       expect(events[0].blockNumber).to.equal(
@@ -327,11 +324,11 @@ describe('EVM Chain Events Log Processing Tests', () => {
       const evmSource: EvmSource = {
         rpc: localRpc,
         contracts: {
-          [sdk.contractAddrs.aave.governance]: {
+          [sdk.contractAddrs.compound.governance]: {
             abi,
             sources: [
               {
-                event_signature: aavePropQueuedSignature,
+                event_signature: compoundPropQueuedSignature,
                 kind: 'proposal-queued',
               },
             ],
@@ -345,7 +342,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
       ]);
       expect(events.length).to.equal(1);
       expect(events[0].contractAddress).to.equal(
-        sdk.contractAddrs.aave.governance,
+        sdk.contractAddrs.compound.governance,
       );
       expect(events[0].kind).to.equal('proposal-queued');
       expect(events[0].blockNumber).to.equal(
@@ -372,15 +369,15 @@ describe('EVM Chain Events Log Processing Tests', () => {
       const evmSource: EvmSource = {
         rpc: localRpc,
         contracts: {
-          [sdk.contractAddrs.aave.governance]: {
+          [sdk.contractAddrs.compound.governance]: {
             abi,
             sources: [
               {
-                event_signature: aavePropQueuedSignature,
+                event_signature: compoundPropQueuedSignature,
                 kind: 'proposal-queued',
               },
               {
-                event_signature: aavePropCreatedSignature,
+                event_signature: compoundPropCreatedSignature,
                 kind: 'proposal-created',
               },
             ],
@@ -401,7 +398,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
       );
       expect(propCreatedEvent).to.exist;
       expect(propCreatedEvent.contractAddress).to.equal(
-        sdk.contractAddrs.aave.governance,
+        sdk.contractAddrs.compound.governance,
       );
       expect(propCreatedEvent.kind).to.equal('proposal-created');
       expect(propCreatedEvent.blockNumber).to.equal(
@@ -412,7 +409,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
       const propQueuedEvent = events.find((e) => e.kind === 'proposal-queued');
       expect(propQueuedEvent).to.exist;
       expect(propQueuedEvent.contractAddress).to.equal(
-        sdk.contractAddrs.aave.governance,
+        sdk.contractAddrs.compound.governance,
       );
       expect(propQueuedEvent.kind).to.equal('proposal-queued');
       expect(propQueuedEvent.blockNumber).to.equal(

@@ -1,12 +1,12 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
+import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-import type { DB } from '../models';
 import type ViewCountCache from '../util/viewCountCache';
 
 export const Errors = {
   NoObjectId: 'Must provide object ID',
-  NoChainOrComm: 'Must provide chain or community',
-  InvalidChainOrComm: 'Invalid chain or community',
+  NoCommunity: 'Must provide community',
+  CommunityNotFound: 'Community not found',
   InvalidThread: 'Invalid thread',
 };
 
@@ -15,25 +15,25 @@ const viewCount = async (
   cache: ViewCountCache,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.body.object_id) {
     return next(new AppError(Errors.NoObjectId));
   }
-  if (!req.body.chain) {
-    return next(new AppError(Errors.NoChainOrComm));
+  if (!req.body.community_id) {
+    return next(new AppError(Errors.NoCommunity));
   }
-  const chain = await models.Community.findOne({
-    where: { id: req.body.chain || null },
+  const community = await models.Community.findOne({
+    where: { id: req.body.community_id || null },
   });
-  if (!chain) {
-    return next(new AppError(Errors.InvalidChainOrComm));
+  if (!community) {
+    return next(new AppError(Errors.CommunityNotFound));
   }
 
   // verify count exists before querying
   let count = await models.Thread.findOne({
     where: {
-      chain: req.body.chain,
+      community_id: req.body.community_id,
       id: req.body.object_id,
     },
   });

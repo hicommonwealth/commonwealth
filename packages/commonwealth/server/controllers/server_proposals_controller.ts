@@ -1,8 +1,7 @@
+import { AppError, RedisCache, ServerError } from '@hicommonwealth/adapters';
 import { ChainNetwork } from '@hicommonwealth/core';
-import { AppError, ServerError } from 'common-common/src/errors';
-import { RedisCache } from 'common-common/src/redisCache';
+import { DB } from '@hicommonwealth/model';
 import { providers } from 'ethers';
-import { DB } from '../models';
 import {
   GetProposalVotesOptions,
   GetProposalVotesResult,
@@ -51,7 +50,7 @@ export class ServerProposalsController {
   private async getContractInfo(chainId: string): Promise<ContractInfo> {
     const contract = await this.models.CommunityContract.findOne({
       where: {
-        chain_id: chainId,
+        community_id: chainId,
       },
       attributes: [],
       include: [

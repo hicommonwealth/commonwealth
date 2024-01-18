@@ -3,10 +3,10 @@ import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/landing/header.scss';
 import React, { useState } from 'react';
 import { LoginModal } from 'views/modals/login_modal';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWModal } from '../../components/component_kit/new_designs/CWModal';
+import { CWButton } from '../../components/component_kit/new_designs/cw_button';
 
 type HeaderProps = {
   onLogin: () => void;
@@ -37,8 +37,9 @@ export const Header = ({ onLogin }: HeaderProps) => {
               Why Commonwealth?
             </CWText>
             <CWButton
+              buttonType="primary"
+              buttonHeight="sm"
               label="Sign in"
-              buttonType="primary-black"
               onClick={() => setIsModalOpen(true)}
             />
           </div>

@@ -2,34 +2,30 @@
 /* eslint-disable max-len */
 import { GovProposalId } from '@cosmjs/stargate/build/modules/gov/queries';
 import {
+  GovV1Client,
+  ProposalSDKType,
+  ProposalStatusSDKType,
+  QueryProposalRequest,
+  QueryProposalResponseSDKType,
+  QueryProposalsRequest,
+  QueryProposalsResponseSDKType,
+  numberToLong,
+  toTimestamp,
+} from '@hicommonwealth/chains';
+import {
   BalanceType,
   ChainBase,
   ChainNetwork,
   ChainType,
 } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import { expect } from 'chai';
-import {
-  ProposalSDKType,
-  ProposalStatusSDKType,
-} from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
-import {
-  QueryProposalRequest,
-  QueryProposalResponseSDKType,
-  QueryProposalsRequest,
-  QueryProposalsResponseSDKType,
-} from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/query';
-import { LCDQueryClient as GovV1Client } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/query.lcd';
-import {
-  numberToLong,
-  toTimestamp,
-} from 'common-common/src/cosmos-ts/src/codegen/helpers';
 import { Proposal, ProposalStatus } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import {
   QueryProposalResponse,
   QueryProposalsResponse,
 } from 'cosmjs-types/cosmos/gov/v1beta1/query';
 import { resetDatabase } from '../../server-test';
-import models from '../../server/database';
 import { generateCosmosGovNotifications } from '../../server/workers/cosmosGovNotifications/generateCosmosGovNotifications';
 import { CosmosClients } from '../../server/workers/cosmosGovNotifications/proposalFetching/getCosmosClient';
 import {
@@ -52,7 +48,7 @@ async function createFakeProposalNotification(
   };
   await models.Notification.create({
     category_id: 'chain-event',
-    chain_id: chainId,
+    community_id: chainId,
     notification_data: JSON.stringify(notifData),
   });
 
@@ -345,14 +341,14 @@ describe('Cosmos Governance Notification Generator', () => {
       await models.Subscription.findOrCreate({
         where: {
           subscriber_id: user.id,
-          chain_id: 'osmosis',
+          community_id: 'osmosis',
           category_id: 'chain-event',
         },
       });
       await models.Subscription.findOrCreate({
         where: {
           subscriber_id: user.id,
-          chain_id: 'kyve',
+          community_id: 'kyve',
           category_id: 'chain-event',
         },
       });
@@ -391,7 +387,7 @@ describe('Cosmos Governance Notification Generator', () => {
       const v1Beta1ExistingNotifPropId = 36;
       await models.Notification.create({
         category_id: 'chain-event',
-        chain_id: 'kyve',
+        community_id: 'kyve',
         notification_data: JSON.stringify({
           event_data: {
             id: v1ExistingNotifPropId,
@@ -401,7 +397,7 @@ describe('Cosmos Governance Notification Generator', () => {
 
       await models.Notification.create({
         category_id: 'chain-event',
-        chain_id: 'osmosis',
+        community_id: 'osmosis',
         notification_data: JSON.stringify({
           event_data: {
             id: v1Beta1ExistingNotifPropId,

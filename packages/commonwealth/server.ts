@@ -1,16 +1,17 @@
-import bodyParser from 'body-parser';
-import { factory, formatFilename } from 'common-common/src/logging';
 import {
+  HotShotsStats,
   RabbitMQController,
-  getRabbitMQConfig,
-} from 'common-common/src/rabbitmq';
-import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
-import { RedisCache } from 'common-common/src/redisCache';
-import {
+  RascalConfigServices,
+  RedisCache,
   ServiceKey,
+  TypescriptLoggingLogger,
+  getRabbitMQConfig,
+  setupErrorHandlers,
   startHealthCheckLoop,
-} from 'common-common/src/scripts/startHealthCheckLoop';
-import { StatsDController } from 'common-common/src/statsd';
+} from '@hicommonwealth/adapters';
+import { logger as _logger, stats } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
+import bodyParser from 'body-parser';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
@@ -24,19 +25,19 @@ import prerenderNode from 'prerender-node';
 import type { BrokerConfig } from 'rascal';
 import Rollbar from 'rollbar';
 import favicon from 'serve-favicon';
-import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import expressStatsInit from 'server/scripts/setupExpressStats';
 import * as v8 from 'v8';
-import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers';
 import {
   DATABASE_CLEAN_HOUR,
+  PRERENDER_TOKEN,
   RABBITMQ_URI,
   REDIS_URL,
   ROLLBAR_ENV,
   ROLLBAR_SERVER_TOKEN,
+  SERVER_URL,
   SESSION_SECRET,
-  VULTR_IP,
+  TBC_BALANCE_TTL_SECONDS,
 } from './server/config';
-import models from './server/database';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
 import { addSwagger } from './server/routing/addSwagger';
@@ -44,17 +45,19 @@ import { addExternalRoutes } from './server/routing/external';
 import setupAPI from './server/routing/router';
 import { sendBatchedNotificationEmails } from './server/scripts/emails';
 import setupAppRoutes from './server/scripts/setupAppRoutes';
-import expressStatsdInit from './server/scripts/setupExpressStats';
-import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import setupServer from './server/scripts/setupServer';
 import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
 import { databaseCleaner } from './server/util/databaseCleaner';
 import GlobalActivityCache from './server/util/globalActivityCache';
 import setupIpfsProxy from './server/util/ipfsProxy';
+import { TokenBalanceCache } from './server/util/tokenBalanceCache/tokenBalanceCache';
 import ViewCountCache from './server/util/viewCountCache';
 
 let isServiceHealthy = false;
+
+const log = _logger(TypescriptLoggingLogger()).getLogger(__filename);
+stats(HotShotsStats());
 
 startHealthCheckLoop({
   service: ServiceKey.Commonwealth,
@@ -65,7 +68,6 @@ startHealthCheckLoop({
   },
 });
 
-const log = factory.getLogger(formatFilename(__filename));
 // set up express async error handling hack
 require('express-async-errors');
 
@@ -82,19 +84,12 @@ async function main() {
 
   // CLI parameters for which task to run
   const SHOULD_SEND_EMAILS = process.env.SEND_EMAILS === 'true';
-  const SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS =
-    process.env.SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS === 'true';
 
-  const NO_TOKEN_BALANCE_CACHE = process.env.NO_TOKEN_BALANCE_CACHE === 'true';
   const NO_GLOBAL_ACTIVITY_CACHE =
     process.env.NO_GLOBAL_ACTIVITY_CACHE === 'true';
   const NO_CLIENT_SERVER =
-    process.env.NO_CLIENT === 'true' ||
-    SHOULD_SEND_EMAILS ||
-    SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS;
+    process.env.NO_CLIENT === 'true' || SHOULD_SEND_EMAILS;
 
-  const tokenBalanceCache = new TokenBalanceCache();
-  await tokenBalanceCache.initBalanceProviders();
   let rc = null;
   if (SHOULD_SEND_EMAILS) {
     rc = await sendBatchedNotificationEmails(models);
@@ -105,7 +100,6 @@ async function main() {
     process.exit(rc);
   }
 
-  const WITH_PRERENDER = process.env.WITH_PRERENDER;
   const NO_PRERENDER = process.env.NO_PRERENDER || NO_CLIENT_SERVER;
 
   const SequelizeStore = SessionSequelizeStore(session.Store);
@@ -191,14 +185,17 @@ async function main() {
 
     // add other middlewares
     app.use(logger('dev'));
-    app.use(expressStatsdInit(StatsDController.get()));
+    app.use(expressStatsInit());
     app.use(bodyParser.json({ limit: '1mb' }));
     app.use(bodyParser.urlencoded({ limit: '1mb', extended: false }));
     app.use(cookieParser());
     app.use(sessionParser);
     app.use(passport.initialize());
     app.use(passport.session());
-    app.use(prerenderNode.set('prerenderServiceUrl', 'http://localhost:3000'));
+
+    if (!DEV && !NO_PRERENDER && SERVER_URL.includes('commonwealth.im')) {
+      app.use(prerenderNode.set('prerenderToken', PRERENDER_TOKEN));
+    }
   };
 
   const templateFile = (() => {
@@ -209,15 +206,7 @@ async function main() {
     }
   })();
 
-  const sendFile = (res) => res.sendFile(`${__dirname}/build/index.html`);
-
-  // Only run prerender in DEV environment if the WITH_PRERENDER flag is provided.
-  // On the other hand, run prerender by default on production.
-  if (DEV) {
-    if (WITH_PRERENDER) setupPrerenderServer();
-  } else {
-    if (!NO_PRERENDER) setupPrerenderServer();
-  }
+  const sendFile = (res) => res.sendFile(`${__dirname}/index.html`);
 
   setupMiddleware();
   setupPassport(models);
@@ -259,12 +248,17 @@ async function main() {
     // TODO: this requires an immediate response if in production
   }
 
-  const redisCache = new RedisCache();
-  await redisCache.init(REDIS_URL, VULTR_IP);
+  const redisCache = new RedisCache(rollbar);
+  await redisCache.init(REDIS_URL);
 
-  if (!NO_TOKEN_BALANCE_CACHE) await tokenBalanceCache.start();
+  const tokenBalanceCache = new TokenBalanceCache(
+    models,
+    redisCache,
+    TBC_BALANCE_TTL_SECONDS,
+  );
+
   const banCache = new BanCache(models);
-  const globalActivityCache = new GlobalActivityCache(models);
+  const globalActivityCache = new GlobalActivityCache(models, redisCache);
 
   // initialize async to avoid blocking startup
   if (!NO_GLOBAL_ACTIVITY_CACHE) globalActivityCache.start();
@@ -287,7 +281,7 @@ async function main() {
   );
 
   // new API
-  addExternalRoutes('/external', app, models, tokenBalanceCache);
+  addExternalRoutes('/external', app, models);
   addSwagger('/docs', app);
 
   setupCosmosProxy(app, models);

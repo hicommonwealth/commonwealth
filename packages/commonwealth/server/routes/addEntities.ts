@@ -1,7 +1,7 @@
+import type { DB } from '@hicommonwealth/model';
 import { validationResult } from 'express-validator';
 import type { OnlyErrorResp } from '../api/extApiTypes';
 import { filterAddressOwnedByUser } from '../middleware/lookupAddressIsOwnedByUser';
-import type { DB } from '../models';
 import type { TypedRequest, TypedResponse } from '../types';
 import { failure, success } from '../types';
 
@@ -45,8 +45,10 @@ export async function addEntities<
   }
 
   entityCopy.forEach((c) => {
-    c[chainIdFieldName] = c['community_id'];
-    delete c['community_id'];
+    if (chainIdFieldName != 'community_id') {
+      c[chainIdFieldName] = c['community_id'];
+      delete c['community_id'];
+    }
 
     // all the entities use the address_id field. If user passed in address, map it to address_id
     if (addressMap && c.address) {

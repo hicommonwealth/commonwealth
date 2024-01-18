@@ -24,6 +24,7 @@ const queryTypeToRQMap = {
 interface CommonProps {
   queryType: typeof QueryTypes[keyof typeof QueryTypes];
   chainId: string;
+  apiEnabled?: boolean;
 }
 
 interface FetchBulkThreadsProps extends CommonProps {
@@ -118,7 +119,17 @@ const getFetchThreadsQueryKey = (props) => {
 };
 
 const fetchBulkThreads = (props) => {
-  return async ({ pageParam = 1 }) => {
+  return async ({
+    pageParam = 1,
+  }): Promise<{
+    data: {
+      numVotingThreads: number;
+      limit: number;
+      page: number;
+      threads: Thread[];
+    };
+    pageParam: number | undefined;
+  }> => {
     const res = await axios.get(
       `${app.serverUrl()}${ApiEndpoints.FETCH_THREADS}`,
       {
@@ -156,7 +167,7 @@ const fetchBulkThreads = (props) => {
 };
 
 const fetchActiveThreads = (props) => {
-  return async () => {
+  return async (): Promise<Thread[]> => {
     const response = await axios.get(
       `${app.serverUrl()}${ApiEndpoints.FETCH_THREADS}`,
       {
@@ -176,6 +187,8 @@ const fetchActiveThreads = (props) => {
 const useFetchThreadsQuery = (
   props: FetchBulkThreadsProps | FetchActiveThreadsProps,
 ) => {
+  const { apiEnabled = true } = props; // destruct to assign default value
+
   // better to use this in case someone updates this props, we wont reflect those changes
   const [queryType] = useState(props.queryType);
 
@@ -194,6 +207,7 @@ const useFetchThreadsQuery = (
     })(),
     staleTime: THREADS_STALE_TIME,
     keepPreviousData: true,
+    enabled: apiEnabled,
   });
 
   if (isFetchBulkThreadsProps(props)) {
