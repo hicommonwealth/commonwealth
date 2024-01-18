@@ -1,12 +1,13 @@
 import { AppError } from '@hicommonwealth/adapters';
 import type { NextFunction, Request, Response } from 'express';
+import { DB } from '../../models';
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',
 };
 
 export default async (
-  models,
+  models: DB,
   req: Request,
   res: Response,
   next: NextFunction,
@@ -15,7 +16,7 @@ export default async (
     return next(new AppError(Errors.NotLoggedIn));
   }
 
-  const associationParams: any = [
+  const associationParams = [
     {
       model: models.Thread,
       as: 'Thread',
@@ -33,7 +34,7 @@ export default async (
     },
     {
       model: models.Community,
-      as: 'Chain',
+      as: 'Community',
       required: false,
       where: { active: true },
     },

@@ -1,6 +1,6 @@
+import { WebhookCategory } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import { WebhookCategory } from '../../shared/types';
 import type { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
 
@@ -20,7 +20,7 @@ export type WebhookModelStatic = ModelStatic<WebhookInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): WebhookModelStatic => {
   const Webhook = <WebhookModelStatic>sequelize.define(
     'Webhook',
@@ -39,7 +39,7 @@ export default (
       underscored: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-    }
+    },
   );
 
   Webhook.associate = (models) => {

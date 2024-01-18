@@ -174,7 +174,9 @@ export default (
       foreignKey: 'chain_node_id',
     });
     models.Community.hasMany(models.Address, { foreignKey: 'community_id' });
-    models.Community.hasMany(models.Notification, { foreignKey: 'chain_id' });
+    models.Community.hasMany(models.Notification, {
+      foreignKey: 'community_id',
+    });
     models.Community.hasMany(models.Topic, {
       as: 'topics',
       foreignKey: 'community_id',

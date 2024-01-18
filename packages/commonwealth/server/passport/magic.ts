@@ -1,15 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Session } from '@canvas-js/interfaces';
-import {
-  ServerError,
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/adapters';
+import { ServerError } from '@hicommonwealth/adapters';
 import {
   ChainBase,
   NotificationCategories,
   WalletId,
   WalletSsoSource,
+  logger,
 } from '@hicommonwealth/core';
 import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
 import { verify } from 'jsonwebtoken';
@@ -31,7 +28,7 @@ import { UserAttributes, UserInstance } from '../models/user';
 import { TypedRequestBody } from '../types';
 import { createRole } from '../util/roles';
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 type MagicLoginContext = {
   models: DB;
@@ -104,7 +101,7 @@ async function createMagicAddressInstances(
       addressInstance.wallet_sso_source === null
     ) {
       addressInstance.wallet_sso_source = walletSsoSource;
-      addressInstance.save({ transaction: t });
+      await addressInstance.save({ transaction: t });
     }
     addressInstances.push(addressInstance);
   }

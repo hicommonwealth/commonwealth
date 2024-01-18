@@ -14,7 +14,6 @@ export const SERVER_URL =
 export const SESSION_SECRET = process.env.SESSION_SECRET || 'my secret';
 export const JWT_SECRET = process.env.JWT_SECRET || 'jwt secret';
 
-export const LOGIN_TOKEN_EXPIRES_IN = 30;
 export const ADDRESS_TOKEN_EXPIRES_IN = 10;
 
 export const ROLLBAR_SERVER_TOKEN = process.env.ROLLBAR_SERVER_TOKEN;
@@ -110,9 +109,6 @@ export const TELEGRAM_BOT_TOKEN =
 export const SEND_WEBHOOKS_EMAILS =
   process.env.NODE_ENV === 'production' &&
   process.env.SEND_WEBHOOKS_EMAILS === 'true';
-
-export const FEATURE_FLAG_GROUP_CHECK_ENABLED =
-  process.env.FEATURE_FLAG_GROUP_CHECK_ENABLED === 'true' || false;
 
 export const MEMBERSHIP_REFRESH_BATCH_SIZE = process.env
   .MEMBERSHIP_REFRESH_BATCH_SIZE

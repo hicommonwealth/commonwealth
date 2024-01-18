@@ -1,5 +1,9 @@
+import {
+  ChainBase,
+  ChainType,
+  CommunityCategoryType,
+} from '@hicommonwealth/core';
 import { z } from 'zod';
-import { ChainBase, ChainCategoryType, ChainType } from '../types';
 import { checkIconSize } from '../utils/checkIconSize';
 import { ALL_COMMUNITIES } from '../utils/constants';
 
@@ -19,7 +23,7 @@ export const CreateCommunitySchema = z.object({
     .superRefine(async (val, ctx) => await checkIconSize(val, ctx))
     .optional(),
   social_links: z.array(z.string().url()).default([]),
-  tags: z.array(z.nativeEnum(ChainCategoryType)).default([]),
+  tags: z.array(z.nativeEnum(CommunityCategoryType)).default([]),
   directory_page_enabled: z.boolean().default(false),
   type: z.nativeEnum(ChainType).default(ChainType.Offchain),
   base: z.nativeEnum(ChainBase),

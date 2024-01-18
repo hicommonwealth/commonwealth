@@ -64,7 +64,7 @@ The goal of this document is to describe the current state of the app initializa
         3. If the chain's data is not loaded, `app.chain.initData()` is fired.
             - This call triggers chain-specific setup of governance data in particular. It will (generally, as part of chain-specific setup) also call `activeAddressHasToken` which hits `/tokenBalance` for the logged-in user. It also emits `ready` from the `chainModuleReady` event emitter.
         4. Emit `ready` from the `chainAdapterReady` event emitter, and print `CHAIN started.` from the console.
-    8. If the user is logged in, his addresses for the initialized community are set as his current active addresses, and the `/selectChain` endpoint is hit, to update his last visited community.
+    8. If the user is logged in, his addresses for the initialized community are set as his current active addresses, and the `/selectCommunity` endpoint is hit, to update his last visited community.
 10. Nested within the `Layout` component, the `Sublayout` component renders the header, sidebar, banners, and similar sub-components, as well as wrapping any child content pages.
 
 ## Change Log

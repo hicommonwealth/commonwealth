@@ -48,19 +48,19 @@ describe('Notification Routes Tests', () => {
 
     notification = await models.Notification.create({
       category_id: NotificationCategories.NewThread,
-      chain_id: chain,
+      community_id: chain,
       notification_data: '',
     });
 
     notificationTwo = await models.Notification.create({
       category_id: NotificationCategories.NewThread,
-      chain_id: chain,
+      community_id: chain,
       notification_data: '',
     });
 
     notificationThree = await models.Notification.create({
       category_id: NotificationCategories.ChainEvent,
-      chain_id: chain,
+      community_id: chain,
       notification_data: '',
     });
 
@@ -185,7 +185,7 @@ describe('Notification Routes Tests', () => {
     it('should pass when notification id is a string instead of an array', async () => {
       const notif = await models.Notification.create({
         category_id: NotificationCategories.NewThread,
-        chain_id: chain,
+        community_id: chain,
         notification_data: '',
       });
 

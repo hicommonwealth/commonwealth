@@ -1,0 +1,20 @@
+{
+  "name": "@hicommonwealth/model",
+  "private": "true",
+  "version": "0.1.0",
+  "description": "Core Model - Server Side",
+  "files": [
+    "build"
+  ],
+  "main": "build/index",
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rm -rf build",
+    "check-types": "tsc --noEmit",
+    "test": "NODE_ENV=test ts-mocha '__tests__/**/*.spec.ts'"
+  },
+  "dependencies": {
+    "node-object-hash": "^3.0.0",
+    "zod": "^3.22.4"
+  }
+}

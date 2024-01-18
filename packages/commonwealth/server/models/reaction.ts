@@ -1,15 +1,11 @@
-import {
-  StatsDController,
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/adapters';
+import { logger, stats } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 export type ReactionAttributes = {
   address_id: number;
@@ -67,7 +63,7 @@ export default (
               });
               if (thread) {
                 thread.increment('reaction_count');
-                StatsDController.get().increment('cw.hook.reaction-count', {
+                stats().increment('cw.hook.reaction-count', {
                   thread_id: String(thread_id),
                 });
               }
@@ -80,7 +76,7 @@ export default (
               if (comment) {
                 comment.increment('reaction_count');
                 thread_id = Number(comment.get('thread_id'));
-                StatsDController.get().increment('cw.hook.reaction-count', {
+                stats().increment('cw.hook.reaction-count', {
                   thread_id: String(thread_id),
                 });
               }
@@ -90,7 +86,7 @@ export default (
               `incrementing thread reaction count ` +
                 `afterCreate: thread_id ${thread_id} comment_id ${comment_id} ${error}`,
             );
-            StatsDController.get().increment('cw.reaction-count-error', {
+            stats().increment('cw.reaction-count-error', {
               thread_id: String(thread_id),
             });
           }
@@ -106,7 +102,7 @@ export default (
               });
               if (thread) {
                 thread.decrement('reaction_count');
-                StatsDController.get().decrement('cw.hook.reaction-count', {
+                stats().decrement('cw.hook.reaction-count', {
                   thread_id: String(thread_id),
                 });
               }
@@ -119,7 +115,7 @@ export default (
               if (comment) {
                 thread_id = Number(comment.get('thread_id'));
                 comment.decrement('reaction_count');
-                StatsDController.get().decrement('cw.hook.reaction-count', {
+                stats().decrement('cw.hook.reaction-count', {
                   thread_id: String(thread_id),
                 });
               }
@@ -129,7 +125,7 @@ export default (
               `incrementing thread reaction count afterDestroy: ` +
                 `thread_id ${thread_id} comment_id ${comment_id} ${error}`,
             );
-            StatsDController.get().increment('cw.hook.reaction-count-error', {
+            stats().increment('cw.hook.reaction-count-error', {
               thread_id: String(thread_id),
             });
           }

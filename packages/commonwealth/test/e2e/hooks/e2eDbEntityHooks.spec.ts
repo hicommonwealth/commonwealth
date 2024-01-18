@@ -127,7 +127,7 @@ export async function clearTestEntities() {
       where: {
         [Op.or]: [
           { thread_id: { [Op.lt]: 0 } },
-          { chain_id: { [Op.in]: chainsToDelete.map((c) => c['id']) } },
+          { community_id: { [Op.in]: chainsToDelete.map((c) => c['id']) } },
         ],
       },
       force: true,

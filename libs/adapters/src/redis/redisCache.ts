@@ -1,14 +1,13 @@
-import type { RedisNamespaces } from '@hicommonwealth/core';
+import { logger, type RedisNamespaces } from '@hicommonwealth/core';
 import {
   ConnectionTimeoutError,
+  createClient,
   ReconnectStrategyError,
   SocketClosedUnexpectedlyError,
-  createClient,
 } from 'redis';
 import type Rollbar from 'rollbar';
-import { formatFilename, loggerFactory } from '../typescript-logging';
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 export function redisRetryStrategy(retries: number) {
   if (retries > 5) {

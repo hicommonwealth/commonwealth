@@ -1,8 +1,4 @@
-import {
-  StatsDController,
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/adapters';
+import { logger, stats } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type {
@@ -10,12 +6,13 @@ import type {
   NotificationsReadInstance,
 } from './notifications_read';
 import type { ModelInstance, ModelStatic } from './types';
-const log = loggerFactory.getLogger(formatFilename(__filename));
+
+const log = logger().getLogger(__filename);
 
 export type NotificationAttributes = {
   id: number;
   notification_data: string;
-  chain_id?: string;
+  community_id?: string;
   category_id: string;
   chain_event_id?: number;
   entity_id: number;
@@ -42,8 +39,7 @@ export default (
       notification_data: { type: dataTypes.TEXT, allowNull: false },
       chain_event_id: { type: dataTypes.INTEGER, allowNull: true },
       entity_id: { type: dataTypes.INTEGER, allowNull: true },
-      // eslint-disable-next-line max-len
-      chain_id: { type: dataTypes.STRING, allowNull: true }, // for backwards compatibility of threads associated with OffchainCommunities rather than a proper chain
+      community_id: { type: dataTypes.STRING, allowNull: true },
       category_id: { type: dataTypes.STRING, allowNull: false },
       thread_id: { type: dataTypes.INTEGER, allowNull: true },
     },
@@ -64,7 +60,7 @@ export default (
                 { max_notif_id: id },
                 { where: { id: thread_id } },
               );
-              StatsDController.get().increment('cw.hook.thread-notif-update', {
+              stats().increment('cw.hook.thread-notif-update', {
                 thread_id: String(thread_id),
               });
             }
@@ -72,7 +68,7 @@ export default (
             log.error(
               `incrementing thread notif for thread ${thread_id} afterCreate: ${error}`,
             );
-            StatsDController.get().increment('cw.hook.thread-notif-error', {
+            stats().increment('cw.hook.thread-notif-error', {
               thread_id: String(thread_id),
             });
           }
@@ -82,7 +78,10 @@ export default (
       underscored: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-      indexes: [{ fields: ['chain_event_id'], prefix: 'new' }],
+      indexes: [
+        { fields: ['chain_event_id'], unique: true },
+        { fields: ['thread_id'] },
+      ],
     },
   );
 
@@ -97,7 +96,7 @@ export default (
       targetKey: 'name',
     });
     models.Notification.belongsTo(models.Community, {
-      foreignKey: 'chain_id',
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
     models.Notification.belongsTo(models.Thread, {

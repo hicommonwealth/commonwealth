@@ -1,10 +1,10 @@
 import { ERC165__factory } from '@hicommonwealth/chains';
+import { Requirement } from '@hicommonwealth/core';
 import Ajv from 'ajv';
 import { CosmosSDK } from 'cosmos-sdk';
 import { ethers } from 'ethers';
 import db from 'server/database';
 import requirementsSchema from './requirementsSchema_v1.json';
-import { Requirement } from './requirementsTypes';
 
 const Errors = {
   InvalidRequirements: 'Invalid requirements',

@@ -34,7 +34,7 @@ const updateBanner = async (
     throw new AppError(UpdateBannerErrors.NoPermission);
   }
 
-  const { banner_text } = req.body || { banner_text: '' };
+  const banner_text = req.body?.banner_text || '';
 
   // find or create
   const [banner] = await models.CommunityBanner.findOrCreate({
@@ -49,7 +49,7 @@ const updateBanner = async (
   if (banner_text !== banner.banner_text) {
     // update if need be
     banner.banner_text = banner_text;
-    banner.save();
+    await banner.save();
   }
   return success(res, banner.toJSON());
 };

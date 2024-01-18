@@ -48,7 +48,7 @@ async function createFakeProposalNotification(
   };
   await models.Notification.create({
     category_id: 'chain-event',
-    chain_id: chainId,
+    community_id: chainId,
     notification_data: JSON.stringify(notifData),
   });
 
@@ -341,14 +341,14 @@ describe('Cosmos Governance Notification Generator', () => {
       await models.Subscription.findOrCreate({
         where: {
           subscriber_id: user.id,
-          chain_id: 'osmosis',
+          community_id: 'osmosis',
           category_id: 'chain-event',
         },
       });
       await models.Subscription.findOrCreate({
         where: {
           subscriber_id: user.id,
-          chain_id: 'kyve',
+          community_id: 'kyve',
           category_id: 'chain-event',
         },
       });
@@ -387,7 +387,7 @@ describe('Cosmos Governance Notification Generator', () => {
       const v1Beta1ExistingNotifPropId = 36;
       await models.Notification.create({
         category_id: 'chain-event',
-        chain_id: 'kyve',
+        community_id: 'kyve',
         notification_data: JSON.stringify({
           event_data: {
             id: v1ExistingNotifPropId,
@@ -397,7 +397,7 @@ describe('Cosmos Governance Notification Generator', () => {
 
       await models.Notification.create({
         category_id: 'chain-event',
-        chain_id: 'osmosis',
+        community_id: 'osmosis',
         notification_data: JSON.stringify({
           event_data: {
             id: v1Beta1ExistingNotifPropId,

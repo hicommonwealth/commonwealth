@@ -1,9 +1,12 @@
-import type { SupportedNetwork } from '@hicommonwealth/core';
-import {
-  NotificationCategories,
-  NotificationCategory,
-} from '@hicommonwealth/core';
-import type { AccessLevel } from './permissions';
+import type { SupportedNetwork } from './types';
+import { NotificationCategories, NotificationCategory } from './types';
+
+export enum AccessLevel {
+  Admin = 'admin',
+  Moderator = 'moderator',
+  Member = 'member',
+  Everyone = 'everyone',
+}
 
 export type SnapshotProposalAttributes = {
   id: string;
@@ -196,3 +199,10 @@ export type WebhookCategory =
   | NotificationCategories.NewThread
   | NotificationCategories.NewComment
   | NotificationCategories.NewReaction;
+
+export type EmitNotification<T> = (
+  models: unknown,
+  notification_data_and_category: NotificationDataAndCategory,
+  excludeAddresses?: string[],
+  includeAddresses?: string[],
+) => Promise<T>;

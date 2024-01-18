@@ -22,7 +22,7 @@ export const createThreadPollHandler = async (
   req: TypedRequest<CreateThreadPollBody, null, CreateThreadPollParams>,
   res: TypedResponse<CreateThreadPollResponse>,
 ) => {
-  const community = req.chain;
+  const { community } = req;
   const { id: threadId } = req.params;
   const { prompt, options, custom_duration } = req.body;
 

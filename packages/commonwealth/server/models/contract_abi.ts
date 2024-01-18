@@ -1,9 +1,8 @@
+import { AbiType } from '@hicommonwealth/core';
+import { hashAbi } from '@hicommonwealth/model';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
 import type { ModelInstance, ModelStatic } from './types';
-
-import { hashAbi } from '../util/abiValidation';
-import { AbiType } from '../../shared/types';
 
 export type ContractAbiAttributes = {
   id: number;
@@ -21,7 +20,7 @@ export type ContractAbiModelStatic = ModelStatic<ContractAbiInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): ContractAbiModelStatic => {
   const ContractAbi = <ContractAbiModelStatic>sequelize.define(
     'ContractAbi',
@@ -51,7 +50,7 @@ export default (
           if (!Array.isArray(this.abi)) {
             throw new Error(
               `Invalid ABI. The given ABI of type ${typeof this
-                .abi} is not a valid array.`
+                .abi} is not a valid array.`,
             );
           }
         },
@@ -63,7 +62,7 @@ export default (
           }
         },
       },
-    }
+    },
   );
 
   ContractAbi.associate = (models) => {
