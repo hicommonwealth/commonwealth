@@ -50,9 +50,6 @@ export const CWToggle = (props: ToggleProps) => {
   const formContext = useFormContext();
   const formFieldContext =
     hookToForm && name ? formContext.register(name) : ({} as any);
-  // TODO: display error when needed
-  // const formFieldErrorMessage =
-  //   hookToForm && name && (formContext?.formState?.errors?.[name]?.message as string);
   const [formCheckedStatus, setFormCheckedStatus] = useState(
     formContext?.getValues?.(name),
   );
@@ -83,8 +80,6 @@ export const CWToggle = (props: ToggleProps) => {
         className="toggle-input"
       />
       <div className="slider" />
-      {/* TODO: display error when needed */}
-      {/* {formFieldErrorMessage && <p className='error'>{formFieldErrorMessage}</p>} */}
     </label>
   );
 };
