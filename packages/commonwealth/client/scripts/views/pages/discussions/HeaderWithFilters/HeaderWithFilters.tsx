@@ -158,6 +158,10 @@ export const HeaderWithFilters = ({
 
   return (
     <div className="HeaderWithFilters">
+      <div>
+        <CWButton label="Buy" buttonType="secondary" buttonAlt="green" />
+        <CWButton label="Sell" buttonType="secondary" buttonAlt="rorange" />
+      </div>
       <div className="header-row">
         <CWText type="h3" fontWeight="semiBold" className="header-text">
           {isUndefined(topic)
