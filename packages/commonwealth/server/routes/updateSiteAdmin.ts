@@ -1,7 +1,7 @@
 import { AppError } from '@hicommonwealth/adapters';
+import type { DB } from '@hicommonwealth/model';
 import type { Response } from 'express';
 import { Op } from 'sequelize';
-import type { DB } from '../models';
 import type { TypedRequestBody } from '../types';
 import { success } from '../types';
 

@@ -1,4 +1,4 @@
-import { PollAttributes } from '../../models/poll';
+import { PollAttributes } from '@hicommonwealth/model';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 

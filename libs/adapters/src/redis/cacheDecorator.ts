@@ -1,6 +1,5 @@
-import { RedisNamespaces } from '@hicommonwealth/core';
+import { RedisNamespaces, logger } from '@hicommonwealth/core';
 import { Request, RequestHandler, Response } from 'express';
-import { formatFilename, loggerFactory } from '../typescript-logging';
 import {
   CacheKeyDuration,
   defaultKeyGenerator,
@@ -8,7 +7,7 @@ import {
 } from '../utils/cacheKeyUtils';
 import { RedisCache } from './redisCache';
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 const XCACHE_HEADER = 'X-Cache';
 export enum XCACHE_VALUES {

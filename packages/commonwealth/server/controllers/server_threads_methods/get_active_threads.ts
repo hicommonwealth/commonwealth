@@ -1,7 +1,9 @@
+import {
+  CommunityInstance,
+  ThreadAttributes,
+  TopicAttributes,
+} from '@hicommonwealth/model';
 import { WhereOptions } from 'sequelize';
-import { CommunityInstance } from '../../models/community';
-import { ThreadAttributes } from '../../models/thread';
-import { TopicAttributes } from '../../models/topic';
 import { ServerThreadsController } from '../server_threads_controller';
 
 const MIN_THREADS_PER_TOPIC = 0;

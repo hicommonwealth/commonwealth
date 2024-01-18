@@ -1,9 +1,11 @@
 import { AppError } from '@hicommonwealth/adapters';
+import {
+  AddressInstance,
+  CommunityInstance,
+  MembershipRejectReason,
+  UserInstance,
+} from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import { MembershipRejectReason } from 'server/models/membership';
-import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/community';
-import { UserInstance } from '../../models/user';
 import { refreshMembershipsForAddress } from '../../util/requirementsModule/refreshMembershipsForAddress';
 import { ServerGroupsController } from '../server_groups_controller';
 

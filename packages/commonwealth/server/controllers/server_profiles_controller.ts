@@ -1,4 +1,4 @@
-import { DB } from 'server/models';
+import { DB } from '@hicommonwealth/model';
 import {
   SearchProfilesOptions,
   SearchProfilesResult,
@@ -13,7 +13,7 @@ export class ServerProfilesController {
   constructor(public models: DB) {}
 
   async searchProfiles(
-    options: SearchProfilesOptions
+    options: SearchProfilesOptions,
   ): Promise<SearchProfilesResult> {
     return __searchProfiles.call(this, options);
   }

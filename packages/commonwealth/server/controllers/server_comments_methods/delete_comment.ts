@@ -1,8 +1,10 @@
 import { AppError } from '@hicommonwealth/adapters';
+import {
+  AddressInstance,
+  CommunityInstance,
+  UserInstance,
+} from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/community';
-import { UserInstance } from '../../models/user';
 import { findOneRole } from '../../util/roles';
 import { ServerCommentsController } from '../server_comments_controller';
 

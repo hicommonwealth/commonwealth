@@ -1,10 +1,13 @@
 // Helper function to look up an (address, author_community_id) pair of parameters,
 // and check that it's owned by the current user. Only for POST requests.
 
+import type {
+  AddressAttributes,
+  AddressInstance,
+  DB,
+  UserInstance,
+} from '@hicommonwealth/model';
 import { Op, WhereOptions } from 'sequelize';
-import type { DB } from '../models';
-import type { AddressAttributes, AddressInstance } from '../models/address';
-import type { UserInstance } from '../models/user';
 
 type AddressCommunityRequest = {
   body?: {

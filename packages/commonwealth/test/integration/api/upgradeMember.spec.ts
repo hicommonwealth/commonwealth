@@ -1,9 +1,9 @@
+import { models } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import app from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import models from '../../../server/database';
 import { Errors } from '../../../server/routes/upgradeMember';
 import { post } from './external/appHook.spec';
 import { testAddresses, testUsers } from './external/dbEntityHooks.spec';
@@ -16,7 +16,7 @@ describe('upgradeMember Integration Tests', () => {
   beforeEach(() => {
     jwtToken = jwt.sign(
       { id: testUsers[0].id, email: testUsers[0].email },
-      JWT_SECRET
+      JWT_SECRET,
     );
   });
 
@@ -33,7 +33,7 @@ describe('upgradeMember Integration Tests', () => {
       '/api/upgradeMember',
       invalidRequest,
       true,
-      app
+      app,
     );
 
     response.should.have.status(400);
@@ -53,7 +53,7 @@ describe('upgradeMember Integration Tests', () => {
       '/api/upgradeMember',
       invalidRequest,
       true,
-      app
+      app,
     );
 
     response.should.have.status(400);
@@ -69,7 +69,7 @@ describe('upgradeMember Integration Tests', () => {
         where: {
           id: testAddresses[0].id,
         },
-      }
+      },
     );
     const validRequest = {
       jwt: jwtToken,

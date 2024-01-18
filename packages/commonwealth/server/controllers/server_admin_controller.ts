@@ -1,4 +1,4 @@
-import { DB } from 'server/models';
+import { DB } from '@hicommonwealth/model';
 import {
   GetStatsOptions,
   GetStatsResult,
