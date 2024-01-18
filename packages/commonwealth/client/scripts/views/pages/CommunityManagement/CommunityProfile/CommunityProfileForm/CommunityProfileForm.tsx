@@ -389,7 +389,10 @@ const CommunityProfileForm = () => {
                 !formState.isDirty &&
                 currentCommunityTags.length === selectedCommunityTags.length &&
                 links.filter((x) => x.value).length ===
-                  (community.socialLinks || []).length
+                  (community.socialLinks || []).length &&
+                links.every((x) =>
+                  (community.socialLinks || []).includes(x.value.trim()),
+                )
               }
               onClick={() => {
                 reset();
