@@ -38,6 +38,8 @@ const CommunityProfileForm = () => {
   const [communityId] = useState(
     slugifyPreserveDashes(community.id.toLowerCase()),
   );
+  // `formKey` remounts the CWForm with new community default values after a
+  // successful update, using the updated formKey.
   const [formKey, setFormKey] = useState(1);
   const [nameFieldDisabledState, setNameFieldDisabledState] = useState({
     isDisabled: true,
