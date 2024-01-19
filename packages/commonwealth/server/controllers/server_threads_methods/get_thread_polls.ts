@@ -1,5 +1,5 @@
+import { PollAttributes } from '@hicommonwealth/model';
 import { ServerThreadsController } from '../server_threads_controller';
-import { PollAttributes } from 'server/models/poll';
 
 export type GetThreadPollsOptions = {
   threadId: number;
@@ -8,7 +8,7 @@ export type GetThreadPollsResult = PollAttributes[];
 
 export async function __getThreadPolls(
   this: ServerThreadsController,
-  { threadId }: GetThreadPollsOptions
+  { threadId }: GetThreadPollsOptions,
 ): Promise<GetThreadPollsResult> {
   const polls = await this.models.Poll.findAll({
     where: { thread_id: threadId },

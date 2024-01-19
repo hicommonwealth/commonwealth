@@ -1,3 +1,4 @@
+import type { DB } from '@hicommonwealth/model';
 import type { Express } from 'express';
 import express from 'express';
 import type Router from 'express/lib/router/index';
@@ -7,7 +8,6 @@ import type {
   PostTopicsReq,
   PutCommentsReq,
 } from '../api/extApiTypes';
-import type { DB } from '../models';
 import { addEntities } from '../routes/addEntities';
 import {
   getComments,
@@ -120,7 +120,6 @@ export function addExternalRoutes(
     onlyIds,
     deleteEntities.bind(this, 'community_id', models, models.Topic),
   );
-
   app.use(endpoint, router);
 
   return router;

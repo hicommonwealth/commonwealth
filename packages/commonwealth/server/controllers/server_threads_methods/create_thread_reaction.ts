@@ -1,10 +1,12 @@
 import { AppError } from '@hicommonwealth/adapters';
 import { NotificationCategories } from '@hicommonwealth/core';
+import {
+  AddressInstance,
+  CommunityInstance,
+  ReactionAttributes,
+  UserInstance,
+} from '@hicommonwealth/model';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/community';
-import { ReactionAttributes } from '../../models/reaction';
-import { UserInstance } from '../../models/user';
 import { getBalanceForAddress } from '../../util/getBalanceForAddress';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';

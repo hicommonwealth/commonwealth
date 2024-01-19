@@ -1,8 +1,7 @@
 import { ServerError } from '@hicommonwealth/adapters';
+import { CommunityInstance, ThreadAttributes } from '@hicommonwealth/model';
 import moment from 'moment';
 import { QueryTypes } from 'sequelize';
-import { CommunityInstance } from '../../models/community';
-import { ThreadAttributes } from '../../models/thread';
 import { getLastEdited } from '../../util/getLastEdited';
 import { ServerThreadsController } from '../server_threads_controller';
 

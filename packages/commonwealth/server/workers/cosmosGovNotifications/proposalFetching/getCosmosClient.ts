@@ -1,8 +1,8 @@
 import { QueryClient, setupGovExtension } from '@cosmjs/stargate';
 import * as tm from '@cosmjs/tendermint-rpc';
 import { GovV1Client, createLCDClient } from '@hicommonwealth/chains';
+import { CommunityInstance } from '@hicommonwealth/model';
 import { COSMOS_GOV_V1_CHAIN_IDS } from '../../../config';
-import { CommunityInstance } from '../../../models/community';
 import { CosmosClientType, GovV1Beta1ClientType } from './types';
 
 export const CosmosClients: Record<string, CosmosClientType> = {};

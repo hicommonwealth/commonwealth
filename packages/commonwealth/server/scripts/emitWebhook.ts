@@ -1,13 +1,13 @@
 import {
   NotificationCategories,
+  NotificationDataAndCategory,
   ProposalType,
   SupportedNetwork,
+  WebhookCategory,
 } from '@hicommonwealth/core';
-import { NotificationDataAndCategory, WebhookCategory } from 'types';
+import { WebhookInstance, models } from '@hicommonwealth/model';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import models from '../database';
-import { WebhookInstance } from '../models/webhook';
 import { dispatchWebhooks } from '../util/webhooks/dispatchWebhook';
 import { WebhookDestinations } from '../util/webhooks/types';
 

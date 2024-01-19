@@ -1,11 +1,10 @@
 import { RedisCache, delay } from '@hicommonwealth/adapters';
-import { BalanceType } from '@hicommonwealth/core';
+import { BalanceSourceType, BalanceType } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import BN from 'bn.js';
 import { expect } from 'chai';
 import Web3 from 'web3';
 import { toWei } from 'web3-utils';
-import models from '../../../server/database';
-import { BalanceSourceType } from '../../../server/util/requirementsModule/requirementsTypes';
 import { TokenBalanceCache } from '../../../server/util/tokenBalanceCache/tokenBalanceCache';
 import { Balances } from '../../../server/util/tokenBalanceCache/types';
 import { ChainTesting } from '../../util/evm-chain-testing/sdk/chainTesting';

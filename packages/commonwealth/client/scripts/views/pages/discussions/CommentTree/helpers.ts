@@ -1,5 +1,5 @@
+import type { ContentType } from '@hicommonwealth/core';
 import app from 'state';
-import type { ContentType } from 'types';
 
 // highlight the header/body of a parent thread, or the body of a comment
 export const jumpHighlightComment = (commentId: number) => {
@@ -21,9 +21,9 @@ export const jumpHighlightComment = (commentId: number) => {
 
 export const clearEditingLocalStorage = (
   id: number | string,
-  contentType: ContentType
+  contentType: ContentType,
 ) => {
   localStorage.removeItem(
-    `${app.activeChainId()}-edit-${contentType}-${id}-storedText`
+    `${app.activeChainId()}-edit-${contentType}-${id}-storedText`,
   );
 };

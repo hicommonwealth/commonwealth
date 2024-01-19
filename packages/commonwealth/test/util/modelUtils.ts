@@ -16,7 +16,6 @@ import {
 import { Keyring } from '@polkadot/api';
 import { stringToU8a } from '@polkadot/util';
 import chai from 'chai';
-import 'chai/register-should';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
@@ -25,13 +24,13 @@ import { createRole, findOneRole } from '../../server/util/roles';
 
 import { createCanvasSessionPayload } from '../../shared/canvas';
 
+import type { Role } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model';
 import { mnemonicGenerate } from '@polkadot/util-crypto';
 import Web3 from 'web3-utils';
 import app from '../../server-test';
-import models from '../../server/database';
-import type { Role } from '../../server/models/role';
 
-import { Link, LinkSource, ThreadAttributes } from '../../server/models/thread';
+import { Link, LinkSource, ThreadAttributes } from '@hicommonwealth/model';
 import {
   TEST_BLOCK_INFO_BLOCKHASH,
   TEST_BLOCK_INFO_STRING,

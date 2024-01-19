@@ -1,9 +1,9 @@
+import { DynamicTemplate } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import moment from 'moment';
 import { Op } from 'sequelize';
-import { DynamicTemplate } from '../../shared/types';
 import { formatAddressShort } from '../../shared/utils';
 import { SENDGRID_API_KEY } from '../config';
-import models from '../database';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');
@@ -60,7 +60,8 @@ export const getTopThreads = async (
         LEFT JOIN "Reactions" r ON t.id = r.thread_id
         INNER JOIN "Addresses" a ON t.address_id = a.id
       WHERE 
-        t.community_id='${communityId}' AND c.created_at > NOW() - INTERVAL '1 WEEK' AND r.created_at > NOW() - INTERVAL '1 WEEK'
+        t.community_id='${communityId}' 
+        AND c.created_at > NOW() - INTERVAL '1 WEEK' AND r.created_at > NOW() - INTERVAL '1 WEEK'
       GROUP BY 
         t.id, a.address
       ORDER BY 

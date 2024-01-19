@@ -4,7 +4,7 @@ import { Configuration, OpenAIApi } from 'openai';
 import { v4 as uuidv4 } from 'uuid';
 
 import { AppError } from '@hicommonwealth/adapters';
-import type { DB } from '../models';
+import type { DB } from '@hicommonwealth/model';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 

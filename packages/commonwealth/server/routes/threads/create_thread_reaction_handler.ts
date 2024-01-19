@@ -1,6 +1,6 @@
 import { AppError } from '@hicommonwealth/adapters';
+import { ReactionAttributes } from '@hicommonwealth/model';
 import { verifyReaction } from '../../../shared/canvas/serverVerify';
-import { ReactionAttributes } from '../../models/reaction';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -27,7 +27,7 @@ export const createThreadReactionHandler = async (
   >,
   res: TypedResponse<CreateThreadReactionResponse>,
 ) => {
-  const { user, address, chain: community } = req;
+  const { user, address, community } = req;
   const {
     reaction,
     canvas_action: canvasAction,

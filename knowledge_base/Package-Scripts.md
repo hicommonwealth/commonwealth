@@ -65,6 +65,7 @@ If you add a script to the `package.json` file, please add documentation for it 
   - [unit-test:watch](#unit-testwatch)
 - [TypeScript](#typescript)
   - [check-types](#check-types)
+  - [sanity](#sanity)
 - [Webpack & TSNode](#webpack--tsnode)
   - [bundle-report](#bundle-report)
   - [listen](#listen)
@@ -72,6 +73,12 @@ If you add a script to the `package.json` file, please add documentation for it 
   - [start-all](#start-all)
   - [start-consumer](#start-consumer)
   - [start-evm-ce](#start-evm-ce)
+- [Devnets](#devnets)
+  - [cosmos:build](#cosmos:build)
+  - [cosmos:start](#cosmos:start)
+  - [cosmos:stop](#cosmos:stop)
+- [Util scripts](#util-scripts)
+  - [add-components-showcase](#add-component-showcase)
 
 ## Build Scripts
 
@@ -473,6 +480,12 @@ Definition: `tsc --noEmit`
 
 Description: Runs a compilation of TypeScript files based on tsconfig.json; does not emit files.
 
+### sanity
+
+Definition: `chmod u+x scripts/sanity.sh && ./scripts/sanity.sh`
+
+Description: Sanity scripts developers should run locally before pushing code, comprising a linter, a check-types, and unit tests. Must be run from root.
+
 ## Webpack && TSNode
 
 ### bundle-report
@@ -530,3 +543,11 @@ Description: Starts existing dormant Cosmos devnet containers.
 Definition: `chmod u+x test/util/cosmos-chain-testing/v1/stop.sh && ./test/util/cosmos-chain-testing/v1/stop.sh && chmod u+x test/util/cosmos-chain-testing/v1beta1/stop.sh && ./test/util/cosmos-chain-testing/v1beta1/stop.sh && chmod u+x test/util/cosmos-chain-testing/ethermint/stop.sh && ./test/util/cosmos-chain-testing/ethermint/stop.sh`
 
 Description: Stop all Cosmos devnet containers.
+
+# Util scripts
+
+## add-component-showcase
+
+Definition: `add-component-showcase`
+
+Description: It creates new `tsx` file and modifies `componentsList.ts` file in order to add components to the showcase page easier. Fore more information take a look at [Component-Kit.md](./Component-Kit.md) documentation file.

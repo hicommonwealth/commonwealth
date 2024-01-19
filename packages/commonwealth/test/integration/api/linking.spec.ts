@@ -1,10 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+import { ActionPayload, Session } from '@canvas-js/interfaces';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 
+import { LinkSource, ThreadAttributes, models } from '@hicommonwealth/model';
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from 'server/config';
-import { LinkSource, ThreadAttributes } from 'server/models/thread';
 import { Errors } from 'server/util/linkingValidationHelper';
 import * as modelUtils from 'test/util/modelUtils';
 import { resetDatabase } from '../../../server-test';
@@ -20,15 +20,22 @@ describe('Linking Tests', () => {
   const kind = 'discussion';
   const stage = 'discussion';
 
-  let adminJWT;
-  let adminAddress;
-  let adminSession;
-  let userJWT;
-  let userAddress;
-  let userSession;
-  let topicId;
-  let thread1: ThreadAttributes;
-  let thread2: ThreadAttributes;
+  let topicId: number,
+    adminJWT: string,
+    adminAddress: string,
+    adminSession: {
+      session: Session;
+      sign: (payload: ActionPayload) => string;
+    },
+    userJWT: string,
+    userAddress: string,
+    userSession: {
+      session: Session;
+      sign: (payload: ActionPayload) => string;
+    },
+    thread1: ThreadAttributes,
+    thread2: ThreadAttributes;
+
   const link1 = {
     source: LinkSource.Snapshot,
     identifier: '0x1234567',
@@ -41,7 +48,15 @@ describe('Linking Tests', () => {
 
   before(async () => {
     await resetDatabase();
-    topicId = await modelUtils.getTopicId({ chain });
+
+    const topic = await models.Topic.findOne({
+      where: {
+        community_id: chain,
+        group_ids: [],
+      },
+    });
+    topicId = topic.id;
+
     let res = await modelUtils.createAndVerifyAddress({ chain });
     adminAddress = res.address;
     adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);

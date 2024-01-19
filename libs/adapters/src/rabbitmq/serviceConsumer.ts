@@ -1,16 +1,11 @@
+import { ILogger, logger } from '@hicommonwealth/core';
 import crypto from 'crypto';
 import Rollbar from 'rollbar';
-import { Logger } from 'typescript-logging';
 import type {
   AbstractRabbitMQController,
   RascalSubscriptions,
   TRmqMessages,
 } from '.';
-import {
-  addPrefix,
-  formatFilename,
-  loggerFactory,
-} from '../typescript-logging';
 
 export type RabbitMQSubscription = {
   messageProcessor: (data: TRmqMessages, ...args: any) => Promise<void>;
@@ -32,7 +27,7 @@ export class ServiceConsumer {
   public readonly subscriptions: RabbitMQSubscription[];
   private _initialized = false;
   protected rollbar: Rollbar;
-  private log: Logger;
+  private log: ILogger;
 
   constructor(
     _serviceName: string,
@@ -46,9 +41,7 @@ export class ServiceConsumer {
     this.subscriptions = _subscriptions;
 
     // setup logger
-    this.log = loggerFactory.getLogger(
-      addPrefix(formatFilename(__filename), [this.serviceName, this.serviceId]),
-    );
+    this.log = logger().getLogger(__filename, this.serviceName, this.serviceId);
 
     this.rabbitMQController = _rabbitmqController;
     this.rollbar = rollbar;

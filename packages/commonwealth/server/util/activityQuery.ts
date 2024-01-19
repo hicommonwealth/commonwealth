@@ -1,6 +1,5 @@
+import type { AddressInstance, DB } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
-import type { DB } from '../models';
-import type { AddressInstance } from '../models/address';
 
 export type ActivityRow = {
   category_id: string;

@@ -1,3 +1,4 @@
+import { AccessLevel, RoleObject } from '@hicommonwealth/core';
 import { Dec, IntPretty } from '@keplr-wallet/unit';
 import { isHex, isU8a } from '@polkadot/util';
 import {
@@ -5,8 +6,6 @@ import {
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
-import { AccessLevel } from './permissions';
-import type { RoleObject } from './types';
 
 export const slugify = (str: string): string => {
   // Remove any character that isn't a alphanumeric character or a

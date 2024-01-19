@@ -1,4 +1,4 @@
-import { StatsDController } from '@hicommonwealth/adapters';
+import { stats } from '@hicommonwealth/core';
 import { HttpMethod } from 'aws-sdk/clients/appmesh';
 import {
   NextFunction,
@@ -17,13 +17,13 @@ type ValidateThenHandle = [ValidationChain[], ...RequestHandler[]];
 const statsMiddleware = (method: string, path: string) => (req, res, next) => {
   try {
     const routePattern = `${method.toUpperCase()} ${path}`;
-    StatsDController.get().increment('cw.path.called', {
+    stats().increment('cw.path.called', {
       path: routePattern,
     });
     const start = Date.now();
     res.on('finish', () => {
       const latency = Date.now() - start;
-      StatsDController.get().histogram(`cw.path.latency`, latency, {
+      stats().histogram(`cw.path.latency`, latency, {
         path: routePattern,
       });
     });

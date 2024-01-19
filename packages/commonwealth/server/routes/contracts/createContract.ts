@@ -1,17 +1,18 @@
 import { AppError } from '@hicommonwealth/adapters';
 import type { ContractType } from '@hicommonwealth/core';
-import { Transaction } from 'sequelize';
-import type { ContractAbiInstance } from 'server/models/contract_abi';
-import { AbiType } from '../../../shared/types';
-import type { DB } from '../../models';
-import type { ChainNodeAttributes } from '../../models/chain_node';
+import { AbiType } from '@hicommonwealth/core';
 import type {
+  ChainNodeAttributes,
+  ContractAbiInstance,
   ContractAttributes,
   ContractInstance,
-} from '../../models/contract';
+  DB,
+} from '@hicommonwealth/model';
+import { hashAbi } from '@hicommonwealth/model';
+import { Transaction } from 'sequelize';
 import type { TypedRequestBody, TypedResponse } from '../../types';
 import { success } from '../../types';
-import validateAbi, { hashAbi } from '../../util/abiValidation';
+import validateAbi from '../../util/abiValidation';
 import { validateOwner } from '../../util/validateOwner';
 
 export const Errors = {
