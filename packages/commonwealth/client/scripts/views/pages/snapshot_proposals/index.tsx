@@ -92,7 +92,7 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
 
   return (
     <div className="SnapshotProposalsPage">
-      <CWText type="h2" fontWeight="medium">
+      <CWText type="h2" fontWeight="medium" className="header">
         Snapshots
       </CWText>
       <div className="top-bar">

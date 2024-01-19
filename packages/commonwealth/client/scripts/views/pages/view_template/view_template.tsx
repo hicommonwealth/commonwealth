@@ -6,7 +6,7 @@ import type Contract from 'models/Contract';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useState } from 'react';
 import app from 'state';
-import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
+import 'view_template/view_template.scss';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import {
@@ -14,7 +14,6 @@ import {
   MessageRow,
 } from 'views/components/component_kit/cw_text_input';
 import { openConfirmation } from 'views/modals/confirmation_modal';
-import 'view_template/view_template.scss';
 import Web3 from 'web3';
 import isValidJson from '../../../../../shared/validateJson';
 import { CWButton } from '../../components/component_kit/cw_button';
@@ -222,7 +221,7 @@ const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
               });
               const w3 = new Web3();
               calldataSubArr.push(
-                w3.eth.abi.encodeFunctionCall(method.abi, _params)
+                w3.eth.abi.encodeFunctionCall(method.abi, _params),
               );
             });
             outputArr.push(calldataSubArr);
@@ -331,7 +330,7 @@ const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
             ...field[component].tx_forms.flatMap((method, i) => {
               // Recursively call the renderTemplate(this function) funciton for each sub function form
               return renderTemplate(method.form, field[component].field_ref, i);
-            })
+            }),
           );
 
           functionComponents.push(<CWDivider />);
@@ -346,8 +345,8 @@ const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
           functionComponents.push(
             ...renderTemplate(
               field[component].form_fields,
-              field[component].field_ref
-            )
+              field[component].field_ref,
+            ),
           );
           functionComponents.push(<CWDivider />);
           return functionComponents;
@@ -388,7 +387,7 @@ const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
             try {
               const functionAbi = parseFunctionFromABI(
                 currentContract.abi,
-                json.tx_template?.method as string
+                json.tx_template?.method as string,
               );
 
               const functionArgs = formatFunctionArgs();
@@ -428,13 +427,6 @@ const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
 
   return (
     <div className={formData.isForm ? 'ViewTemplateForm' : 'ViewTemplatePage'}>
-      <CWBreadcrumbs
-        breadcrumbs={[
-          { label: 'Contracts', path: `/contracts`, navigate },
-          { label: templateNickname },
-        ]}
-      />
-
       {!formData.isForm && (
         <CWText type="h3" className="header">
           {templateNickname}
