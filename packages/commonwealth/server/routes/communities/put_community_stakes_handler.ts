@@ -5,6 +5,7 @@ import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 import { validateCommunityStakeConfig } from '../../util/commonProtocol/communityStakeConfigValidator';
 import { formatErrorPretty } from '../../util/errorFormat';
+import { validateOwner } from '../../util/validateOwner';
 
 type PutCommunityStakesParams = Community.SetCommunityStakeParams;
 type PutCommunityStakesBody = Community.SetCommunityStakeBody;
@@ -25,11 +26,17 @@ export const putCommunityStakeHandler = async (
 
   const { community_id, stake_id } = paramsValidationResult.data;
 
-  const adminAddress = (await req.user.getAddresses())
-    .filter((addr) => !!addr.verified)
-    .find((a) => a.community_id === community_id && a.role === 'admin');
+  const user = req.user;
+  const isAdmin = await validateOwner({
+    models,
+    user,
+    communityId: community_id,
+    allowMod: false,
+    allowAdmin: true,
+    allowGodMode: true,
+  });
 
-  if (!adminAddress) {
+  if (!isAdmin) {
     throw new AppError(
       'User must be an admin of the community to update the community stakes',
     );
@@ -46,7 +53,7 @@ export const putCommunityStakeHandler = async (
   }
 
   const results = await controllers.communities.putCommunityStake({
-    user: req.user,
+    user,
     communityStake: {
       ...paramsValidationResult.data,
       ...bodyValidationResult.data,
