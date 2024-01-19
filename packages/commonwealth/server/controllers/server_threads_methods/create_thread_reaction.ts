@@ -5,9 +5,9 @@ import {
   CommunityInstance,
   ReactionAttributes,
   UserInstance,
+  getBalanceForAddress,
 } from '@hicommonwealth/model';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { getBalanceForAddress } from '../../util/getBalanceForAddress';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_methods/track';

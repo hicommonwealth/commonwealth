@@ -1,7 +1,6 @@
 import { logger, stats } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import { getBalanceForAddress } from 'server/util/getBalanceForAddress';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
@@ -259,4 +258,15 @@ async function decrementReactionWeightsSum(
     by: calculatedVotingWeight,
     transaction,
   });
+}
+
+// ----
+
+// TODO: replace with proper implementation
+export async function getBalanceForAddress(
+  address: string,
+  contractAddress: string,
+  tokenId: number,
+): Promise<number> {
+  return 10;
 }

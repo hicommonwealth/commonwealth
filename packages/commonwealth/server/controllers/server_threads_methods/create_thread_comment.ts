@@ -169,6 +169,7 @@ export async function __createThreadComment(
     canvas_hash: canvasHash,
     discord_meta: discordMeta,
     reaction_count: 0,
+    reaction_weights_sum: 0,
   };
   if (parentId) {
     Object.assign(commentContent, { parent_id: parentId });
