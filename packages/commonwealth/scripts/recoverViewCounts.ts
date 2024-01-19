@@ -1,8 +1,8 @@
 //TODO: This should be deleted after view counts are recovered.
+import { models } from '@hicommonwealth/model';
 import dotenv from 'dotenv';
 import { Client } from 'pg';
 import { exit } from 'yargs';
-import models from '../server/database';
 
 dotenv.config();
 

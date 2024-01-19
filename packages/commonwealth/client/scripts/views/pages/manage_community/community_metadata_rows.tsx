@@ -21,7 +21,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWToggle } from '../../components/component_kit/cw_toggle';
 import DirectoryPageSection from './DirectoryPageSection';
 import { DiscordForumConnections } from './DiscordForumConnections';
-import { setCommunityCategories, setSelectedTags } from './helpers';
+import { getCommunityTags, setCommunityCategories } from './helpers';
 import { ManageRoles } from './manage_roles';
 
 type CommunityMetadataRowsProps = {
@@ -88,7 +88,7 @@ export const CommunityMetadataRows = ({
   const [defaultPage, setDefaultPage] = useState(community.defaultPage);
   const [hasHomepage, setHasHomepage] = useState(community.hasHomepage);
   const [selectedTags2, setSelectedTags2] = useState(
-    setSelectedTags(community.id),
+    getCommunityTags(community.id),
   );
   const [discordBotConnected, setDiscordBotConnected] = useState(
     returningFromDiscordCallback === 'true'
