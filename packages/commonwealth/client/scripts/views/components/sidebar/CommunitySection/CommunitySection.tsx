@@ -118,6 +118,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
       </div>
       <CWModal
         size="small"
+        visibleOverflow
         content={
           <ManageCommunityStakeModal
             mode={typeOfManageCommunityStakeModal}

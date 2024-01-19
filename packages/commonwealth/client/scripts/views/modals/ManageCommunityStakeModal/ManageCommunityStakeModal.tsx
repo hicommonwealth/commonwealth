@@ -8,9 +8,11 @@ import {
 } from 'views/components/component_kit/new_designs/CWModal';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
+import StakeExchangeForm from './StakeExchangeForm';
+
 import './ManageCommunityStakeModal.scss';
 
-const fakeRandomAPICall = () => {
+export const fakeRandomAPICall = () => {
   return new Promise<void>((resolve, reject) => {
     setTimeout(() => {
       if (Math.random() < 0.5) {
@@ -29,56 +31,6 @@ interface ManageCommunityStakeModalProps {
   mode: ManageCommunityStakeModalMode;
 }
 
-interface StakeExchangeFormProps {
-  mode: ManageCommunityStakeModalMode;
-  setModalState: (modalState: ManageCommunityStakeModalState) => void;
-}
-
-const StakeExchangeForm = ({ mode, setModalState }: StakeExchangeFormProps) => {
-  const isBuyMode = mode === 'buy';
-
-  const handleBuy = async () => {
-    try {
-      setModalState(ManageCommunityStakeModalState.Loading);
-      await fakeRandomAPICall();
-      setModalState(ManageCommunityStakeModalState.Success);
-    } catch (err) {
-      console.log('Error buying: ', err);
-      setModalState(ManageCommunityStakeModalState.Failure);
-    }
-  };
-
-  const handleSell = async () => {
-    try {
-      setModalState(ManageCommunityStakeModalState.Loading);
-      await fakeRandomAPICall();
-      setModalState(ManageCommunityStakeModalState.Success);
-    } catch (err) {
-      console.log('Error selling: ', err);
-      setModalState(ManageCommunityStakeModalState.Failure);
-    }
-  };
-
-  const handleClick = () => {
-    isBuyMode ? handleBuy() : handleSell();
-  };
-
-  return (
-    <>
-      <CWModalBody>StakeExchangeForm</CWModalBody>
-      <CWModalFooter>
-        <CWButton
-          label={mode === 'buy' ? 'Buy' : 'Sell'}
-          buttonType="secondary"
-          buttonAlt={mode === 'buy' ? 'green' : 'rorange'}
-          buttonWidth="full"
-          onClick={handleClick}
-        />
-      </CWModalFooter>
-    </>
-  );
-};
-
 const TransactionLoading = () => {
   return (
     <>
@@ -89,7 +41,6 @@ const TransactionLoading = () => {
     </>
   );
 };
-
 interface TransactionFailedProps {
   onModalClose: () => void;
   setModalState: (modalState: ManageCommunityStakeModalState) => void;
@@ -132,7 +83,7 @@ const TransactionSucceeded = ({ onModalClose }: TransactionSucceededProps) => {
   );
 };
 
-enum ManageCommunityStakeModalState {
+export enum ManageCommunityStakeModalState {
   Exchange = 'Exchange',
   Loading = 'Loading',
   Failure = 'Failure',
