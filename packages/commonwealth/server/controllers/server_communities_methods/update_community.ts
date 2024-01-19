@@ -10,6 +10,7 @@ import { Op } from 'sequelize';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';
 import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
+import { validateNamespace } from '../../util/commonProtocol/newNamespaceValidator';
 import { findOneRole } from '../../util/roles';
 import { TrackOptions } from '../server_analytics_methods/track';
 import { ServerCommunitiesController } from '../server_communities_controller';
