@@ -1,6 +1,8 @@
+import {
+  CommunityInstance,
+  CommunitySnapshotSpaceWithSpaceAttached,
+} from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import { CommunityInstance } from '../../models/community';
-import { CommunitySnapshotSpaceWithSpaceAttached } from '../../models/community_snapshot_spaces';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 export type GetCommunitiesOptions = {

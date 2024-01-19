@@ -1,15 +1,16 @@
 import {
+  HotShotsStats,
   RabbitMQController,
   RascalConfigServices,
   RedisCache,
   ServiceKey,
-  StatsDController,
-  formatFilename,
+  TypescriptLoggingLogger,
   getRabbitMQConfig,
-  loggerFactory,
   setupErrorHandlers,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
+import { logger as _logger, stats } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import bodyParser from 'body-parser';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
@@ -24,6 +25,7 @@ import prerenderNode from 'prerender-node';
 import type { BrokerConfig } from 'rascal';
 import Rollbar from 'rollbar';
 import favicon from 'serve-favicon';
+import expressStatsInit from 'server/scripts/setupExpressStats';
 import * as v8 from 'v8';
 import {
   DATABASE_CLEAN_HOUR,
@@ -36,7 +38,6 @@ import {
   SESSION_SECRET,
   TBC_BALANCE_TTL_SECONDS,
 } from './server/config';
-import models from './server/database';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
 import { addSwagger } from './server/routing/addSwagger';
@@ -44,7 +45,6 @@ import { addExternalRoutes } from './server/routing/external';
 import setupAPI from './server/routing/router';
 import { sendBatchedNotificationEmails } from './server/scripts/emails';
 import setupAppRoutes from './server/scripts/setupAppRoutes';
-import expressStatsdInit from './server/scripts/setupExpressStats';
 import setupServer from './server/scripts/setupServer';
 import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
@@ -56,6 +56,9 @@ import ViewCountCache from './server/util/viewCountCache';
 
 let isServiceHealthy = false;
 
+const log = _logger(TypescriptLoggingLogger()).getLogger(__filename);
+stats(HotShotsStats());
+
 startHealthCheckLoop({
   service: ServiceKey.Commonwealth,
   checkFn: async () => {
@@ -65,7 +68,6 @@ startHealthCheckLoop({
   },
 });
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
 // set up express async error handling hack
 require('express-async-errors');
 
@@ -183,7 +185,7 @@ async function main() {
 
     // add other middlewares
     app.use(logger('dev'));
-    app.use(expressStatsdInit(StatsDController.get()));
+    app.use(expressStatsInit());
     app.use(bodyParser.json({ limit: '1mb' }));
     app.use(bodyParser.urlencoded({ limit: '1mb', extended: false }));
     app.use(cookieParser());

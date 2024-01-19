@@ -1,8 +1,8 @@
+import type { DB } from '@hicommonwealth/model';
+import { TopicAttributes, TopicInstance } from '@hicommonwealth/model';
 import { query, validationResult } from 'express-validator';
 import { WhereOptions } from 'sequelize';
 import type { GetTopicsReq, GetTopicsResp } from '../../api/extApiTypes';
-import type { DB } from '../../models';
-import { TopicAttributes, TopicInstance } from '../../models/topic';
 import type { TypedRequestQuery, TypedResponse } from '../../types';
 import { failure, success } from '../../types';
 import { paginationValidation } from '../../util/helperValidations';

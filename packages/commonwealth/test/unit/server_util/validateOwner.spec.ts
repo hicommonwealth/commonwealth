@@ -1,5 +1,5 @@
+import { AddressAttributes } from '@hicommonwealth/model';
 import { expect } from 'chai';
-import { AddressAttributes } from 'server/models/address';
 import { validateOwner } from 'server/util/validateOwner';
 
 describe('validateOwner', () => {

@@ -1,7 +1,6 @@
+import { CommunityInstance, ThreadAttributes } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from 'server/types';
-import { CommunityInstance } from '../../models/community';
-import { ThreadAttributes } from '../../models/thread';
 import {
   PaginationSqlBind,
   PaginationSqlOptions,

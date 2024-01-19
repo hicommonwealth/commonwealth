@@ -1,21 +1,20 @@
 import {
   AppError,
   cacheDecorator,
-  formatFilename,
-  loggerFactory,
   lookupKeyDurationInReq,
 } from '@hicommonwealth/adapters';
+import { logger } from '@hicommonwealth/core';
+import { DB } from '@hicommonwealth/model';
 import axios from 'axios';
 import bodyParser from 'body-parser';
 import { Express } from 'express';
 import _ from 'lodash';
-import { DB } from 'server/models';
 import {
   calcCosmosLCDCacheKeyDuration,
   calcCosmosRPCCacheKeyDuration,
 } from './cosmosCache';
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 const defaultCacheDuration = 60 * 10; // 10 minutes
 
 function setupCosmosProxy(app: Express, models: DB) {

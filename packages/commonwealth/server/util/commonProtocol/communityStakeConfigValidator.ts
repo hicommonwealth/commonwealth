@@ -1,5 +1,5 @@
 import { AppError } from '@hicommonwealth/adapters';
-import { DB } from 'server/models';
+import { DB } from '@hicommonwealth/model';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { factoryContracts, validChains } from './chainConfig';

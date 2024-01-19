@@ -1,6 +1,6 @@
 import { ServerError } from '@hicommonwealth/adapters';
+import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-import type { DB } from '../models';
 
 export const Errors = {
   FailedToToggle: 'Failed to toggle community star',
@@ -12,12 +12,12 @@ const starCommunity = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const chain = req.chain;
+  const { community } = req;
 
   try {
     const [star, created] = await models.StarredCommunity.findOrCreate({
       where: {
-        community_id: chain.id,
+        community_id: community.id,
         user_id: req.user.id,
       },
     });

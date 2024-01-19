@@ -4,11 +4,11 @@ import {
   RedisCache,
   ServerError,
   cacheDecorator,
-  formatFilename,
-  loggerFactory,
   lookupKeyDurationInReq,
   setupErrorHandlers,
 } from '@hicommonwealth/adapters';
+import { logger } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import bodyParser from 'body-parser';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
@@ -25,7 +25,6 @@ import {
   SESSION_SECRET,
   TBC_BALANCE_TTL_SECONDS,
 } from './server/config';
-import models from './server/database';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
 import setupAPI from './server/routing/router'; // performance note: this takes 15 seconds
@@ -35,7 +34,7 @@ import GlobalActivityCache from './server/util/globalActivityCache';
 import { TokenBalanceCache } from './server/util/tokenBalanceCache/tokenBalanceCache';
 import ViewCountCache from './server/util/viewCountCache';
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 require('express-async-errors');
 

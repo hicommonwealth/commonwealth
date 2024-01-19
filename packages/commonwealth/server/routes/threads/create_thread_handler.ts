@@ -1,6 +1,6 @@
 import { IDiscordMeta } from '@hicommonwealth/core';
+import { ThreadAttributes } from '@hicommonwealth/model';
 import { verifyThread } from '../../../shared/canvas/serverVerify';
-import { ThreadAttributes } from '../../models/thread';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 
@@ -25,7 +25,7 @@ export const createThreadHandler = async (
   req: TypedRequestBody<CreateThreadRequestBody>,
   res: TypedResponse<CreateThreadResponse>,
 ) => {
-  const { user, address, chain: community } = req;
+  const { user, address, community } = req;
   const {
     topic_id: topicId,
     title,

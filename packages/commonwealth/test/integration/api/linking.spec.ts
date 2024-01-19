@@ -2,13 +2,12 @@ import { ActionPayload, Session } from '@canvas-js/interfaces';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 
+import { LinkSource, ThreadAttributes, models } from '@hicommonwealth/model';
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from 'server/config';
-import { LinkSource, ThreadAttributes } from 'server/models/thread';
 import { Errors } from 'server/util/linkingValidationHelper';
 import * as modelUtils from 'test/util/modelUtils';
 import { resetDatabase } from '../../../server-test';
-import models from '../../../server/database';
 
 chai.use(chaiHttp);
 const { expect } = chai;

@@ -1,6 +1,6 @@
 import { AppError } from '@hicommonwealth/adapters';
+import { CommentInstance } from '@hicommonwealth/model';
 import { verifyComment } from '../../../shared/canvas/serverVerify';
-import { CommentInstance } from '../../models/comment';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 

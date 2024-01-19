@@ -1,6 +1,6 @@
 import type { RabbitMQController } from '@hicommonwealth/adapters';
+import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-import type { DB } from '../models';
 import { success } from '../types';
 
 const Errors = {

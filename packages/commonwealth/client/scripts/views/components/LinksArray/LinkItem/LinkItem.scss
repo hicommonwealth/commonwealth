@@ -1,0 +1,16 @@
+@import '../../../../../styles/shared';
+
+.LinkItem {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+
+  .IconButton {
+    cursor: pointer;
+
+    &.disabled {
+      cursor: not-allowed !important;
+    }
+  }
+}
