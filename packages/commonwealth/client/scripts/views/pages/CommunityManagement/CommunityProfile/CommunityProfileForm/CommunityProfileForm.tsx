@@ -215,7 +215,7 @@ const CommunityProfileForm = () => {
               placeholder="Community URL"
               value={`${window.location.origin}/${communityId}`}
             />
-            {featureFlags.isCommunityStakesEnabled && (
+            {featureFlags.communityStake && (
               <>
                 <CWTextInput
                   disabled

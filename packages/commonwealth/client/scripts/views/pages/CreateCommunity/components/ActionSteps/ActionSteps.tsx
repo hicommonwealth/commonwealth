@@ -1,8 +1,9 @@
 import React from 'react';
 
-import ActionStep, { ActionStepProps } from './ActionStep';
-
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
+
+import ActionStep from './ActionStep';
+import { ActionStepProps } from './types';
 
 import './ActionSteps.scss';
 

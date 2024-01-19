@@ -6,7 +6,7 @@ import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
-import CreateCommunityHint from '../../../components/CreateCommunityHint';
+import Hint from '../../../components/Hint';
 import { EnableStakeProps, StakeData } from './types';
 import { validationSchema } from './validations';
 
@@ -31,15 +31,6 @@ const EnableStake = ({
     };
   };
 
-  const renderHint = (className: string) => (
-    <CreateCommunityHint
-      className={className}
-      title="What is a namespace?"
-      hint="The namespace is an address that represents your community  on-chain.
-          You can purchase additional community namespaces from the admin panel."
-    />
-  );
-
   return (
     <div className="EnableStake">
       <section className="header">
@@ -53,7 +44,7 @@ const EnableStake = ({
           decide to burn their stake.
         </CWText>
 
-        {renderHint('mobile')}
+        <Hint className="mobile" />
 
         <CWText type="b1" className="description">
           Namespace and symbol must be unique on Common. Edit below.
@@ -114,7 +105,7 @@ const EnableStake = ({
         </section>
       </section>
 
-      {renderHint('desktop')}
+      <Hint className="desktop" />
     </div>
   );
 };
