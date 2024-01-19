@@ -69,14 +69,14 @@
       }
     }
 
-  .cwsl__indicators {
-    cursor: pointer;
-    
-    &.searchable {
-      [class$='-control'] {
-        cursor: text !important;
+    .cwsl__indicators {
+      cursor: pointer;
+
+      &.searchable {
+        [class$='-control'] {
+          cursor: text !important;
+        }
       }
-    }
 
       .cwsl__indicator-separator {
         display: none;
@@ -96,6 +96,15 @@
         @include scrollbarStyles;
         overflow: auto;
         padding: 8px;
+
+        .cwsl__group {
+          padding-bottom: 0;
+
+          .cwsl__group-heading {
+            text-transform: uppercase;
+            font-size: 12px;
+          }
+        }
 
         .cwsl__option {
           border: 0;

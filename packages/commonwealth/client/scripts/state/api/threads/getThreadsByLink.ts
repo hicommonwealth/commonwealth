@@ -1,6 +1,6 @@
+import { Link } from '@hicommonwealth/model';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { Link } from 'server/models/thread';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 
@@ -12,7 +12,9 @@ interface GetThreadsByLinkProps {
   enabled: boolean;
 }
 
-const getThreadsByLink = async ({ link }: GetThreadsByLinkProps) => {
+const getThreadsByLink = async ({
+  link,
+}: GetThreadsByLinkProps): Promise<{ id: number; title: string }[]> => {
   const response = await axios.post(`${app.serverUrl()}/linking/getLinks`, {
     link,
     jwt: app.user.jwt,

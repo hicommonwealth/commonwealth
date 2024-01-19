@@ -1,6 +1,6 @@
+import { ThreadAttributes } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
 import { ServerThreadsController } from '../server_threads_controller';
-import { ThreadAttributes } from '../../models/thread';
 
 export type GetThreadsByIdOptions = {
   threadIds: number[];
@@ -10,7 +10,7 @@ export type GetThreadsByIdResult = ThreadAttributes[];
 
 export async function __getThreadsById(
   this: ServerThreadsController,
-  { threadIds }: GetThreadsByIdOptions
+  { threadIds }: GetThreadsByIdOptions,
 ): Promise<GetThreadsByIdResult> {
   const threads = await this.models.Thread.findAll({
     where: {

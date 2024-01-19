@@ -1,20 +1,19 @@
-import { Op } from 'sequelize';
-import type { DB } from '../models';
-import type { AddressInstance } from '../models/address';
+import type { AddressInstance, DB } from '@hicommonwealth/model';
+import { QueryTypes } from 'sequelize';
 
-export type GlobalActivity = Array<{
+export type ActivityRow = {
   category_id: string;
-  comment_count: string;
+  comment_count: number;
   last_activity: string;
   notification_data: string; // actually object but stringified
-  reaction_count: string;
-  thread_id: string;
-  view_count: number;
+  reaction_count: number;
+  thread_id: number;
   commenters: {
-    id: number;
     Addresses: AddressInstance[];
   }[];
-}>;
+};
+
+export type GlobalActivity = Array<ActivityRow>;
 
 export async function getActivityFeed(
   models: DB,
@@ -24,79 +23,55 @@ export async function getActivityFeed(
    * Last 50 updated threads
    */
 
-  const filterByChainForUsers = id
-    ? 'JOIN "Addresses" a on a.community_id=t.chain and a.user_id = ?'
+  const filterByCommunityForUsers = id
+    ? 'JOIN "Addresses" a on a.community_id=t.community_id and a.user_id = ?'
     : '';
 
   const query = `
-  WITH ranked_thread_notifs as (SELECT t.id AS thread_id,
-                                  t.max_notif_id
-                                FROM "Threads" t 
-                                ${filterByChainForUsers}
-                                WHERE t.max_notif_id IS NOT NULL AND deleted_at IS NULL
-                                ORDER BY t.max_notif_id DESC
-                                LIMIT 50
-                                )
-  -- this section combines the ranked thread ids from above with comments and reactions in order to
-  -- count the number of reactions and comments associated with each thread. It also joins the ranked thread ids
-  -- with notifications and threads in order to retrieve notification data and thread view counts respectively
-  SELECT nt.thread_id,
-         nts.created_at as last_activity,
-         nts.notification_data,
-         nts.category_id,
-         thr.view_count as view_count,
-         thr.comment_count AS comment_count
-  FROM ranked_thread_notifs nt
-  INNER JOIN "Notifications" nts ON nt.max_notif_id = nts.id
-  JOIN "Threads" thr ON thr.id = nt.thread_id
-  ORDER BY nts.created_at DESC;
-`;
+    WITH ranked_thread_notifs AS (
+        SELECT t.id AS thread_id, t.max_notif_id
+        FROM "Threads" t
+        ${filterByCommunityForUsers}
+        WHERE deleted_at IS NULL
+        ORDER BY t.max_notif_id DESC
+        LIMIT 50
+    ) SELECT
+        nts.thread_id,
+        nts.created_at AS last_activity,
+        nts.notification_data,
+        nts.category_id,
+        thr.comment_count,
+                COALESCE(
+                    json_agg(
+                        json_build_object('Addresses', json_build_array(row_to_json(A)))
+                    ) FILTER (WHERE A.id IS NOT NULL), 
+                    json_build_array()
+                ) as commenters
+    FROM ranked_thread_notifs rtn
+    INNER JOIN "Notifications" nts ON rtn.max_notif_id = nts.id
+    JOIN "Threads" thr ON thr.id = rtn.thread_id
+    LEFT JOIN "Comments" C ON C.id = (nts.notification_data::JSONB ->> 'comment_id')::INTEGER
+    LEFT JOIN LATERAL (
+        SELECT A.id, A.address, A.community_id, A.profile_id
+        FROM "Addresses" A
+        JOIN "Comments" C ON A.id = C.address_id AND C.thread_id = thr.id
+        WHERE C.deleted_at IS NULL
+        ORDER BY A.id
+        LIMIT 4
+    ) A ON TRUE
+    WHERE (category_id = 'new-comment-creation' AND C.deleted_at IS NULL) OR category_id = 'new-thread-creation'
+    GROUP BY nts.notification_data, nts.thread_id, nts.created_at, nts.category_id, thr.comment_count
+    ORDER BY nts.created_at DESC;
+  `;
 
-  const notifications: any = await models.sequelize.query(query, {
-    type: 'SELECT',
-    raw: true,
-    replacements: [id],
-  });
-
-  const comments = await models.Comment.findAll({
-    where: {
-      thread_id: {
-        [Op.in]: notifications.map((n) => n.thread_id),
-      },
+  const notifications: any = await models.sequelize.query<GlobalActivity>(
+    query,
+    {
+      type: QueryTypes.SELECT,
+      raw: true,
+      replacements: [id],
     },
-    attributes: ['id', 'thread_id', 'address_id'],
-  });
+  );
 
-  const addresses = await models.Address.findAll({
-    where: {
-      id: {
-        [Op.in]: comments.map((c) => c.address_id),
-      },
-    },
-    attributes: ['id', 'address', 'community_id', 'profile_id'],
-  });
-
-  const profiles = addresses.map((a) => {
-    return {
-      id: a.profile_id,
-      Addresses: [a],
-    };
-  });
-
-  const notificationsWithProfiles = notifications.map((notification) => {
-    const filteredComments = comments.filter(
-      (c) => c.thread_id === notification.thread_id,
-    );
-    const notificationProfiles = filteredComments.map((c) => {
-      const filteredAddress = addresses.find((a) => a.id === c.address_id);
-
-      return profiles.find((p) => p.id === filteredAddress.profile_id);
-    });
-    return {
-      ...notification,
-      commenters: [...new Set(notificationProfiles)],
-    };
-  });
-
-  return notificationsWithProfiles;
+  return notifications;
 }

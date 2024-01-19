@@ -1,3 +1,4 @@
+import { ContentType } from '@hicommonwealth/core';
 import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
@@ -26,7 +27,6 @@ import {
   useAddThreadLinksMutation,
   useGetThreadsByIdQuery,
 } from 'state/api/threads';
-import { ContentType } from 'types';
 import { slugify } from 'utils';
 import ExternalLink from 'views/components/ExternalLink';
 import useJoinCommunity from 'views/components/Header/useJoinCommunity';
@@ -144,6 +144,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const { data: memberships = [] } = useRefreshMembershipQuery({
     chainId: app.activeChainId(),
     address: app?.user?.activeAccount?.address,
+    apiEnabled: !!app?.user?.activeAccount?.address,
   });
 
   const isTopicGated = !!(memberships || []).find((membership) =>
@@ -251,7 +252,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     // load view count
     axios
       .post(`${app.serverUrl()}/viewCount`, {
-        chain: app.activeChainId(),
+        community_id: app.activeChainId(),
         object_id: thread.id,
       })
       .then((response) => {
@@ -283,7 +284,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   if (
     (!isLoading && !thread) ||
     fetchThreadError ||
-    thread.chain !== app.activeChainId()
+    thread.communityId !== app.activeChainId()
   ) {
     return <PageNotFound />;
   }
@@ -320,12 +321,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const hasWebLinks = thread.links.find((x) => x.source === 'web');
 
-  const canComment =
-    (!!hasJoinedCommunity ||
-      (!isAdminOrMod &&
-        app.chain.isGatedTopic(thread?.topic?.id) &&
-        !featureFlags.newGatingEnabled)) &&
-    !isRestrictedMembership;
+  const canComment = !!hasJoinedCommunity && !isRestrictedMembership;
 
   const handleNewSnapshotChange = async ({
     id,
@@ -405,7 +401,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           showLinkedThreadOptions ||
           polls?.length > 0 ||
           isAuthor ||
-          hasWebLinks
+          !!hasWebLinks
         }
         isSpamThread={!!thread.markedAsSpamAt}
         title={
@@ -536,8 +532,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       shouldFocusEditor={shouldFocusCommentEditor}
                       tooltipText={disabledActionsTooltipText}
                     />
-                    {featureFlags.newGatingEnabled &&
-                      foundGatedTopic &&
+                    {foundGatedTopic &&
                       !hideGatingBanner &&
                       isRestrictedMembership && (
                         <CWGatedTopicBanner

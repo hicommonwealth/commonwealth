@@ -120,19 +120,22 @@
   .ql-container {
     min-height: 212px;
     max-height: 512px;
-    overflow-y: scroll;
+    overflow: auto;
     border: none !important;
   }
 
   .ql-editor {
     min-height: 212px;
+    max-height: 512px;
 
     &.ql-blank::before {
       font-style: normal;
     }
+
     & h1 {
       font-size: 24px !important;
     }
+
     & h2 {
       font-size: 20px !important;
     }
@@ -181,6 +184,7 @@
       0% {
         transform: rotate(0deg);
       }
+
       100% {
         transform: rotate(360deg);
       }

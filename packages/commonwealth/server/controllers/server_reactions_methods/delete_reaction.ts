@@ -1,8 +1,7 @@
-import { UserInstance } from 'server/models/user';
-import { ServerReactionsController } from '../server_reactions_controller';
+import { AppError } from '@hicommonwealth/adapters';
+import { AddressInstance, UserInstance } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import { AppError } from '../../../../common-common/src/errors';
-import { AddressInstance } from 'server/models/address';
+import { ServerReactionsController } from '../server_reactions_controller';
 
 const Errors = {
   ReactionNotFound: 'Reaction not found',
@@ -19,7 +18,7 @@ export type DeleteReactionResult = void;
 
 export async function __deleteReaction(
   this: ServerReactionsController,
-  { user, address, reactionId }: DeleteReactionOptions
+  { user, address, reactionId }: DeleteReactionOptions,
 ): Promise<DeleteReactionResult> {
   const userOwnedAddressIds = (await user.getAddresses())
     .filter((addr) => !!addr.verified)
@@ -39,7 +38,7 @@ export async function __deleteReaction(
 
   // check if author is banned
   const [canInteract, banError] = await this.banCache.checkBan({
-    communityId: reaction.chain,
+    communityId: reaction.community_id,
     address: address.address,
   });
   if (!canInteract) {

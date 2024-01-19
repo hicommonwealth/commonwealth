@@ -1,5 +1,5 @@
-import { IDiscordMeta } from 'common-common/src/types';
-import { ThreadAttributes } from '../../models/thread';
+import { IDiscordMeta } from '@hicommonwealth/core';
+import { ThreadAttributes } from '@hicommonwealth/model';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -18,7 +18,6 @@ type UpdateThreadRequestBody = {
   archived?: boolean;
   spam?: boolean;
   topicId?: number;
-  topicName?: string;
   collaborators?: {
     toAdd?: number[];
     toRemove?: number[];
@@ -35,7 +34,7 @@ export const updateThreadHandler = async (
   req: TypedRequest<UpdateThreadRequestBody, null, { id: string }>,
   res: TypedResponse<UpdateThreadResponse>,
 ) => {
-  const { user, address, chain: community } = req;
+  const { user, address, community } = req;
   const { id } = req.params;
   const {
     title,
@@ -47,7 +46,6 @@ export const updateThreadHandler = async (
     archived,
     spam,
     topicId,
-    topicName,
     collaborators,
     canvasSession,
     canvasAction,
@@ -74,7 +72,6 @@ export const updateThreadHandler = async (
       archived,
       spam,
       topicId,
-      topicName,
       collaborators,
       canvasSession,
       canvasAction,

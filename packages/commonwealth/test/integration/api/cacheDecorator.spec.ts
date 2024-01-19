@@ -1,20 +1,22 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable dot-notation */
+/* eslint-disable no-unused-expressions */
 require('dotenv').config();
 import chai from 'chai';
-import 'chai/register-should';
 import chaiHttp from 'chai-http';
+
 chai.use(chaiHttp);
 const expect = chai.expect;
 
-import { RedisCache } from 'common-common/src/redisCache';
-import { RedisNamespaces } from 'common-common/src/types';
 import {
   cacheDecorator,
+  connectToRedis,
+  delay,
+  RedisCache,
   XCACHE_VALUES,
-} from 'common-common/src/cacheDecorator';
+} from '@hicommonwealth/adapters';
+import { RedisNamespaces } from '@hicommonwealth/core';
 import app, { CACHE_ENDPOINTS } from '../../../server-test';
-import { connectToRedis } from '../../util/redisUtils';
-import { delay } from '../../util/delayUtils';
-
 const content_type = {
   json: 'application/json; charset=utf-8',
   html: 'text/html; charset=utf-8',
@@ -23,7 +25,7 @@ const content_type = {
 function verifyNoCacheResponse(
   res,
   status = 200,
-  cacheHeader = XCACHE_VALUES.MISS
+  cacheHeader = XCACHE_VALUES.MISS,
 ) {
   expect(res.body).to.not.be.null;
   expect(res).to.have.status(status);
@@ -36,8 +38,11 @@ async function verifyCacheResponse(key, res, resEarlier) {
   expect(res).to.have.header('X-Cache', XCACHE_VALUES.HIT);
   const valFromRedis = await cacheDecorator.checkCache(key);
   expect(valFromRedis).to.not.be.null;
-  expect(JSON.parse(valFromRedis)).to.be.deep.equal(res.body);
-  expect(JSON.parse(valFromRedis)).to.be.deep.equal(resEarlier.body);
+  if (key === CACHE_ENDPOINTS.JSON) {
+    // to avoid unhandled exceptions when response is not json
+    expect(JSON.parse(valFromRedis)).to.be.deep.equal(res.body);
+    expect(JSON.parse(valFromRedis)).to.be.deep.equal(resEarlier.body);
+  }
 }
 
 async function makeGetRequest(endpoint, headers = {}) {

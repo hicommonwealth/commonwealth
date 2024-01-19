@@ -1,7 +1,6 @@
+import { CommunityInstance, UserInstance } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { ServerTopicsController } from 'server/controllers/server_topics_controller';
-import { UserInstance } from 'server/models/user';
-import { CommunityInstance } from '../../../server/models/community';
 
 const createMockedTopicsController = (isAdmin: boolean = false) => {
   const db: any = {
@@ -79,7 +78,6 @@ describe('ServerTopicsController', () => {
           description: 'ddd',
           featured_in_new_post: false,
           featured_in_sidebar: false,
-          token_threshold: '0',
         },
       }),
     );
@@ -88,7 +86,6 @@ describe('ServerTopicsController', () => {
     expect(topic.description).to.equal('ddd');
     expect(topic.featured_in_new_post).to.equal(false);
     expect(topic.featured_in_sidebar).to.equal(false);
-    expect(topic.token_threshold).to.equal('0');
   });
   describe('#deleteTopic', async () => {
     const { controller, user, chain } = createMockedTopicsController();

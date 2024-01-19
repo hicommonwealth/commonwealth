@@ -27,7 +27,7 @@ export function useBrowserAnalyticsTrack<T extends AnalyticsPayload>({
           // use active account if available; otherwise, use one of user's addresses
           userAddress:
             (app.user?.activeAccount?.address ||
-              app.user?.addresses[0].address) ??
+              app.user?.addresses[0]?.address) ??
             null,
           community: app.activeChainId(),
         });

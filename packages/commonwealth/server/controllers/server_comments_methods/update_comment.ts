@@ -1,16 +1,15 @@
 import moment from 'moment';
 import { Op } from 'sequelize';
 
-import { AppError } from '../../../../common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
+import { NotificationCategories, ProposalType } from '@hicommonwealth/core';
 import {
-  NotificationCategories,
-  ProposalType,
-} from '../../../../common-common/src/types';
+  AddressInstance,
+  CommentAttributes,
+  CommunityInstance,
+  UserInstance,
+} from '@hicommonwealth/model';
 import { renderQuillDeltaToText } from '../../../shared/utils';
-import { AddressInstance } from '../../models/address';
-import { CommentAttributes } from '../../models/comment';
-import { CommunityInstance } from '../../models/community';
-import { UserInstance } from '../../models/user';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { ServerCommentsController } from '../server_comments_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
@@ -42,7 +41,7 @@ export async function __updateComment(
     commentId,
     commentBody,
     discordMeta,
-  }: UpdateCommentOptions
+  }: UpdateCommentOptions,
 ): Promise<UpdateCommentResult> {
   if (!commentId && !discordMeta) {
     throw new AppError(Errors.NoId);
@@ -105,7 +104,7 @@ export async function __updateComment(
   comment.plaintext = (() => {
     try {
       return renderQuillDeltaToText(
-        JSON.parse(decodeURIComponent(commentBody))
+        JSON.parse(decodeURIComponent(commentBody)),
       );
     } catch (e) {
       return decodeURIComponent(commentBody);
@@ -131,7 +130,7 @@ export async function __updateComment(
         root_type: ProposalType.Thread,
         comment_id: +finalComment.id,
         comment_text: finalComment.text,
-        chain_id: finalComment.chain,
+        chain_id: finalComment.community_id,
         author_address: finalComment.Address.address,
         author_chain: finalComment.Address.community_id,
       },
@@ -143,7 +142,7 @@ export async function __updateComment(
   try {
     const previousDraftMentions = parseUserMentions(latestVersion);
     const currentDraftMentions = parseUserMentions(
-      decodeURIComponent(commentBody)
+      decodeURIComponent(commentBody),
     );
     mentions = currentDraftMentions.filter((addrArray) => {
       let alreadyExists = false;
@@ -171,7 +170,7 @@ export async function __updateComment(
           include: [this.models.User],
         });
         return mentionedUser;
-      })
+      }),
     );
     // filter null results
     mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
@@ -194,7 +193,7 @@ export async function __updateComment(
             root_type: ProposalType.Thread,
             comment_id: +finalComment.id,
             comment_text: finalComment.text,
-            chain_id: finalComment.chain,
+            chain_id: finalComment.community_id,
             author_address: finalComment.Address.address,
             author_chain: finalComment.Address.community_id,
           },

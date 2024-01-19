@@ -1,5 +1,4 @@
-import { TokenBalanceCache } from '../../../token-balance-cache/src';
-import { DB } from '../models';
+import { DB } from '@hicommonwealth/model';
 import BanCache from '../util/banCheckCache';
 import {
   __createChainNode,
@@ -27,11 +26,6 @@ import {
   GetCommunitiesResult,
 } from './server_communities_methods/get_communities';
 import {
-  __getCommunityStats,
-  GetCommunityStatsOptions,
-  GetCommunityStatsResult,
-} from './server_communities_methods/get_community_stats';
-import {
   __getRelatedCommunities,
   GetRelatedCommunitiesQuery,
   GetRelatedCommunitiesResult,
@@ -51,11 +45,7 @@ import {
  * Implements methods related to communities
  */
 export class ServerCommunitiesController {
-  constructor(
-    public models: DB,
-    public tokenBalanceCache: TokenBalanceCache,
-    public banCache: BanCache,
-  ) {}
+  constructor(public models: DB, public banCache: BanCache) {}
 
   async searchCommunities(
     options: SearchCommunitiesOptions,
@@ -85,12 +75,6 @@ export class ServerCommunitiesController {
     options: DeleteCommunityOptions,
   ): Promise<DeleteCommunityResult> {
     return __deleteCommunity.call(this, options);
-  }
-
-  async getCommunityStats(
-    options: GetCommunityStatsOptions,
-  ): Promise<GetCommunityStatsResult> {
-    return __getCommunityStats.call(this, options);
   }
 
   async getChainNodes(

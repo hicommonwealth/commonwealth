@@ -5,10 +5,14 @@ export const TOKENS = {
   EVM_TOKEN: 'eth_native',
 };
 
-export const SPECIFICATIONS = {
+export const ERC_SPECIFICATIONS = {
   ERC_20: 'erc20',
   ERC_721: 'erc721',
   ERC_1155: 'erc1155',
+};
+
+export const CW_SPECIFICATIONS = {
+  CW_721: 'cw721',
 };
 
 export const BLOCKCHAINS = {
@@ -27,9 +31,10 @@ export const AMOUNT_CONDITIONS = {
 
 export const requirementTypes = [
   { value: TOKENS.COSMOS_TOKEN, label: 'Cosmos base tokens' },
-  { value: SPECIFICATIONS.ERC_20, label: 'ERC-20' },
-  { value: SPECIFICATIONS.ERC_721, label: 'ERC-721' },
-  { value: SPECIFICATIONS.ERC_1155, label: 'ERC-1155' },
+  { value: CW_SPECIFICATIONS.CW_721, label: 'CW-721' },
+  { value: ERC_SPECIFICATIONS.ERC_20, label: 'ERC-20' },
+  { value: ERC_SPECIFICATIONS.ERC_721, label: 'ERC-721' },
+  { value: ERC_SPECIFICATIONS.ERC_1155, label: 'ERC-1155' },
   { value: TOKENS.EVM_TOKEN, label: 'EVM base tokens' },
 ];
 

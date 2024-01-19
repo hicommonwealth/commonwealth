@@ -12,12 +12,13 @@ import Permissions from '../../../../utils/Permissions';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
 import { CWText } from '../../component_kit/cw_text';
 import AccountConnectionIndicator from '../AccountConnectionIndicator';
+import { AdminSection } from '../AdminSection';
 import CreateCommunityButton from '../CreateCommunityButton';
 import DirectoryMenuItem from '../DirectoryMenuItem';
-import { AdminSection } from '../admin_section';
 import { DiscussionSection } from '../discussion_section';
 import { ExternalLinksModule } from '../external_links_module';
 import { GovernanceSection } from '../governance_section';
+import { AdminSection as OldAdminSection } from '../old_admin_section';
 import { CommunitySectionSkeleton } from './CommunitySectionSkeleton';
 
 interface CommunitySectionProps {
@@ -45,12 +46,16 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
         />
       )}
 
-      {featureFlags.newCreateCommunity && <CreateCommunityButton />}
+      <CreateCommunityButton />
 
       {showAdmin && (
         <>
           <CWDivider />
-          <AdminSection />
+          {featureFlags.newAdminOnboardingEnabled ? (
+            <AdminSection />
+          ) : (
+            <OldAdminSection />
+          )}
         </>
       )}
       {featureFlags.communityHomepage && app.chain?.meta.hasHomepage && (

@@ -1,18 +1,19 @@
-import type { ContractType } from 'common-common/src/types';
-import { AppError } from 'common-common/src/errors';
-import type { DB } from '../../models';
+import { AppError } from '@hicommonwealth/adapters';
+import type { ContractType } from '@hicommonwealth/core';
+import { AbiType } from '@hicommonwealth/core';
 import type {
+  ChainNodeAttributes,
+  ContractAbiInstance,
   ContractAttributes,
   ContractInstance,
-} from '../../models/contract';
-import type { ChainNodeAttributes } from '../../models/chain_node';
+  DB,
+} from '@hicommonwealth/model';
+import { hashAbi } from '@hicommonwealth/model';
+import { Transaction } from 'sequelize';
 import type { TypedRequestBody, TypedResponse } from '../../types';
 import { success } from '../../types';
-import validateAbi, { hashAbi } from '../../util/abiValidation';
-import type { ContractAbiInstance } from 'server/models/contract_abi';
+import validateAbi from '../../util/abiValidation';
 import { validateOwner } from '../../util/validateOwner';
-import { AbiType } from '../../../shared/types';
-import { Transaction } from 'sequelize';
 
 export const Errors = {
   NoType: 'Must provide contract type',
@@ -56,7 +57,7 @@ export type CreateContractResp = {
 async function findOrCreateAbi(
   abi: AbiType,
   models: DB,
-  t?: Transaction
+  t?: Transaction,
 ): Promise<ContractAbiInstance> {
   let contractAbi: ContractAbiInstance;
   const abiHash = hashAbi(abi);
@@ -73,7 +74,7 @@ async function findOrCreateAbi(
         abi: abi,
         abi_hash: abiHash,
       },
-      { transaction: t }
+      { transaction: t },
     );
   }
 
@@ -83,7 +84,7 @@ async function findOrCreateAbi(
 const createContract = async (
   models: DB,
   req: TypedRequestBody<CreateContractReq>,
-  res: TypedResponse<CreateContractResp>
+  res: TypedResponse<CreateContractResp>,
 ) => {
   const {
     address,
@@ -142,7 +143,7 @@ const createContract = async (
     // contract already exists so attempt to add it to the community if it's not already there
     await models.CommunityContract.findOrCreate({
       where: {
-        chain_id,
+        community_id: chain_id,
         contract_id: oldContract.id,
       },
     });
@@ -190,10 +191,10 @@ const createContract = async (
 
       await models.CommunityContract.create(
         {
-          chain_id,
+          community_id: chain_id,
           contract_id: contract.id,
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
 
@@ -223,10 +224,10 @@ const createContract = async (
       });
       await models.CommunityContract.create(
         {
-          chain_id,
+          community_id: chain_id,
           contract_id: contract.id,
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
 

@@ -18,6 +18,7 @@ export enum ComponentType {
   ContentPage = 'ContentPage',
   CustomIcon = 'CustomIcon',
   Divider = 'Divider',
+  Drawer = 'Drawer',
   Form = 'Form',
   FormSection = 'FormSection',
   FormSteps = 'FormSteps',
@@ -85,6 +86,7 @@ export type DefaultMenuItem = {
   type?: 'default';
   className?: string;
   preventClosing?: boolean;
+  isButton?: boolean;
 };
 
 type NotificationMenuItem = {

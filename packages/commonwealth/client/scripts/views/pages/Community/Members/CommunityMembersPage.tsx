@@ -1,9 +1,9 @@
 import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
-import { featureFlags } from 'helpers/feature-flags';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router';
 import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
 import {
@@ -15,11 +15,11 @@ import { SearchProfilesResponse } from 'state/api/profiles/searchProfiles';
 import useGroupMutationBannerStore from 'state/ui/group';
 import { useDebounce } from 'usehooks-ts';
 import Permissions from 'utils/Permissions';
-import { Select } from 'views/components/Select';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
 import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
+import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import {
   CWTab,
   CWTabsRow,
@@ -33,29 +33,24 @@ import {
 import './CommunityMembersPage.scss';
 import GroupsSection from './GroupsSection';
 import MembersSection from './MembersSection';
-import { GroupCategory, MembershipFilter, SearchFilters } from './index.types';
+import { BaseGroupFilter, SearchFilters } from './index.types';
 
 const TABS = [
   { value: 'all-members', label: 'All members' },
-  ...(featureFlags.newGatingEnabled
-    ? [{ value: 'groups', label: 'Groups' }]
-    : []),
+  { value: 'groups', label: 'Groups' },
 ];
 
-const GROUP_AND_MEMBER_FILTERS: GroupCategory[] = [
-  'All groups',
-  'In group',
-  'Not in group',
-];
+const GROUP_AND_MEMBER_FILTERS: BaseGroupFilter[] = ['All groups', 'Ungrouped'];
 
 const CommunityMembersPage = () => {
   useUserActiveAccount();
+  const location = useLocation();
   const navigate = useCommonNavigate();
 
   const [selectedTab, setSelectedTab] = useState(TABS[0].value);
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
     searchText: '',
-    category: GROUP_AND_MEMBER_FILTERS[0],
+    groupFilter: GROUP_AND_MEMBER_FILTERS[0],
   });
   const {
     shouldShowGroupMutationBannerForCommunities,
@@ -70,8 +65,7 @@ const CommunityMembersPage = () => {
   const { data: memberships = null } = useRefreshMembershipQuery({
     chainId: app.activeChainId(),
     address: app?.user?.activeAccount?.address,
-    apiEnabled:
-      app?.user?.activeAccount?.address && !!featureFlags.newGatingEnabled,
+    apiEnabled: !!app?.user?.activeAccount?.address,
   });
 
   const debouncedSearchTerm = useDebounce<string>(
@@ -91,26 +85,45 @@ const CommunityMembersPage = () => {
     orderDirection: APIOrderDirection.Desc,
     includeRoles: true,
     includeGroupIds: true,
-    enabled:
-      app?.user?.activeAccount?.address && featureFlags.newGatingEnabled
-        ? !!memberships
-        : true,
-    ...(searchFilters.category !== 'All groups' && {
-      includeMembershipTypes: searchFilters.category
-        .split(' ')
-        .join('-')
-        .toLowerCase() as MembershipFilter,
+    enabled: app?.user?.activeAccount?.address ? !!memberships : true,
+    ...(searchFilters.groupFilter === 'Ungrouped' && {
+      includeMembershipTypes: 'not-in-group',
     }),
+    ...(!['All groups', 'Ungrouped'].includes(`${searchFilters.groupFilter}`) &&
+      searchFilters.groupFilter && {
+        includeMembershipTypes: `in-group:${searchFilters.groupFilter}`,
+      }),
   });
 
   const { data: groups } = useFetchGroupsQuery({
     communityId: app.activeChainId(),
     includeTopics: true,
-    enabled:
-      app?.user?.activeAccount?.address && featureFlags.newGatingEnabled
-        ? !!memberships
-        : true,
+    enabled: app?.user?.activeAccount?.address ? !!memberships : true,
   });
+
+  const filterOptions = useMemo(
+    () => [
+      {
+        // base filters
+        label: 'Filters',
+        options: GROUP_AND_MEMBER_FILTERS.map((x) => ({
+          id: x,
+          label: x,
+          value: x,
+        })),
+      },
+      {
+        // filters by group name
+        label: 'Groups',
+        options: (groups || []).map((group) => ({
+          id: group.id,
+          label: group.name,
+          value: group.id,
+        })),
+      },
+    ],
+    [groups],
+  );
 
   const formattedMembers = useMemo(() => {
     if (!members?.pages?.length) {
@@ -171,13 +184,11 @@ const CommunityMembersPage = () => {
               .includes(searchFilters.searchText.toLowerCase())
           : true,
       )
-      .filter((group) =>
-        searchFilters.category === 'All groups'
-          ? true
-          : searchFilters.category === 'In group'
-          ? group.isJoined
-          : !group.isJoined,
-      );
+      .filter((group) => {
+        if (searchFilters.groupFilter === 'All groups') return true;
+        if (searchFilters.groupFilter === 'Ungrouped') return !group.isJoined;
+        return group.id === parseInt(`${searchFilters.groupFilter}`);
+      });
 
     const clonedFilteredGroups = [...filteredGroupsArr];
 
@@ -191,11 +202,7 @@ const CommunityMembersPage = () => {
   const updateActiveTab = (activeTab: string) => {
     const params = new URLSearchParams();
     params.set('tab', activeTab);
-    history.pushState(
-      null,
-      '',
-      `${window.location.pathname}?${params.toString()}`,
-    );
+    navigate(`${window.location.pathname}?${params.toString()}`, {}, null);
     setSelectedTab(activeTab);
 
     let eventType;
@@ -214,7 +221,9 @@ const CommunityMembersPage = () => {
     // Invalidate group memberships cache
     queryClient.cancelQueries([ApiEndpoints.FETCH_GROUPS]);
     queryClient.refetchQueries([ApiEndpoints.FETCH_GROUPS]);
+  }, []);
 
+  useEffect(() => {
     // Set the active tab based on URL
     const params = new URLSearchParams(window.location.search.toLowerCase());
     const activeTab = params.get('tab')?.toLowerCase();
@@ -224,9 +233,9 @@ const CommunityMembersPage = () => {
       return;
     }
 
-    featureFlags.newGatingEnabled && updateActiveTab(TABS[1].value);
+    updateActiveTab(TABS[1].value);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [location.search]);
 
   const navigateToCreateGroupPage = () => {
     navigate(`/members/groups/create`);
@@ -277,9 +286,7 @@ const CommunityMembersPage = () => {
         )}
 
       {/* Filter section */}
-      {featureFlags.newGatingEnabled &&
-      selectedTab === TABS[1].value &&
-      groups?.length === 0 ? (
+      {selectedTab === TABS[1].value && groups?.length === 0 ? (
         <></>
       ) : (
         <section
@@ -288,8 +295,8 @@ const CommunityMembersPage = () => {
             'cols-4': boolean;
           }>(
             {
-              'cols-3': featureFlags.newGatingEnabled && !isAdmin,
-              'cols-4': featureFlags.newGatingEnabled && isAdmin,
+              'cols-3': !isAdmin,
+              'cols-4': isAdmin,
             },
             'filters',
           )}
@@ -310,27 +317,29 @@ const CommunityMembersPage = () => {
               }))
             }
           />
-          {featureFlags.newGatingEnabled && app.user.activeAccount && (
+          {app.user.activeAccount && (
             <div className="select-dropdown-container">
               <CWText type="b2" fontWeight="bold" className="filter-text">
                 Filter
               </CWText>
-              <Select
-                containerClassname="select-dropdown"
-                options={GROUP_AND_MEMBER_FILTERS.map((x) => ({
-                  id: x,
-                  label: x,
-                  value: x,
-                }))}
-                selected={searchFilters.category}
-                dropdownPosition="bottom-end"
-                onSelect={(item: any) => {
-                  setSearchFilters((g) => ({ ...g, category: item.value }));
+              <CWSelectList
+                isSearchable={false}
+                isClearable={false}
+                options={filterOptions}
+                value={[
+                  ...filterOptions[0].options,
+                  ...filterOptions[1].options,
+                ].find((option) => option.value === searchFilters.groupFilter)}
+                onChange={(option) => {
+                  setSearchFilters((g) => ({
+                    ...g,
+                    groupFilter: option.value,
+                  }));
                 }}
               />
             </div>
           )}
-          {featureFlags.newGatingEnabled && isAdmin && (
+          {isAdmin && (
             <CWButton
               buttonWidth="full"
               label="Create group"
@@ -342,7 +351,7 @@ const CommunityMembersPage = () => {
       )}
 
       {/* Main content section: based on the selected tab */}
-      {featureFlags.newGatingEnabled && selectedTab === TABS[1].value ? (
+      {selectedTab === TABS[1].value ? (
         <GroupsSection
           filteredGroups={filteredGroups}
           canManageGroups={isAdmin}

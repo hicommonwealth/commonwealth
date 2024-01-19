@@ -1,11 +1,12 @@
-import { factory, formatFilename } from 'common-common/src/logging';
+import { HttpBatchClient, Tendermint34Client } from '@cosmjs/tendermint-rpc';
+import { logger } from '@hicommonwealth/core';
+import { ChainNodeAttributes } from '@hicommonwealth/model';
 import AbiCoder from 'web3-eth-abi';
 import { toBN } from 'web3-utils';
-import { ChainNodeAttributes } from '../../models/chain_node';
 import { rollbar } from '../rollbar';
-import { Balances } from './types';
+import { Balances, GetTendermintClientOptions } from './types';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 /**
  * This function batches hundreds of RPC requests (1 per address) into a few batched RPC requests.
@@ -240,12 +241,8 @@ export function mapNodeToBalanceFetcherContract(
     case 1: // Ethereum Mainnet
     case 1337: // Local Ganache - assuming fork of mainnet
       return '0xb1f8e55c7f64d203c1400b9d8555d050f94adf39';
-    case 3: // Ropsten
-      return '0x8D9708f3F514206486D7E988533f770a16d074a7';
     case 5: // Goerli
       return '0x9788C4E93f9002a7ad8e72633b11E8d1ecd51f9b';
-    case 4: // Rinkeby
-      return '0x3183B673f4816C94BeF53958BaF93C671B7F8Cf2';
     case 56: // BSC
     case 97: // BSC Testnet
       return '0x2352c63A83f9Fd126af8676146721Fa00924d7e4';
@@ -253,7 +250,6 @@ export function mapNodeToBalanceFetcherContract(
     case 80001: // Polygon Mumbai
       return '0x2352c63A83f9Fd126af8676146721Fa00924d7e4';
     case 10: // Optimism Mainnet
-    case 69: // Optimism Kovan
       return '0xB1c568e9C3E6bdaf755A60c7418C269eb11524FC';
     case 42161: // Arbitrum One
       return '0x151E24A486D7258dd7C33Fb67E4bB01919B7B32c';
@@ -312,4 +308,17 @@ export async function evmRpcRequest(
   }
 
   return data;
+}
+
+export async function getTendermintClient(
+  options: GetTendermintClientOptions,
+): Promise<Tendermint34Client> {
+  const batchClient = new HttpBatchClient(
+    options.chainNode?.private_url || options.chainNode.url,
+    {
+      batchSizeLimit: options.batchSize || 100,
+      dispatchInterval: 10,
+    },
+  );
+  return await Tendermint34Client.create(batchClient);
 }

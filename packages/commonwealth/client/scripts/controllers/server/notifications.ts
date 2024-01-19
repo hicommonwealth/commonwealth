@@ -8,9 +8,9 @@ import NotificationSubscription, {
 
 import app from 'state';
 
-import { NotificationCategories } from 'common-common/src/types';
+import { NotificationCategories } from '@hicommonwealth/core';
+import { SubscriptionInstance } from '@hicommonwealth/model';
 import { findSubscription, SubUniqueData } from 'helpers/findSubscription';
-import { SubscriptionInstance } from 'server/models/subscription';
 import { NotificationStore } from 'stores';
 import Notification from '../../models/Notification';
 
@@ -378,7 +378,7 @@ class NotificationsController {
   }
 
   public getSubscribedChains() {
-    return post('/getSubscribedChains', {}, (result) => {
+    return post('/getSubscribedCommunities', {}, (result) => {
       this._chainEventSubscribedChainIds = result.map((x) => x.id);
     });
   }

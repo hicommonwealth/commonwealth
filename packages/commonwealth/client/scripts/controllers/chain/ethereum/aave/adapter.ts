@@ -1,5 +1,5 @@
+import { ChainBase } from '@hicommonwealth/core';
 import type { EthereumCoin } from 'adapters/chain/ethereum/types';
-import { ChainBase } from 'common-common/src/types';
 
 import { notifyError } from 'controllers/app/notifications';
 

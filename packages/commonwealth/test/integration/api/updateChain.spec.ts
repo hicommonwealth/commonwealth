@@ -1,9 +1,11 @@
+import { ChainBase, ChainType } from '@hicommonwealth/core';
+import {
+  CommunityAttributes,
+  UserInstance,
+  models,
+} from '@hicommonwealth/model';
 import { assert } from 'chai';
-import { ChainBase, ChainType } from 'common-common/src/types';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
-import models from '../../../server/database';
-import { CommunityAttributes } from '../../../server/models/community';
-import { UserInstance } from '../../../server/models/user';
 import { buildUser } from '../../unit/unitHelpers';
 import { resetDatabase } from '../../util/resetDatabase';
 
@@ -26,7 +28,7 @@ describe('UpdateChain Tests', () => {
   });
 
   it('Correctly updates chain', async () => {
-    const controller = new ServerCommunitiesController(models, null, null);
+    const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
       userAttributes: { email: '', id: 1, isAdmin: true },

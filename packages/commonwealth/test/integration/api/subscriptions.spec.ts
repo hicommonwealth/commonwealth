@@ -1,23 +1,22 @@
 /* eslint-disable no-unused-expressions */
-
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { NotificationCategories } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import 'chai/register-should';
-import { NotificationCategories } from 'common-common/src/types';
+
+import { models, SubscriptionValidationErrors } from '@hicommonwealth/model';
 import jwt from 'jsonwebtoken';
 import type NotificationSubscription from '../../../client/scripts/models/NotificationSubscription';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import models from '../../../server/database';
 import Errors from '../../../server/routes/subscription/errors';
 import * as modelUtils from '../../util/modelUtils';
-import { SubscriptionValidationErrors } from '../../../server/models/subscription';
 
 chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('Subscriptions Tests', () => {
-  let jwtToken, loggedInAddr, loggedInAddrId, loggedInSession, thread, comment, userId: number;
+  let jwtToken, loggedInAddr, loggedInSession, thread, comment, userId: number;
   const chain = 'ethereum';
 
   before('reset database', async () => {
@@ -25,13 +24,19 @@ describe('Subscriptions Tests', () => {
     // get logged in address/user with JWT
     const result = await modelUtils.createAndVerifyAddress({ chain });
     loggedInAddr = result.address;
-    loggedInAddrId = result.address_id;
     loggedInSession = { session: result.session, sign: result.sign };
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
-      JWT_SECRET
+      JWT_SECRET,
     );
     userId = result.user_id;
+
+    const topic = await models.Topic.findOne({
+      where: {
+        community_id: chain,
+        group_ids: [],
+      },
+    });
 
     let res = await modelUtils.createThread({
       chainId: chain,
@@ -41,8 +46,7 @@ describe('Subscriptions Tests', () => {
       body: 't',
       kind: 'discussion',
       stage: 'discussion',
-      topicName: 't',
-      topicId: undefined,
+      topicId: topic.id,
       session: loggedInSession.session,
       sign: loggedInSession.sign,
     });
@@ -77,7 +81,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body).to.not.be.null;
         expect(res.body.status).to.be.equal('Success');
         expect(res.body.result.category_id).to.be.equal(category);
-        expect(res.body.result.chain_id).to.equal(chain);
+        expect(res.body.result.community_id).to.equal(chain);
         expect(res.body.result.is_active).to.be.equal(true);
         expect(res.body.result.thread_id).to.be.null;
       });
@@ -156,7 +160,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body.result.category_id).to.be.equal(category);
         expect(res.body.result.is_active).to.be.equal(true);
         expect(res.body.result.thread_id).to.be.equal(thread.id);
-        expect(res.body.result.chain_id).to.be.equal(chain);
+        expect(res.body.result.community_id).to.be.equal(chain);
         expect(res.body.result.comment_id).to.be.null;
         rootCommmentSubscription = res.body.result;
       });
@@ -179,7 +183,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body.result.category_id).to.be.equal(category);
         expect(res.body.result.is_active).to.be.equal(true);
         expect(res.body.result.thread_id).to.be.null;
-        expect(res.body.result.chain_id).to.be.equal(chain);
+        expect(res.body.result.community_id).to.be.equal(chain);
         expect(res.body.result.comment_id).to.be.equal(comment.id);
         commentSubscription = res.body.result;
       });
@@ -268,7 +272,7 @@ describe('Subscriptions Tests', () => {
         expect(res.status).to.equal(400);
         expect(res.body).to.not.be.null;
         expect(res.body.error).to.equal(
-          'Cannot find thread model for new subscription'
+          'Cannot find thread model for new subscription',
         );
       });
 
@@ -288,7 +292,7 @@ describe('Subscriptions Tests', () => {
         expect(res.status).to.equal(400);
         expect(res.body).to.not.be.null;
         expect(res.body.error).to.equal(
-          'Cannot find comment model for new subscription'
+          'Cannot find comment model for new subscription',
         );
       });
     });
@@ -314,7 +318,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body.result.category_id).to.be.equal(category);
         expect(res.body.result.is_active).to.be.equal(true);
         expect(res.body.result.thread_id).to.be.equal(thread.id);
-        expect(res.body.result.chain_id).to.be.equal(chain);
+        expect(res.body.result.community_id).to.be.equal(chain);
         expect(res.body.result.comment_id).to.be.null;
         rootCommmentSubscription = res.body.result;
       });
@@ -337,7 +341,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body.result.category_id).to.be.equal(category);
         expect(res.body.result.is_active).to.be.equal(true);
         expect(res.body.result.thread_id).to.be.null;
-        expect(res.body.result.chain_id).to.be.equal(chain);
+        expect(res.body.result.community_id).to.be.equal(chain);
         expect(res.body.result.comment_id).to.be.equal(comment.id);
         commentSubscription = res.body.result;
       });
@@ -426,7 +430,7 @@ describe('Subscriptions Tests', () => {
         expect(res.status).to.equal(400);
         expect(res.body).to.not.be.null;
         expect(res.body.error).to.equal(
-          'Cannot find thread model for new subscription'
+          'Cannot find thread model for new subscription',
         );
       });
 
@@ -446,7 +450,7 @@ describe('Subscriptions Tests', () => {
         expect(res.status).to.equal(400);
         expect(res.body).to.not.be.null;
         expect(res.body.error).to.equal(
-          'Cannot find comment model for new subscription'
+          'Cannot find comment model for new subscription',
         );
       });
     });
@@ -503,7 +507,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body).to.not.be.null;
         expect(res.body.status).to.be.equal('Success');
         expect(res.body.result.category_id).to.be.equal(category);
-        expect(res.body.result.chain_id).to.equal(chain);
+        expect(res.body.result.community_id).to.equal(chain);
         expect(res.body.result.is_active).to.be.equal(true);
         chainSubscription = res.body.result;
       });
@@ -519,7 +523,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body).to.not.be.null;
         expect(res.body.status).to.be.equal('Success');
         expect(res.body.result.category_id).to.be.equal(category);
-        expect(res.body.result.chain_id).to.equal(chain);
+        expect(res.body.result.community_id).to.equal(chain);
         expect(res.body.result.is_active).to.be.equal(true);
         expect(res.body.result.id).to.equal(chainSubscription.id);
       });
@@ -565,7 +569,6 @@ describe('Subscriptions Tests', () => {
       it('should create a snapshot-proposal subscription', async () => {
         const is_active = true;
         const category = NotificationCategories.SnapshotProposal;
-        const snapshot_id = 'test_space';
         const res = await chai
           .request(app)
           .post('/api/createSubscription')
@@ -582,7 +585,6 @@ describe('Subscriptions Tests', () => {
       it('should not create a duplicate snapshot-proposal subscription', async () => {
         const is_active = true;
         const category = NotificationCategories.SnapshotProposal;
-        const snapshot_id = 'test_space';
         const res = await chai
           .request(app)
           .post('/api/createSubscription')
@@ -694,10 +696,10 @@ describe('Subscriptions Tests', () => {
       expect(res.body.result.length).to.be.equal(2);
 
       const threadSubRes = res.body.result.find(
-        (sub: NotificationSubscription) => sub.id === threadSub.id
+        (sub: NotificationSubscription) => sub.id === threadSub.id,
       );
       const ceSubRes = res.body.result.find(
-        (sub: NotificationSubscription) => sub.id === chainEventSub.id
+        (sub: NotificationSubscription) => sub.id === chainEventSub.id,
       );
       expect(threadSubRes).to.not.be.undefined;
       expect(ceSubRes).to.not.be.undefined;
@@ -710,10 +712,10 @@ describe('Subscriptions Tests', () => {
       const result = await modelUtils.createAndVerifyAddress({ chain });
       const newJWT = jwt.sign(
         { id: result.user_id, email: result.email },
-        JWT_SECRET
+        JWT_SECRET,
       );
 
-      const newThreadSub = await modelUtils.createSubscription({
+      await modelUtils.createSubscription({
         jwt: newJWT,
         is_active: true,
         category: NotificationCategories.NewThread,
@@ -731,10 +733,10 @@ describe('Subscriptions Tests', () => {
       expect(res.body.result.length).to.be.equal(2);
 
       const threadSubRes = res.body.result.find(
-        (sub: NotificationSubscription) => sub.id === threadSub.id
+        (sub: NotificationSubscription) => sub.id === threadSub.id,
       );
       const ceSubRes = res.body.result.find(
-        (sub: NotificationSubscription) => sub.id === chainEventSub.id
+        (sub: NotificationSubscription) => sub.id === chainEventSub.id,
       );
       expect(threadSubRes).to.not.be.undefined;
       expect(ceSubRes).to.not.be.undefined;
@@ -811,11 +813,11 @@ describe('Subscriptions Tests', () => {
             is_active: true,
             category: category,
             chain_id: chain,
-          })
+          }),
         );
       }
       const subscriptionIds = (await Promise.all(subscriptions)).map(
-        (s) => s.id
+        (s) => s.id,
       );
       let res = await chai
         .request(app)
@@ -838,7 +840,7 @@ describe('Subscriptions Tests', () => {
       const result = await modelUtils.createAndVerifyAddress({ chain });
       const newJWT = jwt.sign(
         { id: result.user_id, email: result.email },
-        JWT_SECRET
+        JWT_SECRET,
       );
       let res = await chai
         .request(app)
@@ -955,7 +957,7 @@ describe('Subscriptions Tests', () => {
       const result = await modelUtils.createAndVerifyAddress({ chain });
       const newJwt = jwt.sign(
         { id: result.user_id, email: result.email },
-        JWT_SECRET
+        JWT_SECRET,
       );
       expect(subscription).to.not.be.null;
       let res = await chai
@@ -1031,7 +1033,7 @@ describe('Subscriptions Tests', () => {
         expect.fail(subscriptionCreateErrMsg);
       } catch (e) {
         expect(e.message).to.be.equal(
-          `${sequelizeErrMsg}${SubscriptionValidationErrors.UnsupportedCategory}`
+          `${sequelizeErrMsg}${SubscriptionValidationErrors.UnsupportedCategory}`,
         );
       }
 
@@ -1044,7 +1046,7 @@ describe('Subscriptions Tests', () => {
         expect.fail(subscriptionCreateErrMsg);
       } catch (e) {
         expect(e.message).to.be.equal(
-          `${sequelizeErrMsg}${SubscriptionValidationErrors.UnsupportedCategory}`
+          `${sequelizeErrMsg}${SubscriptionValidationErrors.UnsupportedCategory}`,
         );
       }
 
@@ -1057,13 +1059,13 @@ describe('Subscriptions Tests', () => {
         expect.fail(subscriptionCreateErrMsg);
       } catch (e) {
         expect(e.message).to.be.equal(
-          `${sequelizeErrMsg}${SubscriptionValidationErrors.UnsupportedCategory}`
+          `${sequelizeErrMsg}${SubscriptionValidationErrors.UnsupportedCategory}`,
         );
       }
     });
 
     it(`should fail to create a ${NotificationCategories.NewThread} subscription without a chain_id`, async () => {
-      let category_id = NotificationCategories.NewThread;
+      const category_id = NotificationCategories.NewThread;
       try {
         await models.Subscription.create({
           subscriber_id: userId,
@@ -1072,13 +1074,13 @@ describe('Subscriptions Tests', () => {
         expect.fail(subscriptionCreateErrMsg);
       } catch (e) {
         expect(e.message).to.be.equal(
-          `${sequelizeErrMsg}${SubscriptionValidationErrors.NoChainId}`
+          `${sequelizeErrMsg}${SubscriptionValidationErrors.NoCommunityId}`,
         );
       }
     });
 
     it(`should fail to create a ${NotificationCategories.ChainEvent} subscription without a chain_id`, async () => {
-      let category_id = NotificationCategories.ChainEvent;
+      const category_id = NotificationCategories.ChainEvent;
       try {
         await models.Subscription.create({
           subscriber_id: userId,
@@ -1087,14 +1089,14 @@ describe('Subscriptions Tests', () => {
         expect.fail(subscriptionCreateErrMsg);
       } catch (e) {
         expect(e.message).to.be.equal(
-          `${sequelizeErrMsg}${SubscriptionValidationErrors.NoChainId}`
+          `${sequelizeErrMsg}${SubscriptionValidationErrors.NoCommunityId}`,
         );
       }
     });
 
     describe(`${NotificationCategories.NewComment} tests`, () => {
       it(`should fail to create a subscription without a chain_id`, async () => {
-        let category_id = NotificationCategories.NewComment;
+        const category_id = NotificationCategories.NewComment;
         try {
           await models.Subscription.create({
             subscriber_id: userId,
@@ -1103,41 +1105,41 @@ describe('Subscriptions Tests', () => {
           expect.fail(subscriptionCreateErrMsg);
         } catch (e) {
           expect(e.message).to.be.equal(
-            `${sequelizeErrMsg}${SubscriptionValidationErrors.NoChainId}`
+            `${sequelizeErrMsg}${SubscriptionValidationErrors.NoCommunityId}`,
           );
         }
       });
 
       it(`should fail to create a subscription with both a thread_id and a comment_id`, async () => {
-        let category_id = NotificationCategories.NewComment;
+        const category_id = NotificationCategories.NewComment;
         try {
           await models.Subscription.create({
             subscriber_id: userId,
             category_id,
-            chain_id: chain,
+            community_id: chain,
             thread_id: 1,
             comment_id: 1,
           });
           expect.fail(subscriptionCreateErrMsg);
         } catch (e) {
           expect(e.message).to.be.equal(
-            `${sequelizeErrMsg}${SubscriptionValidationErrors.NotBothThreadAndComment}`
+            `${sequelizeErrMsg}${SubscriptionValidationErrors.NotBothThreadAndComment}`,
           );
         }
       });
 
       it(`should fail to create a subscription without a thread_id and a comment_id`, async () => {
-        let category_id = NotificationCategories.NewComment;
+        const category_id = NotificationCategories.NewComment;
         try {
           await models.Subscription.create({
             subscriber_id: userId,
             category_id,
-            chain_id: chain,
+            community_id: chain,
           });
           expect.fail(subscriptionCreateErrMsg);
         } catch (e) {
           expect(e.message).to.be.equal(
-            `${sequelizeErrMsg}${SubscriptionValidationErrors.NoThreadOrComment}`
+            `${sequelizeErrMsg}${SubscriptionValidationErrors.NoThreadOrComment}`,
           );
         }
       });
@@ -1145,7 +1147,7 @@ describe('Subscriptions Tests', () => {
 
     describe(`${NotificationCategories.NewReaction} tests`, () => {
       it(`should fail to create a subscription without a chain_id`, async () => {
-        let category_id = NotificationCategories.NewReaction;
+        const category_id = NotificationCategories.NewReaction;
         try {
           await models.Subscription.create({
             subscriber_id: userId,
@@ -1154,48 +1156,48 @@ describe('Subscriptions Tests', () => {
           expect.fail(subscriptionCreateErrMsg);
         } catch (e) {
           expect(e.message).to.be.equal(
-            `${sequelizeErrMsg}${SubscriptionValidationErrors.NoChainId}`
+            `${sequelizeErrMsg}${SubscriptionValidationErrors.NoCommunityId}`,
           );
         }
       });
 
       it(`should fail to create a subscription with both a thread_id and a comment_id`, async () => {
-        let category_id = NotificationCategories.NewReaction;
+        const category_id = NotificationCategories.NewReaction;
         try {
           await models.Subscription.create({
             subscriber_id: userId,
             category_id,
-            chain_id: chain,
+            community_id: chain,
             thread_id: 1,
             comment_id: 1,
           });
           expect.fail(subscriptionCreateErrMsg);
         } catch (e) {
           expect(e.message).to.be.equal(
-            `${sequelizeErrMsg}${SubscriptionValidationErrors.NotBothThreadAndComment}`
+            `${sequelizeErrMsg}${SubscriptionValidationErrors.NotBothThreadAndComment}`,
           );
         }
       });
 
       it(`should fail to create a subscription without a thread_id and a comment_id`, async () => {
-        let category_id = NotificationCategories.NewReaction;
+        const category_id = NotificationCategories.NewReaction;
         try {
           await models.Subscription.create({
             subscriber_id: userId,
             category_id,
-            chain_id: chain,
+            community_id: chain,
           });
           expect.fail(subscriptionCreateErrMsg);
         } catch (e) {
           expect(e.message).to.be.equal(
-            `${sequelizeErrMsg}${SubscriptionValidationErrors.NoThreadOrComment}`
+            `${sequelizeErrMsg}${SubscriptionValidationErrors.NoThreadOrComment}`,
           );
         }
       });
     });
 
     it(`should allow ${NotificationCategories.NewMention} to be created`, async () => {
-      let category_id = NotificationCategories.NewMention;
+      const category_id = NotificationCategories.NewMention;
       try {
         const result = await models.Subscription.create({
           subscriber_id: userId,
@@ -1208,7 +1210,7 @@ describe('Subscriptions Tests', () => {
     });
 
     it(`should allow ${NotificationCategories.NewCollaboration} to be created`, async () => {
-      let category_id = NotificationCategories.NewCollaboration;
+      const category_id = NotificationCategories.NewCollaboration;
       try {
         const result = await models.Subscription.create({
           subscriber_id: userId,

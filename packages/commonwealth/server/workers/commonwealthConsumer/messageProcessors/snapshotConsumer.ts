@@ -1,14 +1,16 @@
+import { RmqSnapshotNotification } from '@hicommonwealth/adapters';
+import {
+  ILogger,
+  NotificationCategories,
+  SnapshotEventType,
+  stats,
+} from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import axios from 'axios';
-import { RmqSnapshotNotification } from 'common-common/src/rabbitmq/types/snapshotNotification';
-import { StatsDController } from 'common-common/src/statsd';
-import { NotificationCategories } from 'common-common/src/types';
-import { SnapshotEventType } from 'types';
-import type { Logger } from 'typescript-logging';
-import type { DB } from '../../../models';
 import emitNotifications from '../../../util/emitNotifications';
 
 export async function processSnapshotMessage(
-  this: { models: DB; log: Logger },
+  this: { models: DB; log: ILogger },
   data: RmqSnapshotNotification.RmqMsgType,
 ) {
   const { space, id, title, body, choices, start, expire } = data;
@@ -67,7 +69,7 @@ export async function processSnapshotMessage(
     proposal.is_upstream_deleted = true;
     await proposal.save();
 
-    StatsDController.get().increment('cw.deleted_snapshot_proposal_record', 1, {
+    stats().increment('cw.deleted_snapshot_proposal_record', {
       event: eventType,
       space,
     });
@@ -108,7 +110,7 @@ export async function processSnapshotMessage(
     });
   }
 
-  StatsDController.get().increment('cw.created_snapshot_proposal_record', 1, {
+  stats().increment('cw.created_snapshot_proposal_record', {
     event: eventType,
     space,
   });

@@ -1,11 +1,10 @@
-import chai from 'chai';
+import { ActionArgument } from '@canvas-js/interfaces';
+import { models } from '@hicommonwealth/model';
+import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import app from '../../../server-test';
+import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import models from '../../../server/database';
-import { del } from './external/appHook.spec';
-import { testThreads } from './external/dbEntityHooks.spec';
 import * as modelUtils from '../../util/modelUtils';
 
 chai.use(chaiHttp);
@@ -18,20 +17,20 @@ const deleteReaction = async (reactionId, jwtToken, userAddress) => {
     chain: 'ethereum',
   };
 
-  const response = await del(
-    `/api/reactions/${reactionId}`,
-    validRequest,
-    false,
-    app
-  );
+  const res = await chai
+    .request(app)
+    .delete(`/api/reactions/${reactionId}`)
+    .set('Accept', 'application/json')
+    .send(validRequest);
+  assert.equal((res as any).statusCode, 200);
 
-  return response;
+  return JSON.parse(res.text);
 };
 
 const getUniqueCommentText = async () => {
   const time = new Date().getMilliseconds();
   const text = `testCommentCreated at ${time}`;
-  let comment = await models.Comment.findOne({
+  const comment = await models.Comment.findOne({
     where: { text },
   });
   chai.assert.isNull(comment);
@@ -39,15 +38,62 @@ const getUniqueCommentText = async () => {
 };
 
 describe('createReaction Integration Tests', () => {
+  const communityId = 'ethereum';
   let userAddress;
   let userJWT;
   let userSession;
+  let threadId: number;
 
   before(async () => {
-    const res = await modelUtils.createAndVerifyAddress({ chain: 'ethereum' });
+    await resetDatabase();
+
+    const res = await modelUtils.createAndVerifyAddress({ chain: communityId });
     userAddress = res.address;
     userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
     userSession = { session: res.session, sign: res.sign };
+
+    const topic = await models.Topic.findOne({
+      where: {
+        community_id: communityId,
+        group_ids: [],
+      },
+    });
+
+    const { result: thread } = await modelUtils.createThread({
+      chainId: communityId,
+      address: userAddress,
+      jwt: userJWT,
+      title: 'test1',
+      body: 'body1',
+      kind: 'discussion',
+      stage: 'discussion',
+      topicId: topic.id,
+      session: {
+        type: 'session',
+        signature: '',
+        payload: {
+          app: '',
+          chain: '',
+          from: '',
+          sessionAddress: '',
+          sessionDuration: 0,
+          sessionIssued: 0,
+          block: '',
+        },
+      },
+      sign: function (_actionPayload: {
+        app: string;
+        chain: string;
+        from: string;
+        call: string;
+        callArgs: Record<string, ActionArgument>;
+        timestamp: number;
+        block: string;
+      }): string {
+        return '';
+      },
+    });
+    threadId = thread.id;
   });
 
   it('should create comment reactions and verify comment reaction count', async () => {
@@ -57,12 +103,12 @@ describe('createReaction Integration Tests', () => {
       address: userAddress,
       jwt: userJWT,
       text,
-      thread_id: testThreads[0].id,
+      thread_id: threadId,
       session: userSession.session,
       sign: userSession.sign,
     });
 
-    let comment = await models.Comment.findOne({
+    const comment = await models.Comment.findOne({
       where: { text },
     });
 
@@ -72,43 +118,39 @@ describe('createReaction Integration Tests', () => {
     chai.assert.equal(createCommentResponse.status, 'Success');
 
     const createReactionResponse = await modelUtils.createReaction({
-      chain: 'ethereum',
+      chain: communityId,
       address: userAddress,
       jwt: userJWT,
       reaction: 'like',
       comment_id: createCommentResponse.result.id,
-      author_chain: 'ethereum',
+      author_chain: communityId,
       session: userSession.session,
       sign: userSession.sign,
     });
 
     chai.assert.equal(createReactionResponse.status, 'Success');
 
-    comment = await models.Comment.findOne({
-      where: { text },
-    });
+    await comment.reload();
     chai.assert.equal(comment.reaction_count, beforeReactionCount + 1);
 
     const reactionId = createReactionResponse.result.id;
     const deleteReactionResponse = await deleteReaction(
       reactionId,
       userJWT,
-      userAddress
+      userAddress,
     );
     chai.assert.equal(deleteReactionResponse.status, 'Success');
 
-    comment = await models.Comment.findOne({
-      where: { text },
-    });
+    await comment.reload();
     chai.assert.equal(comment.reaction_count, beforeReactionCount);
   });
 
   it('should create thread reactions and verify thread reaction count', async () => {
-    let thread = await models.Thread.findOne({
-      where: { id: testThreads[0].id },
+    const thread = await models.Thread.findOne({
+      where: { id: threadId },
     });
     chai.assert.isNotNull(thread);
-    let beforeReactionCount = thread.reaction_count;
+    const beforeReactionCount = thread.reaction_count;
 
     const createReactionResponse = await modelUtils.createThreadReaction({
       chain: 'ethereum',
@@ -123,24 +165,19 @@ describe('createReaction Integration Tests', () => {
 
     chai.assert.equal(createReactionResponse.status, 'Success');
 
-    thread = await models.Thread.findOne({
-      where: { id: testThreads[0].id },
-    });
+    await thread.reload();
     chai.assert.equal(thread.reaction_count, beforeReactionCount + 1);
 
     const reactionId = createReactionResponse.result.id;
     const deleteReactionResponse = await deleteReaction(
       reactionId,
       userJWT,
-      userAddress
+      userAddress,
     );
 
     chai.assert.equal(deleteReactionResponse.status, 'Success');
 
-    thread = await models.Thread.findOne({
-      where: { id: testThreads[0].id },
-    });
-
+    await thread.reload();
     chai.assert.equal(thread.reaction_count, beforeReactionCount);
   });
 });

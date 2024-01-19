@@ -1,12 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { NotificationCategories } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import chai from 'chai';
-import app, { resetDatabase } from '../../../server-test';
-import { Errors as MarkNotifErrors } from '../../../server/routes/markNotificationsRead';
 import chaiHttp from 'chai-http';
-import * as modelUtils from '../../util/modelUtils';
 import jwt from 'jsonwebtoken';
+import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import models from '../../../server/database';
-import { NotificationCategories } from 'common-common/src/types';
+import { Errors as MarkNotifErrors } from '../../../server/routes/markNotificationsRead';
+import * as modelUtils from '../../util/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -28,7 +29,7 @@ describe('Notification Routes Tests', () => {
     userId = result.user_id;
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
-      JWT_SECRET
+      JWT_SECRET,
     );
 
     newThreadSub = await modelUtils.createSubscription({
@@ -47,19 +48,19 @@ describe('Notification Routes Tests', () => {
 
     notification = await models.Notification.create({
       category_id: NotificationCategories.NewThread,
-      chain_id: chain,
+      community_id: chain,
       notification_data: '',
     });
 
     notificationTwo = await models.Notification.create({
       category_id: NotificationCategories.NewThread,
-      chain_id: chain,
+      community_id: chain,
       notification_data: '',
     });
 
     notificationThree = await models.Notification.create({
       category_id: NotificationCategories.ChainEvent,
-      chain_id: chain,
+      community_id: chain,
       notification_data: '',
     });
 
@@ -98,7 +99,7 @@ describe('Notification Routes Tests', () => {
       expect(res.body.result.numUnread).to.equal(2);
       expect(res.body.result.subscriptions.length).to.be.equal(1);
       expect(
-        res.body.result.subscriptions[0].NotificationsReads.length
+        res.body.result.subscriptions[0].NotificationsReads.length,
       ).to.equal(2);
       expect(
         res.body.result.subscriptions[0].NotificationsReads.find(
@@ -106,8 +107,8 @@ describe('Notification Routes Tests', () => {
             s.Notification.category_id === NotificationCategories.NewThread &&
             s.notification_id === notification.id &&
             s.is_read === false &&
-            s.subscription_id === newThreadSub.id
-        )
+            s.subscription_id === newThreadSub.id,
+        ),
       ).to.not.be.null;
       expect(
         res.body.result.subscriptions[0].NotificationsReads.find(
@@ -115,8 +116,8 @@ describe('Notification Routes Tests', () => {
             s.Notification.category_id === NotificationCategories.NewThread &&
             s.notification_id === notificationTwo.id &&
             s.is_read === true &&
-            s.subscription_id === newThreadSub.id
-        )
+            s.subscription_id === newThreadSub.id,
+        ),
       ).to.not.be.null;
     });
 
@@ -132,7 +133,7 @@ describe('Notification Routes Tests', () => {
       expect(res.body.result.numUnread).to.equal(2);
       expect(res.body.result.subscriptions.length).to.be.equal(1);
       expect(
-        res.body.result.subscriptions[0].NotificationsReads.length
+        res.body.result.subscriptions[0].NotificationsReads.length,
       ).to.equal(1);
       const NR = res.body.result.subscriptions[0].NotificationsReads[0];
       expect(NR.notification_id).to.equal(notification.id);
@@ -184,7 +185,7 @@ describe('Notification Routes Tests', () => {
     it('should pass when notification id is a string instead of an array', async () => {
       const notif = await models.Notification.create({
         category_id: NotificationCategories.NewThread,
-        chain_id: chain,
+        community_id: chain,
         notification_data: '',
       });
 

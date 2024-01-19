@@ -1,9 +1,9 @@
-import { NotificationCategories } from 'common-common/src/types';
-import { ChainEventWebhookData, ForumWebhookData } from '../types';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { NotificationCategories, logger } from '@hicommonwealth/core';
 import request from 'superagent';
-import { factory, formatFilename } from 'common-common/src/logging';
+import { ChainEventWebhookData, ForumWebhookData } from '../types';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 type ZapierWebhookMessage = {
   event: NotificationCategories;
@@ -21,7 +21,7 @@ type ZapierWebhookMessage = {
 
 function formatZapierMessage(
   category: NotificationCategories,
-  data: ForumWebhookData
+  data: ForumWebhookData,
 ): ZapierWebhookMessage {
   return {
     event: category,
@@ -41,7 +41,7 @@ function formatZapierMessage(
 export async function sendZapierWebhook(
   webhookUrl: string,
   category: NotificationCategories,
-  data: ForumWebhookData | ChainEventWebhookData
+  data: ForumWebhookData | ChainEventWebhookData,
 ) {
   if (category === NotificationCategories.ChainEvent) {
     throw new Error('Chain event webhooks not supported for Zapier');

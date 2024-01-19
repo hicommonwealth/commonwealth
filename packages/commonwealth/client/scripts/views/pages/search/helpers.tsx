@@ -92,7 +92,7 @@ export type ReplyResult = {
   text: string;
   address_id: number;
   address: string;
-  address_chain: string;
+  address_community_id: string;
   created_at: string;
 };
 type ReplyResultRowProps = {
@@ -139,7 +139,7 @@ const ReplyResultRow = ({
         <div className="search-results-thread-subtitle">
           <User
             userAddress={comment.address}
-            userCommunityId={comment.address_chain}
+            userCommunityId={comment.address_community_id}
           />
           <CWText className="created-at">
             {moment(comment.created_at).fromNow()}

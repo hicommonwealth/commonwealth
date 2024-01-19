@@ -4,7 +4,7 @@ export type ReactionType = 'like';
 class Reaction {
   public readonly id: number;
   public readonly author: string;
-  public readonly chain: string;
+  public readonly communityId: string;
   public readonly reaction: string;
   public readonly threadId: number | string;
   public readonly commentId: number | string;
@@ -29,7 +29,7 @@ class Reaction {
   }) {
     this.id = id;
     this.author = Address.address;
-    this.chain = Address.community_id;
+    this.communityId = Address.community_id;
     this.reaction = reaction;
     this.threadId = thread_id;
     this.commentId = comment_id;

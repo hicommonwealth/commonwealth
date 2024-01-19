@@ -1,7 +1,8 @@
+/* eslint-disable max-len */
+import { models } from '@hicommonwealth/model';
 import chai, { expect } from 'chai';
 import chaiHttp from 'chai-http';
 import { Op, QueryTypes } from 'sequelize';
-import models from '../../../server/database';
 import {
   testAddresses,
   testComments,
@@ -71,10 +72,10 @@ async function calcAllCountsFromSourceTables() {
         categories: notif_feed_categories,
       },
       type: QueryTypes.SELECT,
-    }
+    },
   )) as any;
 
-  let notification_ids = {};
+  const notification_ids = {};
   for (const notification of notifications) {
     if (!notification.thread_id) continue;
     notification_ids[notification.thread_id] = notification.id;
@@ -171,7 +172,7 @@ async function calcCountsFromSourceTable(threadId: number, commentId: number) {
 
 async function getCountsFromPreComputedColumns(
   threadId: number,
-  commentId: number
+  commentId: number,
 ) {
   const comment = await models.Comment.findOne({
     where: {
@@ -196,11 +197,11 @@ async function getCountsFromPreComputedColumns(
 async function getCounts(threadId: number, commentId: number) {
   const countsFromSourceTable = await calcCountsFromSourceTable(
     threadId,
-    commentId
+    commentId,
   );
   const countsFromPreComputedColumns = await getCountsFromPreComputedColumns(
     threadId,
-    commentId
+    commentId,
   );
   return {
     countsFromSourceTable,
@@ -219,9 +220,9 @@ async function getCountsAll() {
 }
 
 async function createCommentRaw() {
-  const chain = testThreads[0].chain;
+  const chain = testThreads[0].community_id;
   await models.sequelize.query(`
-    INSERT INTO "Comments" ("id", "chain", "address_id", "text", "thread_id", "plaintext", "created_at", "updated_at")
+    INSERT INTO "Comments" ("id", "community_id", "address_id", "text", "thread_id", "plaintext", "created_at", "updated_at")
     VALUES
         (-300, '${chain}', '${testAddresses[0].id}', '', ${testThreads[0].id}, '',now(),now()),
         (-400, '${chain}', '${testAddresses[0].id}', '', ${testThreads[0].id}, '',now(),now()),
@@ -230,11 +231,11 @@ async function createCommentRaw() {
 }
 
 async function createThreadReactionRaw() {
-  const chain = testThreads[0].chain;
+  const chain = testThreads[0].community_id;
   const canvas_hash =
     '0x0000000000000000000000000000000000000000000000000000000000000000';
   await models.sequelize.query(`
-    INSERT INTO "Reactions" ("id", "chain", "address_id", "reaction", "thread_id", "comment_id", "canvas_action", "canvas_hash", "canvas_session", "created_at", "updated_at")
+    INSERT INTO "Reactions" ("id", "community_id", "address_id", "reaction", "thread_id", "comment_id", "canvas_action", "canvas_hash", "canvas_session", "created_at", "updated_at")
     VALUES(-300, '${chain}', '${testAddresses[0].id}', 'like', ${testThreads[0].id}, null, '{}', '${canvas_hash}', '{}', now(), now()),
     (-400, '${chain}', '${testAddresses[0].id}', 'like', ${testThreads[0].id}, null, '{}', '${canvas_hash}', '{}', now(), now()),
     (-500, '${chain}', '${testAddresses[0].id}', 'like', ${testThreads[0].id}, null, '{}', '${canvas_hash}', '{}', now(), now())
@@ -242,11 +243,11 @@ async function createThreadReactionRaw() {
 }
 
 async function createCommentReactionRaw() {
-  const chain = testThreads[0].chain;
+  const chain = testThreads[0].community_id;
   const canvas_hash =
     '0x0000000000000000000000000000000000000000000000000000000000000000';
   await models.sequelize.query(`
-    INSERT INTO "Reactions" ("id", "chain", "address_id", "reaction", "thread_id", "comment_id", "canvas_action", "canvas_hash", "canvas_session", "created_at", "updated_at")
+    INSERT INTO "Reactions" ("id", "community_id", "address_id", "reaction", "thread_id", "comment_id", "canvas_action", "canvas_hash", "canvas_session", "created_at", "updated_at")
     VALUES(-3000, '${chain}', '${testAddresses[0].id}', 'like', null, ${testComments[0].id}, '{}', '${canvas_hash}', '{}', now(), now())
     `);
 }
@@ -254,36 +255,36 @@ async function createCommentReactionRaw() {
 async function verifyRecomputeCountSingle() {
   const before = await getCounts(testThreads[0].id, testComments[0].id);
   expect(before.countsFromSourceTable).to.deep.equal(
-    before.countsFromPreComputedColumns
+    before.countsFromPreComputedColumns,
   );
   await recomputeCounts();
   const after = await getCounts(testThreads[0].id, testComments[0].id);
   expect(after.countsFromSourceTable).to.deep.equal(
-    after.countsFromPreComputedColumns
+    after.countsFromPreComputedColumns,
   );
   expect(before.countsFromSourceTable).to.deep.equal(
-    after.countsFromSourceTable
+    after.countsFromSourceTable,
   );
   expect(before.countsFromPreComputedColumns).to.deep.equal(
-    after.countsFromPreComputedColumns
+    after.countsFromPreComputedColumns,
   );
 }
 
 async function verifyRecomputeCountAll() {
   const before = await getCountsAll();
   expect(before.countsFromSourceTable).to.deep.equal(
-    before.countsFromPreComputedColumns
+    before.countsFromPreComputedColumns,
   );
   await recomputeCounts();
   const after = await getCountsAll();
   expect(after.countsFromSourceTable).to.deep.equal(
-    after.countsFromPreComputedColumns
+    after.countsFromPreComputedColumns,
   );
   expect(before.countsFromSourceTable).to.deep.equal(
-    after.countsFromSourceTable
+    after.countsFromSourceTable,
   );
   expect(before.countsFromPreComputedColumns).to.deep.equal(
-    after.countsFromPreComputedColumns
+    after.countsFromPreComputedColumns,
   );
 }
 
@@ -308,20 +309,20 @@ describe('recomputeCounts', () => {
     it('add comment using raw query, count corrected by recompute count', async () => {
       let before = await getCounts(testThreads[0].id, testComments[0].id);
       expect(before.countsFromSourceTable).to.deep.equal(
-        before.countsFromPreComputedColumns
+        before.countsFromPreComputedColumns,
       );
       await createCommentRaw();
       before = await getCounts(testThreads[0].id, testComments[0].id);
       expect(before.countsFromSourceTable).to.not.deep.equal(
-        before.countsFromPreComputedColumns
+        before.countsFromPreComputedColumns,
       );
       expect(before.countsFromSourceTable.commentCount).to.not.deep.equal(
-        before.countsFromPreComputedColumns.commentCount
+        before.countsFromPreComputedColumns.commentCount,
       );
       await recomputeCounts();
       const after = await getCounts(testThreads[0].id, testComments[0].id);
       expect(after.countsFromSourceTable).to.deep.equal(
-        after.countsFromPreComputedColumns
+        after.countsFromPreComputedColumns,
       );
       await verifyRecomputeCountAll();
     });
@@ -331,22 +332,22 @@ describe('recomputeCounts', () => {
     it('add reaction to thread using raw query, count corrected by recompute count', async () => {
       let before = await getCounts(testThreads[0].id, testComments[0].id);
       expect(before.countsFromSourceTable).to.deep.equal(
-        before.countsFromPreComputedColumns
+        before.countsFromPreComputedColumns,
       );
       await createThreadReactionRaw();
       before = await getCounts(testThreads[0].id, testComments[0].id);
       expect(before.countsFromSourceTable).to.not.deep.equal(
-        before.countsFromPreComputedColumns
+        before.countsFromPreComputedColumns,
       );
       expect(
-        before.countsFromSourceTable.threadReactionCount
+        before.countsFromSourceTable.threadReactionCount,
       ).to.not.deep.equal(
-        before.countsFromPreComputedColumns.threadReactionCount
+        before.countsFromPreComputedColumns.threadReactionCount,
       );
       await recomputeCounts();
       const after = await getCounts(testThreads[0].id, testComments[0].id);
       expect(after.countsFromSourceTable).to.deep.equal(
-        after.countsFromPreComputedColumns
+        after.countsFromPreComputedColumns,
       );
       await verifyRecomputeCountAll();
     });
@@ -354,22 +355,22 @@ describe('recomputeCounts', () => {
     it('add reaction to comment using raw query, count corrected by recompute count', async () => {
       let before = await getCounts(testThreads[0].id, testComments[0].id);
       expect(before.countsFromSourceTable).to.deep.equal(
-        before.countsFromPreComputedColumns
+        before.countsFromPreComputedColumns,
       );
       await createCommentReactionRaw();
       before = await getCounts(testThreads[0].id, testComments[0].id);
       expect(before.countsFromSourceTable).to.not.deep.equal(
-        before.countsFromPreComputedColumns
+        before.countsFromPreComputedColumns,
       );
       expect(
-        before.countsFromSourceTable.commentReactionCount
+        before.countsFromSourceTable.commentReactionCount,
       ).to.not.deep.equal(
-        before.countsFromPreComputedColumns.commentReactionCount
+        before.countsFromPreComputedColumns.commentReactionCount,
       );
       await recomputeCounts();
       const after = await getCounts(testThreads[0].id, testComments[0].id);
       expect(after.countsFromSourceTable).to.deep.equal(
-        after.countsFromPreComputedColumns
+        after.countsFromPreComputedColumns,
       );
       await verifyRecomputeCountAll();
     });
@@ -378,7 +379,7 @@ describe('recomputeCounts', () => {
   describe('notification should be correct on recompute count', () => {
     it('add comment from api, notification id is non zero', async () => {
       const cRes = await modelUtils.createComment({
-        chain: testThreads[0].chain,
+        chain: testThreads[0].community_id,
         address: testAddresses[0].address,
         jwt: testJwtToken,
         text: 'test comment',
@@ -390,14 +391,14 @@ describe('recomputeCounts', () => {
       expect(cRes).not.to.be.null;
       expect(cRes.error).not.to.be.null;
 
-      const before = await getCounts(testThreads[0].id, testComments[0].id);
+      await getCounts(testThreads[0].id, testComments[0].id);
       // expect(before.countsFromSourceTable.notification_id).to.be.greaterThan(0);
       await verifyRecomputeCountAll();
     });
 
     it('add reaction to thread from api, notification id is still zero', async () => {
       const cRes = await modelUtils.createReaction({
-        chain: testThreads[0].chain,
+        chain: testThreads[0].community_id,
         address: testAddresses[0].address,
         jwt: testJwtToken,
         reaction: 'like',
@@ -417,7 +418,7 @@ describe('recomputeCounts', () => {
 
     it('add reaction to comment from api, notification id is still zero', async () => {
       const cRes = await modelUtils.createReaction({
-        chain: testThreads[0].chain,
+        chain: testThreads[0].community_id,
         address: testAddresses[0].address,
         jwt: testJwtToken,
         reaction: 'like',

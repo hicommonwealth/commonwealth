@@ -7,10 +7,14 @@ import 'components/ProposalCard/ProposalCard.scss';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
 
-import { blocknumToDuration, formatNumberLong } from 'helpers';
+import {
+  blocknumToDuration,
+  formatNumberLong,
+  shortenIdentifier,
+} from 'helpers';
+import moment from 'moment';
 import type { AnyProposal } from '../../../models/types';
 import { ProposalStatus } from '../../../models/types';
-import moment from 'moment';
 
 import { Countdown } from 'views/components/countdown';
 
@@ -62,7 +66,7 @@ export const getStatusText = (proposal: AnyProposal, isLoading?: boolean) => {
             duration={blocknumToDuration(proposal.endTime.blocknum)}
           />,
           ` left (ends on block ${formatNumberLong(
-            proposal.endTime.blocknum
+            proposal.endTime.blocknum,
           )})`,
         ]
       : proposal.endTime.kind === 'dynamic'
@@ -71,7 +75,7 @@ export const getStatusText = (proposal: AnyProposal, isLoading?: boolean) => {
             duration={blocknumToDuration(proposal.endTime.getBlocknum())}
           />,
           ` left (ends on block ${formatNumberLong(
-            proposal.endTime.getBlocknum()
+            proposal.endTime.getBlocknum(),
           )})`,
         ]
       : proposal.endTime.kind === 'threshold'
@@ -132,4 +136,4 @@ export const getStatusText = (proposal: AnyProposal, isLoading?: boolean) => {
 };
 
 export const getPrimaryTagText = (proposal: AnyProposal) => `
-  Prop ${proposal.shortIdentifier}`;
+  Prop ${shortenIdentifier(proposal.shortIdentifier)}`;

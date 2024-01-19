@@ -1,6 +1,8 @@
+import type { DB } from '@hicommonwealth/model';
+import { TopicAttributes, TopicInstance } from '@hicommonwealth/model';
 import { query, validationResult } from 'express-validator';
+import { WhereOptions } from 'sequelize';
 import type { GetTopicsReq, GetTopicsResp } from '../../api/extApiTypes';
-import type { DB } from '../../models';
 import type { TypedRequestQuery, TypedResponse } from '../../types';
 import { failure, success } from '../../types';
 import { paginationValidation } from '../../util/helperValidations';
@@ -24,9 +26,9 @@ export const getTopics = async (
 
   const { community_id, count_only } = req.query;
 
-  const where = { chain_id: community_id };
+  const where: WhereOptions<TopicAttributes> = { community_id: community_id };
 
-  let topics, count;
+  let topics: TopicInstance[], count: number;
   if (!count_only) {
     ({ rows: topics, count } = await models.Topic.findAndCountAll({
       where,

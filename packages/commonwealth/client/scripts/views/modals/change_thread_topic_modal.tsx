@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 
-import { featureFlags } from 'helpers/feature-flags';
-import Permissions from 'utils/Permissions';
 import type Thread from '../../models/Thread';
 import type Topic from '../../models/Topic';
 import app from '../../state';
@@ -29,23 +27,10 @@ export const ChangeThreadTopicModal = ({
     communityId: app.activeChainId(),
   });
 
-  const isAdmin = Permissions.isCommunityAdmin();
   const topicsForSelector = topics?.reduce(
     (acc, t) => {
-      if (featureFlags.newGatingEnabled) {
-        acc.enabledTopics.push(t);
-      } else {
-        if (
-          isAdmin ||
-          t.tokenThreshold.isZero() ||
-          !app.chain.isGatedTopic(t.id)
-        ) {
-          acc.enabledTopics.push(t);
-        } else {
-          acc.disabledTopics.push(t);
-        }
-        return acc;
-      }
+      acc.enabledTopics.push(t);
+      return acc;
     },
     { enabledTopics: [], disabledTopics: [] },
   );

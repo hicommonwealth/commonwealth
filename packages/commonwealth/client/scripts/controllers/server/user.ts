@@ -231,7 +231,7 @@ export class UserController {
   }
 
   public selectChain(options: { chain: string }): JQueryPromise<void> {
-    return $.post(`${app.serverUrl()}/selectChain`, {
+    return $.post(`${app.serverUrl()}/selectCommunity`, {
       chain: options.chain,
       auth: true,
       jwt: this._jwt,
@@ -264,10 +264,10 @@ export class UserController {
     this._setStarredCommunities(star);
   }
 
-  public isCommunityStarred(chain: string): boolean {
+  public isCommunityStarred(community_id: string): boolean {
     return (
       this._starredCommunities.findIndex((c) => {
-        return c.chain === chain;
+        return c.community_id === community_id;
       }) !== -1
     );
   }
@@ -276,9 +276,9 @@ export class UserController {
     this._starredCommunities.push(star);
   }
 
-  public removeStarredCommunity(chain: string, userId: number): void {
+  public removeStarredCommunity(community_id: string, userId: number): void {
     const index = this._starredCommunities.findIndex(
-      (s) => s.user_id === userId && s.chain === chain,
+      (s) => s.user_id === userId && s.community_id === community_id,
     );
     this._starredCommunities.splice(index, 1);
   }

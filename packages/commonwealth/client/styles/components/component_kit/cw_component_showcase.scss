@@ -33,6 +33,10 @@ $width: 360px;
         color: $neutral-400;
       }
     }
+
+    .upvote-popover-wrapper {
+      width: fit-content;
+    }
   }
 
   .progress-gallery {

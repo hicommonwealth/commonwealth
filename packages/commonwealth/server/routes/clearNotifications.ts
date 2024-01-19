@@ -1,7 +1,7 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
+import type { DB } from '@hicommonwealth/model';
+import { sequelize } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-import { sequelize } from '../database';
-import type { DB } from '../models';
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',
@@ -13,7 +13,7 @@ export default async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.user) {
     return next(new AppError(Errors.NotLoggedIn));
@@ -36,7 +36,7 @@ export default async (
       WHERE notification_id IN (?)
         AND subscription_id IN (SELECT id FROM "Subscriptions" where subscriber_id = ?)
 	`,
-    { replacements: [notification_ids, req.user.id] }
+    { replacements: [notification_ids, req.user.id] },
   );
 
   return res.json({
