@@ -17,11 +17,11 @@ import {
   ChainNetwork,
   ChainType,
 } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import BN from 'bn.js';
 import { use as chaiUse, expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { getTendermintClient } from 'server/util/tokenBalanceCache/util';
-import models from '../../../server/database';
 import { TokenBalanceCache } from '../../../server/util/tokenBalanceCache/tokenBalanceCache';
 
 chaiUse(chaiAsPromised);

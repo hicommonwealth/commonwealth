@@ -15,6 +15,12 @@ import * as ethUtil from 'ethereumjs-util';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
 import Sequelize from 'sequelize';
 
+import type {
+  AddressInstance,
+  CommunityInstance,
+  DB,
+  ProfileAttributes,
+} from '@hicommonwealth/model';
 import { getADR036SignableSession } from '../../shared/adapters/chain/cosmos/keys';
 import { createSiweMessage } from '../../shared/adapters/chain/ethereum/keys';
 import {
@@ -22,10 +28,6 @@ import {
   createCanvasSessionPayload,
 } from '../../shared/canvas';
 import { addressSwapper } from '../../shared/utils';
-import type { DB } from '../models';
-import type { AddressInstance } from '../models/address';
-import type { CommunityInstance } from '../models/community';
-import type { ProfileAttributes } from '../models/profile';
 
 const log = logger().getLogger(__filename);
 

@@ -20,6 +20,6 @@ export type FormSubmitValues = {
 export type BasicInformationFormProps = {
   selectedAddress: AddressInfo;
   selectedCommunity: SelectedCommunity;
-  onSubmit: (communityId: string) => any;
+  onSubmit: (communityId: string, communityName: string) => any;
   onCancel: () => any;
 };

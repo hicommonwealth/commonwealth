@@ -1,0 +1,39 @@
+@import '../../../../../../styles/shared';
+
+.ActionStep {
+  display: flex;
+  padding: 8px 16px;
+  align-items: center;
+  gap: 16px;
+  border-radius: 6px;
+  border: 1px solid $neutral-200;
+  min-height: 58px;
+
+  .icon {
+    display: flex;
+    min-width: 32px;
+  }
+
+  .circle-check {
+    scale: 1.2;
+  }
+
+  .index {
+    color: $white;
+    font-size: 14px;
+    border-radius: 50%;
+    background-color: $neutral-400;
+    width: 32px;
+    height: 32px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .label {
+    color: $neutral-500;
+  }
+
+  .action-btn {
+    margin-left: auto;
+  }
+}

@@ -1,9 +1,11 @@
 import { ChainBase, ChainType } from '@hicommonwealth/core';
+import {
+  CommunityAttributes,
+  UserInstance,
+  models,
+} from '@hicommonwealth/model';
 import { assert } from 'chai';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
-import models from '../../../server/database';
-import { CommunityAttributes } from '../../../server/models/community';
-import { UserInstance } from '../../../server/models/user';
 import { buildUser } from '../../unit/unitHelpers';
 import { resetDatabase } from '../../util/resetDatabase';
 

@@ -474,6 +474,10 @@ describe('ServerThreadsController', () => {
         id: 1,
         address: '0x123',
         save: async () => ({}),
+        toJSON: () => ({
+          id: 1,
+          address: '0x123',
+        }),
       };
       const chain = {
         id: 'ethereum',
@@ -501,34 +505,22 @@ describe('ServerThreadsController', () => {
           ],
         },
         sequelize: {
-          transaction: async () => ({
-            rollback: async () => ({}),
-            commit: async () => ({}),
-          }),
+          transaction: async (callback: () => any) => callback(),
         },
         Comment: {
-          create: async (data) => ({
-            id: 1,
-            ...data,
-          }),
-          findOne: async () => {
-            const data = {
-              id: 1,
-              thread_id: threadId,
-              text,
-              address_id: address.id,
-              chain: chain.id,
-              Address: address,
-            };
+          create: async (data) => {
             return {
+              id: 1,
               ...data,
-              destroy: async () => ({}),
-              toJSON: () => data,
+              toJSON: () => ({
+                id: 1,
+                ...data,
+              }),
             };
           },
         },
         Subscription: {
-          create: async () => ({}),
+          bulkCreate: async () => ({}),
         },
         Topic: {
           findOne: async () => ({
@@ -579,10 +571,10 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Ban error: banned');
 
       expect(newComment).to.include({
-        thread_id: threadId,
+        thread_id: String(threadId),
         text,
         address_id: address.id,
-        chain: chain.id,
+        community_id: chain.id,
       });
       expect(notificationOptions).to.have.length.greaterThan(0);
       expect(analyticsOptions).to.include({
@@ -1344,7 +1336,7 @@ describe('ServerThreadsController', () => {
           },
         },
         Subscription: {
-          create: async () => ({}),
+          bulkCreate: async () => ({}),
         },
         Address: {
           findAll: async () => [{}], // used in findOneRole

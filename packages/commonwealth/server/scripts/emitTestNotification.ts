@@ -1,10 +1,12 @@
 import { NotificationCategories, logger } from '@hicommonwealth/core';
+import {
+  NotificationInstance,
+  SubscriptionInstance,
+  models,
+} from '@hicommonwealth/model';
 import Sequelize, { Transaction } from 'sequelize';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import models from '../database';
-import { NotificationInstance } from '../models/notification';
-import { SubscriptionInstance } from '../models/subscription';
 import emitNotifications from '../util/emitNotifications';
 
 const log = logger().getLogger(__filename);
@@ -121,7 +123,7 @@ async function getExistingNotifications(
     existingNotifications = await models.Notification.findAll({
       where: {
         category_id: NotificationCategories.ChainEvent,
-        chain_id: chainId,
+        community_id: chainId,
       },
       order: Sequelize.literal(`RANDOM()`),
       limit: 1,
@@ -166,7 +168,7 @@ async function setupNotification(
     const existingCeMockNotif = await models.Notification.findAll({
       where: {
         category_id: NotificationCategories.ChainEvent,
-        chain_id: chainId,
+        community_id: chainId,
         chain_event_id: mockNotif.id || null,
         [Sequelize.Op.and]: [
           Sequelize.literal(
@@ -342,7 +344,7 @@ async function main() {
       result = await models.Subscription.findOrCreate({
         where: {
           subscriber_id: userId,
-          chain_id: argv.chain_id,
+          community_id: argv.chain_id,
           category_id: NotificationCategories.ChainEvent,
         },
         transaction,

@@ -1,9 +1,11 @@
+import {
+  CommentAttributes,
+  DB,
+  Role,
+  ThreadAttributes,
+  UserInstance,
+} from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import { DB } from 'server/models';
-import { CommentAttributes } from 'server/models/comment';
-import { Role } from 'server/models/role';
-import { ThreadAttributes } from 'server/models/thread';
-import { UserInstance } from 'server/models/user';
 import { findAllRoles } from './roles';
 
 type ValidateOwnerOptions = {
@@ -52,7 +54,7 @@ export const validateOwner = async ({
     models,
     { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
     communityId,
-    requiredRoles
+    requiredRoles,
   );
   const role = roles.find((r) => {
     return r.chain_id === communityId && requiredRoles.includes(r.permission);

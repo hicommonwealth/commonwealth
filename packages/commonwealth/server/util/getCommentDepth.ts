@@ -1,6 +1,5 @@
+import { CommentInstance, DB } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
-import { DB } from 'server/models';
-import { CommentInstance } from '../models/comment';
 
 // getCommentDepth recursively calculates the depth of a comment,
 // then returns if the depth exceeds max, and the depth level

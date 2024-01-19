@@ -1,14 +1,18 @@
 import {
+  HotShotsStats,
   RabbitMQController,
   RascalConfigServices,
   RascalPublications,
   ServiceKey,
-  StatsDController,
   TypescriptLoggingLogger,
   getRabbitMQConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { logger, type ISnapshotNotification } from '@hicommonwealth/core';
+import {
+  logger,
+  stats,
+  type ISnapshotNotification,
+} from '@hicommonwealth/core';
 import type { Request, Response } from 'express';
 import express from 'express';
 import v8 from 'v8';
@@ -21,6 +25,9 @@ import {
 
 let isServiceHealthy = false;
 
+const log = logger(TypescriptLoggingLogger()).getLogger(__filename);
+stats(HotShotsStats());
+
 startHealthCheckLoop({
   service: ServiceKey.SnapshotListener,
   checkFn: async () => {
@@ -29,8 +36,6 @@ startHealthCheckLoop({
     }
   },
 });
-
-const log = logger(TypescriptLoggingLogger()).getLogger(__filename);
 
 log.info(
   `Node Option max-old-space-size set to: ${JSON.stringify(
@@ -75,14 +80,10 @@ registerRoute(app, 'post', '/snapshot', async (req: Request, res: Response) => {
 
     await controller.publish(event, RascalPublications.SnapshotListener);
 
-    StatsDController.get().increment(
-      'snapshot_listener.received_snapshot_event',
-      1,
-      {
-        event: eventType,
-        space: event.space,
-      },
-    );
+    stats().increment('snapshot_listener.received_snapshot_event', {
+      event: eventType,
+      space: event.space,
+    });
 
     res.status(200).send({ message: 'Snapshot event received', event });
   } catch (err) {

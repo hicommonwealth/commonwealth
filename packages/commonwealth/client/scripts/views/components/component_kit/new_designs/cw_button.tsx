@@ -32,7 +32,7 @@ export type ButtonProps = {
   type?: 'reset' | 'submit' | 'button';
   containerClassName?: string;
 } & ButtonStyleProps &
-  React.HTMLAttributes<HTMLButtonElement>;
+  React.HTMLAttributes<HTMLButtonElement> & { form?: string };
 
 export const CWButton = (props: ButtonProps) => {
   const {

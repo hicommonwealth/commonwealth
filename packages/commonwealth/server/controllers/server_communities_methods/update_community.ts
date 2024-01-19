@@ -1,13 +1,15 @@
 /* eslint-disable no-continue */
 import { AppError } from '@hicommonwealth/adapters';
 import { ChainBase } from '@hicommonwealth/core';
+import type {
+  CommunityAttributes,
+  CommunitySnapshotSpaceWithSpaceAttached,
+} from '@hicommonwealth/model';
+import { UserInstance } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import type { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
-import { UserInstance } from 'server/models/user';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';
 import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
-import type { CommunityAttributes } from '../../models/community';
 import { findOneRole } from '../../util/roles';
 import { TrackOptions } from '../server_analytics_methods/track';
 import { ServerCommunitiesController } from '../server_communities_controller';
@@ -176,10 +178,11 @@ export async function __updateCommunity(
   if (icon_url) community.icon_url = icon_url;
   if (active !== undefined) community.active = active;
   if (type) community.type = type;
-  if (nonEmptySocialLinks !== undefined && nonEmptySocialLinks.length > 0)
+  if (nonEmptySocialLinks !== undefined && nonEmptySocialLinks.length >= 0)
     community.social_links = nonEmptySocialLinks;
   if (hide_projects) community.hide_projects = hide_projects;
-  if (stages_enabled) community.stages_enabled = stages_enabled;
+  if (typeof stages_enabled === 'boolean')
+    community.stages_enabled = stages_enabled;
   if (custom_stages) community.custom_stages = custom_stages;
   if (terms) community.terms = terms;
   if (has_homepage) community.has_homepage = has_homepage;

@@ -6,7 +6,6 @@ import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/contracts/contracts_page.scss';
 import React, { useState } from 'react';
 import app from 'state';
-import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import {
@@ -22,7 +21,7 @@ const ContractsPage = () => {
   const navigate = useCommonNavigate();
 
   const [contracts, setContracts] = useState<Contract[]>(
-    app.contracts.store.getCommunityContracts()
+    app.contracts.store.getCommunityContracts(),
   );
 
   const [templates, setTemplates] = useState<Template[]>([]);
@@ -44,7 +43,7 @@ const ContractsPage = () => {
       setTemplates(
         fetchedTemplates.map((template) => {
           return Template.fromJSON(template);
-        })
+        }),
       );
     }
   };
@@ -122,9 +121,6 @@ const ContractsPage = () => {
 
   return (
     <div className="ContractsPage">
-      <CWBreadcrumbs
-        breadcrumbs={[{ label: 'Contract action templates', path: '' }]}
-      />
       <div className="header-container">
         <CWText type="h3">Contract action templates</CWText>
         <CWButton

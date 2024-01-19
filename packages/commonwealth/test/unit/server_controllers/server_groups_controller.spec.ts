@@ -1,11 +1,13 @@
+import {
+  AddressInstance,
+  CommunityInstance,
+  GroupAttributes,
+  MembershipAttributes,
+  TopicAttributes,
+  UserInstance,
+} from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { ServerGroupsController } from 'server/controllers/server_groups_controller';
-import { AddressInstance } from 'server/models/address';
-import { GroupAttributes } from 'server/models/group';
-import { MembershipAttributes } from 'server/models/membership';
-import { TopicAttributes } from 'server/models/topic';
-import { UserInstance } from 'server/models/user';
-import { CommunityInstance } from '../../../server/models/community';
 
 const INVALID_REQUIREMENTS_NOT_ARRAY = 'no an array' as unknown as [];
 

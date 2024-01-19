@@ -1,9 +1,9 @@
 import { RedisCache } from '@hicommonwealth/adapters';
 import { RedisNamespaces, logger } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import Rollbar from 'rollbar';
 import { QueryTypes } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
-import type { DB } from '../models';
 
 /**
  * This class hosts a series of 'cleaner' functions that delete unnecessary data from the database. The class schedules
