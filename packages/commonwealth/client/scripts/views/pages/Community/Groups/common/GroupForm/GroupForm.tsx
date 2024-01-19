@@ -1,5 +1,6 @@
 /* eslint-disable react/no-multi-comp */
 import axios from 'axios';
+import { CosmosSDK } from 'cosmos-sdk';
 import { ethers } from 'ethers';
 import { isValidEthAddress } from 'helpers/validateTypes';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -18,6 +19,7 @@ import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInp
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { ZodError, ZodObject } from 'zod';
+import { ERC165__factory } from '../../../../../../../../../../libs/chains/src/eth/types';
 import {
   AMOUNT_CONDITIONS,
   ERC_SPECIFICATIONS,
@@ -71,6 +73,54 @@ async function isEVMAddressContract(
     console.error('Error checking address:', error);
     return false;
   }
+}
+
+async function isCosmosAddressContract(
+  address: string,
+  network_url: string,
+): Promise<boolean> {
+  // Implement the logic to query the Cosmos chain and check if the address is a contract
+  const cosmosSDK = new CosmosSDK(network_url);
+  const accountInfo = await cosmosSDK.getAccountInfo(address);
+  return accountInfo.code_hash !== '';
+}
+
+async function getEVMContractType(
+  contractAddress: string,
+  network_url: string,
+): Promise<string | null> {
+  const provider = new ethers.providers.JsonRpcProvider(network_url);
+  const contract = ERC165__factory.connect(contractAddress, provider);
+
+  // Check if the contract implements ERC1155 interface
+  const supportsERC1155 = await contract.supportsInterface(
+    InterfaceIds.ERC1155,
+  );
+
+  console.log('1155', supportsERC1155);
+
+  if (supportsERC1155) {
+    return 'erc1155';
+  }
+
+  // Check if the contract implements ERC721 interface
+  const supportsERC721 = await contract.supportsInterface(InterfaceIds.ERC721);
+  if (supportsERC721) {
+    return 'erc721';
+  }
+
+  console.log('721', supportsERC721);
+
+  // Check if the contract implements ERC20 interface
+  const supportsERC20 = await contract.supportsInterface(InterfaceIds.ERC20);
+  if (supportsERC20) {
+    return 'erc20';
+  }
+
+  console.log('20', supportsERC20);
+
+  // If none of the above interfaces are implemented, return null
+  return null;
 }
 
 const CWRequirementsRadioButton = ({
@@ -344,72 +394,94 @@ const GroupForm = ({
     setRequirementSubForms([...allRequirements]);
   };
 
-  const validateSubForms = () => {
+  const validateSubForms = async () => {
     const updatedSubForms = [...requirementSubForms];
 
-    requirementSubForms.map(async (subForm, index) => {
-      try {
-        const key = Object.keys(subForm)[0];
+    await Promise.all(
+      requirementSubForms.map(async (subForm, index) => {
+        try {
+          // HACK ALERT: this type of validation change should be done internally by zod, by we are doing this
+          // manually using javascript
+          const schema = getRequirementSubFormSchema(
+            subForm.values.requirementType,
+          );
+          if (subForm.values.requirementType === '') {
+            schema.pick({ requirementType: true }).parse(subForm.values);
+          } else {
+            schema.parse(subForm.values);
+          }
 
-        // HACK ALERT: this type of validation change should be done internally by zod, by we are doing this
-        // manually using javascript
-        const schema = getRequirementSubFormSchema(
-          subForm.values.requirementType,
-        );
-        if (subForm.values.requirementType === '') {
-          schema.pick({ requirementType: true }).parse(subForm.values);
-        } else {
-          schema.parse(subForm.values);
-        }
-
-        const contract_address = subForm.values.requirementContractAddress;
-        const evmId = parseInt(subForm.values.requirementChain); // requirement.data.source.evm_chain_id;
-        const node = await axios.get(
-          `${app.serverUrl()}/nodes?eth_chain_id=${evmId}`,
-        );
-        console.log(node?.data);
-        console.log(evmId);
-        const node_url = node?.data?.result?.filter(
-          (x) => x.eth_chain_id == evmId,
-        )[0].url;
-        console.log(node_url);
-
-        const isAddressContract = await isEVMAddressContract(
-          contract_address,
-          node_url,
-        );
-
-        console.log(isAddressContract);
-
-        if (!isAddressContract) {
           updatedSubForms[index] = {
             ...updatedSubForms[index],
-            errors: {
-              ...updatedSubForms[index].errors,
-              [key]: VALIDATION_MESSAGES.CONTRACT_NOT_FOUND,
-            },
+            errors: {},
+          };
+
+          const key = Object.keys(subForm.values)[3];
+
+          const contract_address = subForm.values.requirementContractAddress;
+          const evmId = parseInt(subForm.values.requirementChain); // requirement.data.source.evm_chain_id;
+          const node = await axios.get(
+            `${app.serverUrl()}/nodes?eth_chain_id=${evmId}`,
+          );
+          const node_url = node?.data?.result?.filter(
+            (x) => x.eth_chain_id == evmId,
+          )[0].url;
+
+          const isAddressContract = await isEVMAddressContract(
+            contract_address,
+            node_url,
+          );
+
+          const isContractType = await getEVMContractType(
+            contract_address,
+            node_url,
+          );
+
+          console.log('IS CONTRACT TYPE ', isContractType);
+
+          if (!isAddressContract) {
+            updatedSubForms[index] = {
+              ...updatedSubForms[index],
+              errors: {
+                ...updatedSubForms[index].errors,
+                [key]: VALIDATION_MESSAGES.CONTRACT_NOT_FOUND,
+              },
+            };
+          } else if (
+            !isContractType ||
+            isContractType !== subForm.values.requirementType
+          ) {
+            updatedSubForms[index] = {
+              ...updatedSubForms[index],
+              errors: {
+                ...updatedSubForms[index].errors,
+                [key]: VALIDATION_MESSAGES.INVALID_CONTRACT_TYPE,
+              },
+            };
+          }
+        } catch (e: any) {
+          const zodError = e as ZodError;
+          const errors = {};
+          zodError.errors.map((x) => {
+            errors[x.path[0]] = x.message;
+          });
+
+          updatedSubForms[index] = {
+            ...updatedSubForms[index],
+            errors: errors as any,
           };
         }
+      }),
+    );
 
-        updatedSubForms[index] = {
-          ...updatedSubForms[index],
-          errors: {},
-        };
-      } catch (e: any) {
-        const zodError = e as ZodError;
-        const errors = {};
-        zodError.errors.map((x) => {
-          errors[x.path[0]] = x.message;
-        });
-
-        updatedSubForms[index] = {
-          ...updatedSubForms[index],
-          errors: errors as any,
-        };
-      }
-    });
+    console.log(updatedSubForms);
 
     setRequirementSubForms([...updatedSubForms]);
+
+    console.log(
+      'UPDATEED ',
+      !!updatedSubForms.find((x) => Object.keys(x.errors).length > 0),
+    );
 
     return !!updatedSubForms.find((x) => Object.keys(x.errors).length > 0);
   };
