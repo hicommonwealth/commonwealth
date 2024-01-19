@@ -23,6 +23,12 @@ export const resetDatabase = (debug = false): Promise<void> => {
         isAdmin: true,
       });
 
+      await models.User.create({
+        email: 'temp@gmail.com',
+        emailVerified: true,
+        isAdmin: true,
+      });
+
       const nodes: Record<string, ChainNodeAttributes> = {
         edgeware: {
           url: 'mainnet1.edgewa.re',
@@ -36,7 +42,8 @@ export const resetDatabase = (debug = false): Promise<void> => {
           balance_type: BalanceType.Ethereum,
         },
         goerli: {
-          url: 'https://eth-goerli.alchemyapi.io/v2/dummy_key',
+          id: 1263,
+          url: 'https://rpc.ankr.com/eth_goerli',
           name: 'Goerli Testnet',
           eth_chain_id: 5,
           balance_type: BalanceType.Ethereum,
@@ -253,6 +260,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
           verified: new Date(),
+          role: 'admin',
         },
         {
           address: '5DJA5ZCobDS3GVn8D2E5YRiotDqGkR2FN1bg6LtfNUmuadwX',
@@ -277,6 +285,17 @@ export const resetDatabase = (debug = false): Promise<void> => {
           verification_token_expires: null,
           verified: new Date(),
           keytype: 'sr25519',
+        },
+        {
+          // be careful modifying me, can break namespace
+          address: '0x42D6716549A78c05FD8EF1f999D52751Bbf9F46a',
+          user_id: 2,
+          community_id: 'ethereum',
+          verification_token: 'PLACEHOLDER',
+          verification_token_expires: null,
+          verified: new Date(),
+          keytype: 'sr25519',
+          role: 'admin',
         },
       ]);
 
