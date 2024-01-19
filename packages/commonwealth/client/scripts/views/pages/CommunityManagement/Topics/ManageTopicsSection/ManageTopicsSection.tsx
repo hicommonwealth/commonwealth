@@ -11,7 +11,7 @@ import { CWModal } from 'client/scripts/views/components/component_kit/new_desig
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/cw_button';
 import { EditTopicModal } from 'client/scripts/views/modals/edit_topic_modal';
 import DraggableTopicsList from 'client/scripts/views/modals/order_topics_modal/draggable_topics_list';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './ManageTopicsSection.scss';
 
 export const ManageTopicsSection = () => {
@@ -59,6 +59,10 @@ export const ManageTopicsSection = () => {
   const handleReversion = () => {
     setTopics(getFilteredTopics(rawTopics));
   };
+
+  useEffect(() => {
+    setTopics(getFilteredTopics(rawTopics));
+  }, [rawTopics]);
 
   return (
     <div className="ManageTopicsSection">
