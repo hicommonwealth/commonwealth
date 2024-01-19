@@ -66,7 +66,7 @@ export const ManageTopicsSection = () => {
         <div className="featured-topic-list">
           {topics.length ? (
             <DraggableTopicsList
-              topics={topics}
+              topics={getFilteredTopics(rawTopics)}
               setTopics={setTopics}
               onEdit={setTopicSelectedToEdit}
             />
