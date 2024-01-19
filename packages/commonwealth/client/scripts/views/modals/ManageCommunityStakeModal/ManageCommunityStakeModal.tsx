@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import {
   CWModalBody,
   CWModalFooter,
@@ -9,6 +8,7 @@ import {
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
 import StakeExchangeForm from './StakeExchangeForm';
+import TransactionLoading from './TransactionLoading';
 
 import './ManageCommunityStakeModal.scss';
 
@@ -31,16 +31,6 @@ interface ManageCommunityStakeModalProps {
   mode: ManageCommunityStakeModalMode;
 }
 
-const TransactionLoading = () => {
-  return (
-    <>
-      <CWModalBody>
-        <div>loading</div>
-        <CWSpinner />
-      </CWModalBody>
-    </>
-  );
-};
 interface TransactionFailedProps {
   onModalClose: () => void;
   setModalState: (modalState: ManageCommunityStakeModalState) => void;
