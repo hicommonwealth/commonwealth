@@ -1,5 +1,5 @@
 import { NotificationDataAndCategory } from '@hicommonwealth/core';
-import { NotificationInstance } from '../../models/notification';
+import { NotificationInstance } from '@hicommonwealth/model';
 import emitNotifications from '../../util/emitNotifications';
 import { ServerNotificationsController } from '../server_notifications_controller';
 

@@ -1,6 +1,6 @@
 import { AppError } from '@hicommonwealth/adapters';
 import { CommunityCategoryType } from '@hicommonwealth/core';
-import type { DB } from '../models';
+import type { DB } from '@hicommonwealth/model';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 

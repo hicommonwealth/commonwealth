@@ -1,15 +1,18 @@
 import { AppError, ServerError } from '@hicommonwealth/adapters';
 import { NotificationCategories, ProposalType } from '@hicommonwealth/core';
+import {
+  AddressInstance,
+  CommunityInstance,
+  DB,
+  ThreadAttributes,
+  ThreadInstance,
+  UserInstance,
+} from '@hicommonwealth/model';
 import { uniq } from 'lodash';
 import moment from 'moment';
 import { Op, Sequelize, Transaction } from 'sequelize';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText, validURL } from '../../../shared/utils';
-import { DB } from '../../models';
-import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/community';
-import { ThreadAttributes, ThreadInstance } from '../../models/thread';
-import { UserInstance } from '../../models/user';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { findAllRoles } from '../../util/roles';
 import { TrackOptions } from '../server_analytics_methods/track';

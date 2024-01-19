@@ -1,9 +1,11 @@
 import { AppError } from '@hicommonwealth/adapters';
+import {
+  CommunityInstance,
+  PollAttributes,
+  UserInstance,
+} from '@hicommonwealth/model';
 import moment from 'moment';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { CommunityInstance } from '../../models/community';
-import { PollAttributes } from '../../models/poll';
-import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_methods/track';
 import { ServerThreadsController } from '../server_threads_controller';

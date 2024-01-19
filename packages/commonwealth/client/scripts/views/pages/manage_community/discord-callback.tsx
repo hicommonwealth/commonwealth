@@ -1,14 +1,18 @@
-import { useCommonNavigate } from 'navigation/helpers';
-import { PageLoading } from '../loading';
-import React, { useCallback, useEffect, useState } from 'react';
-import { PageNotFound } from '../404';
 import axios from 'axios';
+import { featureFlags } from 'helpers/feature-flags';
+import { useCommonNavigate } from 'navigation/helpers';
+import React, { useCallback, useEffect, useState } from 'react';
 import app from 'state';
+import { PageNotFound } from '../404';
+import { PageLoading } from '../loading';
 
 const DiscordCallbackPage = () => {
   const navigate = useCommonNavigate();
   const [failed, setFailed] = useState(false);
   const [failureMessage, setFailureMessage] = useState<string>('');
+  const redirectPath = featureFlags.newAdminOnboardingEnabled
+    ? '/manage/integrations'
+    : '/manage';
 
   const setBotConfig = useCallback(
     async (state: string, guildId: string) => {
@@ -24,23 +28,23 @@ const DiscordCallbackPage = () => {
           },
           {
             headers: { 'Content-Type': 'application/json' },
-          }
+          },
         );
 
         if (stateJSON.redirect_domain) {
-          window.location.href = `${stateJSON.redirect_domain}/manage?returningFromDiscordCallback=true`;
+          window.location.href = `${stateJSON.redirect_domain}/${redirectPath}?returningFromDiscordCallback=true`;
         } else {
           navigate(
-            `/${stateJSON.cw_chain_id}/manage?returningFromDiscordCallback=true`,
+            `/${stateJSON.cw_chain_id}/${redirectPath}?returningFromDiscordCallback=true`,
             {},
-            null
+            null,
           );
         }
       } catch (e) {
         throw new Error(e.response.data.error);
       }
     },
-    [navigate]
+    [navigate],
   );
 
   const params = new URLSearchParams(window.location.search);

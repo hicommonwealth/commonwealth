@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NotificationCategories } from '@hicommonwealth/core';
+import { DB } from '@hicommonwealth/model';
 import { NextFunction, Request, Response } from 'express';
-import { DB } from '../models';
 
 const viewChainActivity = async (
   models: DB,

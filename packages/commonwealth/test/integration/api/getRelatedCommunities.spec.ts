@@ -1,5 +1,5 @@
+import { models } from '@hicommonwealth/model';
 import { assert } from 'chai';
-import models from 'server/database';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 import { resetDatabase } from '../../util/resetDatabase';
 

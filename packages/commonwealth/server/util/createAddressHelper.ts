@@ -5,17 +5,16 @@ import {
   WalletId,
   WalletSsoSource,
 } from '@hicommonwealth/core';
+import type { DB, UserInstance } from '@hicommonwealth/model';
+import { AddressInstance } from '@hicommonwealth/model';
 import { bech32 } from 'bech32';
 import crypto from 'crypto';
 import type { NextFunction } from 'express';
 import { Op } from 'sequelize';
-import { AddressInstance } from 'server/models/address';
 import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
 import { addressSwapper, bech32ToHex } from '../../shared/utils';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
-import type { DB } from '../models';
-import type { UserInstance } from '../models/user';
 import { Errors } from '../routes/createAddress';
 import { createRole, findOneRole } from './roles';
 

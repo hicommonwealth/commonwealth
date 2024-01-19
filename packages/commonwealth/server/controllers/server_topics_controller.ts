@@ -1,4 +1,4 @@
-import { DB } from '../models';
+import { DB } from '@hicommonwealth/model';
 import BanCache from '../util/banCheckCache';
 import {
   CreateTopicOptions,

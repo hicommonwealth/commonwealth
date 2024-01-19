@@ -5,8 +5,7 @@ import {
   CosmosSource,
   NativeSource,
 } from '@hicommonwealth/core';
-import { AddressAttributes } from 'server/models/address';
-import { GroupAttributes } from 'server/models/group';
+import { AddressAttributes, GroupAttributes } from '@hicommonwealth/model';
 import {
   GetBalancesOptions,
   GetCosmosBalancesOptions,

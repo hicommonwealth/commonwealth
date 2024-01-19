@@ -2,11 +2,11 @@ import {
   NotificationCategories,
   NotificationDataAndCategory,
 } from '@hicommonwealth/core';
+import { CommunityInstance } from '@hicommonwealth/model';
 import { capitalize } from 'lodash';
 import { Label as chainEventLabel } from '../../../shared/chain/labelers/util';
 import { renderQuillDeltaToText, smartTrim } from '../../../shared/utils';
 import { SERVER_URL } from '../../config';
-import { CommunityInstance } from '../../models/community';
 import { ChainEventWebhookData, ForumWebhookData } from './types';
 import {
   getActorProfile,

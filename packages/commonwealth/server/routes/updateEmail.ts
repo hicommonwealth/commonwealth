@@ -1,17 +1,13 @@
-import {
-  AppError,
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/adapters';
-import { DynamicTemplate, WalletId } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/adapters';
+import { DynamicTemplate, WalletId, logger } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
 import Sequelize from 'sequelize';
 import { LOGIN_RATE_LIMIT_MINS, SENDGRID_API_KEY, SERVER_URL } from '../config';
-import type { DB } from '../models';
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 sgMail.setApiKey(SENDGRID_API_KEY);
 

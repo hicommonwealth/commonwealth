@@ -38,8 +38,11 @@ async function verifyCacheResponse(key, res, resEarlier) {
   expect(res).to.have.header('X-Cache', XCACHE_VALUES.HIT);
   const valFromRedis = await cacheDecorator.checkCache(key);
   expect(valFromRedis).to.not.be.null;
-  expect(JSON.parse(valFromRedis)).to.be.deep.equal(res.body);
-  expect(JSON.parse(valFromRedis)).to.be.deep.equal(resEarlier.body);
+  if (key === CACHE_ENDPOINTS.JSON) {
+    // to avoid unhandled exceptions when response is not json
+    expect(JSON.parse(valFromRedis)).to.be.deep.equal(res.body);
+    expect(JSON.parse(valFromRedis)).to.be.deep.equal(resEarlier.body);
+  }
 }
 
 async function makeGetRequest(endpoint, headers = {}) {

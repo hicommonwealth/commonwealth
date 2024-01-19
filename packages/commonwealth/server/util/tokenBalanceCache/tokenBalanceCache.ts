@@ -1,13 +1,13 @@
 import { fromBech32, toBech32 } from '@cosmjs/encoding';
+import { RedisCache } from '@hicommonwealth/adapters';
 import {
-  RedisCache,
-  StatsDController,
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/adapters';
-import { BalanceSourceType, RedisNamespaces } from '@hicommonwealth/core';
+  BalanceSourceType,
+  RedisNamespaces,
+  logger,
+  stats,
+} from '@hicommonwealth/core';
+import { DB } from '@hicommonwealth/model';
 import Web3 from 'web3';
-import { DB } from '../../models';
 import { rollbar } from '../rollbar';
 import { __getCosmosNativeBalances } from './providers/get_cosmos_balances';
 import { __getCw721Balances } from './providers/get_cw721_balances';
@@ -23,7 +23,7 @@ import {
   GetEvmBalancesOptions,
 } from './types';
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 export class TokenBalanceCache {
   constructor(
@@ -75,7 +75,7 @@ export class TokenBalanceCache {
       rollbar.error(msg, e);
     }
 
-    StatsDController.get().increment(
+    stats().incrementBy(
       'tbc.successful.balance.fetch',
       Object.keys(balances).length,
       {

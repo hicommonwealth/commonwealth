@@ -1,6 +1,6 @@
 import { ServerError } from '@hicommonwealth/adapters';
+import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-import type { DB } from '../models';
 
 export const Errors = {
   FailedToToggle: 'Failed to toggle community star',
