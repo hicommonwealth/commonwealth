@@ -25,6 +25,7 @@ import {
   GetCommunitiesOptions,
   GetCommunitiesResult,
 } from './server_communities_methods/get_communities';
+import { __getCommunityStake } from './server_communities_methods/get_community_stake';
 import {
   __getRelatedCommunities,
   GetRelatedCommunitiesQuery,
@@ -104,5 +105,11 @@ export class ServerCommunitiesController {
     options: PutCommunityStakeOptions,
   ): Promise<PutCommunityStakeResult> {
     return __putCommunityStake.call(this, options);
+  }
+
+  async getCommunityStake(
+    options: GetCommunitiesOptions,
+  ): Promise<PutCommunityStakeResult> {
+    return __getCommunityStake.call(this, options);
   }
 }

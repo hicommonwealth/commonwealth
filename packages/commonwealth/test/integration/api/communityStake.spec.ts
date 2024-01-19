@@ -65,6 +65,17 @@ describe('PUT communityStakes Tests', () => {
     assert.equal(updateResp.stake_token, expectedUpdateResp.stake_token);
     assert.equal(updateResp.stake_scaler, expectedUpdateResp.stake_scaler);
     assert.equal(updateResp.stake_enabled, expectedUpdateResp.stake_enabled);
+
+    const getResp = await controller.getCommunityStake({
+      community_id: baseRequest.community_id,
+      stake_id: baseRequest.stake_id,
+    });
+
+    assert.equal(getResp.community_id, expectedUpdateResp.community_id);
+    assert.equal(getResp.stake_id, expectedUpdateResp.stake_id);
+    assert.equal(getResp.stake_token, expectedUpdateResp.stake_token);
+    assert.equal(getResp.stake_scaler, expectedUpdateResp.stake_scaler);
+    assert.equal(getResp.stake_enabled, expectedUpdateResp.stake_enabled);
   });
 
   it('The integration with protocol works', async () => {

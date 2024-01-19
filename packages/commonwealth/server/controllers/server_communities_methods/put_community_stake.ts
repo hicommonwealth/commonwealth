@@ -25,7 +25,6 @@ export async function __putCommunityStake(
       stake_scaler,
       stake_enabled,
     },
-    logging: true,
   });
 
   return newCommunityStake;

@@ -2,6 +2,7 @@ import type { Express } from 'express';
 import express from 'express';
 import useragent from 'express-useragent';
 import passport from 'passport';
+import { getCommunityStakeHandler } from '../routes/communities/get_community_stakes_handler';
 import { putCommunityStakeHandler } from '../routes/communities/put_community_stakes_handler';
 
 import { TokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
@@ -366,6 +367,14 @@ function setupRouter(
     '/relatedCommunities',
     getRelatedCommunitiesHandler.bind(this, serverControllers),
   );
+
+  registerRoute(
+    router,
+    'get',
+    '/communityStakes',
+    getCommunityStakeHandler.bind(this, models, serverControllers),
+  );
+
   registerRoute(
     router,
     'put',
