@@ -2,36 +2,42 @@ import { AppError } from '@hicommonwealth/adapters';
 import { Community, DB } from '@hicommonwealth/model';
 import { CommunityStakeAttributes } from '@hicommonwealth/model/build/models/community_stake';
 import { ServerControllers } from '../../routing/router';
-import { TypedRequestBody, TypedResponse, success } from '../../types';
+import { TypedRequest, TypedResponse, success } from '../../types';
 import { validateCommunityStakeConfig } from '../../util/commonProtocol/communityStakeConfigValidator';
 import { formatErrorPretty } from '../../util/errorFormat';
 
-type PutCommunityStakesParams = Community.SetCommunityStake;
+type PutCommunityStakesParams = Community.SetCommunityStakeParams;
+type PutCommunityStakesBody = Community.SetCommunityStakeBody;
 type PutCommunityStakesResponse = CommunityStakeAttributes;
 
 export const putCommunityStakeHandler = async (
   models: DB,
   controllers: ServerControllers,
-  req: TypedRequestBody<PutCommunityStakesParams>,
+  req: TypedRequest<PutCommunityStakesBody, any, PutCommunityStakesParams>,
   res: TypedResponse<PutCommunityStakesResponse>,
 ) => {
-  const validationResult = Community.SetCommunityStakeSchema.safeParse(
-    req.body,
-  );
+  const paramsValidationResult =
+    Community.SetCommunityStakeParamsSchema.safeParse(req.params);
 
-  if (validationResult.success === false) {
-    throw new AppError(formatErrorPretty(validationResult));
+  if (paramsValidationResult.success === false) {
+    throw new AppError(formatErrorPretty(paramsValidationResult));
   }
 
-  await validateCommunityStakeConfig(
-    models,
-    validationResult.data.community_id,
-    req.body.stake_id,
-  );
+  await validateCommunityStakeConfig(models, ...paramsValidationResult.data);
+
+  const bodyValidationResult =
+    Community.SetCommunityStakeParamsSchema.safeParse(req.body);
+
+  if (bodyValidationResult.success === false) {
+    throw new AppError(formatErrorPretty(bodyValidationResult));
+  }
 
   const results = await controllers.communities.putCommunityStake({
     user: req.user,
-    communityStake: validationResult.data,
+    communityStake: {
+      ...paramsValidationResult.data,
+      ...bodyValidationResult.data,
+    },
   });
 
   return success(res, results);
