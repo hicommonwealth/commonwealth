@@ -87,8 +87,25 @@ describe('PUT communityStakes Tests', () => {
     assert.equal(getResp.stake_enabled, expectedUpdateResp.stake_enabled);
   });
 
-  it('The community stake routes work correctly', async () => {
+  it('Should fail if user is not admin', async () => {
     const jwtToken = jwt.sign({ id: 1, email: testUsers[0].email }, JWT_SECRET);
+
+    const response = await put(
+      `/api/communityStakes/${baseRequest.community_id}/${baseRequest.stake_id}`,
+      { ...baseRequest, jwt: jwtToken },
+      true,
+      app,
+    );
+
+    assert.equal(response.status, 400);
+    assert.equal(
+      response.error,
+      'User must be an admin of the community to update the community stakes',
+    );
+  });
+
+  it('The community stake routes work correctly', async () => {
+    const jwtToken = jwt.sign({ id: 2, email: testUsers[0].email }, JWT_SECRET);
 
     const actualPutResponse = (
       await put(

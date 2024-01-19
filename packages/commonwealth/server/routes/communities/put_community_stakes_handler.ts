@@ -23,11 +23,19 @@ export const putCommunityStakeHandler = async (
     throw new AppError(formatErrorPretty(paramsValidationResult));
   }
 
-  await validateCommunityStakeConfig(
-    models,
-    paramsValidationResult.data.community_id,
-    paramsValidationResult.data.stake_id,
-  );
+  const { community_id, stake_id } = paramsValidationResult.data;
+
+  const adminAddress = (await req.user.getAddresses())
+    .filter((addr) => !!addr.verified)
+    .find((a) => a.community_id === community_id && a.role === 'admin');
+
+  if (!adminAddress) {
+    throw new AppError(
+      'User must be an admin of the community to update the community stakes',
+    );
+  }
+
+  await validateCommunityStakeConfig(models, community_id, stake_id);
 
   const bodyValidationResult = Community.SetCommunityStakeBodySchema.safeParse(
     req.body,

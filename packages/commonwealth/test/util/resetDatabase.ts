@@ -319,6 +319,16 @@ export const resetDatabase = (debug = false): Promise<void> => {
           keytype: 'sr25519',
           role: 'admin',
         },
+        {
+          address: '0xtestAddress',
+          user_id: 2,
+          community_id: 'common-protocol',
+          verification_token: 'PLACEHOLDER',
+          verification_token_expires: null,
+          verified: new Date(),
+          keytype: 'sr25519',
+          role: 'admin',
+        },
       ]);
 
       await models.NotificationCategory.bulkCreate([
