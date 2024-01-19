@@ -178,7 +178,7 @@ export async function __updateCommunity(
   if (icon_url) community.icon_url = icon_url;
   if (active !== undefined) community.active = active;
   if (type) community.type = type;
-  if (nonEmptySocialLinks !== undefined && nonEmptySocialLinks.length > 0)
+  if (nonEmptySocialLinks !== undefined && nonEmptySocialLinks.length >= 0)
     community.social_links = nonEmptySocialLinks;
   if (hide_projects) community.hide_projects = hide_projects;
   if (typeof stages_enabled === 'boolean')
