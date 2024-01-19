@@ -1,0 +1,65 @@
+@import '../../../../../../../styles/shared';
+
+.EnableStake {
+  display: flex;
+
+  .FeatureHint {
+    &.mobile {
+      display: none;
+
+      @include smallInclusive {
+        display: block;
+      }
+    }
+
+    &.desktop {
+      max-width: 244px;
+
+      @include smallInclusive {
+        display: none;
+      }
+    }
+  }
+
+  .header {
+    margin-top: 8px;
+    width: 100%;
+    display: flex;
+    gap: 16px;
+    flex-direction: column;
+    max-width: 596px;
+    margin-right: 110px;
+
+    @include smallInclusive {
+      margin-right: unset;
+    }
+
+    .description {
+      color: $neutral-500;
+    }
+
+    .form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .info {
+      display: inline-block;
+
+      a {
+        margin-left: 4px;
+        color: $primary-600;
+      }
+    }
+
+    .Divider {
+      margin-block: 8px;
+    }
+
+    .action-buttons {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+}

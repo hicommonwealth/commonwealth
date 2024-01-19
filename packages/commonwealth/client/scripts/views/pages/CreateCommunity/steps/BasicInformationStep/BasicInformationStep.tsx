@@ -12,7 +12,7 @@ interface BasicInformationStepProps {
   selectedAddress: AddressInfo;
   selectedCommunity: SelectedCommunity;
   handleGoBack: () => void;
-  handleContinue: (communityId: string) => void;
+  handleContinue: (communityId: string, communityName: string) => void;
 }
 
 const BasicInformationStep = ({

@@ -3,6 +3,5 @@ export const featureFlags = {
   communityHomepage: process.env.FLAG_COMMUNITY_HOMEPAGE === 'true',
   sidebarToggle: process.env.FLAG_SIDEBAR_TOGGLE === 'true',
   newAdminOnboardingEnabled: process.env.FLAG_NEW_ADMIN_ONBOARDING === 'true',
-  // TODO: use the proper community stakes feature flag here
-  isCommunityStakesEnabled: false,
+  communityStake: process.env.FLAG_COMMUNITY_STAKE === 'true',
 };
