@@ -1,23 +1,22 @@
 import { z } from 'zod';
 import { models } from '../database';
 import type { CommentAttributes } from '../models';
-import type { Command } from '../types';
+import type { CommandMetadata } from '../types';
 
-export const CreateCommentSchema = z.object({
+const schema = z.object({
   content: z.string(),
 });
 
-export type CreateComment = z.infer<typeof CreateCommentSchema>;
-
-export const createComment: Command<
-  typeof CreateCommentSchema,
-  CommentAttributes
-> = async () =>
-  //actor,
-  //id,
-  //payload,
+export const CreateComment: CommandMetadata<typeof schema, CommentAttributes> =
   {
-    // TODO
-    const comment = await models.Comment.findOne();
-    return comment!;
+    schema,
+    fn: async () =>
+      //actor,
+      //id,
+      //payload,
+      {
+        // TODO
+        const comment = await models.Comment.findOne();
+        return comment!;
+      },
   };

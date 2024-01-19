@@ -1,11 +1,10 @@
-import type {
-  ActorMiddleware,
-  Command,
-  UserAttributes,
+import {
+  command,
+  type CommandMetadata,
+  type UserAttributes,
 } from '@hicommonwealth/model';
-import { InvalidInput, validate } from '@hicommonwealth/model';
 import type { Request, RequestHandler, Response } from 'express';
-import { ZodError, ZodSchema, z } from 'zod';
+import { z, ZodSchema } from 'zod';
 
 /**
  * Adapts commands to express handlers
@@ -17,16 +16,11 @@ import { ZodError, ZodSchema, z } from 'zod';
  *  - chain?: string;
  *  - chain_id?: string;
  *  - community_id?: string;
- * @param fn core command implementation
- * @param middleware actor middleware
+ * @param md command metadata
  * @returns express command handler
  */
 export const expressCommand =
-  <M extends ZodSchema, R>(
-    fn: Command<M, R>,
-    schema: M,
-    middleware: ActorMiddleware[],
-  ): RequestHandler =>
+  <M extends ZodSchema, R>(md: CommandMetadata<M, R>): RequestHandler =>
   async (
     req: Request<
       { id: string },
@@ -38,25 +32,11 @@ export const expressCommand =
       }
     >,
     res: Response<R>,
-  ) => {
-    try {
-      const payload = schema.parse(req.body);
-      const actor = await validate(
-        {
-          user: req.user as UserAttributes,
-          address_id: req.body.address_id,
-          community_id: req.body.chain_id ?? req.body.community_id,
-        },
-        middleware,
-      );
-      return res.json(await fn(actor, req.params.id, payload));
-    } catch (error) {
-      if (error instanceof Error && error.name === 'ZodError') {
-        const details = (error as ZodError).issues.map(
-          ({ path, message }) => `${path.join('.')}: ${message}`,
-        );
-        throw new InvalidInput('Invalid command', details);
-      }
-      throw new InvalidInput('Invalid command', [error]);
-    }
-  };
+  ) =>
+    res.json(
+      await command(md, req.params.id, req.body, {
+        user: req.user as UserAttributes,
+        address_id: req.body.address_id,
+        community_id: req.body.chain_id ?? req.body.community_id,
+      }),
+    );

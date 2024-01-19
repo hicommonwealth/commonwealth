@@ -8,23 +8,21 @@ import {
   DefaultPage,
   NotificationCategories,
 } from '@hicommonwealth/core';
-import type { Cluster } from '@solana/web3.js';
-import * as solw3 from '@solana/web3.js';
-import BN from 'bn.js';
-import { Op } from 'sequelize';
-import Web3 from 'web3';
-import { bech32ToHex, urlHasValidHTTPPrefix } from '../../../shared/utils';
-
 import type {
   AddressInstance,
   ChainNodeAttributes,
   CommunityAttributes,
   RoleAttributes,
 } from '@hicommonwealth/model';
-import { COSMOS_REGISTRY_API } from '../../config';
-
 import { Community, UserInstance } from '@hicommonwealth/model';
+import type { Cluster } from '@solana/web3.js';
+import * as solw3 from '@solana/web3.js';
 import axios from 'axios';
+import BN from 'bn.js';
+import { Op } from 'sequelize';
+import Web3 from 'web3';
+import { bech32ToHex, urlHasValidHTTPPrefix } from '../../../shared/utils';
+import { COSMOS_REGISTRY_API } from '../../config';
 import { RoleInstanceWithPermission } from '../../util/roles';
 import testSubstrateSpec from '../../util/testSubstrateSpec';
 import { ServerCommunitiesController } from '../server_communities_controller';

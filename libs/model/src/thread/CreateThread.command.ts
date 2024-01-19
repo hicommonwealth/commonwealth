@@ -1,23 +1,21 @@
 import { z } from 'zod';
 import { models } from '../database';
 import type { ThreadAttributes } from '../models';
-import type { Command } from '../types';
+import type { CommandMetadata } from '../types';
 
-export const CreateThreadSchema = z.object({
+export const schema = z.object({
   content: z.string(),
 });
 
-export type CreateThread = z.infer<typeof CreateThreadSchema>;
-
-export const createThread: Command<
-  typeof CreateThreadSchema,
-  ThreadAttributes
-> = async () =>
-  //actor,
-  //id,
-  //payload,
-  {
-    // TODO
-    const thread = await models.Thread.findOne();
-    return thread!;
-  };
+export const CreateThread: CommandMetadata<typeof schema, ThreadAttributes> = {
+  schema,
+  fn: async () =>
+    //actor,
+    //id,
+    //payload,
+    {
+      // TODO
+      const thread = await models.Thread.findOne();
+      return thread!;
+    },
+};

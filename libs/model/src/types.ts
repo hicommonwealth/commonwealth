@@ -31,13 +31,30 @@ export type Actor = {
 };
 
 /**
- * Command signature
- * @param actor the command actor
- * @param id the aggregate id
- * @param payload the command payload
+ * Command action signature
+ * @param actor command actor
+ * @param id aggregate id
+ * @param payload command payload
  */
 export type Command<M extends ZodSchema, R> = (
   actor: Actor,
   id: string,
   payload: z.infer<M>,
 ) => Promise<R>;
+
+/**
+ * Middleware signature to loads and/or validates actor state in a chain of responsibility pattern
+ * @param actor the current actor state
+ * @returns the updated actor state or error string
+ * - TODO: should we use [error, actor] tuples instead of returning string?
+ */
+export type ActorMiddleware = (actor: Actor) => Promise<Actor | string>;
+
+/**
+ * Command definition
+ */
+export type CommandMetadata<M extends ZodSchema, R> = {
+  fn: Command<M, R>;
+  schema: M;
+  middleware?: ActorMiddleware[];
+};

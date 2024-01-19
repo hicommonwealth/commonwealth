@@ -1,36 +1,36 @@
 import { z } from 'zod';
 import { models } from '../database';
 import { InvalidInput } from '../errors';
+import { isCommunityAuthor, loadCommunity } from '../middleware';
 import type { CommunityAttributes } from '../models';
-import type { Command } from '../types';
+import type { CommandMetadata } from '../types';
 
-export const SetCommunityNamespaceSchema = z.object({
+export const schema = z.object({
   namespace: z.string(),
 });
 
-export type SetCommunityNamespace = z.infer<typeof SetCommunityNamespaceSchema>;
-
-/**
- * Sets community namespace
- */
-export const setCommunityNamespace: Command<
-  typeof SetCommunityNamespaceSchema,
+export const SetCommunityNamespace: CommandMetadata<
+  typeof schema,
   CommunityAttributes
-> = async (actor, id, payload) => {
-  // if loaded by actor middleware
-  // const community = actor.community;
+> = {
+  schema,
+  middleware: [loadCommunity, isCommunityAuthor],
+  fn: async (actor, id, payload) => {
+    // if loaded by actor middleware
+    // const community = actor.community;
 
-  const community = await models.Community.findOne({ where: { id } });
-  if (!community) throw new InvalidInput('Community not found');
+    const community = await models.Community.findOne({ where: { id } });
+    if (!community) throw new InvalidInput('Community not found');
 
-  // TODO: validate contract
-  // call protocol api
+    // TODO: validate contract
+    // call protocol api
 
-  // payload is validated by message validation middleware
-  // TODO: set to namespace instead of name
-  community.name = payload.namespace;
+    // payload is validated by message validation middleware
+    // TODO: set to namespace instead of name
+    community.name = payload.namespace;
 
-  await community.save();
+    await community.save();
 
-  return community;
+    return community;
+  },
 };

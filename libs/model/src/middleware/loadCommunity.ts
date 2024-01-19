@@ -1,5 +1,5 @@
 import { models } from '../database';
-import type { ActorMiddleware } from './actor-middleware';
+import { ActorMiddleware } from '../types';
 
 export const ALL_COMMUNITIES = 'all_communities';
 

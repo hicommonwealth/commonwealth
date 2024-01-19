@@ -1,5 +1,5 @@
 import { models } from '../database'; // TODO: use port/adapter pattern to test in-memory
-import type { ActorMiddleware } from './actor-middleware';
+import { ActorMiddleware } from '../types';
 
 /**
  * Middleware to validate user as author of the loaded community

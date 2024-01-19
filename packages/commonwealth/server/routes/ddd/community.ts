@@ -1,29 +1,14 @@
 import { expressCommand } from '@hicommonwealth/adapters';
-import {
-  Community,
-  isCommunityAuthor,
-  loadCommunity,
-} from '@hicommonwealth/model';
+import { Community } from '@hicommonwealth/model';
 import { Router } from 'express';
 
 const router = Router();
 
-router.put(
-  '/:id',
-  expressCommand(
-    Community.createCommunity,
-    Community.CreateCommunitySchema,
-    [],
-  ),
-);
+router.put('/:id', expressCommand(Community.CreateCommunity));
 
 router.post(
   '/set-community-namespace/:id',
-  expressCommand(
-    Community.setCommunityNamespace,
-    Community.SetCommunityNamespaceSchema,
-    [loadCommunity, isCommunityAuthor],
-  ),
+  expressCommand(Community.SetCommunityNamespace),
 );
 
 export default router;
