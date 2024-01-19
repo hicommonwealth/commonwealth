@@ -1,4 +1,5 @@
 import { featureFlags } from 'helpers/feature-flags';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import app from 'state';
@@ -16,6 +17,8 @@ import './AdminOnboardingSlider.scss';
 import { DismissModal } from './DismissModal';
 
 export const AdminOnboardingSlider = () => {
+  useUserActiveAccount();
+
   const community = app.config.chains.getById(app.activeChainId());
   const integrations = {
     snapshot: community?.snapshot?.length > 0,
