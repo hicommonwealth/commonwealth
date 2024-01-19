@@ -5,16 +5,20 @@ module.exports = {
     return queryInterface.createTable(
       'CommunityStakes',
       {
-        id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
         community_id: {
           type: Sequelize.STRING,
+          primaryKey: true,
           references: {
             model: 'Communities',
             key: 'id',
           },
           allowNull: false,
         },
-        stake_id: { type: Sequelize.INTEGER, allowNull: false },
+        stake_id: {
+          type: Sequelize.INTEGER,
+          primaryKey: true,
+          allowNull: false,
+        },
         stake_token: { type: Sequelize.STRING, allowNull: false },
         stake_scaler: { type: Sequelize.NUMERIC, allowNull: false },
         stake_enabled: {
@@ -26,7 +30,7 @@ module.exports = {
         updated_at: { type: Sequelize.DATE, allowNull: false },
       },
       {
-        indexes: [{ fields: ['id'] }, { fields: ['community_id'] }],
+        indexes: [{ fields: ['community_id'] }, { fields: ['stake_id'] }],
       },
     );
   },

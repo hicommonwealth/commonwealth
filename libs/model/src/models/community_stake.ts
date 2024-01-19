@@ -25,9 +25,12 @@ export default (
   const CommunityStake = <CommunityStakeModelStatic>sequelize.define(
     'CommunityStakes',
     {
-      id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      community_id: { type: dataTypes.STRING, allowNull: false },
-      stake_id: { type: dataTypes.INTEGER, allowNull: false },
+      community_id: {
+        type: dataTypes.STRING,
+        allowNull: false,
+        primaryKey: true,
+      },
+      stake_id: { type: dataTypes.INTEGER, allowNull: false, primaryKey: true },
       stake_token: { type: dataTypes.STRING, allowNull: false },
       stake_scaler: { type: dataTypes.REAL, allowNull: false },
       stake_enabled: { type: dataTypes.BOOLEAN, allowNull: false },
@@ -40,7 +43,7 @@ export default (
       updatedAt: 'updated_at',
       underscored: true,
       tableName: 'CommunityStakes',
-      indexes: [{ fields: ['community_id'] }],
+      indexes: [{ fields: ['community_id'] }, { fields: ['stake_id'] }],
     },
   );
 

@@ -48,7 +48,7 @@ describe('PUT communityStakes Tests', () => {
     );
 
     const updateResp = await controller.putCommunityStake({
-      communityStake: { ...baseRequest, stake_id: 2 },
+      communityStake: { ...baseRequest, stake_token: 'temp' },
       user: user,
     });
 
