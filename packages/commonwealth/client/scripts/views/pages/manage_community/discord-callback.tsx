@@ -11,8 +11,8 @@ const DiscordCallbackPage = () => {
   const [failed, setFailed] = useState(false);
   const [failureMessage, setFailureMessage] = useState<string>('');
   const redirectPath = featureFlags.newAdminOnboardingEnabled
-    ? '/manage/integrations'
-    : '/manage';
+    ? 'manage/integrations'
+    : 'manage';
 
   const setBotConfig = useCallback(
     async (state: string, guildId: string) => {
