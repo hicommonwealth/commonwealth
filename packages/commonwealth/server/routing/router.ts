@@ -371,7 +371,7 @@ function setupRouter(
     'put',
     '/communityStakes',
     passport.authenticate('jwt', { session: false }),
-    putCommunityStakeHandler.bind(this, serverControllers),
+    putCommunityStakeHandler.bind(this, models, serverControllers),
   );
 
   // ----

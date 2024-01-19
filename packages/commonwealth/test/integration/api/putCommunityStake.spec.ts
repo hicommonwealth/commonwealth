@@ -1,11 +1,11 @@
+import { models, UserInstance } from '@hicommonwealth/model';
 import { assert } from 'chai';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
-import models from '../../../server/database';
-import { CommunityStakeAttributes } from '../../../server/models/community_stake';
-import { UserInstance } from '../../../server/models/user';
+import { validateCommunityStakeConfig } from '../../../server/util/commonProtocol/communityStakeConfigValidator';
 import { buildUser } from '../../unit/unitHelpers';
+import { resetDatabase } from '../../util/resetDatabase';
 
-const baseRequest: CommunityStakeAttributes = {
+const baseRequest = {
   community_id: 'ethereum',
   stake_id: 1,
   stake_token: '',
@@ -14,7 +14,11 @@ const baseRequest: CommunityStakeAttributes = {
 };
 
 describe('PUT communityStakes Tests', () => {
-  it('Correctly creates and updates community stake', async () => {
+  beforeEach(async () => {
+    await resetDatabase();
+  });
+
+  it('The handler creates and updates community stake', async () => {
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
@@ -61,5 +65,9 @@ describe('PUT communityStakes Tests', () => {
     assert.equal(updateResp.stake_token, expectedUpdateResp.stake_token);
     assert.equal(updateResp.stake_scaler, expectedUpdateResp.stake_scaler);
     assert.equal(updateResp.stake_enabled, expectedUpdateResp.stake_enabled);
+  });
+
+  it('The integration with protocol works', async () => {
+    await validateCommunityStakeConfig(models, 'common-protocol', 2);
   });
 });
