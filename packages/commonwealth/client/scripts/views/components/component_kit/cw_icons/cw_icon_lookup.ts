@@ -124,6 +124,7 @@ export const iconLookup = {
   element: Icons.CWElement,
   envelope: Icons.CWEnvelope,
   ethereum: Icons.CWEthereum,
+  etherscan: Icons.CWEtherscan,
   expand: Icons.CWExpand,
   exploreCommunity: Icons.CWExploreCommunities,
   externalLink: Icons.CWExternalLink,

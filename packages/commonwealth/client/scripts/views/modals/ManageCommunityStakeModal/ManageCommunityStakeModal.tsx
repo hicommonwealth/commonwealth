@@ -1,16 +1,12 @@
 import React, { useState } from 'react';
 
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import {
-  CWModalBody,
-  CWModalFooter,
-  CWModalHeader,
-} from 'views/components/component_kit/new_designs/CWModal';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { CWModalHeader } from 'views/components/component_kit/new_designs/CWModal';
 
 import StakeExchangeForm from './StakeExchangeForm';
 import TransactionFailed from './TransactionFailed';
 import TransactionLoading from './TransactionLoading';
+import TransactionSucceeded from './TransactionSucceeded';
 
 import './ManageCommunityStakeModal.scss';
 
@@ -32,25 +28,6 @@ interface ManageCommunityStakeModalProps {
   onModalClose: () => void;
   mode: ManageCommunityStakeModalMode;
 }
-
-interface TransactionSucceededProps {
-  onModalClose: () => void;
-}
-const TransactionSucceeded = ({ onModalClose }: TransactionSucceededProps) => {
-  return (
-    <>
-      <CWModalBody>🚀 TransactionSucceeded</CWModalBody>
-      <CWModalFooter>
-        <CWButton
-          label="Close"
-          buttonType="primary"
-          buttonWidth="full"
-          onClick={onModalClose}
-        />
-      </CWModalFooter>
-    </>
-  );
-};
 
 export enum ManageCommunityStakeModalState {
   Exchange = 'Exchange',
@@ -81,7 +58,7 @@ const ManageCommunityStakeModal = ({
           />
         );
       case ManageCommunityStakeModalState.Success:
-        return <TransactionSucceeded onModalClose={onModalClose} />;
+        return <TransactionSucceeded onModalClose={onModalClose} mode={mode} />;
     }
   };
 
