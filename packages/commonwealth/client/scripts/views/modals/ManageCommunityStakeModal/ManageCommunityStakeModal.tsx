@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import {
   CWModalBody,
   CWModalFooter,
@@ -8,6 +9,7 @@ import {
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
 import StakeExchangeForm from './StakeExchangeForm';
+import TransactionFailed from './TransactionFailed';
 import TransactionLoading from './TransactionLoading';
 
 import './ManageCommunityStakeModal.scss';
@@ -30,29 +32,6 @@ interface ManageCommunityStakeModalProps {
   onModalClose: () => void;
   mode: ManageCommunityStakeModalMode;
 }
-
-interface TransactionFailedProps {
-  onModalClose: () => void;
-  setModalState: (modalState: ManageCommunityStakeModalState) => void;
-}
-const TransactionFailed = ({
-  onModalClose,
-  setModalState,
-}: TransactionFailedProps) => {
-  return (
-    <>
-      <CWModalBody>⚠️ TransactionFailed</CWModalBody>
-      <CWModalFooter>
-        <CWButton label="Close" buttonType="secondary" onClick={onModalClose} />
-        <CWButton
-          label="Try again"
-          buttonType="primary"
-          onClick={() => setModalState(ManageCommunityStakeModalState.Exchange)}
-        />
-      </CWModalFooter>
-    </>
-  );
-};
 
 interface TransactionSucceededProps {
   onModalClose: () => void;
@@ -108,7 +87,12 @@ const ManageCommunityStakeModal = ({
 
   const getModalHeader = () => {
     if (modalState === ManageCommunityStakeModalState.Failure) {
-      return 'Transaction failed';
+      return (
+        <>
+          <CWIcon iconName="warning" weight="fill" className="warning-icon" />{' '}
+          Transaction failed!
+        </>
+      );
     }
 
     if (mode === 'buy') {

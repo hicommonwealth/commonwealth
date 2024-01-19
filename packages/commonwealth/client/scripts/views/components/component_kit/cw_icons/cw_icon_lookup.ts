@@ -48,6 +48,7 @@ import {
   TwitterLogo,
   Users,
   UsersThree,
+  Warning,
 } from '@phosphor-icons/react';
 import * as CustomIcons from './cw_custom_icons';
 import * as Icons from './cw_icons';
@@ -201,6 +202,7 @@ export const iconLookup = {
   vote: Icons.CWVote,
   views: Icons.CWViews,
   wallet: Icons.CWWallet,
+  warning: (props) => withPhosphorIcon(Warning)(props),
   website: Icons.CWWebsite,
   write: Icons.CWWrite,
   members: Icons.CWMembers,
