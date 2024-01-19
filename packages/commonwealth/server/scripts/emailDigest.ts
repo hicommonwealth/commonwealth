@@ -1,9 +1,9 @@
 import { DynamicTemplate } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import moment from 'moment';
 import { Op } from 'sequelize';
 import { formatAddressShort } from '../../shared/utils';
 import { SENDGRID_API_KEY } from '../config';
-import models from '../database';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');

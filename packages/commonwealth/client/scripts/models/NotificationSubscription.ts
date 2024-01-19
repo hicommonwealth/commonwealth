@@ -78,20 +78,6 @@ class NotificationSubscription {
     this.Thread = thread;
     this.snapshotId = snapshotId;
   }
-
-  public static fromJSON(json) {
-    return new NotificationSubscription(
-      json.id,
-      json.category_id,
-      json.is_active,
-      json.created_at,
-      json.immediate_email,
-      json.Chain,
-      json.Comment,
-      json.Thread,
-      json.snapshot_id,
-    );
-  }
 }
 
 export const modelFromServer = (subscription) => {
@@ -101,7 +87,7 @@ export const modelFromServer = (subscription) => {
     is_active,
     created_at,
     immediate_email,
-    Chain,
+    Community,
     Comment,
     Thread,
     snapshot_id,
@@ -136,7 +122,7 @@ export const modelFromServer = (subscription) => {
     is_active,
     created_at,
     immediate_email,
-    Chain,
+    Community,
     modeledComment,
     modeledThread,
     snapshot_id,

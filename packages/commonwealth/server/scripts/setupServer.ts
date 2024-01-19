@@ -1,11 +1,11 @@
 import type { RabbitMQController } from '@hicommonwealth/adapters';
 import { RedisCache, cacheDecorator } from '@hicommonwealth/adapters';
 import { logger } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import type { Express } from 'express-serve-static-core';
 import http from 'http';
 import type Rollbar from 'rollbar';
 import { PORT } from '../config';
-import type { DB } from '../models';
 
 const log = logger().getLogger(__filename);
 

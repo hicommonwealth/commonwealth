@@ -1,7 +1,7 @@
 import { AppError } from '@hicommonwealth/adapters';
+import type { DB } from '@hicommonwealth/model';
+import { Link, LinkSource, ThreadInstance } from '@hicommonwealth/model';
 import type { NextFunction } from 'express';
-import type { DB } from '../../models';
-import { Link, LinkSource, ThreadInstance } from '../../models/thread';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 import { Errors, isAuthorOrAdmin } from '../../util/linkingValidationHelper';
 

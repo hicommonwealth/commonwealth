@@ -1,5 +1,5 @@
+import { models } from '@hicommonwealth/model';
 import chai from 'chai';
-import models from 'server/database';
 import { Op } from 'sequelize';
 import { post } from './appHook.spec';
 import { testChains, testTopics } from './dbEntityHooks.spec';
@@ -12,7 +12,7 @@ describe('postTopics Tests', () => {
       await models.Topic.count({
         where: { id: { [Op.in]: [smallestId - 1, smallestId - 2] } },
       }),
-      0
+      0,
     );
 
     const resp = await post('/api/topics', {
@@ -35,7 +35,7 @@ describe('postTopics Tests', () => {
       await models.Topic.count({
         where: { id: { [Op.in]: [smallestId - 1, smallestId - 2] } },
       }),
-      2
+      2,
     );
   });
 
@@ -45,7 +45,7 @@ describe('postTopics Tests', () => {
       {
         topics: [{ bad: 3 }],
       },
-      true
+      true,
     );
 
     chai.assert.equal(resp.status, 'Failure');

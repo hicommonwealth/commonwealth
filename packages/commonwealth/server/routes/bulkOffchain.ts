@@ -5,14 +5,16 @@ import { ServerError } from '@hicommonwealth/adapters';
 // because it's easy to miss catching errors inside the promise executor, but we use it in this file
 // because the bulk offchain queries are heavily optimized so communities can load quickly.
 //
+import type {
+  CommunityBannerInstance,
+  CommunityContractTemplateInstance,
+  ContractInstance,
+  DB,
+  ThreadInstance,
+} from '@hicommonwealth/model';
 import type { Response } from 'express';
 import { Op, QueryTypes } from 'sequelize';
-import type { CommunityContractTemplateInstance } from 'server/models/community_contract_template';
 import { TypedRequest } from 'server/types';
-import type { DB } from '../models';
-import type { CommunityBannerInstance } from '../models/community_banner';
-import type { ContractInstance } from '../models/contract';
-import type { ThreadInstance } from '../models/thread';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
 

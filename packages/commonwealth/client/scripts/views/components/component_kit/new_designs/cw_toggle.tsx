@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import 'components/component_kit/new_designs/cw_toggle.scss';
 
-import type { BaseStyleProps } from '../types';
-import { getClasses } from '../helpers';
-import { ComponentType } from '../types';
+import { useFormContext } from 'react-hook-form';
 import { setDarkMode } from '../../../../helpers/darkMode';
+import { getClasses } from '../helpers';
+import type { BaseStyleProps } from '../types';
+import { ComponentType } from '../types';
 
 export const toggleDarkMode = (on: boolean, stateFn?: Function) => {
   setDarkMode(on);
@@ -13,17 +14,31 @@ export const toggleDarkMode = (on: boolean, stateFn?: Function) => {
   stateFn(on);
 };
 
+type FormFieldValidationProps = {
+  hookToForm?: boolean;
+  name?: string;
+};
+
 export type ToggleStyleProps = {
   checked?: boolean;
   size: 'small' | 'large';
-} & BaseStyleProps;
+} & BaseStyleProps &
+  FormFieldValidationProps;
 
 export type ToggleProps = {
   onChange?: (e?: any) => void;
 } & ToggleStyleProps;
 
 export const CWToggle = (props: ToggleProps) => {
-  const { className, disabled = false, onChange, checked, size } = props;
+  const {
+    className,
+    disabled = false,
+    onChange,
+    checked,
+    size,
+    name,
+    hookToForm,
+  } = props;
 
   const params = {
     disabled,
@@ -32,19 +47,38 @@ export const CWToggle = (props: ToggleProps) => {
     type: 'checkbox',
   };
 
+  const formContext = useFormContext();
+  const formFieldContext =
+    hookToForm && name ? formContext.register(name) : ({} as any);
+  const [formCheckedStatus, setFormCheckedStatus] = useState(
+    formContext?.getValues?.(name),
+  );
+
   return (
     <label
       className={getClasses<ToggleStyleProps>(
         {
           size,
-          checked,
+          checked: hookToForm && name ? formCheckedStatus : checked,
           disabled,
           className,
         },
-        ComponentType.Toggle
+        ComponentType.Toggle,
       )}
     >
-      <input className="toggle-input" {...params} />
+      <input
+        type="checkbox"
+        {...params}
+        {...(formFieldContext && {
+          ...formFieldContext,
+          onChange: async (e) => {
+            setFormCheckedStatus(e.target.checked);
+            formFieldContext.onChange(e);
+            await params?.onChange?.(e);
+          },
+        })}
+        className="toggle-input"
+      />
       <div className="slider" />
     </label>
   );

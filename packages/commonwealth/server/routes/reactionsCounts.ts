@@ -1,8 +1,7 @@
 import { ServerError } from '@hicommonwealth/adapters';
+import type { DB, ReactionInstance } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import { Sequelize } from 'sequelize';
-import type { DB } from '../models';
-import type { ReactionInstance } from '../models/reaction';
 
 /*
 2 queries:

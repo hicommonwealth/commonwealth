@@ -1,8 +1,8 @@
 /* eslint-disable max-len */
+import { models } from '@hicommonwealth/model';
 import chai, { expect } from 'chai';
 import chaiHttp from 'chai-http';
 import { Op, QueryTypes } from 'sequelize';
-import models from '../../../server/database';
 import {
   testAddresses,
   testComments,

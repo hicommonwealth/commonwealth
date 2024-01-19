@@ -153,7 +153,7 @@ const ManageCommunityPage = () => {
 
   return (
     <div className="ManageCommunityPage">
-      <CWText type="h2" fontWeight="medium">
+      <CWText type="h2" fontWeight="medium" className="header">
         Manage Community
       </CWText>
       <CommunityMetadataRows

@@ -6,8 +6,7 @@ import {
   NotificationCategories,
   logger,
 } from '@hicommonwealth/core';
-import models from '../../server/database';
-import { ChainNodeAttributes } from '../../server/models/chain_node';
+import { ChainNodeAttributes, models } from '@hicommonwealth/model';
 
 const log = logger().getLogger(__filename);
 
