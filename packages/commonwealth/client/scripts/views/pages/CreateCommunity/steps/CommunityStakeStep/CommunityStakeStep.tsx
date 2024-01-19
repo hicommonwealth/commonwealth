@@ -3,8 +3,6 @@ import React, { useState } from 'react';
 import EnableStake from './EnableStake';
 import SignStakeTransactions from './SignStakeTransactions';
 
-import './CommunityStakeStep.scss';
-
 interface CommunityStakeStepProps {
   onOptOutEnablingStake: () => void;
   createdCommunityName: string;

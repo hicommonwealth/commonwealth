@@ -5,18 +5,9 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import CWCircleSpinner from 'views/components/component_kit/new_designs/CWCircleSpinner';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
-import './ActionStep.scss';
+import { ActionStepProps } from './types';
 
-export interface ActionStepProps {
-  state: 'not-started' | 'completed' | 'loading';
-  label: string;
-  index: number;
-  actionButton?: {
-    label: string;
-    disabled: boolean;
-    onClick: () => void;
-  };
-}
+import './ActionStep.scss';
 
 const ActionStep = ({ state, index, label, actionButton }: ActionStepProps) => {
   const isCompleted = state === 'completed';

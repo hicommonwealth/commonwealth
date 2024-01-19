@@ -1,33 +1,16 @@
 import React from 'react';
-import { z } from 'zod';
 
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+
 import CreateCommunityHint from '../../../components/CreateCommunityHint';
+import { EnableStakeProps, StakeData } from './types';
+import { validationSchema } from './validations';
 
 import './EnableStake.scss';
-
-const validationSchema = z.object({
-  namespace: z.string().min(1, 'Namespace is required'),
-  symbol: z
-    .string()
-    .min(1, 'Symbol is required')
-    .max(9, 'Symbol should be maximum 9 characters'),
-});
-
-type StakeData = {
-  symbol: string;
-  namespace: string;
-};
-
-interface EnableStakeProps {
-  onOptOutEnablingStake: () => void;
-  onOptInEnablingStake: ({ namespace, symbol }: StakeData) => void;
-  communityStakeData: StakeData;
-}
 
 const EnableStake = ({
   onOptOutEnablingStake,
