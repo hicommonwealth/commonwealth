@@ -183,7 +183,8 @@ export async function __updateCommunity(
   if (hide_projects) community.hide_projects = hide_projects;
   if (typeof stages_enabled === 'boolean')
     community.stages_enabled = stages_enabled;
-  if (custom_stages) community.custom_stages = custom_stages;
+  if (typeof custom_stages === 'string')
+    community.custom_stages = custom_stages;
   if (typeof terms === 'string') community.terms = terms;
   if (has_homepage) community.has_homepage = has_homepage;
   if (default_page) {
