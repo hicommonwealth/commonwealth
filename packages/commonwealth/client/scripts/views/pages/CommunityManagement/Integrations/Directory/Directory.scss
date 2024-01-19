@@ -19,13 +19,13 @@
 
   .b1 {
     color: $neutral-500 !important;
+    padding-bottom: 12px;
   }
 
   .chains {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    padding-top: 12px;
 
     .cta-button-container {
       width: fit-content;
