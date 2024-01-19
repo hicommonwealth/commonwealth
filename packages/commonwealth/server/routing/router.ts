@@ -375,14 +375,14 @@ function setupRouter(
   registerRoute(
     router,
     'get',
-    '/communityStakes/:communityId/:stakeId',
+    '/communityStakes/:community_id/:stake_id',
     getCommunityStakeHandler.bind(this, models, serverControllers),
   );
 
   registerRoute(
     router,
     'put',
-    '/communityStakes/:communityId/:stakeId',
+    '/communityStakes/:community_id/:stake_id',
     passport.authenticate('jwt', { session: false }),
     putCommunityStakeHandler.bind(this, models, serverControllers),
   );

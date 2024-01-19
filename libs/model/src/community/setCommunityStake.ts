@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const SetCommunityStakeParamsSchema = z.object({
   community_id: z.string(),
-  stake_id: z.number().int(),
+  stake_id: z.coerce.number().int(),
 });
 
 export type SetCommunityStakeParams = z.infer<
@@ -11,8 +11,8 @@ export type SetCommunityStakeParams = z.infer<
 
 export const SetCommunityStakeBodySchema = z.object({
   stake_token: z.string().optional(),
-  stake_scaler: z.number().optional(),
-  stake_enabled: z.boolean().optional(),
+  stake_scaler: z.coerce.number().optional(),
+  stake_enabled: z.coerce.boolean().optional(),
 });
 
 export type SetCommunityStakeBody = z.infer<typeof SetCommunityStakeBodySchema>;

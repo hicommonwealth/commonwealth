@@ -23,10 +23,15 @@ export const putCommunityStakeHandler = async (
     throw new AppError(formatErrorPretty(paramsValidationResult));
   }
 
-  await validateCommunityStakeConfig(models, ...paramsValidationResult.data);
+  await validateCommunityStakeConfig(
+    models,
+    paramsValidationResult.data.community_id,
+    paramsValidationResult.data.stake_id,
+  );
 
-  const bodyValidationResult =
-    Community.SetCommunityStakeParamsSchema.safeParse(req.body);
+  const bodyValidationResult = Community.SetCommunityStakeBodySchema.safeParse(
+    req.body,
+  );
 
   if (bodyValidationResult.success === false) {
     throw new AppError(formatErrorPretty(bodyValidationResult));
