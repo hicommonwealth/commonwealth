@@ -4,10 +4,6 @@ import { slugifyPreserveDashes } from 'utils';
 import { ChainBase } from '@hicommonwealth/core';
 import { notifyError } from 'controllers/app/notifications';
 import useCreateCommunityMutation from 'state/api/communities/createCommunity';
-import {
-  CWCoverImageUploader,
-  ImageBehavior,
-} from 'views/components/component_kit/cw_cover_image_uploader';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
@@ -232,7 +228,7 @@ const BasicInformationForm = ({
         placeholder="Enter a description of your community or project"
       />
 
-      <CWCoverImageUploader
+      {/* <CWCoverImageUploader
         subheaderText="Community Profile Image (Accepts JPG and PNG files)"
         uploadCompleteCallback={console.log}
         canSelectImageBehaviour={false}
@@ -242,7 +238,7 @@ const BasicInformationForm = ({
         hookToForm
         defaultImageBehaviour={ImageBehavior.Circle}
         enableGenerativeAI
-      />
+      /> */}
 
       {socialLinksDisplay ? (
         <>

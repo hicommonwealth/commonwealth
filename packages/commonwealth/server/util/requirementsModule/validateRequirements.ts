@@ -19,16 +19,6 @@ const InterfaceIds = {
   ERC20: '0x36372b07',
 };
 
-function isValidEVMContractAddress(address: string): boolean {
-  const addressRegex = /^(0x)?[0-9a-fA-F]{40}$/;
-  return addressRegex.test(address);
-}
-
-function isValidCosmosContractAddress(address: string): boolean {
-  const addressRegex = /^cosmos1[a-z0-9]{38}$/;
-  return addressRegex.test(address);
-}
-
 async function isEVMAddressContract(
   address: string,
   network_url: string,
@@ -127,14 +117,6 @@ export default function validateRequirements(
         source_type === 'erc20'
       ) {
         const contract_address = requirement.data.source.contract_address;
-        const isValidAddress = await isValidEVMContractAddress(
-          contract_address,
-        );
-
-        if (!isValidAddress) {
-          return new Error(`${Errors.InvalidAddress}: ${contract_address}`);
-        }
-
         const evmId = requirement.data.source.evm_chain_id;
         const node = await db.ChainNode.findOne({
           where: {
@@ -168,12 +150,6 @@ export default function validateRequirements(
 
       if (source_type === 'cw721') {
         const contract_address = requirement.data.source.contract_address;
-        const isValidAddress = isValidCosmosContractAddress(contract_address);
-
-        if (!isValidAddress) {
-          return new Error(`${Errors.InvalidAddress}: ${contract_address}`);
-        }
-
         const cosmosId = requirement.data.source.cosmos_chain_id;
         const node = await db.ChainNode.findOne({
           where: {

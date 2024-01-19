@@ -43,7 +43,8 @@
           "enum": ["cosmos_native"]
         },
         "cosmos_chain_id": {
-          "type": "string"
+          "type": "string",
+          "pattern": "cosmos1[a-z0-9]{38}$"
         },
         "token_symbol": {
           "type": "string"

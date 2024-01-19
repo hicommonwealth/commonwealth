@@ -1,4 +1,6 @@
 /* eslint-disable react/no-multi-comp */
+import axios from 'axios';
+import { ethers } from 'ethers';
 import { isValidEthAddress } from 'helpers/validateTypes';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -50,6 +52,26 @@ type CWRequirementsRadioButtonProps = {
   onSelect: () => any;
   onInputValueChange: (value: string) => any;
 };
+
+const InterfaceIds = {
+  ERC1155: '0xd9b67a26',
+  ERC721: '0x80ac58cd',
+  ERC20: '0x36372b07',
+};
+
+async function isEVMAddressContract(
+  address: string,
+  network_url: string,
+): Promise<boolean> {
+  const provider = new ethers.providers.JsonRpcProvider(network_url);
+  try {
+    const code = await provider.getCode(address);
+    return code !== '0x';
+  } catch (error) {
+    console.error('Error checking address:', error);
+    return false;
+  }
+}
 
 const CWRequirementsRadioButton = ({
   inputError,
@@ -325,8 +347,10 @@ const GroupForm = ({
   const validateSubForms = () => {
     const updatedSubForms = [...requirementSubForms];
 
-    requirementSubForms.map((subForm, index) => {
+    requirementSubForms.map(async (subForm, index) => {
       try {
+        const key = Object.keys(subForm)[0];
+
         // HACK ALERT: this type of validation change should be done internally by zod, by we are doing this
         // manually using javascript
         const schema = getRequirementSubFormSchema(
@@ -336,6 +360,35 @@ const GroupForm = ({
           schema.pick({ requirementType: true }).parse(subForm.values);
         } else {
           schema.parse(subForm.values);
+        }
+
+        const contract_address = subForm.values.requirementContractAddress;
+        const evmId = parseInt(subForm.values.requirementChain); // requirement.data.source.evm_chain_id;
+        const node = await axios.get(
+          `${app.serverUrl()}/nodes?eth_chain_id=${evmId}`,
+        );
+        console.log(node?.data);
+        console.log(evmId);
+        const node_url = node?.data?.result?.filter(
+          (x) => x.eth_chain_id == evmId,
+        )[0].url;
+        console.log(node_url);
+
+        const isAddressContract = await isEVMAddressContract(
+          contract_address,
+          node_url,
+        );
+
+        console.log(isAddressContract);
+
+        if (!isAddressContract) {
+          updatedSubForms[index] = {
+            ...updatedSubForms[index],
+            errors: {
+              ...updatedSubForms[index].errors,
+              [key]: VALIDATION_MESSAGES.CONTRACT_NOT_FOUND,
+            },
+          };
         }
 
         updatedSubForms[index] = {

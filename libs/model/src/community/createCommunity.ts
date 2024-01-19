@@ -4,7 +4,6 @@ import {
   CommunityCategoryType,
 } from '@hicommonwealth/core';
 import { z } from 'zod';
-import { checkIconSize } from '../utils/checkIconSize';
 import { ALL_COMMUNITIES } from '../utils/constants';
 
 export const CreateCommunitySchema = z.object({
@@ -17,11 +16,7 @@ export const CreateCommunitySchema = z.object({
     }),
   chain_node_id: z.number().optional(), // corresponds to the chain field
   description: z.string().optional(),
-  icon_url: z
-    .string()
-    .url()
-    .superRefine(async (val, ctx) => await checkIconSize(val, ctx))
-    .optional(),
+  icon_url: z.string().url().optional(),
   social_links: z.array(z.string().url()).default([]),
   tags: z.array(z.nativeEnum(CommunityCategoryType)).default([]),
   directory_page_enabled: z.boolean().default(false),
