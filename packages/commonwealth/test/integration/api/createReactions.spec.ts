@@ -3,9 +3,14 @@ import { models } from '@hicommonwealth/model';
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
+import Sinon from 'sinon';
 import app, { resetDatabase } from '../../../server-test';
-import { JWT_SECRET } from '../../../server/config';
+import * as Config from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
+
+const { JWT_SECRET } = Config;
+
+Sinon.stub(Config, 'REACTION_WEIGHT_OVERRIDE').value('300');
 
 chai.use(chaiHttp);
 
