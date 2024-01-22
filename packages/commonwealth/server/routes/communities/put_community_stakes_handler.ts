@@ -1,14 +1,19 @@
 import { AppError } from '@hicommonwealth/adapters';
-import { Community, DB } from '@hicommonwealth/model';
-import { CommunityStakeAttributes } from '@hicommonwealth/model/build/models/community_stake';
+import { CommunityStakeAttributes, DB } from '@hicommonwealth/model';
+import {
+  SetCommunityStakeBody,
+  SetCommunityStakeBodySchema,
+  SetCommunityStakeParams,
+  SetCommunityStakeParamsSchema,
+} from 'server/controllers/server_communities_methods/put_community_stake';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 import { validateCommunityStakeConfig } from '../../util/commonProtocol/communityStakeConfigValidator';
 import { formatErrorPretty } from '../../util/errorFormat';
 import { validateOwner } from '../../util/validateOwner';
 
-type PutCommunityStakesParams = Community.SetCommunityStakeParams;
-type PutCommunityStakesBody = Community.SetCommunityStakeBody;
+type PutCommunityStakesParams = SetCommunityStakeParams;
+type PutCommunityStakesBody = SetCommunityStakeBody;
 type PutCommunityStakesResponse = CommunityStakeAttributes;
 
 export const putCommunityStakeHandler = async (
@@ -17,8 +22,9 @@ export const putCommunityStakeHandler = async (
   req: TypedRequest<PutCommunityStakesBody, any, PutCommunityStakesParams>,
   res: TypedResponse<PutCommunityStakesResponse>,
 ) => {
-  const paramsValidationResult =
-    Community.SetCommunityStakeParamsSchema.safeParse(req.params);
+  const paramsValidationResult = SetCommunityStakeParamsSchema.safeParse(
+    req.params,
+  );
 
   if (paramsValidationResult.success === false) {
     throw new AppError(formatErrorPretty(paramsValidationResult));
@@ -44,9 +50,7 @@ export const putCommunityStakeHandler = async (
 
   await validateCommunityStakeConfig(models, community_id, stake_id);
 
-  const bodyValidationResult = Community.SetCommunityStakeBodySchema.safeParse(
-    req.body,
-  );
+  const bodyValidationResult = SetCommunityStakeBodySchema.safeParse(req.body);
 
   if (bodyValidationResult.success === false) {
     throw new AppError(formatErrorPretty(bodyValidationResult));

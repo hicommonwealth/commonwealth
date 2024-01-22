@@ -14,9 +14,7 @@ export const getCommunityStakeHandler = async (
   req: TypedRequestParams<GetCommunityStakesParams>,
   res: TypedResponse<GetCommunityStakesResponse>,
 ) => {
-  const validationResult = Community.GetCommunityStakeSchema.safeParse(
-    req.params,
-  );
+  const validationResult = Community.GetCommunityStake.safeParse(req.params);
 
   if (validationResult.success === false) {
     throw new AppError(formatErrorPretty(validationResult));
