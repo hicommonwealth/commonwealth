@@ -99,7 +99,7 @@ export default (
               where: { id: thread_id },
             });
             if (thread) {
-              thread.increment('comment_count', {
+              await thread.increment('comment_count', {
                 transaction: options.transaction,
               });
               stats().increment('cw.hook.comment-count', {
@@ -120,7 +120,7 @@ export default (
               where: { id: thread_id },
             });
             if (thread) {
-              thread.decrement('comment_count', {
+              await thread.decrement('comment_count', {
                 transaction: options.transaction,
               });
               stats().decrement('cw.hook.comment-count', {
