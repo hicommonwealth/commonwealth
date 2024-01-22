@@ -34,6 +34,7 @@ export async function __deleteReaction(
     where: {
       id: reactionId,
       address_id: { [Op.in]: userOwnedAddressIds },
+      community_id: community.id,
     },
     include: [this.models.Address],
   });
