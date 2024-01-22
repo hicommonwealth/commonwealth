@@ -17,11 +17,11 @@ import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelec
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
+import { fakeRandomAPICall } from '../ManageCommunityStakeModal';
 import {
   ManageCommunityStakeModalMode,
   ManageCommunityStakeModalState,
-  fakeRandomAPICall,
-} from '../ManageCommunityStakeModal';
+} from '../types';
 import {
   CustomAddressOption,
   CustomAddressOptionElement,

@@ -9,9 +9,8 @@ import app from 'state';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { SubscriptionButton } from 'views/components/subscription_button';
-import ManageCommunityStakeModal, {
-  ManageCommunityStakeModalMode,
-} from 'views/modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
+import ManageCommunityStakeModal from 'views/modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
+import { ManageCommunityStakeModalMode } from 'views/modals/ManageCommunityStakeModal/types';
 import Permissions from '../../../../utils/Permissions';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
 import { CWText } from '../../component_kit/cw_text';

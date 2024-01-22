@@ -7,9 +7,14 @@ import StakeExchangeForm from './StakeExchangeForm';
 import TransactionFailed from './TransactionFailed';
 import TransactionLoading from './TransactionLoading';
 import TransactionSucceeded from './TransactionSucceeded';
+import {
+  ManageCommunityStakeModalProps,
+  ManageCommunityStakeModalState,
+} from './types';
 
 import './ManageCommunityStakeModal.scss';
 
+// TODO only for testing purpose, remove when backend will be hooked up
 export const fakeRandomAPICall = () => {
   return new Promise<void>((resolve, reject) => {
     setTimeout(() => {
@@ -21,20 +26,6 @@ export const fakeRandomAPICall = () => {
     }, 1000);
   });
 };
-
-export type ManageCommunityStakeModalMode = 'buy' | 'sell';
-
-interface ManageCommunityStakeModalProps {
-  onModalClose: () => void;
-  mode: ManageCommunityStakeModalMode;
-}
-
-export enum ManageCommunityStakeModalState {
-  Exchange = 'Exchange',
-  Loading = 'Loading',
-  Failure = 'Failure',
-  Success = 'Success',
-}
 
 const ManageCommunityStakeModal = ({
   onModalClose,

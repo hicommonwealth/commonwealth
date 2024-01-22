@@ -7,7 +7,7 @@ import {
 } from 'views/components/component_kit/new_designs/CWModal';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
-import { ManageCommunityStakeModalState } from '../ManageCommunityStakeModal';
+import { ManageCommunityStakeModalState } from '../types';
 
 import './TransactionFailed.scss';
 
