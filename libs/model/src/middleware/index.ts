@@ -1,2 +1,1 @@
-export * from './isCommunityAuthor';
-export * from './loadCommunity';
+export * from './authorization';

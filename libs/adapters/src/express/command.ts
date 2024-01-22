@@ -10,12 +10,7 @@ import { z, ZodSchema } from 'zod';
  * Adapts commands to express handlers
  * - By convention, the aggregate id is a request parameter `:id`
  * - By convention, we can expect the following optional arguments in the body of the request: TODO: check this
- *  - address?: string;
- *  - author_chain?: string;
- *  - author_community_id?: string;
- *  - chain?: string;
- *  - chain_id?: string;
- *  - community_id?: string;
+ *  - address_id?: string;
  * @param md command metadata
  * @returns express command handler
  */
@@ -27,8 +22,6 @@ export const expressCommand =
       R,
       z.infer<M> & {
         address_id?: string;
-        chain_id?: string;
-        community_id?: string;
       }
     >,
     res: Response<R>,
@@ -37,6 +30,6 @@ export const expressCommand =
       await command(md, req.params.id, req.body, {
         user: req.user as UserAttributes,
         address_id: req.body.address_id,
-        community_id: req.body.chain_id ?? req.body.community_id,
+        aggregate_id: req.params.id,
       }),
     );

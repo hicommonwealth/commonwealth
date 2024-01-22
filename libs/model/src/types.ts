@@ -1,32 +1,21 @@
 import { z, ZodSchema } from 'zod';
-import {
-  AddressAttributes,
-  CommunityAttributes,
-  UserAttributes,
-} from './models';
+import { UserAttributes } from './models';
 
 /**
- * "Core" abstraction representing the "user acting on a system", either invoking a command or query operation
+ * "Core" abstraction representing the "user acting on the system", either invoking a command on an aggregate, or querying a projection
  * - Common actors are identified by their unique `user.id` (jwt signin flow)
  *   - `user`: user profile attributes
  * - Actors can "optionally" carry the following unique ids:
  *   - `address_id`: the current web wallet address (TODO: is this optional?)
- *   - `community_id`: when acting on a community
- * - Actors can also pre-load and validate entities via chained {@link ActorMiddleware} reusable utilities
- *   - `address`: current address attributes
- *   - `community`: current community attributes
- *   - `author`: user is the community author
+ *   - `aggregate_id`: the aggregate id when invoking a command
+ * - Actors can also pre-load and validate state via chained {@link ActorMiddleware} reusable utilities
+ *   - `author`: user is the author of the aggregate
  */
 export type Actor = {
   // must be signed in
   user: UserAttributes;
-  // other ids
   address_id?: string;
-  community_id?: string;
-  // entities
-  address?: AddressAttributes;
-  community?: CommunityAttributes;
-  // flags
+  aggregate_id?: string;
   author?: boolean;
 };
 
