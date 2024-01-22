@@ -1,6 +1,6 @@
 import { AppError } from '@hicommonwealth/adapters';
 import type { BanAttributes, DB } from '@hicommonwealth/model';
-import type { TypedResponse } from '../types';
+import type { TypedRequest, TypedResponse } from '../types';
 import { success } from '../types';
 import { validateOwner } from '../util/validateOwner';
 
