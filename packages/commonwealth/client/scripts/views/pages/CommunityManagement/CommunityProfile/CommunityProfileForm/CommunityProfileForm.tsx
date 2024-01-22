@@ -59,21 +59,12 @@ const CommunityProfileForm = () => {
     useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [initialLinks, setInitialLinks] = useState(
-    (community.socialLinks || []).length > 0
-      ? community.socialLinks.map((link) => ({
-          value: link,
-          canUpdate: true,
-          canDelete: true,
-          error: '',
-        }))
-      : [
-          {
-            value: '',
-            canUpdate: true,
-            canDelete: false,
-            error: '',
-          },
-        ],
+    (community.socialLinks || []).map((link) => ({
+      value: link,
+      canUpdate: true,
+      canDelete: true,
+      error: '',
+    })),
   );
 
   const {
@@ -398,6 +389,10 @@ const CommunityProfileForm = () => {
               }
               onClick={() => {
                 reset();
+                setNameFieldDisabledState({
+                  isDisabled: true,
+                  canDisable: true,
+                });
                 setLinks(initialLinks);
                 setSelectedCommunityTags(currentCommunityTags);
               }}

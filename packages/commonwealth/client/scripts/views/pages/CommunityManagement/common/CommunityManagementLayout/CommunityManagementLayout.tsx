@@ -1,3 +1,4 @@
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import React, { ReactNode } from 'react';
 import app from 'state';
 import Permissions from 'utils/Permissions';
@@ -22,8 +23,10 @@ const CommunityManagementLayout = ({
   children,
   featureHint,
 }: CommunityManagementLayout) => {
+  useUserActiveAccount();
+
   if (
-    !app?.user?.activeAccount?.address ||
+    !app.isLoggedIn() ||
     !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin())
   ) {
     return <PageNotFound />;
