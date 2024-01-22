@@ -105,9 +105,15 @@ export const ViewUpvotesDrawer = ({
               columnInfo={getColumnInfo()}
               rowData={getRowData(reactorData)}
             />
-            <div>
-              <CWText></CWText>
-              <CWText></CWText>
+            <div className="totals">
+              <div className="upvotes">
+                <CWText></CWText>
+                <CWText></CWText>
+              </div>
+              <div className="weight">
+                <CWText></CWText>
+                <CWText></CWText>
+              </div>
             </div>
           </>
         )}
