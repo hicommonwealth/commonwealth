@@ -1,4 +1,3 @@
-import { getRelativeTimestamp } from 'client/scripts/helpers/dates';
 import Comment from 'client/scripts/models/Comment';
 import type Thread from 'client/scripts/models/Thread';
 import { useFetchProfilesByAddressesQuery } from 'client/scripts/state/api/profiles';
@@ -59,6 +58,7 @@ export const ViewUpvotesDrawer = ({
         header: 'Timestamp',
         numeric: true,
         sortable: true,
+        chronological: true,
       },
     ];
   };
@@ -68,8 +68,7 @@ export const ViewUpvotesDrawer = ({
       name: voter.name,
       // TODO: USE ACTUAL VOTE WEIGHT
       voteWeight: 5,
-      // TODO: SORT BY ACTUAL TIMESTAMP & DISPLAY RELATIVE
-      timestamp: getRelativeTimestamp(voter.updated_at),
+      timestamp: voter.updated_at,
       avatars: {
         name: {
           avatarUrl: voter.avatarUrl,
