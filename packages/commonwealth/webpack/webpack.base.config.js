@@ -75,6 +75,11 @@ module.exports = {
         process.env.FLAG_NEW_ADMIN_ONBOARDING,
       ),
     }),
+    new webpack.DefinePlugin({
+      'process.env.FLAG_COMMUNITY_STAKE': JSON.stringify(
+        process.env.FLAG_COMMUNITY_STAKE,
+      ),
+    }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../client/index.html'),
       attributes: {

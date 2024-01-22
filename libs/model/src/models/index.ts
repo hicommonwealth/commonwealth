@@ -11,6 +11,7 @@ import type { CommunityContractModelStatic } from './community_contract';
 import type { CommunityContractTemplateMetadataStatic } from './community_contract_metadata';
 import type { CommunityContractTemplateStatic } from './community_contract_template';
 import type { CommunitySnapshotSpaceModelStatic } from './community_snapshot_spaces';
+import type { CommunityStakeModelStatic } from './community_stake';
 import type { ContractModelStatic } from './contract';
 import type { ContractAbiModelStatic } from './contract_abi';
 import type { DiscordBotConfigModelStatic } from './discord_bot_config';
@@ -48,6 +49,7 @@ export type Models = {
   CommunityContract: CommunityContractModelStatic;
   CommunityContractTemplate: CommunityContractTemplateStatic;
   CommunityContractTemplateMetadata: CommunityContractTemplateMetadataStatic;
+  CommunityStake: CommunityStakeModelStatic;
   Template: TemplateModelStatic;
   CommunitySnapshotSpaces: CommunitySnapshotSpaceModelStatic;
   Collaboration: CollaborationModelStatic;

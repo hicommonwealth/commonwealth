@@ -38,7 +38,7 @@ export const setCommunityCategories = async (
   });
 };
 
-export const setSelectedTags = (community: string) => {
+export const getCommunityTags = (community: string) => {
   const chainToCategoriesMap: {
     [community: string]: CommunityCategoryType[];
   } = app.config.chainCategoryMap;
