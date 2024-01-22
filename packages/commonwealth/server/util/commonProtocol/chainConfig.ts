@@ -1,6 +1,6 @@
 // Chains with deployed namespace factories. As new chains are enabled, add here.
 export enum validChains {
-  Goerli,
+  Goerli = 5,
 }
 
 // Requires a live contract for each enum chain. Add address of factory here on new deploy.

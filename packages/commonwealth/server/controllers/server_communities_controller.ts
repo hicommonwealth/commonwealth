@@ -1,5 +1,6 @@
 import { DB } from '@hicommonwealth/model';
 import BanCache from '../util/banCheckCache';
+import { TokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
 import {
   __createChainNode,
   CreateChainNodeOptions,
@@ -26,10 +27,20 @@ import {
   GetCommunitiesResult,
 } from './server_communities_methods/get_communities';
 import {
+  __getCommunityStake,
+  GetCommunityStakeOptions,
+  GetCommunityStakeResult,
+} from './server_communities_methods/get_community_stake';
+import {
   __getRelatedCommunities,
   GetRelatedCommunitiesQuery,
   GetRelatedCommunitiesResult,
 } from './server_communities_methods/get_related_communities';
+import {
+  __putCommunityStake,
+  PutCommunityStakeOptions,
+  PutCommunityStakeResult,
+} from './server_communities_methods/put_community_stake';
 import {
   __searchCommunities,
   SearchCommunitiesOptions,
@@ -45,7 +56,11 @@ import {
  * Implements methods related to communities
  */
 export class ServerCommunitiesController {
-  constructor(public models: DB, public banCache: BanCache) {}
+  constructor(
+    public models: DB,
+    public tokenBalanceCache: TokenBalanceCache,
+    public banCache: BanCache,
+  ) {}
 
   async searchCommunities(
     options: SearchCommunitiesOptions,
@@ -93,5 +108,17 @@ export class ServerCommunitiesController {
     options: GetRelatedCommunitiesQuery,
   ): Promise<GetRelatedCommunitiesResult> {
     return __getRelatedCommunities.call(this, options);
+  }
+
+  async putCommunityStake(
+    options: PutCommunityStakeOptions,
+  ): Promise<PutCommunityStakeResult> {
+    return __putCommunityStake.call(this, options);
+  }
+
+  async getCommunityStake(
+    options: GetCommunityStakeOptions,
+  ): Promise<GetCommunityStakeResult> {
+    return __getCommunityStake.call(this, options);
   }
 }

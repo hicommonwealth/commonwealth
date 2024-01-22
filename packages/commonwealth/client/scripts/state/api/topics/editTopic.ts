@@ -24,7 +24,7 @@ const editTopic = async ({ topic, featuredOrder }: EditTopicProps) => {
     jwt: app.user.jwt,
   });
 
-  return new Topic(response.data);
+  return new Topic(response.data.result);
 };
 
 const useEditTopicMutation = () => {

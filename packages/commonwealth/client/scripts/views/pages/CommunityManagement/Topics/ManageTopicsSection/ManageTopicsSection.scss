@@ -1,0 +1,52 @@
+@import '../../../../../../styles/shared';
+
+@mixin topicRowStyles {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  padding: 8px;
+  background-color: $white;
+}
+
+.ManageTopicsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  .content {
+    .featured-topic-list {
+      display: flex;
+      flex-direction: column;
+      height: 320px;
+
+      @include visibleScrollbar(light);
+
+      .topic-row {
+        @include topicRowStyles;
+
+        &:hover {
+          background-color: $neutral-50;
+        }
+
+        .CWIconButton {
+          margin-left: 4px;
+        }
+      }
+    }
+  }
+
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 24px;
+  }
+
+  @include extraSmall {
+    .actions {
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+  }
+}
