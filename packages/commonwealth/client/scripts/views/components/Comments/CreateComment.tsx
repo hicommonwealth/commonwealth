@@ -4,6 +4,7 @@ import { SessionKeyError } from 'controllers/server/sessions';
 import { useDraft } from 'hooks/useDraft';
 import type { DeltaStatic } from 'quill';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
@@ -19,7 +20,6 @@ type CreateCommentProps = {
   parentCommentId?: number;
   rootThread: Thread;
   canComment: boolean;
-  shouldFocusEditor?: boolean;
   tooltipText?: string;
 };
 
@@ -28,7 +28,6 @@ export const CreateComment = ({
   parentCommentId,
   rootThread,
   canComment,
-  shouldFocusEditor = false,
   tooltipText = '',
 }: CreateCommentProps) => {
   const { saveDraft, restoreDraft, clearDraft } = useDraft<DeltaStatic>(
@@ -36,6 +35,9 @@ export const CreateComment = ({
       ? `new-thread-comment-${rootThread.id}`
       : `new-comment-reply-${parentCommentId}`,
   );
+
+  const [searchParams] = useSearchParams();
+  const shouldFocusEditor = !!searchParams.get('focusEditor');
 
   // get restored draft on init
   const restoredDraft = useMemo(() => {
