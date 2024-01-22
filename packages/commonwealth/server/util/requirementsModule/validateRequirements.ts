@@ -1,4 +1,3 @@
-import { ERC165__factory } from '@hicommonwealth/chains';
 import { Requirement } from '@hicommonwealth/core';
 import Ajv from 'ajv';
 import { CosmosSDK } from 'cosmos-sdk';
@@ -13,10 +12,12 @@ const Errors = {
   InvalidContractType: 'Invalid contract type',
 };
 
-const InterfaceIds = {
-  ERC1155: '0xd9b67a26',
-  ERC721: '0x80ac58cd',
-  ERC20: '0x36372b07',
+const Abis = {
+  ERC20: ['function totalSupply() view returns (uint256)'],
+  ERC721: ['function balanceOf(address owner) view returns (uint256)'],
+  ERC1155: [
+    'function isApprovedForAll(address account, address operator) view returns (bool)',
+  ],
 };
 
 async function isEVMAddressContract(
@@ -48,36 +49,95 @@ async function getCosmosContractType(
   return null;
 }
 
-async function getEVMContractType(
-  contractAddress: string,
-  network_url: string,
-): Promise<string | null> {
+const checkContractType = async (
+  contractAddress,
+  network_url,
+): Promise<string | null> => {
   const provider = new ethers.providers.JsonRpcProvider(network_url);
-  const contract = ERC165__factory.connect(contractAddress, provider);
 
-  // Check if the contract implements ERC1155 interface
-  const supportsERC1155 = await contract.supportsInterface(
-    InterfaceIds.ERC1155,
+  const contractERC20 = new ethers.Contract(
+    contractAddress,
+    Abis.ERC20,
+    provider,
   );
-  if (supportsERC1155) {
-    return 'erc1155';
-  }
+  const contractERC721 = new ethers.Contract(
+    contractAddress,
+    Abis.ERC721,
+    provider,
+  );
+  const contractERC1155 = new ethers.Contract(
+    contractAddress,
+    Abis.ERC1155,
+    provider,
+  );
 
-  // Check if the contract implements ERC721 interface
-  const supportsERC721 = await contract.supportsInterface(InterfaceIds.ERC721);
-  if (supportsERC721) {
-    return 'erc721';
-  }
-
-  // Check if the contract implements ERC20 interface
-  const supportsERC20 = await contract.supportsInterface(InterfaceIds.ERC20);
-  if (supportsERC20) {
+  try {
+    // Check for ERC20
+    await contractERC20.totalSupply();
+    console.log(contractAddress, 'is an ERC20 contract.');
     return 'erc20';
+  } catch (e) {
+    /* Not ERC20 */
   }
 
-  // If none of the above interfaces are implemented, return null
+  try {
+    // Check for ERC721
+    await contractERC721.balanceOf(ethers.constants.AddressZero);
+    console.log(contractAddress, 'is an ERC721 contract.');
+    return 'erc721';
+  } catch (e) {
+    /* Not ERC721 */
+  }
+
+  try {
+    // Check for ERC1155
+    await contractERC1155.isApprovedForAll(
+      ethers.constants.AddressZero,
+      ethers.constants.AddressZero,
+    );
+    console.log(contractAddress, 'is an ERC1155 contract.');
+    return 'erc1155';
+  } catch (e) {
+    /* Not ERC1155 */
+  }
+
+  console.log(
+    'Contract type is unknown or does not implement standard interfaces.',
+  );
   return null;
-}
+};
+
+// async function getEVMContractType(
+//   contractAddress: string,
+//   network_url: string,
+// ): Promise<string | null> {
+//   const provider = new ethers.providers.JsonRpcProvider(network_url);
+//   const contract = ERC165__factory.connect(contractAddress, provider);
+
+//   // Check if the contract implements ERC1155 interface
+//   const supportsERC1155 = await contract.supportsInterface(
+//     InterfaceIds.ERC1155,
+//   );
+
+//   if (supportsERC1155) {
+//     return 'erc1155';
+//   }
+
+//   // Check if the contract implements ERC721 interface
+//   const supportsERC721 = await contract.supportsInterface(InterfaceIds.ERC721);
+//   if (supportsERC721) {
+//     return 'erc721';
+//   }
+
+//   // Check if the contract implements ERC20 interface
+//   const supportsERC20 = await contract.supportsInterface(InterfaceIds.ERC20);
+//   if (supportsERC20) {
+//     return 'erc20';
+//   }
+
+//   // If none of the above interfaces are implemented, return null
+//   return null;
+// }
 
 async function isCosmosAddressContract(
   address: string,
@@ -134,7 +194,7 @@ export default function validateRequirements(
           return new Error(`${Errors.ContractNotFound}: ${contract_address}`);
         }
 
-        const isContractType = await getEVMContractType(
+        const isContractType = await checkContractType(
           contract_address,
           node.url,
         );

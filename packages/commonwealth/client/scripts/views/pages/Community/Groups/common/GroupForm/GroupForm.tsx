@@ -1,6 +1,7 @@
 /* eslint-disable react/no-multi-comp */
+import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
+import { StargateClient } from '@cosmjs/stargate';
 import axios from 'axios';
-import { CosmosSDK } from 'cosmos-sdk';
 import { ethers } from 'ethers';
 import { isValidEthAddress } from 'helpers/validateTypes';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -19,9 +20,9 @@ import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInp
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { ZodError, ZodObject } from 'zod';
-import { ERC165__factory } from '../../../../../../../../../../libs/chains/src/eth/types';
 import {
   AMOUNT_CONDITIONS,
+  CW_SPECIFICATIONS,
   ERC_SPECIFICATIONS,
   TOKENS,
   conditionTypes,
@@ -55,10 +56,19 @@ type CWRequirementsRadioButtonProps = {
   onInputValueChange: (value: string) => any;
 };
 
-const InterfaceIds = {
-  ERC1155: '0xd9b67a26',
-  ERC721: '0x80ac58cd',
-  ERC20: '0x36372b07',
+// Interface for the CW721 Metadata
+interface Cw721Metadata {
+  name: string;
+  symbol: string;
+  // Add other CW721 specific fields
+}
+
+const Abis = {
+  ERC20: ['function totalSupply() view returns (uint256)'],
+  ERC721: ['function balanceOf(address owner) view returns (uint256)'],
+  ERC1155: [
+    'function isApprovedForAll(address account, address operator) view returns (bool)',
+  ],
 };
 
 async function isEVMAddressContract(
@@ -77,50 +87,122 @@ async function isEVMAddressContract(
 
 async function isCosmosAddressContract(
   address: string,
-  network_url: string,
+  networkUrl: string,
 ): Promise<boolean> {
-  // Implement the logic to query the Cosmos chain and check if the address is a contract
-  const cosmosSDK = new CosmosSDK(network_url);
-  const accountInfo = await cosmosSDK.getAccountInfo(address);
-  return accountInfo.code_hash !== '';
-}
+  try {
+    // Initialize the StargateClient
+    const client = await StargateClient.connect(networkUrl);
 
-async function getEVMContractType(
+    // Query the account information
+    const accountInfo = await client.getAccount(address);
+
+    // Disconnect the client (if you are done with the client)
+    client.disconnect();
+
+    // Check if code_hash exists and is not empty
+    // The existence and type of code_hash may vary based on the specific blockchain
+    if (
+      accountInfo &&
+      'codeHash' in accountInfo &&
+      accountInfo.codeHash !== ''
+    ) {
+      console.log('Address is a contract');
+      return true;
+    } else {
+      console.log('Address is not a contract');
+      return false;
+    }
+  } catch (error) {
+    console.error('Error querying the account:', error);
+    return false;
+  }
+}
+const getEVMContractType = async (
+  contractAddress,
+  network_url,
+): Promise<string | null> => {
+  const provider = new ethers.providers.JsonRpcProvider(network_url);
+
+  const contractERC20 = new ethers.Contract(
+    contractAddress,
+    Abis.ERC20,
+    provider,
+  );
+  const contractERC721 = new ethers.Contract(
+    contractAddress,
+    Abis.ERC721,
+    provider,
+  );
+  const contractERC1155 = new ethers.Contract(
+    contractAddress,
+    Abis.ERC1155,
+    provider,
+  );
+
+  try {
+    // Check for ERC20
+    await contractERC20.totalSupply();
+    console.log(contractAddress, 'is an ERC20 contract.');
+    return 'erc20';
+  } catch (e) {
+    /* Not ERC20 */
+  }
+
+  try {
+    // Check for ERC721
+    await contractERC721.balanceOf(ethers.constants.AddressZero);
+    console.log(contractAddress, 'is an ERC721 contract.');
+    return 'erc721';
+  } catch (e) {
+    /* Not ERC721 */
+  }
+
+  try {
+    // Check for ERC1155
+    await contractERC1155.isApprovedForAll(
+      ethers.constants.AddressZero,
+      ethers.constants.AddressZero,
+    );
+    console.log(contractAddress, 'is an ERC1155 contract.');
+    return 'erc1155';
+  } catch (e) {
+    /* Not ERC1155 */
+  }
+
+  console.log(
+    'Contract type is unknown or does not implement standard interfaces.',
+  );
+  return null;
+};
+
+async function getCosmosContractType(
   contractAddress: string,
   network_url: string,
 ): Promise<string | null> {
-  const provider = new ethers.providers.JsonRpcProvider(network_url);
-  const contract = ERC165__factory.connect(contractAddress, provider);
+  try {
+    // Initialize the CosmWasmClient
+    const client = await CosmWasmClient.connect(network_url);
 
-  // Check if the contract implements ERC1155 interface
-  const supportsERC1155 = await contract.supportsInterface(
-    InterfaceIds.ERC1155,
-  );
+    // Query the contract for its info
+    const contractInfo: Cw721Metadata = await client.queryContractSmart(
+      contractAddress,
+      {
+        contract_info: {},
+      },
+    );
 
-  console.log('1155', supportsERC1155);
-
-  if (supportsERC1155) {
-    return 'erc1155';
+    // Check the required fields for CW721, for example, `name` and `symbol`
+    if (contractInfo && contractInfo.name && contractInfo.symbol) {
+      console.log('Contract is a CW721 token, with metadata:', contractInfo);
+      return 'cw721';
+    } else {
+      console.log('Contract does not comply with the CW721 standard.');
+      return null;
+    }
+  } catch (error) {
+    console.error('Error querying the contract:', error);
+    return null;
   }
-
-  // Check if the contract implements ERC721 interface
-  const supportsERC721 = await contract.supportsInterface(InterfaceIds.ERC721);
-  if (supportsERC721) {
-    return 'erc721';
-  }
-
-  console.log('721', supportsERC721);
-
-  // Check if the contract implements ERC20 interface
-  const supportsERC20 = await contract.supportsInterface(InterfaceIds.ERC20);
-  if (supportsERC20) {
-    return 'erc20';
-  }
-
-  console.log('20', supportsERC20);
-
-  // If none of the above interfaces are implemented, return null
-  return null;
 }
 
 const CWRequirementsRadioButton = ({
@@ -417,27 +499,28 @@ const GroupForm = ({
           };
 
           const key = Object.keys(subForm.values)[3];
+          const isCosmos =
+            subForm.values.requirementType === CW_SPECIFICATIONS.CW_721;
 
           const contract_address = subForm.values.requirementContractAddress;
           const evmId = parseInt(subForm.values.requirementChain); // requirement.data.source.evm_chain_id;
+          const cosmosId = subForm.values.requirementChain; // requirement.data.source.cosmos_chain_id;
           const node = await axios.get(
             `${app.serverUrl()}/nodes?eth_chain_id=${evmId}`,
           );
-          const node_url = node?.data?.result?.filter(
-            (x) => x.eth_chain_id == evmId,
+          const node_url = node?.data?.result?.filter((x) =>
+            isCosmos ? x.cosmos_chain_id === cosmosId : x.eth_chain_id == evmId,
           )[0].url;
 
-          const isAddressContract = await isEVMAddressContract(
-            contract_address,
-            node_url,
-          );
+          const isAddressContract = isCosmos
+            ? await isCosmosAddressContract(contract_address, node_url)
+            : await isEVMAddressContract(contract_address, node_url);
 
-          const isContractType = await getEVMContractType(
-            contract_address,
-            node_url,
-          );
+          console.log('isAddressContract', isAddressContract);
 
-          console.log('IS CONTRACT TYPE ', isContractType);
+          const isContractType = isCosmos
+            ? await getCosmosContractType(contract_address, node_url)
+            : await getEVMContractType(contract_address, node_url);
 
           if (!isAddressContract) {
             updatedSubForms[index] = {
@@ -474,14 +557,7 @@ const GroupForm = ({
       }),
     );
 
-    console.log(updatedSubForms);
-
     setRequirementSubForms([...updatedSubForms]);
-
-    console.log(
-      'UPDATEED ',
-      !!updatedSubForms.find((x) => Object.keys(x.errors).length > 0),
-    );
 
     return !!updatedSubForms.find((x) => Object.keys(x.errors).length > 0);
   };
