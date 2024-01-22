@@ -6,6 +6,7 @@ import {
   ReactionAttributes,
   UserInstance,
 } from '@hicommonwealth/model';
+import { REACTION_WEIGHT_OVERRIDE } from 'server/config';
 import { afterCreateReaction } from 'server/util/afterCreateReaction';
 import { ValidChains } from 'server/util/commonProtocol/chainConfig';
 import { getNamespaceBalance } from 'server/util/commonProtocol/contractHelpers';
@@ -101,22 +102,26 @@ export async function __createThreadReaction(
     }
   }
 
-  // calculate voting weight
-  const stake = await this.models.CommunityStake.findOne({
-    where: { community_id: community.id },
-  });
   let calculatedVotingWeight: number | null = null;
-  if (stake) {
-    const stakeScaler = stake.stake_scaler;
-    const stakeBalance = await getNamespaceBalance(
-      this.tokenBalanceCache,
-      community.namespace,
-      stake.stake_id,
-      ValidChains.Goerli,
-      address.address,
-      this.models,
-    );
-    calculatedVotingWeight = parseInt(stakeBalance, 10) * stakeScaler;
+  if (REACTION_WEIGHT_OVERRIDE) {
+    calculatedVotingWeight = REACTION_WEIGHT_OVERRIDE;
+  } else {
+    // calculate voting weight
+    const stake = await this.models.CommunityStake.findOne({
+      where: { community_id: community.id },
+    });
+    if (stake) {
+      const stakeScaler = stake.stake_scaler;
+      const stakeBalance = await getNamespaceBalance(
+        this.tokenBalanceCache,
+        community.namespace,
+        stake.stake_id,
+        ValidChains.Goerli,
+        address.address,
+        this.models,
+      );
+      calculatedVotingWeight = parseInt(stakeBalance, 10) * stakeScaler;
+    }
   }
 
   // create the reaction

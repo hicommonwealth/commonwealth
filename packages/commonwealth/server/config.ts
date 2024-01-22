@@ -125,3 +125,7 @@ export const TBC_BALANCE_TTL_SECONDS = process.env.TBC_BALANCE_TTL_SECONDS
   : 300;
 
 export const PRERENDER_TOKEN = process.env.PRERENDER_TOKEN;
+
+export const REACTION_WEIGHT_OVERRIDE = process.env.REACTION_WEIGHT_OVERRIDE
+  ? parseInt(process.env.REACTION_WEIGHT_OVERRIDE, 10)
+  : null;
