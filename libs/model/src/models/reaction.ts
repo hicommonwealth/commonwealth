@@ -58,7 +58,7 @@ export default (
         afterCreate: async (reaction: ReactionInstance, options) => {
           let thread_id = reaction.thread_id;
           const comment_id = reaction.comment_id;
-          const { Thread, Comment, Address } = sequelize.models;
+          const { Thread, Comment } = sequelize.models;
           try {
             if (thread_id) {
               const thread = await Thread.findOne({
@@ -68,20 +68,6 @@ export default (
                 await thread.increment('reaction_count', {
                   transaction: options.transaction,
                 });
-
-                const address = await Address.findByPk(reaction.address_id);
-                const contractAddress = ''; // TODO: get 1155 contract address
-                const tokenId = 1; // TODO: get token ID
-                const stakeScaler = 5; // TODO: get stake weight from community.stakeScaler
-                await incrementReactionWeightsSum(
-                  address!.toJSON().address,
-                  contractAddress,
-                  tokenId,
-                  stakeScaler,
-                  thread,
-                  options.transaction,
-                );
-
                 stats().increment('cw.hook.reaction-count', {
                   thread_id: String(thread_id),
                 });
@@ -97,20 +83,6 @@ export default (
                   transaction: options.transaction,
                 });
                 thread_id = Number(comment.get('thread_id'));
-
-                const address = await Address.findByPk(reaction.address_id);
-                const contractAddress = ''; // TODO: get 1155 contract address
-                const tokenId = 1; // TODO: get token ID
-                const stakeScaler = 5; // TODO: get stake weight from community.stakeScaler
-                await incrementReactionWeightsSum(
-                  address!.toJSON().address,
-                  contractAddress,
-                  tokenId,
-                  stakeScaler,
-                  comment,
-                  options.transaction,
-                );
-
                 stats().increment('cw.hook.reaction-count', {
                   thread_id: String(thread_id),
                 });
@@ -139,13 +111,6 @@ export default (
                 thread.decrement('reaction_count', {
                   transaction: options.transaction,
                 });
-
-                await decrementReactionWeightsSum(
-                  reaction.calculated_voting_weight,
-                  thread,
-                  options.transaction,
-                );
-
                 stats().decrement('cw.hook.reaction-count', {
                   thread_id: String(thread_id),
                 });
@@ -161,13 +126,6 @@ export default (
                 comment.decrement('reaction_count', {
                   transaction: options.transaction,
                 });
-
-                await decrementReactionWeightsSum(
-                  reaction.calculated_voting_weight,
-                  comment,
-                  options.transaction,
-                );
-
                 stats().decrement('cw.hook.reaction-count', {
                   thread_id: String(thread_id),
                 });
@@ -228,45 +186,3 @@ export default (
 
   return Reaction;
 };
-
-async function incrementReactionWeightsSum(
-  address: string,
-  contractAddress: string,
-  tokenId: number,
-  stakeScaler: number,
-  entity: Sequelize.Model,
-  transaction?: Sequelize.Transaction | null | undefined,
-) {
-  const stakeBalance = await getBalanceForAddress(
-    address,
-    contractAddress,
-    tokenId,
-  );
-  const calculatedVotingWeight = stakeBalance * stakeScaler;
-  return entity.increment('reaction_weights_sum', {
-    by: calculatedVotingWeight,
-    transaction,
-  });
-}
-
-async function decrementReactionWeightsSum(
-  calculatedVotingWeight: number,
-  entity: Sequelize.Model,
-  transaction?: Sequelize.Transaction | null | undefined,
-) {
-  return entity.decrement('reaction_weights_sum', {
-    by: calculatedVotingWeight,
-    transaction,
-  });
-}
-
-// ----
-
-// TODO: replace with proper implementation
-export async function getBalanceForAddress(
-  address: string,
-  contractAddress: string,
-  tokenId: number,
-): Promise<number> {
-  return 10;
-}

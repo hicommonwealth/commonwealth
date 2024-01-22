@@ -34,6 +34,7 @@ describe('ServerReactionsController', () => {
       await serverReactionsController.deleteReaction({
         user: user as any,
         reactionId: 777,
+        community: { id: 'ethereum' } as any,
         address: address as any,
       });
 
@@ -41,6 +42,7 @@ describe('ServerReactionsController', () => {
         serverReactionsController.deleteReaction({
           user: user as any,
           reactionId: 777,
+          community: { id: 'ethereum' } as any,
           address: {
             ...(address as any),
             address: '0xbanned',
@@ -75,6 +77,7 @@ describe('ServerReactionsController', () => {
           user: user as any,
           reactionId: 888,
           address: address as any,
+          community: { id: 'ethereum' } as any,
         }),
       ).to.be.rejectedWith(`Reaction not found: 888`);
     });
@@ -112,6 +115,7 @@ describe('ServerReactionsController', () => {
           user: user as any,
           reactionId: 999,
           address: address as any,
+          community: { id: 'ethereum' } as any,
         }),
       ).to.be.rejectedWith('Ban error: big ban err');
     });
