@@ -127,7 +127,11 @@ export const EditTopicModal = ({
               topicName: name,
               communityId: app.activeChainId(),
             });
-            navigate('/');
+            if (noRedirect) {
+              onModalClose();
+            } else {
+              navigate('/');
+            }
           },
         },
       ],
