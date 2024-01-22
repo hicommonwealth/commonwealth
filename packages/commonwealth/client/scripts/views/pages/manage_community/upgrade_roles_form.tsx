@@ -1,15 +1,16 @@
 import { AccessLevel } from '@hicommonwealth/core';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { formatAddressShort } from 'helpers';
+import { featureFlags } from 'helpers/feature-flags';
 import $ from 'jquery';
 import 'pages/manage_community/upgrade_roles_form.scss';
 import React, { useMemo, useState } from 'react';
 import app from 'state';
 import type RoleInfo from '../../../models/RoleInfo';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
+import { CWButton } from '../../components/component_kit/new_designs/cw_button';
+import { CWRadioButton } from '../../components/component_kit/new_designs/cw_radio_button';
 import { MembersSearchBar } from '../../components/members_search_bar';
-
 type UpgradeRolesFormProps = {
   onRoleUpdate: (oldRole: RoleInfo, newRole: RoleInfo) => void;
   roleData: RoleInfo[];
@@ -47,6 +48,11 @@ export const UpgradeRolesForm = ({
     return nonAdminNames.map((n) => ({ label: n, value: n }));
   }, [nonAdminNames]);
 
+  const newAdminOnboardingEnabledOptions = [
+    { label: 'Admin', value: 'Admin' },
+    { label: 'Moderator', value: 'Moderator' },
+  ];
+
   return (
     <div className="UpgradeRolesForm">
       <MembersSearchBar
@@ -65,17 +71,34 @@ export const UpgradeRolesForm = ({
         />
       </div>
       <div className="upgrade-buttons-container">
-        <CWRadioGroup
-          name="roles"
-          options={[
-            { label: 'Admin', value: 'Admin' },
-            { label: 'Moderator', value: 'Moderator' },
-          ]}
-          toggledOption={role}
-          onChange={(e) => {
-            setRole(e.target.value);
-          }}
-        />
+        {featureFlags.newAdminOnboardingEnabled ? (
+          <>
+            {newAdminOnboardingEnabledOptions.map((o, i) => {
+              return (
+                <CWRadioButton
+                  key={i}
+                  name="roles"
+                  onChange={(e) => {
+                    setRole(e.target.value);
+                  }}
+                  value={o.value}
+                />
+              );
+            })}
+          </>
+        ) : (
+          <CWRadioGroup
+            name="roles"
+            options={[
+              { label: 'Admin', value: 'Admin' },
+              { label: 'Moderator', value: 'Moderator' },
+            ]}
+            toggledOption={role}
+            onChange={(e) => {
+              setRole(e.target.value);
+            }}
+          />
+        )}
         <CWButton
           label="Upgrade Member"
           disabled={!role || !user}
