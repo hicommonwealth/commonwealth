@@ -2,7 +2,7 @@ import { AppError } from '@hicommonwealth/adapters';
 import { DB } from '@hicommonwealth/model';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
-import { factoryContracts, validChains } from './chainConfig';
+import { factoryContracts, ValidChains } from './chainConfig';
 import { getNamespace } from './contractHelpers';
 
 export const validateCommunityStakeConfig = async (
@@ -22,7 +22,7 @@ export const validateCommunityStakeConfig = async (
     ],
     attributes: ['namespace'],
   });
-  if (!Object.values(validChains).includes(community.ChainNode.eth_chain_id)) {
+  if (!Object.values(ValidChains).includes(community.ChainNode.eth_chain_id)) {
     throw new AppError(
       "Community Stakes not configured for community's chain node",
     );

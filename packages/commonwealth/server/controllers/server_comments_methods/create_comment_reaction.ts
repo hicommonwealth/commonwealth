@@ -6,6 +6,9 @@ import {
   ReactionAttributes,
   UserInstance,
 } from '@hicommonwealth/model';
+import { REACTION_WEIGHT_OVERRIDE } from 'server/config';
+import { ValidChains } from 'server/util/commonProtocol/chainConfig';
+import { getNamespaceBalance } from 'server/util/commonProtocol/contractHelpers';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { findAllRoles } from '../../util/roles';
@@ -19,6 +22,7 @@ const Errors = {
   BanError: 'Ban error',
   InsufficientTokenBalance: 'Insufficient token balance',
   BalanceCheckFailed: 'Could not verify user token balance',
+  FailedCreateReaction: 'Failed to create reaction',
 };
 
 export type CreateCommentReactionOptions = {
@@ -91,7 +95,7 @@ export async function __createCommentReaction(
       const { isValid } = await validateTopicGroupsMembership(
         this.models,
         this.tokenBalanceCache,
-        thread.topic_id,
+        thread.topic_id!,
         community,
         address,
       );
@@ -104,30 +108,47 @@ export async function __createCommentReaction(
     }
   }
 
+  let calculatedVotingWeight: number | null = null;
+  if (REACTION_WEIGHT_OVERRIDE) {
+    calculatedVotingWeight = REACTION_WEIGHT_OVERRIDE;
+  } else {
+    // calculate voting weight
+    const stake = await this.models.CommunityStake.findOne({
+      where: { community_id: community.id },
+    });
+    if (stake) {
+      const stakeScaler = stake.stake_scaler;
+      const stakeBalance = await getNamespaceBalance(
+        this.tokenBalanceCache,
+        community.namespace,
+        stake.stake_id,
+        ValidChains.Goerli,
+        address.address,
+        this.models,
+      );
+      calculatedVotingWeight = parseInt(stakeBalance, 10) * stakeScaler;
+    }
+  }
+
   // create the reaction
-  const reactionData: ReactionAttributes = {
+  const reactionWhere: Partial<ReactionAttributes> = {
     reaction,
     address_id: address.id,
     community_id: community.id,
     comment_id: comment.id,
+  };
+  const reactionData: Partial<ReactionAttributes> = {
+    ...reactionWhere,
+    calculated_voting_weight: calculatedVotingWeight,
     canvas_action: canvasAction,
     canvas_session: canvasSession,
     canvas_hash: canvasHash,
   };
-  const [foundOrCreatedReaction, created] =
-    await this.models.Reaction.findOrCreate({
-      where: reactionData,
-      defaults: reactionData,
-      include: [this.models.Address],
-    });
 
-  const finalReaction = created
-    ? await this.models.Reaction.findOne({
-        where: reactionData,
-        include: [this.models.Address],
-      })
-    : foundOrCreatedReaction;
-
+  const [finalReaction] = await this.models.Reaction.findOrCreate({
+    where: reactionWhere,
+    defaults: reactionData,
+  });
   // build notification options
   const allNotificationOptions: EmitOptions[] = [];
 
@@ -141,12 +162,12 @@ export async function __createCommentReaction(
         comment_text: comment.text,
         root_title: thread.title,
         root_type: null, // What is this for?
-        chain_id: finalReaction.community_id,
-        author_address: finalReaction.Address.address,
-        author_chain: finalReaction.Address.community_id,
+        chain_id: community.id,
+        author_address: address.address,
+        author_chain: address.community_id,
       },
     },
-    excludeAddresses: [finalReaction.Address.address],
+    excludeAddresses: [address.address],
   });
 
   // build analytics options
@@ -162,5 +183,14 @@ export async function __createCommentReaction(
   address.last_active = new Date();
   address.save().catch(console.error);
 
-  return [finalReaction.toJSON(), allNotificationOptions, allAnalyticsOptions];
+  const finalReactionWithAddress: ReactionAttributes = {
+    ...finalReaction.toJSON(),
+    Address: address,
+  };
+
+  return [
+    finalReactionWithAddress,
+    allNotificationOptions,
+    allAnalyticsOptions,
+  ];
 }

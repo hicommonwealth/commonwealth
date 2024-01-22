@@ -773,6 +773,7 @@ function setupRouter(
     '/reactions/:id',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
+    databaseValidationService.validateCommunity,
     deleteReactionHandler.bind(this, serverControllers),
   );
   registerRoute(

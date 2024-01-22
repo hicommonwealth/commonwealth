@@ -4,7 +4,7 @@ import { DB } from '@hicommonwealth/model';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { TokenBalanceCache } from '../tokenBalanceCache/tokenBalanceCache';
-import { factoryContracts, validChains } from './chainConfig';
+import { factoryContracts, ValidChains } from './chainConfig';
 
 export const getNamespace = async (
   web3: Web3,
@@ -55,7 +55,7 @@ export const getNamespaceBalance = async (
   tbc: TokenBalanceCache,
   namespace: string,
   tokenId: number,
-  chain: validChains,
+  chain: ValidChains,
   address: string,
   model: DB,
 ): Promise<string> => {
