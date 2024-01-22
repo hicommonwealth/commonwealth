@@ -1,13 +1,9 @@
-import {
-  RedisCache,
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/adapters';
-import { RedisNamespaces } from '@hicommonwealth/core';
+import { RedisCache } from '@hicommonwealth/adapters';
+import { RedisNamespaces, logger } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import Rollbar from 'rollbar';
 import { QueryTypes } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
-import type { DB } from '../models';
 
 /**
  * This class hosts a series of 'cleaner' functions that delete unnecessary data from the database. The class schedules
@@ -15,7 +11,7 @@ import type { DB } from '../models';
  * class uses UTC so that deployments/execution in various timezones does not affect functionality.
  */
 export default class DatabaseCleaner {
-  private readonly log = loggerFactory.getLogger(formatFilename(__filename));
+  private readonly log = logger().getLogger(__filename);
   private _models: DB;
   private _redisCache: RedisCache;
   private _rollbar?: Rollbar;

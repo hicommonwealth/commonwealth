@@ -1,8 +1,8 @@
-import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
+import { logger } from '@hicommonwealth/core';
 import { rollbar } from '../../util/rollbar';
 import { processChainNode, scheduleNodeProcessing } from './nodeProcessing';
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 /**
  * Starts an infinite loop that periodically fetches and parses blocks from

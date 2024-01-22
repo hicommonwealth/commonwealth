@@ -1,7 +1,10 @@
 import { AppError } from '@hicommonwealth/adapters';
+import {
+  AddressInstance,
+  CommunityInstance,
+  UserInstance,
+} from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import { AddressInstance } from 'server/models/address';
-import { UserInstance } from 'server/models/user';
 import { ServerReactionsController } from '../server_reactions_controller';
 
 const Errors = {
@@ -12,6 +15,7 @@ const Errors = {
 export type DeleteReactionOptions = {
   user: UserInstance;
   address: AddressInstance;
+  community: CommunityInstance;
   reactionId: any;
 };
 
@@ -19,7 +23,7 @@ export type DeleteReactionResult = void;
 
 export async function __deleteReaction(
   this: ServerReactionsController,
-  { user, address, reactionId }: DeleteReactionOptions,
+  { user, address, community, reactionId }: DeleteReactionOptions,
 ): Promise<DeleteReactionResult> {
   const userOwnedAddressIds = (await user.getAddresses())
     .filter((addr) => !!addr.verified)
@@ -29,6 +33,7 @@ export async function __deleteReaction(
     where: {
       id: reactionId,
       address_id: { [Op.in]: userOwnedAddressIds },
+      community_id: community.id,
     },
     include: [this.models.Address],
   });

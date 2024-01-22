@@ -1,11 +1,10 @@
+import { models, ThreadAttributes } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { Op } from 'sequelize';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import models from '../../../server/database';
-import { ThreadAttributes } from '../../../server/models/thread';
 import { attributesOf } from '../../../server/util/sequelizeHelpers';
 import * as modelUtils from '../../util/modelUtils';
 import { JoinCommunityArgs, ThreadArgs } from '../../util/modelUtils';

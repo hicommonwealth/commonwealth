@@ -1,11 +1,13 @@
 // contains types for external api
 
-import type { CommentAttributes } from '../models/comment';
-import type { CommunityAttributes } from '../models/community';
-import type { ProfileAttributes } from '../models/profile';
-import type { ReactionAttributes } from '../models/reaction';
-import type { ThreadAttributes } from '../models/thread';
-import type { TopicAttributes } from '../models/topic';
+import type {
+  CommentAttributes,
+  CommunityAttributes,
+  ProfileAttributes,
+  ReactionAttributes,
+  ThreadAttributes,
+  TopicAttributes,
+} from '@hicommonwealth/model';
 
 export enum OrderByOptions {
   UPDATED = 'updated_at',

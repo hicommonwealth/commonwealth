@@ -3,17 +3,16 @@ import {
   RascalConfigServices,
   RascalSubscriptions,
   ServiceKey,
-  StatsDController,
   TRmqMessages,
-  formatFilename,
   getRabbitMQConfig,
-  loggerFactory,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import {
   CommentDiscordActions,
   IDiscordMessage,
   ThreadDiscordActions,
+  logger,
+  stats,
 } from '@hicommonwealth/core';
 import v8 from 'v8';
 import {
@@ -35,7 +34,7 @@ startHealthCheckLoop({
   },
 });
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 log.info(
   `Node Option max-old-space-size set to: ${JSON.stringify(
@@ -82,7 +81,7 @@ async function processMessage(data: TRmqMessages) {
       );
     }
 
-    StatsDController.get().increment('cw.discobot_message_processed', 1, {
+    stats().increment('cw.discobot_message_processed', {
       chain: topic.community_id,
       action: action,
     });

@@ -1,13 +1,12 @@
+import { models } from '@hicommonwealth/model';
 import chai from 'chai';
 import jwt from 'jsonwebtoken';
-import models from 'server/database';
 import { Op } from 'sequelize';
 import { JWT_SECRET } from '../../../../server/config';
-import { post, put } from './appHook.spec';
+import { post } from './appHook.spec';
 import {
   testAddresses,
   testChains,
-  testComments,
   testReactions,
   testUsers,
 } from './dbEntityHooks.spec';
@@ -18,7 +17,7 @@ describe('postReactions Tests', () => {
   beforeEach(() => {
     jwtToken = jwt.sign(
       { id: testUsers[0].id, email: testUsers[0].email },
-      JWT_SECRET
+      JWT_SECRET,
     );
   });
 
@@ -29,7 +28,7 @@ describe('postReactions Tests', () => {
       await models.Reaction.count({
         where: { id: { [Op.in]: [smallestId - 1, smallestId - 2] } },
       }),
-      0
+      0,
     );
 
     const resp = await post('/api/reactions', {
@@ -55,7 +54,7 @@ describe('postReactions Tests', () => {
       await models.Reaction.count({
         where: { id: { [Op.in]: [smallestId - 1, smallestId - 2] } },
       }),
-      2
+      2,
     );
   });
 
@@ -66,7 +65,7 @@ describe('postReactions Tests', () => {
       await models.Reaction.count({
         where: { id: { [Op.in]: [smallestId - 3, smallestId - 4] } },
       }),
-      0
+      0,
     );
 
     const resp = await post('/api/reactions', {
@@ -95,7 +94,7 @@ describe('postReactions Tests', () => {
       await models.Reaction.count({
         where: { id: { [Op.in]: [smallestId - 3, smallestId - 4] } },
       }),
-      0
+      0,
     );
   });
 
@@ -106,7 +105,7 @@ describe('postReactions Tests', () => {
         jwt: jwtToken,
         reactions: [{ bad: 3 }],
       },
-      true
+      true,
     );
 
     chai.assert.equal(resp.status, 'Failure');
@@ -118,7 +117,7 @@ describe('postReactions Tests', () => {
       {
         comments: [{}],
       },
-      true
+      true,
     );
 
     chai.assert.equal(resp.statusCode, 401);

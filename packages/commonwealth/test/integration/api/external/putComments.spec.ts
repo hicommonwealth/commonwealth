@@ -1,7 +1,7 @@
+import { models } from '@hicommonwealth/model';
 import chai from 'chai';
 import jwt from 'jsonwebtoken';
 import { Op } from 'sequelize';
-import models from 'server/database';
 import { JWT_SECRET } from '../../../../server/config';
 import { put } from './appHook.spec';
 import {
@@ -18,7 +18,7 @@ describe('putComments Tests', () => {
   beforeEach(() => {
     jwtToken = jwt.sign(
       { id: testUsers[0].id, email: testUsers[0].email },
-      JWT_SECRET
+      JWT_SECRET,
     );
   });
 
@@ -29,7 +29,7 @@ describe('putComments Tests', () => {
       await models.Comment.count({
         where: { id: { [Op.in]: [smallestId - 1, smallestId - 2] } },
       }),
-      0
+      0,
     );
 
     const resp = await put('/api/comments', {
@@ -57,7 +57,7 @@ describe('putComments Tests', () => {
       await models.Comment.count({
         where: { id: { [Op.in]: [smallestId - 1, smallestId - 2] } },
       }),
-      2
+      2,
     );
   });
 
@@ -68,7 +68,7 @@ describe('putComments Tests', () => {
         jwt: jwtToken,
         comments: [{ bad: 3 }],
       },
-      true
+      true,
     );
 
     chai.assert.equal(resp.status, 'Failure');
@@ -81,7 +81,7 @@ describe('putComments Tests', () => {
       await models.Comment.count({
         where: { id: { [Op.in]: [smallestId - 3, smallestId - 4] } },
       }),
-      0
+      0,
     );
 
     const resp = await put('/api/comments', {
@@ -112,7 +112,7 @@ describe('putComments Tests', () => {
       await models.Comment.count({
         where: { id: { [Op.in]: [smallestId - 3, smallestId - 4] } },
       }),
-      0
+      0,
     );
   });
 
@@ -122,7 +122,7 @@ describe('putComments Tests', () => {
       {
         comments: [{}],
       },
-      true
+      true,
     );
 
     chai.assert.equal(resp.statusCode, 401);

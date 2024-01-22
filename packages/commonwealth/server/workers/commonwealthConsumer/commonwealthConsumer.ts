@@ -5,15 +5,14 @@ import {
   RascalSubscriptions,
   ServiceConsumer,
   ServiceKey,
-  formatFilename,
   getRabbitMQConfig,
-  loggerFactory,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
+import { logger } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import type { BrokerConfig } from 'rascal';
 import Rollbar from 'rollbar';
 import { RABBITMQ_URI, ROLLBAR_ENV, ROLLBAR_SERVER_TOKEN } from '../../config';
-import models from '../../database';
 import { processSnapshotMessage } from './messageProcessors/snapshotConsumer';
 
 let isServiceHealthy = false;
@@ -36,7 +35,7 @@ startHealthCheckLoop({
 // properly handling/processing those messages. Using the script is rarely necessary in
 // local development.
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 export async function setupCommonwealthConsumer(): Promise<ServiceConsumer> {
   const rollbar = new Rollbar({

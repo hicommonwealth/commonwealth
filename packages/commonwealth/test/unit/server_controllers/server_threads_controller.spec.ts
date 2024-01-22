@@ -1,9 +1,16 @@
 import { expect } from 'chai';
 import { ServerThreadsController } from 'server/controllers/server_threads_controller';
+import * as contractHelpers from 'server/util/commonProtocol/contractHelpers';
 import Sinon from 'sinon';
 import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
 
 describe('ServerThreadsController', () => {
+  beforeEach(() => {
+    Sinon.stub(contractHelpers, 'getNamespaceBalance').resolves('0');
+  });
+  afterEach(() => {
+    Sinon.restore();
+  });
   describe('#createThreadReaction', () => {
     it('should create a thread reaction (new reaction)', async () => {
       const sandbox = Sinon.createSandbox();
@@ -56,12 +63,27 @@ describe('ServerThreadsController', () => {
             community_id: 'ethereum',
           }),
         },
+        CommunityStake: {
+          findOne: sandbox.stub().resolves({
+            id: 5,
+            stake_id: 1,
+            stake_scaler: 1,
+          }),
+        },
+        sequelize: {
+          transaction: async (callback) => {
+            return callback();
+          },
+        },
       };
       const tokenBalanceCache = {};
       const user = {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
       };
-      const address = {};
+      const address = {
+        address: '0x123',
+        community_id: 'ethereum',
+      };
       const chain = {
         id: 'ethereum',
       };
@@ -474,6 +496,10 @@ describe('ServerThreadsController', () => {
         id: 1,
         address: '0x123',
         save: async () => ({}),
+        toJSON: () => ({
+          id: 1,
+          address: '0x123',
+        }),
       };
       const chain = {
         id: 'ethereum',
@@ -501,34 +527,22 @@ describe('ServerThreadsController', () => {
           ],
         },
         sequelize: {
-          transaction: async () => ({
-            rollback: async () => ({}),
-            commit: async () => ({}),
-          }),
+          transaction: async (callback: () => any) => callback(),
         },
         Comment: {
-          create: async (data) => ({
-            id: 1,
-            ...data,
-          }),
-          findOne: async () => {
-            const data = {
-              id: 1,
-              thread_id: threadId,
-              text,
-              address_id: address.id,
-              chain: chain.id,
-              Address: address,
-            };
+          create: async (data) => {
             return {
+              id: 1,
               ...data,
-              destroy: async () => ({}),
-              toJSON: () => data,
+              toJSON: () => ({
+                id: 1,
+                ...data,
+              }),
             };
           },
         },
         Subscription: {
-          create: async () => ({}),
+          bulkCreate: async () => ({}),
         },
         Topic: {
           findOne: async () => ({
@@ -579,10 +593,10 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Ban error: banned');
 
       expect(newComment).to.include({
-        thread_id: threadId,
+        thread_id: String(threadId),
         text,
         address_id: address.id,
-        chain: chain.id,
+        community_id: chain.id,
       });
       expect(notificationOptions).to.have.length.greaterThan(0);
       expect(analyticsOptions).to.include({
@@ -1344,7 +1358,7 @@ describe('ServerThreadsController', () => {
           },
         },
         Subscription: {
-          create: async () => ({}),
+          bulkCreate: async () => ({}),
         },
         Address: {
           findAll: async () => [{}], // used in findOneRole

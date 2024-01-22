@@ -11,6 +11,9 @@ import './CWTextInput.scss';
 
 type TextInputSize = 'small' | 'large';
 
+const AVG_CHAR_WIDTH = 8; // in px
+const PADDING_FOR_ADDON = 12; // in px
+
 export type BaseTextInputProps = {
   autoComplete?: string;
   autoFocus?: boolean;
@@ -34,6 +37,7 @@ export type BaseTextInputProps = {
   instructionalMessage?: string;
   manualStatusMessage?: string;
   inputRef?: any;
+  rightTextAddon?: string;
 };
 
 type InputStyleProps = {
@@ -99,6 +103,7 @@ const CWTextInput = (props: TextInputProps) => {
     inputRef,
     validationStatus,
     alignLabelToRight,
+    rightTextAddon,
   } = props;
 
   const formContext = useFormContext();
@@ -120,6 +125,10 @@ const CWTextInput = (props: TextInputProps) => {
       }
     }
   };
+
+  const rightPaddingForAddon = rightTextAddon
+    ? rightTextAddon.length * AVG_CHAR_WIDTH + 2 * PADDING_FOR_ADDON
+    : null;
 
   return (
     <div
@@ -190,7 +199,11 @@ const CWTextInput = (props: TextInputProps) => {
           }}
           value={value}
           defaultValue={defaultValue}
+          style={{ paddingRight: rightPaddingForAddon }}
         />
+        {rightTextAddon && (
+          <div className="right-text-addon">{rightTextAddon}</div>
+        )}
         {iconRightonClick && iconRight ? (
           <div className="text-input-right-onClick-icon">{iconRight}</div>
         ) : iconRight ? (

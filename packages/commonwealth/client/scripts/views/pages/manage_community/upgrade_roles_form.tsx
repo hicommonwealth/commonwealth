@@ -1,12 +1,10 @@
-import $ from 'jquery';
-import React, { useMemo, useState } from 'react';
-
-import 'pages/manage_community/upgrade_roles_form.scss';
-
+import { AccessLevel } from '@hicommonwealth/core';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { formatAddressShort } from 'helpers';
+import $ from 'jquery';
+import 'pages/manage_community/upgrade_roles_form.scss';
+import React, { useMemo, useState } from 'react';
 import app from 'state';
-import { AccessLevel } from '../../../../../shared/permissions';
 import type RoleInfo from '../../../models/RoleInfo';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';

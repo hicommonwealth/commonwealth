@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NotificationCategories } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import models from '../../../server/database';
 import { Errors as MarkNotifErrors } from '../../../server/routes/markNotificationsRead';
 import * as modelUtils from '../../util/modelUtils';
 
@@ -48,19 +48,19 @@ describe('Notification Routes Tests', () => {
 
     notification = await models.Notification.create({
       category_id: NotificationCategories.NewThread,
-      chain_id: chain,
+      community_id: chain,
       notification_data: '',
     });
 
     notificationTwo = await models.Notification.create({
       category_id: NotificationCategories.NewThread,
-      chain_id: chain,
+      community_id: chain,
       notification_data: '',
     });
 
     notificationThree = await models.Notification.create({
       category_id: NotificationCategories.ChainEvent,
-      chain_id: chain,
+      community_id: chain,
       notification_data: '',
     });
 
@@ -185,7 +185,7 @@ describe('Notification Routes Tests', () => {
     it('should pass when notification id is a string instead of an array', async () => {
       const notif = await models.Notification.create({
         category_id: NotificationCategories.NewThread,
-        chain_id: chain,
+        community_id: chain,
         notification_data: '',
       });
 

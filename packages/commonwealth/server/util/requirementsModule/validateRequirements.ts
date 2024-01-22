@@ -1,5 +1,5 @@
+import { Requirement } from '@hicommonwealth/core';
 import Ajv from 'ajv';
-import { Requirement } from './requirementsTypes';
 import requirementsSchema from './requirementsSchema_v1.json';
 
 const Errors = {
@@ -14,13 +14,13 @@ const ajv = new Ajv();
  * @returns Error if invalid, otherwise null
  */
 export default function validateRequirements(
-  requirements: Requirement[]
+  requirements: Requirement[],
 ): Error | null {
   const validate = ajv.compile(requirementsSchema);
   const isValid = validate(requirements);
   if (!isValid) {
     return new Error(
-      `${Errors.InvalidRequirements}: ${JSON.stringify(validate.errors)}`
+      `${Errors.InvalidRequirements}: ${JSON.stringify(validate.errors)}`,
     );
   }
   return null;

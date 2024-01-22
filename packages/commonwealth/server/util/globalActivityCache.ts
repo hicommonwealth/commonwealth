@@ -1,12 +1,8 @@
-import {
-  RedisCache,
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/adapters';
-import { RedisNamespaces } from '@hicommonwealth/core';
+import { RedisCache } from '@hicommonwealth/adapters';
+import { logger, RedisNamespaces } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
+import { AddressAttributes } from '@hicommonwealth/model';
 import { v4 as uuidv4 } from 'uuid';
-import type { DB } from '../models';
-import { AddressAttributes } from '../models/address';
 import {
   ActivityRow,
   getActivityFeed,
@@ -20,7 +16,7 @@ type GlobalActivityJson = Array<
   }
 >;
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 export default class GlobalActivityCache {
   private _cacheKey = 'global_activity';

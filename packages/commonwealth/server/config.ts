@@ -14,7 +14,6 @@ export const SERVER_URL =
 export const SESSION_SECRET = process.env.SESSION_SECRET || 'my secret';
 export const JWT_SECRET = process.env.JWT_SECRET || 'jwt secret';
 
-export const LOGIN_TOKEN_EXPIRES_IN = 30;
 export const ADDRESS_TOKEN_EXPIRES_IN = 10;
 
 export const ROLLBAR_SERVER_TOKEN = process.env.ROLLBAR_SERVER_TOKEN;
@@ -126,3 +125,7 @@ export const TBC_BALANCE_TTL_SECONDS = process.env.TBC_BALANCE_TTL_SECONDS
   : 300;
 
 export const PRERENDER_TOKEN = process.env.PRERENDER_TOKEN;
+
+export const REACTION_WEIGHT_OVERRIDE = process.env.REACTION_WEIGHT_OVERRIDE
+  ? parseInt(process.env.REACTION_WEIGHT_OVERRIDE, 10)
+  : null;

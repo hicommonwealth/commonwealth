@@ -5,11 +5,13 @@ import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps'
 import { MixpanelCommunityCreationEvent } from '../../../../../shared/analytics/types';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
 
-import './CreateCommunity.scss';
 import BasicInformationStep from './steps/BasicInformationStep';
+import CommunityStakeStep from './steps/CommunityStakeStep';
 import CommunityTypeStep from './steps/CommunityTypeStep';
 import SuccessStep from './steps/SuccessStep';
 import { CreateCommunityStep, getFormSteps } from './utils';
+
+import './CreateCommunity.scss';
 
 const CreateCommunity = () => {
   const [createCommunityStep, setCreateCommunityStep] =
@@ -19,6 +21,7 @@ const CreateCommunity = () => {
   );
   const [selectedAddress, setSelectedAddress] = useState<AddressInfo>(null);
   const [createdCommunityId, setCreatedCommunityId] = useState('');
+  const [createdCommunityName, setCreatedCommunityName] = useState('');
 
   useBrowserAnalyticsTrack({
     payload: { event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_VISITED },
@@ -26,6 +29,15 @@ const CreateCommunity = () => {
 
   const handleChangeStep = (action: number) => {
     setCreateCommunityStep((prevState) => prevState + action);
+  };
+
+  const handleCompleteBasicInformationStep = (
+    communityId: string,
+    communityName: string,
+  ) => {
+    handleChangeStep(1);
+    setCreatedCommunityId(communityId);
+    setCreatedCommunityName(communityName);
   };
 
   const isSuccessStep = createCommunityStep === CreateCommunityStep.Success;
@@ -48,10 +60,15 @@ const CreateCommunity = () => {
             selectedAddress={selectedAddress}
             selectedCommunity={selectedCommunity}
             handleGoBack={() => handleChangeStep(-1)}
-            handleContinue={(communityId) => {
-              handleChangeStep(1);
-              setCreatedCommunityId(communityId);
-            }}
+            handleContinue={handleCompleteBasicInformationStep}
+          />
+        );
+
+      case CreateCommunityStep.CommunityStake:
+        return (
+          <CommunityStakeStep
+            onOptOutEnablingStake={() => handleChangeStep(1)}
+            createdCommunityName={createdCommunityName}
           />
         );
 

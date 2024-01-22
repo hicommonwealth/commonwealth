@@ -1,7 +1,6 @@
+import { CommentInstance, models } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { getCommentDepth } from 'server/util/getCommentDepth';
-import models from '../../server/database';
-import { CommentInstance } from '../../server/models/comment';
 import { resetDatabase } from '../util/resetDatabase';
 
 describe('getCommentDepth', () => {

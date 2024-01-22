@@ -1,9 +1,11 @@
+import {
+  ChainNodeAttributes,
+  ContractAbiAttributes,
+  ContractAttributes,
+  EvmEventSourceAttributes,
+  models,
+} from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
-import models from '../../database';
-import { ChainNodeAttributes } from '../../models/chain_node';
-import { ContractAttributes } from '../../models/contract';
-import { ContractAbiAttributes } from '../../models/contract_abi';
-import { EvmEventSourceAttributes } from '../../models/evmEventSource';
 import { EvmSources } from './types';
 
 /**
@@ -22,7 +24,7 @@ export async function getEventSources(): Promise<EvmSources> {
     private_url: ChainNodeAttributes['private_url'];
   }[] = await models.sequelize.query(
     `
-      WITH sub_chains AS (SELECT DISTINCT(S.chain_id)
+      WITH sub_communities AS (SELECT DISTINCT(S.community_id)
                           FROM "Subscriptions" S
                           WHERE S.category_id = 'chain-event')
       SELECT C.address as contract_address, C.chain_node_id, CA.abi, CN.url, CN.private_url
@@ -30,7 +32,7 @@ export async function getEventSources(): Promise<EvmSources> {
                JOIN "Contracts" C on CC.contract_id = C.id
                JOIN "ContractAbis" CA ON CA.id = C.abi_id
                JOIN "ChainNodes" CN ON CN.id = C.chain_node_id
-      WHERE CC.community_id IN (SELECT chain_id FROM sub_chains);
+      WHERE CC.community_id IN (SELECT community_id FROM sub_communities);
   `,
     { type: QueryTypes.SELECT, raw: true },
   );

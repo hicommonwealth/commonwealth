@@ -1,9 +1,9 @@
+import { SearchContentType } from '@hicommonwealth/core';
 import axios from 'axios';
 import Thread from 'models/Thread';
 import moment from 'moment';
 import app from 'state';
 import SearchStore from 'stores/SearchStore';
-import { SearchContentType } from 'types';
 import type { SearchParams } from '../../models/SearchQuery';
 import SearchQuery, { SearchScope } from '../../models/SearchQuery';
 

@@ -1,19 +1,13 @@
 /* eslint-disable max-len */
-import {
-  StatsDController,
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/adapters';
-import { NotificationCategories } from '@hicommonwealth/core';
-import Sequelize, { QueryTypes } from 'sequelize';
 import type {
   IChainEventNotificationData,
   IForumNotificationData,
   NotificationDataAndCategory,
-} from '../../shared/types';
+} from '@hicommonwealth/core';
+import { NotificationCategories, logger, stats } from '@hicommonwealth/core';
+import type { DB, NotificationInstance } from '@hicommonwealth/model';
+import Sequelize, { QueryTypes } from 'sequelize';
 import { SEND_WEBHOOKS_EMAILS, SERVER_URL } from '../config';
-import type { DB } from '../models';
-import type { NotificationInstance } from '../models/notification';
 import {
   createImmediateNotificationEmailObject,
   sendImmediateNotificationEmail,
@@ -22,7 +16,7 @@ import { rollbar } from './rollbar';
 import { mapNotificationsDataToSubscriptions } from './subscriptionMapping';
 import { dispatchWebhooks } from './webhooks/dispatchWebhook';
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 const { Op } = Sequelize;
 
@@ -35,7 +29,7 @@ export default async function emitNotifications(
   const notification_data = notification_data_and_category.data;
   const category_id = notification_data_and_category.categoryId;
   // get subscribers to send notifications to
-  StatsDController.get().increment('cw.notifications.created', {
+  stats().increment('cw.notifications.created', {
     category_id,
     chain:
       (notification_data as any).chain || (notification_data as any).chain_id,
@@ -123,13 +117,13 @@ export default async function emitNotifications(
         notification_data: JSON.stringify(chainEvent),
         chain_event_id: chainEvent.id,
         category_id: 'chain-event',
-        chain_id: chainEvent.chain,
+        community_id: chainEvent.chain,
       });
     } else {
       notification = await models.Notification.create({
         notification_data: JSON.stringify(notification_data),
         category_id,
-        chain_id: (<IForumNotificationData>notification_data).chain_id,
+        community_id: (<IForumNotificationData>notification_data).chain_id,
         thread_id:
           Number((<IForumNotificationData>notification_data).thread_id) ||
           undefined,
@@ -155,7 +149,7 @@ export default async function emitNotifications(
   const replacements = [];
   for (const subscription of subscriptions) {
     if (subscription.subscriber_id) {
-      StatsDController.get().increment('cw.notifications.emitted', {
+      stats().increment('cw.notifications.emitted', {
         category_id,
         chain:
           (notification_data as any).chain ||

@@ -1,4 +1,4 @@
-import { VoteAttributes } from '../../models/vote';
+import { VoteAttributes } from '@hicommonwealth/model';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 

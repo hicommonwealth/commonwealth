@@ -9,7 +9,16 @@
   }
 
   .header {
-    padding: 32px 0 32px 0px;
+    padding-top: 32px;
+    padding-bottom: 32px;
+
+    @include small {
+      padding-top: 14px;
+      padding-bottom: 14px;
+    }
+    @include extraSmall {
+      padding-top: 0px;
+    }
   }
 
   .active-proposals,
