@@ -249,6 +249,28 @@ export const resetDatabase = (debug = false): Promise<void> => {
         community_id: sushi.id,
         contract_id: sushiContract.id,
       });
+      await models.Community.create({
+        id: 'common-protocol',
+        network: ChainNetwork.ERC20,
+        default_symbol: 'cmn',
+        name: 'Common Protocol',
+        icon_url: '/static/img/protocols/eth.png',
+        active: true,
+        description: '',
+        type: ChainType.DAO,
+        base: ChainBase.Ethereum,
+        has_chain_events_listener: false,
+        chain_node_id: 1263,
+        namespace: 'IanSpace',
+      });
+      await models.CommunityStake.create({
+        id: 1,
+        community_id: 'ethereum',
+        stake_id: 1,
+        stake_token: '',
+        stake_scaler: 1,
+        stake_enabled: true,
+      });
 
       // Admin roles for specific communities
       await models.Address.bulkCreate([
@@ -291,6 +313,16 @@ export const resetDatabase = (debug = false): Promise<void> => {
           address: '0x42D6716549A78c05FD8EF1f999D52751Bbf9F46a',
           user_id: 2,
           community_id: 'ethereum',
+          verification_token: 'PLACEHOLDER',
+          verification_token_expires: null,
+          verified: new Date(),
+          keytype: 'sr25519',
+          role: 'admin',
+        },
+        {
+          address: '0xtestAddress',
+          user_id: 2,
+          community_id: 'common-protocol',
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
           verified: new Date(),

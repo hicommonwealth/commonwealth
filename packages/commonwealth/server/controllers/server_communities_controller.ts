@@ -27,10 +27,20 @@ import {
   GetCommunitiesResult,
 } from './server_communities_methods/get_communities';
 import {
+  __getCommunityStake,
+  GetCommunityStakeOptions,
+  GetCommunityStakeResult,
+} from './server_communities_methods/get_community_stake';
+import {
   __getRelatedCommunities,
   GetRelatedCommunitiesQuery,
   GetRelatedCommunitiesResult,
 } from './server_communities_methods/get_related_communities';
+import {
+  __putCommunityStake,
+  PutCommunityStakeOptions,
+  PutCommunityStakeResult,
+} from './server_communities_methods/put_community_stake';
 import {
   __searchCommunities,
   SearchCommunitiesOptions,
@@ -98,5 +108,17 @@ export class ServerCommunitiesController {
     options: GetRelatedCommunitiesQuery,
   ): Promise<GetRelatedCommunitiesResult> {
     return __getRelatedCommunities.call(this, options);
+  }
+
+  async putCommunityStake(
+    options: PutCommunityStakeOptions,
+  ): Promise<PutCommunityStakeResult> {
+    return __putCommunityStake.call(this, options);
+  }
+
+  async getCommunityStake(
+    options: GetCommunityStakeOptions,
+  ): Promise<GetCommunityStakeResult> {
+    return __getCommunityStake.call(this, options);
   }
 }
