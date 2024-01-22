@@ -51,7 +51,7 @@ export const CWToggle = (props: ToggleProps) => {
   const formFieldContext =
     hookToForm && name ? formContext.register(name) : ({} as any);
   const [formCheckedStatus, setFormCheckedStatus] = useState(
-    formContext?.getValues?.(name),
+    hookToForm && name && formContext?.getValues?.(name),
   );
 
   return (
@@ -69,14 +69,15 @@ export const CWToggle = (props: ToggleProps) => {
       <input
         type="checkbox"
         {...params}
-        {...(formFieldContext && {
-          ...formFieldContext,
-          onChange: async (e) => {
-            setFormCheckedStatus(e.target.checked);
-            formFieldContext.onChange(e);
-            await params?.onChange?.(e);
-          },
-        })}
+        {...(hookToForm &&
+          name && {
+            ...formFieldContext,
+            onChange: async (e) => {
+              setFormCheckedStatus(e.target.checked);
+              formFieldContext.onChange(e);
+              await params?.onChange?.(e);
+            },
+          })}
         className="toggle-input"
       />
       <div className="slider" />

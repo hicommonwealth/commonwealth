@@ -96,7 +96,7 @@ const Webhooks = () => {
         `Failed to create ${pluralizeWithoutNumberPrefix(
           webhooksToCreate.length,
           'webhook',
-        )}}!`,
+        )}!`,
       );
     } finally {
       setLinks(
@@ -156,7 +156,10 @@ const Webhooks = () => {
             <p>
               Slack, Discord, and Telegram webhooks are supported. For more
               information and examples for setting these up, please view our{' '}
-              <a href="https://example.com">documentation</a>.
+              <a href="https://docs.commonwealth.im/commonwealth/for-admins-and-mods/capabilities/webhooks">
+                documentation
+              </a>
+              .
             </p>
           </CWText>
         </div>
