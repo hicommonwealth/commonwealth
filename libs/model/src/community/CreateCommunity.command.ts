@@ -4,10 +4,13 @@ import {
   CommunityCategoryType,
 } from '@hicommonwealth/core';
 import { z } from 'zod';
+import { models } from '../database';
+import type { CommunityAttributes } from '../models';
+import type { CommandMetadata } from '../types';
 import { checkIconSize } from '../utils/checkIconSize';
 import { ALL_COMMUNITIES } from '../utils/constants';
 
-export const CreateCommunitySchema = z.object({
+const schema = z.object({
   id: z.string(),
   name: z
     .string()
@@ -50,4 +53,20 @@ export const CreateCommunitySchema = z.object({
   discord: z.string().url().startsWith('https://discord.com/').optional(),
 });
 
-export type CreateCommunity = z.infer<typeof CreateCommunitySchema>;
+export type CreateCommunity = z.infer<typeof schema>;
+
+export const CreateCommunity: CommandMetadata<
+  typeof schema,
+  CommunityAttributes
+> = {
+  schema,
+  fn: async () =>
+    //actor,
+    //id,
+    //payload,
+    {
+      // TODO
+      const community = await models.Community.findOne();
+      return community!;
+    },
+};

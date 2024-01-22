@@ -119,6 +119,7 @@ const _models: Models = {
   CommunityStake: CommunityStakeFactory(sequelize, DataTypes),
 };
 
+// TODO: use port/adaper pattern to test in-memory
 export const models: DB = {
   sequelize,
   Sequelize,
