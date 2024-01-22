@@ -9,6 +9,7 @@ type currentDiscussion = {
 
 const segmentMapping = {
   proposals: 'Proposals',
+  proposal: 'Proposal',
   members: 'Members',
   snapshot: 'Snapshots',
 };
@@ -70,6 +71,9 @@ export const generateBreadcrumbs = (
         pathSegments.splice(index + 1, 1);
         pathSegments[index] = 'snapshots';
         break;
+      case 'proposal':
+        link = 'proposals';
+        break;
       case 'new':
         // Remove 'new' segment and generate the link.
         if (pathSegments[index + 1] === 'discussion') {
@@ -94,11 +98,13 @@ export const generateBreadcrumbs = (
 
     const splitLinks = link.split('/').filter((val) => val.length > 0);
 
+    // Removed IDs from the breadcrumb
     const removedThreadId = decodeURIComponent(pathSegments[index]).replace(
       /^\d+-/,
       '',
     );
 
+    //First pass of generating the label
     label =
       index === pathSegments.length - 1 && !!currentDiscussion.currentThreadName
         ? currentDiscussion.currentThreadName
@@ -149,14 +155,18 @@ export const generateBreadcrumbs = (
       isParent = false;
     }
 
+    //Handles the governance sections
     if (
       governanceSegment &&
       label.toLowerCase() !== governanceSegment.toLowerCase()
     ) {
+      label = 'Governance';
+      if (pathSegments.length === 3 && index === 2) {
+        label = removedThreadId;
+      }
       if (pathSegments.length > 3) {
         pathSegments.splice(2, 2);
       }
-      label = 'Governance';
     }
 
     // Create the breadcrumb object.
