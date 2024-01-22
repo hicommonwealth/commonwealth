@@ -1,4 +1,5 @@
-import { Actor, ActorMiddleware, Role, models } from '..';
+import { Op } from 'sequelize';
+import { Actor, ActorMiddleware, AddressAttributes, Role, models } from '..';
 
 /**
  * TODO: review rules
@@ -8,18 +9,27 @@ import { Actor, ActorMiddleware, Role, models } from '..';
  * - aggregate owner: Allow when the user is the owner of the aggregate (entity)
  */
 
-// TODO: query the role of a user/address in a community
-const getCommunityRole = async (actor: Actor): Promise<Role | undefined> => {
+/**
+ * Finds one active community address that meets the arguments
+ * @param actor actor context
+ * @param roles roles filter
+ * @returns found or undefined
+ */
+const findAddress = async (
+  actor: Actor,
+  roles: Role[],
+): Promise<AddressAttributes | null> => {
   // TODO: cache
-  const address = await models.Address.findOne({
+  return await models.Address.findOne({
     where: {
       user_id: actor.user.id,
-      address: actor.address_id!,
+      address: actor.address_id,
       community_id: actor.aggregate_id,
-      verified: true,
+      verified: { [Op.not]: undefined },
+      role: { [Op.in]: roles },
     },
+    order: ['role', 'DESC'],
   });
-  return address?.role;
 };
 
 /**
@@ -30,9 +40,8 @@ export const isCommunityAdmin: ActorMiddleware = async (actor) => {
   if (actor.user.isAdmin) return actor;
   if (!actor.address_id) return 'Must provide an address';
   if (!actor.aggregate_id) return 'Must provide a community id';
-  const role = await getCommunityRole(actor);
-  if (!role) return 'User is not a member of the community';
-  if (role !== 'admin') return 'User is not the administrator of the community';
+  const addr = await findAddress(actor, ['admin']);
+  if (!addr) return 'User is not the administrator of the community';
   return { ...actor, author: true };
 };
 
@@ -44,9 +53,8 @@ export const isCommunityModerator: ActorMiddleware = async (actor) => {
   if (actor.user.isAdmin) return actor;
   if (!actor.address_id) return 'Must provide an address';
   if (!actor.aggregate_id) return 'Must provide a community id';
-  const role = await getCommunityRole(actor);
-  if (!role) return 'User is not a member of the community';
-  if (role !== 'moderator') return 'User is not a moderator in the community';
+  const addr = await findAddress(actor, ['moderator']);
+  if (!addr) return 'User is not a moderator in the community';
   return { ...actor, author: false };
 };
 
@@ -58,11 +66,9 @@ export const isCommunityAdminOrModerator: ActorMiddleware = async (actor) => {
   if (actor.user.isAdmin) return actor;
   if (!actor.address_id) return 'Must provide an address';
   if (!actor.aggregate_id) return 'Must provide a community id';
-  const role = await getCommunityRole(actor);
-  if (!role) return 'User is not a member of the community';
-  if (role !== 'admin' && role !== 'moderator')
-    return 'User is not an admin or moderator in the community';
-  return { ...actor, author: role === 'admin' };
+  const addr = await findAddress(actor, ['admin', 'moderator']);
+  if (!addr) return 'User is not an admin or moderator in the community';
+  return { ...actor, author: addr.role === 'admin' };
 };
 
 /**
