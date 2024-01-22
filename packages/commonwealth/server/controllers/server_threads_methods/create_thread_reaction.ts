@@ -105,20 +105,19 @@ export async function __createThreadReaction(
   const stake = await this.models.CommunityStake.findOne({
     where: { community_id: community.id },
   });
-  let stakeScaler = 5;
-  let stakeBalance = '10';
+  let calculatedVotingWeight: number | null = null;
   if (stake) {
-    stakeScaler = stake.stake_scaler;
-    stakeBalance = await getNamespaceBalance(
+    const stakeScaler = stake.stake_scaler;
+    const stakeBalance = await getNamespaceBalance(
       this.tokenBalanceCache,
       community.namespace,
       stake.stake_id,
-      ValidChains.Goerli, // TODO: derive chain from community?
+      ValidChains.Goerli,
       address.address,
       this.models,
     );
+    calculatedVotingWeight = parseInt(stakeBalance, 10) * stakeScaler;
   }
-  const calculatedVotingWeight = parseInt(stakeBalance, 10) * stakeScaler;
 
   // create the reaction
   const reactionWhere: Partial<ReactionAttributes> = {
@@ -158,7 +157,7 @@ export async function __createThreadReaction(
         thread_id: thread.id,
         root_title: thread.title,
         root_type: 'discussion',
-        chain_id: finalReaction.community_id,
+        chain_id: community.id,
         author_address: address.address,
         author_chain: address.community_id,
       },
