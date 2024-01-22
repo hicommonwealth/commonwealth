@@ -4,7 +4,13 @@ import { ActorMiddleware } from '../types';
 export const ALL_COMMUNITIES = 'all_communities';
 
 /**
- * Middleware to load community attributes
+ * TODO: Important -> This is just an example
+ * - Let's analyze all existing validation routines and their usage patterns
+ * - Authorization and loading operations can be optimized (caching and custom sql)
+ */
+
+/**
+ * Middleware to load community attributes in actor state
  * @param actor the actor state
  * @returns updated actor state with loaded community, or error string
  */

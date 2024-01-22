@@ -1,7 +1,9 @@
-import { stats } from '@hicommonwealth/core';
+import { logger, stats } from '@hicommonwealth/core';
 import { INVALID_INPUT_ERROR } from '@hicommonwealth/model';
 import { NextFunction, Request, Response } from 'express';
 import { BadRequest, InternalServerError } from './http';
+
+const log = logger().getLogger(__filename);
 
 /**
  * Captures traffic and latency
@@ -19,8 +21,10 @@ export const statsMiddleware = (
       const latency = Date.now() - start;
       stats().histogram(`cw.path.latency`, latency, { path });
     });
-  } catch (err) {
-    console.error(err);
+  } catch (err: unknown) {
+    err instanceof Error
+      ? log.error(err.message, err)
+      : log.error(err as string);
   }
   next();
 };
@@ -34,7 +38,7 @@ export const errorMiddleware = (
   res: Response,
   next: NextFunction,
 ): void => {
-  console.error(error);
+  log.error(error.message, error);
   if (res.headersSent) return next(error);
 
   let response = InternalServerError(

@@ -1,12 +1,14 @@
 import { models } from '../database'; // TODO: use port/adapter pattern to test in-memory
 import { ActorMiddleware } from '../types';
 
-// TODO: Important - Let's analyze all existing validation routines and their usage patterns
-// - Auth loading/caching operations can be optimized
-// - Instead of loading the community and the admin address in two db request, we can load everything at once if this is a common pattern
+/**
+ * TODO: Important -> This is just an example
+ * - Let's analyze all existing validation routines and their usage patterns
+ * - Authorization and loading operations can be optimized (caching and custom sql)
+ */
 
 /**
- * Middleware to validate user as author of the loaded community
+ * Middleware to validate user as author of a loaded community
  * @param actor the actor state
  * @returns updated actor state with validated author flag, or error string
  */
