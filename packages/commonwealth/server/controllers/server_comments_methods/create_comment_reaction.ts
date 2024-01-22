@@ -7,7 +7,6 @@ import {
   UserInstance,
 } from '@hicommonwealth/model';
 import { REACTION_WEIGHT_OVERRIDE } from 'server/config';
-import { afterCreateReaction } from 'server/util/afterCreateReaction';
 import { ValidChains } from 'server/util/commonProtocol/chainConfig';
 import { getNamespaceBalance } from 'server/util/commonProtocol/contractHelpers';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
@@ -146,19 +145,10 @@ export async function __createCommentReaction(
     canvas_hash: canvasHash,
   };
 
-  const finalReaction = await this.models.sequelize.transaction(
-    async (transaction) => {
-      const [foundOrCreatedReaction] = await this.models.Reaction.findOrCreate({
-        where: reactionWhere,
-        defaults: reactionData,
-        transaction,
-      });
-
-      await afterCreateReaction(this.models, reactionData, transaction);
-
-      return foundOrCreatedReaction;
-    },
-  );
+  const [finalReaction] = await this.models.Reaction.findOrCreate({
+    where: reactionWhere,
+    defaults: reactionData,
+  });
   // build notification options
   const allNotificationOptions: EmitOptions[] = [];
 

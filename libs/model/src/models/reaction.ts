@@ -68,6 +68,12 @@ export default (
                 await thread.increment('reaction_count', {
                   transaction: options.transaction,
                 });
+                if (reaction.calculated_voting_weight > 0) {
+                  await thread.increment('reaction_weights_sum', {
+                    by: reaction.calculated_voting_weight,
+                    transaction: options.transaction,
+                  });
+                }
                 stats().increment('cw.hook.reaction-count', {
                   thread_id: String(thread_id),
                 });
@@ -82,6 +88,12 @@ export default (
                 await comment.increment('reaction_count', {
                   transaction: options.transaction,
                 });
+                if (reaction.calculated_voting_weight > 0) {
+                  await comment.increment('reaction_weights_sum', {
+                    by: reaction.calculated_voting_weight,
+                    transaction: options.transaction,
+                  });
+                }
                 thread_id = Number(comment.get('thread_id'));
                 stats().increment('cw.hook.reaction-count', {
                   thread_id: String(thread_id),
@@ -108,9 +120,15 @@ export default (
                 where: { id: thread_id },
               });
               if (thread) {
-                thread.decrement('reaction_count', {
+                await thread.decrement('reaction_count', {
                   transaction: options.transaction,
                 });
+                if (reaction.calculated_voting_weight > 0) {
+                  await thread.decrement('reaction_weights_sum', {
+                    by: reaction.calculated_voting_weight,
+                    transaction: options.transaction,
+                  });
+                }
                 stats().decrement('cw.hook.reaction-count', {
                   thread_id: String(thread_id),
                 });
@@ -123,9 +141,15 @@ export default (
               });
               if (comment) {
                 thread_id = Number(comment.get('thread_id'));
-                comment.decrement('reaction_count', {
+                await comment.decrement('reaction_count', {
                   transaction: options.transaction,
                 });
+                if (reaction.calculated_voting_weight > 0) {
+                  await comment.decrement('reaction_weights_sum', {
+                    by: reaction.calculated_voting_weight,
+                    transaction: options.transaction,
+                  });
+                }
                 stats().decrement('cw.hook.reaction-count', {
                   thread_id: String(thread_id),
                 });

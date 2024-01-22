@@ -5,7 +5,6 @@ import {
   UserInstance,
 } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import { afterDestroyReaction } from 'server/util/afterDestroyReaction';
 import { ServerReactionsController } from '../server_reactions_controller';
 
 const Errors = {
@@ -52,11 +51,5 @@ export async function __deleteReaction(
     throw new AppError(`${Errors.BanError}: ${banError}`);
   }
 
-  await this.models.sequelize.transaction(async (transaction) => {
-    await reaction.destroy({
-      transaction,
-    });
-
-    await afterDestroyReaction(reaction, this.models, transaction);
-  });
+  await reaction.destroy();
 }
