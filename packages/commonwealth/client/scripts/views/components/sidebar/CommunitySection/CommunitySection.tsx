@@ -8,7 +8,6 @@ import { useLocation } from 'react-router-dom';
 import app from 'state';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { SubscriptionButton } from 'views/components/subscription_button';
 import ManageCommunityStakeModal, {
   ManageCommunityStakeModalMode,
@@ -57,19 +56,6 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
         )}
 
         <CreateCommunityButton />
-
-        <CWButton
-          label="Buy"
-          buttonType="secondary"
-          buttonAlt="green"
-          onClick={() => setTypeOfManageCommunityStakeModal('buy')}
-        />
-        <CWButton
-          label="Sell"
-          buttonType="secondary"
-          buttonAlt="rorange"
-          onClick={() => setTypeOfManageCommunityStakeModal('sell')}
-        />
 
         {showAdmin && (
           <>

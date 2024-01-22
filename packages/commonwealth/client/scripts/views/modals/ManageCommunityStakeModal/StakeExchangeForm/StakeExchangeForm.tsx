@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import React, { useState } from 'react';
 import { isMobile } from 'react-device-detect';
 
@@ -13,6 +14,7 @@ import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
+import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
 import {
@@ -68,6 +70,9 @@ const StakeExchangeForm = ({ mode, setModalState }: StakeExchangeFormProps) => {
     isBuyMode ? handleBuy() : handleSell();
   };
 
+  // TODO this should be dynamic
+  const insufficientFunds = isBuyMode && false;
+
   return (
     <div className="StakeExchangeForm">
       <CWModalBody>
@@ -102,7 +107,11 @@ const StakeExchangeForm = ({ mode, setModalState }: StakeExchangeFormProps) => {
 
         <div className="current-balance-row">
           <CWText type="caption">Current balance</CWText>
-          <CWText type="caption" fontWeight="medium">
+          <CWText
+            type="caption"
+            fontWeight="medium"
+            className={clsx({ error: insufficientFunds })}
+          >
             5.642 ETH
           </CWText>
         </div>
@@ -144,6 +153,15 @@ const StakeExchangeForm = ({ mode, setModalState }: StakeExchangeFormProps) => {
             </CWText>
           </div>
         </div>
+
+        {insufficientFunds && (
+          <MessageRow
+            statusMessage="Insufficient funds. Select an address with sufficient
+            funds or add more funds to your wallet."
+            validationStatus="failure"
+            hasFeedback
+          />
+        )}
 
         <div className="total-weight-summary">
           <CWText type="b1" fontWeight="bold">
@@ -202,7 +220,7 @@ const StakeExchangeForm = ({ mode, setModalState }: StakeExchangeFormProps) => {
         </div>
 
         <div className="total-cost-row">
-          <CWText type="caption">Total cost</CWText>
+          <CWText type="caption">{isBuyMode ? 'Total cost' : 'Net'}</CWText>
           <CWText type="caption" fontWeight="medium">
             0.036 ETH • ~$25.00 USD
           </CWText>
@@ -210,9 +228,10 @@ const StakeExchangeForm = ({ mode, setModalState }: StakeExchangeFormProps) => {
       </CWModalBody>
       <CWModalFooter>
         <CWButton
-          label={mode === 'buy' ? 'Buy stake' : 'Sell stake'}
+          disabled={insufficientFunds}
+          label={isBuyMode ? 'Buy stake' : 'Sell stake'}
           buttonType="secondary"
-          buttonAlt={mode === 'buy' ? 'green' : 'rorange'}
+          buttonAlt={isBuyMode ? 'green' : 'rorange'}
           buttonWidth="full"
           onClick={handleClick}
         />
