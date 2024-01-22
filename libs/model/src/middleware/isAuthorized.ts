@@ -1,57 +1,92 @@
-import { ActorMiddleware, CommentAttributes, ThreadAttributes } from '../';
+import { ActorMiddleware, models } from '../';
 
-// TODO: review rules
-// Authorization options, this works like a waterfall
-type AuthorizedOptions = {
-  superAdmin?: boolean; // super admins are authorized (isn't this always the case?)
-  owner?: boolean; // the owner of the aggregate is authorized
-  communityAdmin?: boolean; // community admin is autorized (isn't this the same as owner?)
-  communityModerator?: boolean; // community moderators are authorized
-  entity?: ThreadAttributes | CommentAttributes; // TODO: make generic? or use enum and extract id from request.
+/**
+ * TODO: review rules
+ * Seems like we have to consider these scenarios
+ * - super admin: When the user is a super admin (god mode), allow all operations - no need to specify any flags
+ * - community admin or moderator: Allow when user is admin of the community - only applies to community aggregates
+ * - aggregate owner: Allow when the user is the owner of the aggregate (entity)
+ */
+
+/**
+ * Community admin authorization middleware
+ */
+export const isCommunityAdmin: ActorMiddleware = async (actor) => {
+  // super admin is always allowed
+  if (actor.user.isAdmin) return actor;
+
+  if (!actor.address_id) return 'Must provide an address';
+
+  if (!actor.community_id) return 'Must provide a community id';
+
+  // TODO: query the role of this address in this community
+  // TODO: cache
+  const address = await models.Address.findOne({
+    where: {
+      user_id: actor.user.id,
+      address: actor.address_id,
+      community_id: actor.community_id,
+    },
+  });
+  if (!address) return 'User is not a member of the community';
+  if (!address.verified) return 'User is not verified';
+  if (address.role !== 'admin')
+    return 'User is not the administrator of the community';
+
+  // authorized - TODO: include flags?
+  return actor;
 };
 
 /**
- * Factory that builds authorization middleware used to authorize actors to execute actions
- * @param options authorization options describing who's allowed to execute the action
- * @returns authorization middleware
+ * Community moderator authorization middleware
  */
-export function isAuthorized(auth: AuthorizedOptions): ActorMiddleware {
-  return async (actor) => {
-    if (actor.user.isAdmin && auth.superAdmin) return actor;
+export const isCommunityModerator: ActorMiddleware = async (actor) => {
+  // super admin is always allowed
+  if (actor.user.isAdmin) return actor;
 
-    // TODO: check if aggregate is owned by this actor (one address that belongs to this actor)
-    // // get list of user address
-    // const userOwnedAddressIds = (await actor.user.getAddresses())
-    //   .filter((addr) => !!addr.verified)
-    //   .map((addr) => addr.id);
+  if (!actor.address_id) return 'Must provide an address';
 
-    // // check if entity is owned be any user address
-    // if (entity?.address_id && userOwnedAddressIds.includes(entity.address_id)) {
-    //   return true;
-    // }
+  if (!actor.community_id) return 'Must provide a community id';
 
-    // TODO: check if user is moderator or admin of community
-    // const requiredRoles: Role[] = [];
-    // if (allowMod) {
-    //   requiredRoles.push('moderator');
-    // }
-    // if (allowAdmin) {
-    //   requiredRoles.push('admin');
-    // }
-    // const roles = await findAllRoles(
-    //   models,
-    //   { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
-    //   communityId,
-    //   requiredRoles,
-    // );
-    // const role = roles.find((r) => {
-    //   return r.chain_id === communityId && requiredRoles.includes(r.permission);
-    // });
-    // if (role) {
-    //   return true;
-    // }
+  // TODO: query the role of this address in this community
+  // TODO: cache
+  const address = await models.Address.findOne({
+    where: {
+      user_id: actor.user.id,
+      address: actor.address_id,
+      community_id: actor.community_id,
+    },
+  });
+  if (!address) return 'User is not a member of the community';
+  if (!address.verified) return 'User is not verified';
+  if (address.role !== 'moderator')
+    return 'User is not a moderator of the community';
 
-    // authorized - TODO: include flags?
-    return actor;
-  };
-}
+  // authorized - TODO: include flags?
+  return actor;
+};
+
+/**
+ * TODO: Create one for each entity
+ * Entity author authorization middleware
+ */
+export const isAuthor: ActorMiddleware = async (actor) => {
+  // super admin is always allowed
+  if (actor.user.isAdmin) return actor;
+
+  if (!actor.address_id) return 'Must provide an address';
+
+  // TODO: check if aggregate is owned by this actor (one address that belongs to this actor)
+  // TODO: don't need to load aggregate here, better sql?
+  // // get list of user address
+  // const userOwnedAddressIds = (await actor.user.getAddresses())
+  //   .filter((addr) => !!addr.verified)
+  //   .map((addr) => addr.id);
+  // // check if entity is owned be any user address
+  // if (entity?.address_id && userOwnedAddressIds.includes(entity.address_id)) {
+  //   return true;
+  // }
+
+  // authorized - TODO: include flags?
+  return actor;
+};
