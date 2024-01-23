@@ -60,7 +60,7 @@ const CreateCommunity = () => {
       case CreateCommunityStep.CommunityStake:
         return (
           <CommunityStakeStep
-            onOptOutEnablingStake={() => onChangeStep(true)}
+            goToSuccessStep={() => onChangeStep(true)}
             createdCommunityName={createdCommunityName}
           />
         );

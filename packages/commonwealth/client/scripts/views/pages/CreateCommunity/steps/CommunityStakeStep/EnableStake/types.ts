@@ -4,7 +4,7 @@ export type StakeData = {
 };
 
 export interface EnableStakeProps {
-  onOptOutEnablingStake: () => void;
+  goToSuccessStep: () => void;
   onOptInEnablingStake: ({ namespace, symbol }: StakeData) => void;
   communityStakeData: StakeData;
 }
