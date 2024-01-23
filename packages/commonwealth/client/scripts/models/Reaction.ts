@@ -13,6 +13,7 @@ class Reaction {
   public readonly canvasAction: string;
   public readonly canvasSession: string;
   public readonly canvasHash: string;
+  public calculatedVotingWeight: number;
   // TODO: Do thread/comment/proposal ids ever appear as strings?
 
   constructor({
@@ -26,6 +27,7 @@ class Reaction {
     canvas_action,
     canvas_session,
     canvas_hash,
+    calculated_voting_weight,
   }) {
     this.id = id;
     this.author = Address.address;
@@ -38,6 +40,7 @@ class Reaction {
     this.canvasAction = canvas_action;
     this.canvasSession = canvas_session;
     this.canvasHash = canvas_hash;
+    this.calculatedVotingWeight = calculated_voting_weight;
   }
 }
 

@@ -36,6 +36,7 @@ export const ViewUpvotesDrawer = ({
       avatarUrl: profile.avatarUrl,
       address: profile.address,
       updated_at: reactor?.updated_at,
+      voting_weight: reactor?.voting_weight,
     };
   });
 
@@ -66,8 +67,7 @@ export const ViewUpvotesDrawer = ({
   const voterRow = (voter) => {
     return {
       name: voter.name,
-      // TODO: USE ACTUAL VOTE WEIGHT
-      voteWeight: 5,
+      voteWeight: voter.voting_weight,
       timestamp: voter.updated_at,
       avatars: {
         name: {
@@ -86,7 +86,10 @@ export const ViewUpvotesDrawer = ({
     }
   };
 
-  // TODO: Add totals
+  const getVoteWeightTotal = (voters) => {
+    return voters.reduce((memo, current) => memo + current.voting_weight, 0);
+  };
+
   return (
     <>
       <CWText type="caption" onClick={() => setIsUpvoteDrawerOpen(true)}>
@@ -105,14 +108,18 @@ export const ViewUpvotesDrawer = ({
               columnInfo={getColumnInfo()}
               rowData={getRowData(reactorData)}
             />
-            <div className="totals">
+            <div className="upvote-totals">
               <div className="upvotes">
-                <CWText></CWText>
-                <CWText></CWText>
+                <CWText type="caption" fontWeight="uppercase">
+                  Upvotes
+                </CWText>
+                <CWText type="b2">{reactorData.length}</CWText>
               </div>
               <div className="weight">
-                <CWText></CWText>
-                <CWText></CWText>
+                <CWText type="caption" fontWeight="uppercase">
+                  Total
+                </CWText>
+                <CWText type="b2">{getVoteWeightTotal(reactorData)}</CWText>
               </div>
             </div>
           </>

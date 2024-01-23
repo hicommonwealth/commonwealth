@@ -60,6 +60,11 @@ function processAssociatedReactions(
     : [];
   const allHaveTimestamps =
     tempReactionTimestamps.length === tempReactionIds.length;
+  const tempVotingWeights = reactions
+    ? reactions.map((r) => r?.calculated_voting_weight || 0)
+    : [];
+  const allHaveVoteWeights =
+    tempVotingWeights.length === tempReactionIds.length;
 
   if (
     tempReactionIds.length > 0 &&
@@ -72,6 +77,7 @@ function processAssociatedReactions(
         type: tempReactionType[i],
         address: tempAddressesReacted[i],
         updated_at: allHaveTimestamps ? tempReactionTimestamps[i] : null,
+        voting_weight: allHaveVoteWeights ? tempVotingWeights[i] : 0,
       });
     }
   }
@@ -94,6 +100,7 @@ export type AssociatedReaction = {
   type: ReactionType;
   address: string;
   updated_at: string;
+  voting_weight: number;
 };
 
 export enum LinkSource {
