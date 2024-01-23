@@ -12,8 +12,7 @@ export const logger = port(function logger(logger?: Logger) {
     logger || {
       name: 'in-memory-logger',
       dispose: () => Promise.resolve(),
-      getLogger: (...ids: string[]) => {
-        // console.log('!!!! calling logger from', ids);
+      getLogger: () => {
         return {
           trace(msg: string) {
             console.log(msg);
