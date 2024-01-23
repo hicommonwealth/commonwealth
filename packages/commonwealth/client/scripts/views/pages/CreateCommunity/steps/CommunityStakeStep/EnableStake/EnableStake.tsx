@@ -10,14 +10,26 @@ import Hint from '../../../components/Hint';
 import { EnableStakeProps, StakeData } from './types';
 import { validationSchema } from './validations';
 
+import NamespaceFactory from 'helpers/ContractHelpers/NamespaceFactory';
 import './EnableStake.scss';
 
 const EnableStake = ({
-  onOptOutEnablingStake,
+  goToSuccessStep,
   onOptInEnablingStake,
   communityStakeData,
 }: EnableStakeProps) => {
-  const handleSubmit = (data: StakeData) => {
+  const handleSubmit = async (data: StakeData) => {
+    try {
+      const namespaceFactory = new NamespaceFactory(
+        '0xf877acdb66586ace7381b6e0b83697540f4c3871',
+      );
+      const works = await namespaceFactory.checkNamespaceReservation(
+        'IansSpace222',
+      );
+    } catch (err) {
+      console.log(err);
+    }
+
     onOptInEnablingStake({
       namespace: data.namespace,
       symbol: data.symbol,
@@ -94,7 +106,7 @@ const EnableStake = ({
             label="No"
             buttonWidth="wide"
             buttonType="secondary"
-            onClick={onOptOutEnablingStake}
+            onClick={goToSuccessStep}
           />
           <CWButton
             form="communityStakeForm"
