@@ -7,7 +7,6 @@ import 'pages/manage_community/upgrade_roles_form.scss';
 import React, { useMemo, useState } from 'react';
 import app from 'state';
 import type RoleInfo from '../../../models/RoleInfo';
-// import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import { CWButton } from '../../components/component_kit/new_designs/cw_button';
 import { CWRadioButton } from '../../components/component_kit/new_designs/cw_radio_button';

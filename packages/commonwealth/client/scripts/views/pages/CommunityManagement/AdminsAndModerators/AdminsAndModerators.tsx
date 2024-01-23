@@ -18,6 +18,7 @@ const AdminsAndModerators = () => {
   const [admins, setAdmins] = useState([]);
   const [mods, setMods] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const adminsAndModeratorsClass = true;
 
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
@@ -29,7 +30,7 @@ const AdminsAndModerators = () => {
   const { data: searchResults, refetch } = useSearchProfilesQuery({
     communityId: app.activeChainId(),
     searchTerm: debouncedSearchTerm,
-    limit: 4000,
+    limit: 100,
     orderBy: APIOrderBy.LastActive,
     orderDirection: APIOrderDirection.Desc,
     includeRoles: true,
@@ -111,6 +112,7 @@ const AdminsAndModerators = () => {
 
   return (
     <CommunityManagementLayout
+      adminsAndModeratorsClass
       title="Admins and Moderators"
       description="Let's start with some basic information about your community"
       featureHint={{
@@ -119,7 +121,7 @@ const AdminsAndModerators = () => {
         moderators can only make changes to content by locking and deleting.`,
       }}
     >
-      <section className="admins-moderators">
+      <section>
         <ManageRoles
           label="Admins"
           roledata={admins}

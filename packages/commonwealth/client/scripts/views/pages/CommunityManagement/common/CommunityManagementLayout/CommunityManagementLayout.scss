@@ -21,11 +21,16 @@
     flex-direction: column;
     gap: 32px;
     width: 100%;
+    align-items: flex-start;
 
     .header {
       .b1 {
         color: $neutral-500 !important;
       }
+    }
+
+    .admins-moderators {
+      align-items: unset;
     }
 
     .feature-hint-mobile {
