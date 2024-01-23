@@ -14,17 +14,22 @@ const schema = z.object({
 
 export type SetCommunityStake = z.infer<typeof schema>;
 
+// !command pattern
 export const SetCommunityStake: CommandMetadata<
+  // !command schema
   typeof schema,
+  // !response type
   CommunityStakeAttributes
 > = {
+  // !command schema
   schema,
+  // !authorization
   middleware: [isCommunityAdmin],
+  // !core domain logic
   fn: async (actor, id, payload) => {
+    // !load aggregate by id
     const community = await models.Community.findOne({
-      where: {
-        id,
-      },
+      where: { id },
       include: [
         {
           model: models.ChainNode,
@@ -34,17 +39,21 @@ export const SetCommunityStake: CommandMetadata<
       attributes: ['namespace'],
     });
 
-    // check business rules - invariants
+    // !check business rules - invariants on loaded state + payload
+    // !here we can call domain, application, and infrastructure services (stateless, not related to entities or value objects)
     // TODO: call community namespace validation service (common protocol)
-    // - move tokenBalanceCache from /server/util to libs/model/util
-    // - move commonProtocol from /server/util to libs/model/util
+    // - move tokenBalanceCache domain service from /server/util to libs/model/services
+    // - move commonProtocol domain service from /server/util to libs/model/services
     if (!community?.ChainNode) throw new InvalidInput('Invalid community');
+    // await validateCommunityStakeConfig(community)
 
-    // mutate the state
+    // !persist state mutations
     const [record] = await models.CommunityStake.upsert({
       ...payload,
       community_id: id,
     });
+
+    // !response
     return record;
   },
 };
