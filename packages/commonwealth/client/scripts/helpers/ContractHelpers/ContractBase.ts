@@ -16,16 +16,15 @@ abstract class ContractBase {
       ChainBase.Ethereum,
     )[0];
 
-    this.wallet.enable().then(() => {
-      if (!this.wallet.api) {
-        throw new Error('Web3 Api Not Initialized');
-      }
-      this.web3 = this.wallet.api;
-      this.contract = new this.web3.eth.Contract(
-        abi as AbiItem[],
-        contractAddress,
-      );
-    });
+    if (!this.wallet.api) {
+      throw new Error('Web3 Api Not Initialized');
+    }
+
+    this.web3 = new Web3(this.wallet.api.givenProvider);
+    this.contract = new this.web3.eth.Contract(
+      abi as AbiItem[],
+      contractAddress,
+    );
   }
 
   protected toBN(number: string | number) {

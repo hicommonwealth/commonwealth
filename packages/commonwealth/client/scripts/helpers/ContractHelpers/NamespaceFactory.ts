@@ -78,10 +78,10 @@ class NamespaceFactory extends ContractBase {
     let txReceipt;
     try {
       txReceipt = await this.contract.methods
-        .deployNamespace(name, feeManager, '')
+        .deployNamespace(name, feeManager, [])
         .send({ from: this.wallet.accounts[0] });
-    } catch {
-      throw new Error('Transaction failed');
+    } catch (error) {
+      throw new Error('Transaction failed: ' + error);
     }
 
     return txReceipt;
