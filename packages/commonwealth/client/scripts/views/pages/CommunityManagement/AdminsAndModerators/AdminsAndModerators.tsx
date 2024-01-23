@@ -121,7 +121,7 @@ const AdminsAndModerators = () => {
         moderators can only make changes to content by locking and deleting.`,
       }}
     >
-      <section>
+      <section className="admins-moderators">
         <ManageRoles
           label="Admins"
           roledata={admins}
