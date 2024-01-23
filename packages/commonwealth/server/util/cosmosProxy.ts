@@ -105,10 +105,12 @@ function setupCosmosProxy(app: Express, models: DB) {
     },
   );
 
-  // cosmos-api proxies for the magic link iframe
-  // - POST / for node info
-  // - GET /node_info for fetching chain status (used by magic iframe, and magic login flow)
-  // - GET /auth/accounts/:address for fetching address status (use by magic iframe)
+  /**
+   *  cosmos-api proxies for the magic link iframe
+   * - GET /node_info for fetching chain status (used by magic iframe, and magic login flow)
+   * - POST / for node info
+   * - POST /cosmos.auth.v1beta1.Query/Account for fetching address status (use by magic iframe)
+   */
   app.options('/magicCosmosAPI/:chain', (req, res) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Private-Network', 'true');
@@ -123,12 +125,9 @@ function setupCosmosProxy(app: Express, models: DB) {
   app.use(
     '/magicCosmosAPI/:chain/?(node_info)?',
     bodyParser.text(),
-    cacheDecorator.cacheMiddleware(
-      defaultCacheDuration,
-      lookupKeyDurationInReq,
-    ),
     async (req, res) => {
       log.trace(`Got request: ${JSON.stringify(req.body, null, 2)}`);
+      // always use cosmoshub for simplicity
       const chainNode = await models.ChainNode.findOne({
         where: { cosmos_chain_id: 'cosmoshub' },
       });
