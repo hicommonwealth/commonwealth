@@ -15,7 +15,7 @@ type ValidateOwnerOptions = {
   entity?: ThreadAttributes | CommentAttributes;
   allowMod?: boolean;
   allowAdmin?: boolean;
-  allowGodMode?: boolean;
+  allowSuperAdmin?: boolean;
 };
 
 export const validateOwner = async ({
@@ -25,10 +25,10 @@ export const validateOwner = async ({
   entity,
   allowMod,
   allowAdmin,
-  allowGodMode,
+  allowSuperAdmin,
 }: ValidateOwnerOptions): Promise<boolean> => {
-  // god mode
-  if (allowGodMode && user.isAdmin) {
+  // super admin mode
+  if (allowSuperAdmin && user.isAdmin) {
     return true;
   }
 

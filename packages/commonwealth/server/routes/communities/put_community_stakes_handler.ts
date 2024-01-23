@@ -33,7 +33,7 @@ export const putCommunityStakeHandler = async (
     communityId: community_id,
     allowMod: false,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
 
   if (!isAdmin) {
