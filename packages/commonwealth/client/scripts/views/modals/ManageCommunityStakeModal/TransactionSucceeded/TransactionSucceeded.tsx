@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { notifySuccess } from 'controllers/app/notifications';
 import app from 'state';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -13,6 +12,7 @@ import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
 import { ManageCommunityStakeModalMode } from '../types';
 
+import { saveToClipboard } from 'utils/clipboard';
 import './TransactionSucceeded.scss';
 
 interface TransactionSucceededProps {
@@ -29,12 +29,7 @@ const TransactionSucceeded = ({
   };
 
   const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText('link to copy');
-      notifySuccess('Link copied');
-    } catch (err) {
-      console.log(err);
-    }
+    await saveToClipboard('link to copy', true);
   };
 
   const conditionalText =
@@ -75,7 +70,7 @@ const TransactionSucceeded = ({
 
         <div className="under-divider">
           <CWText type="caption">
-            Don’t trust, verify. Track your transaction on Etherscan.
+            Don&apos;t trust, verify. Track your transaction on Etherscan.
           </CWText>
           <div className="buttons-row">
             <CWButton
