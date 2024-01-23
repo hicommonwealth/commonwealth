@@ -138,7 +138,7 @@ export async function __createThread(
     user,
     communityId: community.id,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     const { isValid, message } = await validateTopicGroupsMembership(

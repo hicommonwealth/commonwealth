@@ -42,7 +42,7 @@ export async function __updateTopicsOrder(
     communityId: community.id,
     allowMod: true,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdminOrMod) {
     throw new AppError(Errors.NoPermission);

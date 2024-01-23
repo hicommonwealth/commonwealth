@@ -35,7 +35,7 @@ const createDiscordBotConfig = async (
     user: req.user,
     communityId: community_id,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError(CreateDiscordBotConfigErrors.NotAdmin);

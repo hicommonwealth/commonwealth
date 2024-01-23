@@ -81,7 +81,7 @@ export async function __createThreadReaction(
     communityId: community.id,
     entity: thread,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     const { isValid, message } = await validateTopicGroupsMembership(

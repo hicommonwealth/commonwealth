@@ -65,7 +65,7 @@ const editTopic = async (
     user: req.user,
     communityId: chain.id,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     return next(new AppError(Errors.NotAdmin));

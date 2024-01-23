@@ -54,7 +54,7 @@ export async function createCommunityContractTemplateAndMetadata(
     user: req.user,
     communityId: chain_id,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError('Must be admin');
@@ -199,7 +199,7 @@ export async function updateCommunityContractTemplate(
       user: req.user,
       communityId: chain_id,
       allowAdmin: true,
-      allowGodMode: true,
+      allowSuperAdmin: true,
     });
     if (!isAdmin) {
       throw new AppError('Must be admin');
@@ -271,7 +271,7 @@ export async function deleteCommunityContractTemplate(
       user: req.user,
       communityId: chain_id,
       allowAdmin: true,
-      allowGodMode: true,
+      allowSuperAdmin: true,
     });
     if (!isAdmin) {
       throw new AppError('Must be admin');
@@ -414,7 +414,7 @@ export async function updateCommunityContractTemplateMetadata(
       user: req.user,
       communityId: req.body.chain_id,
       allowAdmin: true,
-      allowGodMode: true,
+      allowSuperAdmin: true,
     });
     if (!isAdmin) {
       throw new AppError('Must be admin');
@@ -475,7 +475,7 @@ export async function deleteCommunityContractTemplateMetadata(
       user: req.user,
       communityId: req.body.chain_id,
       allowAdmin: true,
-      allowGodMode: true,
+      allowSuperAdmin: true,
     });
     if (!isAdmin) {
       throw new AppError('Must be admin');

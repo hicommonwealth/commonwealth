@@ -45,7 +45,7 @@ export async function __deletePoll(
     communityId: community.id,
     entity: thread,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isThreadOwnerOrAdmin) {
     throw new AppError(Errors.NotAuthor);

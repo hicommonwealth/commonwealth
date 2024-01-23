@@ -81,9 +81,9 @@ export async function __createCommentReaction(
     community.id,
     ['admin'],
   );
-  const isGodMode = user.isAdmin;
+  const isSuperAdmin = user.isAdmin;
   const hasAdminRole = addressAdminRoles.length > 0;
-  if (!isGodMode && !hasAdminRole) {
+  if (!isSuperAdmin && !hasAdminRole) {
     let canReact = false;
     try {
       const { isValid } = await validateTopicGroupsMembership(
