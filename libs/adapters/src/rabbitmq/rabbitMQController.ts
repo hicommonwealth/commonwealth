@@ -1,7 +1,8 @@
-import { logger } from '@hicommonwealth/core';
+import { logger, stats } from '@hicommonwealth/core';
 import * as Rascal from 'rascal';
 import type Rollbar from 'rollbar';
 import type { Sequelize } from 'sequelize';
+import { HotShotsStats } from '../hot-shots';
 import { TypescriptLoggingLogger } from '../typescript-logging';
 import type {
   RascalPublications,
@@ -12,6 +13,7 @@ import type {
 import { AbstractRabbitMQController, RmqMsgFormatError } from './types';
 
 const log = logger(TypescriptLoggingLogger()).getLogger(__filename);
+stats(HotShotsStats());
 
 export class RabbitMQControllerError extends Error {
   constructor(msg: string) {

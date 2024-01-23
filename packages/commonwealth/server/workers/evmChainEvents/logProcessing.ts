@@ -1,6 +1,5 @@
 import { Log } from '@ethersproject/providers';
-import { StatsDController } from '@hicommonwealth/adapters';
-import { logger as _logger } from '@hicommonwealth/core';
+import { logger as _logger, stats } from '@hicommonwealth/core';
 import { ethers } from 'ethers';
 import { rollbar } from '../../util/rollbar';
 import {
@@ -105,7 +104,7 @@ export async function parseLogs(
       rollbar.error(msg, e);
       continue;
     }
-    StatsDController.get().increment('ce.evm.event', {
+    stats().increment('ce.evm.event', {
       contractAddress: address,
       kind: signature.kind,
     });

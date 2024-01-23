@@ -1,6 +1,6 @@
 import { logger } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import fetch from 'node-fetch';
-import type { DB } from '../models';
 
 const log = logger().getLogger(__filename);
 

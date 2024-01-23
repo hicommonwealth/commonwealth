@@ -37,7 +37,7 @@ describe('Subscription Mapping Tests', () => {
       const uniqueSubData = mapNotificationsDataToSubscriptions(notification);
       expect(uniqueSubData).to.deep.equal({
         category_id: NotificationCategories.NewThread,
-        chain_id: chain,
+        community_id: chain,
       });
     });
 
@@ -173,7 +173,7 @@ describe('Subscription Mapping Tests', () => {
       const uniqueSubData = mapNotificationsDataToSubscriptions(notification);
       expect(uniqueSubData).to.deep.equal({
         category_id: NotificationCategories.ChainEvent,
-        chain_id: chain,
+        community_id: chain,
       });
     });
 

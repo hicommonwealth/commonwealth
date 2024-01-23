@@ -5,11 +5,11 @@ require('dotenv').config();
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 
+import { models } from '@hicommonwealth/model';
 import faker from 'faker';
 import jwt from 'jsonwebtoken';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import models from '../../../server/database';
 import Errors from '../../../server/routes/webhooks/errors';
 import * as modelUtils from '../../util/modelUtils';
 

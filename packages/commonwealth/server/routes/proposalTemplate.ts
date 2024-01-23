@@ -1,8 +1,10 @@
 import { AppError } from '@hicommonwealth/adapters';
+import type {
+  CommunityContractTemplateAttributes,
+  CommunityContractTemplateMetadataAttributes,
+  DB,
+} from '@hicommonwealth/model';
 import type { Request, Response } from 'express';
-import type { DB } from '../models';
-import type { CommunityContractTemplateMetadataAttributes } from '../models/community_contract_metadata';
-import type { CommunityContractTemplateAttributes } from '../models/community_contract_template';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { validateOwner } from '../util/validateOwner';

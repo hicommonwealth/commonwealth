@@ -1,7 +1,10 @@
 import { AppError } from '@hicommonwealth/adapters';
-import { CommunityInstance } from '../../models/community';
-import { TopicAttributes, TopicInstance } from '../../models/topic';
-import { UserInstance } from '../../models/user';
+import {
+  CommunityInstance,
+  TopicAttributes,
+  TopicInstance,
+  UserInstance,
+} from '@hicommonwealth/model';
 import { validateOwner } from '../../util/validateOwner';
 import { ServerTopicsController } from '../server_topics_controller';
 

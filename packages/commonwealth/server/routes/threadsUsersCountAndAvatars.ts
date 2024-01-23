@@ -1,9 +1,9 @@
 import { logger } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
+import { sequelize } from '@hicommonwealth/model';
 import type { Request, Response } from 'express';
 import { groupBy } from 'lodash';
 import { QueryTypes } from 'sequelize';
-import { sequelize } from '../database';
-import type { DB } from '../models';
 
 const log = logger().getLogger(__filename);
 

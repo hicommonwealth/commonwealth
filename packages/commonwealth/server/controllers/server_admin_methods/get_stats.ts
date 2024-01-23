@@ -1,7 +1,6 @@
 import { AppError } from '@hicommonwealth/adapters';
+import { CommunityAttributes, UserInstance } from '@hicommonwealth/model';
 import { Op, QueryTypes, WhereOptions } from 'sequelize';
-import { CommunityAttributes } from '../../models/community';
-import { UserInstance } from '../../models/user';
 import { ServerAdminController } from '../server_admin_controller';
 
 export const Errors = {
@@ -24,6 +23,8 @@ export type GetStatsResult = {
     numProposalVotesLastMonth: number;
     numMembersLastMonth: number;
     numGroupsLastMonth: number;
+    averageAddressesPerCommunity: number;
+    populatedCommunities: number;
   };
 };
 
@@ -77,6 +78,8 @@ export async function __getStats(
     numPollsLastMonth,
     numMembersLastMonth,
     numGroupsLastMonth,
+    [{ result: averageAddressesPerCommunity }],
+    [{ result: populatedCommunities }],
   ] = await Promise.all([
     this.models.sequelize.query<{ id: string }>(
       `SELECT id FROM "Communities" WHERE created_at >= NOW() - INTERVAL '30 days'`,
@@ -103,6 +106,30 @@ export async function __getStats(
     this.models.Group.count({
       where: whereCommunityId,
     }),
+    this.models.sequelize.query<{ result: number }>(
+      `
+      SELECT AVG(address_count) as result
+      FROM (
+          SELECT "Communities".id, COUNT("Addresses".id) as address_count
+          FROM "Communities"
+          JOIN "Addresses" ON "Addresses".community_id = "Communities".id
+          GROUP BY "Communities".id
+      ) as _;
+    `,
+      { type: QueryTypes.SELECT },
+    ),
+    this.models.sequelize.query<{ result: number }>(
+      `
+        SELECT COUNT(communities_count) as result FROM (
+          SELECT "Communities".id
+          FROM "Communities"
+          JOIN "Addresses" ON "Addresses".community_id = "Communities".id
+          GROUP BY "Communities".id
+          HAVING COUNT("Addresses".id) > 2
+        ) as communities_count;
+      `,
+      { type: QueryTypes.SELECT },
+    ),
   ]);
 
   return {
@@ -115,6 +142,8 @@ export async function __getStats(
       numPollsLastMonth,
       numMembersLastMonth,
       numGroupsLastMonth,
+      averageAddressesPerCommunity,
+      populatedCommunities,
     },
   };
 }

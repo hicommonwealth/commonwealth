@@ -1,11 +1,11 @@
 import { RedisCache } from '@hicommonwealth/adapters';
 import { NotificationCategories } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { Sequelize } from 'sequelize';
 import sinon from 'sinon';
 import { resetDatabase } from '../../server-test';
-import models from '../../server/database';
 import DatabaseCleaner from '../../server/util/databaseCleaner';
 
 chai.use(chaiHttp);
@@ -158,14 +158,14 @@ describe('DatabaseCleaner Tests', () => {
       await models.Notification.create({
         notification_data: 'testing',
         created_at: hundredDaysAgo,
-        chain_id: 'ethereum',
+        community_id: 'ethereum',
         category_id: 'new-thread-creation',
       });
 
       // create new notification
       await models.Notification.create({
         notification_data: 'testing',
-        chain_id: 'ethereum',
+        community_id: 'ethereum',
         created_at: eightyEightDaysAgo,
         category_id: 'new-thread-creation',
       });
@@ -219,7 +219,7 @@ describe('DatabaseCleaner Tests', () => {
       const newSub = await models.Subscription.create({
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewThread,
-        chain_id: 'ethereum',
+        community_id: 'ethereum',
         is_active: true,
         immediate_email: false,
       });
@@ -227,7 +227,7 @@ describe('DatabaseCleaner Tests', () => {
       const oldSub = await models.Subscription.create({
         subscriber_id: oldUser.id,
         category_id: NotificationCategories.NewThread,
-        chain_id: 'ethereum',
+        community_id: 'ethereum',
         is_active: true,
         immediate_email: false,
       });

@@ -1,7 +1,7 @@
 import { ServerError } from '@hicommonwealth/adapters';
 import { logger } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import type { DB } from '../models';
 
 const log = logger().getLogger(__filename);
 

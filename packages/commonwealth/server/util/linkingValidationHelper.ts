@@ -1,6 +1,5 @@
+import { AddressInstance, DB } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import { DB } from 'server/models';
-import { AddressInstance } from 'server/models/address';
 import { findAllRoles } from './roles';
 
 export const Errors = {

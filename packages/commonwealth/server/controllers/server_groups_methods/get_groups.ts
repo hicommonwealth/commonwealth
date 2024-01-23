@@ -1,8 +1,10 @@
+import {
+  CommunityInstance,
+  GroupAttributes,
+  MembershipAttributes,
+  TopicAttributes,
+} from '@hicommonwealth/model';
 import { Op, WhereOptions } from 'sequelize';
-import { GroupAttributes } from 'server/models/group';
-import { MembershipAttributes } from 'server/models/membership';
-import { TopicAttributes } from 'server/models/topic';
-import { CommunityInstance } from '../../models/community';
 import { ServerGroupsController } from '../server_groups_controller';
 
 export type GetGroupsOptions = {

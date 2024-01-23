@@ -1,8 +1,7 @@
 /* eslint-disable quotes */
 import { AppError, ServerError } from '@hicommonwealth/adapters';
+import type { DB, TopicInstance } from '@hicommonwealth/model';
 import type { NextFunction, Response } from 'express';
-import type { TopicInstance } from 'server/models/topic';
-import type { DB } from '../models';
 import { validateOwner } from '../util/validateOwner';
 
 enum OrderTopicsErrors {
