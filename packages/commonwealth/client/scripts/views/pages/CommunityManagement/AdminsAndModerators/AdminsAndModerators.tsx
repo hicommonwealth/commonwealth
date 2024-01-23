@@ -112,7 +112,7 @@ const AdminsAndModerators = () => {
 
   return (
     <CommunityManagementLayout
-      adminsAndModeratorsClass={adminsAndModeratorsClass}
+      className={adminsAndModeratorsClass}
       title="Admins and Moderators"
       description="Let's start with some basic information about your community"
       featureHint={{
