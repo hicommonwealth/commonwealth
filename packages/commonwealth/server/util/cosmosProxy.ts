@@ -109,7 +109,7 @@ function setupCosmosProxy(app: Express, models: DB) {
   // - POST / for node info
   // - GET /node_info for fetching chain status (used by magic iframe, and magic login flow)
   // - GET /auth/accounts/:address for fetching address status (use by magic iframe)
-  app.options('/magicCosmosAPI/:chain', (req, res, next) => {
+  app.options('/magicCosmosAPI/:chain', (req, res) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Private-Network', 'true');
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
@@ -143,19 +143,6 @@ function setupCosmosProxy(app: Express, models: DB) {
             req.body.method === 'abci_query' &&
             req.body.params.path === '/cosmos.auth.v1beta1.Query/Account'
           ) {
-            const hexToStr = (hex) =>
-              String.fromCharCode(
-                ...hex.match(/.{1,2}/g).map((c) => parseInt(c, 16)),
-              )
-                .replace('-', '')
-                .replace(/\n/g, '');
-
-            // TODO: validate?
-            const cosmosAddress = hexToStr(req.body.params.data);
-
-            // magicCosmosAPI is CORS-approved for the magic iframe
-            res.setHeader('Access-Control-Allow-Origin', '*');
-
             // TODO: stub out value, get block height
             response = {
               data: JSON.stringify({
@@ -168,8 +155,8 @@ function setupCosmosProxy(app: Express, models: DB) {
                     info: '',
                     index: '0',
                     key: null,
-                    value:
-                      'ClcKIC9jb3Ntb3MuYXV0aC52MWJldGExLkJhc2VBY2NvdW50EjMKLWNvc21vczFyYXpsM2gyZWo0dDZrbmVqOGttd2R2Y2xraGV0ZHVyemp6Z211Yxjih20=',
+                    value: `ClcKIC9jb3Ntb3MuYXV0aC52MWJldGExLkJhc2VBY2NvdW50EjMKLWNvc
+                    21vczFyYXpsM2gyZWo0dDZrbmVqOGttd2R2Y2xraGV0ZHVyemp6Z211Yxjih20=`,
                     proofOps: null,
                     height: '17101151',
                     codespace: '',

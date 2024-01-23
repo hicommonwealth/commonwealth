@@ -417,7 +417,7 @@ async function magicLoginRoute(
           },
         ],
       });
-      log.info(
+      log.trace(
         `DECODED LOGGED IN USER: ${JSON.stringify(loggedInUser, null, 2)}`,
       );
       if (!loggedInUser) {
@@ -431,7 +431,6 @@ async function magicLoginRoute(
   const magicUserMetadata = await magic.users.getMetadataByIssuer(
     decodedMagicToken.issuer,
   );
-
   log.trace(
     `MAGIC USER METADATA: ${JSON.stringify(magicUserMetadata, null, 2)}`,
   );
