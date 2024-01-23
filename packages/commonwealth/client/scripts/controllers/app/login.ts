@@ -324,7 +324,7 @@ async function constructMagic(isCosmos: boolean, chain?: string) {
           new OAuthExtension(),
           new CosmosExtension({
             // Magic has a strict cross-origin policy that restricts rpcs to whitelisted URLs,
-            // so make sure cosmoshub's ChainNode url is whitelisted in Magic dashboard.
+            // so make sure this is whitelisted in Magic dashboard.
             rpcUrl: `${document.location.origin}/magicCosmosAPI/${chain}`,
           }),
         ],
