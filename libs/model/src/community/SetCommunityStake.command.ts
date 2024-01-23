@@ -26,7 +26,7 @@ export const SetCommunityStake: CommandMetadata<
   // !authorization
   middleware: [isCommunityAdmin],
   // !core domain logic
-  fn: async (actor, id, payload) => {
+  fn: async (id, payload) => {
     // !load aggregate by id
     const community = await models.Community.findOne({
       where: { id },

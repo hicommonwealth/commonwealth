@@ -26,9 +26,9 @@ export type Actor = {
  * @param payload command payload
  */
 export type Command<M extends ZodSchema, R> = (
-  actor: Actor,
   id: string,
   payload: z.infer<M>,
+  actor: Actor,
 ) => Promise<R>;
 
 /**
@@ -43,7 +43,7 @@ export type ActorMiddleware = (actor: Actor) => Promise<Actor | string>;
  * Command definition
  */
 export type CommandMetadata<M extends ZodSchema, R> = {
-  fn: Command<M, R>;
   schema: M;
   middleware?: ActorMiddleware[];
+  fn: Command<M, R>;
 };

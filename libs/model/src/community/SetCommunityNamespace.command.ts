@@ -15,7 +15,7 @@ export const SetCommunityNamespace: CommandMetadata<
 > = {
   schema,
   middleware: [isCommunityAdmin],
-  fn: async (actor, id, payload) => {
+  fn: async (id, payload) => {
     const community = await models.Community.findOne({ where: { id } });
     if (!community) throw new InvalidInput('Community not found');
 

@@ -37,9 +37,9 @@ export const command = async <M extends ZodSchema, R>(
 ): Promise<R> => {
   try {
     return md.fn(
-      await validate(actor, md.middleware || []),
       id,
       md.schema.parse(payload),
+      await validate(actor, md.middleware || []),
     );
   } catch (error) {
     if (error instanceof Error && error.name === 'ZodError') {
