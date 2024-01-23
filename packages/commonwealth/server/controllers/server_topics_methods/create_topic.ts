@@ -54,7 +54,7 @@ export async function __createTopic(
     communityId: community.id,
     allowMod: true,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
 
   if (!isAdmin) {

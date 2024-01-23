@@ -54,7 +54,7 @@ export async function __updateGroup(
     communityId: community.id,
     allowMod: true,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError(Errors.Unauthorized);

@@ -27,7 +27,7 @@ const updateBanner = async (
     user: req.user,
     communityId: chain.id,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError(UpdateBannerErrors.NoPermission);
