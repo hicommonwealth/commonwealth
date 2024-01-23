@@ -220,6 +220,7 @@ export const CWContentPage = ({
         body(
           <ThreadOptions
             upvoteBtnVisible={!thread?.readOnly}
+            upvoteDrawerBtnBelow={true}
             commentBtnVisible={!thread?.readOnly}
             thread={thread}
             totalComments={thread?.numberOfComments}

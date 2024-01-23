@@ -1,4 +1,5 @@
 export type ReactionType = 'like';
+import type moment from 'moment';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class Reaction {
@@ -13,6 +14,8 @@ class Reaction {
   public readonly canvasAction: string;
   public readonly canvasSession: string;
   public readonly canvasHash: string;
+  public readonly updatedAt: moment.Moment;
+
   public calculatedVotingWeight: number;
   // TODO: Do thread/comment/proposal ids ever appear as strings?
 
@@ -28,6 +31,7 @@ class Reaction {
     canvas_session,
     canvas_hash,
     calculated_voting_weight,
+    updated_at,
   }) {
     this.id = id;
     this.author = Address.address;
@@ -41,6 +45,7 @@ class Reaction {
     this.canvasSession = canvas_session;
     this.canvasHash = canvas_hash;
     this.calculatedVotingWeight = calculated_voting_weight;
+    this.updatedAt = updated_at;
   }
 }
 

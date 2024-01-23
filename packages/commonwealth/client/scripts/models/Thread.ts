@@ -61,7 +61,7 @@ function processAssociatedReactions(
   const allHaveTimestamps =
     tempReactionTimestamps.length === tempReactionIds.length;
   const tempVotingWeights = reactions
-    ? reactions.map((r) => r?.calculated_voting_weight || 0)
+    ? reactions.map((r) => r?.calculated_voting_weight)
     : [];
   const allHaveVoteWeights =
     tempVotingWeights.length === tempReactionIds.length;

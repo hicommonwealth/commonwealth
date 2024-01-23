@@ -24,6 +24,7 @@ type OptionsProps = AdminActionsProps & {
   totalComments?: number;
   disabledActionTooltipText?: string;
   onCommentBtnClick?: () => any;
+  upvoteDrawerBtnBelow?: boolean;
 };
 
 export const ThreadOptions = ({
@@ -48,6 +49,7 @@ export const ThreadOptions = ({
   hasPendingEdits,
   disabledActionTooltipText = '',
   onCommentBtnClick = () => null,
+  upvoteDrawerBtnBelow,
 }: OptionsProps) => {
   const [isSubscribed, setIsSubscribed] = useState(
     thread &&
@@ -132,7 +134,9 @@ export const ThreadOptions = ({
             />
           )}
         </div>
-        <ViewUpvotesDrawer contentType="thread" thread={thread} />
+        {upvoteDrawerBtnBelow && (
+          <ViewUpvotesDrawer contentType="thread" thread={thread} />
+        )}
       </div>
       {thread && <></>}
     </>

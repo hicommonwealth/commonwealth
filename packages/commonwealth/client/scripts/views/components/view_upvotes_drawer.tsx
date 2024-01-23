@@ -18,9 +18,24 @@ export const ViewUpvotesDrawer = ({
   thread,
   comment,
 }: ViewUpvotesDrawerProps) => {
+  const contentKeys = {
+    thread: {
+      addrKey: 'address',
+      updatedAtKey: 'updated_at',
+      voteWeightKey: 'voting_weight',
+    },
+    comment: {
+      addrKey: 'author',
+      updatedAtKey: 'updatedAt',
+      voteWeightKey: 'calculatedVotingWeight',
+    },
+  };
+
+  const typeKeys = contentKeys[contentType];
+
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState(false);
-  const reactors = thread?.associatedReactions;
-  const reactorAddresses = reactors?.map((t) => t.address);
+  const reactors = thread?.associatedReactions || comment?.reactions;
+  const reactorAddresses = reactors?.map((t) => t[typeKeys['addrKey']]);
 
   const { data: reactorProfiles } = useFetchProfilesByAddressesQuery({
     currentChainId: app.activeChainId(),
@@ -29,14 +44,16 @@ export const ViewUpvotesDrawer = ({
   });
 
   const reactorData = reactorProfiles?.map((profile) => {
-    const reactor = reactors.find((addr) => addr.address === profile.address);
+    const reactor = reactors.find(
+      (addr) => addr[typeKeys['addrKey']] === profile.address,
+    );
 
     return {
       name: profile.name,
       avatarUrl: profile.avatarUrl,
       address: profile.address,
-      updated_at: reactor?.updated_at,
-      voting_weight: reactor?.voting_weight,
+      updated_at: reactor?.[typeKeys['updatedAtKey']],
+      voting_weight: reactor?.[typeKeys['voteWeightKey']] || 0,
     };
   });
 
