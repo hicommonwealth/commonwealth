@@ -1,17 +1,18 @@
 import { AppError } from '@hicommonwealth/adapters';
 import type { ContractType } from '@hicommonwealth/core';
 import { AbiType } from '@hicommonwealth/core';
-import { Transaction } from 'sequelize';
-import type { ContractAbiInstance } from 'server/models/contract_abi';
-import type { DB } from '../../models';
-import type { ChainNodeAttributes } from '../../models/chain_node';
 import type {
+  ChainNodeAttributes,
+  ContractAbiInstance,
   ContractAttributes,
   ContractInstance,
-} from '../../models/contract';
+  DB,
+} from '@hicommonwealth/model';
+import { hashAbi } from '@hicommonwealth/model';
+import { Transaction } from 'sequelize';
 import type { TypedRequestBody, TypedResponse } from '../../types';
 import { success } from '../../types';
-import validateAbi, { hashAbi } from '../../util/abiValidation';
+import validateAbi from '../../util/abiValidation';
 import { validateOwner } from '../../util/validateOwner';
 
 export const Errors = {
@@ -105,7 +106,7 @@ const createContract = async (
     user: req.user,
     communityId: chain_id,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError('Must be admin');

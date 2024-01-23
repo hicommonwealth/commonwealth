@@ -1,8 +1,10 @@
 import { AppError } from '@hicommonwealth/adapters';
+import {
+  CommunityInstance,
+  TopicAttributes,
+  UserInstance,
+} from '@hicommonwealth/model';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { CommunityInstance } from '../../models/community';
-import { TopicAttributes } from '../../models/topic';
-import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_methods/track';
 import { ServerTopicsController } from '../server_topics_controller';
@@ -40,7 +42,7 @@ export async function __updateTopic(
     communityId: community.id,
     allowMod: true,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError(Errors.NotAdmin);

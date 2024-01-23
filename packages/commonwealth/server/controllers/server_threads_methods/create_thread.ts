@@ -2,12 +2,14 @@ import moment from 'moment';
 
 import { AppError } from '@hicommonwealth/adapters';
 import { NotificationCategories, ProposalType } from '@hicommonwealth/core';
+import {
+  AddressInstance,
+  CommunityInstance,
+  ThreadAttributes,
+  UserInstance,
+} from '@hicommonwealth/model';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
-import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/community';
-import { ThreadAttributes } from '../../models/thread';
-import { UserInstance } from '../../models/user';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
@@ -138,7 +140,7 @@ export async function __createThread(
     user,
     communityId: community.id,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     const { isValid, message } = await validateTopicGroupsMembership(
@@ -184,20 +186,22 @@ export async function __createThread(
   // -----
 
   // auto-subscribe thread creator to comments & reactions
-  await this.models.Subscription.create({
-    subscriber_id: user.id,
-    category_id: NotificationCategories.NewComment,
-    thread_id: finalThread.id,
-    chain_id: finalThread.community_id,
-    is_active: true,
-  });
-  await this.models.Subscription.create({
-    subscriber_id: user.id,
-    category_id: NotificationCategories.NewReaction,
-    thread_id: finalThread.id,
-    chain_id: finalThread.community_id,
-    is_active: true,
-  });
+  await this.models.Subscription.bulkCreate([
+    {
+      subscriber_id: user.id,
+      category_id: NotificationCategories.NewComment,
+      thread_id: finalThread.id,
+      community_id: finalThread.community_id,
+      is_active: true,
+    },
+    {
+      subscriber_id: user.id,
+      category_id: NotificationCategories.NewReaction,
+      thread_id: finalThread.id,
+      community_id: finalThread.community_id,
+      is_active: true,
+    },
+  ]);
 
   // grab mentions to notify tagged users
   const bodyText = decodeURIComponent(body);

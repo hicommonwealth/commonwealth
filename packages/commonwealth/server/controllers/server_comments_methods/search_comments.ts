@@ -1,6 +1,6 @@
+import { CommunityInstance } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from 'server/types';
-import { CommunityInstance } from '../../models/community';
 import {
   PaginationSqlOptions,
   buildPaginatedResponse,

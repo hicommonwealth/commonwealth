@@ -1,9 +1,11 @@
 import { AppError } from '@hicommonwealth/adapters';
+import {
+  AddressInstance,
+  CommunityInstance,
+  UserInstance,
+  sequelize,
+} from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import { sequelize } from '../../database';
-import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/community';
-import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
@@ -31,7 +33,7 @@ export async function __deleteGroup(
     communityId: community.id,
     allowMod: true,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError(Errors.Unauthorized);

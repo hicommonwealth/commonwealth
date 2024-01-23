@@ -1,8 +1,10 @@
 import { AppError } from '@hicommonwealth/adapters';
+import type {
+  CommunityContractTemplateAttributes,
+  CommunityContractTemplateMetadataAttributes,
+  DB,
+} from '@hicommonwealth/model';
 import type { Request, Response } from 'express';
-import type { DB } from '../models';
-import type { CommunityContractTemplateMetadataAttributes } from '../models/community_contract_metadata';
-import type { CommunityContractTemplateAttributes } from '../models/community_contract_template';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { validateOwner } from '../util/validateOwner';
@@ -54,7 +56,7 @@ export async function createCommunityContractTemplateAndMetadata(
     user: req.user,
     communityId: chain_id,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError('Must be admin');
@@ -199,7 +201,7 @@ export async function updateCommunityContractTemplate(
       user: req.user,
       communityId: chain_id,
       allowAdmin: true,
-      allowGodMode: true,
+      allowSuperAdmin: true,
     });
     if (!isAdmin) {
       throw new AppError('Must be admin');
@@ -271,7 +273,7 @@ export async function deleteCommunityContractTemplate(
       user: req.user,
       communityId: chain_id,
       allowAdmin: true,
-      allowGodMode: true,
+      allowSuperAdmin: true,
     });
     if (!isAdmin) {
       throw new AppError('Must be admin');
@@ -414,7 +416,7 @@ export async function updateCommunityContractTemplateMetadata(
       user: req.user,
       communityId: req.body.chain_id,
       allowAdmin: true,
-      allowGodMode: true,
+      allowSuperAdmin: true,
     });
     if (!isAdmin) {
       throw new AppError('Must be admin');
@@ -475,7 +477,7 @@ export async function deleteCommunityContractTemplateMetadata(
       user: req.user,
       communityId: req.body.chain_id,
       allowAdmin: true,
-      allowGodMode: true,
+      allowSuperAdmin: true,
     });
     if (!isAdmin) {
       throw new AppError('Must be admin');

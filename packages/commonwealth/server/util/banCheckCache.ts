@@ -1,7 +1,7 @@
 // Helper function to look up a scope, i.e. a chain XOR community.
 import { JobRunner } from '@hicommonwealth/adapters';
 // If a community is found, also check that the user is allowed to see it.
-import type { DB } from '../models';
+import type { DB } from '@hicommonwealth/model';
 
 export const BanErrors = {
   NoAddress: 'Address not found',

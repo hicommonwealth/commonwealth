@@ -1,6 +1,5 @@
 import { AppError } from '@hicommonwealth/adapters';
-import type { DB } from '../models';
-import type { BanAttributes, BanInstance } from '../models/ban';
+import type { BanAttributes, BanInstance, DB } from '@hicommonwealth/model';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { validateOwner } from '../util/validateOwner';
@@ -31,7 +30,7 @@ const banAddress = async (
     user: req.user,
     communityId: chain.id,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError(BanAddressErrors.NoPermission);

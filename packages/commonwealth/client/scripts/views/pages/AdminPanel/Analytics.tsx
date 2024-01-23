@@ -18,6 +18,8 @@ type Stats = {
   numProposalVotesLastMonth: number;
   numMembersLastMonth: number;
   numGroupsLastMonth: number;
+  averageAddressesPerCommunity: number;
+  populatedCommunities: number;
 };
 
 const Analytics = () => {
@@ -150,6 +152,22 @@ const Analytics = () => {
                 <CWText fontWeight="medium">Total New Groups</CWText>
                 <CWText className="StatValue">
                   {globalStats?.numGroupsLastMonth}
+                </CWText>
+              </div>
+              <div className="Stat">
+                <CWText fontWeight="medium">
+                  Average Addresses Per Community
+                </CWText>
+                <CWText className="StatValue">
+                  {Math.round(globalStats?.averageAddressesPerCommunity)}
+                </CWText>
+              </div>
+              <div className="Stat">
+                <CWText fontWeight="medium">
+                  {'Total Communities with > 2 addresses'}
+                </CWText>
+                <CWText className="StatValue">
+                  {Math.round(globalStats?.populatedCommunities)}
                 </CWText>
               </div>
             </div>

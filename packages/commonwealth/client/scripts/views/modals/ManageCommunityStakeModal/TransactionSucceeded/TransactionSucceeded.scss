@@ -1,0 +1,50 @@
+@import '../../../../../styles/shared.scss';
+
+.TransactionSucceeded {
+  .CWModalBody {
+    justify-content: center;
+    align-items: center;
+    min-height: 440px;
+
+    .emoji {
+      font-size: 28px;
+    }
+
+    .check-icon {
+      fill: $green-500;
+    }
+
+    .success-info {
+      display: inline;
+      padding-inline: 80px;
+      text-align: center;
+
+      @include smallInclusive {
+        padding-inline: 24px;
+      }
+
+      .Text {
+        display: inline;
+      }
+    }
+
+    .divider {
+      margin-block: 40px;
+    }
+
+    .under-divider {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .buttons-row {
+        margin-top: 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+    }
+  }
+}

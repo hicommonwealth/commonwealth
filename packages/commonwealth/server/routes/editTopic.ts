@@ -1,8 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import { AppError } from '@hicommonwealth/adapters';
+import type { DB, TopicAttributes } from '@hicommonwealth/model';
 import type { NextFunction } from 'express';
-import type { DB } from '../models';
-import type { TopicAttributes } from '../models/topic';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { validateOwner } from '../util/validateOwner';
@@ -65,7 +64,7 @@ const editTopic = async (
     user: req.user,
     communityId: chain.id,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     return next(new AppError(Errors.NotAdmin));

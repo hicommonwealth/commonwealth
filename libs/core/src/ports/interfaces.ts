@@ -18,6 +18,7 @@ export type AdapterFactory<T extends Disposable> = (adapter?: T) => T;
 
 /**
  * A logger port
+ * Logs messages at different levels
  */
 export interface ILogger {
   trace(msg: string, error?: Error): void;
@@ -29,7 +30,28 @@ export interface ILogger {
 }
 /**
  * Logger factory
+ * Builds a named logger
  */
 export interface Logger extends Disposable {
   getLogger(...ids: string[]): ILogger;
+}
+
+/**
+ * Stats port
+ * Records application stats in different forms,
+ * supporting histograms, counters, flags, and traces
+ */
+export interface Stats extends Disposable {
+  histogram(key: string, value: number, tags?: Record<string, string>): void;
+  // counters
+  set(key: string, value: number): void;
+  increment(key: string, tags?: Record<string, string>): void;
+  incrementBy(key: string, value: number, tags?: Record<string, string>): void;
+  decrement(key: string, tags?: Record<string, string>): void;
+  decrementBy(key: string, value: number, tags?: Record<string, string>): void;
+  // flags
+  on(key: string): void;
+  off(key: string): void;
+  // traces
+  timing(key: string, duration: number, tags?: Record<string, string>): void;
 }

@@ -1,7 +1,9 @@
 import { AppError } from '@hicommonwealth/adapters';
-import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/community';
-import { UserInstance } from '../../models/user';
+import {
+  AddressInstance,
+  CommunityInstance,
+  UserInstance,
+} from '@hicommonwealth/model';
 import { validateOwner } from '../../util/validateOwner';
 import { ServerThreadsController } from '../server_threads_controller';
 
@@ -45,7 +47,7 @@ export async function __deletePoll(
     communityId: community.id,
     entity: thread,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isThreadOwnerOrAdmin) {
     throw new AppError(Errors.NotAuthor);

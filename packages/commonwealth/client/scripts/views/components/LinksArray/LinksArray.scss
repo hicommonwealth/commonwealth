@@ -1,0 +1,22 @@
+@import '../../../../styles/shared';
+
+.LinksArray {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+
+  .add-link-button {
+    color: $neutral-600 !important;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    width: fit-content;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 16px;
+    letter-spacing: 0.32px;
+    margin-top: 16px;
+  }
+}

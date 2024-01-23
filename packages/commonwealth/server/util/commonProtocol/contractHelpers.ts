@@ -1,10 +1,10 @@
 import { AppError } from '@hicommonwealth/adapters';
 import { BalanceSourceType } from '@hicommonwealth/core/build/requirements-types';
+import { DB } from '@hicommonwealth/model';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
-import { DB } from '../../models';
 import { TokenBalanceCache } from '../tokenBalanceCache/tokenBalanceCache';
-import { factoryContracts, validChains } from './chainConfig';
+import { factoryContracts, ValidChains } from './chainConfig';
 
 export const getNamespace = async (
   web3: Web3,
@@ -12,25 +12,27 @@ export const getNamespace = async (
   factoryAddress: string,
 ): Promise<string> => {
   const factory = new web3.eth.Contract(
-    {
-      inputs: [
-        {
-          internalType: 'bytes32',
-          name: '',
-          type: 'bytes32',
-        },
-      ],
-      stateMutability: 'view',
-      type: 'function',
-      name: 'getNamespace',
-      outputs: [
-        {
-          internalType: 'address',
-          name: '',
-          type: 'address',
-        },
-      ],
-    } as AbiItem,
+    [
+      {
+        inputs: [
+          {
+            internalType: 'bytes32',
+            name: '',
+            type: 'bytes32',
+          },
+        ],
+        stateMutability: 'view',
+        type: 'function',
+        name: 'getNamespace',
+        outputs: [
+          {
+            internalType: 'address',
+            name: '',
+            type: 'address',
+          },
+        ],
+      },
+    ] as AbiItem[],
     factoryAddress,
   );
 
@@ -53,7 +55,7 @@ export const getNamespaceBalance = async (
   tbc: TokenBalanceCache,
   namespace: string,
   tokenId: number,
-  chain: validChains,
+  chain: ValidChains,
   address: string,
   model: DB,
 ): Promise<string> => {

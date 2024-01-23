@@ -1,11 +1,11 @@
 import { AppError } from '@hicommonwealth/adapters';
+import type { DB } from '@hicommonwealth/model';
 import type {
   TypedRequestBody,
   TypedRequestQuery,
   TypedResponse,
 } from 'server/types';
 import isValidJson from '../../shared/validateJson';
-import type { DB } from '../models';
 import { success } from '../types';
 import { validateOwner } from '../util/validateOwner';
 
@@ -47,7 +47,7 @@ export async function createTemplate(
     user: req.user,
     communityId: chain_id,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError('Must be admin');

@@ -1,7 +1,6 @@
 import { AppError } from '@hicommonwealth/adapters';
+import { CommunityInstance, UserInstance } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import { CommunityInstance } from '../../models/community';
-import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
 import { ServerTopicsController } from '../server_topics_controller';
 
@@ -30,7 +29,7 @@ export async function __updateTopicChannel(
     communityId: community.id,
     allowMod: true,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
 
   if (!isAdmin) {

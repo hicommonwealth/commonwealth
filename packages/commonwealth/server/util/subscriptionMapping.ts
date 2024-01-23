@@ -18,13 +18,13 @@ export function mapNotificationsDataToSubscriptions(
 ): Record<string, unknown> {
   const uniqueData = { category_id: notification.categoryId };
   if (notification.categoryId === NotificationCategories.ChainEvent) {
-    uniqueData['chain_id'] = notification.data.chain;
+    uniqueData['community_id'] = notification.data.chain;
   } else if (
     notification.categoryId === NotificationCategories.SnapshotProposal
   ) {
     uniqueData['snapshot_id'] = notification.data.space;
   } else if (notification.categoryId === NotificationCategories.NewThread) {
-    uniqueData['chain_id'] = notification.data.chain_id;
+    uniqueData['community_id'] = notification.data.chain_id;
   } else if (notification.categoryId === NotificationCategories.NewComment) {
     if (notification.data.parent_comment_id) {
       uniqueData['comment_id'] = notification.data.parent_comment_id;

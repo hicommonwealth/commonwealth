@@ -1,54 +1,66 @@
 import { AppError } from '@hicommonwealth/adapters';
-import { DB } from 'server/models';
+import { DB } from '@hicommonwealth/model';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
-import { factoryContracts, validChains } from './chainConfig';
+import { factoryContracts, ValidChains } from './chainConfig';
 import { getNamespace } from './contractHelpers';
 
-export const validateCommunitStakeConfig = async (
+export const validateCommunityStakeConfig = async (
   model: DB,
-  namespace: string,
+  communityId: string,
   id: number,
-  chain: validChains,
 ) => {
-  const factoryData = factoryContracts[chain];
-  const node = await model.ChainNode.findOne({
+  const community = await model.Community.findOne({
     where: {
-      eth_chain_id: factoryData.chainId,
+      id: communityId,
     },
-    attributes: ['url'],
+    include: [
+      {
+        model: model.ChainNode,
+        attributes: ['eth_chain_id', 'url'],
+      },
+    ],
+    attributes: ['namespace'],
   });
-  const web3 = new Web3(node.url);
+  if (!Object.values(ValidChains).includes(community.ChainNode.eth_chain_id)) {
+    throw new AppError(
+      "Community Stakes not configured for community's chain node",
+    );
+  }
+  const factoryData = factoryContracts[community.ChainNode.eth_chain_id];
+  const web3 = new Web3(community.ChainNode.url);
   const namespaceAddress = await getNamespace(
     web3,
-    namespace,
+    community.namespace,
     factoryData.factory,
   );
   const communityStakes = new web3.eth.Contract(
-    {
-      inputs: [
-        {
-          internalType: 'address',
-          name: '',
-          type: 'address',
-        },
-        {
-          internalType: 'uint256',
-          name: '',
-          type: 'uint256',
-        },
-      ],
-      stateMutability: 'view',
-      type: 'function',
-      name: 'whitelist',
-      outputs: [
-        {
-          internalType: 'bool',
-          name: '',
-          type: 'bool',
-        },
-      ],
-    } as AbiItem,
+    [
+      {
+        inputs: [
+          {
+            internalType: 'address',
+            name: '',
+            type: 'address',
+          },
+          {
+            internalType: 'uint256',
+            name: '',
+            type: 'uint256',
+          },
+        ],
+        stateMutability: 'view',
+        type: 'function',
+        name: 'whitelist',
+        outputs: [
+          {
+            internalType: 'bool',
+            name: '',
+            type: 'bool',
+          },
+        ],
+      },
+    ] as AbiItem[],
     factoryData.communityStake,
   );
   const whitelisted = await communityStakes.methods

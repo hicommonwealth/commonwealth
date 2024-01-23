@@ -1,12 +1,15 @@
 import { AppError } from '@hicommonwealth/adapters';
 import { Requirement } from '@hicommonwealth/core';
+import {
+  AddressInstance,
+  CommunityInstance,
+  GroupAttributes,
+  GroupMetadata,
+  UserInstance,
+  sequelize,
+} from '@hicommonwealth/model';
 import { Op } from 'sequelize';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { sequelize } from '../../database';
-import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/community';
-import { GroupAttributes, GroupMetadata } from '../../models/group';
-import { UserInstance } from '../../models/user';
 import validateMetadata from '../../util/requirementsModule/validateMetadata';
 import validateRequirements from '../../util/requirementsModule/validateRequirements';
 import { validateOwner } from '../../util/validateOwner';
@@ -44,7 +47,7 @@ export async function __createGroup(
     communityId: community.id,
     allowMod: true,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError(Errors.Unauthorized);

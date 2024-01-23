@@ -1,0 +1,79 @@
+$loader-pink: #ff80d7;
+$loader-blue: #0079cc;
+$size: 24px;
+
+@keyframes animation1 {
+  0% {
+    opacity: 0.7;
+    transform: translate(0, 0);
+  }
+  49.99% {
+    opacity: 0.7;
+    transform: translate($size, 0);
+  }
+  50% {
+    opacity: 0;
+    transform: translate($size, 0);
+  }
+  100% {
+    opacity: 0.5;
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes animation2 {
+  0% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate($size, 0);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+.LoadingSpinner {
+  width: fit-content;
+
+  &.center {
+    width: 100%;
+
+    .container {
+      margin-inline: auto;
+    }
+  }
+
+  .container {
+    width: 2 * $size;
+    height: $size;
+    position: relative;
+
+    .pink-1,
+    .blue,
+    .pink-2 {
+      position: absolute;
+      width: $size;
+      height: $size;
+      border-radius: 50%;
+    }
+
+    .pink-1 {
+      background: $loader-pink;
+      animation: animation2 1.4s linear infinite;
+      animation-delay: -0.7s;
+    }
+
+    .blue {
+      background: $loader-blue;
+      animation: animation2 1.4s linear infinite;
+      animation-delay: 0s;
+    }
+
+    .pink-2 {
+      background: $loader-pink;
+      animation: animation1 1.4s linear infinite;
+      animation-delay: -0.7s;
+    }
+  }
+}

@@ -17,6 +17,13 @@ const fetchGroups = async ({
   // includeMembers = false,
   includeTopics = false,
 }: FetchGroupsProps): Promise<Group[]> => {
+  // HACK:
+  // This returns early when communityId is falsy
+  // ideal solution would be to make the `enabled` prop of `useQuery`
+  // work, but for some reason, it messes up on the /members page.
+  // This early return however doesn't seem to messup cache on current page.
+  if (!communityId) return;
+
   const response = await axios.get(
     `${app.serverUrl()}${ApiEndpoints.FETCH_GROUPS}`,
     {

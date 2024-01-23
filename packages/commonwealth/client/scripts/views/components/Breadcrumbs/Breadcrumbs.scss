@@ -1,0 +1,304 @@
+@import '../../../../styles/shared';
+
+.Breadcrumbs {
+  align-items: center;
+  font-size: 0.875rem;
+  color: $neutral-400;
+  background-color: $white;
+  min-height: 40px;
+  padding: 2px 0px;
+  position: fixed;
+  width: 100%;
+  margin-top: -16px;
+  overflow: auto;
+  z-index: 3;
+
+  @include extraSmall {
+    position: static;
+    min-height: 40px;
+    margin-top: 0px;
+  }
+
+  .disable-active-cursor {
+    &:hover {
+      cursor: default;
+    }
+  }
+
+  .commonPadding {
+    display: flex;
+    flex-direction: row;
+    padding-left: 32px;
+
+    @include large {
+      padding-left: 56px;
+    }
+
+    @include medium {
+      padding-left: 40px;
+    }
+
+    @include small {
+      padding-left: 26px;
+    }
+
+    @include extraSmall {
+      padding-left: 26px;
+    }
+  }
+
+  .contracts {
+    display: flex;
+    flex-direction: row;
+    padding-left: 38px;
+
+    @include large {
+      padding-left: calc(20% - 14px);
+    }
+
+    @include medium {
+      padding-left: 72px;
+    }
+
+    @include small {
+      padding-left: 42px;
+    }
+
+    @include extraSmall {
+      padding-left: 26px;
+    }
+  }
+
+  .newContract {
+    display: flex;
+    flex-direction: row;
+    padding-left: 38px;
+
+    @include large {
+      padding-left: 24%;
+    }
+
+    @include medium {
+      padding-left: 160.5px;
+    }
+
+    @include small {
+      padding-left: 24px;
+    }
+
+    @include extraSmall {
+      padding-left: 24px;
+    }
+  }
+
+  .dashboard {
+    display: flex;
+    flex-direction: row;
+    padding-left: 32px;
+
+    @include large {
+      padding-left: 56px;
+    }
+
+    @include medium {
+      padding-left: 40px;
+    }
+
+    @include small {
+      padding-left: 18px;
+    }
+
+    @include extraSmall {
+      padding-left: 18px;
+    }
+  }
+
+  .explore-communities {
+    display: flex;
+    flex-direction: row;
+    padding-left: 50px;
+  }
+
+  .new-proposal {
+    display: flex;
+    flex-direction: row;
+    padding-left: 24px;
+  }
+
+  .new-thread {
+    display: flex;
+    flex-direction: row;
+    padding-left: 24px;
+  }
+
+  .notification-management {
+    display: flex;
+    flex-direction: row;
+
+    @include large {
+      padding-left: 178px;
+    }
+
+    @include mediumInclusive {
+      padding-left: 72px;
+    }
+
+    @include small {
+      padding-left: 56px;
+    }
+
+    @include extraSmall {
+      padding-left: 16px;
+    }
+  }
+
+  .discussion {
+    display: flex;
+    flex-direction: row;
+    padding-left: 36px;
+
+    @include large {
+      padding-left: 40px;
+    }
+
+    @include medium {
+      padding-left: 40px;
+    }
+
+    @include small {
+      padding-left: 16px;
+    }
+
+    @include extraSmall {
+      padding-left: 16px;
+    }
+  }
+
+  .discussions {
+    display: flex;
+    flex-direction: row;
+    padding-left: 36px;
+
+    @include large {
+      padding-left: 40px;
+    }
+
+    @include medium {
+      padding-left: 40px;
+    }
+
+    @include small {
+      padding-left: 24px;
+    }
+
+    @include extraSmall {
+      padding-left: 24px;
+    }
+  }
+
+  .members {
+    display: flex;
+    padding-left: 40px;
+    flex-direction: row;
+
+    @include large {
+      padding-left: 40px;
+    }
+
+    @include medium {
+      padding-left: 40px;
+    }
+
+    @include small {
+      padding-left: 16px;
+    }
+
+    @include extraSmall {
+      padding-left: 16px;
+    }
+  }
+
+  .governance {
+    display: flex;
+    padding-left: 24px;
+    flex-direction: row;
+  }
+
+  .admin {
+    display: flex;
+    padding: 8px 0px 8px 24px;
+  }
+
+  .analytics {
+    display: flex;
+    padding: 8px 0px 8px 36px;
+  }
+
+  .search {
+    display: flex;
+    align-items: center;
+    padding-left: 32px;
+    padding-top: 16px;
+
+    @include extraSmall {
+      padding-left: 8px;
+      margin-top: -8%;
+    }
+  }
+
+  .create-community {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    padding-left: 72px;
+    padding-top: 16px;
+
+    @include extraSmall {
+      padding-left: 16px;
+    }
+  }
+
+  .notifications {
+    display: flex;
+    flex-direction: row;
+    padding-left: 24px;
+  }
+
+  .viewProfile {
+    display: flex;
+    flex-direction: row;
+
+    @include large {
+      padding-left: 80px;
+    }
+
+    @include mediumInclusive {
+      padding-left: 72px;
+    }
+
+    @include mediumSmallInclusive {
+      padding-left: 48px;
+    }
+
+    @include smallInclusive {
+      padding-left: 32px;
+    }
+  }
+
+  .editProfile {
+    display: flex;
+    flex-direction: row;
+    margin-left: 50px;
+    @include mediumInclusive {
+      margin-left: 50px;
+    }
+
+    @include mediumSmallInclusive {
+      margin-left: 48px;
+    }
+
+    @include smallInclusive {
+      margin-left: 48px;
+    }
+  }
+}

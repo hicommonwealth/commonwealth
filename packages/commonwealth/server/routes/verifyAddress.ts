@@ -9,13 +9,15 @@ import {
   WalletSsoSource,
   logger,
 } from '@hicommonwealth/core';
+import type {
+  CommunityInstance,
+  DB,
+  ProfileAttributes,
+} from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { addressSwapper } from '../../shared/utils';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
-import type { DB } from '../models';
-import type { CommunityInstance } from '../models/community';
-import type { ProfileAttributes } from '../models/profile';
 import assertAddressOwnership from '../util/assertAddressOwnership';
 import verifySessionSignature from '../util/verifySessionSignature';
 
