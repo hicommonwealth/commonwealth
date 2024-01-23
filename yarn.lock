@@ -15699,6 +15699,18 @@ marked-footnote@^1.2.2:
   resolved "https://registry.yarnpkg.com/marked-footnote/-/marked-footnote-1.2.2.tgz#693404c3fbe93c70cb2afe4642803a65aaf9a4c7"
   integrity sha512-TFBEHwHLSSedub7P6XHHs+dMMOnDeNV5+kFDo4trU//gDd8iM57lg9jr9NGwDifPwLllHwKmFcRNp5uYvO2Fnw==
 
+marked-smartypants@1.1.5:
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/marked-smartypants/-/marked-smartypants-1.1.5.tgz#1ea079764ce47c963843c2f77b5a6cb85664f409"
+  integrity sha512-gp+IpDsthwcXJ/sWT8si7dGWL6Diag3Iy4+OOoMZnhjFAox9z77cWfqQUmwY9oP9XACWZeiBXvWW1TOjTbvwAw==
+  dependencies:
+    smartypants "^0.2.2"
+
+marked-xhtml@1.0.8:
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/marked-xhtml/-/marked-xhtml-1.0.8.tgz#358c17b939cd1e213c872f9370df583bf2a8bafd"
+  integrity sha512-wA0WnknsLYdI1sJ8wz4SM/5zDalsHj4EEj0eo6MtFP7r6aAoIDGNH/SdReIBIOGOV9KxdlLye4fSs3/26S4wMg==
+
 marked@^11.0.0:
   version "11.1.1"
   resolved "https://registry.yarnpkg.com/marked/-/marked-11.1.1.tgz#e1b2407241f744fb1935fac224680874d9aff7a3"
@@ -20474,6 +20486,11 @@ smart-truncate@^1.0.1:
   version "1.0.1"
   resolved "https://registry.npmjs.org/smart-truncate/-/smart-truncate-1.0.1.tgz"
   integrity sha512-f+kSLMDWKSCpYhwOZM+Da4d8klk5nY4gH57HOEOaaotsZEsTIm/51/9vKDNE26WjU72eBM1zEYdQl6uDwvZfLg==
+
+smartypants@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/smartypants/-/smartypants-0.2.2.tgz#ad7124d8eb9ab437906db1cd7bd7aaf49e5d9a42"
+  integrity sha512-TzobUYoEft/xBtb2voRPryAUIvYguG0V7Tt3de79I1WfXgCwelqVsGuZSnu3GFGRZhXR90AeEYIM+icuB/S06Q==
 
 snyk-config@^5.0.0:
   version "5.1.0"
