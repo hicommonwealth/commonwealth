@@ -8,7 +8,7 @@ import { CreateCommunityStep, handleChangeStep } from './utils';
 
 const useCreateCommunity = () => {
   const [createCommunityStep, setCreateCommunityStep] =
-    useState<CreateCommunityStep>(CreateCommunityStep.CommunityTypeSelection);
+    useState<CreateCommunityStep>(CreateCommunityStep.CommunityStake);
   const [selectedCommunity, setSelectedCommunity] = useState<SelectedCommunity>(
     { type: null, chainBase: null },
   );
