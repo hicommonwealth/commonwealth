@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import React, { ReactNode } from 'react';
-import { FormProvider, useForm, UseFormReturn } from 'react-hook-form';
+import React, { ReactNode, useEffect } from 'react';
+import { FormProvider, UseFormReturn, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 type FormProps = {
@@ -11,6 +11,8 @@ type FormProps = {
   className?: string;
   initialValues?: Object;
   validationSchema: z.Schema<any, any>;
+  watchlist?: string[];
+  onWatch?: (values: any) => void;
 };
 
 /**
@@ -25,12 +27,20 @@ const CWForm = ({
   children,
   className,
   initialValues,
+  onWatch,
 }: FormProps) => {
   const formMethods: UseFormReturn = useForm({
     resolver: zodResolver(validationSchema),
     defaultValues: initialValues,
     mode: 'all',
   });
+
+  useEffect(() => {
+    if (onWatch) {
+      const subscription = formMethods.watch(onWatch);
+      return () => subscription.unsubscribe();
+    }
+  }, [formMethods, onWatch]);
 
   const handleFormSubmit = async (event) => {
     // This will chain our custom onSubmit along with the react-hook-form's submit chain

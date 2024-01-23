@@ -1,15 +1,17 @@
-import AddressInfo from 'models/AddressInfo';
 import React, { useState } from 'react';
+
+import AddressInfo from 'models/AddressInfo';
 import { SelectedCommunity } from 'views/components/component_kit/new_designs/CWCommunitySelector';
 import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps';
+
 import { MixpanelCommunityCreationEvent } from '../../../../../shared/analytics/types';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
-
 import BasicInformationStep from './steps/BasicInformationStep';
+import { ETHEREUM_MAINNET_ID } from './steps/BasicInformationStep/BasicInformationForm/constants';
 import CommunityStakeStep from './steps/CommunityStakeStep';
 import CommunityTypeStep from './steps/CommunityTypeStep';
 import SuccessStep from './steps/SuccessStep';
-import { CreateCommunityStep, getFormSteps } from './utils';
+import { CreateCommunityStep, getFormSteps, handleChangeStep } from './utils';
 
 import './CreateCommunity.scss';
 
@@ -20,6 +22,7 @@ const CreateCommunity = () => {
     { type: null, chainBase: null },
   );
   const [selectedAddress, setSelectedAddress] = useState<AddressInfo>(null);
+  const [selectedChainId, setSelectedChainId] = useState(null);
   const [createdCommunityId, setCreatedCommunityId] = useState('');
   const [createdCommunityName, setCreatedCommunityName] = useState('');
 
@@ -27,20 +30,35 @@ const CreateCommunity = () => {
     payload: { event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_VISITED },
   });
 
-  const handleChangeStep = (action: number) => {
-    setCreateCommunityStep((prevState) => prevState + action);
-  };
+  const isSuccessStep = createCommunityStep === CreateCommunityStep.Success;
+
+  const isValidStepToShowCommunityStakeFormStep = [
+    CreateCommunityStep.BasicInformation,
+    CreateCommunityStep.CommunityStake,
+  ].includes(createCommunityStep);
+  const isEthereumMainnetSelected = selectedChainId === ETHEREUM_MAINNET_ID;
+  const showCommunityStakeStep =
+    isValidStepToShowCommunityStakeFormStep &&
+    selectedCommunity.type === 'ethereum' &&
+    isEthereumMainnetSelected;
 
   const handleCompleteBasicInformationStep = (
     communityId: string,
     communityName: string,
   ) => {
-    handleChangeStep(1);
+    onChangeStep(true);
     setCreatedCommunityId(communityId);
     setCreatedCommunityName(communityName);
   };
 
-  const isSuccessStep = createCommunityStep === CreateCommunityStep.Success;
+  const onChangeStep = (forward: boolean) => {
+    handleChangeStep(
+      forward,
+      createCommunityStep,
+      setCreateCommunityStep,
+      showCommunityStakeStep,
+    );
+  };
 
   const getCurrentStep = () => {
     switch (createCommunityStep) {
@@ -50,7 +68,7 @@ const CreateCommunity = () => {
             selectedCommunity={selectedCommunity}
             setSelectedCommunity={setSelectedCommunity}
             setSelectedAddress={setSelectedAddress}
-            handleContinue={() => handleChangeStep(1)}
+            handleContinue={() => onChangeStep(true)}
           />
         );
 
@@ -59,7 +77,8 @@ const CreateCommunity = () => {
           <BasicInformationStep
             selectedAddress={selectedAddress}
             selectedCommunity={selectedCommunity}
-            handleGoBack={() => handleChangeStep(-1)}
+            setSelectedChainId={setSelectedChainId}
+            handleGoBack={() => onChangeStep(false)}
             handleContinue={handleCompleteBasicInformationStep}
           />
         );
@@ -67,7 +86,7 @@ const CreateCommunity = () => {
       case CreateCommunityStep.CommunityStake:
         return (
           <CommunityStakeStep
-            onOptOutEnablingStake={() => handleChangeStep(1)}
+            onOptOutEnablingStake={() => onChangeStep(true)}
             createdCommunityName={createdCommunityName}
           />
         );
@@ -80,7 +99,9 @@ const CreateCommunity = () => {
   return (
     <div className="CreateCommunity">
       {!isSuccessStep && (
-        <CWFormSteps steps={getFormSteps(createCommunityStep)} />
+        <CWFormSteps
+          steps={getFormSteps(createCommunityStep, showCommunityStakeStep)}
+        />
       )}
 
       {getCurrentStep()}
