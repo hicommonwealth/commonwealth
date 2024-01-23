@@ -19,13 +19,21 @@
   .left-section {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
     gap: 32px;
+    width: 100%;
+    align-items: flex-start;
 
     .header {
       .b1 {
         color: $neutral-500 !important;
       }
+    }
+
+    .admins-moderators {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      width: 100%;
     }
 
     .feature-hint-mobile {
