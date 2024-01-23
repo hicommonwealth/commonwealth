@@ -7,6 +7,7 @@ import 'pages/manage_community/upgrade_roles_form.scss';
 import React, { useMemo, useState } from 'react';
 import app from 'state';
 import type RoleInfo from '../../../models/RoleInfo';
+// import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import { CWButton } from '../../components/component_kit/new_designs/cw_button';
 import { CWRadioButton } from '../../components/component_kit/new_designs/cw_radio_button';
@@ -26,6 +27,10 @@ export const UpgradeRolesForm = ({
 }: UpgradeRolesFormProps) => {
   const [role, setRole] = useState('');
   const [user, setUser] = useState('');
+  const [radioButtons, setRadioButtons] = useState([
+    { id: 1, checked: false },
+    { id: 2, checked: false },
+  ]);
 
   const nonAdmins: RoleInfo[] = roleData.filter((_role) => {
     return (
@@ -53,6 +58,14 @@ export const UpgradeRolesForm = ({
     { label: 'Moderator', value: 'Moderator' },
   ];
 
+  const handleRadioButtonChange = (id) => {
+    const updatedRadioButtons = radioButtons.map((radioButton) => ({
+      ...radioButton,
+      checked: radioButton.id === id,
+    }));
+    setRadioButtons(updatedRadioButtons);
+  };
+
   return (
     <div className="UpgradeRolesForm">
       <MembersSearchBar
@@ -75,14 +88,18 @@ export const UpgradeRolesForm = ({
           <>
             {newAdminOnboardingEnabledOptions.map((o, i) => {
               return (
-                <CWRadioButton
-                  key={i}
-                  name="roles"
-                  onChange={(e) => {
-                    setRole(e.target.value);
-                  }}
-                  value={o.value}
-                />
+                <div key={i}>
+                  <CWRadioButton
+                    key={i}
+                    checked={radioButtons[i].checked}
+                    name="roles"
+                    onChange={(e) => {
+                      setRole(e.target.value);
+                      handleRadioButtonChange(i + 1);
+                    }}
+                    value={o.value}
+                  />
+                </div>
               );
             })}
           </>

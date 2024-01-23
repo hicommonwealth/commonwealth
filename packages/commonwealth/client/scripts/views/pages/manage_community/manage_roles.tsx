@@ -112,7 +112,7 @@ export const ManageRoles = ({
           onClick: async () => {
             await removeRole(role);
             if (isLosingAdminPermissions) {
-              navigate(`/`);
+              navigate(`/manage/moderators`);
             }
           },
         },

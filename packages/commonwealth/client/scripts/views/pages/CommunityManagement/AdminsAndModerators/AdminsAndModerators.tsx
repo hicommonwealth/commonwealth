@@ -1,4 +1,3 @@
-// import { AccessLevel } from '@hicommonwealth/core';
 import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import useFetchAdminQuery from 'state/api/members/fetchAdmin';
@@ -14,7 +13,6 @@ import { ComponentType } from '../../../components/component_kit/types';
 import { UpgradeRolesForm } from '../../../pages/manage_community/upgrade_roles_form';
 import { ManageRoles } from '../../manage_community/manage_roles';
 import CommunityManagementLayout from '../common/CommunityManagementLayout';
-import './AdminsAndModerators.scss';
 
 const AdminsAndModerators = () => {
   const [admins, setAdmins] = useState([]);
@@ -25,18 +23,17 @@ const AdminsAndModerators = () => {
 
   const { data: { admins: returnedAdmins, mods: returnedMods } = {} } =
     useFetchAdminQuery({
-      chainId: app.activeChainId(),
+      communityId: app.activeChainId(),
     });
 
   const { data: searchResults, refetch } = useSearchProfilesQuery({
     communityId: app.activeChainId(),
     searchTerm: debouncedSearchTerm,
-    limit: 20,
+    limit: 4000,
     orderBy: APIOrderBy.LastActive,
     orderDirection: APIOrderDirection.Desc,
     includeRoles: true,
   });
-
   const roleData = useMemo(() => {
     if (!searchResults?.pages?.length) {
       return [];
@@ -122,10 +119,15 @@ const AdminsAndModerators = () => {
         moderators can only make changes to content by locking and deleting.`,
       }}
     >
-      <section>
+      <section className="admins-moderators">
         <ManageRoles
           label="Admins"
           roledata={admins}
+          onRoleUpdate={handleRoleUpdate}
+        />
+        <ManageRoles
+          label="Moderators"
+          roledata={mods}
           onRoleUpdate={handleRoleUpdate}
         />
         <CWText type="caption" className={ComponentType.Label}>
