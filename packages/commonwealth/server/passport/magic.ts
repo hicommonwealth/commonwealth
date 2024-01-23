@@ -377,6 +377,7 @@ async function magicLoginRoute(
     signature: string;
     sessionPayload?: string; // optional because session keys are feature-flagged
     magicAddress?: string; // optional because session keys are feature-flagged
+    didToken?: string; // optional because currently only used for cosmos
     walletSsoSource: WalletSsoSource;
   }>,
   decodedMagicToken: MagicUser,
@@ -431,6 +432,7 @@ async function magicLoginRoute(
   const magicUserMetadata = await magic.users.getMetadataByIssuer(
     decodedMagicToken.issuer,
   );
+
   log.trace(
     `MAGIC USER METADATA: ${JSON.stringify(magicUserMetadata, null, 2)}`,
   );
@@ -441,8 +443,11 @@ async function magicLoginRoute(
     const session: Session = {
       type: 'session',
       signature: req.body.signature,
-      payload: JSON.parse(req.body.sessionPayload),
+      payload: req.body.sessionPayload
+        ? JSON.parse(req.body.sessionPayload)
+        : undefined,
     };
+
     if (process.env.ENFORCE_SESSION_KEYS === 'true') {
       if (req.body.magicAddress !== session.payload.from) {
         throw new Error(
@@ -454,11 +459,12 @@ async function magicLoginRoute(
         throw new Error('sessionPayload signed with invalid signature');
       }
     }
+
     if (chainToJoin) {
-      if (
-        chainToJoin.base === ChainBase.CosmosSDK &&
-        session.payload.chain.startsWith('cosmos:')
-      ) {
+      if (chainToJoin.base === ChainBase.CosmosSDK) {
+        // throws if magicAddress does not match signed address in didToken
+        await magic.token.validate(req.body.didToken, req.body.magicAddress);
+
         generatedAddresses.push({
           address: req.body.magicAddress,
           chain: chainToJoin.id,
