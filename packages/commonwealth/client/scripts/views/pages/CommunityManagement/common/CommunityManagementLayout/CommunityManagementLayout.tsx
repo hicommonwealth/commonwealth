@@ -15,6 +15,7 @@ type CommunityManagementLayout = {
     title: string;
     description: string;
   };
+  className?: boolean;
 };
 
 const CommunityManagementLayout = ({
@@ -22,6 +23,7 @@ const CommunityManagementLayout = ({
   description,
   children,
   featureHint,
+  className,
 }: CommunityManagementLayout) => {
   useUserActiveAccount();
 
@@ -31,10 +33,10 @@ const CommunityManagementLayout = ({
   ) {
     return <PageNotFound />;
   }
-
+  const showAlternateClassname = className ? 'admins-moderators' : '';
   return (
     <section className="CommunityManagementLayout">
-      <section className="left-section">
+      <section className={`left-section ${showAlternateClassname}`}>
         <div className="header">
           <CWText type="h2">{title}</CWText>
           <CWText type="b1">{description}</CWText>
