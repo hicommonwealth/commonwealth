@@ -1,5 +1,5 @@
 import { RedisCache } from '@hicommonwealth/adapters';
-import { RedisNamespaces, logger } from '@hicommonwealth/core';
+import { CacheNamespaces, logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import Rollbar from 'rollbar';
 import { QueryTypes } from 'sequelize';
@@ -313,7 +313,7 @@ export default class DatabaseCleaner {
   private async acquireLock() {
     // the lock will automatically time out so there is no need to unlock it
     return await this._redisCache.setKey(
-      RedisNamespaces.Database_Cleaner,
+      CacheNamespaces.Database_Cleaner,
       this._lockName,
       uuidv4(),
       this._lockTimeoutSeconds,

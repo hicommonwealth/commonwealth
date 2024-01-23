@@ -15,7 +15,7 @@ import {
   RedisCache,
   XCACHE_VALUES,
 } from '@hicommonwealth/adapters';
-import { RedisNamespaces } from '@hicommonwealth/core';
+import { CacheNamespaces } from '@hicommonwealth/core';
 import app, { CACHE_ENDPOINTS } from '../../../server-test';
 const content_type = {
   json: 'application/json; charset=utf-8',
@@ -61,7 +61,7 @@ async function makePostRequest(endpoint, body, headers = {}) {
 
 describe('Cache Decorator', () => {
   const redisCache: RedisCache = new RedisCache();
-  const route_namespace: RedisNamespaces = RedisNamespaces.Route_Response;
+  const route_namespace: CacheNamespaces = CacheNamespaces.Route_Response;
 
   before(async () => {
     await connectToRedis(redisCache);

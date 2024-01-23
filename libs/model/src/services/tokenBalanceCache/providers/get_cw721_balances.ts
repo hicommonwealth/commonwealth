@@ -1,8 +1,7 @@
 import { WasmExtension, setupWasmExtension } from '@cosmjs/cosmwasm-stargate';
 import { QueryClient } from '@cosmjs/stargate';
 import { logger } from '@hicommonwealth/core';
-import { ChainNodeInstance } from '@hicommonwealth/model';
-import { rollbar } from '../../rollbar';
+import { ChainNodeInstance } from '../../../models/chain_node';
 import { Balances } from '../types';
 import { getTendermintClient } from '../util';
 
@@ -65,15 +64,11 @@ export async function getOffChainBatchCw721Balances(
   // actually in parallel
   const promiseResults = await Promise.allSettled<Balances>(balancePromises);
 
-  const result = {};
+  const result: Balances = {};
   addresses.forEach((a, i) => {
     const balanceResult = promiseResults[i];
     if (balanceResult?.status === 'rejected') {
       log.error(
-        `Failed to get balance for address ${a}:
-        ${balanceResult.reason}`,
-      );
-      rollbar.error(
         `Failed to get balance for address ${a}:
         ${balanceResult.reason}`,
       );
@@ -103,8 +98,10 @@ async function getCw721Balance(
       [ownerAddress]: result?.['tokens']?.length.toString(),
     };
   } catch (e) {
-    log.error(`Failed to get balance for address ${ownerAddress}`, e);
-    rollbar.error(`Failed to get balance for address ${ownerAddress}`, e);
+    log.error(
+      `Failed to get balance for address ${ownerAddress}`,
+      e instanceof Error ? e : undefined,
+    );
     return {};
   }
 }

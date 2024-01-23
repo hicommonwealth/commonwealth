@@ -3,7 +3,7 @@ import {
   cacheDecorator as cacheDecoratorInstance,
   KeyFunction,
 } from '@hicommonwealth/adapters';
-import { RedisNamespaces } from '@hicommonwealth/core';
+import { CacheNamespaces } from '@hicommonwealth/core';
 import { daemon } from '.';
 
 export class Activity<T extends (...args: any[]) => any> {
@@ -15,7 +15,7 @@ export class Activity<T extends (...args: any[]) => any> {
     private query: T,
     private cacheKey: KeyFunction<T>,
     private cacheDuration: number,
-    private cacheNamespace: RedisNamespaces,
+    private cacheNamespace: CacheNamespaces,
     private cacheDecorator: CacheDecorator = cacheDecoratorInstance,
   ) {
     this.queryWithCache = this.cacheWrapHelper(false);

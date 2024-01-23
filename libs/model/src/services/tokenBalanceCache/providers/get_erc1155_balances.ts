@@ -1,7 +1,6 @@
 import { logger } from '@hicommonwealth/core';
-import { ChainNodeInstance } from '@hicommonwealth/model';
 import AbiCoder from 'web3-eth-abi';
-import { rollbar } from '../../rollbar';
+import { ChainNodeInstance } from '../../../models/chain_node';
 import { Balances } from '../types';
 import { evmRpcRequest } from '../util';
 
@@ -23,7 +22,7 @@ export async function __getErc1155Balances(options: GetErc1155BalancesOptions) {
   const rpcEndpoint = options.chainNode.private_url || options.chainNode.url;
   if (options.addresses.length === 1) {
     return await getErc1155Balance(
-      options.chainNode.eth_chain_id,
+      options.chainNode.eth_chain_id!,
       rpcEndpoint,
       options.contractAddress,
       options.tokenId,
@@ -31,7 +30,7 @@ export async function __getErc1155Balances(options: GetErc1155BalancesOptions) {
     );
   } else {
     return await getOnChainBatchErc1155Balances(
-      options.chainNode.eth_chain_id,
+      options.chainNode.eth_chain_id!,
       rpcEndpoint,
       options.contractAddress,
       options.tokenId,
@@ -87,17 +86,15 @@ async function getOnChainBatchErc1155Balances(
   const datas = await evmRpcRequest(rpcEndpoint, rpcRequests, errorMsg);
   if (!datas) return {};
 
-  const addressBalanceMap = {};
+  const addressBalanceMap: Balances = {};
 
   if (datas.error) {
-    rollbar.error(errorMsg, datas.error);
     log.error(errorMsg, datas.error);
     return {};
   } else {
     for (const data of datas) {
       if (data.error) {
         const msg = `balanceOfBatch request failed on EVM chain id: ${evmChainId} for contract ${contractAddress}`;
-        rollbar.error(msg, data.error);
         log.error(msg, data.error);
         continue;
       }
@@ -149,7 +146,6 @@ async function getErc1155Balance(
   if (!data) return {};
 
   if (data.error) {
-    rollbar.error(errorMsg, data.error);
     log.error(errorMsg, data.error);
     return {};
   } else {

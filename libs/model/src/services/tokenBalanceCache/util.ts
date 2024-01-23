@@ -1,9 +1,8 @@
 import { HttpBatchClient, Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { logger } from '@hicommonwealth/core';
-import { ChainNodeAttributes } from '@hicommonwealth/model';
 import AbiCoder from 'web3-eth-abi';
 import { toBN } from 'web3-utils';
-import { rollbar } from '../rollbar';
+import { ChainNodeAttributes } from '../../models/chain_node';
 import { Balances, GetTendermintClientOptions } from './types';
 
 const log = logger().getLogger(__filename);
@@ -34,7 +33,7 @@ export async function evmOffChainRpcBatching(
 
   const batchRequestPromises = [];
   // maps an RPC request id to an address
-  const idAddressMap = {};
+  const idAddressMap: Record<string, string> = {};
 
   // iterate through addresses in batches of size rpcBatchSize creating a single request for each batch
   let id = 1;
@@ -70,7 +69,7 @@ export async function evmOffChainRpcBatching(
   }
 
   let failedAddresses: string[] = [];
-  const jsonPromises = [];
+  const jsonPromises: Promise<any>[] = [];
   const responses = await Promise.allSettled(batchRequestPromises);
   const chainNodeErrorMsg =
     `${failingChainNodeError} RPC batch request failed for method '${rpc.method}' ` +
@@ -80,13 +79,12 @@ export async function evmOffChainRpcBatching(
   responses.forEach((res, index) => {
     // handle a failed batch request
     if (res.status === 'rejected') {
-      const startIndex = rpc.batchSize * index;
+      const startIndex = rpc.batchSize! * index;
       const relevantAddresses = addresses.slice(
         startIndex,
-        Math.min(startIndex + rpc.batchSize, addresses.length),
+        Math.min(startIndex + rpc.batchSize!, addresses.length),
       );
       failedAddresses = [...failedAddresses, ...relevantAddresses];
-      rollbar.critical(chainNodeErrorMsg, res.reason);
       log.fatal(chainNodeErrorMsg, res.reason);
     } else {
       jsonPromises.push(res.value.json());
@@ -97,29 +95,27 @@ export async function evmOffChainRpcBatching(
   try {
     datas = (await Promise.all(jsonPromises)).flat();
   } catch (e) {
-    rollbar.critical(chainNodeErrorMsg, e);
-    log.fatal(chainNodeErrorMsg, e);
+    log.fatal(chainNodeErrorMsg, e instanceof Error ? e : undefined);
     return {
       balances: {},
       failedAddresses: addresses,
     };
   }
 
-  const balances = {};
+  const balances: Balances = {};
   for (const data of datas) {
     if (data.error) {
       failedAddresses.push(idAddressMap[data.id]);
       const msg = `RPC request failed on EVM chain id ${source.evmChainId}${
         source.contractAddress ? `for token ${source.contractAddress}` : ''
       }.`;
-      rollbar.error(msg, data.error);
       log.error(msg, data.error);
       continue;
     }
 
     const address = idAddressMap[data.id];
     balances[address] = source.contractAddress
-      ? AbiCoder.decodeParameter('uint256', data.result)
+      ? (AbiCoder.decodeParameter('uint256', data.result) as any)
       : toBN(data.result).toString(10);
   }
 
@@ -193,11 +189,10 @@ export async function evmBalanceFetcherBatching(
       failedAddresses: addresses,
     };
 
-  const addressBalanceMap = {};
+  const addressBalanceMap: Balances = {};
   let failedAddresses: string[] = [];
 
   if (datas.error) {
-    rollbar.error(errorMsg, datas.error);
     log.error(errorMsg, datas.error);
     return { balances: {}, failedAddresses: addresses };
   } else {
@@ -214,7 +209,6 @@ export async function evmBalanceFetcherBatching(
           `chain id: ${source.evmChainId}${
             source.contractAddress ? `for token ${source.contractAddress}` : ''
           }.`;
-        rollbar.error(msg, data.error);
         log.error(msg, data.error);
         continue;
       }
@@ -303,8 +297,7 @@ export async function evmRpcRequest(
     data = await response.json();
   } catch (e) {
     const augmentedMsg = `${failingChainNodeError} ${errorMsg}`;
-    log.fatal(augmentedMsg, e);
-    rollbar.critical(augmentedMsg, e);
+    log.fatal(augmentedMsg, e instanceof Error ? e : undefined);
   }
 
   return data;

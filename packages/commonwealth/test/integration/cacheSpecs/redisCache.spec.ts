@@ -4,11 +4,11 @@
 const chai = require('chai');
 const expect = chai.expect;
 import { RedisCache, connectToRedis, delay } from '@hicommonwealth/adapters';
-import { RedisNamespaces } from '@hicommonwealth/core';
+import { CacheNamespaces } from '@hicommonwealth/core';
 
 async function addRandomKeys(
   redisCache: RedisCache,
-  test_namespace: RedisNamespaces,
+  test_namespace: CacheNamespaces,
 ) {
   const random = Math.random();
   const key1 = `testKey${random}`;
@@ -29,7 +29,7 @@ async function addRandomKeys(
 
 export async function testExpiry(
   redisCache: RedisCache,
-  test_namespace: RedisNamespaces,
+  test_namespace: CacheNamespaces,
 ) {
   const random = Math.random();
   const key = `testKey${random}`;
@@ -45,7 +45,7 @@ export async function testExpiry(
 
 describe('RedisCache', () => {
   let redisCache: RedisCache;
-  const test_namespace: RedisNamespaces = RedisNamespaces.Test_Redis;
+  const test_namespace: CacheNamespaces = CacheNamespaces.Test_Redis;
 
   before(async () => {
     redisCache = new RedisCache();

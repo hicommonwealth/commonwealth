@@ -10,5 +10,8 @@ export * as User from './user';
 export * from './database';
 export * from './errors';
 export * from './models';
+export { TokenBalanceCache } from './services/tokenBalanceCache/tokenBalanceCache';
+export * from './services/tokenBalanceCache/types';
+export { getTendermintClient } from './services/tokenBalanceCache/util';
 export * from './types';
 export * from './utils/abi';

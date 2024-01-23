@@ -1,3 +1,5 @@
+import { CacheNamespaces } from '../types';
+
 /**
  * Resource disposer function
  */
@@ -54,4 +56,34 @@ export interface Stats extends Disposable {
   off(key: string): void;
   // traces
   timing(key: string, duration: number, tags?: Record<string, string>): void;
+}
+
+/**
+ * Cache port
+ */
+export interface Cache extends Disposable {
+  getKey(namespace: CacheNamespaces, key: string): Promise<string>;
+  setKey(
+    namespace: CacheNamespaces,
+    key: string,
+    value: string,
+    duration: number,
+    notExists: boolean,
+  ): Promise<boolean>;
+  getKeys(
+    namespace: CacheNamespaces,
+    keys: string[],
+  ): Promise<false | Record<string, unknown>>;
+  setKeys(
+    namespace: CacheNamespaces,
+    data: { [key: string]: string },
+    duration: number,
+    transaction: boolean,
+  ): Promise<false | Array<'OK' | null>>;
+  getNamespaceKeys(
+    namespace: CacheNamespaces,
+    maxResults: number,
+  ): Promise<{ [key: string]: string } | boolean>;
+  deleteKey(namespace: CacheNamespaces, key: string): Promise<number>;
+  deleteNamespaceKeys(namespace: CacheNamespaces): Promise<number | boolean>;
 }

@@ -1,12 +1,10 @@
 import { RedisCache, delay } from '@hicommonwealth/adapters';
-import { BalanceSourceType, BalanceType } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { BalanceSourceType, BalanceType, cache } from '@hicommonwealth/core';
+import { Balances, TokenBalanceCache, models } from '@hicommonwealth/model';
 import BN from 'bn.js';
 import { expect } from 'chai';
 import Web3 from 'web3';
 import { toWei } from 'web3-utils';
-import { TokenBalanceCache } from '../../../server/util/tokenBalanceCache/tokenBalanceCache';
-import { Balances } from '../../../server/util/tokenBalanceCache/types';
 import { ChainTesting } from '../../util/evm-chain-testing/sdk/chainTesting';
 import { ERC1155 } from '../../util/evm-chain-testing/sdk/erc1155';
 import { ERC721 } from '../../util/evm-chain-testing/sdk/nft';
@@ -83,7 +81,8 @@ describe('Token Balance Cache EVM Tests', function () {
   before(async () => {
     redisCache = new RedisCache();
     await redisCache.init('redis://localhost:6379');
-    tbc = new TokenBalanceCache(models, redisCache);
+    cache(redisCache);
+    tbc = new TokenBalanceCache(models);
   });
 
   describe('ERC20', () => {
@@ -709,7 +708,7 @@ describe('Token Balance Cache EVM Tests', function () {
 
     before('Set TBC caching TTL and reset chain node', async () => {
       await resetChainNode(ethChainId);
-      tbc = new TokenBalanceCache(models, redisCache, balanceTTL);
+      tbc = new TokenBalanceCache(models, balanceTTL);
       // clear all Redis keys
       await redisCache.client.flushAll();
     });

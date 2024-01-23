@@ -9,7 +9,7 @@ import {
   GovernorCountingSimple,
   GovernorCountingSimple__factory,
 } from '@hicommonwealth/chains';
-import { RedisNamespaces } from '@hicommonwealth/core';
+import { CacheNamespaces } from '@hicommonwealth/core';
 import { providers } from 'ethers';
 import { GovVersion } from './types';
 
@@ -109,7 +109,7 @@ export async function getCompoundGovContractAndVersion(
   provider: providers.Web3Provider,
 ): Promise<ContractAndVersion> {
   const govVersion = (await redis.getKey(
-    RedisNamespaces.Compound_Gov_Version,
+    CacheNamespaces.Compound_Gov_Version,
     compoundGovAddress,
   )) as GovVersion | undefined;
 
@@ -119,7 +119,7 @@ export async function getCompoundGovContractAndVersion(
       provider,
     );
     await redis.setKey(
-      RedisNamespaces.Compound_Gov_Version,
+      CacheNamespaces.Compound_Gov_Version,
       compoundGovAddress,
       result.version,
     );

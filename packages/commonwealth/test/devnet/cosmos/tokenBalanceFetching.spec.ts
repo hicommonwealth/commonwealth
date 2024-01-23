@@ -16,13 +16,16 @@ import {
   ChainBase,
   ChainNetwork,
   ChainType,
+  cache,
 } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import {
+  TokenBalanceCache,
+  getTendermintClient,
+  models,
+} from '@hicommonwealth/model';
 import BN from 'bn.js';
 import { use as chaiUse, expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { getTendermintClient } from 'server/util/tokenBalanceCache/util';
-import { TokenBalanceCache } from '../../../server/util/tokenBalanceCache/tokenBalanceCache';
 
 chaiUse(chaiAsPromised);
 
@@ -100,7 +103,8 @@ describe('Token Balance Cache Cosmos Tests', function () {
   before(async () => {
     redisCache = new RedisCache();
     await redisCache.init('redis://localhost:6379');
-    tbc = new TokenBalanceCache(models, redisCache);
+    cache(redisCache);
+    tbc = new TokenBalanceCache(models);
   });
 
   describe('Cosmos Native', function () {
@@ -185,7 +189,7 @@ describe('Token Balance Cache Cosmos Tests', function () {
       const balanceTTL = 20;
 
       before('Set TBC caching TTL and reset Redis', async () => {
-        tbc = new TokenBalanceCache(models, redisCache, balanceTTL);
+        tbc = new TokenBalanceCache(models, balanceTTL);
         await redisCache.client.flushAll();
       });
 
@@ -350,7 +354,7 @@ describe('Token Balance Cache Cosmos Tests', function () {
       const balanceTTL = 20;
 
       before('Set TBC caching TTL and reset Redis', async () => {
-        tbc = new TokenBalanceCache(models, redisCache, balanceTTL);
+        tbc = new TokenBalanceCache(models, balanceTTL);
         await redisCache.client.flushAll();
       });
 

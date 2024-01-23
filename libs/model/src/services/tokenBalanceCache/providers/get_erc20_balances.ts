@@ -1,35 +1,54 @@
 import { logger } from '@hicommonwealth/core';
-import { ChainNodeInstance } from '@hicommonwealth/model';
 import AbiCoder from 'web3-eth-abi';
-import { rollbar } from '../../rollbar';
+import { ChainNodeInstance } from '../../../models/chain_node';
 import { Balances } from '../types';
-import { evmOffChainRpcBatching, evmRpcRequest } from '../util';
+import {
+  evmBalanceFetcherBatching,
+  evmOffChainRpcBatching,
+  evmRpcRequest,
+  mapNodeToBalanceFetcherContract,
+} from '../util';
 
 const log = logger().getLogger(__filename);
 
-export type GetErc721BalancesOptions = {
+export type GetErc20BalancesOptions = {
   chainNode: ChainNodeInstance;
   addresses: string[];
   contractAddress: string;
   batchSize?: number;
 };
 
-export async function __getErc721Balances(options: GetErc721BalancesOptions) {
+export async function __getErc20Balances(
+  options: GetErc20BalancesOptions,
+): Promise<Balances> {
   if (options.addresses.length === 0) {
     return {};
   }
 
   const rpcEndpoint = options.chainNode.private_url || options.chainNode.url;
   if (options.addresses.length === 1) {
-    return await getErc721Balance(
-      options.chainNode.eth_chain_id,
+    return await getErc20Balance(
+      options.chainNode.eth_chain_id!,
       rpcEndpoint,
       options.contractAddress,
       options.addresses[0],
     );
+  }
+
+  const balanceFetcherContract = mapNodeToBalanceFetcherContract(
+    options.chainNode.eth_chain_id,
+  );
+  if (balanceFetcherContract) {
+    return await getOnChainBatchErc20Balances(
+      options.chainNode.eth_chain_id!,
+      rpcEndpoint,
+      options.contractAddress,
+      options.addresses,
+      options.batchSize,
+    );
   } else {
-    return await getOffChainBatchErc721Balances(
-      options.chainNode.eth_chain_id,
+    return await getOffChainBatchErc20Balances(
+      options.chainNode.eth_chain_id!,
       rpcEndpoint,
       options.contractAddress,
       options.addresses,
@@ -38,13 +57,36 @@ export async function __getErc721Balances(options: GetErc721BalancesOptions) {
   }
 }
 
-async function getOffChainBatchErc721Balances(
+async function getOnChainBatchErc20Balances(
+  ethChainId: number,
+  rpcEndpoint: string,
+  contractAddress: string,
+  addresses: string[],
+  batchSize = 1000,
+): Promise<Balances> {
+  // ignore failedAddresses returned property for now -> revisit if we want to implement retry strategy
+  const { balances } = await evmBalanceFetcherBatching(
+    {
+      evmChainId: ethChainId,
+      url: rpcEndpoint,
+      contractAddress: contractAddress,
+    },
+    {
+      batchSize,
+    },
+    addresses,
+  );
+  return balances;
+}
+
+async function getOffChainBatchErc20Balances(
   evmChainId: number,
   rpcEndpoint: string,
   contractAddress: string,
   addresses: string[],
   batchSize = 1000,
 ): Promise<Balances> {
+  // ignore failedAddresses returned property for now -> revisit if we want to implement retry strategy
   const { balances } = await evmOffChainRpcBatching(
     {
       evmChainId,
@@ -60,17 +102,16 @@ async function getOffChainBatchErc721Balances(
         return {
           to: tokenAddress,
           data: calldata,
-        };
+        } as Record<string, string>;
       },
       batchSize,
     },
     addresses,
   );
-
   return balances;
 }
 
-async function getErc721Balance(
+async function getErc20Balance(
   evmChainId: number,
   rpcEndpoint: string,
   contractAddress: string,
@@ -100,7 +141,6 @@ async function getErc721Balance(
   if (!data) return {};
 
   if (data.error) {
-    rollbar.error(errorMsg, data.error);
     log.error(errorMsg, data.error);
     return {};
   } else {

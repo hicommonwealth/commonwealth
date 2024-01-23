@@ -14,7 +14,7 @@ import {
   cacheDecorator,
   connectToRedis,
 } from '@hicommonwealth/adapters';
-import { RedisNamespaces } from '@hicommonwealth/core';
+import { CacheNamespaces } from '@hicommonwealth/core';
 import {
   cosmosLCDDuration,
   cosmosRPCDuration,
@@ -41,7 +41,7 @@ async function verifyCacheResponse(key, res, resEarlier) {
 
 describe('Cosmos Cache', () => {
   const redisCache: RedisCache = new RedisCache();
-  const route_namespace: RedisNamespaces = RedisNamespaces.Route_Response;
+  const route_namespace: CacheNamespaces = CacheNamespaces.Route_Response;
 
   before(async () => {
     await resetDatabase();

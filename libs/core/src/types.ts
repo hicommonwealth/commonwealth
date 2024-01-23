@@ -144,7 +144,7 @@ export enum BalanceType {
   Substrate = 'substrate',
 }
 
-export enum RedisNamespaces {
+export enum CacheNamespaces {
   Route_Response = 'route_response',
   Function_Response = 'function_response',
   Global_Response = 'global_response',

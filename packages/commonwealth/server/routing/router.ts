@@ -5,7 +5,7 @@ import passport from 'passport';
 import { getCommunityStakeHandler } from '../routes/communities/get_community_stakes_handler';
 import { putCommunityStakeHandler } from '../routes/communities/put_community_stakes_handler';
 
-import { TokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
+import { TokenBalanceCache } from '@hicommonwealth/model';
 
 import {
   methodNotAllowedMiddleware,
