@@ -32,11 +32,17 @@ A community is a space on Common, joinable by PROFILES, that owns metadata and i
 
 A set of features considered central to Common, which interface out with first-party apps. As of 240123, the core consists of a SIGN-IN system, a NOTIFICATION system, and a GROUP system.
 
+### Forum
+
+The Common forum is Common's flagship first-party app. Its primary organizational primitive is the COMMUNITY. The forum app provides UI for off-chain discussions, and for interacting with community-associated CHAINS.
+
+### Group
+
+<!-- TODO -->
+
 ### Link
 
-Some Common content can be inter-linked, so that the content's UI prominently reflects its relationship to other content. As of 240123, THREADS can be linked to PROPOSALS and other THREADS.
-
-snapshot and onchain
+Some Common content can be inter-linked, so that the content's UI prominently reflects its relationship to other content. As of 240123, THREADS can be linked to other THREADS as well as to PROPOSALS (both Snapshot and on-chain).
 
 ### Member
 
@@ -68,19 +74,27 @@ All "log-in" and similar language is deprecated and semantically incorrect.
 
 ### Stake
 
+Community Stake is a feature whereby COMMUNITY ADMINS allow MEMBER PROFILES' ADDRESSES (?) to deposit Ethereum into a smart contract in exchange for ERC1155 tokens. The received tokens are considered "stake."
+
+Stake is used for GATING content and features across a COMMUNITY FORUM.
+
 ### Subscription
 
 SEe NOTIFICATIONS.
 
+### Template
+
+Used for THREADS within TOPICS.
+
 ### Thread
 
-A thread is a post made via the Common forum app, on top of which COMMENTS and REACTIONS may be created. May LINK to other THREADS and PROPOSALS, or own a POLL.
+A thread is a post made via the Common FORUM app, on top of which COMMENTS and REACTIONS may be created. May LINK to other THREADS and PROPOSALS, or own a POLL.
 
 <!-- TODO: Improve "is a post" language. -->
 
 ### Topic
 
-A topic is a sub-section of a COMMUNITY forum. It may be GATED or require PERMISSIONS to participate in.
+A topic is a sub-section of a COMMUNITY FORUM. It may be GATED or require PERMISSIONS to participate in.
 
 <!-- TODO: Investigate GATING and PERMISSIONS -->
 
@@ -113,3 +127,9 @@ A component linked to a PORT, which translates incoming and outoing data and mes
 ### Fast-Follow
 
 A new-feature ticket related to a project that is non-blocking but can be completed within a week, to be completed after the project is complete.
+
+<!-- TODO: IMPROVE WORDING FOR CLARITY -->
+
+## Change Log
+
+24012X: Authored by Graham Johnson (#).
