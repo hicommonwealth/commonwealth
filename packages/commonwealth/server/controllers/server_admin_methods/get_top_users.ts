@@ -64,7 +64,7 @@ export async function __getTopUsers(
         GROUP BY
             user_id, profile_id, profile_name, thread_count, comment_count
       HAVING
-          NOT ('edgeware' = ANY(array_agg(community_id)) OR 'commonwealth' = ANY(array_agg(community_id)))
+          NOT ('edgeware' = ANY(array_agg(community_id)) OR 'cmn-protocol' = ANY(array_agg(community_id)))
       ORDER BY
         total_activity DESC
     )
