@@ -53,11 +53,13 @@ import GlobalActivityCache from './server/util/globalActivityCache';
 import setupIpfsProxy from './server/util/ipfsProxy';
 import ViewCountCache from './server/util/viewCountCache';
 
-let isServiceHealthy = false;
-
+// initialize production adapters
 const log = _logger(TypescriptLoggingLogger()).getLogger(__filename);
 stats(HotShotsStats());
+const redisCache = new RedisCache();
+cache(redisCache);
 
+let isServiceHealthy = false;
 startHealthCheckLoop({
   service: ServiceKey.Commonwealth,
   checkFn: async () => {
@@ -88,6 +90,8 @@ async function main() {
     process.env.NO_GLOBAL_ACTIVITY_CACHE === 'true';
   const NO_CLIENT_SERVER =
     process.env.NO_CLIENT === 'true' || SHOULD_SEND_EMAILS;
+
+  await redisCache.init(REDIS_URL);
 
   let rc = null;
   if (SHOULD_SEND_EMAILS) {
@@ -246,10 +250,6 @@ async function main() {
     rollbar.critical('The main service RabbitMQController is not initialized!');
     // TODO: this requires an immediate response if in production
   }
-
-  const redisCache = new RedisCache(rollbar);
-  await redisCache.init(REDIS_URL);
-  cache(redisCache);
 
   const tokenBalanceCache = new TokenBalanceCache(
     models,

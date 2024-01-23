@@ -1,13 +1,10 @@
-import { logger, type CacheNamespaces } from '@hicommonwealth/core';
+import { ILogger, logger, type CacheNamespaces } from '@hicommonwealth/core';
 import {
   ConnectionTimeoutError,
   ReconnectStrategyError,
   SocketClosedUnexpectedlyError,
   createClient,
 } from 'redis';
-import type Rollbar from 'rollbar';
-
-const log = logger().getLogger(__filename);
 
 export function redisRetryStrategy(retries: number) {
   if (retries > 5) {
@@ -28,10 +25,10 @@ export function redisRetryStrategy(retries: number) {
 export class RedisCache {
   private _initialized = false;
   private _client;
-  private _rollbar?: Rollbar;
+  private _log: ILogger;
 
-  constructor(rollbar?: Rollbar) {
-    this._rollbar = rollbar;
+  constructor() {
+    this._log = logger().getLogger(__filename);
   }
 
   // get namespace key for redis
@@ -44,13 +41,13 @@ export class RedisCache {
    */
   public async init(redis_url: string) {
     if (!redis_url) {
-      log.warn(
+      this._log.warn(
         'Redis Url is undefined. Some services (e.g. chat) may not be available.',
       );
       this._initialized = false;
       return;
     }
-    log.info(`Connecting to Redis at: ${redis_url}`);
+    this._log.info(`Connecting to Redis at: ${redis_url}`);
 
     if (!this._client) {
       const redisOptions = {};
@@ -74,37 +71,31 @@ export class RedisCache {
     this._client.on('error', (err) => {
       if (err instanceof ConnectionTimeoutError) {
         const msg = `RedisCache connection to ${redis_url} timed out!`;
-        log.error(msg);
-        this._rollbar?.error(
-          'RedisCache max connection retries exceeded! RedisCache client shutting down!',
-        );
+        this._log.error(msg);
       } else if (err instanceof ReconnectStrategyError) {
         const msg =
           'RedisCache max connection retries exceeded! RedisCache client shutting down!';
-        log.fatal(msg);
-        this._rollbar?.critical(msg);
+        this._log.fatal(msg);
       } else if (err instanceof SocketClosedUnexpectedlyError) {
         const msg = 'RedisCache socket closed unexpectedly';
-        log.error(msg);
-        this._rollbar?.error(msg);
+        this._log.error(msg);
       } else {
         const msg = 'RedisCache unknown connection error:';
-        log.error(msg, err);
-        this._rollbar?.critical(msg, err);
+        this._log.error(msg, err);
       }
     });
 
     this._client.on('ready', () => {
       this._initialized = !!this._client.isOpen;
-      log.info(`RedisCache connection ready ${this._initialized}`);
+      this._log.info(`RedisCache connection ready ${this._initialized}`);
     });
     this._client.on('reconnecting', () => {
       this._initialized = !!this._client.isOpen;
-      log.info(`RedisCache reconnecting ${this._initialized}`);
+      this._log.info(`RedisCache reconnecting ${this._initialized}`);
     });
     this._client.on('end', () => {
       this._initialized = !!this._client.isOpen;
-      log.info(`RedisCache disconnected ${this._initialized}`);
+      this._log.info(`RedisCache disconnected ${this._initialized}`);
     });
 
     if (!this._client.isOpen) {
@@ -116,7 +107,9 @@ export class RedisCache {
 
   private initialized() {
     if (!this._initialized) {
-      log.warn('Redis client is not initialized. Run RedisCache.init() first!');
+      this._log.warn(
+        'Redis client is not initialized. Run RedisCache.init() first!',
+      );
       return false;
     }
     return true;
@@ -163,8 +156,7 @@ export class RedisCache {
       }
     } catch (e) {
       const msg = `An error occurred while setting the following key value pair '${namespace} ${key}: ${value}'`;
-      log.error(msg, e);
-      this._rollbar?.error(msg, e);
+      this._log.error(msg, e);
       return false;
     }
 
@@ -183,8 +175,7 @@ export class RedisCache {
       }
     } catch (e) {
       const msg = `An error occurred while getting the following key '${key}'`;
-      log.error(msg, e);
-      this._rollbar?.error(msg, e);
+      this._log.error(msg, e);
     }
   }
 
@@ -229,8 +220,7 @@ export class RedisCache {
           const msg =
             `Error occurred while setting multiple keys ` +
             `${transaction ? 'in a transaction' : 'in a pipeline'}`;
-          log.error(msg, e);
-          this._rollbar?.error(msg, e);
+          this._log.error(msg, e);
           return false;
         }
       } else {
@@ -238,8 +228,7 @@ export class RedisCache {
           return await this._client.MSET(transformedData);
         } catch (e) {
           const msg = 'Error occurred while setting multiple keys';
-          log.error(msg, e);
-          this._rollbar?.error(msg, e);
+          this._log.error(msg, e);
           return false;
         }
       }
@@ -265,8 +254,7 @@ export class RedisCache {
         }, {});
       } catch (e) {
         const msg = 'An error occurred while getting many keys';
-        log.error(msg, e);
-        this._rollbar?.error(msg, e);
+        this._log.error(msg, e);
         return false;
       }
       return result;
@@ -299,8 +287,7 @@ export class RedisCache {
       }
     } catch (e) {
       const msg = 'An error occurred while fetching the namespace keys';
-      log.error(msg, e);
-      this._rollbar?.error(msg, e);
+      this._log.error(msg, e);
       return false;
     }
   }
@@ -312,8 +299,10 @@ export class RedisCache {
    * alongside the server initialization so that the instance can be used by all routes.
    */
   public async closeClient(): Promise<boolean> {
-    await this._client.quit();
-    this._initialized = false;
+    if (this._initialized) {
+      await this._client.quit();
+      this._initialized = false;
+    }
     return true;
   }
 
@@ -348,18 +337,17 @@ export class RedisCache {
           try {
             const resp = await this._client.del(key);
             count += resp;
-            log.trace(`deleted key ${key} ${resp} ${count}`);
+            this._log.trace(`deleted key ${key} ${resp} ${count}`);
           } catch (err) {
-            log.trace(`error deleting key ${key}`);
-            log.trace(err);
+            this._log.trace(`error deleting key ${key}`);
+            this._log.trace(err);
           }
         }
       }
       return count;
     } catch (e) {
       const msg = `An error occurred while deleting a all keys in the ${namespace} namespace`;
-      log.error(msg, e);
-      this._rollbar?.error(msg, e);
+      this._log.error(msg, e);
       return false;
     }
   }
@@ -375,8 +363,7 @@ export class RedisCache {
       }
     } catch (e) {
       const msg = `An error occurred while deleting the following key: ${finalKey}`;
-      log.error(msg, e);
-      this._rollbar?.error(msg, e);
+      this._log.error(msg, e);
       return 0;
     }
   }

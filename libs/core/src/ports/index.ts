@@ -12,26 +12,29 @@ export const logger = port(function logger(logger?: Logger) {
     logger || {
       name: 'in-memory-logger',
       dispose: () => Promise.resolve(),
-      getLogger: () => ({
-        trace(msg: string) {
-          console.log(msg);
-        },
-        debug(msg: string) {
-          console.log(msg);
-        },
-        info(msg: string) {
-          console.log(msg);
-        },
-        warn(msg: string) {
-          console.log(msg);
-        },
-        error(msg: string, error?: Error) {
-          console.error(msg, error?.message);
-        },
-        fatal(msg: string, error?: Error) {
-          console.error(msg, error?.message);
-        },
-      }),
+      getLogger: (...ids: string[]) => {
+        // console.log('!!!! calling logger from', ids);
+        return {
+          trace(msg: string) {
+            console.log(msg);
+          },
+          debug(msg: string) {
+            console.log(msg);
+          },
+          info(msg: string) {
+            console.log(msg);
+          },
+          warn(msg: string) {
+            console.log(msg);
+          },
+          error(msg: string, error?: Error) {
+            console.error(msg, error?.message);
+          },
+          fatal(msg: string, error?: Error) {
+            console.error(msg, error?.message);
+          },
+        };
+      },
     }
   );
 });
@@ -63,7 +66,7 @@ export const stats = port(function stats(stats?: Stats) {
 export const cache = port(function cache(cache?: Cache) {
   return (
     cache || {
-      name: 'in-memory-stats',
+      name: 'in-memory-cache',
       dispose: () => Promise.resolve(),
       getKey: () => Promise.resolve(''),
       setKey: () => Promise.resolve(false),
