@@ -449,7 +449,7 @@ export async function handleSocialLoginCallback({
     }
   }
 
-  let authedSessionPayload, authedSignature;
+  let authedSessionPayload, authedSignature, didToken;
   try {
     // Sign a session
     if (isCosmos && desiredChain) {
@@ -463,6 +463,8 @@ export async function handleSocialLoginCallback({
         );
       }
 
+      didToken = await magic.user.generateIdToken({ attachment: magicAddress });
+
       // Request the cosmos chain ID, since this is used by Magic to generate
       // the signed message. The API is already used by the Magic iframe,
       // but they don't expose the results.
@@ -470,7 +472,6 @@ export async function handleSocialLoginCallback({
         `${document.location.origin}/magicCosmosAPI/${desiredChain.id}/node_info`,
       );
       const chainId = nodeInfo.node_info.network;
-
       const timestamp = +new Date();
 
       const signer = { signMessage: magic.cosmos.sign };
@@ -545,6 +546,7 @@ export async function handleSocialLoginCallback({
       username: profileMetadata?.username,
       avatarUrl: profileMetadata?.avatarUrl,
       magicAddress,
+      didToken,
       sessionPayload: authedSessionPayload,
       signature: authedSignature,
       walletSsoSource,
