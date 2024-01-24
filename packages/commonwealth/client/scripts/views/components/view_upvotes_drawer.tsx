@@ -1,16 +1,27 @@
+import Account from 'client/scripts/models/Account';
+import AddressInfo from 'client/scripts/models/AddressInfo';
+import MinimumProfile from 'client/scripts/models/MinimumProfile';
 import React, { useState } from 'react';
+import { AuthorAndPublishInfo } from '../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { CWText } from './component_kit/cw_text';
 import CWDrawer from './component_kit/new_designs/CWDrawer';
 import { CWTable } from './component_kit/new_designs/CWTable';
+import { QuillRenderer } from './react_quill_editor/quill_renderer';
 
 type ViewUpvotesDrawerProps = {
   header: string;
   reactorData: any[];
+  contentBody: string;
+  author: Account | AddressInfo | MinimumProfile;
+  publishDate: moment.Moment;
 };
 
 export const ViewUpvotesDrawer = ({
   header,
   reactorData,
+  contentBody,
+  author,
+  publishDate,
 }: ViewUpvotesDrawerProps) => {
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState(false);
 
@@ -64,6 +75,14 @@ export const ViewUpvotesDrawer = ({
     return voters.reduce((memo, current) => memo + current.voting_weight, 0);
   };
 
+  const getAuthorCommunityId = (contentAuthor) => {
+    if (contentAuthor instanceof MinimumProfile) {
+      return contentAuthor?.chain;
+    } else if (contentAuthor instanceof Account) {
+      return contentAuthor.community.id;
+    }
+  };
+
   return (
     <>
       <CWText type="caption" onClick={() => setIsUpvoteDrawerOpen(true)}>
@@ -74,6 +93,19 @@ export const ViewUpvotesDrawer = ({
         header={header}
         onClose={() => setIsUpvoteDrawerOpen(false)}
       >
+        <div className="upvoted-content">
+          <div className="upvoted-content-header">
+            <AuthorAndPublishInfo
+              authorAddress={author?.address}
+              authorChainId={getAuthorCommunityId(author)}
+              publishDate={publishDate}
+              showUserAddressWithInfo={false}
+            />
+          </div>
+          <div className="upvoted-content-body">
+            <QuillRenderer doc={contentBody} cutoffLines={10} />
+          </div>
+        </div>
         {reactorData && (
           <>
             <CWTable

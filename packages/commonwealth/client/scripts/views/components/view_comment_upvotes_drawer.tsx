@@ -33,6 +33,12 @@ export const ViewCommentUpvotesDrawer = ({
   });
 
   return (
-    <ViewUpvotesDrawer header="Comment upvotes" reactorData={reactorData} />
+    <ViewUpvotesDrawer
+      contentBody={comment.text}
+      header="Comment upvotes"
+      reactorData={reactorData}
+      author={app.chain.accounts.get(comment.author)}
+      publishDate={comment.createdAt}
+    />
   );
 };

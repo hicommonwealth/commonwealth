@@ -33,6 +33,12 @@ export const ViewThreadUpvotesDrawer = ({
   });
 
   return (
-    <ViewUpvotesDrawer header="Thread upvotes" reactorData={reactorData} />
+    <ViewUpvotesDrawer
+      contentBody={thread.body}
+      header="Thread upvotes"
+      reactorData={reactorData}
+      author={app.chain.accounts.get(thread.author)}
+      publishDate={thread.createdAt}
+    />
   );
 };

@@ -22,6 +22,15 @@
       margin-bottom: 16px;
     }
 
+    .upvoted-content {
+      padding: 16px 0;
+      margin-bottom: 24px;
+
+      .upvoted-content-body {
+        padding: 16px 0 0 18px;
+      }
+    }
+
     .upvote-totals {
       display: flex;
       justify-content: space-evenly;
