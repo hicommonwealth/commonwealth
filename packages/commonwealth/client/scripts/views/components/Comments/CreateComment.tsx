@@ -19,7 +19,6 @@ type CreateCommentProps = {
   parentCommentId?: number;
   rootThread: Thread;
   canComment: boolean;
-  shouldFocusEditor?: boolean;
   tooltipText?: string;
 };
 
@@ -28,7 +27,6 @@ export const CreateComment = ({
   parentCommentId,
   rootThread,
   canComment,
-  shouldFocusEditor = false,
   tooltipText = '',
 }: CreateCommentProps) => {
   const { saveDraft, restoreDraft, clearDraft } = useDraft<DeltaStatic>(
@@ -146,7 +144,7 @@ export const CreateComment = ({
             onCancel={handleCancel}
             author={author}
             editorValue={editorValue}
-            shouldFocus={shouldFocusEditor}
+            shouldFocus
             tooltipText={tooltipText}
           />
           {RevalidationModal}
