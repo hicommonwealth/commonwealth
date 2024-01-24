@@ -1,5 +1,9 @@
 @import '../../../../../../styles/shared.scss';
 
+.drawer-trigger {
+  color: $neutral-500;
+}
+
 .Drawer {
   padding-bottom: 46px;
   overflow: auto;

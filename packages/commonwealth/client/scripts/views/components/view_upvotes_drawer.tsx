@@ -85,7 +85,11 @@ export const ViewUpvotesDrawer = ({
 
   return (
     <>
-      <CWText type="caption" onClick={() => setIsUpvoteDrawerOpen(true)}>
+      <CWText
+        type="caption"
+        className="drawer-trigger"
+        onClick={() => setIsUpvoteDrawerOpen(true)}
+      >
         View Upvotes
       </CWText>
       <CWDrawer
