@@ -31,6 +31,14 @@ export const UpgradeRolesForm = ({
     { id: 2, checked: false },
   ]);
 
+  const zeroOutRadioButtons = () => {
+    const zeroedOutRadioButtons = radioButtons.map((radioButton) => ({
+      ...radioButton,
+      checked: false,
+    }));
+    setRadioButtons(zeroedOutRadioButtons);
+  };
+
   const nonAdmins: RoleInfo[] = roleData.filter((_role) => {
     return (
       _role.permission === AccessLevel.Member ||
@@ -144,6 +152,7 @@ export const UpgradeRolesForm = ({
 
               onRoleUpdate(_user, r.result);
             });
+            zeroOutRadioButtons();
           }}
         />
       </div>
