@@ -109,7 +109,7 @@ async function main() {
     db: models.sequelize,
     tableName: 'Sessions',
     checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
-    expiration: 7 * 24 * 60 * 60 * 1000, // Set session expiration to 7 days
+    expiration: 14 * 24 * 60 * 60 * 1000, // Set session expiration to 7 days
   });
 
   sessionStore.sync();
