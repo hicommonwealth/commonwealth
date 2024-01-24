@@ -1,4 +1,4 @@
-import { ViewUpvotesDrawer } from 'client/scripts/views/components/view_upvotes_drawer';
+import { ViewThreadUpvotesDrawer } from 'client/scripts/views/components/view_thread_upvotes_drawer';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import Thread from 'models/Thread';
 import React, { useState } from 'react';
@@ -134,9 +134,7 @@ export const ThreadOptions = ({
             />
           )}
         </div>
-        {upvoteDrawerBtnBelow && (
-          <ViewUpvotesDrawer contentType="thread" thread={thread} />
-        )}
+        {upvoteDrawerBtnBelow && <ViewThreadUpvotesDrawer thread={thread} />}
       </div>
       {thread && <></>}
     </>
