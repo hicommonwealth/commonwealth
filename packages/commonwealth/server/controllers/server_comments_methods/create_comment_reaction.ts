@@ -1,4 +1,5 @@
 import { AppError, ServerError } from '@hicommonwealth/adapters';
+import { ValidChains } from '@hicommonwealth/chains';
 import { NotificationCategories } from '@hicommonwealth/core';
 import {
   AddressInstance,
@@ -7,7 +8,6 @@ import {
   UserInstance,
 } from '@hicommonwealth/model';
 import { REACTION_WEIGHT_OVERRIDE } from 'server/config';
-import { ValidChains } from 'server/util/commonProtocol/chainConfig';
 import { getNamespaceBalance } from 'server/util/commonProtocol/contractHelpers';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';

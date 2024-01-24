@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { ValidChains } from 'helpers/chainConfig';
+import { ValidChains } from '@hicommonwealth/chains';
 import AddressInfo from 'models/AddressInfo';
 import { SelectedCommunity } from 'views/components/component_kit/new_designs/CWCommunitySelector';
 
