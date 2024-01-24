@@ -103,7 +103,7 @@ export const AdminOnboardingSlider = () => {
         <div className="cards">
           <AdminOnboardingCard
             cardType="create-topic"
-            isActionCompleted={topics.length > 0}
+            isActionCompleted={topics.length > 1} // we have a default 'General' topic which is not counted here
             onCTAClick={() => redirectToPage('create-topic')}
           />
           <AdminOnboardingCard
