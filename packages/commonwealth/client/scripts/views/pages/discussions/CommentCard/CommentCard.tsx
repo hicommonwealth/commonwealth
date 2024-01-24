@@ -4,7 +4,7 @@ import type { DeltaStatic } from 'quill';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 
-import { ViewUpvotesDrawer } from 'client/scripts/views/components/view_upvotes_drawer';
+import { ViewCommentUpvotesDrawer } from 'client/scripts/views/components/view_comment_upvotes_drawer';
 import type Comment from 'models/Comment';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
@@ -173,7 +173,7 @@ export const CommentCard = ({
                 tooltipText={disabledActionsTooltipText}
               />
 
-              <ViewUpvotesDrawer contentType="comment" comment={comment} />
+              <ViewCommentUpvotesDrawer comment={comment} />
 
               <SharePopover commentId={comment.id} />
 
