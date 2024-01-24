@@ -75,8 +75,9 @@ export function downloadCSV(rows: CSVRow[], filename: string) {
   const csvContent = [
     labels,
     ...rows.map((row) =>
-      Object.values(row).map(
-        (col) => `"${col.toString().replace(/"/g, '""')}"`, // Enclose in quotes and escape existing quotes
+      Object.values(row).map((col) =>
+        // Enclose in quotes and escape existing quotes
+        typeof col === 'string' ? `"${col.replace(/"/g, '""')}"` : col,
       ),
     ),
   ]
