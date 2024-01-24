@@ -1,61 +1,18 @@
-import Comment from 'client/scripts/models/Comment';
-import type Thread from 'client/scripts/models/Thread';
-import { useFetchProfilesByAddressesQuery } from 'client/scripts/state/api/profiles';
 import React, { useState } from 'react';
-import app from 'state';
 import { CWText } from './component_kit/cw_text';
 import CWDrawer from './component_kit/new_designs/CWDrawer';
 import { CWTable } from './component_kit/new_designs/CWTable';
 
 type ViewUpvotesDrawerProps = {
-  contentType: 'thread' | 'comment';
-  thread?: Thread;
-  comment?: Comment<any>;
+  header: string;
+  reactorData: any[];
 };
 
 export const ViewUpvotesDrawer = ({
-  contentType,
-  thread,
-  comment,
+  header,
+  reactorData,
 }: ViewUpvotesDrawerProps) => {
-  const contentKeys = {
-    thread: {
-      addrKey: 'address',
-      updatedAtKey: 'updated_at',
-      voteWeightKey: 'voting_weight',
-    },
-    comment: {
-      addrKey: 'author',
-      updatedAtKey: 'updatedAt',
-      voteWeightKey: 'calculatedVotingWeight',
-    },
-  };
-
-  const typeKeys = contentKeys[contentType];
-
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState(false);
-  const reactors = thread?.associatedReactions || comment?.reactions;
-  const reactorAddresses = reactors?.map((t) => t[typeKeys['addrKey']]);
-
-  const { data: reactorProfiles } = useFetchProfilesByAddressesQuery({
-    currentChainId: app.activeChainId(),
-    profileAddresses: reactorAddresses,
-    profileChainIds: [app.chain.id],
-  });
-
-  const reactorData = reactorProfiles?.map((profile) => {
-    const reactor = reactors.find(
-      (addr) => addr[typeKeys['addrKey']] === profile.address,
-    );
-
-    return {
-      name: profile.name,
-      avatarUrl: profile.avatarUrl,
-      address: profile.address,
-      updated_at: reactor?.[typeKeys['updatedAtKey']],
-      voting_weight: reactor?.[typeKeys['voteWeightKey']] || 0,
-    };
-  });
 
   const getColumnInfo = () => {
     return [
@@ -114,9 +71,7 @@ export const ViewUpvotesDrawer = ({
       </CWText>
       <CWDrawer
         open={isUpvoteDrawerOpen}
-        header={`${
-          contentType.charAt(0).toLocaleUpperCase() + contentType.slice(1)
-        } upvotes`}
+        header={header}
         onClose={() => setIsUpvoteDrawerOpen(false)}
       >
         {reactorData && (
