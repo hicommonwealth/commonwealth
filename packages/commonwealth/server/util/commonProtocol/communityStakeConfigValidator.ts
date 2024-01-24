@@ -1,8 +1,8 @@
 import { AppError } from '@hicommonwealth/adapters';
+import { factoryContracts, ValidChains } from '@hicommonwealth/chains';
 import { DB } from '@hicommonwealth/model';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
-import { factoryContracts, ValidChains } from './chainConfig';
 import { getNamespace } from './contractHelpers';
 
 export const validateCommunityStakeConfig = async (

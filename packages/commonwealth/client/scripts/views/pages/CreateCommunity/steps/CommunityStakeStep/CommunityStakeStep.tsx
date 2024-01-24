@@ -1,16 +1,21 @@
 import React, { useState } from 'react';
 
+import AddressInfo from 'models/AddressInfo';
 import EnableStake from './EnableStake';
 import SignStakeTransactions from './SignStakeTransactions';
 
 interface CommunityStakeStepProps {
   goToSuccessStep: () => void;
   createdCommunityName: string;
+  createdCommunityId: string;
+  selectedAddress: AddressInfo;
 }
 
 const CommunityStakeStep = ({
   goToSuccessStep,
   createdCommunityName,
+  createdCommunityId,
+  selectedAddress,
 }: CommunityStakeStepProps) => {
   const [enableStakePage, setEnableStakePage] = useState(true);
   const [communityStakeData, setCommunityStakeData] = useState({
@@ -32,7 +37,12 @@ const CommunityStakeStep = ({
           communityStakeData={communityStakeData}
         />
       ) : (
-        <SignStakeTransactions goToSuccessStep={goToSuccessStep} />
+        <SignStakeTransactions
+          goToSuccessStep={goToSuccessStep}
+          communityStakeData={communityStakeData}
+          selectedAddress={selectedAddress}
+          createdCommunityId={createdCommunityId}
+        />
       )}
     </div>
   );

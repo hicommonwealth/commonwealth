@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -7,10 +7,10 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
 import Hint from '../../../components/Hint';
-import { EnableStakeProps, StakeData } from './types';
+import { EnableStakeProps, StakeData } from '../types';
+import useNamespaceFactory from '../useNamespaceFactory';
 import { validationSchema } from './validations';
 
-import NamespaceFactory from 'helpers/ContractHelpers/NamespaceFactory';
 import './EnableStake.scss';
 
 const EnableStake = ({
@@ -18,22 +18,32 @@ const EnableStake = ({
   onOptInEnablingStake,
   communityStakeData,
 }: EnableStakeProps) => {
+  const [namespaceError, setNamespaceError] = useState('');
+
+  const { namespaceFactory } = useNamespaceFactory();
+
+  const clearNamespaceError = () => {
+    setNamespaceError('');
+  };
+
   const handleSubmit = async (data: StakeData) => {
     try {
-      const namespaceFactory = new NamespaceFactory(
-        '0xf877acdb66586ace7381b6e0b83697540f4c3871',
-      );
-      const works = await namespaceFactory.checkNamespaceReservation(
-        'IansSpace222',
-      );
+      clearNamespaceError();
+
+      const isNamespaceAvailable =
+        await namespaceFactory.checkNamespaceReservation(data.namespace);
+
+      if (!isNamespaceAvailable) {
+        return setNamespaceError('Namespace already exists');
+      }
+
+      onOptInEnablingStake({
+        namespace: data.namespace,
+        symbol: data.symbol,
+      });
     } catch (err) {
       console.log(err);
     }
-
-    onOptInEnablingStake({
-      namespace: data.namespace,
-      symbol: data.symbol,
-    });
   };
 
   const getInitialValue = () => {
@@ -76,6 +86,8 @@ const EnableStake = ({
             label="Community Namespace"
             placeholder="namespace"
             fullWidth
+            customError={namespaceError}
+            onChange={clearNamespaceError}
           />
 
           <CWTextInput

@@ -62,6 +62,8 @@ const CreateCommunity = () => {
           <CommunityStakeStep
             goToSuccessStep={() => onChangeStep(true)}
             createdCommunityName={createdCommunityName}
+            createdCommunityId={createdCommunityId}
+            selectedAddress={selectedAddress}
           />
         );
 
