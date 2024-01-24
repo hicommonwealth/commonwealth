@@ -104,11 +104,7 @@ class NamespaceFactory extends ContractBase {
     let txReceipt;
     try {
       txReceipt = await this.contract.methods
-        .configureCommunityStakeId(
-          name,
-          name.concat(' Community Stake'),
-          stakesId,
-        )
+        .configureCommunityStakesId(name, name + ' Community Stake', stakesId)
         .send({ from: this.wallet.accounts[0] });
     } catch {
       throw new Error('Transaction failed');
