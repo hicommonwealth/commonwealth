@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 
+import { STAKE_ID } from '@hicommonwealth/chains';
 import { useUpdateCommunityMutation } from 'state/api/communities';
+import { useUpdateCommunityStake } from 'state/api/communityStake';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
-import { fakeRandomAPICall } from 'views/modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 
 import ActionSteps from '../../../components/ActionSteps';
 import { ActionStepsProps } from '../../../components/ActionSteps/types';
@@ -12,6 +13,8 @@ import Hint from '../../../components/Hint';
 import { ActionState, SignStakeTransactionsProps } from '../types';
 import useNamespaceFactory from '../useNamespaceFactory';
 
+import axios from 'axios';
+import app from 'state';
 import './SignStakeTransactions.scss';
 
 const defaultActionState: ActionState = {
@@ -33,6 +36,7 @@ const SignStakeTransactions = ({
 
   const { namespaceFactory } = useNamespaceFactory();
   const { mutateAsync: updateCommunity } = useUpdateCommunityMutation();
+  const { mutateAsync: updateCommunityStake } = useUpdateCommunityStake();
 
   const getActionSteps = (): ActionStepsProps['steps'] => {
     return [
@@ -92,6 +96,8 @@ const SignStakeTransactions = ({
         state: 'completed',
       }));
     } catch (err) {
+      console.log(err);
+
       const error = err?.message?.includes('Namespace already reserved')
         ? 'Namespace already reserved'
         : 'There was an issue creating the namespace. Please try again.';
@@ -112,18 +118,44 @@ const SignStakeTransactions = ({
         errorText: '',
       }));
 
-      await fakeRandomAPICall();
+      await namespaceFactory.configureCommunityStakes(
+        communityStakeData.namespace,
+        STAKE_ID,
+      );
+
+      const response = await axios.get(
+        `${app.serverUrl()}/communityStakes/${createdCommunityId}/${STAKE_ID}`,
+      );
+
+      console.log('response', response);
+
+      await updateCommunityStake({
+        communityId: createdCommunityId,
+        stakeId: STAKE_ID,
+      });
 
       setLaunchStakeData((prevState) => ({
         ...prevState,
         state: 'completed',
       }));
-      goToSuccessStep();
+
+      const responseafter = await axios.get(
+        `${app.serverUrl()}/communityStakes/${createdCommunityId}/${STAKE_ID}`,
+      );
+
+      console.log('responseafter', responseafter);
+
+      // goToSuccessStep();
     } catch (err) {
+      console.log(err);
+
+      const error =
+        'There was an issue launching community stakes. Please try again.';
+
       setLaunchStakeData((prevState) => ({
         ...prevState,
         state: 'not-started',
-        errorText: 'Some error here',
+        errorText: error,
       }));
     }
   };
