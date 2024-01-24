@@ -86,6 +86,8 @@ export const ThreadOptions = ({
         }}
       >
         <div className="options-container">
+          {!upvoteDrawerBtnBelow && <ViewThreadUpvotesDrawer thread={thread} />}
+
           {upvoteBtnVisible && thread && (
             <ReactionButton
               thread={thread}

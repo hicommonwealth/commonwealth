@@ -160,7 +160,9 @@ export const CWTable = ({
             }
 
             const numericColVal = col.chronological
-              ? getRelativeTimestamp(info.getValue())
+              ? info.getValue()
+                ? getRelativeTimestamp(info.getValue())
+                : 'N/A'
               : info.getValue();
 
             if (col.numeric) {
