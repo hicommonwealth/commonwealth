@@ -7,8 +7,8 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
 import Hint from '../../../components/Hint';
+import { EnableStakeProps, StakeData } from '../types';
 import useNamespaceFactory from '../useNamespaceFactory';
-import { EnableStakeProps, StakeData } from './types';
 import { validationSchema } from './validations';
 
 import './EnableStake.scss';

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { ValidChains } from 'helpers/chainConfig';
 import AddressInfo from 'models/AddressInfo';
 import { SelectedCommunity } from 'views/components/component_kit/new_designs/CWCommunitySelector';
 
@@ -8,7 +9,7 @@ import { CreateCommunityStep, handleChangeStep } from './utils';
 
 const useCreateCommunity = () => {
   const [createCommunityStep, setCreateCommunityStep] =
-    useState<CreateCommunityStep>(CreateCommunityStep.CommunityStake);
+    useState<CreateCommunityStep>(CreateCommunityStep.CommunityTypeSelection);
   const [selectedCommunity, setSelectedCommunity] = useState<SelectedCommunity>(
     { type: null, chainBase: null },
   );
@@ -39,7 +40,12 @@ const useCreateCommunity = () => {
     CreateCommunityStep.BasicInformation,
     CreateCommunityStep.CommunityStake,
   ].includes(createCommunityStep);
-  const isEthereumMainnetSelected = selectedChainId === ETHEREUM_MAINNET_ID;
+  // TODO only for testing/QA purpose
+  // Goerli should be removed before merging to production
+  // only ETHEREUM_MAINNET_ID should be here
+  const isEthereumMainnetSelected =
+    selectedChainId === ETHEREUM_MAINNET_ID ||
+    selectedChainId === String(ValidChains.Goerli);
   const showCommunityStakeStep =
     isValidStepToShowCommunityStakeFormStep &&
     selectedCommunity.type === 'ethereum' &&

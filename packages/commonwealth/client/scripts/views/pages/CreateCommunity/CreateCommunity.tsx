@@ -32,8 +32,7 @@ const CreateCommunity = () => {
     payload: { event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_VISITED },
   });
 
-  const isSuccessStep =
-    createCommunityStep === CreateCommunityStep.CommunityTypeSelection;
+  const isSuccessStep = createCommunityStep === CreateCommunityStep.Success;
 
   const getCurrentStep = () => {
     switch (createCommunityStep) {
@@ -63,6 +62,8 @@ const CreateCommunity = () => {
           <CommunityStakeStep
             goToSuccessStep={() => onChangeStep(true)}
             createdCommunityName={createdCommunityName}
+            createdCommunityId={createdCommunityId}
+            selectedAddress={selectedAddress}
           />
         );
 
