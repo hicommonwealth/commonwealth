@@ -50,7 +50,7 @@ class NamespaceFactory extends ContractBase {
    * Checks if namespace is reserved both in existing names and at
    * reservation hook
    * @param name Namespace name
-   * @returns contract address 0x...
+   * @returns Boolean: true when namespace is available, otherwise false
    */
   async checkNamespaceReservation(name: string): Promise<boolean> {
     this.isInitialized();

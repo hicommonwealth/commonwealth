@@ -32,7 +32,8 @@ const CreateCommunity = () => {
     payload: { event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_VISITED },
   });
 
-  const isSuccessStep = createCommunityStep === CreateCommunityStep.Success;
+  const isSuccessStep =
+    createCommunityStep === CreateCommunityStep.CommunityTypeSelection;
 
   const getCurrentStep = () => {
     switch (createCommunityStep) {
