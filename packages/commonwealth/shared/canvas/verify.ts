@@ -13,6 +13,7 @@ import {
 import { caip2ToChainBase } from './chainMappings';
 
 import { configure } from 'safe-stable-stringify';
+import { MAGIC_API_KEY } from 'server/config';
 export const stringify = configure({
   bigint: false,
   circularValue: Error,
@@ -87,6 +88,21 @@ export const verify = async ({
 
     if (sessionPayload.from.startsWith('magic:')) {
       // validate magic DID token
+      const magicSDK = await import('@magic-sdk/admin');
+      const magic = new magicSDK.Magic(MAGIC_API_KEY);
+
+      const signaturePattern = /\b(.+)\/([A-Za-z0-9+/=]+)\/([A-Za-z0-9+/=]+)\b/;
+      const signaturePatternMatch = signaturePattern.exec(signature);
+      if (signaturePatternMatch === null) {
+        throw new Error(
+          `Invalid signature: signature did not match ${signaturePattern}`,
+        );
+      }
+      const [_, domain, nonce, signatureData] = signaturePatternMatch;
+
+      await magic.token.validate(signatureData, sessionPayload.sessionAddress);
+      // if no error thrown, signature is valid
+      return true;
     } else if (
       !action &&
       bech32.bech32.decode(sessionPayload.from).prefix === 'terra'

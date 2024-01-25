@@ -125,9 +125,13 @@ export async function signSessionWithMagic(
     const siwe = await require('siwe');
     const nonce = siwe.generateNonce();
     const domain = document.location.origin;
-    const signatureData = await signer.signMessage({
+    const signatureData = await signer.magic.user.generateIdToken({
       attachment: sessionPublicAddress,
     });
+    // const signatureData = await signer.signMessage({
+    //   attachment: sessionPublicAddress,
+    //   // lifespan: 60,
+    // });
 
     // const signature = await signer.signMessage(msgs, fee); // this is a cosmos tx
 
