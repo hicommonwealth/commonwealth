@@ -10,6 +10,8 @@ import { CWThreadAction } from '../../component_kit/new_designs/cw_thread_action
 import { QuillRenderer } from '../../react_quill_editor/quill_renderer';
 import { getColumnInfo } from '../util';
 
+import './ViewUpvotesDrawer.scss';
+
 type ViewUpvotesDrawerProps = {
   header: string;
   reactorData: any[];
@@ -62,7 +64,7 @@ export const ViewUpvotesDrawer = ({
   };
 
   return (
-    <>
+    <div className="ViewUpvotesDrawer">
       <CWThreadAction
         label="View upvotes"
         action="view-upvotes"
@@ -113,6 +115,6 @@ export const ViewUpvotesDrawer = ({
           </CWText>
         )}
       </CWDrawer>
-    </>
+    </div>
   );
 };
