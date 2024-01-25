@@ -1,6 +1,6 @@
 /* eslint-disable react/no-multi-comp */
 import { setupWasmExtension } from '@cosmjs/cosmwasm-stargate';
-import { QueryClient, StargateClient } from '@cosmjs/stargate';
+import { QueryClient } from '@cosmjs/stargate';
 import { HttpClient, Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import axios from 'axios';
 import { ethers } from 'ethers';
@@ -88,36 +88,24 @@ async function isEVMAddressContract(
 
 async function isCosmosAddressContract(
   address: string,
-  networkUrl: string,
+  network_url: string,
 ): Promise<boolean> {
   try {
-    // Initialize the StargateClient
-    const client = await StargateClient.connect(networkUrl);
+    const client = new HttpClient(network_url);
+    const tmClient = await Tendermint34Client.create(client);
+    const api = QueryClient.withExtensions(tmClient, setupWasmExtension);
 
-    // Query the account information
-    const accountInfo = await client.getAccount(address);
-
-    // Disconnect the client (if you are done with the client)
-    client.disconnect();
-
-    // Check if code_hash exists and is not empty
-    // The existence and type of code_hash may vary based on the specific blockchain
-    if (
-      accountInfo &&
-      'codeHash' in accountInfo &&
-      accountInfo.codeHash !== ''
-    ) {
-      console.log('Address is a contract');
+    const contractInfo = await api.wasm.getContractInfo(address);
+    if (contractInfo) {
       return true;
     } else {
-      console.log('Address is not a contract');
       return false;
     }
   } catch (error) {
-    console.error('Error querying the account:', error);
     return false;
   }
 }
+
 const getEVMContractType = async (
   contractAddress,
   network_url,
@@ -177,7 +165,7 @@ const getEVMContractType = async (
 };
 
 async function getCosmosContractType(
-  contractAddress: string,
+  address: string,
   network_url: string,
 ): Promise<string | null> {
   try {
@@ -185,32 +173,13 @@ async function getCosmosContractType(
     const tmClient = await Tendermint34Client.create(client);
     const api = QueryClient.withExtensions(tmClient, setupWasmExtension);
 
-    const contractInfo = await api.wasm.getContractInfo(contractAddress);
-
-    // Initialize the CosmWasmClient
-    // const client = await CosmWasmClient.connect(network_url);
-
-    // Query the contract for its info
-    // const contractInfo: Cw721Metadata = await client.queryContractSmart(
-    //   contractAddress,
-    //   {
-    //     contract_info: {},
-    //   },
-    // );
-
-    // Check the required fields for CW721, for example, `name` and `symbol`
-    if (contractInfo && contractInfo.address && contractInfo.contractInfo) {
-      console.log(
-        'Contract is a CW721 token, with metadata:',
-        contractInfo.contractInfo,
-      );
+    const contractInfo = await api.wasm.getContractInfo(address);
+    if (contractInfo && contractInfo.contractInfo.codeId.equals(49)) {
       return 'cw721';
     } else {
-      console.log('Contract does not comply with the CW721 standard.');
       return null;
     }
   } catch (error) {
-    console.error('Error querying the contract:', error);
     return null;
   }
 }
