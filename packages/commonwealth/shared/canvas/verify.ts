@@ -84,7 +84,10 @@ export const verify = async ({
       import('@cosmjs/encoding'),
       import('@cosmjs/crypto'),
     ]);
-    if (
+
+    if (sessionPayload.from.startsWith('magic:')) {
+      // validate magic DID token
+    } else if (
       !action &&
       bech32.bech32.decode(sessionPayload.from).prefix === 'terra'
     ) {

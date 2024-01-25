@@ -1,7 +1,6 @@
 import { addressSwapper } from 'commonwealth/shared/utils';
 
 import type { ActionArgument, SessionPayload } from '@canvas-js/interfaces';
-import { getADR036SignableSession } from 'adapters/chain/cosmos/keys';
 import { createSiweMessage } from 'adapters/chain/ethereum/keys';
 import { chainBaseToCanvasChainId, createCanvasSessionPayload } from 'canvas';
 
@@ -94,15 +93,20 @@ export async function signSessionWithMagic(
     signerAddress,
   );
 
+  const from = () => {
+    if (walletChain === ChainBase.CosmosSDK) return `magic:${signerAddress}`;
+    else if (walletChain === ChainBase.Substrate)
+      return addressSwapper({
+        address: signerAddress,
+        currentPrefix: 42,
+      });
+    else return signerAddress;
+  };
+
   const sessionPayload = createCanvasSessionPayload(
     walletChain,
     canvasChainId,
-    walletChain === ChainBase.Substrate
-      ? addressSwapper({
-          address: signerAddress,
-          currentPrefix: 42,
-        })
-      : signerAddress,
+    from(),
     sessionPublicAddress,
     timestamp,
     blockhash,
@@ -110,13 +114,24 @@ export async function signSessionWithMagic(
 
   // skip wallet.signCanvasMessage(), do the logic here instead
   if (walletChain === ChainBase.CosmosSDK) {
-    const canvas = await import('@canvas-js/interfaces');
-    const { msgs, fee } = await getADR036SignableSession(
-      Buffer.from(canvas.serializeSessionPayload(sessionPayload)),
-      signerAddress,
-    );
-    const signature = await signer.signMessage(msgs, fee); // this is a cosmos tx
-    return { signature, sessionPayload };
+    // TODO: make this magic token gen, and handle verification for magic separately from ADR036
+    // const canvas = await import('@canvas-js/interfaces');
+    // const { msgs, fee } = await getADR036SignableSession(
+    //   Buffer.from(canvas.serializeSessionPayload(sessionPayload)),
+    //   signerAddress,
+    // );
+
+    // signature format: https://docs.canvas.xyz/docs/formats#ethereum
+    const siwe = await require('siwe');
+    const nonce = siwe.generateNonce();
+    const domain = document.location.origin;
+    const signatureData = await signer.signMessage({
+      attachment: sessionPublicAddress,
+    });
+
+    // const signature = await signer.signMessage(msgs, fee); // this is a cosmos tx
+
+    return { signature: `${domain}/${nonce}/${signatureData}`, sessionPayload };
   } else {
     // signature format: https://docs.canvas.xyz/docs/formats#ethereum
     const siwe = await require('siwe');
