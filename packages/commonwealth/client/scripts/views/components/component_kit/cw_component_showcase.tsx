@@ -6,8 +6,8 @@ import 'components/component_kit/new_designs/cw_button.scss';
 
 import { notifySuccess } from 'controllers/app/notifications';
 import { CWAccountCreationButton } from './cw_account_creation_button';
-import { CWAuthButton } from './cw_auth_button';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
+import { CWAuthButton } from './CWAuthButtonOld';
 
 import { DeltaStatic } from 'quill';
 import app from 'state';
