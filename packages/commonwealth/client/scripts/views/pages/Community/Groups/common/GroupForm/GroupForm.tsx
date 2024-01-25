@@ -65,12 +65,29 @@ interface Cw721Metadata {
 }
 
 const Abis = {
-  ERC20: ['function totalSupply() view returns (uint256)'],
+  ERC20: ['function decimals() view returns (uint256)'],
   ERC721: ['function balanceOf(address owner) view returns (uint256)'],
   ERC1155: [
     'function isApprovedForAll(address account, address operator) view returns (bool)',
   ],
 };
+
+async function getErc20Decimals(
+  address: string,
+  network_url,
+): Promise<number | null> {
+  try {
+    const provider = new ethers.providers.JsonRpcProvider(network_url);
+
+    const contractERC20 = new ethers.Contract(address, Abis.ERC20, provider);
+
+    const decimals = await contractERC20.decimals();
+    return decimals;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
 
 async function isEVMAddressContract(
   address: string,
@@ -130,8 +147,7 @@ const getEVMContractType = async (
 
   try {
     // Check for ERC20
-    await contractERC20.totalSupply();
-    console.log(contractAddress, 'is an ERC20 contract.');
+    await contractERC20.decimals();
     return 'erc20';
   } catch (e) {
     /* Not ERC20 */
@@ -140,7 +156,6 @@ const getEVMContractType = async (
   try {
     // Check for ERC721
     await contractERC721.balanceOf(ethers.constants.AddressZero);
-    console.log(contractAddress, 'is an ERC721 contract.');
     return 'erc721';
   } catch (e) {
     /* Not ERC721 */
@@ -152,7 +167,6 @@ const getEVMContractType = async (
       ethers.constants.AddressZero,
       ethers.constants.AddressZero,
     );
-    console.log(contractAddress, 'is an ERC1155 contract.');
     return 'erc1155';
   } catch (e) {
     /* Not ERC1155 */
@@ -482,6 +496,7 @@ const GroupForm = ({
             subForm.values.requirementType === CW_SPECIFICATIONS.CW_721;
 
           const contract_address = subForm.values.requirementContractAddress;
+          const amount = subForm.values.requirementAmount;
           const evmId = parseInt(subForm.values.requirementChain); // requirement.data.source.evm_chain_id;
           const cosmosId = subForm.values.requirementChain; // requirement.data.source.cosmos_chain_id;
           const node = await axios.get(
@@ -494,8 +509,6 @@ const GroupForm = ({
           const isAddressContract = isCosmos
             ? await isCosmosAddressContract(contract_address, node_url)
             : await isEVMAddressContract(contract_address, node_url);
-
-          console.log('isAddressContract', isAddressContract);
 
           const isContractType = isCosmos
             ? await getCosmosContractType(contract_address, node_url)
@@ -520,6 +533,22 @@ const GroupForm = ({
                 [key]: VALIDATION_MESSAGES.INVALID_CONTRACT_TYPE,
               },
             };
+          } else if (isContractType === 'erc20') {
+            const erc20Decimals = await getErc20Decimals(
+              contract_address,
+              node_url,
+            );
+            const amountKey = Object.keys(subForm.values)[0];
+
+            if (erc20Decimals && amount.split('.')[1]?.length > erc20Decimals) {
+              updatedSubForms[index] = {
+                ...updatedSubForms[index],
+                errors: {
+                  ...updatedSubForms[index].errors,
+                  [amountKey]: VALIDATION_MESSAGES.INPUT_TOO_SMALL,
+                },
+              };
+            }
           }
         } catch (e: any) {
           const zodError = e as ZodError;
@@ -585,7 +614,7 @@ const GroupForm = ({
   ]);
 
   const handleSubmit = async (values: FormSubmitValues) => {
-    const hasSubFormErrors = validateSubForms();
+    const hasSubFormErrors = await validateSubForms();
     if (hasSubFormErrors || cwRequiremenetsLabelInputField.error) {
       return;
     }

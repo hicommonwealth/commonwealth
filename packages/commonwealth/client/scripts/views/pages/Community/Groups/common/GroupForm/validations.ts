@@ -8,6 +8,7 @@ export const VALIDATION_MESSAGES = {
   INVALID_ADDRESS: 'Invalid address',
   CONTRACT_NOT_FOUND: 'Contract not found',
   INVALID_CONTRACT_TYPE: 'Invalid contract type',
+  INPUT_TOO_SMALL: 'Input too small',
 };
 
 export const requirementSubFormValidationSchema = z.object({

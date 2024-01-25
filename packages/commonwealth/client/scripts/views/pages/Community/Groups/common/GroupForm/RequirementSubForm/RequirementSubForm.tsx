@@ -32,7 +32,7 @@ const RequirementSubForm = ({
   const helperTextForAmount = {
     [TOKENS.EVM_TOKEN]: 'Using 18 decimal precision',
     [TOKENS.COSMOS_TOKEN]: 'Using 6 decimal precision',
-    [ERC_SPECIFICATIONS.ERC_20]: 'Using 18 decimal precision',
+    [ERC_SPECIFICATIONS.ERC_20]: 'Using decimal precision of the token',
     [ERC_SPECIFICATIONS.ERC_721]: '',
     [CW_SPECIFICATIONS.CW_721]: '',
   };
