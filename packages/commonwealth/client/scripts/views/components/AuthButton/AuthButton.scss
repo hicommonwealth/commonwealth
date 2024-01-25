@@ -1,0 +1,58 @@
+@import '../../../../styles/shared';
+
+.AuthButton {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-radius: 6px;
+  border: 2px solid $neutral-200;
+  padding: 16px;
+  width: 100%;
+  min-height: 68px !important;
+  max-height: 68px !important;
+  height: 68px !important;
+  outline: none !important;
+  cursor: pointer;
+  background-color: white;
+
+  &:not(:disabled) {
+    &:focus-within,
+    &:focus,
+    &:active {
+      border: 2px solid $primary-200 !important;
+      outline: none !important;
+    }
+  }
+
+  &:disabled {
+    background-color: $neutral-100 !important;
+    cursor: not-allowed;
+  }
+
+  &:hover {
+    background-color: $neutral-25;
+  }
+
+  .icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .label {
+    font-weight: 600;
+  }
+
+  .description {
+    margin-left: auto;
+    background-color: $primary-600;
+
+    &.no-bg {
+      background-color: transparent;
+      padding: 0 !important;
+
+      .Text {
+        color: $neutral-400 !important;
+      }
+    }
+  }
+}
