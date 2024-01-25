@@ -21,8 +21,6 @@ chai.use(chaiHttp);
 const expect = chai.expect;
 const app = express();
 app.use(express.json());
-const cacheDecorator = new CacheDecorator();
-setupCacheTestEndpoints(app, cacheDecorator);
 
 const content_type = {
   json: 'application/json; charset=utf-8',
@@ -55,17 +53,18 @@ async function makePostRequest(endpoint, body, headers = {}) {
 }
 
 describe('Cache Disable Tests', () => {
+  process.env.DISABLE_CACHE = 'true';
+  console.log(
+    `Cache Disable Tests: DISABLE_CACHE ${process.env.DISABLE_CACHE}`,
+  );
   const redisCache: RedisCache = new RedisCache();
   const route_namespace: RedisNamespaces = RedisNamespaces.Route_Response;
+  const cacheDecorator = new CacheDecorator(redisCache);
+  setupCacheTestEndpoints(app, cacheDecorator);
+  process.env.DISABLE_CACHE = 'false';
 
   before(async () => {
     await connectToRedis(redisCache);
-    process.env.DISABLE_CACHE = 'true';
-    console.log(
-      `Cache Disable Tests: DISABLE_CACHE ${process.env.DISABLE_CACHE}`,
-    );
-    cacheDecorator.setCache(redisCache);
-    process.env.DISABLE_CACHE = 'false';
   });
 
   after(async () => {

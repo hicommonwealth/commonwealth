@@ -232,6 +232,7 @@ export async function main(app: express.Express) {
 
   const redisCache = new RedisCache(rollbar);
   await redisCache.init(REDIS_URL);
+  const cacheDecorator = new CacheDecorator(redisCache);
 
   const tokenBalanceCache = new TokenBalanceCache(
     models,
@@ -266,7 +267,6 @@ export async function main(app: express.Express) {
   addExternalRoutes('/external', app, models);
   addSwagger('/docs', app);
 
-  const cacheDecorator = new CacheDecorator();
   setupCosmosProxy(app, models, cacheDecorator);
   setupIpfsProxy(app, cacheDecorator);
 
@@ -286,7 +286,7 @@ export async function main(app: express.Express) {
 
   setupErrorHandlers(app, rollbar);
 
-  setupServer(app, rollbar, models, rabbitMQController, redisCache);
+  setupServer(app);
 
   // database clean-up jobs (should be run after the API so, we don't affect start-up time
   databaseCleaner.initLoop(

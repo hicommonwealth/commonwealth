@@ -31,22 +31,17 @@ export class FuncExecError extends Error {
 }
 
 export class CacheDecorator {
-  private redisCache: RedisCache;
   private _log?: ILogger;
+  private _redisCache?: RedisCache;
 
-  constructor() {
+  constructor(redisCache: RedisCache) {
     this._log = logger().getLogger(__filename);
-  }
-
-  // Set redis cache instance
-  public setCache(redisCache: RedisCache) {
-    this._log.info(`setCache: DISABLE_CACHE ${process.env.DISABLE_CACHE}`);
     // If cache is disabled, skip caching
     if (process.env.DISABLE_CACHE === 'true') {
       this._log.info(`cacheMiddleware: cache disabled`);
       return;
     }
-    this.redisCache = redisCache;
+    this._redisCache = redisCache;
   }
 
   /**
@@ -324,7 +319,7 @@ export class CacheDecorator {
   ): Promise<boolean> {
     if (!this.isEnabled()) return false;
 
-    return await this.redisCache.setKey(
+    return await this._redisCache.setKey(
       namespace,
       cacheKey,
       valueToCache,
@@ -337,7 +332,7 @@ export class CacheDecorator {
     cacheKey: string,
     namespace: RedisNamespaces = RedisNamespaces.Route_Response,
   ): Promise<string> {
-    const ret = await this.redisCache.getKey(namespace, cacheKey);
+    const ret = await this._redisCache.getKey(namespace, cacheKey);
     if (ret) {
       return ret;
     }
@@ -414,6 +409,6 @@ export class CacheDecorator {
   }
 
   private isEnabled(): boolean {
-    return this.redisCache && this.redisCache.isInitialized();
+    return this._redisCache && this._redisCache.isInitialized();
   }
 }

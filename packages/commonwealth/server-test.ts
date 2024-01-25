@@ -113,6 +113,7 @@ const setupServer = () => {
 
 const banCache = new BanCache(models);
 const redisCache = new RedisCache();
+const cacheDecorator = new CacheDecorator(redisCache);
 const globalActivityCache = new GlobalActivityCache(models, redisCache);
 globalActivityCache.start();
 
@@ -128,7 +129,7 @@ setupAPI(
   databaseValidationService,
   redisCache,
 );
-setupCosmosProxy(app, models, new CacheDecorator());
+setupCosmosProxy(app, models, cacheDecorator);
 
 const rollbar = new Rollbar({
   accessToken: ROLLBAR_SERVER_TOKEN,
@@ -141,5 +142,6 @@ setupErrorHandlers(app, rollbar);
 setupServer();
 
 export { resetDatabase } from './test/util/resetDatabase';
+export { cacheDecorator, redisCache };
 
 export default app;
