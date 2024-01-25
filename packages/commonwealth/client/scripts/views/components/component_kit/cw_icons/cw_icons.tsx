@@ -1439,11 +1439,11 @@ export const CWEdgeware = (props: IconProps) => {
         <circle cx="8" cy="8" r="8" fill="white" />
       </mask>
       <g xmlns="http://www.w3.org/2000/svg" mask="url(#mask0_1396_13825)">
-        <rect width="16" height="16" fill="url(#pattern0)" />
+        <rect width="16" height="16" fill="url(#patternCWEdgeware)" />
       </g>
       <defs xmlns="http://www.w3.org/2000/svg">
         <pattern
-          id="pattern0"
+          id="patternCWEdgeware"
           patternContentUnits="objectBoundingBox"
           width="1"
           height="1"
@@ -3416,10 +3416,10 @@ export const CWGoogle = (props: IconProps) => {
       xmlns="http://www.w3.org/2000/svg"
       {...otherProps}
     >
-      <rect width="32" height="32" fill="url(#pattern0)" />
+      <rect width="32" height="32" fill="url(#patternCWGoogle)" />
       <defs>
         <pattern
-          id="pattern0"
+          id="patternCWGoogle"
           patternContentUnits="objectBoundingBox"
           width="1"
           height="1"

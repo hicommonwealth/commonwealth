@@ -30,6 +30,7 @@ import {
 } from 'views/components/react_quill_editor';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
+import AuthButton from '../AuthButton';
 import { AvatarUpload } from '../Avatar';
 import CommunityStakeBanner from '../CommunityStakeBanner';
 import UpvotePopover from '../UpvotePopover';
@@ -629,7 +630,7 @@ export const ComponentShowcase = () => {
         <div className="tag-row">
           <CWText type="h4">Login User Tag</CWText>
           <CWTag label="mnh7a" type="login" iconName="cosmos" />
-          <CWTag label="mnh7a" type="login" iconName="discordLogin" />
+          <CWTag label="mnh7a" type="login" iconName="discordOld" />
           <CWTag label="mnh7a" type="login" iconName="discord" />
           <CWTag label="mnh7a" type="login" iconName="envelope" />
           <CWTag label="mnh7a" type="login" iconName="ethereum" />
@@ -642,11 +643,7 @@ export const ComponentShowcase = () => {
         <div className="tag-row">
           <CWText type="h4">Address Tags</CWText>
           <CWTag label="0xd83e1...a39bD" type="address" iconName="cosmos" />
-          <CWTag
-            label="0xd83e1...a39bD"
-            type="address"
-            iconName="discordLogin"
-          />
+          <CWTag label="0xd83e1...a39bD" type="address" iconName="discord" />
           <CWTag label="0xd83e1...a39bD" type="address" iconName="envelope" />
           <CWTag label="0xd83e1...a39bD" type="address" iconName="ethereum" />
           <CWTag label="0xd83e1...a39bD" type="address" iconName="octocat" />
@@ -2213,6 +2210,20 @@ export const ComponentShowcase = () => {
             tellus, ac fermentum ex.
           </div>
         </CWDrawer>
+      </div>
+      <div className="auth-buttons">
+        <CWText type="h5">Auth Buttons</CWText>
+        <div className="list">
+          <AuthButton type="walletConnect" />
+          <AuthButton type="keplr" />
+          <AuthButton type="leap" />
+          <AuthButton type="github" />
+          <AuthButton type="google" />
+          <AuthButton type="discord" />
+          <AuthButton type="x" />
+          <AuthButton type="email" />
+          <AuthButton type="NO_WALLETS_FOUND" />
+        </div>
       </div>
     </div>
   );
