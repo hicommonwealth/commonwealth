@@ -17,9 +17,6 @@ const editCommunityStake = async ({
       jwt: app.user.jwt,
       community_id: communityId,
       stake_id: stakeId,
-      stake_token: '',
-      stake_scaler: 1,
-      stake_enabled: true,
     },
   );
 };
