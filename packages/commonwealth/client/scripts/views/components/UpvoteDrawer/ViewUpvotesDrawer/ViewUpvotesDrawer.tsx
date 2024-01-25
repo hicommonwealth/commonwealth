@@ -108,7 +108,9 @@ export const ViewUpvotesDrawer = ({
             </div>
           </>
         ) : (
-          <CWText>There are no upvotes to view.</CWText>
+          <CWText className="empty-upvotes-container" type="b1">
+            There are no upvotes to view.
+          </CWText>
         )}
       </CWDrawer>
     </>

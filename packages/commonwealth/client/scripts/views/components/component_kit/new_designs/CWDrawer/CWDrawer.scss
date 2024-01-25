@@ -8,6 +8,10 @@
   padding-bottom: 46px;
   overflow: auto;
 
+  .empty-upvotes-container {
+    color: $neutral-500;
+  }
+
   .drawer-actions {
     display: flex;
     gap: 8px;
