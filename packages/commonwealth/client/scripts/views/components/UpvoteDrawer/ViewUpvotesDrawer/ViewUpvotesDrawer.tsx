@@ -20,6 +20,14 @@ type ViewUpvotesDrawerProps = {
   publishDate: moment.Moment;
 };
 
+type Upvoter = {
+  name: string;
+  avatarUrl: string;
+  address: string;
+  updated_at: string;
+  voting_weight: number;
+};
+
 export const ViewUpvotesDrawer = ({
   header,
   reactorData,
@@ -29,7 +37,7 @@ export const ViewUpvotesDrawer = ({
 }: ViewUpvotesDrawerProps) => {
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState(false);
 
-  const voterRow = (voter) => {
+  const voterRow = (voter: Upvoter) => {
     return {
       name: voter.name,
       voteWeight: voter.voting_weight,
@@ -43,7 +51,7 @@ export const ViewUpvotesDrawer = ({
     };
   };
 
-  const getRowData = (voters) => {
+  const getRowData = (voters: Upvoter[]) => {
     if (voters) {
       return voters?.map((voter) => {
         return voterRow(voter);
