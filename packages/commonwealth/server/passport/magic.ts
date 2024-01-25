@@ -377,7 +377,6 @@ async function magicLoginRoute(
     signature: string;
     sessionPayload?: string; // optional because session keys are feature-flagged
     magicAddress?: string; // optional because session keys are feature-flagged
-    didToken?: string; // optional because currently only used for cosmos
     walletSsoSource: WalletSsoSource;
   }>,
   decodedMagicToken: MagicUser,
@@ -462,7 +461,7 @@ async function magicLoginRoute(
 
     if (chainToJoin) {
       if (chainToJoin.base === ChainBase.CosmosSDK) {
-        const signaturePattern = /(.+)\/([A-Za-z0-9+\/]+)\/([A-Za-z0-9+/=]+)/;
+        const signaturePattern = /(.+)\/([A-Za-z0-9+]+)\/([A-Za-z0-9+=]+)/;
         const signaturePatternMatch = signaturePattern.exec(session.signature);
         if (signaturePatternMatch === null) {
           throw new Error(
@@ -471,9 +470,8 @@ async function magicLoginRoute(
         }
         const [_, domain, nonce, signatureData] = signaturePatternMatch;
 
-        // throws if magicAddress does not match signed address in didToken
+        // throws if magicAddress does not match signed address in session DIDToken
         await magic.token.validate(signatureData, req.body.magicAddress);
-        console.log('magic token validated');
 
         generatedAddresses.push({
           address: req.body.magicAddress,

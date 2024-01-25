@@ -449,7 +449,7 @@ export async function handleSocialLoginCallback({
     }
   }
 
-  let authedSessionPayload, authedSignature, didToken;
+  let authedSessionPayload, authedSignature;
   try {
     // Sign a session
     if (isCosmos && desiredChain) {
@@ -463,22 +463,9 @@ export async function handleSocialLoginCallback({
         );
       }
 
-      // didToken = await magic.user.generateIdToken({ attachment: magicAddress });
-
-      // Request the cosmos chain ID, since this is used by Magic to generate
-      // the signed message. The API is already used by the Magic iframe,
-      // but they don't expose the results.
-      // const nodeInfo = await $.get(
-      //   `${document.location.origin}/magicCosmosAPI/${desiredChain.id}/node_info`,
-      // );
-      // const chainId = nodeInfo.node_info.network;
       const timestamp = +new Date();
 
-      const signer = {
-        // signMessage: magic.user.generateIdToken,
-        magic: magic,
-        // request: magic.user.generateIdToken,
-      };
+      const signer = { magic };
       const { signature, sessionPayload } = await signSessionWithMagic(
         ChainBase.CosmosSDK,
         signer,
@@ -486,19 +473,15 @@ export async function handleSocialLoginCallback({
         timestamp,
       );
       // TODO: provide blockhash as last argument to signSessionWithMagic
-
-      // signature.signatures[0].chain_id = chainId;
       await app.sessions.authSession(
         ChainBase.CosmosSDK, // could be desiredChain.base in the future?
         chainBaseToCanvasChainId(ChainBase.CosmosSDK, bech32Prefix), // not the cosmos chain id, since that might change
         magicAddress,
         sessionPayload,
         signature,
-        // JSON.stringify(signature.signatures[0]),
       );
       authedSessionPayload = JSON.stringify(sessionPayload);
       authedSignature = signature;
-      // authedSignature = JSON.stringify(signature.signatures[0]);
       console.log(
         'Reauthenticated Cosmos session from magic address:',
         magicAddress,
@@ -536,7 +519,6 @@ export async function handleSocialLoginCallback({
     }
   } catch (err) {
     // if session auth fails, do nothing
-    console.log('error:', err);
   }
 
   // Otherwise, skip Account.validate(), proceed directly to server login
@@ -554,7 +536,6 @@ export async function handleSocialLoginCallback({
       username: profileMetadata?.username,
       avatarUrl: profileMetadata?.avatarUrl,
       magicAddress,
-      didToken,
       sessionPayload: authedSessionPayload,
       signature: authedSignature,
       walletSsoSource,
