@@ -6,5 +6,5 @@
     "tsBuildInfoFile": "build/.tsbuildinfo"
   },
   "include": ["src"],
-  "references": [{ "path": "../core" }, { "path": "../model" }]
+  "references": [{ "path": "../core" }]
 }

@@ -1,3 +1,2 @@
-export * from './cacheDecorator';
-export * from './redisCache';
-export * from './redisUtils';
+export * from './RedisCache';
+export * from './RedisCacheDecorator';

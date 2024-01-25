@@ -1,16 +1,13 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // import { describe, it, beforeEach, afterEach } from 'mocha';
-import {
-  CacheDecorator,
-  CacheKeyDuration,
-  RedisCache,
-} from '@hicommonwealth/adapters';
 import { RedisNamespaces } from '@hicommonwealth/core';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
-import { Activity } from '../daemons/activity';
+import { Activity } from '../../src/daemon';
+import { CacheDecorator, RedisCache } from '../../src/redis';
+import { CacheKeyDuration } from '../../src/utils';
 chai.use(chaiAsPromised);
 
 describe('CacheDecorator', () => {

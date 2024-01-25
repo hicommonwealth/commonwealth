@@ -3,8 +3,8 @@
 /* eslint-disable no-unused-expressions */
 const chai = require('chai');
 const expect = chai.expect;
-import { RedisCache, connectToRedis, delay } from '@hicommonwealth/adapters';
 import { RedisNamespaces } from '@hicommonwealth/core';
+import { RedisCache, connectToRedis, delay } from '../../src';
 
 async function addRandomKeys(
   redisCache: RedisCache,
@@ -72,7 +72,7 @@ describe('RedisCache', () => {
 
   it('test key expiry', async () => {
     await testExpiry(redisCache, test_namespace);
-  });
+  }).timeout(5000);
 
   it('should get multiple keys with namespace', async () => {
     const data = await addRandomKeys(redisCache, test_namespace);

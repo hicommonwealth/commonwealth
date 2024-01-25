@@ -1,5 +1,5 @@
 import type { RabbitMQController } from '@hicommonwealth/adapters';
-import { RedisCache, cacheDecorator } from '@hicommonwealth/adapters';
+import { CacheDecorator, RedisCache } from '@hicommonwealth/adapters';
 import { logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import type { Express } from 'express-serve-static-core';
@@ -18,6 +18,7 @@ const setupServer = (
 ) => {
   app.set('port', PORT);
   const server = http.createServer(app);
+  const cacheDecorator = new CacheDecorator();
   cacheDecorator.setCache(redisCache);
 
   const onError = (error) => {

@@ -1,13 +1,12 @@
-import { RedisNamespaces, logger } from '@hicommonwealth/core';
+import { ILogger, RedisNamespaces, logger } from '@hicommonwealth/core';
 import { Request, RequestHandler, Response } from 'express';
 import {
   CacheKeyDuration,
+  CustomRequest,
   defaultKeyGenerator,
   isCacheKeyDuration,
 } from '../utils/cacheKeyUtils';
-import { RedisCache } from './redisCache';
-
-const log = logger().getLogger(__filename);
+import { RedisCache } from './RedisCache';
 
 const XCACHE_HEADER = 'X-Cache';
 export enum XCACHE_VALUES {
@@ -33,13 +32,18 @@ export class FuncExecError extends Error {
 
 export class CacheDecorator {
   private redisCache: RedisCache;
+  private _log?: ILogger;
+
+  constructor() {
+    this._log = logger().getLogger(__filename);
+  }
 
   // Set redis cache instance
   public setCache(redisCache: RedisCache) {
-    log.info(`setCache: DISABLE_CACHE ${process.env.DISABLE_CACHE}`);
+    this._log.info(`setCache: DISABLE_CACHE ${process.env.DISABLE_CACHE}`);
     // If cache is disabled, skip caching
     if (process.env.DISABLE_CACHE === 'true') {
-      log.info(`cacheMiddleware: cache disabled`);
+      this._log.info(`cacheMiddleware: cache disabled`);
       return;
     }
     this.redisCache = redisCache;
@@ -61,7 +65,7 @@ export class CacheDecorator {
       try {
         // If cache is disabled, skip caching
         if (!this.isEnabled()) {
-          log.trace(`Cache disabled, skipping cache`);
+          this._log.trace(`Cache disabled, skipping cache`);
           return this.callFunction(fn, ...args);
         }
 
@@ -78,7 +82,7 @@ export class CacheDecorator {
           cacheDuration === undefined ||
           cacheDuration === null
         ) {
-          log.trace(`Cache key not found for ${fn.name}`);
+          this._log.trace(`Cache key not found for ${fn.name}`);
           return this.callFunction(fn, ...args);
         }
 
@@ -100,7 +104,7 @@ export class CacheDecorator {
         );
         return result;
       } catch (error) {
-        log.error(`Error in cacheWrap for ${fn.name}: ${error}`);
+        this._log.error(`Error in cacheWrap for ${fn.name}: ${error}`);
         if (error instanceof FuncExecError) {
           throw error;
         } else {
@@ -142,19 +146,19 @@ export class CacheDecorator {
     try {
       cachedValue = await this.checkCache(cacheKey, namespace);
       if (cachedValue) {
-        log.trace(`FOUND in cache ${cacheKey}`);
+        this._log.trace(`FOUND in cache ${cacheKey}`);
         try {
           return JSON.parse(cachedValue);
         } catch (error) {
           // If parsing fails, return the raw cached value
-          log.warn(
+          this._log.warn(
             `Failed to parse cached value for ${cacheKey} as JSON, returning raw value. Error: ${error}`,
           );
         }
       }
     } catch (error) {
       // If parsing fails, return the raw cached value
-      log.error(
+      this._log.error(
         `Failed to fetch cached value for ${cacheKey} as JSON, ${error}`,
       );
     }
@@ -168,11 +172,13 @@ export class CacheDecorator {
     try {
       const result = await fn(...args);
       if (result === undefined || result === null) {
-        log.warn(`Function ${fn.name} returned undefined, not caching result`);
+        this._log.warn(
+          `Function ${fn.name} returned undefined, not caching result`,
+        );
       }
       return result;
     } catch (error) {
-      log.error(`Error calling function ${fn.name}: ${error}`);
+      this._log.error(`Error calling function ${fn.name}: ${error}`);
       throw new FuncExecError(error);
     }
   }
@@ -193,10 +199,10 @@ export class CacheDecorator {
           cacheDuration,
           namespace,
         );
-        //log.debug(`cacheWrap: SET ${cacheKey}`);
+        //this._log.debug(`cacheWrap: SET ${cacheKey}`);
         if (!ret) throw new Error('Unable to set redis key returned false');
       } catch (error) {
-        log.warn(`Error caching value for ${cacheKey}: ${error}`);
+        this._log.warn(`Error caching value for ${cacheKey}: ${error}`);
       }
     }
     return result;
@@ -209,7 +215,7 @@ export class CacheDecorator {
   public cacheMiddleware(
     duration: seconds,
     keyGenerator: (
-      req: Request,
+      req: CustomRequest,
     ) => string | CacheKeyDuration = defaultKeyGenerator,
     namespace: RedisNamespaces = RedisNamespaces.Route_Response,
   ): RequestHandler {
@@ -218,27 +224,27 @@ export class CacheDecorator {
       try {
         // If cache is disabled, skip caching
         if (!this.isEnabled()) {
-          log.trace(`Cache disabled, skipping cache`);
+          this._log.trace(`Cache disabled, skipping cache`);
           res.set(XCACHE_HEADER, XCACHE_VALUES.UNDEF);
           isNextCalled = true;
           return next();
         }
 
         // cache control header is set to no-cache, skip caching
-        if (CacheDecorator.skipCache(req)) {
+        if (this.skipCache(req)) {
           res.set(XCACHE_HEADER, XCACHE_VALUES.SKIP);
           isNextCalled = true;
           return next();
         }
 
         // If cache key is not found, skip caching
-        const { cacheKey, cacheDuration } = CacheDecorator.calcCacheKeyDuration(
+        const { cacheKey, cacheDuration } = this.calcCacheKeyDuration(
           req,
           keyGenerator,
           duration,
         );
         if (!cacheKey) {
-          log.trace(`Cache key not found for ${req.originalUrl}`);
+          this._log.trace(`Cache key not found for ${req.originalUrl}`);
           res.set(XCACHE_HEADER, XCACHE_VALUES.NOKEY);
           isNextCalled = true;
           return next();
@@ -267,8 +273,10 @@ export class CacheDecorator {
         isNextCalled = true;
         return next();
       } catch (err) {
-        log.warn(`calling next from cacheMiddleware catch ${req.originalUrl}`);
-        log.warn(err);
+        this._log.warn(
+          `calling next from cacheMiddleware catch ${req.originalUrl}`,
+        );
+        this._log.warn(err);
         if (!isNextCalled) {
           return next();
         }
@@ -285,14 +293,14 @@ export class CacheDecorator {
     namespace: RedisNamespaces = RedisNamespaces.Route_Response,
   ): Promise<boolean> {
     if (!cacheKey) {
-      log.trace(`Cache key not found for ${res.req.originalUrl}`);
+      this._log.trace(`Cache key not found for ${res.req.originalUrl}`);
       return false;
     }
 
     const cachedResponse = await this.checkCache(cacheKey, namespace);
     if (cachedResponse) {
       // Response found in cache, send it
-      log.trace(`Response ${cacheKey} FOUND in cache, sending it`);
+      this._log.trace(`Response ${cacheKey} FOUND in cache, sending it`);
       res.set(XCACHE_HEADER, XCACHE_VALUES.HIT);
       // If the response is a JSON, parse it and send it
       try {
@@ -356,39 +364,39 @@ export class CacheDecorator {
               namespace,
             );
             if (ret) {
-              log.trace(`SET: ${cacheKey}`);
+              this._log.trace(`SET: ${cacheKey}`);
             } else {
-              log.warn(
+              this._log.warn(
                 `NOSET: Unable to set redis key returned false ${cacheKey} ${ret}`,
               );
             }
           } else {
-            log.warn(
+            this._log.warn(
               `NOSET: ${cacheKey} Response status code is not 200 but ${res.statusCode}, skip writing cache`,
             );
           }
         } catch (error) {
-          log.warn(
+          this._log.warn(
             `SETERR: Error writing cache ${cacheKey} skip writing cache`,
           );
         }
       } catch (err) {
-        log.error(`Error catch all res.send ${cacheKey}`);
+        this._log.error(`Error catch all res.send ${cacheKey}`);
       }
     }.bind(this);
   }
 
-  private static skipCache(req: Request): boolean {
+  private skipCache(req: Request): boolean {
     // check for Cache-Control: no-cache header
     const cacheControl = req.header('Cache-Control');
     if (cacheControl && cacheControl.includes('no-cache')) {
-      log.trace(`Cache-Control: no-cache header found, skipping cache`);
+      this._log.trace(`Cache-Control: no-cache header found, skipping cache`);
       return true;
     }
     return false;
   }
 
-  private static calcCacheKeyDuration(req, keyGenerator, duration) {
+  private calcCacheKeyDuration(req, keyGenerator, duration) {
     // if you like to skip caching based on some condition, return null from keyGenerator
     let cacheKey = keyGenerator(req);
     let cacheDuration = duration;
@@ -399,7 +407,7 @@ export class CacheDecorator {
       cacheKey = cacheKey.cacheKey;
     }
 
-    log.trace(
+    this._log.trace(
       `req: ${req.originalUrl}, cacheKey: ${cacheKey}, cacheDuration: ${cacheDuration}`,
     );
     return { cacheKey, cacheDuration };
@@ -409,5 +417,3 @@ export class CacheDecorator {
     return this.redisCache && this.redisCache.isInitialized();
   }
 }
-
-export const cacheDecorator = new CacheDecorator();
