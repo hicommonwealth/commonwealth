@@ -30,7 +30,6 @@ import {
 } from 'views/components/react_quill_editor';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
-import AuthButton from '../AuthButton';
 import { AvatarUpload } from '../Avatar';
 import CommunityStakeBanner from '../CommunityStakeBanner';
 import UpvotePopover from '../UpvotePopover';
@@ -2210,20 +2209,6 @@ export const ComponentShowcase = () => {
             tellus, ac fermentum ex.
           </div>
         </CWDrawer>
-      </div>
-      <div className="auth-buttons">
-        <CWText type="h5">Auth Buttons</CWText>
-        <div className="list">
-          <AuthButton type="walletConnect" />
-          <AuthButton type="keplr" />
-          <AuthButton type="leap" />
-          <AuthButton type="github" />
-          <AuthButton type="google" />
-          <AuthButton type="discord" />
-          <AuthButton type="x" />
-          <AuthButton type="email" />
-          <AuthButton type="NO_WALLETS_FOUND" />
-        </div>
       </div>
     </div>
   );
