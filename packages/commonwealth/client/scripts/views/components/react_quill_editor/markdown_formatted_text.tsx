@@ -13,6 +13,9 @@ import { loadScript } from 'helpers';
 import { twitterLinkRegex } from 'helpers/constants';
 import { debounce } from 'lodash';
 import { marked } from 'marked';
+import markedFoodnote from 'marked-footnote';
+import { markedSmartypants } from 'marked-smartypants';
+import { markedXhtml } from 'marked-xhtml';
 import removeMd from 'remove-markdown';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { getClasses } from '../component_kit/helpers';
@@ -39,13 +42,12 @@ markdownRenderer.image = (href, title, text) => {
   }
   return `<img alt="${text}" src="${href}"/>`;
 };
-marked.setOptions({
-  renderer: markdownRenderer,
-  gfm: true, // use github flavored markdown
-  smartypants: true,
-  smartLists: true,
-  xhtml: true,
-});
+marked
+  .setOptions({
+    renderer: markdownRenderer,
+    gfm: true, // use github flavored markdown
+  })
+  .use(markedFoodnote(), markedSmartypants(), markedXhtml());
 
 type MarkdownFormattedTextProps = Omit<QuillRendererProps, 'doc'> & {
   doc: string;

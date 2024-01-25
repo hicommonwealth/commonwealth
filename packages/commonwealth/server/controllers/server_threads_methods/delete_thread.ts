@@ -66,7 +66,7 @@ export async function __deleteThread(
     entity: thread,
     allowMod: true,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isOwnerOrAdmin) {
     throw new AppError(Errors.NotOwned);

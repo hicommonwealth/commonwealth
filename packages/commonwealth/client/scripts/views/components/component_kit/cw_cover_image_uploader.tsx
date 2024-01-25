@@ -1,6 +1,6 @@
 import 'components/component_kit/cw_cover_image_uploader.scss';
 import $ from 'jquery';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 
 import app from 'state';
 import { replaceBucketWithCDN } from '../../../helpers/awsHelpers';
@@ -99,14 +99,7 @@ export const CWCoverImageUploader = ({
   useNecessaryEffect(() => {
     if (defaultFormContext.value && !defaultFormContext.isSet) {
       canResetValue.current = false;
-      const currentImageBehavior = !imageBehavior
-        ? ImageBehavior.Fill
-        : imageBehavior;
-      if (currentImageBehavior !== ImageBehavior.Circle) {
-        attachButton.current.style.display = 'none';
-      } else {
-        attachButton.current.style.display = 'flex';
-      }
+      attachButton.current.style.display = 'flex';
 
       setImageURL(defaultFormContext.value);
       setImageBehavior(ImageBehavior.Circle);
@@ -309,15 +302,18 @@ export const CWCoverImageUploader = ({
 
   const isFillImage = imageBehavior === ImageBehavior.Fill;
 
-  const backgroundStyles = {
-    backgroundImage:
-      imageURL && defaultImageBehaviour !== ImageBehavior.Circle
-        ? `url(${imageURL})`
-        : 'none',
-    backgroundSize: isFillImage ? 'cover' : '100px',
-    backgroundRepeat: isFillImage ? 'no-repeat' : 'repeat',
-    backgroundPosition: isFillImage ? 'center' : '0 0',
-  };
+  const backgroundStyles = useMemo(
+    () => ({
+      backgroundImage:
+        imageURL && defaultImageBehaviour !== ImageBehavior.Circle
+          ? `url(${imageURL})`
+          : 'none',
+      backgroundSize: isFillImage ? 'cover' : '100px',
+      backgroundRepeat: isFillImage ? 'no-repeat' : 'repeat',
+      backgroundPosition: isFillImage ? 'center' : '0 0',
+    }),
+    [imageURL, defaultImageBehaviour, isFillImage],
+  );
 
   return (
     <div className="CoverImageUploader">
