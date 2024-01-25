@@ -1,9 +1,11 @@
 import {
+  HotShotsStats,
   RabbitMQController,
   RascalConfigServices,
   RascalSubscriptions,
   ServiceKey,
   TRmqMessages,
+  TypescriptLoggingLogger,
   getRabbitMQConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
@@ -34,7 +36,8 @@ startHealthCheckLoop({
   },
 });
 
-const log = logger().getLogger(__filename);
+const log = logger(TypescriptLoggingLogger()).getLogger(__filename);
+stats(HotShotsStats());
 
 log.info(
   `Node Option max-old-space-size set to: ${JSON.stringify(
