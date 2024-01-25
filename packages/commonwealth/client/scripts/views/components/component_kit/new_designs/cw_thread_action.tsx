@@ -21,7 +21,8 @@ export type ActionType =
   | 'reply'
   | 'share'
   | 'subscribe'
-  | 'overflow';
+  | 'overflow'
+  | 'view-upvotes';
 
 const commonProps = (disabled: boolean) => {
   return {

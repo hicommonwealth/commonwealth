@@ -6,6 +6,7 @@ import { AuthorAndPublishInfo } from '../pages/discussions/ThreadCard/AuthorAndP
 import { CWText } from './component_kit/cw_text';
 import CWDrawer from './component_kit/new_designs/CWDrawer';
 import { CWTable } from './component_kit/new_designs/CWTable';
+import { CWThreadAction } from './component_kit/new_designs/cw_thread_action';
 import { QuillRenderer } from './react_quill_editor/quill_renderer';
 
 type ViewUpvotesDrawerProps = {
@@ -85,13 +86,11 @@ export const ViewUpvotesDrawer = ({
 
   return (
     <>
-      <CWText
-        type="caption"
-        className="drawer-trigger"
+      <CWThreadAction
+        label="View upvotes"
+        action="view-upvotes"
         onClick={() => setIsUpvoteDrawerOpen(true)}
-      >
-        View Upvotes
-      </CWText>
+      />
       <CWDrawer
         open={isUpvoteDrawerOpen}
         header={header}
