@@ -28,7 +28,7 @@ export const ViewThreadUpvotesDrawer = ({
       avatarUrl: profile.avatarUrl,
       address: profile.address,
       updated_at: reactor?.updated_at,
-      voting_weight: reactor?.voting_weight || 0,
+      voting_weight: reactor?.voting_weight,
     };
   });
 

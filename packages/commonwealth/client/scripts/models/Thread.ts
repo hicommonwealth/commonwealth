@@ -79,7 +79,7 @@ function processAssociatedReactions(
         type: tempReactionType[i],
         address: tempAddressesReacted[i],
         updated_at: tempReactionTimestamps[i],
-        voting_weight: tempReactionWeights[i],
+        voting_weight: tempReactionWeights[i] || 0,
       });
     }
   }
