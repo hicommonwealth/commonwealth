@@ -46,7 +46,7 @@ const createCommunity = async ({
     name,
     base: chainBase,
     description,
-    icon_url: 'https://google.com',
+    icon_url: iconUrl,
     social_links: socialLinks,
     eth_chain_id: ethChainId,
     cosmos_chain_id: cosmosChainId,
