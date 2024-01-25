@@ -181,8 +181,8 @@ async function getCosmosContractType(
   network_url: string,
 ): Promise<string | null> {
   try {
-    const batchClient = new HttpClient(network_url);
-    const tmClient = await Tendermint34Client.create(batchClient);
+    const client = new HttpClient(network_url);
+    const tmClient = await Tendermint34Client.create(client);
     const api = QueryClient.withExtensions(tmClient, setupWasmExtension);
 
     const contractInfo = await api.wasm.getContractInfo(contractAddress);
