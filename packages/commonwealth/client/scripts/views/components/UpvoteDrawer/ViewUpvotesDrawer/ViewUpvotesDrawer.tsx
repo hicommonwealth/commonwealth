@@ -12,11 +12,13 @@ import { getColumnInfo } from '../util';
 
 import './ViewUpvotesDrawer.scss';
 
+type Profile = Account | AddressInfo | MinimumProfile;
+
 type ViewUpvotesDrawerProps = {
   header: string;
   reactorData: any[];
   contentBody: string;
-  author: Account | AddressInfo | MinimumProfile;
+  author: Profile;
   publishDate: moment.Moment;
 };
 
@@ -59,11 +61,11 @@ export const ViewUpvotesDrawer = ({
     }
   };
 
-  const getVoteWeightTotal = (voters) => {
+  const getVoteWeightTotal = (voters: Upvoter[]) => {
     return voters.reduce((memo, current) => memo + current.voting_weight, 0);
   };
 
-  const getAuthorCommunityId = (contentAuthor) => {
+  const getAuthorCommunityId = (contentAuthor: Profile) => {
     if (contentAuthor instanceof MinimumProfile) {
       return contentAuthor?.chain;
     } else if (contentAuthor instanceof Account) {
