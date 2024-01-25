@@ -43,6 +43,8 @@ function processAssociatedReactions(
   reactions: any[],
   reactionIds: any[],
   reactionType: any[],
+  reactionTimestamps: string[],
+  reactionWeights: number[],
   addressesReacted: any[],
 ) {
   const temp = [];
@@ -55,29 +57,33 @@ function processAssociatedReactions(
     (reactions
       ? reactions.map((r) => r?.address || r?.Address?.address)
       : addressesReacted) || [];
-  const tempReactionTimestamps = reactions
-    ? reactions.map((r) => r?.updated_at)
-    : [];
-  const allHaveTimestamps =
-    tempReactionTimestamps.length === tempReactionIds.length;
+  const tempReactionTimestamps =
+    (reactions ? reactions.map((r) => r?.updated_at) : reactionTimestamps) ||
+    [];
+
+  const tempReactionWeights =
+    (reactions
+      ? reactions.map((r) => r.calculated_voting_weight)
+      : reactionWeights) || [];
+
   const tempVotingWeights = reactions
     ? reactions.map((r) => r?.calculated_voting_weight)
     : [];
-  const allHaveVoteWeights =
-    tempVotingWeights.length === tempReactionIds.length;
 
   if (
     tempReactionIds.length > 0 &&
     tempReactionIds.length === tempReactionType.length &&
-    tempReactionType.length === tempAddressesReacted.length
+    tempReactionType.length === tempAddressesReacted.length &&
+    tempAddressesReacted.length === tempReactionTimestamps.length &&
+    tempReactionTimestamps.length === tempReactionWeights.length
   ) {
     for (let i = 0; i < tempReactionIds.length; i++) {
       temp.push({
         id: tempReactionIds[i],
         type: tempReactionType[i],
         address: tempAddressesReacted[i],
-        updated_at: allHaveTimestamps ? tempReactionTimestamps[i] : null,
-        voting_weight: allHaveVoteWeights ? tempVotingWeights[i] : 0,
+        updated_at: tempReactionTimestamps[i],
+        voting_weight: tempVotingWeights[i],
       });
     }
   }
@@ -196,6 +202,8 @@ export class Thread implements IUniqueId {
     reactions,
     reactionIds,
     reactionType,
+    reactionTimestamps,
+    reactionWeights,
     addressesReacted,
     canvasAction,
     canvasSession,
@@ -232,6 +240,8 @@ export class Thread implements IUniqueId {
     reactionIds: any[]; // TODO: fix type
     addressesReacted: any[]; //TODO: fix type,
     reactionType: any[]; // TODO: fix type
+    reactionTimestamps: string[];
+    reactionWeights: number[];
     version_history: any[]; // TODO: fix type
     Address: any; // TODO: fix type
     discord_meta?: any;
@@ -274,6 +284,8 @@ export class Thread implements IUniqueId {
       reactions,
       reactionIds,
       reactionType,
+      reactionTimestamps,
+      reactionWeights,
       addressesReacted,
     );
     this.latestActivity = last_commented_on
