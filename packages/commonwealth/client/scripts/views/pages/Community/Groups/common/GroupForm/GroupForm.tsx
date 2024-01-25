@@ -1,6 +1,7 @@
 /* eslint-disable react/no-multi-comp */
-import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
-import { StargateClient } from '@cosmjs/stargate';
+import { setupWasmExtension } from '@cosmjs/cosmwasm-stargate';
+import { QueryClient, StargateClient } from '@cosmjs/stargate';
+import { HttpClient, Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import axios from 'axios';
 import { ethers } from 'ethers';
 import { isValidEthAddress } from 'helpers/validateTypes';
@@ -180,20 +181,29 @@ async function getCosmosContractType(
   network_url: string,
 ): Promise<string | null> {
   try {
+    const batchClient = new HttpClient(network_url);
+    const tmClient = await Tendermint34Client.create(batchClient);
+    const api = QueryClient.withExtensions(tmClient, setupWasmExtension);
+
+    const contractInfo = await api.wasm.getContractInfo(contractAddress);
+
     // Initialize the CosmWasmClient
-    const client = await CosmWasmClient.connect(network_url);
+    // const client = await CosmWasmClient.connect(network_url);
 
     // Query the contract for its info
-    const contractInfo: Cw721Metadata = await client.queryContractSmart(
-      contractAddress,
-      {
-        contract_info: {},
-      },
-    );
+    // const contractInfo: Cw721Metadata = await client.queryContractSmart(
+    //   contractAddress,
+    //   {
+    //     contract_info: {},
+    //   },
+    // );
 
     // Check the required fields for CW721, for example, `name` and `symbol`
-    if (contractInfo && contractInfo.name && contractInfo.symbol) {
-      console.log('Contract is a CW721 token, with metadata:', contractInfo);
+    if (contractInfo && contractInfo.address && contractInfo.contractInfo) {
+      console.log(
+        'Contract is a CW721 token, with metadata:',
+        contractInfo.contractInfo,
+      );
       return 'cw721';
     } else {
       console.log('Contract does not comply with the CW721 standard.');
