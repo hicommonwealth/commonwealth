@@ -11,12 +11,15 @@ const editCommunityStake = async ({
   communityId,
   stakeId,
 }: EditCommunityStakeProps) => {
-  return await axios.patch(
+  return await axios.put(
     `${app.serverUrl()}/communityStakes/${communityId}/${stakeId}`,
     {
       jwt: app.user.jwt,
       community_id: communityId,
       stake_id: stakeId,
+      stake_token: '',
+      stake_scaler: 1,
+      stake_enabled: true,
     },
   );
 };
@@ -24,9 +27,6 @@ const editCommunityStake = async ({
 const useUpdateCommunityMutation = () => {
   return useMutation({
     mutationFn: editCommunityStake,
-    onSuccess: async () => {
-      console.log('done');
-    },
   });
 };
 

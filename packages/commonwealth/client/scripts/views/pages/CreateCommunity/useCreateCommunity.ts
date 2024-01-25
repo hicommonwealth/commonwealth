@@ -4,7 +4,6 @@ import { ValidChains } from '@hicommonwealth/chains';
 import AddressInfo from 'models/AddressInfo';
 import { SelectedCommunity } from 'views/components/component_kit/new_designs/CWCommunitySelector';
 
-import { ETHEREUM_MAINNET_ID } from './steps/BasicInformationStep/BasicInformationForm/constants';
 import { CreateCommunityStep, handleChangeStep } from './utils';
 
 const useCreateCommunity = () => {
@@ -44,7 +43,7 @@ const useCreateCommunity = () => {
   // Goerli should be removed before merging to production
   // only ETHEREUM_MAINNET_ID should be here
   const isEthereumMainnetSelected =
-    selectedChainId === ETHEREUM_MAINNET_ID ||
+    // selectedChainId === ETHEREUM_MAINNET_ID ||
     selectedChainId === String(ValidChains.Goerli);
   const showCommunityStakeStep =
     isValidStepToShowCommunityStakeFormStep &&

@@ -13,8 +13,6 @@ import Hint from '../../../components/Hint';
 import { ActionState, SignStakeTransactionsProps } from '../types';
 import useNamespaceFactory from '../useNamespaceFactory';
 
-import axios from 'axios';
-import app from 'state';
 import './SignStakeTransactions.scss';
 
 const defaultActionState: ActionState = {
@@ -123,12 +121,6 @@ const SignStakeTransactions = ({
         STAKE_ID,
       );
 
-      const response = await axios.get(
-        `${app.serverUrl()}/communityStakes/${createdCommunityId}/${STAKE_ID}`,
-      );
-
-      console.log('response', response);
-
       await updateCommunityStake({
         communityId: createdCommunityId,
         stakeId: STAKE_ID,
@@ -139,13 +131,7 @@ const SignStakeTransactions = ({
         state: 'completed',
       }));
 
-      const responseafter = await axios.get(
-        `${app.serverUrl()}/communityStakes/${createdCommunityId}/${STAKE_ID}`,
-      );
-
-      console.log('responseafter', responseafter);
-
-      // goToSuccessStep();
+      goToSuccessStep();
     } catch (err) {
       console.log(err);
 
