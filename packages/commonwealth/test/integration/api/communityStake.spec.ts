@@ -19,6 +19,7 @@ const baseRequest = {
   stake_id: 2,
   stake_token: '',
   stake_scaler: 1,
+  vote_weight: 1,
   stake_enabled: true,
 };
 
@@ -27,6 +28,7 @@ const expectedCreateResp = {
   stake_id: baseRequest.stake_id,
   stake_token: baseRequest.stake_token,
   stake_scaler: baseRequest.stake_scaler,
+  vote_weight: baseRequest.vote_weight,
   stake_enabled: baseRequest.stake_enabled,
 };
 
@@ -51,6 +53,7 @@ describe('PUT communityStakes Tests', () => {
     assert.equal(createResponse.stake_id, expectedCreateResp.stake_id);
     assert.equal(createResponse.stake_token, expectedCreateResp.stake_token);
     assert.equal(createResponse.stake_scaler, expectedCreateResp.stake_scaler);
+    assert.equal(createResponse.vote_weight, expectedCreateResp.vote_weight);
     assert.equal(
       createResponse.stake_enabled,
       expectedCreateResp.stake_enabled,
@@ -66,6 +69,7 @@ describe('PUT communityStakes Tests', () => {
       stake_id: baseRequest.stake_id,
       stake_token: 'temp',
       stake_scaler: baseRequest.stake_scaler,
+      vote_weight: baseRequest.vote_weight,
       stake_enabled: baseRequest.stake_enabled,
     };
 
@@ -73,6 +77,7 @@ describe('PUT communityStakes Tests', () => {
     assert.equal(updateResp.stake_id, expectedUpdateResp.stake_id);
     assert.equal(updateResp.stake_token, expectedUpdateResp.stake_token);
     assert.equal(updateResp.stake_scaler, expectedUpdateResp.stake_scaler);
+    assert.equal(updateResp.vote_weight, expectedUpdateResp.vote_weight);
     assert.equal(updateResp.stake_enabled, expectedUpdateResp.stake_enabled);
 
     const getResp = await controller.getCommunityStake({
@@ -84,6 +89,7 @@ describe('PUT communityStakes Tests', () => {
     assert.equal(getResp.stake_id, expectedUpdateResp.stake_id);
     assert.equal(getResp.stake_token, expectedUpdateResp.stake_token);
     assert.equal(getResp.stake_scaler, expectedUpdateResp.stake_scaler);
+    assert.equal(getResp.vote_weight, expectedUpdateResp.vote_weight);
     assert.equal(getResp.stake_enabled, expectedUpdateResp.stake_enabled);
   });
 

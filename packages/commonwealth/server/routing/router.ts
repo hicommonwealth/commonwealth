@@ -375,7 +375,7 @@ function setupRouter(
   registerRoute(
     router,
     'get',
-    '/communityStakes/:community_id/:stake_id',
+    '/communityStakes/:community_id/:stake_id?',
     getCommunityStakeHandler.bind(this, models, serverControllers),
   );
 

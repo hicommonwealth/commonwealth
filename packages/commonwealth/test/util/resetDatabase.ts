@@ -269,6 +269,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         stake_id: 1,
         stake_token: '',
         stake_scaler: 1,
+        vote_weight: 1,
         stake_enabled: true,
       });
 

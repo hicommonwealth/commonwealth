@@ -12,6 +12,7 @@ export type SetCommunityStakeParams = z.infer<
 export const SetCommunityStakeBodySchema = z.object({
   stake_token: z.string().default(''),
   stake_scaler: z.coerce.number().default(1),
+  vote_weight: z.coerce.number().default(1),
   stake_enabled: z.coerce.boolean().default(true),
 });
 
