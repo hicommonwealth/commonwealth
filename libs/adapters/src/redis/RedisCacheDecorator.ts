@@ -6,7 +6,7 @@ import {
   defaultKeyGenerator,
   isCacheKeyDuration,
 } from '../utils/cacheKeyUtils';
-import { RedisCache } from './RedisCache';
+import { RedisCache } from './RedisCacheAdapter';
 
 const XCACHE_HEADER = 'X-Cache';
 export enum XCACHE_VALUES {
