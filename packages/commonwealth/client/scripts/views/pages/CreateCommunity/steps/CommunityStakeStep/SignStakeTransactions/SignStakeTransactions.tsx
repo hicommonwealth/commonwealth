@@ -1,8 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-import { STAKE_ID } from '@hicommonwealth/chains';
-import { useUpdateCommunityMutation } from 'state/api/communities';
-import { useUpdateCommunityStake } from 'state/api/communityStake';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
@@ -11,15 +8,11 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import ActionSteps from '../../../components/ActionSteps';
 import { ActionStepsProps } from '../../../components/ActionSteps/types';
 import Hint from '../../../components/Hint';
-import { ActionState, SignStakeTransactionsProps } from '../types';
-import useNamespaceFactory from '../useNamespaceFactory';
+import { SignStakeTransactionsProps } from '../types';
+import useLaunchCommunityStake from './useLaunchCommunityStake';
+import useReserveCommunityNamespace from './useReserveCommunityNamespace';
 
 import './SignStakeTransactions.scss';
-
-const defaultActionState: ActionState = {
-  state: 'not-started',
-  errorText: '',
-};
 
 const SignStakeTransactions = ({
   goToSuccessStep,
@@ -27,21 +20,26 @@ const SignStakeTransactions = ({
   selectedAddress,
   createdCommunityId,
 }: SignStakeTransactionsProps) => {
-  const [reserveNamespaceData, setReserveNamespaceData] =
-    useState<ActionState>(defaultActionState);
+  const { handleReserveCommunityNamespace, reserveNamespaceData } =
+    useReserveCommunityNamespace({
+      communityId: createdCommunityId,
+      namespace: communityStakeData.namespace,
+      symbol: communityStakeData.symbol,
+      userAddress: selectedAddress.address,
+    });
 
-  const [launchStakeData, setLaunchStakeData] =
-    useState<ActionState>(defaultActionState);
-
-  const { namespaceFactory } = useNamespaceFactory();
-  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation();
-  const { mutateAsync: updateCommunityStake } = useUpdateCommunityStake();
+  const { handleLaunchCommunityStake, launchStakeData } =
+    useLaunchCommunityStake({
+      namespace: communityStakeData.namespace,
+      communityId: createdCommunityId,
+      goToSuccessStep,
+    });
 
   const getActionSteps = (): ActionStepsProps['steps'] => {
     return [
       {
-        state: reserveNamespaceData.state,
         label: 'Reserve community namespace',
+        state: reserveNamespaceData.state,
         errorText: reserveNamespaceData.errorText,
         actionButton: {
           label: reserveNamespaceData.state === 'completed' ? 'Signed' : 'Sign',
@@ -52,8 +50,8 @@ const SignStakeTransactions = ({
         },
       },
       {
-        state: launchStakeData.state,
         label: 'Launch community stake',
+        state: launchStakeData.state,
         errorText: launchStakeData.errorText,
         ...(reserveNamespaceData.state === 'completed'
           ? {
@@ -68,83 +66,6 @@ const SignStakeTransactions = ({
           : {}),
       },
     ];
-  };
-
-  const handleReserveCommunityNamespace = async () => {
-    try {
-      setReserveNamespaceData((prevState) => ({
-        ...prevState,
-        state: 'loading',
-        errorText: '',
-      }));
-
-      const txReceipt = await namespaceFactory.deployNamespace(
-        communityStakeData.namespace,
-        selectedAddress.address,
-      );
-
-      await updateCommunity({
-        communityId: createdCommunityId,
-        namespace: communityStakeData.namespace,
-        symbol: communityStakeData.symbol,
-        transactionHash: txReceipt.transactionHash,
-      });
-
-      setReserveNamespaceData((prevState) => ({
-        ...prevState,
-        state: 'completed',
-      }));
-    } catch (err) {
-      console.log(err);
-
-      const error = err?.message?.includes('Namespace already reserved')
-        ? 'Namespace already reserved'
-        : 'There was an issue creating the namespace. Please try again.';
-
-      setReserveNamespaceData((prevState) => ({
-        ...prevState,
-        state: 'not-started',
-        errorText: error,
-      }));
-    }
-  };
-
-  const handleLaunchCommunityStake = async () => {
-    try {
-      setLaunchStakeData((prevState) => ({
-        ...prevState,
-        state: 'loading',
-        errorText: '',
-      }));
-
-      await namespaceFactory.configureCommunityStakes(
-        communityStakeData.namespace,
-        STAKE_ID,
-      );
-
-      await updateCommunityStake({
-        communityId: createdCommunityId,
-        stakeId: STAKE_ID,
-      });
-
-      setLaunchStakeData((prevState) => ({
-        ...prevState,
-        state: 'completed',
-      }));
-
-      goToSuccessStep();
-    } catch (err) {
-      console.log(err);
-
-      const error =
-        'There was an issue launching community stakes. Please try again.';
-
-      setLaunchStakeData((prevState) => ({
-        ...prevState,
-        state: 'not-started',
-        errorText: error,
-      }));
-    }
   };
 
   const handleCancel = () => {

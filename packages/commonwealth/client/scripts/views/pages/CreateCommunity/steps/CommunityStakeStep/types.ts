@@ -23,3 +23,8 @@ export interface EnableStakeProps {
   onOptInEnablingStake: ({ namespace, symbol }: StakeData) => void;
   communityStakeData: StakeData;
 }
+
+export const defaultActionState: ActionState = {
+  state: 'not-started',
+  errorText: '',
+};
