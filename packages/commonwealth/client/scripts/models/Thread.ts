@@ -66,10 +66,6 @@ function processAssociatedReactions(
       ? reactions.map((r) => r.calculated_voting_weight)
       : reactionWeights) || [];
 
-  const tempVotingWeights = reactions
-    ? reactions.map((r) => r?.calculated_voting_weight)
-    : [];
-
   if (
     tempReactionIds.length > 0 &&
     tempReactionIds.length === tempReactionType.length &&
@@ -83,7 +79,7 @@ function processAssociatedReactions(
         type: tempReactionType[i],
         address: tempAddressesReacted[i],
         updated_at: tempReactionTimestamps[i],
-        voting_weight: tempVotingWeights[i],
+        voting_weight: tempReactionWeights[i],
       });
     }
   }
