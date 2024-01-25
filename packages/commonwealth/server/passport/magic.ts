@@ -443,13 +443,13 @@ async function magicLoginRoute(
     const session: Session = {
       type: 'session',
       signature: req.body.signature,
-      payload: req.body.sessionPayload
-        ? JSON.parse(req.body.sessionPayload)
-        : undefined,
+      payload: JSON.parse(req.body.sessionPayload),
     };
 
     if (process.env.ENFORCE_SESSION_KEYS === 'true') {
-      if (req.body.magicAddress !== session.payload.from) {
+      if (
+        req.body.magicAddress !== session.payload.from.replace('magic:', '')
+      ) {
         throw new Error(
           'sessionPayload address did not match user-provided magicAddress',
         );
@@ -462,8 +462,18 @@ async function magicLoginRoute(
 
     if (chainToJoin) {
       if (chainToJoin.base === ChainBase.CosmosSDK) {
+        const signaturePattern = /(.+)\/([A-Za-z0-9+\/]+)\/([A-Za-z0-9+/=]+)/;
+        const signaturePatternMatch = signaturePattern.exec(session.signature);
+        if (signaturePatternMatch === null) {
+          throw new Error(
+            `Invalid signature: signature did not match ${signaturePattern}`,
+          );
+        }
+        const [_, domain, nonce, signatureData] = signaturePatternMatch;
+
         // throws if magicAddress does not match signed address in didToken
-        await magic.token.validate(req.body.didToken, req.body.magicAddress);
+        await magic.token.validate(signatureData, req.body.magicAddress);
+        console.log('magic token validated');
 
         generatedAddresses.push({
           address: req.body.magicAddress,

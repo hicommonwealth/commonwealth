@@ -74,8 +74,9 @@ export const verify = async ({
       import('@cosmjs/encoding'),
       import('@cosmjs/crypto'),
     ]);
-    // if (payload.from.startsWith('magic:')) {TODO}
-    if (
+    if (payload.from.startsWith('magic:')) {
+      console.log('CANVAS.ts magic:', payload.from);
+    } else if (
       !action &&
       bech32.bech32.decode(sessionPayload.from).prefix === 'terra'
     ) {

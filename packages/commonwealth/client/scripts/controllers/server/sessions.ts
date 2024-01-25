@@ -126,7 +126,7 @@ export async function signSessionWithMagic(
     const nonce = siwe.generateNonce();
     const domain = document.location.origin;
     const signatureData = await signer.magic.user.generateIdToken({
-      attachment: sessionPublicAddress,
+      attachment: signerAddress,
     });
     // const signatureData = await signer.signMessage({
     //   attachment: sessionPublicAddress,

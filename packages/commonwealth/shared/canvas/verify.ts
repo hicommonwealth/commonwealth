@@ -91,7 +91,7 @@ export const verify = async ({
       const magicSDK = await import('@magic-sdk/admin');
       const magic = new magicSDK.Magic(MAGIC_API_KEY);
 
-      const signaturePattern = /\b(.+)\/([A-Za-z0-9+/=]+)\/([A-Za-z0-9+/=]+)\b/;
+      const signaturePattern = /(.+)\/([A-Za-z0-9+\/]+)\/([A-Za-z0-9+/=]+)/;
       const signaturePatternMatch = signaturePattern.exec(signature);
       if (signaturePatternMatch === null) {
         throw new Error(
@@ -100,7 +100,11 @@ export const verify = async ({
       }
       const [_, domain, nonce, signatureData] = signaturePatternMatch;
 
-      await magic.token.validate(signatureData, sessionPayload.sessionAddress);
+      await magic.token.validate(
+        signatureData,
+        sessionPayload.from.replace('magic:', ''),
+      );
+      console.log('magic token validated');
       // if no error thrown, signature is valid
       return true;
     } else if (
