@@ -8,6 +8,7 @@ import CWDrawer from '../../component_kit/new_designs/CWDrawer';
 import { CWTable } from '../../component_kit/new_designs/CWTable';
 import { CWThreadAction } from '../../component_kit/new_designs/cw_thread_action';
 import { QuillRenderer } from '../../react_quill_editor/quill_renderer';
+import { getColumnInfo } from '../util';
 
 type ViewUpvotesDrawerProps = {
   header: string;
@@ -25,30 +26,6 @@ export const ViewUpvotesDrawer = ({
   publishDate,
 }: ViewUpvotesDrawerProps) => {
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState(false);
-
-  const getColumnInfo = () => {
-    return [
-      {
-        key: 'name',
-        header: 'Name',
-        numeric: false,
-        sortable: true,
-      },
-      {
-        key: 'voteWeight',
-        header: 'Vote Weight',
-        numeric: true,
-        sortable: true,
-      },
-      {
-        key: 'timestamp',
-        header: 'Timestamp',
-        numeric: true,
-        sortable: true,
-        chronological: true,
-      },
-    ];
-  };
 
   const voterRow = (voter) => {
     return {
