@@ -33,9 +33,9 @@ const AuthButton = ({
         <CWTag
           type="stage"
           label={auth.description.text}
-          classNames={`description ${
-            !auth.description.hasBackground ? 'no-bg' : ''
-          }`}
+          classNames={clsx('description', {
+            'no-bg': !auth.description.hasBackground,
+          })}
         />
       )}
     </button>
