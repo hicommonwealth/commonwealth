@@ -24,9 +24,13 @@ Some CHAINS use modules rather than CONTRACTS. Modules are used predominantly wi
 
 ### Comment
 
+See [models/comment.ts](../libs/model/src/models/comment.ts).
+
 ### Community
 
 A community is a space on Common, joinable by PROFILES, that owns metadata and is defined by a set of (ROLES) and PERMISSIONS for participation.
+
+See [models/community.ts](../libs/model/src/models/community.ts)
 
 ### Core
 
@@ -38,7 +42,9 @@ The Common forum is Common's flagship first-party app. Its primary organizationa
 
 ### Group
 
-<!-- TODO -->
+`Groups` are used by community admins to handle permissioning across the forum, using associated `Membership` objects that link `Addresses` to Groups. For more thorough documentation, see [Groups](./Groups.md) entry.
+
+See [models/group.ts](../libs/model/src/models/group.ts).
 
 ### Link
 
@@ -46,13 +52,21 @@ Some Common content can be inter-linked, so that the content's UI prominently re
 
 ### Member
 
-Generically, a member is a PROFILE that holds a (ROLE) within a COMMUNITY. More specifically, "Member" is the lowest-ranking (ROLE) in COMMUNITIES, below MODERATOR and ADMIN.
+Generically, a member is a PROFILE that holds a (ROLE) within a COMMUNITY.
+
+More specifically, "Member" is the lowest-ranking (ROLE) in COMMUNITIES, below MODERATOR and ADMIN.
+
+<!-- TODO: UPDATE IN LIGHT OF NEW PERMISSIONS -->
 
 ### Notification
 
+See [models/notification.ts](../libs/model/src/models/notification.ts).
+
 ### Profile
 
-A profile is one or more ADDRESS, grouped together as a single identity, and owned by a USER.
+A profile is one or more ADDRESS, grouped together as a single identity, representing a single USER.
+
+See [models/profile.ts](../libs/model/src/models/profile.ts).
 
 ### Reaction
 
@@ -60,9 +74,11 @@ A profile is one or more ADDRESS, grouped together as a single identity, and own
 
 A poll is an off-chain mechanism for allowing PROFILES on a COMMUNITY to vote on a prompt (i.e. a question or decision). Poll objects in our database own many VOTES.
 
+See [models/poll.ts](../libs/model/src/models/poll.ts).
+
 ### Role
 
-DEPRECATED IN FAVOR OF GROUPS ONTOLOGY.
+As of 231215, Roles are considered deprecated ontology at Common. In their place is a GROUPS and PERMISSIONS system.
 
 ### Sessions
 
@@ -82,9 +98,13 @@ Stake is used for GATING content and features across a COMMUNITY FORUM.
 
 SEe NOTIFICATIONS.
 
+See See [models/subscription.ts](../libs/model/src/models/subscription.ts).
+
 ### Template
 
 Used for THREADS within TOPICS.
+
+See See [models/template.ts](../libs/model/src/models/template.ts).
 
 ### Thread
 
@@ -92,17 +112,23 @@ A thread is a post made via the Common FORUM app, on top of which COMMENTS and R
 
 <!-- TODO: Improve "is a post" language. -->
 
+See [models/thread.ts](../libs/model/src/models/thread.ts)
+
 ### Topic
 
 A topic is a sub-section of a COMMUNITY FORUM. It may be GATED or require PERMISSIONS to participate in.
 
 <!-- TODO: Investigate GATING and PERMISSIONS -->
 
+See [models/topic.ts](../libs/model/src/models/topic.ts)
+
 ### User
 
-A user on Common is an account which owns one or more PROFILES, and is identified by a unique login token.
+A user on Common is an account which is associated with a PROFILE, owns one or more ADDRESSES, and is identified by a unique login token.
 
 A user is considered ACTIVATED when one of its profiles has taken an action, such as adding an UPVOTE, COMMENT, THREAD, or POLL.
+
+See [models/user.ts](../libs/model/src/models/user.ts).
 
 ### Wallet
 
@@ -111,6 +137,8 @@ A tool, typically a browser plugin or hardware device, that manages keys for sig
 <!-- TODO: Make Common-specific -->
 
 ### Votes
+
+Votes are responses by ADDRESSES to POLL prompts. See [models/vote.ts](../libs/model/src/models/vote.ts).
 
 ## Hexagonal Architecture
 

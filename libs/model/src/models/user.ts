@@ -133,6 +133,8 @@ export default (
     });
     models.User.hasMany(models.Address);
     models.User.hasMany(models.Profile);
+    // TODO Graham 240125: The above is out of date; as of early 2023,
+    // there is a 1:1 relationship between Users and Profiles.
     models.User.hasMany(models.StarredCommunity, {
       foreignKey: 'user_id',
       sourceKey: 'id',
