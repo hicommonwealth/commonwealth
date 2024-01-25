@@ -55,6 +55,7 @@ export const verify = async ({
           `Invalid signature: signature did not match ${signaturePattern}`,
         );
       }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const [_, domain, nonce, signatureData] = signaturePatternMatch;
       const siweMessage = createSiweMessage(sessionPayload, domain, nonce);
 
