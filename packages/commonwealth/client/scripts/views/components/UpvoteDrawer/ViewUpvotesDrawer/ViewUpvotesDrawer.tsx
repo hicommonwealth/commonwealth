@@ -86,7 +86,7 @@ export const ViewUpvotesDrawer = ({
             <QuillRenderer doc={contentBody} cutoffLines={10} />
           </div>
         </div>
-        {reactorData && (
+        {reactorData?.length > 0 ? (
           <>
             <CWTable
               columnInfo={getColumnInfo()}
@@ -107,6 +107,8 @@ export const ViewUpvotesDrawer = ({
               </div>
             </div>
           </>
+        ) : (
+          <CWText>There are no upvotes to view.</CWText>
         )}
       </CWDrawer>
     </>
