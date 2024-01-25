@@ -1,4 +1,4 @@
-import { ViewThreadUpvotesDrawer } from 'client/scripts/views/components/view_thread_upvotes_drawer';
+import { ViewThreadUpvotesDrawer } from 'client/scripts/views/components/UpvoteDrawer';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import Thread from 'models/Thread';
 import React, { useState } from 'react';

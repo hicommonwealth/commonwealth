@@ -2,7 +2,7 @@ import Comment from 'client/scripts/models/Comment';
 import { useFetchProfilesByAddressesQuery } from 'client/scripts/state/api/profiles';
 import React from 'react';
 import app from 'state';
-import { ViewUpvotesDrawer } from './view_upvotes_drawer';
+import { ViewUpvotesDrawer } from './ViewUpvotesDrawer';
 
 type ViewCommentUpvotesDrawerProps = {
   comment?: Comment<any>;

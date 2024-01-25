@@ -2,12 +2,12 @@ import Account from 'client/scripts/models/Account';
 import AddressInfo from 'client/scripts/models/AddressInfo';
 import MinimumProfile from 'client/scripts/models/MinimumProfile';
 import React, { useState } from 'react';
-import { AuthorAndPublishInfo } from '../pages/discussions/ThreadCard/AuthorAndPublishInfo';
-import { CWText } from './component_kit/cw_text';
-import CWDrawer from './component_kit/new_designs/CWDrawer';
-import { CWTable } from './component_kit/new_designs/CWTable';
-import { CWThreadAction } from './component_kit/new_designs/cw_thread_action';
-import { QuillRenderer } from './react_quill_editor/quill_renderer';
+import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
+import { CWText } from '../../component_kit/cw_text';
+import CWDrawer from '../../component_kit/new_designs/CWDrawer';
+import { CWTable } from '../../component_kit/new_designs/CWTable';
+import { CWThreadAction } from '../../component_kit/new_designs/cw_thread_action';
+import { QuillRenderer } from '../../react_quill_editor/quill_renderer';
 
 type ViewUpvotesDrawerProps = {
   header: string;
