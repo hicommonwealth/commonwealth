@@ -4,24 +4,33 @@ import 'components/sidebar/sidebar_quick_switcher.scss';
 
 import ChainInfo from '../../../models/ChainInfo';
 
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
+import useSidebarStore from 'state/ui/sidebar';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWIconButton } from '../component_kit/cw_icon_button';
-import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import useSidebarStore from 'state/ui/sidebar';
 
 export const SidebarQuickSwitcher = () => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
-  const { setMenu } = useSidebarStore();
+  const { setMenu, menuVisible, menuName, setUserToggledVisibility } =
+    useSidebarStore();
+
+  function handleToggle() {
+    const isVisible = !menuVisible;
+    setMenu({ name: menuName, isVisible });
+    setTimeout(() => {
+      setUserToggledVisibility(isVisible ? 'open' : 'closed');
+    }, 200);
+  }
 
   const allCommunities = app.config.chains
     .getAll()
     .sort((a, b) => a.name.localeCompare(b.name))
     .filter(
-      (item) => !!item.node // only chains with nodes
+      (item) => !!item.node, // only chains with nodes
     );
 
   const starredCommunities = allCommunities.filter((item) => {
@@ -34,6 +43,13 @@ export const SidebarQuickSwitcher = () => {
   return (
     <div className="SidebarQuickSwitcher">
       <div className="community-nav-bar">
+        {!app.activeChainId() && (
+          <CWIconButton
+            iconButtonTheme="black"
+            iconName={menuVisible ? 'caretDoubleLeft' : 'caretDoubleRight'}
+            onClick={handleToggle}
+          />
+        )}
         {isLoggedIn && (
           <CWIconButton
             iconName="plusCirclePhosphor"

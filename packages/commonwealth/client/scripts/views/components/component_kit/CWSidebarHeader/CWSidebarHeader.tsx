@@ -3,11 +3,13 @@ import React from 'react';
 
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
+import { featureFlags } from '../../../../helpers/feature-flags';
 import { Skeleton } from '../../Skeleton';
 import { CWCommunityAvatar } from '../../component_kit/cw_community_avatar';
 import { CWText } from '../../component_kit/cw_text';
+import { CWIconButton } from '../cw_icon_button';
 
-const SidebarHeader = () => {
+const SidebarHeader = ({ handleToggle }: { handleToggle: () => void }) => {
   const navigate = useCommonNavigate();
 
   return (
@@ -23,6 +25,16 @@ const SidebarHeader = () => {
       <CWText className="header" type="h5">
         {app?.chain?.meta?.name || <Skeleton width="70%" />}
       </CWText>
+
+      {featureFlags.sidebarToggle && app.activeChainId() && (
+        <div className="collapsable-icon">
+          <CWIconButton
+            iconButtonTheme="black"
+            iconName="caretDoubleLeft"
+            onClick={handleToggle}
+          />
+        </div>
+      )}
     </div>
   );
 };

@@ -10,7 +10,6 @@ import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip'
 import { HelpMenuPopover } from 'views/menus/help_menu';
 import { FeedbackModal } from 'views/modals/feedback_modal';
 import { LoginModal } from 'views/modals/login_modal';
-import { featureFlags } from '../helpers/feature-flags';
 import app from '../state';
 import { CWDivider } from './components/component_kit/cw_divider';
 import { CWIconButton } from './components/component_kit/cw_icon_button';
@@ -85,7 +84,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
           {isWindowSmallInclusive(window.innerWidth) && (
             <CWDivider isVertical />
           )}
-          {(featureFlags.sidebarToggle || onMobile) && app.activeChainId() && (
+          {onMobile && app.activeChainId() && (
             <CWIconButton
               iconButtonTheme="black"
               iconName={menuVisible ? 'sidebarCollapse' : 'sidebarExpand'}
