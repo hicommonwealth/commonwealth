@@ -51,6 +51,8 @@ const useCreateThreadReactionMutation = ({
         id: response.data.result.id,
         address: response.data.result.Address.address,
         type: 'like',
+        updated_at: response.data.result.updated_at,
+        voting_weight: response.data.result.calculated_voting_weight,
       };
       updateThreadInAllCaches(
         chainId,
