@@ -51,7 +51,7 @@ const CreateCommunity = () => {
           <BasicInformationStep
             selectedAddress={selectedAddress}
             selectedCommunity={selectedCommunity}
-            setSelectedChainId={setSelectedChainId}
+            handleSelectedChainId={setSelectedChainId}
             handleGoBack={() => onChangeStep(false)}
             handleContinue={handleCompleteBasicInformationStep}
           />

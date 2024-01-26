@@ -11,7 +11,6 @@ type FormProps = {
   className?: string;
   initialValues?: Object;
   validationSchema: z.Schema<any, any>;
-  watchlist?: string[];
   onWatch?: (values: any) => void;
 };
 

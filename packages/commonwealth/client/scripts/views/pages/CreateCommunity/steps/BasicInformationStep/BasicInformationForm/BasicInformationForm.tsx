@@ -43,7 +43,7 @@ const BasicInformationForm = ({
   selectedCommunity,
   onSubmit,
   onCancel,
-  setSelectedChainId,
+  handleSelectedChainId,
 }: BasicInformationFormProps) => {
   const [communityName, setCommunityName] = useState('');
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
@@ -186,7 +186,7 @@ const BasicInformationForm = ({
   };
 
   const handleWatchForm = (values: any) => {
-    setSelectedChainId(values?.chain?.value);
+    handleSelectedChainId(values?.chain?.value);
   };
 
   return (

@@ -22,5 +22,5 @@ export type BasicInformationFormProps = {
   selectedCommunity: SelectedCommunity;
   onSubmit: (communityId: string, communityName: string) => any;
   onCancel: () => any;
-  setSelectedChainId: (chainId: string) => void;
+  handleSelectedChainId: (chainId: string) => void;
 };
