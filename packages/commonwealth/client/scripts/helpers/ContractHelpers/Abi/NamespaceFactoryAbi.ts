@@ -13,19 +13,6 @@ export const namespaceFactoryAbi = [
     ],
   },
   {
-    inputs: [],
-    stateMutability: 'view',
-    type: 'function',
-    name: 'reservationHook',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-  },
-  {
     inputs: [
       {
         internalType: 'string',
@@ -50,25 +37,14 @@ export const namespaceFactoryAbi = [
   },
   {
     inputs: [
-      {
-        internalType: 'string',
-        name: 'name',
-        type: 'string',
-      },
-      {
-        internalType: 'string',
-        name: 'tokenName',
-        type: 'string',
-      },
-      {
-        internalType: 'uint256',
-        name: 'id',
-        type: 'uint256',
-      },
+      { internalType: 'string', name: 'name', type: 'string' },
+      { internalType: 'string', name: 'tokenName', type: 'string' },
+      { internalType: 'uint256', name: 'id', type: 'uint256' },
     ],
+    name: 'configureCommunityStakesId',
+    outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
-    name: 'configureCommunityStakeId',
   },
   {
     inputs: [
