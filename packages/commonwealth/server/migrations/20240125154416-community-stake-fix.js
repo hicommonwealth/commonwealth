@@ -2,13 +2,18 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    return queryInterface.addColumn('CommunityStakes', 'vote_weight', {
-      type: Sequelize.NUMERIC,
-      allowNull: false,
-    });
+    return await queryInterface.renameColumn(
+      'CommunityStakes',
+      'stake_scaler',
+      'vote_weight',
+    );
   },
 
   down: async (queryInterface, Sequelize) => {
-    return queryInterface.removeColumn('CommunityStakes', 'vote_weight');
+    return await queryInterface.renameColumn(
+      'CommunityStakes',
+      'vote_weight',
+      'stake_scaler',
+    );
   },
 };

@@ -18,7 +18,6 @@ const baseRequest = {
   community_id: 'common-protocol',
   stake_id: 2,
   stake_token: '',
-  stake_scaler: 1,
   vote_weight: 1,
   stake_enabled: true,
 };
@@ -27,7 +26,6 @@ const expectedCreateResp = {
   community_id: baseRequest.community_id,
   stake_id: baseRequest.stake_id,
   stake_token: baseRequest.stake_token,
-  stake_scaler: baseRequest.stake_scaler,
   vote_weight: baseRequest.vote_weight,
   stake_enabled: baseRequest.stake_enabled,
 };
@@ -52,7 +50,6 @@ describe('PUT communityStakes Tests', () => {
     assert.equal(createResponse.community_id, expectedCreateResp.community_id);
     assert.equal(createResponse.stake_id, expectedCreateResp.stake_id);
     assert.equal(createResponse.stake_token, expectedCreateResp.stake_token);
-    assert.equal(createResponse.stake_scaler, expectedCreateResp.stake_scaler);
     assert.equal(createResponse.vote_weight, expectedCreateResp.vote_weight);
     assert.equal(
       createResponse.stake_enabled,
@@ -68,7 +65,6 @@ describe('PUT communityStakes Tests', () => {
       community_id: baseRequest.community_id,
       stake_id: baseRequest.stake_id,
       stake_token: 'temp',
-      stake_scaler: baseRequest.stake_scaler,
       vote_weight: baseRequest.vote_weight,
       stake_enabled: baseRequest.stake_enabled,
     };
@@ -76,7 +72,6 @@ describe('PUT communityStakes Tests', () => {
     assert.equal(updateResp.community_id, expectedUpdateResp.community_id);
     assert.equal(updateResp.stake_id, expectedUpdateResp.stake_id);
     assert.equal(updateResp.stake_token, expectedUpdateResp.stake_token);
-    assert.equal(updateResp.stake_scaler, expectedUpdateResp.stake_scaler);
     assert.equal(updateResp.vote_weight, expectedUpdateResp.vote_weight);
     assert.equal(updateResp.stake_enabled, expectedUpdateResp.stake_enabled);
 
@@ -88,7 +83,6 @@ describe('PUT communityStakes Tests', () => {
     assert.equal(getResp.community_id, expectedUpdateResp.community_id);
     assert.equal(getResp.stake_id, expectedUpdateResp.stake_id);
     assert.equal(getResp.stake_token, expectedUpdateResp.stake_token);
-    assert.equal(getResp.stake_scaler, expectedUpdateResp.stake_scaler);
     assert.equal(getResp.vote_weight, expectedUpdateResp.vote_weight);
     assert.equal(getResp.stake_enabled, expectedUpdateResp.stake_enabled);
   });
@@ -111,10 +105,7 @@ describe('PUT communityStakes Tests', () => {
     );
     assert.equal(actualPutResponse.stake_id, expectedCreateResp.stake_id);
     assert.equal(actualPutResponse.stake_token, expectedCreateResp.stake_token);
-    assert.equal(
-      actualPutResponse.stake_scaler,
-      expectedCreateResp.stake_scaler,
-    );
+    assert.equal(actualPutResponse.vote_weight, expectedCreateResp.vote_weight);
     assert.equal(
       actualPutResponse.stake_enabled,
       expectedCreateResp.stake_enabled,
@@ -135,10 +126,7 @@ describe('PUT communityStakes Tests', () => {
     );
     assert.equal(actualGetResponse.stake_id, expectedCreateResp.stake_id);
     assert.equal(actualGetResponse.stake_token, expectedCreateResp.stake_token);
-    assert.equal(
-      actualGetResponse.stake_scaler,
-      expectedCreateResp.stake_scaler,
-    );
+    assert.equal(actualGetResponse.vote_weight, expectedCreateResp.vote_weight);
     assert.equal(
       actualGetResponse.stake_enabled,
       expectedCreateResp.stake_enabled,

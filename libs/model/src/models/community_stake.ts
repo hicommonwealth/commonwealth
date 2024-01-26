@@ -7,7 +7,6 @@ export type CommunityStakeAttributes = {
   community_id?: string;
   stake_id?: number;
   stake_token?: string;
-  stake_scaler?: number;
   vote_weight?: number;
   stake_enabled?: boolean;
 
@@ -33,7 +32,6 @@ export default (
       },
       stake_id: { type: dataTypes.INTEGER, allowNull: false, primaryKey: true },
       stake_token: { type: dataTypes.STRING, allowNull: false },
-      stake_scaler: { type: dataTypes.REAL, allowNull: false },
       vote_weight: { type: dataTypes.REAL, allowNull: false },
       stake_enabled: { type: dataTypes.BOOLEAN, allowNull: false },
       created_at: { type: dataTypes.DATE, allowNull: false },
