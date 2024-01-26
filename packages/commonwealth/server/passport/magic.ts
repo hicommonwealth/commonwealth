@@ -22,7 +22,7 @@ import {
   UserInstance,
   sequelize,
 } from '@hicommonwealth/model';
-import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
+import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import { verify } from 'jsonwebtoken';
 import passport from 'passport';
 import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
@@ -49,7 +49,7 @@ type MagicLoginContext = {
 };
 
 const DEFAULT_ETH_CHAIN = 'ethereum';
-const DEFAULT_COSMOS_CHAIN = 'osmosis';
+const DEFAULT_COSMOS_CHAIN = 'cosmos';
 
 // Creates a trusted address in a community
 async function createMagicAddressInstances(
@@ -429,8 +429,11 @@ async function magicLoginRoute(
     }
   }
 
-  const magicUserMetadata = await magic.users.getMetadataByIssuer(
+  const isCosmos = chainToJoin.base === ChainBase.CosmosSDK;
+
+  const magicUserMetadata = await magic.users.getMetadataByIssuerAndWallet(
     decodedMagicToken.issuer,
+    isCosmos ? WalletType.COSMOS : WalletType.ETH,
   );
 
   log.trace(
@@ -448,22 +451,19 @@ async function magicLoginRoute(
         : undefined,
     };
 
-    if (process.env.ENFORCE_SESSION_KEYS === 'true') {
-      if (req.body.magicAddress !== session.payload.from) {
-        throw new Error(
-          'sessionPayload address did not match user-provided magicAddress',
-        );
-      }
-      const valid = await verifyCanvas({ session });
-      if (!valid) {
-        throw new Error('sessionPayload signed with invalid signature');
-      }
-    }
-
     if (chainToJoin) {
-      if (chainToJoin.base === ChainBase.CosmosSDK) {
+      if (isCosmos) {
+        const magicUserMetadataCosmosAddress = magicUserMetadata.wallets?.find(
+          (wallet) => wallet.wallet_type === WalletType.COSMOS,
+        )?.public_address;
+
+        if (magicUserMetadataCosmosAddress !== req.body.magicAddress) {
+          throw new Error(
+            'magicAddress does not match magic user metadata Cosmos address',
+          );
+        }
         // throws if magicAddress does not match signed address in didToken
-        await magic.token.validate(req.body.didToken, req.body.magicAddress);
+        // await magic.token.validate(req.body.didToken, req.body.magicAddress);
 
         generatedAddresses.push({
           address: req.body.magicAddress,
@@ -482,6 +482,21 @@ async function magicLoginRoute(
         log.warn(
           `Cannot create magic account on chain ${chainToJoin.id}. Ignoring.`,
         );
+      }
+    }
+
+    if (process.env.ENFORCE_SESSION_KEYS === 'true') {
+      if (
+        !session.payload?.from ||
+        req.body.magicAddress !== session.payload.from
+      ) {
+        throw new Error(
+          'sessionPayload address did not match user-provided magicAddress',
+        );
+      }
+      const valid = await verifyCanvas({ session });
+      if (!valid) {
+        throw new Error('sessionPayload signed with invalid signature');
       }
     }
   } catch (err) {
