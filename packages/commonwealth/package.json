@@ -37,7 +37,7 @@
     "reset-frack-db": "heroku pg:copy commonwealth-beta::CW_READ_DB DATABASE_URL --app commonwealth-frack --confirm commonwealth-frack",
     "send-notification-digest-emails": "SEND_EMAILS=true ts-node -r tsconfig-paths/register server.ts",
     "send-cosmos-notifs": "ts-node -r tsconfig-paths/register server/workers/cosmosGovNotifications/generateCosmosGovNotifications.ts",
-    "start": "ts-node-dev -r tsconfig-paths/register --inspect=0.0.0.0:9229 --max-old-space-size=4096 --respawn --transpile-only server.ts",
+    "start": "ts-node-dev -r tsconfig-paths/register --max-old-space-size=4096 --respawn --transpile-only server.ts",
     "start-evm-ce": "ts-node -r tsconfig-paths/register server/workers/evmChainEvents/startEvmPolling.ts",
     "start-all": "concurrently -p '{name}' -c red,green -n app,consumer 'yarn start' 'yarn start-consumer'",
     "start-android": "npx cap run android",

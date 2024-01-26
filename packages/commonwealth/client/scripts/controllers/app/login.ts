@@ -451,14 +451,11 @@ export async function handleSocialLoginCallback({
     }
   }
 
-  let authedSessionPayload, authedSignature, didToken;
+  let authedSessionPayload, authedSignature;
   try {
     // Sign a session
     if (isCosmos && desiredChain) {
       const bech32Prefix = desiredChain.bech32Prefix;
-
-      didToken = await magic.user.generateIdToken({ attachment: magicAddress });
-
       const chainId = 'cosmoshub';
       const timestamp = +new Date();
 
@@ -534,7 +531,6 @@ export async function handleSocialLoginCallback({
       username: profileMetadata?.username,
       avatarUrl: profileMetadata?.avatarUrl,
       magicAddress,
-      didToken,
       sessionPayload: authedSessionPayload,
       signature: authedSignature,
       walletSsoSource,

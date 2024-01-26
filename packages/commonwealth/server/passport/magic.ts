@@ -455,8 +455,7 @@ async function magicLoginRoute(
         // (magic bug?): magic typing doesn't match data, so we need to cast as any
         const magicWallets = magicUserMetadata.wallets as any[];
         const magicUserMetadataCosmosAddress = magicWallets?.find(
-          (wallet: any) =>
-            (wallet as unknown as any).wallet_type === WalletType.COSMOS,
+          (wallet) => wallet.wallet_type === WalletType.COSMOS,
         )?.public_address;
 
         if (req.body.magicAddress !== magicUserMetadataCosmosAddress) {
