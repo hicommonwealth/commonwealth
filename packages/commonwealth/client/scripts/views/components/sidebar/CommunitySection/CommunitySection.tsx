@@ -6,7 +6,10 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
-import { VoteWeightModule } from 'views/components/CommunityStake';
+import {
+  VoteWeightModule,
+  useCommunityStake,
+} from 'views/components/CommunityStake';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { SubscriptionButton } from 'views/components/subscription_button';
@@ -37,6 +40,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   const { pathname } = useLocation();
   const { isLoggedIn } = useUserLoggedIn();
   const { activeAccount } = useUserActiveAccount();
+  const { stakeEnabled } = useCommunityStake();
 
   if (showSkeleton) return <CommunitySectionSkeleton />;
 
@@ -44,7 +48,6 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
   const isMod = Permissions.isCommunityModerator();
   const showAdmin = app.user && (isAdmin || isMod);
-  const communityStakeEnabled = true;
 
   return (
     <>
@@ -56,7 +59,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
               address={activeAccount?.address}
             />
 
-            {communityStakeEnabled && (
+            {stakeEnabled && (
               <VoteWeightModule
                 voteWeight={1}
                 stakeNumber={1}

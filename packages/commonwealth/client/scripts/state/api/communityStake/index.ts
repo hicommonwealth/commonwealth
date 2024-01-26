@@ -1,3 +1,4 @@
 import useUpdateCommunityStake from './editCommunityStake';
+import useFetchCommunityStakeQuery from './fetchCommunityStake';
 
-export { useUpdateCommunityStake };
+export { useFetchCommunityStakeQuery, useUpdateCommunityStake };

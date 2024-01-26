@@ -13,6 +13,7 @@ export const ApiEndpoints = {
   // stand alone endpoints should be have upper snake case keys so we can easily tell them apart in code
   BULK_TOPICS: '/topics',
   FETCH_ADMIN: '/roles',
+  FETCH_COMMUNITY_STAKES: '/communityStakes',
   FETCH_COMMENTS: '/viewComments',
   FETCH_RELATED_COMMUNITIES: '/relatedCommunities',
   FETCH_THREADS: '/threads',
