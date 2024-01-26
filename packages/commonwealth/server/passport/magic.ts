@@ -377,7 +377,6 @@ async function magicLoginRoute(
     signature: string;
     sessionPayload?: string; // optional because session keys are feature-flagged
     magicAddress?: string; // optional because session keys are feature-flagged
-    didToken?: string; // optional because currently only used for cosmos
     walletSsoSource: WalletSsoSource;
   }>,
   decodedMagicToken: MagicUser,
@@ -453,17 +452,18 @@ async function magicLoginRoute(
 
     if (chainToJoin) {
       if (isCosmos) {
-        const magicUserMetadataCosmosAddress = magicUserMetadata.wallets?.find(
-          (wallet) => wallet.wallet_type === WalletType.COSMOS,
+        // (magic bug?): magic typing doesn't match data, so we need to cast as any
+        const magicWallets = magicUserMetadata.wallets as any[];
+        const magicUserMetadataCosmosAddress = magicWallets?.find(
+          (wallet: any) =>
+            (wallet as unknown as any).wallet_type === WalletType.COSMOS,
         )?.public_address;
 
-        if (magicUserMetadataCosmosAddress !== req.body.magicAddress) {
+        if (req.body.magicAddress !== magicUserMetadataCosmosAddress) {
           throw new Error(
-            'magicAddress does not match magic user metadata Cosmos address',
+            'user-provided magicAddress does not match magic metadata Cosmos address',
           );
         }
-        // throws if magicAddress does not match signed address in didToken
-        // await magic.token.validate(req.body.didToken, req.body.magicAddress);
 
         generatedAddresses.push({
           address: req.body.magicAddress,
