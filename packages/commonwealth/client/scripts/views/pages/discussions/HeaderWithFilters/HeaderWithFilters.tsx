@@ -9,6 +9,7 @@ import { matchRoutes } from 'react-router-dom';
 import app from 'state';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
+import CommunityStakeBanner from 'views/components/CommunityStakeBanner';
 import { Select } from 'views/components/Select';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -158,6 +159,8 @@ export const HeaderWithFilters = ({
 
   return (
     <div className="HeaderWithFilters">
+      <CommunityStakeBanner onClose={() => undefined} />
+
       <div className="header-row">
         <CWText type="h3" fontWeight="semiBold" className="header-text">
           {isUndefined(topic)

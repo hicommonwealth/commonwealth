@@ -8,6 +8,7 @@ import { useLocation } from 'react-router-dom';
 import app from 'state';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import CWVoteWeightModule from 'views/components/component_kit/new_designs/CWVoteWeightModule';
 import { SubscriptionButton } from 'views/components/subscription_button';
 import ManageCommunityStakeModal from 'views/modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import { ManageCommunityStakeModalMode } from 'views/modals/ManageCommunityStakeModal/types';
@@ -43,15 +44,27 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
   const isMod = Permissions.isCommunityModerator();
   const showAdmin = app.user && (isAdmin || isMod);
+  const communityStakeEnabled = true;
 
   return (
     <>
       <div className="community-menu">
         {app.isLoggedIn() && (
-          <AccountConnectionIndicator
-            connected={!!activeAccount}
-            address={activeAccount?.address}
-          />
+          <>
+            <AccountConnectionIndicator
+              connected={!!activeAccount}
+              address={activeAccount?.address}
+            />
+
+            {communityStakeEnabled && (
+              <CWVoteWeightModule
+                voteWeight={1}
+                stakeNumber={1}
+                stakeValue={3}
+                denomination="eth"
+              />
+            )}
+          </>
         )}
 
         <CreateCommunityButton />

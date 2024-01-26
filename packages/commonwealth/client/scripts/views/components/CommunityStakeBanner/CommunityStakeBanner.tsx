@@ -6,7 +6,7 @@ import { CWTag } from '../component_kit/new_designs/CWTag';
 
 type CommunityStakeBannerProps = {
   onClose: () => void;
-  groupName: string;
+  groupName?: string;
 };
 export const CommunityStakeBanner = ({
   onClose,
@@ -17,11 +17,10 @@ export const CommunityStakeBanner = ({
   return (
     <CWBanner
       className="CommunityStakeBanner"
-      title="Community Staking Banner Header"
-      body="The more stake you purchase, the greater your vote
-      weight. This means you have greater influence over
-      highlighting the ideas you think are most important
-      while also supporting your community financially."
+      title="Increase your vote weight by buying community stake"
+      body="The more stake you purchase, the greater your vote weight.
+      This means you have greater influence over highlighting the ideas
+       you think are most important while also supporting your community financially."
       buttons={[
         {
           label: 'Buy stake',
@@ -43,12 +42,14 @@ export const CommunityStakeBanner = ({
       ]}
       onClose={onClose}
       footer={
-        <>
-          <CWText type="caption" className="description">
-            Buying a stake will automatically place you in group
-          </CWText>
-          <CWTag label={groupName} type="group" />
-        </>
+        groupName ? (
+          <>
+            <CWText type="caption" className="description">
+              Buying a stake will automatically place you in group
+            </CWText>
+            <CWTag label={groupName} type="group" />
+          </>
+        ) : null
       }
     />
   );

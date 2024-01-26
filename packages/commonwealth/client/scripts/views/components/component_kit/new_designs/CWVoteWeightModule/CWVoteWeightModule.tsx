@@ -1,10 +1,12 @@
 import React from 'react';
 import { isMobile } from 'react-device-detect';
+
 import { CWText } from '../../cw_text';
 import { ComponentType } from '../../types';
 import CWIconButton from '../CWIconButton';
 import CWPopover, { usePopover } from '../CWPopover';
 import { CWButton } from '../cw_button';
+
 import './CWVoteWeightModule.scss';
 
 type VoteWeightModuleProps = {
@@ -48,21 +50,21 @@ export const CWVoteWeightModule = ({
               valued at {stakeValue} {denomination}
             </CWText>
           </div>
-          {stakeNumber > 1 ? (
+          {stakeNumber >= 1 ? (
             <div className="actions">
               <CWButton
                 label="Buy stake"
                 buttonType="secondary"
                 buttonAlt="green"
                 buttonHeight="sm"
-                buttonWidth="narrow"
+                buttonWidth="full"
               />
               <CWButton
                 label="Sell stake"
                 buttonType="secondary"
                 buttonAlt="rorange"
                 buttonHeight="sm"
-                buttonWidth="narrow"
+                buttonWidth="full"
               />
             </div>
           ) : (
