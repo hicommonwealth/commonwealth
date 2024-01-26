@@ -49,7 +49,6 @@ type MagicLoginContext = {
 };
 
 const DEFAULT_ETH_CHAIN = 'ethereum';
-const DEFAULT_COSMOS_CHAIN = 'cosmos';
 
 // Creates a trusted address in a community
 async function createMagicAddressInstances(
