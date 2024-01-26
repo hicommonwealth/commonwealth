@@ -1,13 +1,14 @@
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 
-import { CWText } from '../../cw_text';
-import { ComponentType } from '../../types';
-import CWIconButton from '../CWIconButton';
-import CWPopover, { usePopover } from '../CWPopover';
-import { CWButton } from '../cw_button';
+import { CWText } from 'views/components/component_kit/cw_text';
+import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
+import CWPopover, {
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
-import './CWVoteWeightModule.scss';
+import './VoteWeightModule.scss';
 
 type VoteWeightModuleProps = {
   voteWeight: number;
@@ -16,7 +17,7 @@ type VoteWeightModuleProps = {
   denomination: string;
 };
 
-export const CWVoteWeightModule = ({
+export const VoteWeightModule = ({
   voteWeight,
   stakeNumber,
   stakeValue,
@@ -25,7 +26,7 @@ export const CWVoteWeightModule = ({
   const popoverProps = usePopover();
 
   return (
-    <div className={ComponentType.VoteWeightModule}>
+    <div className="VoteWeightModule">
       <div className="content">
         <div className="title-container">
           <CWText type="caption" fontWeight="uppercase">

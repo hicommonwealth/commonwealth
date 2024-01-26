@@ -6,9 +6,9 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
+import { VoteWeightModule } from 'views/components/CommunityStake';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
-import CWVoteWeightModule from 'views/components/component_kit/new_designs/CWVoteWeightModule';
 import { SubscriptionButton } from 'views/components/subscription_button';
 import ManageCommunityStakeModal from 'views/modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import { ManageCommunityStakeModalMode } from 'views/modals/ManageCommunityStakeModal/types';
@@ -57,7 +57,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
             />
 
             {communityStakeEnabled && (
-              <CWVoteWeightModule
+              <VoteWeightModule
                 voteWeight={1}
                 stakeNumber={1}
                 stakeValue={3}

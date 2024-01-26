@@ -1,8 +1,10 @@
-import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
-import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
-import { CWText } from '../component_kit/cw_text';
-import { CWTag } from '../component_kit/new_designs/CWTag';
+
+import { useCommonNavigate } from 'navigation/helpers';
+
+import { CWText } from '../../component_kit/cw_text';
+import CWBanner from '../../component_kit/new_designs/CWBanner';
+import { CWTag } from '../../component_kit/new_designs/CWTag';
 
 type CommunityStakeBannerProps = {
   onClose: () => void;
