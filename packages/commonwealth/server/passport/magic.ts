@@ -460,7 +460,10 @@ async function magicLoginRoute(
     }
 
     if (chainToJoin) {
-      if (chainToJoin.base === ChainBase.CosmosSDK) {
+      if (
+        chainToJoin.base === ChainBase.CosmosSDK &&
+        session.payload.chain.startsWith('cosmos:')
+      ) {
         const signaturePattern = /(.+)\/([A-Za-z0-9+]+)\/([A-Za-z0-9+=]+)/;
         const signaturePatternMatch = signaturePattern.exec(session.signature);
         if (signaturePatternMatch === null) {
