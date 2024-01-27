@@ -39,23 +39,6 @@ function verifyNoCacheResponse(
   expect(res).to.have.header('X-Cache', cacheHeader);
 }
 
-async function verifyCacheResponse(
-  cacheDecorator: CacheDecorator,
-  key,
-  res,
-  resEarlier,
-) {
-  expect(res).to.have.status(200);
-  expect(res).to.have.header('X-Cache', XCACHE_VALUES.HIT);
-  const valFromRedis = await cacheDecorator.checkCache(key);
-  expect(valFromRedis).to.not.be.null;
-  if (key === CACHE_ENDPOINTS.JSON) {
-    // to avoid unhandled exceptions when response is not json
-    expect(JSON.parse(valFromRedis)).to.be.deep.equal(res.body);
-    expect(JSON.parse(valFromRedis)).to.be.deep.equal(resEarlier.body);
-  }
-}
-
 async function makeGetRequest(endpoint, headers = {}) {
   headers = { ...headers, Accept: 'application/json' };
   const res = await chai.request(app).get(endpoint).set(headers);
@@ -76,6 +59,18 @@ describe('Cache Decorator', () => {
   const cacheDecorator = new CacheDecorator(redisCache);
   setupCacheTestEndpoints(app, cacheDecorator);
 
+  async function verifyCacheResponse(key, res, resEarlier) {
+    expect(res).to.have.status(200);
+    expect(res).to.have.header('X-Cache', XCACHE_VALUES.HIT);
+    const valFromRedis = await cacheDecorator.checkCache(key);
+    expect(valFromRedis).to.not.be.null;
+    if (key === CACHE_ENDPOINTS.JSON) {
+      // to avoid unhandled exceptions when response is not json
+      expect(JSON.parse(valFromRedis)).to.be.deep.equal(res.body);
+      expect(JSON.parse(valFromRedis)).to.be.deep.equal(resEarlier.body);
+    }
+  }
+
   before(async () => {
     await connectToRedis(redisCache);
   });
@@ -92,7 +87,7 @@ describe('Cache Decorator', () => {
     expect(res).to.have.header('content-type', content_type.html);
 
     const res2 = await makeGetRequest(CACHE_ENDPOINTS.TEXT);
-    verifyCacheResponse(cacheDecorator, CACHE_ENDPOINTS.TEXT, res2, res);
+    verifyCacheResponse(CACHE_ENDPOINTS.TEXT, res2, res);
     expect(res2).to.have.header('content-type', content_type.html);
 
     // wait for cache to expire
@@ -115,7 +110,7 @@ describe('Cache Decorator', () => {
     expect(res2.body).to.be.deep.equal(res.body);
 
     const res3 = await makeGetRequest(CACHE_ENDPOINTS.JSON);
-    verifyCacheResponse(cacheDecorator, CACHE_ENDPOINTS.JSON, res3, res2);
+    verifyCacheResponse(CACHE_ENDPOINTS.JSON, res3, res2);
     expect(res3).to.have.header('content-type', content_type.json);
     expect(res3.body).to.be.deep.equal(res.body);
     expect(res3.body).to.be.deep.equal(res2.body);
@@ -149,7 +144,7 @@ describe('Cache Decorator', () => {
       key: 'test',
       duration: 3,
     });
-    verifyCacheResponse(cacheDecorator, 'test', res2, res);
+    verifyCacheResponse('test', res2, res);
     expect(res2).to.have.header('content-type', content_type.json);
     expect(res2.body).to.be.deep.equal({ key: 'test', duration: 3 });
 
