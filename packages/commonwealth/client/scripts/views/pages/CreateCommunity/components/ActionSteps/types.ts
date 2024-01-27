@@ -8,3 +8,7 @@ export interface ActionStepProps {
     onClick: () => void;
   };
 }
+
+export interface ActionStepsProps {
+  steps: Array<Omit<ActionStepProps, 'index'> & { errorText?: string }>;
+}

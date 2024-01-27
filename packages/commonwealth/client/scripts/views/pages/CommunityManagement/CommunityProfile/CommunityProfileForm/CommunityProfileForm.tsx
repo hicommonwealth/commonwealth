@@ -213,6 +213,7 @@ const CommunityProfileForm = () => {
                   fullWidth
                   label="Community Namespace"
                   placeholder="Community Namespace"
+                  value={community.namespace}
                 />
                 <CWTextInput
                   disabled

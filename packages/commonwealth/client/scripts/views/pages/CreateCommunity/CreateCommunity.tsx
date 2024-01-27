@@ -1,44 +1,36 @@
-import AddressInfo from 'models/AddressInfo';
-import React, { useState } from 'react';
-import { SelectedCommunity } from 'views/components/component_kit/new_designs/CWCommunitySelector';
+import React from 'react';
+
 import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps';
+
 import { MixpanelCommunityCreationEvent } from '../../../../../shared/analytics/types';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
-
 import BasicInformationStep from './steps/BasicInformationStep';
 import CommunityStakeStep from './steps/CommunityStakeStep';
 import CommunityTypeStep from './steps/CommunityTypeStep';
 import SuccessStep from './steps/SuccessStep';
+import useCreateCommunity from './useCreateCommunity';
 import { CreateCommunityStep, getFormSteps } from './utils';
 
 import './CreateCommunity.scss';
 
 const CreateCommunity = () => {
-  const [createCommunityStep, setCreateCommunityStep] =
-    useState<CreateCommunityStep>(CreateCommunityStep.CommunityTypeSelection);
-  const [selectedCommunity, setSelectedCommunity] = useState<SelectedCommunity>(
-    { type: null, chainBase: null },
-  );
-  const [selectedAddress, setSelectedAddress] = useState<AddressInfo>(null);
-  const [createdCommunityId, setCreatedCommunityId] = useState('');
-  const [createdCommunityName, setCreatedCommunityName] = useState('');
+  const {
+    createCommunityStep,
+    selectedCommunity,
+    setSelectedCommunity,
+    selectedAddress,
+    setSelectedAddress,
+    setSelectedChainId,
+    createdCommunityId,
+    createdCommunityName,
+    handleCompleteBasicInformationStep,
+    onChangeStep,
+    showCommunityStakeStep,
+  } = useCreateCommunity();
 
   useBrowserAnalyticsTrack({
     payload: { event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_VISITED },
   });
-
-  const handleChangeStep = (action: number) => {
-    setCreateCommunityStep((prevState) => prevState + action);
-  };
-
-  const handleCompleteBasicInformationStep = (
-    communityId: string,
-    communityName: string,
-  ) => {
-    handleChangeStep(1);
-    setCreatedCommunityId(communityId);
-    setCreatedCommunityName(communityName);
-  };
 
   const isSuccessStep = createCommunityStep === CreateCommunityStep.Success;
 
@@ -50,7 +42,7 @@ const CreateCommunity = () => {
             selectedCommunity={selectedCommunity}
             setSelectedCommunity={setSelectedCommunity}
             setSelectedAddress={setSelectedAddress}
-            handleContinue={() => handleChangeStep(1)}
+            handleContinue={() => onChangeStep(true)}
           />
         );
 
@@ -59,7 +51,8 @@ const CreateCommunity = () => {
           <BasicInformationStep
             selectedAddress={selectedAddress}
             selectedCommunity={selectedCommunity}
-            handleGoBack={() => handleChangeStep(-1)}
+            handleSelectedChainId={setSelectedChainId}
+            handleGoBack={() => onChangeStep(false)}
             handleContinue={handleCompleteBasicInformationStep}
           />
         );
@@ -67,8 +60,10 @@ const CreateCommunity = () => {
       case CreateCommunityStep.CommunityStake:
         return (
           <CommunityStakeStep
-            onOptOutEnablingStake={() => handleChangeStep(1)}
+            goToSuccessStep={() => onChangeStep(true)}
             createdCommunityName={createdCommunityName}
+            createdCommunityId={createdCommunityId}
+            selectedAddress={selectedAddress}
           />
         );
 
@@ -80,7 +75,9 @@ const CreateCommunity = () => {
   return (
     <div className="CreateCommunity">
       {!isSuccessStep && (
-        <CWFormSteps steps={getFormSteps(createCommunityStep)} />
+        <CWFormSteps
+          steps={getFormSteps(createCommunityStep, showCommunityStakeStep)}
+        />
       )}
 
       {getCurrentStep()}

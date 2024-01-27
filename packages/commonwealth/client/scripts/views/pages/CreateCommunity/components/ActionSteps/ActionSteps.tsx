@@ -3,13 +3,9 @@ import React from 'react';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 
 import ActionStep from './ActionStep';
-import { ActionStepProps } from './types';
+import { ActionStepsProps } from './types';
 
 import './ActionSteps.scss';
-
-interface ActionStepsProps {
-  steps: Array<Omit<ActionStepProps, 'index'> & { errorText?: string }>;
-}
 
 const ActionSteps = ({ steps }: ActionStepsProps) => {
   if (!steps || steps.length === 0) {
