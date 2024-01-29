@@ -11,20 +11,13 @@ import useSidebarStore from 'state/ui/sidebar';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWIconButton } from '../component_kit/cw_icon_button';
+import { RotatingButton } from './RotatingButton';
 
 export const SidebarQuickSwitcher = () => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
   const { setMenu, menuVisible, menuName, setUserToggledVisibility } =
     useSidebarStore();
-
-  function handleToggle() {
-    const isVisible = !menuVisible;
-    setMenu({ name: menuName, isVisible });
-    setTimeout(() => {
-      setUserToggledVisibility(isVisible ? 'open' : 'closed');
-    }, 200);
-  }
 
   const allCommunities = app.config.chains
     .getAll()
@@ -43,13 +36,7 @@ export const SidebarQuickSwitcher = () => {
   return (
     <div className="SidebarQuickSwitcher">
       <div className="community-nav-bar">
-        {!app.activeChainId() && (
-          <CWIconButton
-            iconButtonTheme="black"
-            iconName={menuVisible ? 'caretDoubleLeft' : 'caretDoubleRight'}
-            onClick={handleToggle}
-          />
-        )}
+        <RotatingButton />
         {isLoggedIn && (
           <CWIconButton
             iconName="plusCirclePhosphor"

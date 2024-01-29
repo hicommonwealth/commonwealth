@@ -106,5 +106,16 @@
 }
 
 .expand-sidebar {
-  padding: 14px 0 0 14px;
+  padding: 16px;
+  background: $neutral-50;
+  border-right: 1px solid $neutral-200;
+}
+
+.rotate {
+  transform: rotate(-180deg);
+  transition: 0.2s linear;
+}
+.un-rotate {
+  transform: rotate(0deg);
+  transition: 0.2s linear;
 }
