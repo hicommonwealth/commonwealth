@@ -37,13 +37,14 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   const { pathname } = useLocation();
   const { isLoggedIn } = useUserLoggedIn();
   const { activeAccount } = useUserActiveAccount();
-  const { stakeEnabled } = useCommunityStake();
+  const { stakeEnabled, stakeBalance, voteWeight, stakeValue, isLoading } =
+    useCommunityStake();
   const {
     modeOfManageCommunityStakeModal,
     setModeOfManageCommunityStakeModal,
   } = useManageCommunityStakeModalStore();
 
-  if (showSkeleton) return <CommunitySectionSkeleton />;
+  if (showSkeleton || isLoading) return <CommunitySectionSkeleton />;
 
   const onHomeRoute = pathname === `/${app.activeChainId()}/feed`;
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
@@ -62,10 +63,10 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
 
             {stakeEnabled && (
               <VoteWeightModule
-                voteWeight={1}
-                stakeNumber={1}
-                stakeValue={3}
-                denomination="eth"
+                voteWeight={voteWeight}
+                stakeNumber={stakeBalance}
+                stakeValue={stakeValue}
+                denomination="ETH"
                 onOpenStakeModal={setModeOfManageCommunityStakeModal}
               />
             )}

@@ -1,5 +1,6 @@
 import { AppError } from '@hicommonwealth/adapters';
 import { ValidChains } from '@hicommonwealth/chains';
+import { calculateVoteWeight } from '@hicommonwealth/chains/src/commonProtocol/utils';
 import { NotificationCategories } from '@hicommonwealth/core';
 import {
   AddressInstance,
@@ -119,7 +120,7 @@ export async function __createThreadReaction(
         address.address,
         this.models,
       );
-      calculatedVotingWeight = parseInt(stakeBalance, 10) * stakeScaler;
+      calculatedVotingWeight = calculateVoteWeight(stakeBalance, stakeScaler);
     }
   }
 
