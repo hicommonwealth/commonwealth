@@ -100,17 +100,18 @@ export const VoteWeightModule = ({
         body={
           <div className="explanation-container">
             <CWText type="b2">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla
-              egestas sem non laoreet suscipit.
+              Your vote weight is based on membership and the amount of Stake
+              you have in your wallet.
             </CWText>
 
             <CWText type="b2">
-              Aenean commodo id nisi vitae elementum. Ut imperdiet nibh id elit
-              facilisis hendrerit.
+              Each member of this community gets 1 vote for joining.
             </CWText>
 
             <CWText type="b2">
-              Donec a sagittis arcu. Phasellus at auctor arcu.
+              All other vote weight is provided by the amount of stake in your
+              wallet, and the vote weight provided per stake by the
+              community&apos;s stake contract.
             </CWText>
           </div>
         }
