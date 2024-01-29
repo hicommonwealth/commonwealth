@@ -67,15 +67,17 @@
 
       .stake-selector {
         display: flex;
-        gap: 60px;
+        gap: 50px;
         align-items: center;
 
         @include smallInclusive {
-          gap: 30px;
+          gap: 25px;
         }
 
         .number {
           font-size: 29px;
+          min-width: 34px;
+          justify-content: center;
         }
       }
     }

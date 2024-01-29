@@ -1,14 +1,12 @@
-import { useQuery } from '@tanstack/react-query';
-
-import {
-  factoryContracts,
-  STAKE_ID,
-  ValidChains,
-} from '@hicommonwealth/chains';
+import { STAKE_ID } from '@hicommonwealth/chains';
 import { calculateVoteWeight } from '@hicommonwealth/chains/build/commonProtocol/utils';
-import CommunityStakes from 'helpers/ContractHelpers/CommunityStakes';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import app from 'state';
-import { useFetchCommunityStakeQuery } from 'state/api/communityStake';
+import {
+  useFetchCommunityStakeQuery,
+  useGetBuyPriceQuery,
+  useGetUserStakeBalanceQuery,
+} from 'state/api/communityStake';
 
 interface UseCommunityStakeProps {
   communityId?: string;
@@ -17,11 +15,8 @@ interface UseCommunityStakeProps {
 
 const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
   const { communityId, stakeId = STAKE_ID } = props;
+  const { isLoggedIn } = useUserLoggedIn();
 
-  const communityStakes = new CommunityStakes(
-    factoryContracts[ValidChains.Goerli].communityStake,
-    factoryContracts[ValidChains.Goerli].factory,
-  );
   const activeCommunityId = app?.chain?.id;
   const activeCommunityNamespace = app?.chain?.meta?.namespace;
 
@@ -34,36 +29,25 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
 
   const stakeData = stakeResponse?.data?.result;
   const stakeEnabled = stakeData?.stake_enabled;
-  const apiEnabled = Boolean(stakeEnabled && !!activeCommunityNamespace);
+  const apiEnabled = Boolean(
+    stakeEnabled && !!activeCommunityNamespace && isLoggedIn,
+  );
 
   const {
     isInitialLoading: userStakeBalanceLoading,
     data: userStakeBalanceData,
-  } = useQuery({
-    queryKey: ['getUserStakeBalance', activeCommunityNamespace, STAKE_ID],
-    queryFn: async () =>
-      await communityStakes.getUserStakeBalance(
-        activeCommunityNamespace,
-        STAKE_ID,
-      ),
-    enabled: apiEnabled,
+  } = useGetUserStakeBalanceQuery({
+    namespace: activeCommunityNamespace,
+    stakeId: STAKE_ID,
+    apiEnabled,
   });
 
   const { isInitialLoading: buyPriceDataLoading, data: buyPriceData } =
-    useQuery({
-      queryKey: [
-        'getBuyPrice',
-        activeCommunityNamespace,
-        STAKE_ID,
-        userStakeBalanceData,
-      ],
-      queryFn: () =>
-        communityStakes.getBuyPrice(
-          activeCommunityNamespace,
-          STAKE_ID,
-          Number(userStakeBalanceData),
-        ),
-      enabled: apiEnabled && !isNaN(Number(userStakeBalanceData)),
+    useGetBuyPriceQuery({
+      namespace: activeCommunityNamespace,
+      stakeId: STAKE_ID,
+      amount: Number(userStakeBalanceData),
+      apiEnabled: apiEnabled && !isNaN(Number(userStakeBalanceData)),
     });
 
   const voteWeight = calculateVoteWeight(

@@ -29,3 +29,8 @@ export const ApiEndpoints = {
   searchProfiles: (searchTerm: string) => `/profiles?search=${searchTerm}`,
   searchChains: (searchTerm: string) => `/communities?search=${searchTerm}`,
 };
+
+export const ContractMethods = {
+  GET_USER_STAKE_BALANCE: 'getUserStakeBalance',
+  GET_BUY_PRICE: 'getBuyPrice',
+};

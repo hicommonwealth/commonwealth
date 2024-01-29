@@ -27,6 +27,7 @@ import {
   CustomAddressOptionElement,
 } from './CustomAddressOption';
 
+import { useCommunityStake } from 'views/components/CommunityStake';
 import './StakeExchangeForm.scss';
 
 interface StakeExchangeFormProps {
@@ -35,10 +36,14 @@ interface StakeExchangeFormProps {
 }
 
 const StakeExchangeForm = ({ mode, setModalState }: StakeExchangeFormProps) => {
+  const [numberOfStakeToExchange, setNumberOfStakeToExchange] = useState(0);
   const [selectedAddress, setSelectedAddress] = useState({
     value: '0xeRh',
     label: '0xeRh',
   });
+
+  // create new hook rather than using useCommunityStake
+  const { stakeBalance, stakeValue, voteWeight } = useCommunityStake();
 
   const popoverProps = usePopover();
 
@@ -68,6 +73,17 @@ const StakeExchangeForm = ({ mode, setModalState }: StakeExchangeFormProps) => {
 
   const handleClick = () => {
     isBuyMode ? handleBuy() : handleSell();
+  };
+
+  const handleMinus = () => {
+    if (numberOfStakeToExchange === 0) {
+      return;
+    }
+
+    setNumberOfStakeToExchange((prevState) => prevState - 1);
+  };
+  const handlePlus = () => {
+    setNumberOfStakeToExchange((prevState) => prevState + 1);
   };
 
   // TODO this should be dynamic
@@ -119,12 +135,12 @@ const StakeExchangeForm = ({ mode, setModalState }: StakeExchangeFormProps) => {
         <CWDivider />
 
         <div className="stake-valued-row">
-          <CWText type="caption">You have 0 stake</CWText>
+          <CWText type="caption">You have {stakeBalance} stake</CWText>
           <CWText type="caption" className="valued">
-            valued at 0.00 ETH
+            valued at {stakeValue} ETH
           </CWText>
           <CWText type="caption" className="vote-weight">
-            Current vote weight 1
+            Current vote weight {voteWeight}
           </CWText>
         </div>
 
@@ -137,11 +153,20 @@ const StakeExchangeForm = ({ mode, setModalState }: StakeExchangeFormProps) => {
               Stake
             </CWText>
             <div className="stake-selector">
-              <CWCircleButton buttonType="secondary" iconName="minus" />
+              <CWCircleButton
+                buttonType="secondary"
+                iconName="minus"
+                onClick={handleMinus}
+                disabled={numberOfStakeToExchange === 0}
+              />
               <CWText type="h3" fontWeight="bold" className="number">
-                0
+                {numberOfStakeToExchange}
               </CWText>
-              <CWCircleButton buttonType="secondary" iconName="plus" />
+              <CWCircleButton
+                buttonType="secondary"
+                iconName="plus"
+                onClick={handlePlus}
+              />
             </div>
           </div>
           <div className="price-per-unit-row">
@@ -149,7 +174,7 @@ const StakeExchangeForm = ({ mode, setModalState }: StakeExchangeFormProps) => {
               Price per unit
             </CWText>
             <CWText type="caption" fontWeight="medium">
-              0.036 ETH • ~$25 USD
+              {0.036} ETH • ~$25 USD
             </CWText>
           </div>
         </div>
