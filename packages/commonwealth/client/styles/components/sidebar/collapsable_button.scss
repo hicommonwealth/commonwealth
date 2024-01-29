@@ -1,0 +1,55 @@
+.collapsable-button-positioning-unscoped {
+  position: absolute;
+  left: 16px;
+  top: 67px;
+  z-index: 5;
+}
+
+.collapsable-button-positioning-scoped {
+  position: absolute;
+  left: 246px;
+  top: 67px;
+  z-index: 5;
+}
+
+// This is an invisible box that allows us to hover over it in order to make the collapsable button visible
+.collapsable-button-hover {
+  position: fixed;
+  height: 100vh;
+  width: 57px;
+  overflow: hidden;
+  z-index: 5;
+}
+
+.collapse {
+  transform: rotate(-180deg);
+  transition: 0.2s linear;
+  opacity: 0;
+}
+
+.un-collapse {
+  transform: rotate(0deg);
+  transition: 0.2s linear;
+}
+
+.collapsable-button-hover:hover .collapse {
+  opacity: 1;
+}
+
+.collapse-scoped {
+  position: absolute;
+  transform: rotate(-180deg);
+  transition: 0.2s linear;
+  left: 10px;
+  top: 67px;
+  z-index: 5;
+}
+
+.un-collapse-scoped {
+  position: absolute;
+  transform: rotate(0deg);
+  transition: 0.2s linear;
+  left: 246px;
+  top: 67px;
+  z-index: 5;
+}
