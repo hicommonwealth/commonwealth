@@ -48,7 +48,7 @@ export const CosmosProposalForm = () => {
     useDepositParamsQuery(stakingDenom);
 
   const minDeposit = parseFloat(
-    minimalToNaturalDenom(+depositParams?.minDeposit, meta?.decimals),
+    minimalToNaturalDenom(+depositParams?.minDeposit, meta?.decimals)
   );
 
   return (
@@ -123,14 +123,14 @@ export const CosmosProposalForm = () => {
 
           const depositInMinimalDenom = naturalDenomToMinimal(
             deposit,
-            meta?.decimals,
+            meta?.decimals
           );
 
           const _deposit = deposit
             ? new CosmosToken(
                 depositParams?.minDeposit?.denom,
                 depositInMinimalDenom,
-                false,
+                false
               )
             : depositParams?.minDeposit;
 
@@ -139,14 +139,14 @@ export const CosmosProposalForm = () => {
           } else if (cosmosProposalType === 'communitySpend') {
             const spendAmountInMinimalDenom = naturalDenomToMinimal(
               payoutAmount,
-              meta?.decimals,
+              meta?.decimals
             );
             prop = encodeCommunitySpend(
               title,
               description,
               recipient,
               spendAmountInMinimalDenom,
-              depositParams?.minDeposit?.denom,
+              depositParams?.minDeposit?.denom
             );
           } else {
             throw new Error('Unknown Cosmos proposal type.');

@@ -44,7 +44,7 @@ export const ProposalExtensions = (props: ProposalExtensionsProps) => {
     const cosmos = app.chain as Cosmos;
     const meta = cosmos.meta;
     const minDeposit = parseFloat(
-      minimalToNaturalDenom(+cosmosDepositParams?.minDeposit, meta?.decimals),
+      minimalToNaturalDenom(+cosmosDepositParams?.minDeposit, meta?.decimals)
     );
 
     if (!setCosmosDepositAmount) return <CWText>Misconfigured</CWText>;

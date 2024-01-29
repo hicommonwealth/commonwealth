@@ -10,8 +10,8 @@ import { queryClient } from 'state/api/config';
 import { Splash } from './Splash';
 
 const unleashConfig = {
-  url: process.env.UNLEASH_URL,
-  clientKey: process.env.UNLEASH_CLIENT_KEY,
+  url: process.env.UNLEASH_FRONTEND_SERVER_URL,
+  clientKey: process.env.UNLEASH_FRONTEND_API_TOKEN,
   refreshInterval: 15,
   appName: 'commonwealth-web',
 };

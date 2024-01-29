@@ -1,7 +1,10 @@
 import { logger } from '@hicommonwealth/core';
 import { config } from 'dotenv';
 import { Unleash } from 'unleash-client';
-import { UNLEASH_SERVER_API_TOKEN, UNLEASH_SERVER_URL } from '../config';
+import {
+  UNLEASH_BACKEND_API_TOKEN,
+  UNLEASH_HEROKU_SERVER_URL,
+} from '../config';
 
 config();
 
@@ -15,19 +18,21 @@ export class UnleashClient {
   }
 
   static getInstance(): Unleash {
-    if (!UNLEASH_SERVER_URL) {
+    if (!UNLEASH_HEROKU_SERVER_URL) {
       log.info('No unleash server URL found, feature flagging disabled.');
       return null;
     }
 
     if (!UnleashClient.instance) {
       UnleashClient.instance = new Unleash({
-        url: UNLEASH_SERVER_URL,
-        appName: 'commonwealth-server',
-        customHeaders: { Authorization: UNLEASH_SERVER_API_TOKEN },
+        url: UNLEASH_HEROKU_SERVER_URL,
+        appName: 'commonwealth-app',
+        customHeaders: { Authorization: UNLEASH_BACKEND_API_TOKEN },
       });
 
-      UnleashClient.instance?.on('synchronized', log.info);
+      UnleashClient.instance?.on('synchronized', () => {
+        log.info('Unleash started successfully');
+      });
     }
 
     return UnleashClient.instance;

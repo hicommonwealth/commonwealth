@@ -130,7 +130,7 @@ export const REACTION_WEIGHT_OVERRIDE = process.env.REACTION_WEIGHT_OVERRIDE
   ? parseInt(process.env.REACTION_WEIGHT_OVERRIDE, 10)
   : null;
 
-export const UNLEASH_SERVER_URL = process.env.UNLEASH_SERVER_URL;
-export const UNLEASH_SERVER_API_TOKEN =
-  process.env.UNLEASH_SERVER_API_TOKEN ||
+export const UNLEASH_HEROKU_SERVER_URL = process.env.UNLEASH_HEROKU_SERVER_URL;
+export const UNLEASH_BACKEND_API_TOKEN =
+  process.env.UNLEASH_BACKEND_API_TOKEN ||
   'default:development.unleash-insecure-api-token';
