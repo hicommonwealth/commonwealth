@@ -46,6 +46,8 @@ export const ManageTopicsSection = () => {
     getFilteredTopics(rawTopics),
   );
 
+  const filteredTopics = getFilteredTopics(rawTopics);
+
   const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
 
   const handleSave = async () => {
@@ -57,7 +59,7 @@ export const ManageTopicsSection = () => {
   };
 
   const handleReversion = () => {
-    setTopics(getFilteredTopics(rawTopics));
+    setTopics(filteredTopics);
   };
 
   useEffect(() => {
@@ -86,6 +88,9 @@ export const ManageTopicsSection = () => {
           buttonWidth={isWindowExtraSmall ? 'full' : 'narrow'}
           buttonHeight="med"
           onClick={handleReversion}
+          disabled={filteredTopics.every(
+            (value, index) => value.id === topics[index].id,
+          )}
         />
         <CWButton
           buttonType="primary"
