@@ -235,7 +235,7 @@ async function loginExistingMagicUser({
       ssoToken.issued_at = decodedMagicToken.claim.iat;
       ssoToken.updated_at = new Date();
       ssoToken.state_id = decodedMagicToken.claim.tid;
-      await ssoToken.save({ transaction }); // todo
+      await ssoToken.save({ transaction });
       log.trace('SSO TOKEN HANDLED NORMALLY');
     } else {
       // situation for legacy SsoToken instances:

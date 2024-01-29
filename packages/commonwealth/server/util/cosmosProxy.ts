@@ -113,7 +113,6 @@ function setupCosmosProxy(
    *  cosmos-api proxies for the magic link iframe
    * - GET /node_info for fetching chain status (used by magic iframe, and magic login flow)
    * - POST / for node info
-   * - POST /cosmos.auth.v1beta1.Query/Account for fetching address status (use by magic iframe)
    */
   app.options('/magicCosmosAPI/:chain', (req, res) => {
     res.header('Access-Control-Allow-Origin', 'https://auth.magic.link');
