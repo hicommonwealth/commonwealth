@@ -199,6 +199,18 @@ class CommunityStakes extends ContractBase {
     }
     return this.addressCache.address;
   }
+
+  /**
+   * gets current users balance and converts to ETH value
+   * @returns string balance in ETH
+   */
+  async getUserEthBalance(): Promise<string> {
+    if (!this.initialized) {
+      await this.initialize();
+    }
+    const balance = await this.web3.eth.getBalance(this.wallet.accounts[0]);
+    return this.web3.utils.fromWei(balance);
+  }
 }
 
 export default CommunityStakes;

@@ -38,7 +38,9 @@ class NamespaceFactory extends ContractBase {
    * @returns contract address 0x...
    */
   async getNamespaceAddress(name: string): Promise<string> {
-    this.isInitialized();
+    if (!this.initialized) {
+      await this.initialize();
+    }
     const hexString = this.web3.utils.utf8ToHex(name);
     const activeNamespace = await this.contract.methods
       .getNamespace(hexString)
@@ -53,7 +55,9 @@ class NamespaceFactory extends ContractBase {
    * @returns Boolean: true when namespace is available, otherwise false
    */
   async checkNamespaceReservation(name: string): Promise<boolean> {
-    this.isInitialized();
+    if (!this.initialized) {
+      await this.initialize();
+    }
     const activeNamespace = await this.getNamespaceAddress(name);
     if (activeNamespace !== '0x0000000000000000000000000000000000000000') {
       return false;
@@ -73,7 +77,9 @@ class NamespaceFactory extends ContractBase {
    * @returns txReceipt or Error if name is taken or tx fails
    */
   async deployNamespace(name: string, feeManager: string): Promise<any> {
-    this.isInitialized();
+    if (!this.initialized) {
+      await this.initialize();
+    }
     // Check if name is available
     const namespaceStatus = await this.checkNamespaceReservation(name);
     if (!namespaceStatus) {
@@ -100,7 +106,9 @@ class NamespaceFactory extends ContractBase {
    * @returns tx receipt or failure message
    */
   async configureCommunityStakes(name: string, stakesId: number): Promise<any> {
-    this.isInitialized();
+    if (!this.initialized) {
+      await this.initialize();
+    }
     let txReceipt;
     try {
       txReceipt = await this.contract.methods
