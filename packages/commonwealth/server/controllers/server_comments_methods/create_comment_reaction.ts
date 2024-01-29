@@ -117,7 +117,7 @@ export async function __createCommentReaction(
       where: { community_id: community.id },
     });
     if (stake) {
-      const stakeScaler = stake.stake_scaler;
+      const voteWeight = stake.vote_weight;
       const stakeBalance = await getNamespaceBalance(
         this.tokenBalanceCache,
         community.namespace,
@@ -126,7 +126,7 @@ export async function __createCommentReaction(
         address.address,
         this.models,
       );
-      calculatedVotingWeight = parseInt(stakeBalance, 10) * stakeScaler;
+      calculatedVotingWeight = parseInt(stakeBalance, 10) * voteWeight;
     }
   }
 
