@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { snapshotValidationSchema } from '../../../views/pages/CommunityManagement/Integrations/Snapshots/validation';
+import z from 'zod';
 
 export type Link = {
   value: string;
@@ -42,5 +42,5 @@ export type LinksArrayProps = {
 
 export type LinksArrayHookProps = {
   initialLinks: Link[];
-  linkValidation?: typeof snapshotValidationSchema;
+  linkValidation?: z.ZodEffects<z.ZodString, string, string> | z.ZodString;
 };
