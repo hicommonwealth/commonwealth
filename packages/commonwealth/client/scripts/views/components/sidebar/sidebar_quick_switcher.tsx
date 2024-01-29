@@ -35,7 +35,7 @@ export const SidebarQuickSwitcher = () => {
   return (
     <div className="SidebarQuickSwitcher">
       <div className="community-nav-bar">
-        <div className="collapsable-button-space"></div>
+        <div className="collapsable-button-space" />
         {isLoggedIn && (
           <CWIconButton
             iconName="plusCirclePhosphor"
