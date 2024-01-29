@@ -11,7 +11,6 @@ import useSidebarStore from 'state/ui/sidebar';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWIconButton } from '../component_kit/cw_icon_button';
-import { RotatingButton } from './RotatingButton';
 
 export const SidebarQuickSwitcher = () => {
   const navigate = useCommonNavigate();
@@ -36,7 +35,7 @@ export const SidebarQuickSwitcher = () => {
   return (
     <div className="SidebarQuickSwitcher">
       <div className="community-nav-bar">
-        <RotatingButton />
+        <div className="collapsable-button-space"></div>
         {isLoggedIn && (
           <CWIconButton
             iconName="plusCirclePhosphor"

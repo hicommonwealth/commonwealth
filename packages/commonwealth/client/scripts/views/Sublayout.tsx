@@ -14,6 +14,7 @@ import { SublayoutHeader } from './SublayoutHeader';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import GatingGrowl from './components/GatingGrowl/GatingGrowl';
+import { RotatingButton } from './components/sidebar/RotatingButton';
 
 type SublayoutProps = {
   hideFooter?: boolean;
@@ -65,6 +66,7 @@ const Sublayout = ({
 
   return (
     <div className="Sublayout">
+      <RotatingButton />
       <div className="header-and-body-container">
         <SublayoutHeader onMobile={isWindowSmallInclusive} />
         <div className="sidebar-and-body-container">

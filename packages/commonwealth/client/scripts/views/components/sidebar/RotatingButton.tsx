@@ -19,11 +19,15 @@ export const RotatingButton = () => {
   }
 
   return (
-    <CWIconButton
-      iconButtonTheme="black"
-      iconName="caretDoubleLeft"
-      onClick={handleToggle}
-      className={rotate ? 'un-rotate' : 'rotate'}
-    />
+    <div className="rotating-button-hover">
+      <div className="rotating-button">
+        <CWIconButton
+          iconButtonTheme="black"
+          iconName="caretDoubleLeft"
+          onClick={handleToggle}
+          className={rotate ? 'collapse' : 'un-collapse'}
+        />
+      </div>
+    </div>
   );
 };

@@ -33,7 +33,7 @@ export const Sidebar = ({
   const sidebarClass = useMemo(() => {
     return clsx('Sidebar', {
       onadd: menuVisible && recentlyUpdatedVisibility,
-      // onremove: !menuVisible,
+      onremove: !menuVisible,
     });
   }, [menuVisible, recentlyUpdatedVisibility]);
 
