@@ -20,15 +20,14 @@ export const CollapsableSidebarButtonUnscoped = () => {
   }
 
   return (
-    <div className="collapsable-button-hover">
-      <div className="collapsable-button-positioning-unscoped">
-        <CWIconButton
-          iconButtonTheme="black"
-          iconName="caretDoubleLeft"
-          onClick={handleToggle}
-          className={isCollapsed ? 'collapse' : 'un-collapse'}
-        />
-      </div>
+    <div className="hover-box">
+      <CWIconButton
+        iconButtonTheme="black"
+        iconName="caretDoubleLeft"
+        onClick={handleToggle}
+        iconSize="small"
+        className={isCollapsed ? 'collapse-unscoped' : 'expand-unscoped'}
+      />
     </div>
   );
 };
