@@ -7,6 +7,7 @@ import {
   useUpdateFeaturedTopicsOrderMutation,
 } from 'client/scripts/state/api/topics';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
+import CWIconButton from 'client/scripts/views/components/component_kit/new_designs/CWIconButton';
 import { CWModal } from 'client/scripts/views/components/component_kit/new_designs/CWModal';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/cw_button';
 import { EditTopicModal } from 'client/scripts/views/modals/edit_topic_modal';
@@ -18,6 +19,24 @@ export const ManageTopicsSection = () => {
   const getFilteredTopics = (rawTopics: Topic[]): Topic[] => {
     const topics = rawTopics
       .filter((topic) => topic.featuredInSidebar)
+      .map((topic) => ({ ...topic } as Topic));
+
+    if (!topics.length) return [];
+
+    if (!topics[0].order) {
+      return [...topics]
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .reduce((acc, curr, index) => {
+          return [...acc, { ...curr, order: index + 1 }];
+        }, []);
+    } else {
+      return [...topics].sort((a, b) => a.order - b.order);
+    }
+  };
+
+  const getRegularTopics = (rawTopics: Topic[]): Topic[] => {
+    const topics = rawTopics
+      .filter((topic) => !topic.featuredInSidebar)
       .map((topic) => ({ ...topic } as Topic));
 
     if (!topics.length) return [];
@@ -46,6 +65,10 @@ export const ManageTopicsSection = () => {
     getFilteredTopics(rawTopics),
   );
 
+  const [regularTopics, setRegularTopics] = useState<Topic[]>(() =>
+    getRegularTopics(rawTopics),
+  );
+
   const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
 
   const handleSave = async () => {
@@ -62,12 +85,20 @@ export const ManageTopicsSection = () => {
 
   useEffect(() => {
     setTopics(getFilteredTopics(rawTopics));
+    setRegularTopics(getRegularTopics(rawTopics));
   }, [rawTopics]);
 
   return (
     <div className="ManageTopicsSection">
       <div className="content">
         <div className="featured-topic-list">
+          <div className="header">
+            <CWText type="h4">Featured Topics</CWText>
+            <CWText type="b1">
+              Manage the topics that appear in the sidebar of your community
+            </CWText>
+          </div>
+
           {topics.length ? (
             <DraggableTopicsList
               topics={topics}
@@ -76,6 +107,35 @@ export const ManageTopicsSection = () => {
             />
           ) : (
             <CWText>No Topics to Reorder</CWText>
+          )}
+        </div>
+
+        <div className="regular-topic-list">
+          <div className="header">
+            <CWText type="h4">Other Topics</CWText>
+            <CWText type="b1">
+              Manage the topics that appear in the discussion filter dropdown
+            </CWText>
+          </div>
+
+          {regularTopics.length ? (
+            regularTopics.map((regTopic, index) => (
+              <div key={index} className="topic-row">
+                <CWText>
+                  {regTopic.name}
+                  <CWIconButton
+                    iconName="pencil"
+                    buttonSize="sm"
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      setTopicSelectedToEdit(regTopic);
+                    }}
+                  />
+                </CWText>
+              </div>
+            ))
+          ) : (
+            <CWText>No Topics to View</CWText>
           )}
         </div>
       </div>

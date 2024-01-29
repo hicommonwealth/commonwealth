@@ -15,12 +15,25 @@
   gap: 24px;
 
   .content {
-    .featured-topic-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .featured-topic-list,
+    .regular-topic-list {
       display: flex;
       flex-direction: column;
-      height: 320px;
+      height: 400px;
+      gap: 8px;
 
       @include visibleScrollbar(light);
+
+      .header {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
 
       .topic-row {
         @include topicRowStyles;
