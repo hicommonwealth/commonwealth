@@ -1,11 +1,11 @@
-import { factory, formatFilename } from 'common-common/src/logging';
+import { logger } from '@hicommonwealth/core';
 import { config } from 'dotenv';
 import { Unleash } from 'unleash-client';
 import { UNLEASH_SERVER_API_TOKEN, UNLEASH_SERVER_URL } from '../config';
 
 config();
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 export class UnleashClient {
   private static instance: Unleash = null;

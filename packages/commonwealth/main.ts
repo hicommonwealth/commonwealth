@@ -43,6 +43,7 @@ import setupAPI from './server/routing/router';
 import { sendBatchedNotificationEmails } from './server/scripts/emails';
 import setupAppRoutes from './server/scripts/setupAppRoutes';
 import setupServer from './server/scripts/setupServer';
+import { UnleashClient } from './server/scripts/setupUnleash';
 import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
 import { databaseCleaner } from './server/util/databaseCleaner';
@@ -55,6 +56,7 @@ import ViewCountCache from './server/util/viewCountCache';
 require('express-async-errors');
 
 export async function main(app: express.Express) {
+  UnleashClient.getInstance(); // start unleash client async
   const log = _logger().getLogger(__filename);
   log.info(
     `Node Option max-old-space-size set to: ${JSON.stringify(
