@@ -184,6 +184,7 @@ async function createNewMagicUser({
         issuer: decodedMagicToken.issuer,
         issued_at: decodedMagicToken.claim.iat,
         address_id: canonicalAddressInstance.id, // always ethereum address
+        state_id: decodedMagicToken.claim.tid,
         created_at: new Date(),
         updated_at: new Date(),
       },
@@ -233,7 +234,8 @@ async function loginExistingMagicUser({
       }
       ssoToken.issued_at = decodedMagicToken.claim.iat;
       ssoToken.updated_at = new Date();
-      await ssoToken.save({ transaction });
+      ssoToken.state_id = decodedMagicToken.claim.tid;
+      await ssoToken.save({ transaction }); // todo
       log.trace('SSO TOKEN HANDLED NORMALLY');
     } else {
       // situation for legacy SsoToken instances:
@@ -282,6 +284,7 @@ async function loginExistingMagicUser({
     );
     if (malformedSsoToken) {
       malformedSsoToken.address_id = canonicalAddressInstance.id;
+      malformedSsoToken.state_id = decodedMagicToken.claim.tid;
       await malformedSsoToken.save({ transaction });
       log.info(
         `Finished migration of SsoToken for user ${existingUserInstance.id}!`,
@@ -292,6 +295,7 @@ async function loginExistingMagicUser({
           issuer: decodedMagicToken.issuer,
           issued_at: decodedMagicToken.claim.iat,
           address_id: canonicalAddressInstance.id, // always ethereum address
+          state_id: decodedMagicToken.claim.tid,
           created_at: new Date(),
           updated_at: new Date(),
         },
@@ -358,6 +362,7 @@ async function addMagicToUser({
     issuer: decodedMagicToken.issuer,
     issued_at: decodedMagicToken.claim.iat,
     address_id: canonicalAddressInstance.id,
+    state_id: decodedMagicToken.claim.tid,
     created_at: new Date(),
     updated_at: new Date(),
   });
@@ -394,6 +399,21 @@ async function magicLoginRoute(
 
   // canonical address is always ethereum
   const canonicalAddress = decodedMagicToken.publicAddress;
+
+  // replay attack check
+  const didTokenId = decodedMagicToken.claim.tid; // single-use token id
+  const previouslyUsedSsoTokenByTID = await models.SsoToken.findOne({
+    where: {
+      state_id: didTokenId,
+    },
+  });
+
+  if (previouslyUsedSsoTokenByTID) {
+    log.warn('Replay attack detected.');
+    throw new Error(
+      `Replay attack detected for user ${decodedMagicToken.publicAddress}}.`,
+    );
+  }
 
   // validate chain if provided (i.e. logging in on community page)
   if (req.body.chain) {
