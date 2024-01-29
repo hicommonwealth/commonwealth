@@ -52,7 +52,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
 
   const voteWeight = calculateVoteWeight(
     userStakeBalanceData,
-    stakeData?.stake_scaler,
+    stakeData?.vote_weight,
   );
   const stakeBalance = Number(userStakeBalanceData);
   const stakeValue = stakeBalance * Number(buyPriceData?.price);

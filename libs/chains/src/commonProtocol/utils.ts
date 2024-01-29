@@ -1,6 +1,6 @@
 export const calculateVoteWeight = (
   stakeBalance: string,
-  stakeScaler: number,
+  voteWeight: number,
 ) => {
-  return parseInt(stakeBalance, 10) * stakeScaler || 1;
+  return parseInt(stakeBalance, 10) * voteWeight || 1;
 };

@@ -111,7 +111,7 @@ export async function __createThreadReaction(
       where: { community_id: community.id },
     });
     if (stake) {
-      const vote_weight = stake.vote_weight;
+      const voteWeight = stake.vote_weight;
       const stakeBalance = await getNamespaceBalance(
         this.tokenBalanceCache,
         community.namespace,
@@ -120,7 +120,7 @@ export async function __createThreadReaction(
         address.address,
         this.models,
       );
-      calculatedVotingWeight = calculateVoteWeight(stakeBalance, vote_weight);
+      calculatedVotingWeight = calculateVoteWeight(stakeBalance, voteWeight);
     }
   }
 
