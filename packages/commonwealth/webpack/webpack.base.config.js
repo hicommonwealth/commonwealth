@@ -91,17 +91,6 @@ module.exports = {
       Buffer: ['buffer', 'Buffer'],
     }),
     new webpack.IgnorePlugin({ resourceRegExp: /\.md$/ }),
-    new webpack.NormalModuleReplacementPlugin(/node:/, (resource) => {
-      const mod = resource.request.replace(/^node:/, '');
-
-      switch (mod) {
-        case 'path':
-          resource.request = 'path-browserify';
-          break;
-        default:
-          throw new Error(`Not found ${mod}`);
-      }
-    }),
   ],
   optimization: {
     splitChunks: {
