@@ -60,8 +60,7 @@ const Snapshots = () => {
         <CWText type="h4">Snapshot</CWText>
         <CWText type="b1">
           You can connect multiple Snapshot spaces to keep your voting
-          conversations all in one place. Note: only input the name of your
-          snapshot space, not the full url.
+          conversations all in one place.
         </CWText>
       </div>
 
