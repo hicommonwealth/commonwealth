@@ -8,10 +8,7 @@ import {
 } from 'client/scripts/state/api/topics';
 import { CWCheckbox } from 'client/scripts/views/components/component_kit/cw_checkbox';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import {
-  CWValidationText,
-  ValidationStatus,
-} from 'client/scripts/views/components/component_kit/cw_validation_text';
+import { ValidationStatus } from 'client/scripts/views/components/component_kit/cw_validation_text';
 import { CWTextInput } from 'client/scripts/views/components/component_kit/new_designs/CWTextInput';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/cw_button';
 import {
@@ -22,7 +19,10 @@ import {
 import { serializeDelta } from 'client/scripts/views/components/react_quill_editor/utils';
 import type { DeltaStatic } from 'quill';
 import React, { useEffect, useState } from 'react';
+import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import './CreateTopicSection.scss';
+
+import { topicCreationValidationSchema } from './validation';
 
 export const CreateTopicSection = () => {
   const { mutateAsync: createTopic } = useCreateTopicMutation();
@@ -104,32 +104,25 @@ export const CreateTopicSection = () => {
 
   return (
     <div className="CreateTopicSection">
-      <div className="form">
+      <CWForm validationSchema={topicCreationValidationSchema}>
         <div className="form-inputs">
-          <div>
-            <CWTextInput
-              label="Name (required)"
-              placeholder="Enter a topic name"
-              value={name}
-              onInput={(e) => {
-                setName(e.target.value);
-              }}
-              inputValidationFn={handleInputValidation}
-              autoFocus
-            />
-            {errorMsg && (
-              <CWValidationText
-                className="validation-text"
-                message={errorMsg}
-                status="failure"
-              />
-            )}
-          </div>
-
           <CWTextInput
+            hookToForm
+            label="Name (required)"
+            placeholder="Enter a topic name"
+            name="topicName"
+            value={name}
+            onInput={(e) => {
+              setName(e.target.value);
+            }}
+            inputValidationFn={handleInputValidation}
+            autoFocus
+          />
+          <CWTextInput
+            hookToForm
             label="Description"
             placeholder="Enter a description"
-            name="description"
+            name="topicDescription"
             tabIndex={2}
             value={description}
             onInput={(e) => {
@@ -181,7 +174,7 @@ export const CreateTopicSection = () => {
             onClick={handleCreateTopic}
           />
         </div>
-      </div>
+      </CWForm>
     </div>
   );
 };
