@@ -3,6 +3,8 @@ export enum ValidChains {
   Goerli = 5,
 }
 
+export const STAKE_ID = 2;
+
 // Requires a live contract for each enum chain. Add address of factory here on new deploy.
 export const factoryContracts: {
   [key in ValidChains]: {

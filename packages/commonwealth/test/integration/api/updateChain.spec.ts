@@ -96,7 +96,9 @@ describe('UpdateChain Tests', () => {
     }
   });
 
-  it('Correctly updates namespace', async () => {
+  // skipped because public chainNodes are unreliable. If you want to test this functionality, update the goleri
+  // chainNode and do it locally.
+  xit('Correctly updates namespace', async () => {
     const tbc = {
       getBalances: async (_: any) => {
         return { '0x42D6716549A78c05FD8EF1f999D52751Bbf9F46a': '1' };

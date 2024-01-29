@@ -15,19 +15,21 @@ class NamespaceFactory extends ContractBase {
    */
   constructor(factoryAddress: string) {
     super(factoryAddress, namespaceFactoryAbi);
-    this.contract.methods
-      .reservationHook()
-      .call()
-      .then((addr) => {
-        if (
-          addr.toLowerCase() !== '0x0000000000000000000000000000000000000000'
-        ) {
-          this.reservationHook = new this.web3.eth.Contract(
-            reservationHookAbi as AbiItem[],
-            addr,
-          );
-        }
-      });
+  }
+
+  /**
+   * Initializes wallet and contracts.
+   * This must be called after instantiation before other methods are available.
+   */
+  async initialize(): Promise<void> {
+    await super.initialize();
+    const addr = await this.contract.methods.reservationHook().call();
+    if (addr.toLowerCase() !== '0x0000000000000000000000000000000000000000') {
+      this.reservationHook = new this.web3.eth.Contract(
+        reservationHookAbi as AbiItem[],
+        addr,
+      );
+    }
   }
 
   /**
@@ -36,6 +38,7 @@ class NamespaceFactory extends ContractBase {
    * @returns contract address 0x...
    */
   async getNamespaceAddress(name: string): Promise<string> {
+    this.isInitialized();
     const hexString = this.web3.utils.utf8ToHex(name);
     const activeNamespace = await this.contract.methods
       .getNamespace(hexString)
@@ -47,9 +50,10 @@ class NamespaceFactory extends ContractBase {
    * Checks if namespace is reserved both in existing names and at
    * reservation hook
    * @param name Namespace name
-   * @returns contract address 0x...
+   * @returns Boolean: true when namespace is available, otherwise false
    */
   async checkNamespaceReservation(name: string): Promise<boolean> {
+    this.isInitialized();
     const activeNamespace = await this.getNamespaceAddress(name);
     if (activeNamespace !== '0x0000000000000000000000000000000000000000') {
       return false;
@@ -69,6 +73,7 @@ class NamespaceFactory extends ContractBase {
    * @returns txReceipt or Error if name is taken or tx fails
    */
   async deployNamespace(name: string, feeManager: string): Promise<any> {
+    this.isInitialized();
     // Check if name is available
     const namespaceStatus = await this.checkNamespaceReservation(name);
     if (!namespaceStatus) {
@@ -78,10 +83,10 @@ class NamespaceFactory extends ContractBase {
     let txReceipt;
     try {
       txReceipt = await this.contract.methods
-        .deployNamespace(name, feeManager, '')
+        .deployNamespace(name, feeManager, [])
         .send({ from: this.wallet.accounts[0] });
-    } catch {
-      throw new Error('Transaction failed');
+    } catch (error) {
+      throw new Error('Transaction failed: ' + error);
     }
 
     return txReceipt;
@@ -95,14 +100,11 @@ class NamespaceFactory extends ContractBase {
    * @returns tx receipt or failure message
    */
   async configureCommunityStakes(name: string, stakesId: number): Promise<any> {
+    this.isInitialized();
     let txReceipt;
     try {
       txReceipt = await this.contract.methods
-        .configureCommunityStakeId(
-          name,
-          name.concat(' Community Stake'),
-          stakesId,
-        )
+        .configureCommunityStakesId(name, name + ' Community Stake', stakesId)
         .send({ from: this.wallet.accounts[0] });
     } catch {
       throw new Error('Transaction failed');

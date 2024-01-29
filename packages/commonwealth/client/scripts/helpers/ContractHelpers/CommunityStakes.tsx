@@ -1,5 +1,5 @@
 import ContractBase from './ContractBase';
-import NamespaceFactory from './NamspaceFactory';
+import NamespaceFactory from './NamespaceFactory';
 
 export type PriceData = {
   price: string;
