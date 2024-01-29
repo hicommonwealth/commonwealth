@@ -20,7 +20,6 @@ import logger from 'morgan';
 import passport from 'passport';
 import prerenderNode from 'prerender-node';
 import type { BrokerConfig } from 'rascal';
-import Rollbar from 'rollbar';
 import favicon from 'serve-favicon';
 import expressStatsInit from 'server/scripts/setupExpressStats';
 import * as v8 from 'v8';
@@ -29,8 +28,6 @@ import {
   PRERENDER_TOKEN,
   RABBITMQ_URI,
   REDIS_URL,
-  ROLLBAR_ENV,
-  ROLLBAR_SERVER_TOKEN,
   SERVER_URL,
   SESSION_SECRET,
   TBC_BALANCE_TTL_SECONDS,
@@ -193,13 +190,6 @@ export async function main(app: express.Express) {
   setupMiddleware();
   setupPassport(models);
 
-  const rollbar = new Rollbar({
-    accessToken: ROLLBAR_SERVER_TOKEN,
-    environment: ROLLBAR_ENV,
-    captureUncaught: true,
-    captureUnhandledRejections: true,
-  });
-
   let rabbitMQController: RabbitMQController;
   try {
     rabbitMQController = new RabbitMQController(
@@ -212,25 +202,16 @@ export async function main(app: express.Express) {
     );
     await rabbitMQController.init();
   } catch (e) {
-    console.warn(
-      'The main service RabbitMQController failed to initialize!',
-      e,
-    );
-    rollbar.critical(
-      'The main service RabbitMQController failed to initialize!',
-      e,
-    );
+    log.error('The main service RabbitMQController failed to initialize!', e);
   }
 
   if (!rabbitMQController.initialized) {
-    console.warn(
+    log.error(
       'The RabbitMQController is not initialized! Some services may be unavailable',
     );
-    rollbar.critical('The main service RabbitMQController is not initialized!');
-    // TODO: this requires an immediate response if in production
   }
 
-  const redisCache = new RedisCache(rollbar);
+  const redisCache = new RedisCache();
   await redisCache.init(REDIS_URL);
   const cacheDecorator = new CacheDecorator(redisCache);
 
@@ -284,15 +265,10 @@ export async function main(app: express.Express) {
 
   setupAppRoutes(app, models, templateFile, sendFile);
 
-  setupErrorHandlers(app, rollbar);
+  setupErrorHandlers(app);
 
   setupServer(app);
 
   // database clean-up jobs (should be run after the API so, we don't affect start-up time
-  databaseCleaner.initLoop(
-    models,
-    Number(DATABASE_CLEAN_HOUR),
-    redisCache,
-    rollbar,
-  );
+  databaseCleaner.initLoop(models, Number(DATABASE_CLEAN_HOUR), redisCache);
 }

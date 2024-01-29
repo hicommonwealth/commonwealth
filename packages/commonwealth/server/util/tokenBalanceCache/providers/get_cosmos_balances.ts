@@ -8,7 +8,6 @@ import {
 } from '@cosmjs/stargate';
 import { logger } from '@hicommonwealth/core';
 import { ChainNodeInstance } from '@hicommonwealth/model';
-import { rollbar } from '../../rollbar';
 import { Balances } from '../types';
 import { getTendermintClient } from '../util';
 
@@ -40,7 +39,6 @@ export async function __getCosmosNativeBalances(
 
   if (!denom) {
     const msg = `Could not query staking params for cosmos chain id: ${options.chainNode.cosmos_chain_id}`;
-    rollbar.critical(msg);
     log.error(msg);
     throw new Error('Could not query staking params');
   }
@@ -77,10 +75,6 @@ async function getOffChainBatchCosmosNativeBalances(
     const balanceResult = promiseResults[i];
     if (balanceResult.status === 'rejected') {
       log.error(`Failed to get balance for address ${a}`, balanceResult.reason);
-      rollbar.error(
-        `Failed to get balance for address ${a}`,
-        balanceResult.reason,
-      );
     } else {
       result[a] = balanceResult.value.amount;
     }
@@ -100,7 +94,6 @@ async function getCosmosNativeBalance(
     };
   } catch (e) {
     log.error(`Failed to get balance for address ${address}`, e);
-    rollbar.error(`Failed to get balance for address ${address}`, e);
     return {};
   }
 }

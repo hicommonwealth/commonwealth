@@ -13,14 +13,8 @@ import express from 'express';
 import session from 'express-session';
 import http from 'http';
 import passport from 'passport';
-import Rollbar from 'rollbar';
 import favicon from 'serve-favicon';
-import {
-  ROLLBAR_ENV,
-  ROLLBAR_SERVER_TOKEN,
-  SESSION_SECRET,
-  TBC_BALANCE_TTL_SECONDS,
-} from './server/config';
+import { SESSION_SECRET, TBC_BALANCE_TTL_SECONDS } from './server/config';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
 import setupAPI from './server/routing/router'; // performance note: this takes 15 seconds
@@ -131,14 +125,7 @@ setupAPI(
 );
 setupCosmosProxy(app, models, cacheDecorator);
 
-const rollbar = new Rollbar({
-  accessToken: ROLLBAR_SERVER_TOKEN,
-  environment: ROLLBAR_ENV,
-  captureUncaught: true,
-  captureUnhandledRejections: true,
-});
-
-setupErrorHandlers(app, rollbar);
+setupErrorHandlers(app);
 setupServer();
 
 export { resetDatabase } from './test/util/resetDatabase';

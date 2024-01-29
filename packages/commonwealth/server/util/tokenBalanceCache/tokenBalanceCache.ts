@@ -8,7 +8,6 @@ import {
 } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
 import Web3 from 'web3';
-import { rollbar } from '../rollbar';
 import { __getCosmosNativeBalances } from './providers/get_cosmos_balances';
 import { __getCw721Balances } from './providers/get_cw721_balances';
 import { __getErc1155Balances } from './providers/get_erc1155_balances';
@@ -72,7 +71,6 @@ export class TokenBalanceCache {
         `Failed to fetch balance(s) for ${options.addresses.length}` +
         ` address(es) on ${chainId}${contractAddress}`;
       log.error(msg, e);
-      rollbar.error(msg, e);
     }
 
     stats().incrementBy(
@@ -97,7 +95,6 @@ export class TokenBalanceCache {
     if (!chainNode) {
       const msg = `ChainNode with cosmos_chain_id ${options.sourceOptions.cosmosChainId} does not exist`;
       log.error(msg);
-      rollbar.error(msg);
       return {};
     }
 
@@ -112,7 +109,6 @@ export class TokenBalanceCache {
       } catch (e) {
         if (address != '0xdiscordbot') {
           log.error(`Skipping address: ${address}`, e);
-          rollbar.error(`Skipping address: ${address}`, e);
         }
       }
     }
@@ -193,7 +189,6 @@ export class TokenBalanceCache {
     if (!chainNode) {
       const msg = `ChainNode with eth_chain_id ${options.sourceOptions.evmChainId} does not exist`;
       log.error(msg);
-      rollbar.error(msg);
       return {};
     }
 

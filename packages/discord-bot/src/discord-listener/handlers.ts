@@ -5,7 +5,6 @@ import {
 import { DiscordAction, IDiscordMessage, logger } from '@hicommonwealth/core';
 import { Client, Message, ThreadChannel } from 'discord.js';
 import { getImageUrls } from '../discord-listener/util';
-import { rollbar } from '../utils/rollbar';
 import { getForumLinkedTopic } from '../utils/util';
 
 const log = logger().getLogger(__filename);
@@ -60,7 +59,6 @@ export async function handleMessage(
     }
   } catch (error) {
     log.info(`Error Processing Discord Message`, error);
-    rollbar.error(`Error Processing Discord Message`, error);
   }
 }
 
@@ -112,7 +110,6 @@ export async function handleThreadChannel(
       }
     }
   } catch (e) {
-    log.info(`Error Processing Discord Message`, e);
-    rollbar.error(`Error Processing Discord Message`, e);
+    log.error(`Error Processing Discord Message`, e);
   }
 }

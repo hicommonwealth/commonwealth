@@ -9,7 +9,6 @@ import {
   WebhookInstance,
   models,
 } from '@hicommonwealth/model';
-import { rollbar } from '../rollbar';
 import { sendDiscordWebhook } from './destinations/discord';
 import { sendSlackWebhook } from './destinations/slack';
 import { sendTelegramWebhook } from './destinations/telegram';
@@ -112,8 +111,6 @@ export async function dispatchWebhooks(
 
       // TODO: Issue #5230
       log.error(`Error sending webhook: ${result.reason}`, error);
-      // log.error(`Error sending webhook: ${result.reason}`, error);
-      rollbar.error(`Error sending webhook: ${result.reason}`, error);
     } else {
       stats().increment('webhook.success');
     }

@@ -1,6 +1,5 @@
 import { ILogger, logger } from '@hicommonwealth/core';
 import * as Rascal from 'rascal';
-import type Rollbar from 'rollbar';
 import type { Sequelize } from 'sequelize';
 import type {
   RascalPublications,
@@ -34,13 +33,9 @@ export class RabbitMQController extends AbstractRabbitMQController {
   public readonly subscribers: string[];
   public readonly publishers: string[];
   protected readonly _rawVhost: any;
-  protected rollbar: Rollbar;
   private _log: ILogger;
 
-  constructor(
-    protected readonly _rabbitMQConfig: Rascal.BrokerConfig,
-    rollbar?: Rollbar,
-  ) {
+  constructor(protected readonly _rabbitMQConfig: Rascal.BrokerConfig) {
     super();
 
     this._log = logger().getLogger(__filename);
@@ -54,8 +49,6 @@ export class RabbitMQController extends AbstractRabbitMQController {
 
     // array of publishers
     this.publishers = Object.keys(this._rawVhost.publications);
-
-    this.rollbar = rollbar;
   }
 
   public async init(): Promise<void> {
@@ -134,11 +127,9 @@ export class RabbitMQController extends AbstractRabbitMQController {
             // message to avoid re-queuing the message multiple times
             if (e instanceof RmqMsgFormatError) {
               this._log.error(`Invalid Message Format Error - ${errorMsg}`, e);
-              this.rollbar?.warn(`Invalid Message Format - ${errorMsg}`, e);
               ackOrNack(e, { strategy: 'nack' });
             } else {
               this._log.error(`Unknown Error - ${errorMsg}`, e);
-              this.rollbar?.warn(`Unknown Error - ${errorMsg}`, e);
               ackOrNack(e, [
                 { strategy: 'republish', defer: 2000, attempts: 3 },
                 { strategy: 'nack' },
@@ -148,12 +139,10 @@ export class RabbitMQController extends AbstractRabbitMQController {
       });
       subscription.on('error', (err) => {
         this._log.error(`Subscriber error: ${err}`);
-        this.rollbar?.warn(`Subscriber error: ${err}`);
       });
       subscription.on('invalid_content', (err, message, ackOrNack) => {
         this._log.error(`Invalid content`, err);
         ackOrNack(err, { strategy: 'nack' });
-        this.rollbar?.warn(`Invalid content`, err);
       });
     } catch (err) {
       throw new RabbitMQControllerError(`${err.message}`);
@@ -182,7 +171,6 @@ export class RabbitMQController extends AbstractRabbitMQController {
 
       publication.on('error', (err, messageId) => {
         this._log.error(`Publisher error ${messageId}`, err);
-        this.rollbar?.warn(`Publisher error ${messageId}`, err);
         throw new PublishError(err.message);
       });
     } catch (err) {
@@ -248,18 +236,8 @@ export class RabbitMQController extends AbstractRabbitMQController {
         );
         // if this fails once not much damage is done since the message is re-queued later again anyway
         (<any>await DB.model).increment('queued', { where: { id: objectId } });
-        this.rollbar?.warn(
-          `RepublishMessages job failure for message: ${JSON.stringify(
-            publishData,
-          )} to ${publication}.`,
-          e,
-        );
       } else {
         this._log.error(
-          `Sequelize error occurred while setting queued to -1 for ${DB.model.getTableName()} with id: ${objectId}`,
-          e,
-        );
-        this.rollbar?.warn(
           `Sequelize error occurred while setting queued to -1 for ${DB.model.getTableName()} with id: ${objectId}`,
           e,
         );
