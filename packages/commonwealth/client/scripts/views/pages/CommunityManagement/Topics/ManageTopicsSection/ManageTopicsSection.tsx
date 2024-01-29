@@ -16,7 +16,7 @@ import React, { useEffect, useState } from 'react';
 import './ManageTopicsSection.scss';
 
 export const ManageTopicsSection = () => {
-  const getFilteredTopics = (rawTopics: Topic[]): Topic[] => {
+  const getFeaturedTopics = (rawTopics: Topic[]): Topic[] => {
     const topics = rawTopics
       .filter((topic) => topic.featuredInSidebar)
       .map((topic) => ({ ...topic } as Topic));
@@ -61,8 +61,8 @@ export const ManageTopicsSection = () => {
   const { mutateAsync: updateFeaturedTopicsOrder } =
     useUpdateFeaturedTopicsOrderMutation();
 
-  const [topics, setTopics] = useState<Topic[]>(() =>
-    getFilteredTopics(rawTopics),
+  const [featuredTopics, setFeaturedTopics] = useState<Topic[]>(() =>
+    getFeaturedTopics(rawTopics),
   );
 
   const [regularTopics, setRegularTopics] = useState<Topic[]>(() =>
@@ -73,18 +73,18 @@ export const ManageTopicsSection = () => {
 
   const handleSave = async () => {
     try {
-      await updateFeaturedTopicsOrder({ featuredTopics: topics });
+      await updateFeaturedTopicsOrder({ featuredTopics: featuredTopics });
     } catch (err) {
       notifyError('Failed to update order');
     }
   };
 
   const handleReversion = () => {
-    setTopics(getFilteredTopics(rawTopics));
+    setFeaturedTopics(getFeaturedTopics(rawTopics));
   };
 
   useEffect(() => {
-    setTopics(getFilteredTopics(rawTopics));
+    setFeaturedTopics(getFeaturedTopics(rawTopics));
     setRegularTopics(getRegularTopics(rawTopics));
   }, [rawTopics]);
 
@@ -99,10 +99,10 @@ export const ManageTopicsSection = () => {
             </CWText>
           </div>
 
-          {topics.length ? (
+          {featuredTopics.length ? (
             <DraggableTopicsList
-              topics={topics}
-              setTopics={setTopics}
+              topics={featuredTopics}
+              setTopics={setFeaturedTopics}
               onEdit={setTopicSelectedToEdit}
             />
           ) : (
