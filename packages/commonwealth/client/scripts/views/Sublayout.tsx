@@ -14,7 +14,8 @@ import { SublayoutHeader } from './SublayoutHeader';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import GatingGrowl from './components/GatingGrowl/GatingGrowl';
-import { RotatingButton } from './components/sidebar/RotatingButton';
+import { CollapsableSidebarButtonScoped } from './components/sidebar/CollapsableSidebarButtonScoped';
+import { CollapsableSidebarButtonUnscoped } from './components/sidebar/CollapsableSidebarButtonUnscoped';
 
 type SublayoutProps = {
   hideFooter?: boolean;
@@ -66,7 +67,11 @@ const Sublayout = ({
 
   return (
     <div className="Sublayout">
-      <RotatingButton />
+      {isInsideCommunity ? (
+        <CollapsableSidebarButtonScoped />
+      ) : (
+        <CollapsableSidebarButtonUnscoped />
+      )}
       <div className="header-and-body-container">
         <SublayoutHeader onMobile={isWindowSmallInclusive} />
         <div className="sidebar-and-body-container">

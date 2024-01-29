@@ -1,12 +1,13 @@
+import 'components/sidebar/collapsable_button.scss';
 import React, { useState } from 'react';
 import useSidebarStore from '../../../state/ui/sidebar/index';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 
-export const RotatingButton = () => {
+export const CollapsableSidebarButtonUnscoped = () => {
   const { setMenu, menuName, menuVisible, setUserToggledVisibility } =
     useSidebarStore();
 
-  const [rotate, setRotate] = useState(menuVisible);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   function handleToggle() {
     const isVisible = !menuVisible;
@@ -15,17 +16,17 @@ export const RotatingButton = () => {
       setUserToggledVisibility(isVisible ? 'open' : 'closed');
     }, 200);
 
-    setRotate(!rotate);
+    setIsCollapsed(!isCollapsed);
   }
 
   return (
-    <div className="rotating-button-hover">
-      <div className="rotating-button">
+    <div className="collapsable-button-hover">
+      <div className="collapsable-button-positioning-unscoped">
         <CWIconButton
           iconButtonTheme="black"
           iconName="caretDoubleLeft"
           onClick={handleToggle}
-          className={rotate ? 'collapse' : 'un-collapse'}
+          className={isCollapsed ? 'collapse' : 'un-collapse'}
         />
       </div>
     </div>
