@@ -46,7 +46,6 @@ describe('PUT communityStakes Tests', () => {
       communityStake: baseRequest,
       user: user,
     });
-
     assert.equal(createResponse.community_id, expectedCreateResp.community_id);
     assert.equal(createResponse.stake_id, expectedCreateResp.stake_id);
     assert.equal(createResponse.stake_token, expectedCreateResp.stake_token);
@@ -85,6 +84,7 @@ describe('PUT communityStakes Tests', () => {
     assert.equal(getResp.stake_token, expectedUpdateResp.stake_token);
     assert.equal(getResp.vote_weight, expectedUpdateResp.vote_weight);
     assert.equal(getResp.stake_enabled, expectedUpdateResp.stake_enabled);
+    assert.equal(getResp.Chain.namespace, 'IanSpace');
   });
 
   it('The community stake routes work correctly', async () => {

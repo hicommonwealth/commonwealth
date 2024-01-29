@@ -51,7 +51,6 @@ export default (
     models.CommunityStake.belongsTo(models.Community, {
       foreignKey: 'community_id',
       targetKey: 'id',
-      as: 'Community',
     });
   };
 
