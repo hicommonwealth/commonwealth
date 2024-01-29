@@ -57,8 +57,7 @@ export const CreateTopicSection = () => {
     setErrorMsg(null);
   }, [name, featuredInNewPost, editorText]);
 
-  const handleCreateTopic = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
+  const handleCreateTopic = async (_e: React.MouseEvent<HTMLButtonElement>) => {
     try {
       await createTopic({
         name,
@@ -104,7 +103,10 @@ export const CreateTopicSection = () => {
 
   return (
     <div className="CreateTopicSection">
-      <CWForm validationSchema={topicCreationValidationSchema}>
+      <CWForm
+        validationSchema={topicCreationValidationSchema}
+        onSubmit={handleCreateTopic}
+      >
         <div className="form-inputs">
           <CWTextInput
             hookToForm
@@ -171,7 +173,7 @@ export const CreateTopicSection = () => {
             buttonHeight="med"
             buttonWidth={isWindowExtraSmall ? 'full' : 'wide'}
             disabled={isSaving || !!errorMsg}
-            onClick={handleCreateTopic}
+            type="submit"
           />
         </div>
       </CWForm>
