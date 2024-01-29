@@ -68,10 +68,10 @@ process.once('SIGTERM', async (arg?: any) => {
   await disposeAndExit('EXIT');
 });
 process.once('uncaughtException', async (arg?: any) => {
-  console.log(`uncaughtException ${arg}`);
+  console.error(`uncaughtException ${arg}`);
   await disposeAndExit('ERROR');
 });
 process.once('unhandledRejection', async (arg?: any) => {
-  console.log(`unhandledRejection ${arg}`);
+  console.error(`unhandledRejection ${arg}`);
   await disposeAndExit('ERROR');
 });
