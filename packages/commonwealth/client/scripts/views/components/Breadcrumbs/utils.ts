@@ -125,14 +125,6 @@ export const generateBreadcrumbs = (
       label = 'Discussions';
     }
 
-    if (
-      pathSegments[pathSegments.length - 1] === 'contract' ||
-      (['manage', 'analytics', 'contracts'].includes(pathSegments[1]) &&
-        index === 0)
-    ) {
-      label = 'Admin Capabilities';
-    }
-
     // Handles the unique logic of the discussions section
     if (
       !locationPath.includes('new/discussion') &&
@@ -166,6 +158,19 @@ export const generateBreadcrumbs = (
       }
       if (pathSegments.length > 3) {
         pathSegments.splice(2, 2);
+      }
+    }
+
+    if (
+      pathSegments[pathSegments.length - 1] === 'contract' ||
+      (['manage', 'analytics', 'contracts'].includes(pathSegments[1]) &&
+        index === 0)
+    ) {
+      label = 'Admin Capabilities';
+      isParent = true;
+
+      if (pathSegments.length > 1 && pathSegments[1] === 'manage') {
+        pathSegments.splice(0, 1);
       }
     }
 
