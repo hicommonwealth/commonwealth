@@ -1,22 +1,22 @@
-import React, { MutableRefObject, useMemo } from 'react';
-import ReactQuill from 'react-quill';
-import { renderToolbarIcon, SerializableDeltaStatic } from './utils';
-import { DeltaStatic } from 'quill';
-import clsx from 'clsx';
 import {
-  TextHOne,
-  TextHTwo,
-  TextB,
-  TextItalic,
-  TextStrikethrough,
-  LinkSimple,
   Code,
-  Quotes,
   Image,
-  ListNumbers,
+  LinkSimple,
   ListBullets,
   ListChecks,
+  ListNumbers,
+  Quotes,
+  TextB,
+  TextHOne,
+  TextHTwo,
+  TextItalic,
+  TextStrikethrough,
 } from '@phosphor-icons/react';
+import clsx from 'clsx';
+import { DeltaStatic } from 'quill';
+import React, { MutableRefObject, useMemo } from 'react';
+import ReactQuill from 'react-quill';
+import { SerializableDeltaStatic, renderToolbarIcon } from './utils';
 
 import 'components/react_quill/react_quill_editor.scss';
 
@@ -131,7 +131,7 @@ export const useMarkdownToolbarHandlers = ({
       editor.deleteText(selection.index, selection.length);
       editor.insertText(
         selection.index,
-        `${markdownChars}${text.trim()}${markdownChars}`
+        `${markdownChars}${text.trim()}${markdownChars}`,
       );
       setContentDelta({
         ...editor.getContents(),
