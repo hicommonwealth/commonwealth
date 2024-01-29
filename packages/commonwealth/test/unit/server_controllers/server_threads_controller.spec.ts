@@ -67,7 +67,7 @@ describe('ServerThreadsController', () => {
           findOne: sandbox.stub().resolves({
             id: 5,
             stake_id: 1,
-            stake_scaler: 1,
+            vote_weight: 1,
           }),
         },
         sequelize: {
