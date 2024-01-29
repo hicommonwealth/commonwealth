@@ -7,6 +7,7 @@ import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { ManageCommunityStakeModalMode } from 'views/modals/ManageCommunityStakeModal/types';
 
 import './VoteWeightModule.scss';
 
@@ -15,6 +16,7 @@ type VoteWeightModuleProps = {
   stakeNumber: number;
   stakeValue: number;
   denomination: string;
+  onOpenStakeModal: (modalMode: ManageCommunityStakeModalMode) => void;
 };
 
 export const VoteWeightModule = ({
@@ -22,6 +24,7 @@ export const VoteWeightModule = ({
   stakeNumber,
   stakeValue,
   denomination,
+  onOpenStakeModal,
 }: VoteWeightModuleProps) => {
   const popoverProps = usePopover();
 
@@ -59,6 +62,7 @@ export const VoteWeightModule = ({
                 buttonAlt="green"
                 buttonHeight="sm"
                 buttonWidth="full"
+                onClick={() => onOpenStakeModal('buy')}
               />
               <CWButton
                 label="Sell stake"
@@ -66,6 +70,7 @@ export const VoteWeightModule = ({
                 buttonAlt="rorange"
                 buttonHeight="sm"
                 buttonWidth="full"
+                onClick={() => onOpenStakeModal('sell')}
               />
             </div>
           ) : (
@@ -76,6 +81,7 @@ export const VoteWeightModule = ({
                 buttonAlt="green"
                 buttonHeight="sm"
                 buttonWidth="full"
+                onClick={() => onOpenStakeModal('buy')}
               />
             </div>
           )}

@@ -2,6 +2,7 @@ import React from 'react';
 
 import { useCommonNavigate } from 'navigation/helpers';
 
+import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import { CWText } from '../../component_kit/cw_text';
 import CWBanner from '../../component_kit/new_designs/CWBanner';
 import { CWTag } from '../../component_kit/new_designs/CWTag';
@@ -15,6 +16,8 @@ export const CommunityStakeBanner = ({
   groupName,
 }: CommunityStakeBannerProps) => {
   const navigate = useCommonNavigate();
+  const { setModeOfManageCommunityStakeModal } =
+    useManageCommunityStakeModalStore();
 
   return (
     <CWBanner
@@ -29,9 +32,7 @@ export const CommunityStakeBanner = ({
           buttonType: 'secondary',
           buttonAlt: 'green',
           buttonWidth: 'wide',
-          onClick: () => {
-            navigate('/');
-          },
+          onClick: () => setModeOfManageCommunityStakeModal('buy'),
         },
         {
           label: 'Learn More',

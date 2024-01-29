@@ -5,7 +5,7 @@ import { featureFlags } from 'helpers/feature-flags';
 import { useCommonNavigate } from 'navigation/helpers';
 import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
-import useNewTopicModalMutationStore from 'state/ui/newTopicModal';
+import { useNewTopicModalStore } from 'state/ui/modals';
 import { sidebarStore } from 'state/ui/sidebar';
 import { NewTopicModal } from '../../modals/new_topic_modal';
 import { OrderTopicsModal } from '../../modals/order_topics_modal';
@@ -57,7 +57,7 @@ const AdminSectionComponent = () => {
   const [isOrderTopicsModalOpen, setIsOrderTopicsModalOpen] =
     React.useState<boolean>(false);
   const { isNewTopicModalOpen, setIsNewTopicModalOpen } =
-    useNewTopicModalMutationStore();
+    useNewTopicModalStore();
 
   const matchesManageCommunityRoute = matchRoutes(
     [{ path: '/manage' }, { path: ':scope/manage' }],

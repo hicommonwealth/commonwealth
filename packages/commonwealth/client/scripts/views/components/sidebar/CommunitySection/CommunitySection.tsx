@@ -3,7 +3,7 @@ import { featureFlags } from 'helpers/feature-flags';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useState } from 'react';
+import React from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
 import {
@@ -14,7 +14,7 @@ import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { SubscriptionButton } from 'views/components/subscription_button';
 import ManageCommunityStakeModal from 'views/modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
-import { ManageCommunityStakeModalMode } from 'views/modals/ManageCommunityStakeModal/types';
+import useManageCommunityStakeModalStore from '../../../../state/ui/modals/manageCommunityStakeModal';
 import Permissions from '../../../../utils/Permissions';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
 import { CWText } from '../../component_kit/cw_text';
@@ -33,14 +33,15 @@ interface CommunitySectionProps {
 }
 
 export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
-  const [typeOfManageCommunityStakeModal, setTypeOfManageCommunityStakeModal] =
-    useState<ManageCommunityStakeModalMode>(null);
-
   const navigate = useCommonNavigate();
   const { pathname } = useLocation();
   const { isLoggedIn } = useUserLoggedIn();
   const { activeAccount } = useUserActiveAccount();
   const { stakeEnabled } = useCommunityStake();
+  const {
+    modeOfManageCommunityStakeModal,
+    setModeOfManageCommunityStakeModal,
+  } = useManageCommunityStakeModalStore();
 
   if (showSkeleton) return <CommunitySectionSkeleton />;
 
@@ -65,6 +66,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
                 stakeNumber={1}
                 stakeValue={3}
                 denomination="eth"
+                onOpenStakeModal={setModeOfManageCommunityStakeModal}
               />
             )}
           </>
@@ -122,12 +124,12 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
         visibleOverflow
         content={
           <ManageCommunityStakeModal
-            mode={typeOfManageCommunityStakeModal}
-            onModalClose={() => setTypeOfManageCommunityStakeModal(null)}
+            mode={modeOfManageCommunityStakeModal}
+            onModalClose={() => setModeOfManageCommunityStakeModal(null)}
           />
         }
-        onClose={() => setTypeOfManageCommunityStakeModal(null)}
-        open={!!typeOfManageCommunityStakeModal}
+        onClose={() => setModeOfManageCommunityStakeModal(null)}
+        open={!!modeOfManageCommunityStakeModal}
       />
     </>
   );
