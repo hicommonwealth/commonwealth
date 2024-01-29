@@ -1,10 +1,11 @@
-import { NotificationCategories } from 'common-common/src/types';
-import NotificationSubscription from 'models/NotificationSubscription';
-import Comment from 'models/Comment';
-import Thread from 'models/Thread';
-import { findSubscription, SubUniqueData } from 'helpers/findSubscription';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { NotificationCategories } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
+import { findSubscription, SubUniqueData } from 'helpers/findSubscription';
+import Comment from 'models/Comment';
+import NotificationSubscription from 'models/NotificationSubscription';
+import Thread from 'models/Thread';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -25,7 +26,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     false,
     {
       id: 'randomChain',
-    }
+    },
   ),
   new NotificationSubscription(
     2,
@@ -35,7 +36,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     false,
     {
       id: chainId,
-    }
+    },
   ),
   new NotificationSubscription(
     3,
@@ -45,7 +46,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     false,
     {
       id: 'randomChain2',
-    }
+    },
   ),
   new NotificationSubscription(
     4,
@@ -55,7 +56,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     false,
     {
       id: chainId,
-    }
+    },
   ),
   new NotificationSubscription(
     5,
@@ -66,7 +67,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     null,
     null,
     null,
-    'random_snapshot_space'
+    'random_snapshot_space',
   ),
   new NotificationSubscription(
     6,
@@ -77,7 +78,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     null,
     null,
     null,
-    snapshotId
+    snapshotId,
   ),
   new NotificationSubscription(
     7,
@@ -89,7 +90,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     <Comment<any>>{
       id: 2,
     },
-    null
+    null,
   ),
   new NotificationSubscription(
     8,
@@ -101,7 +102,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     <Comment<any>>{
       id: commentId,
     },
-    null
+    null,
   ),
   new NotificationSubscription(
     9,
@@ -113,7 +114,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     null,
     <Thread>{
       id: 2,
-    }
+    },
   ),
   new NotificationSubscription(
     10,
@@ -125,7 +126,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     null,
     <Thread>{
       id: threadId,
-    }
+    },
   ),
   new NotificationSubscription(
     11,
@@ -137,7 +138,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     <Comment<any>>{
       id: 2,
     },
-    null
+    null,
   ),
   new NotificationSubscription(
     12,
@@ -149,7 +150,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     <Comment<any>>{
       id: commentId,
     },
-    null
+    null,
   ),
   new NotificationSubscription(
     13,
@@ -161,7 +162,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     null,
     <Thread>{
       id: 2,
-    }
+    },
   ),
   new NotificationSubscription(
     14,
@@ -173,35 +174,35 @@ const notifSubscriptions: NotificationSubscription[] = [
     null,
     <Thread>{
       id: threadId,
-    }
+    },
   ),
   new NotificationSubscription(
     15,
     NotificationCategories.NewMention,
     true,
     new Date(),
-    false
+    false,
   ),
   new NotificationSubscription(
     16,
     NotificationCategories.NewCollaboration,
     true,
     new Date(),
-    false
+    false,
   ),
   new NotificationSubscription(
     17,
     NotificationCategories.ThreadEdit,
     true,
     new Date(),
-    false
+    false,
   ),
   new NotificationSubscription(
     18,
     NotificationCategories.CommentEdit,
     true,
     new Date(),
-    false
+    false,
   ),
 ];
 
@@ -216,7 +217,7 @@ describe('findSubscription tests', () => {
       // type coercion necessary here since type error would usually be thrown to stop us from not passing a chain
       const result = findSubscription(
         <SubUniqueData>findOptions,
-        notifSubscriptions
+        notifSubscriptions,
       );
       expect(result).to.be.undefined;
     });
@@ -245,7 +246,7 @@ describe('findSubscription tests', () => {
       // type coercion necessary here since type error would usually be thrown to stop us from not passing a chain
       const result = findSubscription(
         <SubUniqueData>findOptions,
-        notifSubscriptions
+        notifSubscriptions,
       );
       expect(result).to.be.undefined;
     });
@@ -274,7 +275,7 @@ describe('findSubscription tests', () => {
       // type coercion necessary here since type error would usually be thrown to stop us from not passing a chain
       const result = findSubscription(
         <SubUniqueData>findOptions,
-        notifSubscriptions
+        notifSubscriptions,
       );
       expect(result).to.be.undefined;
     });
@@ -303,7 +304,7 @@ describe('findSubscription tests', () => {
       // type coercion necessary here since type error would usually be thrown to stop us from not passing a chain
       const result = findSubscription(
         <SubUniqueData>findOptions,
-        notifSubscriptions
+        notifSubscriptions,
       );
       expect(result).to.be.undefined;
     });
@@ -317,7 +318,7 @@ describe('findSubscription tests', () => {
       // type coercion necessary here since type error would usually be thrown to stop us from not passing a chain
       const result = findSubscription(
         <SubUniqueData>findOptions,
-        notifSubscriptions
+        notifSubscriptions,
       );
       expect(result).to.be.undefined;
     });
@@ -361,7 +362,7 @@ describe('findSubscription tests', () => {
       // type coercion necessary here since type error would usually be thrown to stop us from not passing a chain
       const result = findSubscription(
         <SubUniqueData>findOptions,
-        notifSubscriptions
+        notifSubscriptions,
       );
       expect(result).to.be.undefined;
     });
@@ -375,7 +376,7 @@ describe('findSubscription tests', () => {
       // type coercion necessary here since type error would usually be thrown to stop us from not passing a chain
       const result = findSubscription(
         <SubUniqueData>findOptions,
-        notifSubscriptions
+        notifSubscriptions,
       );
       expect(result).to.be.undefined;
     });

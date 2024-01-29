@@ -5,9 +5,14 @@ export const TOKENS = {
   EVM_TOKEN: 'eth_native',
 };
 
-export const SPECIFICATIONS = {
+export const ERC_SPECIFICATIONS = {
   ERC_20: 'erc20',
   ERC_721: 'erc721',
+  ERC_1155: 'erc1155',
+};
+
+export const CW_SPECIFICATIONS = {
+  CW_721: 'cw721',
 };
 
 export const BLOCKCHAINS = {
@@ -26,28 +31,25 @@ export const AMOUNT_CONDITIONS = {
 
 export const requirementTypes = [
   { value: TOKENS.COSMOS_TOKEN, label: 'Cosmos base tokens' },
-  { value: SPECIFICATIONS.ERC_20, label: 'ERC-20' },
-  { value: SPECIFICATIONS.ERC_721, label: 'ERC-721' },
+  { value: CW_SPECIFICATIONS.CW_721, label: 'CW-721' },
+  { value: ERC_SPECIFICATIONS.ERC_20, label: 'ERC-20' },
+  { value: ERC_SPECIFICATIONS.ERC_721, label: 'ERC-721' },
+  { value: ERC_SPECIFICATIONS.ERC_1155, label: 'ERC-1155' },
   { value: TOKENS.EVM_TOKEN, label: 'EVM base tokens' },
 ];
-
-// Get eth chain id from the app.config.chains for these chains
-export const cosmosBaseChainIds = ['cosmos', 'injective'];
-export const ethBaseChainIds = ['axie-infinity', 'ethereum', 'polygon'];
-const chainIdsToFind = [...cosmosBaseChainIds, ...ethBaseChainIds];
-const foundChains = app.config.chains
-  .getAll()
-  .filter((x) => chainIdsToFind.includes(x.id.toLowerCase()));
-export const chainTypes = chainIdsToFind.map((x) => ({
-  chainBase: cosmosBaseChainIds.includes(x) ? 'cosmos' : 'ethereum',
-  value: cosmosBaseChainIds.includes(x)
-    ? 'cosmos' // cosmos and injective have 'cosmos' id
-    : foundChains.find((y) => y.id.toLowerCase() === x)?.ChainNode?.ethChainId,
-  label: x.replace(/\b\w/g, (l) => l.toUpperCase()),
-}));
 
 export const conditionTypes = [
   { value: AMOUNT_CONDITIONS.MORE, label: 'More than' },
   { value: AMOUNT_CONDITIONS.EQUAL, label: 'Equal to' },
   { value: AMOUNT_CONDITIONS.LESS, label: 'Less than' },
 ];
+
+// Get chain id's from the app.config.chains for all eth and cosmos chains
+export const chainTypes = app.config.nodes
+  .getAll()
+  .filter((chain) => chain.ethChainId || chain.cosmosChainId)
+  .map((chain) => ({
+    chainBase: chain.ethChainId ? 'ethereum' : 'cosmos',
+    value: chain.ethChainId || chain.cosmosChainId,
+    label: chain.name.replace(/\b\w/g, (l) => l.toUpperCase()),
+  }));

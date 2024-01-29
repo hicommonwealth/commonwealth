@@ -1,12 +1,12 @@
 import AWS from 'aws-sdk';
-import { v4 as uuidv4 } from 'uuid';
-import { Configuration, OpenAIApi } from 'openai';
 import fetch from 'node-fetch';
+import { Configuration, OpenAIApi } from 'openai';
+import { v4 as uuidv4 } from 'uuid';
 
+import { AppError } from '@hicommonwealth/adapters';
+import type { DB } from '@hicommonwealth/model';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import type { DB } from '../models';
-import { AppError } from '../../../common-common/src/errors';
 
 const configuration = new Configuration({
   organization: 'org-D0ty00TJDApqHYlrn1gge2Ql',
@@ -24,7 +24,7 @@ type generateImageResp = {
 const generateImage = async (
   models: DB,
   req: TypedRequestBody<generateImageReq>,
-  res: TypedResponse<generateImageResp>
+  res: TypedResponse<generateImageResp>,
 ) => {
   const { description } = req.body;
 
@@ -36,7 +36,7 @@ const generateImage = async (
   try {
     const response = await openai.createImage({
       prompt: description,
-      size: '512x512',
+      size: '256x256',
       response_format: 'url',
     });
 

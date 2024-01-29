@@ -1,12 +1,9 @@
-import type {
-  GetProfilesReq,
-  GetProfilesResp,
-} from 'common-common/src/api/extApiTypes';
-import { needParamErrMsg } from 'common-common/src/api/extApiTypes';
+import type { DB } from '@hicommonwealth/model';
+import { ProfileAttributes } from '@hicommonwealth/model';
 import { oneOf, query, validationResult } from 'express-validator';
 import Sequelize, { WhereOptions } from 'sequelize';
-import type { DB } from '../../models';
-import { ProfileAttributes } from '../../models/profile';
+import type { GetProfilesReq, GetProfilesResp } from '../../api/extApiTypes';
+import { needParamErrMsg } from '../../api/extApiTypes';
 import type { TypedRequestQuery, TypedResponse } from '../../types';
 import { failure, success } from '../../types';
 import { paginationValidation } from '../../util/helperValidations';
@@ -20,7 +17,7 @@ export const getProfilesValidation = [
       query('addresses').exists().toArray(),
       query('profile_ids').exists().toArray(),
     ],
-    `${needParamErrMsg} (addresses, profile_ids)`
+    `${needParamErrMsg} (addresses, profile_ids)`,
   ),
   query('count_only').optional().isBoolean().toBoolean(),
   ...paginationValidation,
@@ -29,7 +26,7 @@ export const getProfilesValidation = [
 const getProfiles = async (
   models: DB,
   req: TypedRequestQuery<GetProfilesReq>,
-  res: TypedResponse<GetProfilesResp>
+  res: TypedResponse<GetProfilesResp>,
 ) => {
   const errors = validationResult(req).array();
   if (errors.length !== 0) {

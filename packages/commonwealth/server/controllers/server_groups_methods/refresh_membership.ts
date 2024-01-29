@@ -1,16 +1,17 @@
-import { flatten, uniq } from 'lodash';
-import moment from 'moment';
-import { Op, Sequelize } from 'sequelize';
-import { ServerError } from '../../../../common-common/src/errors';
-import { TokenBalanceCache } from '../../../../token-balance-cache/src';
-import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/community';
-import { MembershipInstance } from '../../models/membership';
-import { UserInstance } from '../../models/user';
-import validateGroupMembership from '../../util/requirementsModule/validateGroupMembership';
-import { ServerCommunitiesController } from '../server_communities_controller';
+import { AppError } from '@hicommonwealth/adapters';
+import {
+  AddressInstance,
+  CommunityInstance,
+  MembershipRejectReason,
+  UserInstance,
+} from '@hicommonwealth/model';
+import { Op } from 'sequelize';
+import { refreshMembershipsForAddress } from '../../util/requirementsModule/refreshMembershipsForAddress';
+import { ServerGroupsController } from '../server_groups_controller';
 
-const MEMBERSHIP_TTL_SECONDS = 60 * 2;
+const Errors = {
+  TopicNotFound: 'Topic not found',
+};
 
 export type RefreshMembershipOptions = {
   user: UserInstance;
@@ -21,108 +22,55 @@ export type RefreshMembershipOptions = {
 export type RefreshMembershipResult = {
   topicId?: number;
   allowed: boolean;
-  rejectReason?: string;
+  rejectReason?: MembershipRejectReason;
 }[];
 
 export async function __refreshMembership(
-  this: ServerCommunitiesController,
+  this: ServerGroupsController,
   { community, address, topicId }: RefreshMembershipOptions,
 ): Promise<RefreshMembershipResult> {
-  // get all groups across the community topics
-  const communityTopics = await this.models.Topic.findAll({
+  // get all groups in the community
+  let groups = await this.models.Group.findAll({
     where: {
-      chain_id: community.id,
-      ...(topicId ? { id: topicId } : {}),
-    },
-  });
-  const groupIds = uniq(
-    flatten(communityTopics.map(({ group_ids }) => group_ids)),
-  );
-  const groups = await this.models.Group.findAll({
-    where: {
-      id: { [Op.in]: groupIds },
+      community_id: community.id,
     },
   });
 
-  // update membership for each group
-  const updatedMemberships = await Promise.all(
-    groups.map(async (group) => {
-      const [membership, created] = await this.models.Membership.findOrCreate({
-        where: {
-          group_id: group.id,
-          address_id: address.id,
-        },
-        defaults: {
-          group_id: group.id,
-          address_id: address.id,
-          reject_reason: null,
-          last_checked: Sequelize.literal('CURRENT_TIMESTAMP') as any,
-        },
-        include: [
-          {
-            model: this.models.Group,
-            as: 'group',
-          },
-        ],
-      });
-      membership.group = group;
+  // optionally filter to only groups associated with topic
+  if (topicId) {
+    const topic = await this.models.Topic.findByPk(topicId);
+    if (!topic) {
+      throw new AppError(Errors.TopicNotFound);
+    }
+    groups = groups.filter((g) => topic.group_ids.includes(g.id));
+  }
 
-      if (!created) {
-        const expiresAt = moment(membership.last_checked).add(
-          MEMBERSHIP_TTL_SECONDS,
-          'seconds',
-        );
-        if (moment().isBefore(expiresAt)) {
-          // already exists and is fresh, don't recompute
-          return membership;
-        }
-      }
-
-      // is newly created or stale, recompute
-      return recomputeMembership(membership, address, this.tokenBalanceCache);
-    }),
+  const memberships = await refreshMembershipsForAddress(
+    this.models,
+    this.tokenBalanceCache,
+    address,
+    groups,
+    true, // use fresh balances
   );
+
+  const topics = await this.models.Topic.findAll({
+    where: {
+      group_ids: {
+        [Op.overlap]: groups.map((g) => g.id),
+      },
+    },
+    attributes: ['id', 'group_ids'],
+  });
 
   // transform memberships to result shape
-  const results = updatedMemberships.map((membership) => {
-    const topic = communityTopics.find((t) =>
-      t.group_ids.includes(membership.group_id),
-    );
-    return {
-      groupId: membership.group_id,
-      topicId: topic.id,
-      allowed: !membership.reject_reason,
-      rejectReason: membership.reject_reason,
-    };
-  });
+  const results = memberships.map((membership) => ({
+    groupId: membership.group_id,
+    topicIds: topics
+      .filter((t) => t.group_ids.includes(membership.group_id))
+      .map((t) => t.id),
+    allowed: !membership.reject_reason,
+    rejectReason: membership.reject_reason,
+  }));
 
   return results;
-}
-
-/**
- * recomputeMembership checks the membership against the requirements,
- * updates the membership status and returns it
- * @param membership The membership to recompute
- * @param address The user address
- * @returns MembershipInstance
- */
-async function recomputeMembership(
-  membership: MembershipInstance,
-  address: AddressInstance,
-  tokenBalanceCache: TokenBalanceCache,
-): Promise<MembershipInstance> {
-  if (!membership.group) {
-    throw new ServerError('membership Group is not populated');
-  }
-  const { metadata, requirements } = membership.group;
-  const { isValid, messages } = await validateGroupMembership(
-    address.address,
-    requirements,
-    tokenBalanceCache,
-    metadata.required_requirements || 0,
-  );
-  return membership.update({
-    reject_reason: isValid ? null : JSON.stringify(messages),
-    last_checked: Sequelize.literal('CURRENT_TIMESTAMP'),
-  });
 }

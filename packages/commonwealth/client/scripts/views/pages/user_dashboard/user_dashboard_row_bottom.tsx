@@ -1,17 +1,17 @@
 import React from 'react';
 
-import { NotificationCategories } from 'common-common/src/types';
+import { NotificationCategories } from '@hicommonwealth/core';
 
 import 'pages/user_dashboard/user_dashboard_row_bottom.scss';
 
 import useForceRerender from 'hooks/useForceRerender';
 import app from 'state';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import type NotificationSubscription from '../../../models/NotificationSubscription';
 import type { ProfileWithAddress } from '../../components/component_kit/cw_avatar_group';
 import { CWAvatarGroup } from '../../components/component_kit/cw_avatar_group';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../../components/component_kit/cw_text';
 import { UserDashboardRowBottomSkeleton } from './UserDashboardRowBottomSkeleton';
 import { subscribeToThread } from './helpers';
@@ -19,7 +19,7 @@ import { subscribeToThread } from './helpers';
 type UserDashboardRowBottomProps = {
   commentCount: number;
   threadId: string;
-  chainId: string;
+  communityId: string;
   commentId?: string;
   commenters: ProfileWithAddress[];
   showSkeleton?: boolean;
@@ -30,7 +30,7 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
     threadId,
     commentCount,
     commentId,
-    chainId,
+    communityId,
     commenters,
     showSkeleton,
   } = props;
@@ -44,13 +44,13 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
     subThreadId: string,
     bothActive: boolean,
     commentSubscription: NotificationSubscription,
-    reactionSubscription: NotificationSubscription
+    reactionSubscription: NotificationSubscription,
   ) => {
     await subscribeToThread(
       subThreadId,
       bothActive,
       commentSubscription,
-      reactionSubscription
+      reactionSubscription,
     );
     forceRerender();
   };
@@ -76,13 +76,17 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
     <div className="UserDashboardRowBottom">
       <div className="comments">
         <div className="count">
-          <CWIcon iconName="feedback" iconSize="small" className="icon" />
+          <CWIcon iconName="comment" iconSize="small" />
           <CWText type="caption" className="text">
             {commentCount} {commentCount == 1 ? 'Comment' : 'Comments'}
           </CWText>
         </div>
         <div>
-          <CWAvatarGroup profiles={commenters} chainId={chainId} />
+          <CWAvatarGroup
+            profiles={commenters}
+            communityId={communityId}
+            totalProfiles={commentCount}
+          />
         </div>
       </div>
       <div
@@ -100,7 +104,7 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
                   threadId,
                   bothActive,
                   commentSubscription,
-                  reactionSubscription
+                  reactionSubscription,
                 );
               },
               label: bothActive ? 'Unsubscribe' : 'Subscribe',
@@ -124,12 +128,12 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
               onClick: async () => {
                 if (commentId) {
                   await navigator.clipboard.writeText(
-                    `${domain}/${chainId}/discussion/${threadId}?comment=${commentId}`
+                    `${domain}/${communityId}/discussion/${threadId}?comment=${commentId}`,
                   );
                   return;
                 }
                 await navigator.clipboard.writeText(
-                  `${domain}/${chainId}/discussion/${threadId}`
+                  `${domain}/${communityId}/discussion/${threadId}`,
                 );
               },
             },
@@ -140,14 +144,14 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
               onClick: async () => {
                 if (commentId) {
                   await window.open(
-                    `https://twitter.com/intent/tweet?text=${domain}/${chainId}/discussion/${threadId}
-                      ?comment=${commentId}`
+                    `https://twitter.com/intent/tweet?text=${domain}/${communityId}/discussion/${threadId}
+                      ?comment=${commentId}`,
                   );
                   return;
                 }
                 await window.open(
-                  `https://twitter.com/intent/tweet?text=${domain}/${chainId}/discussion/${threadId}`,
-                  '_blank'
+                  `https://twitter.com/intent/tweet?text=${domain}/${communityId}/discussion/${threadId}`,
+                  '_blank',
                 );
               },
             },

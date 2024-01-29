@@ -1,5 +1,9 @@
-import { CommunityInstance } from '../../models/community';
-import { ThreadAttributes } from '../../models/thread';
+import {
+  CommunityInstance,
+  ThreadAttributes,
+  TopicAttributes,
+} from '@hicommonwealth/model';
+import { WhereOptions } from 'sequelize';
 import { ServerThreadsController } from '../server_threads_controller';
 
 const MIN_THREADS_PER_TOPIC = 0;
@@ -14,7 +18,7 @@ export type GetActiveThreadsResult = ThreadAttributes[];
 
 export async function __getActiveThreads(
   this: ServerThreadsController,
-  { community, threadsPerTopic }: GetActiveThreadsOptions
+  { community, threadsPerTopic }: GetActiveThreadsOptions,
 ): Promise<GetActiveThreadsResult> {
   const allThreads = [];
   if (
@@ -26,7 +30,9 @@ export async function __getActiveThreads(
     threadsPerTopic = 3;
   }
 
-  const communityWhere = { chain_id: community.id };
+  const communityWhere: WhereOptions<TopicAttributes> = {
+    community_id: community.id,
+  };
   const communityTopics = await this.models.Topic.findAll({
     where: communityWhere,
   });
@@ -51,7 +57,7 @@ export async function __getActiveThreads(
           ['last_commented_on', 'DESC'],
         ],
       });
-    })
+    }),
   );
 
   allRecentTopicThreadsRaw = allRecentTopicThreadsRaw.flat();
@@ -64,7 +70,7 @@ export async function __getActiveThreads(
 
   communityTopics.forEach((topic) => {
     const threadsWithCommentsCount = allRecentTopicThreads.filter(
-      (thread) => thread.topic_id === topic.id
+      (thread) => thread.topic_id === topic.id,
     );
     allThreads.push(...(threadsWithCommentsCount || []));
   });

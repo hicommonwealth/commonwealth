@@ -1,6 +1,6 @@
 import { Capacitor } from '@capacitor/core';
+import { CommunityCategoryType } from '@hicommonwealth/core';
 import axios from 'axios';
-import { ChainCategoryType } from 'common-common/src/types';
 import { updateActiveUser } from 'controllers/app/login';
 import RecentActivityController from 'controllers/app/recent_activity';
 import CosmosAccount from 'controllers/chain/cosmos/account';
@@ -15,13 +15,13 @@ import PollsController from 'controllers/server/polls';
 import { RolesController } from 'controllers/server/roles';
 import SearchController from 'controllers/server/search';
 import SessionsController from 'controllers/server/sessions';
-import { WebSocketController } from 'controllers/server/socket';
 import { UserController } from 'controllers/server/user';
 import { EventEmitter } from 'events';
 import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
 import NodeInfo from 'models/NodeInfo';
 import NotificationCategory from 'models/NotificationCategory';
+import StarredCommunity from 'models/StarredCommunity';
 import { ChainStore, NodeStore } from 'stores';
 
 export enum ApiStatus {
@@ -37,7 +37,6 @@ export const enum LoginState {
 }
 
 export interface IApp {
-  socket: WebSocketController;
   chain: IChainAdapter<
     any,
     | CosmosAccount
@@ -95,7 +94,7 @@ export interface IApp {
     defaultChain: string;
     evmTestEnv?: string;
     enforceSessionKeys?: boolean;
-    chainCategoryMap?: { [chain: string]: ChainCategoryType[] };
+    chainCategoryMap?: { [chain: string]: CommunityCategoryType[] };
   };
 
   loginStatusLoaded(): boolean;
@@ -105,6 +104,7 @@ export interface IApp {
   isProduction(): boolean;
 
   isDesktopApp(win): boolean;
+
   isNative(win): boolean;
 
   serverUrl(): string;
@@ -131,7 +131,6 @@ const roles = new RolesController(user);
 
 // INITIALIZE MAIN APP
 const app: IApp = {
-  socket: new WebSocketController(),
   chain: null,
   activeChainId: () => app.chain?.id,
 
@@ -291,26 +290,20 @@ export async function initAppState(
       : LoginState.LoggedOut;
 
     if (app.loginState === LoginState.LoggedIn) {
-      console.log('Initializing socket connection with JTW:', app.user.jwt);
-      // init the websocket connection and the chain-events namespace
-      app.socket.init(app.user.jwt);
-      app.user.notifications.refresh(); // TODO: redraw if needed
+      app.user.notifications.refresh();
       if (shouldRedraw) {
         app.loginStateEmitter.emit('redraw');
       }
-    } else if (
-      app.loginState === LoginState.LoggedOut &&
-      app.socket.isConnected
-    ) {
-      // TODO: create global deinit function
-      app.socket.disconnect();
-      if (shouldRedraw) {
-        app.loginStateEmitter.emit('redraw');
-      }
+    } else if (app.loginState === LoginState.LoggedOut && shouldRedraw) {
+      app.loginStateEmitter.emit('redraw');
     }
 
     app.user.setStarredCommunities(
-      statusRes.result.user ? statusRes.result.user.starredCommunities : [],
+      statusRes.result.user?.starredCommunities
+        ? statusRes.result.user?.starredCommunities.map(
+            (c) => new StarredCommunity(c),
+          )
+        : [],
     );
     // update the selectedChain, unless we explicitly want to avoid
     // changing the current state (e.g. when logging in through link_new_address_modal)
@@ -325,7 +318,7 @@ export async function initAppState(
     }
   } catch (err) {
     app.loadingError =
-      err.responseJSON?.error || 'Error loading application state';
+      err.response?.data?.error || 'Error loading application state';
     throw err;
   }
 }

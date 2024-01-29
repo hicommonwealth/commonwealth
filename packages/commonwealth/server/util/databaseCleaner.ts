@@ -1,10 +1,9 @@
-import type { DB } from '../models';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { QueryTypes } from 'sequelize';
+import { RedisCache } from '@hicommonwealth/adapters';
+import { RedisNamespaces, logger } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import Rollbar from 'rollbar';
-import { RedisCache } from 'common-common/src/redisCache';
+import { QueryTypes } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
-import { RedisNamespaces } from 'common-common/src/types';
 
 /**
  * This class hosts a series of 'cleaner' functions that delete unnecessary data from the database. The class schedules
@@ -12,7 +11,7 @@ import { RedisNamespaces } from 'common-common/src/types';
  * class uses UTC so that deployments/execution in various timezones does not affect functionality.
  */
 export default class DatabaseCleaner {
-  private readonly log = factory.getLogger(formatFilename(__filename));
+  private readonly log = logger().getLogger(__filename);
   private _models: DB;
   private _redisCache: RedisCache;
   private _rollbar?: Rollbar;
@@ -41,7 +40,7 @@ export default class DatabaseCleaner {
     hourToRun: number,
     redisCache: RedisCache,
     rollbar?: Rollbar,
-    oneRunMax = false
+    oneRunMax = false,
   ) {
     this.init(models, rollbar);
     this._redisCache = redisCache;
@@ -55,10 +54,10 @@ export default class DatabaseCleaner {
 
     if (hourToRun < 0 || hourToRun >= 24) {
       this.log.error(
-        `${hourToRun} is not a valid hour. The given hourToRun must be greater than or equal to 0 and less than 24`
+        `${hourToRun} is not a valid hour. The given hourToRun must be greater than or equal to 0 and less than 24`,
       );
       this._rollbar?.error(
-        `The database cleaner failed to initialize. ${hourToRun} is not a valid hour.`
+        `The database cleaner failed to initialize. ${hourToRun} is not a valid hour.`,
       );
       return;
     }
@@ -72,7 +71,7 @@ export default class DatabaseCleaner {
     this._timeoutID = setTimeout(this.startLoop.bind(this), this.getTimeout());
 
     this.log.info(
-      `The current date is ${now.toString()}. The cleaner will run on ${this._timeToRun.toString()}`
+      `The current date is ${now.toString()}. The cleaner will run on ${this._timeToRun.toString()}`,
     );
   }
 
@@ -90,7 +89,7 @@ export default class DatabaseCleaner {
     if (!this._oneRunMax) {
       this._timeoutID = setTimeout(
         this.startLoop.bind(this),
-        this.getTimeout()
+        this.getTimeout(),
       );
     }
   }
@@ -153,7 +152,7 @@ export default class DatabaseCleaner {
             LIMIT ?
           );
         `,
-          { replacements: [DELETE_NOTIF_THRESHOLD], transaction: t }
+          { replacements: [DELETE_NOTIF_THRESHOLD], transaction: t },
         );
 
         await this._models.sequelize.query(
@@ -162,7 +161,7 @@ export default class DatabaseCleaner {
               USING notif_ids_to_delete ND
           WHERE NR.notification_id = ND.id;
         `,
-          { type: QueryTypes.BULKDELETE, transaction: t }
+          { type: QueryTypes.BULKDELETE, transaction: t },
         );
 
         numNotifDeleted = await this._models.sequelize.query(
@@ -171,14 +170,14 @@ export default class DatabaseCleaner {
               USING notif_ids_to_delete ND
           WHERE N.id = ND.id;
         `,
-          { type: QueryTypes.BULKDELETE, transaction: t }
+          { type: QueryTypes.BULKDELETE, transaction: t },
         );
 
         await this._models.sequelize.query(
           `
           DROP TABLE notif_ids_to_delete;
         `,
-          { transaction: t }
+          { transaction: t },
         );
       });
 
@@ -247,7 +246,7 @@ export default class DatabaseCleaner {
               LIMIT ?
             );
         `,
-          { transaction: t, replacements: [DELETE_SUBS_THRESHOLD] }
+          { transaction: t, replacements: [DELETE_SUBS_THRESHOLD] },
         );
 
         await this._models.sequelize.query(
@@ -256,7 +255,7 @@ export default class DatabaseCleaner {
               USING sub_ids_to_delete SD
           WHERE NR.subscription_id = SD.id;
         `,
-          { type: QueryTypes.BULKDELETE, transaction: t }
+          { type: QueryTypes.BULKDELETE, transaction: t },
         );
 
         numSubsDeleted = await this._models.sequelize.query(
@@ -265,14 +264,14 @@ export default class DatabaseCleaner {
               USING sub_ids_to_delete SD
           WHERE S.id = SD.id;
         `,
-          { type: QueryTypes.BULKDELETE, transaction: t }
+          { type: QueryTypes.BULKDELETE, transaction: t },
         );
 
         await this._models.sequelize.query(
           `
           DROP TABLE sub_ids_to_delete;
         `,
-          { transaction: t }
+          { transaction: t },
         );
         totalSubsDeleted += numSubsDeleted;
 
@@ -318,7 +317,7 @@ export default class DatabaseCleaner {
       this._lockName,
       uuidv4(),
       this._lockTimeoutSeconds,
-      true
+      true,
     );
   }
 

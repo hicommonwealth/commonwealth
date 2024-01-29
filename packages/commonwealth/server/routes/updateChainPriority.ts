@@ -1,5 +1,5 @@
-import { AppError } from 'common-common/src/errors';
-import type { DB } from '../models';
+import { AppError } from '@hicommonwealth/adapters';
+import type { DB } from '@hicommonwealth/model';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
@@ -24,7 +24,7 @@ type updateChainPriorityResp = {
 const updateChainPriority = async (
   models: DB,
   req: TypedRequestBody<updateChainPriorityReq>,
-  res: TypedResponse<updateChainPriorityResp>
+  res: TypedResponse<updateChainPriorityResp>,
 ) => {
   // Verify Chain Exists
   const { chain_id, action, secret } = req.body;

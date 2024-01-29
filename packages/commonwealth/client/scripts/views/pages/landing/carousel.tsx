@@ -3,27 +3,27 @@ import { useInterval } from 'usehooks-ts';
 
 import 'pages/landing/carousel.scss';
 
-import type { Chain } from './index';
+import type { Community } from './index';
 
 import { useCommonNavigate } from 'navigation/helpers';
-import { CWText } from '../../components/component_kit/cw_text';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
+import { CWText } from '../../components/component_kit/cw_text';
 
 type CarouselProps = {
-  chains: Array<Chain>;
+  communities: Array<Community>;
 };
 
-export const Carousel = ({ chains }: CarouselProps) => {
+export const Carousel = ({ communities }: CarouselProps) => {
   const navigate = useCommonNavigate();
 
-  const [currentChainsIdx, setCurrentChainsIdx] = useState(0);
+  const [currentCommunityIdx, setCurrentCommunityIdx] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
   useInterval(
     () => {
-      setCurrentChainsIdx(currentChainsIdx + 4);
+      setCurrentCommunityIdx(currentCommunityIdx + 4);
     },
-    !isPaused ? 3000 : null
+    !isPaused ? 3000 : null,
   );
 
   return (
@@ -39,20 +39,22 @@ export const Carousel = ({ chains }: CarouselProps) => {
         </CWText>
       </div>
       <div className="cards-row">
-        {chains.slice(currentChainsIdx, currentChainsIdx + 4).map((c, i) => (
-          <div
-            key={i}
-            className="carousel-card"
-            onClick={() => navigate(c.id)}
-            onMouseEnter={() => setIsPaused(true)}
-            onMouseLeave={() => setIsPaused(false)}
-          >
-            <CWCommunityAvatar community={c.chainInfo} size="xxl" />
-            <CWText type="h4" fontWeight="semiBold" isCentered>
-              {c.name}
-            </CWText>
-          </div>
-        ))}
+        {communities
+          .slice(currentCommunityIdx, currentCommunityIdx + 4)
+          .map((c, i) => (
+            <div
+              key={i}
+              className="carousel-card"
+              onClick={() => navigate(c.id)}
+              onMouseEnter={() => setIsPaused(true)}
+              onMouseLeave={() => setIsPaused(false)}
+            >
+              <CWCommunityAvatar community={c.communityInfo} size="xxl" />
+              <CWText type="h4" fontWeight="semiBold" isCentered>
+                {c.name}
+              </CWText>
+            </div>
+          ))}
       </div>
     </div>
   );

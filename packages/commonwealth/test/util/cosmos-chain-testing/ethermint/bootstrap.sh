@@ -6,6 +6,8 @@ CONFIG_FOLDER=$EVMOS_HOME/config
 GENESIS=$CONFIG_FOLDER/genesis.json
 # You can add this mnemonic to keplr to use the UI
 COW_MNEMONIC="extra cute enough manage arctic acid ball divide reduce turtle pony duck remind short find feature tooth steak fix assault vote sad cattle roof"
+TEST_ONE_MNEMONIC="jewel disease neglect feel mother dry hire yellow minute main tray famous"
+TEST_TWO_MNEMONIC="wild science ski despair vault sure check car donate slush way window"
 EVMOS_CHAIN_ID="evmos_9000-5"
 KEYALGO="eth_secp256k1"
 MONIKER="evmos-dev"
@@ -32,7 +34,7 @@ dasel put -t string -r json -f $GENESIS -v "aevmos" '.app_state.txfees.basedenom
 dasel put -t string -r json -f $GENESIS -v "aevmos" '.app_state.mint.params.mint_denom'
 
 # Update gov module
-dasel put -r json -t string -f $GENESIS -v "90s" '.app_state.gov.voting_params.voting_period'
+dasel put -r json -t string -f $GENESIS -v "180s" '.app_state.gov.voting_params.voting_period'
 # 20 EVMOS deposit:
 dasel put -r json -t string -f $GENESIS -v "20000000000000000000" '.app_state.gov.deposit_params.min_deposit.index(0).amount'
 dasel put -r json -t string -f $GENESIS -v "aevmos" '.app_state.gov.deposit_params.min_deposit.index(0).denom'
@@ -68,6 +70,12 @@ dasel put -r toml -t bool -f $CONFIG_FOLDER/app.toml -v "true" '.api.enabled-uns
 
 # Enable cors on gRPC Web
 dasel put -r toml -t bool -f $CONFIG_FOLDER/app.toml -v "true" '.grpc-web.enable-unsafe-cors'
+
+# Add test accounts with funds
+echo "$TEST_ONE_MNEMONIC" | simd keys add test_one --recover --keyring-backend=test --home "$EVMOS_HOME" --algo $KEYALGO
+echo "$TEST_TWO_MNEMONIC" | simd keys add test_two --recover --keyring-backend=test --home "$EVMOS_HOME" --algo $KEYALGO
+simd add-genesis-account test_one 10000000000000000000000000aevmos
+simd add-genesis-account test_two 5000000000000000000000000aevmos
 
 echo $COW_MNEMONIC | evmosd keys add cow --recover --keyring-backend test --home $EVMOS_HOME --algo $KEYALGO
 # make cow a validator:

@@ -1,15 +1,14 @@
-import { factory, formatFilename } from 'common-common/src/logging';
 import {
   BalanceType,
   ChainBase,
   ChainNetwork,
   ChainType,
   NotificationCategories,
-} from 'common-common/src/types';
-import models from '../../server/database';
-import { ChainNodeAttributes } from '../../server/models/chain_node';
+  logger,
+} from '@hicommonwealth/core';
+import { ChainNodeAttributes, models } from '@hicommonwealth/model';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 export const resetDatabase = (debug = false): Promise<void> => {
   if (debug) log.info('Resetting database...');
@@ -20,6 +19,12 @@ export const resetDatabase = (debug = false): Promise<void> => {
       if (debug) log.info('Initializing default models...');
       const drew = await models.User.create({
         email: 'drewstone329@gmail.com',
+        emailVerified: true,
+        isAdmin: true,
+      });
+
+      await models.User.create({
+        email: 'temp@gmail.com',
         emailVerified: true,
         isAdmin: true,
       });
@@ -36,10 +41,11 @@ export const resetDatabase = (debug = false): Promise<void> => {
           eth_chain_id: 1,
           balance_type: BalanceType.Ethereum,
         },
-        ropsten: {
-          url: 'https://eth-ropsten.alchemyapi.io/v2/dummy_key',
-          name: 'Ropsten Testnet',
-          eth_chain_id: 3,
+        goerli: {
+          id: 1263,
+          url: 'https://rpc.ankr.com/eth_goerli',
+          name: 'Goerli Testnet',
+          eth_chain_id: 5,
           balance_type: BalanceType.Ethereum,
         },
         osmosis: {
@@ -47,6 +53,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
           name: 'Osmosis',
           balance_type: BalanceType.Cosmos,
           cosmos_chain_id: 'osmosis',
+          bech32: 'osmo',
         },
         csdkBeta: {
           url: 'https://cosmos-devnet-beta.herokuapp.com/rpc',
@@ -54,6 +61,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
           balance_type: BalanceType.Cosmos,
           alt_wallet_url: 'https://cosmos-devnet-beta.herokuapp.com/lcd/',
           cosmos_chain_id: 'csdkbetaci',
+          bech32: 'cosmos',
         },
         csdkV1: {
           url: 'https://cosmos-devnet.herokuapp.com/rpc',
@@ -61,6 +69,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
           balance_type: BalanceType.Cosmos,
           alt_wallet_url: 'https://cosmos-devnet.herokuapp.com/lcd/',
           cosmos_chain_id: 'csdkv1',
+          bech32: 'cosmos',
         },
       };
 
@@ -87,6 +96,10 @@ export const resetDatabase = (debug = false): Promise<void> => {
         has_chain_events_listener: false,
         chain_node_id: edgewareNode.id,
       });
+      await models.Topic.create({
+        community_id: 'edgeware',
+        name: 'General',
+      });
       await models.Community.create({
         id: 'ethereum',
         network: ChainNetwork.Ethereum,
@@ -98,6 +111,10 @@ export const resetDatabase = (debug = false): Promise<void> => {
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
         chain_node_id: mainnetNode.id,
+      });
+      await models.Topic.create({
+        community_id: 'ethereum',
+        name: 'General',
       });
       const alex = await models.Community.create({
         id: 'alex',
@@ -111,6 +128,10 @@ export const resetDatabase = (debug = false): Promise<void> => {
         has_chain_events_listener: false,
         chain_node_id: testnetNode.id,
       });
+      await models.Topic.create({
+        community_id: 'alex',
+        name: 'General',
+      });
       await models.Community.create({
         id: 'osmosis',
         network: ChainNetwork.Osmosis,
@@ -122,6 +143,11 @@ export const resetDatabase = (debug = false): Promise<void> => {
         base: ChainBase.CosmosSDK,
         has_chain_events_listener: false,
         chain_node_id: osmosisNode.id,
+        bech32_prefix: 'osmo',
+      });
+      await models.Topic.create({
+        community_id: 'osmosis',
+        name: 'General',
       });
       await models.Community.create({
         id: 'csdk-beta',
@@ -134,6 +160,11 @@ export const resetDatabase = (debug = false): Promise<void> => {
         base: ChainBase.CosmosSDK,
         has_chain_events_listener: false,
         chain_node_id: csdkBetaNode.id,
+        bech32_prefix: 'cosmos',
+      });
+      await models.Topic.create({
+        community_id: 'csdk-beta',
+        name: 'General',
       });
       await models.Community.create({
         id: 'csdk',
@@ -146,6 +177,11 @@ export const resetDatabase = (debug = false): Promise<void> => {
         base: ChainBase.CosmosSDK,
         has_chain_events_listener: true,
         chain_node_id: csdkV1Node.id,
+        bech32_prefix: 'cosmos',
+      });
+      await models.Topic.create({
+        community_id: 'csdk',
+        name: 'General',
       });
       const alexContract = await models.Contract.create({
         address: '0xFab46E002BbF0b4509813474841E0716E6730136',
@@ -155,7 +191,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         chain_node_id: testnetNode.id,
       });
       await models.CommunityContract.create({
-        chain_id: alex.id,
+        community_id: alex.id,
         contract_id: alexContract.id,
       });
       const yearn = await models.Community.create({
@@ -170,6 +206,10 @@ export const resetDatabase = (debug = false): Promise<void> => {
         has_chain_events_listener: false,
         chain_node_id: mainnetNode.id,
       });
+      await models.Topic.create({
+        community_id: 'yearn',
+        name: 'General',
+      });
       const yearnContract = await models.Contract.create({
         address: '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e',
         token_name: 'yearn',
@@ -178,7 +218,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         chain_node_id: mainnetNode.id,
       });
       await models.CommunityContract.create({
-        chain_id: yearn.id,
+        community_id: yearn.id,
         contract_id: yearnContract.id,
       });
       const sushi = await models.Community.create({
@@ -194,6 +234,10 @@ export const resetDatabase = (debug = false): Promise<void> => {
         has_chain_events_listener: false,
         chain_node_id: mainnetNode.id,
       });
+      await models.Topic.create({
+        community_id: 'sushi',
+        name: 'General',
+      });
       const sushiContract = await models.Contract.create({
         address: '0x6b3595068778dd592e39a122f4f5a5cf09c90fe2',
         token_name: 'sushi',
@@ -202,8 +246,30 @@ export const resetDatabase = (debug = false): Promise<void> => {
         chain_node_id: mainnetNode.id,
       });
       await models.CommunityContract.create({
-        chain_id: sushi.id,
+        community_id: sushi.id,
         contract_id: sushiContract.id,
+      });
+      await models.Community.create({
+        id: 'common-protocol',
+        network: ChainNetwork.ERC20,
+        default_symbol: 'cmn',
+        name: 'Common Protocol',
+        icon_url: '/static/img/protocols/eth.png',
+        active: true,
+        description: '',
+        type: ChainType.DAO,
+        base: ChainBase.Ethereum,
+        has_chain_events_listener: false,
+        chain_node_id: 1263,
+        namespace: 'IanSpace',
+      });
+      await models.CommunityStake.create({
+        id: 1,
+        community_id: 'ethereum',
+        stake_id: 1,
+        stake_token: '',
+        vote_weight: 1,
+        stake_enabled: true,
       });
 
       // Admin roles for specific communities
@@ -216,6 +282,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
           verified: new Date(),
+          role: 'admin',
         },
         {
           address: '5DJA5ZCobDS3GVn8D2E5YRiotDqGkR2FN1bg6LtfNUmuadwX',
@@ -240,6 +307,27 @@ export const resetDatabase = (debug = false): Promise<void> => {
           verification_token_expires: null,
           verified: new Date(),
           keytype: 'sr25519',
+        },
+        {
+          // be careful modifying me, can break namespace
+          address: '0x42D6716549A78c05FD8EF1f999D52751Bbf9F46a',
+          user_id: 2,
+          community_id: 'ethereum',
+          verification_token: 'PLACEHOLDER',
+          verification_token_expires: null,
+          verified: new Date(),
+          keytype: 'sr25519',
+          role: 'admin',
+        },
+        {
+          address: '0xtestAddress',
+          user_id: 2,
+          community_id: 'common-protocol',
+          verification_token: 'PLACEHOLDER',
+          verification_token_expires: null,
+          verified: new Date(),
+          keytype: 'sr25519',
+          role: 'admin',
         },
       ]);
 
@@ -305,8 +393,14 @@ export const resetDatabase = (debug = false): Promise<void> => {
         event: 'proposal/created',
         start: new Date().toString(),
         expire: new Date(
-          new Date().getTime() + 100 * 24 * 60 * 60 * 1000
+          new Date().getTime() + 100 * 24 * 60 * 60 * 1000,
         ).toString(),
+      });
+
+      await models.Topic.create({
+        name: 'Test Topic',
+        description: 'A topic made for testing',
+        community_id: 'ethereum',
       });
 
       if (debug) log.info('Database reset!');

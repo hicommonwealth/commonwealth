@@ -1,6 +1,7 @@
+import type { ProposalType } from '@hicommonwealth/core';
 import type { Coin } from 'adapters/currency';
 import type { IIdentifiable } from 'adapters/shared';
-import type { ProposalType } from 'common-common/src/types';
+import { EventEmitter } from 'events';
 import type moment from 'moment';
 import type { ProposalStore } from '../stores';
 import type Account from './Account';
@@ -12,13 +13,12 @@ import type {
   VotingType,
   VotingUnit,
 } from './types';
-import { EventEmitter } from 'events';
 
 abstract class Proposal<
   ApiT,
   C extends Coin,
   ConstructorT extends IIdentifiable,
-  VoteT extends IVote<C>
+  VoteT extends IVote<C>,
 > implements IUniqueId
 {
   // basic info
@@ -92,11 +92,11 @@ abstract class Proposal<
 
   protected complete(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    store: ProposalStore<Proposal<ApiT, C, ConstructorT, VoteT>>
+    store: ProposalStore<Proposal<ApiT, C, ConstructorT, VoteT>>,
   ): void {
     if (this._completed) {
       console.warn(
-        `Warning: state marked as complete multiple times on proposal ${this.identifier}`
+        `Warning: state marked as complete multiple times on proposal ${this.identifier}`,
       );
     }
     this._completed = true;

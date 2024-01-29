@@ -5,6 +5,7 @@ import {
   getBlock,
   getETH,
 } from './routes/chain';
+import { deploy1155, mint1155 } from './routes/erc1155';
 import { approve, getBalance, getTokens, transfer } from './routes/erc20';
 import {
   approve721,
@@ -62,6 +63,9 @@ function setupRouter(): Router {
   router.post('/erc721/transfer', transfer721);
   router.get('/erc721/deploy', deploy721);
   router.post('/erc721/mintBurn', mintBurn721);
+
+  router.get('/erc1155/deploy', deploy1155);
+  router.post('/erc1155/mint', mint1155);
 
   return router;
 }

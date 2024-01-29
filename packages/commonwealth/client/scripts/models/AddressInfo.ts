@@ -1,4 +1,5 @@
-import type { WalletId, WalletSsoSource } from 'common-common/src/types';
+import type { WalletId, WalletSsoSource } from '@hicommonwealth/core';
+import moment from 'moment';
 import app from 'state';
 import Account from './Account';
 
@@ -16,6 +17,7 @@ class AddressInfo extends Account {
     walletSsoSource,
     ghostAddress,
     profileId,
+    lastActive,
   }: {
     id: number | null | undefined;
     address: string;
@@ -25,6 +27,7 @@ class AddressInfo extends Account {
     walletSsoSource?: WalletSsoSource;
     ghostAddress?: boolean;
     profileId?: number;
+    lastActive?: string | moment.Moment;
   }) {
     const chain = app.config.chains.getById(chainId);
     if (!chain) throw new Error(`Failed to locate chain: ${chainId}`);
@@ -36,6 +39,7 @@ class AddressInfo extends Account {
       walletSsoSource,
       ghostAddress,
       ignoreProfile: false,
+      lastActive,
     });
     this.id = id;
     this.keytype = keytype;

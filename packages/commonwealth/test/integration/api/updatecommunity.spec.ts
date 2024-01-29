@@ -2,7 +2,7 @@
 
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import 'chai/register-should';
+
 import jwt from 'jsonwebtoken';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
@@ -85,56 +85,46 @@ describe('Update Community/Chain Tests', () => {
     });
 
     it('should update discord', async () => {
-      const discord = 'http://discord.gg';
+      const discord = ['http://discord.gg'];
       const res = await chai
         .request(app)
         .patch(`/api/communities/${chain}`)
         .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: chain, discord });
+        .send({ jwt: jwtToken, id: chain, social_links: discord });
       expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.discord).to.be.equal(discord);
+      expect(res.body.result.social_links).to.deep.equal(discord);
     });
 
-    it.skip('should fail to update github without proper prefix', async () => {
-      const github = 'github.com';
+    it.skip('should fail to update social link without proper prefix', async () => {
+      const socialLinks = ['github.com'];
       const res = await chai
         .request(app)
         .patch(`/api/communities/${chain}`)
         .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: chain, github });
-      expect(res.body.error).to.be.equal(ChainError.InvalidGithub);
-    });
-
-    it.skip('should fail to update telegram without proper prefix', async () => {
-      const telegram = 't.me';
-      const res = await chai
-        .request(app)
-        .patch(`/api/communities/${chain}`)
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: chain, telegram });
-      expect(res.body.error).to.be.equal(ChainError.InvalidTelegram);
+        .send({ jwt: jwtToken, id: chain, socialLinks });
+      expect(res.body.error).to.exist;
     });
 
     it('should update telegram', async () => {
-      const telegram = 'https://t.me/';
+      const telegram = ['https://t.me/'];
       const res = await chai
         .request(app)
         .patch(`/api/communities/${chain}`)
         .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: chain, telegram });
+        .send({ jwt: jwtToken, id: chain, social_links: telegram });
       expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.telegram).to.be.equal(telegram);
+      expect(res.body.result.social_links).to.deep.equal(telegram);
     });
 
     it.skip('should update github', async () => {
-      const github = 'https://github.com/';
+      const github = ['https://github.com/'];
       const res = await chai
         .request(app)
         .patch(`/api/communities/${chain}`)
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, id: chain, github });
       expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.github).to.be.equal(github);
+      expect(res.body.result.github).to.deep.equal(github);
     });
 
     it('should update symbol', async () => {

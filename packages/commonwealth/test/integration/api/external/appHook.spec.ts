@@ -1,3 +1,4 @@
+import { models } from '@hicommonwealth/model';
 import bodyParser from 'body-parser';
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
@@ -7,9 +8,7 @@ import express from 'express';
 import session from 'express-session';
 import passport from 'passport';
 import { SESSION_SECRET } from 'server/config';
-import models from 'server/database';
 import { addExternalRoutes } from 'server/routing/external';
-import { tokenBalanceCache } from 'test/integration/api/external/cacheHooks.spec';
 import setupPassport from '../../../../server/passport/index';
 
 chai.use(chaiHttp);
@@ -42,14 +41,14 @@ before(async () => {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  addExternalRoutes('/api', app, models, tokenBalanceCache);
+  addExternalRoutes('/api', app, models);
 });
 
 export async function get(
   path: string,
   val: Record<string, unknown> = null,
   expectError = false,
-  passedApp = app
+  passedApp = app,
 ) {
   const res = <any>(
     await chai
@@ -72,7 +71,7 @@ export async function put(
   path: string,
   val: Record<string, unknown>,
   expectError = false,
-  passedApp = app
+  passedApp = app,
 ) {
   const res = <any>(
     await chai
@@ -95,7 +94,7 @@ export async function post(
   path: string,
   val: Record<string, unknown>,
   expectError = false,
-  expectedApp = app
+  expectedApp = app,
 ) {
   const res = <any>(
     await chai
@@ -118,7 +117,7 @@ export async function del(
   path: string,
   val: Record<string, unknown>,
   expectError = false,
-  expectedApp = app
+  expectedApp = app,
 ) {
   const res = <any>(
     await chai

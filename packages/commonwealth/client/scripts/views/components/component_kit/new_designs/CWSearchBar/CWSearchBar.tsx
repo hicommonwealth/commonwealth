@@ -52,13 +52,15 @@ export const CWSearchBar: FC<SearchBarProps> = ({
 }) => {
   const navigate = useCommonNavigate();
   const [showTag, setShowTag] = useState(true);
-  const chainId = app.activeChainId() || 'all_communities';
-  const chain = app.config.chains.getById(chainId);
+  const communityId = showTag
+    ? app.activeChainId() || 'all_communities'
+    : 'all_communities';
+  const community = app.config.chains.getById(communityId);
   const [searchTerm, setSearchTerm] = useState('');
   const { searchResults } = useSearchResults(searchTerm, [
     'threads',
     'replies',
-    chainId === 'all_communities' ? 'communities' : null,
+    communityId === 'all_communities' ? 'communities' : null,
     'members',
   ]);
 
@@ -95,7 +97,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
   const handleGoToSearchPage = () => {
     const searchQuery = new SearchQuery(searchTerm, {
       isSearchPreview: false,
-      chainScope: showTag ? chainId : 'all_communities',
+      communityScope: showTag ? communityId : 'all_communities',
     });
     goToSearchPage(searchQuery, navigate);
     resetSearchBar();
@@ -120,11 +122,11 @@ export const CWSearchBar: FC<SearchBarProps> = ({
           size={24}
           onClick={handleGoToSearchPage}
         />
-        {showTag && !!chain && (
+        {showTag && !!community && (
           <CWTag
-            label={chain.name}
+            label={community.name}
             type="input"
-            community={chain}
+            community={community}
             onClick={() => setShowTag(false)}
           />
         )}

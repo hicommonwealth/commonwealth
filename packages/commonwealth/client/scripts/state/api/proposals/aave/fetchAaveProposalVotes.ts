@@ -1,8 +1,8 @@
+import { useQuery } from '@tanstack/react-query';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
+import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
-import { useQuery } from '@tanstack/react-query';
-import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 
 const VOTE_STALE_TIME = 30000; // 30 seconds
 
@@ -12,15 +12,15 @@ const fetchAaveProposalVotes = async (proposalId: string) => {
 
 const useAaveProposalVotesQuery = ({
   moduleReady,
-  chainId,
+  communityId,
   proposalId,
 }: {
   moduleReady: boolean;
-  chainId: string;
+  communityId: string;
   proposalId: string;
 }) => {
   return useQuery({
-    queryKey: [ApiEndpoints.FETCH_PROPOSAL_VOTES, chainId, proposalId],
+    queryKey: [ApiEndpoints.FETCH_PROPOSAL_VOTES, communityId, proposalId],
     queryFn: () => fetchAaveProposalVotes(proposalId),
     enabled: moduleReady,
     staleTime: VOTE_STALE_TIME,

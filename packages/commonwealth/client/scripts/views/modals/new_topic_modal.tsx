@@ -1,31 +1,27 @@
-import React, { useEffect } from 'react';
 import type { DeltaStatic } from 'quill';
-
-import app from '../../state';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import React, { useEffect } from 'react';
+import { pluralizeWithoutNumberPrefix } from '../../helpers';
 import { useCommonNavigate } from '../../navigation/helpers';
+import app from '../../state';
 import {
   useCreateTopicMutation,
   useFetchTopicsQuery,
 } from '../../state/api/topics';
-import { pluralizeWithoutNumberPrefix } from '../../helpers';
-import { CWTextInput } from '../components/component_kit/cw_text_input';
-import { TokenDecimalInput } from '../components/token_decimal_input';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
-import { CWLabel } from '../components/component_kit/cw_label';
+import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
-import {
-  createDeltaFromText,
-  getTextFromDelta,
-  ReactQuillEditor,
-} from '../components/react_quill_editor';
-import { serializeDelta } from '../components/react_quill_editor/utils';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
+import {
+  ReactQuillEditor,
+  createDeltaFromText,
+  getTextFromDelta,
+} from '../components/react_quill_editor';
+import { serializeDelta } from '../components/react_quill_editor/utils';
 
 import '../../../styles/modals/new_topic_modal.scss';
 
@@ -38,12 +34,12 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
   const { mutateAsync: createTopic } = useCreateTopicMutation();
   const navigate = useCommonNavigate();
   const { data: topics } = useFetchTopicsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
   const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(
-    createDeltaFromText('')
+    createDeltaFromText(''),
   );
   const [isSaving, setIsSaving] = React.useState<boolean>(false);
   const [description, setDescription] = React.useState<string>('');
@@ -52,7 +48,6 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
   const [featuredInSidebar, setFeaturedInSidebar] =
     React.useState<boolean>(false);
   const [name, setName] = React.useState<string>('');
-  const [tokenThreshold, setTokenThreshold] = React.useState<string>('0');
 
   const editorText = getTextFromDelta(contentDelta);
 
@@ -68,14 +63,6 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
     setErrorMsg(null);
   }, [name, featuredInNewPost, editorText]);
 
-  const decimals = app.chain?.meta?.decimals
-    ? app.chain.meta.decimals
-    : app.chain.network === ChainNetwork.ERC721
-    ? 0
-    : app.chain.base === ChainBase.CosmosSDK
-    ? 6
-    : 18;
-
   return (
     <div className="NewTopicModal">
       <CWModalHeader label="New topic" onModalClose={onModalClose} />
@@ -88,7 +75,7 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
           }}
           inputValidationFn={(text: string) => {
             const currentCommunityTopicNames = topics.map((t) =>
-              t.name.toLowerCase()
+              t.name.toLowerCase(),
             );
 
             if (currentCommunityTopicNames.includes(text.toLowerCase())) {
@@ -102,7 +89,7 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
             if (disallowedCharMatches) {
               const err = `The ${pluralizeWithoutNumberPrefix(
                 disallowedCharMatches.length,
-                'char'
+                'char',
               )}
                 ${disallowedCharMatches.join(', ')} are not permitted`;
               setErrorMsg(err);
@@ -126,20 +113,6 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
             setDescription(e.target.value);
           }}
         />
-        {app.activeChainId() && (
-          <React.Fragment>
-            <CWLabel
-              label={`Number of tokens needed to post (${app.chain?.meta.default_symbol})`}
-            />
-            <TokenDecimalInput
-              decimals={decimals}
-              defaultValueInWei="0"
-              onInputChange={(newValue: string) => {
-                setTokenThreshold(newValue);
-              }}
-            />
-          </React.Fragment>
-        )}
         <div className="checkboxes">
           <CWCheckbox
             label="Featured in Sidebar"
@@ -186,7 +159,6 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
                   description,
                   featuredInSidebar,
                   featuredInNewPost,
-                  tokenThreshold,
                   defaultOffchainTemplate: serializeDelta(contentDelta),
                 });
                 navigate(`/discussions/${encodeURI(name.toString().trim())}`);

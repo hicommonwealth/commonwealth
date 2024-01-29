@@ -1,21 +1,21 @@
-import { TypedRequestQuery, TypedResponse, success } from '../../types';
-import { ServerControllers } from '../../routing/router';
-import { GetGroupsResult } from '../../controllers/server_groups_methods/get_groups';
+import { AppError } from '@hicommonwealth/adapters';
 import z from 'zod';
-import { AppError } from '../../../../common-common/src/errors';
+import { GetGroupsResult } from '../../controllers/server_groups_methods/get_groups';
+import { ServerControllers } from '../../routing/router';
+import { TypedRequestQuery, TypedResponse, success } from '../../types';
 
 type GetGroupsQueryQuery = {
-  include_members?: string;
   include_topics?: string;
-  address_id?: string;
 };
 type GetGroupsResponse = GetGroupsResult;
 
 export const getGroupsHandler = async (
   controllers: ServerControllers,
   req: TypedRequestQuery<GetGroupsQueryQuery>,
-  res: TypedResponse<GetGroupsResponse>
+  res: TypedResponse<GetGroupsResponse>,
 ) => {
+  const { community } = req;
+
   const schema = z.object({
     query: z.object({
       address_id: z.coerce.number().optional(),
@@ -28,14 +28,13 @@ export const getGroupsHandler = async (
     throw new AppError(JSON.stringify(validationResult.error));
   }
   const {
-    query: { address_id, include_members, include_topics },
+    query: { include_members, include_topics },
   } = validationResult.data;
 
   const result = await controllers.groups.getGroups({
-    community: req.chain,
+    community,
     includeMembers: include_members,
     includeTopics: include_topics,
-    addressId: address_id,
   });
   return success(res, result);
 };

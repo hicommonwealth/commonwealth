@@ -1,3 +1,4 @@
+import { ContentType } from '@hicommonwealth/core';
 import clsx from 'clsx';
 import { SessionKeyError } from 'controllers/server/sessions';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
@@ -12,7 +13,6 @@ import {
   useFetchCommentsQuery,
   useToggleCommentSpamStatusMutation,
 } from 'state/api/comments';
-import { ContentType } from 'types';
 import { CreateComment } from 'views/components/Comments/CreateComment';
 import {
   deserializeDelta,
@@ -66,7 +66,7 @@ export const CommentTree = ({
   const [highlightedComment, setHighlightedComment] = useState(false);
 
   const { data: allComments = [] } = useFetchCommentsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: parseInt(`${thread.id}`),
   });
 
@@ -75,7 +75,7 @@ export const CommentTree = ({
     reset: resetDeleteCommentMutation,
     error: deleteCommentError,
   } = useDeleteCommentMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: thread.id,
     existingNumberOfComments: thread.numberOfComments,
   });
@@ -85,7 +85,7 @@ export const CommentTree = ({
     reset: resetEditCommentMutation,
     error: editCommentError,
   } = useEditCommentMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: thread.id,
   });
 
@@ -100,7 +100,7 @@ export const CommentTree = ({
 
   const { mutateAsync: toggleCommentSpamStatus } =
     useToggleCommentSpamStatusMutation({
-      chainId: app.activeChainId(),
+      communityId: app.activeChainId(),
       threadId: thread.id,
     });
 
@@ -172,8 +172,8 @@ export const CommentTree = ({
             try {
               await deleteComment({
                 commentId: comment.id,
-                canvasHash: comment.canvas_hash,
-                chainId: app.activeChainId(),
+                canvasHash: comment.canvasHash,
+                communityId: app.activeChainId(),
                 address: app.user.activeAccount.address,
                 existingNumberOfComments: thread.numberOfComments,
               });
@@ -181,7 +181,7 @@ export const CommentTree = ({
               if (err instanceof SessionKeyError) {
                 return;
               }
-              console.error(err?.responseJSON?.error || err?.message);
+              console.error(err.response.data.error || err?.message);
               notifyError('Failed to delete comment');
             }
           },
@@ -322,7 +322,7 @@ export const CommentTree = ({
           updatedBody: serializeDelta(newDelta) || comment.text,
           threadId: thread.id,
           parentCommentId: comment.parentComment,
-          chainId: app.activeChainId(),
+          communityId: app.activeChainId(),
           address: app.user.activeAccount.address,
         });
         setEdits((p) => ({
@@ -400,7 +400,7 @@ export const CommentTree = ({
               await toggleCommentSpamStatus({
                 commentId: comment.id,
                 isSpam: !comment.markedAsSpamAt,
-                chainId: app.activeChainId(),
+                communityId: app.activeChainId(),
                 address: app.user.activeAccount.address,
               });
             } catch (err) {
@@ -451,9 +451,7 @@ export const CommentTree = ({
                   maxReplyLimitReached={comment.maxReplyLimitReached}
                   canReact={
                     !thread.archivedAt &&
-                    (!!hasJoinedCommunity ||
-                      isAdmin ||
-                      !app.chain.isGatedTopic(thread?.topic?.id)) &&
+                    (!!hasJoinedCommunity || isAdmin) &&
                     canReact
                   }
                   canEdit={

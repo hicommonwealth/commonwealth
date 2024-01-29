@@ -1,14 +1,15 @@
-import { AppError } from '../../../../common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
+import { ValidChains } from '@hicommonwealth/chains';
+import { NotificationCategories } from '@hicommonwealth/core';
 import {
-  ChainNetwork,
-  ChainType,
-  NotificationCategories,
-} from '../../../../common-common/src/types';
+  AddressInstance,
+  CommunityInstance,
+  ReactionAttributes,
+  UserInstance,
+} from '@hicommonwealth/model';
+import { REACTION_WEIGHT_OVERRIDE } from 'server/config';
+import { getNamespaceBalance } from 'server/util/commonProtocol/contractHelpers';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/community';
-import { ReactionAttributes } from '../../models/reaction';
-import { UserInstance } from '../../models/user';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_methods/track';
@@ -38,7 +39,7 @@ export type CreateThreadReactionOptions = {
 export type CreateThreadReactionResult = [
   ReactionAttributes,
   EmitOptions,
-  TrackOptions
+  TrackOptions,
 ];
 
 export async function __createThreadReaction(
@@ -52,7 +53,7 @@ export async function __createThreadReaction(
     canvasAction,
     canvasSession,
     canvasHash,
-  }: CreateThreadReactionOptions
+  }: CreateThreadReactionOptions,
 ): Promise<CreateThreadReactionResult> {
   const thread = await this.models.Thread.findOne({
     where: { id: threadId },
@@ -79,56 +80,68 @@ export async function __createThreadReaction(
   }
 
   // check balance (bypass for admin)
-  if (
-    community &&
-    (community.type === ChainType.Token ||
-      community.network === ChainNetwork.Ethereum)
-  ) {
-    const isAdmin = await validateOwner({
-      models: this.models,
-      user,
-      communityId: community.id,
-      entity: thread,
-      allowAdmin: true,
-      allowGodMode: true,
+  const isAdmin = await validateOwner({
+    models: this.models,
+    user,
+    communityId: community.id!,
+    entity: thread,
+    allowAdmin: true,
+    allowSuperAdmin: true,
+  });
+  if (!isAdmin) {
+    const { isValid, message } = await validateTopicGroupsMembership(
+      this.models,
+      this.tokenBalanceCache,
+      thread.topic_id!,
+      community,
+      address,
+    );
+    if (!isValid) {
+      throw new AppError(`${Errors.FailedCreateReaction}: ${message}`);
+    }
+  }
+
+  let calculatedVotingWeight: number | null = null;
+  if (REACTION_WEIGHT_OVERRIDE) {
+    calculatedVotingWeight = REACTION_WEIGHT_OVERRIDE;
+  } else {
+    // calculate voting weight
+    const stake = await this.models.CommunityStake.findOne({
+      where: { community_id: community.id },
     });
-    if (!isAdmin) {
-      const { isValid, message } = await validateTopicGroupsMembership(
-        this.models,
+    if (stake) {
+      const vote_weight = stake.vote_weight;
+      const stakeBalance = await getNamespaceBalance(
         this.tokenBalanceCache,
-        thread.topic_id,
-        community,
-        address
+        community.namespace,
+        stake.stake_id,
+        ValidChains.Goerli,
+        address.address,
+        this.models,
       );
-      if (!isValid) {
-        throw new AppError(`${Errors.FailedCreateReaction}: ${message}`);
-      }
+      calculatedVotingWeight = parseInt(stakeBalance, 10) * vote_weight;
     }
   }
 
   // create the reaction
-  const reactionData: ReactionAttributes = {
+  const reactionWhere: Partial<ReactionAttributes> = {
     reaction,
     address_id: address.id,
-    chain: community.id,
+    community_id: community.id,
     thread_id: thread.id,
+  };
+  const reactionData: Partial<ReactionAttributes> = {
+    ...reactionWhere,
+    calculated_voting_weight: calculatedVotingWeight,
     canvas_action: canvasAction,
     canvas_session: canvasSession,
     canvas_hash: canvasHash,
   };
-  const [foundOrCreatedReaction, created] =
-    await this.models.Reaction.findOrCreate({
-      where: reactionData,
-      defaults: reactionData,
-      include: [this.models.Address],
-    });
 
-  const finalReaction = created
-    ? await this.models.Reaction.findOne({
-        where: reactionData,
-        include: [this.models.Address],
-      })
-    : foundOrCreatedReaction;
+  const [finalReaction] = await this.models.Reaction.findOrCreate({
+    where: reactionWhere,
+    defaults: reactionData,
+  });
 
   // build notification options
   const notificationOptions: EmitOptions = {
@@ -139,20 +152,24 @@ export async function __createThreadReaction(
         thread_id: thread.id,
         root_title: thread.title,
         root_type: 'discussion',
-        chain_id: finalReaction.chain,
-        author_address: finalReaction.Address.address,
-        author_chain: finalReaction.Address.community_id,
+        chain_id: community.id,
+        author_address: address.address,
+        author_chain: address.community_id,
       },
     },
-    excludeAddresses: [finalReaction.Address.address],
+    excludeAddresses: [address.address],
   };
 
   // build analytics options
   const analyticsOptions: TrackOptions = {
     event: MixpanelCommunityInteractionEvent.CREATE_REACTION,
     community: community.id,
-    isCustomDomain: null,
   };
 
-  return [finalReaction.toJSON(), notificationOptions, analyticsOptions];
+  const finalReactionWithAddress: ReactionAttributes = {
+    ...finalReaction.toJSON(),
+    Address: address,
+  };
+
+  return [finalReactionWithAddress, notificationOptions, analyticsOptions];
 }

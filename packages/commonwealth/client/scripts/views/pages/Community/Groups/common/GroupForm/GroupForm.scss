@@ -40,13 +40,22 @@
           }
         }
       }
+
+      .requirements-radio-btn-helper-text {
+        color: $neutral-500;
+      }
     }
   }
 
   .action-buttons {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: baseline;
     gap: 8px;
+
+    @include extraSmall {
+      justify-content: flex-end;
+    }
   }
 }

@@ -1,12 +1,16 @@
 import 'components/component_kit/cw_cover_image_uploader.scss';
 import $ from 'jquery';
-import React from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 
 import app from 'state';
 import { replaceBucketWithCDN } from '../../../helpers/awsHelpers';
-import { CWButton } from './cw_button';
+import { CWButton as OldCWButton } from './cw_button';
 import { CWIconButton } from './cw_icon_button';
+import { CWButton } from './new_designs/cw_button';
 
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
+import { useFormContext } from 'react-hook-form';
+import { compressImage } from 'utils/ImageCompression';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWRadioGroup } from './cw_radio_group';
 import { CWSpinner } from './cw_spinner';
@@ -14,9 +18,16 @@ import { CWText } from './cw_text';
 import { CWTextInput, MessageRow } from './cw_text_input';
 import type { ValidationStatus } from './cw_validation_text';
 import { getClasses } from './helpers';
-import { compressImage } from 'utils/ImageCompression';
+import { MessageRow as NewMessageRow } from './new_designs/CWTextInput/MessageRow';
 
-type CoverImageUploaderProps = {
+// TODO: currently it doesn't support "edit more", i.e if we set url in CWForm "initialValues", this component won't
+// pick it up like the rest of CWForm hooked components do. Add suport for it when needed.
+type CoverImageUploaderFormValidationProps = {
+  name?: string;
+  hookToForm?: boolean;
+};
+
+type CoverImageUploaderProps = CoverImageUploaderFormValidationProps & {
   headerText?: string;
   subheaderText?: string;
   enableGenerativeAI?: boolean;
@@ -24,6 +35,10 @@ type CoverImageUploaderProps = {
   defaultImageUrl?: string;
   defaultImageBehavior?: string;
   uploadCompleteCallback: CallableFunction;
+  canSelectImageBehaviour?: boolean;
+  defaultImageBehaviour?: ImageBehavior;
+  showUploadAndGenerateText?: boolean;
+  onImageProcessStatusChange?: (isProcessing: boolean) => any;
 };
 
 export enum ImageAs {
@@ -34,16 +49,33 @@ export enum ImageAs {
 export enum ImageBehavior {
   Fill = 'cover',
   Tiled = 'repeat',
+  Circle = 'circle',
 }
 
 // TODO Graham 10/24/22: Synchronize avatar upload against new cover upload system
-export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
+export const CWCoverImageUploader = ({
+  name,
+  hookToForm,
+  headerText,
+  subheaderText,
+  enableGenerativeAI,
+  generatedImageCallback,
+  defaultImageUrl,
+  defaultImageBehavior,
+  uploadCompleteCallback,
+  canSelectImageBehaviour = true,
+  showUploadAndGenerateText,
+  defaultImageBehaviour,
+  onImageProcessStatusChange = () => {},
+}: CoverImageUploaderProps) => {
   const [imageURL, setImageURL] = React.useState<string>();
   const [isUploading, setIsUploading] = React.useState<boolean>();
   const [uploadStatus, setUploadStatus] = React.useState<
     ValidationStatus | undefined
   >();
-  const [imageBehavior, setImageBehavior] = React.useState<ImageBehavior>();
+  const [imageBehavior, setImageBehavior] = React.useState<ImageBehavior>(
+    defaultImageBehaviour,
+  );
   const [prompt, setPrompt] = React.useState<string>();
   const [isPrompting, setIsPrompting] = React.useState<boolean>();
   const [isGenerating, setIsGenerating] = React.useState<boolean>();
@@ -51,8 +83,51 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
   const attachButton = React.useRef<HTMLDivElement>(null);
   const pseudoInput = React.useRef<HTMLInputElement>(null);
 
+  const formContext = useFormContext();
+  hookToForm && name && formContext.register(name);
+  const formFieldErrorMessage =
+    hookToForm &&
+    name &&
+    (formContext?.formState?.errors?.[name]?.message as string);
+
+  const canResetValue = useRef(true);
+  const [defaultFormContext, setDefaultFormContext] = React.useState({
+    isSet: false,
+    value: hookToForm && name ? formContext?.getValues?.(name) : null,
+  });
+
+  useNecessaryEffect(() => {
+    if (defaultFormContext.value && !defaultFormContext.isSet) {
+      canResetValue.current = false;
+      attachButton.current.style.display = 'flex';
+
+      setImageURL(defaultFormContext.value);
+      setImageBehavior(ImageBehavior.Circle);
+      setDefaultFormContext({
+        isSet: true,
+        value: defaultFormContext.value,
+      });
+
+      formContext.setValue(name, defaultFormContext.value);
+      formContext.setError(name, null);
+      setTimeout(() => {
+        canResetValue.current = true;
+      }, 1000);
+    }
+  }, [defaultFormContext, imageBehavior, formContext]);
+
+  useEffect(() => {
+    onImageProcessStatusChange(isUploading || isGenerating);
+  }, [isUploading, isGenerating, onImageProcessStatusChange]);
+
+  useNecessaryEffect(() => {
+    if (!imageURL && canResetValue.current && formContext && name) {
+      formContext.setValue(name, '');
+    }
+  }, [imageURL, formContext, name]);
+
   const uploadImage = async (
-    file: File
+    file: File,
   ): Promise<[string, ValidationStatus]> => {
     try {
       const signatureResponse = await $.post(
@@ -62,7 +137,7 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
           mimetype: file.type,
           auth: true,
           jwt: app.user.jwt,
-        }
+        },
       );
       if (signatureResponse.status !== 'Success') throw new Error();
 
@@ -85,29 +160,38 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
 
   const generateImage = async () => {
     try {
+      setImageURL('');
       const res = await $.post(`${app.serverUrl()}/generateImage`, {
         description: prompt,
         jwt: app.user.jwt,
       });
 
+      const generatedImageURL = res.result.imageUrl;
+
       if (isPrompting) {
-        setImageURL(res.result.imageUrl);
+        setImageURL(generatedImageURL);
+        if (hookToForm && name && formContext) {
+          formContext.setValue(name, generatedImageURL);
+          formContext.setError(name, null);
+        }
         const currentImageBehavior = !imageBehavior
           ? ImageBehavior.Fill
           : imageBehavior;
         setImageBehavior(currentImageBehavior);
         setUploadStatus('success');
-        attachButton.current.style.display = 'none';
+        if (defaultImageBehaviour !== ImageBehavior.Circle) {
+          attachButton.current.style.display = 'none';
+        }
 
-        props.generatedImageCallback(res.result.imageUrl, currentImageBehavior);
-        props.uploadCompleteCallback(res.result.imageUrl, currentImageBehavior);
+        generatedImageCallback?.(generatedImageURL, currentImageBehavior);
+        uploadCompleteCallback(generatedImageURL, currentImageBehavior);
       }
 
       setIsUploading(false);
       setIsPrompting(false);
       setIsGenerating(false);
 
-      return res.result.imageUrl;
+      return generatedImageURL;
     } catch (e) {
       setUploadStatus('failure');
       setIsUploading(false);
@@ -138,11 +222,17 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
 
     if (_imageURL) {
       setImageURL(_imageURL);
+      if (hookToForm && name && formContext) {
+        formContext.setValue(name, _imageURL);
+        formContext.setError(name, null);
+      }
       const currentImageBehavior = !imageBehavior
         ? ImageBehavior.Fill
         : imageBehavior;
       setImageBehavior(currentImageBehavior);
-      attachButton.current.style.display = 'none';
+      if (defaultImageBehaviour !== ImageBehavior.Circle) {
+        attachButton.current.style.display = 'none';
+      }
       uploadCompleteCallback(_imageURL, currentImageBehavior);
     }
   };
@@ -177,14 +267,12 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
   };
 
   const clickHandler = (e) => {
-    e.stopImmediatePropagation();
+    e?.stopImmediatePropagation?.();
     if (isUploading) return;
     pseudoInput.current?.click();
   };
 
   React.useEffect(() => {
-    const { defaultImageUrl, defaultImageBehavior } = props;
-
     setImageURL(defaultImageUrl);
     setImageBehavior(defaultImageBehavior as ImageBehavior);
     setIsPrompting(false);
@@ -200,30 +288,32 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
     attachZone.current.addEventListener('drop', dropHandler);
 
     return () => {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       pseudoInput.current?.removeEventListener('change', pseudoInputHandler);
       attachZone.current?.removeEventListener('click', clickHandler);
       attachZone.current?.removeEventListener('dragenter', dragEnterHandler);
       attachZone.current?.removeEventListener('dragleave', dragLeaveHandler);
       attachZone.current?.removeEventListener('dragover', dragOverHandler);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       attachZone.current?.removeEventListener('drop', dropHandler);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const {
-    headerText,
-    subheaderText,
-    enableGenerativeAI,
-    uploadCompleteCallback,
-  } = props;
 
   const isFillImage = imageBehavior === ImageBehavior.Fill;
 
-  const backgroundStyles = {
-    backgroundImage: imageURL ? `url(${imageURL})` : 'none',
-    backgroundSize: isFillImage ? 'cover' : '100px',
-    backgroundRepeat: isFillImage ? 'no-repeat' : 'repeat',
-    backgroundPosition: isFillImage ? 'center' : '0 0',
-  };
+  const backgroundStyles = useMemo(
+    () => ({
+      backgroundImage:
+        imageURL && defaultImageBehaviour !== ImageBehavior.Circle
+          ? `url(${imageURL})`
+          : 'none',
+      backgroundSize: isFillImage ? 'cover' : '100px',
+      backgroundRepeat: isFillImage ? 'no-repeat' : 'repeat',
+      backgroundPosition: isFillImage ? 'center' : '0 0',
+    }),
+    [imageURL, defaultImageBehaviour, isFillImage],
+  );
 
   return (
     <div className="CoverImageUploader">
@@ -248,28 +338,32 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
         className={getClasses<{
           isUploading: boolean;
           uploadStatus: ValidationStatus;
+          validationStatus: 'failure' | undefined;
         }>(
           {
             isUploading,
             uploadStatus,
+            validationStatus: formFieldErrorMessage ? 'failure' : undefined,
           },
-          'attach-zone'
+          'attach-zone',
         )}
         style={backgroundStyles}
         ref={attachZone}
       >
-        {uploadStatus === 'success' && enableGenerativeAI && (
-          <CWButton
-            label="retry"
-            buttonType="mini-black"
-            className="retry-button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setPrompt('');
-              setIsPrompting(true);
-            }}
-          />
-        )}
+        {uploadStatus === 'success' &&
+          enableGenerativeAI &&
+          !showUploadAndGenerateText && (
+            <OldCWButton
+              label="retry"
+              buttonType="mini-black"
+              className="retry-button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setPrompt('');
+                setIsPrompting(true);
+              }}
+            />
+          )}
 
         {isPrompting && (
           <div
@@ -305,7 +399,7 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
                   }}
                   containerClassName="prompt-input"
                 />
-                <CWButton
+                <OldCWButton
                   label="Generate"
                   buttonType="mini-black"
                   className="generate-btn"
@@ -331,15 +425,33 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
         />
         {isUploading && <CWSpinner size="large" />}
         <div className="attach-btn" ref={attachButton}>
-          {!isUploading && <CWIcon iconName="imageUpload" iconSize="medium" />}
-          <CWText type="caption" fontWeight="medium">
-            {headerText}
-          </CWText>
+          {imageURL && defaultImageBehaviour === ImageBehavior.Circle && (
+            <img className="circle-img" src={imageURL} />
+          )}
+          {!isUploading && !imageURL && (
+            <CWIcon iconName="imageSquare" iconSize="large" weight="fill" />
+          )}
+          {headerText && !imageURL && (
+            <CWText type="caption" fontWeight="medium">
+              {headerText}
+            </CWText>
+          )}
+          {showUploadAndGenerateText && !isUploading && !imageURL && (
+            <CWText
+              type="caption"
+              fontWeight="medium"
+              className="upload-generate-text"
+            >
+              Drag an image here or generate one below
+            </CWText>
+          )}
           {enableGenerativeAI && !isUploading && (
             <CWButton
-              buttonType="mini-white"
+              buttonHeight="sm"
+              containerClassName="generate-btn"
+              type="button"
+              buttonType="secondary"
               label="Generate Image"
-              className="generate-btn"
               onClick={(e) => {
                 e.stopPropagation();
                 setPrompt('');
@@ -349,33 +461,40 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
           )}
         </div>
       </div>
-      <div className="options">
-        <CWText
-          type="caption"
-          fontWeight="medium"
-          className="cover-image-title"
-        >
-          Choose image behavior
-        </CWText>
-        <CWRadioGroup
-          name="image-behaviour"
-          onChange={(e) => {
-            setImageBehavior(e.target.value);
-            uploadCompleteCallback(imageURL, e.target.value);
-          }}
-          toggledOption={imageBehavior}
-          options={[
-            {
-              label: 'Fill',
-              value: ImageBehavior.Fill,
-            },
-            {
-              label: 'Tile',
-              value: ImageBehavior.Tiled,
-            },
-          ]}
-        />
-      </div>
+      <NewMessageRow
+        hasFeedback={!!formFieldErrorMessage}
+        statusMessage={formFieldErrorMessage}
+        validationStatus={formFieldErrorMessage ? 'failure' : undefined}
+      />
+      {canSelectImageBehaviour && (
+        <div className="options">
+          <CWText
+            type="caption"
+            fontWeight="medium"
+            className="cover-image-title"
+          >
+            Choose image behavior
+          </CWText>
+          <CWRadioGroup
+            name="image-behaviour"
+            onChange={(e) => {
+              setImageBehavior(e.target.value);
+              uploadCompleteCallback(imageURL, e.target.value);
+            }}
+            toggledOption={imageBehavior}
+            options={[
+              {
+                label: 'Fill',
+                value: ImageBehavior.Fill,
+              },
+              {
+                label: 'Tile',
+                value: ImageBehavior.Tiled,
+              },
+            ]}
+          />
+        </div>
+      )}
     </div>
   );
 };

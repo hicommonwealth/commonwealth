@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 
 import 'components/linked_addresses.scss';
 
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import type AddressInfo from '../../models/AddressInfo';
 import type NewProfile from '../../models/NewProfile';
 import { DeleteAddressModal } from '../modals/delete_address_modal';
 import { CWIconButton } from './component_kit/cw_icon_button';
-import { CWAddressTooltip } from './component_kit/cw_popover/cw_address_tooltip';
-import { PopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
 import { CWTruncatedAddress } from './component_kit/cw_truncated_address';
 import { CWModal } from './component_kit/new_designs/CWModal';
+/* eslint-disable react/no-multi-comp */
 
 type AddressProps = {
   profile: NewProfile;
@@ -30,12 +30,7 @@ const Address = (props: AddressProps) => {
 
   return (
     <div className="AddressContainer">
-      <CWAddressTooltip
-        address={address}
-        renderTrigger={() => (
-          <CWTruncatedAddress address={address} communityInfo={community} />
-        )}
-      />
+      <CWTruncatedAddress address={address} communityInfo={community} />
       <PopoverMenu
         menuItems={[
           {
@@ -60,7 +55,7 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
 
   return (
     <div className="LinkedAddresses">
-      {addresses.map((addr, i) => {
+      {addresses?.map((addr, i) => {
         return (
           <Address
             key={i}

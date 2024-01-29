@@ -5,6 +5,10 @@
   padding: 24px;
   padding-left: 36px;
 
+  @include smallInclusive {
+    padding: 16px;
+  }
+
   .header {
     padding: 32px 0px 32px 0px;
   }
@@ -19,6 +23,7 @@
     .Text:first-of-type {
       justify-content: start;
     }
+
     .Text {
       justify-content: right;
       margin-right: 8px;

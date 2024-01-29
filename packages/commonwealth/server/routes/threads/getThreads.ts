@@ -1,11 +1,8 @@
-import type {
-  GetThreadsReq,
-  GetThreadsResp,
-} from 'common-common/src/api/extApiTypes';
+import type { DB } from '@hicommonwealth/model';
+import { ThreadAttributes } from '@hicommonwealth/model';
 import { query, validationResult } from 'express-validator';
 import Sequelize, { WhereOptions } from 'sequelize';
-import type { DB } from '../../models';
-import { ThreadAttributes } from '../../models/thread';
+import type { GetThreadsReq, GetThreadsResp } from '../../api/extApiTypes';
 import type { TypedRequestQuery, TypedResponse } from '../../types';
 import { failure, success } from '../../types';
 import { paginationValidation } from '../../util/helperValidations';
@@ -27,7 +24,7 @@ export const getThreadsValidation = [
 export const getThreads = async (
   models: DB,
   req: TypedRequestQuery<GetThreadsReq>,
-  res: TypedResponse<GetThreadsResp>
+  res: TypedResponse<GetThreadsResp>,
 ) => {
   const errors = validationResult(req).array();
   if (errors.length !== 0) {
@@ -47,7 +44,7 @@ export const getThreads = async (
   const pagination = formatPagination(req.query);
 
   // if address is included, find which thread_ids they correspond to.
-  const where: WhereOptions<ThreadAttributes> = { chain: community_id };
+  const where: WhereOptions<ThreadAttributes> = { community_id: community_id };
   if (addresses) {
     const addressIds = await models.Address.findAll({
       where: { address: { [Op.in]: addresses } },

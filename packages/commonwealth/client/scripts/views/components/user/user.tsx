@@ -1,17 +1,19 @@
-import { ChainBase } from 'common-common/src/types';
+import { ChainBase } from '@hicommonwealth/core';
 import 'components/user/user.scss';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
 import { Avatar } from 'views/components/Avatar';
+import CWPopover, {
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
 import { formatAddressShort } from '../../../../../shared/utils';
 import Permissions from '../../../utils/Permissions';
 import { BanUserModal } from '../../modals/ban_user_modal';
 import { CWButton } from '../component_kit/cw_button';
-import { CWModal } from '../component_kit/new_designs/CWModal';
-import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
 import { CWText } from '../component_kit/cw_text';
+import { CWModal } from '../component_kit/new_designs/CWModal';
 import { UserSkeleton } from './UserSkeleton';
 import type { UserAttrsWithSkeletonProp } from './user.types';
 
@@ -21,7 +23,7 @@ export const User = ({
   shouldShowRole,
   shouldShowAsDeleted = false,
   userAddress,
-  userChainId,
+  userCommunityId,
   shouldHideAvatar,
   shouldShowAvatarOnly,
   shouldShowAddressWithDisplayName,
@@ -34,8 +36,8 @@ export const User = ({
   const { data: users } = useFetchProfilesByAddressesQuery({
     currentChainId: app.activeChainId(),
     profileAddresses: [userAddress],
-    profileChainIds: [userChainId],
-    apiCallEnabled: !!(userAddress && userChainId),
+    profileChainIds: [userCommunityId],
+    apiCallEnabled: !!(userAddress && userCommunityId),
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -52,27 +54,27 @@ export const User = ({
 
   const profile = users?.[0] || {};
 
-  const fullAddress = formatAddressShort(userAddress, userChainId);
+  const fullAddress = formatAddressShort(userAddress, userCommunityId);
   const redactedAddress = formatAddressShort(
     userAddress,
-    userChainId,
+    userCommunityId,
     true,
     undefined,
-    app.chain?.meta?.bech32Prefix
+    app.chain?.meta?.bech32Prefix,
   );
-
   const showAvatar = profile ? !shouldHideAvatar : false;
   const loggedInUserIsAdmin =
     Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
-  const friendlyChainName = app.config.chains.getById(userChainId)?.name;
+  const friendlyCommunityName =
+    app.config.chains.getById(userCommunityId)?.name;
   const adminsAndMods = app.chain?.meta.adminsAndMods || [];
   const isGhostAddress = app.user.addresses.some(
-    ({ address, ghostAddress }) => userAddress === address && ghostAddress
+    ({ address, ghostAddress }) => userAddress === address && ghostAddress,
   );
   const roleInCommunity =
     role ||
     adminsAndMods.find(
-      (r) => r.address === userAddress && r.address_chain === userChainId
+      (r) => r.address === userAddress && r.address_chain === userCommunityId,
     );
 
   const roleTags = (
@@ -207,8 +209,8 @@ export const User = ({
           {profile?.address && (
             <div className="user-address">{redactedAddress}</div>
           )}
-          {friendlyChainName && (
-            <div className="user-chain">{friendlyChainName}</div>
+          {friendlyCommunityName && (
+            <div className="user-chain">{friendlyCommunityName}</div>
           )}
           {roleTags}
           {/* If Admin Allow Banning */}
@@ -247,7 +249,7 @@ export const User = ({
     >
       {userFinal}
       {profile && (
-        <Popover
+        <CWPopover
           content={userPopover}
           {...popoverProps}
           placement={popoverPlacement}

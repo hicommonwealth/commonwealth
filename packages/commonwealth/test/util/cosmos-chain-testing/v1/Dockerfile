@@ -24,7 +24,7 @@ RUN make build \
 WORKDIR /root
 
 EXPOSE ${PORT}
-EXPOSE 5050
+EXPOSE 5051
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY bootstrap.sh  bootstrap.sh
 RUN chmod +x bootstrap.sh && chmod +x /usr/bin/simd && mkdir -p /run/nginx

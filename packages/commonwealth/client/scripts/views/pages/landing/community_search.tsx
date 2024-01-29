@@ -1,32 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import type { ChangeEvent } from 'react';
-import { useDebounce } from 'usehooks-ts';
 import { sortBy } from 'lodash';
+import type { ChangeEvent } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDebounce } from 'usehooks-ts';
 
 import 'pages/landing/community_search.scss';
 
-import type { Chain } from './index';
+import type { Community } from './index';
 
 import { useCommonNavigate } from 'navigation/helpers';
-import { CWText } from '../../components/component_kit/cw_text';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { getClasses } from '../../components/component_kit/helpers';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { CWText } from '../../components/component_kit/cw_text';
+import { getClasses } from '../../components/component_kit/helpers';
 
 const strip = (str: string) => {
   return str.replace(/\s/g, '').toLowerCase();
 };
 
 type CommunitySearchProps = {
-  chains: Array<Chain>;
+  communities: Array<Community>;
 };
 
-export const CommunitySearch = ({ chains }: CommunitySearchProps) => {
+export const CommunitySearch = ({ communities }: CommunitySearchProps) => {
   const navigate = useCommonNavigate();
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState<Array<Chain>>([]);
+  const [searchResults, setSearchResults] = useState<Array<Community>>([]);
 
   const debouncedValue = useDebounce<string>(searchTerm, 500);
 
@@ -36,11 +36,11 @@ export const CommunitySearch = ({ chains }: CommunitySearchProps) => {
 
   useEffect(() => {
     const search = () => {
-      const results = chains
+      const results = communities
         .filter(
           (c) =>
             strip(c.name).includes(strip(searchTerm)) ||
-            strip(c.id).includes(strip(searchTerm))
+            strip(c.id).includes(strip(searchTerm)),
         )
         .slice(0, 5);
 
@@ -107,7 +107,10 @@ export const CommunitySearch = ({ chains }: CommunitySearchProps) => {
                     onClick={() => navigate(c.id)}
                     className="search-result-row"
                   >
-                    <CWCommunityAvatar community={c.chainInfo} size="small" />
+                    <CWCommunityAvatar
+                      community={c.communityInfo}
+                      size="small"
+                    />
                     <CWText fontWeight="medium">{c.name}</CWText>
                   </div>
                 ))}

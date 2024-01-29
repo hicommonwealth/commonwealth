@@ -76,6 +76,16 @@
   }
 }
 
+// IMP: this CSS fixes 2 bugs in the editor
+// 1- Flickering when pasting some content
+// 2- Auto scrolling to top when pasting some content
+.ql-clipboard {
+  position: fixed !important;
+  left: 50% !important;
+  top: 50% !important;
+  opacity: 0;
+}
+
 .QuillEditorWrapper {
   border-radius: 6px;
   border: 1px solid $neutral-200;
@@ -110,15 +120,24 @@
   .ql-container {
     min-height: 212px;
     max-height: 512px;
-    overflow-y: scroll;
+    overflow: auto;
     border: none !important;
   }
 
   .ql-editor {
     min-height: 212px;
+    max-height: 512px;
 
     &.ql-blank::before {
       font-style: normal;
+    }
+
+    & h1 {
+      font-size: 24px !important;
+    }
+
+    & h2 {
+      font-size: 20px !important;
     }
   }
 
@@ -165,6 +184,7 @@
       0% {
         transform: rotate(0deg);
       }
+
       100% {
         transform: rotate(360deg);
       }

@@ -1,25 +1,29 @@
-import { NotificationDataAndCategory } from '../../../shared/types';
+import {
+  NotificationCategories,
+  NotificationDataAndCategory,
+  logger,
+  stats,
+} from '@hicommonwealth/core';
+import {
+  CommunityInstance,
+  WebhookInstance,
+  models,
+} from '@hicommonwealth/model';
+import { rollbar } from '../rollbar';
 import { sendDiscordWebhook } from './destinations/discord';
-import { NotificationCategories } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { fetchWebhooks, getWebhookDestination } from './util';
-import { getWebhookData } from './getWebhookData';
-import { WebhookDestinations } from './types';
 import { sendSlackWebhook } from './destinations/slack';
 import { sendTelegramWebhook } from './destinations/telegram';
-import { WebhookInstance } from '../../models/webhook';
 import { sendZapierWebhook } from './destinations/zapier';
-import { rollbar } from '../rollbar';
-import { StatsDController } from 'common-common/src/statsd';
-import models from '../../database';
-import { CommunityInstance } from '../../models/community';
+import { getWebhookData } from './getWebhookData';
+import { WebhookDestinations } from './types';
+import { fetchWebhooks, getWebhookDestination } from './util';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 // TODO: @Timothee disable/deprecate a webhook ulr if it fails too many times (remove dead urls)
 export async function dispatchWebhooks(
   notification: NotificationDataAndCategory,
-  webhooks?: WebhookInstance[]
+  webhooks?: WebhookInstance[],
 ) {
   if (
     notification.categoryId === NotificationCategories.SnapshotProposal ||
@@ -27,7 +31,7 @@ export async function dispatchWebhooks(
     notification.categoryId === NotificationCategories.CommentEdit
   ) {
     log.warn(
-      `Webhooks not supported for ${notification.categoryId} notifications`
+      `Webhooks not supported for ${notification.categoryId} notifications`,
     );
     return;
   }
@@ -36,20 +40,23 @@ export async function dispatchWebhooks(
     webhooks = await fetchWebhooks(notification);
   }
 
-  let chainId: string;
+  let communityId: string;
   if (notification.categoryId === NotificationCategories.ChainEvent) {
-    chainId = notification.data.chain;
+    communityId = notification.data.chain;
   } else {
-    chainId = notification.data.chain_id;
+    communityId = notification.data.chain_id;
   }
 
-  const chain: CommunityInstance | undefined = await models.Community.findOne({
-    where: {
-      id: chainId,
-    },
-  });
+  const community: CommunityInstance | undefined =
+    await models.Community.findOne({
+      where: {
+        id: communityId,
+      },
+    });
 
-  const webhookData = Object.freeze(await getWebhookData(notification, chain));
+  const webhookData = Object.freeze(
+    await getWebhookData(notification, community),
+  );
 
   const webhookPromises = [];
   for (const webhook of webhooks) {
@@ -62,29 +69,29 @@ export async function dispatchWebhooks(
             {
               ...webhookData,
             },
-            chain
-          )
+            community,
+          ),
         );
         break;
       case WebhookDestinations.Slack:
         webhookPromises.push(
           sendSlackWebhook(webhook.url, notification.categoryId, {
             ...webhookData,
-          })
+          }),
         );
         break;
       case WebhookDestinations.Telegram:
         webhookPromises.push(
           sendTelegramWebhook(webhook.url, notification.categoryId, {
             ...webhookData,
-          })
+          }),
         );
         break;
       case WebhookDestinations.Zapier:
         webhookPromises.push(
           sendZapierWebhook(webhook.url, notification.categoryId, {
             ...webhookData,
-          })
+          }),
         );
         break;
       default:
@@ -95,7 +102,7 @@ export async function dispatchWebhooks(
   const results = await Promise.allSettled(webhookPromises);
   for (const result of results) {
     if (result.status === 'rejected') {
-      StatsDController.get().increment('webhook.error');
+      stats().increment('webhook.error');
       let error;
       if (result.reason instanceof Error) {
         error = result.reason;
@@ -104,16 +111,11 @@ export async function dispatchWebhooks(
       }
 
       // TODO: Issue #5230
-      console.error(
-        `[${formatFilename(__filename)}]: Error sending webhook: ${
-          result.reason
-        }`,
-        error
-      );
+      log.error(`Error sending webhook: ${result.reason}`, error);
       // log.error(`Error sending webhook: ${result.reason}`, error);
       rollbar.error(`Error sending webhook: ${result.reason}`, error);
     } else {
-      StatsDController.get().increment('webhook.success');
+      stats().increment('webhook.success');
     }
   }
 }

@@ -1,23 +1,23 @@
-import NodeInfo from 'models/NodeInfo';
-import ChainInfo from 'models/ChainInfo';
-import { notifySuccess, notifyError } from 'controllers/app/notifications';
+import { BalanceType } from '@hicommonwealth/core';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { detectURL } from 'helpers/threads';
+import CommunityInfo from 'models/ChainInfo';
+import NodeInfo from 'models/NodeInfo';
+import 'pages/AdminPanel.scss';
 import React, { useState } from 'react';
 import app from 'state';
-import { BalanceType } from '../../../../../../common-common/src/types';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
 import { openConfirmation } from '../../modals/confirmation_modal';
 import { createChainNode } from './utils';
-import 'pages/AdminPanel.scss';
-import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
 
 const RPCEndpointTask = () => {
   const [rpcEndpointChainValue, setRpcEndpointChainValue] =
     useState<string>('');
-  const [rpcEndpointChain, setRpcEndpointChain] = useState<ChainInfo>(null);
+  const [rpcEndpointChain, setRpcEndpointChain] = useState<CommunityInfo>(null);
   const [rpcEndpoint, setRpcEndpoint] = useState<string>('');
   const [rpcEndpointChainValueValidated, setRpcEndpointChainValueValidated] =
     useState<boolean>(false);
@@ -28,15 +28,20 @@ const RPCEndpointTask = () => {
   const [rpcName, setRpcName] = useState<string>('');
   const [bech32, setBech32] = useState<string>('');
   const [balanceType, setBalanceType] = useState<BalanceType>(
-    BalanceType.Ethereum
+    BalanceType.Ethereum,
   );
   const [chainNodeNotCreated, setChainNodeNotCreated] =
+    useState<boolean>(false);
+  const [ethChainId, setEthChainId] = useState<number>(null);
+  const [ethChainIdValueValidated, setEthChainIdValueValidated] =
     useState<boolean>(false);
 
   const buttonEnabled =
     (rpcEndpointChainNodeValidated &&
       rpcEndpointChainNode &&
-      rpcEndpointChainValueValidated) ||
+      rpcEndpointChainValueValidated &&
+      balanceType !== BalanceType.Ethereum &&
+      !ethChainIdValueValidated) ||
     (rpcName !== '' && bech32 !== '' && rpcEndpoint !== '');
 
   const setCommunityIdInput = (e) => {
@@ -45,7 +50,7 @@ const RPCEndpointTask = () => {
   };
 
   const RPCEndpointValidationFn = (
-    value: string
+    value: string,
   ): [ValidationStatus, string] | [] => {
     if (
       !detectURL(value) &&
@@ -68,13 +73,24 @@ const RPCEndpointTask = () => {
     return [];
   };
 
+  const ethChainIdEndpointValidationFn = (
+    value: string,
+  ): [ValidationStatus, string] | [] => {
+    if (value === '' || /^[1-9]\d*$/.test(value)) {
+      return [];
+    }
+
+    setEthChainIdValueValidated(false);
+    return ['failure', 'ETH chain id provided is not a number'];
+  };
+
   const idValidationFn = (value: string): [ValidationStatus, string] | [] => {
-    const chainInfo = app.config.chains.getById(value);
-    if (!chainInfo) {
+    const communityInfo = app.config.chains.getById(value);
+    if (!communityInfo) {
       setRpcEndpointChainValueValidated(false);
       return ['failure', 'Community not found'];
     }
-    setRpcEndpointChain(chainInfo);
+    setRpcEndpointChain(communityInfo);
     setRpcEndpointChainValueValidated(true);
     return [];
   };
@@ -89,6 +105,7 @@ const RPCEndpointTask = () => {
           name: rpcName,
           bech32,
           balance_type: balanceType,
+          eth_chain_id: ethChainId,
         });
         nodeId = res.data.result.node_id;
       }
@@ -135,7 +152,7 @@ const RPCEndpointTask = () => {
       <CWText type="h4">Switch/Add RPC Endpoint</CWText>
       <CWText type="caption">
         Changes the RPC endpoint for a specific chain, or adds an endpoint if it
-        doesn't yet exist.
+        doesn&apos;t yet exist.
       </CWText>
       <div className="MultiRow">
         <div className="TaskRow">
@@ -191,6 +208,18 @@ const RPCEndpointTask = () => {
                 setBalanceType(item.value as BalanceType);
               }}
             />
+
+            {balanceType === BalanceType.Ethereum && (
+              <CWTextInput
+                value={ethChainId}
+                onInput={(e) => {
+                  setEthChainId(e.target.value);
+                }}
+                inputValidationFn={ethChainIdEndpointValidationFn}
+                placeholder="Enter an ETH chain id"
+                label="eth chain id"
+              />
+            )}
           </div>
         )}
       </div>

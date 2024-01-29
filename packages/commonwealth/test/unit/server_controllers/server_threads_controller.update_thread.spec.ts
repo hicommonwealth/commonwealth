@@ -1,3 +1,4 @@
+import { CommunityInstance } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { ServerThreadsController } from 'server/controllers/server_threads_controller';
 import {
@@ -5,7 +6,6 @@ import {
   UpdateThreadPermissions,
   validatePermissions,
 } from 'server/controllers/server_threads_methods/update_thread';
-import { CommunityInstance } from '../../../server/models/community';
 import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
 
 describe('ServerThreadsController', () => {
@@ -16,6 +16,7 @@ describe('ServerThreadsController', () => {
         isMod: false,
         isAdmin: false,
         isSuperAdmin: false,
+        isCollaborator: false,
       };
       expect(() =>
         validatePermissions(permissions, {
@@ -23,7 +24,7 @@ describe('ServerThreadsController', () => {
           isMod: true,
           isAdmin: true,
           isSuperAdmin: true,
-        })
+        }),
       ).to.throw('Unauthorized');
     });
 
@@ -33,34 +34,35 @@ describe('ServerThreadsController', () => {
         isMod: false,
         isAdmin: true,
         isSuperAdmin: false,
+        isCollaborator: false,
       };
 
       // throws
       expect(() =>
         validatePermissions(permissions, {
           isThreadOwner: true,
-        })
+        }),
       ).to.throw('Unauthorized');
 
       // throws
       expect(() =>
         validatePermissions(permissions, {
           isMod: true,
-        })
+        }),
       ).to.throw('Unauthorized');
 
       // does NOT throw
       expect(() =>
         validatePermissions(permissions, {
           isAdmin: true,
-        })
+        }),
       ).to.not.throw();
 
       // throws
       expect(() =>
         validatePermissions(permissions, {
           isSuperAdmin: true,
-        })
+        }),
       ).to.throw('Unauthorized');
 
       // does NOT throw
@@ -70,7 +72,7 @@ describe('ServerThreadsController', () => {
           isMod: true,
           isAdmin: true,
           isSuperAdmin: true,
-        })
+        }),
       ).to.not.throw();
     });
   });
@@ -110,6 +112,11 @@ describe('ServerThreadsController', () => {
             toJSON: () => ({}),
           }),
         },
+        Topic: {
+          findOne: async () => ({
+            id: 1,
+          }),
+        },
         // for findAllRoles
         Address: {
           findAll: async () => [address],
@@ -127,7 +134,7 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db,
         tokenBalanceCache,
-        banCache
+        banCache,
       );
       const [updatedThread, notificationOptions, analyticsOptions] =
         await serverThreadsController.updateThread(attributes);
@@ -139,7 +146,7 @@ describe('ServerThreadsController', () => {
             ...attributes.address,
             address: '0xbanned',
           },
-        })
+        }),
       ).to.be.rejectedWith('Ban error: banned');
 
       expect(updatedThread).to.be.ok;

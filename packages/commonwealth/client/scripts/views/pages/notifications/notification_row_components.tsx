@@ -1,26 +1,29 @@
+import {
+  NotificationCategories,
+  ProposalType,
+  SupportedNetwork,
+} from '@hicommonwealth/core';
+import { getProposalUrlPath } from 'identifiers';
 import moment from 'moment';
-import React, { useState } from 'react';
-import 'pages/notifications/notification_row.scss';
-import AddressInfo from '../../../models/AddressInfo';
-import type { NotificationRowProps } from './notification_row';
-import type { IEventLabel } from '../../../../../shared/chain/labelers/util';
-import { Label as ChainEventLabel } from '../../../../../shared/chain/labelers/util';
-import { SupportedNetwork } from '../../../../../shared/chain/types/types';
-import type { CWEvent } from '../../../../../shared/chain/types/types';
-import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { useCommonNavigate } from 'navigation/helpers';
+import 'pages/notifications/notification_row.scss';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 import app from 'state';
 import { User } from 'views/components/user/user';
+import type { IEventLabel } from '../../../../../shared/chain/labelers/util';
+import { Label as ChainEventLabel } from '../../../../../shared/chain/labelers/util';
+import type { CWEvent } from '../../../../../shared/chain/types/types';
+import AddressInfo from '../../../models/AddressInfo';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { getClasses } from '../../components/component_kit/helpers';
 import { UserGallery } from '../../components/user/user_gallery';
 import { getBatchNotificationFields } from './helpers';
-import { getProposalUrlPath } from 'identifiers';
+import type { NotificationRowProps } from './notification_row';
 
 export const ChainEventNotificationRow = (
-  props: Omit<NotificationRowProps, 'allRead'>
+  props: Omit<NotificationRowProps, 'allRead'>,
 ) => {
   const { notification, onListPage } = props;
 
@@ -42,7 +45,7 @@ export const ChainEventNotificationRow = (
     data: notification.chainEvent.data,
   };
 
-  const chainName = app.config.chains.getById(chainId)?.name;
+  const communityName = app.config.chains.getById(chainId)?.name;
 
   let label: IEventLabel | undefined;
   try {
@@ -57,7 +60,7 @@ export const ChainEventNotificationRow = (
       <div
         className={getClasses<{ isUnread?: boolean }>(
           { isUnread: !notification.isRead },
-          'NotificationRow'
+          'NotificationRow',
         )}
         key={notification.id}
         id={notification.id.toString()}
@@ -86,7 +89,7 @@ export const ChainEventNotificationRow = (
     proposalType,
     (chainEvent.data as any).id,
     false,
-    chainId
+    chainId,
   );
 
   return (
@@ -98,7 +101,7 @@ export const ChainEventNotificationRow = (
     >
       <div className="comment-body">
         <div className="comment-body-top chain-event-notification-top">
-          {label.heading} on {chainName}
+          {label.heading} on {communityName}
           {!onListPage && (
             <CWIconButton
               iconName="close"
@@ -126,6 +129,7 @@ type ExtendedNotificationRowProps = NotificationRowProps & {
   allRead: boolean;
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
   const { handleSetMarkingRead, markingRead, notification, allRead } = props;
   const [isRead, setIsRead] = useState<boolean>(notification.isRead);
@@ -135,7 +139,7 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
   const navigate = useNavigate();
 
   const notificationData = [notification].map((notif) =>
-    typeof notif.data === 'string' ? JSON.parse(notif.data) : notif.data
+    typeof notif.data === 'string' ? JSON.parse(notif.data) : notif.data,
   );
 
   const { authorInfo, createdAt, notificationHeader, notificationBody } =
@@ -170,7 +174,7 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
       {authorInfo.length === 1 ? (
         <User
           userAddress={(authorInfo[0] as [string, string])[1]}
-          userChainId={(authorInfo[0] as [string, string])[0]}
+          userCommunityId={(authorInfo[0] as [string, string])[0]}
           shouldShowAvatarOnly
           avatarSize={26}
         />
@@ -178,7 +182,7 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
         <UserGallery
           users={authorInfo.map(
             (auth) =>
-              new AddressInfo({ id: null, address: auth[1], chainId: auth[0] })
+              new AddressInfo({ id: null, address: auth[1], chainId: auth[0] }),
           )}
           avatarSize={26}
         />
@@ -223,8 +227,9 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const SnapshotNotificationRow = (
-  props: ExtendedNotificationRowProps
+  props: ExtendedNotificationRowProps,
 ) => {
   const { handleSetMarkingRead, markingRead, notification, allRead } = props;
   const [isRead, setIsRead] = useState<boolean>(notification.isRead);

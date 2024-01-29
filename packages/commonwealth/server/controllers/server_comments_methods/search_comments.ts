@@ -1,6 +1,6 @@
+import { CommunityInstance } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from 'server/types';
-import { CommunityInstance } from '../../models/community';
 import {
   PaginationSqlOptions,
   buildPaginatedResponse,
@@ -24,9 +24,9 @@ export type SearchCommentsResult = TypedPaginatedResult<{
   type: 'comment';
   address_id: number;
   address: string;
-  address_chain: string;
+  address_community_id: string;
   created_at: string;
-  chain: string;
+  community_id: string;
   rank: number;
 }>;
 
@@ -79,7 +79,7 @@ export async function __searchComments(
   }
 
   const communityWhere = bind.community
-    ? '"Comments".chain = $community AND'
+    ? '"Comments".community_id = $community AND'
     : '';
 
   const sqlBaseQuery = `
@@ -91,9 +91,9 @@ export async function __searchComments(
       'comment' as type,
       "Addresses".id as address_id,
       "Addresses".address,
-      "Addresses".community_id as address_chain,
+      "Addresses".community_id as address_community_id,
       "Comments".created_at,
-      "Threads".chain,
+      "Threads".community_id as community_id,
       ts_rank_cd("Comments"._search, query) as rank
     FROM "Comments"
     JOIN "Threads" ON "Comments".thread_id = "Threads".id

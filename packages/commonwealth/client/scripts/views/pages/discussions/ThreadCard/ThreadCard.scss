@@ -1,5 +1,4 @@
 @import '../../../../../styles/shared';
-@import '../../../../../styles/components/component_kit/cw_popover/cw_tooltip';
 
 .ThreadCard {
   cursor: pointer;
@@ -11,10 +10,6 @@
   gap: 16px;
   text-decoration: none;
   color: unset !important;
-
-  .OldTooltip {
-    @include newTempBlackTooltip;
-  }
 
   @include smallInclusive {
     padding: 12px;
@@ -86,6 +81,18 @@
       .content-body {
         @include multiline-text-ellipsis($max-lines: 2);
         word-break: break-word;
+
+        .MarkdownFormattedText {
+          @include caption;
+
+          h1,
+          h2,
+          h3,
+          h4,
+          h5 {
+            font-size: 12px;
+          }
+        }
       }
 
       .content-title {

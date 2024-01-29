@@ -1,8 +1,8 @@
+import type { ChainNetwork, DefaultPage } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/core';
 import type { RegisteredTypes } from '@polkadot/types/types';
 import axios from 'axios';
-import type { ChainNetwork, DefaultPage } from 'common-common/src/types';
-import { ChainBase } from 'common-common/src/types';
-import { ETHERMINT_CHAINS } from 'controllers/app/webWallets/keplr_ethereum_web_wallet';
+import { COSMOS_EVM_CHAINS } from 'controllers/app/webWallets/keplr_ethereum_web_wallet';
 import app from 'state';
 import type NodeInfo from './NodeInfo';
 import RoleInfo from './RoleInfo';
@@ -17,11 +17,7 @@ class ChainInfo {
   public readonly base: ChainBase;
   public iconUrl: string;
   public description: string;
-  public website: string;
-  public discord: string;
-  public element: string;
-  public telegram: string;
-  public github: string;
+  public socialLinks: string[];
   public stagesEnabled: boolean;
   public customStages: string;
   public customDomain: string;
@@ -47,6 +43,7 @@ class ChainInfo {
   public discordBotWebhooksEnabled?: boolean;
   public directoryPageEnabled?: boolean;
   public directoryPageChainNodeId?: number;
+  public namespace?: string;
 
   public get node() {
     return this.ChainNode;
@@ -59,11 +56,7 @@ class ChainInfo {
     name,
     iconUrl,
     description,
-    website,
-    discord,
-    element,
-    telegram,
-    github,
+    social_links,
     stagesEnabled,
     customStages,
     customDomain,
@@ -89,6 +82,7 @@ class ChainInfo {
     discordBotWebhooksEnabled,
     directoryPageEnabled,
     directoryPageChainNodeId,
+    namespace,
   }) {
     this.id = id;
     this.network = network;
@@ -97,11 +91,7 @@ class ChainInfo {
     this.name = name;
     this.iconUrl = iconUrl;
     this.description = description;
-    this.website = website;
-    this.discord = discord;
-    this.element = element;
-    this.telegram = telegram;
-    this.github = github;
+    this.socialLinks = social_links;
     this.stagesEnabled = stagesEnabled;
     this.customStages = customStages;
     this.customDomain = customDomain;
@@ -127,6 +117,7 @@ class ChainInfo {
     this.discordBotWebhooksEnabled = discordBotWebhooksEnabled;
     this.directoryPageEnabled = directoryPageEnabled;
     this.directoryPageChainNodeId = directoryPageChainNodeId;
+    this.namespace = namespace;
   }
 
   public static fromJSON({
@@ -136,11 +127,7 @@ class ChainInfo {
     name,
     icon_url,
     description,
-    website,
-    discord,
-    element,
-    telegram,
-    github,
+    social_links,
     stages_enabled,
     custom_stages,
     custom_domain,
@@ -165,6 +152,7 @@ class ChainInfo {
     discord_bot_webhooks_enabled,
     directory_page_enabled,
     directory_page_chain_node_id,
+    namespace,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -179,7 +167,7 @@ class ChainInfo {
       ? 6
       : 18;
 
-    if (ETHERMINT_CHAINS.some((c) => c === id)) {
+    if (COSMOS_EVM_CHAINS.some((c) => c === id)) {
       decimals = 18;
     }
 
@@ -195,11 +183,7 @@ class ChainInfo {
       name,
       iconUrl: icon_url,
       description,
-      website,
-      discord,
-      element,
-      telegram,
-      github,
+      social_links,
       stagesEnabled: stages_enabled,
       customStages: custom_stages,
       customDomain: custom_domain,
@@ -225,6 +209,7 @@ class ChainInfo {
       discordBotWebhooksEnabled: discord_bot_webhooks_enabled,
       directoryPageEnabled: directory_page_enabled,
       directoryPageChainNodeId: directory_page_chain_node_id,
+      namespace,
     });
   }
 
@@ -241,8 +226,8 @@ class ChainInfo {
           r.permission,
           r.allow,
           r.deny,
-          r.is_user_default
-        )
+          r.is_user_default,
+        ),
       );
     });
   }
@@ -255,11 +240,7 @@ class ChainInfo {
   public async updateChainData({
     name,
     description,
-    website,
-    discord,
-    element,
-    telegram,
-    github,
+    social_links,
     stagesEnabled,
     customStages,
     customDomain,
@@ -277,11 +258,8 @@ class ChainInfo {
   }: {
     name?: string;
     description?: string;
-    website?: string;
+    social_links?: string[];
     discord?: string;
-    element?: string;
-    telegram?: string;
-    github?: string;
     stagesEnabled?: boolean;
     customStages?: string;
     customDomain?: string;
@@ -302,11 +280,7 @@ class ChainInfo {
       id,
       name,
       description,
-      website,
-      discord,
-      element,
-      telegram,
-      github,
+      social_links,
       stages_enabled: stagesEnabled,
       custom_stages: customStages,
       custom_domain: customDomain,
@@ -326,11 +300,7 @@ class ChainInfo {
     const updatedChain = r.data.result;
     this.name = updatedChain.name;
     this.description = updatedChain.description;
-    this.website = updatedChain.website;
-    this.discord = updatedChain.discord;
-    this.element = updatedChain.element;
-    this.telegram = updatedChain.telegram;
-    this.github = updatedChain.github;
+    this.socialLinks = updatedChain.social_links;
     this.stagesEnabled = updatedChain.stages_enabled;
     this.customStages = updatedChain.custom_stages;
     this.customDomain = updatedChain.custom_domain;
@@ -345,6 +315,42 @@ class ChainInfo {
     this.directoryPageEnabled = updatedChain.directory_page_enabled;
     this.directoryPageChainNodeId = updatedChain.directory_page_chain_node_id;
   }
+
+  public categorizeSocialLinks(): CategorizedSocialLinks {
+    const categorizedLinks: CategorizedSocialLinks = {
+      discords: [],
+      githubs: [],
+      telegrams: [],
+      elements: [],
+      remainingLinks: [],
+    };
+
+    this.socialLinks
+      .filter((link) => !!link)
+      .forEach((link) => {
+        if (link.includes('://discord.com') || link.includes('://discord.gg')) {
+          categorizedLinks.discords.push(link);
+        } else if (link.includes('://github.com')) {
+          categorizedLinks.githubs.push(link);
+        } else if (link.includes('://t.me')) {
+          categorizedLinks.telegrams.push(link);
+        } else if (link.includes('://matrix.to')) {
+          categorizedLinks.elements.push(link);
+        } else {
+          categorizedLinks.remainingLinks.push(link);
+        }
+      });
+
+    return categorizedLinks;
+  }
 }
+
+export type CategorizedSocialLinks = {
+  discords: string[];
+  githubs: string[];
+  telegrams: string[];
+  elements: string[];
+  remainingLinks: string[];
+};
 
 export default ChainInfo;

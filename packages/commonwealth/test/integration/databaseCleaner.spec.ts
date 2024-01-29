@@ -1,11 +1,11 @@
+import { RedisCache } from '@hicommonwealth/adapters';
+import { NotificationCategories } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import { RedisCache } from 'common-common/src/redisCache';
-import { NotificationCategories } from 'common-common/src/types';
 import { Sequelize } from 'sequelize';
 import sinon from 'sinon';
 import { resetDatabase } from '../../server-test';
-import models from '../../server/database';
 import DatabaseCleaner from '../../server/util/databaseCleaner';
 
 chai.use(chaiHttp);
@@ -54,13 +54,13 @@ describe('DatabaseCleaner Tests', () => {
         now.getUTCHours() + 4,
         mockRedis,
         undefined,
-        true
+        true,
       );
 
       expect(dbCleaner.timeoutID).to.not.be.undefined;
       clearTimeout(dbCleaner.timeoutID);
       expect(dbCleaner.timeToRun.getTime()).to.be.equal(
-        now.getTime() + 14400000
+        now.getTime() + 14400000,
       );
       expect(dbCleaner.completed).to.be.false;
     });
@@ -85,7 +85,7 @@ describe('DatabaseCleaner Tests', () => {
         now.getUTCHours() - 4,
         mockRedis,
         undefined,
-        true
+        true,
       );
       expect(dbCleaner.timeoutID).to.not.be.undefined;
       clearTimeout(dbCleaner.timeoutID);
@@ -158,14 +158,14 @@ describe('DatabaseCleaner Tests', () => {
       await models.Notification.create({
         notification_data: 'testing',
         created_at: hundredDaysAgo,
-        chain_id: 'ethereum',
+        community_id: 'ethereum',
         category_id: 'new-thread-creation',
       });
 
       // create new notification
       await models.Notification.create({
         notification_data: 'testing',
-        chain_id: 'ethereum',
+        community_id: 'ethereum',
         created_at: eightyEightDaysAgo,
         category_id: 'new-thread-creation',
       });
@@ -177,7 +177,7 @@ describe('DatabaseCleaner Tests', () => {
       const notifs = await models.Notification.findAll();
       expect(notifs.length).to.equal(1);
       expect(notifs[0].created_at.toString()).to.equal(
-        eightyEightDaysAgo.toString()
+        eightyEightDaysAgo.toString(),
       );
     });
 
@@ -186,7 +186,7 @@ describe('DatabaseCleaner Tests', () => {
 
       const oneYearAndTwoDaysAgo = new Date(now);
       oneYearAndTwoDaysAgo.setUTCFullYear(
-        oneYearAndTwoDaysAgo.getUTCFullYear() - 1
+        oneYearAndTwoDaysAgo.getUTCFullYear() - 1,
       );
       oneYearAndTwoDaysAgo.setUTCDate(oneYearAndTwoDaysAgo.getUTCDate() - 2);
 
@@ -219,7 +219,7 @@ describe('DatabaseCleaner Tests', () => {
       const newSub = await models.Subscription.create({
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewThread,
-        chain_id: 'ethereum',
+        community_id: 'ethereum',
         is_active: true,
         immediate_email: false,
       });
@@ -227,7 +227,7 @@ describe('DatabaseCleaner Tests', () => {
       const oldSub = await models.Subscription.create({
         subscriber_id: oldUser.id,
         category_id: NotificationCategories.NewThread,
-        chain_id: 'ethereum',
+        community_id: 'ethereum',
         is_active: true,
         immediate_email: false,
       });

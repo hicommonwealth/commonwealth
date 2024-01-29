@@ -1,22 +1,27 @@
+import {
+  AppError,
+  CacheDecorator,
+  lookupKeyDurationInReq,
+} from '@hicommonwealth/adapters';
+import { logger } from '@hicommonwealth/core';
+import { DB } from '@hicommonwealth/model';
 import axios from 'axios';
 import bodyParser from 'body-parser';
+import { Express } from 'express';
 import _ from 'lodash';
-
-import { AppError } from 'common-common/src/errors';
-import type { Express } from 'express';
-import type { DB } from '../models';
-import { factory, formatFilename } from 'common-common/src/logging';
 import {
   calcCosmosLCDCacheKeyDuration,
   calcCosmosRPCCacheKeyDuration,
 } from './cosmosCache';
-import { lookupKeyDurationInReq } from 'common-common/src/cacheKeyUtils';
-import { cacheDecorator } from 'common-common/src/cacheDecorator';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 const defaultCacheDuration = 60 * 10; // 10 minutes
 
-function setupCosmosProxy(app: Express, models: DB) {
+function setupCosmosProxy(
+  app: Express,
+  models: DB,
+  cacheDecorator: CacheDecorator,
+) {
   // using bodyParser here because cosmjs generates text/plain type headers
   app.post(
     '/cosmosAPI/:chain',
@@ -24,7 +29,7 @@ function setupCosmosProxy(app: Express, models: DB) {
     calcCosmosRPCCacheKeyDuration,
     cacheDecorator.cacheMiddleware(
       defaultCacheDuration,
-      lookupKeyDurationInReq
+      lookupKeyDurationInReq,
     ),
     async function cosmosProxy(req, res) {
       log.trace(`Got request: ${JSON.stringify(req.body, null, 2)}`);
@@ -47,14 +52,14 @@ function setupCosmosProxy(app: Express, models: DB) {
           `Got response from endpoint: ${JSON.stringify(
             response.data,
             null,
-            2
-          )}`
+            2,
+          )}`,
         );
         return res.send(response.data);
       } catch (err) {
         res.status(500).json({ message: err.message });
       }
-    }
+    },
   );
 
   // for gov v1 queries.
@@ -64,7 +69,7 @@ function setupCosmosProxy(app: Express, models: DB) {
     calcCosmosLCDCacheKeyDuration,
     cacheDecorator.cacheMiddleware(
       defaultCacheDuration,
-      lookupKeyDurationInReq
+      lookupKeyDurationInReq,
     ),
     async function cosmosProxy(req, res) {
       log.trace(`Got request: ${JSON.stringify(req.body, null, 2)}`);
@@ -94,14 +99,14 @@ function setupCosmosProxy(app: Express, models: DB) {
           `Got response from endpoint: ${JSON.stringify(
             response.data,
             null,
-            2
-          )}`
+            2,
+          )}`,
         );
         return res.send(response.data);
       } catch (err) {
         res.status(500).json({ message: err.message });
       }
-    }
+    },
   );
 }
 

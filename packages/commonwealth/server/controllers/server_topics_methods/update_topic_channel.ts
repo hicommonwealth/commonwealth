@@ -1,7 +1,6 @@
+import { AppError } from '@hicommonwealth/adapters';
+import { CommunityInstance, UserInstance } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import { AppError } from '../../../../common-common/src/errors';
-import { CommunityInstance } from '../../models/community';
-import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
 import { ServerTopicsController } from '../server_topics_controller';
 
@@ -30,7 +29,7 @@ export async function __updateTopicChannel(
     communityId: community.id,
     allowMod: true,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
 
   if (!isAdmin) {
@@ -88,7 +87,7 @@ export async function __updateTopicChannel(
     // No previous topic associated with channel. Set all threads with channel id to new topic
     const threadsOnTopicFromDiscordBot = await this.models.Thread.findAll({
       where: {
-        chain: community.id,
+        community_id: community.id,
         // discord meta is not null
         discord_meta: {
           channel_id: channelId,

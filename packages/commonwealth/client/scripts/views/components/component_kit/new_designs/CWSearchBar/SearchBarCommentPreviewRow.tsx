@@ -1,11 +1,11 @@
-import React, { FC } from 'react';
 import moment from 'moment';
+import React, { FC } from 'react';
 
 import { useCommonNavigate } from '../../../../../navigation/helpers';
 import { ReplyResult } from '../../../../pages/search/helpers';
-import { CWText } from '../../cw_text';
 import { renderTruncatedHighlights } from '../../../react_quill_editor/highlighter';
 import { QuillRenderer } from '../../../react_quill_editor/quill_renderer';
+import { CWText } from '../../cw_text';
 
 import './SearchBarCommentPreviewRow.scss';
 
@@ -23,7 +23,7 @@ export const SearchBarCommentPreviewRow: FC<
   const content = searchResult.text;
 
   const handleClick = () => {
-    const path = `/${searchResult.chain}/discussion/${searchResult.proposalid}?comment=${searchResult.id}`;
+    const path = `/${searchResult.community_id}/discussion/${searchResult.proposalid}?comment=${searchResult.id}`;
     navigate(path, {}, null);
   };
 

@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
 import ModalUnstyled from '@mui/base/Modal';
+import React, { FC } from 'react';
 
 import { getClasses } from '../../helpers';
 import { ComponentType } from '../../types';
@@ -15,10 +15,12 @@ interface CWModalProps {
   onClose: () => void;
   open: boolean;
   className?: string;
+  rootClassName?: string;
   visibleOverflow?: boolean;
 }
 
 // Backdrop is needed for modal clickaway events
+// eslint-disable-next-line react/display-name
 const Backdrop = React.forwardRef<
   HTMLDivElement,
   { className: string; ownerState: any }
@@ -36,6 +38,7 @@ const CWModal: FC<CWModalProps> = ({
   size,
   onClose,
   open,
+  rootClassName,
   className,
   visibleOverflow,
 }) => (
@@ -44,11 +47,12 @@ const CWModal: FC<CWModalProps> = ({
     onClose={onClose}
     slots={{ backdrop: Backdrop }}
     disableEnforceFocus
+    className={rootClassName}
   >
     <div
       className={`${getClasses(
         { isFullScreen, size, visibleOverflow },
-        ComponentType.Modal
+        ComponentType.Modal,
       )} ${className}`}
     >
       {content}

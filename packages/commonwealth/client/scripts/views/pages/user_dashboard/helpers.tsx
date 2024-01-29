@@ -1,4 +1,4 @@
-import { NotificationCategories } from 'common-common/src/types';
+import { NotificationCategories } from '@hicommonwealth/core';
 import { notifySuccess } from 'controllers/app/notifications';
 import getFetch from 'helpers/getFetch';
 import $ from 'jquery';
@@ -60,21 +60,21 @@ export const fetchActivity = async (requestType: DashboardViews) => {
       return { status: 'Failure', result: [] };
     }
 
-    const chains: any = new Set();
+    const communities: any = new Set();
     for (const event of events) {
-      chains.add(event.chain);
+      communities.add(event.chain);
     }
 
     const res: {
       result: { id: string; icon_url: string }[];
       status: boolean;
     } = await $.post(`${app.serverUrl()}/viewChainIcons`, {
-      chains: JSON.stringify(Array.from(chains)),
+      communities: JSON.stringify(Array.from(communities)),
     });
 
-    const chainIconUrls = {};
+    const communityIconUrls = {};
     for (const item of res.result) {
-      chainIconUrls[item.id] = item.icon_url;
+      communityIconUrls[item.id] = item.icon_url;
     }
 
     activity = {

@@ -59,21 +59,20 @@ const getFontWeight = (type: FontType) => {
   }
 };
 
-export const CWText = (props: TextProps) => {
-  const {
-    className,
-    disabled = false,
-    isCentered,
-    fontStyle,
-    onClick,
-    noWrap = false,
-    title,
-    type = 'b1',
-    fontWeight = getFontWeight(type),
-    truncate = false,
-    ...otherProps
-  } = props;
-
+export const CWText = ({
+  className,
+  disabled = false,
+  isCentered,
+  fontStyle,
+  onClick,
+  noWrap = false,
+  title,
+  type = 'b1',
+  fontWeight = getFontWeight(type),
+  truncate = false,
+  children,
+  ...otherProps
+}: TextProps) => {
   return (
     <div
       className={getClasses<TextStyleProps & { onClick?: boolean }>(
@@ -88,13 +87,13 @@ export const CWText = (props: TextProps) => {
           className,
           truncate,
         },
-        ComponentType.Text
+        ComponentType.Text,
       )}
       title={title ? title.toString() : undefined}
       onClick={onClick}
       {...otherProps}
     >
-      {props.children}
+      {children}
     </div>
   );
 };

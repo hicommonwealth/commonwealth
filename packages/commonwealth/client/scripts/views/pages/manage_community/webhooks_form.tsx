@@ -10,20 +10,20 @@ import { WebhookSettingsModal } from 'views/modals/webhook_settings_modal';
 import type Webhook from '../../../models/Webhook';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 
 export const WebhooksForm = () => {
   const [webhookUrl, setWebhookUrl] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [webhooks, setWebhooks] = useState<Array<Webhook>>([]);
 
-  const chainOrCommObj = useMemo(
+  const communityObj = useMemo(
     () => ({
       chain: app.activeChainId(),
     }),
-    []
+    [],
   );
 
   useNecessaryEffect(() => {
@@ -31,7 +31,7 @@ export const WebhooksForm = () => {
       try {
         const response = await axios.get(`${app.serverUrl()}/getWebhooks`, {
           params: {
-            ...chainOrCommObj,
+            ...communityObj,
             auth: true,
             jwt: app.user.jwt,
           },
@@ -45,12 +45,12 @@ export const WebhooksForm = () => {
     };
 
     fetch();
-  }, [chainOrCommObj]);
+  }, [communityObj]);
 
   const createWebhook = async () => {
     try {
       const response = await axios.post(`${app.serverUrl()}/createWebhook`, {
-        ...chainOrCommObj,
+        ...communityObj,
         webhookUrl,
         auth: true,
         jwt: app.user.jwt,
@@ -70,7 +70,7 @@ export const WebhooksForm = () => {
   const deleteWebhook = async (webhook: Webhook) => {
     try {
       await axios.post(`${app.serverUrl()}/deleteWebhook`, {
-        ...chainOrCommObj,
+        ...communityObj,
         webhookUrl: webhook.url,
         auth: true,
         jwt: app.user.jwt,
@@ -85,11 +85,11 @@ export const WebhooksForm = () => {
 
   const updateWebhook = async (
     webhook: Webhook,
-    selectedCategories: Array<string>
+    selectedCategories: Array<string>,
   ) => {
     try {
       const response = await axios.post(`${app.serverUrl()}/updateWebhook`, {
-        ...chainOrCommObj,
+        ...communityObj,
         webhookId: webhook.id,
         categories: selectedCategories,
         jwt: app.user.jwt,
@@ -100,7 +100,7 @@ export const WebhooksForm = () => {
       const updatedWebhooks = webhooks.map((hook) =>
         hook.id === updatedWebhookFromServer.id
           ? updatedWebhookFromServer
-          : hook
+          : hook,
       );
 
       setWebhooks(updatedWebhooks);

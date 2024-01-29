@@ -1,0 +1,11 @@
+@import '../../../../../styles/shared';
+
+.DismissModal {
+  .CWModalBody {
+    .Text {
+      color: $neutral-500 !important;
+    }
+
+    padding-bottom: 24px !important;
+  }
+}

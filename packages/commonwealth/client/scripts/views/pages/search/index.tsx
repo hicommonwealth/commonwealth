@@ -7,7 +7,10 @@ import {
   VALID_SEARCH_SCOPES,
 } from 'models/SearchQuery';
 import 'pages/search/index.scss';
+import useSidebarStore from 'state/ui/sidebar';
+import { Breadcrumbs } from '../../components/Breadcrumbs';
 
+import useWindowResize from 'hooks/useWindowResize';
 import React, { useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
@@ -44,7 +47,7 @@ const DEFAULT_SORT_OPTIONS = SORT_MAP.Best;
 
 type SearchQueryParams = {
   q?: string;
-  chainScope?: string;
+  communityScope?: string;
   sort?: string;
   tab?: string;
 };
@@ -52,17 +55,22 @@ type SearchQueryParams = {
 const SearchPage = () => {
   const navigate = useNavigate();
   const commonNavigate = useCommonNavigate();
+  const { setMenu } = useSidebarStore();
 
   const location = useLocation();
   const [urlQueryParams] = useSearchParams();
   const [bottomRef, bottomInView] = useInView();
 
+  const { toggleMobileView } = useWindowResize({
+    setMenu,
+  });
+
   const queryParams = useMemo(() => {
     return Object.fromEntries(urlQueryParams.entries()) as SearchQueryParams;
   }, [urlQueryParams]);
 
-  const chain =
-    queryParams.chainScope || app.activeChainId() || 'all_communities';
+  const community =
+    queryParams.communityScope || app.activeChainId() || 'all_communities';
 
   const activeTab = useMemo(() => {
     if (VALID_SEARCH_SCOPES.includes(queryParams.tab as SearchScope)) {
@@ -82,7 +90,7 @@ const SearchPage = () => {
 
   const handleSearchAllCommunities = () => {
     const newQueryParams = new URLSearchParams(urlQueryParams.toString());
-    newQueryParams.set('chainScope', 'all_communities');
+    newQueryParams.set('communityScope', 'all_communities');
     navigate({
       pathname: location.pathname,
       search: `?${newQueryParams.toString()}`,
@@ -103,7 +111,7 @@ const SearchPage = () => {
     SORT_MAP[queryParams.sort] || DEFAULT_SORT_OPTIONS;
 
   const sharedQueryOptions = {
-    chainId: app.activeChainId() || 'all_communities',
+    communityId: community,
     searchTerm: queryParams.q,
     limit: 20,
     orderBy,
@@ -131,10 +139,10 @@ const SearchPage = () => {
   });
 
   const {
-    data: chainsData,
-    error: chainsError,
+    data: communityData,
+    error: communityError,
     fetchNextPage: chainsFetchNextPage,
-    isLoading: chainsIsLoading,
+    isLoading: communityIsLoading,
   } = useSearchChainsQuery({
     ...sharedQueryOptions,
     enabled: activeTab === SearchScope.Communities,
@@ -165,7 +173,8 @@ const SearchPage = () => {
         );
       case SearchScope.Communities:
         return (
-          chainsData?.pages.reduce((acc, p) => [...acc, ...p.results], []) || []
+          communityData?.pages.reduce((acc, p) => [...acc, ...p.results], []) ||
+          []
         );
       case SearchScope.Members:
         return (
@@ -175,7 +184,7 @@ const SearchPage = () => {
       default:
         return [];
     }
-  }, [activeTab, chainsData, commentsData, profilesData, threadsData]);
+  }, [activeTab, communityData, commentsData, profilesData, threadsData]);
 
   const totalResults = useMemo(() => {
     switch (activeTab) {
@@ -184,34 +193,35 @@ const SearchPage = () => {
       case SearchScope.Replies:
         return commentsData?.pages?.[0]?.totalResults || 0;
       case SearchScope.Communities:
-        return chainsData?.pages?.[0]?.totalResults || 0;
+        return communityData?.pages?.[0]?.totalResults || 0;
       case SearchScope.Members:
         return profilesData?.pages?.[0]?.totalResults || 0;
       default:
         return 0;
     }
-  }, [activeTab, chainsData, commentsData, profilesData, threadsData]);
+  }, [activeTab, communityData, commentsData, profilesData, threadsData]);
 
   const totalResultsText = pluralize(totalResults, activeTab.toLowerCase());
   const scopeText = useMemo(() => {
-    if (chain) {
-      if (chain === 'all_communities') {
+    if (community) {
+      if (community === 'all_communities') {
         return 'across all communities.';
       }
-      return `in ${capitalize(chain)}.`;
+      return `in ${capitalize(community)}.`;
     } else {
       // also applies when app.isCustomDomain() is true
       return '';
     }
-  }, [chain]);
+  }, [community]);
 
   // when error, notify
   useEffect(() => {
-    const err = threadsError || commentsError || chainsError || profilesError;
+    const err =
+      threadsError || commentsError || communityError || profilesError;
     if (err) {
       notifyError((err as Error).message);
     }
-  }, [chainsError, commentsError, profilesError, threadsError]);
+  }, [communityError, commentsError, profilesError, threadsError]);
 
   // when scroll to bottom, fetch next page
   useEffect(() => {
@@ -247,7 +257,7 @@ const SearchPage = () => {
       case SearchScope.Replies:
         return commentsIsLoading;
       case SearchScope.Communities:
-        return chainsIsLoading;
+        return communityIsLoading;
       case SearchScope.Members:
         return profilesIsLoading;
       default:
@@ -255,7 +265,7 @@ const SearchPage = () => {
     }
   }, [
     activeTab,
-    chainsIsLoading,
+    communityIsLoading,
     commentsIsLoading,
     profilesIsLoading,
     threadsIsLoading,
@@ -263,6 +273,7 @@ const SearchPage = () => {
 
   return (
     <div className="SearchPage">
+      {toggleMobileView && <Breadcrumbs />}
       <div className="search-results">
         <div className="cw-tabs-row-container">
           <CWTabsRow>
@@ -283,7 +294,7 @@ const SearchPage = () => {
               <CWText className="search-results-caption">
                 {totalResultsText} matching &apos;{queryParams.q}&apos;{' '}
                 {scopeText}
-                {chain !== 'all_communities' && !app.isCustomDomain() && (
+                {community !== 'all_communities' && !app.isCustomDomain() && (
                   <a
                     href="#"
                     className="search-all-communities"
@@ -315,7 +326,7 @@ const SearchPage = () => {
                 )}
               <div className="search-results-list">
                 {renderSearchResults(
-                  results as any,
+                  results,
                   queryParams.q,
                   activeTab,
                   commonNavigate,

@@ -3,6 +3,10 @@
 .EditProfile {
   padding: 50px;
 
+  @include smallInclusive {
+    padding: 16px;
+  }
+
   &.full-height {
     height: 100%;
   }

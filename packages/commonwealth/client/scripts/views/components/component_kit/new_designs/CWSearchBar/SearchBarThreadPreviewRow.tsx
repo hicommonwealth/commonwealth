@@ -25,7 +25,7 @@ export const SearchBarThreadPreviewRow: FC<SearchBarThreadPreviewRowProps> = ({
   const content = decodeURIComponent(searchResult.body);
 
   const handleClick = () => {
-    const path = `/${searchResult.chain}/discussion/${searchResult.id}`;
+    const path = `/${searchResult.community_id}/discussion/${searchResult.id}`;
     navigate(path, {}, null);
   };
 
@@ -33,25 +33,25 @@ export const SearchBarThreadPreviewRow: FC<SearchBarThreadPreviewRowProps> = ({
     <div className="SearchBarThreadPreviewRow" onClick={handleClick}>
       <div className="header-row">
         <User
-          userChainId={searchResult.chain}
+          userCommunityId={searchResult.community_id}
           userAddress={searchResult.address}
         />
         <CWText className="last-updated-text">•</CWText>
         <CWText type="caption" className="last-updated-text">
           {moment(searchResult.created_at).format('l')}
         </CWText>
+        <CWText type="b2" fontWeight="bold">
+          {renderTruncatedHighlights(searchTerm, title)}
+        </CWText>
+        <CWText type="caption" className="excerpt-text" fontWeight="medium">
+          <QuillRenderer
+            hideFormatting={true}
+            doc={content}
+            searchTerm={searchTerm}
+            containerClass="SearchQuillRenderer"
+          />
+        </CWText>
       </div>
-      <CWText type="b2" fontWeight="bold">
-        {renderTruncatedHighlights(searchTerm, title)}
-      </CWText>
-      <CWText type="caption" className="excerpt-text" fontWeight="medium">
-        <QuillRenderer
-          hideFormatting={true}
-          doc={content}
-          searchTerm={searchTerm}
-          containerClass="SearchQuillRenderer"
-        />
-      </CWText>
     </div>
   );
 };

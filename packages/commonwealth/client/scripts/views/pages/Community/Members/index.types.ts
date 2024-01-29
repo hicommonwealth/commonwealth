@@ -1,6 +1,6 @@
-export type GroupCategory = 'All groups' | 'In group' | 'Not in group';
+export type BaseGroupFilter = 'All groups' | 'Ungrouped';
 
 export type SearchFilters = {
   searchText?: string;
-  category?: GroupCategory;
+  groupFilter?: BaseGroupFilter | number; // or the group id represented by number
 };

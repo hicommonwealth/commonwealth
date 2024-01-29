@@ -1,10 +1,10 @@
+import { AccessLevel } from '@hicommonwealth/core';
 import axios from 'axios';
 import useForceRerender from 'hooks/useForceRerender';
 import 'pages/manage_community/index.scss';
 import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useDebounce } from 'usehooks-ts';
-import { AccessLevel } from '../../../../../shared/permissions';
 import {
   APIOrderBy,
   APIOrderDirection,
@@ -16,7 +16,7 @@ import Permissions from '../../../utils/Permissions';
 import { CWText } from '../../components/component_kit/cw_text';
 import ErrorPage from '../error';
 import { AdminPanelTabs } from './admin_panel_tabs';
-import { ChainMetadataRows } from './chain_metadata_rows';
+import { CommunityMetadataRows } from './community_metadata_rows';
 
 const ManageCommunityPage = () => {
   const forceRerender = useForceRerender();
@@ -54,7 +54,7 @@ const ManageCommunityPage = () => {
   };
 
   const { data: searchResults, refetch } = useSearchProfilesQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     searchTerm: debouncedSearchTerm,
     limit: 20,
     orderBy: APIOrderBy.LastActive,
@@ -78,7 +78,7 @@ const ManageCommunityPage = () => {
 
   useEffect(() => {
     NewProfilesController.Instance.isFetched.on('redraw', () =>
-      forceRerender()
+      forceRerender(),
     );
 
     NewProfilesController.Instance.isFetched.off('redraw', forceRerender);
@@ -95,7 +95,7 @@ const ManageCommunityPage = () => {
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   if (!isAdmin) {
-    return <ErrorPage message={'Must be admin'} />;
+    return <ErrorPage message="Must be admin" />;
   }
 
   const handleRoleUpdate = (oldRole, newRole) => {
@@ -136,7 +136,7 @@ const ManageCommunityPage = () => {
         newRole.permission,
         newRole.allow,
         newRole.deny,
-        newRole.is_user_default
+        newRole.is_user_default,
       );
       adminsAndMods.push(roleInfo);
 
@@ -153,12 +153,12 @@ const ManageCommunityPage = () => {
 
   return (
     <div className="ManageCommunityPage">
-      <CWText type="h2" fontWeight="medium">
+      <CWText type="h2" fontWeight="medium" className="header">
         Manage Community
       </CWText>
-      <ChainMetadataRows
+      <CommunityMetadataRows
         admins={admins}
-        chain={app.config.chains.getById(app.activeChainId())}
+        community={app.config.chains.getById(app.activeChainId())}
         mods={mods}
         onRoleUpdate={handleRoleUpdate}
         onSave={() => forceRerender()}

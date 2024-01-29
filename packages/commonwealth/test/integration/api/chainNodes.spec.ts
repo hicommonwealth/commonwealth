@@ -1,11 +1,36 @@
-import { expect, assert } from 'chai';
-import models from 'server/database';
-import { BalanceType } from 'common-common/src/types';
+import { BalanceType } from '@hicommonwealth/core';
+import { models, UserInstance } from '@hicommonwealth/model';
+import { assert, expect } from 'chai';
 import { resetDatabase } from 'server-test';
+import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
+import { buildUser } from '../../unit/unitHelpers';
 
 describe('ChainNode Tests', () => {
-  before(async () => {
+  beforeEach(async () => {
     await resetDatabase();
+  });
+
+  it('Creates new ChainNode when', async () => {
+    const controller = new ServerCommunitiesController(models, null, null);
+    const user: UserInstance = buildUser({
+      models,
+      userAttributes: { email: '', id: 1, isAdmin: true },
+    }) as UserInstance;
+    const resp = await controller.createChainNode({
+      user,
+      url: 'wss://',
+      name: 'asd',
+      balanceType: 'ethereum',
+      eth_chain_id: 123,
+    });
+
+    const createdNode = await models.ChainNode.findOne({
+      where: { id: resp.node_id },
+    });
+    assert.equal(createdNode.url, 'wss://');
+    assert.equal(createdNode.name, 'asd');
+    assert.equal(createdNode.balance_type, 'ethereum');
+    assert.equal(createdNode.eth_chain_id, 123);
   });
 
   it('adds eth chain node to db', async () => {
@@ -13,7 +38,7 @@ describe('ChainNode Tests', () => {
       await models.ChainNode.count({
         where: { eth_chain_id: 123 },
       }),
-      0
+      0,
     );
 
     await models.ChainNode.findOrCreate({
@@ -28,7 +53,7 @@ describe('ChainNode Tests', () => {
       await models.ChainNode.count({
         where: { eth_chain_id: 123 },
       }),
-      1
+      1,
     );
   });
 
@@ -38,7 +63,7 @@ describe('ChainNode Tests', () => {
       await models.ChainNode.count({
         where: { eth_chain_id: ethChainId },
       }),
-      0
+      0,
     );
 
     await models.ChainNode.findOrCreate({
@@ -74,7 +99,7 @@ describe('ChainNode Tests', () => {
       await models.ChainNode.count({
         where: { cosmos_chain_id: cosmosChainId },
       }),
-      0
+      0,
     );
 
     await models.ChainNode.findOrCreate({
@@ -90,7 +115,7 @@ describe('ChainNode Tests', () => {
       await models.ChainNode.count({
         where: { cosmos_chain_id: cosmosChainId },
       }),
-      1
+      1,
     );
   });
 
@@ -100,7 +125,7 @@ describe('ChainNode Tests', () => {
       await models.ChainNode.count({
         where: { cosmos_chain_id: cosmosChainId },
       }),
-      0
+      0,
     );
 
     await models.ChainNode.findOrCreate({
@@ -133,7 +158,7 @@ describe('ChainNode Tests', () => {
       await models.ChainNode.count({
         where: { cosmos_chain_id: cosmosChainId },
       }),
-      1
+      1,
     );
   });
 });

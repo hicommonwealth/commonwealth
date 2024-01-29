@@ -16,7 +16,7 @@ const isCommunityAdmin = (account?: Account) => {
     app.user.activeAccount &&
     app.roles.isRoleOfCommunity({
       role: ROLES.ADMIN,
-      chain: app.activeChainId(),
+      community: app.activeChainId(),
       ...(account && { account }),
     })
   );
@@ -27,7 +27,7 @@ const isCommunityModerator = (account?: Account) => {
     app.user.activeAccount &&
     app.roles.isRoleOfCommunity({
       role: ROLES.MODERATOR,
-      chain: app.activeChainId(),
+      community: app.activeChainId(),
       ...(account && { account }),
     })
   );

@@ -1,6 +1,6 @@
-import { BigNumber, providers } from 'ethers';
-import { IAaveGovernanceV2__factory } from 'common-common/src/eth/types';
+import { IAaveGovernanceV2__factory } from '@hicommonwealth/chains';
 import { IAaveVoteResponse } from 'adapters/chain/aave/types';
+import { BigNumber, providers } from 'ethers';
 
 type VoteEventArgsArray = [BigNumber, string, boolean, BigNumber];
 type VoteEventArgsObject = {
@@ -11,7 +11,7 @@ type VoteEventArgsObject = {
 };
 
 export function formatAaveProposalVote(
-  vote: VoteEventArgsObject
+  vote: VoteEventArgsObject,
 ): IAaveVoteResponse {
   const aaveResponse: IAaveVoteResponse = {
     id: +vote.id,
@@ -26,11 +26,11 @@ export function formatAaveProposalVote(
 export async function getAaveProposalVotes(
   aaveGovAddress: string,
   provider: providers.Web3Provider,
-  proposalId: number
+  proposalId: number,
 ): Promise<VoteEventArgsObject[]> {
   const govContract = IAaveGovernanceV2__factory.connect(
     aaveGovAddress,
-    provider
+    provider,
   );
   await govContract.deployed();
 
@@ -41,7 +41,7 @@ export async function getAaveProposalVotes(
   >(
     govContract.filters.VoteEmitted(null, null, null, null),
     proposal.startBlock.toNumber(),
-    proposal.endBlock.toNumber()
+    proposal.endBlock.toNumber(),
   );
 
   const voteArgs: VoteEventArgsObject[] = [];

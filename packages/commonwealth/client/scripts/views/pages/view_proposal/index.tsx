@@ -1,42 +1,42 @@
-import React, { useState, useEffect } from 'react';
-import { ChainNetwork } from 'common-common/src/types';
-import _ from 'lodash';
-import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
+import { ChainNetwork } from '@hicommonwealth/core';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
+import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
+import useForceRerender from 'hooks/useForceRerender';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
-import useForceRerender from 'hooks/useForceRerender';
 import {
   chainToProposalSlug,
   getProposalUrlPath,
   idToProposal,
 } from 'identifiers';
+import _ from 'lodash';
 import { useCommonNavigate } from 'navigation/helpers';
+import React, { useEffect, useState } from 'react';
 import app from 'state';
-import { slugify } from 'utils';
-import { PageNotFound } from 'views/pages/404';
-import { PageLoading } from 'views/pages/loading';
-import type { AnyProposal } from '../../../models/types';
-import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
-import { CWContentPage } from '../../components/component_kit/CWContentPage';
-import { VotingActions } from '../../components/proposals/voting_actions';
-import { VotingResults } from '../../components/proposals/voting_results';
-import { Skeleton } from '../../components/Skeleton';
-import { AaveViewProposalDetail } from './aave_summary';
-import type { SubheaderProposalType } from './proposal_components';
-import { ProposalSubheader } from './proposal_components';
-import { JSONDisplay } from './json_display';
-import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
+import { usePoolParamsQuery } from 'state/api/chainParams';
 import {
   useAaveProposalsQuery,
   useCompoundProposalsQuery,
+  useCosmosProposalDepositsQuery,
   useCosmosProposalMetadataQuery,
   useCosmosProposalQuery,
   useCosmosProposalTallyQuery,
   useCosmosProposalVotesQuery,
-  useCosmosProposalDepositsQuery,
 } from 'state/api/proposals';
-import { usePoolParamsQuery } from 'state/api/chainParams';
+import { slugify } from 'utils';
+import { PageNotFound } from 'views/pages/404';
+import { PageLoading } from 'views/pages/loading';
+import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
+import type { AnyProposal } from '../../../models/types';
+import { Skeleton } from '../../components/Skeleton';
+import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
+import { CWContentPage } from '../../components/component_kit/CWContentPage';
+import { VotingActions } from '../../components/proposals/voting_actions';
+import { VotingResults } from '../../components/proposals/voting_results';
+import { AaveViewProposalDetail } from './aave_summary';
+import { JSONDisplay } from './json_display';
+import type { SubheaderProposalType } from './proposal_components';
+import { ProposalSubheader } from './proposal_components';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -73,7 +73,7 @@ const ViewProposalPage = ({
     setProposal(cosmosProposal);
     setTitle(cosmosProposal?.title);
     setDescription(cosmosProposal?.description);
-  }, [cosmosProposal, app.chain.apiInitialized]);
+  }, [cosmosProposal]);
 
   useEffect(() => {
     if (_.isEmpty(metadata)) return;
@@ -104,7 +104,7 @@ const ViewProposalPage = ({
   const { data: cachedAaveProposals, isLoading: aaveProposalsLoading } =
     useAaveProposalsQuery({
       moduleReady: fetchAaveData,
-      chainId: app.chain?.id,
+      communityId: app.chain?.id,
     });
 
   const onCompound = app.chain?.network === ChainNetwork.Compound;
@@ -112,29 +112,39 @@ const ViewProposalPage = ({
   const { data: cachedCompoundProposals, isLoading: compoundProposalsLoading } =
     useCompoundProposalsQuery({
       moduleReady: fetchCompoundData,
-      chainId: app.chain?.id,
+      communityId: app.chain?.id,
     });
 
   useEffect(() => {
     if (!aaveProposalsLoading && fetchAaveData && !proposal) {
       const foundProposal = cachedAaveProposals?.find(
-        (p) => p.identifier === proposalId
+        (p) => p.identifier === proposalId,
       );
 
       if (!foundProposal?.ipfsData) {
         foundProposal.ipfsDataReady.once('ready', () =>
-          setProposal(foundProposal)
+          setProposal(foundProposal),
         );
       } else {
         setProposal(foundProposal);
       }
     } else if (!compoundProposalsLoading && fetchCompoundData && !proposal) {
       const foundProposal = cachedCompoundProposals?.find(
-        (p) => p.identifier === proposalId
+        (p) => p.identifier === proposalId,
       );
       setProposal(foundProposal);
     }
-  }, [cachedAaveProposals, cachedCompoundProposals, isAdapterLoaded]);
+  }, [
+    cachedAaveProposals,
+    cachedCompoundProposals,
+    isAdapterLoaded,
+    aaveProposalsLoading,
+    compoundProposalsLoading,
+    fetchAaveData,
+    fetchCompoundData,
+    proposal,
+    proposalId,
+  ]);
 
   useNecessaryEffect(() => {
     const afterAdapterLoaded = async () => {
@@ -176,7 +186,7 @@ const ViewProposalPage = ({
       const newPath = getProposalUrlPath(
         proposal.slug,
         `${proposalId}-${slugTitle}`,
-        true
+        true,
       );
       navigate(newPath, { replace: true });
     }

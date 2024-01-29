@@ -21,6 +21,10 @@
     background-color: $neutral-50;
   }
 
+  .sidebar-header-wrapper {
+    background-color: $neutral-50;
+  }
+
   .sidebar-default-menu {
     border-right: 1px solid $neutral-200;
     display: flex;
@@ -60,9 +64,12 @@
 
     background-color: $neutral-25;
     border-right: 1px solid $neutral-200;
-    height: calc(
-      100vh - (#{$global-header-height} + #{$global-sidebar-header-height})
-    );
+    height: 100%;
+
+    &.heightInsideCommunity {
+      height: calc(100% - #{$global-sidebar-header-height}) !important;
+    }
+
     overflow: auto;
     width: calc(calc(#{$sidebar-width} + #{$quick-switcher-width}) + 1px);
 

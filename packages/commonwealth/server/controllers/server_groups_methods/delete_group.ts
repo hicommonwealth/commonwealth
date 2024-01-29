@@ -1,9 +1,11 @@
+import { AppError } from '@hicommonwealth/adapters';
+import {
+  AddressInstance,
+  CommunityInstance,
+  UserInstance,
+  sequelize,
+} from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import { AppError } from '../../../../common-common/src/errors';
-import { sequelize } from '../../database';
-import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/community';
-import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
@@ -23,7 +25,7 @@ export type DeleteGroupResult = void;
 
 export async function __deleteGroup(
   this: ServerCommunitiesController,
-  { user, community, groupId }: DeleteGroupOptions
+  { user, community, groupId }: DeleteGroupOptions,
 ): Promise<DeleteGroupResult> {
   const isAdmin = await validateOwner({
     models: this.models,
@@ -31,7 +33,7 @@ export async function __deleteGroup(
     communityId: community.id,
     allowMod: true,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError(Errors.Unauthorized);
@@ -54,7 +56,7 @@ export async function __deleteGroup(
         group_ids: sequelize.fn(
           'array_remove',
           sequelize.col('group_ids'),
-          group.id
+          group.id,
         ),
       },
       {
@@ -64,13 +66,14 @@ export async function __deleteGroup(
           },
         },
         transaction,
-      }
+      },
     );
     // delete all memberships of group
     await this.models.Membership.destroy({
       where: {
         group_id: group.id,
       },
+      transaction,
     });
     // delete group
     await this.models.Group.destroy({

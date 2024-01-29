@@ -1,31 +1,36 @@
-import { DB } from '../models';
+import { DB } from '@hicommonwealth/model';
 import BanCache from '../util/banCheckCache';
-import { TokenBalanceCache } from '../../../token-balance-cache/src';
-import {
-  RefreshMembershipOptions,
-  RefreshMembershipResult,
-  __refreshMembership,
-} from './server_groups_methods/refresh_membership';
-import {
-  GetGroupsOptions,
-  GetGroupsResult,
-  __getGroups,
-} from './server_groups_methods/get_groups';
+import { TokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
 import {
   CreateGroupOptions,
   CreateGroupResult,
   __createGroup,
 } from './server_groups_methods/create_group';
 import {
-  UpdateGroupOptions,
-  UpdateGroupResult,
-  __updateGroup,
-} from './server_groups_methods/update_group';
-import {
   DeleteGroupOptions,
   DeleteGroupResult,
   __deleteGroup,
 } from './server_groups_methods/delete_group';
+import {
+  GetGroupsOptions,
+  GetGroupsResult,
+  __getGroups,
+} from './server_groups_methods/get_groups';
+import {
+  RefreshCommunityMembershipsOptions,
+  RefreshCommunityMembershipsResult,
+  __refreshCommunityMemberships,
+} from './server_groups_methods/refresh_community_memberships';
+import {
+  RefreshMembershipOptions,
+  RefreshMembershipResult,
+  __refreshMembership,
+} from './server_groups_methods/refresh_membership';
+import {
+  UpdateGroupOptions,
+  UpdateGroupResult,
+  __updateGroup,
+} from './server_groups_methods/update_group';
 
 /**
  * Implements methods related to groups
@@ -34,13 +39,19 @@ export class ServerGroupsController {
   constructor(
     public models: DB,
     public tokenBalanceCache: TokenBalanceCache,
-    public banCache: BanCache
+    public banCache: BanCache,
   ) {}
 
   async refreshMembership(
-    options: RefreshMembershipOptions
+    options: RefreshMembershipOptions,
   ): Promise<RefreshMembershipResult> {
     return __refreshMembership.call(this, options);
+  }
+
+  async refreshCommunityMemberships(
+    options: RefreshCommunityMembershipsOptions,
+  ): Promise<RefreshCommunityMembershipsResult> {
+    return __refreshCommunityMemberships.call(this, options);
   }
 
   async getGroups(options: GetGroupsOptions): Promise<GetGroupsResult> {

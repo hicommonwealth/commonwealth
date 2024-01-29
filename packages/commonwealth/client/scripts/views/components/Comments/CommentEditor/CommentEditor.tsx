@@ -1,11 +1,8 @@
-import BN from 'bn.js';
+import { ContentType } from '@hicommonwealth/core';
 import Account from 'client/scripts/models/Account';
 import clsx from 'clsx';
-import { getDecimals, weiToTokens } from 'helpers';
 import type { DeltaStatic } from 'quill';
 import React from 'react';
-import app from 'state';
-import { ContentType } from 'types';
 import { User } from 'views/components/user/user';
 import { CWText } from '../../component_kit/cw_text';
 import { CWValidationText } from '../../component_kit/cw_validation_text';
@@ -20,12 +17,8 @@ type CommentEditorProps = {
   errorMsg: string;
   contentDelta: DeltaStatic;
   setContentDelta: React.Dispatch<React.SetStateAction<DeltaStatic>>;
-  tokenPostingThreshold: BN;
-  topicName: string;
-  userBalance: BN;
   disabled: boolean;
   onCancel: (e: any) => void;
-  isAdmin: boolean;
   author: Account;
   editorValue: string;
   shouldFocus: boolean;
@@ -39,19 +32,13 @@ export const CommentEditor = ({
   errorMsg,
   contentDelta,
   setContentDelta,
-  tokenPostingThreshold,
-  topicName,
-  userBalance,
   disabled,
   onCancel,
-  isAdmin,
   author,
   editorValue,
   shouldFocus,
   tooltipText,
 }: CommentEditorProps) => {
-  const decimals = getDecimals(app.chain);
-
   return (
     <div className="CommentEditor">
       <div className="attribution-row">
@@ -66,7 +53,7 @@ export const CommentEditor = ({
           >
             <User
               userAddress={author?.address}
-              userChainId={author?.community.id}
+              userCommunityId={author?.community.id}
               shouldHideAvatar
               shouldLinkProfile
             />
@@ -82,19 +69,6 @@ export const CommentEditor = ({
         tooltipLabel={tooltipText}
         shouldFocus={shouldFocus}
       />
-      {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
-        <CWText className="token-req-text">
-          Commenting in {topicName} requires{' '}
-          {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
-          {app.chain.meta.default_symbol}.{' '}
-          {userBalance && (
-            <>
-              You have {weiToTokens(userBalance.toString(), decimals)}{' '}
-              {app.chain.meta.default_symbol}.
-            </>
-          )}
-        </CWText>
-      )}
       <div className="form-bottom">
         <div className="form-buttons">
           {editorValue.length > 0 && (
@@ -102,7 +76,7 @@ export const CommentEditor = ({
           )}
           <CWButton
             buttonWidth="wide"
-            disabled={disabled && !isAdmin}
+            disabled={disabled}
             onClick={handleSubmitComment}
             label="Submit"
           />

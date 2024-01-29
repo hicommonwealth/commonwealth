@@ -4,10 +4,11 @@ import type { DeltaStatic } from 'quill';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 
+import { ViewCommentUpvotesDrawer } from 'client/scripts/views/components/UpvoteDrawer';
 import type Comment from 'models/Comment';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
@@ -86,6 +87,7 @@ export const CommentCard = ({
     useState<boolean>(false);
   const [verifiedAction, setVerifiedAction] = useState<Action>();
   const [verifiedSession, setVerifiedSession] = useState<Session>();
+  const [onReaction, setOnReaction] = useState<boolean>(false);
 
   useEffect(() => {
     try {
@@ -111,6 +113,10 @@ export const CommentCard = ({
       return;
     }
   }, [comment.canvasAction, comment.canvasSession]);
+
+  const handleReaction = () => {
+    setOnReaction((prevOnReaction) => !prevOnReaction);
+  };
 
   return (
     <div className="comment-body">
@@ -170,13 +176,17 @@ export const CommentCard = ({
                 comment={comment}
                 disabled={!canReact}
                 tooltipText={disabledActionsTooltipText}
+                onReaction={handleReaction}
               />
+
+              <ViewCommentUpvotesDrawer comment={comment} />
 
               <SharePopover commentId={comment.id} />
 
               {!isThreadArchived && replyBtnVisible && (
                 <CWThreadAction
                   action="reply"
+                  label="Reply"
                   disabled={maxReplyLimitReached || !canReply}
                   tooltipText={
                     disabledActionsTooltipText

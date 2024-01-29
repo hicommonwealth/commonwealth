@@ -1,51 +1,56 @@
-import { DB } from '../models';
+import { DB } from '@hicommonwealth/model';
 import BanCache from '../util/banCheckCache';
-import { TokenBalanceCache } from '../../../token-balance-cache/src';
+import { TokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
+import {
+  __createChainNode,
+  CreateChainNodeOptions,
+  CreateChainNodeResult,
+} from './server_communities_methods/create_chain_node';
+import {
+  __createCommunity,
+  CreateCommunityOptions,
+  CreateCommunityResult,
+} from './server_communities_methods/create_community';
+import {
+  __deleteCommunity,
+  DeleteCommunityOptions,
+  DeleteCommunityResult,
+} from './server_communities_methods/delete_community';
+import {
+  __getChainNodes,
+  GetChainNodesOptions,
+  GetChainNodesResult,
+} from './server_communities_methods/get_chain_nodes';
+import {
+  __getCommunities,
+  GetCommunitiesOptions,
+  GetCommunitiesResult,
+} from './server_communities_methods/get_communities';
+import {
+  __getCommunityStake,
+  GetCommunityStakeOptions,
+  GetCommunityStakeResult,
+} from './server_communities_methods/get_community_stake';
 import {
   __getRelatedCommunities,
   GetRelatedCommunitiesQuery,
-  GetRelatedCommunitiesResult
+  GetRelatedCommunitiesResult,
 } from './server_communities_methods/get_related_communities';
 import {
+  __putCommunityStake,
+  PutCommunityStakeOptions,
+  PutCommunityStakeResult,
+} from './server_communities_methods/put_community_stake';
+import {
+  __searchCommunities,
   SearchCommunitiesOptions,
   SearchCommunitiesResult,
-  __searchCommunities,
 } from './server_communities_methods/search_communities';
 import {
-  GetCommunitiesOptions,
-  GetCommunitiesResult,
-  __getCommunities,
-} from './server_communities_methods/get_communities';
-import {
-  GetChainNodesOptions,
-  GetChainNodesResult,
-  __getChainNodes,
-} from './server_communities_methods/get_chain_nodes';
-import {
-  CreateCommunityOptions,
-  CreateCommunityResult,
-  __createCommunity,
-} from './server_communities_methods/create_community';
-import {
-  DeleteCommunityOptions,
-  DeleteCommunityResult,
-  __deleteCommunity,
-} from './server_communities_methods/delete_community';
-import {
+  __updateCommunity,
   UpdateCommunityOptions,
   UpdateCommunityResult,
-  __updateCommunity,
 } from './server_communities_methods/update_community';
-import {
-  GetCommunityStatsOptions,
-  GetCommunityStatsResult,
-  __getCommunityStats,
-} from './server_communities_methods/get_community_stats';
-import {
-  CreateChainNodeOptions,
-  CreateChainNodeResult,
-  __createChainNode,
-} from './server_communities_methods/create_chain_node';
 
 /**
  * Implements methods related to communities
@@ -54,60 +59,66 @@ export class ServerCommunitiesController {
   constructor(
     public models: DB,
     public tokenBalanceCache: TokenBalanceCache,
-    public banCache: BanCache
+    public banCache: BanCache,
   ) {}
 
   async searchCommunities(
-    options: SearchCommunitiesOptions
+    options: SearchCommunitiesOptions,
   ): Promise<SearchCommunitiesResult> {
     return __searchCommunities.call(this, options);
   }
 
   async getCommunities(
-    options: GetCommunitiesOptions
+    options: GetCommunitiesOptions,
   ): Promise<GetCommunitiesResult> {
     return __getCommunities.call(this, options);
   }
 
   async createCommunity(
-    options: CreateCommunityOptions
+    options: CreateCommunityOptions,
   ): Promise<CreateCommunityResult> {
     return __createCommunity.call(this, options);
   }
 
   async updateCommunity(
-    options: UpdateCommunityOptions
+    options: UpdateCommunityOptions,
   ): Promise<UpdateCommunityResult> {
     return __updateCommunity.call(this, options);
   }
 
   async deleteCommunity(
-    options: DeleteCommunityOptions
+    options: DeleteCommunityOptions,
   ): Promise<DeleteCommunityResult> {
     return __deleteCommunity.call(this, options);
   }
 
-  async getCommunityStats(
-    options: GetCommunityStatsOptions
-  ): Promise<GetCommunityStatsResult> {
-    return __getCommunityStats.call(this, options);
-  }
-
- async getChainNodes(
-    options: GetChainNodesOptions
+  async getChainNodes(
+    options: GetChainNodesOptions,
   ): Promise<GetChainNodesResult> {
     return __getChainNodes.call(this, options);
   }
 
   async createChainNode(
-    options: CreateChainNodeOptions
+    options: CreateChainNodeOptions,
   ): Promise<CreateChainNodeResult> {
     return __createChainNode.call(this, options);
   }
 
   async getRelatedCommunities(
-    options: GetRelatedCommunitiesQuery
+    options: GetRelatedCommunitiesQuery,
   ): Promise<GetRelatedCommunitiesResult> {
     return __getRelatedCommunities.call(this, options);
+  }
+
+  async putCommunityStake(
+    options: PutCommunityStakeOptions,
+  ): Promise<PutCommunityStakeResult> {
+    return __putCommunityStake.call(this, options);
+  }
+
+  async getCommunityStake(
+    options: GetCommunityStakeOptions,
+  ): Promise<GetCommunityStakeResult> {
+    return __getCommunityStake.call(this, options);
   }
 }

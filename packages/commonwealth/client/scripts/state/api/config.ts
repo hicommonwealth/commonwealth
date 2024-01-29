@@ -12,6 +12,7 @@ export const ApiEndpoints = {
   // endpoint builder functions like getEndpoint(id) => /endpoint/:id should have camel cased keys
   // stand alone endpoints should be have upper snake case keys so we can easily tell them apart in code
   BULK_TOPICS: '/topics',
+  FETCH_ADMIN: '/roles',
   FETCH_COMMENTS: '/viewComments',
   FETCH_RELATED_COMMUNITIES: '/relatedCommunities',
   FETCH_THREADS: '/threads',
@@ -21,6 +22,7 @@ export const ApiEndpoints = {
   FETCH_PROPOSAL_VOTES: '/proposalVotes',
   FETCH_GROUPS: '/groups',
   REFRESH_MEMBERSHIP: '/refresh-membership',
+  FETCH_WEBHOOKS: '/getWebhooks',
   searchThreads: (searchTerm: string) => `/threads?search=${searchTerm}`,
   searchComments: (searchTerm: string) => `/comments?search=${searchTerm}`,
   searchProfiles: (searchTerm: string) => `/profiles?search=${searchTerm}`,

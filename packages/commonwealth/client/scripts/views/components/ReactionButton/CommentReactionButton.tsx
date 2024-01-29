@@ -19,12 +19,14 @@ type CommentReactionButtonProps = {
   comment: Comment<any>;
   disabled: boolean;
   tooltipText?: string;
+  onReaction?: () => void;
 };
 
 export const CommentReactionButton = ({
   comment,
   disabled,
   tooltipText = '',
+  onReaction,
 }: CommentReactionButtonProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
@@ -36,7 +38,7 @@ export const CommentReactionButton = ({
   } = useCreateCommentReactionMutation({
     threadId: comment.threadId,
     commentId: comment.id,
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
   const {
     mutateAsync: deleteCommentReaction,
@@ -44,7 +46,7 @@ export const CommentReactionButton = ({
     reset: resetDeleteCommentReaction,
   } = useDeleteCommentReactionMutation({
     commentId: comment.id,
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: comment.threadId,
   });
 
@@ -59,7 +61,7 @@ export const CommentReactionButton = ({
 
   const activeAddress = app.user.activeAccount?.address;
   const hasReacted = !!(comment.reactions || []).find(
-    (x) => x?.author === activeAddress
+    (x) => x?.author === activeAddress,
   );
   const likes = (comment.reactions || []).length;
 
@@ -72,12 +74,14 @@ export const CommentReactionButton = ({
       return;
     }
 
+    onReaction();
+
     if (hasReacted) {
       const foundReaction = comment.reactions.find((r) => {
         return r.author === activeAddress;
       });
       deleteCommentReaction({
-        chainId: app.activeChainId(),
+        communityId: app.activeChainId(),
         address: app.user.activeAccount.address,
         canvasHash: foundReaction.canvasHash,
         reactionId: foundReaction.id,
@@ -85,14 +89,14 @@ export const CommentReactionButton = ({
         if (err instanceof SessionKeyError) {
           return;
         }
-        console.error(err?.responseJSON?.error || err?.message);
+        console.error(err.response.data.error || err?.message);
         notifyError('Failed to update reaction count');
       });
     } else {
       createCommentReaction({
         address: activeAddress,
         commentId: comment.id,
-        chainId: app.activeChainId(),
+        communityId: app.activeChainId(),
         threadId: comment.threadId,
       }).catch((err) => {
         if (err instanceof SessionKeyError) {
@@ -117,9 +121,8 @@ export const CommentReactionButton = ({
         voteCount={likes}
         disabled={!hasJoinedCommunity || disabled}
         selected={hasReacted}
-        onMouseEnter={() => undefined}
         onClick={handleVoteClick}
-        tooltipContent={getDisplayedReactorsForPopup({
+        popoverContent={getDisplayedReactorsForPopup({
           reactors: (comment.reactions || []).map((r) => r.author),
         })}
         tooltipText={tooltipText}

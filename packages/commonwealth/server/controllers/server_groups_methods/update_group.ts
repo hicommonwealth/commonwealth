@@ -1,16 +1,21 @@
+import { AppError } from '@hicommonwealth/adapters';
+import { Requirement } from '@hicommonwealth/core';
+import {
+  AddressInstance,
+  CommunityInstance,
+  GroupAttributes,
+  GroupMetadata,
+  TopicInstance,
+  UserInstance,
+  sequelize,
+} from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import { TopicInstance } from 'server/models/topic';
-import { AppError } from '../../../../common-common/src/errors';
-import { sequelize } from '../../database';
-import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/community';
-import { GroupAttributes, GroupMetadata } from '../../models/group';
-import { UserInstance } from '../../models/user';
-import { Requirement } from '../../util/requirementsModule/requirementsTypes';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import validateMetadata from '../../util/requirementsModule/validateMetadata';
 import validateRequirements from '../../util/requirementsModule/validateRequirements';
 import { validateOwner } from '../../util/validateOwner';
-import { ServerCommunitiesController } from '../server_communities_controller';
+import { TrackOptions } from '../server_analytics_methods/track';
+import { ServerGroupsController } from '../server_groups_controller';
 
 const Errors = {
   InvalidMetadata: 'Invalid metadata',
@@ -30,10 +35,10 @@ export type UpdateGroupOptions = {
   topics?: number[];
 };
 
-export type UpdateGroupResult = GroupAttributes;
+export type UpdateGroupResult = [GroupAttributes, TrackOptions];
 
 export async function __updateGroup(
-  this: ServerCommunitiesController,
+  this: ServerGroupsController,
   {
     user,
     community,
@@ -49,7 +54,7 @@ export async function __updateGroup(
     communityId: community.id,
     allowMod: true,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError(Errors.Unauthorized);
@@ -78,7 +83,7 @@ export async function __updateGroup(
         id: {
           [Op.in]: topics || [],
         },
-        chain_id: community.id,
+        community_id: community.id,
       },
     });
     if (topics?.length > 0 && topics.length !== topicsToAssociate.length) {
@@ -169,5 +174,11 @@ export async function __updateGroup(
     }
   });
 
-  return group.toJSON();
+  const analyticsOptions = {
+    event: MixpanelCommunityInteractionEvent.UPDATE_GROUP,
+    community: community.id,
+    userId: user.id,
+  };
+
+  return [group.toJSON(), analyticsOptions];
 }

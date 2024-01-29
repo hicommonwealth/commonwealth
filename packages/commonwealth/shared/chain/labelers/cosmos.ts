@@ -1,7 +1,7 @@
+import { SupportedNetwork } from '@hicommonwealth/core';
 import type { IEventData } from '../types/cosmos';
 import { EventKind } from '../types/cosmos';
 import { IEventLabel, LabelerFilter } from './util';
-import { SupportedNetwork } from '../types/types';
 
 function fmtAddr(addr: string) {
   if (!addr) return '';
@@ -15,7 +15,7 @@ function fmtAddr(addr: string) {
  */
 export const Label: LabelerFilter = (
   chainId: string,
-  data: IEventData
+  data: IEventData,
 ): IEventLabel => {
   switch (data.kind) {
     case EventKind.SubmitProposal:
@@ -44,7 +44,7 @@ export const Label: LabelerFilter = (
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const _exhaustiveMatch: never = data;
       throw new Error(
-        `[${SupportedNetwork.Cosmos}::${chainId}]: Unknown event type`
+        `[${SupportedNetwork.Cosmos}::${chainId}]: Unknown event type`,
       );
     }
   }

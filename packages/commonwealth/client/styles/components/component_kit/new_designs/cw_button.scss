@@ -73,8 +73,6 @@
   }
 
   .Button {
-    font-family: $font-family-neue-haas-unica;
-    font-weight: 500;
     align-items: center;
     border: 2px solid transparent;
     border-radius: $border-radius-corners-wider;
@@ -125,9 +123,6 @@
     &.sm,
     &.med {
       gap: 0.625rem;
-      .Text.button-text {
-        font-size: 0.875rem;
-      }
 
       .Icon {
         height: 1rem;
@@ -241,6 +236,56 @@
 
       &.disabled {
         background-color: $neutral-200;
+        @include iconAndTextColors($neutral-400, $neutral-400);
+      }
+    }
+
+    &.green {
+      background-color: $green-50;
+      @include iconAndTextColors($neutral-800, $neutral-700);
+
+      &:hover {
+        background-color: $green-100;
+        @include iconAndTextColors($neutral-800, $neutral-800);
+      }
+
+      &:active {
+        background-color: $green-50;
+        @include iconAndTextColors($neutral-800, $neutral-700);
+      }
+
+      &:focus {
+        background-color: $green-100;
+        @include iconAndTextColors($neutral-800, $neutral-800);
+      }
+
+      &.disabled {
+        background-color: $neutral-50;
+        @include iconAndTextColors($neutral-400, $neutral-400);
+      }
+    }
+
+    &.rorange {
+      background-color: $rorange-50;
+      @include iconAndTextColors($neutral-800, $neutral-700);
+
+      &:hover {
+        background-color: $rorange-100;
+        @include iconAndTextColors($neutral-800, $neutral-800);
+      }
+
+      &:active {
+        background-color: $rorange-50;
+        @include iconAndTextColors($neutral-800, $neutral-700);
+      }
+
+      &:focus {
+        background-color: $rorange-100;
+        @include iconAndTextColors($neutral-800, $neutral-800);
+      }
+
+      &.disabled {
+        background-color: $neutral-50;
         @include iconAndTextColors($neutral-400, $neutral-400);
       }
     }

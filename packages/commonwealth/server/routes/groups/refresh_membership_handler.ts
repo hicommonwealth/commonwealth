@@ -1,8 +1,8 @@
-import { TypedRequestBody, TypedResponse, success } from '../../types';
-import { ServerControllers } from '../../routing/router';
-import { RefreshMembershipResult } from '../../controllers/server_groups_methods/refresh_membership';
-import { AppError } from '../../../../common-common/src/errors';
+import { AppError } from '@hicommonwealth/adapters';
 import z from 'zod';
+import { RefreshMembershipResult } from '../../controllers/server_groups_methods/refresh_membership';
+import { ServerControllers } from '../../routing/router';
+import { TypedRequestBody, TypedResponse, success } from '../../types';
 
 type RefreshMembershipBody = {
   topic_id: number;
@@ -12,9 +12,9 @@ type RefreshMembershipResponse = RefreshMembershipResult;
 export const refreshMembershipHandler = async (
   controllers: ServerControllers,
   req: TypedRequestBody<RefreshMembershipBody>,
-  res: TypedResponse<RefreshMembershipResponse>
+  res: TypedResponse<RefreshMembershipResponse>,
 ) => {
-  const { user, address, chain } = req;
+  const { user, address, community } = req;
 
   const schema = z.object({
     body: z.object({
@@ -32,7 +32,7 @@ export const refreshMembershipHandler = async (
 
   const result = await controllers.groups.refreshMembership({
     user,
-    community: chain,
+    community,
     address,
     topicId: topic_id,
   });

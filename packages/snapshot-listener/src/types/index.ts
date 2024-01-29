@@ -1,9 +1,9 @@
-import type { ISnapshotNotification } from 'common-common/src/types';
+import type { ISnapshotNotification } from '@hicommonwealth/core';
 
 export abstract class EventHandler<DBEventType = ISnapshotNotification> {
   public abstract handle(
     event: ISnapshotNotification,
-    dbEvent?: DBEventType
+    dbEvent?: DBEventType,
   ): Promise<DBEventType>;
 }
 

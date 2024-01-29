@@ -1,4 +1,4 @@
-import { DB } from '../models';
+import { DB } from '@hicommonwealth/model';
 import BanCache from '../util/banCheckCache';
 import {
   DeleteReactionOptions,
@@ -14,7 +14,7 @@ export class ServerReactionsController {
   constructor(public models: DB, public banCache: BanCache) {}
 
   async deleteReaction(
-    options: DeleteReactionOptions
+    options: DeleteReactionOptions,
   ): Promise<DeleteReactionResult> {
     return __deleteReaction.call(this, options);
   }

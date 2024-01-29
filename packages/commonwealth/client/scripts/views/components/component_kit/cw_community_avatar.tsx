@@ -17,7 +17,7 @@ type CommunityAvatarProps = {
 const CWCommunityAvatarSkeleton = () => {
   return (
     <div className={ComponentType.CommunityAvatar}>
-      <Skeleton circle width={16} height={16} />
+      <Skeleton circle width={31} height={31} />
     </div>
   );
 };
@@ -36,7 +36,7 @@ export const CWCommunityAvatar = (props: CommunityAvatarProps) => {
     <div
       className={getClasses<{ onClick: boolean; size: IconSize }>(
         { onClick: !!onClick, size },
-        ComponentType.CommunityAvatar
+        ComponentType.CommunityAvatar,
       )}
       onClick={onClick}
     >
