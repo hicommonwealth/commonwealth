@@ -43,7 +43,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         },
         goerli: {
           id: 1263,
-          url: 'https://rpc.ankr.com/eth_goerli',
+          url: 'https://ethereum-goerli.publicnode.com',
           name: 'Goerli Testnet',
           eth_chain_id: 5,
           balance_type: BalanceType.Ethereum,

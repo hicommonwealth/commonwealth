@@ -48,7 +48,7 @@ export const validateNamespace = async (
 
   //tx data validation
   const txReceipt = await web3.eth.getTransactionReceipt(txHash);
-  if (!txReceipt.status) {
+  if (!txReceipt?.status) {
     throw new AppError('tx failed');
   }
   if (txReceipt.from.toLowerCase() !== address.toLowerCase()) {
