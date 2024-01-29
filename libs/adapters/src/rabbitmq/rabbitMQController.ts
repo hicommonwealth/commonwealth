@@ -1,9 +1,7 @@
-import { logger, stats } from '@hicommonwealth/core';
+import { ILogger, logger } from '@hicommonwealth/core';
 import * as Rascal from 'rascal';
 import type Rollbar from 'rollbar';
 import type { Sequelize } from 'sequelize';
-import { HotShotsStats } from '../hot-shots';
-import { TypescriptLoggingLogger } from '../typescript-logging';
 import type {
   RascalPublications,
   RascalSubscriptions,
@@ -11,9 +9,6 @@ import type {
   TRmqMessages,
 } from './types';
 import { AbstractRabbitMQController, RmqMsgFormatError } from './types';
-
-const log = logger(TypescriptLoggingLogger()).getLogger(__filename);
-stats(HotShotsStats());
 
 export class RabbitMQControllerError extends Error {
   constructor(msg: string) {
@@ -40,12 +35,15 @@ export class RabbitMQController extends AbstractRabbitMQController {
   public readonly publishers: string[];
   protected readonly _rawVhost: any;
   protected rollbar: Rollbar;
+  private _log: ILogger;
 
   constructor(
     protected readonly _rabbitMQConfig: Rascal.BrokerConfig,
     rollbar?: Rollbar,
   ) {
     super();
+
+    this._log = logger().getLogger(__filename);
 
     // sets the first vhost config to _rawVhost
     this._rawVhost =
@@ -61,30 +59,32 @@ export class RabbitMQController extends AbstractRabbitMQController {
   }
 
   public async init(): Promise<void> {
-    log.info(`Rascal connecting to RabbitMQ: ${this._rawVhost.connection}`);
+    this._log.info(
+      `Rascal connecting to RabbitMQ: ${this._rawVhost.connection}`,
+    );
 
     this.broker = await Rascal.BrokerAsPromised.create(
       Rascal.withDefaultConfig(this._rabbitMQConfig),
     );
 
     this.broker.on('error', (err, { vhost, connectionUrl }) => {
-      log.error(
+      this._log.error(
         `Broker error on vhost: ${vhost} using url: ${connectionUrl}`,
         err,
       );
     });
     this.broker.on('vhost_initialized', ({ vhost, connectionUrl }) => {
-      log.info(
+      this._log.info(
         `Vhost: ${vhost} was initialised using connection: ${connectionUrl}`,
       );
     });
     this.broker.on('blocked', (reason, { vhost, connectionUrl }) => {
-      log.warn(
+      this._log.warn(
         `Vhost: ${vhost} was blocked using connection: ${connectionUrl}. Reason: ${reason}`,
       );
     });
     this.broker.on('unblocked', ({ vhost, connectionUrl }) => {
-      log.info(
+      this._log.info(
         `Vhost: ${vhost} was unblocked using connection: ${connectionUrl}.`,
       );
     });
@@ -115,7 +115,7 @@ export class RabbitMQController extends AbstractRabbitMQController {
       throw new RabbitMQControllerError('Subscription does not exist');
 
     try {
-      log.info(`Subscribing to ${subscriptionName}`);
+      this._log.info(`Subscribing to ${subscriptionName}`);
       subscription = await this.broker.subscribe(subscriptionName);
 
       subscription.on('message', (message, content, ackOrNack) => {
@@ -133,11 +133,11 @@ export class RabbitMQController extends AbstractRabbitMQController {
             // if the message processor throws because of a message formatting error then we immediately deadLetter the
             // message to avoid re-queuing the message multiple times
             if (e instanceof RmqMsgFormatError) {
-              log.error(`Invalid Message Format Error - ${errorMsg}`, e);
+              this._log.error(`Invalid Message Format Error - ${errorMsg}`, e);
               this.rollbar?.warn(`Invalid Message Format - ${errorMsg}`, e);
               ackOrNack(e, { strategy: 'nack' });
             } else {
-              log.error(`Unknown Error - ${errorMsg}`, e);
+              this._log.error(`Unknown Error - ${errorMsg}`, e);
               this.rollbar?.warn(`Unknown Error - ${errorMsg}`, e);
               ackOrNack(e, [
                 { strategy: 'republish', defer: 2000, attempts: 3 },
@@ -147,11 +147,11 @@ export class RabbitMQController extends AbstractRabbitMQController {
           });
       });
       subscription.on('error', (err) => {
-        log.error(`Subscriber error: ${err}`);
+        this._log.error(`Subscriber error: ${err}`);
         this.rollbar?.warn(`Subscriber error: ${err}`);
       });
       subscription.on('invalid_content', (err, message, ackOrNack) => {
-        log.error(`Invalid content`, err);
+        this._log.error(`Invalid content`, err);
         ackOrNack(err, { strategy: 'nack' });
         this.rollbar?.warn(`Invalid content`, err);
       });
@@ -181,7 +181,7 @@ export class RabbitMQController extends AbstractRabbitMQController {
       publication = await this.broker.publish(publisherName, data);
 
       publication.on('error', (err, messageId) => {
-        log.error(`Publisher error ${messageId}`, err);
+        this._log.error(`Publisher error ${messageId}`, err);
         this.rollbar?.warn(`Publisher error ${messageId}`, err);
         throw new PublishError(err.message);
       });
@@ -240,7 +240,7 @@ export class RabbitMQController extends AbstractRabbitMQController {
       });
     } catch (e) {
       if (e instanceof RabbitMQControllerError) {
-        log.error(
+        this._log.error(
           `RepublishMessages job failure for message: ${JSON.stringify(
             publishData,
           )} to ${publication}.`,
@@ -255,7 +255,7 @@ export class RabbitMQController extends AbstractRabbitMQController {
           e,
         );
       } else {
-        log.error(
+        this._log.error(
           `Sequelize error occurred while setting queued to -1 for ${DB.model.getTableName()} with id: ${objectId}`,
           e,
         );

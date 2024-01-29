@@ -1,8 +1,4 @@
-import {
-  command,
-  type CommandMetadata,
-  type UserAttributes,
-} from '@hicommonwealth/model';
+import { command, type CommandMetadata, type User } from '@hicommonwealth/core';
 import type { Request, RequestHandler, Response } from 'express';
 import { z, ZodSchema } from 'zod';
 
@@ -28,7 +24,7 @@ export const expressCommand =
   ) =>
     res.json(
       await command(md, req.params.id, req.body, {
-        user: req.user as UserAttributes,
+        user: req.user as User,
         address_id: req.body.address_id,
         aggregate_id: req.params.id,
       }),

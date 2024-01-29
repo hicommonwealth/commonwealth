@@ -1,6 +1,6 @@
 import { AppError } from '@hicommonwealth/adapters';
 import { factoryContracts, ValidChains } from '@hicommonwealth/chains';
-import { BalanceSourceType } from '@hicommonwealth/core/build/requirements-types';
+import { BalanceSourceType } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';

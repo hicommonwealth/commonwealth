@@ -1,5 +1,6 @@
+import { Actor, ActorMiddleware } from '@hicommonwealth/core';
 import { Op } from 'sequelize';
-import { Actor, ActorMiddleware, AddressAttributes, Role, models } from '..';
+import { AddressAttributes, Role, models } from '..';
 
 /**
  * TODO: review rules

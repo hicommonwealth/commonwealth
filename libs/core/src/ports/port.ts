@@ -59,13 +59,19 @@ export const dispose = (
 /**
  * Handlers to dispose registered resources on exit or unhandled exceptions
  */
-['SIGINT', 'SIGTERM', 'uncaughtException', 'unhandledRejection'].map((e) => {
-  process.once(e, async (arg?: any) => {
-    console.log(`${e} ${arg !== e ? arg : ''}`);
-    await disposeAndExit(
-      ['uncaughtException', 'unhandledRejection'].includes(e)
-        ? 'ERROR'
-        : 'EXIT',
-    );
-  });
+process.once('SIGINT', async (arg?: any) => {
+  console.log(`SIGINT ${arg !== 'SIGINT' ? arg : ''}`);
+  await disposeAndExit('EXIT');
+});
+process.once('SIGTERM', async (arg?: any) => {
+  console.log(`SIGTERM ${arg !== 'SIGTERM' ? arg : ''}`);
+  await disposeAndExit('EXIT');
+});
+process.once('uncaughtException', async (arg?: any) => {
+  console.error(`uncaughtException ${arg}`);
+  await disposeAndExit('ERROR');
+});
+process.once('unhandledRejection', async (arg?: any) => {
+  console.error(`unhandledRejection ${arg}`);
+  await disposeAndExit('ERROR');
 });

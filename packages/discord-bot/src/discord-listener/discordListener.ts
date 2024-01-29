@@ -1,11 +1,13 @@
 import {
+  HotShotsStats,
   RabbitMQController,
   RascalConfigServices,
   ServiceKey,
+  TypescriptLoggingLogger,
   getRabbitMQConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { logger } from '@hicommonwealth/core';
+import { logger, stats } from '@hicommonwealth/core';
 import {
   Client,
   IntentsBitField,
@@ -21,7 +23,8 @@ import {
 import { DISCORD_TOKEN, RABBITMQ_URI } from '../utils/config';
 import { rollbar } from '../utils/rollbar';
 
-const log = logger().getLogger(__filename);
+const log = logger(TypescriptLoggingLogger()).getLogger(__filename);
+stats(HotShotsStats());
 
 let isServiceHealthy = false;
 
