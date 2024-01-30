@@ -48,15 +48,25 @@ export const TypescriptLoggingLogger = (): Logger => ({
   name: 'TypescriptLoggingLogger',
   dispose: () => Promise.resolve(),
   getLogger: (filename: string, ...ids: string[]) => {
-    // send error/fatal logs to rollbar
     const logger = loggerFactory.getLogger(addPrefix(filename, ids));
     return {
-      ...logger,
-      error: (msg, error) => {
+      trace(msg: string, error?: Error) {
+        logger.trace(msg, error);
+      },
+      debug(msg: string, error?: Error) {
+        logger.debug(msg, error);
+      },
+      info(msg: string, error?: Error) {
+        logger.info(msg, error);
+      },
+      warn(msg: string, error?: Error) {
+        logger.warn(msg, error);
+      },
+      error(msg: string, error?: Error) {
         logger.error(msg, error);
         rollbar.error(msg, error);
       },
-      fatal: (msg, error) => {
+      fatal(msg: string, error?: Error) {
         logger.fatal(msg, error);
         rollbar.critical(msg, error);
       },
