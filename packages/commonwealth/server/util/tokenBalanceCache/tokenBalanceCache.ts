@@ -1,8 +1,8 @@
 import { fromBech32, toBech32 } from '@cosmjs/encoding';
-import { RedisCache } from '@hicommonwealth/adapters';
 import {
   BalanceSourceType,
-  RedisNamespaces,
+  CacheNamespaces,
+  cache,
   logger,
   stats,
 } from '@hicommonwealth/core';
@@ -25,11 +25,7 @@ import {
 const log = logger().getLogger(__filename);
 
 export class TokenBalanceCache {
-  constructor(
-    public models: DB,
-    public redis: RedisCache,
-    public balanceTTL = 300,
-  ) {}
+  constructor(public models: DB, public balanceTTL = 300) {}
 
   /**
    * This is the main function through which all balances should be fetched.
@@ -244,8 +240,8 @@ export class TokenBalanceCache {
   ): Promise<Balances> {
     const balances: Balances = {};
     if (!options.cacheRefresh) {
-      const result = await this.redis.getKeys(
-        RedisNamespaces.Token_Balance,
+      const result = await cache().getKeys(
+        CacheNamespaces.Token_Balance,
         addresses.map((address) => this.buildCacheKey(options, address)),
       );
       if (result !== false) {
@@ -263,8 +259,8 @@ export class TokenBalanceCache {
 
   private async cacheBalances(options: GetBalancesOptions, balances: Balances) {
     if (Object.keys(balances).length > 0) {
-      await this.redis.setKeys(
-        RedisNamespaces.Token_Balance,
+      await cache().setKeys(
+        CacheNamespaces.Token_Balance,
         Object.keys(balances).reduce((result, address) => {
           const transformedKey = this.buildCacheKey(options, address);
           result[transformedKey] = balances[address];

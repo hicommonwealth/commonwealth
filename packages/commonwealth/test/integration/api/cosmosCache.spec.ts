@@ -4,7 +4,7 @@
 /* eslint-disable max-len */
 require('dotenv').config();
 import { connectToRedis } from '@hicommonwealth/adapters';
-import { RedisNamespaces } from '@hicommonwealth/core';
+import { CacheNamespaces } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import {
@@ -39,7 +39,7 @@ async function verifyCacheResponse(key, res, resEarlier) {
 }
 
 describe('Cosmos Cache', () => {
-  const route_namespace: RedisNamespaces = RedisNamespaces.Route_Response;
+  const route_namespace: CacheNamespaces = CacheNamespaces.Route_Response;
 
   before(async () => {
     await resetDatabase();

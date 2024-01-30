@@ -9,13 +9,15 @@ import {
   setupStakingExtension,
 } from '@cosmjs/stargate';
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
-import { RedisCache, delay } from '@hicommonwealth/adapters';
+import { RedisCache } from '@hicommonwealth/adapters';
 import {
   BalanceSourceType,
   BalanceType,
   ChainBase,
   ChainNetwork,
   ChainType,
+  cache,
+  delay,
 } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import BN from 'bn.js';
@@ -89,7 +91,6 @@ describe('Token Balance Cache Cosmos Tests', function () {
   this.timeout(80_000);
   let tbc: TokenBalanceCache;
   // mnemonic + token allocation can be found in cosmos-chain-test/[version]/bootstrap.sh files
-  let redisCache: RedisCache;
   const cosmosChainId = 'csdkv1ci';
   const addressOne = 'cosmos1zf45elxg5alxxeewvumpprfqtxmy2ufhzvetgx';
   const addressTwo = 'cosmos1f85wzgz83gkq09g9gj79c6w9gydu87a7e6hax7';
@@ -98,9 +99,10 @@ describe('Token Balance Cache Cosmos Tests', function () {
   const addressTwoBalance = '30000000000';
 
   before(async () => {
-    redisCache = new RedisCache();
+    const redisCache = new RedisCache();
     await redisCache.init('redis://localhost:6379');
-    tbc = new TokenBalanceCache(models, redisCache);
+    cache(redisCache);
+    tbc = new TokenBalanceCache(models);
   });
 
   describe('Cosmos Native', function () {
@@ -185,8 +187,8 @@ describe('Token Balance Cache Cosmos Tests', function () {
       const balanceTTL = 20;
 
       before('Set TBC caching TTL and reset Redis', async () => {
-        tbc = new TokenBalanceCache(models, redisCache, balanceTTL);
-        await redisCache.client.flushAll();
+        tbc = new TokenBalanceCache(models, balanceTTL);
+        await cache().flushAll();
       });
 
       it('should cache for TTL but not longer', async () => {
@@ -350,8 +352,8 @@ describe('Token Balance Cache Cosmos Tests', function () {
       const balanceTTL = 20;
 
       before('Set TBC caching TTL and reset Redis', async () => {
-        tbc = new TokenBalanceCache(models, redisCache, balanceTTL);
-        await redisCache.client.flushAll();
+        tbc = new TokenBalanceCache(models, balanceTTL);
+        await cache().flushAll();
       });
 
       it('should cache balance, then refresh after TTL', async () => {

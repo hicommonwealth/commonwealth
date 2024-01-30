@@ -94,7 +94,6 @@ import updateAddress from '../routes/updateAddress';
 import viewChainIcons from '../routes/viewChainIcons';
 import type BanCache from '../util/banCheckCache';
 
-import { RedisCache } from '@hicommonwealth/adapters';
 import type DatabaseValidationService from '../middleware/databaseValidationService';
 import createDiscordBotConfig from '../routes/createDiscordBotConfig';
 import generateImage from '../routes/generateImage';
@@ -205,7 +204,6 @@ function setupRouter(
   banCache: BanCache,
   globalActivityCache: GlobalActivityCache,
   databaseValidationService: DatabaseValidationService,
-  redisCache: RedisCache,
 ) {
   // controllers
   const serverControllers: ServerControllers = {
@@ -231,7 +229,7 @@ function setupRouter(
       banCache,
     ),
     polls: new ServerPollsController(models, tokenBalanceCache),
-    proposals: new ServerProposalsController(models, redisCache),
+    proposals: new ServerProposalsController(models),
     groups: new ServerGroupsController(models, tokenBalanceCache, banCache),
     topics: new ServerTopicsController(models, banCache),
     admin: new ServerAdminController(models),
