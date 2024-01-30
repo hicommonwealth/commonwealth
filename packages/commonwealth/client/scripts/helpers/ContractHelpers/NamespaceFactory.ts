@@ -73,10 +73,15 @@ class NamespaceFactory extends ContractBase {
   /**
    * Deploys a new namespace. Note current wallet will be admin of namespace
    * @param name New Namespace name
+   * @param walletAddress an active evm wallet addresss to send tx from
    * @param feeManager wallet or contract address to send community fees
    * @returns txReceipt or Error if name is taken or tx fails
    */
-  async deployNamespace(name: string, feeManager: string): Promise<any> {
+  async deployNamespace(
+    name: string,
+    walletAddress: string,
+    feeManager: string,
+  ): Promise<any> {
     if (!this.initialized) {
       await this.initialize();
     }
@@ -90,7 +95,7 @@ class NamespaceFactory extends ContractBase {
     try {
       txReceipt = await this.contract.methods
         .deployNamespace(name, feeManager, [])
-        .send({ from: this.wallet.accounts[0] });
+        .send({ from: walletAddress });
     } catch (error) {
       throw new Error('Transaction failed: ' + error);
     }
@@ -103,9 +108,14 @@ class NamespaceFactory extends ContractBase {
    * Note: current wallet address must be an admin on the namespace specified
    * @param name Namespace name
    * @param stakesId the id on the namespace to use for stake
+   * @param walletAddress an active evm wallet addresss to send tx from
    * @returns tx receipt or failure message
    */
-  async configureCommunityStakes(name: string, stakesId: number): Promise<any> {
+  async configureCommunityStakes(
+    name: string,
+    stakesId: number,
+    walletAddress: string,
+  ): Promise<any> {
     if (!this.initialized) {
       await this.initialize();
     }
@@ -113,7 +123,7 @@ class NamespaceFactory extends ContractBase {
     try {
       txReceipt = await this.contract.methods
         .configureCommunityStakesId(name, name + ' Community Stake', stakesId)
-        .send({ from: this.wallet.accounts[0] });
+        .send({ from: walletAddress });
     } catch {
       throw new Error('Transaction failed');
     }
