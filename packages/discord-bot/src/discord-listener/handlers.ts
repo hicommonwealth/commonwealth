@@ -55,10 +55,10 @@ export async function handleMessage(
         `Message published to RabbitMQ: ${JSON.stringify(message.content)}`,
       );
     } catch (error) {
-      log.info(`Error publishing to rabbitMQ`, error);
+      log.error(`Error publishing to rabbitMQ`, error);
     }
   } catch (error) {
-    log.info(`Error Processing Discord Message`, error);
+    log.error(`Error Processing Discord Message`, error);
   }
 }
 
