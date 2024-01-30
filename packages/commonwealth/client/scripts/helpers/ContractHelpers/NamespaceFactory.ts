@@ -13,16 +13,16 @@ class NamespaceFactory extends ContractBase {
    * Initializes a namespace instance at factory address
    * @param factoryAddress the address of the active factory to use
    */
-  constructor(factoryAddress: string) {
-    super(factoryAddress, namespaceFactoryAbi);
+  constructor(factoryAddress: string, rpc: string) {
+    super(factoryAddress, namespaceFactoryAbi, rpc);
   }
 
   /**
    * Initializes wallet and contracts.
    * This must be called after instantiation before other methods are available.
    */
-  async initialize(): Promise<void> {
-    await super.initialize();
+  async initialize(withWallet: boolean = false): Promise<void> {
+    await super.initialize(withWallet);
     const addr = await this.contract.methods.reservationHook().call();
     if (addr.toLowerCase() !== '0x0000000000000000000000000000000000000000') {
       this.reservationHook = new this.web3.eth.Contract(
@@ -82,8 +82,8 @@ class NamespaceFactory extends ContractBase {
     walletAddress: string,
     feeManager: string,
   ): Promise<any> {
-    if (!this.initialized) {
-      await this.initialize();
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true);
     }
     // Check if name is available
     const namespaceStatus = await this.checkNamespaceReservation(name);
@@ -116,8 +116,8 @@ class NamespaceFactory extends ContractBase {
     stakesId: number,
     walletAddress: string,
   ): Promise<any> {
-    if (!this.initialized) {
-      await this.initialize();
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true);
     }
     let txReceipt;
     try {

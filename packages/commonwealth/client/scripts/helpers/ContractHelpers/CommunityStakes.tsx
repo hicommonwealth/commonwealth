@@ -14,14 +14,17 @@ class CommunityStakes extends ContractBase {
   namespaceFactory: NamespaceFactory;
   addressCache = { address: '0x0', name: '' };
 
-  constructor(contractAddress: string, factoryAddress: string) {
-    super(contractAddress, communityStakesAbi);
+  constructor(contractAddress: string, factoryAddress: string, rpc: string) {
+    super(contractAddress, communityStakesAbi, rpc);
     this.namespaceFactoryAddress = factoryAddress;
   }
 
-  async initialize(): Promise<void> {
-    await super.initialize();
-    this.namespaceFactory = new NamespaceFactory(this.namespaceFactoryAddress);
+  async initialize(withWallet: boolean = false): Promise<void> {
+    await super.initialize(withWallet);
+    this.namespaceFactory = new NamespaceFactory(
+      this.namespaceFactoryAddress,
+      this.rpc,
+    );
     await this.namespaceFactory.initialize();
   }
 
@@ -105,8 +108,8 @@ class CommunityStakes extends ContractBase {
     amount: number,
     walletAddress: string,
   ): Promise<any> {
-    if (!this.initialized) {
-      await this.initialize();
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true);
     }
     const namespaceAddress = await this.getNamespaceAddress(name);
     const totalPrice = await this.contract.methods
@@ -136,8 +139,8 @@ class CommunityStakes extends ContractBase {
     amount: number,
     walletAddress: string,
   ): Promise<any> {
-    if (!this.initialized) {
-      await this.initialize();
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true);
     }
     const namespaceAddress = await this.getNamespaceAddress(name);
     let txReceipt;
