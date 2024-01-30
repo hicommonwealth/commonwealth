@@ -103,16 +103,7 @@ export async function main(app: express.Express) {
   const setupMiddleware = () => {
     // redirect from commonwealthapp.herokuapp.com to commonwealth.im
     app.all(/.*/, (req, res, next) => {
-      const host = req.header('host');
-      const origin = req.get('origin');
-
-      // For development only - need to figure out prod solution
-      // if host is native mobile app, don't redirect
-      if (origin?.includes('capacitor://')) {
-        res.header('Access-Control-Allow-Origin', '*');
-      }
-
-      if (host?.match(/commonwealthapp.herokuapp.com/i)) {
+      if (req.header('host')?.match(/commonwealthapp.herokuapp.com/i)) {
         res.redirect(301, `https://commonwealth.im${req.url}`);
       } else {
         next();

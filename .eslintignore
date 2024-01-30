@@ -1,14 +1,11 @@
 node_modules
 test
 static
-ios
-android
 *build
 *.github
 *.env
 *node_modules
 libs/chains/src/cosmos-ts
-capacitor.config.ts
 *.mocharc.json
 *.nycrc
 *.stylelintrc
