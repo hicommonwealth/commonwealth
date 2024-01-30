@@ -1,6 +1,6 @@
 import { logger } from '@hicommonwealth/core';
-import { ChainNodeInstance } from '@hicommonwealth/model';
 import AbiCoder from 'web3-eth-abi';
+import { ChainNodeInstance } from '../../../models/chain_node';
 import { Balances } from '../types';
 import { evmRpcRequest } from '../util';
 
@@ -22,7 +22,7 @@ export async function __getErc1155Balances(options: GetErc1155BalancesOptions) {
   const rpcEndpoint = options.chainNode.private_url || options.chainNode.url;
   if (options.addresses.length === 1) {
     return await getErc1155Balance(
-      options.chainNode.eth_chain_id,
+      options.chainNode.eth_chain_id!,
       rpcEndpoint,
       options.contractAddress,
       options.tokenId,
@@ -30,7 +30,7 @@ export async function __getErc1155Balances(options: GetErc1155BalancesOptions) {
     );
   } else {
     return await getOnChainBatchErc1155Balances(
-      options.chainNode.eth_chain_id,
+      options.chainNode.eth_chain_id!,
       rpcEndpoint,
       options.contractAddress,
       options.tokenId,
@@ -86,7 +86,7 @@ async function getOnChainBatchErc1155Balances(
   const datas = await evmRpcRequest(rpcEndpoint, rpcRequests, errorMsg);
   if (!datas) return {};
 
-  const addressBalanceMap = {};
+  const addressBalanceMap: Balances = {};
 
   if (datas.error) {
     log.error(errorMsg, datas.error);

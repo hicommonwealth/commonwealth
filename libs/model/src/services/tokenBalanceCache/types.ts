@@ -1,5 +1,5 @@
 import { BalanceSourceType } from '@hicommonwealth/core';
-import { ChainNodeInstance } from '@hicommonwealth/model';
+import { ChainNodeInstance } from '../../models/chain_node';
 
 export type Balances = { [address: string]: string };
 
@@ -33,12 +33,14 @@ type GetErc20BalanceOptions = GetEvmBalancesBase & {
     contractAddress: string;
   };
 };
+
 type GetErc721BalanceOptions = GetEvmBalancesBase & {
   balanceSourceType: BalanceSourceType.ERC721;
   sourceOptions: {
     contractAddress: string;
   };
 };
+
 export type GetErc1155BalanceOptions = GetEvmBalancesBase & {
   balanceSourceType: BalanceSourceType.ERC1155;
   sourceOptions: {
@@ -50,9 +52,11 @@ export type GetErc1155BalanceOptions = GetEvmBalancesBase & {
 export type GetEthNativeBalanceOptions = GetEvmBalancesBase & {
   balanceSourceType: BalanceSourceType.ETHNative;
 };
+
 type GetCosmosNativeBalanceOptions = GetCosmosBalancesBase & {
   balanceSourceType: BalanceSourceType.CosmosNative;
 };
+
 export type GetCw721BalanceOptions = GetCosmosBalancesBase & {
   balanceSourceType: BalanceSourceType.CW721;
   sourceOptions: {

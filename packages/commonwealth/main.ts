@@ -7,7 +7,7 @@ import {
   setupErrorHandlers,
 } from '@hicommonwealth/adapters';
 import { logger as _logger, cache } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { TokenBalanceCache, models } from '@hicommonwealth/model';
 import bodyParser from 'body-parser';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
@@ -45,7 +45,6 @@ import setupCosmosProxy from './server/util/cosmosProxy';
 import { databaseCleaner } from './server/util/databaseCleaner';
 import GlobalActivityCache from './server/util/globalActivityCache';
 import setupIpfsProxy from './server/util/ipfsProxy';
-import { TokenBalanceCache } from './server/util/tokenBalanceCache/tokenBalanceCache';
 import ViewCountCache from './server/util/viewCountCache';
 
 // set up express async error handling hack

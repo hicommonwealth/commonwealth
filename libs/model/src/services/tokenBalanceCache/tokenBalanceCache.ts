@@ -6,8 +6,8 @@ import {
   logger,
   stats,
 } from '@hicommonwealth/core';
-import { DB } from '@hicommonwealth/model';
 import Web3 from 'web3';
+import { DB } from '../../models';
 import { __getCosmosNativeBalances } from './providers/get_cosmos_balances';
 import { __getCw721Balances } from './providers/get_cw721_balances';
 import { __getErc1155Balances } from './providers/get_erc1155_balances';
@@ -66,7 +66,7 @@ export class TokenBalanceCache {
       const msg =
         `Failed to fetch balance(s) for ${options.addresses.length}` +
         ` address(es) on ${chainId}${contractAddress}`;
-      log.error(msg, e);
+      log.error(msg, e instanceof Error ? e : undefined);
     }
 
     stats().incrementBy(
@@ -100,11 +100,14 @@ export class TokenBalanceCache {
     for (const address of options.addresses) {
       try {
         const { data } = fromBech32(address);
-        const encodedAddress = toBech32(chainNode.bech32, data);
+        const encodedAddress = toBech32(chainNode.bech32!, data);
         addressMap[encodedAddress] = address;
       } catch (e) {
         if (address != '0xdiscordbot') {
-          log.error(`Skipping address: ${address}`, e);
+          log.error(
+            `Skipping address: ${address}`,
+            e instanceof Error ? e : undefined,
+          );
         }
       }
     }
@@ -265,7 +268,7 @@ export class TokenBalanceCache {
           const transformedKey = this.buildCacheKey(options, address);
           result[transformedKey] = balances[address];
           return result;
-        }, {}),
+        }, {} as Balances),
         this.balanceTTL,
         false,
       );

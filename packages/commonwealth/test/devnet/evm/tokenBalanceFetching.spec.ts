@@ -5,13 +5,11 @@ import {
   cache,
   delay,
 } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { Balances, TokenBalanceCache, models } from '@hicommonwealth/model';
 import BN from 'bn.js';
 import { expect } from 'chai';
 import Web3 from 'web3';
 import { toWei } from 'web3-utils';
-import { TokenBalanceCache } from '../../../server/util/tokenBalanceCache/tokenBalanceCache';
-import { Balances } from '../../../server/util/tokenBalanceCache/types';
 import { ChainTesting } from '../../util/evm-chain-testing/sdk/chainTesting';
 import { ERC1155 } from '../../util/evm-chain-testing/sdk/erc1155';
 import { ERC721 } from '../../util/evm-chain-testing/sdk/nft';

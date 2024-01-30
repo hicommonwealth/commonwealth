@@ -1,11 +1,13 @@
 import { logger } from '@hicommonwealth/core';
 import {
   AddressAttributes,
+  Balances,
   CommunityInstance,
   DB,
   GroupAttributes,
   MembershipAttributes,
   MembershipRejectReason,
+  OptionsWithBalances,
 } from '@hicommonwealth/model';
 import moment from 'moment';
 import { Op, Sequelize } from 'sequelize';
@@ -15,10 +17,6 @@ import {
 } from '../../config';
 import { makeGetBalancesOptions } from '../../util/requirementsModule/makeGetBalancesOptions';
 import validateGroupMembership from '../../util/requirementsModule/validateGroupMembership';
-import {
-  Balances,
-  OptionsWithBalances,
-} from '../../util/tokenBalanceCache/types';
 import { ServerGroupsController } from '../server_groups_controller';
 
 const log = logger().getLogger(__filename);
