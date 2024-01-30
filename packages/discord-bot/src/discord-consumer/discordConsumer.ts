@@ -22,7 +22,6 @@ import {
   handleThreadMessages,
 } from '../discord-consumer/handlers';
 import { CW_BOT_KEY, DISCOBOT_ADDRESS, RABBITMQ_URI } from '../utils/config';
-import { rollbar } from '../utils/rollbar';
 import { getForumLinkedTopic } from '../utils/util';
 
 let isServiceHealthy = false;
@@ -96,10 +95,8 @@ async function processMessage(data: TRmqMessages) {
         `\n\tStatus: ${error.response.status}` +
         `\n\tData: ${JSON.stringify(error.response.data)}`;
       log.error(msg, new Error(error.response.data.error));
-      rollbar.error(msg, new Error(error.response.data.error));
     } else {
       log.error(`Failed to process Message:`, error);
-      rollbar.error(`Failed to process Message:`, error);
     }
   }
 }

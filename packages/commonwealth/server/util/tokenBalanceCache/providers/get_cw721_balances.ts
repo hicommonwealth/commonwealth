@@ -2,7 +2,6 @@ import { WasmExtension, setupWasmExtension } from '@cosmjs/cosmwasm-stargate';
 import { QueryClient } from '@cosmjs/stargate';
 import { logger } from '@hicommonwealth/core';
 import { ChainNodeInstance } from '@hicommonwealth/model';
-import { rollbar } from '../../rollbar';
 import { Balances } from '../types';
 import { getTendermintClient } from '../util';
 
@@ -73,10 +72,6 @@ export async function getOffChainBatchCw721Balances(
         `Failed to get balance for address ${a}:
         ${balanceResult.reason}`,
       );
-      rollbar.error(
-        `Failed to get balance for address ${a}:
-        ${balanceResult.reason}`,
-      );
     } else {
       result[a] = balanceResult.value?.tokens?.length.toString();
     }
@@ -104,7 +99,6 @@ async function getCw721Balance(
     };
   } catch (e) {
     log.error(`Failed to get balance for address ${ownerAddress}`, e);
-    rollbar.error(`Failed to get balance for address ${ownerAddress}`, e);
     return {};
   }
 }

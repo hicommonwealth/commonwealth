@@ -1,7 +1,6 @@
 import { logger } from '@hicommonwealth/core';
 import { ChainNodeInstance } from '@hicommonwealth/model';
 import AbiCoder from 'web3-eth-abi';
-import { rollbar } from '../../rollbar';
 import { Balances } from '../types';
 import {
   evmBalanceFetcherBatching,
@@ -142,7 +141,6 @@ async function getErc20Balance(
   if (!data) return {};
 
   if (data.error) {
-    rollbar.error(errorMsg, data.error);
     log.error(errorMsg, data.error);
     return {};
   } else {

@@ -5,13 +5,12 @@ import { REDIS_URL } from '../server/config';
 import { ServerCommunitiesController } from '../server/controllers/server_communities_controller';
 import { ServerGroupsController } from '../server/controllers/server_groups_controller';
 import BanCache from '../server/util/banCheckCache';
-import { rollbar } from '../server/util/rollbar';
 import { TokenBalanceCache } from '../server/util/tokenBalanceCache/tokenBalanceCache';
 
 dotenv.config();
 
 async function main() {
-  const redisCache = new RedisCache(rollbar);
+  const redisCache = new RedisCache();
   await redisCache.init(REDIS_URL);
   const banCache = new BanCache(models);
 

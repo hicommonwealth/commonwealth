@@ -1,7 +1,6 @@
 import { RedisCache } from '@hicommonwealth/adapters';
 import { RedisNamespaces, logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
-import Rollbar from 'rollbar';
 import { QueryTypes } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -14,7 +13,6 @@ export default class DatabaseCleaner {
   private readonly log = logger().getLogger(__filename);
   private _models: DB;
   private _redisCache: RedisCache;
-  private _rollbar?: Rollbar;
   private _timeToRun: Date;
   private _completed = false;
   private _oneRunMax = false;
@@ -23,9 +21,8 @@ export default class DatabaseCleaner {
   // lock times out in 12 hours
   private _lockTimeoutSeconds = 43200;
 
-  public init(models: DB, rollbar?: Rollbar) {
+  public init(models: DB) {
     this._models = models;
-    this._rollbar = rollbar;
   }
 
   /**
@@ -39,25 +36,20 @@ export default class DatabaseCleaner {
     models: DB,
     hourToRun: number,
     redisCache: RedisCache,
-    rollbar?: Rollbar,
     oneRunMax = false,
   ) {
-    this.init(models, rollbar);
+    this.init(models);
     this._redisCache = redisCache;
     this._oneRunMax = oneRunMax;
 
     if (!hourToRun && hourToRun !== 0) {
       this.log.warn(`No hourToRun given. The cleaner will not run.`);
-      this._rollbar?.warn(`No hourToRun given. The cleaner will not run.`);
       return;
     }
 
     if (hourToRun < 0 || hourToRun >= 24) {
       this.log.error(
         `${hourToRun} is not a valid hour. The given hourToRun must be greater than or equal to 0 and less than 24`,
-      );
-      this._rollbar?.error(
-        `The database cleaner failed to initialize. ${hourToRun} is not a valid hour.`,
       );
       return;
     }
@@ -105,14 +97,12 @@ export default class DatabaseCleaner {
       await this.cleanNotifications(this._oneRunMax);
     } catch (e) {
       this.log.error('Failed to clean notifications', e);
-      this._rollbar?.error('Failed to clean notifications', e);
     }
 
     try {
       await this.cleanSubscriptions(this._oneRunMax);
     } catch (e) {
       this.log.error('Failed to clean subscriptions', e);
-      this._rollbar?.error('Failed to clean subscriptions', e);
     }
 
     this.log.info('Database clean-up finished.');

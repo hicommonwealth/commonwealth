@@ -8,7 +8,6 @@ import {
   getActivityFeed,
   type GlobalActivity,
 } from './activityQuery';
-import { rollbar } from './rollbar';
 
 type GlobalActivityJson = Array<
   Omit<ActivityRow, 'commenters'> & {
@@ -47,7 +46,6 @@ export default class GlobalActivityCache {
       if (this._initialized) {
         const msg = 'Failed to fetch global activity from Redis';
         log.error(msg);
-        rollbar.error(msg);
       }
       return await getActivityFeed(this._models);
     }
@@ -96,11 +94,9 @@ export default class GlobalActivityCache {
       );
       if (!result) {
         log.error(errorMsg);
-        rollbar.error(errorMsg);
       }
     } catch (e) {
       log.error(errorMsg, e);
-      rollbar.error(errorMsg, e);
     }
   }
 
@@ -123,7 +119,6 @@ export default class GlobalActivityCache {
       if (!result) {
         const msg = 'Failed to save global activity in Redis';
         log.error(msg);
-        rollbar.error(msg);
         return;
       }
 
@@ -131,7 +126,6 @@ export default class GlobalActivityCache {
     } catch (e) {
       const msg = 'Failed to refresh the global cache';
       log.error(msg, e);
-      rollbar.error(msg, e);
     }
   }
 

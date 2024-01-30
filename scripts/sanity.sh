@@ -1,6 +1,7 @@
 #! /bin/bash
 
 # Sanity scripts we should run locally before pushing code
+set -e 
 
 # lint changes
 yarn lint-branch-warnings
