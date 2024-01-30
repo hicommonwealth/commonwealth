@@ -319,3 +319,4 @@ export const NewSnapshotProposalForm = ({
     </div>
   );
 };
+export default NewSnapshotProposalForm;

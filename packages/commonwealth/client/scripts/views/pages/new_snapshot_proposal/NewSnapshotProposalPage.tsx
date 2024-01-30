@@ -6,7 +6,7 @@ type NewSnapshotProposalPageProps = {
   snapshotId: string;
 };
 
-const NewSnapshotProposalPage = ({
+export const NewSnapshotProposalPage = ({
   snapshotId,
 }: NewSnapshotProposalPageProps) => {
   return (
