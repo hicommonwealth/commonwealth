@@ -2,8 +2,10 @@ import clsx from 'clsx';
 import React, { useState } from 'react';
 import { isMobile } from 'react-device-detect';
 
+import { STAKE_ID } from '@hicommonwealth/chains';
 import { calculateVoteWeight } from '@hicommonwealth/chains/src/commonProtocol/utils';
 import app from 'state';
+import { useBuyStakeMutation } from 'state/api/communityStake';
 import { useCommunityStake } from 'views/components/CommunityStake';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
@@ -37,10 +39,15 @@ import './StakeExchangeForm.scss';
 
 interface StakeExchangeFormProps {
   mode: ManageCommunityStakeModalMode;
-  setModalState: (modalState: ManageCommunityStakeModalState) => void;
+  onSetModalState: (modalState: ManageCommunityStakeModalState) => void;
+  onSetSuccessTransactionHash: (hash: string) => void;
 }
 
-const StakeExchangeForm = ({ mode, setModalState }: StakeExchangeFormProps) => {
+const StakeExchangeForm = ({
+  mode,
+  onSetModalState,
+  onSetSuccessTransactionHash,
+}: StakeExchangeFormProps) => {
   const activeAccountAddress = app?.user?.activeAccount?.address;
   const addressOptions = app.user.activeAccounts.map(({ address }) => ({
     label: address,
@@ -62,6 +69,8 @@ const StakeExchangeForm = ({ mode, setModalState }: StakeExchangeFormProps) => {
   const { stakeBalance, stakeValue, currentVoteWeight, stakeData } =
     useCommunityStake();
 
+  const { mutateAsync: buyStake } = useBuyStakeMutation();
+
   const expectedVoteWeight = calculateVoteWeight(
     String(numberOfStakeToExchange),
     stakeData?.vote_weight,
@@ -73,23 +82,29 @@ const StakeExchangeForm = ({ mode, setModalState }: StakeExchangeFormProps) => {
 
   const handleBuy = async () => {
     try {
-      setModalState(ManageCommunityStakeModalState.Loading);
-      await fakeRandomAPICall();
-      setModalState(ManageCommunityStakeModalState.Success);
+      onSetModalState(ManageCommunityStakeModalState.Loading);
+      const txReceipt = await buyStake({
+        amount: numberOfStakeToExchange,
+        stakeId: STAKE_ID,
+        namespace: stakeData?.Chain?.namespace,
+      });
+
+      onSetModalState(ManageCommunityStakeModalState.Success);
+      onSetSuccessTransactionHash(txReceipt?.transactionHash);
     } catch (err) {
       console.log('Error buying: ', err);
-      setModalState(ManageCommunityStakeModalState.Failure);
+      onSetModalState(ManageCommunityStakeModalState.Failure);
     }
   };
 
   const handleSell = async () => {
     try {
-      setModalState(ManageCommunityStakeModalState.Loading);
+      onSetModalState(ManageCommunityStakeModalState.Loading);
       await fakeRandomAPICall();
-      setModalState(ManageCommunityStakeModalState.Success);
+      onSetModalState(ManageCommunityStakeModalState.Success);
     } catch (err) {
       console.log('Error selling: ', err);
-      setModalState(ManageCommunityStakeModalState.Failure);
+      onSetModalState(ManageCommunityStakeModalState.Failure);
     }
   };
 

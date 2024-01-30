@@ -19,3 +19,9 @@ export const getInitialAccountValue = (
 ) => {
   return addressOptions.find(({ value }) => value === activeAccountAddress);
 };
+
+export const buildEtherscanLink = (txHash: string) => {
+  // TODO remove goerli before production deployment
+  const prefix = 'goerli.';
+  return `https://${prefix}etherscan.io/tx/${txHash}`;
+};

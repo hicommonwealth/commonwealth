@@ -5,13 +5,13 @@ import { ContractMethods } from 'state/api/config';
 
 const GET_BUY_PRICE_STALE_TIME = 2 * 1_000; // 2 sec
 
-type GetUBuyPriceProps = Omit<UseGetBuyPriceQueryProps, 'apiEnabled'>;
+type GetBuyPriceProps = Omit<UseGetBuyPriceQueryProps, 'apiEnabled'>;
 
 const getBuyPrice = async ({
   namespace,
   stakeId,
   amount,
-}: GetUBuyPriceProps) => {
+}: GetBuyPriceProps) => {
   const communityStakes = new CommunityStakes(
     factoryContracts[ValidChains.Goerli].communityStake,
     factoryContracts[ValidChains.Goerli].factory,

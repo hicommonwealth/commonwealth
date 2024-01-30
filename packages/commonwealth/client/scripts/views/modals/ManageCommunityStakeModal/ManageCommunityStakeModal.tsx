@@ -34,11 +34,18 @@ const ManageCommunityStakeModal = ({
   const [modalState, setModalState] = useState(
     ManageCommunityStakeModalState.Exchange,
   );
+  const [successTransactionHash, setSuccessTransactionHash] = useState('');
 
   const getModalBody = () => {
     switch (modalState) {
       case ManageCommunityStakeModalState.Exchange:
-        return <StakeExchangeForm mode={mode} setModalState={setModalState} />;
+        return (
+          <StakeExchangeForm
+            mode={mode}
+            onSetModalState={setModalState}
+            onSetSuccessTransactionHash={setSuccessTransactionHash}
+          />
+        );
       case ManageCommunityStakeModalState.Loading:
         return <TransactionLoading />;
       case ManageCommunityStakeModalState.Failure:
@@ -49,7 +56,13 @@ const ManageCommunityStakeModal = ({
           />
         );
       case ManageCommunityStakeModalState.Success:
-        return <TransactionSucceeded onModalClose={onModalClose} mode={mode} />;
+        return (
+          <TransactionSucceeded
+            onModalClose={onModalClose}
+            mode={mode}
+            successTransactionHash={successTransactionHash}
+          />
+        );
     }
   };
 
