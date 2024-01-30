@@ -18,6 +18,27 @@
     }
   }
 
+  &.boxed {
+    .Text,
+    .Icon {
+      color: $neutral-400;
+    }
+
+    .Icon {
+      margin-right: 10px;
+    }
+
+    &.isSelected {
+      border: none;
+      background-color: $white;
+
+      .Text.label {
+        color: $primary-500;
+        -webkit-text-stroke: 0.5px $primary-500;
+      }
+    }
+  }
+
   &.isDisabled {
     cursor: not-allowed;
     filter: grayscale(1);
