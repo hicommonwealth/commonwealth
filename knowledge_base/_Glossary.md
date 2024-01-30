@@ -20,7 +20,7 @@ A delegate contract is a smart CONTRACT that contains the functions, events, and
 
 Some CHAINS use modules rather than CONTRACTS. Modules are used predominantly within the Cosmos and Substrate ecosystems.
 
-## Commonwealth
+## Common App
 
 ### Comment
 
@@ -60,13 +60,21 @@ More specifically, "Member" is the lowest-ranking (ROLE) in COMMUNITIES, below M
 
 ### Notification
 
-See [models/notification.ts](../libs/model/src/models/notification.ts).
+Notifications are messages emitted to users who are SUBSCRIBED to a given category of activity atop a given forum entity (e.g. a THREAD or COMMUNITY).
+
+For a list of activity categories which may trigger notification, see [NotificationCategories](../libs/core/src/types.ts).
+
+**Model:** [notification.ts](../libs/model/src/models/notification.ts)
+
+**Knowledge Base:** [Notifications.md](./Notifications.md)
+
+**Related Terms:** [Subscription](#subscription)
 
 ### Profile
 
 A profile is one or more ADDRESS, grouped together as a single identity, representing a single USER.
 
-See [models/profile.ts](../libs/model/src/models/profile.ts).
+**Model:** [profile.ts](../libs/model/src/models/profile.ts)
 
 ### Reaction
 
@@ -96,9 +104,11 @@ Stake is used for GATING content and features across a COMMUNITY FORUM.
 
 ### Subscription
 
-SEe NOTIFICATIONS.
+USERS subscribe (and are autosubscribed) to new events, e.g. in COMMUNITIES they join or on THREADS and COMMENTS they author. Users receive all NOTIFICATION objects which match the entity and category  ids of their subscriptions.
 
-See See [models/subscription.ts](../libs/model/src/models/subscription.ts).
+**Related Terms:** [Notification](#notification)
+
+**Model:** [subscription.ts](../libs/model/src/models/subscription.ts).
 
 ### Template
 
@@ -108,9 +118,7 @@ See See [models/template.ts](../libs/model/src/models/template.ts).
 
 ### Thread
 
-A thread is a post made via the Common FORUM app, on top of which COMMENTS and REACTIONS may be created. May LINK to other THREADS and PROPOSALS, or own a POLL.
-
-<!-- TODO: Improve "is a post" language. -->
+A THREAD is a discussion space created via the Common FORUM app. "THREAD" may refer either specifically to the original post (OP) object which opens the discussion, or more broadly to the group of discussion COMMENTS which includes and responds to OP. A thread may be REACTED to; it may be LINKED to other THREADS and PROPOSALS; and it may house a related POLL.
 
 See [models/thread.ts](../libs/model/src/models/thread.ts)
 

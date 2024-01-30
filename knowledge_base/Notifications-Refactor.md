@@ -1,10 +1,10 @@
-**Contents**
+# Notifications Refactor
+
+## Contents
 
 - [Notifications Refactor](#notifications-refactor)
   * [Refactor Proposals](#refactor-proposals)
 - [Change Log](#change-log)
-
-# Notifications Refactor
 
 - The refactor aims to keep Notifications functional.
 - AWS will facilitate push notifications in the initial phase.
@@ -45,4 +45,5 @@
 
 ## Change Log
 
+- 240130: Flagged by Graham Johnson for audit, possible integration with Notifications.ts.
 - 230731: Authored by Nakul Manchanda.
