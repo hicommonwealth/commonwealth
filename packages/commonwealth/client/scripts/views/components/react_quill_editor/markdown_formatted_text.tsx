@@ -18,7 +18,12 @@ import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { getClasses } from '../component_kit/helpers';
 import { renderTruncatedHighlights } from './highlighter';
 import { QuillRendererProps } from './quill_renderer';
-import { countLinesMarkdown, fetchTwitterEmbedInfo } from './utils';
+import {
+  countLinesMarkdown,
+  fetchTwitterEmbedInfo,
+  isMarkdownTable,
+  markdownToHtmlTable,
+} from './utils';
 
 const OPEN_LINKS_IN_NEW_TAB = true;
 
@@ -175,7 +180,11 @@ export const MarkdownFormattedText = ({
           'MarkdownFormattedText',
         )}
       >
-        {finalDoc}
+        {isMarkdownTable(doc) ? (
+          <div dangerouslySetInnerHTML={{ __html: markdownToHtmlTable(doc) }} />
+        ) : (
+          finalDoc
+        )}
       </div>
       {isTruncated && (
         <div className="show-more-button-wrapper">

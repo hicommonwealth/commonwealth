@@ -109,11 +109,11 @@ const ReactQuillEditor = ({
     });
   };
 
-  // const isASCIIArt = (text: string) => {
-  //   const patterns = [/[@#S%^&*()\-+=|\\\/]{3,}/, /^\s{2,}/gm];
-  //
-  //   return patterns.some((pattern) => pattern.test(text));
-  // };
+  const isASCIIArt = (text: string) => {
+    const patterns = [/[@#S%^&*()\-+=|\\\/]{3,}/, /^\s{2,}/gm];
+
+    return patterns.some((pattern) => pattern.test(text));
+  };
 
   const handleChange = (value, delta, source, editor: UnprivilegedEditor) => {
     const newContent = convertTwitterLinksToEmbeds(editor.getContents());
