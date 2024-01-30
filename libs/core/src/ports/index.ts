@@ -12,26 +12,28 @@ export const logger = port(function logger(logger?: Logger) {
     logger || {
       name: 'in-memory-logger',
       dispose: () => Promise.resolve(),
-      getLogger: () => ({
-        trace(msg: string) {
-          console.log(msg);
-        },
-        debug(msg: string) {
-          console.log(msg);
-        },
-        info(msg: string) {
-          console.log(msg);
-        },
-        warn(msg: string) {
-          console.log(msg);
-        },
-        error(msg: string, error?: Error) {
-          console.error(msg, error?.message);
-        },
-        fatal(msg: string, error?: Error) {
-          console.error(msg, error?.message);
-        },
-      }),
+      getLogger: () => {
+        return {
+          trace(msg: string) {
+            console.log(msg);
+          },
+          debug(msg: string) {
+            console.log(msg);
+          },
+          info(msg: string) {
+            console.log(msg);
+          },
+          warn(msg: string) {
+            console.log(msg);
+          },
+          error(msg: string, error?: Error) {
+            console.error(msg, error?.message);
+          },
+          fatal(msg: string, error?: Error) {
+            console.error(msg, error?.message);
+          },
+        };
+      },
     }
   );
 });

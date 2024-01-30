@@ -1,5 +1,5 @@
 import { BalanceSourceType } from '@hicommonwealth/core';
-import { ChainNodeInstance } from '@hicommonwealth/model';
+import { ChainNodeInstance } from '../../models/chain_node';
 
 export type Balances = { [address: string]: string };
 

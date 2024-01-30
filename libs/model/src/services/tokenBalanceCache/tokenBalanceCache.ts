@@ -2,12 +2,13 @@ import { fromBech32, toBech32 } from '@cosmjs/encoding';
 import {
   BalanceSourceType,
   CacheNamespaces,
+  ILogger,
   cache,
   logger,
   stats,
 } from '@hicommonwealth/core';
-import { DB } from '@hicommonwealth/model';
 import Web3 from 'web3';
+import { DB } from '../../models';
 import { __getCosmosNativeBalances } from './providers/get_cosmos_balances';
 import { __getCw721Balances } from './providers/get_cw721_balances';
 import { __getErc1155Balances } from './providers/get_erc1155_balances';
@@ -22,10 +23,12 @@ import {
   GetEvmBalancesOptions,
 } from './types';
 
-const log = logger().getLogger(__filename);
-
 export class TokenBalanceCache {
-  constructor(public models: DB, public balanceTTL = 300) {}
+  private _log: ILogger;
+
+  constructor(public models: DB, public balanceTTL = 300) {
+    this._log = logger().getLogger(__filename);
+  }
 
   /**
    * This is the main function through which all balances should be fetched.
@@ -66,7 +69,7 @@ export class TokenBalanceCache {
       const msg =
         `Failed to fetch balance(s) for ${options.addresses.length}` +
         ` address(es) on ${chainId}${contractAddress}`;
-      log.error(msg, e);
+      this._log.error(msg, e instanceof Error ? e : undefined);
     }
 
     stats().incrementBy(
@@ -90,7 +93,7 @@ export class TokenBalanceCache {
 
     if (!chainNode) {
       const msg = `ChainNode with cosmos_chain_id ${options.sourceOptions.cosmosChainId} does not exist`;
-      log.error(msg);
+      this._log.error(msg);
       return {};
     }
 
@@ -100,11 +103,14 @@ export class TokenBalanceCache {
     for (const address of options.addresses) {
       try {
         const { data } = fromBech32(address);
-        const encodedAddress = toBech32(chainNode.bech32, data);
+        const encodedAddress = toBech32(chainNode.bech32!, data);
         addressMap[encodedAddress] = address;
       } catch (e) {
         if (address != '0xdiscordbot') {
-          log.error(`Skipping address: ${address}`, e);
+          this._log.error(
+            `Skipping address: ${address}`,
+            e instanceof Error ? e : undefined,
+          );
         }
       }
     }
@@ -163,7 +169,7 @@ export class TokenBalanceCache {
       if (Web3.utils.isAddress(address)) {
         validatedAddresses.push(address);
       } else {
-        log.info(`Skipping non-address ${address}`);
+        this._log.info(`Skipping non-address ${address}`);
       }
     }
 
@@ -184,7 +190,7 @@ export class TokenBalanceCache {
 
     if (!chainNode) {
       const msg = `ChainNode with eth_chain_id ${options.sourceOptions.evmChainId} does not exist`;
-      log.error(msg);
+      this._log.error(msg);
       return {};
     }
 
@@ -265,7 +271,7 @@ export class TokenBalanceCache {
           const transformedKey = this.buildCacheKey(options, address);
           result[transformedKey] = balances[address];
           return result;
-        }, {}),
+        }, {} as Balances),
         this.balanceTTL,
         false,
       );

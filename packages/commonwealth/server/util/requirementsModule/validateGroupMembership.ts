@@ -4,9 +4,11 @@ import {
   Requirement,
   ThresholdData,
 } from '@hicommonwealth/core';
-import { MembershipRejectReason } from '@hicommonwealth/model';
+import {
+  MembershipRejectReason,
+  OptionsWithBalances,
+} from '@hicommonwealth/model';
 import { toBN } from 'web3-utils';
-import { OptionsWithBalances } from '../tokenBalanceCache/types';
 
 export type ValidateGroupMembershipResponse = {
   isValid: boolean;

@@ -1,8 +1,8 @@
 import { DB } from '@hicommonwealth/model';
 import BanCache from '../util/banCheckCache';
 
+import { TokenBalanceCache } from '@hicommonwealth/model';
 import GlobalActivityCache from '../util/globalActivityCache';
-import { TokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
 
 import {
   CreateCommentReactionOptions,

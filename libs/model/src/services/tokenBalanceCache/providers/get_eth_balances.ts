@@ -1,6 +1,6 @@
 import { logger } from '@hicommonwealth/core';
-import { ChainNodeInstance } from '@hicommonwealth/model';
 import { toBN } from 'web3-utils';
+import { ChainNodeInstance } from '../../../models/chain_node';
 import { Balances } from '../types';
 import {
   evmBalanceFetcherBatching,
@@ -25,7 +25,7 @@ export async function __getEthBalances(options: GetEthBalancesOptions) {
   const rpcEndpoint = options.chainNode.private_url || options.chainNode.url;
   if (options.addresses.length === 1) {
     return await getEthBalance(
-      options.chainNode.eth_chain_id,
+      options.chainNode.eth_chain_id!,
       rpcEndpoint,
       options.addresses[0],
     );
@@ -36,14 +36,14 @@ export async function __getEthBalances(options: GetEthBalancesOptions) {
   );
   if (balanceFetcherContract) {
     return await getOnChainBatchEthBalances(
-      options.chainNode.eth_chain_id,
+      options.chainNode.eth_chain_id!,
       rpcEndpoint,
       options.addresses,
       options.batchSize,
     );
   } else {
     return await getOffChainBatchEthBalances(
-      options.chainNode.eth_chain_id,
+      options.chainNode.eth_chain_id!,
       rpcEndpoint,
       options.addresses,
       options.batchSize,

@@ -21,7 +21,6 @@ import setupAPI from './server/routing/router'; // performance note: this takes 
 import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
 import GlobalActivityCache from './server/util/globalActivityCache';
-import { TokenBalanceCache } from './server/util/tokenBalanceCache/tokenBalanceCache';
 import ViewCountCache from './server/util/viewCountCache';
 
 const log = logger().getLogger(__filename);

@@ -1,12 +1,11 @@
 import { RedisCache } from '@hicommonwealth/adapters';
 import { cache } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { TokenBalanceCache, models } from '@hicommonwealth/model';
 import * as dotenv from 'dotenv';
 import { REDIS_URL } from '../server/config';
 import { ServerCommunitiesController } from '../server/controllers/server_communities_controller';
 import { ServerGroupsController } from '../server/controllers/server_groups_controller';
 import BanCache from '../server/util/banCheckCache';
-import { TokenBalanceCache } from '../server/util/tokenBalanceCache/tokenBalanceCache';
 
 dotenv.config();
 
@@ -14,7 +13,6 @@ async function main() {
   const redisCache = new RedisCache();
   await redisCache.init(REDIS_URL);
   cache(redisCache);
-
   const banCache = new BanCache(models);
 
   const tokenBalanceCache = new TokenBalanceCache(models);

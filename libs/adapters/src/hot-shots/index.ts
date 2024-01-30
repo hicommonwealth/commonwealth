@@ -4,6 +4,7 @@ import { StatsD } from 'hot-shots';
 export const HotShotsStats = (): Stats => {
   const log = logger().getLogger(__filename);
   let client = new StatsD({
+  let client = new StatsD({
     globalTags: { env: process.env.NODE_ENV || 'development' },
     errorHandler: (error) => {
       log.error('Caught statsd socket error', error);
