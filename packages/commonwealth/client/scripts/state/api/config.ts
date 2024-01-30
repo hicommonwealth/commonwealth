@@ -34,3 +34,9 @@ export const ContractMethods = {
   GET_USER_STAKE_BALANCE: 'getUserStakeBalance',
   GET_BUY_PRICE: 'getBuyPrice',
 };
+
+export const ExternalEndpoints = {
+  coinbase: {
+    ethToUsdRate: 'https://api.coinbase.com/v2/prices/ETH-USD/sell',
+  },
+};

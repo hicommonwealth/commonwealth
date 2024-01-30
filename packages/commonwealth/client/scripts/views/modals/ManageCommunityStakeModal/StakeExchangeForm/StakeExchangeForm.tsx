@@ -2,6 +2,8 @@ import clsx from 'clsx';
 import React, { useState } from 'react';
 import { isMobile } from 'react-device-detect';
 
+import { useCommunityStake } from 'views/components/CommunityStake';
+import { Skeleton } from 'views/components/Skeleton';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWCircleButton from 'views/components/component_kit/new_designs/CWCircleButton';
@@ -22,12 +24,13 @@ import {
   ManageCommunityStakeModalMode,
   ManageCommunityStakeModalState,
 } from '../types';
+import useStakeExchange from '../useStakeExchange';
+import { convertEthToUsd } from '../utils';
 import {
   CustomAddressOption,
   CustomAddressOptionElement,
 } from './CustomAddressOption';
 
-import { useCommunityStake } from 'views/components/CommunityStake';
 import './StakeExchangeForm.scss';
 
 interface StakeExchangeFormProps {
@@ -36,11 +39,17 @@ interface StakeExchangeFormProps {
 }
 
 const StakeExchangeForm = ({ mode, setModalState }: StakeExchangeFormProps) => {
-  const [numberOfStakeToExchange, setNumberOfStakeToExchange] = useState(0);
   const [selectedAddress, setSelectedAddress] = useState({
     value: '0xeRh',
     label: '0xeRh',
   });
+
+  const {
+    numberOfStakeToExchange,
+    setNumberOfStakeToExchange,
+    buyPriceData,
+    ethUsdRate,
+  } = useStakeExchange({ mode });
 
   // create new hook rather than using useCommunityStake
   const { stakeBalance, stakeValue, voteWeight } = useCommunityStake();
@@ -88,6 +97,8 @@ const StakeExchangeForm = ({ mode, setModalState }: StakeExchangeFormProps) => {
 
   // TODO this should be dynamic
   const insufficientFunds = isBuyMode && false;
+
+  const isUsdPriceLoading = !buyPriceData?.price || !ethUsdRate;
 
   return (
     <div className="StakeExchangeForm">
@@ -173,9 +184,14 @@ const StakeExchangeForm = ({ mode, setModalState }: StakeExchangeFormProps) => {
             <CWText type="caption" className="label">
               Price per unit
             </CWText>
-            <CWText type="caption" fontWeight="medium">
-              {0.036} ETH • ~$25 USD
-            </CWText>
+            {isUsdPriceLoading ? (
+              <Skeleton className="price-skeleton" />
+            ) : (
+              <CWText type="caption" fontWeight="medium">
+                {buyPriceData?.price} ETH • ~$
+                {convertEthToUsd(buyPriceData?.price, ethUsdRate)} USD
+              </CWText>
+            )}
           </div>
         </div>
 

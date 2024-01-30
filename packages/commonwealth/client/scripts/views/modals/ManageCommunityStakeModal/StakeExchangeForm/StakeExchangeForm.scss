@@ -93,6 +93,10 @@
       .label {
         color: $neutral-400;
       }
+
+      .price-skeleton {
+        min-width: 150px;
+      }
     }
   }
 
