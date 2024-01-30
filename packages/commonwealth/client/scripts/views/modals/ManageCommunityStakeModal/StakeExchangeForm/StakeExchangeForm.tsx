@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import React, { useState } from 'react';
 import { isMobile } from 'react-device-detect';
 
+import { calculateVoteWeight } from '@hicommonwealth/chains/src/commonProtocol/utils';
 import { useCommunityStake } from 'views/components/CommunityStake';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
@@ -51,8 +52,13 @@ const StakeExchangeForm = ({ mode, setModalState }: StakeExchangeFormProps) => {
     ethUsdRate,
   } = useStakeExchange({ mode });
 
-  // create new hook rather than using useCommunityStake
-  const { stakeBalance, stakeValue, voteWeight } = useCommunityStake();
+  const { stakeBalance, stakeValue, currentVoteWeight, stakeData } =
+    useCommunityStake();
+
+  const expectedVoteWeight = calculateVoteWeight(
+    String(numberOfStakeToExchange),
+    stakeData?.vote_weight,
+  );
 
   const popoverProps = usePopover();
 
@@ -95,10 +101,10 @@ const StakeExchangeForm = ({ mode, setModalState }: StakeExchangeFormProps) => {
     setNumberOfStakeToExchange((prevState) => prevState + 1);
   };
 
-  // TODO this should be dynamic
-  const insufficientFunds = isBuyMode && false;
-
-  const isUsdPriceLoading = !buyPriceData?.price || !ethUsdRate;
+  const currentBalance = 0.012;
+  const insufficientFunds =
+    isBuyMode && currentBalance < parseFloat(buyPriceData?.totalPrice);
+  const isUsdPriceLoading = !buyPriceData || !ethUsdRate;
 
   return (
     <div className="StakeExchangeForm">
@@ -139,7 +145,7 @@ const StakeExchangeForm = ({ mode, setModalState }: StakeExchangeFormProps) => {
             fontWeight="medium"
             className={clsx({ error: insufficientFunds })}
           >
-            5.642 ETH
+            {currentBalance} ETH
           </CWText>
         </div>
 
@@ -151,7 +157,7 @@ const StakeExchangeForm = ({ mode, setModalState }: StakeExchangeFormProps) => {
             valued at {stakeValue} ETH
           </CWText>
           <CWText type="caption" className="vote-weight">
-            Current vote weight {voteWeight}
+            Current vote weight {currentVoteWeight}
           </CWText>
         </div>
 
@@ -209,7 +215,7 @@ const StakeExchangeForm = ({ mode, setModalState }: StakeExchangeFormProps) => {
             Total weight
           </CWText>
           <CWText type="h3" fontWeight="bold" className="number">
-            50
+            {expectedVoteWeight}
           </CWText>
         </div>
 
@@ -255,16 +261,26 @@ const StakeExchangeForm = ({ mode, setModalState }: StakeExchangeFormProps) => {
             />
             <CWText type="caption">Fees</CWText>
           </div>
-          <CWText type="caption" fontWeight="medium">
-            0.001 ETH • ~$1.75 USD
-          </CWText>
+          {isUsdPriceLoading ? (
+            <Skeleton className="price-skeleton" />
+          ) : (
+            <CWText type="caption" fontWeight="medium">
+              {buyPriceData?.fees} ETH • ~$
+              {convertEthToUsd(buyPriceData?.fees, ethUsdRate)} USD
+            </CWText>
+          )}
         </div>
 
         <div className="total-cost-row">
           <CWText type="caption">{isBuyMode ? 'Total cost' : 'Net'}</CWText>
-          <CWText type="caption" fontWeight="medium">
-            0.036 ETH • ~$25.00 USD
-          </CWText>
+          {isUsdPriceLoading ? (
+            <Skeleton className="price-skeleton" />
+          ) : (
+            <CWText type="caption" fontWeight="medium">
+              {buyPriceData?.totalPrice} ETH • ~$
+              {convertEthToUsd(buyPriceData?.totalPrice, ethUsdRate)} USD
+            </CWText>
+          )}
         </div>
       </CWModalBody>
       <CWModalFooter>

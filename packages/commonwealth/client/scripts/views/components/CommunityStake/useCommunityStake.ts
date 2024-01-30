@@ -50,7 +50,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
       apiEnabled: apiEnabled && !isNaN(Number(userStakeBalanceData)),
     });
 
-  const voteWeight = calculateVoteWeight(
+  const currentVoteWeight = calculateVoteWeight(
     userStakeBalanceData,
     stakeData?.vote_weight,
   );
@@ -60,9 +60,10 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     communityStakeLoading || userStakeBalanceLoading || buyPriceDataLoading;
 
   return {
+    stakeData,
     stakeEnabled,
     stakeBalance,
-    voteWeight,
+    currentVoteWeight,
     stakeValue,
     isLoading,
   };
