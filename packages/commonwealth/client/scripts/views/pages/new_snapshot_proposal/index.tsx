@@ -24,10 +24,6 @@ import {
 import { createNewProposal } from './helpers';
 import type { ThreadForm } from './types';
 
-type NewSnapshotProposalPageProps = {
-  snapshotId: string;
-};
-
 type NewSnapshotProposalFormProps = {
   snapshotId: string;
   thread?: Thread;
@@ -90,7 +86,7 @@ export const NewSnapshotProposalForm = ({
         onSave({ id: response.id, snapshot_title: response.title }); // Pass relevant information
       }
     } catch (err) {
-      notifyError(capitalize(err.message));
+      notifyError(capitalize(err.error_description));
     } finally {
       setIsSaving(false);
     }
@@ -300,7 +296,7 @@ export const NewSnapshotProposalForm = ({
           <ReactQuillEditor
             contentDelta={contentDelta}
             setContentDelta={setContentDelta}
-            placeholder={'What is your proposal?'}
+            placeholder="What is your proposal?"
           />
           <div className="footer">
             {onModalClose && (
@@ -323,18 +319,3 @@ export const NewSnapshotProposalForm = ({
     </div>
   );
 };
-
-const NewSnapshotProposalPage = ({
-  snapshotId,
-}: NewSnapshotProposalPageProps) => {
-  return (
-    <div className="NewSnapshotProposalPage">
-      <CWText type="h3" fontWeight="medium">
-        New Snapshot Proposal
-      </CWText>
-      <NewSnapshotProposalForm snapshotId={snapshotId} />
-    </div>
-  );
-};
-
-export default NewSnapshotProposalPage;
