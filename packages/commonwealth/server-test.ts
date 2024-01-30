@@ -4,7 +4,7 @@ import {
   RedisCache,
   setupErrorHandlers,
 } from '@hicommonwealth/adapters';
-import { logger } from '@hicommonwealth/core';
+import { cache, logger } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import bodyParser from 'body-parser';
 import SessionSequelizeStore from 'connect-session-sequelize';
@@ -25,6 +25,9 @@ import { TokenBalanceCache } from './server/util/tokenBalanceCache/tokenBalanceC
 import ViewCountCache from './server/util/viewCountCache';
 
 const log = logger().getLogger(__filename);
+const redisCache = new RedisCache();
+const cacheDecorator = new CacheDecorator(redisCache);
+cache(redisCache);
 
 require('express-async-errors');
 
@@ -34,7 +37,6 @@ const SequelizeStore = SessionSequelizeStore(session.Store);
 const viewCountCache = new ViewCountCache(1, 10 * 60);
 const tokenBalanceCache = new TokenBalanceCache(
   models,
-  null as RedisCache,
   TBC_BALANCE_TTL_SECONDS,
 );
 const databaseValidationService = new DatabaseValidationService(models);
@@ -106,9 +108,7 @@ const setupServer = () => {
 };
 
 const banCache = new BanCache(models);
-const redisCache = new RedisCache();
-const cacheDecorator = new CacheDecorator(redisCache);
-const globalActivityCache = new GlobalActivityCache(models, redisCache);
+const globalActivityCache = new GlobalActivityCache(models);
 globalActivityCache.start();
 
 setupPassport(models);
@@ -121,7 +121,6 @@ setupAPI(
   banCache,
   globalActivityCache,
   databaseValidationService,
-  redisCache,
 );
 setupCosmosProxy(app, models, cacheDecorator);
 

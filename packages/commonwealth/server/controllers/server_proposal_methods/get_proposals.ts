@@ -38,7 +38,6 @@ export async function __getProposals(
     const proposals = await getCompoundProposals(
       contractInfo.address,
       provider,
-      this.redisCache,
     );
     formattedProposals = proposals.map((p) => formatCompoundBravoProposal(p));
   } else {

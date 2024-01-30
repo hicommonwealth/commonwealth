@@ -1,5 +1,4 @@
-import { RedisCache } from '@hicommonwealth/adapters';
-import { logger, RedisNamespaces } from '@hicommonwealth/core';
+import { CacheNamespaces, cache, logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import { AddressAttributes } from '@hicommonwealth/model';
 import { v4 as uuidv4 } from 'uuid';
@@ -24,7 +23,6 @@ export default class GlobalActivityCache {
 
   constructor(
     private _models: DB,
-    private _redisCache: RedisCache,
     private _cacheTTL: number = 60 * 5, // cache TTL in seconds
   ) {}
 
@@ -37,8 +35,8 @@ export default class GlobalActivityCache {
   public async getGlobalActivity(): Promise<
     GlobalActivityJson | GlobalActivity
   > {
-    const activity = await this._redisCache.getKey(
-      RedisNamespaces.Activity_Cache,
+    const activity = await cache().getKey(
+      CacheNamespaces.Activity_Cache,
       this._cacheKey,
     );
 
@@ -59,8 +57,8 @@ export default class GlobalActivityCache {
     const errorMsg = 'Failed to update global activity in Redis';
 
     try {
-      const res = await this._redisCache.getKey(
-        RedisNamespaces.Activity_Cache,
+      const res = await cache().getKey(
+        CacheNamespaces.Activity_Cache,
         this._cacheKey,
       );
 
@@ -87,8 +85,8 @@ export default class GlobalActivityCache {
 
       if (!updated) return;
 
-      const result = await this._redisCache.setKey(
-        RedisNamespaces.Activity_Cache,
+      const result = await cache().setKey(
+        CacheNamespaces.Activity_Cache,
         this._cacheKey,
         JSON.stringify(activity),
       );
@@ -110,8 +108,8 @@ export default class GlobalActivityCache {
       }
 
       const activity = await getActivityFeed(this._models);
-      const result = await this._redisCache.setKey(
-        RedisNamespaces.Activity_Cache,
+      const result = await cache().setKey(
+        CacheNamespaces.Activity_Cache,
         this._cacheKey,
         JSON.stringify(activity),
       );
@@ -130,8 +128,8 @@ export default class GlobalActivityCache {
   }
 
   private async acquireLock() {
-    return await this._redisCache.setKey(
-      RedisNamespaces.Activity_Cache,
+    return await cache().setKey(
+      CacheNamespaces.Activity_Cache,
       this._lockName,
       uuidv4(),
       // shorten by 5 seconds to eliminate any discrepancies

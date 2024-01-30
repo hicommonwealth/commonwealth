@@ -1,11 +1,16 @@
-import { ILogger, logger, type RedisNamespaces } from '@hicommonwealth/core';
+import {
+  Cache,
+  ILogger,
+  logger,
+  timeoutPromise,
+  type CacheNamespaces,
+} from '@hicommonwealth/core';
 import {
   ConnectionTimeoutError,
-  createClient,
   ReconnectStrategyError,
   SocketClosedUnexpectedlyError,
+  createClient,
 } from 'redis';
-import { timeoutPromise } from '../utils';
 
 export function redisRetryStrategy(retries: number) {
   if (retries > 5) {
@@ -23,17 +28,17 @@ export function redisRetryStrategy(retries: number) {
  * WARNING: If running blocking arbitrary commands using the client directly be sure to include the 'isolated' option
  * in order to avoid blocking the client for other requests that may be occurring.
  */
-export class RedisCache {
+export class RedisCache implements Cache {
   private _initialized = false;
   private _client;
-  private _log?: ILogger;
+  private _log: ILogger;
 
   constructor() {
     this._log = logger().getLogger(__filename);
   }
 
   // get namespace key for redis
-  static getNamespaceKey(namespace: RedisNamespaces, key: string) {
+  static getNamespaceKey(namespace: CacheNamespaces, key: string) {
     return `${namespace}_${key}`;
   }
 
@@ -124,14 +129,14 @@ export class RedisCache {
    * the chat websocket. The resulting key would thus be 'chat_socket_[user_id]'. The prefix can be thought of as the
    * namespace of the data that you are trying to store.
    * @param namespace The prefix to append to the dynamic key i.e. the namespace. An instance of the
-   * RedisNamespaces enum.
+   * CacheNamespaces enum.
    * @param key The actual key you want to store (can be any valid string).
    * @param value The value to associate with the namespace and key
    * @param duration The number of seconds after which the key should be automatically 'deleted' by Redis i.e. TTL
    * @param notExists If true and the key already exists the key will not be set
    */
   public async setKey(
-    namespace: RedisNamespaces,
+    namespace: CacheNamespaces,
     key: string,
     value: string,
     duration = 0,
@@ -166,7 +171,7 @@ export class RedisCache {
   }
 
   public async getKey(
-    namespace: RedisNamespaces,
+    namespace: CacheNamespaces,
     key: string,
   ): Promise<string> {
     try {
@@ -192,7 +197,7 @@ export class RedisCache {
    * is true, a blocking and potentially less performant operation is executed.
    */
   public async setKeys(
-    namespace: RedisNamespaces,
+    namespace: CacheNamespaces,
     data: { [key: string]: string },
     duration = 0,
     transaction = true,
@@ -237,7 +242,7 @@ export class RedisCache {
   }
 
   public async getKeys(
-    namespace: RedisNamespaces,
+    namespace: CacheNamespaces,
     keys: string[],
   ): Promise<false | Record<string, unknown>> {
     if (this.initialized()) {
@@ -268,7 +273,7 @@ export class RedisCache {
    * @param maxResults The maximum number of keys to retrieve from the given namespace
    */
   public async getNamespaceKeys(
-    namespace: RedisNamespaces,
+    namespace: CacheNamespaces,
     maxResults = 1000,
   ): Promise<{ [key: string]: string } | boolean> {
     const keys = [];
@@ -300,9 +305,19 @@ export class RedisCache {
    * alongside the server initialization so that the instance can be used by all routes.
    */
   public async closeClient(): Promise<boolean> {
-    await this._client.quit();
-    this._initialized = false;
+    if (this._initialized) {
+      await this._client.quit();
+      this._initialized = false;
+    }
     return true;
+  }
+
+  public get name(): string {
+    return 'RedisCache';
+  }
+
+  public async dispose(): Promise<void> {
+    await this.closeClient();
   }
 
   /**
@@ -318,7 +333,7 @@ export class RedisCache {
    * @returns boolean
    */
   public async deleteNamespaceKeys(
-    namespace: RedisNamespaces,
+    namespace: CacheNamespaces,
   ): Promise<number | boolean> {
     try {
       let count = 0;
@@ -344,7 +359,7 @@ export class RedisCache {
   }
 
   public async deleteKey(
-    namespace: RedisNamespaces,
+    namespace: CacheNamespaces,
     key: string,
   ): Promise<number> {
     const finalKey = RedisCache.getNamespaceKey(namespace, key);
@@ -359,8 +374,8 @@ export class RedisCache {
     }
   }
 
-  public get client(): typeof this._client {
-    return this._client;
+  public async flushAll(): Promise<void> {
+    await this._client.flushAll();
   }
 }
 
