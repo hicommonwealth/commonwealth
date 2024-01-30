@@ -1,6 +1,6 @@
 import React from 'react';
-import { NewSnapshotProposalForm } from '../../../views/pages/new_snapshot_proposal/index';
 import { CWText } from '../../components/component_kit/cw_text';
+import { NewSnapshotProposalForm } from './index';
 
 type NewSnapshotProposalPageProps = {
   snapshotId: string;
