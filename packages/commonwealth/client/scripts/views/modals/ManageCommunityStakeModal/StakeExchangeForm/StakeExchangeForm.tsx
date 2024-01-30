@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { isMobile } from 'react-device-detect';
 
 import { calculateVoteWeight } from '@hicommonwealth/chains/src/commonProtocol/utils';
+import app from 'state';
 import { useCommunityStake } from 'views/components/CommunityStake';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
@@ -26,7 +27,7 @@ import {
   ManageCommunityStakeModalState,
 } from '../types';
 import useStakeExchange from '../useStakeExchange';
-import { convertEthToUsd } from '../utils';
+import { convertEthToUsd, getInitialAccountValue } from '../utils';
 import {
   CustomAddressOption,
   CustomAddressOptionElement,
@@ -40,16 +41,22 @@ interface StakeExchangeFormProps {
 }
 
 const StakeExchangeForm = ({ mode, setModalState }: StakeExchangeFormProps) => {
-  const [selectedAddress, setSelectedAddress] = useState({
-    value: '0xeRh',
-    label: '0xeRh',
-  });
+  const activeAccountAddress = app?.user?.activeAccount?.address;
+  const addressOptions = app.user.activeAccounts.map(({ address }) => ({
+    label: address,
+    value: address,
+  }));
+
+  const [selectedAddress, setSelectedAddress] = useState(
+    getInitialAccountValue(activeAccountAddress, addressOptions),
+  );
 
   const {
     numberOfStakeToExchange,
     setNumberOfStakeToExchange,
     buyPriceData,
     ethUsdRate,
+    userEthBalance,
   } = useStakeExchange({ mode });
 
   const { stakeBalance, stakeValue, currentVoteWeight, stakeData } =
@@ -101,9 +108,11 @@ const StakeExchangeForm = ({ mode, setModalState }: StakeExchangeFormProps) => {
     setNumberOfStakeToExchange((prevState) => prevState + 1);
   };
 
-  const currentBalance = 0.012;
   const insufficientFunds =
-    isBuyMode && currentBalance < parseFloat(buyPriceData?.totalPrice);
+    parseFloat(userEthBalance) < parseFloat(buyPriceData?.totalPrice);
+  const buyingDisabled =
+    isBuyMode && (insufficientFunds || numberOfStakeToExchange === 0);
+
   const isUsdPriceLoading = !buyPriceData || !ethUsdRate;
 
   return (
@@ -127,15 +136,8 @@ const StakeExchangeForm = ({ mode, setModalState }: StakeExchangeFormProps) => {
           label="Select address"
           isClearable={false}
           isSearchable={false}
-          options={[
-            { value: '0xeRh', label: '0xeRh' },
-            { value: '0xaBc', label: '0xaBc' },
-            { value: 'eRhWN', label: 'eRhWN' },
-          ]}
-          onChange={(newValue) => {
-            console.log('selected value is: ', newValue.label);
-            setSelectedAddress(newValue);
-          }}
+          options={addressOptions}
+          onChange={setSelectedAddress}
         />
 
         <div className="current-balance-row">
@@ -145,7 +147,7 @@ const StakeExchangeForm = ({ mode, setModalState }: StakeExchangeFormProps) => {
             fontWeight="medium"
             className={clsx({ error: insufficientFunds })}
           >
-            {currentBalance} ETH
+            {userEthBalance} ETH
           </CWText>
         </div>
 
@@ -285,7 +287,7 @@ const StakeExchangeForm = ({ mode, setModalState }: StakeExchangeFormProps) => {
       </CWModalBody>
       <CWModalFooter>
         <CWButton
-          disabled={insufficientFunds}
+          disabled={buyingDisabled}
           label={isBuyMode ? 'Buy stake' : 'Sell stake'}
           buttonType="secondary"
           buttonAlt={isBuyMode ? 'green' : 'rorange'}

@@ -6,6 +6,7 @@ import {
   useGetBuyPriceQuery,
 } from 'state/api/communityStake';
 import { ManageCommunityStakeModalMode } from 'views/modals/ManageCommunityStakeModal/types';
+import useGetUserEthBalanceQuery from '../../../state/api/communityStake/getUserEthBalance';
 
 interface UseStakeExchangeProps {
   mode: ManageCommunityStakeModalMode;
@@ -15,6 +16,8 @@ const useStakeExchange = ({ mode }: UseStakeExchangeProps) => {
   const [numberOfStakeToExchange, setNumberOfStakeToExchange] = useState(1);
 
   const activeCommunityNamespace = app?.chain?.meta?.namespace;
+
+  const { data: userEthBalance } = useGetUserEthBalanceQuery();
 
   const { data: buyPriceData } = useGetBuyPriceQuery({
     namespace: activeCommunityNamespace,
@@ -31,6 +34,7 @@ const useStakeExchange = ({ mode }: UseStakeExchangeProps) => {
     setNumberOfStakeToExchange,
     buyPriceData,
     ethUsdRate,
+    userEthBalance,
   };
 };
 

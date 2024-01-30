@@ -2166,6 +2166,7 @@ export const ComponentShowcase = () => {
           stakeNumber={1}
           stakeValue={0.072}
           denomination="ETH"
+          onOpenStakeModal={() => console.log('open modal')}
         />
       </div>
       <div className="drawer-container">

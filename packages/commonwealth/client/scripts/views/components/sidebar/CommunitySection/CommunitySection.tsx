@@ -37,8 +37,13 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   const { pathname } = useLocation();
   const { isLoggedIn } = useUserLoggedIn();
   const { activeAccount } = useUserActiveAccount();
-  const { stakeEnabled, stakeBalance, voteWeight, stakeValue, isLoading } =
-    useCommunityStake();
+  const {
+    stakeEnabled,
+    stakeBalance,
+    currentVoteWeight,
+    stakeValue,
+    isLoading,
+  } = useCommunityStake();
   const {
     modeOfManageCommunityStakeModal,
     setModeOfManageCommunityStakeModal,
@@ -63,7 +68,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
 
             {stakeEnabled && (
               <VoteWeightModule
-                voteWeight={voteWeight}
+                voteWeight={currentVoteWeight}
                 stakeNumber={stakeBalance}
                 stakeValue={stakeValue}
                 denomination="ETH"
