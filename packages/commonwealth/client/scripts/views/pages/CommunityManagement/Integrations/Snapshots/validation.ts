@@ -1,10 +1,13 @@
 import z from 'zod';
 
-const snapshotValidationSchema = z
-  .string()
-  .refine((space) => /^[a-zA-Z0-9-.]+\.eth$|^[a-zA-Z0-9-]+\.xyz$/.test(space), {
-    message:
-      'Snapshot name must be in the form of *.eth or *.xyz and not include http or https',
-  });
+const snapshotValidationSchema = z.string().refine(
+  (space) => {
+    const extension = space.slice(space.length - 4);
+    return extension === '.eth' || extension === '.xyz';
+  },
+  {
+    message: 'Snapshot name must be in the form of *.eth or *.xyz',
+  },
+);
 
 export { snapshotValidationSchema };
