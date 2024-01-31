@@ -51,6 +51,7 @@ export const NewSnapshotProposalForm = ({
   const [, setSnapshotScoresFetched] = useState<boolean>(false);
   const [space, setSpace] = useState<SnapshotSpace | null>(null);
   const [userScore, setUserScore] = useState<number>(0);
+  const [errorMessage, setErrorMessage] = useState(false);
 
   const location = useLocation();
   const pathVars = useMemo(() => {
@@ -91,6 +92,15 @@ export const NewSnapshotProposalForm = ({
       setIsSaving(false);
     }
   };
+
+  useEffect(() => {
+    const errorTimeout = setTimeout(() => {
+      // setLoading(false);
+      setErrorMessage(true);
+    }, 6000);
+
+    return () => clearTimeout(errorTimeout);
+  }, [loading]);
 
   useEffect(() => {
     const init = async () => {
@@ -210,9 +220,17 @@ export const NewSnapshotProposalForm = ({
   return (
     <div className="NewSnapshotProposalForm">
       {loading ? (
-        <div className="proposal-loading">
-          <CWSpinner />
-        </div>
+        errorMessage ? (
+          <div className="error-text">
+            <CWText>
+              Snapshot space not found. Check your Snapshot name and try again.
+            </CWText>
+          </div>
+        ) : (
+          <div className="proposal-loading">
+            <CWSpinner />
+          </div>
+        )
       ) : (
         <>
           {space.filters?.onlyMembers && !isMember && (
