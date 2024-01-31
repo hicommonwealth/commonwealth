@@ -25,19 +25,21 @@ const AuthButton = ({
     >
       <IconComp className="icon" iconName={auth.icon.name as any} />
 
-      <CWText type="h5" className="label">
-        {auth.label}
-      </CWText>
+      <div className="info">
+        <CWText type="h5" className="label">
+          {auth.label}
+        </CWText>
 
-      {auth?.description && (
-        <CWTag
-          type="stage"
-          label={auth.description.text}
-          classNames={clsx('description', {
-            'no-bg': !auth.description.hasBackground,
-          })}
-        />
-      )}
+        {auth?.description && (
+          <CWTag
+            type="stage"
+            label={auth.description.text}
+            classNames={clsx('description', {
+              'no-bg': !auth.description.hasBackground,
+            })}
+          />
+        )}
+      </div>
     </button>
   );
 };

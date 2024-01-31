@@ -8,9 +8,6 @@
   border: 2px solid $neutral-200;
   padding: 16px;
   width: 100%;
-  min-height: 68px !important;
-  max-height: 68px !important;
-  height: 68px !important;
   outline: none !important;
   cursor: pointer;
   background-color: white;
@@ -40,20 +37,33 @@
     min-height: 36px;
   }
 
-  .label {
-    font-weight: 600;
-  }
+  .info {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
 
-  .description {
-    margin-left: auto;
-    background-color: $primary-600;
+    .label {
+      font-weight: 600;
+      margin-right: auto;
+      margin-top: -6px;
+      margin-bottom: -6px;
+    }
 
-    &.no-bg {
-      background-color: transparent;
-      padding: 0 !important;
+    .description {
+      margin-top: -6px;
+      margin-bottom: -6px;
+      background-color: $primary-600;
 
-      .Text {
-        color: $neutral-400 !important;
+      &.no-bg {
+        background-color: transparent;
+        padding: 0 !important;
+
+        .Text {
+          color: $neutral-400 !important;
+        }
       }
     }
   }

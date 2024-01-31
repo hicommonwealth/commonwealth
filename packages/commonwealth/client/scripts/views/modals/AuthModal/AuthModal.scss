@@ -1,0 +1,78 @@
+@import '../../../../styles/shared';
+
+.AuthModal {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  gap: 16px;
+  border-radius: 6px;
+  padding: 48px;
+  min-width: 600px;
+  max-width: 600px;
+
+  @include extraSmall {
+    padding: 32px;
+    min-width: 100%;
+    max-width: 100%;
+  }
+
+  .close-btn {
+    position: absolute;
+    right: 0;
+    margin-right: 16px;
+    cursor: pointer;
+
+    @include extraSmall {
+      top: 16px;
+    }
+  }
+
+  .logo {
+    height: auto;
+    margin: auto;
+    width: 227px;
+
+    @include extraSmall {
+      width: 175px;
+    }
+  }
+
+  .header {
+    text-align: center;
+  }
+
+  .tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    .Tab {
+      .Text {
+        width: 100%;
+        max-width: 100%;
+      }
+    }
+  }
+
+  .auth-options {
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+    gap: 16px;
+    width: 100%;
+    max-height: 420px;
+  }
+
+  .disclaimer {
+    text-align: center;
+    margin-top: 16px;
+    padding: 0 16px;
+    line-height: 1.5;
+
+    a,
+    a:visited,
+    a:active,
+    a:hover {
+      color: $primary-600;
+    }
+  }
+}
