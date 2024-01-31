@@ -4,7 +4,12 @@ import {
 } from '../component_kit/cw_icons/cw_icon_lookup';
 
 export type AuthSSOs = 'google' | 'discord' | 'x' | 'github';
-export type AuthWallets = 'keplr' | 'leap' | 'NO_WALLETS_FOUND';
+export type AuthWallets =
+  | 'keplr'
+  | 'leap'
+  | 'phantom'
+  | 'polkadot'
+  | 'NO_WALLETS_FOUND';
 export type AuthTypes = 'walletConnect' | AuthWallets | AuthSSOs | 'email';
 
 export type AuthButtonConfig = {

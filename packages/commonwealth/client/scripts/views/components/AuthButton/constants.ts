@@ -10,7 +10,7 @@ export const AUTH_TYPES: AuthTypesList = {
     },
     label: 'WalletConnect',
     description: {
-      text: 'Supports 350+ Wallets',
+      text: 'All Ethereum Wallets',
       hasBackground: true,
     },
   },
@@ -42,6 +42,28 @@ export const AUTH_TYPES: AuthTypesList = {
     label: 'Leap',
     description: {
       text: 'Cosmos Communities',
+      hasBackground: false,
+    },
+  },
+  phantom: {
+    icon: {
+      name: 'phantom',
+      isCustom: true,
+    },
+    label: 'Phantom',
+    description: {
+      text: 'Solana Communities',
+      hasBackground: false,
+    },
+  },
+  polkadot: {
+    icon: {
+      name: 'polkadot',
+      isCustom: true,
+    },
+    label: 'Polkadot',
+    description: {
+      text: 'Substrate Communities',
       hasBackground: false,
     },
   },
