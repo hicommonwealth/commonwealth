@@ -119,7 +119,7 @@ const ReactQuillEditor = ({
     const newContent = convertTwitterLinksToEmbeds(editor.getContents());
     setContentDelta({
       ...newContent,
-      ___isMarkdown: isMarkdownEnabled,
+      ___isMarkdown: true,
     } as SerializableDeltaStatic);
   };
 
