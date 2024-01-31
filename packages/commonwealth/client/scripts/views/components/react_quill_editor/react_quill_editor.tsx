@@ -83,7 +83,6 @@ const ReactQuillEditor = ({
     editorRef,
     setContentDelta,
     setIsUploading,
-    isMarkdownEnabled,
   });
 
   // handle image upload for image toolbar button

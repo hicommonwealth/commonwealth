@@ -1,7 +1,7 @@
-import { MutableRefObject, useCallback } from 'react';
-import ReactQuill, { Quill } from 'react-quill';
 import { DeltaOperation, DeltaStatic } from 'quill';
 import imageDropAndPaste from 'quill-image-drop-and-paste';
+import { MutableRefObject, useCallback } from 'react';
+import ReactQuill, { Quill } from 'react-quill';
 
 import app from 'state';
 import {
@@ -16,14 +16,12 @@ Quill.register('modules/imageDropAndPaste', imageDropAndPaste);
 type UseImageDropAndPasteProps = {
   editorRef: MutableRefObject<ReactQuill>;
   setIsUploading: (value: boolean) => void;
-  isMarkdownEnabled: boolean;
   setContentDelta: (value: DeltaStatic) => void;
 };
 
 export const useImageDropAndPaste = ({
   editorRef,
   setIsUploading,
-  isMarkdownEnabled,
   setContentDelta,
 }: UseImageDropAndPasteProps) => {
   // must be memoized or else infinite loop
@@ -58,7 +56,7 @@ export const useImageDropAndPaste = ({
         });
         setContentDelta({
           ops: opsWithoutBase64Images,
-          ___isMarkdown: isMarkdownEnabled,
+          ___isMarkdown: true,
         } as SerializableDeltaStatic);
 
         const file = base64ToFile(imageDataUrl, imageType);
@@ -66,7 +64,7 @@ export const useImageDropAndPaste = ({
         const uploadedFileUrl = await uploadFileToS3(
           file,
           app.serverUrl(),
-          app.user.jwt
+          app.user.jwt,
         );
 
         const selectedIndex = editor.getSelection()?.index;
@@ -83,24 +81,11 @@ export const useImageDropAndPaste = ({
           blankEditor = true;
         }
 
-        // Insert image op at the selected index.
-        // If editor is not blank, must insert a line break
-        // for the image to be in the middle of text
-        if (isMarkdownEnabled) {
-          editor.insertText(selectedIndex, `![image](${uploadedFileUrl})`);
-        } else {
-          if (!blankEditor) {
-            editor.insertText(selectedIndex, lineBreak);
-          }
-          if (selectedIndex === 0) {
-            editor.insertEmbed(selectedIndex, 'image', uploadedFileUrl);
-          } else {
-            editor.insertEmbed(selectedIndex + 1, 'image', uploadedFileUrl);
-          }
-        }
+        editor.insertText(selectedIndex, `![image](${uploadedFileUrl})`);
+
         setContentDelta({
           ...editor.getContents(),
-          ___isMarkdown: isMarkdownEnabled,
+          ___isMarkdown: true,
         } as SerializableDeltaStatic); // sync state with editor content
       } catch (err) {
         console.error(err);
@@ -109,7 +94,7 @@ export const useImageDropAndPaste = ({
         setIsUploading(false);
       }
     },
-    [editorRef, isMarkdownEnabled, setContentDelta, setIsUploading]
+    [editorRef, setContentDelta, setIsUploading],
   );
 
   return { handleImageDropAndPaste };
