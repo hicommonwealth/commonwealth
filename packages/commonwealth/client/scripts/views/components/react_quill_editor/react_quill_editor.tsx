@@ -23,6 +23,7 @@ import { SerializableDeltaStatic, getTextFromDelta } from './utils';
 
 import 'components/react_quill/react_quill_editor.scss';
 import 'react-quill/dist/quill.snow.css';
+import { MarkdownPreview } from './MarkdownPreview';
 
 Quill.register('modules/magicUrl', MagicUrl);
 Quill.register('modules/imageUploader', ImageUploader);
@@ -243,113 +244,117 @@ const ReactQuillEditor = ({
           />
         ))}
       </CWTabsRow>
-      <div
-        className={clsx('QuillEditorContainer', { isDisabled })}
-        onMouseEnter={() => setIsHovering(true)}
-        onMouseLeave={() => setIsHovering(false)}
-      >
+      {selectedTab === TABS[0].label ? (
         <div
-          className={clsx('QuillEditorWrapper', {
-            isFocused,
-            isDisabled,
-            isHovering,
-          })}
+          className={clsx('QuillEditorContainer', { isDisabled })}
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
         >
-          {showTooltip && <QuillTooltip label={tooltipLabel} />}
-          {isUploading && <LoadingIndicator />}
+          <div
+            className={clsx('QuillEditorWrapper', {
+              isFocused,
+              isDisabled,
+              isHovering,
+            })}
+          >
+            {showTooltip && <QuillTooltip label={tooltipLabel} />}
+            {isUploading && <LoadingIndicator />}
 
-          <CWModal
-            size="medium"
-            content={
-              <PreviewModal
-                doc={
-                  isMarkdownEnabled
-                    ? getTextFromDelta(contentDelta)
-                    : contentDelta
-                }
-                onModalClose={handlePreviewModalClose}
-                title={isMarkdownEnabled ? 'As Markdown' : 'As Rich Text'}
-              />
-            }
-            onClose={handlePreviewModalClose}
-            open={isPreviewVisible}
-          />
-          {isVisible && (
-            <>
-              <CustomQuillToolbar
-                toolbarId={toolbarId}
-                isMarkdownEnabled={isMarkdownEnabled}
-                handleToggleMarkdown={handleToggleMarkdown}
-                setIsPreviewVisible={setIsPreviewVisible}
-                isDisabled={isDisabled}
-                isPreviewDisabled={getTextFromDelta(contentDelta).length < 1}
-              />
-              <DragDropContext onDragEnd={handleDragStop}>
-                <Droppable droppableId="quillEditor">
-                  {(provided) => (
-                    <div
-                      className={`${isDraggingOver ? 'ondragover' : ''}`}
-                      {...provided.droppableProps}
-                      ref={provided.innerRef}
-                      onDragOver={handleDragStart}
-                      onDragLeave={handleDragStop}
-                      onDrop={handleDragStop}
-                    >
-                      <div data-text-editor="name">
-                        <ReactQuill
-                          ref={editorRef}
-                          className={clsx('QuillEditor', className, {
-                            markdownEnabled: isMarkdownEnabled,
-                          })}
-                          scrollingContainer="ql-container"
-                          placeholder={placeholder}
-                          tabIndex={tabIndex}
-                          theme="snow"
-                          bounds={`[data-text-editor="name"]`}
-                          value={contentDelta}
-                          onFocus={() => setIsFocused(true)}
-                          onBlur={() => setIsFocused(false)}
-                          onChange={handleChange}
-                          onChangeSelection={(selection: RangeStatic) => {
-                            if (!selection) {
-                              return;
-                            }
-                            lastSelectionRef.current = selection;
-                          }}
-                          formats={isMarkdownEnabled ? [] : undefined}
-                          modules={{
-                            toolbar: {
-                              container: `#${toolbarId}`,
-                              handlers: isMarkdownEnabled
-                                ? markdownToolbarHandlers
+            <CWModal
+              size="medium"
+              content={
+                <PreviewModal
+                  doc={
+                    isMarkdownEnabled
+                      ? getTextFromDelta(contentDelta)
+                      : contentDelta
+                  }
+                  onModalClose={handlePreviewModalClose}
+                  title={isMarkdownEnabled ? 'As Markdown' : 'As Rich Text'}
+                />
+              }
+              onClose={handlePreviewModalClose}
+              open={isPreviewVisible}
+            />
+            {isVisible && (
+              <>
+                <CustomQuillToolbar
+                  toolbarId={toolbarId}
+                  isMarkdownEnabled={isMarkdownEnabled}
+                  handleToggleMarkdown={handleToggleMarkdown}
+                  setIsPreviewVisible={setIsPreviewVisible}
+                  isDisabled={isDisabled}
+                  isPreviewDisabled={getTextFromDelta(contentDelta).length < 1}
+                />
+                <DragDropContext onDragEnd={handleDragStop}>
+                  <Droppable droppableId="quillEditor">
+                    {(provided) => (
+                      <div
+                        className={`${isDraggingOver ? 'ondragover' : ''}`}
+                        {...provided.droppableProps}
+                        ref={provided.innerRef}
+                        onDragOver={handleDragStart}
+                        onDragLeave={handleDragStop}
+                        onDrop={handleDragStop}
+                      >
+                        <div data-text-editor="name">
+                          <ReactQuill
+                            ref={editorRef}
+                            className={clsx('QuillEditor', className, {
+                              markdownEnabled: isMarkdownEnabled,
+                            })}
+                            scrollingContainer="ql-container"
+                            placeholder={placeholder}
+                            tabIndex={tabIndex}
+                            theme="snow"
+                            bounds={`[data-text-editor="name"]`}
+                            value={contentDelta}
+                            onFocus={() => setIsFocused(true)}
+                            onBlur={() => setIsFocused(false)}
+                            onChange={handleChange}
+                            onChangeSelection={(selection: RangeStatic) => {
+                              if (!selection) {
+                                return;
+                              }
+                              lastSelectionRef.current = selection;
+                            }}
+                            formats={isMarkdownEnabled ? [] : undefined}
+                            modules={{
+                              toolbar: {
+                                container: `#${toolbarId}`,
+                                handlers: isMarkdownEnabled
+                                  ? markdownToolbarHandlers
+                                  : undefined,
+                              },
+                              imageDropAndPaste: {
+                                handler: handleImageDropAndPaste,
+                              },
+                              clipboard: {
+                                matchVisual: false,
+                              },
+                              mention,
+                              magicUrl: !isMarkdownEnabled,
+                              keyboard: isMarkdownEnabled
+                                ? markdownKeyboardShortcuts
                                 : undefined,
-                            },
-                            imageDropAndPaste: {
-                              handler: handleImageDropAndPaste,
-                            },
-                            clipboard: {
-                              matchVisual: false,
-                            },
-                            mention,
-                            magicUrl: !isMarkdownEnabled,
-                            keyboard: isMarkdownEnabled
-                              ? markdownKeyboardShortcuts
-                              : undefined,
-                            imageUploader: {
-                              upload: handleImageUploader,
-                            },
-                          }}
-                        />
+                              imageUploader: {
+                                upload: handleImageUploader,
+                              },
+                            }}
+                          />
+                        </div>
+                        {provided.placeholder}
                       </div>
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
-              </DragDropContext>
-            </>
-          )}
+                    )}
+                  </Droppable>
+                </DragDropContext>
+              </>
+            )}
+          </div>
         </div>
-      </div>
+      ) : (
+        <MarkdownPreview doc={getTextFromDelta(contentDelta)} />
+      )}
     </div>
   );
 };
