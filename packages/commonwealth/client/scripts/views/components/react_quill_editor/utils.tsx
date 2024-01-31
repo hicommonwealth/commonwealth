@@ -53,25 +53,20 @@ export const isMarkdownTable = (markdown: string) => {
 };
 
 export const markdownToHtmlTable = (markdown) => {
-  // Split the markdown content into lines
   const lines = markdown.trim().split('\n');
 
-  // Check if each line contains at least one pipe character '|'
   const containsPipe = lines.every((line) => line.includes('|'));
 
-  // Check if the first non-empty line has a pipe character '|'
   const startsWithPipe = lines
     .find((line) => line.trim().length > 0)
     ?.includes('|');
 
-  // Check if the second non-empty line starts and ends with a pipe character '|'
   const secondLine = lines.find(
     (line) => line.trim().length > 0 && line.trim().startsWith('|'),
   );
   const secondLineStartsWithPipe = secondLine?.startsWith('|');
   const secondLineEndsWithPipe = secondLine?.endsWith('|');
 
-  // If all the above conditions are true, it's likely a markdown table
   if (
     containsPipe &&
     startsWithPipe &&
@@ -79,30 +74,44 @@ export const markdownToHtmlTable = (markdown) => {
     secondLineEndsWithPipe
   ) {
     let html = '<table>';
+    let isHeaderRow = true;
+
     lines.forEach((line, index) => {
       const cells = line.split('|').map((cell) => cell.trim());
-      const tag = index === 0 || index === 1 ? 'th' : 'td';
+      const tag = isHeaderRow ? 'th' : 'td';
+      const rowTag = isHeaderRow ? 'thead' : 'tbody';
 
-      html += '<tr>';
+      // Check if the row is solely made up of alignment markers
+      const isAlignmentRow = cells.every((cell) => /^:\-+:$/.test(cell));
 
-      cells.forEach((cell) => {
-        const alignment =
-          cell.startsWith(':') && cell.endsWith(':')
-            ? 'text-align:center;'
-            : cell.startsWith(':')
-            ? 'text-align:left;'
-            : cell.endsWith(':')
-            ? 'text-align:right;'
-            : '';
-        const bold = cell.startsWith('**') && cell.endsWith('**');
-        const content = bold
-          ? `<strong>${cell.substring(2, cell.length - 2)}</strong>`
-          : cell;
+      if (!isAlignmentRow) {
+        html += `<${rowTag}><tr>`;
+        cells.forEach((cell) => {
+          let alignment = '';
+          if (cell.startsWith(':') && cell.endsWith(':')) {
+            alignment = 'text-align:center;';
+          } else if (cell.startsWith(':')) {
+            alignment = 'text-align:left;';
+          } else if (cell.endsWith(':')) {
+            alignment = 'text-align:right;';
+          }
 
-        html += `<${tag} style="${alignment}">${content}</${tag}>`;
-      });
+          const bold = cell.startsWith('**') && cell.endsWith('**');
+          const content = bold
+            ? `<strong>${cell.substring(2, cell.length - 2)}</strong>`
+            : cell;
 
-      html += '</tr>';
+          // Check if the cell content is the alignment format ":---:"
+          const isAlignmentFormat = /^:\-+:$/.test(cell);
+
+          if (!isAlignmentFormat) {
+            html += `<${tag} style="${alignment}">${content}</${tag}>`;
+          }
+        });
+
+        html += '</tr></${rowTag}>';
+        if (isHeaderRow) isHeaderRow = false; // Update flag after processing header row
+      }
     });
 
     html += '</table>';
