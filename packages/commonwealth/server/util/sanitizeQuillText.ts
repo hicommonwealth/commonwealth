@@ -3,6 +3,7 @@ type EmbedSanitizer = (url: string) => string | null;
 
 const youtubeEmbedSanitizer: EmbedSanitizer = (url: string): string | null => {
   const regex =
+    // eslint-disable-next-line max-len
     /^(?:https?:\/\/)?(?:m\.|www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
   const match = url.match(regex);
   if (match) {

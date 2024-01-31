@@ -275,7 +275,7 @@ export class RedisCache implements Cache {
    * @returns The new value of the key after the increment.
    */
   public async incrementKey(
-    namespace: RedisNamespaces,
+    namespace: CacheNamespaces,
     key: string,
     increment = 1,
   ): Promise<number | null> {
@@ -286,8 +286,7 @@ export class RedisCache implements Cache {
       }
     } catch (e) {
       const msg = `An error occurred while incrementing the key: ${key}`;
-      log.error(msg, e);
-      this._rollbar?.error(msg, e);
+      this._log.error(msg, e);
       return null;
     }
   }
@@ -300,7 +299,7 @@ export class RedisCache implements Cache {
    * @returns The new value of the key after the decrement.
    */
   public async decrementKey(
-    namespace: RedisNamespaces,
+    namespace: CacheNamespaces,
     key: string,
     decrement = 1,
   ): Promise<number | null> {
@@ -311,8 +310,7 @@ export class RedisCache implements Cache {
       }
     } catch (e) {
       const msg = `An error occurred while decrementing the key: ${key}`;
-      log.error(msg, e);
-      this._rollbar?.error(msg, e);
+      this._log.error(msg, e);
       return null;
     }
   }
@@ -325,7 +323,7 @@ export class RedisCache implements Cache {
    * @returns True if the expiration was set successfully, false otherwise.
    */
   public async setKeyTTL(
-    namespace: RedisNamespaces,
+    namespace: CacheNamespaces,
     key: string,
     ttlInSeconds: number,
   ): Promise<boolean> {
@@ -344,8 +342,7 @@ export class RedisCache implements Cache {
       }
     } catch (e) {
       const msg = `An error occurred while setting the expiration of the key: ${key}`;
-      log.error(msg, e);
-      this._rollbar?.error(msg, e);
+      this._log.error(msg, e);
     }
     return false;
   }
@@ -357,7 +354,7 @@ export class RedisCache implements Cache {
    * @returns The TTL in seconds for the specified key, or -1 if the key does not exist or has no associated expiration.
    */
   public async getKeyTTL(
-    namespace: RedisNamespaces,
+    namespace: CacheNamespaces,
     key: string,
   ): Promise<number> {
     try {
@@ -368,8 +365,7 @@ export class RedisCache implements Cache {
       }
     } catch (e) {
       const msg = `An error occurred while retrieving the TTL of the key: ${key}`;
-      log.error(msg, e);
-      this._rollbar?.error(msg, e);
+      this._log.error(msg, e);
     }
     return -2;
   }

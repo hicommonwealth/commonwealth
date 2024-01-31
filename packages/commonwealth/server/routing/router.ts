@@ -1097,7 +1097,6 @@ function setupRouter(
     'post',
     '/generateImage',
     rateLimiterMiddleware({
-      redisCache,
       routerNamespace: 'generateImage',
       requestsPerMinute: GENERATE_IMAGE_RATE_LIMIT,
     }),

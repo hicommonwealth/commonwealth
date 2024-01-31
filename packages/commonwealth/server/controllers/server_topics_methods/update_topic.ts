@@ -1,5 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
 import { TopicAttributes, UserInstance } from '@hicommonwealth/model';
+import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_methods/track';

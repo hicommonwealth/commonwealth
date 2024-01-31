@@ -1,5 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
-import { logger } from '@hicommonwealth/core';
+import { AppError, logger } from '@hicommonwealth/core';
 import {
   AddressAttributes,
   Balances,

@@ -1,9 +1,7 @@
-import { RedisCache } from '@hicommonwealth/adapters';
-import { RedisNamespaces } from '@hicommonwealth/core';
+import { CacheNamespaces, cache } from '@hicommonwealth/core';
 
 // Rate Limiter Middleware Function
 type RateLimiterOptions = {
-  redisCache: RedisCache;
   routerNamespace: string;
   requestsPerMinute: number;
 };
@@ -15,7 +13,6 @@ const getClientIp = (req) => {
 };
 
 export function rateLimiterMiddleware({
-  redisCache,
   routerNamespace,
   requestsPerMinute,
 }: RateLimiterOptions) {
@@ -23,19 +20,19 @@ export function rateLimiterMiddleware({
     const cacheKey = `${routerNamespace}-${getClientIp(req)}`;
 
     try {
-      const requestCount = await redisCache.incrementKey(
-        RedisNamespaces.Rate_Limiter,
+      const requestCount = await cache().incrementKey(
+        CacheNamespaces.Rate_Limiter,
         cacheKey,
       );
 
       if (requestCount === 1) {
         // is first request in window, set expiration
-        await redisCache.setKeyTTL(RedisNamespaces.Rate_Limiter, cacheKey, 60);
+        await cache().setKeyTTL(CacheNamespaces.Rate_Limiter, cacheKey, 60);
       }
 
       if (requestCount > requestsPerMinute) {
-        const ttl = await redisCache.getKeyTTL(
-          RedisNamespaces.Rate_Limiter,
+        const ttl = await cache().getKeyTTL(
+          CacheNamespaces.Rate_Limiter,
           cacheKey,
         );
         return res
