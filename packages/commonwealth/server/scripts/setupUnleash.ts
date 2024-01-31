@@ -8,10 +8,10 @@ import {
 
 config();
 
-const log = logger().getLogger(__filename);
-
 export class UnleashClient {
   private static instance: Unleash = null;
+
+  private static log = logger().getLogger(__filename);
 
   private constructor() {
     // Private constructor to prevent instantiation
@@ -19,7 +19,7 @@ export class UnleashClient {
 
   static getInstance(): Unleash {
     if (!UNLEASH_HEROKU_SERVER_URL) {
-      log.info('No unleash server URL found, feature flagging disabled.');
+      this.log.info('No unleash server URL found, feature flagging disabled.');
       return null;
     }
 
@@ -31,7 +31,7 @@ export class UnleashClient {
       });
 
       UnleashClient.instance?.on('synchronized', () => {
-        log.info('Unleash started successfully');
+        this.log.info('Unleash started successfully');
       });
     }
 
