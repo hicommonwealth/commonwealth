@@ -1,4 +1,4 @@
-import 'components/component_kit/cw_auth_button.scss';
+import 'components/component_kit/CWAuthButtonOld.scss';
 import React from 'react';
 import { CWCustomIcon } from './cw_icons/cw_custom_icon';
 import { CWIcon } from './cw_icons/cw_icon';
@@ -30,7 +30,7 @@ export const CWAuthButton = (props: AuthButtonProps) => {
           disabled,
           darkMode,
         },
-        ComponentType.WalletOptionRow
+        ComponentType.WalletOptionRow,
       )}
       onClick={onClick}
     >
@@ -68,7 +68,7 @@ export const CWNoAuthMethodsAvailable = (props: { darkMode?: boolean }) => {
           disabled: true,
           darkMode: props.darkMode,
         },
-        ComponentType.WalletOptionRow
+        ComponentType.WalletOptionRow,
       )}
     >
       <CWText
