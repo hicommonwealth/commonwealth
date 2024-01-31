@@ -38,8 +38,10 @@ const CWTab = ({
       onClick={onClick}
       type="button"
     >
-      {iconLeft && <CWIcon iconName={iconLeft} />}
-      <CWText className="label">{label}</CWText>
+      {iconLeft && <CWIcon iconName={iconLeft} iconSize="small" />}
+      <CWText type={boxed ? 'b2' : 'b1'} className="label">
+        {label}
+      </CWText>
       {showTag && <CWTag label="New" type="new" iconName="newStar" />}
     </button>
   );

@@ -38,7 +38,8 @@
       border: none;
       background-color: $white;
 
-      .Text.label {
+      .Text.label,
+      .Icon {
         color: $primary-500;
         -webkit-text-stroke: 0.5px $primary-500;
       }
