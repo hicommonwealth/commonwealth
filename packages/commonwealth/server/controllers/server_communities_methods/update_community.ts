@@ -4,9 +4,8 @@ import type {
   CommunityAttributes,
   CommunitySnapshotSpaceWithSpaceAttached,
 } from '@hicommonwealth/model';
-import { UserInstance } from '@hicommonwealth/model';
+import { UserInstance, validateNamespace } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import { validateNamespace } from '../../../../../libs/model/src/services/commonProtocol/newNamespaceValidator';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';
 import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
