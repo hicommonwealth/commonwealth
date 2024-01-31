@@ -21,7 +21,6 @@ import {
   handleThreadChannel,
 } from '../discord-listener/handlers';
 import { DISCORD_TOKEN, RABBITMQ_URI } from '../utils/config';
-import { rollbar } from '../utils/rollbar';
 
 const log = logger(TypescriptLoggingLogger()).getLogger(__filename);
 stats(HotShotsStats());
@@ -118,5 +117,5 @@ async function startDiscordListener() {
 }
 
 startDiscordListener().catch((e) => {
-  rollbar.critical(e);
+  log.fatal(e);
 });

@@ -1,5 +1,7 @@
 import Rollbar from 'rollbar';
-import { ROLLBAR_ENV, ROLLBAR_SERVER_TOKEN } from './config';
+
+const ROLLBAR_SERVER_TOKEN = process.env.ROLLBAR_SERVER_TOKEN;
+const ROLLBAR_ENV = process.env.ROLLBAR_ENV || 'local';
 
 export const rollbar = new Rollbar({
   accessToken: ROLLBAR_SERVER_TOKEN,

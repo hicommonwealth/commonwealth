@@ -49,13 +49,7 @@ describe('DatabaseCleaner Tests', () => {
       // set cleaner to run at 10 AM UTC
       console.log('input time to run', now.toString(), now.getUTCHours() + 4);
       const dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(
-        models,
-        now.getUTCHours() + 4,
-        mockRedis,
-        undefined,
-        true,
-      );
+      dbCleaner.initLoop(models, now.getUTCHours() + 4, mockRedis, true);
 
       expect(dbCleaner.timeoutID).to.not.be.undefined;
       clearTimeout(dbCleaner.timeoutID);
@@ -70,7 +64,7 @@ describe('DatabaseCleaner Tests', () => {
       now.setUTCMinutes(0);
       now.setUTCMilliseconds(0);
       const dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(models, now.getUTCHours(), mockRedis, undefined, true);
+      dbCleaner.initLoop(models, now.getUTCHours(), mockRedis, true);
       expect(dbCleaner.timeoutID).to.not.be.undefined;
       clearTimeout(dbCleaner.timeoutID);
       expect(dbCleaner.timeToRun.getUTCHours()).to.be.equal(now.getUTCHours());
@@ -80,13 +74,7 @@ describe('DatabaseCleaner Tests', () => {
     it('should not run if started after the correct hour', () => {
       const now = new Date();
       const dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(
-        models,
-        now.getUTCHours() - 4,
-        mockRedis,
-        undefined,
-        true,
-      );
+      dbCleaner.initLoop(models, now.getUTCHours() - 4, mockRedis, true);
       expect(dbCleaner.timeoutID).to.not.be.undefined;
       clearTimeout(dbCleaner.timeoutID);
       now.setUTCDate(now.getUTCDate() + 1);
@@ -99,24 +87,24 @@ describe('DatabaseCleaner Tests', () => {
 
     it('should not run if an hour to run is not provided', () => {
       const dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(models, NaN, mockRedis, undefined, true);
+      dbCleaner.initLoop(models, NaN, mockRedis, true);
       expect(dbCleaner.timeToRun).to.be.undefined;
       expect(dbCleaner.timeoutID).to.be.undefined;
     });
 
     it('should not run if the hour provided is invalid', () => {
       let dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(models, 24, mockRedis, undefined, true);
+      dbCleaner.initLoop(models, 24, mockRedis, true);
       expect(dbCleaner.timeToRun).to.be.undefined;
       expect(dbCleaner.timeoutID).to.be.undefined;
 
       dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(models, 25, mockRedis, undefined, true);
+      dbCleaner.initLoop(models, 25, mockRedis, true);
       expect(dbCleaner.timeToRun).to.be.undefined;
       expect(dbCleaner.timeoutID).to.be.undefined;
 
       dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(models, -1, mockRedis, undefined, true);
+      dbCleaner.initLoop(models, -1, mockRedis, true);
       expect(dbCleaner.timeToRun).to.be.undefined;
       expect(dbCleaner.timeoutID).to.be.undefined;
     });

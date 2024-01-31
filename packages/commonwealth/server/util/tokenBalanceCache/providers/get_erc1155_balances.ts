@@ -1,7 +1,6 @@
 import { logger } from '@hicommonwealth/core';
 import { ChainNodeInstance } from '@hicommonwealth/model';
 import AbiCoder from 'web3-eth-abi';
-import { rollbar } from '../../rollbar';
 import { Balances } from '../types';
 import { evmRpcRequest } from '../util';
 
@@ -90,14 +89,12 @@ async function getOnChainBatchErc1155Balances(
   const addressBalanceMap = {};
 
   if (datas.error) {
-    rollbar.error(errorMsg, datas.error);
     log.error(errorMsg, datas.error);
     return {};
   } else {
     for (const data of datas) {
       if (data.error) {
         const msg = `balanceOfBatch request failed on EVM chain id: ${evmChainId} for contract ${contractAddress}`;
-        rollbar.error(msg, data.error);
         log.error(msg, data.error);
         continue;
       }
@@ -149,7 +146,6 @@ async function getErc1155Balance(
   if (!data) return {};
 
   if (data.error) {
-    rollbar.error(errorMsg, data.error);
     log.error(errorMsg, data.error);
     return {};
   } else {

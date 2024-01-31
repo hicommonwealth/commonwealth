@@ -5,7 +5,6 @@ import {
   ReconnectStrategyError,
   SocketClosedUnexpectedlyError,
 } from 'redis';
-import type Rollbar from 'rollbar';
 import { timeoutPromise } from '../utils';
 
 export function redisRetryStrategy(retries: number) {
@@ -27,12 +26,10 @@ export function redisRetryStrategy(retries: number) {
 export class RedisCache {
   private _initialized = false;
   private _client;
-  private _rollbar?: Rollbar;
   private _log?: ILogger;
 
-  constructor(rollbar?: Rollbar) {
+  constructor() {
     this._log = logger().getLogger(__filename);
-    this._rollbar = rollbar;
   }
 
   // get namespace key for redis
@@ -76,22 +73,16 @@ export class RedisCache {
       if (err instanceof ConnectionTimeoutError) {
         const msg = `RedisCache connection to ${redis_url} timed out!`;
         this._log.error(msg);
-        this._rollbar?.error(
-          'RedisCache max connection retries exceeded! RedisCache client shutting down!',
-        );
       } else if (err instanceof ReconnectStrategyError) {
         const msg =
           'RedisCache max connection retries exceeded! RedisCache client shutting down!';
         this._log.fatal(msg);
-        this._rollbar?.critical(msg);
       } else if (err instanceof SocketClosedUnexpectedlyError) {
         const msg = 'RedisCache socket closed unexpectedly';
         this._log.error(msg);
-        this._rollbar?.error(msg);
       } else {
         const msg = 'RedisCache unknown connection error:';
         this._log.error(msg, err);
-        this._rollbar?.critical(msg, err);
       }
     });
 
@@ -167,7 +158,6 @@ export class RedisCache {
     } catch (e) {
       const msg = `An error occurred while setting the following key value pair '${namespace} ${key}: ${value}'`;
       this._log.error(msg, e);
-      this._rollbar?.error(msg, e);
       return false;
     }
 
@@ -187,7 +177,6 @@ export class RedisCache {
     } catch (e) {
       const msg = `An error occurred while getting the following key '${key}'`;
       this._log.error(msg, e);
-      this._rollbar?.error(msg, e);
     }
   }
 
@@ -233,7 +222,6 @@ export class RedisCache {
             `Error occurred while setting multiple keys ` +
             `${transaction ? 'in a transaction' : 'in a pipeline'}`;
           this._log.error(msg, e);
-          this._rollbar?.error(msg, e);
           return false;
         }
       } else {
@@ -242,7 +230,6 @@ export class RedisCache {
         } catch (e) {
           const msg = 'Error occurred while setting multiple keys';
           this._log.error(msg, e);
-          this._rollbar?.error(msg, e);
           return false;
         }
       }
@@ -269,7 +256,6 @@ export class RedisCache {
       } catch (e) {
         const msg = 'An error occurred while getting many keys';
         this._log.error(msg, e);
-        this._rollbar?.error(msg, e);
         return false;
       }
       return result;
@@ -303,7 +289,6 @@ export class RedisCache {
     } catch (e) {
       const msg = 'An error occurred while fetching the namespace keys';
       this._log.error(msg, e);
-      this._rollbar?.error(msg, e);
       return false;
     }
   }
@@ -354,7 +339,6 @@ export class RedisCache {
     } catch (e) {
       const msg = `An error occurred while deleting a all keys in the ${namespace} namespace`;
       this._log.error(msg, e);
-      this._rollbar?.error(msg, e);
       return false;
     }
   }
@@ -371,7 +355,6 @@ export class RedisCache {
     } catch (e) {
       const msg = `An error occurred while deleting the following key: ${finalKey}`;
       this._log.error(msg, e);
-      this._rollbar?.error(msg, e);
       return 0;
     }
   }

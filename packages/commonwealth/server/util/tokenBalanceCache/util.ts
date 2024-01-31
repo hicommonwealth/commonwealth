@@ -3,7 +3,6 @@ import { logger } from '@hicommonwealth/core';
 import { ChainNodeAttributes } from '@hicommonwealth/model';
 import AbiCoder from 'web3-eth-abi';
 import { toBN } from 'web3-utils';
-import { rollbar } from '../rollbar';
 import { Balances, GetTendermintClientOptions } from './types';
 
 const log = logger().getLogger(__filename);
@@ -86,7 +85,6 @@ export async function evmOffChainRpcBatching(
         Math.min(startIndex + rpc.batchSize, addresses.length),
       );
       failedAddresses = [...failedAddresses, ...relevantAddresses];
-      rollbar.critical(chainNodeErrorMsg, res.reason);
       log.fatal(chainNodeErrorMsg, res.reason);
     } else {
       jsonPromises.push(res.value.json());
@@ -97,7 +95,6 @@ export async function evmOffChainRpcBatching(
   try {
     datas = (await Promise.all(jsonPromises)).flat();
   } catch (e) {
-    rollbar.critical(chainNodeErrorMsg, e);
     log.fatal(chainNodeErrorMsg, e);
     return {
       balances: {},
@@ -112,7 +109,6 @@ export async function evmOffChainRpcBatching(
       const msg = `RPC request failed on EVM chain id ${source.evmChainId}${
         source.contractAddress ? `for token ${source.contractAddress}` : ''
       }.`;
-      rollbar.error(msg, data.error);
       log.error(msg, data.error);
       continue;
     }
@@ -197,7 +193,6 @@ export async function evmBalanceFetcherBatching(
   let failedAddresses: string[] = [];
 
   if (datas.error) {
-    rollbar.error(errorMsg, datas.error);
     log.error(errorMsg, datas.error);
     return { balances: {}, failedAddresses: addresses };
   } else {
@@ -214,7 +209,6 @@ export async function evmBalanceFetcherBatching(
           `chain id: ${source.evmChainId}${
             source.contractAddress ? `for token ${source.contractAddress}` : ''
           }.`;
-        rollbar.error(msg, data.error);
         log.error(msg, data.error);
         continue;
       }
@@ -304,7 +298,6 @@ export async function evmRpcRequest(
   } catch (e) {
     const augmentedMsg = `${failingChainNodeError} ${errorMsg}`;
     log.fatal(augmentedMsg, e);
-    rollbar.critical(augmentedMsg, e);
   }
 
   return data;
