@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import type { CommunityBannerInstance, DB } from '@hicommonwealth/model';
 import type { Response } from 'express';
 import type { TypedRequestBody } from '../types';

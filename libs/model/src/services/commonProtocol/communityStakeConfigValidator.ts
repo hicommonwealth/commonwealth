@@ -1,33 +1,36 @@
-import { AppError } from '@hicommonwealth/adapters';
 import { factoryContracts, ValidChains } from '@hicommonwealth/chains';
-import { DB } from '@hicommonwealth/model';
+import { AppError } from '@hicommonwealth/core';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
+import { CommunityAttributes } from '../../models/community';
 import { getNamespace } from './contractHelpers';
 
 export const validateCommunityStakeConfig = async (
-  model: DB,
-  communityId: string,
+  community: CommunityAttributes,
   id: number,
 ) => {
-  const community = await model.Community.findOne({
-    where: {
-      id: communityId,
-    },
-    include: [
-      {
-        model: model.ChainNode,
-        attributes: ['eth_chain_id', 'url'],
-      },
-    ],
-    attributes: ['namespace'],
-  });
-  if (!Object.values(ValidChains).includes(community.ChainNode.eth_chain_id)) {
+  // const community = await model.Community.findOne({
+  //   where: {
+  //     id: communityId,
+  //   },
+  //   include: [
+  //     {
+  //       model: model.ChainNode,
+  //       attributes: ['eth_chain_id', 'url'],
+  //     },
+  //   ],
+  //   attributes: ['namespace'],
+  // });
+  if (!community.ChainNode?.eth_chain_id || !community.namespace) {
+    throw new AppError('Invalid community');
+  }
+  const chain_id = community.ChainNode.eth_chain_id;
+  if (!Object.values(ValidChains).includes(chain_id)) {
     throw new AppError(
       "Community Stakes not configured for community's chain node",
     );
   }
-  const factoryData = factoryContracts[community.ChainNode.eth_chain_id];
+  const factoryData = factoryContracts[chain_id as ValidChains];
   const web3 = new Web3(community.ChainNode.url);
   const namespaceAddress = await getNamespace(
     web3,

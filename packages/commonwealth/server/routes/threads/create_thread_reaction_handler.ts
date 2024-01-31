@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import { ReactionAttributes } from '@hicommonwealth/model';
 import { verifyReaction } from '../../../shared/canvas/serverVerify';
 import { ServerControllers } from '../../routing/router';

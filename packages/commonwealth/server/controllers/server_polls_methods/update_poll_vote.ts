@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { AppError, ServerError } from '@hicommonwealth/adapters';
+import { AppError, ServerError } from '@hicommonwealth/core';
 import {
   AddressInstance,
   CommunityInstance,

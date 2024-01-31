@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import { Community, CommunityStakeAttributes, DB } from '@hicommonwealth/model';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestParams, TypedResponse, success } from '../../types';

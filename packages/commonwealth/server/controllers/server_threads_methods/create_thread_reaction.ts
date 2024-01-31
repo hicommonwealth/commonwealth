@@ -1,14 +1,13 @@
-import { AppError } from '@hicommonwealth/adapters';
 import { ValidChains } from '@hicommonwealth/chains';
-import { NotificationCategories } from '@hicommonwealth/core';
+import { AppError, NotificationCategories } from '@hicommonwealth/core';
 import {
   AddressInstance,
   CommunityInstance,
   ReactionAttributes,
   UserInstance,
+  contractHelpers,
 } from '@hicommonwealth/model';
 import { REACTION_WEIGHT_OVERRIDE } from 'server/config';
-import { getNamespaceBalance } from 'server/util/commonProtocol/contractHelpers';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
@@ -111,7 +110,7 @@ export async function __createThreadReaction(
     });
     if (stake) {
       const vote_weight = stake.vote_weight;
-      const stakeBalance = await getNamespaceBalance(
+      const stakeBalance = await contractHelpers.getNamespaceBalance(
         this.tokenBalanceCache,
         community.namespace,
         stake.stake_id,
