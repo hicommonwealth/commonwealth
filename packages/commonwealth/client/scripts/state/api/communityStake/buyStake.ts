@@ -6,15 +6,29 @@ interface BuyStakeProps {
   namespace: string;
   stakeId: number;
   amount: number;
+  chainRpc: string;
+  walletAddress: string;
 }
 
-const buyStake = async ({ namespace, stakeId, amount }: BuyStakeProps) => {
+const buyStake = async ({
+  namespace,
+  stakeId,
+  amount,
+  chainRpc,
+  walletAddress,
+}: BuyStakeProps) => {
   const communityStakes = new CommunityStakes(
     factoryContracts[ValidChains.Goerli].communityStake,
     factoryContracts[ValidChains.Goerli].factory,
+    chainRpc,
   );
 
-  return await communityStakes.buyStake(namespace, stakeId, amount);
+  return await communityStakes.buyStake(
+    namespace,
+    stakeId,
+    amount,
+    walletAddress,
+  );
 };
 
 const useBuyStakeMutation = () => {

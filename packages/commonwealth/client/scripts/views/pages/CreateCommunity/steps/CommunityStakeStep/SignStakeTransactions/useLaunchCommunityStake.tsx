@@ -10,12 +10,14 @@ interface UseLaunchCommunityStakeProps {
   namespace: string;
   communityId: string;
   goToSuccessStep: () => void;
+  selectedAddress: string;
 }
 
 const useLaunchCommunityStake = ({
   namespace,
   communityId,
   goToSuccessStep,
+  selectedAddress,
 }: UseLaunchCommunityStakeProps) => {
   const [launchStakeData, setLaunchStakeData] =
     useState<ActionState>(defaultActionState);
@@ -30,7 +32,11 @@ const useLaunchCommunityStake = ({
         errorText: '',
       });
 
-      await namespaceFactory.configureCommunityStakes(namespace, STAKE_ID);
+      await namespaceFactory.configureCommunityStakes(
+        namespace,
+        STAKE_ID,
+        selectedAddress,
+      );
 
       await updateCommunityStake({
         communityId,

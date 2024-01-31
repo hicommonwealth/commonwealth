@@ -10,20 +10,26 @@ import useGetUserEthBalanceQuery from '../../../state/api/communityStake/getUser
 
 interface UseStakeExchangeProps {
   mode: ManageCommunityStakeModalMode;
+  address: string;
 }
 
-const useStakeExchange = ({ mode }: UseStakeExchangeProps) => {
+const useStakeExchange = ({ mode, address }: UseStakeExchangeProps) => {
   const [numberOfStakeToExchange, setNumberOfStakeToExchange] = useState(1);
 
   const activeCommunityNamespace = app?.chain?.meta?.namespace;
+  const chainRpc = app?.chain?.meta?.ChainNode?.url;
 
-  const { data: userEthBalance } = useGetUserEthBalanceQuery();
+  const { data: userEthBalance } = useGetUserEthBalanceQuery({
+    chainRpc,
+    walletAddress: address,
+  });
 
   const { data: buyPriceData } = useGetBuyPriceQuery({
     namespace: activeCommunityNamespace,
     stakeId: STAKE_ID,
     amount: numberOfStakeToExchange,
     apiEnabled: mode === 'buy',
+    chainRpc,
   });
 
   const { data: ethUsdRateData } = useFetchEthUsdRateQuery();

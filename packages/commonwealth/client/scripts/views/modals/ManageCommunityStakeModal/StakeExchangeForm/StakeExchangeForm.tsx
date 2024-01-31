@@ -48,6 +48,7 @@ const StakeExchangeForm = ({
   onSetModalState,
   onSetSuccessTransactionHash,
 }: StakeExchangeFormProps) => {
+  const chainRpc = app?.chain?.meta?.ChainNode?.url;
   const activeAccountAddress = app?.user?.activeAccount?.address;
   const addressOptions = app.user.activeAccounts.map(({ address }) => ({
     label: address,
@@ -64,10 +65,10 @@ const StakeExchangeForm = ({
     buyPriceData,
     ethUsdRate,
     userEthBalance,
-  } = useStakeExchange({ mode });
+  } = useStakeExchange({ mode, address: selectedAddress.value });
 
   const { stakeBalance, stakeValue, currentVoteWeight, stakeData } =
-    useCommunityStake();
+    useCommunityStake({ walletAddress: selectedAddress.value });
 
   const { mutateAsync: buyStake } = useBuyStakeMutation();
 
@@ -87,6 +88,8 @@ const StakeExchangeForm = ({
         amount: numberOfStakeToExchange,
         stakeId: STAKE_ID,
         namespace: stakeData?.Chain?.namespace,
+        chainRpc,
+        walletAddress: selectedAddress.value,
       });
 
       onSetModalState(ManageCommunityStakeModalState.Success);

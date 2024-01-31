@@ -11,14 +11,17 @@ import {
 interface UseCommunityStakeProps {
   communityId?: string;
   stakeId?: number;
+  walletAddress?: string;
 }
 
 const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
-  const { communityId, stakeId = STAKE_ID } = props;
+  const { communityId, stakeId = STAKE_ID, walletAddress } = props;
   const { isLoggedIn } = useUserLoggedIn();
 
   const activeCommunityId = app?.chain?.id;
   const activeCommunityNamespace = app?.chain?.meta?.namespace;
+  const chainRpc = app?.chain?.meta?.ChainNode?.url;
+  const activeAccountAddress = app?.user?.activeAccount?.address;
 
   const { isInitialLoading: communityStakeLoading, data: stakeResponse } =
     useFetchCommunityStakeQuery({
@@ -30,7 +33,10 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
   const stakeData = stakeResponse?.data?.result;
   const stakeEnabled = stakeData?.stake_enabled;
   const apiEnabled = Boolean(
-    stakeEnabled && !!activeCommunityNamespace && isLoggedIn,
+    stakeEnabled &&
+      (walletAddress || activeAccountAddress) &&
+      !!activeCommunityNamespace &&
+      isLoggedIn,
   );
 
   const {
@@ -40,6 +46,8 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     namespace: activeCommunityNamespace,
     stakeId: STAKE_ID,
     apiEnabled,
+    chainRpc,
+    walletAddress: walletAddress || activeAccountAddress,
   });
 
   const { isInitialLoading: buyPriceDataLoading, data: buyPriceData } =
@@ -48,6 +56,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
       stakeId: STAKE_ID,
       amount: Number(userStakeBalanceData),
       apiEnabled: apiEnabled && !isNaN(Number(userStakeBalanceData)),
+      chainRpc,
     });
 
   const currentVoteWeight = calculateVoteWeight(

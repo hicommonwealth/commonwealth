@@ -11,10 +11,12 @@ const getBuyPrice = async ({
   namespace,
   stakeId,
   amount,
+  chainRpc,
 }: GetBuyPriceProps) => {
   const communityStakes = new CommunityStakes(
     factoryContracts[ValidChains.Goerli].communityStake,
     factoryContracts[ValidChains.Goerli].factory,
+    chainRpc,
   );
 
   return await communityStakes.getBuyPrice(namespace, stakeId, amount);
@@ -25,6 +27,7 @@ interface UseGetBuyPriceQueryProps {
   stakeId: number;
   amount: number;
   apiEnabled: boolean;
+  chainRpc: string;
 }
 
 const useGetBuyPriceQuery = ({
@@ -32,10 +35,17 @@ const useGetBuyPriceQuery = ({
   stakeId,
   amount,
   apiEnabled,
+  chainRpc,
 }: UseGetBuyPriceQueryProps) => {
   return useQuery({
-    queryKey: [ContractMethods.GET_BUY_PRICE, namespace, stakeId, amount],
-    queryFn: () => getBuyPrice({ namespace, stakeId, amount }),
+    queryKey: [
+      ContractMethods.GET_BUY_PRICE,
+      namespace,
+      stakeId,
+      amount,
+      chainRpc,
+    ],
+    queryFn: () => getBuyPrice({ namespace, stakeId, amount, chainRpc }),
     enabled: apiEnabled,
     staleTime: GET_BUY_PRICE_STALE_TIME,
   });

@@ -13,29 +13,47 @@ type GetUserStakeBalanceProps = Omit<
 const getUserStakeBalance = async ({
   namespace,
   stakeId,
+  chainRpc,
+  walletAddress,
 }: GetUserStakeBalanceProps) => {
   const communityStakes = new CommunityStakes(
     factoryContracts[ValidChains.Goerli].communityStake,
     factoryContracts[ValidChains.Goerli].factory,
+    chainRpc,
   );
 
-  return await communityStakes.getUserStakeBalance(namespace, stakeId);
+  return await communityStakes.getUserStakeBalance(
+    namespace,
+    stakeId,
+    walletAddress,
+  );
 };
 
 interface UseGetUserStakeBalanceQueryProps {
   namespace: string;
   stakeId: number;
   apiEnabled: boolean;
+  chainRpc: string;
+  walletAddress: string;
 }
 
 const useGetUserStakeBalanceQuery = ({
   namespace,
   stakeId,
   apiEnabled,
+  chainRpc,
+  walletAddress,
 }: UseGetUserStakeBalanceQueryProps) => {
   return useQuery({
-    queryKey: [ContractMethods.GET_USER_STAKE_BALANCE, namespace, stakeId],
-    queryFn: () => getUserStakeBalance({ namespace, stakeId }),
+    queryKey: [
+      ContractMethods.GET_USER_STAKE_BALANCE,
+      namespace,
+      stakeId,
+      chainRpc,
+      walletAddress,
+    ],
+    queryFn: () =>
+      getUserStakeBalance({ namespace, stakeId, chainRpc, walletAddress }),
     staleTime: GET_USER_STAKE_BALANCE_STALE_TIME,
     enabled: apiEnabled,
   });
