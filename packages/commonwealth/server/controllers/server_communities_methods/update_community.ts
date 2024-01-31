@@ -66,7 +66,6 @@ export async function __updateCommunity(
         attributes: ['url', 'eth_chain_id'],
       },
     ],
-    attributes: ['chain_node_id'],
   });
   let addresses;
   if (!community) {

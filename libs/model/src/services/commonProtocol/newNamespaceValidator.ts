@@ -39,7 +39,7 @@ export const validateNamespace = async (
   //   attributes: ['chain_node_id'],
   // });
   if (!community.ChainNode?.eth_chain_id) {
-    throw new AppError('Invalid community');
+    throw new AppError('Namespace not supported on selected chain');
   }
   const chain_id = community.ChainNode.eth_chain_id;
   const factoryData = factoryContracts[chain_id as ValidChains];
