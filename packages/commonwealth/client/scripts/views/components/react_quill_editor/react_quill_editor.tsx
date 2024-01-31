@@ -1,15 +1,16 @@
 import clsx from 'clsx';
+import { nextTick } from 'process';
 import { RangeStatic } from 'quill';
 import ImageUploader from 'quill-image-uploader';
 import MagicUrl from 'quill-magic-url';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import ReactQuill, { Quill } from 'react-quill';
-
-import { nextTick } from 'process';
 import { openConfirmation } from '../../modals/confirmation_modal';
 import { PreviewModal } from '../../modals/preview_modal';
+import type { IconName } from '../component_kit/cw_icons/cw_icon_lookup';
 import { CWModal } from '../component_kit/new_designs/CWModal';
+import { CWTab, CWTabsRow } from '../component_kit/new_designs/CWTabs';
 import QuillTooltip from './QuillTooltip';
 import { LoadingIndicator } from './loading_indicator';
 import { CustomQuillToolbar, useMarkdownToolbarHandlers } from './toolbar';
@@ -37,6 +38,11 @@ type ReactQuillEditorProps = {
   shouldFocus?: boolean;
 };
 
+const TABS = [
+  { label: 'Markdown', iconLeft: 'code' },
+  { label: 'Preview', iconLeft: 'eye' },
+];
+
 // ReactQuillEditor is a custom wrapper for the react-quill component
 const ReactQuillEditor = ({
   className = '',
@@ -61,6 +67,7 @@ const ReactQuillEditor = ({
   const [isFocused, setIsFocused] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
+  const [selectedTab, setSelectedTab] = useState(TABS[0].label);
 
   // ref is used to prevent rerenders when selection
   // is changed, since rerenders bug out the editor
@@ -221,110 +228,127 @@ const ReactQuillEditor = ({
   const showTooltip = isDisabled && isHovering;
 
   return (
-    <div
-      className={clsx('QuillEditorContainer', { isDisabled })}
-      onMouseEnter={() => setIsHovering(true)}
-      onMouseLeave={() => setIsHovering(false)}
-    >
+    <div className="editor-and-tabs-container">
+      <CWTabsRow boxed={true}>
+        {TABS.map((tab, index) => (
+          <CWTab
+            key={index}
+            label={tab.label}
+            boxed={true}
+            iconLeft={tab.iconLeft as IconName}
+            isSelected={selectedTab === tab.label}
+            onClick={() => {
+              setSelectedTab(tab.label);
+            }}
+          />
+        ))}
+      </CWTabsRow>
       <div
-        className={clsx('QuillEditorWrapper', {
-          isFocused,
-          isDisabled,
-          isHovering,
-        })}
+        className={clsx('QuillEditorContainer', { isDisabled })}
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
       >
-        {showTooltip && <QuillTooltip label={tooltipLabel} />}
-        {isUploading && <LoadingIndicator />}
-        <CWModal
-          size="medium"
-          content={
-            <PreviewModal
-              doc={
-                isMarkdownEnabled
-                  ? getTextFromDelta(contentDelta)
-                  : contentDelta
-              }
-              onModalClose={handlePreviewModalClose}
-              title={isMarkdownEnabled ? 'As Markdown' : 'As Rich Text'}
-            />
-          }
-          onClose={handlePreviewModalClose}
-          open={isPreviewVisible}
-        />
-        {isVisible && (
-          <>
-            <CustomQuillToolbar
-              toolbarId={toolbarId}
-              isMarkdownEnabled={isMarkdownEnabled}
-              handleToggleMarkdown={handleToggleMarkdown}
-              setIsPreviewVisible={setIsPreviewVisible}
-              isDisabled={isDisabled}
-              isPreviewDisabled={getTextFromDelta(contentDelta).length < 1}
-            />
-            <DragDropContext onDragEnd={handleDragStop}>
-              <Droppable droppableId="quillEditor">
-                {(provided) => (
-                  <div
-                    className={`${isDraggingOver ? 'ondragover' : ''}`}
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    onDragOver={handleDragStart}
-                    onDragLeave={handleDragStop}
-                    onDrop={handleDragStop}
-                  >
-                    <div data-text-editor="name">
-                      <ReactQuill
-                        ref={editorRef}
-                        className={clsx('QuillEditor', className, {
-                          markdownEnabled: isMarkdownEnabled,
-                        })}
-                        scrollingContainer="ql-container"
-                        placeholder={placeholder}
-                        tabIndex={tabIndex}
-                        theme="snow"
-                        bounds={`[data-text-editor="name"]`}
-                        value={contentDelta}
-                        onFocus={() => setIsFocused(true)}
-                        onBlur={() => setIsFocused(false)}
-                        onChange={handleChange}
-                        onChangeSelection={(selection: RangeStatic) => {
-                          if (!selection) {
-                            return;
-                          }
-                          lastSelectionRef.current = selection;
-                        }}
-                        formats={isMarkdownEnabled ? [] : undefined}
-                        modules={{
-                          toolbar: {
-                            container: `#${toolbarId}`,
-                            handlers: isMarkdownEnabled
-                              ? markdownToolbarHandlers
+        <div
+          className={clsx('QuillEditorWrapper', {
+            isFocused,
+            isDisabled,
+            isHovering,
+          })}
+        >
+          {showTooltip && <QuillTooltip label={tooltipLabel} />}
+          {isUploading && <LoadingIndicator />}
+
+          <CWModal
+            size="medium"
+            content={
+              <PreviewModal
+                doc={
+                  isMarkdownEnabled
+                    ? getTextFromDelta(contentDelta)
+                    : contentDelta
+                }
+                onModalClose={handlePreviewModalClose}
+                title={isMarkdownEnabled ? 'As Markdown' : 'As Rich Text'}
+              />
+            }
+            onClose={handlePreviewModalClose}
+            open={isPreviewVisible}
+          />
+          {isVisible && (
+            <>
+              <CustomQuillToolbar
+                toolbarId={toolbarId}
+                isMarkdownEnabled={isMarkdownEnabled}
+                handleToggleMarkdown={handleToggleMarkdown}
+                setIsPreviewVisible={setIsPreviewVisible}
+                isDisabled={isDisabled}
+                isPreviewDisabled={getTextFromDelta(contentDelta).length < 1}
+              />
+              <DragDropContext onDragEnd={handleDragStop}>
+                <Droppable droppableId="quillEditor">
+                  {(provided) => (
+                    <div
+                      className={`${isDraggingOver ? 'ondragover' : ''}`}
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
+                      onDragOver={handleDragStart}
+                      onDragLeave={handleDragStop}
+                      onDrop={handleDragStop}
+                    >
+                      <div data-text-editor="name">
+                        <ReactQuill
+                          ref={editorRef}
+                          className={clsx('QuillEditor', className, {
+                            markdownEnabled: isMarkdownEnabled,
+                          })}
+                          scrollingContainer="ql-container"
+                          placeholder={placeholder}
+                          tabIndex={tabIndex}
+                          theme="snow"
+                          bounds={`[data-text-editor="name"]`}
+                          value={contentDelta}
+                          onFocus={() => setIsFocused(true)}
+                          onBlur={() => setIsFocused(false)}
+                          onChange={handleChange}
+                          onChangeSelection={(selection: RangeStatic) => {
+                            if (!selection) {
+                              return;
+                            }
+                            lastSelectionRef.current = selection;
+                          }}
+                          formats={isMarkdownEnabled ? [] : undefined}
+                          modules={{
+                            toolbar: {
+                              container: `#${toolbarId}`,
+                              handlers: isMarkdownEnabled
+                                ? markdownToolbarHandlers
+                                : undefined,
+                            },
+                            imageDropAndPaste: {
+                              handler: handleImageDropAndPaste,
+                            },
+                            clipboard: {
+                              matchVisual: false,
+                            },
+                            mention,
+                            magicUrl: !isMarkdownEnabled,
+                            keyboard: isMarkdownEnabled
+                              ? markdownKeyboardShortcuts
                               : undefined,
-                          },
-                          imageDropAndPaste: {
-                            handler: handleImageDropAndPaste,
-                          },
-                          clipboard: {
-                            matchVisual: false,
-                          },
-                          mention,
-                          magicUrl: !isMarkdownEnabled,
-                          keyboard: isMarkdownEnabled
-                            ? markdownKeyboardShortcuts
-                            : undefined,
-                          imageUploader: {
-                            upload: handleImageUploader,
-                          },
-                        }}
-                      />
+                            imageUploader: {
+                              upload: handleImageUploader,
+                            },
+                          }}
+                        />
+                      </div>
+                      {provided.placeholder}
                     </div>
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
-          </>
-        )}
+                  )}
+                </Droppable>
+              </DragDropContext>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

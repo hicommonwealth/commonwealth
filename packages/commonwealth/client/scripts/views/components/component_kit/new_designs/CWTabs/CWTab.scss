@@ -18,6 +18,12 @@
     }
   }
 
+  &:first-child {
+    &.boxed.isSelected {
+      border-top-left-radius: $border-radius-corners-wider;
+    }
+  }
+
   &.boxed {
     .Text,
     .Icon {

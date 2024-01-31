@@ -3,8 +3,6 @@
 .CustomQuillToolbar {
   display: flex;
   justify-content: space-between;
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
   border: none !important;
   background-color: $neutral-25;
   border-bottom: 1px solid $neutral-200 !important;
@@ -87,8 +85,6 @@
 }
 
 .QuillEditorWrapper {
-  border-radius: 6px;
-  border: 1px solid $neutral-200;
   min-height: 255px;
   position: relative;
 
@@ -298,4 +294,14 @@
 
 .image-uploading {
   display: none;
+}
+
+.editor-and-tabs-container {
+  border: 1px solid $neutral-200;
+  border-radius: $border-radius-corners-wider;
+
+  .CWTabsRow.boxed {
+    width: 100%;
+    margin-bottom: 0;
+  }
 }
