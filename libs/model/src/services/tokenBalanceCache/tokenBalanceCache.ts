@@ -2,6 +2,7 @@ import { fromBech32, toBech32 } from '@cosmjs/encoding';
 import {
   BalanceSourceType,
   CacheNamespaces,
+  ILogger,
   cache,
   logger,
   stats,
@@ -22,10 +23,12 @@ import {
   GetEvmBalancesOptions,
 } from './types';
 
-const log = logger().getLogger(__filename);
-
 export class TokenBalanceCache {
-  constructor(public models: DB, public balanceTTL = 300) {}
+  private _log: ILogger;
+
+  constructor(public models: DB, public balanceTTL = 300) {
+    this._log = logger().getLogger(__filename);
+  }
 
   /**
    * This is the main function through which all balances should be fetched.
@@ -66,7 +69,7 @@ export class TokenBalanceCache {
       const msg =
         `Failed to fetch balance(s) for ${options.addresses.length}` +
         ` address(es) on ${chainId}${contractAddress}`;
-      log.error(msg, e instanceof Error ? e : undefined);
+      this._log.error(msg, e instanceof Error ? e : undefined);
     }
 
     stats().incrementBy(
@@ -90,7 +93,7 @@ export class TokenBalanceCache {
 
     if (!chainNode) {
       const msg = `ChainNode with cosmos_chain_id ${options.sourceOptions.cosmosChainId} does not exist`;
-      log.error(msg);
+      this._log.error(msg);
       return {};
     }
 
@@ -104,7 +107,7 @@ export class TokenBalanceCache {
         addressMap[encodedAddress] = address;
       } catch (e) {
         if (address != '0xdiscordbot') {
-          log.error(
+          this._log.error(
             `Skipping address: ${address}`,
             e instanceof Error ? e : undefined,
           );
@@ -166,7 +169,7 @@ export class TokenBalanceCache {
       if (Web3.utils.isAddress(address)) {
         validatedAddresses.push(address);
       } else {
-        log.info(`Skipping non-address ${address}`);
+        this._log.info(`Skipping non-address ${address}`);
       }
     }
 
@@ -187,7 +190,7 @@ export class TokenBalanceCache {
 
     if (!chainNode) {
       const msg = `ChainNode with eth_chain_id ${options.sourceOptions.evmChainId} does not exist`;
-      log.error(msg);
+      this._log.error(msg);
       return {};
     }
 
