@@ -1,6 +1,9 @@
+import { WalletSsoSource } from '@hicommonwealth/core';
+import useWallets from 'client/scripts/hooks/useWallets';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import AuthButton from '../../components/AuthButton';
+import { AuthTypes } from '../../components/AuthButton/types';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
@@ -18,6 +21,10 @@ type AuthModalProps = {
 const AuthModal = ({ onClose, isOpen }: AuthModalProps) => {
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
 
+  const { onSocialLogin } = useWallets({
+    onModalClose: onClose,
+  });
+
   const tabsList = [
     {
       name: 'Wallet',
@@ -28,6 +35,21 @@ const AuthModal = ({ onClose, isOpen }: AuthModalProps) => {
       options: ['google', 'discord', 'x', 'github', 'email'],
     },
   ] as const;
+
+  const onAuthMethodSelect = async (option: AuthTypes) => {
+    if (option === 'email') {
+      // TODO: implement this in https://github.com/hicommonwealth/commonwealth/issues/6386
+      return;
+    }
+
+    // if any SSO option is selected
+    if (activeTabIndex === 1) {
+      // TODO: decide if twitter references are to be updated to 'x'
+      await onSocialLogin(
+        option === 'x' ? WalletSsoSource.Twitter : (option as WalletSsoSource),
+      );
+    }
+  };
 
   return (
     <CWModal
@@ -56,7 +78,11 @@ const AuthModal = ({ onClose, isOpen }: AuthModalProps) => {
 
           <section className="auth-options">
             {tabsList[activeTabIndex].options.map((option, key) => (
-              <AuthButton key={key} type={option} />
+              <AuthButton
+                key={key}
+                type={option}
+                onClick={async () => await onAuthMethodSelect(option)}
+              />
             ))}
           </section>
 
