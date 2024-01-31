@@ -90,7 +90,6 @@ const ReactQuillEditor = ({
     editorRef,
     setContentDelta,
     setIsUploading,
-    isMarkdownEnabled,
   });
 
   // handle custom toolbar behavior for markdown
