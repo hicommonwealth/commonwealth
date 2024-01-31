@@ -173,19 +173,6 @@ const ReactQuillEditor = ({
     setIsPreviewVisible(false);
   };
 
-  // when markdown state is changed, add markdown metadata to delta ops
-  // and refresh quill component
-  useEffect(() => {
-    const editor = editorRef.current?.getEditor();
-    if (editor) {
-      setContentDelta({
-        ...editor.getContents(),
-        ___isMarkdown: isMarkdownEnabled,
-      } as SerializableDeltaStatic);
-    }
-    refreshQuillComponent();
-  }, [isMarkdownEnabled, setContentDelta]);
-
   // when initialized, update markdown state to match content type
   useEffect(() => {
     if (!editorRef.current) {
