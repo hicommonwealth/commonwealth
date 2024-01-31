@@ -5,7 +5,10 @@ import { isMobile } from 'react-device-detect';
 import { STAKE_ID } from '@hicommonwealth/chains';
 import { calculateVoteWeight } from '@hicommonwealth/chains/src/commonProtocol/utils';
 import app from 'state';
-import { useBuyStakeMutation } from 'state/api/communityStake';
+import {
+  useBuyStakeMutation,
+  useSellStakeMutation,
+} from 'state/api/communityStake';
 import { useCommunityStake } from 'views/components/CommunityStake';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
@@ -23,7 +26,6 @@ import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelec
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
-import { fakeRandomAPICall } from '../ManageCommunityStakeModal';
 import {
   ManageCommunityStakeModalMode,
   ManageCommunityStakeModalState,
@@ -65,12 +67,15 @@ const StakeExchangeForm = ({
     buyPriceData,
     ethUsdRate,
     userEthBalance,
+    userEthBalanceLoading,
+    sellPriceData,
   } = useStakeExchange({ mode, address: selectedAddress.value });
 
   const { stakeBalance, stakeValue, currentVoteWeight, stakeData } =
     useCommunityStake({ walletAddress: selectedAddress.value });
 
   const { mutateAsync: buyStake } = useBuyStakeMutation();
+  const { mutateAsync: sellStake } = useSellStakeMutation();
 
   const expectedVoteWeight = calculateVoteWeight(
     String(numberOfStakeToExchange),
@@ -84,6 +89,7 @@ const StakeExchangeForm = ({
   const handleBuy = async () => {
     try {
       onSetModalState(ManageCommunityStakeModalState.Loading);
+
       const txReceipt = await buyStake({
         amount: numberOfStakeToExchange,
         stakeId: STAKE_ID,
@@ -92,8 +98,8 @@ const StakeExchangeForm = ({
         walletAddress: selectedAddress.value,
       });
 
-      onSetModalState(ManageCommunityStakeModalState.Success);
       onSetSuccessTransactionHash(txReceipt?.transactionHash);
+      onSetModalState(ManageCommunityStakeModalState.Success);
     } catch (err) {
       console.log('Error buying: ', err);
       onSetModalState(ManageCommunityStakeModalState.Failure);
@@ -103,7 +109,15 @@ const StakeExchangeForm = ({
   const handleSell = async () => {
     try {
       onSetModalState(ManageCommunityStakeModalState.Loading);
-      await fakeRandomAPICall();
+      const txReceipt = await sellStake({
+        amount: numberOfStakeToExchange,
+        stakeId: STAKE_ID,
+        namespace: stakeData?.Chain?.namespace,
+        chainRpc,
+        walletAddress: selectedAddress.value,
+      });
+
+      onSetSuccessTransactionHash(txReceipt?.transactionHash);
       onSetModalState(ManageCommunityStakeModalState.Success);
     } catch (err) {
       console.log('Error selling: ', err);
@@ -127,11 +141,47 @@ const StakeExchangeForm = ({
   };
 
   const insufficientFunds =
+    isBuyMode &&
     parseFloat(userEthBalance) < parseFloat(buyPriceData?.totalPrice);
-  const buyingDisabled =
-    isBuyMode && (insufficientFunds || numberOfStakeToExchange === 0);
 
-  const isUsdPriceLoading = !buyPriceData || !ethUsdRate;
+  const ctaDisabled = isBuyMode
+    ? insufficientFunds || numberOfStakeToExchange <= 0
+    : numberOfStakeToExchange > stakeBalance;
+
+  const isUsdPriceLoading = isBuyMode
+    ? !buyPriceData || !ethUsdRate
+    : !sellPriceData || !ethUsdRate;
+
+  const pricePerUnitEth = isBuyMode
+    ? buyPriceData?.price
+    : sellPriceData?.price;
+
+  const pricePerUnitUsd = isBuyMode
+    ? convertEthToUsd(buyPriceData?.price, ethUsdRate)
+    : convertEthToUsd(sellPriceData?.price, ethUsdRate);
+
+  const feesPriceEth = isBuyMode
+    ? buyPriceData?.fees
+    : Math.abs(parseFloat(sellPriceData?.fees));
+  const feesPriceUsd = isBuyMode
+    ? convertEthToUsd(buyPriceData?.fees, ethUsdRate)
+    : convertEthToUsd(Math.abs(parseFloat(sellPriceData?.fees)), ethUsdRate);
+
+  const totalPriceEth = isBuyMode
+    ? buyPriceData?.totalPrice
+    : sellPriceData?.totalPrice;
+
+  const totalPriceUsd = isBuyMode
+    ? convertEthToUsd(buyPriceData?.totalPrice, ethUsdRate)
+    : convertEthToUsd(sellPriceData?.totalPrice, ethUsdRate);
+
+  const minusDisabled = isBuyMode
+    ? numberOfStakeToExchange <= 0
+    : numberOfStakeToExchange <= 1;
+
+  const plusDisabled = isBuyMode
+    ? false
+    : numberOfStakeToExchange >= stakeBalance;
 
   return (
     <div className="StakeExchangeForm">
@@ -160,13 +210,17 @@ const StakeExchangeForm = ({
 
         <div className="current-balance-row">
           <CWText type="caption">Current balance</CWText>
-          <CWText
-            type="caption"
-            fontWeight="medium"
-            className={clsx({ error: insufficientFunds })}
-          >
-            {userEthBalance} ETH
-          </CWText>
+          {userEthBalanceLoading ? (
+            <Skeleton className="price-skeleton" />
+          ) : (
+            <CWText
+              type="caption"
+              fontWeight="medium"
+              className={clsx({ error: insufficientFunds })}
+            >
+              {userEthBalance} ETH
+            </CWText>
+          )}
         </div>
 
         <CWDivider />
@@ -194,7 +248,7 @@ const StakeExchangeForm = ({
                 buttonType="secondary"
                 iconName="minus"
                 onClick={handleMinus}
-                disabled={numberOfStakeToExchange === 0}
+                disabled={minusDisabled}
               />
               <CWText type="h3" fontWeight="bold" className="number">
                 {numberOfStakeToExchange}
@@ -203,6 +257,7 @@ const StakeExchangeForm = ({
                 buttonType="secondary"
                 iconName="plus"
                 onClick={handlePlus}
+                disabled={plusDisabled}
               />
             </div>
           </div>
@@ -214,8 +269,8 @@ const StakeExchangeForm = ({
               <Skeleton className="price-skeleton" />
             ) : (
               <CWText type="caption" fontWeight="medium">
-                {buyPriceData?.price} ETH • ~$
-                {convertEthToUsd(buyPriceData?.price, ethUsdRate)} USD
+                {pricePerUnitEth} ETH • ~$
+                {pricePerUnitUsd} USD
               </CWText>
             )}
           </div>
@@ -266,7 +321,9 @@ const StakeExchangeForm = ({
               body={
                 <div className="explanation-container">
                   <CWText type="b2">
-                    When purchasing points, a 5% goes into a community treasury.
+                    {isBuyMode
+                      ? 'When purchasing points, a 5% goes into a community treasury.'
+                      : 'When transacting with Stake, a 5% fee goes into the community treasury'}
                   </CWText>
                   <CWText type="b2">
                     This treasury is used for various purposes, such as funding
@@ -285,8 +342,8 @@ const StakeExchangeForm = ({
             <Skeleton className="price-skeleton" />
           ) : (
             <CWText type="caption" fontWeight="medium">
-              {buyPriceData?.fees} ETH • ~$
-              {convertEthToUsd(buyPriceData?.fees, ethUsdRate)} USD
+              {feesPriceEth} ETH • ~$
+              {feesPriceUsd} USD
             </CWText>
           )}
         </div>
@@ -297,15 +354,15 @@ const StakeExchangeForm = ({
             <Skeleton className="price-skeleton" />
           ) : (
             <CWText type="caption" fontWeight="medium">
-              {buyPriceData?.totalPrice} ETH • ~$
-              {convertEthToUsd(buyPriceData?.totalPrice, ethUsdRate)} USD
+              {totalPriceEth} ETH • ~$
+              {totalPriceUsd} USD
             </CWText>
           )}
         </div>
       </CWModalBody>
       <CWModalFooter>
         <CWButton
-          disabled={buyingDisabled}
+          disabled={ctaDisabled}
           label={isBuyMode ? 'Buy stake' : 'Sell stake'}
           buttonType="secondary"
           buttonAlt={isBuyMode ? 'green' : 'rorange'}

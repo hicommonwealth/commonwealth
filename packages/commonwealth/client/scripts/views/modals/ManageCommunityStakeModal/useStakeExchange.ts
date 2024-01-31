@@ -4,6 +4,7 @@ import app from 'state';
 import {
   useFetchEthUsdRateQuery,
   useGetBuyPriceQuery,
+  useGetSellPriceQuery,
 } from 'state/api/communityStake';
 import { ManageCommunityStakeModalMode } from 'views/modals/ManageCommunityStakeModal/types';
 import useGetUserEthBalanceQuery from '../../../state/api/communityStake/getUserEthBalance';
@@ -19,16 +20,25 @@ const useStakeExchange = ({ mode, address }: UseStakeExchangeProps) => {
   const activeCommunityNamespace = app?.chain?.meta?.namespace;
   const chainRpc = app?.chain?.meta?.ChainNode?.url;
 
-  const { data: userEthBalance } = useGetUserEthBalanceQuery({
-    chainRpc,
-    walletAddress: address,
-  });
+  const { data: userEthBalance, isLoading: userEthBalanceLoading } =
+    useGetUserEthBalanceQuery({
+      chainRpc,
+      walletAddress: address,
+    });
 
   const { data: buyPriceData } = useGetBuyPriceQuery({
     namespace: activeCommunityNamespace,
     stakeId: STAKE_ID,
     amount: numberOfStakeToExchange,
     apiEnabled: mode === 'buy',
+    chainRpc,
+  });
+
+  const { data: sellPriceData } = useGetSellPriceQuery({
+    namespace: activeCommunityNamespace,
+    stakeId: STAKE_ID,
+    amount: numberOfStakeToExchange,
+    apiEnabled: mode === 'sell',
     chainRpc,
   });
 
@@ -41,6 +51,8 @@ const useStakeExchange = ({ mode, address }: UseStakeExchangeProps) => {
     buyPriceData,
     ethUsdRate,
     userEthBalance,
+    userEthBalanceLoading,
+    sellPriceData,
   };
 };
 
