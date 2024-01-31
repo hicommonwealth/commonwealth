@@ -116,13 +116,18 @@ const AuthModal = ({ onClose, isOpen }: AuthModalProps) => {
           </CWTabsRow>
 
           <section className="auth-options">
-            {tabsList[activeTabIndex].options.map((option, key) => (
-              <AuthButton
-                key={key}
-                type={option}
-                onClick={async () => await onAuthMethodSelect(option)}
-              />
-            ))}
+            {activeTabIndex === 0 &&
+            tabsList[activeTabIndex].options.length === 0 ? (
+              <AuthButton type="NO_WALLETS_FOUND" />
+            ) : (
+              tabsList[activeTabIndex].options.map((option, key) => (
+                <AuthButton
+                  key={key}
+                  type={option}
+                  onClick={async () => await onAuthMethodSelect(option)}
+                />
+              ))
+            )}
           </section>
 
           <p className="disclaimer">
