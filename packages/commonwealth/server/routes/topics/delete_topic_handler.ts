@@ -20,7 +20,7 @@ export const deleteTopicHandler = async (
   req: TypedRequest<DeleteTopicRequestBody, any, DeleteTopicRequestParams>,
   res: TypedResponse<DeleteTopicResponse>,
 ) => {
-  const { user, community } = req;
+  const { user } = req;
   const { topicId } = req.params;
 
   const validationSchema = z.coerce.number();
@@ -33,7 +33,6 @@ export const deleteTopicHandler = async (
 
   await controllers.topics.deleteTopic({
     user,
-    community,
     topicId: validationResult.data,
   });
 
