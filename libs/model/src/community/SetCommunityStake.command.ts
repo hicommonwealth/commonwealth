@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { models } from '../database';
-import { InvalidInput } from '../errors';
 import { isCommunityAdmin } from '../middleware';
 import { CommunityStakeAttributes } from '../models/community_stake';
 import { CommandMetadata } from '../types';
@@ -41,11 +40,7 @@ export const SetCommunityStake: CommandMetadata<
 
     // !check business rules - invariants on loaded state + payload
     // !here we can call domain, application, and infrastructure services (stateless, not related to entities or value objects)
-    // TODO: call community namespace validation service (common protocol)
-    // - move tokenBalanceCache domain service from /server/util to libs/model/services
-    // - move commonProtocol domain service from /server/util to libs/model/services
-    if (!community?.ChainNode) throw new InvalidInput('Invalid community');
-    // await validateCommunityStakeConfig(community)
+    await validateCommunityStakeConfig(community);
 
     // !persist state mutations
     const [record] = await models.CommunityStake.upsert({
