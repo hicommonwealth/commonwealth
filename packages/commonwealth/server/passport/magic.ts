@@ -409,8 +409,8 @@ async function magicLoginRoute(
   // replay attack check
   const didTokenId = decodedMagicToken.claim.tid; // single-use token id
 
-  // The same didToken is used for potentially two addresses at the same time,
-  // (ex: Eth and Cosmos for Cosmos login)
+  // The same didToken is used for potentially two addresses at the same time
+  // (ex: Eth and cosmos for Cosmos sign-in),
   // but if a single one is found we reject the token replay
   const usedMagicToken = await models.Address.findOne({
     where: {
@@ -421,7 +421,7 @@ async function magicLoginRoute(
   if (usedMagicToken) {
     log.warn('Replay attack detected.');
     throw new Error(
-      `Replay attack detected for user ${decodedMagicToken.publicAddress}}.`,
+      `Replay attack detected for user ${decodedMagicToken.publicAddress}.`,
     );
   }
 
