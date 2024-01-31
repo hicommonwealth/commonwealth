@@ -1,9 +1,8 @@
 import { NotificationCategories } from '@hicommonwealth/core';
-import { CommunityInstance } from '@hicommonwealth/model';
+import { CommunityInstance, contractHelpers } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { ServerCommentsController } from 'server/controllers/server_comments_controller';
 import { SearchCommentsOptions } from 'server/controllers/server_comments_methods/search_comments';
-import * as contractHelpers from 'server/util/commonProtocol/contractHelpers';
 import Sinon from 'sinon';
 import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
 

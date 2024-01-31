@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import { AddressInstance, UserInstance } from '@hicommonwealth/model';
 import { validateOwner } from '../../util/validateOwner';
 import { ServerThreadsController } from '../server_threads_controller';

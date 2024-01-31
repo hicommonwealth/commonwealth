@@ -1,6 +1,6 @@
+import { contractHelpers } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { ServerThreadsController } from 'server/controllers/server_threads_controller';
-import * as contractHelpers from 'server/util/commonProtocol/contractHelpers';
 import Sinon from 'sinon';
 import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
 

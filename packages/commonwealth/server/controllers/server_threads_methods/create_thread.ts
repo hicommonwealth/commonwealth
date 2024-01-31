@@ -1,7 +1,10 @@
 import moment from 'moment';
 
-import { AppError } from '@hicommonwealth/adapters';
-import { NotificationCategories, ProposalType } from '@hicommonwealth/core';
+import {
+  AppError,
+  NotificationCategories,
+  ProposalType,
+} from '@hicommonwealth/core';
 import {
   AddressInstance,
   CommunityInstance,

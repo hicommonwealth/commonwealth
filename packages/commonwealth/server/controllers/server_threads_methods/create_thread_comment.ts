@@ -1,5 +1,9 @@
-import { AppError, ServerError } from '@hicommonwealth/adapters';
-import { NotificationCategories, ProposalType } from '@hicommonwealth/core';
+import {
+  AppError,
+  NotificationCategories,
+  ProposalType,
+  ServerError,
+} from '@hicommonwealth/core';
 import {
   AddressInstance,
   CommentAttributes,

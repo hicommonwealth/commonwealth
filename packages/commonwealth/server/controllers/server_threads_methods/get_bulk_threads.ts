@@ -1,4 +1,4 @@
-import { ServerError } from '@hicommonwealth/adapters';
+import { ServerError } from '@hicommonwealth/core';
 import { ThreadAttributes } from '@hicommonwealth/model';
 import moment from 'moment';
 import { QueryTypes } from 'sequelize';

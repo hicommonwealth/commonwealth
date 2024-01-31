@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Session } from '@canvas-js/interfaces';
-import { ServerError } from '@hicommonwealth/adapters';
 import {
   ChainBase,
   NotificationCategories,
+  ServerError,
   WalletId,
   WalletSsoSource,
   logger,

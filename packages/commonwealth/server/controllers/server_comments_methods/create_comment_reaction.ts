@@ -1,13 +1,16 @@
-import { AppError, ServerError } from '@hicommonwealth/adapters';
 import { ValidChains } from '@hicommonwealth/chains';
-import { NotificationCategories } from '@hicommonwealth/core';
+import {
+  AppError,
+  NotificationCategories,
+  ServerError,
+} from '@hicommonwealth/core';
 import {
   AddressInstance,
   ReactionAttributes,
   UserInstance,
+  contractHelpers,
 } from '@hicommonwealth/model';
 import { REACTION_WEIGHT_OVERRIDE } from 'server/config';
-import { getNamespaceBalance } from 'server/util/commonProtocol/contractHelpers';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { findAllRoles } from '../../util/roles';
@@ -123,7 +126,7 @@ export async function __createCommentReaction(
       if (!community) {
         throw new AppError(Errors.CommunityNotFound);
       }
-      const stakeBalance = await getNamespaceBalance(
+      const stakeBalance = await contractHelpers.getNamespaceBalance(
         this.tokenBalanceCache,
         community.namespace,
         stake.stake_id,

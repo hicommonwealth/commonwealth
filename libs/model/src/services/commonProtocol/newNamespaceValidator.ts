@@ -1,8 +1,8 @@
-import { AppError } from '@hicommonwealth/adapters';
-import { factoryContracts } from '@hicommonwealth/chains';
-import { BalanceSourceType } from '@hicommonwealth/core';
-import { DB, TokenBalanceCache } from '@hicommonwealth/model';
+import { ValidChains, factoryContracts } from '@hicommonwealth/chains';
+import { AppError, BalanceSourceType } from '@hicommonwealth/core';
 import Web3 from 'web3';
+import { CommunityAttributes } from '../../models';
+import { TokenBalanceCache } from '../tokenBalanceCache';
 import { getNamespace } from './contractHelpers';
 
 /**
@@ -16,30 +16,33 @@ import { getNamespace } from './contractHelpers';
  * @param namespace The namespace name
  * @param txHash transaction hash of creation tx
  * @param address user's address
- * @param communityId the id of the community
+ * @param community the community
  * @returns an AppError if any validations fail, else passses
  */
 export const validateNamespace = async (
-  model: DB,
   tbc: TokenBalanceCache,
   namespace: string,
   txHash: string,
   address: string,
-  communityId: string,
+  community: CommunityAttributes,
 ) => {
-  const community = await model.Community.findOne({
-    where: {
-      id: communityId,
-    },
-    include: [
-      {
-        model: model.ChainNode,
-        attributes: ['url', 'eth_chain_id'],
-      },
-    ],
-    attributes: ['chain_node_id'],
-  });
-  const factoryData = factoryContracts[community.ChainNode.eth_chain_id];
+  // const community = await model.Community.findOne({
+  //   where: {
+  //     id: communityId,
+  //   },
+  //   include: [
+  //     {
+  //       model: model.ChainNode,
+  //       attributes: ['url', 'eth_chain_id'],
+  //     },
+  //   ],
+  //   attributes: ['chain_node_id'],
+  // });
+  if (!community.ChainNode?.eth_chain_id) {
+    throw new AppError('Namespace not supported on selected chain');
+  }
+  const chain_id = community.ChainNode.eth_chain_id;
+  const factoryData = factoryContracts[chain_id as ValidChains];
   if (!factoryData) {
     throw new AppError('Namespace not supported on selected chain');
   }

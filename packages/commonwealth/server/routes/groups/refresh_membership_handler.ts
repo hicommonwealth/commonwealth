@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import z from 'zod';
 import { RefreshMembershipResult } from '../../controllers/server_groups_methods/refresh_membership';
 import { ServerControllers } from '../../routing/router';

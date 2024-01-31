@@ -1,6 +1,5 @@
-import { logger } from '@hicommonwealth/core';
+import { AppError, ServerError, logger } from '@hicommonwealth/core';
 import type { Express, Request, Response } from 'express';
-import { AppError, ServerError } from '../errors';
 
 class ExpressError extends Error {
   constructor(public error: Error, public req: Request) {

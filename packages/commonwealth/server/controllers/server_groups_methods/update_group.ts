@@ -1,5 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
-import { Requirement } from '@hicommonwealth/core';
+import { AppError, Requirement } from '@hicommonwealth/core';
 import {
   AddressInstance,
   GroupAttributes,

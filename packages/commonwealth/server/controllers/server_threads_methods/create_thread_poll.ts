@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import { PollAttributes, UserInstance } from '@hicommonwealth/model';
 import moment from 'moment';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';

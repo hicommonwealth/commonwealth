@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import type { BanAttributes, DB } from '@hicommonwealth/model';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
