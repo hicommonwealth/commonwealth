@@ -29,7 +29,6 @@ export const setupErrorHandlers = (app: Express) => {
   app.use((error, req, res: Response, next) => {
     log.error(error.message, new ExpressError(error, req));
     if (error instanceof ServerError) {
-      // if the original error is given when creating the ServerError instance then pass its message to Rollbar
       res.status(error.status).send({
         status: error.status,
         // Use external facing error message

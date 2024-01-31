@@ -1,6 +1,5 @@
 import { AppError } from '@hicommonwealth/adapters';
-import { Community, DB } from '@hicommonwealth/model';
-import { CommunityStakeAttributes } from '@hicommonwealth/model/build/models/community_stake';
+import { Community, CommunityStakeAttributes, DB } from '@hicommonwealth/model';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 import { validateCommunityStakeConfig } from '../../util/commonProtocol/communityStakeConfigValidator';

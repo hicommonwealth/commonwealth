@@ -5,6 +5,9 @@ export * as Reaction from './reaction';
 export * as Thread from './thread';
 export * as User from './user';
 
+// Core Services
+export * from './services/tokenBalanceCache';
+
 // Internals - Should not be exported once we finish the migrations to models
 export * from './database';
 export * from './models';

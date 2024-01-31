@@ -3,9 +3,9 @@ import {
   CommunityInstance,
   DB,
   MembershipRejectReason,
+  TokenBalanceCache,
 } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import { TokenBalanceCache } from '../tokenBalanceCache/tokenBalanceCache';
 import { refreshMembershipsForAddress } from './refreshMembershipsForAddress';
 
 /**

@@ -7,7 +7,7 @@ import {
   setupStakingExtension,
 } from '@cosmjs/stargate';
 import { logger } from '@hicommonwealth/core';
-import { ChainNodeInstance } from '@hicommonwealth/model';
+import { ChainNodeInstance } from '../../../models/chain_node';
 import { Balances } from '../types';
 import { getTendermintClient } from '../util';
 
@@ -70,7 +70,7 @@ async function getOffChainBatchCosmosNativeBalances(
   // actually in parallel
   const promiseResults = await Promise.allSettled<Coin>(balancePromises);
 
-  const result = {};
+  const result: Balances = {};
   addresses.forEach((a, i) => {
     const balanceResult = promiseResults[i];
     if (balanceResult.status === 'rejected') {
@@ -93,7 +93,10 @@ async function getCosmosNativeBalance(
       [address]: result.amount,
     };
   } catch (e) {
-    log.error(`Failed to get balance for address ${address}`, e);
+    log.error(
+      `Failed to get balance for address ${address}`,
+      e instanceof Error ? e : undefined,
+    );
     return {};
   }
 }

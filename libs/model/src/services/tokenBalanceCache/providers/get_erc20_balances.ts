@@ -1,6 +1,6 @@
 import { logger } from '@hicommonwealth/core';
-import { ChainNodeInstance } from '@hicommonwealth/model';
 import AbiCoder from 'web3-eth-abi';
+import { ChainNodeInstance } from '../../../models/chain_node';
 import { Balances } from '../types';
 import {
   evmBalanceFetcherBatching,
@@ -28,7 +28,7 @@ export async function __getErc20Balances(
   const rpcEndpoint = options.chainNode.private_url || options.chainNode.url;
   if (options.addresses.length === 1) {
     return await getErc20Balance(
-      options.chainNode.eth_chain_id,
+      options.chainNode.eth_chain_id!,
       rpcEndpoint,
       options.contractAddress,
       options.addresses[0],
@@ -40,7 +40,7 @@ export async function __getErc20Balances(
   );
   if (balanceFetcherContract) {
     return await getOnChainBatchErc20Balances(
-      options.chainNode.eth_chain_id,
+      options.chainNode.eth_chain_id!,
       rpcEndpoint,
       options.contractAddress,
       options.addresses,
@@ -48,7 +48,7 @@ export async function __getErc20Balances(
     );
   } else {
     return await getOffChainBatchErc20Balances(
-      options.chainNode.eth_chain_id,
+      options.chainNode.eth_chain_id!,
       rpcEndpoint,
       options.contractAddress,
       options.addresses,
@@ -102,7 +102,7 @@ async function getOffChainBatchErc20Balances(
         return {
           to: tokenAddress,
           data: calldata,
-        };
+        } as Record<string, any>;
       },
       batchSize,
     },
