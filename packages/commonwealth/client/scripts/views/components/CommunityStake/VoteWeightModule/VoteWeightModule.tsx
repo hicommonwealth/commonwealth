@@ -8,6 +8,7 @@ import CWPopover, {
 } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { ManageCommunityStakeModalMode } from 'views/modals/ManageCommunityStakeModal/types';
+import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 
 import './VoteWeightModule.scss';
 
@@ -51,7 +52,7 @@ export const VoteWeightModule = ({
               You have {stakeNumber} stake
             </CWText>
             <CWText type="caption" className="stake-value">
-              valued at {stakeValue} {denomination}
+              valued at {capDecimals(String(stakeValue))} {denomination}
             </CWText>
           </div>
           {stakeNumber >= 1 ? (

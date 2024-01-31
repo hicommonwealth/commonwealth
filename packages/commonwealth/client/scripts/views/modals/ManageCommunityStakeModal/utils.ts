@@ -25,3 +25,17 @@ export const buildEtherscanLink = (txHash: string) => {
   const prefix = 'goerli.';
   return `https://${prefix}etherscan.io/tx/${txHash}`;
 };
+
+export const capDecimals = (value: string, capNumber = 8) => {
+  if (!value) {
+    return;
+  }
+
+  const [, decimalPart] = value.split('.');
+
+  if (!decimalPart || decimalPart.length <= capNumber) {
+    return value;
+  }
+
+  return parseFloat(value).toFixed(capNumber);
+};

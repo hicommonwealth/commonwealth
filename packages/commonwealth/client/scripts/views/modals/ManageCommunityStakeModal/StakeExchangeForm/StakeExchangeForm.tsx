@@ -31,7 +31,7 @@ import {
   ManageCommunityStakeModalState,
 } from '../types';
 import useStakeExchange from '../useStakeExchange';
-import { convertEthToUsd, getInitialAccountValue } from '../utils';
+import { capDecimals, convertEthToUsd, getInitialAccountValue } from '../utils';
 import {
   CustomAddressOption,
   CustomAddressOptionElement,
@@ -162,7 +162,7 @@ const StakeExchangeForm = ({
 
   const feesPriceEth = isBuyMode
     ? buyPriceData?.fees
-    : Math.abs(parseFloat(sellPriceData?.fees));
+    : String(Math.abs(parseFloat(sellPriceData?.fees)));
   const feesPriceUsd = isBuyMode
     ? convertEthToUsd(buyPriceData?.fees, ethUsdRate)
     : convertEthToUsd(Math.abs(parseFloat(sellPriceData?.fees)), ethUsdRate);
@@ -218,7 +218,7 @@ const StakeExchangeForm = ({
               fontWeight="medium"
               className={clsx({ error: insufficientFunds })}
             >
-              {userEthBalance} ETH
+              {capDecimals(userEthBalance)} ETH
             </CWText>
           )}
         </div>
@@ -228,7 +228,7 @@ const StakeExchangeForm = ({
         <div className="stake-valued-row">
           <CWText type="caption">You have {stakeBalance} stake</CWText>
           <CWText type="caption" className="valued">
-            valued at {stakeValue} ETH
+            valued at {capDecimals(String(stakeValue))} ETH
           </CWText>
           <CWText type="caption" className="vote-weight">
             Current vote weight {currentVoteWeight}
@@ -269,7 +269,7 @@ const StakeExchangeForm = ({
               <Skeleton className="price-skeleton" />
             ) : (
               <CWText type="caption" fontWeight="medium">
-                {pricePerUnitEth} ETH • ~$
+                {capDecimals(pricePerUnitEth)} ETH • ~$
                 {pricePerUnitUsd} USD
               </CWText>
             )}
@@ -342,7 +342,7 @@ const StakeExchangeForm = ({
             <Skeleton className="price-skeleton" />
           ) : (
             <CWText type="caption" fontWeight="medium">
-              {feesPriceEth} ETH • ~$
+              {capDecimals(feesPriceEth)} ETH • ~$
               {feesPriceUsd} USD
             </CWText>
           )}
@@ -354,7 +354,7 @@ const StakeExchangeForm = ({
             <Skeleton className="price-skeleton" />
           ) : (
             <CWText type="caption" fontWeight="medium">
-              {totalPriceEth} ETH • ~$
+              {capDecimals(totalPriceEth)} ETH • ~$
               {totalPriceUsd} USD
             </CWText>
           )}
