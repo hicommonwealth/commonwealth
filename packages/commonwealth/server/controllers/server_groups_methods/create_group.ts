@@ -1,5 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
-import { Requirement } from '@hicommonwealth/core';
+import { AppError, Requirement } from '@hicommonwealth/core';
 import {
   AddressInstance,
   CommunityInstance,
@@ -47,7 +46,7 @@ export async function __createGroup(
     communityId: community.id,
     allowMod: true,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError(Errors.Unauthorized);

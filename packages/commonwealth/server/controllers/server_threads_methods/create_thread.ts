@@ -1,7 +1,10 @@
 import moment from 'moment';
 
-import { AppError } from '@hicommonwealth/adapters';
-import { NotificationCategories, ProposalType } from '@hicommonwealth/core';
+import {
+  AppError,
+  NotificationCategories,
+  ProposalType,
+} from '@hicommonwealth/core';
 import {
   AddressInstance,
   CommunityInstance,
@@ -140,7 +143,7 @@ export async function __createThread(
     user,
     communityId: community.id,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     const { isValid, message } = await validateTopicGroupsMembership(

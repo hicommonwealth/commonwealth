@@ -1,9 +1,9 @@
+import type { CommandMetadata } from '@hicommonwealth/core';
+import { InvalidInput } from '@hicommonwealth/core';
 import { z } from 'zod';
 import { models } from '../database';
-import { InvalidInput } from '../errors';
 import { isCommunityAdmin } from '../middleware';
 import type { CommunityAttributes } from '../models';
-import type { CommandMetadata } from '../types';
 
 export const schema = z.object({
   namespace: z.string(),

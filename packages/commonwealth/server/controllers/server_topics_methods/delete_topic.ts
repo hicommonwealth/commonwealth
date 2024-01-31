@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import { CommunityInstance, UserInstance } from '@hicommonwealth/model';
 import { validateOwner } from '../../util/validateOwner';
 import { ServerTopicsController } from '../server_topics_controller';
@@ -29,7 +29,7 @@ export async function __deleteTopic(
     communityId: community.id,
     allowMod: true,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError(Errors.NotAdmin);

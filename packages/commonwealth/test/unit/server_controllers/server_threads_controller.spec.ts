@@ -1,9 +1,16 @@
+import { contractHelpers } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { ServerThreadsController } from 'server/controllers/server_threads_controller';
 import Sinon from 'sinon';
 import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
 
 describe('ServerThreadsController', () => {
+  beforeEach(() => {
+    Sinon.stub(contractHelpers, 'getNamespaceBalance').resolves('0');
+  });
+  afterEach(() => {
+    Sinon.restore();
+  });
   describe('#createThreadReaction', () => {
     it('should create a thread reaction (new reaction)', async () => {
       const sandbox = Sinon.createSandbox();
@@ -56,12 +63,27 @@ describe('ServerThreadsController', () => {
             community_id: 'ethereum',
           }),
         },
+        CommunityStake: {
+          findOne: sandbox.stub().resolves({
+            id: 5,
+            stake_id: 1,
+            vote_weight: 1,
+          }),
+        },
+        sequelize: {
+          transaction: async (callback) => {
+            return callback();
+          },
+        },
       };
       const tokenBalanceCache = {};
       const user = {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
       };
-      const address = {};
+      const address = {
+        address: '0x123',
+        community_id: 'ethereum',
+      };
       const chain = {
         id: 'ethereum',
       };

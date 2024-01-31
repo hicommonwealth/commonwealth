@@ -1,5 +1,9 @@
-import { AppError, ServerError } from '@hicommonwealth/adapters';
-import { NotificationCategories, ProposalType } from '@hicommonwealth/core';
+import {
+  AppError,
+  NotificationCategories,
+  ProposalType,
+  ServerError,
+} from '@hicommonwealth/core';
 import {
   AddressInstance,
   CommentAttributes,
@@ -126,7 +130,7 @@ export async function __createThreadComment(
     communityId: community.id,
     entity: thread,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     const { isValid, message } = await validateTopicGroupsMembership(
@@ -169,6 +173,7 @@ export async function __createThreadComment(
     canvas_hash: canvasHash,
     discord_meta: discordMeta,
     reaction_count: 0,
+    reaction_weights_sum: 0,
   };
   if (parentId) {
     Object.assign(commentContent, { parent_id: parentId });

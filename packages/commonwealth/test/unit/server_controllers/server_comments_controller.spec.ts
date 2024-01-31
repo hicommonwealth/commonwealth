@@ -1,5 +1,5 @@
 import { NotificationCategories } from '@hicommonwealth/core';
-import { CommunityInstance } from '@hicommonwealth/model';
+import { CommunityInstance, contractHelpers } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { ServerCommentsController } from 'server/controllers/server_comments_controller';
 import { SearchCommentsOptions } from 'server/controllers/server_comments_methods/search_comments';
@@ -7,10 +7,21 @@ import Sinon from 'sinon';
 import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
 
 describe('ServerCommentsController', () => {
+  beforeEach(() => {
+    Sinon.stub(contractHelpers, 'getNamespaceBalance').resolves('0');
+  });
+  afterEach(() => {
+    Sinon.restore();
+  });
   describe('#createCommentReaction', () => {
     it('should create a comment reaction (new reaction)', async () => {
       const sandbox = Sinon.createSandbox();
       const db = {
+        sequelize: {
+          transaction: async (callback) => {
+            return callback();
+          },
+        },
         Address: {
           findAll: async () => [{}], // used in findOneRole
         },
@@ -52,6 +63,13 @@ describe('ServerCommentsController', () => {
             community_id: 'ethereum',
           }),
         },
+        CommunityStake: {
+          findOne: sandbox.stub().resolves({
+            id: 5,
+            stake_id: 1,
+            vote_weight: 1,
+          }),
+        },
       };
       const tokenBalanceCache = {};
       const banCache = BAN_CACHE_MOCK_FN('ethereum');
@@ -60,6 +78,8 @@ describe('ServerCommentsController', () => {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
       };
       const address = {
+        address: '0x123',
+        community_id: 'ethereum',
         save: async () => {},
       };
       const community = {

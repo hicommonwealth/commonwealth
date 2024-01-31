@@ -1,8 +1,9 @@
+import { CommandMetadata, InvalidInput } from '@hicommonwealth/core';
 import { z } from 'zod';
 import { models } from '../database';
 import { isCommunityAdmin } from '../middleware';
 import { CommunityStakeAttributes } from '../models/community_stake';
-import { CommandMetadata } from '../types';
+import { validateCommunityStakeConfig } from '../services/commonProtocol';
 
 const schema = z.object({
   stake_id: z.coerce.number().int(),
@@ -39,8 +40,10 @@ export const SetCommunityStake: CommandMetadata<
     });
 
     // !check business rules - invariants on loaded state + payload
+    if (!community) throw new InvalidInput('Community not found');
+
     // !here we can call domain, application, and infrastructure services (stateless, not related to entities or value objects)
-    await validateCommunityStakeConfig(community);
+    await validateCommunityStakeConfig(community, payload.stake_id);
 
     // !persist state mutations
     const [record] = await models.CommunityStake.upsert({

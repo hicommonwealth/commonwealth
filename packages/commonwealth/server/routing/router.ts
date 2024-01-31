@@ -6,7 +6,7 @@ import { getCommunityStakeHandler } from '../routes/communities/get_community_st
 import { putCommunityStakeHandler } from '../routes/communities/put_community_stakes_handler';
 import ddd from '../routes/ddd';
 
-import { TokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
+import { TokenBalanceCache } from '@hicommonwealth/model';
 
 import {
   methodNotAllowedMiddleware,
@@ -95,7 +95,6 @@ import updateAddress from '../routes/updateAddress';
 import viewChainIcons from '../routes/viewChainIcons';
 import type BanCache from '../util/banCheckCache';
 
-import { RedisCache } from '@hicommonwealth/adapters';
 import type DatabaseValidationService from '../middleware/databaseValidationService';
 import createDiscordBotConfig from '../routes/createDiscordBotConfig';
 import generateImage from '../routes/generateImage';
@@ -206,7 +205,6 @@ function setupRouter(
   banCache: BanCache,
   globalActivityCache: GlobalActivityCache,
   databaseValidationService: DatabaseValidationService,
-  redisCache: RedisCache,
 ) {
   // controllers
   const serverControllers: ServerControllers = {
@@ -232,7 +230,7 @@ function setupRouter(
       banCache,
     ),
     polls: new ServerPollsController(models, tokenBalanceCache),
-    proposals: new ServerProposalsController(models, redisCache),
+    proposals: new ServerProposalsController(models),
     groups: new ServerGroupsController(models, tokenBalanceCache, banCache),
     topics: new ServerTopicsController(models, banCache),
     admin: new ServerAdminController(models),
@@ -376,7 +374,7 @@ function setupRouter(
   registerRoute(
     router,
     'get',
-    '/communityStakes/:community_id/:stake_id',
+    '/communityStakes/:community_id/:stake_id?',
     getCommunityStakeHandler.bind(this, models, serverControllers),
   );
 
@@ -774,6 +772,7 @@ function setupRouter(
     '/reactions/:id',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
+    databaseValidationService.validateCommunity,
     deleteReactionHandler.bind(this, serverControllers),
   );
   registerRoute(

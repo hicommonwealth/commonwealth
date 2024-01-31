@@ -1,8 +1,8 @@
 import { Request } from 'express';
 
 export type CacheKeyDuration = {
-  cacheKey: string;
-  cacheDuration: number;
+  cacheKey?: string;
+  cacheDuration?: number;
 };
 
 // Extend the Request type with your custom properties
@@ -32,7 +32,7 @@ export const defaultUserKeyGenerator = (
 
 export function lookupKeyDurationInReq(
   req: CustomRequest,
-): CacheKeyDuration | null {
+): CacheKeyDuration | string {
   let cacheKey = null;
   let cacheDuration = null;
 

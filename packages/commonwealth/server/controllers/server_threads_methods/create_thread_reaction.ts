@@ -1,11 +1,13 @@
-import { AppError } from '@hicommonwealth/adapters';
-import { NotificationCategories } from '@hicommonwealth/core';
+import { ValidChains } from '@hicommonwealth/chains';
+import { AppError, NotificationCategories } from '@hicommonwealth/core';
 import {
   AddressInstance,
   CommunityInstance,
   ReactionAttributes,
   UserInstance,
+  contractHelpers,
 } from '@hicommonwealth/model';
+import { REACTION_WEIGHT_OVERRIDE } from 'server/config';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
@@ -80,16 +82,16 @@ export async function __createThreadReaction(
   const isAdmin = await validateOwner({
     models: this.models,
     user,
-    communityId: community.id,
+    communityId: community.id!,
     entity: thread,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     const { isValid, message } = await validateTopicGroupsMembership(
       this.models,
       this.tokenBalanceCache,
-      thread.topic_id,
+      thread.topic_id!,
       community,
       address,
     );
@@ -98,29 +100,47 @@ export async function __createThreadReaction(
     }
   }
 
+  let calculatedVotingWeight: number | null = null;
+  if (REACTION_WEIGHT_OVERRIDE) {
+    calculatedVotingWeight = REACTION_WEIGHT_OVERRIDE;
+  } else {
+    // calculate voting weight
+    const stake = await this.models.CommunityStake.findOne({
+      where: { community_id: community.id },
+    });
+    if (stake) {
+      const vote_weight = stake.vote_weight;
+      const stakeBalance = await contractHelpers.getNamespaceBalance(
+        this.tokenBalanceCache,
+        community.namespace,
+        stake.stake_id,
+        ValidChains.Goerli,
+        address.address,
+        this.models,
+      );
+      calculatedVotingWeight = parseInt(stakeBalance, 10) * vote_weight;
+    }
+  }
+
   // create the reaction
-  const reactionData: ReactionAttributes = {
+  const reactionWhere: Partial<ReactionAttributes> = {
     reaction,
     address_id: address.id,
     community_id: community.id,
     thread_id: thread.id,
+  };
+  const reactionData: Partial<ReactionAttributes> = {
+    ...reactionWhere,
+    calculated_voting_weight: calculatedVotingWeight,
     canvas_action: canvasAction,
     canvas_session: canvasSession,
     canvas_hash: canvasHash,
   };
-  const [foundOrCreatedReaction, created] =
-    await this.models.Reaction.findOrCreate({
-      where: reactionData,
-      defaults: reactionData,
-      include: [this.models.Address],
-    });
 
-  const finalReaction = created
-    ? await this.models.Reaction.findOne({
-        where: reactionData,
-        include: [this.models.Address],
-      })
-    : foundOrCreatedReaction;
+  const [finalReaction] = await this.models.Reaction.findOrCreate({
+    where: reactionWhere,
+    defaults: reactionData,
+  });
 
   // build notification options
   const notificationOptions: EmitOptions = {
@@ -131,12 +151,12 @@ export async function __createThreadReaction(
         thread_id: thread.id,
         root_title: thread.title,
         root_type: 'discussion',
-        chain_id: finalReaction.community_id,
-        author_address: finalReaction.Address.address,
-        author_chain: finalReaction.Address.community_id,
+        chain_id: community.id,
+        author_address: address.address,
+        author_chain: address.community_id,
       },
     },
-    excludeAddresses: [finalReaction.Address.address],
+    excludeAddresses: [address.address],
   };
 
   // build analytics options
@@ -145,5 +165,10 @@ export async function __createThreadReaction(
     community: community.id,
   };
 
-  return [finalReaction.toJSON(), notificationOptions, analyticsOptions];
+  const finalReactionWithAddress: ReactionAttributes = {
+    ...finalReaction.toJSON(),
+    Address: address,
+  };
+
+  return [finalReactionWithAddress, notificationOptions, analyticsOptions];
 }

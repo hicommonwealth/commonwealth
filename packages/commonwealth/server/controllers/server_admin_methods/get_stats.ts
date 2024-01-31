@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import { CommunityAttributes, UserInstance } from '@hicommonwealth/model';
 import { Op, QueryTypes, WhereOptions } from 'sequelize';
 import { ServerAdminController } from '../server_admin_controller';

@@ -1,5 +1,9 @@
-import { AppError } from '@hicommonwealth/adapters';
-import { CommunityStakeAttributes, DB } from '@hicommonwealth/model';
+import { AppError } from '@hicommonwealth/core';
+import {
+  CommunityStakeAttributes,
+  DB,
+  validateCommunityStakeConfig,
+} from '@hicommonwealth/model';
 import {
   SetCommunityStakeBody,
   SetCommunityStakeBodySchema,
@@ -8,7 +12,6 @@ import {
 } from 'server/controllers/server_communities_methods/put_community_stake';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
-import { validateCommunityStakeConfig } from '../../util/commonProtocol/communityStakeConfigValidator';
 import { formatErrorPretty } from '../../util/errorFormat';
 import { validateOwner } from '../../util/validateOwner';
 
@@ -39,7 +42,7 @@ export const putCommunityStakeHandler = async (
     communityId: community_id,
     allowMod: false,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
 
   if (!isAdmin) {
@@ -48,7 +51,20 @@ export const putCommunityStakeHandler = async (
     );
   }
 
-  await validateCommunityStakeConfig(models, community_id, stake_id);
+  const community = await models.Community.findOne({
+    where: {
+      id: community_id,
+    },
+    include: [
+      {
+        model: models.ChainNode,
+        attributes: ['eth_chain_id', 'url'],
+      },
+    ],
+    attributes: ['namespace'],
+  });
+
+  await validateCommunityStakeConfig(community, stake_id);
 
   const bodyValidationResult = SetCommunityStakeBodySchema.safeParse(req.body);
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -7,21 +7,43 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
 import Hint from '../../../components/Hint';
-import { EnableStakeProps, StakeData } from './types';
+import { EnableStakeProps, StakeData } from '../types';
+import useNamespaceFactory from '../useNamespaceFactory';
 import { validationSchema } from './validations';
 
 import './EnableStake.scss';
 
 const EnableStake = ({
-  onOptOutEnablingStake,
+  goToSuccessStep,
   onOptInEnablingStake,
   communityStakeData,
 }: EnableStakeProps) => {
-  const handleSubmit = (data: StakeData) => {
-    onOptInEnablingStake({
-      namespace: data.namespace,
-      symbol: data.symbol,
-    });
+  const [namespaceError, setNamespaceError] = useState('');
+
+  const { namespaceFactory } = useNamespaceFactory();
+
+  const clearNamespaceError = () => {
+    setNamespaceError('');
+  };
+
+  const handleSubmit = async (data: StakeData) => {
+    try {
+      clearNamespaceError();
+
+      const isNamespaceAvailable =
+        await namespaceFactory.checkNamespaceReservation(data.namespace);
+
+      if (!isNamespaceAvailable) {
+        return setNamespaceError('Namespace already exists');
+      }
+
+      onOptInEnablingStake({
+        namespace: data.namespace,
+        symbol: data.symbol,
+      });
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const getInitialValue = () => {
@@ -64,6 +86,8 @@ const EnableStake = ({
             label="Community Namespace"
             placeholder="namespace"
             fullWidth
+            customError={namespaceError}
+            onChange={clearNamespaceError}
           />
 
           <CWTextInput
@@ -94,7 +118,7 @@ const EnableStake = ({
             label="No"
             buttonWidth="wide"
             buttonType="secondary"
-            onClick={onOptOutEnablingStake}
+            onClick={goToSuccessStep}
           />
           <CWButton
             form="communityStakeForm"

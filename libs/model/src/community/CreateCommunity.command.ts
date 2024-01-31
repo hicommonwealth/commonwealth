@@ -1,3 +1,4 @@
+import type { CommandMetadata } from '@hicommonwealth/core';
 import {
   ChainBase,
   ChainType,
@@ -6,7 +7,6 @@ import {
 import { z } from 'zod';
 import { models } from '../database';
 import type { CommunityAttributes } from '../models';
-import type { CommandMetadata } from '../types';
 import { checkIconSize } from '../utils/checkIconSize';
 import { ALL_COMMUNITIES } from '../utils/constants';
 
@@ -60,13 +60,9 @@ export const CreateCommunity: CommandMetadata<
   CommunityAttributes
 > = {
   schema,
-  fn: async () =>
-    //actor,
-    //id,
-    //payload,
-    {
-      // TODO
-      const community = await models.Community.findOne();
-      return community!;
-    },
+  fn: async () => {
+    // TODO
+    const community = await models.Community.findOne();
+    return community!;
+  },
 };

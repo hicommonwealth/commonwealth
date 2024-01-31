@@ -29,6 +29,7 @@ const deleteReaction = async ({
       data: {
         author_community_id: communityId,
         address: address,
+        community_id: communityId,
         jwt: app.user.jwt,
         canvas_action: action,
         canvas_session: session,

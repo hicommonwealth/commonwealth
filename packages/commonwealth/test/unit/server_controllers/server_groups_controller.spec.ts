@@ -6,8 +6,11 @@ import {
   TopicAttributes,
   UserInstance,
 } from '@hicommonwealth/model';
-import { expect } from 'chai';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 import { ServerGroupsController } from 'server/controllers/server_groups_controller';
+
+chai.use(chaiAsPromised);
 
 const INVALID_REQUIREMENTS_NOT_ARRAY = 'no an array' as unknown as [];
 
