@@ -68,18 +68,6 @@ export const useImageDropAndPaste = ({
         );
 
         const selectedIndex = editor.getSelection()?.index;
-        const text: string = editor.getText();
-        let blankEditor = false;
-        let lineBreak = '\n';
-
-        // When Quill editor is blank, getLength returns 1
-        if (editor.getLength() > 1) {
-          if (text[selectedIndex - 1] && text[selectedIndex]) {
-            lineBreak = '\n\n';
-          }
-        } else {
-          blankEditor = true;
-        }
 
         editor.insertText(selectedIndex, `![image](${uploadedFileUrl})`);
 
