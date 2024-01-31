@@ -268,6 +268,113 @@ export class RedisCache implements Cache {
   }
 
   /**
+   * Increments the integer value of a key by the given amount.
+   * @param namespace The namespace of the key to increment.
+   * @param key The key whose value is to be incremented.
+   * @param increment The amount by which the key's value should be incremented.
+   * @returns The new value of the key after the increment.
+   */
+  public async incrementKey(
+    namespace: RedisNamespaces,
+    key: string,
+    increment = 1,
+  ): Promise<number | null> {
+    try {
+      if (this.initialized()) {
+        const finalKey = RedisCache.getNamespaceKey(namespace, key);
+        return await this._client.incr(finalKey, increment);
+      }
+    } catch (e) {
+      const msg = `An error occurred while incrementing the key: ${key}`;
+      log.error(msg, e);
+      this._rollbar?.error(msg, e);
+      return null;
+    }
+  }
+
+  /**
+   * Decrements the integer value of a key by the given amount.
+   * @param namespace The namespace of the key to decrement.
+   * @param key The key whose value is to be decremented.
+   * @param decrement The amount by which the key's value should be decremented.
+   * @returns The new value of the key after the decrement.
+   */
+  public async decrementKey(
+    namespace: RedisNamespaces,
+    key: string,
+    decrement = 1,
+  ): Promise<number | null> {
+    try {
+      if (this.initialized()) {
+        const finalKey = RedisCache.getNamespaceKey(namespace, key);
+        return await this._client.decr(finalKey, decrement);
+      }
+    } catch (e) {
+      const msg = `An error occurred while decrementing the key: ${key}`;
+      log.error(msg, e);
+      this._rollbar?.error(msg, e);
+      return null;
+    }
+  }
+
+  /**
+   * Sets the expiration (TTL) of a key within a specific namespace.
+   * @param namespace The namespace of the key for which to set the expiration.
+   * @param key The key for which to set the expiration.
+   * @param ttlInSeconds The time to live (TTL) in seconds for the key. Use 0 to remove the expiration.
+   * @returns True if the expiration was set successfully, false otherwise.
+   */
+  public async setKeyTTL(
+    namespace: RedisNamespaces,
+    key: string,
+    ttlInSeconds: number,
+  ): Promise<boolean> {
+    try {
+      if (this.initialized()) {
+        const finalKey = RedisCache.getNamespaceKey(namespace, key);
+
+        // If ttlInSeconds is 0, remove the expiration (PERSIST command).
+        if (ttlInSeconds === 0) {
+          await this._client.persist(finalKey);
+        } else {
+          // Set the expiration using the EXPIRE command.
+          const result = await this._client.expire(finalKey, ttlInSeconds);
+          return result === 1; // EXPIRE returns 1 if the key exists and the expiration is set.
+        }
+      }
+    } catch (e) {
+      const msg = `An error occurred while setting the expiration of the key: ${key}`;
+      log.error(msg, e);
+      this._rollbar?.error(msg, e);
+    }
+    return false;
+  }
+
+  /**
+   * Retrieves the current Time to Live (TTL) of a key within a specific namespace.
+   * @param namespace The namespace of the key for which to get the TTL.
+   * @param key The key for which to get the TTL.
+   * @returns The TTL in seconds for the specified key, or -1 if the key does not exist or has no associated expiration.
+   */
+  public async getKeyTTL(
+    namespace: RedisNamespaces,
+    key: string,
+  ): Promise<number> {
+    try {
+      if (this.initialized()) {
+        const finalKey = RedisCache.getNamespaceKey(namespace, key);
+        const ttl = await this._client.ttl(finalKey);
+        return ttl; // TTL in seconds; -2 if the key does not exist, -1 if the key exists but has no associated expire.
+      }
+    } catch (e) {
+      const msg = `An error occurred while retrieving the TTL of the key: ${key}`;
+      log.error(msg, e);
+      this._rollbar?.error(msg, e);
+    }
+    return -2;
+  }
+
+  /**
    * Get all the key-value pairs of a specific namespace.
    * @param namespace The name of the namespace to retrieve keys from
    * @param maxResults The maximum number of keys to retrieve from the given namespace

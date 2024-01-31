@@ -1,9 +1,5 @@
 import { AppError } from '@hicommonwealth/adapters';
-import {
-  CommunityInstance,
-  PollAttributes,
-  UserInstance,
-} from '@hicommonwealth/model';
+import { PollAttributes, UserInstance } from '@hicommonwealth/model';
 import moment from 'moment';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { validateOwner } from '../../util/validateOwner';
@@ -19,7 +15,6 @@ export const Errors = {
 
 export type CreateThreadPollOptions = {
   user: UserInstance;
-  community: CommunityInstance;
   threadId: number;
   prompt: string;
   options: string[];
@@ -29,14 +24,7 @@ export type CreateThreadPollResult = [PollAttributes, TrackOptions];
 
 export async function __createThreadPoll(
   this: ServerThreadsController,
-  {
-    user,
-    community,
-    threadId,
-    prompt,
-    options,
-    customDuration,
-  }: CreateThreadPollOptions,
+  { user, threadId, prompt, options, customDuration }: CreateThreadPollOptions,
 ): Promise<CreateThreadPollResult> {
   if (customDuration) {
     if (
@@ -65,19 +53,21 @@ export async function __createThreadPoll(
   const isThreadOwner = await validateOwner({
     models: this.models,
     user,
-    communityId: community.id,
+    communityId: thread.community_id,
     entity: thread,
   });
   if (!isThreadOwner) {
     throw new AppError(Errors.NotAuthor);
   }
 
+  const community = await this.models.Community.findByPk(thread.community_id);
+
   // check if admin_only flag is set
   if (community.admin_only_polling) {
     const isAdmin = await validateOwner({
       models: this.models,
       user,
-      communityId: community.id,
+      communityId: thread.community_id,
       allowAdmin: true,
     });
     if (!isAdmin) {
@@ -102,7 +92,7 @@ export async function __createThreadPoll(
 
   const analyticsOptions = {
     event: MixpanelCommunityInteractionEvent.CREATE_POLL,
-    community: community.id,
+    community: thread.community_id,
     userId: user.id,
   };
 

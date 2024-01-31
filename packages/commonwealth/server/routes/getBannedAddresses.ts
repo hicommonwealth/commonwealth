@@ -20,12 +20,12 @@ const getBannedAddresses = async (
   req: TypedRequestQuery<GetBannedAddressesReq>,
   res: TypedResponse<GetBannedAddressesResp>,
 ) => {
-  const chain = req.chain;
+  const { community } = req;
 
   const isAdmin = await validateOwner({
     models: models,
     user: req.user,
-    communityId: chain.id,
+    communityId: community.id,
     allowAdmin: true,
     allowSuperAdmin: true,
   });
@@ -33,7 +33,9 @@ const getBannedAddresses = async (
     throw new AppError(GetBannedAddressesErrors.NoPermission);
   }
 
-  const bans = await models.Ban.findAll({ where: { community_id: chain.id } });
+  const bans = await models.Ban.findAll({
+    where: { community_id: community.id },
+  });
   return success(
     res,
     bans.map((b) => b.toJSON()),

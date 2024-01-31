@@ -155,6 +155,7 @@ export enum CacheNamespaces {
   Compound_Gov_Version = 'compound_gov_version',
   Token_Balance = 'token_balance',
   Activity_Cache = 'activity_cache',
+  Rate_Limiter = 'rate_limiter',
 }
 
 export interface ISnapshotNotification {

@@ -1,12 +1,12 @@
 import { ServerError } from '@hicommonwealth/adapters';
-import { CommunityInstance, ThreadAttributes } from '@hicommonwealth/model';
+import { ThreadAttributes } from '@hicommonwealth/model';
 import moment from 'moment';
 import { QueryTypes } from 'sequelize';
 import { getLastEdited } from '../../util/getLastEdited';
 import { ServerThreadsController } from '../server_threads_controller';
 
 export type GetBulkThreadsOptions = {
-  community?: CommunityInstance;
+  communityId: string;
   stage: string;
   topicId: number;
   includePinnedThreads: boolean;
@@ -28,7 +28,7 @@ export type GetBulkThreadsResult = {
 export async function __getBulkThreads(
   this: ServerThreadsController,
   {
-    community,
+    communityId,
     stage,
     topicId,
     includePinnedThreads,
@@ -53,7 +53,7 @@ export async function __getBulkThreads(
       page: _page,
       limit: _limit,
       offset: _offset,
-      ...(community && { community_id: community.id }),
+      ...(communityId && { community_id: communityId }),
       ...(stage && { stage }),
       ...(topicId && { topic_id: topicId }),
     };
@@ -137,7 +137,7 @@ export async function __getBulkThreads(
         ) reactions
         ON t.id = reactions.thread_id
         WHERE t.deleted_at IS NULL
-          ${community ? ` AND t.community_id = $community_id` : ''}
+          ${communityId ? ` AND t.community_id = $community_id` : ''}
           ${topicId ? ` AND t.topic_id = $topic_id ` : ''}
           ${stage ? ` AND t.stage = $stage ` : ''}
           ${archived ? ` AND t.archived_at IS NOT NULL ` : ''}
@@ -241,7 +241,7 @@ export async function __getBulkThreads(
 
   const numVotingThreads = await this.models.Thread.count({
     where: {
-      community_id: community?.id,
+      community_id: communityId,
       stage: 'voting',
     },
   });

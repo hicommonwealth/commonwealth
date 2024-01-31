@@ -1,30 +1,31 @@
 import moment from 'moment';
-import { Op } from 'sequelize';
 
 import { AppError } from '@hicommonwealth/adapters';
 import { NotificationCategories, ProposalType } from '@hicommonwealth/core';
 import {
   AddressInstance,
   CommentAttributes,
-  CommunityInstance,
   UserInstance,
 } from '@hicommonwealth/model';
+import { WhereOptions } from 'sequelize';
+import { validateOwner } from 'server/util/validateOwner';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { ServerCommentsController } from '../server_comments_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
 
 const Errors = {
+  CommentNotFound: 'Comment not found',
   ThreadNotFoundForComment: 'Thread not found for comment',
   BanError: 'Ban error',
   ParseMentionsFailed: 'Failed to parse mentions',
   NoId: 'Must provide id',
+  NotAuthor: 'User is not author of comment',
 };
 
 export type UpdateCommentOptions = {
   user: UserInstance;
   address: AddressInstance;
-  community: CommunityInstance;
   commentId?: number;
   commentBody: string;
   discordMeta?: any;
@@ -34,54 +35,55 @@ export type UpdateCommentResult = [CommentAttributes, EmitOptions[]];
 
 export async function __updateComment(
   this: ServerCommentsController,
-  {
-    user,
-    address,
-    community,
-    commentId,
-    commentBody,
-    discordMeta,
-  }: UpdateCommentOptions,
+  { user, address, commentId, commentBody, discordMeta }: UpdateCommentOptions,
 ): Promise<UpdateCommentResult> {
   if (!commentId && !discordMeta) {
     throw new AppError(Errors.NoId);
   }
 
-  if (discordMeta !== undefined && discordMeta !== null) {
-    const existingComment = await this.models.Comment.findOne({
-      where: { discord_meta: discordMeta },
-    });
-    if (existingComment) {
-      commentId = existingComment.id;
-    } else {
-      throw new AppError(Errors.NoId);
-    }
+  const commentWhere: WhereOptions<CommentAttributes> = {};
+  if (commentId) {
+    commentWhere.id = commentId;
+  }
+  if (discordMeta) {
+    commentWhere.discord_meta = discordMeta;
+  }
+
+  const comment = await this.models.Comment.findOne({
+    where: commentWhere,
+    include: [
+      {
+        model: this.models.Thread,
+        required: true,
+      },
+    ],
+  });
+  if (!comment) {
+    throw new AppError(Errors.NoId);
+  }
+  const { Thread: thread } = comment;
+  if (!thread) {
+    throw new AppError(Errors.ThreadNotFoundForComment);
   }
 
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
-    communityId: community.id,
+    communityId: comment.community_id,
     address: address.address,
   });
   if (!canInteract) {
     throw new AppError(`${Errors.BanError}: ${banError}`);
   }
 
-  const userOwnedAddressIds = (await user.getAddresses())
-    .filter((addr) => !!addr.verified)
-    .map((addr) => addr.id);
-  const comment = await this.models.Comment.findOne({
-    where: {
-      id: commentId,
-      address_id: { [Op.in]: userOwnedAddressIds },
-    },
+  const isAuthor = await validateOwner({
+    models: this.models,
+    user,
+    communityId: comment.community_id,
+    entity: comment,
+    allowSuperAdmin: true,
   });
-
-  const thread = await this.models.Thread.findOne({
-    where: { id: comment.thread_id },
-  });
-  if (!thread) {
-    throw new AppError(Errors.ThreadNotFoundForComment);
+  if (!isAuthor) {
+    throw new AppError(Errors.NotAuthor);
   }
 
   let latestVersion;
