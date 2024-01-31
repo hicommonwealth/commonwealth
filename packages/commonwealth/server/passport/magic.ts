@@ -56,6 +56,7 @@ async function createMagicAddressInstances(
   generatedAddresses: Array<{ address: string; chain: string }>,
   user: UserAttributes,
   walletSsoSource: WalletSsoSource,
+  decodedMagicToken: MagicUser,
   t?: Transaction,
 ): Promise<AddressInstance[]> {
   const addressInstances: AddressInstance[] = [];
@@ -73,7 +74,7 @@ async function createMagicAddressInstances(
       defaults: {
         user_id,
         profile_id,
-        verification_token: 'MAGIC',
+        verification_token: decodedMagicToken.claim.tid, // to prevent re-use
         verification_token_expires: null,
         verified: new Date(), // trust addresses from magic
         last_active: new Date(),
@@ -100,13 +101,19 @@ async function createMagicAddressInstances(
         userId: user_id,
         event: MixpanelCommunityInteractionEvent.JOIN_COMMUNITY,
       });
-    } else if (
-      addressInstance.wallet_sso_source === WalletSsoSource.Unknown ||
-      // set wallet_sso_source if it was unknown before
-      addressInstance.wallet_sso_source === undefined ||
-      addressInstance.wallet_sso_source === null
-    ) {
-      addressInstance.wallet_sso_source = walletSsoSource;
+    } else {
+      // Update used magic token to prevent replay attacks
+      addressInstance.verification_token = decodedMagicToken.claim.tid;
+
+      if (
+        addressInstance.wallet_sso_source === WalletSsoSource.Unknown ||
+        // set wallet_sso_source if it was unknown before
+        addressInstance.wallet_sso_source === undefined ||
+        addressInstance.wallet_sso_source === null
+      ) {
+        addressInstance.wallet_sso_source = walletSsoSource;
+      }
+
       await addressInstance.save({ transaction: t });
     }
     addressInstances.push(addressInstance);
@@ -152,6 +159,7 @@ async function createNewMagicUser({
         generatedAddresses,
         newUser,
         walletSsoSource,
+        decodedMagicToken,
         transaction,
       );
 
@@ -184,7 +192,6 @@ async function createNewMagicUser({
         issuer: decodedMagicToken.issuer,
         issued_at: decodedMagicToken.claim.iat,
         address_id: canonicalAddressInstance.id, // always ethereum address
-        state_id: decodedMagicToken.claim.tid,
         created_at: new Date(),
         updated_at: new Date(),
       },
@@ -234,7 +241,6 @@ async function loginExistingMagicUser({
       }
       ssoToken.issued_at = decodedMagicToken.claim.iat;
       ssoToken.updated_at = new Date();
-      ssoToken.state_id = decodedMagicToken.claim.tid;
       await ssoToken.save({ transaction });
       log.trace('SSO TOKEN HANDLED NORMALLY');
     } else {
@@ -274,6 +280,7 @@ async function loginExistingMagicUser({
       generatedAddresses,
       existingUserInstance,
       walletSsoSource,
+      decodedMagicToken,
       transaction,
     );
 
@@ -284,7 +291,6 @@ async function loginExistingMagicUser({
     );
     if (malformedSsoToken) {
       malformedSsoToken.address_id = canonicalAddressInstance.id;
-      malformedSsoToken.state_id = decodedMagicToken.claim.tid;
       await malformedSsoToken.save({ transaction });
       log.info(
         `Finished migration of SsoToken for user ${existingUserInstance.id}!`,
@@ -295,7 +301,6 @@ async function loginExistingMagicUser({
           issuer: decodedMagicToken.issuer,
           issued_at: decodedMagicToken.claim.iat,
           address_id: canonicalAddressInstance.id, // always ethereum address
-          state_id: decodedMagicToken.claim.tid,
           created_at: new Date(),
           updated_at: new Date(),
         },
@@ -323,6 +328,7 @@ async function mergeLogins(ctx: MagicLoginContext): Promise<UserInstance> {
     {
       user_id: loggedInUser.id,
       profile_id: loggedInUser.Profiles[0].id,
+      verification_token: ctx.decodedMagicToken.claim.tid,
     },
     {
       where: {
@@ -352,6 +358,7 @@ async function addMagicToUser({
     generatedAddresses,
     loggedInUser,
     walletSsoSource,
+    decodedMagicToken,
   );
 
   // create new token with provided user/address. contract is each address owns an SsoToken.
@@ -362,7 +369,6 @@ async function addMagicToUser({
     issuer: decodedMagicToken.issuer,
     issued_at: decodedMagicToken.claim.iat,
     address_id: canonicalAddressInstance.id,
-    state_id: decodedMagicToken.claim.tid,
     created_at: new Date(),
     updated_at: new Date(),
   });
@@ -402,13 +408,17 @@ async function magicLoginRoute(
 
   // replay attack check
   const didTokenId = decodedMagicToken.claim.tid; // single-use token id
-  const previouslyUsedSsoTokenByTID = await models.SsoToken.findOne({
+
+  // The same didToken is used for potentially two addresses at the same time,
+  // (ex: Eth and Cosmos for Cosmos login)
+  // but if a single one is found we reject the token replay
+  const usedMagicToken = await models.Address.findOne({
     where: {
-      state_id: didTokenId,
+      verification_token: didTokenId,
     },
   });
 
-  if (previouslyUsedSsoTokenByTID) {
+  if (usedMagicToken) {
     log.warn('Replay attack detected.');
     throw new Error(
       `Replay attack detected for user ${decodedMagicToken.publicAddress}}.`,
@@ -570,6 +580,7 @@ async function magicLoginRoute(
       generatedAddresses,
       loggedInUser,
       walletSsoSource,
+      decodedMagicToken,
     );
     return cb(null, existingUserInstance);
   }
