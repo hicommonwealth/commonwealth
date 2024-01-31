@@ -17,7 +17,7 @@ import type Substrate from 'controllers/chain/substrate/adapter';
 import { signSessionWithAccount } from 'controllers/server/sessions';
 import $ from 'jquery';
 import _ from 'lodash';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
 import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
@@ -30,6 +30,7 @@ import {
 } from '../../../shared/analytics/types';
 import NewProfilesController from '../controllers/server/newProfiles';
 import { setDarkMode } from '../helpers/darkMode';
+import { featureFlags } from '../helpers/feature-flags';
 import {
   getAddressFromWallet,
   loginToAxie,
@@ -49,6 +50,7 @@ import type {
 } from '../views/pages/login/types';
 import { useBrowserAnalyticsTrack } from './useBrowserAnalyticsTrack';
 import useBrowserWindow from './useBrowserWindow';
+import useNecessaryEffect from './useNecessaryEffect';
 
 type IuseWalletProps = {
   initialBody?: LoginActiveStep;
@@ -61,12 +63,15 @@ type IuseWalletProps = {
 };
 
 const useWallets = (walletProps: IuseWalletProps) => {
+  const isAccountCreationTriggered = useRef(false);
   const [avatarUrl, setAvatarUrl] = useState<string>();
   const [address, setAddress] = useState<string>();
   const [activeStep, setActiveStep] = useState<LoginActiveStep>();
   const [profiles, setProfiles] = useState<Array<ProfileRowProps>>();
   const [sidebarType, setSidebarType] = useState<LoginSidebarType>();
-  const [username, setUsername] = useState<string>();
+  const [username, setUsername] = useState<string>(
+    featureFlags.newSignInModal ? 'Anonymous' : '',
+  );
   const [email, setEmail] = useState<string>();
   const [wallets, setWallets] = useState<Array<IWebWallet<any>>>();
   const [selectedWallet, setSelectedWallet] = useState<IWebWallet<any>>();
@@ -693,6 +698,22 @@ const useWallets = (walletProps: IuseWalletProps) => {
       onAccountVerified(account, false, false);
     }
   };
+
+  useNecessaryEffect(() => {
+    if (featureFlags.newSignInModal) {
+      if (
+        isAccountCreationTriggered.current ||
+        activeStep !== 'selectAccountType'
+      )
+        return;
+      isAccountCreationTriggered.current = true;
+      onCreateNewAccount().then(() => {
+        setTimeout(() => {
+          onSaveProfileInfo();
+        }, 1000);
+      });
+    }
+  }, [activeStep, onCreateNewAccount, onSaveProfileInfo]);
 
   return {
     showMobile,

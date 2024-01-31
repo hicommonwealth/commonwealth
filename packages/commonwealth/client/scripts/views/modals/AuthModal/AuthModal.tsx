@@ -1,7 +1,8 @@
-import { WalletSsoSource } from '@hicommonwealth/core';
+import { ChainBase, WalletSsoSource } from '@hicommonwealth/core';
 import useWallets from 'client/scripts/hooks/useWallets';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import app from 'state';
 import AuthButton from '../../components/AuthButton';
 import { AuthTypes } from '../../components/AuthButton/types';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -21,14 +22,43 @@ type AuthModalProps = {
 const AuthModal = ({ onClose, isOpen }: AuthModalProps) => {
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
 
-  const { onSocialLogin } = useWallets({
+  const { wallets, onWalletSelect, onSocialLogin } = useWallets({
     onModalClose: onClose,
   });
 
   const tabsList = [
     {
       name: 'Wallet',
-      options: ['walletConnect', 'keplr', 'leap', 'phantom', 'polkadot'],
+      options: [
+        // only show ethereum based wallets options on non-community pages or on ethereum based communities
+        ...(!app?.chain?.base || app?.chain?.base === ChainBase.Ethereum
+          ? ['walletConnect']
+          : []),
+        // only show cosmos based wallets on non-community pages or on cosmos based communities
+        ...(wallets || [])
+          .filter(
+            (wallet) =>
+              (!app?.chain?.base || app?.chain?.base === ChainBase.CosmosSDK) &&
+              wallet.chain === ChainBase.CosmosSDK,
+          )
+          .map((wallet) => wallet.name),
+        // only show solana based wallets on solana based communities
+        ...(wallets || [])
+          .filter(
+            (wallet) =>
+              app?.chain?.base === ChainBase.Solana &&
+              wallet.chain === ChainBase.Solana,
+          )
+          .map((wallet) => wallet.name),
+        // only show substrate based wallets on substrate based communities
+        ...(wallets || [])
+          .filter(
+            (wallet) =>
+              app?.chain?.base === ChainBase.Substrate &&
+              wallet.chain === ChainBase.Substrate,
+          )
+          .map((wallet) => wallet.name),
+      ],
     },
     {
       name: 'Email or Social',
@@ -40,6 +70,15 @@ const AuthModal = ({ onClose, isOpen }: AuthModalProps) => {
     if (option === 'email') {
       // TODO: implement this in https://github.com/hicommonwealth/commonwealth/issues/6386
       return;
+    }
+
+    // if any wallet option is selected
+    if (activeTabIndex === 0) {
+      await onWalletSelect(
+        wallets.find(
+          (wallet) => wallet.name.toLowerCase() === option.toLowerCase(),
+        ),
+      );
     }
 
     // if any SSO option is selected
