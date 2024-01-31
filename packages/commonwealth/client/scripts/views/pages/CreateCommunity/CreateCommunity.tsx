@@ -1,3 +1,4 @@
+import { useFlag } from '@unleash/proxy-client-react';
 import React from 'react';
 
 import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps';
@@ -14,6 +15,7 @@ import { CreateCommunityStep, getFormSteps } from './utils';
 import './CreateCommunity.scss';
 
 const CreateCommunity = () => {
+  const communityStakeEnabled = useFlag('flag.communityStake');
   const {
     createCommunityStep,
     selectedCommunity,
@@ -76,7 +78,11 @@ const CreateCommunity = () => {
     <div className="CreateCommunity">
       {!isSuccessStep && (
         <CWFormSteps
-          steps={getFormSteps(createCommunityStep, showCommunityStakeStep)}
+          steps={getFormSteps(
+            createCommunityStep,
+            showCommunityStakeStep,
+            communityStakeEnabled,
+          )}
         />
       )}
 

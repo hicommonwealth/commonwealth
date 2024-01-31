@@ -1,6 +1,6 @@
 import { DefaultPage } from '@hicommonwealth/core';
+import { useFlag } from '@unleash/proxy-client-react';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { featureFlags } from 'helpers/feature-flags';
 import getLinkType from 'helpers/linkType';
 import React, { useState } from 'react';
 import { slugifyPreserveDashes } from 'shared/utils';
@@ -32,6 +32,7 @@ import {
 } from './validation';
 
 const CommunityProfileForm = () => {
+  const communityStakeEnabled = useFlag('flag.communityStake');
   const communityTagOptions: CommunityTags[] = ['DeFi', 'DAO'];
   const community = app.config.chains.getById(app.activeChainId());
 
@@ -206,7 +207,7 @@ const CommunityProfileForm = () => {
               placeholder="Community URL"
               value={`${window.location.origin}/${communityId}`}
             />
-            {featureFlags.communityStake && (
+            {communityStakeEnabled && (
               <>
                 <CWTextInput
                   disabled

@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { featureFlags } from 'helpers/feature-flags';
 import { CWFormStepsProps } from 'views/components/component_kit/new_designs/CWFormSteps/CWFormSteps';
 
 export enum CreateCommunityStep {
@@ -13,6 +12,7 @@ export enum CreateCommunityStep {
 export const getFormSteps = (
   createCommunityStep: CreateCommunityStep,
   showCommunityStakeStep: boolean,
+  communityStakeEnabled: boolean,
 ): CWFormStepsProps['steps'] => {
   return [
     {
@@ -31,7 +31,7 @@ export const getFormSteps = (
           ? 'active'
           : 'completed',
     },
-    ...((featureFlags.communityStake && showCommunityStakeStep
+    ...((communityStakeEnabled && showCommunityStakeStep
       ? [
           {
             label: 'Community Stake',
@@ -54,6 +54,7 @@ export const handleChangeStep = (
     React.SetStateAction<CreateCommunityStep>
   >,
   showCommunityStakeStep: boolean,
+  communityStakeEnabled: boolean,
 ) => {
   switch (createCommunityStep) {
     case CreateCommunityStep.CommunityTypeSelection:
@@ -62,7 +63,7 @@ export const handleChangeStep = (
     case CreateCommunityStep.BasicInformation:
       setCreateCommunityStep(
         forward
-          ? featureFlags.communityStake && showCommunityStakeStep
+          ? communityStakeEnabled && showCommunityStakeStep
             ? CreateCommunityStep.CommunityStake
             : CreateCommunityStep.Success
           : CreateCommunityStep.CommunityTypeSelection,

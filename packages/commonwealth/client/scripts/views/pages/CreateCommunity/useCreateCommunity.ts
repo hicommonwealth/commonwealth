@@ -1,3 +1,4 @@
+import { useFlag } from '@unleash/proxy-client-react';
 import { useState } from 'react';
 
 import { ValidChains } from '@hicommonwealth/chains';
@@ -7,6 +8,7 @@ import { SelectedCommunity } from 'views/components/component_kit/new_designs/CW
 import { CreateCommunityStep, handleChangeStep } from './utils';
 
 const useCreateCommunity = () => {
+  const communityStakeEnabled = useFlag('flag.communityStake');
   const [createCommunityStep, setCreateCommunityStep] =
     useState<CreateCommunityStep>(CreateCommunityStep.CommunityTypeSelection);
   const [selectedCommunity, setSelectedCommunity] = useState<SelectedCommunity>(
@@ -23,6 +25,7 @@ const useCreateCommunity = () => {
       createCommunityStep,
       setCreateCommunityStep,
       showCommunityStakeStep,
+      communityStakeEnabled,
     );
   };
 
