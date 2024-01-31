@@ -15,30 +15,45 @@ import {
 import './AuthModal.scss';
 
 type AuthModalProps = {
-  onClose: () => any;
   isOpen: boolean;
+  onClose: () => any;
+  onSuccess?: () => any;
+  showWalletsFor?: ChainBase.CosmosSDK | ChainBase.Ethereum;
 };
 
-const AuthModal = ({ onClose, isOpen }: AuthModalProps) => {
+const AuthModal = ({
+  isOpen,
+  onClose,
+  onSuccess,
+  showWalletsFor,
+}: AuthModalProps) => {
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
 
   const { wallets, onWalletSelect, onSocialLogin } = useWallets({
     onModalClose: onClose,
+    onSuccess,
   });
 
   const tabsList = [
     {
       name: 'Wallet',
       options: [
+        // Note: If `showWalletsFor` is present then show wallets for that chain, else
         // only show ethereum based wallets options on non-community pages or on ethereum based communities
-        ...(!app?.chain?.base || app?.chain?.base === ChainBase.Ethereum
+        ...((!showWalletsFor
+          ? !app?.chain?.base
+          : showWalletsFor === ChainBase.Ethereum) ||
+        app?.chain?.base === ChainBase.Ethereum
           ? ['walletConnect']
           : []),
         // only show cosmos based wallets on non-community pages or on cosmos based communities
         ...(wallets || [])
           .filter(
             (wallet) =>
-              (!app?.chain?.base || app?.chain?.base === ChainBase.CosmosSDK) &&
+              ((!showWalletsFor
+                ? !app?.chain?.base
+                : showWalletsFor === ChainBase.CosmosSDK) ||
+                app?.chain?.base === ChainBase.CosmosSDK) &&
               wallet.chain === ChainBase.CosmosSDK,
           )
           .map((wallet) => wallet.name),
