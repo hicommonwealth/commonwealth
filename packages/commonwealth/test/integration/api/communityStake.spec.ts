@@ -1,8 +1,11 @@
-import { models, UserInstance } from '@hicommonwealth/model';
+import {
+  models,
+  UserInstance,
+  validateCommunityStakeConfig,
+} from '@hicommonwealth/model';
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import { validateCommunityStakeConfig } from '../../../../../libs/model/src/services/commonProtocol/communityStakeConfigValidator';
 import app from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
