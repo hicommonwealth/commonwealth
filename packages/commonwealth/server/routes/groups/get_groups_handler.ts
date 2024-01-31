@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import z from 'zod';
 import { GetGroupsResult } from '../../controllers/server_groups_methods/get_groups';
 import { ServerControllers } from '../../routing/router';

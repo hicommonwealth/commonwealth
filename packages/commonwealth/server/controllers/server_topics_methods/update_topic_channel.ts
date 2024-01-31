@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import { CommunityInstance, UserInstance } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
 import { validateOwner } from '../../util/validateOwner';

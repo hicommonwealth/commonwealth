@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import type { NextFunction, Request, Response } from 'express';
 import { findAllRoles } from '../../util/roles';
 import Errors from './errors';

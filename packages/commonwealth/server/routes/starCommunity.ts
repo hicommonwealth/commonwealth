@@ -1,4 +1,4 @@
-import { ServerError } from '@hicommonwealth/adapters';
+import { ServerError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 

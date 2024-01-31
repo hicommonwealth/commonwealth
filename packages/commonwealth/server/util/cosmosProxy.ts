@@ -1,9 +1,8 @@
 import {
-  AppError,
   CacheDecorator,
   lookupKeyDurationInReq,
 } from '@hicommonwealth/adapters';
-import { logger } from '@hicommonwealth/core';
+import { AppError, logger } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
 import axios from 'axios';
 import bodyParser from 'body-parser';

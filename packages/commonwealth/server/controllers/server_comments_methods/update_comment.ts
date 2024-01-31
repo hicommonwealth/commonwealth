@@ -1,8 +1,11 @@
 import moment from 'moment';
 import { Op } from 'sequelize';
 
-import { AppError } from '@hicommonwealth/adapters';
-import { NotificationCategories, ProposalType } from '@hicommonwealth/core';
+import {
+  AppError,
+  NotificationCategories,
+  ProposalType,
+} from '@hicommonwealth/core';
 import {
   AddressInstance,
   CommentAttributes,

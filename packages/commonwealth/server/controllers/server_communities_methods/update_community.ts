@@ -1,16 +1,15 @@
 /* eslint-disable no-continue */
-import { AppError } from '@hicommonwealth/adapters';
-import { ChainBase } from '@hicommonwealth/core';
+import { AppError, ChainBase } from '@hicommonwealth/core';
 import type {
   CommunityAttributes,
   CommunitySnapshotSpaceWithSpaceAttached,
 } from '@hicommonwealth/model';
 import { UserInstance } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
+import { validateNamespace } from '../../../../../libs/model/src/services/commonProtocol/newNamespaceValidator';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';
 import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
-import { validateNamespace } from '../../util/commonProtocol/newNamespaceValidator';
 import { findOneRole } from '../../util/roles';
 import { TrackOptions } from '../server_analytics_methods/track';
 import { ServerCommunitiesController } from '../server_communities_controller';
@@ -60,7 +59,16 @@ export async function __updateCommunity(
     throw new AppError(Errors.CantChangeNetwork);
   }
 
-  const community = await this.models.Community.findOne({ where: { id: id } });
+  const community = await this.models.Community.findOne({
+    where: { id },
+    include: [
+      {
+        model: this.models.ChainNode,
+        attributes: ['url', 'eth_chain_id'],
+      },
+    ],
+    attributes: ['chain_node_id'],
+  });
   let addresses;
   if (!community) {
     throw new AppError(Errors.NoCommunityFound);
@@ -237,12 +245,11 @@ export async function __updateCommunity(
     }
 
     await validateNamespace(
-      this.models,
       this.tokenBalanceCache,
       namespace,
       transactionHash,
       ownerOfChain.address,
-      community.id,
+      community,
     );
 
     community.namespace = namespace;

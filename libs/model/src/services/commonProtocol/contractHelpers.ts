@@ -1,9 +1,9 @@
-import { AppError } from '@hicommonwealth/adapters';
 import { factoryContracts, ValidChains } from '@hicommonwealth/chains';
-import { BalanceSourceType } from '@hicommonwealth/core';
-import { DB, TokenBalanceCache } from '@hicommonwealth/model';
+import { AppError, BalanceSourceType } from '@hicommonwealth/core';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
+import { DB } from '../../models';
+import { TokenBalanceCache } from '../tokenBalanceCache';
 
 export const getNamespace = async (
   web3: Web3,
