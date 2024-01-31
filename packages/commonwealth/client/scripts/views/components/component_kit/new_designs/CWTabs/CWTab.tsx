@@ -38,7 +38,7 @@ const CWTab = ({
       onClick={onClick}
       type="button"
     >
-      {iconLeft && <CWIcon iconName={iconLeft} iconSize="small" />}
+      {iconLeft && <CWIcon iconName={iconLeft} />}
       <CWText type={boxed ? 'b2' : 'b1'} className="label">
         {label}
       </CWText>
