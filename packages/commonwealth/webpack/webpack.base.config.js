@@ -76,6 +76,11 @@ module.exports = {
       ),
     }),
     new webpack.DefinePlugin({
+      'process.env.FLAG_NEW_SIGN_IN_MODAL': JSON.stringify(
+        process.env.FLAG_NEW_SIGN_IN_MODAL,
+      ),
+    }),
+    new webpack.DefinePlugin({
       'process.env.FLAG_COMMUNITY_STAKE': JSON.stringify(
         process.env.FLAG_COMMUNITY_STAKE,
       ),
