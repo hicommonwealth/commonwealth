@@ -24,55 +24,25 @@ export const createDeltaFromText = (
   } as SerializableDeltaStatic;
 };
 
+const hyphenSeparatorRegex = /^\s*\|\s*[-:]+\s*(?:\|\s*[-:]+\s*)*\|?\s*$/;
+
 export const isMarkdownTable = (markdown: string) => {
-  // Split the markdown content into lines
   const lines = markdown.trim().split('\n');
 
-  // Check if each line contains at least one pipe character '|'
-  const containsPipe = lines.every((line) => line.includes('|'));
-
-  // Check if the first non-empty line has a pipe character '|'
-  const startsWithPipe = lines
-    .find((line) => line.trim().length > 0)
-    ?.includes('|');
-
-  // Check if the second non-empty line starts and ends with a pipe character '|'
-  const secondLine = lines.find(
-    (line) => line.trim().length > 0 && line.trim().startsWith('|'),
+  // Check if the markdown contains both pipe and hyphen separators
+  const containsPipeSeparator = lines.every((line) => line.includes('|'));
+  const containsHyphenSeparator = lines.some((line) =>
+    hyphenSeparatorRegex.test(line),
   );
-  const secondLineStartsWithPipe = secondLine?.startsWith('|');
-  const secondLineEndsWithPipe = secondLine?.endsWith('|');
 
-  // If all the above conditions are true, it's likely a markdown table
-  return (
-    containsPipe &&
-    startsWithPipe &&
-    secondLineStartsWithPipe &&
-    secondLineEndsWithPipe
-  );
+  return containsPipeSeparator || containsHyphenSeparator;
 };
 
-export const markdownToHtmlTable = (markdown) => {
+export const markdownToHtmlTable = (markdown: string) => {
   const lines = markdown.trim().split('\n');
+  const isTable = isMarkdownTable(markdown);
 
-  const containsPipe = lines.every((line) => line.includes('|'));
-
-  const startsWithPipe = lines
-    .find((line) => line.trim().length > 0)
-    ?.includes('|');
-
-  const secondLine = lines.find(
-    (line) => line.trim().length > 0 && line.trim().startsWith('|'),
-  );
-  const secondLineStartsWithPipe = secondLine?.startsWith('|');
-  const secondLineEndsWithPipe = secondLine?.endsWith('|');
-
-  if (
-    containsPipe &&
-    startsWithPipe &&
-    secondLineStartsWithPipe &&
-    secondLineEndsWithPipe
-  ) {
+  if (isTable) {
     let html = '<table>';
     let isHeaderRow = true;
 
@@ -81,44 +51,42 @@ export const markdownToHtmlTable = (markdown) => {
       const tag = isHeaderRow ? 'th' : 'td';
       const rowTag = isHeaderRow ? 'thead' : 'tbody';
 
-      // Check if the row is solely made up of alignment markers
-      const isAlignmentRow = cells.every((cell) => /^:\-+:$/.test(cell));
+      // Check if the row is a header or if it's a separator row
+      const isHeader = isHeaderRow && line.trim().startsWith('|');
+      const isSeparator = hyphenSeparatorRegex.test(line);
 
-      if (!isAlignmentRow) {
+      if (!isSeparator) {
         html += `<${rowTag}><tr>`;
         cells.forEach((cell) => {
-          let alignment = '';
-          if (cell.startsWith(':') && cell.endsWith(':')) {
-            alignment = 'text-align:center;';
-          } else if (cell.startsWith(':')) {
-            alignment = 'text-align:left;';
-          } else if (cell.endsWith(':')) {
-            alignment = 'text-align:right;';
-          }
-
-          const bold = cell.startsWith('**') && cell.endsWith('**');
-          const content = bold
-            ? `<strong>${cell.substring(2, cell.length - 2)}</strong>`
-            : cell;
-
-          // Check if the cell content is the alignment format ":---:"
-          const isAlignmentFormat = /^:\-+:$/.test(cell);
-
-          if (!isAlignmentFormat) {
-            html += `<${tag} style="${alignment}">${content}</${tag}>`;
+          if (cell !== '') {
+            let content = cell.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            content = content.replace(/_(.*?)_/g, '<em>$1</em>');
+            content = content.replace(/~~(.*?)~~/g, '<del>$1</del>');
+            html += `<${tag}>${content}</${tag}>`;
           }
         });
-
-        html += '</tr></${rowTag}>';
-        if (isHeaderRow) isHeaderRow = false; // Update flag after processing header row
+        html += '</tr></tbody>';
+        isHeaderRow = false;
+      } else if (isHeader) {
+        html += '<thead><tr>';
+        cells.forEach((cell) => {
+          if (cell !== '') {
+            let content = cell.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            content = content.replace(/_(.*?)_/g, '<em>$1</em>');
+            content = content.replace(/~~(.*?)~~/g, '<del>$1</del>');
+            html += `<${tag}>${content}</${tag}>`;
+          }
+        });
+        html += '</tr></thead>';
       }
     });
 
     html += '</table>';
     return html;
   } else {
-    // Implement other conversion methods for different types of Markdown content
-    return markdown; // For simplicity, returning original markdown if it's not a table
+    //This may never be used but being regex can be imperfect
+    //Added this as a redundant check
+    return markdown;
   }
 };
 

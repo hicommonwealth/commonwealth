@@ -84,6 +84,8 @@ export const renderQuillDelta = (
   const convertedDelta = getTextFromDelta(delta);
   const isAscii = containsASCIIPatterns(convertedDelta);
 
+  console.log('is', isAscii);
+
   // convert quill delta into a tree of {block -> parent -> child} nodes
   // blocks are <ul> <ol>, parents are all other block nodes, children are inline nodes
 
