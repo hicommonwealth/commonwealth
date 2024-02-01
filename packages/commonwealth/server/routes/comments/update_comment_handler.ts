@@ -18,7 +18,7 @@ export const updateCommentHandler = async (
   req: TypedRequest<UpdateCommentRequestBody, {}, UpdateCommentRequestParams>,
   res: TypedResponse<UpdateCommentResponse>,
 ) => {
-  const { user, community, address } = req;
+  const { user, address } = req;
   const { id: commentId } = req.params;
   const { body: commentBody, discord_meta: discordMeta } = req.body;
 
@@ -26,7 +26,6 @@ export const updateCommentHandler = async (
     await controllers.comments.updateComment({
       user,
       address,
-      community,
       commentId,
       commentBody,
       discordMeta,

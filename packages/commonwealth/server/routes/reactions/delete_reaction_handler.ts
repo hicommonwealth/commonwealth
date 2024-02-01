@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import { ServerControllers } from 'server/routing/router';
 import { TypedRequestParams, TypedResponse, success } from '../../types';
 

@@ -1,8 +1,8 @@
+import { TypescriptLoggingLogger } from '@hicommonwealth/adapters';
 import { logger } from '@hicommonwealth/core';
-import { rollbar } from '../../util/rollbar';
 import { processChainNode, scheduleNodeProcessing } from './nodeProcessing';
 
-const log = logger().getLogger(__filename);
+const log = logger(TypescriptLoggingLogger()).getLogger(__filename);
 
 /**
  * Starts an infinite loop that periodically fetches and parses blocks from
@@ -36,9 +36,7 @@ export async function startEvmPolling(
 
 if (require.main === module) {
   startEvmPolling(120_000).catch((e) => {
-    console.error(e);
     log.error('Evm poller shutting down due to a critical error:', e);
-    rollbar.critical('Evm poller shutting down due to a critical error:', e);
     process.exit(1);
   });
 }

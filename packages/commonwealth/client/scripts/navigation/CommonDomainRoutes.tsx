@@ -94,7 +94,7 @@ const ViewSnapshotsProposalPage = lazy(
   () => import('views/pages/view_snapshot_proposal'),
 );
 const NewSnapshotProposalPage = lazy(
-  () => import('views/pages/new_snapshot_proposal'),
+  () => import('views/pages/new_snapshot_proposal/NewSnapshotProposalPage'),
 );
 const AdminPanelPage = lazy(() => import('views/pages/AdminPanel'));
 

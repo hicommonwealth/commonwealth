@@ -77,7 +77,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const { fetchNextPage, data, isInitialLoading, hasNextPage } =
     useFetchThreadsQuery({
-      chainId: app.activeChainId(),
+      communityId: app.activeChainId(),
       queryType: 'bulk',
       page: 1,
       limit: 20,

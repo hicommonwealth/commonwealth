@@ -1,9 +1,8 @@
 import {
-  AppError,
-  cacheDecorator,
+  CacheDecorator,
   lookupKeyDurationInReq,
 } from '@hicommonwealth/adapters';
-import { logger } from '@hicommonwealth/core';
+import { AppError, logger } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
 import axios from 'axios';
 import bodyParser from 'body-parser';
@@ -17,7 +16,11 @@ import {
 const log = logger().getLogger(__filename);
 const defaultCacheDuration = 60 * 10; // 10 minutes
 
-function setupCosmosProxy(app: Express, models: DB) {
+function setupCosmosProxy(
+  app: Express,
+  models: DB,
+  cacheDecorator: CacheDecorator,
+) {
   // using bodyParser here because cosmjs generates text/plain type headers
   app.post(
     '/cosmosAPI/:chain',

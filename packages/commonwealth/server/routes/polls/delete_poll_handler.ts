@@ -9,14 +9,13 @@ export type DeletePollResponse = null;
 export const deletePollHandler = async (
   controllers: ServerControllers,
   req: TypedRequest<null, null, DeletePollParams>,
-  res: TypedResponse<DeletePollResponse>
+  res: TypedResponse<DeletePollResponse>,
 ) => {
   const { id: pollId } = req.params;
 
   await controllers.polls.deletePoll({
     user: req.user,
     address: req.address,
-    community: req.chain,
     pollId: parseInt(pollId, 10),
   });
 

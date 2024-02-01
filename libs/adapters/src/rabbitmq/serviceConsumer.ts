@@ -1,6 +1,5 @@
 import { ILogger, logger } from '@hicommonwealth/core';
 import crypto from 'crypto';
-import Rollbar from 'rollbar';
 import type {
   AbstractRabbitMQController,
   RascalSubscriptions,
@@ -26,14 +25,12 @@ export class ServiceConsumer {
   public readonly rabbitMQController: AbstractRabbitMQController;
   public readonly subscriptions: RabbitMQSubscription[];
   private _initialized = false;
-  protected rollbar: Rollbar;
   private log: ILogger;
 
   constructor(
     _serviceName: string,
     _rabbitmqController: AbstractRabbitMQController,
     _subscriptions: RabbitMQSubscription[],
-    rollbar?: Rollbar,
   ) {
     this.serviceName = _serviceName;
     // TODO: make this deterministic somehow
@@ -44,7 +41,6 @@ export class ServiceConsumer {
     this.log = logger().getLogger(__filename, this.serviceName, this.serviceId);
 
     this.rabbitMQController = _rabbitmqController;
-    this.rollbar = rollbar;
   }
 
   public async init(): Promise<void> {
@@ -57,7 +53,6 @@ export class ServiceConsumer {
         await this.rabbitMQController.init();
       } catch (e) {
         this.log.error('Failed to initialize the RabbitMQ Controller', e);
-        this.rollbar?.error('Failed to initialize the RabbitMQ Controller', e);
       }
     }
 
@@ -72,13 +67,6 @@ export class ServiceConsumer {
         console.log('subscribed to', sub.subscriptionName);
       } catch (e) {
         this.log.error(
-          `Failed to start the '${sub.subscriptionName}' subscription with the '${sub.messageProcessor}' ` +
-            `processor function using context: ${JSON.stringify(
-              sub.msgProcessorContext,
-            )}`,
-          e,
-        );
-        this.rollbar?.critical(
           `Failed to start the '${sub.subscriptionName}' subscription with the '${sub.messageProcessor}' ` +
             `processor function using context: ${JSON.stringify(
               sub.msgProcessorContext,
