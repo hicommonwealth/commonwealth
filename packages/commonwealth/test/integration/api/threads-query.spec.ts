@@ -1,15 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { models } from '@hicommonwealth/model';
+import { models, tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import { resetDatabase } from '../../../server-test';
 
 chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('Thread queries', () => {
   before(async () => {
-    await resetDatabase();
+    await tester.seedDb();
   });
   it('query_thread_through_collabo', async () => {
     const chain = await models.Community.findOne();

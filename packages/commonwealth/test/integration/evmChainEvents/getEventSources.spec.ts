@@ -1,6 +1,7 @@
-import { resetDatabase } from '../../util/resetDatabase';
-import { getEventSources } from '../../../server/workers/evmChainEvents/getEventSources';
+import { tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
+import { getEventSources } from '../../../server/workers/evmChainEvents/getEventSources';
+import { localRpc } from '../../devnet/evm/evmChainEvents/util';
 import {
   getTestAbi,
   getTestCommunityContract,
@@ -8,11 +9,10 @@ import {
   getTestSignatures,
   getTestSubscription,
 } from './util';
-import { localRpc } from '../../devnet/evm/evmChainEvents/util';
 
 describe('getEventSources', () => {
   before(async () => {
-    await resetDatabase();
+    await tester.seedDb();
   });
 
   it('should not return sources that are not subscribed to', async () => {
@@ -52,11 +52,11 @@ describe('getEventSources', () => {
     expect(result).to.exist.and.to.haveOwnProperty(chainNodeId);
     expect(result[chainNodeId].rpc).to.equal(localRpc);
     expect(result[chainNodeId].contracts).to.exist.and.to.haveOwnProperty(
-      contractAddress
+      contractAddress,
     );
     expect(result[chainNodeId].contracts[contractAddress].abi).to.exist;
     expect(
-      result[chainNodeId].contracts[contractAddress].sources
+      result[chainNodeId].contracts[contractAddress].sources,
     ).exist.and.to.have.lengthOf(2);
 
     const propCreatedSource = result[chainNodeId].contracts[
@@ -64,7 +64,7 @@ describe('getEventSources', () => {
     ].sources.find((s) => s.event_signature === signatures[0].event_signature);
     expect(propCreatedSource).to.exist.and.to.haveOwnProperty(
       'kind',
-      signatures[0].kind
+      signatures[0].kind,
     );
 
     const propQueuedSource = result[chainNodeId].contracts[
@@ -72,7 +72,7 @@ describe('getEventSources', () => {
     ].sources.find((s) => s.event_signature === signatures[1].event_signature);
     expect(propQueuedSource).to.exist.and.to.haveOwnProperty(
       'kind',
-      signatures[1].kind
+      signatures[1].kind,
     );
   });
 });
