@@ -1,6 +1,6 @@
 import { DB } from '@hicommonwealth/model';
 
-import { TokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
+import { TokenBalanceCache } from '@hicommonwealth/model';
 
 import {
   DeletePollOptions,

@@ -14,7 +14,7 @@
       "@hicommonwealth/*": ["libs/*/src"]
     }
   },
-  "include": [],
+  "include": ["**/src"],
   "exclude": ["node_modules", "**/build"],
   "ts-node": {
     "require": ["tsconfig-paths/register"]

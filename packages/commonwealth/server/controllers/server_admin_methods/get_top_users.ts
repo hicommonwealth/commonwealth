@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import { UserInstance } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { ServerAdminController } from '../server_admin_controller';
@@ -24,6 +24,7 @@ export async function __getTopUsers(
   const sql = `
   WITH Stats as (
     SELECT
+      p.id as profile_id,
       p.profile_name AS profile_name,
       p.user_id as user_id,
       COUNT(DISTINCT t.id) AS thread_count,
@@ -46,7 +47,7 @@ export async function __getTopUsers(
   )
   SELECT
     profile_name as "Profile Name",
-    user_id as "User ID",
+    profile_id as "Profile ID",
     CAST(thread_count as INTEGER) as "Threads Count",
     CAST(comment_count as INTEGER) as "Comments Count",
     CAST(total_activity as INTEGER) as "Total Activity",

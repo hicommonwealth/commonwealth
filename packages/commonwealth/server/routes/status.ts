@@ -1,5 +1,4 @@
-import { ServerError } from '@hicommonwealth/adapters';
-import { CommunityCategoryType } from '@hicommonwealth/core';
+import { CommunityCategoryType, ServerError } from '@hicommonwealth/core';
 import type {
   AddressInstance,
   CommunityInstance,

@@ -16,10 +16,6 @@ export const JWT_SECRET = process.env.JWT_SECRET || 'jwt secret';
 
 export const ADDRESS_TOKEN_EXPIRES_IN = 10;
 
-export const ROLLBAR_SERVER_TOKEN = process.env.ROLLBAR_SERVER_TOKEN;
-
-export const ROLLBAR_ENV = process.env.ROLLBAR_ENV || 'local';
-
 export const SLACK_FEEDBACK_WEBHOOK = process.env.SLACK_FEEDBACK_WEBHOOK;
 
 export const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
@@ -129,3 +125,7 @@ export const PRERENDER_TOKEN = process.env.PRERENDER_TOKEN;
 export const REACTION_WEIGHT_OVERRIDE = process.env.REACTION_WEIGHT_OVERRIDE
   ? parseInt(process.env.REACTION_WEIGHT_OVERRIDE, 10)
   : null;
+
+export const GENERATE_IMAGE_RATE_LIMIT = process.env.GENERATE_IMAGE_RATE_LIMIT
+  ? parseInt(process.env.GENERATE_IMAGE_RATE_LIMIT, 10)
+  : 10;

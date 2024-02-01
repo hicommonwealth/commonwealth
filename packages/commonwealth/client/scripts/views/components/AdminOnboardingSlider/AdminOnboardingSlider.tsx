@@ -48,7 +48,7 @@ export const AdminOnboardingSlider = () => {
     });
   const { data: threads = [], isLoading: isLoadingThreads = false } =
     useFetchThreadsQuery({
-      chainId: app.activeChainId(),
+      communityId: app.activeChainId(),
       queryType: 'bulk',
       page: 1,
       limit: 20,
@@ -106,7 +106,7 @@ export const AdminOnboardingSlider = () => {
         <div className="cards">
           <AdminOnboardingCard
             cardType="create-topic"
-            isActionCompleted={topics.length > 0}
+            isActionCompleted={topics.length > 1} // we have a default 'General' topic which is not counted here
             onCTAClick={() => redirectToPage('create-topic')}
           />
           <AdminOnboardingCard

@@ -211,4 +211,10 @@
       font-family: $font-family-monospace;
     }
   }
+
+  .footnotes {
+    [id^='footnote-'] {
+      scroll-margin-top: 45px;
+    }
+  }
 }

@@ -43,6 +43,7 @@ const BasicInformationForm = ({
   selectedCommunity,
   onSubmit,
   onCancel,
+  handleSelectedChainId,
 }: BasicInformationFormProps) => {
   const [communityName, setCommunityName] = useState('');
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
@@ -184,12 +185,17 @@ const BasicInformationForm = ({
     });
   };
 
+  const handleWatchForm = (values: any) => {
+    handleSelectedChainId(values?.chain?.value);
+  };
+
   return (
     <CWForm
       validationSchema={basicInformationFormValidationSchema}
       onSubmit={handleSubmit}
       className="BasicInformationForm"
       initialValues={getInitialValue()}
+      onWatch={handleWatchForm}
     >
       {/* Form fields */}
       <CWTextInput

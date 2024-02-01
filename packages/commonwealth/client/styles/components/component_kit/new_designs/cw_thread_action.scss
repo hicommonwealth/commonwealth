@@ -5,13 +5,13 @@
   display: inline-flex;
   padding: 4px 8px;
   align-items: center;
-  gap: 4px;
   width: fit-content;
   color: $neutral-500;
   border: 0;
 
   .Text {
     color: $neutral-500;
+    margin-left: 4px;
   }
 
   &:focus {

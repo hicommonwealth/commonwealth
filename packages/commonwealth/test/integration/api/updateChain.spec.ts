@@ -1,13 +1,13 @@
 import { ChainBase, ChainType } from '@hicommonwealth/core';
 import {
   CommunityAttributes,
+  TokenBalanceCache,
   UserInstance,
   models,
 } from '@hicommonwealth/model';
 import { assert } from 'chai';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 import { Errors } from '../../../server/controllers/server_communities_methods/update_community';
-import { TokenBalanceCache } from '../../../server/util/tokenBalanceCache/tokenBalanceCache';
 import { buildUser } from '../../unit/unitHelpers';
 import { resetDatabase } from '../../util/resetDatabase';
 
@@ -96,7 +96,9 @@ describe('UpdateChain Tests', () => {
     }
   });
 
-  it('Correctly updates namespace', async () => {
+  // skipped because public chainNodes are unreliable. If you want to test this functionality, update the goleri
+  // chainNode and do it locally.
+  xit('Correctly updates namespace', async () => {
     const tbc = {
       getBalances: async (_: any) => {
         return { '0x42D6716549A78c05FD8EF1f999D52751Bbf9F46a': '1' };

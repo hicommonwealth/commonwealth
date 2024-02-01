@@ -1,13 +1,17 @@
-import { AppError, ServerError } from '@hicommonwealth/adapters';
-import { NotificationCategories, ProposalType } from '@hicommonwealth/core';
+import {
+  AppError,
+  NotificationCategories,
+  ProposalType,
+  ServerError,
+} from '@hicommonwealth/core';
 import {
   AddressInstance,
   CommentAttributes,
   CommentInstance,
-  CommunityInstance,
   UserInstance,
 } from '@hicommonwealth/model';
 import moment from 'moment';
+import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import { getCommentDepth } from '../../util/getCommentDepth';
@@ -36,7 +40,6 @@ const MAX_COMMENT_DEPTH = 8; // Sets the maximum depth of comments
 export type CreateThreadCommentOptions = {
   user: UserInstance;
   address: AddressInstance;
-  community: CommunityInstance;
   parentId: number;
   threadId: number;
   text: string;
@@ -57,7 +60,6 @@ export async function __createThreadComment(
   {
     user,
     address,
-    community,
     parentId,
     threadId,
     text,
@@ -67,14 +69,8 @@ export async function __createThreadComment(
     discordMeta,
   }: CreateThreadCommentOptions,
 ): Promise<CreateThreadCommentResult> {
-  // check if banned
-  const [canInteract, banError] = await this.banCache.checkBan({
-    communityId: community.id,
-    address: address.address,
-  });
-  if (!canInteract) {
-    throw new AppError(`${Errors.BanError}: ${banError}`);
-  }
+  // sanitize text
+  text = sanitizeQuillText(text);
 
   // check if thread exists
   const thread = await this.models.Thread.findOne({
@@ -82,6 +78,15 @@ export async function __createThreadComment(
   });
   if (!thread) {
     throw new AppError(Errors.ThreadNotFound);
+  }
+
+  // check if banned
+  const [canInteract, banError] = await this.banCache.checkBan({
+    communityId: thread.community_id,
+    address: address.address,
+  });
+  if (!canInteract) {
+    throw new AppError(`${Errors.BanError}: ${banError}`);
   }
 
   // check if thread is archived
@@ -101,7 +106,7 @@ export async function __createThreadComment(
     parentComment = await this.models.Comment.findOne({
       where: {
         id: parentId,
-        community_id: community.id,
+        community_id: thread.community_id,
       },
       include: [this.models.Address],
     });
@@ -123,17 +128,17 @@ export async function __createThreadComment(
   const isAdmin = await validateOwner({
     models: this.models,
     user,
-    communityId: community.id,
+    communityId: thread.community_id,
     entity: thread,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     const { isValid, message } = await validateTopicGroupsMembership(
       this.models,
       this.tokenBalanceCache,
       thread.topic_id,
-      community,
+      thread.community_id,
       address,
     );
     if (!isValid) {
@@ -162,7 +167,7 @@ export async function __createThreadComment(
     plaintext,
     version_history,
     address_id: address.id,
-    community_id: community.id,
+    community_id: thread.community_id,
     parent_id: null,
     canvas_action: canvasAction,
     canvas_session: canvasSession,
@@ -323,7 +328,7 @@ export async function __createThreadComment(
 
   const analyticsOptions = {
     event: MixpanelCommunityInteractionEvent.CREATE_COMMENT,
-    community: community.id,
+    community: thread.community_id,
     userId: user.id,
   };
 
