@@ -2,12 +2,12 @@ import { createBoundedUseStore } from 'state/ui/utils';
 import { devtools } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 
-interface IGrowlStore {
+interface GrowlStore {
   growlHidden: boolean;
   setGrowlHidden: (growlHidden: boolean) => void;
 }
 
-export const growlStore = createStore<IGrowlStore>()(
+const growlStore = createStore<GrowlStore>()(
   devtools(
     (set) => ({
       growlHidden: false,

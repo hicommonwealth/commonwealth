@@ -1,9 +1,7 @@
-@import '../../../../../../styles/shared.scss';
+@import '../../../../../styles/shared.scss';
 
 .VoteWeightModule {
   padding: 16px 24px;
-  width: 232px;
-  border-right: 1px solid $neutral-200;
   border-bottom: 1px solid $neutral-200;
 
   .content {
