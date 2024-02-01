@@ -56,7 +56,7 @@ export type Command<M extends ZodSchema, R> = (
 export type Query<M extends ZodSchema, R> = (
   payload: z.infer<M>,
   actor: Actor,
-) => Promise<R>;
+) => Promise<R | undefined | null>;
 
 /**
  * Command definition

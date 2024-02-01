@@ -15,7 +15,7 @@ export const query = async <M extends ZodSchema, R>(
   md: QueryMetadata<M, R>,
   payload: M,
   actor: Actor,
-): Promise<R> => {
+): Promise<R | undefined | null> => {
   try {
     return md.fn(
       md.schema.parse(payload),

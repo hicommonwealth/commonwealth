@@ -15,17 +15,15 @@ export const GetCommunityStake: QueryMetadata<
   schema,
   middleware: [],
   fn: async (payload) => {
-    return (
-      (await models.CommunityStake.findOne({
-        where: payload,
-        include: [
-          {
-            model: models.Community,
-            required: true,
-            attributes: ['namespace'],
-          },
-        ],
-      })) ?? {}
-    );
+    return await models.CommunityStake.findOne({
+      where: payload,
+      include: [
+        {
+          model: models.Community,
+          required: true,
+          attributes: ['namespace'],
+        },
+      ],
+    });
   },
 };

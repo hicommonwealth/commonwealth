@@ -4,22 +4,17 @@ import {
   DB,
   validateCommunityStakeConfig,
 } from '@hicommonwealth/model';
+import {
+  SetCommunityStakeBodySchema,
+  SetCommunityStakeParams,
+  SetCommunityStakeParamsSchema,
+} from 'server/controllers/server_communities_methods/put_community_stake';
 import { z } from 'zod';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 import { formatErrorPretty } from '../../util/errorFormat';
 import { validateOwner } from '../../util/validateOwner';
 
-const SetCommunityStakeParamsSchema = z.object({
-  community_id: z.string(),
-  stake_id: z.coerce.number().int(),
-});
-type SetCommunityStakeParams = z.infer<typeof SetCommunityStakeParamsSchema>;
-const SetCommunityStakeBodySchema = z.object({
-  stake_token: z.string().default(''),
-  vote_weight: z.coerce.number().default(1),
-  stake_enabled: z.coerce.boolean().default(true),
-});
 type SetCommunityStakeBody = z.infer<typeof SetCommunityStakeBodySchema>;
 type PutCommunityStakesParams = SetCommunityStakeParams;
 type PutCommunityStakesBody = SetCommunityStakeBody;
