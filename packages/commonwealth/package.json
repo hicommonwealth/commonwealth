@@ -6,7 +6,7 @@
     "add-component-showcase": "npx ts-node -T ./scripts/add-component-showcase.ts",
     "build": "tsc -b && tsc-alias",
     "clean": "rm -rf build",
-    "check-types": "tsc --noEmit",
+    "check-types": "tsc --noEmit -p tsconfig.check-types.json",
     "bundle": "webpack --config webpack/webpack.prod.config.js --progress",
     "build-android": "NODE_ENV=mobile webpack --config webpack/webpack.config.mobile.js --progress && NODE_ENV=mobile npx cap sync android",
     "build-ios": "NODE_ENV=mobile webpack --config webpack/webpack.config.mobile.js --progress && NODE_ENV=mobile npx cap sync ios",

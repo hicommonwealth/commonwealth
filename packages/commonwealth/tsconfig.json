@@ -12,15 +12,7 @@
       "*": ["./*", "shared/*", "client/scripts/*"]
     }
   },
-  "include": [
-    "./client",
-    "./shared",
-    "./test",
-    "./globals.d.ts",
-    "./server",
-    "./server.ts",
-    "./scripts"
-  ],
+  "include": ["shared", "globals.d.ts", "server", "server.ts"],
   "references": [
     { "path": "../../libs/adapters" },
     { "path": "../../libs/chains" },
