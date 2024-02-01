@@ -41,11 +41,11 @@ export const resetDatabase = (debug = false): Promise<void> => {
           eth_chain_id: 1,
           balance_type: BalanceType.Ethereum,
         },
-        goerli: {
+        sepolia: {
           id: 1263,
-          url: 'https://rpc.ankr.com/eth_goerli',
-          name: 'Goerli Testnet',
-          eth_chain_id: 5,
+          url: 'https://ethereum-sepolia.publicnode.com',
+          name: 'Sepolia Testnet',
+          eth_chain_id: 11155111,
           balance_type: BalanceType.Ethereum,
         },
         osmosis: {
