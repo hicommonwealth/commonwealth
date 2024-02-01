@@ -18,7 +18,7 @@ type AuthModalProps = {
   isOpen: boolean;
   onClose: () => any;
   onSuccess?: () => any;
-  showWalletsFor?: ChainBase.CosmosSDK | ChainBase.Ethereum;
+  showWalletsFor?: ChainBase;
 };
 
 const AuthModal = ({
@@ -34,45 +34,40 @@ const AuthModal = ({
     onSuccess,
   });
 
+  const cosmosWallets = (wallets || [])
+    .filter((wallet) => wallet.chain === ChainBase.CosmosSDK)
+    .map((wallet) => wallet.name);
+  const solanaWallets = (wallets || [])
+    .filter((wallet) => wallet.chain === ChainBase.Solana)
+    .map((wallet) => wallet.name);
+  const substrateWallets = (wallets || [])
+    .filter((wallet) => wallet.chain === ChainBase.Substrate)
+    .map((wallet) => wallet.name);
+
   const tabsList = [
     {
       name: 'Wallet',
       options: [
-        // Note: If `showWalletsFor` is present then show wallets for that chain, else
-        // only show ethereum based wallets options on non-community pages or on ethereum based communities
-        ...((!showWalletsFor
-          ? !app?.chain?.base
-          : showWalletsFor === ChainBase.Ethereum) ||
-        app?.chain?.base === ChainBase.Ethereum
+        // Branches:
+        // 1. If `showWalletsFor` is present then show wallets for that chain
+        // 2. else show all wallets if on any non-community page
+        // 3. else when on any community page, show wallets specific to that community
+        ...([app?.chain?.base, showWalletsFor].includes(ChainBase.Ethereum) ||
+        !app?.chain?.base
           ? ['walletconnect']
           : []),
-        // only show cosmos based wallets on non-community pages or on cosmos based communities
-        ...(wallets || [])
-          .filter(
-            (wallet) =>
-              ((!showWalletsFor
-                ? !app?.chain?.base
-                : showWalletsFor === ChainBase.CosmosSDK) ||
-                app?.chain?.base === ChainBase.CosmosSDK) &&
-              wallet.chain === ChainBase.CosmosSDK,
-          )
-          .map((wallet) => wallet.name),
-        // only show solana based wallets on solana based communities
-        ...(wallets || [])
-          .filter(
-            (wallet) =>
-              app?.chain?.base === ChainBase.Solana &&
-              wallet.chain === ChainBase.Solana,
-          )
-          .map((wallet) => wallet.name),
-        // only show substrate based wallets on substrate based communities
-        ...(wallets || [])
-          .filter(
-            (wallet) =>
-              app?.chain?.base === ChainBase.Substrate &&
-              wallet.chain === ChainBase.Substrate,
-          )
-          .map((wallet) => wallet.name),
+        ...([app?.chain?.base, showWalletsFor].includes(ChainBase.CosmosSDK) ||
+        !app?.chain?.base
+          ? cosmosWallets
+          : []),
+        ...([app?.chain?.base, showWalletsFor].includes(ChainBase.Solana) ||
+        !app?.chain?.base
+          ? solanaWallets
+          : []),
+        ...([app?.chain?.base, showWalletsFor].includes(ChainBase.Substrate) ||
+        !app?.chain?.base
+          ? substrateWallets
+          : []),
       ],
     },
     {
