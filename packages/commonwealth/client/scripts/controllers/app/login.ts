@@ -424,7 +424,7 @@ export async function handleSocialLoginCallback({
   let profileMetadata, magicAddress;
   if (isEmail) {
     const metadata = await magic.user.getMetadata();
-    profileMetadata = { username: metadata.email };
+    profileMetadata = { username: null };
 
     if (isCosmos) {
       magicAddress = metadata.publicAddress;
