@@ -3,7 +3,6 @@ import moment from 'moment';
 import { AppError, ServerError } from '@hicommonwealth/core';
 import {
   AddressInstance,
-  CommunityInstance,
   UserInstance,
   VoteAttributes,
 } from '@hicommonwealth/model';
@@ -26,7 +25,6 @@ export const Errors = {
 export type UpdatePollVoteOptions = {
   user: UserInstance;
   address: AddressInstance;
-  community: CommunityInstance;
   pollId: number;
   option: string;
 };
@@ -35,10 +33,10 @@ export type UpdatePollVoteResult = [VoteAttributes, TrackOptions];
 
 export async function __updatePollVote(
   this: ServerPollsController,
-  { user, address, community, pollId, option }: UpdatePollVoteOptions,
+  { user, address, pollId, option }: UpdatePollVoteOptions,
 ): Promise<UpdatePollVoteResult> {
   const poll = await this.models.Poll.findOne({
-    where: { id: pollId, community_id: community.id },
+    where: { id: pollId },
   });
   if (!poll) {
     throw new AppError(Errors.NoPoll);
@@ -74,7 +72,7 @@ export async function __updatePollVote(
       this.models,
       this.tokenBalanceCache,
       thread.topic_id,
-      community,
+      poll.community_id,
       address,
     );
     if (!isValid) {
@@ -89,7 +87,7 @@ export async function __updatePollVote(
       poll_id: poll.id,
       address: address.address,
       author_community_id: address.community_id,
-      community_id: community.id,
+      community_id: poll.community_id,
     };
     // delete existing votes
     await this.models.Vote.destroy({
@@ -108,7 +106,7 @@ export async function __updatePollVote(
 
   const analyticsOptions = {
     event: MixpanelCommunityInteractionEvent.SUBMIT_VOTE,
-    community: community.id,
+    community: poll.community_id,
     userId: user.id,
   };
 

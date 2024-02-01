@@ -125,3 +125,7 @@ export const PRERENDER_TOKEN = process.env.PRERENDER_TOKEN;
 export const REACTION_WEIGHT_OVERRIDE = process.env.REACTION_WEIGHT_OVERRIDE
   ? parseInt(process.env.REACTION_WEIGHT_OVERRIDE, 10)
   : null;
+
+export const GENERATE_IMAGE_RATE_LIMIT = process.env.GENERATE_IMAGE_RATE_LIMIT
+  ? parseInt(process.env.GENERATE_IMAGE_RATE_LIMIT, 10)
+  : 10;

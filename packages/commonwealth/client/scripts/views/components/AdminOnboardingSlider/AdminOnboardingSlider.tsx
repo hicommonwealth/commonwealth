@@ -48,7 +48,7 @@ export const AdminOnboardingSlider = () => {
     });
   const { data: threads = [], isLoading: isLoadingThreads = false } =
     useFetchThreadsQuery({
-      chainId: app.activeChainId(),
+      communityId: app.activeChainId(),
       queryType: 'bulk',
       page: 1,
       limit: 20,

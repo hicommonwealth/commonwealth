@@ -1,5 +1,5 @@
 import { AppError } from '@hicommonwealth/core';
-import { CommunityInstance, UserInstance } from '@hicommonwealth/model';
+import { UserInstance } from '@hicommonwealth/model';
 import { validateOwner } from '../../util/validateOwner';
 import { ServerTopicsController } from '../server_topics_controller';
 
@@ -13,7 +13,6 @@ export const Errors = {
 
 export type DeleteTopicOptions = {
   user: UserInstance;
-  community: CommunityInstance;
   topicId: number;
 };
 
@@ -21,23 +20,23 @@ export type DeleteTopicResult = void;
 
 export async function __deleteTopic(
   this: ServerTopicsController,
-  { user, community, topicId }: DeleteTopicOptions,
+  { user, topicId }: DeleteTopicOptions,
 ): Promise<DeleteTopicResult> {
+  const topic = await this.models.Topic.findByPk(topicId);
+  if (!topic) {
+    throw new AppError(Errors.TopicNotFound);
+  }
+
   const isAdmin = validateOwner({
     models: this.models,
     user,
-    communityId: community.id,
+    communityId: topic.community_id,
     allowMod: true,
     allowAdmin: true,
     allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError(Errors.NotAdmin);
-  }
-
-  const topic = await this.models.Topic.findOne({ where: { id: topicId } });
-  if (!topic) {
-    throw new AppError(Errors.TopicNotFound);
   }
 
   // remove topic from threads, then delete topic
@@ -49,7 +48,7 @@ export async function __deleteTopic(
       {
         where: {
           topic_id: topicId,
-          community_id: community.id,
+          community_id: topic.community_id,
         },
         transaction,
       },

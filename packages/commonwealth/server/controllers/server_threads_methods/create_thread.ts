@@ -11,6 +11,7 @@ import {
   ThreadAttributes,
   UserInstance,
 } from '@hicommonwealth/model';
+import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import { parseUserMentions } from '../../util/parseUserMentions';
@@ -73,6 +74,9 @@ export async function __createThread(
     discordMeta,
   }: CreateThreadOptions,
 ): Promise<CreateThreadResult> {
+  // sanitize text
+  body = sanitizeQuillText(body);
+
   if (kind === 'discussion') {
     if (!title || !title.trim()) {
       throw new AppError(Errors.DiscussionMissingTitle);
@@ -150,7 +154,7 @@ export async function __createThread(
       this.models,
       this.tokenBalanceCache,
       topicId,
-      community,
+      community.id,
       address,
     );
     if (!isValid) {

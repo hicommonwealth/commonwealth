@@ -48,7 +48,10 @@ export const createGroupHandler = async (
 
   // refresh memberships in background
   controllers.groups
-    .refreshCommunityMemberships({ community, group })
+    .refreshCommunityMemberships({
+      communityId: community.id,
+      groupId: group.id,
+    })
     .catch(console.error);
 
   controllers.analytics.track(analyticsOptions, req).catch(console.error);
