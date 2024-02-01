@@ -67,7 +67,6 @@ const StakeExchangeForm = ({
 }: StakeExchangeFormProps) => {
   const chainRpc = app?.chain?.meta?.ChainNode?.url;
   const activeAccountAddress = app?.user?.activeAccount?.address;
-  app.user.activeAccounts;
 
   const {
     buyPriceData,
@@ -174,6 +173,7 @@ const StakeExchangeForm = ({
   const feesPriceEth = isBuyMode
     ? buyPriceData?.fees
     : String(Math.abs(parseFloat(sellPriceData?.fees)));
+
   const feesPriceUsd = isBuyMode
     ? convertEthToUsd(buyPriceData?.fees, ethUsdRate)
     : convertEthToUsd(Math.abs(parseFloat(sellPriceData?.fees)), ethUsdRate);
