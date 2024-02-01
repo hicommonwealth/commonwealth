@@ -190,7 +190,7 @@ export const seedDb = async (debug = false): Promise<void> => {
     });
     await models.CommunityContract.create({
       community_id: alex.id!,
-      contract_id: alexContract.id,
+      contract_id: alexContract.id!,
     });
     const yearn = await models.Community.create({
       id: 'yearn',
@@ -217,7 +217,7 @@ export const seedDb = async (debug = false): Promise<void> => {
     });
     await models.CommunityContract.create({
       community_id: yearn.id!,
-      contract_id: yearnContract.id,
+      contract_id: yearnContract.id!,
     });
     const sushi = await models.Community.create({
       id: 'sushi',
@@ -245,7 +245,7 @@ export const seedDb = async (debug = false): Promise<void> => {
     });
     await models.CommunityContract.create({
       community_id: sushi.id!,
-      contract_id: sushiContract.id,
+      contract_id: sushiContract.id!,
     });
     await models.Community.create({
       id: 'common-protocol',
