@@ -316,6 +316,10 @@ export async function initAppState(
         ChainInfo.fromJSON(statusRes.result.user.selectedChain),
       );
     }
+
+    window.FS.identify({
+      uid: statusRes.result.user.addresses[0].user_id,
+    });
   } catch (err) {
     app.loadingError =
       err.response?.data?.error || 'Error loading application state';
