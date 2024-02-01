@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
 import AuthButton from '../../components/AuthButton';
-import { AuthTypes } from '../../components/AuthButton/types';
+import { AuthTypes, AuthWallets } from '../../components/AuthButton/types';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
@@ -13,13 +13,7 @@ import {
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
 import './AuthModal.scss';
-
-type AuthModalProps = {
-  isOpen: boolean;
-  onClose: () => any;
-  onSuccess?: () => any;
-  showWalletsFor?: ChainBase;
-};
+import { AuthModalProps, AuthModalTabs } from './types';
 
 const AuthModal = ({
   isOpen,
@@ -44,7 +38,7 @@ const AuthModal = ({
     .filter((wallet) => wallet.chain === ChainBase.Substrate)
     .map((wallet) => wallet.name);
 
-  const tabsList = [
+  const tabsList: AuthModalTabs[] = [
     {
       name: 'Wallet',
       options: [
@@ -68,13 +62,13 @@ const AuthModal = ({
         !app?.chain?.base
           ? substrateWallets
           : []),
-      ],
+      ] as AuthWallets[],
     },
     {
       name: 'Email or Social',
       options: ['google', 'discord', 'x', 'github', 'email'],
     },
-  ] as const;
+  ];
 
   const onAuthMethodSelect = async (option: AuthTypes) => {
     if (option === 'email') {
