@@ -4,13 +4,17 @@ import {
 } from '../component_kit/cw_icons/cw_icon_lookup';
 
 export type AuthSSOs = 'google' | 'discord' | 'x' | 'github';
+export type CosmosWallets = 'keplr' | 'leap';
+export type SubstrateWallets = 'polkadot';
+export type SolanaWallets = 'phantom';
+export type EVMWallets = 'walletconnect' | 'metamask' | 'coinbase';
 export type AuthWallets =
-  | 'keplr'
-  | 'leap'
-  | 'phantom'
-  | 'polkadot'
+  | CosmosWallets
+  | SolanaWallets
+  | SubstrateWallets
+  | EVMWallets
   | 'NO_WALLETS_FOUND';
-export type AuthTypes = 'walletConnect' | AuthWallets | AuthSSOs | 'email';
+export type AuthTypes = AuthWallets | AuthSSOs | 'email';
 
 export type AuthButtonConfig = {
   label: string;

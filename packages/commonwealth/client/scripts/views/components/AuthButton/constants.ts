@@ -3,7 +3,7 @@ import { AuthTypesList } from './types';
 // A list of all the available auth types, with config for rendering the button
 export const AUTH_TYPES: AuthTypesList = {
   // general
-  walletConnect: {
+  walletconnect: {
     icon: {
       name: 'walletconnect',
       isCustom: true,
@@ -66,6 +66,20 @@ export const AUTH_TYPES: AuthTypesList = {
       text: 'Substrate Communities',
       hasBackground: false,
     },
+  },
+  metamask: {
+    icon: {
+      name: 'metamask',
+      isCustom: true,
+    },
+    label: 'Metamask',
+  },
+  coinbase: {
+    icon: {
+      name: 'coinbase',
+      isCustom: true,
+    },
+    label: 'Coinbase',
   },
   // SSO's
   google: {

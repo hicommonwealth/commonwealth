@@ -44,7 +44,7 @@ const AuthModal = ({
           ? !app?.chain?.base
           : showWalletsFor === ChainBase.Ethereum) ||
         app?.chain?.base === ChainBase.Ethereum
-          ? ['walletConnect']
+          ? ['walletconnect']
           : []),
         // only show cosmos based wallets on non-community pages or on cosmos based communities
         ...(wallets || [])
