@@ -113,7 +113,7 @@ const AuthModal = ({
         <section className="AuthModal">
           <CWIcon iconName="close" onClick={onClose} className="close-btn" />
 
-          <img src="/static/img/common-logo.svg" className="logo" />
+          <img src="/static/img/branding/common-logo.svg" className="logo" />
 
           <CWText type="h2" className="header" isCentered>
             Sign into Common
@@ -145,12 +145,13 @@ const AuthModal = ({
             )}
           </section>
 
-          <p className="disclaimer">
+          <CWText className="disclaimer">
             By connecting to Common you agree to our&nbsp;
             <br />
-            <Link to="/terms">Terms of Service</Link>&nbsp; and&nbsp;
+            <Link to="/terms">Terms of Service</Link>
+            &nbsp;and&nbsp;
             <Link to="/privacy">Privacy Policy</Link>
-          </p>
+          </CWText>
         </section>
       }
     />

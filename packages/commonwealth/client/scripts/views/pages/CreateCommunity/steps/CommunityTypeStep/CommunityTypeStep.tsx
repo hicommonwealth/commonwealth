@@ -150,9 +150,7 @@ const CommunityTypeStep = ({
               initialSidebar="createCommunityLogin"
               initialWallets={availableWallets}
               onModalClose={() => setIsAuthModalOpen(false)}
-              onSuccess={() => {
-                setIsNewCommunityAdminModalOpen(true);
-              }}
+              onSuccess={() => setIsNewCommunityAdminModalOpen(true)}
             />
           }
           isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
