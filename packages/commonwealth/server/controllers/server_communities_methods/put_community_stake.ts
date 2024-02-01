@@ -1,3 +1,4 @@
+import { AppError } from '@hicommonwealth/core';
 import {
   Community,
   CommunityStakeAttributes,
@@ -13,13 +14,21 @@ export type PutCommunityStakeOptions = {
 
 export type PutCommunityStakeResult = CommunityStakeAttributes;
 
-export async function __putCommunityStake(
+export async function __createCommunityStake(
   this: ServerCommunitiesController,
   { communityStake }: PutCommunityStakeOptions,
 ): Promise<CommunityStakeAttributes> {
-  const [newCommunityStake] = await this.models.CommunityStake.upsert(
-    communityStake,
-  );
+  const { community_id, stake_id } = communityStake;
+
+  const [newCommunityStake, created] =
+    await this.models.CommunityStake.findOrCreate({
+      where: { community_id, stake_id },
+      defaults: { ...communityStake },
+    });
+
+  if (!created) {
+    throw new AppError('Community stake already exists');
+  }
 
   return newCommunityStake;
 }

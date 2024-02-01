@@ -14,7 +14,7 @@ type PutCommunityStakesParams = Community.SetCommunityStakeParams;
 type PutCommunityStakesBody = Community.SetCommunityStakeBody;
 type PutCommunityStakesResponse = CommunityStakeAttributes;
 
-export const putCommunityStakeHandler = async (
+export const createCommunityStakeHandler = async (
   models: DB,
   controllers: ServerControllers,
   req: TypedRequest<PutCommunityStakesBody, any, PutCommunityStakesParams>,
@@ -68,7 +68,7 @@ export const putCommunityStakeHandler = async (
     throw new AppError(formatErrorPretty(bodyValidationResult));
   }
 
-  const results = await controllers.communities.putCommunityStake({
+  const results = await controllers.communities.createCommunityStake({
     user,
     communityStake: {
       ...paramsValidationResult.data,

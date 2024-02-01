@@ -38,7 +38,7 @@ import {
 import {
   PutCommunityStakeOptions,
   PutCommunityStakeResult,
-  __putCommunityStake,
+  __createCommunityStake,
 } from './server_communities_methods/put_community_stake';
 import {
   SearchCommunitiesOptions,
@@ -109,10 +109,10 @@ export class ServerCommunitiesController {
     return __getRelatedCommunities.call(this, options);
   }
 
-  async putCommunityStake(
+  async createCommunityStake(
     options: PutCommunityStakeOptions,
   ): Promise<PutCommunityStakeResult> {
-    return __putCommunityStake.call(this, options);
+    return __createCommunityStake.call(this, options);
   }
 
   async getCommunityStake(
