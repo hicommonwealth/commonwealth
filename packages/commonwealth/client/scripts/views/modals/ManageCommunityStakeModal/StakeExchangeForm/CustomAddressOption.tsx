@@ -31,13 +31,13 @@ const CustomAddressOptionElement = ({
 
 interface CustomAddressOptionProps {
   originalProps: OptionProps<{ value: string; label: string }>;
-  selectedAddress: { value: string; label: string };
+  selectedAddressValue: string;
 }
 
 // eslint-disable-next-line react/no-multi-comp
 const CustomAddressOption = ({
   originalProps,
-  selectedAddress,
+  selectedAddressValue,
 }: CustomAddressOptionProps) => {
   const { data, label } = originalProps;
 
@@ -46,7 +46,7 @@ const CustomAddressOption = ({
       <CustomAddressOptionElement
         value={data.value}
         label={formatAddressShort(label, 6)}
-        selectedAddressValue={selectedAddress.value}
+        selectedAddressValue={selectedAddressValue}
       />
     </components.Option>
   );

@@ -161,9 +161,14 @@ export const HeaderWithFilters = ({
     }
   };
 
+  // TODO will be done in https://github.com/hicommonwealth/commonwealth/issues/6416
+  const stakeBannerEnabled = false;
+
   return (
     <div className="HeaderWithFilters">
-      {stakeEnabled && <CommunityStakeBanner onClose={() => undefined} />}
+      {stakeEnabled && stakeBannerEnabled && (
+        <CommunityStakeBanner onClose={() => undefined} />
+      )}
 
       <div className="header-row">
         <CWText type="h3" fontWeight="semiBold" className="header-text">

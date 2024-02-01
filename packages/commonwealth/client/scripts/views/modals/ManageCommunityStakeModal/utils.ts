@@ -1,3 +1,7 @@
+import { WalletId } from '@hicommonwealth/core';
+import Account from 'models/Account';
+import AddressInfo from 'models/AddressInfo';
+
 export const convertEthToUsd = (
   ethAmount: string | number,
   ethUsdRate: string,
@@ -11,13 +15,6 @@ export const convertEthToUsd = (
   }
 
   return (eth * rate).toFixed(2);
-};
-
-export const getInitialAccountValue = (
-  activeAccountAddress: string,
-  addressOptions: { value: string; label: string }[],
-) => {
-  return addressOptions.find(({ value }) => value === activeAccountAddress);
 };
 
 export const buildEtherscanLink = (txHash: string) => {
@@ -38,4 +35,35 @@ export const capDecimals = (value: string, capNumber = 8) => {
   }
 
   return parseFloat(value).toFixed(capNumber);
+};
+
+export const getInitialAccountValue = (
+  activeAccountAddress: string,
+  addressOptions: { value: string; label: string }[],
+) => {
+  const activeAddressOption = addressOptions.find(
+    ({ value }) => value === activeAccountAddress,
+  );
+
+  return activeAddressOption || addressOptions[0];
+};
+
+export const getAvailableAddressesForStakeExchange = (
+  activeAccounts: Account[],
+  userAddresses: AddressInfo[],
+) => {
+  // only active accounts (from selected community) that are metamask wallets
+  return activeAccounts.reduce((availableAddresses, account) => {
+    const foundAddress = userAddresses.find(
+      (address) =>
+        address.address === account.address &&
+        address.community.id === account.community.id,
+    );
+
+    if (!foundAddress || foundAddress.walletId !== WalletId.Metamask) {
+      return [...availableAddresses];
+    }
+
+    return [...availableAddresses, account];
+  }, []);
 };

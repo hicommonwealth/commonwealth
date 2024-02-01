@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import React, { useState } from 'react';
+import React from 'react';
 import { isMobile } from 'react-device-detect';
 
 import { STAKE_ID } from '@hicommonwealth/chains';
@@ -26,12 +26,12 @@ import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelec
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
+import { useStakeExchange } from '../hooks';
 import {
   ManageCommunityStakeModalMode,
   ManageCommunityStakeModalState,
 } from '../types';
-import useStakeExchange from '../useStakeExchange';
-import { capDecimals, convertEthToUsd, getInitialAccountValue } from '../utils';
+import { capDecimals, convertEthToUsd } from '../utils';
 import {
   CustomAddressOption,
   CustomAddressOptionElement,
@@ -39,27 +39,30 @@ import {
 
 import './StakeExchangeForm.scss';
 
+type OptionDropdown = {
+  value: string;
+  label: string;
+};
+
 interface StakeExchangeFormProps {
   mode: ManageCommunityStakeModalMode;
   onSetModalState: (modalState: ManageCommunityStakeModalState) => void;
   onSetSuccessTransactionHash: (hash: string) => void;
+  selectedAddress: OptionDropdown;
+  onSetSelectedAddress: (address: OptionDropdown) => void;
+  addressOptions: OptionDropdown[];
 }
 
 const StakeExchangeForm = ({
   mode,
   onSetModalState,
   onSetSuccessTransactionHash,
+  selectedAddress,
+  onSetSelectedAddress,
+  addressOptions,
 }: StakeExchangeFormProps) => {
   const chainRpc = app?.chain?.meta?.ChainNode?.url;
   const activeAccountAddress = app?.user?.activeAccount?.address;
-  const addressOptions = app.user.activeAccounts.map(({ address }) => ({
-    label: address,
-    value: address,
-  }));
-
-  const [selectedAddress, setSelectedAddress] = useState(
-    getInitialAccountValue(activeAccountAddress, addressOptions),
-  );
 
   const {
     numberOfStakeToExchange,
@@ -175,9 +178,7 @@ const StakeExchangeForm = ({
     ? convertEthToUsd(buyPriceData?.totalPrice, ethUsdRate)
     : convertEthToUsd(sellPriceData?.totalPrice, ethUsdRate);
 
-  const minusDisabled = isBuyMode
-    ? numberOfStakeToExchange <= 0
-    : numberOfStakeToExchange <= 1;
+  const minusDisabled = numberOfStakeToExchange <= 1;
 
   const plusDisabled = isBuyMode
     ? false
@@ -190,7 +191,10 @@ const StakeExchangeForm = ({
           components={{
             // Option item in the dropdown
             Option: (originalProps) =>
-              CustomAddressOption({ originalProps, selectedAddress }),
+              CustomAddressOption({
+                originalProps,
+                selectedAddressValue: activeAccountAddress,
+              }),
           }}
           value={selectedAddress}
           formatOptionLabel={(option) => (
@@ -198,14 +202,14 @@ const StakeExchangeForm = ({
             <CustomAddressOptionElement
               value={option.value}
               label={option.label}
-              selectedAddressValue={selectedAddress.value}
+              selectedAddressValue={activeAccountAddress}
             />
           )}
           label="Select address"
           isClearable={false}
           isSearchable={false}
           options={addressOptions}
-          onChange={setSelectedAddress}
+          onChange={onSetSelectedAddress}
         />
 
         <div className="current-balance-row">

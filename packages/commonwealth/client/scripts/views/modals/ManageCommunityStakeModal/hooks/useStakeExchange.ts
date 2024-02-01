@@ -6,8 +6,8 @@ import {
   useGetBuyPriceQuery,
   useGetSellPriceQuery,
 } from 'state/api/communityStake';
+import useGetUserEthBalanceQuery from 'state/api/communityStake/getUserEthBalance';
 import { ManageCommunityStakeModalMode } from 'views/modals/ManageCommunityStakeModal/types';
-import useGetUserEthBalanceQuery from '../../../state/api/communityStake/getUserEthBalance';
 
 interface UseStakeExchangeProps {
   mode: ManageCommunityStakeModalMode;
