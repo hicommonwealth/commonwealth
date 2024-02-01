@@ -2,6 +2,7 @@ import { factoryContracts, ValidChains } from '@hicommonwealth/chains';
 import { useMutation } from '@tanstack/react-query';
 import CommunityStakes from 'helpers/ContractHelpers/CommunityStakes';
 import { ContractMethods, queryClient } from 'state/api/config';
+import { setActiveAccountOnTransactionSuccess } from 'views/modals/ManageCommunityStakeModal/utils';
 
 interface SellStakeProps {
   namespace: string;
@@ -45,6 +46,7 @@ const useSellStakeMutation = () => {
           variables.walletAddress,
         ],
       });
+      await setActiveAccountOnTransactionSuccess(variables.walletAddress);
     },
   });
 };

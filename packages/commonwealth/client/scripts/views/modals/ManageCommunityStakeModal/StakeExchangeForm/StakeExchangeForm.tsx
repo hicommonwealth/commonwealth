@@ -67,6 +67,7 @@ const StakeExchangeForm = ({
 }: StakeExchangeFormProps) => {
   const chainRpc = app?.chain?.meta?.ChainNode?.url;
   const activeAccountAddress = app?.user?.activeAccount?.address;
+  app.user.activeAccounts;
 
   const {
     buyPriceData,

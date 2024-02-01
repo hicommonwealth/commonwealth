@@ -1,6 +1,8 @@
 import { WalletId } from '@hicommonwealth/core';
+import { setActiveAccount } from 'controllers/app/login';
 import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
+import app from 'state';
 
 export const convertEthToUsd = (
   ethAmount: string | number,
@@ -66,4 +68,15 @@ export const getAvailableAddressesForStakeExchange = (
 
     return [...availableAddresses, account];
   }, []);
+};
+
+export const setActiveAccountOnTransactionSuccess = async (
+  userAddressUsedInTransaction: string,
+) => {
+  if (app.user.activeAccount.address !== userAddressUsedInTransaction) {
+    const accountToSet = app.user.activeAccounts.find(
+      (account) => account.address === userAddressUsedInTransaction,
+    );
+    return await setActiveAccount(accountToSet);
+  }
 };
