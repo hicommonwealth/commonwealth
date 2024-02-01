@@ -126,6 +126,10 @@ export const REACTION_WEIGHT_OVERRIDE = process.env.REACTION_WEIGHT_OVERRIDE
   ? parseInt(process.env.REACTION_WEIGHT_OVERRIDE, 10)
   : null;
 
+export const GENERATE_IMAGE_RATE_LIMIT = process.env.GENERATE_IMAGE_RATE_LIMIT
+  ? parseInt(process.env.GENERATE_IMAGE_RATE_LIMIT, 10)
+  : 10;
+
 export const UNLEASH_HEROKU_SERVER_URL = process.env.UNLEASH_HEROKU_SERVER_URL;
 export const UNLEASH_BACKEND_API_TOKEN =
   process.env.UNLEASH_BACKEND_API_TOKEN ||

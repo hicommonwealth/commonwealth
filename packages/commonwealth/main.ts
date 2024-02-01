@@ -6,8 +6,8 @@ import {
   getRabbitMQConfig,
   setupErrorHandlers,
 } from '@hicommonwealth/adapters';
-import { logger as _logger } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { logger as _logger, cache } from '@hicommonwealth/core';
+import { TokenBalanceCache, models } from '@hicommonwealth/model';
 import bodyParser from 'body-parser';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
@@ -46,7 +46,6 @@ import setupCosmosProxy from './server/util/cosmosProxy';
 import { databaseCleaner } from './server/util/databaseCleaner';
 import GlobalActivityCache from './server/util/globalActivityCache';
 import setupIpfsProxy from './server/util/ipfsProxy';
-import { TokenBalanceCache } from './server/util/tokenBalanceCache/tokenBalanceCache';
 import ViewCountCache from './server/util/viewCountCache';
 
 // set up express async error handling hack
@@ -60,6 +59,11 @@ export async function main(app: express.Express) {
       v8.getHeapStatistics().heap_size_limit / 1000000000,
     )} GB`,
   );
+
+  const redisCache = new RedisCache();
+  await redisCache.init(REDIS_URL);
+  const cacheDecorator = new CacheDecorator(redisCache);
+  cache(redisCache);
 
   const DEV = process.env.NODE_ENV !== 'production';
 
@@ -213,18 +217,13 @@ export async function main(app: express.Express) {
     );
   }
 
-  const redisCache = new RedisCache();
-  await redisCache.init(REDIS_URL);
-  const cacheDecorator = new CacheDecorator(redisCache);
-
   const tokenBalanceCache = new TokenBalanceCache(
     models,
-    redisCache,
     TBC_BALANCE_TTL_SECONDS,
   );
 
   const banCache = new BanCache(models);
-  const globalActivityCache = new GlobalActivityCache(models, redisCache);
+  const globalActivityCache = new GlobalActivityCache(models);
 
   // initialize async to avoid blocking startup
   if (!NO_GLOBAL_ACTIVITY_CACHE) globalActivityCache.start();
@@ -243,7 +242,6 @@ export async function main(app: express.Express) {
     banCache,
     globalActivityCache,
     dbValidationService,
-    redisCache,
   );
 
   // new API
@@ -272,5 +270,5 @@ export async function main(app: express.Express) {
   setupServer(app);
 
   // database clean-up jobs (should be run after the API so, we don't affect start-up time
-  databaseCleaner.initLoop(models, Number(DATABASE_CLEAN_HOUR), redisCache);
+  databaseCleaner.initLoop(models, Number(DATABASE_CLEAN_HOUR));
 }

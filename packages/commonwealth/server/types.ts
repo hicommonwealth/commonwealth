@@ -1,8 +1,10 @@
+import type {
+  AddressInstance,
+  CommunityInstance,
+  UserInstance,
+} from '@hicommonwealth/model';
 import type { Response } from 'express';
 import type { ValidationError } from 'express-validator';
-import type { AddressInstance } from '../../../libs/model/src/models/address';
-import type { CommunityInstance } from '../../../libs/model/src/models/community';
-import type { UserInstance } from '../../../libs/model/src/models/user';
 
 export type PaginationQueryParams = {
   limit?: string;

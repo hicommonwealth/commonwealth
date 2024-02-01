@@ -20,6 +20,14 @@ const createMockedTopicsController = (isAdmin: boolean = false) => {
           toJSON: () => {},
         };
       },
+      findByPk: async () => {
+        return {
+          id: 1,
+          destroy: async () => {},
+          save: async () => {},
+          toJSON: () => {},
+        };
+      },
     },
     CommunityRole: {
       findAll: async () => [
@@ -88,10 +96,9 @@ describe('ServerTopicsController', () => {
     expect(topic.featured_in_sidebar).to.equal(false);
   });
   describe('#deleteTopic', async () => {
-    const { controller, user, chain } = createMockedTopicsController();
+    const { controller, user } = createMockedTopicsController();
     await controller.deleteTopic({
       user,
-      community: chain,
       topicId: 1,
     });
   });
@@ -103,19 +110,17 @@ describe('ServerTopicsController', () => {
     expect(topics).to.have.length(1);
   });
   describe('#updateTopicChannel', async () => {
-    const { controller, user, chain } = createMockedTopicsController(true);
+    const { controller, user } = createMockedTopicsController(true);
     await controller.updateTopicChannel({
       user,
-      community: chain,
       topicId: 1,
       channelId: 'ccc',
     });
   });
   describe('#updateTopic', async () => {
-    const { controller, user, chain } = createMockedTopicsController(true);
+    const { controller, user } = createMockedTopicsController(true);
     await controller.updateTopic({
       user,
-      community: chain,
       body: {
         id: 1,
         name: 'ddd',

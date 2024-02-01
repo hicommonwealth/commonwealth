@@ -118,7 +118,7 @@ export const iconLookup = {
   delegate: Icons.CWDelegate,
   democraticProposal: Icons.CWDemocraticProposal,
   discord: Icons.CWDiscord,
-  discordLogin: Icons.CWDiscordLogin,
+  discordOld: Icons.CWDiscordLogin, // TODO: possible remove
   dot: Icons.CWDot,
   dots: Icons.CWDots,
   dotsVertical: Icons.CWDotsVertical,
@@ -239,6 +239,7 @@ export const customIconLookup = {
   walletconnect: CustomIcons.CWWalletConnect,
   'terra-walletconnect': CustomIcons.CWWalletConnect,
   coinbase: CustomIcons.CWCoinbase,
+  x: CustomIcons.CWX, // twitter
 };
 
 export type IconName = keyof typeof iconLookup;

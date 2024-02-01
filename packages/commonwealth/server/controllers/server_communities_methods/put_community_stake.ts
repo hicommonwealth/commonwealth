@@ -1,5 +1,8 @@
-import { Community, UserInstance } from '@hicommonwealth/model';
-import { CommunityStakeAttributes } from '@hicommonwealth/model/build/models/community_stake';
+import {
+  Community,
+  CommunityStakeAttributes,
+  UserInstance,
+} from '@hicommonwealth/model';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 export type PutCommunityStakeOptions = {

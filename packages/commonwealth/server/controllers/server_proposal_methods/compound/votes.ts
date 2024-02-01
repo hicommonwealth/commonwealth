@@ -1,4 +1,3 @@
-import { RedisCache } from '@hicommonwealth/adapters';
 import {
   GovernorAlpha,
   GovernorBravoDelegate,
@@ -26,14 +25,9 @@ export async function getCompoundProposalVotes(
   compoundGovAddress: string,
   provider: providers.Web3Provider,
   proposalId: string,
-  redisCache: RedisCache,
 ): Promise<CompoundVoteEvents[]> {
   const { contract, version: govVersion } =
-    await getCompoundGovContractAndVersion(
-      redisCache,
-      compoundGovAddress,
-      provider,
-    );
+    await getCompoundGovContractAndVersion(compoundGovAddress, provider);
 
   let events;
   if (govVersion === GovVersion.Alpha) {

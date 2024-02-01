@@ -146,7 +146,7 @@ export enum BalanceType {
   Substrate = 'substrate',
 }
 
-export enum RedisNamespaces {
+export enum CacheNamespaces {
   Route_Response = 'route_response',
   Function_Response = 'function_response',
   Global_Response = 'global_response',
@@ -155,6 +155,7 @@ export enum RedisNamespaces {
   Compound_Gov_Version = 'compound_gov_version',
   Token_Balance = 'token_balance',
   Activity_Cache = 'activity_cache',
+  Rate_Limiter = 'rate_limiter',
 }
 
 export interface ISnapshotNotification {
