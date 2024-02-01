@@ -1,5 +1,6 @@
 import { STAKE_ID } from '@hicommonwealth/chains';
 import { calculateVoteWeight } from '@hicommonwealth/chains/build/commonProtocol/utils';
+import { featureFlags } from 'helpers/feature-flags';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import app from 'state';
 import {
@@ -27,13 +28,14 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     useFetchCommunityStakeQuery({
       communityId: communityId || activeCommunityId,
       stakeId,
-      apiEnabled: !!activeCommunityId,
+      apiEnabled: featureFlags.communityStake && !!activeCommunityId,
     });
 
   const stakeData = stakeResponse?.data?.result;
   const stakeEnabled = stakeData?.stake_enabled;
   const apiEnabled = Boolean(
-    stakeEnabled &&
+    featureFlags.communityStake &&
+      stakeEnabled &&
       (walletAddress || activeAccountAddress) &&
       !!activeCommunityNamespace &&
       isLoggedIn,

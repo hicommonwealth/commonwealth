@@ -66,7 +66,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
               address={activeAccount?.address}
             />
 
-            {stakeEnabled && (
+            {featureFlags.communityStake && stakeEnabled && (
               <VoteWeightModule
                 voteWeight={currentVoteWeight}
                 stakeNumber={stakeBalance}

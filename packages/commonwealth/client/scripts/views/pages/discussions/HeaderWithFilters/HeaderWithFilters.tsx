@@ -1,4 +1,5 @@
 import { parseCustomStages, threadStageToLabel } from 'helpers';
+import { featureFlags } from 'helpers/feature-flags';
 import { isUndefined } from 'helpers/typeGuards';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
@@ -162,7 +163,7 @@ export const HeaderWithFilters = ({
   };
 
   // TODO will be done in https://github.com/hicommonwealth/commonwealth/issues/6416
-  const stakeBannerEnabled = false;
+  const stakeBannerEnabled = featureFlags.communityStake && false;
 
   return (
     <div className="HeaderWithFilters">
