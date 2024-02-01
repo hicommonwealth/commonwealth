@@ -7,6 +7,8 @@ export const Errors = {
   ChainNodeExists: 'Chain Node already exists',
   NotAdmin: 'Not an admin',
   ChainIdNaN: 'eth_chain_id is required on ethereum Chain Nodes',
+  NeedCosmosChainId:
+    'cosmos_chain_id is a string, required on Cosmos Chain Nodes',
 };
 
 export type CreateChainNodeOptions = {
@@ -38,6 +40,12 @@ export async function __createChainNode(
 
   if (balanceType === 'ethereum' && typeof eth_chain_id !== 'number') {
     throw new AppError(Errors.ChainIdNaN);
+  }
+  if (
+    balanceType === BalanceType.Cosmos &&
+    typeof cosmos_chain_id !== 'string'
+  ) {
+    throw new AppError(Errors.NeedCosmosChainId);
   }
 
   let where;

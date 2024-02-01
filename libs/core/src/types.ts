@@ -242,3 +242,8 @@ export type ChainEventNotification = {
 };
 
 export type AnalyticsOptions = Record<string, any>;
+
+export enum NodeHealth {
+  Failed = 'failed',
+  Healthy = 'healthy',
+}
