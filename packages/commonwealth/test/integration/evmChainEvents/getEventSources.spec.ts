@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { getEventSources } from '../../../server/workers/evmChainEvents/getEventSources';
