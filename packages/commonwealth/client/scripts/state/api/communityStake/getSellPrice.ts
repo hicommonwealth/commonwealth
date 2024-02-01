@@ -14,8 +14,8 @@ const getSellPrice = async ({
   chainRpc,
 }: GetSellPriceProps) => {
   const communityStakes = new CommunityStakes(
-    factoryContracts[ValidChains.Goerli].communityStake,
-    factoryContracts[ValidChains.Goerli].factory,
+    factoryContracts[ValidChains.Sepolia].communityStake,
+    factoryContracts[ValidChains.Sepolia].factory,
     chainRpc,
   );
 
