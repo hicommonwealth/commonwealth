@@ -1,24 +1,7 @@
 import { ZodError, ZodSchema } from 'zod';
-import { InvalidActor, InvalidInput } from './errors';
-import { ActorMiddleware, CommandMetadata, type Actor } from './types';
-
-/**
- * Actor middleware validation helper
- * @param actor signed-in user as actor
- * @param middleware chained actor middlewares
- * @returns validated actor
- */
-const validate = async (
-  actor: Actor,
-  middleware: ActorMiddleware[],
-): Promise<Actor> => {
-  for (const fn of middleware) {
-    const result = await fn(actor);
-    if (typeof result === 'string') throw new InvalidActor(actor, result);
-    actor = result;
-  }
-  return actor;
-};
+import { InvalidInput } from './errors';
+import { CommandMetadata, type Actor } from './types';
+import { validateActor } from './utils';
 
 /**
  * Generic command handler
@@ -39,7 +22,7 @@ export const command = async <M extends ZodSchema, R>(
     return md.fn(
       id,
       md.schema.parse(payload),
-      await validate(actor, md.middleware || []),
+      await validateActor(actor, md.middleware || []),
     );
   } catch (error) {
     if (error instanceof Error && error.name === 'ZodError') {
