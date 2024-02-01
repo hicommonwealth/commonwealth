@@ -51,6 +51,8 @@ interface StakeExchangeFormProps {
   selectedAddress: OptionDropdown;
   onSetSelectedAddress: (address: OptionDropdown) => void;
   addressOptions: OptionDropdown[];
+  numberOfStakeToExchange: number;
+  onSetNumberOfStakeToExchange: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const StakeExchangeForm = ({
@@ -60,19 +62,23 @@ const StakeExchangeForm = ({
   selectedAddress,
   onSetSelectedAddress,
   addressOptions,
+  numberOfStakeToExchange,
+  onSetNumberOfStakeToExchange,
 }: StakeExchangeFormProps) => {
   const chainRpc = app?.chain?.meta?.ChainNode?.url;
   const activeAccountAddress = app?.user?.activeAccount?.address;
 
   const {
-    numberOfStakeToExchange,
-    setNumberOfStakeToExchange,
     buyPriceData,
     ethUsdRate,
     userEthBalance,
     userEthBalanceLoading,
     sellPriceData,
-  } = useStakeExchange({ mode, address: selectedAddress.value });
+  } = useStakeExchange({
+    mode,
+    address: selectedAddress.value,
+    numberOfStakeToExchange,
+  });
 
   const { stakeBalance, stakeValue, currentVoteWeight, stakeData } =
     useCommunityStake({ walletAddress: selectedAddress.value });
@@ -112,6 +118,7 @@ const StakeExchangeForm = ({
   const handleSell = async () => {
     try {
       onSetModalState(ManageCommunityStakeModalState.Loading);
+
       const txReceipt = await sellStake({
         amount: numberOfStakeToExchange,
         stakeId: STAKE_ID,
@@ -137,10 +144,10 @@ const StakeExchangeForm = ({
       return;
     }
 
-    setNumberOfStakeToExchange((prevState) => prevState - 1);
+    onSetNumberOfStakeToExchange((prevState) => prevState - 1);
   };
   const handlePlus = () => {
-    setNumberOfStakeToExchange((prevState) => prevState + 1);
+    onSetNumberOfStakeToExchange((prevState) => prevState + 1);
   };
 
   const insufficientFunds =

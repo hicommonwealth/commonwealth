@@ -23,6 +23,7 @@ const ManageCommunityStakeModal = ({
     ManageCommunityStakeModalState.Exchange,
   );
   const [successTransactionHash, setSuccessTransactionHash] = useState('');
+  const [numberOfStakeToExchange, setNumberOfStakeToExchange] = useState(1);
 
   const { selectedAddress, setSelectedAddress, addressOptions } =
     useStakeAddresses();
@@ -38,6 +39,8 @@ const ManageCommunityStakeModal = ({
             selectedAddress={selectedAddress}
             onSetSelectedAddress={setSelectedAddress}
             addressOptions={addressOptions}
+            numberOfStakeToExchange={numberOfStakeToExchange}
+            onSetNumberOfStakeToExchange={setNumberOfStakeToExchange}
           />
         );
       case ManageCommunityStakeModalState.Loading:

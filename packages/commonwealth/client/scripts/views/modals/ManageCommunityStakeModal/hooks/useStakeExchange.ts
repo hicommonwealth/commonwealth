@@ -1,5 +1,4 @@
 import { STAKE_ID } from '@hicommonwealth/chains';
-import { useState } from 'react';
 import app from 'state';
 import {
   useFetchEthUsdRateQuery,
@@ -12,11 +11,14 @@ import { ManageCommunityStakeModalMode } from 'views/modals/ManageCommunityStake
 interface UseStakeExchangeProps {
   mode: ManageCommunityStakeModalMode;
   address: string;
+  numberOfStakeToExchange: number;
 }
 
-const useStakeExchange = ({ mode, address }: UseStakeExchangeProps) => {
-  const [numberOfStakeToExchange, setNumberOfStakeToExchange] = useState(1);
-
+const useStakeExchange = ({
+  mode,
+  address,
+  numberOfStakeToExchange,
+}: UseStakeExchangeProps) => {
   const activeCommunityNamespace = app?.chain?.meta?.namespace;
   const chainRpc = app?.chain?.meta?.ChainNode?.url;
 
@@ -46,8 +48,6 @@ const useStakeExchange = ({ mode, address }: UseStakeExchangeProps) => {
   const ethUsdRate = ethUsdRateData?.data?.data?.amount;
 
   return {
-    numberOfStakeToExchange,
-    setNumberOfStakeToExchange,
     buyPriceData,
     ethUsdRate,
     userEthBalance,
