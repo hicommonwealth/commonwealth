@@ -35,6 +35,7 @@ interface UseGetUserStakeBalanceQueryProps {
   apiEnabled: boolean;
   chainRpc: string;
   walletAddress: string;
+  keepPreviousData?: boolean;
 }
 
 const useGetUserStakeBalanceQuery = ({
@@ -43,6 +44,7 @@ const useGetUserStakeBalanceQuery = ({
   apiEnabled,
   chainRpc,
   walletAddress,
+  keepPreviousData = false,
 }: UseGetUserStakeBalanceQueryProps) => {
   return useQuery({
     queryKey: [
@@ -56,6 +58,7 @@ const useGetUserStakeBalanceQuery = ({
       getUserStakeBalance({ namespace, stakeId, chainRpc, walletAddress }),
     staleTime: GET_USER_STAKE_BALANCE_STALE_TIME,
     enabled: apiEnabled,
+    keepPreviousData,
   });
 };
 

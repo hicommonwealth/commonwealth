@@ -48,6 +48,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     apiEnabled,
     chainRpc,
     walletAddress: walletAddress || activeAccountAddress,
+    keepPreviousData: true,
   });
 
   const { isInitialLoading: buyPriceDataLoading, data: buyPriceData } =
@@ -57,6 +58,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
       amount: Number(userStakeBalanceData),
       apiEnabled: apiEnabled && !isNaN(Number(userStakeBalanceData)),
       chainRpc,
+      keepPreviousData: true,
     });
 
   const currentVoteWeight = calculateVoteWeight(

@@ -28,6 +28,7 @@ interface UseGetBuyPriceQueryProps {
   amount: number;
   apiEnabled: boolean;
   chainRpc: string;
+  keepPreviousData?: boolean;
 }
 
 const useGetBuyPriceQuery = ({
@@ -36,6 +37,7 @@ const useGetBuyPriceQuery = ({
   amount,
   apiEnabled,
   chainRpc,
+  keepPreviousData = false,
 }: UseGetBuyPriceQueryProps) => {
   return useQuery({
     queryKey: [
@@ -48,6 +50,7 @@ const useGetBuyPriceQuery = ({
     queryFn: () => getBuyPrice({ namespace, stakeId, amount, chainRpc }),
     enabled: apiEnabled,
     staleTime: GET_BUY_PRICE_STALE_TIME,
+    keepPreviousData,
   });
 };
 
