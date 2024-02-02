@@ -37,9 +37,6 @@ const useCreateCommunity = () => {
     CreateCommunityStep.BasicInformation,
     CreateCommunityStep.CommunityStake,
   ].includes(createCommunityStep);
-  // TODO only for testing/QA purpose
-  // Goerli should be removed before merging to production
-  // only ETHEREUM_MAINNET_ID should be here
   const isEthereumMainnetSelected =
     // selectedChainId === ETHEREUM_MAINNET_ID ||
     selectedChainId === String(commonProtocol.ValidChains.Goerli);
