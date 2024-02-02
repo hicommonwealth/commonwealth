@@ -318,9 +318,11 @@ export async function initAppState(
       );
     }
 
-    window.FS.identify({
-      uid: statusRes.result.user.addresses[0].user_id,
-    });
+    if (statusRes.result.user) {
+      window.FS('setIdentity', {
+        uid: statusRes.result.user.profileId,
+      });
+    }
   } catch (err) {
     app.loadingError =
       err.response?.data?.error || 'Error loading application state';
