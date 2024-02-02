@@ -1,4 +1,4 @@
-import { factoryContracts, ValidChains } from '@hicommonwealth/chains';
+import { commonProtocol } from '@hicommonwealth/core';
 import { useMutation } from '@tanstack/react-query';
 import CommunityStakes from 'helpers/ContractHelpers/CommunityStakes';
 import { ContractMethods, queryClient } from 'state/api/config';
@@ -20,8 +20,10 @@ const sellStake = async ({
   walletAddress,
 }: SellStakeProps) => {
   const communityStakes = new CommunityStakes(
-    factoryContracts[ValidChains.Sepolia].communityStake,
-    factoryContracts[ValidChains.Sepolia].factory,
+    commonProtocol.factoryContracts[
+      commonProtocol.ValidChains.Sepolia
+    ].communityStake,
+    commonProtocol.factoryContracts[commonProtocol.ValidChains.Sepolia].factory,
     chainRpc,
   );
 

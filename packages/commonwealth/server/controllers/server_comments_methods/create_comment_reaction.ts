@@ -1,9 +1,8 @@
-import { ValidChains } from '@hicommonwealth/chains';
-import { calculateVoteWeight } from '@hicommonwealth/chains/src/commonProtocol/utils';
 import {
   AppError,
   NotificationCategories,
   ServerError,
+  commonProtocol,
 } from '@hicommonwealth/core';
 import {
   AddressInstance,
@@ -131,11 +130,14 @@ export async function __createCommentReaction(
         this.tokenBalanceCache,
         community.namespace,
         stake.stake_id,
-        ValidChains.Sepolia,
+        commonProtocol.ValidChains.Sepolia,
         address.address,
         this.models,
       );
-      calculatedVotingWeight = calculateVoteWeight(stakeBalance, voteWeight);
+      calculatedVotingWeight = commonProtocol.calculateVoteWeight(
+        stakeBalance,
+        voteWeight,
+      );
     }
   }
 

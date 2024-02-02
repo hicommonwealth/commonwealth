@@ -1,9 +1,7 @@
-import { useState } from 'react';
-
-import { ValidChains } from '@hicommonwealth/chains';
+import { commonProtocol } from '@hicommonwealth/core';
 import AddressInfo from 'models/AddressInfo';
+import { useState } from 'react';
 import { SelectedCommunity } from 'views/components/component_kit/new_designs/CWCommunitySelector';
-
 import { CreateCommunityStep, handleChangeStep } from './utils';
 
 const useCreateCommunity = () => {
@@ -40,7 +38,8 @@ const useCreateCommunity = () => {
     CreateCommunityStep.CommunityStake,
   ].includes(createCommunityStep);
   const isEthereumMainnetSelected =
-    selectedChainId === String(ValidChains.Sepolia);
+    // selectedChainId === ETHEREUM_MAINNET_ID ||
+    selectedChainId === String(commonProtocol.ValidChains.Sepolia);
   const showCommunityStakeStep =
     isValidStepToShowCommunityStakeFormStep &&
     selectedCommunity.type === 'ethereum' &&

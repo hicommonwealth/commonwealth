@@ -1,8 +1,6 @@
+import { commonProtocol } from '@hicommonwealth/core';
 import { useState } from 'react';
-
-import { STAKE_ID } from '@hicommonwealth/chains';
 import { useUpdateCommunityStake } from 'state/api/communityStake';
-
 import { ActionState, defaultActionState } from '../types';
 import useNamespaceFactory from '../useNamespaceFactory';
 
@@ -34,13 +32,13 @@ const useLaunchCommunityStake = ({
 
       await namespaceFactory.configureCommunityStakes(
         namespace,
-        STAKE_ID,
+        commonProtocol.STAKE_ID,
         selectedAddress,
       );
 
       await updateCommunityStake({
         communityId,
-        stakeId: STAKE_ID,
+        stakeId: commonProtocol.STAKE_ID,
       });
 
       setLaunchStakeData({

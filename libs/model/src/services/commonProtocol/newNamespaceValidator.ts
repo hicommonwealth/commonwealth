@@ -1,5 +1,8 @@
-import { ValidChains, factoryContracts } from '@hicommonwealth/chains';
-import { AppError, BalanceSourceType } from '@hicommonwealth/core';
+import {
+  AppError,
+  BalanceSourceType,
+  commonProtocol,
+} from '@hicommonwealth/core';
 import Web3 from 'web3';
 import { CommunityAttributes } from '../../models';
 import { TokenBalanceCache } from '../tokenBalanceCache';
@@ -42,7 +45,8 @@ export const validateNamespace = async (
     throw new AppError('Namespace not supported on selected chain');
   }
   const chain_id = community.ChainNode.eth_chain_id;
-  const factoryData = factoryContracts[chain_id as ValidChains];
+  const factoryData =
+    commonProtocol.factoryContracts[chain_id as commonProtocol.ValidChains];
   if (!factoryData) {
     throw new AppError('Namespace not supported on selected chain');
   }

@@ -2,8 +2,7 @@ import clsx from 'clsx';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 
-import { STAKE_ID } from '@hicommonwealth/chains';
-import { calculateVoteWeight } from '@hicommonwealth/chains/src/commonProtocol/utils';
+import { commonProtocol } from '@hicommonwealth/core';
 import app from 'state';
 import {
   useBuyStakeMutation,
@@ -86,7 +85,7 @@ const StakeExchangeForm = ({
   const { mutateAsync: buyStake } = useBuyStakeMutation();
   const { mutateAsync: sellStake } = useSellStakeMutation();
 
-  const expectedVoteWeight = calculateVoteWeight(
+  const expectedVoteWeight = commonProtocol.calculateVoteWeight(
     String(numberOfStakeToExchange),
     stakeData?.vote_weight,
   );
@@ -101,7 +100,7 @@ const StakeExchangeForm = ({
 
       const txReceipt = await buyStake({
         amount: numberOfStakeToExchange,
-        stakeId: STAKE_ID,
+        stakeId: commonProtocol.STAKE_ID,
         namespace: stakeData?.Chain?.namespace,
         chainRpc,
         walletAddress: selectedAddress.value,
@@ -121,7 +120,7 @@ const StakeExchangeForm = ({
 
       const txReceipt = await sellStake({
         amount: numberOfStakeToExchange,
-        stakeId: STAKE_ID,
+        stakeId: commonProtocol.STAKE_ID,
         namespace: stakeData?.Chain?.namespace,
         chainRpc,
         walletAddress: selectedAddress.value,
