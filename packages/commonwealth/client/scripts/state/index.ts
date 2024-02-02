@@ -319,9 +319,13 @@ export async function initAppState(
     }
 
     if (statusRes.result.user) {
-      window.FS('setIdentity', {
-        uid: statusRes.result.user.profileId,
-      });
+      try {
+        window.FS('setIdentity', {
+          uid: statusRes.result.user.profileId,
+        });
+      } catch (e) {
+        console.error('FullStory not found.');
+      }
     }
   } catch (err) {
     app.loadingError =
