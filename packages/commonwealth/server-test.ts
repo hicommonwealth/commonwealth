@@ -126,7 +126,6 @@ setupCosmosProxy(app, models, cacheDecorator);
 setupErrorHandlers(app);
 setupServer();
 
-export { resetDatabase } from './test/util/resetDatabase';
 export { cacheDecorator, redisCache };
 
 export default app;

@@ -1,5 +1,6 @@
 import {
   models,
+  tester,
   UserInstance,
   validateCommunityStakeConfig,
 } from '@hicommonwealth/model';
@@ -10,7 +11,6 @@ import app from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 import { buildUser } from '../../unit/unitHelpers';
-import { resetDatabase } from '../../util/resetDatabase';
 import { get, put } from './external/appHook.spec';
 import { testUsers } from './external/dbEntityHooks.spec';
 
@@ -35,7 +35,7 @@ const expectedCreateResp = {
 
 describe('PUT communityStakes Tests', () => {
   beforeEach(async () => {
-    await resetDatabase();
+    await tester.seedDb();
   });
 
   it('The handler creates and updates community stake', async () => {
