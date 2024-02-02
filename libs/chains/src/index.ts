@@ -1,4 +1,5 @@
 export * from './commonProtocol/chainConfig';
+export * from './commonProtocol/utils';
 export * from './cosmos-ts';
 export {
   ProposalStatus,

@@ -1,5 +1,4 @@
-import { ValidChains } from '@hicommonwealth/chains';
-import { calculateVoteWeight } from '@hicommonwealth/chains/src/commonProtocol/utils';
+import { ValidChains, calculateVoteWeight } from '@hicommonwealth/chains';
 import {
   AppError,
   NotificationCategories,
