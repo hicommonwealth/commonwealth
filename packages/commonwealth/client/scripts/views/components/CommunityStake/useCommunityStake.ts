@@ -1,5 +1,4 @@
-import { STAKE_ID } from '@hicommonwealth/chains';
-import { calculateVoteWeight } from '@hicommonwealth/chains/build/commonProtocol/utils';
+import { STAKE_ID, calculateVoteWeight } from '@hicommonwealth/chains';
 import { featureFlags } from 'helpers/feature-flags';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import app from 'state';
