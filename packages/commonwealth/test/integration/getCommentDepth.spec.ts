@@ -1,7 +1,6 @@
-import { CommentInstance, models } from '@hicommonwealth/model';
+import { CommentInstance, models, tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { getCommentDepth } from 'server/util/getCommentDepth';
-import { resetDatabase } from '../util/resetDatabase';
 
 describe('getCommentDepth', () => {
   const community_id = 'ethereum';
@@ -9,7 +8,7 @@ describe('getCommentDepth', () => {
   const maxDepth = 8;
 
   before(async () => {
-    await resetDatabase();
+    await tester.seedDb();
     const address = await models.Address.findOne({
       where: {
         community_id,
