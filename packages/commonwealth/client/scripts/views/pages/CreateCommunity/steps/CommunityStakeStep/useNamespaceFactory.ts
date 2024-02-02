@@ -4,10 +4,12 @@ import app from 'state';
 
 const useNamespaceFactory = () => {
   const goerliFactoryAddress =
-    commonProtocol.factoryContracts[commonProtocol.ValidChains.Goerli].factory;
+    commonProtocol.factoryContracts[commonProtocol.ValidChains.Sepolia].factory;
   const chainRpc = app.config.nodes
     .getAll()
-    .find((node) => node.ethChainId === commonProtocol.ValidChains.Goerli)?.url;
+    .find(
+      (node) => node.ethChainId === commonProtocol.ValidChains.Sepolia,
+    )?.url;
   const namespaceFactory = new NamespaceFactory(goerliFactoryAddress, chainRpc);
 
   return { namespaceFactory };

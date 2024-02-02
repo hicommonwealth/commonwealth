@@ -39,7 +39,7 @@ const useCreateCommunity = () => {
   ].includes(createCommunityStep);
   const isEthereumMainnetSelected =
     // selectedChainId === ETHEREUM_MAINNET_ID ||
-    selectedChainId === String(commonProtocol.ValidChains.Goerli);
+    selectedChainId === String(commonProtocol.ValidChains.Sepolia);
   const showCommunityStakeStep =
     isValidStepToShowCommunityStakeFormStep &&
     selectedCommunity.type === 'ethereum' &&

@@ -130,7 +130,7 @@ export async function __createCommentReaction(
         this.tokenBalanceCache,
         community.namespace,
         stake.stake_id,
-        commonProtocol.ValidChains.Goerli,
+        commonProtocol.ValidChains.Sepolia,
         address.address,
         this.models,
       );

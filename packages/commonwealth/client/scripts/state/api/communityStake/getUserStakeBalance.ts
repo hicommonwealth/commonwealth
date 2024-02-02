@@ -18,9 +18,9 @@ const getUserStakeBalance = async ({
 }: GetUserStakeBalanceProps) => {
   const communityStakes = new CommunityStakes(
     commonProtocol.factoryContracts[
-      commonProtocol.ValidChains.Goerli
+      commonProtocol.ValidChains.Sepolia
     ].communityStake,
-    commonProtocol.factoryContracts[commonProtocol.ValidChains.Goerli].factory,
+    commonProtocol.factoryContracts[commonProtocol.ValidChains.Sepolia].factory,
     chainRpc,
   );
 
