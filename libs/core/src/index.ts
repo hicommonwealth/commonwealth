@@ -1,3 +1,4 @@
+export * as commonProtocol from './commonProtocol';
 export * from './errors';
 export * from './framework';
 export * from './ports';

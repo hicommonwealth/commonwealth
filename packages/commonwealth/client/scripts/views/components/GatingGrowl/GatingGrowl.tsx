@@ -1,6 +1,6 @@
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
-import useGrowlStore from 'state/ui/growl/Growl';
+import useGrowlStore from 'state/ui/growl';
 import Persmissions from 'utils/Permissions';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWGrowl } from 'views/components/component_kit/cw_growl';

@@ -1,5 +1,4 @@
-import { factoryContracts, ValidChains } from '@hicommonwealth/chains';
-import { AppError } from '@hicommonwealth/core';
+import { AppError, commonProtocol } from '@hicommonwealth/core';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { CommunityAttributes } from '../../models/community';
@@ -25,12 +24,13 @@ export const validateCommunityStakeConfig = async (
     throw new AppError('Invalid community');
   }
   const chain_id = community.ChainNode.eth_chain_id;
-  if (!Object.values(ValidChains).includes(chain_id)) {
+  if (!Object.values(commonProtocol.ValidChains).includes(chain_id)) {
     throw new AppError(
       "Community Stakes not configured for community's chain node",
     );
   }
-  const factoryData = factoryContracts[chain_id as ValidChains];
+  const factoryData =
+    commonProtocol.factoryContracts[chain_id as commonProtocol.ValidChains];
   const web3 = new Web3(community.ChainNode.url);
   const namespaceAddress = await getNamespace(
     web3,

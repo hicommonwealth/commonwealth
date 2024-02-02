@@ -351,7 +351,10 @@ export async function startLoginWithMagicLink({
   if (email) {
     // email-based login
     const bearer = await magic.auth.loginWithMagicLink({ email });
-    const address = await handleSocialLoginCallback({ bearer, isEmail: true });
+    const address = await handleSocialLoginCallback({
+      bearer,
+      walletSsoSource: WalletSsoSource.Email,
+    });
     return { bearer, address };
   } else {
     const params = `?redirectTo=${
@@ -406,18 +409,17 @@ export async function handleSocialLoginCallback({
   bearer,
   chain,
   walletSsoSource,
-  isEmail,
 }: {
   bearer?: string;
   chain?: string;
   walletSsoSource?: string;
-  isEmail?: boolean;
 }): Promise<string> {
   // desiredChain may be empty if social login was initialized from
   // a page without a chain, in which case we default to an eth login
   const desiredChain = app.chain?.meta || app.config.chains.getById(chain);
   const isCosmos = desiredChain?.base === ChainBase.CosmosSDK;
   const magic = await constructMagic(isCosmos, desiredChain?.id);
+  const isEmail = walletSsoSource === WalletSsoSource.Email;
 
   // Code up to this line might run multiple times because of extra calls to useEffect().
   // Those runs will be rejected because getRedirectResult purges the browser search param.
@@ -453,24 +455,8 @@ export async function handleSocialLoginCallback({
   try {
     // Sign a session
     if (isCosmos && desiredChain) {
-      // Not every chain prefix will succeed, so Magic defaults to osmo... as the Cosmos prefix
       const bech32Prefix = desiredChain.bech32Prefix;
-      try {
-        magicAddress = await magic.cosmos.changeAddress(bech32Prefix);
-      } catch (err) {
-        console.error(
-          `Error changing address to ${bech32Prefix}. Keeping default cosmos prefix and moving on. Error: ${err}`,
-        );
-      }
-
-      // Request the cosmos chain ID, since this is used by Magic to generate
-      // the signed message. The API is already used by the Magic iframe,
-      // but they don't expose the results.
-      const nodeInfo = await $.get(
-        `${document.location.origin}/magicCosmosAPI/${desiredChain.id}/node_info`,
-      );
-      const chainId = nodeInfo.node_info.network;
-
+      const chainId = 'cosmoshub';
       const timestamp = +new Date();
 
       const signer = { signMessage: magic.cosmos.sign };

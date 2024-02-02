@@ -1,5 +1,8 @@
-import { ValidChains } from '@hicommonwealth/chains';
-import { AppError, NotificationCategories } from '@hicommonwealth/core';
+import {
+  AppError,
+  NotificationCategories,
+  commonProtocol,
+} from '@hicommonwealth/core';
 import {
   AddressInstance,
   ReactionAttributes,
@@ -104,7 +107,7 @@ export async function __createThreadReaction(
       where: { community_id: thread.community_id },
     });
     if (stake) {
-      const vote_weight = stake.vote_weight;
+      const voteWeight = stake.vote_weight;
       const community = await this.models.Community.findByPk(
         thread.community_id,
       );
@@ -115,11 +118,14 @@ export async function __createThreadReaction(
         this.tokenBalanceCache,
         community.namespace,
         stake.stake_id,
-        ValidChains.Goerli,
+        commonProtocol.ValidChains.Sepolia,
         address.address,
         this.models,
       );
-      calculatedVotingWeight = parseInt(stakeBalance, 10) * vote_weight;
+      calculatedVotingWeight = commonProtocol.calculateVoteWeight(
+        stakeBalance,
+        voteWeight,
+      );
     }
   }
 

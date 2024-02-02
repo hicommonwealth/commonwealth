@@ -1,7 +1,7 @@
+import { tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import sinon from 'sinon';
 import { scheduleNodeProcessing } from '../../../server/workers/evmChainEvents/nodeProcessing';
-import { resetDatabase } from '../../util/resetDatabase';
 import {
   getTestAbi,
   getTestCommunityContract,
@@ -17,7 +17,7 @@ describe('scheduleNodeProcessing', () => {
   let singleSourceSuccess = false;
 
   before(async () => {
-    await resetDatabase();
+    await tester.seedDb();
   });
 
   beforeEach(() => {
