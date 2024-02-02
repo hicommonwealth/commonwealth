@@ -1,19 +1,20 @@
 import React from 'react';
 
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
-import app from '../../state';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import { formatNumberShort } from '../../../../shared/adapters/currency';
+import { MixpanelSnapshotEvents } from '../../../../shared/analytics/types';
+import '../../../styles/modals/confirm_snapshot_vote_modal.scss';
 import { notifyError } from '../../controllers/app/notifications';
 import { castVote } from '../../helpers/snapshot_utils';
-import { formatNumberShort } from '../../../../shared/adapters/currency';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
+import app from '../../state';
 import { CWText } from '../components/component_kit/cw_text';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
-
-import '../../../styles/modals/confirm_snapshot_vote_modal.scss';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
 
 type ConfirmSnapshotVoteModalProps = {
   id: string;
@@ -28,7 +29,7 @@ type ConfirmSnapshotVoteModalProps = {
 };
 
 export const ConfirmSnapshotVoteModal = (
-  props: ConfirmSnapshotVoteModalProps
+  props: ConfirmSnapshotVoteModalProps,
 ) => {
   const {
     id,
@@ -43,6 +44,36 @@ export const ConfirmSnapshotVoteModal = (
   const author = app.user.activeAccount;
 
   const [isSaving, setIsSaving] = React.useState<boolean>(false);
+
+  const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
+
+  const handleVote = async (e) => {
+    e.preventDefault();
+    setIsSaving(true);
+    const votePayload = {
+      space: space.id,
+      proposal: id,
+      type: 'single-choice',
+      choice: parseInt(selectedChoice) + 1,
+      metadata: JSON.stringify({}),
+    };
+    try {
+      castVote(author.address, votePayload).then(async () => {
+        await app.snapshot.refreshProposals();
+        onModalClose();
+        successCallback();
+      });
+    } catch (err) {
+      console.log(err);
+      const errorMessage = err.message;
+      notifyError(errorMessage);
+    }
+    setIsSaving(false);
+
+    trackAnalytics({
+      event: MixpanelSnapshotEvents.SNAPSHOT_VOTE_OCCURRED,
+    });
+  };
 
   return (
     <div className="ConfirmSnapshotVoteModal">
@@ -83,29 +114,7 @@ export const ConfirmSnapshotVoteModal = (
           buttonType="primary"
           buttonHeight="sm"
           disabled={isSaving}
-          onClick={async (e) => {
-            e.preventDefault();
-            setIsSaving(true);
-            const votePayload = {
-              space: space.id,
-              proposal: id,
-              type: 'single-choice',
-              choice: parseInt(selectedChoice) + 1,
-              metadata: JSON.stringify({}),
-            };
-            try {
-              castVote(author.address, votePayload).then(async () => {
-                await app.snapshot.refreshProposals();
-                onModalClose();
-                successCallback();
-              });
-            } catch (err) {
-              console.log(err);
-              const errorMessage = err.message;
-              notifyError(errorMessage);
-            }
-            setIsSaving(false);
-          }}
+          onClick={handleVote}
         />
       </CWModalFooter>
     </div>

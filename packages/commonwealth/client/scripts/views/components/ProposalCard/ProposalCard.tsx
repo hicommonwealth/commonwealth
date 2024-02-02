@@ -2,22 +2,21 @@ import React, { useEffect, useState } from 'react';
 
 import 'components/ProposalCard/ProposalCard.scss';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
-import { isNotNil } from 'helpers/typeGuards';
 import { getProposalUrlPath } from 'identifiers';
 import type { AnyProposal } from '../../../models/types';
 
+import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
+import {
+  useCosmosProposalMetadataQuery,
+  useCosmosProposalTallyQuery,
+} from 'state/api/proposals';
 import { slugify } from 'utils';
 import { CWCard } from '../component_kit/cw_card';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWText } from '../component_kit/cw_text';
-import { getPrimaryTagText, getStatusClass, getStatusText } from './helpers';
 import { ProposalTag } from './ProposalTag';
-import { useCommonNavigate } from 'navigation/helpers';
-import {
-  useCosmosProposalTallyQuery,
-  useCosmosProposalMetadataQuery,
-} from 'state/api/proposals';
+import { getPrimaryTagText, getStatusClass, getStatusText } from './helpers';
 
 type ProposalCardProps = {
   injectedContent?: React.ReactNode;
@@ -30,7 +29,7 @@ export const ProposalCard = ({
 }: ProposalCardProps) => {
   const navigate = useCommonNavigate();
   const [title, setTitle] = useState(
-    proposal.title || `Proposal ${proposal.identifier}`
+    proposal.title || `Proposal ${proposal.identifier}`,
   );
   const { data: metadata } = useCosmosProposalMetadataQuery(proposal);
   const { isFetching: isFetchingTally } = useCosmosProposalTallyQuery(proposal);
@@ -38,15 +37,6 @@ export const ProposalCard = ({
   useEffect(() => {
     if (metadata?.title) setTitle(metadata?.title);
   }, [metadata]);
-
-  useEffect(() => {
-    if (proposal instanceof AaveProposal) {
-      proposal.ipfsDataReady.once('ready', () => {
-        // triggers render of shortDescription too
-        setTitle(proposal?.ipfsData.title);
-      });
-    }
-  }, [proposal]);
 
   useEffect(() => {
     if (proposal instanceof AaveProposal) {
@@ -72,7 +62,7 @@ export const ProposalCard = ({
         const path = getProposalUrlPath(
           proposal.slug,
           `${proposal.identifier}-${slugify(proposal.title)}`,
-          true
+          true,
         );
 
         navigate(path); // avoid resetting scroll point
@@ -102,7 +92,7 @@ export const ProposalCard = ({
           fontWeight="medium"
           className={`proposal-status-text ${getStatusClass(
             proposal,
-            isFetchingTally
+            isFetchingTally,
           )}`}
         >
           {getStatusText(proposal, isFetchingTally)}
