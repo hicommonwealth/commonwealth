@@ -5,11 +5,10 @@ import {
   SnapshotEventType,
   SupportedNetwork,
 } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { models, tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import { resetDatabase } from '../../server-test';
 import { JWT_SECRET } from '../../server/config';
 import emitNotifications from '../../server/util/emitNotifications';
 import * as modelUtils from '../util/modelUtils';
@@ -40,7 +39,7 @@ describe('emitNotifications tests', () => {
   let userAddressId2;
 
   before('Reset database', async () => {
-    await resetDatabase();
+    await tester.seedDb();
 
     // creates 2 ethereum users
     const firstUser = await modelUtils.createAndVerifyAddress({ chain });

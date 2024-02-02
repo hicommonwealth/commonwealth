@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import z from 'zod';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestParams, TypedResponse, success } from '../../types';
@@ -19,7 +19,7 @@ export const updateTopicChannelHandler = async (
   req: TypedRequestParams<UpdateTopicChannelRequestParams>,
   res: TypedResponse<UpdateTopicChannelResponse>,
 ) => {
-  const { user, community } = req;
+  const { user } = req;
   const { topicId, channelId } = req.params;
 
   const validationSchema = z.object({
@@ -38,7 +38,6 @@ export const updateTopicChannelHandler = async (
 
   await controllers.topics.updateTopicChannel({
     user,
-    community,
     topicId: parseInt(topicId, 10),
     channelId,
   });

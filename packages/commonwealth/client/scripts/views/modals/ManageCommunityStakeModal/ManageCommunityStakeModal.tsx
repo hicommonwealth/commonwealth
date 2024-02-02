@@ -7,25 +7,13 @@ import StakeExchangeForm from './StakeExchangeForm';
 import TransactionFailed from './TransactionFailed';
 import TransactionLoading from './TransactionLoading';
 import TransactionSucceeded from './TransactionSucceeded';
+import { useStakeAddresses } from './hooks';
 import {
   ManageCommunityStakeModalProps,
   ManageCommunityStakeModalState,
 } from './types';
 
 import './ManageCommunityStakeModal.scss';
-
-// TODO only for testing purpose, remove when backend will be hooked up
-export const fakeRandomAPICall = () => {
-  return new Promise<void>((resolve, reject) => {
-    setTimeout(() => {
-      if (Math.random() < 0.5) {
-        resolve();
-      } else {
-        reject();
-      }
-    }, 1000);
-  });
-};
 
 const ManageCommunityStakeModal = ({
   onModalClose,
@@ -34,11 +22,27 @@ const ManageCommunityStakeModal = ({
   const [modalState, setModalState] = useState(
     ManageCommunityStakeModalState.Exchange,
   );
+  const [successTransactionHash, setSuccessTransactionHash] = useState('');
+  const [numberOfStakeToExchange, setNumberOfStakeToExchange] = useState(1);
+
+  const { selectedAddress, setSelectedAddress, addressOptions } =
+    useStakeAddresses();
 
   const getModalBody = () => {
     switch (modalState) {
       case ManageCommunityStakeModalState.Exchange:
-        return <StakeExchangeForm mode={mode} setModalState={setModalState} />;
+        return (
+          <StakeExchangeForm
+            mode={mode}
+            onSetModalState={setModalState}
+            onSetSuccessTransactionHash={setSuccessTransactionHash}
+            selectedAddress={selectedAddress}
+            onSetSelectedAddress={setSelectedAddress}
+            addressOptions={addressOptions}
+            numberOfStakeToExchange={numberOfStakeToExchange}
+            onSetNumberOfStakeToExchange={setNumberOfStakeToExchange}
+          />
+        );
       case ManageCommunityStakeModalState.Loading:
         return <TransactionLoading />;
       case ManageCommunityStakeModalState.Failure:
@@ -49,7 +53,13 @@ const ManageCommunityStakeModal = ({
           />
         );
       case ManageCommunityStakeModalState.Success:
-        return <TransactionSucceeded onModalClose={onModalClose} mode={mode} />;
+        return (
+          <TransactionSucceeded
+            onModalClose={onModalClose}
+            mode={mode}
+            successTransactionHash={successTransactionHash}
+          />
+        );
     }
   };
 

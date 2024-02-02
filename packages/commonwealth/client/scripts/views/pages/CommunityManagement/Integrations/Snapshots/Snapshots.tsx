@@ -68,6 +68,7 @@ const Snapshots = () => {
         <LinksArray
           label="Snapshot Space"
           addLinkButtonCTA="+ Add Snapshot Space"
+          placeholder="examplesnapshotspace.eth"
           links={snapshots}
           onLinkAdd={onLinkAdd}
           onLinkUpdatedAtIndex={onLinkUpdatedAtIndex}

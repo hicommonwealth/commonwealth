@@ -5,6 +5,7 @@
 require('dotenv').config();
 import { connectToRedis } from '@hicommonwealth/adapters';
 import { CacheNamespaces } from '@hicommonwealth/core';
+import { tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import {
@@ -12,11 +13,7 @@ import {
   cosmosRPCDuration,
   cosmosRPCKey,
 } from 'server/util/cosmosCache';
-import app, {
-  cacheDecorator,
-  redisCache,
-  resetDatabase,
-} from '../../../server-test';
+import app, { cacheDecorator, redisCache } from '../../../server-test';
 const v1beta1ChainId = 'csdk-beta';
 const v1ChainId = 'csdk';
 
@@ -42,7 +39,7 @@ describe('Cosmos Cache', () => {
   const route_namespace: CacheNamespaces = CacheNamespaces.Route_Response;
 
   before(async () => {
-    await resetDatabase();
+    await tester.seedDb();
     await connectToRedis(redisCache);
   });
 

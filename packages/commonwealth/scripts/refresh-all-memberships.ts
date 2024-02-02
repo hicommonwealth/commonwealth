@@ -1,12 +1,11 @@
 import { RedisCache } from '@hicommonwealth/adapters';
 import { cache } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { TokenBalanceCache, models } from '@hicommonwealth/model';
 import * as dotenv from 'dotenv';
 import { REDIS_URL } from '../server/config';
 import { ServerCommunitiesController } from '../server/controllers/server_communities_controller';
 import { ServerGroupsController } from '../server/controllers/server_groups_controller';
 import BanCache from '../server/util/banCheckCache';
-import { TokenBalanceCache } from '../server/util/tokenBalanceCache/tokenBalanceCache';
 
 dotenv.config();
 
@@ -39,7 +38,7 @@ async function main() {
     if (process.env.COMMUNITY_ID && process.env.COMMUNITY_ID !== community.id)
       continue;
     await groupsController.refreshCommunityMemberships({
-      community,
+      communityId: community.id,
     });
   }
 

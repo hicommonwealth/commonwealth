@@ -17,12 +17,10 @@ import {
   stats,
 } from '@hicommonwealth/core';
 import v8 from 'v8';
-import {
-  handleCommentMessages,
-  handleThreadMessages,
-} from '../discord-consumer/handlers';
 import { CW_BOT_KEY, DISCOBOT_ADDRESS, RABBITMQ_URI } from '../utils/config';
-import { getForumLinkedTopic } from '../utils/util';
+
+const log = logger(TypescriptLoggingLogger()).getLogger(__filename);
+stats(HotShotsStats());
 
 let isServiceHealthy = false;
 
@@ -35,9 +33,6 @@ startHealthCheckLoop({
   },
 });
 
-const log = logger(TypescriptLoggingLogger()).getLogger(__filename);
-stats(HotShotsStats());
-
 log.info(
   `Node Option max-old-space-size set to: ${JSON.stringify(
     v8.getHeapStatistics().heap_size_limit / 1000000000,
@@ -45,6 +40,12 @@ log.info(
 );
 
 async function processMessage(data: TRmqMessages) {
+  // async imports to delay calling logger
+  const { handleCommentMessages, handleThreadMessages } = await import(
+    '../discord-consumer/handlers'
+  );
+  const { getForumLinkedTopic } = await import('../utils/util');
+
   try {
     const parsedMessage = data as IDiscordMessage;
     const topic = await getForumLinkedTopic(parsedMessage.parent_channel_id);

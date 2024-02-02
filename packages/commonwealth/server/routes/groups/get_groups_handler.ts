@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import z from 'zod';
 import { GetGroupsResult } from '../../controllers/server_groups_methods/get_groups';
 import { ServerControllers } from '../../routing/router';
@@ -32,7 +32,7 @@ export const getGroupsHandler = async (
   } = validationResult.data;
 
   const result = await controllers.groups.getGroups({
-    community,
+    communityId: community.id,
     includeMembers: include_members,
     includeTopics: include_topics,
   });

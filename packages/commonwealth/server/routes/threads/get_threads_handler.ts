@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
 import { ServerControllers } from '../../routing/router';
 import {
@@ -55,7 +55,6 @@ export const getThreadsHandler = async (
   >,
   res: TypedResponse<GetThreadsResponse>,
 ) => {
-  const { community } = req;
   const { thread_ids, bulk, active, search, community_id } = req.query;
 
   // get threads by IDs
@@ -85,7 +84,7 @@ export const getThreadsHandler = async (
     } = req.query as BulkThreadsRequestQuery;
 
     const bulkThreads = await controllers.threads.getBulkThreads({
-      community,
+      communityId: community_id,
       stage,
       topicId: parseInt(topic_id, 10),
       includePinnedThreads: includePinnedThreads === 'true',
@@ -104,7 +103,7 @@ export const getThreadsHandler = async (
     const { threads_per_topic } = req.query as ActiveThreadsRequestQuery;
 
     const activeThreads = await controllers.threads.getActiveThreads({
-      community,
+      communityId: community_id,
       threadsPerTopic: parseInt(threads_per_topic, 10),
     });
     return success(res, activeThreads);
@@ -121,7 +120,7 @@ export const getThreadsHandler = async (
     }
 
     const searchResults = await controllers.threads.searchThreads({
-      community,
+      communityId: community_id,
       searchTerm: search,
       threadTitleOnly: thread_title_only === 'true',
       limit: parseInt(limit, 10) || 0,

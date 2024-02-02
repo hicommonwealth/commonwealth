@@ -1,5 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
-import { Requirement } from '@hicommonwealth/core';
+import { AppError, Requirement } from '@hicommonwealth/core';
 import { GroupAttributes, GroupMetadata } from '@hicommonwealth/model';
 import z from 'zod';
 import { ServerControllers } from '../../routing/router';
@@ -18,7 +17,7 @@ export const updateGroupHandler = async (
   req: TypedRequest<UpdateGroupBody, null, UpdateGroupParams>,
   res: TypedResponse<UpdateGroupResponse>,
 ) => {
-  const { user, address, community } = req;
+  const { user, address } = req;
 
   const schema = z.object({
     params: z.object({
@@ -47,7 +46,6 @@ export const updateGroupHandler = async (
 
   const [group, analyticsOptions] = await controllers.groups.updateGroup({
     user,
-    community,
     address,
     groupId,
     metadata: metadata as Required<typeof metadata>,
@@ -58,7 +56,10 @@ export const updateGroupHandler = async (
   // refresh memberships in background if requirements updated
   if (requirements?.length > 0) {
     controllers.groups
-      .refreshCommunityMemberships({ community, group })
+      .refreshCommunityMemberships({
+        communityId: group.community_id,
+        groupId: group.id,
+      })
       .catch(console.error);
   }
 

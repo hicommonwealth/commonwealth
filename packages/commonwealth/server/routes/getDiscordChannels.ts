@@ -35,7 +35,7 @@ const getDiscordChannels = async (
   req: TypedRequestBody<GetDiscordChannelsReq>,
   res: TypedResponse<GetDiscordChannelsResp>,
 ) => {
-  const { chain: community } = req;
+  const { community } = req;
 
   const configEntry = await models.DiscordBotConfig.findOne({
     where: {

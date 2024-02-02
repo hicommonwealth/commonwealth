@@ -73,6 +73,10 @@ export const cache = port(function cache(cache?: Cache) {
       deleteKey: () => Promise.resolve(0),
       deleteNamespaceKeys: () => Promise.resolve(0),
       flushAll: () => Promise.resolve(),
+      incrementKey: () => Promise.resolve(0),
+      decrementKey: () => Promise.resolve(0),
+      getKeyTTL: () => Promise.resolve(0),
+      setKeyTTL: () => Promise.resolve(false),
     }
   );
 });
