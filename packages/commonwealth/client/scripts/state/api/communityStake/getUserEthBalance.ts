@@ -12,8 +12,8 @@ const getUserEthBalance = async ({
   walletAddress,
 }: GetUserEthBalanceProps) => {
   const communityStakes = new CommunityStakes(
-    factoryContracts[ValidChains.Goerli].communityStake,
-    factoryContracts[ValidChains.Goerli].factory,
+    factoryContracts[ValidChains.Sepolia].communityStake,
+    factoryContracts[ValidChains.Sepolia].factory,
     chainRpc,
   );
 

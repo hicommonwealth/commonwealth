@@ -116,7 +116,7 @@ export async function __createThreadReaction(
         this.tokenBalanceCache,
         community.namespace,
         stake.stake_id,
-        ValidChains.Goerli,
+        ValidChains.Sepolia,
         address.address,
         this.models,
       );
