@@ -1,4 +1,5 @@
 import { ValidChains } from '@hicommonwealth/chains';
+import { calculateVoteWeight } from '@hicommonwealth/chains/src/commonProtocol/utils';
 import { AppError, NotificationCategories } from '@hicommonwealth/core';
 import {
   AddressInstance,
@@ -104,7 +105,7 @@ export async function __createThreadReaction(
       where: { community_id: thread.community_id },
     });
     if (stake) {
-      const vote_weight = stake.vote_weight;
+      const voteWeight = stake.vote_weight;
       const community = await this.models.Community.findByPk(
         thread.community_id,
       );
@@ -119,7 +120,7 @@ export async function __createThreadReaction(
         address.address,
         this.models,
       );
-      calculatedVotingWeight = parseInt(stakeBalance, 10) * vote_weight;
+      calculatedVotingWeight = calculateVoteWeight(stakeBalance, voteWeight);
     }
   }
 

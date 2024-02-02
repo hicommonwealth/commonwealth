@@ -1,29 +1,36 @@
 import React from 'react';
 import { isMobile } from 'react-device-detect';
-import { CWText } from '../../cw_text';
-import { ComponentType } from '../../types';
-import CWIconButton from '../CWIconButton';
-import CWPopover, { usePopover } from '../CWPopover';
-import { CWButton } from '../cw_button';
-import './CWVoteWeightModule.scss';
+
+import { CWText } from 'views/components/component_kit/cw_text';
+import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
+import CWPopover, {
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { ManageCommunityStakeModalMode } from 'views/modals/ManageCommunityStakeModal/types';
+import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
+
+import './VoteWeightModule.scss';
 
 type VoteWeightModuleProps = {
   voteWeight: number;
   stakeNumber: number;
   stakeValue: number;
   denomination: string;
+  onOpenStakeModal: (modalMode: ManageCommunityStakeModalMode) => void;
 };
 
-export const CWVoteWeightModule = ({
+export const VoteWeightModule = ({
   voteWeight,
   stakeNumber,
   stakeValue,
   denomination,
+  onOpenStakeModal,
 }: VoteWeightModuleProps) => {
   const popoverProps = usePopover();
 
   return (
-    <div className={ComponentType.VoteWeightModule}>
+    <div className="VoteWeightModule">
       <div className="content">
         <div className="title-container">
           <CWText type="caption" fontWeight="uppercase">
@@ -45,24 +52,26 @@ export const CWVoteWeightModule = ({
               You have {stakeNumber} stake
             </CWText>
             <CWText type="caption" className="stake-value">
-              valued at {stakeValue} {denomination}
+              valued at {capDecimals(String(stakeValue))} {denomination}
             </CWText>
           </div>
-          {stakeNumber > 1 ? (
+          {stakeNumber >= 1 ? (
             <div className="actions">
               <CWButton
                 label="Buy stake"
                 buttonType="secondary"
                 buttonAlt="green"
                 buttonHeight="sm"
-                buttonWidth="narrow"
+                buttonWidth="full"
+                onClick={() => onOpenStakeModal('buy')}
               />
               <CWButton
                 label="Sell stake"
                 buttonType="secondary"
                 buttonAlt="rorange"
                 buttonHeight="sm"
-                buttonWidth="narrow"
+                buttonWidth="full"
+                onClick={() => onOpenStakeModal('sell')}
               />
             </div>
           ) : (
@@ -73,6 +82,7 @@ export const CWVoteWeightModule = ({
                 buttonAlt="green"
                 buttonHeight="sm"
                 buttonWidth="full"
+                onClick={() => onOpenStakeModal('buy')}
               />
             </div>
           )}
@@ -97,17 +107,18 @@ export const CWVoteWeightModule = ({
         body={
           <div className="explanation-container">
             <CWText type="b2">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla
-              egestas sem non laoreet suscipit.
+              Your vote weight is based on membership and the amount of Stake
+              you have in your wallet.
             </CWText>
 
             <CWText type="b2">
-              Aenean commodo id nisi vitae elementum. Ut imperdiet nibh id elit
-              facilisis hendrerit.
+              Each member of this community gets 1 vote for joining.
             </CWText>
 
             <CWText type="b2">
-              Donec a sagittis arcu. Phasellus at auctor arcu.
+              All other vote weight is provided by the amount of stake in your
+              wallet, and the vote weight provided per stake by the
+              community&apos;s stake contract.
             </CWText>
           </div>
         }
