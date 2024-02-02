@@ -2,8 +2,7 @@ import clsx from 'clsx';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 
-import { STAKE_ID } from '@hicommonwealth/chains';
-import { calculateVoteWeight } from '@hicommonwealth/chains/src/commonProtocol/utils';
+import { STAKE_ID, calculateVoteWeight } from '@hicommonwealth/chains';
 import app from 'state';
 import {
   useBuyStakeMutation,
