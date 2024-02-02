@@ -3,11 +3,11 @@ import NamespaceFactory from 'helpers/ContractHelpers/NamespaceFactory';
 import app from 'state';
 
 const useNamespaceFactory = () => {
-  const goerliFactoryAddress = factoryContracts[ValidChains.Sepolia].factory;
+  const chainFactoryAddress = factoryContracts[ValidChains.Sepolia].factory;
   const chainRpc = app.config.nodes
     .getAll()
     .find((node) => node.ethChainId === ValidChains.Sepolia)?.url;
-  const namespaceFactory = new NamespaceFactory(goerliFactoryAddress, chainRpc);
+  const namespaceFactory = new NamespaceFactory(chainFactoryAddress, chainRpc);
 
   return { namespaceFactory };
 };

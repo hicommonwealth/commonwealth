@@ -20,7 +20,6 @@ export const convertEthToUsd = (
 };
 
 export const buildEtherscanLink = (txHash: string) => {
-  // TODO remove goerli before production deployment
   const prefix = 'sepolia.';
   return `https://${prefix}etherscan.io/tx/${txHash}`;
 };
