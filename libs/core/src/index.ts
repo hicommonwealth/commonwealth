@@ -1,4 +1,5 @@
 export * from './command';
+export * as commonProtocol from './commonProtocol';
 export * from './errors';
 export * from './ports';
 export * from './requirements-types';

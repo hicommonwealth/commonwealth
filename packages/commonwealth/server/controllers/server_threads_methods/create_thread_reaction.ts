@@ -1,6 +1,8 @@
-import { ValidChains } from '@hicommonwealth/chains';
-import { calculateVoteWeight } from '@hicommonwealth/chains/src/commonProtocol/utils';
-import { AppError, NotificationCategories } from '@hicommonwealth/core';
+import {
+  AppError,
+  NotificationCategories,
+  commonProtocol,
+} from '@hicommonwealth/core';
 import {
   AddressInstance,
   ReactionAttributes,
@@ -116,11 +118,14 @@ export async function __createThreadReaction(
         this.tokenBalanceCache,
         community.namespace,
         stake.stake_id,
-        ValidChains.Goerli,
+        commonProtocol.ValidChains.Goerli,
         address.address,
         this.models,
       );
-      calculatedVotingWeight = calculateVoteWeight(stakeBalance, voteWeight);
+      calculatedVotingWeight = commonProtocol.calculateVoteWeight(
+        stakeBalance,
+        voteWeight,
+      );
     }
   }
 

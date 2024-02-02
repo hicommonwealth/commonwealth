@@ -1,5 +1,4 @@
-import { STAKE_ID } from '@hicommonwealth/chains';
-import { calculateVoteWeight } from '@hicommonwealth/chains/build/commonProtocol/utils';
+import { commonProtocol } from '@hicommonwealth/core';
 import { featureFlags } from 'helpers/feature-flags';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import app from 'state';
@@ -16,7 +15,11 @@ interface UseCommunityStakeProps {
 }
 
 const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
-  const { communityId, stakeId = STAKE_ID, walletAddress } = props;
+  const {
+    communityId,
+    stakeId = commonProtocol.STAKE_ID,
+    walletAddress,
+  } = props;
   const { isLoggedIn } = useUserLoggedIn();
 
   const activeCommunityId = app?.chain?.id;
@@ -46,7 +49,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     data: userStakeBalanceData,
   } = useGetUserStakeBalanceQuery({
     namespace: activeCommunityNamespace,
-    stakeId: STAKE_ID,
+    stakeId: commonProtocol.STAKE_ID,
     apiEnabled,
     chainRpc,
     walletAddress: walletAddress || activeAccountAddress,
@@ -56,14 +59,14 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
   const { isInitialLoading: buyPriceDataLoading, data: buyPriceData } =
     useGetBuyPriceQuery({
       namespace: activeCommunityNamespace,
-      stakeId: STAKE_ID,
+      stakeId: commonProtocol.STAKE_ID,
       amount: Number(userStakeBalanceData),
       apiEnabled: apiEnabled && !isNaN(Number(userStakeBalanceData)),
       chainRpc,
       keepPreviousData: true,
     });
 
-  const currentVoteWeight = calculateVoteWeight(
+  const currentVoteWeight = commonProtocol.calculateVoteWeight(
     userStakeBalanceData,
     stakeData?.vote_weight,
   );

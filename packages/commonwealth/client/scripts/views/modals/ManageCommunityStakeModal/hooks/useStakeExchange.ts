@@ -1,4 +1,4 @@
-import { STAKE_ID } from '@hicommonwealth/chains';
+import { commonProtocol } from '@hicommonwealth/core';
 import app from 'state';
 import {
   useFetchEthUsdRateQuery,
@@ -30,7 +30,7 @@ const useStakeExchange = ({
 
   const { data: buyPriceData } = useGetBuyPriceQuery({
     namespace: activeCommunityNamespace,
-    stakeId: STAKE_ID,
+    stakeId: commonProtocol.STAKE_ID,
     amount: numberOfStakeToExchange,
     apiEnabled: mode === 'buy',
     chainRpc,
@@ -38,7 +38,7 @@ const useStakeExchange = ({
 
   const { data: sellPriceData } = useGetSellPriceQuery({
     namespace: activeCommunityNamespace,
-    stakeId: STAKE_ID,
+    stakeId: commonProtocol.STAKE_ID,
     amount: numberOfStakeToExchange,
     apiEnabled: mode === 'sell',
     chainRpc,

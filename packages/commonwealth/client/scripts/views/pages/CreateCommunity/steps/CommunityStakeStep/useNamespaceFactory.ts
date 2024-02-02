@@ -1,12 +1,13 @@
-import { factoryContracts, ValidChains } from '@hicommonwealth/chains';
+import { commonProtocol } from '@hicommonwealth/core';
 import NamespaceFactory from 'helpers/ContractHelpers/NamespaceFactory';
 import app from 'state';
 
 const useNamespaceFactory = () => {
-  const goerliFactoryAddress = factoryContracts[ValidChains.Goerli].factory;
+  const goerliFactoryAddress =
+    commonProtocol.factoryContracts[commonProtocol.ValidChains.Goerli].factory;
   const chainRpc = app.config.nodes
     .getAll()
-    .find((node) => node.ethChainId === ValidChains.Goerli)?.url;
+    .find((node) => node.ethChainId === commonProtocol.ValidChains.Goerli)?.url;
   const namespaceFactory = new NamespaceFactory(goerliFactoryAddress, chainRpc);
 
   return { namespaceFactory };

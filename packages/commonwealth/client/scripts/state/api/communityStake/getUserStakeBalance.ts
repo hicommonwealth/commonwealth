@@ -1,4 +1,4 @@
-import { factoryContracts, ValidChains } from '@hicommonwealth/chains';
+import { commonProtocol } from '@hicommonwealth/core';
 import { useQuery } from '@tanstack/react-query';
 import CommunityStakes from 'helpers/ContractHelpers/CommunityStakes';
 import { ContractMethods } from 'state/api/config';
@@ -17,8 +17,10 @@ const getUserStakeBalance = async ({
   walletAddress,
 }: GetUserStakeBalanceProps) => {
   const communityStakes = new CommunityStakes(
-    factoryContracts[ValidChains.Goerli].communityStake,
-    factoryContracts[ValidChains.Goerli].factory,
+    commonProtocol.factoryContracts[
+      commonProtocol.ValidChains.Goerli
+    ].communityStake,
+    commonProtocol.factoryContracts[commonProtocol.ValidChains.Goerli].factory,
     chainRpc,
   );
 
