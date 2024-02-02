@@ -224,7 +224,8 @@ const app: IApp = {
   },
   skipDeinitChain: false,
 };
-
+//allows for FS.identify to be used
+declare const window: any;
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
 export async function initAppState(
