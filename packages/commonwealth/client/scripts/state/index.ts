@@ -224,7 +224,8 @@ const app: IApp = {
   },
   skipDeinitChain: false,
 };
-
+//allows for FS.identify to be used
+declare const window: any;
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
 export async function initAppState(
@@ -315,6 +316,16 @@ export async function initAppState(
       app.user.setSelectedChain(
         ChainInfo.fromJSON(statusRes.result.user.selectedChain),
       );
+    }
+
+    if (statusRes.result.user) {
+      try {
+        window.FS('setIdentity', {
+          uid: statusRes.result.user.profileId,
+        });
+      } catch (e) {
+        console.error('FullStory not found.');
+      }
     }
   } catch (err) {
     app.loadingError =
