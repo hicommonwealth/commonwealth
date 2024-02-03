@@ -80,13 +80,14 @@ export const isThreadAuthor: ActorMiddleware = async (actor) => {
   if (actor.user.isAdmin) return actor;
   if (!actor.address_id) return 'Must provide an address';
   if (!actor.aggregate_id) return 'Must provide a thread id';
-  const address = await models.Thread.findOne({
+  const thread = await models.Thread.findOne({
     where: {
       id: actor.aggregate_id,
       address_id: actor.address_id,
     },
   });
-  if (!address) return 'User not the author of the thread';
+  if (!thread) return 'User not the author of the thread';
+  //TODO: include loaded entity in actor?
   return { ...actor, author: true };
 };
 
@@ -98,12 +99,13 @@ export const isCommentAuthor: ActorMiddleware = async (actor) => {
   if (actor.user.isAdmin) return actor;
   if (!actor.address_id) return 'Must provide an address';
   if (!actor.aggregate_id) return 'Must provide a comment id';
-  const address = await models.Comment.findOne({
+  const comment = await models.Comment.findOne({
     where: {
       id: actor.aggregate_id,
       address_id: actor.address_id,
     },
   });
-  if (!address) return 'User not the author of the comment';
+  if (!comment) return 'User not the author of the comment';
+  //TODO: include loaded entity in actor?
   return { ...actor, author: true };
 };
