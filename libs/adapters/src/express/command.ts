@@ -11,7 +11,7 @@ import { z, ZodSchema } from 'zod';
  * @returns express command handler
  */
 export const expressCommand =
-  <M extends ZodSchema, R>(md: CommandMetadata<M, R>): RequestHandler =>
+  <T, M extends ZodSchema, R>(md: CommandMetadata<T, M, R>): RequestHandler =>
   async (
     req: Request<
       { id: string },

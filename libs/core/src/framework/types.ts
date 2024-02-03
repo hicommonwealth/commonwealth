@@ -13,28 +13,29 @@ export type User = {
 /**
  * "Core" abstraction representing the "user acting on the system", either invoking a command on an aggregate, or querying a projection
  * - Common actors are identified by their unique `user.id` (jwt signin flow)
- *   - `user`: user profile attributes
+ *   - `user`: authenticated user attributes
  * - Actors can "optionally" carry the following unique ids:
- *   - `address_id`: the current web wallet address (TODO: is this optional?)
+ *   - `address_id`: the active web wallet address
  *   - `aggregate_id`: the aggregate id when invoking a command
  * - Actors can also pre-load and validate state via chained {@link ActorMiddleware} reusable utilities
- *   - `author`: user is the author of the aggregate
+ *   - `aggregate`: the loaded aggregate when invoking a command
+ *   - `author`: true when user is the author of the aggregate
  */
-export type Actor = {
+export type Actor<T> = {
   // must be signed in
   user: User;
   address_id?: string;
   aggregate_id?: string;
+  aggregate?: T | null;
   author?: boolean;
 };
 
 /**
  * Middleware signature to loads and/or validates actor state in a chain of responsibility pattern
  * @param actor the current actor state
- * @returns the updated actor state or error string
- * - TODO: should we use [error, actor] tuples instead of returning string?
+ * @returns the updated actor state, or throws invalid actor errors
  */
-export type ActorMiddleware = (actor: Actor) => Promise<Actor | string>;
+export type ActorMiddleware<T> = (actor: Actor<T>) => Promise<Actor<T>>;
 
 /**
  * Command action signature
@@ -42,10 +43,10 @@ export type ActorMiddleware = (actor: Actor) => Promise<Actor | string>;
  * @param payload command payload
  * @param actor command actor
  */
-export type Command<M extends ZodSchema, R> = (
+export type Command<T, M extends ZodSchema, R> = (
   id: string,
   payload: z.infer<M>,
-  actor: Actor,
+  actor: Actor<T>,
 ) => Promise<R>;
 
 /**
@@ -55,16 +56,16 @@ export type Command<M extends ZodSchema, R> = (
  */
 export type Query<M extends ZodSchema, R> = (
   payload: z.infer<M>,
-  actor: Actor,
+  actor: Actor<never>,
 ) => Promise<R | undefined | null>;
 
 /**
  * Command definition
  */
-export type CommandMetadata<M extends ZodSchema, R> = {
-  fn: Command<M, R>;
+export type CommandMetadata<T, M extends ZodSchema, R> = {
+  fn: Command<T, M, R>;
   schema: M;
-  middleware?: ActorMiddleware[];
+  middleware?: ActorMiddleware<T>[];
 };
 
 /**
@@ -73,5 +74,5 @@ export type CommandMetadata<M extends ZodSchema, R> = {
 export type QueryMetadata<M extends ZodSchema, R> = {
   fn: Query<M, R>;
   schema: M;
-  middleware?: ActorMiddleware[];
+  middleware?: ActorMiddleware<never>[];
 };

@@ -7,7 +7,11 @@ export const schema = z.object({
   content: z.string(),
 });
 
-export const CreateThread: CommandMetadata<typeof schema, ThreadAttributes> = {
+export const CreateThread: CommandMetadata<
+  ThreadAttributes,
+  typeof schema,
+  ThreadAttributes
+> = {
   schema,
   fn: async () =>
     //actor,

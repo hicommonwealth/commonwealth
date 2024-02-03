@@ -1,5 +1,5 @@
 import { ZodError, ZodSchema } from 'zod';
-import { InvalidInput } from './errors';
+import { INVALID_ACTOR_ERROR, InvalidInput } from './errors';
 import { QueryMetadata, type Actor } from './types';
 import { validateActor } from './utils';
 
@@ -14,7 +14,7 @@ import { validateActor } from './utils';
 export const query = async <M extends ZodSchema, R>(
   md: QueryMetadata<M, R>,
   payload: M,
-  actor: Actor,
+  actor: Actor<never>,
 ): Promise<R | undefined | null> => {
   try {
     return md.fn(
@@ -22,11 +22,13 @@ export const query = async <M extends ZodSchema, R>(
       await validateActor(actor, md.middleware || []),
     );
   } catch (error) {
-    if (error instanceof Error && error.name === 'ZodError') {
-      const details = (error as ZodError).issues.map(
-        ({ path, message }) => `${path.join('.')}: ${message}`,
-      );
-      throw new InvalidInput('Invalid query', details);
+    if (error instanceof Error) {
+      if (error.name === 'ZodError') {
+        const details = (error as ZodError).issues.map(
+          ({ path, message }) => `${path.join('.')}: ${message}`,
+        );
+        throw new InvalidInput('Invalid query', details);
+      } else if (error.name === INVALID_ACTOR_ERROR) throw error;
     }
     throw new InvalidInput('Invalid query', [error as string]);
   }

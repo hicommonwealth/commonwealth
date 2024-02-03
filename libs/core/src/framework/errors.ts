@@ -12,7 +12,7 @@ export class InvalidInput extends Error {
 
 export const INVALID_ACTOR_ERROR = 'InvalidActorError';
 export class InvalidActor extends Error {
-  constructor(public actor: Actor, message: string) {
+  constructor(public actor: Actor<unknown>, message: string) {
     super(message);
     this.name = INVALID_ACTOR_ERROR;
   }

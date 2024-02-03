@@ -56,6 +56,7 @@ const schema = z.object({
 export type CreateCommunity = z.infer<typeof schema>;
 
 export const CreateCommunity: CommandMetadata<
+  CommunityAttributes,
   typeof schema,
   CommunityAttributes
 > = {

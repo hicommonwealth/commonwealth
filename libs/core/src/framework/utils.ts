@@ -1,4 +1,3 @@
-import { InvalidActor } from './errors';
 import { Actor, ActorMiddleware } from './types';
 
 /**
@@ -7,14 +6,12 @@ import { Actor, ActorMiddleware } from './types';
  * @param middleware chained actor middlewares
  * @returns validated actor
  */
-export const validateActor = async (
-  actor: Actor,
-  middleware: ActorMiddleware[],
-): Promise<Actor> => {
+export const validateActor = async <T>(
+  actor: Actor<T>,
+  middleware: ActorMiddleware<T>[],
+): Promise<Actor<T>> => {
   for (const fn of middleware) {
-    const result = await fn(actor);
-    if (typeof result === 'string') throw new InvalidActor(actor, result);
-    actor = result;
+    actor = await fn(actor);
   }
   return actor;
 };

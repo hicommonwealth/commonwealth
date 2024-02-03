@@ -1,5 +1,5 @@
 import { ZodError, ZodSchema } from 'zod';
-import { InvalidInput } from './errors';
+import { INVALID_ACTOR_ERROR, InvalidInput } from './errors';
 import { CommandMetadata, type Actor } from './types';
 import { validateActor } from './utils';
 
@@ -12,11 +12,11 @@ import { validateActor } from './utils';
  * @param actor command actor
  * @returns command response
  */
-export const command = async <M extends ZodSchema, R>(
-  md: CommandMetadata<M, R>,
+export const command = async <T, M extends ZodSchema, R>(
+  md: CommandMetadata<T, M, R>,
   id: string,
   payload: M,
-  actor: Actor,
+  actor: Actor<T>,
 ): Promise<R> => {
   try {
     return md.fn(
@@ -25,11 +25,13 @@ export const command = async <M extends ZodSchema, R>(
       await validateActor(actor, md.middleware || []),
     );
   } catch (error) {
-    if (error instanceof Error && error.name === 'ZodError') {
-      const details = (error as ZodError).issues.map(
-        ({ path, message }) => `${path.join('.')}: ${message}`,
-      );
-      throw new InvalidInput('Invalid command', details);
+    if (error instanceof Error) {
+      if (error.name === 'ZodError') {
+        const details = (error as ZodError).issues.map(
+          ({ path, message }) => `${path.join('.')}: ${message}`,
+        );
+        throw new InvalidInput('Invalid command', details);
+      } else if (error.name === INVALID_ACTOR_ERROR) throw error;
     }
     throw new InvalidInput('Invalid command', [error as string]);
   }

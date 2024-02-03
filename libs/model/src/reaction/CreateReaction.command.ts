@@ -8,6 +8,7 @@ export const schema = z.object({
 });
 
 export const CreateReaction: CommandMetadata<
+  ReactionAttributes,
   typeof schema,
   ReactionAttributes
 > = {

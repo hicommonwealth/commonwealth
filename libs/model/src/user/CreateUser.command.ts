@@ -7,7 +7,11 @@ export const schema = z.object({
   content: z.string(),
 });
 
-export const CreateUser: CommandMetadata<typeof schema, UserAttributes> = {
+export const CreateUser: CommandMetadata<
+  UserAttributes,
+  typeof schema,
+  UserAttributes
+> = {
   schema,
   fn: async () =>
     //actor,

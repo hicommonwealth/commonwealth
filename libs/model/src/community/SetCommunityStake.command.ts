@@ -2,7 +2,7 @@ import { CommandMetadata, InvalidInput } from '@hicommonwealth/core';
 import { z } from 'zod';
 import { models } from '../database';
 import { isCommunityAdmin } from '../middleware';
-import { CommunityStakeAttributes } from '../models/community_stake';
+import { CommunityAttributes, CommunityStakeAttributes } from '../models';
 import { validateCommunityStakeConfig } from '../services/commonProtocol';
 
 const schema = z.object({
@@ -16,6 +16,7 @@ export type SetCommunityStake = z.infer<typeof schema>;
 
 // !command pattern
 export const SetCommunityStake: CommandMetadata<
+  CommunityAttributes,
   // !command schema
   typeof schema,
   // !response type

@@ -10,6 +10,7 @@ export const schema = z.object({
 });
 
 export const SetCommunityNamespace: CommandMetadata<
+  CommunityAttributes,
   typeof schema,
   CommunityAttributes
 > = {
