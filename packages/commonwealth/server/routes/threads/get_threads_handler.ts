@@ -70,13 +70,9 @@ export const getThreadsHandler = async (
 
   // get threads by IDs
   if (thread_ids) {
-    const threadIds = thread_ids.map((id) => parseInt(id, 10));
-    for (const id of threadIds) {
-      if (isNaN(id)) {
-        throw new AppError(Errors.InvalidThreadId);
-      }
-    }
-    const threads = await controllers.threads.getThreadsByIds({ threadIds });
+    const threads = await controllers.threads.getThreadsByIds({
+      threadIds: thread_ids,
+    });
     return success(res, threads);
   }
 
