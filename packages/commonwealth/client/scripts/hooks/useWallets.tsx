@@ -177,10 +177,13 @@ const useWallets = (walletProps: IuseWalletProps) => {
   }, []);
 
   // Handles Magic Link Login
-  const onEmailLogin = async () => {
+  const onEmailLogin = async (emailToUse = '') => {
+    const tempEmailToUse = emailToUse || email;
+    setEmail(tempEmailToUse);
+
     setIsMagicLoading(true);
 
-    if (!email) {
+    if (!tempEmailToUse) {
       notifyError('Please enter a valid email address.');
       setIsMagicLoading(false);
       return;
@@ -189,7 +192,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     try {
       const isCosmos = app.chain?.base === ChainBase.CosmosSDK;
       const { address: magicAddress } = await startLoginWithMagicLink({
-        email,
+        email: tempEmailToUse,
         isCosmos,
         redirectTo: document.location.pathname + document.location.search,
         chain: app.chain?.id,

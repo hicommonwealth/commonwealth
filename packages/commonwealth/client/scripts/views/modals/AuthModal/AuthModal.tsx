@@ -17,6 +17,7 @@ import {
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
 import './AuthModal.scss';
+import { EmailForm } from './EmailForm';
 import { AuthModalProps, AuthModalTabs } from './types';
 
 const AuthModal = ({
@@ -26,9 +27,22 @@ const AuthModal = ({
   showWalletsFor,
 }: AuthModalProps) => {
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
+  const [isAuthenticatingWithEmail, setIsAuthenticatingWithEmail] =
+    useState(false);
 
-  const { wallets, onWalletSelect, onSocialLogin } = useWallets({
-    onModalClose: onClose,
+  const handleClose = async () => {
+    setIsAuthenticatingWithEmail(false);
+    await onClose();
+  };
+
+  const {
+    wallets,
+    isMagicLoading,
+    onEmailLogin,
+    onWalletSelect,
+    onSocialLogin,
+  } = useWallets({
+    onModalClose: handleClose,
     onSuccess,
   });
 
@@ -76,7 +90,7 @@ const AuthModal = ({
 
   const onAuthMethodSelect = async (option: AuthTypes) => {
     if (option === 'email') {
-      // TODO: implement this in https://github.com/hicommonwealth/commonwealth/issues/6386
+      setIsAuthenticatingWithEmail(true);
       return;
     }
 
@@ -101,11 +115,15 @@ const AuthModal = ({
   return (
     <CWModal
       open={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
       size="medium"
       content={
         <section className="AuthModal">
-          <CWIcon iconName="close" onClick={onClose} className="close-btn" />
+          <CWIcon
+            iconName="close"
+            onClick={handleClose}
+            className="close-btn"
+          />
 
           <img src="/static/img/branding/common-logo.svg" className="logo" />
 
@@ -119,6 +137,7 @@ const AuthModal = ({
                 <CWTab
                   key={tab.name}
                   label={tab.name}
+                  isDisabled={isMagicLoading}
                   isSelected={tabsList[activeTabIndex].name === tab.name}
                   onClick={() => setActiveTabIndex(index)}
                 />
@@ -126,17 +145,34 @@ const AuthModal = ({
             </CWTabsRow>
 
             <section className="auth-options">
+              {/* On the wallets tab, if no wallet is found, show "No wallets Found" */}
               {activeTabIndex === 0 &&
-              tabsList[activeTabIndex].options.length === 0 ? (
-                <AuthButton type="NO_WALLETS_FOUND" />
-              ) : (
+                tabsList[activeTabIndex].options.length === 0 && (
+                  <AuthButton type="NO_WALLETS_FOUND" />
+                )}
+
+              {/*
+                If email option is selected don't render SSO's list,
+                else render wallets/SSO's list based on activeTabIndex
+              */}
+              {(activeTabIndex === 0 ||
+                (activeTabIndex === 1 && !isAuthenticatingWithEmail)) &&
                 tabsList[activeTabIndex].options.map((option, key) => (
                   <AuthButton
                     key={key}
                     type={option}
+                    disabled={isMagicLoading}
                     onClick={async () => await onAuthMethodSelect(option)}
                   />
-                ))
+                ))}
+
+              {/* If email option is selected from the SSO's list, show email form */}
+              {activeTabIndex === 1 && isAuthenticatingWithEmail && (
+                <EmailForm
+                  isLoading={isMagicLoading}
+                  onCancel={() => setIsAuthenticatingWithEmail(false)}
+                  onSubmit={async ({ email }) => await onEmailLogin(email)}
+                />
               )}
             </section>
           </CWModalBody>
