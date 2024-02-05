@@ -35,4 +35,7 @@ export type AuthButtonProps = {
   onClick?: () => any;
   className?: string;
   disabled?: boolean;
+  showDescription?: boolean;
+  rounded?: boolean;
+  variant?: 'light' | 'dark';
 };
