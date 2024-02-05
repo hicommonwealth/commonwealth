@@ -12,6 +12,8 @@ type EVMWalletsSubModalProps = {
   disabled?: boolean;
   availableWallets?: EVMWallets[];
   onWalletSelect?: (wallet: EVMWallets) => any;
+  canResetWalletConnect?: boolean;
+  onResetWalletConnect?: () => any;
 };
 
 const EVMWalletsSubModal = ({
@@ -20,6 +22,8 @@ const EVMWalletsSubModal = ({
   disabled,
   availableWallets,
   onWalletSelect,
+  canResetWalletConnect,
+  onResetWalletConnect,
 }: EVMWalletsSubModalProps) => {
   return (
     <CWModal
@@ -38,15 +42,26 @@ const EVMWalletsSubModal = ({
 
           <section className="evm-wallet-list">
             {availableWallets.map((wallet) => (
-              <AuthButton
-                key={wallet}
-                type={wallet}
-                rounded
-                variant="dark"
-                showDescription={false}
-                onClick={async () => await onWalletSelect(wallet)}
-                disabled={disabled}
-              />
+              <>
+                <AuthButton
+                  key={wallet}
+                  type={wallet}
+                  rounded
+                  variant="dark"
+                  showDescription={false}
+                  onClick={async () => await onWalletSelect(wallet)}
+                  disabled={disabled}
+                />
+                {/* Show reset button for wallet connect, if its auth flow session is active */}
+                {wallet === 'walletconnect' && canResetWalletConnect && (
+                  <button
+                    className="wallet-connect-reset-btn"
+                    onClick={onResetWalletConnect}
+                  >
+                    Reset WalletConnect
+                  </button>
+                )}
+              </>
             ))}
           </section>
         </section>
