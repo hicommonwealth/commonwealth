@@ -63,7 +63,7 @@ export const CommentReactionButton = ({
   const hasReacted = !!(comment.reactions || []).find(
     (x) => x?.author === activeAddress,
   );
-  const likes = (comment.reactions || []).length;
+  const likes = comment.reactionWeightsSum;
 
   const handleVoteClick = async (e) => {
     e.stopPropagation();
