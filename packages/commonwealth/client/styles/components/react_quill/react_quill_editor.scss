@@ -16,13 +16,11 @@
 
   .CustomQuillToolbar {
     display: flex;
-    justify-content: space-between;
     border: none !important;
     background-color: $white;
     border-bottom: 1px solid $neutral-200 !important;
 
-    .left-buttons,
-    .right-buttons {
+    .left-buttons {
       display: flex;
       align-items: center;
 
@@ -34,31 +32,6 @@
 
     .left-buttons {
       flex-wrap: wrap;
-    }
-
-    .right-buttons {
-      margin-left: auto;
-
-      .markdown-button {
-        border-radius: 6px;
-        font-size: 14px;
-        color: $primary-500;
-        font-weight: 500;
-        padding: 1px 8px !important;
-        outline: none;
-        width: auto;
-
-        &.enabled {
-          background: $primary-50;
-          color: $primary-600;
-        }
-      }
-
-      .eye-icon {
-        display: flex;
-        align-items: center;
-        padding: 4px;
-      }
     }
 
     .section {
