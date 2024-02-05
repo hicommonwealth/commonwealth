@@ -39,15 +39,17 @@ const authorizeAddress = async (
   if (!actor.address_id)
     throw new InvalidActor(actor, 'Must provide an address');
   // TODO: cache
-  const addr = await models.Address.findOne({
-    where: {
-      user_id: actor.user.id,
-      address: actor.address_id,
-      community_id,
-      role: { [Op.in]: roles },
-    },
-    order: [['role', 'DESC']],
-  });
+  const addr = (
+    await models.Address.findOne({
+      where: {
+        user_id: actor.user.id,
+        address: actor.address_id,
+        community_id,
+        role: { [Op.in]: roles },
+      },
+      order: [['role', 'DESC']],
+    })
+  )?.get({ plain: true });
   if (!addr)
     throw new InvalidActor(actor, `User is not ${roles} in the community`);
   return addr;
@@ -99,14 +101,16 @@ export const loadThread: CommandMiddleware<ThreadAttributes, any> = async ({
   payload,
 }) => {
   if (!id) throw new InvalidInput('Must provide a thread id');
-  const thread = await models.Thread.findOne({
-    where: { id },
-    include: {
-      model: models.Address,
-      required: true,
-      attributes: ['address'],
-    },
-  });
+  const thread = (
+    await models.Thread.findOne({
+      where: { id },
+      include: {
+        model: models.Address,
+        required: true,
+        attributes: ['address'],
+      },
+    })
+  )?.get({ plain: true });
   if (!thread) throw new InvalidInput(`Thread ${id} not found`);
   return { id, actor, payload, state: thread };
 };
@@ -136,14 +140,16 @@ export const loadComment: CommandMiddleware<CommentAttributes, any> = async ({
   payload,
 }) => {
   if (!id) throw new InvalidInput('Must provide a comment id');
-  const comment = await models.Comment.findOne({
-    where: { id },
-    include: {
-      model: models.Address,
-      required: true,
-      attributes: ['address'],
-    },
-  });
+  const comment = (
+    await models.Comment.findOne({
+      where: { id },
+      include: {
+        model: models.Address,
+        required: true,
+        attributes: ['address'],
+      },
+    })
+  )?.get({ plain: true });
   if (!comment) throw new InvalidInput(`Comment ${id} not found`);
   return { id, actor, payload, state: comment };
 };
