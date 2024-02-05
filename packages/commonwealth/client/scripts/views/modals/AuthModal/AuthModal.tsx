@@ -7,7 +7,11 @@ import AuthButton from '../../components/AuthButton';
 import { AuthTypes, AuthWallets } from '../../components/AuthButton/types';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
-import { CWModal } from '../../components/component_kit/new_designs/CWModal';
+import {
+  CWModal,
+  CWModalBody,
+  CWModalFooter,
+} from '../../components/component_kit/new_designs/CWModal';
 import {
   CWTab,
   CWTabsRow,
@@ -98,6 +102,7 @@ const AuthModal = ({
     <CWModal
       open={isOpen}
       onClose={onClose}
+      size="medium"
       content={
         <section className="AuthModal">
           <CWIcon iconName="close" onClick={onClose} className="close-btn" />
@@ -108,39 +113,43 @@ const AuthModal = ({
             Sign into Common
           </CWText>
 
-          <CWTabsRow className="tabs">
-            {tabsList.map((tab, index) => (
-              <CWTab
-                key={tab.name}
-                label={tab.name}
-                isSelected={tabsList[activeTabIndex].name === tab.name}
-                onClick={() => setActiveTabIndex(index)}
-              />
-            ))}
-          </CWTabsRow>
-
-          <section className="auth-options">
-            {activeTabIndex === 0 &&
-            tabsList[activeTabIndex].options.length === 0 ? (
-              <AuthButton type="NO_WALLETS_FOUND" />
-            ) : (
-              tabsList[activeTabIndex].options.map((option, key) => (
-                <AuthButton
-                  key={key}
-                  type={option}
-                  onClick={async () => await onAuthMethodSelect(option)}
+          <CWModalBody className="content">
+            <CWTabsRow className="tabs">
+              {tabsList.map((tab, index) => (
+                <CWTab
+                  key={tab.name}
+                  label={tab.name}
+                  isSelected={tabsList[activeTabIndex].name === tab.name}
+                  onClick={() => setActiveTabIndex(index)}
                 />
-              ))
-            )}
-          </section>
+              ))}
+            </CWTabsRow>
 
-          <CWText className="disclaimer">
-            By connecting to Common you agree to our&nbsp;
-            <br />
-            <Link to="/terms">Terms of Service</Link>
-            &nbsp;and&nbsp;
-            <Link to="/privacy">Privacy Policy</Link>
-          </CWText>
+            <section className="auth-options">
+              {activeTabIndex === 0 &&
+              tabsList[activeTabIndex].options.length === 0 ? (
+                <AuthButton type="NO_WALLETS_FOUND" />
+              ) : (
+                tabsList[activeTabIndex].options.map((option, key) => (
+                  <AuthButton
+                    key={key}
+                    type={option}
+                    onClick={async () => await onAuthMethodSelect(option)}
+                  />
+                ))
+              )}
+            </section>
+          </CWModalBody>
+
+          <CWModalFooter className="footer">
+            <CWText isCentered>
+              By connecting to Common you agree to our&nbsp;
+              <br />
+              <Link to="/terms">Terms of Service</Link>
+              &nbsp;and&nbsp;
+              <Link to="/privacy">Privacy Policy</Link>
+            </CWText>
+          </CWModalFooter>
         </section>
       }
     />
