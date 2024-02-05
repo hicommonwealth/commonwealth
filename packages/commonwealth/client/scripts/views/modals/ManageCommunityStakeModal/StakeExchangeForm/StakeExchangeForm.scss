@@ -8,6 +8,12 @@
     min-width: 180px;
   }
 
+  .CWModalBody {
+    @include heightSmallInclusive {
+      max-height: 300px;
+    }
+  }
+
   // address dropdown items
   .text-container {
     display: flex;
