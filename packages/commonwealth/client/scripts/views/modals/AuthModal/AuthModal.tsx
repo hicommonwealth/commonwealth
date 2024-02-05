@@ -40,12 +40,15 @@ const AuthModal = ({
   const handleClose = async () => {
     setIsAuthenticatingWithEmail(false);
     setIsEVMWalletsModalVisible(false);
+    isWalletConnectEnabled && (await onResetWalletConnect());
     await onClose();
   };
 
   const {
     wallets,
     isMagicLoading,
+    isWalletConnectEnabled,
+    onResetWalletConnect,
     onEmailLogin,
     onWalletSelect,
     onSocialLogin,
@@ -204,11 +207,21 @@ const AuthModal = ({
         }
       />
       <EVMWalletsSubModal
-        availableWallets={evmWallets}
+        availableWallets={
+          [
+            ...(evmWallets.includes('walletconnect') ? ['walletconnect'] : []),
+            ...evmWallets.filter((x) => x !== 'walletconnect'),
+          ] as EVMWallets[]
+        }
         isOpen={isEVMWalletsModalVisible}
-        onClose={() => setIsEVMWalletsModalVisible(false)}
+        onClose={async () => {
+          setIsEVMWalletsModalVisible(false);
+          isWalletConnectEnabled && (await onResetWalletConnect());
+        }}
         onWalletSelect={async (option) => await onAuthMethodSelect(option)}
         disabled={isMagicLoading}
+        canResetWalletConnect={isWalletConnectEnabled}
+        onResetWalletConnect={onResetWalletConnect}
       />
     </>
   );

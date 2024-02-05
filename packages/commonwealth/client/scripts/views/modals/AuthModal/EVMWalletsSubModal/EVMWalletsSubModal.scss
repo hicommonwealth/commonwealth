@@ -45,6 +45,17 @@
       flex-direction: column;
       gap: 8px;
       width: 100%;
+
+      .wallet-connect-reset-btn {
+        margin-left: auto;
+        color: $neutral-400;
+        outline: none;
+        border: none;
+        background-color: transparent;
+        font-size: 14px;
+        margin-bottom: 16px;
+        cursor: pointer;
+      }
     }
   }
 }
