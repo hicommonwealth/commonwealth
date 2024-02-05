@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # builds configured app
-exit 2
+yarn build
 
 # clean other heroku apps - should we only keep /build folders?
 if [ "$CW_BUILD" = true ]; then
