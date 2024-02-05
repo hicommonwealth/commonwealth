@@ -7,19 +7,15 @@ const schema = z.object({
   content: z.string(),
 });
 
-export const CreateComment: CommandMetadata<
-  CommentAttributes,
-  typeof schema,
-  CommentAttributes
-> = {
-  schema,
-  fn: async () =>
-    //actor,
-    //id,
-    //payload,
-    {
-      // TODO
-      const comment = await models.Comment.findOne();
-      return comment!;
+export const CreateComment: CommandMetadata<CommentAttributes, typeof schema> =
+  {
+    schema,
+    load: [],
+    body: async (context) => {
+      context.state = await models.Comment.findOne();
+      return context;
     },
-};
+    save: async (context) => {
+      return context;
+    },
+  };

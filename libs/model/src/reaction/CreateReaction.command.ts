@@ -9,17 +9,15 @@ export const schema = z.object({
 
 export const CreateReaction: CommandMetadata<
   ReactionAttributes,
-  typeof schema,
-  ReactionAttributes
+  typeof schema
 > = {
   schema,
-  fn: async () =>
-    //actor,
-    //id,
-    //payload,
-    {
-      // TODO
-      const reaction = await models.Reaction.findOne();
-      return reaction!;
-    },
+  load: [],
+  body: async (context) => {
+    context.state = await models.Reaction.findOne();
+    return context;
+  },
+  save: async (context) => {
+    return context;
+  },
 };

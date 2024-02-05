@@ -9,21 +9,24 @@ const schema = z.object({
 });
 
 export const GetCommunityStake: QueryMetadata<
-  typeof schema,
-  CommunityStakeAttributes
+  CommunityStakeAttributes,
+  typeof schema
 > = {
   schema,
-  middleware: [],
-  fn: async (payload) => {
-    return await models.CommunityStake.findOne({
-      where: payload,
-      include: [
-        {
-          model: models.Community,
-          required: true,
-          attributes: ['namespace'],
-        },
-      ],
-    });
+  auth: [],
+  body: async ({ actor, payload }) => {
+    const results = (
+      await models.CommunityStake.findOne({
+        where: payload,
+        include: [
+          {
+            model: models.Community,
+            required: true,
+            attributes: ['namespace'],
+          },
+        ],
+      })
+    )?.get({ plain: true });
+    return { actor, payload, results };
   },
 };

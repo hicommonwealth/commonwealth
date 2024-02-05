@@ -11,21 +11,20 @@ import { z, ZodSchema } from 'zod';
  * @returns express command handler
  */
 export const expressCommand =
-  <T, M extends ZodSchema, R>(md: CommandMetadata<T, M, R>): RequestHandler =>
+  <T, P extends ZodSchema>(md: CommandMetadata<T, P>): RequestHandler =>
   async (
     req: Request<
       { id: string },
-      R,
-      z.infer<M> & {
+      T,
+      z.infer<P> & {
         address_id?: string;
       }
     >,
-    res: Response<R>,
-  ) =>
-    res.json(
-      await command(md, req.params.id, req.body, {
-        user: req.user as User,
-        address_id: req.body.address_id,
-        aggregate_id: req.params.id,
-      }),
-    );
+    res: Response<Partial<T> | undefined | null>,
+  ) => {
+    const context = await command(md, req.params.id, req.body, {
+      user: req.user as User,
+      address_id: req.body.address_id,
+    });
+    return res.json(context.state);
+  };

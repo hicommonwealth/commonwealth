@@ -7,19 +7,14 @@ export const schema = z.object({
   content: z.string(),
 });
 
-export const CreateThread: CommandMetadata<
-  ThreadAttributes,
-  typeof schema,
-  ThreadAttributes
-> = {
+export const CreateThread: CommandMetadata<ThreadAttributes, typeof schema> = {
   schema,
-  fn: async () =>
-    //actor,
-    //id,
-    //payload,
-    {
-      // TODO
-      const thread = await models.Thread.findOne();
-      return thread!;
-    },
+  load: [],
+  body: async (context) => {
+    context.state = await models.Thread.findOne();
+    return context;
+  },
+  save: async (context) => {
+    return context;
+  },
 };

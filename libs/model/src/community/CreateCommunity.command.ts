@@ -3,6 +3,7 @@ import {
   ChainBase,
   ChainType,
   CommunityCategoryType,
+  InvalidInput,
 } from '@hicommonwealth/core';
 import { z } from 'zod';
 import { models } from '../database';
@@ -57,13 +58,18 @@ export type CreateCommunity = z.infer<typeof schema>;
 
 export const CreateCommunity: CommandMetadata<
   CommunityAttributes,
-  typeof schema,
-  CommunityAttributes
+  typeof schema
 > = {
   schema,
-  fn: async () => {
-    // TODO
-    const community = await models.Community.findOne();
-    return community!;
+  load: [],
+  body: async ({ id, actor, payload }) => {
+    const community = await models.Community.findOne({ where: { id } });
+    if (community) throw new InvalidInput('Community already exists');
+
+    return { id, actor, payload };
+  },
+  save: () => {
+    //await models.Community.create({...payload, active:false,chain_node_id:ValidChains.Sepolia});
+    return Promise.resolve();
   },
 };

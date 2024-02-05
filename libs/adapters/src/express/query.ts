@@ -8,13 +8,17 @@ import { z, ZodSchema } from 'zod';
  * @returns express query handler
  */
 export const expressQuery =
-  <M extends ZodSchema, R>(md: QueryMetadata<M, R>): RequestHandler =>
+  <T, P extends ZodSchema>(md: QueryMetadata<T, P>): RequestHandler =>
   async (
-    req: Request<Partial<z.infer<M>>, R, Partial<z.infer<M>>>,
-    res: Response<R>,
-  ) =>
-    res.json(
-      await query(md, { ...req.body, ...req.params } as z.infer<M>, {
+    req: Request<Partial<z.infer<P>>, T, Partial<z.infer<P>>>,
+    res: Response<T | undefined | null>,
+  ) => {
+    const context = await query(
+      md,
+      { ...req.body, ...req.params } as z.infer<P>,
+      {
         user: req.user as User,
-      }),
+      },
     );
+    return res.json(context.results);
+  };

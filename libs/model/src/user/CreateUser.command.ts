@@ -7,19 +7,14 @@ export const schema = z.object({
   content: z.string(),
 });
 
-export const CreateUser: CommandMetadata<
-  UserAttributes,
-  typeof schema,
-  UserAttributes
-> = {
+export const CreateUser: CommandMetadata<UserAttributes, typeof schema> = {
   schema,
-  fn: async () =>
-    //actor,
-    //id,
-    //payload,
-    {
-      // TODO
-      const user = await models.User.findOne();
-      return user!;
-    },
+  load: [],
+  body: async (context) => {
+    context.state = await models.User.findOne();
+    return context;
+  },
+  save: async (context) => {
+    return context;
+  },
 };

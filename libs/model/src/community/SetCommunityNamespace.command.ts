@@ -3,32 +3,34 @@ import { InvalidInput } from '@hicommonwealth/core';
 import { z } from 'zod';
 import { models } from '../database';
 import { isCommunityAdmin } from '../middleware';
-import type { CommunityAttributes } from '../models';
+import type { CommunityAttributes, CommunityInstance } from '../models';
 
 export const schema = z.object({
   namespace: z.string(),
+  txHash: z.string(),
+  address: z.string(),
 });
 
 export const SetCommunityNamespace: CommandMetadata<
   CommunityAttributes,
-  typeof schema,
-  CommunityAttributes
+  typeof schema
 > = {
   schema,
-  middleware: [isCommunityAdmin],
-  fn: async (id, payload) => {
+  load: [isCommunityAdmin],
+  body: async ({ id, actor, payload }) => {
     const community = await models.Community.findOne({ where: { id } });
     if (!community) throw new InvalidInput('Community not found');
 
     // TODO: validate contract
-    // call protocol api
+    // call protocol api and resolve if tbc should be a singleton
 
-    // payload is validated by message validation middleware
-    // TODO: set to namespace instead of name
-    community.name = payload.namespace;
+    //await validateNamespace(TokenBalanceCache, payload.namespace, payload.txHash, payload.address, community)
+    community.namespace = payload.namespace;
 
-    await community.save();
-
-    return community;
+    return { id, actor, payload, state: community };
+  },
+  save: async (context) => {
+    await (context.state! as CommunityInstance).save();
+    return context;
   },
 };
