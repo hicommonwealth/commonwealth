@@ -1,5 +1,4 @@
-# Exit immediately if a command exits with a non-zero status.
-set -e
+#! /bin/bash
 
 # build
 if [ "$SL_BUILD" = true ]; then
