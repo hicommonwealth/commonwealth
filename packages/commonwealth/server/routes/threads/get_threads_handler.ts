@@ -1,4 +1,5 @@
 import { AppError } from '@hicommonwealth/core';
+import { Thread } from '@hicommonwealth/model';
 import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
 import { ServerControllers } from '../../routing/router';
 import {
@@ -7,6 +8,7 @@ import {
   TypedResponse,
   success,
 } from '../../types';
+import { formatErrorPretty } from '../../util/errorFormat';
 
 const Errors = {
   UnexpectedError: 'Unexpected error',
@@ -55,22 +57,34 @@ export const getThreadsHandler = async (
   >,
   res: TypedResponse<GetThreadsResponse>,
 ) => {
-  const { thread_ids, bulk, active, search, community_id } = req.query;
+  const queryValidationResult = Thread.GetThreadsParamsSchema.safeParse(
+    req.query,
+  );
+
+  if (queryValidationResult.success === false) {
+    throw new AppError(formatErrorPretty(queryValidationResult));
+  }
+
+  const { thread_ids, bulk, active, search, community_id } =
+    queryValidationResult.data;
 
   // get threads by IDs
   if (thread_ids) {
-    const threadIds = thread_ids.map((id) => parseInt(id, 10));
-    for (const id of threadIds) {
-      if (isNaN(id)) {
-        throw new AppError(Errors.InvalidThreadId);
-      }
-    }
-    const threads = await controllers.threads.getThreadsByIds({ threadIds });
+    const threads = await controllers.threads.getThreadsByIds({
+      threadIds: thread_ids,
+    });
     return success(res, threads);
   }
 
   // get bulk threads
   if (bulk) {
+    const bulkQueryValidationResult =
+      Thread.GetBulkThreadsParamsSchema.safeParse(req.query);
+
+    if (bulkQueryValidationResult.success === false) {
+      throw new AppError(formatErrorPretty(bulkQueryValidationResult));
+    }
+
     const {
       stage,
       topic_id,
@@ -81,19 +95,19 @@ export const getThreadsHandler = async (
       from_date,
       to_date,
       archived,
-    } = req.query as BulkThreadsRequestQuery;
+    } = bulkQueryValidationResult.data;
 
     const bulkThreads = await controllers.threads.getBulkThreads({
       communityId: community_id,
       stage,
-      topicId: parseInt(topic_id, 10),
-      includePinnedThreads: includePinnedThreads === 'true',
-      page: parseInt(page, 10),
-      limit: parseInt(limit, 10),
+      topicId: topic_id,
+      includePinnedThreads,
+      page,
+      limit,
       orderBy,
       fromDate: from_date,
       toDate: to_date,
-      archived: archived === 'true',
+      archived: archived,
     });
     return success(res, bulkThreads);
   }
