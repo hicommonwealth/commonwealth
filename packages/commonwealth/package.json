@@ -17,6 +17,7 @@
     "db-doc": "chmod u+x scripts/gen-mermaid-erd.sh && ./scripts/gen-mermaid-erd.sh > ../../knowledge_base/Database-ERD.md",
     "dump-db": "pg_dump $(heroku config:get CW_READ_DB -a commonwealth-beta) --verbose --exclude-table-data=\"public.\\\"Subscriptions\\\"\" --exclude-table-data=\"public.\\\"Sessions\\\"\" --exclude-table-data=\"public.\\\"LoginTokens\\\"\" --exclude-table-data=\"public.\\\"Notifications\\\"\" --exclude-table-data=\"public.\\\"Webhooks\\\"\" --exclude-table-data=\"public.\\\"NotificationsRead\\\"\" --no-privileges --no-owner -f latest.dump",
     "e2e-start-server": "ETH_RPC=e2e-test yarn start",
+    "email-digest-cron": "ts-node -r tsconfig-paths/register server/scripts/emailDigest.ts",
     "emit-notification": "ts-node -r tsconfig-paths/register server/scripts/emitTestNotification.ts",
     "emit-webhook": "ts-node -r tsconfig-paths/register server/scripts/emitWebhook.ts",
     "format": "prettier --ignore-path ../../.prettierignore --config ../../.prettierrc.json --write .",

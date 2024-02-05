@@ -362,6 +362,14 @@ Description: Starts the app server with the ETH_RPC env variable set to “e2e-t
 
 Contributor: Kurtis Assad
 
+### email-digest-cron
+
+Definition: `ts-node -r tsconfig-paths/register server/scripts/emitTestNotification.ts`
+
+Description: Runs the emailDigest script. Ran once a week, used in the heroku scheduler.
+
+Contributor: Kurtis Assad
+
 ### emit-notification
 
 Definition: `ts-node --project tsconfig.json server/scripts/emitTestNotification.ts`
