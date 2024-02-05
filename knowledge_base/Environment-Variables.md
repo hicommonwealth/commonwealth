@@ -2,7 +2,7 @@
 
 This entry documents environment variables (both public config and secret auth tokens) used across the Commonwealth monorepo. Environment variables should always be organized alphabetically.
 
-For a list of config tokens to get you started developing, see our [.env.example](../.env.example) file.
+For documentation on feature flags, see the [dedicated entry](./Feature-Flags.md). For a list of config tokens to get you started developing, see our [.env.example](../.env.example) file.
 
 We use GitHub Secrets to manage our auth tokens; reach out to the documentarian Graham Johnson, or else to an engineering lead, if you need access.
 
@@ -332,7 +332,7 @@ Used in chain testing; for more information, see [Chain-Testing-Overview.md](../
 
 ## SEND_WEBHOOKS_EMAILS
 
-Enables Webhook and email dispatching in production when set to `true`. Should be `false` or undefined elsewhere, to prevent Webhooks and emails from being sent in non-production environments. 
+Enables Webhook and email dispatching in production when set to `true`. Should be `false` or undefined elsewhere, to prevent Webhooks and emails from being sent in non-production environments.
 
 ## SENDGRID_API_KEY
 
