@@ -12,7 +12,11 @@ import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 
-export const SidebarQuickSwitcher = () => {
+export const SidebarQuickSwitcher = ({
+  isInsideCommunity,
+}: {
+  isInsideCommunity: boolean;
+}) => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
   const { setMenu, menuVisible, menuName, setUserToggledVisibility } =
@@ -35,7 +39,7 @@ export const SidebarQuickSwitcher = () => {
   return (
     <div className="SidebarQuickSwitcher">
       <div className="community-nav-bar">
-        <div className="collapsable-button-space" />
+        {!isInsideCommunity && <div className="collapsable-button-space" />}
         {isLoggedIn && (
           <CWIconButton
             iconName="plusCirclePhosphor"
