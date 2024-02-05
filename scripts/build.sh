@@ -1,5 +1,8 @@
 #! /bin/bash
 
+# Exit immediately if a command exits with a non-zero status.
+set -e
+
 # build
 if [ "$SL_BUILD" = true ]; then
   yarn workspace snapshot-listener build
