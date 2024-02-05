@@ -19,7 +19,7 @@
     "dump-db": "yarn --cwd packages/commonwealth dump-db",
     "format": "prettier --write .",
     "format-check": "prettier --check .",
-    "heroku-postbuild": "chmod u+x scripts/heroku-build.sh && ./scripts/heroku-build.sh",
+    "heroku-postbuild": "exit 2",
     "heroku-prebuild": "yarn global add node-gyp",
     "lint": "./scripts/lint-new-work.sh",
     "lint-all": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint './packages/**/*.{ts,tsx}'",
