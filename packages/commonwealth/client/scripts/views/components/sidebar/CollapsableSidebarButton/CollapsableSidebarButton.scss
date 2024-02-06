@@ -8,16 +8,11 @@
     z-index: 5;
     transition: 0.2s linear;
     pointer-events: none;
-  }
 
-  .hover-box-expanded {
-    position: fixed;
-    height: 100vh;
-    width: 290px;
-    overflow: hidden;
-    z-index: 5;
-    transition: 0.2s linear;
-    pointer-events: none;
+    &.expanded {
+      width: 290px;
+      transition: 0.2s linear;
+    }
   }
 
   .collapse-unscoped {
