@@ -31,9 +31,12 @@ export const CollapsableSidebarButton = ({
           iconName="caretDoubleLeft"
           onClick={handleToggle}
           iconSize="small"
-          className={
-            menuVisible ? `expand-${cssString}` : `collapse-${cssString}`
-          }
+          className={clsx({
+            'expand-scoped': menuVisible && isInsideCommunity,
+            'expand-unscoped': menuVisible && !isInsideCommunity,
+            'collapse-scoped': !menuVisible && isInsideCommunity,
+            'collapse-unscoped': !menuVisible && !isInsideCommunity,
+          })}
         />
       </div>
     </div>
