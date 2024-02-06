@@ -100,7 +100,7 @@ module.exports = {
           "@hicommonwealth/adapters/**",
           "@hicommonwealth/model/**"
         ],
-        message: "Avoid importing from inside lib folders!",
+        message: "Avoid importing from 'lib' directories. Import from the main entry point instead.",
       }]
     }]
   },
