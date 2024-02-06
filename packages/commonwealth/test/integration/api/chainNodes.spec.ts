@@ -1,17 +1,16 @@
 import { BalanceType } from '@hicommonwealth/core';
-import { models, UserInstance } from '@hicommonwealth/model';
+import { models, tester, UserInstance } from '@hicommonwealth/model';
 import { assert, expect } from 'chai';
-import { resetDatabase } from 'server-test';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 import { buildUser } from '../../unit/unitHelpers';
 
 describe('ChainNode Tests', () => {
   beforeEach(async () => {
-    await resetDatabase();
+    await tester.seedDb();
   });
 
   it('Creates new ChainNode when', async () => {
-    const controller = new ServerCommunitiesController(models, null);
+    const controller = new ServerCommunitiesController(models, null, null);
     const user: UserInstance = buildUser({
       models,
       userAttributes: { email: '', id: 1, isAdmin: true },

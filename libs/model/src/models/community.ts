@@ -51,6 +51,7 @@ export type CommunityAttributes = {
   discord_bot_webhooks_enabled?: boolean;
   directory_page_enabled?: boolean;
   directory_page_chain_node_id?: number;
+  namespace?: string;
 
   // associations
   ChainNode?: ChainNodeAttributes;
@@ -157,6 +158,7 @@ export default (
         allowNull: true,
         defaultValue: null,
       },
+      namespace: { type: dataTypes.STRING, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: true },
       updated_at: { type: dataTypes.DATE, allowNull: true },
     },
@@ -191,6 +193,9 @@ export default (
       foreignKey: 'community_id',
     });
     models.Community.hasMany(models.Group, { foreignKey: 'community_id' });
+    models.Community.hasMany(models.CommunityStake, {
+      foreignKey: 'community_id',
+    });
   };
 
   return Community;

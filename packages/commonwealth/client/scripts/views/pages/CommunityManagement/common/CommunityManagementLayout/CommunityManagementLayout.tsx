@@ -1,3 +1,4 @@
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import React, { ReactNode } from 'react';
 import app from 'state';
 import Permissions from 'utils/Permissions';
@@ -14,6 +15,7 @@ type CommunityManagementLayout = {
     title: string;
     description: string;
   };
+  className?: boolean;
 };
 
 const CommunityManagementLayout = ({
@@ -21,17 +23,20 @@ const CommunityManagementLayout = ({
   description,
   children,
   featureHint,
+  className,
 }: CommunityManagementLayout) => {
+  useUserActiveAccount();
+
   if (
-    !app?.user?.activeAccount?.address ||
+    !app.isLoggedIn() ||
     !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin())
   ) {
     return <PageNotFound />;
   }
-
+  const showAlternateClassname = className ? 'admins-moderators' : '';
   return (
     <section className="CommunityManagementLayout">
-      <section className="left-section">
+      <section className={`left-section ${showAlternateClassname}`}>
         <div className="header">
           <CWText type="h2">{title}</CWText>
           <CWText type="b1">{description}</CWText>

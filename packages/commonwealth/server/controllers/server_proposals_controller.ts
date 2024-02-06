@@ -1,5 +1,4 @@
-import { AppError, RedisCache, ServerError } from '@hicommonwealth/adapters';
-import { ChainNetwork } from '@hicommonwealth/core';
+import { AppError, ChainNetwork, ServerError } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
 import { providers } from 'ethers';
 import {
@@ -23,7 +22,7 @@ export type ContractInfo = {
 };
 
 export class ServerProposalsController {
-  constructor(public models: DB, public redisCache: RedisCache) {}
+  constructor(public models: DB) {}
 
   public async getProposals(
     options: GetProposalsOptions,

@@ -7,7 +7,7 @@ import app from 'state';
 import { addressSwapper } from 'utils';
 import IWebWallet from '../../../models/IWebWallet';
 import { User } from '../user/user';
-import { CWAuthButton, CWNoAuthMethodsAvailable } from './cw_auth_button';
+import { CWAuthButton, CWNoAuthMethodsAvailable } from './CWAuthButtonOld';
 import { CWDivider } from './cw_divider';
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';

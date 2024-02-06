@@ -16,10 +16,6 @@ export const JWT_SECRET = process.env.JWT_SECRET || 'jwt secret';
 
 export const ADDRESS_TOKEN_EXPIRES_IN = 10;
 
-export const ROLLBAR_SERVER_TOKEN = process.env.ROLLBAR_SERVER_TOKEN;
-
-export const ROLLBAR_ENV = process.env.ROLLBAR_ENV || 'local';
-
 export const SLACK_FEEDBACK_WEBHOOK = process.env.SLACK_FEEDBACK_WEBHOOK;
 
 export const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
@@ -34,34 +30,15 @@ export const DATABASE_URI = process.env.USES_DOCKER_DB
 
 export const RABBITMQ_URI = (() => {
   if (!process.env.CLOUDAMQP_URL || process.env.NODE_ENV === 'development') {
-    if (
-      process.env.VULTR_RABBITMQ_CONTAINER_PORT &&
-      process.env.VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT
-    ) {
-      return `amqp://guest:guest@${process.env.VULTR_IP}:${process.env.VULTR_RABBITMQ_CONTAINER_PORT}`;
-    } else return 'amqp://127.0.0.1';
+    return 'amqp://127.0.0.1';
   } else return process.env.CLOUDAMQP_URL;
-})();
-
-export const RABBITMQ_API_URI = (() => {
-  if (
-    process.env.VULTR_RABBITMQ_CONTAINER_PORT &&
-    process.env.VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT
-  )
-    return `http://guest:guest@${process.env.VULTR_IP}:${process.env.VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT}/api`;
-  else return 'http://guest:guest@localhost:15672/api';
 })();
 
 // if a tls redis url is provided then that takes priority over everything else
 // then if a normal non-tls url is provided that is the second best option (local/staging)
-// finally, if no redis url is specified we use the Vultr redis instance (vultr)
 export const REDIS_URL = (() => {
   if (process.env.REDIS_TLS_URL) return process.env.REDIS_TLS_URL; // staging + production
   if (process.env.REDIS_URL) return process.env.REDIS_URL; // local + staging
-  if (process.env.VULTR_IP && process.env.VULTR_REDIS_CONTAINER_PORT)
-    // vultr
-    return `redis://${process.env.VULTR_IP}:${process.env.VULTR_REDIS_CONTAINER_PORT}`;
-
   return undefined;
 })();
 
@@ -125,3 +102,11 @@ export const TBC_BALANCE_TTL_SECONDS = process.env.TBC_BALANCE_TTL_SECONDS
   : 300;
 
 export const PRERENDER_TOKEN = process.env.PRERENDER_TOKEN;
+
+export const REACTION_WEIGHT_OVERRIDE = process.env.REACTION_WEIGHT_OVERRIDE
+  ? parseInt(process.env.REACTION_WEIGHT_OVERRIDE, 10)
+  : null;
+
+export const GENERATE_IMAGE_RATE_LIMIT = process.env.GENERATE_IMAGE_RATE_LIMIT
+  ? parseInt(process.env.GENERATE_IMAGE_RATE_LIMIT, 10)
+  : 10;

@@ -6,7 +6,7 @@ import { buildUser } from '../../unit/unitHelpers';
 
 describe('create chain tests', () => {
   it('fails when no eth_chain_id is provided when chain is ethereum', async () => {
-    const controller = new ServerCommunitiesController(models, null);
+    const controller = new ServerCommunitiesController(models, null, null);
     const user: UserInstance = buildUser({
       models,
       userAttributes: { email: '', id: 1, isAdmin: true },
@@ -28,7 +28,7 @@ describe('create chain tests', () => {
   });
 
   it('fails when eth_chain_id is not a number', async () => {
-    const controller = new ServerCommunitiesController(models, null);
+    const controller = new ServerCommunitiesController(models, null, null);
     const user: UserInstance = buildUser({
       models,
       userAttributes: { email: '', id: 1, isAdmin: true },

@@ -1,4 +1,4 @@
-import { Link } from '@hicommonwealth/model';
+import type { Link } from '@hicommonwealth/model';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';

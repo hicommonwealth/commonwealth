@@ -1,7 +1,6 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import {
   AddressInstance,
-  CommunityInstance,
   UserInstance,
   sequelize,
 } from '@hicommonwealth/model';
@@ -16,7 +15,6 @@ const Errors = {
 
 export type DeleteGroupOptions = {
   user: UserInstance;
-  community: CommunityInstance;
   address: AddressInstance;
   groupId: number;
 };
@@ -25,28 +23,23 @@ export type DeleteGroupResult = void;
 
 export async function __deleteGroup(
   this: ServerCommunitiesController,
-  { user, community, groupId }: DeleteGroupOptions,
+  { user, groupId }: DeleteGroupOptions,
 ): Promise<DeleteGroupResult> {
+  const group = await this.models.Group.findByPk(groupId);
+  if (!group) {
+    throw new AppError(Errors.GroupNotFound);
+  }
+
   const isAdmin = await validateOwner({
     models: this.models,
     user,
-    communityId: community.id,
+    communityId: group.community_id,
     allowMod: true,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError(Errors.Unauthorized);
-  }
-
-  const group = await this.models.Group.findOne({
-    where: {
-      id: groupId,
-      community_id: community.id,
-    },
-  });
-  if (!group) {
-    throw new AppError(Errors.GroupNotFound);
   }
 
   await this.models.sequelize.transaction(async (transaction) => {

@@ -1,12 +1,12 @@
+import { StrictModeDroppable } from 'lib/react-beautiful-dnd';
 import React, { useEffect, useState } from 'react';
-import { Virtuoso } from 'react-virtuoso';
 import type { DraggableProvided } from 'react-beautiful-dnd';
 import { DragDropContext, Draggable } from 'react-beautiful-dnd';
-import { StrictModeDroppable } from 'lib/react-beautiful-dnd';
-
-import type Topic from '../../../models/Topic';
-import { CWText } from 'views/components/component_kit/cw_text';
+import { Virtuoso } from 'react-virtuoso';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { CWText } from 'views/components/component_kit/cw_text';
+import type Topic from '../../../models/Topic';
+import CWIconButton from '../../components/component_kit/new_designs/CWIconButton';
 
 const reorder = (list: Topic[], startIndex, endIndex): Topic[] => {
   const result = Array.from(list);
@@ -40,9 +40,10 @@ interface TopicRowProps {
   provided: DraggableProvided;
   item: Topic;
   isDragging: boolean;
+  onEdit?: React.Dispatch<React.SetStateAction<Topic>>;
 }
 
-const TopicRow = ({ provided, item, isDragging }: TopicRowProps) => {
+const TopicRow = ({ provided, item, isDragging, onEdit }: TopicRowProps) => {
   return (
     <div
       {...provided.draggableProps}
@@ -53,7 +54,20 @@ const TopicRow = ({ provided, item, isDragging }: TopicRowProps) => {
       }}
       className={`topic-row ${isDragging ? 'is-dragging' : ''}`}
     >
-      <CWText>{item.name}</CWText>
+      <CWText>
+        {item.name}
+        {onEdit && (
+          <CWIconButton
+            iconName="pencil"
+            buttonSize="sm"
+            onClick={async (e) => {
+              e.stopPropagation();
+              onEdit(item);
+            }}
+          />
+        )}
+      </CWText>
+
       <CWIcon iconName="hamburger" />
     </div>
   );
@@ -62,11 +76,13 @@ const TopicRow = ({ provided, item, isDragging }: TopicRowProps) => {
 interface DraggableTopicsListProps {
   topics: Topic[];
   setTopics: React.Dispatch<React.SetStateAction<Topic[]>>;
+  onEdit?: React.Dispatch<React.SetStateAction<Topic>>;
 }
 
 const DraggableTopicsList = ({
   topics,
   setTopics,
+  onEdit,
 }: DraggableTopicsListProps) => {
   const onDragEnd = (result) => {
     if (!result.destination) {
@@ -78,7 +94,7 @@ const DraggableTopicsList = ({
     }
 
     setTopics((items) =>
-      reorder(items, result.source.index, result.destination.index)
+      reorder(items, result.source.index, result.destination.index),
     );
   };
 
@@ -115,6 +131,7 @@ const DraggableTopicsList = ({
                         provided={draggableProvided}
                         item={item}
                         isDragging={false}
+                        onEdit={onEdit}
                       />
                     )}
                   </Draggable>

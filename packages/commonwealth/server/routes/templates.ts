@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import type {
   TypedRequestBody,
@@ -47,7 +47,7 @@ export async function createTemplate(
     user: req.user,
     communityId: chain_id,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError('Must be admin');

@@ -11,7 +11,7 @@ import './CustomTOS.scss';
 const CustomTOS = () => {
   const [community] = useState(app.config.chains.getById(app.activeChainId()));
   const [terms, setTerms] = useState({
-    value: community.terms,
+    value: community.terms || '',
     error: '',
   });
   const [isSaving, setIsSaving] = useState(false);
@@ -20,11 +20,13 @@ const CustomTOS = () => {
     const value = event?.target?.value?.trim() || '';
     let error = '';
 
-    try {
-      linkValidationSchema.parse(value);
-    } catch (e: any) {
-      const zodError = e as ZodError;
-      error = zodError.errors[0].message;
+    if (value) {
+      try {
+        linkValidationSchema.parse(value);
+      } catch (e: any) {
+        const zodError = e as ZodError;
+        error = zodError.errors[0].message;
+      }
     }
 
     setTerms({ error, value });

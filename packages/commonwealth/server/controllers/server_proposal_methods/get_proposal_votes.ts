@@ -41,7 +41,6 @@ export async function __getProposalVotes(
       contractInfo.address,
       provider,
       proposalId,
-      this.redisCache,
     );
     votes = votesArgs.map((vote) => formatCompoundProposalVote(vote));
   } else {

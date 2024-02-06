@@ -20,6 +20,7 @@ import {
   Chats,
   Check,
   CheckCircle,
+  CircleNotch,
   CirclesThreePlus,
   ClockCounterClockwise,
   Compass,
@@ -33,10 +34,12 @@ import {
   LockKey,
   LockKeyOpen,
   LockOpen,
+  Minus,
   NotePencil,
   Notepad,
   PaperPlaneTilt,
   PencilSimple,
+  Plus,
   PlusCircle,
   PushPin,
   Question,
@@ -48,6 +51,7 @@ import {
   TwitterLogo,
   Users,
   UsersThree,
+  Warning,
 } from '@phosphor-icons/react';
 import * as CustomIcons from './cw_custom_icons';
 import * as Icons from './cw_icons';
@@ -93,6 +97,7 @@ export const iconLookup = {
   chevronUp: Icons.CWChevronUp,
   chats: withPhosphorIcon(Chats),
   circlesThreeplus: withPhosphorIcon(CirclesThreePlus),
+  circleNotch: withPhosphorIcon(CircleNotch),
   caretUp: withPhosphorIcon(CaretUp),
   caretDown: withPhosphorIcon(CaretDown),
   caretRight: withPhosphorIcon(CaretRight),
@@ -113,7 +118,7 @@ export const iconLookup = {
   delegate: Icons.CWDelegate,
   democraticProposal: Icons.CWDemocraticProposal,
   discord: Icons.CWDiscord,
-  discordLogin: Icons.CWDiscordLogin,
+  discordOld: Icons.CWDiscordLogin, // TODO: possible remove
   dot: Icons.CWDot,
   dots: Icons.CWDots,
   dotsVertical: Icons.CWDotsVertical,
@@ -123,6 +128,7 @@ export const iconLookup = {
   element: Icons.CWElement,
   envelope: Icons.CWEnvelope,
   ethereum: Icons.CWEthereum,
+  etherscan: Icons.CWEtherscan,
   expand: Icons.CWExpand,
   exploreCommunity: Icons.CWExploreCommunities,
   externalLink: Icons.CWExternalLink,
@@ -155,6 +161,7 @@ export const iconLookup = {
   lockOpenNew: withPhosphorIcon(LockOpen),
   logout: Icons.CWLogout,
   mail: Icons.CWMail,
+  minus: withPhosphorIcon(Minus),
   mute: Icons.CWMute,
   near: Icons.CWNear,
   newStar: Icons.CWNewStar,
@@ -168,6 +175,7 @@ export const iconLookup = {
   // pin: Icons.CWPin,
   pin: withPhosphorIcon(PushPin),
   plus: Icons.CWPlus,
+  plusPhosphor: withPhosphorIcon(Plus),
   plusCircle: Icons.CWPlusCircle,
   plusCirclePhosphor: (props) => withPhosphorIcon(PlusCircle)(props),
   polkadot: Icons.CWPolkadot,
@@ -201,6 +209,7 @@ export const iconLookup = {
   vote: Icons.CWVote,
   views: Icons.CWViews,
   wallet: Icons.CWWallet,
+  warning: (props) => withPhosphorIcon(Warning)(props),
   website: Icons.CWWebsite,
   write: Icons.CWWrite,
   members: Icons.CWMembers,
@@ -230,6 +239,7 @@ export const customIconLookup = {
   walletconnect: CustomIcons.CWWalletConnect,
   'terra-walletconnect': CustomIcons.CWWalletConnect,
   coinbase: CustomIcons.CWCoinbase,
+  x: CustomIcons.CWX, // twitter
 };
 
 export type IconName = keyof typeof iconLookup;

@@ -1,13 +1,11 @@
 /* eslint-disable global-require */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { models, tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-
-import { models } from '@hicommonwealth/model';
 import jwt from 'jsonwebtoken';
 import MockExpressRequest from 'mock-express-request';
-import { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import DatabaseValidationService from '../../../server/middleware/databaseValidationService';
 import * as modelUtils from '../../util/modelUtils';
@@ -32,7 +30,7 @@ describe('DatabaseValidationService Tests', () => {
 
   before(async function () {
     this.timeout(300000);
-    await resetDatabase();
+    await tester.seedDb();
     console.log('Database reset');
     databaseValidationService = new DatabaseValidationService(models);
     let res = await modelUtils.createAndVerifyAddress({ chain });

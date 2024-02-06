@@ -6,7 +6,6 @@ import {
   logger,
 } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
-import Rollbar from 'rollbar';
 import { EventKind, coinToCoins } from '../../../shared/chain/types/cosmos';
 import emitNotifications from '../../util/emitNotifications';
 import { AllCosmosProposals } from './proposalFetching/types';
@@ -106,7 +105,6 @@ function formatProposalDates(date: string | Date): number {
 export async function emitProposalNotifications(
   models: DB,
   proposals: AllCosmosProposals,
-  rollbar?: Rollbar,
 ) {
   for (const chainId in proposals.v1) {
     const chainProposals = proposals.v1[chainId];
@@ -135,10 +133,7 @@ export async function emitProposalNotifications(
           },
         });
       } catch (e) {
-        console.error('Error emitting v1 proposal notification', e);
         log.error('Error emitting v1 proposal notification', e);
-        log.error(e);
-        rollbar?.error(e);
       }
     }
   }
@@ -170,10 +165,7 @@ export async function emitProposalNotifications(
           },
         });
       } catch (e) {
-        console.error('Error emitting v1beta1 proposal notification', e);
         log.error('Error emitting v1beta1 proposal notification', e);
-        log.error(e);
-        rollbar?.error(e);
       }
     }
   }

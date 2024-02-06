@@ -1,7 +1,7 @@
 import { BalanceSourceType, Requirement } from '@hicommonwealth/core';
+import { OptionsWithBalances } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import validateGroupMembership from 'server/util/requirementsModule/validateGroupMembership';
-import { OptionsWithBalances } from 'server/util/tokenBalanceCache/types';
 
 type MockRequirementOptions = {
   threshold: string;

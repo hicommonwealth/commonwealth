@@ -1,9 +1,7 @@
 import React, { ReactElement } from 'react';
 
-import { Browser } from '@capacitor/browser';
 import { loadScript } from 'helpers';
 import { DeltaStatic } from 'quill';
-import app from 'state';
 import { preprocessQuillDeltaForRendering } from '../../../../../shared/utils';
 import { getTextFromDelta } from './utils';
 
@@ -156,9 +154,6 @@ export const renderQuillDelta = (
                         target={openLinksInNewTab ? '_blank' : ''}
                         rel="noopener noreferrer"
                         onClick={async (e) => {
-                          if (app.isNative(window)) {
-                            await Browser.open({ url: child.attributes.link });
-                          }
                           if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey)
                             return;
                           if (
