@@ -58,7 +58,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
   return (
     <>
       <div className="SublayoutHeader">
-        <div className="header-left desktop">
+        <div className="header-left">
           <CWDivider isVertical />
           <CWIconButton
             iconName="commonLogo"
@@ -80,7 +80,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
           {isWindowSmallInclusive(window.innerWidth) && (
             <CWDivider isVertical />
           )}
-          {onMobile && app.activeChainId() && (
+          {onMobile && (
             <CWIconButton
               iconButtonTheme="black"
               iconName={menuVisible ? 'sidebarCollapse' : 'sidebarExpand'}
