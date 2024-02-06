@@ -94,15 +94,15 @@ export const CustomQuillToolbar = ({
         <button className="ql-image">image</button>
       </div>
       <div className="section">
-        <button className="ql-list" value="ordered" />
-        <button className="ql-list" value="bullet" />
-        <button className="ql-list" value="check" />
-      </div>
-      <div className="section">
         <button className="ql-text-align" value="left"></button>
         <button className="ql-text-align" value="center"></button>
         <button className="ql-text-align" value="right"></button>
         <button className="ql-text-align" value="justify"></button>
+      </div>
+      <div className="section">
+        <button className="ql-list" value="ordered" />
+        <button className="ql-list" value="bullet" />
+        <button className="ql-list" value="check" />
       </div>
     </div>
     <div className={clsx('right-buttons', { isDisabled })}>
