@@ -45,14 +45,18 @@ const textModifierTags = (cell: string) => {
   return content;
 };
 
+// markdownToHtmlTable converts a markdown table to an HTML table
+// The raw markdown param is specifically used to build a tree of the markdown
+// Then construct the HTML table from the tree
+// The finalDoc param is used if the markdown is already a valid table
+// The only times I have found this function needs to happen is when pasting from HackMD
+// and a table with the colon-hyphen syntax as the spacer
 export const markdownToHtmlTable = (markdown: string, finalDoc: string) => {
   const lines = markdown.trim().split('\n');
 
   const isTable = isMarkdownTable(finalDoc);
 
   if (!isTable) {
-    //This may never be used but being regex can be imperfect
-    //Added this as a redundant check
     return finalDoc;
   }
 
