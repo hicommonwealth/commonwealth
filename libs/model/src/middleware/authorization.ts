@@ -1,6 +1,6 @@
 import {
   Actor,
-  CommandMiddleware,
+  CommandHandler,
   InvalidActor,
   InvalidInput,
 } from '@hicommonwealth/core';
@@ -58,47 +58,38 @@ const authorizeAddress = async (
 /**
  * Community middleware
  */
-export const isCommunityAdmin: CommandMiddleware<
+export const isCommunityAdmin: CommandHandler<
   CommunityAttributes,
   any
-> = async ({ id, actor, payload }) => {
+> = async ({ id, actor }) => {
   // super admin is always allowed
   if (actor.user.isAdmin) return;
   await authorizeAddress(id, actor, ['admin']);
-  return { id, actor: { ...actor, author: true }, payload };
 };
 
-export const isCommunityModerator: CommandMiddleware<
+export const isCommunityModerator: CommandHandler<
   CommunityAttributes,
   any
-> = async ({ id, actor, payload }) => {
+> = async ({ id, actor }) => {
   // super admin is always allowed
   if (actor.user.isAdmin) return;
   await authorizeAddress(id, actor, ['moderator']);
-  return { id, actor: { ...actor, author: true }, payload };
 };
 
-export const isCommunityAdminOrModerator: CommandMiddleware<
+export const isCommunityAdminOrModerator: CommandHandler<
   CommunityAttributes,
   any
-> = async ({ id, actor, payload }) => {
+> = async ({ id, actor }) => {
   // super admin is always allowed
   if (actor.user.isAdmin) return;
-  const addr = await authorizeAddress(id, actor, ['admin', 'moderator']);
-  return {
-    id,
-    actor: { ...actor, author: addr.role === 'admin' },
-    payload,
-  };
+  await authorizeAddress(id, actor, ['admin', 'moderator']);
 };
 
 /**
  * Thread middleware
  */
-export const loadThread: CommandMiddleware<ThreadAttributes, any> = async ({
+export const loadThread: CommandHandler<ThreadAttributes, any> = async ({
   id,
-  actor,
-  payload,
 }) => {
   if (!id) throw new InvalidInput('Must provide a thread id');
   const thread = (
@@ -112,15 +103,13 @@ export const loadThread: CommandMiddleware<ThreadAttributes, any> = async ({
     })
   )?.get({ plain: true });
   if (!thread) throw new InvalidInput(`Thread ${id} not found`);
-  return { id, actor, payload, state: thread };
+  return thread;
 };
 
-export const isThreadAuthor: CommandMiddleware<ThreadAttributes, any> = async ({
-  id,
-  actor,
-  payload,
+export const isThreadAuthor: CommandHandler<ThreadAttributes, any> = async (
+  { actor },
   state,
-}) => {
+) => {
   // super admin is always allowed
   if (actor.user.isAdmin) return;
   if (!actor.address_id)
@@ -128,16 +117,13 @@ export const isThreadAuthor: CommandMiddleware<ThreadAttributes, any> = async ({
   if (!state) throw new InvalidActor(actor, 'Must load thread');
   if (state.Address?.address !== actor.address_id)
     throw new InvalidActor(actor, 'User is not the author of the thread');
-  return { id, actor: { ...actor, author: true }, payload, state };
 };
 
 /**
  * Comment middleware
  */
-export const loadComment: CommandMiddleware<CommentAttributes, any> = async ({
+export const loadComment: CommandHandler<CommentAttributes, any> = async ({
   id,
-  actor,
-  payload,
 }) => {
   if (!id) throw new InvalidInput('Must provide a comment id');
   const comment = (
@@ -151,13 +137,13 @@ export const loadComment: CommandMiddleware<CommentAttributes, any> = async ({
     })
   )?.get({ plain: true });
   if (!comment) throw new InvalidInput(`Comment ${id} not found`);
-  return { id, actor, payload, state: comment };
+  return comment;
 };
 
-export const isCommentAuthor: CommandMiddleware<
-  CommentAttributes,
-  any
-> = async ({ id, actor, payload, state }) => {
+export const isCommentAuthor: CommandHandler<CommentAttributes, any> = async (
+  { actor },
+  state,
+) => {
   // super admin is always allowed
   if (actor.user.isAdmin) return;
   if (!actor.address_id)
@@ -165,5 +151,4 @@ export const isCommentAuthor: CommandMiddleware<
   if (!state) throw new InvalidActor(actor, 'Must load comment');
   if (state.Address?.address !== actor.address_id)
     throw new InvalidActor(actor, 'User is not the author of the comment');
-  return { id, actor: { ...actor, author: true }, payload, state };
 };

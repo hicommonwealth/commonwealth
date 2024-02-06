@@ -11,14 +11,14 @@ export const expressQuery =
   <T, P extends ZodSchema>(md: QueryMetadata<T, P>): RequestHandler =>
   async (
     req: Request<Partial<z.infer<P>>, T, Partial<z.infer<P>>>,
-    res: Response<T | undefined | null>,
+    res: Response<T | undefined>,
   ) => {
-    const context = await query(
+    const results = await query(
       md,
       { ...req.body, ...req.params } as z.infer<P>,
       {
         user: req.user as User,
       },
     );
-    return res.json(context.results);
+    return res.json(results);
   };

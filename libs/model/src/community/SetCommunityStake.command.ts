@@ -19,28 +19,24 @@ export const SetCommunityStake: CommandMetadata<
   typeof schema
 > = {
   schema,
-  // !authorization and loading
-  load: [isCommunityAdmin],
+  auth: [isCommunityAdmin],
+  body: async ({ id, payload }) => {
+    // !load
+    const community = await models.Community.findOne({
+      where: { id },
+      include: [
+        {
+          model: models.ChainNode,
+          attributes: ['eth_chain_id', 'url'],
+        },
+        {
+          model: models.CommunityStake,
+        },
+      ],
+      attributes: ['namespace'],
+    });
 
-  // !core domain logic
-  body: async ({ id, actor, payload }) => {
-    const community = (
-      await models.Community.findOne({
-        where: { id },
-        include: [
-          {
-            model: models.ChainNode,
-            attributes: ['eth_chain_id', 'url'],
-          },
-          {
-            model: models.CommunityStake,
-          },
-        ],
-        attributes: ['namespace'],
-      })
-    )?.get({ plain: true });
-
-    // !check business rules - invariants on loaded state + payload
+    // !domain logic - invariants on loaded state & payload
     if (!community) throw new InvalidInput('Community not found');
     if (
       community.CommunityStakes &&
@@ -50,28 +46,18 @@ export const SetCommunityStake: CommandMetadata<
         `Stake ${payload.stake_id} already configured in community ${id}`,
       );
 
-    // !here we can call domain, application, and infrastructure services (stateless, not related to entities or value objects)
+    // !domain, application, and infrastructure services (stateless, not related to entities or value objects)
     await validateCommunityStakeConfig(community, payload.stake_id);
 
-    return {
-      id,
-      actor,
-      payload,
-      state: community,
-    };
-  },
-
-  // !persist state mutations
-  save: async ({ id, actor, payload, state }) => {
-    await models.CommunityStake.upsert({
+    // !side effects
+    const [updated] = await models.CommunityStake.upsert({
       ...payload,
       community_id: id,
     });
+
     return {
-      id,
-      actor,
-      payload,
-      state: { ...state, CommunityStakes: [{ ...payload }] },
+      ...community.get({ plain: true }),
+      CommunityStakes: [updated.get({ plain: true })],
     };
   },
 };

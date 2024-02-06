@@ -7,17 +7,18 @@ import { InvalidInput, QueryContext, QueryMetadata, type Actor } from './types';
  * @param md query metadata
  * @param payload query payload (filters)
  * @param actor query actor
- * @returns resolved query context
+ * @returns query results
+ * @throws {@link InvalidInput} when user invokes query with invalid payload or attributes, or rethrows internal errors
  */
 export const query = async <T, P extends ZodSchema>(
   { schema, auth, body }: QueryMetadata<T, P>,
   payload: z.infer<P>,
   actor: Actor,
-): Promise<QueryContext<T, P>> => {
+): Promise<T | undefined> => {
   try {
-    let context: QueryContext<T, P> = { actor, payload: schema.parse(payload) };
+    const context: QueryContext<P> = { actor, payload: schema.parse(payload) };
     for (const fn of auth) {
-      context = await fn(context);
+      await fn(context);
     }
     return await body(context);
   } catch (error) {

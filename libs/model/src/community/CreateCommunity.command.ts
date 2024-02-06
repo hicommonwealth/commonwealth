@@ -61,15 +61,11 @@ export const CreateCommunity: CommandMetadata<
   typeof schema
 > = {
   schema,
-  load: [],
-  body: async ({ id, actor, payload }) => {
+  auth: [],
+  body: async ({ id, payload }) => {
     const community = await models.Community.findOne({ where: { id } });
     if (community) throw new InvalidInput('Community already exists');
-
-    return { id, actor, payload };
-  },
-  save: () => {
-    //await models.Community.create({...payload, active:false,chain_node_id:ValidChains.Sepolia});
-    return Promise.resolve();
+    //await models.Community.create(payload)
+    return payload as Partial<CommunityAttributes>;
   },
 };

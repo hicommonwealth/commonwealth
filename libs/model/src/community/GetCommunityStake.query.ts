@@ -14,8 +14,8 @@ export const GetCommunityStake: QueryMetadata<
 > = {
   schema,
   auth: [],
-  body: async ({ actor, payload }) => {
-    const results = (
+  body: async ({ payload }) => {
+    return (
       await models.CommunityStake.findOne({
         where: payload,
         include: [
@@ -27,6 +27,5 @@ export const GetCommunityStake: QueryMetadata<
         ],
       })
     )?.get({ plain: true });
-    return { actor, payload, results };
   },
 };

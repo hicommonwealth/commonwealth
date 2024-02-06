@@ -46,15 +46,22 @@ describe('Community stake', () => {
       url: 'https://ethereum-sepolia.publicnode.com',
     };
 
-    const cc = await command(SetCommunityStake, id, payload, actor);
-    expect(cc?.state).to.deep.include({
+    const cr = await command(SetCommunityStake, id, payload, actor);
+    expect(cr).to.deep.contains({
       ...community.Chain,
       ChainNode,
-      CommunityStakes: [{ ...payload }],
+      CommunityStakes: [
+        {
+          community_id: id,
+          ...payload,
+          created_at: cr?.CommunityStakes?.at(0)?.created_at,
+          updated_at: cr?.CommunityStakes?.at(0)?.updated_at,
+        },
+      ],
     });
 
-    const qc = await query(GetCommunityStake, { community_id: id }, actor);
-    expect(qc.results).to.deep.include({ ...payload, ...community });
+    const qr = await query(GetCommunityStake, { community_id: id }, actor);
+    expect(qr).to.deep.include({ ...payload, ...community });
   });
 
   it('should fail set when community not found', async () => {
@@ -76,11 +83,11 @@ describe('Community stake', () => {
   });
 
   it('should get empty result when community stake not configured', async () => {
-    const qc = await query(
+    const qr = await query(
       GetCommunityStake,
       { community_id: 'edgeware' },
       actor,
     );
-    expect(qc.results).to.be.undefined;
+    expect(qr).to.be.undefined;
   });
 });

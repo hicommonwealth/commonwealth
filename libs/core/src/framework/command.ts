@@ -13,27 +13,27 @@ import {
  * @param id aggregate id
  * @param payload command payload
  * @param actor command actor
- * @returns resolved command context
+ * @returns side effects
+ * @throws {@link InvalidInput} when user invokes command with invalid payload or attributes, or rethrows internal domain errors
  */
 export const command = async <T, P extends ZodSchema>(
-  { schema, load, body, save }: CommandMetadata<T, P>,
+  { schema, auth, body }: CommandMetadata<T, P>,
   id: string,
   payload: z.infer<P>,
   actor: Actor,
-): Promise<CommandContext<T, P>> => {
+): Promise<Partial<T> | undefined> => {
   try {
-    let context: CommandContext<T, P> = {
+    const context: CommandContext<P> = {
       id,
       actor,
       payload: schema.parse(payload),
     };
-    for (const fn of load) {
+    let state: Partial<T> | undefined = undefined;
+    for (const fn of auth) {
       // can use deep clone to make it pure
-      context = (await fn(context)) ?? context;
+      state = (await fn(context, state)) ?? state;
     }
-    context = (await body(context)) ?? context;
-    context = (await save(context)) ?? context;
-    return context;
+    return (await body(context, state)) ?? undefined;
   } catch (error) {
     if (error instanceof Error) {
       if (error.name === 'ZodError') {

@@ -3,7 +3,7 @@ import { InvalidInput } from '@hicommonwealth/core';
 import { z } from 'zod';
 import { models } from '../database';
 import { isCommunityAdmin } from '../middleware';
-import type { CommunityAttributes, CommunityInstance } from '../models';
+import type { CommunityAttributes } from '../models';
 
 export const schema = z.object({
   namespace: z.string(),
@@ -16,8 +16,8 @@ export const SetCommunityNamespace: CommandMetadata<
   typeof schema
 > = {
   schema,
-  load: [isCommunityAdmin],
-  body: async ({ id, actor, payload }) => {
+  auth: [isCommunityAdmin],
+  body: async ({ id, payload }) => {
     const community = await models.Community.findOne({ where: { id } });
     if (!community) throw new InvalidInput('Community not found');
 
@@ -26,11 +26,6 @@ export const SetCommunityNamespace: CommandMetadata<
 
     //await validateNamespace(TokenBalanceCache, payload.namespace, payload.txHash, payload.address, community)
     community.namespace = payload.namespace;
-
-    return { id, actor, payload, state: community };
-  },
-  save: async (context) => {
-    await (context.state! as CommunityInstance).save();
-    return context;
+    return (await community.save()).get({ plain: true });
   },
 };
