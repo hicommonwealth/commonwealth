@@ -1,7 +1,7 @@
 import {
   Actor,
   InvalidActor,
-  InvalidInput,
+  InvalidState,
   command,
   query,
 } from '@hicommonwealth/core';
@@ -77,7 +77,7 @@ describe('Community stake', () => {
         address_id: '0x42D6716549A78c05FD8EF1f999D52751Bbf9F46a',
       }),
     ).to.eventually.be.rejectedWith(
-      InvalidInput,
+      InvalidState,
       'Stake 1 already configured in community ethereum',
     );
   });

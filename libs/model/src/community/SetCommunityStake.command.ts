@@ -1,7 +1,8 @@
-import { CommandMetadata, InvalidInput } from '@hicommonwealth/core';
+import { CommandMetadata, InvalidState } from '@hicommonwealth/core';
 import { z } from 'zod';
 import { models } from '../database';
 import { isCommunityAdmin } from '../middleware';
+import { MustExist } from '../middleware/invariants';
 import { CommunityAttributes } from '../models';
 import { validateCommunityStakeConfig } from '../services/commonProtocol/communityStakeConfigValidator';
 
@@ -37,12 +38,12 @@ export const SetCommunityStake: CommandMetadata<
     });
 
     // !domain logic - invariants on loaded state & payload
-    if (!community) throw new InvalidInput('Community not found');
+    if (!MustExist('Community', community)) return;
     if (
       community.CommunityStakes &&
       community.CommunityStakes.find((s) => s.stake_id === payload.stake_id)
     )
-      throw new InvalidInput(
+      throw new InvalidState(
         `Stake ${payload.stake_id} already configured in community ${id}`,
       );
 

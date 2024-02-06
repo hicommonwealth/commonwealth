@@ -1,8 +1,8 @@
 import type { CommandMetadata } from '@hicommonwealth/core';
-import { InvalidInput } from '@hicommonwealth/core';
 import { z } from 'zod';
 import { models } from '../database';
 import { isCommunityAdmin } from '../middleware';
+import { MustExist } from '../middleware/invariants';
 import type { CommunityAttributes } from '../models';
 
 export const schema = z.object({
@@ -19,7 +19,8 @@ export const SetCommunityNamespace: CommandMetadata<
   auth: [isCommunityAdmin],
   body: async ({ id, payload }) => {
     const community = await models.Community.findOne({ where: { id } });
-    if (!community) throw new InvalidInput('Community not found');
+
+    if (!MustExist('Community', community)) return;
 
     // TODO: validate contract
     // call protocol api and resolve if tbc should be a singleton

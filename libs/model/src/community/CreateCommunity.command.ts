@@ -3,10 +3,10 @@ import {
   ChainBase,
   ChainType,
   CommunityCategoryType,
-  InvalidInput,
 } from '@hicommonwealth/core';
 import { z } from 'zod';
 import { models } from '../database';
+import { MustNotExist } from '../middleware/invariants';
 import type { CommunityAttributes } from '../models';
 import { checkIconSize } from '../utils/checkIconSize';
 import { ALL_COMMUNITIES } from '../utils/constants';
@@ -64,7 +64,9 @@ export const CreateCommunity: CommandMetadata<
   auth: [],
   body: async ({ id, payload }) => {
     const community = await models.Community.findOne({ where: { id } });
-    if (community) throw new InvalidInput('Community already exists');
+
+    MustNotExist('Community', community);
+
     //await models.Community.create(payload)
     return payload as Partial<CommunityAttributes>;
   },

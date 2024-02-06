@@ -1,6 +1,7 @@
-import { InvalidInput, type CommandMetadata } from '@hicommonwealth/core';
+import { type CommandMetadata } from '@hicommonwealth/core';
 import { z } from 'zod';
 import { models } from '../database';
+import { MustNotExist } from '../middleware/invariants';
 import type { ThreadAttributes } from '../models';
 
 export const schema = z.object({
@@ -12,7 +13,9 @@ export const CreateThread: CommandMetadata<ThreadAttributes, typeof schema> = {
   auth: [],
   body: async ({ id, payload }) => {
     const thread = await models.Thread.findOne({ where: { id } });
-    if (thread) throw new InvalidInput('Thread already exists');
+
+    MustNotExist('Thread', thread);
+
     //await models.Thread.create(payload)
     return payload as Partial<ThreadAttributes>;
   },

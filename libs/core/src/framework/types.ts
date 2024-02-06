@@ -3,8 +3,9 @@ import z, { ZodSchema } from 'zod';
 /**
  * Error names as constants
  */
-export const INVALID_INPUT_ERROR = 'InvalidInputError';
-export const INVALID_ACTOR_ERROR = 'InvalidActorError';
+export const INVALID_INPUT_ERROR = 'Invalid Input Error';
+export const INVALID_ACTOR_ERROR = 'Invalid Actor Error';
+export const INVALID_STATE_ERROR = 'Invalid State Error';
 
 /**
  * Represents a user in the system with attributes commonly provided by authentication infrastructure
@@ -50,6 +51,20 @@ export class InvalidActor extends Error {
   constructor(public actor: Actor, message: string) {
     super(message);
     this.name = INVALID_ACTOR_ERROR;
+  }
+}
+
+/**
+ * Invalid state error - usually domain invariant violations
+ */
+export class InvalidState extends Error {
+  constructor(
+    message: string,
+    public readonly state?: unknown,
+    public readonly payload?: unknown,
+  ) {
+    super(message);
+    this.name = INVALID_STATE_ERROR;
   }
 }
 

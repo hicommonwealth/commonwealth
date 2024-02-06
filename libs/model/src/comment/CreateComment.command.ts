@@ -1,6 +1,7 @@
-import { InvalidInput, type CommandMetadata } from '@hicommonwealth/core';
+import { type CommandMetadata } from '@hicommonwealth/core';
 import { z } from 'zod';
 import { models } from '../database';
+import { MustNotExist } from '../middleware/invariants';
 import type { CommentAttributes } from '../models';
 
 const schema = z.object({
@@ -13,7 +14,9 @@ export const CreateComment: CommandMetadata<CommentAttributes, typeof schema> =
     auth: [],
     body: async ({ id, payload }) => {
       const comment = await models.Comment.findOne({ where: { id } });
-      if (comment) throw new InvalidInput('Comment already exists');
+
+      MustNotExist('Comment', comment);
+
       //await models.Comment.create(payload)
       return payload as Partial<CommentAttributes>;
     },

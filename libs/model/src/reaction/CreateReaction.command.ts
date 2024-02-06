@@ -1,6 +1,7 @@
-import { InvalidInput, type CommandMetadata } from '@hicommonwealth/core';
+import { type CommandMetadata } from '@hicommonwealth/core';
 import { z } from 'zod';
 import { models } from '../database';
+import { MustNotExist } from '../middleware/invariants';
 import type { ReactionAttributes } from '../models';
 
 export const schema = z.object({
@@ -15,7 +16,9 @@ export const CreateReaction: CommandMetadata<
   auth: [],
   body: async ({ id, payload }) => {
     const reaction = await models.Reaction.findOne({ where: { id } });
-    if (reaction) throw new InvalidInput('Reaction already exists');
+
+    MustNotExist('Reaction', reaction);
+
     //await models.Reaction.create(payload)
     return payload as Partial<ReactionAttributes>;
   },
