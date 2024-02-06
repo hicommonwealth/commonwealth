@@ -1,8 +1,8 @@
 import {
+  UserInstance,
+  communityStakeConfigValidator,
   models,
   tester,
-  UserInstance,
-  validateCommunityStakeConfig,
 } from '@hicommonwealth/model';
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
@@ -149,6 +149,9 @@ describe('PUT communityStakes Tests', () => {
       ],
       attributes: ['namespace'],
     });
-    await validateCommunityStakeConfig(community, 2);
+    await communityStakeConfigValidator.validateCommunityStakeConfig(
+      community,
+      2,
+    );
   });
 });
