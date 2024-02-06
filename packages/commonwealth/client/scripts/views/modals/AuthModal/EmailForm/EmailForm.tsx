@@ -19,32 +19,35 @@ const EmailForm = ({ onSubmit, onCancel, isLoading }: EmailFormProps) => {
       validationSchema={emailValidationSchema}
       onSubmit={!isLoading ? onSubmit : () => {}}
     >
-      <CWTextInput
-        fullWidth
-        hookToForm
-        name="email"
-        label="Email address"
-        placeholder="Email address"
-      />
-
-      {isLoading && <CWLoadingSpinner />}
-
-      <div className="action-btns">
-        <CWButton
-          type="button"
-          onClick={onCancel}
-          buttonType="tertiary"
-          label="Back to sign in options"
-          disabled={isLoading}
-        />
-        <CWButton
-          type="submit"
-          buttonWidth="wide"
-          buttonType="primary"
-          label="Sign in with Magic"
-          disabled={isLoading}
-        />
-      </div>
+      {isLoading ? (
+        <CWLoadingSpinner />
+      ) : (
+        <>
+          <CWTextInput
+            fullWidth
+            hookToForm
+            name="email"
+            label="Email address"
+            placeholder="Email address"
+          />
+          <div className="action-btns">
+            <CWButton
+              type="button"
+              onClick={onCancel}
+              buttonType="tertiary"
+              label="Back to sign in options"
+              disabled={isLoading}
+            />
+            <CWButton
+              type="submit"
+              buttonWidth="wide"
+              buttonType="primary"
+              label="Sign in with Magic"
+              disabled={isLoading}
+            />
+          </div>
+        </>
+      )}
     </CWForm>
   );
 };
