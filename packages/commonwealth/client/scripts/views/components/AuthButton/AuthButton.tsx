@@ -24,7 +24,7 @@ const AuthButton = ({
     <button
       disabled={disabled}
       onClick={disabled ? null : onClick}
-      className={clsx('AuthButton', variant, rounded && 'rounded', className)}
+      className={clsx('AuthButton', variant, className, { rounded })}
     >
       <IconComp className="icon" iconName={auth.icon.name as any} />
 
