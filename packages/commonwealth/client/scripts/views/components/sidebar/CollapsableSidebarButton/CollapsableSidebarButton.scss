@@ -1,4 +1,4 @@
-.CollapsableSidebarButtonUnscoped {
+.CollapsableSidebarButton {
   // This is an invisible box that allows us to hover over it in order to make the collapsable button visible
   .hover-box {
     position: fixed;
@@ -7,11 +7,11 @@
     overflow: hidden;
     z-index: 5;
     transition: 0.2s linear;
-    pointer-events: none;
 
     &.expanded {
       width: 290px;
       transition: 0.2s linear;
+      pointer-events: none;
     }
   }
 
@@ -63,5 +63,9 @@
 
   .hover-box:hover .collapse-scoped {
     opacity: 1;
+  }
+
+  .hover-image {
+    cursor: pointer;
   }
 }

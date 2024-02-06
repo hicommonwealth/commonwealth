@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import React from 'react';
 import useSidebarStore from '../../../../state/ui/sidebar/index';
 import { CWIconButton } from '../../component_kit/cw_icon_button';
@@ -11,12 +12,6 @@ export const CollapsableSidebarButton = ({
   const { setMenu, menuName, menuVisible, setUserToggledVisibility } =
     useSidebarStore();
 
-  const cssString = isInsideCommunity ? 'scoped' : 'unscoped';
-  let divBoxCss = 'hover-box';
-  if (isInsideCommunity && menuVisible) {
-    divBoxCss = 'hover-box-expanded';
-  }
-
   const handleToggle = () => {
     const isVisible = !menuVisible;
     setMenu({ name: menuName, isVisible });
@@ -24,7 +19,7 @@ export const CollapsableSidebarButton = ({
   };
 
   return (
-    <div className="CollapsableSidebarButtonUnscoped">
+    <div className="CollapsableSidebarButton">
       <div
         className={clsx('hover-box', {
           expanded: isInsideCommunity && menuVisible,
@@ -35,7 +30,7 @@ export const CollapsableSidebarButton = ({
           iconName="caretDoubleLeft"
           onClick={handleToggle}
           iconSize="small"
-          className={clsx({
+          className={clsx('hover-image', {
             'expand-scoped': menuVisible && isInsideCommunity,
             'expand-unscoped': menuVisible && !isInsideCommunity,
             'collapse-scoped': !menuVisible && isInsideCommunity,
