@@ -1,22 +1,22 @@
-import React, { MutableRefObject, useMemo } from 'react';
-import ReactQuill from 'react-quill';
-import { renderToolbarIcon, SerializableDeltaStatic } from './utils';
-import { DeltaStatic } from 'quill';
-import clsx from 'clsx';
 import {
-  TextHOne,
-  TextHTwo,
-  TextB,
-  TextItalic,
-  TextStrikethrough,
-  LinkSimple,
   Code,
-  Quotes,
   Image,
-  ListNumbers,
+  LinkSimple,
   ListBullets,
   ListChecks,
+  ListNumbers,
+  Quotes,
+  TextB,
+  TextHOne,
+  TextHTwo,
+  TextItalic,
+  TextStrikethrough,
 } from '@phosphor-icons/react';
+import clsx from 'clsx';
+import { DeltaStatic } from 'quill';
+import React, { MutableRefObject, useMemo } from 'react';
+import ReactQuill from 'react-quill';
+import { SerializableDeltaStatic, renderToolbarIcon } from './utils';
 
 import 'components/react_quill/react_quill_editor.scss';
 
@@ -131,7 +131,7 @@ export const useMarkdownToolbarHandlers = ({
       editor.deleteText(selection.index, selection.length);
       editor.insertText(
         selection.index,
-        `${markdownChars}${text.trim()}${markdownChars}`
+        `${markdownChars}${text.trim()}${markdownChars}`,
       );
       setContentDelta({
         ...editor.getContents(),
@@ -214,6 +214,20 @@ export const useMarkdownToolbarHandlers = ({
     };
   };
 
+  const handleListText = (text, prefix) => {
+    return text.split('\n').reduce((acc, line) => {
+      // remove empty lines
+      if (line.trim().length === 0) {
+        return acc;
+      }
+      // don't add prefix if already has it
+      if (line.startsWith(prefix)) {
+        return acc + `${line.trim()}\n`;
+      }
+      return acc + `${prefix} ${line}\n`;
+    }, '');
+  };
+
   const createListHandler = () => {
     return (value: string) => {
       const editor = editorRef?.current?.getEditor();
@@ -229,17 +243,15 @@ export const useMarkdownToolbarHandlers = ({
         throw new Error(`could not get prefix for value: ${value}`);
       }
       const text = editor.getText(selection.index, selection.length);
-      const newText = text.split('\n').reduce((acc, line) => {
-        // remove empty lines
-        if (line.trim().length === 0) {
-          return acc;
-        }
-        // don't add prefix if already has it
-        if (line.startsWith(prefix)) {
-          return acc + `${line.trim()}\n`;
-        }
-        return acc + `${prefix} ${line}\n`;
-      }, '');
+
+      let newText;
+
+      if (text.length > 0) {
+        newText = handleListText(text, prefix);
+      } else {
+        newText = `${prefix} `;
+      }
+
       editor.deleteText(selection.index, selection.length);
       editor.insertText(selection.index, newText);
       setContentDelta({
