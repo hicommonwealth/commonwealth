@@ -20,6 +20,7 @@ import {
 import { useBrowserAnalyticsTrack } from '../../../../../hooks/useBrowserAnalyticsTrack';
 import { communityTypeOptions } from './helpers';
 
+import { ChainBase } from '@hicommonwealth/core';
 import { featureFlags } from 'helpers/feature-flags';
 import { AuthModal } from 'views/modals/AuthModal';
 import './CommunityTypeStep.scss';
@@ -165,7 +166,7 @@ const CommunityTypeStep = ({
           }}
           showWalletsFor={
             communityTypeOptions.find((c) => c.type === selectedCommunity.type)
-              ?.chainBase
+              ?.chainBase as Exclude<ChainBase, ChainBase.NEAR>
           }
         />
       )}
