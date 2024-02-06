@@ -228,7 +228,7 @@ class CoinbaseWebWalletController implements IWebWallet<string> {
                   chainId: chainIdHex,
                   chainName: baseChain.name,
                   nativeCurrency: baseChain.nativeCurrency,
-                  rpcUrls: [rpcUrl],
+                  rpcUrls: [url],
                 },
               ],
             });
