@@ -1,4 +1,9 @@
-import { ChainBase, WalletSsoSource } from '@hicommonwealth/core';
+import {
+  ChainBase,
+  ChainNetwork,
+  WalletId,
+  WalletSsoSource,
+} from '@hicommonwealth/core';
 import useWallets from 'client/scripts/hooks/useWallets';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -45,7 +50,7 @@ const AuthModal = ({
   };
 
   const {
-    wallets,
+    wallets = [],
     isMagicLoading,
     isWalletConnectEnabled,
     onResetWalletConnect,
@@ -57,44 +62,74 @@ const AuthModal = ({
     onSuccess,
   });
 
-  const evmWallets = (wallets || [])
-    .filter((wallet) => wallet.chain == ChainBase.Ethereum)
-    .map((wallet) => wallet.name) as EVMWallets[];
-  const cosmosWallets = (wallets || [])
-    .filter((wallet) => wallet.chain === ChainBase.CosmosSDK)
-    .map((wallet) => wallet.name);
-  const solanaWallets = (wallets || [])
-    .filter((wallet) => wallet.chain === ChainBase.Solana)
-    .map((wallet) => wallet.name);
-  const substrateWallets = (wallets || [])
-    .filter((wallet) => wallet.chain === ChainBase.Substrate)
-    .map((wallet) => wallet.name);
+  const filterWalletNames = (byChain: ChainBase) =>
+    wallets
+      .filter((wallet) => wallet.chain === byChain)
+      .map((wallet) => wallet.name);
+  const findWalletById = (walletId: WalletId) =>
+    wallets.find((wallet) => wallet.name === walletId);
+
+  const hasWalletConnect = findWalletById(WalletId.WalletConnect);
+  const evmWallets = filterWalletNames(ChainBase.Ethereum) as EVMWallets[];
+  const cosmosWallets = filterWalletNames(ChainBase.CosmosSDK);
+  const solanaWallets = filterWalletNames(ChainBase.Solana);
+  const substrateWallets = filterWalletNames(ChainBase.Substrate);
+  const nearWallet = findWalletById(WalletId.NearWallet)?.name;
+  const roninWallet = findWalletById(WalletId.Ronin)?.name;
+
+  const getWalletNames = () => {
+    // Wallet Display Logic:
+    // 1. When `showWalletsFor` is present, show wallets for that specific chain only.
+    // 2. On communities based on 'Ethereum', 'Cosmos', 'Solana', 'Substrate', or 'Near' chains:
+    //    - Display wallets specific to the respective community chain.
+    //    - 'Near' is the only community where 'Near' wallet is shown
+    // 3. On non-community pages, show 'Ethereum', 'Cosmos', 'Solana', and 'Substrate' based wallets
+    // 4. On specific communities, show specific wallets
+    //    a. On 'axie-infinity' community, only show 'Ronin' wallet
+    //    b. On 'terra' community, only show 'terrastation' and 'terra-walletconnect' (wallet connect for terra) wallets
+    //    c. On 'evmos' and 'injective' communities, only show 'cosm-metamask' (metamask for cosmos communities) and
+    //       'keplr-ethereum' (keplr for ethereum communities) wallets
+
+    const showWalletsForSpecificChains = showWalletsFor || app?.chain?.base;
+    if (showWalletsForSpecificChains) {
+      switch (showWalletsForSpecificChains) {
+        case ChainBase.Ethereum:
+          if (
+            !showWalletsFor &&
+            app?.chain?.meta?.id === ChainNetwork.AxieInfinity &&
+            roninWallet
+          ) {
+            return [roninWallet];
+          }
+
+          return hasWalletConnect ? ['walletconnect'] : [];
+        case ChainBase.CosmosSDK:
+          return cosmosWallets;
+        case ChainBase.Solana:
+          return solanaWallets;
+        case ChainBase.Substrate:
+          return substrateWallets;
+        case ChainBase.NEAR:
+          return [nearWallet];
+        default:
+          return [];
+      }
+    }
+
+    if (!app?.chain?.base) {
+      return [
+        ...(hasWalletConnect ? ['walletconnect'] : []),
+        ...cosmosWallets,
+        ...solanaWallets,
+        ...substrateWallets,
+      ];
+    }
+  };
 
   const tabsList: AuthModalTabs[] = [
     {
       name: 'Wallet',
-      options: [
-        // Branches:
-        // 1. If `showWalletsFor` is present then show wallets for that chain
-        // 2. else show all wallets if on any non-community page
-        // 3. else when on any community page, show wallets specific to that community
-        ...([app?.chain?.base, showWalletsFor].includes(ChainBase.Ethereum) ||
-        (!app?.chain?.base && !showWalletsFor)
-          ? ['walletconnect']
-          : []),
-        ...([app?.chain?.base, showWalletsFor].includes(ChainBase.CosmosSDK) ||
-        (!app?.chain?.base && !showWalletsFor)
-          ? cosmosWallets
-          : []),
-        ...([app?.chain?.base, showWalletsFor].includes(ChainBase.Solana) ||
-        (!app?.chain?.base && !showWalletsFor)
-          ? solanaWallets
-          : []),
-        ...([app?.chain?.base, showWalletsFor].includes(ChainBase.Substrate) ||
-        (!app?.chain?.base && !showWalletsFor)
-          ? substrateWallets
-          : []),
-      ] as AuthWallets[],
+      options: getWalletNames() as AuthWallets[],
     },
     {
       name: 'Email or Social',

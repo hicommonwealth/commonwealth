@@ -8,11 +8,19 @@ export type CosmosWallets = 'keplr' | 'leap';
 export type SubstrateWallets = 'polkadot';
 export type SolanaWallets = 'phantom';
 export type EVMWallets = 'walletconnect' | 'metamask' | 'coinbase';
+export type CommunitySpecificWallets =
+  | 'near'
+  | 'ronin'
+  | 'terrastation'
+  | 'terra-walletconnect'
+  | 'cosm-metamask'
+  | 'keplr-ethereum';
 export type AuthWallets =
   | CosmosWallets
   | SolanaWallets
   | SubstrateWallets
   | EVMWallets
+  | CommunitySpecificWallets
   | 'NO_WALLETS_FOUND';
 export type AuthTypes = AuthWallets | AuthSSOs;
 

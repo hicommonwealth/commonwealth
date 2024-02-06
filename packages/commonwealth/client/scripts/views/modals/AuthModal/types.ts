@@ -10,5 +10,9 @@ export type AuthModalProps = {
   isOpen: boolean;
   onClose: () => any;
   onSuccess?: () => any;
-  showWalletsFor?: ChainBase;
+  showWalletsFor?:
+    | ChainBase.Ethereum
+    | ChainBase.CosmosSDK
+    | ChainBase.Solana
+    | ChainBase.Substrate;
 };

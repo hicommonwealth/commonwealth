@@ -81,6 +81,48 @@ export const AUTH_TYPES: AuthTypesList = {
     },
     label: 'Coinbase',
   },
+  near: {
+    icon: {
+      name: 'near',
+      isCustom: true,
+    },
+    label: 'Near',
+  },
+  ronin: {
+    icon: {
+      name: 'ronin',
+      isCustom: true,
+    },
+    label: 'Ronin',
+  },
+  terrastation: {
+    icon: {
+      name: 'terrastation',
+      isCustom: true,
+    },
+    label: 'Station',
+  },
+  'terra-walletconnect': {
+    icon: {
+      name: 'terra-walletconnect',
+      isCustom: true,
+    },
+    label: 'WalletConnect (Terra)',
+  },
+  'cosm-metamask': {
+    icon: {
+      name: 'cosm-metamask',
+      isCustom: true,
+    },
+    label: 'Metamask',
+  },
+  'keplr-ethereum': {
+    icon: {
+      name: 'keplr-ethereum',
+      isCustom: true,
+    },
+    label: 'Keplr',
+  },
   // SSO's
   google: {
     icon: {
