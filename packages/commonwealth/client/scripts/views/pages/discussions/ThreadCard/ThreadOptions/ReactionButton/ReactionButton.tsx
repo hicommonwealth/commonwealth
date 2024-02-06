@@ -143,7 +143,7 @@ export const ReactionButton = ({
         >
           <CWUpvote
             onClick={handleVoteClick}
-            voteCount={thread.reactionWeightsSum}
+            voteCount={thread.reactionWeightsSum || reactors.length}
             disabled={disabled}
             active={hasReacted}
           />
