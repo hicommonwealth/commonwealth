@@ -1,18 +1,17 @@
 import {
-  Icon,
+  Code,
   Image,
-  LinkSimpleHorizontal,
+  Link,
   ListBullets,
   ListChecks,
   ListNumbers,
+  Quotes,
   TextB,
   TextHOne,
   TextHTwo,
   TextItalic,
   TextStrikethrough,
 } from '@phosphor-icons/react';
-
-import { CWCode, CWQuotes } from '../component_kit/cw_icons/cw_icons';
 
 import clsx from 'clsx';
 import { DeltaStatic } from 'quill';
@@ -34,9 +33,9 @@ Object.assign(quillIcons, {
   bold: renderToolbarIcon(TextB),
   italic: renderToolbarIcon(TextItalic),
   strike: renderToolbarIcon(TextStrikethrough),
-  link: renderToolbarIcon(LinkSimpleHorizontal),
-  'code-block': renderToolbarIcon(CWCode as Icon),
-  blockquote: renderToolbarIcon(CWQuotes as Icon),
+  link: renderToolbarIcon(Link),
+  'code-block': renderToolbarIcon(Code),
+  blockquote: renderToolbarIcon(Quotes),
   image: renderToolbarIcon(Image),
   list: {
     ordered: renderToolbarIcon(ListNumbers),
