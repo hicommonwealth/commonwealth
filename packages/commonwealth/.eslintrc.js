@@ -92,7 +92,17 @@ module.exports = {
     'react/no-multi-comp': [1, { "ignoreStateless": false }],
     'react/jsx-curly-brace-presence': [1, { props: "never", children: "never" }],
     '@typescript-eslint/no-unused-vars': 1,
-    'react/jsx-key': 1
+    'react/jsx-key': 1,
+    "no-restricted-imports": ["error", {
+      patterns: [{
+        group: [
+          "@hicommonwealth/core/**",
+          "@hicommonwealth/adapters/**",
+          "@hicommonwealth/model/**"
+        ],
+        message: "Avoid importing from inside lib folders!",
+      }]
+    }]
   },
   ignorePatterns: ['server/scripts/setupPrerenderService.ts'],
   extends: [
