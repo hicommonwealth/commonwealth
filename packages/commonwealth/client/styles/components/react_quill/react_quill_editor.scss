@@ -59,12 +59,14 @@
       &:hover {
         svg {
           fill: $neutral-600;
+          color: $neutral-600;
         }
       }
 
       svg {
         height: unset !important;
         fill: $neutral-500;
+        color: $neutral-500;
       }
     }
   }

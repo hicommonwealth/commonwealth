@@ -894,6 +894,51 @@ export const CWCloud = (props: IconProps) => {
   );
 };
 
+export const CWCode = (props: IconProps) => {
+  const {
+    className,
+    componentType,
+    disabled,
+    iconButtonTheme,
+    iconSize,
+    selected,
+    ...otherProps
+  } = props;
+
+  return (
+    <svg
+      className={getClasses<IconStyleProps>(
+        { className, disabled, iconButtonTheme, iconSize, selected },
+        componentType,
+      )}
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      fill="currentColor"
+      viewBox="0 0 16 16"
+      {...otherProps}
+    >
+      <path
+        d="M4.84418 6.22217L3.06641 7.99995L4.84418 9.77772"
+        stroke="currentColor"
+        strokeWidth="1.77841"
+      ></path>
+
+      <path
+        d="M11.9556 6.22217L13.7333 7.99995L11.9556 9.77772"
+        stroke="currentColor"
+        strokeWidth="1.77841"
+      ></path>
+
+      <path
+        d="M9.28852 4.44434L7.51074 11.5554"
+        stroke="currentColor"
+        strokeWidth="1.77841"
+      ></path>
+    </svg>
+  );
+};
+
 export const CWCollapse = (props: IconProps) => {
   const {
     className,
@@ -2720,6 +2765,64 @@ export const CWPolygon = (props: IconProps) => {
         d="M11.5646 5.66283C11.3063 5.5104 10.9705 5.5104 10.6864 5.66283L8.67158 6.83142L7.30259 7.59356L5.28782 8.76212C5.02952 8.91456 4.69373 8.91456 4.4096 8.76212L2.80812 7.84759C2.54981 7.69515 2.369 7.4157 2.369 7.11087V5.30717C2.369 5.00232 2.52399 4.72288 2.80812 4.57045L4.38376 3.68131C4.64206 3.52889 4.97786 3.52889 5.26199 3.68131L6.83765 4.57045C7.09592 4.72288 7.27677 5.00232 7.27677 5.30717V6.47575L8.64576 5.68823V4.51964C8.64576 4.2148 8.49078 3.93535 8.20664 3.78293L5.28782 2.10625C5.02952 1.95383 4.69373 1.95383 4.4096 2.10625L1.43911 3.78293C1.15498 3.93535 1 4.2148 1 4.51964V7.89839C1 8.20322 1.15498 8.48267 1.43911 8.63511L4.4096 10.3118C4.6679 10.4642 5.00369 10.4642 5.28782 10.3118L7.30259 9.16859L8.67158 8.38108L10.6864 7.23789C10.9447 7.08545 11.2804 7.08545 11.5646 7.23789L13.1402 8.12704C13.3985 8.27944 13.5793 8.55889 13.5793 8.86376V10.6675C13.5793 10.9723 13.4243 11.2517 13.1402 11.4042L11.5646 12.3187C11.3063 12.4711 10.9705 12.4711 10.6864 12.3187L9.11069 11.4295C8.85238 11.2772 8.67158 10.9977 8.67158 10.6928V9.52427L7.30259 10.3118V11.4804C7.30259 11.7852 7.45757 12.0647 7.7417 12.2171L10.7122 13.8937C10.9705 14.0462 11.3063 14.0462 11.5904 13.8937L14.5609 12.2171C14.8192 12.0647 15 11.7852 15 11.4804V8.10162C15 7.79679 14.845 7.51734 14.5609 7.3649L11.5646 5.66283Z"
         fill="#656167"
       ></path>
+    </svg>
+  );
+};
+
+export const CWQuotes = (props: IconProps) => {
+  const {
+    className,
+    componentType,
+    disabled,
+    iconButtonTheme,
+    iconSize,
+    selected,
+    ...otherProps
+  } = props;
+
+  return (
+    <svg
+      className={getClasses<IconStyleProps>(
+        { className, disabled, iconButtonTheme, iconSize, selected },
+        componentType,
+      )}
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      fill="currentColor"
+      viewBox="0 0 16 16"
+      {...otherProps}
+    >
+      <path
+        d="M6.62318 4.44434H3.95557V7.11195H6.62318V4.44434Z"
+        fill="currentColor"
+        stroke="currentColor"
+        strokeWidth="1.77841"
+      />
+      <path
+        d="M12.8453 4.44434H10.1777V7.11195H12.8453V4.44434Z"
+        fill="currentColor"
+        stroke="currentColor"
+        strokeWidth="1.77841"
+      />
+      <path
+        d="M6.62223 7.11133C6.62223 10.6944 3.95557 11.5558 3.95557 11.5558L6.62223 7.11133Z"
+        fill="currentColor"
+      />
+      <path
+        d="M6.62223 7.11133C6.62223 10.6944 3.95557 11.5558 3.95557 11.5558"
+        stroke="currentColor"
+        strokeWidth="1.77841"
+      />
+      <path
+        d="M12.8444 7.11133C12.8444 10.6944 10.1777 11.5558 10.1777 11.5558L12.8444 7.11133Z"
+        fill="currentColor"
+      />
+      <path
+        d="M12.8444 7.11133C12.8444 10.6944 10.1777 11.5558 10.1777 11.5558"
+        stroke="currentColor"
+        strokeWidth="1.77841"
+      />
     </svg>
   );
 };

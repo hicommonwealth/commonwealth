@@ -1,22 +1,24 @@
-import React, { MutableRefObject, useMemo } from 'react';
-import ReactQuill from 'react-quill';
-import { renderToolbarIcon, SerializableDeltaStatic } from './utils';
-import { DeltaStatic } from 'quill';
-import clsx from 'clsx';
 import {
-  TextHOne,
-  TextHTwo,
-  TextB,
-  TextItalic,
-  TextStrikethrough,
-  LinkSimple,
-  Code,
-  Quotes,
+  Icon,
   Image,
-  ListNumbers,
+  LinkSimpleHorizontal,
   ListBullets,
   ListChecks,
+  ListNumbers,
+  TextB,
+  TextHOne,
+  TextHTwo,
+  TextItalic,
+  TextStrikethrough,
 } from '@phosphor-icons/react';
+
+import { CWCode, CWQuotes } from '../component_kit/cw_icons/cw_icons';
+
+import clsx from 'clsx';
+import { DeltaStatic } from 'quill';
+import React, { MutableRefObject, useMemo } from 'react';
+import ReactQuill from 'react-quill';
+import { SerializableDeltaStatic, renderToolbarIcon } from './utils';
 
 import 'components/react_quill/react_quill_editor.scss';
 
@@ -32,9 +34,9 @@ Object.assign(quillIcons, {
   bold: renderToolbarIcon(TextB),
   italic: renderToolbarIcon(TextItalic),
   strike: renderToolbarIcon(TextStrikethrough),
-  link: renderToolbarIcon(LinkSimple),
-  'code-block': renderToolbarIcon(Code),
-  blockquote: renderToolbarIcon(Quotes, { weight: 'fill' }),
+  link: renderToolbarIcon(LinkSimpleHorizontal),
+  'code-block': renderToolbarIcon(CWCode as Icon),
+  blockquote: renderToolbarIcon(CWQuotes as Icon),
   image: renderToolbarIcon(Image),
   list: {
     ordered: renderToolbarIcon(ListNumbers),
@@ -131,7 +133,7 @@ export const useMarkdownToolbarHandlers = ({
       editor.deleteText(selection.index, selection.length);
       editor.insertText(
         selection.index,
-        `${markdownChars}${text.trim()}${markdownChars}`
+        `${markdownChars}${text.trim()}${markdownChars}`,
       );
       setContentDelta({
         ...editor.getContents(),
