@@ -3,7 +3,7 @@ import React, { ReactElement } from 'react';
 import { loadScript } from 'helpers';
 import { DeltaStatic } from 'quill';
 import { preprocessQuillDeltaForRendering } from '../../../../../shared/utils';
-import { getTextFromDelta } from './utils';
+import { containsASCIIPatterns, getTextFromDelta } from './utils';
 
 type TempList = Array<
   Array<{
@@ -64,12 +64,6 @@ const consolidateOrderedLists = (_groups) => {
   }
 
   return result;
-};
-
-const containsASCIIPatterns = (text: string) => {
-  const patterns = [/[@#S%^&*()\-+=|\\\/]{3,}/, /^\s{2,}/gm];
-
-  return patterns.some((pattern) => pattern.test(text));
 };
 
 export const renderQuillDelta = (

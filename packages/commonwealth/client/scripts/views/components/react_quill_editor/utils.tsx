@@ -24,6 +24,12 @@ export const createDeltaFromText = (
   } as SerializableDeltaStatic;
 };
 
+export const containsASCIIPatterns = (text: string) => {
+  const patterns = [/[@#S%^&*()\-+=|\\\/]{3,}/, /^\s{2,}/gm];
+
+  return patterns.some((pattern) => pattern.test(text));
+};
+
 const hyphenSeparatorRegex = /^\s*\|\s*[-:]+\s*(?:\|\s*[-:]+\s*)*\|?\s*$/;
 
 export const isMarkdownTable = (markdown: string) => {
@@ -39,9 +45,12 @@ export const isMarkdownTable = (markdown: string) => {
 };
 
 const textModifierTags = (cell: string) => {
-  let content = cell.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-  content = content.replace(/_(.*?)_/g, '<em>$1</em>');
-  content = content.replace(/~~(.*?)~~/g, '<del>$1</del>');
+  const content = cell
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/_(.*?)_/g, '<em>$1</em>')
+    .replace(/~~(.*?)~~/g, '<del>$1</del>')
+    .replace(/<input.*?>/g, '<input type="checkbox">')
+    .replace(/:+1:/g, '&#x1F44D;');
   return content;
 };
 

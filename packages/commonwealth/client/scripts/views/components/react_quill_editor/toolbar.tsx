@@ -133,6 +133,32 @@ export const useMarkdownToolbarHandlers = ({
         selection.index,
         `${markdownChars}${text.trim()}${markdownChars}`,
       );
+
+      setContentDelta({
+        ...editor.getContents(),
+        ___isMarkdown: true,
+      } as SerializableDeltaStatic);
+    };
+  };
+
+  const createCodeHandler = () => {
+    return () => {
+      const editor = editorRef?.current?.getEditor();
+      if (!editor) {
+        return;
+      }
+      const selection = editor.getSelection();
+      if (!selection) {
+        return;
+      }
+      const text = editor.getText(selection.index, selection.length);
+      const start = '```\n';
+      const end = '```';
+
+      editor.deleteText(selection.index, selection.length);
+
+      editor.insertText(selection.index, `${start}${text}${end}`);
+
       setContentDelta({
         ...editor.getContents(),
         ___isMarkdown: true,
@@ -255,7 +281,7 @@ export const useMarkdownToolbarHandlers = ({
       italic: createHandler('_'),
       strike: createHandler('~~'),
       code: createHandler('`'),
-      'code-block': createHandler('\n```\n'),
+      'code-block': createCodeHandler(),
       header: createHeaderHandler(),
       link: createLinkHandler(),
       blockquote: createBlockquoteHandler(),
