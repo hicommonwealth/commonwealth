@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-
+import { useBrowserAnalyticsTrack } from 'client/scripts/hooks/useBrowserAnalyticsTrack';
 import 'components/proposals/voting_actions.scss';
 import { notifyError } from 'controllers/app/notifications';
 import type CosmosAccount from 'controllers/chain/cosmos/account';
@@ -24,6 +23,8 @@ import {
   NearSputnikVote,
   NearSputnikVoteString,
 } from 'controllers/chain/near/sputnik/types';
+import React, { useEffect, useState } from 'react';
+import { MixpanelGovernanceEvents } from '../../../../../shared/analytics/types';
 import type { AnyProposal } from '../../../models/types';
 import { VotingType } from '../../../models/types';
 
@@ -50,6 +51,8 @@ export const VotingActions = (props: VotingActionsProps) => {
   const [amount, setAmount] = useState<number>();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(app.isLoggedIn());
   const [, setConviction] = useState<number>();
+
+  const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
 
   useEffect(() => {
     app.loginStateEmitter.once('redraw', () => {
@@ -103,7 +106,7 @@ export const VotingActions = (props: VotingActionsProps) => {
         const chain = app.chain as Cosmos;
         const depositAmountInMinimalDenom = parseInt(
           naturalDenomToMinimal(amount, chain.meta?.decimals),
-          10
+          10,
         );
 
         proposal
@@ -111,35 +114,57 @@ export const VotingActions = (props: VotingActionsProps) => {
           .then(emitRedraw)
           .catch((err) => notifyError(err.toString()));
       } else {
-        proposal
-          .voteTx(new CosmosVote(user, 'Yes'))
-          .then(emitRedraw)
-          .catch((err) => notifyError(err.toString()));
+        try {
+          await proposal.voteTx(new CosmosVote(user, 'Yes'));
+          emitRedraw();
+          trackAnalytics({
+            event: MixpanelGovernanceEvents.COSMOS_VOTE_OCCURRED,
+          });
+        } catch (error) {
+          notifyError(error.toString());
+        }
       }
     } else if (proposal instanceof CompoundProposal) {
-      proposal
-        .submitVoteWebTx(new CompoundProposalVote(user, BravoVote.YES))
-        .then(emitRedraw)
-        .catch((err) => notifyError(err.toString()));
+      try {
+        await proposal.submitVoteWebTx(
+          new CompoundProposalVote(user, BravoVote.YES),
+        );
+        emitRedraw();
+        trackAnalytics({
+          event: MixpanelGovernanceEvents.COMPOUND_VOTE_OCCURRED,
+        });
+      } catch (err) {
+        notifyError(err.toString());
+      }
     } else if (proposal instanceof AaveProposal) {
-      proposal
-        .submitVoteWebTx(new AaveProposalVote(user, true))
-        .then(emitRedraw)
-        .catch((err) => notifyError(err.toString()));
+      try {
+        await proposal.submitVoteWebTx(new AaveProposalVote(user, true));
+        emitRedraw();
+        trackAnalytics({
+          event: MixpanelGovernanceEvents.AAVE_VOTE_OCCURRED,
+        });
+      } catch (err) {
+        notifyError(err.toString());
+      }
     } else if (proposal instanceof NearSputnikProposal) {
-      proposal
-        .submitVoteWebTx(
-          new NearSputnikVote(user, NearSputnikVoteString.Approve)
-        )
-        .then(emitRedraw)
-        .catch((err) => notifyError(err.toString()));
+      try {
+        await proposal.submitVoteWebTx(
+          new NearSputnikVote(user, NearSputnikVoteString.Approve),
+        );
+        emitRedraw();
+        trackAnalytics({
+          event: MixpanelGovernanceEvents.SPUTNIK_VOTE_OCCURRED,
+        });
+      } catch (err) {
+        notifyError(err.toString());
+      }
     } else {
       toggleVotingModal(false);
       return notifyError('Invalid proposal type');
     }
   };
 
-  const voteNo = (e) => {
+  const voteNo = async (e) => {
     e.preventDefault();
     toggleVotingModal(true);
 
@@ -147,27 +172,49 @@ export const VotingActions = (props: VotingActionsProps) => {
       proposal instanceof CosmosProposal ||
       proposal instanceof CosmosProposalV1
     ) {
-      proposal
-        .voteTx(new CosmosVote(user, 'No'))
-        .then(emitRedraw)
-        .catch((err) => notifyError(err.toString()));
+      try {
+        await proposal.voteTx(new CosmosVote(user, 'No'));
+        emitRedraw();
+      } catch (err) {
+        notifyError(err.toString());
+      }
+      trackAnalytics({
+        event: MixpanelGovernanceEvents.COSMOS_VOTE_OCCURRED,
+      });
     } else if (proposal instanceof CompoundProposal) {
-      proposal
-        .submitVoteWebTx(new CompoundProposalVote(user, BravoVote.NO))
-        .then(emitRedraw)
-        .catch((err) => notifyError(err.toString()));
+      try {
+        await proposal.submitVoteWebTx(
+          new CompoundProposalVote(user, BravoVote.NO),
+        );
+        emitRedraw();
+        trackAnalytics({
+          event: MixpanelGovernanceEvents.COMPOUND_VOTE_OCCURRED,
+        });
+      } catch (err) {
+        notifyError(err.toString());
+      }
     } else if (proposal instanceof AaveProposal) {
-      proposal
-        .submitVoteWebTx(new AaveProposalVote(user, false))
-        .then(emitRedraw)
-        .catch((err) => notifyError(err.toString()));
+      try {
+        await proposal.submitVoteWebTx(new AaveProposalVote(user, false));
+        emitRedraw();
+        trackAnalytics({
+          event: MixpanelGovernanceEvents.AAVE_VOTE_OCCURRED,
+        });
+      } catch (err) {
+        notifyError(err.toString());
+      }
+      trackAnalytics({
+        event: MixpanelGovernanceEvents.SPUTNIK_VOTE_OCCURRED,
+      });
     } else if (proposal instanceof NearSputnikProposal) {
-      proposal
-        .submitVoteWebTx(
-          new NearSputnikVote(user, NearSputnikVoteString.Reject)
-        )
-        .then(emitRedraw)
-        .catch((err) => notifyError(err.toString()));
+      try {
+        await proposal.submitVoteWebTx(
+          new NearSputnikVote(user, NearSputnikVoteString.Reject),
+        );
+        emitRedraw();
+      } catch (err) {
+        notifyError(err.toString());
+      }
     } else {
       toggleVotingModal(false);
       return notifyError('Invalid proposal type');
@@ -225,7 +272,7 @@ export const VotingActions = (props: VotingActionsProps) => {
     if (proposal instanceof NearSputnikProposal) {
       proposal
         .submitVoteWebTx(
-          new NearSputnikVote(user, NearSputnikVoteString.Remove)
+          new NearSputnikVote(user, NearSputnikVoteString.Remove),
         )
         .then(() => {
           onModalClose();
