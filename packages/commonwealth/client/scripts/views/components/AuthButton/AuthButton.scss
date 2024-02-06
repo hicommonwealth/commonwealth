@@ -38,7 +38,7 @@
   }
 
   &.dark {
-    background-color: #1e1f1f;
+    background-color: $gray-800;
     border: transparent;
 
     &:not(:disabled) {
