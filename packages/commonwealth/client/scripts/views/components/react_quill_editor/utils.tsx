@@ -63,9 +63,9 @@ const textModifierTags = (cell: string) => {
 export const markdownToHtmlTable = (markdown: string, finalDoc: string) => {
   const lines = markdown.trim().split('\n');
 
-  const isTable = isMarkdownTable(finalDoc);
+  const isNotValidMarkdownTable = isMarkdownTable(finalDoc);
 
-  if (!isTable) {
+  if (!isNotValidMarkdownTable) {
     return finalDoc;
   }
 
