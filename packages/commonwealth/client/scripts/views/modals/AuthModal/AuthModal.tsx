@@ -79,19 +79,19 @@ const AuthModal = ({
         // 2. else show all wallets if on any non-community page
         // 3. else when on any community page, show wallets specific to that community
         ...([app?.chain?.base, showWalletsFor].includes(ChainBase.Ethereum) ||
-        !app?.chain?.base
+        (!app?.chain?.base && !showWalletsFor)
           ? ['walletconnect']
           : []),
         ...([app?.chain?.base, showWalletsFor].includes(ChainBase.CosmosSDK) ||
-        !app?.chain?.base
+        (!app?.chain?.base && !showWalletsFor)
           ? cosmosWallets
           : []),
         ...([app?.chain?.base, showWalletsFor].includes(ChainBase.Solana) ||
-        !app?.chain?.base
+        (!app?.chain?.base && !showWalletsFor)
           ? solanaWallets
           : []),
         ...([app?.chain?.base, showWalletsFor].includes(ChainBase.Substrate) ||
-        !app?.chain?.base
+        (!app?.chain?.base && !showWalletsFor)
           ? substrateWallets
           : []),
       ] as AuthWallets[],
