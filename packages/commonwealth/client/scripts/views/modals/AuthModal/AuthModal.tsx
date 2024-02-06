@@ -4,7 +4,11 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
 import AuthButton from '../../components/AuthButton';
-import { AuthTypes, AuthWallets } from '../../components/AuthButton/types';
+import {
+  AuthTypes,
+  AuthWallets,
+  EVMWallets,
+} from '../../components/AuthButton/types';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import {
@@ -17,6 +21,8 @@ import {
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
 import './AuthModal.scss';
+import { EVMWalletsSubModal } from './EVMWalletsSubModal';
+import { EmailForm } from './EmailForm';
 import { AuthModalProps, AuthModalTabs } from './types';
 
 const AuthModal = ({
@@ -26,12 +32,31 @@ const AuthModal = ({
   showWalletsFor,
 }: AuthModalProps) => {
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
+  const [isEVMWalletsModalVisible, setIsEVMWalletsModalVisible] =
+    useState(false);
+  const [isAuthenticatingWithEmail, setIsAuthenticatingWithEmail] =
+    useState(false);
 
-  const { wallets, onWalletSelect, onSocialLogin } = useWallets({
-    onModalClose: onClose,
+  const handleClose = async () => {
+    setIsAuthenticatingWithEmail(false);
+    setIsEVMWalletsModalVisible(false);
+    await onClose();
+  };
+
+  const {
+    wallets,
+    isMagicLoading,
+    onEmailLogin,
+    onWalletSelect,
+    onSocialLogin,
+  } = useWallets({
+    onModalClose: handleClose,
     onSuccess,
   });
 
+  const evmWallets = (wallets || [])
+    .filter((wallet) => wallet.chain == ChainBase.Ethereum)
+    .map((wallet) => wallet.name) as EVMWallets[];
   const cosmosWallets = (wallets || [])
     .filter((wallet) => wallet.chain === ChainBase.CosmosSDK)
     .map((wallet) => wallet.name);
@@ -76,17 +101,19 @@ const AuthModal = ({
 
   const onAuthMethodSelect = async (option: AuthTypes) => {
     if (option === 'email') {
-      // TODO: implement this in https://github.com/hicommonwealth/commonwealth/issues/6386
+      setIsAuthenticatingWithEmail(true);
       return;
     }
 
     // if any wallet option is selected
     if (activeTabIndex === 0) {
-      await onWalletSelect(
-        wallets.find(
-          (wallet) => wallet.name.toLowerCase() === option.toLowerCase(),
-        ),
-      );
+      // if wallet connect option is selected, open the EVM wallet list modal
+      if (option === 'walletconnect' && !isEVMWalletsModalVisible) {
+        setIsEVMWalletsModalVisible(true);
+        return;
+      }
+
+      await onWalletSelect(wallets.find((wallet) => wallet.name === option));
     }
 
     // if any SSO option is selected
@@ -99,60 +126,91 @@ const AuthModal = ({
   };
 
   return (
-    <CWModal
-      open={isOpen}
-      onClose={onClose}
-      size="medium"
-      content={
-        <section className="AuthModal">
-          <CWIcon iconName="close" onClick={onClose} className="close-btn" />
+    <>
+      <CWModal
+        open={isOpen}
+        onClose={handleClose}
+        size="medium"
+        content={
+          <section className="AuthModal">
+            <CWIcon
+              iconName="close"
+              onClick={handleClose}
+              className="close-btn"
+            />
 
-          <img src="/static/img/branding/common-logo.svg" className="logo" />
+            <img src="/static/img/branding/common-logo.svg" className="logo" />
 
-          <CWText type="h2" className="header" isCentered>
-            Sign into Common
-          </CWText>
-
-          <CWModalBody className="content">
-            <CWTabsRow className="tabs">
-              {tabsList.map((tab, index) => (
-                <CWTab
-                  key={tab.name}
-                  label={tab.name}
-                  isSelected={tabsList[activeTabIndex].name === tab.name}
-                  onClick={() => setActiveTabIndex(index)}
-                />
-              ))}
-            </CWTabsRow>
-
-            <section className="auth-options">
-              {activeTabIndex === 0 &&
-              tabsList[activeTabIndex].options.length === 0 ? (
-                <AuthButton type="NO_WALLETS_FOUND" />
-              ) : (
-                tabsList[activeTabIndex].options.map((option, key) => (
-                  <AuthButton
-                    key={key}
-                    type={option}
-                    onClick={async () => await onAuthMethodSelect(option)}
-                  />
-                ))
-              )}
-            </section>
-          </CWModalBody>
-
-          <CWModalFooter className="footer">
-            <CWText isCentered>
-              By connecting to Common you agree to our&nbsp;
-              <br />
-              <Link to="/terms">Terms of Service</Link>
-              &nbsp;and&nbsp;
-              <Link to="/privacy">Privacy Policy</Link>
+            <CWText type="h2" className="header" isCentered>
+              Sign into Common
             </CWText>
-          </CWModalFooter>
-        </section>
-      }
-    />
+
+            <CWModalBody className="content">
+              <CWTabsRow className="tabs">
+                {tabsList.map((tab, index) => (
+                  <CWTab
+                    key={tab.name}
+                    label={tab.name}
+                    isDisabled={isMagicLoading}
+                    isSelected={tabsList[activeTabIndex].name === tab.name}
+                    onClick={() => setActiveTabIndex(index)}
+                  />
+                ))}
+              </CWTabsRow>
+
+              <section className="auth-options">
+                {/* On the wallets tab, if no wallet is found, show "No wallets Found" */}
+                {activeTabIndex === 0 &&
+                  tabsList[activeTabIndex].options.length === 0 && (
+                    <AuthButton type="NO_WALLETS_FOUND" />
+                  )}
+
+                {/*
+                If email option is selected don't render SSO's list,
+                else render wallets/SSO's list based on activeTabIndex
+              */}
+                {(activeTabIndex === 0 ||
+                  (activeTabIndex === 1 && !isAuthenticatingWithEmail)) &&
+                  tabsList[activeTabIndex].options.map((option, key) => (
+                    <AuthButton
+                      key={key}
+                      type={option}
+                      disabled={isMagicLoading}
+                      onClick={async () => await onAuthMethodSelect(option)}
+                    />
+                  ))}
+
+                {/* If email option is selected from the SSO's list, show email form */}
+                {activeTabIndex === 1 && isAuthenticatingWithEmail && (
+                  <EmailForm
+                    isLoading={isMagicLoading}
+                    onCancel={() => setIsAuthenticatingWithEmail(false)}
+                    onSubmit={async ({ email }) => await onEmailLogin(email)}
+                  />
+                )}
+              </section>
+            </CWModalBody>
+
+            <CWModalFooter className="footer">
+              <CWText isCentered>
+                By connecting to Common you agree to our&nbsp;
+                <br />
+                <Link to="/terms">Terms of Service</Link>
+                &nbsp;and&nbsp;
+                <Link to="/privacy">Privacy Policy</Link>
+              </CWText>
+            </CWModalFooter>
+          </section>
+        }
+      />
+      <EVMWalletsSubModal
+        availableWallets={evmWallets}
+        isOpen={isEVMWalletsModalVisible}
+        onClose={() => setIsEVMWalletsModalVisible(false)}
+        onWalletSelect={async (option) => await onAuthMethodSelect(option)}
+        disabled={isMagicLoading}
+      />
+    </>
   );
 };
 
