@@ -1,22 +1,26 @@
-import React, { MutableRefObject, useMemo } from 'react';
-import ReactQuill from 'react-quill';
-import { renderToolbarIcon, SerializableDeltaStatic } from './utils';
-import { DeltaStatic } from 'quill';
-import clsx from 'clsx';
 import {
-  TextHOne,
-  TextHTwo,
-  TextB,
-  TextItalic,
-  TextStrikethrough,
-  LinkSimple,
   Code,
-  Quotes,
   Image,
-  ListNumbers,
+  LinkSimple,
   ListBullets,
   ListChecks,
+  ListNumbers,
+  Quotes,
+  TextAlignCenter,
+  TextAlignJustify,
+  TextAlignLeft,
+  TextAlignRight,
+  TextB,
+  TextHOne,
+  TextHTwo,
+  TextItalic,
+  TextStrikethrough,
 } from '@phosphor-icons/react';
+import clsx from 'clsx';
+import { DeltaStatic } from 'quill';
+import React, { MutableRefObject, useMemo } from 'react';
+import ReactQuill from 'react-quill';
+import { SerializableDeltaStatic, renderToolbarIcon } from './utils';
 
 import 'components/react_quill/react_quill_editor.scss';
 
@@ -40,6 +44,12 @@ Object.assign(quillIcons, {
     ordered: renderToolbarIcon(ListNumbers),
     bullet: renderToolbarIcon(ListBullets),
     check: renderToolbarIcon(ListChecks),
+  },
+  'text-align': {
+    left: renderToolbarIcon(TextAlignLeft),
+    center: renderToolbarIcon(TextAlignCenter),
+    right: renderToolbarIcon(TextAlignRight),
+    justify: renderToolbarIcon(TextAlignJustify),
   },
 });
 
@@ -88,6 +98,12 @@ export const CustomQuillToolbar = ({
         <button className="ql-list" value="bullet" />
         <button className="ql-list" value="check" />
       </div>
+      <div className="section">
+        <button className="ql-text-align" value="left"></button>
+        <button className="ql-text-align" value="center"></button>
+        <button className="ql-text-align" value="right"></button>
+        <button className="ql-text-align" value="justify"></button>
+      </div>
     </div>
     <div className={clsx('right-buttons', { isDisabled })}>
       <button
@@ -131,7 +147,7 @@ export const useMarkdownToolbarHandlers = ({
       editor.deleteText(selection.index, selection.length);
       editor.insertText(
         selection.index,
-        `${markdownChars}${text.trim()}${markdownChars}`
+        `${markdownChars}${text.trim()}${markdownChars}`,
       );
       setContentDelta({
         ...editor.getContents(),
@@ -249,6 +265,34 @@ export const useMarkdownToolbarHandlers = ({
     };
   };
 
+  const alignTextHandler = () => {
+    return (alignment: string) => {
+      const editor = editorRef?.current?.getEditor();
+      if (!editor) {
+        return;
+      }
+      const selection = editor.getSelection();
+      if (!selection) {
+        return;
+      }
+
+      if (!alignment) {
+        throw new Error(`Could not get alignment!`);
+      }
+
+      const text = editor.getText(selection.index, selection.length);
+      const newText = `<div style="text-align: ${alignment}"> ${text} </div>`;
+
+      editor.deleteText(selection.index, selection.length);
+      editor.insertText(selection.index, newText);
+
+      setContentDelta({
+        ...editor.getContents(),
+        ___isMarkdown: true,
+      } as SerializableDeltaStatic);
+    };
+  };
+
   const handlers = useMemo(() => {
     return {
       bold: createHandler('**'),
@@ -260,6 +304,7 @@ export const useMarkdownToolbarHandlers = ({
       link: createLinkHandler(),
       blockquote: createBlockquoteHandler(),
       list: createListHandler(),
+      'text-align': alignTextHandler(),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
