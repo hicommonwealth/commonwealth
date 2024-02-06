@@ -19,12 +19,14 @@ type CommentReactionButtonProps = {
   comment: Comment<any>;
   disabled: boolean;
   tooltipText?: string;
+  onReaction?: () => void;
 };
 
 export const CommentReactionButton = ({
   comment,
   disabled,
   tooltipText = '',
+  onReaction,
 }: CommentReactionButtonProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
@@ -71,6 +73,8 @@ export const CommentReactionButton = ({
       setIsModalOpen(true);
       return;
     }
+
+    onReaction();
 
     if (hasReacted) {
       const foundReaction = comment.reactions.find((r) => {

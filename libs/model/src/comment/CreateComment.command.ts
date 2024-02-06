@@ -1,7 +1,7 @@
+import type { CommandMetadata } from '@hicommonwealth/core';
 import { z } from 'zod';
 import { models } from '../database';
 import type { CommentAttributes } from '../models';
-import type { CommandMetadata } from '../types';
 
 const schema = z.object({
   content: z.string(),

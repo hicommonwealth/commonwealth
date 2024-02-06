@@ -1,5 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
-import { NotificationCategories } from '@hicommonwealth/core';
+import { AppError, NotificationCategories } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import Errors from './errors';

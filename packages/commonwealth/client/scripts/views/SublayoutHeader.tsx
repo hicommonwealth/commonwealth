@@ -58,12 +58,8 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
   return (
     <>
       <div className="SublayoutHeader">
-        <div
-          className={`header-left ${
-            app.platform() === 'desktop' ? 'desktop' : ''
-          }`}
-        >
-          {app.platform() === 'desktop' && <CWDivider isVertical />}
+        <div className="header-left desktop">
+          <CWDivider isVertical />
           <CWIconButton
             iconName="commonLogo"
             iconButtonTheme="black"

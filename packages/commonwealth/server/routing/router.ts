@@ -5,7 +5,7 @@ import passport from 'passport';
 import { getCommunityStakeHandler } from '../routes/communities/get_community_stakes_handler';
 import { putCommunityStakeHandler } from '../routes/communities/put_community_stakes_handler';
 
-import { TokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
+import { TokenBalanceCache } from '@hicommonwealth/model';
 
 import {
   methodNotAllowedMiddleware,
@@ -94,7 +94,6 @@ import updateAddress from '../routes/updateAddress';
 import viewChainIcons from '../routes/viewChainIcons';
 import type BanCache from '../util/banCheckCache';
 
-import { RedisCache } from '@hicommonwealth/adapters';
 import type DatabaseValidationService from '../middleware/databaseValidationService';
 import createDiscordBotConfig from '../routes/createDiscordBotConfig';
 import generateImage from '../routes/generateImage';
@@ -140,6 +139,8 @@ import { ServerReactionsController } from '../controllers/server_reactions_contr
 import { ServerThreadsController } from '../controllers/server_threads_controller';
 import { ServerTopicsController } from '../controllers/server_topics_controller';
 
+import { GENERATE_IMAGE_RATE_LIMIT } from 'server/config';
+import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
 import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
 import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_handler';
@@ -205,7 +206,6 @@ function setupRouter(
   banCache: BanCache,
   globalActivityCache: GlobalActivityCache,
   databaseValidationService: DatabaseValidationService,
-  redisCache: RedisCache,
 ) {
   // controllers
   const serverControllers: ServerControllers = {
@@ -231,7 +231,7 @@ function setupRouter(
       banCache,
     ),
     polls: new ServerPollsController(models, tokenBalanceCache),
-    proposals: new ServerProposalsController(models, redisCache),
+    proposals: new ServerProposalsController(models),
     groups: new ServerGroupsController(models, tokenBalanceCache, banCache),
     topics: new ServerTopicsController(models, banCache),
     admin: new ServerAdminController(models),
@@ -375,7 +375,7 @@ function setupRouter(
   registerRoute(
     router,
     'get',
-    '/communityStakes/:community_id/:stake_id',
+    '/communityStakes/:community_id/:stake_id?',
     getCommunityStakeHandler.bind(this, models, serverControllers),
   );
 
@@ -453,7 +453,6 @@ function setupRouter(
     '/bot/threads',
     databaseValidationService.validateBotUser,
     databaseValidationService.validateAuthor,
-    databaseValidationService.validateCommunityWithTopics,
     updateThreadHandler.bind(this, serverControllers),
   );
 
@@ -471,7 +470,6 @@ function setupRouter(
     '/threads/:id',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
-    databaseValidationService.validateCommunity,
     updateThreadHandler.bind(this, serverControllers),
   );
 
@@ -482,14 +480,12 @@ function setupRouter(
     '/threads/:id/polls',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
-    databaseValidationService.validateCommunity,
     createThreadPollHandler.bind(this, serverControllers),
   );
   registerRoute(
     router,
     'get',
     '/threads/:id/polls',
-    databaseValidationService.validateCommunity,
     getThreadPollsHandler.bind(this, serverControllers),
   );
   registerRoute(
@@ -498,7 +494,6 @@ function setupRouter(
     '/polls/:id',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
-    databaseValidationService.validateCommunity,
     deletePollHandler.bind(this, serverControllers),
   );
   registerRoute(
@@ -507,14 +502,12 @@ function setupRouter(
     '/polls/:id/votes',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
-    databaseValidationService.validateCommunity,
     updatePollVoteHandler.bind(this, serverControllers),
   );
   registerRoute(
     router,
     'get',
     '/polls/:id/votes',
-    databaseValidationService.validateCommunity,
     getPollVotesHandler.bind(this, serverControllers),
   );
 
@@ -598,7 +591,6 @@ function setupRouter(
     '/threads/:id',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
-    databaseValidationService.validateCommunity,
     deleteThreadHandler.bind(this, serverControllers),
   );
   registerRoute(
@@ -632,7 +624,6 @@ function setupRouter(
     '/threads/:id/comments',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
-    databaseValidationService.validateCommunity,
     createThreadCommentHandler.bind(this, serverControllers),
   );
 
@@ -642,7 +633,6 @@ function setupRouter(
     '/bot/threads/:id/comments',
     databaseValidationService.validateBotUser,
     databaseValidationService.validateAuthor,
-    databaseValidationService.validateCommunity,
     createThreadCommentHandler.bind(this, serverControllers),
   );
 
@@ -652,7 +642,6 @@ function setupRouter(
     '/bot/threads/:id/comments',
     databaseValidationService.validateBotUser,
     databaseValidationService.validateAuthor,
-    databaseValidationService.validateCommunity,
     updateCommentHandler.bind(this, serverControllers),
   );
 
@@ -662,7 +651,6 @@ function setupRouter(
     '/bot/comments/:message_id',
     databaseValidationService.validateBotUser,
     databaseValidationService.validateAuthor,
-    databaseValidationService.validateCommunity,
     deleteBotCommentHandler.bind(this, serverControllers),
   );
 
@@ -672,7 +660,6 @@ function setupRouter(
     '/comments/:id',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
-    databaseValidationService.validateCommunity,
     updateCommentHandler.bind(this, serverControllers),
   );
   registerRoute(
@@ -681,7 +668,6 @@ function setupRouter(
     '/comments/:id',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
-    databaseValidationService.validateCommunity,
     deleteCommentHandler.bind(this, serverControllers),
   );
   registerRoute(
@@ -713,7 +699,6 @@ function setupRouter(
     'patch',
     '/topics/:topicId/channels/:channelId' /* OLD: /updateTopic */,
     passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
     updateTopicChannelHandler.bind(this, serverControllers),
   );
   registerRoute(
@@ -729,7 +714,6 @@ function setupRouter(
     'patch',
     '/topics/:topicId' /* OLD: /editTopic */,
     passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
     updateTopicHandler.bind(this, serverControllers),
   );
   registerRoute(
@@ -737,7 +721,6 @@ function setupRouter(
     'delete',
     '/topics/:topicId' /* OLD: /deleteTopic */,
     passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
     deleteTopicHandler.bind(this, serverControllers),
   );
   registerRoute(
@@ -755,7 +738,6 @@ function setupRouter(
     '/threads/:id/reactions',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
-    databaseValidationService.validateCommunity,
     createThreadReactionHandler.bind(this, serverControllers),
   );
   registerRoute(
@@ -764,7 +746,6 @@ function setupRouter(
     '/comments/:id/reactions',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
-    databaseValidationService.validateCommunity,
     createCommentReactionHandler.bind(this, serverControllers),
   );
   registerRoute(
@@ -841,7 +822,6 @@ function setupRouter(
     'post',
     '/updateWebhook',
     passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
     updateWebhook.bind(this, models),
   );
   registerRoute(
@@ -867,7 +847,6 @@ function setupRouter(
     'post',
     '/setDefaultRole',
     passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
     setDefaultRole.bind(this, models),
   );
 
@@ -1117,6 +1096,10 @@ function setupRouter(
     router,
     'post',
     '/generateImage',
+    rateLimiterMiddleware({
+      routerNamespace: 'generateImage',
+      requestsPerMinute: GENERATE_IMAGE_RATE_LIMIT,
+    }),
     passport.authenticate('jwt', { session: false }),
     generateImage.bind(this, models),
   );
@@ -1252,7 +1235,6 @@ function setupRouter(
     '/refresh-membership',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
-    databaseValidationService.validateCommunity,
     refreshMembershipHandler.bind(this, serverControllers),
   );
 
@@ -1280,7 +1262,6 @@ function setupRouter(
     '/groups/:id',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
-    databaseValidationService.validateCommunity,
     updateGroupHandler.bind(this, serverControllers),
   );
 
@@ -1290,7 +1271,6 @@ function setupRouter(
     '/groups/:id',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
-    databaseValidationService.validateCommunity,
     deleteGroupHandler.bind(this, serverControllers),
   );
 

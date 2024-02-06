@@ -43,6 +43,7 @@ class ChainInfo {
   public discordBotWebhooksEnabled?: boolean;
   public directoryPageEnabled?: boolean;
   public directoryPageChainNodeId?: number;
+  public namespace?: string;
 
   public get node() {
     return this.ChainNode;
@@ -81,6 +82,7 @@ class ChainInfo {
     discordBotWebhooksEnabled,
     directoryPageEnabled,
     directoryPageChainNodeId,
+    namespace,
   }) {
     this.id = id;
     this.network = network;
@@ -115,6 +117,7 @@ class ChainInfo {
     this.discordBotWebhooksEnabled = discordBotWebhooksEnabled;
     this.directoryPageEnabled = directoryPageEnabled;
     this.directoryPageChainNodeId = directoryPageChainNodeId;
+    this.namespace = namespace;
   }
 
   public static fromJSON({
@@ -149,6 +152,7 @@ class ChainInfo {
     discord_bot_webhooks_enabled,
     directory_page_enabled,
     directory_page_chain_node_id,
+    namespace,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -205,6 +209,7 @@ class ChainInfo {
       discordBotWebhooksEnabled: discord_bot_webhooks_enabled,
       directoryPageEnabled: directory_page_enabled,
       directoryPageChainNodeId: directory_page_chain_node_id,
+      namespace,
     });
   }
 
