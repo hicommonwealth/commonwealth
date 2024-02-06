@@ -6,7 +6,7 @@
   letter-spacing: 0.01em;
 
   position: relative;
-  // word-break: break-word;
+  word-break: break-word;
 
   @include formatted-text();
   @include collapsible();

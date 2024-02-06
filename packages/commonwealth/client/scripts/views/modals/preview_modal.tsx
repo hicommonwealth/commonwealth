@@ -1,6 +1,5 @@
 import type { DeltaStatic } from 'quill';
 import React from 'react';
-
 import {
   CWModalBody,
   CWModalHeader,

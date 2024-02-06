@@ -38,56 +38,64 @@ export const isMarkdownTable = (markdown: string) => {
   return containsPipeSeparator || containsHyphenSeparator;
 };
 
-export const markdownToHtmlTable = (markdown: string) => {
+const textModifierTags = (cell: string) => {
+  let content = cell.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  content = content.replace(/_(.*?)_/g, '<em>$1</em>');
+  content = content.replace(/~~(.*?)~~/g, '<del>$1</del>');
+  return content;
+};
+
+export const markdownToHtmlTable = (markdown: string, finalDoc: string) => {
   const lines = markdown.trim().split('\n');
-  const isTable = isMarkdownTable(markdown);
 
-  if (isTable) {
-    let html = '<table>';
-    let isHeaderRow = true;
+  const isTable = isMarkdownTable(finalDoc);
 
-    lines.forEach((line, index) => {
-      const cells = line.split('|').map((cell) => cell.trim());
-      const tag = isHeaderRow ? 'th' : 'td';
-      const rowTag = isHeaderRow ? 'thead' : 'tbody';
-
-      // Check if the row is a header or if it's a separator row
-      const isHeader = isHeaderRow && line.trim().startsWith('|');
-      const isSeparator = hyphenSeparatorRegex.test(line);
-
-      if (!isSeparator) {
-        html += `<${rowTag}><tr>`;
-        cells.forEach((cell) => {
-          if (cell !== '') {
-            let content = cell.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            content = content.replace(/_(.*?)_/g, '<em>$1</em>');
-            content = content.replace(/~~(.*?)~~/g, '<del>$1</del>');
-            html += `<${tag}>${content}</${tag}>`;
-          }
-        });
-        html += '</tr></tbody>';
-        isHeaderRow = false;
-      } else if (isHeader) {
-        html += '<thead><tr>';
-        cells.forEach((cell) => {
-          if (cell !== '') {
-            let content = cell.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            content = content.replace(/_(.*?)_/g, '<em>$1</em>');
-            content = content.replace(/~~(.*?)~~/g, '<del>$1</del>');
-            html += `<${tag}>${content}</${tag}>`;
-          }
-        });
-        html += '</tr></thead>';
-      }
-    });
-
-    html += '</table>';
-    return html;
-  } else {
+  if (!isTable) {
     //This may never be used but being regex can be imperfect
     //Added this as a redundant check
-    return markdown;
+    return finalDoc;
   }
+
+  let html = '<table style={{whiteSpace: "nowrap"}}>';
+  let isHeaderRow = true;
+
+  lines.forEach((line) => {
+    const cells = line.split('|').map((cell) => cell.trim());
+    const tag = isHeaderRow ? 'th' : 'td';
+    const rowTag = isHeaderRow ? 'thead' : 'tbody';
+
+    // Check if the row is a header or if it's a separator row
+    // This is specifically important for HackMD tables syntax
+    const isHeader = isHeaderRow && line.trim().startsWith('|');
+    const isSeparator = hyphenSeparatorRegex.test(line);
+
+    if (!isSeparator) {
+      html += `<${rowTag}><tr>`;
+      cells.forEach((cell) => {
+        if (cell !== '') {
+          const content = textModifierTags(cell);
+          html += `<${tag}>${content}</${tag}>`;
+        }
+      });
+      html += '</tr></tbody>';
+      isHeaderRow = false;
+    } else if (isHeader) {
+      html += '<thead><tr>';
+      cells.forEach((cell) => {
+        if (cell !== '') {
+          let content = cell.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+          content = content.replace(/_(.*?)_/g, '<em>$1</em>');
+          content = content.replace(/~~(.*?)~~/g, '<del>$1</del>');
+          html += `<${tag}>${content}</${tag}>`;
+        }
+      });
+      html += '</tr></thead>';
+    }
+  });
+
+  html += '</table>';
+
+  return html;
 };
 
 // getTextFromDelta returns the text from a DeltaStatic

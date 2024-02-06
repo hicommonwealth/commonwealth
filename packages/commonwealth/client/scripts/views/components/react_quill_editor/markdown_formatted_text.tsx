@@ -183,7 +183,16 @@ export const MarkdownFormattedText = ({
         )}
       >
         {isMarkdownTable(doc) ? (
-          <div dangerouslySetInnerHTML={{ __html: markdownToHtmlTable(doc) }} />
+          <div
+            dangerouslySetInnerHTML={{
+              __html: DOMPurify.sanitize(
+                markdownToHtmlTable(
+                  doc,
+                  finalDoc.props.dangerouslySetInnerHTML.__html,
+                ),
+              ),
+            }}
+          />
         ) : (
           finalDoc
         )}

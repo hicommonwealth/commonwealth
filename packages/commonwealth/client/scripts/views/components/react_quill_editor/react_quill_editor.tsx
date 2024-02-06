@@ -109,16 +109,8 @@ const ReactQuillEditor = ({
     });
   };
 
-  const isASCIIArt = (text: string) => {
-    const patterns = [/[@#S%^&*()\-+=|\\\/]{3,}/, /^\s{2,}/gm];
-
-    return patterns.some((pattern) => pattern.test(text));
-  };
-
   const handleChange = (value, delta, source, editor: UnprivilegedEditor) => {
     const newContent = convertTwitterLinksToEmbeds(editor.getContents());
-
-    console.log('new', newContent);
 
     setContentDelta({
       ...newContent,
@@ -175,49 +167,6 @@ const ReactQuillEditor = ({
   const handlePreviewModalClose = () => {
     setIsPreviewVisible(false);
   };
-
-  // useEffect(() => {
-  //   const isAsciiArt = isASCIIArt(getTextFromDelta(contentDelta));
-  //   const handleAsciiArt = () => {
-  //     if (isAsciiArt && !isMarkdownEnabled) {
-  //       setIsMarkdownEnabled(isAsciiArt);
-  //       refreshQuillComponent();
-  //     } else if (
-  //       isAsciiArt &&
-  //       isMarkdownEnabled &&
-  //       !getTextFromDelta(contentDelta).includes('```')
-  //     ) {
-  //       const updatedOps = contentDelta.ops?.map((op, index) => {
-  //         if (op.insert && typeof op.insert === 'string') {
-  //           return {
-  //             ...op,
-  //             insert:
-  //               index === 0 || index === contentDelta.ops.length - 1
-  //                 ? '```\n' + op.insert + '\n```'
-  //                 : op.insert,
-  //           };
-  //         }
-  //         return op;
-  //       });
-  //
-  //       const updatedContent = {
-  //         ...contentDelta,
-  //         ops: updatedOps,
-  //       };
-  //
-  //       setContentDelta({
-  //         ...updatedContent,
-  //         ___isMarkdown: isAsciiArt,
-  //       } as SerializableDeltaStatic);
-  //     }
-  //   };
-  //
-  //   handleAsciiArt();
-  //
-  //   // Add dependencies as needed for the useEffect hook
-  // }, [contentDelta]);
-  //
-  console.log('delta', contentDelta);
 
   // when markdown state is changed, add markdown metadata to delta ops
   // and refresh quill component
