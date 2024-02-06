@@ -95,13 +95,26 @@ const BasicInformationForm = ({
     }
 
     return chainTypes
-      .filter(
-        (chainType) =>
-          chainType.chainBase ===
-          (selectedCommunity.type === CommunityType.Cosmos
+      .filter((chainType) => {
+        const type =
+          selectedCommunity.type === CommunityType.Cosmos
             ? CommunityType.Cosmos
-            : CommunityType.Ethereum),
-      )
+            : CommunityType.Ethereum;
+
+        if (chainType.chainBase === type) {
+          return !(
+            window.location.hostname.includes('commonwealth.im') &&
+            [
+              'evmosdevci',
+              'csdkv1',
+              'csdkbeta',
+              'csdkv1ci',
+              'csdkbetaci',
+              'evmosdev',
+            ].includes(String(chainType.value))
+          );
+        }
+      })
       .map((chainType) => ({
         label: chainType.label,
         value: `${chainType.value}`,
