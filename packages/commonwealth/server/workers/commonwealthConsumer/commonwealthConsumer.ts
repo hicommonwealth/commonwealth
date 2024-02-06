@@ -11,10 +11,8 @@ import {
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import { logger, stats } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
 import type { BrokerConfig } from 'rascal';
 import { RABBITMQ_URI } from '../../config';
-import { processSnapshotMessage } from './messageProcessors/snapshotConsumer';
 
 const log = logger(TypescriptLoggingLogger()).getLogger(__filename);
 stats(HotShotsStats());
@@ -40,6 +38,11 @@ startHealthCheckLoop({
 // local development.
 
 export async function setupCommonwealthConsumer(): Promise<ServiceConsumer> {
+  const { models } = await import('@hicommonwealth/model');
+  const { processSnapshotMessage } = await import(
+    './messageProcessors/snapshotConsumer'
+  );
+
   let rmqController: RabbitMQController;
   try {
     rmqController = new RabbitMQController(

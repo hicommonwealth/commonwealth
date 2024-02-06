@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-syntax */
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import type { DB, TopicAttributes } from '@hicommonwealth/model';
 import type { NextFunction } from 'express';
 import type { TypedRequestBody, TypedResponse } from '../types';

@@ -1,6 +1,5 @@
-import { logger } from '@hicommonwealth/core';
+import { AppError, ServerError, logger } from '@hicommonwealth/core';
 import type { Express, Request, Response } from 'express';
-import { AppError, ServerError } from '../errors';
 
 class ExpressError extends Error {
   constructor(public error: Error, public req: Request) {
@@ -29,7 +28,6 @@ export const setupErrorHandlers = (app: Express) => {
   app.use((error, req, res: Response, next) => {
     log.error(error.message, new ExpressError(error, req));
     if (error instanceof ServerError) {
-      // if the original error is given when creating the ServerError instance then pass its message to Rollbar
       res.status(error.status).send({
         status: error.status,
         // Use external facing error message

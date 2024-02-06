@@ -1,11 +1,10 @@
 import {
   AddressAttributes,
-  CommunityInstance,
   DB,
   MembershipRejectReason,
+  TokenBalanceCache,
 } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import { TokenBalanceCache } from '../tokenBalanceCache/tokenBalanceCache';
 import { refreshMembershipsForAddress } from './refreshMembershipsForAddress';
 
 /**
@@ -14,7 +13,7 @@ import { refreshMembershipsForAddress } from './refreshMembershipsForAddress';
  * @param models DB handle
  * @param tokenBalanceCache Token balance cache handle (new implementation)
  * @param topicId ID of the topic
- * @param community Community of the groups
+ * @param communityId ID of the community of the groups
  * @param address Address to check against requirements
  * @returns validity with optional error message
  */
@@ -22,7 +21,7 @@ export async function validateTopicGroupsMembership(
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
   topicId: number,
-  community: CommunityInstance,
+  communityId: string,
   address: AddressAttributes,
 ): Promise<{ isValid: boolean; message?: string }> {
   // check via new TBC with groups
@@ -30,7 +29,7 @@ export async function validateTopicGroupsMembership(
   // get all groups of topic
   const topic = await models.Topic.findOne({
     where: {
-      community_id: community.id,
+      community_id: communityId,
       id: topicId,
     },
   });

@@ -1,6 +1,7 @@
 import React from 'react';
 import { components, OptionProps } from 'react-select';
 
+import { formatAddressShort } from 'helpers';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 
 interface CustomAddressOptionElement {
@@ -23,20 +24,20 @@ const CustomAddressOptionElement = ({
           iconName="checkCircleFilled"
         />
       )}
-      {label}
+      {formatAddressShort(label, 6)}
     </div>
   );
 };
 
 interface CustomAddressOptionProps {
   originalProps: OptionProps<{ value: string; label: string }>;
-  selectedAddress: { value: string; label: string };
+  selectedAddressValue: string;
 }
 
 // eslint-disable-next-line react/no-multi-comp
 const CustomAddressOption = ({
   originalProps,
-  selectedAddress,
+  selectedAddressValue,
 }: CustomAddressOptionProps) => {
   const { data, label } = originalProps;
 
@@ -44,8 +45,8 @@ const CustomAddressOption = ({
     <components.Option {...originalProps}>
       <CustomAddressOptionElement
         value={data.value}
-        label={label}
-        selectedAddressValue={selectedAddress.value}
+        label={formatAddressShort(label, 6)}
+        selectedAddressValue={selectedAddressValue}
       />
     </components.Option>
   );

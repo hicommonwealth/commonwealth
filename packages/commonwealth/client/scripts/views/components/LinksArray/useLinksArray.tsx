@@ -41,13 +41,16 @@ const useLinksArray = ({
   };
 
   const onLinkUpdatedAtIndex = (updatedLink: Link, index: number) => {
+    const splitLink = updatedLink.value.split('/');
+    const sanitizedLink = splitLink[splitLink.length - 1];
+    updatedLink.value = sanitizedLink;
+
     const updatedLinks = [...links];
     updatedLinks[index] = {
       ...updatedLink,
       value: updatedLink.value.trim(),
       error: getLinkValidationError(updatedLink.value.trim()),
     };
-
     setLinks([...updatedLinks]);
   };
 

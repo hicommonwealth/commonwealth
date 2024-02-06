@@ -8,7 +8,7 @@ import type {
 import type { ModelInstance, ModelStatic } from './types';
 
 export type ContractAttributes = {
-  id: number;
+  id?: number;
   address: string;
   chain_node_id: number;
   abi_id?: number;

@@ -1,13 +1,16 @@
-import { models, UserInstance } from '@hicommonwealth/model';
+import {
+  models,
+  tester,
+  UserInstance,
+  validateCommunityStakeConfig,
+} from '@hicommonwealth/model';
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import app from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
-import { validateCommunityStakeConfig } from '../../../server/util/commonProtocol/communityStakeConfigValidator';
 import { buildUser } from '../../unit/unitHelpers';
-import { resetDatabase } from '../../util/resetDatabase';
 import { get, put } from './external/appHook.spec';
 import { testUsers } from './external/dbEntityHooks.spec';
 
@@ -32,7 +35,7 @@ const expectedCreateResp = {
 
 describe('PUT communityStakes Tests', () => {
   beforeEach(async () => {
-    await resetDatabase();
+    await tester.seedDb();
   });
 
   it('The handler creates and updates community stake', async () => {
@@ -134,6 +137,18 @@ describe('PUT communityStakes Tests', () => {
   });
 
   it('The integration with protocol works', async () => {
-    await validateCommunityStakeConfig(models, 'common-protocol', 2);
+    const community = await models.Community.findOne({
+      where: {
+        id: 'common-protocol',
+      },
+      include: [
+        {
+          model: models.ChainNode,
+          attributes: ['eth_chain_id', 'url'],
+        },
+      ],
+      attributes: ['namespace'],
+    });
+    await validateCommunityStakeConfig(community, 2);
   });
 });

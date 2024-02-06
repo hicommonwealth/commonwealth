@@ -1,5 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
-import { NotificationCategories } from '@hicommonwealth/core';
+import { AppError, NotificationCategories } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import {
   CommentInstance,
