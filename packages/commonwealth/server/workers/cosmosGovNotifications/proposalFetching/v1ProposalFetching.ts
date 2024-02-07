@@ -40,6 +40,12 @@ export async function fetchLatestCosmosProposalV1(
         }
       } else nextKey = pagination.next_key;
     }
+
+    // TODO: temp fix to handle chains that return nextKey as a string instead of Uint8Array
+    // Our v1 API needs to handle this better. To be addressed in #6610
+    if (typeof nextKey === 'string') {
+      nextKey = new Uint8Array(Buffer.from(nextKey, 'base64'));
+    }
   } while (uint8ArrayToNumberBE(nextKey) > 0);
 
   if (finalProposalsPage.length > 0) {

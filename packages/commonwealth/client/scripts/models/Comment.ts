@@ -13,6 +13,7 @@ export class Comment<T extends IUniqueId> {
   public readonly text: string;
   public readonly plaintext: string;
   public readonly reactions: Reaction[];
+  public reactionWeightsSum: number;
   public readonly id: number;
   public readonly createdAt: momentType.Moment;
   public readonly authorChain?: string;
@@ -40,6 +41,7 @@ export class Comment<T extends IUniqueId> {
     parent_id,
     plaintext,
     reactions,
+    reaction_weights_sum,
     created_at,
     deleted_at,
     authorChain,
@@ -92,6 +94,7 @@ export class Comment<T extends IUniqueId> {
     this.canvasSession = canvas_session;
     this.canvasHash = canvas_hash;
     this.reactions = (reactions || []).map((r) => new Reaction(r));
+    this.reactionWeightsSum = reaction_weights_sum;
     this.rootThread = thread_id;
     this.discord_meta = discord_meta;
   }

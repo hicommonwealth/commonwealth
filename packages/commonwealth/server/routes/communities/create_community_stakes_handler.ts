@@ -1,27 +1,34 @@
 import { AppError } from '@hicommonwealth/core';
 import {
-  Community,
   CommunityStakeAttributes,
   DB,
-  validateCommunityStakeConfig,
+  communityStakeConfigValidator,
 } from '@hicommonwealth/model';
+import {
+  SetCommunityStakeBodySchema,
+  SetCommunityStakeParams,
+  SetCommunityStakeParamsSchema,
+} from 'server/controllers/server_communities_methods/create_community_stake';
+import { z } from 'zod';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 import { formatErrorPretty } from '../../util/errorFormat';
 import { validateOwner } from '../../util/validateOwner';
 
-type PutCommunityStakesParams = Community.SetCommunityStakeParams;
-type PutCommunityStakesBody = Community.SetCommunityStakeBody;
+type SetCommunityStakeBody = z.infer<typeof SetCommunityStakeBodySchema>;
+type PutCommunityStakesParams = SetCommunityStakeParams;
+type PutCommunityStakesBody = SetCommunityStakeBody;
 type PutCommunityStakesResponse = CommunityStakeAttributes;
 
-export const putCommunityStakeHandler = async (
+export const createCommunityStakeHandler = async (
   models: DB,
   controllers: ServerControllers,
   req: TypedRequest<PutCommunityStakesBody, any, PutCommunityStakesParams>,
   res: TypedResponse<PutCommunityStakesResponse>,
 ) => {
-  const paramsValidationResult =
-    Community.SetCommunityStakeParamsSchema.safeParse(req.params);
+  const paramsValidationResult = SetCommunityStakeParamsSchema.safeParse(
+    req.params,
+  );
 
   if (paramsValidationResult.success === false) {
     throw new AppError(formatErrorPretty(paramsValidationResult));
@@ -58,17 +65,18 @@ export const putCommunityStakeHandler = async (
     attributes: ['namespace'],
   });
 
-  await validateCommunityStakeConfig(community, stake_id);
-
-  const bodyValidationResult = Community.SetCommunityStakeBodySchema.safeParse(
-    req.body,
+  await communityStakeConfigValidator.validateCommunityStakeConfig(
+    community,
+    stake_id,
   );
+
+  const bodyValidationResult = SetCommunityStakeBodySchema.safeParse(req.body);
 
   if (bodyValidationResult.success === false) {
     throw new AppError(formatErrorPretty(bodyValidationResult));
   }
 
-  const results = await controllers.communities.putCommunityStake({
+  const results = await controllers.communities.createCommunityStake({
     user,
     communityStake: {
       ...paramsValidationResult.data,
