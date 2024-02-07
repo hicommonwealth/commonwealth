@@ -59,6 +59,7 @@ describe('POST communityStakes Tests', () => {
       expectedCreateResp.stake_enabled,
     );
 
+    let error;
     try {
       // try to change vote weight
       await controller.createCommunityStake({
@@ -66,8 +67,11 @@ describe('POST communityStakes Tests', () => {
         user: user,
       });
     } catch (e) {
-      assert.equal(e.message, 'Community stake already exists');
+      error = e;
     }
+
+    assert.equal(error.message, 'Community stake already exists');
+
     await controller.getCommunityStake({
       community_id: baseRequest.community_id,
       stake_id: baseRequest.stake_id,
