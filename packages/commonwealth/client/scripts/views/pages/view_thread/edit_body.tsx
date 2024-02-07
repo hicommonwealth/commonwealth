@@ -123,6 +123,7 @@ export const EditBody = (props: EditBodyProps) => {
         <ReactQuillEditor
           contentDelta={contentDelta}
           setContentDelta={setContentDelta}
+          cancelEditing={cancelEditing}
         />
         <div className="buttons-row">
           <CWButton

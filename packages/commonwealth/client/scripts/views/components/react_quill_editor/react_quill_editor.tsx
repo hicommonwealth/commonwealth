@@ -35,6 +35,7 @@ type ReactQuillEditorProps = {
   isDisabled?: boolean;
   tooltipLabel?: string;
   shouldFocus?: boolean;
+  cancelEditing?: () => void;
 };
 
 const TABS = [
@@ -52,6 +53,7 @@ const ReactQuillEditor = ({
   isDisabled = false,
   tooltipLabel = 'Join community',
   shouldFocus = false,
+  cancelEditing,
 }: ReactQuillEditorProps) => {
   const toolbarId = useMemo(() => {
     return `cw-toolbar-${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
@@ -160,6 +162,9 @@ const ReactQuillEditor = ({
               label: 'No',
               buttonType: 'secondary',
               buttonHeight: 'sm',
+              onClick: () => {
+                cancelEditing();
+              },
             },
           ],
         });
