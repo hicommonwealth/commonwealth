@@ -3,28 +3,29 @@ import type { EncodeObject } from '@cosmjs/proto-signing';
 import type {
   BankExtension,
   GovExtension,
+  QueryClient,
   StakingExtension,
   StdFee,
 } from '@cosmjs/stargate';
-import type { QueryClient } from '@cosmjs/stargate';
-import type { Event } from '@cosmjs/tendermint-rpc';
-import type { Tendermint34Client } from '@cosmjs/tendermint-rpc';
+import type { Event, Tendermint34Client } from '@cosmjs/tendermint-rpc';
+import { ChainNetwork, WalletId } from '@hicommonwealth/core';
 import BN from 'bn.js';
-import { ChainNetwork, WalletId } from 'common-common/src/types';
 
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
-import { LCD } from 'chain-events/src/chains/cosmos/types';
+import { LCD } from '../../../../../shared/chain/types/cosmos';
 import ChainInfo from '../../../models/ChainInfo';
 import {
   IChainModule,
   ITXData,
   ITXModalData,
 } from '../../../models/interfaces';
-import WebWalletController from '../../app/web_wallets';
+import { COSMOS_EVM_CHAINS } from '../../app/webWallets/keplr_ethereum_web_wallet';
 import KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
+import LeapWebWalletController from '../../app/webWallets/leap_web_wallet';
+import WebWalletController from '../../app/web_wallets';
 import type CosmosAccount from './account';
 import {
   getLCDClient,
@@ -33,7 +34,6 @@ import {
   getTMClient,
 } from './chain.utils';
 import EthSigningClient from './eth_signing_client';
-import EVMKeplrWebWalletController from '../../app/webWallets/keplr_ethereum_web_wallet';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
@@ -121,22 +121,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       }
     }
 
-    await Promise.all([
-      this.fetchPoolParams(),
-      this.fetchBlock(), // Poll for new block immediately
-      this.fetchStakingParams(),
-    ]);
-  }
-
-  private async fetchPoolParams(): Promise<void> {
-    try {
-      const {
-        pool: { bondedTokens },
-      } = await this._api.staking.pool();
-      this._staked = this.coins(new BN(bondedTokens));
-    } catch (e) {
-      console.error('Error fetching pool params: ', e);
-    }
+    await this.fetchBlock(); // Poll for new block immediately
   }
 
   private async fetchBlock(): Promise<void> {
@@ -156,15 +141,20 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     }
   }
 
-  private async fetchStakingParams(): Promise<void> {
-    try {
-      const {
-        params: { bondDenom },
-      } = await this._api.staking.params();
-      this._denom = bondDenom;
-    } catch (e) {
-      console.error('Error fetching staking params: ', e);
-    }
+  public async fetchPoolParams(): Promise<CosmosToken> {
+    const {
+      pool: { bondedTokens },
+    } = await this._api.staking.pool();
+    this._staked = this.coins(new BN(bondedTokens));
+    return this._staked;
+  }
+
+  public async fetchStakingParams(): Promise<string> {
+    const {
+      params: { bondDenom },
+    } = await this._api.staking.params();
+    this._denom = bondDenom;
+    return this._denom;
   }
 
   public async deinit(): Promise<void> {
@@ -173,7 +163,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
   public async sendTx(
     account: CosmosAccount,
-    tx: EncodeObject
+    tx: EncodeObject,
   ): Promise<readonly Event[]> {
     const chain = this._app.chain;
     // TODO: error handling
@@ -181,23 +171,37 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     if (chain.network === ChainNetwork.Terra) {
       throw new Error('Tx not yet supported on Terra');
     }
-    const wallet = WebWalletController.Instance.getByName(
-      WalletId.Keplr
-    ) as KeplrWebWalletController;
-    if (!wallet) throw new Error('Keplr wallet not found');
+
+    const activeAddress = this._app.user.activeAccount?.address;
+    const walletId = this._app.user.addresses?.find(
+      (a) => a.address === activeAddress && a.community?.id === chain.id,
+    )?.walletId;
+    const isKeplr = walletId === WalletId.Keplr;
+    const isLeap = walletId === WalletId.Leap;
+    let wallet;
+
+    if (isKeplr) {
+      wallet = WebWalletController.Instance.getByName(
+        WalletId.Keplr,
+      ) as KeplrWebWalletController;
+    } else if (isLeap) {
+      wallet = WebWalletController.Instance.getByName(
+        WalletId.Leap,
+      ) as LeapWebWalletController;
+    } else {
+      throw new Error('Cosmos wallet not found');
+    }
+
     if (!wallet.enabled) {
       await wallet.enable();
     }
+
     const cosm = await import('@cosmjs/stargate');
     const dbId = chain.meta.id;
     let client;
 
-    const ethermintWallet = WebWalletController.Instance.getByName(
-      WalletId.KeplrEthereum
-    ) as EVMKeplrWebWalletController;
-
     // TODO: To check if ethermint, we can get slip44 cointype from Cosmos Chain Directory instead of hardcoding
-    if (ethermintWallet.specificChains.some((c) => c === dbId)) {
+    if (COSMOS_EVM_CHAINS.some((c) => c === dbId)) {
       const chainId = wallet.getChainId();
 
       client = await EthSigningClient(
@@ -206,12 +210,12 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
           chainId,
           path: dbId,
         },
-        wallet.offlineSigner
+        wallet.offlineSigner,
       );
     } else {
       client = await getSigningClient(
         chain.meta.node.url,
-        wallet.offlineSigner
+        wallet.offlineSigner,
       );
     }
 
@@ -229,7 +233,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
         account.address,
         [tx],
         DEFAULT_FEE,
-        DEFAULT_MEMO
+        DEFAULT_MEMO,
       );
       console.log(result);
       if (cosm.isDeliverTxFailure(result)) {
@@ -254,7 +258,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     txFunc,
     txName: string,
     objName: string,
-    cb?: (success: boolean) => void
+    cb?: (success: boolean) => void,
   ): ITXModalData {
     throw new Error('unsupported');
   }

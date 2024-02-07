@@ -1,31 +1,34 @@
-import { Op } from 'sequelize';
 import moment from 'moment';
 
-import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
-import { UserInstance } from '../../models/user';
-import { getThreadUrl, renderQuillDeltaToText } from '../../../shared/utils';
 import {
+  AppError,
   NotificationCategories,
   ProposalType,
-} from '../../../../common-common/src/types';
+} from '@hicommonwealth/core';
+import {
+  AddressInstance,
+  CommentAttributes,
+  UserInstance,
+} from '@hicommonwealth/model';
+import { WhereOptions } from 'sequelize';
+import { validateOwner } from 'server/util/validateOwner';
+import { renderQuillDeltaToText } from '../../../shared/utils';
 import { parseUserMentions } from '../../util/parseUserMentions';
-import { CommentAttributes } from '../../models/comment';
 import { ServerCommentsController } from '../server_comments_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
-import { AppError } from '../../../../common-common/src/errors';
 
 const Errors = {
+  CommentNotFound: 'Comment not found',
   ThreadNotFoundForComment: 'Thread not found for comment',
   BanError: 'Ban error',
   ParseMentionsFailed: 'Failed to parse mentions',
   NoId: 'Must provide id',
+  NotAuthor: 'User is not author of comment',
 };
 
 export type UpdateCommentOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
   commentId?: number;
   commentBody: string;
   discordMeta?: any;
@@ -35,54 +38,55 @@ export type UpdateCommentResult = [CommentAttributes, EmitOptions[]];
 
 export async function __updateComment(
   this: ServerCommentsController,
-  {
-    user,
-    address,
-    chain,
-    commentId,
-    commentBody,
-    discordMeta,
-  }: UpdateCommentOptions
+  { user, address, commentId, commentBody, discordMeta }: UpdateCommentOptions,
 ): Promise<UpdateCommentResult> {
   if (!commentId && !discordMeta) {
     throw new AppError(Errors.NoId);
   }
 
-  if (discordMeta !== undefined && discordMeta !== null) {
-    const existingComment = await this.models.Comment.findOne({
-      where: { discord_meta: discordMeta },
-    });
-    if (existingComment) {
-      commentId = existingComment.id;
-    } else {
-      throw new AppError(Errors.NoId);
-    }
+  const commentWhere: WhereOptions<CommentAttributes> = {};
+  if (commentId) {
+    commentWhere.id = commentId;
+  }
+  if (discordMeta) {
+    commentWhere.discord_meta = discordMeta;
+  }
+
+  const comment = await this.models.Comment.findOne({
+    where: commentWhere,
+    include: [
+      {
+        model: this.models.Thread,
+        required: true,
+      },
+    ],
+  });
+  if (!comment) {
+    throw new AppError(Errors.NoId);
+  }
+  const { Thread: thread } = comment;
+  if (!thread) {
+    throw new AppError(Errors.ThreadNotFoundForComment);
   }
 
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
-    chain: chain.id,
+    communityId: comment.community_id,
     address: address.address,
   });
   if (!canInteract) {
     throw new AppError(`${Errors.BanError}: ${banError}`);
   }
 
-  const userOwnedAddressIds = (await user.getAddresses())
-    .filter((addr) => !!addr.verified)
-    .map((addr) => addr.id);
-  const comment = await this.models.Comment.findOne({
-    where: {
-      id: commentId,
-      address_id: { [Op.in]: userOwnedAddressIds },
-    },
+  const isAuthor = await validateOwner({
+    models: this.models,
+    user,
+    communityId: comment.community_id,
+    entity: comment,
+    allowSuperAdmin: true,
   });
-
-  const thread = await this.models.Thread.findOne({
-    where: { id: comment.thread_id },
-  });
-  if (!thread) {
-    throw new AppError(Errors.ThreadNotFoundForComment);
+  if (!isAuthor) {
+    throw new AppError(Errors.NotAuthor);
   }
 
   let latestVersion;
@@ -105,7 +109,7 @@ export async function __updateComment(
   comment.plaintext = (() => {
     try {
       return renderQuillDeltaToText(
-        JSON.parse(decodeURIComponent(commentBody))
+        JSON.parse(decodeURIComponent(commentBody)),
       );
     } catch (e) {
       return decodeURIComponent(commentBody);
@@ -117,30 +121,24 @@ export async function __updateComment(
     include: [this.models.Address],
   });
 
-  const cwUrl = getThreadUrl(thread, comment?.id);
   const root_title = thread.title || '';
 
   const allNotificationOptions: EmitOptions[] = [];
 
   allNotificationOptions.push({
-    categoryId: NotificationCategories.CommentEdit,
-    objectId: '',
-    notificationData: {
-      created_at: new Date(),
-      thread_id: comment.thread_id,
-      root_title,
-      root_type: ProposalType.Thread,
-      comment_id: +finalComment.id,
-      comment_text: finalComment.text,
-      chain_id: finalComment.chain,
-      author_address: finalComment.Address.address,
-      author_chain: finalComment.Address.chain,
-    },
-    webhookData: {
-      user: finalComment.Address.address,
-      url: cwUrl,
-      title: thread.title || '',
-      chain: finalComment.chain,
+    notification: {
+      categoryId: NotificationCategories.CommentEdit,
+      data: {
+        created_at: new Date(),
+        thread_id: comment.thread_id,
+        root_title,
+        root_type: ProposalType.Thread,
+        comment_id: +finalComment.id,
+        comment_text: finalComment.text,
+        chain_id: finalComment.community_id,
+        author_address: finalComment.Address.address,
+        author_chain: finalComment.Address.community_id,
+      },
     },
     excludeAddresses: [finalComment.Address.address],
   });
@@ -149,7 +147,7 @@ export async function __updateComment(
   try {
     const previousDraftMentions = parseUserMentions(latestVersion);
     const currentDraftMentions = parseUserMentions(
-      decodeURIComponent(commentBody)
+      decodeURIComponent(commentBody),
     );
     mentions = currentDraftMentions.filter((addrArray) => {
       let alreadyExists = false;
@@ -171,13 +169,13 @@ export async function __updateComment(
       mentions.map(async (mention) => {
         const mentionedUser = await this.models.Address.findOne({
           where: {
-            chain: mention[0],
+            community_id: mention[0],
             address: mention[1],
           },
           include: [this.models.User],
         });
         return mentionedUser;
-      })
+      }),
     );
     // filter null results
     mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
@@ -190,20 +188,21 @@ export async function __updateComment(
         return; // some Addresses may be missing users, e.g. if the user removed the address
       }
       allNotificationOptions.push({
-        categoryId: NotificationCategories.NewMention,
-        objectId: `user-${mentionedAddress.User.id}`,
-        notificationData: {
-          created_at: new Date(),
-          thread_id: +comment.thread_id,
-          root_title,
-          root_type: ProposalType.Thread,
-          comment_id: +finalComment.id,
-          comment_text: finalComment.text,
-          chain_id: finalComment.chain,
-          author_address: finalComment.Address.address,
-          author_chain: finalComment.Address.chain,
+        notification: {
+          categoryId: NotificationCategories.NewMention,
+          data: {
+            mentioned_user_id: mentionedAddress.User.id,
+            created_at: new Date(),
+            thread_id: +comment.thread_id,
+            root_title,
+            root_type: ProposalType.Thread,
+            comment_id: +finalComment.id,
+            comment_text: finalComment.text,
+            chain_id: finalComment.community_id,
+            author_address: finalComment.Address.address,
+            author_chain: finalComment.Address.community_id,
+          },
         },
-        webhookData: null,
         excludeAddresses: [finalComment.Address.address],
       });
     });

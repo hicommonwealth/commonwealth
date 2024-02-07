@@ -1,23 +1,24 @@
 import moment from 'moment';
-import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
-import { UserInstance } from '../../models/user';
-import { EmitOptions } from '../server_notifications_methods/emit';
-import { ThreadAttributes } from '../../models/thread';
-import { TrackOptions } from '../server_analytics_methods/track';
-import { getThreadUrl, renderQuillDeltaToText } from '../../../shared/utils';
+
 import {
-  ChainNetwork,
-  ChainType,
+  AppError,
   NotificationCategories,
   ProposalType,
-} from '../../../../common-common/src/types';
-import { findAllRoles } from '../../util/roles';
-import validateTopicThreshold from '../../util/validateTopicThreshold';
-import { ServerError } from 'near-api-js/lib/utils/rpc_errors';
-import { AppError } from '../../../../common-common/src/errors';
-import { parseUserMentions } from '../../util/parseUserMentions';
+} from '@hicommonwealth/core';
+import {
+  AddressInstance,
+  CommunityInstance,
+  ThreadAttributes,
+  UserInstance,
+} from '@hicommonwealth/model';
+import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { renderQuillDeltaToText } from '../../../shared/utils';
+import { parseUserMentions } from '../../util/parseUserMentions';
+import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
+import { validateOwner } from '../../util/validateOwner';
+import { TrackOptions } from '../server_analytics_methods/track';
+import { EmitOptions } from '../server_notifications_methods/emit';
 import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
@@ -34,13 +35,12 @@ export const Errors = {
 export type CreateThreadOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  community: CommunityInstance;
   title: string;
   body: string;
   kind: string;
   readOnly: boolean;
   topicId?: number;
-  topicName?: string;
   stage?: string;
   url?: string;
   canvasAction?: any;
@@ -52,7 +52,7 @@ export type CreateThreadOptions = {
 export type CreateThreadResult = [
   ThreadAttributes,
   EmitOptions[],
-  TrackOptions
+  TrackOptions,
 ];
 
 export async function __createThread(
@@ -60,21 +60,23 @@ export async function __createThread(
   {
     user,
     address,
-    chain,
+    community,
     title,
     body,
     kind,
     readOnly,
     topicId,
-    topicName,
     stage,
     url,
     canvasAction,
     canvasSession,
     canvasHash,
     discordMeta,
-  }: CreateThreadOptions
+  }: CreateThreadOptions,
 ): Promise<CreateThreadResult> {
+  // sanitize text
+  body = sanitizeQuillText(body);
+
   if (kind === 'discussion') {
     if (!title || !title.trim()) {
       throw new AppError(Errors.DiscussionMissingTitle);
@@ -97,7 +99,7 @@ export async function __createThread(
 
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
-    chain: chain.id,
+    communityId: community.id,
     address: address.address,
   });
   if (!canInteract) {
@@ -123,7 +125,7 @@ export async function __createThread(
   const version_history: string[] = [JSON.stringify(firstVersion)];
 
   const threadContent: Partial<ThreadAttributes> = {
-    chain: chain.id,
+    community_id: community.id,
     address_id: address.id,
     title,
     body,
@@ -137,63 +139,32 @@ export async function __createThread(
     canvas_session: canvasSession,
     canvas_hash: canvasHash,
     discord_meta: discordMeta,
+    topic_id: +topicId,
   };
+
+  const isAdmin = await validateOwner({
+    models: this.models,
+    user,
+    communityId: community.id,
+    allowAdmin: true,
+    allowSuperAdmin: true,
+  });
+  if (!isAdmin) {
+    const { isValid, message } = await validateTopicGroupsMembership(
+      this.models,
+      this.tokenBalanceCache,
+      topicId,
+      community.id,
+      address,
+    );
+    if (!isValid) {
+      throw new AppError(`${Errors.FailedCreateThread}: ${message}`);
+    }
+  }
 
   // begin essential database changes within transaction
   const newThreadId = await this.models.sequelize.transaction(
     async (transaction) => {
-      // New Topic table entries created
-      if (topicId) {
-        threadContent.topic_id = +topicId;
-      } else if (topicName) {
-        const [topic] = await this.models.Topic.findOrCreate({
-          where: {
-            name: topicName,
-            chain_id: chain?.id || null,
-          },
-          transaction,
-        });
-        threadContent.topic_id = topic.id;
-        topicId = topic.id;
-      } else {
-        if (chain.topics?.length) {
-          throw new AppError(
-            'Must pass a topic_name string and/or a numeric topic_id'
-          );
-        }
-      }
-
-      if (
-        chain &&
-        (chain.type === ChainType.Token ||
-          chain.network === ChainNetwork.Ethereum)
-      ) {
-        // skip check for admins
-        const isAdmin = await findAllRoles(
-          this.models,
-          { where: { address_id: address.id } },
-          chain.id,
-          ['admin']
-        );
-        if (!user.isAdmin && isAdmin.length === 0) {
-          let canReact;
-          try {
-            canReact = await validateTopicThreshold(
-              this.tokenBalanceCache,
-              this.models,
-              topicId,
-              address.address
-            );
-          } catch (e) {
-            throw new ServerError(Errors.BalanceCheckFailed, e);
-          }
-
-          if (!canReact) {
-            throw new AppError(Errors.InsufficientTokenBalance);
-          }
-        }
-      }
-
       const thread = await this.models.Thread.create(threadContent, {
         transaction,
       });
@@ -203,7 +174,7 @@ export async function __createThread(
 
       return thread.id;
       // end of transaction
-    }
+    },
   );
 
   const finalThread = await this.models.Thread.findOne({
@@ -222,65 +193,22 @@ export async function __createThread(
   // -----
 
   // auto-subscribe thread creator to comments & reactions
-  await this.models.Subscription.create({
-    subscriber_id: user.id,
-    category_id: NotificationCategories.NewComment,
-    object_id: `discussion_${finalThread.id}`,
-    thread_id: finalThread.id,
-    chain_id: finalThread.chain,
-    is_active: true,
-  });
-  await this.models.Subscription.create({
-    subscriber_id: user.id,
-    category_id: NotificationCategories.NewReaction,
-    object_id: `discussion_${finalThread.id}`,
-    thread_id: finalThread.id,
-    chain_id: finalThread.chain,
-    is_active: true,
-  });
-
-  // auto-subscribe NewThread subscribers to NewComment as well
-  // findOrCreate because redundant creation if author is also subscribed to NewThreads
-  const location = finalThread.chain;
-  try {
-    await this.models.sequelize.query(
-      `
-    WITH irrelevant_subs AS (
-      SELECT id
-      FROM "Subscriptions"
-      WHERE subscriber_id IN (
-        SELECT subscriber_id FROM "Subscriptions" WHERE category_id = ? AND object_id = ?
-      ) AND category_id = ? AND object_id = ? AND thread_id = ? AND chain_id = ? AND is_active = true
-    )
-    INSERT INTO "Subscriptions"
-    (subscriber_id, category_id, object_id, thread_id, chain_id, is_active, created_at, updated_at)
-    SELECT subscriber_id, ? as category_id, ? as object_id, ? as thread_id, ? as
-     chain_id, true as is_active, NOW() as created_at, NOW() as updated_at
-    FROM "Subscriptions"
-    WHERE category_id = ? AND object_id = ? AND id NOT IN (SELECT id FROM irrelevant_subs);
-  `,
-      {
-        raw: true,
-        type: 'RAW',
-        replacements: [
-          NotificationCategories.NewThread,
-          location,
-          NotificationCategories.NewComment,
-          `discussion_${finalThread.id}`,
-          finalThread.id,
-          finalThread.chain,
-          NotificationCategories.NewComment,
-          `discussion_${finalThread.id}`,
-          finalThread.id,
-          finalThread.chain,
-          NotificationCategories.NewThread,
-          location,
-        ],
-      }
-    );
-  } catch (e) {
-    console.log(e);
-  }
+  await this.models.Subscription.bulkCreate([
+    {
+      subscriber_id: user.id,
+      category_id: NotificationCategories.NewComment,
+      thread_id: finalThread.id,
+      community_id: finalThread.community_id,
+      is_active: true,
+    },
+    {
+      subscriber_id: user.id,
+      category_id: NotificationCategories.NewReaction,
+      thread_id: finalThread.id,
+      community_id: finalThread.community_id,
+      is_active: true,
+    },
+  ]);
 
   // grab mentions to notify tagged users
   const bodyText = decodeURIComponent(body);
@@ -292,12 +220,12 @@ export async function __createThread(
         mentions.map(async (mention) => {
           return this.models.Address.findOne({
             where: {
-              chain: mention[0] || null,
+              community_id: mention[0] || null,
               address: mention[1] || null,
             },
             include: [this.models.User],
           });
-        })
+        }),
       );
       // filter null results
       mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
@@ -313,26 +241,18 @@ export async function __createThread(
   const allNotificationOptions: EmitOptions[] = [];
 
   allNotificationOptions.push({
-    categoryId: NotificationCategories.NewThread,
-    objectId: location,
-    notificationData: {
-      created_at: new Date(),
-      thread_id: finalThread.id,
-      root_type: ProposalType.Thread,
-      root_title: finalThread.title,
-      comment_text: finalThread.body,
-      chain_id: finalThread.chain,
-      author_address: finalThread.Address.address,
-      author_chain: finalThread.Address.chain,
-    },
-    webhookData: {
-      user: finalThread.Address.address,
-      author_chain: finalThread.Address.chain,
-      url: getThreadUrl(finalThread),
-      title: title,
-      bodyUrl: url,
-      chain: finalThread.chain,
-      body: finalThread.body,
+    notification: {
+      categoryId: NotificationCategories.NewThread,
+      data: {
+        created_at: new Date(),
+        thread_id: finalThread.id,
+        root_type: ProposalType.Thread,
+        root_title: finalThread.title,
+        comment_text: finalThread.body,
+        chain_id: finalThread.community_id,
+        author_address: finalThread.Address.address,
+        author_chain: finalThread.Address.community_id,
+      },
     },
     excludeAddresses: excludedAddrs,
   });
@@ -344,27 +264,28 @@ export async function __createThread(
         return; // some Addresses may be missing users, e.g. if the user removed the address
       }
       allNotificationOptions.push({
-        categoryId: NotificationCategories.NewMention,
-        objectId: `user-${mentionedAddress.User.id}`,
-        notificationData: {
-          created_at: new Date(),
-          thread_id: finalThread.id,
-          root_type: ProposalType.Thread,
-          root_title: finalThread.title,
-          comment_text: finalThread.body,
-          chain_id: finalThread.chain,
-          author_address: finalThread.Address.address,
-          author_chain: finalThread.Address.chain,
+        notification: {
+          categoryId: NotificationCategories.NewMention,
+          data: {
+            mentioned_user_id: mentionedAddress.User.id,
+            created_at: new Date(),
+            thread_id: finalThread.id,
+            root_type: ProposalType.Thread,
+            root_title: finalThread.title,
+            comment_text: finalThread.body,
+            chain_id: finalThread.community_id,
+            author_address: finalThread.Address.address,
+            author_chain: finalThread.Address.community_id,
+          },
         },
-        webhookData: null,
         excludeAddresses: [finalThread.Address.address],
       });
     });
 
   const analyticsOptions = {
     event: MixpanelCommunityInteractionEvent.CREATE_THREAD,
-    community: chain.id,
-    isCustomDomain: null,
+    community: community.id,
+    userId: user.id,
   };
 
   return [finalThread.toJSON(), allNotificationOptions, analyticsOptions];

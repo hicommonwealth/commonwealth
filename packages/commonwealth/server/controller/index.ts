@@ -1,7 +1,8 @@
+import { AppError } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
+import { Role } from '@hicommonwealth/model';
 import type { Request, Response } from 'express';
-import type { DB } from '../models';
 import { findAllRoles } from '../util/roles';
-import { AppError } from '../../../common-common/src/errors';
 
 export const Errors = {
   InvalidChain: 'Invalid chain',
@@ -16,9 +17,13 @@ export async function listRoles(models: DB, req: Request, res: Response) {
   if (typeof permissions !== 'undefined' && !Array.isArray(permissions)) {
     throw new AppError(Errors.InvalidPermissions);
   }
-  const filteredPermissions =
-    permissions?.length > 0
-      ? permissions.filter((p) => ['member', 'moderator', 'admin'].includes(p))
+  const filteredPermissions: Role[] =
+    permissions?.length > 0 && Array.isArray(permissions)
+      ? (permissions
+          .map(String)
+          .filter((p) =>
+            ['member', 'moderator', 'admin'].includes(p as string),
+          ) as Role[])
       : undefined;
 
   const roles = await findAllRoles(
@@ -27,7 +32,7 @@ export async function listRoles(models: DB, req: Request, res: Response) {
       include: [models.Address],
     },
     req.chain.id,
-    filteredPermissions
+    filteredPermissions,
   );
 
   return res.json({ status: 'Success', result: roles });

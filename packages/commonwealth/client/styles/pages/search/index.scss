@@ -36,16 +36,11 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
-    margin: 0 auto;
     width: 796px;
+    padding-top: 16px;
 
     @include smallInclusive {
       width: 100%;
-    }
-
-    .TabBar {
-      justify-content: center;
-      margin-bottom: 0;
     }
 
     .search-results-caption.Text {
@@ -63,7 +58,6 @@
     .search-results-filters {
       display: flex;
       align-items: baseline;
-      justify-content: center;
       gap: 8px;
     }
 

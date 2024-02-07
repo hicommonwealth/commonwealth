@@ -1,0 +1,46 @@
+@import '../../../../styles/shared';
+
+.directory-loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10%;
+}
+
+.directory-tiles-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(506px, 1fr));
+  gap: 24px;
+
+  @include medium {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  }
+
+  @include extraSmall {
+    grid-template-columns: 1fr;
+  }
+}
+
+.community-name-cell {
+  display: flex;
+  min-width: 200px;
+  gap: 8px;
+  align-items: center;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  @include extraSmall {
+    min-width: unset;
+  }
+}
+
+.directory-empty-state {
+  color: $neutral-500;
+
+  b {
+    margin-left: 4px;
+  }
+}

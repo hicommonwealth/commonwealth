@@ -1,27 +1,27 @@
 import { Op } from 'sequelize';
 
-import { AppError } from 'common-common/src/errors';
-import { factory, formatFilename } from 'common-common/src/logging';
-
 import {
+  AppError,
   ChainBase,
+  DynamicTemplate,
   NotificationCategories,
   WalletId,
-} from 'common-common/src/types';
+  WalletSsoSource,
+  logger,
+} from '@hicommonwealth/core';
+import type {
+  CommunityInstance,
+  DB,
+  ProfileAttributes,
+} from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-
-import { DynamicTemplate } from '../../shared/types';
-import { addressSwapper } from '../../shared/utils';
-import type { DB } from '../models';
-import type { ChainInstance } from '../models/chain';
-import type { ProfileAttributes } from '../models/profile';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
-import assertAddressOwnership from '../util/assertAddressOwnership';
-import verifySignature from '../util/verifySignature';
-
+import { addressSwapper } from '../../shared/utils';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
+import assertAddressOwnership from '../util/assertAddressOwnership';
+import verifySessionSignature from '../util/verifySessionSignature';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');
@@ -35,26 +35,27 @@ export const Errors = {
   InvalidArguments: 'Invalid arguments',
   CouldNotVerifySignature: 'Failed to verify signature',
   BadSecret: 'Invalid jwt secret',
-  BadToken: 'Invalid login token',
+  BadToken: 'Invalid sign in token',
   WrongWallet: 'Verified with different wallet than created',
 };
 
 const processAddress = async (
   models: DB,
-  chain: ChainInstance,
+  chain: CommunityInstance,
   chain_id: string | number,
   address: string,
   wallet_id: WalletId,
+  wallet_sso_source: WalletSsoSource,
   signature: string,
   user: Express.User,
   sessionAddress: string | null,
   sessionIssued: string | null,
-  sessionBlockInfo: string | null
+  sessionBlockInfo: string | null,
 ): Promise<void> => {
   const addressInstance = await models.Address.scope('withPrivateData').findOne(
     {
-      where: { chain: chain.id, address },
-    }
+      where: { community_id: chain.id, address },
+    },
   );
   if (!addressInstance) {
     throw new AppError(Errors.AddressNF);
@@ -73,7 +74,7 @@ const processAddress = async (
 
   // verify the signature matches the session information = verify ownership
   try {
-    const valid = await verifySignature(
+    const valid = await verifySessionSignature(
       models,
       chain,
       chain_id,
@@ -82,7 +83,7 @@ const processAddress = async (
       signature,
       sessionAddress,
       sessionIssued,
-      sessionBlockInfo
+      sessionBlockInfo,
     );
     if (!valid) {
       throw new AppError(Errors.InvalidSignature);
@@ -109,13 +110,11 @@ const processAddress = async (
       await models.Subscription.create({
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewMention,
-        object_id: `user-${newUser.id}`,
         is_active: true,
       });
       await models.Subscription.create({
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewCollaboration,
-        object_id: `user-${newUser.id}`,
         is_active: true,
       });
       addressInstance.user_id = newUser.id;
@@ -155,7 +154,7 @@ const processAddress = async (
           user_id: { [Op.ne]: addressInstance.user_id },
           verified: { [Op.ne]: null },
         },
-      }
+      },
     );
 
     try {
@@ -177,7 +176,7 @@ const processAddress = async (
       };
       await sgMail.send(msg);
       log.info(
-        `Sent address move email: ${address} transferred to a new account`
+        `Sent address move email: ${address} transferred to a new account`,
       );
     } catch (e) {
       log.error(`Could not send address move email for: ${address}`);
@@ -189,12 +188,12 @@ const verifyAddress = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.body.chain || !req.body.chain_id) {
     throw new AppError(Errors.NoChain);
   }
-  const chain = await models.Chain.findOne({
+  const chain = await models.Community.findOne({
     where: { id: req.body.chain },
   });
   const chain_id = req.body.chain_id;
@@ -220,11 +219,12 @@ const verifyAddress = async (
     chain_id,
     address,
     req.body.wallet_id,
+    req.body.wallet_sso_source,
     req.body.signature,
     req.user,
     req.body.session_public_address,
     req.body.session_timestamp || null, // disallow empty strings
-    req.body.session_block_data || null // disallow empty strings
+    req.body.session_block_data || null, // disallow empty strings
   );
 
   // assertion check
@@ -239,7 +239,7 @@ const verifyAddress = async (
   } else {
     // if user isn't logged in, log them in now
     const newAddress = await models.Address.findOne({
-      where: { chain: req.body.chain, address },
+      where: { community_id: req.body.chain, address },
     });
     const user = await models.User.scope('withPrivateData').findOne({
       where: { id: newAddress.user_id },
@@ -250,18 +250,17 @@ const verifyAddress = async (
         serverAnalyticsController.track(
           {
             event: MixpanelLoginEvent.LOGIN_FAILED,
-            isCustomDomain: null,
           },
-          req
+          req,
         );
         return next(err);
       }
       serverAnalyticsController.track(
         {
           event: MixpanelLoginEvent.LOGIN_COMPLETED,
-          isCustomDomain: null,
+          userId: user.id,
         },
-        req
+        req,
       );
 
       return res.json({
@@ -269,7 +268,7 @@ const verifyAddress = async (
         result: {
           user,
           address,
-          message: 'Logged in',
+          message: 'Signed in',
         },
       });
     });

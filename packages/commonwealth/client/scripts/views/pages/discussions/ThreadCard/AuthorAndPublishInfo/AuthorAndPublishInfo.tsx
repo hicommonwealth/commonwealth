@@ -1,26 +1,28 @@
-import React from 'react';
+import { PopperPlacementType } from '@mui/base/Popper';
 import { threadStageToLabel } from 'helpers';
-import type Account from '../../../../../models/Account';
-import AddressInfo from '../../../../../models/AddressInfo';
-import MinimumProfile from '../../../../../models/MinimumProfile';
-import { IThreadCollaborator } from '../../../../../models/Thread';
-import { ThreadStage } from '../../../../../models/types';
-import {
-  Popover,
-  usePopover,
-} from 'views/components/component_kit/cw_popover/cw_popover';
-import { CWTag } from 'views/components/component_kit/cw_tag';
+import { getRelativeTimestamp } from 'helpers/dates';
+import moment from 'moment';
+import React, { useRef } from 'react';
+import { ArchiveTrayWithTooltip } from 'views/components/ArchiveTrayWithTooltip';
+import { LockWithTooltip } from 'views/components/LockWithTooltip';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
+import CWPopover, {
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { User } from 'views/components/user/user';
-import './AuthorAndPublishInfo.scss';
-import { LockWithTooltip } from 'views/components/lock_with_tooltip';
-import moment from 'moment';
+import { IThreadCollaborator } from '../../../../../models/Thread';
+import { ThreadStage } from '../../../../../models/types';
 import { NewThreadTag } from '../../NewThreadTag';
+import './AuthorAndPublishInfo.scss';
+import useAuthorMetadataCustomWrap from './useAuthorMetadataCustomWrap';
 
 export type AuthorAndPublishInfoProps = {
   isHot?: boolean;
-  authorInfo: Account | AddressInfo | MinimumProfile | undefined;
+  authorAddress: string;
+  authorChainId: string;
   discord_meta?: {
     user: { id: string; username: string };
     channel_id: string;
@@ -30,7 +32,7 @@ export type AuthorAndPublishInfoProps = {
   isLocked?: boolean;
   lockedAt?: string;
   lastUpdated?: string;
-  publishDate?: string;
+  publishDate?: moment.Moment;
   viewsCount?: number;
   showSplitDotIndicator?: boolean;
   showPublishLabelWithDate?: boolean;
@@ -39,11 +41,14 @@ export type AuthorAndPublishInfoProps = {
   isSpamThread?: boolean;
   threadStage?: ThreadStage;
   onThreadStageLabelClick?: (threadStage: ThreadStage) => Promise<any>;
+  archivedAt?: moment.Moment;
+  popoverPlacement?: PopperPlacementType;
 };
 
 export const AuthorAndPublishInfo = ({
   isHot,
-  authorInfo,
+  authorAddress,
+  authorChainId,
   isLocked,
   lockedAt,
   lastUpdated,
@@ -58,8 +63,12 @@ export const AuthorAndPublishInfo = ({
   threadStage,
   onThreadStageLabelClick,
   collaboratorsInfo,
+  archivedAt,
+  popoverPlacement,
 }: AuthorAndPublishInfoProps) => {
   const popoverProps = usePopover();
+  const containerRef = useRef(null);
+  useAuthorMetadataCustomWrap(containerRef);
 
   const dotIndicator = showSplitDotIndicator && (
     <CWText className="dot-indicator">•</CWText>
@@ -68,15 +77,17 @@ export const AuthorAndPublishInfo = ({
   const fromDiscordBot = discord_meta !== null && discord_meta !== undefined;
 
   return (
-    <div className="AuthorAndPublishInfo">
+    <div className="AuthorAndPublishInfo" ref={containerRef}>
       <User
         avatarSize={24}
-        user={authorInfo}
-        popover
-        linkify
-        showAddressWithDisplayName={
+        userAddress={authorAddress}
+        userCommunityId={authorChainId}
+        shouldShowPopover
+        shouldLinkProfile
+        shouldShowAddressWithDisplayName={
           fromDiscordBot ? false : showUserAddressWithInfo
         }
+        popoverPlacement={popoverPlacement}
       />
 
       {fromDiscordBot && (
@@ -86,7 +97,7 @@ export const AuthorAndPublishInfo = ({
             <b>{discord_meta?.user?.username}</b>
           </CWText>
           {dotIndicator}
-          <CWTag label={'Discord'} type={'discord'} iconName="discord" />
+          <CWTag label="Discord" type="login" iconName="discord" />
           {dotIndicator}
           <CWText type="caption" className="discord-author">
             Bridged from Discord
@@ -106,15 +117,16 @@ export const AuthorAndPublishInfo = ({
             {`${collaboratorsInfo.length} other${
               collaboratorsInfo.length > 1 ? 's' : ''
             }`}
-            <Popover
+            <CWPopover
               content={
                 <div className="collaborators">
-                  {collaboratorsInfo.map(({ address, chain }) => {
+                  {collaboratorsInfo.map(({ address, community_id }) => {
                     return (
                       <User
-                        linkify
+                        shouldLinkProfile
                         key={address}
-                        user={new AddressInfo(null, address, chain, null)}
+                        userAddress={address}
+                        userCommunityId={community_id}
                       />
                     );
                   })}
@@ -129,15 +141,33 @@ export const AuthorAndPublishInfo = ({
       {publishDate && (
         <>
           {dotIndicator}
-          <CWText type="caption" fontWeight="medium" className="section-text">
-            {showPublishLabelWithDate ? 'Published on ' : ''}
-            {showEditedLabelWithDate ? 'Edited on ' : ''}
-            {publishDate}
-          </CWText>
+
+          <CWTooltip
+            placement="top"
+            content={
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {publishDate.format('MMMM Do YYYY')} {dotIndicator}{' '}
+                {publishDate.format('h:mm A')}
+              </div>
+            }
+            renderTrigger={(handleInteraction) => (
+              <CWText
+                type="caption"
+                fontWeight="regular"
+                className="section-text publish-date"
+                onMouseEnter={handleInteraction}
+                onMouseLeave={handleInteraction}
+              >
+                {showPublishLabelWithDate ? 'Published ' : ''}
+                {showEditedLabelWithDate ? 'Edited ' : ''}
+                {getRelativeTimestamp(publishDate?.toISOString())}
+              </CWText>
+            )}
+          />
         </>
       )}
 
-      {viewsCount >= 0 && (
+      {viewsCount !== null && viewsCount >= 0 && (
         <>
           {dotIndicator}
           <CWText type="caption" className="section-text">
@@ -145,6 +175,8 @@ export const AuthorAndPublishInfo = ({
           </CWText>
         </>
       )}
+
+      {archivedAt && <ArchiveTrayWithTooltip archivedAt={moment(archivedAt)} />}
 
       {threadStage && (
         <>
@@ -156,7 +188,7 @@ export const AuthorAndPublishInfo = ({
                 stage:
                   threadStage === ThreadStage.Failed ? 'negative' : 'positive',
               },
-              'proposal-stage-text'
+              'proposal-stage-text',
             )}
             onClick={async () => await onThreadStageLabelClick(threadStage)}
           >
@@ -169,7 +201,7 @@ export const AuthorAndPublishInfo = ({
 
       {isHot && <CWTag iconName="trendUp" label="Trending" type="trending" />}
 
-      {isSpamThread && <CWTag label={'SPAM'} type={'disabled'} />}
+      {isSpamThread && <CWTag label="SPAM" type="disabled" />}
 
       {isLocked && lockedAt && lastUpdated && (
         <LockWithTooltip

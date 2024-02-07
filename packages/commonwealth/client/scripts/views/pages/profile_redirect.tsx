@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 
-import $ from 'jquery';
-
-import app from 'state';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { useCommonNavigate } from 'navigation/helpers';
-import { PageLoading } from './loading';
+import app from 'state';
+import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
 import { PageNotFound } from './404';
+import { PageLoading } from './loading';
 
 type ProfileRedirectProps = {
   address: string;
@@ -13,43 +13,40 @@ type ProfileRedirectProps = {
 };
 
 const ProfileRedirect = (props: ProfileRedirectProps) => {
-  const [profileId, setProfileId] = useState<number>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<boolean>(false);
+  const [profileNotFound, setProfileNotFound] = useState<boolean>(false);
   const navigate = useCommonNavigate();
 
-  const getProfileId = async (address, chain) => {
-    setLoading(true);
-    try {
-      const res = await $.post(`${app.serverUrl()}/getAddressProfile`, {
-        address,
-        chain,
-      });
-      if (res.status === 'Success' && res.result) {
-        setProfileId(res.result.profileId);
-      }
-    } catch (err) {
-      setError(true);
-    }
-    setLoading(false);
-  };
+  const { address, scope } = props;
+  const communityId = scope || app.activeChainId();
+  const {
+    data: users,
+    isError,
+    isLoading,
+  } = useFetchProfilesByAddressesQuery({
+    profileChainIds: [communityId],
+    profileAddresses: [address || app.user.activeAccount?.address],
+    currentChainId: communityId,
+    apiCallEnabled: !!address && !!communityId,
+  });
 
-  if (loading) {
+  useNecessaryEffect(() => {
+    if (!isError && users && Array.isArray(users) && users[0]?.id) {
+      navigate(`/profile/id/${users[0].id}`, {}, null);
+    } else {
+      setProfileNotFound(true);
+    }
+  }, [isError, users]);
+
+  if (isLoading) {
     return <PageLoading />;
   }
 
-  if (error) {
+  if (isError) {
     return <PageNotFound message="There was an error loading this profile." />;
   }
 
-  let { address, scope } = props;
-  if (!address) address = app.user.activeAccount?.address;
-  if (!scope) scope = app.activeChainId();
-
-  if (address && scope && !profileId) getProfileId(address, scope);
-
-  if (profileId) {
-    navigate(`/profile/id/${profileId}`, {}, null);
+  if (profileNotFound) {
+    return <PageNotFound message="Profile not found" />;
   }
 };
 

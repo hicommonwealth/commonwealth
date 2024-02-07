@@ -1,0 +1,36 @@
+@import '../shared';
+
+.TemplateSelectorItem {
+    display: flex;
+    flex-direction: row;
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+  
+    &:hover {
+      background-color: #f0f0f0;
+    }
+  
+    .selected {
+      min-width: 50px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  
+      svg {
+        fill: $black;
+        width: 18px;
+      }
+    }
+  
+    .template-nickname {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+  
+    .template-contract-address {
+      font-size: 0.8rem;
+      color: #888;
+    }
+  }

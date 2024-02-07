@@ -1,16 +1,16 @@
+import type { DB } from '@hicommonwealth/model';
 import type { Request, Response } from 'express';
-import type { DB } from '../models';
 
 const domain = async (models: DB, req: Request, res: Response) => {
   const hostname = req.headers['x-forwarded-host'] || req.hostname;
 
   // return the community id matching the hostname's custom domain
   try {
-    const chain = await models.Chain.findOne({
+    const community = await models.Community.findOne({
       where: { custom_domain: hostname },
     });
-    if (chain) {
-      return res.json({ customDomain: chain.id });
+    if (community) {
+      return res.json({ customDomain: community.id });
     }
   } catch (e) {
     // do nothing

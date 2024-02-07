@@ -1,59 +1,37 @@
-import { IChainEntityKind } from 'chain-events/src';
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 import { filterLinks } from 'helpers/threads';
+
 import {
   chainEntityTypeToProposalName,
   chainEntityTypeToProposalSlug,
   getProposalUrlPath,
 } from 'identifiers';
-import { Link, LinkSource } from 'models/Thread';
+import { LinkSource } from 'models/Thread';
 import 'pages/view_thread/linked_proposals_card.scss';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import app from 'state';
-import type ChainEntity from '../../../models/ChainEntity';
 import type Thread from '../../../models/Thread';
-import type { ThreadStage } from '../../../models/types';
+import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { CWContentPageCard } from '../../components/component_kit/CWContentPage';
-import { Modal } from '../../components/component_kit/cw_modal';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
 
-type LinkedProposalProps = {
-  thread: Thread;
-  title: string;
-  ceType: ChainEntity['type'];
-  ceTypeId: ChainEntity['typeId'];
-  ceCompleted?: ChainEntity['completed'];
+type ThreadLinkProps = {
+  threadChain: string;
+  identifier: string;
 };
 
-const LinkedProposal = ({
-  thread,
-  title,
-  ceType,
-  ceTypeId,
-  ceCompleted,
-}: LinkedProposalProps) => {
-  const slug = chainEntityTypeToProposalSlug(ceType);
+const getThreadLink = ({ threadChain, identifier }: ThreadLinkProps) => {
+  const slug = chainEntityTypeToProposalSlug();
 
-  const threadLink =
-    thread.chain === 'edgeware' && !ceType.includes('/')
-      ? `/${thread.chain}/link/chain-entity/${ceTypeId}`
-      : `${app.isCustomDomain() ? '' : `/${thread.chain}`}${getProposalUrlPath(
-          slug,
-          ceTypeId,
-          true
-        )}`;
+  const threadLink = `${
+    app.isCustomDomain() ? '' : `/${threadChain}`
+  }${getProposalUrlPath(slug, identifier, true)}`;
 
-  return (
-    <ReactRouterLink to={threadLink}>
-      {`${
-        title ?? chainEntityTypeToProposalName(ceType) ?? 'Proposal'
-      } #${ceTypeId} ${ceCompleted ? ' (Completed)' : ''}`}
-    </ReactRouterLink>
-  );
+  return threadLink;
 };
 
 type LinkedProposalsCardProps = {
@@ -72,12 +50,12 @@ export const LinkedProposalsCard = ({
 
   const initialSnapshotLinks = useMemo(
     () => filterLinks(thread.links, LinkSource.Snapshot),
-    [thread.links]
+    [thread.links],
   );
 
   const initialProposalLinks = useMemo(
     () => filterLinks(thread.links, LinkSource.Proposal),
-    [thread.links]
+    [thread.links],
   );
 
   useEffect(() => {
@@ -85,22 +63,22 @@ export const LinkedProposalsCard = ({
       const proposal = initialSnapshotLinks[0];
       if (proposal.identifier.includes('/')) {
         setSnapshotUrl(
-          `${app.isCustomDomain() ? '' : `/${thread.chain}`}/snapshot/${
+          `${app.isCustomDomain() ? '' : `/${thread.communityId}`}/snapshot/${
             proposal.identifier
-          }`
+          }`,
         );
       } else {
         loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
           for (const { space: _space, proposals } of data) {
             const matchingSnapshot = proposals.find(
-              (sn) => sn.id === proposal.identifier
+              (sn) => sn.id === proposal.identifier,
             );
             if (matchingSnapshot) {
               setSnapshotTitle(matchingSnapshot.title);
               setSnapshotUrl(
-                `${app.isCustomDomain() ? '' : `/${thread.chain}`}/snapshot/${
-                  _space.id
-                }/${matchingSnapshot.id}`
+                `${
+                  app.isCustomDomain() ? '' : `/${thread.communityId}`
+                }/snapshot/${_space.id}/${matchingSnapshot.id}`,
               );
               break;
             }
@@ -109,7 +87,7 @@ export const LinkedProposalsCard = ({
       }
       setSnapshotProposalsLoaded(true);
     }
-  }, [initialSnapshotLinks]);
+  }, [initialSnapshotLinks, thread.communityId]);
 
   const showSnapshot =
     initialSnapshotLinks.length > 0 && snapshotProposalsLoaded;
@@ -131,22 +109,34 @@ export const LinkedProposalsCard = ({
                     <div className="linked-proposals">
                       {initialProposalLinks.map((l) => {
                         return (
-                          <LinkedProposal
+                          <ReactRouterLink
                             key={l.identifier}
-                            thread={thread}
-                            title={l.title}
-                            ceType={'proposal' as IChainEntityKind}
-                            ceTypeId={l.identifier}
-                          />
+                            to={getThreadLink({
+                              threadChain: thread.communityId,
+                              identifier: l.identifier,
+                            })}
+                          >
+                            {`${
+                              l.title ??
+                              chainEntityTypeToProposalName() ??
+                              'Proposal'
+                            } #${l.identifier}`}
+                          </ReactRouterLink>
                         );
                       })}
                     </div>
                   )}
-                  {showSnapshot && (
-                    <ReactRouterLink to={snapshotUrl}>
-                      Snapshot: {initialSnapshotLinks[0].title ?? snapshotTitle}
-                    </ReactRouterLink>
-                  )}
+                  {showSnapshot &&
+                    (snapshotUrl ? (
+                      <ReactRouterLink to={snapshotUrl}>
+                        Snapshot:{' '}
+                        {initialSnapshotLinks[0].title ?? snapshotTitle}
+                      </ReactRouterLink>
+                    ) : (
+                      <div className="snapshot-spinner-container">
+                        <CWSpinner size="medium" />
+                      </div>
+                    ))}
                 </div>
               ) : (
                 <CWText type="b2" className="no-proposals-text">
@@ -167,8 +157,9 @@ export const LinkedProposalsCard = ({
           )
         }
       />
-      <Modal
+      <CWModal
         className="LinkedProposalsCardModal"
+        size="medium"
         content={
           <UpdateProposalStatusModal
             thread={thread}

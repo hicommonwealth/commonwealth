@@ -1,12 +1,8 @@
-import type {
-  DeleteReq,
-  OnlyErrorResp,
-} from 'common-common/src/api/extApiTypes';
+import type { DB, ModelStatic } from '@hicommonwealth/model';
 import { validationResult } from 'express-validator';
 import { Op } from 'sequelize';
+import type { DeleteReq, OnlyErrorResp } from '../api/extApiTypes';
 import { filterAddressOwnedByUser } from '../middleware/lookupAddressIsOwnedByUser';
-import type { DB } from '../models';
-import type { ModelStatic } from '../models/types';
 import type { TypedRequest, TypedResponse } from '../types';
 import { failure, success } from '../types';
 
@@ -15,7 +11,7 @@ export const deleteEntities = async (
   models: DB,
   model: ModelStatic<any>,
   req: TypedRequest<DeleteReq>,
-  res: TypedResponse<OnlyErrorResp>
+  res: TypedResponse<OnlyErrorResp>,
 ) => {
   const errors = validationResult(req).array();
   if (errors.length !== 0) {
@@ -32,7 +28,7 @@ export const deleteEntities = async (
       req.user.id,
       entities.map((e) => e[chainIdFieldName]),
       [],
-      entities.map((e) => e.address_id)
+      entities.map((e) => e.address_id),
     );
 
     if (addresses.unowned.length !== 0) {

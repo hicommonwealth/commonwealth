@@ -23,7 +23,7 @@ const deleteReaction = async ({
     session = null,
     action = null,
     hash = null,
-  } = await app.sessions.signDeleteThreadReaction({
+  } = await app.sessions.signDeleteThreadReaction(address, {
     thread_id: threadId,
   });
 
@@ -31,14 +31,15 @@ const deleteReaction = async ({
     `${app.serverUrl()}/reactions/${reactionId}`,
     {
       data: {
-        author_chain: chainId,
+        author_community_id: chainId,
         address: address,
+        community_id: app.chain.id,
         jwt: app.user.jwt,
         canvas_action: action,
         canvas_session: session,
         canvas_hash: hash,
       },
-    }
+    },
   );
 
   return {
@@ -68,7 +69,7 @@ const useDeleteThreadReactionMutation = ({
             { id: response.data.result.reaction_id },
           ] as any,
         },
-        'removeFromExisting'
+        'removeFromExisting',
       );
     },
   });

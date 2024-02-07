@@ -1,19 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
-import Template from 'models/Template';
-import 'modals/view_template_modal.scss';
-import { CWText } from '../components/component_kit/cw_text';
-import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
-import { CWButton } from '../components/component_kit/cw_button';
-import app from 'state';
+import { renderDisabledTemplate } from '../../helpers/action_template_helpers';
+import Template from '../../models/Template';
+import app from '../../state';
 import { CWCommunityAvatar } from '../components/component_kit/cw_community_avatar';
-import { User } from '../components/user/user';
-import { TemplateComponents } from '../pages/view_template/view_template';
-import validateType from 'client/scripts/helpers/validateTypes';
 import { CWDivider } from '../components/component_kit/cw_divider';
-import { CWDropdown } from '../components/component_kit/cw_dropdown';
-import { CWTextInput } from '../components/component_kit/cw_text_input';
-import { renderDisabledTemplate } from 'helpers/action_template_helpers';
+import { CWText } from '../components/component_kit/cw_text';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
+import { User } from '../components/user/user';
+
+import '../../../styles/modals/view_template_modal.scss';
+import Account from '../../models/Account';
 
 const ViewTemplateModal = ({
   template,
@@ -22,25 +24,19 @@ const ViewTemplateModal = ({
   template: Template;
   onClose: () => void;
 }) => {
-  const creator = app.chain.accounts.get(template.createdBy);
+  const creator: Account = app.chain.accounts.get(template.createdBy);
 
   return (
     <div className="ViewTemplateModal">
-      <div className="TopSection">
-        <CWText type="h4" fontWeight="bold">
-          View template
-        </CWText>
-        <CWIcon
-          iconName="close"
-          iconSize="small"
-          className="closeIcon"
-          onClick={onClose}
-        />
-      </div>
-      <div className="Body">
+      <CWModalHeader label="View template" onModalClose={onClose} />
+      <CWModalBody>
         <div className="CreationRow">
           <CWText type="b2">By</CWText>
-          <User user={creator} showAddressWithDisplayName />
+          <User
+            userAddress={creator.address}
+            userCommunityId={creator.community?.id || creator?.profile?.chain}
+            shouldShowAddressWithDisplayName
+          />
           <CWText type="b2">•</CWText>
           <CWText type="b2">Created in</CWText>
           <CWCommunityAvatar
@@ -79,15 +75,15 @@ const ViewTemplateModal = ({
             {renderDisabledTemplate(JSON.parse(template.template).form_fields)}
           </div>
         </div>
-      </div>
-
-      <div className="BottomSection">
+      </CWModalBody>
+      <CWModalFooter>
         <CWButton
           label="Close"
-          buttonType="secondary-black"
+          buttonType="secondary"
+          buttonHeight="sm"
           onClick={onClose}
         />
-      </div>
+      </CWModalFooter>
     </div>
   );
 };

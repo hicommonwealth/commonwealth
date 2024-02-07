@@ -4,20 +4,14 @@ import {
   APIOrderBy,
   APIOrderDirection,
 } from 'client/scripts/helpers/constants';
+import { CommunityResult } from 'client/scripts/views/pages/search/helpers';
 import app from 'state';
 import { ApiEndpoints } from '../config';
 
 const SEARCH_CHAINS_STALE_TIME = 2 * 60 * 60 * 1_000; // 2 h
 
 export type SearchChainsResponse = {
-  results: {
-    id: string;
-    name: string;
-    default_symbol: string;
-    type: string;
-    icon_url: string;
-    created_at: string | null;
-  }[];
+  results: CommunityResult[];
   limit: number;
   page: number;
   totalPages: number;
@@ -25,7 +19,7 @@ export type SearchChainsResponse = {
 };
 
 interface SearchChainsProps {
-  chainId: string;
+  communityId: string;
   searchTerm: string;
   limit: number;
   orderBy: APIOrderBy;
@@ -35,7 +29,7 @@ interface SearchChainsProps {
 
 const searchChains = async ({
   pageParam = 1,
-  chainId,
+  communityId,
   searchTerm,
   limit,
   orderBy,
@@ -44,37 +38,36 @@ const searchChains = async ({
   const {
     data: { result },
   } = await axios.get<{ result: SearchChainsResponse }>(
-    `${app.serverUrl()}/chains`,
+    `${app.serverUrl()}/communities`,
     {
       headers: {
         'Content-Type': 'application/json',
       },
       params: {
-        chain: chainId,
+        community_id: communityId,
         search: searchTerm,
         limit: limit.toString(),
         page: pageParam.toString(),
         order_by: orderBy,
         order_direction: orderDirection,
       },
-    }
+    },
   );
   return result;
 };
 
 const useSearchChainsQuery = ({
-  chainId,
+  communityId,
   searchTerm,
   limit,
   orderBy,
   orderDirection,
-
   enabled = true,
 }: SearchChainsProps) => {
   const key = [
     ApiEndpoints.searchChains(searchTerm),
     {
-      chainId,
+      communityId,
       orderBy,
       orderDirection,
     },
@@ -84,7 +77,7 @@ const useSearchChainsQuery = ({
     ({ pageParam }) =>
       searchChains({
         pageParam,
-        chainId,
+        communityId,
         searchTerm,
         limit,
         orderBy,
@@ -100,7 +93,7 @@ const useSearchChainsQuery = ({
       },
       staleTime: SEARCH_CHAINS_STALE_TIME,
       enabled,
-    }
+    },
   );
 };
 

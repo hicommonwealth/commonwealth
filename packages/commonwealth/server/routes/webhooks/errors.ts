@@ -3,7 +3,7 @@ const Errors = {
   NotAdmin: 'Not an admin of chain or community',
   MissingWebhook: 'Must provide a webhook url',
   MissingCategories: 'Must provide webhook categories',
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
   NoWebhookFound: 'No webhook under provided parameters',
 };
 

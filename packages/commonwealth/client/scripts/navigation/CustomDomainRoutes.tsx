@@ -6,72 +6,88 @@ import { withLayout } from 'views/Layout';
 
 const SearchPage = lazy(() => import('views/pages/search'));
 
-const CreateCommunityPage = lazy(() => import('views/pages/create_community'));
+const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
-const MembersPage = lazy(() => import('views/pages/members'));
+const MembersPage = lazy(
+  () => import('views/pages/Community/Members/CommunityMembersPage'),
+);
+const DirectoryPage = lazy(() => import('views/pages/DirectoryPage'));
+const CreateMembersGroupPage = lazy(
+  () => import('views/pages/Community/Groups/Create'),
+);
+const UpdateMembersGroupPage = lazy(
+  () => import('views/pages/Community/Groups/Update'),
+);
 const SputnikDaosPage = lazy(() => import('views/pages/sputnikdaos'));
 const FinishNearLoginPage = lazy(() => import('views/pages/finish_near_login'));
 const FinishAxieLoginPage = lazy(() => import('views/pages/finish_axie_login'));
 const FinishSocialLoginPage = lazy(
-  () => import('views/pages/finish_social_login')
+  () => import('views/pages/finish_social_login'),
 );
 
 const NotificationsPage = lazy(() => import('views/pages/notifications'));
 const NotificationSettingsPage = lazy(
-  () => import('views/pages/notification_settings')
+  () => import('views/pages/notification_settings'),
 );
 
-const ReferendaPage = lazy(() => import('views/pages/referenda'));
 const ProposalsPage = lazy(() => import('views/pages/proposals'));
 const ViewProposalPage = lazy(() => import('views/pages/view_proposal/index'));
 const NewProposalPage = lazy(() => import('views/pages/new_proposal/index'));
 
 const DiscussionsPage = lazy(
-  () => import('views/pages/discussions/DiscussionsPage')
+  () => import('views/pages/discussions/DiscussionsPage'),
 );
 const ViewThreadPage = lazy(
-  () => import('views/pages/view_thread/ViewThreadPage')
+  () => import('views/pages/view_thread/ViewThreadPage'),
 );
 const NewThreadPage = lazy(() => import('views/pages/new_thread'));
 const DiscussionsRedirectPage = lazy(
-  () => import('views/pages/discussions_redirect')
-);
-const ChainEntityLinkRedirectPage = lazy(
-  () => import('views/pages/chain_entity_link_redirect')
+  () => import('views/pages/discussions_redirect'),
 );
 const SnapshotProposalLinkRedirectPage = lazy(
-  () => import('views/pages/snapshot_proposal_link_redirect')
+  () => import('views/pages/snapshot_proposal_link_redirect'),
 );
 
 const ContractsPage = lazy(() => import('views/pages/contracts'));
 const NewContractPage = lazy(() => import('views/pages/new_contract'));
 const GeneralContractPage = lazy(() => import('views/pages/general_contract'));
 const NewContractTemplatePage = lazy(
-  () => import('views/pages/new_contract_template')
+  () => import('views/pages/new_contract_template'),
 );
 const ViewTemplatePage = lazy(() => import('views/pages/view_template'));
 
-const TreasuryPage = lazy(() => import('views/pages/treasury'));
-const TipsPage = lazy(() => import('views/pages/tips'));
-
 const ManageCommunityPage = lazy(
-  () => import('views/pages/manage_community/ManageCommunityPage')
+  () => import('views/pages/manage_community/ManageCommunityPage'),
 );
 const DiscordCallbackPage = lazy(
-  () => import('views/pages/manage_community/discord-callback')
+  () => import('views/pages/manage_community/discord-callback'),
 );
 const AnalyticsPage = lazy(() => import('views/pages/stats'));
+
+const CommunityAdminAndModerators = lazy(
+  () => import('views/pages/CommunityManagement/AdminsAndModerators'),
+);
+const CommunityProfile = lazy(
+  () => import('views/pages/CommunityManagement/CommunityProfile'),
+);
+const CommunityIntegrations = lazy(
+  () => import('views/pages/CommunityManagement/Integrations'),
+);
+const CommunityTopics = lazy(
+  () => import('views/pages/CommunityManagement/Topics'),
+);
+
 const SnapshotProposalPage = lazy(
-  () => import('views/pages/snapshot_proposals')
+  () => import('views/pages/snapshot_proposals'),
 );
 const ViewMultipleSnapshotsPage = lazy(
-  () => import('views/pages/view_multiple_snapshot_spaces')
+  () => import('views/pages/view_multiple_snapshot_spaces'),
 );
 const ViewSnapshotsProposalPage = lazy(
-  () => import('views/pages/view_snapshot_proposal')
+  () => import('views/pages/view_snapshot_proposal'),
 );
 const NewSnapshotProposalPage = lazy(
-  () => import('views/pages/new_snapshot_proposal')
+  () => import('views/pages/new_snapshot_proposal'),
 );
 
 const NewProfilePage = lazy(() => import('views/pages/new_profile'));
@@ -81,6 +97,7 @@ const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 const CustomDomainRoutes = () => {
   return [
     <Route
+      key="/"
       path="/"
       element={withLayout(DiscussionsRedirectPage, {
         scoped: true,
@@ -88,44 +105,59 @@ const CustomDomainRoutes = () => {
       })}
     />,
     <Route
+      key="/createCommunity"
       path="/createCommunity"
-      element={withLayout(CreateCommunityPage, {
-        scoped: true,
-        type: 'common',
-      })}
+      element={withLayout(CreateCommunityPage, { type: 'common' })}
     />,
+    <Route key="/home" path="/home" element={<Navigate to="/overview" />} />,
     <Route
-      path="/createCommunity/:type"
-      element={withLayout(CreateCommunityPage, {
-        scoped: true,
-        type: 'common',
-      })}
-    />,
-    <Route path="/home" element={<Navigate to="/overview" />} />,
-    <Route
+      key="/search"
       path="/search"
       element={withLayout(SearchPage, { type: 'common' })}
     />,
-    <Route path="/web3login" element={<Navigate to="/" />} />,
+    <Route key="/web3login" path="/web3login" element={<Navigate to="/" />} />,
     <Route
+      key="/overview"
       path="/overview"
       element={withLayout(OverviewPage, {
         scoped: true,
       })}
     />,
     <Route
+      key="/members"
       path="/members"
       element={withLayout(MembersPage, {
         scoped: true,
       })}
     />,
     <Route
+      key="/members/groups/create"
+      path="/members/groups/create"
+      element={withLayout(CreateMembersGroupPage, {
+        scoped: true,
+      })}
+    />,
+    <Route
+      key="/members/groups/:groupId/update"
+      path="/members/groups/:groupId/update"
+      element={withLayout(UpdateMembersGroupPage, {
+        scoped: true,
+      })}
+    />,
+    <Route
+      key="/directory"
+      path="/directory"
+      element={withLayout(DirectoryPage, { scoped: true })}
+    />,
+    <Route
+      key="/sputnik-daos"
       path="/sputnik-daos"
       element={withLayout(SputnikDaosPage, {
         scoped: true,
       })}
     />,
     <Route
+      key="/finishNearLogin"
       path="/finishNearLogin"
       element={withLayout(FinishNearLoginPage, {
         scoped: true,
@@ -133,16 +165,19 @@ const CustomDomainRoutes = () => {
       })}
     />,
     <Route
+      key="/finishaxielogin"
       path="/finishaxielogin"
       element={withLayout(FinishAxieLoginPage, { type: 'common' })}
     />,
     <Route
+      key="/finishsociallogin"
       path="/finishsociallogin"
       element={withLayout(FinishSocialLoginPage, { type: 'common' })}
     />,
 
     // NOTIFICATIONS
     <Route
+      key="/notifications"
       path="/notifications"
       element={withLayout(NotificationsPage, {
         scoped: true,
@@ -151,6 +186,7 @@ const CustomDomainRoutes = () => {
     />,
 
     <Route
+      key="/notification-settings"
       path="/notification-settings"
       element={withLayout(NotificationSettingsPage, {
         scoped: true,
@@ -161,36 +197,35 @@ const CustomDomainRoutes = () => {
 
     // GOVERNANCE
     <Route
-      path="/referenda"
-      element={withLayout(ReferendaPage, {
-        scoped: true,
-      })}
-    />,
-    <Route
+      key="/proposals"
       path="/proposals"
       element={withLayout(ProposalsPage, {
         scoped: true,
       })}
     />,
     <Route
+      key="/proposal/:type/:identifier"
       path="/proposal/:type/:identifier"
       element={withLayout(ViewProposalPage, {
         scoped: true,
       })}
     />,
     <Route
+      key="/proposal/:identifier"
       path="/proposal/:identifier"
       element={withLayout(ViewProposalPage, {
         scoped: true,
       })}
     />,
     <Route
+      key="/new/proposal/:type"
       path="/new/proposal/:type"
       element={withLayout(NewProposalPage, {
         scoped: true,
       })}
     />,
     <Route
+      key="/new/proposal"
       path="/new/proposal"
       element={withLayout(NewProposalPage, {
         scoped: true,
@@ -200,34 +235,46 @@ const CustomDomainRoutes = () => {
 
     // DISCUSSIONS
     <Route
+      key="/discussions"
       path="/discussions"
       element={withLayout(DiscussionsPage, {
         scoped: true,
       })}
     />,
     <Route
+      key="/discussions/:topicName"
       path="/discussions/:topicName"
       element={withLayout(DiscussionsPage, {
         scoped: true,
       })}
     />,
     <Route
+      key="/discussion/:identifier"
       path="/discussion/:identifier"
       element={withLayout(ViewThreadPage, {
         scoped: true,
       })}
     />,
     <Route
+      key="/new/discussion"
       path="/new/discussion"
       element={withLayout(NewThreadPage, {
         scoped: true,
       })}
     />,
     <Route
+      key="/proposal/discussion/:identifier"
       path="/proposal/discussion/:identifier"
       element={
         <Navigate to={(parameters) => `/discussion/${parameters.identifier}`} />
       }
+    />,
+    <Route
+      key={0}
+      path="/archived"
+      element={withLayout(DiscussionsPage, {
+        scoped: true,
+      })}
     />,
     // DISCUSSIONS END
 
@@ -235,30 +282,35 @@ const CustomDomainRoutes = () => {
     ...(featureFlags.proposalTemplates
       ? [
           <Route
+            key="/contracts"
             path="/contracts"
             element={withLayout(ContractsPage, {
               scoped: true,
             })}
           />,
           <Route
+            key="/new/contract"
             path="/new/contract"
             element={withLayout(NewContractPage, {
               scoped: true,
             })}
           />,
           <Route
+            key="/new/contract_template/:contract_id"
             path="/new/contract_template/:contract_id"
             element={withLayout(NewContractTemplatePage, {
               scoped: true,
             })}
           />,
           <Route
+            key="/contract/:contractAddress"
             path="/contract/:contractAddress"
             element={withLayout(GeneralContractPage, {
               scoped: true,
             })}
           />,
           <Route
+            key="/:contract_address/:slug"
             path="/:contract_address/:slug"
             element={withLayout(ViewTemplatePage, {
               scoped: true,
@@ -268,59 +320,89 @@ const CustomDomainRoutes = () => {
       : []),
     // CONTRACTS END
 
-    // TREASURY
-    <Route
-      path="/treasury"
-      element={withLayout(TreasuryPage, {
-        scoped: true,
-      })}
-    />,
-    <Route
-      path="/tips"
-      element={withLayout(TipsPage, {
-        scoped: true,
-      })}
-    />,
-    // TREASURY END
-
     // ADMIN
+    ...(featureFlags.newAdminOnboardingEnabled
+      ? [
+          <Route
+            key="/manage/profile"
+            path="/manage/profile"
+            element={withLayout(CommunityProfile, {
+              scoped: true,
+            })}
+          />,
+          <Route
+            key="/manage/integrations"
+            path="/manage/integrations"
+            element={withLayout(CommunityIntegrations, {
+              scoped: true,
+            })}
+          />,
+          <Route
+            key="/manage/topics"
+            path="/manage/topics"
+            element={withLayout(CommunityTopics, {
+              scoped: true,
+            })}
+          />,
+          <Route
+            key="/manage/moderators"
+            path="/manage/moderators"
+            element={withLayout(CommunityAdminAndModerators, {
+              scoped: true,
+            })}
+          />,
+        ]
+      : [
+          <Route
+            key="/:scope/manage"
+            path="/:scope/manage"
+            element={<Navigate to="/manage" />}
+          />,
+          <Route
+            key="/manage"
+            path="/manage"
+            element={withLayout(ManageCommunityPage, {
+              scoped: true,
+            })}
+          />,
+        ]),
     <Route
-      path="/manage"
-      element={withLayout(ManageCommunityPage, {
-        scoped: true,
-      })}
-    />,
-    <Route
+      key="/discord-callback"
       path="/discord-callback"
       element={withLayout(DiscordCallbackPage, {
         scoped: true,
       })}
     />,
     <Route
+      key="/analytics"
       path="/analytics"
       element={withLayout(AnalyticsPage, {
         scoped: true,
       })}
     />,
     <Route
+      key="/snapshot/:snapshotId"
       path="/snapshot/:snapshotId"
       element={withLayout(SnapshotProposalPage, {
         scoped: true,
       })}
     />,
     <Route
+      key="/multiple-snapshots"
       path="/multiple-snapshots"
       element={withLayout(ViewMultipleSnapshotsPage, {
         scoped: true,
       })}
     />,
     <Route
+      key="/snapshot/:snapshotId/:identifier"
       path="/snapshot/:snapshotId/:identifier"
       element={withLayout(ViewSnapshotsProposalPage, {
         scoped: true,
       })}
     />,
     <Route
+      key="/new/snapshot/:snapshotId"
       path="/new/snapshot/:snapshotId"
       element={withLayout(NewSnapshotProposalPage, {
         scoped: true,
@@ -330,6 +412,7 @@ const CustomDomainRoutes = () => {
 
     // PROFILES
     <Route
+      key="/account/:address"
       path="/account/:address"
       element={withLayout(ProfilePageRedirect, {
         scoped: true,
@@ -337,6 +420,7 @@ const CustomDomainRoutes = () => {
       })}
     />,
     <Route
+      key="/account"
       path="/account"
       element={withLayout(ProfilePageRedirect, {
         scoped: true,
@@ -344,6 +428,7 @@ const CustomDomainRoutes = () => {
       })}
     />,
     <Route
+      key="/profile/id/:profileId"
       path="/profile/id/:profileId"
       element={withLayout(NewProfilePage, {
         scoped: true,
@@ -351,6 +436,7 @@ const CustomDomainRoutes = () => {
       })}
     />,
     <Route
+      key="/profile/edit"
       path="/profile/edit"
       element={withLayout(EditNewProfilePage, {
         scoped: true,
@@ -360,43 +446,78 @@ const CustomDomainRoutes = () => {
     // PROFILES END
 
     // REDIRECTS //
-    <Route path="/:scope/home" element={<Navigate to="/overview" />} />,
-    <Route path="/:scope/search" element={<Navigate to="/search" />} />,
-    <Route path="/:scope/web3login" element={<Navigate to="/web3login" />} />,
-    <Route path="/:scope/overview" element={<Navigate to="/overview" />} />,
-    <Route path="/:scope/members" element={<Navigate to="/members" />} />,
     <Route
+      key="/:scope/home"
+      path="/:scope/home"
+      element={<Navigate to="/overview" />}
+    />,
+    <Route
+      key="/:scope/search"
+      path="/:scope/search"
+      element={<Navigate to="/search" />}
+    />,
+    <Route
+      key="/:scope/web3login"
+      path="/:scope/web3login"
+      element={<Navigate to="/web3login" />}
+    />,
+    <Route
+      key="/:scope/overview"
+      path="/:scope/overview"
+      element={<Navigate to="/overview" />}
+    />,
+    <Route
+      key="/:scope/members"
+      path="/:scope/members"
+      element={<Navigate to="/members" />}
+    />,
+    <Route
+      key="/:scope/sputnik-daos"
       path="/:scope/sputnik-daos"
       element={<Navigate to="/sputnik-daos" />}
     />,
     <Route
+      key="/:scope/finishNearLogin"
       path="/:scope/finishNearLogin"
       element={<Navigate to="/finishNearLogin" />}
     />,
     <Route
+      key="/:scope/finishaxielogin"
       path="/:scope/finishaxielogin"
       element={<Navigate to="/finishaxielogin" />}
     />,
     <Route
+      key="/:scope/finishsociallogin"
       path="/:scope/finishsociallogin"
       element={<Navigate to="/finishsociallogin" />}
     />,
 
     // NOTIFICATIONS
     <Route
+      key="/:scope/notifications"
       path="/:scope/notifications"
       element={<Navigate to="/notifications" />}
     />,
     <Route
+      key="/:scope/notification-settings"
       path="/:scope/notification-settings"
       element={<Navigate to="/notification-settings" />}
     />,
     // NOTIFICATIONS END
 
     // GOVERNANCE
-    <Route path="/:scope/referenda" element={<Navigate to="/referenda" />} />,
-    <Route path="/:scope/proposals" element={<Navigate to="/proposals" />} />,
     <Route
+      key="/:scope/referenda"
+      path="/:scope/referenda"
+      element={<Navigate to="/referenda" />}
+    />,
+    <Route
+      key="/:scope/proposals"
+      path="/:scope/proposals"
+      element={<Navigate to="/proposals" />}
+    />,
+    <Route
+      key="/:scope/proposal/:type/:identifier"
       path="/:scope/proposal/:type/:identifier"
       element={
         <Navigate
@@ -407,18 +528,21 @@ const CustomDomainRoutes = () => {
       }
     />,
     <Route
+      key="/:scope/proposal/:identifier"
       path="/:scope/proposal/:identifier"
       element={
         <Navigate to={(parameters) => `/proposal/${parameters.identifier}`} />
       }
     />,
     <Route
+      key="/:scope/new/proposal/:type"
       path="/:scope/new/proposal/:type"
       element={
         <Navigate to={(parameters) => `/new/proposal/${parameters.type}`} />
       }
     />,
     <Route
+      key="/:scope/new/proposal"
       path="/:scope/new/proposal"
       element={<Navigate to="/new/proposal" />}
     />,
@@ -426,26 +550,31 @@ const CustomDomainRoutes = () => {
 
     // DISCUSSIONS
     <Route
+      key="/:scope/discussions"
       path="/:scope/discussions"
       element={<Navigate to="/discussions" />}
     />,
     <Route
+      key="/:scope/discussions/:topicName"
       path="/:scope/discussions/:topicName"
       element={
         <Navigate to={(parameters) => `/discussions/${parameters.topicName}`} />
       }
     />,
     <Route
+      key="/:scope/discussion/:identifier"
       path="/:scope/discussion/:identifier"
       element={
         <Navigate to={(parameters) => `/discussion/${parameters.identifier}`} />
       }
     />,
     <Route
+      key="/:scope/new/discussion"
       path="/:scope/new/discussion"
       element={<Navigate to="/new/discussion" />}
     />,
     <Route
+      key="/:scope/proposal/discussion/:identifier"
       path="/:scope/proposal/discussion/:identifier"
       element={
         <Navigate
@@ -457,10 +586,12 @@ const CustomDomainRoutes = () => {
 
     // CONTRACTS
     <Route
+      key="/:scope/new/contract"
       path="/:scope/new/contract"
       element={<Navigate to="/new/contract" />}
     />,
     <Route
+      key="/:scope/contract/:contractAddress"
       path="/:scope/contract/:contractAddress"
       element={
         <Navigate
@@ -471,24 +602,38 @@ const CustomDomainRoutes = () => {
     // CONTRACTS END
 
     // TREASURY
-    <Route path="/:scope/treasury" element={<Navigate to="/treasury" />} />,
-    <Route path="/:scope/tips" element={<Navigate to="/tips" />} />,
+    <Route
+      key="/:scope/treasury"
+      path="/:scope/treasury"
+      element={<Navigate to="/treasury" />}
+    />,
+    <Route
+      key="/:scope/tips"
+      path="/:scope/tips"
+      element={<Navigate to="/tips" />}
+    />,
     // TREASURY END
 
     // ADMIN
-    <Route path="/:scope/manage" element={<Navigate to="/manage" />} />,
-    <Route path="/:scope/analytics" element={<Navigate to="/analytics" />} />,
     <Route
+      key="/:scope/analytics"
+      path="/:scope/analytics"
+      element={<Navigate to="/analytics" />}
+    />,
+    <Route
+      key="/:scope/snapshot/:snapshotId"
       path="/:scope/snapshot/:snapshotId"
       element={
         <Navigate to={(parameters) => `/snapshot/${parameters.snapshotId}`} />
       }
     />,
     <Route
+      key="/:scope/multiple-snapshots"
       path="/:scope/multiple-snapshots"
       element={<Navigate to="/multiple-snapshots" />}
     />,
     <Route
+      key="/:scope/snapshot/:snapshotId/:identifier"
       path="/:scope/snapshot/:snapshotId/:identifier"
       element={
         <Navigate
@@ -499,6 +644,7 @@ const CustomDomainRoutes = () => {
       }
     />,
     <Route
+      key="/:scope/new/snapshot/:snapshotId"
       path="/:scope/new/snapshot/:snapshotId"
       element={
         <Navigate
@@ -510,17 +656,24 @@ const CustomDomainRoutes = () => {
 
     // PROFILES
     <Route
+      key="/:scope/account/:address"
       path="/:scope/account/:address"
       element={<Navigate to="/account/:address" />}
     />,
-    <Route path="/:scope/account" element={<Navigate to="/account" />} />,
     <Route
+      key="/:scope/account"
+      path="/:scope/account"
+      element={<Navigate to="/account" />}
+    />,
+    <Route
+      key="/:scope/profile/id/:profileId"
       path="/:scope/profile/id/:profileId"
       element={
         <Navigate to={(parameters) => `/profile/id/${parameters.profileId}`} />
       }
     />,
     <Route
+      key="/:scope/profile/edit"
       path="/:scope/profile/edit"
       element={<Navigate to="/profile/edit" />}
     />,
@@ -533,12 +686,7 @@ const CustomDomainRoutes = () => {
     // (b) produce a correct link to the entity (whether /snapshot/space/id or /proposal/id), and
     // (c) update the link objects associated with the identifer to point at the correct page.
     <Route
-      path="/link/chain-entity/:identifier"
-      element={withLayout(ChainEntityLinkRedirectPage, {
-        scoped: true,
-      })}
-    />,
-    <Route
+      key="/link/snapshot-proposal/:identifier"
       path="/link/snapshot-proposal/:identifier"
       element={withLayout(SnapshotProposalLinkRedirectPage, {
         scoped: true,

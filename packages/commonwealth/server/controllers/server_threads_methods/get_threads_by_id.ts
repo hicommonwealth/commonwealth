@@ -1,7 +1,6 @@
+import { ThreadAttributes } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
 import { ServerThreadsController } from '../server_threads_controller';
-import getThreadsWithCommentCount from '../../util/getThreadCommentsCount';
-import { ThreadAttributes } from '../../models/thread';
 
 export type GetThreadsByIdOptions = {
   threadIds: number[];
@@ -11,13 +10,11 @@ export type GetThreadsByIdResult = ThreadAttributes[];
 
 export async function __getThreadsById(
   this: ServerThreadsController,
-  { threadIds }: GetThreadsByIdOptions
+  { threadIds }: GetThreadsByIdOptions,
 ): Promise<GetThreadsByIdResult> {
-  let threads;
-  threads = await this.models.Thread.findAll({
+  const threads = await this.models.Thread.findAll({
     where: {
       id: { [Op.in]: threadIds },
-      // chain: req.chain ? req.chain.id : undefined,
     },
     include: [
       {
@@ -26,7 +23,6 @@ export async function __getThreadsById(
       },
       {
         model: this.models.Address,
-        // through: models.Collaboration,
         as: 'collaborators',
       },
       {
@@ -47,10 +43,11 @@ export async function __getThreadsById(
     ],
   });
 
-  threads = await getThreadsWithCommentCount({
-    threads: threads.map((th) => th.toJSON()),
-    models: this.models,
+  const result = threads.map((thread) => {
+    const t = thread.toJSON();
+    (t as any).numberOfComments = t.comment_count || 0;
+    return t;
   });
 
-  return threads;
+  return result;
 }

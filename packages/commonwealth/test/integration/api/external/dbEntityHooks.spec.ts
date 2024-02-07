@@ -1,17 +1,21 @@
+import type {
+  AddressInstance,
+  ChainNodeAttributes,
+  CollaborationAttributes,
+  CommentInstance,
+  CommunityInstance,
+  ProfileAttributes,
+  ReactionAttributes,
+  ThreadInstance,
+  TopicAttributes,
+  UserInstance,
+} from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model';
+import jwt from 'jsonwebtoken';
 import moment from 'moment';
 import * as process from 'process';
 import Sequelize from 'sequelize';
-import models from 'server/database';
-import type { AddressInstance } from 'server/models/address';
-import type { ChainInstance } from 'server/models/chain';
-import type { ChainNodeAttributes } from 'server/models/chain_node';
-import type { CollaborationAttributes } from 'server/models/collaboration';
-import type { CommentInstance } from 'server/models/comment';
-import type { ReactionAttributes } from 'server/models/reaction';
-import type { ThreadInstance } from 'server/models/thread';
-import type { TopicAttributes } from 'server/models/topic';
-import type { UserInstance } from 'server/models/user';
-import type { ProfileAttributes } from '../../../../server/models/profile';
+import { JWT_SECRET } from '../../../../server/config';
 
 const Op = Sequelize.Op;
 
@@ -19,16 +23,22 @@ export let testThreads: ThreadInstance[];
 export let testComments: CommentInstance[];
 export let testUsers: UserInstance[];
 export let testAddresses: AddressInstance[];
-export let testChains: ChainInstance[];
+export let testChains: CommunityInstance[];
 export let testCollaborations: CollaborationAttributes[];
 export let testReactions: ReactionAttributes[];
 export let testChainNodes: ChainNodeAttributes[];
 export let testTopics: TopicAttributes[];
 export let testProfiles: ProfileAttributes[];
+export let testJwtToken: string;
 
 export async function clearTestEntities() {
   await models.Topic.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-  await models.Reaction.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
+  await models.Reaction.destroy({
+    where: {
+      [Op.or]: [{ id: { [Op.lt]: 0 } }, { address_id: { [Op.lt]: 0 } }],
+    },
+    force: true,
+  });
   await models.Collaboration.destroy({
     where: { thread_id: { [Op.lt]: 0 } },
     force: true,
@@ -48,7 +58,7 @@ export async function clearTestEntities() {
     where: { thread_id: { [Op.lt]: 0 } },
     force: true,
   });
-  await models.Chain.destroy({
+  await models.Community.destroy({
     where: { chain_node_id: { [Op.lt]: 0 } },
     force: true,
   });
@@ -72,8 +82,8 @@ export async function createTestEntities() {
               isAdmin: true,
             },
           })
-        )[0]
-    )
+        )[0],
+    ),
   );
 
   testProfiles = await Promise.all(
@@ -89,8 +99,8 @@ export async function createTestEntities() {
               user_id: -i - 1,
             },
           })
-        )[0]
-    )
+        )[0],
+    ),
   );
 
   testChainNodes = [
@@ -119,7 +129,7 @@ export async function createTestEntities() {
   try {
     testChains = [
       (
-        await models.Chain.findOrCreate({
+        await models.Community.findOrCreate({
           where: {
             id: 'cmntest',
             chain_node_id: -1,
@@ -139,7 +149,7 @@ export async function createTestEntities() {
         })
       )[0],
       (
-        await models.Chain.findOrCreate({
+        await models.Community.findOrCreate({
           where: {
             id: 'cmntest2',
             chain_node_id: -2,
@@ -164,7 +174,7 @@ export async function createTestEntities() {
         where: {
           id: -1,
           name: 'testTopic',
-          chain_id: 'cmntest',
+          community_id: 'cmntest',
         },
       })
     )[0],
@@ -173,7 +183,7 @@ export async function createTestEntities() {
         where: {
           id: -2,
           name: 'testTopic2',
-          chain_id: 'cmntest',
+          community_id: 'cmntest',
         },
       })
     )[0],
@@ -188,14 +198,14 @@ export async function createTestEntities() {
               id: -i - 1,
               user_id: -i - 1,
               address: `testAddress${-i - 1}`,
-              chain: 'cmntest',
+              community_id: 'cmntest',
               verification_token: '',
               profile_id: i < 2 ? -1 : -2,
               verified: moment.now(),
             },
           })
-        )[0]
-    )
+        )[0],
+    ),
   );
 
   testThreads = await Promise.all(
@@ -208,13 +218,13 @@ export async function createTestEntities() {
               address_id: -1,
               title: '',
               body: '',
-              chain: 'cmntest',
+              community_id: 'cmntest',
               topic_id: -1,
               kind: 'discussion',
             },
           })
-        )[0]
-    )
+        )[0],
+    ),
   );
 
   testThreads.push(
@@ -228,14 +238,14 @@ export async function createTestEntities() {
                 address_id: -2,
                 title: '',
                 body: '',
-                chain: 'cmntest',
+                community_id: 'cmntest',
                 topic_id: -2,
                 kind: 'discussion',
               },
             })
-          )[0]
-      )
-    ))
+          )[0],
+      ),
+    )),
   );
 
   testCollaborations = await Promise.all(
@@ -248,8 +258,8 @@ export async function createTestEntities() {
               address_id: -i - 1,
             },
           })
-        )[0]
-    )
+        )[0],
+    ),
   );
 
   testComments = await Promise.all(
@@ -259,15 +269,15 @@ export async function createTestEntities() {
           await models.Comment.findOrCreate({
             where: {
               id: -i - 1,
-              chain: 'cmntest',
+              community_id: 'cmntest',
               address_id: -1,
               text: '',
               thread_id: -1,
               plaintext: '',
             },
           })
-        )[0]
-    )
+        )[0],
+    ),
   );
 
   testComments.push(
@@ -278,16 +288,16 @@ export async function createTestEntities() {
             await models.Comment.findOrCreate({
               where: {
                 id: -i - 1 - 2,
-                chain: 'cmntest',
+                community_id: 'cmntest',
                 address_id: -2,
                 text: '',
                 thread_id: -2,
                 plaintext: '',
               },
             })
-          )[0]
-      )
-    ))
+          )[0],
+      ),
+    )),
   );
 
   testReactions = await Promise.all(
@@ -300,11 +310,11 @@ export async function createTestEntities() {
               reaction: 'like',
               address_id: -1,
               thread_id: -1,
-              chain: 'cmntest',
+              community_id: 'cmntest',
             },
           })
-        )[0]
-    )
+        )[0],
+    ),
   );
 
   testReactions.push(
@@ -318,12 +328,17 @@ export async function createTestEntities() {
                 reaction: 'like',
                 address_id: -2,
                 comment_id: -2,
-                chain: 'cmntest',
+                community_id: 'cmntest',
               },
             })
-          )[0]
-      )
-    ))
+          )[0],
+      ),
+    )),
+  );
+
+  testJwtToken = jwt.sign(
+    { id: testUsers[0].id, email: testUsers[0].email },
+    JWT_SECRET,
   );
 }
 

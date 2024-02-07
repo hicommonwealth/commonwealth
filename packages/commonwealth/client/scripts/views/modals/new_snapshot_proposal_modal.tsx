@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { NewSnapshotProposalForm } from '../pages/new_snapshot_proposal';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
-
-import app from 'state';
-
-import 'modals/new_snapshot_proposal_modal.scss';
 
 import type Thread from '../../models/Thread';
+import app from '../../state';
+import { NewSnapshotProposalForm } from '../pages/new_snapshot_proposal';
 import { CWDropdown } from '../components/component_kit/cw_dropdown';
+import {
+  CWModalBody,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
+
+import '../../../styles/modals/new_snapshot_proposal_modal.scss';
 
 type NewSnapshotProposalModalProps = {
   thread: Thread;
@@ -41,11 +43,8 @@ export const NewSnapshotProposalModal = ({
 
   return (
     <div className="NewSnapshotProposalModal">
-      <div className="compact-modal-title">
-        <h3>Create New Snapshot</h3>
-        <CWIconButton iconName="close" onClick={onModalClose} />
-      </div>
-      <div className="compact-modal-body">
+      <CWModalHeader label="Create New Snapshot" onModalClose={onModalClose} />
+      <CWModalBody>
         {snapshotOptions.length > 0 ? (
           <>
             <CWDropdown
@@ -58,6 +57,7 @@ export const NewSnapshotProposalModal = ({
                 snapshotId={selectedSnapshotId}
                 thread={thread}
                 onSave={onSave}
+                onModalClose={onModalClose}
               />
             )}
           </>
@@ -66,9 +66,10 @@ export const NewSnapshotProposalModal = ({
             snapshotId={selectedSnapshotId}
             thread={thread}
             onSave={onSave}
+            onModalClose={onModalClose}
           />
         )}
-      </div>
+      </CWModalBody>
     </div>
   );
 };

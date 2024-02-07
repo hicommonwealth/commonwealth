@@ -1,1 +1,0 @@
-[Milestones](https://github.com/hicommonwealth/commonwealth/milestones)

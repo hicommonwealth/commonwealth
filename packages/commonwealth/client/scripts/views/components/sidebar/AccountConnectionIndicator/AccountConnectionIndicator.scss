@@ -1,37 +1,39 @@
 @import '../../../../../styles/shared';
 
 .AccountConnectionIndicator {
-  padding-top: 16px;
+  .status-address {
+    padding-top: 16px;
+    border-bottom: 1px solid $neutral-200;
 
-  .status-text {
-    padding-inline: 24px;
-    color: $neutral-400;
-    line-height: 16px;
-    letter-spacing: 0.24px;
-    text-transform: uppercase;
-  }
+    .status-text {
+      padding-inline: 24px;
+      color: $neutral-400;
+      line-height: 16px;
+      letter-spacing: 0.24px;
+      text-transform: uppercase;
+    }
 
-  .status-row {
-    display: flex;
-    align-items: center;
-    margin: 8px 24px 16px;
+    .status-row {
+      display: flex;
+      align-items: center;
+      margin: 8px 24px 16px;
 
-    .status-light {
-      width: 8px;
-      height: 8px;
-      margin-right: 8px;
-      background-color: $neutral-300;
-      border-radius: 50%;
+      .status-light {
+        width: 8px;
+        height: 8px;
+        margin-right: 8px;
+        background-color: $neutral-300;
+        border-radius: 50%;
 
-      &.connected {
-        background-color: $green-600;
+        &.connected {
+          background-color: $green-600;
+        }
       }
     }
   }
 
   .status-button {
     padding: 16px;
-    border-top: 1px solid $neutral-200;
     border-bottom: 1px solid $neutral-200;
   }
 }

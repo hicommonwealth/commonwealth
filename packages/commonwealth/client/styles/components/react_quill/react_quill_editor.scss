@@ -7,6 +7,7 @@
   border-top-right-radius: 6px;
   border: none !important;
   background-color: $neutral-25;
+  border-bottom: 1px solid $neutral-200 !important;
 
   .left-buttons,
   .right-buttons {
@@ -75,6 +76,16 @@
   }
 }
 
+// IMP: this CSS fixes 2 bugs in the editor
+// 1- Flickering when pasting some content
+// 2- Auto scrolling to top when pasting some content
+.ql-clipboard {
+  position: fixed !important;
+  left: 50% !important;
+  top: 50% !important;
+  opacity: 0;
+}
+
 .QuillEditorWrapper {
   border-radius: 6px;
   border: 1px solid $neutral-200;
@@ -109,17 +120,30 @@
   .ql-container {
     min-height: 212px;
     max-height: 512px;
-    overflow-y: scroll;
+    overflow: auto;
     border: none !important;
-    border-top: 1px solid $neutral-200 !important;
   }
 
   .ql-editor {
     min-height: 212px;
+    max-height: 512px;
 
     &.ql-blank::before {
       font-style: normal;
     }
+
+    & h1 {
+      font-size: 24px !important;
+    }
+
+    & h2 {
+      font-size: 20px !important;
+    }
+  }
+
+  .ondragover {
+    background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' stroke='%23338fff' stroke-width='4' stroke-dasharray='4%2c 4' stroke-dashoffset='0' stroke-linecap='butt'/%3e%3c/svg%3e");
+    caret-color: $primary-500;
   }
 
   .LoadingIndicator {
@@ -160,6 +184,7 @@
       0% {
         transform: rotate(0deg);
       }
+
       100% {
         transform: rotate(360deg);
       }

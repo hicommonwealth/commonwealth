@@ -1,12 +1,10 @@
-import { ProposalType } from 'common-common/src/types';
-import type ChainEntity from 'models/ChainEntity';
+import { ProposalType } from '@hicommonwealth/core';
+import type MinimumProfile from 'models/MinimumProfile';
 import moment, { Moment } from 'moment';
-import app from 'state';
 import type { ReactionType } from './Reaction';
 import Topic from './Topic';
 import type { IUniqueId } from './interfaces';
 import type { ThreadKind, ThreadStage } from './types';
-import type MinimumProfile from 'models/MinimumProfile';
 
 function getDecodedString(str: string) {
   try {
@@ -41,28 +39,13 @@ function processVersionHistory(versionHistory: any[]) {
   return versionHistoryProcessed;
 }
 
-function processChainEntities(chain: string) {
-  const chainEntitiesProcessed: ChainEntity[] = [];
-
-  return chainEntitiesProcessed
-    ? chainEntitiesProcessed.map((ce) => {
-        return {
-          id: +ce.id,
-          chain,
-          type: ce.type,
-          typeId: (ce as any).type_id || ce.typeId,
-          completed: ce.completed,
-          author: this.author,
-        };
-      })
-    : [];
-}
-
 function processAssociatedReactions(
   reactions: any[],
   reactionIds: any[],
   reactionType: any[],
-  addressesReacted: any[]
+  reactionTimestamps: string[],
+  reactionWeights: number[],
+  addressesReacted: any[],
 ) {
   const temp = [];
   const tempReactionIds =
@@ -74,16 +57,29 @@ function processAssociatedReactions(
     (reactions
       ? reactions.map((r) => r?.address || r?.Address?.address)
       : addressesReacted) || [];
+  const tempReactionTimestamps =
+    (reactions ? reactions.map((r) => r?.updated_at) : reactionTimestamps) ||
+    [];
+
+  const tempReactionWeights =
+    (reactions
+      ? reactions.map((r) => r.calculated_voting_weight)
+      : reactionWeights) || [];
+
   if (
     tempReactionIds.length > 0 &&
     tempReactionIds.length === tempReactionType.length &&
-    tempReactionType.length === tempAddressesReacted.length
+    tempReactionType.length === tempAddressesReacted.length &&
+    tempAddressesReacted.length === tempReactionTimestamps.length &&
+    tempReactionTimestamps.length === tempReactionWeights.length
   ) {
     for (let i = 0; i < tempReactionIds.length; i++) {
       temp.push({
         id: tempReactionIds[i],
         type: tempReactionType[i],
         address: tempAddressesReacted[i],
+        updated_at: tempReactionTimestamps[i],
+        voting_weight: tempReactionWeights[i] || 0,
       });
     }
   }
@@ -98,13 +94,15 @@ export interface VersionHistory {
 
 export interface IThreadCollaborator {
   address: string;
-  chain: string;
+  community_id: string;
 }
 
 export type AssociatedReaction = {
   id: number | string;
   type: ReactionType;
   address: string;
+  updated_at: string;
+  voting_weight: number;
 };
 
 export enum LinkSource {
@@ -112,18 +110,25 @@ export enum LinkSource {
   Proposal = 'proposal',
   Thread = 'thread',
   Web = 'web',
+  Template = 'template',
+}
+
+export enum LinkDisplay {
+  inline = 'inline',
+  sidebar = 'sidebar',
+  both = 'both',
 }
 
 export type Link = {
   source: LinkSource;
   identifier: string;
   title?: string;
+  display?: LinkDisplay;
 };
 
 export class Thread implements IUniqueId {
   public readonly author: string;
   public collaborators?: IThreadCollaborator[];
-  public chainEntities?: any[];
   public readonly authorChain: string;
   public readonly title: string;
   public readonly body: string;
@@ -144,15 +149,15 @@ export class Thread implements IUniqueId {
   public readonly createdAt: Moment;
   public readonly updatedAt: Moment;
   public readonly lastCommentedOn: Moment;
+  public archivedAt: Moment | null;
   public topic: Topic;
   public readonly slug = ProposalType.Thread;
   public readonly url: string;
   public readonly versionHistory: VersionHistory[];
-  public readonly chain: string;
+  public readonly communityId: string;
   public readonly lastEdited: Moment;
 
   public markedAsSpamAt: Moment;
-  public archivedAt: Moment;
   public readonly lockedAt: Moment;
 
   public readonly hasPoll: boolean;
@@ -160,6 +165,7 @@ export class Thread implements IUniqueId {
   public associatedReactions: AssociatedReaction[];
   public links: Link[];
   public readonly discord_meta: any;
+  public readonly latestActivity: Moment;
 
   public get uniqueIdentifier() {
     return `${this.slug}_${this.identifier}`;
@@ -175,7 +181,7 @@ export class Thread implements IUniqueId {
     kind,
     stage,
     version_history,
-    chain,
+    community_id,
     read_only,
     body,
     plaintext,
@@ -192,6 +198,8 @@ export class Thread implements IUniqueId {
     reactions,
     reactionIds,
     reactionType,
+    reactionTimestamps,
+    reactionWeights,
     addressesReacted,
     canvasAction,
     canvasSession,
@@ -205,7 +213,7 @@ export class Thread implements IUniqueId {
     id: number;
     kind: ThreadKind;
     stage: ThreadStage;
-    chain: string;
+    community_id: string;
     url?: string;
     pinned?: boolean;
     links?: Link[];
@@ -228,6 +236,8 @@ export class Thread implements IUniqueId {
     reactionIds: any[]; // TODO: fix type
     addressesReacted: any[]; //TODO: fix type,
     reactionType: any[]; // TODO: fix type
+    reactionTimestamps: string[];
+    reactionWeights: number[];
     version_history: any[]; // TODO: fix type
     Address: any; // TODO: fix type
     discord_meta?: any;
@@ -243,10 +253,10 @@ export class Thread implements IUniqueId {
     this.topic = topic?.id ? new Topic({ ...(topic || {}) } as any) : null;
     this.kind = kind;
     this.stage = stage;
-    this.authorChain = Address.chain;
+    this.authorChain = Address.community_id;
     this.pinned = pinned;
     this.url = url;
-    this.chain = chain;
+    this.communityId = community_id;
     this.readOnly = read_only;
     this.collaborators = collaborators || [];
     this.lastCommentedOn = last_commented_on ? moment(last_commented_on) : null;
@@ -266,13 +276,17 @@ export class Thread implements IUniqueId {
     this.links = links || [];
     this.discord_meta = discord_meta;
     this.versionHistory = processVersionHistory(version_history);
-    this.chainEntities = processChainEntities(chain);
     this.associatedReactions = processAssociatedReactions(
       reactions,
       reactionIds,
       reactionType,
-      addressesReacted
+      reactionTimestamps,
+      reactionWeights,
+      addressesReacted,
     );
+    this.latestActivity = last_commented_on
+      ? moment(last_commented_on)
+      : moment(created_at);
   }
 }
 

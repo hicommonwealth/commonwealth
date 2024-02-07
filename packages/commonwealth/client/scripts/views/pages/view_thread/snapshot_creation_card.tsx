@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 
-import app from 'state';
+import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { CWContentPageCard } from '../../components/component_kit/CWContentPage';
+import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { NewSnapshotProposalModal } from '../../modals/new_snapshot_proposal_modal';
-import { Modal } from '../../components/component_kit/cw_modal';
 
 import 'pages/view_thread/snapshot_creation_card.scss';
 
@@ -46,7 +45,8 @@ export const SnapshotCreationCard = ({
           </div>
         }
       />
-      <Modal
+      <CWModal
+        size="large"
         content={
           <NewSnapshotProposalModal
             thread={thread}

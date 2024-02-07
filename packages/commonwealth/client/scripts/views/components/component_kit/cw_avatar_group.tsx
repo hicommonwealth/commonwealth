@@ -7,29 +7,41 @@ import { CWAvatar, CWJdenticon } from './cw_avatar';
 import { CWText } from './cw_text';
 
 export type ProfileWithAddress = MinimumProfile & {
-  Addresses: any;
+  Addresses: {
+    address: string;
+    community_id: string;
+    id: number;
+    profile_id: number;
+  }[];
 };
 
 type AvatarGroupProps = {
   profiles: ProfileWithAddress[];
-  chainId: string;
+  communityId: string;
+  totalProfiles?: number;
 };
 
-export const CWAvatarGroup = (props: AvatarGroupProps) => {
-  const { profiles, chainId } = props;
-
+export const CWAvatarGroup = ({
+  profiles,
+  communityId,
+  totalProfiles,
+}: AvatarGroupProps) => {
   if (!profiles || profiles?.filter((p) => !!p && p.Addresses).length === 0)
     return;
 
+  const maxProfileAvatars = 4;
+
   const truncatedProfiles = profiles
     .filter((p) => !!p && p.Addresses)
-    .slice(0, 4)
+    .slice(0, maxProfileAvatars)
     .reverse();
 
   const count = profiles.length - 4;
   let countText;
 
-  if (count > 5) {
+  if (totalProfiles > maxProfileAvatars) {
+    countText = `+${totalProfiles - maxProfileAvatars} others`;
+  } else if (count > maxProfileAvatars + 1) {
     countText = `+${count} others`;
   } else if (count === 1) {
     countText = '+1 other';
@@ -49,7 +61,7 @@ export const CWAvatarGroup = (props: AvatarGroupProps) => {
             );
           } else {
             const address = profile.Addresses.find((addr) => {
-              return addr.chain == chainId;
+              return addr.community_id == communityId;
             });
 
             // some old posts are broken = have no address in the specified community.

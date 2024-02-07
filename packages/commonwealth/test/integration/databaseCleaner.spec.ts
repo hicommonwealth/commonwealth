@@ -1,21 +1,17 @@
+import { NotificationCategories } from '@hicommonwealth/core';
+import { models, tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import { resetDatabase } from '../../server-test';
-import DatabaseCleaner from '../../server/util/databaseCleaner';
-import models from '../../server/database';
-import sinon from 'sinon';
-import { NotificationCategories } from 'common-common/src/types';
 import { Sequelize } from 'sequelize';
-import { RedisCache } from 'common-common/src/redisCache';
+import sinon from 'sinon';
+import DatabaseCleaner from '../../server/util/databaseCleaner';
 
 chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('DatabaseCleaner Tests', () => {
-  let mockRedis: sinon.SinonStubbedInstance<RedisCache>;
-
   before('Reset database', async () => {
-    await resetDatabase();
+    await tester.seedDb();
   });
 
   describe('Tests when the cleaner runs', () => {
@@ -35,11 +31,6 @@ describe('DatabaseCleaner Tests', () => {
       clock.restore();
     });
 
-    beforeEach(() => {
-      mockRedis = sinon.createStubInstance(RedisCache);
-      mockRedis.setKey.resolves(true);
-    });
-
     afterEach(() => {
       sinon.restore();
     });
@@ -49,18 +40,12 @@ describe('DatabaseCleaner Tests', () => {
       // set cleaner to run at 10 AM UTC
       console.log('input time to run', now.toString(), now.getUTCHours() + 4);
       const dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(
-        models,
-        now.getUTCHours() + 4,
-        mockRedis,
-        undefined,
-        true
-      );
+      dbCleaner.initLoop(models, now.getUTCHours() + 4, true);
 
       expect(dbCleaner.timeoutID).to.not.be.undefined;
       clearTimeout(dbCleaner.timeoutID);
       expect(dbCleaner.timeToRun.getTime()).to.be.equal(
-        now.getTime() + 14400000
+        now.getTime() + 14400000,
       );
       expect(dbCleaner.completed).to.be.false;
     });
@@ -70,7 +55,7 @@ describe('DatabaseCleaner Tests', () => {
       now.setUTCMinutes(0);
       now.setUTCMilliseconds(0);
       const dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(models, now.getUTCHours(), mockRedis, undefined, true);
+      dbCleaner.initLoop(models, now.getUTCHours(), true);
       expect(dbCleaner.timeoutID).to.not.be.undefined;
       clearTimeout(dbCleaner.timeoutID);
       expect(dbCleaner.timeToRun.getUTCHours()).to.be.equal(now.getUTCHours());
@@ -80,13 +65,7 @@ describe('DatabaseCleaner Tests', () => {
     it('should not run if started after the correct hour', () => {
       const now = new Date();
       const dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(
-        models,
-        now.getUTCHours() - 4,
-        mockRedis,
-        undefined,
-        true
-      );
+      dbCleaner.initLoop(models, now.getUTCHours() - 4, true);
       expect(dbCleaner.timeoutID).to.not.be.undefined;
       clearTimeout(dbCleaner.timeoutID);
       now.setUTCDate(now.getUTCDate() + 1);
@@ -99,24 +78,24 @@ describe('DatabaseCleaner Tests', () => {
 
     it('should not run if an hour to run is not provided', () => {
       const dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(models, NaN, mockRedis, undefined, true);
+      dbCleaner.initLoop(models, NaN, true);
       expect(dbCleaner.timeToRun).to.be.undefined;
       expect(dbCleaner.timeoutID).to.be.undefined;
     });
 
     it('should not run if the hour provided is invalid', () => {
       let dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(models, 24, mockRedis, undefined, true);
+      dbCleaner.initLoop(models, 24, true);
       expect(dbCleaner.timeToRun).to.be.undefined;
       expect(dbCleaner.timeoutID).to.be.undefined;
 
       dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(models, 25, mockRedis, undefined, true);
+      dbCleaner.initLoop(models, 25, true);
       expect(dbCleaner.timeToRun).to.be.undefined;
       expect(dbCleaner.timeoutID).to.be.undefined;
 
       dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(models, -1, mockRedis, undefined, true);
+      dbCleaner.initLoop(models, -1, true);
       expect(dbCleaner.timeToRun).to.be.undefined;
       expect(dbCleaner.timeoutID).to.be.undefined;
     });
@@ -158,14 +137,14 @@ describe('DatabaseCleaner Tests', () => {
       await models.Notification.create({
         notification_data: 'testing',
         created_at: hundredDaysAgo,
-        chain_id: 'ethereum',
+        community_id: 'ethereum',
         category_id: 'new-thread-creation',
       });
 
       // create new notification
       await models.Notification.create({
         notification_data: 'testing',
-        chain_id: 'ethereum',
+        community_id: 'ethereum',
         created_at: eightyEightDaysAgo,
         category_id: 'new-thread-creation',
       });
@@ -177,7 +156,7 @@ describe('DatabaseCleaner Tests', () => {
       const notifs = await models.Notification.findAll();
       expect(notifs.length).to.equal(1);
       expect(notifs[0].created_at.toString()).to.equal(
-        eightyEightDaysAgo.toString()
+        eightyEightDaysAgo.toString(),
       );
     });
 
@@ -186,7 +165,7 @@ describe('DatabaseCleaner Tests', () => {
 
       const oneYearAndTwoDaysAgo = new Date(now);
       oneYearAndTwoDaysAgo.setUTCFullYear(
-        oneYearAndTwoDaysAgo.getUTCFullYear() - 1
+        oneYearAndTwoDaysAgo.getUTCFullYear() - 1,
       );
       oneYearAndTwoDaysAgo.setUTCDate(oneYearAndTwoDaysAgo.getUTCDate() - 2);
 
@@ -198,7 +177,7 @@ describe('DatabaseCleaner Tests', () => {
       await models.Address.create({
         user_id: oldUser.id,
         address: '0x1234',
-        chain: 'ethereum',
+        community_id: 'ethereum',
         verification_token: 'blah',
         last_active: Sequelize.literal(`NOW() - INTERVAL '13 months'`) as any,
       });
@@ -211,7 +190,7 @@ describe('DatabaseCleaner Tests', () => {
       await models.Address.create({
         user_id: newUser.id,
         address: '0x2345',
-        chain: 'ethereum',
+        community_id: 'ethereum',
         verification_token: 'blah',
         last_active: Sequelize.literal(`NOW()`) as any,
       });
@@ -219,7 +198,7 @@ describe('DatabaseCleaner Tests', () => {
       const newSub = await models.Subscription.create({
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewThread,
-        object_id: 'ethereum',
+        community_id: 'ethereum',
         is_active: true,
         immediate_email: false,
       });
@@ -227,7 +206,7 @@ describe('DatabaseCleaner Tests', () => {
       const oldSub = await models.Subscription.create({
         subscriber_id: oldUser.id,
         category_id: NotificationCategories.NewThread,
-        object_id: 'ethereum',
+        community_id: 'ethereum',
         is_active: true,
         immediate_email: false,
       });

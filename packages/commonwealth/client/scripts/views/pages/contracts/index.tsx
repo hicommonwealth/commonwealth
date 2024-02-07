@@ -6,10 +6,12 @@ import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/contracts/contracts_page.scss';
 import React, { useState } from 'react';
 import app from 'state';
-import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import {
+  CWTab,
+  CWTabsRow,
+} from '../../components/component_kit/new_designs/CWTabs';
 import { openConfirmation } from '../../modals/confirmation_modal';
 import { PageLoading } from '../loading';
 import { ContractCard } from './contract_card';
@@ -19,7 +21,7 @@ const ContractsPage = () => {
   const navigate = useCommonNavigate();
 
   const [contracts, setContracts] = useState<Contract[]>(
-    app.contracts.store.getCommunityContracts()
+    app.contracts.store.getCommunityContracts(),
   );
 
   const [templates, setTemplates] = useState<Template[]>([]);
@@ -41,7 +43,7 @@ const ContractsPage = () => {
       setTemplates(
         fetchedTemplates.map((template) => {
           return Template.fromJSON(template);
-        })
+        }),
       );
     }
   };
@@ -77,7 +79,7 @@ const ContractsPage = () => {
         buttons: [
           {
             label: 'Close',
-            buttonType: 'secondary-black',
+            buttonType: 'secondary',
           },
         ],
       });
@@ -93,7 +95,8 @@ const ContractsPage = () => {
         buttons: [
           {
             label: 'Delete',
-            buttonType: 'mini-red',
+            buttonType: 'destructive',
+            buttonHeight: 'sm',
             onClick: async () => {
               try {
                 await app.contracts.deleteTemplate({
@@ -108,7 +111,8 @@ const ContractsPage = () => {
           },
           {
             label: 'Cancel',
-            buttonType: 'mini-black',
+            buttonType: 'primary',
+            buttonHeight: 'sm',
           },
         ],
       });
@@ -117,9 +121,6 @@ const ContractsPage = () => {
 
   return (
     <div className="ContractsPage">
-      <CWBreadcrumbs
-        breadcrumbs={[{ label: 'Contract action templates', path: '' }]}
-      />
       <div className="header-container">
         <CWText type="h3">Contract action templates</CWText>
         <CWButton
@@ -135,7 +136,7 @@ const ContractsPage = () => {
       </CWText>
 
       <div className="Tabs">
-        <CWTabBar>
+        <CWTabsRow>
           <CWTab
             label="Contracts and actions"
             onClick={() => {
@@ -150,7 +151,7 @@ const ContractsPage = () => {
             }}
             isSelected={tabOn === 'templates'}
           />
-        </CWTabBar>
+        </CWTabsRow>
       </div>
       {tabOn === 'contracts' ? (
         <>

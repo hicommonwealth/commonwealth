@@ -1,11 +1,12 @@
-import { constructTypedCanvasMessage } from 'adapters/chain/ethereum/keys';
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
+import { createSiweMessage } from 'adapters/chain/ethereum/keys';
 import { setActiveAccount } from 'controllers/app/login';
+import * as siwe from 'siwe';
 import app from 'state';
 import type Web3 from 'web3';
 
-import { hexToNumber } from 'web3-utils';
 import type { SessionPayload } from '@canvas-js/interfaces';
+import { hexToNumber } from 'web3-utils';
 import Account from '../../../models/Account';
 import BlockInfo from '../../../models/BlockInfo';
 import ChainInfo from '../../../models/ChainInfo';
@@ -67,14 +68,20 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
 
   public async signCanvasMessage(
     account: Account,
-    sessionPayload: SessionPayload
+    sessionPayload: SessionPayload,
   ): Promise<string> {
-    const typedCanvasMessage = constructTypedCanvasMessage(sessionPayload);
+    const nonce = siwe.generateNonce();
+    // this must be open-ended, because of custom domains
+    const domain = document.location.origin;
+    const message = createSiweMessage(sessionPayload, domain, nonce);
     const signature = await this._provider.request({
-      method: 'eth_signTypedData_v4',
-      params: [account.address, JSON.stringify(typedCanvasMessage)],
+      method: 'personal_sign',
+      params: [message, account.address],
+      jsonrpc: '2.0',
     });
-    return signature;
+
+    // signature format: https://docs.canvas.xyz/docs/formats#ethereum
+    return `${domain}/${nonce}/${signature}`;
   }
 
   public async reset() {
@@ -102,7 +109,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     this._provider = await EthereumProvider.init({
       projectId: '927f4643b1e10ad3dbdbdbdaf9c5fbbe',
       chains: [chainId],
-      methods: ['eth_sendTransaction', 'personal_sign', 'eth_signTypedData_v4'],
+      optionalMethods: ['eth_getBlockByNumber', 'eth_sendTransaction'],
       showQrModal: true,
     });
 
@@ -134,7 +141,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   public async initAccountsChanged() {
     await this._provider.on('accountsChanged', async (accounts: string[]) => {
       const updatedAddress = app.user.activeAccounts.find(
-        (addr) => addr.address === accounts[0]
+        (addr) => addr.address === accounts[0],
       );
       if (!updatedAddress) return;
       await setActiveAccount(updatedAddress);

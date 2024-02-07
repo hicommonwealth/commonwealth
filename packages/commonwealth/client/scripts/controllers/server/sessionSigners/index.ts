@@ -11,20 +11,29 @@ import type {
   ActionArgument,
 } from '@canvas-js/interfaces';
 
+export class InvalidSession extends Error {}
+
 export abstract class ISessionController {
   // Get the current user's human-readable session address.
-  abstract getAddress(chainId: string): string | null;
+  abstract getAddress(chainId: string, fromAddress: string): string | null;
 
   // Check whether the current user has an authenticated session stored locally.
-  abstract hasAuthenticatedSession(chainId: string): Promise<boolean>;
+  abstract hasAuthenticatedSession(
+    chainId: string,
+    fromAddress: string
+  ): Promise<boolean>;
 
   // Get the current user's human-readable session address,
   // and generate an unsigned session if it doesn't exist yet.
-  abstract getOrCreateAddress(chainId: string): Promise<string>;
+  abstract getOrCreateAddress(
+    chainId: string,
+    fromAddress: string
+  ): Promise<string>;
 
   // Authenticate a session by submitting a signature.
   abstract authSession(
     chainId: string,
+    fromAddress: string,
     sessionPayload: SessionPayload,
     signature: string
   ): void;
@@ -32,6 +41,7 @@ export abstract class ISessionController {
   // Sign an action, using the current authenticated session.
   abstract sign(
     chainId: string,
+    fromAddress: string,
     call: string,
     args: Record<string, ActionArgument>
   ): Promise<{

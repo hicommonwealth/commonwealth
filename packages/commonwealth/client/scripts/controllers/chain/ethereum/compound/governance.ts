@@ -1,13 +1,17 @@
+import type {
+  GovernorCompatibilityBravo,
+  GovernorCountingSimple,
+} from '@hicommonwealth/chains';
 import type { ICompoundProposalResponse } from 'adapters/chain/compound/types';
-import BN from 'bn.js';
-import { CompoundEvents } from 'chain-events/src';
-import { CompoundTypes } from 'chain-events/src/types';
-import type { GovernorCompatibilityBravo } from 'common-common/src/eth/types';
-import { chainToEventNetwork } from 'controllers/server/chain_entities';
-import type { BigNumber, BigNumberish, ContractTransaction } from 'ethers';
-import type { ITXModalData } from '../../../../models/interfaces';
-import ProposalModule from '../../../../models/ProposalModule';
+import axios from 'axios';
+import Compound from 'controllers/chain/ethereum/compound/adapter';
+import { deserializeBigNumbers } from 'controllers/chain/ethereum/util';
+import type { BigNumberish, ContractTransaction } from 'ethers';
+import { BigNumber } from 'ethers';
 import type { IApp } from 'state';
+import { ApiEndpoints } from 'state/api/config';
+import ProposalModule from '../../../../models/ProposalModule';
+import type { ITXModalData } from '../../../../models/interfaces';
 import type EthereumAccounts from '../accounts';
 import { attachSigner } from '../contractApi';
 import type CompoundAPI from './api';
@@ -29,10 +33,9 @@ export default class CompoundGovernance extends ProposalModule<
   CompoundProposal
 > {
   // CONSTANTS
-  private _quorumVotes: BN;
-  private _proposalThreshold: BN;
-  private _votingDelay: BN;
-  private _votingPeriod: BN;
+  private _quorumVotes: BigNumber;
+  private _proposalThreshold: BigNumber;
+  private _votingPeriod: BigNumber;
 
   private _api: CompoundAPI;
   private _Chain: CompoundChain;
@@ -45,10 +48,6 @@ export default class CompoundGovernance extends ProposalModule<
 
   public get proposalThreshold() {
     return this._proposalThreshold;
-  }
-
-  public get votingDelay() {
-    return this._votingDelay;
   }
 
   public get votingPeriod() {
@@ -71,16 +70,16 @@ export default class CompoundGovernance extends ProposalModule<
   }
 
   // INIT / DEINIT
-  constructor(app: IApp, private _usingServerChainEntities = false) {
-    super(
-      app,
-      (e) => new CompoundProposal(this._Accounts, this._Chain, this, e)
-    );
+  constructor(app: IApp) {
+    super(app);
   }
 
   public async propose(args: CompoundProposalArgs): Promise<string> {
     const address = this.app.user.activeAccount.address;
-    const contract = await attachSigner(this.app.user.activeAccount, this._api.Contract);
+    const contract = await attachSigner(
+      this.app.user.activeAccount,
+      this._api.Contract,
+    );
 
     const { targets, values, signatures, calldatas, description } = args;
     if (!targets || !values || !calldatas || !description)
@@ -100,7 +99,7 @@ export default class CompoundGovernance extends ProposalModule<
         values,
         calldatas,
         description,
-        { gasLimit }
+        { gasLimit },
       );
     } else {
       const gasLimit = await contract.estimateGas[
@@ -131,31 +130,29 @@ export default class CompoundGovernance extends ProposalModule<
     this._Chain = chain;
     this._Accounts = Accounts;
 
-    this._votingDelay = new BN(
-      (await this._api.Contract.votingDelay()).toString()
-    );
-    this._votingPeriod = new BN(
-      (await this._api.Contract.votingPeriod()).toString()
+    this._votingPeriod = BigNumber.from(
+      (await this._api.Contract.votingPeriod()).toString(),
     );
 
     // determine capacities and init type-specific parameters
     if (this.api.isGovAlpha(this.api.Contract)) {
       this._supportsAbstain = false;
       this._useAbstainInQuorum = false;
-      this._quorumVotes = new BN(
-        (await this._api.Contract.quorumVotes()).toString()
+      this._quorumVotes = BigNumber.from(
+        (await this._api.Contract.quorumVotes()).toString(),
       );
-      this._proposalThreshold = new BN(
-        (await this._api.Contract.proposalThreshold()).toString()
+
+      this._proposalThreshold = BigNumber.from(
+        (await this._api.Contract.proposalThreshold()).toString(),
       );
     } else if (this.api.govType === GovernorType.Bravo) {
       this._supportsAbstain = true;
       this._useAbstainInQuorum = false;
-      this._quorumVotes = new BN(
-        (await this._api.Contract.quorumVotes()).toString()
+      this._quorumVotes = BigNumber.from(
+        (await this._api.Contract.quorumVotes()).toString(),
       );
-      this._proposalThreshold = new BN(
-        (await this._api.Contract.proposalThreshold()).toString()
+      this._proposalThreshold = BigNumber.from(
+        (await this._api.Contract.proposalThreshold()).toString(),
       );
     } else {
       // OZ we need to query and parse counting mode
@@ -166,51 +163,48 @@ export default class CompoundGovernance extends ProposalModule<
       this._supportsAbstain = params.get('support') === 'bravo';
       this._useAbstainInQuorum = params.get('quorum') !== 'bravo';
       const blockNumber = await this._api.Provider.getBlockNumber();
-      this._quorumVotes = new BN(
+      this._quorumVotes = BigNumber.from(
         (
           await (this.api.Contract as GovernorCompatibilityBravo).quorum(
-            blockNumber - 1
+            blockNumber - 1,
           )
-        ).toString()
+        ).toString(),
+      );
+      this._proposalThreshold = BigNumber.from(
+        (
+          await (
+            this.api.Contract as GovernorCountingSimple
+          ).proposalThreshold()
+        ).toString(),
       );
     }
 
-    // load server proposals
-    console.log('Fetching compound proposals from backend.');
-    await this.app.chainEntities.refresh(this.app.chain.id);
-    const entities = this.app.chainEntities.getByType(
-      CompoundTypes.EntityKind.Proposal
-    );
-    console.log(`Found ${entities.length} proposals!`);
-    entities.forEach((e) => this._entityConstructor(e));
-    await Promise.all(this.store.getAll().map((p) => p.init()));
-
-    // register new chain-event handlers
-    this.app.chainEntities.registerEntityHandler(
-      CompoundTypes.EntityKind.Proposal,
-      (entity, event) => {
-        this.updateProposal(entity, event);
-        const proposal = this.store.getByIdentifier(entity.typeId);
-        if (!proposal.initialized) {
-          proposal.init();
-        }
-      }
-    );
-
-    // kick off listener
-    const subscriber = new CompoundEvents.Subscriber(
-      this._api.Contract as any,
-      this.app.chain.id
-    );
-    const processor = new CompoundEvents.Processor(this._api.Contract as any);
-    await this.app.chainEntities.subscribeEntities(
-      this.app.chain.id,
-      chainToEventNetwork(this.app.chain.meta),
-      subscriber,
-      processor
-    );
-
     this._initialized = true;
+  }
+
+  static async getProposals(compoundChain: Compound) {
+    const { chain, accounts, governance, meta } = compoundChain;
+    const res = await axios.get(
+      `${chain.app.serverUrl()}${ApiEndpoints.FETCH_PROPOSALS}`,
+      {
+        params: {
+          chainId: meta.id,
+        },
+      },
+    );
+    const proposals: ICompoundProposalResponse[] = res.data.result.proposals;
+    proposals.forEach((p) => {
+      if (!governance.store.getByIdentifier(p.identifier)) {
+        new CompoundProposal(
+          accounts,
+          chain,
+          governance,
+          deserializeBigNumbers(p),
+        );
+      }
+    });
+
+    return governance.store.getAll();
   }
 
   public deinit() {

@@ -1,4 +1,4 @@
-import { ChainNetwork, ProposalType } from 'common-common/src/types';
+import { ChainNetwork, ProposalType } from '@hicommonwealth/core';
 import useForceRerender from 'hooks/useForceRerender';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 import {
@@ -100,7 +100,7 @@ const NewProposalPage = (props: NewProposalPageProps) => {
 
   const getBody = () => {
     if (!app.user.activeAccount) {
-      return <CWText>Must be logged in</CWText>;
+      return <CWText>Must be signed in</CWText>;
     } else if (app.chain?.network === ChainNetwork.Plasm) {
       return <CWText>Feature not supported yet for this community</CWText>;
     } else {

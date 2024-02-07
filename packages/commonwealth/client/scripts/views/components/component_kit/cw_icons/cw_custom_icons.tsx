@@ -1,6 +1,7 @@
 import React from 'react';
 
 /* eslint-disable max-len */
+/* eslint-disable react/no-multi-comp */
 
 import 'components/component_kit/cw_icon.scss';
 
@@ -40,27 +41,153 @@ export const CWKeplr = (props: CustomIconProps) => {
   const { componentType, iconSize, ...otherProps } = props;
   return (
     <svg
-      className={getClasses<CustomIconStyleProps>({ iconSize }, componentType)}
-      xmlns="http://www.w3.org/2000/svg"
-      width="32"
-      height="32"
       fill="none"
-      viewBox="0 0 32 32"
+      xmlns="http://www.w3.org/2000/svg"
+      width="42"
+      height="42"
+      viewBox="0 0 42 42"
+      className={getClasses<CustomIconStyleProps>({ iconSize }, componentType)}
       {...otherProps}
     >
-      <path
-        fill="#207afe"
-        d="M23 4h-1v2h2v19h-2v1.9h1a3 3 0 003-3V7a3 3 0 00-3-3z"
-      ></path>
-      <path fill="#06f" d="M5 21.9V9.1l10-1.7v16.2z"></path>
-      <path
-        fill="#06f"
-        d="M17 2h-.7l-14 2.5A3.1 3.1 0 000 7.6v15.8a3.1 3.1 0 002.4 3.1l14 2.5h.6a3.1 3.1 0 003-3.2V5.2A3.1 3.1 0 0017 2z"
-      ></path>
-      <path
-        fill="#207afe"
-        d="M29 6h-1v2h2v15h-2v1.9h1a3.1 3.1 0 003-3.2V9.2A3.1 3.1 0 0029 6z"
-      ></path>
+      <g clipPath="url(#clip0_425_5107)">
+        <path
+          d="M32.4545 0H9.54545C4.27365 0 0 4.27365 0 9.54545V32.4545C0 37.7264 4.27365 42 9.54545 42H32.4545C37.7264 42 42 37.7264 42 32.4545V9.54545C42 4.27365 37.7264 0 32.4545 0Z"
+          fill="url(#paint0_linear_425_5107)"
+        />
+        <path
+          d="M32.4545 0H9.54545C4.27365 0 0 4.27365 0 9.54545V32.4545C0 37.7264 4.27365 42 9.54545 42H32.4545C37.7264 42 42 37.7264 42 32.4545V9.54545C42 4.27365 37.7264 0 32.4545 0Z"
+          fill="url(#paint1_radial_425_5107)"
+        />
+        <path
+          d="M32.4545 0H9.54545C4.27365 0 0 4.27365 0 9.54545V32.4545C0 37.7264 4.27365 42 9.54545 42H32.4545C37.7264 42 42 37.7264 42 32.4545V9.54545C42 4.27365 37.7264 0 32.4545 0Z"
+          fill="url(#paint2_radial_425_5107)"
+        />
+        <path
+          d="M32.4545 0H9.54545C4.27365 0 0 4.27365 0 9.54545V32.4545C0 37.7264 4.27365 42 9.54545 42H32.4545C37.7264 42 42 37.7264 42 32.4545V9.54545C42 4.27365 37.7264 0 32.4545 0Z"
+          fill="url(#paint3_radial_425_5107)"
+        />
+        <path
+          d="M17.2526 32.2614V22.5192L26.7185 32.2614H31.9849V32.0079L21.0964 20.9122L31.1469 10.3857V10.2614H25.8464L17.2526 19.5635V10.2614H12.9849V32.2614H17.2526Z"
+          fill="white"
+        />
+      </g>
+      <defs>
+        <linearGradient
+          id="paint0_linear_425_5107"
+          x1="21"
+          y1="0"
+          x2="21"
+          y2="42"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="#1FD1FF" />
+          <stop offset="1" stopColor="#1BB8FF" />
+        </linearGradient>
+        <radialGradient
+          id="paint1_radial_425_5107"
+          cx="0"
+          cy="0"
+          r="1"
+          gradientUnits="userSpaceOnUse"
+          gradientTransform="translate(2.00623 40.4086) rotate(-45.1556) scale(67.3547 68.3624)"
+        >
+          <stop stopColor="#232DE3" />
+          <stop offset="1" stopColor="#232DE3" stopOpacity="0" />
+        </radialGradient>
+        <radialGradient
+          id="paint2_radial_425_5107"
+          cx="0"
+          cy="0"
+          r="1"
+          gradientUnits="userSpaceOnUse"
+          gradientTransform="translate(39.7379 41.7602) rotate(-138.45) scale(42.1137 64.2116)"
+        >
+          <stop stopColor="#8B4DFF" />
+          <stop offset="1" stopColor="#8B4DFF" stopOpacity="0" />
+        </radialGradient>
+        <radialGradient
+          id="paint3_radial_425_5107"
+          cx="0"
+          cy="0"
+          r="1"
+          gradientUnits="userSpaceOnUse"
+          gradientTransform="translate(20.6501 0.311498) rotate(90) scale(33.1135 80.3423)"
+        >
+          <stop stopColor="#24D5FF" />
+          <stop offset="1" stopColor="#1BB8FF" stopOpacity="0" />
+        </radialGradient>
+        <clipPath id="clip0_425_5107">
+          <rect width="42" height="42" fill="white" />
+        </clipPath>
+      </defs>
+    </svg>
+  );
+};
+
+export const CWLeap = (props: CustomIconProps) => {
+  const { componentType, iconSize, ...otherProps } = props;
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 34.32 22.29"
+      className={getClasses<CustomIconStyleProps>({ iconSize }, componentType)}
+      {...otherProps}
+    >
+      <defs>
+        <clipPath id="clippath">
+          <path
+            d="M0 0h34.31v22.29H0z"
+            style={{
+              fill: 'none',
+            }}
+          />
+        </clipPath>
+        <style>
+          {'.cls-4{fill:#4bc174}.cls-5{fill:#0d0d0d}.cls-6{fill:#eee}'}
+        </style>
+      </defs>
+      <g>
+        <path
+          d="M30.91 15.39c0 4.91-5.99 6.9-13.43 6.9s-13.52-2-13.52-6.9S10 6.51 17.43 6.51s13.47 3.98 13.47 8.88Z"
+          style={{
+            fill: '#4baf74',
+          }}
+        />
+        <path
+          d="M29.55 4.69C29.55 2.1 27.44 0 24.84 0c-1.47 0-2.77.67-3.64 1.71-1.18-.26-2.43-.41-3.73-.41s-2.56.14-3.73.41C12.86.67 11.56 0 10.1 0 7.5 0 5.39 2.1 5.39 4.69c0 .85.23 1.64.62 2.32-.38.8-.58 1.65-.58 2.53 0 4.55 5.39 8.24 12.04 8.24s12.04-3.69 12.04-8.24c0-.88-.2-1.73-.58-2.53.39-.69.62-1.47.62-2.32Z"
+          className="cls-4"
+        />
+        <path
+          d="M9.72 7.29c1.59 0 2.88-1.28 2.88-2.86s-1.29-2.86-2.88-2.86-2.88 1.28-2.88 2.86 1.29 2.86 2.88 2.86ZM25.08 7.29c1.59 0 2.88-1.28 2.88-2.86s-1.29-2.86-2.88-2.86-2.88 1.28-2.88 2.86 1.29 2.86 2.88 2.86Z"
+          className="cls-6"
+        />
+        <path
+          d="M8.18 21.94c.62 0 1.11-.54 1.04-1.14-.25-2.15-1.33-6.81-6.04-9.61-6.28-3.73-1.31 9.11-1.31 9.11l-1.3.75c-.44.25-.25.9.24.9h7.37ZM26.93 21.94c-.56 0-.99-.54-.93-1.14.22-2.14 1.19-6.81 5.45-9.61 5.68-3.73 1.19 9.11 1.19 9.11l1.18.75c.39.25.23.9-.22.9h-6.66Z"
+          className="cls-4"
+        />
+        <path
+          d="M9.72 4.95c.29 0 .52-.23.52-.52s-.23-.52-.52-.52-.52.23-.52.52.23.52.52.52ZM25.07 4.95c.29 0 .52-.23.52-.52s-.23-.52-.52-.52-.52.23-.52.52.23.52.52.52Z"
+          className="cls-5"
+        />
+      </g>
+    </svg>
+  );
+};
+
+export const CWX = (props: CustomIconProps) => {
+  const { componentType, iconSize, ...otherProps } = props;
+
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="36"
+      height="36"
+      viewBox="0 0 1200 1227"
+      fill="black"
+      className={getClasses<CustomIconStyleProps>({ iconSize }, componentType)}
+      {...otherProps}
+    >
+      <path d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.854V687.828Z" />
     </svg>
   );
 };
@@ -74,7 +201,7 @@ export const CWMagic = (props: CustomIconProps) => {
       {...otherProps}
       className={getClasses<CustomIconStyleProps>(
         { iconSize, className },
-        componentType
+        componentType,
       )}
       xmlns="http://www.w3.org/2000/svg"
       width="32"
@@ -216,7 +343,7 @@ export const CWPhantom = (props: CustomIconProps) => {
     <svg
       className={getClasses<CustomIconStyleProps>(
         { ...customIconStyleAttrs },
-        componentType
+        componentType,
       )}
       xmlns="http://www.w3.org/2000/svg"
       width="32"
@@ -309,6 +436,29 @@ export const CWRonin = (props: CustomIconProps) => {
         fill="#1374E9"
         d="M26.762 18.258c-.013-.549-.1-1.141-.49-1.588-.592-.68-1.236-1.302-2.21-1.396a.52.52 0 01-.151-.068c.033-.037.07-.107.097-.104.405.052.702-.223 1.016-.378 1.153-.568 1.709-1.571 1.738-2.826.037-1.737.012-3.475.007-5.211 0-.608.017-1.216-.164-1.824-.173-.578-.592-1.303-1.11-1.637a4.737 4.737 0 00-2.315-.72H11.196a8.611 8.611 0 00-1.643.153C8.377 2.89 7.11 4.07 7.123 5.48c.014 3.145 0 6.289 0 9.434 0 3.145 0 6.29-.01 9.434.01.313.079.622.201.911.312.861 1.063 1.345 1.73 1.854.776.594 1.519 1.229 2.303 1.812.607.447 1.173.933 1.769 1.389 0 0 .182.193.303.143.207-.082.163-.24.181-.371a4.531 4.531 0 000-.627V17.873a5.454 5.454 0 010-.63.608.608 0 01.608-.53h3.784a1.29 1.29 0 01.427.055 2.378 2.378 0 011.662 2.334v10.512a4.133 4.133 0 000 .628c.044.272.375.348.593.162.76-.638 1.507-1.28 2.279-1.904.489-.396 1.012-.76 1.502-1.15.507-.396.991-.821 1.448-1.274a2.887 2.887 0 00.836-1.983c.053-1.945.057-3.891.023-5.836zm-6.662-6.8c0 .934-.644 1.715-1.537 2.035a3.14 3.14 0 01-1.1.163H14.22c-.501 0-.608-.114-.608-.628V6.383c0-.523.283-.81.798-.812a698.49 698.49 0 015.043 0c.567 0 .643.084.646.68v2.604c0 .867.006 1.735.001 2.602z"
       ></path>
+    </svg>
+  );
+};
+
+export const CWCoinbase = (props: CustomIconProps) => {
+  const { componentType, iconSize, ...otherProps } = props;
+  return (
+    <svg
+      className={getClasses<CustomIconStyleProps>({ iconSize }, componentType)}
+      xmlns="http://www.w3.org/2000/svg"
+      width="32"
+      height="32"
+      fill="none"
+      viewBox="0 0 32 32"
+      {...otherProps}
+    >
+      <circle cx="16" cy="16" r="16" fill="#0052FF" />
+      <path
+        fill="#FFFFFF"
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M 4.800781 16 C 4.800781 22.1875 9.8125 27.199219 16 27.199219 C 22.1875 27.199219 27.199219 22.1875 27.199219 16 C 27.199219 9.8125 22.1875 4.800781 16 4.800781 C 9.8125 4.800781 4.800781 9.8125 4.800781 16 Z M 13.136719 12.390625 C 12.726562 12.390625 12.390625 12.726562 12.390625 13.136719 L 12.390625 18.863281 C 12.390625 19.273438 12.726562 19.609375 13.136719 19.609375 L 18.863281 19.609375 C 19.273438 19.609375 19.609375 19.273438 19.609375 18.863281 L 19.609375 13.136719 C 19.609375 12.726562 19.273438 12.390625 18.863281 12.390625 Z M 13.136719 12.390625 "
+      />
     </svg>
   );
 };
@@ -533,28 +683,17 @@ export const CWEmail = (props: CustomIconProps) => {
   const { componentType, iconSize, ...otherProps } = props;
   return (
     <svg
-      className={getClasses<CustomIconStyleProps>({ iconSize }, componentType)}
-      width="32"
-      height="32"
-      viewBox="0 0 32 32"
-      xmlns="http://www.w3.org/2000/svg"
+      width="26"
+      height="21"
+      viewBox="0 0 26 21"
       fill="none"
-      stroke="#656167"
+      xmlns="http://www.w3.org/2000/svg"
+      className={getClasses<CustomIconStyleProps>({ iconSize }, componentType)}
       {...otherProps}
     >
       <path
-        d="M4 7h24v17a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7Z"
-        fill="none"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M28 7 16 18 4 7"
-        fill="none"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        d="M25 0.549316H1C0.734784 0.549316 0.48043 0.654673 0.292893 0.84221C0.105357 1.02975 0 1.2841 0 1.54932V18.5493C0 19.0798 0.210714 19.5885 0.585786 19.9635C0.960859 20.3386 1.46957 20.5493 2 20.5493H24C24.5304 20.5493 25.0391 20.3386 25.4142 19.9635C25.7893 19.5885 26 19.0798 26 18.5493V1.54932C26 1.2841 25.8946 1.02975 25.7071 0.84221C25.5196 0.654673 25.2652 0.549316 25 0.549316ZM24 18.5493H2V3.82307L12.3237 13.2868C12.5082 13.4562 12.7496 13.5501 13 13.5501C13.2504 13.5501 13.4918 13.4562 13.6763 13.2868L24 3.82307V18.5493Z"
+        fill="#141315"
       />
     </svg>
   );
@@ -571,7 +710,7 @@ export const CWEth = ({
       {...otherProps}
       className={getClasses<CustomIconStyleProps>(
         { iconSize, className },
-        componentType
+        componentType,
       )}
       xmlns="http://www.w3.org/2000/svg"
       width="16"
@@ -618,7 +757,7 @@ export const CWCosmos = ({
       {...otherProps}
       className={getClasses<CustomIconStyleProps>(
         { iconSize, className },
-        componentType
+        componentType,
       )}
       xmlns="http://www.w3.org/2000/svg"
       width="16"
@@ -671,7 +810,7 @@ export const CWNearIcon = ({
       {...otherProps}
       className={getClasses<CustomIconStyleProps>(
         { iconSize, className },
-        componentType
+        componentType,
       )}
       xmlns="http://www.w3.org/2000/svg"
       width="12"
@@ -705,7 +844,7 @@ export const CWDiscord = ({
       {...otherProps}
       className={getClasses<CustomIconStyleProps>(
         { iconSize, className },
-        componentType
+        componentType,
       )}
       width="16"
       height="16"
@@ -732,7 +871,7 @@ export const CWGithub = ({
       {...otherProps}
       className={getClasses<CustomIconStyleProps>(
         { iconSize, className },
-        componentType
+        componentType,
       )}
       width="16"
       height="16"
@@ -758,7 +897,7 @@ export const CWTwitter = ({
     <svg
       className={getClasses<CustomIconStyleProps>(
         { iconSize, className },
-        componentType
+        componentType,
       )}
       width="16"
       height="16"
@@ -785,7 +924,7 @@ export const CWEnvelop = ({
     <svg
       className={getClasses<CustomIconStyleProps>(
         { iconSize, className },
-        componentType
+        componentType,
       )}
       {...otherProps}
       width="16"

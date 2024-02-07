@@ -1,23 +1,27 @@
-import moment from 'moment';
-import { UserInstance } from '../../models/user';
-import { ServerThreadsController } from '../server_threads_controller';
-import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
-import { Op, Sequelize, Transaction } from 'sequelize';
-import { renderQuillDeltaToText, validURL } from '../../../shared/utils';
-import { EmitOptions } from '../server_notifications_methods/emit';
 import {
+  AppError,
   NotificationCategories,
   ProposalType,
-} from '../../../../common-common/src/types';
+  ServerError,
+} from '@hicommonwealth/core';
+import {
+  AddressInstance,
+  CommunityInstance,
+  DB,
+  ThreadAttributes,
+  ThreadInstance,
+  UserInstance,
+} from '@hicommonwealth/model';
+import { uniq } from 'lodash';
+import moment from 'moment';
+import { Op, Sequelize, Transaction, WhereOptions } from 'sequelize';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { renderQuillDeltaToText, validURL } from '../../../shared/utils';
 import { parseUserMentions } from '../../util/parseUserMentions';
-import { ThreadAttributes, ThreadInstance } from '../../models/thread';
-import { AppError, ServerError } from '../../../../common-common/src/errors';
-import { DB } from '../../models';
 import { findAllRoles } from '../../util/roles';
 import { TrackOptions } from '../server_analytics_methods/track';
-import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { uniq } from 'lodash';
+import { EmitOptions } from '../server_notifications_methods/emit';
+import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -38,7 +42,6 @@ export const Errors = {
 export type UpdateThreadOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
   threadId?: number;
   title?: string;
   body?: string;
@@ -49,7 +52,6 @@ export type UpdateThreadOptions = {
   archived?: boolean;
   spam?: boolean;
   topicId?: number;
-  topicName?: string;
   collaborators?: {
     toAdd?: number[];
     toRemove?: number[];
@@ -63,7 +65,7 @@ export type UpdateThreadOptions = {
 export type UpdateThreadResult = [
   ThreadAttributes,
   EmitOptions[],
-  TrackOptions[]
+  TrackOptions[],
 ];
 
 export async function __updateThread(
@@ -71,7 +73,6 @@ export async function __updateThread(
   {
     user,
     address,
-    chain,
     threadId,
     title,
     body,
@@ -82,40 +83,43 @@ export async function __updateThread(
     archived,
     spam,
     topicId,
-    topicName,
     collaborators,
     canvasSession,
     canvasAction,
     canvasHash,
     discordMeta,
-  }: UpdateThreadOptions
+  }: UpdateThreadOptions,
 ): Promise<UpdateThreadResult> {
   // Discobot handling
-  if (!threadId) {
-    if (!discordMeta) {
-      throw new AppError(Errors.ThreadNotFound);
-    }
-    const existingThread = await this.models.Thread.findOne({
-      where: { discord_meta: discordMeta },
-    });
-    if (!existingThread) {
-      throw new AppError(Errors.ThreadNotFound);
-    }
-    threadId = existingThread.id;
+
+  const threadWhere: WhereOptions<ThreadAttributes> = {};
+  if (threadId) {
+    threadWhere.id = threadId;
+  }
+  if (discordMeta) {
+    threadWhere.discord_meta = discordMeta;
+  }
+
+  const thread = await this.models.Thread.findOne({
+    where: threadWhere,
+    include: {
+      model: this.models.Address,
+      as: 'collaborators',
+      required: false,
+    },
+  });
+
+  if (!thread) {
+    throw new AppError(Errors.ThreadNotFound);
   }
 
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
-    chain: chain.id,
+    communityId: thread.community_id,
     address: address.address,
   });
   if (!canInteract) {
     throw new AppError(`Ban error: ${banError}`);
-  }
-
-  const thread = await this.models.Thread.findByPk(threadId);
-  if (!thread) {
-    throw new AppError(`${Errors.ThreadNotFound}: ${threadId}`);
   }
 
   // get various permissions
@@ -125,19 +129,28 @@ export async function __updateThread(
   const roles = await findAllRoles(
     this.models,
     { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
-    chain.id,
-    ['moderator', 'admin']
+    thread.community_id,
+    ['moderator', 'admin'],
   );
 
+  const isCollaborator = !!thread.collaborators?.find(
+    (a) => a.address === address.address,
+  );
   const isThreadOwner = userOwnedAddressIds.includes(thread.address_id);
   const isMod = !!roles.find(
-    (r) => r.chain_id === chain.id && r.permission === 'moderator'
+    (r) => r.chain_id === thread.community_id && r.permission === 'moderator',
   );
   const isAdmin = !!roles.find(
-    (r) => r.chain_id === chain.id && r.permission === 'admin'
+    (r) => r.chain_id === thread.community_id && r.permission === 'admin',
   );
   const isSuperAdmin = user.isAdmin;
-  if (!isThreadOwner && !isMod && !isAdmin && !isSuperAdmin) {
+  if (
+    !isThreadOwner &&
+    !isMod &&
+    !isAdmin &&
+    !isSuperAdmin &&
+    !isCollaborator
+  ) {
     throw new AppError(Errors.Unauthorized);
   }
   const permissions = {
@@ -145,6 +158,7 @@ export async function __updateThread(
     isMod,
     isAdmin,
     isSuperAdmin,
+    isCollaborator,
   };
 
   const now = new Date();
@@ -171,6 +185,8 @@ export async function __updateThread(
   // build analytics
   const allAnalyticsOptions: TrackOptions[] = [];
 
+  const community = await this.models.Community.findByPk(thread.community_id);
+
   //  patch thread properties
   const transaction = await this.models.sequelize.transaction();
 
@@ -188,7 +204,7 @@ export async function __updateThread(
         canvasAction,
         canvasHash,
       },
-      toUpdate
+      toUpdate,
     );
 
     await setThreadPinned(permissions, pinned, toUpdate);
@@ -202,18 +218,17 @@ export async function __updateThread(
     await setThreadStage(
       permissions,
       stage,
-      chain,
+      community,
       allAnalyticsOptions,
-      toUpdate
+      toUpdate,
     );
 
     await setThreadTopic(
       permissions,
-      thread,
+      community,
       topicId,
-      topicName,
       this.models,
-      toUpdate
+      toUpdate,
     );
 
     await thread.update(
@@ -221,7 +236,7 @@ export async function __updateThread(
         ...toUpdate,
         last_edited: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
-      { transaction }
+      { transaction },
     );
 
     await updateThreadCollaborators(
@@ -229,7 +244,7 @@ export async function __updateThread(
       thread,
       collaborators,
       this.models,
-      transaction
+      transaction,
     );
 
     await transaction.commit();
@@ -266,19 +281,18 @@ export async function __updateThread(
   const allNotificationOptions: EmitOptions[] = [];
 
   allNotificationOptions.push({
-    categoryId: NotificationCategories.ThreadEdit,
-    objectId: '',
-    notificationData: {
-      created_at: now,
-      thread_id: +finalThread.id,
-      root_type: ProposalType.Thread,
-      root_title: finalThread.title,
-      chain_id: finalThread.chain,
-      author_address: finalThread.Address.address,
-      author_chain: finalThread.Address.chain,
+    notification: {
+      categoryId: NotificationCategories.ThreadEdit,
+      data: {
+        created_at: now,
+        thread_id: +finalThread.id,
+        root_type: ProposalType.Thread,
+        root_title: finalThread.title,
+        chain_id: finalThread.community_id,
+        author_address: finalThread.Address.address,
+        author_chain: finalThread.Address.community_id,
+      },
     },
-    // don't send webhook notifications for edits
-    webhookData: null,
     excludeAddresses: [address.address],
   });
 
@@ -307,7 +321,7 @@ export async function __updateThread(
         try {
           const mentionedUser = await this.models.Address.findOne({
             where: {
-              chain: mention[0],
+              community_id: mention[0],
               address: mention[1],
             },
             include: [this.models.User],
@@ -316,7 +330,7 @@ export async function __updateThread(
         } catch (err) {
           return null;
         }
-      })
+      }),
     );
     // filter null results
     mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
@@ -329,19 +343,20 @@ export async function __updateThread(
         return; // some Addresses may be missing users, e.g. if the user removed the address
       }
       allNotificationOptions.push({
-        categoryId: NotificationCategories.NewMention,
-        objectId: `user-${mentionedAddress.User.id}`,
-        notificationData: {
-          created_at: now,
-          thread_id: +finalThread.id,
-          root_type: ProposalType.Thread,
-          root_title: finalThread.title,
-          comment_text: finalThread.body,
-          chain_id: finalThread.chain,
-          author_address: finalThread.Address.address,
-          author_chain: finalThread.Address.chain,
+        notification: {
+          categoryId: NotificationCategories.NewMention,
+          data: {
+            mentioned_user_id: mentionedAddress.User.id,
+            created_at: now,
+            thread_id: +finalThread.id,
+            root_type: ProposalType.Thread,
+            root_title: finalThread.title,
+            comment_text: finalThread.body,
+            chain_id: finalThread.community_id,
+            author_address: finalThread.Address.address,
+            author_chain: finalThread.Address.community_id,
+          },
         },
-        webhookData: null,
         excludeAddresses: [finalThread.Address.address],
       });
     });
@@ -357,6 +372,7 @@ export type UpdateThreadPermissions = {
   isMod: boolean;
   isAdmin: boolean;
   isSuperAdmin: boolean;
+  isCollaborator: boolean;
 };
 
 /**
@@ -365,9 +381,15 @@ export type UpdateThreadPermissions = {
  */
 export function validatePermissions(
   permissions: UpdateThreadPermissions,
-  flags: Partial<UpdateThreadPermissions>
+  flags: Partial<UpdateThreadPermissions>,
 ) {
-  const keys = ['isThreadOwner', 'isMod', 'isAdmin', 'isSuperAdmin'];
+  const keys = [
+    'isThreadOwner',
+    'isMod',
+    'isAdmin',
+    'isSuperAdmin',
+    'isCollaborator',
+  ];
   for (const k of keys) {
     if (flags[k] && permissions[k]) {
       // at least one flag is satisfied
@@ -401,7 +423,7 @@ async function setThreadAttributes(
     canvasAction,
     canvasHash,
   }: UpdatableThreadAttributes,
-  toUpdate: Partial<ThreadAttributes>
+  toUpdate: Partial<ThreadAttributes>,
 ) {
   if (
     typeof title !== 'undefined' ||
@@ -413,6 +435,7 @@ async function setThreadAttributes(
       isMod: true,
       isAdmin: true,
       isSuperAdmin: true,
+      isCollaborator: true,
     });
 
     // title
@@ -460,7 +483,7 @@ async function setThreadAttributes(
 async function setThreadPinned(
   permissions: UpdateThreadPermissions,
   pinned: boolean | undefined,
-  toUpdate: Partial<ThreadAttributes>
+  toUpdate: Partial<ThreadAttributes>,
 ) {
   if (typeof pinned !== 'undefined') {
     validatePermissions(permissions, {
@@ -479,7 +502,7 @@ async function setThreadPinned(
 async function setThreadLocked(
   permissions: UpdateThreadPermissions,
   locked: boolean | undefined,
-  toUpdate: Partial<ThreadAttributes>
+  toUpdate: Partial<ThreadAttributes>,
 ) {
   if (typeof locked !== 'undefined') {
     validatePermissions(permissions, {
@@ -502,7 +525,7 @@ async function setThreadLocked(
 async function setThreadArchived(
   permissions: UpdateThreadPermissions,
   archive: boolean | undefined,
-  toUpdate: Partial<ThreadAttributes>
+  toUpdate: Partial<ThreadAttributes>,
 ) {
   if (typeof archive !== 'undefined') {
     validatePermissions(permissions, {
@@ -524,7 +547,7 @@ async function setThreadArchived(
 async function setThreadSpam(
   permissions: UpdateThreadPermissions,
   spam: boolean | undefined,
-  toUpdate: Partial<ThreadAttributes>
+  toUpdate: Partial<ThreadAttributes>,
 ) {
   if (typeof spam !== 'undefined') {
     validatePermissions(permissions, {
@@ -545,9 +568,9 @@ async function setThreadSpam(
 async function setThreadStage(
   permissions: UpdateThreadPermissions,
   stage: string | undefined,
-  chain: ChainInstance,
+  community: CommunityInstance,
   allAnalyticsOptions: TrackOptions[],
-  toUpdate: Partial<ThreadAttributes>
+  toUpdate: Partial<ThreadAttributes>,
 ) {
   if (typeof stage !== 'undefined') {
     validatePermissions(permissions, {
@@ -560,9 +583,9 @@ async function setThreadStage(
     // fetch available stages
     let customStages = [];
     try {
-      const chainStages = JSON.parse(chain.custom_stages);
-      if (Array.isArray(chainStages)) {
-        customStages = Array.from(chainStages)
+      const communityStages = JSON.parse(community.custom_stages);
+      if (Array.isArray(communityStages)) {
+        customStages = Array.from(communityStages)
           .map((s) => s.toString())
           .filter((s) => s);
       }
@@ -597,35 +620,29 @@ async function setThreadStage(
  */
 async function setThreadTopic(
   permissions: UpdateThreadPermissions,
-  thread: ThreadInstance,
-  topicId: number | undefined,
-  topicName: string | undefined,
+  community: CommunityInstance,
+  topicId: number,
   models: DB,
-  toUpdate: Partial<ThreadAttributes>
+  toUpdate: Partial<ThreadAttributes>,
 ) {
-  if (typeof topicId !== 'undefined' || typeof topicName !== 'undefined') {
+  if (typeof topicId !== 'undefined') {
     validatePermissions(permissions, {
       isThreadOwner: true,
       isMod: true,
       isAdmin: true,
       isSuperAdmin: true,
     });
+    const topic = await models.Topic.findOne({
+      where: {
+        id: topicId,
+        community_id: community.id,
+      },
+    });
 
-    if (typeof topicId !== 'undefined') {
-      const topic = await models.Topic.findByPk(topicId);
-      if (!topic) {
-        throw new AppError(Errors.InvalidTopic);
-      }
-      toUpdate.topic_id = topic.id;
-    } else if (typeof topicName !== 'undefined') {
-      const [topic] = await models.Topic.findOrCreate({
-        where: {
-          name: topicName,
-          chain_id: thread.chain,
-        },
-      });
-      toUpdate.topic_id = topic.id;
+    if (!topic) {
+      throw new AppError(Errors.InvalidTopic);
     }
+    toUpdate.topic_id = topic.id;
   }
 }
 
@@ -642,7 +659,7 @@ async function updateThreadCollaborators(
       }
     | undefined,
   models: DB,
-  transaction: Transaction
+  transaction: Transaction,
 ) {
   const { toAdd, toRemove } = collaborators || {};
   if (Array.isArray(toAdd) || Array.isArray(toRemove)) {
@@ -665,7 +682,7 @@ async function updateThreadCollaborators(
     if (toAddUnique.length > 0) {
       const collaboratorAddresses = await models.Address.findAll({
         where: {
-          chain: thread.chain,
+          community_id: thread.community_id,
           id: {
             [Op.in]: toAddUnique,
           },
@@ -683,7 +700,7 @@ async function updateThreadCollaborators(
             },
             transaction,
           });
-        })
+        }),
       );
     }
 

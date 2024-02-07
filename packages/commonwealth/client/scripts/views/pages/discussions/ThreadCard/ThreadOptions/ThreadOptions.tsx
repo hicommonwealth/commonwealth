@@ -1,5 +1,8 @@
+import { ViewThreadUpvotesDrawer } from 'client/scripts/views/components/UpvoteDrawer';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import Thread from 'models/Thread';
 import React, { useState } from 'react';
+import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { SharePopover } from 'views/components/share_popover';
 import {
   getCommentSubscription,
@@ -9,9 +12,6 @@ import {
 import { AdminActions, AdminActionsProps } from './AdminActions';
 import { ReactionButton } from './ReactionButton';
 import './ThreadOptions.scss';
-import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
-import { pluralize } from 'helpers';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
 type OptionsProps = AdminActionsProps & {
   thread?: Thread;
@@ -19,8 +19,12 @@ type OptionsProps = AdminActionsProps & {
   commentBtnVisible?: boolean;
   shareEndpoint?: string;
   canUpdateThread?: boolean;
+  canReact?: boolean;
+  canComment?: boolean;
   totalComments?: number;
+  disabledActionTooltipText?: string;
   onCommentBtnClick?: () => any;
+  upvoteDrawerBtnBelow?: boolean;
 };
 
 export const ThreadOptions = ({
@@ -29,6 +33,8 @@ export const ThreadOptions = ({
   commentBtnVisible = true,
   shareEndpoint,
   canUpdateThread,
+  canReact = true,
+  canComment = true,
   totalComments,
   onLockToggle,
   onCollaboratorsEdit,
@@ -41,12 +47,14 @@ export const ThreadOptions = ({
   onSnapshotProposalFromThread,
   onSpamToggle,
   hasPendingEdits,
+  disabledActionTooltipText = '',
   onCommentBtnClick = () => null,
+  upvoteDrawerBtnBelow,
 }: OptionsProps) => {
   const [isSubscribed, setIsSubscribed] = useState(
     thread &&
       getCommentSubscription(thread)?.isActive &&
-      getReactionSubscription(thread)?.isActive
+      getReactionSubscription(thread)?.isActive,
   );
 
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
@@ -65,7 +73,7 @@ export const ThreadOptions = ({
       getCommentSubscription(thread),
       getReactionSubscription(thread),
       isSubscribed,
-      setIsSubscribed
+      setIsSubscribed,
     );
   };
 
@@ -77,52 +85,58 @@ export const ThreadOptions = ({
           e.preventDefault();
         }}
       >
-        {upvoteBtnVisible && thread && (
-          <ReactionButton
-            thread={thread}
-            size="small"
-            disabled={!hasJoinedCommunity}
-          />
-        )}
+        <div className="options-container">
+          {!upvoteDrawerBtnBelow && <ViewThreadUpvotesDrawer thread={thread} />}
 
-        {commentBtnVisible && totalComments >= 0 && (
+          {upvoteBtnVisible && thread && (
+            <ReactionButton
+              thread={thread}
+              size="small"
+              disabled={!canReact}
+              tooltipText={disabledActionTooltipText}
+            />
+          )}
+
+          {commentBtnVisible && totalComments >= 0 && (
+            <CWThreadAction
+              label={`${totalComments}`}
+              action="comment"
+              disabled={!canComment}
+              onClick={onCommentBtnClick}
+              tooltipText={disabledActionTooltipText}
+            />
+          )}
+
+          <SharePopover
+            // if share endpoint is present it will be used, else the current url will be used
+            discussionLink={shareEndpoint}
+          />
+
           <CWThreadAction
-            label={`${pluralize(totalComments, 'Comment')}`}
-            action="comment"
+            action="subscribe"
+            onClick={handleToggleSubscribe}
+            selected={!isSubscribed}
             disabled={!hasJoinedCommunity}
-            onClick={onCommentBtnClick}
           />
-        )}
 
-        <SharePopover
-          // if share endpoint is present it will be used, else the current url will be used
-          discussionLink={shareEndpoint}
-        />
-
-        <CWThreadAction
-          action="subscribe"
-          onClick={handleToggleSubscribe}
-          selected={!isSubscribed}
-          label={isSubscribed ? 'Unsubscribe' : 'Subscribe'}
-          disabled={!hasJoinedCommunity}
-        />
-
-        {canUpdateThread && thread && (
-          <AdminActions
-            thread={thread}
-            onLockToggle={onLockToggle}
-            onCollaboratorsEdit={onCollaboratorsEdit}
-            onDelete={onDelete}
-            onEditStart={onEditStart}
-            onEditCancel={onEditCancel}
-            onEditConfirm={onEditConfirm}
-            onPinToggle={onPinToggle}
-            onProposalStageChange={onProposalStageChange}
-            onSnapshotProposalFromThread={onSnapshotProposalFromThread}
-            onSpamToggle={onSpamToggle}
-            hasPendingEdits={hasPendingEdits}
-          />
-        )}
+          {canUpdateThread && thread && (
+            <AdminActions
+              thread={thread}
+              onLockToggle={onLockToggle}
+              onCollaboratorsEdit={onCollaboratorsEdit}
+              onDelete={onDelete}
+              onEditStart={onEditStart}
+              onEditCancel={onEditCancel}
+              onEditConfirm={onEditConfirm}
+              onPinToggle={onPinToggle}
+              onProposalStageChange={onProposalStageChange}
+              onSnapshotProposalFromThread={onSnapshotProposalFromThread}
+              onSpamToggle={onSpamToggle}
+              hasPendingEdits={hasPendingEdits}
+            />
+          )}
+        </div>
+        {upvoteDrawerBtnBelow && <ViewThreadUpvotesDrawer thread={thread} />}
       </div>
       {thread && <></>}
     </>

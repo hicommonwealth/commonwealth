@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { Circle, RadioButton } from '@phosphor-icons/react';
+import React, { ReactNode } from 'react';
+import { useFormContext } from 'react-hook-form';
 
-import 'components/component_kit/new_designs/cw_radio_button.scss';
+import '../../../../../styles/components/component_kit/new_designs/cw_radio_button.scss';
 import { CWText } from '../cw_text';
 
 export type RadioButtonType = {
-  label?: string;
+  label?: string | ReactNode;
   value: string;
   disabled?: boolean;
 };
@@ -15,14 +15,22 @@ type RadioButtonStyleProps = {
   checked?: boolean;
 };
 
+type RadioButtoFormValidationProps = {
+  name?: string;
+  hookToForm?: boolean;
+};
+
 type RadioButtonProps = {
   groupName?: string;
   onChange?: (e?: any) => void;
 } & Omit<RadioButtonType, 'disabled'> &
-  RadioButtonStyleProps;
+  RadioButtonStyleProps &
+  RadioButtoFormValidationProps;
 
 export const CWRadioButton = (props: RadioButtonProps) => {
   const {
+    name,
+    hookToForm,
     disabled = false,
     groupName,
     label,
@@ -30,43 +38,33 @@ export const CWRadioButton = (props: RadioButtonProps) => {
     checked,
     value,
   } = props;
-  const [isChecked, setIsChecked] = useState<boolean>(checked);
 
-  const handleClick = () => {
-    if (!disabled) {
-      setIsChecked(!isChecked);
-    }
-    onChange();
-  };
+  const formContext = useFormContext();
+  const formFieldContext = hookToForm
+    ? formContext.register(name)
+    : ({} as any);
 
-  // For Storybook checked control
-  useEffect(() => setIsChecked(checked), [checked]);
-
-  const commonProps = {
-    name: groupName,
-    onClick: handleClick,
-    size: 20,
-  };
+  // TODO: this message is not needed now, but when its needed it should be coming from the radio group
+  // const formFieldErrorMessage =
+  //   hookToForm && (formContext?.formState?.errors?.[name]?.message as string);
 
   return (
-    <div className="container">
-      {isChecked ? (
-        <RadioButton
-          className={`radio-button checked ${disabled ? 'disabled' : ''}`}
-          {...commonProps}
-          weight="fill"
-        />
-      ) : (
-        <Circle
-          className={`radio-button ${disabled ? 'disabled' : ''}`}
-          {...commonProps}
-          weight="regular"
-        />
-      )}
-      <div className={disabled ? 'background' : ''} />
+    <label className="container">
+      <input
+        type="radio"
+        className={`radio-button ${disabled ? 'disabled' : ''}`}
+        checked={checked}
+        name={groupName}
+        value={value}
+        {...formFieldContext}
+        onChange={async (e) => {
+          hookToForm && (await formFieldContext?.onChange(e));
+          await onChange?.(e);
+        }}
+      />
       <CWText className="label" type="b2" fontWeight="regular">
         {label || value}
       </CWText>
-    </div>
+    </label>
   );
 };

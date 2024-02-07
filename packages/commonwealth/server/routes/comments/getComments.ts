@@ -1,10 +1,8 @@
-import type {
-  GetCommentsReq,
-  GetCommentsResp,
-} from 'common-common/src/api/extApiTypes';
+import type { DB } from '@hicommonwealth/model';
+import { CommentAttributes } from '@hicommonwealth/model';
 import { query, validationResult } from 'express-validator';
-import Sequelize from 'sequelize';
-import type { DB } from '../../models';
+import Sequelize, { WhereOptions } from 'sequelize';
+import type { GetCommentsReq, GetCommentsResp } from '../../api/extApiTypes';
 import type { TypedRequestQuery, TypedResponse } from '../../types';
 import { failure, success } from '../../types';
 import { paginationValidation } from '../../util/helperValidations';
@@ -23,7 +21,7 @@ export const getCommentsValidation = [
 export const getComments = async (
   models: DB,
   req: TypedRequestQuery<GetCommentsReq>,
-  res: TypedResponse<GetCommentsResp>
+  res: TypedResponse<GetCommentsResp>,
 ) => {
   const errors = validationResult(req).array();
   if (errors.length !== 0) {
@@ -32,7 +30,7 @@ export const getComments = async (
 
   const { community_id, addresses, thread_ids, count_only } = req.query;
 
-  const where = { chain: community_id };
+  const where: WhereOptions<CommentAttributes> = { community_id: community_id };
 
   // if address is included, find which addressIds they correspond to.
   if (addresses) {

@@ -1,69 +1,51 @@
 @import '../shared';
 
 .EditCollaboratorsModal {
-  width: 400px;
-
-  @include smallInclusive {
-    width: 100%;
-  }
-
-  .compact-modal-body {
+  .section {
     display: flex;
     flex-direction: column;
-    gap: 16px;
 
-    .section {
+    .TextInput {
+      margin-bottom: 8px;
+    }
+
+    .collaborator-rows-container {
+      border-radius: $border-radius-corners;
+      border: 1px solid $neutral-200;
       display: flex;
       flex-direction: column;
+      gap: 4px;
+      height: 140px;
+      overflow-y: auto;
 
-      .TextInput {
-        margin-bottom: 8px;
-      }
+      @include visibleScrollbar(light);
 
-      .collaborator-rows-container {
-        border-radius: $border-radius-corners;
-        border: 1px solid $neutral-200;
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        height: 140px;
-        overflow-y: auto;
-
-        @include visibleScrollbar(light);
-
-        .collaborator-row {
-          align-items: center;
-          display: flex;
-          flex-shrink: 0;
-          height: 32px;
-          justify-content: space-between;
-          padding: 0 8px;
-          width: 100%;
-
-          &:hover {
-            background-color: $neutral-100;
-          }
-        }
-      }
-
-      .no-collaborators {
+      .collaborator-row {
         align-items: center;
-        background-color: $neutral-100;
-        border-radius: $border-radius-corners;
         display: flex;
-        justify-content: center;
-        height: 140px;
+        flex-shrink: 0;
+        height: 32px;
+        justify-content: space-between;
+        padding: 0 8px;
+        width: 100%;
 
-        .no-collaborators-text.Text {
-          color: $neutral-500;
+        &:hover {
+          background-color: $neutral-100;
         }
       }
     }
 
-    .buttons-row {
+    .no-collaborators {
+      align-items: center;
+      background-color: $neutral-100;
+      border-radius: $border-radius-corners;
       display: flex;
-      gap: 8px;
-      justify-content: flex-end;
+      justify-content: center;
+      height: 140px;
+
+      .no-collaborators-text.Text {
+        color: $neutral-500;
+      }
     }
   }
 }

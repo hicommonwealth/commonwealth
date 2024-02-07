@@ -1,9 +1,9 @@
-import $ from 'jquery';
+import { AbiType } from '@hicommonwealth/core';
 import type { Response } from 'express';
+import $ from 'jquery';
+import app from 'state';
 import { ContractsStore } from 'stores';
 import Contract from '../../models/Contract';
-import app from 'state';
-import type { BalanceType, ContractType } from 'common-common/src/types';
 
 type AddCommunityContractTemplateAttributes = {
   slug: string;
@@ -55,44 +55,27 @@ class ContractsController {
     return this._store.getCommunityContracts();
   }
 
-  public async addContractAbi(
-    contract: Contract,
-    abi: string,
-    nickname: string
-  ) {
-    const response = await $.post(`${app.serverUrl()}/contractAbi`, {
-      jwt: app.user.jwt,
-      contractId: contract.id,
-      abi,
-      nickname,
-    });
-    const resultContract = response['result']['contract'];
-    const resultAbi = response['result']['contractAbi'];
-    this.update(resultAbi.abi, resultContract);
-    return response;
-  }
-
   public async checkFetchEtherscanForAbi(address: string) {
     const response: Response = await $.post(
       `${app.serverUrl()}/etherscanAPI/fetchEtherscanContract`,
       {
         address,
         jwt: app.user.jwt,
-      }
+      },
     );
     const resultContract = response['result']['contract'];
     const resultAbi = response['result']['contractAbi'];
     this.update(resultAbi.abi, resultContract);
   }
 
-  public async getAbiFromEtherscan(address: string) {
+  public async getAbiFromEtherscan(address: string): Promise<AbiType> {
     const response: Response = await $.post(
       `${app.serverUrl()}/etherscanAPI/fetchEtherscanContractAbi`,
       {
         address,
         chain_node_id: app.chain.meta.ChainNode.id,
         jwt: app.user.jwt,
-      }
+      },
     );
     const resultAbi = response['result']['contractAbi'];
 
@@ -101,7 +84,7 @@ class ContractsController {
 
   public async update(
     abi: Array<Record<string, unknown>>,
-    contractAttributes: any
+    contractAttributes: any,
   ) {
     // Update contract in store
     if (this._store.getById(contractAttributes.id)) {
@@ -136,7 +119,7 @@ class ContractsController {
         isFactory: is_factory,
         nickname,
         ccts,
-      })
+      }),
     );
   }
 
@@ -199,74 +182,6 @@ class ContractsController {
     }
   }
 
-  public async add({
-    community,
-    balance_type,
-    chain_node_id,
-    node_url,
-    address,
-    abi,
-    abiNickname,
-    contractType,
-    symbol,
-    token_name,
-    decimals,
-    nickname,
-  }: {
-    community: string;
-    balance_type: BalanceType;
-    chain_node_id: number;
-    node_url: string;
-    address: string;
-    abi?: string;
-    abiNickname?: string;
-    contractType: ContractType;
-    symbol: string;
-    token_name: string;
-    decimals: number;
-    nickname: string;
-  }) {
-    const response = await $.post(`${app.serverUrl()}/contract`, {
-      community,
-      balance_type,
-      chain_node_id,
-      jwt: app.user.jwt,
-      node_url,
-      address,
-      abi,
-      contractType,
-      symbol,
-      token_name,
-      decimals,
-      nickname,
-      abiNickname,
-      chain_id: app.activeChainId(),
-    });
-    const responseContract = response['result']['contract'];
-    const { id, type, is_factory } = responseContract;
-    const result = new Contract({
-      id,
-      address,
-      chainNodeId: chain_node_id,
-      type,
-      decimals,
-      tokenName: token_name,
-      symbol,
-      abi: abi !== undefined ? JSON.parse(abi) : abi,
-      isFactory: is_factory,
-      nickname,
-    });
-    if (this._store.getById(result.id)) {
-      this._store.remove(this._store.getById(result.id));
-    }
-    this._store.add(result);
-    return result;
-  }
-
-  public addToStore(contract: Contract) {
-    return this._store.add(contract);
-  }
-
   public async addContractAndAbi({
     chain_node_id,
     address,
@@ -288,24 +203,12 @@ class ContractsController {
       const responseContract = response.result.contract;
       const { id, type, is_factory } = responseContract;
 
-      let abiParsed;
-
-      try {
-        if (abi) {
-          abiParsed = JSON.parse(abi);
-        } else {
-          abiParsed = abi;
-        }
-      } catch (err) {
-        abiParsed = abi;
-      }
-
       const result = new Contract({
         id,
         address,
         chainNodeId: chain_node_id,
         type,
-        abi: abiParsed,
+        abi: JSON.parse(abi),
         isFactory: is_factory,
         hasGlobalTemplate: response.result.hasGlobalTemplate,
       });
@@ -335,7 +238,7 @@ class ContractsController {
     community: string;
   }) {
     try {
-      await $.post(`${app.serverUrl()}/contract/template`, {
+      const response = await $.post(`${app.serverUrl()}/contract/template`, {
         jwt: app.user.jwt,
         chain_id: app.activeChainId(),
         name,
@@ -349,6 +252,7 @@ class ContractsController {
       const contract = this._store.getById(contract_id);
       this._store.remove(this._store.getById(contract_id));
       this._store.add(new Contract({ ...contract, hasGlobalTemplate: true }));
+      return response.result.template_id;
     } catch (err) {
       console.log(err);
       throw new Error('Failed to create template');
@@ -385,7 +289,7 @@ class ContractsController {
   }
 
   public async addCommunityContractTemplate(
-    communityContractTemplateAndMetadata: AddCommunityContractTemplateAttributes
+    communityContractTemplateAndMetadata: AddCommunityContractTemplateAttributes,
   ) {
     try {
       const newContract = await $.post(
@@ -394,7 +298,7 @@ class ContractsController {
           ...communityContractTemplateAndMetadata,
           chain_id: app.activeChainId(),
           jwt: app.user.jwt,
-        }
+        },
       );
 
       this.updateTemplate({
@@ -411,7 +315,7 @@ class ContractsController {
   }
 
   public async editCommunityContractTemplate(
-    communityContractTemplateMetadata: EditCommunityContractTemplateAttributes
+    communityContractTemplateMetadata: EditCommunityContractTemplateAttributes,
   ) {
     try {
       const updateContract = await $.ajax({
@@ -513,14 +417,7 @@ class ContractsController {
           };
         }>;
         if (contractWithTemplate.contract.ContractAbi) {
-          // Necessary because the contract abi was stored as a string in some contracts
-          if (
-            typeof contractWithTemplate.contract.ContractAbi.abi === 'string'
-          ) {
-            abiJson = JSON.parse(contractWithTemplate.contract.ContractAbi.abi);
-          } else {
-            abiJson = contractWithTemplate.contract.ContractAbi.abi;
-          }
+          abiJson = contractWithTemplate.contract.ContractAbi.abi;
         }
         if (contractWithTemplate.ccts) {
           ccts = contractWithTemplate.ccts.map((cct) => {
@@ -539,7 +436,7 @@ class ContractsController {
             abi: abiJson,
             ccts: ccts,
             hasGlobalTemplate: contractWithTemplate.hasGlobalTemplate,
-          })
+          }),
         );
       } catch (e) {
         console.error(e);

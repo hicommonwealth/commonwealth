@@ -1,22 +1,29 @@
-import moment from 'moment';
+import type { Action, Session } from '@canvas-js/interfaces';
+import { verify } from 'canvas';
 import type { DeltaStatic } from 'quill';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import app from 'state';
+
+import { ViewCommentUpvotesDrawer } from 'client/scripts/views/components/UpvoteDrawer';
 import type Comment from 'models/Comment';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
-import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
-import { CWTag } from 'views/components/component_kit/cw_tag';
-import { CWText } from 'views/components/component_kit/cw_text';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { ReactQuillEditor } from 'views/components/react_quill_editor';
 import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 import { deserializeDelta } from 'views/components/react_quill_editor/utils';
 import { SharePopover } from 'views/components/share_popover';
+import { CanvasVerifyDataModal } from 'views/modals/canvas_verify_data_modal';
 import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
 import './CommentCard.scss';
-import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 
 type CommentCardProps = {
+  disabledActionsTooltipText?: string;
   // Edit
   canEdit?: boolean;
   onEditStart?: () => any;
@@ -32,6 +39,7 @@ type CommentCardProps = {
   replyBtnVisible?: boolean;
   onReply?: () => any;
   canReply?: boolean;
+  maxReplyLimitReached: boolean;
   // Reaction
   canReact?: boolean;
   // Spam
@@ -40,9 +48,11 @@ type CommentCardProps = {
   canToggleSpam?: boolean;
   // actual comment
   comment: Comment<any>;
+  isThreadArchived: boolean;
 };
 
 export const CommentCard = ({
+  disabledActionsTooltipText = '',
   // edit
   editDraft,
   canEdit,
@@ -58,6 +68,7 @@ export const CommentCard = ({
   replyBtnVisible,
   onReply,
   canReply,
+  maxReplyLimitReached,
   // reaction
   canReact,
   // spam
@@ -66,9 +77,46 @@ export const CommentCard = ({
   canToggleSpam,
   // actual comment
   comment,
+  isThreadArchived,
 }: CommentCardProps) => {
   const commentBody = deserializeDelta(editDraft || comment.text);
   const [commentDelta, setCommentDelta] = useState<DeltaStatic>(commentBody);
+  const author = app.chain.accounts.get(comment.author);
+
+  const [isCanvasVerifyModalVisible, setIsCanvasVerifyDataModalVisible] =
+    useState<boolean>(false);
+  const [verifiedAction, setVerifiedAction] = useState<Action>();
+  const [verifiedSession, setVerifiedSession] = useState<Session>();
+  const [onReaction, setOnReaction] = useState<boolean>(false);
+
+  useEffect(() => {
+    try {
+      // suppress "unexpected error while verifying" error message on non-synced comments
+      if (!comment.canvasSession || !comment.canvasAction) return;
+      const session: Session = JSON.parse(comment.canvasSession);
+      const action: Action = JSON.parse(comment.canvasAction);
+      const actionSignerAddress = session?.payload?.sessionAddress;
+      if (
+        !comment.canvasSession ||
+        !comment.canvasAction ||
+        !actionSignerAddress
+      )
+        return;
+      verify({ session })
+        .then(() => setVerifiedSession(session))
+        .catch((err) => console.log('Could not verify session', err.stack));
+      verify({ action, actionSignerAddress })
+        .then(() => setVerifiedAction(action))
+        .catch((err) => console.log('Could not verify action', err.stack));
+    } catch (err) {
+      console.log('Unexpected error while verifying action/session');
+      return;
+    }
+  }, [comment.canvasAction, comment.canvasSession]);
+
+  const handleReaction = () => {
+    setOnReaction((prevOnReaction) => !prevOnReaction);
+  };
 
   return (
     <div className="comment-body">
@@ -77,9 +125,12 @@ export const CommentCard = ({
           <span>[deleted]</span>
         ) : (
           <AuthorAndPublishInfo
-            authorInfo={app.chain.accounts.get(comment.author)}
-            publishDate={moment(comment.createdAt).format('l')}
+            authorAddress={author.address}
+            authorChainId={author.community?.id || author?.profile?.chain}
+            publishDate={comment.createdAt}
             discord_meta={comment.discord_meta}
+            popoverPlacement="top"
+            showUserAddressWithInfo={false}
           />
         )}
       </div>
@@ -115,20 +166,35 @@ export const CommentCard = ({
         </div>
       ) : (
         <div className="comment-content">
-          {isSpam && <CWTag label="SPAM" type="disabled" />}
+          {isSpam && <CWTag label="SPAM" type="spam" />}
           <CWText className="comment-text">
             <QuillRenderer doc={comment.text} />
           </CWText>
           {!comment.deleted && (
             <div className="comment-footer">
-              <CommentReactionButton comment={comment} disabled={!canReact} />
+              <CommentReactionButton
+                comment={comment}
+                disabled={!canReact}
+                tooltipText={disabledActionsTooltipText}
+                onReaction={handleReaction}
+              />
+
+              <ViewCommentUpvotesDrawer comment={comment} />
 
               <SharePopover commentId={comment.id} />
 
-              {replyBtnVisible && (
+              {!isThreadArchived && replyBtnVisible && (
                 <CWThreadAction
                   action="reply"
-                  disabled={!canReply}
+                  label="Reply"
+                  disabled={maxReplyLimitReached || !canReply}
+                  tooltipText={
+                    disabledActionsTooltipText
+                      ? disabledActionsTooltipText
+                      : canReply && maxReplyLimitReached
+                      ? 'Nested reply limit reached'
+                      : ''
+                  }
                   onClick={async (e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -137,7 +203,7 @@ export const CommentCard = ({
                 />
               )}
 
-              {(canEdit || canDelete) && (
+              {!isThreadArchived && (canEdit || canDelete) && (
                 <PopoverMenu
                   className="CommentActions"
                   renderTrigger={(onClick) => (
@@ -146,7 +212,7 @@ export const CommentCard = ({
                   menuItems={[
                     canEdit && {
                       label: 'Edit',
-                      iconLeft: 'write' as const,
+                      iconLeft: 'notePencil' as const,
                       onClick: onEditStart,
                       iconLeftWeight: 'bold' as const,
                     },
@@ -165,6 +231,30 @@ export const CommentCard = ({
                     },
                   ].filter(Boolean)}
                 />
+              )}
+
+              {isCanvasVerifyModalVisible && (
+                <CWModal
+                  size="medium"
+                  content={
+                    <CanvasVerifyDataModal
+                      obj={comment}
+                      onClose={() => setIsCanvasVerifyDataModalVisible(false)}
+                    />
+                  }
+                  onClose={() => setIsCanvasVerifyDataModalVisible(false)}
+                  open={isCanvasVerifyModalVisible}
+                />
+              )}
+              {verifiedAction && verifiedSession && (
+                <CWText
+                  type="caption"
+                  fontWeight="medium"
+                  className="verification-icon"
+                  onClick={() => setIsCanvasVerifyDataModalVisible(true)}
+                >
+                  <CWIcon iconName="check" iconSize="xs" />
+                </CWText>
               )}
             </div>
           )}

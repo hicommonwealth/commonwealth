@@ -18,8 +18,9 @@ describe('sidebar store', () => {
     });
 
     it('should retain menuVisible if isVisible is not provided', () => {
+      const previousVisibility = sidebarStore.getState().menuVisible;
       sidebarStore.getState().setMenu({ name: 'createContent' });
-      expect(sidebarStore.getState().menuVisible).to.be.false;
+      expect(sidebarStore.getState().menuVisible).to.equal(previousVisibility);
     });
   });
 

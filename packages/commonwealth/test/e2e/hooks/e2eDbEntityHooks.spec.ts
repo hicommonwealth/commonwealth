@@ -1,16 +1,16 @@
-import * as process from 'process';
+import type {
+  AddressInstance,
+  ChainNodeAttributes,
+  CollaborationAttributes,
+  CommentInstance,
+  CommunityInstance,
+  ReactionAttributes,
+  ThreadInstance,
+  TopicAttributes,
+  UserInstance,
+} from '@hicommonwealth/model';
+import { ProfileAttributes, models } from '@hicommonwealth/model';
 import Sequelize from 'sequelize';
-import models from 'server/database';
-import type { AddressInstance } from 'server/models/address';
-import type { ChainInstance } from 'server/models/chain';
-import type { ChainNodeAttributes } from 'server/models/chain_node';
-import type { CollaborationAttributes } from 'server/models/collaboration';
-import type { CommentInstance } from 'server/models/comment';
-import type { ReactionAttributes } from 'server/models/reaction';
-import type { ThreadInstance } from 'server/models/thread';
-import type { TopicAttributes } from 'server/models/topic';
-import type { UserInstance } from 'server/models/user';
-import { ProfileAttributes } from '../../../server/models/profile';
 import { testAddress } from '../utils/e2eUtils';
 
 const Op = Sequelize.Op;
@@ -19,7 +19,7 @@ export let testThreads: ThreadInstance[];
 export let testComments: CommentInstance[];
 export let testUsers: UserInstance[];
 export let testAddresses: AddressInstance[];
-export let testChains: ChainInstance[];
+export let testChains: CommunityInstance[];
 export let testCollaborations: CollaborationAttributes[];
 export let testReactions: ReactionAttributes[];
 export let testChainNodes: ChainNodeAttributes[];
@@ -48,7 +48,7 @@ export async function clearTestEntities() {
       where: {
         [Op.or]: [
           { id: { [Op.lt]: 0 } },
-          { selected_chain_id: { [Op.in]: ['cmntest', 'cmntest2'] } },
+          { selected_community_id: { [Op.in]: ['cmntest', 'cmntest2'] } },
         ],
       },
     });
@@ -64,7 +64,7 @@ export async function clearTestEntities() {
       },
     });
 
-    const chainsToDelete = await models.Chain.findAll({
+    const chainsToDelete = await models.Community.findAll({
       where: { chain_node_id: { [Op.lt]: 0 } },
     });
 
@@ -107,7 +107,7 @@ export async function clearTestEntities() {
         [Op.or]: [
           { id: { [Op.lt]: 0 } },
           { user_id: { [Op.in]: usersToDelete.map((u) => u['id']) } },
-          { chain: { [Op.in]: ['cmntest', 'cmntest2'] } },
+          { community_id: { [Op.in]: ['cmntest', 'cmntest2'] } },
         ],
       },
       force: true,
@@ -128,12 +128,12 @@ export async function clearTestEntities() {
       where: {
         [Op.or]: [
           { thread_id: { [Op.lt]: 0 } },
-          { chain_id: { [Op.in]: chainsToDelete.map((c) => c['id']) } },
+          { community_id: { [Op.in]: chainsToDelete.map((c) => c['id']) } },
         ],
       },
       force: true,
     });
-    await models.Chain.destroy({
+    await models.Community.destroy({
       where: { id: { [Op.in]: chainsToDelete.map((c) => c['id']) } },
       force: true,
     });
@@ -164,8 +164,8 @@ export async function createTestEntities() {
                 isAdmin: true,
               },
             })
-          )[0]
-      )
+          )[0],
+      ),
     );
 
     testProfiles = await Promise.all(
@@ -181,8 +181,8 @@ export async function createTestEntities() {
                 user_id: -i - 1,
               },
             })
-          )[0]
-      )
+          )[0],
+      ),
     );
 
     testChainNodes = [
@@ -190,9 +190,9 @@ export async function createTestEntities() {
         await models.ChainNode.findOrCreate({
           where: {
             id: -1,
-            eth_chain_id: 1,
+            eth_chain_id: -1,
             url: 'test1',
-            balance_type: 'cmntest',
+            balance_type: 'ethereum',
             name: 'TestName1',
           },
         })
@@ -201,9 +201,9 @@ export async function createTestEntities() {
         await models.ChainNode.findOrCreate({
           where: {
             id: -2,
-            eth_chain_id: 1,
+            eth_chain_id: -2,
             url: 'test2',
-            balance_type: 'cmntest',
+            balance_type: 'ethereum',
             name: 'TestName2',
           },
         })
@@ -212,7 +212,7 @@ export async function createTestEntities() {
 
     testChains = [
       (
-        await models.Chain.findOrCreate({
+        await models.Community.findOrCreate({
           where: {
             id: 'cmntest',
             chain_node_id: -1,
@@ -228,11 +228,12 @@ export async function createTestEntities() {
               'https://pbs.twimg.com/profile_images/1562880197376020480/6R_gefq8_400x400.jpg',
             active: true,
             default_symbol: 'cmn',
+            custom_domain: 'customdomain.com',
           },
         })
       )[0],
       (
-        await models.Chain.findOrCreate({
+        await models.Community.findOrCreate({
           where: {
             id: 'cmntest2',
             chain_node_id: -2,
@@ -243,6 +244,7 @@ export async function createTestEntities() {
               'https://pbs.twimg.com/profile_images/1562880197376020480/6R_gefq8_400x400.jpg',
             active: true,
             default_symbol: 'cmntest2',
+            custom_domain: 'customdomain.com',
           },
         }).catch((e) => console.log(e))
       )[0],
@@ -254,7 +256,7 @@ export async function createTestEntities() {
           where: {
             id: -1,
             name: 'testTopic',
-            chain_id: 'cmntest',
+            community_id: 'cmntest',
           },
         })
       )[0],
@@ -263,7 +265,7 @@ export async function createTestEntities() {
           where: {
             id: -2,
             name: 'testTopic2',
-            chain_id: 'cmntest',
+            community_id: 'cmntest',
           },
         })
       )[0],
@@ -285,13 +287,13 @@ export async function createTestEntities() {
                 id: -i - 1,
                 user_id: -i - 1,
                 address: addresses[i],
-                chain: 'cmntest',
+                community_id: 'cmntest',
                 verification_token: '',
                 profile_id: i < 2 ? -1 : -2,
               },
             })
-          )[0]
-      )
+          )[0],
+      ),
     );
 
     testThreads = await Promise.all(
@@ -304,13 +306,13 @@ export async function createTestEntities() {
                 address_id: -1,
                 title: `testThread Title ${-i - 1}`,
                 body: `testThread Body ${-i - 1}`,
-                chain: 'cmntest',
+                community_id: 'cmntest',
                 topic_id: -1,
                 kind: 'discussion',
               },
             })
-          )[0]
-      )
+          )[0],
+      ),
     );
 
     testThreads.push(
@@ -324,14 +326,14 @@ export async function createTestEntities() {
                   address_id: -2,
                   title: `testThread Title ${-i - 1 - 2}`,
                   body: `testThread Body ${-i - 1 - 2}`,
-                  chain: 'cmntest',
+                  community_id: 'cmntest',
                   topic_id: -2,
                   kind: 'discussion',
                 },
               })
-            )[0]
-        )
-      ))
+            )[0],
+        ),
+      )),
     );
 
     testCollaborations = await Promise.all(
@@ -344,8 +346,8 @@ export async function createTestEntities() {
                 address_id: -i - 1,
               },
             })
-          )[0]
-      )
+          )[0],
+      ),
     );
 
     testComments = await Promise.all(
@@ -355,15 +357,15 @@ export async function createTestEntities() {
             await models.Comment.findOrCreate({
               where: {
                 id: -i - 1,
-                chain: 'cmntest',
+                community_id: 'cmntest',
                 address_id: -1,
                 text: '',
                 thread_id: -1,
                 plaintext: '',
               },
             })
-          )[0]
-      )
+          )[0],
+      ),
     );
 
     testComments.push(
@@ -374,16 +376,16 @@ export async function createTestEntities() {
               await models.Comment.findOrCreate({
                 where: {
                   id: -i - 1 - 2,
-                  chain: 'cmntest',
+                  community_id: 'cmntest',
                   address_id: -2,
                   text: '',
                   thread_id: -2,
                   plaintext: '',
                 },
               })
-            )[0]
-        )
-      ))
+            )[0],
+        ),
+      )),
     );
 
     testReactions = await Promise.all(
@@ -396,11 +398,11 @@ export async function createTestEntities() {
                 reaction: 'like',
                 address_id: -1,
                 thread_id: -1,
-                chain: 'cmntest',
+                community_id: 'cmntest',
               },
             })
-          )[0]
-      )
+          )[0],
+      ),
     );
 
     testReactions.push(
@@ -414,26 +416,14 @@ export async function createTestEntities() {
                   reaction: 'like',
                   address_id: -2,
                   comment_id: -2,
-                  chain: 'cmntest',
+                  community_id: 'cmntest',
                 },
               })
-            )[0]
-        )
-      ))
+            )[0],
+        ),
+      )),
     );
   } catch (e) {
     console.log(e);
   }
-}
-
-if (process.env.TEST_ENV !== 'playwright') {
-  beforeEach(async () => {
-    await clearTestEntities();
-
-    await createTestEntities();
-  });
-
-  afterEach(async () => {
-    await clearTestEntities();
-  });
 }

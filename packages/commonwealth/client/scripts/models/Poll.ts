@@ -1,4 +1,4 @@
-import $ from 'jquery';
+import axios from 'axios';
 import type moment from 'moment';
 import { notifyError } from '../controllers/app/notifications';
 import app from '../state';
@@ -7,7 +7,7 @@ import Vote from './Vote';
 class Poll {
   public readonly id: number;
   public readonly threadId: number;
-  public readonly chainId: string;
+  public readonly communityId: string;
   public readonly createdAt: moment.Moment;
   public readonly endsAt: moment.Moment;
   public readonly prompt: string;
@@ -25,7 +25,7 @@ class Poll {
   constructor({
     id,
     threadId,
-    chainId,
+    communityId,
     createdAt,
     endsAt,
     prompt,
@@ -34,7 +34,7 @@ class Poll {
   }: {
     id: number;
     threadId: number;
-    chainId: string;
+    communityId: string;
     createdAt: moment.Moment;
     endsAt: moment.Moment;
     prompt: string;
@@ -43,7 +43,7 @@ class Poll {
   }) {
     this.id = id;
     this.threadId = threadId;
-    this.chainId = chainId;
+    this.communityId = communityId;
     this.createdAt = createdAt;
     this.endsAt = endsAt;
     this.prompt = prompt;
@@ -53,7 +53,7 @@ class Poll {
 
   public getUserVote(chain: string, address: string) {
     return (this.votes || []).find(
-      (vote) => vote.address === address && vote.authorChain === chain
+      (vote) => vote.address === address && vote.authorCommunityId === chain
     );
   }
 
@@ -70,20 +70,23 @@ class Poll {
     if (!selectedOption) {
       notifyError('Invalid voting option');
     }
-    const response = await $.post(`${app.serverUrl()}/updateVote`, {
-      poll_id: this.id,
-      chain_id: this.chainId,
-      author_chain: authorChain,
-      option: selectedOption,
-      address,
-      jwt: app.user.jwt,
-    });
+    const response = await axios.put(
+      `${app.serverUrl()}/polls/${this.id}/votes`,
+      {
+        poll_id: this.id,
+        chain_id: this.communityId,
+        author_chain: authorChain,
+        option: selectedOption,
+        address,
+        jwt: app.user.jwt,
+      }
+    );
     // TODO Graham 5/3/22: We should have a dedicated controller + store
     // to handle logic like this
-    const vote = new Vote(response.result);
+    const vote = new Vote(response.data.result);
     // Remove existing vote
     const existingVoteIndex = this.votes.findIndex(
-      (v) => v.address === address && v.authorChain === authorChain
+      (v) => v.address === address && v.authorCommunityId === authorChain
     );
     if (existingVoteIndex !== -1) {
       this.votes.splice(existingVoteIndex, 1);

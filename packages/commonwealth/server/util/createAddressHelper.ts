@@ -1,22 +1,28 @@
-import crypto from 'crypto';
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import {
+  AppError,
+  ChainBase,
+  ChainNetwork,
+  WalletId,
+  WalletSsoSource,
+} from '@hicommonwealth/core';
+import type { DB, UserInstance } from '@hicommonwealth/model';
+import { AddressInstance } from '@hicommonwealth/model';
 import { bech32 } from 'bech32';
+import crypto from 'crypto';
 import type { NextFunction } from 'express';
-import { AppError } from 'common-common/src/errors';
-import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
-import { createRole, findOneRole } from './roles';
-import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
-import type { UserInstance } from '../models/user';
-import type { DB } from '../models';
-import { addressSwapper } from '../../shared/utils';
-import { Errors } from '../routes/createAddress';
 import { Op } from 'sequelize';
+import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
+import { addressSwapper, bech32ToHex } from '../../shared/utils';
+import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
+import { Errors } from '../routes/createAddress';
+import { createRole, findOneRole } from './roles';
 
 type CreateAddressReq = {
   address: string;
   chain: string;
   wallet_id: WalletId;
+  wallet_sso_source: WalletSsoSource;
   community?: string;
   keytype?: string;
   block_info?: string;
@@ -27,7 +33,7 @@ export async function createAddressHelper(
   req: CreateAddressReq,
   models: DB,
   user: Express.User & UserInstance,
-  next: NextFunction
+  next: NextFunction,
 ) {
   // start the process of creating a new address. this may be called
   // when logged in to link a new address for an existing user, or
@@ -48,7 +54,9 @@ export async function createAddressHelper(
     return next(new AppError('Cannot join with an injective address'));
   }
 
-  const chain = await models.Chain.findOne({
+  const serverAnalyticsController = new ServerAnalyticsController();
+
+  const chain = await models.Community.findOne({
     where: { id: req.chain },
   });
 
@@ -58,6 +66,8 @@ export async function createAddressHelper(
 
   // test / convert address as needed
   let encodedAddress = (req.address as string).trim();
+  let addressHex: string;
+  let existingAddressWithHex: AddressInstance;
   try {
     if (chain.base === ChainBase.Substrate) {
       encodedAddress = addressSwapper({
@@ -68,6 +78,21 @@ export async function createAddressHelper(
       // cosmos or injective
       const { words } = bech32.decode(req.address, 50);
       encodedAddress = bech32.encode(chain.bech32_prefix, words);
+      addressHex = await bech32ToHex(req.address);
+
+      // check all addresses for matching hex
+      const existingHexes = await models.Address.scope(
+        'withPrivateData',
+      ).findAll({
+        where: { hex: addressHex, verified: { [Op.ne]: null } },
+      });
+      const existingHexesSorted = existingHexes.sort((a, b) => {
+        // sort by latest last_active
+        return +b.dataValues.last_active - +a.dataValues.last_active;
+      });
+
+      // use the latest active address with this hex to assign profile
+      existingAddressWithHex = existingHexesSorted?.[0];
     } else if (chain.base === ChainBase.Ethereum) {
       const Web3 = (await import('web3-utils')).default;
       if (!Web3.isAddress(encodedAddress)) {
@@ -88,18 +113,17 @@ export async function createAddressHelper(
   } catch (e) {
     return next(new AppError(Errors.InvalidAddress));
   }
-
   const existingAddress = await models.Address.scope('withPrivateData').findOne(
     {
-      where: { chain: req.chain, address: encodedAddress },
-    }
+      where: { community_id: req.chain, address: encodedAddress },
+    },
   );
 
-  const existingAddressOnOtherChain = await models.Address.scope(
-    'withPrivateData'
-  ).findOne({
-    where: { chain: { [Op.ne]: req.chain }, address: encodedAddress },
-  });
+  const addressExistsOnOtherChain =
+    !!existingAddressWithHex ||
+    (await models.Address.scope('withPrivateData').findOne({
+      where: { community_id: { [Op.ne]: req.chain }, address: encodedAddress },
+    }));
 
   if (existingAddress) {
     // address already exists on another user, only take ownership if
@@ -119,7 +143,7 @@ export async function createAddressHelper(
     // Address.updateWithToken
     const verification_token = crypto.randomBytes(18).toString('hex');
     const verification_token_expires = new Date(
-      +new Date() + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000
+      +new Date() + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
     );
     if (updatedId) {
       existingAddress.user_id = updatedId;
@@ -134,54 +158,75 @@ export async function createAddressHelper(
     existingAddress.last_active = new Date();
     existingAddress.block_info = req.block_info;
 
+    existingAddress.hex = addressHex;
+
     // we update addresses with the wallet used to sign in
     existingAddress.wallet_id = req.wallet_id;
+    existingAddress.wallet_sso_source = req.wallet_sso_source;
 
     const updatedObj = await existingAddress.save();
 
     // even if this is the existing address, there is a case to login to community through this address's chain
     // if community is valid, then we should create a role between this community vs address
+
+    let isRole = true;
     if (req.community) {
       const role = await findOneRole(
         models,
         { where: { address_id: updatedObj.id } },
-        req.community
+        req.community,
       );
       if (!role) {
         await createRole(models, updatedObj.id, req.community, 'member');
+        isRole = false;
       }
     }
-    return { ...updatedObj.toJSON(), newly_created: false };
+    return {
+      ...updatedObj.toJSON(),
+      newly_created: false,
+      joined_community: !isRole,
+    };
   } else {
     // address doesn't exist, add it to the database
     try {
       // Address.createWithToken
       const verification_token = crypto.randomBytes(18).toString('hex');
       const verification_token_expires = new Date(
-        +new Date() + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000
+        +new Date() + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
       );
       const last_active = new Date();
-      let profile_id: number;
-      const user_id = user ? user.id : null;
+      let profile_id: number | undefined;
+      let user_id = user ? user.id : null;
+
+      if (existingAddressWithHex) {
+        user_id = existingAddressWithHex.user_id;
+      }
 
       if (user_id) {
         const profile = await models.Profile.findOne({
           attributes: ['id'],
-          where: { is_default: true, user_id },
+          where: { user_id },
         });
         profile_id = profile?.id;
       }
+
+      if (existingAddressWithHex && !profile_id) {
+        profile_id = existingAddressWithHex.profile_id;
+      }
+
       const newObj = await models.Address.create({
         user_id,
         profile_id,
-        chain: req.chain,
+        community_id: req.chain,
         address: encodedAddress,
+        hex: addressHex,
         verification_token,
         verification_token_expires,
         block_info: req.block_info,
         keytype: req.keytype,
         last_active,
         wallet_id: req.wallet_id,
+        wallet_sso_source: req.wallet_sso_source,
       });
 
       // if user.id is undefined, the address is being used to create a new user,
@@ -190,19 +235,18 @@ export async function createAddressHelper(
         await createRole(models, newObj.id, req.chain, 'member');
       }
 
-      const serverAnalyticsController = new ServerAnalyticsController();
       serverAnalyticsController.track(
         {
           event: MixpanelUserSignupEvent.NEW_USER_SIGNUP,
           chain: req.chain,
-          isCustomDomain: null,
         },
-        req
+        req,
       );
 
       return {
         ...newObj.toJSON(),
-        newly_created: !existingAddressOnOtherChain,
+        newly_created: !addressExistsOnOtherChain,
+        joined_community: !!user,
       };
     } catch (e) {
       return next(e);

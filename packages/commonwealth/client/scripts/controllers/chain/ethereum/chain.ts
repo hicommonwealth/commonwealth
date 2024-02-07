@@ -85,6 +85,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
       this.app.chain.block.height = headers.number;
       this.app.chain.block.lastTime = moment.unix(+headers.timestamp);
 
+      // TODO: @Timothee - delete all this and the dependencies on app.chain.block.duration
       // compute the average block time
       // TODO: cache the average blocktime on server rather than computing it here every time
       const nHeadersForBlocktime = 5;

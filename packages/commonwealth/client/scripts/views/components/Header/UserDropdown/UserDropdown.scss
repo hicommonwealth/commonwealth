@@ -3,6 +3,13 @@
 .UserDropdown {
   width: 256px;
 
+  .menu-section-header-text:first-child {
+    padding-top: 6px;
+  }
+  .menu-section-divider {
+    margin-top: 8px;
+    margin-bottom: 6px;
+  }
   .menu-item-text {
     width: 100%;
   }
@@ -37,5 +44,3 @@
     margin-left: 8px;
   }
 }
-
-

@@ -1,27 +1,25 @@
 import React from 'react';
 
-import { AaveTypes, CompoundTypes } from 'chain-events/src/types';
+import { ProposalState as AaveProposalState } from '../../../../../shared/chain/types/aave';
+import { ProposalState as CompoundProposalState } from '../../../../../shared/chain/types/compound';
 
 import 'components/ProposalCard/ProposalCard.scss';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
-import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
-import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
-import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 
-import { blocknumToDuration, formatNumberLong } from 'helpers';
 import {
-  chainEntityTypeToProposalShortName,
-  proposalSlugToChainEntityType,
-} from 'identifiers';
+  blocknumToDuration,
+  formatNumberLong,
+  shortenIdentifier,
+} from 'helpers';
+import moment from 'moment';
 import type { AnyProposal } from '../../../models/types';
 import { ProposalStatus } from '../../../models/types';
-import moment from 'moment';
 
 import { Countdown } from 'views/components/countdown';
 
-export const getStatusClass = (proposal: AnyProposal) => {
-  if (!proposal.initialized) return '';
+export const getStatusClass = (proposal: AnyProposal, isLoading?: boolean) => {
+  if (isLoading) return '';
   return proposal.isPassing === ProposalStatus.Passing
     ? 'pass'
     : proposal.isPassing === ProposalStatus.Passed
@@ -33,26 +31,18 @@ export const getStatusClass = (proposal: AnyProposal) => {
     : '';
 };
 
-export const getStatusText = (proposal: AnyProposal) => {
-  if (!proposal.initialized) return 'loading...';
-  if (proposal.completed && proposal instanceof SubstrateDemocracyProposal) {
-    if (proposal.isPassing === ProposalStatus.Passed)
-      return 'Passed, moved to referendum';
-    return 'Cancelled';
-  } else if (proposal.completed && proposal instanceof AaveProposal) {
-    if (proposal.state === AaveTypes.ProposalState.CANCELED) return 'Cancelled';
-    if (proposal.state === AaveTypes.ProposalState.EXECUTED) return 'Executed';
-    if (proposal.state === AaveTypes.ProposalState.EXPIRED) return 'Expired';
-    if (proposal.state === AaveTypes.ProposalState.FAILED)
-      return 'Did not pass';
+export const getStatusText = (proposal: AnyProposal, isLoading?: boolean) => {
+  if (isLoading) return 'loading...';
+  if (proposal.completed && proposal instanceof AaveProposal) {
+    if (proposal.state === AaveProposalState.CANCELED) return 'Cancelled';
+    if (proposal.state === AaveProposalState.EXECUTED) return 'Executed';
+    if (proposal.state === AaveProposalState.EXPIRED) return 'Expired';
+    if (proposal.state === AaveProposalState.FAILED) return 'Did not pass';
   } else if (proposal.completed && proposal instanceof CompoundProposal) {
-    if (proposal.state === CompoundTypes.ProposalState.Canceled)
-      return 'Cancelled';
-    if (proposal.state === CompoundTypes.ProposalState.Executed)
-      return 'Executed';
-    if (proposal.state === CompoundTypes.ProposalState.Expired)
-      return 'Expired';
-    if (proposal.state === CompoundTypes.ProposalState.Defeated)
+    if (proposal.state === CompoundProposalState.Canceled) return 'Cancelled';
+    if (proposal.state === CompoundProposalState.Executed) return 'Executed';
+    if (proposal.state === CompoundProposalState.Expired) return 'Expired';
+    if (proposal.state === CompoundProposalState.Defeated)
       return 'Did not pass';
   } else if (proposal.completed) {
     if (proposal.isPassing === ProposalStatus.Passed) return 'Passed';
@@ -76,7 +66,7 @@ export const getStatusText = (proposal: AnyProposal) => {
             duration={blocknumToDuration(proposal.endTime.blocknum)}
           />,
           ` left (ends on block ${formatNumberLong(
-            proposal.endTime.blocknum
+            proposal.endTime.blocknum,
           )})`,
         ]
       : proposal.endTime.kind === 'dynamic'
@@ -85,7 +75,7 @@ export const getStatusText = (proposal: AnyProposal) => {
             duration={blocknumToDuration(proposal.endTime.getBlocknum())}
           />,
           ` left (ends on block ${formatNumberLong(
-            proposal.endTime.getBlocknum()
+            proposal.endTime.getBlocknum(),
           )})`,
         ]
       : proposal.endTime.kind === 'threshold'
@@ -99,38 +89,36 @@ export const getStatusText = (proposal: AnyProposal) => {
       : '';
 
   if (proposal instanceof AaveProposal) {
-    if (proposal.state === AaveTypes.ProposalState.ACTIVE)
+    if (proposal.state === AaveProposalState.ACTIVE)
       return [
         proposal.isPassing === ProposalStatus.Passing
           ? 'Passing, '
           : 'Not passing, ',
         countdown,
       ];
-    if (proposal.state === AaveTypes.ProposalState.PENDING)
+    if (proposal.state === AaveProposalState.PENDING)
       return ['Pending, ', countdown];
-    if (proposal.state === AaveTypes.ProposalState.QUEUED)
+    if (proposal.state === AaveProposalState.QUEUED)
       return ['Queued, ', countdown];
-    if (proposal.state === AaveTypes.ProposalState.SUCCEEDED)
-      return 'Ready to queue';
-    if (proposal.state === AaveTypes.ProposalState.EXPIRED) return 'Expired';
+    if (proposal.state === AaveProposalState.SUCCEEDED) return 'Ready to queue';
+    if (proposal.state === AaveProposalState.EXPIRED) return 'Expired';
   }
 
   if (proposal instanceof CompoundProposal) {
-    if (proposal.state === CompoundTypes.ProposalState.Active)
+    if (proposal.state === CompoundProposalState.Active)
       return [
         proposal.isPassing === ProposalStatus.Passing
           ? 'Passing, '
           : 'Not passing, ',
         countdown,
       ];
-    if (proposal.state === CompoundTypes.ProposalState.Pending)
+    if (proposal.state === CompoundProposalState.Pending)
       return ['Pending, ', countdown];
-    if (proposal.state === CompoundTypes.ProposalState.Queued)
+    if (proposal.state === CompoundProposalState.Queued)
       return ['Queued, ', countdown];
-    if (proposal.state === CompoundTypes.ProposalState.Succeeded)
+    if (proposal.state === CompoundProposalState.Succeeded)
       return 'Ready to queue';
-    if (proposal.state === CompoundTypes.ProposalState.Expired)
-      return 'Expired';
+    if (proposal.state === CompoundProposalState.Expired) return 'Expired';
   }
 
   if (proposal.isPassing === ProposalStatus.Passed)
@@ -139,43 +127,13 @@ export const getStatusText = (proposal: AnyProposal) => {
       countdown.length === 2 ? countdown[0] : '???',
     ];
   if (proposal.isPassing === ProposalStatus.Failed) return 'Did not pass';
-  if (
-    proposal.isPassing === ProposalStatus.Passing &&
-    proposal instanceof SubstrateDemocracyProposal
-  )
-    return ['Expected to pass and move to referendum, ', countdown];
   if (proposal.isPassing === ProposalStatus.Passing)
     return ['Passing, ', countdown];
-  if (proposal.isPassing === ProposalStatus.Failing)
+  if (proposal.isPassing === ProposalStatus.Failing) {
     return ['Not passing, ', countdown];
+  }
   return '';
 };
 
 export const getPrimaryTagText = (proposal: AnyProposal) => `
-  ${chainEntityTypeToProposalShortName(
-    proposalSlugToChainEntityType(proposal.slug)
-  )} ${proposal.shortIdentifier}`;
-
-export const getSecondaryTagText = (proposal: AnyProposal) => {
-  if (
-    proposal instanceof SubstrateDemocracyProposal &&
-    proposal.getReferendum()
-  ) {
-    return `REF #${proposal.getReferendum().identifier}`;
-  } else if (proposal instanceof SubstrateDemocracyReferendum) {
-    const originatingProposalOrMotion = proposal.getProposalOrMotion(
-      proposal.preimage
-    );
-
-    return originatingProposalOrMotion instanceof SubstrateDemocracyProposal
-      ? `PROP #${originatingProposalOrMotion.identifier}`
-      : 'MISSING PROP';
-  } else if (
-    proposal instanceof SubstrateTreasuryProposal &&
-    !proposal.data.index
-  ) {
-    return 'MISSING DATA';
-  } else {
-    return null;
-  }
-};
+  Prop ${shortenIdentifier(proposal.shortIdentifier)}`;

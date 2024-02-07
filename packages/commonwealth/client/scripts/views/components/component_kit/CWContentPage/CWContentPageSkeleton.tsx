@@ -1,14 +1,20 @@
-import 'components/component_kit/CWContentPage.scss';
 import React from 'react';
 import { Skeleton } from '../../Skeleton';
 import { ComponentType } from '../types';
+import './CWContentPage.scss';
 
-export const CWContentPageSkeleton = ({ sidebarComponentsSkeletonCount }) => {
+type CWContentPageSkeletonProps = {
+  sidebarComponentsSkeletonCount: number;
+};
+
+export const CWContentPageSkeleton = ({
+  sidebarComponentsSkeletonCount,
+}: CWContentPageSkeletonProps) => {
   const mainBody = (
     <div className="main-body-container">
       {/* thread header */}
       <div className="header">
-        <Skeleton width={'90%'} />
+        <Skeleton width="90%" />
         <Skeleton />
       </div>
 
@@ -17,11 +23,11 @@ export const CWContentPageSkeleton = ({ sidebarComponentsSkeletonCount }) => {
 
       {/* thread description */}
       <div>
-        <Skeleton width={'80%'} />
+        <Skeleton width="80%" />
         <Skeleton />
-        <Skeleton width={'90%'} />
+        <Skeleton width="90%" />
         <Skeleton />
-        <Skeleton width={'95%'} />
+        <Skeleton width="95%" />
       </div>
 
       {/* comment input */}
@@ -34,13 +40,13 @@ export const CWContentPageSkeleton = ({ sidebarComponentsSkeletonCount }) => {
 
       {/* mimics comments */}
       <div>
-        <Skeleton width={'80%'} />
-        <Skeleton width={'100%'} />
-        <Skeleton width={'90%'} />
+        <Skeleton width="80%" />
+        <Skeleton width="100%" />
+        <Skeleton width="90%" />
       </div>
       <div>
-        <Skeleton width={'90%'} />
-        <Skeleton width={'25%'} />
+        <Skeleton width="90%" />
+        <Skeleton width="25%" />
       </div>
     </div>
   );
@@ -51,14 +57,16 @@ export const CWContentPageSkeleton = ({ sidebarComponentsSkeletonCount }) => {
         {mainBody}
         {sidebarComponentsSkeletonCount > 0 && (
           <div className="sidebar">
-            {Array.from({ length: sidebarComponentsSkeletonCount }).map(() => (
-              <div className="cards-column">
-                <Skeleton width={'80%'} />
-                <Skeleton width={'100%'} />
-                <Skeleton width={'50%'} />
-                <Skeleton width={'75%'} />
-              </div>
-            ))}
+            {Array.from({ length: sidebarComponentsSkeletonCount }).map(
+              (n, i) => (
+                <div className="cards-column" key={i}>
+                  <Skeleton width="80%" />
+                  <Skeleton width="100%" />
+                  <Skeleton width="50%" />
+                  <Skeleton width="75%" />
+                </div>
+              )
+            )}
           </div>
         )}
       </div>

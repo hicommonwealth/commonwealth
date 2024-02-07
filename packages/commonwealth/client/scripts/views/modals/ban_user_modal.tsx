@@ -1,56 +1,76 @@
 import React from 'react';
 
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import $ from 'jquery';
-
-import type MinimumProfile from '../../models/MinimumProfile';
-import app from 'state';
-import { CWButton } from '../components/component_kit/cw_button';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { useBanProfileByAddressMutation } from 'state/api/profiles';
+import { CWText } from 'views/components/component_kit/cw_text';
+import {
+  notifyError,
+  notifySuccess,
+} from '../../controllers/app/notifications';
+import app from '../../state';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
 
 type BanUserModalAttrs = {
   onModalClose: () => void;
-  profile: MinimumProfile;
+  address: string;
 };
 
-export const BanUserModal = (props: BanUserModalAttrs) => {
-  const { profile, onModalClose } = props;
+export const BanUserModal = ({ address, onModalClose }: BanUserModalAttrs) => {
+  const { mutateAsync: banUser } = useBanProfileByAddressMutation({
+    chainId: app.activeChainId(),
+    address: address,
+  });
+
+  const onBanConfirmation = async () => {
+    // ZAK TODO: Update Banned User Table with userProfile
+    if (!address) {
+      notifyError('CW Data error');
+      return;
+    }
+
+    try {
+      await banUser({
+        address,
+        chainId: app.activeChainId(),
+      });
+      onModalClose();
+      notifySuccess('Banned Address');
+    } catch (e) {
+      notifyError(e.response.data.error);
+    }
+  };
 
   return (
-    <React.Fragment>
-      <div className="compact-modal-title ban-user">
-        <h3>Are You Sure?</h3>
-        <CWIconButton iconName="close" onClick={() => onModalClose()} />
-      </div>
-      <div className="compact-modal-body">
-        <div>
-          Banning an address prevents it from interacting with the forum.
-        </div>
-        <div className="ban-modal-content">
-          <CWButton
-            label="Ban Address (just click once and wait)"
-            buttonType="primary-red"
-            onClick={async () => {
-              try {
-                // ZAK TODO: Update Banned User Table with userProfile
-                if (!profile.address) {
-                  notifyError('CW Data error');
-                  return;
-                }
-                await $.post('/api/banAddress', {
-                  jwt: app.user.jwt,
-                  address: profile.address,
-                  chain_id: app.activeChainId(),
-                });
-                onModalClose();
-                notifySuccess('Banned Address');
-              } catch (e) {
-                notifyError('Ban Address Failed');
-              }
-            }}
-          />
-        </div>
-      </div>
-    </React.Fragment>
+    <div className="BanUserModal">
+      <CWModalHeader
+        label="Are You Sure?"
+        icon="danger"
+        onModalClose={onModalClose}
+      />
+      <CWModalBody>
+        <CWText>
+          Banning an address prevents it from interacting with the forum. This
+          may take a few moments. Please click once and wait.
+        </CWText>
+      </CWModalBody>
+      <CWModalFooter>
+        <CWButton
+          label="Cancel"
+          buttonType="secondary"
+          buttonHeight="sm"
+          onClick={onModalClose}
+        />
+        <CWButton
+          label="Ban Address"
+          buttonType="destructive"
+          buttonHeight="sm"
+          onClick={onBanConfirmation}
+        />
+      </CWModalFooter>
+    </div>
   );
 };

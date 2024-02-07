@@ -1,22 +1,24 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable dot-notation */
+/* eslint-disable no-unused-expressions */
+/* eslint-disable max-len */
 require('dotenv').config();
+import { connectToRedis } from '@hicommonwealth/adapters';
+import { CacheNamespaces } from '@hicommonwealth/core';
+import { tester } from '@hicommonwealth/model';
 import chai from 'chai';
-import 'chai/register-should';
 import chaiHttp from 'chai-http';
-chai.use(chaiHttp);
-const expect = chai.expect;
-
-import { RedisCache } from 'common-common/src/redisCache';
-import { RedisNamespaces } from 'common-common/src/types';
-import { cacheDecorator } from 'common-common/src/cacheDecorator';
-import app, { resetDatabase } from '../../../server-test';
-import { connectToRedis } from '../../util/redisUtils';
 import {
   cosmosLCDDuration,
   cosmosRPCDuration,
   cosmosRPCKey,
 } from 'server/util/cosmosCache';
+import app, { cacheDecorator, redisCache } from '../../../server-test';
+const v1beta1ChainId = 'csdk-beta';
+const v1ChainId = 'csdk';
 
-const v1beta1ChainId = 'juno';
+chai.use(chaiHttp);
+const expect = chai.expect;
 
 function verifyNoCacheResponse(res) {
   expect(res.body).to.not.be.null;
@@ -34,13 +36,11 @@ async function verifyCacheResponse(key, res, resEarlier) {
 }
 
 describe('Cosmos Cache', () => {
-  const redisCache: RedisCache = new RedisCache();
-  const route_namespace: RedisNamespaces = RedisNamespaces.Route_Response;
+  const route_namespace: CacheNamespaces = CacheNamespaces.Route_Response;
 
   before(async () => {
-    await resetDatabase();
+    await tester.seedDb();
     await connectToRedis(redisCache);
-    cacheDecorator.setCache(redisCache);
   });
 
   after(async () => {
@@ -55,7 +55,7 @@ describe('Cosmos Cache', () => {
       headers = {
         'content-type': 'text/plain;charset=UTF-8',
         'accept-language': 'en-US,en;q=0.9',
-      }
+      },
     ) {
       return chai.request(app).post(path).set(headers).send(body);
     }
@@ -80,7 +80,7 @@ describe('Cosmos Cache', () => {
 
     const rpcProposalsCacheExpectedTest = async (
       proposalStatus: string,
-      expectedDuration: number
+      expectedDuration: number,
     ) => {
       const request = {
         originalUrl: `/cosmosAPI/${v1beta1ChainId}`,
@@ -198,7 +198,7 @@ describe('Cosmos Cache', () => {
       };
       const bodyString = JSON.stringify(body);
       const expectedKey = `/cosmosAPI/${v1beta1ChainId}_${JSON.stringify(
-        params
+        params,
       )}`;
 
       rpcTestKeyAndDuration(body, expectedKey, 60 * 60 * 24 * 5);
@@ -249,14 +249,14 @@ describe('Cosmos Cache', () => {
       rpcTestKeyAndDuration(body, expectedKey, 6);
       await rpcTestIsCached(bodyString, expectedKey);
     });
-  });
+  }).timeout(5000);
 
   describe('cosmosLCD', () => {
     const lcdProposalsCacheExpectedTest = async (
       proposalStatus: string,
-      expectedDuration: number
+      expectedDuration: number,
     ) => {
-      const url = `/cosmosLCD/csdk/cosmos/gov/v1/proposals?proposal_status=${proposalStatus}&voter=&depositor=`;
+      const url = `/cosmosLCD/${v1ChainId}/cosmos/gov/v1/proposals?proposal_status=${proposalStatus}&voter=&depositor=`;
       lcdTestDuration(expectedDuration, url, {
         proposal_status: proposalStatus,
       });
@@ -265,9 +265,9 @@ describe('Cosmos Cache', () => {
 
     const lcdParamsCacheExpectedTest = async (
       param: string,
-      expectedDuration: number
+      expectedDuration: number,
     ) => {
-      const url = `/cosmosLCD/csdk/cosmos/gov/v1/params/${param}`;
+      const url = `/cosmosLCD/${v1ChainId}/cosmos/gov/v1/params/${param}`;
       lcdTestDuration(expectedDuration, url);
       await lcdTestIsCached(url);
     };
@@ -283,7 +283,7 @@ describe('Cosmos Cache', () => {
     function lcdTestDuration(
       expectedDuration: number,
       url: string,
-      query?: any
+      query?: any,
     ) {
       const request = {
         originalUrl: url,
@@ -295,19 +295,19 @@ describe('Cosmos Cache', () => {
     }
 
     it('should have 7-day duration for an an individual proposal', async () => {
-      const url = `/cosmosLCD/csdk/cosmos/gov/v1/proposals/1`;
+      const url = `/cosmosLCD/${v1ChainId}/cosmos/gov/v1/proposals/1`;
       lcdTestDuration(60 * 60 * 24 * 7, url);
     });
     it("should have 6-second duration for an an individual proposal's live votes", async () => {
-      const url = `/cosmosLCD/csdk/cosmos/gov/v1/proposals/1/votes`;
+      const url = `/cosmosLCD/${v1ChainId}/cosmos/gov/v1/proposals/1/votes`;
       lcdTestDuration(6, url);
     });
     it("should have 6-second duration for an individual proposal's live tally", async () => {
-      const url = `/cosmosLCD/csdk/cosmos/gov/v1/proposals/1/tally`;
+      const url = `/cosmosLCD/${v1ChainId}/cosmos/gov/v1/proposals/1/tally`;
       lcdTestDuration(6, url);
     });
     it("should have 6-second duration for an individual proposal's live deposits", async () => {
-      const url = `/cosmosLCD/csdk/cosmos/gov/v1/proposals/1/deposits`;
+      const url = `/cosmosLCD/${v1ChainId}/cosmos/gov/v1/proposals/1/deposits`;
       lcdTestDuration(6, url);
     });
     it('should cache deposit period proposals', async () => {

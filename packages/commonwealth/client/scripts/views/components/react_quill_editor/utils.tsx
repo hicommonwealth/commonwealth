@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { notifyError } from '../../../controllers/app/notifications';
 import type { DeltaStatic } from 'quill';
 import { Icon, IconProps } from '@phosphor-icons/react';
 import ReactDOMServer from 'react-dom/server';
@@ -108,6 +109,7 @@ export const uploadFileToS3 = async (
     return trimmedURL;
   } catch (err) {
     console.error('upload failed: ', err);
+    notifyError('Upload failed');
     throw err;
   }
 };

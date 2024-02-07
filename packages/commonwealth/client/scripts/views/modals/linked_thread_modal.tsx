@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
 
-import 'modals/linked_thread_modal.scss';
-
-import { notifyError } from 'controllers/app/notifications';
-import { getAddedAndDeleted } from 'helpers/threads';
-import { LinkSource } from 'models/Thread';
-import app from 'state';
+import type Thread from '../../models/Thread';
+import app from '../../state';
+import { notifyError } from '../../controllers/app/notifications';
+import { getAddedAndDeleted } from '../../helpers/threads';
+import { LinkSource } from '../../models/Thread';
 import {
   useAddThreadLinksMutation,
   useDeleteThreadLinksMutation,
-} from 'state/api/threads';
-import { ThreadSelector } from 'views/components/thread_selector';
-import type Thread from '../../models/Thread';
-import { CWButton } from '../components/component_kit/cw_button';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
+} from '../../state/api/threads';
+import { ThreadSelector } from '../components/thread_selector';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
 
 type LinkedThreadModalProps = {
   linkedThreads: Thread[];
@@ -46,9 +48,7 @@ export const LinkedThreadModal = ({
       tempLinkedThreads,
       initialLinkedThreads
     );
-
     let links: Thread['links'];
-
     try {
       if (toAdd.length) {
         const updatedThread = await addThreadLinks({
@@ -60,10 +60,8 @@ export const LinkedThreadModal = ({
             title: el.title,
           })),
         });
-
         links = updatedThread.links;
       }
-
       if (toDelete.length) {
         const updatedThread = await deleteThreadLinks({
           chainId: app.activeChainId(),
@@ -73,12 +71,9 @@ export const LinkedThreadModal = ({
             identifier: String(el.id),
           })),
         });
-
         links = updatedThread.links;
       }
-
       onModalClose();
-
       if (links && onSave) {
         onSave(links);
       }
@@ -93,35 +88,38 @@ export const LinkedThreadModal = ({
     const isSelected = tempLinkedThreads.find(
       ({ id }) => selectedThread.id === id
     );
-
     const updatedLinkedThreads = isSelected
       ? tempLinkedThreads.filter(({ id }) => selectedThread.id !== id)
       : [...tempLinkedThreads, selectedThread];
-
     setTempLinkedThreads(updatedLinkedThreads);
   };
 
   return (
     <div className="LinkedThreadModal">
-      <div className="compact-modal-title">
-        <h3>Link to Existing Threads</h3>
-        <CWIconButton iconName="close" onClick={onModalClose} />
-      </div>
-      <div className="compact-modal-body">
+      <CWModalHeader
+        label="Link to Existing Threads"
+        onModalClose={onModalClose}
+      />
+      <CWModalBody>
         <ThreadSelector
           linkedThreadsToSet={tempLinkedThreads}
           onSelect={handleSelectThread}
         />
-
-        <div className="buttons-row">
-          <CWButton
-            label="Cancel"
-            buttonType="secondary-blue"
-            onClick={onModalClose}
-          />
-          <CWButton label="Save changes" onClick={handleSaveChanges} />
-        </div>
-      </div>
+      </CWModalBody>
+      <CWModalFooter>
+        <CWButton
+          label="Cancel"
+          buttonType="secondary"
+          buttonHeight="sm"
+          onClick={onModalClose}
+        />
+        <CWButton
+          label="Save changes"
+          buttonType="primary"
+          buttonHeight="sm"
+          onClick={handleSaveChanges}
+        />
+      </CWModalFooter>
     </div>
   );
 };

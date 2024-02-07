@@ -1,3 +1,4 @@
+import type { WalletSsoSource } from '@hicommonwealth/core';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 import type { ProfileRowProps } from '../../components/component_kit/cw_profiles_list';
@@ -7,7 +8,8 @@ export type LoginSidebarType =
   | 'emailLogin'
   | 'communityWalletOptions'
   | 'newAddressLinked'
-  | 'newOrReturning';
+  | 'newOrReturning'
+  | 'createCommunityLogin';
 
 export type LoginActiveStep =
   | 'allSet'
@@ -40,7 +42,7 @@ export type LoginProps = {
   setSidebarType: (sidebarType: string) => void;
   canResetWalletConnect: boolean;
   onEmailLogin: () => Promise<void>;
-  onSocialLogin: (provider: string) => Promise<void>;
+  onSocialLogin: (provider: WalletSsoSource) => Promise<void>;
   onConnectAnotherWay: () => void;
   onLinkExistingAccount: () => void;
   onCreateNewAccount: () => void;
@@ -52,12 +54,12 @@ export type LoginProps = {
   onAccountVerified: (
     account: Account,
     newlyCreated: boolean,
-    linking: boolean
+    linking: boolean,
   ) => Promise<void>;
   onWalletSelect: (wallet: IWebWallet<any>) => Promise<void>;
   onWalletAddressSelect: (
     wallet: IWebWallet<any>,
-    address: string
+    address: string,
   ) => Promise<void>;
   onNavigateToWalletList: () => void;
 };

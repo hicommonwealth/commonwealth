@@ -1,6 +1,6 @@
-import 'chai/register-should';
 import chai from 'chai';
-import type { GetProfilesReq } from 'common-common/src/api/extApiTypes';
+
+import type { GetProfilesReq } from 'server/api/extApiTypes';
 import {
   testAddresses,
   testProfiles,
@@ -16,13 +16,13 @@ describe('getProfiles Tests', () => {
 
     chai.assert.lengthOf(resp.result.profiles, 2);
     chai.assert.lengthOf(resp.result.profiles[0].Addresses, 2);
-    chai.assert.isNotNull(resp.result.profiles[0].Addresses[0].Chain);
+    chai.assert.isNotNull(resp.result.profiles[0].Addresses[0].Community);
 
     const profiles = resp.result.profiles.filter(
-      (p) => p.id === testAddresses[0].id
+      (p) => p.id === testAddresses[0].id,
     )[0];
     const profileAddresses = profiles.Addresses.sort(
-      (a, b) => a.Threads.length - b.Threads.length
+      (a, b) => a.Threads.length - b.Threads.length,
     );
     chai.assert.lengthOf(profileAddresses[0].Threads, 2);
     chai.assert.lengthOf(profileAddresses[0].Comments, 2);
@@ -36,13 +36,13 @@ describe('getProfiles Tests', () => {
 
     chai.assert.lengthOf(resp.result.profiles, 2);
     chai.assert.lengthOf(resp.result.profiles[0].Addresses, 2);
-    chai.assert.isNotNull(resp.result.profiles[0].Addresses[0].Chain);
+    chai.assert.isNotNull(resp.result.profiles[0].Addresses[0].Community);
 
     const profiles = resp.result.profiles.filter(
-      (p) => p.id === testAddresses[0].id
+      (p) => p.id === testAddresses[0].id,
     )[0];
     const profileAddresses = profiles.Addresses.sort(
-      (a, b) => a.Threads.length - b.Threads.length
+      (a, b) => a.Threads.length - b.Threads.length,
     );
     chai.assert.lengthOf(profileAddresses[0].Threads, 2);
     chai.assert.lengthOf(profileAddresses[0].Comments, 2);
@@ -66,13 +66,13 @@ describe('getProfiles Tests', () => {
     chai.assert.lengthOf(resp.result, 1);
     chai.assert.equal(
       resp.result[0].msg,
-      'Please provide a parameter to query by (addresses, profile_ids)'
+      'Please provide a parameter to query by (addresses, profile_ids)',
     );
 
     resp = await get(
       '/api/profiles',
       { profile_ids: testProfiles.map((p) => p.id), count_only: 3 },
-      true
+      true,
     );
 
     chai.assert.lengthOf(resp.result, 1);

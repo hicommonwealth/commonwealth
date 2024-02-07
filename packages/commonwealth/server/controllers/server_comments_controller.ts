@@ -1,12 +1,19 @@
-import { DB } from '../models';
+import { DB } from '@hicommonwealth/model';
 import BanCache from '../util/banCheckCache';
-import { TokenBalanceCache } from '../../../token-balance-cache/src';
+
+import { TokenBalanceCache } from '@hicommonwealth/model';
+import GlobalActivityCache from '../util/globalActivityCache';
 
 import {
   CreateCommentReactionOptions,
   CreateCommentReactionResult,
   __createCommentReaction,
 } from './server_comments_methods/create_comment_reaction';
+import {
+  DeleteCommentOptions,
+  DeleteCommentResult,
+  __deleteComment,
+} from './server_comments_methods/delete_comment';
 import {
   SearchCommentsOptions,
   SearchCommentsResult,
@@ -17,11 +24,6 @@ import {
   UpdateCommentResult,
   __updateComment,
 } from './server_comments_methods/update_comment';
-import {
-  DeleteCommentOptions,
-  DeleteCommentResult,
-  __deleteComment,
-} from './server_comments_methods/delete_comment';
 
 /**
  * A controller class containing methods relating to comments
@@ -31,7 +33,8 @@ export class ServerCommentsController {
   constructor(
     public models: DB,
     public tokenBalanceCache: TokenBalanceCache,
-    public banCache: BanCache
+    public banCache: BanCache,
+    public globalActivityCache?: GlobalActivityCache,
   ) {}
 
   /**
@@ -39,7 +42,7 @@ export class ServerCommentsController {
    *
    */
   async createCommentReaction(
-    options: CreateCommentReactionOptions
+    options: CreateCommentReactionOptions,
   ): Promise<CreateCommentReactionResult> {
     return __createCommentReaction.call(this, options);
   }
@@ -49,7 +52,7 @@ export class ServerCommentsController {
    *
    */
   async searchComments(
-    options: SearchCommentsOptions
+    options: SearchCommentsOptions,
   ): Promise<SearchCommentsResult> {
     return __searchComments.call(this, options);
   }
@@ -59,7 +62,7 @@ export class ServerCommentsController {
    *
    */
   async updateComment(
-    options: UpdateCommentOptions
+    options: UpdateCommentOptions,
   ): Promise<UpdateCommentResult> {
     return __updateComment.call(this, options);
   }
@@ -69,7 +72,7 @@ export class ServerCommentsController {
    *
    */
   async deleteComment(
-    options: DeleteCommentOptions
+    options: DeleteCommentOptions,
   ): Promise<DeleteCommentResult> {
     return __deleteComment.call(this, options);
   }

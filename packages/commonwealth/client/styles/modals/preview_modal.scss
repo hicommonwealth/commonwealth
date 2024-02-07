@@ -1,34 +1,26 @@
 @import '../shared';
 
 .PreviewModal {
-  max-height: 95vh;
-  max-width: 70vw;
-  overflow-y: scroll;
-
-  .compact-modal-title {
-    position: sticky;
-    top: 0;
-    z-index: 1;
+  .QuillFormattedText {
+    margin: 25px 0;
+    max-height: 64vh;
+    overflow-y: auto;
+    width: 640px;
   }
 
-  .compact-modal-body {
-    .QuillFormattedText {
-      margin: 25px 0;
-      max-height: 64vh;
-      overflow-y: auto;
-      width: 640px;
-    }
+  .empty-state-container {
+    align-items: center;
+    display: flex;
+    height: 400px;
+    justify-content: center;
+    width: 400px;
 
-    .empty-state-container {
-      align-items: center;
-      display: flex;
-      height: 400px;
-      justify-content: center;
-      width: 400px;
-
-      .empty-text.Text {
-        color: $neutral-500;
-      }
+    .empty-text.Text {
+      color: $neutral-500;
     }
+  }
+
+  .CWModalBody {
+    padding-bottom: 16px;
   }
 }

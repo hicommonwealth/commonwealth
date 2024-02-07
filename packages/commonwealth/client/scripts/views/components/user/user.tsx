@@ -1,211 +1,140 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-
+import { ChainBase } from '@hicommonwealth/core';
 import 'components/user/user.scss';
-
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import app from 'state';
-import { ChainBase } from 'common-common/src/types';
-import { formatAddressShort } from '../../../../../shared/utils';
-import NewProfilesController from '../../../controllers/server/newProfiles';
-import type Account from '../../../models/Account';
-import AddressInfo from '../../../models/AddressInfo';
-import MinimumProfile from '../../../models/MinimumProfile';
-import { CWButton } from '../component_kit/cw_button';
-import { BanUserModal } from '../../modals/ban_user_modal';
-import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
-import { CWText } from '../component_kit/cw_text';
-import { Modal } from '../component_kit/cw_modal';
-import { useCommonNavigate } from 'navigation/helpers';
-import useForceRerender from 'hooks/useForceRerender';
+import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
 import { Avatar } from 'views/components/Avatar';
+import CWPopover, {
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
+import { formatAddressShort } from '../../../../../shared/utils';
 import Permissions from '../../../utils/Permissions';
-
-// Address can be shown in full, autotruncated with formatAddressShort(),
-// or set to a custom max character length
-export type AddressDisplayOptions = {
-  autoTruncate?: boolean;
-  maxCharLength?: number;
-  showFullAddress?: boolean;
-};
-
-type UserAttrs = {
-  addressDisplayOptions?: AddressDisplayOptions; // display full or truncated address
-  avatarOnly?: boolean; // overrides most other properties
-  avatarSize?: number;
-  hideAvatar?: boolean;
-  linkify?: boolean;
-  onClick?: (e: any) => void;
-  popover?: boolean;
-  showAddressWithDisplayName?: boolean; // show address inline with the display name
-  showAsDeleted?: boolean;
-  showRole?: boolean;
-  user: Account | AddressInfo | MinimumProfile | undefined;
-  role?: { permission: string };
-};
+import { BanUserModal } from '../../modals/ban_user_modal';
+import { CWButton } from '../component_kit/cw_button';
+import { CWText } from '../component_kit/cw_text';
+import { CWModal } from '../component_kit/new_designs/CWModal';
+import { UserSkeleton } from './UserSkeleton';
+import type { UserAttrsWithSkeletonProp } from './user.types';
 
 export const User = ({
-  avatarOnly,
-  hideAvatar,
-  showAddressWithDisplayName,
-  user,
-  linkify,
-  onClick,
-  popover,
-  showRole,
-  showAsDeleted = false,
-  addressDisplayOptions,
-  avatarSize: size,
+  shouldLinkProfile,
+  shouldShowPopover,
+  shouldShowRole,
+  shouldShowAsDeleted = false,
+  userAddress,
+  userCommunityId,
+  shouldHideAvatar,
+  shouldShowAvatarOnly,
+  shouldShowAddressWithDisplayName,
+  avatarSize = 16,
   role,
-}: UserAttrs) => {
-  const navigate = useCommonNavigate();
-  const forceRerender = useForceRerender();
-
-  useEffect(() => {
-    NewProfilesController.Instance.isFetched.on('redraw', () => {
-      forceRerender();
-    });
-
-    NewProfilesController.Instance.isFetched.off('redraw', () => {
-      forceRerender();
-    });
-  }, [forceRerender]);
-
+  showSkeleton,
+  popoverPlacement,
+}: UserAttrsWithSkeletonProp) => {
+  const popoverProps = usePopover();
+  const { data: users } = useFetchProfilesByAddressesQuery({
+    currentChainId: app.activeChainId(),
+    profileAddresses: [userAddress],
+    profileChainIds: [userCommunityId],
+    apiCallEnabled: !!(userAddress && userCommunityId),
+  });
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const popoverProps = usePopover();
-
-  const { maxCharLength } = addressDisplayOptions || {};
-
-  const avatarSize = size || 16;
-
-  const showAvatar = user ? !hideAvatar : false;
-
-  let account: Account;
-  let profile: MinimumProfile;
-  let addrShort: string;
-  let loggedInUserIsAdmin = false;
-  let friendlyChainName: string | undefined;
-  let adminsAndMods = [];
-
-  if (user) {
-    loggedInUserIsAdmin =
-      Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
-
-    addrShort = formatAddressShort(
-      user.address,
-      typeof user.chain === 'string' ? user.chain : user.chain?.id,
-      true,
-      maxCharLength,
-      app.chain?.meta?.bech32Prefix
+  if (showSkeleton) {
+    return (
+      <UserSkeleton
+        shouldShowAvatarOnly={shouldShowAvatarOnly}
+        shouldHideAvatar={shouldHideAvatar}
+        shouldShowPopover={shouldShowPopover}
+        avatarSize={avatarSize}
+      />
     );
-
-    friendlyChainName = app.config.chains.getById(
-      typeof user.chain === 'string' ? user.chain : user.chain?.id
-    )?.name;
-
-    adminsAndMods = app.chain?.meta.adminsAndMods || [];
-
-    if (user instanceof AddressInfo) {
-      const chainId = user.chain;
-
-      const address = user.address;
-
-      if (!chainId || !address) return;
-
-      // only load account if it's possible to, using the current chain
-      if (app.chain && app.chain.id === chainId.id) {
-        try {
-          account = app.chain.accounts.get(address);
-        } catch (e) {
-          console.log('legacy account error, carry on');
-          account = null;
-        }
-      }
-
-      profile = NewProfilesController.Instance.getProfile(chainId.id, address);
-
-      if (!role) {
-        role = adminsAndMods.find(
-          (r) => r.address === address && r.address_chain === chainId.id
-        );
-      }
-    } else if (user instanceof MinimumProfile) {
-      profile = user;
-
-      // only load account if it's possible to, using the current chain
-      if (app.chain && app.chain.id === profile.chain) {
-        try {
-          account = app.chain.accounts.get(profile.address);
-        } catch (e) {
-          console.error(e);
-          account = null;
-        }
-      }
-
-      if (!role) {
-        role = adminsAndMods.find(
-          (r) =>
-            r.address === profile.address && r.address_chain === profile.chain
-        );
-      }
-    } else {
-      account = user;
-      // TODO: we should remove this, since account should always be of type Account,
-      // but we currently inject objects of type 'any' on the profile page
-      const chainId = account.chain.id;
-
-      profile = NewProfilesController.Instance.getProfile(
-        chainId,
-        account.address
-      );
-
-      if (!role) {
-        role = adminsAndMods.find(
-          (r) => r.address === account.address && r.address_chain === chainId
-        );
-      }
-    }
   }
 
-  const getRoleTags = () => (
+  const profile = users?.[0] || {};
+
+  const fullAddress = formatAddressShort(userAddress, userCommunityId);
+  const redactedAddress = formatAddressShort(
+    userAddress,
+    userCommunityId,
+    true,
+    undefined,
+    app.chain?.meta?.bech32Prefix,
+  );
+  const showAvatar = profile ? !shouldHideAvatar : false;
+  const loggedInUserIsAdmin =
+    Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
+  const friendlyCommunityName =
+    app.config.chains.getById(userCommunityId)?.name;
+  const adminsAndMods = app.chain?.meta.adminsAndMods || [];
+  const isGhostAddress = app.user.addresses.some(
+    ({ address, ghostAddress }) => userAddress === address && ghostAddress,
+  );
+  const roleInCommunity =
+    role ||
+    adminsAndMods.find(
+      (r) => r.address === userAddress && r.address_chain === userCommunityId,
+    );
+
+  const roleTags = (
     <>
-      {/* role in commonwealth forum */}
-      {showRole && role && (
+      {shouldShowRole && roleInCommunity && (
         <div className="role-tag-container">
-          <CWText className="role-tag-text">{role.permission}</CWText>
+          <CWText className="role-tag-text">
+            {roleInCommunity.permission}
+          </CWText>
         </div>
       )}
     </>
   );
 
-  const handleClick = (e: any) => {
-    if (onClick) {
-      onClick(e);
-    } else {
-      navigate(`/profile/id/${profile.id}`, {}, null);
-    }
-  };
-
   const isSelfSelected = app.user.addresses
     .map((a) => a.address)
-    .includes(account?.address);
+    .includes(userAddress);
 
-  const userFinal = avatarOnly ? (
+  const userBasisInfo = (
+    <>
+      {!profile ? (
+        shouldShowAsDeleted ? (
+          'Deleted'
+        ) : (
+          'Anonymous'
+        )
+      ) : !profile?.id ? (
+        redactedAddress
+      ) : !shouldShowAddressWithDisplayName ? (
+        profile?.name
+      ) : (
+        <>
+          <div>{profile?.name}</div>
+          <div className="id-short">{fullAddress}</div>
+        </>
+      )}
+      {roleTags}
+    </>
+  );
+
+  const userFinal = shouldShowAvatarOnly ? (
     <div className="User avatar-only" key={profile?.address || '-'}>
       <Avatar
         url={profile?.avatarUrl}
-        size={16}
+        size={profile?.avatarUrl ? avatarSize : avatarSize - 4}
         address={profile?.id}
       />
     </div>
   ) : (
     <div
-      className={`User${linkify && profile?.id ? ' linkified' : ''}`}
+      className={`User${shouldLinkProfile && profile?.id ? ' linkified' : ''}`}
       key={profile?.address || '-'}
     >
       {showAvatar && (
         <Link
-          to={profile ? `/profile/id/${profile.id}` : undefined}
+          to={
+            profile && shouldLinkProfile
+              ? `/profile/id/${profile?.id}`
+              : undefined
+          }
           className="user-avatar"
           style={{ width: `${avatarSize}px`, height: `${avatarSize}px` }}
         >
@@ -219,68 +148,25 @@ export const User = ({
       {
         <>
           {/* non-substrate name */}
-          {linkify && profile?.id ? (
+          {shouldLinkProfile && profile?.id ? (
             <Link
               className="user-display-name username"
-              to={profile ? `/profile/id/${profile.id}` : undefined}
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
+              to={`/profile/id/${profile?.id}`}
+              onClick={(e) => e.stopPropagation()}
             >
-              <>
-                {!profile ? (
-                  addrShort
-                ) : !showAddressWithDisplayName ? (
-                  profile.name
-                ) : (
-                  <>
-                    <div>
-                      {profile.name}
-                    </div>
-                    <div className="id-short">
-                      {formatAddressShort(profile.address, profile.chain)}
-                    </div>
-                  </>
-                )}
-                {getRoleTags()}
-              </>
+              {userBasisInfo}
             </Link>
           ) : (
-            <a className="user-display-name username">
-              {!profile ? (
-                showAsDeleted ? (
-                  'Deleted'
-                ) : (
-                  'Anonymous'
-                )
-              ) : !profile.id ? (
-                addrShort
-              ) : !showAddressWithDisplayName ? (
-                profile.name
-              ) : (
-                <>
-                  {profile.name}
-                  <div className="id-short">
-                    {formatAddressShort(profile.address, profile.chain)}
-                  </div>
-                </>
-              )}
-
-              {getRoleTags()}
-            </a>
+            <a className="user-display-name username">{userBasisInfo}</a>
           )}
-          {account &&
-            app.user.addresses.some(
-              ({ address, ghostAddress }) =>
-                account.address === address && ghostAddress
-            ) && (
-              <img
-                alt="ghost"
-                src="/static/img/ghost.svg"
-                width="20px"
-                style={{ display: 'inline-block' }}
-              />
-            )}
+          {isGhostAddress && (
+            <img
+              alt="ghost"
+              src="/static/img/ghost.svg"
+              width="20px"
+              style={{ display: 'inline-block' }}
+            />
+          )}
         </>
       }
     </div>
@@ -289,16 +175,11 @@ export const User = ({
   const userPopover = (
     <>
       {profile && (
-        <div
-          className="UserPopover"
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-        >
+        <div className="UserPopover" onClick={(e) => e.stopPropagation()}>
           <div className="user-avatar">
             <Avatar
               url={profile?.avatarUrl}
-              size={32}
+              size={profile?.avatarUrl ? 36 : 32}
               address={profile?.id}
             />
           </div>
@@ -306,50 +187,32 @@ export const User = ({
             {app.chain && app.chain.base === ChainBase.Substrate && (
               <Link
                 className="user-display-name substrate@"
-                to={profile?.id ? `/profile/id/${profile.id}` : undefined}
+                to={profile?.id ? `/profile/id/${profile?.id}` : undefined}
               >
                 {!profile || !profile?.id ? (
-                  !profile?.id ? (
-                    `${profile.address.slice(0, 8)}...${profile.address.slice(
-                      -5
-                    )}`
+                  !profile?.id && userAddress ? (
+                    `${userAddress.slice(0, 8)}...${userAddress.slice(-5)}`
                   ) : (
-                    addrShort
+                    redactedAddress
                   )
-                ) : !showAddressWithDisplayName ? (
-                  profile.name
+                ) : !shouldShowAddressWithDisplayName ? (
+                  profile?.name
                 ) : (
                   <>
-                    {profile.name}
-                    <div className="id-short">
-                      {formatAddressShort(
-                        profile.address,
-                        profile.chain,
-                        true,
-                        maxCharLength,
-                        app.chain?.meta?.bech32Prefix
-                      )}
-                    </div>
+                    {profile?.name}
+                    <div className="id-short">{redactedAddress}</div>
                   </>
                 )}
               </Link>
             )}
           </div>
           {profile?.address && (
-            <div className="user-address">
-              {formatAddressShort(
-                profile.address,
-                profile.chain,
-                true,
-                maxCharLength,
-                app.chain?.meta?.bech32Prefix
-              )}
-            </div>
+            <div className="user-address">{redactedAddress}</div>
           )}
-          {friendlyChainName && (
-            <div className="user-chain">{friendlyChainName}</div>
+          {friendlyCommunityName && (
+            <div className="user-chain">{friendlyCommunityName}</div>
           )}
-          {getRoleTags()}
+          {roleTags}
           {/* If Admin Allow Banning */}
           {loggedInUserIsAdmin && !isSelfSelected && (
             <div className="ban-wrapper">
@@ -357,17 +220,18 @@ export const User = ({
                 onClick={() => {
                   setIsModalOpen(true);
                 }}
-                label="Ban User"
+                label="Ban address"
                 buttonType="primary-red"
               />
             </div>
           )}
         </div>
       )}
-      <Modal
+      <CWModal
+        size="small"
         content={
           <BanUserModal
-            profile={profile}
+            address={userAddress}
             onModalClose={() => setIsModalOpen(false)}
           />
         }
@@ -377,14 +241,20 @@ export const User = ({
     </>
   );
 
-  return popover ? (
+  return shouldShowPopover ? (
     <div
       className="user-popover-wrapper"
       onMouseEnter={popoverProps.handleInteraction}
       onMouseLeave={popoverProps.handleInteraction}
     >
       {userFinal}
-      {user && <Popover content={userPopover} {...popoverProps} />}
+      {profile && (
+        <CWPopover
+          content={userPopover}
+          {...popoverProps}
+          placement={popoverPlacement}
+        />
+      )}
     </div>
   ) : (
     userFinal

@@ -1,7 +1,7 @@
 // Helper function to look up a scope, i.e. a chain XOR community.
-import JobRunner from 'common-common/src/cacheJobRunner';
+import { JobRunner } from '@hicommonwealth/adapters';
 // If a community is found, also check that the user is allowed to see it.
-import type { DB } from '../models';
+import type { DB } from '@hicommonwealth/model';
 
 export const BanErrors = {
   NoAddress: 'Address not found',
@@ -14,20 +14,18 @@ export default class BanCache extends JobRunner<CacheT> {
   constructor(
     private _models: DB,
     private _ttlS: number = 60 * 15, // 10 minutes
-    _pruningJobTimeS: number = 60 * 5 // 5 minutes
+    _pruningJobTimeS: number = 60 * 5, // 5 minutes
   ) {
     super({}, _pruningJobTimeS);
     this.start();
   }
 
   public async checkBan(params: {
-    chain?: string;
-    chain_id?: string;
+    communityId?: string;
     address: string;
   }): Promise<[boolean, string?]> {
-    const chain_id = params.chain || params.chain_id;
-    const { address } = params;
-    const cacheKey = `${chain_id}-${address}`;
+    const { address, communityId } = params;
+    const cacheKey = `${communityId}-${address}`;
 
     // first, check cache for existing ban
     const isCachedBan = await this.access(async (c: CacheT) => {
@@ -68,7 +66,7 @@ export default class BanCache extends JobRunner<CacheT> {
 
     const ban = await this._models.Ban.findOne({
       where: {
-        chain_id,
+        community_id: communityId,
         address,
       },
     });

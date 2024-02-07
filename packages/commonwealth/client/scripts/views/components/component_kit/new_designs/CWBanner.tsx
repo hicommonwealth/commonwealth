@@ -1,13 +1,14 @@
-import React from 'react';
 import {
-  X,
-  Info,
   CheckCircle,
-  WarningCircle,
-  Warning,
   IconProps,
+  Info,
+  Warning,
+  WarningCircle,
+  X,
 } from '@phosphor-icons/react';
+import React, { ReactNode } from 'react';
 
+import clsx from 'clsx';
 import 'components/component_kit/new_designs/CWBanner.scss';
 import { CWText } from 'views/components/component_kit/cw_text';
 import {
@@ -15,7 +16,6 @@ import {
   ButtonType,
   CWButton,
 } from 'views/components/component_kit/new_designs/cw_button';
-import clsx from 'clsx';
 
 // TODO this component covers only one type of Banner,
 // it should be extended with other types
@@ -41,6 +41,7 @@ interface CWBannerProps {
   buttons?: ButtonProps[];
   className?: string;
   onClose: () => void;
+  footer?: ReactNode;
 }
 
 const getButtonType = (index: number, bannerType: BannerType): ButtonType => {
@@ -62,6 +63,7 @@ const CWBanner = ({
   buttons,
   className,
   onClose,
+  footer,
 }: CWBannerProps) => {
   const TypeIcon = typeIconLookup[type];
 
@@ -77,9 +79,11 @@ const CWBanner = ({
           {title}
         </CWText>
         {body && (
-          <CWText type="b2" className="body">
-            {body}
-          </CWText>
+          <div>
+            <CWText type="b2" className="body">
+              {body}
+            </CWText>
+          </div>
         )}
         {buttons?.length > 0 && (
           <div className="actions-row">
@@ -97,6 +101,7 @@ const CWBanner = ({
             })}
           </div>
         )}
+        {footer && <div className="footer">{footer}</div>}
       </div>
       <div className="close-icon-container">
         <X weight="light" size={20} className="close-icon" onClick={onClose} />

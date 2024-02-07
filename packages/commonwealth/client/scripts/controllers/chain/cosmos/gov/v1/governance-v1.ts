@@ -1,17 +1,16 @@
-import BN from 'bn.js';
-import type { ICosmosProposal } from 'controllers/chain/cosmos/types';
-import { CosmosToken } from 'controllers/chain/cosmos/types';
-import { Any } from 'common-common/src/cosmos-ts/src/codegen/google/protobuf/any';
-
-import type { ITXModalData } from 'models/interfaces';
+import { Any, numberToLong } from '@hicommonwealth/chains';
+import { ITXModalData } from 'client/scripts/models/interfaces';
+import type {
+  CosmosToken,
+  ICosmosProposal,
+} from 'controllers/chain/cosmos/types';
 import ProposalModule from 'models/ProposalModule';
 import type CosmosAccount from '../../account';
 import type CosmosAccounts from '../../accounts';
 import type CosmosChain from '../../chain';
 import type { CosmosApiType } from '../../chain';
-import { CosmosProposalV1 } from './proposal-v1';
-import { numberToLong } from 'common-common/src/cosmos-ts/src/codegen/helpers';
 import { encodeMsgSubmitProposal } from '../v1beta1/utils-v1beta1';
+import { CosmosProposalV1 } from './proposal-v1';
 import { propToIProposal } from './utils-v1';
 
 /** This file is a copy of controllers/chain/cosmos/governance.ts, modified for
@@ -26,18 +25,14 @@ class CosmosGovernanceV1 extends ProposalModule<
   ICosmosProposal,
   CosmosProposalV1
 > {
-  private _votingPeriodS: number;
-  private _yesThreshold: number;
-  private _vetoThreshold: number;
-  private _maxDepositPeriodS: number;
   private _minDeposit: CosmosToken;
-
-  public get vetoThreshold() {
-    return this._vetoThreshold;
-  }
 
   public get minDeposit() {
     return this._minDeposit;
+  }
+
+  public setMinDeposit(minDeposit: CosmosToken) {
+    this._minDeposit = minDeposit;
   }
 
   private _Chain: CosmosChain;
@@ -45,15 +40,10 @@ class CosmosGovernanceV1 extends ProposalModule<
 
   public async init(
     ChainInfo: CosmosChain,
-    Accounts: CosmosAccounts
+    Accounts: CosmosAccounts,
   ): Promise<void> {
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
-    await Promise.all([
-      this.fetchDepositParams(),
-      this.fetchTallyThresholds(),
-      this.fetchVotingPeriod(),
-    ]);
     this._initialized = true;
   }
 
@@ -62,20 +52,10 @@ class CosmosGovernanceV1 extends ProposalModule<
     if (existingProposal) {
       return existingProposal;
     }
-    const { proposal } = await this._Chain.lcd.cosmos.gov.v1.proposal({
-      proposalId: numberToLong(proposalId),
-    });
-    const cosmosProp = new CosmosProposalV1(
-      this._Chain,
-      this._Accounts,
-      this,
-      propToIProposal(proposal)
-    );
-    await cosmosProp.init();
-    return cosmosProp;
+    return this._initProposal(proposalId);
   }
 
-  private async _initProposal(proposalId: number): Promise<void> {
+  private async _initProposal(proposalId: number): Promise<CosmosProposalV1> {
     try {
       if (!proposalId) return;
       const { proposal } = await this._Chain.lcd.cosmos.gov.v1.proposal({
@@ -85,66 +65,12 @@ class CosmosGovernanceV1 extends ProposalModule<
         this._Chain,
         this._Accounts,
         this,
-        propToIProposal(proposal)
+        propToIProposal(proposal),
       );
       await cosmosProposal.init();
+      return cosmosProposal;
     } catch (error) {
       console.error('Error fetching proposal: ', error);
-    }
-  }
-
-  private async fetchDepositParams(): Promise<void> {
-    try {
-      const { deposit_params } = await this._Chain.lcd.cosmos.gov.v1.params({
-        paramsType: 'deposit',
-      });
-      this._maxDepositPeriodS = +deposit_params?.max_deposit_period.replace(
-        's',
-        ''
-      );
-
-      // TODO: support off-denom deposits
-      const depositCoins = deposit_params?.min_deposit.find(
-        ({ denom }) => denom === this._Chain.denom
-      );
-      if (depositCoins) {
-        this._minDeposit = new CosmosToken(
-          depositCoins.denom,
-          new BN(depositCoins.amount)
-        );
-      } else {
-        console.error(
-          'Gov minDeposit in wrong denom:',
-          deposit_params?.min_deposit
-        );
-        this._minDeposit = new CosmosToken(this._Chain.denom, 0);
-      }
-      console.log(this._minDeposit);
-    } catch (e) {
-      console.error('Error fetching deposit params', e);
-    }
-  }
-
-  private async fetchTallyThresholds(): Promise<void> {
-    try {
-      const { tally_params } = await this._Chain.lcd.cosmos.gov.v1.params({
-        paramsType: 'tallying',
-      });
-      this._yesThreshold = +tally_params?.threshold;
-      this._vetoThreshold = +tally_params?.veto_threshold;
-    } catch (e) {
-      console.error('Error fetching tally params', e);
-    }
-  }
-
-  private async fetchVotingPeriod(): Promise<void> {
-    try {
-      const { voting_params } = await this._Chain.lcd.cosmos.gov.v1.params({
-        paramsType: 'voting',
-      });
-      this._votingPeriodS = +voting_params.voting_period.replace('s', '');
-    } catch (e) {
-      console.error('Error fetching voting params', e);
     }
   }
 
@@ -154,7 +80,7 @@ class CosmosGovernanceV1 extends ProposalModule<
     description: string,
     initialDeposit: CosmosToken,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    memo = ''
+    memo = '',
   ): ITXModalData {
     throw new Error('unsupported');
   }
@@ -163,12 +89,12 @@ class CosmosGovernanceV1 extends ProposalModule<
   public async submitProposalTx(
     sender: CosmosAccount,
     initialDeposit: CosmosToken,
-    content: Any
+    content: Any,
   ): Promise<number> {
     const msg = encodeMsgSubmitProposal(
       sender.address,
       initialDeposit,
-      content
+      content,
     );
 
     // fetch completed proposal from returned events
@@ -177,7 +103,7 @@ class CosmosGovernanceV1 extends ProposalModule<
     const submitEvent = events?.find((e) => e.type === 'submit_proposal');
     const cosm = await import('@cosmjs/encoding');
     const idAttribute = submitEvent?.attributes.find(
-      ({ key }) => key && cosm.fromAscii(key) === 'proposal_id'
+      ({ key }) => key && cosm.fromAscii(key) === 'proposal_id',
     );
     const id = +cosm.fromAscii(idAttribute.value);
     await this._initProposal(id);

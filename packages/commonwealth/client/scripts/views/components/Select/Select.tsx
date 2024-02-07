@@ -1,21 +1,25 @@
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 import type { Placement } from '@popperjs/core/lib';
 import React from 'react';
+import CWPopover, {
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
 import { CWButton } from '../component_kit/cw_button';
-import { IconName } from '../component_kit/cw_icons/cw_icon_lookup';
 import { CWIconButton } from '../component_kit/cw_icon_button';
-import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
+import { IconName } from '../component_kit/cw_icons/cw_icon_lookup';
+import { MessageRow } from '../component_kit/new_designs/CWTextInput/MessageRow';
 import { Option } from './Option';
 import './Select.scss';
 
 export type SelectProps = {
   size?: 'default' | 'compact';
+  label?: string;
   placeholder?: string;
   selected: string;
   onSelect?: (
     v:
       | string
-      | { id: string | number; value: any; label: string; iconLeft?: IconName }
+      | { id: string | number; value: any; label: string; iconLeft?: IconName },
   ) => any;
   onOpen?: () => {};
   onClose?: () => {};
@@ -24,9 +28,10 @@ export type SelectProps = {
     | { id: string | number; value: any; label: string; iconLeft?: IconName }[];
   canEditOption?: boolean;
   onOptionEdit?: (
-    v: string | { id: string | number; value: any; label: string }
+    v: string | { id: string | number; value: any; label: string },
   ) => any;
   dropdownPosition?: Placement;
+  containerClassname?: string;
 };
 
 export const Select = ({
@@ -40,11 +45,13 @@ export const Select = ({
   canEditOption,
   dropdownPosition,
   placeholder = 'Select an option',
+  label = '',
+  containerClassname,
 }: SelectProps) => {
   const popoverProps = usePopover();
 
   const selectedOption = (options as any).find(
-    (o: any) => o.value === selected || o === selected
+    (o: any) => o.value === selected || o === selected,
   );
 
   return (
@@ -55,7 +62,8 @@ export const Select = ({
       }}
     >
       {/* needs to be div instead of fragment so listener can work */}
-      <div>
+      <div className={containerClassname}>
+        {label && <MessageRow label={label} />}
         <CWButton
           className={`Select ${
             popoverProps.anchorEl ? 'active' : ''
@@ -74,21 +82,23 @@ export const Select = ({
             onOpen && (await onOpen());
           }}
         />
-        <Popover
+        <CWPopover
           content={
             <div className="Select-Options-Wrapper">
               {options.map((option, i) => {
-                const label = option.label || option;
+                const optionLabel = option.label || option;
                 const current = option.value || option;
 
                 return (
                   <Option
                     key={i}
                     size={size}
-                    label={label}
-                    onClick={(e) => {
+                    label={optionLabel}
+                    onClick={async (e) => {
                       e.preventDefault();
                       onSelect(option);
+                      popoverProps.setAnchorEl(null);
+                      onClose && (await onClose());
                     }}
                     isSelected={selected === current}
                     iconLeft={option && option.iconLeft ? option.iconLeft : ''}
@@ -103,6 +113,11 @@ export const Select = ({
                             onOptionEdit && (await onOptionEdit(option));
                           }}
                         />
+                      ),
+                    })}
+                    {...(option.value === 'Archived' && {
+                      iconRight: (
+                        <CWIconButton iconName="archiveTray" iconSize="small" />
                       ),
                     })}
                   />

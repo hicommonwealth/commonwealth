@@ -1,16 +1,16 @@
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
 import { bech32 } from 'bech32';
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
 
 import app from 'state';
 import type Web3 from 'web3';
 
-import type {
-  provider,
-  TransactionConfig,
-  RLPEncodedTransaction,
-} from 'web3-core';
 import type { SessionPayload } from '@canvas-js/interfaces';
+import type {
+  RLPEncodedTransaction,
+  TransactionConfig,
+  provider,
+} from 'web3-core';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 
@@ -19,7 +19,7 @@ declare let window: any;
 function encodeEthAddress(bech32Prefix: string, address: string): string {
   return bech32.encode(
     bech32Prefix,
-    bech32.toWords(Buffer.from(address.slice(2), 'hex'))
+    bech32.toWords(Buffer.from(address.slice(2), 'hex')),
   );
 }
 
@@ -84,19 +84,19 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
 
   public async signCanvasMessage(
     account: Account,
-    canvasMessage: SessionPayload
+    canvasSessionPayload: SessionPayload,
   ): Promise<string> {
     const canvas = await import('@canvas-js/interfaces');
     const signature = await this._web3.eth.personal.sign(
-      canvas.serializeSessionPayload(canvasMessage),
+      canvas.serializeSessionPayload(canvasSessionPayload),
       this._ethAccounts[0],
-      ''
+      '',
     );
     return signature;
   }
 
   public async signTransaction(
-    tx: TransactionConfig
+    tx: TransactionConfig,
   ): Promise<RLPEncodedTransaction> {
     const rlpEncodedTx = await this._web3.eth.personal.signTransaction(tx, '');
     return rlpEncodedTx;
@@ -119,14 +119,14 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
       } else {
         for (const acc of this._ethAccounts) {
           this._accounts.push(
-            encodeEthAddress(app.chain?.meta.bech32Prefix || 'inj', acc)
+            encodeEthAddress(app.chain?.meta.bech32Prefix || 'inj', acc),
           );
         }
       }
 
       // fetch chain id from URL using stargate client
       const url = `${window.location.origin}/cosmosAPI/${
-        app.chain?.id || this.defaultNetwork
+        app.chain?.network || this.defaultNetwork
       }`;
       const cosm = await import('@cosmjs/stargate');
       const client = await cosm.StargateClient.connect(url);
@@ -147,14 +147,14 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
       'accountsChanged',
       async (accounts: string[]) => {
         const encodedAccounts = accounts.map((a) =>
-          encodeEthAddress(app.chain?.meta.bech32Prefix || 'inj', a)
+          encodeEthAddress(app.chain?.meta.bech32Prefix || 'inj', a),
         );
         const updatedAddress = app.user.activeAccounts.find(
-          (addr) => addr.address === encodedAccounts[0]
+          (addr) => addr.address === encodedAccounts[0],
         );
         if (!updatedAddress) return;
         await setActiveAccount(updatedAddress);
-      }
+      },
     );
     // TODO: chainChanged, disconnect events
   }

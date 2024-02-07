@@ -1,5 +1,5 @@
+import { AddressAttributes } from '@hicommonwealth/model';
 import { expect } from 'chai';
-import { AddressAttributes } from 'server/models/address';
 import { validateOwner } from 'server/util/validateOwner';
 
 describe('validateOwner', () => {
@@ -18,24 +18,24 @@ describe('validateOwner', () => {
       const entity: any = {};
       const allowMod = false;
       const allowAdmin = false;
-      const allowGodMode = false;
+      const allowSuperAdmin = false;
 
       const result = await validateOwner({
         models,
         user,
-        chainId,
+        communityId: chainId,
         entity,
         allowMod,
         allowAdmin,
-        allowGodMode,
+        allowSuperAdmin,
       });
 
       expect(result).to.be.false;
     });
   });
 
-  describe('check god mod', () => {
-    it('should deny god mode user', async () => {
+  describe('check super admin mode', () => {
+    it('should deny super admin mode user', async () => {
       const models: any = {
         // for findAllRoles
         Address: {
@@ -50,22 +50,22 @@ describe('validateOwner', () => {
       const entity: any = {};
       const allowMod = false;
       const allowAdmin = false;
-      const allowGodMode = false;
+      const allowSuperAdmin = false;
 
       const result = await validateOwner({
         models,
         user,
-        chainId,
+        communityId: chainId,
         entity,
         allowMod,
         allowAdmin,
-        allowGodMode,
+        allowSuperAdmin,
       });
 
       expect(result).to.be.false;
     });
 
-    it('should allow god mode user', async () => {
+    it('should allow super admin user', async () => {
       const models: any = {};
       const user: any = {
         getAddresses: async () => [],
@@ -75,16 +75,16 @@ describe('validateOwner', () => {
       const entity: any = {};
       const allowMod = false;
       const allowAdmin = false;
-      const allowGodMode = true;
+      const allowSuperAdmin = true;
 
       const result = await validateOwner({
         models,
         user,
-        chainId,
+        communityId: chainId,
         entity,
         allowMod,
         allowAdmin,
-        allowGodMode,
+        allowSuperAdmin,
       });
 
       expect(result).to.be.true;
@@ -115,15 +115,15 @@ describe('validateOwner', () => {
       };
       const allowMod = false;
       const allowAdmin = false;
-      const allowGodMode = false;
+      const allowSuperAdmin = false;
       const result = await validateOwner({
         models,
         user,
-        chainId,
+        communityId: chainId,
         entity,
         allowMod,
         allowAdmin,
-        allowGodMode,
+        allowSuperAdmin,
       });
       expect(result).to.be.false;
     });
@@ -151,15 +151,15 @@ describe('validateOwner', () => {
       };
       const allowMod = false;
       const allowAdmin = false;
-      const allowGodMode = false;
+      const allowSuperAdmin = false;
       const result = await validateOwner({
         models,
         user,
-        chainId,
+        communityId: chainId,
         entity,
         allowMod,
         allowAdmin,
-        allowGodMode,
+        allowSuperAdmin,
       });
       expect(result).to.be.true;
     });
@@ -175,7 +175,7 @@ describe('validateOwner', () => {
               id: 1,
               address: '0x123',
               role: 'moderator',
-              chain: 'ethereum',
+              community_id: 'ethereum',
             },
           ],
         },
@@ -187,15 +187,15 @@ describe('validateOwner', () => {
       const entity = null;
       const allowMod = false;
       const allowAdmin = false;
-      const allowGodMode = false;
+      const allowSuperAdmin = false;
       const result = await validateOwner({
         models,
         user,
-        chainId,
+        communityId: chainId,
         entity,
         allowMod,
         allowAdmin,
-        allowGodMode,
+        allowSuperAdmin,
       });
       expect(result).to.be.false;
     });
@@ -209,7 +209,7 @@ describe('validateOwner', () => {
               id: 1,
               address: '0x123',
               role: 'moderator',
-              chain: 'ethereum',
+              community_id: 'ethereum',
             },
           ],
         },
@@ -221,15 +221,15 @@ describe('validateOwner', () => {
       const entity = null;
       const allowMod = true;
       const allowAdmin = false;
-      const allowGodMode = false;
+      const allowSuperAdmin = false;
       const result = await validateOwner({
         models,
         user,
-        chainId,
+        communityId: chainId,
         entity,
         allowMod,
         allowAdmin,
-        allowGodMode,
+        allowSuperAdmin,
       });
       expect(result).to.be.true;
     });
@@ -244,7 +244,7 @@ describe('validateOwner', () => {
             id: 1,
             address: '0x123',
             role: 'admin',
-            chain: 'ethereum',
+            community_id: 'ethereum',
           },
         ],
       },
@@ -256,15 +256,15 @@ describe('validateOwner', () => {
     const entity = null;
     const allowMod = false;
     const allowAdmin = false;
-    const allowGodMode = false;
+    const allowSuperAdmin = false;
     const result = await validateOwner({
       models,
       user,
-      chainId,
+      communityId: chainId,
       entity,
       allowMod,
       allowAdmin,
-      allowGodMode,
+      allowSuperAdmin,
     });
     expect(result).to.be.false;
   });
@@ -278,7 +278,7 @@ describe('validateOwner', () => {
             id: 1,
             address: '0x123',
             role: 'admin',
-            chain: 'ethereum',
+            community_id: 'ethereum',
           },
         ],
       },
@@ -290,15 +290,15 @@ describe('validateOwner', () => {
     const entity = null;
     const allowMod = false;
     const allowAdmin = true;
-    const allowGodMode = false;
+    const allowSuperAdmin = false;
     const result = await validateOwner({
       models,
       user,
-      chainId,
+      communityId: chainId,
       entity,
       allowMod,
       allowAdmin,
-      allowGodMode,
+      allowSuperAdmin,
     });
     expect(result).to.be.true;
   });

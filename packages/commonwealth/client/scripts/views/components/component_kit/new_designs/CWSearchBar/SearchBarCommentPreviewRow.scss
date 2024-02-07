@@ -1,0 +1,18 @@
+@import '../../../../../../styles/shared';
+@import './CWSearchBar.scss';
+
+.SearchBarCommentPreviewRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  @include everyRowStyles;
+
+  .last-updated-text.Text {
+    color: $neutral-500;
+  }
+
+  .excerpt-text.Text {
+    color: $neutral-600;
+  }
+}

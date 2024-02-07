@@ -67,7 +67,7 @@ export const MessageRow = (props: MessageRowProps) => {
     <div
       className={getClasses<{ hasFeedback: boolean }>(
         { hasFeedback },
-        'MessageRow'
+        'MessageRow',
       )}
     >
       <CWLabel label={label} />
@@ -76,7 +76,7 @@ export const MessageRow = (props: MessageRowProps) => {
           type="caption"
           className={getClasses<{ status: ValidationStatus }>(
             { status: validationStatus },
-            'feedback-message-text'
+            'feedback-message-text',
           )}
         >
           {statusMessage}
@@ -110,34 +110,33 @@ export const useTextInputWithValidation = () => {
   };
 };
 
-export const CWTextInput = (props: TextInputProps) => {
+export const CWTextInput = ({
+  autoComplete = 'off',
+  autoFocus,
+  containerClassName,
+  darkMode,
+  defaultValue,
+  value,
+  disabled,
+  iconRight,
+  iconRightonClick,
+  inputClassName,
+  inputValidationFn,
+  label,
+  maxLength,
+  name,
+  onInput,
+  onenterkey,
+  onClick,
+  placeholder,
+  size = 'large',
+  tabIndex,
+  displayOnly,
+  manualStatusMessage = '',
+  manualValidationStatus,
+  validationStatus,
+}: TextInputProps) => {
   const validationProps = useTextInputWithValidation();
-
-  const {
-    autoComplete = 'off',
-    autoFocus,
-    containerClassName,
-    darkMode,
-    defaultValue,
-    value,
-    disabled,
-    iconRight,
-    iconRightonClick,
-    inputClassName,
-    inputValidationFn,
-    label,
-    maxLength,
-    name,
-    onInput,
-    onenterkey,
-    onClick,
-    placeholder,
-    size = 'large',
-    tabIndex,
-    displayOnly,
-    manualStatusMessage = '',
-    manualValidationStatus = '',
-  } = props;
 
   return (
     <div
@@ -147,9 +146,9 @@ export const CWTextInput = (props: TextInputProps) => {
       }>(
         {
           containerClassName,
-          validationStatus: props.validationStatus,
+          validationStatus,
         },
-        ComponentType.TextInput
+        ComponentType.OldTextInput,
       )}
       onClick={onClick}
     >
@@ -198,12 +197,12 @@ export const CWTextInput = (props: TextInputProps) => {
               validationProps.setInputTimeout(
                 setTimeout(() => {
                   validationProps.setIsTyping(false);
-                  if (inputValidationFn && e.currentTarget.value?.length > 3) {
-                    const result = inputValidationFn(e.currentTarget.value);
+                  if (inputValidationFn && e.currentTarget?.value?.length > 3) {
+                    const result = inputValidationFn(e.currentTarget?.value);
                     validationProps.setValidationStatus(result[0]);
                     validationProps.setStatusMessage(result[1]);
                   }
-                }, timeout)
+                }, timeout),
               );
             }
           }}

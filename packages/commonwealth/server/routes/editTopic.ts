@@ -1,8 +1,7 @@
 /* eslint-disable no-restricted-syntax */
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/core';
+import type { DB, TopicAttributes } from '@hicommonwealth/model';
 import type { NextFunction } from 'express';
-import type { DB } from '../models';
-import type { TopicAttributes } from '../models/topic';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { validateOwner } from '../util/validateOwner';
@@ -11,7 +10,7 @@ import { validateOwner } from '../util/validateOwner';
 // We should consider merging or consolidating somehow, to prevent checks diverging again.
 
 export const Errors = {
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
   NoTopicId: 'Must supply topic ID',
   NotAdmin: 'Must be an admin to edit or feature topics',
   NotVerified: 'Must have a verified address to edit or feature topics',
@@ -40,7 +39,7 @@ const editTopic = async (
   models: DB,
   req: TypedRequestBody<EditTopicReq>,
   res: TypedResponse<EditTopicResp>,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const chain = req.chain;
   if (!req.body.id) {
@@ -63,9 +62,9 @@ const editTopic = async (
   const isAdmin = await validateOwner({
     models: models,
     user: req.user,
-    chainId: chain.id,
+    communityId: chain.id,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     return next(new AppError(Errors.NotAdmin));

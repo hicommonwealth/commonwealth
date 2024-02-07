@@ -1,0 +1,14 @@
+@import '../../../../../../styles/shared';
+
+.Webhooks {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+
+  .link-type {
+    min-width: 80px;
+    text-align: center;
+    text-transform: capitalize;
+  }
+}

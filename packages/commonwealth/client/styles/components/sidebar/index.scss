@@ -4,6 +4,26 @@
   display: flex;
   flex-direction: column;
   width: min-content;
+  position: absolute;
+  height: calc(100% - #{$global-header-height});
+
+  &.onadd {
+    animation: slidein 0.2s ease-in-out;
+    display: flex;
+  }
+
+  &.onremove {
+    animation: slideout 0.2s ease-in-out;
+    display: none;
+  }
+
+  .sidebar-header-wrapper {
+    background-color: $neutral-50;
+  }
+
+  .sidebar-header-wrapper {
+    background-color: $neutral-50;
+  }
 
   .sidebar-default-menu {
     border-right: 1px solid $neutral-200;
@@ -44,7 +64,12 @@
 
     background-color: $neutral-25;
     border-right: 1px solid $neutral-200;
-    height: calc(100vh - #{$global-header-height});
+    height: 100%;
+
+    &.heightInsideCommunity {
+      height: calc(100% - #{$global-sidebar-header-height}) !important;
+    }
+
     overflow: auto;
     width: calc(calc(#{$sidebar-width} + #{$quick-switcher-width}) + 1px);
 

@@ -9,14 +9,14 @@ import useFetchCommentsQuery from './fetchComments';
 interface CreateCommentProps {
   address: string;
   threadId: number;
-  chainId: string;
+  communityId: string;
   unescapedText: string;
   parentCommentId: number;
   existingNumberOfComments: number;
 }
 
 const createComment = async ({
-  chainId,
+  communityId,
   address,
   threadId,
   unescapedText,
@@ -26,7 +26,7 @@ const createComment = async ({
     session = null,
     action = null,
     hash = null,
-  } = await app.sessions.signComment({
+  } = await app.sessions.signComment(address, {
     thread_id: threadId,
     body: unescapedText,
     parent_comment_id: parentCommentId,
@@ -35,8 +35,8 @@ const createComment = async ({
   const response = await axios.post(
     `${app.serverUrl()}/threads/${threadId}/comments`,
     {
-      author_chain: chainId,
-      chain: chainId,
+      author_community_id: communityId,
+      community_id: communityId,
       address: address,
       parent_id: parentCommentId,
       text: encodeURIComponent(unescapedText),
@@ -44,20 +44,20 @@ const createComment = async ({
       canvas_action: action,
       canvas_session: session,
       canvas_hash: hash,
-    }
+    },
   );
 
   return new Comment(response.data.result);
 };
 
 const useCreateCommentMutation = ({
-  chainId,
+  communityId,
   threadId,
   existingNumberOfComments = 0,
 }: Partial<CreateCommentProps>) => {
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
-    chainId,
+    communityId,
     threadId,
   });
 
@@ -65,12 +65,12 @@ const useCreateCommentMutation = ({
     mutationFn: createComment,
     onSuccess: async (newComment) => {
       // update fetch comments query state
-      const key = [ApiEndpoints.FETCH_COMMENTS, chainId, threadId];
+      const key = [ApiEndpoints.FETCH_COMMENTS, communityId, threadId];
       queryClient.cancelQueries({ queryKey: key });
       queryClient.setQueryData(key, () => {
         return [...comments, newComment];
       });
-      updateThreadInAllCaches(chainId, threadId, {
+      updateThreadInAllCaches(communityId, threadId, {
         numberOfComments: existingNumberOfComments + 1,
       });
       return newComment;

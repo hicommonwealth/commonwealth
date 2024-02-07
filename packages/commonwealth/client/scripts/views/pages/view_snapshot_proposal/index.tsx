@@ -11,10 +11,12 @@ import {
   VoteResults,
   VoteResultsData,
 } from 'helpers/snapshot_utils';
+import useBrowserWindow from 'hooks/useBrowserWindow';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { LinkSource } from 'models/Thread';
 import app from 'state';
 import { useGetThreadsByLinkQuery } from 'state/api/threads';
+import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import AddressInfo from '../../../models/AddressInfo';
 import { CWContentPage } from '../../components/component_kit/CWContentPage';
 import {
@@ -25,8 +27,6 @@ import { QuillRenderer } from '../../components/react_quill_editor/quill_rendere
 import { SnapshotInformationCard } from './snapshot_information_card';
 import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
 import { SnapshotVotesTable } from './snapshot_votes_table';
-import useBrowserWindow from 'hooks/useBrowserWindow';
-import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 
 type ViewSnapshotProposalPageProps = {
   identifier: string;
@@ -79,7 +79,11 @@ export const ViewSnapshotProposalPage = ({
     if (!proposal || !activeChainId) {
       return null;
     }
-    return new AddressInfo(null, proposal.author, activeChainId, null);
+    return new AddressInfo({
+      id: null,
+      address: proposal.author,
+      chainId: activeChainId,
+    });
   }, [proposal, activeChainId]);
 
   useManageDocumentTitle('View snapshot proposal', proposal?.title);
@@ -94,7 +98,7 @@ export const ViewSnapshotProposalPage = ({
       }
 
       const currentProposal = app.snapshot.proposals.find(
-        (p) => p.id === proposalId
+        (p) => p.id === proposalId,
       );
       setProposal(currentProposal);
 
@@ -107,11 +111,11 @@ export const ViewSnapshotProposalPage = ({
       const powerRes = await getPower(
         currentSpace,
         currentProposal,
-        activeUserAddress
+        activeUserAddress,
       );
       setPower(powerRes);
     },
-    [activeUserAddress]
+    [activeUserAddress],
   );
 
   useNecessaryEffect(() => {

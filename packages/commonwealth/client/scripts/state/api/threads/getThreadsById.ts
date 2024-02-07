@@ -12,19 +12,19 @@ interface GetThreadsByIdProps {
   apiCallEnabled?: boolean;
 }
 
-const getThreadsById = async ({ chainId, ids }: GetThreadsByIdProps) => {
+const getThreadsById = async ({
+  chainId,
+  ids,
+}: GetThreadsByIdProps): Promise<Thread[]> => {
   const response = await axios.get(
     `${app.serverUrl()}${ApiEndpoints.FETCH_THREADS}`,
     {
       params: {
-        chain: chainId,
+        community_id: chainId,
         thread_ids: ids,
       },
-    }
+    },
   );
-
-  // TODO: this can be removed in future
-  app.chainEntities.getRawEntities(app.activeChainId());
 
   return response.data.result.map((t) => new Thread(t));
 };

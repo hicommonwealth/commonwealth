@@ -1,7 +1,7 @@
 import sgMail from '@sendgrid/mail';
 
+import { DB } from '@hicommonwealth/model';
 import { SENDGRID_API_KEY } from '../config';
-import { DB } from '../models';
 
 import {
   EmitOptions,

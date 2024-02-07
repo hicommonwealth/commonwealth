@@ -1,17 +1,18 @@
-import React from 'react';
-
-import type Thread from '../../../models/Thread';
-import 'pages/view_thread/edit_body.scss';
+import { ContentType } from '@hicommonwealth/core';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import app from 'state';
-import { ContentType } from 'types';
-import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
-import { CWButton } from '../../components/component_kit/new_designs/cw_button';
+import { SessionKeyError } from 'controllers/server/sessions';
+import 'pages/view_thread/edit_body.scss';
 import type { DeltaStatic } from 'quill';
+import React from 'react';
+import app from 'state';
+import { useEditThreadMutation } from 'state/api/threads';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
+import { openConfirmation } from 'views/modals/confirmation_modal';
+import type Thread from '../../../models/Thread';
+import { CWButton } from '../../components/component_kit/new_designs/cw_button';
 import { ReactQuillEditor } from '../../components/react_quill_editor';
 import { deserializeDelta } from '../../components/react_quill_editor/utils';
-import { openConfirmation } from 'views/modals/confirmation_modal';
-import { useEditThreadMutation } from 'state/api/threads';
+import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
 
 type EditBodyProps = {
   title: string;
@@ -39,11 +40,20 @@ export const EditBody = (props: EditBodyProps) => {
   const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(body);
   const [saving, setSaving] = React.useState<boolean>(false);
 
-  const { mutateAsync: editThread } = useEditThreadMutation({
+  const {
+    mutateAsync: editThread,
+    reset: resetEditThreadMutation,
+    error: editThreadError,
+  } = useEditThreadMutation({
     chainId: app.activeChainId(),
     threadId: thread.id,
     currentStage: thread.stage,
     currentTopicId: thread.topic.id,
+  });
+
+  const { RevalidationModal } = useSessionRevalidationModal({
+    handleClose: resetEditThreadMutation,
+    error: editThreadError,
   });
 
   const cancel = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -59,7 +69,8 @@ export const EditBody = (props: EditBodyProps) => {
         buttons: [
           {
             label: 'Yes',
-            buttonType: 'mini-black',
+            buttonType: 'primary',
+            buttonHeight: 'sm',
             onClick: () => {
               clearEditingLocalStorage(thread.id, ContentType.Thread);
               cancelEditing();
@@ -67,7 +78,8 @@ export const EditBody = (props: EditBodyProps) => {
           },
           {
             label: 'No',
-            buttonType: 'mini-white',
+            buttonType: 'secondary',
+            buttonHeight: 'sm',
           },
         ],
       });
@@ -95,37 +107,39 @@ export const EditBody = (props: EditBodyProps) => {
       notifySuccess('Thread successfully edited');
       threadUpdatedCallback(title, newBody);
     } catch (err) {
-      const error =
-        err.responseJSON && err.responseJSON.error
-          ? err.responseJSON.error
-          : 'Failed to edit thread';
-      console.log(error);
-      notifyError(error);
+      if (err instanceof SessionKeyError) {
+        return;
+      }
+      console.error(err?.responseJSON?.error || err?.message);
+      notifyError('Failed to edit thread');
     } finally {
       setSaving(false);
     }
   };
 
   return (
-    <div className="EditBody">
-      <ReactQuillEditor
-        contentDelta={contentDelta}
-        setContentDelta={setContentDelta}
-      />
-      <div className="buttons-row">
-        <CWButton
-          label="Cancel"
-          disabled={saving}
-          buttonType="tertiary"
-          onClick={cancel}
+    <>
+      <div className="EditBody">
+        <ReactQuillEditor
+          contentDelta={contentDelta}
+          setContentDelta={setContentDelta}
         />
-        <CWButton
-          label="Save"
-          buttonWidth="wide"
-          disabled={saving}
-          onClick={save}
-        />
+        <div className="buttons-row">
+          <CWButton
+            label="Cancel"
+            disabled={saving}
+            buttonType="tertiary"
+            onClick={cancel}
+          />
+          <CWButton
+            label="Save"
+            buttonWidth="wide"
+            disabled={saving}
+            onClick={save}
+          />
+        </div>
       </div>
-    </div>
+      {RevalidationModal}
+    </>
   );
 };

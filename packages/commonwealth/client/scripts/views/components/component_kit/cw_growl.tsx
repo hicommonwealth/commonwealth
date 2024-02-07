@@ -11,13 +11,17 @@ type GrowlPosition = 'bottom-left' | 'bottom-right';
 type GrowlAttrs = {
   className?: string;
   disabled: boolean;
-  onclose?: () => void;
+  onClose?: () => void;
   position: GrowlPosition;
 } & React.PropsWithChildren;
 
-export const CWGrowl = (props: GrowlAttrs) => {
-  const { className, position, disabled } = props;
-
+export const CWGrowl = ({
+  className,
+  position,
+  disabled,
+  onClose,
+  children,
+}: GrowlAttrs) => {
   return (
     !disabled && (
       <div
@@ -26,8 +30,13 @@ export const CWGrowl = (props: GrowlAttrs) => {
           position: GrowlPosition;
         }>({ className, position }, ComponentType.Growl)}
       >
-        <CWCard className="growl-card" elevation="elevation-3" interactive>
-          {props.children}
+        <CWCard
+          className="growl-card"
+          elevation="elevation-3"
+          interactive
+          onClick={onClose}
+        >
+          {children}
         </CWCard>
       </div>
     )

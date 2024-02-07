@@ -1,19 +1,22 @@
 import React, { useState } from 'react';
 
-import 'modals/order_topics_modal.scss';
-
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError } from '../../../controllers/app/notifications';
 import type Topic from '../../../models/Topic';
-import app from 'state';
-import { CWButton } from 'views/components/component_kit/cw_button';
-import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
-
-import DraggableTopicsList from './draggable_topics_list';
-import { CWText } from '../../components/component_kit/cw_text';
+import app from '../../../state';
 import {
   useFetchTopicsQuery,
   useUpdateFeaturedTopicsOrderMutation,
-} from 'state/api/topics';
+} from '../../../state/api/topics';
+import { CWText } from '../../components/component_kit/cw_text';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../../components/component_kit/new_designs/CWModal';
+import { CWButton } from '../../components/component_kit/new_designs/cw_button';
+import DraggableTopicsList from './draggable_topics_list';
+
+import '../../../../styles/modals/order_topics_modal.scss';
 
 type OrderTopicsModalProps = {
   onModalClose: () => void;
@@ -39,14 +42,14 @@ const getFilteredTopics = (rawTopics: Topic[]): Topic[] => {
 
 export const OrderTopicsModal = ({ onModalClose }: OrderTopicsModalProps) => {
   const { data: rawTopics } = useFetchTopicsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const { mutateAsync: updateFeaturedTopicsOrder } =
     useUpdateFeaturedTopicsOrderMutation();
 
   const [topics, setTopics] = useState<Topic[]>(() =>
-    getFilteredTopics(rawTopics)
+    getFilteredTopics(rawTopics),
   );
 
   const handleSave = async () => {
@@ -60,11 +63,8 @@ export const OrderTopicsModal = ({ onModalClose }: OrderTopicsModalProps) => {
 
   return (
     <div className="OrderTopicsModal">
-      <div className="compact-modal-title">
-        <h3>Reorder Topics</h3>
-        <CWIconButton iconName="close" onClick={onModalClose} />
-      </div>
-      <div className="compact-modal-body">
+      <CWModalHeader label="Reorder Topics" onModalClose={onModalClose} />
+      <CWModalBody>
         <div className="featured-topic-list">
           {topics.length ? (
             <DraggableTopicsList topics={topics} setTopics={setTopics} />
@@ -72,8 +72,21 @@ export const OrderTopicsModal = ({ onModalClose }: OrderTopicsModalProps) => {
             <CWText>No Topics to Reorder</CWText>
           )}
         </div>
-        <CWButton onClick={handleSave} label="Save" />
-      </div>
+      </CWModalBody>
+      <CWModalFooter>
+        <CWButton
+          label="Cancel"
+          buttonType="secondary"
+          buttonHeight="sm"
+          onClick={onModalClose}
+        />
+        <CWButton
+          buttonType="primary"
+          buttonHeight="sm"
+          onClick={handleSave}
+          label="Save"
+        />
+      </CWModalFooter>
     </div>
   );
 };

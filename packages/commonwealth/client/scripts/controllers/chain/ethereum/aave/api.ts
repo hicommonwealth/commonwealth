@@ -1,22 +1,14 @@
-import BN from 'bn.js';
 import type {
   AaveTokenV2,
   Executor,
-  GovernanceStrategy,
   IAaveGovernanceV2,
-} from 'common-common/src/eth/types';
-import {
-  Executor__factory,
-  GovernanceStrategy__factory,
-} from 'common-common/src/eth/types';
+} from '@hicommonwealth/chains';
+import { Executor__factory } from '@hicommonwealth/chains';
 import ContractApi from 'controllers/chain/ethereum/contractApi';
 
 export interface AaveExecutor {
   contract: Executor;
   address: string;
-  gracePeriod: number;
-  voteDifferential: BN;
-  minimumQuorum: BN;
   delay: number;
 }
 
@@ -26,29 +18,16 @@ export default class AaveApi extends ContractApi<IAaveGovernanceV2> {
     return this._Governance;
   }
 
-  private _Strategy: GovernanceStrategy;
-  public get Strategy() {
-    return this._Strategy;
-  }
-
   private _Token: AaveTokenV2;
   public get Token() {
     return this._Token;
   }
 
+  private _aaveExecutorsInitialized = false;
   private _Executors: AaveExecutor[];
-  public get Executors() {
-    return this._Executors;
-  }
 
-  public getExecutor(executorAddress: string): AaveExecutor {
-    return this.Executors.find((ex) => ex.address === executorAddress);
-  }
-
-  public async init() {
-    console.log('aave initApi()');
-    await super.init();
-    this._Governance = this.Contract;
+  public async getAaveExecutors(): Promise<AaveExecutor[]> {
+    if (this._aaveExecutorsInitialized) return this._Executors;
 
     // fetch executors from governance via historical filter query
     const executorAuthFilter = this.Governance.filters.ExecutorAuthorized(null);
@@ -62,36 +41,52 @@ export default class AaveApi extends ContractApi<IAaveGovernanceV2> {
       if (isValid) {
         const executor = Executor__factory.connect(
           address,
-          this.Contract.provider
+          this.Contract.provider,
         );
         await executor.deployed();
 
-        // fetch constants
-        const gracePeriod = +(await executor.GRACE_PERIOD());
-        const minimumQuorum = new BN(
-          (await executor.MINIMUM_QUORUM()).toString()
-        );
-        const voteDifferential = new BN(
-          (await executor.VOTE_DIFFERENTIAL()).toString()
-        );
         const delay = +(await executor.getDelay());
         this._Executors.push({
           contract: executor,
           address: executor.address,
-          gracePeriod,
-          minimumQuorum,
-          voteDifferential,
           delay,
         });
+
+        if (!this.deployedExecutors[executor.address]) {
+          this.deployedExecutors[executor.address] = executor;
+        }
       }
     }
 
-    // fetch strategy from governance
-    const strategyAddress = await this.Governance.getGovernanceStrategy();
-    this._Strategy = GovernanceStrategy__factory.connect(
-      strategyAddress,
-      this.Contract.provider
-    );
-    await this._Strategy.deployed();
+    this._aaveExecutorsInitialized = true;
+    return this._Executors;
+  }
+
+  private deployedExecutors: { [address: string]: Executor } = {};
+  public async getDeployedExecutor(executorAddress: string): Promise<Executor> {
+    if (this.deployedExecutors[executorAddress]) {
+      return this.deployedExecutors[executorAddress];
+    } else {
+      const isValid = await this.Governance.isExecutorAuthorized(
+        executorAddress,
+      );
+      if (isValid) {
+        const executor = Executor__factory.connect(
+          executorAddress,
+          this.Contract.provider,
+        );
+        const deployedExecutor = await executor.deployed();
+        this.deployedExecutors[executorAddress] = deployedExecutor;
+        return deployedExecutor;
+      } else {
+        console.error('Executor is not authorized');
+      }
+    }
+  }
+
+  public async init() {
+    console.log('aave initApi()');
+    await super.init();
+    this._Governance = this.Contract;
   }
 }

@@ -1,38 +1,25 @@
-import React, { useState, useEffect, useMemo } from 'react';
-
-import BN from 'bn.js';
-
-import 'components/Comments/CreateComment.scss';
+import { ContentType } from '@hicommonwealth/core';
 import { notifyError } from 'controllers/app/notifications';
-import { weiToTokens, getDecimals } from 'helpers';
-import type { DeltaStatic } from 'quill';
-import Thread from '../../../models/Thread';
-
-import app from 'state';
-import { ContentType } from 'types';
-import { User } from 'views/components/user/user';
-import { CWButton } from '../component_kit/new_designs/cw_button';
-import { CWText } from '../component_kit/cw_text';
-import { CWValidationText } from '../component_kit/cw_validation_text';
-import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
-import {
-  createDeltaFromText,
-  getTextFromDelta,
-  ReactQuillEditor,
-} from '../react_quill_editor';
-import { serializeDelta } from '../react_quill_editor/utils';
+import { SessionKeyError } from 'controllers/server/sessions';
 import { useDraft } from 'hooks/useDraft';
+import type { DeltaStatic } from 'quill';
+import React, { useEffect, useMemo, useState } from 'react';
+import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
-import Permissions from '../../../utils/Permissions';
-import clsx from 'clsx';
-import { getTokenBalance } from 'helpers/token_balance_helper';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
+import Thread from '../../../models/Thread';
+import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
+import { createDeltaFromText, getTextFromDelta } from '../react_quill_editor';
+import { serializeDelta } from '../react_quill_editor/utils';
+import { ArchiveMsg } from './ArchiveMsg';
+import { CommentEditor } from './CommentEditor';
 
 type CreateCommentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
   parentCommentId?: number;
   rootThread: Thread;
   canComment: boolean;
-  shouldFocusEditor?: boolean;
+  tooltipText?: string;
 };
 
 export const CreateComment = ({
@@ -40,12 +27,12 @@ export const CreateComment = ({
   parentCommentId,
   rootThread,
   canComment,
-  shouldFocusEditor = false,
+  tooltipText = '',
 }: CreateCommentProps) => {
   const { saveDraft, restoreDraft, clearDraft } = useDraft<DeltaStatic>(
     !parentCommentId
       ? `new-thread-comment-${rootThread.id}`
-      : `new-comment-reply-${parentCommentId}`
+      : `new-comment-reply-${parentCommentId}`,
   );
 
   // get restored draft on init
@@ -58,53 +45,39 @@ export const CreateComment = ({
 
   const [sendingComment, setSendingComment] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [tokenPostingThreshold, setTokenPostingThreshold] = useState(
-    new BN('0')
-  );
-  const [userBalance, setUserBalance] = useState(new BN('0'));
-  const [balanceLoading, setBalanceLoading] = useState(false);
+
   const editorValue = getTextFromDelta(contentDelta);
 
   const author = app.user.activeAccount;
 
   const parentType = parentCommentId ? ContentType.Comment : ContentType.Thread;
-  const activeTopic = rootThread instanceof Thread ? rootThread?.topic : null;
 
-  useEffect(() => {
-    activeTopic?.id &&
-      setTokenPostingThreshold(app.chain.getTopicThreshold(activeTopic?.id));
-  }, [activeTopic]);
-
-  useEffect(() => {
-    if (!tokenPostingThreshold.isZero() && !balanceLoading) {
-      setBalanceLoading(true);
-      if (!app.user.activeAccount?.tokenBalance) {
-        getTokenBalance().then(() => {
-          setUserBalance(app.user.activeAccount?.tokenBalance);
-        });
-      } else {
-        setUserBalance(app.user.activeAccount?.tokenBalance);
-      }
-    }
-  }, [tokenPostingThreshold]);
-
-  const { mutateAsync: createComment } = useCreateCommentMutation({
+  const {
+    mutateAsync: createComment,
+    error: createCommentError,
+    reset: resetCreateCommentMutation,
+  } = useCreateCommentMutation({
     threadId: rootThread.id,
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     existingNumberOfComments: rootThread.numberOfComments || 0,
+  });
+
+  const { RevalidationModal } = useSessionRevalidationModal({
+    handleClose: resetCreateCommentMutation,
+    error: createCommentError,
   });
 
   const handleSubmitComment = async () => {
     setErrorMsg(null);
     setSendingComment(true);
 
-    const chainId = app.activeChainId();
+    const communityId = app.activeChainId();
 
     try {
       const newComment: any = await createComment({
         threadId: rootThread.id,
-        chainId: chainId,
-        address: author.address,
+        communityId,
+        address: app.user.activeAccount.address,
         parentCommentId: parentCommentId,
         unescapedText: serializeDelta(contentDelta),
         existingNumberOfComments: rootThread.numberOfComments || 0,
@@ -123,8 +96,13 @@ export const CreateComment = ({
       // once we are receiving notifications from the websocket
       await app.user.notifications.refresh();
     } catch (err) {
-      const errMsg = err?.responseJSON?.error || 'Failed to create comment';
-      notifyError(errMsg);
+      if (err instanceof SessionKeyError) {
+        return;
+      }
+      const errMsg = err?.responseJSON?.error || err?.message;
+      console.error(errMsg);
+
+      notifyError('Failed to create comment');
       setErrorMsg(errMsg);
     } finally {
       setSendingComment(false);
@@ -135,17 +113,9 @@ export const CreateComment = ({
     }
   };
 
-  const userFailsThreshold = app.chain.isGatedTopic(activeTopic?.id);
-  const isAdmin = Permissions.isCommunityAdmin();
-  const disabled =
-    editorValue.length === 0 ||
-    sendingComment ||
-    userFailsThreshold ||
-    !canComment;
+  const disabled = editorValue.length === 0 || sendingComment;
 
-  const decimals = getDecimals(app.chain);
-
-  const cancel = (e) => {
+  const handleCancel = (e) => {
     e.preventDefault();
     setContentDelta(createDeltaFromText(''));
     if (handleIsReplying) {
@@ -160,56 +130,28 @@ export const CreateComment = ({
   }, [handleIsReplying, saveDraft, contentDelta]);
 
   return (
-    <div className="CreateComment">
-      <div className="attribution-row">
-        <div className="attribution-left-content">
-          <CWText type="caption">
-            {parentType === ContentType.Comment ? 'Reply as' : 'Comment as'}
-          </CWText>
-          <CWText
-            type="caption"
-            fontWeight="medium"
-            className={clsx('user-link-text', { disabled: !canComment })}
-          >
-            <User user={author} hideAvatar linkify />
-          </CWText>
-        </div>
-        {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
-      </div>
-      <ReactQuillEditor
-        className="editor"
-        contentDelta={contentDelta}
-        setContentDelta={setContentDelta}
-        isDisabled={!canComment}
-        tooltipLabel="Join community to comment"
-        shouldFocus={shouldFocusEditor}
-      />
-      {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
-        <CWText className="token-req-text">
-          Commenting in {activeTopic?.name} requires{' '}
-          {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
-          {app.chain.meta.default_symbol}.{' '}
-          {userBalance && (
-            <>
-              You have {weiToTokens(userBalance.toString(), decimals)}{' '}
-              {app.chain.meta.default_symbol}.
-            </>
-          )}
-        </CWText>
-      )}
-      <div className="form-bottom">
-        <div className="form-buttons">
-          {editorValue.length > 0 && (
-            <CWButton buttonType="tertiary" onClick={cancel} label="Cancel" />
-          )}
-          <CWButton
-            buttonWidth="wide"
-            disabled={disabled && !isAdmin}
-            onClick={handleSubmitComment}
-            label="Submit"
+    <>
+      {rootThread.archivedAt === null ? (
+        <>
+          <CommentEditor
+            parentType={parentType}
+            canComment={canComment}
+            handleSubmitComment={handleSubmitComment}
+            errorMsg={errorMsg}
+            contentDelta={contentDelta}
+            setContentDelta={setContentDelta}
+            disabled={disabled}
+            onCancel={handleCancel}
+            author={author}
+            editorValue={editorValue}
+            shouldFocus
+            tooltipText={tooltipText}
           />
-        </div>
-      </div>
-    </div>
+          {RevalidationModal}
+        </>
+      ) : (
+        <ArchiveMsg archivedAt={rootThread.archivedAt} />
+      )}
+    </>
   );
 };

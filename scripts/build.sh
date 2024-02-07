@@ -1,11 +1,14 @@
-if [ "$CE_BUILD" = true ]; then
-  yarn --cwd packages/chain-events build-services
-elif [ "$CW_BUILD" = true ]; then
-  yarn --cwd packages/commonwealth build-all
-elif [ "$SL_BUILD" = true ]; then
-  yarn --cwd packages/snapshot-listener build
+#! /bin/bash
+
+# Exit immediately if a command exits with a non-zero status.
+set -e
+
+# build
+if [ "$SL_BUILD" = true ]; then
+  yarn workspace snapshot-listener build
 elif [ "$DL_BUILD" = true ]; then
-  yarn --cwd packages/discord-bot build
+  yarn workspace discord-bot build
 else
-  yarn --cwd packages/chain-events build-services && yarn --cwd packages/commonwealth build
+  NODE_OPTIONS=--max_old_space_size=4096 yarn workspace commonwealth bundle
+  yarn workspace commonwealth build
 fi

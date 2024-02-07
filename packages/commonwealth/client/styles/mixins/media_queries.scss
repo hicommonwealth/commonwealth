@@ -28,6 +28,12 @@
   }
 }
 
+@mixin mediumSmallMid {
+  @media only screen and (max-width: $breakpoint-medium-small-mid-px) {
+    @content;
+  }
+}
+
 @mixin mediumSmall {
   @media only screen and (min-width: $breakpoint-medium-small-min-px) and (max-width: $breakpoint-medium-small-max-px) {
     @content;
@@ -48,6 +54,12 @@
 
 @mixin extraSmall {
   @media only screen and (max-width: $breakpoint-extra-small-max-px) {
+    @content;
+  }
+}
+
+@mixin heightSmallInclusive {
+  @media only screen and (max-height: $breakpoint-height-small-max) {
     @content;
   }
 }

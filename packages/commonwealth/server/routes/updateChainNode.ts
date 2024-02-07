@@ -1,10 +1,10 @@
-import type { RabbitMQController } from 'common-common/src/rabbitmq';
+import type { RabbitMQController } from '@hicommonwealth/adapters';
+import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-import type { DB } from '../models';
 import { success } from '../types';
 
 const Errors = {
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
   NotAdmin: 'Not an admin',
   NoChainNodeId: 'Must provide chain node ID',
   noChainNodeFound: 'ChainNode not found',
@@ -15,7 +15,7 @@ const updateChainNode = async (
   rabbitMQController: RabbitMQController,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.id) return next(new Error(Errors.NoChainNodeId));

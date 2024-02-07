@@ -1,16 +1,16 @@
+import { AppError } from '@hicommonwealth/core';
 import AWS from 'aws-sdk';
-import { AppError } from 'common-common/src/errors';
 
+import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
-import type { DB } from '../models';
 
 AWS.config.update({
   signatureVersion: 'v4',
 });
 
 export const Errors = {
-  NotLoggedIn: 'Must be logged in',
+  NotLoggedIn: 'Must be signed in',
   MissingParams: 'Must specify name and mimetype',
   ImageType: 'Can only upload JPG, PNG, GIF, and WEBP images',
 };
@@ -19,7 +19,7 @@ const getUploadSignature = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.user) {
     return next(new AppError(Errors.NotLoggedIn));
@@ -32,7 +32,7 @@ const getUploadSignature = async (
   const contentType = req.body.mimetype;
   if (
     ['image/gif', 'image/png', 'image/jpeg', 'image/webp'].indexOf(
-      contentType
+      contentType,
     ) === -1
   ) {
     return next(new AppError(Errors.ImageType));

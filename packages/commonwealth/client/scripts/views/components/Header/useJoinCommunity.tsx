@@ -1,19 +1,20 @@
-import app from 'state';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { addressSwapper } from 'utils';
+import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
 import {
   linkExistingAddressToChainOrCommunity,
   setActiveAccount,
 } from 'controllers/app/login';
-import AddressInfo from 'models/AddressInfo';
 import { isSameAccount } from 'helpers';
-import ITokenAdapter from 'models/ITokenAdapter';
+import { featureFlags } from 'helpers/feature-flags';
+import AddressInfo from 'models/AddressInfo';
 import React, { useState } from 'react';
-import { Modal } from 'views/components/component_kit/cw_modal';
-import { AccountSelector } from 'views/components/component_kit/cw_wallets_list';
+import app from 'state';
+import { addressSwapper } from 'utils';
 import { TOSModal } from 'views/components/Header/TOSModal';
-import { LoginModal } from 'views/modals/login_modal';
+import { AccountSelector } from 'views/components/component_kit/cw_wallets_list';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
+import { LoginModal } from 'views/modals/login_modal';
+import { AuthModal } from '../../modals/AuthModal';
+import { CWModal } from '../component_kit/new_designs/CWModal';
 
 const NON_INTEROP_NETWORKS = [ChainNetwork.AxieInfinity];
 
@@ -21,12 +22,12 @@ const useJoinCommunity = () => {
   const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] =
     useState(false);
   const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const activeChainInfo = app.chain?.meta;
   const activeBase = activeChainInfo?.base;
   const hasTermsOfService = !!activeChainInfo?.terms;
-  const activeChainId = activeChainInfo?.id;
+  const activeCommunityId = activeChainInfo?.id;
 
   const samebaseAddresses = app.user.addresses.filter((a, idx) => {
     // if no active chain, add all addresses
@@ -35,7 +36,7 @@ const useJoinCommunity = () => {
     }
 
     // add all items on same base as active chain
-    const addressChainInfo = app.config.chains.getById(a.chain.id);
+    const addressChainInfo = app.config.chains.getById(a.community.id);
     if (addressChainInfo?.base !== activeBase) {
       return false;
     }
@@ -44,7 +45,8 @@ const useJoinCommunity = () => {
     const addressExists = !!app.user.addresses.slice(idx + 1).find(
       (prev) =>
         activeBase === ChainBase.Substrate &&
-        (app.config.chains.getById(prev.chain.id)?.base === ChainBase.Substrate
+        (app.config.chains.getById(prev.community.id)?.base ===
+        ChainBase.Substrate
           ? addressSwapper({
               address: prev.address,
               currentPrefix: 42,
@@ -53,7 +55,7 @@ const useJoinCommunity = () => {
               address: a.address,
               currentPrefix: 42,
             })
-          : prev.address === a.address)
+          : prev.address === a.address),
     );
 
     if (addressExists) {
@@ -79,7 +81,7 @@ const useJoinCommunity = () => {
         return true;
       }
       return false;
-    }
+    },
   );
 
   const performJoinCommunityLinking = async () => {
@@ -94,7 +96,7 @@ const useJoinCommunity = () => {
     ) {
       await linkToCommunity(0);
     } else {
-      setIsLoginModalOpen(true);
+      setIsAuthModalOpen(true);
     }
   };
 
@@ -104,51 +106,54 @@ const useJoinCommunity = () => {
 
     if (originAddressInfo) {
       try {
-        const targetChain = activeChainId || originAddressInfo.chain.id;
+        const targetCommunity =
+          activeCommunityId || originAddressInfo.community.id;
 
         const address = originAddressInfo.address;
 
         const res = await linkExistingAddressToChainOrCommunity(
           address,
-          targetChain,
-          originAddressInfo.chain.id
+          targetCommunity,
+          originAddressInfo.community.id,
         );
 
         if (res && res.result) {
           const { verification_token, addresses, encodedAddress } = res.result;
           app.user.setAddresses(
             addresses.map((a) => {
-              return new AddressInfo(
-                a.id,
-                a.address,
-                a.chain,
-                a.keytype,
-                a.wallet_id
-              );
-            })
+              return new AddressInfo({
+                id: a.id,
+                address: a.address,
+                chainId: a.community_id,
+                keytype: a.keytype,
+                walletId: a.wallet_id,
+              });
+            }),
           );
           const addressInfo = app.user.addresses.find(
-            (a) => a.address === encodedAddress && a.chain.id === targetChain
+            (a) =>
+              a.address === encodedAddress &&
+              a.community.id === targetCommunity,
           );
 
           const account = app.chain.accounts.get(
             encodedAddress,
-            addressInfo.keytype
+            addressInfo.keytype,
           );
           if (app.chain) {
             account.setValidationToken(verification_token);
             console.log('setting validation token');
           }
           if (
-            activeChainId &&
+            activeCommunityId &&
             !app.roles.getRoleInCommunity({
               account,
-              chain: activeChainId,
+              community: activeCommunityId,
             })
           ) {
             await app.roles.createRole({
               address: addressInfo,
-              chain: activeChainId,
+              community: activeCommunityId,
             });
           }
           await setActiveAccount(account);
@@ -157,16 +162,11 @@ const useJoinCommunity = () => {
               .length === 0
           ) {
             app.user.setActiveAccounts(
-              app.user.activeAccounts.concat([account])
+              app.user.activeAccounts.concat([account]),
             );
           }
         } else {
           // Todo: handle error
-        }
-
-        // If token forum make sure has token and add to app.chain obj
-        if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
-          await app.chain.activeAddressHasToken(app.user.activeAccount.address);
         }
       } catch (err) {
         console.error(err);
@@ -181,7 +181,7 @@ const useJoinCommunity = () => {
       (app.user.activeAccount?.address?.slice(0, 3) === 'inj' &&
         app.chain?.meta.id !== 'injective')
     ) {
-      setIsLoginModalOpen(true);
+      setIsAuthModalOpen(true);
     } else {
       if (hasTermsOfService) {
         setIsTOSModalOpen(true);
@@ -192,7 +192,8 @@ const useJoinCommunity = () => {
   };
 
   const AccountSelectorModal = (
-    <Modal
+    <CWModal
+      size="small"
       content={
         <AccountSelector
           accounts={sameBaseAddressesRemoveDuplicates.map((addressInfo) => ({
@@ -213,7 +214,8 @@ const useJoinCommunity = () => {
   );
 
   const TermsOfServiceModal = (
-    <Modal
+    <CWModal
+      size="medium"
       content={
         <TOSModal
           onAccept={async () => {
@@ -229,12 +231,23 @@ const useJoinCommunity = () => {
   );
 
   const LoginModalWrapper = (
-    <Modal
-      content={<LoginModal onModalClose={() => setIsLoginModalOpen(false)} />}
-      isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-      onClose={() => setIsLoginModalOpen(false)}
-      open={isLoginModalOpen}
-    />
+    <>
+      {!featureFlags.newSignInModal ? (
+        <CWModal
+          content={
+            <LoginModal onModalClose={() => setIsAuthModalOpen(false)} />
+          }
+          isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
+          onClose={() => setIsAuthModalOpen(false)}
+          open={isAuthModalOpen}
+        />
+      ) : (
+        <AuthModal
+          onClose={() => setIsAuthModalOpen(false)}
+          isOpen={isAuthModalOpen}
+        />
+      )}
+    </>
   );
 
   const JoinCommunityModals = (

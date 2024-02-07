@@ -2,7 +2,7 @@ import type { SessionPayload } from '@canvas-js/interfaces';
 import type { AccountData, OfflineDirectSigner } from '@cosmjs/proto-signing';
 import type { ChainInfo, Window as KeplrWindow } from '@keplr-wallet/types';
 
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
 import app from 'state';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
@@ -11,6 +11,8 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
   interface Window extends KeplrWindow {}
 }
+
+export const COSMOS_EVM_CHAINS = ['evmos', 'injective', 'evmos-dev'];
 
 class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   // GETTERS/SETTERS
@@ -24,7 +26,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   public readonly label = 'Keplr';
   public readonly chain = ChainBase.CosmosSDK;
   public readonly defaultNetwork = ChainNetwork.Evmos;
-  public readonly specificChains = ['evmos', 'injective', 'evmos-dev'];
+  public readonly specificChains = COSMOS_EVM_CHAINS;
 
   public get available() {
     return !!window.keplr;
@@ -71,15 +73,15 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
 
   public async signCanvasMessage(
     account: Account,
-    canvasMessage: SessionPayload
+    canvasSessionPayload: SessionPayload,
   ): Promise<string> {
     const keplr = await import('@keplr-wallet/types');
     const canvas = await import('@canvas-js/interfaces');
     const signature = await window.keplr.signEthereum(
       this._chainId,
       account.address,
-      canvas.serializeSessionPayload(canvasMessage),
-      keplr.EthSignType.MESSAGE
+      canvas.serializeSessionPayload(canvasSessionPayload),
+      keplr.EthSignType.MESSAGE,
     );
     return `0x${Buffer.from(signature).toString('hex')}`;
   }
@@ -97,7 +99,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
     this._enabling = true;
     try {
       // fetch chain id from URL using stargate client
-      const url = `${window.location.origin}/cosmosAPI/${app.chain.id}`;
+      const url = `${window.location.origin}/cosmosAPI/${app.chain.network}`;
       const cosm = await import('@cosmjs/stargate');
       const client = await cosm.StargateClient.connect(url);
       const chainId = await client.getChainId();
@@ -108,10 +110,10 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
         await window.keplr.enable(this._chainId);
       } catch (err) {
         console.log(
-          `Failed to enable chain: ${err.message}. Trying experimentalSuggestChain...`
+          `Failed to enable chain: ${err.message}. Trying experimentalSuggestChain...`,
         );
 
-        const bech32Prefix = app.chain.meta.bech32Prefix;
+        const bech32Prefix = app.chain.meta.bech32Prefix?.toLowerCase();
         const info: ChainInfo = {
           chainId: this._chainId,
           chainName: app.chain.meta.name,

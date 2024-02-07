@@ -1,12 +1,12 @@
+import { AppError } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import type {
   TypedRequestBody,
   TypedRequestQuery,
   TypedResponse,
 } from 'server/types';
-import { success } from '../types';
-import type { DB } from '../models';
-import { AppError } from '../../../common-common/src/errors';
 import isValidJson from '../../shared/validateJson';
+import { success } from '../types';
 import { validateOwner } from '../util/validateOwner';
 
 type CreateTemplateAndMetadataReq = {
@@ -30,7 +30,7 @@ type DeleteTemplateAndMetadataReq = {
 export async function createTemplate(
   models: DB,
   req: TypedRequestBody<CreateTemplateAndMetadataReq>,
-  res: TypedResponse<CreateTemplateAndMetadataResp>
+  res: TypedResponse<CreateTemplateAndMetadataResp>,
 ) {
   const {
     contract_id,
@@ -45,9 +45,9 @@ export async function createTemplate(
   const isAdmin = await validateOwner({
     models: models,
     user: req.user,
-    chainId: chain_id,
+    communityId: chain_id,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError('Must be admin');
@@ -106,7 +106,7 @@ type getTemplateAndMetadataResp = {
 export async function getTemplates(
   models: DB,
   req: TypedRequestQuery<getTemplateAndMetadataReq>,
-  res: TypedResponse<getTemplateAndMetadataResp>
+  res: TypedResponse<getTemplateAndMetadataResp>,
 ) {
   const { contract_id } = req.query;
 
@@ -166,7 +166,7 @@ export async function getTemplates(
 export async function deleteTemplate(
   models: DB,
   req: TypedRequestBody<DeleteTemplateAndMetadataReq>,
-  res: TypedResponse<{ message: string }>
+  res: TypedResponse<{ message: string }>,
 ) {
   const { template_id } = req.body;
 

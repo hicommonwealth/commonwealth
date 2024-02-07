@@ -7,7 +7,6 @@ import useSidebarStore from 'state/ui/sidebar';
 import { MobileMenuName } from 'views/AppMobileMenus';
 import { useCommonNavigate } from 'navigation/helpers';
 import { NavigateOptions, To } from 'react-router';
-import { featureFlags } from 'helpers/feature-flags';
 
 export const getMainMenuItems = (
   setMobileMenuName: (name: MobileMenuName) => void,
@@ -18,36 +17,22 @@ export const getMainMenuItems = (
       ? [
           {
             label: 'Create',
-            iconLeft: featureFlags.sessionKeys
-              ? 'plusCirclePhosphor'
-              : 'plusCircle',
+            iconLeft: 'plusCirclePhosphor',
             iconRight: 'chevronRight',
             onClick: () => setMobileMenuName('CreateContentMenu'),
           },
         ]
       : []) as Array<MenuItem>),
-    ...((featureFlags.sessionKeys
-      ? [
-          {
-            label: 'Explore communities',
-            iconLeft: 'compassPhosphor',
-            onClick: () => navigate('/communities', {}, null),
-          },
-          {
-            label: 'Help',
-            iconLeft: 'question',
-            onClick: () =>
-              window.open('https://docs.commonwealth.im/commonwealth/'),
-          },
-        ]
-      : [
-          {
-            label: 'Help',
-            iconLeft: 'help',
-            iconRight: 'chevronRight',
-            onClick: () => setMobileMenuName('HelpMenu'),
-          },
-        ]) as Array<MenuItem>),
+    {
+      label: 'Explore communities',
+      iconLeft: 'compassPhosphor',
+      onClick: () => navigate('/communities', {}, null),
+    },
+    {
+      label: 'Help',
+      iconLeft: 'question',
+      onClick: () => window.open('https://docs.commonwealth.im/commonwealth/'),
+    },
     ...((app.isLoggedIn()
       ? [
           {

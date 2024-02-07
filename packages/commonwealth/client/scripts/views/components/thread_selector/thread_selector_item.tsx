@@ -1,10 +1,10 @@
 import React from 'react';
-import NewProfilesController from '../../../controllers/server/newProfiles';
-import type Thread from '../../../models/Thread';
 import app from 'state';
+import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
+import { formatAddressShort } from 'utils';
 import { CWCheck } from 'views/components/component_kit/cw_icons/cw_icons';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { formatAddressShort } from 'utils';
+import type Thread from '../../../models/Thread';
 
 interface ThreadSelectorItemProps {
   thread: Thread;
@@ -17,10 +17,16 @@ export const ThreadSelectorItem = ({
   onClick,
   isSelected,
 }: ThreadSelectorItemProps) => {
-  const author = NewProfilesController.Instance.getProfile(
-    thread.authorChain,
-    thread.author
-  );
+  const { data: users } = useFetchProfilesByAddressesQuery({
+    profileChainIds: [(thread?.authorChain as any)?.id || thread?.authorChain],
+    profileAddresses: [thread?.author],
+    currentChainId: app.activeChainId(),
+    apiCallEnabled: !!(
+      ((thread?.authorChain as any)?.id || thread?.authorChain) &&
+      thread?.author
+    ),
+  });
+  const author = users?.[0];
 
   return (
     <div className="thread-selector-item-row" onClick={() => onClick(thread)}>
@@ -30,9 +36,9 @@ export const ThreadSelectorItem = ({
           {thread.title}
         </CWText>
         <CWText type="caption">
-          {author.name
-            ? `${author.name} • ${formatAddressShort(thread.author)}`
-            : thread.author}
+          {author?.name
+            ? `${author?.name} • ${formatAddressShort(thread?.author)}`
+            : thread?.author}
         </CWText>
       </div>
     </div>

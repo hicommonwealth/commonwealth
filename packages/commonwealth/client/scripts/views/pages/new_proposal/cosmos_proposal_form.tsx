@@ -1,23 +1,31 @@
-import React, { useState } from 'react';
 import type { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
+import React, { useState } from 'react';
 
 import { notifyError } from 'controllers/app/notifications';
 import type CosmosAccount from 'controllers/chain/cosmos/account';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
-import { CosmosToken } from 'controllers/chain/cosmos/types';
 import {
   encodeCommunitySpend,
   encodeTextProposal,
 } from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
+import { CosmosToken } from 'controllers/chain/cosmos/types';
+import {
+  useDepositParamsQuery,
+  useStakingParamsQuery,
+} from 'state/api/chainParams';
 
+import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
+import {
+  minimalToNaturalDenom,
+  naturalDenomToMinimal,
+} from '../../../../../shared/utils';
+import { Skeleton } from '../../components/Skeleton';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWTextArea } from '../../components/component_kit/cw_text_area';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { useCommonNavigate } from 'navigation/helpers';
 
 export const CosmosProposalForm = () => {
   const [cosmosProposalType, setCosmosProposalType] = useState<
@@ -33,10 +41,17 @@ export const CosmosProposalForm = () => {
 
   const author = app.user.activeAccount as CosmosAccount;
   const cosmos = app.chain as Cosmos;
+  const meta = cosmos.meta;
 
-  return !cosmos.governance.initialized ? (
-    <CWSpinner />
-  ) : (
+  const { data: stakingDenom } = useStakingParamsQuery();
+  const { data: depositParams, isLoading: isLoadingDepositParams } =
+    useDepositParamsQuery(stakingDenom);
+
+  const minDeposit = parseFloat(
+    minimalToNaturalDenom(+depositParams?.minDeposit, meta?.decimals)
+  );
+
+  return (
     <>
       <CWLabel label="Proposal Type" />
       <CWRadioGroup
@@ -64,15 +79,21 @@ export const CosmosProposalForm = () => {
         onInput={(e) => {
           setDescription(e.target.value);
         }}
+        value={description}
+        resizeWithText
       />
-      <CWTextInput
-        label={`Deposit (${cosmos.governance.minDeposit?.denom})`}
-        placeholder={`Min: ${+cosmos.governance.minDeposit}`}
-        defaultValue={+cosmos.governance.minDeposit}
-        onInput={(e) => {
-          setDeposit(+e.target.value);
-        }}
-      />
+      {isLoadingDepositParams ? (
+        <Skeleton className="TextInput" style={{ height: 62 }} />
+      ) : (
+        <CWTextInput
+          label={`Deposit (${meta?.default_symbol})`}
+          placeholder={`Min: ${minDeposit}`}
+          defaultValue={minDeposit}
+          onInput={(e) => {
+            setDeposit(+e.target.value);
+          }}
+        />
+      )}
       {cosmosProposalType !== 'textProposal' && (
         <CWTextInput
           label="Recipient"
@@ -83,9 +104,9 @@ export const CosmosProposalForm = () => {
           }}
         />
       )}
-      {cosmosProposalType !== 'textProposal' && (
+      {cosmosProposalType === 'communitySpend' && (
         <CWTextInput
-          label={`Amount (${cosmos.governance.minDeposit?.denom})`}
+          label={`Amount (${meta?.default_symbol})`}
           placeholder="12345"
           defaultValue=""
           onInput={(e) => {
@@ -100,23 +121,32 @@ export const CosmosProposalForm = () => {
 
           let prop: ProtobufAny;
 
+          const depositInMinimalDenom = naturalDenomToMinimal(
+            deposit,
+            meta?.decimals
+          );
+
           const _deposit = deposit
             ? new CosmosToken(
-                cosmos.governance.minDeposit?.denom,
-                deposit,
+                depositParams?.minDeposit?.denom,
+                depositInMinimalDenom,
                 false
               )
-            : cosmos.governance.minDeposit;
+            : depositParams?.minDeposit;
 
           if (cosmosProposalType === 'textProposal') {
             prop = encodeTextProposal(title, description);
           } else if (cosmosProposalType === 'communitySpend') {
+            const spendAmountInMinimalDenom = naturalDenomToMinimal(
+              payoutAmount,
+              meta?.decimals
+            );
             prop = encodeCommunitySpend(
               title,
               description,
               recipient,
-              payoutAmount.toString(),
-              cosmos.governance.minDeposit?.denom
+              spendAmountInMinimalDenom,
+              depositParams?.minDeposit?.denom
             );
           } else {
             throw new Error('Unknown Cosmos proposal type.');

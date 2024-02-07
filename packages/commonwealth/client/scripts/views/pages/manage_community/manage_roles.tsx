@@ -1,18 +1,15 @@
-import React from 'react';
-
+import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
-
+import { featureFlags } from 'helpers/feature-flags';
+import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/manage_community/manage_roles.scss';
-
+import React from 'react';
 import app from 'state';
 import { User } from 'views/components/user/user';
-import AddressInfo from '../../../models/AddressInfo';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 import RoleInfo from '../../../models/RoleInfo';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWLabel } from '../../components/component_kit/cw_label';
-import { useCommonNavigate } from 'navigation/helpers';
-import { openConfirmation } from 'views/modals/confirmation_modal';
-import axios from 'axios';
 
 type ManageRoleRowProps = {
   label: string;
@@ -27,12 +24,12 @@ export const ManageRoles = ({
 }: ManageRoleRowProps) => {
   const navigate = useCommonNavigate();
 
-  const chainOrCommObj = { chain: app.activeChainId() };
+  const communityObj = { chain: app.activeChainId() };
 
   const removeRole = async (role: RoleInfo) => {
     try {
       const res = await axios.post(`${app.serverUrl()}/upgradeMember`, {
-        ...chainOrCommObj,
+        ...communityObj,
         new_role: 'member',
         address: role.Address.address,
         jwt: app.user.jwt,
@@ -45,7 +42,7 @@ export const ManageRoles = ({
       const newRole = res.data.result;
       onRoleUpdate(role, newRole);
     } catch (err) {
-      const errMsg = err.responseJSON?.error || 'Failed to alter role.';
+      const errMsg = err.response?.data?.error || 'Failed to alter role.';
       notifyError(errMsg);
     }
   };
@@ -53,10 +50,10 @@ export const ManageRoles = ({
   const handleDeleteRole = async (role: RoleInfo) => {
     const isSelf =
       role.Address.address === app.user.activeAccount?.address &&
-      role.chain_id === app.user.activeAccount?.chain.id;
+      role.chain_id === app.user.activeAccount?.community.id;
 
     const roleBelongsToUser = !!app.user.addresses.filter(
-      (addr_) => addr_.id === (role.address_id || role.Address.id)
+      (addr_) => addr_.id === (role.address_id || role.Address.id),
     ).length;
 
     const res = await axios.get(`${app.serverUrl()}/roles`, {
@@ -69,7 +66,7 @@ export const ManageRoles = ({
 
     const userAdminsAndMods = adminsAndMods.filter((role_) => {
       const belongsToUser = !!app.user.addresses.filter(
-        (addr_) => addr_.id === role_.address_id
+        (addr_) => addr_.id === role_.address_id,
       ).length;
       return belongsToUser;
     });
@@ -84,7 +81,7 @@ export const ManageRoles = ({
 
     const onlyModsRemaining = () => {
       const modCount = userAdminsAndMods.filter(
-        (r) => r.permission === 'moderator'
+        (r) => r.permission === 'moderator',
       ).length;
 
       const remainingRoleCount = userAdminsAndMods.length - 1;
@@ -108,17 +105,23 @@ export const ManageRoles = ({
       buttons: [
         {
           label: 'Remove',
-          buttonType: 'mini-red',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
           onClick: async () => {
             await removeRole(role);
             if (isLosingAdminPermissions) {
-              navigate(`/`);
+              navigate(
+                featureFlags.newAdminOnboardingEnabled
+                  ? '/manage/moderators'
+                  : '/',
+              );
             }
           },
         },
         {
           label: 'Cancel',
-          buttonType: 'mini-white',
+          buttonType: 'secondary',
+          buttonHeight: 'sm',
         },
       ],
     });
@@ -134,18 +137,11 @@ export const ManageRoles = ({
           return (
             <div className="role-row" key={addr.id}>
               <User
-                user={
-                  new AddressInfo(
-                    addr.id,
-                    addr.address,
-                    role.chain_id,
-                    null,
-                    addr.walletId
-                  )
-                } // role.Address, // make AddressInfo?
-                popover
-                linkify
-                hideAvatar
+                userAddress={addr.address}
+                userCommunityId={role.chain_id}
+                shouldShowPopover
+                shouldLinkProfile
+                shouldHideAvatar
               />
               <CWIcon
                 iconName="close"

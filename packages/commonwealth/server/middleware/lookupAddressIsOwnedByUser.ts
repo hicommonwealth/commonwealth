@@ -1,13 +1,20 @@
-// Helper function to look up an (address, author_chain) pair of parameters,
+// Helper function to look up an (address, author_community_id) pair of parameters,
 // and check that it's owned by the current user. Only for POST requests.
 
-import { Op } from 'sequelize';
-import type { DB } from '../models';
-import type { AddressInstance } from '../models/address';
-import type { UserInstance } from '../models/user';
+import type {
+  AddressAttributes,
+  AddressInstance,
+  DB,
+  UserInstance,
+} from '@hicommonwealth/model';
+import { Op, WhereOptions } from 'sequelize';
 
-type AddressChainReq = {
-  body?: { author_chain: string; address: string };
+type AddressCommunityRequest = {
+  body?: {
+    author_chain?: string; // obsolete
+    author_community_id?: string;
+    address: string;
+  };
   user?: UserInstance;
 };
 
@@ -16,12 +23,12 @@ type UnownedAddresses = { address: string } | { addressId: number };
 export const filterAddressOwnedByUser = async (
   models: DB,
   user_id: number,
-  chains: string[],
+  communityIds: string[],
   addresses: string[],
-  addressIds: number[]
+  addressIds: number[],
 ): Promise<{ owned: AddressInstance[]; unowned: UnownedAddresses[] }> => {
-  const where = {
-    chain: { [Op.in]: chains },
+  const where: WhereOptions<AddressAttributes> = {
+    community_id: { [Op.in]: communityIds },
     user_id,
   };
 
@@ -57,26 +64,23 @@ export const filterAddressOwnedByUser = async (
 
 const lookupAddressIsOwnedByUser = async (
   models: DB,
-  req: AddressChainReq
+  req: AddressCommunityRequest,
 ): Promise<[AddressInstance | null, string | null]> => {
   if (!req.user?.id) {
-    return [null, 'Not logged in'];
+    return [null, 'Not signed in'];
   }
-
-  if (!req.body?.author_chain) {
-    return [null, 'Must provide author chain'];
+  const authorCommunityId =
+    req.body?.author_chain || req.body?.author_community_id;
+  if (!authorCommunityId) {
+    return [null, 'Must provide author community ID'];
   }
 
   if (!req.body?.address) {
     return [null, 'Must provide an address'];
   }
 
-  const query: {
-    chain: string;
-    address: string;
-    user_id?: number;
-  } = {
-    chain: req.body.author_chain,
+  const query: WhereOptions<AddressAttributes> = {
+    community_id: authorCommunityId,
     address: req.body.address,
   };
 

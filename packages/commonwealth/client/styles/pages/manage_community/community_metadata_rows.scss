@@ -1,0 +1,155 @@
+@import '../../shared';
+
+.members-search-bar {
+  width: 100% !important;
+}
+
+.ChainMetadataRows {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+
+  .InputRow {
+    display: flex;
+    flex-direction: column;
+
+    textarea {
+      resize: none;
+    }
+  }
+
+  .AvatarUploadRow,
+  .ToggleRow {
+    display: flex;
+    flex-direction: column;
+
+    .toggle-and-label {
+      display: flex;
+      flex-direction: row;
+    }
+  }
+
+  .ToggleRow {
+    .toggle-and-caption {
+      align-items: center;
+      display: flex;
+      gap: 8px;
+    }
+  }
+
+  .tag-row {
+    display: flex;
+    flex-direction: column;
+
+    .tag-group {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+
+      > * {
+        margin-right: 8px;
+      }
+    }
+  }
+
+  .commonbot-section {
+    margin-top: 24px;
+    margin-bottom: 24px;
+
+    .save-snapshot {
+      margin-top: 24px;
+    }
+
+    .notifications-copy {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .connect-button {
+      margin-top: 8px;
+    }
+
+    .connected-line {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+
+      .connect-group {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        margin-left: 16px;
+      }
+    }
+
+    .ForumCaption {
+      margin-top: 8px;
+    }
+
+    .snapshot-settings {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .toggle-section {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 16px;
+    }
+
+    .settings-row {
+      display: flex;
+      flex-direction: column;
+      padding-top: 8px;
+      gap: 8px;
+
+      .spinner-group {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+    }
+  }
+
+  .directory-page-divider {
+    margin-block: 20px;
+  }
+}
+
+.DiscordForumConnections {
+  display: flex;
+  padding: 16px;
+  border: 1px solid $neutral-200;
+  border-radius: 4px;
+  flex-direction: column;
+  gap: 16px;
+
+  .CloseButton {
+    fill: $neutral-500;
+    cursor: pointer;
+    height: 20px;
+  }
+
+  .TopicRow {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+
+    .ChannelText {
+      color: $neutral-500;
+      width: 200px;
+    }
+
+    .HeaderText {
+      width: 200px;
+    }
+  }
+}

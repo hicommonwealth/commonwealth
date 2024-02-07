@@ -1,8 +1,5 @@
-import React from 'react';
-
 import 'components/user/user_gallery.scss';
-
-import app from 'state';
+import React from 'react';
 import Account from '../../../models/Account';
 import AddressInfo from '../../../models/AddressInfo';
 import { User } from './user';
@@ -20,9 +17,13 @@ type UserGalleryProps = {
 // The list of passed users must be unique to begin with, if one
 // wishes to prevent redundant rendering of avatars.
 
-export const UserGallery = (props: UserGalleryProps) => {
-  const { users, avatarSize, popover, addressesCount, maxUsers = 10 } = props;
-
+export const UserGallery = ({
+  users,
+  avatarSize,
+  popover,
+  addressesCount,
+  maxUsers = 10,
+}: UserGalleryProps) => {
   const userCount = users.length;
 
   const overflowUsers =
@@ -32,14 +33,16 @@ export const UserGallery = (props: UserGalleryProps) => {
     <div className="UserGallery">
       {users
         .slice(0, Math.min(userCount, maxUsers))
-        .map((user: Account | AddressInfo) => {
+        .map((user: Account | AddressInfo, index) => {
           return (
             <User
-              user={user}
-              avatarOnly
-              showAsDeleted
-              popover={popover}
+              userAddress={user.address}
+              userCommunityId={user.community?.id || user.profile?.chain}
+              shouldShowAvatarOnly
+              shouldShowAsDeleted
+              shouldShowPopover={popover}
               avatarSize={avatarSize}
+              key={index}
             />
           );
         })}

@@ -1,0 +1,29 @@
+{
+  "name": "commonwealth-canvas-node",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node ./node_modules/@canvas-js/cli/dist/index.js run contract.js --chain eip155:* --chain cosmos:* --chain solana:* --chain substrate:* --chain near:* --syncModule $PWD/syncModule.js",
+    "dev": "$(which -a canvas | tail -1) run contract.js --chain eip155:* --chain cosmos:* --chain solana:* --chain substrate:* --chain near:* --syncModule $PWD/syncModule.js"
+  },
+  "engines": {
+    "node": "18.x"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hicommonwealth/canvas-node.git"
+  },
+  "dependencies": {
+    "@canvas-js/core": "0.5.0-alpha4",
+    "@canvas-js/cli": "0.5.0-alpha4",
+    "chalk": "^5.2.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "http-status-codes": "^2.2.0",
+    "prompts": "^2.4.2",
+    "stoppable": "^1.1.0",
+    "ws": "^8.13.0",
+    "yargs": "^17.7.1"
+  }
+}

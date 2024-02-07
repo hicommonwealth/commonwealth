@@ -1,21 +1,37 @@
-import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
+/* eslint-disable react/no-multi-comp */
+import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { uuidv4 } from 'lib/util';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
+import { isMobile } from 'react-device-detect';
 import app from 'state';
-import { uuidv4 } from 'lib/util';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
+import type { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import {
+  handleIconClick,
+  handleMouseEnter,
+  handleMouseLeave,
+} from 'views/menus/utils';
+import Permissions from '../../utils/Permissions';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
-import type { PopoverMenuItem } from '../components/component_kit/cw_popover/cw_popover_menu';
-import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
-import { featureFlags } from 'helpers/feature-flags';
-import Permissions from '../../utils/Permissions';
+import { getClasses } from '../components/component_kit/helpers';
 
 const resetSidebarState = () => {
-  sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
+  //Bouncer pattern -- I have found isMobile does not always detect screen
+  //size when responsively resizing so added a redundancy with window.innerWidth
+  if (!isMobile || window.innerWidth > 425) return;
+
+  if (sidebarStore.getState().userToggledVisibility !== 'open') {
+    sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
+  } else {
+    sidebarStore.getState().setMenu({ name: 'default', isVisible: true });
+  }
 };
 
 const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
@@ -31,10 +47,6 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
     (app.chain?.base === ChainBase.Ethereum &&
       app.chain?.network === ChainNetwork.Aave) ||
     app.chain?.network === ChainNetwork.Compound;
-
-  const showSubstrateProposalItems =
-    app.chain?.base === ChainBase.Substrate &&
-    app.chain?.network !== ChainNetwork.Plasm;
 
   const getTemplateItems = (): PopoverMenuItem[] => {
     const contracts = app.contracts.getCommunityContracts();
@@ -93,42 +105,6 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
         ]
       : [];
 
-  const getSubstrateProposalItems = (): PopoverMenuItem[] =>
-    showSubstrateProposalItems
-      ? [
-          {
-            label: 'New treasury proposal',
-            onClick: () => {
-              resetSidebarState();
-              navigate('/new/proposal/:type', {
-                type: ProposalType.SubstrateTreasuryProposal,
-              });
-            },
-            iconLeft: 'treasuryProposal',
-          },
-          {
-            label: 'New democracy proposal',
-            onClick: () => {
-              resetSidebarState();
-              navigate('/new/proposal/:type', {
-                type: ProposalType.SubstrateDemocracyProposal,
-              });
-            },
-            iconLeft: 'democraticProposal',
-          },
-          {
-            label: 'New tip',
-            onClick: () => {
-              resetSidebarState();
-              navigate('/new/proposal/:type', {
-                type: ProposalType.SubstrateTreasuryTip,
-              });
-            },
-            iconLeft: 'jar',
-          },
-        ]
-      : [];
-
   const getSnapshotProposalItem = (): PopoverMenuItem[] =>
     showSnapshotOptions
       ? [
@@ -151,20 +127,15 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
       : [];
 
   const getUniversalCreateItems = (): PopoverMenuItem[] => [
-    // {
-    //   label: 'New Crowdfund',
-    //   iconLeft: 'wallet',
-    //   onClick: () => {
-
-    //   }
-    // },
     {
-      label: 'New Community',
-      iconLeft: 'people',
+      label: 'Create community',
+      isButton: true,
+      iconLeft: 'peopleNew',
+      iconLeftWeight: 'bold',
       onClick: (e) => {
         e?.preventDefault();
         resetSidebarState();
-        navigate('/createCommunity/starter', {}, null);
+        navigate('/createCommunity', {}, null);
       },
     },
   ];
@@ -178,7 +149,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
         {
           label: 'Connect Discord',
           iconLeft: 'discord',
-          onClick: async (e) => {
+          onClick: async () => {
             try {
               const verification_token = uuidv4();
               await app.discord.createConfig(verification_token);
@@ -193,7 +164,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
                     !isCustomDomain
                       ? window.location.origin
                       : 'https://commonwealth.im'
-                  }`
+                  }`,
                 )}/discord-callback&response_type=code&scope=bot&state=${encodeURI(
                   JSON.stringify({
                     cw_chain_id: app.activeChainId(),
@@ -201,9 +172,9 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
                     redirect_domain: isCustomDomain
                       ? window.location.origin
                       : undefined,
-                  })
+                  }),
                 )}`,
-                '_parent'
+                '_parent',
               );
             } catch (err) {
               console.log(err);
@@ -233,7 +204,6 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
           } as PopoverMenuItem,
           ...getOnChainProposalItem(),
           ...getSputnikProposalItem(),
-          ...getSubstrateProposalItems(),
           ...getSnapshotProposalItem(),
           ...getTemplateItems(),
           ...getDiscordBotConnectionItems(),
@@ -247,22 +217,35 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   ];
 };
 
-export const CreateContentSidebar = () => {
+export const CreateContentSidebar = ({
+  isInsideCommunity,
+}: {
+  isInsideCommunity: boolean;
+}) => {
   const navigate = useCommonNavigate();
   const { setMenu } = useSidebarStore();
 
   return (
     <CWSidebarMenu
-      className="CreateContentSidebar"
+      className={getClasses<{
+        heightInsideCommunity: boolean;
+      }>(
+        {
+          heightInsideCommunity: isInsideCommunity,
+        },
+        'CreateContentSidebar',
+      )}
       menuHeader={{
         label: 'Create',
         onClick: async () => {
           const sidebar = document.getElementsByClassName(
-            'CreateContentSidebar'
+            'CreateContentSidebar',
           );
           sidebar[0].classList.add('onremove');
           setTimeout(() => {
-            setMenu({ name: 'default', isVisible: false });
+            const isSidebarOpen =
+              !!sidebarStore.getState().userToggledVisibility;
+            setMenu({ name: 'default', isVisible: isSidebarOpen });
           }, 200);
         },
       }}
@@ -304,13 +287,31 @@ export const CreateContentPopover = () => {
   return (
     <PopoverMenu
       menuItems={getCreateContentMenuItems(navigate)}
-      renderTrigger={(onclick) => (
-        <CWIconButton
-          iconButtonTheme="black"
-          iconName={
-            featureFlags.sessionKeys ? 'plusCirclePhosphor' : 'plusCircle'
-          }
-          onClick={onclick}
+      renderTrigger={(onClick, isMenuOpen) => (
+        <CWTooltip
+          content="Create content"
+          placement="bottom"
+          renderTrigger={(handleInteraction, isTooltipOpen) => (
+            <CWIconButton
+              iconButtonTheme="black"
+              iconName="plusCirclePhosphor"
+              onClick={(e) =>
+                handleIconClick({
+                  e,
+                  isMenuOpen,
+                  isTooltipOpen,
+                  handleInteraction,
+                  onClick,
+                })
+              }
+              onMouseEnter={(e) => {
+                handleMouseEnter({ e, isMenuOpen, handleInteraction });
+              }}
+              onMouseLeave={(e) => {
+                handleMouseLeave({ e, isTooltipOpen, handleInteraction });
+              }}
+            />
+          )}
         />
       )}
     />

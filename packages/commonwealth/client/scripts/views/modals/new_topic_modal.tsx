@@ -1,27 +1,29 @@
-import React, { useEffect } from 'react';
-
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
-
-import { pluralizeWithoutNumberPrefix } from 'helpers';
-
-import 'modals/new_topic_modal.scss';
-import app from 'state';
-import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { TokenDecimalInput } from 'views/components/token_decimal_input';
-import { CWButton } from '../components/component_kit/cw_button';
-import { CWCheckbox } from '../components/component_kit/cw_checkbox';
-import { CWLabel } from '../components/component_kit/cw_label';
-import { CWValidationText } from '../components/component_kit/cw_validation_text';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import { useCommonNavigate } from 'navigation/helpers';
 import type { DeltaStatic } from 'quill';
+import React, { useEffect } from 'react';
+import { pluralizeWithoutNumberPrefix } from '../../helpers';
+import { useCommonNavigate } from '../../navigation/helpers';
+import app from '../../state';
 import {
+  useCreateTopicMutation,
+  useFetchTopicsQuery,
+} from '../../state/api/topics';
+import { CWCheckbox } from '../components/component_kit/cw_checkbox';
+import { CWTextInput } from '../components/component_kit/cw_text_input';
+import { CWValidationText } from '../components/component_kit/cw_validation_text';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
+import {
+  ReactQuillEditor,
   createDeltaFromText,
   getTextFromDelta,
-  ReactQuillEditor,
 } from '../components/react_quill_editor';
 import { serializeDelta } from '../components/react_quill_editor/utils';
-import { useCreateTopicMutation, useFetchTopicsQuery } from 'state/api/topics';
+
+import '../../../styles/modals/new_topic_modal.scss';
 
 type NewTopicModalProps = {
   onModalClose: () => void;
@@ -32,12 +34,12 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
   const { mutateAsync: createTopic } = useCreateTopicMutation();
   const navigate = useCommonNavigate();
   const { data: topics } = useFetchTopicsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
   const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(
-    createDeltaFromText('')
+    createDeltaFromText(''),
   );
   const [isSaving, setIsSaving] = React.useState<boolean>(false);
   const [description, setDescription] = React.useState<string>('');
@@ -46,7 +48,6 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
   const [featuredInSidebar, setFeaturedInSidebar] =
     React.useState<boolean>(false);
   const [name, setName] = React.useState<string>('');
-  const [tokenThreshold, setTokenThreshold] = React.useState<string>('0');
 
   const editorText = getTextFromDelta(contentDelta);
 
@@ -62,21 +63,10 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
     setErrorMsg(null);
   }, [name, featuredInNewPost, editorText]);
 
-  const decimals = app.chain?.meta?.decimals
-    ? app.chain.meta.decimals
-    : app.chain.network === ChainNetwork.ERC721
-    ? 0
-    : app.chain.base === ChainBase.CosmosSDK
-    ? 6
-    : 18;
-
   return (
     <div className="NewTopicModal">
-      <div className="compact-modal-title">
-        <h3>New topic</h3>
-        <CWIconButton iconName="close" onClick={() => onModalClose()} />
-      </div>
-      <div className="compact-modal-body">
+      <CWModalHeader label="New topic" onModalClose={onModalClose} />
+      <CWModalBody>
         <CWTextInput
           label="Name"
           value={name}
@@ -85,7 +75,7 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
           }}
           inputValidationFn={(text: string) => {
             const currentCommunityTopicNames = topics.map((t) =>
-              t.name.toLowerCase()
+              t.name.toLowerCase(),
             );
 
             if (currentCommunityTopicNames.includes(text.toLowerCase())) {
@@ -99,7 +89,7 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
             if (disallowedCharMatches) {
               const err = `The ${pluralizeWithoutNumberPrefix(
                 disallowedCharMatches.length,
-                'char'
+                'char',
               )}
                 ${disallowedCharMatches.join(', ')} are not permitted`;
               setErrorMsg(err);
@@ -123,20 +113,6 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
             setDescription(e.target.value);
           }}
         />
-        {app.activeChainId() && (
-          <React.Fragment>
-            <CWLabel
-              label={`Number of tokens needed to post (${app.chain?.meta.default_symbol})`}
-            />
-            <TokenDecimalInput
-              decimals={decimals}
-              defaultValueInWei="0"
-              onInputChange={(newValue: string) => {
-                setTokenThreshold(newValue);
-              }}
-            />
-          </React.Fragment>
-        )}
         <div className="checkboxes">
           <CWCheckbox
             label="Featured in Sidebar"
@@ -161,33 +137,47 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
             setContentDelta={setContentDelta}
           />
         )}
-        <CWButton
-          label="Create topic"
-          disabled={isSaving || !!errorMsg}
-          onClick={async (e: React.MouseEvent<HTMLButtonElement>) => {
-            e.preventDefault();
-
-            try {
-              await createTopic({
-                name,
-                description,
-                featuredInSidebar,
-                featuredInNewPost,
-                tokenThreshold,
-                defaultOffchainTemplate: serializeDelta(contentDelta),
-              });
-
-              navigate(`/discussions/${encodeURI(name.toString().trim())}`);
-
-              onModalClose();
-            } catch (err) {
-              setErrorMsg('Error creating topic');
-              setIsSaving(false);
-            }
-          }}
-        />
-        {errorMsg && <CWValidationText message={errorMsg} status="failure" />}{' '}
-      </div>
+      </CWModalBody>
+      <CWModalFooter className="NewTopicModalFooter">
+        <div className="action-buttons">
+          <CWButton
+            label="Cancel"
+            buttonType="secondary"
+            buttonHeight="sm"
+            onClick={onModalClose}
+          />
+          <CWButton
+            label="Create topic"
+            buttonType="primary"
+            buttonHeight="sm"
+            disabled={isSaving || !!errorMsg}
+            onClick={async (e: React.MouseEvent<HTMLButtonElement>) => {
+              e.preventDefault();
+              try {
+                await createTopic({
+                  name,
+                  description,
+                  featuredInSidebar,
+                  featuredInNewPost,
+                  defaultOffchainTemplate: serializeDelta(contentDelta),
+                });
+                navigate(`/discussions/${encodeURI(name.toString().trim())}`);
+                onModalClose();
+              } catch (err) {
+                setErrorMsg('Error creating topic');
+                setIsSaving(false);
+              }
+            }}
+          />
+        </div>
+        {errorMsg && (
+          <CWValidationText
+            className="validation-text"
+            message={errorMsg}
+            status="failure"
+          />
+        )}
+      </CWModalFooter>
     </div>
   );
 };

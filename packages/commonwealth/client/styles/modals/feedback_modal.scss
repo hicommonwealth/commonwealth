@@ -1,11 +1,15 @@
 @import '../shared';
 
 .FeedbackModal {
-  width: 400px;
+  width: 100%;
 
-  .compact-modal-body {
+  .TextArea {
+    margin: 3px 0;
+  }
+
+  .CWModalFooter {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    align-items: flex-end;
   }
 }

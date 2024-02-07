@@ -1,17 +1,20 @@
 import React, { useMemo, useState } from 'react';
 
+import { NotificationCategories } from '@hicommonwealth/core';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import moment from 'moment';
 import 'pages/snapshot_proposals.scss';
 import app from 'state';
-import { NotificationCategories } from '../../../../../../common-common/src/types';
+import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import useNecessaryEffect from '../../../hooks/useNecessaryEffect';
 import { CardsCollection } from '../../components/cards_collection';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWText } from '../../components/component_kit/cw_text';
+import {
+  CWTab,
+  CWTabsRow,
+} from '../../components/component_kit/new_designs/CWTabs';
 import { SnapshotProposalCard } from './SnapshotProposalCard';
-import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 
 type SnapshotProposalsPageProps = {
   topic?: string;
@@ -31,16 +34,15 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
 
   const spaceSubscription = useMemo(
     () =>
-      app.user.notifications.subscriptions.find((sub) => {
-        return (
-          sub.category === 'snapshot-proposal' && sub.objectId === snapshotId
-        );
+      app.user.notifications.findNotificationSubscription({
+        categoryId: NotificationCategories.SnapshotProposal,
+        options: { snapshotId },
       }),
-    [snapshotId]
+    [snapshotId],
   );
 
   const [hasSubscription, setHasSubscription] = useState<boolean>(
-    spaceSubscription !== undefined
+    spaceSubscription !== undefined,
   );
 
   useManageDocumentTitle('Snapshots');
@@ -60,7 +62,7 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
         app.snapshot.proposals.filter((proposal: SnapshotProposal) =>
           moment(+proposal.end * 1000) >= moment()
             ? tempProposals.active.push(proposal)
-            : tempProposals.ended.push(proposal)
+            : tempProposals.ended.push(proposal),
         );
 
         setProposals(tempProposals);
@@ -78,7 +80,10 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
       });
     } else {
       app.user.notifications
-        .subscribe(NotificationCategories.SnapshotProposal, snapshotId)
+        .subscribe({
+          categoryId: NotificationCategories.SnapshotProposal,
+          options: { snapshotId },
+        })
         .then(() => {
           setHasSubscription(true);
         });
@@ -87,16 +92,20 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
 
   return (
     <div className="SnapshotProposalsPage">
+      <CWText type="h2" fontWeight="medium" className="header">
+        Snapshots
+      </CWText>
       <div className="top-bar">
-        <CWTabBar>
+        <CWTabsRow>
           {['Active', 'Ended'].map((tabName, index) => (
             <CWTab
+              key={index}
               label={tabName}
               isSelected={activeTab === index + 1}
               onClick={() => setActiveTab(index + 1)}
             />
           ))}
-        </CWTabBar>
+        </CWTabsRow>
         <div>
           <CWButton
             label={

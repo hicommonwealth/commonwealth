@@ -5,7 +5,6 @@ class NewProfile {
   private _email: string;
   private _website: string;
   private _bio: string;
-  private _isDefault: boolean;
   private _avatarUrl: string;
   private _slug: string;
   private _socials: string[];
@@ -27,10 +26,6 @@ class NewProfile {
 
   get bio() {
     return this._bio;
-  }
-
-  get isDefault() {
-    return this._isDefault;
   }
 
   get avatarUrl() {
@@ -62,7 +57,6 @@ class NewProfile {
     email,
     website,
     bio,
-    is_default,
     avatar_url,
     slug,
     socials,
@@ -74,39 +68,12 @@ class NewProfile {
     this._email = email;
     this._website = website;
     this._bio = bio;
-    this._isDefault = is_default;
     this._avatarUrl = avatar_url;
     this._slug = slug;
     this._socials = socials;
     this._id = id;
     this._isOwner = is_owner;
     this._backgroundImage = background_image;
-  }
-
-  public initialize(
-    name,
-    email,
-    website,
-    bio,
-    isDefault,
-    avatarUrl,
-    slug,
-    socials,
-    id,
-    isOwner,
-    backgroundImage
-  ) {
-    this._name = name;
-    this._email = email;
-    this._website = website;
-    this._bio = bio;
-    this._isDefault = isDefault;
-    this._avatarUrl = avatarUrl;
-    this._slug = slug;
-    this._socials = socials;
-    this._id = id;
-    this._isOwner = isOwner;
-    this._backgroundImage = backgroundImage;
   }
 
   public static fromJSON(json) {

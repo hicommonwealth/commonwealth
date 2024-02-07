@@ -73,9 +73,11 @@ type MobileMenuProps = {
   menuItems: Array<MenuItem>;
 };
 
-export const CWMobileMenu = (props: MobileMenuProps) => {
-  const { className, menuHeader, menuItems } = props;
-
+export const CWMobileMenu = ({
+  className,
+  menuHeader,
+  menuItems,
+}: MobileMenuProps) => {
   return (
     <div
       className={getClasses<{ className: string }>(

@@ -1,107 +1,68 @@
 @import '../shared';
 
 .ViewTemplateModal {
-  height: 712px;
-  width: 720px;
-  max-height: 84vh;
   display: flex;
   position: relative;
   flex-direction: column;
 
-  .TopSection {
+  .CreationRow {
+    gap: 8px;
     display: flex;
-    height: 72px;
-    padding: 24px;
     align-items: center;
     justify-content: center;
-    width: 100%;
-
-    .closeIcon {
-      position: absolute;
-      right: 24px;
-      cursor: pointer;
-    }
-
-    border-bottom: 1px solid $neutral-200;
   }
 
-  .Body {
-    flex: 1;
+  .LabelRow {
     display: flex;
     align-items: flex-start;
-    padding: 24px;
-    overflow-y: auto;
+    justify-content: center;
+    gap: 12px;
     flex-direction: column;
-    gap: 24px;
 
-    .CreationRow {
-      gap: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .LabelRow {
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      gap: 12px;
-      flex-direction: column;
-
-      .labelText {
-        color: $neutral-600;
-      }
-    }
-
-    .BlobContainer {
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      gap: 12px;
-      flex-direction: column;
-
-      .labelText {
-        color: $neutral-600;
-      }
-
-      .Blob {
-        background: $neutral-50;
-        border-radius: 5px;
-        display: flex;
-        padding: 8px;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-        width: 100%;
-      }
-
-      .BlobDivider {
-        margin-top: 20px;
-      }
-    }
-
-    .TemplateDisplay {
-      display: flex;
-      gap: 12px;
-      flex-direction: column;
-
-      .labelText {
-        color: $neutral-600;
-      }
-
-      .Template {
-        display: flex;
-        gap: 24px;
-        flex-direction: column;
-      }
+    .labelText {
+      color: $neutral-600;
     }
   }
 
-  .BottomSection {
+  .BlobContainer {
     display: flex;
-    height: 72px;
-    padding: 24px;
-    align-items: center;
-    justify-content: flex-end;
-    border-top: 1px solid $neutral-200;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 12px;
+    flex-direction: column;
+
+    .labelText {
+      color: $neutral-600;
+    }
+
+    .Blob {
+      background: $neutral-50;
+      border-radius: 5px;
+      display: flex;
+      padding: 8px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      width: 100%;
+    }
+
+    .BlobDivider {
+      margin-top: 20px;
+    }
+  }
+
+  .TemplateDisplay {
+    display: flex;
+    gap: 12px;
+    flex-direction: column;
+
+    .labelText {
+      color: $neutral-600;
+    }
+
+    .Template {
+      display: flex;
+      gap: 24px;
+      flex-direction: column;
+    }
   }
 }

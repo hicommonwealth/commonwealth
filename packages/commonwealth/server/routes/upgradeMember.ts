@@ -1,14 +1,15 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
+import { isRole } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { Op } from 'sequelize';
-import type { DB } from '../models';
-import { isRole } from '../models/role';
+import { validateOwner } from 'server/util/validateOwner';
 
 export const Errors = {
   InvalidAddress: 'Invalid address',
   InvalidRole: 'Invalid role',
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
   MustBeAdmin: 'Must be an admin to upgrade member',
   NoMember: 'Cannot find member to upgrade',
   MustHaveAdmin: 'Communities must have at least one admin',
@@ -25,38 +26,32 @@ const upgradeMember = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
+  const { user } = req;
   const errors = validationResult(req).array();
   if (errors.length !== 0) {
     return next(new AppError(errors[0].msg));
   }
 
-  if (!req.user) return next(new AppError(Errors.NotLoggedIn));
-
-  const chain = req.chain;
+  const { community } = req;
   const { address, new_role } = req.body;
 
-  // find if the requester has an admin address in the target community
-  const adminAddress = await models.Address.findOne({
-    where: {
-      chain: chain.id,
-      user_id: req.user.id,
-      verified: {
-        [Op.ne]: null,
-      },
-      role: 'admin',
-    },
+  const isAdmin = await validateOwner({
+    models,
+    user,
+    communityId: community.id,
+    allowAdmin: true,
+    allowSuperAdmin: true,
   });
-
-  if (!adminAddress && !req.user.isAdmin) {
+  if (!isAdmin) {
     return next(new AppError(Errors.MustBeAdmin));
   }
 
   // check if address provided exists
   const targetAddress = await models.Address.findOne({
     where: {
-      chain: chain.id,
+      community_id: community.id,
       address: address,
     },
   });
@@ -74,7 +69,7 @@ const upgradeMember = async (
   ) {
     const otherExistingAdmin = await models.Address.findOne({
       where: {
-        chain: chain.id,
+        community_id: community.id,
         role: 'admin',
         id: {
           [Op.ne]: targetAddress.id,
@@ -99,7 +94,7 @@ const upgradeMember = async (
       address_id: targetAddress.id,
       updated_at: targetAddress.updated_at,
       created_at: targetAddress.created_at,
-      chain_id: targetAddress.chain,
+      chain_id: targetAddress.community_id,
       permission: targetAddress.role,
       allow: '0',
       deny: '0',

@@ -8,6 +8,7 @@
 @import 'mixins/inputs';
 @import 'mixins/icons';
 @import 'mixins/text';
+@import 'mixins/scrollbars';
 @import 'utils';
 
 // layout & global nav parameters
@@ -15,6 +16,7 @@
 $sidebar-width: 232px;
 $quick-switcher-width: 56px;
 $global-header-height: 56px;
+$global-sidebar-header-height: 49px;
 $sidebar-community-header-height: 56px;
 
 // base fonts
@@ -77,7 +79,7 @@ $font-family-monospace: 'DM Mono', monospace;
   }
 
   @include smallInclusive {
-    padding: 24px;
+    padding: 16px;
   }
 }
 

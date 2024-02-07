@@ -1,6 +1,5 @@
-import { AppError } from 'common-common/src/errors';
-import type { DB } from '../models';
-import type { BanAttributes } from '../models/ban';
+import { AppError } from '@hicommonwealth/core';
+import type { BanAttributes, DB } from '@hicommonwealth/model';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 import { validateOwner } from '../util/validateOwner';
@@ -19,25 +18,27 @@ type GetBannedAddressesResp = BanAttributes[];
 const getBannedAddresses = async (
   models: DB,
   req: TypedRequestQuery<GetBannedAddressesReq>,
-  res: TypedResponse<GetBannedAddressesResp>
+  res: TypedResponse<GetBannedAddressesResp>,
 ) => {
-  const chain = req.chain;
+  const { community } = req;
 
   const isAdmin = await validateOwner({
     models: models,
     user: req.user,
-    chainId: chain.id,
+    communityId: community.id,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError(GetBannedAddressesErrors.NoPermission);
   }
 
-  const bans = await models.Ban.findAll({ where: { chain_id: chain.id } });
+  const bans = await models.Ban.findAll({
+    where: { community_id: community.id },
+  });
   return success(
     res,
-    bans.map((b) => b.toJSON())
+    bans.map((b) => b.toJSON()),
   );
 };
 

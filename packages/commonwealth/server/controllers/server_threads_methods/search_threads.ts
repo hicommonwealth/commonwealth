@@ -1,17 +1,16 @@
-import { Op, QueryTypes } from 'sequelize';
-import { ServerThreadsController } from '../server_threads_controller';
+import { ThreadAttributes } from '@hicommonwealth/model';
+import { QueryTypes } from 'sequelize';
+import { TypedPaginatedResult } from 'server/types';
 import {
   PaginationSqlBind,
   PaginationSqlOptions,
   buildPaginatedResponse,
   buildPaginationSql,
 } from '../../util/queries';
-import { ChainInstance } from '../../models/chain';
-import { ThreadAttributes } from '../../models/thread';
-import { TypedPaginatedResult } from 'server/types';
+import { ServerThreadsController } from '../server_threads_controller';
 
 export type SearchThreadsOptions = {
-  chain: ChainInstance;
+  communityId: string;
   searchTerm: string;
   threadTitleOnly: boolean;
   limit?: number;
@@ -20,21 +19,25 @@ export type SearchThreadsOptions = {
   orderDirection?: 'ASC' | 'DESC';
 };
 
+type ThreadSearchData = Omit<ThreadAttributes, 'chain'> & {
+  community_id: string;
+};
+
 export type SearchThreadsResult =
-  | TypedPaginatedResult<ThreadAttributes[]>
-  | ThreadAttributes[];
+  | TypedPaginatedResult<ThreadSearchData[]>
+  | ThreadSearchData[];
 
 export async function __searchThreads(
   this: ServerThreadsController,
   {
-    chain,
+    communityId,
     searchTerm,
     threadTitleOnly,
     limit,
     page,
     orderBy,
     orderDirection,
-  }: SearchThreadsOptions
+  }: SearchThreadsOptions,
 ): Promise<SearchThreadsResult> {
   // sort by rank by default
   let sortOptions: PaginationSqlOptions = {
@@ -62,17 +65,19 @@ export async function __searchThreads(
     buildPaginationSql(sortOptions);
 
   const bind: PaginationSqlBind & {
-    chain?: string;
+    community?: string;
     searchTerm?: string;
   } = {
     searchTerm: searchTerm,
     ...paginationBind,
   };
-  if (chain) {
-    bind.chain = chain.id;
+  if (communityId) {
+    bind.community = communityId;
   }
 
-  const chainWhere = bind.chain ? '"Threads".chain = $chain AND' : '';
+  const communityWhere = bind.community
+    ? '"Threads".community_id = $community AND'
+    : '';
 
   let searchWhere = `"Threads".title ILIKE '%' || $searchTerm || '%'`;
   if (!threadTitleOnly) {
@@ -88,17 +93,17 @@ export async function __searchThreads(
       'thread' as type,
       "Addresses".id as address_id,
       "Addresses".address,
-      "Addresses".chain as address_chain,
+      "Addresses".community_id as address_chain,
       "Threads".created_at,
-      "Threads".chain,
+      "Threads".community_id as community_id,
       ts_rank_cd("Threads"._search, query) as rank
     FROM "Threads"
     JOIN "Addresses" ON "Threads".address_id = "Addresses".id,
     websearch_to_tsquery('english', $searchTerm) as query
     WHERE
-      ${chainWhere}
+      ${communityWhere}
       "Threads".deleted_at IS NULL AND
-      ${searchWhere}
+      (${searchWhere})
     ${paginationSort}
   `;
 
@@ -109,7 +114,7 @@ export async function __searchThreads(
     JOIN "Addresses" ON "Threads".address_id = "Addresses".id,
     websearch_to_tsquery('english', $searchTerm) as query
     WHERE
-      ${chainWhere}
+      ${communityWhere}
       "Threads".deleted_at IS NULL AND
       ${searchWhere}
   `;

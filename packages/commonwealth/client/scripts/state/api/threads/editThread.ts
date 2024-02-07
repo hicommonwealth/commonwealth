@@ -61,12 +61,24 @@ const editThread = async ({
   topicId,
   // for editing thread collaborators
   collaborators,
-}: EditThreadProps) => {
+}: EditThreadProps): Promise<Thread> => {
+  const {
+    action = null,
+    session = null,
+    hash = null,
+  } = await app.sessions.signThread(address, {
+    community: app.activeChainId(),
+    title: newTitle,
+    body: newBody,
+    link: url,
+    topic: topicId,
+  });
+
   const response = await axios.patch(`${app.serverUrl()}/threads/${threadId}`, {
     // common payload
-    author_chain: chainId,
+    author_community_id: chainId,
     address: address,
-    chain: chainId,
+    community_id: chainId,
     jwt: app.user.jwt,
     // for edit profile
     ...(url && { url }),
@@ -87,6 +99,9 @@ const editThread = async ({
     ...(topicId !== undefined && { topicId }),
     // for editing thread collaborators
     ...(collaborators !== undefined && { collaborators }),
+    canvas_action: action,
+    canvas_session: session,
+    canvas_hash: hash,
   });
 
   return new Thread(response.data.result);
@@ -119,7 +134,7 @@ const useEditThreadMutation = ({
           chainId,
           threadId,
           updatedThread.topic,
-          currentTopicId
+          currentTopicId,
         );
       }
 

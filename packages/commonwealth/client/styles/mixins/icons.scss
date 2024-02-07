@@ -1,6 +1,7 @@
 $xxs-icon: 9px;
 $xs-icon: 12px;
 $small-icon: 16px;
+$regular-icon: 20px;
 $medium-icon: 24px;
 $large-icon: 32px;
 $xl-icon: 48px;
@@ -22,6 +23,10 @@ $xxl-icon: 60px;
 
   &.small {
     font-size: $small-icon;
+  }
+
+  &.regular {
+    font-size: $regular-icon;
   }
 
   &.medium {

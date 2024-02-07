@@ -1,24 +1,16 @@
+@import '../../shared.scss';
+
 .TOSModal {
   display: flex;
   flex-direction: column;
-  height: 140px;
-  margin: 8px;
-  width: 400px;
+  width: auto;
+  height: auto;
 
-  .close-button-wrapper {
-    display: flex;
-    justify-content: flex-end;
-  }
+  .Text {
+    display: block;
 
-  .content-wrapper {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    margin-top: 4px;
-
-    .Text {
-      text-align: center;
+    > a {
+      margin-left: 4px;
     }
   }
 }

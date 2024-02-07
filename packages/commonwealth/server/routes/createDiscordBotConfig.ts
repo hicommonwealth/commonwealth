@@ -1,17 +1,17 @@
-import { AppError } from 'common-common/src/errors';
-import type { DB } from '../models';
+import { AppError } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { validateOwner } from '../util/validateOwner';
 
 enum CreateDiscordBotConfigErrors {
-  NoChain = 'Must supply a chain ID',
+  NoCommunity = 'Must supply a community ID',
   NotAdmin = 'Not an admin',
   Error = 'Could not Create discord bot config',
 }
 
 type CreateDiscordBotConfigReq = {
-  chain_id: string;
+  community_id: string;
   verification_token: string;
 };
 
@@ -22,34 +22,34 @@ const TOKEN_EXPIRATION_MINUTES = 5;
 const createDiscordBotConfig = async (
   models: DB,
   req: TypedRequestBody<CreateDiscordBotConfigReq>,
-  res: TypedResponse<CreateDiscordBotConfigResp>
+  res: TypedResponse<CreateDiscordBotConfigResp>,
 ) => {
-  const { chain_id, verification_token } = req.body;
+  const { community_id, verification_token } = req.body;
 
-  if (!chain_id || !verification_token) {
-    throw new AppError(CreateDiscordBotConfigErrors.NoChain);
+  if (!community_id || !verification_token) {
+    throw new AppError(CreateDiscordBotConfigErrors.NoCommunity);
   }
 
   const isAdmin = await validateOwner({
     models: models,
     user: req.user,
-    chainId: chain_id,
+    communityId: community_id,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError(CreateDiscordBotConfigErrors.NotAdmin);
   }
 
   const token_expiration = new Date(
-    +new Date() + TOKEN_EXPIRATION_MINUTES * 60 * 1000
+    +new Date() + TOKEN_EXPIRATION_MINUTES * 60 * 1000,
   );
 
   try {
     // check if already exists
     const existing = await models.DiscordBotConfig.findOne({
       where: {
-        chain_id,
+        community_id: community_id,
       },
     });
 
@@ -61,14 +61,14 @@ const createDiscordBotConfig = async (
         },
         {
           where: {
-            chain_id,
+            community_id,
           },
-        }
+        },
       );
 
-      await models.Chain.update(
+      await models.Community.update(
         { discord_config_id: existingConfig.id },
-        { where: { id: chain_id } }
+        { where: { id: community_id } },
       );
 
       return success(res, {
@@ -76,7 +76,7 @@ const createDiscordBotConfig = async (
       });
     } else {
       await models.DiscordBotConfig.create({
-        chain_id,
+        community_id,
         verification_token,
         token_expiration,
       });

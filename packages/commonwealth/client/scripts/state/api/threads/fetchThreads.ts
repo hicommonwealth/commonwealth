@@ -23,7 +23,8 @@ const queryTypeToRQMap = {
 
 interface CommonProps {
   queryType: typeof QueryTypes[keyof typeof QueryTypes];
-  chainId: string;
+  communityId: string;
+  apiEnabled?: boolean;
 }
 
 interface FetchBulkThreadsProps extends CommonProps {
@@ -35,7 +36,13 @@ interface FetchBulkThreadsProps extends CommonProps {
   topicId?: number;
   stage?: string;
   includePinnedThreads?: boolean;
-  orderBy?: 'newest' | 'oldest' | 'mostLikes' | 'mostComments';
+  isOnArchivePage?: boolean;
+  orderBy?:
+    | 'newest'
+    | 'oldest'
+    | 'mostLikes'
+    | 'mostComments'
+    | 'latestActivity';
 }
 
 interface FetchActiveThreadsProps extends CommonProps {
@@ -48,6 +55,7 @@ const featuredFilterQueryMap = {
   oldest: 'createdAt:asc',
   mostLikes: 'numberOfLikes:desc',
   mostComments: 'numberOfComments:desc',
+  latestActivity: 'latestActivity:desc',
 };
 
 const useDateCursor = ({
@@ -62,7 +70,8 @@ const useDateCursor = ({
 
   useEffect(() => {
     const updater = () => {
-      const { toDate, fromDate } = getToAndFromDatesRangesForThreadsTimelines(dateRange)
+      const { toDate, fromDate } =
+        getToAndFromDatesRangesForThreadsTimelines(dateRange);
       setDateCursor({ toDate, fromDate });
     };
 
@@ -88,7 +97,7 @@ const getFetchThreadsQueryKey = (props) => {
   if (isFetchBulkThreadsProps(props)) {
     return [
       ApiEndpoints.FETCH_THREADS,
-      props.chainId,
+      props.communityId,
       props.queryType,
       props.topicId,
       props.stage,
@@ -102,15 +111,25 @@ const getFetchThreadsQueryKey = (props) => {
   if (isFetchActiveThreadsProps(props)) {
     return [
       ApiEndpoints.FETCH_THREADS,
-      props.chainId,
+      props.communityId,
       props.queryType,
       props.topicsPerThread,
     ];
   }
-}
+};
 
 const fetchBulkThreads = (props) => {
-  return async ({ pageParam = 1 }) => {
+  return async ({
+    pageParam = 1,
+  }): Promise<{
+    data: {
+      numVotingThreads: number;
+      limit: number;
+      page: number;
+      threads: Thread[];
+    };
+    pageParam: number | undefined;
+  }> => {
     const res = await axios.get(
       `${app.serverUrl()}${ApiEndpoints.FETCH_THREADS}`,
       {
@@ -118,7 +137,7 @@ const fetchBulkThreads = (props) => {
           bulk: true,
           page: pageParam,
           limit: props.limit,
-          chain: props.chainId,
+          community_id: props.communityId,
           ...(props.topicId && { topic_id: props.topicId }),
           ...(props.stage && { stage: props.stage }),
           ...(props.includePinnedThreads && {
@@ -129,8 +148,9 @@ const fetchBulkThreads = (props) => {
           orderBy:
             featuredFilterQueryMap[props.orderBy] ||
             featuredFilterQueryMap.newest,
+          ...(props.isOnArchivePage && { archived: true }),
         },
-      }
+      },
     );
 
     // transform the response
@@ -141,57 +161,60 @@ const fetchBulkThreads = (props) => {
 
     return {
       data: transformedData,
-      pageParam:
-        transformedData.threads.length > 0 ? pageParam + 1 : undefined,
+      pageParam: transformedData.threads.length > 0 ? pageParam + 1 : undefined,
     };
   };
-}
+};
 
 const fetchActiveThreads = (props) => {
-  return async () => {
+  return async (): Promise<Thread[]> => {
     const response = await axios.get(
       `${app.serverUrl()}${ApiEndpoints.FETCH_THREADS}`,
       {
         params: {
           active: true,
-          chain: props.chainId,
+          community_id: props.communityId,
           threads_per_topic: props.topicsPerThread || 3,
         },
-      }
+      },
     );
 
     // transform response
     return response.data.result.map((c) => new Thread(c));
   };
-}
+};
 
 const useFetchThreadsQuery = (
-  props: FetchBulkThreadsProps | FetchActiveThreadsProps
+  props: FetchBulkThreadsProps | FetchActiveThreadsProps,
 ) => {
+  const { apiEnabled = true } = props; // destruct to assign default value
+
   // better to use this in case someone updates this props, we wont reflect those changes
   const [queryType] = useState(props.queryType);
 
   const chosenQueryType = queryTypeToRQMap[queryType]({
     queryKey: getFetchThreadsQueryKey(props),
     queryFn: (() => {
-      if (isFetchBulkThreadsProps(props)) return fetchBulkThreads(props)
-      if (isFetchActiveThreadsProps(props)) return fetchActiveThreads(props)
+      if (isFetchBulkThreadsProps(props)) return fetchBulkThreads(props);
+      if (isFetchActiveThreadsProps(props)) return fetchActiveThreads(props);
     })(),
     ...(() => {
       if (isFetchBulkThreadsProps(props)) {
         return {
-          getNextPageParam: (lastPage, pages) => lastPage.pageParam,
+          getNextPageParam: (lastPage) => lastPage.pageParam,
         };
       }
     })(),
     staleTime: THREADS_STALE_TIME,
+    keepPreviousData: true,
+    enabled: apiEnabled,
   });
 
   if (isFetchBulkThreadsProps(props)) {
     // transform pages into workable object
     const reducedData = (chosenQueryType?.data?.pages || []).reduce(
       (acc, curr) => ({ threads: [...acc.threads, ...curr.data.threads] }),
-      { threads: [] }
+      { threads: [] },
     );
 
     return {

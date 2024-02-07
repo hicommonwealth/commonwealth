@@ -3,20 +3,26 @@ $breakpoint-large-min: 1440;
 $breakpoint-medium-max: 1439;
 $breakpoint-medium-min: 1240;
 $breakpoint-medium-small-max: 1239;
+$breakpoint-medium-small-mid: 1150;
 $breakpoint-medium-small-min: 905;
 $breakpoint-small-max: 904;
 $breakpoint-small-min: 600;
 $breakpoint-extra-small-max: 599;
+
+$breakpoint-height-small-max: 700;
 
 // for scss media queries
 $breakpoint-large-min-px: $breakpoint-large-min * 1px;
 $breakpoint-medium-max-px: $breakpoint-medium-max * 1px;
 $breakpoint-medium-min-px: $breakpoint-medium-min * 1px;
 $breakpoint-medium-small-max-px: $breakpoint-medium-small-max * 1px;
+$breakpoint-medium-small-mid-px: $breakpoint-medium-small-mid * 1px;
 $breakpoint-medium-small-min-px: $breakpoint-medium-small-min * 1px;
 $breakpoint-small-max-px: $breakpoint-small-max * 1px;
 $breakpoint-small-min-px: $breakpoint-small-min * 1px;
 $breakpoint-extra-small-max-px: $breakpoint-extra-small-max * 1px;
+
+$breakpoint-height-small-max: $breakpoint-height-small-max * 1px;
 
 :export {
   breakpointLargeMinPx: $breakpoint-large-min-px;

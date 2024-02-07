@@ -1,12 +1,14 @@
+import { NotificationCategory } from '@hicommonwealth/core';
 import moment from 'moment';
 import ChainEvent from './ChainEvent';
-import type NotificationSubscription from './NotificationSubscription';
 
 export class Notification {
   public readonly id: number;
+  public readonly categoryId: NotificationCategory;
   public readonly data: string;
   public readonly createdAt: moment.Moment;
-  public readonly subscription?: NotificationSubscription;
+
+  public readonly subscriptionId: number;
   public readonly chainEvent?: ChainEvent;
   private _isRead?: boolean;
 
@@ -14,12 +16,21 @@ export class Notification {
     return this._isRead;
   }
 
-  constructor(id, data, isRead, createdAt, subscription, chainEvent?) {
+  constructor(
+    id: number,
+    categoryId: NotificationCategory,
+    data: string,
+    isRead: boolean,
+    createdAt: string,
+    subscriptionId: number,
+    chainEvent?,
+  ) {
     this.id = id;
+    this.categoryId = categoryId;
     this.data = data;
     this._isRead = !!isRead;
     this.createdAt = moment(createdAt);
-    this.subscription = subscription;
+    this.subscriptionId = subscriptionId;
     this.chainEvent = chainEvent;
   }
 
@@ -31,14 +42,15 @@ export class Notification {
     }
   }
 
-  public static fromJSON(json, subscription: NotificationSubscription) {
+  public static fromJSON(json) {
     return new Notification(
       json.id,
+      json.category_id,
       json.notification_data,
       json.is_read,
       json.created_at,
-      subscription,
-      json?.ChainEvent ? ChainEvent.fromJSON(json.ChainEvent) : undefined
+      json.subscription_id,
+      json?.ChainEvent ? ChainEvent.fromJSON(json.ChainEvent) : undefined,
     );
   }
 }

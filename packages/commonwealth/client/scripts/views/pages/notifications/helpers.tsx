@@ -1,23 +1,19 @@
-import React from 'react';
-import moment from 'moment';
-import _ from 'lodash';
-
-import 'pages/notifications/notification_row.scss';
-
-import type { IPostNotificationData } from 'types';
-import { NotificationCategories, ProposalType } from 'common-common/src/types';
-
-import app from 'state';
+import type { IForumNotificationData } from '@hicommonwealth/core';
+import { NotificationCategories, ProposalType } from '@hicommonwealth/core';
 import { pluralize } from 'helpers';
+import _ from 'lodash';
+import moment from 'moment';
+import 'pages/notifications/notification_row.scss';
+import React from 'react';
+import app from 'state';
+import { getCommunityUrl, getThreadUrl } from 'utils';
 import { User } from 'views/components/user/user';
-import { getThreadUrl, getCommunityUrl } from 'utils';
-import AddressInfo from '../../../models/AddressInfo';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 
 const jumpHighlightNotification = (
   commentId,
   shouldScroll = true,
-  animationDelayTime = 2000
+  animationDelayTime = 2000,
 ) => {
   const $div =
     commentId === 'parent' || commentId === 'body'
@@ -51,7 +47,7 @@ const jumpHighlightNotification = (
   }
 };
 
-const getNotificationFields = (category, data: IPostNotificationData) => {
+const getNotificationFields = (category, data: IForumNotificationData) => {
   const {
     created_at,
     thread_id,
@@ -81,8 +77,9 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
 
   const actorName = (
     <User
-      user={new AddressInfo(null, author_address, author_chain, null)}
-      hideAvatar
+      userAddress={author_address}
+      userCommunityId={author_chain}
+      shouldHideAvatar
     />
   );
 
@@ -151,7 +148,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
 
 export const getBatchNotificationFields = (
   category,
-  data: IPostNotificationData[]
+  data: IForumNotificationData[],
 ) => {
   if (data.length === 1) {
     return getNotificationFields(category, data[0]);
@@ -171,7 +168,7 @@ export const getBatchNotificationFields = (
   } = data[0];
 
   const authorInfo = _.uniq(
-    data.map((d) => `${d.author_chain}#${d.author_address}`)
+    data.map((d) => `${d.author_chain}#${d.author_address}`),
   ).map((u) => u.split('#'));
 
   const length = authorInfo.length - 1;
@@ -191,8 +188,9 @@ export const getBatchNotificationFields = (
 
   const actorName = (
     <User
-      user={new AddressInfo(null, author_address, author_chain, null)}
-      hideAvatar
+      userAddress={author_address}
+      userCommunityId={author_chain}
+      shouldHideAvatar
     />
   );
 

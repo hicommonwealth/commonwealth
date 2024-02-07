@@ -1,26 +1,21 @@
-import { ServerError } from 'common-common/src/errors';
+import { CommunityCategoryType, ServerError } from '@hicommonwealth/core';
+import type {
+  AddressInstance,
+  CommunityInstance,
+  DB,
+  EmailNotificationInterval,
+  NotificationCategoryInstance,
+  StarredCommunityAttributes,
+  UserInstance,
+} from '@hicommonwealth/model';
+import { ThreadAttributes, sequelize } from '@hicommonwealth/model';
 import jwt from 'jsonwebtoken';
 import { Op, QueryTypes } from 'sequelize';
-import type { AddressInstance } from 'server/models/address';
-import type { ChainInstance } from 'server/models/chain';
-import type { ChainNodeInstance } from 'server/models/chain_node';
-import type { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
-import type { NotificationCategoryInstance } from 'server/models/notification_category';
-import type { SocialAccountInstance } from 'server/models/social_account';
-import type { StarredCommunityAttributes } from 'server/models/starred_community';
-import type {
-  EmailNotificationInterval,
-  UserInstance,
-} from 'server/models/user';
-import { JWT_SECRET } from '../config';
-import { sequelize } from '../database';
-import type { DB } from '../models';
+import { ETH_RPC, JWT_SECRET } from '../config';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
-import { ETH_RPC } from '../config';
-import type { ChainCategoryType } from 'common-common/src/types';
 
 type ThreadCountQueryData = {
   concat: string;
@@ -28,11 +23,6 @@ type ThreadCountQueryData = {
 };
 
 type StatusResp = {
-  chainsWithSnapshots: {
-    chain: ChainInstance;
-    snapshot: string[];
-  }[];
-  nodes: ChainNodeInstance[];
   notificationCategories: NotificationCategoryInstance[];
   recentThreads: ThreadCountQueryData[];
   roles?: RoleInstanceWithPermission[];
@@ -43,109 +33,79 @@ type StatusResp = {
     emailInterval: EmailNotificationInterval;
     jwt: string;
     addresses: AddressInstance[];
-    socialAccounts: SocialAccountInstance[];
-    selectedChain: ChainInstance;
+    selectedChain: CommunityInstance;
     isAdmin: boolean;
     disableRichText: boolean;
     starredCommunities: StarredCommunityAttributes[];
     unseenPosts: { [chain: string]: number };
+    profileId?: number;
   };
   evmTestEnv?: string;
-  chainCategoryMap: { [chain: string]: ChainCategoryType[] };
+  enforceSessionKeys?: boolean;
+  chainCategoryMap: { [chain: string]: CommunityCategoryType[] };
 };
 
 const getChainStatus = async (models: DB) => {
-  const [chains, nodes, notificationCategories] = await Promise.all([
-    models.Chain.findAll({
+  const [chains, notificationCategories] = await Promise.all([
+    models.Community.findAll({
       where: { active: true },
     }),
-    models.ChainNode.findAll(),
     models.NotificationCategory.findAll(),
   ]);
 
-  const chainCategories: { [chain: string]: ChainCategoryType[] } = {};
+  const chainCategories: { [chain: string]: CommunityCategoryType[] } = {};
   for (const chain of chains) {
     if (chain.category !== null) {
-      chainCategories[chain.id] = chain.category as ChainCategoryType[];
+      chainCategories[chain.id] = chain.category as CommunityCategoryType[];
     }
   }
 
-  const chainsIds = chains.map((chain) => chain.id);
-  const snapshotSpaces: CommunitySnapshotSpaceWithSpaceAttached[] =
-    await models.CommunitySnapshotSpaces.findAll({
-      where: {
-        chain_id: {
-          [Op.in]: chainsIds,
-        },
-      },
-      include: {
-        model: models.SnapshotSpace,
-        as: 'snapshot_space',
-      },
-    });
-
-  const chainsWithSnapshots = chains.map((chain) => {
-    const chainSnapshotSpaces = snapshotSpaces.filter(
-      (space) => space.chain_id === chain.id
-    );
-    const snapshotSpaceNames = chainSnapshotSpaces.map(
-      (space) => space.snapshot_space?.snapshot_space
-    );
-    return {
-      chain,
-      snapshot: snapshotSpaceNames.length > 0 ? snapshotSpaceNames : [],
-    };
-  });
-
   const thirtyDaysAgo = new Date(
-    (new Date() as any) - 1000 * 24 * 60 * 60 * 30
+    (new Date() as any) - 1000 * 24 * 60 * 60 * 30,
   );
 
   const threadCountQueryData: ThreadCountQueryData[] =
     await models.sequelize.query(
       `
-      SELECT "Threads".chain, COUNT("Threads".id)
+      SELECT "Threads".community_id as chain, COUNT("Threads".id)
       FROM "Threads"
       WHERE "Threads".created_at > :thirtyDaysAgo
       AND "Threads".deleted_at IS NULL
-      AND "Threads".chain IS NOT NULL
-      GROUP BY "Threads".chain;
+      GROUP BY "Threads".community_id;
       `,
-      { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT }
+      { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT },
     );
 
   return {
-    nodes,
     notificationCategories,
     chainCategories,
-    chainsWithSnapshots,
     threadCountQueryData,
   };
 };
 
 export const getUserStatus = async (models: DB, user: UserInstance) => {
-  const chains = await models.Chain.findAll({
+  const chains = await models.Community.findAll({
     where: { active: true },
     attributes: ['id'],
   });
 
   const unfilteredAddresses = await user.getAddresses();
   // TODO: fetch all this data with a single query
-  const [addresses, socialAccounts, selectedChain, isAdmin, disableRichText] =
+  const [addresses, selectedChain, isAdmin, disableRichText] =
     await Promise.all([
       unfilteredAddresses.filter(
         (address) =>
-          !!address.verified && chains.map((c) => c.id).includes(address.chain)
+          !!address.verified &&
+          chains.map((c) => c.id).includes(address.community_id),
       ),
-      user.getSocialAccounts(),
-      user.getSelectedChain(),
+      user.getSelectedCommunity(),
       user.isAdmin,
       user.disableRichText,
     ]);
 
   // look up my roles & private communities
   const myAddressIds: number[] = Array.from(
-    addresses.map((address) => address.id)
+    addresses.map((address) => address.id),
   );
 
   const roles = await findAllRoles(models, {
@@ -165,7 +125,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
   const commsAndChains = await getChainActivity(addresses);
   const unseenPosts = {};
   let query = ``;
-  let replacements = [];
+  let replacements: string[] = [];
 
   // this loops through the communities/chains for which we want to see if there are any new updates
   // for each community a UNION SELECT query is appended to the query so that that communities updated threads are
@@ -173,11 +133,9 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
   // than a new query for each community
   for (let i = 0; i < commsAndChains.length; i++) {
     const name = commsAndChains[i][0];
-    let time: any = commsAndChains[i][1];
-    time = new Date(time as string);
+    const date = commsAndChains[i][1];
 
-    // if time is invalid reset + skip this chain
-    if (Number.isNaN(time.getDate())) {
+    if (!date) {
       unseenPosts[name] = {};
       continue;
     }
@@ -185,21 +143,21 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     // adds a union between SELECT queries if the number of SELECT queries is greater than 1
     if (i != 0) query += ' UNION ';
     // add the chain and timestamp to replacements so that we can safely populate the query with dynamic parameters
-    replacements.push(name, time.getTime());
+    replacements.push(name, date);
     // append the SELECT query
-    query += `SELECT id, chain FROM "Threads" WHERE
-(kind IN ('discussion', 'link') OR chain = ?) AND created_at > TO_TIMESTAMP(?)`;
+    query += `SELECT id, community_id FROM "Threads" WHERE
+    community_id = ? AND created_at > ? AND deleted_at IS NULL`;
     if (i === commsAndChains.length - 1) query += ';';
   }
 
   // populate the query replacements and execute the query
-  const threadNumPromise: Promise<{ id: string; chain: string }[]> = <any>(
-    sequelize.query(query, {
-      raw: true,
-      type: QueryTypes.SELECT,
-      replacements,
-    })
-  );
+  const threadNumPromise = sequelize.query<
+    Pick<ThreadAttributes, 'id' | 'community_id'>
+  >(query, {
+    raw: true,
+    type: QueryTypes.SELECT,
+    replacements,
+  });
 
   // wait for all the promises to resolve
   const [starredCommunities, threadNum] = await Promise.all([
@@ -212,13 +170,14 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
   // the set of activePosts is used to compare with the comments
   // under threads so that there are no duplicate active threads counted
   for (const thread of threadNum) {
-    if (!unseenPosts[thread.chain]) unseenPosts[thread.chain] = {};
-    unseenPosts[thread.chain].activePosts
-      ? unseenPosts[thread.chain].activePosts.add(thread.id)
-      : (unseenPosts[thread.chain].activePosts = new Set(thread.id));
-    unseenPosts[thread.chain].threads
-      ? unseenPosts[thread.chain].threads++
-      : (unseenPosts[thread.chain].threads = 1);
+    if (!unseenPosts[thread.community_id])
+      unseenPosts[thread.community_id] = {};
+    unseenPosts[thread.community_id].activePosts
+      ? unseenPosts[thread.community_id].activePosts.add(thread.id)
+      : (unseenPosts[thread.community_id].activePosts = new Set([thread.id]));
+    unseenPosts[thread.community_id].threads
+      ? unseenPosts[thread.community_id].threads++
+      : (unseenPosts[thread.community_id].threads = 1);
   }
 
   // reset var
@@ -228,11 +187,9 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
   // same principal as the loop above but for comments instead of threads
   for (let i = 0; i < commsAndChains.length; i++) {
     const name = commsAndChains[i][0];
-    let time: any = commsAndChains[i][1];
-    time = new Date(time as string);
+    const date = commsAndChains[i][1];
 
-    // if time is invalid reset + skip this chain
-    if (Number.isNaN(time.getDate())) {
+    if (!date) {
       unseenPosts[name] = {};
       continue;
     }
@@ -240,14 +197,14 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     // adds a union between SELECT queries if the number of SELECT queries is greater than 1
     if (i !== 0) query += ' UNION ';
     // add the chain and timestamp to replacements so that we can safely populate the query with dynamic parameters
-    replacements.push(name, time.getTime());
+    replacements.push(name, date);
     // append the SELECT query
-    query += `SELECT thread_id, chain FROM "Comments" WHERE chain = ? AND created_at > TO_TIMESTAMP(?)`;
+    query += `SELECT thread_id, community_id FROM "Comments" WHERE community_id = ? AND created_at > ?`;
     if (i === commsAndChains.length - 1) query += ';';
   }
 
   // populate query and execute
-  const commentNum: { thread_id: string; chain: string }[] = <any>(
+  const commentNum: { thread_id: string; community_id: string }[] = <any>(
     await sequelize.query(query, {
       raw: true,
       type: QueryTypes.SELECT,
@@ -257,21 +214,21 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
 
   // iterates through the retrieved comments and adds each thread id to the activePosts set
   for (const comment of commentNum) {
-    if (!unseenPosts[comment.chain]) unseenPosts[comment.chain] = {};
+    if (!unseenPosts[comment.community_id])
+      unseenPosts[comment.community_id] = {};
     const id = comment.thread_id;
-    unseenPosts[comment.chain].activePosts
-      ? unseenPosts[comment.chain].activePosts.add(id)
-      : (unseenPosts[comment.chain].activePosts = new Set(id));
-    unseenPosts[comment.chain].comments
-      ? unseenPosts[comment.chain].comments++
-      : (unseenPosts[comment.chain].comments = 1);
+    unseenPosts[comment.community_id].activePosts
+      ? unseenPosts[comment.community_id].activePosts.add(id)
+      : (unseenPosts[comment.community_id].activePosts = new Set([id]));
+    unseenPosts[comment.community_id].comments
+      ? unseenPosts[comment.community_id].comments++
+      : (unseenPosts[comment.community_id].comments = 1);
   }
 
   // set the activePosts to num in set
   for (const chain of commsAndChains) {
-    // again checks for invalid time values
-    const [name, time] = chain;
-    if (Number.isNaN(new Date(time as string).getDate())) {
+    const [name, date] = chain;
+    if (!date) {
       unseenPosts[name] = {};
       continue;
     }
@@ -310,7 +267,6 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
       emailInterval: user.emailNotificationInterval,
       jwt: '',
       addresses,
-      socialAccounts,
       selectedChain,
       isAdmin,
       disableRichText,
@@ -325,55 +281,49 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
 export const status = async (
   models: DB,
   req: TypedRequestQuery,
-  res: TypedResponse<StatusResp>
+  res: TypedResponse<StatusResp>,
 ) => {
   try {
     const chainStatusPromise = getChainStatus(models);
     const { user: reqUser } = req;
     if (!reqUser) {
-      const {
-        nodes,
-        notificationCategories,
-        chainCategories,
-        chainsWithSnapshots,
-        threadCountQueryData,
-      } = await chainStatusPromise;
+      const { notificationCategories, chainCategories, threadCountQueryData } =
+        await chainStatusPromise;
 
       return success(res, {
-        chainsWithSnapshots,
-        nodes,
         notificationCategories,
         recentThreads: threadCountQueryData,
         evmTestEnv: ETH_RPC,
+        enforceSessionKeys: process.env.ENFORCE_SESSION_KEYS == 'true',
         chainCategoryMap: chainCategories,
       });
     } else {
       // user is logged in
       const userStatusPromise = getUserStatus(models, reqUser);
-      const [chainStatus, userStatus] = await Promise.all([
+      const profilePromise = models.Profile.findOne({
+        where: {
+          user_id: reqUser.id,
+        },
+      });
+      const [chainStatus, userStatus, profileInstance] = await Promise.all([
         chainStatusPromise,
         userStatusPromise,
+        profilePromise,
       ]);
-      const {
-        nodes,
-        notificationCategories,
-        chainCategories,
-        chainsWithSnapshots,
-        threadCountQueryData,
-      } = chainStatus;
+      const { notificationCategories, chainCategories, threadCountQueryData } =
+        chainStatus;
       const { roles, user, id, email } = userStatus;
       const jwtToken = jwt.sign({ id, email }, JWT_SECRET);
       user.jwt = jwtToken as string;
 
       return success(res, {
-        chainsWithSnapshots,
-        nodes,
         notificationCategories,
         recentThreads: threadCountQueryData,
         roles,
         loggedIn: true,
-        user,
+        user: { ...user, profileId: profileInstance.id },
         evmTestEnv: ETH_RPC,
+        enforceSessionKeys: process.env.ENFORCE_SESSION_KEYS == 'true',
         chainCategoryMap: chainCategories,
       });
     }
@@ -383,15 +333,15 @@ export const status = async (
   }
 };
 
-type ChainActivity = [chain: string, timestamp: string][];
+type ChainActivity = [chain: string, timestamp: string | null][];
 
 function getChainActivity(
-  addresses: AddressInstance[]
+  addresses: AddressInstance[],
 ): Promise<ChainActivity> {
   return Promise.all(
     addresses.map(async (address) => {
-      const { chain, last_active } = address;
-      return [chain, last_active.toISOString()];
-    })
+      const { community_id, last_active } = address;
+      return [community_id, last_active?.toISOString()];
+    }),
   );
 }

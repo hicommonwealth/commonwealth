@@ -12,8 +12,8 @@ import { DeltaStatic } from 'quill';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router';
 import app from 'state';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { MixpanelSnapshotEvents } from '../../../../../shared/analytics/types';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
@@ -24,20 +24,18 @@ import {
 import { createNewProposal } from './helpers';
 import type { ThreadForm } from './types';
 
-type NewSnapshotProposalPageProps = {
-  snapshotId: string;
-};
-
 type NewSnapshotProposalFormProps = {
   snapshotId: string;
   thread?: Thread;
   onSave?: (snapshotInfo: { id: string; snapshot_title: string }) => void;
+  onModalClose?: () => void;
 };
 
 export const NewSnapshotProposalForm = ({
   snapshotId,
   thread,
   onSave,
+  onModalClose,
 }: NewSnapshotProposalFormProps) => {
   const navigate = useCommonNavigate();
 
@@ -47,7 +45,7 @@ export const NewSnapshotProposalForm = ({
   const [form, setForm] = useState<ThreadForm | null>(null);
   const [members, setMembers] = useState<string[]>([]);
   const [contentDelta, setContentDelta] = useState<DeltaStatic>(
-    createDeltaFromText('')
+    createDeltaFromText(''),
   );
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [, setSnapshotScoresFetched] = useState<boolean>(false);
@@ -66,7 +64,7 @@ export const NewSnapshotProposalForm = ({
 
   const clearLocalStorage = () => {
     localStorage.removeItem(
-      `${app.activeChainId()}-new-snapshot-proposal-name`
+      `${app.activeChainId()}-new-snapshot-proposal-name`,
     );
   };
 
@@ -88,7 +86,9 @@ export const NewSnapshotProposalForm = ({
         onSave({ id: response.id, snapshot_title: response.title }); // Pass relevant information
       }
     } catch (err) {
-      notifyError(capitalize(err.message));
+      err.code === 'ACTION_REJECTED'
+        ? notifyError('User rejected signing')
+        : notifyError(capitalize(err.error_description));
     } finally {
       setIsSaving(false);
     }
@@ -142,17 +142,17 @@ export const NewSnapshotProposalForm = ({
         const currentPath = window.location.pathname;
         if (currentPath.includes('/discussion/')) {
           const domain = window.location.origin;
-          const chainId = app.activeChainId();
+          const communityId = app.activeChainId();
           const threadId = thread.id;
 
           const linkText = `\n\nThis conversation was started on Commonwealth. Any attached images have been removed. See more discussion: `;
-          const linkUrl = `\n${domain}/${chainId}/discussion/${threadId}`;
+          const linkUrl = `\n${domain}/${communityId}/discussion/${threadId}`;
 
           const linkMarkdown = `${linkText}[here](${linkUrl})`;
 
           const delta = createDeltaFromText(
             thread.plaintext + linkMarkdown,
-            true
+            true,
           );
           setContentDelta(delta);
         } else {
@@ -166,7 +166,7 @@ export const NewSnapshotProposalForm = ({
       const snapshotSpace = app.snapshot.space;
       const scoreResponse = await getScore(
         snapshotSpace,
-        app.user.activeAccount.address
+        app.user.activeAccount.address,
       );
       setUserScore(scoreResponse);
       setSpace(snapshotSpace);
@@ -183,24 +183,17 @@ export const NewSnapshotProposalForm = ({
     };
   }, []);
 
-  if (loading)
-    return (
-      <div className="loading-state">
-        <CWSpinner />
-      </div>
-    );
-
   const author = app.user.activeAccount;
 
   const isMember =
     author &&
     author.address &&
     !!members.find(
-      (member) => member.toLowerCase() === author.address.toLowerCase()
+      (member) => member.toLowerCase() === author.address.toLowerCase(),
     );
 
   const minScoreFromSpace =
-    space.validation?.params.minScore ?? space.filters?.minScore; // Fall back to filters
+    space?.validation?.params.minScore ?? space?.filters?.minScore; // Fall back to filters
 
   const hasMinScore = userScore >= minScoreFromSpace;
 
@@ -218,102 +211,114 @@ export const NewSnapshotProposalForm = ({
 
   return (
     <div className="NewSnapshotProposalForm">
-      {space.filters?.onlyMembers && !isMember && (
-        <CWText>
-          You need to be a member of the space in order to submit a proposal.
-        </CWText>
-      )}
-      {showScoreWarning ? (
-        <CWText>
-          You need to have a minimum of {space.filters.minScore} {space.symbol}{' '}
-          in order to submit a proposal.
-        </CWText>
+      {loading ? (
+        <div className="proposal-loading">
+          <CWSpinner />
+        </div>
       ) : (
-        <CWText>
-          You need to meet the minimum quorum of {space.symbol} in order to
-          submit a proposal.
-        </CWText>
-      )}
-      <CWTextInput
-        label="Question/Proposal"
-        placeholder="Should 0xMaki be our new Mayor?"
-        onInput={(e) => {
-          setForm({
-            ...form,
-            name: e.target.value,
-          });
-          localStorage.setItem(
-            `${app.activeChainId()}-new-snapshot-proposal-name`,
-            form.name
-          );
-        }}
-        defaultValue={form.name}
-      />
-      {form.choices.map((_, idx) => {
-        return (
+        <>
+          {space.filters?.onlyMembers && !isMember && (
+            <CWText>
+              You need to be a member of the space in order to submit a
+              proposal.
+            </CWText>
+          )}
+          {showScoreWarning ? (
+            <CWText>
+              You need to have a minimum of {space.filters.minScore}{' '}
+              {space.symbol} in order to submit a proposal.
+            </CWText>
+          ) : (
+            <CWText>
+              You need to meet the minimum quorum of {space.symbol} in order to
+              submit a proposal.
+            </CWText>
+          )}
           <CWTextInput
-            key={`choice-${idx}`}
-            label={`Choice ${idx + 1}`}
-            placeholder={
-              idx === 0 ? 'Yes' : idx === 1 ? 'No' : `Option ${idx + 1}`
-            }
+            label="Question/Proposal"
+            placeholder="Should 0xMaki be our new Mayor?"
             onInput={(e) => {
               setForm({
                 ...form,
-                choices: form.choices.map((choice, i) =>
-                  i === idx ? e.target.value : choice
-                ),
+                name: e.target.value,
               });
+              localStorage.setItem(
+                `${app.activeChainId()}-new-snapshot-proposal-name`,
+                form.name,
+              );
             }}
-            iconRight={
-              idx > 1 && idx === form.choices.length - 1 ? 'trash' : undefined
-            }
-            iconRightonClick={() => {
-              setForm({
-                ...form,
-                choices: form.choices.slice(0, -1),
-              });
-            }}
+            defaultValue={form.name}
           />
-        );
-      })}
-      <CWButton
-        iconLeft="plus"
-        label="Add voting choice"
-        onClick={() => {
-          setForm({
-            ...form,
-            choices: form.choices.concat(`Option ${form.choices.length + 1}`),
-          });
-        }}
-      />
-      <ReactQuillEditor
-        contentDelta={contentDelta}
-        setContentDelta={setContentDelta}
-        placeholder={'What is your proposal?'}
-      />
-      <CWButton
-        label="Publish"
-        disabled={!author || isSaving || !isValid}
-        onClick={handlePublish}
-      />
+          {form.choices.map((_, idx) => {
+            return (
+              <CWTextInput
+                key={`choice-${idx}`}
+                label={`Choice ${idx + 1}`}
+                placeholder={
+                  idx === 0 ? 'Yes' : idx === 1 ? 'No' : `Option ${idx + 1}`
+                }
+                onInput={(e) => {
+                  setForm({
+                    ...form,
+                    choices: form.choices.map((choice, i) =>
+                      i === idx ? e.target.value : choice,
+                    ),
+                  });
+                }}
+                iconRight={
+                  idx > 1 && idx === form.choices.length - 1
+                    ? 'trash'
+                    : undefined
+                }
+                iconRightonClick={() => {
+                  setForm({
+                    ...form,
+                    choices: form.choices.slice(0, -1),
+                  });
+                }}
+              />
+            );
+          })}
+          <div className="add-voting-btn">
+            <CWButton
+              iconLeft="plus"
+              buttonType="primary"
+              buttonHeight="sm"
+              label="Add voting choice"
+              onClick={() => {
+                setForm({
+                  ...form,
+                  choices: form.choices.concat(
+                    `Option ${form.choices.length + 1}`,
+                  ),
+                });
+              }}
+            />
+          </div>
+          <ReactQuillEditor
+            contentDelta={contentDelta}
+            setContentDelta={setContentDelta}
+            placeholder="What is your proposal?"
+          />
+          <div className="footer">
+            {onModalClose && (
+              <CWButton
+                buttonHeight="sm"
+                buttonType="secondary"
+                label="Cancel"
+                onClick={onModalClose}
+              />
+            )}
+            <CWButton
+              buttonHeight="sm"
+              label="Publish"
+              disabled={!author || isSaving || !isValid}
+              onClick={handlePublish}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 };
-
-const NewSnapshotProposalPageComponent = ({
-  snapshotId,
-}: NewSnapshotProposalPageProps) => {
-  return (
-    <div className="NewSnapshotProposalPage">
-      <CWText type="h3" fontWeight="medium">
-        New Snapshot Proposal
-      </CWText>
-      <NewSnapshotProposalForm snapshotId={snapshotId} />
-    </div>
-  );
-};
-
-const NewSnapshotProposalPage = NewSnapshotProposalPageComponent;
-
-export default NewSnapshotProposalPage;
+export default NewSnapshotProposalForm;

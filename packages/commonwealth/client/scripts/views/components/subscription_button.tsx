@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { NotificationCategories } from 'common-common/src/types';
+import { NotificationCategories } from '@hicommonwealth/core';
 import { isNotUndefined } from 'helpers/typeGuards';
 
 import app from 'state';
@@ -8,15 +8,13 @@ import { CWButton } from './component_kit/cw_button';
 
 export const SubscriptionButton = () => {
   const subscriptions = app.user.notifications;
-  const communitySubscription = subscriptions.subscriptions.find(
-    (v) =>
-      v.category === NotificationCategories.NewThread &&
-      v.objectId === app.activeChainId()
-  );
+  const communitySubscription = subscriptions.findNotificationSubscription({
+    categoryId: NotificationCategories.NewThread,
+    options: { chainId: app.activeChainId() },
+  });
   const [notificationsOn, setNotificationsOn] = useState<boolean>(
-    isNotUndefined(communitySubscription)
+    isNotUndefined(communitySubscription),
   );
-  const communityOrChain = app.activeChainId();
 
   return (
     <CWButton
@@ -28,7 +26,12 @@ export const SubscriptionButton = () => {
             .then(() => setNotificationsOn(false));
         } else {
           subscriptions
-            .subscribe(NotificationCategories.NewThread, communityOrChain)
+            .subscribe({
+              categoryId: NotificationCategories.NewThread,
+              options: {
+                chainId: app.activeChainId(),
+              },
+            })
             .then(() => setNotificationsOn(true));
         }
       }}

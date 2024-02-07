@@ -1,0 +1,6 @@
+@import '../../../../../../styles/shared';
+@import './CWSearchBar.scss';
+
+.SearchBarCommunityPreviewRow {
+  @include everyRowStyles;
+}

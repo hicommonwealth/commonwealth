@@ -5,8 +5,6 @@
 .idea
 /venv
 /build
-/ios
-/android
 node_modules/
 jsconfig.json
 .vscode
@@ -21,6 +19,8 @@ coverage/
 *.csv
 cache/
 stats.json
+serviceAccountKey.json
+
 
 # Database downloads
 latest.dump
@@ -30,6 +30,11 @@ out.dump.*
 redacted.dump
 redacted.dump.*
 *.dat
+
+# Docker volumes
+.rabbitmq
+.postgres
+.redis-data
 
 # Bundle analyzer
 out.png
@@ -44,3 +49,5 @@ stats.json
 test_accounts.txt
 
 /test-results
+
+summary.json

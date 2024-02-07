@@ -110,17 +110,10 @@
 }
 
 .AccountSelector {
-  height: 400px;
-  width: 400px;
-  margin: 8px;
+  margin-bottom: 24px;
   gap: 8px;
   display: flex;
   flex-direction: column;
-
-  .close-button-wrapper {
-    display: flex;
-    justify-content: flex-end;
-  }
 
   .account-item {
     cursor: pointer;

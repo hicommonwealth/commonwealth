@@ -1,18 +1,18 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import 'components/thread_selector.scss';
-import NewProfilesController from '../../../controllers/server/newProfiles';
-import Thread from '../../../models/Thread';
+import AddressInfo from 'models/AddressInfo';
 import app from 'state';
-import { CWTextInput } from '../component_kit/cw_text_input';
+import { useDebounce } from 'usehooks-ts';
 import { QueryList } from 'views/components/component_kit/cw_query_list';
 import { ThreadSelectorItem } from 'views/components/thread_selector/thread_selector_item';
-import { useDebounce } from 'usehooks-ts';
-import { useSearchThreadsQuery } from '../../../../scripts/state/api/threads';
 import {
   APIOrderBy,
   APIOrderDirection,
 } from '../../../../scripts/helpers/constants';
+import { useSearchThreadsQuery } from '../../../../scripts/state/api/threads';
+import Thread from '../../../models/Thread';
+import { CWTextInput } from '../component_kit/cw_text_input';
 
 type ThreadSelectorProps = {
   linkedThreadsToSet: Array<Thread>;
@@ -28,7 +28,7 @@ export const ThreadSelector = ({
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
   const sharedQueryOptions = {
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     searchTerm: debouncedSearchTerm,
     limit: 5,
     orderBy: APIOrderBy.Rank,
@@ -49,9 +49,13 @@ export const ThreadSelector = ({
         new Thread({
           id: t.id,
           title: t.title,
-          chain: t.chain,
-          Address: t.address,
-        } as any)
+          community_id: t.community_id,
+          Address: new AddressInfo({
+            id: t.address_id,
+            address: t.address,
+            chainId: t.address_chain,
+          }),
+        } as ConstructorParameters<typeof Thread>[0]),
     );
   }, [threadsData]);
 
@@ -87,19 +91,12 @@ export const ThreadSelector = ({
         />
       );
     },
-    [linkedThreadsToSet, onSelect]
+    [linkedThreadsToSet, onSelect],
   );
 
   const EmptyComponent = () => (
     <div className="empty-component">{getEmptyContentMessage()}</div>
   );
-
-  // when results loaded, get profiles
-  useEffect(() => {
-    searchResults.forEach((thread) => {
-      NewProfilesController.Instance.getProfile(thread.chain, thread.author);
-    });
-  }, [searchResults]);
 
   return (
     <div className="ThreadSelector">

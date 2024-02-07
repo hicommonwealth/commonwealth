@@ -1,7 +1,6 @@
-import { AppError } from 'common-common/src/errors';
-import type { DB } from '../models';
+import { AppError, BalanceType } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import { TypedRequestBody, TypedResponse, success } from '../types';
-import { BalanceType } from '../../../common-common/src/types';
 
 export const Errors = {
   ChainExists: 'Chain Node already exists',
@@ -18,7 +17,7 @@ type createChainNodeReq = {
 const createChainNode = async (
   models: DB,
   req: TypedRequestBody<createChainNodeReq>,
-  res: TypedResponse<{ node_id: number }>
+  res: TypedResponse<{ node_id: number }>,
 ) => {
   if (!req.user.isAdmin) {
     throw new AppError(Errors.NotAdmin);

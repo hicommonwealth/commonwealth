@@ -1,44 +1,69 @@
 import { notifyError } from 'controllers/app/notifications';
+import { SessionKeyError } from 'controllers/server/sessions';
+import { featureFlags } from 'helpers/feature-flags';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import React, { useState } from 'react';
 import app from 'state';
 import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import type Comment from '../../../models/Comment';
 import {
   useCreateCommentReactionMutation,
   useDeleteCommentReactionMutation,
 } from '../../../state/api/comments';
+import { AuthModal } from '../../modals/AuthModal';
 import { LoginModal } from '../../modals/login_modal';
-import { Modal } from '../component_kit/cw_modal';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
+import { CWModal } from '../component_kit/new_designs/CWModal';
 import { getDisplayedReactorsForPopup } from './helpers';
 
 type CommentReactionButtonProps = {
   comment: Comment<any>;
   disabled: boolean;
+  tooltipText?: string;
+  onReaction?: () => void;
 };
 
 export const CommentReactionButton = ({
   comment,
   disabled,
+  tooltipText = '',
+  onReaction,
 }: CommentReactionButtonProps) => {
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
-  const { mutateAsync: createCommentReaction } =
-    useCreateCommentReactionMutation({
-      threadId: comment.threadId,
-      commentId: comment.id,
-      chainId: app.activeChainId(),
-    });
-  const { mutateAsync: deleteCommentReaction } =
-    useDeleteCommentReactionMutation({
-      commentId: comment.id,
-      chainId: app.activeChainId(),
-      threadId: comment.threadId,
-    });
+  const {
+    mutateAsync: createCommentReaction,
+    error: createCommentReactionError,
+    reset: resetCreateCommentReaction,
+  } = useCreateCommentReactionMutation({
+    threadId: comment.threadId,
+    commentId: comment.id,
+    communityId: app.activeChainId(),
+  });
+  const {
+    mutateAsync: deleteCommentReaction,
+    error: deleteCommentReactionError,
+    reset: resetDeleteCommentReaction,
+  } = useDeleteCommentReactionMutation({
+    commentId: comment.id,
+    communityId: app.activeChainId(),
+    threadId: comment.threadId,
+  });
+
+  const resetSessionRevalidationModal = createCommentReactionError
+    ? resetCreateCommentReaction
+    : resetDeleteCommentReaction;
+
+  const { RevalidationModal } = useSessionRevalidationModal({
+    handleClose: resetSessionRevalidationModal,
+    error: createCommentReactionError || deleteCommentReactionError,
+  });
 
   const activeAddress = app.user.activeAccount?.address;
   const hasReacted = !!(comment.reactions || []).find(
-    (x) => x?.author === activeAddress
+    (x) => x?.author === activeAddress,
   );
   const likes = (comment.reactions || []).length;
 
@@ -47,29 +72,39 @@ export const CommentReactionButton = ({
     e.preventDefault();
 
     if (!app.isLoggedIn() || !app.user.activeAccount) {
-      setIsModalOpen(true);
+      setIsAuthModalOpen(true);
       return;
     }
+
+    onReaction();
 
     if (hasReacted) {
       const foundReaction = comment.reactions.find((r) => {
         return r.author === activeAddress;
       });
       deleteCommentReaction({
-        chainId: app.activeChainId(),
+        communityId: app.activeChainId(),
         address: app.user.activeAccount.address,
         canvasHash: foundReaction.canvasHash,
         reactionId: foundReaction.id,
-      }).catch(() => {
+      }).catch((err) => {
+        if (err instanceof SessionKeyError) {
+          return;
+        }
+        console.error(err.response.data.error || err?.message);
         notifyError('Failed to update reaction count');
       });
     } else {
       createCommentReaction({
         address: activeAddress,
         commentId: comment.id,
-        chainId: app.activeChainId(),
+        communityId: app.activeChainId(),
         threadId: comment.threadId,
-      }).catch(() => {
+      }).catch((err) => {
+        if (err instanceof SessionKeyError) {
+          return;
+        }
+        console.error(err?.responseJSON?.error || err?.message);
         notifyError('Failed to save reaction');
       });
     }
@@ -77,21 +112,31 @@ export const CommentReactionButton = ({
 
   return (
     <>
-      <Modal
-        content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
-        isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-        onClose={() => setIsModalOpen(false)}
-        open={isModalOpen}
-      />
+      {!featureFlags.newSignInModal ? (
+        <CWModal
+          content={
+            <LoginModal onModalClose={() => setIsAuthModalOpen(false)} />
+          }
+          isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
+          onClose={() => setIsAuthModalOpen(false)}
+          open={isAuthModalOpen}
+        />
+      ) : (
+        <AuthModal
+          onClose={() => setIsAuthModalOpen(false)}
+          isOpen={isAuthModalOpen}
+        />
+      )}
+      {RevalidationModal}
       <CWUpvoteSmall
         voteCount={likes}
-        disabled={disabled}
+        disabled={!hasJoinedCommunity || disabled}
         selected={hasReacted}
-        onMouseEnter={() => undefined}
         onClick={handleVoteClick}
-        tooltipContent={getDisplayedReactorsForPopup({
+        popoverContent={getDisplayedReactorsForPopup({
           reactors: (comment.reactions || []).map((r) => r.author),
         })}
+        tooltipText={tooltipText}
       />
     </>
   );

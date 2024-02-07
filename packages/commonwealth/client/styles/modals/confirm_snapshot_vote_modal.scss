@@ -1,12 +1,6 @@
 @import '../shared';
 
 .ConfirmSnapshotVoteModal {
-  width: 480px;
-
-  @include extraSmall {
-    width: 100%;
-  }
-
   .vote-info {
     border: 2px solid $primary-300;
     border-radius: $border-radius-corners;
@@ -24,11 +18,5 @@
         color: $primary-500;
       }
     }
-  }
-
-  .button-group {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
   }
 }

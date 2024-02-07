@@ -1,0 +1,44 @@
+@import '../../../../../../styles/shared';
+@import './CWSearchBar.scss';
+
+.SearchBarThreadPreviewRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  @include everyRowStyles;
+
+  .header-row {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+
+    .User {
+      align-items: center;
+      display: flex;
+
+      .user-avatar {
+        position: unset;
+      }
+
+      .username {
+        @include caption;
+
+        font-weight: 500;
+      }
+    }
+
+    .last-updated-text.Text {
+      color: $neutral-500;
+    }
+  }
+
+  .excerpt-text.Text {
+    color: $neutral-600;
+  }
+}
+
+.SearchQuillRenderer {
+  max-height: 66px;
+  overflow-y: hidden;
+}

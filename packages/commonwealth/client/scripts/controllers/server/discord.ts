@@ -1,3 +1,4 @@
+import axios from 'axios';
 import $ from 'jquery';
 import app from 'state';
 
@@ -10,7 +11,7 @@ class DiscordController {
   public async createConfig(verification_token: string) {
     try {
       await $.post(`${app.serverUrl()}/createDiscordBotConfig`, {
-        chain_id: app.activeChainId(),
+        community_id: app.activeChainId(),
         verification_token,
         jwt: app.user.jwt,
       });
@@ -23,7 +24,7 @@ class DiscordController {
   public async setConfig(snapshot_channel_id: string) {
     try {
       await $.post(`${app.serverUrl()}/setDiscordBotConfig`, {
-        chain_id: app.activeChainId(),
+        community_id: app.activeChainId(),
         snapshot_channel_id,
         jwt: app.user.jwt,
       });
@@ -33,11 +34,11 @@ class DiscordController {
     }
   }
 
-  public async getChannels(chain_id: string): Promise<getChannelsResp> {
+  public async getChannels(community_id: string): Promise<getChannelsResp> {
     try {
       const discordBotConfig = await $.post(
         `${app.serverUrl()}/getDiscordChannels`,
-        { chain_id, jwt: app.user.jwt }
+        { community_id, jwt: app.user.jwt },
       );
 
       return {
@@ -52,15 +53,16 @@ class DiscordController {
 
   public async setForumChannelConnection(
     topicId: string,
-    channelId: string | null
+    channelId: string | null,
   ) {
     try {
-      await $.post(`${app.serverUrl()}/updateTopic`, {
-        chain_id: app.activeChainId(),
-        topic_id: topicId,
-        channel_id: channelId,
-        jwt: app.user.jwt,
-      });
+      await axios.patch(
+        `${app.serverUrl()}/topics/${topicId}/channels/${channelId}`,
+        {
+          chain: app.activeChainId(),
+          jwt: app.user.jwt,
+        },
+      );
     } catch (e) {
       console.log(e);
       throw new Error(e);

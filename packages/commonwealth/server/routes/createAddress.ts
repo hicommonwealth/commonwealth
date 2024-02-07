@@ -1,9 +1,8 @@
+import type { WalletId, WalletSsoSource } from '@hicommonwealth/core';
+import type { AddressAttributes, DB } from '@hicommonwealth/model';
 import type { NextFunction } from 'express';
-import type { WalletId } from 'common-common/src/types';
-import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import type { AddressAttributes } from '../models/address';
 import { createAddressHelper } from '../util/createAddressHelper';
 
 export const Errors = {
@@ -18,18 +17,22 @@ export type CreateAddressReq = {
   address: string;
   chain: string;
   wallet_id: WalletId;
+  wallet_sso_source: WalletSsoSource;
   community?: string;
   keytype?: string;
   block_info?: string;
 };
 
-type CreateAddressResp = AddressAttributes & { newly_created: boolean };
+type CreateAddressResp = AddressAttributes & {
+  newly_created: boolean;
+  joined_community: boolean;
+};
 
 const createAddress = async (
   models: DB,
   req: TypedRequestBody<CreateAddressReq>,
   res: TypedResponse<CreateAddressResp>,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const output = await createAddressHelper(req.body, models, req.user, next);
   return success(res, output);

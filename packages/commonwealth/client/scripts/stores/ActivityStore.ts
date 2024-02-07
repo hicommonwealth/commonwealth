@@ -103,7 +103,11 @@ export class ActiveAddressesStore {
     }
     const communityStore = this._addressesByCommunity[parentEntity];
     if (!communityStore[id]) {
-      const addressInfo = new AddressInfo(id, address.address, chain, null);
+      const addressInfo = new AddressInfo({
+        id: null,
+        address: address.address,
+        chainId: chain,
+      });
       const postCount = 1;
       communityStore[id] = { addressInfo, postCount };
     } else {

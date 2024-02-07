@@ -1,44 +1,50 @@
-import React, { ReactElement } from 'react';
+/* eslint-disable react/no-multi-comp */
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 import 'pages/view_proposal/proposal_header_links.scss';
 
-import { ProposalType } from 'common-common/src/types';
+import { ProposalType } from '@hicommonwealth/core';
 import { getProposalUrlPath } from 'identifiers';
-import type { AnyProposal } from '../../../models/types';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 type ProposalHeaderLinkProps = {
-  threads: any[];
-  chain: string;
+  threads: { id: number; title: string }[];
+  community: string;
 };
 
 // "Go to discussion"
-const threadLinkButton = (threadId: string, title: string, chain: string) => {
+const threadLinkButton = (
+  threadId: number,
+  title: string,
+  community: string,
+) => {
   const path = getProposalUrlPath(
     ProposalType.Thread,
-    `${threadId}`,
+    threadId,
     false,
-    chain
+    community,
   );
 
   return (
     <div className="HeaderLink">
-      <Link to={path}>{title ? decodeURIComponent(title) : 'Go to thread'}</Link>
+      <Link to={path}>
+        {title ? decodeURIComponent(title) : 'Go to thread'}
+      </Link>
       <CWIcon iconName="externalLink" iconSize="small" />
     </div>
   );
 };
-export const ThreadLink = ({ threads, chain }: ProposalHeaderLinkProps) => {
+export const ThreadLink = ({ threads, community }: ProposalHeaderLinkProps) => {
   const components: JSX.Element[] = [];
   threads.forEach((t) =>
-    components.push(threadLinkButton(t.id, t.title, chain))
+    components.push(threadLinkButton(t.id, t.title, community)),
   );
   return <React.Fragment>{components}</React.Fragment>;
 };
 
 type SnapshotThreadLinkProps = {
-  thread: { id: string; title: string };
+  thread: { id: number; title: string };
 };
 
 export const SnapshotThreadLink = ({ thread }: SnapshotThreadLinkProps) => {

@@ -1,4 +1,5 @@
 import { parseCustomStages, threadStageToLabel } from 'helpers';
+import { featureFlags } from 'helpers/feature-flags';
 import { isUndefined } from 'helpers/typeGuards';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
@@ -8,12 +9,17 @@ import React, { useEffect, useRef, useState } from 'react';
 import { matchRoutes } from 'react-router-dom';
 import app from 'state';
 import { useFetchTopicsQuery } from 'state/api/topics';
+import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
+import {
+  CommunityStakeBanner,
+  useCommunityStake,
+} from 'views/components/CommunityStake';
+import DismissStakeBannerModal from 'views/components/CommunityStake/DismissStakeBannerModal';
 import { Select } from 'views/components/Select';
-import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
-import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
-import { Modal } from 'views/components/component_kit/cw_modal';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import type Topic from '../../../../models/Topic';
 import {
@@ -21,10 +27,9 @@ import {
   ThreadStage,
   ThreadTimelineFilterTypes,
 } from '../../../../models/types';
+
+import useCommunityStakeStore from 'state/ui/communityStake';
 import './HeaderWithFilters.scss';
-import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
-import SwitchAddressBanner from 'views/components/SwitchAddressBanner';
-import { featureFlags } from 'helpers/feature-flags';
 
 type HeaderWithFiltersProps = {
   stage: string;
@@ -34,6 +39,9 @@ type HeaderWithFiltersProps = {
   totalThreadCount: number;
   isIncludingSpamThreads: boolean;
   onIncludeSpamThreads: (includeSpams: boolean) => any;
+  isIncludingArchivedThreads: boolean;
+  onIncludeArchivedThreads: (includeArchived: boolean) => any;
+  isOnArchivePage?: boolean;
 };
 
 export const HeaderWithFilters = ({
@@ -44,9 +52,14 @@ export const HeaderWithFilters = ({
   totalThreadCount,
   isIncludingSpamThreads,
   onIncludeSpamThreads,
+  isIncludingArchivedThreads,
+  onIncludeArchivedThreads,
+  isOnArchivePage,
 }: HeaderWithFiltersProps) => {
   const navigate = useCommonNavigate();
   const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
+  const [isDismissStakeBannerModalOpen, setIsDismissStakeBannerModalOpen] =
+    useState(false);
   const forceRerender = useForceRerender();
   const filterRowRef = useRef<HTMLDivElement>();
   const [rightFiltersDropdownPosition, setRightFiltersDropdownPosition] =
@@ -55,11 +68,13 @@ export const HeaderWithFilters = ({
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
   const { totalThreadsInCommunityForVoting } =
     useEXCEPTION_CASE_threadCountersStore();
+  const { stakeEnabled } = useCommunityStake();
+  const { dismissBanner, isBannerVisible } = useCommunityStakeStore();
 
   const onFilterResize = () => {
     if (filterRowRef.current) {
       setRightFiltersDropdownPosition(
-        filterRowRef.current.clientHeight > 40 ? 'bottom-start' : 'bottom-end'
+        filterRowRef.current.clientHeight > 40 ? 'bottom-start' : 'bottom-end',
       );
     }
   };
@@ -86,7 +101,7 @@ export const HeaderWithFilters = ({
   const { stagesEnabled, customStages } = app.chain?.meta || {};
 
   const { data: topics } = useFetchTopicsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const featuredTopics = (topics || [])
@@ -114,7 +129,12 @@ export const HeaderWithFilters = ({
 
   const matchesDiscussionsTopicRoute = matchRoutes(
     [{ path: '/discussions/:topic' }, { path: ':scope/discussions/:topic' }],
-    location
+    location,
+  );
+
+  const matchesArchivedRoute = matchRoutes(
+    [{ path: '/archived' }, { path: ':scope/archived' }],
+    location,
   );
 
   const onFilterSelect = ({
@@ -123,7 +143,7 @@ export const HeaderWithFilters = ({
     filterVal = '',
   }) => {
     const urlParams = Object.fromEntries(
-      new URLSearchParams(window.location.search)
+      new URLSearchParams(window.location.search),
     );
     urlParams[filterKey] = filterVal;
 
@@ -131,36 +151,56 @@ export const HeaderWithFilters = ({
       delete urlParams[filterKey];
     }
 
-    navigate(
-      `/discussions${pickedTopic ? `/${pickedTopic}` : ''}?` +
-        Object.keys(urlParams)
-          .map((x) => `${x}=${urlParams[x]}`)
-          .join('&')
-    );
+    if (matchesArchivedRoute && !pickedTopic) {
+      navigate(
+        `/archived?` +
+          Object.keys(urlParams)
+            .map((x) => `${x}=${urlParams[x]}`)
+            .join('&'),
+      );
+    } else {
+      navigate(
+        `/discussions${pickedTopic ? `/${pickedTopic}` : ''}?` +
+          Object.keys(urlParams)
+            .map((x) => `${x}=${urlParams[x]}`)
+            .join('&'),
+      );
+    }
   };
 
-  const handleSwitchAddress = () => {
-    console.log('click switch address');
+  const handleDismissStakeBannerModal = (
+    dismissForThisCommunity: boolean,
+    dismissForAnyCommunity: boolean,
+  ) => {
+    setIsDismissStakeBannerModalOpen(false);
+
+    dismissBanner({
+      communityId: app.activeChainId(),
+      communityDismissal: dismissForThisCommunity,
+      allCommunitiesDismissal: dismissForAnyCommunity,
+    });
   };
 
-  const handleJoinCommunity = () => {
-    console.log('click handle join');
-  };
+  const stakeBannerEnabled =
+    featureFlags.communityStake &&
+    stakeEnabled &&
+    isBannerVisible(app.activeChainId());
 
   return (
     <div className="HeaderWithFilters">
-      {featureFlags.sessionKeys && (
-        // TODO adjust communityName and onClose to be dynamic once the logic is ready
-        <SwitchAddressBanner
-          communityName="dydx"
-          onCommunityJoin={handleJoinCommunity}
-          onAddressSwitch={handleSwitchAddress}
-          onClose={() => console.log('close')}
+      {stakeBannerEnabled && (
+        <CommunityStakeBanner
+          onClose={() => setIsDismissStakeBannerModalOpen(true)}
         />
       )}
+
       <div className="header-row">
         <CWText type="h3" fontWeight="semiBold" className="header-text">
-          {isUndefined(topic) ? 'All Discussions' : topic}
+          {isUndefined(topic)
+            ? isOnArchivePage
+              ? 'Archived'
+              : 'All Discussions'
+            : topic}
         </CWText>
         <div className="count-and-button">
           <CWText
@@ -170,23 +210,17 @@ export const HeaderWithFilters = ({
           >
             {totalThreadCount} Threads
           </CWText>
-          {isWindowExtraSmall ? (
-            <CWIconButton
-              iconName="plusCircle"
-              iconButtonTheme="black"
-              onClick={() => {
-                navigate('/new/discussion');
-              }}
-              disabled={!hasJoinedCommunity}
-            />
-          ) : (
+          {!isWindowExtraSmall && (
             <CWButton
-              buttonType="mini-black"
-              label="Create Thread"
+              buttonType="primary"
+              buttonHeight="sm"
+              label="Create thread"
               iconLeft="plus"
               onClick={() => {
                 navigate(
-                  `/new/discussion${topic ? `?topic=${selectedTopic?.id}` : ''}`
+                  `/new/discussion${
+                    topic ? `?topic=${selectedTopic?.id}` : ''
+                  }`,
                 );
               }}
               disabled={!hasJoinedCommunity}
@@ -197,6 +231,14 @@ export const HeaderWithFilters = ({
 
       {selectedTopic?.description && (
         <CWText className="subheader-text">{selectedTopic.description}</CWText>
+      )}
+
+      {isOnArchivePage && (
+        <CWText className="subheader-text">
+          This section is for all archived posts. Archived posts will always be
+          visible here and can be linked to new thread posts, but they can’t be
+          upvoted or receive new comments.
+        </CWText>
       )}
 
       {app.chain?.meta && (
@@ -227,14 +269,20 @@ export const HeaderWithFilters = ({
                 {
                   id: 3,
                   value: ThreadFeaturedFilterTypes.MostLikes,
-                  label: 'Likes',
-                  iconLeft: 'heart',
+                  label: 'Upvotes',
+                  iconLeft: 'upvote',
                 },
                 {
                   id: 4,
                   value: ThreadFeaturedFilterTypes.MostComments,
                   label: 'Comments',
                   iconLeft: 'chatDots',
+                },
+                {
+                  id: 5,
+                  value: ThreadFeaturedFilterTypes.LatestActivity,
+                  label: 'Latest Activity',
+                  iconLeft: 'bellRinging',
                 },
               ]}
             />
@@ -268,13 +316,13 @@ export const HeaderWithFilters = ({
                   ]}
                   dropdownPosition={rightFiltersDropdownPosition}
                   canEditOption={app.roles?.isAdminOfEntity({
-                    chain: app.activeChainId(),
+                    community: app.activeChainId(),
                   })}
                   onOptionEdit={(item: any) =>
                     setTopicSelectedToEdit(
                       [...featuredTopics, ...otherTopics].find(
-                        (x) => x.id === item.id
-                      )
+                        (x) => x.id === item.id,
+                      ),
                     )
                   }
                 />
@@ -339,16 +387,28 @@ export const HeaderWithFilters = ({
         </div>
       )}
 
-      <CWCheckbox
-        checked={isIncludingSpamThreads}
-        label="Include posts flagged as spam"
-        className="ml-auto"
-        onChange={(e) => {
-          onIncludeSpamThreads(e.target.checked);
-        }}
-      />
+      <div className="checkboxes">
+        <CWCheckbox
+          checked={isIncludingSpamThreads}
+          label="Include posts flagged as spam"
+          onChange={(e) => {
+            onIncludeSpamThreads(e.target.checked);
+          }}
+        />
 
-      <Modal
+        {!isOnArchivePage && (
+          <CWCheckbox
+            checked={isIncludingArchivedThreads}
+            label="Include archived posts"
+            onChange={(e) => {
+              onIncludeArchivedThreads(e.target.checked);
+            }}
+          />
+        )}
+      </div>
+
+      <CWModal
+        size="medium"
         content={
           <EditTopicModal
             topic={topicSelectedToEdit}
@@ -357,6 +417,17 @@ export const HeaderWithFilters = ({
         }
         onClose={() => setTopicSelectedToEdit(null)}
         open={!!topicSelectedToEdit}
+      />
+      <CWModal
+        size="small"
+        content={
+          <DismissStakeBannerModal
+            onModalClose={() => setIsDismissStakeBannerModalOpen(false)}
+            onDismiss={handleDismissStakeBannerModal}
+          />
+        }
+        onClose={() => setIsDismissStakeBannerModalOpen(false)}
+        open={isDismissStakeBannerModalOpen}
       />
     </div>
   );

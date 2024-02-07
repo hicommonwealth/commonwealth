@@ -1,23 +1,23 @@
-import React from 'react';
 import { isDefaultStage, pluralize, threadStageToLabel } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
 import moment from 'moment';
-import type Thread from '../../../models/Thread';
-import type Topic from '../../../models/Topic';
-import 'pages/overview/TopicSummaryRow.scss';
 import { useCommonNavigate } from 'navigation/helpers';
+import 'pages/overview/TopicSummaryRow.scss';
+import React from 'react';
 import app from 'state';
 import { slugify } from 'utils';
-import { CWTag } from 'views/components/component_kit/cw_tag';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import type Thread from '../../../models/Thread';
+import type Topic from '../../../models/Topic';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
+import { CWTag } from '../../components/component_kit/new_designs/CWTag';
+import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { SharePopover } from '../../components/share_popover';
 import { User } from '../../components/user/user';
-import { NewThreadTag } from '../discussions/NewThreadTag';
-import { getLastUpdated, isHot } from '../discussions/helpers';
+import { getLastUpdated, isHot, isNewThread } from '../discussions/helpers';
 import { TopicSummaryRowSkeleton } from './TopicSummaryRowSkeleton';
 
 type TopicSummaryRowProps = {
@@ -31,7 +31,7 @@ export const TopicSummaryRow = ({
   monthlyThreads = [],
   pinnedThreads = [],
   topic,
-  isLoading
+  isLoading,
 }: TopicSummaryRowProps) => {
   const navigate = useCommonNavigate();
 
@@ -76,20 +76,21 @@ export const TopicSummaryRow = ({
         {threadsToDisplay.map((thread, idx) => {
           const discussionLink = getProposalUrlPath(
             thread.slug,
-            `${thread.identifier}-${slugify(thread.title)}`
+            `${thread.identifier}-${slugify(thread.title)}`,
           );
 
           const user = app.chain.accounts.get(thread.author);
 
           const isStageDefault = isDefaultStage(thread.stage);
           const isTagsRowVisible = thread.stage && !isStageDefault;
+          const stageLabel = threadStageToLabel(thread.stage);
 
           return (
             <div key={idx}>
               <div
                 className={getClasses<{ isPinned?: boolean }>(
                   { isPinned: thread.pinned },
-                  'recent-thread-row'
+                  'recent-thread-row',
                 )}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -99,10 +100,13 @@ export const TopicSummaryRow = ({
                 <div className="row-top">
                   <div className="user-and-date-row">
                     <User
-                      user={user}
-                      showAddressWithDisplayName
+                      userAddress={user.address}
+                      userCommunityId={
+                        user.community?.id || user.profile?.chain
+                      }
+                      shouldShowAddressWithDisplayName
+                      shouldLinkProfile
                       avatarSize={24}
-                      linkify
                     />
                     <CWText className="last-updated-text">•</CWText>
                     <CWText
@@ -112,7 +116,9 @@ export const TopicSummaryRow = ({
                     >
                       {moment(getLastUpdated(thread)).format('l')}
                     </CWText>
-                    <NewThreadTag threadCreatedAt={thread.createdAt} />
+                    {isNewThread(thread.createdAt) && (
+                      <CWTag label="New" type="new" iconName="newStar" />
+                    )}
                     {thread.readOnly && (
                       <CWIcon iconName="lock" iconSize="small" />
                     )}
@@ -128,13 +134,14 @@ export const TopicSummaryRow = ({
                 </CWText>
 
                 <CWText type="caption" className="thread-preview">
-                  {thread.plaintext}
+                  <QuillRenderer doc={thread.plaintext} />
                 </CWText>
 
                 {isTagsRowVisible && (
                   <div className="tags-row">
                     <CWTag
-                      label={threadStageToLabel(thread.stage)}
+                      label={stageLabel}
+                      classNames={stageLabel}
                       trimAt={20}
                       type="stage"
                     />
@@ -149,6 +156,7 @@ export const TopicSummaryRow = ({
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
+                        navigate(`${discussionLink}?focusEditor=true`);
                       }}
                     />
                   </div>

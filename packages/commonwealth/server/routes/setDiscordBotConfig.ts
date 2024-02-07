@@ -1,6 +1,6 @@
-import { AppError } from 'common-common/src/errors';
-import { validateChain } from '../middleware/validateChain';
-import type { DB } from '../models';
+import { AppError } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
+import { validateCommunity } from '../middleware/validateCommunity';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
@@ -26,19 +26,19 @@ type SetDiscordBotConfigResp = {
 const setDiscordBotConfig = async (
   models: DB,
   req: TypedRequestBody<SetDiscordBotConfigReq>,
-  res: TypedResponse<SetDiscordBotConfigResp>
+  res: TypedResponse<SetDiscordBotConfigResp>,
 ) => {
   const { chain_id, guild_id, verification_token, snapshot_channel_id } =
     req.body;
 
-  const [chain, error] = await validateChain(models, { chain_id });
-  if (!chain_id || error) throw new AppError(SetDiscordBotConfigErrors.NoChain);
+  const [chain, error] = await validateCommunity(models, { chain_id });
+  if (!chain || error) throw new AppError(SetDiscordBotConfigErrors.NoChain);
 
   if (snapshot_channel_id) {
     // An update that comes from CW, not the bot. Handle accordingly
     const configEntry = await models.DiscordBotConfig.findOne({
       where: {
-        chain_id,
+        community_id: chain_id,
       },
     });
     configEntry.snapshot_channel_id =
@@ -51,12 +51,12 @@ const setDiscordBotConfig = async (
 
   const configEntry = await models.DiscordBotConfig.findOne({
     where: {
-      chain_id,
+      community_id: chain_id,
       verification_token,
     },
   });
 
-  if (!configEntry || chain_id !== configEntry.chain_id) {
+  if (!configEntry || chain_id !== configEntry.community_id) {
     throw new AppError(SetDiscordBotConfigErrors.NotAdmin);
   }
 
@@ -67,7 +67,7 @@ const setDiscordBotConfig = async (
   const existingCommunityWithGuildConnected =
     await models.DiscordBotConfig.findAll({ where: { guild_id } });
 
-  const chainInstance = await models.Chain.findOne({
+  const chainInstance = await models.Community.findOne({
     where: { id: chain_id },
   });
 
@@ -82,11 +82,11 @@ const setDiscordBotConfig = async (
 
       await models.DiscordBotConfig.destroy({
         where: {
-          chain_id,
+          community_id: chain_id,
         },
       });
       console.log(
-        'Attempted to add a guild that was already connected to another CW community.'
+        'Attempted to add a guild that was already connected to another CW community.',
       );
     } catch (e) {
       console.log(e);
@@ -104,7 +104,7 @@ const setDiscordBotConfig = async (
         user_id: profile.user_id,
         profile_id: profile.id,
         address: '0xdiscordbot',
-        chain: chain_id,
+        community_id: chain_id,
         role: 'admin',
         verification_token: '123456',
         verification_token_expires: new Date(2030, 1, 1),
@@ -122,7 +122,7 @@ const setDiscordBotConfig = async (
   try {
     await configEntry.update(
       {
-        chain_id,
+        community_id: chain_id,
         guild_id,
         verification_token: null,
         token_expiration: null,
@@ -132,7 +132,7 @@ const setDiscordBotConfig = async (
         where: {
           guild_id,
         },
-      }
+      },
     );
 
     return success(res, {

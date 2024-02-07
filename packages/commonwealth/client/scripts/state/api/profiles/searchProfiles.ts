@@ -4,24 +4,14 @@ import {
   APIOrderBy,
   APIOrderDirection,
 } from 'client/scripts/helpers/constants';
+import { MemberResult } from 'client/scripts/views/pages/search/helpers';
 import app from 'state';
 import { ApiEndpoints } from '../config';
 
 const SEARCH_PROFILES_STALE_TIME = 60 * 1_000; // 60 s
 
 export type SearchProfilesResponse = {
-  results: {
-    id: number;
-    user_id: string;
-    profile_name: string;
-    avatar_url: string;
-    addresses: {
-      id: number;
-      chain: string;
-      address: string;
-    }[];
-    roles?: any[];
-  }[];
+  results: MemberResult[];
   limit: number;
   page: number;
   totalPages: number;
@@ -29,23 +19,26 @@ export type SearchProfilesResponse = {
 };
 
 interface SearchProfilesProps {
-  chainId: string;
+  communityId: string;
   searchTerm: string;
   limit: number;
   orderBy: APIOrderBy;
   orderDirection: APIOrderDirection;
   includeRoles: boolean;
-
+  includeMembershipTypes?: 'in-group' | `in-group:${string}` | 'not-in-group';
+  includeGroupIds?: boolean;
   enabled?: boolean;
 }
 
 const searchProfiles = async ({
   pageParam = 1,
-  chainId,
+  communityId,
   searchTerm,
   limit,
   orderBy,
   orderDirection,
+  includeMembershipTypes,
+  includeGroupIds,
   includeRoles,
 }: SearchProfilesProps & { pageParam: number }) => {
   const {
@@ -57,35 +50,41 @@ const searchProfiles = async ({
         'Content-Type': 'application/json',
       },
       params: {
-        chain: chainId,
+        community_id: communityId,
         search: searchTerm,
         limit: limit.toString(),
         page: pageParam.toString(),
         order_by: orderBy,
         order_direction: orderDirection,
         include_roles: includeRoles,
+        ...(includeMembershipTypes && { memberships: includeMembershipTypes }),
+        ...(includeGroupIds && { include_group_ids: includeGroupIds }),
       },
-    }
+    },
   );
   return result;
 };
 
 const useSearchProfilesQuery = ({
-  chainId,
+  communityId,
   searchTerm,
   limit,
   orderBy,
   orderDirection,
   includeRoles,
+  includeGroupIds,
+  includeMembershipTypes,
   enabled = true,
 }: SearchProfilesProps) => {
   const key = [
     ApiEndpoints.searchProfiles(searchTerm),
     {
-      chainId,
+      communityId,
       orderBy,
       orderDirection,
       includeRoles,
+      includeGroupIds,
+      includeMembershipTypes,
     },
   ];
   return useInfiniteQuery(
@@ -93,11 +92,13 @@ const useSearchProfilesQuery = ({
     ({ pageParam }) =>
       searchProfiles({
         pageParam,
-        chainId,
+        communityId,
         searchTerm,
         limit,
         orderBy,
         orderDirection,
+        includeMembershipTypes,
+        includeGroupIds,
         includeRoles,
       }),
     {
@@ -110,7 +111,7 @@ const useSearchProfilesQuery = ({
       },
       staleTime: SEARCH_PROFILES_STALE_TIME,
       enabled,
-    }
+    },
   );
 };
 

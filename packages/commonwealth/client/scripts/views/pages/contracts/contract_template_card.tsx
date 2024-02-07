@@ -1,11 +1,11 @@
 import React from 'react';
 
-import app from 'state';
 import moment from 'moment';
+import app from 'state';
 import { CWCard } from 'views/components/component_kit/cw_card';
-import { CWText } from 'views/components/component_kit/cw_text';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
-import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import {
   displayOptions,
   ManageContractTemplateModalProps,
@@ -13,8 +13,8 @@ import {
 
 import 'pages/contracts/contract_template_card.scss';
 import { openConfirmation } from 'views/modals/confirmation_modal';
-import { User } from '../../components/user/user';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
+import { User } from '../../components/user/user';
 
 type ContractTemplateCardProps = {
   contractId: number;
@@ -32,7 +32,10 @@ type ContractTemplateCardProps = {
   handleShowModal: (
     templateId: number,
     cct_id: number,
-    template: Omit<ManageContractTemplateModalProps['template'], 'id' | 'title'>
+    template: Omit<
+      ManageContractTemplateModalProps['template'],
+      'id' | 'title'
+    >,
   ) => void;
 };
 
@@ -77,7 +80,8 @@ export const ContractTemplateCard = ({
       buttons: [
         {
           label: 'Delete',
-          buttonType: 'mini-red',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
           onClick: async () => {
             await app.contracts.deleteCommunityContractTemplate({
               contract_id: contractId,
@@ -89,7 +93,8 @@ export const ContractTemplateCard = ({
         },
         {
           label: 'Cancel',
-          buttonType: 'mini-black',
+          buttonType: 'primary',
+          buttonHeight: 'sm',
         },
       ],
     });
@@ -135,7 +140,13 @@ export const ContractTemplateCard = ({
                   {info.label}
                 </CWText>
                 <div className="enabledby-row">
-                  <User user={enabler} showAddressWithDisplayName />
+                  <User
+                    userAddress={enabler.address}
+                    userCommunityId={
+                      enabler.community?.id || enabler?.profile?.chain
+                    }
+                    shouldShowAddressWithDisplayName
+                  />
                   <div className="text-group">
                     <CWText type="caption">on</CWText>
                     <CWText type="caption" fontWeight="medium">

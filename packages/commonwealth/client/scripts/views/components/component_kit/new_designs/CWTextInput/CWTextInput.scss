@@ -1,0 +1,97 @@
+@import '../../../../../../styles/shared.scss';
+
+@mixin iconPositionStyles {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.TextInput {
+  display: flex;
+  flex-direction: column;
+
+  .input-and-icon-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+    flex: 1;
+    width: 240px;
+
+    &.fullWidth {
+      width: 100%;
+    }
+
+    input {
+      @include inputStyles;
+      width: 100%;
+
+      &.darkMode {
+        @include darkModeInputStyles;
+      }
+
+      &.small {
+        font-size: 14px;
+        height: 32px;
+        line-height: 20px;
+        padding: 6px 8px;
+        border-radius: 4px;
+      }
+
+      &.large {
+        font-size: 14px;
+        height: 40px;
+        letter-spacing: 0.02em;
+        line-height: 24px;
+        padding: 10px 12px;
+        border-radius: 6px;
+      }
+
+      &.hasLeftIcon {
+        padding-left: 32px;
+      }
+
+      &.hasRightIcon {
+        padding-right: 32px;
+      }
+    }
+
+    .text-input-icon > svg {
+      fill: $neutral-400;
+    }
+
+    .text-input-left-icon > svg {
+      @include iconPositionStyles;
+      left: 8px;
+    }
+
+    .text-input-left-onClick-icon > svg {
+      @include iconPositionStyles;
+      left: 8px;
+    }
+
+    .text-input-right-icon > svg {
+      @include iconPositionStyles;
+      right: 8px;
+    }
+
+    .text-input-right-onClick-icon > svg {
+      @include iconPositionStyles;
+      right: 8px;
+    }
+
+    .right-text-addon {
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      padding-inline: 12px;
+      background-color: $neutral-50;
+      height: calc(100% - 2px);
+      border-top-right-radius: 6px;
+      border-bottom-right-radius: 6px;
+      color: $neutral-400;
+      position: absolute;
+      right: 1px;
+      border-left: 1px solid $neutral-200;
+    }
+  }
+}

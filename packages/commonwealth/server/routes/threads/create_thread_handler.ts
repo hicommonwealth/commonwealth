@@ -1,4 +1,6 @@
-import { ThreadAttributes } from '../../models/thread';
+import { IDiscordMeta } from '@hicommonwealth/core';
+import { ThreadAttributes } from '@hicommonwealth/model';
+import { verifyThread } from '../../../shared/canvas/serverVerify';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 
@@ -14,19 +16,18 @@ type CreateThreadRequestBody = {
   canvas_action?: any;
   canvas_session?: any;
   canvas_hash?: any;
-  discord_meta?: any;
+  discord_meta?: IDiscordMeta;
 };
 type CreateThreadResponse = ThreadAttributes;
 
 export const createThreadHandler = async (
   controllers: ServerControllers,
   req: TypedRequestBody<CreateThreadRequestBody>,
-  res: TypedResponse<CreateThreadResponse>
+  res: TypedResponse<CreateThreadResponse>,
 ) => {
-  const { user, address, chain } = req;
+  const { user, address, community } = req;
   const {
     topic_id: topicId,
-    topic_name: topicName,
     title,
     body,
     kind,
@@ -39,17 +40,26 @@ export const createThreadHandler = async (
     discord_meta,
   } = req.body;
 
+  if (process.env.ENFORCE_SESSION_KEYS === 'true') {
+    await verifyThread(canvasAction, canvasSession, canvasHash, {
+      title,
+      body,
+      address: address.address,
+      community: community.id,
+      topic: topicId ? parseInt(topicId, 10) : null,
+    });
+  }
+
   const [thread, notificationOptions, analyticsOptions] =
     await controllers.threads.createThread({
       user,
       address,
-      chain,
+      community,
       title,
       body,
       kind,
       readOnly,
       topicId: parseInt(topicId, 10) || undefined,
-      topicName,
       stage,
       url,
       canvasAction,

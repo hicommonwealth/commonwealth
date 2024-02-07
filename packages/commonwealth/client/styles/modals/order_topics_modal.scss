@@ -10,13 +10,10 @@
 }
 
 .OrderTopicsModal {
-  width: 360px;
-
   .featured-topic-list {
     display: flex;
     flex-direction: column;
     height: 320px;
-    margin-bottom: 16px;
 
     @include visibleScrollbar(light);
 

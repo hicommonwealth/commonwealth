@@ -36,6 +36,7 @@
     align-items: center;
     display: flex;
     min-width: 0;
+    height: 100%;
 
     .title-text {
       color: $neutral-600;
@@ -43,6 +44,10 @@
       text-overflow: ellipsis;
       white-space: nowrap;
       width: 100%;
+    }
+
+    .right-icon svg {
+      fill: $neutral-500;
     }
 
     &.background {
@@ -56,6 +61,10 @@
     &.active,
     &:hover {
       background-color: $primary-50;
+    }
+
+    .section-title-text-active {
+      font-weight: 500;
     }
 
     .carat {
@@ -120,5 +129,9 @@
     margin-right: 4px;
     padding: 2px 4px 3px;
     min-width: 16px;
+  }
+
+  svg {
+    fill: transparent;
   }
 }

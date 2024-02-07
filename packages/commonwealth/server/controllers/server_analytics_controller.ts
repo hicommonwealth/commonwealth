@@ -1,3 +1,4 @@
+import { SERVER_URL } from '../config';
 import { TrackOptions, __track } from './server_analytics_methods/track';
 
 export class ServerAnalyticsController {
@@ -7,11 +8,13 @@ export class ServerAnalyticsController {
    */
   async track(options: TrackOptions, req?: any) {
     let newOptions = { ...options };
+    const host = req?.get?.('host');
     if (req) {
       const browserInfo = getRequestBrowserInfo(req);
       newOptions = {
         ...newOptions,
         ...browserInfo,
+        ...(host && { isCustomDomain: SERVER_URL.includes(host) }),
       };
     }
     return __track.call(this, newOptions);

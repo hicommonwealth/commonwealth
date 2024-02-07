@@ -1,18 +1,18 @@
-import { useGetThreadsByIdQuery } from 'state/api/threads';
 import { filterLinks } from 'helpers/threads';
 import { getProposalUrlPath } from 'identifiers';
 import 'pages/view_thread/linked_threads_card.scss';
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
+import { useGetThreadsByIdQuery } from 'state/api/threads';
 import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import { slugify } from '../../../../../shared/utils';
 import type Thread from '../../../models/Thread';
 import { LinkSource } from '../../../models/Thread';
+import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { CWContentPageCard } from '../../components/component_kit/CWContentPage';
-import { Modal } from '../../components/component_kit/cw_modal';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { LinkedThreadModal } from '../../modals/linked_thread_modal';
 
 type LinkedThreadsCardProps = {
@@ -29,9 +29,9 @@ export const LinkedThreadsCard = ({
   const linkedThreadIds = useMemo(
     () =>
       filterLinks(thread.links, LinkSource.Thread).map(
-        ({ identifier }) => identifier
+        ({ identifier }) => identifier,
       ),
-    [thread.links]
+    [thread.links],
   );
 
   const { data: linkedThreads, isLoading } = useGetThreadsByIdQuery({
@@ -57,7 +57,7 @@ export const LinkedThreadsCard = ({
                     const discussionLink = getProposalUrlPath(
                       t.slug,
                       `${t.identifier}-${slugify(t.title)}`,
-                      false
+                      false,
                     );
 
                     return (
@@ -83,7 +83,8 @@ export const LinkedThreadsCard = ({
           )
         }
       />
-      <Modal
+      <CWModal
+        size="small"
         content={
           <LinkedThreadModal
             thread={thread}

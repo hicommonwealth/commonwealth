@@ -1,38 +1,45 @@
+import type { DeltaStatic } from 'quill';
 import React, { useState } from 'react';
 
 import { pluralizeWithoutNumberPrefix } from 'helpers';
-
-import 'modals/edit_topic_modal.scss';
-import Topic from '../../models/Topic';
-
-import app from 'state';
-
-import { CWButton } from '../components/component_kit/cw_button';
+import Topic, { TopicAttributes } from '../../models/Topic';
+import { useCommonNavigate } from '../../navigation/helpers';
+import app from '../../state';
+import {
+  useDeleteTopicMutation,
+  useEditTopicMutation,
+} from '../../state/api/topics';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import { useCommonNavigate } from 'navigation/helpers';
 import {
-  getTextFromDelta,
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
+import {
   ReactQuillEditor,
+  getTextFromDelta,
 } from '../components/react_quill_editor';
-import type { DeltaStatic } from 'quill';
 import {
   deserializeDelta,
   serializeDelta,
 } from '../components/react_quill_editor/utils';
-import { openConfirmation } from 'views/modals/confirmation_modal';
-import { useDeleteTopicMutation, useEditTopicMutation } from 'state/api/topics';
+import { openConfirmation } from './confirmation_modal';
+
+import '../../../styles/modals/edit_topic_modal.scss';
 
 type EditTopicModalProps = {
   onModalClose: () => void;
   topic: Topic;
+  noRedirect?: boolean;
 };
 
 export const EditTopicModal = ({
   topic,
   onModalClose,
+  noRedirect,
 }: EditTopicModalProps) => {
   const {
     defaultOffchainTemplate,
@@ -50,15 +57,15 @@ export const EditTopicModal = ({
 
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(
-    deserializeDelta(defaultOffchainTemplate)
+    deserializeDelta(defaultOffchainTemplate),
   );
 
   const [description, setDescription] = useState<string>(descriptionProp);
   const [featuredInNewPost, setFeaturedInNewPost] = useState<boolean>(
-    featuredInNewPostProp
+    featuredInNewPostProp,
   );
   const [featuredInSidebar, setFeaturedInSidebar] = useState<boolean>(
-    featuredInSidebarProp
+    featuredInSidebarProp,
   );
   const [name, setName] = useState<string>(nameProp);
 
@@ -72,11 +79,11 @@ export const EditTopicModal = ({
       return;
     }
 
-    const topicInfo = {
+    const topicInfo: TopicAttributes = {
       id,
       description: description,
       name: name,
-      chain_id: app.activeChainId(),
+      community_id: app.activeChainId(),
       telegram: null,
       featured_in_sidebar: featuredInSidebar,
       featured_in_new_post: featuredInNewPost,
@@ -88,7 +95,11 @@ export const EditTopicModal = ({
 
     try {
       await editTopic({ topic: new Topic(topicInfo) });
-      navigate(`/discussions/${encodeURI(name.toString().trim())}`);
+      if (noRedirect) {
+        onModalClose();
+      } else {
+        navigate(`/discussions/${encodeURI(name.toString().trim())}`);
+      }
     } catch (err) {
       setErrorMsg(err.message || err);
     } finally {
@@ -102,20 +113,26 @@ export const EditTopicModal = ({
       description: <>Delete this topic?</>,
       buttons: [
         {
+          label: 'Cancel',
+          buttonType: 'secondary',
+          buttonHeight: 'sm',
+        },
+        {
           label: 'Delete',
-          buttonType: 'mini-red',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
           onClick: async () => {
             await deleteTopic({
               topicId: id,
               topicName: name,
-              chainId: app.activeChainId(),
+              communityId: app.activeChainId(),
             });
-            navigate('/');
+            if (noRedirect) {
+              onModalClose();
+            } else {
+              navigate('/');
+            }
           },
-        },
-        {
-          label: 'Cancel',
-          buttonType: 'mini-white',
         },
       ],
     });
@@ -123,11 +140,8 @@ export const EditTopicModal = ({
 
   return (
     <div className="EditTopicModal">
-      <div className="compact-modal-title">
-        <h3>Edit topic</h3>
-        <CWIconButton iconName="close" onClick={() => onModalClose()} />
-      </div>
-      <div className="compact-modal-body">
+      <CWModalHeader label="Edit topic" onModalClose={onModalClose} />
+      <CWModalBody>
         <CWTextInput
           label="Name"
           value={name}
@@ -141,7 +155,7 @@ export const EditTopicModal = ({
             if (disallowedCharMatches) {
               newErrorMsg = `The ${pluralizeWithoutNumberPrefix(
                 disallowedCharMatches.length,
-                'char'
+                'char',
               )}
                 ${disallowedCharMatches.join(', ')} are not permitted`;
               setErrorMsg(newErrorMsg);
@@ -187,17 +201,39 @@ export const EditTopicModal = ({
             tabIndex={3}
           />
         )}
-        <div className="buttons-row">
-          <CWButton onClick={handleSaveChanges} label="Save changes" />
+      </CWModalBody>
+      <CWModalFooter className="EditTopicModalFooter">
+        <div className="action-buttons">
+          <div className="delete-topic">
+            <CWButton
+              buttonType="destructive"
+              buttonHeight="sm"
+              disabled={isSaving}
+              onClick={handleDeleteTopic}
+              label="Delete topic"
+            />
+          </div>
           <CWButton
-            buttonType="primary-red"
-            disabled={isSaving}
-            onClick={handleDeleteTopic}
-            label="Delete topic"
+            label="Cancel"
+            buttonType="secondary"
+            buttonHeight="sm"
+            onClick={onModalClose}
+          />
+          <CWButton
+            buttonType="primary"
+            buttonHeight="sm"
+            onClick={handleSaveChanges}
+            label="Save changes"
           />
         </div>
-        {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
-      </div>
+        {errorMsg && (
+          <CWValidationText
+            className="error-message"
+            message={errorMsg}
+            status="failure"
+          />
+        )}
+      </CWModalFooter>
     </div>
   );
 };

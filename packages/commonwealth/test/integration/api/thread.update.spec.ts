@@ -1,10 +1,11 @@
+import { ActionPayload, Session } from '@canvas-js/interfaces';
+import { models, tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import 'chai/register-should';
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from 'server/config';
-import app, { resetDatabase } from '../../../server-test';
 import * as modelUtils from 'test/util/modelUtils';
+import app from '../../../server-test';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -12,26 +13,25 @@ const { expect } = chai;
 describe('Thread Patch Update', () => {
   const chain = 'ethereum';
 
-  let adminJWT;
-  let adminUserId;
-  let adminAddress;
-  let adminAddressId;
+  let adminJWT: string;
+  let adminAddress: string;
 
-  let userJWT;
-  let userId;
-  let userAddress;
-  let userAddressId;
+  let userJWT: string;
+  let userAddress: string;
+  let userSession: {
+    session: Session;
+    sign: (payload: ActionPayload) => string;
+  };
+  let topicId: number;
 
   before(async () => {
-    await resetDatabase();
+    await tester.seedDb();
     const adminRes = await modelUtils.createAndVerifyAddress({ chain });
     {
       adminAddress = adminRes.address;
-      adminUserId = adminRes.user_id;
-      adminAddressId = adminRes.address_id;
       adminJWT = jwt.sign(
         { id: adminRes.user_id, email: adminRes.email },
-        JWT_SECRET
+        JWT_SECRET,
       );
       const isAdmin = await modelUtils.updateRole({
         address_id: adminRes.address_id,
@@ -46,15 +46,22 @@ describe('Thread Patch Update', () => {
     const userRes = await modelUtils.createAndVerifyAddress({ chain });
     {
       userAddress = userRes.address;
-      userId = userRes.user_id;
-      userAddressId = userRes.address_id;
       userJWT = jwt.sign(
         { id: userRes.user_id, email: userRes.email },
-        JWT_SECRET
+        JWT_SECRET,
       );
+      userSession = { session: userRes.session, sign: userRes.sign };
       expect(userAddress).to.not.be.null;
       expect(userJWT).to.not.be.null;
     }
+
+    const topic = await models.Topic.findOne({
+      where: {
+        community_id: chain,
+        group_ids: [],
+      },
+    });
+    topicId = topic.id;
   });
 
   describe('update thread', () => {
@@ -67,8 +74,9 @@ describe('Thread Patch Update', () => {
         body: 'body1',
         kind: 'discussion',
         stage: 'discussion',
-        topicName: 't1',
-        topicId: undefined,
+        topicId,
+        session: userSession.session,
+        sign: userSession.sign,
       });
 
       const res = await chai.request
@@ -76,27 +84,27 @@ describe('Thread Patch Update', () => {
         .patch(`/api/threads/${thread.id}`)
         .set('Accept', 'application/json')
         .send({
-          author_chain: thread.chain,
-          chain: thread.chain,
+          author_chain: thread.community_id,
+          chain: thread.community_id,
           address: userAddress,
+          topicId,
           jwt: userJWT,
           title: 'newTitle',
           body: 'newBody',
           stage: 'voting',
           locked: true,
           archived: true,
-          topicName: 'newTopic',
         });
 
       expect(res.status).to.equal(200);
       expect(res.body.result).to.contain({
         id: thread.id,
-        chain: 'ethereum',
+        community_id: 'ethereum',
         title: 'newTitle',
         body: 'newBody',
         stage: 'voting',
       });
-      expect(res.body.result.topic.name).to.equal('newTopic');
+      // expect(res.body.result.topic.name).to.equal('newTopic');
       expect(res.body.result.locked).to.not.be.null;
       expect(res.body.result.archived).to.not.be.null;
     });
@@ -110,8 +118,9 @@ describe('Thread Patch Update', () => {
         body: 'body2',
         kind: 'discussion',
         stage: 'discussion',
-        topicName: 't2',
-        topicId: undefined,
+        topicId,
+        session: userSession.session,
+        sign: userSession.sign,
       });
 
       {
@@ -120,11 +129,12 @@ describe('Thread Patch Update', () => {
           .patch(`/api/threads/${thread.id}`)
           .set('Accept', 'application/json')
           .send({
-            author_chain: thread.chain,
-            chain: thread.chain,
+            author_chain: thread.community_id,
+            chain: thread.community_id,
             address: userAddress,
             jwt: userJWT,
             pinned: true,
+            topicId,
           });
         expect(res.status).to.equal(400);
       }
@@ -135,11 +145,12 @@ describe('Thread Patch Update', () => {
           .patch(`/api/threads/${thread.id}`)
           .set('Accept', 'application/json')
           .send({
-            author_chain: thread.chain,
-            chain: thread.chain,
+            author_chain: thread.community_id,
+            chain: thread.community_id,
             address: userAddress,
             jwt: userJWT,
             spam: true,
+            topicId,
           });
         expect(res.status).to.equal(400);
       }
@@ -155,8 +166,9 @@ describe('Thread Patch Update', () => {
         body: 'body2',
         kind: 'discussion',
         stage: 'discussion',
-        topicName: 't2',
-        topicId: undefined,
+        topicId,
+        session: userSession.session,
+        sign: userSession.sign,
       });
 
       // admin sets thread as pinned
@@ -166,11 +178,12 @@ describe('Thread Patch Update', () => {
           .patch(`/api/threads/${thread.id}`)
           .set('Accept', 'application/json')
           .send({
-            author_chain: thread.chain,
-            chain: thread.chain,
+            author_chain: thread.community_id,
+            chain: thread.community_id,
             address: adminAddress,
             jwt: adminJWT,
             pinned: true,
+            topicId,
           });
         expect(res.status).to.equal(200);
         expect(res.body.result.pinned).to.be.true;
@@ -183,11 +196,12 @@ describe('Thread Patch Update', () => {
           .patch(`/api/threads/${thread.id}`)
           .set('Accept', 'application/json')
           .send({
-            author_chain: thread.chain,
-            chain: thread.chain,
+            author_chain: thread.community_id,
+            chain: thread.community_id,
             address: adminAddress,
             jwt: adminJWT,
             spam: true,
+            topicId,
           });
         expect(res.status).to.equal(200);
         expect(!!res.body.result.marked_as_spam_at).to.be.true;

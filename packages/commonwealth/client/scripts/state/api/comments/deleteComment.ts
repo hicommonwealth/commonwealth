@@ -7,7 +7,7 @@ import useFetchCommentsQuery from './fetchComments';
 
 interface DeleteCommentProps {
   address: string;
-  chainId: string;
+  communityId: string;
   canvasHash: string;
   commentId: number;
   existingNumberOfComments: number;
@@ -15,7 +15,7 @@ interface DeleteCommentProps {
 
 const deleteComment = async ({
   address,
-  chainId,
+  communityId,
   commentId,
   canvasHash,
 }: DeleteCommentProps) => {
@@ -23,7 +23,7 @@ const deleteComment = async ({
     session = null,
     action = null,
     hash = null,
-  } = await app.sessions.signDeleteComment({
+  } = await app.sessions.signDeleteComment(app.user.activeAccount.address, {
     comment_id: canvasHash,
   });
 
@@ -31,8 +31,8 @@ const deleteComment = async ({
     data: {
       jwt: app.user.jwt,
       address: address,
-      chain: chainId,
-      author_chain: chainId,
+      community_id: communityId,
+      author_community_id: communityId,
     },
   });
 
@@ -54,19 +54,19 @@ const deleteComment = async ({
 };
 
 interface UseDeleteCommentMutationProps {
-  chainId: string;
+  communityId: string;
   threadId: number;
   existingNumberOfComments: number;
 }
 
 const useDeleteCommentMutation = ({
-  chainId,
+  communityId,
   threadId,
   existingNumberOfComments,
 }: UseDeleteCommentMutationProps) => {
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
-    chainId,
+    communityId,
     threadId,
   });
 
@@ -75,17 +75,17 @@ const useDeleteCommentMutation = ({
     onSuccess: async (response) => {
       // find the existing comment index
       const foundCommentIndex = comments.findIndex(
-        (x) => x.id === response.softDeleted.id
+        (x) => x.id === response.softDeleted.id,
       );
 
       if (foundCommentIndex > -1) {
         const softDeletedComment = Object.assign(
           { ...comments[foundCommentIndex] },
-          { ...response.softDeleted }
+          { ...response.softDeleted },
         );
 
         // update fetch comments query state
-        const key = [ApiEndpoints.FETCH_COMMENTS, chainId, threadId];
+        const key = [ApiEndpoints.FETCH_COMMENTS, communityId, threadId];
         queryClient.cancelQueries({ queryKey: key });
         queryClient.setQueryData(key, () => {
           const updatedComments = [...(comments || [])];
@@ -93,7 +93,7 @@ const useDeleteCommentMutation = ({
           return [...updatedComments];
         });
       }
-      updateThreadInAllCaches(chainId, threadId, {
+      updateThreadInAllCaches(communityId, threadId, {
         numberOfComments: existingNumberOfComments - 1 || 0,
       });
       return response;

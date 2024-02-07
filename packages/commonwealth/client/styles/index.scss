@@ -10,6 +10,9 @@ body {
   box-sizing: border-box;
   height: 100vh;
   width: 100%;
+  //Prevents overscroll on macOS
+  position: fixed;
+  overflow: hidden;
 }
 
 #root {
