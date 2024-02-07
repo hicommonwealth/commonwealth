@@ -45,7 +45,7 @@ export const Sidebar = ({
         </div>
       )}
       <div className="sidebar-default-menu">
-        <SidebarQuickSwitcher />
+        <SidebarQuickSwitcher isInsideCommunity={isInsideCommunity} />
         {isInsideCommunity && (
           <CommunitySection showSkeleton={!app.activeChainId()} />
         )}

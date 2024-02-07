@@ -1,10 +1,10 @@
 import { ActionArgument } from '@canvas-js/interfaces';
-import { models } from '@hicommonwealth/model';
+import { models, tester } from '@hicommonwealth/model';
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import Sinon from 'sinon';
-import app, { resetDatabase } from '../../../server-test';
+import app from '../../../server-test';
 import * as Config from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
 
@@ -50,7 +50,7 @@ describe('createReaction Integration Tests', () => {
   let threadId: number;
 
   before(async () => {
-    await resetDatabase();
+    await tester.seedDb();
 
     const res = await modelUtils.createAndVerifyAddress({ chain: communityId });
     userAddress = res.address;

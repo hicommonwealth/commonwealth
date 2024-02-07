@@ -4,6 +4,7 @@ import useragent from 'express-useragent';
 import passport from 'passport';
 import { getCommunityStakeHandler } from '../routes/communities/get_community_stakes_handler';
 import { createCommunityStakeHandler } from '../routes/communities/put_community_stakes_handler';
+import ddd from '../routes/ddd';
 
 import { TokenBalanceCache } from '@hicommonwealth/model';
 
@@ -1275,7 +1276,11 @@ function setupRouter(
   );
 
   app.use(endpoint, router);
+  // ddd-routes
+  app.use('/', ddd);
   app.use(methodNotAllowedMiddleware());
+  // catch-all and format errors - TODO: fix unit tests
+  // app.use(errorMiddleware);
 }
 
 export default setupRouter;

@@ -8,8 +8,6 @@
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
     "bundle": "webpack --config webpack/webpack.prod.config.js --progress",
-    "build-android": "NODE_ENV=mobile webpack --config webpack/webpack.config.mobile.js --progress && NODE_ENV=mobile npx cap sync android",
-    "build-ios": "NODE_ENV=mobile webpack --config webpack/webpack.config.mobile.js --progress && NODE_ENV=mobile npx cap sync ios",
     "bundle-report": "webpack-bundle-analyzer --port 4200 build/stats.json",
     "clean-db": "ts-node -r tsconfig-paths/register server/scripts/cleanDb.ts",
     "create-migration": "npx sequelize migration:generate --name",
@@ -29,8 +27,6 @@
     "load-db": "chmod u+x scripts/load-db.sh && ./scripts/load-db.sh",
     "migrate-db": "npx sequelize db:migrate",
     "migrate-db-down": "npx sequelize db:migrate:undo",
-    "open-android": "NODE_ENV=mobile npx cap open ios",
-    "open-ios": "NODE_ENV=mobile npx cap open ios",
     "psql": "chmod u+x scripts/start-psql.sh && ./scripts/start-psql.sh",
     "recompute-counts": "npx ts-node -T ./scripts/recompute-count-job.ts",
     "reset-db": "chmod u+x scripts/reset-db.sh && ./scripts/reset-db.sh",
@@ -40,11 +36,9 @@
     "start": "ts-node-dev -r tsconfig-paths/register --max-old-space-size=4096 --respawn --transpile-only server.ts",
     "start-evm-ce": "ts-node -r tsconfig-paths/register server/workers/evmChainEvents/startEvmPolling.ts",
     "start-all": "concurrently -p '{name}' -c red,green -n app,consumer 'yarn start' 'yarn start-consumer'",
-    "start-android": "npx cap run android",
     "start-ci": "FETCH_INTERVAL_MS=500 ts-node -r tsconfig-paths/register server.ts",
     "start-consumer": "ts-node -r tsconfig-paths/register server/workers/commonwealthConsumer/commonwealthConsumer.ts run-as-script",
     "start-external-webpack": "NODE_ENV=production NO_PRERENDER=true NO_SSL=true ts-node -T -r tsconfig-paths/register server.ts",
-    "start-ios": "npx cap run ios",
     "stylelint": "stylelint client/styles/*",
     "test": "nyc ts-mocha './test/**/*.spec.ts'",
     "test-api": "NODE_ENV=test nyc ts-mocha './test/integration/api/**/*.spec.ts'",
@@ -77,8 +71,6 @@
     "@apollo/client": "^3.3.18",
     "@brillout/import": "^0.2.2",
     "@canvas-js/interfaces": "0.5.0-alpha4",
-    "@capacitor/browser": "^4.0.1",
-    "@capacitor/core": "^4.3.0",
     "@cosmjs/amino": "^0.31.3",
     "@cosmjs/cosmwasm-stargate": "^0.31.3",
     "@cosmjs/proto-signing": "^0.31.3",
@@ -103,8 +95,8 @@
     "@polkadot/util-crypto": "7.4.1",
     "@popperjs/core": "^2.0.6",
     "@sendgrid/mail": "^6.5.0",
-    "@solana/web3.js": "^1.30.2",
     "@snapshot-labs/snapshot.js": "^0.4.35",
+    "@solana/web3.js": "^1.30.2",
     "@tanstack/react-query": "^4.29.7",
     "@tanstack/react-query-devtools": "^4.29.7",
     "@tanstack/react-table": "^8.9.7",
@@ -223,7 +215,5 @@
     "zod": "^3.22.4",
     "zustand": "^4.3.8"
   },
-  "devDependencies": {
-    "@capacitor/cli": "^4.3.0"
-  }
+  "devDependencies": {}
 }

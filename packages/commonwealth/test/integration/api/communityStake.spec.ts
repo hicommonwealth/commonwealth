@@ -1,7 +1,8 @@
 import {
-  models,
   UserInstance,
-  validateCommunityStakeConfig,
+  communityStakeConfigValidator,
+  models,
+  tester,
 } from '@hicommonwealth/model';
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
@@ -10,7 +11,6 @@ import app from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 import { buildUser } from '../../unit/unitHelpers';
-import { resetDatabase } from '../../util/resetDatabase';
 import { get, post } from './external/appHook.spec';
 import { testUsers } from './external/dbEntityHooks.spec';
 
@@ -35,7 +35,7 @@ const expectedCreateResp = {
 
 describe('POST communityStakes Tests', () => {
   beforeEach(async () => {
-    await resetDatabase();
+    await tester.seedDb();
   });
 
   it('The handler creates and updates community stake', async () => {
@@ -146,6 +146,9 @@ describe('POST communityStakes Tests', () => {
       ],
       attributes: ['namespace'],
     });
-    await validateCommunityStakeConfig(community, 2);
+    await communityStakeConfigValidator.validateCommunityStakeConfig(
+      community,
+      2,
+    );
   });
 });

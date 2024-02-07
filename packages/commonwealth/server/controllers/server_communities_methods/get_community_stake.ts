@@ -1,10 +1,14 @@
-import { Community, CommunityStakeAttributes } from '@hicommonwealth/model';
+import { CommunityStakeAttributes } from '@hicommonwealth/model';
+import { z } from 'zod';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
-export type GetCommunityStakeOptions = Community.GetCommunityStake;
-export type GetCommunityStakeResult = CommunityStakeAttributes & {
-  Chain: { namespace: string };
-};
+export const GetCommunityStakeSchema = z.object({
+  community_id: z.string(),
+  stake_id: z.coerce.number().int().optional(),
+});
+
+export type GetCommunityStakeOptions = z.infer<typeof GetCommunityStakeSchema>;
+export type GetCommunityStakeResult = CommunityStakeAttributes;
 
 export async function __getCommunityStake(
   this: ServerCommunitiesController,

@@ -1,7 +1,8 @@
+import { tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { ApiEndpoints } from 'state/api/config';
-import app, { resetDatabase } from '../../../server-test';
+import app from '../../../server-test';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -12,7 +13,7 @@ describe('Topic Tests', () => {
   const chain = 'ethereum';
 
   before('reset database', async () => {
-    await resetDatabase();
+    await tester.seedDb();
   });
 
   describe('Bulk Topics', () => {
