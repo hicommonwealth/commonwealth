@@ -1,4 +1,5 @@
-import { Cache, Logger, Stats } from './interfaces';
+import { AnalyticsOptions } from '../types';
+import { Analytics, Cache, Logger, Stats } from './interfaces';
 import { port } from './port';
 
 export * from './enums';
@@ -78,6 +79,22 @@ export const cache = port(function cache(cache?: Cache) {
       decrementKey: () => Promise.resolve(0),
       getKeyTTL: () => Promise.resolve(0),
       setKeyTTL: () => Promise.resolve(false),
+    }
+  );
+});
+
+/**
+ * Analytics port factory
+ */
+
+export const analytics = port(function analytics(analytics?: Analytics) {
+  return (
+    analytics || {
+      name: 'in-memory-analytics',
+      dispose: () => Promise.resolve(),
+      track: (event: string, payload: AnalyticsOptions) => {
+        console.log(`TRACK [${event}]: ${JSON.stringify(payload)}`);
+      },
     }
   );
 });

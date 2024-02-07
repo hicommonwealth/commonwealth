@@ -239,3 +239,5 @@ export type ChainEventNotification = {
   created_at: Date;
   ChainEvent: ChainEventAttributes;
 };
+
+export type AnalyticsOptions = Record<string, any>;

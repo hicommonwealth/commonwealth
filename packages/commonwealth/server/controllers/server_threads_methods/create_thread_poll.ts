@@ -3,7 +3,7 @@ import { PollAttributes, UserInstance } from '@hicommonwealth/model';
 import moment from 'moment';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { validateOwner } from '../../util/validateOwner';
-import { TrackOptions } from '../server_analytics_methods/track';
+import { TrackOptions } from '../server_analytics_controller';
 import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
