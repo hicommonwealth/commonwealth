@@ -167,6 +167,9 @@ const ReactQuillEditor = ({
               },
             },
           ],
+          onClose: () => {
+            cancelEditing();
+          },
         });
       }
     }
