@@ -147,7 +147,10 @@ const SessionRevalidationModal = ({
                   buttonType="secondary-blue"
                   onClick={() => setConnectWithEmail(false)}
                 />
-                <CWButton label="Connect" onClick={onEmailLogin} />
+                <CWButton
+                  label="Connect"
+                  onClick={async () => await onEmailLogin()}
+                />
               </div>
             </div>
           ) : (

@@ -26,13 +26,14 @@ const useStakeExchange = ({
     useGetUserEthBalanceQuery({
       chainRpc,
       walletAddress: address,
+      apiEnabled: !!address,
     });
 
   const { data: buyPriceData } = useGetBuyPriceQuery({
     namespace: activeCommunityNamespace,
     stakeId: commonProtocol.STAKE_ID,
     amount: numberOfStakeToExchange,
-    apiEnabled: mode === 'buy',
+    apiEnabled: mode === 'buy' && !!address,
     chainRpc,
   });
 

@@ -8,6 +8,7 @@ import {
   Quotes,
   TextB,
   TextHOne,
+  TextHThree,
   TextHTwo,
   TextItalic,
   TextStrikethrough,
@@ -28,6 +29,7 @@ Object.assign(quillIcons, {
   header: {
     1: renderToolbarIcon(TextHOne),
     2: renderToolbarIcon(TextHTwo),
+    3: renderToolbarIcon(TextHThree),
   },
   bold: renderToolbarIcon(TextB),
   italic: renderToolbarIcon(TextItalic),
@@ -71,6 +73,7 @@ export const CustomQuillToolbar = ({
       <div className="section">
         <button className="ql-header" value={1} />
         <button className="ql-header" value={2} />
+        <button className="ql-header" value={3} />
       </div>
       <div className="section">
         <button className="ql-bold"></button>
@@ -152,7 +155,7 @@ export const useMarkdownToolbarHandlers = ({
       }
       const start = selection.index;
       const prefix = start === 0 ? '' : '\n';
-      const hashChar = headerValue === '2' ? '##' : '#';
+      const hashChar = '#'.repeat(parseInt(headerValue));
       editor.insertText(start, `${prefix}${hashChar} `);
       setContentDelta({
         ...editor.getContents(),

@@ -86,7 +86,9 @@ export const NewSnapshotProposalForm = ({
         onSave({ id: response.id, snapshot_title: response.title }); // Pass relevant information
       }
     } catch (err) {
-      notifyError(capitalize(err.error_description));
+      err.code === 'ACTION_REJECTED'
+        ? notifyError('User rejected signing')
+        : notifyError(capitalize(err.error_description));
     } finally {
       setIsSaving(false);
     }
