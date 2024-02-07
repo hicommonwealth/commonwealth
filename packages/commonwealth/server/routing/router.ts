@@ -2,8 +2,8 @@ import type { Express } from 'express';
 import express from 'express';
 import useragent from 'express-useragent';
 import passport from 'passport';
+import { createCommunityStakeHandler } from '../routes/communities/create_community_stakes_handler';
 import { getCommunityStakeHandler } from '../routes/communities/get_community_stakes_handler';
-import { createCommunityStakeHandler } from '../routes/communities/put_community_stakes_handler';
 import ddd from '../routes/ddd';
 
 import { TokenBalanceCache } from '@hicommonwealth/model';

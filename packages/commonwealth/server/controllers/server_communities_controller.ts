@@ -1,4 +1,8 @@
-import { DB, TokenBalanceCache } from '@hicommonwealth/model';
+import {
+  CommunityStakeAttributes,
+  DB,
+  TokenBalanceCache,
+} from '@hicommonwealth/model';
 import BanCache from '../util/banCheckCache';
 import {
   CreateChainNodeOptions,
@@ -10,6 +14,10 @@ import {
   CreateCommunityResult,
   __createCommunity,
 } from './server_communities_methods/create_community';
+import {
+  PostCommunityStakeOptions,
+  __createCommunityStake,
+} from './server_communities_methods/create_community_stake';
 import {
   DeleteCommunityOptions,
   DeleteCommunityResult,
@@ -35,11 +43,6 @@ import {
   GetRelatedCommunitiesResult,
   __getRelatedCommunities,
 } from './server_communities_methods/get_related_communities';
-import {
-  PutCommunityStakeOptions,
-  PutCommunityStakeResult,
-  __createCommunityStake,
-} from './server_communities_methods/put_community_stake';
 import {
   SearchCommunitiesOptions,
   SearchCommunitiesResult,
@@ -110,8 +113,8 @@ export class ServerCommunitiesController {
   }
 
   async createCommunityStake(
-    options: PutCommunityStakeOptions,
-  ): Promise<PutCommunityStakeResult> {
+    options: PostCommunityStakeOptions,
+  ): Promise<CommunityStakeAttributes> {
     return __createCommunityStake.call(this, options);
   }
 

@@ -8,7 +8,7 @@ import {
   SetCommunityStakeBodySchema,
   SetCommunityStakeParams,
   SetCommunityStakeParamsSchema,
-} from 'server/controllers/server_communities_methods/put_community_stake';
+} from 'server/controllers/server_communities_methods/create_community_stake';
 import { z } from 'zod';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
