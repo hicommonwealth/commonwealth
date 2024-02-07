@@ -142,6 +142,7 @@ import { ServerTopicsController } from '../controllers/server_topics_controller'
 
 import { GENERATE_IMAGE_RATE_LIMIT } from 'server/config';
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
+import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
 import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
 import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_handler';
@@ -425,6 +426,14 @@ function setupRouter(
     '/admin/analytics',
     passport.authenticate('jwt', { session: false }),
     getStatsHandler.bind(this, serverControllers),
+  );
+
+  registerRoute(
+    router,
+    'get',
+    '/admin/top-users',
+    passport.authenticate('jwt', { session: false }),
+    getTopUsersHandler.bind(this, serverControllers),
   );
 
   // threads
