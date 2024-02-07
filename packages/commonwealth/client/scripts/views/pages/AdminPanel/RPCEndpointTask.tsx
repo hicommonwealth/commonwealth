@@ -42,7 +42,9 @@ const RPCEndpointTask = () => {
       rpcEndpointChainValueValidated &&
       balanceType !== BalanceType.Ethereum &&
       !ethChainIdValueValidated) ||
-    (rpcName !== '' && bech32 !== '' && rpcEndpoint !== '');
+    (rpcName !== '' &&
+      (bech32 !== '' || balanceType === BalanceType.Ethereum) &&
+      rpcEndpoint !== '');
 
   const setCommunityIdInput = (e) => {
     setRpcEndpointChainValue(e.target.value);
