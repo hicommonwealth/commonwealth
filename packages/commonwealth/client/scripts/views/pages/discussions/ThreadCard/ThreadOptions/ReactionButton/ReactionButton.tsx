@@ -117,7 +117,7 @@ export const ReactionButton = ({
     <>
       {size === 'small' ? (
         <CWUpvoteSmall
-          voteCount={thread.reactionWeightsSum}
+          voteCount={thread.reactionWeightsSum || reactors.length}
           disabled={disabled}
           isThreadArchived={!!thread.archivedAt}
           selected={hasReacted}
@@ -131,7 +131,7 @@ export const ReactionButton = ({
         <TooltipWrapper disabled={disabled} text={tooltipText}>
           <CWUpvote
             onClick={handleVoteClick}
-            voteCount={thread.reactionWeightsSum}
+            voteCount={thread.reactionWeightsSum || reactors.length}
             disabled={disabled}
             active={hasReacted}
           />
