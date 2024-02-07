@@ -30,34 +30,15 @@ export const DATABASE_URI = process.env.USES_DOCKER_DB
 
 export const RABBITMQ_URI = (() => {
   if (!process.env.CLOUDAMQP_URL || process.env.NODE_ENV === 'development') {
-    if (
-      process.env.VULTR_RABBITMQ_CONTAINER_PORT &&
-      process.env.VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT
-    ) {
-      return `amqp://guest:guest@${process.env.VULTR_IP}:${process.env.VULTR_RABBITMQ_CONTAINER_PORT}`;
-    } else return 'amqp://127.0.0.1';
+    return 'amqp://127.0.0.1';
   } else return process.env.CLOUDAMQP_URL;
-})();
-
-export const RABBITMQ_API_URI = (() => {
-  if (
-    process.env.VULTR_RABBITMQ_CONTAINER_PORT &&
-    process.env.VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT
-  )
-    return `http://guest:guest@${process.env.VULTR_IP}:${process.env.VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT}/api`;
-  else return 'http://guest:guest@localhost:15672/api';
 })();
 
 // if a tls redis url is provided then that takes priority over everything else
 // then if a normal non-tls url is provided that is the second best option (local/staging)
-// finally, if no redis url is specified we use the Vultr redis instance (vultr)
 export const REDIS_URL = (() => {
   if (process.env.REDIS_TLS_URL) return process.env.REDIS_TLS_URL; // staging + production
   if (process.env.REDIS_URL) return process.env.REDIS_URL; // local + staging
-  if (process.env.VULTR_IP && process.env.VULTR_REDIS_CONTAINER_PORT)
-    // vultr
-    return `redis://${process.env.VULTR_IP}:${process.env.VULTR_REDIS_CONTAINER_PORT}`;
-
   return undefined;
 })();
 
@@ -125,3 +106,7 @@ export const PRERENDER_TOKEN = process.env.PRERENDER_TOKEN;
 export const REACTION_WEIGHT_OVERRIDE = process.env.REACTION_WEIGHT_OVERRIDE
   ? parseInt(process.env.REACTION_WEIGHT_OVERRIDE, 10)
   : null;
+
+export const GENERATE_IMAGE_RATE_LIMIT = process.env.GENERATE_IMAGE_RATE_LIMIT
+  ? parseInt(process.env.GENERATE_IMAGE_RATE_LIMIT, 10)
+  : 10;

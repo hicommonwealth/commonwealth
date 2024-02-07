@@ -38,7 +38,7 @@ async function main() {
     if (process.env.COMMUNITY_ID && process.env.COMMUNITY_ID !== community.id)
       continue;
     await groupsController.refreshCommunityMemberships({
-      community,
+      communityId: community.id,
     });
   }
 

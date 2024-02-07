@@ -34,6 +34,7 @@ const SignStakeTransactions = ({
       namespace: communityStakeData.namespace,
       communityId: createdCommunityId,
       goToSuccessStep,
+      selectedAddress: selectedAddress.address,
     });
 
   const isPreventLeaveEnabled = reserveNamespaceData.state !== 'not-started';

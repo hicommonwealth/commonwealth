@@ -2,17 +2,16 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 require('dotenv').config();
-import { CacheNamespaces } from '@hicommonwealth/core';
+import { CacheNamespaces, delay } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import express from 'express';
 import {
   CacheDecorator,
-  connectToRedis,
   RedisCache,
   XCACHE_VALUES,
+  connectToRedis,
 } from '../../src/redis';
-import { delay } from '../../src/utils/delayUtils';
 import {
   CACHE_ENDPOINTS,
   setupCacheTestEndpoints,

@@ -33,6 +33,7 @@ const useReserveCommunityNamespace = ({
       const txReceipt = await namespaceFactory.deployNamespace(
         namespace,
         userAddress,
+        userAddress,
       );
 
       await updateCommunity({

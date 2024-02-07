@@ -5,30 +5,38 @@ import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 
 abstract class ContractBase {
-  protected contract;
-  public contractAddress;
+  protected contract: any;
+  public contractAddress: string;
   protected wallet: IWebWallet<any>;
   protected web3: Web3;
   protected initialized: boolean;
-  private abi;
+  protected walletEnabled: boolean;
+  protected rpc: string;
+  private abi: any;
 
-  constructor(contractAddress: string, abi: any) {
+  constructor(contractAddress: string, abi: any, rpc: string) {
     this.contractAddress = contractAddress;
     this.abi = abi;
+    this.rpc = rpc;
   }
 
-  async initialize(): Promise<void> {
+  async initialize(withWallet: boolean = false): Promise<void> {
     if (!this.initialized) {
       try {
-        this.wallet = WebWalletController.Instance.availableWallets(
-          ChainBase.Ethereum,
-        )[0];
+        let provider = this.rpc;
+        if (withWallet) {
+          this.wallet = WebWalletController.Instance.availableWallets(
+            ChainBase.Ethereum,
+          )[0];
 
-        if (!this.wallet.api) {
-          await this.wallet.enable();
+          if (!this.wallet.api) {
+            await this.wallet.enable();
+          }
+          provider = this.wallet.api.givenProvider;
+          this.walletEnabled = true;
         }
 
-        this.web3 = new Web3(this.wallet.api.givenProvider);
+        this.web3 = new Web3(provider);
         this.contract = new this.web3.eth.Contract(
           this.abi as AbiItem[],
           this.contractAddress,

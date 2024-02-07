@@ -1,5 +1,8 @@
-import { factoryContracts, ValidChains } from '@hicommonwealth/chains';
-import { AppError, BalanceSourceType } from '@hicommonwealth/core';
+import {
+  AppError,
+  BalanceSourceType,
+  commonProtocol,
+} from '@hicommonwealth/core';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { DB } from '../../models';
@@ -54,11 +57,11 @@ export const getNamespaceBalance = async (
   tbc: TokenBalanceCache,
   namespace: string,
   tokenId: number,
-  chain: ValidChains,
+  chain: commonProtocol.ValidChains,
   address: string,
   model: DB,
 ): Promise<string> => {
-  const factoryData = factoryContracts[chain];
+  const factoryData = commonProtocol.factoryContracts[chain];
   const node = await model.ChainNode.findOne({
     where: {
       eth_chain_id: factoryData.chainId,

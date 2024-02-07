@@ -37,14 +37,40 @@ export const namespaceFactoryAbi = [
   },
   {
     inputs: [
-      { internalType: 'string', name: 'name', type: 'string' },
-      { internalType: 'string', name: 'tokenName', type: 'string' },
-      { internalType: 'uint256', name: 'id', type: 'uint256' },
+      {
+        internalType: 'string',
+        name: 'name',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: 'tokenName',
+        type: 'string',
+      },
+      {
+        internalType: 'uint256',
+        name: 'id',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: 'exchangeToken',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'scalar',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'curve',
+        type: 'uint256',
+      },
     ],
-    name: 'configureCommunityStakesId',
-    outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
+    name: 'configureCommunityStakeId',
   },
   {
     inputs: [

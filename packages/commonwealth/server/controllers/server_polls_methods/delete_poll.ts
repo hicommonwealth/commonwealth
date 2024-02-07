@@ -1,9 +1,5 @@
 import { AppError } from '@hicommonwealth/core';
-import {
-  AddressInstance,
-  CommunityInstance,
-  UserInstance,
-} from '@hicommonwealth/model';
+import { AddressInstance, UserInstance } from '@hicommonwealth/model';
 import { validateOwner } from '../../util/validateOwner';
 import { ServerThreadsController } from '../server_threads_controller';
 
@@ -17,7 +13,6 @@ export const Errors = {
 export type DeletePollOptions = {
   user: UserInstance;
   address: AddressInstance;
-  community: CommunityInstance;
   pollId: number;
 };
 
@@ -25,7 +20,7 @@ export type DeletePollResult = void;
 
 export async function __deletePoll(
   this: ServerThreadsController,
-  { user, community, pollId }: DeletePollOptions,
+  { user, pollId }: DeletePollOptions,
 ): Promise<DeletePollResult> {
   const poll = await this.models.Poll.findByPk(pollId);
   if (!poll) {
@@ -44,7 +39,7 @@ export async function __deletePoll(
   const isThreadOwnerOrAdmin = await validateOwner({
     models: this.models,
     user,
-    communityId: community.id,
+    communityId: thread.community_id,
     entity: thread,
     allowAdmin: true,
     allowSuperAdmin: true,
