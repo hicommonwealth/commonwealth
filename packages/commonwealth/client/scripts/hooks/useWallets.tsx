@@ -593,7 +593,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
                 ),
               })
             : selectedAddress,
-        chain: app.activeChainId() ?? wallet.chain,
+        author_community_id: app.activeChainId() ?? wallet.chain,
         jwt: app.user.jwt,
       });
       if (result.exists && result.belongsToUser) {

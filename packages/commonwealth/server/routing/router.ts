@@ -314,7 +314,6 @@ function setupRouter(
     'post',
     '/getAddressStatus',
     databaseValidationService.validateAuthor,
-    databaseValidationService.validateCommunity,
     getAddressStatus.bind(this, models),
   );
   registerRoute(
