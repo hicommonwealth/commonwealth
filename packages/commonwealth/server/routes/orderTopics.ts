@@ -1,5 +1,5 @@
 /* eslint-disable quotes */
-import { AppError, ServerError } from '@hicommonwealth/adapters';
+import { AppError, ServerError } from '@hicommonwealth/core';
 import type { DB, TopicInstance } from '@hicommonwealth/model';
 import type { NextFunction, Response } from 'express';
 import { validateOwner } from '../util/validateOwner';

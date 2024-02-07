@@ -16,10 +16,6 @@ import {
   ThreadChannel,
 } from 'discord.js';
 import v8 from 'v8';
-import {
-  handleMessage,
-  handleThreadChannel,
-} from '../discord-listener/handlers';
 import { DISCORD_TOKEN, RABBITMQ_URI } from '../utils/config';
 
 const log = logger(TypescriptLoggingLogger()).getLogger(__filename);
@@ -43,6 +39,11 @@ log.info(
 );
 
 async function startDiscordListener() {
+  // async imports to delay calling logger
+  const { handleMessage, handleThreadChannel } = await import(
+    '../discord-listener/handlers'
+  );
+
   const controller = new RabbitMQController(
     getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.DiscobotService),
   );

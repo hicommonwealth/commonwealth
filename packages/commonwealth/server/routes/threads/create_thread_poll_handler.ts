@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import { PollAttributes } from '@hicommonwealth/model';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
@@ -22,7 +22,6 @@ export const createThreadPollHandler = async (
   req: TypedRequest<CreateThreadPollBody, null, CreateThreadPollParams>,
   res: TypedResponse<CreateThreadPollResponse>,
 ) => {
-  const { community } = req;
   const { id: threadId } = req.params;
   const { prompt, options, custom_duration } = req.body;
 
@@ -38,7 +37,6 @@ export const createThreadPollHandler = async (
 
   const [poll, analyticsOptions] = await controllers.threads.createThreadPoll({
     user: req.user,
-    community,
     threadId: parseInt(threadId, 10) || undefined,
     prompt,
     options,

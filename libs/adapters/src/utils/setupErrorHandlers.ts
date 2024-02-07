@@ -1,12 +1,5 @@
-import { logger } from '@hicommonwealth/core';
+import { AppError, ServerError, logger } from '@hicommonwealth/core';
 import type { Express, Request, Response } from 'express';
-import { AppError, ServerError } from '../errors';
-
-class ExpressError extends Error {
-  constructor(public error: Error, public req: Request) {
-    super(error.message);
-  }
-}
 
 // Handle server and application errors.
 // 401 Unauthorized errors are handled by Express' middleware and returned
@@ -27,20 +20,22 @@ export const setupErrorHandlers = (app: Express) => {
   // Handle our ServerErrors (500), AppErrors (400), or unknown errors.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   app.use((error, req, res: Response, next) => {
-    log.error(error.message, new ExpressError(error, req));
+    error.req = req;
     if (error instanceof ServerError) {
-      // if the original error is given when creating the ServerError instance then pass its message to Rollbar
+      log.error(error.message, error);
       res.status(error.status).send({
         status: error.status,
         // Use external facing error message
         error: 'Server error, please try again later.',
       });
     } else if (error instanceof AppError) {
+      log.warn(error.message, error); // just warn, to avoid overloading rollbar with bots and attacks
       res.status(error.status).send({
         status: error.status,
         error: error.message,
       });
     } else {
+      log.error(error.message, error);
       res.status(500);
       res.json({
         status: error.status,

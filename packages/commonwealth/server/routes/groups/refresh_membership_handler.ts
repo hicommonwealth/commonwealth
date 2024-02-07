@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import z from 'zod';
 import { RefreshMembershipResult } from '../../controllers/server_groups_methods/refresh_membership';
 import { ServerControllers } from '../../routing/router';
@@ -14,7 +14,7 @@ export const refreshMembershipHandler = async (
   req: TypedRequestBody<RefreshMembershipBody>,
   res: TypedResponse<RefreshMembershipResponse>,
 ) => {
-  const { user, address, community } = req;
+  const { user, address } = req;
 
   const schema = z.object({
     body: z.object({
@@ -32,7 +32,6 @@ export const refreshMembershipHandler = async (
 
   const result = await controllers.groups.refreshMembership({
     user,
-    community,
     address,
     topicId: topic_id,
   });

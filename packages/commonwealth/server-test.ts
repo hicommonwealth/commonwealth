@@ -5,7 +5,7 @@ import {
   setupErrorHandlers,
 } from '@hicommonwealth/adapters';
 import { cache, logger } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { TokenBalanceCache, models } from '@hicommonwealth/model';
 import bodyParser from 'body-parser';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
@@ -21,7 +21,6 @@ import setupAPI from './server/routing/router'; // performance note: this takes 
 import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
 import GlobalActivityCache from './server/util/globalActivityCache';
-import { TokenBalanceCache } from './server/util/tokenBalanceCache/tokenBalanceCache';
 import ViewCountCache from './server/util/viewCountCache';
 
 const log = logger().getLogger(__filename);
@@ -127,7 +126,6 @@ setupCosmosProxy(app, models, cacheDecorator);
 setupErrorHandlers(app);
 setupServer();
 
-export { resetDatabase } from './test/util/resetDatabase';
 export { cacheDecorator, redisCache };
 
 export default app;

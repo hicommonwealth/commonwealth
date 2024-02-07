@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import type { Response } from 'express';
 import { Op } from 'sequelize';

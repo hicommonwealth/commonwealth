@@ -1,10 +1,9 @@
+import { models, tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-
-import { models } from '@hicommonwealth/model';
 import jwt from 'jsonwebtoken';
 import * as modelUtils from 'test/util/modelUtils';
-import app, { resetDatabase } from '../../../server-test';
+import app from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 
 chai.use(chaiHttp);
@@ -21,7 +20,7 @@ describe('Polls', () => {
   let pollId = 0;
 
   before(async () => {
-    await resetDatabase();
+    await tester.seedDb();
 
     const topic = await models.Topic.findOne({
       where: {

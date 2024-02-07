@@ -1,5 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
-import { Requirement } from '@hicommonwealth/core';
+import { AppError, Requirement } from '@hicommonwealth/core';
 import { GroupAttributes, GroupMetadata } from '@hicommonwealth/model';
 import z from 'zod';
 import { ServerControllers } from '../../routing/router';
@@ -49,7 +48,10 @@ export const createGroupHandler = async (
 
   // refresh memberships in background
   controllers.groups
-    .refreshCommunityMemberships({ community, group })
+    .refreshCommunityMemberships({
+      communityId: community.id,
+      groupId: group.id,
+    })
     .catch(console.error);
 
   controllers.analytics.track(analyticsOptions, req).catch(console.error);

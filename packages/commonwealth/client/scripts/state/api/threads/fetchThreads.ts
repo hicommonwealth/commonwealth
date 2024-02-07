@@ -23,7 +23,7 @@ const queryTypeToRQMap = {
 
 interface CommonProps {
   queryType: typeof QueryTypes[keyof typeof QueryTypes];
-  chainId: string;
+  communityId: string;
   apiEnabled?: boolean;
 }
 
@@ -97,7 +97,7 @@ const getFetchThreadsQueryKey = (props) => {
   if (isFetchBulkThreadsProps(props)) {
     return [
       ApiEndpoints.FETCH_THREADS,
-      props.chainId,
+      props.communityId,
       props.queryType,
       props.topicId,
       props.stage,
@@ -111,7 +111,7 @@ const getFetchThreadsQueryKey = (props) => {
   if (isFetchActiveThreadsProps(props)) {
     return [
       ApiEndpoints.FETCH_THREADS,
-      props.chainId,
+      props.communityId,
       props.queryType,
       props.topicsPerThread,
     ];
@@ -137,7 +137,7 @@ const fetchBulkThreads = (props) => {
           bulk: true,
           page: pageParam,
           limit: props.limit,
-          community_id: props.chainId,
+          community_id: props.communityId,
           ...(props.topicId && { topic_id: props.topicId }),
           ...(props.stage && { stage: props.stage }),
           ...(props.includePinnedThreads && {
@@ -173,7 +173,7 @@ const fetchActiveThreads = (props) => {
       {
         params: {
           active: true,
-          chain: props.chainId,
+          community_id: props.communityId,
           threads_per_topic: props.topicsPerThread || 3,
         },
       },

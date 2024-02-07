@@ -31,7 +31,7 @@ import {
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { AvatarUpload } from '../Avatar';
-import CommunityStakeBanner from '../CommunityStakeBanner';
+import { CommunityStakeBanner, VoteWeightModule } from '../CommunityStake';
 import UpvotePopover from '../UpvotePopover';
 import { CWCard } from './cw_card';
 import { CWCheckbox } from './cw_checkbox';
@@ -70,7 +70,6 @@ import { CWTag } from './new_designs/CWTag';
 import { CWTextInput } from './new_designs/CWTextInput';
 import { CWTooltip } from './new_designs/CWTooltip';
 import { CWTypeaheadSelectList } from './new_designs/CWTypeaheadSelectList';
-import CWVoteWeightModule from './new_designs/CWVoteWeightModule';
 import { createColumnInfo, makeData, optionList } from './showcase_helpers';
 
 const displayIcons = (icons) => {
@@ -2158,11 +2157,12 @@ export const ComponentShowcase = () => {
       </div>
       <div>
         <CWText type="h3">Vote Weight Module</CWText>
-        <CWVoteWeightModule
+        <VoteWeightModule
           voteWeight={100}
           stakeNumber={1}
           stakeValue={0.072}
           denomination="ETH"
+          onOpenStakeModal={() => console.log('open modal')}
         />
       </div>
       <div className="drawer-container">

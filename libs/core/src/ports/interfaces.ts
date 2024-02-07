@@ -87,4 +87,20 @@ export interface Cache extends Disposable {
   deleteKey(namespace: CacheNamespaces, key: string): Promise<number>;
   deleteNamespaceKeys(namespace: CacheNamespaces): Promise<number | boolean>;
   flushAll(): Promise<void>;
+  incrementKey(
+    namespace: CacheNamespaces,
+    key: string,
+    increment?: number,
+  ): Promise<number | null>;
+  decrementKey(
+    namespace: CacheNamespaces,
+    key: string,
+    decrement?: number,
+  ): Promise<number | null>;
+  getKeyTTL(namespace: CacheNamespaces, key: string): Promise<number>;
+  setKeyTTL(
+    namespace: CacheNamespaces,
+    key: string,
+    ttlInSeconds: number,
+  ): Promise<boolean>;
 }

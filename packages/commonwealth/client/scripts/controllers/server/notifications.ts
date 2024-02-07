@@ -9,7 +9,7 @@ import NotificationSubscription, {
 import app from 'state';
 
 import { NotificationCategories } from '@hicommonwealth/core';
-import { SubscriptionInstance } from '@hicommonwealth/model';
+import type { SubscriptionInstance } from '@hicommonwealth/model';
 import { findSubscription, SubUniqueData } from 'helpers/findSubscription';
 import { NotificationStore } from 'stores';
 import Notification from '../../models/Notification';
