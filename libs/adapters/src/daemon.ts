@@ -1,4 +1,4 @@
-import { RedisNamespaces, logger } from '@hicommonwealth/core';
+import { CacheNamespaces, logger } from '@hicommonwealth/core';
 import { CacheDecorator, KeyFunction } from './redis';
 
 const log = logger().getLogger(__filename);
@@ -12,7 +12,7 @@ export class Activity<T extends (...args: any[]) => any> {
     private query: T,
     private cacheKey: KeyFunction<T>,
     private cacheDuration: number,
-    private cacheNamespace: RedisNamespaces,
+    private cacheNamespace: CacheNamespaces,
     private cacheDecorator: CacheDecorator,
   ) {
     this.queryWithCache = this.cacheWrapHelper(false);

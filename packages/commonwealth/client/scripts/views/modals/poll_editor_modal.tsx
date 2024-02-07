@@ -124,7 +124,7 @@ export const PollEditorModal = ({
   return (
     <div className="PollEditorModal" ref={modalContainerRef}>
       <CWModalHeader label="Create Poll" onModalClose={onModalClose} />
-      <CWModalBody allowOverflow>
+      <CWModalBody>
         <CWTextInput
           label="Question"
           placeholder="Do you support this proposal?"

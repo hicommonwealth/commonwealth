@@ -3,6 +3,7 @@ import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
+import { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
 
 const log = logger().getLogger(__filename);
@@ -30,6 +31,7 @@ export type CommentAttributes = {
   // associations
   Chain?: CommunityAttributes;
   Address?: AddressAttributes;
+  Thread?: ThreadAttributes;
 
   //counts
   reaction_count: number;

@@ -2,17 +2,16 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 require('dotenv').config();
-import { RedisNamespaces } from '@hicommonwealth/core';
+import { CacheNamespaces, delay } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import express from 'express';
 import {
   CacheDecorator,
-  connectToRedis,
   RedisCache,
   XCACHE_VALUES,
+  connectToRedis,
 } from '../../src/redis';
-import { delay } from '../../src/utils/delayUtils';
 import {
   CACHE_ENDPOINTS,
   setupCacheTestEndpoints,
@@ -55,7 +54,7 @@ async function makePostRequest(endpoint, body, headers = {}) {
 
 describe('Cache Decorator', () => {
   const redisCache: RedisCache = new RedisCache();
-  const route_namespace: RedisNamespaces = RedisNamespaces.Route_Response;
+  const route_namespace: CacheNamespaces = CacheNamespaces.Route_Response;
   const cacheDecorator = new CacheDecorator(redisCache);
   setupCacheTestEndpoints(app, cacheDecorator);
 

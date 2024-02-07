@@ -10,6 +10,7 @@ import type { DataTypes } from 'sequelize';
 import type { AddressAttributes, AddressInstance } from './address';
 import type { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
 import type { CommentAttributes } from './comment';
+import { CommunityStakeAttributes } from './community_stake';
 import type { ContractInstance } from './contract';
 import type { StarredCommunityAttributes } from './starred_community';
 import type { ThreadAttributes } from './thread';
@@ -65,6 +66,7 @@ export type CommunityAttributes = {
   Users?: UserAttributes[] | UserAttributes['id'][];
   ChainObjectVersion?: any; // TODO
   Contract?: ContractInstance;
+  CommunityStakes?: CommunityStakeAttributes[];
 
   created_at?: Date;
   updated_at?: Date;

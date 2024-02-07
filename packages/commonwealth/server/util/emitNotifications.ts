@@ -12,7 +12,6 @@ import {
   createImmediateNotificationEmailObject,
   sendImmediateNotificationEmail,
 } from '../scripts/emails';
-import { rollbar } from './rollbar';
 import { mapNotificationsDataToSubscriptions } from './subscriptionMapping';
 import { dispatchWebhooks } from './webhooks/dispatchWebhook';
 
@@ -197,7 +196,6 @@ export default async function emitNotifications(
       await dispatchWebhooks(notification_data_and_category);
     } catch (e) {
       log.error('Failed to dispatch webhooks', e);
-      rollbar.error('Failed to dispatch webhooks', e);
     }
   }
 

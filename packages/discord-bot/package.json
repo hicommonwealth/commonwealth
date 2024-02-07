@@ -11,7 +11,8 @@
     "start-consumer": "ts-node -T src/discord-consumer/discordConsumer.ts",
     "start-prod-consumer": "node build/discord-consumer/discordConsumer.js",
     "start-prod-listener": "node build/discord-listener/discordListener.js",
-    "switch-staging-app": "chmod u+x scripts/switch-discobot-staging-env.sh && ./scripts/switch-discobot-staging-env.sh"
+    "switch-staging-app": "chmod u+x scripts/switch-discobot-staging-env.sh && ./scripts/switch-discobot-staging-env.sh",
+    "test": "ts-mocha '__tests__/**/*.spec.ts'"
   },
   "keywords": [],
   "author": "",
@@ -21,7 +22,6 @@
     "discord.js": "^14.11.0",
     "dotenv": "^16.0.3",
     "pg": "^8.11.3",
-    "rollbar": "^2.6.1",
     "sequelize": "^6.32.1"
   }
 }

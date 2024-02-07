@@ -4,6 +4,20 @@
   display: flex;
   flex-direction: column;
 
+  .price-skeleton {
+    min-width: 180px;
+  }
+
+  .CWModalBody {
+    @include heightSmallInclusive {
+      max-height: 300px;
+    }
+  }
+
+  .SelectList {
+    z-index: 10;
+  }
+
   // address dropdown items
   .text-container {
     display: flex;
@@ -67,15 +81,17 @@
 
       .stake-selector {
         display: flex;
-        gap: 60px;
+        gap: 50px;
         align-items: center;
 
         @include smallInclusive {
-          gap: 30px;
+          gap: 25px;
         }
 
         .number {
           font-size: 29px;
+          min-width: 34px;
+          justify-content: center;
         }
       }
     }
@@ -109,10 +125,11 @@
 
     .number {
       font-size: 29px;
-      margin-right: 90px;
+      justify-content: center;
+      width: 214px;
 
       @include smallInclusive {
-        margin-right: 60px;
+        width: 164px;
       }
     }
   }

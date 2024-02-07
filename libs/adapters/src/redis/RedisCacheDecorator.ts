@@ -1,4 +1,4 @@
-import { ILogger, RedisNamespaces, logger } from '@hicommonwealth/core';
+import { CacheNamespaces, ILogger, logger } from '@hicommonwealth/core';
 import { Request, RequestHandler, Response } from 'express';
 import {
   CacheKeyDuration,
@@ -54,7 +54,7 @@ export class CacheDecorator {
     fn: T,
     key: KeyFunction<T>,
     duration: seconds,
-    namespace: RedisNamespaces = RedisNamespaces.Function_Response,
+    namespace: CacheNamespaces = CacheNamespaces.Function_Response,
   ) {
     return async (...args: Parameters<T>): Promise<ReturnType<T>> => {
       try {
@@ -135,7 +135,7 @@ export class CacheDecorator {
 
   private async getCachedValue(
     cacheKey: string,
-    namespace: RedisNamespaces,
+    namespace: CacheNamespaces,
   ): Promise<any> {
     let cachedValue;
     try {
@@ -182,7 +182,7 @@ export class CacheDecorator {
     fn: T,
     cacheKey: string,
     cacheDuration: seconds,
-    namespace: RedisNamespaces,
+    namespace: CacheNamespaces,
     ...args: Parameters<T>
   ): Promise<ReturnType<T>> {
     const result = await this.callFunction(fn, ...args);
@@ -212,7 +212,7 @@ export class CacheDecorator {
     keyGenerator: (
       req: CustomRequest,
     ) => string | CacheKeyDuration = defaultKeyGenerator,
-    namespace: RedisNamespaces = RedisNamespaces.Route_Response,
+    namespace: CacheNamespaces = CacheNamespaces.Route_Response,
   ): RequestHandler {
     return async function cache(req, res, next) {
       let isNextCalled = false;
@@ -285,7 +285,7 @@ export class CacheDecorator {
   public async checkCacheAndSendResponseIfFound(
     res: Response,
     cacheKey: string,
-    namespace: RedisNamespaces = RedisNamespaces.Route_Response,
+    namespace: CacheNamespaces = CacheNamespaces.Route_Response,
   ): Promise<boolean> {
     if (!cacheKey) {
       this._log.trace(`Cache key not found for ${res.req.originalUrl}`);
@@ -315,7 +315,7 @@ export class CacheDecorator {
     cacheKey: string,
     valueToCache: string,
     duration: number,
-    namespace: RedisNamespaces = RedisNamespaces.Route_Response,
+    namespace: CacheNamespaces = CacheNamespaces.Route_Response,
   ): Promise<boolean> {
     if (!this.isEnabled()) return false;
 
@@ -330,7 +330,7 @@ export class CacheDecorator {
   // Check if the response is already cached, if yes, return it
   public async checkCache(
     cacheKey: string,
-    namespace: RedisNamespaces = RedisNamespaces.Route_Response,
+    namespace: CacheNamespaces = CacheNamespaces.Route_Response,
   ): Promise<string> {
     const ret = await this._redisCache.getKey(namespace, cacheKey);
     if (ret) {
@@ -341,7 +341,7 @@ export class CacheDecorator {
   // response interceptor to cache the response and send it
   private initInterceptor(
     cacheKey: string,
-    namespace: RedisNamespaces,
+    namespace: CacheNamespaces,
     duration: number,
     originalSend,
     res,

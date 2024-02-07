@@ -1,15 +1,15 @@
 import { ChainBase, ChainType } from '@hicommonwealth/core';
 import {
   CommunityAttributes,
+  TokenBalanceCache,
   UserInstance,
   models,
+  tester,
 } from '@hicommonwealth/model';
 import { assert } from 'chai';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 import { Errors } from '../../../server/controllers/server_communities_methods/update_community';
-import { TokenBalanceCache } from '../../../server/util/tokenBalanceCache/tokenBalanceCache';
 import { buildUser } from '../../unit/unitHelpers';
-import { resetDatabase } from '../../util/resetDatabase';
 
 const baseRequest: CommunityAttributes = {
   id: 'ethereum',
@@ -26,7 +26,7 @@ const baseRequest: CommunityAttributes = {
 
 describe('UpdateChain Tests', () => {
   before(async () => {
-    await resetDatabase();
+    await tester.seedDb();
   });
 
   it('Correctly updates chain', async () => {

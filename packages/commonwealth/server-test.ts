@@ -4,8 +4,8 @@ import {
   RedisCache,
   setupErrorHandlers,
 } from '@hicommonwealth/adapters';
-import { logger } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { cache, logger } from '@hicommonwealth/core';
+import { TokenBalanceCache, models } from '@hicommonwealth/model';
 import bodyParser from 'body-parser';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
@@ -13,24 +13,20 @@ import express from 'express';
 import session from 'express-session';
 import http from 'http';
 import passport from 'passport';
-import Rollbar from 'rollbar';
 import favicon from 'serve-favicon';
-import {
-  ROLLBAR_ENV,
-  ROLLBAR_SERVER_TOKEN,
-  SESSION_SECRET,
-  TBC_BALANCE_TTL_SECONDS,
-} from './server/config';
+import { SESSION_SECRET, TBC_BALANCE_TTL_SECONDS } from './server/config';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
 import setupAPI from './server/routing/router'; // performance note: this takes 15 seconds
 import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
 import GlobalActivityCache from './server/util/globalActivityCache';
-import { TokenBalanceCache } from './server/util/tokenBalanceCache/tokenBalanceCache';
 import ViewCountCache from './server/util/viewCountCache';
 
 const log = logger().getLogger(__filename);
+const redisCache = new RedisCache();
+const cacheDecorator = new CacheDecorator(redisCache);
+cache(redisCache);
 
 require('express-async-errors');
 
@@ -40,7 +36,6 @@ const SequelizeStore = SessionSequelizeStore(session.Store);
 const viewCountCache = new ViewCountCache(1, 10 * 60);
 const tokenBalanceCache = new TokenBalanceCache(
   models,
-  null as RedisCache,
   TBC_BALANCE_TTL_SECONDS,
 );
 const databaseValidationService = new DatabaseValidationService(models);
@@ -112,9 +107,7 @@ const setupServer = () => {
 };
 
 const banCache = new BanCache(models);
-const redisCache = new RedisCache();
-const cacheDecorator = new CacheDecorator(redisCache);
-const globalActivityCache = new GlobalActivityCache(models, redisCache);
+const globalActivityCache = new GlobalActivityCache(models);
 globalActivityCache.start();
 
 setupPassport(models);
@@ -127,21 +120,12 @@ setupAPI(
   banCache,
   globalActivityCache,
   databaseValidationService,
-  redisCache,
 );
 setupCosmosProxy(app, models, cacheDecorator);
 
-const rollbar = new Rollbar({
-  accessToken: ROLLBAR_SERVER_TOKEN,
-  environment: ROLLBAR_ENV,
-  captureUncaught: true,
-  captureUnhandledRejections: true,
-});
-
-setupErrorHandlers(app, rollbar);
+setupErrorHandlers(app);
 setupServer();
 
-export { resetDatabase } from './test/util/resetDatabase';
 export { cacheDecorator, redisCache };
 
 export default app;

@@ -6,8 +6,8 @@ import {
   getRabbitMQConfig,
   setupErrorHandlers,
 } from '@hicommonwealth/adapters';
-import { logger as _logger } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { logger as _logger, cache } from '@hicommonwealth/core';
+import { TokenBalanceCache, models } from '@hicommonwealth/model';
 import bodyParser from 'body-parser';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
@@ -20,7 +20,6 @@ import logger from 'morgan';
 import passport from 'passport';
 import prerenderNode from 'prerender-node';
 import type { BrokerConfig } from 'rascal';
-import Rollbar from 'rollbar';
 import favicon from 'serve-favicon';
 import expressStatsInit from 'server/scripts/setupExpressStats';
 import * as v8 from 'v8';
@@ -29,8 +28,6 @@ import {
   PRERENDER_TOKEN,
   RABBITMQ_URI,
   REDIS_URL,
-  ROLLBAR_ENV,
-  ROLLBAR_SERVER_TOKEN,
   SERVER_URL,
   SESSION_SECRET,
   TBC_BALANCE_TTL_SECONDS,
@@ -48,7 +45,6 @@ import setupCosmosProxy from './server/util/cosmosProxy';
 import { databaseCleaner } from './server/util/databaseCleaner';
 import GlobalActivityCache from './server/util/globalActivityCache';
 import setupIpfsProxy from './server/util/ipfsProxy';
-import { TokenBalanceCache } from './server/util/tokenBalanceCache/tokenBalanceCache';
 import ViewCountCache from './server/util/viewCountCache';
 
 // set up express async error handling hack
@@ -61,6 +57,11 @@ export async function main(app: express.Express) {
       v8.getHeapStatistics().heap_size_limit / 1000000000,
     )} GB`,
   );
+
+  const redisCache = new RedisCache();
+  await redisCache.init(REDIS_URL);
+  const cacheDecorator = new CacheDecorator(redisCache);
+  cache(redisCache);
 
   const DEV = process.env.NODE_ENV !== 'production';
 
@@ -106,16 +107,7 @@ export async function main(app: express.Express) {
   const setupMiddleware = () => {
     // redirect from commonwealthapp.herokuapp.com to commonwealth.im
     app.all(/.*/, (req, res, next) => {
-      const host = req.header('host');
-      const origin = req.get('origin');
-
-      // For development only - need to figure out prod solution
-      // if host is native mobile app, don't redirect
-      if (origin?.includes('capacitor://')) {
-        res.header('Access-Control-Allow-Origin', '*');
-      }
-
-      if (host?.match(/commonwealthapp.herokuapp.com/i)) {
+      if (req.header('host')?.match(/commonwealthapp.herokuapp.com/i)) {
         res.redirect(301, `https://commonwealth.im${req.url}`);
       } else {
         next();
@@ -193,13 +185,6 @@ export async function main(app: express.Express) {
   setupMiddleware();
   setupPassport(models);
 
-  const rollbar = new Rollbar({
-    accessToken: ROLLBAR_SERVER_TOKEN,
-    environment: ROLLBAR_ENV,
-    captureUncaught: true,
-    captureUnhandledRejections: true,
-  });
-
   let rabbitMQController: RabbitMQController;
   try {
     rabbitMQController = new RabbitMQController(
@@ -212,36 +197,22 @@ export async function main(app: express.Express) {
     );
     await rabbitMQController.init();
   } catch (e) {
-    console.warn(
-      'The main service RabbitMQController failed to initialize!',
-      e,
-    );
-    rollbar.critical(
-      'The main service RabbitMQController failed to initialize!',
-      e,
-    );
+    log.error('The main service RabbitMQController failed to initialize!', e);
   }
 
   if (!rabbitMQController.initialized) {
-    console.warn(
+    log.error(
       'The RabbitMQController is not initialized! Some services may be unavailable',
     );
-    rollbar.critical('The main service RabbitMQController is not initialized!');
-    // TODO: this requires an immediate response if in production
   }
-
-  const redisCache = new RedisCache(rollbar);
-  await redisCache.init(REDIS_URL);
-  const cacheDecorator = new CacheDecorator(redisCache);
 
   const tokenBalanceCache = new TokenBalanceCache(
     models,
-    redisCache,
     TBC_BALANCE_TTL_SECONDS,
   );
 
   const banCache = new BanCache(models);
-  const globalActivityCache = new GlobalActivityCache(models, redisCache);
+  const globalActivityCache = new GlobalActivityCache(models);
 
   // initialize async to avoid blocking startup
   if (!NO_GLOBAL_ACTIVITY_CACHE) globalActivityCache.start();
@@ -260,7 +231,6 @@ export async function main(app: express.Express) {
     banCache,
     globalActivityCache,
     dbValidationService,
-    redisCache,
   );
 
   // new API
@@ -284,15 +254,10 @@ export async function main(app: express.Express) {
 
   setupAppRoutes(app, models, templateFile, sendFile);
 
-  setupErrorHandlers(app, rollbar);
+  setupErrorHandlers(app);
 
   setupServer(app);
 
   // database clean-up jobs (should be run after the API so, we don't affect start-up time
-  databaseCleaner.initLoop(
-    models,
-    Number(DATABASE_CLEAN_HOUR),
-    redisCache,
-    rollbar,
-  );
+  databaseCleaner.initLoop(models, Number(DATABASE_CLEAN_HOUR));
 }

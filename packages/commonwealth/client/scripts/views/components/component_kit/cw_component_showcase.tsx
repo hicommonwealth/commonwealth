@@ -6,8 +6,8 @@ import 'components/component_kit/new_designs/cw_button.scss';
 
 import { notifySuccess } from 'controllers/app/notifications';
 import { CWAccountCreationButton } from './cw_account_creation_button';
-import { CWAuthButton } from './cw_auth_button';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
+import { CWAuthButton } from './CWAuthButtonOld';
 
 import { DeltaStatic } from 'quill';
 import app from 'state';
@@ -31,7 +31,7 @@ import {
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { AvatarUpload } from '../Avatar';
-import CommunityStakeBanner from '../CommunityStakeBanner';
+import { CommunityStakeBanner, VoteWeightModule } from '../CommunityStake';
 import UpvotePopover from '../UpvotePopover';
 import { CWCard } from './cw_card';
 import { CWCheckbox } from './cw_checkbox';
@@ -70,7 +70,6 @@ import { CWTag } from './new_designs/CWTag';
 import { CWTextInput } from './new_designs/CWTextInput';
 import { CWTooltip } from './new_designs/CWTooltip';
 import { CWTypeaheadSelectList } from './new_designs/CWTypeaheadSelectList';
-import CWVoteWeightModule from './new_designs/CWVoteWeightModule';
 import { createColumnInfo, makeData, optionList } from './showcase_helpers';
 
 const displayIcons = (icons) => {
@@ -640,7 +639,7 @@ export const ComponentShowcase = () => {
         <div className="tag-row">
           <CWText type="h4">Login User Tag</CWText>
           <CWTag label="mnh7a" type="login" iconName="cosmos" />
-          <CWTag label="mnh7a" type="login" iconName="discordLogin" />
+          <CWTag label="mnh7a" type="login" iconName="discordOld" />
           <CWTag label="mnh7a" type="login" iconName="discord" />
           <CWTag label="mnh7a" type="login" iconName="envelope" />
           <CWTag label="mnh7a" type="login" iconName="ethereum" />
@@ -653,11 +652,7 @@ export const ComponentShowcase = () => {
         <div className="tag-row">
           <CWText type="h4">Address Tags</CWText>
           <CWTag label="0xd83e1...a39bD" type="address" iconName="cosmos" />
-          <CWTag
-            label="0xd83e1...a39bD"
-            type="address"
-            iconName="discordLogin"
-          />
+          <CWTag label="0xd83e1...a39bD" type="address" iconName="discord" />
           <CWTag label="0xd83e1...a39bD" type="address" iconName="envelope" />
           <CWTag label="0xd83e1...a39bD" type="address" iconName="ethereum" />
           <CWTag label="0xd83e1...a39bD" type="address" iconName="octocat" />
@@ -2188,11 +2183,12 @@ export const ComponentShowcase = () => {
       </div>
       <div>
         <CWText type="h3">Vote Weight Module</CWText>
-        <CWVoteWeightModule
+        <VoteWeightModule
           voteWeight={100}
           stakeNumber={1}
           stakeValue={0.072}
           denomination="ETH"
+          onOpenStakeModal={() => console.log('open modal')}
         />
       </div>
       <div className="drawer-container">

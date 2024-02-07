@@ -1,6 +1,7 @@
 import type { DB } from '@hicommonwealth/model';
 import { ProfileAttributes } from '@hicommonwealth/model';
 import type { NextFunction } from 'express';
+import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { failure, success } from '../types';
 
@@ -40,16 +41,11 @@ const updateNewProfile = async (
 
   if (!profile) return next(new Error(Errors.NoProfileFound));
 
-  const {
-    email,
-    slug,
-    name,
-    bio,
-    website,
-    avatarUrl,
-    socials,
-    backgroundImage,
-  } = req.body;
+  const { email, slug, name, website, avatarUrl, socials, backgroundImage } =
+    req.body;
+
+  let { bio } = req.body;
+  bio = sanitizeQuillText(bio, true);
 
   if (profile.user_id !== req.user.id) {
     return next(new Error(Errors.NotAuthorized));

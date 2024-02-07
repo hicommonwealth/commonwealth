@@ -2,7 +2,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 require('dotenv').config();
-import { RedisNamespaces } from '@hicommonwealth/core';
+import { CacheNamespaces } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import express from 'express';
@@ -58,7 +58,7 @@ describe('Cache Disable Tests', () => {
     `Cache Disable Tests: DISABLE_CACHE ${process.env.DISABLE_CACHE}`,
   );
   const redisCache: RedisCache = new RedisCache();
-  const route_namespace: RedisNamespaces = RedisNamespaces.Route_Response;
+  const route_namespace: CacheNamespaces = CacheNamespaces.Route_Response;
   const cacheDecorator = new CacheDecorator(redisCache);
   setupCacheTestEndpoints(app, cacheDecorator);
   process.env.DISABLE_CACHE = 'false';

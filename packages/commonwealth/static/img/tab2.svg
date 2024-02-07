@@ -32,7 +32,7 @@
 <path d="M161 308C161 301.373 166.373 296 173 296H199C205.627 296 211 301.373 211 308V334C211 340.627 205.627 346 199 346H173C166.373 346 161 340.627 161 334V308Z" fill="white"/>
 <path d="M173 296.5H199C205.351 296.5 210.5 301.649 210.5 308V334C210.5 340.351 205.351 345.5 199 345.5H173C166.649 345.5 161.5 340.351 161.5 334V308C161.5 301.649 166.649 296.5 173 296.5Z" stroke="#E7E7E7"/>
 </g>
-<rect x="172" y="307" width="29" height="28" fill="url(#pattern0)"/>
+<rect x="172" y="307" width="29" height="28" fill="url(#patternTab2)"/>
 <defs>
 <filter id="filter0_d" x="0" y="0" width="729" height="554" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
 <feFlood flood-opacity="0" result="BackgroundImageFix"/>
@@ -62,7 +62,7 @@
 <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
 <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
 </filter>
-<pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">
+<pattern id="patternTab2" patternContentUnits="objectBoundingBox" width="1" height="1">
 <use xlink:href="#image0" transform="translate(0 -0.0178571) scale(0.0005)"/>
 </pattern>
 <linearGradient id="paint0_linear" x1="617.431" y1="179.1" x2="442.195" y2="463.524" gradientUnits="userSpaceOnUse">
