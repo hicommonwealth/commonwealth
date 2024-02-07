@@ -10,6 +10,8 @@ import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { ManageCommunityStakeModalMode } from 'views/modals/ManageCommunityStakeModal/types';
 import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import './VoteWeightModule.scss';
 
 type VoteWeightModuleProps = {
@@ -28,6 +30,16 @@ export const VoteWeightModule = ({
   onOpenStakeModal,
 }: VoteWeightModuleProps) => {
   const popoverProps = usePopover();
+  const { handleJoinCommunity } = useJoinCommunity();
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+
+  const handleBuyStakeClick = async () => {
+    if (!hasJoinedCommunity) {
+      await handleJoinCommunity();
+    }
+
+    onOpenStakeModal('buy');
+  };
 
   return (
     <div className="VoteWeightModule">
@@ -49,7 +61,7 @@ export const VoteWeightModule = ({
         <div className="info-and-actions">
           <div className="info">
             <CWText type="caption" className="stake-num">
-              You have {stakeNumber} stake
+              You have {stakeNumber || 0} stake
             </CWText>
             <CWText type="caption" className="stake-value">
               valued at {capDecimals(String(stakeValue))} {denomination}
@@ -63,7 +75,7 @@ export const VoteWeightModule = ({
                 buttonAlt="green"
                 buttonHeight="sm"
                 buttonWidth="full"
-                onClick={() => onOpenStakeModal('buy')}
+                onClick={handleBuyStakeClick}
               />
               <CWButton
                 label="Sell stake"
@@ -82,7 +94,7 @@ export const VoteWeightModule = ({
                 buttonAlt="green"
                 buttonHeight="sm"
                 buttonWidth="full"
-                onClick={() => onOpenStakeModal('buy')}
+                onClick={handleBuyStakeClick}
               />
             </div>
           )}
