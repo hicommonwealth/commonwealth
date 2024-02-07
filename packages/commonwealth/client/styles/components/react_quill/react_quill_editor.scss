@@ -62,6 +62,10 @@
         }
       }
 
+      &:focus {
+        outline: none;
+      }
+
       svg {
         height: unset !important;
         fill: $neutral-500;
