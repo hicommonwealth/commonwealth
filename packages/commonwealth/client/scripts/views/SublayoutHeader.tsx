@@ -8,8 +8,10 @@ import useSidebarStore from 'state/ui/sidebar';
 import UserDropdown from 'views/components/Header/UserDropdown/UserDropdown';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { HelpMenuPopover } from 'views/menus/help_menu';
+import { AuthModal } from 'views/modals/AuthModal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
 import { LoginModal } from 'views/modals/login_modal';
+import { featureFlags } from '../helpers/feature-flags';
 import app from '../state';
 import { CWDivider } from './components/component_kit/cw_divider';
 import { CWIconButton } from './components/component_kit/cw_icon_button';
@@ -40,7 +42,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
     setRecentlyUpdatedVisibility,
   } = useSidebarStore();
   const { isLoggedIn } = useUserLoggedIn();
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -134,7 +136,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
               label="Sign in"
               buttonWidth="wide"
               disabled={location.pathname.includes('/finishsociallogin')}
-              onClick={() => setIsLoginModalOpen(true)}
+              onClick={() => setIsAuthModalOpen(true)}
             />
           )}
         </div>
@@ -147,12 +149,21 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
         onClose={() => setIsFeedbackModalOpen(false)}
         open={isFeedbackModalOpen}
       />
-      <CWModal
-        content={<LoginModal onModalClose={() => setIsLoginModalOpen(false)} />}
-        isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-        onClose={() => setIsLoginModalOpen(false)}
-        open={isLoginModalOpen}
-      />
+      {!featureFlags.newSignInModal ? (
+        <CWModal
+          content={
+            <LoginModal onModalClose={() => setIsAuthModalOpen(false)} />
+          }
+          isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
+          onClose={() => setIsAuthModalOpen(false)}
+          open={isAuthModalOpen}
+        />
+      ) : (
+        <AuthModal
+          onClose={() => setIsAuthModalOpen(false)}
+          isOpen={isAuthModalOpen}
+        />
+      )}
     </>
   );
 };

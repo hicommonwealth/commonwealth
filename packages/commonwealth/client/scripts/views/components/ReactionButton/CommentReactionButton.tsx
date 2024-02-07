@@ -1,5 +1,6 @@
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
+import { featureFlags } from 'helpers/feature-flags';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import React, { useState } from 'react';
 import app from 'state';
@@ -10,6 +11,7 @@ import {
   useCreateCommentReactionMutation,
   useDeleteCommentReactionMutation,
 } from '../../../state/api/comments';
+import { AuthModal } from '../../modals/AuthModal';
 import { LoginModal } from '../../modals/login_modal';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { CWModal } from '../component_kit/new_designs/CWModal';
@@ -28,7 +30,7 @@ export const CommentReactionButton = ({
   tooltipText = '',
   onReaction,
 }: CommentReactionButtonProps) => {
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const {
@@ -70,7 +72,7 @@ export const CommentReactionButton = ({
     e.preventDefault();
 
     if (!app.isLoggedIn() || !app.user.activeAccount) {
-      setIsModalOpen(true);
+      setIsAuthModalOpen(true);
       return;
     }
 
@@ -110,12 +112,21 @@ export const CommentReactionButton = ({
 
   return (
     <>
-      <CWModal
-        content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
-        isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-        onClose={() => setIsModalOpen(false)}
-        open={isModalOpen}
-      />
+      {!featureFlags.newSignInModal ? (
+        <CWModal
+          content={
+            <LoginModal onModalClose={() => setIsAuthModalOpen(false)} />
+          }
+          isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
+          onClose={() => setIsAuthModalOpen(false)}
+          open={isAuthModalOpen}
+        />
+      ) : (
+        <AuthModal
+          onClose={() => setIsAuthModalOpen(false)}
+          isOpen={isAuthModalOpen}
+        />
+      )}
       {RevalidationModal}
       <CWUpvoteSmall
         voteCount={likes}
