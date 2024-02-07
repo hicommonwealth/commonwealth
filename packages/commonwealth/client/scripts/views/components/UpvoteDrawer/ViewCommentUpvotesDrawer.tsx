@@ -28,7 +28,7 @@ export const ViewCommentUpvotesDrawer = ({
       avatarUrl: profile.avatarUrl,
       address: profile.address,
       updated_at: reactor?.updatedAt,
-      voting_weight: reactor?.calculatedVotingWeight || 0,
+      voting_weight: reactor?.calculatedVotingWeight || 1,
     };
   });
 

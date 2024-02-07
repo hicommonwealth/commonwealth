@@ -31,6 +31,7 @@
     "recompute-counts": "npx ts-node -T ./scripts/recompute-count-job.ts",
     "reset-db": "chmod u+x scripts/reset-db.sh && ./scripts/reset-db.sh",
     "reset-frack-db": "heroku pg:copy commonwealth-beta::CW_READ_DB DATABASE_URL --app commonwealth-frack --confirm commonwealth-frack",
+    "resize-large-images": "npx ts-node -T ./scripts/resizeImages.ts",
     "send-notification-digest-emails": "SEND_EMAILS=true ts-node -r tsconfig-paths/register server.ts",
     "send-cosmos-notifs": "ts-node -r tsconfig-paths/register server/workers/cosmosGovNotifications/generateCosmosGovNotifications.ts",
     "start": "ts-node-dev -r tsconfig-paths/register --max-old-space-size=4096 --respawn --transpile-only server.ts",

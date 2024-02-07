@@ -163,6 +163,7 @@ export class Thread implements IUniqueId {
   public readonly hasPoll: boolean;
   public numberOfComments: number;
   public associatedReactions: AssociatedReaction[];
+  public reactionWeightsSum: number;
   public links: Link[];
   public readonly discord_meta: any;
   public readonly latestActivity: Moment;
@@ -200,6 +201,7 @@ export class Thread implements IUniqueId {
     reactionType,
     reactionTimestamps,
     reactionWeights,
+    reaction_weights_sum,
     addressesReacted,
     canvasAction,
     canvasSession,
@@ -238,6 +240,7 @@ export class Thread implements IUniqueId {
     reactionType: any[]; // TODO: fix type
     reactionTimestamps: string[];
     reactionWeights: number[];
+    reaction_weights_sum: number;
     version_history: any[]; // TODO: fix type
     Address: any; // TODO: fix type
     discord_meta?: any;
@@ -276,6 +279,7 @@ export class Thread implements IUniqueId {
     this.links = links || [];
     this.discord_meta = discord_meta;
     this.versionHistory = processVersionHistory(version_history);
+    this.reactionWeightsSum = reaction_weights_sum;
     this.associatedReactions = processAssociatedReactions(
       reactions,
       reactionIds,
