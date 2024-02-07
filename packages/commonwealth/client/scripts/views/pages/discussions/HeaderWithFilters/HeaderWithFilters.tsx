@@ -1,4 +1,5 @@
 import { parseCustomStages, threadStageToLabel } from 'helpers';
+import { featureFlags } from 'helpers/feature-flags';
 import { isUndefined } from 'helpers/typeGuards';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
@@ -9,6 +10,11 @@ import { matchRoutes } from 'react-router-dom';
 import app from 'state';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
+import {
+  CommunityStakeBanner,
+  useCommunityStake,
+} from 'views/components/CommunityStake';
+import DismissStakeBannerModal from 'views/components/CommunityStake/DismissStakeBannerModal';
 import { Select } from 'views/components/Select';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -21,6 +27,8 @@ import {
   ThreadStage,
   ThreadTimelineFilterTypes,
 } from '../../../../models/types';
+
+import useCommunityStakeStore from 'state/ui/communityStake';
 import './HeaderWithFilters.scss';
 
 type HeaderWithFiltersProps = {
@@ -50,6 +58,8 @@ export const HeaderWithFilters = ({
 }: HeaderWithFiltersProps) => {
   const navigate = useCommonNavigate();
   const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
+  const [isDismissStakeBannerModalOpen, setIsDismissStakeBannerModalOpen] =
+    useState(false);
   const forceRerender = useForceRerender();
   const filterRowRef = useRef<HTMLDivElement>();
   const [rightFiltersDropdownPosition, setRightFiltersDropdownPosition] =
@@ -58,6 +68,8 @@ export const HeaderWithFilters = ({
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
   const { totalThreadsInCommunityForVoting } =
     useEXCEPTION_CASE_threadCountersStore();
+  const { stakeEnabled } = useCommunityStake();
+  const { dismissBanner, isBannerVisible } = useCommunityStakeStore();
 
   const onFilterResize = () => {
     if (filterRowRef.current) {
@@ -156,8 +168,32 @@ export const HeaderWithFilters = ({
     }
   };
 
+  const handleDismissStakeBannerModal = (
+    dismissForThisCommunity: boolean,
+    dismissForAnyCommunity: boolean,
+  ) => {
+    setIsDismissStakeBannerModalOpen(false);
+
+    dismissBanner({
+      communityId: app.activeChainId(),
+      communityDismissal: dismissForThisCommunity,
+      allCommunitiesDismissal: dismissForAnyCommunity,
+    });
+  };
+
+  const stakeBannerEnabled =
+    featureFlags.communityStake &&
+    stakeEnabled &&
+    isBannerVisible(app.activeChainId());
+
   return (
     <div className="HeaderWithFilters">
+      {stakeBannerEnabled && (
+        <CommunityStakeBanner
+          onClose={() => setIsDismissStakeBannerModalOpen(true)}
+        />
+      )}
+
       <div className="header-row">
         <CWText type="h3" fontWeight="semiBold" className="header-text">
           {isUndefined(topic)
@@ -381,6 +417,17 @@ export const HeaderWithFilters = ({
         }
         onClose={() => setTopicSelectedToEdit(null)}
         open={!!topicSelectedToEdit}
+      />
+      <CWModal
+        size="small"
+        content={
+          <DismissStakeBannerModal
+            onModalClose={() => setIsDismissStakeBannerModalOpen(false)}
+            onDismiss={handleDismissStakeBannerModal}
+          />
+        }
+        onClose={() => setIsDismissStakeBannerModalOpen(false)}
+        open={isDismissStakeBannerModalOpen}
       />
     </div>
   );

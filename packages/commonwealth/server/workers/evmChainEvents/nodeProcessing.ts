@@ -1,6 +1,5 @@
 import { logger, stats } from '@hicommonwealth/core';
 import { NotificationInstance, models } from '@hicommonwealth/model';
-import { rollbar } from '../../util/rollbar';
 import { emitChainEventNotifs } from './emitChainEventNotifs';
 import { getEventSources } from './getEventSources';
 import { getEvents } from './logProcessing';
@@ -58,7 +57,6 @@ export async function processChainNode(
   } catch (e) {
     const msg = `Error occurred while processing chainNodeId ${chainNodeId}`;
     log.error(msg, e);
-    rollbar.critical(msg, e);
   }
 }
 

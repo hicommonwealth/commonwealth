@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-syntax */
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import type { DB, TopicAttributes } from '@hicommonwealth/model';
 import type { NextFunction } from 'express';
 import type { TypedRequestBody, TypedResponse } from '../types';
@@ -64,7 +64,7 @@ const editTopic = async (
     user: req.user,
     communityId: chain.id,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     return next(new AppError(Errors.NotAdmin));

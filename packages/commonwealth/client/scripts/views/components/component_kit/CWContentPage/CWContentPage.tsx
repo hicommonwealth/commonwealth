@@ -215,13 +215,12 @@ export const CWContentPage = ({
         {!isEditing ? authorAndPublishInfoRow : <></>}
       </div>
       {subHeader}
-
       {isEditing ? authorAndPublishInfoRow : <></>}
-
       {body &&
         body(
           <ThreadOptions
             upvoteBtnVisible={!thread?.readOnly}
+            upvoteDrawerBtnBelow={true}
             commentBtnVisible={!thread?.readOnly}
             thread={thread}
             totalComments={thread?.numberOfComments}

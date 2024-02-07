@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import { AddressInstance, UserInstance } from '@hicommonwealth/model';
 import deleteThreadFromDb from '../../util/deleteThread';
 import { validateOwner } from '../../util/validateOwner';
@@ -66,7 +66,7 @@ export async function __deleteThread(
     entity: thread,
     allowMod: true,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isOwnerOrAdmin) {
     throw new AppError(Errors.NotOwned);

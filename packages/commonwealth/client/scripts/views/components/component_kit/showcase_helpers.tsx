@@ -54,7 +54,10 @@ const newCommunity = (): any => {
       <CWButton label="button" buttonType={buttonType} iconLeft={iconName} />
     ),
     avatars: {
-      name: 'https://assets.commonwealth.im/f5c5a0c6-0552-40be-bb4b-b25fbd0cfbe2.png',
+      name: {
+        avatarUrl:
+          'https://assets.commonwealth.im/f5c5a0c6-0552-40be-bb4b-b25fbd0cfbe2.png',
+      },
     },
   };
 };

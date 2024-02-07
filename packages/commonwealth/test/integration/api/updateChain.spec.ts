@@ -1,15 +1,15 @@
 import { ChainBase, ChainType } from '@hicommonwealth/core';
 import {
   CommunityAttributes,
+  TokenBalanceCache,
   UserInstance,
   models,
+  tester,
 } from '@hicommonwealth/model';
 import { assert } from 'chai';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 import { Errors } from '../../../server/controllers/server_communities_methods/update_community';
-import { TokenBalanceCache } from '../../../server/util/tokenBalanceCache/tokenBalanceCache';
 import { buildUser } from '../../unit/unitHelpers';
-import { resetDatabase } from '../../util/resetDatabase';
 
 const baseRequest: CommunityAttributes = {
   id: 'ethereum',
@@ -26,7 +26,7 @@ const baseRequest: CommunityAttributes = {
 
 describe('UpdateChain Tests', () => {
   before(async () => {
-    await resetDatabase();
+    await tester.seedDb();
   });
 
   it('Correctly updates chain', async () => {
@@ -37,24 +37,28 @@ describe('UpdateChain Tests', () => {
     }) as UserInstance;
 
     let response = await controller.updateCommunity({
+      ...baseRequest,
       directory_page_enabled: true,
       directory_page_chain_node_id: 1,
-      ...baseRequest,
+      type: ChainType.Offchain,
       user: user,
     });
 
     assert.equal(response.directory_page_enabled, true);
     assert.equal(response.directory_page_chain_node_id, 1);
+    assert.equal(response.type, 'offchain');
 
     response = await controller.updateCommunity({
+      ...baseRequest,
       directory_page_enabled: false,
       directory_page_chain_node_id: null,
-      ...baseRequest,
+      type: ChainType.Chain,
       user: user,
     });
 
     assert.equal(response.directory_page_enabled, false);
     assert.equal(response.directory_page_chain_node_id, null);
+    assert.equal(response.type, 'chain');
   });
 
   it('Fails if namespace present but no transaction hash', async () => {
@@ -96,7 +100,9 @@ describe('UpdateChain Tests', () => {
     }
   });
 
-  it('Correctly updates namespace', async () => {
+  // skipped because public chainNodes are unreliable. If you want to test this functionality, update the goleri
+  // chainNode and do it locally.
+  xit('Correctly updates namespace', async () => {
     const tbc = {
       getBalances: async (_: any) => {
         return { '0x42D6716549A78c05FD8EF1f999D52751Bbf9F46a': '1' };

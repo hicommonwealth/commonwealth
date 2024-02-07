@@ -1,5 +1,5 @@
-import { AppError } from '@hicommonwealth/adapters';
 import {
+  AppError,
   ChainBase,
   ChainNetwork,
   WalletId,

@@ -1,0 +1,32 @@
+name: Convert PRs to Drafts without Linked Issue
+
+on:
+  pull_request:
+    types:
+      - opened
+
+jobs:
+  checkLinkedIssue:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v6
+        id: set-result
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prDescription = context.payload.pull_request.body;
+            const issueMatcher = /([cC]loses|[fF]ixes):\s*#(\d+)/;
+            
+            let prNumber = -1;
+            if (issueMatcher.test(prDescription)) {
+              prNumber = context.payload.number
+            }
+            
+            return prNumber;
+          result-encoding: string
+
+      - name: Mark as draft
+        if: ${{ steps.set-result.outputs.result == '-1' }}
+        uses: voiceflow/draft-pr@latest
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}

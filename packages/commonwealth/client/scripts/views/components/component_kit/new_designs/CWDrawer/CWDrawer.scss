@@ -2,6 +2,7 @@
 
 .Drawer {
   padding-bottom: 46px;
+  overflow: auto;
 
   .drawer-actions {
     display: flex;
@@ -10,16 +11,16 @@
     padding: 16px 56px 12px 56px;
   }
 
-  .Icon {
-    cursor: pointer;
-  }
-
   .content-container {
     padding: 20px 56px;
+
+    div.h3 {
+      margin-bottom: 16px;
+    }
   }
 
   @include extraSmall {
-    padding-bottom: 0px;
+    padding-bottom: 56px;
 
     .drawer-actions {
       gap: 4px;

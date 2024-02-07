@@ -1,11 +1,16 @@
-import { AppError, ServerError } from '@hicommonwealth/adapters';
-import { NotificationCategories } from '@hicommonwealth/core';
+import {
+  AppError,
+  NotificationCategories,
+  ServerError,
+  commonProtocol,
+} from '@hicommonwealth/core';
 import {
   AddressInstance,
-  CommunityInstance,
   ReactionAttributes,
   UserInstance,
+  contractHelpers,
 } from '@hicommonwealth/model';
+import { REACTION_WEIGHT_OVERRIDE } from 'server/config';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { findAllRoles } from '../../util/roles';
@@ -19,12 +24,13 @@ const Errors = {
   BanError: 'Ban error',
   InsufficientTokenBalance: 'Insufficient token balance',
   BalanceCheckFailed: 'Could not verify user token balance',
+  FailedCreateReaction: 'Failed to create reaction',
+  CommunityNotFound: 'Community not found',
 };
 
 export type CreateCommentReactionOptions = {
   user: UserInstance;
   address: AddressInstance;
-  community: CommunityInstance;
   reaction: string;
   commentId: number;
   canvasAction?: any;
@@ -43,7 +49,6 @@ export async function __createCommentReaction(
   {
     user,
     address,
-    community,
     reaction,
     commentId,
     canvasAction,
@@ -53,46 +58,47 @@ export async function __createCommentReaction(
 ): Promise<CreateCommentReactionResult> {
   const comment = await this.models.Comment.findOne({
     where: { id: commentId },
+    include: [
+      {
+        model: this.models.Thread,
+        required: true,
+      },
+    ],
   });
   if (!comment) {
     throw new AppError(`${Errors.CommentNotFound}: ${commentId}`);
   }
-
-  const thread = await this.models.Thread.findOne({
-    where: { id: comment.thread_id },
-  });
+  const { Thread: thread } = comment;
   if (!thread) {
-    throw new AppError(`${Errors.ThreadNotFoundForComment}: ${commentId}`);
+    throw new AppError(Errors.ThreadNotFoundForComment);
   }
 
   // check address ban
-  if (community) {
-    const [canInteract, banError] = await this.banCache.checkBan({
-      communityId: community.id,
-      address: address.address,
-    });
-    if (!canInteract) {
-      throw new AppError(`${Errors.BanError}: ${banError}`);
-    }
+  const [canInteract, banError] = await this.banCache.checkBan({
+    communityId: thread.community_id,
+    address: address.address,
+  });
+  if (!canInteract) {
+    throw new AppError(`${Errors.BanError}: ${banError}`);
   }
 
   // check balance (bypass for admin)
   const addressAdminRoles = await findAllRoles(
     this.models,
     { where: { address_id: address.id } },
-    community.id,
+    thread.community_id,
     ['admin'],
   );
-  const isGodMode = user.isAdmin;
+  const isSuperAdmin = user.isAdmin;
   const hasAdminRole = addressAdminRoles.length > 0;
-  if (!isGodMode && !hasAdminRole) {
+  if (!isSuperAdmin && !hasAdminRole) {
     let canReact = false;
     try {
       const { isValid } = await validateTopicGroupsMembership(
         this.models,
         this.tokenBalanceCache,
         thread.topic_id,
-        community,
+        thread.community_id,
         address,
       );
       canReact = isValid;
@@ -104,30 +110,56 @@ export async function __createCommentReaction(
     }
   }
 
+  let calculatedVotingWeight: number | null = null;
+  if (REACTION_WEIGHT_OVERRIDE) {
+    calculatedVotingWeight = REACTION_WEIGHT_OVERRIDE;
+  } else {
+    // calculate voting weight
+    const stake = await this.models.CommunityStake.findOne({
+      where: { community_id: thread.community_id },
+    });
+    if (stake) {
+      const voteWeight = stake.vote_weight;
+      const community = await this.models.Community.findByPk(
+        thread.community_id,
+      );
+      if (!community) {
+        throw new AppError(Errors.CommunityNotFound);
+      }
+      const stakeBalance = await contractHelpers.getNamespaceBalance(
+        this.tokenBalanceCache,
+        community.namespace,
+        stake.stake_id,
+        commonProtocol.ValidChains.Sepolia,
+        address.address,
+        this.models,
+      );
+      calculatedVotingWeight = commonProtocol.calculateVoteWeight(
+        stakeBalance,
+        voteWeight,
+      );
+    }
+  }
+
   // create the reaction
-  const reactionData: ReactionAttributes = {
+  const reactionWhere: Partial<ReactionAttributes> = {
     reaction,
     address_id: address.id,
-    community_id: community.id,
+    community_id: thread.community_id,
     comment_id: comment.id,
+  };
+  const reactionData: Partial<ReactionAttributes> = {
+    ...reactionWhere,
+    calculated_voting_weight: calculatedVotingWeight,
     canvas_action: canvasAction,
     canvas_session: canvasSession,
     canvas_hash: canvasHash,
   };
-  const [foundOrCreatedReaction, created] =
-    await this.models.Reaction.findOrCreate({
-      where: reactionData,
-      defaults: reactionData,
-      include: [this.models.Address],
-    });
 
-  const finalReaction = created
-    ? await this.models.Reaction.findOne({
-        where: reactionData,
-        include: [this.models.Address],
-      })
-    : foundOrCreatedReaction;
-
+  const [finalReaction] = await this.models.Reaction.findOrCreate({
+    where: reactionWhere,
+    defaults: reactionData,
+  });
   // build notification options
   const allNotificationOptions: EmitOptions[] = [];
 
@@ -141,12 +173,12 @@ export async function __createCommentReaction(
         comment_text: comment.text,
         root_title: thread.title,
         root_type: null, // What is this for?
-        chain_id: finalReaction.community_id,
-        author_address: finalReaction.Address.address,
-        author_chain: finalReaction.Address.community_id,
+        chain_id: thread.community_id,
+        author_address: address.address,
+        author_chain: address.community_id,
       },
     },
-    excludeAddresses: [finalReaction.Address.address],
+    excludeAddresses: [address.address],
   });
 
   // build analytics options
@@ -154,7 +186,7 @@ export async function __createCommentReaction(
 
   allAnalyticsOptions.push({
     event: MixpanelCommunityInteractionEvent.CREATE_REACTION,
-    community: community.id,
+    community: thread.community_id,
     userId: user.id,
   });
 
@@ -162,5 +194,14 @@ export async function __createCommentReaction(
   address.last_active = new Date();
   address.save().catch(console.error);
 
-  return [finalReaction.toJSON(), allNotificationOptions, allAnalyticsOptions];
+  const finalReactionWithAddress: ReactionAttributes = {
+    ...finalReaction.toJSON(),
+    Address: address,
+  };
+
+  return [
+    finalReactionWithAddress,
+    allNotificationOptions,
+    allAnalyticsOptions,
+  ];
 }

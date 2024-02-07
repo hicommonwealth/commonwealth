@@ -1,4 +1,3 @@
-import { RedisCache } from '@hicommonwealth/adapters';
 import {
   GovernorAlpha,
   GovernorBravoDelegate,
@@ -52,14 +51,9 @@ export function formatCompoundBravoProposal(
 export async function getCompoundProposals(
   compoundGovAddress: string,
   provider: providers.Web3Provider,
-  redisCache: RedisCache,
 ): Promise<ProposalDataType[]> {
   const { contract, version: govVersion } =
-    await getCompoundGovContractAndVersion(
-      redisCache,
-      compoundGovAddress,
-      provider,
-    );
+    await getCompoundGovContractAndVersion(compoundGovAddress, provider);
 
   await contract.deployed();
   let proposalArrays: ResolvedProposalPromises;

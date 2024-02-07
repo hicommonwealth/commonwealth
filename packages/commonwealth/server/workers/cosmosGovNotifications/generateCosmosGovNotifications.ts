@@ -1,6 +1,5 @@
 import { logger } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
-import { rollbar } from '../../util/rollbar';
 import {
   fetchLatestProposals,
   fetchUpToLatestCosmosProposals,
@@ -63,7 +62,6 @@ if (require.main === module) {
     .then(() => process.exit(0))
     .catch((err) => {
       log.error(err);
-      rollbar.error(err);
       process.exit(1);
     });
 }

@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import type { BanAttributes, DB } from '@hicommonwealth/model';
 import type { TypedRequest, TypedResponse } from '../types';
 import { success } from '../types';
@@ -22,7 +22,7 @@ const getBannedAddresses = async (
     user: req.user,
     communityId: community.id,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError(GetBannedAddressesErrors.NoPermission);

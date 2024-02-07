@@ -2,10 +2,9 @@ import type { SessionPayload } from '@canvas-js/interfaces';
 import type {
   ConnectedWallet,
   WalletController,
-} from '@terra-money/wallet-controller';
+} from '@terra-money/wallet-provider';
 
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
-import app from 'state';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 
@@ -23,7 +22,6 @@ class TerraWalletConnectWebWalletController
   private _accounts: TerraAddress[];
   private _controller: WalletController;
   private _wallet: ConnectedWallet;
-  private _terra;
 
   public readonly name = WalletId.TerraWalletConnect;
   public readonly label = 'WalletConnect';
@@ -50,21 +48,17 @@ class TerraWalletConnectWebWalletController
   }
 
   public async getRecentBlock(chainIdentifier: string) {
-    const client = new this._terra.LCDClient({
-      URL: app.chain.meta.ChainNode.url,
-      chainID: chainIdentifier,
-    });
-    const tmClient = new this._terra.TendermintAPI(client);
-    const blockInfo = await tmClient.blockInfo();
+    const url = `${window.location.origin}/cosmosAPI/${chainIdentifier}`;
+    const cosm = await import('@cosmjs/stargate');
+    const client = await cosm.StargateClient.connect(url);
+    const height = await client.getHeight();
+    const block = await client.getBlock(height - 2); // validator pool may be out of sync
 
     return {
-      number: parseInt(blockInfo.block.header.height),
-      // TODO: is this the hash we should use? the terra.js API has no documentation
-      hash: blockInfo.block.header.data_hash,
+      number: block.header.height,
+      hash: block.id,
       // seconds since epoch
-      timestamp: Math.floor(
-        new Date(blockInfo.block.header.time).getTime() / 1000,
-      ),
+      timestamp: Math.floor(new Date(block.header.time).getTime() / 1000),
     };
   }
 
@@ -101,10 +95,9 @@ class TerraWalletConnectWebWalletController
 
   public async enable() {
     console.log('Attempting to enable WalletConnect');
-    this._terra = await import('@terra-money/terra.js');
     this._enabling = true;
     try {
-      const terra = await import('@terra-money/wallet-controller');
+      const terra = await import('@terra-money/wallet-provider');
       const chainOptions = await terra.getChainOptions();
       this._controller = new terra.WalletController({
         ...chainOptions,

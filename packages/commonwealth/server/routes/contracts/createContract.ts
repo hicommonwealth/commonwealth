@@ -1,6 +1,5 @@
-import { AppError } from '@hicommonwealth/adapters';
 import type { ContractType } from '@hicommonwealth/core';
-import { AbiType } from '@hicommonwealth/core';
+import { AbiType, AppError } from '@hicommonwealth/core';
 import type {
   ChainNodeAttributes,
   ContractAbiInstance,
@@ -106,7 +105,7 @@ const createContract = async (
     user: req.user,
     communityId: chain_id,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError('Must be admin');

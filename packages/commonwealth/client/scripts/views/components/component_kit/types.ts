@@ -28,6 +28,7 @@ export enum ComponentType {
   Icon = 'Icon',
   IconButton = 'IconButton',
   Label = 'Label',
+  LoadingSpinner = 'LoadingSpinner',
   MessageBanner = 'MessageBanner',
   MobileMenu = 'MobileMenu',
   Modal = 'CWModal',
@@ -56,7 +57,6 @@ export enum ComponentType {
   TypeaheadSelectList = 'TypeaheadSelectList',
   Upvote = 'Upvote',
   ValidationText = 'ValidationText',
-  VoteWeightModule = 'VoteWeightModule',
   WalletOptionRow = 'WalletOptionRow',
   SelectList = 'SelectList',
 }

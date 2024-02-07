@@ -16,6 +16,8 @@ export type ReactionAttributes = {
   proposal_id?: number;
   comment_id?: number;
 
+  calculated_voting_weight: number;
+
   canvas_action: string;
   canvas_session: string;
   canvas_hash: string;
@@ -45,6 +47,7 @@ export default (
       comment_id: { type: dataTypes.INTEGER, allowNull: true },
       address_id: { type: dataTypes.INTEGER, allowNull: false },
       reaction: { type: dataTypes.STRING, allowNull: false },
+      calculated_voting_weight: { type: dataTypes.INTEGER, allowNull: true },
       // signed data
       canvas_action: { type: dataTypes.JSONB, allowNull: true },
       canvas_session: { type: dataTypes.JSONB, allowNull: true },
@@ -52,7 +55,7 @@ export default (
     },
     {
       hooks: {
-        afterCreate: async (reaction: ReactionInstance) => {
+        afterCreate: async (reaction: ReactionInstance, options) => {
           let thread_id = reaction.thread_id;
           const comment_id = reaction.comment_id;
           const { Thread, Comment } = sequelize.models;
@@ -62,7 +65,15 @@ export default (
                 where: { id: thread_id },
               });
               if (thread) {
-                thread.increment('reaction_count');
+                await thread.increment('reaction_count', {
+                  transaction: options.transaction,
+                });
+                if (reaction.calculated_voting_weight > 0) {
+                  await thread.increment('reaction_weights_sum', {
+                    by: reaction.calculated_voting_weight,
+                    transaction: options.transaction,
+                  });
+                }
                 stats().increment('cw.hook.reaction-count', {
                   thread_id: String(thread_id),
                 });
@@ -74,7 +85,15 @@ export default (
                 where: { id: comment_id },
               });
               if (comment) {
-                comment.increment('reaction_count');
+                await comment.increment('reaction_count', {
+                  transaction: options.transaction,
+                });
+                if (reaction.calculated_voting_weight > 0) {
+                  await comment.increment('reaction_weights_sum', {
+                    by: reaction.calculated_voting_weight,
+                    transaction: options.transaction,
+                  });
+                }
                 thread_id = Number(comment.get('thread_id'));
                 stats().increment('cw.hook.reaction-count', {
                   thread_id: String(thread_id),
@@ -91,7 +110,7 @@ export default (
             });
           }
         },
-        afterDestroy: async (reaction: ReactionInstance) => {
+        afterDestroy: async (reaction: ReactionInstance, options) => {
           let thread_id = reaction.thread_id;
           const comment_id = reaction.comment_id;
           const { Thread, Comment } = sequelize.models;
@@ -101,7 +120,15 @@ export default (
                 where: { id: thread_id },
               });
               if (thread) {
-                thread.decrement('reaction_count');
+                await thread.decrement('reaction_count', {
+                  transaction: options.transaction,
+                });
+                if (reaction.calculated_voting_weight > 0) {
+                  await thread.decrement('reaction_weights_sum', {
+                    by: reaction.calculated_voting_weight,
+                    transaction: options.transaction,
+                  });
+                }
                 stats().decrement('cw.hook.reaction-count', {
                   thread_id: String(thread_id),
                 });
@@ -114,7 +141,15 @@ export default (
               });
               if (comment) {
                 thread_id = Number(comment.get('thread_id'));
-                comment.decrement('reaction_count');
+                await comment.decrement('reaction_count', {
+                  transaction: options.transaction,
+                });
+                if (reaction.calculated_voting_weight > 0) {
+                  await comment.decrement('reaction_weights_sum', {
+                    by: reaction.calculated_voting_weight,
+                    transaction: options.transaction,
+                  });
+                }
                 stats().decrement('cw.hook.reaction-count', {
                   thread_id: String(thread_id),
                 });
