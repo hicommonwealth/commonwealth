@@ -3,7 +3,6 @@
 .UserDashboard {
   display: flex;
   flex: 1;
-  gap: 56px;
   justify-content: space-between;
   width: auto;
   z-index: 0;
@@ -27,6 +26,10 @@
       gap: 24px;
       width: 100%;
       margin-bottom: 16px;
+
+      @include small {
+        margin-top: 12px;
+      }
     }
   }
 

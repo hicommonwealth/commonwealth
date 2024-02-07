@@ -1,8 +1,9 @@
+import type { IEventLabel } from 'chain/labelers/util';
 import 'pages/user_dashboard/user_dashboard_chain_event_row.scss';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import type { IEventLabel } from '../../../../../../chain-events/src';
-import ChainInfo from '../../../models/ChainInfo';
+import CommunityInfo from '../../../models/ChainInfo';
+import { Skeleton } from '../../components/Skeleton';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import type { IconName } from '../../components/component_kit/cw_icons/cw_icon_lookup';
@@ -10,21 +11,58 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
 
 type UserDashboardChainEventRowProps = {
-  blockNumber: number;
-  chain: ChainInfo;
+  blockNumber?: number;
+  community: CommunityInfo;
   label: IEventLabel;
+  showSkeleton?: boolean;
 };
 
-export const UserDashboardChainEventRow = (
-  props: UserDashboardChainEventRowProps
-) => {
-  const { blockNumber, chain, label } = props;
+export const UserDashboardChainEventRowSkeleton = () => {
+  return (
+    <div className="UserDashboardChainEventRow">
+      <div className="chain-event-icon-container">
+        <Skeleton height={20} width={20} />
+      </div>
+      <div className="chain-event-text-container w-full">
+        <div className="community-title">
+          <CWCommunityAvatar community={{} as any} showSkeleton />
+          <div className="ml-8">
+            <CWText type="caption" fontWeight="medium">
+              <Skeleton width={50} />
+            </CWText>
+          </div>
+          <div className="dot">.</div>
+          <CWText type="caption" fontWeight="medium" className="block">
+            <Skeleton width={50} />
+          </CWText>
+        </div>
+
+        <CWText className="row-top-text">
+          <Skeleton width={200} />
+        </CWText>
+        <div>
+          <Skeleton width={'90%'} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const UserDashboardChainEventRow = ({
+  blockNumber,
+  community,
+  label,
+  showSkeleton,
+}: UserDashboardChainEventRowProps) => {
+  if (showSkeleton) {
+    return <UserDashboardChainEventRowSkeleton />;
+  }
 
   return (
     <Link
       className={getClasses<{ isLink?: boolean }>(
         { isLink: !!label.linkUrl },
-        'UserDashboardChainEventRow'
+        'UserDashboardChainEventRow',
       )}
       {...(label.linkUrl && { to: label.linkUrl })}
     >
@@ -36,21 +74,23 @@ export const UserDashboardChainEventRow = (
       </div>
       <div className="chain-event-text-container">
         <div className="community-title">
-          <CWCommunityAvatar community={chain} size="small" />
+          <CWCommunityAvatar community={community} size="small" />
           <Link
             onClick={(e) => {
               e.stopPropagation();
             }}
-            {...(chain?.id && { to: `/${chain?.id}` })}
+            {...(community?.id && { to: `/${community?.id}` })}
           >
             <CWText type="caption" fontWeight="medium">
-              {chain?.name || 'Unknown chain'}
+              {community?.name || 'Unknown chain'}
             </CWText>
           </Link>
           <div className="dot">.</div>
-          <CWText type="caption" fontWeight="medium" className="block">
-            Block {blockNumber}
-          </CWText>
+          {blockNumber ? (
+            <CWText type="caption" fontWeight="medium" className="block">
+              Block {blockNumber}
+            </CWText>
+          ) : null}
         </div>
         <CWText className="row-top-text" fontWeight="bold">
           {label.heading}

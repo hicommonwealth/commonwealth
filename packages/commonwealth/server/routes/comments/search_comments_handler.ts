@@ -1,56 +1,45 @@
-import {
-  MIN_COMMENT_SEARCH_QUERY_LENGTH,
-  SearchCommentResult,
-} from '../../controllers/server_comments_controller';
-import { TypedRequestQuery, TypedResponse, success } from '../../types';
+import { AppError } from '@hicommonwealth/core';
+import { SearchCommentsResult } from 'server/controllers/server_comments_methods/search_comments';
+import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
 import { ServerControllers } from '../../routing/router';
-import { AppError } from '../../../../common-common/src/errors';
-import { ALL_CHAINS } from '../../middleware/databaseValidationService';
+import {
+  PaginationQueryParams,
+  TypedRequestQuery,
+  TypedResponse,
+  success,
+} from '../../types';
 
 const Errors = {
-  UnexpectedError: 'Unexpected error',
-  QueryMissing: 'Must enter query to begin searching',
-  QueryTooShort: 'Query must be at least 4 characters',
-  NoCommunity: 'Title search must be community scoped',
-  NoChains: 'No chains resolved to execute search',
+  InvalidCommunityId: 'Invalid community ID',
+  NoCommunity: 'No community resolved to execute search',
 };
 
-type SearchCommentsRequestParams = {
+type SearchCommentsRequestQuery = {
   search: string;
-  chain?: string;
-  sort?: string;
-  page?: string;
-  page_size?: string;
-};
-type SearchCommentsResponse = SearchCommentResult[];
+  community_id?: string;
+} & PaginationQueryParams;
+
+type SearchCommentsResponse = SearchCommentsResult;
 
 export const searchCommentsHandler = async (
   controllers: ServerControllers,
-  req: TypedRequestQuery<SearchCommentsRequestParams>,
-  res: TypedResponse<SearchCommentsResponse>
+  req: TypedRequestQuery<SearchCommentsRequestQuery>,
+  res: TypedResponse<SearchCommentsResponse>,
 ) => {
   const options = req.query;
-  if (!options.search) {
-    throw new AppError(Errors.QueryMissing);
-  }
-  if (options.search.length < MIN_COMMENT_SEARCH_QUERY_LENGTH) {
-    throw new AppError(Errors.QueryTooShort);
-  }
-  if (!options.chain) {
-    throw new AppError(Errors.NoChains);
-  }
-  if (!req.chain && options.chain !== ALL_CHAINS) {
-    // if no chain resolved, ensure that client explicitly requested all chains
-    throw new AppError(Errors.NoChains);
+  if (!req.community && options.community_id !== ALL_COMMUNITIES) {
+    // if no chain resolved, ensure that client explicitly requested all communities
+    throw new AppError(Errors.NoCommunity);
   }
 
-  const commentSearchResults = await controllers.comments.searchComments(
-    req.chain,
-    options.search,
-    options.sort,
-    parseInt(options.page, 10) || 0,
-    parseInt(options.page_size, 10) || 0
-  );
+  const commentSearchResults = await controllers.comments.searchComments({
+    community: req.community,
+    search: options.search,
+    limit: parseInt(options.limit, 10) || 0,
+    page: parseInt(options.page, 10) || 0,
+    orderBy: options.order_by,
+    orderDirection: options.order_direction as any,
+  });
 
   return success(res, commentSearchResults);
 };

@@ -3,9 +3,9 @@ import React, { useEffect, useState } from 'react';
 import 'components/proposals/aave_proposal_card_detail.scss';
 
 import type AaveProposal from 'controllers/chain/ethereum/aave/proposal';
-import { User } from '../user/user';
 import { CWLabel } from '../component_kit/cw_label';
 import { CWText } from '../component_kit/cw_text';
+import { User } from '../user/user';
 
 export const roundVote = (percentage) => {
   return percentage.toFixed(2).split('.0')[0].slice(0, 4);
@@ -42,7 +42,7 @@ export const AaveProposalCardDetail = (props: AaveProposalCardDetailProps) => {
   useEffect(() => {
     // TODO: we need to load titles / description async too
     proposal.ipfsDataReady.once('ready', () =>
-      setAuthor(proposal.ipfsData?.author)
+      setAuthor(proposal.ipfsData?.author),
     );
   });
   // TODO: move executor display to entire page
@@ -59,7 +59,14 @@ export const AaveProposalCardDetail = (props: AaveProposalCardDetailProps) => {
               {author.split(' (')[0]}
             </CWText>
           ) : (
-            <User user={proposal.author} hideAvatar linkify />
+            <User
+              userAddress={proposal.author.address}
+              userCommunityId={
+                proposal.author.community?.id || proposal.author.profile?.chain
+              }
+              shouldHideAvatar
+              shouldLinkProfile
+            />
           )}
         </div>
         <div className="aave-metadata-column">

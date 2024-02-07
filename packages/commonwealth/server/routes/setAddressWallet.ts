@@ -1,6 +1,5 @@
-import { AppError } from 'common-common/src/errors';
-import { WalletId } from 'common-common/src/types';
-import type { DB } from '../models';
+import { AppError, WalletId } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
@@ -20,7 +19,7 @@ type SetAddressWalletReq = {
 const setAddressWallet = async (
   models: DB,
   req: TypedRequestBody<SetAddressWalletReq>,
-  res: TypedResponse<Record<string, never>>
+  res: TypedResponse<Record<string, never>>,
 ) => {
   const author = req.address;
   if (author.wallet_id) throw new AppError(Errors.AddressAlreadyHasWalletId);

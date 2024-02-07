@@ -5,6 +5,10 @@
   display: flex;
   flex-direction: column;
 
+  .DiscordAuthButton {
+    fill: #5865f2;
+  }
+
   .wallets-and-link-container {
     display: flex;
     flex-direction: column;
@@ -30,7 +34,7 @@
         @include visibleScrollbar(dark);
 
         .WalletOptionRow .email-auth-btn {
-          stroke: $white  !important;
+          stroke: $white !important;
         }
       }
     }
@@ -41,7 +45,7 @@
     }
 
     .discord {
-      color: #5865F2 !important;
+      color: #5865f2 !important;
     }
 
     .wallet-list-links {
@@ -106,17 +110,10 @@
 }
 
 .AccountSelector {
-  height: 400px;
-  width: 400px;
-  margin: 8px;
+  margin-bottom: 24px;
   gap: 8px;
   display: flex;
   flex-direction: column;
-
-  .close-button-wrapper {
-    display: flex;
-    justify-content: flex-end;
-  }
 
   .account-item {
     cursor: pointer;

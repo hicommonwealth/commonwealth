@@ -1,9 +1,11 @@
-import { ChainBase } from 'common-common/src/types';
+/* eslint-disable react-hooks/exhaustive-deps */
+import type { SessionPayload } from '@canvas-js/interfaces';
+import { ChainBase, WalletSsoSource } from '@hicommonwealth/core';
 import 'components/component_kit/cw_wallets_list.scss';
 import {
   completeClientLogin,
   createUserWithAddress,
-  loginWithMagicLink,
+  startLoginWithMagicLink,
   updateActiveAddresses,
 } from 'controllers/app/login';
 import { notifyError, notifyInfo } from 'controllers/app/notifications';
@@ -18,9 +20,17 @@ import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
+import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
 import { addressSwapper } from 'utils';
+import {
+  BaseMixpanelPayload,
+  MixpanelCommunityInteractionEvent,
+  MixpanelLoginEvent,
+  MixpanelLoginPayload,
+} from '../../../shared/analytics/types';
 import NewProfilesController from '../controllers/server/newProfiles';
 import { setDarkMode } from '../helpers/darkMode';
+import { featureFlags } from '../helpers/feature-flags';
 import {
   getAddressFromWallet,
   loginToAxie,
@@ -28,6 +38,7 @@ import {
 } from '../helpers/wallet';
 import Account from '../models/Account';
 import IWebWallet from '../models/IWebWallet';
+import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from '../state/api/profiles/fetchProfilesByAddress';
 import type { ProfileRowProps } from '../views/components/component_kit/cw_profiles_list';
 import {
   breakpointFnValidator,
@@ -37,19 +48,15 @@ import type {
   LoginActiveStep,
   LoginSidebarType,
 } from '../views/pages/login/types';
-import useBrowserWindow from './useBrowserWindow';
 import { useBrowserAnalyticsTrack } from './useBrowserAnalyticsTrack';
-import {
-  MixpanelLoginEvent,
-  MixpanelLoginPayload,
-} from '../../../shared/analytics/types';
+import useBrowserWindow from './useBrowserWindow';
 
 type IuseWalletProps = {
   initialBody?: LoginActiveStep;
   initialSidebar?: LoginSidebarType;
   initialAccount?: Account;
   initialWallets?: IWebWallet<any>[];
-  onSuccess?: () => void;
+  onSuccess?: (address?: string | undefined) => void;
   onModalClose: () => void;
   useSessionKeyLoginFlow?: boolean;
 };
@@ -60,7 +67,9 @@ const useWallets = (walletProps: IuseWalletProps) => {
   const [activeStep, setActiveStep] = useState<LoginActiveStep>();
   const [profiles, setProfiles] = useState<Array<ProfileRowProps>>();
   const [sidebarType, setSidebarType] = useState<LoginSidebarType>();
-  const [username, setUsername] = useState<string>();
+  const [username, setUsername] = useState<string>(
+    featureFlags.newSignInModal ? 'Anonymous' : '',
+  );
   const [email, setEmail] = useState<string>();
   const [wallets, setWallets] = useState<Array<IWebWallet<any>>>();
   const [selectedWallet, setSelectedWallet] = useState<IWebWallet<any>>();
@@ -68,7 +77,9 @@ const useWallets = (walletProps: IuseWalletProps) => {
     useState<IWebWallet<any>>();
   const [cachedWalletSignature, setCachedWalletSignature] = useState<string>();
   const [cachedTimestamp, setCachedTimestamp] = useState<number>();
-  const [cachedChainId, setCachedChainId] = useState<string | number>();
+  const [cachedChainId, setCachedChainId] = useState<string>();
+  const [cachedSessionPayload, setCachedSessionPayload] =
+    useState<SessionPayload>();
   const [primaryAccount, setPrimaryAccount] = useState<Account>();
   const [secondaryLinkAccount, setSecondaryLinkAccount] = useState<Account>();
   const [isInCommunityPage, setIsInCommunityPage] = useState<boolean>();
@@ -83,14 +94,18 @@ const useWallets = (walletProps: IuseWalletProps) => {
     (w) =>
       (w instanceof WalletConnectWebWalletController ||
         w instanceof TerraWalletConnectWebWalletController) &&
-      w.enabled
+      w.enabled,
   );
 
   const isLinkingWallet = activeStep === 'selectPrevious';
 
-  const { trackAnalytics } = useBrowserAnalyticsTrack<MixpanelLoginPayload>({
+  const { trackAnalytics } = useBrowserAnalyticsTrack<
+    MixpanelLoginPayload | BaseMixpanelPayload
+  >({
     onAction: true,
   });
+
+  const { mutateAsync: updateProfile } = useUpdateProfileByAddressMutation();
 
   useBrowserWindow({
     onResize: () =>
@@ -99,7 +114,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
         (state: boolean) => {
           setShowMobile(state);
         },
-        isWindowMediumSmallInclusive
+        isWindowMediumSmallInclusive,
       ),
     resizeListenerUpdateDeps: [showMobile],
   });
@@ -109,7 +124,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
       import('../helpers/mockMetaMaskUtil').then((f) => {
         window['ethereum'] = new f.MockMetaMaskProvider(
           'https://eth-mainnet.g.alchemy.com/v2/pZsX6R3wGdnwhUJHlVmKg4QqsiS32Qm4',
-          '0x09187906d2ff8848c20050df632152b5b27d816ec62acd41d4498feb522ac5c3'
+          '0x09187906d2ff8848c20050df632152b5b27d816ec62acd41d4498feb522ac5c3',
         );
       });
     }
@@ -119,25 +134,25 @@ const useWallets = (walletProps: IuseWalletProps) => {
     setIsInCommunityPage(tempIsInCommunityPage);
 
     if (tempIsInCommunityPage) {
-      const chainbase = app.chain?.meta?.base;
+      const chainbase = app.chain?.base;
       setWallets(WebWalletController.Instance.availableWallets(chainbase));
       setSidebarType('communityWalletOptions');
       setActiveStep('walletList');
     } else {
-      const allChains = app.config.chains.getAll();
+      const allCommunities = app.config.chains.getAll();
       const sortedChainBases = [
         ChainBase.CosmosSDK,
         ChainBase.Ethereum,
         // ChainBase.NEAR,
         ChainBase.Substrate,
         ChainBase.Solana,
-      ].filter((base) => allChains.find((chain) => chain.base === base));
+      ].filter((base) => allCommunities.find((chain) => chain.base === base));
       setWallets(
         _.flatten(
           sortedChainBases.map((base) => {
             return WebWalletController.Instance.availableWallets(base);
-          })
-        )
+          }),
+        ),
       );
       setSidebarType('connectWallet');
       setActiveStep('walletList');
@@ -162,26 +177,36 @@ const useWallets = (walletProps: IuseWalletProps) => {
   }, []);
 
   // Handles Magic Link Login
-  const onEmailLogin = async () => {
+  const onEmailLogin = async (emailToUse = '') => {
+    const tempEmailToUse = emailToUse || email;
+    setEmail(tempEmailToUse);
+
     setIsMagicLoading(true);
 
-    if (!email) {
+    if (!tempEmailToUse) {
       notifyError('Please enter a valid email address.');
       setIsMagicLoading(false);
       return;
     }
 
     try {
-      await loginWithMagicLink({ email });
+      const isCosmos = app.chain?.base === ChainBase.CosmosSDK;
+      const { address: magicAddress } = await startLoginWithMagicLink({
+        email: tempEmailToUse,
+        isCosmos,
+        redirectTo: document.location.pathname + document.location.search,
+        chain: app.chain?.id,
+      });
       setIsMagicLoading(false);
 
-      if (walletProps.onSuccess) walletProps.onSuccess();
+      if (walletProps.onSuccess) walletProps.onSuccess(magicAddress);
 
       if (isWindowMediumSmallInclusive(window.innerWidth)) {
         walletProps.onModalClose();
       } else {
         walletProps.onModalClose();
       }
+
       trackAnalytics({
         event: MixpanelLoginEvent.LOGIN,
         community: app?.activeChainId(),
@@ -194,19 +219,25 @@ const useWallets = (walletProps: IuseWalletProps) => {
     } catch (e) {
       notifyError("Couldn't send magic link");
       setIsMagicLoading(false);
-      console.error(e);
+      console.error(e.stack);
     }
   };
 
   // New callback for handling social login
-  const onSocialLogin = async (provider: string) => {
+  const onSocialLogin = async (provider: WalletSsoSource) => {
     setIsMagicLoading(true);
 
     try {
-      await loginWithMagicLink({ provider, chain: app.chain?.id });
+      const isCosmos = app?.chain?.base === ChainBase.CosmosSDK;
+      const { address: magicAddress } = await startLoginWithMagicLink({
+        provider,
+        isCosmos,
+        redirectTo: document.location.pathname + document.location.search,
+        chain: app.chain?.id,
+      });
       setIsMagicLoading(false);
 
-      if (walletProps.onSuccess) walletProps.onSuccess();
+      if (walletProps.onSuccess) walletProps.onSuccess(magicAddress);
 
       if (isWindowMediumSmallInclusive(window.innerWidth)) {
         walletProps.onModalClose();
@@ -225,7 +256,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     } catch (e) {
       notifyError("Couldn't send magic link");
       setIsMagicLoading(false);
-      console.error(e);
+      console.error(e.stack);
     }
   };
 
@@ -233,12 +264,12 @@ const useWallets = (walletProps: IuseWalletProps) => {
   const onLogInWithAccount = async (
     account: Account,
     exitOnComplete: boolean,
-    shouldRedrawApp = true
+    shouldRedrawApp = true,
   ) => {
     const profile = account.profile;
     setAddress(account.address);
 
-    if (profile.name) {
+    if (profile.name && profile.initialized) {
       setUsername(profile.name);
     }
 
@@ -246,21 +277,24 @@ const useWallets = (walletProps: IuseWalletProps) => {
       completeClientLogin(account);
     } else {
       // log in as the new user
-      await initAppState(false, null, shouldRedrawApp);
+      await initAppState(false, shouldRedrawApp);
       if (localStorage.getItem('user-dark-mode-state') === 'on') {
         setDarkMode(true);
       }
       if (app.chain) {
-        const chain =
+        const community =
           app.user.selectedChain ||
           app.config.chains.getById(app.activeChainId());
-        await updateActiveAddresses({ chain, shouldRedraw: shouldRedrawApp });
+        await updateActiveAddresses({
+          chain: community,
+          shouldRedraw: shouldRedrawApp,
+        });
       }
     }
 
     if (exitOnComplete) {
       walletProps.onModalClose();
-      if (walletProps.onSuccess) walletProps.onSuccess();
+      if (walletProps.onSuccess) walletProps.onSuccess(account.address);
     }
   };
 
@@ -269,10 +303,10 @@ const useWallets = (walletProps: IuseWalletProps) => {
     account: Account,
     newlyCreated: boolean,
     linking: boolean,
-    currentWallet?: IWebWallet<any>
+    currentWallet?: IWebWallet<any>,
   ) => {
     if (walletProps.useSessionKeyLoginFlow) {
-      walletProps.onModalClose();
+      walletProps.onSuccess?.(account.address);
       return;
     }
 
@@ -287,8 +321,9 @@ const useWallets = (walletProps: IuseWalletProps) => {
       app.sessions.authSession(
         app.chain.base,
         chainId,
+        account.address,
         sessionPayload,
-        signature
+        signature,
       );
       await onLogInWithAccount(account, true);
       return;
@@ -310,7 +345,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
       }
       setSecondaryLinkAccount(account);
       setProfiles(
-        [account.profile] // TODO: Update when User -> Many Profiles goes in
+        [account.profile], // TODO: Update when User -> Many Profiles goes in
       );
     }
 
@@ -321,7 +356,13 @@ const useWallets = (walletProps: IuseWalletProps) => {
         const { signature, sessionPayload, chainId } =
           await signSessionWithAccount(walletToUse, account, timestamp);
         await account.validate(signature, timestamp, chainId);
-        // Can't call authSession now, since chain.base is unknown, so we wait till action
+        await app.sessions.authSession(
+          app.chain ? app.chain.base : walletToUse.chain,
+          chainId,
+          account.address,
+          sessionPayload,
+          signature,
+        );
         await onLogInWithAccount(account, true);
       } catch (e) {
         console.log(e);
@@ -330,21 +371,32 @@ const useWallets = (walletProps: IuseWalletProps) => {
       if (!linking) {
         try {
           const timestamp = +new Date();
-          const { signature, chainId } = await signSessionWithAccount(
-            walletToUse,
-            account,
-            timestamp
-          );
+          const { signature, chainId, sessionPayload } =
+            await signSessionWithAccount(walletToUse, account, timestamp);
           // Can't call authSession now, since chain.base is unknown, so we wait till action
           setCachedWalletSignature(signature);
           setCachedTimestamp(timestamp);
           setCachedChainId(chainId);
-          walletProps.onSuccess?.();
+          setCachedSessionPayload(sessionPayload);
+          walletProps.onSuccess?.(account.address);
+          setSidebarType('newOrReturning');
+          setActiveStep('selectAccountType');
+
+          if (featureFlags.newSignInModal) {
+            // Create the account with default values
+            await onCreateNewAccount(
+              walletToUse,
+              signature,
+              timestamp,
+              chainId,
+              sessionPayload,
+              account,
+            );
+            await onSaveProfileInfo(account);
+          }
         } catch (e) {
           console.log(e);
         }
-        setSidebarType('newOrReturning');
-        setActiveStep('selectAccountType');
       } else {
         setSidebarType('newAddressLinked');
         setActiveStep('selectProfile');
@@ -353,25 +405,61 @@ const useWallets = (walletProps: IuseWalletProps) => {
   };
 
   // Handle Logic for creating a new account, including validating signature
-  const onCreateNewAccount = async () => {
+  const onCreateNewAccount = async (
+    currentWallet?: IWebWallet<any>,
+    currentCachedWalletSignature?: string,
+    currentCachedTimestamp?: number,
+    currentCachedChainId?: string,
+    currentCachedSessionPayload?: SessionPayload,
+    currentPrimaryAccount?: Account,
+  ) => {
+    const walletToUse = currentWallet || selectedWallet;
+    const cachedWalletSignatureToUse =
+      currentCachedWalletSignature || cachedWalletSignature;
+    const cachedTimestampToUse = currentCachedTimestamp || cachedTimestamp;
+    const cachedChainIdToUse = currentCachedChainId || cachedChainId;
+    const cachedSessionPayloadToUse =
+      currentCachedSessionPayload || cachedSessionPayload;
+    const primaryAccountToUse = currentPrimaryAccount || primaryAccount;
+
     try {
-      if (selectedWallet.chain !== 'near') {
-        await primaryAccount.validate(
-          cachedWalletSignature,
-          cachedTimestamp,
-          cachedChainId,
-          false
+      if (walletToUse.chain !== 'near') {
+        await primaryAccountToUse.validate(
+          cachedWalletSignatureToUse,
+          cachedTimestampToUse,
+          cachedChainIdToUse,
+          false,
+        );
+        await app.sessions.authSession(
+          walletToUse.chain,
+          cachedChainIdToUse,
+          primaryAccountToUse.address,
+          cachedSessionPayloadToUse,
+          cachedWalletSignatureToUse,
         );
       }
-      await onLogInWithAccount(primaryAccount, false, false);
+      await onLogInWithAccount(primaryAccountToUse, false, false);
       // Important: when we first create an account and verify it, the user id
       // is initially null from api (reloading the page will update it), to correct
       // it we need to get the id from api
-      await NewProfilesController.Instance.updateProfileForAccount(
-        primaryAccount.profile.address,
-        {},
-        false
-      );
+      const updatedProfiles =
+        await DISCOURAGED_NONREACTIVE_fetchProfilesByAddress(
+          primaryAccountToUse.profile.chain,
+          primaryAccountToUse.profile.address,
+        );
+      const currentUserUpdatedProfile = updatedProfiles[0];
+      if (!currentUserUpdatedProfile) {
+        console.log('No profile yet.');
+      } else {
+        primaryAccountToUse.profile.initialize(
+          currentUserUpdatedProfile?.name,
+          currentUserUpdatedProfile.address,
+          currentUserUpdatedProfile?.avatarUrl,
+          currentUserUpdatedProfile.id,
+          primaryAccountToUse.profile.chain,
+          currentUserUpdatedProfile?.lastActive,
+        );
+      }
     } catch (e) {
       console.log(e);
       notifyError('Failed to create account. Please try again.');
@@ -394,19 +482,20 @@ const useWallets = (walletProps: IuseWalletProps) => {
         await signSessionWithAccount(
           selectedLinkingWallet,
           secondaryLinkAccount,
-          secondaryTimestamp
+          secondaryTimestamp,
         );
       await secondaryLinkAccount.validate(
         secondarySignature,
         secondaryTimestamp,
-        secondaryChainId
+        secondaryChainId,
       );
       await primaryAccount.validate(
         cachedWalletSignature,
         cachedTimestamp,
-        cachedChainId
+        cachedChainId,
       );
-      // Can't call authSession now, since chain.base is unknown, so we wait till action
+      // TODO: call authSession here, which requires special handling because of
+      // the call to signSessionWithAccount() earlier
       await onLogInWithAccount(primaryAccount, true);
     } catch (e) {
       console.log(e);
@@ -415,19 +504,22 @@ const useWallets = (walletProps: IuseWalletProps) => {
   };
 
   // Handle saving profile information
-  const onSaveProfileInfo = async () => {
-    const data = {
-      name: username,
-      avatarUrl: avatarUrl,
-    };
+  const onSaveProfileInfo = async (currentPrimaryAccount?: Account) => {
+    const primaryAccountToUse = currentPrimaryAccount || primaryAccount;
+
     try {
       if (username || avatarUrl) {
-        await NewProfilesController.Instance.updateProfileForAccount(
-          primaryAccount.profile.address,
-          data
-        );
+        await updateProfile({
+          address: primaryAccountToUse.profile.address,
+          chain: primaryAccountToUse.profile.chain,
+          name: username,
+          avatarUrl,
+        });
+        // we should trigger a redraw emit manually
+        NewProfilesController.Instance.isFetched.emit('redraw');
       }
-      if (walletProps.onSuccess) walletProps.onSuccess();
+      if (walletProps.onSuccess)
+        walletProps.onSuccess(primaryAccountToUse.profile.address);
       app.loginStateEmitter.emit('redraw'); // redraw app state when fully onboarded with new account
       walletProps.onModalClose();
     } catch (e) {
@@ -441,7 +533,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     const wallet = wallets.find(
       (w) =>
         w instanceof WalletConnectWebWalletController ||
-        w instanceof TerraWalletConnectWebWalletController
+        w instanceof TerraWalletConnectWebWalletController,
     );
 
     await wallet.reset();
@@ -473,7 +565,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
   const onWalletAddressSelect = async (
     wallet: IWebWallet<any>,
-    selectedAddress: string
+    selectedAddress: string,
   ) => {
     setSelectedWallet(wallet);
     if (walletProps.useSessionKeyLoginFlow) {
@@ -485,7 +577,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
   const onNormalWalletLogin = async (
     wallet: IWebWallet<any>,
-    selectedAddress: string
+    selectedAddress: string,
   ) => {
     setSelectedWallet(wallet);
 
@@ -497,7 +589,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
                 address: selectedAddress,
                 currentPrefix: parseInt(
                   (app.chain as Substrate)?.meta.ss58Prefix,
-                  10
+                  10,
                 ),
               })
             : selectedAddress,
@@ -510,7 +602,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
       }
       if (result.exists) {
         notifyInfo(
-          'This address is already linked to another account. Signing will transfer ownership to your account.'
+          'This address is already linked to another account. Signing will transfer ownership to your account.',
         );
       }
     }
@@ -518,19 +610,32 @@ const useWallets = (walletProps: IuseWalletProps) => {
     try {
       const sessionPublicAddress = await app.sessions.getOrCreateAddress(
         wallet.chain,
-        wallet.getChainId().toString()
+        wallet.getChainId().toString(),
+        selectedAddress,
       );
       const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
-      const validationBlockInfo =
-        wallet.getRecentBlock && (await wallet.getRecentBlock(chainIdentifier));
-      const { account: signingAccount, newlyCreated } =
-        await createUserWithAddress(
-          selectedAddress,
-          wallet.name,
-          chainIdentifier,
-          sessionPublicAddress,
-          validationBlockInfo
-        );
+
+      let validationBlockInfo;
+      try {
+        validationBlockInfo =
+          wallet.getRecentBlock &&
+          (await wallet.getRecentBlock(chainIdentifier));
+      } catch (err) {
+        // if getRecentBlock fails, continue with null blockhash
+      }
+
+      const {
+        account: signingAccount,
+        newlyCreated,
+        joinedCommunity,
+      } = await createUserWithAddress(
+        selectedAddress,
+        wallet.name,
+        null, // no sso source
+        chainIdentifier,
+        sessionPublicAddress,
+        validationBlockInfo,
+      );
 
       if (isMobile) {
         setSignerAccount(signingAccount);
@@ -542,8 +647,14 @@ const useWallets = (walletProps: IuseWalletProps) => {
           signingAccount,
           newlyCreated,
           isLinkingWallet,
-          wallet
+          wallet,
         );
+      }
+
+      if (joinedCommunity) {
+        trackAnalytics({
+          event: MixpanelCommunityInteractionEvent.JOIN_COMMUNITY,
+        });
       }
 
       trackAnalytics({
@@ -563,45 +674,52 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
   const onSessionKeyRevalidation = async (
     wallet: IWebWallet<any>,
-    selectedAddress: string
+    selectedAddress: string,
   ) => {
     const timestamp = +new Date();
     const sessionAddress = await app.sessions.getOrCreateAddress(
       wallet.chain,
-      wallet.getChainId().toString()
+      wallet.getChainId().toString(),
+      selectedAddress,
     );
     const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
-    const validationBlockInfo = await wallet.getRecentBlock(chainIdentifier);
+    let validationBlockInfo;
+    try {
+      validationBlockInfo = await wallet.getRecentBlock(chainIdentifier);
+    } catch (err) {
+      // if getRecentBlock fails, continue with null blockhash
+    }
 
     // Start the create-user flow, so validationBlockInfo gets saved to the backend
     // This creates a new `Account` object with fields set up to be validated by verifyAddress.
     const { account } = await createUserWithAddress(
       selectedAddress,
       wallet.name,
+      null, // no sso source?
       chainIdentifier,
       sessionAddress,
-      validationBlockInfo
+      validationBlockInfo,
     );
     account.setValidationBlockInfo(
-      validationBlockInfo ? JSON.stringify(validationBlockInfo) : null
+      validationBlockInfo ? JSON.stringify(validationBlockInfo) : null,
     );
 
     const { chainId, sessionPayload, signature } = await signSessionWithAccount(
       wallet,
       account,
-      timestamp
+      timestamp,
     );
     await account.validate(signature, timestamp, chainId);
     await app.sessions.authSession(
       wallet.chain,
       chainId,
+      account.address,
       sessionPayload,
-      signature
+      signature,
     );
     console.log('Started new session for', wallet.chain, chainId);
 
     // ensure false for newlyCreated / linking vars on revalidate
-    onAccountVerified(account, false, false);
     if (isMobile) {
       if (setSignerAccount) setSignerAccount(account);
       if (setIsNewlyCreated) setIsNewlyCreated(false);

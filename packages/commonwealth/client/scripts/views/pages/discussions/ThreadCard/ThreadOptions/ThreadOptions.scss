@@ -1,0 +1,11 @@
+.ThreadOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .options-container {
+    align-items: center;
+    display: flex;
+    gap: 1px;
+  }
+}

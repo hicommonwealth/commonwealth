@@ -1,25 +1,31 @@
-import React, { useState } from 'react';
-import _ from 'underscore';
 import moment from 'moment';
+import React, { useRef, useState } from 'react';
+import _ from 'underscore';
 
-import 'modals/poll_editor_modal.scss';
-
+import {
+  notifyError,
+  notifySuccess,
+} from '../../controllers/app/notifications';
+import { pluralize } from '../../helpers';
 import type Thread from '../../models/Thread';
-
-import app from 'state';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { pluralize } from 'helpers';
-import { CWButton } from '../components/component_kit/cw_button';
+import app from '../../state';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWLabel } from '../components/component_kit/cw_label';
+import { SelectList } from '../components/component_kit/cw_select_list';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import { SelectList } from 'views/components/component_kit/cw_select_list';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
+
+import '../../../styles/modals/poll_editor_modal.scss';
 
 const getPollDurationCopy = (
   customDuration: string,
-  customDurationEnabled: boolean
+  customDurationEnabled: boolean,
 ) => {
   if (customDurationEnabled && customDuration === 'Infinite') {
     return 'This poll will never expire.';
@@ -56,6 +62,7 @@ export const PollEditorModal = ({
   const [customDurationEnabled, setCustomDurationEnabled] = useState(false);
   const [options, setOptions] = useState(TWO_EMPTY_OPTIONS);
   const [prompt, setPrompt] = useState('');
+  const modalContainerRef = useRef(null);
 
   const handleInputChange = (value: string, index: number) => {
     setOptions((prevState) => {
@@ -84,7 +91,9 @@ export const PollEditorModal = ({
       return;
     }
 
-    if (!options?.length || !options[0]?.length || !options[1]?.length) {
+    const allOptionsAreFilledOut = options.every((option) => !!option.trim());
+
+    if (!options?.length || !allOptionsAreFilledOut) {
       notifyError('Must set poll options');
       return;
     }
@@ -101,7 +110,7 @@ export const PollEditorModal = ({
         options,
         customDuration: customDurationEnabled ? customDuration : null,
         address: app.user.activeAccount.address,
-        authorChain: app.user.activeAccount.chain.id,
+        authorCommunity: app.user.activeAccount.community.id,
       });
       notifySuccess('Poll creation succeeded');
       onPollCreate();
@@ -113,16 +122,13 @@ export const PollEditorModal = ({
   };
 
   return (
-    <div className="PollEditorModal">
-      <div className="compact-modal-title">
-        <h3>Create Poll</h3>
-        <CWIconButton iconName="close" onClick={() => onModalClose()} />
-      </div>
-      <div className="compact-modal-body">
+    <div className="PollEditorModal" ref={modalContainerRef}>
+      <CWModalHeader label="Create Poll" onModalClose={onModalClose} />
+      <CWModalBody>
         <CWTextInput
           label="Question"
           placeholder="Do you support this proposal?"
-          defaultValue={prompt}
+          value={prompt}
           onInput={(e) => {
             setPrompt(e.target.value);
           }}
@@ -142,12 +148,15 @@ export const PollEditorModal = ({
           <div className="buttons-row">
             <CWButton
               label="Remove choice"
-              buttonType="secondary-red"
+              buttonType="destructive"
+              buttonHeight="sm"
               disabled={options.length <= 2}
               onClick={handleRemoveLastChoice}
             />
             <CWButton
               label="Add choice"
+              buttonType="primary"
+              buttonHeight="sm"
               disabled={options.length >= 6}
               onClick={handleAddChoice}
             />
@@ -166,6 +175,7 @@ export const PollEditorModal = ({
             />
             {customDurationEnabled && (
               <SelectList
+                menuPortalTarget={modalContainerRef?.current}
                 isSearchable={false}
                 options={customDurationOptions}
                 defaultValue={customDurationOptions[0]}
@@ -174,15 +184,21 @@ export const PollEditorModal = ({
             )}
           </div>
         </div>
-        <div className="buttons-row">
-          <CWButton
-            label="Cancel"
-            buttonType="secondary-blue"
-            onClick={onModalClose}
-          />
-          <CWButton label="Save changes" onClick={handleSavePoll} />
-        </div>
-      </div>
+      </CWModalBody>
+      <CWModalFooter>
+        <CWButton
+          label="Cancel"
+          buttonType="secondary"
+          buttonHeight="sm"
+          onClick={onModalClose}
+        />
+        <CWButton
+          label="Save changes"
+          buttonType="primary"
+          buttonHeight="sm"
+          onClick={handleSavePoll}
+        />
+      </CWModalFooter>
     </div>
   );
 };

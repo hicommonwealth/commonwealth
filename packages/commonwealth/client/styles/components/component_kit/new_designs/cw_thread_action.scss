@@ -1,0 +1,56 @@
+@import '../../../shared.scss';
+
+.ThreadAction {
+  border-radius: 6px;
+  display: inline-flex;
+  padding: 4px 8px;
+  align-items: center;
+  width: fit-content;
+  color: $neutral-500;
+  border: 0;
+
+  .Text {
+    color: $neutral-500;
+    margin-left: 4px;
+  }
+
+  &:focus {
+    outline: 0;
+  }
+
+  &.upvoteSelected {
+    color: $primary-500;
+
+    &:hover {
+      color: $primary-500;
+    }
+
+    .Text {
+      color: $primary-500 !important;
+    }
+  }
+
+  &.default {
+    color: $neutral-500;
+  }
+
+  &:hover {
+    background-color: $neutral-100;
+    color: $neutral-600;
+    cursor: pointer;
+
+    .Text {
+      color: $neutral-600;
+    }
+  }
+
+  &.disabled {
+    color: $neutral-400;
+    background-color: inherit;
+    cursor: not-allowed;
+
+    .Text {
+      color: $neutral-400;
+    }
+  }
+}

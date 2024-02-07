@@ -1,27 +1,39 @@
-import axios from 'axios';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { isEqual } from 'lodash';
-import 'modals/edit_collaborators_modal.scss';
 import React, { useState } from 'react';
-import type { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
-import app from 'state';
+import { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
 import { useDebounce } from 'usehooks-ts';
-import NewProfilesController from '../../controllers/server/newProfiles';
+import {
+  notifyError,
+  notifySuccess,
+} from '../../controllers/app/notifications';
+import useNecessaryEffect from '../../hooks/useNecessaryEffect';
 import type Thread from '../../models/Thread';
 import type { IThreadCollaborator } from '../../models/Thread';
-import { CWButton } from '../components/component_kit/cw_button';
+import app from '../../state';
+import { useEditThreadMutation } from '../../state/api/threads';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWLabel } from '../components/component_kit/cw_label';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { User } from '../components/user/user';
+
+import '../../../styles/modals/edit_collaborators_modal.scss';
 
 type EditCollaboratorsModalProps = {
   onModalClose: () => void;
   thread: Thread;
   onCollaboratorsUpdated: (newEditors: IThreadCollaborator[]) => void;
 };
+
+interface IThreadCollaboratorWithId extends IThreadCollaborator {
+  id: number;
+}
 
 export const EditCollaboratorsModal = ({
   onModalClose,
@@ -31,12 +43,19 @@ export const EditCollaboratorsModal = ({
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
+  const { mutateAsync: editThread } = useEditThreadMutation({
+    chainId: app.activeChainId(),
+    threadId: thread.id,
+    currentStage: thread.stage,
+    currentTopicId: thread.topic.id,
+  });
+
   const [searchResults, setSearchResults] = useState<
     Array<RoleInstanceWithPermissionAttributes>
   >([]);
   const [collaborators, setCollaborators] = useState<
-    Array<IThreadCollaborator>
-  >(thread.collaborators);
+    Array<IThreadCollaboratorWithId>
+  >(thread.collaborators as any);
 
   useNecessaryEffect(() => {
     const fetchMembers = async () => {
@@ -46,17 +65,18 @@ export const EditCollaboratorsModal = ({
           app.activeChainId(),
           30,
           1,
-          true
+          true,
         );
 
         const results: Array<RoleInstanceWithPermissionAttributes> =
-          response.profiles
+          response.results
             .map((profile) => ({
               ...profile.roles[0],
               Address: profile.addresses[0],
             }))
             .filter(
-              (role) => role.Address.address !== app.user.activeAccount?.address
+              (role) =>
+                role.Address.address !== app.user.activeAccount?.address,
             );
 
         setSearchResults(results);
@@ -72,21 +92,17 @@ export const EditCollaboratorsModal = ({
     }
   }, [debouncedSearchTerm]);
 
-  const handleUpdateCollaborators = (c: IThreadCollaborator) => {
+  const handleUpdateCollaborators = (c: IThreadCollaboratorWithId) => {
     const updated = collaborators.find((_c) => _c.address === c.address)
       ? collaborators.filter((_c) => _c.address !== c.address)
       : collaborators.concat([c]);
-
     setCollaborators(updated);
   };
 
   return (
     <div className="EditCollaboratorsModal">
-      <div className="compact-modal-title">
-        <h3>Edit collaborators</h3>
-        <CWIconButton iconName="close" onClick={onModalClose} />
-      </div>
-      <div className="compact-modal-body">
+      <CWModalHeader label="Edit collaborators" onModalClose={onModalClose} />
+      <CWModalBody>
         <div className="section">
           <CWTextInput
             label="Search Members"
@@ -106,16 +122,15 @@ export const EditCollaboratorsModal = ({
                   className="collaborator-row"
                   onClick={() =>
                     handleUpdateCollaborators({
+                      id: c.Address.id,
                       address: c.Address.address,
-                      chain: c.Address.chain,
+                      community_id: c.Address.community_id,
                     })
                   }
                 >
                   <User
-                    user={NewProfilesController.Instance.getProfile(
-                      c.chain_id,
-                      c.Address.address
-                    )}
+                    userAddress={c.Address.address}
+                    userCommunityId={c.chain_id}
                   />
                 </div>
               ))
@@ -135,10 +150,8 @@ export const EditCollaboratorsModal = ({
               {collaborators.map((c, i) => (
                 <div key={i} className="collaborator-row">
                   <User
-                    user={NewProfilesController.Instance.getProfile(
-                      c.chain,
-                      c.address
-                    )}
+                    userAddress={c.address}
+                    userCommunityId={c.community_id}
                   />
                   <CWIconButton
                     iconName="close"
@@ -156,86 +169,61 @@ export const EditCollaboratorsModal = ({
             </div>
           )}
         </div>
-        <div className="buttons-row">
-          <CWButton
-            label="Cancel"
-            buttonType="secondary-blue"
-            onClick={onModalClose}
-          />
-          <CWButton
-            disabled={isEqual(thread.collaborators, collaborators)}
-            label="Save changes"
-            onClick={async () => {
-              const added = collaborators.filter(
-                (c1) =>
-                  !thread.collaborators.some((c2) => c1.address === c2.address)
-              );
+      </CWModalBody>
+      <CWModalFooter>
+        <CWButton
+          label="Cancel"
+          buttonType="secondary"
+          buttonHeight="sm"
+          onClick={onModalClose}
+        />
+        <CWButton
+          disabled={isEqual(thread.collaborators, collaborators)}
+          label="Save changes"
+          buttonType="primary"
+          buttonHeight="sm"
+          onClick={async () => {
+            const newCollaborators = collaborators.filter(
+              (c1) =>
+                !thread.collaborators.some((c2) => c1.address === c2.address),
+            );
+            const removedCollaborators = (thread.collaborators as any).filter(
+              (c1) => !collaborators.some((c2) => c1.address === c2.address),
+            );
 
-              if (added.length > 0) {
-                try {
-                  const response = await axios.post(
-                    `${app.serverUrl()}/addEditors`,
-                    {
-                      address: app.user.activeAccount.address,
-                      author_chain: app.user.activeAccount.chain.id,
-                      chain: app.activeChainId(),
-                      thread_id: thread.id,
-                      editors: added,
-                      jwt: app.user.jwt,
-                    }
-                  );
-
-                  if (response.data.status === 'Success') {
-                    notifySuccess('Collaborators added');
-                    onCollaboratorsUpdated(response.data.result.collaborators);
-                  } else {
-                    notifyError('Failed to add collaborators');
-                  }
-                } catch (err) {
-                  throw new Error(
-                    err.responseJSON && err.responseJSON.error
-                      ? err.responseJSON.error
-                      : 'Failed to add collaborators'
-                  );
-                }
+            if (
+              newCollaborators.length > 0 ||
+              removedCollaborators.length > 0
+            ) {
+              try {
+                const updatedThread = await editThread({
+                  threadId: thread.id,
+                  chainId: app.activeChainId(),
+                  address: app.user.activeAccount.address,
+                  collaborators: {
+                    ...(newCollaborators.length > 0 && {
+                      toAdd: newCollaborators.map((x) => x.id),
+                    }),
+                    ...(removedCollaborators.length > 0 && {
+                      toRemove: removedCollaborators.map((x) => x.id),
+                    }),
+                  },
+                });
+                notifySuccess('Collaborators updated');
+                onCollaboratorsUpdated &&
+                  onCollaboratorsUpdated(updatedThread.collaborators);
+              } catch (err) {
+                const error =
+                  err?.response?.data?.error ||
+                  'Failed to update collaborators';
+                notifyError(error);
               }
+            }
 
-              const deleted = thread.collaborators.filter(
-                (c1) => !collaborators.some((c2) => c1.address === c2.address)
-              );
-
-              if (deleted.length > 0) {
-                try {
-                  const response = await axios.post(
-                    `${app.serverUrl()}/deleteEditors`,
-                    {
-                      address: app.user.activeAccount.address,
-                      author_chain: app.user.activeAccount.chain.id,
-                      chain: app.activeChainId(),
-                      thread_id: thread.id,
-                      editors: deleted,
-                      jwt: app.user.jwt,
-                    }
-                  );
-
-                  if (response.data.status === 'Success') {
-                    notifySuccess('Collaborators removed');
-                    onCollaboratorsUpdated(response.data.result.collaborators);
-                  } else {
-                    throw new Error('Failed to remove collaborators');
-                  }
-                } catch (err) {
-                  const errMsg =
-                    err.responseJSON?.error || 'Failed to remove collaborators';
-                  notifyError(errMsg);
-                }
-              }
-
-              onModalClose();
-            }}
-          />
-        </div>
-      </div>
+            onModalClose();
+          }}
+        />
+      </CWModalFooter>
     </div>
   );
 };

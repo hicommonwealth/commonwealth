@@ -1,16 +1,18 @@
-import type { ContractType } from 'common-common/src/types';
-import { AppError } from 'common-common/src/errors';
-import type { DB } from '../../models';
+import type { ContractType } from '@hicommonwealth/core';
+import { AbiType, AppError } from '@hicommonwealth/core';
 import type {
+  ChainNodeAttributes,
+  ContractAbiInstance,
   ContractAttributes,
   ContractInstance,
-} from '../../models/contract';
-import type { ChainNodeAttributes } from '../../models/chain_node';
+  DB,
+} from '@hicommonwealth/model';
+import { hashAbi } from '@hicommonwealth/model';
+import { Transaction } from 'sequelize';
 import type { TypedRequestBody, TypedResponse } from '../../types';
 import { success } from '../../types';
 import validateAbi from '../../util/abiValidation';
-import type { ContractAbiInstance } from 'server/models/contract_abi';
-import validateRoles from '../../util/validateRoles';
+import { validateOwner } from '../../util/validateOwner';
 
 export const Errors = {
   NoType: 'Must provide contract type',
@@ -51,13 +53,39 @@ export type CreateContractResp = {
   hasGlobalTemplate?: boolean;
 };
 
+async function findOrCreateAbi(
+  abi: AbiType,
+  models: DB,
+  t?: Transaction,
+): Promise<ContractAbiInstance> {
+  let contractAbi: ContractAbiInstance;
+  const abiHash = hashAbi(abi);
+  contractAbi = await models.ContractAbi.findOne({
+    where: {
+      abi_hash: abiHash,
+    },
+    transaction: t,
+  });
+
+  if (!contractAbi) {
+    contractAbi = await models.ContractAbi.create(
+      {
+        abi: abi,
+        abi_hash: abiHash,
+      },
+      { transaction: t },
+    );
+  }
+
+  return contractAbi;
+}
+
 const createContract = async (
   models: DB,
   req: TypedRequestBody<CreateContractReq>,
-  res: TypedResponse<CreateContractResp>
+  res: TypedResponse<CreateContractResp>,
 ) => {
   const {
-    community,
     address,
     contractType = '',
     abi,
@@ -69,11 +97,19 @@ const createContract = async (
   } = req.body;
 
   if (!req.user) {
-    throw new AppError('Not logged in');
+    throw new AppError('Not signed in');
   }
 
-  const isAdmin = await validateRoles(models, req.user, 'admin', chain_id);
-  if (!isAdmin) throw new AppError('Must be admin');
+  const isAdmin = await validateOwner({
+    models: models,
+    user: req.user,
+    communityId: chain_id,
+    allowAdmin: true,
+    allowSuperAdmin: true,
+  });
+  if (!isAdmin) {
+    throw new AppError('Must be admin');
+  }
 
   const Web3 = (await import('web3-utils')).default;
   if (!Web3.isAddress(address)) {
@@ -86,7 +122,7 @@ const createContract = async (
 
   let abiAsRecord: Array<Record<string, unknown>>;
   if (abi) {
-    if ((Object.keys(abi) as Array<string>).length === 0) {
+    if ((Object.keys(JSON.parse(abi)) as Array<string>).length === 0) {
       throw new AppError(Errors.InvalidABI);
     }
 
@@ -98,10 +134,15 @@ const createContract = async (
   });
 
   if (oldContract && oldContract.address === address) {
+    if (abi && !oldContract.abi_id) {
+      const contract_abi = await findOrCreateAbi(abiAsRecord, models);
+      oldContract.abi_id = contract_abi.id;
+      await oldContract.save();
+    }
     // contract already exists so attempt to add it to the community if it's not already there
     await models.CommunityContract.findOrCreate({
       where: {
-        chain_id,
+        community_id: chain_id,
         contract_id: oldContract.id,
       },
     });
@@ -132,21 +173,7 @@ const createContract = async (
   if (abi) {
     // transactionalize contract creation
     await models.sequelize.transaction(async (t) => {
-      contract_abi = await models.ContractAbi.findOne({
-        where: {
-          abi: JSON.stringify(abiAsRecord),
-        },
-        transaction: t,
-      });
-
-      if (!contract_abi) {
-        contract_abi = await models.ContractAbi.create(
-          {
-            abi: JSON.stringify(abiAsRecord),
-          },
-          { transaction: t }
-        );
-      }
+      contract_abi = await findOrCreateAbi(abiAsRecord, models, t);
 
       [contract] = await models.Contract.findOrCreate({
         where: {
@@ -163,10 +190,10 @@ const createContract = async (
 
       await models.CommunityContract.create(
         {
-          chain_id,
+          community_id: chain_id,
           contract_id: contract.id,
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
 
@@ -196,10 +223,10 @@ const createContract = async (
       });
       await models.CommunityContract.create(
         {
-          chain_id,
+          community_id: chain_id,
           contract_id: contract.id,
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
 

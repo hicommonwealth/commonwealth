@@ -1,23 +1,19 @@
-import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 import moment from 'moment';
 
-import type { SubscriptionInstance } from 'server/models/subscription';
-import app from '../state';
 import type ChainInfo from './ChainInfo';
-import type { Comment as CommentT } from './Comment';
-import type { IUniqueId } from './interfaces';
+import { Comment as CommentT } from './Comment';
 import { Thread as ThreadT } from './Thread';
+import type { IUniqueId } from './interfaces';
 
 class NotificationSubscription {
   public readonly category: string;
-  public readonly objectId: string;
+  public readonly snapshotId: string;
   public readonly createdAt: moment.Moment;
   public readonly Chain: ChainInfo;
   public readonly Comment: CommentT<IUniqueId>;
   public readonly Thread: ThreadT;
 
   public readonly id?: number;
-  public readonly chainEntityId?: any;
 
   private _immediateEmail: boolean;
   public get immediateEmail() {
@@ -33,78 +29,78 @@ class NotificationSubscription {
   }
 
   private _isActive: boolean;
-  public get isActive() {
-    return this._isActive;
-  }
-
-  // TODO: should resolve Chain vs chain
-  public get getChain() {
-    return this.Chain.id || this.Chain;
+  public disable() {
+    this._isActive = false;
   }
 
   public enable() {
     this._isActive = true;
   }
 
-  public disable() {
-    this._isActive = false;
+  public get isActive() {
+    return this._isActive;
+  }
+
+  public get chainId() {
+    return this.Chain?.id;
+  }
+
+  public get threadId() {
+    return this.Thread?.id;
+  }
+
+  public get commentId() {
+    return this.Comment?.id;
+  }
+
+  public get categoryId() {
+    return this.category;
   }
 
   constructor(
     id,
     category,
-    objectId,
     isActive,
     createdAt,
     immediateEmail,
     Chain?,
     comment?: CommentT<IUniqueId>,
-    thread?: ThreadT
+    thread?: ThreadT,
+    snapshotId?: string,
   ) {
     this.id = id;
     this.category = category;
-    this.objectId = objectId;
     this._isActive = isActive;
     this.createdAt = moment(createdAt);
     this._immediateEmail = immediateEmail;
     this.Chain = Chain;
     this.Comment = comment;
     this.Thread = thread;
-  }
-
-  public static fromJSON(json) {
-    return new NotificationSubscription(
-      json.id,
-      json.category_id,
-      json.object_id,
-      json.is_active,
-      json.created_at,
-      json.immediate_email,
-      json.chain_id,
-      json.Comment || json.offchain_comment_id,
-      json.Thread || json.offchain_thread_id
-    );
+    this.snapshotId = snapshotId;
   }
 }
 
-export const modelFromServer = (subscription: SubscriptionInstance) => {
+export const modelFromServer = (subscription) => {
   const {
     id,
     category_id,
-    object_id,
     is_active,
     created_at,
     immediate_email,
-    Chain,
+    Community,
     Comment,
     Thread,
+    snapshot_id,
   } = subscription;
 
   let modeledThread: ThreadT;
 
   if (Thread) {
     try {
-      modeledThread = app.threads.modelFromServer(Thread);
+      // The `Thread` var here uses /server/models/thread.ts as its type
+      // and we are modeling it to /client/scripts/models/Thread.ts so
+      // using any here to avoid lint error.
+      modeledThread = new ThreadT(Thread as any);
     } catch (e) {
       console.log('error', e);
     }
@@ -114,7 +110,7 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
 
   if (Comment) {
     try {
-      modeledComment = modelCommentFromServer(Comment);
+      modeledComment = new CommentT({ ...Comment });
     } catch (e) {
       console.log('error', e);
     }
@@ -123,13 +119,13 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
   return new NotificationSubscription(
     id,
     category_id,
-    object_id,
     is_active,
     created_at,
     immediate_email,
-    Chain,
+    Community,
     modeledComment,
-    modeledThread
+    modeledThread,
+    snapshot_id,
   );
 };
 

@@ -1,0 +1,11 @@
+@import '../../../../../../../../styles/shared';
+
+.InfoBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  .caption {
+    color: $neutral-500;
+  }
+}

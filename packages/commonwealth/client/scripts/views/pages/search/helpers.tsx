@@ -1,61 +1,70 @@
-import React from 'react';
 import moment from 'moment';
+import React, { useMemo } from 'react';
 
 import 'pages/search/index.scss';
 
-import type { SearchSort } from 'models/SearchQuery';
-import NewProfilesController from '../../../controllers/server/newProfiles';
-import type MinimumProfile from '../../../models/MinimumProfile';
 import app from 'state';
-import { SearchContentType } from 'types';
+import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
+import CommunityInfo from '../../../models/ChainInfo';
+import type MinimumProfile from '../../../models/MinimumProfile';
 import { SearchScope } from '../../../models/SearchQuery';
-import AddressInfo from '../../../models/AddressInfo';
 import { CommunityLabel } from '../../components/community_label';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
-import { User } from '../../components/user/user';
-import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { renderTruncatedHighlights } from '../../components/react_quill_editor/highlighter';
+import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
+import { User } from '../../components/user/user';
 
-const getDiscussionResult = (thread, searchTerm, setRoute) => {
-  let title = '';
-  try {
-    title = decodeURIComponent(thread.title);
-  } catch (err) {
-    title = thread.title;
-  }
-
-  const proposalId = thread.proposalid;
-  const chain = thread.chain;
+export type ThreadResult = {
+  id: number;
+  community_id: string;
+  title: string;
+  body: string;
+  address_id: number;
+  address: string;
+  address_chain: string;
+  created_at: string;
+};
+type ThreadResultRowProps = {
+  thread: ThreadResult;
+  searchTerm: string;
+  setRoute: any;
+};
+const ThreadResultRow = ({
+  thread,
+  searchTerm,
+  setRoute,
+}: ThreadResultRowProps) => {
+  const title = useMemo(() => {
+    try {
+      return decodeURIComponent(thread.title);
+    } catch (error) {
+      return thread.title;
+    }
+  }, [thread.title]);
 
   const handleClick = () => {
-    setRoute(`/discussion/${proposalId}`, {}, thread.chain);
+    setRoute(`/discussion/${thread.id}`, {}, thread.community_id);
   };
 
-  if (app.isCustomDomain() && app.customDomainId() !== chain) {
-    return;
+  if (app.isCustomDomain() && app.customDomainId() !== thread.community_id) {
+    return <></>;
   }
 
   return (
-    <div key={proposalId} className="search-result-row" onClick={handleClick}>
+    <div key={thread.id} className="search-result-row" onClick={handleClick}>
       <CWIcon iconName="feedback" />
       <div className="inner-container">
         <CWText fontStyle="uppercase" type="caption" className="thread-header">
-          {`discussion - ${thread.chain}`}
+          {`discussion - ${thread.community_id}`}
         </CWText>
         <CWText className="search-results-thread-title" fontWeight="medium">
           {renderTruncatedHighlights(searchTerm, title)}
         </CWText>
         <div className="search-results-thread-subtitle">
           <User
-            user={
-              new AddressInfo(
-                thread.address_id,
-                thread.address,
-                thread.address_chain,
-                null
-              )
-            }
+            userAddress={thread.address}
+            userCommunityId={thread.address_chain}
           />
           <CWText className="created-at">
             {moment(thread.created_at).fromNow()}
@@ -67,6 +76,7 @@ const getDiscussionResult = (thread, searchTerm, setRoute) => {
             hideFormatting={true}
             doc={thread.body}
             searchTerm={searchTerm}
+            markdownCutoffLength={400}
           />
         </CWText>
       </div>
@@ -74,39 +84,62 @@ const getDiscussionResult = (thread, searchTerm, setRoute) => {
   );
 };
 
-const getCommentResult = (comment, searchTerm, setRoute) => {
+export type ReplyResult = {
+  id: number;
+  proposalid: number;
+  community_id: string;
+  title: string;
+  text: string;
+  address_id: number;
+  address: string;
+  address_community_id: string;
+  created_at: string;
+};
+type ReplyResultRowProps = {
+  comment: ReplyResult;
+  searchTerm: string;
+  setRoute: any;
+};
+const ReplyResultRow = ({
+  comment,
+  searchTerm,
+  setRoute,
+}: ReplyResultRowProps) => {
   const proposalId = comment.proposalid;
-  const chain = comment.chain;
+  const communityId = comment.community_id;
+
+  const title = useMemo(() => {
+    try {
+      return decodeURIComponent(comment.title);
+    } catch (error) {
+      return comment.title;
+    }
+  }, [comment.title]);
 
   const handleClick = () => {
-    setRoute(`/discussion/${proposalId}?comment=${comment.id}`, {}, chain);
+    setRoute(
+      `/discussion/${proposalId}?comment=${comment.id}`,
+      {},
+      communityId,
+    );
   };
 
-  if (app.isCustomDomain() && app.customDomainId() !== chain) return;
+  if (app.isCustomDomain() && app.customDomainId() !== communityId) {
+    return <></>;
+  }
 
   return (
     <div key={comment.id} className="search-result-row" onClick={handleClick}>
       <CWIcon iconName="feedback" />
       <div className="inner-container">
-        <CWText fontWeight="medium">{`comment - ${
-          comment.chain || comment.community
-        }`}</CWText>
+        <CWText fontWeight="medium">{`comment - ${communityId}`}</CWText>
         <CWText className="search-results-thread-title">
-          {renderTruncatedHighlights(
-            searchTerm,
-            decodeURIComponent(comment.title)
-          )}
+          {renderTruncatedHighlights(searchTerm, title)}
         </CWText>
         <div className="search-results-thread-subtitle">
           <User
-            user={
-              new AddressInfo(
-                comment.address_id,
-                comment.address,
-                comment.address_chain,
-                null
-              )
-            }
+            userAddress={comment.address}
+            userCommunityId={comment.address_community_id}
           />
           <CWText className="created-at">
             {moment(comment.created_at).fromNow()}
@@ -131,82 +164,129 @@ const getCommentResult = (comment, searchTerm, setRoute) => {
  *  The route should be set to /<community-id>, so null should be passed instead of a prefix,
  *  as defined in the useCommonNavigate hook and the getScopePrefix helper function.
  */
-const getCommunityResult = (community, setRoute) => {
-  const params =
-    community.SearchContentType === SearchContentType.Token
-      ? { community }
-      : community.SearchContentType === SearchContentType.Chain
-      ? { community }
-      : null;
-
+export type CommunityResult = {
+  id: string;
+  name: string;
+  default_symbol: string;
+  type: string;
+  icon_url: string;
+  created_at: string | null;
+};
+type CommunityResultRowProps = {
+  community: CommunityResult;
+  searchTerm: string;
+  setRoute: any;
+};
+const CommunityResultRow = ({
+  community,
+  setRoute,
+}: CommunityResultRowProps) => {
   const handleClick = () => {
-    if (params.community) {
-      setRoute(params.community.id ? `/${params.community.id}` : '/', {}, null);
-    } else {
-      setRoute(community.id ? `/${community.id}` : '/', {}, null);
-    }
+    setRoute(community.id ? `/${community.id}` : '/', {}, null);
   };
+
+  const communityInfo = CommunityInfo.fromJSON(community as any);
 
   return (
     <div
-      key={community?.id}
+      key={community.id}
       className="community-result-row"
       onClick={handleClick}
     >
-      <CommunityLabel {...params} />
+      <CommunityLabel community={communityInfo} />
     </div>
   );
 };
 
-const getMemberResult = (addr, setRoute) => {
-  const profile: MinimumProfile = NewProfilesController.Instance.getProfile(
-    addr.chain,
-    addr.address
-  );
+export type MemberResult = {
+  id: number;
+  user_id: string;
+  profile_name: string;
+  avatar_url: string;
+  addresses: {
+    id: number;
+    chain: string;
+    address: string;
+  }[];
+  group_ids?: [];
+  roles?: any[];
+};
+type MemberResultRowProps = {
+  addr: MemberResult;
+  setRoute: any;
+};
+const MemberResultRow = ({ addr, setRoute }: MemberResultRowProps) => {
+  const { chain: community, address } = addr.addresses[0];
+  const { data: users } = useFetchProfilesByAddressesQuery({
+    profileChainIds: [community],
+    profileAddresses: [address],
+    currentChainId: app.activeChainId(),
+    apiCallEnabled: !!(community && address),
+  });
+  const profile: MinimumProfile = users?.[0];
 
   const handleClick = () => {
-    setRoute(`/profile/id/${profile.id}`, {}, null);
+    setRoute(`/profile/id/${profile?.id}`, {}, null);
   };
 
-  if (app.isCustomDomain() && app.customDomainId() !== addr.chain) {
+  if (app.isCustomDomain() && app.customDomainId() !== community) {
     return null;
   }
 
   return (
-    <div key={profile.id} className="member-result-row" onClick={handleClick}>
+    <div key={address} className="member-result-row" onClick={handleClick}>
       <User
-        user={profile}
-        showRole
-        linkify
+        userAddress={address}
+        userCommunityId={community}
+        shouldShowRole
+        shouldLinkProfile
         avatarSize={32}
-        showAddressWithDisplayName
+        shouldShowAddressWithDisplayName
       />
     </div>
   );
 };
 
-export const getListing = (
-  results: any,
+export const renderSearchResults = (
+  results: any[],
   searchTerm: string,
-  sort: SearchSort,
   searchType: SearchScope,
-  setRoute: any
+  setRoute: any,
 ) => {
-  if (Object.keys(results).length === 0 || !results[searchType]) return [];
-
-  const tabScopedResults = results[searchType].map((res) => {
-    return res.searchType === SearchScope.Threads ? (
-      getDiscussionResult(res, searchTerm, setRoute)
-    ) : res.searchType === SearchScope.Members ? (
-      getMemberResult(res, setRoute)
-    ) : res.searchType === SearchScope.Communities ? (
-      getCommunityResult(res, setRoute)
-    ) : res.searchType === SearchScope.Replies ? (
-      getCommentResult(res, searchTerm, setRoute)
-    ) : (
-      <>ERROR</>
-    );
+  if (!results || results.length === 0) {
+    return [];
+  }
+  const components = results.map((res) => {
+    switch (searchType) {
+      case SearchScope.Threads:
+        return (
+          <ThreadResultRow
+            thread={res}
+            searchTerm={searchTerm}
+            setRoute={setRoute}
+          />
+        );
+      case SearchScope.Members:
+        return <MemberResultRow addr={res} setRoute={setRoute} />;
+      case SearchScope.Communities:
+        return (
+          <CommunityResultRow
+            community={res}
+            searchTerm={searchTerm}
+            setRoute={setRoute}
+          />
+        );
+      case SearchScope.Replies:
+        return (
+          <ReplyResultRow
+            comment={res}
+            searchTerm={searchTerm}
+            setRoute={setRoute}
+          />
+        );
+      default:
+        return <>ERROR</>;
+    }
   });
-
-  return tabScopedResults;
+  return components;
 };

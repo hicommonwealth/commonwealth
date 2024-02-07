@@ -1,5 +1,5 @@
+import type { ChainBase } from '@hicommonwealth/core';
 import type { Coin } from 'adapters/currency';
-import type { ChainBase } from 'common-common/src/types';
 import $ from 'jquery';
 
 import moment from 'moment';
@@ -7,10 +7,11 @@ import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import { clearLocalStorage } from 'stores/PersistentStore';
 import { setDarkMode } from '../helpers/darkMode';
+import { EXCEPTION_CASE_threadCountersStore } from '../state/ui/thread';
 import Account from './Account';
 import type ChainInfo from './ChainInfo';
-import type { IAccountsModule, IBlockInfo, IChainModule } from './interfaces';
 import ProposalModule from './ProposalModule';
+import type { IAccountsModule, IBlockInfo, IChainModule } from './interfaces';
 
 // Extended by a chain's main implementation. Responsible for module
 // initialization. Saved as `app.chain` in the global object store.
@@ -32,8 +33,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   }
 
   public abstract chain: IChainModule<C, A>;
-  public abstract accounts: IAccountsModule<C, A>;
-  public readonly communityBanner?: string;
+  public abstract accounts: IAccountsModule<A>;
 
   protected _serverLoaded: boolean;
   public get serverLoaded() {
@@ -44,7 +44,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     clearLocalStorage();
     console.log(`Starting ${this.meta.name}`);
     const [response] = await Promise.all([
-      // this.app.chainEntities.refresh(this.meta.id),
       $.get(`${this.app.serverUrl()}/bulkOffchain`, {
         chain: this.id,
         community: null,
@@ -60,34 +59,23 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     }
 
     const {
-      pinnedThreads,
       admins,
-      activeUsers,
+      // activeUsers,
+      // pinned and active threads must not be returned from api
       numVotingThreads,
       numTotalThreads,
       communityBanner,
       contractsWithTemplatesData,
     } = response.result;
-    this.app.threads.initialize(
-      pinnedThreads,
-      numVotingThreads,
-      numTotalThreads,
-      true
-    );
+    // Update community level thread counters variables (Store in state instead of react query here is an
+    // exception case, view the threadCountersStore code for more details)
+    EXCEPTION_CASE_threadCountersStore.setState({
+      totalThreadsInCommunity: numTotalThreads,
+      totalThreadsInCommunityForVoting: numVotingThreads,
+    });
     this.meta.setAdmins(admins);
-    this.app.recentActivity.setMostActiveUsers(activeUsers);
     this.meta.setBanner(communityBanner);
     this.app.contracts.initialize(contractsWithTemplatesData, true);
-
-    await this.app.recentActivity.getRecentTopicActivity(this.id);
-
-    if (!this.app.threadUniqueAddressesCount.getInitializedPinned()) {
-      this.app.threadUniqueAddressesCount.fetchThreadsUniqueAddresses({
-        threads: this.app.threads.listingStore.getPinnedThreads(),
-        chain: this.meta.id,
-        pinned: true,
-      });
-    }
 
     this._serverLoaded = true;
     return true;
@@ -95,21 +83,17 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
 
   public deinitServer() {
     this._serverLoaded = false;
-    this.app.threads.deinit();
-    this.app.comments.deinit();
-    this.app.reactions.deinit();
-    if (this.app.chainEntities) {
-      this.app.chainEntities.deinit();
-    }
-    this.app.reactionCounts.deinit();
-    this.app.threadUniqueAddressesCount.deinit();
+    EXCEPTION_CASE_threadCountersStore.setState({
+      totalThreadsInCommunity: 0,
+      totalThreadsInCommunityForVoting: 0,
+    });
     console.log(`${this.meta.name} stopped`);
   }
 
   public async initApi(): Promise<void> {
     this._apiInitialized = true;
     console.log(
-      `Started API for ${this.meta.id} on node: ${this.meta.node?.url}.`
+      `Started API for ${this.meta.id} on node: ${this.meta.node?.url}.`,
     );
   }
 
@@ -118,7 +102,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     this.app.chainModuleReady.emit('ready');
     this.app.isModuleReady = true;
     console.log(
-      `Loaded data for ${this.meta.id} on node: ${this.meta.node?.url}.`
+      `Loaded data for ${this.meta.id} on node: ${this.meta.node?.url}.`,
     );
   }
 
@@ -144,7 +128,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     // TODO: does this need debouncing?
     if (modules.some((mod) => !!mod && !mod.initializing && !mod.ready)) {
       await Promise.all(
-        modules.map((mod) => mod.init(this.chain, this.accounts))
+        modules.map((mod) => mod.init(this.chain, this.accounts)),
       );
       this.app.chainModuleReady.emit('ready');
     }
@@ -153,15 +137,11 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   public abstract base: ChainBase;
 
   public networkStatus: ApiStatus = ApiStatus.Disconnected;
-  public networkError: string;
 
   public readonly meta: ChainInfo;
   public readonly block: IBlockInfo;
 
   public app: IApp;
-  public version: string;
-  public name: string;
-  public runtimeName: string;
 
   constructor(meta: ChainInfo, app: IApp) {
     this.meta = meta;

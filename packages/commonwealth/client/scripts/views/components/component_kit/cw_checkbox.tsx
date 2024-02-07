@@ -4,10 +4,11 @@ import 'components/component_kit/cw_checkbox.scss';
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 
+import clsx from 'clsx';
 import type { BaseStyleProps } from './types';
 import { ComponentType } from './types';
 
-export type CheckboxType = { label?: string; value?: string };
+export type CheckboxType = { label?: string | React.ReactNode; value?: string };
 
 type CheckboxStyleProps = {
   checked?: boolean;
@@ -17,20 +18,20 @@ type CheckboxStyleProps = {
 type CheckboxProps = {
   groupName?: string;
   onChange?: (e?: any) => void;
+  labelClassName?: string;
 } & CheckboxType &
   CheckboxStyleProps;
 
-export const CWCheckbox = (props: CheckboxProps) => {
-  const {
-    className,
-    disabled = false,
-    indeterminate = false,
-    label,
-    onChange,
-    checked,
-    value,
-  } = props;
-
+export const CWCheckbox = ({
+  className,
+  disabled = false,
+  indeterminate = false,
+  label,
+  onChange,
+  checked,
+  value,
+  labelClassName,
+}: CheckboxProps) => {
   const params = {
     disabled,
     onChange,
@@ -48,14 +49,16 @@ export const CWCheckbox = (props: CheckboxProps) => {
           indeterminate,
           className,
         },
-        ComponentType.Checkbox
+        ComponentType.Checkbox,
       )}
     >
       <div className="check">
         <input className="checkbox-input" {...params} />
         <div className="checkbox-control" />
       </div>
-      <CWText className="checkbox-label">{label || value}</CWText>
+      <CWText className={clsx('checkbox-label', labelClassName)}>
+        {label || value}
+      </CWText>
     </label>
   );
 };

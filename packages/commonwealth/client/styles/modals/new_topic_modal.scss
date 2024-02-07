@@ -1,17 +1,29 @@
 @import '../shared';
 
 .NewTopicModal {
-  width: 420px;
+  width: 100%;
 
-  .compact-modal-body {
+  .checkboxes {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 8px;
+  }
 
-    .checkboxes {
+  .NewTopicModalFooter {
+    display: flex;
+    flex-direction: column;
+
+    .action-buttons {
       display: flex;
-      flex-direction: column;
-      gap: 8px;
+      align-self: flex-end;
+    }
+
+    .validation-text {
+      display: block;
+      align-items: center;
+      text-align: end;
+      margin-top: 0;
     }
   }
+
 }

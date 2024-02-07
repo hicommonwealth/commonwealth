@@ -2,5 +2,6 @@
   --require tsconfig-paths/register
   --require @babel/register
   --require source-map-support/register
+  --require ignore-styles
   --timeout 20000
   --exit

@@ -1,6 +1,6 @@
-import 'chai/register-should';
 import chai from 'chai';
-import type { GetCommunitiesReq } from 'common-common/src/api/extApiTypes';
+
+import type { GetCommunitiesReq } from 'server/api/extApiTypes';
 import {
   testChains,
   testComments,
@@ -39,13 +39,13 @@ describe('getCommunities Tests', () => {
     chai.assert.lengthOf(resp.result, 1);
     chai.assert.equal(
       resp.result[0].msg,
-      'Please provide a parameter to query by (community_id, network, comment_id, address_ids, addresses)'
+      'Please provide a parameter to query by (community_id, network, comment_id, address_ids, addresses)',
     );
 
     resp = await get(
       '/api/communities',
-      { community_id: testComments[0].chain, count_only: 3 },
-      true
+      { community_id: testComments[0].community_id, count_only: 3 },
+      true,
     );
 
     chai.assert.lengthOf(resp.result, 1);

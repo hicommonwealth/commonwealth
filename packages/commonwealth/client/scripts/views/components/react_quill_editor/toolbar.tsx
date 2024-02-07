@@ -1,7 +1,47 @@
 import React, { MutableRefObject, useMemo } from 'react';
 import ReactQuill from 'react-quill';
-import { SerializableDeltaStatic } from './utils';
+import { renderToolbarIcon, SerializableDeltaStatic } from './utils';
 import { DeltaStatic } from 'quill';
+import clsx from 'clsx';
+import {
+  TextHOne,
+  TextHTwo,
+  TextB,
+  TextItalic,
+  TextStrikethrough,
+  LinkSimple,
+  Code,
+  Quotes,
+  Image,
+  ListNumbers,
+  ListBullets,
+  ListChecks,
+} from '@phosphor-icons/react';
+
+import 'components/react_quill/react_quill_editor.scss';
+
+import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
+
+const quillIcons = ReactQuill.Quill.import('ui/icons');
+
+Object.assign(quillIcons, {
+  header: {
+    1: renderToolbarIcon(TextHOne),
+    2: renderToolbarIcon(TextHTwo),
+  },
+  bold: renderToolbarIcon(TextB),
+  italic: renderToolbarIcon(TextItalic),
+  strike: renderToolbarIcon(TextStrikethrough),
+  link: renderToolbarIcon(LinkSimple),
+  'code-block': renderToolbarIcon(Code),
+  blockquote: renderToolbarIcon(Quotes, { weight: 'fill' }),
+  image: renderToolbarIcon(Image),
+  list: {
+    ordered: renderToolbarIcon(ListNumbers),
+    bullet: renderToolbarIcon(ListBullets),
+    check: renderToolbarIcon(ListChecks),
+  },
+});
 
 const LIST_ITEM_PREFIX = {
   ordered: '1.',
@@ -11,22 +51,60 @@ const LIST_ITEM_PREFIX = {
 
 type CustomQuillToolbarProps = {
   toolbarId: string;
+  isMarkdownEnabled: boolean;
+  handleToggleMarkdown: () => void;
+  setIsPreviewVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  isDisabled?: boolean;
+  isPreviewDisabled: boolean;
 };
 
-export const CustomQuillToolbar = ({ toolbarId }: CustomQuillToolbarProps) => (
-  <div id={toolbarId}>
-    <button className="ql-header" value={1} />
-    <button className="ql-header" value={2} />
-    <button className="ql-bold"></button>
-    <button className="ql-italic"></button>
-    <button className="ql-strike"></button>
-    <button className="ql-link"></button>
-    <button className="ql-code-block"></button>
-    <button className="ql-blockquote"></button>
-    <button className="ql-image"></button>
-    <button className="ql-list" value="ordered" />
-    <button className="ql-list" value="bullet" />
-    <button className="ql-list" value="check" />
+export const CustomQuillToolbar = ({
+  toolbarId,
+  setIsPreviewVisible,
+  handleToggleMarkdown,
+  isMarkdownEnabled,
+  isDisabled = false,
+  isPreviewDisabled,
+}: CustomQuillToolbarProps) => (
+  <div id={toolbarId} className="CustomQuillToolbar">
+    <div className={clsx('left-buttons', { isDisabled })}>
+      <div className="section">
+        <button className="ql-header" value={1} />
+        <button className="ql-header" value={2} />
+      </div>
+      <div className="section">
+        <button className="ql-bold"></button>
+        <button className="ql-italic"></button>
+        <button className="ql-strike"></button>
+      </div>
+      <div className="section">
+        <button className="ql-link"></button>
+        <button className="ql-code-block"></button>
+        <button className="ql-blockquote"></button>
+        <button className="ql-image">image</button>
+      </div>
+      <div className="section">
+        <button className="ql-list" value="ordered" />
+        <button className="ql-list" value="bullet" />
+        <button className="ql-list" value="check" />
+      </div>
+    </div>
+    <div className={clsx('right-buttons', { isDisabled })}>
+      <button
+        className={clsx('markdown-button', { enabled: isMarkdownEnabled })}
+        onClick={handleToggleMarkdown}
+      >
+        Markdown
+      </button>
+      <div className="eye-icon">
+        <CWIconButton
+          iconName="eye"
+          iconSize="small"
+          onClick={() => setIsPreviewVisible(true)}
+          disabled={isPreviewDisabled}
+        />
+      </div>
+    </div>
   </div>
 );
 

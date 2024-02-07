@@ -1,26 +1,26 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import Sequelize from 'sequelize';
-import type { DB } from '../models';
 
 const Op = Sequelize.Op;
 const MAX_NOTIF = 40;
 
-export enum NotificationCategories {
+export enum RouteNotificationCategories {
   ChainEvents = 'chain-event',
   Discussion = 'discussion',
 }
 
 export const Errors = {
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
 };
 
 export default async (
   models: DB,
-  notificationCategory: NotificationCategories,
+  notificationCategory: RouteNotificationCategories,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.user) {
     return next(new AppError(Errors.NotLoggedIn));
@@ -45,12 +45,12 @@ export default async (
   }
 
   const notificationWhereOptions = {};
-  if (notificationCategory === NotificationCategories.ChainEvents) {
+  if (notificationCategory === RouteNotificationCategories.ChainEvents) {
     notificationWhereOptions['category_id'] =
-      NotificationCategories.ChainEvents;
+      RouteNotificationCategories.ChainEvents;
   } else {
     notificationWhereOptions['category_id'] = {
-      [Op.ne]: NotificationCategories.ChainEvents,
+      [Op.ne]: RouteNotificationCategories.ChainEvents,
     };
   }
 
@@ -60,30 +60,12 @@ export default async (
     },
   });
 
-  let maxId;
-  // if maxId is not provided that means this is the first request so load the first 100
-  // TODO: if this is too slow create a table keeping track of maxId for each user and query that instead
-  //  (increment the counters in emitNotifications)
-  // TODO: or better yet create onUpdate and onDelete triggers to update the counters
-  // TODO: should this always run so we can return number of unread or things like that?
-  const numNr = (<any>await models.NotificationsRead.findOne({
-    attributes: [<any>models.sequelize.fn('MAX', models.sequelize.col('id'))],
-    where: { user_id: req.user.id },
-    raw: true,
-  })).max;
-
-  if (!req.body.maxId || req.body.maxId === 0) maxId = numNr;
-  else maxId = req.body.maxId;
-
-  const whereAndOptions: any = [
-    { user_id: req.user.id },
-    { id: { [Op.lte]: maxId } },
-  ];
+  const whereAndOptions: any = [{ user_id: req.user.id }];
 
   if (req.body.unread_only) whereAndOptions.push({ is_read: false });
 
   // TODO: write raw query so that all subscriptions are included
-  const notificationsReadPromise = models.NotificationsRead.findAll({
+  const notificationsRead = await models.NotificationsRead.findAll({
     include: [
       {
         model: models.Subscription,
@@ -101,26 +83,11 @@ export default async (
     where: {
       [Op.and]: whereAndOptions,
     },
-    order: [['id', 'DESC']],
+    order: [['notification_id', 'DESC']],
     limit: MAX_NOTIF,
     raw: true,
     nest: true,
   });
-
-  // NOTE: Zak commenting this out (and promise below). getting more enriched subscriptions in /viewSubscriptions
-  // const subscriptionsPromise = models.Subscription.findAll({
-  //   where: {
-  //     subscriber_id: req.user.id,
-  //   },
-  // });
-
-  const [
-    notificationsRead,
-    // allSubscriptions
-  ] = await Promise.all([
-    notificationsReadPromise,
-    // subscriptionsPromise,
-  ]);
 
   const subscriptionsObj = {};
 
@@ -144,10 +111,9 @@ export default async (
   for (const nr of notificationsRead) {
     let chainEvent;
     // if the Notification instance defines a chain_event_id then this is a chain-event notification so parse it
-    if (nr.Notification.chain_event_id) {
+    if (nr.Notification.category_id === 'chain-event') {
       chainEvent = JSON.parse(nr.Notification.notification_data);
     }
-
     // creates an object for each subscription for which we have a NotificationsRead instance.
     // this object will store all the NotificationsRead, Notification, and ChainEvent instances associated with
     // a specific subscription
@@ -160,7 +126,6 @@ export default async (
 
     // push the NotificationsRead + Notifications data to the NotificationsRead array for each subscription
     subscriptionsObj[nr.subscription_id].NotificationsReads.push({
-      id: nr.id,
       is_read: nr.is_read,
       notification_id: nr.notification_id,
       subscription_id: nr.subscription_id,
@@ -193,6 +158,6 @@ export default async (
 
   return res.json({
     status: 'Success',
-    result: { subscriptions, numNotifications: numNr, numUnread },
+    result: { subscriptions, numUnread },
   });
 };

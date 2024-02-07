@@ -1,13 +1,17 @@
-import MinimumProfile from '../../../models/MinimumProfile';
+import moment from 'moment';
 import { RangeStatic } from 'quill';
+import QuillMention from 'quill-mention';
 import { MutableRefObject, useCallback, useMemo } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
-import moment from 'moment';
-import QuillMention from 'quill-mention';
+import MinimumProfile from '../../../models/MinimumProfile';
 
-import app from 'state';
+import axios from 'axios';
 import { debounce } from 'lodash';
-import { TTLCache } from '../../../helpers/ttl_cache';
+import app from 'state';
+import {
+  APIOrderBy,
+  APIOrderDirection,
+} from '../../../../scripts/helpers/constants';
 
 const Delta = Quill.import('delta');
 Quill.register('modules/mention', QuillMention);
@@ -21,10 +25,6 @@ export const useMention = ({
   editorRef,
   lastSelectionRef,
 }: UseMentionProps) => {
-  const mentionCache = useMemo(() => {
-    return new TTLCache(1_000 * 60, `mentions-${app.activeChainId()}`);
-  }, []);
-
   const selectMention = useCallback(
     (item: QuillMention) => {
       const editor = editorRef.current?.getEditor();
@@ -52,10 +52,10 @@ export const useMention = ({
         editor.getLength() -
           afterText.length -
           (afterText.startsWith(' ') ? 0 : 1),
-        0
+        0,
       );
     },
-    [editorRef, lastSelectionRef]
+    [editorRef, lastSelectionRef],
   );
 
   const mention = useMemo(() => {
@@ -70,9 +70,9 @@ export const useMention = ({
           searchTerm: string,
           renderList: (
             formattedMatches: QuillMention,
-            searchTerm: string
+            searchTerm: string,
           ) => null,
-          mentionChar: string
+          mentionChar: string,
         ) => {
           if (mentionChar !== '@') return;
 
@@ -91,33 +91,38 @@ export const useMention = ({
             ];
           } else {
             // try to get results from cache
-            let { profiles } = mentionCache.get(searchTerm) || {};
-            if (!profiles) {
-              const res = await app.search.searchMentionableProfiles(
-                searchTerm,
-                app.activeChainId()
-              );
-              if (!res.profiles?.length) {
-                return;
-              }
-              profiles = res.profiles;
-              mentionCache.set(searchTerm, res);
-            }
+            const { data } = await axios.get(`${app.serverUrl()}/profiles`, {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              params: {
+                chain: app.activeChainId(),
+                search: searchTerm,
+                limit: '50',
+                page: '1',
+                order_by: APIOrderBy.LastActive,
+                order_direction: APIOrderDirection.Desc,
+              },
+            });
+            const profiles = data?.result?.results;
             formattedMatches = profiles.map((p: any) => {
               const profileId = p.id;
               const profileAddress = p.addresses[0]?.address;
               const profileName = p.profile_name;
-              const profileChain = p.addresses[0]?.chain;
+              const profileCommunity = p.addresses[0]?.community_id;
               const avatarUrl = p.avatar_url;
 
-              const profile = new MinimumProfile(profileAddress, profileChain);
+              const profile = new MinimumProfile(
+                profileAddress,
+                profileCommunity,
+              );
               profile.initialize(
                 profileName,
                 profileAddress,
                 avatarUrl,
                 profileId,
-                profileChain,
-                null
+                profileCommunity,
+                null,
               );
               const node = document.createElement('div');
 
@@ -132,7 +137,7 @@ export const useMention = ({
                 avatar.className = 'ql-mention-avatar';
                 avatar.innerHTML = MinimumProfile.getSVGAvatar(
                   profileAddress,
-                  20
+                  20,
                 );
               }
 
@@ -142,7 +147,7 @@ export const useMention = ({
 
               const addrSpan = document.createElement('span');
               addrSpan.innerText =
-                profileChain === 'near'
+                profileCommunity === 'near'
                   ? profileAddress
                   : `${profileAddress.slice(0, 6)}...`;
               addrSpan.className = 'ql-mention-addr';
@@ -171,7 +176,7 @@ export const useMention = ({
           }
           renderList(formattedMatches, searchTerm);
         },
-        500
+        500,
       ),
       isolateChar: true,
     };

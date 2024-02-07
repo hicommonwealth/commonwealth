@@ -1,29 +1,29 @@
-import { NotificationCategories } from 'common-common/src/types';
+import { NotificationCategories } from '@hicommonwealth/core';
+import { getMultipleSpacesById } from 'helpers/snapshot_utils';
 import useForceRerender from 'hooks/useForceRerender';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/notification_settings/index.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
-import AddressInfo from '../../../models/AddressInfo';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import NotificationSubscription from '../../../models/NotificationSubscription';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWCollapsible } from '../../components/component_kit/cw_collapsible';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
-import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWToggle } from '../../components/component_kit/cw_toggle';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 import { User } from '../../components/user/user';
 import { PageLoading } from '../loading';
-import { bundleSubs } from './helpers';
 import {
   SubscriptionRowMenu,
   SubscriptionRowTextContainer,
 } from './helper_components';
+import { bundleSubs, extractSnapshotProposals } from './helpers';
 
 const emailIntervalFrequencyMap = {
   never: 'Never',
@@ -33,24 +33,61 @@ const emailIntervalFrequencyMap = {
   monthly: 'Once a month',
 };
 
+type SnapshotInfo = {
+  snapshotId: string;
+  space: {
+    avatar: string;
+    name: string;
+  };
+  subs: Array<NotificationSubscription>;
+};
+
 const NotificationSettingsPage = () => {
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
   const [email, setEmail] = useState('');
   const [emailValidated, setEmailValidated] = useState(false);
   const [sentEmail, setSentEmail] = useState(false);
+  const [snapshotsInfo, setSnapshotsInfo] = useState(null);
 
   const [currentFrequency, setCurrentFrequency] = useState(
-    app.user.emailInterval
+    app.user.emailInterval,
   );
 
   useEffect(() => {
     app.user.notifications.isLoaded.once('redraw', forceRerender);
-  }, [app?.user.notifications, app.user.emailInterval]);
+  }, [forceRerender]);
+
+  useEffect(() => {
+    // bundled snapshot subscriptions
+    const bundledSnapshotSubs = extractSnapshotProposals(
+      app.user.notifications.discussionSubscriptions,
+    );
+    const snapshotIds = Object.keys(bundledSnapshotSubs);
+
+    const getSpaces = async () => {
+      try {
+        const getSpaceById = await getMultipleSpacesById(snapshotIds);
+
+        const snapshotsInfoArr = snapshotIds.map((snapshotId) => ({
+          snapshotId,
+          space: getSpaceById.find((x: { id: string }) => x.id === snapshotId),
+          subs: bundledSnapshotSubs[snapshotId],
+        }));
+
+        setSnapshotsInfo(snapshotsInfoArr);
+      } catch (err) {
+        console.error(err);
+        return null;
+      }
+    };
+
+    getSpaces();
+  }, []);
 
   const handleSubscriptions = async (
     hasSomeInAppSubs: boolean,
-    subs: NotificationSubscription[]
+    subs: NotificationSubscription[],
   ) => {
     if (hasSomeInAppSubs) {
       await app.user.notifications.disableSubscriptions(subs);
@@ -62,7 +99,7 @@ const NotificationSettingsPage = () => {
 
   const handleEmailSubscriptions = async (
     hasSomeEmailSubs: boolean,
-    subs: NotificationSubscription[]
+    subs: NotificationSubscription[],
   ) => {
     if (hasSomeEmailSubs) {
       await app.user.notifications.disableImmediateEmails(subs);
@@ -86,24 +123,23 @@ const NotificationSettingsPage = () => {
 
   // bundled discussion subscriptions
   const bundledSubs = bundleSubs(
-    app?.user.notifications.subscriptions.filter(
-      (x) => x.category !== 'chain-event'
-    )
+    app?.user.notifications.discussionSubscriptions,
   );
+
   // bundled chain-event subscriptions
   const chainEventSubs = bundleSubs(
-    app?.user.notifications.subscriptions.filter(
-      (x) => x.category === 'chain-event'
-    )
+    app?.user.notifications.chainEventSubscriptions,
   );
 
-  const subscribedChainIds =
+  const subscribedCommunityIds =
     app?.user.notifications.chainEventSubscribedChainIds;
 
-  // chains/communities the user has addresses for but does not have existing subscriptions for
-  const relevantSubscribedChains = app?.user.addresses
-    .map((x) => x.chain)
-    .filter((x) => subscribedChainIds.includes(x.id) && !chainEventSubs[x.id]);
+  // communities the user has addresses for but does not have existing subscriptions for
+  const relevantSubscribedCommunities = app?.user.addresses
+    .map((x) => x.community)
+    .filter(
+      (x) => subscribedCommunityIds.includes(x.id) && !chainEventSubs[x.id],
+    );
 
   return (
     <div className="NotificationSettingsPage">
@@ -171,8 +207,8 @@ const NotificationSettingsPage = () => {
               <>
                 <CWText type="h5">Email Request</CWText>
                 <CWText type="b1">
-                  Mmm...seems like we don't have your email on file? Enter your
-                  email below so we can send you scheduled email digests.
+                  {`Mmm...seems like we don't have your email on file? Enter your
+                  email below so we can send you scheduled email digests.`}
                 </CWText>
                 <div className="email-input-row">
                   <CWTextInput
@@ -246,20 +282,20 @@ const NotificationSettingsPage = () => {
           In-App
         </CWText>
       </div>
-      {relevantSubscribedChains
+      {relevantSubscribedCommunities
         .sort((x, y) => x.name.localeCompare(y.name))
-        .map((chain) => {
+        .map((community) => {
           return (
             <div
               className="notification-row chain-events-subscriptions-padding"
-              key={chain.id}
+              key={community.id}
             >
               <div className="notification-row-header">
                 <div className="left-content-container">
                   <div className="avatar-and-name">
-                    <CWCommunityAvatar size="medium" community={chain} />
+                    <CWCommunityAvatar size="medium" community={community} />
                     <CWText type="h5" fontWeight="medium">
-                      {chain.name}
+                      {community.name}
                     </CWText>
                   </div>
                 </div>
@@ -275,7 +311,10 @@ const NotificationSettingsPage = () => {
                   checked={false}
                   onChange={() => {
                     app.user.notifications
-                      .subscribe(NotificationCategories.ChainEvent, chain.id)
+                      .subscribe({
+                        categoryId: NotificationCategories.ChainEvent,
+                        options: { chainId: community.id },
+                      })
                       .then(() => {
                         forceRerender();
                       });
@@ -288,21 +327,25 @@ const NotificationSettingsPage = () => {
 
       {Object.entries(chainEventSubs)
         .sort((x, y) => x[0].localeCompare(y[0]))
-        .map(([chainName, subs]) => {
-          const chainInfo = app.config.chains.getById(chainName);
+        .map(([communityName, subs]) => {
+          const communityInfo = app.config.chains.getById(communityName);
           const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
           const hasSomeInAppSubs = subs.some((s) => s.isActive);
+
           return (
             <div
               className="notification-row chain-events-subscriptions-padding"
-              key={chainName}
+              key={communityInfo?.id}
             >
               <div className="notification-row-header">
                 <div className="left-content-container">
                   <div className="avatar-and-name">
-                    <CWCommunityAvatar size="medium" community={chainInfo} />
+                    <CWCommunityAvatar
+                      size="medium"
+                      community={communityInfo}
+                    />
                     <CWText type="h5" fontWeight="medium">
-                      {chainInfo?.name}
+                      {communityInfo?.name}
                     </CWText>
                   </div>
                 </div>
@@ -355,15 +398,18 @@ const NotificationSettingsPage = () => {
       </div>
       {Object.entries(bundledSubs)
         .sort((x, y) => x[0].localeCompare(y[0]))
-        .map(([chainName, subs]) => {
-          const chainInfo = app?.config.chains.getById(chainName);
-          const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
-          const hasSomeInAppSubs = subs.some((s) => s.isActive);
+        .map(([communityName, subs]) => {
+          const communityInfo = app?.config.chains.getById(communityName);
+          const sortedSubs = subs.sort((a, b) =>
+            a.category.localeCompare(b.category),
+          );
+          const hasSomeEmailSubs = sortedSubs.some((s) => s.immediateEmail);
+          const hasSomeInAppSubs = sortedSubs.some((s) => s.isActive);
 
-          if (!chainInfo?.id) return null; // handles incomplete loading case
+          if (!communityInfo?.id) return null; // handles incomplete loading case
 
           return (
-            <div key={chainInfo?.id} className="notification-row">
+            <div key={communityInfo?.id} className="notification-row">
               <CWCollapsible
                 headerContent={
                   <div className="notification-row-header">
@@ -371,10 +417,10 @@ const NotificationSettingsPage = () => {
                       <div className="avatar-and-name">
                         <CWCommunityAvatar
                           size="medium"
-                          community={chainInfo}
+                          community={communityInfo}
                         />
                         <CWText type="h5" fontWeight="medium">
-                          {chainInfo?.name}
+                          {communityInfo?.name}
                         </CWText>
                       </div>
                       <CWText type="b2" className="subscriptions-count-text">
@@ -420,30 +466,18 @@ const NotificationSettingsPage = () => {
                     </div>
                     {subs.map((sub) => {
                       const getUser = () => {
-                        if (sub.Thread?.chain) {
+                        if (sub.Thread?.communityId) {
                           return (
                             <User
-                              user={
-                                new AddressInfo(
-                                  null,
-                                  sub.Thread.author,
-                                  sub.Thread.chain,
-                                  null
-                                )
-                              }
+                              userAddress={sub.Thread.author}
+                              userCommunityId={sub.Thread.communityId}
                             />
                           );
-                        } else if (sub.Comment?.chain) {
+                        } else if (sub.Comment?.communityId) {
                           return (
                             <User
-                              user={
-                                new AddressInfo(
-                                  null,
-                                  sub.Comment.author,
-                                  sub.Comment.chain,
-                                  null
-                                )
-                              }
+                              userAddress={sub.Comment.author}
+                              userCommunityId={sub.Comment.communityId}
                             />
                           );
                         } else {
@@ -509,6 +543,84 @@ const NotificationSettingsPage = () => {
                   </div>
                 }
               />
+            </div>
+          );
+        })}
+      <div>
+        <CWText
+          type="h4"
+          fontWeight="semiBold"
+          className="chain-events-section-margin"
+        >
+          Snapshot Subscriptions
+        </CWText>
+        <div className="column-header-row">
+          <CWText
+            type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
+            fontWeight="medium"
+            className="column-header-text"
+          >
+            Community
+          </CWText>
+          <CWText
+            type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
+            fontWeight="medium"
+            className="column-header-text"
+          >
+            Email
+          </CWText>
+          <CWText
+            type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
+            fontWeight="medium"
+            className="last-column-header-text"
+          >
+            In-App
+          </CWText>
+        </div>
+      </div>
+      {snapshotsInfo &&
+        snapshotsInfo.map((snapshot: SnapshotInfo) => {
+          //destructuring snapshotInfo for readability
+          const { snapshotId, space, subs } = snapshot;
+          if (!snapshotId) return null; // handles incomplete loading case
+
+          //remove ipfs:// from avatar
+          const avatar = space.avatar.replace('ipfs://', '');
+
+          const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
+          const hasSomeInAppSubs = subs.some((s) => s.isActive);
+
+          return (
+            <div
+              className="notification-row chain-events-subscriptions-padding"
+              key={snapshotId}
+            >
+              <div className="notification-row-header">
+                <div className="left-content-container">
+                  <div className="avatar-and-name">
+                    <img
+                      className="snapshot-icon"
+                      src={`${app.serverUrl()}/ipfsProxy?hash=${avatar}&image=true`}
+                    />
+                    <CWText type="h5" fontWeight="medium">
+                      {space.name}
+                    </CWText>
+                  </div>
+                </div>
+                <CWCheckbox
+                  label="Receive Emails"
+                  checked={hasSomeEmailSubs}
+                  onChange={() => {
+                    handleEmailSubscriptions(hasSomeEmailSubs, subs);
+                  }}
+                />
+                <CWToggle
+                  checked={hasSomeInAppSubs}
+                  onChange={() => {
+                    handleSubscriptions(hasSomeInAppSubs, subs);
+                  }}
+                />
+              </div>
             </div>
           );
         })}

@@ -7,8 +7,7 @@ import moment from 'moment';
 import 'pages/snapshot/snapshot_information_card.scss';
 
 import app from 'state';
-import AddressInfo from '../../../models/AddressInfo';
-import { CWContentPageCard } from '../../components/component_kit/cw_content_page';
+import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { User } from '../../components/user/user';
@@ -42,7 +41,7 @@ const SnapshotInfoLinkRow = (props: SnapshotInfoLinkRowProps) => {
       <CWText type="caption" className="snapshot-info-row-label">
         {label}
       </CWText>
-      <a href={url} target="_blank">
+      <a href={url} target="_blank" rel="noreferrer">
         <CWText className="snapshot-link" noWrap>
           {value}
         </CWText>
@@ -54,7 +53,7 @@ const SnapshotInfoLinkRow = (props: SnapshotInfoLinkRowProps) => {
 
 type SnapshotInformationCardProps = {
   proposal: SnapshotProposal;
-  threads: Array<{ id: string; title: string }> | null;
+  threads: Array<{ id: number; title: string }> | null;
 };
 
 export const SnapshotInformationCard = ({
@@ -62,7 +61,7 @@ export const SnapshotInformationCard = ({
   threads,
 }: SnapshotInformationCardProps) => {
   const votingSystem = capitalize(
-    proposal.type.split('-').join(' ').concat(' voting')
+    proposal.type.split('-').join(' ').concat(' voting'),
   );
 
   return (
@@ -76,17 +75,11 @@ export const SnapshotInformationCard = ({
               value={
                 app.chain ? (
                   <User
-                    user={
-                      new AddressInfo(
-                        null,
-                        proposal.author,
-                        app.activeChainId(),
-                        null
-                      )
-                    }
-                    hideAvatar
-                    linkify
-                    popover
+                    userAddress={proposal.author}
+                    userCommunityId={app.activeChainId()}
+                    shouldHideAvatar
+                    shouldLinkProfile
+                    shouldShowPopover
                   />
                 ) : (
                   proposal.author

@@ -1,22 +1,11 @@
-import {
-  TypedRequest,
-  TypedRequestBody,
-  TypedResponse,
-  success,
-} from '../../types';
+import { IDiscordMeta } from '@hicommonwealth/core';
+import { CommentAttributes } from '@hicommonwealth/model';
 import { ServerControllers } from '../../routing/router';
-import { CommentAttributes } from 'server/models/comment';
-import { AppError } from '../../../../common-common/src/errors';
-
-const Errors = {
-  NoId: 'Must provide id',
-  NoBody: 'Must provide text body',
-  NotAddrOwner: 'Address not owned by this user',
-  NoProposal: 'No matching proposal found',
-};
+import { TypedRequest, TypedResponse, success } from '../../types';
 
 type UpdateCommentRequestBody = {
   body: string;
+  discord_meta?: IDiscordMeta;
 };
 type UpdateCommentRequestParams = {
   id: number;
@@ -27,28 +16,20 @@ type UpdateCommentResponse = CommentAttributes;
 export const updateCommentHandler = async (
   controllers: ServerControllers,
   req: TypedRequest<UpdateCommentRequestBody, {}, UpdateCommentRequestParams>,
-  res: TypedResponse<UpdateCommentResponse>
+  res: TypedResponse<UpdateCommentResponse>,
 ) => {
-  const { user, chain, address } = req;
+  const { user, address } = req;
   const { id: commentId } = req.params;
-  const { body: commentBody } = req.body;
-  if (!commentId) {
-    throw new AppError(Errors.NoId);
-  }
-  if (!commentBody) {
-    throw new AppError(Errors.NoBody);
-  }
-  const attachments = req.body['attachments[]'];
+  const { body: commentBody, discord_meta: discordMeta } = req.body;
 
   const [updatedComment, notificationOptions] =
-    await controllers.comments.updateComment(
+    await controllers.comments.updateComment({
       user,
       address,
-      chain,
       commentId,
       commentBody,
-      attachments
-    );
+      discordMeta,
+    });
 
   // emit notifications
   for (const n of notificationOptions) {

@@ -1,3 +1,4 @@
+import { AbiType } from '@hicommonwealth/core';
 import type moment from 'moment';
 
 class Contract {
@@ -60,7 +61,7 @@ class Contract {
     symbol?: string;
     isFactory?: boolean;
     nickname?: string;
-    abi?: Array<Record<string, unknown>>;
+    abi?: AbiType;
     ccts?: Array<{
       id: number;
       communityContractId: number;

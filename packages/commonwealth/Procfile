@@ -1,3 +1,4 @@
-web: cd packages/commonwealth && NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) ts-node -P tsconfig.server.json -T server.ts
-consumer: cd packages/commonwealth && node --max-old-space-size=$(../../scripts/get-max-old-space-size.sh) build/commonwealth/server/CommonwealthConsumer/CommonwealthConsumer.js run-as-script
+web: cd packages/commonwealth && NODE_ENV=production NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) node --enable-source-maps ./build/server.js
+consumer: cd packages/commonwealth && node --max-old-space-size=$(../../scripts/get-max-old-space-size.sh) build/server/workers/commonwealthConsumer/commonwealthConsumer.js run-as-script
+evm-ce: cd packages/commonwealth && node --max-old-space-size=$(../../scripts/get-max-old-space-size.sh) build/server/workers/evmChainEvents/startEvmPolling.js
 release: cd packages/commonwealth && npx sequelize-cli db:migrate --config server/sequelize.json

@@ -5,9 +5,8 @@ import validateType from 'helpers/validateTypes';
 import type Contract from 'models/Contract';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
 import app from 'state';
-import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
+import 'view_template/view_template.scss';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import {
@@ -15,7 +14,6 @@ import {
   MessageRow,
 } from 'views/components/component_kit/cw_text_input';
 import { openConfirmation } from 'views/modals/confirmation_modal';
-import 'view_template/view_template.scss';
 import Web3 from 'web3';
 import isValidJson from '../../../../../shared/validateJson';
 import { CWButton } from '../../components/component_kit/cw_button';
@@ -27,6 +25,7 @@ export enum TemplateComponents {
   INPUT = 'input',
   DROPDOWN = 'dropdown',
   FUNCTIONFORM = 'function',
+  STRUCTFORM = 'struct',
 }
 
 type Json = {
@@ -47,9 +46,16 @@ type Json = {
   };
 };
 
-const ViewTemplatePage = () => {
+type ViewTemplateFormProps = {
+  contract_address?: string;
+  slug?: string;
+  isForm?: boolean;
+  setTemplateNickname(name: string): any;
+};
+
+const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
   const navigate = useCommonNavigate();
-  const params = useParams();
+  const params = formData;
   const [formState, setFormState] = useState({});
   const [json, setJson] = useState<Json>(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -70,11 +76,18 @@ const ViewTemplatePage = () => {
     });
 
     if (!contractInStore || !templateMetadata) {
+      if (formData.isForm) return <div>No Contract Available</div>;
       navigate('/404', {}, null);
     }
 
     setCurrentContract(contractInStore);
     setTemplateNickname(templateMetadata.cctmd.nickname);
+    if (
+      params.setTemplateNickname &&
+      typeof params.setTemplateNickname === 'function'
+    ) {
+      params.setTemplateNickname(templateMetadata.cctmd.nickname);
+    }
 
     app.contracts
       .getTemplatesForContract(contractInStore.id)
@@ -136,6 +149,18 @@ const ViewTemplatePage = () => {
               });
 
               break;
+            case TemplateComponents.STRUCTFORM:
+              setFormState((prevState) => {
+                const newState = { ...prevState };
+                const form = {};
+                field.struct.form_fields.forEach((nestField) => {
+                  form[nestField.input.field_ref] = null;
+                });
+                newState[field.struct.field_ref] = form;
+                return newState;
+              });
+              break;
+
             default:
               break;
           }
@@ -196,7 +221,7 @@ const ViewTemplatePage = () => {
               });
               const w3 = new Web3();
               calldataSubArr.push(
-                w3.eth.abi.encodeFunctionCall(method.abi, _params)
+                w3.eth.abi.encodeFunctionCall(method.abi, _params),
               );
             });
             outputArr.push(calldataSubArr);
@@ -254,7 +279,13 @@ const ViewTemplatePage = () => {
           return <CWDivider />;
         case TemplateComponents.TEXT:
           return (
-            <CWText fontStyle={field[component].field_type}>
+            <CWText
+              fontStyle={
+                formData.isForm && field[component].field_type == 'h1'
+                  ? 'h2'
+                  : field[component].field_type
+              }
+            >
               {field[component].field_value}
             </CWText>
           );
@@ -269,9 +300,14 @@ const ViewTemplatePage = () => {
                   const newState = { ...prevState };
 
                   if (nested_field_ref) {
-                    newState[nested_field_ref][nested_index][
-                      field[component].field_ref
-                    ] = e.target.value;
+                    if (nested_index) {
+                      newState[nested_field_ref][nested_index][
+                        field[component].field_ref
+                      ] = e.target.value;
+                    } else {
+                      newState[nested_field_ref][field[component].field_ref] =
+                        e.target.value;
+                    }
                   } else {
                     newState[field[component].field_ref] = e.target.value;
                   }
@@ -294,9 +330,24 @@ const ViewTemplatePage = () => {
             ...field[component].tx_forms.flatMap((method, i) => {
               // Recursively call the renderTemplate(this function) funciton for each sub function form
               return renderTemplate(method.form, field[component].field_ref, i);
-            })
+            }),
           );
 
+          functionComponents.push(<CWDivider />);
+          return functionComponents;
+        }
+        case TemplateComponents.STRUCTFORM: {
+          const functionComponents = [
+            <CWDivider />,
+            <CWText type="h3">{field[component].field_label}</CWText>,
+          ];
+
+          functionComponents.push(
+            ...renderTemplate(
+              field[component].form_fields,
+              field[component].field_ref,
+            ),
+          );
           functionComponents.push(<CWDivider />);
           return functionComponents;
         }
@@ -330,13 +381,13 @@ const ViewTemplatePage = () => {
       description: constructTxPreview(), // TODO: Replace with some preview we like
       buttons: [
         {
-          buttonType: 'primary-black',
+          buttonType: 'primary',
           label: 'confirm',
           onClick: async () => {
             try {
               const functionAbi = parseFunctionFromABI(
                 currentContract.abi,
-                json.tx_template?.method as string
+                json.tx_template?.method as string,
               );
 
               const functionArgs = formatFunctionArgs();
@@ -359,7 +410,7 @@ const ViewTemplatePage = () => {
           },
         },
         {
-          buttonType: 'secondary-black',
+          buttonType: 'secondary',
           label: 'cancel',
           onClick: () => {
             console.log('transaction cancelled');
@@ -370,23 +421,20 @@ const ViewTemplatePage = () => {
   };
 
   if (!json) {
+    if (formData.isForm) return <div>No Contract Available</div>;
     return;
   }
 
   return (
-    <div className="ViewTemplatePage">
-      <CWBreadcrumbs
-        breadcrumbs={[
-          { label: 'Contracts', path: `/contracts`, navigate },
-          { label: templateNickname },
-        ]}
-      />
-      <CWText type="h3" className="header">
-        {templateNickname}
-      </CWText>
+    <div className={formData.isForm ? 'ViewTemplateForm' : 'ViewTemplatePage'}>
+      {!formData.isForm && (
+        <CWText type="h3" className="header">
+          {templateNickname}
+        </CWText>
+      )}
 
       <div className="form">
-        <CWDivider className="divider" />
+        {!formData.isForm && <CWDivider className="divider" />}
 
         {!templateError ? (
           <div className="template">{renderTemplate(json.form_fields)}</div>

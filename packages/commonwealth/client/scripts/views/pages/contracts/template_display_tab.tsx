@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
-import app from 'state';
 import Contract from 'models/Contract';
 import Template from 'models/Template';
 import { useCommonNavigate } from 'navigation/helpers';
+import React, { useState } from 'react';
+import app from 'state';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
+import Account from '../../../models/Account';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { Modal } from '../../components/component_kit/cw_modal';
-import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { User } from '../../components/user/user';
 import ViewTemplateModal from '../../modals/view_template_modal';
 
@@ -33,7 +34,8 @@ export const TemplateDisplayTab = ({
 
   return (
     <div className="template-display-section">
-      <Modal
+      <CWModal
+        size="medium"
         content={
           <ViewTemplateModal
             template={mountedTemplate}
@@ -87,21 +89,27 @@ export const TemplateDisplayTab = ({
           </div>
         </div>
         {templates.length > 0 ? (
-          templates.map((template) => {
-            const creator = app.chain.accounts.get(template.createdBy);
+          templates.map((template, index) => {
+            const creator: Account = app.chain.accounts.get(template.createdBy);
             return (
-              <div className="table-row">
+              <div className="table-row" key={index}>
                 <div className="table-column">
                   <CWText>{template.name}</CWText>
                 </div>
                 <div className="table-column">
-                  <User user={creator} showAddressWithDisplayName />
+                  <User
+                    userAddress={creator.address}
+                    userCommunityId={
+                      creator.community?.id || creator?.profile?.chain
+                    }
+                    shouldShowAddressWithDisplayName
+                  />
                 </div>
                 <div className="table-column">
                   <div className="IconGroup">
                     <CWCommunityAvatar
                       community={app.config.chains.getById(
-                        template.createdForCommunity
+                        template.createdForCommunity,
                       )}
                       size="small"
                     />

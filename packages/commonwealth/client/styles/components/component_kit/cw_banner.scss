@@ -3,16 +3,18 @@
 @mixin bannerStyles {
   align-items: flex-start;
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  min-height: 56px;
-  padding: 16px 16px 16px 192px;
+  min-height: 48px;
+  box-sizing: border-box;
+  padding: 8px 16px 8px 192px;
 
   @include mediumSmall {
-    padding: 16px 16px 16px 32px;
+    padding: 8px 16px 8px 32px;
   }
 
   @include small {
-    padding: 16px 16px 16px 32px;
+    padding: 8px 16px 8px 32px;
   }
 
   @include extraSmall {

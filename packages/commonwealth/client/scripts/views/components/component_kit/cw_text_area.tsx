@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import 'components/component_kit/cw_text_area.scss';
 
@@ -6,17 +6,29 @@ import { ComponentType } from './types';
 import { getClasses } from './helpers';
 import type { ValidationStatus } from './cw_validation_text';
 import { MessageRow, useTextInputWithValidation } from './cw_text_input';
+import { MessageRow as NewMessageRow } from './new_designs/CWTextInput/MessageRow';
 import type { BaseTextInputProps } from './cw_text_input';
+import { useFormContext } from 'react-hook-form';
 
 type TextAreaStyleProps = {
   disabled?: boolean;
   validationStatus?: ValidationStatus;
+  instructionalMessage?: string;
+  resizeWithText?: boolean;
 };
 
-type TextAreaProps = BaseTextInputProps & TextAreaStyleProps;
+type TextAreaFormValidationProps = {
+  name?: string;
+  hookToForm?: boolean;
+};
+
+type TextAreaProps = BaseTextInputProps &
+  TextAreaStyleProps &
+  TextAreaFormValidationProps;
 
 export const CWTextArea = (props: TextAreaProps) => {
   const validationProps = useTextInputWithValidation();
+  const textareaRef = useRef(null);
 
   const {
     autoComplete,
@@ -30,7 +42,26 @@ export const CWTextArea = (props: TextAreaProps) => {
     onInput,
     placeholder,
     tabIndex,
+    resizeWithText = false,
+    hookToForm,
+    instructionalMessage,
   } = props;
+
+  useEffect(() => {
+    if (resizeWithText) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      textareaRef.current.style.minHeight = '152px';
+      textareaRef.current.style.maxHeight = '512px';
+    }
+  }, [value, resizeWithText]);
+
+  const formContext = useFormContext();
+  const formFieldContext = hookToForm
+    ? formContext.register(name)
+    : ({} as any);
+  const formFieldErrorMessage =
+    hookToForm && (formContext?.formState?.errors?.[name]?.message as string);
 
   return (
     <div className={ComponentType.TextArea}>
@@ -46,7 +77,9 @@ export const CWTextArea = (props: TextAreaProps) => {
         autoFocus={autoFocus}
         autoComplete={autoComplete}
         className={getClasses<TextAreaStyleProps & { isTyping: boolean }>({
-          validationStatus: validationProps.validationStatus,
+          validationStatus:
+            validationProps.validationStatus ||
+            (formFieldErrorMessage ? 'failure' : undefined),
           disabled,
           isTyping: validationProps.isTyping,
         })}
@@ -55,6 +88,9 @@ export const CWTextArea = (props: TextAreaProps) => {
         maxLength={maxLength}
         name={name}
         placeholder={placeholder}
+        ref={textareaRef}
+        value={value}
+        {...formFieldContext}
         onInput={(e) => {
           if (onInput) onInput(e);
 
@@ -80,6 +116,8 @@ export const CWTextArea = (props: TextAreaProps) => {
           }
         }}
         onBlur={(e) => {
+          if (hookToForm) formFieldContext?.onBlur?.(e);
+
           if (inputValidationFn) {
             if (e.target.value?.length === 0) {
               validationProps.setIsTyping(false);
@@ -92,8 +130,24 @@ export const CWTextArea = (props: TextAreaProps) => {
             }
           }
         }}
-        value={value}
       />
+      {label && (
+        <NewMessageRow
+          instructionalMessage={instructionalMessage}
+          statusMessage={validationProps.statusMessage}
+          validationStatus={validationProps.validationStatus}
+        />
+      )}
+      {label && (
+        <NewMessageRow
+          hasFeedback={!!inputValidationFn || !!formFieldErrorMessage}
+          statusMessage={validationProps.statusMessage || formFieldErrorMessage}
+          validationStatus={
+            validationProps.validationStatus ||
+            (formFieldErrorMessage ? 'failure' : undefined)
+          }
+        />
+      )}
     </div>
   );
 };

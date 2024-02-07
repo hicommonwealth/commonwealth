@@ -10,7 +10,7 @@ import app from 'state';
 
 import 'pages/contracts/contract_card.scss';
 import { useCommonNavigate } from 'navigation/helpers';
-import { Modal } from 'views/components/component_kit/cw_modal';
+import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import React, { useState } from 'react';
 import ManageContractTemplateModal, {
   ManageContractTemplateModalProps,
@@ -54,7 +54,7 @@ export const ContractCard = ({
       buttons: [
         {
           label: 'Delete',
-          buttonType: 'mini-red',
+          buttonType: 'destructive',
           onClick: async () => {
             try {
               await app.contracts.deleteCommunityContract({
@@ -68,7 +68,7 @@ export const ContractCard = ({
         },
         {
           label: 'Cancel',
-          buttonType: 'mini-black',
+          buttonType: 'primary',
         },
       ],
     });
@@ -165,7 +165,8 @@ export const ContractCard = ({
             </CWText>
           )}
         </div>
-        <Modal
+        <CWModal
+          size="medium"
           content={
             <ManageContractTemplateModal
               contractId={manageContractTemplateModalData?.contractId}

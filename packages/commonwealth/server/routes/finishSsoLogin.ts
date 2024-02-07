@@ -1,25 +1,29 @@
-import { AppError, ServerError } from 'common-common/src/errors';
-import { NotificationCategories, WalletId } from 'common-common/src/types';
+import {
+  AppError,
+  DynamicTemplate,
+  NotificationCategories,
+  ServerError,
+  WalletId,
+  logger,
+} from '@hicommonwealth/core';
+import type {
+  AddressAttributes,
+  DB,
+  ProfileAttributes,
+  UserAttributes,
+} from '@hicommonwealth/model';
+import { sequelize } from '@hicommonwealth/model';
 import * as jwt from 'jsonwebtoken';
 import { isAddress, toChecksumAddress } from 'web3-utils';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
-import { DynamicTemplate } from '../../shared/types';
 import { AXIE_SHARED_SECRET } from '../config';
-import { sequelize } from '../database';
-import type { DB } from '../models';
-import type { AddressAttributes } from '../models/address';
-import type { ProfileAttributes } from '../models/profile';
-import type { UserAttributes } from '../models/user';
-
+import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { createRole } from '../util/roles';
-
 import { redirectWithLoginError } from './finishEmailLogin';
-import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');
@@ -57,7 +61,7 @@ const Errors = {
   TokenBadIssuer: 'Invalid token issuer',
   TokenExpired: 'Token expired',
   TokenBadAddress: 'Invalid token address',
-  AlreadyLoggedIn: 'User is already logged in',
+  AlreadyLoggedIn: 'User is already signed in',
   ReplayAttack: 'Invalid token. Try again',
   AccountCreationFailed: 'Failed to create account',
 };
@@ -68,8 +72,10 @@ type FinishSsoLoginRes = { user?: UserAttributes; address?: AddressAttributes };
 const finishSsoLogin = async (
   models: DB,
   req: TypedRequestBody<FinishSsoLoginReq>,
-  res: TypedResponse<FinishSsoLoginRes>
+  res: TypedResponse<FinishSsoLoginRes>,
 ) => {
+  const serverAnalyticsController = new ServerAnalyticsController();
+
   // verify issuer (TODO: support other SSO endpoints)
   if (req.body.issuer !== Issuers.AxieInfinity) {
     throw new AppError(Errors.InvalidIssuer);
@@ -136,7 +142,7 @@ const finishSsoLogin = async (
     {
       where: {
         address: checksumAddress,
-        chain: 'axie-infinity',
+        community_id: 'axie-infinity',
       },
       include: [
         {
@@ -145,7 +151,7 @@ const finishSsoLogin = async (
           required: false,
         },
       ],
-    }
+    },
   );
   if (existingAddress) {
     // TODO: transactionalize
@@ -214,7 +220,7 @@ const finishSsoLogin = async (
         };
         await sgMail.send(msg);
         log.info(
-          `Sent address move email: ${existingAddress} transferred to a new account`
+          `Sent address move email: ${existingAddress} transferred to a new account`,
         );
       } catch (e) {
         log.error(`Could not send address move email for: ${existingAddress}`);
@@ -251,12 +257,15 @@ const finishSsoLogin = async (
           if (err)
             return redirectWithLoginError(
               res,
-              `Could not log in with ronin wallet`
+              `Could not sign in with ronin wallet`,
             );
-          serverAnalyticsTrack({
-            event: MixpanelLoginEvent.LOGIN_COMPLETED,
-            isCustomDomain: null,
-          });
+          serverAnalyticsController.track(
+            {
+              event: MixpanelLoginEvent.LOGIN_COMPLETED,
+              userId: existingUser.id,
+            },
+            req,
+          );
         });
         return success(res, { user: existingUser });
       } else {
@@ -268,20 +277,25 @@ const finishSsoLogin = async (
         await existingAddress.save();
         req.login(newUser, (err) => {
           if (err) {
-            serverAnalyticsTrack({
-              event: MixpanelLoginEvent.LOGIN_FAILED,
-              isCustomDomain: null,
-            });
+            serverAnalyticsController.track(
+              {
+                event: MixpanelLoginEvent.LOGIN_FAILED,
+              },
+              req,
+            );
             return redirectWithLoginError(
               res,
-              `Could not log in with ronin wallet`
+              `Could not sign in with ronin wallet`,
             );
           }
 
-          serverAnalyticsTrack({
-            event: MixpanelLoginEvent.LOGIN_COMPLETED,
-            isCustomDomain: null,
-          });
+          serverAnalyticsController.track(
+            {
+              event: MixpanelLoginEvent.LOGIN_COMPLETED,
+              userId: newUser.id,
+            },
+            req,
+          );
         });
         return success(res, { user: newUser });
       }
@@ -299,7 +313,7 @@ const finishSsoLogin = async (
         user = await models.User.createWithProfile(
           models,
           { email: null },
-          { transaction: t }
+          { transaction: t },
         );
         profile = user.Profiles[0];
       } else {
@@ -314,7 +328,7 @@ const finishSsoLogin = async (
       const newAddress = await models.Address.create(
         {
           address: checksumAddress,
-          chain: AXIE_INFINITY_CHAIN_ID,
+          community_id: AXIE_INFINITY_CHAIN_ID,
           verification_token: 'SSO',
           verification_token_expires: null,
           verified: new Date(), // trust addresses from magic
@@ -322,8 +336,9 @@ const finishSsoLogin = async (
           user_id: user.id,
           profile_id: profile.id,
           wallet_id: WalletId.Ronin,
+          // wallet_sso_source: null,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await createRole(
@@ -332,7 +347,7 @@ const finishSsoLogin = async (
         AXIE_INFINITY_CHAIN_ID,
         'member',
         false,
-        t
+        t,
       );
 
       // Automatically create subscription to their own mentions
@@ -340,10 +355,9 @@ const finishSsoLogin = async (
         {
           subscriber_id: user.id,
           category_id: NotificationCategories.NewMention,
-          object_id: `user-${user.id}`,
           is_active: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // Automatically create a subscription to collaborations
@@ -351,10 +365,9 @@ const finishSsoLogin = async (
         {
           subscriber_id: user.id,
           category_id: NotificationCategories.NewCollaboration,
-          object_id: `user-${user.id}`,
           is_active: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // populate token
@@ -371,10 +384,13 @@ const finishSsoLogin = async (
       const newAddress = await models.Address.findOne({
         where: { address: checksumAddress },
       });
-      serverAnalyticsTrack({
-        event: MixpanelLoginEvent.LOGIN_COMPLETED,
-        isCustomDomain: null,
-      });
+      serverAnalyticsController.track(
+        {
+          event: MixpanelLoginEvent.LOGIN_COMPLETED,
+          userId: reqUser.id,
+        },
+        req,
+      );
       return success(res, { address: newAddress });
     } else {
       // re-fetch user to include address object, if freshly created
@@ -389,12 +405,15 @@ const finishSsoLogin = async (
         if (err)
           return redirectWithLoginError(
             res,
-            `Could not log in with ronin wallet`
+            `Could not sign in with ronin wallet`,
           );
-        serverAnalyticsTrack({
-          event: MixpanelLoginEvent.LOGIN_COMPLETED,
-          isCustomDomain: null,
-        });
+        serverAnalyticsController.track(
+          {
+            event: MixpanelLoginEvent.LOGIN_COMPLETED,
+            userId: newUser.id,
+          },
+          req,
+        );
       });
       return success(res, { user: newUser });
     }

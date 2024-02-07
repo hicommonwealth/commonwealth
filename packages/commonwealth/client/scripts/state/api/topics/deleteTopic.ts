@@ -1,19 +1,20 @@
+import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
-import { useMutation } from '@tanstack/react-query';
 import { ApiEndpoints, queryClient } from 'state/api/config';
 
 interface DeleteTopicProps {
   topicId: number;
-  chainId: string;
+  communityId: string;
   topicName: string;
 }
 
-const deleteTopic = async ({ topicId, chainId }: DeleteTopicProps) => {
-  await axios.post(`${app.serverUrl()}/deleteTopic`, {
-    id: topicId,
-    chain: chainId,
-    jwt: app.user.jwt,
+const deleteTopic = async ({ topicId, communityId }: DeleteTopicProps) => {
+  await axios.delete(`${app.serverUrl()}/topics/${topicId}`, {
+    data: {
+      community_id: communityId,
+      jwt: app.user.jwt,
+    },
   });
 };
 
@@ -22,9 +23,10 @@ const useDeleteTopicMutation = () => {
     mutationFn: deleteTopic,
     onSuccess: async (data, variables) => {
       await queryClient.invalidateQueries({
-        queryKey: [ApiEndpoints.BULK_TOPICS, variables.chainId],
+        queryKey: [ApiEndpoints.BULK_TOPICS, variables.communityId],
       });
-      await app.threads.listingStore.removeTopic(variables.topicName);
+      // TODO: add a new method in thread cache to deal with this
+      // await app.threads.listingStore.removeTopic(variables.topicName);
     },
   });
 };

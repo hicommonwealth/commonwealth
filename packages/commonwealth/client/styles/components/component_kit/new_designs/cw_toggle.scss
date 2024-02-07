@@ -1,0 +1,104 @@
+@import '../../../shared';
+
+.Toggle {
+  background-color: $neutral-200;
+  border-radius: $border-radius-rounded-corners;
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+
+  &.large {
+    height: 24px;
+    width: 44px;
+
+    .slider {
+      height: 20px;
+      width: 20px;
+      left: 2px;
+      top: 2px;
+    }
+  }
+
+  &.small {
+    height: 20px;
+    width: 36px;
+
+    .slider {
+      height: 16px;
+      width: 16px;
+      left: 2px;
+      top: 2px;
+    }
+  }
+
+  &:hover {
+    background-color: $neutral-300;
+  }
+
+  .toggle-input {
+    @include hideInput;
+  }
+
+  .slider {
+    background-color: $white;
+    border-radius: $border-radius-round;
+    left: 2px;
+    position: absolute;
+    top: 2px;
+    transition: all ease-in-out 0.1s;
+    box-shadow: 0px 1px 3px rgba(40, 39, 41, 0.1),
+      0px 1px 2px rgba(40, 39, 41, 0.06);
+
+    &.large {
+      height: 20px;
+      width: 20px;
+    }
+
+    &.small {
+      height: 16px;
+      width: 16px;
+    }
+
+    &.disabled {
+      background-color: $neutral-200;
+    }
+  }
+
+  &.checked {
+    background-color: $primary-500;
+    transition: all ease-in-out 0.1s;
+
+    &:hover {
+      background-color: $primary-600;
+    }
+
+    &.large {
+      .slider {
+        transform: translateX(20px);
+      }
+    }
+
+    &.small {
+      .slider {
+        transform: translateX(16px);
+      }
+    }
+
+    &.disabled {
+      background-color: $neutral-200;
+
+      .slider {
+        background-color: $neutral-100;
+      }
+    }
+  }
+
+  &.disabled {
+    background-color: $neutral-200;
+    pointer-events: none;
+
+    .slider {
+      background-color: $neutral-100;
+    }
+  }
+}

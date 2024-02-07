@@ -1,4 +1,4 @@
-import { Role } from 'server/models/role';
+import type { Role } from '@hicommonwealth/model';
 
 // DEPRECATED. This class is currently obtained by getting Address information.
 // If you can, just query for address instead.
@@ -37,7 +37,7 @@ class CommunityRole {
       allow,
       deny,
       createdAt,
-      updatedAt
+      updatedAt,
     );
   }
 }

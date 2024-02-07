@@ -10,7 +10,7 @@ const NewThreadPage = () => {
 
   useEffect(() => {
     if (!app.isLoggedIn()) {
-      notifyInfo('You need to log in first');
+      notifyInfo('You need to sign in first');
       navigate('/login', {}, null);
       return;
     }

@@ -1,0 +1,174 @@
+@import '../../shared';
+
+.TopicSummaryRow {
+  border-bottom: 1px solid $neutral-200;
+  display: grid;
+  grid-template-columns: 352px 1fr;
+  gap: 16px;
+
+  @include mediumSmallInclusive {
+    display: flex;
+    flex-direction: column;
+    gap: unset;
+  }
+
+  .topic-column {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px 0;
+
+    @include mediumSmallInclusive {
+      gap: unset;
+    }
+
+    .name-and-count {
+      display: flex;
+      flex-direction: column;
+
+      @include mediumSmallInclusive {
+        align-items: center;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+      }
+
+      .topic-name-text.Text {
+        color: $primary-500;
+        width: 100%;
+      }
+
+      .threads-count-text.Text {
+        color: $neutral-500;
+        width: 100%;
+      }
+    }
+  }
+
+  .recent-threads-column {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    .recent-thread-row {
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 16px;
+
+      &.isPinned {
+        background: $neutral-100;
+
+        &:hover {
+          background: $neutral-200;
+        }
+      }
+
+      &:hover {
+        background: $neutral-50;
+      }
+
+      &.isLoading {
+        &:hover {
+          background: unset;
+        }
+      }
+
+      @include mediumSmallInclusive {
+        padding: 16px 8px;
+      }
+
+      .row-top {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+
+        .user-and-date-row {
+          align-items: center;
+          display: flex;
+          gap: 8px;
+
+          .User {
+            align-items: center;
+            display: flex;
+
+            .user-avatar {
+              position: unset;
+            }
+
+            .username {
+              @include caption;
+
+              font-weight: 500;
+            }
+          }
+        }
+
+        .row-top-icons {
+          display: flex;
+          gap: 4px;
+
+          @include flame;
+        }
+      }
+
+      .last-updated-text.Text {
+        color: $neutral-500;
+      }
+
+      .thread-preview {
+        @include multiline-text-ellipsis(2);
+        word-break: break-word;
+
+        .MarkdownFormattedText {
+          @include caption;
+
+          h1,
+          h2,
+          h3,
+          h4,
+          h5 {
+            font-size: 12px;
+          }
+        }
+      }
+
+      .row-bottom {
+        display: flex;
+        justify-content: space-between;
+
+        .comments-and-users {
+          display: flex;
+          gap: 16px;
+
+          .user-gallery {
+            display: flex;
+            gap: 8px;
+
+            .avatars-row {
+              display: flex;
+              flex-direction: row-reverse;
+              justify-content: flex-end;
+
+              > * {
+                border: 2px solid $white;
+                margin-right: -4px;
+              }
+            }
+
+            .Text {
+              color: $neutral-500;
+            }
+          }
+        }
+
+        .row-bottom-menu {
+          display: flex;
+          gap: 16px;
+          margin-left: 8px;
+        }
+      }
+    }
+  }
+}

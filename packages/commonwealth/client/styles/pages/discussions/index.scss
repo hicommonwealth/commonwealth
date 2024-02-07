@@ -8,8 +8,9 @@ $size: 48px;
   flex-direction: column;
   width: 100%;
 
-  div[data-test-id=virtuoso-item-list],
-  div[data-viewport-type=element]>div:first-child {
+  div[data-test-id='virtuoso-item-list'],
+  div[data-viewport-type='element'] > div:first-child,
+  .threads-wrapper {
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -24,21 +25,32 @@ $size: 48px;
     }
 
     @include smallInclusive {
-      padding: 24px;
+      padding: 16px;
     }
   }
 
-  div[data-test-id=virtuoso-item-list] {
+  div[data-test-id='virtuoso-item-list'] {
     gap: 2px;
   }
 
-  div[data-viewport-type=element]>div:first-child {
+  div[data-viewport-type='element'] > div:first-child {
     padding-bottom: 16px !important;
   }
 
   .no-threads-text {
     color: $neutral-500;
     margin-left: 40px;
+  }
+
+  .mobileBreadcrumbs {
+    margin-left: -24px;
+    margin-top: -16px;
+    min-height: 40px;
+
+    @include small {
+      margin-left: -24px;
+      margin-top: -8px;
+    }
   }
 
   .RecentThreads {
@@ -66,4 +78,11 @@ $size: 48px;
     align-items: center;
     padding: 24px;
   }
+}
+
+.floating-mobile-button {
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+  z-index: 1;
 }

@@ -13,7 +13,7 @@ type BannerProps = {
   onClose?: () => void;
 };
 
-export const CWBanner = ({
+export const Old_CWBanner = ({
   bannerContent,
   className,
   onClose,

@@ -1,0 +1,36 @@
+@import '../../../../../../styles/shared.scss';
+
+.MessageRow {
+  display: flex;
+  align-items: center;
+
+  .icon {
+    display: grid;
+    align-items: center;
+    justify-content: center;
+
+    &.success > svg {
+      color: $green-600;
+    }
+
+    &.failure > svg {
+      color: $rorange-500;
+    }
+  }
+
+  .feedback-message-text.Text {
+    display: grid;
+    align-items: flex-end;
+    justify-content: flex-end;
+    text-align: left;
+    margin-left: 4px;
+
+    &.success {
+      color: $green-600;
+    }
+
+    &.failure {
+      color: $rorange-500;
+    }
+  }
+}

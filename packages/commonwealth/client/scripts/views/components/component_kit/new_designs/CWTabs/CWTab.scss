@@ -1,0 +1,53 @@
+@import '../../../../../../styles/shared.scss';
+
+.Tab {
+  outline: none;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid transparent;
+
+  &.isSelected {
+    border-bottom: 2px solid $primary-500;
+
+    .label {
+      color: $neutral-700;
+      -webkit-text-stroke: 0.5px $neutral-700;
+    }
+  }
+
+  &.isDisabled {
+    cursor: not-allowed;
+    filter: grayscale(1);
+
+    .label {
+      color: $neutral-400;
+    }
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:hover:not(.isDisabled) {
+    .label {
+      color: $neutral-700;
+      -webkit-text-stroke: 0.5px $neutral-700;
+    }
+  }
+
+  .label {
+    display: block;
+    color: $neutral-500;
+    max-width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .Tag {
+    margin-left: 10px;
+  }
+}

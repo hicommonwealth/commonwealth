@@ -1,9 +1,4 @@
 import type { IAaveProposalResponse } from 'adapters/chain/aave/types';
-import { AaveEvents } from 'chain-events/src';
-import { AaveTypes } from 'chain-events/src/types';
-import type { Executor } from 'common-common/src/eth/types';
-import { chainToEventNetwork } from 'controllers/server/chain_entities';
-import type { ITXModalData } from '../../../../models/interfaces';
 import ProposalModule from '../../../../models/ProposalModule';
 import type { IApp } from 'state';
 import type EthereumAccounts from '../accounts';
@@ -12,9 +7,13 @@ import type AaveApi from './api';
 import type AaveChain from './chain';
 
 import AaveProposal from './proposal';
+import Aave from 'controllers/chain/ethereum/aave/adapter';
+import axios from 'axios';
+import { ApiEndpoints } from 'state/api/config';
+import { deserializeBigNumbers } from 'controllers/chain/ethereum/util';
 
 export interface AaveProposalArgs {
-  executor: Executor | string;
+  executor: string;
   targets: string[];
   values: string[];
   signatures: string[];
@@ -30,7 +29,6 @@ export default class AaveGovernance extends ProposalModule<
 > {
   // CONSTANTS
   private _Accounts: EthereumAccounts;
-  private _Chain: AaveChain;
   private _api: AaveApi;
 
   // GETTERS
@@ -39,8 +37,8 @@ export default class AaveGovernance extends ProposalModule<
   }
 
   // INIT / DEINIT
-  constructor(app: IApp, private _usingServerChainEntities = false) {
-    super(app, (e) => new AaveProposal(this._Chain, this._Accounts, this, e));
+  constructor(app: IApp) {
+    super(app);
   }
 
   // METHODS
@@ -71,13 +69,10 @@ export default class AaveGovernance extends ProposalModule<
       throw new Error('all argument arrays must have the same length');
     }
 
-    // validate executor
-    const ex =
-      typeof executor === 'string' ? this._api.getExecutor(executor) : executor;
-    if (!ex) {
+    const executorContract = await this._api.getDeployedExecutor(executor);
+    if (!executorContract) {
       throw new Error('Executor not found.');
     }
-    const executorContract = ex.contract;
     const isExecutorAuthorized =
       await this._api.Governance.isExecutorAuthorized(executorContract.address);
     if (!isExecutorAuthorized) {
@@ -97,7 +92,10 @@ export default class AaveGovernance extends ProposalModule<
     }
 
     // send transaction
-    const contract = await attachSigner(this.app.user.activeAccount, this._api.Governance);
+    const contract = await attachSigner(
+      this.app.user.activeAccount,
+      this._api.Governance
+    );
     const tx = await contract.create(
       executorContract.address,
       targets,
@@ -115,55 +113,43 @@ export default class AaveGovernance extends ProposalModule<
   }
 
   public async init(chain: AaveChain, accounts: EthereumAccounts) {
-    this._Chain = chain;
     this._Accounts = accounts;
     this._api = chain.aaveApi;
 
-    // load server proposals
-    console.log('Fetching aave proposals from backend.');
-    await this.app.chainEntities.refresh(this.app.chain.id);
-    const entities = this.app.chainEntities.getByType(
-      AaveTypes.EntityKind.Proposal
-    );
-    entities.forEach((e) => this._entityConstructor(e));
-    console.log(`Found ${entities.length} proposals!`);
-
-    await Promise.all(this.store.getAll().map((p) => p.init()));
-
-    // register new chain-event handlers
-    this.app.chainEntities.registerEntityHandler(
-      AaveTypes.EntityKind.Proposal,
-      (entity, event) => {
-        this.updateProposal(entity, event);
-      }
-    );
-
-    // kick off listener
-    const chainEventsContracts: AaveTypes.Api = {
-      governance: this._api.Governance as any,
-    };
-    const subscriber = new AaveEvents.Subscriber(
-      chainEventsContracts,
-      this.app.chain.id
-    );
-    const processor = new AaveEvents.Processor(chainEventsContracts);
-    await this.app.chainEntities.subscribeEntities(
-      this.app.chain.id,
-      chainToEventNetwork(this.app.chain.meta),
-      subscriber,
-      processor
-    );
-
+    // set init to true without fetching proposals so chainAdapterReady emits true
     this._initialized = true;
   }
 
-  public deinit() {
-    this.app.chainEntities.deinit();
-    this.store.clear();
+  static async getProposals(aaveChain: Aave) {
+    const { chain, accounts, governance, meta } = aaveChain;
+    const res = await axios.get(
+      `${chain.app.serverUrl()}${ApiEndpoints.FETCH_PROPOSALS}`,
+      {
+        params: {
+          chainId: meta.id,
+        },
+      }
+    );
+
+    const proposals: IAaveProposalResponse[] = res.data.result.proposals;
+    proposals.forEach((p) => {
+      // this check is necessary because the store serializes the proposal instance if it already exists
+      // thus replacing the proposal instance with a regular object
+      if (!governance.store.getByIdentifier(p.identifier)) {
+        new AaveProposal(accounts, governance, deserializeBigNumbers(p));
+      }
+    });
+
+    await Promise.all(
+      governance.store.getAll().map((p) => {
+        p.init();
+      })
+    );
+
+    return governance.store.getAll();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public createTx(...args: any[]): ITXModalData {
-    throw new Error('Method not implemented.');
+  public deinit() {
+    this.store.clear();
   }
 }

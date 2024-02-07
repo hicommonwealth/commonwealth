@@ -1,14 +1,18 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import 'components/thread_selector.scss';
-import { notifyError } from 'controllers/app/notifications';
-import NewProfilesController from '../../../controllers/server/newProfiles';
-import type Thread from '../../../models/Thread';
-import type { SearchParams } from 'models/SearchQuery';
+import AddressInfo from 'models/AddressInfo';
 import app from 'state';
-import { CWTextInput } from '../component_kit/cw_text_input';
+import { useDebounce } from 'usehooks-ts';
 import { QueryList } from 'views/components/component_kit/cw_query_list';
 import { ThreadSelectorItem } from 'views/components/thread_selector/thread_selector_item';
+import {
+  APIOrderBy,
+  APIOrderDirection,
+} from '../../../../scripts/helpers/constants';
+import { useSearchThreadsQuery } from '../../../../scripts/state/api/threads';
+import Thread from '../../../models/Thread';
+import { CWTextInput } from '../component_kit/cw_text_input';
 
 type ThreadSelectorProps = {
   linkedThreadsToSet: Array<Thread>;
@@ -19,69 +23,60 @@ export const ThreadSelector = ({
   linkedThreadsToSet,
   onSelect,
 }: ThreadSelectorProps) => {
-  const [inputTimeout, setInputTimeout] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [searchResults, setSearchResults] = useState<Thread[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [showOnlyLinkedThreads, setShowOnlyLinkedThreads] = useState(true);
 
-  const queryLength = searchTerm?.trim()?.length;
+  const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
+
+  const sharedQueryOptions = {
+    communityId: app.activeChainId(),
+    searchTerm: debouncedSearchTerm,
+    limit: 5,
+    orderBy: APIOrderBy.Rank,
+    orderDirection: APIOrderDirection.Desc,
+    threadTitleOnly: true,
+  };
+  const queryEnabled = debouncedSearchTerm?.trim().length > 0;
+
+  const { data: threadsData, isLoading } = useSearchThreadsQuery({
+    ...sharedQueryOptions,
+    enabled: queryEnabled,
+  });
+
+  const searchResults = useMemo(() => {
+    const threads = threadsData?.pages?.[0]?.results || [];
+    return threads.map(
+      (t) =>
+        new Thread({
+          id: t.id,
+          title: t.title,
+          community_id: t.community_id,
+          Address: new AddressInfo({
+            id: t.address_id,
+            address: t.address,
+            chainId: t.address_chain,
+          }),
+        } as ConstructorParameters<typeof Thread>[0]),
+    );
+  }, [threadsData]);
 
   const getEmptyContentMessage = () => {
-    if (queryLength > 0 && queryLength < 5) {
-      return 'Query too short';
-    } else if (queryLength >= 5 && !searchResults.length) {
+    if (!queryEnabled) {
+      return 'Type a thread title to search';
+    } else if (searchResults.length === 0) {
       return 'No threads found';
     } else if (!linkedThreadsToSet?.length) {
       return 'No currently linked threads';
     }
   };
 
-  const options =
-    showOnlyLinkedThreads && !queryLength ? linkedThreadsToSet : searchResults;
+  const options = !queryEnabled ? linkedThreadsToSet : searchResults;
 
-  const handleInputChange = (e) => {
-    const target = e.target as HTMLInputElement;
-    clearTimeout(inputTimeout);
-    setSearchTerm(target.value);
-    setShowOnlyLinkedThreads(false);
-
-    const inputTimeoutRef = setTimeout(async () => {
-      if (target.value?.trim().length > 4) {
-        setLoading(true);
-        const inputValue = target.value.trim();
-        const params: SearchParams = {
-          chainScope: app.activeChainId(),
-          pageSize: 20,
-        };
-
-        app.search
-          .searchThreadTitles(inputValue, params)
-          .then((results) => {
-            setSearchResults(results);
-            setLoading(false);
-            results.forEach((thread) => {
-              NewProfilesController.Instance.getProfile(
-                thread.authorChain,
-                thread.author
-              );
-            });
-          })
-          .catch(() => {
-            setLoading(false);
-            notifyError('Could not find matching thread');
-          });
-      } else if (target.value?.length === 0) {
-        setShowOnlyLinkedThreads(true);
-      }
-    }, 250);
-    setInputTimeout(inputTimeoutRef);
+  const handleInputChange = (e: any) => {
+    setSearchTerm(e.target.value);
   };
 
   const handleClearButtonClick = () => {
     setSearchTerm('');
-    setSearchResults([]);
-    setShowOnlyLinkedThreads(true);
   };
 
   const renderItem = useCallback(
@@ -96,7 +91,7 @@ export const ThreadSelector = ({
         />
       );
     },
-    [linkedThreadsToSet, onSelect]
+    [linkedThreadsToSet, onSelect],
   );
 
   const EmptyComponent = () => (
@@ -114,7 +109,7 @@ export const ThreadSelector = ({
       />
 
       <QueryList
-        loading={loading}
+        loading={queryEnabled ? isLoading : false}
         options={options}
         components={{ EmptyPlaceholder: EmptyComponent }}
         renderItem={renderItem}

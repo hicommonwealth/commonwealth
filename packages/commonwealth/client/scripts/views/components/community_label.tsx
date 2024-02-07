@@ -5,9 +5,10 @@ import { CWCommunityAvatar } from './component_kit/cw_community_avatar';
 import type { IconSize } from './component_kit/cw_icons/types';
 
 import { CWText } from './component_kit/cw_text';
+import ChainInfo from 'client/scripts/models/ChainInfo';
 
 type CommunityLabelProps = {
-  community: any;
+  community: ChainInfo;
   size?: IconSize;
 };
 

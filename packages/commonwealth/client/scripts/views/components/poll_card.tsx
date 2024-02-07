@@ -1,17 +1,22 @@
-import React, { useState } from 'react';
+import React, { FC, useState } from 'react';
 
-import 'components/poll_card.scss';
-
-import { CWButton } from './component_kit/cw_button';
 import { CWCard } from './component_kit/cw_card';
 import { CWCheckbox } from './component_kit/cw_checkbox';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
-import { CWTooltip } from './component_kit/cw_popover/cw_tooltip';
 import { CWProgressBar } from './component_kit/cw_progress_bar';
 import { CWRadioButton } from './component_kit/cw_radio_button';
 import { CWText } from './component_kit/cw_text';
 import { getClasses } from './component_kit/helpers';
-import { Modal } from './component_kit/cw_modal';
+import {
+  CWModal,
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from './component_kit/new_designs/CWModal';
+import { CWButton } from './component_kit/new_designs/cw_button';
+
+import 'components/poll_card.scss';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 
 const LIVE_PREVIEW_MAX = 3;
 const ENDED_PREVIEW_MAX = 1;
@@ -32,6 +37,11 @@ export type PollOptionProps = {
   selectedOptions?: Array<string>;
   disableVoteOptions?: boolean;
   setSelectedOptions?: React.Dispatch<React.SetStateAction<string[]>>;
+};
+
+type DeletePollModalProps = {
+  onDelete: any;
+  onClose: () => void;
 };
 
 export const PollOptions = ({
@@ -92,22 +102,28 @@ export const CastVoteSection = ({
     <div className="CastVoteSection">
       {disableVoteButton ? (
         <CWTooltip
+          placement="top"
           content={tooltipErrorMessage ?? 'Select an option to vote.'}
           renderTrigger={(handleInteraction) => (
-            <CWButton
+            <div
               onMouseEnter={handleInteraction}
               onMouseLeave={handleInteraction}
-              label="Vote"
-              buttonType="mini-black"
-              disabled={disableVoteButton}
-              onClick={() => onVoteCast()}
-            />
+            >
+              <CWButton
+                label="Vote"
+                buttonType="primary"
+                buttonHeight="sm"
+                disabled={disableVoteButton}
+                onClick={() => onVoteCast()}
+              />
+            </div>
           )}
         />
       ) : (
         <CWButton
           label="Vote"
-          buttonType="mini-black"
+          buttonType="primary"
+          buttonHeight="sm"
           disabled={disableVoteButton}
           onClick={() => onVoteCast()}
         />
@@ -124,6 +140,7 @@ export type VoteDisplayProps = {
   voteDirectionString: string;
   pollEnded: boolean;
   voteInformation: Array<VoteInformation>;
+  isSnapshot: boolean;
 };
 
 export const VoteDisplay = ({
@@ -131,9 +148,10 @@ export const VoteDisplay = ({
   timeRemaining,
   voteDirectionString,
   voteInformation,
+  isSnapshot,
 }: VoteDisplayProps) => {
   const topResponse = voteInformation.sort(
-    (option1, option2) => option2.voteCount - option1.voteCount
+    (option1, option2) => option2.voteCount - option1.voteCount,
   )[0].label;
 
   return (
@@ -154,7 +172,9 @@ export const VoteDisplay = ({
         </>
       ) : (
         <div className="completed-vote-information">
-          <CWText type="caption">This Poll is Complete</CWText>
+          <CWText type="caption">{`This ${
+            isSnapshot ? 'Proposal' : 'Poll'
+          } is Complete`}</CWText>
           <CWText type="caption">{`"${topResponse}" was the Top Response`}</CWText>
           {voteDirectionString !== '' && (
             <CWText
@@ -279,24 +299,40 @@ export const ResultsSection = ({
   );
 };
 
-const DeletePollModal = ({ onClickDelete }) => {
+export const DeletePollModal: FC<DeletePollModalProps> = ({
+  onDelete,
+  onClose,
+}) => {
   const handleDeleteClick = async (e) => {
     e.preventDefault();
-    await onClickDelete();
+    await onDelete();
     // Assuming you are using a library like 'react-modal', you can trigger the modal exit using that library's methods.
   };
 
   return (
     <div className="DeleteThreadModal">
-      <div className="compact-modal-title">
-        <CWText className="modal-text">Delete this poll?</CWText>
-      </div>
-      <div className="compact-modal-body">
-        <div className="modal-body">
-          <CWText>This action cannot be reversed.</CWText>
-          <CWButton label="confirm" onClick={handleDeleteClick} />
-        </div>
-      </div>
+      <CWModalHeader
+        label="Delete this poll?"
+        icon="danger"
+        onModalClose={onClose}
+      />
+      <CWModalBody>
+        <CWText>This action cannot be reversed.</CWText>
+      </CWModalBody>
+      <CWModalFooter>
+        <CWButton
+          label="Cancel"
+          buttonType="secondary"
+          buttonHeight="sm"
+          onClick={onClose}
+        />
+        <CWButton
+          buttonType="destructive"
+          buttonHeight="sm"
+          label="Confirm"
+          onClick={handleDeleteClick}
+        />
+      </CWModalFooter>
     </div>
   );
 };
@@ -353,13 +389,15 @@ export const PollCard = ({
         <CWText type="b2" className="poll-title-text">
           {proposalTitle}
         </CWText>
-        <Modal
+        <CWModal
+          size="small"
           content={
             <DeletePollModal
-              onClickDelete={async () => {
+              onDelete={async () => {
                 if (onDeleteClick) onDeleteClick();
                 setDeleteModalOpen(false);
               }}
+              onClose={() => setDeleteModalOpen(false)}
             />
           }
           onClose={() => setDeleteModalOpen(false)}
@@ -407,6 +445,7 @@ export const PollCard = ({
             }
             pollEnded={pollEnded}
             voteInformation={voteInformation}
+            isSnapshot={false}
           />
         )}
       </div>

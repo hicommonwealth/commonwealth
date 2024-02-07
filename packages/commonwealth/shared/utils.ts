@@ -1,12 +1,11 @@
+import { AccessLevel, RoleObject } from '@hicommonwealth/core';
+import { Dec, IntPretty } from '@keplr-wallet/unit';
 import { isHex, isU8a } from '@polkadot/util';
 import {
   checkAddress,
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
-import { ProposalType } from 'common-common/src/types';
-import { AccessLevel } from './permissions';
-import type { RoleObject } from './types';
 
 export const slugify = (str: string): string => {
   // Remove any character that isn't a alphanumeric character or a
@@ -36,16 +35,6 @@ export const slugifyPreserveDashes = (str: string): string => {
     .toLowerCase();
 };
 
-export const requiresTypeSlug = (type: ProposalType): boolean => {
-  return (
-    type === ProposalType.SubstrateDemocracyReferendum ||
-    type === ProposalType.SubstrateDemocracyProposal ||
-    type === ProposalType.SubstrateTreasuryTip ||
-    type === ProposalType.SubstrateTechnicalCommitteeMotion ||
-    type === ProposalType.SubstrateTreasuryProposal
-  );
-};
-
 /* eslint-disable */
 export const getThreadUrl = (
   thread: {
@@ -54,7 +43,7 @@ export const getThreadUrl = (
     id?: string | number;
     title?: string;
   },
-  comment?: string | number
+  comment?: string | number,
 ): string => {
   const aId = thread.chain;
   const tId = thread.type_id || thread.id;
@@ -69,7 +58,7 @@ export const getThreadUrl = (
 export const getThreadUrlWithoutObject = (
   proposalCommunity,
   proposalId,
-  comment?
+  comment?,
 ) => {
   const aId = proposalCommunity;
   const tId = proposalId;
@@ -104,7 +93,7 @@ export const validURL = (str) => {
       '(\\:\\d+)?(\\/[-a-z\\d%_.~+:@]*)*' + // port and path
       '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
       '(\\#[-a-z\\d_]*)?$',
-    'i'
+    'i',
   ); // fragment locator
   return !!pattern.test(str);
 };
@@ -197,20 +186,19 @@ export function formatAddressShort(
   address: string,
   chain?: string,
   includeEllipsis?: boolean,
-  maxCharLength?: number
+  maxCharLength?: number,
+  prefix?: string,
 ) {
   if (!address) return;
   if (chain === 'near') {
     return `@${address}`;
-  } else if (
-    chain === 'straightedge' ||
-    chain === 'cosmoshub' ||
-    chain === 'osmosis' ||
-    chain === 'injective' ||
-    chain === 'injective-testnet' ||
-    chain === 'osmosis-local'
-  ) {
-    return `${address.slice(0, 9)}${includeEllipsis ? '…' : ''}`;
+  } else if (prefix && !maxCharLength) {
+    if (!includeEllipsis) return address;
+    const totalLength = address.length;
+    return `${address.slice(0, prefix.length + 3)}...${address.slice(
+      totalLength - 4,
+      totalLength,
+    )}`;
   } else {
     return `${address.slice(0, maxCharLength || 5)}${
       includeEllipsis ? '…' : ''
@@ -242,7 +230,7 @@ export const addressSwapper = (options: {
   // check if it is valid with the current prefix & reencode if needed
   const [valid, errorMsg] = checkAddress(
     options.address,
-    options.currentPrefix
+    options.currentPrefix,
   );
 
   if (!valid) {
@@ -258,7 +246,7 @@ export const addressSwapper = (options: {
 
 export function aggregatePermissions(
   roles: RoleObject[],
-  chain_permissions: { allow: number; deny: number }
+  chain_permissions: { allow: number; deny: number },
 ) {
   const ORDER: AccessLevel[] = [
     AccessLevel.Member,
@@ -282,4 +270,64 @@ export function aggregatePermissions(
 
   // compute permissions
   return BigInt(0); //bandaid fix. always allow permissions due to removing functionality.
+}
+
+/**
+ * Convert Cosmos-style minimal denom amount to readable full-denom amount
+ * Example 7000000 uosmo -> 7 OSMO
+ * Example 8000000000000000000 aevmos -> 8 EVMOS
+ */
+export function minimalToNaturalDenom(
+  amount?: string | number,
+  decimals?: number,
+): string {
+  if (!amount || !decimals) return '0';
+  const intPretty = new IntPretty(
+    new Dec(amount.toString()),
+  ).moveDecimalPointLeft(decimals);
+
+  // return full decimal precision and let the UI handle rounding
+  return intPretty.toDec().toString(decimals);
+}
+
+/**
+ * Convert readable full-denom amount to minimal denom amount (BigInt)
+ * Example 8 OSMO -> 8000000 uosmo
+ * Example 8 EVMOS -> 8000000000000000000 aevmos
+ * Intended for Cosmos use (decimals usually 6 or 18)
+ */
+export function naturalDenomToMinimal(
+  naturalAmount?: string | number,
+  decimals?: number,
+): string {
+  if (!naturalAmount || !decimals) return '0';
+  const intPretty = new IntPretty(
+    new Dec(naturalAmount.toString()),
+  ).moveDecimalPointRight(decimals);
+
+  // 0 decimal places because this is max precision for the chain
+  return intPretty.toDec().toString(0);
+}
+
+/**
+ * Convert Cosmos bech32 address to a hexadecimal string
+ * hex is used as a common identifier for addresses across chains.
+ * This allows us to achieve One Signer, One Account
+ *
+ * Example:
+ * bech32ToHex('osmo18q3tlnx8vguv2fadqslm7x59ejauvsmnhltgq6') => '3822bfccc76238c527ad043fbf1a85ccbbc64373'
+ * bech32ToHex('cosmos18q3tlnx8vguv2fadqslm7x59ejauvsmnlycckg') => '3822bfccc76238c527ad043fbf1a85ccbbc64373' (same)
+ *
+ * Caveat: Ethermint addresses will share a hex, but it will differ from
+ * their siblings on standard Cosmos derivation paths.
+ * e.g. evmos hex != osmo hex, but evmos hex == inj hex
+ */
+export async function bech32ToHex(address: string) {
+  const { toHex, fromBech32 } = await import('@cosmjs/encoding');
+  try {
+    const encodedData = fromBech32(address).data;
+    return toHex(encodedData);
+  } catch (e) {
+    console.log(`Error converting bech32 to hex: ${e}. Hex was not generated.`);
+  }
 }

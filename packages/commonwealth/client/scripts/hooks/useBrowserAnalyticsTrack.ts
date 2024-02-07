@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
+import app from 'state';
 import { clientAnalyticsTrack } from '../../../shared/analytics/client-track';
 import { AnalyticsPayload } from '../../../shared/analytics/types';
-import app from 'state';
 
 /**
  * Hook to capture analytics events on the browser
@@ -24,7 +24,12 @@ export function useBrowserAnalyticsTrack<T extends AnalyticsPayload>({
       try {
         clientAnalyticsTrack({
           ...payload,
-          userAddress: app.user?.activeAccount?.address ?? null,
+          // use active account if available; otherwise, use one of user's addresses
+          userAddress:
+            (app.user?.activeAccount?.address ||
+              app.user?.addresses[0]?.address) ??
+            null,
+          community: app.activeChainId(),
         });
         hasFiredRef.current = true;
       } catch (e) {
@@ -40,13 +45,15 @@ export function useBrowserAnalyticsTrack<T extends AnalyticsPayload>({
         try {
           clientAnalyticsTrack({
             ...actionPayload,
+            userAddress: app.user?.activeAccount?.address ?? null,
+            community: app.activeChainId(),
           });
         } catch (e) {
           console.log('Failed to track event:', e.message);
         }
       }
     },
-    [onAction]
+    [onAction],
   );
 
   return { trackAnalytics };

@@ -1,177 +1,143 @@
-import 'components/ReactionButton/CommentReactionButton.scss';
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import React, { useState, useEffect } from 'react';
+import { notifyError } from 'controllers/app/notifications';
+import { SessionKeyError } from 'controllers/server/sessions';
+import { featureFlags } from 'helpers/feature-flags';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import React, { useState } from 'react';
 import app from 'state';
-import type ChainInfo from '../../../models/ChainInfo';
+import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import type Comment from '../../../models/Comment';
-import Permissions from '../../../utils/Permissions';
+import {
+  useCreateCommentReactionMutation,
+  useDeleteCommentReactionMutation,
+} from '../../../state/api/comments';
+import { AuthModal } from '../../modals/AuthModal';
 import { LoginModal } from '../../modals/login_modal';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import ReactionCount from '../../../models/ReactionCount';
-import { CWIconButton } from '../component_kit/cw_icon_button';
-import { CWText } from '../component_kit/cw_text';
-import { Modal } from '../component_kit/cw_modal';
-import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
-import {
-  getClasses,
-  isWindowMediumSmallInclusive,
-} from '../component_kit/helpers';
-import {
-  fetchReactionsByComment,
-  getDisplayedReactorsForPopup,
-  onReactionClick,
-} from './helpers';
+import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
+import { CWModal } from '../component_kit/new_designs/CWModal';
+import { getDisplayedReactorsForPopup } from './helpers';
 
 type CommentReactionButtonProps = {
   comment: Comment<any>;
+  disabled: boolean;
+  tooltipText?: string;
+  onReaction?: () => void;
 };
 
 export const CommentReactionButton = ({
   comment,
+  disabled,
+  tooltipText = '',
+  onReaction,
 }: CommentReactionButtonProps) => {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [reactors, setReactors] = useState<Array<any>>([]);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [reactionCounts, setReactionCounts] = useState<ReactionCount<any>>();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
-  useEffect(() => {
-    const redrawFunction = (comment_id) => {
-      if (comment_id !== comment.id) {
-        return;
-      }
-
-      setReactionCounts(app.reactionCounts.store.getByPost(comment));
-    };
-
-    app.reactionCounts.isFetched.on('redraw', redrawFunction);
-
-    return () => {
-      app.reactionCounts.isFetched.off('redraw', redrawFunction);
-    };
+  const {
+    mutateAsync: createCommentReaction,
+    error: createCommentReactionError,
+    reset: resetCreateCommentReaction,
+  } = useCreateCommentReactionMutation({
+    threadId: comment.threadId,
+    commentId: comment.id,
+    communityId: app.activeChainId(),
+  });
+  const {
+    mutateAsync: deleteCommentReaction,
+    error: deleteCommentReactionError,
+    reset: resetDeleteCommentReaction,
+  } = useDeleteCommentReactionMutation({
+    commentId: comment.id,
+    communityId: app.activeChainId(),
+    threadId: comment.threadId,
   });
 
-  const { likes = 0, hasReacted } = reactionCounts || {};
+  const resetSessionRevalidationModal = createCommentReactionError
+    ? resetCreateCommentReaction
+    : resetDeleteCommentReaction;
 
-  // token balance check if needed
-  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
-
-  const parentThread = app.threads.getById(comment.threadId);
-
-  const topicName = parentThread?.topic?.name;
-
-  const isUserForbidden = !isAdmin && TopicGateCheck.isGatedTopic(topicName);
+  const { RevalidationModal } = useSessionRevalidationModal({
+    handleClose: resetSessionRevalidationModal,
+    error: createCommentReactionError || deleteCommentReactionError,
+  });
 
   const activeAddress = app.user.activeAccount?.address;
+  const hasReacted = !!(comment.reactions || []).find(
+    (x) => x?.author === activeAddress,
+  );
+  const likes = (comment.reactions || []).length;
 
-  const dislike = async (userAddress: string) => {
-    const reaction = (await fetchReactionsByComment(comment.id)).find((r) => {
-      return r.Address.address === activeAddress;
-    });
+  const handleVoteClick = async (e) => {
+    e.stopPropagation();
+    e.preventDefault();
 
-    setIsLoading(true);
+    if (!app.isLoggedIn() || !app.user.activeAccount) {
+      setIsAuthModalOpen(true);
+      return;
+    }
 
-    app.reactionCounts
-      .delete(reaction, {
-        ...reactionCounts,
-        likes: likes - 1,
-        hasReacted: false,
-      })
-      .then(() => {
-        setReactors(
-          reactors.filter(({ Address }) => Address.address !== userAddress)
-        );
+    onReaction();
 
-        setReactionCounts(app.reactionCounts.store.getByPost(comment));
-        setIsLoading(false);
+    if (hasReacted) {
+      const foundReaction = comment.reactions.find((r) => {
+        return r.author === activeAddress;
       });
-  };
-
-  const like = (chain: ChainInfo, chainId: string, userAddress: string) => {
-    setIsLoading(true);
-
-    app.reactionCounts
-      .createCommentReaction(userAddress, comment, 'like', chainId)
-      .then(() => {
-        setReactors([
-          ...reactors,
-          {
-            Address: { address: userAddress, chain },
-          },
-        ]);
-
-        setReactionCounts(app.reactionCounts.store.getByPost(comment));
-        setIsLoading(false);
+      deleteCommentReaction({
+        communityId: app.activeChainId(),
+        address: app.user.activeAccount.address,
+        canvasHash: foundReaction.canvasHash,
+        reactionId: foundReaction.id,
+      }).catch((err) => {
+        if (err instanceof SessionKeyError) {
+          return;
+        }
+        console.error(err.response.data.error || err?.message);
+        notifyError('Failed to update reaction count');
       });
+    } else {
+      createCommentReaction({
+        address: activeAddress,
+        commentId: comment.id,
+        communityId: app.activeChainId(),
+        threadId: comment.threadId,
+      }).catch((err) => {
+        if (err instanceof SessionKeyError) {
+          return;
+        }
+        console.error(err?.responseJSON?.error || err?.message);
+        notifyError('Failed to save reaction');
+      });
+    }
   };
 
   return (
     <>
-      <Modal
-        content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
-        isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-        onClose={() => setIsModalOpen(false)}
-        open={isModalOpen}
-      />
-      <button
-        className={getClasses<{ disabled?: boolean }>(
-          { disabled: isLoading || isUserForbidden },
-          `CommentReactionButton ${hasReacted ? ' has-reacted' : ''}`
-        )}
-        onMouseEnter={async () => {
-          setReactors(await fetchReactionsByComment(comment.id));
-        }}
-        onClick={async (e) => {
-          e.stopPropagation();
-          e.preventDefault();
-
-          if (!app.isLoggedIn() || !app.user.activeAccount) {
-            setIsModalOpen(true);
-          } else {
-            onReactionClick(e, hasReacted, dislike, like);
+      {!featureFlags.newSignInModal ? (
+        <CWModal
+          content={
+            <LoginModal onModalClose={() => setIsAuthModalOpen(false)} />
           }
-        }}
-      >
-        {likes > 0 ? (
-          <CWTooltip
-            content={
-              <div className="reaction-button-tooltip-contents">
-                {getDisplayedReactorsForPopup({
-                  reactors: reactors.map((r) => r.Address.address),
-                })}
-              </div>
-            }
-            renderTrigger={(handleInteraction) => (
-              <div
-                onMouseEnter={handleInteraction}
-                onMouseLeave={handleInteraction}
-                className="btn-container"
-              >
-                <CWIcon
-                  iconName="upvote"
-                  iconSize="small"
-                  {...(hasReacted && { weight: 'fill' })}
-                />
-                <div
-                  className={`reactions-count ${
-                    hasReacted ? ' has-reacted' : ''
-                  }`}
-                >
-                  {likes}
-                </div>
-              </div>
-            )}
-          />
-        ) : (
-          <>
-            <CWIcon iconName="upvote" iconSize="small" />
-            <div
-              className={`reactions-count ${hasReacted ? ' has-reacted' : ''}`}
-            >
-              {likes}
-            </div>
-          </>
-        )}
-      </button>
+          isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
+          onClose={() => setIsAuthModalOpen(false)}
+          open={isAuthModalOpen}
+        />
+      ) : (
+        <AuthModal
+          onClose={() => setIsAuthModalOpen(false)}
+          isOpen={isAuthModalOpen}
+        />
+      )}
+      {RevalidationModal}
+      <CWUpvoteSmall
+        voteCount={likes}
+        disabled={!hasJoinedCommunity || disabled}
+        selected={hasReacted}
+        onClick={handleVoteClick}
+        popoverContent={getDisplayedReactorsForPopup({
+          reactors: (comment.reactions || []).map((r) => r.author),
+        })}
+        tooltipText={tooltipText}
+      />
     </>
   );
 };

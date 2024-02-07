@@ -1,22 +1,22 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/core';
+import { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-import { Op } from 'sequelize';
 
 export const Errors = {
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
 };
 
 export default async (
-  models,
+  models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.user) {
     return next(new AppError(Errors.NotLoggedIn));
   }
 
-  const associationParams: any = [
+  const associationParams = [
     {
       model: models.Thread,
       as: 'Thread',
@@ -33,18 +33,16 @@ export default async (
       include: [models.Address],
     },
     {
-      model: models.Chain,
-      as: 'Chain',
+      model: models.Community,
+      as: 'Community',
       required: false,
       where: { active: true },
     },
   ];
 
-  const searchParams: any[] = [{ subscriber_id: req.user.id }];
-
   const subscriptions = await models.Subscription.findAll({
     where: {
-      [Op.and]: searchParams,
+      subscriber_id: req.user.id,
     },
     include: [...associationParams],
   });

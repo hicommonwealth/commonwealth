@@ -9,13 +9,13 @@ import AaveProposal, {
   AaveProposalVote,
 } from 'controllers/chain/ethereum/aave/proposal';
 import { CompoundProposalVote } from 'controllers/chain/ethereum/compound/proposal';
-import { SubstrateDemocracyVote } from 'controllers/chain/substrate/democracy_referendum';
 import type { IVote } from '../../../models/interfaces';
 import type { AnyProposal } from '../../../models/types';
 import { VotingUnit } from '../../../models/types';
 import { BinaryVote, DepositVote } from '../../../models/votes';
 
 import app from 'state';
+import Account from '../../../models/Account';
 import { User } from '../../components/user/user';
 import { CWText } from '../component_kit/cw_text';
 
@@ -70,9 +70,26 @@ export const VoteListing = (props: VoteListingProps) => {
 
   if (proposal instanceof AaveProposal) {
     (sortedVotes as AaveProposalVote[]).sort((v1, v2) =>
-      v2.power.cmp(v1.power)
+      v2.power.cmp(v1.power),
     );
   }
+
+  const VoterInfo = ({
+    voter,
+    shouldShowPopover = true,
+  }: {
+    voter: Account;
+    shouldShowPopover?: boolean;
+  }) => {
+    return (
+      <User
+        userAddress={voter.address}
+        userCommunityId={voter.community?.id || voter.profile?.chain}
+        shouldLinkProfile
+        shouldShowPopover={shouldShowPopover}
+      />
+    );
+  };
 
   return (
     <div className="VoteListing">
@@ -91,14 +108,14 @@ export const VoteListing = (props: VoteListingProps) => {
             case vote instanceof CosmosVote:
               return (
                 <div className="vote" key={i}>
-                  <User user={vote.account} linkify popover />
+                  <VoterInfo voter={vote.account} />
                   {balanceWeighted && balance && <CWText>{balance}</CWText>}
                 </div>
               );
             case vote instanceof CompoundProposalVote:
               return (
                 <div className="vote" key={i}>
-                  <User user={vote.account} linkify />
+                  <VoterInfo voter={vote.account} shouldShowPopover={false} />
                   {balance && typeof balance === 'string' && (
                     <div className="vote-right-container">
                       <CWText noWrap title={balance}>
@@ -112,7 +129,7 @@ export const VoteListing = (props: VoteListingProps) => {
             case vote instanceof AaveProposalVote:
               return (
                 <div className="vote" key={i}>
-                  <User user={vote.account} linkify />
+                  <VoterInfo voter={vote.account} shouldShowPopover={false} />
                   {balance && typeof balance === 'string' && (
                     <div className="vote-right-container">
                       <CWText noWrap title={balance}>
@@ -124,65 +141,30 @@ export const VoteListing = (props: VoteListingProps) => {
               );
 
             case vote instanceof BinaryVote:
-              switch (true) {
-                case vote instanceof SubstrateDemocracyVote:
-                  return (
-                    <div className="vote" key={i}>
-                      <User user={vote.account} linkify popover />
-                      <div className="vote-right-container">
-                        <CWText
-                          noWrap
-                          title={formatCoin(
-                            (vote as SubstrateDemocracyVote).balance,
-                            true
-                          )}
-                        >
-                          {formatCoin(
-                            (vote as SubstrateDemocracyVote).balance,
-                            true
-                          )}
-                        </CWText>
-                        <CWText
-                          noWrap
-                          title={
-                            (vote as SubstrateDemocracyVote).weight &&
-                            `${(vote as SubstrateDemocracyVote).weight}x`
-                          }
-                        >
-                          {(vote as SubstrateDemocracyVote).weight &&
-                            `${(vote as SubstrateDemocracyVote).weight}x`}
-                        </CWText>
-                      </div>
-                    </div>
-                  );
-                default:
-                  return (
-                    <div className="vote" key={i}>
-                      <User user={vote.account} linkify popover />
-                      <div className="vote-right-container">
-                        <CWText
-                          noWrap
-                          title={(vote as any).amount && (vote as any).amount}
-                        >
-                          {(vote as any).amount && (vote as any).amount}
-                        </CWText>
-                        <CWText
-                          noWrap
-                          title={
-                            (vote as any).weight && `${(vote as any).weight}x`
-                          }
-                        >
-                          {(vote as any).weight && `${(vote as any).weight}x`}
-                        </CWText>
-                      </div>
-                    </div>
-                  );
-              }
+              return (
+                <div className="vote" key={i}>
+                  <VoterInfo voter={vote.account} />
+                  <div className="vote-right-container">
+                    <CWText
+                      noWrap
+                      title={(vote as any).amount && (vote as any).amount}
+                    >
+                      {(vote as any).amount && (vote as any).amount}
+                    </CWText>
+                    <CWText
+                      noWrap
+                      title={(vote as any).weight && `${(vote as any).weight}x`}
+                    >
+                      {(vote as any).weight && `${(vote as any).weight}x`}
+                    </CWText>
+                  </div>
+                </div>
+              );
 
             case vote instanceof DepositVote:
               return (
                 <div className="vote" key={i}>
-                  <User user={vote.account} linkify popover />
+                  <VoterInfo voter={vote.account} />
                   <CWText>
                     {formatCoin((vote as DepositVote<any>).deposit, true)}
                   </CWText>
@@ -192,7 +174,7 @@ export const VoteListing = (props: VoteListingProps) => {
             default:
               return (
                 <div className="vote" key={i}>
-                  <User user={vote.account} linkify popover />
+                  <VoterInfo voter={vote.account} />
                 </div>
               );
           }

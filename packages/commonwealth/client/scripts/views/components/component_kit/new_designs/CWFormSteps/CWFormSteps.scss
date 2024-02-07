@@ -1,0 +1,12 @@
+@import '../../../../../../styles/shared';
+
+.FormSteps {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  flex-wrap: wrap;
+
+  @include extraSmall {
+    flex-direction: column;
+  }
+}

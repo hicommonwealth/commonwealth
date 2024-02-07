@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Coin, formatNumberLong } from 'adapters/currency';
 import BN from 'bn.js';
@@ -10,7 +10,14 @@ import type NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
 import type { AnyProposal } from '../../../models/types';
 import { VotingType } from '../../../models/types';
 
+import { ChainNetwork } from '@hicommonwealth/core';
+import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
+import useForceRerender from 'hooks/useForceRerender';
 import app from 'state';
+import {
+  useAaveProposalVotesQuery,
+  useCompoundProposalVotesQuery,
+} from 'state/api/proposals';
 import Web3 from 'web3-utils';
 import {
   AaveVotingResult,
@@ -20,15 +27,24 @@ import {
   YesNoAbstainVetoVotingResult,
   YesNoRejectVotingResult,
 } from './voting_result_components';
-import useForceRerender from 'hooks/useForceRerender';
 
 type VotingResultsProps = { proposal: AnyProposal };
 
 export const VotingResults = (props: VotingResultsProps) => {
   const { proposal } = props;
   const forceRerender = useForceRerender();
+  const [isLoading, setLoading] = useState(
+    !app.chain || !app.chain.loaded || !app.chain.apiInitialized,
+  );
 
-  const votes = proposal.getVotes();
+  useEffect(() => {
+    const listener = () => setLoading(false);
+    app.chainAdapterReady.on('ready', listener);
+
+    return () => {
+      app.chainAdapterReady.off('ready', listener);
+    };
+  }, []);
 
   useEffect(() => {
     app.proposalEmitter.on('redraw', forceRerender);
@@ -37,6 +53,21 @@ export const VotingResults = (props: VotingResultsProps) => {
       app.proposalEmitter.removeAllListeners();
     };
   }, [forceRerender]);
+
+  const { data: aaveVotes } = useAaveProposalVotesQuery({
+    moduleReady: app.chain?.network === ChainNetwork.Aave && !isLoading,
+    communityId: app.chain?.id,
+    proposalId: proposal.identifier,
+  });
+
+  const { data: compoundVotes } = useCompoundProposalVotesQuery({
+    moduleReady: app.chain?.network === ChainNetwork.Compound && !isLoading,
+    communityId: app.chain?.id,
+    proposalId: proposal.data.id,
+    proposalIdentifier: proposal.identifier,
+  });
+
+  const votes = aaveVotes || compoundVotes || proposal.getVotes();
 
   // TODO: fix up this function for cosmos votes
   if (
@@ -69,7 +100,7 @@ export const VotingResults = (props: VotingResultsProps) => {
     );
   } else if (
     proposal.votingType === VotingType.SimpleYesApprovalVoting &&
-    proposal instanceof CosmosProposal
+    (proposal instanceof CosmosProposal || proposal instanceof CosmosProposalV1)
   ) {
     // special case for cosmos proposals in deposit stage
     return (
@@ -92,22 +123,22 @@ export const VotingResults = (props: VotingResultsProps) => {
 
     const yesBalance = yesVotes.reduce(
       (total, v) => total.add(v.power),
-      new BN(0)
+      new BN(0),
     );
 
     const yesBalanceString = `${formatNumberLong(
-      +Web3.fromWei(yesBalance.toString())
+      +Web3.fromWei(yesBalance.toString()),
     )} ${app.chain.meta.default_symbol}`;
 
     const noVotes: AaveProposalVote[] = votes.filter((v) => !v.choice);
 
     const noBalance = noVotes.reduce(
       (total, v) => total.add(v.power),
-      new BN(0)
+      new BN(0),
     );
 
     const noBalanceString = `${formatNumberLong(
-      +Web3.fromWei(noBalance.toString())
+      +Web3.fromWei(noBalance.toString()),
     )} ${app.chain.meta.default_symbol}`;
 
     return (

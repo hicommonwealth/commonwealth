@@ -1,11 +1,12 @@
+/* eslint-disable react/function-component-definition */
 import React, { useEffect } from 'react';
 import { NavigateOptions } from 'react-router-dom';
 
+import { DefaultPage } from '@hicommonwealth/core';
+import { featureFlags } from 'helpers/feature-flags';
+import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { PageLoading } from './loading';
-import { DefaultPage } from 'common-common/src/types';
-import { useCommonNavigate } from 'navigation/helpers';
-import { featureFlags } from 'helpers/feature-flags';
 
 export default function DiscussionsRedirect() {
   const navigate = useCommonNavigate();

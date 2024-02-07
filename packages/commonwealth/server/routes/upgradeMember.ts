@@ -1,14 +1,15 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
+import { isRole } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { Op } from 'sequelize';
-import type { DB } from '../models';
-import { isRole } from '../models/role';
+import { validateOwner } from 'server/util/validateOwner';
 
 export const Errors = {
   InvalidAddress: 'Invalid address',
   InvalidRole: 'Invalid role',
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
   MustBeAdmin: 'Must be an admin to upgrade member',
   NoMember: 'Cannot find member to upgrade',
   MustHaveAdmin: 'Communities must have at least one admin',
@@ -25,60 +26,60 @@ const upgradeMember = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
+  const { user } = req;
   const errors = validationResult(req).array();
   if (errors.length !== 0) {
     return next(new AppError(errors[0].msg));
   }
 
-  if (!req.user) return next(new AppError(Errors.NotLoggedIn));
-
-  const chain = req.chain;
+  const { community } = req;
   const { address, new_role } = req.body;
 
-  // Get address ids of user making request to assert admin status
-  const requesterAddresses = await req.user.getAddresses();
-  const requesterAddressIds = requesterAddresses
-    .filter((addr) => !!addr.verified)
-    .map((addr) => addr.id);
+  const isAdmin = await validateOwner({
+    models,
+    user,
+    communityId: community.id,
+    allowAdmin: true,
+    allowSuperAdmin: true,
+  });
+  if (!isAdmin) {
+    return next(new AppError(Errors.MustBeAdmin));
+  }
 
-  const addresses = await models.Address.findAll({
+  // check if address provided exists
+  const targetAddress = await models.Address.findOne({
     where: {
-      chain: chain.id,
-      [Op.or]: {
-        id: { [Op.in]: requesterAddressIds },
-        address: address,
-      },
+      community_id: community.id,
+      address: address,
     },
   });
 
-  const targetAddress = addresses.find((a) => address === a.address);
-
-  // check if address provided exists
   if (!targetAddress) return next(new AppError(Errors.NoMember));
-
-  const allCommunityAdmin = addresses.filter((m) => m.role === 'admin');
-  const requesterAdminRoles = allCommunityAdmin.filter((a) =>
-    requesterAddressIds.includes(a.id)
-  );
-
-  if (requesterAdminRoles.length < 1 && !req.user.isAdmin)
-    return next(new AppError(Errors.MustBeAdmin));
-
-  const requesterAdminAddressIds = requesterAdminRoles.map(
-    (r) => r.toJSON().id
-  );
-  const isLastAdmin = allCommunityAdmin.length < 2;
-  const adminSelfDemoting =
-    requesterAdminAddressIds.includes(address.id) && new_role !== 'admin';
-
-  if (isLastAdmin && adminSelfDemoting) {
-    return next(new AppError(Errors.MustHaveAdmin));
-  }
 
   if (new_role === targetAddress.role) {
     return next(new AppError(Errors.InvalidRole));
+  }
+
+  // if demoting from admin ensure at least 1 other admin remains
+  if (
+    targetAddress.role === 'admin' &&
+    (new_role === 'moderator' || new_role === 'member')
+  ) {
+    const otherExistingAdmin = await models.Address.findOne({
+      where: {
+        community_id: community.id,
+        role: 'admin',
+        id: {
+          [Op.ne]: targetAddress.id,
+        },
+      },
+    });
+
+    if (!otherExistingAdmin && !req.user.isAdmin) {
+      return next(new AppError(Errors.MustHaveAdmin));
+    }
   }
 
   // If all validations pass, update role;
@@ -93,7 +94,7 @@ const upgradeMember = async (
       address_id: targetAddress.id,
       updated_at: targetAddress.updated_at,
       created_at: targetAddress.created_at,
-      chain_id: targetAddress.chain,
+      chain_id: targetAddress.community_id,
       permission: targetAddress.role,
       allow: '0',
       deny: '0',

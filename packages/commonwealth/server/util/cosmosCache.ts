@@ -1,24 +1,22 @@
 import type { Request } from 'express';
 
 const oneBlock = 6; // typical Cosmos block time is ~6 seconds
-const defaultCacheDuration = 60 * 10; // 10 minutes
+const defaultCacheDuration = null; // do not cache unless specified
 
 export function calcCosmosRPCCacheKeyDuration(req, res, next) {
   const body = parseReqBody(req);
-  const params = JSON.stringify(body?.params);
-  const method = body?.method;
 
   // cosmosRPCDuration and cosmosRPCKey are defined below
   // TX Response: do not cache and call next()
-  req.cacheDuration = cosmosRPCDuration(body, method, params);
-  if (req.cacheDuration === null) return next();
+  req.cacheDuration = cosmosRPCDuration(body);
+  if (!req.cacheDuration) return next();
   req.cacheKey = cosmosRPCKey(req, body);
 
   return next();
 }
 
-export function calcCosmosLCDCacheKeyDuration(req, res, next) {
-  // Matches ProposalStatus from common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov.ts
+export function cosmosLCDDuration(req) {
+  // Matches ProposalStatus from libs/chains/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov.ts
   const activeProposalCodes = [1, 2]; // ['DepositPeriod', 'VotingPeriod']
   const completedProposalCodes = [3, 4, 5]; // ['Passed', 'Rejected', 'Failed']
   const url = req.url;
@@ -27,68 +25,70 @@ export function calcCosmosLCDCacheKeyDuration(req, res, next) {
 
   if (proposalStatus) {
     if (activeProposalCodes.some((c) => c === +proposalStatus)) {
-      // ACTIVE PROPOSALS: short cache
-      duration = oneBlock;
+      // ACTIVE PROPOSALS: 10 seconds cache
+      duration = 10;
     } else if (completedProposalCodes.some((c) => c === +proposalStatus)) {
-      // COMPLETED PROPOSALS: cache 15 minutes
-      duration = 60 * 15;
+      // COMPLETED PROPOSALS: cache 30 seconds
+      duration = 30;
     }
-    // specific proposal request:
-  } else if (url.includes('/proposals/')) {
-    // LIVE VOTES/TALLY/DEPOSITS: 5 minutes
-    duration = 60 * 5;
-  } else if (url.includes('/params/')) {
-    // PARAMS: cache long term (1 day)
-    duration = 60 * 60 * 24;
+  } else if (/\/proposals\/\d+\/(votes|tally|deposits)/.test(url)) {
+    // live proposal voting data: cache 6 seconds
+    duration = oneBlock;
+  } else if (/\/proposals\/(\d+)$/.test(url)) {
+    // specific proposal request: long-term cache (1 week)
+    duration = 60 * 60 * 24 * 7;
+  } else if (url?.includes('/params/')) {
+    // PARAMS: cache long term (5 days)
+    duration = 60 * 60 * 24 * 5;
   }
+  return duration;
+}
 
+export function calcCosmosLCDCacheKeyDuration(req, res, next) {
+  if (/BROADCAST/.test(req.body?.mode)) return next(); // TX broadcast: do not cache
+  if (/\/cosmos\/tx\/v1beta1/.test(req.url)) return next(); // TX request: do not cache
+  const duration = cosmosLCDDuration(req);
   req.cacheDuration = duration;
   req.cacheKey = req.originalUrl;
-
   return next();
 }
 
-const cosmosRPCDuration = (body, method, params) => {
+export const cosmosRPCDuration = (body) => {
   let duration = defaultCacheDuration;
-  // RPC specific codes from cosmJS requests
-  const activeCodes = ['0801', '0802']; // ['DepositPerion', 'VotingPeriod']
-  const completedCodes = [
-    '0803', // 'Passed'
-    '0804', // 'Rejected'
-    '0805', // 'Failed'
-    '0803220a0a080000000000000087', // 'Passed - Osmosis'
-    '0803220a0a080000000000000100', // 'Passed - Osmosis'
-    '0803220a0a080000000000000189', // 'Passed - Osmosis'
-  ];
 
-  if (/^(tx)/.test(method)) {
+  if (/^(tx)/.test(body?.method)) {
     // TX Response: do not cache
     return null;
-  } else if (/(block|status)/.test(method)) {
+  } else if (/(block|status)/.test(body?.method)) {
     // BLOCK CHECK: short cache
     duration = oneBlock;
-  } else if (/Query\/(Votes|TallyResult|Deposits)/.test(params)) {
-    // LIVE DATA: 5 minutes
-    duration = 60 * 5;
-  } else if (/Query\/(Params|Pool)/.test(params)) {
-    // chain PARAMS: cache long-term (1 day)
-    duration = 60 * 60 * 24;
-  } else if (activeCodes.some((c) => c === body?.params?.data)) {
-    // ACTIVE PROPOSALS: short cache
+  } else if (/Query\/(Proposal)$/.test(body?.params?.path)) {
+    // Individual Proposal: cache long-term (1 week)
+    duration = 60 * 60 * 24 * 7;
+  } else if (/Query\/(Votes|TallyResult|Deposits)/.test(body?.params?.path)) {
+    // LIVE DATA: 6 seconds
     duration = oneBlock;
-  } else if (completedCodes.some((c) => c === body?.params?.data)) {
-    // COMPLETED PROPOSALS: cache 15 minutes
-    duration = 60 * 15;
+  } else if (/Query\/(Params|Pool)/.test(body?.params?.path)) {
+    // chain PARAMS: cache long-term (5 days)
+    duration = 60 * 60 * 24 * 5;
+  } else if (/(0801|0802)/.test(body?.params?.data)) {
+    // ACTIVE PROPOSALS: 10 seconds
+    // RPC specific codes from cosmJS requests:
+    // 0801 = 'DepositPeriod', 0802 = 'VotingPeriod'
+    duration = 10;
+  } else if (/(0803|0804|0805)/.test(body?.params?.data)) {
+    // COMPLETED PROPOSALS: 30 seconds
+    // 0803 = 'Passed', 0804 = 'Rejected', 0805 = 'Failed'
+    duration = 30;
   }
-
   return duration;
 };
 
-const cosmosRPCKey = (req, body) => {
+export const cosmosRPCKey = (req, body) => {
   const params = body?.params;
   let identifier = JSON.stringify(params);
 
-  if (/Query\/(Params|Pool)/.test(identifier)) {
+  if (/Query\/(Params|Pool)/.test(params?.path) && params?.data === '') {
     // chain PARAMS: need to leave off ID to cache long-term
     identifier = params.path;
   }

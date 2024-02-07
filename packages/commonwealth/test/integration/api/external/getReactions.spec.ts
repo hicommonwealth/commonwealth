@@ -1,17 +1,17 @@
-import 'chai/register-should';
 import chai from 'chai';
-import type { GetReactionsReq } from 'common-common/src/api/extApiTypes';
-import { OrderByOptions } from 'common-common/src/api/extApiTypes';
+
+import type { ReactionAttributes } from '@hicommonwealth/model';
+import type { GetReactionsReq } from 'server/api/extApiTypes';
+import { OrderByOptions } from 'server/api/extApiTypes';
 import {
   testComments,
   testReactions,
 } from 'test/integration/api/external/dbEntityHooks.spec';
-import type { ReactionAttributes } from 'server/models/reaction';
 import { get } from './appHook.spec';
 
 describe('getReactions Tests', () => {
   it('should return reactions with specified community_id correctly', async () => {
-    const r: GetReactionsReq = { community_id: testReactions[0].chain };
+    const r: GetReactionsReq = { community_id: testReactions[0].community_id };
     const resp = await get('/api/reactions', r, true);
 
     chai.assert.lengthOf(resp.result.reactions, 5);
@@ -19,7 +19,7 @@ describe('getReactions Tests', () => {
 
   it('should return reactions with specified addresses correctly', async () => {
     const r: GetReactionsReq = {
-      community_id: testReactions[0].chain,
+      community_id: testReactions[0].community_id,
       addresses: ['testAddress-1'],
     };
     let resp = await get('/api/reactions', r, true);
@@ -34,7 +34,7 @@ describe('getReactions Tests', () => {
 
   it('should paginate correctly', async () => {
     const r: GetReactionsReq = {
-      community_id: testReactions[0].chain,
+      community_id: testReactions[0].community_id,
       addresses: ['testAddress-2'],
       limit: 2,
     };
@@ -55,7 +55,7 @@ describe('getReactions Tests', () => {
 
   it('should order correctly', async () => {
     const r: GetReactionsReq = {
-      community_id: testReactions[0].chain,
+      community_id: testReactions[0].community_id,
       addresses: ['testAddress-2'],
       sort: OrderByOptions.CREATED,
     };
@@ -66,8 +66,8 @@ describe('getReactions Tests', () => {
       resp.result.reactions,
       ([...resp.result.reactions] as ReactionAttributes[]).sort(
         (a, b) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      )
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+      ),
     );
 
     r.sort = OrderByOptions.UPDATED;
@@ -78,8 +78,8 @@ describe('getReactions Tests', () => {
       resp.result.reactions,
       ([...resp.result.reactions] as ReactionAttributes[]).sort(
         (a, b) =>
-          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-      )
+          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime(),
+      ),
     );
   });
 
@@ -92,8 +92,8 @@ describe('getReactions Tests', () => {
 
     resp = await get(
       '/api/reactions',
-      { community_id: testComments[0].chain, count_only: 3 },
-      true
+      { community_id: testComments[0].community_id, count_only: 3 },
+      true,
     );
 
     chai.assert.lengthOf(resp.result, 1);

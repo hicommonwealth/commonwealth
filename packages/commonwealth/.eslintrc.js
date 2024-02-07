@@ -4,9 +4,12 @@ module.exports = {
   settings: {
     'import/resolver': {
       webpack: {
-        config: path.resolve(__dirname, 'webpack/webpack.common.js'),
+        config: path.resolve(__dirname, 'webpack/webpack.base.config.js'),
       },
     },
+    'react': {
+      'version': 'detect',
+    }
   },
   plugins: ['@tanstack/query'],
   rules: {
@@ -84,7 +87,27 @@ module.exports = {
     ],
     '@tanstack/query/exhaustive-deps': 'error',
     '@tanstack/query/prefer-query-object-syntax': 'error',
+    'react/destructuring-assignment': [1, 'always'],
+    'react/function-component-definition': [1, { "namedComponents": "arrow-function" }],
+    'react/no-multi-comp': [1, { "ignoreStateless": false }],
+    'react/jsx-curly-brace-presence': [1, { props: "never", children: "never" }],
+    '@typescript-eslint/no-unused-vars': 1,
+    'react/jsx-key': 1,
+    "no-restricted-imports": ["error", {
+      patterns: [{
+        group: [
+          "@hicommonwealth/core/**",
+          "@hicommonwealth/adapters/**",
+          "@hicommonwealth/model/**"
+        ],
+        message: "Avoid importing from 'lib' directories. Import from the main entry point instead.",
+      }]
+    }]
   },
   ignorePatterns: ['server/scripts/setupPrerenderService.ts'],
-  extends: ['plugin:@tanstack/eslint-plugin-query/recommended'],
-};
+  extends: [
+    'plugin:@tanstack/eslint-plugin-query/recommended',
+    "plugin:react-hooks/recommended",
+    "plugin:react/recommended"
+  ],
+}

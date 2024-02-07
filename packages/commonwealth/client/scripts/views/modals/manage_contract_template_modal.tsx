@@ -1,18 +1,23 @@
 import React, { useState } from 'react';
 
-import { CWText } from 'views/components/component_kit/cw_text';
+import app from '../../state';
+import { useCommonNavigate } from '../../navigation/helpers';
+import { CWText } from '../components/component_kit/cw_text';
 import {
   CWDropdown,
   DropdownItemType,
-} from 'views/components/component_kit/cw_dropdown';
-import { CWButton } from 'views/components/component_kit/cw_button';
-import { CWDivider } from 'views/components/component_kit/cw_divider';
-import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import app from 'state';
+} from '../components/component_kit/cw_dropdown';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
+import { CWDivider } from '../components/component_kit/cw_divider';
+import { CWTextInput } from '../components/component_kit/cw_text_input';
+import { notifyError } from '../../controllers/app/notifications';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
 
-import 'modals/manage_contract_template_modal.scss';
-import { notifyError } from 'controllers/app/notifications';
-import { useCommonNavigate } from 'navigation/helpers';
+import '../../../styles/modals/manage_contract_template_modal.scss';
 
 export const displayOptions = [
   { value: '2', label: 'In Create Dropdown' },
@@ -172,129 +177,132 @@ const ManageContractTemplateModal = ({
 
   return (
     <div className="ManageContractTemplateModal">
-      <CWText type="h4" fontWeight="bold">
-        {modalTitle}
-      </CWText>
-      {!isEditMode && (
-        <CWText type="h5" className="subtitle" fontWeight="medium">
-          {modalSubtitle}
-        </CWText>
-      )}
-
-      <div className="form">
-        {!isEditMode ? (
-          <>
-            <CWText type="caption" fontWeight="medium" className="input-label">
-              Action template
-            </CWText>
-            <CWDropdown
-              {...(isEditMode
-                ? { containerClassName: 'disabled-dropdown' }
-                : {})}
-              initialValue={initialTemplateName}
-              label="Choose an action template to enable this action for your community"
-              options={templateOptions}
-              onSelect={handleSelectTemplate}
+      <CWModalHeader
+        label={modalTitle}
+        subheader={!isEditMode ? modalSubtitle : ''}
+        onModalClose={onModalClose}
+      />
+      <CWModalBody>
+        <div className="form">
+          {!isEditMode ? (
+            <>
+              <CWText
+                type="caption"
+                fontWeight="medium"
+                className="input-label"
+              >
+                Action template
+              </CWText>
+              <CWDropdown
+                {...(isEditMode
+                  ? { containerClassName: 'disabled-dropdown' }
+                  : {})}
+                initialValue={initialTemplateName}
+                label="Choose an action template to enable this action for your community"
+                options={templateOptions}
+                onSelect={handleSelectTemplate}
+              />
+            </>
+          ) : (
+            <CWTextInput
+              containerClassName="input-label"
+              disabled
+              value={initialTemplateName.label}
+              label="Action template"
             />
-          </>
-        ) : (
-          <CWTextInput
-            containerClassName="input-label"
-            disabled
-            value={initialTemplateName.label}
-            label="Action template"
-          />
-        )}
-        {!isEditMode && (
-          <CWText className="create-template-info" type="caption">
-            Don’t see a template that fits your needs?
-            <CWText
-              type="caption"
-              fontWeight="medium"
-              className="cta"
-              onClick={handleCreateNewTemplate}
-            >
-              Create a new action template
+          )}
+          {!isEditMode && (
+            <CWText className="create-template-info" type="caption">
+              Don't see a template that fits your needs?
+              <CWText
+                type="caption"
+                fontWeight="medium"
+                className="cta"
+                onClick={handleCreateNewTemplate}
+              >
+                Create a new action template
+              </CWText>
             </CWText>
+          )}
+          <CWDivider className="divider" />
+          <CWText type="h5" className="subtitle" fontWeight="medium">
+            Set metadata for action
           </CWText>
-        )}
-        <CWDivider className="divider" />
-        <CWText type="h5" className="subtitle" fontWeight="medium">
-          Set metadata for action
-        </CWText>
-        <CWText type="caption" fontWeight="medium" className="input-label">
-          Display Name
-        </CWText>
-        <CWTextInput
-          label="Give your template instance an official new name"
-          value={form.displayName}
-          placeholder="Enter display name"
-          onInput={(e) => {
-            setForm((prevState) => ({
-              ...prevState,
-              displayName: e.target.value,
-            }));
-          }}
-        />
-        <CWText type="caption" fontWeight="medium" className="input-label">
-          Action details
-        </CWText>
-        <CWTextInput
-          label="Describe what your community can do with this action template"
-          value={form.nickname}
-          placeholder="Enter description"
-          onInput={(e) => {
-            setForm((prevState) => ({
-              ...prevState,
-              nickname: e.target.value,
-            }));
-          }}
-        />
-        <CWText type="caption" fontWeight="medium" className="input-label">
-          Slug
-        </CWText>
-        <CWTextInput
-          label="Provide a unique identifier for your action template's URL address"
-          value={form.slug}
-          placeholder="/placeholder-is-display-name-without-spaces"
-          onInput={(e) => {
-            setForm((prevState) => ({
-              ...prevState,
-              slug: e.target.value,
-            }));
-          }}
-        />
-        <CWText type="caption" fontWeight="medium" className="input-label">
-          Display option
-        </CWText>
-        <CWDropdown
-          label="Choose where to display template"
-          initialValue={initialDisplayOption}
-          options={displayOptions}
-          onSelect={(result) => {
-            setForm((prevState) => ({
-              ...prevState,
-              displayOption: result.value,
-            }));
-          }}
-        />
-      </div>
-
-      <div className="footer">
+          <CWText type="caption" fontWeight="medium" className="input-label">
+            Display Name
+          </CWText>
+          <CWTextInput
+            label="Give your template instance an official new name"
+            value={form.displayName}
+            placeholder="Enter display name"
+            onInput={(e) => {
+              setForm((prevState) => ({
+                ...prevState,
+                displayName: e.target.value,
+              }));
+            }}
+          />
+          <CWText type="caption" fontWeight="medium" className="input-label">
+            Action details
+          </CWText>
+          <CWTextInput
+            label="Describe what your community can do with this action template"
+            value={form.nickname}
+            placeholder="Enter description"
+            onInput={(e) => {
+              setForm((prevState) => ({
+                ...prevState,
+                nickname: e.target.value,
+              }));
+            }}
+          />
+          <CWText type="caption" fontWeight="medium" className="input-label">
+            Slug
+          </CWText>
+          <CWTextInput
+            label="Provide a unique identifier for your action template's URL address"
+            value={form.slug}
+            placeholder="/placeholder-is-display-name-without-spaces"
+            onInput={(e) => {
+              setForm((prevState) => ({
+                ...prevState,
+                slug: e.target.value,
+              }));
+            }}
+          />
+          <CWText type="caption" fontWeight="medium" className="input-label">
+            Display option
+          </CWText>
+          <CWDropdown
+            label="Choose where to display template"
+            initialValue={initialDisplayOption}
+            options={displayOptions}
+            onSelect={(result) => {
+              setForm((prevState) => ({
+                ...prevState,
+                displayOption: result.value,
+              }));
+            }}
+          />
+        </div>
+      </CWModalBody>
+      <CWModalFooter>
         <CWButton
-          buttonType="mini-white"
+          buttonType="secondary"
+          buttonHeight="sm"
           label="Cancel"
           onClick={handleCancel}
         />
         <CWButton
-          buttonType="mini-black"
+          buttonType="primary"
+          buttonHeight="sm"
           label={confirmButtonLabel}
           disabled={confirmButtonDisabled}
           onClick={(e) =>
             isEditMode ? handleSaveEditingTemplate(e) : handleAddTemplate(e)
           }
         />
-      </div>
+      </CWModalFooter>
     </div>
   );
 };

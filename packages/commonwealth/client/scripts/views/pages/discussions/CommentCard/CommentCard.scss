@@ -1,0 +1,146 @@
+@import '../../../../../styles/shared';
+
+.thread-connectors-container {
+  display: flex;
+  gap: 24px;
+  margin-right: 24px;
+
+  @include extraSmall {
+    gap: 12px;
+    margin-right: 12px;
+  }
+
+  .thread-connector {
+    background-color: $neutral-200;
+    height: 100%;
+    left: 36px;
+    position: relative;
+    top: 16px;
+    width: 1px;
+    z-index: -1;
+
+    &.smaller {
+      height: calc(100% - 40px);
+    }
+
+    @include extraSmall {
+      left: 24px;
+    }
+
+    &.replying {
+      background-color: $neutral-300;
+      width: 2px;
+    }
+  }
+}
+
+.Comment {
+  display: flex;
+
+  &.highlighted {
+    background-color: $yellow-200;
+    border-radius: $border-radius-corners;
+
+    &.highlightAnimationComplete {
+      background-color: transparent;
+      transition: background-color 1s ease-in-out;
+    }
+  }
+
+  .comment-body {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 16px 0;
+    gap: 16px;
+
+    .comment-text {
+      div,
+      p {
+        font-size: 16px !important;
+        line-height: 24px !important;
+        /* identical to box height, or 143% */
+        letter-spacing: 0.16px !important;
+      }
+      h1 {
+        font-size: 24px !important;
+      }
+      h2 {
+        font-size: 20px !important;
+      }
+    }
+
+    .comment-text {
+      padding-left: 8px;
+    }
+
+    .comment-content {
+      padding-left: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .comment-header {
+      align-items: center;
+      display: flex;
+      gap: 8px;
+
+      .User {
+        align-items: center;
+        display: flex;
+        height: 24px;
+
+        .username {
+          font-weight: 500;
+
+          @include caption;
+        }
+      }
+
+      .published-text.Text {
+        color: $neutral-500;
+      }
+
+      .verification-icon {
+        color: $neutral-500;
+        margin-top: 2px;
+      }
+    }
+
+    .comment-footer {
+      display: flex;
+      align-items: center;
+      gap: 1px;
+      flex-wrap: wrap;
+    }
+  }
+}
+
+.CommentActions {
+  .danger {
+    color: $rorange-600 !important;
+
+    .Icon {
+      color: $rorange-600 !important;
+    }
+
+    .Text {
+      color: $rorange-600 !important;
+    }
+  }
+}
+
+.EditComment {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-left: 2.3em;
+
+  .buttons-row {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    width: 100%;
+  }
+}

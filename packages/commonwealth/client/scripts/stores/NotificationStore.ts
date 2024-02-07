@@ -7,13 +7,13 @@ class NotificationStore extends IdStore<Notification> {
 
   public add(n: Notification) {
     super.add(n);
-    this._storeSubscription[n.subscription.id] = n;
+    this._storeSubscription[n.subscriptionId] = n;
     return this;
   }
 
   public remove(n: Notification) {
     super.remove(n);
-    delete this._storeSubscription[n.subscription.id];
+    delete this._storeSubscription[n.subscriptionId];
     return this;
   }
 

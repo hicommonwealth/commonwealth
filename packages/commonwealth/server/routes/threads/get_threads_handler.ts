@@ -1,21 +1,25 @@
-import { TypedRequestQuery, TypedResponse, success } from '../../types';
+import { AppError } from '@hicommonwealth/core';
+import { Thread } from '@hicommonwealth/model';
+import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
 import { ServerControllers } from '../../routing/router';
-import { AppError } from '../../../../common-common/src/errors';
-import { ALL_CHAINS } from '../../middleware/databaseValidationService';
-
-const MIN_SEARCH_QUERY_LENGTH = 4;
+import {
+  PaginationQueryParams,
+  TypedRequestQuery,
+  TypedResponse,
+  success,
+} from '../../types';
+import { formatErrorPretty } from '../../util/errorFormat';
 
 const Errors = {
   UnexpectedError: 'Unexpected error',
   InvalidRequest: 'Invalid request',
   InvalidThreadId: 'Invalid thread ID',
-  QueryMissing: 'Must enter query to begin searching',
-  QueryTooShort: 'Query must be at least 4 characters',
-  NoChains: 'No chains resolved to execute search',
+  InvalidCommunityId: 'Invalid community ID',
+  NoCommunity: 'No community resolved to execute search',
 };
 
 type GetThreadsRequestQuery = {
-  chain: string;
+  community_id: string;
   thread_ids?: string[];
   bulk?: string;
   active?: string;
@@ -27,10 +31,7 @@ type ActiveThreadsRequestQuery = {
 type SearchThreadsRequestQuery = {
   search: string;
   thread_title_only?: string;
-  sort?: string;
-  page?: string;
-  page_size?: string;
-};
+} & PaginationQueryParams;
 type BulkThreadsRequestQuery = {
   topic_id: string;
   stage?: string;
@@ -40,6 +41,7 @@ type BulkThreadsRequestQuery = {
   orderBy?: string;
   from_date?: string;
   to_date?: string;
+  archived?: string;
 };
 type GetThreadsResponse = any;
 
@@ -53,25 +55,36 @@ export const getThreadsHandler = async (
         | BulkThreadsRequestQuery
       )
   >,
-  res: TypedResponse<GetThreadsResponse>
+  res: TypedResponse<GetThreadsResponse>,
 ) => {
-  const { chain } = req;
-  const { thread_ids, bulk, active, search } = req.query;
+  const queryValidationResult = Thread.GetThreadsParamsSchema.safeParse(
+    req.query,
+  );
+
+  if (queryValidationResult.success === false) {
+    throw new AppError(formatErrorPretty(queryValidationResult));
+  }
+
+  const { thread_ids, bulk, active, search, community_id } =
+    queryValidationResult.data;
 
   // get threads by IDs
   if (thread_ids) {
-    const threadIds = thread_ids.map((id) => parseInt(id, 10));
-    for (const id of threadIds) {
-      if (isNaN(id)) {
-        throw new AppError(Errors.InvalidThreadId);
-      }
-    }
-    const threads = await controllers.threads.getThreadsByIds(threadIds);
+    const threads = await controllers.threads.getThreadsByIds({
+      threadIds: thread_ids,
+    });
     return success(res, threads);
   }
 
   // get bulk threads
   if (bulk) {
+    const bulkQueryValidationResult =
+      Thread.GetBulkThreadsParamsSchema.safeParse(req.query);
+
+    if (bulkQueryValidationResult.success === false) {
+      throw new AppError(formatErrorPretty(bulkQueryValidationResult));
+    }
+
     const {
       stage,
       topic_id,
@@ -81,19 +94,21 @@ export const getThreadsHandler = async (
       orderBy,
       from_date,
       to_date,
-    } = req.query as BulkThreadsRequestQuery;
+      archived,
+    } = bulkQueryValidationResult.data;
 
-    const bulkThreads = await controllers.threads.getBulkThreads(
-      chain,
+    const bulkThreads = await controllers.threads.getBulkThreads({
+      communityId: community_id,
       stage,
-      parseInt(topic_id, 10),
-      includePinnedThreads === 'true',
-      parseInt(page, 10),
-      parseInt(limit, 10),
+      topicId: topic_id,
+      includePinnedThreads,
+      page,
+      limit,
       orderBy,
-      from_date,
-      to_date
-    );
+      fromDate: from_date,
+      toDate: to_date,
+      archived: archived,
+    });
     return success(res, bulkThreads);
   }
 
@@ -101,36 +116,32 @@ export const getThreadsHandler = async (
   if (active) {
     const { threads_per_topic } = req.query as ActiveThreadsRequestQuery;
 
-    const activeThreads = await controllers.threads.getActiveThreads(
-      chain,
-      parseInt(threads_per_topic, 10)
-    );
+    const activeThreads = await controllers.threads.getActiveThreads({
+      communityId: community_id,
+      threadsPerTopic: parseInt(threads_per_topic, 10),
+    });
     return success(res, activeThreads);
   }
 
   // search for threads
   if (search) {
-    const { thread_title_only, sort, page, page_size } =
+    const { thread_title_only, limit, page, order_by, order_direction } =
       req.query as SearchThreadsRequestQuery;
-    if (!search) {
-      throw new AppError(Errors.QueryMissing);
-    }
-    if (search.length < MIN_SEARCH_QUERY_LENGTH) {
-      throw new AppError(Errors.QueryTooShort);
-    }
-    if (!req.chain && req.query.chain !== ALL_CHAINS) {
-      // if no chain resolved, ensure that client explicitly requested all chains
-      throw new AppError(Errors.NoChains);
+
+    if (!req.community && community_id !== ALL_COMMUNITIES) {
+      // if no community resolved, ensure that client explicitly requested all communities
+      throw new AppError(Errors.NoCommunity);
     }
 
-    const searchResults = await controllers.threads.searchThreads(
-      chain,
-      search,
-      thread_title_only === 'true',
-      sort,
-      parseInt(page, 10),
-      parseInt(page_size, 10)
-    );
+    const searchResults = await controllers.threads.searchThreads({
+      communityId: community_id,
+      searchTerm: search,
+      threadTitleOnly: thread_title_only === 'true',
+      limit: parseInt(limit, 10) || 0,
+      page: parseInt(page, 10) || 0,
+      orderBy: order_by,
+      orderDirection: order_direction as any,
+    });
     return success(res, searchResults);
   }
 

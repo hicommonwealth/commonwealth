@@ -1,5 +1,7 @@
+/* eslint-disable react/jsx-key */
+/* eslint-disable react-hooks/exhaustive-deps */
+import { ChainBase } from '@hicommonwealth/core';
 import { parseFunctionsFromABI } from 'abi_utils';
-import { ChainBase } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { callContractFunction } from 'controllers/chain/ethereum/callContractFunction';
 import { ethers } from 'ethers';
@@ -9,7 +11,7 @@ import {
   validateAbiInput,
 } from 'helpers/abi_form_helpers';
 import 'pages/general_contract/index.scss';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import app from 'state';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWSpinner } from 'views/components/component_kit/cw_spinner';
@@ -28,40 +30,44 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
   const [loaded, setLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [functionNameToFunctionOutput] = useState<Map<string, Result>>(
-    new Map<string, Result>()
+  const [contract, setContract] = useState<Contract>();
+  const functionNameToFunctionOutput = useRef<Map<string, Result>>(
+    new Map<string, Result>(),
   );
-  const [functionNameToFunctionInputArgs] = useState<
+  const [abiItems, setAbiItems] = useState<AbiItem[]>([]);
+  const functionNameToFunctionInputArgs = useRef<
     Map<string, Map<number, string>>
   >(new Map<string, Map<number, string>>());
 
-  const fetchContractAbi = async (contract: Contract) => {
-    if (contract.abi === undefined) {
+  const fetchContractAbi = async (_contract: Contract) => {
+    if (_contract.abi === undefined) {
       try {
         // use the contract address to fetch the abi using controller
-        await app.contracts.checkFetchEtherscanForAbi(contract.address);
+        await app.contracts.checkFetchEtherscanForAbi(_contract.address);
         // TODO The UI Should In One Go show the abi form after successfully fetching the abi
         // from etherscan, which it does not do rn
       } catch (err) {
         notifyError(
-          err.message || `Fetching ABI for ${contract.address} failed: ${err}`
+          err.message || `Fetching ABI for ${_contract.address} failed: ${err}`,
         );
       }
     }
   };
 
+  useEffect(() => {
+    loadContractAbi().then(setAbiItems);
+  }, [contractAddress, app.contracts]);
+
   const callFunction = async (_contractAddress: string, fn: AbiItem) => {
     try {
       setLoading(true);
-
-      const contract = app.contracts.getByAddress(_contractAddress);
 
       if (!contract) {
         throw new Error('Contract not found');
       }
 
       // Convert map of number to string to array of string
-      const inputArgs = functionNameToFunctionInputArgs.get(fn.name);
+      const inputArgs = functionNameToFunctionInputArgs.current.get(fn.name);
       const inputArgsArray = [];
       if (inputArgs && inputArgs.size > 0) {
         for (let i = 0; i < inputArgs.size; i++) {
@@ -77,9 +83,9 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
 
       const ethersInterface = new ethers.utils.Interface(contract.abi);
 
-      functionNameToFunctionOutput.set(
+      functionNameToFunctionOutput.current.set(
         fn.name,
-        ethersInterface.decodeFunctionResult(fn.name, result)
+        ethersInterface.decodeFunctionResult(fn.name, result),
       );
       setSaving(false);
       setLoaded(true);
@@ -90,28 +96,21 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
     }
   };
 
-  const loadContractAbi = (): AbiItem[] => {
-    const contract: Contract = app.contracts.getByAddress(contractAddress);
+  const loadContractAbi = async (): Promise<AbiItem[]> => {
+    const _contract: Contract = app.contracts.getByAddress(contractAddress);
+    setContract(_contract);
 
-    if (!contract || !contract.abi) {
+    if (!_contract?.abi) {
       // TODO: show screen for "no ABI found" -- or fetch data
+      if (app.contracts.getCommunityContracts().length > 0 && !contract) {
+        fetchContractAbi(_contract);
+      }
       return [];
+    } else {
+      setLoaded(!!contract);
+      return parseFunctionsFromABI(_contract.abi);
     }
-
-    const abiFunctions = parseFunctionsFromABI(contract.abi);
-
-    return abiFunctions;
   };
-
-  if (app.contracts.getCommunityContracts().length > 0) {
-    const contract: Contract = app.contracts.getByAddress(contractAddress);
-
-    if (contract) {
-      setLoaded(true);
-    }
-
-    fetchContractAbi(contract);
-  }
 
   if (!app.contracts || !app.chain) {
     return <PageLoading message="General Contract" />;
@@ -135,7 +134,7 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
           <CWText>Outputs</CWText>
           <CWText>Call Function</CWText>
         </div>
-        {loadContractAbi().map((fn: AbiItem) => {
+        {abiItems.map((fn: AbiItem) => {
           return (
             <div className="function-row">
               <CWText>{fn.name}</CWText>
@@ -158,7 +157,7 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
                               inputIdx,
                               e.target.value,
                               fn.name,
-                              functionNameToFunctionInputArgs
+                              functionNameToFunctionInputArgs.current,
                             );
 
                             setLoaded(true);
@@ -174,9 +173,8 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
               </div>
               <div className="functions-output-container">
                 {fn.outputs.map((output: AbiOutput, i) => {
-                  const fnOutputArray = functionNameToFunctionOutput.get(
-                    fn.name
-                  );
+                  const fnOutputArray =
+                    functionNameToFunctionOutput.current.get(fn.name);
                   return (
                     <div>
                       <div className="function-outputs">
@@ -208,7 +206,7 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
                       callFunction(contractAddress, fn);
                     } catch (err) {
                       notifyError(
-                        err.message || 'Submitting Function Call failed'
+                        err.message || 'Submitting Function Call failed',
                       );
                     } finally {
                       setSaving(false);

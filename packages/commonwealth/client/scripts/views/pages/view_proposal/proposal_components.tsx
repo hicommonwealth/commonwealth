@@ -9,12 +9,12 @@ import 'pages/view_proposal/proposal_components.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import ExternalLink from 'views/components/ExternalLink';
-import { CWButton } from '../../components/component_kit/cw_button';
-import { CWText } from '../../components/component_kit/cw_text';
 import {
   getStatusClass,
   getStatusText,
 } from '../../components/ProposalCard/helpers';
+import { CWButton } from '../../components/component_kit/cw_button';
+import { CWText } from '../../components/component_kit/cw_text';
 import { cancelProposal } from '../../components/proposals/helpers';
 import { ThreadLink } from './proposal_header_links';
 
@@ -71,7 +71,8 @@ type ProposalSubheaderProps = {
 export const ProposalSubheader = (props: ProposalSubheaderProps) => {
   const { onModalClose, proposal, toggleVotingModal, votingModalOpen } = props;
   const forceRerender = useForceRerender();
-  const [linkedThreads, setLinkedThreads] = useState(null);
+  const [linkedThreads, setLinkedThreads] =
+    useState<{ id: number; title: string }[]>(null);
 
   useEffect(() => {
     app.proposalEmitter.on('redraw', forceRerender);
@@ -107,7 +108,10 @@ export const ProposalSubheader = (props: ProposalSubheaderProps) => {
         (linkedThreads && (
           <div className="proposal-links">
             {linkedThreads && (
-              <ThreadLink threads={linkedThreads} chain={proposal['chain']} />
+              <ThreadLink
+                threads={linkedThreads}
+                community={proposal['chain']}
+              />
             )}
             {proposal['blockExplorerLink'] && (
               <ExternalLink url={proposal['blockExplorerLink']}>
@@ -160,18 +164,14 @@ export const ProposalSubheader = (props: ProposalSubheaderProps) => {
             <CWButton
               disabled={votingModalOpen}
               onClick={() => proposal.queueTx()}
-              label={
-                proposal.data.queued || proposal.data.executed
-                  ? 'Queued'
-                  : 'Queue'
-              }
+              label={proposal.queued || proposal.executed ? 'Queued' : 'Queue'}
             />
           )}
           {proposal.isExecutable && (
             <CWButton
               disabled={votingModalOpen}
               onClick={() => proposal.executeTx()}
-              label={proposal.data.executed ? 'Executed' : 'Execute'}
+              label={proposal.executed ? 'Executed' : 'Execute'}
             />
           )}
           <CompoundCancelButton

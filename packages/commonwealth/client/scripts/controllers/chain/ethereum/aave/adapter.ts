@@ -1,5 +1,5 @@
+import { ChainBase } from '@hicommonwealth/core';
 import type { EthereumCoin } from 'adapters/chain/ethereum/types';
-import { ChainBase } from 'common-common/src/types';
 
 import { notifyError } from 'controllers/app/notifications';
 
@@ -40,7 +40,7 @@ export default class Aave extends IChainAdapter<EthereumCoin, EthereumAccount> {
 
   public async initData() {
     console.log('Aave initData()');
-    await this.chain.initEventLoop();
+    this.chain.initEventLoop();
     await this.governance.init(this.chain, this.accounts);
     await super.initData();
   }

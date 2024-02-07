@@ -1,0 +1,1 @@
+export { CWContentPageCard } from './CWContentPageCard';

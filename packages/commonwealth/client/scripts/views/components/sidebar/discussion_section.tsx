@@ -1,8 +1,14 @@
 import React from 'react';
 
 import 'components/sidebar/index.scss';
+import { useCommonNavigate } from 'navigation/helpers';
+import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
+import { useFetchTopicsQuery } from 'state/api/topics';
+import { sidebarStore } from 'state/ui/sidebar';
 import { handleRedirectClicks } from '../../../helpers';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { isWindowSmallInclusive } from '../component_kit/helpers';
 import { verifyCachedToggleTree } from './helpers';
 import { SidebarSectionGroup } from './sidebar_section';
 import type {
@@ -10,13 +16,18 @@ import type {
   SidebarSectionAttrs,
   ToggleTree,
 } from './types';
-import { useCommonNavigate } from 'navigation/helpers';
-import { useLocation, matchRoutes } from 'react-router-dom';
-import { useFetchTopicsQuery } from 'state/api/topics';
+
+const resetSidebarState = () => {
+  if (isWindowSmallInclusive(window.innerWidth)) {
+    sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
+  } else {
+    sidebarStore.getState().setMenu({ name: 'default', isVisible: true });
+  }
+};
 
 function setDiscussionsToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
-    localStorage[`${app.activeChainId()}-discussions-toggle-tree`]
+    localStorage[`${app.activeChainId()}-discussions-toggle-tree`],
   );
   const split = path.split('.');
   for (const field of split.slice(0, split.length - 1)) {
@@ -37,23 +48,27 @@ export const DiscussionSection = () => {
   const location = useLocation();
   const matchesDiscussionsRoute = matchRoutes(
     [{ path: '/discussions' }, { path: ':scope/discussions' }],
-    location
+    location,
   );
   const matchesOverviewRoute = matchRoutes(
     [{ path: '/overview' }, { path: ':scope/overview' }],
-    location
+    location,
+  );
+  const matchesArchivedRoute = matchRoutes(
+    [{ path: '/archived' }, { path: ':scope/archived' }],
+    location,
   );
   const matchesDiscussionsTopicRoute = matchRoutes(
     [{ path: '/discussions/:topic' }, { path: ':scope/discussions/:topic' }],
-    location
+    location,
   );
   const matchesSputnikDaosRoute = matchRoutes(
     [{ path: '/sputnik-daos' }, { path: ':scope/sputnik-daos' }],
-    location
+    location,
   );
 
   const { data: topicsData } = useFetchTopicsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const topics = (topicsData || [])
@@ -100,7 +115,7 @@ export const DiscussionSection = () => {
       JSON.stringify(discussionsDefaultToggleTree);
   }
   const toggleTreeState = JSON.parse(
-    localStorage[`${app.activeChainId()}-discussions-toggle-tree`]
+    localStorage[`${app.activeChainId()}-discussions-toggle-tree`],
   );
 
   const discussionsGroupData: SectionGroupAttrs[] = [
@@ -113,6 +128,7 @@ export const DiscussionSection = () => {
       isActive: !!matchesDiscussionsRoute,
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
+        resetSidebarState();
         handleRedirectClicks(
           navigate,
           e,
@@ -120,7 +136,7 @@ export const DiscussionSection = () => {
           app.activeChainId(),
           () => {
             setDiscussionsToggleTree(`children.All.toggledState`, toggle);
-          }
+          },
         );
       },
       displayData: null,
@@ -134,6 +150,7 @@ export const DiscussionSection = () => {
       isActive: !!matchesOverviewRoute,
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
+        resetSidebarState();
         handleRedirectClicks(
           navigate,
           e,
@@ -141,7 +158,7 @@ export const DiscussionSection = () => {
           app.activeChainId(),
           () => {
             setDiscussionsToggleTree(`children.Overview.toggledState`, toggle);
-          }
+          },
         );
       },
       displayData: null,
@@ -157,6 +174,7 @@ export const DiscussionSection = () => {
         (app.chain ? app.chain.serverLoaded : true),
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
+        resetSidebarState();
         handleRedirectClicks(
           navigate,
           e,
@@ -165,9 +183,9 @@ export const DiscussionSection = () => {
           () => {
             setDiscussionsToggleTree(
               `children.SputnikDAOs.toggledState`,
-              toggle
+              toggle,
             );
-          }
+          },
         );
       },
       displayData: null,
@@ -187,6 +205,7 @@ export const DiscussionSection = () => {
         // eslint-disable-next-line no-loop-func
         onClick: (e, toggle: boolean) => {
           e.preventDefault();
+          resetSidebarState();
           handleRedirectClicks(
             navigate,
             e,
@@ -195,9 +214,9 @@ export const DiscussionSection = () => {
             () => {
               setDiscussionsToggleTree(
                 `children.${topic.name}.toggledState`,
-                toggle
+                toggle,
               );
-            }
+            },
           );
         },
         displayData: null,
@@ -205,6 +224,31 @@ export const DiscussionSection = () => {
       discussionsGroupData.push(discussionSectionGroup);
     }
   }
+
+  const archivedSectionGroup: SectionGroupAttrs = {
+    title: 'Archived',
+    rightIcon: <CWIcon iconName="archiveTray" iconSize="small" />,
+    containsChildren: false,
+    hasDefaultToggle: false,
+    isVisible: true,
+    isUpdated: true,
+    isActive: !!matchesArchivedRoute,
+    onClick: (e, toggle: boolean) => {
+      e.preventDefault();
+      handleRedirectClicks(
+        navigate,
+        e,
+        `/archived`,
+        app.activeChainId(),
+        () => {
+          setDiscussionsToggleTree(`children.Archived.toggledState`, toggle);
+        },
+      );
+    },
+    displayData: null,
+  };
+
+  discussionsGroupData.push(archivedSectionGroup);
 
   const sidebarSectionData: SidebarSectionAttrs = {
     title: discussionsLabel,

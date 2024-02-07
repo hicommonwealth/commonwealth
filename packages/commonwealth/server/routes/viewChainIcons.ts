@@ -1,22 +1,22 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-import type { DB } from '../models';
 
 const viewChainIcons = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
-  if (!req.body.chains) {
+  if (!req.body.communities) {
     return next(new AppError('Must provide a list of chains'));
   }
-  const chains = JSON.parse(req.body.chains);
+  const communities = JSON.parse(req.body.communities);
 
-  const iconUrls = await models.Chain.findAll({
+  const iconUrls = await models.Community.findAll({
     attributes: ['id', 'icon_url'],
     where: {
-      id: chains,
+      id: communities,
     },
     raw: true,
   });

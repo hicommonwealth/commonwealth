@@ -1,14 +1,17 @@
-import React from 'react';
-
 import 'components/sidebar/explore_sidebar.scss';
-import ChainInfo from '../../../models/ChainInfo';
-
+import React from 'react';
 import app from 'state';
+import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
+import ChainInfo from '../../../models/ChainInfo';
 import { CWSidebarMenu } from '../component_kit/cw_sidebar_menu';
+import { getClasses } from '../component_kit/helpers';
 import type { MenuItem } from '../component_kit/types';
-import useSidebarStore from 'state/ui/sidebar';
 
-export const ExploreCommunitiesSidebar = () => {
+export const ExploreCommunitiesSidebar = ({
+  isInsideCommunity,
+}: {
+  isInsideCommunity: boolean;
+}) => {
   const { setMenu } = useSidebarStore();
 
   const allCommunities = app.config.chains
@@ -21,18 +24,20 @@ export const ExploreCommunitiesSidebar = () => {
 
   const isInCommunity = (item) => {
     if (item instanceof ChainInfo) {
-      return app.roles.getAllRolesInCommunity({ chain: item.id }).length > 0;
+      return (
+        app.roles.getAllRolesInCommunity({ community: item.id }).length > 0
+      );
     } else {
       return false;
     }
   };
 
   const starredCommunities = allCommunities.filter((c) => {
-    return c instanceof ChainInfo && app.communities.isStarred(c.id);
+    return c instanceof ChainInfo && app.user.isCommunityStarred(c.id);
   });
 
   const joinedCommunities = allCommunities.filter(
-    (c) => isInCommunity(c) && !app.communities.isStarred(c.id)
+    (c) => isInCommunity(c) && !app.user.isCommunityStarred(c.id),
   );
 
   const communityList: MenuItem[] = [
@@ -60,16 +65,21 @@ export const ExploreCommunitiesSidebar = () => {
 
   return (
     <CWSidebarMenu
-      className="ExploreCommunitiesSidebar"
+      className={getClasses<{
+        heightInsideCommunity: boolean;
+      }>(
+        {
+          heightInsideCommunity: isInsideCommunity,
+        },
+        'ExploreCommunitiesSidebar',
+      )}
       menuHeader={{
         label: 'Explore',
         onClick: async () => {
-          const sidebar = document.getElementsByClassName(
-            'ExploreCommunitiesSidebar'
-          );
-          sidebar[0].classList.add('onremove');
           setTimeout(() => {
-            setMenu({ name: 'default', isVisible: false });
+            const isSidebarOpen =
+              !!sidebarStore.getState().userToggledVisibility;
+            setMenu({ name: 'default', isVisible: isSidebarOpen });
           }, 200);
         },
       }}

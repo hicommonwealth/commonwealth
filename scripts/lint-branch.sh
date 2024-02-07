@@ -10,12 +10,16 @@ if [ -n "$GITHUB_BASE_REF" ]; then
 fi
 
 # Get a list of changed .ts files
-LINES=$(git diff origin/$BASE_BRANCH...HEAD --name-only --diff-filter=d | grep \\.ts)
+LINES=$(git diff origin/$BASE_BRANCH...HEAD --name-only --diff-filter=d | grep '\.ts$' | grep -v 'libs/chains/src/cosmos-ts/')
 
 if [ -z "$LINES" ]
 then
     echo "There is nothing to lint"
 else
     echo $LINES
-    NODE_OPTIONS="--max-old-space-size=4096" eslint $LINES
+    if [ -n "$FAIL_WARNINGS" ]; then
+        NODE_OPTIONS="--max-old-space-size=8192" eslint --max-warnings=0 $LINES --no-ignore
+    else
+        NODE_OPTIONS="--max-old-space-size=8192" eslint $LINES
+    fi
 fi

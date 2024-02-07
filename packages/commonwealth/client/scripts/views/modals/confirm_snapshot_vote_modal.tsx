@@ -1,16 +1,19 @@
 import React from 'react';
 
-import { notifyError } from 'controllers/app/notifications';
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
-import { castVote } from 'helpers/snapshot_utils';
-import { formatNumberShort } from 'adapters/currency';
-
-import 'modals/confirm_snapshot_vote_modal.scss';
-
-import app from 'state';
-import { CWButton } from '../components/component_kit/cw_button';
+import app from '../../state';
+import { notifyError } from '../../controllers/app/notifications';
+import { castVote } from '../../helpers/snapshot_utils';
+import { formatNumberShort } from '../../../../shared/adapters/currency';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
+
+import '../../../styles/modals/confirm_snapshot_vote_modal.scss';
 
 type ConfirmSnapshotVoteModalProps = {
   id: string;
@@ -43,11 +46,8 @@ export const ConfirmSnapshotVoteModal = (
 
   return (
     <div className="ConfirmSnapshotVoteModal">
-      <div className="compact-modal-title">
-        <h3>Confirm vote</h3>
-        <CWIconButton iconName="close" onClick={() => onModalClose()} />
-      </div>
-      <div className="compact-modal-body">
+      <CWModalHeader label="Confirm vote" onModalClose={onModalClose} />
+      <CWModalBody>
         <CWText type="h4" fontWeight="semiBold">
           Are you sure you want to vote {proposal.choices[selectedChoice]}?
         </CWText>
@@ -66,49 +66,48 @@ export const ConfirmSnapshotVoteModal = (
             </CWText>
           </div>
         </div>
-        <div className="button-group">
-          <CWButton
-            label="Cancel"
-            buttonType="secondary-blue"
-            disabled={isSaving}
-            onClick={async (e) => {
-              e.preventDefault();
-              onModalClose();
-            }}
-          />
-          <CWButton
-            label="Vote"
-            disabled={isSaving}
-            onClick={async (e) => {
-              e.preventDefault();
-
-              setIsSaving(true);
-
-              const votePayload = {
-                space: space.id,
-                proposal: id,
-                type: 'single-choice',
-                choice: parseInt(selectedChoice) + 1,
-                metadata: JSON.stringify({}),
-              };
-
-              try {
-                castVote(author.address, votePayload).then(async () => {
-                  await app.snapshot.refreshProposals();
-                  onModalClose();
-                  successCallback();
-                });
-              } catch (err) {
-                console.log(err);
-                const errorMessage = err.message;
-                notifyError(errorMessage);
-              }
-
-              setIsSaving(false);
-            }}
-          />
-        </div>
-      </div>
+      </CWModalBody>
+      <CWModalFooter>
+        <CWButton
+          label="Cancel"
+          buttonType="secondary"
+          buttonHeight="sm"
+          disabled={isSaving}
+          onClick={async (e) => {
+            e.preventDefault();
+            onModalClose();
+          }}
+        />
+        <CWButton
+          label="Vote"
+          buttonType="primary"
+          buttonHeight="sm"
+          disabled={isSaving}
+          onClick={async (e) => {
+            e.preventDefault();
+            setIsSaving(true);
+            const votePayload = {
+              space: space.id,
+              proposal: id,
+              type: 'single-choice',
+              choice: parseInt(selectedChoice) + 1,
+              metadata: JSON.stringify({}),
+            };
+            try {
+              castVote(author.address, votePayload).then(async () => {
+                await app.snapshot.refreshProposals();
+                onModalClose();
+                successCallback();
+              });
+            } catch (err) {
+              console.log(err);
+              const errorMessage = err.message;
+              notifyError(errorMessage);
+            }
+            setIsSaving(false);
+          }}
+        />
+      </CWModalFooter>
     </div>
   );
 };

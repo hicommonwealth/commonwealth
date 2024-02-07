@@ -1,5 +1,5 @@
+import { NotificationCategories } from '@hicommonwealth/core';
 import React, { useEffect } from 'react';
-import { NotificationCategories } from 'common-common/src/types';
 import type Notification from '../../../models/Notification';
 
 import {
@@ -25,7 +25,7 @@ export const NotificationRow = (props: NotificationRowProps) => {
 
   useEffect(() => setMarkingRead(allRead), [allRead]);
 
-  const { category } = notification.subscription;
+  const category = notification.categoryId;
 
   if (category === NotificationCategories.ChainEvent) {
     return (

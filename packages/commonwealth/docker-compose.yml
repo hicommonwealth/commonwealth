@@ -1,0 +1,50 @@
+version: '3'
+services:
+  cw_postgres:
+    container_name: cw_postgres
+    image: postgres:15.1-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: commonwealth
+      POSTGRES_PASSWORD: edgeware
+      POSTGRES_DB: commonwealth
+    volumes:
+      - .postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U commonwealth']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - '5432:5432'
+    networks:
+      - cw-network
+
+  cw_rabbitmq:
+    container_name: cw_rabbitmq
+    image: rabbitmq:3.11-management
+    restart: always
+    # environment:
+    #   RABBITMQ_DEFAULT_USER: commonwealth
+    #   RABBITMQ_DEFAULT_PASS: edgeware
+    volumes:
+      - '.rabbitmq:/var/lib/rabbitmq/mnesia/'
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - cw-network
+
+  local-redis:
+    container_name: local-redis
+    image: redis:latest
+    ports:
+      - 6379:6379
+    volumes:
+      - ./redis-data:/data
+    networks:
+      - cw-network
+
+networks:
+  cw-network:
+    name: cw-network

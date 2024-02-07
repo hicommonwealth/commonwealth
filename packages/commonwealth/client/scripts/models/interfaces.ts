@@ -46,38 +46,13 @@ export interface IChainModule<C extends Coin, A extends Account> {
   coins(n: number | BN, inDollars?: boolean): C;
 
   denom: string;
-
-  // Signs and submits an on-chain transaction, wrapping it in a modal dialog that tracks its status.
-  createTXModalData(
-    author: A,
-    // TODO: type txfunc
-    txFunc,
-    txName: string,
-    objName: string,
-    cb?: (success: boolean) => void
-  ): ITXModalData;
 }
 
 // Implemented by a chain's account module. Store for account objects.
-export interface IAccountsModule<C extends Coin, A extends Account>
-  extends StorageModule {
+export interface IAccountsModule<A extends Account> extends StorageModule {
   // Converts an address into an account module. Should check storage prior to
   // creating a new account object.
   get(address: string, keytype?: string, ignoreProfile?: boolean): A;
-}
-
-// Offchain stores and management for discussion features.
-export interface IOffchainAccountsModule<C extends Coin, A extends Account>
-  extends StorageModule {
-  get(address: string, chain?: string): A;
-}
-
-export interface ITransactionResult {
-  status: TransactionStatus;
-  hash?: string;
-  err?: string;
-  blocknum?: number;
-  timestamp?: moment.Moment;
 }
 
 export type IBalanceAccount<C extends Coin> = Account & { balance: Promise<C> };
@@ -122,4 +97,12 @@ export interface IUnavailableEndTime {
 
 export interface IQueuedEndTime {
   kind: 'queued';
+}
+
+export interface IGatedTopic {
+  id: number;
+  type: string;
+  data: {
+    threshold: number;
+  };
 }

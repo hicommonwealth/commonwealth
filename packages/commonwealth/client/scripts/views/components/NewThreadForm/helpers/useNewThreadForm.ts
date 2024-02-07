@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
 import type { DeltaStatic } from 'quill';
+import { useEffect, useMemo, useState } from 'react';
 
+import { useDraft } from 'hooks/useDraft';
+import { useSearchParams } from 'react-router-dom';
 import type Topic from '../../../../models/Topic';
 import { ThreadKind } from '../../../../models/types';
 import { getTextFromDelta } from '../../react_quill_editor';
-import { useDraft } from 'hooks/useDraft';
-import { useSearchParams } from 'react-router-dom';
 
 type NewThreadDraft = {
   topicId: number;
@@ -13,42 +13,43 @@ type NewThreadDraft = {
   body: DeltaStatic;
 };
 
-const useNewThreadForm = (chainId: string, topicsForSelector: Topic[]) => {
+const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
   const [searchParams] = useSearchParams();
   const topicIdFromUrl: number = parseInt(searchParams.get('topic') || '0');
 
   const { saveDraft, restoreDraft, clearDraft } = useDraft<NewThreadDraft>(
-    `new-thread-${chainId}-info`
+    `new-thread-${communityId}-info`,
   );
+  const [canShowGatingBanner, setCanShowGatingBanner] = useState(true);
 
   // get restored draft on init
   const restoredDraft: NewThreadDraft | null = useMemo(() => {
-    if (!topicsForSelector.length) {
+    if (!topicsForSelector.length || topicIdFromUrl === 0) {
       return null;
     }
     return restoreDraft();
-  }, [restoreDraft, topicsForSelector]);
+  }, [restoreDraft, topicsForSelector, topicIdFromUrl]);
 
   const defaultTopic = useMemo(() => {
     return (
       topicsForSelector.find(
         (t) =>
           t.id === restoredDraft?.topicId ||
-          (topicIdFromUrl && t.id === topicIdFromUrl)
+          (topicIdFromUrl && t.id === topicIdFromUrl),
       ) ||
       topicsForSelector.find((t) => t.name.includes('General')) ||
       null
     );
-  }, [restoredDraft, topicsForSelector]);
+  }, [restoredDraft, topicsForSelector, topicIdFromUrl]);
 
   const [threadKind, setThreadKind] = useState<ThreadKind>(
-    ThreadKind.Discussion
+    ThreadKind.Discussion,
   );
   const [threadUrl, setThreadUrl] = useState('');
   const [threadTopic, setThreadTopic] = useState<Topic>(defaultTopic);
   const [threadTitle, setThreadTitle] = useState(restoredDraft?.title || '');
   const [threadContentDelta, setThreadContentDelta] = useState<DeltaStatic>(
-    restoredDraft?.body
+    restoredDraft?.body,
   );
   const [isSaving, setIsSaving] = useState(false);
 
@@ -80,13 +81,22 @@ const useNewThreadForm = (chainId: string, topicsForSelector: Topic[]) => {
       return;
     }
     saveDraft(draft);
-  }, [saveDraft, threadTopic, threadTitle, threadContentDelta]);
 
-  useEffect(() => {
+    if (!threadContentDelta && threadTopic?.defaultOffchainTemplate) {
+      try {
+        const template = JSON.parse(
+          threadTopic.defaultOffchainTemplate,
+        ) as DeltaStatic;
+        setThreadContentDelta(template);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+
     if (!threadTopic && defaultTopic) {
       setThreadTopic(defaultTopic);
     }
-  }, [defaultTopic, threadTopic]);
+  }, [saveDraft, threadTopic, threadTitle, threadContentDelta, defaultTopic]);
 
   return {
     threadKind,
@@ -103,6 +113,8 @@ const useNewThreadForm = (chainId: string, topicsForSelector: Topic[]) => {
     setIsSaving,
     isDisabled,
     clearDraft,
+    canShowGatingBanner,
+    setCanShowGatingBanner,
   };
 };
 

@@ -1,7 +1,7 @@
-import axios from 'axios';
-import app from 'state';
-import Topic from 'models/Topic';
 import { useMutation } from '@tanstack/react-query';
+import axios from 'axios';
+import Topic from 'models/Topic';
+import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
 
 interface CreateTopicProps {
@@ -10,7 +10,6 @@ interface CreateTopicProps {
   telegram?: string;
   featuredInSidebar: boolean;
   featuredInNewPost: boolean;
-  tokenThreshold: string;
   defaultOffchainTemplate: string;
 }
 
@@ -20,19 +19,17 @@ const createTopic = async ({
   telegram,
   featuredInSidebar,
   featuredInNewPost,
-  tokenThreshold,
   defaultOffchainTemplate,
 }: CreateTopicProps) => {
-  const response = await axios.post(`${app.serverUrl()}/createTopic`, {
+  const response = await axios.post(`${app.serverUrl()}/topics`, {
     name,
     description,
     telegram,
     featured_in_sidebar: featuredInSidebar,
     featured_in_new_post: featuredInNewPost,
-    token_threshold: tokenThreshold || '0',
     default_offchain_template: defaultOffchainTemplate,
     jwt: app.user.jwt,
-    chain: app.activeChainId(),
+    community_id: app.activeChainId(),
   });
 
   return new Topic(response.data.result);
@@ -43,7 +40,7 @@ const useCreateTopicMutation = () => {
     mutationFn: createTopic,
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({
-        queryKey: [ApiEndpoints.BULK_TOPICS, data.chainId],
+        queryKey: [ApiEndpoints.BULK_TOPICS, data.communityId],
       });
     },
   });

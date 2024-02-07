@@ -4,6 +4,7 @@ import { DeltaStatic } from 'quill';
 import ReactQuill from 'react-quill';
 
 import app from 'state';
+import { compressImage } from 'utils/ImageCompression';
 
 type UseImageUploaderProps = {
   editorRef: MutableRefObject<ReactQuill>;
@@ -34,8 +35,11 @@ export const useImageUploader = ({
         const selectedIndex =
           editor.getSelection()?.index || editor.getLength() || 0;
 
+        // Compress the image before uploading
+        const compressedFile = await compressImage(file);
+
         const uploadedFileUrl = await uploadFileToS3(
-          file,
+          compressedFile,
           app.serverUrl(),
           app.user.jwt
         );

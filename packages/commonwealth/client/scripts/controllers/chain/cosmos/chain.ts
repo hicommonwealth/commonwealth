@@ -3,28 +3,29 @@ import type { EncodeObject } from '@cosmjs/proto-signing';
 import type {
   BankExtension,
   GovExtension,
+  QueryClient,
   StakingExtension,
   StdFee,
 } from '@cosmjs/stargate';
-import type { QueryClient } from '@cosmjs/stargate';
-import type { Event } from '@cosmjs/tendermint-rpc';
-import type { Tendermint34Client } from '@cosmjs/tendermint-rpc';
+import type { Event, Tendermint34Client } from '@cosmjs/tendermint-rpc';
+import { ChainNetwork, WalletId } from '@hicommonwealth/core';
 import BN from 'bn.js';
-import { ChainNetwork, WalletId } from 'common-common/src/types';
 
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
-import { LCD } from 'chain-events/src/chains/cosmos/types';
+import { LCD } from '../../../../../shared/chain/types/cosmos';
 import ChainInfo from '../../../models/ChainInfo';
 import {
   IChainModule,
   ITXData,
   ITXModalData,
 } from '../../../models/interfaces';
+import { COSMOS_EVM_CHAINS } from '../../app/webWallets/keplr_ethereum_web_wallet';
+import KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
+import LeapWebWalletController from '../../app/webWallets/leap_web_wallet';
 import WebWalletController from '../../app/web_wallets';
-import type KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
 import type CosmosAccount from './account';
 import {
   getLCDClient,
@@ -32,6 +33,7 @@ import {
   getSigningClient,
   getTMClient,
 } from './chain.utils';
+import EthSigningClient from './eth_signing_client';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
@@ -88,44 +90,71 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
   public async init(chain: ChainInfo, reset = false) {
     const url = `${window.location.origin}/cosmosAPI/${chain.id}`;
-    console.log(`Starting Tendermint RPC API at ${url}...`);
+
     // TODO: configure broadcast mode
-
-    this._tmClient = await getTMClient(url);
-    this._api = await getRPCClient(this._tmClient);
-
-    if (chain?.cosmosGovernanceVersion === 'v1') {
-      const lcdUrl = `${window.location.origin}/cosmosLCD/${chain.id}`;
-      const lcd = await getLCDClient(lcdUrl);
-      this._lcd = lcd;
+    try {
+      console.log(`Starting Tendermint client...`);
+      this._tmClient = await getTMClient(url);
+    } catch (e) {
+      console.error('Error starting tendermint client: ', e);
     }
-
-    const {
-      pool: { bondedTokens },
-    } = await this._api.staking.pool();
-    this._staked = this.coins(new BN(bondedTokens));
-
-    const {
-      params: { bondDenom },
-    } = await this._api.staking.params();
-    this._denom = bondDenom;
 
     if (this.app.chain.networkStatus === ApiStatus.Disconnected) {
       this.app.chain.networkStatus = ApiStatus.Connecting;
     }
 
-    // Poll for new block immediately
-    const { block } = await this._tmClient.block();
-    const height = +block.header.height;
-    const { block: prevBlock } = await this._tmClient.block(height - 1);
-    const time = moment.unix(block.header.time.valueOf() / 1000);
-    // TODO: check if this is correctly seconds or milliseconds
-    this.app.chain.block.duration =
-      block.header.time.valueOf() - prevBlock.header.time.valueOf();
-    this.app.chain.block.lastTime = time;
-    this.app.chain.block.height = height;
+    try {
+      console.log(`Starting RPC API at ${url}...`);
+      this._api = await getRPCClient(this._tmClient);
+    } catch (e) {
+      console.error('Error starting RPC client: ', e);
+    }
 
-    this.app.chain.networkStatus = ApiStatus.Connected;
+    if (chain?.cosmosGovernanceVersion === 'v1') {
+      try {
+        const lcdUrl = `${window.location.origin}/cosmosLCD/${chain.id}`;
+        console.log(`Starting LCD API at ${lcdUrl}...`);
+        const lcd = await getLCDClient(lcdUrl);
+        this._lcd = lcd;
+      } catch (e) {
+        console.error('Error starting LCD client: ', e);
+      }
+    }
+
+    await this.fetchBlock(); // Poll for new block immediately
+  }
+
+  private async fetchBlock(): Promise<void> {
+    try {
+      const { block } = await this._tmClient.block();
+      const height = +block.header.height;
+      const { block: prevBlock } = await this._tmClient.block(height - 1);
+      // TODO: check if this is correctly seconds or milliseconds
+      const time = moment.unix(block.header.time.valueOf() / 1000);
+      this.app.chain.block.duration =
+        block.header.time.valueOf() - prevBlock.header.time.valueOf();
+      this.app.chain.block.lastTime = time;
+      this.app.chain.block.height = height;
+      this.app.chain.networkStatus = ApiStatus.Connected;
+    } catch (e) {
+      console.error('Error fetching block: ', e);
+    }
+  }
+
+  public async fetchPoolParams(): Promise<CosmosToken> {
+    const {
+      pool: { bondedTokens },
+    } = await this._api.staking.pool();
+    this._staked = this.coins(new BN(bondedTokens));
+    return this._staked;
+  }
+
+  public async fetchStakingParams(): Promise<string> {
+    const {
+      params: { bondDenom },
+    } = await this._api.staking.params();
+    this._denom = bondDenom;
+    return this._denom;
   }
 
   public async deinit(): Promise<void> {
@@ -134,25 +163,61 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
   public async sendTx(
     account: CosmosAccount,
-    tx: EncodeObject
+    tx: EncodeObject,
   ): Promise<readonly Event[]> {
+    const chain = this._app.chain;
     // TODO: error handling
     // TODO: support multiple wallets
-    if (this._app.chain.network === ChainNetwork.Terra) {
+    if (chain.network === ChainNetwork.Terra) {
       throw new Error('Tx not yet supported on Terra');
     }
-    const wallet = WebWalletController.Instance.getByName(
-      WalletId.Keplr
-    ) as KeplrWebWalletController;
-    if (!wallet) throw new Error('Keplr wallet not found');
+
+    const activeAddress = this._app.user.activeAccount?.address;
+    const walletId = this._app.user.addresses?.find(
+      (a) => a.address === activeAddress && a.community?.id === chain.id,
+    )?.walletId;
+    const isKeplr = walletId === WalletId.Keplr;
+    const isLeap = walletId === WalletId.Leap;
+    let wallet;
+
+    if (isKeplr) {
+      wallet = WebWalletController.Instance.getByName(
+        WalletId.Keplr,
+      ) as KeplrWebWalletController;
+    } else if (isLeap) {
+      wallet = WebWalletController.Instance.getByName(
+        WalletId.Leap,
+      ) as LeapWebWalletController;
+    } else {
+      throw new Error('Cosmos wallet not found');
+    }
+
     if (!wallet.enabled) {
       await wallet.enable();
     }
+
     const cosm = await import('@cosmjs/stargate');
-    const client = await getSigningClient(
-      this._app.chain.meta.node.url,
-      wallet.offlineSigner
-    );
+    const dbId = chain.meta.id;
+    let client;
+
+    // TODO: To check if ethermint, we can get slip44 cointype from Cosmos Chain Directory instead of hardcoding
+    if (COSMOS_EVM_CHAINS.some((c) => c === dbId)) {
+      const chainId = wallet.getChainId();
+
+      client = await EthSigningClient(
+        {
+          restUrl: `${window.location.origin}/cosmosLCD/${dbId}`,
+          chainId,
+          path: dbId,
+        },
+        wallet.offlineSigner,
+      );
+    } else {
+      client = await getSigningClient(
+        chain.meta.node.url,
+        wallet.offlineSigner,
+      );
+    }
 
     // these parameters will be overridden by the wallet
     // TODO: can it be simulated?
@@ -168,12 +233,12 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
         account.address,
         [tx],
         DEFAULT_FEE,
-        DEFAULT_MEMO
+        DEFAULT_MEMO,
       );
       console.log(result);
-      if (cosm.isBroadcastTxFailure(result)) {
+      if (cosm.isDeliverTxFailure(result)) {
         throw new Error('TX execution failed.');
-      } else if (cosm.isBroadcastTxSuccess(result)) {
+      } else if (cosm.isDeliverTxSuccess(result)) {
         const txHash = result.transactionHash;
         const txResult = await this._tmClient.tx({
           hash: Buffer.from(txHash, 'hex'),
@@ -193,7 +258,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     txFunc,
     txName: string,
     objName: string,
-    cb?: (success: boolean) => void
+    cb?: (success: boolean) => void,
   ): ITXModalData {
     throw new Error('unsupported');
   }

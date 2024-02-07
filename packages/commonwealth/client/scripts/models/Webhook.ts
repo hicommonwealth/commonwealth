@@ -1,28 +1,25 @@
-import ChainInfo from './ChainInfo';
+import { WebhookCategory } from '@hicommonwealth/core';
 
 class Webhook {
   public readonly id: number;
   public readonly url: string;
-  public categories: string[];
-  public readonly chain_id?: string;
-  public readonly Chain?: ChainInfo;
+  public categories: WebhookCategory[];
+  public readonly community_id?: string;
 
-  constructor(id, url, categories, chain_id, chain) {
+  constructor(
+    id: number,
+    url: string,
+    categories: WebhookCategory[],
+    community_id: string,
+  ) {
     this.id = id;
     this.url = url;
     this.categories = categories;
-    this.chain_id = chain_id;
-    this.Chain = chain;
+    this.community_id = community_id;
   }
 
   public static fromJSON(json) {
-    return new Webhook(
-      json.id,
-      json.url,
-      json.categories,
-      json.chain_id,
-      json.Chain
-    );
+    return new Webhook(json.id, json.url, json.categories, json.community_id);
   }
 }
 

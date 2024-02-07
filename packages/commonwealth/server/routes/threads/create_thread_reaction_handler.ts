@@ -1,7 +1,8 @@
-import { TypedRequest, TypedResponse, success } from '../../types';
-import { AppError } from 'common-common/src/errors';
-import { ReactionAttributes } from '../../models/reaction';
+import { AppError } from '@hicommonwealth/core';
+import { ReactionAttributes } from '@hicommonwealth/model';
+import { verifyReaction } from '../../../shared/canvas/serverVerify';
 import { ServerControllers } from '../../routing/router';
+import { TypedRequest, TypedResponse, success } from '../../types';
 
 const Errors = {
   InvalidReaction: 'Invalid reaction',
@@ -24,9 +25,9 @@ export const createThreadReactionHandler = async (
     any,
     CreateThreadReactionRequestParams
   >,
-  res: TypedResponse<CreateThreadReactionResponse>
+  res: TypedResponse<CreateThreadReactionResponse>,
 ) => {
-  const { user, address, chain } = req;
+  const { user, address } = req;
   const {
     reaction,
     canvas_action: canvasAction,
@@ -43,18 +44,25 @@ export const createThreadReactionHandler = async (
     throw new AppError(Errors.InvalidThreadId);
   }
 
+  if (process.env.ENFORCE_SESSION_KEYS === 'true') {
+    await verifyReaction(canvasAction, canvasSession, canvasHash, {
+      thread_id: threadId,
+      address: address.address,
+      value: reaction,
+    });
+  }
+
   // create thread reaction
   const [newReaction, notificationOptions, analyticsOptions] =
-    await controllers.threads.createThreadReaction(
+    await controllers.threads.createThreadReaction({
       user,
       address,
-      chain,
       reaction,
       threadId,
       canvasAction,
       canvasSession,
-      canvasHash
-    );
+      canvasHash,
+    });
 
   // update address last active
   address.last_active = new Date();
@@ -64,7 +72,7 @@ export const createThreadReactionHandler = async (
   controllers.notifications.emit(notificationOptions).catch(console.error);
 
   // track analytics event
-  controllers.analytics.track(analyticsOptions).catch(console.error);
+  controllers.analytics.track(analyticsOptions, req).catch(console.error);
 
   return success(res, newReaction);
 };

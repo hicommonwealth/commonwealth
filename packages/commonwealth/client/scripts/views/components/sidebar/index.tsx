@@ -1,78 +1,60 @@
+import clsx from 'clsx';
 import 'components/sidebar/index.scss';
-import { featureFlags } from 'helpers/feature-flags';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import { useCommonNavigate } from 'navigation/helpers';
-import React from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useEffect, useMemo } from 'react';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
-import { SubscriptionButton } from 'views/components/subscription_button';
 import { CreateContentSidebar } from '../../menus/create_content_menu';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import { CWText } from '../component_kit/cw_text';
-import { AdminSection } from './admin_section';
-import { DiscussionSection } from './discussion_section';
+import { SidebarHeader } from '../component_kit/CWSidebarHeader';
+import { CommunitySection } from './CommunitySection';
 import { ExploreCommunitiesSidebar } from './explore_sidebar';
-import { ExternalLinksModule } from './external_links_module';
-import { GovernanceSection } from './governance_section';
 import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
-import Permissions from '../../../utils/Permissions';
 
 export type SidebarMenuName =
   | 'default'
   | 'createContent'
   | 'exploreCommunities';
 
-export const Sidebar = ({ isInsideCommunity }) => {
-  const navigate = useCommonNavigate();
-  const { pathname } = useLocation();
-  const { isLoggedIn } = useUserLoggedIn();
-  const { menuName } = useSidebarStore();
+export const Sidebar = ({
+  isInsideCommunity,
+}: {
+  isInsideCommunity: boolean;
+}) => {
+  const {
+    menuName,
+    menuVisible,
+    setRecentlyUpdatedVisibility,
+    recentlyUpdatedVisibility,
+  } = useSidebarStore();
 
-  const onHomeRoute = pathname === `/${app.activeChainId()}/feed`;
+  useEffect(() => {
+    setRecentlyUpdatedVisibility(false);
+  }, [setRecentlyUpdatedVisibility]);
 
-  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
-  const isMod = Permissions.isCommunityModerator();
-  const showAdmin = app.user && (isAdmin || isMod);
+  const sidebarClass = useMemo(() => {
+    return clsx('Sidebar', {
+      onadd: menuVisible && recentlyUpdatedVisibility,
+      onremove: !menuVisible,
+    });
+  }, [menuVisible, recentlyUpdatedVisibility]);
 
   return (
-    <div className="Sidebar">
+    <div className={sidebarClass}>
+      {isInsideCommunity && (
+        <div className="sidebar-header-wrapper">
+          <SidebarHeader />
+        </div>
+      )}
       <div className="sidebar-default-menu">
-        <SidebarQuickSwitcher />
-        {app.activeChainId() && isInsideCommunity && (
-          <div className="community-menu">
-            {showAdmin && <AdminSection />}
-            {featureFlags.communityHomepage && app.chain?.meta.hasHomepage && (
-              <div
-                className={onHomeRoute ? 'home-button active' : 'home-button'}
-                onClick={() => navigate('/feed')}
-              >
-                <CWIcon iconName="home" iconSize="small" />
-                <CWText>Home</CWText>
-              </div>
-            )}
-            <DiscussionSection />
-            <GovernanceSection />
-            <ExternalLinksModule />
-            <div className="buttons-container">
-              {isLoggedIn && app.chain && (
-                <div className="subscription-button">
-                  <SubscriptionButton />
-                </div>
-              )}
-              {app.isCustomDomain() && (
-                <div
-                  className="powered-by"
-                  onClick={() => {
-                    window.open('https://commonwealth.im/');
-                  }}
-                />
-              )}
-            </div>
-          </div>
+        <SidebarQuickSwitcher isInsideCommunity={isInsideCommunity} />
+        {isInsideCommunity && (
+          <CommunitySection showSkeleton={!app.activeChainId()} />
         )}
-        {menuName === 'createContent' && <CreateContentSidebar />}
-        {menuName === 'exploreCommunities' && <ExploreCommunitiesSidebar />}
+        {menuName === 'createContent' && (
+          <CreateContentSidebar isInsideCommunity={isInsideCommunity} />
+        )}
+        {menuName === 'exploreCommunities' && (
+          <ExploreCommunitiesSidebar isInsideCommunity={isInsideCommunity} />
+        )}
       </div>
     </div>
   );

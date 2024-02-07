@@ -1,60 +1,71 @@
 import React from 'react';
 
-import { NotificationCategories } from 'common-common/src/types';
+import { NotificationCategories } from '@hicommonwealth/core';
 
 import 'pages/user_dashboard/user_dashboard_row_bottom.scss';
 
-import app from 'state';
-import { CWAvatarGroup } from '../../components/component_kit/cw_avatar_group';
-import type { ProfileWithAddress } from '../../components/component_kit/cw_avatar_group';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
-import { CWText } from '../../components/component_kit/cw_text';
-import { subscribeToThread } from './helpers';
-import type NotificationSubscription from '../../../models/NotificationSubscription';
 import useForceRerender from 'hooks/useForceRerender';
+import app from 'state';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
+import type NotificationSubscription from '../../../models/NotificationSubscription';
+import type { ProfileWithAddress } from '../../components/component_kit/cw_avatar_group';
+import { CWAvatarGroup } from '../../components/component_kit/cw_avatar_group';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWText } from '../../components/component_kit/cw_text';
+import { UserDashboardRowBottomSkeleton } from './UserDashboardRowBottomSkeleton';
+import { subscribeToThread } from './helpers';
 
 type UserDashboardRowBottomProps = {
   commentCount: number;
   threadId: string;
-  chainId: string;
+  communityId: string;
   commentId?: string;
   commenters: ProfileWithAddress[];
+  showSkeleton?: boolean;
 };
 
 export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
-  const { threadId, commentCount, commentId, chainId, commenters } = props;
+  const {
+    threadId,
+    commentCount,
+    commentId,
+    communityId,
+    commenters,
+    showSkeleton,
+  } = props;
   const forceRerender = useForceRerender();
+
+  if (showSkeleton) {
+    return <UserDashboardRowBottomSkeleton />;
+  }
 
   const setSubscription = async (
     subThreadId: string,
     bothActive: boolean,
     commentSubscription: NotificationSubscription,
-    reactionSubscription: NotificationSubscription
+    reactionSubscription: NotificationSubscription,
   ) => {
     await subscribeToThread(
       subThreadId,
       bothActive,
       commentSubscription,
-      reactionSubscription
+      reactionSubscription,
     );
     forceRerender();
   };
 
-  const adjustedId = `discussion_${threadId}`;
+  const commentSubscription =
+    app.user.notifications.findNotificationSubscription({
+      categoryId: NotificationCategories.NewComment,
+      options: { threadId: Number(threadId) },
+    });
 
-  const commentSubscription = app.user.notifications.subscriptions.find(
-    (v) =>
-      v.objectId === adjustedId &&
-      v.category === NotificationCategories.NewComment
-  );
-
-  const reactionSubscription = app.user.notifications.subscriptions.find(
-    (v) =>
-      v.objectId === adjustedId &&
-      v.category === NotificationCategories.NewReaction
-  );
+  const reactionSubscription =
+    app.user.notifications.findNotificationSubscription({
+      categoryId: NotificationCategories.NewReaction,
+      options: { threadId: Number(threadId) },
+    });
 
   const bothActive =
     commentSubscription?.isActive && reactionSubscription?.isActive;
@@ -65,13 +76,17 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
     <div className="UserDashboardRowBottom">
       <div className="comments">
         <div className="count">
-          <CWIcon iconName="feedback" iconSize="small" className="icon" />
+          <CWIcon iconName="comment" iconSize="small" />
           <CWText type="caption" className="text">
             {commentCount} {commentCount == 1 ? 'Comment' : 'Comments'}
           </CWText>
         </div>
         <div>
-          <CWAvatarGroup profiles={commenters} chainId={chainId} />
+          <CWAvatarGroup
+            profiles={commenters}
+            communityId={communityId}
+            totalProfiles={commentCount}
+          />
         </div>
       </div>
       <div
@@ -89,7 +104,7 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
                   threadId,
                   bothActive,
                   commentSubscription,
-                  reactionSubscription
+                  reactionSubscription,
                 );
               },
               label: bothActive ? 'Unsubscribe' : 'Subscribe',
@@ -107,34 +122,36 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
         <PopoverMenu
           menuItems={[
             {
-              iconLeft: 'copy',
-              label: 'Copy URL',
+              iconLeft: 'linkPhosphor',
+              iconLeftSize: 'regular',
+              label: 'Copy link',
               onClick: async () => {
                 if (commentId) {
                   await navigator.clipboard.writeText(
-                    `${domain}/${chainId}/discussion/${threadId}?comment=${commentId}`
+                    `${domain}/${communityId}/discussion/${threadId}?comment=${commentId}`,
                   );
                   return;
                 }
                 await navigator.clipboard.writeText(
-                  `${domain}/${chainId}/discussion/${threadId}`
+                  `${domain}/${communityId}/discussion/${threadId}`,
                 );
               },
             },
             {
-              iconLeft: 'twitter',
+              iconLeft: 'twitterOutline',
+              iconLeftSize: 'regular',
               label: 'Share on Twitter',
               onClick: async () => {
                 if (commentId) {
                   await window.open(
-                    `https://twitter.com/intent/tweet?text=${domain}/${chainId}/discussion/${threadId}
-                      ?comment=${commentId}`
+                    `https://twitter.com/intent/tweet?text=${domain}/${communityId}/discussion/${threadId}
+                      ?comment=${commentId}`,
                   );
                   return;
                 }
                 await window.open(
-                  `https://twitter.com/intent/tweet?text=${domain}/${chainId}/discussion/${threadId}`,
-                  '_blank'
+                  `https://twitter.com/intent/tweet?text=${domain}/${communityId}/discussion/${threadId}`,
+                  '_blank',
                 );
               },
             },

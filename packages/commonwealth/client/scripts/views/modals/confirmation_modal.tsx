@@ -1,21 +1,27 @@
 import React, { useState } from 'react';
-
-import { Modal } from 'views/components/component_kit/cw_modal';
-import { uuidv4 } from 'lib/util';
 import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
-import type { ButtonProps } from 'views/components/component_kit/cw_button';
-import { CWButton } from 'views/components/component_kit/cw_button';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
+import clsx from 'clsx';
 
-import 'modals/confirmation_modal.scss';
+import { uuidv4 } from '../../lib/util';
+import type { ButtonProps } from '../components/component_kit/new_designs/cw_button';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
+import { CWText } from '../components/component_kit/cw_text';
+import {
+  CWModal,
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
+
+import '../../../styles/modals/confirmation_modal.scss';
 
 interface ConfirmationModalProps {
   title?: string;
   description: string | JSX.Element;
   buttons: ButtonProps[];
   removeModal: () => void;
+  className?: string;
 }
 
 const ConfirmationModal = ({
@@ -23,6 +29,7 @@ const ConfirmationModal = ({
   description,
   buttons,
   removeModal,
+  className,
 }: ConfirmationModalProps) => {
   const [open, setOpen] = useState(true);
 
@@ -43,23 +50,19 @@ const ConfirmationModal = ({
   ));
 
   return (
-    <Modal
+    <CWModal
+      size="small"
       content={
-        <div className="ConfirmationModal">
-          <div className="header">
-            {title && <CWText type="h4">{title}</CWText>}
-            <CWIconButton
-              className="ModalExitButton"
-              iconName="close"
-              onClick={onClose}
-            />
-          </div>
-          {description && (
-            <CWText type="b1" className="description">
-              {description}
-            </CWText>
-          )}
-          <div className="footer">{actions}</div>
+        <div className={clsx('ConfirmationModal', className)}>
+          <CWModalHeader label={title} icon="warning" onModalClose={onClose} />
+          <CWModalBody>
+            {description && (
+              <CWText type="b1" className="description">
+                {description}
+              </CWText>
+            )}
+          </CWModalBody>
+          {actions?.length ? <CWModalFooter>{actions}</CWModalFooter> : null}
         </div>
       }
       onClose={onClose}
@@ -72,6 +75,7 @@ interface OpenConfirmationProps {
   title?: string;
   description: string | JSX.Element;
   buttons: ButtonProps[];
+  className?: string;
 }
 
 export const openConfirmation = (props: OpenConfirmationProps) => {

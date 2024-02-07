@@ -36,6 +36,7 @@
   .comment-thread-info {
     .noWrap {
       display: flex;
+      flex-wrap: wrap;
     }
 
     .User {
@@ -50,5 +51,6 @@
 
   .comment-preview {
     color: $neutral-600;
+    flex-wrap: wrap;
   }
 }

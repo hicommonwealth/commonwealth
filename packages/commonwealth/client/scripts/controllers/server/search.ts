@@ -1,11 +1,11 @@
+import { SearchContentType } from '@hicommonwealth/core';
+import axios from 'axios';
+import Thread from 'models/Thread';
 import moment from 'moment';
 import app from 'state';
 import SearchStore from 'stores/SearchStore';
-import { SearchContentType } from 'types';
-import type Thread from '../../models/Thread';
-import SearchQuery, { SearchScope } from '../../models/SearchQuery';
 import type { SearchParams } from '../../models/SearchQuery';
-import axios from 'axios';
+import SearchQuery, { SearchScope } from '../../models/SearchQuery';
 
 const SEARCH_PREVIEW_SIZE = 6;
 const SEARCH_PAGE_SIZE = 10;
@@ -31,7 +31,7 @@ class SearchController {
       return this.getByQuery(searchQuery);
     }
     const searchCache = this._store.getOrAdd(searchQuery);
-    const { searchTerm, chainScope, isSearchPreview, sort } = searchQuery;
+    const { searchTerm, communityScope, isSearchPreview, sort } = searchQuery;
     const pageSize = isSearchPreview ? SEARCH_PREVIEW_SIZE : SEARCH_PAGE_SIZE;
     const scope = searchQuery.getSearchScope();
 
@@ -42,7 +42,7 @@ class SearchController {
       ) {
         const discussions = await this.searchDiscussions(searchTerm, {
           pageSize,
-          chainScope,
+          communityScope,
           sort,
         });
 
@@ -51,14 +51,14 @@ class SearchController {
             discussion.SearchContentType = SearchContentType.Thread;
             discussion.searchType = SearchScope.Threads;
             return discussion;
-          }
+          },
         );
       }
 
       if (scope.includes(SearchScope.Replies)) {
         const comments = await this.searchComments(searchTerm, {
           pageSize,
-          chainScope,
+          communityScope,
           sort,
         });
 
@@ -79,10 +79,10 @@ class SearchController {
         });
 
         searchCache.results[SearchScope.Communities] = filteredComms
-          .map((chain) => {
-            chain.SearchContentType = SearchContentType.Chain;
-            chain.searchType = SearchScope.Communities;
-            return chain;
+          .map((community) => {
+            community.SearchContentType = SearchContentType.Chain;
+            community.searchType = SearchScope.Communities;
+            return community;
           })
           .sort(this.sortCommunities);
       }
@@ -90,7 +90,7 @@ class SearchController {
       if (scope.includes(SearchScope.Members)) {
         const { profiles } = await this.searchMentionableProfiles(
           searchTerm,
-          chainScope
+          communityScope,
         );
 
         searchCache.results[SearchScope.Members] = profiles
@@ -99,7 +99,7 @@ class SearchController {
               id: profile.id,
               profile_id: profile.id,
               address: profile.addresses[0]?.address,
-              chain: profile.addresses[0]?.chain,
+              chain: profile.addresses[0]?.community_id,
               name: profile.profile_name,
               user_id: profile.user_id,
               UserId: profile.user_id,
@@ -141,12 +141,12 @@ class SearchController {
     searchQuery: SearchQuery,
     tab: SearchScope,
     page: number,
-    pageSize: number
+    pageSize: number,
   ) {
-    const { searchTerm, chainScope, sort } = searchQuery;
+    const { searchTerm, communityScope, sort } = searchQuery;
     const searchParams = {
       pageSize,
-      chainScope,
+      communityScope,
       sort,
     };
     switch (tab) {
@@ -154,7 +154,7 @@ class SearchController {
         const discussions = await this.searchDiscussions(
           searchTerm,
           searchParams,
-          page
+          page,
         );
         return discussions.map((row) => {
           return {
@@ -168,7 +168,7 @@ class SearchController {
         const replies = await this.searchComments(
           searchTerm,
           searchParams,
-          page
+          page,
         );
         return replies.map((row) => {
           return {
@@ -186,12 +186,12 @@ class SearchController {
   private searchDiscussions = async (
     searchTerm: string,
     params: SearchParams,
-    page?: number
+    page?: number,
   ) => {
-    const { pageSize, chainScope, communityScope, sort } = params;
+    const { pageSize, communityScope, sort } = params;
     try {
       const queryParams = {
-        chain: chainScope,
+        chain: communityScope,
         community: communityScope,
         search: searchTerm,
         page_size: pageSize,
@@ -216,12 +216,12 @@ class SearchController {
   private searchComments = async (
     searchTerm: string,
     params: SearchParams,
-    page?: number
+    page?: number,
   ) => {
-    const { pageSize, chainScope, communityScope, sort } = params;
+    const { pageSize, communityScope, sort } = params;
     try {
       const queryParams = {
-        chain: chainScope,
+        chain: communityScope,
         community: communityScope,
         search: searchTerm,
         page_size: pageSize,
@@ -245,13 +245,13 @@ class SearchController {
 
   public searchThreadTitles = async (
     searchTerm: string,
-    params: SearchParams
+    params: SearchParams,
   ): Promise<Thread[]> => {
-    const { pageSize, chainScope, communityScope } = params;
+    const { pageSize, communityScope } = params;
     try {
       const response = await axios.get(`${app.serverUrl()}/threads`, {
         params: {
-          chain: chainScope,
+          chain: communityScope,
           community: communityScope,
           search: searchTerm,
           results_size: pageSize,
@@ -262,7 +262,7 @@ class SearchController {
         throw new Error(`Got unsuccessful status: ${response.status}`);
       }
       return response.data.result.map((rawThread) => {
-        return app.threads.modelFromServer(rawThread);
+        return new Thread(rawThread);
       });
     } catch (e) {
       console.error(e);
@@ -272,39 +272,34 @@ class SearchController {
 
   public searchMentionableProfiles = async (
     searchTerm: string,
-    chainScope: string,
+    communityScope: string,
     pageSize?: number,
     page?: number,
-    includeRoles?: boolean
+    includeRoles?: boolean,
   ) => {
-    try {
-      const response = await axios.get(`${app.serverUrl()}/searchProfiles`, {
-        params: {
-          chain: chainScope,
-          search: searchTerm,
-          page_size: pageSize,
-          page,
-          include_roles: includeRoles,
-        },
-      });
-      if (response.data.status !== 'Success') {
-        throw new Error(`Got unsuccessful status: ${response.status}`);
-      }
-      return response.data.result;
-    } catch (e) {
-      console.error(e);
-      return { profiles: [] };
+    const response = await axios.get(`${app.serverUrl()}/profiles`, {
+      params: {
+        chain: communityScope,
+        search: searchTerm,
+        page_size: pageSize,
+        page,
+        include_roles: includeRoles,
+      },
+    });
+    if (response.data.status !== 'Success') {
+      throw new Error(`Got unsuccessful status: ${response.status}`);
     }
+    return response.data.result;
   };
 
   private sortResults = (a, b) => {
     // TODO: Token-sorting approach
     // Some users are not verified; we give them a default date of 1900
     const aCreatedAt = moment(
-      a.created_at || a.createdAt || a.verified || '1900-01-01T:00:00:00Z'
+      a.created_at || a.createdAt || a.verified || '1900-01-01T:00:00:00Z',
     );
     const bCreatedAt = moment(
-      b.created_at || b.createdAt || b.verified || '1900-01-01T:00:00:00Z'
+      b.created_at || b.createdAt || b.verified || '1900-01-01T:00:00:00Z',
     );
     return bCreatedAt.diff(aCreatedAt);
   };

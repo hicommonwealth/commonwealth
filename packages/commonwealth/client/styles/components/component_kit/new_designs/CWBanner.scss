@@ -1,0 +1,120 @@
+@import '../../../shared';
+
+@mixin bannerTheme($main, $background, $accent) {
+  border: 1px solid $main;
+  background: $background;
+
+  .type-icon-container {
+    svg {
+      fill: $main;
+    }
+  }
+
+  .header {
+    color: $main;
+  }
+
+  .body {
+    color: $main;
+  }
+
+  .close-icon-container {
+    svg {
+      fill: $accent;
+    }
+  }
+}
+
+.CWBanner {
+  padding: 16px;
+  display: flex;
+  border-radius: 6px;
+  border: 1px solid $neutral-600;
+  background: $neutral-25;
+  justify-content: flex-start;
+  min-width: fit-content;
+
+  .type-icon-container {
+    margin-right: 8px;
+  }
+
+  .content-container {
+    display: flex;
+    flex-direction: column;
+    padding-right: 5px;
+
+    .header {
+      color: $neutral-600;
+    }
+
+    .body {
+      color: $neutral-600;
+    }
+  }
+
+  .close-icon-container {
+    margin-left: auto;
+
+    .close-icon {
+      cursor: pointer;
+    }
+  }
+
+  .gating-tags {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+    padding-top: 8px;
+  }
+
+  .actions-row {
+    display: flex;
+    margin-top: 24px;
+    flex-wrap: wrap;
+
+    @include smallInclusive {
+      justify-content: center;
+
+      .btn-border,
+      .Button {
+        width: 100% !important;
+      }
+    }
+  }
+
+  .footer {
+    display: flex;
+    margin-top: 16px;
+    gap: 4px;
+
+    .description {
+      color: $neutral-500;
+    }
+  }
+
+  &.info {
+    @include bannerTheme($primary-700, $primary-25, $primary-500);
+  }
+
+  &.success {
+    @include bannerTheme($green-700, $green-25, $green-600);
+  }
+
+  &.warning {
+    @include bannerTheme($yellow-700, $yellow-25, $yellow-600);
+  }
+
+  &.error {
+    @include bannerTheme($rorange-600, $rorange-25, $rorange-500);
+
+    .Button.primary {
+      background-color: $rorange-500;
+
+      &:hover {
+        background-color: $rorange-400;
+      }
+    }
+  }
+}

@@ -7,7 +7,7 @@ import { stringToHex } from '@polkadot/util';
 
 import type { SessionPayload } from '@canvas-js/interfaces';
 
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
 import { addressSwapper } from 'utils';
 
 import app from 'state';
@@ -17,7 +17,8 @@ import IWebWallet from '../../../models/IWebWallet';
 declare let window: any;
 
 class PolkadotWebWalletController
-  implements IWebWallet<InjectedAccountWithMeta> {
+  implements IWebWallet<InjectedAccountWithMeta>
+{
   // GETTERS/SETTERS
   private polkadot;
   private _enabled: boolean;
@@ -68,10 +69,12 @@ class PolkadotWebWalletController
   // ACTIONS
   public async signCanvasMessage(
     account: Account,
-    canvasMessage: SessionPayload
+    canvasSessionPayload: SessionPayload,
   ): Promise<string> {
     const canvas = await import('@canvas-js/interfaces');
-    const message = stringToHex(canvas.serializeSessionPayload(canvasMessage));
+    const message = stringToHex(
+      canvas.serializeSessionPayload(canvasSessionPayload),
+    );
 
     const signer = await this.getSigner(account.address);
     const payload: SignerPayloadRaw = {
@@ -86,7 +89,6 @@ class PolkadotWebWalletController
   public async enable() {
     this.polkadot = await import('@polkadot/extension-dapp');
     console.log('Attempting to enable Substrate web wallet');
-    if (!this.available) throw new Error('Web wallet not available');
 
     // returns an array of all the injected sources
     // (this needs to be called first, before other requests)

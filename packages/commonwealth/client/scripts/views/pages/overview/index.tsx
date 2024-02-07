@@ -1,43 +1,45 @@
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
+import 'pages/discussions/index.scss';
 import 'pages/overview/index.scss';
 import React, { useEffect } from 'react';
 import app from 'state';
+import { useFetchThreadsQuery } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import type Thread from '../../../models/Thread';
 import type Topic from '../../../models/Topic';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { PageLoading } from '../loading';
-import { TopicSummaryRow } from './topic_summary_row';
+import { TopicSummaryRow } from './TopicSummaryRow';
 
 const OverviewPage = () => {
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
-  const { isWindowExtraSmall } = useBrowserWindow({});
+  const { isWindowSmallInclusive } = useBrowserWindow({});
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+
+  const { data: recentlyActiveThreads, isLoading } = useFetchThreadsQuery({
+    queryType: 'active',
+    communityId: app.activeChainId(),
+    topicsPerThread: 3,
+    // TODO: ask for a pinned thread prop here to show pinned threads
+  });
 
   useEffect(() => {
-    app.threads.isFetched.on('redraw', forceRerender);
     app.loginStateEmitter.on('redraw', forceRerender);
-    app.user.isFetched.on('redraw', forceRerender);
 
     return () => {
-      app.threads.isFetched.off('redraw', forceRerender);
       app.loginStateEmitter.off('redraw', forceRerender);
-      app.user.isFetched.off('redraw', forceRerender);
     };
   }, [forceRerender]);
 
-  const allMonthlyThreads = app.threads.overviewStore.getAll();
-  const allPinnedThreads = app.threads.listingStore.getThreads({
-    pinned: true,
-  });
-
   const { data: topics = [] } = useFetchTopicsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const anyTopicsFeatured = topics.some((t) => t.featuredInSidebar);
@@ -55,21 +57,23 @@ const OverviewPage = () => {
     pinnedThreads: Array<Thread>;
     topic: Topic;
   }> = topicsSorted.map((topic) => {
-    const monthlyThreads = allMonthlyThreads.filter(
-      (thread) => topic?.id && thread.topic?.id && topic.id === thread.topic.id
-    );
-    const pinnedThreads = allPinnedThreads.filter(
-      (thread) => topic?.id && thread.topic?.id && topic.id === thread.topic.id
+    const monthlyThreads = (recentlyActiveThreads || []).filter(
+      (thread) =>
+        topic?.id &&
+        thread.topic?.id &&
+        topic.id === thread.topic.id &&
+        thread.archivedAt === null &&
+        !thread.markedAsSpamAt,
     );
 
     return {
       monthlyThreads,
-      pinnedThreads,
+      pinnedThreads: [], // TODO: ask for a pinned thread prop in /threads?active=true api to show pinned threads
       topic,
     };
   });
 
-  return !topicSummaryRows.length && !app.threads.initialized ? (
+  return !topicSummaryRows.length ? (
     <PageLoading />
   ) : (
     <div className="OverviewPage">
@@ -80,7 +84,8 @@ const OverviewPage = () => {
           </CWText>
           <CWButton
             className="latest-button"
-            buttonType="mini-black"
+            buttonType="primary"
+            buttonHeight="sm"
             label="Latest Threads"
             iconLeft="home"
             onClick={() => {
@@ -88,24 +93,16 @@ const OverviewPage = () => {
             }}
           />
         </div>
-        {isWindowExtraSmall ? (
-          <CWIconButton
-            iconName="plusCircle"
-            iconButtonTheme="black"
-            onClick={() => {
-              navigate('/new/discussion');
-            }}
-            disabled={!app.user.activeAccount}
-          />
-        ) : (
+        {!isWindowSmallInclusive && (
           <CWButton
-            buttonType="mini-black"
-            label="Create Thread"
+            buttonType="primary"
+            buttonHeight="sm"
+            label="Create thread"
             iconLeft="plus"
             onClick={() => {
               navigate('/new/discussion');
             }}
-            disabled={!app.user.activeAccount}
+            disabled={!hasJoinedCommunity}
           />
         )}
       </div>
@@ -129,8 +126,21 @@ const OverviewPage = () => {
       </div>
       <CWDivider />
       {topicSummaryRows.map((row, i) => (
-        <TopicSummaryRow {...row} key={i} />
+        <TopicSummaryRow {...row} key={i} isLoading={isLoading} />
       ))}
+      {isWindowSmallInclusive && (
+        <div className="floating-mobile-button">
+          <CWIconButton
+            iconName="plusCircle"
+            iconButtonTheme="black"
+            iconSize="xl"
+            onClick={() => {
+              navigate('/new/discussion');
+            }}
+            disabled={!hasJoinedCommunity}
+          />
+        </div>
+      )}
     </div>
   );
 };

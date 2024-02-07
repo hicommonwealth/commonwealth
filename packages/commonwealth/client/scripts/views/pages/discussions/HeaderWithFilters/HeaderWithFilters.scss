@@ -1,0 +1,79 @@
+@import '../../../../../styles/shared';
+
+.HeaderWithFilters {
+  background-color: $white;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+
+    .count-and-button {
+      align-items: center;
+      display: flex;
+      gap: 16px;
+
+      .thread-count-text.Text {
+        color: $neutral-400;
+      }
+    }
+  }
+
+  .subheader-text.Text {
+    color: $neutral-600;
+  }
+
+  .filter-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .filter-section {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+
+  .filter-label {
+    display: grid;
+    place-items: center;
+    font-weight: bold;
+    font-size: 14px;
+    margin-right: 16px;
+    width: 34px;
+  }
+
+  .checkboxes {
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+  }
+
+  @include smallInclusive {
+    .filter-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+  }
+
+  @include extraSmall {
+    .filter-section-right {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .filter-section-top {
+      align-items: flex-start;
+    }
+
+    .filter-label {
+      padding: 8px 0;
+    }
+  }
+}

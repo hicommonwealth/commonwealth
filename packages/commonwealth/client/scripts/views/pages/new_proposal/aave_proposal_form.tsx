@@ -1,42 +1,55 @@
-import React, { useState } from 'react';
 import { utils } from 'ethers';
+import React, { useEffect, useState } from 'react';
 
 import 'pages/new_proposal/aave_proposal_form.scss';
 
+import { notifyError } from 'controllers/app/notifications';
+import type Aave from 'controllers/chain/ethereum/aave/adapter';
+import { AaveExecutor } from 'controllers/chain/ethereum/aave/api';
+import type { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
 import app from 'state';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { User } from 'views/components/user/user';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWLabel } from '../../components/component_kit/cw_label';
-import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
-import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import {
+  CWTab,
+  CWTabsRow,
+} from '../../components/component_kit/new_designs/CWTabs';
 import type { AaveProposalState } from './types';
 import { defaultStateItem } from './types';
-import type { Executor } from 'common-common/src/eth/types';
-import type Aave from 'controllers/chain/ethereum/aave/adapter';
-import type { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
-import { notifyError } from 'controllers/app/notifications';
 
 export const AaveProposalForm = () => {
   const [aaveProposalState, setAaveProposalState] = useState<
     Array<AaveProposalState>
   >([defaultStateItem]);
   const [activeTabIndex, setActiveTabIndex] = useState(0);
-  const [executor, setExecutor] = useState<Executor | string>();
+  const [executor, setExecutor] = useState('');
   const [ipfsHash, setIpfsHash] = useState();
   const [proposer, setProposer] = useState('');
   const [tabCount, setTabCount] = useState(1);
+  const [executorList, setExecutorList] = useState<AaveExecutor[]>([]);
 
   const author = app.user.activeAccount;
   const aave = app.chain as Aave;
 
+  useEffect(() => {
+    const getExecutors = async () => {
+      const executors = await aave.governance.api.getAaveExecutors();
+      setExecutorList(executors);
+    };
+
+    getExecutors();
+  }, [aave.governance.api]);
+
   const updateAaveProposalState = <K extends keyof AaveProposalState>(
     index: number,
     key: K,
-    value: AaveProposalState[K]
+    value: AaveProposalState[K],
   ) => {
     const newAaveProposalState = [...aaveProposalState];
     newAaveProposalState[index][key] = value;
@@ -47,7 +60,13 @@ export const AaveProposalForm = () => {
     <div className="AaveProposalForm">
       <div className="row-with-label">
         <CWLabel label="Proposer (you)" />
-        <User user={author} linkify popover showAddressWithDisplayName />
+        <User
+          userAddress={author.address}
+          userCommunityId={author.community?.id || author.profile?.chain}
+          shouldLinkProfile
+          shouldShowPopover
+          shouldShowAddressWithDisplayName
+        />
       </div>
       <CWTextInput
         label="IPFS Hash"
@@ -59,7 +78,7 @@ export const AaveProposalForm = () => {
       <div className="row-with-label">
         <CWLabel label="Executor" />
         <div className="executors-container">
-          {aave.governance.api.Executors.map((r) => (
+          {executorList.map((r) => (
             <div
               key={r.address}
               className={`executor ${
@@ -86,7 +105,7 @@ export const AaveProposalForm = () => {
         </div>
       </div>
       <div className="tab-selector">
-        <CWTabBar>
+        <CWTabsRow>
           {aaveProposalState.map((_, index) => (
             <CWTab
               key={`Call ${index + 1}`}
@@ -97,7 +116,7 @@ export const AaveProposalForm = () => {
               }}
             />
           ))}
-        </CWTabBar>
+        </CWTabsRow>
         <PopoverMenu
           menuItems={[
             {
@@ -123,7 +142,7 @@ export const AaveProposalForm = () => {
                 setActiveTabIndex(tabCount - 1);
 
                 const newAaveProposalState = aaveProposalState.filter(
-                  (_, i) => i !== aaveProposalState.length - 1
+                  (_, i) => i !== aaveProposalState.length - 1,
                 );
 
                 setAaveProposalState(newAaveProposalState);
@@ -173,7 +192,7 @@ export const AaveProposalForm = () => {
           updateAaveProposalState(
             activeTabIndex,
             'withDelegateCall',
-            e.target.checked
+            e.target.checked,
           );
         }}
         label="Delegate Call"
@@ -187,7 +206,7 @@ export const AaveProposalForm = () => {
           setProposer(app.user?.activeAccount?.address);
 
           if (!proposer) {
-            throw new Error('Invalid address / not logged in');
+            throw new Error('Invalid address / not signed in');
           }
 
           if (!executor) {
@@ -223,7 +242,7 @@ export const AaveProposalForm = () => {
           const _ipfsHash = utils.formatBytes32String(ipfsHash);
 
           const details: AaveProposalArgs = {
-            executor: executor as string,
+            executor,
             targets,
             values,
             calldatas,

@@ -3,38 +3,37 @@ import React from 'react';
 import 'components/community_card.scss';
 
 import { isCommandClick } from 'helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 import type ChainInfo from '../../models/ChainInfo';
 import { CWButton } from './component_kit/cw_button';
 import { CWCard } from './component_kit/cw_card';
 import { CWCommunityAvatar } from './component_kit/cw_community_avatar';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { CWText } from './component_kit/cw_text';
-import { useCommonNavigate } from 'navigation/helpers';
 
-type CommunityCardProps = { chain: ChainInfo };
+type CommunityCardProps = { community: ChainInfo };
 
-export const CommunityCard = (props: CommunityCardProps) => {
-  const { chain } = props;
+export const CommunityCard = ({ community }: CommunityCardProps) => {
   const navigate = useCommonNavigate();
 
   const redirectFunction = (e) => {
     e.preventDefault();
     if (isCommandClick(e)) {
-      window.open(`/${chain.id}`, '_blank');
+      window.open(`/${community.id}`, '_blank');
       return;
     }
     localStorage['home-scrollY'] = window.scrollY;
-    navigate(`/${chain.id}`);
+    navigate(`/${community.id}`);
   };
 
   // Potentially Temporary (could be built into create community flow)
   let prettyDescription = '';
 
-  if (chain.description) {
+  if (community.description) {
     prettyDescription =
-      chain.description[chain.description.length - 1] === '.'
-        ? chain.description
-        : `${chain.description}.`;
+      community.description[community.description.length - 1] === '.'
+        ? community.description
+        : `${community.description}.`;
   }
 
   return (
@@ -45,15 +44,15 @@ export const CommunityCard = (props: CommunityCardProps) => {
       onClick={redirectFunction}
     >
       <div className="top-content">
-        <CWCommunityAvatar community={chain} size="xxl" />
+        <CWCommunityAvatar community={community} size="xxl" />
         <CWText
           type="h4"
           fontWeight="semiBold"
           className="chain-name"
-          title={chain.name}
+          title={community.name}
           noWrap
         >
-          {chain.name}
+          {community.name}
         </CWText>
       </div>
       <div className="bottom-content">

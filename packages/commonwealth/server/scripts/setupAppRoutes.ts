@@ -1,11 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { ChainBase, ChainNetwork, logger } from '@hicommonwealth/core';
+import type { CommunityInstance, DB } from '@hicommonwealth/model';
 import cheerio from 'cheerio';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { DEFAULT_COMMONWEALTH_LOGO } from '../config';
-import type { DB } from '../models';
-import type { ChainInstance } from '../models/chain';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true';
 const DEV = process.env.NODE_ENV !== 'production';
@@ -27,25 +26,11 @@ const getUrl = (req) => {
   return req.protocol + '://' + req.get('host') + req.originalUrl;
 };
 
-const setupAppRoutes = (
-  app,
-  models: DB,
-  devMiddleware,
-  templateFile,
-  sendFile
-) => {
-  if (NO_CLIENT_SERVER) {
+const setupAppRoutes = (app, models: DB, templateFile, sendFile) => {
+  if (NO_CLIENT_SERVER || DEV) {
     return;
   }
   log.info('setupAppRoutes');
-  // Development: serve everything through devMiddleware
-  if (DEV) {
-    app.get('*', (req, res, next) => {
-      req.url = '/build/';
-      devMiddleware(req, res, next);
-    });
-    return;
-  }
 
   // Production: serve SEO-optimized routes where possible
   //
@@ -90,7 +75,7 @@ const setupAppRoutes = (
     const metadataHtml: string = $tmpl.html();
     const twitterSafeHtml = metadataHtml.replace(
       /<meta name="twitter:image:src" content="(.*?)">/g,
-      '<meta name="twitter:image" content="$1">'
+      '<meta name="twitter:image" content="$1">',
     );
 
     res.send(twitterSafeHtml);
@@ -98,44 +83,14 @@ const setupAppRoutes = (
 
   app.get('/:scope?/overview', renderGeneralPage);
 
-  app.get('/:scope?/account/:address', async (req, res) => {
-    // Retrieve title, description, and author from the database
-    let title, description, author, profileData, image;
-    const address = await models.Address.findOne({
-      where: { chain: req.params.scope, address: req.params.address },
-      include: [models.Profile],
-    });
-    const profile = await address.getProfile();
-    if (address && profile) {
-      try {
-        title = profileData.name;
-        description = profile.bio;
-        image = profile.avatar_url;
-        author = '';
-      } catch (e) {
-        title = '';
-        description = '';
-        image = '';
-        author = '';
-      }
-    } else {
-      title = '';
-      description = '';
-      image = '';
-      author = '';
-    }
-    const url = getUrl(req);
-
-    renderWithMetaTags(res, title, description, author, image, url);
-  });
-
   const renderThread = async (scope: string, threadId: string, req, res) => {
     // Retrieve discussions
     const thread = await models.Thread.findOne({
-      where: scope ? { id: threadId, chain: scope } : { id: threadId },
+      where: scope ? { id: threadId, community_id: scope } : { id: threadId },
       include: [
         {
-          model: models.Chain,
+          model: models.Community,
+          as: 'Community',
           where: scope ? null : { custom_domain: req.hostname },
           attributes: ['custom_domain', 'icon_url'],
         },
@@ -155,8 +110,8 @@ const setupAppRoutes = (
 
     const title = thread ? decodeTitle(thread.title) : '';
     const description = thread ? thread.plaintext : '';
-    const image = thread?.Chain?.icon_url
-      ? `${thread.Chain.icon_url}`
+    const image = thread?.Community?.icon_url
+      ? `${thread.Community.icon_url}`
       : DEFAULT_COMMONWEALTH_LOGO;
 
     const author = thread?.Address?.Profile?.profile_name
@@ -171,7 +126,7 @@ const setupAppRoutes = (
     scope: string,
     req,
     res,
-    chain?: ChainInstance
+    chain?: CommunityInstance,
   ) => {
     // Retrieve title, description, and author from the database
     chain = chain || (await getChain(req, scope));
@@ -250,8 +205,10 @@ const setupAppRoutes = (
 
   async function getChain(req, scope: string) {
     return scope
-      ? await models.Chain.findOne({ where: { id: scope } })
-      : await models.Chain.findOne({ where: { custom_domain: req.hostname } });
+      ? await models.Community.findOne({ where: { id: scope } })
+      : await models.Community.findOne({
+          where: { custom_domain: req.hostname },
+        });
   }
 
   app.get('/:scope?', renderGeneralPage);

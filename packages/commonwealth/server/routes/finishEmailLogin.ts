@@ -1,22 +1,21 @@
-import { StatsDController } from 'common-common/src/statsd';
-import { NotificationCategories } from 'common-common/src/types';
+import { NotificationCategories, stats } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import type { Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
-import type { DB } from '../models';
-import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
+import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 
 export const redirectWithLoginSuccess = (
   res,
   email,
   path?,
   confirmation?,
-  newAcct = false
+  newAcct = false,
 ) => {
   // Returns new if we are creating a new account
   if (res?.user?.id) {
-    StatsDController.get().set('cw.users.unique', res.user.id);
+    stats().set('cw.users.unique', res.user.id);
   }
-  StatsDController.get().increment('cw.users.logged_in');
+  stats().increment('cw.users.logged_in');
   const url = `/?loggedin=true&email=${email}&new=${newAcct}${
     path ? `&path=${encodeURIComponent(path)}` : ''
   }${confirmation ? '&confirmation=success' : ''}`;
@@ -30,33 +29,19 @@ export const redirectWithLoginError = (res, message) => {
 
 const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
   const previousUser = req.user;
+  const serverAnalyticsController = new ServerAnalyticsController();
   if (req.user && req.user.email && req.user.emailVerified) {
     return redirectWithLoginSuccess(res, req.user.email);
   }
   const token = req.query.token;
   const email = req.query.email;
   const confirmation = req.query.confirmation;
-  if (!token) {
-    return redirectWithLoginError(res, 'Missing token');
-  }
-  if (!email) {
-    return redirectWithLoginError(res, 'Missing email');
-  }
-
-  // Validate login token, and mark as used
-  const tokenObj = await models.LoginToken.findOne({ where: { token, email } });
-  if (!tokenObj) {
-    return redirectWithLoginError(res, 'Invalid token');
-  }
-  if (+new Date() >= +tokenObj.expires) {
-    return redirectWithLoginError(res, 'Token expired');
-  }
+  const tokenObj = await models.LoginToken.findOne({
+    where: { token: token as string, email: email as string },
+  });
   tokenObj.used = new Date();
-  await tokenObj.save();
-
-  // Log in the user associated with the verified email
   const existingUser = await models.User.scope('withPrivateData').findOne({
-    where: { email },
+    where: { email: email as string },
   });
 
   if (existingUser) {
@@ -64,45 +49,38 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
       if (err)
         return redirectWithLoginError(
           res,
-          `Could not log in with user at ${email}`
+          `Could not sign in with user at ${email}`,
         );
       // If the user is currently in a partly-logged-in state, merge their
-      // social accounts over to the newly found user
+      // addresses over to the newly found user
       if (previousUser && previousUser.id !== existingUser.id) {
-        const [
-          oldSocialAccounts,
-          oldAddresses,
-          newSocialAccounts,
-          newAddresses,
-        ] = await Promise.all([
-          previousUser.getSocialAccounts(),
+        const [oldAddresses, newAddresses] = await Promise.all([
           (
             await previousUser.getAddresses()
           ).filter((address) => !!address.verified),
-          existingUser.getSocialAccounts(),
           (
             await existingUser.getAddresses()
           ).filter((address) => !!address.verified),
         ]);
-        await existingUser.setSocialAccounts(
-          oldSocialAccounts.concat(newSocialAccounts)
-        );
         await existingUser.setAddresses(oldAddresses.concat(newAddresses));
       }
       if (!existingUser.emailVerified) {
         existingUser.emailVerified = true;
         await existingUser.save();
       }
-      serverAnalyticsTrack({
-        event: MixpanelLoginEvent.LOGIN_COMPLETED,
-        isCustomDomain: null,
-      });
+      serverAnalyticsController.track(
+        {
+          event: MixpanelLoginEvent.LOGIN_COMPLETED,
+          userId: existingUser.id,
+        },
+        req,
+      );
 
       return redirectWithLoginSuccess(
         res,
         email,
         tokenObj.redirect_path,
-        confirmation
+        confirmation,
       );
     });
   } else if (previousUser && !previousUser.email) {
@@ -114,24 +92,27 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
       if (err)
         return redirectWithLoginError(
           res,
-          `Could not log in with user at ${email}`
+          `Could not sign in with user at ${email}`,
         );
-      serverAnalyticsTrack({
-        event: MixpanelLoginEvent.LOGIN_COMPLETED,
-        isCustomDomain: null,
-      });
+      serverAnalyticsController.track(
+        {
+          event: MixpanelLoginEvent.LOGIN_COMPLETED,
+          userId: previousUser.id,
+        },
+        req,
+      );
 
       return redirectWithLoginSuccess(
         res,
         email,
         tokenObj.redirect_path,
-        confirmation
+        confirmation,
       );
     });
   } else {
     // If the user isn't in a partly-logged-in state, create a new user
     const newUser = await models.User.createWithProfile(models, {
-      email,
+      email: email as string,
       emailVerified: true,
     });
 
@@ -139,7 +120,6 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
     await models.Subscription.create({
       subscriber_id: newUser.id,
       category_id: NotificationCategories.NewMention,
-      object_id: `user-${newUser.id}`,
       is_active: true,
     });
 
@@ -147,33 +127,37 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
     await models.Subscription.create({
       subscriber_id: newUser.id,
       category_id: NotificationCategories.NewCollaboration,
-      object_id: `user-${newUser.id}`,
       is_active: true,
     });
 
     req.login(newUser, (err) => {
       if (err) {
-        serverAnalyticsTrack({
-          event: MixpanelLoginEvent.LOGIN_FAILED,
-          isCustomDomain: null,
-        });
+        serverAnalyticsController.track(
+          {
+            event: MixpanelLoginEvent.LOGIN_FAILED,
+          },
+          req,
+        );
         return redirectWithLoginError(
           res,
-          `Could not log in with user at ${email}`
+          `Could not sign in with user at ${email}`,
         );
       }
 
-      serverAnalyticsTrack({
-        event: MixpanelLoginEvent.LOGIN_COMPLETED,
-        isCustomDomain: null,
-      });
+      serverAnalyticsController.track(
+        {
+          event: MixpanelLoginEvent.LOGIN_COMPLETED,
+          userId: newUser.id,
+        },
+        req,
+      );
 
       return redirectWithLoginSuccess(
         res,
         email,
         tokenObj.redirect_path,
         confirmation,
-        true
+        true,
       );
     });
   }

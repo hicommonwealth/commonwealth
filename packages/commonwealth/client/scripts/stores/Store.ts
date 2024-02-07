@@ -17,7 +17,8 @@ abstract class Store<T> {
         ? this._store.splice(options.pushToIndex, 0, item)
         : this._store.push(item);
     } else {
-      this._store[index] = item;
+      // if the item is a class instance (e.g. Proposals) this serializes it into an object
+      this._store[index] = { ...item };
     }
 
     return this;

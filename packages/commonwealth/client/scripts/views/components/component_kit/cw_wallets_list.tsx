@@ -1,30 +1,36 @@
-import type { ChainNetwork } from 'common-common/src/types';
-import { ChainBase } from 'common-common/src/types';
-import 'components/component_kit/cw_wallets_list.scss';
+/* eslint-disable react/no-multi-comp */
+import type { ChainNetwork } from '@hicommonwealth/core';
+import { ChainBase, WalletSsoSource } from '@hicommonwealth/core';
 import type Substrate from 'controllers/chain/substrate/adapter';
-import AddressInfo from '../../../models/AddressInfo';
-import IWebWallet from '../../../models/IWebWallet';
 import React from 'react';
 import app from 'state';
 import { addressSwapper } from 'utils';
+import IWebWallet from '../../../models/IWebWallet';
 import { User } from '../user/user';
-import { CWIconButton } from './cw_icon_button';
-import { Modal } from './cw_modal';
-import { CWTooltip } from './cw_popover/cw_tooltip';
-import { CWText } from './cw_text';
-import { CWNoAuthMethodsAvailable, CWAuthButton } from './cw_auth_button';
+import { CWAuthButton, CWNoAuthMethodsAvailable } from './CWAuthButtonOld';
 import { CWDivider } from './cw_divider';
+import { CWText } from './cw_text';
 import { getClasses } from './helpers';
+import { CWModal, CWModalBody, CWModalHeader } from './new_designs/CWModal';
+import { CWTooltip } from './new_designs/CWTooltip';
 
-const LinkAccountItem = (props: {
+import 'components/component_kit/cw_wallets_list.scss';
+
+type LinkAccountItemProps = {
   account: { address: string; meta?: { name: string } };
   idx: number;
   onSelect: (idx: number) => void;
   walletChain: ChainBase;
   walletNetwork: ChainNetwork;
-}) => {
-  const { account, walletNetwork, walletChain, onSelect, idx } = props;
+};
 
+const LinkAccountItem = ({
+  account,
+  walletNetwork,
+  walletChain,
+  onSelect,
+  idx,
+}: LinkAccountItemProps) => {
   const address = app.chain
     ? addressSwapper({
         address: account.address,
@@ -50,10 +56,9 @@ const LinkAccountItem = (props: {
       <div className="account-item-avatar">
         <div className="account-user">
           <User
-            user={
-              new AddressInfo(null, address, app.chain?.id || walletNetwork)
-            }
-            avatarOnly
+            userAddress={address}
+            userCommunityId={app.chain?.id || walletNetwork}
+            shouldShowAvatarOnly
             avatarSize={40}
           />
         </div>
@@ -63,10 +68,9 @@ const LinkAccountItem = (props: {
         <div className="account-item-address">
           <div className="account-user">
             <User
-              user={
-                new AddressInfo(null, address, app.chain?.id || walletNetwork)
-              }
-              hideAvatar
+              userAddress={address}
+              userCommunityId={app.chain?.id || walletNetwork}
+              shouldHideAvatar
             />
           </div>
         </div>
@@ -91,28 +95,24 @@ export const AccountSelector = (props: AccountSelectorProps) => {
 
   return (
     <div className="AccountSelector">
-      <div className="close-button-wrapper">
-        <CWIconButton
-          iconButtonTheme="primary"
-          iconName="close"
-          iconSize="small"
-          className="close-icon"
-          onClick={() => onModalClose()}
-        />
-      </div>
-
-      {accounts.map((account, idx) => {
-        return (
-          <LinkAccountItem
-            key={`${account.address}-${idx}`}
-            account={account}
-            walletChain={walletChain}
-            walletNetwork={walletNetwork}
-            onSelect={onSelect}
-            idx={idx}
-          />
-        );
-      })}
+      <CWModalHeader
+        label="Select account to join"
+        onModalClose={onModalClose}
+      />
+      <CWModalBody>
+        {accounts.map((account, idx) => {
+          return (
+            <LinkAccountItem
+              key={`${account.address}-${idx}`}
+              account={account}
+              walletChain={walletChain}
+              walletNetwork={walletNetwork}
+              onSelect={onSelect}
+              idx={idx}
+            />
+          );
+        })}
+      </CWModalBody>
     </div>
   );
 };
@@ -123,14 +123,17 @@ type WalletsListProps = {
   canResetWalletConnect: boolean;
   hasNoWalletsLink?: boolean;
   wallets: Array<IWebWallet<any>>;
+  useSessionKeyRevalidationFlow?: boolean;
+  hideSocialLogins?: boolean;
   onResetWalletConnect: () => void;
   onWalletSelect: (wallet: IWebWallet<any>) => Promise<void>;
   onSocialLogin: (
-    type: 'google' | 'twitter' | 'discord' | 'github'
+    type: WalletSsoSource,
+    useSessionKeyRevalidationFlow: boolean,
   ) => Promise<void>;
   onWalletAddressSelect: (
     wallet: IWebWallet<any>,
-    address: string
+    address: string,
   ) => Promise<void>;
 };
 
@@ -141,10 +144,12 @@ export const CWWalletsList = (props: WalletsListProps) => {
     canResetWalletConnect,
     hasNoWalletsLink = true,
     wallets,
+    useSessionKeyRevalidationFlow,
     onResetWalletConnect,
     onWalletSelect,
     onWalletAddressSelect,
     onSocialLogin,
+    hideSocialLogins,
   } = props;
 
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
@@ -155,7 +160,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
         <div
           className={getClasses<{ darkMode?: boolean }>(
             { darkMode },
-            'wallets'
+            'wallets',
           )}
         >
           {wallets.map((wallet: IWebWallet<any>, index) => (
@@ -166,12 +171,10 @@ export const CWWalletsList = (props: WalletsListProps) => {
                 darkMode={darkMode}
                 onClick={async () => {
                   await onWalletSelect(wallet);
-                  if (wallet.chain === 'substrate') {
-                    // setIsModalOpen(true);
-                  }
                 }}
               />
-              <Modal
+              <CWModal
+                size="small"
                 content={
                   <AccountSelector
                     accounts={wallet.accounts}
@@ -182,15 +185,16 @@ export const CWWalletsList = (props: WalletsListProps) => {
                         if (app.chain) {
                           return addressSwapper({
                             address: wallet.accounts[accountIndex].address,
-                            currentPrefix: (app.chain as Substrate).chain
-                              .ss58Format,
+                            currentPrefix: parseInt(
+                              (app.chain as Substrate).meta.ss58Prefix,
+                              10,
+                            ),
                           });
                         }
                         return wallet.accounts[accountIndex].address;
                       })();
 
                       await onWalletAddressSelect(wallet, selectedAddress);
-                      // setIsModalOpen(false);
                     }}
                     onModalClose={() => setIsModalOpen(false)}
                   />
@@ -200,58 +204,76 @@ export const CWWalletsList = (props: WalletsListProps) => {
               />
             </React.Fragment>
           ))}
+          {wallets.length === 0 && (
+            <CWNoAuthMethodsAvailable darkMode={darkMode} />
+          )}
+
+          {!hideSocialLogins && (
+            <>
+              <CWDivider className="wallets-divider" />
+
+              <CWAuthButton
+                type="google"
+                label="Sign in with Google"
+                darkMode={darkMode}
+                onClick={async () =>
+                  onSocialLogin(
+                    WalletSsoSource.Google,
+                    useSessionKeyRevalidationFlow,
+                  )
+                }
+              />
+
+              <CWText
+                type="b2"
+                className={getClasses<{ darkMode?: boolean }>(
+                  { darkMode },
+                  'connect-another-way-link',
+                )}
+              >
+                <a onClick={onConnectAnotherWay}>
+                  Sign in with another email address
+                </a>
+              </CWText>
+            </>
+          )}
 
           <CWDivider className="wallets-divider" />
 
-          <CWAuthButton
-            type="google"
-            label="Sign in with Google"
-            darkMode={darkMode}
-            onClick={async () => onSocialLogin('google')}
-          />
-
-          <CWText
-            type="b2"
-            className={getClasses<{ darkMode?: boolean }>(
-              { darkMode },
-              'connect-another-way-link'
-            )}
-          >
-            <a onClick={onConnectAnotherWay}>
-              Sign in with another email address
-            </a>
-          </CWText>
-
-          <CWDivider className="wallets-divider" />
-          {/* <CWAuthButton
-            type="email"
-            label="Email"
-            darkMode={darkMode}
-            onClick={onConnectAnotherWay}
-            className="CustomIcon large email-auth-btn"
-          /> */}
           <CWAuthButton
             type="discord"
             label="Discord"
             darkMode={darkMode}
-            onClick={async () => onSocialLogin('discord')}
+            onClick={async () =>
+              onSocialLogin(
+                WalletSsoSource.Discord,
+                useSessionKeyRevalidationFlow,
+              )
+            }
+            className="DiscordAuthButton"
           />
           <CWAuthButton
             type="github"
             label="Github"
             darkMode={darkMode}
-            onClick={() => onSocialLogin('github')}
+            onClick={() =>
+              onSocialLogin(
+                WalletSsoSource.Github,
+                useSessionKeyRevalidationFlow,
+              )
+            }
           />
           <CWAuthButton
             type="twitter"
             label="Twitter"
             darkMode={darkMode}
-            onClick={() => onSocialLogin('twitter')}
+            onClick={() =>
+              onSocialLogin(
+                WalletSsoSource.Twitter,
+                useSessionKeyRevalidationFlow,
+              )
+            }
           />
-
-          {wallets.length === 0 && (
-            <CWNoAuthMethodsAvailable darkMode={darkMode} />
-          )}
         </div>
         <div className="wallet-list-links">
           {canResetWalletConnect && (
@@ -259,7 +281,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
               type="caption"
               className={getClasses<{ darkMode?: boolean }>(
                 { darkMode },
-                'reset-wc-link'
+                'reset-wc-link',
               )}
             >
               <a
@@ -275,19 +297,8 @@ export const CWWalletsList = (props: WalletsListProps) => {
           )}
           {hasNoWalletsLink && (
             <CWTooltip
-              content={
-                <>
-                  <CWText type="caption">
-                    If you don’t see your wallet then make sure:
-                  </CWText>
-                  <CWText type="caption">
-                    • Your wallet chrome extension installed?
-                  </CWText>
-                  <CWText type="caption">
-                    • Your wallet chrome extension active?
-                  </CWText>
-                </>
-              }
+              content="Make sure that your wallet browser extension is installed and active."
+              placement="top"
               renderTrigger={(handleInteraction) => (
                 <CWText
                   onMouseEnter={handleInteraction}
@@ -295,10 +306,10 @@ export const CWWalletsList = (props: WalletsListProps) => {
                   type="caption"
                   className={getClasses<{ darkMode?: boolean }>(
                     { darkMode },
-                    'no-wallet-link'
+                    'no-wallet-link',
                   )}
                 >
-                  Don't see your wallet?
+                  Don&apos;t see your wallet?
                 </CWText>
               )}
             />

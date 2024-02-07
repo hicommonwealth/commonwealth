@@ -1,12 +1,11 @@
-import BN from 'bn.js';
-import moment from 'moment';
-
-import { LCD } from 'chain-events/src/chains/cosmos/types';
 import {
   ProposalSDKType,
   ProposalStatus,
   TallyResultSDKType,
-} from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
+} from '@hicommonwealth/chains';
+import BN from 'bn.js';
+import moment from 'moment';
+import type { LCD } from '../../../../../../../shared/chain/types/cosmos';
 import type {
   CosmosProposalState,
   ICosmosProposal,
@@ -18,65 +17,70 @@ import { isCompleted } from '../v1beta1/utils-v1beta1';
 
 export const fetchProposalsByStatusV1 = async (
   lcd: LCD,
-  status: ProposalStatus
+  status: ProposalStatus,
 ): Promise<ProposalSDKType[]> => {
-  const { proposals: proposalsByStatus, pagination } =
-    await lcd.cosmos.gov.v1.proposals({
-      proposalStatus: status,
-      voter: '',
-      depositor: '',
-    });
-
-  let nextKey = pagination?.next_key;
-  while (nextKey?.length > 0) {
-    // console.log(nextKey);
-    const { proposals, pagination: nextPage } =
+  try {
+    const { proposals: proposalsByStatus, pagination } =
       await lcd.cosmos.gov.v1.proposals({
         proposalStatus: status,
         voter: '',
         depositor: '',
-        pagination: {
-          key: nextKey,
-          limit: null,
-          offset: null,
-          countTotal: true,
-          reverse: true,
-        },
       });
-    proposalsByStatus.push(...proposals);
-    nextKey = nextPage.next_key;
+
+    let nextKey = pagination?.next_key;
+    while (nextKey?.length > 0) {
+      // console.log(nextKey);
+      const { proposals, pagination: nextPage } =
+        await lcd.cosmos.gov.v1.proposals({
+          proposalStatus: status,
+          voter: '',
+          depositor: '',
+          pagination: {
+            key: nextKey,
+            limit: null,
+            offset: null,
+            countTotal: true,
+            reverse: true,
+          },
+        });
+      proposalsByStatus.push(...proposals);
+      nextKey = nextPage.next_key;
+    }
+    return proposalsByStatus;
+  } catch (e) {
+    console.error(`Error fetching proposal by status ${status}`, e);
+    return [];
   }
-  return proposalsByStatus;
 };
 
 export const getActiveProposalsV1 = async (
-  lcd: LCD
+  lcd: LCD,
 ): Promise<ICosmosProposal[]> => {
   const votingPeriodProposals = await fetchProposalsByStatusV1(
     lcd,
-    ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD
+    ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD,
   );
   const depositPeriodProposals = await fetchProposalsByStatusV1(
     lcd,
-    ProposalStatus.PROPOSAL_STATUS_DEPOSIT_PERIOD
+    ProposalStatus.PROPOSAL_STATUS_DEPOSIT_PERIOD,
   );
   return sortProposalsV1([...votingPeriodProposals, ...depositPeriodProposals]);
 };
 
 export const getCompletedProposalsV1 = async (
-  lcd: LCD
+  lcd: LCD,
 ): Promise<ICosmosProposal[]> => {
   const passedProposals = await fetchProposalsByStatusV1(
     lcd,
-    ProposalStatus.PROPOSAL_STATUS_PASSED
+    ProposalStatus.PROPOSAL_STATUS_PASSED,
   );
   const failedProposals = await fetchProposalsByStatusV1(
     lcd,
-    ProposalStatus.PROPOSAL_STATUS_FAILED
+    ProposalStatus.PROPOSAL_STATUS_FAILED,
   );
   const rejectedProposals = await fetchProposalsByStatusV1(
     lcd,
-    ProposalStatus.PROPOSAL_STATUS_REJECTED
+    ProposalStatus.PROPOSAL_STATUS_REJECTED,
   );
   const combined = [
     ...passedProposals,
@@ -87,7 +91,7 @@ export const getCompletedProposalsV1 = async (
 };
 
 export const sortProposalsV1 = (
-  proposals: ProposalSDKType[]
+  proposals: ProposalSDKType[],
 ): ICosmosProposal[] => {
   return proposals
     .map((p) => propToIProposal(p))
@@ -122,7 +126,7 @@ export const propToIProposal = (p: ProposalSDKType): ICosmosProposal | null => {
     depositEndTime: moment.unix(new Date(p.deposit_end_time).valueOf() / 1000),
     votingEndTime: moment.unix(new Date(p.voting_end_time).valueOf() / 1000),
     votingStartTime: moment.unix(
-      new Date(p.voting_start_time).valueOf() / 1000
+      new Date(p.voting_start_time).valueOf() / 1000,
     ),
     proposer: null,
     state: {
@@ -163,7 +167,7 @@ const stateEnumToStringV1 = (status: string): CosmosProposalState => {
 };
 
 export const marshalTallyV1 = (
-  tally: TallyResultSDKType
+  tally: TallyResultSDKType,
 ): ICosmosProposalTally => {
   if (!tally) return null;
   return {

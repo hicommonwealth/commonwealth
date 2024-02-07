@@ -1,14 +1,12 @@
 @import '../shared';
 
 .WebhookSettingsModal {
-  .compact-modal-body {
+  .checkbox-section {
     display: flex;
     flex-direction: column;
-    gap: 16px;
 
-    .checkbox-section {
-      display: flex;
-      flex-direction: column;
+    .checkbox {
+      margin-top: 4px;
     }
   }
 }

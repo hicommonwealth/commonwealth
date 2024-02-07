@@ -1,0 +1,263 @@
+@import '../../../shared';
+
+.Tag {
+  font-family: $font-family-neue-haas-unica;
+  border-radius: $border-radius-corners-wider;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 24px;
+  font-size: 12px;
+  gap: 2px;
+  padding: 4px 8px;
+  width: fit-content;
+
+  .Text {
+    line-height: 16px;
+  }
+
+  &.disabled,
+  &.spam {
+    background-color: $neutral-300 !important;
+
+    .Text,
+    .Icon {
+      color: $white !important;
+    }
+  }
+
+  &.new {
+    background-color: $yellow-50;
+    border: 1px solid $yellow-600;
+
+    .Text {
+      color: $yellow-600;
+    }
+
+    .Icon {
+      stroke: $yellow-600;
+      padding: 0;
+      fill: none;
+    }
+  }
+
+  &.trending {
+    background-color: $green-50;
+    border: 1px solid $green-600;
+
+    .Text,
+    .Icon {
+      color: $green-600;
+    }
+
+    svg {
+      fill: none;
+    }
+  }
+
+  &.poll {
+    background-color: $purple-50;
+
+    .Text,
+    .Icon {
+      color: $purple-600;
+    }
+  }
+
+  &.active {
+    background-color: $pink-100;
+
+    .Text,
+    .Icon {
+      color: $pink-700;
+    }
+  }
+
+  &.poll,
+  &.active {
+    padding: 4px 12px;
+    border-radius: $border-radius-tags;
+  }
+
+  &.passed {
+    background-color: $green-300;
+
+    .Text,
+    .Icon {
+      color: $green-700;
+    }
+  }
+
+  &.failed {
+    background-color: $rorange-300;
+
+    .Text,
+    .Icon {
+      color: $rorange-700;
+    }
+  }
+
+  &.proposal {
+    background-color: $primary-100;
+
+    .Text,
+    .Icon {
+      color: $primary-600;
+    }
+  }
+
+  &.referendum {
+    background-color: $neutral-100;
+    border-radius: $border-radius-corners;
+
+    .Text,
+    .Icon {
+      color: $neutral-600;
+    }
+  }
+
+  &.stage {
+    background-color: $green-600;
+
+    .Text,
+    .Icon {
+      color: $white;
+    }
+
+    &.phase-1 {
+      background-color: $rorange-600;
+    }
+
+    &.phase-2 {
+      background-color: $rorange-400;
+    }
+
+    &.phase-3 {
+      background-color: $yellow-500;
+    }
+
+    &.phase-4 {
+      background-color: $green-600;
+    }
+
+    &.phase-5 {
+      background-color: $green-500;
+    }
+
+    &.phase-6 {
+      background-color: $primary-600;
+    }
+
+    &.phase-7 {
+      background-color: $primary-400;
+    }
+
+    &.phase-8 {
+      background-color: $purple-600;
+    }
+
+    &.phase-9 {
+      background-color: $purple-400;
+    }
+  }
+
+  &.input,
+  &.group {
+    background-color: $neutral-100;
+    padding: 2px 8px;
+    gap: 8px;
+
+    .close-container {
+      background-color: $neutral-100;
+      display: flex;
+      margin-left: 8px;
+
+      &:hover {
+        > svg {
+          background-color: $neutral-200;
+        }
+      }
+    }
+
+    .Text {
+      font-size: 14px;
+      line-height: 20px;
+      color: $neutral-800;
+    }
+
+    &:hover {
+      background-color: $neutral-200;
+
+      .close-container {
+        background-color: $neutral-200;
+
+        > svg {
+          background-color: $neutral-200;
+        }
+      }
+
+      .Text {
+        color: $neutral-900;
+      }
+    }
+
+    &.container:hover {
+      background-color: $neutral-200;
+    }
+  }
+
+  &.group {
+    .Text {
+      font-size: 12px;
+      line-height: 16px;
+      color: $neutral-700;
+    }
+  }
+
+  &.address,
+  &.login {
+    background-color: $neutral-200;
+    gap: 8px;
+
+    .Text,
+    .Icon {
+      color: $neutral-600;
+    }
+
+    .Icon {
+      &.envelope {
+        fill: none;
+      }
+    }
+
+    &:hover {
+      background-color: $neutral-300;
+
+      .Text,
+      .Icon {
+        color: $neutral-800;
+      }
+    }
+  }
+
+  &.address {
+    padding: 2px 8px;
+    gap: 10px;
+  }
+
+  &.action {
+    display: grid;
+    align-items: center;
+    color: $neutral-500;
+    max-width: 20px;
+    max-height: 20px;
+    width: fit-content;
+    height: fit-content;
+    padding: 0;
+
+    &:hover {
+      cursor: pointer;
+      color: $neutral-600;
+    }
+  }
+}

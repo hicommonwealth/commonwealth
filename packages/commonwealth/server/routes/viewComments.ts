@@ -1,7 +1,8 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-import type { DB } from '../models';
-import { getLastEdited } from '../util/getLastEdited';
+import { getLastEdited } from 'server/util/getLastEdited';
+import { sanitizeDeletedComment } from 'server/util/sanitizeDeletedComment';
 
 export const Errors = {
   NoRootId: 'Must provide thread_id',
@@ -11,19 +12,19 @@ const viewComments = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
-  const chain = req.chain;
+  const { community } = req;
+  const threadId = req.query.thread_id as string;
 
-  if (!req.query.thread_id) {
+  if (!threadId) {
     return next(new AppError(Errors.NoRootId));
   }
 
   const comments = await models.Comment.findAll({
-    where: { chain: chain.id, thread_id: req.query.thread_id },
+    where: { community_id: community.id, thread_id: threadId },
     include: [
       models.Address,
-      models.Attachment,
       {
         model: models.Reaction,
         as: 'reactions',
@@ -39,14 +40,18 @@ const viewComments = async (
     order: [['created_at', 'DESC']],
     paranoid: false,
   });
+
+  const sanitizedComments = comments.map((c) => {
+    const data = c.toJSON();
+    return {
+      ...sanitizeDeletedComment(data),
+      last_edited: getLastEdited(data),
+    };
+  });
+
   return res.json({
     status: 'Success',
-    result: comments.map((c) => {
-      const row = c.toJSON();
-      const last_edited = getLastEdited(row);
-      row['last_edited'] = last_edited;
-      return row;
-    }),
+    result: sanitizedComments,
   });
 };
 

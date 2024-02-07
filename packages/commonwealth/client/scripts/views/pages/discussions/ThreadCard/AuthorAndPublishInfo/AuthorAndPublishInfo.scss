@@ -1,0 +1,81 @@
+@import '../../../../../../styles/shared';
+
+.AuthorAndPublishInfo {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  // this is needed to make sure that "applyLeftMarginToItems" works correctly
+  > * {
+    height: 24px !important;
+    line-height: 24px !important;
+  }
+
+  .discord-author {
+    display: flex;
+    gap: 4px;
+  }
+
+  .User {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+
+    .user-avatar {
+      margin-right: 0 !important;
+    }
+
+    .username {
+      @include caption;
+
+      font-weight: 500;
+    }
+  }
+
+  .cursor-pointer {
+    cursor: pointer;
+  }
+
+  .dot-indicator.Text {
+    color: $neutral-400;
+  }
+
+  .section-text.Text {
+    color: $neutral-600;
+  }
+
+  .publish-date {
+    cursor: default;
+
+    .Text {
+      color: $neutral-500;
+    }
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .proposal-stage-text.Text {
+    font-weight: 500;
+
+    &.positive {
+      color: $green-500;
+    }
+
+    &.negative {
+      color: $rorange-500;
+    }
+  }
+}
+
+.collaborators {
+  background-color: $white;
+  border-radius: $border-radius-corners;
+  box-shadow: $elevation-2;
+  padding: 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}

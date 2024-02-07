@@ -1,14 +1,13 @@
 /* eslint-disable quotes */
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError, ServerError } from '@hicommonwealth/core';
+import type { DB, TopicInstance } from '@hicommonwealth/model';
 import type { NextFunction, Response } from 'express';
-import type { TopicInstance } from 'server/models/topic';
-import type { DB } from '../models';
-import validateRoles from '../util/validateRoles';
+import { validateOwner } from '../util/validateOwner';
 
 enum OrderTopicsErrors {
-  NoUser = 'Not logged in',
+  NoUser = 'Not signed in',
   NoIds = 'Must supply ordered array of topic IDs',
-  NoChain = 'Must supply a chain ID',
+  NoCommunity = 'Must supply a community ID',
   NoPermission = `You do not have permission to order topics`,
   InvalidTopic = 'Passed topics may not all be featured, or may include an invalid ID',
 }
@@ -19,18 +18,25 @@ const OrderTopics = async (
   models: DB,
   req,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
-  const chain = req.chain;
+  if (!req.user) {
+    return next(new AppError(OrderTopicsErrors.NoUser));
+  }
 
-  if (!req.user) return next(new AppError(OrderTopicsErrors.NoUser));
-  const isAdminOrMod: boolean = await validateRoles(
-    models,
-    req.user,
-    'moderator',
-    chain.id
-  );
-  if (!isAdminOrMod) return next(new AppError(OrderTopicsErrors.NoPermission));
+  const { community } = req;
+
+  const isAdminOrMod = await validateOwner({
+    models: models,
+    user: req.user,
+    communityId: community.id,
+    allowMod: true,
+    allowAdmin: true,
+    allowSuperAdmin: true,
+  });
+  if (!isAdminOrMod) {
+    return next(new AppError(OrderTopicsErrors.NoPermission));
+  }
 
   const newTopicOrder: string[] = req.body.orderedIds;
 
@@ -54,7 +60,7 @@ const OrderTopics = async (
           await topic.save();
           return topic;
         })();
-      })
+      }),
     );
 
     return res.json({

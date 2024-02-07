@@ -1,14 +1,13 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
-import 'components/ChainEntitiesSelector.scss';
+import 'components/ProposalSelector.scss';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 
-import app from 'state';
+import app, { ApiStatus } from 'state';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { QueryList } from 'views/components/component_kit/cw_query_list';
-import { useGetCompletedCosmosProposals } from 'hooks/cosmos/useGetCompletedCosmosProposals';
-import { useGetActiveCosmosProposals } from 'hooks/cosmos/useGetActiveCosmosProposals';
 import { CosmosProposalSelectorItem } from 'views/components/CosmosProposalSelector';
+import { useGetAllCosmosProposals } from 'hooks/cosmos/useGetAllCosmosProposals';
 
 const filterProposals = (ce: CosmosProposal, searchTerm: string) => {
   return (
@@ -30,16 +29,15 @@ export const CosmosProposalSelector = ({
     useState(false);
   const [loadingActive, setActiveLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const { activeCosmosProposals } = useGetActiveCosmosProposals({
-    app,
-    setIsLoading: setActiveLoading,
-    isLoading: loadingActive,
-  });
-  const { completedCosmosProposals } = useGetCompletedCosmosProposals({
-    app,
-    setIsLoading: setCompletedProposalsLoading,
-    isLoading: loadingCompletedProposals,
-  });
+  const { activeCosmosProposals = [], completedCosmosProposals = [] } =
+    useGetAllCosmosProposals({
+      app,
+      setIsLoadingActiveProposals: setActiveLoading,
+      setIsLoadingCompletedProposals: setCompletedProposalsLoading,
+      needToInitAPI:
+        !app.chain.apiInitialized &&
+        app.chain.networkStatus !== ApiStatus.Connecting,
+    });
 
   const handleClearButtonClick = () => {
     setSearchTerm('');
@@ -83,7 +81,7 @@ export const CosmosProposalSelector = ({
   }
 
   return (
-    <div className="ChainEntitiesSelector">
+    <div className="ProposalSelector">
       <CWTextInput
         placeholder="Search for an existing proposal..."
         iconRightonClick={handleClearButtonClick}

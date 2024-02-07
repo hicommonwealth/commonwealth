@@ -1,3 +1,34 @@
+.m-auto {
+  margin: auto !important;
+}
+
 .ml-auto {
-    margin-left: auto;
+  margin-left: auto !important;
+}
+
+.mt-16 {
+  margin-top: 16px;
+}
+
+.ml-8 {
+  margin-left: 8px;
+}
+
+.w-full {
+  width: 100% !important;
+}
+
+.capitalize {
+  text-transform: capitalize;
+}
+
+.px-16 {
+  padding: 0 16px !important;
+}
+
+.no-outline {
+  outline: none !important;
+  &:focus-within {
+    border: none !important;
+  }
 }

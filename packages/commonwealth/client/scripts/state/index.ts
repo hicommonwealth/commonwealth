@@ -1,31 +1,27 @@
-import ChainEntityController from 'controllers/server/chain_entities';
-import DiscordController from 'controllers/server/discord';
-import { WebSocketController } from 'controllers/server/socket';
-import { EventEmitter } from 'events';
-import { ChainStore, NodeStore } from 'stores';
+import { CommunityCategoryType } from '@hicommonwealth/core';
+import axios from 'axios';
+import { updateActiveUser } from 'controllers/app/login';
 import RecentActivityController from 'controllers/app/recent_activity';
+import CosmosAccount from 'controllers/chain/cosmos/account';
+import EthereumAccount from 'controllers/chain/ethereum/account';
+import { NearAccount } from 'controllers/chain/near/account';
 import SnapshotController from 'controllers/chain/snapshot';
-import CommentsController from 'controllers/server/comments';
-import CommunitiesController from 'controllers/server/communities';
+import SolanaAccount from 'controllers/chain/solana/account';
+import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import ContractsController from 'controllers/server/contracts';
-import NewProfilesController from 'controllers/server/newProfiles';
+import DiscordController from 'controllers/server/discord';
 import PollsController from 'controllers/server/polls';
-import ReactionCountsController from 'controllers/server/reactionCounts';
-import ReactionsController from 'controllers/server/reactions';
-import ThreadReactionsController from 'controllers/server/reactions/ThreadReactionsController';
 import { RolesController } from 'controllers/server/roles';
 import SearchController from 'controllers/server/search';
 import SessionsController from 'controllers/server/sessions';
-import ThreadsController from 'controllers/server/threads';
-import ThreadUniqueAddressesCount from 'controllers/server/threadUniqueAddressesCount';
 import { UserController } from 'controllers/server/user';
+import { EventEmitter } from 'events';
 import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
 import NodeInfo from 'models/NodeInfo';
 import NotificationCategory from 'models/NotificationCategory';
-import $ from 'jquery';
-import { updateActiveUser } from 'controllers/app/login';
-import { ChainCategoryType } from 'common-common/src/types';
+import StarredCommunity from 'models/StarredCommunity';
+import { ChainStore, NodeStore } from 'stores';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -40,9 +36,14 @@ export const enum LoginState {
 }
 
 export interface IApp {
-  socket: WebSocketController;
-  chain: IChainAdapter<any, any>;
-  chainEntities: ChainEntityController;
+  chain: IChainAdapter<
+    any,
+    | CosmosAccount
+    | EthereumAccount
+    | NearAccount
+    | SolanaAccount
+    | SubstrateAccount
+  >;
 
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
@@ -54,13 +55,7 @@ export interface IApp {
   chainModuleReady: EventEmitter;
   isModuleReady: boolean;
 
-  // Threads
-  threads: ThreadsController;
-  threadUniqueAddressesCount: ThreadUniqueAddressesCount;
-  comments: CommentsController;
-  reactions: ReactionsController;
-  threadReactions: ThreadReactionsController;
-  reactionCounts: ReactionCountsController;
+  // Polls
   polls: PollsController;
 
   // Proposals
@@ -69,9 +64,6 @@ export interface IApp {
   // Search
   search: SearchController;
   searchAddressCache: any;
-
-  // Community
-  communities: CommunitiesController;
 
   // Contracts
   contracts: ContractsController;
@@ -100,15 +92,13 @@ export interface IApp {
     notificationCategories?: NotificationCategory[];
     defaultChain: string;
     evmTestEnv?: string;
-    chainCategoryMap?: { [chain: string]: ChainCategoryType[] };
+    enforceSessionKeys?: boolean;
+    chainCategoryMap?: { [chain: string]: CommunityCategoryType[] };
   };
 
   loginStatusLoaded(): boolean;
 
   isLoggedIn(): boolean;
-
-  isProduction(): boolean;
-  isNative(win): boolean;
 
   serverUrl(): string;
 
@@ -121,6 +111,9 @@ export interface IApp {
   customDomainId(): string;
 
   setCustomDomain(d: string): void;
+
+  // bandaid fix to skip next deinit chain on layout.tsx transition
+  skipDeinitChain: boolean;
 }
 
 // INJECT DEPENDENCIES
@@ -129,9 +122,7 @@ const roles = new RolesController(user);
 
 // INITIALIZE MAIN APP
 const app: IApp = {
-  socket: new WebSocketController(),
   chain: null,
-  chainEntities: new ChainEntityController(),
   activeChainId: () => app.chain?.id,
 
   chainPreloading: false,
@@ -145,20 +136,11 @@ const app: IApp = {
   chainModuleReady: new EventEmitter().setMaxListeners(100),
   isModuleReady: false,
 
-  // Thread
-  threads: ThreadsController.Instance,
-  threadUniqueAddressesCount: new ThreadUniqueAddressesCount(),
-  comments: new CommentsController(),
-  reactions: new ReactionsController(),
-  threadReactions: new ThreadReactionsController(),
-  reactionCounts: new ReactionCountsController(),
+  // Polls
   polls: new PollsController(),
 
   // Proposals
   proposalEmitter: new EventEmitter(),
-
-  // Community
-  communities: new CommunitiesController(),
 
   // Contracts
   contracts: new ContractsController(),
@@ -192,21 +174,8 @@ const app: IApp = {
   // TODO: Collect all getters into an object
   loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,
   isLoggedIn: () => app.loginState === LoginState.LoggedIn,
-  isNative: () => {
-    const capacitor = window['Capacitor'];
-    return !!(capacitor && capacitor.isNative);
-  },
-  isProduction: () =>
-    document.location.origin.indexOf('commonwealth.im') !== -1,
   serverUrl: () => {
-    //* TODO: @ Used to store the webpack SERVER_URL, should only be set for mobile deployments */
-    const mobileUrl = 'http://127.0.0.1:8080/api'; // Replace with your computer ip, staging, or production url
-
-    if (app.isNative(window)) {
-      return mobileUrl;
-    } else {
-      return '/api';
-    }
+    return '/api';
   },
 
   loadingError: null,
@@ -219,109 +188,116 @@ const app: IApp = {
   setCustomDomain: (d) => {
     app._customDomainId = d;
   },
+  skipDeinitChain: false,
 };
-
+//allows for FS.identify to be used
+declare const window: any;
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
 export async function initAppState(
   updateSelectedChain = true,
-  customDomain = null,
-  shouldRedraw = true
+  shouldRedraw = true,
 ): Promise<void> {
-  return new Promise((resolve, reject) => {
-    $.get(`${app.serverUrl()}/status`)
-      .then(async (data) => {
-        app.config.chains.clear();
-        app.config.nodes.clear();
-        app.user.notifications.clear();
-        app.user.notifications.clearSubscriptions();
-        app.config.evmTestEnv = data.result.evmTestEnv;
+  try {
+    const [
+      { data: statusRes },
+      { data: communitiesWithSnapshotsRes },
+      { data: nodesRes },
+    ] = await Promise.all([
+      axios.get(`${app.serverUrl()}/status`),
+      axios.get(`${app.serverUrl()}/communities?snapshots=true`),
+      axios.get(`${app.serverUrl()}/nodes`),
+    ]);
 
-        data.result.nodes
-          .sort((a, b) => a.id - b.id)
-          .map((node) => {
-            return app.config.nodes.add(NodeInfo.fromJSON(node));
-          });
+    app.config.chains.clear();
+    app.config.nodes.clear();
+    app.user.notifications.clear();
+    app.user.notifications.clearSubscriptions();
+    app.config.evmTestEnv = statusRes.result.evmTestEnv;
+    app.config.enforceSessionKeys = statusRes.result.enforceSessionKeys;
 
-        data.result.chainsWithSnapshots
-          .filter((chainsWithSnapshots) => chainsWithSnapshots.chain.active)
-          .map((chainsWithSnapshots) => {
-            delete chainsWithSnapshots.chain.ChainNode;
-            return app.config.chains.add(
-              ChainInfo.fromJSON({
-                ChainNode: app.config.nodes.getById(
-                  chainsWithSnapshots.chain.chain_node_id
-                ),
-                snapshot: chainsWithSnapshots.snapshot,
-                ...chainsWithSnapshots.chain,
-              })
-            );
-          });
-
-        app.roles.setRoles(data.result.roles);
-        app.config.notificationCategories =
-          data.result.notificationCategories.map((json) =>
-            NotificationCategory.fromJSON(json)
-          );
-        app.config.chainCategoryMap = data.result.chainCategoryMap;
-        // add recentActivity
-        const { recentThreads } = data.result;
-        recentThreads.forEach(({ chain, count }) => {
-          app.recentActivity.setCommunityThreadCounts(chain, count);
-        });
-
-        // update the login status
-        updateActiveUser(data.result.user);
-        app.loginState = data.result.user
-          ? LoginState.LoggedIn
-          : LoginState.LoggedOut;
-
-        if (app.loginState === LoginState.LoggedIn) {
-          console.log('Initializing socket connection with JTW:', app.user.jwt);
-          // init the websocket connection and the chain-events namespace
-          app.socket.init(app.user.jwt);
-          app.user.notifications.refresh(); // TODO: redraw if needed
-          if (shouldRedraw) {
-            app.loginStateEmitter.emit('redraw');
-          }
-        } else if (
-          app.loginState === LoginState.LoggedOut &&
-          app.socket.isConnected
-        ) {
-          // TODO: create global deinit function
-          app.socket.disconnect();
-          if (shouldRedraw) {
-            app.loginStateEmitter.emit('redraw');
-          }
-        }
-
-        app.user.setStarredCommunities(
-          data.result.user ? data.result.user.starredCommunities : []
-        );
-        // update the selectedChain, unless we explicitly want to avoid
-        // changing the current state (e.g. when logging in through link_new_address_modal)
-        if (
-          updateSelectedChain &&
-          data.result.user &&
-          data.result.user.selectedChain
-        ) {
-          app.user.setSelectedChain(
-            ChainInfo.fromJSON(data.result.user.selectedChain)
-          );
-        }
-
-        if (customDomain) {
-          app.setCustomDomain(customDomain);
-        }
-
-        resolve();
-      })
-      .catch((err: any) => {
-        app.loadingError =
-          err.responseJSON?.error || 'Error loading application state';
-        reject(err);
+    nodesRes.result
+      .sort((a, b) => a.id - b.id)
+      .forEach((node) => {
+        app.config.nodes.add(NodeInfo.fromJSON(node));
       });
-  });
+
+    communitiesWithSnapshotsRes.result
+      .filter((chainsWithSnapshots) => chainsWithSnapshots.community.active)
+      .forEach((chainsWithSnapshots) => {
+        delete chainsWithSnapshots.community.ChainNode;
+        app.config.chains.add(
+          ChainInfo.fromJSON({
+            ChainNode: app.config.nodes.getById(
+              chainsWithSnapshots.community.chain_node_id,
+            ),
+            snapshot: chainsWithSnapshots.snapshot,
+            ...chainsWithSnapshots.community,
+          }),
+        );
+      });
+
+    app.roles.setRoles(statusRes.result.roles);
+    app.config.notificationCategories =
+      statusRes.result.notificationCategories.map((json) =>
+        NotificationCategory.fromJSON(json),
+      );
+    app.config.chainCategoryMap = statusRes.result.chainCategoryMap;
+
+    // add recentActivity
+    const { recentThreads } = statusRes.result;
+    recentThreads.forEach(({ chain, count }) => {
+      app.recentActivity.setCommunityThreadCounts(chain, count);
+    });
+
+    // update the login status
+    updateActiveUser(statusRes.result.user);
+    app.loginState = statusRes.result.user
+      ? LoginState.LoggedIn
+      : LoginState.LoggedOut;
+
+    if (app.loginState === LoginState.LoggedIn) {
+      app.user.notifications.refresh();
+      if (shouldRedraw) {
+        app.loginStateEmitter.emit('redraw');
+      }
+    } else if (app.loginState === LoginState.LoggedOut && shouldRedraw) {
+      app.loginStateEmitter.emit('redraw');
+    }
+
+    app.user.setStarredCommunities(
+      statusRes.result.user?.starredCommunities
+        ? statusRes.result.user?.starredCommunities.map(
+            (c) => new StarredCommunity(c),
+          )
+        : [],
+    );
+    // update the selectedChain, unless we explicitly want to avoid
+    // changing the current state (e.g. when logging in through link_new_address_modal)
+    if (
+      updateSelectedChain &&
+      statusRes.result.user &&
+      statusRes.result.user.selectedChain
+    ) {
+      app.user.setSelectedChain(
+        ChainInfo.fromJSON(statusRes.result.user.selectedChain),
+      );
+    }
+
+    if (statusRes.result.user) {
+      try {
+        window.FS('setIdentity', {
+          uid: statusRes.result.user.profileId,
+        });
+      } catch (e) {
+        console.error('FullStory not found.');
+      }
+    }
+  } catch (err) {
+    app.loadingError =
+      err.response?.data?.error || 'Error loading application state';
+    throw err;
+  }
 }
 
 export default app;

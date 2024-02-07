@@ -115,6 +115,7 @@ export const SnapshotPollCard = (props: SnapshotPollCardProps) => {
             voteDirectionString={voteDirectionString}
             pollEnded={pollEnded}
             voteInformation={internalVoteInformation}
+            isSnapshot
           />
         )}
       </div>

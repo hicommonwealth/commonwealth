@@ -5,16 +5,39 @@
   flex: 1;
   flex-direction: column;
   gap: 16px;
-  flex: 1;
   padding: 24px;
-  max-width: 456px;
 
   @include extraSmall {
     width: 100%;
   }
 
+  @include smallInclusive {
+    padding: 16px;
+  }
+
   .date-range {
     display: flex;
     flex-direction: column;
+  }
+}
+
+.NewSnapshotProposalForm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .proposal-loading {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .add-voting-btn {
+    align-self: flex-end;
+  }
+
+  .footer {
+    display: flex;
+    justify-content: flex-end;
   }
 }

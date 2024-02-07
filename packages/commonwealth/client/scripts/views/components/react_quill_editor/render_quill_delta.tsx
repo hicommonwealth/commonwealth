@@ -2,8 +2,6 @@ import React, { ReactElement } from 'react';
 
 import { loadScript } from 'helpers';
 import { preprocessQuillDeltaForRendering } from '../../../../../shared/utils';
-import app from 'state';
-import { Browser } from '@capacitor/browser';
 
 type TempList = Array<
   Array<{
@@ -17,7 +15,7 @@ type TempList = Array<
 
 const getGroupTag = (
   group: { listtype: string },
-  collapse: boolean
+  collapse: boolean,
 ): ['span' | 'ul' | 'ol' | 'div', string?] => {
   if (collapse) return ['span'];
   if (group.listtype === 'bullet') return ['ul'];
@@ -31,7 +29,7 @@ const getParentTag = (
   parent: {
     attributes: { list?: string };
   },
-  collapse: boolean
+  collapse: boolean,
 ): ['span' | 'li' | 'div', ('checked' | 'unchecked')?] => {
   if (collapse) return ['span'];
   if (parent.attributes?.list === 'bullet') return ['li'];
@@ -70,7 +68,7 @@ export const renderQuillDelta = (
   hideFormatting = false,
   collapse = false,
   openLinksInNewTab = false,
-  navigate
+  navigate,
 ) => {
   // convert quill delta into a tree of {block -> parent -> child} nodes
   // blocks are <ul> <ol>, parents are all other block nodes, children are inline nodes
@@ -141,21 +139,18 @@ export const renderQuillDelta = (
                         target={openLinksInNewTab ? '_blank' : ''}
                         rel="noopener noreferrer"
                         onClick={async (e) => {
-                          if (app.isNative(window)) {
-                            await Browser.open({ url: child.attributes.link });
-                          }
                           if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey)
                             return;
                           if (
                             child.attributes.link.startsWith(
-                              `${document.location.origin}/`
+                              `${document.location.origin}/`,
                             )
                           ) {
                             // don't open a new window if the link is on Commonwealth
                             e.preventDefault();
                             e.stopPropagation();
                             const navigateTo = child.attributes.link.split(
-                              `${document.location.origin}`
+                              `${document.location.origin}`,
                             )[1];
                             navigate(navigateTo, {}, null);
                           }
@@ -175,7 +170,7 @@ export const renderQuillDelta = (
                 })}
               </ParentTag>
             );
-          })
+          }),
         );
       })
     : consolidateOrderedLists(groups).map((group) => {
@@ -184,6 +179,7 @@ export const renderQuillDelta = (
           if (child.insert?.image) {
             return <img key={ii} src={child.insert?.image} alt="image" />;
           }
+
           // handle video
           if (child.insert?.video) {
             return (
@@ -198,6 +194,7 @@ export const renderQuillDelta = (
               </div>
             );
           }
+
           // handle tweets
           if (child.insert?.twitter) {
             const id = child.insert.twitter.id;
@@ -221,6 +218,7 @@ export const renderQuillDelta = (
               </blockquote>
             );
           }
+
           // handle text nodes
           let result;
           if (child.insert?.mention) {
@@ -241,14 +239,14 @@ export const renderQuillDelta = (
                   if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
                   if (
                     child.attributes.link.startsWith(
-                      `${document.location.origin}/`
+                      `${document.location.origin}/`,
                     )
                   ) {
                     // don't open a new window if the link is on Commonwealth
                     e.preventDefault();
                     e.stopPropagation();
                     const navigateTo = child.attributes.link.split(
-                      `${document.location.origin}`
+                      `${document.location.origin}`,
                     )[1];
                     navigate(navigateTo, {}, null);
                   }
@@ -260,14 +258,15 @@ export const renderQuillDelta = (
           } else {
             result = <span key={ii}>{child.insert}</span>;
           }
+
           Object.entries(child.attributes || {}).forEach(([k, v]) => {
             if (k !== 'color' && k !== 'background' && v !== true) return;
             switch (k) {
               case 'bold':
-                result = <strong key={ii}>{result}</strong>;
+                result = <b key={ii}>{result}</b>;
                 return;
               case 'italic':
-                result = <em key={ii}>{result}</em>;
+                result = <i key={ii}>{result}</i>;
                 return;
               case 'strike':
                 result = <s key={ii}>{result}</s>;
@@ -296,8 +295,10 @@ export const renderQuillDelta = (
                 result = <span key={ii}>{result}</span>;
             }
           });
+
           return result;
         };
+
         const renderParent = (parent, ii) => {
           // render empty parent nodes as .between-paragraphs
           if (
@@ -307,6 +308,7 @@ export const renderQuillDelta = (
           ) {
             return <div className="between-paragraphs" key={ii} />;
           }
+
           // render normal parent nodes with content
           const Tag = parent.attributes?.blockquote
             ? 'blockquote'
@@ -347,6 +349,7 @@ export const renderQuillDelta = (
             </Tag>
           );
         };
+
         // special handler for lists, which need to be un-flattened and turned into a tree
         const renderListGroup = (_group, ii) => {
           const [GroupTag, groupTagClass] = getGroupTag(_group, collapse);
@@ -365,7 +368,7 @@ export const renderQuillDelta = (
                   type="checkbox"
                   disabled
                   checked={isChecked}
-                />
+                />,
               );
             }
 
@@ -398,7 +401,7 @@ export const renderQuillDelta = (
                         </data.tag>
                       );
                     })}
-                  </GroupTag>
+                  </GroupTag>,
                 );
                 iiii++;
               }
@@ -425,7 +428,7 @@ export const renderQuillDelta = (
                     </data.tag>
                   );
                 })}
-              </GroupTag>
+              </GroupTag>,
             );
             iii++;
           }

@@ -1,0 +1,75 @@
+@import '../../../../../../styles/shared';
+
+.TypeaheadSelectList {
+  .CWSelectList .SelectList {
+    @include inputStyles;
+    font-family: $font-family-neue-haas-unica;
+    max-height: none;
+    padding: 0;
+
+    &.disabled {
+      .tasl__control {
+        background-color: $neutral-50;
+        color: $neutral-400;
+
+        &.tasl__control--is-disabled {
+          pointer-events: auto;
+          cursor: not-allowed;
+        }
+
+        .tasl__indicators {
+          .tasl__indicator {
+            svg {
+              color: $neutral-400;
+            }
+          }
+        }
+      }
+    }
+
+    .tasl__control {
+      padding: 10px 16px;
+
+      .tasl__value-container {
+        padding: 0;
+        max-width: none;
+        line-height: 16px;
+
+        .tasl__single-value {
+          margin: 0;
+        }
+      }
+
+      .tasl__indicators {
+        .tasl__indicator {
+          padding: 0px;
+          color: $neutral-800;
+        }
+      }
+    }
+
+    .tasl__menu {
+      border: none;
+      box-shadow: $elevation-4;
+
+      .tasl__menu-list {
+        border: 1px solid $neutral-200;
+        border-radius: $border-radius-corners-wider;
+        padding: 8px 0;
+
+        .tasl__option {
+          padding: 0 8px;
+          background-color: #fff;
+          border-radius: 0;
+          margin-bottom: 0;
+
+          .text-container {
+            padding: 10px 12px;
+            border-radius: $border-radius-corners-wider;
+            font-size: 14px;
+          }
+        }
+      }
+    }
+  }
+}

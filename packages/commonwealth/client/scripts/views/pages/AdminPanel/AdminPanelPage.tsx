@@ -6,8 +6,10 @@ import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWText } from '../../components/component_kit/cw_text';
 import Analytics from './Analytics';
 import DeleteChainTask from './DeleteChainTask';
+import DownloadMembersListTask from './DownloadMembersListTask';
 import MakeSiteAdminTask from './MakeSiteAdminTask';
 import RPCEndpointTask from './RPCEndpointTask';
+import TopUsers from './TopUsers';
 
 const AdminPanelPage = () => {
   const navigate = useCommonNavigate();
@@ -26,8 +28,10 @@ const AdminPanelPage = () => {
       <CWDivider />
       <CWText type="h2">Site Admin Tasks</CWText>
       <DeleteChainTask />
+      <DownloadMembersListTask />
       <RPCEndpointTask />
       <MakeSiteAdminTask />
+      <TopUsers />
     </div>
   );
 };

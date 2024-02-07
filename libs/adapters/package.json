@@ -1,0 +1,29 @@
+{
+  "name": "@hicommonwealth/adapters",
+  "private": "true",
+  "version": "0.1.0",
+  "description": "External adapters",
+  "files": [
+    "build"
+  ],
+  "main": "build/index",
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rm -rf build",
+    "check-types": "tsc --noEmit",
+    "test": "ts-mocha '__tests__/**/*.spec.ts'"
+  },
+  "dependencies": {
+    "amqplib": "^0.10.3",
+    "async-rwlock": "^1.1.1",
+    "express": "^4.18.2",
+    "hot-shots": "^9",
+    "pg": "^8.11.3",
+    "node-fetch": "2",
+    "rascal": "^14.4.5",
+    "redis": "4.2.0",
+    "rollbar": "^2.6.1",
+    "sequelize": "^6.32.1",
+    "typescript-logging": "^0.6.4"
+  }
+}

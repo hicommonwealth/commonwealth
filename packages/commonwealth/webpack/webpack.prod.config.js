@@ -4,6 +4,7 @@ const { merge } = require('webpack-merge');
 const common = require('./webpack.base.config.js');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const { WebpackDeduplicationPlugin } = require('webpack-deduplication-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = merge(common, {
   mode: 'production',
@@ -22,10 +23,18 @@ module.exports = merge(common, {
     new WebpackDeduplicationPlugin({
       cacheDir: './cache',
     }),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: path.resolve(__dirname, '../favicon.ico'),
+          to: path.resolve(__dirname, '../build/favicon.ico'),
+        },
+      ],
+    }),
     new BundleAnalyzerPlugin({
-      analyzerMode: 'disabled',
-      generateStatsFile: false,
-      statsOptions: { source: false },
+      analyzerMode: 'disabled', // 'server',
+      generateStatsFile: false, // true,
+      statsOptions: { source: false }, // { source: true },
     }),
   ],
   module: {
@@ -35,9 +44,6 @@ module.exports = merge(common, {
         include: [
           path.resolve(__dirname, '../client'),
           path.resolve(__dirname, '../shared'),
-          path.resolve(__dirname, '../../common-common'),
-          path.resolve(__dirname, '../../chain-events'),
-          path.resolve(__dirname, '../../token-balance-cache'),
         ],
         exclude: /\/node_modules\//,
         use: {

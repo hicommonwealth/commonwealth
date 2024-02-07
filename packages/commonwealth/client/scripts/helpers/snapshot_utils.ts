@@ -46,6 +46,7 @@ class GqlLazyLoader {
       symbol
       private
       network
+      avatar
       validation {
         params
       }
@@ -63,6 +64,37 @@ class GqlLazyLoader {
         params
       }
       members
+    }
+  }
+`;
+  }
+
+  public static async MULTIPLE_SPACE_QUERY() {
+    await this.init();
+    return this.gql`
+ query Spaces($id_in: [String!]) {
+    spaces(
+      where: {
+        id_in: $id_in
+      }
+    ) {
+      id
+      name
+      about
+      network
+      symbol
+      strategies {
+        name
+        params
+      }
+      avatar
+      admins
+      members
+      filters {
+        minScore
+        onlyMembers
+      }
+      plugins
     }
   }
 `;
@@ -188,6 +220,7 @@ export interface SnapshotSpace {
   symbol: string;
   private: boolean;
   network: string;
+  avatar: string;
   validation: {
     params: {
       minScore: number;
@@ -251,16 +284,45 @@ export async function getSpace(space: string): Promise<SnapshotSpace> {
       space,
     },
   });
+
   return spaceObj.data.space;
 }
 
-export async function getProposal(id: string): Promise<{ title: string, space: string }> {
+export async function getMultipleSpaces(space: string): Promise<SnapshotSpace> {
+  await getApolloClient();
+  const spaceObj = await apolloClient.query({
+    query: await GqlLazyLoader.SPACE_QUERY(),
+    variables: {
+      space,
+    },
+  });
+
+  return spaceObj.data.space;
+}
+
+export async function getMultipleSpacesById(
+  id_in: Array<string>
+): Promise<Array<SnapshotSpace>> {
+  await getApolloClient();
+  const spaceObj = await apolloClient.query({
+    query: await GqlLazyLoader.MULTIPLE_SPACE_QUERY(),
+    variables: {
+      id_in,
+    },
+  });
+
+  return spaceObj.data.spaces;
+}
+
+export async function getProposal(
+  id: string
+): Promise<{ title: string; space: string }> {
   await getApolloClient();
   const proposalObj = await apolloClient.query({
     query: await GqlLazyLoader.PROPOSAL_QUERY(),
     variables: {
       id: +id,
-    }
+    },
   });
   return proposalObj.data?.proposals[0];
 }

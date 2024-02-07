@@ -7,14 +7,17 @@ import type { CompoundProposalArgs } from 'controllers/chain/ethereum/compound/g
 import 'pages/new_proposal/compound_proposal_form.scss';
 
 import app from 'state';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { User } from 'views/components/user/user';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWLabel } from '../../components/component_kit/cw_label';
-import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
-import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWTextArea } from '../../components/component_kit/cw_text_area';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import {
+  CWTab,
+  CWTabsRow,
+} from '../../components/component_kit/new_designs/CWTabs';
 import type { AaveProposalState } from './types';
 import { defaultStateItem } from './types';
 
@@ -34,7 +37,13 @@ export const CompoundProposalForm = () => {
     <div className="CompoundProposalForm">
       <div className="row-with-label">
         <CWLabel label="Proposer (you)" />
-        <User user={author} linkify popover showAddressWithDisplayName />
+        <User
+          userAddress={author.address}
+          userCommunityId={author.community?.id || author.profile?.chain}
+          shouldLinkProfile
+          shouldShowPopover
+          shouldShowAddressWithDisplayName
+        />
       </div>
       <CWTextInput
         label="Proposal Title (leave blank for no title)"
@@ -49,11 +58,13 @@ export const CompoundProposalForm = () => {
         onInput={(e) => {
           setDescription(e.target.value);
         }}
+        resizeWithText
       />
       <div className="tab-selector">
-        <CWTabBar>
+        <CWTabsRow>
           {aaveProposalState.map((_, index) => (
             <CWTab
+              key={index}
               label={`Call ${index + 1}`}
               isSelected={activeTabIndex === index}
               onClick={() => {
@@ -61,7 +72,7 @@ export const CompoundProposalForm = () => {
               }}
             />
           ))}
-        </CWTabBar>
+        </CWTabsRow>
         <PopoverMenu
           menuItems={[
             {
@@ -86,7 +97,7 @@ export const CompoundProposalForm = () => {
                 setActiveTabIndex(tabCount - 1);
 
                 const newAaveProposalState = aaveProposalState.filter(
-                  (_, i) => i !== aaveProposalState.length - 1
+                  (_, i) => i !== aaveProposalState.length - 1,
                 );
 
                 setAaveProposalState(newAaveProposalState);
@@ -138,7 +149,7 @@ export const CompoundProposalForm = () => {
           setProposer(app.user?.activeAccount?.address);
 
           if (!proposer) {
-            throw new Error('Invalid address / not logged in');
+            throw new Error('Invalid address / not signed in');
           }
 
           if (!description) {
@@ -171,7 +182,7 @@ export const CompoundProposalForm = () => {
               JSON.stringify({
                 description,
                 title,
-              })
+              }),
             );
           }
 

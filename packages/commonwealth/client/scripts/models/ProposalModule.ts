@@ -1,15 +1,8 @@
-import type { Coin } from 'adapters/currency';
-import type { IIdentifiable } from 'adapters/shared';
+import type { Coin } from '../../../shared/adapters/currency';
+import type { IIdentifiable } from '../../../shared/adapters/shared';
 import type { IApp } from 'state';
 import { ProposalStore } from '../stores';
-import type ChainEntity from './ChainEntity';
-import type ChainEvent from './ChainEvent';
-import type {
-  IAccountsModule,
-  IChainModule,
-  ITXModalData,
-  IVote,
-} from './interfaces';
+import type { IAccountsModule, IChainModule, IVote } from './interfaces';
 import type Proposal from './Proposal';
 import StorageModule from './StorageModule';
 
@@ -54,28 +47,7 @@ export abstract class ProposalModule<
     return this._app;
   }
 
-  protected _entityConstructor(entity: ChainEntity): ProposalT {
-    try {
-      return this._constructorFunc(entity);
-    } catch (e) {
-      console.error(`failed to construct proposal from entity: ${e.message}`);
-      console.error('failed entity: ', entity);
-    }
-  }
-
-  public updateProposal(entity: ChainEntity, event: ChainEvent): void {
-    const proposal = this.store.getByIdentifier(entity.typeId);
-    if (!proposal) {
-      this._entityConstructor(entity);
-    } else {
-      proposal.update(event);
-    }
-  }
-
-  constructor(
-    app: IApp,
-    protected _constructorFunc?: (e: ChainEntity) => ProposalT
-  ) {
+  constructor(app: IApp) {
     super();
     this._app = app;
   }
@@ -106,17 +78,15 @@ export abstract class ProposalModule<
   */
   public abstract init(
     ChainInfo: IChainModule<any, any>,
-    Accounts: IAccountsModule<any, any>
+    Accounts: IAccountsModule<any>
   ): Promise<void>;
 
   public deinit() {
     this._initialized = false;
     this._error = undefined;
-    this.store.getAll().map((p) => p.deinit());
+    this.store.getAll()?.map((p) => p?.initialized && p?.deinit());
     this.store.clear();
   }
-
-  public abstract createTx(...args): ITXModalData | Promise<ITXModalData>;
 }
 
 export default ProposalModule;

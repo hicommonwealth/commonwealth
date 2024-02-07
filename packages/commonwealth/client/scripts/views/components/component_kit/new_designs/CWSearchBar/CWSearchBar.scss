@@ -1,0 +1,107 @@
+@import '../../../../../../styles/shared';
+
+@mixin everyRowStyles {
+  cursor: pointer;
+  padding: 8px;
+
+  &:hover {
+    background-color: $neutral-100;
+    border-radius: 6px;
+  }
+}
+
+.Searchbar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 8px 16px;
+  gap: 8px;
+  height: 40px;
+  background-color: $white;
+  border: 1px solid $neutral-200;
+  border-radius: 6px;
+  color: $neutral-800;
+
+  @include mediumSmallMid {
+    width: 100%;
+  }
+
+  @include extraSmall {
+    display: none;
+  }
+
+  &:hover {
+    border: 1px solid $primary-600;
+  }
+
+  &:focus-within {
+    outline: none;
+    border-color: $primary-500;
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.12), 0px 0px 0px 3px $primary-100;
+  }
+
+  &:focus-within:hover {
+    border-color: $primary-500;
+  }
+
+  &.container {
+    position: relative;
+    padding: 0;
+    border: none;
+
+    &:hover {
+      border: none;
+    }
+  }
+
+  &.disabled {
+    background-color: $neutral-50;
+    border-color: $neutral-200;
+    box-shadow: none;
+    color: $neutral-500;
+
+    &:hover {
+      border-color: $neutral-200;
+    }
+  }
+
+  input {
+    width: 100%;
+    border: none;
+    @include b2;
+
+    &:focus {
+      outline: none;
+      box-shadow: none;
+    }
+
+    &.disabled {
+      background-color: $neutral-50;
+    }
+
+    ::placeholder {
+      color: $neutral-800;
+    }
+  }
+
+  .magnifyingGlass {
+    color: $neutral-400;
+
+    &:hover {
+      cursor: pointer;
+      color: $neutral-600;
+    }
+  }
+
+  &.inputElement {
+    flex: 1;
+    width: fit-content;
+    padding: 0;
+    height: fit-content;
+    background-color: inherit;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+  }
+}

@@ -42,8 +42,24 @@
   font-family: NeueHaasUnica;
   font-weight: 500;
   font-style: normal;
-  src: url('neue-haas-unica-medium.eot'),
-    url('neue-haas-unica-medium.woff2') format('woff2'),
-    url('neue-haas-unica-medium.woff') format('woff'),
-    url('neue-haas-unica-medium.ttf') format('truetype');
+  src: url('NeueHaasUnica-Medium.eot'),
+    url('NeueHaasUnica-Medium.woff2') format('woff2'),
+    url('NeueHaasUnica-Medium.woff') format('woff'),
+    url('NeueHaasUnica-Medium.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: NeueHaasUnica;
+  font-weight: 400;
+  font-style: normal;
+  src: url('NeueHaasUnica-Regular.eot'),
+    url('NeueHaasUnica-Regular.woff2') format('woff2'),
+    url('NeueHaasUnica-Regular.woff') format('woff'),
+    url('NeueHaasUnica-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'DM Mono';
+  font-weight: 300;
+  src: url('DMMono-Regular.ttf') format('truetype');
 }

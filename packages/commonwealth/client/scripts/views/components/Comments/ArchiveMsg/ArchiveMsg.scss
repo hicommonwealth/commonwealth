@@ -1,0 +1,14 @@
+@import '../../../../../styles/shared.scss';
+
+.ArchiveMsg {
+  background-color: $neutral-50;
+  padding: 16px 24px;
+  border-radius: $border-radius-md;
+
+  .archive-msg-container {
+    @include b2;
+    display: flex;
+    gap: 8px;
+    color: $neutral-600;
+  }
+}

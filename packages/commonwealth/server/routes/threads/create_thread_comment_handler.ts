@@ -1,11 +1,12 @@
-import { TypedRequest, TypedResponse, success } from '../../types';
+import { AppError } from '@hicommonwealth/core';
+import { CommentInstance } from '@hicommonwealth/model';
+import { verifyComment } from '../../../shared/canvas/serverVerify';
 import { ServerControllers } from '../../routing/router';
-import { CommentInstance } from '../../models/comment';
-import { AppError } from '../../../../common-common/src/errors';
+import { TypedRequest, TypedResponse, success } from '../../types';
 
 export const Errors = {
   MissingThreadId: 'Must provide valid thread_id',
-  MissingTextOrAttachment: 'Must provide text or attachment',
+  MissingText: 'Must provide text',
 
   MissingRootId: 'Must provide valid thread_id',
   InvalidParent: 'Invalid parent',
@@ -24,15 +25,16 @@ type CreateThreadCommentRequestBody = {
   canvas_action;
   canvas_session;
   canvas_hash;
+  discord_meta;
 };
 type CreateThreadCommentResponse = CommentInstance;
 
 export const createThreadCommentHandler = async (
   controllers: ServerControllers,
   req: TypedRequest<CreateThreadCommentRequestBody, null, { id: string }>,
-  res: TypedResponse<CreateThreadCommentResponse>
+  res: TypedResponse<CreateThreadCommentResponse>,
 ) => {
-  const { user, address, chain } = req;
+  const { user, address } = req;
   const { id: threadId } = req.params;
   const {
     parent_id: parentId,
@@ -40,39 +42,43 @@ export const createThreadCommentHandler = async (
     canvas_action: canvasAction,
     canvas_session: canvasSession,
     canvas_hash: canvasHash,
+    discord_meta,
   } = req.body;
 
   if (!threadId) {
     throw new AppError(Errors.MissingThreadId);
   }
-  if (
-    (!text || !text.trim()) &&
-    (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)
-  ) {
-    throw new AppError(Errors.MissingTextOrAttachment);
+  if (!text || !text.trim()) {
+    throw new AppError(Errors.MissingText);
   }
 
-  const attachments = req.body['attachments[]'];
+  if (process.env.ENFORCE_SESSION_KEYS === 'true') {
+    await verifyComment(canvasAction, canvasSession, canvasHash, {
+      thread_id: parseInt(threadId, 10) || undefined,
+      text,
+      address: address.address,
+      parent_comment_id: parentId,
+    });
+  }
 
   const [comment, notificationOptions, analyticsOptions] =
-    await controllers.threads.createThreadComment(
+    await controllers.threads.createThreadComment({
       user,
       address,
-      chain,
       parentId,
-      parseInt(threadId, 10),
+      threadId: parseInt(threadId, 10) || undefined,
       text,
-      attachments,
       canvasAction,
       canvasSession,
-      canvasHash
-    );
+      canvasHash,
+      discordMeta: discord_meta,
+    });
 
   for (const n of notificationOptions) {
     controllers.notifications.emit(n).catch(console.error);
   }
 
-  controllers.analytics.track(analyticsOptions);
+  controllers.analytics.track(analyticsOptions, req).catch(console.error);
 
   return success(res, comment);
 };

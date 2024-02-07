@@ -6,8 +6,8 @@ import app from 'state';
 import type Thread from '../../../models/Thread';
 import { CardsCollection } from '../../components/cards_collection';
 import { CWText } from '../../components/component_kit/cw_text';
-import { PageLoading } from '../loading';
-import { SnapshotSpaceCard } from './snapshot_space_card';
+import { SnapshotSpaceCard } from './SnapshotSpaceCard';
+import { Skeleton } from '../../components/Skeleton';
 
 enum SPACES_HEADER_MESSAGES {
   NEW_PROPOSAL = 'Select a Snapshot Space to Create a Proposal:',
@@ -78,7 +78,23 @@ const MultipleSnapshotsPage = (props: MultipleSnapshotsPageProps) => {
       setSpacesMetadata(data);
     });
 
-    return <PageLoading />;
+    return (
+      <div className="MultipleSnapshotsPage">
+        <Skeleton count={1} width={'40%'} />
+        <br />
+        <CardsCollection
+          content={Array.from({ length: 2 }).map(() => (
+            <SnapshotSpaceCard
+              showSkeleton={true}
+              proposal={null}
+              proposals={[]}
+              redirectAction=""
+              space={{} as any}
+            />
+          ))}
+        />
+      </div>
+    );
   }
 
   return (

@@ -1,6 +1,6 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-import type { DB } from '../models';
 
 const VALID_DIGEST_INTERVALS = [
   'never',
@@ -20,7 +20,7 @@ const writeUserSetting = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { key, value } = req.body;
 
@@ -31,15 +31,7 @@ const writeUserSetting = async (
     return next(new AppError(Errors.NoKeyValue));
   }
 
-  if (key === 'lastVisited') {
-    const obj = JSON.parse(req.user.lastVisited);
-    const val = JSON.parse(value);
-    const { activeEntity, timestamp } = val;
-    obj[activeEntity] = timestamp;
-    const str = JSON.stringify(obj);
-    req.user.lastVisited = str;
-    await req.user.save();
-  } else if (key === 'disableRichText' && value === 'true') {
+  if (key === 'disableRichText' && value === 'true') {
     req.user.disableRichText = true;
     await req.user.save();
   } else if (key === 'disableRichText' && value === 'false') {

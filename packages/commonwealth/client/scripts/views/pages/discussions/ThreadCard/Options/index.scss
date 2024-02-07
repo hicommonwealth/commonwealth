@@ -3,6 +3,7 @@
 .Options {
   align-items: center;
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 
   .thread-option-btn {
@@ -23,6 +24,12 @@
 
     .Text {
       color: $neutral-600;
+    }
+  }
+
+  .popover-container {
+    button.action-btn {
+      outline: none;
     }
   }
 }

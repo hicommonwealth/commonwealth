@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import type { SessionPayload } from '@canvas-js/interfaces';
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 
@@ -35,7 +35,7 @@ class NearWebWalletController implements IWebWallet<any> {
 
   public async signCanvasMessage(
     account: Account,
-    canvasMessage: SessionPayload
+    canvasSessionPayload: SessionPayload,
   ): Promise<string> {
     throw new Error('not implemented');
   }

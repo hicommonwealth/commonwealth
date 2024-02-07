@@ -1,3 +1,6 @@
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+
+import { notifyError } from 'controllers/app/notifications';
 import {
   getPower,
   getResults,
@@ -8,40 +11,53 @@ import {
   VoteResults,
   VoteResultsData,
 } from 'helpers/snapshot_utils';
+import useBrowserWindow from 'hooks/useBrowserWindow';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { LinkSource } from 'models/Thread';
-import React, { useCallback, useMemo, useState } from 'react';
 import app from 'state';
+import { useGetThreadsByLinkQuery } from 'state/api/threads';
+import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import AddressInfo from '../../../models/AddressInfo';
-import { CWContentPage } from '../../components/component_kit/cw_content_page';
+import { CWContentPage } from '../../components/component_kit/CWContentPage';
 import {
   ActiveProposalPill,
   ClosedProposalPill,
 } from '../../components/proposal_pills';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
-import { PageLoading } from '../loading';
 import { SnapshotInformationCard } from './snapshot_information_card';
 import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
 import { SnapshotVotesTable } from './snapshot_votes_table';
 
-type ViewProposalPageProps = {
+type ViewSnapshotProposalPageProps = {
   identifier: string;
   scope: string;
   snapshotId: string;
 };
 
-export const ViewProposalPage = ({
+export const ViewSnapshotProposalPage = ({
   identifier,
   snapshotId,
-}: ViewProposalPageProps) => {
+}: ViewSnapshotProposalPageProps) => {
   const [proposal, setProposal] = useState<SnapshotProposal | null>(null);
   const [space, setSpace] = useState<SnapshotSpace | null>(null);
   const [voteResults, setVoteResults] = useState<VoteResults | null>(null);
   const [power, setPower] = useState<Power | null>(null);
-  const [threads, setThreads] = useState<Array<{
-    id: string;
-    title: string;
-  }> | null>([]);
+
+  const { data, error, isLoading } = useGetThreadsByLinkQuery({
+    chainId: app.activeChainId(),
+    link: {
+      source: LinkSource.Snapshot,
+      identifier: proposal?.id,
+    },
+    enabled: !!(app.activeChainId() && proposal?.id),
+  });
+  const threads = data || [];
+
+  useEffect(() => {
+    if (!isLoading && error) {
+      notifyError('Could not get threads');
+    }
+  }, [error, isLoading]);
 
   const symbol: string = space?.symbol || '';
   const validatedAgainstStrategies: boolean = !power
@@ -63,8 +79,16 @@ export const ViewProposalPage = ({
     if (!proposal || !activeChainId) {
       return null;
     }
-    return new AddressInfo(null, proposal.author, activeChainId, null);
+    return new AddressInfo({
+      id: null,
+      address: proposal.author,
+      chainId: activeChainId,
+    });
   }, [proposal, activeChainId]);
+
+  useManageDocumentTitle('View snapshot proposal', proposal?.title);
+
+  const { isWindowLarge } = useBrowserWindow({});
 
   const loadVotes = useCallback(
     async (snapId: string, proposalId: string) => {
@@ -74,7 +98,7 @@ export const ViewProposalPage = ({
       }
 
       const currentProposal = app.snapshot.proposals.find(
-        (p) => p.id === proposalId
+        (p) => p.id === proposalId,
       );
       setProposal(currentProposal);
 
@@ -87,25 +111,11 @@ export const ViewProposalPage = ({
       const powerRes = await getPower(
         currentSpace,
         currentProposal,
-        activeUserAddress
+        activeUserAddress,
       );
       setPower(powerRes);
-
-      try {
-        if (app.activeChainId()) {
-          const threadsForSnapshot = await app.threads.getThreadsForLink({
-            link: {
-              source: LinkSource.Snapshot,
-              identifier: currentProposal.id,
-            },
-          });
-          setThreads(threadsForSnapshot);
-        }
-      } catch (e) {
-        console.error(`Failed to fetch threads: ${e}`);
-      }
     },
-    [activeUserAddress]
+    [activeUserAddress],
   );
 
   useNecessaryEffect(() => {
@@ -113,7 +123,12 @@ export const ViewProposalPage = ({
   }, [identifier, loadVotes, snapshotId]);
 
   if (!proposal) {
-    return <PageLoading />;
+    return (
+      <CWContentPage
+        showSkeleton
+        sidebarComponentsSkeletonCount={isWindowLarge ? 2 : 0}
+      />
+    );
   }
 
   return (
@@ -172,4 +187,4 @@ export const ViewProposalPage = ({
   );
 };
 
-export default ViewProposalPage;
+export default ViewSnapshotProposalPage;

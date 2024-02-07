@@ -9,7 +9,7 @@ import moment from 'moment';
 
 import { ConfirmSnapshotVoteModal } from '../../modals/confirm_snapshot_vote_modal';
 import { SnapshotPollCard } from './snapshot_poll_card';
-import { Modal } from '../../components/component_kit/cw_modal';
+import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 
 type SnapshotProposalCardsProps = {
   activeUserAddress: string;
@@ -27,7 +27,7 @@ type SnapshotProposalCardsProps = {
 };
 
 const enum VotingError {
-  NOT_VALIDATED = 'You cannot vote on this poll or are not logged in.',
+  NOT_VALIDATED = 'You cannot vote on this poll or are not signed in.',
   ALREADY_VOTED = 'Already Submitted Vote',
 }
 
@@ -134,7 +134,8 @@ export const SnapshotPollCardContainer = (
         tooltipErrorMessage={voteErrorText}
         isPreview={false}
       />
-      <Modal
+      <CWModal
+        size="small"
         content={
           <ConfirmSnapshotVoteModal
             space={space}

@@ -10,21 +10,10 @@
     align-items: center;
     display: flex;
     gap: 16px;
-
-    .comments-count {
-      align-items: center;
-      display: flex;
-      gap: 4px;
-
-      .Text,
-      .Icon {
-        color: $neutral-500;
-      }
-    }
   }
 
   .callout-text {
-    background: #F7F6F7;
+    background: #f7f6f7;
     display: flex;
     gap: 10px;
     color: #656167;
@@ -39,6 +28,10 @@
       color: #656167;
     }
   }
+
+  .JoinCommunityBanner {
+    margin-top: 8px;
+  }
 }
 
 .cards-column {
@@ -46,6 +39,16 @@
   flex-direction: column;
   gap: 16px;
 }
+
+.thread-actions .popover-container {
+  display: flex;
+  border-radius: $border-radius-corners;
+
+  &:hover {
+    background-color: $neutral-100;
+  }
+}
+
 
 .comments-filter-row {
   display: flex;
@@ -62,7 +65,7 @@
   }
 }
 
-@include extraSmall {  
+@include extraSmall {
   .comments-filter-row {
     flex-direction: column;
     align-items: flex-start;
@@ -72,5 +75,4 @@
       margin-left: 0 !important;
     }
   }
-
 }

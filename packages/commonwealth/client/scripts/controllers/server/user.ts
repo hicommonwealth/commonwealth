@@ -1,17 +1,15 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/consistent-type-imports */
-import $ from 'jquery';
 import { EventEmitter } from 'events';
+import $ from 'jquery';
 
 import app from 'state';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import ChainInfo from '../../models/ChainInfo';
-import SocialAccount from '../../models/SocialAccount';
 import StarredCommunity from '../../models/StarredCommunity';
 import { notifyError } from '../app/notifications';
-import DraftsController from './drafts';
 
 // eslint-disable-next-line
 import NotificationsController from './notifications';
@@ -80,21 +78,12 @@ export class UserController {
 
   private _setActiveAccounts(
     activeAccounts: Account[],
-    shouldRedraw = true
+    shouldRedraw = true,
   ): void {
     this._activeAccounts = activeAccounts;
     if (shouldRedraw) {
       this.isFetched.emit('redraw');
     }
-  }
-
-  private _socialAccounts: SocialAccount[] = [];
-  public get socialAccounts(): SocialAccount[] {
-    return this._socialAccounts;
-  }
-
-  private _setSocialAccounts(socialAccounts: SocialAccount[]): void {
-    this._socialAccounts = socialAccounts;
   }
 
   private _selectedChain: ChainInfo;
@@ -134,15 +123,6 @@ export class UserController {
     this._notifications = notifications;
   }
 
-  private _lastVisited: object;
-  public get lastVisited(): object {
-    return this._lastVisited;
-  }
-
-  private _setLastVisited(lastVisited: object): void {
-    this._lastVisited = lastVisited;
-  }
-
   private _starredCommunities: StarredCommunity[];
   public get starredCommunities(): StarredCommunity[] {
     return this._starredCommunities;
@@ -150,15 +130,6 @@ export class UserController {
 
   private _setStarredCommunities(starredCommunities: StarredCommunity[]): void {
     this._starredCommunities = starredCommunities;
-  }
-
-  private _discussionDrafts: DraftsController = new DraftsController();
-  public get discussionDrafts(): DraftsController {
-    return this._discussionDrafts;
-  }
-
-  private _setDiscussionDrafts(drafts: DraftsController): void {
-    this._discussionDrafts = drafts;
   }
 
   private _unseenPosts: object;
@@ -175,6 +146,7 @@ export class UserController {
   // Recommend using the setActiveAccount helper in controllers/app/login.ts to persist the setting to the backend.
   public ephemerallySetActiveAccount(account: Account): void {
     this._setActiveAccount(account);
+    this.isFetched.emit('redraw');
   }
 
   public setEmail(email: string): void {
@@ -232,13 +204,13 @@ export class UserController {
   public removeAddress(address: AddressInfo): void {
     this._addresses.splice(
       this._addresses.findIndex((a) => a.address === address.address),
-      1
+      1,
     );
   }
 
   public setActiveAccounts(
     activeAccounts: Account[],
-    shouldRedraw = true
+    shouldRedraw = true,
   ): void {
     this._setActiveAccounts(activeAccounts, shouldRedraw);
   }
@@ -250,22 +222,7 @@ export class UserController {
   public removeActiveAddress(address: Account): void {
     this._activeAccounts.splice(
       this._activeAccounts.findIndex((a) => a.address === address.address),
-      1
-    );
-  }
-
-  public setSocialAccounts(socialAccounts: SocialAccount[]): void {
-    this._setSocialAccounts(socialAccounts);
-  }
-
-  public addSocialAccount(social: SocialAccount): void {
-    this._socialAccounts.push(social);
-  }
-
-  public removeSocialAccount(social: SocialAccount): void {
-    this._socialAccounts.splice(
-      this._socialAccounts.findIndex((s) => s.username === social.username),
-      1
+      1,
     );
   }
 
@@ -274,7 +231,7 @@ export class UserController {
   }
 
   public selectChain(options: { chain: string }): JQueryPromise<void> {
-    return $.post(`${app.serverUrl()}/selectChain`, {
+    return $.post(`${app.serverUrl()}/selectCommunity`, {
       chain: options.chain,
       auth: true,
       jwt: this._jwt,
@@ -303,25 +260,25 @@ export class UserController {
     this._setNotifications(notifications);
   }
 
-  public setDiscussionDrafts(drafts: DraftsController): void {
-    this.setDiscussionDrafts(drafts);
-  }
-
-  public setLastVisited(lastVisited: object): void {
-    this._setLastVisited(lastVisited);
-  }
-
   public setStarredCommunities(star: StarredCommunity[]): void {
     this._setStarredCommunities(star);
+  }
+
+  public isCommunityStarred(community_id: string): boolean {
+    return (
+      this._starredCommunities.findIndex((c) => {
+        return c.community_id === community_id;
+      }) !== -1
+    );
   }
 
   public addStarredCommunity(star: StarredCommunity): void {
     this._starredCommunities.push(star);
   }
 
-  public removeStarredCommunity(star: StarredCommunity): void {
+  public removeStarredCommunity(community_id: string, userId: number): void {
     const index = this._starredCommunities.findIndex(
-      (s) => s.user_id === star.user_id && s.chain === star.chain
+      (s) => s.user_id === userId && s.community_id === community_id,
     );
     this._starredCommunities.splice(index, 1);
   }

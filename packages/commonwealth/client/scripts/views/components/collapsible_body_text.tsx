@@ -1,15 +1,13 @@
 import React from 'react';
 
-import type { AnyProposal } from '../../models/types';
-
 import { QuillRenderer } from './react_quill_editor/quill_renderer';
 
 type CollapsibleProposalBodyProps = {
-  proposal: AnyProposal;
+  doc: string;
 };
 
 export const CollapsibleProposalBody = ({
-  proposal,
+  doc,
 }: CollapsibleProposalBodyProps) => {
-  return <QuillRenderer doc={proposal.description} cutoffLines={50} />;
+  return <QuillRenderer doc={doc} cutoffLines={50} />;
 };

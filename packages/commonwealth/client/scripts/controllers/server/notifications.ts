@@ -2,10 +2,15 @@
 import { EventEmitter } from 'events';
 import $ from 'jquery';
 
-import NotificationSubscription, { modelFromServer } from 'models/NotificationSubscription';
+import NotificationSubscription, {
+  modelFromServer,
+} from 'models/NotificationSubscription';
 
 import app from 'state';
 
+import { NotificationCategories } from '@hicommonwealth/core';
+import type { SubscriptionInstance } from '@hicommonwealth/model';
+import { findSubscription, SubUniqueData } from 'helpers/findSubscription';
 import { NotificationStore } from 'stores';
 import Notification from '../../models/Notification';
 
@@ -36,7 +41,7 @@ const get = (route, args, callback) => {
 };
 
 interface NotifOptions {
-  chain_filter: string;
+  community_filter: string;
   maxId: number;
 }
 
@@ -46,9 +51,6 @@ class NotificationsController {
   // these are the chains that chain-events has active listeners for (used to detemine what chains are shown on the
   // notification settings page
   private _chainEventSubscribedChainIds: string[] = [];
-
-  private _maxChainEventNotificationId: number = Number.POSITIVE_INFINITY;
-  private _maxDiscussionNotificationId: number = Number.POSITIVE_INFINITY;
 
   private _numPages = 0;
   private _numUnread = 0;
@@ -83,32 +85,51 @@ class NotificationsController {
   }
 
   private _subscriptions: NotificationSubscription[] = [];
-  public get subscriptions() {
-    return this._subscriptions;
+
+  public get discussionSubscriptions(): NotificationSubscription[] {
+    return this._subscriptions.filter(
+      (s) => s.categoryId !== NotificationCategories.ChainEvent,
+    );
   }
 
-  public subscribe(category: string, objectId: string) {
-    const subscription = this.subscriptions.find(
-      (v) => v.category === category && v.objectId === objectId
+  public get chainEventSubscriptions(): NotificationSubscription[] {
+    return this._subscriptions.filter(
+      (s) => s.categoryId === NotificationCategories.ChainEvent,
     );
+  }
+
+  public subscribe(data: SubUniqueData) {
+    const subscription = this.findNotificationSubscription(data);
     if (subscription) {
       return this.enableSubscriptions([subscription]);
     } else {
+      const untypedData: {
+        categoryId: NotificationCategories;
+        options?: {
+          chainId?: string;
+          threadId?: number;
+          commentId?: number;
+          snapshotId?: string;
+        };
+      } = data;
+      const requestData = {
+        chain_id: untypedData.options?.chainId,
+        thread_id: untypedData.options?.threadId,
+        comment_id: untypedData.options?.commentId,
+        snapshot_id: untypedData.options?.snapshotId,
+      };
+
       return post(
         '/createSubscription',
         {
-          category,
-          object_id: objectId,
+          category: data.categoryId,
           is_active: true,
+          ...requestData,
         },
-        (result) => {
+        (result: SubscriptionInstance) => {
           const newSubscription = modelFromServer(result);
-          if (newSubscription.category === 'chain-event')
-            app.socket.chainEventsNs.addChainEventSubscriptions([
-              newSubscription,
-            ]);
           this._subscriptions.push(newSubscription);
-        }
+        },
       );
     }
   }
@@ -121,13 +142,10 @@ class NotificationsController {
         'subscription_ids[]': subscriptions.map((n) => n.id),
       },
       () => {
-        const ceSubs = [];
         for (const s of subscriptions) {
           s.enable();
-          if (s.category === 'chain-event') ceSubs.push(s);
         }
-        app.socket.chainEventsNs.addChainEventSubscriptions(ceSubs);
-      }
+      },
     );
   }
 
@@ -144,8 +162,7 @@ class NotificationsController {
           s.disable();
           if (s.category === 'chain-event') ceSubs.push(s);
         }
-        app.socket.chainEventsNs.deleteChainEventSubscriptions(ceSubs);
-      }
+      },
     );
   }
 
@@ -160,7 +177,7 @@ class NotificationsController {
         for (const s of subscriptions) {
           s.enableImmediateEmail();
         }
-      }
+      },
     );
   }
 
@@ -175,7 +192,7 @@ class NotificationsController {
         for (const s of subscriptions) {
           s.disableImmediateEmail();
         }
-      }
+      },
     );
   }
 
@@ -192,11 +209,7 @@ class NotificationsController {
           throw new Error('subscription not found!');
         }
         this._subscriptions.splice(idx, 1);
-        if (subscription.category === 'chain-event')
-          app.socket.chainEventsNs.deleteChainEventSubscriptions([
-            subscription,
-          ]);
-      }
+      },
     );
   }
 
@@ -220,7 +233,7 @@ class NotificationsController {
         if (unreadNotifications.slice(MAX_NOTIFICATIONS_READ).length > 0) {
           this.markAsRead(unreadNotifications.slice(MAX_NOTIFICATIONS_READ));
         }
-      }
+      },
     );
   }
 
@@ -263,7 +276,7 @@ class NotificationsController {
           this.delete(notifications.slice(MAX_NOTIFICATIONS_CLEAR));
         }
         // TODO: post(/clearNotifications) should wait on all notifications being marked as read before redrawing
-      }
+      },
     );
   }
 
@@ -278,9 +291,6 @@ class NotificationsController {
   }
 
   public clearSubscriptions() {
-    app.socket?.chainEventsNs.deleteChainEventSubscriptions(
-      this._subscriptions
-    );
     this._subscriptions = [];
   }
 
@@ -302,15 +312,12 @@ class NotificationsController {
 
   public getChainEventNotifications() {
     if (!app.user || !app.user.jwt) {
-      throw new Error('must be logged in to refresh notifications');
+      throw new Error('must be signed in to refresh notifications');
     }
 
     const options: NotifOptions = app.isCustomDomain()
-      ? { chain_filter: app.activeChainId(), maxId: undefined }
-      : { chain_filter: undefined, maxId: undefined };
-
-    if (this._maxChainEventNotificationId !== Number.POSITIVE_INFINITY)
-      options.maxId = this._maxChainEventNotificationId;
+      ? { community_filter: app.activeChainId(), maxId: undefined }
+      : { community_filter: undefined, maxId: undefined };
 
     return post('/viewChainEventNotifications', options, (result) => {
       this._numPages = result.numPages;
@@ -322,14 +329,11 @@ class NotificationsController {
 
   public getDiscussionNotifications() {
     if (!app.user || !app.user.jwt) {
-      throw new Error('must be logged in to refresh notifications');
+      throw new Error('must be signed in to refresh notifications');
     }
     const options: NotifOptions = app.isCustomDomain()
-      ? { chain_filter: app.activeChainId(), maxId: undefined }
-      : { chain_filter: undefined, maxId: undefined };
-
-    if (this._maxDiscussionNotificationId !== Number.POSITIVE_INFINITY)
-      options.maxId = this._maxDiscussionNotificationId;
+      ? { community_filter: app.activeChainId(), maxId: undefined }
+      : { community_filter: undefined, maxId: undefined };
 
     return post('/viewDiscussionNotifications', options, (result) => {
       this._numPages = result.numPages;
@@ -340,41 +344,28 @@ class NotificationsController {
   }
 
   private parseNotifications(subscriptions) {
-    const ceSubs = [];
-
     for (const subscriptionJSON of subscriptions) {
-      const subscription = NotificationSubscription.fromJSON(subscriptionJSON);
+      const subscriptionId = subscriptionJSON.subscription_id;
+      const categoryId = subscriptionJSON.category_id;
 
       // save the notification read + notification instances if any
       for (const notificationsReadJSON of subscriptionJSON.NotificationsReads) {
         const data = {
           is_read: notificationsReadJSON.is_read,
+          subscription_id: subscriptionId,
           ...notificationsReadJSON.Notification,
         };
-        const notification = Notification.fromJSON(data, subscription);
+        const notification = Notification.fromJSON(data);
 
-        if (subscription.category === 'chain-event') {
+        if (categoryId === 'chain-event') {
           if (!this._chainEventStore.getById(notification.id))
             this._chainEventStore.add(notification);
-          // the minimum id is the new max id for next page
-          if (notificationsReadJSON.id < this._maxChainEventNotificationId) {
-            this._maxChainEventNotificationId = notificationsReadJSON.id;
-            if (notificationsReadJSON.id === 1)
-              this._maxChainEventNotificationId = 0;
-          }
         } else {
           if (!this._discussionStore.getById(notification.id))
             this._discussionStore.add(notification);
-          if (notificationsReadJSON.id < this._maxDiscussionNotificationId) {
-            this._maxDiscussionNotificationId = notificationsReadJSON.id;
-            if (notificationsReadJSON.id === 1)
-              this._maxDiscussionNotificationId = 0;
-          }
         }
       }
-      if (subscription.category === 'chain-event') ceSubs.push(subscription);
     }
-    app.socket.chainEventsNs.addChainEventSubscriptions(ceSubs);
   }
 
   public getSubscriptions() {
@@ -387,7 +378,7 @@ class NotificationsController {
   }
 
   public getSubscribedChains() {
-    return post('/getSubscribedChains', {}, (result) => {
+    return post('/getSubscribedCommunities', {}, (result) => {
       this._chainEventSubscribedChainIds = result.map((x) => x.id);
     });
   }
@@ -401,6 +392,10 @@ class NotificationsController {
     ]);
     this.isLoaded.emit('redraw');
     return Promise.resolve();
+  }
+
+  public findNotificationSubscription(findOptions: SubUniqueData) {
+    return findSubscription(findOptions, this._subscriptions);
   }
 }
 

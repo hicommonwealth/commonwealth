@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackInjectAttributesPlugin = require('html-webpack-inject-attributes-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 require('dotenv').config();
 
@@ -24,27 +25,28 @@ module.exports = {
   plugins: [
     new webpack.DefinePlugin({
       'process.env.MIXPANEL_PROD_TOKEN': JSON.stringify(
-        process.env.MIXPANEL_PROD_TOKEN || '312b6c5fadb9a88d98dc1fb38de5d900'
+        process.env.MIXPANEL_PROD_TOKEN || '312b6c5fadb9a88d98dc1fb38de5d900',
       ),
     }),
     new webpack.DefinePlugin({
       'process.env.MIXPANEL_DEV_TOKEN': JSON.stringify(
-        process.env.MIXPANEL_DEV_TOKEN || '312b6c5fadb9a88d98dc1fb38de5d900'
+        process.env.MIXPANEL_DEV_TOKEN || '312b6c5fadb9a88d98dc1fb38de5d900',
       ),
     }),
     new webpack.DefinePlugin({
       'process.env.MAGIC_PUBLISHABLE_KEY': JSON.stringify(
-        process.env.MAGIC_PUBLISHABLE_KEY || 'pk_live_EF89AABAFB87D6F4'
+        process.env.MAGIC_PUBLISHABLE_KEY || 'pk_live_EF89AABAFB87D6F4',
       ),
     }),
     new webpack.DefinePlugin({
       'process.env.DISCORD_CLIENT_ID': JSON.stringify(
-        process.env.DISCORD_CLIENT_ID || '1034502265664454776'
+        // TODO: @Timothee can we remove the default/hardcoded value here?
+        process.env.DISCORD_CLIENT_ID || '1034502265664454776',
       ),
     }),
     new webpack.DefinePlugin({
       'process.env.DISCORD_UI_URL': JSON.stringify(
-        process.env.DISCORD_UI_URL || 'http://localhost:3000'
+        process.env.DISCORD_UI_URL || 'http://localhost:3000',
       ),
     }),
     new webpack.DefinePlugin({
@@ -52,16 +54,31 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       'process.env.FLAG_COMMUNITY_HOMEPAGE': JSON.stringify(
-        process.env.FLAG_COMMUNITY_HOMEPAGE
+        process.env.FLAG_COMMUNITY_HOMEPAGE,
       ),
     }),
     new webpack.DefinePlugin({
       'process.env.FLAG_PROPOSAL_TEMPLATES': JSON.stringify(
-        process.env.FLAG_PROPOSAL_TEMPLATES
+        process.env.FLAG_PROPOSAL_TEMPLATES,
       ),
     }),
     new webpack.DefinePlugin({
       'process.env.ETH_RPC': JSON.stringify(process.env.ETH_RPC),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.FLAG_NEW_ADMIN_ONBOARDING': JSON.stringify(
+        process.env.FLAG_NEW_ADMIN_ONBOARDING,
+      ),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.FLAG_NEW_SIGN_IN_MODAL': JSON.stringify(
+        process.env.FLAG_NEW_SIGN_IN_MODAL,
+      ),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.FLAG_COMMUNITY_STAKE': JSON.stringify(
+        process.env.FLAG_COMMUNITY_STAKE,
+      ),
     }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../client/index.html'),
@@ -85,14 +102,13 @@ module.exports = {
       chunks: 'all',
       // TODO: Commented out packages need to be code split. Commented out for now so that webpack can tree shake the imports
       cacheGroups: {
-        bitcoin: {
-          test: /[\\/]node_modules[\\/](bip39)[\\/]/,
-          name: 'bitcoin',
+        ethersAsync: {
+          test: /[\\/]node_modules[\\/](ethers)[\\/]/,
+          name: 'ethersAsync',
           chunks: 'all',
         },
         ethereumAsync: {
-          // this is made into an async chunk (lazy loaded)
-          test: /[\\/]node_modules[\\/](web3|@audius|ethers|web3-eth-accounts|@walletconnect|ethereumjs-abi)[\\/]/,
+          test: /[\\/]node_modules[\\/](@audius|web3|web3-eth-accounts|@walletconnect|ethereumjs-abi)[\\/]/,
           name: 'ethereumAsync',
           chunks: 'all',
         },
@@ -140,6 +156,7 @@ module.exports = {
     },
   },
   resolve: {
+    plugins: [new TsconfigPathsPlugin({})],
     extensions: ['.ts', '.tsx', '.mjs', '.js', '.jsx', '.svg'],
     modules: [
       '../client/scripts',
@@ -148,14 +165,6 @@ module.exports = {
       'node_modules', // local node modules
       '../node_modules', // global node modules
     ],
-    alias: {
-      'common-common': path.resolve(__dirname, '../../common-common'),
-      'chain-events': path.resolve(__dirname, '../../chain-events'),
-      'token-balance-cache': path.resolve(
-        __dirname,
-        '../../token-balance-cache'
-      ),
-    },
     fallback: {
       fs: false,
       net: false,
@@ -174,13 +183,7 @@ module.exports = {
       {
         // ignore ".spec.ts" test files in build
         test: /^(?!.*\.spec\.ts$).*(?:\.ts)$/,
-        include: [
-          path.resolve(__dirname, '../client'),
-          path.resolve(__dirname, '../shared'),
-          path.resolve(__dirname, '../../common-common'),
-          path.resolve(__dirname, '../../chain-events'),
-          path.resolve(__dirname, '../../token-balance-cache'),
-        ],
+
         loader: 'esbuild-loader',
         options: {
           loader: 'ts',

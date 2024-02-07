@@ -1,0 +1,27 @@
+@import '../../../shared';
+
+.SidebarHeader {
+  display: flex;
+  padding: 8px 0px 8px 8px;
+  border-top-left-radius: 80px;
+  border-bottom-left-radius: 80px;
+  border-left: 2px solid $neutral-200;
+  border-bottom: 1px solid $neutral-200;
+  flex-direction: row;
+  align-items: center;
+  border-right: 1px solid $neutral-200;
+  background-color: $white;
+  min-height: $global-sidebar-header-height !important;
+  max-height: $global-sidebar-header-height !important;
+  height: $global-sidebar-header-height !important;
+
+  .header {
+    padding: 0px 8px 0px 12px;
+    display: block;
+    width: 100%;
+  }
+
+  .collapsable-icon {
+    padding-right: 4px;
+  }
+}

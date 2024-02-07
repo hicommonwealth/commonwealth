@@ -1,0 +1,16 @@
+.DirectoryMenuItem {
+  height: 36px;
+  cursor: pointer;
+
+  .title-text {
+    width: unset !important;
+  }
+
+  .right-icon {
+    margin-left: 8px;
+
+    svg {
+      fill: none !important;
+    }
+  }
+}

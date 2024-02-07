@@ -1,24 +1,27 @@
-import moment from 'moment';
-import type { Request, Response, NextFunction } from 'express';
 import {
-  SENDGRID_API_KEY,
+  AppError,
+  DynamicTemplate,
+  WalletId,
+  logger,
+} from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
+import sgMail from '@sendgrid/mail';
+import type { NextFunction, Request, Response } from 'express';
+import moment from 'moment';
+import {
   LOGIN_RATE_LIMIT_MINS,
   LOGIN_RATE_LIMIT_TRIES,
-  MAGIC_SUPPORTED_BASES,
   MAGIC_DEFAULT_CHAIN,
+  MAGIC_SUPPORTED_BASES,
+  SENDGRID_API_KEY,
 } from '../config';
-import { DynamicTemplate } from '../../shared/types';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { WalletId } from 'common-common/src/types';
-import { validateChain } from '../middleware/validateChain';
-import type { DB } from '../models';
-import { AppError } from 'common-common/src/errors';
-import sgMail from '@sendgrid/mail';
+import { validateCommunity } from '../middleware/validateCommunity';
+
 sgMail.setApiKey(SENDGRID_API_KEY);
-const log = factory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 export const Errors = {
-  AlreadyLoggedIn: 'Already logged in',
+  AlreadyLoggedIn: 'Already signed in',
   NoEmail: 'Missing email',
   InvalidEmail: 'Invalid email',
   ChainOrCommunityRequired:
@@ -29,7 +32,7 @@ const startEmailLogin = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const protocol = req.headers['x-forwarded-proto'] || req.protocol;
   const hostname = req.headers['x-forwarded-host'] || req.hostname;
@@ -67,7 +70,7 @@ const startEmailLogin = async (
   // ignore error because someone might try to log in from the homepage, or another page without
   // chain or community
   const context = req.body.chain ? req.body : { chain: MAGIC_DEFAULT_CHAIN };
-  const [chain] = await validateChain(models, context);
+  const [chain] = await validateCommunity(models, context);
   const magicChain = chain;
 
   const isNewRegistration = !previousUser;
@@ -102,7 +105,7 @@ const startEmailLogin = async (
     return res.json({
       status: 'Error',
       message:
-        "You've tried to log in several times already. " +
+        "You've tried to sign in several times already. " +
         `Check your spam folder, or wait ${LOGIN_RATE_LIMIT_MINS} minutes to try again.`,
     });
   }

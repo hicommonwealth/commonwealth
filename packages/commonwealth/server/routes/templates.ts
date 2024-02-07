@@ -1,13 +1,13 @@
+import { AppError } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import type {
   TypedRequestBody,
   TypedRequestQuery,
   TypedResponse,
 } from 'server/types';
-import { success } from '../types';
-import type { DB } from '../models';
-import { AppError } from '../../../common-common/src/errors';
 import isValidJson from '../../shared/validateJson';
-import validateRoles from '../util/validateRoles';
+import { success } from '../types';
+import { validateOwner } from '../util/validateOwner';
 
 type CreateTemplateAndMetadataReq = {
   contract_id: string;
@@ -30,7 +30,7 @@ type DeleteTemplateAndMetadataReq = {
 export async function createTemplate(
   models: DB,
   req: TypedRequestBody<CreateTemplateAndMetadataReq>,
-  res: TypedResponse<CreateTemplateAndMetadataResp>
+  res: TypedResponse<CreateTemplateAndMetadataResp>,
 ) {
   const {
     contract_id,
@@ -42,8 +42,16 @@ export async function createTemplate(
     created_for_community,
   } = req.body;
 
-  const isAdmin = await validateRoles(models, req.user, 'admin', chain_id);
-  if (!isAdmin) throw new AppError('Must be admin');
+  const isAdmin = await validateOwner({
+    models: models,
+    user: req.user,
+    communityId: chain_id,
+    allowAdmin: true,
+    allowSuperAdmin: true,
+  });
+  if (!isAdmin) {
+    throw new AppError('Must be admin');
+  }
 
   if (!contract_id || !name || !template) {
     throw new AppError('Must provide contract_id, name, and template');
@@ -98,7 +106,7 @@ type getTemplateAndMetadataResp = {
 export async function getTemplates(
   models: DB,
   req: TypedRequestQuery<getTemplateAndMetadataReq>,
-  res: TypedResponse<getTemplateAndMetadataResp>
+  res: TypedResponse<getTemplateAndMetadataResp>,
 ) {
   const { contract_id } = req.query;
 
@@ -158,7 +166,7 @@ export async function getTemplates(
 export async function deleteTemplate(
   models: DB,
   req: TypedRequestBody<DeleteTemplateAndMetadataReq>,
-  res: TypedResponse<{ message: string }>
+  res: TypedResponse<{ message: string }>,
 ) {
   const { template_id } = req.body;
 

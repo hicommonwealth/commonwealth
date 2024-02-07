@@ -2,14 +2,13 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 require('dotenv').config();
+import { models, tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import 'chai/register-should';
 import faker from 'faker';
 import jwt from 'jsonwebtoken';
-import app, { resetDatabase } from '../../../server-test';
+import app from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import models from '../../../server/database';
 import Errors from '../../../server/routes/webhooks/errors';
 import * as modelUtils from '../../util/modelUtils';
 
@@ -32,22 +31,25 @@ describe('Webhook Tests', () => {
   let loggedInAddr;
   let notLoggedInAddr;
   let loggedInNotAdminAddr;
+  let loggedInSession;
   let notAdminJWT;
   const chain = 'ethereum';
-  const topicName = 'test';
-  const topicId = 0;
+  let topicId;
 
   before('reset database', async () => {
-    await resetDatabase();
+    await tester.seedDb();
   });
 
   beforeEach(async () => {
+    // get topic
+    topicId = await modelUtils.getTopicId({ chain });
     // get logged in address/user with JWT
     let result = await modelUtils.createAndVerifyAddress({ chain });
     loggedInAddr = result.address;
+    loggedInSession = { session: result.session, sign: result.sign };
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
-      JWT_SECRET
+      JWT_SECRET,
     );
     await modelUtils.updateRole({
       address_id: result.address_id,
@@ -62,7 +64,7 @@ describe('Webhook Tests', () => {
     loggedInNotAdminAddr = result.address;
     notAdminJWT = jwt.sign(
       { id: result.user_id, email: result.email },
-      JWT_SECRET
+      JWT_SECRET,
     );
   });
 
@@ -74,12 +76,10 @@ describe('Webhook Tests', () => {
         .post('/api/createWebhook')
         .set('Accept', 'application/json')
         .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
-      console.log('YOOOOOOO');
-      console.log(res.body);
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.equal('Success');
       expect(res.body.result).to.be.not.null;
-      expect(res.body.result.chain_id).to.be.equal(chain);
+      expect(res.body.result.community_id).to.be.equal(chain);
       expect(res.body.result.url).to.be.equal(webhookUrl);
     });
 
@@ -90,7 +90,7 @@ describe('Webhook Tests', () => {
         .post('/api/createWebhook')
         .set('Accept', 'application/json')
         .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
-      let webhookUrls = await models['Webhook'].findAll({
+      let webhookUrls = await models.Webhook.findAll({
         where: { url: webhookUrl },
       });
       expect(webhookUrls).to.have.length(1);
@@ -100,7 +100,7 @@ describe('Webhook Tests', () => {
         .set('Accept', 'application/json')
         .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
       expectErrorOnResponse(400, Errors.NoDuplicates, errorRes);
-      webhookUrls = await models['Webhook'].findAll({
+      webhookUrls = await models.Webhook.findAll({
         where: { url: webhookUrl },
       });
       expect(webhookUrls).to.have.length(1);
@@ -118,10 +118,10 @@ describe('Webhook Tests', () => {
           address: notLoggedInAddr,
           chain,
           webhookUrl,
-          jwt: jwt.sign({ id: -1, email: null }, JWT_SECRET),
+          jwt: jwt.sign({ id: -999999, email: null }, JWT_SECRET),
         });
       expectErrorOnResponse(401, undefined, errorRes);
-      const webhookUrls = await models['Webhook'].findAll({
+      const webhookUrls = await models.Webhook.findAll({
         where: { url: webhookUrl },
       });
       expect(webhookUrls).to.have.length(0);
@@ -143,7 +143,7 @@ describe('Webhook Tests', () => {
           jwt: notAdminJWT,
         });
       expectErrorOnResponse(400, Errors.NotAdmin, errorRes);
-      const webhookUrls = await models['Webhook'].findAll({
+      const webhookUrls = await models.Webhook.findAll({
         where: { url: webhookUrl },
       });
       expect(webhookUrls).to.have.length(0);
@@ -151,21 +151,21 @@ describe('Webhook Tests', () => {
 
     it('should delete a webhook', async () => {
       const webhookUrl = faker.internet.url();
-      let res = await chai.request
+      await chai.request
         .agent(app)
         .post('/api/createWebhook')
         .set('Accept', 'application/json')
         .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
-      let webhookUrls = await models['Webhook'].findAll({
+      let webhookUrls = await models.Webhook.findAll({
         where: { url: webhookUrl },
       });
       expect(webhookUrls).to.have.length(1);
-      res = await chai.request
+      await chai.request
         .agent(app)
         .post('/api/deleteWebhook')
         .set('Accept', 'application/json')
         .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
-      webhookUrls = await models['Webhook'].findAll({
+      webhookUrls = await models.Webhook.findAll({
         where: { url: webhookUrl },
       });
       expect(webhookUrls).to.have.length(0);
@@ -200,7 +200,7 @@ describe('Webhook Tests', () => {
   describe('/getWebhooks', () => {
     it('should get all webhooks', async () => {
       const urls = await Promise.all(
-        [1, 2, 3, 4, 5].map(async (i) => {
+        [1, 2, 3, 4, 5].map(async () => {
           const webhookUrl = faker.internet.url();
           await chai.request
             .agent(app)
@@ -208,7 +208,7 @@ describe('Webhook Tests', () => {
             .set('Accept', 'application/json')
             .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
           return webhookUrl;
-        })
+        }),
       );
       expect(urls).to.have.length(5);
       const res = await chai.request
@@ -221,7 +221,7 @@ describe('Webhook Tests', () => {
 
     it('should fail to get webhooks from non-admin', async () => {
       const urls = await Promise.all(
-        [1, 2, 3, 4, 5].map(async (i) => {
+        [1, 2, 3, 4, 5].map(async () => {
           const webhookUrl = faker.internet.url();
           await chai.request
             .agent(app)
@@ -229,7 +229,7 @@ describe('Webhook Tests', () => {
             .set('Accept', 'application/json')
             .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
           return webhookUrl;
-        })
+        }),
       );
       expect(urls).to.have.length(5);
       const errorRes = await chai.request
@@ -243,19 +243,18 @@ describe('Webhook Tests', () => {
 
   describe('Integration Tests', () => {
     before('reset database', async () => {
-      await resetDatabase();
+      await tester.seedDb();
     });
     // we want to test that no errors occur up to the point the webhook is hit
     it('should send a webhook for markdown and rich text content', async () => {
       const webhookUrl = process.env.SLACK_FEEDBACK_WEBHOOK;
-      let res = await modelUtils.createWebhook({
+      await modelUtils.createWebhook({
         chain,
         webhookUrl,
         jwt: jwtToken,
       });
-      res = await modelUtils.createThread({
+      await modelUtils.createThread({
         chainId: chain,
-        topicName,
         topicId,
         address: loggedInAddr,
         jwt: jwtToken,
@@ -263,17 +262,22 @@ describe('Webhook Tests', () => {
         body: decodeURIComponent(markdownThread.body),
         kind: 'discussion',
         stage: 'discussion',
+        session: loggedInSession.session,
+        sign: loggedInSession.sign,
       });
-      res = await modelUtils.createComment({
+      // expect(res.statusCode).to.be.equal(200);
+      await modelUtils.createComment({
         chain,
         address: loggedInAddr,
         jwt: jwtToken,
         text: decodeURIComponent(markdownComment.text),
         thread_id: `$`,
+        session: loggedInSession.session,
+        sign: loggedInSession.sign,
       });
-      res = await modelUtils.createThread({
+      // expect(res.statusCode).to.be.equal(200);
+      await modelUtils.createThread({
         chainId: chain,
-        topicName,
         topicId,
         address: loggedInAddr,
         jwt: jwtToken,
@@ -281,14 +285,20 @@ describe('Webhook Tests', () => {
         body: decodeURIComponent(richTextThread.body),
         kind: 'discussion',
         stage: 'discussion',
+        session: loggedInSession.session,
+        sign: loggedInSession.sign,
       });
-      res = await modelUtils.createComment({
+      // expect(res.statusCode).to.be.equal(200);
+      await modelUtils.createComment({
         chain,
         address: loggedInAddr,
         jwt: jwtToken,
         text: decodeURIComponent(richTextComment.text),
         thread_id: `discussion_`,
+        session: loggedInSession.session,
+        sign: loggedInSession.sign,
       });
+      // expect(res.statusCode).to.be.equal(200);
     });
   });
 });

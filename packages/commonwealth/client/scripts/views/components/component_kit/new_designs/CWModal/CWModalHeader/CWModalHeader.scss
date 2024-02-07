@@ -1,0 +1,67 @@
+@import '../../../../../../../styles/shared';
+
+.CWModalHeader {
+  width: 100%;
+  background: $white;
+  border-radius: 6px 6px 0 0;
+  padding: 24px 24px 16px 24px;
+
+  .ModalHeader {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    word-break: break-word;
+
+    .Frame {
+      display: flex;
+      justify-content: space-between;
+      flex-direction: column;
+      gap: 8px;
+      margin-right: auto;
+
+      .title-text {
+        font-weight: 500;
+        letter-spacing: -0.01em;
+        text-align: left;
+      }
+    }
+
+    .close-icon {
+      color: $neutral-500;
+      flex-shrink: 0;
+
+      &:hover {
+        cursor: pointer;
+        color: $neutral-800;
+      }
+    }
+
+    .danger-icon,
+    .warning-icon {
+      color: $rorange-600;
+      flex-shrink: 0;
+      margin-right: 8px;
+      line-height: 28px;
+      margin-top: 2px;
+    }
+
+    .danger-icon {
+      color: $rorange-600;
+    }
+
+    .warning-icon {
+      flex-shrink: 0;
+      color: $yellow-500;
+      margin-right: 8px;
+      margin-top: 2px;
+    }
+  }
+
+  .Subtitle {
+    color: $neutral-800;
+    font-style: normal;
+    line-height: 16px;
+    margin-top: 8px;
+    word-break: break-word;
+  }
+}

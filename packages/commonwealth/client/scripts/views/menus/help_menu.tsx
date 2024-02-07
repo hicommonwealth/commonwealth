@@ -1,11 +1,17 @@
 import React from 'react';
 
+import useSidebarStore from 'state/ui/sidebar';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import {
+  handleIconClick,
+  handleMouseEnter,
+  handleMouseLeave,
+} from 'views/menus/utils';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
-import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
+import { CWModal } from '../components/component_kit/new_designs/CWModal';
 import { FeedbackModal } from '../modals/feedback_modal';
-import { Modal } from '../components/component_kit/cw_modal';
-import useSidebarStore from 'state/ui/sidebar';
 
 export const HelpMenu = () => {
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
@@ -31,7 +37,8 @@ export const HelpMenu = () => {
           },
         ]}
       />
-      <Modal
+      <CWModal
+        size="small"
         content={<FeedbackModal onModalClose={() => setIsModalOpen(false)} />}
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
@@ -44,32 +51,57 @@ export const HelpMenuPopover = () => {
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
   return (
-    <React.Fragment>
+    <>
       <PopoverMenu
-        renderTrigger={(onclick) => (
-          <CWIconButton
-            iconButtonTheme="black"
-            iconName="help"
-            onClick={onclick}
-          />
-        )}
         menuItems={[
           {
-            label: 'Send Feedback',
-            onClick: () => setIsModalOpen(true),
-          },
-          {
-            label: 'Help',
+            label: 'Help documentation',
             onClick: () =>
               window.open('https://docs.commonwealth.im/commonwealth/'),
           },
+          {
+            label: 'Send feedback',
+            onClick: () => setIsModalOpen(true),
+          },
         ]}
+        renderTrigger={(onClick, isMenuOpen) => (
+          <CWTooltip
+            content="Help"
+            placement="bottom"
+            renderTrigger={(handleInteraction, isTooltipOpen) => (
+              <CWIconButton
+                iconButtonTheme="black"
+                iconName="question"
+                onClick={(e) =>
+                  handleIconClick({
+                    e,
+                    isMenuOpen,
+                    isTooltipOpen,
+                    handleInteraction,
+                    onClick,
+                  })
+                }
+                onMouseEnter={(e) => {
+                  handleMouseEnter({ e, isMenuOpen, handleInteraction });
+                }}
+                onMouseLeave={(e) => {
+                  handleMouseLeave({
+                    e,
+                    isTooltipOpen,
+                    handleInteraction,
+                  });
+                }}
+              />
+            )}
+          />
+        )}
       />
-      <Modal
+      <CWModal
+        size="small"
         content={<FeedbackModal onModalClose={() => setIsModalOpen(false)} />}
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />
-    </React.Fragment>
+    </>
   );
 };

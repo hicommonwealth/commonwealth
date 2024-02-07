@@ -1,9 +1,8 @@
-import { AppError } from 'common-common/src/errors';
-import type { DB } from '../models';
-import type { BanAttributes } from '../models/ban';
+import { AppError } from '@hicommonwealth/core';
+import type { BanAttributes, DB } from '@hicommonwealth/model';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
-import validateRoles from '../util/validateRoles';
+import { validateOwner } from '../util/validateOwner';
 
 enum GetBannedAddressesErrors {
   NoChain = 'Must supply a chain ID',
@@ -19,16 +18,27 @@ type GetBannedAddressesResp = BanAttributes[];
 const getBannedAddresses = async (
   models: DB,
   req: TypedRequestQuery<GetBannedAddressesReq>,
-  res: TypedResponse<GetBannedAddressesResp>
+  res: TypedResponse<GetBannedAddressesResp>,
 ) => {
-  const chain = req.chain;
-  const isAdmin = await validateRoles(models, req.user, 'admin', chain.id);
-  if (!isAdmin) throw new AppError(GetBannedAddressesErrors.NoPermission);
+  const { community } = req;
 
-  const bans = await models.Ban.findAll({ where: { chain_id: chain.id } });
+  const isAdmin = await validateOwner({
+    models: models,
+    user: req.user,
+    communityId: community.id,
+    allowAdmin: true,
+    allowSuperAdmin: true,
+  });
+  if (!isAdmin) {
+    throw new AppError(GetBannedAddressesErrors.NoPermission);
+  }
+
+  const bans = await models.Ban.findAll({
+    where: { community_id: community.id },
+  });
   return success(
     res,
-    bans.map((b) => b.toJSON())
+    bans.map((b) => b.toJSON()),
   );
 };
 

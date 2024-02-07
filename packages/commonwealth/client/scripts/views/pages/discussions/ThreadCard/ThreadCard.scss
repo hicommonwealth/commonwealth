@@ -1,0 +1,144 @@
+@import '../../../../../styles/shared';
+
+.ThreadCard {
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  border-radius: 6px;
+  padding: 16px;
+  gap: 16px;
+  text-decoration: none;
+  color: unset !important;
+
+  @include smallInclusive {
+    padding: 12px;
+  }
+
+  &.showSkeleton {
+    &:hover {
+      background: unset;
+    }
+  }
+
+  &.isPinned {
+    background: $neutral-50;
+
+    &:hover {
+      background: $neutral-50;
+      text-decoration: none;
+      color: unset;
+    }
+  }
+
+  &:hover {
+    background: $neutral-50;
+    text-decoration: none;
+    color: unset;
+  }
+
+  .content-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+
+    .content-header {
+      align-items: center;
+      display: flex;
+      gap: 4px;
+      justify-content: space-between;
+
+      .content-header-skeleton {
+        width: 200px;
+        max-width: 100%;
+      }
+
+      .content-header-icons-skeleton {
+        width: 100px;
+        max-width: 100%;
+      }
+
+      .content-header-icons {
+        display: flex;
+        gap: 8px;
+
+        @include flame;
+
+        @include smallInclusive {
+          gap: 4px;
+
+          @include flame($size: small);
+        }
+      }
+    }
+
+    .content-body-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      .content-body {
+        @include multiline-text-ellipsis($max-lines: 2);
+        word-break: break-word;
+
+        .MarkdownFormattedText {
+          @include caption;
+
+          h1,
+          h2,
+          h3,
+          h4,
+          h5 {
+            font-size: 12px;
+          }
+        }
+      }
+
+      .content-title {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding-right: 72px; // hack to be removed on completion of discussion listings
+      }
+    }
+
+    .content-top-tags {
+      display: flex;
+      gap: 8px;
+    }
+
+    .content-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding-right: 72px; // hack to be removed on completion of discussion listings
+    }
+
+    .content-footer {
+      display: flex;
+      justify-content: space-between;
+
+      .content-footer-btn {
+        outline: 0;
+        border: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 4px;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: $border-radius-corners-wider;
+
+        &:hover {
+          background-color: $neutral-200;
+        }
+      }
+
+      .content-footer-menu {
+        display: flex;
+        gap: 16px;
+      }
+    }
+  }
+}

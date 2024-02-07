@@ -10,22 +10,21 @@ class ReactionCount<T extends IUniqueId> {
   public readonly likes: number;
   public readonly dislikes?: number;
 
-  constructor(
+  constructor({
     id,
-    threadId,
-    commentId,
-    proposalId,
-    hasReacted,
-    likes,
-    dislikes = 0
-  ) {
+    thread_id,
+    comment_id,
+    proposal_id,
+    has_reacted,
+    like,
+    dislikes = 0,
+  }) {
     this.id = id;
-    this.threadId = threadId;
-    this.commentId = commentId;
-    this.proposalId = proposalId;
-    this.proposalId = proposalId;
-    this.hasReacted = hasReacted;
-    this.likes = likes;
+    this.threadId = thread_id;
+    this.commentId = comment_id;
+    this.proposalId = proposal_id;
+    this.hasReacted = has_reacted;
+    this.likes = parseInt(like + '');
     this.dislikes = dislikes;
   }
 }

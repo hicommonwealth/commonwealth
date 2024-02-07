@@ -1,17 +1,16 @@
 /* eslint-disable no-restricted-syntax */
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/core';
+import type { DB, TopicAttributes } from '@hicommonwealth/model';
 import type { NextFunction } from 'express';
-import type { DB } from '../models';
-import type { TopicAttributes } from '../models/topic';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import validateRoles from '../util/validateRoles';
+import { validateOwner } from '../util/validateOwner';
 
 // TODO Graham 8-12-22: This route has high redundancy with createTopic, and has fallen out of sync.
 // We should consider merging or consolidating somehow, to prevent checks diverging again.
 
 export const Errors = {
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
   NoTopicId: 'Must supply topic ID',
   NotAdmin: 'Must be an admin to edit or feature topics',
   NotVerified: 'Must have a verified address to edit or feature topics',
@@ -40,7 +39,7 @@ const editTopic = async (
   models: DB,
   req: TypedRequestBody<EditTopicReq>,
   res: TypedResponse<EditTopicResp>,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const chain = req.chain;
   if (!req.body.id) {
@@ -60,13 +59,14 @@ const editTopic = async (
     return next(new AppError(Errors.DefaultTemplateRequired));
   }
 
-  const requesterIsAdmin = await validateRoles(
-    models,
-    req.user,
-    'admin',
-    chain.id
-  );
-  if (requesterIsAdmin === null) {
+  const isAdmin = await validateOwner({
+    models: models,
+    user: req.user,
+    communityId: chain.id,
+    allowAdmin: true,
+    allowSuperAdmin: true,
+  });
+  if (!isAdmin) {
     return next(new AppError(Errors.NotAdmin));
   }
 
