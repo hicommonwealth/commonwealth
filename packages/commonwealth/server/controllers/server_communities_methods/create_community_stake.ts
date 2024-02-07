@@ -1,3 +1,4 @@
+import { AppError } from '@hicommonwealth/core';
 import { CommunityStakeAttributes, UserInstance } from '@hicommonwealth/model';
 import { z } from 'zod';
 import { ServerCommunitiesController } from '../server_communities_controller';
@@ -19,20 +20,26 @@ export const SetCommunityStakeBodySchema = z.object({
 
 export type SetCommunityStakeBody = z.infer<typeof SetCommunityStakeBodySchema>;
 
-export type PutCommunityStakeOptions = {
+export type PostCommunityStakeOptions = {
   user: UserInstance;
   communityStake: SetCommunityStakeParams & SetCommunityStakeBody;
 };
 
-export type PutCommunityStakeResult = CommunityStakeAttributes;
-
-export async function __putCommunityStake(
+export async function __createCommunityStake(
   this: ServerCommunitiesController,
-  { communityStake }: PutCommunityStakeOptions,
+  { communityStake }: PostCommunityStakeOptions,
 ): Promise<CommunityStakeAttributes> {
-  const [newCommunityStake] = await this.models.CommunityStake.upsert(
-    communityStake,
-  );
+  const { community_id, stake_id } = communityStake;
+
+  const [newCommunityStake, created] =
+    await this.models.CommunityStake.findOrCreate({
+      where: { community_id, stake_id },
+      defaults: { ...communityStake },
+    });
+
+  if (!created) {
+    throw new AppError('Community stake already exists');
+  }
 
   return newCommunityStake;
 }

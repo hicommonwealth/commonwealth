@@ -3,9 +3,26 @@ import {
   IconName,
 } from '../component_kit/cw_icons/cw_icon_lookup';
 
-export type AuthSSOs = 'google' | 'discord' | 'x' | 'github';
-export type AuthWallets = 'keplr' | 'leap' | 'NO_WALLETS_FOUND';
-export type AuthTypes = 'walletConnect' | AuthWallets | AuthSSOs | 'email';
+export type AuthSSOs = 'google' | 'discord' | 'x' | 'github' | 'email';
+export type CosmosWallets = 'keplr' | 'leap';
+export type SubstrateWallets = 'polkadot';
+export type SolanaWallets = 'phantom';
+export type EVMWallets = 'walletconnect' | 'metamask' | 'coinbase';
+export type CommunitySpecificWallets =
+  | 'near'
+  | 'ronin'
+  | 'terrastation'
+  | 'terra-walletconnect'
+  | 'cosm-metamask'
+  | 'keplr-ethereum';
+export type AuthWallets =
+  | CosmosWallets
+  | SolanaWallets
+  | SubstrateWallets
+  | EVMWallets
+  | CommunitySpecificWallets
+  | 'NO_WALLETS_FOUND';
+export type AuthTypes = AuthWallets | AuthSSOs;
 
 export type AuthButtonConfig = {
   label: string;
@@ -26,4 +43,7 @@ export type AuthButtonProps = {
   onClick?: () => any;
   className?: string;
   disabled?: boolean;
+  showDescription?: boolean;
+  rounded?: boolean;
+  variant?: 'light' | 'dark';
 };

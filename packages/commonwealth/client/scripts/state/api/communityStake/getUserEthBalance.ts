@@ -1,7 +1,7 @@
 import { commonProtocol } from '@hicommonwealth/core';
 import { useQuery } from '@tanstack/react-query';
-import CommunityStakes from 'helpers/ContractHelpers/CommunityStakes';
 import { ContractMethods } from 'state/api/config';
+import { lazyLoadCommunityStakes } from '../../../helpers/ContractHelpers/LazyCommunityStakes';
 
 const GET_USER_ETH_BALANCE_STALE_TIME = 60 * 1_000; // 1 min
 
@@ -14,6 +14,7 @@ const getUserEthBalance = async ({
   chainRpc,
   walletAddress,
 }: GetUserEthBalanceProps) => {
+  const CommunityStakes = await lazyLoadCommunityStakes();
   const communityStakes = new CommunityStakes(
     commonProtocol.factoryContracts[
       commonProtocol.ValidChains.Sepolia

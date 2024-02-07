@@ -8,7 +8,7 @@ import {
   SetCommunityStakeBodySchema,
   SetCommunityStakeParams,
   SetCommunityStakeParamsSchema,
-} from 'server/controllers/server_communities_methods/put_community_stake';
+} from 'server/controllers/server_communities_methods/create_community_stake';
 import { z } from 'zod';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
@@ -20,7 +20,7 @@ type PutCommunityStakesParams = SetCommunityStakeParams;
 type PutCommunityStakesBody = SetCommunityStakeBody;
 type PutCommunityStakesResponse = CommunityStakeAttributes;
 
-export const putCommunityStakeHandler = async (
+export const createCommunityStakeHandler = async (
   models: DB,
   controllers: ServerControllers,
   req: TypedRequest<PutCommunityStakesBody, any, PutCommunityStakesParams>,
@@ -76,7 +76,7 @@ export const putCommunityStakeHandler = async (
     throw new AppError(formatErrorPretty(bodyValidationResult));
   }
 
-  const results = await controllers.communities.putCommunityStake({
+  const results = await controllers.communities.createCommunityStake({
     user,
     communityStake: {
       ...paramsValidationResult.data,

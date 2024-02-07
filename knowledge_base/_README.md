@@ -29,7 +29,7 @@ For a complete list of knowledge base entries, see our [Table of Contents](_TOC.
 
 Many text-only docs can be fluently read in pre-rendered Markdown. However, VSCode also has built-in Markdown rendering features, which can be enabled by the keyboard shortcut Cmd-Shift-V. To render [Mermaid diagrams](#mermaid-visualizations), we recommend the Markdown Preview Mermaid Support extension for VSCode.
 
-Alternatively, the knowledge base can be browsed and shared, in rendered form, through the GitHub repo.
+Alternatively, the knowledge base can be browsed and shared, in rendered form, through the GitHub repo. To search the repo using GitHub's built-in search feature, append `path:knowledge_base` to your query.
 
 ## Updating The Docs: How & When
 
