@@ -33,7 +33,6 @@ const EVMWalletsSubModal = ({
       content={
         <section className="container">
           <div className="header">
-            <CWIcon iconName="help" />
             <CWText type="h3" className="header" isCentered>
               Connect Wallet
             </CWText>
