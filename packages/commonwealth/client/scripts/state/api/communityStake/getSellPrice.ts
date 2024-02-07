@@ -1,7 +1,7 @@
 import { commonProtocol } from '@hicommonwealth/core';
 import { useQuery } from '@tanstack/react-query';
-import CommunityStakes from 'helpers/ContractHelpers/CommunityStakes';
 import { ContractMethods } from 'state/api/config';
+import { lazyLoadCommunityStakes } from '../../../helpers/ContractHelpers/LazyCommunityStakes';
 
 const GET_SELL_PRICE_STALE_TIME = 2 * 1_000; // 2 sec
 
@@ -13,6 +13,7 @@ const getSellPrice = async ({
   amount,
   chainRpc,
 }: GetSellPriceProps) => {
+  const CommunityStakes = await lazyLoadCommunityStakes();
   const communityStakes = new CommunityStakes(
     commonProtocol.factoryContracts[
       commonProtocol.ValidChains.Sepolia
