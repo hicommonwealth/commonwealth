@@ -4,13 +4,13 @@
 // It will then re-upload these compressed images to s3.
 // Lastly it will update the icon_url with the new compressed image link
 
+import { models, sequelize } from '@hicommonwealth/model';
 import type { S3 } from 'aws-sdk';
 import AWS from 'aws-sdk';
 import * as https from 'https';
 import fetch from 'node-fetch';
 import { Op } from 'sequelize';
 import sharp from 'sharp';
-import models, { sequelize } from '../server/database';
 
 const s3 = new AWS.S3();
 
@@ -74,18 +74,17 @@ const httpsAgent = new https.Agent({
 
 async function resizeChains() {
   const updateChain = async (id, location, transaction) => {
-    await models.Chain.update(
+    await models.Community.update(
       { icon_url: location },
-      { where: { id: id }, transaction }
+      { where: { id: id }, transaction },
     );
   };
 
   const getNthChain = async (n) =>
-    await models.Chain.findAll({
+    await models.Community.findAll({
       where: {
         icon_url: {
-          [Op.ne]: null,
-          [Op.ne]: '',
+          [Op.or]: [{ [Op.ne]: null }, { [Op.ne]: '' }],
         },
       },
       offset: n,
@@ -98,7 +97,7 @@ async function resizeChains() {
     'icon_url',
     updateChain,
     'Chain',
-    startChainsFrom ? parseInt(startChainsFrom) : 0
+    startChainsFrom ? parseInt(startChainsFrom) : 0,
   );
 }
 
@@ -106,7 +105,7 @@ async function resizeProfiles() {
   const updateProfile = async (id, location, transaction) => {
     await models.Profile.update(
       { avatar_url: location },
-      { where: { id: id }, transaction }
+      { where: { id: id }, transaction },
     );
   };
 
@@ -114,8 +113,7 @@ async function resizeProfiles() {
     await models.Profile.findAll({
       where: {
         avatar_url: {
-          [Op.ne]: null,
-          [Op.ne]: '',
+          [Op.or]: [{ [Op.ne]: null }, { [Op.ne]: '' }],
         },
       },
       offset: n,
@@ -128,7 +126,7 @@ async function resizeProfiles() {
     'avatar_url',
     updateProfile,
     'Profile',
-    startProfilesFrom ? parseInt(startProfilesFrom) : 0
+    startProfilesFrom ? parseInt(startProfilesFrom) : 0,
   );
 }
 
@@ -139,7 +137,7 @@ async function uploadToS3AndReplace(
   field,
   updateFunction,
   name,
-  startFrom
+  startFrom,
 ) {
   let i = startFrom;
   // loop through the dataSupplier, until we hit the end.
@@ -149,7 +147,7 @@ async function uploadToS3AndReplace(
     }
     datum = datum[0];
     console.log(
-      `Processing ${datum[field]}. This is the ${i} in the ${name}s table`
+      `Processing ${datum[field]}. This is the ${i} in the ${name}s table`,
     );
     const transaction = await sequelize.transaction();
     let resp;
@@ -160,11 +158,11 @@ async function uploadToS3AndReplace(
         // captchas.
         datum[field].replace(
           'assets.commonwealth.im',
-          'assets.commonwealth.im.s3.amazonaws.com'
+          'assets.commonwealth.im.s3.amazonaws.com',
         ),
         {
           agent: httpsAgent,
-        }
+        },
       );
     } catch (e) {
       console.log(e);
@@ -199,11 +197,11 @@ async function uploadToS3AndReplace(
     // to the bucket directly. We want to swap this out with the cloudflare url.
     const newLocation = newImage.Location.replace(
       's3.amazonaws.com/assets.commonwealth.im',
-      'assets.commonwealth.im'
+      'assets.commonwealth.im',
     );
 
     console.log(
-      `Successfully resized ${name} ${datum.id} with new url ${newLocation}`
+      `Successfully resized ${name} ${datum.id} with new url ${newLocation}`,
     );
     await updateFunction(datum.id, newLocation, transaction);
 
