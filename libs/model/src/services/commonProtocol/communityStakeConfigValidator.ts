@@ -8,18 +8,6 @@ export const validateCommunityStakeConfig = async (
   community: CommunityAttributes,
   id: number,
 ) => {
-  // const community = await model.Community.findOne({
-  //   where: {
-  //     id: communityId,
-  //   },
-  //   include: [
-  //     {
-  //       model: model.ChainNode,
-  //       attributes: ['eth_chain_id', 'url'],
-  //     },
-  //   ],
-  //   attributes: ['namespace'],
-  // });
   if (!community.ChainNode?.eth_chain_id || !community.namespace) {
     throw new AppError('Invalid community');
   }
