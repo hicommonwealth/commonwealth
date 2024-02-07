@@ -1,5 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
-import { ChainBase } from '@hicommonwealth/core';
+import { AppError, ChainBase } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
 import crypto from 'crypto';
 import type { Request, Response } from 'express';
