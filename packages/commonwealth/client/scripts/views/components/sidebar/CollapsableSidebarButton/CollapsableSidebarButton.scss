@@ -7,11 +7,15 @@
     overflow: hidden;
     z-index: 5;
     transition: 0.2s linear;
+    pointer-events: none;
+
+    &.collapsed {
+      pointer-events: auto;
+    }
 
     &.expanded {
       width: 290px;
       transition: 0.2s linear;
-      pointer-events: none;
     }
   }
 
