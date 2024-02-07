@@ -19,11 +19,22 @@
     flex-direction: column;
     gap: 16px;
 
+    .featured-topic-list {
+      height: 400px;
+    }
+
+    .regular-topic-list {
+      max-height: 400px;
+
+      .topic-list-container {
+        overflow-y: auto;
+      }
+    }
+
     .featured-topic-list,
     .regular-topic-list {
       display: flex;
       flex-direction: column;
-      height: 400px;
       gap: 8px;
 
       @include visibleScrollbar(light);

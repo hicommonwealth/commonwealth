@@ -118,25 +118,27 @@ export const ManageTopicsSection = () => {
             </CWText>
           </div>
 
-          {regularTopics.length ? (
-            regularTopics.map((regTopic, index) => (
-              <div key={index} className="topic-row">
-                <CWText>
-                  {regTopic.name}
-                  <CWIconButton
-                    iconName="pencil"
-                    buttonSize="sm"
-                    onClick={async (e) => {
-                      e.stopPropagation();
-                      setTopicSelectedToEdit(regTopic);
-                    }}
-                  />
-                </CWText>
-              </div>
-            ))
-          ) : (
-            <CWText>No Topics to View</CWText>
-          )}
+          <div className="topic-list-container">
+            {regularTopics.length ? (
+              regularTopics.map((regTopic, index) => (
+                <div key={index} className="topic-row">
+                  <CWText>
+                    {regTopic.name}
+                    <CWIconButton
+                      iconName="pencil"
+                      buttonSize="sm"
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        setTopicSelectedToEdit(regTopic);
+                      }}
+                    />
+                  </CWText>
+                </div>
+              ))
+            ) : (
+              <CWText>No Topics to View</CWText>
+            )}
+          </div>
         </div>
       </div>
       <div className="actions">
