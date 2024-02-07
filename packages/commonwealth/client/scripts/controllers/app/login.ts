@@ -280,7 +280,7 @@ export async function createUserWithAddress(
 }> {
   const response = await $.post(`${app.serverUrl()}/createAddress`, {
     address,
-    chain,
+    community_id: chain,
     jwt: app.user.jwt,
     wallet_id: walletId,
     wallet_sso_source: walletSsoSource,

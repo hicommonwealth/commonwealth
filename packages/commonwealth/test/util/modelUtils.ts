@@ -145,7 +145,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .agent(app)
       .post('/api/createAddress')
       .set('Accept', 'application/json')
-      .send({ address: keyPair.address, chain, wallet_id });
+      .send({ address: keyPair.address, community_id: chain, wallet_id });
 
     // generate session wallet
     const sessionKeyring = new Keyring();
