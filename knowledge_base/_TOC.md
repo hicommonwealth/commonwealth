@@ -7,6 +7,7 @@
 - [Code Style (under development)](Code-Style.md)
 - [React Best Practices](React-Best-Practices-And-Improvements.md)
 - [Platform Coding Guidelines](Platform-Coding-Guidelines.md)
+- [Environment Variables](Environment-Variables.md)
 
 ## Common App
 
@@ -33,6 +34,7 @@
 - [Package.json Scripts](Package-Scripts.md)
 - [Rollbar](Rollbar.md)
 - [Testing Environments](Testing-Environments.md)
+- [Unleash](Feature-Flags.md)
 - [Wallet Support](Wallet-Support.md)
 
 ### React
