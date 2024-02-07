@@ -190,7 +190,7 @@ const ReactQuillEditor = ({
 
   return (
     <div className="editor-and-tabs-container">
-      <CWTabsRow boxed={true}>
+      <CWTabsRow boxed>
         {TABS.map((tab, index) => (
           <CWTab
             key={index}
