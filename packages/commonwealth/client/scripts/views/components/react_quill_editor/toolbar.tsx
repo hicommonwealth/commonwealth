@@ -57,7 +57,6 @@ export const CustomQuillToolbar = ({
   isDisabled = false,
 }: CustomQuillToolbarProps) => (
   <div id={toolbarId} className="CustomQuillToolbar">
-    <div className="tabs"></div>
     <div className={clsx('left-buttons', { isDisabled })}>
       <div className="section">
         <button className="ql-header" value={1} />
