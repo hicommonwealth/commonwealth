@@ -20,18 +20,17 @@
     background-color: $white;
     border-bottom: 1px solid $neutral-200 !important;
 
-    .left-buttons {
+    .formatting-buttons-container {
+      width: 100%;
       display: flex;
+      justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
 
       &.isDisabled {
         opacity: 0.6;
         filter: grayscale(1);
       }
-    }
-
-    .left-buttons {
-      flex-wrap: wrap;
     }
 
     .section {
