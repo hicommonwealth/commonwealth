@@ -11,7 +11,7 @@
     "build": "tsc -b",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
-    "test": "ts-mocha '__tests__/**/*.spec.ts'"
+    "test": "NODE_ENV=test ts-mocha '__tests__/**/*.spec.ts'"
   },
   "dependencies": {
     "zod": "^3.22.4"
