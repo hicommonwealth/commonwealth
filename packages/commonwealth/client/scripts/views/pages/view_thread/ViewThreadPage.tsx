@@ -385,6 +385,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
     isThreadTopicGated: isRestrictedMembership,
+    action: 'comment',
   });
 
   return (
