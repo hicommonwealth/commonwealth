@@ -13,7 +13,6 @@ import { SublayoutBanners } from './SublayoutBanners';
 import { SublayoutHeader } from './SublayoutHeader';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
-import GatingGrowl from './components/GatingGrowl/GatingGrowl';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
 
 type SublayoutProps = {
@@ -105,7 +104,6 @@ const Sublayout = ({
             )}
           </div>
         </div>
-        {isInsideCommunity && <GatingGrowl />}
       </div>
     </div>
   );

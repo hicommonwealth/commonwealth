@@ -75,12 +75,12 @@ const StakeExchangeForm = ({
     sellPriceData,
   } = useStakeExchange({
     mode,
-    address: selectedAddress.value,
+    address: selectedAddress?.value,
     numberOfStakeToExchange,
   });
 
   const { stakeBalance, stakeValue, currentVoteWeight, stakeData } =
-    useCommunityStake({ walletAddress: selectedAddress.value });
+    useCommunityStake({ walletAddress: selectedAddress?.value });
 
   const { mutateAsync: buyStake } = useBuyStakeMutation();
   const { mutateAsync: sellStake } = useSellStakeMutation();
@@ -103,7 +103,7 @@ const StakeExchangeForm = ({
         stakeId: commonProtocol.STAKE_ID,
         namespace: stakeData?.Chain?.namespace,
         chainRpc,
-        walletAddress: selectedAddress.value,
+        walletAddress: selectedAddress?.value,
       });
 
       onSetSuccessTransactionHash(txReceipt?.transactionHash);
@@ -123,7 +123,7 @@ const StakeExchangeForm = ({
         stakeId: commonProtocol.STAKE_ID,
         namespace: stakeData?.Chain?.namespace,
         chainRpc,
-        walletAddress: selectedAddress.value,
+        walletAddress: selectedAddress?.value,
       });
 
       onSetSuccessTransactionHash(txReceipt?.transactionHash);
@@ -154,7 +154,7 @@ const StakeExchangeForm = ({
     parseFloat(userEthBalance) < parseFloat(buyPriceData?.totalPrice);
 
   const ctaDisabled = isBuyMode
-    ? insufficientFunds || numberOfStakeToExchange <= 0
+    ? insufficientFunds || numberOfStakeToExchange <= 0 || !selectedAddress
     : numberOfStakeToExchange > stakeBalance;
 
   const isUsdPriceLoading = isBuyMode
@@ -203,6 +203,7 @@ const StakeExchangeForm = ({
                 selectedAddressValue: activeAccountAddress,
               }),
           }}
+          noOptionsMessage={() => 'No available Metamask address'}
           value={selectedAddress}
           formatOptionLabel={(option) => (
             // Selected option

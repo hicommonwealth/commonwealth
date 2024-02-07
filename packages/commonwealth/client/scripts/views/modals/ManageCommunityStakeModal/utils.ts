@@ -29,6 +29,10 @@ export const capDecimals = (value: string, capNumber = 8) => {
     return;
   }
 
+  if (isNaN(Number(value))) {
+    return 0;
+  }
+
   const [, decimalPart] = value.split('.');
 
   if (!decimalPart || decimalPart.length <= capNumber) {
