@@ -10,7 +10,7 @@
   }
 
   .container {
-    background-color: #191a1a;
+    background-color: $gray-900;
     color: white !important;
     border-radius: 24px;
     display: flex;
@@ -32,6 +32,7 @@
       padding: 0 24px;
 
       .Text {
+        margin-left: 24px;
         color: white !important;
       }
 
@@ -45,6 +46,17 @@
       flex-direction: column;
       gap: 8px;
       width: 100%;
+
+      .wallet-connect-reset-btn {
+        margin-left: auto;
+        color: $neutral-400;
+        outline: none;
+        border: none;
+        background-color: transparent;
+        font-size: 14px;
+        margin-bottom: 16px;
+        cursor: pointer;
+      }
     }
   }
 }

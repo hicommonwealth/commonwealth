@@ -6,9 +6,16 @@ export type AuthModalTabs = {
   options: AuthWallets[] | AuthSSOs[];
 };
 
-export type AuthModalProps = {
-  isOpen: boolean;
+export type BaseModalProps = {
   onClose: () => any;
   onSuccess?: () => any;
-  showWalletsFor?: ChainBase;
+  showWalletsFor?:
+    | ChainBase.Ethereum
+    | ChainBase.CosmosSDK
+    | ChainBase.Solana
+    | ChainBase.Substrate;
 };
+
+export type AuthModalProps = {
+  isOpen: boolean;
+} & BaseModalProps;
