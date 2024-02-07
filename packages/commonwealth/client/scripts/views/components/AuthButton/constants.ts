@@ -3,14 +3,14 @@ import { AuthTypesList } from './types';
 // A list of all the available auth types, with config for rendering the button
 export const AUTH_TYPES: AuthTypesList = {
   // general
-  walletConnect: {
+  walletconnect: {
     icon: {
       name: 'walletconnect',
       isCustom: true,
     },
     label: 'WalletConnect',
     description: {
-      text: 'Supports 350+ Wallets',
+      text: 'All Ethereum Wallets',
       hasBackground: true,
     },
   },
@@ -44,6 +44,84 @@ export const AUTH_TYPES: AuthTypesList = {
       text: 'Cosmos Communities',
       hasBackground: false,
     },
+  },
+  phantom: {
+    icon: {
+      name: 'phantom',
+      isCustom: true,
+    },
+    label: 'Phantom',
+    description: {
+      text: 'Solana Communities',
+      hasBackground: false,
+    },
+  },
+  polkadot: {
+    icon: {
+      name: 'polkadot',
+      isCustom: true,
+    },
+    label: 'Polkadot',
+    description: {
+      text: 'Substrate Communities',
+      hasBackground: false,
+    },
+  },
+  metamask: {
+    icon: {
+      name: 'metamask',
+      isCustom: true,
+    },
+    label: 'Metamask',
+  },
+  coinbase: {
+    icon: {
+      name: 'coinbase',
+      isCustom: true,
+    },
+    label: 'Coinbase',
+  },
+  near: {
+    icon: {
+      name: 'near',
+      isCustom: true,
+    },
+    label: 'Near',
+  },
+  ronin: {
+    icon: {
+      name: 'ronin',
+      isCustom: true,
+    },
+    label: 'Ronin',
+  },
+  terrastation: {
+    icon: {
+      name: 'terrastation',
+      isCustom: true,
+    },
+    label: 'Station',
+  },
+  'terra-walletconnect': {
+    icon: {
+      name: 'terra-walletconnect',
+      isCustom: true,
+    },
+    label: 'WalletConnect (Terra)',
+  },
+  'cosm-metamask': {
+    icon: {
+      name: 'cosm-metamask',
+      isCustom: true,
+    },
+    label: 'Metamask',
+  },
+  'keplr-ethereum': {
+    icon: {
+      name: 'keplr-ethereum',
+      isCustom: true,
+    },
+    label: 'Keplr',
   },
   // SSO's
   google: {

@@ -11,7 +11,8 @@
     "start-consumer": "ts-node -T src/discord-consumer/discordConsumer.ts",
     "start-prod-consumer": "node build/discord-consumer/discordConsumer.js",
     "start-prod-listener": "node build/discord-listener/discordListener.js",
-    "switch-staging-app": "chmod u+x scripts/switch-discobot-staging-env.sh && ./scripts/switch-discobot-staging-env.sh"
+    "switch-staging-app": "chmod u+x scripts/switch-discobot-staging-env.sh && ./scripts/switch-discobot-staging-env.sh",
+    "test": "ts-mocha '__tests__/**/*.spec.ts'"
   },
   "keywords": [],
   "author": "",

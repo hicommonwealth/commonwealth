@@ -4,8 +4,6 @@ import type IWebWallet from '../../../models/IWebWallet';
 
 import type { SessionPayload } from '@canvas-js/interfaces';
 
-import app from 'state';
-
 type TerraAddress = {
   address: string;
 };
@@ -20,8 +18,6 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
   private _enabled: boolean;
   private _accounts: TerraAddress[] = [];
   private _enabling = false;
-  private _terra;
-  private _extension;
 
   public readonly name = WalletId.TerraStation;
   public readonly label = 'Station';
@@ -70,21 +66,17 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
   }
 
   public async getRecentBlock(chainIdentifier: string) {
-    const client = new this._terra.LCDClient({
-      URL: app.chain.meta.ChainNode.url,
-      chainID: chainIdentifier,
-    });
-    const tmClient = new this._terra.TendermintAPI(client);
-    const blockInfo = await tmClient.blockInfo();
+    const url = `${window.location.origin}/cosmosAPI/${chainIdentifier}`;
+    const cosm = await import('@cosmjs/stargate');
+    const client = await cosm.StargateClient.connect(url);
+    const height = await client.getHeight();
+    const block = await client.getBlock(height - 2); // validator pool may be out of sync
 
     return {
-      number: parseInt(blockInfo.block.header.height),
-      // TODO: is this the hash we should use? the terra.js API has no documentation
-      hash: blockInfo.block.header.data_hash,
+      number: block.header.height,
+      hash: block.id,
       // seconds since epoch
-      timestamp: Math.floor(
-        new Date(blockInfo.block.header.time).getTime() / 1000,
-      ),
+      timestamp: Math.floor(new Date(block.header.time).getTime() / 1000),
     };
   }
 

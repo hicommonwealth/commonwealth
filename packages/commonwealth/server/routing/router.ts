@@ -2,8 +2,9 @@ import type { Express } from 'express';
 import express from 'express';
 import useragent from 'express-useragent';
 import passport from 'passport';
+import { createCommunityStakeHandler } from '../routes/communities/create_community_stakes_handler';
 import { getCommunityStakeHandler } from '../routes/communities/get_community_stakes_handler';
-import { putCommunityStakeHandler } from '../routes/communities/put_community_stakes_handler';
+import ddd from '../routes/ddd';
 
 import { TokenBalanceCache } from '@hicommonwealth/model';
 
@@ -141,6 +142,7 @@ import { ServerTopicsController } from '../controllers/server_topics_controller'
 
 import { GENERATE_IMAGE_RATE_LIMIT } from 'server/config';
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
+import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
 import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
 import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_handler';
@@ -381,10 +383,10 @@ function setupRouter(
 
   registerRoute(
     router,
-    'put',
+    'post',
     '/communityStakes/:community_id/:stake_id',
     passport.authenticate('jwt', { session: false }),
-    putCommunityStakeHandler.bind(this, models, serverControllers),
+    createCommunityStakeHandler.bind(this, models, serverControllers),
   );
 
   // ----
@@ -424,6 +426,14 @@ function setupRouter(
     '/admin/analytics',
     passport.authenticate('jwt', { session: false }),
     getStatsHandler.bind(this, serverControllers),
+  );
+
+  registerRoute(
+    router,
+    'get',
+    '/admin/top-users',
+    passport.authenticate('jwt', { session: false }),
+    getTopUsersHandler.bind(this, serverControllers),
   );
 
   // threads
@@ -1275,7 +1285,11 @@ function setupRouter(
   );
 
   app.use(endpoint, router);
+  // ddd-routes
+  app.use('/', ddd);
   app.use(methodNotAllowedMiddleware());
+  // catch-all and format errors - TODO: fix unit tests
+  // app.use(errorMiddleware);
 }
 
 export default setupRouter;

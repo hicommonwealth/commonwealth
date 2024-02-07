@@ -3,6 +3,7 @@ import { port } from './port';
 
 export * from './enums';
 export * from './interfaces';
+export * from './port';
 
 /**
  * Logger port factory

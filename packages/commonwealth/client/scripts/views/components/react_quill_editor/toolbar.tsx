@@ -1,7 +1,7 @@
 import {
   Code,
   Image,
-  LinkSimple,
+  Link,
   ListBullets,
   ListChecks,
   ListNumbers,
@@ -12,19 +12,18 @@ import {
   TextAlignRight,
   TextB,
   TextHOne,
+  TextHThree,
   TextHTwo,
   TextItalic,
   TextStrikethrough,
 } from '@phosphor-icons/react';
 import clsx from 'clsx';
+import 'components/react_quill/react_quill_editor.scss';
 import { DeltaStatic } from 'quill';
 import React, { MutableRefObject, useMemo } from 'react';
 import ReactQuill from 'react-quill';
-import { SerializableDeltaStatic, renderToolbarIcon } from './utils';
-
-import 'components/react_quill/react_quill_editor.scss';
-
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
+import { SerializableDeltaStatic, renderToolbarIcon } from './utils';
 
 const quillIcons = ReactQuill.Quill.import('ui/icons');
 
@@ -32,13 +31,14 @@ Object.assign(quillIcons, {
   header: {
     1: renderToolbarIcon(TextHOne),
     2: renderToolbarIcon(TextHTwo),
+    3: renderToolbarIcon(TextHThree),
   },
   bold: renderToolbarIcon(TextB),
   italic: renderToolbarIcon(TextItalic),
   strike: renderToolbarIcon(TextStrikethrough),
-  link: renderToolbarIcon(LinkSimple),
+  link: renderToolbarIcon(Link),
   'code-block': renderToolbarIcon(Code),
-  blockquote: renderToolbarIcon(Quotes, { weight: 'fill' }),
+  blockquote: renderToolbarIcon(Quotes),
   image: renderToolbarIcon(Image),
   list: {
     ordered: renderToolbarIcon(ListNumbers),
@@ -81,6 +81,7 @@ export const CustomQuillToolbar = ({
       <div className="section">
         <button className="ql-header" value={1} />
         <button className="ql-header" value={2} />
+        <button className="ql-header" value={3} />
       </div>
       <div className="section">
         <button className="ql-bold"></button>
@@ -168,7 +169,7 @@ export const useMarkdownToolbarHandlers = ({
       }
       const start = selection.index;
       const prefix = start === 0 ? '' : '\n';
-      const hashChar = headerValue === '2' ? '##' : '#';
+      const hashChar = '#'.repeat(parseInt(headerValue));
       editor.insertText(start, `${prefix}${hashChar} `);
       setContentDelta({
         ...editor.getContents(),

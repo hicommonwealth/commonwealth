@@ -28,8 +28,14 @@ export const fetchProposalsByStatusV1 = async (
       });
 
     let nextKey = pagination?.next_key;
+
     while (nextKey?.length > 0) {
-      // console.log(nextKey);
+      // TODO: temp fix to handle chains that return nextKey as a string instead of Uint8Array
+      // Our v1 API needs to handle this better. To be addressed in #6610
+      if (typeof nextKey === 'string') {
+        nextKey = new Uint8Array(Buffer.from(nextKey, 'base64'));
+      }
+
       const { proposals, pagination: nextPage } =
         await lcd.cosmos.gov.v1.proposals({
           proposalStatus: status,
@@ -37,8 +43,8 @@ export const fetchProposalsByStatusV1 = async (
           depositor: '',
           pagination: {
             key: nextKey,
-            limit: null,
-            offset: null,
+            limit: undefined,
+            offset: undefined,
             countTotal: true,
             reverse: true,
           },

@@ -1,8 +1,8 @@
 import { commonProtocol } from '@hicommonwealth/core';
 import { useMutation } from '@tanstack/react-query';
-import CommunityStakes from 'helpers/ContractHelpers/CommunityStakes';
 import { ContractMethods, queryClient } from 'state/api/config';
 import { setActiveAccountOnTransactionSuccess } from 'views/modals/ManageCommunityStakeModal/utils';
+import { lazyLoadCommunityStakes } from '../../../helpers/ContractHelpers/LazyCommunityStakes';
 
 interface BuyStakeProps {
   namespace: string;
@@ -19,6 +19,7 @@ const buyStake = async ({
   chainRpc,
   walletAddress,
 }: BuyStakeProps) => {
+  const CommunityStakes = await lazyLoadCommunityStakes();
   const communityStakes = new CommunityStakes(
     commonProtocol.factoryContracts[
       commonProtocol.ValidChains.Sepolia
