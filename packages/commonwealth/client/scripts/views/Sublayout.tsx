@@ -28,7 +28,7 @@ const Sublayout = ({
   const forceRerender = useForceRerender();
   const { menuVisible, mobileMenuName, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
-  const { isWindowSmallInclusive } = useBrowserWindow({
+  const { isWindowSmallInclusive, isWindowExtraSmall } = useBrowserWindow({
     onResize: () => setResizing(true),
     resizeListenerUpdateDeps: [resizing],
   });
@@ -66,43 +66,50 @@ const Sublayout = ({
   return (
     <div className="Sublayout">
       {!isWindowSmallInclusive && (
-        <CollapsableSidebarButton isInsideCommunity={isInsideCommunity} />
+        <CollapsableSidebarButton
+          onMobile={isWindowExtraSmall}
+          isInsideCommunity={isInsideCommunity}
+        />
       )}
-      <div className="header-and-body-container">
-        <SublayoutHeader onMobile={isWindowSmallInclusive} />
-        <div className="sidebar-and-body-container">
-          <Sidebar isInsideCommunity={isInsideCommunity} />
-          <div
-            className={clsx(
-              'body-and-sticky-headers-container',
-              {
-                'menu-visible': menuVisible,
-                'menu-hidden': !menuVisible,
-                'quick-switcher-visible':
-                  menuName === 'exploreCommunities' ||
-                  menuName === 'createContent' ||
-                  isInsideCommunity,
-              },
-              resizing,
-            )}
-          >
-            <SublayoutBanners banner={banner} chain={chain} terms={terms} />
+      <SublayoutHeader
+        onMobile={isWindowExtraSmall}
+        isInsideCommunity={isInsideCommunity}
+      />
+      <div className="sidebar-and-body-container">
+        <Sidebar
+          isInsideCommunity={isInsideCommunity}
+          onMobile={isWindowExtraSmall}
+        />
+        <div
+          className={clsx(
+            'body-and-sticky-headers-container',
+            {
+              'menu-visible': menuVisible,
+              'menu-hidden': !menuVisible,
+              'quick-switcher-visible':
+                menuName === 'exploreCommunities' ||
+                menuName === 'createContent' ||
+                isInsideCommunity,
+            },
+            resizing,
+          )}
+        >
+          <SublayoutBanners banner={banner} chain={chain} terms={terms} />
 
-            {isWindowSmallInclusive && mobileMenuName ? (
-              <AppMobileMenus />
-            ) : (
-              <div className="Body">
-                {!toggleMobileView && (
-                  <div className="breadcrumbContainer">
-                    <Breadcrumbs />
-                  </div>
-                )}
-                {isInsideCommunity && <AdminOnboardingSlider />}
-                {children}
-                {!app.isCustomDomain() && !hideFooter && <Footer />}
-              </div>
-            )}
-          </div>
+          {isWindowSmallInclusive && mobileMenuName ? (
+            <AppMobileMenus />
+          ) : (
+            <div className="Body">
+              {!toggleMobileView && (
+                <div className="breadcrumbContainer">
+                  <Breadcrumbs />
+                </div>
+              )}
+              {isInsideCommunity && <AdminOnboardingSlider />}
+              {children}
+              {!app.isCustomDomain() && !hideFooter && <Footer />}
+            </div>
+          )}
         </div>
       </div>
     </div>

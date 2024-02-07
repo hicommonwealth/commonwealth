@@ -8,6 +8,20 @@ html.todesktop .SublayoutHeader {
   -webkit-app-region: drag;
 }
 
+// TODO move to its own file
+.MobileHeader {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  position: absolute;
+  width: 100%;
+
+  .right-side {
+    display: flex;
+    margin-left: auto;
+  }
+}
+
 .SublayoutHeader,
 html.todesktop .SublayoutHeader {
   align-items: center;

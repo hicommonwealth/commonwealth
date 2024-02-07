@@ -7,6 +7,10 @@
   position: absolute;
   height: calc(100% - #{$global-header-height});
 
+  &.onMobile {
+    height: 100%;
+  }
+
   &.onadd {
     animation: slidein 0.2s ease-in-out;
     display: flex;
@@ -15,10 +19,6 @@
   &.onremove {
     animation: slideout 0.2s ease-in-out;
     display: none;
-  }
-
-  .sidebar-header-wrapper {
-    background-color: $neutral-50;
   }
 
   .sidebar-header-wrapper {

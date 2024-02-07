@@ -1,5 +1,6 @@
 import 'SublayoutHeader.scss';
 import clsx from 'clsx';
+import { featureFlags } from 'helpers/feature-flags';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
@@ -7,6 +8,7 @@ import { useLocation } from 'react-router-dom';
 import useSidebarStore from 'state/ui/sidebar';
 import UserDropdown from 'views/components/Header/UserDropdown/UserDropdown';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import CollapsableSidebarButton from 'views/components/sidebar/CollapsableSidebarButton';
 import { HelpMenuPopover } from 'views/menus/help_menu';
 import { FeedbackModal } from 'views/modals/feedback_modal';
 import { LoginModal } from 'views/modals/login_modal';
@@ -25,9 +27,13 @@ import { NotificationsMenuPopover } from './menus/notifications_menu';
 
 type SublayoutHeaderProps = {
   onMobile: boolean;
+  isInsideCommunity: boolean;
 };
 
-export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
+export const SublayoutHeader = ({
+  onMobile,
+  isInsideCommunity,
+}: SublayoutHeaderProps) => {
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const navigate = useCommonNavigate();
   const {
@@ -53,6 +59,26 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
     setTimeout(() => {
       setUserToggledVisibility(isVisible ? 'open' : 'closed');
     }, 200);
+  }
+
+  if (featureFlags.mobileNavigation && onMobile) {
+    const shouldShow = isInsideCommunity ? !menuVisible : true;
+
+    return (
+      <div className="MobileHeader">
+        {shouldShow && (
+          <CollapsableSidebarButton
+            onMobile={onMobile}
+            isInsideCommunity={isInsideCommunity}
+          />
+        )}
+
+        <div className="right-side">
+          <div>glass icon</div>
+          <div>profile</div>
+        </div>
+      </div>
+    );
   }
 
   return (
