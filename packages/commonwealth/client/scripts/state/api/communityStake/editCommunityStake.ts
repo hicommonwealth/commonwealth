@@ -11,7 +11,7 @@ const editCommunityStake = async ({
   communityId,
   stakeId,
 }: EditCommunityStakeProps) => {
-  return await axios.put(
+  return await axios.post(
     `${app.serverUrl()}/communityStakes/${communityId}/${stakeId}`,
     {
       jwt: app.user.jwt,
