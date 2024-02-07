@@ -8,7 +8,7 @@ Unleash gives us access to several desirable features: flags may be turned on or
 
 Our Unleash server may be found at `flag.commonwealth.im`. For account and sign-in information, reach out to Kurtis Assad.
 
-As of 240205, Common has configured one project ("Default") and two environments within that project ("production," "development”". Existing feature flags (or "toggles") are visible from the dashboard overview.
+As of 240205, Common has configured one project ("Default") and two environments within that project ("production," "development"). Existing feature flags (or "toggles") are visible from the dashboard overview.
 
 To create a new flag, select "Create feature toggle" and fill out the resulting form. Flags should be named in camelCase, following the syntax `flag.descriptiveName`. `Rollout percentage` refers to the ratio of users for whom the flag will evaluate `true` to `false`.
 
