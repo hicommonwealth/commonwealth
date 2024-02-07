@@ -1,5 +1,5 @@
-import { AppError } from '@hicommonwealth/adapters';
-import { Community } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
+import { Community } from '@hicommonwealth/model';
 import { MixpanelCommunityCreationEvent } from '../../../shared/analytics/types';
 import {
   CreateCommunityOptions,
@@ -23,9 +23,8 @@ export const createCommunityHandler = async (
     }
   }
 
-  const validationResult = await Community.CreateCommunitySchema.safeParseAsync(
-    req.body,
-  );
+  const validationResult =
+    await Community.CreateCommunity.schema.safeParseAsync(req.body);
 
   if (validationResult.success === false) {
     throw new AppError(formatErrorPretty(validationResult));

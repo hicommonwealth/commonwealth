@@ -1,15 +1,16 @@
+import type {
+  AddressInstance,
+  ChainNodeAttributes,
+  CollaborationAttributes,
+  CommentInstance,
+  CommunityInstance,
+  ReactionAttributes,
+  ThreadInstance,
+  TopicAttributes,
+  UserInstance,
+} from '@hicommonwealth/model';
+import { ProfileAttributes, models } from '@hicommonwealth/model';
 import Sequelize from 'sequelize';
-import models from 'server/database';
-import type { AddressInstance } from 'server/models/address';
-import type { ChainNodeAttributes } from 'server/models/chain_node';
-import type { CollaborationAttributes } from 'server/models/collaboration';
-import type { CommentInstance } from 'server/models/comment';
-import type { ReactionAttributes } from 'server/models/reaction';
-import type { ThreadInstance } from 'server/models/thread';
-import type { TopicAttributes } from 'server/models/topic';
-import type { UserInstance } from 'server/models/user';
-import type { CommunityInstance } from '../../../server/models/community';
-import { ProfileAttributes } from '../../../server/models/profile';
 import { testAddress } from '../utils/e2eUtils';
 
 const Op = Sequelize.Op;
@@ -47,7 +48,7 @@ export async function clearTestEntities() {
       where: {
         [Op.or]: [
           { id: { [Op.lt]: 0 } },
-          { selected_chain_id: { [Op.in]: ['cmntest', 'cmntest2'] } },
+          { selected_community_id: { [Op.in]: ['cmntest', 'cmntest2'] } },
         ],
       },
     });
@@ -127,7 +128,7 @@ export async function clearTestEntities() {
       where: {
         [Op.or]: [
           { thread_id: { [Op.lt]: 0 } },
-          { chain_id: { [Op.in]: chainsToDelete.map((c) => c['id']) } },
+          { community_id: { [Op.in]: chainsToDelete.map((c) => c['id']) } },
         ],
       },
       force: true,
@@ -397,7 +398,7 @@ export async function createTestEntities() {
                 reaction: 'like',
                 address_id: -1,
                 thread_id: -1,
-                chain: 'cmntest',
+                community_id: 'cmntest',
               },
             })
           )[0],
@@ -415,7 +416,7 @@ export async function createTestEntities() {
                   reaction: 'like',
                   address_id: -2,
                   comment_id: -2,
-                  chain: 'cmntest',
+                  community_id: 'cmntest',
                 },
               })
             )[0],

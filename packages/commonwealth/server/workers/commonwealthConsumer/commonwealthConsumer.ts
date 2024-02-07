@@ -1,20 +1,21 @@
 import {
+  HotShotsStats,
   RabbitMQController,
   RabbitMQSubscription,
   RascalConfigServices,
   RascalSubscriptions,
   ServiceConsumer,
   ServiceKey,
-  formatFilename,
+  TypescriptLoggingLogger,
   getRabbitMQConfig,
-  loggerFactory,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
+import { logger, stats } from '@hicommonwealth/core';
 import type { BrokerConfig } from 'rascal';
-import Rollbar from 'rollbar';
-import { RABBITMQ_URI, ROLLBAR_ENV, ROLLBAR_SERVER_TOKEN } from '../../config';
-import models from '../../database';
-import { processSnapshotMessage } from './messageProcessors/snapshotConsumer';
+import { RABBITMQ_URI } from '../../config';
+
+const log = logger(TypescriptLoggingLogger()).getLogger(__filename);
+stats(HotShotsStats());
 
 let isServiceHealthy = false;
 
@@ -36,15 +37,11 @@ startHealthCheckLoop({
 // properly handling/processing those messages. Using the script is rarely necessary in
 // local development.
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
-
 export async function setupCommonwealthConsumer(): Promise<ServiceConsumer> {
-  const rollbar = new Rollbar({
-    accessToken: ROLLBAR_SERVER_TOKEN,
-    environment: ROLLBAR_ENV,
-    captureUncaught: true,
-    captureUnhandledRejections: true,
-  });
+  const { models } = await import('@hicommonwealth/model');
+  const { processSnapshotMessage } = await import(
+    './messageProcessors/snapshotConsumer'
+  );
 
   let rmqController: RabbitMQController;
   try {
@@ -55,16 +52,11 @@ export async function setupCommonwealthConsumer(): Promise<ServiceConsumer> {
           RascalConfigServices.CommonwealthService,
         )
       ),
-      rollbar,
     );
     await rmqController.init();
   } catch (e) {
     log.error(
       'Rascal consumer setup failed. Please check the Rascal configuration',
-    );
-    rollbar.critical(
-      'Rascal consumer setup failed. Please check the Rascal configuration',
-      e,
     );
     throw e;
   }

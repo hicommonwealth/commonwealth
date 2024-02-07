@@ -1,4 +1,5 @@
 /* eslint-disable react/no-multi-comp */
+import { isValidEthAddress } from 'helpers/validateTypes';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
@@ -294,6 +295,24 @@ const GroupForm = ({
           [key]: message,
         },
       };
+    }
+
+    // Validate if contract address is valid based on the selected requirement type
+    if (val.requirementContractAddress) {
+      const isInvalidEthAddress =
+        [...Object.values(ERC_SPECIFICATIONS), TOKENS.EVM_TOKEN].includes(
+          allRequirements[index].values.requirementType,
+        ) && !isValidEthAddress(val.requirementContractAddress);
+
+      if (isInvalidEthAddress) {
+        allRequirements[index] = {
+          ...allRequirements[index],
+          errors: {
+            ...allRequirements[index].errors,
+            [key]: VALIDATION_MESSAGES.INVALID_INPUT,
+          },
+        };
+      }
     }
 
     setRequirementSubForms([...allRequirements]);

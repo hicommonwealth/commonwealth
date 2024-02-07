@@ -1,0 +1,171 @@
+@import '../../../../../styles/shared.scss';
+
+.StakeExchangeForm {
+  display: flex;
+  flex-direction: column;
+
+  .price-skeleton {
+    min-width: 180px;
+  }
+
+  .CWModalBody {
+    @include heightSmallInclusive {
+      max-height: 300px;
+    }
+  }
+
+  .SelectList {
+    z-index: 10;
+  }
+
+  // address dropdown items
+  .text-container {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+
+    .check-icon {
+      fill: $green-600;
+      margin-right: 8px;
+    }
+  }
+
+  .current-balance-row {
+    display: flex;
+    justify-content: space-between;
+    color: $neutral-500;
+
+    .Text {
+      color: $neutral-500;
+    }
+
+    .error {
+      color: $rorange-500;
+    }
+  }
+
+  .stake-valued-row {
+    .Text {
+      display: inline;
+    }
+
+    .valued {
+      color: $neutral-400;
+      margin-left: 4px;
+    }
+
+    .vote-weight {
+      display: block;
+      margin-top: 8px;
+    }
+  }
+
+  .exchange-stake-number-selector {
+    background-color: $neutral-50;
+    border-radius: 6px;
+    padding: 8px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .header {
+      text-transform: uppercase;
+      color: $neutral-400;
+    }
+
+    .stake-selector-row {
+      display: flex;
+      gap: 8px;
+      justify-content: space-between;
+      align-items: center;
+
+      .stake-selector {
+        display: flex;
+        gap: 50px;
+        align-items: center;
+
+        @include smallInclusive {
+          gap: 25px;
+        }
+
+        .number {
+          font-size: 29px;
+          min-width: 34px;
+          justify-content: center;
+        }
+      }
+    }
+
+    .price-per-unit-row {
+      display: flex;
+      justify-content: space-between;
+
+      .Text {
+        color: $neutral-500;
+      }
+
+      .label {
+        color: $neutral-400;
+      }
+    }
+  }
+
+  .feedback-message-text {
+    text-align: left !important;
+  }
+
+  .total-weight-summary {
+    background-color: $neutral-50;
+    border-radius: 6px;
+    padding: 8px 16px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+
+    .number {
+      font-size: 29px;
+      justify-content: center;
+      width: 214px;
+
+      @include smallInclusive {
+        width: 164px;
+      }
+    }
+  }
+
+  .fees-row,
+  .total-cost-row {
+    display: flex;
+    justify-content: space-between;
+
+    .Text {
+      color: $neutral-500;
+    }
+  }
+
+  .fees-row {
+    .left-side {
+      display: flex;
+      align-items: center;
+
+      .CWIconButton {
+        margin-right: 4px;
+      }
+    }
+  }
+}
+
+.Popover {
+  .popover-title {
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .explanation-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+}

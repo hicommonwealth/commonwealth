@@ -1,13 +1,16 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+import { ActionPayload, Session } from '@canvas-js/interfaces';
+import {
+  LinkSource,
+  ThreadAttributes,
+  models,
+  tester,
+} from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from 'server/config';
-import { LinkSource, ThreadAttributes } from 'server/models/thread';
 import { Errors } from 'server/util/linkingValidationHelper';
 import * as modelUtils from 'test/util/modelUtils';
-import { resetDatabase } from '../../../server-test';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -17,22 +20,25 @@ describe('Linking Tests', () => {
 
   const title = 'test title';
   const body = 'test body';
-  const topicName = 'test topic';
-  const topicId = undefined;
   const kind = 'discussion';
   const stage = 'discussion';
 
-  let adminJWT;
-  let adminAddress;
-  let adminAddressId;
-  let adminSession;
-  let userJWT;
-  let userId;
-  let userAddress;
-  let userAddressId;
-  let userSession;
-  let thread1: ThreadAttributes;
-  let thread2: ThreadAttributes;
+  let topicId: number,
+    adminJWT: string,
+    adminAddress: string,
+    adminSession: {
+      session: Session;
+      sign: (payload: ActionPayload) => string;
+    },
+    userJWT: string,
+    userAddress: string,
+    userSession: {
+      session: Session;
+      sign: (payload: ActionPayload) => string;
+    },
+    thread1: ThreadAttributes,
+    thread2: ThreadAttributes;
+
   const link1 = {
     source: LinkSource.Snapshot,
     identifier: '0x1234567',
@@ -44,10 +50,18 @@ describe('Linking Tests', () => {
   const link5 = { source: LinkSource.Proposal, identifier: '4' };
 
   before(async () => {
-    await resetDatabase();
+    await tester.seedDb();
+
+    const topic = await models.Topic.findOne({
+      where: {
+        community_id: chain,
+        group_ids: [],
+      },
+    });
+    topicId = topic.id;
+
     let res = await modelUtils.createAndVerifyAddress({ chain });
     adminAddress = res.address;
-    adminAddressId = res.address_id;
     adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
     const isAdmin = await modelUtils.updateRole({
       address_id: res.address_id,
@@ -61,8 +75,6 @@ describe('Linking Tests', () => {
 
     res = await modelUtils.createAndVerifyAddress({ chain });
     userAddress = res.address;
-    userId = res.user_id;
-    userAddressId = res.address_id;
     userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
     userSession = { session: res.session, sign: res.sign };
     expect(userAddress).to.not.be.null;
@@ -75,7 +87,6 @@ describe('Linking Tests', () => {
         stage,
         chainId: chain,
         title,
-        topicName,
         topicId,
         body,
         jwt: userJWT,
@@ -91,7 +102,6 @@ describe('Linking Tests', () => {
         stage,
         chainId: chain,
         title,
-        topicName,
         topicId,
         body,
         jwt: adminJWT,

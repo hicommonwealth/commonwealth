@@ -1,7 +1,7 @@
 import {
   ChainBase,
-  ChainCategoryType,
   ChainNetwork,
+  CommunityCategoryType,
 } from '@hicommonwealth/core';
 import numeral from 'numeral';
 import 'pages/communities.scss';
@@ -19,7 +19,7 @@ const buildCommunityString = (numCommunities: number) =>
 
 const communityToCategoriesMap = app.config.chainCategoryMap;
 // Handle mapping provided by ChainCategories table
-const communityCategories = Object.values(ChainCategoryType);
+const communityCategories = Object.values(CommunityCategoryType);
 const communityNetworks = Object.keys(ChainNetwork).filter(
   (val) => val === 'ERC20',
 ); // We only are allowing ERC20 for now
@@ -81,7 +81,7 @@ const CommunitiesPage = () => {
           filterMap[cat] &&
           (!communityToCategoriesMap[data.id] ||
             !communityToCategoriesMap[data.id].includes(
-              cat as ChainCategoryType,
+              cat as CommunityCategoryType,
             ))
         ) {
           return false;

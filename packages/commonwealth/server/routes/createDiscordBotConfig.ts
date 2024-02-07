@@ -1,5 +1,5 @@
-import { AppError } from '@hicommonwealth/adapters';
-import type { DB } from '../models';
+import { AppError } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { validateOwner } from '../util/validateOwner';
@@ -35,7 +35,7 @@ const createDiscordBotConfig = async (
     user: req.user,
     communityId: community_id,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError(CreateDiscordBotConfigErrors.NotAdmin);

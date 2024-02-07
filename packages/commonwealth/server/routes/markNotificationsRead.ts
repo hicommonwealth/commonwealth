@@ -1,7 +1,7 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
+import { sequelize } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-import { sequelize } from '../database';
-import type { DB } from '../models';
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',

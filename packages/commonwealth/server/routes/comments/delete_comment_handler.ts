@@ -1,4 +1,4 @@
-import { CommentAttributes } from '../../models/comment';
+import { CommentAttributes } from '@hicommonwealth/model';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestParams, TypedResponse, success } from '../../types';
 
@@ -12,13 +12,12 @@ export const deleteCommentHandler = async (
   req: TypedRequestParams<DeleteCommentRequestParams>,
   res: TypedResponse<DeleteCommentResponse>,
 ) => {
-  const { user, address, community } = req;
+  const { user, address } = req;
   const { id: commentId } = req.params;
 
   await controllers.comments.deleteComment({
     user,
     address,
-    community,
     commentId: parseInt(commentId, 10),
   });
 

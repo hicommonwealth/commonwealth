@@ -1,7 +1,10 @@
-import { AppError } from '@hicommonwealth/adapters';
-import { CommunityInstance } from '../../models/community';
-import { TopicAttributes, TopicInstance } from '../../models/topic';
-import { UserInstance } from '../../models/user';
+import { AppError } from '@hicommonwealth/core';
+import {
+  CommunityInstance,
+  TopicAttributes,
+  TopicInstance,
+  UserInstance,
+} from '@hicommonwealth/model';
 import { validateOwner } from '../../util/validateOwner';
 import { ServerTopicsController } from '../server_topics_controller';
 
@@ -42,7 +45,7 @@ export async function __updateTopicsOrder(
     communityId: community.id,
     allowMod: true,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdminOrMod) {
     throw new AppError(Errors.NoPermission);

@@ -1,5 +1,4 @@
-import { Capacitor } from '@capacitor/core';
-import { ChainCategoryType } from '@hicommonwealth/core';
+import { CommunityCategoryType } from '@hicommonwealth/core';
 import axios from 'axios';
 import { updateActiveUser } from 'controllers/app/login';
 import RecentActivityController from 'controllers/app/recent_activity';
@@ -94,22 +93,14 @@ export interface IApp {
     defaultChain: string;
     evmTestEnv?: string;
     enforceSessionKeys?: boolean;
-    chainCategoryMap?: { [chain: string]: ChainCategoryType[] };
+    chainCategoryMap?: { [chain: string]: CommunityCategoryType[] };
   };
 
   loginStatusLoaded(): boolean;
 
   isLoggedIn(): boolean;
 
-  isProduction(): boolean;
-
-  isDesktopApp(win): boolean;
-
-  isNative(win): boolean;
-
   serverUrl(): string;
-
-  platform(): string;
 
   loadingError: string;
 
@@ -183,33 +174,8 @@ const app: IApp = {
   // TODO: Collect all getters into an object
   loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,
   isLoggedIn: () => app.loginState === LoginState.LoggedIn,
-  isNative: () => {
-    const capacitor = window['Capacitor'];
-    return !!(capacitor && capacitor.isNative);
-  },
-  isDesktopApp: (window) => {
-    return window.todesktop;
-  },
-  platform: () => {
-    // Using Desktop API to determine if the platform is desktop
-    if (app.isDesktopApp(window)) {
-      return 'desktop';
-    } else {
-      // If not desktop, get the platform from Capacitor
-      return Capacitor.getPlatform();
-    }
-  },
-  isProduction: () =>
-    document.location.origin.indexOf('commonwealth.im') !== -1,
   serverUrl: () => {
-    //* TODO: @ Used to store the webpack SERVER_URL, should only be set for mobile deployments */
-    const mobileUrl = 'http://127.0.0.1:8080/api'; // Replace with your computer ip, staging, or production url
-
-    if (app.isNative(window)) {
-      return mobileUrl;
-    } else {
-      return '/api';
-    }
+    return '/api';
   },
 
   loadingError: null,
@@ -224,7 +190,8 @@ const app: IApp = {
   },
   skipDeinitChain: false,
 };
-
+//allows for FS.identify to be used
+declare const window: any;
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
 export async function initAppState(
@@ -315,6 +282,16 @@ export async function initAppState(
       app.user.setSelectedChain(
         ChainInfo.fromJSON(statusRes.result.user.selectedChain),
       );
+    }
+
+    if (statusRes.result.user) {
+      try {
+        window.FS('setIdentity', {
+          uid: statusRes.result.user.profileId,
+        });
+      } catch (e) {
+        console.error('FullStory not found.');
+      }
     }
   } catch (err) {
     app.loadingError =

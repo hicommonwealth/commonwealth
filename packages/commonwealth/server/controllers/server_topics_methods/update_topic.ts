@@ -1,8 +1,7 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
+import { TopicAttributes, UserInstance } from '@hicommonwealth/model';
+import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { CommunityInstance } from '../../models/community';
-import { TopicAttributes } from '../../models/topic';
-import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_methods/track';
 import { ServerTopicsController } from '../server_topics_controller';
@@ -20,7 +19,6 @@ export const Errors = {
 
 export type UpdateTopicOptions = {
   user: UserInstance;
-  community: CommunityInstance;
   body: Partial<TopicAttributes>;
 };
 
@@ -28,26 +26,30 @@ export type UpdateTopicResult = [TopicAttributes, TrackOptions];
 
 export async function __updateTopic(
   this: ServerTopicsController,
-  { user, community, body }: UpdateTopicOptions,
+  { user, body }: UpdateTopicOptions,
 ): Promise<UpdateTopicResult> {
+  const { id } = body;
   if (!body.id) {
     throw new AppError(Errors.NoTopicId);
+  }
+  const topic = await this.models.Topic.findByPk(id);
+  if (!topic) {
+    throw new AppError(Errors.TopicNotFound);
   }
 
   const isAdmin = await validateOwner({
     models: this.models,
     user: user,
-    communityId: community.id,
+    communityId: topic.community_id,
     allowMod: true,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError(Errors.NotAdmin);
   }
 
   const {
-    id,
     name,
     description,
     telegram,
@@ -56,15 +58,13 @@ export async function __updateTopic(
     featured_in_new_post,
   } = body;
 
-  const default_community_template = body.default_offchain_template?.trim();
+  let default_community_template = body.default_offchain_template?.trim();
   if (featured_in_new_post && !default_community_template) {
     throw new AppError(Errors.DefaultTemplateRequired);
   }
+  // sanitize text
+  default_community_template = sanitizeQuillText(default_community_template);
 
-  const topic = await this.models.Topic.findOne({ where: { id } });
-  if (!topic) {
-    throw new AppError(Errors.TopicNotFound);
-  }
   if (typeof name !== 'undefined') {
     if (name.match(/["<>%{}|\\/^`]/g)) {
       throw new AppError(Errors.InvalidTopicName);
@@ -93,7 +93,7 @@ export async function __updateTopic(
 
   const analyticsOptions = {
     event: MixpanelCommunityInteractionEvent.UPDATE_TOPIC,
-    community: community.id,
+    community: topic.community_id,
     userId: user.id,
   };
 

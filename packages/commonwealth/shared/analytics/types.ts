@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/core/build/types';
+import { ChainBase } from '@hicommonwealth/core';
 
 export const enum MixpanelPageViewEvent {
   LANDING_PAGE_VIEW = 'Landing Page Viewed',

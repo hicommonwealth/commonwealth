@@ -1,0 +1,70 @@
+@import '../../../../../styles/shared.scss';
+
+.VoteWeightModule {
+  padding: 16px 24px;
+  border-bottom: 1px solid $neutral-200;
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .title-container {
+      display: flex;
+      justify-content: space-between;
+
+      .Text {
+        color: $neutral-400;
+      }
+    }
+
+    .vote-weight {
+      color: $neutral-800;
+    }
+
+    .info-and-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      .info {
+        .stake-num {
+          color: $neutral-800;
+        }
+
+        .stake-value {
+          color: $neutral-400;
+        }
+      }
+
+      .actions {
+        display: flex;
+
+        .btn-border {
+          .Button {
+            padding-left: 8px;
+            padding-right: 8px;
+          }
+        }
+      }
+
+      .action {
+        display: flex;
+      }
+    }
+  }
+}
+
+.Popover {
+  .popover-title {
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .explanation-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+}

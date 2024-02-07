@@ -38,13 +38,6 @@ If you add a script to the `package.json` file, please add documentation for it 
   - [lint-branch](#lint-branch)
   - [lint-branch-warnings](#lint-branch-warnings)
   - [style-lint](#style-lint)
-- [Mobile](#mobile)
-  - [build-android](#build-android)
-  - [build-ios](#build-ios)
-  - [open-android](#open-android)
-  - [open-ios](#open-ios)
-  - [start-android](#start-android)
-  - [start-ios](#start-ios)
 - [Other Services](#other-services)
   - [send-cosmos-notifs](#send-cosmos-notifs)
   - [send-notification-digest-emails](#send-notification-digest-emails)
@@ -65,6 +58,7 @@ If you add a script to the `package.json` file, please add documentation for it 
   - [unit-test:watch](#unit-testwatch)
 - [TypeScript](#typescript)
   - [check-types](#check-types)
+  - [sanity](#sanity)
 - [Webpack & TSNode](#webpack--tsnode)
   - [bundle-report](#bundle-report)
   - [listen](#listen)
@@ -72,6 +66,12 @@ If you add a script to the `package.json` file, please add documentation for it 
   - [start-all](#start-all)
   - [start-consumer](#start-consumer)
   - [start-evm-ce](#start-evm-ce)
+- [Devnets](#devnets)
+  - [cosmos:build](#cosmos:build)
+  - [cosmos:start](#cosmos:start)
+  - [cosmos:stop](#cosmos:stop)
+- [Util scripts](#util-scripts)
+  - [add-components-showcase](#add-component-showcase)
 
 ## Build Scripts
 
@@ -279,56 +279,6 @@ Description: Lints SCSS files.
 
 Considerations: Why lint styles separately? Why not just include `.scss` file extension in [lint](#lint) and [lint-all](#lint-all) scripts (which currently only target `.ts` files)? **Flagged for possible removal.**
 
-## Mobile
-
-### build-android
-
-Definition: `NODE_ENV=mobile webpack --config webpack/webpack.config.mobile.js --progress && NODE_ENV=mobile npx cap sync android`
-
-Description: Uses Capacitor library to build app for Android based on webpack.config.mobile.js file.
-
-Contributor: Dillon Chen
-
-### build-ios
-
-Definition: `NODE_ENV=mobile webpack --config webpack/webpack.config.mobile.js --progress && NODE_ENV=mobile npx cap sync ios`
-
-Description: Uses Capacitor library to build app for iOS based on webpack.config.mobile.js file.
-
-Contributor: Dillon Chen
-
-### open-android
-
-Definition: `NODE_ENV=mobile npx cap open android`
-
-Description: Uses the Capacitor tool to build and run the app's Android project with a simulator.
-
-Contributor: Dillon Chen
-
-### open-ios
-
-Definition: `NODE_ENV=mobile npx cap open ios`
-
-Description: Uses the Capacitor tool to build and run the app's iOS project with a simulator.
-
-Contributor: Dillon Chen
-
-### start-android
-
-Definition: `npx cap run android`
-
-Description: Uses the Capacitor tool to build and run the app's Android project with a simulator.
-
-Contributor: Dillon Chen
-
-### start-ios
-
-Definition: `npx cap run ios`
-
-Description: Uses the Capacitor tool to build and run the app's iOS project with a simulator.
-
-Contributor: Dillon Chen
-
 ## Other services
 
 ### send-cosmos-notifs
@@ -473,6 +423,12 @@ Definition: `tsc --noEmit`
 
 Description: Runs a compilation of TypeScript files based on tsconfig.json; does not emit files.
 
+### sanity
+
+Definition: `chmod u+x scripts/sanity.sh && ./scripts/sanity.sh`
+
+Description: Sanity scripts developers should run locally before pushing code, comprising a linter, a check-types, and unit tests. Must be run from root.
+
 ## Webpack && TSNode
 
 ### bundle-report
@@ -530,3 +486,11 @@ Description: Starts existing dormant Cosmos devnet containers.
 Definition: `chmod u+x test/util/cosmos-chain-testing/v1/stop.sh && ./test/util/cosmos-chain-testing/v1/stop.sh && chmod u+x test/util/cosmos-chain-testing/v1beta1/stop.sh && ./test/util/cosmos-chain-testing/v1beta1/stop.sh && chmod u+x test/util/cosmos-chain-testing/ethermint/stop.sh && ./test/util/cosmos-chain-testing/ethermint/stop.sh`
 
 Description: Stop all Cosmos devnet containers.
+
+# Util scripts
+
+## add-component-showcase
+
+Definition: `add-component-showcase`
+
+Description: It creates new `tsx` file and modifies `componentsList.ts` file in order to add components to the showcase page easier. Fore more information take a look at [Component-Kit.md](./Component-Kit.md) documentation file.

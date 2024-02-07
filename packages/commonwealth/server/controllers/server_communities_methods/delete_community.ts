@@ -1,7 +1,6 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
+import { UserInstance, sequelize } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import { UserInstance } from 'server/models/user';
-import { sequelize } from '../../database';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 export const Errors = {
@@ -50,18 +49,18 @@ export async function __deleteCommunity(
         await this.models.sequelize.transaction(async (t) => {
           await this.models.User.update(
             {
-              selected_chain_id: null,
+              selected_community_id: null,
             },
             {
               where: {
-                selected_chain_id: community.id,
+                selected_community_id: community.id,
               },
               transaction: t,
             },
           );
 
           await this.models.Reaction.destroy({
-            where: { chain: community.id },
+            where: { community_id: community.id },
             transaction: t,
           });
 
@@ -84,7 +83,7 @@ export async function __deleteCommunity(
           });
 
           await this.models.Subscription.destroy({
-            where: { chain_id: community.id },
+            where: { community_id: community.id },
             transaction: t,
           });
 
@@ -152,7 +151,7 @@ export async function __deleteCommunity(
 
           // notifications + notifications_read (cascade)
           await this.models.Notification.destroy({
-            where: { chain_id: community.id },
+            where: { community_id: community.id },
             transaction: t,
           });
 

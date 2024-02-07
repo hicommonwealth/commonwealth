@@ -1,17 +1,11 @@
-import {
-  StatsDController,
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/adapters';
-import models from '../../database';
-import { NotificationInstance } from '../../models/notification';
-import { rollbar } from '../../util/rollbar';
+import { logger, stats } from '@hicommonwealth/core';
+import { NotificationInstance, models } from '@hicommonwealth/model';
 import { emitChainEventNotifs } from './emitChainEventNotifs';
 import { getEventSources } from './getEventSources';
 import { getEvents } from './logProcessing';
 import { EvmSource } from './types';
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 /**
  * Given a ChainNode id and event sources, this function fetches all events parsed since
@@ -28,7 +22,7 @@ export async function processChainNode(
         `\tchainNodeId: ${chainNodeId}\n` +
         `\tcontracts: ${JSON.stringify(Object.keys(evmSource.contracts))}`,
     );
-    StatsDController.get().increment('ce.evm.chain_node_id', {
+    stats().increment('ce.evm.chain_node_id', {
       chainNodeId: String(chainNodeId),
     });
 
@@ -63,7 +57,6 @@ export async function processChainNode(
   } catch (e) {
     const msg = `Error occurred while processing chainNodeId ${chainNodeId}`;
     log.error(msg, e);
-    rollbar.critical(msg, e);
   }
 }
 

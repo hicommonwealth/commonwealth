@@ -1,14 +1,12 @@
+import { ThreadAttributes, TopicAttributes } from '@hicommonwealth/model';
 import { WhereOptions } from 'sequelize';
-import { CommunityInstance } from '../../models/community';
-import { ThreadAttributes } from '../../models/thread';
-import { TopicAttributes } from '../../models/topic';
 import { ServerThreadsController } from '../server_threads_controller';
 
 const MIN_THREADS_PER_TOPIC = 0;
 const MAX_THREADS_PER_TOPIC = 10;
 
 export type GetActiveThreadsOptions = {
-  community: CommunityInstance;
+  communityId: string;
   threadsPerTopic: number;
 };
 
@@ -16,7 +14,7 @@ export type GetActiveThreadsResult = ThreadAttributes[];
 
 export async function __getActiveThreads(
   this: ServerThreadsController,
-  { community, threadsPerTopic }: GetActiveThreadsOptions,
+  { communityId, threadsPerTopic }: GetActiveThreadsOptions,
 ): Promise<GetActiveThreadsResult> {
   const allThreads = [];
   if (
@@ -29,7 +27,7 @@ export async function __getActiveThreads(
   }
 
   const communityWhere: WhereOptions<TopicAttributes> = {
-    community_id: community.id,
+    community_id: communityId,
   };
   const communityTopics = await this.models.Topic.findAll({
     where: communityWhere,

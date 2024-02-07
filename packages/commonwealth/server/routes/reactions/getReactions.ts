@@ -1,8 +1,8 @@
+import type { DB } from '@hicommonwealth/model';
+import { ReactionAttributes } from '@hicommonwealth/model';
 import { query, validationResult } from 'express-validator';
 import Sequelize, { WhereOptions } from 'sequelize';
 import type { GetReactionsReq, GetReactionsResp } from '../../api/extApiTypes';
-import type { DB } from '../../models';
-import { ReactionAttributes } from '../../models/reaction';
 import type { TypedRequestQuery, TypedResponse } from '../../types';
 import { failure, success } from '../../types';
 import { paginationValidation } from '../../util/helperValidations';
@@ -31,7 +31,7 @@ const getReactions = async (
   }
   const { community_id, comment_id, addresses, count_only } = req.query;
 
-  const where: WhereOptions<ReactionAttributes> = { chain: community_id };
+  const where: WhereOptions<ReactionAttributes> = { community_id };
   if (comment_id) where.comment_id = comment_id;
 
   // if address is included, find which addressIds they correspond to.

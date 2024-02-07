@@ -1,6 +1,5 @@
-import { DB } from '../models';
+import { DB, TokenBalanceCache } from '@hicommonwealth/model';
 import BanCache from '../util/banCheckCache';
-import { TokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
 import {
   CreateGroupOptions,
   CreateGroupResult,

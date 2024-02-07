@@ -13,4 +13,13 @@
     width: 100%;
     padding: 16px;
   }
+
+  .header {
+    padding-top: 32px;
+    padding-bottom: 32px;
+
+    @include extraSmall {
+      padding-top: 0px;
+    }
+  }
 }

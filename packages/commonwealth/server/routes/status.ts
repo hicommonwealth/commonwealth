@@ -1,19 +1,17 @@
-import { ServerError } from '@hicommonwealth/adapters';
-import type { ChainCategoryType } from '@hicommonwealth/core';
+import { CommunityCategoryType, ServerError } from '@hicommonwealth/core';
+import type {
+  AddressInstance,
+  CommunityInstance,
+  DB,
+  EmailNotificationInterval,
+  NotificationCategoryInstance,
+  StarredCommunityAttributes,
+  UserInstance,
+} from '@hicommonwealth/model';
+import { ThreadAttributes, sequelize } from '@hicommonwealth/model';
 import jwt from 'jsonwebtoken';
 import { Op, QueryTypes } from 'sequelize';
-import type { AddressInstance } from 'server/models/address';
-import type { NotificationCategoryInstance } from 'server/models/notification_category';
-import type { StarredCommunityAttributes } from 'server/models/starred_community';
-import type {
-  EmailNotificationInterval,
-  UserInstance,
-} from 'server/models/user';
 import { ETH_RPC, JWT_SECRET } from '../config';
-import { sequelize } from '../database';
-import type { DB } from '../models';
-import type { CommunityInstance } from '../models/community';
-import { ThreadAttributes } from '../models/thread';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 import type { RoleInstanceWithPermission } from '../util/roles';
@@ -40,10 +38,11 @@ type StatusResp = {
     disableRichText: boolean;
     starredCommunities: StarredCommunityAttributes[];
     unseenPosts: { [chain: string]: number };
+    profileId?: number;
   };
   evmTestEnv?: string;
   enforceSessionKeys?: boolean;
-  chainCategoryMap: { [chain: string]: ChainCategoryType[] };
+  chainCategoryMap: { [chain: string]: CommunityCategoryType[] };
 };
 
 const getChainStatus = async (models: DB) => {
@@ -54,10 +53,10 @@ const getChainStatus = async (models: DB) => {
     models.NotificationCategory.findAll(),
   ]);
 
-  const chainCategories: { [chain: string]: ChainCategoryType[] } = {};
+  const chainCategories: { [chain: string]: CommunityCategoryType[] } = {};
   for (const chain of chains) {
     if (chain.category !== null) {
-      chainCategories[chain.id] = chain.category as ChainCategoryType[];
+      chainCategories[chain.id] = chain.category as CommunityCategoryType[];
     }
   }
 
@@ -99,7 +98,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
           !!address.verified &&
           chains.map((c) => c.id).includes(address.community_id),
       ),
-      user.getSelectedChain(),
+      user.getSelectedCommunity(),
       user.isAdmin,
       user.disableRichText,
     ]);
@@ -301,9 +300,15 @@ export const status = async (
     } else {
       // user is logged in
       const userStatusPromise = getUserStatus(models, reqUser);
-      const [chainStatus, userStatus] = await Promise.all([
+      const profilePromise = models.Profile.findOne({
+        where: {
+          user_id: reqUser.id,
+        },
+      });
+      const [chainStatus, userStatus, profileInstance] = await Promise.all([
         chainStatusPromise,
         userStatusPromise,
+        profilePromise,
       ]);
       const { notificationCategories, chainCategories, threadCountQueryData } =
         chainStatus;
@@ -316,7 +321,7 @@ export const status = async (
         recentThreads: threadCountQueryData,
         roles,
         loggedIn: true,
-        user,
+        user: { ...user, profileId: profileInstance.id },
         evmTestEnv: ETH_RPC,
         enforceSessionKeys: process.env.ENFORCE_SESSION_KEYS == 'true',
         chainCategoryMap: chainCategories,

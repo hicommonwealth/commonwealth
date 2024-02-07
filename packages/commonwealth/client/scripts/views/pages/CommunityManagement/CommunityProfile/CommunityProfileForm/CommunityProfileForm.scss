@@ -1,0 +1,96 @@
+@import '../../../../../../styles/shared';
+
+.CommunityProfileForm {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+
+  .header {
+    .h4 {
+      color: $neutral-900 !important;
+    }
+
+    .b1 {
+      color: $neutral-500 !important;
+    }
+  }
+
+  .base-section,
+  .links-section,
+  .tags-section,
+  .stages-section,
+  .banner-section,
+  .default-page-section {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .base-section {
+    gap: 24px;
+
+    .lock-icon {
+      fill: $neutral-600 !important;
+      cursor: pointer;
+
+      &.disabled {
+        fill: $neutral-400 !important;
+        cursor: not-allowed !important;
+        pointer-events: all;
+      }
+    }
+  }
+
+  .links-section,
+  .tags-section,
+  .stages-section,
+  .banner-section,
+  .default-page-section {
+    gap: 16px;
+  }
+
+  .links-section {
+    .link-type {
+      min-width: 80px;
+      text-align: center;
+      text-transform: capitalize;
+    }
+  }
+
+  .tags-section {
+    .controls {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      gap: 16px;
+    }
+  }
+
+  .stages-section {
+    .b1 {
+      p {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+    }
+  }
+
+  .default-page-section {
+    .controls {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      gap: 8px;
+    }
+  }
+
+  .action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+}

@@ -1,9 +1,8 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError, Requirement } from '@hicommonwealth/core';
+import { GroupAttributes, GroupMetadata } from '@hicommonwealth/model';
 import z from 'zod';
-import { GroupAttributes, GroupMetadata } from '../../models/group';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
-import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 
 type CreateGroupBody = {
   metadata: GroupMetadata;
@@ -49,7 +48,10 @@ export const createGroupHandler = async (
 
   // refresh memberships in background
   controllers.groups
-    .refreshCommunityMemberships({ community, group })
+    .refreshCommunityMemberships({
+      communityId: community.id,
+      groupId: group.id,
+    })
     .catch(console.error);
 
   controllers.analytics.track(analyticsOptions, req).catch(console.error);

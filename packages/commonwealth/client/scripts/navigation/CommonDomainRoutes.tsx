@@ -70,6 +70,20 @@ const DiscordCallbackPage = lazy(
   () => import('views/pages/manage_community/discord-callback'),
 );
 const AnalyticsPage = lazy(() => import('views/pages/stats'));
+
+const CommunityAdminAndModerators = lazy(
+  () => import('views/pages/CommunityManagement/AdminsAndModerators'),
+);
+const CommunityProfile = lazy(
+  () => import('views/pages/CommunityManagement/CommunityProfile'),
+);
+const CommunityIntegrations = lazy(
+  () => import('views/pages/CommunityManagement/Integrations'),
+);
+const CommunityTopics = lazy(
+  () => import('views/pages/CommunityManagement/Topics'),
+);
+
 const SnapshotProposalPage = lazy(
   () => import('views/pages/snapshot_proposals'),
 );
@@ -80,7 +94,7 @@ const ViewSnapshotsProposalPage = lazy(
   () => import('views/pages/view_snapshot_proposal'),
 );
 const NewSnapshotProposalPage = lazy(
-  () => import('views/pages/new_snapshot_proposal'),
+  () => import('views/pages/new_snapshot_proposal/NewSnapshotProposalPage'),
 );
 const AdminPanelPage = lazy(() => import('views/pages/AdminPanel'));
 
@@ -398,10 +412,55 @@ const CommonDomainRoutes = () => [
   />,
 
   // ADMIN
+  ...(featureFlags.newAdminOnboardingEnabled
+    ? [
+        <Route
+          key="/:scope/manage/profile"
+          path="/:scope/manage/profile"
+          element={withLayout(CommunityProfile, {
+            scoped: true,
+          })}
+        />,
+        <Route
+          key="/:scope/manage/integrations"
+          path="/:scope/manage/integrations"
+          element={withLayout(CommunityIntegrations, {
+            scoped: true,
+          })}
+        />,
+        <Route
+          key="/:scope/manage/topics"
+          path="/:scope/manage/topics"
+          element={withLayout(CommunityTopics, {
+            scoped: true,
+          })}
+        />,
+        <Route
+          key="/:scope/manage/moderators"
+          path="/:scope/manage/moderators"
+          element={withLayout(CommunityAdminAndModerators, {
+            scoped: true,
+          })}
+        />,
+      ]
+    : [
+        <Route
+          key="/:scope/manage"
+          path="/:scope/manage"
+          element={withLayout(ManageCommunityPage, {
+            scoped: true,
+          })}
+        />,
+        <Route
+          key="/manage"
+          path="/manage"
+          element={withLayout(ManageCommunityPage, {})}
+        />,
+      ]),
   <Route
-    key="/:scope/manage"
-    path="/:scope/manage"
-    element={withLayout(ManageCommunityPage, {
+    key="/:scope/analytics"
+    path="/:scope/analytics"
+    element={withLayout(AnalyticsPage, {
       scoped: true,
     })}
   />,
@@ -409,18 +468,6 @@ const CommonDomainRoutes = () => [
     key="/discord-callback"
     path="/discord-callback"
     element={withLayout(DiscordCallbackPage, {
-      scoped: true,
-    })}
-  />,
-  <Route
-    key="/manage"
-    path="/manage"
-    element={withLayout(ManageCommunityPage, {})}
-  />,
-  <Route
-    key="/:scope/analytics"
-    path="/:scope/analytics"
-    element={withLayout(AnalyticsPage, {
       scoped: true,
     })}
   />,

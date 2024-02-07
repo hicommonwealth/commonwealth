@@ -1,3 +1,4 @@
+import { ContentType } from '@hicommonwealth/core';
 import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
@@ -15,7 +16,6 @@ import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/view_thread/index.scss';
 import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
 import {
@@ -26,7 +26,6 @@ import {
   useAddThreadLinksMutation,
   useGetThreadsByIdQuery,
 } from 'state/api/threads';
-import { ContentType } from 'types';
 import { slugify } from 'utils';
 import ExternalLink from 'views/components/ExternalLink';
 import useJoinCommunity from 'views/components/Header/useJoinCommunity';
@@ -108,8 +107,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
-  const [searchParams] = useSearchParams();
-  const shouldFocusCommentEditor = !!searchParams.get('focusEditor');
 
   const { data: groups = [] } = useFetchGroupsQuery({
     communityId: app.activeChainId(),
@@ -252,7 +249,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     // load view count
     axios
       .post(`${app.serverUrl()}/viewCount`, {
-        chain: app.activeChainId(),
+        community_id: app.activeChainId(),
         object_id: thread.id,
       })
       .then((response) => {
@@ -495,7 +492,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       }
                       slug={linkedTemplates[0]?.identifier.split('/')[2]}
                       setTemplateNickname={null}
-                      isForm={true}
+                      isForm
                     />
                   )}
                 {thread.readOnly || fromDiscordBot ? (
@@ -529,7 +526,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     <CreateComment
                       rootThread={thread}
                       canComment={canComment}
-                      shouldFocusEditor={shouldFocusCommentEditor}
                       tooltipText={disabledActionsTooltipText}
                     />
                     {foundGatedTopic &&

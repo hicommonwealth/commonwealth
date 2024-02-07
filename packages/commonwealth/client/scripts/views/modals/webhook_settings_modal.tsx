@@ -2,8 +2,11 @@ import {
   ChainBase,
   ChainNetwork,
   NotificationCategories,
+  WebhookCategory,
 } from '@hicommonwealth/core';
 import React, { useState } from 'react';
+import app from 'state';
+import '../../../styles/modals/webhook_settings_modal.scss';
 import type Webhook from '../../models/Webhook';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWText } from '../components/component_kit/cw_text';
@@ -13,10 +16,6 @@ import {
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
-
-import app from 'state';
-import { WebhookCategory } from 'types';
-import '../../../styles/modals/webhook_settings_modal.scss';
 
 type WebhookSettingsModalProps = {
   onModalClose: () => void;

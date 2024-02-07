@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "build",
+    "tsBuildInfoFile": "build/.tsbuildinfo",
+    "strict": true
+  },
+  "include": ["src"],
+  "references": [{ "path": "../core" }, { "path": "../chains" }]
+}
