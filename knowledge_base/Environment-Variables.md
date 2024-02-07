@@ -42,7 +42,6 @@ If you add a new environment variable, you must add documentation here. Please d
 - [ETHERSCAN_JS_API_KEY](#etherscan_js_api_key)
 - [FLAG_COMMUNITY_HOMEPAGE](#flag_community_homepage)
 - [FLAG_PROPOSAL_TEMPLATES](#flag_proposal_templates)
-- [FLAG_SIDEBAR_TOGGLE](#flag_sidebar_toggle)
 - [HEROKU_APP_NAME](#heroku_app_name)
 - [IS_CI](#is_ci)
 - [JWT_SECRET](#jwt_secret)
@@ -221,10 +220,6 @@ Boolean toggle to display side-wide homepage feature for communities. Temporary 
 ## FLAG_PROPOSAL_TEMPLATES
 
 Boolean toggle to display side-wide sidebar proposal templates. Temporary flag for 2.0 work.
-
-## FLAG_SIDEBAR_TOGGLE
-
-Boolean toggle to display site-wide discussions homepage sidebar. Temporary flag for 2.0 work.
 
 ## HEROKU_APP_NAME
 
