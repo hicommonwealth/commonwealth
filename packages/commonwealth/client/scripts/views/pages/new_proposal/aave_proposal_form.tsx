@@ -109,10 +109,6 @@ export const AaveProposalForm = () => {
       ipfsHash: _ipfsHash,
     };
 
-    // aave.governance
-    //   .propose(details)
-    //   .catch((err) => notifyError(err.data?.message || err.message));
-
     try {
       await aave.governance.propose(details);
       trackAnalytics({

@@ -175,12 +175,12 @@ export const VotingActions = (props: VotingActionsProps) => {
       try {
         await proposal.voteTx(new CosmosVote(user, 'No'));
         emitRedraw();
+        trackAnalytics({
+          event: MixpanelGovernanceEvents.COSMOS_VOTE_OCCURRED,
+        });
       } catch (err) {
         notifyError(err.toString());
       }
-      trackAnalytics({
-        event: MixpanelGovernanceEvents.COSMOS_VOTE_OCCURRED,
-      });
     } else if (proposal instanceof CompoundProposal) {
       try {
         await proposal.submitVoteWebTx(
@@ -203,15 +203,15 @@ export const VotingActions = (props: VotingActionsProps) => {
       } catch (err) {
         notifyError(err.toString());
       }
-      trackAnalytics({
-        event: MixpanelGovernanceEvents.SPUTNIK_VOTE_OCCURRED,
-      });
     } else if (proposal instanceof NearSputnikProposal) {
       try {
         await proposal.submitVoteWebTx(
           new NearSputnikVote(user, NearSputnikVoteString.Reject),
         );
         emitRedraw();
+        trackAnalytics({
+          event: MixpanelGovernanceEvents.SPUTNIK_VOTE_OCCURRED,
+        });
       } catch (err) {
         notifyError(err.toString());
       }

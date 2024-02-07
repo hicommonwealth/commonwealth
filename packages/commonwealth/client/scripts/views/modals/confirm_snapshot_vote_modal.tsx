@@ -63,16 +63,15 @@ export const ConfirmSnapshotVoteModal = (
         onModalClose();
         successCallback();
       });
+      trackAnalytics({
+        event: MixpanelSnapshotEvents.SNAPSHOT_VOTE_OCCURRED,
+      });
     } catch (err) {
       console.log(err);
       const errorMessage = err.message;
       notifyError(errorMessage);
     }
     setIsSaving(false);
-
-    trackAnalytics({
-      event: MixpanelSnapshotEvents.SNAPSHOT_VOTE_OCCURRED,
-    });
   };
 
   return (
