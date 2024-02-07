@@ -1,6 +1,7 @@
 import React from 'react';
 
 import 'components/sidebar/sidebar_quick_switcher.scss';
+import useBrowserWindow from '../../../hooks/useBrowserWindow';
 
 import ChainInfo from '../../../models/ChainInfo';
 
@@ -19,8 +20,9 @@ export const SidebarQuickSwitcher = ({
 }) => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
-  const { setMenu, menuVisible, menuName, setUserToggledVisibility } =
-    useSidebarStore();
+  const { setMenu } = useSidebarStore();
+
+  const { isWindowSmallInclusive } = useBrowserWindow({});
 
   const allCommunities = app.config.chains
     .getAll()
@@ -39,7 +41,9 @@ export const SidebarQuickSwitcher = ({
   return (
     <div className="SidebarQuickSwitcher">
       <div className="community-nav-bar">
-        {!isInsideCommunity && <div className="collapsable-button-space" />}
+        {!isInsideCommunity && !isWindowSmallInclusive && (
+          <div className="collapsable-button-space" />
+        )}
         {isLoggedIn && (
           <CWIconButton
             iconName="plusCirclePhosphor"
