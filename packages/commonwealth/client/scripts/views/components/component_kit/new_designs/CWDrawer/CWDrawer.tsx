@@ -1,51 +1,81 @@
-import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
+import clsx from 'clsx';
 import React, { ComponentProps } from 'react';
 import Drawer from 'react-modern-drawer';
-import 'react-modern-drawer/dist/index.css';
+
+import useBrowserWindow from 'hooks/useBrowserWindow';
+
 import { CWIcon } from '../../cw_icons/cw_icon';
 import { CWText } from '../../cw_text';
 import { ComponentType } from '../../types';
+
+import 'react-modern-drawer/dist/index.css';
 import './CWDrawer.scss';
 
 type CWDrawerProps = Omit<ComponentProps<typeof Drawer>, 'direction'> & {
   direction?: 'left' | 'right' | 'top' | 'bottom';
-  header: string;
+  header?: string;
 };
 
 export const CWDrawer = ({
-  direction,
+  direction = 'right',
   duration,
   open,
   onClose,
   children,
   header,
+  className,
+  size,
+  ...props
 }: CWDrawerProps) => {
   const { isWindowExtraSmall } = useBrowserWindow({});
+
+  const sideDirection = direction === 'right' || direction === 'left';
+
+  const getDrawerSize = () => {
+    if (size) {
+      return size;
+    }
+
+    if (sideDirection) {
+      return isWindowExtraSmall ? '90vw' : '50vw';
+    }
+
+    if (direction === 'bottom') {
+      return '50vh';
+    }
+  };
 
   return (
     <Drawer
       duration={duration}
-      size={isWindowExtraSmall ? '90vw' : '50vw'}
       open={open}
       onClose={onClose}
-      direction={direction || 'right'}
+      direction={direction}
       enableOverlay={true}
       overlayOpacity={0}
-      className={ComponentType.Drawer}
-      // moves the drawer below the top navigation bar
-      style={{ top: '56px' }}
+      className={clsx(ComponentType.Drawer, className, {
+        'bottom-drawer': direction === 'bottom',
+      })}
+      size={getDrawerSize()}
+      {...props}
     >
-      <div className="drawer-actions">
-        <CWIcon
-          iconName="caretDoubleRight"
-          onClick={onClose}
-          iconSize="small"
-        />
-      </div>
-      <div className="content-container">
-        <CWText type="h3">{header}</CWText>
-        {children}
-      </div>
+      {sideDirection ? (
+        <>
+          <div className="drawer-actions">
+            <CWIcon
+              iconName="caretDoubleRight"
+              onClick={onClose}
+              iconSize="small"
+            />
+          </div>
+          <div className="content-container">
+            <CWText type="h3">{header}</CWText>
+            {children}
+          </div>
+        </>
+      ) : (
+        children
+      )}
     </Drawer>
   );
 };

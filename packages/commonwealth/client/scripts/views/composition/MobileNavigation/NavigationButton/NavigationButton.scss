@@ -1,11 +1,12 @@
 @import '../../../../../styles/shared.scss';
 
 .NavigationButton {
+  cursor: pointer;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 4px 16px 0px;
+  padding: 4px 16px 0;
 
   svg {
     fill: $neutral-600;

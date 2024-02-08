@@ -81,6 +81,7 @@ export const ViewUpvotesDrawer = ({
         onClick={() => setIsUpvoteDrawerOpen(true)}
       />
       <CWDrawer
+        className="upvote-drawer"
         open={isUpvoteDrawerOpen}
         header={header}
         onClose={() => setIsUpvoteDrawerOpen(false)}
