@@ -82,6 +82,9 @@ export const EditBody = (props: EditBodyProps) => {
             buttonHeight: 'sm',
           },
         ],
+        onClose: () => {
+          return;
+        },
       });
     } else {
       cancelEditing();

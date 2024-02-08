@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { nextTick } from 'process';
 import { RangeStatic } from 'quill';
 import ImageUploader from 'quill-image-uploader';
@@ -121,14 +122,14 @@ const ReactQuillEditor = ({
     } as SerializableDeltaStatic);
   };
 
-  useEffect(() => {
+  useNecessaryEffect(() => {
     if (!editorRef.current) {
       return;
     }
 
     const editor = editorRef.current?.getEditor();
 
-    if (!contentDelta?.___isMarkdown) {
+    if (!contentDelta.___isMarkdown) {
       const isContentAvailable =
         getTextFromDelta(editor.getContents()).length > 0;
 
@@ -168,12 +169,11 @@ const ReactQuillEditor = ({
             },
           ],
           onClose: () => {
-            cancelEditing();
+            return;
           },
         });
       }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    } // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleDragStart = () => setIsDraggingOver(true);
