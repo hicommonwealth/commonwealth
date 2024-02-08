@@ -46,16 +46,17 @@ const MobileNavigation = () => {
   ];
 
   return (
-    <div className="MobileNavigation">
-      {navigationConfig.map(({ type, selected, onClick }) => (
-        <NavigationButton
-          key={type}
-          type={type}
-          selected={selected}
-          onClick={onClick}
-        />
-      ))}
-
+    <>
+      <div className="MobileNavigation">
+        {navigationConfig.map(({ type, selected, onClick }) => (
+          <NavigationButton
+            key={type}
+            type={type}
+            selected={selected}
+            onClick={onClick}
+          />
+        ))}
+      </div>
       <CWDrawer
         size="200px"
         direction="bottom"
@@ -64,7 +65,7 @@ const MobileNavigation = () => {
       >
         <CreateContentDrawer onClose={() => setIsDrawerOpen(false)} />
       </CWDrawer>
-    </div>
+    </>
   );
 };
 
