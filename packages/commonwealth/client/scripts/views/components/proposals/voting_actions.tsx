@@ -1,4 +1,3 @@
-import { useBrowserAnalyticsTrack } from 'client/scripts/hooks/useBrowserAnalyticsTrack';
 import 'components/proposals/voting_actions.scss';
 import { notifyError } from 'controllers/app/notifications';
 import type CosmosAccount from 'controllers/chain/cosmos/account';
@@ -24,9 +23,10 @@ import {
   NearSputnikVoteString,
 } from 'controllers/chain/near/sputnik/types';
 import React, { useEffect, useState } from 'react';
-import { MixpanelGovernanceEvents } from '../../../../../shared/analytics/types';
 import type { AnyProposal } from '../../../models/types';
 import { VotingType } from '../../../models/types';
+import { MixpanelGovernanceEvents } from '/analytics/types';
+import { useBrowserAnalyticsTrack } from '/hooks/useBrowserAnalyticsTrack';
 
 import app from 'state';
 

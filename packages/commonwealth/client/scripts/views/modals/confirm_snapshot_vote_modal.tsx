@@ -2,8 +2,6 @@ import React from 'react';
 
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import { formatNumberShort } from '../../../../shared/adapters/currency';
-import { MixpanelSnapshotEvents } from '../../../../shared/analytics/types';
 import '../../../styles/modals/confirm_snapshot_vote_modal.scss';
 import { notifyError } from '../../controllers/app/notifications';
 import { castVote } from '../../helpers/snapshot_utils';
@@ -15,6 +13,8 @@ import {
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
+import { formatNumberShort } from '/adapters/currency';
+import { MixpanelSnapshotEvents } from '/analytics/types';
 
 type ConfirmSnapshotVoteModalProps = {
   id: string;
