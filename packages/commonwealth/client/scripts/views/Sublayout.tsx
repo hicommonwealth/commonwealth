@@ -13,6 +13,7 @@ import { SublayoutBanners } from './SublayoutBanners';
 import { SublayoutHeader } from './SublayoutHeader';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
+import { ValentineGrowl } from './components/ValentineGrowl';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
 
 type SublayoutProps = {
@@ -104,6 +105,7 @@ const Sublayout = ({
             )}
           </div>
         </div>
+        <ValentineGrowl />
       </div>
     </div>
   );
