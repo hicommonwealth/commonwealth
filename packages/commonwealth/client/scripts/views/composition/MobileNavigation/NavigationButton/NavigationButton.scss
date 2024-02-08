@@ -1,0 +1,19 @@
+@import '../../../../../styles/shared.scss';
+
+.NavigationButton {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 4px 16px 0px;
+
+  svg {
+    fill: $neutral-600;
+  }
+
+  .Text {
+    font-size: 8px;
+    color: $neutral-500;
+    line-height: 16px;
+  }
+}

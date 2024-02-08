@@ -14,6 +14,7 @@ import { SublayoutHeader } from './SublayoutHeader';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
+import MobileNavigation from './composition/MobileNavigation';
 
 type SublayoutProps = {
   hideFooter?: boolean;
@@ -112,6 +113,7 @@ const Sublayout = ({
           )}
         </div>
       </div>
+      {isWindowExtraSmall && <MobileNavigation />}
     </div>
   );
 };

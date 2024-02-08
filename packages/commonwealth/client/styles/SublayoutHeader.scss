@@ -15,6 +15,7 @@ html.todesktop .SublayoutHeader {
   align-items: center;
   position: absolute;
   width: 100%;
+  border-bottom: 1px solid $neutral-200;
 
   .right-side {
     display: flex;
