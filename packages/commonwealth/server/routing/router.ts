@@ -1285,11 +1285,11 @@ function setupRouter(
   );
 
   app.use(endpoint, router);
+
   // ddd-routes
-  app.use('/', ddd);
+  app.use('/ddd', ddd);
+
   app.use(methodNotAllowedMiddleware());
-  // catch-all and format errors - TODO: fix unit tests
-  // app.use(errorMiddleware);
 }
 
 export default setupRouter;

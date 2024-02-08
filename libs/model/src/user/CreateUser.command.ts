@@ -1,7 +1,7 @@
 import { type CommandMetadata } from '@hicommonwealth/core';
 import { z } from 'zod';
 import { models } from '../database';
-import { MustNotExist } from '../middleware/invariants';
+import { mustNotExist } from '../middleware/guards';
 import type { UserAttributes } from '../models';
 
 export const schema = z.object({
@@ -14,7 +14,7 @@ export const CreateUser: CommandMetadata<UserAttributes, typeof schema> = {
   body: async ({ id, payload }) => {
     const user = await models.User.findOne({ where: { id } });
 
-    MustNotExist('User', user);
+    mustNotExist('User', user);
 
     //await models.User.create(payload)
     return payload as Partial<UserAttributes>;

@@ -16,7 +16,10 @@ export const query = async <T, P extends ZodSchema>(
   actor: Actor,
 ): Promise<T | undefined> => {
   try {
-    const context: QueryContext<P> = { actor, payload: schema.parse(payload) };
+    const validated = Object.fromEntries(
+      Object.entries(schema.parse(payload)).filter(([, v]) => v !== undefined),
+    );
+    const context: QueryContext<P> = { actor, payload: validated };
     for (const fn of auth) {
       await fn(context);
     }
