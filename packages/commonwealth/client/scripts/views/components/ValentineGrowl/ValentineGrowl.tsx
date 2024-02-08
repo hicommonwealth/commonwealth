@@ -21,7 +21,7 @@ const ValentineGrowl = () => {
 
   const openInviteInCalender = () => {
     const link = document.createElement('a');
-    link.href = 'webcal://static/invites/common-community-call.ics';
+    link.href = `webcal://${window.location.host}/static/invites/common-community-call.ics`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
