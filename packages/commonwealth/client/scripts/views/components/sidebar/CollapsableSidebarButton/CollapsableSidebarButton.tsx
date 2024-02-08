@@ -28,10 +28,9 @@ export const CollapsableSidebarButton = ({
         })}
       >
         <CWIconButton
-          iconButtonTheme="black"
+          iconButtonTheme="neutral"
           iconName="caretDoubleLeft"
           onClick={handleToggle}
-          iconSize="small"
           className={clsx('hover-image', {
             'expand-scoped': menuVisible && isInsideCommunity,
             'expand-unscoped': menuVisible && !isInsideCommunity,

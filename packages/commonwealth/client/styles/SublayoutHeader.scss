@@ -19,6 +19,12 @@ html.todesktop .SublayoutHeader {
   .right-side {
     display: flex;
     margin-left: auto;
+    gap: 24px;
+    margin-right: 14px;
+
+    .Avatar {
+      border: 1px solid $neutral-200;
+    }
   }
 }
 

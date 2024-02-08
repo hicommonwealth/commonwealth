@@ -17,6 +17,10 @@
       flex-direction: column;
       transition: margin-left 0.2s ease-in-out;
 
+      @include extraSmall {
+        margin-top: 48px;
+      }
+
       &.resizing {
         transition: none;
       }

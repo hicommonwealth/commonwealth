@@ -9,6 +9,7 @@ import useSidebarStore from 'state/ui/sidebar';
 import UserDropdown from 'views/components/Header/UserDropdown/UserDropdown';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import CollapsableSidebarButton from 'views/components/sidebar/CollapsableSidebarButton';
+import { User } from 'views/components/user/user';
 import { HelpMenuPopover } from 'views/menus/help_menu';
 import { FeedbackModal } from 'views/modals/feedback_modal';
 import { LoginModal } from 'views/modals/login_modal';
@@ -53,6 +54,8 @@ export const SublayoutHeader = ({
     setRecentlyUpdatedVisibility(menuVisible);
   }, [menuVisible, setRecentlyUpdatedVisibility]);
 
+  const user = app.user.addresses[0];
+
   function handleToggle() {
     const isVisible = !menuVisible;
     setMenu({ name: menuName, isVisible });
@@ -74,8 +77,13 @@ export const SublayoutHeader = ({
         )}
 
         <div className="right-side">
-          <div>glass icon</div>
-          <div>profile</div>
+          <CWIconButton iconName="magnifyingGlass" iconButtonTheme="neutral" />
+          <User
+            shouldShowAvatarOnly
+            avatarSize={24}
+            userAddress={user?.address}
+            userCommunityId={user?.community?.id}
+          />
         </div>
       </div>
     );
@@ -129,7 +137,7 @@ export const SublayoutHeader = ({
             />
           </div>
           <div
-            className={clsx('DesktopMenuContainer', 'session-keys', {
+            className={clsx('DesktopMenuContainer', {
               isLoggedIn,
             })}
           >

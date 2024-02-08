@@ -46,7 +46,7 @@ export const SidebarQuickSwitcher = ({
         {isLoggedIn && (
           <CWIconButton
             iconName="plusCirclePhosphor"
-            iconButtonTheme="black"
+            iconButtonTheme="neutral"
             onClick={() => {
               setMenu({ name: 'createContent' });
             }}
@@ -54,7 +54,7 @@ export const SidebarQuickSwitcher = ({
         )}
         <CWIconButton
           iconName="compassPhosphor"
-          iconButtonTheme="black"
+          iconButtonTheme="neutral"
           onClick={() => {
             setMenu({ name: 'exploreCommunities' });
           }}

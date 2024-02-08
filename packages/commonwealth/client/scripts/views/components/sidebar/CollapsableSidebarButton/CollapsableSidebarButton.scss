@@ -1,9 +1,15 @@
+@import '../../../../../styles/shared';
+
 .CollapsableSidebarButton {
-  // This is an invisible box that allows us to hover over it in order to make the collapsable button visible
+  svg {
+    fill: $neutral-500;
+  }
 
   &.onMobile {
-    margin-left: 20px;
+    margin-left: 16px;
 
+    // This is an invisible box that allows us to hover over
+    // it in order to make the collapsable button visible
     .hover-box {
       position: static;
       height: auto;
@@ -40,7 +46,7 @@
 
     .collapse-unscoped {
       left: 16px;
-      top: 70px;
+      top: 68px;
       transform: rotate(-180deg);
       transition: 0.2s linear;
       opacity: 0;
@@ -54,8 +60,8 @@
     }
 
     .expand-unscoped {
-      left: 20px;
-      top: 70px;
+      left: 16px;
+      top: 68px;
       transform: rotate(0deg);
       transition: 0.2s linear;
       position: absolute;
@@ -68,7 +74,7 @@
       transform: rotate(-180deg);
       transition: 0.2s linear;
       left: 10px;
-      top: 71px;
+      top: 68px;
       z-index: 5;
       opacity: 0;
       pointer-events: auto;
@@ -83,7 +89,7 @@
       transform: rotate(0deg);
       transition: 0.2s linear;
       left: 257px;
-      top: 71px;
+      top: 68px;
       z-index: 5;
       pointer-events: auto;
     }
