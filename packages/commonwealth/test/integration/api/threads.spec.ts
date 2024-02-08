@@ -3,9 +3,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable global-require */
 /* eslint-disable no-unused-expressions */
+import { tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from 'server/config';
 import { Errors as CreateThreadErrors } from 'server/controllers/server_threads_methods/create_thread';
@@ -15,7 +15,7 @@ import { Errors as EditThreadHandlerErrors } from 'server/routes/threads/update_
 import { Errors as ViewCountErrors } from 'server/routes/viewCount';
 import sleep from 'sleep-promise';
 import * as modelUtils from 'test/util/modelUtils';
-import app, { resetDatabase } from '../../../server-test';
+import app from '../../../server-test';
 import { markdownComment } from '../../util/fixtures/markdownComment';
 
 chai.use(chaiHttp);
@@ -51,7 +51,7 @@ describe.skip('Thread Tests', () => {
   let thread;
 
   before(async () => {
-    await resetDatabase();
+    await tester.seedDb();
     topicId = await modelUtils.getTopicId({ chain });
     let res = await modelUtils.createAndVerifyAddress({ chain });
     adminAddress = res.address;

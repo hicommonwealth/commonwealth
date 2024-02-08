@@ -2,9 +2,9 @@ import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import React, { ComponentProps } from 'react';
 import Drawer from 'react-modern-drawer';
 import 'react-modern-drawer/dist/index.css';
-import { CWIcon } from '../../cw_icons/cw_icon';
 import { CWText } from '../../cw_text';
 import { ComponentType } from '../../types';
+import CWIconButton from '../CWIconButton';
 import './CWDrawer.scss';
 
 type CWDrawerProps = Omit<ComponentProps<typeof Drawer>, 'direction'> & {
@@ -36,10 +36,10 @@ export const CWDrawer = ({
       style={{ top: '56px' }}
     >
       <div className="drawer-actions">
-        <CWIcon
+        <CWIconButton
           iconName="caretDoubleRight"
           onClick={onClose}
-          iconSize="small"
+          buttonSize="sm"
         />
       </div>
       <div className="content-container">

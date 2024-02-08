@@ -22,10 +22,13 @@ const AdminsAndModerators = () => {
 
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
-  const { data: { admins: returnedAdmins, mods: returnedMods } = {} } =
-    useFetchAdminQuery({
-      communityId: app.activeChainId(),
-    });
+  const {
+    data: { admins: returnedAdmins, mods: returnedMods } = {},
+    isLoading: isFetchAdminQueryLoading,
+    refetch: refetchAdminData,
+  } = useFetchAdminQuery({
+    communityId: app.activeChainId(),
+  });
 
   const { data: searchResults, refetch } = useSearchProfilesQuery({
     communityId: app.activeChainId(),
@@ -35,6 +38,7 @@ const AdminsAndModerators = () => {
     orderDirection: APIOrderDirection.Desc,
     includeRoles: true,
   });
+
   const roleData = useMemo(() => {
     if (!searchResults?.pages?.length) {
       return [];
@@ -50,13 +54,13 @@ const AdminsAndModerators = () => {
   }, [searchResults]);
 
   useEffect(() => {
-    if (returnedAdmins && returnedAdmins.length > 0) {
+    if (!isFetchAdminQueryLoading && returnedAdmins.length > 0) {
       setAdmins(returnedAdmins);
     }
-    if (returnedMods && returnedMods.length > 0) {
+    if (!isFetchAdminQueryLoading && returnedMods.length > 0) {
       setMods(returnedMods);
     }
-  }, [returnedAdmins, returnedMods]);
+  }, [returnedAdmins, returnedMods, isFetchAdminQueryLoading]);
 
   const handleRoleUpdate = (oldRole, newRole) => {
     // newRole doesn't have the Address property that oldRole has,
@@ -108,6 +112,7 @@ const AdminsAndModerators = () => {
       }
     }
     refetch();
+    refetchAdminData();
   };
 
   return (
@@ -121,28 +126,32 @@ const AdminsAndModerators = () => {
         moderators can only make changes to content by locking and deleting.`,
       }}
     >
-      <section className="admins-moderators">
-        <ManageRoles
-          label="Admins"
-          roledata={admins}
-          onRoleUpdate={handleRoleUpdate}
-        />
-        <ManageRoles
-          label="Moderators"
-          roledata={mods}
-          onRoleUpdate={handleRoleUpdate}
-        />
-        <CWText type="caption" className={ComponentType.Label}>
-          Members
-        </CWText>
+      {isFetchAdminQueryLoading ? (
+        <p>Loading admins and moderators...</p>
+      ) : (
+        <section className="admins-moderators">
+          <ManageRoles
+            label="Admins"
+            roledata={admins}
+            onRoleUpdate={handleRoleUpdate}
+          />
+          <ManageRoles
+            label="Moderators"
+            roledata={mods}
+            onRoleUpdate={handleRoleUpdate}
+          />
+          <CWText type="caption" className={ComponentType.Label}>
+            Members
+          </CWText>
 
-        <UpgradeRolesForm
-          roleData={roleData}
-          onRoleUpdate={handleRoleUpdate}
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-        />
-      </section>
+          <UpgradeRolesForm
+            roleData={roleData}
+            onRoleUpdate={handleRoleUpdate}
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+          />
+        </section>
+      )}
     </CommunityManagementLayout>
   );
 };

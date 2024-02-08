@@ -202,9 +202,9 @@
 <line y1="-0.5" x2="940.008" y2="-0.5" transform="matrix(0.999994 -0.00349542 0.00315764 0.999995 50 432)" stroke="#47494D"/>
 <line y1="-0.5" x2="940.008" y2="-0.5" transform="matrix(0.999994 -0.00349542 0.00315764 0.999995 50 747)" stroke="#47494D"/>
 <line y1="-0.5" x2="940.008" y2="-0.5" transform="matrix(0.999994 -0.00349542 0.00315764 0.999995 50 1061)" stroke="#47494D"/>
-<rect x="594" y="32" width="42" height="42" fill="url(#pattern0)"/>
-<rect x="755" y="32" width="42" height="42" fill="url(#pattern1)"/>
-<rect x="916" y="27" width="51" height="51" fill="url(#pattern2)"/>
+<rect x="594" y="32" width="42" height="42" fill="url(#patternWealthTable1)"/>
+<rect x="755" y="32" width="42" height="42" fill="url(#patternWealthTable2)"/>
+<rect x="916" y="27" width="51" height="51" fill="url(#patternWealthTable3)"/>
 <defs>
 <filter id="filter0_d" x="0" y="84" width="1040" height="1072" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
 <feFlood flood-opacity="0" result="BackgroundImageFix"/>
@@ -280,13 +280,13 @@
 <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
 <feGaussianBlur stdDeviation="5" result="effect1_foregroundBlur"/>
 </filter>
-<pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">
+<pattern id="patternWealthTable1" patternContentUnits="objectBoundingBox" width="1" height="1">
 <use xlink:href="#image0" transform="scale(0.000976562)"/>
 </pattern>
-<pattern id="pattern1" patternContentUnits="objectBoundingBox" width="1" height="1">
+<pattern id="patternWealthTable2" patternContentUnits="objectBoundingBox" width="1" height="1">
 <use xlink:href="#image1" transform="translate(0 -0.00433839) scale(0.0021692)"/>
 </pattern>
-<pattern id="pattern2" patternContentUnits="objectBoundingBox" width="1" height="1">
+<pattern id="patternWealthTable3" patternContentUnits="objectBoundingBox" width="1" height="1">
 <use xlink:href="#image2" transform="scale(0.00195312)"/>
 </pattern>
 <linearGradient id="paint0_linear" x1="416" y1="139.391" x2="385.453" y2="171" gradientUnits="userSpaceOnUse">

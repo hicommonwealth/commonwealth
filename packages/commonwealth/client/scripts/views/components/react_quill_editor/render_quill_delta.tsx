@@ -2,8 +2,6 @@ import React, { ReactElement } from 'react';
 
 import { loadScript } from 'helpers';
 import { preprocessQuillDeltaForRendering } from '../../../../../shared/utils';
-import app from 'state';
-import { Browser } from '@capacitor/browser';
 
 type TempList = Array<
   Array<{
@@ -17,7 +15,7 @@ type TempList = Array<
 
 const getGroupTag = (
   group: { listtype: string },
-  collapse: boolean
+  collapse: boolean,
 ): ['span' | 'ul' | 'ol' | 'div', string?] => {
   if (collapse) return ['span'];
   if (group.listtype === 'bullet') return ['ul'];
@@ -31,7 +29,7 @@ const getParentTag = (
   parent: {
     attributes: { list?: string };
   },
-  collapse: boolean
+  collapse: boolean,
 ): ['span' | 'li' | 'div', ('checked' | 'unchecked')?] => {
   if (collapse) return ['span'];
   if (parent.attributes?.list === 'bullet') return ['li'];
@@ -70,7 +68,7 @@ export const renderQuillDelta = (
   hideFormatting = false,
   collapse = false,
   openLinksInNewTab = false,
-  navigate
+  navigate,
 ) => {
   // convert quill delta into a tree of {block -> parent -> child} nodes
   // blocks are <ul> <ol>, parents are all other block nodes, children are inline nodes
@@ -141,21 +139,18 @@ export const renderQuillDelta = (
                         target={openLinksInNewTab ? '_blank' : ''}
                         rel="noopener noreferrer"
                         onClick={async (e) => {
-                          if (app.isNative(window)) {
-                            await Browser.open({ url: child.attributes.link });
-                          }
                           if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey)
                             return;
                           if (
                             child.attributes.link.startsWith(
-                              `${document.location.origin}/`
+                              `${document.location.origin}/`,
                             )
                           ) {
                             // don't open a new window if the link is on Commonwealth
                             e.preventDefault();
                             e.stopPropagation();
                             const navigateTo = child.attributes.link.split(
-                              `${document.location.origin}`
+                              `${document.location.origin}`,
                             )[1];
                             navigate(navigateTo, {}, null);
                           }
@@ -175,7 +170,7 @@ export const renderQuillDelta = (
                 })}
               </ParentTag>
             );
-          })
+          }),
         );
       })
     : consolidateOrderedLists(groups).map((group) => {
@@ -244,14 +239,14 @@ export const renderQuillDelta = (
                   if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
                   if (
                     child.attributes.link.startsWith(
-                      `${document.location.origin}/`
+                      `${document.location.origin}/`,
                     )
                   ) {
                     // don't open a new window if the link is on Commonwealth
                     e.preventDefault();
                     e.stopPropagation();
                     const navigateTo = child.attributes.link.split(
-                      `${document.location.origin}`
+                      `${document.location.origin}`,
                     )[1];
                     navigate(navigateTo, {}, null);
                   }
@@ -373,7 +368,7 @@ export const renderQuillDelta = (
                   type="checkbox"
                   disabled
                   checked={isChecked}
-                />
+                />,
               );
             }
 
@@ -406,7 +401,7 @@ export const renderQuillDelta = (
                         </data.tag>
                       );
                     })}
-                  </GroupTag>
+                  </GroupTag>,
                 );
                 iiii++;
               }
@@ -433,7 +428,7 @@ export const renderQuillDelta = (
                     </data.tag>
                   );
                 })}
-              </GroupTag>
+              </GroupTag>,
             );
             iii++;
           }

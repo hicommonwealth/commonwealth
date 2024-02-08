@@ -1,11 +1,10 @@
-import { models } from '@hicommonwealth/model';
+import { models, tester } from '@hicommonwealth/model';
 import { assert } from 'chai';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
-import { resetDatabase } from '../../util/resetDatabase';
 
 describe('GetRelatedCommunities Tests', () => {
   before(async () => {
-    await resetDatabase();
+    await tester.seedDb();
   });
 
   it('Correctly returns nothing if base does not match chainNode', async () => {

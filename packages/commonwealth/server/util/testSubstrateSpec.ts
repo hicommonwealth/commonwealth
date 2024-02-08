@@ -1,5 +1,4 @@
-import { AppError, ServerError } from '@hicommonwealth/adapters';
-import { logger } from '@hicommonwealth/core';
+import { AppError, ServerError, logger } from '@hicommonwealth/core';
 import type { RegisteredTypes } from '@polkadot/types/types';
 import { constructSubstrateUrl } from '../../shared/substrate';
 

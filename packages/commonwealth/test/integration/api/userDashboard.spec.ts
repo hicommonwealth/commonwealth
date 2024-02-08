@@ -1,9 +1,9 @@
-import { models, ThreadAttributes } from '@hicommonwealth/model';
+import { models, tester, ThreadAttributes } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { Op } from 'sequelize';
-import app, { resetDatabase } from '../../../server-test';
+import app from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import { attributesOf } from '../../../server/util/sequelizeHelpers';
 import * as modelUtils from '../../util/modelUtils';
@@ -37,7 +37,7 @@ describe('User Dashboard API', () => {
   let topicId2: number;
 
   before('Reset database', async () => {
-    await resetDatabase();
+    await tester.seedDb();
 
     const topic = await models.Topic.findOne({
       where: {

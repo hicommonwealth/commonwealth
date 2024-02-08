@@ -37,13 +37,6 @@ If you add a script to the `package.json` file, please add documentation for it 
   - [lint-branch](#lint-branch)
   - [lint-branch-warnings](#lint-branch-warnings)
   - [style-lint](#style-lint)
-- [Mobile](#mobile)
-  - [build-android](#build-android)
-  - [build-ios](#build-ios)
-  - [open-android](#open-android)
-  - [open-ios](#open-ios)
-  - [start-android](#start-android)
-  - [start-ios](#start-ios)
 - [Other Services](#other-services)
   - [send-cosmos-notifs](#send-cosmos-notifs)
   - [send-notification-digest-emails](#send-notification-digest-emails)
@@ -272,56 +265,6 @@ Definition: `stylelint client/styles/*`
 Description: Lints SCSS files.
 
 Considerations: Why lint styles separately? Why not just include `.scss` file extension in [lint-branch](#lint-branch) and [lint-all](#lint-all) scripts (which currently only target `.ts` files)? **Flagged for possible removal.**
-
-## Mobile
-
-### build-android
-
-Definition: `NODE_ENV=mobile webpack --config webpack/webpack.config.mobile.js --progress && NODE_ENV=mobile npx cap sync android`
-
-Description: Uses Capacitor library to build app for Android based on webpack.config.mobile.js file.
-
-Contributor: Dillon Chen
-
-### build-ios
-
-Definition: `NODE_ENV=mobile webpack --config webpack/webpack.config.mobile.js --progress && NODE_ENV=mobile npx cap sync ios`
-
-Description: Uses Capacitor library to build app for iOS based on webpack.config.mobile.js file.
-
-Contributor: Dillon Chen
-
-### open-android
-
-Definition: `NODE_ENV=mobile npx cap open android`
-
-Description: Uses the Capacitor tool to build and run the app's Android project with a simulator.
-
-Contributor: Dillon Chen
-
-### open-ios
-
-Definition: `NODE_ENV=mobile npx cap open ios`
-
-Description: Uses the Capacitor tool to build and run the app's iOS project with a simulator.
-
-Contributor: Dillon Chen
-
-### start-android
-
-Definition: `npx cap run android`
-
-Description: Uses the Capacitor tool to build and run the app's Android project with a simulator.
-
-Contributor: Dillon Chen
-
-### start-ios
-
-Definition: `npx cap run ios`
-
-Description: Uses the Capacitor tool to build and run the app's iOS project with a simulator.
-
-Contributor: Dillon Chen
 
 ## Other services
 

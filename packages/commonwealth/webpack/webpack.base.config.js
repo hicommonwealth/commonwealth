@@ -58,11 +58,6 @@ module.exports = {
       ),
     }),
     new webpack.DefinePlugin({
-      'process.env.FLAG_SIDEBAR_TOGGLE': JSON.stringify(
-        process.env.FLAG_SIDEBAR_TOGGLE,
-      ),
-    }),
-    new webpack.DefinePlugin({
       'process.env.FLAG_PROPOSAL_TEMPLATES': JSON.stringify(
         process.env.FLAG_PROPOSAL_TEMPLATES,
       ),
@@ -73,6 +68,11 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env.FLAG_NEW_ADMIN_ONBOARDING': JSON.stringify(
         process.env.FLAG_NEW_ADMIN_ONBOARDING,
+      ),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.FLAG_NEW_SIGN_IN_MODAL': JSON.stringify(
+        process.env.FLAG_NEW_SIGN_IN_MODAL,
       ),
     }),
     new webpack.DefinePlugin({

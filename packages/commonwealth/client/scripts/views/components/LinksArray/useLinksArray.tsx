@@ -47,7 +47,6 @@ const useLinksArray = ({
       value: updatedLink.value.trim(),
       error: getLinkValidationError(updatedLink.value.trim()),
     };
-
     setLinks([...updatedLinks]);
   };
 

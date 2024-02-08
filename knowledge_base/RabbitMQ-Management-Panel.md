@@ -1,7 +1,7 @@
 # Access
 
 1. See [this FAQ][1] for instructions on getting your RabbitMQ Management panel URL.
-2. If you are running a local or Vultr instance of RabbitMQ the username is 'guest' and the password is 'guest'.
+2. If you are running a local instance of RabbitMQ the username is 'guest' and the password is 'guest'.
 
 # Queues
 
