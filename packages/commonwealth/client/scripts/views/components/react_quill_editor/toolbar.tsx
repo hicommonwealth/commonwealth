@@ -18,7 +18,6 @@ import 'components/react_quill/react_quill_editor.scss';
 import { DeltaStatic } from 'quill';
 import React, { MutableRefObject, useMemo } from 'react';
 import ReactQuill from 'react-quill';
-import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { SerializableDeltaStatic, renderToolbarIcon } from './utils';
 
 const quillIcons = ReactQuill.Quill.import('ui/icons');
@@ -51,23 +50,15 @@ const LIST_ITEM_PREFIX = {
 
 type CustomQuillToolbarProps = {
   toolbarId: string;
-  isMarkdownEnabled: boolean;
-  handleToggleMarkdown: () => void;
-  setIsPreviewVisible: React.Dispatch<React.SetStateAction<boolean>>;
   isDisabled?: boolean;
-  isPreviewDisabled: boolean;
 };
 
 export const CustomQuillToolbar = ({
   toolbarId,
-  setIsPreviewVisible,
-  handleToggleMarkdown,
-  isMarkdownEnabled,
   isDisabled = false,
-  isPreviewDisabled,
 }: CustomQuillToolbarProps) => (
   <div id={toolbarId} className="CustomQuillToolbar">
-    <div className={clsx('left-buttons', { isDisabled })}>
+    <div className={clsx('formatting-buttons-container', { isDisabled })}>
       <div className="section">
         <button className="ql-header" value={1} />
         <button className="ql-header" value={2} />
@@ -88,22 +79,6 @@ export const CustomQuillToolbar = ({
         <button className="ql-list" value="ordered" />
         <button className="ql-list" value="bullet" />
         <button className="ql-list" value="check" />
-      </div>
-    </div>
-    <div className={clsx('right-buttons', { isDisabled })}>
-      <button
-        className={clsx('markdown-button', { enabled: isMarkdownEnabled })}
-        onClick={handleToggleMarkdown}
-      >
-        Markdown
-      </button>
-      <div className="eye-icon">
-        <CWIconButton
-          iconName="eye"
-          iconSize="small"
-          onClick={() => setIsPreviewVisible(true)}
-          disabled={isPreviewDisabled}
-        />
       </div>
     </div>
   </div>
