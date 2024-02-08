@@ -22,6 +22,10 @@ Some CHAINS use modules rather than CONTRACTS. Modules are used predominantly wi
 
 ## Common App
 
+### Bridge
+
+The Product Team uses "bridge" and "bridging" language, in user-facing comms, to refer to implementation-agnostic, cross-platform integrations such as [Discobot](./Discobot.md) and Farcaster.
+
 ### Comment
 
 See [models/comment.ts](../libs/model/src/models/comment.ts).
