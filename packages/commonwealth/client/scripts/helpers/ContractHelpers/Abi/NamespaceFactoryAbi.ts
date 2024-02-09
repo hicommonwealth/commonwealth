@@ -20,6 +20,11 @@ export const namespaceFactoryAbi = [
         type: 'string',
       },
       {
+        internalType: 'string',
+        name: '_uri',
+        type: 'string',
+      },
+      {
         internalType: 'address',
         name: '_feeManager',
         type: 'address',

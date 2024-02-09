@@ -93,8 +93,9 @@ class NamespaceFactory extends ContractBase {
 
     let txReceipt;
     try {
+      const uri = `commonwealth.im/api/namespaceMetadata/${name}/{id}`;
       txReceipt = await this.contract.methods
-        .deployNamespace(name, feeManager, [])
+        .deployNamespace(name, uri, feeManager, [])
         .send({ from: walletAddress });
     } catch (error) {
       throw new Error('Transaction failed: ' + error);
