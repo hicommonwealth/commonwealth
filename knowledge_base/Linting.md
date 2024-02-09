@@ -12,12 +12,10 @@
 
 All linting commands should be run from root.
 
-- `yarn lint`
-  - Lints new code changes that have yet to be committed.
 - `yarn lint-all`
   - Lints all code (regardless of changes)
 - `yarn lint-branch`
-  - Lints all changes made in a branch (used in CI). This is the command most people will want to use.
+  - Lints all changes made in a branch (used in CI).
 
 ## Configuration
 
