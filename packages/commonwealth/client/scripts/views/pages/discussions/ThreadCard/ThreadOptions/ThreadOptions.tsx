@@ -1,4 +1,5 @@
 import { ViewThreadUpvotesDrawer } from 'client/scripts/views/components/UpvoteDrawer';
+import { featureFlags } from 'helpers/feature-flags';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import Thread from 'models/Thread';
 import React, { useState } from 'react';
@@ -86,7 +87,9 @@ export const ThreadOptions = ({
         }}
       >
         <div className="options-container">
-          {!upvoteDrawerBtnBelow && <ViewThreadUpvotesDrawer thread={thread} />}
+          {featureFlags.communityStake && !upvoteDrawerBtnBelow && (
+            <ViewThreadUpvotesDrawer thread={thread} />
+          )}
 
           {upvoteBtnVisible && thread && (
             <ReactionButton
@@ -136,7 +139,9 @@ export const ThreadOptions = ({
             />
           )}
         </div>
-        {upvoteDrawerBtnBelow && <ViewThreadUpvotesDrawer thread={thread} />}
+        {featureFlags.communityStake && upvoteDrawerBtnBelow && (
+          <ViewThreadUpvotesDrawer thread={thread} />
+        )}
       </div>
       {thread && <></>}
     </>

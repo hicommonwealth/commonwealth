@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import app from 'state';
 
 import { ViewCommentUpvotesDrawer } from 'client/scripts/views/components/UpvoteDrawer';
+import { featureFlags } from 'helpers/feature-flags';
 import type Comment from 'models/Comment';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
@@ -179,7 +180,9 @@ export const CommentCard = ({
                 onReaction={handleReaction}
               />
 
-              <ViewCommentUpvotesDrawer comment={comment} />
+              {featureFlags.communityStake && (
+                <ViewCommentUpvotesDrawer comment={comment} />
+              )}
 
               <SharePopover commentId={comment.id} />
 
