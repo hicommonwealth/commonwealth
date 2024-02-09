@@ -1,6 +1,10 @@
-import { INVALID_INPUT_ERROR, stats } from '@hicommonwealth/core';
+import {
+  INVALID_ACTOR_ERROR,
+  INVALID_INPUT_ERROR,
+  stats,
+} from '@hicommonwealth/core';
 import { NextFunction, Request, Response } from 'express';
-import { BadRequest, InternalServerError } from './http';
+import { BadRequest, InternalServerError, Unauthorized } from './http';
 
 /**
  * Captures traffic and latency
@@ -19,7 +23,7 @@ export const statsMiddleware = (
       stats().histogram(`cw.path.latency`, latency, { path });
     });
   } catch (err: unknown) {
-    console.error(err);
+    console.error(err); // don't use logger port here
   }
   next();
 };
@@ -33,7 +37,7 @@ export const errorMiddleware = (
   res: Response,
   next: NextFunction,
 ): void => {
-  console.error(error);
+  console.error(error); // don't use logger port here
   if (res.headersSent) return next(error);
 
   let response = InternalServerError(
@@ -44,8 +48,18 @@ export const errorMiddleware = (
     switch (name) {
       case INVALID_INPUT_ERROR:
         response = BadRequest(message, 'details' in error && error.details);
+        break;
+
+      case INVALID_ACTOR_ERROR:
+        response = Unauthorized(message);
+        break;
+
+      default:
+        response = InternalServerError(
+          message,
+          process.env.NODE_ENV !== 'production' ? stack : undefined,
+        );
     }
-    response = InternalServerError(message, stack);
   }
   res.status(response.status).send(response);
 };

@@ -1,7 +1,7 @@
 import {
   Code,
   Image,
-  LinkSimple,
+  Link,
   ListBullets,
   ListChecks,
   ListNumbers,
@@ -14,14 +14,11 @@ import {
   TextStrikethrough,
 } from '@phosphor-icons/react';
 import clsx from 'clsx';
+import 'components/react_quill/react_quill_editor.scss';
 import { DeltaStatic } from 'quill';
 import React, { MutableRefObject, useMemo } from 'react';
 import ReactQuill from 'react-quill';
 import { SerializableDeltaStatic, renderToolbarIcon } from './utils';
-
-import 'components/react_quill/react_quill_editor.scss';
-
-import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 
 const quillIcons = ReactQuill.Quill.import('ui/icons');
 
@@ -34,9 +31,9 @@ Object.assign(quillIcons, {
   bold: renderToolbarIcon(TextB),
   italic: renderToolbarIcon(TextItalic),
   strike: renderToolbarIcon(TextStrikethrough),
-  link: renderToolbarIcon(LinkSimple),
+  link: renderToolbarIcon(Link),
   'code-block': renderToolbarIcon(Code),
-  blockquote: renderToolbarIcon(Quotes, { weight: 'fill' }),
+  blockquote: renderToolbarIcon(Quotes),
   image: renderToolbarIcon(Image),
   list: {
     ordered: renderToolbarIcon(ListNumbers),
@@ -53,23 +50,15 @@ const LIST_ITEM_PREFIX = {
 
 type CustomQuillToolbarProps = {
   toolbarId: string;
-  isMarkdownEnabled: boolean;
-  handleToggleMarkdown: () => void;
-  setIsPreviewVisible: React.Dispatch<React.SetStateAction<boolean>>;
   isDisabled?: boolean;
-  isPreviewDisabled: boolean;
 };
 
 export const CustomQuillToolbar = ({
   toolbarId,
-  setIsPreviewVisible,
-  handleToggleMarkdown,
-  isMarkdownEnabled,
   isDisabled = false,
-  isPreviewDisabled,
 }: CustomQuillToolbarProps) => (
   <div id={toolbarId} className="CustomQuillToolbar">
-    <div className={clsx('left-buttons', { isDisabled })}>
+    <div className={clsx('formatting-buttons-container', { isDisabled })}>
       <div className="section">
         <button className="ql-header" value={1} />
         <button className="ql-header" value={2} />
@@ -90,22 +79,6 @@ export const CustomQuillToolbar = ({
         <button className="ql-list" value="ordered" />
         <button className="ql-list" value="bullet" />
         <button className="ql-list" value="check" />
-      </div>
-    </div>
-    <div className={clsx('right-buttons', { isDisabled })}>
-      <button
-        className={clsx('markdown-button', { enabled: isMarkdownEnabled })}
-        onClick={handleToggleMarkdown}
-      >
-        Markdown
-      </button>
-      <div className="eye-icon">
-        <CWIconButton
-          iconName="eye"
-          iconSize="small"
-          onClick={() => setIsPreviewVisible(true)}
-          disabled={isPreviewDisabled}
-        />
       </div>
     </div>
   </div>

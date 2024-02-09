@@ -175,7 +175,9 @@ export const CommentCard = ({
               <CommentReactionButton
                 comment={comment}
                 disabled={!canReact}
-                tooltipText={disabledActionsTooltipText}
+                tooltipText={
+                  disabledActionsTooltipText ? 'Join community to upvote' : ''
+                }
                 onReaction={handleReaction}
               />
 
@@ -190,7 +192,7 @@ export const CommentCard = ({
                   disabled={maxReplyLimitReached || !canReply}
                   tooltipText={
                     disabledActionsTooltipText
-                      ? disabledActionsTooltipText
+                      ? 'Join community to reply'
                       : canReply && maxReplyLimitReached
                       ? 'Nested reply limit reached'
                       : ''
