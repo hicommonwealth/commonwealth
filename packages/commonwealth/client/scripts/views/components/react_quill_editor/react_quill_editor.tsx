@@ -87,7 +87,7 @@ const ReactQuillEditor = ({
 
   //Handles the incomplete notion checkbox syntax when pasting
   //We may end up expanding this hook to handle other pasting issues
-  const handleNotionPaste = useNotionPaste(setContentDelta);
+  const handleNotionPaste = useNotionPaste(setContentDelta, editorRef);
 
   // handle image upload for image toolbar button
   const { handleImageUploader } = useImageUploader({
