@@ -14,6 +14,7 @@ import QuillTooltip from './QuillTooltip';
 import { LoadingIndicator } from './loading_indicator';
 import { CustomQuillToolbar, useMarkdownToolbarHandlers } from './toolbar';
 import { convertTwitterLinksToEmbeds } from './twitter_embed';
+import { useNotionPaste } from './useNotionPaste';
 import { useImageDropAndPaste } from './use_image_drop_and_paste';
 import { useImageUploader } from './use_image_uploader';
 import { useMarkdownShortcuts } from './use_markdown_shortcuts';
@@ -83,6 +84,10 @@ const ReactQuillEditor = ({
     setContentDelta,
     setIsUploading,
   });
+
+  //Handles the incomplete notion checkbox syntax when pasting
+  //We may end up expanding this hook to handle other pasting issues
+  const handleNotionPaste = useNotionPaste(setContentDelta);
 
   // handle image upload for image toolbar button
   const { handleImageUploader } = useImageUploader({
@@ -275,6 +280,7 @@ const ReactQuillEditor = ({
                               },
                               clipboard: {
                                 matchVisual: false,
+                                handler: handleNotionPaste,
                               },
                               mention,
                               magicUrl: false,
