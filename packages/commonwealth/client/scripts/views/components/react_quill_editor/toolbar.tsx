@@ -217,15 +217,28 @@ export const useMarkdownToolbarHandlers = ({
     };
   };
 
-  const handleListText = (text, prefix) => {
+  // Handles selecting and formatting ordered lists
+  const handleListText = (text: string, prefix: string) => {
+    let counter = 1;
+    let hasIncremented = false;
+
     return text.split('\n').reduce((acc, line) => {
-      // remove empty lines
       if (line.trim().length === 0) {
         return acc;
       }
-      // don't add prefix if already has it
+
       if (line.startsWith(prefix)) {
         return acc + `${line.trim()}\n`;
+      }
+
+      if (prefix === '1.') {
+        const numberedPrefix = `${counter++}.`;
+        if (line.trim() === '' && !hasIncremented) {
+          hasIncremented = true; // Mark the counter as incremented
+          return acc + `${numberedPrefix} ${line}\n`;
+        }
+        hasIncremented = false;
+        return acc + `${numberedPrefix} ${line}\n`;
       }
       return acc + `${prefix} ${line}\n`;
     }, '');
@@ -242,6 +255,7 @@ export const useMarkdownToolbarHandlers = ({
         return;
       }
       const prefix = LIST_ITEM_PREFIX[value];
+
       if (!prefix) {
         throw new Error(`could not get prefix for value: ${value}`);
       }
