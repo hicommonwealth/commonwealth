@@ -190,7 +190,7 @@ export const useMarkdownToolbarHandlers = ({
     };
   };
 
-  // Handles selecting and formatting ordered lists
+  // // Handles selecting and formatting ordered lists
   const handleListText = (text: string, prefix: string) => {
     let counter = 1;
     let hasIncremented = false;
@@ -220,6 +220,7 @@ export const useMarkdownToolbarHandlers = ({
   const createListHandler = () => {
     return (value: string) => {
       const editor = editorRef?.current?.getEditor();
+
       if (!editor) {
         return;
       }
@@ -239,7 +240,7 @@ export const useMarkdownToolbarHandlers = ({
       if (text.length > 0) {
         newText = handleListText(text, prefix);
       } else {
-        newText = `${prefix} `;
+        editor.insertText(0, `${prefix} `);
       }
 
       editor.deleteText(selection.index, selection.length);
