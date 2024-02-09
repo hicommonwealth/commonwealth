@@ -217,6 +217,41 @@ export const useMarkdownToolbarHandlers = ({
     }, '');
   };
 
+  // const createListHandler = () => {
+  //   return (value: string) => {
+  //     const editor = editorRef?.current?.getEditor();
+  //
+  //     if (!editor) {
+  //       return;
+  //     }
+  //     const selection = editor.getSelection();
+  //     if (!selection) {
+  //       return;
+  //     }
+  //     const prefix = LIST_ITEM_PREFIX[value];
+  //
+  //     if (!prefix) {
+  //       throw new Error(`could not get prefix for value: ${value}`);
+  //     }
+  //     const text = editor.getText(selection.index, selection.length);
+  //
+  //     let newText;
+  //
+  //     if (text.length > 0) {
+  //       newText = handleListText(text, prefix);
+  //     } else {
+  //       editor.insertText(0, `${prefix} `);
+  //     }
+  //
+  //     editor.deleteText(selection.index, selection.length);
+  //     editor.insertText(selection.index, newText);
+  //     setContentDelta({
+  //       ...editor.getContents(),
+  //       ___isMarkdown: true,
+  //     } as SerializableDeltaStatic);
+  //   };
+  // };
+
   const createListHandler = () => {
     return (value: string) => {
       const editor = editorRef?.current?.getEditor();
@@ -224,27 +259,65 @@ export const useMarkdownToolbarHandlers = ({
       if (!editor) {
         return;
       }
+
       const selection = editor.getSelection();
+
       if (!selection) {
         return;
       }
+
       const prefix = LIST_ITEM_PREFIX[value];
 
       if (!prefix) {
         throw new Error(`could not get prefix for value: ${value}`);
       }
-      const text = editor.getText(selection.index, selection.length);
 
+      const text = editor.getText(selection.index, selection.length);
       let newText;
 
       if (text.length > 0) {
         newText = handleListText(text, prefix);
       } else {
-        editor.insertText(0, `${prefix} `);
+        editor.insertText(selection.index, `${prefix} `);
       }
 
+      // Detect Enter key press
+      editor.on('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault(); // Prevent default behavior of Enter key
+
+          const currentLineIndex = editor.getLines(selection.index, 1)[0].index;
+          const previousLineIndex = currentLineIndex - 1;
+
+          if (previousLineIndex >= 0) {
+            const previousLine = editor.getText(
+              previousLineIndex,
+              editor.getLine(previousLineIndex).length,
+            );
+
+            // Check if the previous line contains a list prefix
+            if (
+              Object.values(LIST_ITEM_PREFIX).some((listPrefix) =>
+                previousLine.trim().startsWith(listPrefix),
+              )
+            ) {
+              // Continue the list by inserting a new line with the same prefix
+              const nextPrefix = `${prefix} `;
+              editor.insertText(editor.getSelection().index, `\n${nextPrefix}`);
+              return;
+            }
+          }
+
+          // If the previous line doesn't contain a list prefix, insert a new list item
+          editor.insertText(editor.getSelection().index, `\n${prefix} `);
+        }
+      });
+
+      // Delete the selected text and insert the new list
       editor.deleteText(selection.index, selection.length);
       editor.insertText(selection.index, newText);
+
+      // Update contentDelta
       setContentDelta({
         ...editor.getContents(),
         ___isMarkdown: true,
