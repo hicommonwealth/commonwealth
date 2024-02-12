@@ -130,7 +130,6 @@ const ReactQuillEditor = ({
       ___isMarkdown: true,
     } as SerializableDeltaStatic);
   };
-  //
 
   useNecessaryEffect(() => {
     if (!editorRef.current) {
