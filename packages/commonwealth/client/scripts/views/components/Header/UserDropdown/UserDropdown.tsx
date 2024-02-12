@@ -29,8 +29,10 @@ import axios from 'axios';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import WebWalletController from 'controllers/app/web_wallets';
 import { setDarkMode } from 'helpers/darkMode';
+import { featureFlags } from 'helpers/feature-flags';
 import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
 import useGroupMutationBannerStore from 'state/ui/group';
+import { AuthModal } from 'views/modals/AuthModal';
 
 const resetWalletConnectSession = async () => {
   /**
@@ -61,7 +63,7 @@ const UserDropdown = () => {
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
     localStorage.getItem('dark-mode-state') === 'on',
   );
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [revalidationModalData, setRevalidationModalData] = useState<{
     walletSsoSource: WalletSsoSource;
     walletAddress: string;
@@ -126,7 +128,7 @@ const UserDropdown = () => {
                 {
                   type: 'default',
                   label: 'Connect a new address',
-                  onClick: () => setIsLoginModalOpen(true),
+                  onClick: () => setIsAuthModalOpen(true),
                 },
                 { type: 'divider' },
               ] as PopoverMenuItem[])
@@ -192,12 +194,21 @@ const UserDropdown = () => {
           </button>
         )}
       />
-      <CWModal
-        content={<LoginModal onModalClose={() => setIsLoginModalOpen(false)} />}
-        isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-        onClose={() => setIsLoginModalOpen(false)}
-        open={isLoginModalOpen}
-      />
+      {!featureFlags.newSignInModal ? (
+        <CWModal
+          content={
+            <LoginModal onModalClose={() => setIsAuthModalOpen(false)} />
+          }
+          isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
+          onClose={() => setIsAuthModalOpen(false)}
+          open={isAuthModalOpen}
+        />
+      ) : (
+        <AuthModal
+          onClose={() => setIsAuthModalOpen(false)}
+          isOpen={isAuthModalOpen}
+        />
+      )}
       <CWModal
         size="medium"
         content={

@@ -13,6 +13,9 @@ const AuthButton = ({
   onClick,
   className = '',
   disabled = false,
+  showDescription = true,
+  rounded = false,
+  variant = 'light',
 }: AuthButtonProps) => {
   const auth = AUTH_TYPES[type];
   const IconComp = auth.icon.isCustom ? CWCustomIcon : CWIcon;
@@ -21,23 +24,25 @@ const AuthButton = ({
     <button
       disabled={disabled}
       onClick={disabled ? null : onClick}
-      className={clsx('AuthButton', className)}
+      className={clsx('AuthButton', variant, className, { rounded })}
     >
       <IconComp className="icon" iconName={auth.icon.name as any} />
 
-      <CWText type="h5" className="label">
-        {auth.label}
-      </CWText>
+      <div className="info">
+        <CWText type="h5" className="label">
+          {auth.label}
+        </CWText>
 
-      {auth?.description && (
-        <CWTag
-          type="stage"
-          label={auth.description.text}
-          classNames={clsx('description', {
-            'no-bg': !auth.description.hasBackground,
-          })}
-        />
-      )}
+        {auth?.description && showDescription && (
+          <CWTag
+            type="stage"
+            label={auth.description.text}
+            classNames={clsx('description', {
+              'no-bg': !auth.description.hasBackground,
+            })}
+          />
+        )}
+      </div>
     </button>
   );
 };

@@ -25,6 +25,7 @@ export const CollapsableSidebarButton = ({
       <div
         className={clsx('hover-box', {
           expanded: isInsideCommunity && menuVisible,
+          collapsed: !menuVisible,
         })}
       >
         <CWIconButton

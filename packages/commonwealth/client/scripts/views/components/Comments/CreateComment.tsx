@@ -144,7 +144,7 @@ export const CreateComment = ({
             onCancel={handleCancel}
             author={author}
             editorValue={editorValue}
-            shouldFocus
+            shouldFocus={canComment}
             tooltipText={tooltipText}
           />
           {RevalidationModal}

@@ -7,7 +7,7 @@ const AuthButtonsShowcase = () => {
     <>
       <CWText type="h5">Regular</CWText>
       <div className="flex-row">
-        <AuthButton type="walletConnect" />
+        <AuthButton type="walletconnect" />
         <AuthButton type="keplr" />
         <AuthButton type="leap" />
         <AuthButton type="github" />
@@ -18,7 +18,7 @@ const AuthButtonsShowcase = () => {
       </div>
       <CWText type="h5">Disabled</CWText>
       <div className="flex-row">
-        <AuthButton type="walletConnect" disabled />
+        <AuthButton type="walletconnect" disabled />
         <AuthButton type="keplr" disabled />
       </div>
       <CWText type="h5">No wallet extension</CWText>

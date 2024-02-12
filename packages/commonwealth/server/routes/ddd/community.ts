@@ -5,13 +5,6 @@ import passport from 'passport';
 
 const router = Router();
 
-//router.put('/:id', expressCommand(Community.CreateCommunity));
-
-//router.post(
-//  '/set-community-namespace/:id',
-//  expressCommand(Community.SetCommunityNamespace),
-//);
-
 router.get(
   '/:community_id/stake/:stake_id?',
   passport.authenticate('jwt', { session: false }),

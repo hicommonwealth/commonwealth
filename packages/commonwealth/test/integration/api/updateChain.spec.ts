@@ -37,24 +37,28 @@ describe('UpdateChain Tests', () => {
     }) as UserInstance;
 
     let response = await controller.updateCommunity({
+      ...baseRequest,
       directory_page_enabled: true,
       directory_page_chain_node_id: 1,
-      ...baseRequest,
+      type: ChainType.Offchain,
       user: user,
     });
 
     assert.equal(response.directory_page_enabled, true);
     assert.equal(response.directory_page_chain_node_id, 1);
+    assert.equal(response.type, 'offchain');
 
     response = await controller.updateCommunity({
+      ...baseRequest,
       directory_page_enabled: false,
       directory_page_chain_node_id: null,
-      ...baseRequest,
+      type: ChainType.Chain,
       user: user,
     });
 
     assert.equal(response.directory_page_enabled, false);
     assert.equal(response.directory_page_chain_node_id, null);
+    assert.equal(response.type, 'chain');
   });
 
   it('Fails if namespace present but no transaction hash', async () => {

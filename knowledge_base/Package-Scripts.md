@@ -33,7 +33,6 @@ If you add a script to the `package.json` file, please add documentation for it 
   - [cosmos:stop](#cosmosstop)
 - [Linting & Formatting](#linting--formatting)
   - [format](#format)
-  - [lint](#lint)
   - [lint-all](#lint-all)
   - [lint-branch](#lint-branch)
   - [lint-branch-warnings](#lint-branch-warnings)
@@ -241,29 +240,17 @@ Definition: `prettier --ignore-path ../../.prettierignore --config ../../.pretti
 
 Description: Autoformats files using config `prettierrc.json` config.
 
-### lint
-
-Definition: `./scripts/lint-new-work.sh`
-
-Description: Lints new work, according to script file `lint-new-work.sh`.
-
-Considerations: Problematically, only checks .ts files. Name is misleading. Redundancy with [lint-branch](#lint-branch) script. **Flagged for possible removal.**
-
 ### lint-all
 
 Definition: `eslint client/\\**/*.{ts,tsx} server/\\**/*.ts`
 
-Description: Only lints changed files on current branch.
-
-Considerations: May be more clearly renamed "lint-changes".
+Description: Lints all TypeScript files within the `client` and `server` directories.
 
 ### lint-branch
 
 Definition: `./scripts/lint-branch.sh`
 
-Description: Redundant with [lint](#lint) script, which uses 'git status' instead of 'git diff' but is build toward the same action (isolating changed files for linting).
-
-Considerations: Recommend eliminating either [lint](#lint) or [lint-branch](#lint-branch) scripts. Problematically, lint-branch only checks .ts files. **Flagged for possible removal.**
+Description: Used in the CI. Lints updated files on the current branch.
 
 ### lint-branch-warnings
 
@@ -277,7 +264,7 @@ Definition: `stylelint client/styles/*`
 
 Description: Lints SCSS files.
 
-Considerations: Why lint styles separately? Why not just include `.scss` file extension in [lint](#lint) and [lint-all](#lint-all) scripts (which currently only target `.ts` files)? **Flagged for possible removal.**
+Considerations: Why lint styles separately? Why not just include `.scss` file extension in [lint-branch](#lint-branch) and [lint-all](#lint-all) scripts (which currently only target `.ts` files)? **Flagged for possible removal.**
 
 ## Other services
 

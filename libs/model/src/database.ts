@@ -42,11 +42,14 @@ import WebhookFactory from './models/webhook';
 
 const log = logger().getLogger(__filename);
 
-export const DATABASE_URI = process.env.USES_DOCKER_DB
-  ? 'postgresql://commonwealth:edgeware@postgres/commonwealth' // this is because url will be hidden in CI.yaml
-  : !process.env.DATABASE_URL || process.env.NODE_ENV === 'development'
-  ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
-  : process.env.DATABASE_URL;
+export const DATABASE_URI =
+  process.env.NODE_ENV === 'test'
+    ? 'postgresql://commonwealth:edgeware@localhost/common_test'
+    : process.env.USES_DOCKER_DB
+    ? 'postgresql://commonwealth:edgeware@postgres/commonwealth' // this is because url will be hidden in CI.yaml
+    : !process.env.DATABASE_URL || process.env.NODE_ENV === 'development'
+    ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
+    : process.env.DATABASE_URL;
 
 export const sequelize = new Sequelize(DATABASE_URI, {
   // disable string operators (https://github.com/sequelize/sequelize/issues/8417)
@@ -119,7 +122,6 @@ const _models: Models = {
   CommunityStake: CommunityStakeFactory(sequelize, DataTypes),
 };
 
-// TODO: use port/adaper pattern to test in-memory
 export const models: DB = {
   sequelize,
   Sequelize,

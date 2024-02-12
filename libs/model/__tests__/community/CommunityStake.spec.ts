@@ -3,6 +3,7 @@ import {
   InvalidActor,
   InvalidState,
   command,
+  dispose,
   query,
 } from '@hicommonwealth/core';
 import chai, { expect } from 'chai';
@@ -28,6 +29,10 @@ describe('Community stake', () => {
 
   before(async () => {
     await seedDb();
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   it('should fail set when community namespace not configured', () => {

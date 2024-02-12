@@ -4,9 +4,9 @@ import Drawer from 'react-modern-drawer';
 
 import useBrowserWindow from 'hooks/useBrowserWindow';
 
-import { CWIcon } from '../../cw_icons/cw_icon';
 import { CWText } from '../../cw_text';
 import { ComponentType } from '../../types';
+import CWIconButton from '../CWIconButton';
 
 import 'react-modern-drawer/dist/index.css';
 import './CWDrawer.scss';
@@ -62,10 +62,10 @@ export const CWDrawer = ({
       {sideDirection ? (
         <>
           <div className="drawer-actions">
-            <CWIcon
+            <CWIconButton
               iconName="caretDoubleRight"
               onClick={onClose}
-              iconSize="small"
+              buttonSize="sm"
             />
           </div>
           <div className="content-container">
