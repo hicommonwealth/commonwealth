@@ -75,11 +75,6 @@ module.exports = {
         process.env.FLAG_COMMUNITY_STAKE,
       ),
     }),
-    new webpack.DefinePlugin({
-      'process.env.FLAG_MOBILE_NAVIGATION': JSON.stringify(
-        process.env.FLAG_MOBILE_NAVIGATION,
-      ),
-    }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../client/index.html'),
       attributes: {

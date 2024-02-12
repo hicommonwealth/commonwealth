@@ -21,6 +21,15 @@
       align-items: center;
       gap: 8px;
       padding-block: 8px;
+
+      &.disabled {
+        color: $neutral-400;
+        pointer-events: none;
+
+        .Text {
+          color: $neutral-400;
+        }
+      }
     }
   }
 }

@@ -1,6 +1,5 @@
 import 'SublayoutHeader.scss';
 import clsx from 'clsx';
-import { featureFlags } from 'helpers/feature-flags';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
@@ -64,7 +63,11 @@ export const SublayoutHeader = ({
     }, 200);
   }
 
-  if (featureFlags.mobileNavigation && onMobile) {
+  // TODO this will be handled in next ticket
+  const magnifyingGlassVisible = false;
+  const newUserIcon = false;
+
+  if (onMobile) {
     const shouldShow = isInsideCommunity ? !menuVisible : true;
 
     return (
@@ -77,13 +80,32 @@ export const SublayoutHeader = ({
         )}
 
         <div className="right-side">
-          <CWIconButton iconName="magnifyingGlass" iconButtonTheme="neutral" />
-          <User
-            shouldShowAvatarOnly
-            avatarSize={24}
-            userAddress={user?.address}
-            userCommunityId={user?.community?.id}
-          />
+          {magnifyingGlassVisible && (
+            <CWIconButton
+              iconName="magnifyingGlass"
+              iconButtonTheme="neutral"
+            />
+          )}
+
+          {isLoggedIn ? (
+            newUserIcon ? (
+              <User
+                shouldShowAvatarOnly
+                avatarSize={24}
+                userAddress={user?.address}
+                userCommunityId={user?.community?.id}
+              />
+            ) : (
+              <UserDropdown />
+            )
+          ) : (
+            <CWButton
+              label="Sign in"
+              buttonHeight="sm"
+              disabled={location.pathname.includes('/finishsociallogin')}
+              onClick={() => setIsLoginModalOpen(true)}
+            />
+          )}
         </div>
       </div>
     );
