@@ -6,7 +6,7 @@ export const topicCreationValidationSchema = z.object({
   topicName: z
     .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
     .min(1, { message: VALIDATION_MESSAGES.NO_INPUT }),
-  topicDescription: z
-    .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
-    .min(1, { message: VALIDATION_MESSAGES.NO_INPUT }),
+  topicDescription: z.string({
+    invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
+  }),
 });
