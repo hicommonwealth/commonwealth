@@ -7,6 +7,7 @@ type MarkdownPreviewProps = {
 };
 
 export const MarkdownPreview = ({ doc }: MarkdownPreviewProps) => {
+  console.log('doc', doc);
   return (
     <div className="MarkdownPreview">
       <QuillRenderer

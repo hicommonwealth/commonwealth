@@ -123,6 +123,60 @@ const ReactQuillEditor = ({
     });
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const lines = contentDelta.ops[0].insert
+        .split('\n')
+        .filter((line) => line !== '');
+
+      const lastLine = lines[lines.length - 1];
+      const matchNumberedList = lastLine.match(/^\d+\./);
+      const matchUnsortedList = lastLine.match(/^-/);
+      const matchCheckboxList = lastLine.match(/^- \[[ xX]\] /);
+
+      if (matchNumberedList) {
+        const nextNumber = parseInt(matchNumberedList[0]) + 1;
+
+        const newContent = {
+          ...contentDelta,
+          ops: [
+            {
+              insert: `${contentDelta.ops[0].insert.slice(
+                0,
+                -1,
+              )}${nextNumber}. `,
+            },
+          ],
+        };
+        setContentDelta(newContent);
+        setTimeout(() => {
+          const quillEditor = editorRef.current.editor;
+          const newCursorPosition = quillEditor.getLength();
+          quillEditor.setSelection(newCursorPosition, newCursorPosition);
+        }, 10);
+      } else if (matchUnsortedList || matchCheckboxList) {
+        const suffix = matchCheckboxList ? '- [ ]' : '-';
+        const newContent = {
+          ...contentDelta,
+          ops: [
+            {
+              insert: `${contentDelta.ops[0].insert.slice(0, -1)}${suffix} `, // Removing the last newline character
+            },
+          ],
+        };
+        setContentDelta(newContent);
+        setTimeout(() => {
+          const quillEditor = editorRef.current.editor;
+          const newCursorPosition = quillEditor.getLength();
+          quillEditor.setSelection(newCursorPosition, newCursorPosition);
+        }, 10);
+      } else {
+        return;
+      }
+    }
+  };
+
   const handleChange = (value, delta, source, editor) => {
     const newContent = convertTwitterLinksToEmbeds(editor.getContents());
 
@@ -260,6 +314,7 @@ const ReactQuillEditor = ({
                             ref={editorRef}
                             className={`QuillEditor markdownEnabled ${className}`}
                             scrollingContainer="ql-container"
+                            onKeyDown={handleKeyDown}
                             placeholder={placeholder}
                             tabIndex={tabIndex}
                             theme="snow"
