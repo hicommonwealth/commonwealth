@@ -26,10 +26,7 @@ export const expressCommand =
     try {
       const results = await command(md, {
         id: req.params.id,
-        actor: {
-          user: req.user as User,
-          address_id: req.body.address_id,
-        },
+        actor: { user: req.user as User, address_id: req.body.address_id },
         payload: req.body,
       });
       return res.json(results);
