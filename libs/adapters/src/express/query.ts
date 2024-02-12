@@ -15,13 +15,10 @@ export const expressQuery =
     next: NextFunction,
   ) => {
     try {
-      const results = await query(
-        md,
-        { ...req.body, ...req.params } as z.infer<P>,
-        {
-          user: req.user as User,
-        },
-      );
+      const results = await query(md, {
+        actor: { user: req.user as User },
+        payload: { ...req.body, ...req.params } as z.infer<P>,
+      });
       return res.json(results);
     } catch (error) {
       next(error);
