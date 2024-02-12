@@ -4328,6 +4328,11 @@
   resolved "https://registry.yarnpkg.com/@openfeature/core/-/core-0.0.25.tgz#8e40b6988692f0038057480ec3ae8be9c72ea3b9"
   integrity sha512-/NrqVXY39WTOZ3EUtqnFOXFlvcJNuXFm+gi3Zs7wz8SzNdFhvrFtsL7ylQtIgYK5WBOP1HxrtAwrpEicaO1emw==
 
+"@openfeature/react-sdk@^0.1.1-experimental":
+  version "0.1.1-experimental"
+  resolved "https://registry.yarnpkg.com/@openfeature/react-sdk/-/react-sdk-0.1.1-experimental.tgz#fcd473cd826882c34b1dff04a6e33ce6cfeca378"
+  integrity sha512-VVLvSl3OW6WN4Pej99Jq4gYSZXH9ovJ8asUCWW4rvrx1jDJC78EyOM4Sv6Kw3j/2Nxk/BVWEAW+rzEENX5WwDg==
+
 "@openfeature/server-sdk@^1.11.0":
   version "1.11.0"
   resolved "https://registry.yarnpkg.com/@openfeature/server-sdk/-/server-sdk-1.11.0.tgz#c81827274a452603e36fcb94ded53c19a18f297b"
