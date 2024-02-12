@@ -79,6 +79,7 @@ export enum WalletSsoSource {
   Github = 'github',
   Discord = 'discord',
   Twitter = 'twitter',
+  apple = 'apple',
   Email = 'email',
   Unknown = 'unknown', // address created after we launched SSO, before we started recording WalletSsoSource
 }

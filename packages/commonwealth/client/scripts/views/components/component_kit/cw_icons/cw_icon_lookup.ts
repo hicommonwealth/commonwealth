@@ -244,6 +244,7 @@ export const customIconLookup = {
   'terra-walletconnect': CustomIcons.CWWalletConnect,
   coinbase: CustomIcons.CWCoinbase,
   x: CustomIcons.CWX, // twitter
+  apple: CustomIcons.CWApple,
 };
 
 export type IconName = keyof typeof iconLookup;
