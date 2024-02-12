@@ -8,6 +8,7 @@ import React, { StrictMode } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { queryClient } from 'state/api/config';
+import { UnleashProvider } from '../../shared/UnleashProvider';
 import { featureFlags } from './helpers/feature-flags';
 import { CWIcon } from './views/components/component_kit/cw_icons/cw_icon';
 
@@ -20,7 +21,18 @@ const Splash = () => {
   );
 };
 
-OpenFeature.setProvider(new InMemoryProvider(featureFlags));
+const unleashConfig = {
+  url: process.env.UNLEASH_FRONTEND_SERVER_URL,
+  clientKey: process.env.UNLEASH_FRONTEND_API_TOKEN,
+  refreshInterval: 15,
+  appName: 'commonwealth-web',
+};
+
+OpenFeature.setProvider(
+  process.env.UNLEASH_FRONTEND_API_TOKEN
+    ? new UnleashProvider(unleashConfig)
+    : new InMemoryProvider(featureFlags),
+);
 
 const App = () => {
   const { customDomain, isLoading } = useInitApp();

@@ -208,6 +208,7 @@
     "swagger-ui-express": "^4.6.0",
     "tweetnacl": "^1.0.3",
     "underscore": "^1.13.1",
+    "unleash-proxy-client": "^3.3.1",
     "usehooks-ts": "^2.9.1",
     "vm-browserify": "^1.1.2",
     "web3": "1.8.2",
