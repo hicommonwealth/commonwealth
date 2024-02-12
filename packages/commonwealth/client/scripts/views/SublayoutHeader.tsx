@@ -5,10 +5,9 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import useSidebarStore from 'state/ui/sidebar';
+import MobileHeader from 'views/components/Composition/MobileHeader';
 import UserDropdown from 'views/components/Header/UserDropdown/UserDropdown';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import CollapsableSidebarButton from 'views/components/sidebar/CollapsableSidebarButton';
-import { User } from 'views/components/user/user';
 import { HelpMenuPopover } from 'views/menus/help_menu';
 import { AuthModal } from 'views/modals/AuthModal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
@@ -55,148 +54,107 @@ export const SublayoutHeader = ({
     setRecentlyUpdatedVisibility(menuVisible);
   }, [menuVisible, setRecentlyUpdatedVisibility]);
 
-  const user = app.user.addresses[0];
-
-  function handleToggle() {
+  const handleToggle = () => {
     const isVisible = !menuVisible;
     setMenu({ name: menuName, isVisible });
     setTimeout(() => {
       setUserToggledVisibility(isVisible ? 'open' : 'closed');
     }, 200);
-  }
-
-  // TODO this will be handled in next ticket
-  const magnifyingGlassVisible = false;
-  const newUserIcon = false;
-
-  if (onMobile) {
-    const shouldShow = isInsideCommunity ? !menuVisible : true;
-
-    return (
-      <div className="MobileHeader">
-        {shouldShow && (
-          <CollapsableSidebarButton
-            onMobile={onMobile}
-            isInsideCommunity={isInsideCommunity}
-          />
-        )}
-
-        <div className="right-side">
-          {magnifyingGlassVisible && (
-            <CWIconButton
-              iconName="magnifyingGlass"
-              iconButtonTheme="neutral"
-            />
-          )}
-
-          {isLoggedIn ? (
-            newUserIcon ? (
-              <User
-                shouldShowAvatarOnly
-                avatarSize={24}
-                userAddress={user?.address}
-                userCommunityId={user?.community?.id}
-              />
-            ) : (
-              <UserDropdown />
-            )
-          ) : (
-            <CWButton
-              label="Sign in"
-              buttonHeight="sm"
-              disabled={location.pathname.includes('/finishsociallogin')}
-              onClick={() => setIsLoginModalOpen(true)}
-            />
-          )}
-        </div>
-      </div>
-    );
-  }
+  };
 
   return (
     <>
-      <div className="SublayoutHeader">
-        <div className="header-left">
-          <CWDivider isVertical />
-          <CWIconButton
-            iconName="commonLogo"
-            iconButtonTheme="black"
-            iconSize="xl"
-            onClick={() => {
-              if (app.isCustomDomain()) {
-                navigate('/', {}, null);
-              } else {
-                if (isLoggedIn) {
-                  setMobileMenuName(null);
-                  navigate('/dashboard/for-you', {}, null);
-                } else {
-                  navigate('/dashboard/global', {}, null);
-                }
-              }
-            }}
-          />
-          {isWindowSmallInclusive(window.innerWidth) && (
+      {onMobile ? (
+        <MobileHeader
+          onMobile={onMobile}
+          onSignInClick={() => setIsAuthModalOpen(true)}
+          isInsideCommunity={isInsideCommunity}
+          menuVisible={menuVisible}
+        />
+      ) : (
+        <div className="SublayoutHeader">
+          <div className="header-left">
             <CWDivider isVertical />
-          )}
-          {onMobile && (
             <CWIconButton
+              iconName="commonLogo"
               iconButtonTheme="black"
-              iconName={menuVisible ? 'sidebarCollapse' : 'sidebarExpand'}
-              onClick={handleToggle}
-            />
-          )}
-        </div>
-        <div className="searchbar">
-          <CWSearchBar />
-        </div>
-        <div className="header-right">
-          <div className="MobileMenuContainer">
-            <CWIconButton
-              iconName="dotsVertical"
-              iconButtonTheme="black"
+              iconSize="xl"
               onClick={() => {
-                setMenu({ name: menuName, isVisible: false });
-                setMobileMenuName(mobileMenuName ? null : 'MainMenu');
+                if (app.isCustomDomain()) {
+                  navigate('/', {}, null);
+                } else {
+                  if (isLoggedIn) {
+                    setMobileMenuName(null);
+                    navigate('/dashboard/for-you', {}, null);
+                  } else {
+                    navigate('/dashboard/global', {}, null);
+                  }
+                }
               }}
             />
+            {isWindowSmallInclusive(window.innerWidth) && (
+              <CWDivider isVertical />
+            )}
+            {onMobile && (
+              <CWIconButton
+                iconButtonTheme="black"
+                iconName={menuVisible ? 'sidebarCollapse' : 'sidebarExpand'}
+                onClick={handleToggle}
+              />
+            )}
           </div>
-          <div
-            className={clsx('DesktopMenuContainer', {
-              isLoggedIn,
-            })}
-          >
-            <CreateContentPopover />
-            <CWTooltip
-              content="Explore communities"
-              placement="bottom"
-              renderTrigger={(handleInteraction) => (
-                <CWIconButton
-                  iconButtonTheme="black"
-                  iconName="compassPhosphor"
-                  onClick={() => navigate('/communities', {}, null)}
-                  onMouseEnter={handleInteraction}
-                  onMouseLeave={handleInteraction}
-                />
-              )}
-            />
-
-            <HelpMenuPopover />
-
-            {isLoggedIn && <NotificationsMenuPopover />}
+          <div className="searchbar">
+            <CWSearchBar />
           </div>
-          {isLoggedIn && <UserDropdown />}
-          {!isLoggedIn && (
-            <CWButton
-              buttonType="primary"
-              buttonHeight="sm"
-              label="Sign in"
-              buttonWidth="wide"
-              disabled={location.pathname.includes('/finishsociallogin')}
-              onClick={() => setIsAuthModalOpen(true)}
-            />
-          )}
+          <div className="header-right">
+            <div className="MobileMenuContainer">
+              <CWIconButton
+                iconName="dotsVertical"
+                iconButtonTheme="black"
+                onClick={() => {
+                  setMenu({ name: menuName, isVisible: false });
+                  setMobileMenuName(mobileMenuName ? null : 'MainMenu');
+                }}
+              />
+            </div>
+            <div
+              className={clsx('DesktopMenuContainer', {
+                isLoggedIn,
+              })}
+            >
+              <CreateContentPopover />
+              <CWTooltip
+                content="Explore communities"
+                placement="bottom"
+                renderTrigger={(handleInteraction) => (
+                  <CWIconButton
+                    iconButtonTheme="black"
+                    iconName="compassPhosphor"
+                    onClick={() => navigate('/communities', {}, null)}
+                    onMouseEnter={handleInteraction}
+                    onMouseLeave={handleInteraction}
+                  />
+                )}
+              />
+
+              <HelpMenuPopover />
+
+              {isLoggedIn && <NotificationsMenuPopover />}
+            </div>
+            {isLoggedIn && <UserDropdown />}
+            {!isLoggedIn && (
+              <CWButton
+                buttonType="primary"
+                buttonHeight="sm"
+                label="Sign in"
+                buttonWidth="wide"
+                disabled={location.pathname.includes('/finishsociallogin')}
+                onClick={() => setIsAuthModalOpen(true)}
+              />
+            )}
+          </div>
         </div>
-      </div>
+      )}
       <CWModal
         size="small"
         content={
