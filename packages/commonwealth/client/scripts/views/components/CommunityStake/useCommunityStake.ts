@@ -1,5 +1,4 @@
 import { commonProtocol } from '@hicommonwealth/core';
-import { featureFlags } from 'helpers/feature-flags';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import app from 'state';
 import {
@@ -7,6 +6,7 @@ import {
   useGetBuyPriceQuery,
   useGetUserStakeBalanceQuery,
 } from 'state/api/communityStake';
+import { useFlag } from '../../../hooks/useFlag';
 
 interface UseCommunityStakeProps {
   communityId?: string;
@@ -15,6 +15,7 @@ interface UseCommunityStakeProps {
 }
 
 const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
+  const communityStakeEnabled = useFlag('communityStake');
   const {
     communityId,
     stakeId = commonProtocol.STAKE_ID,
@@ -31,13 +32,13 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     useFetchCommunityStakeQuery({
       communityId: communityId || activeCommunityId,
       stakeId,
-      apiEnabled: featureFlags.communityStake && !!activeCommunityId,
+      apiEnabled: communityStakeEnabled && !!activeCommunityId,
     });
 
   const stakeData = stakeResponse?.data?.result;
   const stakeEnabled = stakeData?.stake_enabled;
   const apiEnabled = Boolean(
-    featureFlags.communityStake &&
+    communityStakeEnabled &&
       stakeEnabled &&
       (walletAddress || activeAccountAddress) &&
       !!activeCommunityNamespace &&

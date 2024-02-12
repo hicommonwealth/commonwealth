@@ -1,10 +1,10 @@
-import { featureFlags } from 'helpers/feature-flags';
 import { isNonEmptyString } from 'helpers/typeGuards';
 import $ from 'jquery';
 import 'pages/web3login.scss';
 import React from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import app from 'state';
+import { useFlag } from '../../hooks/useFlag';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
@@ -15,6 +15,7 @@ import { PageNotFound } from './404';
 import { PageLoading } from './loading';
 
 const Web3LoginPage = () => {
+  const newSignInModalEnabled = useFlag('newSignInModal');
   const [searchParams] = useSearchParams();
   const [errorMsg, setErrorMsg] = React.useState<string>('');
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
@@ -64,7 +65,7 @@ const Web3LoginPage = () => {
 
   return (
     <>
-      {!featureFlags.newSignInModal ? (
+      {!newSignInModalEnabled ? (
         <CWModal
           content={
             <LoginModal onModalClose={() => setIsAuthModalOpen(false)} />

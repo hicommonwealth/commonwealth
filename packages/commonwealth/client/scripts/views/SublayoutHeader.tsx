@@ -11,7 +11,7 @@ import { HelpMenuPopover } from 'views/menus/help_menu';
 import { AuthModal } from 'views/modals/AuthModal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
 import { LoginModal } from 'views/modals/login_modal';
-import { featureFlags } from '../helpers/feature-flags';
+import { useFlag } from '../hooks/useFlag';
 import app from '../state';
 import { CWDivider } from './components/component_kit/cw_divider';
 import { CWIconButton } from './components/component_kit/cw_icon_button';
@@ -30,6 +30,7 @@ type SublayoutHeaderProps = {
 };
 
 export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
+  const newSignInModalEnabled = useFlag('newSignInModal');
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const navigate = useCommonNavigate();
   const {
@@ -149,7 +150,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
         onClose={() => setIsFeedbackModalOpen(false)}
         open={isFeedbackModalOpen}
       />
-      {!featureFlags.newSignInModal ? (
+      {!newSignInModalEnabled ? (
         <CWModal
           content={
             <LoginModal onModalClose={() => setIsAuthModalOpen(false)} />

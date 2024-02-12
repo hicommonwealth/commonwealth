@@ -1,11 +1,11 @@
 import { AccessLevel } from '@hicommonwealth/core';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { formatAddressShort } from 'helpers';
-import { featureFlags } from 'helpers/feature-flags';
 import $ from 'jquery';
 import 'pages/manage_community/upgrade_roles_form.scss';
 import React, { useMemo, useState } from 'react';
 import app from 'state';
+import { useFlag } from '../../../hooks/useFlag';
 import type RoleInfo from '../../../models/RoleInfo';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import { CWButton } from '../../components/component_kit/new_designs/cw_button';
@@ -24,6 +24,7 @@ export const UpgradeRolesForm = ({
   searchTerm,
   setSearchTerm,
 }: UpgradeRolesFormProps) => {
+  const newAdminOnboardingEnabled = useFlag('newAdminOnboarding');
   const [role, setRole] = useState('');
   const [user, setUser] = useState('');
   const [radioButtons, setRadioButtons] = useState([
@@ -91,7 +92,7 @@ export const UpgradeRolesForm = ({
         />
       </div>
       <div className="upgrade-buttons-container">
-        {featureFlags.newAdminOnboardingEnabled ? (
+        {newAdminOnboardingEnabled ? (
           <>
             {newAdminOnboardingEnabledOptions.map((o, i) => {
               return (
