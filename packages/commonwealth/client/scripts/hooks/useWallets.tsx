@@ -641,7 +641,16 @@ const useWallets = (walletProps: IuseWalletProps) => {
         setSignerAccount(signingAccount);
         setIsNewlyCreated(newlyCreated);
         setIsLinkingOnMobile(isLinkingWallet);
-        setActiveStep('redirectToSign');
+        if (featureFlags.newSignInModal) {
+          onAccountVerified(
+            signingAccount,
+            newlyCreated,
+            isLinkingWallet,
+            wallet,
+          );
+        } else {
+          setActiveStep('redirectToSign');
+        }
       } else {
         onAccountVerified(
           signingAccount,
@@ -724,7 +733,11 @@ const useWallets = (walletProps: IuseWalletProps) => {
       if (setSignerAccount) setSignerAccount(account);
       if (setIsNewlyCreated) setIsNewlyCreated(false);
       if (setIsLinkingOnMobile) setIsLinkingOnMobile(false);
-      setActiveStep('redirectToSign');
+      if (featureFlags.newSignInModal) {
+        onAccountVerified(account, false, false);
+      } else {
+        setActiveStep('redirectToSign');
+      }
       return;
     } else {
       onAccountVerified(account, false, false);
