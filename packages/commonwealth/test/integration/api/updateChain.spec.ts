@@ -4,8 +4,10 @@ import {
   UserInstance,
   models,
   tester,
+  tokenBalanceCache,
 } from '@hicommonwealth/model';
 import { assert } from 'chai';
+import Sinon from 'sinon';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 import { Errors } from '../../../server/controllers/server_communities_methods/update_community';
 import { buildUser } from '../../unit/unitHelpers';
@@ -102,11 +104,9 @@ describe('UpdateChain Tests', () => {
   // skipped because public chainNodes are unreliable. If you want to test this functionality, update the goleri
   // chainNode and do it locally.
   xit('Correctly updates namespace', async () => {
-    const tbc = {
-      getBalances: async (_: any) => {
-        return { '0x42D6716549A78c05FD8EF1f999D52751Bbf9F46a': '1' };
-      },
-    };
+    Sinon.stub(tokenBalanceCache, 'getBalances').resolves({
+      '0x42D6716549A78c05FD8EF1f999D52751Bbf9F46a': '1',
+    });
 
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
@@ -130,5 +130,6 @@ describe('UpdateChain Tests', () => {
     });
 
     assert.equal(response.namespace, 'IanSpace');
+    Sinon.restore();
   });
 });
