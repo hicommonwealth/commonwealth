@@ -1,5 +1,5 @@
-import z, { ZodError, ZodSchema } from 'zod';
-import { InvalidInput, QueryContext, QueryMetadata, type Actor } from './types';
+import { ZodError, ZodSchema } from 'zod';
+import { InvalidInput, QueryContext, QueryMetadata } from './types';
 
 /**
  * Generic query handler that adapts external protocols to conventional query flow
@@ -12,8 +12,7 @@ import { InvalidInput, QueryContext, QueryMetadata, type Actor } from './types';
  */
 export const query = async <T, P extends ZodSchema>(
   { schema, auth, body }: QueryMetadata<T, P>,
-  payload: z.infer<P>,
-  actor: Actor,
+  { actor, payload }: QueryContext<P>,
 ): Promise<T | undefined> => {
   try {
     const validated = Object.fromEntries(
