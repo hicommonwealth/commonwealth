@@ -26,6 +26,86 @@ import { countLinesMarkdown, fetchTwitterEmbedInfo } from './utils';
 const OPEN_LINKS_IN_NEW_TAB = true;
 
 const markdownRenderer = new marked.Renderer();
+
+// markdownRenderer.list = (body, ordered, start) => {
+//   // Handling checkbox list items
+//   if (body.includes('<input disabled="" type="checkbox"/>')) {
+//     console.log('Checkbox list detected', body);
+//     return body.replace(
+//       /<li>\s*<input disabled="" type="checkbox"\/>\s*(.*?)\s*<\/li>/g,
+//       '<ul><li><input type="checkbox" disabled>$1</li></ul>'
+//     );
+//   }
+//
+//   // Handling numbered list items
+//   if (ordered) {
+//     console.log('Numbered list detected', body);
+//     const listItems = body.split('<li>').map((item, index) => {
+//       if (index === 0) {
+//         return item;
+//       }
+//       return `<ol start="${index}"><li>${item}</li></ol>`;
+//     });
+//
+//     return listItems.join('');
+//
+//     // return body.replace(
+//     //   /<li>\s*(.*?)\s*<\/li>/g,
+//     //   `<ol start="${count}"><li>$1</li></ol>`
+//     // );
+//   }
+//
+//   // Handling bulleted list items
+//   console.log('Bulleted list detected', body);
+//   return body.replace(/<li>\s*(.*?)\s*<\/li>/g, '<ul><li>$1</li></ul>');
+// };
+//
+//
+
+markdownRenderer.list = (body, ordered, start) => {
+  let result = '';
+
+  // Handling checkbox list items
+  if (body.includes('<input disabled="" type="checkbox"/>')) {
+    console.log('Checkbox list detected', body);
+    const split = body.split('<li>');
+    const listItems = split.map((item, index) => {
+      if (index === 0) {
+        return item;
+      }
+      return `<ul><li>${item}</li></ul>`;
+    });
+    return body.replace(
+      /<li>\s*<input disabled="" type="checkbox"\/>\s*(.*?)\s*<\/li>/g,
+      '<ul><li><input type="checkbox" disabled>$1</li></ul>',
+    );
+  }
+
+  // Handling numbered list items
+  if (ordered) {
+    console.log('Numbered list detected', body);
+    const listItems = body.split('<li>').map((item, index) => {
+      if (index === 0) {
+        return item;
+      }
+      return `<ol start="${index}"><li>${item}</li></ol>`;
+    });
+
+    return listItems.join('');
+  }
+
+  // Handling bulleted list items
+  if (!ordered && body.includes('<li>')) {
+    console.log('Bulleted list detected', body);
+    result = body.replace(/<li>\s*(.*?)\s*<\/li>/g, '<ul><li>$1</li></ul>');
+  }
+
+  // Handling individual list items
+  result = result.replace(/<li>\s*(.*?)\s*<\/li>/g, '<ul><li>$1</li></ul>');
+
+  return result;
+};
+
 markdownRenderer.link = (href, title, text) => {
   return `<a ${
     href.indexOf('://commonwealth.im/') !== -1 && 'target="_blank"'
@@ -112,6 +192,8 @@ export const MarkdownFormattedText = ({
     // wrap all elements in span to avoid container-based positioning
     return <span>{textWithHighlights}</span>;
   }, [doc, sanitizedHTML, searchTerm]);
+
+  console.log('final', finalDoc);
 
   const toggleDisplay = () => setUserExpand(!userExpand);
 
