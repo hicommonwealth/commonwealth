@@ -642,7 +642,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
         setSignerAccount(signingAccount);
         setIsNewlyCreated(newlyCreated);
         setIsLinkingOnMobile(isLinkingWallet);
-        if (featureFlags.newSignInModal) {
+        if (newSignInModalEnabled) {
           onAccountVerified(
             signingAccount,
             newlyCreated,
@@ -734,7 +734,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
       if (setSignerAccount) setSignerAccount(account);
       if (setIsNewlyCreated) setIsNewlyCreated(false);
       if (setIsLinkingOnMobile) setIsLinkingOnMobile(false);
-      if (featureFlags.newSignInModal) {
+      if (newSignInModalEnabled) {
         onAccountVerified(account, false, false);
       } else {
         setActiveStep('redirectToSign');
