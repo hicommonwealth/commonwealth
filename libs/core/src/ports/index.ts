@@ -1,4 +1,3 @@
-import { AnalyticsOptions } from '../types';
 import { Analytics, Cache, Logger, Stats } from './interfaces';
 import { port } from './port';
 
@@ -92,9 +91,7 @@ export const analytics = port(function analytics(analytics?: Analytics) {
     analytics || {
       name: 'in-memory-analytics',
       dispose: () => Promise.resolve(),
-      track: (event: string, payload: AnalyticsOptions) => {
-        console.log(`TRACK [${event}]: ${JSON.stringify(payload)}`);
-      },
+      track: () => {},
     }
   );
 });

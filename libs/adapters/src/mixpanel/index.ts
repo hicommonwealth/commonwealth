@@ -1,5 +1,7 @@
-import { Analytics, AnalyticsOptions } from '@hicommonwealth/core';
+import { Analytics, AnalyticsOptions, logger } from '@hicommonwealth/core';
 import MixpanelLib from 'mixpanel';
+
+const log = logger().getLogger(__filename);
 
 export const MixpanelAnalytics = (): Analytics => {
   let mixpanelNode;
@@ -13,7 +15,7 @@ export const MixpanelAnalytics = (): Analytics => {
       mixpanelNode = MixpanelLib.init(process.env.MIXPANEL_DEV_TOKEN);
     }
   } catch (e) {
-    console.error('Unable to initialized the backend mixpanel client: ', e);
+    log.error('Unable to initialized the backend mixpanel client: ', e);
   }
 
   return {
@@ -23,7 +25,7 @@ export const MixpanelAnalytics = (): Analytics => {
       try {
         mixpanelNode?.track(event, payload);
       } catch (e) {
-        console.log(`Failed to track event, ${event.toString()}:`, e.message);
+        log.error(`Failed to track event, ${event.toString()}:`, e.message);
       }
     },
   };
