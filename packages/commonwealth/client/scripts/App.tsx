@@ -8,6 +8,7 @@ import React, { StrictMode } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { queryClient } from 'state/api/config';
+import { UnleashClient } from 'unleash-proxy-client';
 import { UnleashProvider } from '../../shared/UnleashProvider';
 import { featureFlags } from './helpers/feature-flags';
 import { CWIcon } from './views/components/component_kit/cw_icons/cw_icon';
@@ -30,7 +31,7 @@ const unleashConfig = {
 
 OpenFeature.setProvider(
   process.env.UNLEASH_FRONTEND_API_TOKEN
-    ? new UnleashProvider(unleashConfig)
+    ? new UnleashProvider(new UnleashClient(unleashConfig))
     : new InMemoryProvider(featureFlags),
 );
 
@@ -43,7 +44,7 @@ const App = () => {
         {isLoading ? (
           <Splash />
         ) : (
-          <OpenFeatureProvider client={undefined}>
+          <OpenFeatureProvider>
             <RouterProvider router={router(customDomain)} />
           </OpenFeatureProvider>
         )}
