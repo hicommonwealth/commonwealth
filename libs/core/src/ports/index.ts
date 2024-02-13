@@ -1,8 +1,9 @@
-import { Logger, Stats } from './interfaces';
+import { Cache, Logger, Stats } from './interfaces';
 import { port } from './port';
 
 export * from './enums';
 export * from './interfaces';
+export * from './port';
 
 /**
  * Logger port factory
@@ -53,6 +54,30 @@ export const stats = port(function stats(stats?: Stats) {
       on: () => {},
       off: () => {},
       timing: () => {},
+    }
+  );
+});
+
+/**
+ * Cache port factory
+ */
+export const cache = port(function cache(cache?: Cache) {
+  return (
+    cache || {
+      name: 'in-memory-cache',
+      dispose: () => Promise.resolve(),
+      getKey: () => Promise.resolve(''),
+      setKey: () => Promise.resolve(false),
+      getKeys: () => Promise.resolve(false),
+      setKeys: () => Promise.resolve(false),
+      getNamespaceKeys: () => Promise.resolve(false),
+      deleteKey: () => Promise.resolve(0),
+      deleteNamespaceKeys: () => Promise.resolve(0),
+      flushAll: () => Promise.resolve(),
+      incrementKey: () => Promise.resolve(0),
+      decrementKey: () => Promise.resolve(0),
+      getKeyTTL: () => Promise.resolve(0),
+      setKeyTTL: () => Promise.resolve(false),
     }
   );
 });

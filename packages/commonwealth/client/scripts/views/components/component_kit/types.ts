@@ -12,6 +12,7 @@ export enum ComponentType {
   Card = 'Card',
   Checkbox = 'Checkbox',
   CircleButton = 'CircleButton',
+  CircleSpinner = 'CircleSpinner',
   Collapsible = 'Collapsible',
   CommunityAvatar = 'CommunityAvatar',
   CommunitySelector = 'CommunitySelector',
@@ -27,6 +28,7 @@ export enum ComponentType {
   Icon = 'Icon',
   IconButton = 'IconButton',
   Label = 'Label',
+  LoadingSpinner = 'LoadingSpinner',
   MessageBanner = 'MessageBanner',
   MobileMenu = 'MobileMenu',
   Modal = 'CWModal',
@@ -55,7 +57,6 @@ export enum ComponentType {
   TypeaheadSelectList = 'TypeaheadSelectList',
   Upvote = 'Upvote',
   ValidationText = 'ValidationText',
-  VoteWeightModule = 'VoteWeightModule',
   WalletOptionRow = 'WalletOptionRow',
   SelectList = 'SelectList',
 }

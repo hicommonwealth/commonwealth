@@ -40,7 +40,7 @@
 <rect x="511.023" y="227.415" width="56.3745" height="30.0058" rx="15.0029" transform="rotate(4.32232 511.023 227.415)" fill="url(#paint1_linear)"/>
 </g>
 <rect x="513.944" y="227.526" width="51.1809" height="27" rx="13.5" transform="rotate(3.01224 513.944 227.526)" fill="white" stroke="#E7E7E7"/>
-<path d="M522.793 249.707L538.77 250.548L539.611 234.57L523.633 233.729L522.793 249.707Z" fill="url(#pattern0)"/>
+<path d="M522.793 249.707L538.77 250.548L539.611 234.57L523.633 233.729L522.793 249.707Z" fill="url(#patternTab4)"/>
 <path d="M547.195 243.36L547.882 243.397C549.001 243.455 549.845 244.157 549.787 245.259C549.73 246.346 548.894 247.007 547.727 246.945C546.497 246.881 545.784 246.122 545.668 244.978L544.438 244.914C544.504 246.696 545.769 247.932 547.686 248.033C549.651 248.136 550.901 246.92 550.986 245.306C551.044 244.204 550.419 243.29 549.381 242.931C550.29 242.706 550.975 241.861 551.032 240.774C551.115 239.209 550.055 238.031 548.186 237.933C546.444 237.841 545.184 238.945 544.857 240.594L546.087 240.658C546.285 239.643 547.026 238.961 548.128 239.019C549.231 239.077 549.88 239.833 549.831 240.775C549.775 241.83 548.945 242.379 547.906 242.324L547.251 242.29L547.195 243.36Z" fill="black"/>
 <g opacity="0.8" filter="url(#filter3_f)">
 <rect x="296.548" y="439.855" width="66" height="36" rx="18" transform="rotate(-1.47401 296.548 439.855)" fill="url(#paint2_linear)"/>
@@ -72,7 +72,7 @@
 <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
 <feGaussianBlur stdDeviation="15" result="effect1_foregroundBlur"/>
 </filter>
-<pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">
+<pattern id="patternTab4" patternContentUnits="objectBoundingBox" width="1" height="1">
 <use xlink:href="#image0" transform="scale(0.015625)"/>
 </pattern>
 <filter id="filter3_f" x="266.548" y="408.157" width="126.904" height="97.6858" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">

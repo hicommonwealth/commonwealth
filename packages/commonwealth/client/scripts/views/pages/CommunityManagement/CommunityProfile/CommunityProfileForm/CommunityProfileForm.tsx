@@ -1,6 +1,5 @@
 import { DefaultPage } from '@hicommonwealth/core';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { featureFlags } from 'helpers/feature-flags';
 import getLinkType from 'helpers/linkType';
 import React, { useState } from 'react';
 import { slugifyPreserveDashes } from 'shared/utils';
@@ -23,6 +22,7 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
+import { useFlag } from '../../../../../hooks/useFlag';
 import { getCommunityTags } from '../../../manage_community/helpers';
 import './CommunityProfileForm.scss';
 import { CommunityTags, FormSubmitValues } from './types';
@@ -32,6 +32,7 @@ import {
 } from './validation';
 
 const CommunityProfileForm = () => {
+  const communityStakeEnabled = useFlag('communityStake');
   const communityTagOptions: CommunityTags[] = ['DeFi', 'DAO'];
   const community = app.config.chains.getById(app.activeChainId());
 
@@ -59,21 +60,12 @@ const CommunityProfileForm = () => {
     useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [initialLinks, setInitialLinks] = useState(
-    (community.socialLinks || []).length > 0
-      ? community.socialLinks.map((link) => ({
-          value: link,
-          canUpdate: true,
-          canDelete: true,
-          error: '',
-        }))
-      : [
-          {
-            value: '',
-            canUpdate: true,
-            canDelete: false,
-            error: '',
-          },
-        ],
+    (community.socialLinks || []).map((link) => ({
+      value: link,
+      canUpdate: true,
+      canDelete: true,
+      error: '',
+    })),
   );
 
   const {
@@ -215,13 +207,14 @@ const CommunityProfileForm = () => {
               placeholder="Community URL"
               value={`${window.location.origin}/${communityId}`}
             />
-            {featureFlags.isCommunityStakesEnabled && (
+            {communityStakeEnabled && (
               <>
                 <CWTextInput
                   disabled
                   fullWidth
                   label="Community Namespace"
                   placeholder="Community Namespace"
+                  value={community.namespace}
                 />
                 <CWTextInput
                   disabled
@@ -398,6 +391,10 @@ const CommunityProfileForm = () => {
               }
               onClick={() => {
                 reset();
+                setNameFieldDisabledState({
+                  isDisabled: true,
+                  canDisable: true,
+                });
                 setLinks(initialLinks);
                 setSelectedCommunityTags(currentCommunityTags);
               }}

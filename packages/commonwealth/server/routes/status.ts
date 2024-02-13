@@ -1,5 +1,4 @@
-import { ServerError } from '@hicommonwealth/adapters';
-import { CommunityCategoryType } from '@hicommonwealth/core';
+import { CommunityCategoryType, ServerError } from '@hicommonwealth/core';
 import type {
   AddressInstance,
   CommunityInstance,
@@ -39,6 +38,7 @@ type StatusResp = {
     disableRichText: boolean;
     starredCommunities: StarredCommunityAttributes[];
     unseenPosts: { [chain: string]: number };
+    profileId?: number;
   };
   evmTestEnv?: string;
   enforceSessionKeys?: boolean;
@@ -300,9 +300,15 @@ export const status = async (
     } else {
       // user is logged in
       const userStatusPromise = getUserStatus(models, reqUser);
-      const [chainStatus, userStatus] = await Promise.all([
+      const profilePromise = models.Profile.findOne({
+        where: {
+          user_id: reqUser.id,
+        },
+      });
+      const [chainStatus, userStatus, profileInstance] = await Promise.all([
         chainStatusPromise,
         userStatusPromise,
+        profilePromise,
       ]);
       const { notificationCategories, chainCategories, threadCountQueryData } =
         chainStatus;
@@ -315,7 +321,7 @@ export const status = async (
         recentThreads: threadCountQueryData,
         roles,
         loggedIn: true,
-        user,
+        user: { ...user, profileId: profileInstance.id },
         evmTestEnv: ETH_RPC,
         enforceSessionKeys: process.env.ENFORCE_SESSION_KEYS == 'true',
         chainCategoryMap: chainCategories,

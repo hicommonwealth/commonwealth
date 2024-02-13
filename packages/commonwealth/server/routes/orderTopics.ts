@@ -1,5 +1,5 @@
 /* eslint-disable quotes */
-import { AppError, ServerError } from '@hicommonwealth/adapters';
+import { AppError, ServerError } from '@hicommonwealth/core';
 import type { DB, TopicInstance } from '@hicommonwealth/model';
 import type { NextFunction, Response } from 'express';
 import { validateOwner } from '../util/validateOwner';
@@ -32,7 +32,7 @@ const OrderTopics = async (
     communityId: community.id,
     allowMod: true,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdminOrMod) {
     return next(new AppError(OrderTopicsErrors.NoPermission));

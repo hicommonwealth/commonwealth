@@ -1,0 +1,22 @@
+@import '../../../../../../styles/shared';
+
+.ActionSteps {
+  display: flex;
+  flex-direction: column;
+
+  .ActionStep {
+    margin-top: 16px;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  .MessageRow {
+    margin-top: 4px;
+
+    .Text {
+      text-align: left;
+    }
+  }
+}

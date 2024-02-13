@@ -1,7 +1,7 @@
 import { Op } from 'sequelize';
 
-import { AppError } from '@hicommonwealth/adapters';
 import {
+  AppError,
   ChainBase,
   DynamicTemplate,
   NotificationCategories,

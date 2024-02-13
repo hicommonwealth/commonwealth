@@ -12,7 +12,8 @@ interface BasicInformationStepProps {
   selectedAddress: AddressInfo;
   selectedCommunity: SelectedCommunity;
   handleGoBack: () => void;
-  handleContinue: (communityId: string) => void;
+  handleContinue: (communityId: string, communityName: string) => void;
+  handleSelectedChainId: (chainId: string) => void;
 }
 
 const BasicInformationStep = ({
@@ -20,6 +21,7 @@ const BasicInformationStep = ({
   selectedCommunity,
   handleGoBack,
   handleContinue,
+  handleSelectedChainId,
 }: BasicInformationStepProps) => {
   return (
     <div className="BasicInformationStep">
@@ -41,6 +43,7 @@ const BasicInformationStep = ({
         selectedCommunity={selectedCommunity}
         onSubmit={handleContinue}
         onCancel={handleGoBack}
+        handleSelectedChainId={handleSelectedChainId}
       />
     </div>
   );

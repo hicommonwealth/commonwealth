@@ -5,11 +5,12 @@ import $ from 'jquery';
 import 'pages/manage_community/upgrade_roles_form.scss';
 import React, { useMemo, useState } from 'react';
 import app from 'state';
+import { useFlag } from '../../../hooks/useFlag';
 import type RoleInfo from '../../../models/RoleInfo';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
+import { CWButton } from '../../components/component_kit/new_designs/cw_button';
+import { CWRadioButton } from '../../components/component_kit/new_designs/cw_radio_button';
 import { MembersSearchBar } from '../../components/members_search_bar';
-
 type UpgradeRolesFormProps = {
   onRoleUpdate: (oldRole: RoleInfo, newRole: RoleInfo) => void;
   roleData: RoleInfo[];
@@ -23,8 +24,21 @@ export const UpgradeRolesForm = ({
   searchTerm,
   setSearchTerm,
 }: UpgradeRolesFormProps) => {
+  const newAdminOnboardingEnabled = useFlag('newAdminOnboarding');
   const [role, setRole] = useState('');
   const [user, setUser] = useState('');
+  const [radioButtons, setRadioButtons] = useState([
+    { id: 1, checked: false },
+    { id: 2, checked: false },
+  ]);
+
+  const zeroOutRadioButtons = () => {
+    const zeroedOutRadioButtons = radioButtons.map((radioButton) => ({
+      ...radioButton,
+      checked: false,
+    }));
+    setRadioButtons(zeroedOutRadioButtons);
+  };
 
   const nonAdmins: RoleInfo[] = roleData.filter((_role) => {
     return (
@@ -47,6 +61,19 @@ export const UpgradeRolesForm = ({
     return nonAdminNames.map((n) => ({ label: n, value: n }));
   }, [nonAdminNames]);
 
+  const newAdminOnboardingEnabledOptions = [
+    { label: 'Admin', value: 'Admin' },
+    { label: 'Moderator', value: 'Moderator' },
+  ];
+
+  const handleRadioButtonChange = (id) => {
+    const updatedRadioButtons = radioButtons.map((radioButton) => ({
+      ...radioButton,
+      checked: radioButton.id === id,
+    }));
+    setRadioButtons(updatedRadioButtons);
+  };
+
   return (
     <div className="UpgradeRolesForm">
       <MembersSearchBar
@@ -65,17 +92,38 @@ export const UpgradeRolesForm = ({
         />
       </div>
       <div className="upgrade-buttons-container">
-        <CWRadioGroup
-          name="roles"
-          options={[
-            { label: 'Admin', value: 'Admin' },
-            { label: 'Moderator', value: 'Moderator' },
-          ]}
-          toggledOption={role}
-          onChange={(e) => {
-            setRole(e.target.value);
-          }}
-        />
+        {newAdminOnboardingEnabled ? (
+          <>
+            {newAdminOnboardingEnabledOptions.map((o, i) => {
+              return (
+                <div key={i}>
+                  <CWRadioButton
+                    key={i}
+                    checked={radioButtons[i].checked}
+                    name="roles"
+                    onChange={(e) => {
+                      setRole(e.target.value);
+                      handleRadioButtonChange(i + 1);
+                    }}
+                    value={o.value}
+                  />
+                </div>
+              );
+            })}
+          </>
+        ) : (
+          <CWRadioGroup
+            name="roles"
+            options={[
+              { label: 'Admin', value: 'Admin' },
+              { label: 'Moderator', value: 'Moderator' },
+            ]}
+            toggledOption={role}
+            onChange={(e) => {
+              setRole(e.target.value);
+            }}
+          />
+        )}
         <CWButton
           label="Upgrade Member"
           disabled={!role || !user}
@@ -105,6 +153,7 @@ export const UpgradeRolesForm = ({
 
               onRoleUpdate(_user, r.result);
             });
+            zeroOutRadioButtons();
           }}
         />
       </div>

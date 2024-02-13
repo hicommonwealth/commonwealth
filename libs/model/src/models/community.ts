@@ -10,6 +10,7 @@ import type { DataTypes } from 'sequelize';
 import type { AddressAttributes, AddressInstance } from './address';
 import type { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
 import type { CommentAttributes } from './comment';
+import { CommunityStakeAttributes } from './community_stake';
 import type { ContractInstance } from './contract';
 import type { StarredCommunityAttributes } from './starred_community';
 import type { ThreadAttributes } from './thread';
@@ -51,6 +52,7 @@ export type CommunityAttributes = {
   discord_bot_webhooks_enabled?: boolean;
   directory_page_enabled?: boolean;
   directory_page_chain_node_id?: number;
+  namespace?: string;
 
   // associations
   ChainNode?: ChainNodeAttributes;
@@ -64,6 +66,7 @@ export type CommunityAttributes = {
   Users?: UserAttributes[] | UserAttributes['id'][];
   ChainObjectVersion?: any; // TODO
   Contract?: ContractInstance;
+  CommunityStakes?: CommunityStakeAttributes[];
 
   created_at?: Date;
   updated_at?: Date;
@@ -157,6 +160,7 @@ export default (
         allowNull: true,
         defaultValue: null,
       },
+      namespace: { type: dataTypes.STRING, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: true },
       updated_at: { type: dataTypes.DATE, allowNull: true },
     },
@@ -191,6 +195,9 @@ export default (
       foreignKey: 'community_id',
     });
     models.Community.hasMany(models.Group, { foreignKey: 'community_id' });
+    models.Community.hasMany(models.CommunityStake, {
+      foreignKey: 'community_id',
+    });
   };
 
   return Community;

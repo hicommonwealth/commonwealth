@@ -1,12 +1,12 @@
 import React from 'react';
 
 import { handleRedirectClicks } from 'helpers';
-import { featureFlags } from 'helpers/feature-flags';
 import { useCommonNavigate } from 'navigation/helpers';
 import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
-import useNewTopicModalMutationStore from 'state/ui/newTopicModal';
+import { useNewTopicModalStore } from 'state/ui/modals';
 import { sidebarStore } from 'state/ui/sidebar';
+import { useFlag } from '../../../hooks/useFlag';
 import { NewTopicModal } from '../../modals/new_topic_modal';
 import { OrderTopicsModal } from '../../modals/order_topics_modal';
 import { isWindowSmallInclusive } from '../component_kit/helpers';
@@ -51,13 +51,14 @@ const setAdminToggleTree = (path: string, toggle: boolean) => {
 };
 
 const AdminSectionComponent = () => {
+  const proposalTemplatesEnabled = useFlag('proposalTemplates');
   const navigate = useCommonNavigate();
   const location = useLocation();
 
   const [isOrderTopicsModalOpen, setIsOrderTopicsModalOpen] =
     React.useState<boolean>(false);
   const { isNewTopicModalOpen, setIsNewTopicModalOpen } =
-    useNewTopicModalMutationStore();
+    useNewTopicModalStore();
 
   const matchesManageCommunityRoute = matchRoutes(
     [{ path: '/manage' }, { path: ':scope/manage' }],
@@ -117,7 +118,7 @@ const AdminSectionComponent = () => {
         );
       },
     },
-    ...(featureFlags.proposalTemplates
+    ...(proposalTemplatesEnabled
       ? [
           {
             title: 'Contract action templates',

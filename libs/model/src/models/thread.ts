@@ -65,6 +65,7 @@ export type ThreadAttributes = {
 
   //counts
   reaction_count: number;
+  reaction_weights_sum: number;
   comment_count: number;
 
   //notifications
@@ -150,6 +151,10 @@ export default (
         type: dataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0,
+      },
+      reaction_weights_sum: {
+        type: dataTypes.INTEGER,
+        allowNull: true,
       },
       comment_count: {
         type: dataTypes.INTEGER,

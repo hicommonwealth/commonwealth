@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import type { BanAttributes, BanInstance, DB } from '@hicommonwealth/model';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
@@ -23,14 +23,14 @@ const banAddress = async (
   req: TypedRequestBody<BanAddressReq>,
   res: TypedResponse<BanAddressResp>,
 ) => {
-  const chain = req.chain;
+  const { community } = req;
 
   const isAdmin = await validateOwner({
     models: models,
     user: req.user,
-    communityId: chain.id,
+    communityId: community.id,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError(BanAddressErrors.NoPermission);
@@ -43,11 +43,11 @@ const banAddress = async (
   // find or create Ban
   const [ban, created] = await models.Ban.findOrCreate({
     where: {
-      community_id: chain.id,
+      community_id: community.id,
       address,
     },
     defaults: {
-      community_id: chain.id,
+      community_id: community.id,
       address,
     },
   });

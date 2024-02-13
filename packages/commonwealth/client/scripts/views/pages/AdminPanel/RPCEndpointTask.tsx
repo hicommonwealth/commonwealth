@@ -1,4 +1,4 @@
-import { BalanceType } from '@hicommonwealth/core';
+import { BalanceType, ChainType } from '@hicommonwealth/core';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { detectURL } from 'helpers/threads';
 import CommunityInfo from 'models/ChainInfo';
@@ -42,7 +42,9 @@ const RPCEndpointTask = () => {
       rpcEndpointChainValueValidated &&
       balanceType !== BalanceType.Ethereum &&
       !ethChainIdValueValidated) ||
-    (rpcName !== '' && bech32 !== '' && rpcEndpoint !== '');
+    (rpcName !== '' &&
+      (bech32 !== '' || balanceType === BalanceType.Ethereum) &&
+      rpcEndpoint !== '');
 
   const setCommunityIdInput = (e) => {
     setRpcEndpointChainValue(e.target.value);
@@ -112,6 +114,7 @@ const RPCEndpointTask = () => {
 
       await rpcEndpointChain.updateChainData({
         chain_node_id: nodeId ?? rpcEndpointChainNode.id.toString(),
+        type: ChainType.Chain,
       });
       setRpcEndpointChainValue('');
       setRpcEndpoint('');
@@ -213,7 +216,7 @@ const RPCEndpointTask = () => {
               <CWTextInput
                 value={ethChainId}
                 onInput={(e) => {
-                  setEthChainId(e.target.value);
+                  setEthChainId(parseInt(e.target.value));
                 }}
                 inputValidationFn={ethChainIdEndpointValidationFn}
                 placeholder="Enter an ETH chain id"
