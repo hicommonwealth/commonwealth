@@ -6,6 +6,7 @@ import {
 } from '@hicommonwealth/core';
 import { z } from 'zod';
 import { models } from '../database';
+import { mustNotExist } from '../middleware/guards';
 import type { CommunityAttributes } from '../models';
 import { checkIconSize } from '../utils/checkIconSize';
 import { ALL_COMMUNITIES } from '../utils/constants';
@@ -56,17 +57,17 @@ const schema = z.object({
 export type CreateCommunity = z.infer<typeof schema>;
 
 export const CreateCommunity: CommandMetadata<
-  typeof schema,
-  CommunityAttributes
+  CommunityAttributes,
+  typeof schema
 > = {
   schema,
-  fn: async () =>
-    //actor,
-    //id,
-    //payload,
-    {
-      // TODO
-      const community = await models.Community.findOne();
-      return community!;
-    },
+  auth: [],
+  body: async ({ id, payload }) => {
+    const community = await models.Community.findOne({ where: { id } });
+
+    mustNotExist('Community', community);
+
+    //await models.Community.create(payload)
+    return payload as Partial<CommunityAttributes>;
+  },
 };

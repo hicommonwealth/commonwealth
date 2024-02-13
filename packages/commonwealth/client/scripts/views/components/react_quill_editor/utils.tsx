@@ -1,18 +1,18 @@
-import axios from 'axios';
-import { notifyError } from '../../../controllers/app/notifications';
-import type { DeltaStatic } from 'quill';
 import { Icon, IconProps } from '@phosphor-icons/react';
-import ReactDOMServer from 'react-dom/server';
+import axios from 'axios';
+import type { DeltaStatic } from 'quill';
 import React from 'react';
-import { replaceBucketWithCDN } from '../../../helpers/awsHelpers';
+import ReactDOMServer from 'react-dom/server';
 import { compressImage } from 'utils/ImageCompression';
+import { notifyError } from '../../../controllers/app/notifications';
+import { replaceBucketWithCDN } from '../../../helpers/awsHelpers';
 
 export const VALID_IMAGE_TYPES = ['jpeg', 'gif', 'png'];
 
 // createDeltaFromText returns a new DeltaStatic object from a string
 export const createDeltaFromText = (
   str: string,
-  isMarkdown?: boolean
+  isMarkdown?: boolean,
 ): SerializableDeltaStatic => {
   return {
     ops: [
@@ -72,7 +72,7 @@ export const base64ToFile = (data: string, fileType: string): File => {
 export const uploadFileToS3 = async (
   file: File,
   appServerUrl: string,
-  jwtToken: string
+  jwtToken: string,
 ): Promise<string> => {
   try {
     // get a signed upload URL for s3
@@ -83,12 +83,12 @@ export const uploadFileToS3 = async (
         name: file.name,
         auth: 'true',
         jwt: jwtToken,
-      })
+      }),
     );
 
     if (sigResponse.status != 200) {
       throw new Error(
-        `failed to get an S3 signed upload URL: ${sigResponse.data.error}`
+        `failed to get an S3 signed upload URL: ${sigResponse.data.error}`,
       );
     }
 
@@ -187,6 +187,86 @@ export const fetchTwitterEmbedInfo = async (url: string) => {
 
 export const renderToolbarIcon = (PhosphorIcon: Icon, props?: IconProps) => {
   return ReactDOMServer.renderToStaticMarkup(
-    <PhosphorIcon weight="bold" {...props} />
+    <PhosphorIcon weight="bold" {...props} />,
   );
+};
+
+const formatOpsInsert = (currentLine, formattingAttrs) => {
+  let prefixed = '';
+  let suffixed = '';
+
+  const headerNum = formattingAttrs.header;
+  const bold = formattingAttrs.bold;
+  const strike = formattingAttrs.strike;
+  const italic = formattingAttrs.italic;
+
+  const newLineRegex = /^(\n+)(.+)/g;
+  const match = [...currentLine.insert.matchAll(newLineRegex)];
+
+  const newLines = match?.[0]?.[1];
+  const text = match?.[0]?.[2];
+
+  if (headerNum) {
+    prefixed = prefixed.concat('#'.repeat(headerNum), ' ');
+  }
+
+  if (bold) {
+    prefixed = prefixed.concat('**');
+    suffixed = '**' + suffixed;
+  }
+
+  if (italic) {
+    prefixed = prefixed.concat('*');
+    suffixed = '*' + suffixed;
+  }
+
+  if (strike) {
+    prefixed = prefixed.concat('~~');
+    suffixed = '~~' + suffixed;
+  }
+
+  return `${newLines || ''}${prefixed}${
+    text || currentLine.insert || ''
+  }${suffixed}`;
+};
+
+export const RTFtoMD = (delta: DeltaStatic) => {
+  let mdString = '';
+
+  delta.ops.forEach((currentLine, index) => {
+    const nextLine = delta.ops[index + 1];
+
+    const onlyNewLinesRegex = /^(\n+)$/g;
+    const currentIsNewLineInsert = onlyNewLinesRegex.test(currentLine.insert);
+    const nextIsNewLineInsert =
+      nextLine && onlyNewLinesRegex.test(nextLine.insert);
+    let text = '';
+
+    if (currentIsNewLineInsert) {
+      text = currentLine.insert;
+    } else {
+      if (currentLine.attributes) {
+        text = formatOpsInsert(currentLine, currentLine.attributes);
+      } else {
+        if (nextLine && nextIsNewLineInsert) {
+          text = formatOpsInsert(currentLine, nextLine.attributes);
+        } else {
+          text = currentLine.insert;
+        }
+      }
+    }
+
+    mdString = mdString.concat(text);
+  });
+
+  const mdDelta = {
+    ops: [
+      {
+        insert: mdString,
+      },
+    ],
+    ___isMarkdown: true,
+  };
+
+  return mdDelta as SerializableDeltaStatic;
 };

@@ -2,7 +2,7 @@
 
 This entry documents environment variables (both public config and secret auth tokens) used across the Commonwealth monorepo. Environment variables should always be organized alphabetically.
 
-For a list of config tokens to get you started developing, see our [.env.example](../.env.example) file.
+For documentation on feature flags managed through Unleash, see the [dedicated entry](./Feature-Flags.md). For a list of config tokens to get you started developing, see our [.env.example](../.env.example) file.
 
 We use GitHub Secrets to manage our auth tokens; reach out to the documentarian Graham Johnson, or else to an engineering lead, if you need access.
 
@@ -42,7 +42,6 @@ If you add a new environment variable, you must add documentation here. Please d
 - [ETHERSCAN_JS_API_KEY](#etherscan_js_api_key)
 - [FLAG_COMMUNITY_HOMEPAGE](#flag_community_homepage)
 - [FLAG_PROPOSAL_TEMPLATES](#flag_proposal_templates)
-- [FLAG_SIDEBAR_TOGGLE](#flag_sidebar_toggle)
 - [HEROKU_APP_NAME](#heroku_app_name)
 - [IS_CI](#is_ci)
 - [JWT_SECRET](#jwt_secret)
@@ -222,10 +221,6 @@ Boolean toggle to display side-wide homepage feature for communities. Temporary 
 
 Boolean toggle to display side-wide sidebar proposal templates. Temporary flag for 2.0 work.
 
-## FLAG_SIDEBAR_TOGGLE
-
-Boolean toggle to display site-wide discussions homepage sidebar. Temporary flag for 2.0 work.
-
 ## HEROKU_APP_NAME
 
 Automatically in Heroku; the respective app name. Required when using the DataDog PSQL integration.
@@ -332,7 +327,7 @@ Used in chain testing; for more information, see [Chain-Testing-Overview.md](../
 
 ## SEND_WEBHOOKS_EMAILS
 
-Enables Webhook and email dispatching in production when set to `true`. Should be `false` or undefined elsewhere, to prevent Webhooks and emails from being sent in non-production environments. 
+Enables Webhook and email dispatching in production when set to `true`. Should be `false` or undefined elsewhere, to prevent Webhooks and emails from being sent in non-production environments.
 
 ## SENDGRID_API_KEY
 

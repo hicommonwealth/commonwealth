@@ -1,11 +1,9 @@
+import clsx from 'clsx';
 import React, { useState } from 'react';
 import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
-import clsx from 'clsx';
 
 import { uuidv4 } from '../../lib/util';
-import type { ButtonProps } from '../components/component_kit/new_designs/cw_button';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import {
   CWModal,
@@ -13,6 +11,8 @@ import {
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
+import type { ButtonProps } from '../components/component_kit/new_designs/cw_button';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
 
 import '../../../styles/modals/confirmation_modal.scss';
 
@@ -76,6 +76,7 @@ interface OpenConfirmationProps {
   description: string | JSX.Element;
   buttons: ButtonProps[];
   className?: string;
+  onClose?: () => void;
 }
 
 export const openConfirmation = (props: OpenConfirmationProps) => {
@@ -88,6 +89,7 @@ export const openConfirmation = (props: OpenConfirmationProps) => {
   const removeModal = () => {
     root.unmount();
     target.remove();
+    props.onClose();
   };
 
   root = createRoot(target);

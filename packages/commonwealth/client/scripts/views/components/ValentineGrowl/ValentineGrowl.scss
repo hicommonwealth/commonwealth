@@ -1,6 +1,6 @@
 @import '../../../../styles/shared';
 
-.GatingGrowl {
+.ValentineGrowl {
   display: flex;
   flex-direction: column;
   background-color: $white;
@@ -9,26 +9,14 @@
   cursor: pointer;
   border-bottom-left-radius: 0.3125rem;
   border-bottom-right-radius: 0.3125rem;
-  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-
-  .container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    width: 100%;
-    max-width: 400px;
-    text-align: center;
-    gap: 1rem;
-    cursor: default;
-  }
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.5);
 
   .closeButton {
     align-self: flex-end;
     cursor: pointer;
     position: absolute;
-    color: $white;
+    color: $black;
     top: 1rem;
     right: 0rem;
     z-index: 2;
@@ -41,6 +29,7 @@
   .img {
     width: 320px;
     height: 192px;
+    margin-bottom: -25px;
     cursor: default;
     border-top-left-radius: 0.3125rem;
     border-top-right-radius: 0.3125rem;
@@ -48,8 +37,26 @@
     z-index: 1;
   }
 
-  .checkbox {
-    cursor: pointer;
+  .container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    gap: 1rem;
+    cursor: default;
+
+    .subtitle-text {
+      margin-top: -12px;
+    }
+
+    .body {
+      color: $neutral-600;
+      letter-spacing: 1px;
+    }
   }
 
   .icon {
@@ -57,18 +64,15 @@
     padding-left: 6px;
   }
 
-  .learnMore {
-    cursor: pointer;
-  }
-
   .checkboxContainer {
     display: flex;
     align-items: center;
     justify-content: center;
     padding-bottom: 1rem;
-  }
 
-  .checkbox {
-    color: $neutral-400;
+    .checkbox {
+      cursor: pointer;
+      color: $neutral-400;
+    }
   }
 }

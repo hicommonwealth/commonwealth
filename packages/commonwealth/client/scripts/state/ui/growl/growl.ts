@@ -3,15 +3,15 @@ import { devtools } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 
 interface GrowlStore {
-  growlHidden: boolean;
-  setGrowlHidden: (growlHidden: boolean) => void;
+  isGrowlHidden: boolean;
+  setIsGrowlHidden: (isGrowlHidden: boolean) => void;
 }
 
 const growlStore = createStore<GrowlStore>()(
   devtools(
     (set) => ({
-      growlHidden: false,
-      setGrowlHidden: (growlHidden: boolean) => set({ growlHidden }),
+      isGrowlHidden: false,
+      setIsGrowlHidden: (isGrowlHidden: boolean) => set({ isGrowlHidden }),
     }),
     {
       name: 'growl',

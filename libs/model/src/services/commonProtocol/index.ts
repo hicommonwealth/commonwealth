@@ -1,3 +1,3 @@
-export * from './communityStakeConfigValidator';
+export * as communityStakeConfigValidator from './communityStakeConfigValidator';
 export * as contractHelpers from './contractHelpers';
-export * from './newNamespaceValidator';
+export * as newNamespaceValidator from './newNamespaceValidator';

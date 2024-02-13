@@ -1,6 +1,6 @@
-import { logger } from '@hicommonwealth/core';
+import { ServerError, logger } from '@hicommonwealth/core';
 import { Express } from 'express';
-import { CustomRequest, ServerError, lookupKeyDurationInReq } from '../../src';
+import { CustomRequest, lookupKeyDurationInReq } from '../../src';
 import { CacheDecorator } from '../../src/redis';
 
 const log = logger().getLogger(__filename);

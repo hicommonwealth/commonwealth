@@ -1,5 +1,6 @@
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
+import { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type CommunityStakeAttributes = {
@@ -12,6 +13,9 @@ export type CommunityStakeAttributes = {
 
   created_at?: Date;
   updated_at?: Date;
+
+  // associations
+  Chain?: CommunityAttributes;
 };
 
 export type CommunityStakeInstance = ModelInstance<CommunityStakeAttributes>;

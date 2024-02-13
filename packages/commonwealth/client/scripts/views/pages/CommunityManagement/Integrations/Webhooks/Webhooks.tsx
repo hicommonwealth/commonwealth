@@ -12,6 +12,7 @@ import {
   useEditWebhookMutation,
   useFetchWebhooksQuery,
 } from 'state/api/webhooks';
+import _ from 'underscore';
 import { LinksArray, useLinksArray } from 'views/components/LinksArray';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
@@ -197,7 +198,14 @@ const Webhooks = () => {
           <CWButton
             buttonType="secondary"
             label="Save Changes"
-            disabled={webhooks.length === existingWebhooks.length}
+            disabled={_.isEqual(
+              [...(webhooks || []).map((x) => x.value.trim())].sort((a, b) =>
+                a.localeCompare(b),
+              ),
+              [...(existingWebhooks || []).map((x) => x.url.trim())].sort(
+                (a, b) => a.localeCompare(b),
+              ),
+            )}
             onClick={onSaveChanges}
           />
         ) : (
