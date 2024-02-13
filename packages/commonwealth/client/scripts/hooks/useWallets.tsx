@@ -30,7 +30,6 @@ import {
 } from '../../../shared/analytics/types';
 import NewProfilesController from '../controllers/server/newProfiles';
 import { setDarkMode } from '../helpers/darkMode';
-import { featureFlags } from '../helpers/feature-flags';
 import {
   getAddressFromWallet,
   loginToAxie,
@@ -50,6 +49,7 @@ import type {
 } from '../views/pages/login/types';
 import { useBrowserAnalyticsTrack } from './useBrowserAnalyticsTrack';
 import useBrowserWindow from './useBrowserWindow';
+import { useFlag } from './useFlag';
 
 type IuseWalletProps = {
   initialBody?: LoginActiveStep;
@@ -62,13 +62,14 @@ type IuseWalletProps = {
 };
 
 const useWallets = (walletProps: IuseWalletProps) => {
+  const newSignInModalEnabled = useFlag('newSignInModal');
   const [avatarUrl, setAvatarUrl] = useState<string>();
   const [address, setAddress] = useState<string>();
   const [activeStep, setActiveStep] = useState<LoginActiveStep>();
   const [profiles, setProfiles] = useState<Array<ProfileRowProps>>();
   const [sidebarType, setSidebarType] = useState<LoginSidebarType>();
   const [username, setUsername] = useState<string>(
-    featureFlags.newSignInModal ? 'Anonymous' : '',
+    newSignInModalEnabled ? 'Anonymous' : '',
   );
   const [email, setEmail] = useState<string>();
   const [wallets, setWallets] = useState<Array<IWebWallet<any>>>();
@@ -382,7 +383,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
           setSidebarType('newOrReturning');
           setActiveStep('selectAccountType');
 
-          if (featureFlags.newSignInModal) {
+          if (newSignInModalEnabled) {
             // Create the account with default values
             await onCreateNewAccount(
               walletToUse,
@@ -641,7 +642,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
         setSignerAccount(signingAccount);
         setIsNewlyCreated(newlyCreated);
         setIsLinkingOnMobile(isLinkingWallet);
-        if (featureFlags.newSignInModal) {
+        if (newSignInModalEnabled) {
           onAccountVerified(
             signingAccount,
             newlyCreated,
@@ -733,7 +734,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
       if (setSignerAccount) setSignerAccount(account);
       if (setIsNewlyCreated) setIsNewlyCreated(false);
       if (setIsLinkingOnMobile) setIsLinkingOnMobile(false);
-      if (featureFlags.newSignInModal) {
+      if (newSignInModalEnabled) {
         onAccountVerified(account, false, false);
       } else {
         setActiveStep('redirectToSign');
