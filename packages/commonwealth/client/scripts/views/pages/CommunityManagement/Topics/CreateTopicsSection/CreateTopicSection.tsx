@@ -21,7 +21,7 @@ import type { DeltaStatic } from 'quill';
 import React, { useEffect, useState } from 'react';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import './CreateTopicSection.scss';
-
+import { FormSubmitValues } from './types';
 import { topicCreationValidationSchema } from './validation';
 
 export const CreateTopicSection = () => {
@@ -32,6 +32,7 @@ export const CreateTopicSection = () => {
   });
 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [nameErrorMsg, setNameErrorMsg] = useState<string | null>(null);
   const [contentDelta, setContentDelta] = useState<DeltaStatic>(
     createDeltaFromText(''),
   );
@@ -46,18 +47,14 @@ export const CreateTopicSection = () => {
   const editorText = getTextFromDelta(contentDelta);
 
   useEffect(() => {
-    if (!name || !name.trim()) {
-      setErrorMsg('Name must be specified.');
-      return;
-    }
     if (featuredInNewPost && editorText.length === 0) {
       setErrorMsg('Must add template.');
       return;
     }
     setErrorMsg(null);
-  }, [name, featuredInNewPost, editorText]);
+  }, [featuredInNewPost, editorText]);
 
-  const handleCreateTopic = async (_e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleCreateTopic = async (values: FormSubmitValues) => {
     try {
       await createTopic({
         name,
@@ -78,7 +75,7 @@ export const CreateTopicSection = () => {
 
     if (currentCommunityTopicNames.includes(text.toLowerCase())) {
       const err = 'Topic name already used within community.';
-      setErrorMsg(err);
+      setNameErrorMsg(err);
       return ['failure', err];
     }
 
@@ -90,13 +87,11 @@ export const CreateTopicSection = () => {
         'char',
       )}
     ${disallowedCharMatches.join(', ')} are not permitted`;
-      setErrorMsg(err);
+      setNameErrorMsg(err);
       return ['failure', err];
     }
 
-    if (errorMsg) {
-      setErrorMsg(null);
-    }
+    setNameErrorMsg(null);
 
     return ['success', 'Valid topic name'];
   };
@@ -116,8 +111,9 @@ export const CreateTopicSection = () => {
             value={name}
             onInput={(e) => {
               setName(e.target.value);
+              handleInputValidation(e.target.value);
             }}
-            inputValidationFn={handleInputValidation}
+            customError={nameErrorMsg}
             autoFocus
           />
           <CWTextInput
