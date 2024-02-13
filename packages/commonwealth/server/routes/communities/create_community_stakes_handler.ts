@@ -2,7 +2,7 @@ import { AppError } from '@hicommonwealth/core';
 import {
   CommunityStakeAttributes,
   DB,
-  communityStakeConfigValidator,
+  commonProtocol,
 } from '@hicommonwealth/model';
 import {
   SetCommunityStakeBodySchema,
@@ -65,7 +65,7 @@ export const createCommunityStakeHandler = async (
     attributes: ['namespace'],
   });
 
-  await communityStakeConfigValidator.validateCommunityStakeConfig(
+  await commonProtocol.communityStakeConfigValidator.validateCommunityStakeConfig(
     community,
     stake_id,
   );

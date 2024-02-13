@@ -19,11 +19,7 @@ import {
   cache,
   delay,
 } from '@hicommonwealth/core';
-import {
-  TokenBalanceCache,
-  getTendermintClient,
-  models,
-} from '@hicommonwealth/model';
+import { models, tokenBalanceCache } from '@hicommonwealth/model';
 import BN from 'bn.js';
 import { use as chaiUse, expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -91,7 +87,6 @@ async function generateCosmosAddresses(numberOfAddresses: number) {
 
 describe('Token Balance Cache Cosmos Tests', function () {
   this.timeout(80_000);
-  let tbc: TokenBalanceCache;
   // mnemonic + token allocation can be found in cosmos-chain-test/[version]/bootstrap.sh files
   const cosmosChainId = 'csdkv1ci';
   const addressOne = 'cosmos1zf45elxg5alxxeewvumpprfqtxmy2ufhzvetgx';
@@ -104,12 +99,11 @@ describe('Token Balance Cache Cosmos Tests', function () {
     const redisCache = new RedisCache();
     await redisCache.init('redis://localhost:6379');
     cache(redisCache);
-    tbc = new TokenBalanceCache(models);
   });
 
   describe('Cosmos Native', function () {
     it('should return a single balance', async () => {
-      const balance = await tbc.getBalances({
+      const balance = await tokenBalanceCache.getBalances({
         balanceSourceType: BalanceSourceType.CosmosNative,
         addresses: [addressOne],
         sourceOptions: {
@@ -124,7 +118,7 @@ describe('Token Balance Cache Cosmos Tests', function () {
     });
 
     it('should not throw if a single address fails', async () => {
-      const balance = await tbc.getBalances({
+      const balance = await tokenBalanceCache.getBalances({
         balanceSourceType: BalanceSourceType.CosmosNative,
         addresses: [addressOne, discobotAddress],
         sourceOptions: {
@@ -138,7 +132,7 @@ describe('Token Balance Cache Cosmos Tests', function () {
     });
 
     it('should only return a single result per address', async () => {
-      const balances = await tbc.getBalances({
+      const balances = await tokenBalanceCache.getBalances({
         balanceSourceType: BalanceSourceType.CosmosNative,
         addresses: [addressOne, addressOne],
         sourceOptions: {
@@ -152,7 +146,7 @@ describe('Token Balance Cache Cosmos Tests', function () {
     });
 
     it('should return many balances', async () => {
-      const balances = await tbc.getBalances({
+      const balances = await tokenBalanceCache.getBalances({
         balanceSourceType: BalanceSourceType.CosmosNative,
         addresses: [addressOne, addressTwo],
         sourceOptions: {
@@ -170,7 +164,7 @@ describe('Token Balance Cache Cosmos Tests', function () {
       const bulkAddresses = await generateCosmosAddresses(20);
       bulkAddresses.splice(4, 0, addressOne);
       bulkAddresses.splice(5, 0, addressTwo);
-      const balances = await tbc.getBalances({
+      const balances = await tokenBalanceCache.getBalances({
         balanceSourceType: BalanceSourceType.CosmosNative,
         addresses: bulkAddresses,
         sourceOptions: {
@@ -189,7 +183,6 @@ describe('Token Balance Cache Cosmos Tests', function () {
       const balanceTTL = 20;
 
       before('Set TBC caching TTL and reset Redis', async () => {
-        tbc = new TokenBalanceCache(models, balanceTTL);
         await cache().flushAll();
       });
 
@@ -211,14 +204,17 @@ describe('Token Balance Cache Cosmos Tests', function () {
         const { amount } = await api.bank.balance(addressOne, denom);
         const originalAddressOneBalance = amount;
 
-        const balance = await tbc.getBalances({
-          balanceSourceType: BalanceSourceType.CosmosNative,
-          addresses: [addressOne],
-          sourceOptions: {
-            cosmosChainId,
+        const balance = await tokenBalanceCache.getBalances(
+          {
+            balanceSourceType: BalanceSourceType.CosmosNative,
+            addresses: [addressOne],
+            sourceOptions: {
+              cosmosChainId,
+            },
+            cacheRefresh: true,
           },
-          cacheRefresh: true,
-        });
+          balanceTTL,
+        );
         expect(Object.keys(balance).length).to.equal(1);
         expect(balance[addressOne]).to.equal(originalAddressOneBalance);
 
@@ -236,24 +232,30 @@ describe('Token Balance Cache Cosmos Tests', function () {
           gas: '200000',
         });
 
-        const balanceTwo = await tbc.getBalances({
-          balanceSourceType: BalanceSourceType.CosmosNative,
-          addresses: [addressOne],
-          sourceOptions: {
-            cosmosChainId,
+        const balanceTwo = await tokenBalanceCache.getBalances(
+          {
+            balanceSourceType: BalanceSourceType.CosmosNative,
+            addresses: [addressOne],
+            sourceOptions: {
+              cosmosChainId,
+            },
           },
-        });
+          balanceTTL,
+        );
         expect(Object.keys(balanceTwo).length).to.equal(1);
         expect(balanceTwo[addressOne]).to.equal(originalAddressOneBalance);
         await delay(20000);
 
-        const balanceThree = await tbc.getBalances({
-          balanceSourceType: BalanceSourceType.CosmosNative,
-          addresses: [addressOne],
-          sourceOptions: {
-            cosmosChainId,
+        const balanceThree = await tokenBalanceCache.getBalances(
+          {
+            balanceSourceType: BalanceSourceType.CosmosNative,
+            addresses: [addressOne],
+            sourceOptions: {
+              cosmosChainId,
+            },
           },
-        });
+          balanceTTL,
+        );
         const finalBn = new BN(originalAddressOneBalance);
         expect(Object.keys(balanceThree).length).to.equal(1);
         expect(balanceThree[addressOne]).to.equal(
@@ -276,7 +278,7 @@ describe('Token Balance Cache Cosmos Tests', function () {
     });
 
     it('should return a single cw721 balance', async () => {
-      const balance = await tbc.getBalances({
+      const balance = await tokenBalanceCache.getBalances({
         balanceSourceType: BalanceSourceType.CW721,
         addresses: [addressWithNft],
         sourceOptions: {
@@ -290,7 +292,7 @@ describe('Token Balance Cache Cosmos Tests', function () {
       expect(balance[addressWithNft]).to.equal('1');
     });
     it('should return many cw721 balances', async () => {
-      const balances = await tbc.getBalances({
+      const balances = await tokenBalanceCache.getBalances({
         balanceSourceType: BalanceSourceType.CW721,
         addresses: [addressWithNft, addressWithoutNft],
         sourceOptions: {
@@ -305,7 +307,7 @@ describe('Token Balance Cache Cosmos Tests', function () {
       expect(balances[addressWithoutNft]).to.equal('0');
     });
     it('should not throw if a single address fails', async () => {
-      const balance = await tbc.getBalances({
+      const balance = await tokenBalanceCache.getBalances({
         balanceSourceType: BalanceSourceType.CW721,
         addresses: [discobotAddress],
         sourceOptions: {
@@ -318,7 +320,7 @@ describe('Token Balance Cache Cosmos Tests', function () {
       expect(Object.keys(balance).length).to.equal(0);
     });
     it('should not throw if a single address out of many fails', async () => {
-      const balance = await tbc.getBalances({
+      const balance = await tokenBalanceCache.getBalances({
         balanceSourceType: BalanceSourceType.CW721,
         addresses: [addressWithNft, discobotAddress],
         sourceOptions: {
@@ -335,7 +337,7 @@ describe('Token Balance Cache Cosmos Tests', function () {
       const bulkAddresses = await generateCosmosAddresses(20);
       bulkAddresses.splice(4, 0, addressWithNft);
       bulkAddresses.splice(5, 0, addressWithoutNft);
-      const balances = await tbc.getBalances({
+      const balances = await tokenBalanceCache.getBalances({
         balanceSourceType: BalanceSourceType.CW721,
         addresses: bulkAddresses,
         sourceOptions: {
@@ -354,7 +356,6 @@ describe('Token Balance Cache Cosmos Tests', function () {
       const balanceTTL = 20;
 
       before('Set TBC caching TTL and reset Redis', async () => {
-        tbc = new TokenBalanceCache(models, balanceTTL);
         await cache().flushAll();
       });
 
@@ -364,7 +365,7 @@ describe('Token Balance Cache Cosmos Tests', function () {
             cosmos_chain_id: stargazeChainId,
           },
         });
-        const tmClient = await getTendermintClient({
+        const tmClient = await tokenBalanceCache.getTendermintClient({
           chainNode,
         });
         const api = QueryClient.withExtensions(tmClient, setupWasmExtension);
@@ -382,29 +383,35 @@ describe('Token Balance Cache Cosmos Tests', function () {
         );
         const expectedAddressOneBalance = response.tokens.length.toString();
 
-        const balance = await tbc.getBalances({
-          balanceSourceType: BalanceSourceType.CW721,
-          addresses: [addressWithNft],
-          sourceOptions: {
-            cosmosChainId: stargazeChainId,
-            contractAddress,
+        const balance = await tokenBalanceCache.getBalances(
+          {
+            balanceSourceType: BalanceSourceType.CW721,
+            addresses: [addressWithNft],
+            sourceOptions: {
+              cosmosChainId: stargazeChainId,
+              contractAddress,
+            },
+            cacheRefresh: true,
           },
-          cacheRefresh: true,
-        });
+          balanceTTL,
+        );
 
         expect(Object.keys(balance).length).to.equal(1);
         expect(balance[addressWithNft]).to.equal(expectedAddressOneBalance);
 
         delay(20000);
 
-        const balanceAfterTTL = await tbc.getBalances({
-          balanceSourceType: BalanceSourceType.CW721,
-          addresses: [addressWithNft],
-          sourceOptions: {
-            cosmosChainId: stargazeChainId,
-            contractAddress,
+        const balanceAfterTTL = await tokenBalanceCache.getBalances(
+          {
+            balanceSourceType: BalanceSourceType.CW721,
+            addresses: [addressWithNft],
+            sourceOptions: {
+              cosmosChainId: stargazeChainId,
+              contractAddress,
+            },
           },
-        });
+          balanceTTL,
+        );
 
         expect(Object.keys(balanceAfterTTL).length).to.equal(1);
         expect(balanceAfterTTL[addressWithNft]).to.equal(

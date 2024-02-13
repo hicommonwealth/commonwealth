@@ -5,7 +5,7 @@ import {
 } from '@hicommonwealth/core';
 import Web3 from 'web3';
 import { CommunityAttributes } from '../../models';
-import { TokenBalanceCache } from '../tokenBalanceCache';
+import { getBalances } from '../tokenBalanceCache';
 import { getNamespace } from './contractHelpers';
 
 /**
@@ -15,7 +15,6 @@ import { getNamespace } from './contractHelpers';
  * 3. correct contract address
  * 4. If user is the admin of namespace on-chain
  * @param model
- * @param tbc
  * @param namespace The namespace name
  * @param txHash transaction hash of creation tx
  * @param address user's address
@@ -23,7 +22,6 @@ import { getNamespace } from './contractHelpers';
  * @returns an AppError if any validations fail, else passses
  */
 export const validateNamespace = async (
-  tbc: TokenBalanceCache,
   namespace: string,
   txHash: string,
   address: string,
@@ -73,7 +71,7 @@ export const validateNamespace = async (
   }
 
   // Validate User as admin
-  const balance = await tbc.getBalances({
+  const balance = await getBalances({
     balanceSourceType: BalanceSourceType.ERC1155,
     addresses: [address],
     sourceOptions: {
