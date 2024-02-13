@@ -2,7 +2,6 @@ import {
   AddressAttributes,
   DB,
   MembershipRejectReason,
-  TokenBalanceCache,
 } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
 import { refreshMembershipsForAddress } from './refreshMembershipsForAddress';
@@ -11,7 +10,6 @@ import { refreshMembershipsForAddress } from './refreshMembershipsForAddress';
  * Validates if a given user address passes a set of requirements and grants access for
  * all groups of the given topic.
  * @param models DB handle
- * @param tokenBalanceCache Token balance cache handle (new implementation)
  * @param topicId ID of the topic
  * @param communityId ID of the community of the groups
  * @param address Address to check against requirements
@@ -19,7 +17,6 @@ import { refreshMembershipsForAddress } from './refreshMembershipsForAddress';
  */
 export async function validateTopicGroupsMembership(
   models: DB,
-  tokenBalanceCache: TokenBalanceCache,
   topicId: number,
   communityId: string,
   address: AddressAttributes,
@@ -51,7 +48,6 @@ export async function validateTopicGroupsMembership(
 
   const memberships = await refreshMembershipsForAddress(
     models,
-    tokenBalanceCache,
     address,
     groups,
     false, // use cached balances

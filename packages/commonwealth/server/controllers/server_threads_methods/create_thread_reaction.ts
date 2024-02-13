@@ -7,7 +7,7 @@ import {
   AddressInstance,
   ReactionAttributes,
   UserInstance,
-  contractHelpers,
+  commonProtocol as commonProtocolService,
 } from '@hicommonwealth/model';
 import { REACTION_WEIGHT_OVERRIDE } from 'server/config';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
@@ -88,7 +88,6 @@ export async function __createThreadReaction(
   if (!isAdmin) {
     const { isValid, message } = await validateTopicGroupsMembership(
       this.models,
-      this.tokenBalanceCache,
       thread.topic_id,
       thread.community_id,
       address,
@@ -114,14 +113,14 @@ export async function __createThreadReaction(
       if (!community) {
         throw new AppError(Errors.CommunityNotFound);
       }
-      const stakeBalance = await contractHelpers.getNamespaceBalance(
-        this.tokenBalanceCache,
-        community.namespace,
-        stake.stake_id,
-        commonProtocol.ValidChains.Sepolia,
-        address.address,
-        this.models,
-      );
+      const stakeBalance =
+        await commonProtocolService.contractHelpers.getNamespaceBalance(
+          community.namespace,
+          stake.stake_id,
+          commonProtocol.ValidChains.Sepolia,
+          address.address,
+          this.models,
+        );
       calculatedVotingWeight = commonProtocol.calculateVoteWeight(
         stakeBalance,
         voteWeight,
