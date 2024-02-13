@@ -57,8 +57,8 @@ export const CreateTopicSection = () => {
   const handleCreateTopic = async (values: FormSubmitValues) => {
     try {
       await createTopic({
-        name,
-        description,
+        name: values.topicName,
+        description: values.topicDescription,
         featuredInSidebar,
         featuredInNewPost,
         defaultOffchainTemplate: serializeDelta(contentDelta),
