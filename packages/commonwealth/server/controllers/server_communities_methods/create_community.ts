@@ -80,9 +80,12 @@ export async function __createCommunity(
   this: ServerCommunitiesController,
   { user, community }: CreateCommunityOptions,
 ): Promise<CreateCommunityResult> {
+  // FIXME: this is taken care by authentication layer
   if (!user) {
     throw new AppError('Not signed in');
   }
+
+  // FIXME: this looks like a non-reusable custom authorization
   // require Admin privilege for creating Chain/DAO
   if (
     community.type !== ChainType.Token &&
@@ -110,6 +113,7 @@ export async function __createCommunity(
   let sanitizedSpec;
   let hex;
 
+  // FIXME: this looks like input validation
   // always generate a chain id
   if (community.base === ChainBase.Ethereum) {
     if (!community.eth_chain_id || !+community.eth_chain_id) {
@@ -123,6 +127,7 @@ export async function __createCommunity(
     community.base === ChainBase.Ethereum &&
     community.type !== ChainType.Offchain
   ) {
+    // FIXME: this looks like input validation
     if (!Web3.utils.isAddress(community.address)) {
       throw new AppError(Errors.InvalidAddress);
     }
@@ -272,6 +277,8 @@ export async function __createCommunity(
     token_name,
     user_address,
   } = community;
+
+  // FIXME: this looks like input validation
   if (website && !urlHasValidHTTPPrefix(website)) {
     throw new AppError(Errors.InvalidWebsite);
   } else if (discord && !urlHasValidHTTPPrefix(discord)) {
@@ -366,6 +373,7 @@ export async function __createCommunity(
   const nodeJSON = node.toJSON();
   delete nodeJSON.private_url;
 
+  // FIXME: looks like state mutations start here, make sure we are using the same transaction
   await this.models.Topic.create({
     community_id: createdCommunity.id,
     name: 'General',
