@@ -14,6 +14,13 @@ async function main() {
     );
   }
 
+  if (!process.argv[2]) {
+    throw new Error(
+      'Must provide a boolean argument indicating what `User.isAdmin` should be set to.',
+    );
+  }
+  const isAdmin = process.argv[2] === 'true';
+
   const where: WhereOptions<UserAttributes> = {};
   if (process.env.SUPER_ADMIN_EMAIL) {
     where['email'] = process.env.SUPER_ADMIN_EMAIL;
@@ -28,7 +35,7 @@ async function main() {
 
   await models.User.update(
     {
-      isAdmin: true,
+      isAdmin,
     },
     {
       where,
