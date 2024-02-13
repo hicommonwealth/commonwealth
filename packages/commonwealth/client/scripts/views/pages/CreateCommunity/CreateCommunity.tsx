@@ -26,6 +26,7 @@ const CreateCommunity = () => {
     handleCompleteBasicInformationStep,
     onChangeStep,
     showCommunityStakeStep,
+    selectedChainId,
   } = useCreateCommunity();
 
   useBrowserAnalyticsTrack({
@@ -64,6 +65,7 @@ const CreateCommunity = () => {
             createdCommunityName={createdCommunityName}
             createdCommunityId={createdCommunityId}
             selectedAddress={selectedAddress}
+            chainId={selectedChainId}
           />
         );
 

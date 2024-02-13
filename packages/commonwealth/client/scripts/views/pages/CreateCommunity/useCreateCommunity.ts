@@ -57,6 +57,7 @@ const useCreateCommunity = () => {
     handleCompleteBasicInformationStep,
     onChangeStep,
     showCommunityStakeStep,
+    selectedChainId,
   };
 };
 

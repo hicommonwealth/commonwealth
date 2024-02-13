@@ -12,7 +12,7 @@ interface IWebWallet<AccountT extends { address: string } | string> {
   enabling: boolean;
   accounts: readonly AccountT[];
   api?: any;
-  enable: () => Promise<void>;
+  enable: (forceChainId: string) => Promise<void>;
   reset?: () => Promise<void>;
 
   getChainId(): string | null;
@@ -23,6 +23,8 @@ interface IWebWallet<AccountT extends { address: string } | string> {
     account: Account,
     canvasSessionPayload: SessionPayload,
   ): Promise<string>;
+
+  switchNetwork?(chainId?: string): Promise<void>;
 
   chain: ChainBase;
   defaultNetwork: ChainNetwork;
