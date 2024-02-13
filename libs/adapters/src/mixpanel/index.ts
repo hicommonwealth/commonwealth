@@ -1,9 +1,9 @@
 import { Analytics, AnalyticsOptions, logger } from '@hicommonwealth/core';
 import MixpanelLib from 'mixpanel';
 
-const log = logger().getLogger(__filename);
-
 export const MixpanelAnalytics = (): Analytics => {
+  const log = logger().getLogger(__filename);
+
   let mixpanelNode;
 
   try {
