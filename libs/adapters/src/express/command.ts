@@ -24,9 +24,10 @@ export const expressCommand =
     next: NextFunction,
   ) => {
     try {
-      const results = await command(md, req.params.id, req.body, {
-        user: req.user as User,
-        address_id: req.body.address_id,
+      const results = await command(md, {
+        id: req.params.id,
+        actor: { user: req.user as User, address_id: req.body.address_id },
+        payload: req.body,
       });
       return res.json(results);
     } catch (error) {
