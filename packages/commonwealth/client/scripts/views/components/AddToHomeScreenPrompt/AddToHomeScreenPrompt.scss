@@ -26,6 +26,7 @@
     }
 
     .title {
+      color: var(--Neutrals-900, #141315);
       /* Heading 05/Medium */
       font-family: Silka;
       font-size: 18px;
@@ -73,10 +74,6 @@
       font-weight: 400;
       line-height: 24px; /* 171.429% */
       letter-spacing: 0.14px;
-    }
-
-    .instructions {
-      margin-top: 1rem;
     }
 
     .highlight {
