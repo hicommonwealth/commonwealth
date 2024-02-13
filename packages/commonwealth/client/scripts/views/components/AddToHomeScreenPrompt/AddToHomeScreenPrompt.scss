@@ -1,0 +1,175 @@
+.home-screen-prompt {
+  display: flex;
+  align-items: flex-end; // Align items to the bottom
+  justify-content: center;
+  height: 100vh;
+  position: fixed; // Make the prompt fixed
+  bottom: 0; // Position it at the top
+  left: 0; // Position it at the left
+  right: 0; // Position it at the right
+  width: 100%; // Make it span the full width
+  height: 100%; // Make it span the full height
+  background-color: rgba(0, 0, 0, 0.5); // Add a semi-transparent background
+  z-index: 1000; // Make sure it's above everything else
+  margin: 0; // Remove margins
+  box-sizing: border-box; // Include padding and border in width and height
+
+  .header {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #ccc; // Change color as needed
+    padding: 16px 16px 8px; // top, right-left, bottom
+
+    .icon {
+      margin-right: 0.5rem; // Adjust this value as needed
+      padding-right: 16px;
+    }
+
+    .title {
+      /* Heading 05/Medium */
+      font-family: Silka;
+      font-size: 18px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 24px; /* 133.333% */
+      letter-spacing: -0.18px;
+    }
+  }
+
+  .prompt-content {
+    background-color: #fff;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    padding: 16px;
+    border-radius: 6px;
+
+    .title {
+      font-size: 1.125rem;
+      font-weight: 600;
+    }
+
+    .description,
+    .instructions {
+      margin-top: 16px;
+      color: #718096;
+      font-variant-numeric: lining-nums tabular-nums;
+      font-family: 'SF Pro Text';
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 24px; /* 171.429% */
+      letter-spacing: 0.14px;
+    }
+
+    .description {
+    }
+
+    .hide-prompt {
+      margin-top: 16px;
+      font-variant-numeric: lining-nums tabular-nums;
+      font-family: 'SF Pro Text';
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 24px; /* 171.429% */
+      letter-spacing: 0.14px;
+    }
+
+    .instructions {
+      margin-top: 1rem;
+    }
+
+    .highlight {
+      background: var(--Neutrals-50, #f7f7f7);
+      padding-left: 8px;
+      padding-right: 8px;
+    }
+  }
+}
+
+.android-home-screen-prompt {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  position: fixed; // Make the prompt fixed
+  bottom: 0; // Position it at the top
+  left: 0; // Position it at the left
+  width: 100%; // Make it span the full width
+  height: 100%; // Make it span the full height
+  background-color: rgba(0, 0, 0, 0.5); // Add a semi-transparent background
+  z-index: 1000; // Make sure it's above everything else
+
+  .header {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #ccc; // Change color as needed
+    padding: 16px 16px 8px; // top, right-left, bottom
+
+    .icon {
+      margin-right: 0.5rem; // Adjust this value as needed
+      padding-right: 16px;
+    }
+
+    .title {
+      /* Heading 05/Medium */
+      font-family: Silka;
+      font-size: 18px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 24px; /* 133.333% */
+      letter-spacing: -0.18px;
+    }
+  }
+
+  .prompt-content {
+    padding: 1rem;
+    background-color: #fff;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    padding: 16px;
+    border-radius: 6px;
+
+    .title {
+      font-size: 1.125rem;
+      font-weight: 600;
+    }
+
+    .description,
+    .instructions {
+      margin-top: 16px;
+      color: #718096;
+      font-variant-numeric: lining-nums tabular-nums;
+      font-family: 'SF Pro Text';
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 24px; /* 171.429% */
+      letter-spacing: 0.14px;
+    }
+
+    .description {
+    }
+
+    .hide-prompt {
+      margin-top: 16px;
+      font-variant-numeric: lining-nums tabular-nums;
+      font-family: 'SF Pro Text';
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 24px; /* 171.429% */
+      letter-spacing: 0.14px;
+    }
+
+    .instructions {
+      margin-top: 1rem;
+    }
+
+    .highlight {
+      background: var(--Neutrals-50, #f7f7f7);
+      padding-left: 8px;
+      padding-right: 8px;
+    }
+  }
+}

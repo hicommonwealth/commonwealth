@@ -6,6 +6,8 @@ import React, { StrictMode } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { queryClient } from 'state/api/config';
+import useAppStatus from './hooks/useAppStatus';
+import AddToHomeScreenPrompt from './views/components/AddToHomeScreenPrompt/AddToHomeScreenPrompt';
 import { CWIcon } from './views/components/component_kit/cw_icons/cw_icon';
 
 const Splash = () => {
@@ -19,6 +21,13 @@ const Splash = () => {
 
 const App = () => {
   const { customDomain, isLoading } = useInitApp();
+  const {
+    isAddedToHomeScreen,
+    isStandalone,
+    isMarketingPage,
+    isIOS,
+    isAndroid,
+  } = useAppStatus();
 
   return (
     <StrictMode>
@@ -26,8 +35,15 @@ const App = () => {
         {isLoading ? (
           <Splash />
         ) : (
-          <RouterProvider router={router(customDomain)} />
+          <>
+            <RouterProvider router={router(customDomain)} />
+          </>
         )}
+
+        {isAddedToHomeScreen || isMarketingPage ? null : (
+          <AddToHomeScreenPrompt isIOS={isIOS} isAndroid={isAndroid} />
+        )}
+
         <ToastContainer />
         <ReactQueryDevtools />
       </QueryClientProvider>
