@@ -5,7 +5,7 @@ import {
   cache,
   delay,
 } from '@hicommonwealth/core';
-import { Balances, TokenBalanceCache, models } from '@hicommonwealth/model';
+import { Balances, models, tokenBalanceCache } from '@hicommonwealth/model';
 import BN from 'bn.js';
 import { expect } from 'chai';
 import Web3 from 'web3';
@@ -67,7 +67,6 @@ function checkZeroBalances(balances: Balances, skipAddress: string[]) {
 describe('Token Balance Cache EVM Tests', function () {
   this.timeout(160000);
 
-  let tbc: TokenBalanceCache;
   const sdk = new ChainTesting('http://127.0.0.1:3000');
 
   const addressOne = '0xCEB3C3D4B78d5d10bd18930DC0757ddB588A862a';
@@ -86,7 +85,6 @@ describe('Token Balance Cache EVM Tests', function () {
     const redisCache = new RedisCache();
     await redisCache.init('redis://localhost:6379');
     cache(redisCache);
-    tbc = new TokenBalanceCache(models);
   });
 
   describe('ERC20', () => {
@@ -118,7 +116,7 @@ describe('Token Balance Cache EVM Tests', function () {
 
     describe('Single address', () => {
       it('should not fail if no address is given', async () => {
-        const balance = await tbc.getBalances({
+        const balance = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC20,
           addresses: [],
           sourceOptions: {
@@ -132,7 +130,7 @@ describe('Token Balance Cache EVM Tests', function () {
       });
 
       it('should not fail if a single invalid address is given', async () => {
-        const balance = await tbc.getBalances({
+        const balance = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC20,
           addresses: [discobotAddress],
           sourceOptions: {
@@ -146,7 +144,7 @@ describe('Token Balance Cache EVM Tests', function () {
       });
 
       it('should return a single balance', async () => {
-        const balance = await tbc.getBalances({
+        const balance = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC20,
           addresses: [addressOne],
           sourceOptions: {
@@ -163,7 +161,7 @@ describe('Token Balance Cache EVM Tests', function () {
 
     describe('on-chain batching', () => {
       it('should return many balances', async () => {
-        const balances = await tbc.getBalances({
+        const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC20,
           addresses: [addressOne, addressTwo],
           sourceOptions: {
@@ -179,7 +177,7 @@ describe('Token Balance Cache EVM Tests', function () {
       });
 
       it('should not throw if a single address fails', async () => {
-        const balances = await tbc.getBalances({
+        const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC20,
           addresses: [addressOne, discobotAddress, addressTwo],
           sourceOptions: {
@@ -195,7 +193,7 @@ describe('Token Balance Cache EVM Tests', function () {
       });
 
       it('should correctly batch balance requests', async () => {
-        const balances = await tbc.getBalances({
+        const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC20,
           addresses: bulkAddresses,
           sourceOptions: {
@@ -230,7 +228,7 @@ describe('Token Balance Cache EVM Tests', function () {
       });
 
       it('should return many balances', async () => {
-        const balances = await tbc.getBalances({
+        const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC20,
           addresses: [addressOne, addressTwo],
           sourceOptions: {
@@ -246,7 +244,7 @@ describe('Token Balance Cache EVM Tests', function () {
       });
 
       it('should not throw if a single address fails', async () => {
-        const balances = await tbc.getBalances({
+        const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC20,
           addresses: [addressOne, discobotAddress, addressTwo],
           sourceOptions: {
@@ -263,7 +261,7 @@ describe('Token Balance Cache EVM Tests', function () {
       });
 
       it('should correctly batch balance requests', async () => {
-        const balances = await tbc.getBalances({
+        const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC20,
           addresses: bulkAddresses,
           sourceOptions: {
@@ -306,7 +304,7 @@ describe('Token Balance Cache EVM Tests', function () {
 
     describe('Single address', () => {
       it('should not fail if no address is given', async () => {
-        const balance = await tbc.getBalances({
+        const balance = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ETHNative,
           addresses: [],
           sourceOptions: {
@@ -318,7 +316,7 @@ describe('Token Balance Cache EVM Tests', function () {
       });
 
       it('should not fail if a single invalid address is given', async () => {
-        const balance = await tbc.getBalances({
+        const balance = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ETHNative,
           addresses: [discobotAddress],
           sourceOptions: {
@@ -331,7 +329,7 @@ describe('Token Balance Cache EVM Tests', function () {
       });
 
       it('should return a single balance', async () => {
-        const balance = await tbc.getBalances({
+        const balance = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ETHNative,
           addresses: [addressOne],
           sourceOptions: {
@@ -347,7 +345,7 @@ describe('Token Balance Cache EVM Tests', function () {
 
     describe('on-chain batching', () => {
       it('should return many balances', async () => {
-        const balances = await tbc.getBalances({
+        const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ETHNative,
           addresses: [addressOne, addressTwo],
           sourceOptions: {
@@ -362,7 +360,7 @@ describe('Token Balance Cache EVM Tests', function () {
       });
 
       it('should not throw if a single address fails', async () => {
-        const balances = await tbc.getBalances({
+        const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ETHNative,
           addresses: [addressOne, discobotAddress, addressTwo],
           sourceOptions: {
@@ -377,7 +375,7 @@ describe('Token Balance Cache EVM Tests', function () {
       });
 
       it('should correctly batch balance requests', async () => {
-        const balances = await tbc.getBalances({
+        const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ETHNative,
           addresses: bulkAddresses,
           sourceOptions: {
@@ -411,7 +409,7 @@ describe('Token Balance Cache EVM Tests', function () {
       });
 
       it('should return many balances', async () => {
-        const balances = await tbc.getBalances({
+        const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ETHNative,
           addresses: [addressOne, addressTwo],
           sourceOptions: {
@@ -426,7 +424,7 @@ describe('Token Balance Cache EVM Tests', function () {
       });
 
       it('should not throw if a single address fails', async () => {
-        const balances = await tbc.getBalances({
+        const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ETHNative,
           addresses: [addressOne, discobotAddress, addressTwo],
           sourceOptions: {
@@ -441,7 +439,7 @@ describe('Token Balance Cache EVM Tests', function () {
       });
 
       it('should correctly batch balance requests', async () => {
-        const balances = await tbc.getBalances({
+        const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ETHNative,
           addresses: bulkAddresses,
           sourceOptions: {
@@ -475,7 +473,7 @@ describe('Token Balance Cache EVM Tests', function () {
 
     describe('Single address', () => {
       it('should not fail if no address is given', async () => {
-        const balance = await tbc.getBalances({
+        const balance = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC721,
           addresses: [],
           sourceOptions: {
@@ -489,7 +487,7 @@ describe('Token Balance Cache EVM Tests', function () {
       });
 
       it('should not fail if a single invalid address is given', async () => {
-        const balance = await tbc.getBalances({
+        const balance = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC721,
           addresses: [discobotAddress],
           sourceOptions: {
@@ -503,7 +501,7 @@ describe('Token Balance Cache EVM Tests', function () {
       });
 
       it('should return a single balance', async () => {
-        const balance = await tbc.getBalances({
+        const balance = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC721,
           addresses: [addressOne721],
           sourceOptions: {
@@ -520,7 +518,7 @@ describe('Token Balance Cache EVM Tests', function () {
 
     describe('off-chain batching', () => {
       it('should return many balances', async () => {
-        const balances = await tbc.getBalances({
+        const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC721,
           addresses: [addressOne721, addressTwo721],
           sourceOptions: {
@@ -536,7 +534,7 @@ describe('Token Balance Cache EVM Tests', function () {
       });
 
       it('should not throw if a single address fails', async () => {
-        const balances = await tbc.getBalances({
+        const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC721,
           addresses: [addressOne721, discobotAddress, addressTwo721],
           sourceOptions: {
@@ -556,7 +554,7 @@ describe('Token Balance Cache EVM Tests', function () {
         bulkAddresses721.splice(4, 0, addressOne721);
         bulkAddresses721.splice(5, 0, addressTwo721);
 
-        const balances = await tbc.getBalances({
+        const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC721,
           addresses: bulkAddresses721,
           sourceOptions: {
@@ -588,7 +586,7 @@ describe('Token Balance Cache EVM Tests', function () {
 
     describe('Single address', () => {
       it('should not fail if no address is given', async () => {
-        const balance = await tbc.getBalances({
+        const balance = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC1155,
           addresses: [],
           sourceOptions: {
@@ -603,7 +601,7 @@ describe('Token Balance Cache EVM Tests', function () {
       });
 
       it('should not fail if a single invalid address is given', async () => {
-        const balance = await tbc.getBalances({
+        const balance = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC1155,
           addresses: [discobotAddress],
           sourceOptions: {
@@ -618,7 +616,7 @@ describe('Token Balance Cache EVM Tests', function () {
       });
 
       it('should return a single balance', async () => {
-        const balance = await tbc.getBalances({
+        const balance = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC1155,
           addresses: [addressOne],
           sourceOptions: {
@@ -632,7 +630,7 @@ describe('Token Balance Cache EVM Tests', function () {
         expect(Object.keys(balance).length).to.equal(1);
         expect(balance[addressOne]).to.equal('10');
 
-        const balanceTwo = await tbc.getBalances({
+        const balanceTwo = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC1155,
           addresses: [addressTwo],
           sourceOptions: {
@@ -650,7 +648,7 @@ describe('Token Balance Cache EVM Tests', function () {
 
     describe('on-chain batching', () => {
       it('should return many balances', async () => {
-        const balances = await tbc.getBalances({
+        const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC1155,
           addresses: [addressOne, addressTwo],
           sourceOptions: {
@@ -667,7 +665,7 @@ describe('Token Balance Cache EVM Tests', function () {
       });
 
       it('should not throw if a single address fails', async () => {
-        const balances = await tbc.getBalances({
+        const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC1155,
           addresses: [addressOne, discobotAddress, addressTwo],
           sourceOptions: {
@@ -684,7 +682,7 @@ describe('Token Balance Cache EVM Tests', function () {
       });
 
       it('should correctly batch balance requests', async () => {
-        const balances = await tbc.getBalances({
+        const balances = await tokenBalanceCache.getBalances({
           balanceSourceType: BalanceSourceType.ERC1155,
           addresses: bulkAddresses,
           sourceOptions: {
@@ -712,7 +710,6 @@ describe('Token Balance Cache EVM Tests', function () {
 
     before('Set TBC caching TTL and reset chain node', async () => {
       await resetChainNode(ethChainId);
-      tbc = new TokenBalanceCache(models, balanceTTL);
       // clear all Redis keys
       await cache().flushAll();
     });
@@ -723,29 +720,35 @@ describe('Token Balance Cache EVM Tests', function () {
         addressOne,
       );
 
-      const balance = await tbc.getBalances({
-        balanceSourceType: BalanceSourceType.ERC20,
-        addresses: [addressOne],
-        sourceOptions: {
-          evmChainId: ethChainId,
-          contractAddress: chainLinkAddress,
+      const balance = await tokenBalanceCache.getBalances(
+        {
+          balanceSourceType: BalanceSourceType.ERC20,
+          addresses: [addressOne],
+          sourceOptions: {
+            evmChainId: ethChainId,
+            contractAddress: chainLinkAddress,
+          },
+          cacheRefresh: true,
         },
-        cacheRefresh: true,
-      });
+        balanceTTL,
+      );
       expect(Object.keys(balance).length).to.equal(1);
       expect(balance[addressOne]).to.equal(originalAddressOneBalance);
 
       // this must complete in under balanceTTL time or the test fails
       await sdk.getErc20(chainLinkAddress, addressOne, transferAmount);
 
-      const balanceTwo = await tbc.getBalances({
-        balanceSourceType: BalanceSourceType.ERC20,
-        addresses: [addressOne],
-        sourceOptions: {
-          evmChainId: ethChainId,
-          contractAddress: chainLinkAddress,
+      const balanceTwo = await tokenBalanceCache.getBalances(
+        {
+          balanceSourceType: BalanceSourceType.ERC20,
+          addresses: [addressOne],
+          sourceOptions: {
+            evmChainId: ethChainId,
+            contractAddress: chainLinkAddress,
+          },
         },
-      });
+        balanceTTL,
+      );
       expect(Object.keys(balanceTwo).length).to.equal(1);
       expect(balanceTwo[addressOne]).to.equal(originalAddressOneBalance);
 
@@ -756,14 +759,17 @@ describe('Token Balance Cache EVM Tests', function () {
         .add(transferAmountBN)
         .toString(10);
 
-      const balanceThree = await tbc.getBalances({
-        balanceSourceType: BalanceSourceType.ERC20,
-        addresses: [addressOne],
-        sourceOptions: {
-          evmChainId: ethChainId,
-          contractAddress: chainLinkAddress,
+      const balanceThree = await tokenBalanceCache.getBalances(
+        {
+          balanceSourceType: BalanceSourceType.ERC20,
+          addresses: [addressOne],
+          sourceOptions: {
+            evmChainId: ethChainId,
+            contractAddress: chainLinkAddress,
+          },
         },
-      });
+        balanceTTL,
+      );
       expect(Object.keys(balanceThree).length).to.equal(1);
       expect(balanceThree[addressOne]).to.equal(finalAddressOneBalance);
     });

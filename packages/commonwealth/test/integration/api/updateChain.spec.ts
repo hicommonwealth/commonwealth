@@ -1,7 +1,6 @@
 import { ChainBase, ChainType } from '@hicommonwealth/core';
 import {
   CommunityAttributes,
-  TokenBalanceCache,
   UserInstance,
   models,
   tester,
@@ -30,7 +29,7 @@ describe('UpdateChain Tests', () => {
   });
 
   it('Correctly updates chain', async () => {
-    const controller = new ServerCommunitiesController(models, null, null);
+    const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
       userAttributes: { email: '', id: 1, isAdmin: true },
@@ -62,7 +61,7 @@ describe('UpdateChain Tests', () => {
   });
 
   it('Fails if namespace present but no transaction hash', async () => {
-    const controller = new ServerCommunitiesController(models, null, null);
+    const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
       userAttributes: { email: '', id: 2, isAdmin: false },
@@ -81,7 +80,7 @@ describe('UpdateChain Tests', () => {
   });
 
   it('Fails if chain node of community does not match supported chain', async () => {
-    const controller = new ServerCommunitiesController(models, null, null);
+    const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
       userAttributes: { email: '', id: 2, isAdmin: false },
@@ -109,11 +108,7 @@ describe('UpdateChain Tests', () => {
       },
     };
 
-    const controller = new ServerCommunitiesController(
-      models,
-      tbc as unknown as TokenBalanceCache,
-      null,
-    );
+    const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
       userAttributes: { email: '', id: 2, isAdmin: false },

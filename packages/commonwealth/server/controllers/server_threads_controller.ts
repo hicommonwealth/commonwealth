@@ -1,7 +1,6 @@
 import { DB } from '@hicommonwealth/model';
 import BanCache from '../util/banCheckCache';
 
-import { TokenBalanceCache } from '@hicommonwealth/model';
 import GlobalActivityCache from '../util/globalActivityCache';
 
 import {
@@ -66,7 +65,6 @@ import {
 export class ServerThreadsController {
   constructor(
     public models: DB,
-    public tokenBalanceCache: TokenBalanceCache,
     public banCache: BanCache,
     public globalActivityCache?: GlobalActivityCache,
   ) {}
