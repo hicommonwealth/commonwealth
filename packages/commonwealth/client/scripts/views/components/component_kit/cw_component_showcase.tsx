@@ -2198,11 +2198,7 @@ export const ComponentShowcase = () => {
           onClick={() => setIsDrawerOpen(true)}
         />
 
-        <CWDrawer
-          open={isDrawerOpen}
-          header="Lorem Ipsum"
-          onClose={() => setIsDrawerOpen(false)}
-        >
+        <CWDrawer open={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}>
           <div>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis
             porttitor vel erat nec eleifend. Nullam sit amet dui et eros luctus
@@ -2221,7 +2217,6 @@ export const ComponentShowcase = () => {
         />
         <CWDrawer
           open={isLeftDrawerOpen}
-          header="Lorem Ipsum"
           onClose={() => setIsLeftDrawerOpen(false)}
           direction="left"
         >

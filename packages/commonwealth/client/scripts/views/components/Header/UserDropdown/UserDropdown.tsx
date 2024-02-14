@@ -44,7 +44,7 @@ const resetWalletConnectSession = async () => {
   await walletConnectWallet.reset();
 };
 
-const handleLogout = async () => {
+export const handleLogout = async () => {
   try {
     await axios.get(`${app.serverUrl()}/logout`);
     await initAppState();

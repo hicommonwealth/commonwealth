@@ -20,3 +20,32 @@
     }
   }
 }
+
+.UserDrawer {
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    padding: 12px 14px;
+
+    .Avatar {
+      border: 1px solid $neutral-200;
+    }
+
+    .name {
+      max-width: 220px;
+      display: inline-block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .PopoverMenu {
+    border-radius: 0 !important;
+    border-width: 0 !important;
+    box-shadow: unset !important;
+    padding-block: 8px;
+  }
+}
