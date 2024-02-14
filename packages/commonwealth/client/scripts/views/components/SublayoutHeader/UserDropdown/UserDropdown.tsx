@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import app from 'state';
 
 import { WalletSsoSource } from '@hicommonwealth/core';
-import useUserMenuItems from 'views/components/Header/UserDropdown/useUserMenuItems';
+import useUserMenuItems from 'views/components/SublayoutHeader/UserDropdown/useUserMenuItems';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';

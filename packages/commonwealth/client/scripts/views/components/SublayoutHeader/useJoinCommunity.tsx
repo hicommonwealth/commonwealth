@@ -8,7 +8,7 @@ import AddressInfo from 'models/AddressInfo';
 import React, { useState } from 'react';
 import app from 'state';
 import { addressSwapper } from 'utils';
-import { TOSModal } from 'views/components/Header/TOSModal';
+import { TOSModal } from 'views/components/SublayoutHeader/TOSModal';
 import { AccountSelector } from 'views/components/component_kit/cw_wallets_list';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import { LoginModal } from 'views/modals/login_modal';

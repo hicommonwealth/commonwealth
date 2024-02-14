@@ -1,8 +1,8 @@
-import React from 'react';
 import clsx from 'clsx';
-import { CWText } from 'views/components/component_kit/cw_text';
 import { formatAddressShort } from 'helpers';
+import React from 'react';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { CWText } from 'views/components/component_kit/cw_text';
 import './UserDropdownItem.scss';
 
 interface UserDropdownItemProps {

@@ -5,7 +5,7 @@ import app from 'state';
 import { useFlag } from 'hooks/useFlag';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
-import useUserMenuItems from 'views/components/Header/UserDropdown/useUserMenuItems';
+import useUserMenuItems from 'views/components/SublayoutHeader/UserDropdown/useUserMenuItems';
 import MenuContent from 'views/components/component_kit/CWPopoverMenu/MenuContent';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';

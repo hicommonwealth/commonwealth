@@ -9,8 +9,8 @@ import React, { useState } from 'react';
 import app, { initAppState } from 'state';
 import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
 import useGroupMutationBannerStore from 'state/ui/group';
-import { UserDropdownItem } from 'views/components/Header/UserDropdown/UserDropdownItem';
-import useCheckAuthenticatedAddresses from 'views/components/Header/UserDropdown/useCheckAuthenticatedAddresses';
+import { UserDropdownItem } from 'views/components/SublayoutHeader/UserDropdown/UserDropdownItem';
+import useCheckAuthenticatedAddresses from 'views/components/SublayoutHeader/UserDropdown/useCheckAuthenticatedAddresses';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import {
   CWToggle,

@@ -11,7 +11,7 @@ import { ManageCommunityStakeModalMode } from 'views/modals/ManageCommunityStake
 import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
-import useJoinCommunity from 'views/components/Header/useJoinCommunity';
+import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import './VoteWeightModule.scss';
 
 type VoteWeightModuleProps = {

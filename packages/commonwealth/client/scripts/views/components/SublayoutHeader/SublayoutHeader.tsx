@@ -1,30 +1,32 @@
-import 'SublayoutHeader.scss';
 import clsx from 'clsx';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import app from 'state';
+
+import { useFlag } from 'hooks/useFlag';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { useCommonNavigate } from 'navigation/helpers';
 import useSidebarStore from 'state/ui/sidebar';
-import MobileHeader from 'views/components/Header/MobileHeader';
-import UserDropdown from 'views/components/Header/UserDropdown/UserDropdown';
-import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import { HelpMenuPopover } from 'views/menus/help_menu';
-import { AuthModal } from 'views/modals/AuthModal';
-import { FeedbackModal } from 'views/modals/feedback_modal';
-import { LoginModal } from 'views/modals/login_modal';
-import { useFlag } from '../hooks/useFlag';
-import app from '../state';
-import { CWDivider } from './components/component_kit/cw_divider';
-import { CWIconButton } from './components/component_kit/cw_icon_button';
+import MobileHeader from 'views/components/SublayoutHeader/MobileHeader';
+import UserDropdown from 'views/components/SublayoutHeader/UserDropdown/UserDropdown';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
+import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import {
   isWindowMediumSmallInclusive,
   isWindowSmallInclusive,
-} from './components/component_kit/helpers';
-import { CWModal } from './components/component_kit/new_designs/CWModal';
-import { CWSearchBar } from './components/component_kit/new_designs/CWSearchBar';
-import { CWButton } from './components/component_kit/new_designs/cw_button';
-import { CreateContentPopover } from './menus/create_content_menu';
-import { NotificationsMenuPopover } from './menus/notifications_menu';
+} from 'views/components/component_kit/helpers';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import { CWSearchBar } from 'views/components/component_kit/new_designs/CWSearchBar';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { CreateContentPopover } from 'views/menus/create_content_menu';
+import { HelpMenuPopover } from 'views/menus/help_menu';
+import { NotificationsMenuPopover } from 'views/menus/notifications_menu';
+import { AuthModal } from 'views/modals/AuthModal';
+import { FeedbackModal } from 'views/modals/feedback_modal';
+import { LoginModal } from 'views/modals/login_modal';
+
+import './SublayoutHeader.scss';
 
 type SublayoutHeaderProps = {
   onMobile: boolean;
