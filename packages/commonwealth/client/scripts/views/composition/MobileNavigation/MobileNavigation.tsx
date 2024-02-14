@@ -30,11 +30,15 @@ const MobileNavigation = () => {
       onClick: () => navigate('/dashboard', {}, null),
       selected: !!matchesDashboard,
     },
-    {
-      type: 'create',
-      onClick: () => setIsDrawerOpen(true),
-      selected: false,
-    },
+    ...(isLoggedIn
+      ? [
+          {
+            type: 'create' as const,
+            onClick: () => setIsDrawerOpen(true),
+            selected: false,
+          },
+        ]
+      : []),
     {
       type: 'explore',
       onClick: () => navigate('/communities', {}, null),
@@ -64,7 +68,7 @@ const MobileNavigation = () => {
         ))}
       </div>
       <CWDrawer
-        size="200px"
+        size="auto"
         direction="bottom"
         open={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}

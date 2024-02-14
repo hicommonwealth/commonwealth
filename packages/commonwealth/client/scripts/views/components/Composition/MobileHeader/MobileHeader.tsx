@@ -26,7 +26,7 @@ const MobileHeader = ({
 }: MobileHeaderProps) => {
   const { isLoggedIn } = useUserLoggedIn();
 
-  const user = app.user.addresses[0];
+  const user = app?.user?.addresses?.[0];
 
   // TODO this will be handled in next ticket
   const magnifyingGlassVisible = false;

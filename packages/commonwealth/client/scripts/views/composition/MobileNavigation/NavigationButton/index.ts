@@ -1,4 +1,5 @@
-import NavigationButton, { NavigationButtonProps } from './NavigationButton';
+import type { NavigationButtonProps } from './NavigationButton';
+import NavigationButton from './NavigationButton';
 
 export { NavigationButtonProps };
 
