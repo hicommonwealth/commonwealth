@@ -153,7 +153,6 @@
     "marked-footnote": "^1.2.2",
     "marked-smartypants": "1.1.5",
     "marked-xhtml": "1.0.8",
-    "mixpanel": "^0.14.0",
     "mixpanel-browser": "^2.45.0",
     "moment": "^2.23.0",
     "morgan": "^1.9.1",
