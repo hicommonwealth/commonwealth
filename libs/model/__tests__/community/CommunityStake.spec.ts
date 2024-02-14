@@ -1,5 +1,4 @@
 import {
-  Actor,
   InvalidActor,
   InvalidState,
   command,
@@ -15,16 +14,18 @@ import { seedDb } from '../../src/test';
 chai.use(chaiAsPromised);
 
 describe('Community stake', () => {
-  const id = 'common-protocol';
-  const actor: Actor = {
-    user: { id: 2, email: '' },
-    address_id: '0xtestAddress',
-  };
-  const payload = {
-    stake_id: 1,
-    stake_token: '',
-    vote_weight: 1,
-    stake_enabled: true,
+  const context = {
+    id: 'common-protocol',
+    actor: {
+      user: { id: 2, email: '' },
+      address_id: '0xtestAddress',
+    },
+    payload: {
+      stake_id: 1,
+      stake_token: '',
+      vote_weight: 1,
+      stake_enabled: true,
+    },
   };
 
   before(async () => {
@@ -37,13 +38,12 @@ describe('Community stake', () => {
 
   it('should fail set when community namespace not configured', () => {
     _validateCommunityStakeConfig.onFirstCall().rejects();
-    expect(command(SetCommunityStake, id, payload, actor)).to.eventually.be
-      .rejected;
+    expect(command(SetCommunityStake, context)).to.eventually.be.rejected;
   });
 
   it('should set and get community stake', async () => {
     const community = {
-      community_id: id,
+      community_id: context.id,
       Chain: { namespace: 'IanSpace' },
     };
     const ChainNode = {
@@ -51,35 +51,42 @@ describe('Community stake', () => {
       url: 'https://ethereum-sepolia.publicnode.com',
     };
 
-    const cr = await command(SetCommunityStake, id, payload, actor);
+    const cr = await command(SetCommunityStake, context);
     expect(cr).to.deep.contains({
       ...community.Chain,
       ChainNode,
       CommunityStakes: [
         {
-          community_id: id,
-          ...payload,
+          community_id: context.id,
+          ...context.payload,
           created_at: cr?.CommunityStakes?.at(0)?.created_at,
           updated_at: cr?.CommunityStakes?.at(0)?.updated_at,
         },
       ],
     });
 
-    const qr = await query(GetCommunityStake, { community_id: id }, actor);
-    expect(qr).to.deep.include({ ...payload, ...community });
+    const qr = await query(GetCommunityStake, {
+      actor: context.actor,
+      payload: { community_id: context.id },
+    });
+    expect(qr).to.deep.include({ ...context.payload, ...community });
   });
 
   it('should fail set when community not found', async () => {
     expect(
-      command(SetCommunityStake, 'does-not-exist', payload, actor),
+      command(SetCommunityStake, { ...context, id: 'does-not-exist' }),
     ).to.eventually.be.rejectedWith(InvalidActor);
   });
 
   it('should fail set when community stake has been configured', () => {
     expect(
-      command(SetCommunityStake, 'ethereum', payload, {
-        user: { id: 2, email: '' },
-        address_id: '0x42D6716549A78c05FD8EF1f999D52751Bbf9F46a',
+      command(SetCommunityStake, {
+        ...context,
+        actor: {
+          user: { id: 2, email: '' },
+          address_id: '0x42D6716549A78c05FD8EF1f999D52751Bbf9F46a',
+        },
+        id: 'ethereum',
       }),
     ).to.eventually.be.rejectedWith(
       InvalidState,
@@ -88,11 +95,10 @@ describe('Community stake', () => {
   });
 
   it('should get empty result when community stake not configured', async () => {
-    const qr = await query(
-      GetCommunityStake,
-      { community_id: 'edgeware' },
-      actor,
-    );
+    const qr = await query(GetCommunityStake, {
+      actor: context.actor,
+      payload: { community_id: 'edgeware' },
+    });
     expect(qr).to.be.undefined;
   });
 });

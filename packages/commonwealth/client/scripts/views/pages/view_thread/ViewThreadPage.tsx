@@ -3,7 +3,6 @@ import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { commentsByDate } from 'helpers/dates';
-import { featureFlags } from 'helpers/feature-flags';
 import { filterLinks, getThreadActionTooltipText } from 'helpers/threads';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
@@ -32,6 +31,7 @@ import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import { PageNotFound } from 'views/pages/404';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
+import { useFlag } from '../../../hooks/useFlag';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import Poll from '../../../models/Poll';
 import { Link, LinkDisplay, LinkSource } from '../../../models/Thread';
@@ -80,6 +80,7 @@ type ViewThreadPageProps = {
 };
 
 const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
+  const proposalTemplatesEnabled = useFlag('proposalTemplates');
   const threadId = identifier.split('-')[0];
 
   const navigate = useCommonNavigate();
@@ -310,9 +311,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     linkedThreads.length > 0 || isAuthor || isAdminOrMod;
 
   const showTemplateOptions =
-    featureFlags.proposalTemplates && (isAuthor || isAdminOrMod);
+    proposalTemplatesEnabled && (isAuthor || isAdminOrMod);
   const showLinkedTemplateOptions =
-    featureFlags.proposalTemplates && linkedTemplates.length > 0;
+    proposalTemplatesEnabled && linkedTemplates.length > 0;
 
   const hasSnapshotProposal = thread.links.find((x) => x.source === 'snapshot');
 

@@ -1,5 +1,4 @@
 import { parseCustomStages, threadStageToLabel } from 'helpers';
-import { featureFlags } from 'helpers/feature-flags';
 import { isUndefined } from 'helpers/typeGuards';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
@@ -21,6 +20,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
+import { useFlag } from '../../../../hooks/useFlag';
 import type Topic from '../../../../models/Topic';
 import {
   ThreadFeaturedFilterTypes,
@@ -56,6 +56,7 @@ export const HeaderWithFilters = ({
   onIncludeArchivedThreads,
   isOnArchivePage,
 }: HeaderWithFiltersProps) => {
+  const communityStakeEnabled = useFlag('communityStake');
   const navigate = useCommonNavigate();
   const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
   const [isDismissStakeBannerModalOpen, setIsDismissStakeBannerModalOpen] =
@@ -182,7 +183,7 @@ export const HeaderWithFilters = ({
   };
 
   const stakeBannerEnabled =
-    featureFlags.communityStake &&
+    communityStakeEnabled &&
     stakeEnabled &&
     isBannerVisible(app.activeChainId());
 

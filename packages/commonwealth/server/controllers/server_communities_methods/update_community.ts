@@ -4,7 +4,7 @@ import type {
   CommunityAttributes,
   CommunitySnapshotSpaceWithSpaceAttached,
 } from '@hicommonwealth/model';
-import { UserInstance, newNamespaceValidator } from '@hicommonwealth/model';
+import { UserInstance, commonProtocol } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';
@@ -242,8 +242,7 @@ export async function __updateCommunity(
       throw new AppError(Errors.NotAdmin);
     }
 
-    await newNamespaceValidator.validateNamespace(
-      this.tokenBalanceCache,
+    await commonProtocol.newNamespaceValidator.validateNamespace(
       namespace,
       transactionHash,
       ownerOfChain.address,

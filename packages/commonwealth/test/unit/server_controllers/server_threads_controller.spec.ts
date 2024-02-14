@@ -1,4 +1,4 @@
-import { contractHelpers } from '@hicommonwealth/model';
+import { commonProtocol } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { ServerThreadsController } from 'server/controllers/server_threads_controller';
 import Sinon from 'sinon';
@@ -6,7 +6,9 @@ import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
 
 describe('ServerThreadsController', () => {
   beforeEach(() => {
-    Sinon.stub(contractHelpers, 'getNamespaceBalance').resolves('0');
+    Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves(
+      '0',
+    );
   });
   afterEach(() => {
     Sinon.restore();
@@ -82,7 +84,6 @@ describe('ServerThreadsController', () => {
           },
         },
       };
-      const tokenBalanceCache = {};
       const user = {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
       };
@@ -99,7 +100,6 @@ describe('ServerThreadsController', () => {
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -181,7 +181,6 @@ describe('ServerThreadsController', () => {
           findOne: sandbox.stub().resolves(null),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: sandbox.stub().resolves([true, null]),
       };
@@ -194,7 +193,6 @@ describe('ServerThreadsController', () => {
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -245,7 +243,6 @@ describe('ServerThreadsController', () => {
           }),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: sandbox.stub().resolves([true, null]),
       };
@@ -259,7 +256,6 @@ describe('ServerThreadsController', () => {
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -309,7 +305,6 @@ describe('ServerThreadsController', () => {
           }),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: sandbox.stub().resolves([false, 'big ban err']),
       };
@@ -323,7 +318,6 @@ describe('ServerThreadsController', () => {
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -437,9 +431,6 @@ describe('ServerThreadsController', () => {
           bulkCreate: sandbox.stub().resolves([]),
         },
       };
-      const tokenBalanceCache = {
-        getBalances: sandbox.stub().resolves({}),
-      };
       const banCache = {
         checkBan: sandbox.stub().resolves([true, null]),
       };
@@ -455,7 +446,6 @@ describe('ServerThreadsController', () => {
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -539,14 +529,12 @@ describe('ServerThreadsController', () => {
           findAll: async () => [],
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: () => [true, null],
       };
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -611,14 +599,12 @@ describe('ServerThreadsController', () => {
           create: async () => ({}),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: async () => [false, 'big bad error'],
       };
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -683,14 +669,12 @@ describe('ServerThreadsController', () => {
           create: async () => ({}),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: async () => [true, null],
       };
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -785,14 +769,12 @@ describe('ServerThreadsController', () => {
           create: async () => ({}),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: async () => [true, null],
       };
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -847,14 +829,12 @@ describe('ServerThreadsController', () => {
           create: async () => ({}),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: async () => [true, null],
       };
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -927,14 +907,12 @@ describe('ServerThreadsController', () => {
           create: async () => ({}),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: async () => [true, null],
       };
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -1003,14 +981,12 @@ describe('ServerThreadsController', () => {
           create: async () => ({}),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: async () => [true, null],
       };
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -1071,14 +1047,12 @@ describe('ServerThreadsController', () => {
           findAll: async () => [{}], // used in findOneRole
         },
       };
-      const tokenBalanceCache = {};
       const banCache = BAN_CACHE_MOCK_FN('ethereum');
       const address = {
         address: '0x123',
       };
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
       const user = {
@@ -1120,13 +1094,11 @@ describe('ServerThreadsController', () => {
           destroy: async () => ({}),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: async () => [true, null],
       };
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
       const user = {
@@ -1168,13 +1140,11 @@ describe('ServerThreadsController', () => {
           destroy: async () => ({}),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: async () => [false, 'bad'],
       };
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
       const user = {
@@ -1215,13 +1185,11 @@ describe('ServerThreadsController', () => {
           findAll: async () => [{}], // used in findOneRole
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: async () => [true, null],
       };
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
       const user = {
@@ -1308,11 +1276,9 @@ describe('ServerThreadsController', () => {
           findAll: async () => [{}], // used in findOneRole
         },
       };
-      const tokenBalanceCache = {};
       const banCache = BAN_CACHE_MOCK_FN('ethereum');
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
       const user = {

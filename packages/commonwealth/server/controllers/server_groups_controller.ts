@@ -1,4 +1,4 @@
-import { DB, TokenBalanceCache } from '@hicommonwealth/model';
+import { DB } from '@hicommonwealth/model';
 import BanCache from '../util/banCheckCache';
 import {
   CreateGroupOptions,
@@ -35,11 +35,7 @@ import {
  * Implements methods related to groups
  */
 export class ServerGroupsController {
-  constructor(
-    public models: DB,
-    public tokenBalanceCache: TokenBalanceCache,
-    public banCache: BanCache,
-  ) {}
+  constructor(public models: DB, public banCache: BanCache) {}
 
   async refreshMembership(
     options: RefreshMembershipOptions,

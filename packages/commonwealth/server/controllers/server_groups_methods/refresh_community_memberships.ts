@@ -7,6 +7,7 @@ import {
   MembershipAttributes,
   MembershipRejectReason,
   OptionsWithBalances,
+  tokenBalanceCache,
 } from '@hicommonwealth/model';
 import moment from 'moment';
 import { Op, Sequelize } from 'sequelize';
@@ -67,7 +68,7 @@ export async function __refreshCommunityMemberships(
       getBalancesOptions.map(async (options) => {
         let result: Balances = {};
         try {
-          result = await this.tokenBalanceCache.getBalances({
+          result = await tokenBalanceCache.getBalances({
             ...options,
             cacheRefresh: false, // get cached balances
           });

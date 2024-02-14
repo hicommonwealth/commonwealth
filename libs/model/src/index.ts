@@ -6,8 +6,7 @@ export * as Thread from './thread';
 export * as User from './user';
 
 // Core Services
-export * from './services/commonProtocol';
-export * from './services/tokenBalanceCache';
+export * from './services';
 
 // Test Service
 export * as tester from './test';
