@@ -1,38 +1,38 @@
-.home-screen-prompt {
+@import '../../../../styles/shared';
+
+.ios-home-screen-prompt {
   display: flex;
-  align-items: flex-end; // Align items to the bottom
+  align-items: flex-end;
   justify-content: center;
-  height: 100vh;
-  position: fixed; // Make the prompt fixed
-  bottom: 0; // Position it at the top
-  left: 0; // Position it at the left
-  right: 0; // Position it at the right
-  width: 100%; // Make it span the full width
-  height: 100%; // Make it span the full height
-  background-color: rgba(0, 0, 0, 0.5); // Add a semi-transparent background
-  z-index: 1000; // Make sure it's above everything else
-  margin: 0; // Remove margins
-  box-sizing: border-box; // Include padding and border in width and height
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  margin: 0;
+  box-sizing: border-box;
 
   .header {
     display: flex;
     align-items: center;
     border-bottom: 1px solid #ccc; // Change color as needed
-    padding: 16px 16px 8px; // top, right-left, bottom
+    padding: 16px 16px 8px;
 
     .icon {
-      margin-right: 0.5rem; // Adjust this value as needed
+      margin-right: 0.5rem;
       padding-right: 16px;
     }
 
     .title {
-      color: var(--Neutrals-900, #141315);
-      /* Heading 05/Medium */
+      color: $neutral-900;
       font-family: Silka;
       font-size: 18px;
       font-style: normal;
       font-weight: 500;
-      line-height: 24px; /* 133.333% */
+      line-height: 24px;
       letter-spacing: -0.18px;
     }
   }
@@ -54,15 +54,12 @@
       margin-top: 16px;
       color: #718096;
       font-variant-numeric: lining-nums tabular-nums;
-      font-family: 'SF Pro Text';
+      font-family: NeueHaasUnica;
       font-size: 14px;
       font-style: normal;
       font-weight: 400;
-      line-height: 24px; /* 171.429% */
+      line-height: 24px;
       letter-spacing: 0.14px;
-    }
-
-    .description {
     }
 
     .hide-prompt {
@@ -72,12 +69,12 @@
       font-size: 14px;
       font-style: normal;
       font-weight: 400;
-      line-height: 24px; /* 171.429% */
+      line-height: 24px;
       letter-spacing: 0.14px;
     }
 
     .highlight {
-      background: var(--Neutrals-50, #f7f7f7);
+      background: $neutral-50;
       padding-left: 8px;
       padding-right: 8px;
     }
@@ -89,84 +86,113 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  position: fixed; // Make the prompt fixed
-  bottom: 0; // Position it at the top
-  left: 0; // Position it at the left
-  width: 100%; // Make it span the full width
-  height: 100%; // Make it span the full height
-  background-color: rgba(0, 0, 0, 0.5); // Add a semi-transparent background
-  z-index: 1000; // Make sure it's above everything else
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
 
   .header {
     display: flex;
     align-items: center;
-    border-bottom: 1px solid #ccc; // Change color as needed
-    padding: 16px 16px 8px; // top, right-left, bottom
+    padding-top: 8px;
 
     .icon {
-      margin-right: 0.5rem; // Adjust this value as needed
-      padding-right: 16px;
-    }
-
-    .title {
-      /* Heading 05/Medium */
-      font-family: Silka;
-      font-size: 18px;
-      font-style: normal;
-      font-weight: 500;
-      line-height: 24px; /* 133.333% */
-      letter-spacing: -0.18px;
+      margin-right: 16px;
     }
   }
 
+  .app {
+    .app-name {
+      color: $neutral-900;
+      text-align: center;
+      font-variant-numeric: lining-nums tabular-nums;
+      font-family: 'Roboto';
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 16px;
+      letter-spacing: 0.16px;
+    }
+    .app-url {
+      color: $neutral-500;
+      text-align: center;
+      font-variant-numeric: lining-nums tabular-nums;
+      font-family: 'Roboto';
+      font-size: 12px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 16px;
+      letter-spacing: 0.24px;
+    }
+  }
+
+  .button-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 32px;
+  }
+
+  .prompt-button {
+    color: $primary-500;
+    text-align: right;
+    font-variant-numeric: lining-nums tabular-nums;
+    font-family: 'Roboto';
+    font-size: 16px !important;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px;
+    letter-spacing: 0.16px;
+    background-color: white !important;
+    padding: 0px !important;
+    margin: 0px !important;
+  }
+
   .prompt-content {
-    padding: 1rem;
     background-color: #fff;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
       0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    padding: 16px;
-    border-radius: 6px;
+    padding: 8px 24px 8px;
+    border-radius: 26px;
+    margin-left: 18px;
+    margin-right: 18px;
 
     .title {
-      font-size: 1.125rem;
-      font-weight: 600;
-    }
-
-    .description,
-    .instructions {
-      margin-top: 16px;
-      color: #718096;
-      font-variant-numeric: lining-nums tabular-nums;
-      font-family: 'SF Pro Text';
-      font-size: 14px;
+      font-family: 'Roboto';
+      font-size: 24px;
       font-style: normal;
       font-weight: 400;
-      line-height: 24px; /* 171.429% */
-      letter-spacing: 0.14px;
+      line-height: 24px;
+      letter-spacing: -0.24px;
+      color: $neutral-900;
+      padding: 24px 0px 8px;
     }
 
     .description {
+      margin-top: 16px;
+      align-self: stretch;
+      color: $neutral-900;
+      font-variant-numeric: lining-nums tabular-nums;
+      font-family: 'Roboto';
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 24px;
+      letter-spacing: 0.16px;
     }
 
     .hide-prompt {
+      flex: 1 0 0;
       margin-top: 16px;
+      color: $neutral-900;
       font-variant-numeric: lining-nums tabular-nums;
-      font-family: 'SF Pro Text';
-      font-size: 14px;
+      font-family: 'Roboto';
+      font-size: 16px !important;
       font-style: normal;
       font-weight: 400;
-      line-height: 24px; /* 171.429% */
-      letter-spacing: 0.14px;
-    }
-
-    .instructions {
-      margin-top: 1rem;
-    }
-
-    .highlight {
-      background: var(--Neutrals-50, #f7f7f7);
-      padding-left: 8px;
-      padding-right: 8px;
+      line-height: 24px;
+      letter-spacing: 0.16px;
     }
   }
 }

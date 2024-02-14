@@ -7,7 +7,7 @@ import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { queryClient } from 'state/api/config';
 import useAppStatus from './hooks/useAppStatus';
-import AddToHomeScreenPrompt from './views/components/AddToHomeScreenPrompt/AddToHomeScreenPrompt';
+import { AddToHomeScreenPrompt } from './views/components/AddToHomeScreenPrompt';
 import { CWIcon } from './views/components/component_kit/cw_icons/cw_icon';
 
 const Splash = () => {
@@ -35,12 +35,10 @@ const App = () => {
         {isLoading ? (
           <Splash />
         ) : (
-          <>
-            <RouterProvider router={router(customDomain)} />
-          </>
+          <RouterProvider router={router(customDomain)} />
         )}
 
-        {isAddedToHomeScreen || isMarketingPage ? null : (
+        {isAddedToHomeScreen || false ? null : (
           <AddToHomeScreenPrompt isIOS={isIOS} isAndroid={isAndroid} />
         )}
 
