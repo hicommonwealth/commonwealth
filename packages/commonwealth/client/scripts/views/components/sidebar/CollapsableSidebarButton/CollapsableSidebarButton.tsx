@@ -6,8 +6,10 @@ import './CollapsableSidebarButton.scss';
 
 export const CollapsableSidebarButton = ({
   isInsideCommunity,
+  onMobile,
 }: {
   isInsideCommunity: boolean;
+  onMobile: boolean;
 }) => {
   const { setMenu, menuName, menuVisible, setUserToggledVisibility } =
     useSidebarStore();
@@ -19,7 +21,7 @@ export const CollapsableSidebarButton = ({
   };
 
   return (
-    <div className="CollapsableSidebarButton">
+    <div className={clsx('CollapsableSidebarButton', { onMobile })}>
       <div
         className={clsx('hover-box', {
           expanded: isInsideCommunity && menuVisible,
@@ -27,10 +29,9 @@ export const CollapsableSidebarButton = ({
         })}
       >
         <CWIconButton
-          iconButtonTheme="black"
+          iconButtonTheme="neutral"
           iconName="caretDoubleLeft"
           onClick={handleToggle}
-          iconSize="small"
           className={clsx('hover-image', {
             'expand-scoped': menuVisible && isInsideCommunity,
             'expand-unscoped': menuVisible && !isInsideCommunity,
