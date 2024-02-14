@@ -191,7 +191,7 @@ export const useMarkdownToolbarHandlers = ({
   };
 
   const createListHandler = () => {
-    return (value) => {
+    return (value: string) => {
       const editor = editorRef?.current?.getEditor();
       if (!editor) {
         return;
