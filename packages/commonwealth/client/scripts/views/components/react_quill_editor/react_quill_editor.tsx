@@ -301,7 +301,7 @@ const ReactQuillEditor = ({
                     )}
                   </Droppable>
                 </DragDropContext>
-                <CustomQuillFooter />
+                <CustomQuillFooter handleImageUploader={handleImageUploader} />
               </>
             )}
           </div>
