@@ -26,6 +26,8 @@ describe('Reaction vote weight', () => {
 
   let user: UserInstance | null = null;
   let address: AddressInstance | null = null;
+  let community: CommunityInstance | null = null;
+  let topic: TopicInstance | null = null;
 
   const createThread = async () => {
     const t = await threadsController.createThread({
@@ -50,9 +52,6 @@ describe('Reaction vote weight', () => {
     });
     return c[0];
   };
-
-  let community: CommunityInstance | null = null;
-  let topic: TopicInstance | null = null;
 
   before(async () => {
     await tester.seedDb();
@@ -87,6 +86,10 @@ describe('Reaction vote weight', () => {
     );
   });
 
+  afterEach(() => {
+    Sinon.restore();
+  });
+
   it('should set thread reaction vote weight and thread vote sum correctly', async () => {
     Sinon.stub(contractHelpers, 'getNamespaceBalance').resolves('50');
     const thread = await createThread();
@@ -100,7 +103,6 @@ describe('Reaction vote weight', () => {
     expect(reaction.calculated_voting_weight).to.eq(expectedWeight);
     const t = await models.Thread.findByPk(thread.id);
     expect(t.reaction_weights_sum).to.eq(expectedWeight);
-    Sinon.restore();
   });
 
   it('should set comment reaction vote weight and comment vote sum correctly', async () => {
@@ -117,7 +119,6 @@ describe('Reaction vote weight', () => {
     expect(reaction.calculated_voting_weight).to.eq(expectedWeight);
     const c = await models.Comment.findByPk(comment.id);
     expect(c.reaction_weights_sum).to.eq(expectedWeight);
-    Sinon.restore();
   });
 
   it('should set thread reaction vote weight to min 1', async () => {
@@ -131,7 +132,6 @@ describe('Reaction vote weight', () => {
     });
     const expectedWeight = 1;
     expect(reaction.calculated_voting_weight).to.eq(expectedWeight);
-    Sinon.restore();
   });
 
   it('should set comment reaction vote weight to min 1', async () => {
@@ -146,6 +146,5 @@ describe('Reaction vote weight', () => {
     });
     const expectedWeight = 1;
     expect(reaction.calculated_voting_weight).to.eq(expectedWeight);
-    Sinon.restore();
   });
 });
