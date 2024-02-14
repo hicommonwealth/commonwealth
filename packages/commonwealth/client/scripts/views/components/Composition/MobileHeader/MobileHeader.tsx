@@ -4,22 +4,16 @@ import app from 'state';
 
 import { useFlag } from 'hooks/useFlag';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import { useCommonNavigate } from 'navigation/helpers';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
-import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
-import useGroupMutationBannerStore from 'state/ui/group';
 import UserDropdown from 'views/components/Header/UserDropdown';
-import { handleLogout } from 'views/components/Header/UserDropdown/UserDropdown';
-import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
+import useUserMenuItems from 'views/components/Header/UserDropdown/useUserMenuItems';
 import MenuContent from 'views/components/component_kit/CWPopoverMenu/MenuContent';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWToggle } from 'views/components/component_kit/cw_toggle';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import CWDrawer from 'views/components/component_kit/new_designs/CWDrawer';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
-import { toggleDarkMode } from 'views/components/component_kit/new_designs/cw_toggle';
 import CollapsableSidebarButton from 'views/components/sidebar/CollapsableSidebarButton';
 import { User } from 'views/components/user/user';
 import { AuthModal } from 'views/modals/AuthModal';
@@ -40,19 +34,10 @@ const MobileHeader = ({
   isInsideCommunity,
   menuVisible,
 }: MobileHeaderProps) => {
-  const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
-    localStorage.getItem('dark-mode-state') === 'on',
-  );
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isUserDrawerOpen, setIsUserDrawerOpen] = useState(false);
   const { isLoggedIn } = useUserLoggedIn();
-  const navigate = useCommonNavigate();
   const newSignInModalEnabled = useFlag('newSignInModal');
-
-  const { clearSetGatingGroupBannerForCommunities } =
-    useGroupMutationBannerStore();
-  const { clearSetAdminOnboardingCardVisibilityForCommunities } =
-    useAdminOnboardingSliderMutationStore();
 
   const user = app?.user?.addresses?.[0];
 
@@ -69,6 +54,14 @@ const MobileHeader = ({
   });
 
   const profile = users?.[0];
+
+  const userMenuItems = useUserMenuItems({
+    setIsAuthModalOpen,
+    // TODO try to move higher
+    setRevalidationModalData: () => undefined,
+    isMenuOpen: isUserDrawerOpen,
+    onAddressItemClick: () => setIsUserDrawerOpen(false),
+  });
 
   return (
     <>
@@ -135,67 +128,7 @@ const MobileHeader = ({
             />
           </div>
 
-          <MenuContent
-            menuItems={[
-              ...(app.user.activeAccounts.length > 0
-                ? ([
-                    {
-                      type: 'header',
-                      label: 'Addresses',
-                    },
-                    // ...addresses,
-                    {
-                      type: 'default',
-                      label: 'Connect a new address',
-                      onClick: () => {
-                        setIsUserDrawerOpen(false);
-                        setIsAuthModalOpen(true);
-                      },
-                    },
-                    { type: 'divider' },
-                  ] as PopoverMenuItem[])
-                : []),
-              {
-                type: 'header',
-                label: 'Settings',
-              },
-              {
-                type: 'default',
-                label: 'View profile',
-                onClick: () => navigate(`/profile/id/${'asd'}`, {}, null),
-              },
-              {
-                type: 'default',
-                label: 'Edit profile',
-                onClick: () => navigate(`/profile/edit`, {}, null),
-              },
-              {
-                type: 'default',
-                label: 'Notifications',
-                onClick: () => navigate('/notification-settings', {}, null),
-              },
-              {
-                type: 'default',
-                label: (
-                  <div className="UserDropdownItem">
-                    <div>Dark mode</div>
-                    <CWToggle readOnly checked={false} />
-                  </div>
-                ),
-                preventClosing: true,
-                onClick: () => toggleDarkMode(!isDarkModeOn, setIsDarkModeOn),
-              },
-              {
-                type: 'default',
-                label: 'Sign out',
-                onClick: () => {
-                  clearSetGatingGroupBannerForCommunities();
-                  clearSetAdminOnboardingCardVisibilityForCommunities();
-                  handleLogout();
-                },
-              },
-            ]}
-          />
+          <MenuContent menuItems={userMenuItems} />
         </div>
       </CWDrawer>
       {!newSignInModalEnabled ? (
