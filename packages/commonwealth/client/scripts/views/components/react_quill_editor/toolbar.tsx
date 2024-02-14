@@ -191,31 +191,51 @@ export const useMarkdownToolbarHandlers = ({
   };
 
   const createListHandler = () => {
-    return (value: string) => {
+    return (value) => {
       const editor = editorRef?.current?.getEditor();
       if (!editor) {
         return;
       }
       const selection = editor.getSelection();
+
       if (!selection) {
         return;
       }
       const prefix = LIST_ITEM_PREFIX[value];
+
       if (!prefix) {
         throw new Error(`could not get prefix for value: ${value}`);
       }
       const text = editor.getText(selection.index, selection.length);
-      const newText = text.split('\n').reduce((acc, line) => {
-        // remove empty lines
-        if (line.trim().length === 0) {
-          return acc;
-        }
-        // don't add prefix if already has it
-        if (line.startsWith(prefix)) {
-          return acc + `${line.trim()}\n`;
-        }
-        return acc + `${prefix} ${line}\n`;
-      }, '');
+
+      const newText = text
+        .split('\n')
+        .map((line) => {
+          const trimmedLine = line.trim();
+
+          if (trimmedLine.length === 0) {
+            return '';
+          }
+
+          let updatedLine = trimmedLine;
+
+          // Remove previous prefixes
+          Object.values(LIST_ITEM_PREFIX).forEach((p) => {
+            if (trimmedLine.startsWith(p)) {
+              updatedLine = updatedLine.substring(p.length);
+            }
+          });
+
+          if (value === 'check' && !updatedLine.startsWith('[ ]')) {
+            updatedLine = `${prefix} ${updatedLine}`;
+          } else {
+            updatedLine = `${prefix} ${updatedLine}`;
+          }
+
+          return updatedLine;
+        })
+        .join('\n');
+
       editor.deleteText(selection.index, selection.length);
       editor.insertText(selection.index, newText);
       setContentDelta({
