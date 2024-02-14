@@ -12,7 +12,7 @@ export const schema = z.object({
   address: z.string(),
 });
 
-export const SetCommunityNamespace: CommandMetadata<
+export const UpdateCommunity: CommandMetadata<
   CommunityAttributes,
   typeof schema
 > = {

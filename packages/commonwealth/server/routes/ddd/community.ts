@@ -17,4 +17,10 @@ router.put(
   expressCommand(Community.SetCommunityStake),
 );
 
+router.post(
+  '/:id/group',
+  passport.authenticate('jwt', { session: false }),
+  expressCommand(Community.CreateGroup),
+);
+
 export default router;

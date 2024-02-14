@@ -27,6 +27,7 @@ import { RoleInstanceWithPermission } from '../../util/roles';
 import testSubstrateSpec from '../../util/testSubstrateSpec';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
+// FIXME: Probably part of zod validation
 export const Errors = {
   NoId: 'Must provide id',
   ReservedId: 'The id is reserved and cannot be used',
