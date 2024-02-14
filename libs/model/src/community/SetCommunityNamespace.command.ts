@@ -4,7 +4,7 @@ import { models } from '../database';
 import { isCommunityAdmin } from '../middleware';
 import { mustExist } from '../middleware/guards';
 import type { CommunityAttributes } from '../models';
-import { validateNamespace } from '../services/commonProtocol/newNamespaceValidator';
+import { commonProtocol } from '../services';
 
 export const schema = z.object({
   namespace: z.string(),
@@ -23,7 +23,7 @@ export const SetCommunityNamespace: CommandMetadata<
 
     if (!mustExist('Community', community)) return;
 
-    await validateNamespace(
+    await commonProtocol.newNamespaceValidator.validateNamespace(
       payload.namespace,
       payload.txHash,
       payload.address,
