@@ -2,7 +2,6 @@ import clsx from 'clsx';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { nextTick } from 'process';
 import { RangeStatic } from 'quill';
-import ImageUploader from 'quill-image-uploader';
 import MagicUrl from 'quill-magic-url';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
@@ -27,7 +26,6 @@ import 'react-quill/dist/quill.snow.css';
 import { MarkdownPreview } from './MarkdownPreview';
 
 Quill.register('modules/magicUrl', MagicUrl);
-Quill.register('modules/imageUploader', ImageUploader);
 
 type ReactQuillEditorProps = {
   className?: string;
@@ -290,9 +288,6 @@ const ReactQuillEditor = ({
                               mention,
                               magicUrl: false,
                               keyboard: markdownKeyboardShortcuts,
-                              imageUploader: {
-                                upload: handleImageUploader,
-                              },
                             }}
                           />
                         </div>
