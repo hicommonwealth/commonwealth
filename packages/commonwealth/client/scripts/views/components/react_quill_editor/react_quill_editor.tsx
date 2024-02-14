@@ -11,6 +11,7 @@ import { openConfirmation } from '../../modals/confirmation_modal';
 import type { IconName } from '../component_kit/cw_icons/cw_icon_lookup';
 import { CWTab, CWTabsRow } from '../component_kit/new_designs/CWTabs';
 import QuillTooltip from './QuillTooltip';
+import { CustomQuillFooter } from './footer';
 import { LoadingIndicator } from './loading_indicator';
 import { CustomQuillToolbar, useMarkdownToolbarHandlers } from './toolbar';
 import { convertTwitterLinksToEmbeds } from './twitter_embed';
@@ -300,6 +301,7 @@ const ReactQuillEditor = ({
                     )}
                   </Droppable>
                 </DragDropContext>
+                <CustomQuillFooter />
               </>
             )}
           </div>
