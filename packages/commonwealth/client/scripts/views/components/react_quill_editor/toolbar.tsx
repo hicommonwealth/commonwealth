@@ -232,7 +232,7 @@ export const useMarkdownToolbarHandlers = ({
             updatedLine = `${prefix} ${updatedLine}`;
           }
 
-          return updatedLine;
+          return updatedLine.replace(/\s{2,}/, ' ');
         })
         .join('\n');
 
