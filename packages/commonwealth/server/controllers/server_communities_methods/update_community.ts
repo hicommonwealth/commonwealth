@@ -194,11 +194,14 @@ export async function __updateCommunity(
   if (hide_projects) community.hide_projects = hide_projects;
   if (typeof stages_enabled === 'boolean')
     community.stages_enabled = stages_enabled;
-  if (
-    typeof custom_stages === 'string' &&
-    (custom_stages === '' || Array.isArray(JSON.parse(custom_stages)))
-  )
-    community.custom_stages = custom_stages;
+  if (typeof custom_stages === 'string' && custom_stages !== '') {
+    try {
+      const result = Array.isArray(JSON.parse(custom_stages));
+      if (result) community.custom_stages = JSON.parse(custom_stages);
+    } catch (e) {}
+  } else if (typeof custom_stages === 'string' && custom_stages === '') {
+    community.custom_stages = [];
+  }
   if (typeof terms === 'string') community.terms = terms;
   if (has_homepage) community.has_homepage = has_homepage;
   if (default_page) {
