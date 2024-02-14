@@ -5,7 +5,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import useSidebarStore from 'state/ui/sidebar';
-import MobileHeader from 'views/components/Composition/MobileHeader';
+import MobileHeader from 'views/components/Header/MobileHeader';
 import UserDropdown from 'views/components/Header/UserDropdown/UserDropdown';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { HelpMenuPopover } from 'views/menus/help_menu';

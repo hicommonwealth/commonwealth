@@ -5,7 +5,6 @@ import app from 'state';
 import { useFlag } from 'hooks/useFlag';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
-import UserDropdown from 'views/components/Header/UserDropdown';
 import useUserMenuItems from 'views/components/Header/UserDropdown/useUserMenuItems';
 import MenuContent from 'views/components/component_kit/CWPopoverMenu/MenuContent';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
@@ -43,7 +42,6 @@ const MobileHeader = ({
 
   // TODO this will be handled in next ticket
   const magnifyingGlassVisible = false;
-  const newUserIcon = true;
   const shouldShow = isInsideCommunity ? !menuVisible : true;
 
   const { data: users } = useFetchProfilesByAddressesQuery({
@@ -82,21 +80,14 @@ const MobileHeader = ({
           )}
 
           {isLoggedIn ? (
-            newUserIcon ? (
-              <>
-                <UserDropdown />
-                <div onClick={() => setIsUserDrawerOpen(true)}>
-                  <User
-                    shouldShowAvatarOnly
-                    avatarSize={24}
-                    userAddress={user?.address}
-                    userCommunityId={user?.community?.id}
-                  />
-                </div>
-              </>
-            ) : (
-              <UserDropdown />
-            )
+            <div onClick={() => setIsUserDrawerOpen(true)}>
+              <User
+                shouldShowAvatarOnly
+                avatarSize={24}
+                userAddress={user?.address}
+                userCommunityId={user?.community?.id}
+              />
+            </div>
           ) : (
             <CWButton
               label="Sign in"

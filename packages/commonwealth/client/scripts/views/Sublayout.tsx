@@ -13,9 +13,9 @@ import { SublayoutBanners } from './SublayoutBanners';
 import { SublayoutHeader } from './SublayoutHeader';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
+import MobileNavigation from './components/MobileNavigation';
 import { ValentineGrowl } from './components/ValentineGrowl';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
-import MobileNavigation from './composition/MobileNavigation';
 
 type SublayoutProps = {
   hideFooter?: boolean;
