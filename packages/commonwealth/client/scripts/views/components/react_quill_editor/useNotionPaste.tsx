@@ -6,33 +6,20 @@ export const useNotionPaste = (setContentDelta, contentDelta, editorRef) => {
       event.preventDefault();
       const editor = editorRef.current?.getEditor();
       const pastedText = event.clipboardData.getData('text/plain');
+
       if (pastedText) {
-        const lines = pastedText.split('\n');
-        const fixedLines = lines.map((line) => {
-          if (line.trim().startsWith('[ ]')) {
-            return `- ${line.trim()}`;
-          }
-          return line;
+        setContentDelta({
+          ops: [
+            {
+              insert: pastedText,
+            },
+          ],
         });
-        const fixedText = fixedLines.join('\n');
-
-        if (fixedText !== contentDelta.ops[0]?.insert) {
-          setContentDelta((prevDelta) => ({
-            ...prevDelta,
-            ops: [
-              ...prevDelta.ops,
-              {
-                insert: fixedText,
-              },
-            ],
-          }));
-
-          //Setting a delay to reset cursor position
-          setTimeout(() => {
-            const newCursorPosition = editor.getLength();
-            editor.setSelection(newCursorPosition, newCursorPosition);
-          }, 10);
-        }
+        setTimeout(() => {
+          const newCursorPosition = editor.getLength();
+          editor.setSelection(newCursorPosition, newCursorPosition);
+        }, 10);
+        return;
       }
     };
 
