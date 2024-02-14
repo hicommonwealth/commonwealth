@@ -78,7 +78,7 @@ const UserDropdown = () => {
     recheck: isOpen,
   });
 
-  const user = app.user.addresses[0];
+  const user = app.user?.addresses?.[0];
   const profileId = user?.profileId || user?.profile.id;
 
   const addresses: PopoverMenuItem[] = app.user.activeAccounts.map(

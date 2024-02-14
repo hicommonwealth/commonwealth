@@ -1,7 +1,13 @@
 @import '../../../../../styles/shared.scss';
 
 .ViewUpvotesDrawer {
-  .Drawer {
+  .Drawer.upvote-drawer {
+    top: 56px !important;
+
+    @include extraSmall {
+      top: 48px !important;
+    }
+
     .empty-upvotes-container {
       color: $neutral-500;
     }

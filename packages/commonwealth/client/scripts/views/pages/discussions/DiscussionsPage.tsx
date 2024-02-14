@@ -18,7 +18,6 @@ import {
 import app from '../../../state';
 import { useFetchTopicsQuery } from '../../../state/api/topics';
 import { Breadcrumbs } from '../../components/Breadcrumbs';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { HeaderWithFilters } from './HeaderWithFilters';
 import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
@@ -203,19 +202,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           ),
         }}
       />
-      {isWindowSmallInclusive && (
-        <div className="floating-mobile-button">
-          <CWIconButton
-            iconName="plusCircle"
-            iconButtonTheme="black"
-            iconSize="xl"
-            onClick={() => {
-              navigate('/new/discussion');
-            }}
-            disabled={!hasJoinedCommunity}
-          />
-        </div>
-      )}
     </div>
   );
 };

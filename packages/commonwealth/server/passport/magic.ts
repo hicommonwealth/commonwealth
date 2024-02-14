@@ -457,7 +457,7 @@ async function magicLoginRoute(
     }
   }
 
-  const isCosmos = chainToJoin.base === ChainBase.CosmosSDK;
+  const isCosmos = chainToJoin?.base === ChainBase.CosmosSDK;
 
   const magicUserMetadata = await magic.users.getMetadataByIssuerAndWallet(
     decodedMagicToken.issuer,
