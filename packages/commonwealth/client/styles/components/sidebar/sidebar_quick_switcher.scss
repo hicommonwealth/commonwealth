@@ -10,6 +10,10 @@
   overflow: hidden;
   width: $quick-switcher-width;
 
+  &:not(.isInsideCommunity) {
+    padding-top: 32px;
+  }
+
   .community-nav-bar {
     align-items: center;
     display: flex;

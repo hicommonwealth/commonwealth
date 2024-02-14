@@ -3,7 +3,13 @@ import {
   IconName,
 } from '../component_kit/cw_icons/cw_icon_lookup';
 
-export type AuthSSOs = 'google' | 'discord' | 'x' | 'github' | 'email';
+export type AuthSSOs =
+  | 'google'
+  | 'discord'
+  | 'x'
+  | 'github'
+  | 'apple'
+  | 'email';
 export type CosmosWallets = 'keplr' | 'leap';
 export type SubstrateWallets = 'polkadot';
 export type SolanaWallets = 'phantom';

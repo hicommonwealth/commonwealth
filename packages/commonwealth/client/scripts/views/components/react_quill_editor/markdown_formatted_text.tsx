@@ -26,6 +26,7 @@ import { countLinesMarkdown, fetchTwitterEmbedInfo } from './utils';
 const OPEN_LINKS_IN_NEW_TAB = true;
 
 const markdownRenderer = new marked.Renderer();
+
 markdownRenderer.link = (href, title, text) => {
   return `<a ${
     href.indexOf('://commonwealth.im/') !== -1 && 'target="_blank"'
@@ -33,6 +34,7 @@ markdownRenderer.link = (href, title, text) => {
     OPEN_LINKS_IN_NEW_TAB ? 'target="_blank"' : ''
   } href="${href}">${text}</a>`;
 };
+
 markdownRenderer.image = (href, title, text) => {
   if (href?.startsWith('ipfs://')) {
     const hash = href.split('ipfs://')[1];

@@ -7,7 +7,7 @@ import {
   setupErrorHandlers,
 } from '@hicommonwealth/adapters';
 import { logger as _logger, cache } from '@hicommonwealth/core';
-import { TokenBalanceCache, models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model';
 import bodyParser from 'body-parser';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
@@ -30,7 +30,6 @@ import {
   REDIS_URL,
   SERVER_URL,
   SESSION_SECRET,
-  TBC_BALANCE_TTL_SECONDS,
 } from './server/config';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
@@ -206,11 +205,6 @@ export async function main(app: express.Express) {
     );
   }
 
-  const tokenBalanceCache = new TokenBalanceCache(
-    models,
-    TBC_BALANCE_TTL_SECONDS,
-  );
-
   const banCache = new BanCache(models);
   const globalActivityCache = new GlobalActivityCache(models);
 
@@ -227,7 +221,6 @@ export async function main(app: express.Express) {
     app,
     models,
     viewCountCache,
-    tokenBalanceCache,
     banCache,
     globalActivityCache,
     dbValidationService,

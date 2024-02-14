@@ -152,7 +152,6 @@ export async function __createThread(
   if (!isAdmin) {
     const { isValid, message } = await validateTopicGroupsMembership(
       this.models,
-      this.tokenBalanceCache,
       topicId,
       community.id,
       address,

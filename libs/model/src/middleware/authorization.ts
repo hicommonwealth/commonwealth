@@ -1,5 +1,5 @@
 import {
-  Actor,
+  CommandContext,
   CommandHandler,
   InvalidActor,
   InvalidInput,
@@ -24,18 +24,16 @@ import {
 
 /**
  * Finds one active community address that meets the arguments
- * @param community_id community id
- * @param actor actor context
+ * @param actor command actor
+ * @param id community id
  * @param roles roles filter
  * @returns authorized address or throws
  */
 const authorizeAddress = async (
-  community_id: string,
-  actor: Actor,
+  { actor, id }: CommandContext<any>,
   roles: Role[],
 ): Promise<AddressAttributes> => {
-  if (!community_id)
-    throw new InvalidActor(actor, 'Must provide a community id');
+  if (!id) throw new InvalidActor(actor, 'Must provide a community id');
   if (!actor.address_id)
     throw new InvalidActor(actor, 'Must provide an address');
   // TODO: cache
@@ -44,7 +42,7 @@ const authorizeAddress = async (
       where: {
         user_id: actor.user.id,
         address: actor.address_id,
-        community_id,
+        community_id: id,
         role: { [Op.in]: roles },
       },
       order: [['role', 'DESC']],
@@ -61,28 +59,28 @@ const authorizeAddress = async (
 export const isCommunityAdmin: CommandHandler<
   CommunityAttributes,
   any
-> = async ({ id, actor }) => {
+> = async (ctx) => {
   // super admin is always allowed
-  if (actor.user.isAdmin) return;
-  await authorizeAddress(id, actor, ['admin']);
+  if (ctx.actor.user.isAdmin) return;
+  await authorizeAddress(ctx, ['admin']);
 };
 
 export const isCommunityModerator: CommandHandler<
   CommunityAttributes,
   any
-> = async ({ id, actor }) => {
+> = async (ctx) => {
   // super admin is always allowed
-  if (actor.user.isAdmin) return;
-  await authorizeAddress(id, actor, ['moderator']);
+  if (ctx.actor.user.isAdmin) return;
+  await authorizeAddress(ctx, ['moderator']);
 };
 
 export const isCommunityAdminOrModerator: CommandHandler<
   CommunityAttributes,
   any
-> = async ({ id, actor }) => {
+> = async (ctx) => {
   // super admin is always allowed
-  if (actor.user.isAdmin) return;
-  await authorizeAddress(id, actor, ['admin', 'moderator']);
+  if (ctx.actor.user.isAdmin) return;
+  await authorizeAddress(ctx, ['admin', 'moderator']);
 };
 
 /**
