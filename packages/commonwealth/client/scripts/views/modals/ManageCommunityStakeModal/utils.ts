@@ -20,7 +20,7 @@ export const convertEthToUsd = (
 };
 
 export const buildEtherscanLink = (txHash: string) => {
-  const prefix = 'sepolia.';
+  const prefix = 'Base.';
   return `https://${prefix}etherscan.io/tx/${txHash}`;
 };
 

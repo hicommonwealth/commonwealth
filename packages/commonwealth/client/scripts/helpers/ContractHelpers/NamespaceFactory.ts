@@ -93,7 +93,7 @@ class NamespaceFactory extends ContractBase {
 
     let txReceipt;
     try {
-      const uri = `commonwealth.im/api/namespaceMetadata/${name}/{id}`;
+      const uri = `${window.location.origin}/api/namespaceMetadata/${name}/{id}`;
       txReceipt = await this.contract.methods
         .deployNamespace(name, uri, feeManager, [])
         .send({ from: walletAddress });
@@ -128,7 +128,7 @@ class NamespaceFactory extends ContractBase {
           name + ' Community Stake',
           stakesId,
           '0x0000000000000000000000000000000000000000',
-          16000,
+          100000000,
           0,
         )
         .send({ from: walletAddress });
