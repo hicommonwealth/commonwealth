@@ -120,7 +120,7 @@ export default (
       active: { type: dataTypes.BOOLEAN },
       stages_enabled: {
         type: dataTypes.BOOLEAN,
-        allowNull: true,
+        allowNull: false,
         defaultValue: true,
       },
       custom_stages: { type: dataTypes.STRING, allowNull: true },
