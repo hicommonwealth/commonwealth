@@ -32,9 +32,9 @@ module.exports = merge(common, {
       ],
     }),
     new BundleAnalyzerPlugin({
-      analyzerMode: 'disabled',
-      generateStatsFile: false,
-      statsOptions: { source: false },
+      analyzerMode: 'disabled', // 'server',
+      generateStatsFile: false, // true,
+      statsOptions: { source: false }, // { source: true },
     }),
   ],
   module: {

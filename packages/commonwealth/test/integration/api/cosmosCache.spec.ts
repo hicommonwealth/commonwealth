@@ -3,26 +3,22 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable max-len */
 require('dotenv').config();
+import { connectToRedis } from '@hicommonwealth/adapters';
+import { CacheNamespaces } from '@hicommonwealth/core';
+import { tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-
-chai.use(chaiHttp);
-const expect = chai.expect;
-
-import {
-  RedisCache,
-  cacheDecorator,
-  connectToRedis,
-} from '@hicommonwealth/adapters';
-import { RedisNamespaces } from '@hicommonwealth/core';
 import {
   cosmosLCDDuration,
   cosmosRPCDuration,
   cosmosRPCKey,
 } from 'server/util/cosmosCache';
-import app, { resetDatabase } from '../../../server-test';
+import app, { cacheDecorator, redisCache } from '../../../server-test';
 const v1beta1ChainId = 'csdk-beta';
 const v1ChainId = 'csdk';
+
+chai.use(chaiHttp);
+const expect = chai.expect;
 
 function verifyNoCacheResponse(res) {
   expect(res.body).to.not.be.null;
@@ -40,13 +36,11 @@ async function verifyCacheResponse(key, res, resEarlier) {
 }
 
 describe('Cosmos Cache', () => {
-  const redisCache: RedisCache = new RedisCache();
-  const route_namespace: RedisNamespaces = RedisNamespaces.Route_Response;
+  const route_namespace: CacheNamespaces = CacheNamespaces.Route_Response;
 
   before(async () => {
-    await resetDatabase();
+    await tester.seedDb();
     await connectToRedis(redisCache);
-    cacheDecorator.setCache(redisCache);
   });
 
   after(async () => {
@@ -255,7 +249,7 @@ describe('Cosmos Cache', () => {
       rpcTestKeyAndDuration(body, expectedKey, 6);
       await rpcTestIsCached(bodyString, expectedKey);
     });
-  });
+  }).timeout(5000);
 
   describe('cosmosLCD', () => {
     const lcdProposalsCacheExpectedTest = async (

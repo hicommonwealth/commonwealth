@@ -1,7 +1,5 @@
 import { DB } from '@hicommonwealth/model';
 
-import { TokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
-
 import {
   DeletePollOptions,
   DeletePollResult,
@@ -23,7 +21,7 @@ import {
  *
  */
 export class ServerPollsController {
-  constructor(public models: DB, public tokenBalanceCache: TokenBalanceCache) {}
+  constructor(public models: DB) {}
 
   async deletePoll(options: DeletePollOptions): Promise<DeletePollResult> {
     return __deletePoll.call(this, options);

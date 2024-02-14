@@ -18,8 +18,11 @@ import {
   MixpanelLoginPayload,
 } from '../../../../../../../shared/analytics/types';
 import { useBrowserAnalyticsTrack } from '../../../../../hooks/useBrowserAnalyticsTrack';
+import { useFlag } from '../../../../../hooks/useFlag';
 import { communityTypeOptions } from './helpers';
 
+import { ChainBase } from '@hicommonwealth/core';
+import { AuthModal } from 'views/modals/AuthModal';
 import './CommunityTypeStep.scss';
 
 interface CommunityTypeStepProps {
@@ -35,9 +38,10 @@ const CommunityTypeStep = ({
   setSelectedAddress,
   handleContinue,
 }: CommunityTypeStepProps) => {
+  const newSignInModalEnabled = useFlag('newSignInModal');
   const [isNewCommunityAdminModalOpen, setIsNewCommunityAdminModalOpen] =
     useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const { isLoggedIn } = useUserLoggedIn();
 
@@ -60,7 +64,7 @@ const CommunityTypeStep = ({
     setSelectedCommunity({ type: selectedType, chainBase: selectedChainBase });
 
     if (!isLoggedIn) {
-      setIsLoginModalOpen(true);
+      setIsAuthModalOpen(true);
     } else {
       setIsNewCommunityAdminModalOpen(true);
     }
@@ -72,7 +76,7 @@ const CommunityTypeStep = ({
   );
 
   const handleClickConnectNewWallet = () => {
-    setIsLoginModalOpen(true);
+    setIsAuthModalOpen(true);
     setIsNewCommunityAdminModalOpen(false);
   };
 
@@ -139,22 +143,34 @@ const CommunityTypeStep = ({
         onClose={() => setIsNewCommunityAdminModalOpen(false)}
         open={isNewCommunityAdminModalOpen}
       />
-      <CWModal
-        rootClassName="CreateCommunityLoginModal"
-        content={
-          <LoginModal
-            initialSidebar="createCommunityLogin"
-            initialWallets={availableWallets}
-            onModalClose={() => setIsLoginModalOpen(false)}
-            onSuccess={() => {
-              setIsNewCommunityAdminModalOpen(true);
-            }}
-          />
-        }
-        isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-        onClose={() => setIsLoginModalOpen(false)}
-        open={isLoginModalOpen}
-      />
+      {!newSignInModalEnabled ? (
+        <CWModal
+          rootClassName="CreateCommunityLoginModal"
+          content={
+            <LoginModal
+              initialSidebar="createCommunityLogin"
+              initialWallets={availableWallets}
+              onModalClose={() => setIsAuthModalOpen(false)}
+              onSuccess={() => setIsNewCommunityAdminModalOpen(true)}
+            />
+          }
+          isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
+          onClose={() => setIsAuthModalOpen(false)}
+          open={isAuthModalOpen}
+        />
+      ) : (
+        <AuthModal
+          isOpen={isAuthModalOpen}
+          onClose={() => setIsAuthModalOpen(false)}
+          onSuccess={() => {
+            setIsNewCommunityAdminModalOpen(true);
+          }}
+          showWalletsFor={
+            communityTypeOptions.find((c) => c.type === selectedCommunity.type)
+              ?.chainBase as Exclude<ChainBase, ChainBase.NEAR>
+          }
+        />
+      )}
     </div>
   );
 };

@@ -1,4 +1,6 @@
-export const getLastEdited = (post) => {
+import { CommentAttributes } from '@hicommonwealth/model';
+
+export const getLastEdited = (post: CommentAttributes) => {
   let lastEdited;
   if (post.version_history && post.version_history?.length > 1) {
     try {

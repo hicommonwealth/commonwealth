@@ -1,8 +1,8 @@
-import { featureFlags } from 'helpers/feature-flags';
 import { Navigate } from 'navigation/helpers';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { withLayout } from 'views/Layout';
+import { RouteFeatureFlags } from './Router';
 
 const LandingPage = lazy(() => import('views/pages/landing'));
 const WhyCommonwealthPage = lazy(() => import('views/pages/why_commonwealth'));
@@ -94,7 +94,7 @@ const ViewSnapshotsProposalPage = lazy(
   () => import('views/pages/view_snapshot_proposal'),
 );
 const NewSnapshotProposalPage = lazy(
-  () => import('views/pages/new_snapshot_proposal'),
+  () => import('views/pages/new_snapshot_proposal/NewSnapshotProposalPage'),
 );
 const AdminPanelPage = lazy(() => import('views/pages/AdminPanel'));
 
@@ -102,7 +102,11 @@ const NewProfilePage = lazy(() => import('views/pages/new_profile'));
 const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
-const CommonDomainRoutes = () => [
+const CommonDomainRoutes = ({
+  proposalTemplatesEnabled,
+  newAdminOnboardingEnabled,
+  communityHomepageEnabled,
+}: RouteFeatureFlags) => [
   <Route
     key="/"
     path="/"
@@ -342,7 +346,7 @@ const CommonDomainRoutes = () => [
       scoped: true,
     })}
   />,
-  ...(featureFlags.communityHomepage
+  ...(communityHomepageEnabled
     ? [
         <Route
           key="/:scope/feed"
@@ -363,7 +367,7 @@ const CommonDomainRoutes = () => [
   // DISCUSSIONS END
 
   // CONTRACTS
-  ...(featureFlags.proposalTemplates
+  ...(proposalTemplatesEnabled
     ? [
         <Route
           key="/:scope/contracts"
@@ -412,7 +416,7 @@ const CommonDomainRoutes = () => [
   />,
 
   // ADMIN
-  ...(featureFlags.newAdminOnboardingEnabled
+  ...(newAdminOnboardingEnabled
     ? [
         <Route
           key="/:scope/manage/profile"

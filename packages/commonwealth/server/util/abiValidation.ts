@@ -1,5 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
-import { AbiType } from '@hicommonwealth/core';
+import { AbiType, AppError } from '@hicommonwealth/core';
 import type { AbiItem } from 'web3-utils';
 import { parseAbiItemsFromABI } from '../../shared/abi_utils';
 

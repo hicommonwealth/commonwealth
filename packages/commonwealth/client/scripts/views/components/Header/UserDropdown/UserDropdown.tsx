@@ -19,6 +19,7 @@ import {
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import SessionRevalidationModal from 'views/modals/SessionRevalidationModal';
 import { LoginModal } from 'views/modals/login_modal';
+import { useFlag } from '../../../../hooks/useFlag';
 import { CWModal } from '../../component_kit/new_designs/CWModal';
 import './UserDropdown.scss';
 import { UserDropdownItem } from './UserDropdownItem';
@@ -31,6 +32,7 @@ import WebWalletController from 'controllers/app/web_wallets';
 import { setDarkMode } from 'helpers/darkMode';
 import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
 import useGroupMutationBannerStore from 'state/ui/group';
+import { AuthModal } from 'views/modals/AuthModal';
 
 const resetWalletConnectSession = async () => {
   /**
@@ -56,12 +58,13 @@ const handleLogout = async () => {
 };
 
 const UserDropdown = () => {
+  const newSignInModalEnabled = useFlag('newSignInModal');
   const navigate = useCommonNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
     localStorage.getItem('dark-mode-state') === 'on',
   );
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [revalidationModalData, setRevalidationModalData] = useState<{
     walletSsoSource: WalletSsoSource;
     walletAddress: string;
@@ -126,7 +129,7 @@ const UserDropdown = () => {
                 {
                   type: 'default',
                   label: 'Connect a new address',
-                  onClick: () => setIsLoginModalOpen(true),
+                  onClick: () => setIsAuthModalOpen(true),
                 },
                 { type: 'divider' },
               ] as PopoverMenuItem[])
@@ -192,12 +195,21 @@ const UserDropdown = () => {
           </button>
         )}
       />
-      <CWModal
-        content={<LoginModal onModalClose={() => setIsLoginModalOpen(false)} />}
-        isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-        onClose={() => setIsLoginModalOpen(false)}
-        open={isLoginModalOpen}
-      />
+      {!newSignInModalEnabled ? (
+        <CWModal
+          content={
+            <LoginModal onModalClose={() => setIsAuthModalOpen(false)} />
+          }
+          isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
+          onClose={() => setIsAuthModalOpen(false)}
+          open={isAuthModalOpen}
+        />
+      ) : (
+        <AuthModal
+          onClose={() => setIsAuthModalOpen(false)}
+          isOpen={isAuthModalOpen}
+        />
+      )}
       <CWModal
         size="medium"
         content={

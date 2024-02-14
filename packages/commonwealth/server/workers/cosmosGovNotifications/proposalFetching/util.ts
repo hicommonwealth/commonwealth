@@ -3,7 +3,6 @@ import { logger } from '@hicommonwealth/core';
 import { CommunityInstance } from '@hicommonwealth/model';
 import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import { COSMOS_GOV_V1_CHAIN_IDS } from '../../../config';
-import { rollbar } from '../../../util/rollbar';
 import { AllCosmosProposals } from './types';
 
 const log = logger().getLogger(__filename);
@@ -74,7 +73,6 @@ export function processProposalSettledPromises(
   for (const result of v1ProposalResults) {
     if (result.status === 'rejected') {
       log.error('Fetching v1 proposal failed.', result.reason);
-      rollbar?.error('Fetching v1 proposal failed.', result.reason);
     } else {
       v1Proposals.push(result.value);
     }
@@ -84,7 +82,6 @@ export function processProposalSettledPromises(
   for (const result of v1Beta1ProposalResults) {
     if (result.status === 'rejected') {
       log.error('Fetching v1beta1 proposal failed.', result.reason);
-      rollbar?.error('Fetching v1beta1 proposal failed.', result.reason);
     } else {
       v1Beta1Proposals.push(result.value);
     }

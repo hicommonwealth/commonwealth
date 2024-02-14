@@ -1,14 +1,17 @@
-import { models, UserInstance } from '@hicommonwealth/model';
+import {
+  UserInstance,
+  commonProtocol,
+  models,
+  tester,
+} from '@hicommonwealth/model';
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import app from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
-import { validateCommunityStakeConfig } from '../../../server/util/commonProtocol/communityStakeConfigValidator';
 import { buildUser } from '../../unit/unitHelpers';
-import { resetDatabase } from '../../util/resetDatabase';
-import { get, put } from './external/appHook.spec';
+import { get, post } from './external/appHook.spec';
 import { testUsers } from './external/dbEntityHooks.spec';
 
 chai.use(chaiHttp);
@@ -30,22 +33,23 @@ const expectedCreateResp = {
   stake_enabled: baseRequest.stake_enabled,
 };
 
-describe('PUT communityStakes Tests', () => {
+describe('POST communityStakes Tests', () => {
   beforeEach(async () => {
-    await resetDatabase();
+    await tester.seedDb();
   });
 
   it('The handler creates and updates community stake', async () => {
-    const controller = new ServerCommunitiesController(models, null, null);
+    const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
       userAttributes: { email: '', id: 1, isAdmin: true },
     }) as UserInstance;
 
-    const createResponse = await controller.putCommunityStake({
+    const createResponse = await controller.createCommunityStake({
       communityStake: baseRequest,
       user: user,
     });
+
     assert.equal(createResponse.community_id, expectedCreateResp.community_id);
     assert.equal(createResponse.stake_id, expectedCreateResp.stake_id);
     assert.equal(createResponse.stake_token, expectedCreateResp.stake_token);
@@ -55,43 +59,39 @@ describe('PUT communityStakes Tests', () => {
       expectedCreateResp.stake_enabled,
     );
 
-    const updateResp = await controller.putCommunityStake({
-      communityStake: { ...baseRequest, stake_token: 'temp' },
-      user: user,
-    });
+    let error;
+    try {
+      // try to change vote weight
+      await controller.createCommunityStake({
+        communityStake: { ...baseRequest, vote_weight: 20 },
+        user: user,
+      });
+    } catch (e) {
+      error = e;
+    }
 
-    const expectedUpdateResp = {
-      community_id: baseRequest.community_id,
-      stake_id: baseRequest.stake_id,
-      stake_token: 'temp',
-      vote_weight: baseRequest.vote_weight,
-      stake_enabled: baseRequest.stake_enabled,
-    };
+    assert.equal(error.message, 'Community stake already exists');
 
-    assert.equal(updateResp.community_id, expectedUpdateResp.community_id);
-    assert.equal(updateResp.stake_id, expectedUpdateResp.stake_id);
-    assert.equal(updateResp.stake_token, expectedUpdateResp.stake_token);
-    assert.equal(updateResp.vote_weight, expectedUpdateResp.vote_weight);
-    assert.equal(updateResp.stake_enabled, expectedUpdateResp.stake_enabled);
-
-    const getResp = await controller.getCommunityStake({
+    await controller.getCommunityStake({
       community_id: baseRequest.community_id,
       stake_id: baseRequest.stake_id,
     });
 
-    assert.equal(getResp.community_id, expectedUpdateResp.community_id);
-    assert.equal(getResp.stake_id, expectedUpdateResp.stake_id);
-    assert.equal(getResp.stake_token, expectedUpdateResp.stake_token);
-    assert.equal(getResp.vote_weight, expectedUpdateResp.vote_weight);
-    assert.equal(getResp.stake_enabled, expectedUpdateResp.stake_enabled);
-    assert.equal(getResp.Chain.namespace, 'IanSpace');
+    assert.equal(createResponse.community_id, expectedCreateResp.community_id);
+    assert.equal(createResponse.stake_id, expectedCreateResp.stake_id);
+    assert.equal(createResponse.stake_token, expectedCreateResp.stake_token);
+    assert.equal(createResponse.vote_weight, expectedCreateResp.vote_weight);
+    assert.equal(
+      createResponse.stake_enabled,
+      expectedCreateResp.stake_enabled,
+    );
   });
 
   it('The community stake routes work correctly', async () => {
     const jwtToken = jwt.sign({ id: 2, email: testUsers[0].email }, JWT_SECRET);
 
     const actualPutResponse = (
-      await put(
+      await post(
         `/api/communityStakes/${baseRequest.community_id}/${baseRequest.stake_id}`,
         { ...baseRequest, jwt: jwtToken },
         true,
@@ -134,6 +134,21 @@ describe('PUT communityStakes Tests', () => {
   });
 
   it('The integration with protocol works', async () => {
-    await validateCommunityStakeConfig(models, 'common-protocol', 2);
+    const community = await models.Community.findOne({
+      where: {
+        id: 'common-protocol',
+      },
+      include: [
+        {
+          model: models.ChainNode,
+          attributes: ['eth_chain_id', 'url'],
+        },
+      ],
+      attributes: ['namespace'],
+    });
+    await commonProtocol.communityStakeConfigValidator.validateCommunityStakeConfig(
+      community,
+      2,
+    );
   });
 });

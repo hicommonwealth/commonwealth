@@ -1,66 +1,60 @@
-import { DB } from '@hicommonwealth/model';
+import { CommunityStakeAttributes, DB } from '@hicommonwealth/model';
 import BanCache from '../util/banCheckCache';
-import { TokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
 import {
-  __createChainNode,
   CreateChainNodeOptions,
   CreateChainNodeResult,
+  __createChainNode,
 } from './server_communities_methods/create_chain_node';
 import {
-  __createCommunity,
   CreateCommunityOptions,
   CreateCommunityResult,
+  __createCommunity,
 } from './server_communities_methods/create_community';
 import {
-  __deleteCommunity,
+  PostCommunityStakeOptions,
+  __createCommunityStake,
+} from './server_communities_methods/create_community_stake';
+import {
   DeleteCommunityOptions,
   DeleteCommunityResult,
+  __deleteCommunity,
 } from './server_communities_methods/delete_community';
 import {
-  __getChainNodes,
   GetChainNodesOptions,
   GetChainNodesResult,
+  __getChainNodes,
 } from './server_communities_methods/get_chain_nodes';
 import {
-  __getCommunities,
   GetCommunitiesOptions,
   GetCommunitiesResult,
+  __getCommunities,
 } from './server_communities_methods/get_communities';
 import {
-  __getCommunityStake,
   GetCommunityStakeOptions,
   GetCommunityStakeResult,
+  __getCommunityStake,
 } from './server_communities_methods/get_community_stake';
 import {
-  __getRelatedCommunities,
   GetRelatedCommunitiesQuery,
   GetRelatedCommunitiesResult,
+  __getRelatedCommunities,
 } from './server_communities_methods/get_related_communities';
 import {
-  __putCommunityStake,
-  PutCommunityStakeOptions,
-  PutCommunityStakeResult,
-} from './server_communities_methods/put_community_stake';
-import {
-  __searchCommunities,
   SearchCommunitiesOptions,
   SearchCommunitiesResult,
+  __searchCommunities,
 } from './server_communities_methods/search_communities';
 import {
-  __updateCommunity,
   UpdateCommunityOptions,
   UpdateCommunityResult,
+  __updateCommunity,
 } from './server_communities_methods/update_community';
 
 /**
  * Implements methods related to communities
  */
 export class ServerCommunitiesController {
-  constructor(
-    public models: DB,
-    public tokenBalanceCache: TokenBalanceCache,
-    public banCache: BanCache,
-  ) {}
+  constructor(public models: DB, public banCache: BanCache) {}
 
   async searchCommunities(
     options: SearchCommunitiesOptions,
@@ -110,10 +104,10 @@ export class ServerCommunitiesController {
     return __getRelatedCommunities.call(this, options);
   }
 
-  async putCommunityStake(
-    options: PutCommunityStakeOptions,
-  ): Promise<PutCommunityStakeResult> {
-    return __putCommunityStake.call(this, options);
+  async createCommunityStake(
+    options: PostCommunityStakeOptions,
+  ): Promise<CommunityStakeAttributes> {
+    return __createCommunityStake.call(this, options);
   }
 
   async getCommunityStake(

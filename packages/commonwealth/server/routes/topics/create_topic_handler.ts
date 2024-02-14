@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import { TopicAttributes } from '@hicommonwealth/model';
 import z from 'zod';
 import { ServerControllers } from '../../routing/router';

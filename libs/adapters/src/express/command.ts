@@ -1,35 +1,36 @@
-import {
-  command,
-  type CommandMetadata,
-  type UserAttributes,
-} from '@hicommonwealth/model';
-import type { Request, RequestHandler, Response } from 'express';
+import { command, type CommandMetadata, type User } from '@hicommonwealth/core';
+import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import { z, ZodSchema } from 'zod';
 
 /**
  * Adapts commands to express handlers
  * - By convention, the aggregate id is a request parameter `:id`
- * - By convention, we can expect the following optional arguments in the body of the request: TODO: check this
+ * - By convention, we can expect the following optional arguments in the body of the request:
  *  - address_id?: string;
  * @param md command metadata
  * @returns express command handler
  */
 export const expressCommand =
-  <M extends ZodSchema, R>(md: CommandMetadata<M, R>): RequestHandler =>
+  <T, P extends ZodSchema>(md: CommandMetadata<T, P>): RequestHandler =>
   async (
     req: Request<
       { id: string },
-      R,
-      z.infer<M> & {
+      T,
+      z.infer<P> & {
         address_id?: string;
       }
     >,
-    res: Response<R>,
-  ) =>
-    res.json(
-      await command(md, req.params.id, req.body, {
-        user: req.user as UserAttributes,
-        address_id: req.body.address_id,
-        aggregate_id: req.params.id,
-      }),
-    );
+    res: Response<Partial<T> | undefined>,
+    next: NextFunction,
+  ) => {
+    try {
+      const results = await command(md, {
+        id: req.params.id,
+        actor: { user: req.user as User, address_id: req.body.address_id },
+        payload: req.body,
+      });
+      return res.json(results);
+    } catch (error) {
+      next(error);
+    }
+  };

@@ -1,11 +1,11 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import {
   AddressInstance,
-  CommunityInstance,
+  CommentAttributes,
   UserInstance,
 } from '@hicommonwealth/model';
-import { Op } from 'sequelize';
-import { findOneRole } from '../../util/roles';
+import { WhereOptions } from 'sequelize';
+import { validateOwner } from 'server/util/validateOwner';
 import { ServerCommentsController } from '../server_comments_controller';
 
 const Errors = {
@@ -17,7 +17,6 @@ const Errors = {
 export type DeleteCommentOptions = {
   user: UserInstance;
   address: AddressInstance;
-  community: CommunityInstance;
   commentId?: number;
   messageId?: string;
 };
@@ -26,68 +25,45 @@ export type DeleteCommentResult = void;
 
 export async function __deleteComment(
   this: ServerCommentsController,
-  { user, address, community, commentId, messageId }: DeleteCommentOptions,
+  { user, address, commentId, messageId }: DeleteCommentOptions,
 ): Promise<DeleteCommentResult> {
-  if (!commentId) {
-    // Discord Bot Handling
-    const existingComment = await this.models.Comment.findOne({
-      where: {
-        discord_meta: {
-          message_id: messageId,
-        },
-      },
-    });
+  const commentWhere: WhereOptions<CommentAttributes> = {};
+  if (commentId) {
+    commentWhere.id = commentId;
+  }
+  if (messageId) {
+    commentWhere.discord_meta = {
+      message_id: messageId,
+    };
+  }
 
-    if (existingComment) {
-      commentId = existingComment.id;
-    } else {
-      throw new AppError(Errors.CommentNotFound);
-    }
+  const comment = await this.models.Comment.findOne({
+    where: commentWhere,
+  });
+  if (!comment) {
+    throw new AppError(Errors.CommentNotFound);
   }
 
   // check if author can delete post
   const [canInteract, error] = await this.banCache.checkBan({
-    communityId: community.id,
+    communityId: comment.community_id,
     address: address.address,
   });
   if (!canInteract) {
     throw new AppError(`${Errors.BanError}: ${error}`);
   }
 
-  const userOwnedAddressIds = (await user.getAddresses())
-    .filter((addr) => !!addr.verified)
-    .map((addr) => addr.id);
-
-  // find comment, if owned by user
-  let comment = await this.models.Comment.findOne({
-    where: {
-      id: commentId,
-      address_id: { [Op.in]: userOwnedAddressIds },
-    },
-    include: [this.models.Address],
+  const isAdminOrOwner = await validateOwner({
+    models: this.models,
+    user,
+    entity: comment,
+    communityId: comment.community_id,
+    allowMod: true,
+    allowAdmin: true,
+    allowSuperAdmin: true,
   });
-
-  // if not owned by user, check if is admin/mod
-  if (!comment) {
-    comment = await this.models.Comment.findOne({
-      where: {
-        id: commentId,
-      },
-      include: [this.models.Community],
-    });
-    if (!comment) {
-      throw new AppError(Errors.CommentNotFound);
-    }
-    const requesterIsAdminOrMod = await findOneRole(
-      this.models,
-      { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
-      comment?.Chain?.id,
-      ['admin', 'moderator'],
-    );
-
-    if (!requesterIsAdminOrMod && !user.isAdmin) {
-      throw new AppError(Errors.NotOwned);
-    }
+  if (!isAdminOrOwner) {
+    throw new AppError(Errors.NotOwned);
   }
 
   // find and delete all associated subscriptions

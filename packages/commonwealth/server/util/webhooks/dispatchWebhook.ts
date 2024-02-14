@@ -9,7 +9,6 @@ import {
   WebhookInstance,
   models,
 } from '@hicommonwealth/model';
-import { rollbar } from '../rollbar';
 import { sendDiscordWebhook } from './destinations/discord';
 import { sendSlackWebhook } from './destinations/slack';
 import { sendTelegramWebhook } from './destinations/telegram';
@@ -33,6 +32,15 @@ export async function dispatchWebhooks(
     log.warn(
       `Webhooks not supported for ${notification.categoryId} notifications`,
     );
+    return;
+  }
+
+  if (
+    notification.categoryId === NotificationCategories.NewComment &&
+    notification.data?.parent_comment_id
+  ) {
+    // If parent comment exists we don't want to send a webhook.
+    // Otherwise we will duplicate send a webhook for every reply to a comment.
     return;
   }
 
@@ -112,8 +120,6 @@ export async function dispatchWebhooks(
 
       // TODO: Issue #5230
       log.error(`Error sending webhook: ${result.reason}`, error);
-      // log.error(`Error sending webhook: ${result.reason}`, error);
-      rollbar.error(`Error sending webhook: ${result.reason}`, error);
     } else {
       stats().increment('webhook.success');
     }

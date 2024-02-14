@@ -1,12 +1,12 @@
-import { useState } from 'react';
-
-import { ValidChains } from '@hicommonwealth/chains';
+import { commonProtocol } from '@hicommonwealth/core';
 import AddressInfo from 'models/AddressInfo';
+import { useState } from 'react';
 import { SelectedCommunity } from 'views/components/component_kit/new_designs/CWCommunitySelector';
-
+import { useFlag } from '../../../hooks/useFlag';
 import { CreateCommunityStep, handleChangeStep } from './utils';
 
 const useCreateCommunity = () => {
+  const communityStakeEnabled = useFlag('communityStake');
   const [createCommunityStep, setCreateCommunityStep] =
     useState<CreateCommunityStep>(CreateCommunityStep.CommunityTypeSelection);
   const [selectedCommunity, setSelectedCommunity] = useState<SelectedCommunity>(
@@ -23,6 +23,7 @@ const useCreateCommunity = () => {
       createCommunityStep,
       setCreateCommunityStep,
       showCommunityStakeStep,
+      communityStakeEnabled,
     );
   };
 
@@ -39,12 +40,9 @@ const useCreateCommunity = () => {
     CreateCommunityStep.BasicInformation,
     CreateCommunityStep.CommunityStake,
   ].includes(createCommunityStep);
-  // TODO only for testing/QA purpose
-  // Goerli should be removed before merging to production
-  // only ETHEREUM_MAINNET_ID should be here
   const isEthereumMainnetSelected =
     // selectedChainId === ETHEREUM_MAINNET_ID ||
-    selectedChainId === String(ValidChains.Goerli);
+    selectedChainId === String(commonProtocol.ValidChains.Sepolia);
   const showCommunityStakeStep =
     isValidStepToShowCommunityStakeFormStep &&
     selectedCommunity.type === 'ethereum' &&

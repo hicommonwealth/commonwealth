@@ -1,33 +1,27 @@
 import { RedisCache } from '@hicommonwealth/adapters';
+import { cache } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import * as dotenv from 'dotenv';
 import { REDIS_URL } from '../server/config';
 import { ServerCommunitiesController } from '../server/controllers/server_communities_controller';
 import { ServerGroupsController } from '../server/controllers/server_groups_controller';
 import BanCache from '../server/util/banCheckCache';
-import { rollbar } from '../server/util/rollbar';
-import { TokenBalanceCache } from '../server/util/tokenBalanceCache/tokenBalanceCache';
 
 dotenv.config();
 
 async function main() {
-  const redisCache = new RedisCache(rollbar);
+  const redisCache = new RedisCache();
   await redisCache.init(REDIS_URL);
-  const banCache = new BanCache(models);
+  cache(redisCache);
 
-  const tokenBalanceCache = new TokenBalanceCache(models, redisCache);
+  const banCache = new BanCache(models);
 
   const communitiesController = new ServerCommunitiesController(
     models,
-    tokenBalanceCache,
     banCache,
   );
 
-  const groupsController = new ServerGroupsController(
-    models,
-    tokenBalanceCache,
-    banCache,
-  );
+  const groupsController = new ServerGroupsController(models, banCache);
 
   const communitiesResult = await communitiesController.getCommunities({
     hasGroups: true,
@@ -37,7 +31,7 @@ async function main() {
     if (process.env.COMMUNITY_ID && process.env.COMMUNITY_ID !== community.id)
       continue;
     await groupsController.refreshCommunityMemberships({
-      community,
+      communityId: community.id,
     });
   }
 
