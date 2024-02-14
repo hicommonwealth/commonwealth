@@ -152,6 +152,13 @@ export const AUTH_TYPES: AuthTypesList = {
     },
     label: 'Github',
   },
+  apple: {
+    icon: {
+      name: 'apple',
+      isCustom: true,
+    },
+    label: 'Apple',
+  },
   email: {
     icon: {
       name: 'email',
