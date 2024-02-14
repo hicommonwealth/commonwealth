@@ -129,20 +129,12 @@
   ol {
     @include b2;
 
-    li:has(task-list-item input[type='checkbox']),
     li:has(input[type='checkbox']) {
       list-style: none;
       list-style-type: none;
       display: flex;
       align-items: center;
       padding-left: 0;
-    }
-
-    task-list-item {
-      list-style: none;
-      list-style-type: none;
-      padding-left: 0;
-      margin-left: 0;
     }
 
     li:has(p input[type='checkbox']),
