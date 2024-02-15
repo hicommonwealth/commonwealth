@@ -70,10 +70,8 @@ export const GovernanceSection = () => {
     isNotOffchain &&
     app.user.activeAccount &&
     app.chain?.network === ChainNetwork.Compound &&
-    !(
-      compoundContracts.length > 0 &&
-      isGovernorCountingSimple(compoundContracts[0])
-    );
+    compoundContracts.length > 0 &&
+    !isGovernorCountingSimple(compoundContracts[0]);
 
   const showSnapshotOptions =
     app.chain?.base === ChainBase.Ethereum &&
