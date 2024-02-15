@@ -7,7 +7,7 @@ import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { User } from 'views/components/user/user';
 
-import useUserMenuItems from '../useUserMenuItems';
+import useUserMenuItems from '../../useUserMenuItems';
 
 import './UserDropdown.scss';
 

@@ -44,7 +44,7 @@ const MobileHeader = ({
   const { menuVisible } = useSidebarStore();
   const user = app?.user?.addresses?.[0];
 
-  const magnifyingGlassVisible = false;
+  const magnifyingGlassVisible = true;
   const shouldShowCollapsableSidebarButton = isInsideCommunity
     ? !menuVisible
     : true;
