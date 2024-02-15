@@ -6,8 +6,6 @@ import { createCommunityStakeHandler } from '../routes/communities/create_commun
 import { getCommunityStakeHandler } from '../routes/communities/get_community_stakes_handler';
 import ddd from '../routes/ddd';
 
-import { TokenBalanceCache } from '@hicommonwealth/model';
-
 import {
   methodNotAllowedMiddleware,
   registerRoute,
@@ -204,22 +202,15 @@ function setupRouter(
   app: Express,
   models: DB,
   viewCountCache: ViewCountCache,
-  tokenBalanceCache: TokenBalanceCache,
   banCache: BanCache,
   globalActivityCache: GlobalActivityCache,
   databaseValidationService: DatabaseValidationService,
 ) {
   // controllers
   const serverControllers: ServerControllers = {
-    threads: new ServerThreadsController(
-      models,
-      tokenBalanceCache,
-      banCache,
-      globalActivityCache,
-    ),
+    threads: new ServerThreadsController(models, banCache, globalActivityCache),
     comments: new ServerCommentsController(
       models,
-      tokenBalanceCache,
       banCache,
       globalActivityCache,
     ),
@@ -227,14 +218,10 @@ function setupRouter(
     notifications: new ServerNotificationsController(models),
     analytics: new ServerAnalyticsController(),
     profiles: new ServerProfilesController(models),
-    communities: new ServerCommunitiesController(
-      models,
-      tokenBalanceCache,
-      banCache,
-    ),
-    polls: new ServerPollsController(models, tokenBalanceCache),
+    communities: new ServerCommunitiesController(models, banCache),
+    polls: new ServerPollsController(models),
     proposals: new ServerProposalsController(models),
-    groups: new ServerGroupsController(models, tokenBalanceCache, banCache),
+    groups: new ServerGroupsController(models, banCache),
     topics: new ServerTopicsController(models, banCache),
     admin: new ServerAdminController(models),
   };
@@ -1285,11 +1272,11 @@ function setupRouter(
   );
 
   app.use(endpoint, router);
+
   // ddd-routes
-  app.use('/', ddd);
+  app.use('/ddd', ddd);
+
   app.use(methodNotAllowedMiddleware());
-  // catch-all and format errors - TODO: fix unit tests
-  // app.use(errorMiddleware);
 }
 
 export default setupRouter;

@@ -6,7 +6,7 @@ import {
 } from '@hicommonwealth/core';
 import { z } from 'zod';
 import { models } from '../database';
-import { MustNotExist } from '../middleware/invariants';
+import { mustNotExist } from '../middleware/guards';
 import type { CommunityAttributes } from '../models';
 import { checkIconSize } from '../utils/checkIconSize';
 import { ALL_COMMUNITIES } from '../utils/constants';
@@ -65,7 +65,7 @@ export const CreateCommunity: CommandMetadata<
   body: async ({ id, payload }) => {
     const community = await models.Community.findOne({ where: { id } });
 
-    MustNotExist('Community', community);
+    mustNotExist('Community', community);
 
     //await models.Community.create(payload)
     return payload as Partial<CommunityAttributes>;

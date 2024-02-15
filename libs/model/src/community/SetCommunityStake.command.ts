@@ -2,7 +2,7 @@ import { CommandMetadata, InvalidState } from '@hicommonwealth/core';
 import { z } from 'zod';
 import { models } from '../database';
 import { isCommunityAdmin } from '../middleware';
-import { MustExist } from '../middleware/invariants';
+import { mustExist } from '../middleware/guards';
 import { CommunityAttributes } from '../models';
 import { validateCommunityStakeConfig } from '../services/commonProtocol/communityStakeConfigValidator';
 
@@ -38,7 +38,7 @@ export const SetCommunityStake: CommandMetadata<
     });
 
     // !domain logic - invariants on loaded state & payload
-    if (!MustExist('Community', community)) return;
+    if (!mustExist('Community', community)) return;
     if (
       community.CommunityStakes &&
       community.CommunityStakes.find((s) => s.stake_id === payload.stake_id)

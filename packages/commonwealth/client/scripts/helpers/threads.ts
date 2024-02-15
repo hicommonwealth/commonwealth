@@ -13,7 +13,7 @@ export const filterLinks = (links: Link[] = [], source: LinkSource) => {
 export const getAddedAndDeleted = <T>(
   finalArr: T[],
   initialArr: T[],
-  key: keyof T = 'id' as keyof T
+  key: keyof T = 'id' as keyof T,
 ) => {
   const toAdd = finalArr.reduce((acc, curr) => {
     const wasSelected = initialArr.find((obj) => obj[key] === curr[key]);
@@ -43,13 +43,15 @@ export const getThreadActionTooltipText = ({
   isThreadArchived = false,
   isThreadLocked = false,
   isThreadTopicGated = false,
+  action = 'upvote',
 }: {
   isCommunityMember?: boolean;
   isThreadArchived?: boolean;
   isThreadLocked?: boolean;
   isThreadTopicGated?: boolean;
+  action?: string;
 }) => {
-  if (!isCommunityMember) return 'Join community to upvote';
+  if (!isCommunityMember) return `Join community to ${action}`;
   if (isThreadArchived) return 'Thread is archived';
   if (isThreadLocked) return 'Thread is locked';
   if (isThreadTopicGated) return 'Topic is gated';

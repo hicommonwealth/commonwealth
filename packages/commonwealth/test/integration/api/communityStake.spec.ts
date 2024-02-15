@@ -1,6 +1,6 @@
 import {
   UserInstance,
-  communityStakeConfigValidator,
+  commonProtocol,
   models,
   tester,
 } from '@hicommonwealth/model';
@@ -39,7 +39,7 @@ describe('POST communityStakes Tests', () => {
   });
 
   it('The handler creates and updates community stake', async () => {
-    const controller = new ServerCommunitiesController(models, null, null);
+    const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
       userAttributes: { email: '', id: 1, isAdmin: true },
@@ -146,7 +146,7 @@ describe('POST communityStakes Tests', () => {
       ],
       attributes: ['namespace'],
     });
-    await communityStakeConfigValidator.validateCommunityStakeConfig(
+    await commonProtocol.communityStakeConfigValidator.validateCommunityStakeConfig(
       community,
       2,
     );

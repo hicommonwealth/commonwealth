@@ -1,7 +1,6 @@
 import { ChainBase, DefaultPage } from '@hicommonwealth/core';
 import axios from 'axios';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { featureFlags } from 'helpers/feature-flags';
 import { uuidv4 } from 'lib/util';
 import 'pages/manage_community/community_metadata_rows.scss';
 import React, { useEffect, useState } from 'react';
@@ -10,6 +9,7 @@ import useFetchDiscordChannelsQuery from 'state/api/fetchDiscordChannels';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { InputRow, SelectRow, ToggleRow } from 'views/components/metadata_rows';
+import { useFlag } from '../../../hooks/useFlag';
 import type CommunityInfo from '../../../models/ChainInfo';
 import type RoleInfo from '../../../models/RoleInfo';
 import { AvatarUpload } from '../../components/Avatar';
@@ -39,6 +39,8 @@ export const CommunityMetadataRows = ({
   onRoleUpdate,
   onSave,
 }: CommunityMetadataRowsProps) => {
+  const communityHomepageEnabled = useFlag('communityHomepage');
+
   const params = new URLSearchParams(window.location.search);
   const returningFromDiscordCallback = params.get(
     'returningFromDiscordCallback',
@@ -339,7 +341,7 @@ export const CommunityMetadataRows = ({
         }
       />
 
-      {featureFlags.communityHomepage && (
+      {communityHomepageEnabled && (
         <ToggleRow
           title="Homepage"
           defaultValue={hasHomepage}
@@ -358,7 +360,7 @@ export const CommunityMetadataRows = ({
           }
         />
       )}
-      {featureFlags.communityHomepage && hasHomepage ? (
+      {communityHomepageEnabled && hasHomepage ? (
         <SelectRow
           title="Default Page"
           options={[
