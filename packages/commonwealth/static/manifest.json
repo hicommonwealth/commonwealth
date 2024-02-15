@@ -8,17 +8,7 @@
   "theme_color": "#2972cc",
   "icons": [
     {
-      "src": "/static/img/branding/common-logo.svg",
-      "sizes": "512x512",
-      "type": "image/svg"
-    },
-    {
-      "src": "/static/img/branding/common-logo.svg",
-      "sizes": "192x192",
-      "type": "image/svg"
-    },
-    {
-      "src": "/static/img/branding/common-logo.svg",
+      "src": "/static/img/branding/common.svg",
       "sizes": "32x32",
       "type": "image/svg"
     }

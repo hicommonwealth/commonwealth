@@ -23,9 +23,6 @@ export const AddToHomeScreenPrompt = ({
       setShowPrompt(false);
     }
 
-    localStorage.setItem('hidePromptTime', '0');
-    localStorage.setItem('hidePromptDays', '0');
-
     if (sessionStorage.getItem('hidePrompt')) {
       setShowPrompt(false);
     }
@@ -48,10 +45,7 @@ export const AddToHomeScreenPrompt = ({
         <div className="prompt-content">
           <div className="header">
             <div className="icon">
-              <img
-                src="/static/img/branding/common-logo.svg"
-                alt="Commonwealth"
-              />
+              <img src="/static/img/branding/common.svg" alt="Commonwealth" />
             </div>
             <CWText className="title">Add to Home Screen</CWText>
           </div>
@@ -87,7 +81,9 @@ export const AddToHomeScreenPrompt = ({
     });
 
     const handleInstallClick = () => {
+      console.log('Install button clicked');
       installPromptEvent.prompt();
+      console.log('Install prompt displayed');
 
       // Wait for the user to respond to the prompt
       installPromptEvent.userChoice.then((choiceResult) => {
@@ -119,10 +115,7 @@ export const AddToHomeScreenPrompt = ({
           <CWText className="title">Install App</CWText>
           <div className="header">
             <div className="icon">
-              <img
-                src="/static/img/branding/common-logo.svg"
-                alt="Commonwealth"
-              />
+              <img src="/static/img/branding/common.svg" alt="Commonwealth" />
             </div>
             <div className="app">
               <CWText className="app-name">Common</CWText>
