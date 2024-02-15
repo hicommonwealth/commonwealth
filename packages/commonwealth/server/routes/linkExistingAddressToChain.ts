@@ -1,5 +1,5 @@
-import { AppError } from '@hicommonwealth/adapters';
-import { ChainBase, logger } from '@hicommonwealth/core';
+import { AppError, ChainBase, logger } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import crypto from 'crypto';
 import type { NextFunction, Request, Response } from 'express';
 import Sequelize from 'sequelize';
@@ -7,7 +7,6 @@ import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types'
 import { addressSwapper, bech32ToHex } from '../../shared/utils';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
-import type { DB } from '../models';
 import assertAddressOwnership from '../util/assertAddressOwnership';
 import { createRole, findOneRole } from '../util/roles';
 

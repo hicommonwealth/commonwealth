@@ -1,10 +1,12 @@
 import { NotificationCategories, logger } from '@hicommonwealth/core';
+import {
+  NotificationInstance,
+  SubscriptionInstance,
+  models,
+} from '@hicommonwealth/model';
 import Sequelize, { Transaction } from 'sequelize';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import models from '../database';
-import { NotificationInstance } from '../models/notification';
-import { SubscriptionInstance } from '../models/subscription';
 import emitNotifications from '../util/emitNotifications';
 
 const log = logger().getLogger(__filename);

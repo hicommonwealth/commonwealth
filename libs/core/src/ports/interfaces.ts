@@ -1,3 +1,5 @@
+import { AnalyticsOptions, CacheNamespaces } from '../types';
+
 /**
  * Resource disposer function
  */
@@ -17,7 +19,7 @@ export interface Disposable {
 export type AdapterFactory<T extends Disposable> = (adapter?: T) => T;
 
 /**
- * A logger port
+ * Logger port
  * Logs messages at different levels
  */
 export interface ILogger {
@@ -54,4 +56,58 @@ export interface Stats extends Disposable {
   off(key: string): void;
   // traces
   timing(key: string, duration: number, tags?: Record<string, string>): void;
+}
+
+/**
+ * Cache port
+ */
+export interface Cache extends Disposable {
+  getKey(namespace: CacheNamespaces, key: string): Promise<string>;
+  setKey(
+    namespace: CacheNamespaces,
+    key: string,
+    value: string,
+    duration?: number,
+    notExists?: boolean,
+  ): Promise<boolean>;
+  getKeys(
+    namespace: CacheNamespaces,
+    keys: string[],
+  ): Promise<false | Record<string, unknown>>;
+  setKeys(
+    namespace: CacheNamespaces,
+    data: { [key: string]: string },
+    duration?: number,
+    transaction?: boolean,
+  ): Promise<false | Array<'OK' | null>>;
+  getNamespaceKeys(
+    namespace: CacheNamespaces,
+    maxResults?: number,
+  ): Promise<{ [key: string]: string } | boolean>;
+  deleteKey(namespace: CacheNamespaces, key: string): Promise<number>;
+  deleteNamespaceKeys(namespace: CacheNamespaces): Promise<number | boolean>;
+  flushAll(): Promise<void>;
+  incrementKey(
+    namespace: CacheNamespaces,
+    key: string,
+    increment?: number,
+  ): Promise<number | null>;
+  decrementKey(
+    namespace: CacheNamespaces,
+    key: string,
+    decrement?: number,
+  ): Promise<number | null>;
+  getKeyTTL(namespace: CacheNamespaces, key: string): Promise<number>;
+  setKeyTTL(
+    namespace: CacheNamespaces,
+    key: string,
+    ttlInSeconds: number,
+  ): Promise<boolean>;
+}
+
+/**
+ * Analytics port
+ */
+export interface Analytics extends Disposable {
+  track(event: string, payload: AnalyticsOptions): void;
 }

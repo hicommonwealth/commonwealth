@@ -1,9 +1,8 @@
-import { AppError, ServerError } from '@hicommonwealth/adapters';
-import { logger } from '@hicommonwealth/core';
+import { AppError, ServerError, logger } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import request from 'superagent';
 import { SLACK_FEEDBACK_WEBHOOK } from '../config';
-import type { DB } from '../models';
 
 export const Errors = {
   NotSent: 'Please enter the feedback message.',

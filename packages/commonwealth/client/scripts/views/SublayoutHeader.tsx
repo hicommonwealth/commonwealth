@@ -5,12 +5,14 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import useSidebarStore from 'state/ui/sidebar';
+import MobileHeader from 'views/components/Composition/MobileHeader';
 import UserDropdown from 'views/components/Header/UserDropdown/UserDropdown';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { HelpMenuPopover } from 'views/menus/help_menu';
+import { AuthModal } from 'views/modals/AuthModal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
 import { LoginModal } from 'views/modals/login_modal';
-import { featureFlags } from '../helpers/feature-flags';
+import { useFlag } from '../hooks/useFlag';
 import app from '../state';
 import { CWDivider } from './components/component_kit/cw_divider';
 import { CWIconButton } from './components/component_kit/cw_icon_button';
@@ -26,9 +28,14 @@ import { NotificationsMenuPopover } from './menus/notifications_menu';
 
 type SublayoutHeaderProps = {
   onMobile: boolean;
+  isInsideCommunity: boolean;
 };
 
-export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
+export const SublayoutHeader = ({
+  onMobile,
+  isInsideCommunity,
+}: SublayoutHeaderProps) => {
+  const newSignInModalEnabled = useFlag('newSignInModal');
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const navigate = useCommonNavigate();
   const {
@@ -41,109 +48,114 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
     setRecentlyUpdatedVisibility,
   } = useSidebarStore();
   const { isLoggedIn } = useUserLoggedIn();
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
     setRecentlyUpdatedVisibility(menuVisible);
   }, [menuVisible, setRecentlyUpdatedVisibility]);
 
-  function handleToggle() {
+  const handleToggle = () => {
     const isVisible = !menuVisible;
     setMenu({ name: menuName, isVisible });
     setTimeout(() => {
       setUserToggledVisibility(isVisible ? 'open' : 'closed');
     }, 200);
-  }
+  };
 
   return (
     <>
-      <div className="SublayoutHeader">
-        <div
-          className={`header-left ${
-            app.platform() === 'desktop' ? 'desktop' : ''
-          }`}
-        >
-          {app.platform() === 'desktop' && <CWDivider isVertical />}
-          <CWIconButton
-            iconName="commonLogo"
-            iconButtonTheme="black"
-            iconSize="xl"
-            onClick={() => {
-              if (app.isCustomDomain()) {
-                navigate('/', {}, null);
-              } else {
-                if (isLoggedIn) {
-                  setMobileMenuName(null);
-                  navigate('/dashboard/for-you', {}, null);
-                } else {
-                  navigate('/dashboard/global', {}, null);
-                }
-              }
-            }}
-          />
-          {isWindowSmallInclusive(window.innerWidth) && (
+      {onMobile ? (
+        <MobileHeader
+          onMobile={onMobile}
+          onSignInClick={() => setIsAuthModalOpen(true)}
+          isInsideCommunity={isInsideCommunity}
+          menuVisible={menuVisible}
+        />
+      ) : (
+        <div className="SublayoutHeader">
+          <div className="header-left">
             <CWDivider isVertical />
-          )}
-          {(featureFlags.sidebarToggle || onMobile) && app.activeChainId() && (
             <CWIconButton
+              iconName="commonLogo"
               iconButtonTheme="black"
-              iconName={menuVisible ? 'sidebarCollapse' : 'sidebarExpand'}
-              onClick={handleToggle}
-            />
-          )}
-        </div>
-        <div className="searchbar">
-          <CWSearchBar />
-        </div>
-        <div className="header-right">
-          <div className="MobileMenuContainer">
-            <CWIconButton
-              iconName="dotsVertical"
-              iconButtonTheme="black"
+              iconSize="xl"
               onClick={() => {
-                setMenu({ name: menuName, isVisible: false });
-                setMobileMenuName(mobileMenuName ? null : 'MainMenu');
+                if (app.isCustomDomain()) {
+                  navigate('/', {}, null);
+                } else {
+                  if (isLoggedIn) {
+                    setMobileMenuName(null);
+                    navigate('/dashboard/for-you', {}, null);
+                  } else {
+                    navigate('/dashboard/global', {}, null);
+                  }
+                }
               }}
             />
+            {isWindowSmallInclusive(window.innerWidth) && (
+              <CWDivider isVertical />
+            )}
+            {onMobile && (
+              <CWIconButton
+                iconButtonTheme="black"
+                iconName={menuVisible ? 'sidebarCollapse' : 'sidebarExpand'}
+                onClick={handleToggle}
+              />
+            )}
           </div>
-          <div
-            className={clsx('DesktopMenuContainer', 'session-keys', {
-              isLoggedIn,
-            })}
-          >
-            <CreateContentPopover />
-            <CWTooltip
-              content="Explore communities"
-              placement="bottom"
-              renderTrigger={(handleInteraction) => (
-                <CWIconButton
-                  iconButtonTheme="black"
-                  iconName="compassPhosphor"
-                  onClick={() => navigate('/communities', {}, null)}
-                  onMouseEnter={handleInteraction}
-                  onMouseLeave={handleInteraction}
-                />
-              )}
-            />
-
-            <HelpMenuPopover />
-
-            {isLoggedIn && <NotificationsMenuPopover />}
+          <div className="searchbar">
+            <CWSearchBar />
           </div>
-          {isLoggedIn && <UserDropdown />}
-          {!isLoggedIn && (
-            <CWButton
-              buttonType="primary"
-              buttonHeight="sm"
-              label="Sign in"
-              buttonWidth="wide"
-              disabled={location.pathname.includes('/finishsociallogin')}
-              onClick={() => setIsLoginModalOpen(true)}
-            />
-          )}
+          <div className="header-right">
+            <div className="MobileMenuContainer">
+              <CWIconButton
+                iconName="dotsVertical"
+                iconButtonTheme="black"
+                onClick={() => {
+                  setMenu({ name: menuName, isVisible: false });
+                  setMobileMenuName(mobileMenuName ? null : 'MainMenu');
+                }}
+              />
+            </div>
+            <div
+              className={clsx('DesktopMenuContainer', {
+                isLoggedIn,
+              })}
+            >
+              <CreateContentPopover />
+              <CWTooltip
+                content="Explore communities"
+                placement="bottom"
+                renderTrigger={(handleInteraction) => (
+                  <CWIconButton
+                    iconButtonTheme="black"
+                    iconName="compassPhosphor"
+                    onClick={() => navigate('/communities', {}, null)}
+                    onMouseEnter={handleInteraction}
+                    onMouseLeave={handleInteraction}
+                  />
+                )}
+              />
+
+              <HelpMenuPopover />
+
+              {isLoggedIn && <NotificationsMenuPopover />}
+            </div>
+            {isLoggedIn && <UserDropdown />}
+            {!isLoggedIn && (
+              <CWButton
+                buttonType="primary"
+                buttonHeight="sm"
+                label="Sign in"
+                buttonWidth="wide"
+                disabled={location.pathname.includes('/finishsociallogin')}
+                onClick={() => setIsAuthModalOpen(true)}
+              />
+            )}
+          </div>
         </div>
-      </div>
+      )}
       <CWModal
         size="small"
         content={
@@ -152,12 +164,21 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
         onClose={() => setIsFeedbackModalOpen(false)}
         open={isFeedbackModalOpen}
       />
-      <CWModal
-        content={<LoginModal onModalClose={() => setIsLoginModalOpen(false)} />}
-        isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-        onClose={() => setIsLoginModalOpen(false)}
-        open={isLoginModalOpen}
-      />
+      {!newSignInModalEnabled ? (
+        <CWModal
+          content={
+            <LoginModal onModalClose={() => setIsAuthModalOpen(false)} />
+          }
+          isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
+          onClose={() => setIsAuthModalOpen(false)}
+          open={isAuthModalOpen}
+        />
+      ) : (
+        <AuthModal
+          onClose={() => setIsAuthModalOpen(false)}
+          isOpen={isAuthModalOpen}
+        />
+      )}
     </>
   );
 };

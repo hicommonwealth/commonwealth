@@ -1,12 +1,11 @@
 import { ActionPayload, Session } from '@canvas-js/interfaces';
+import { models, tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from 'server/config';
 import * as modelUtils from 'test/util/modelUtils';
-import app, { resetDatabase } from '../../../server-test';
-import models from '../../../server/database';
+import app from '../../../server-test';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -26,7 +25,7 @@ describe('Thread Patch Update', () => {
   let topicId: number;
 
   before(async () => {
-    await resetDatabase();
+    await tester.seedDb();
     const adminRes = await modelUtils.createAndVerifyAddress({ chain });
     {
       adminAddress = adminRes.address;

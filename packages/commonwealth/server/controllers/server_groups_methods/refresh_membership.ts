@@ -1,9 +1,10 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
+import {
+  AddressInstance,
+  MembershipRejectReason,
+  UserInstance,
+} from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import { MembershipRejectReason } from 'server/models/membership';
-import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/community';
-import { UserInstance } from '../../models/user';
 import { refreshMembershipsForAddress } from '../../util/requirementsModule/refreshMembershipsForAddress';
 import { ServerGroupsController } from '../server_groups_controller';
 
@@ -13,7 +14,6 @@ const Errors = {
 
 export type RefreshMembershipOptions = {
   user: UserInstance;
-  community: CommunityInstance;
   address: AddressInstance;
   topicId: number;
 };
@@ -25,12 +25,12 @@ export type RefreshMembershipResult = {
 
 export async function __refreshMembership(
   this: ServerGroupsController,
-  { community, address, topicId }: RefreshMembershipOptions,
+  { address, topicId }: RefreshMembershipOptions,
 ): Promise<RefreshMembershipResult> {
   // get all groups in the community
   let groups = await this.models.Group.findAll({
     where: {
-      community_id: community.id,
+      community_id: address.community_id,
     },
   });
 
@@ -45,7 +45,6 @@ export async function __refreshMembership(
 
   const memberships = await refreshMembershipsForAddress(
     this.models,
-    this.tokenBalanceCache,
     address,
     groups,
     true, // use fresh balances

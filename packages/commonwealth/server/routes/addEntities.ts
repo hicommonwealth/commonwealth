@@ -1,7 +1,7 @@
+import type { DB } from '@hicommonwealth/model';
 import { validationResult } from 'express-validator';
 import type { OnlyErrorResp } from '../api/extApiTypes';
 import { filterAddressOwnedByUser } from '../middleware/lookupAddressIsOwnedByUser';
-import type { DB } from '../models';
 import type { TypedRequest, TypedResponse } from '../types';
 import { failure, success } from '../types';
 

@@ -1,5 +1,5 @@
-import type { NextFunction, Request, Response } from 'express';
-import type { DB } from '../models';
+import type { DB } from '@hicommonwealth/model';
+import type { Request, Response } from 'express';
 
 export const Errors = {
   NeedSecret: 'Must provide the secret to use this route',
@@ -10,7 +10,6 @@ export const getSubscribedCommunities = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction,
 ) => {
   const communities = await models.Community.findAll({
     where: { has_chain_events_listener: true },

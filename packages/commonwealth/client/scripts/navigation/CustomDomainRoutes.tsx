@@ -1,8 +1,8 @@
-import { featureFlags } from 'helpers/feature-flags';
 import { Navigate } from 'navigation/helpers';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { withLayout } from 'views/Layout';
+import { RouteFeatureFlags } from './Router';
 
 const SearchPage = lazy(() => import('views/pages/search'));
 
@@ -94,7 +94,10 @@ const NewProfilePage = lazy(() => import('views/pages/new_profile'));
 const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
-const CustomDomainRoutes = () => {
+const CustomDomainRoutes = ({
+  proposalTemplatesEnabled,
+  newAdminOnboardingEnabled,
+}: RouteFeatureFlags) => {
   return [
     <Route
       key="/"
@@ -279,7 +282,7 @@ const CustomDomainRoutes = () => {
     // DISCUSSIONS END
 
     // CONTRACTS
-    ...(featureFlags.proposalTemplates
+    ...(proposalTemplatesEnabled
       ? [
           <Route
             key="/contracts"
@@ -321,7 +324,7 @@ const CustomDomainRoutes = () => {
     // CONTRACTS END
 
     // ADMIN
-    ...(featureFlags.newAdminOnboardingEnabled
+    ...(newAdminOnboardingEnabled
       ? [
           <Route
             key="/manage/profile"

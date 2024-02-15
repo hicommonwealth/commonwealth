@@ -1,7 +1,6 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
+import type { CommunityBannerInstance, DB } from '@hicommonwealth/model';
 import type { Response } from 'express';
-import type { DB } from '../models';
-import type { CommunityBannerInstance } from '../models/community_banner';
 import type { TypedRequestBody } from '../types';
 import { success } from '../types';
 import { validateOwner } from '../util/validateOwner';
@@ -21,14 +20,14 @@ const updateBanner = async (
   req: TypedRequestBody<UpdateBannerReq>,
   res: Response,
 ) => {
-  const chain = req.chain;
+  const { community } = req;
 
   const isAdmin = await validateOwner({
     models: models,
     user: req.user,
-    communityId: chain.id,
+    communityId: community.id,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError(UpdateBannerErrors.NoPermission);
@@ -39,10 +38,10 @@ const updateBanner = async (
   // find or create
   const [banner] = await models.CommunityBanner.findOrCreate({
     where: {
-      community_id: chain.id,
+      community_id: community.id,
     },
     defaults: {
-      community_id: chain.id,
+      community_id: community.id,
       banner_text,
     },
   });

@@ -1,15 +1,16 @@
 /* eslint-disable no-continue */
-import { AppError } from '@hicommonwealth/adapters';
-import { ChainBase } from '@hicommonwealth/core';
+import { AppError, ChainBase } from '@hicommonwealth/core';
+import type {
+  CommunityAttributes,
+  CommunitySnapshotSpaceWithSpaceAttached,
+} from '@hicommonwealth/model';
+import { UserInstance, commonProtocol } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import type { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
-import { UserInstance } from 'server/models/user';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';
 import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
-import type { CommunityAttributes } from '../../models/community';
 import { findOneRole } from '../../util/roles';
-import { TrackOptions } from '../server_analytics_methods/track';
+import { TrackOptions } from '../server_analytics_controller';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 export const Errors = {
@@ -26,12 +27,14 @@ export const Errors = {
     'Snapshot data may only be added to chains with Ethereum base',
   InvalidTerms: 'Terms of Service must begin with https://',
   InvalidDefaultPage: 'Default page does not exist',
+  InvalidTransactionHash: 'Valid transaction hash required to verify namespace',
 };
 
 export type UpdateCommunityOptions = CommunityAttributes & {
   user: UserInstance;
   featuredTopics?: string[];
   snapshot?: string[];
+  transactionHash?: string;
 };
 export type UpdateCommunityResult = CommunityAttributes & {
   snapshot: string[];
@@ -55,13 +58,21 @@ export async function __updateCommunity(
     throw new AppError(Errors.CantChangeNetwork);
   }
 
-  const community = await this.models.Community.findOne({ where: { id: id } });
+  const community = await this.models.Community.findOne({
+    where: { id },
+    include: [
+      {
+        model: this.models.ChainNode,
+        attributes: ['url', 'eth_chain_id'],
+      },
+    ],
+  });
+  let addresses;
   if (!community) {
     throw new AppError(Errors.NoCommunityFound);
   } else {
-    const userAddressIds = (await user.getAddresses())
-      .filter((addr) => !!addr.verified)
-      .map((addr) => addr.id);
+    addresses = (await user.getAddresses()).filter((addr) => !!addr.verified);
+    const userAddressIds = addresses.map((addr) => addr.id);
     const userMembership = await findOneRole(
       this.models,
       { where: { address_id: { [Op.in]: userAddressIds } } },
@@ -92,6 +103,8 @@ export async function __updateCommunity(
     chain_node_id,
     directory_page_enabled,
     directory_page_chain_node_id,
+    namespace,
+    transactionHash,
   } = rest;
 
   // Handle single string case and undefined case
@@ -176,12 +189,14 @@ export async function __updateCommunity(
   if (icon_url) community.icon_url = icon_url;
   if (active !== undefined) community.active = active;
   if (type) community.type = type;
-  if (nonEmptySocialLinks !== undefined && nonEmptySocialLinks.length > 0)
+  if (nonEmptySocialLinks !== undefined && nonEmptySocialLinks.length >= 0)
     community.social_links = nonEmptySocialLinks;
   if (hide_projects) community.hide_projects = hide_projects;
-  if (stages_enabled) community.stages_enabled = stages_enabled;
-  if (custom_stages) community.custom_stages = custom_stages;
-  if (terms) community.terms = terms;
+  if (typeof stages_enabled === 'boolean')
+    community.stages_enabled = stages_enabled;
+  if (typeof custom_stages === 'string')
+    community.custom_stages = custom_stages;
+  if (typeof terms === 'string') community.terms = terms;
   if (has_homepage) community.has_homepage = has_homepage;
   if (default_page) {
     if (!has_homepage) {
@@ -214,6 +229,27 @@ export async function __updateCommunity(
   }
   if (directory_page_chain_node_id !== undefined) {
     community.directory_page_chain_node_id = directory_page_chain_node_id;
+  }
+  if (namespace !== undefined) {
+    if (!transactionHash) {
+      throw new AppError(Errors.InvalidTransactionHash);
+    }
+
+    const ownerOfChain = addresses.find(
+      (a) => a.community_id === community.id && a.role === 'admin',
+    );
+    if (!ownerOfChain) {
+      throw new AppError(Errors.NotAdmin);
+    }
+
+    await commonProtocol.newNamespaceValidator.validateNamespace(
+      namespace,
+      transactionHash,
+      ownerOfChain.address,
+      community,
+    );
+
+    community.namespace = namespace;
   }
 
   // TODO Graham 3/31/22: Will this potentially lead to undesirable effects if toggle

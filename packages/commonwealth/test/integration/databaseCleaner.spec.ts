@@ -1,21 +1,17 @@
-import { RedisCache } from '@hicommonwealth/adapters';
 import { NotificationCategories } from '@hicommonwealth/core';
+import { models, tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { Sequelize } from 'sequelize';
 import sinon from 'sinon';
-import { resetDatabase } from '../../server-test';
-import models from '../../server/database';
 import DatabaseCleaner from '../../server/util/databaseCleaner';
 
 chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('DatabaseCleaner Tests', () => {
-  let mockRedis: sinon.SinonStubbedInstance<RedisCache>;
-
   before('Reset database', async () => {
-    await resetDatabase();
+    await tester.seedDb();
   });
 
   describe('Tests when the cleaner runs', () => {
@@ -35,11 +31,6 @@ describe('DatabaseCleaner Tests', () => {
       clock.restore();
     });
 
-    beforeEach(() => {
-      mockRedis = sinon.createStubInstance(RedisCache);
-      mockRedis.setKey.resolves(true);
-    });
-
     afterEach(() => {
       sinon.restore();
     });
@@ -49,13 +40,7 @@ describe('DatabaseCleaner Tests', () => {
       // set cleaner to run at 10 AM UTC
       console.log('input time to run', now.toString(), now.getUTCHours() + 4);
       const dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(
-        models,
-        now.getUTCHours() + 4,
-        mockRedis,
-        undefined,
-        true,
-      );
+      dbCleaner.initLoop(models, now.getUTCHours() + 4, true);
 
       expect(dbCleaner.timeoutID).to.not.be.undefined;
       clearTimeout(dbCleaner.timeoutID);
@@ -70,7 +55,7 @@ describe('DatabaseCleaner Tests', () => {
       now.setUTCMinutes(0);
       now.setUTCMilliseconds(0);
       const dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(models, now.getUTCHours(), mockRedis, undefined, true);
+      dbCleaner.initLoop(models, now.getUTCHours(), true);
       expect(dbCleaner.timeoutID).to.not.be.undefined;
       clearTimeout(dbCleaner.timeoutID);
       expect(dbCleaner.timeToRun.getUTCHours()).to.be.equal(now.getUTCHours());
@@ -80,13 +65,7 @@ describe('DatabaseCleaner Tests', () => {
     it('should not run if started after the correct hour', () => {
       const now = new Date();
       const dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(
-        models,
-        now.getUTCHours() - 4,
-        mockRedis,
-        undefined,
-        true,
-      );
+      dbCleaner.initLoop(models, now.getUTCHours() - 4, true);
       expect(dbCleaner.timeoutID).to.not.be.undefined;
       clearTimeout(dbCleaner.timeoutID);
       now.setUTCDate(now.getUTCDate() + 1);
@@ -99,24 +78,24 @@ describe('DatabaseCleaner Tests', () => {
 
     it('should not run if an hour to run is not provided', () => {
       const dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(models, NaN, mockRedis, undefined, true);
+      dbCleaner.initLoop(models, NaN, true);
       expect(dbCleaner.timeToRun).to.be.undefined;
       expect(dbCleaner.timeoutID).to.be.undefined;
     });
 
     it('should not run if the hour provided is invalid', () => {
       let dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(models, 24, mockRedis, undefined, true);
+      dbCleaner.initLoop(models, 24, true);
       expect(dbCleaner.timeToRun).to.be.undefined;
       expect(dbCleaner.timeoutID).to.be.undefined;
 
       dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(models, 25, mockRedis, undefined, true);
+      dbCleaner.initLoop(models, 25, true);
       expect(dbCleaner.timeToRun).to.be.undefined;
       expect(dbCleaner.timeoutID).to.be.undefined;
 
       dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(models, -1, mockRedis, undefined, true);
+      dbCleaner.initLoop(models, -1, true);
       expect(dbCleaner.timeToRun).to.be.undefined;
       expect(dbCleaner.timeoutID).to.be.undefined;
     });

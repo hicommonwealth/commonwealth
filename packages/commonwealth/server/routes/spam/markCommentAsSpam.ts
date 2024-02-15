@@ -1,9 +1,9 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import type { Request, Response } from 'express';
-import { Op, Sequelize } from 'sequelize';
-import type { DB } from '../../models';
+import { Sequelize } from 'sequelize';
+import { validateOwner } from 'server/util/validateOwner';
 import { success } from '../../types';
-import { findAllRoles } from '../../util/roles';
 
 export const Errors = {
   InvalidCommentId: 'Comment ID invalid',
@@ -30,23 +30,18 @@ export default async (models: DB, req: Request, res: Response) => {
   if (!comment) {
     throw new AppError(Errors.CommentNotFound);
   }
-  const userOwnedAddressIds = (await req.user.getAddresses())
-    .filter((addr) => !!addr.verified)
-    .map((addr) => addr.id);
-  if (!userOwnedAddressIds.includes(comment.address_id) && !req.user.isAdmin) {
-    // is not author or site admin
-    const roles = await findAllRoles(
-      models,
-      { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
-      comment.community_id,
-      ['admin', 'moderator'],
-    );
-    const role = roles.find((r) => {
-      return r.chain_id === comment.community_id;
-    });
-    if (!role) {
-      throw new AppError(Errors.NotAdmin);
-    }
+
+  const isAdminOrOwner = await validateOwner({
+    models: models,
+    user: req.user,
+    entity: comment,
+    communityId: comment.community_id,
+    allowMod: true,
+    allowAdmin: true,
+    allowSuperAdmin: true,
+  });
+  if (!isAdminOrOwner) {
+    throw new AppError(Errors.NotAdmin);
   }
 
   await comment.update({

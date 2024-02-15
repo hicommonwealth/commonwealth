@@ -1,8 +1,7 @@
+import { models, UserInstance } from '@hicommonwealth/model';
 import { assert } from 'chai';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 import { Errors } from '../../../server/controllers/server_communities_methods/create_chain_node';
-import models from '../../../server/database';
-import { UserInstance } from '../../../server/models/user';
 import { buildUser } from '../../unit/unitHelpers';
 
 describe('create chain tests', () => {

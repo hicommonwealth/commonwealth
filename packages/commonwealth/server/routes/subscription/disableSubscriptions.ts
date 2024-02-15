@@ -1,7 +1,7 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
+import { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import Sequelize from 'sequelize';
-import { DB } from '../../models';
 import Errors from './errors';
 
 const Op = Sequelize.Op;

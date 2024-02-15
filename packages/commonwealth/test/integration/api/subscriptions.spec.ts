@@ -1,15 +1,17 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NotificationCategories } from '@hicommonwealth/core';
+import {
+  models,
+  SubscriptionValidationErrors,
+  tester,
+} from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-
 import jwt from 'jsonwebtoken';
 import type NotificationSubscription from '../../../client/scripts/models/NotificationSubscription';
-import app, { resetDatabase } from '../../../server-test';
+import app from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import models from '../../../server/database';
-import { SubscriptionValidationErrors } from '../../../server/models/subscription';
 import Errors from '../../../server/routes/subscription/errors';
 import * as modelUtils from '../../util/modelUtils';
 
@@ -21,7 +23,7 @@ describe('Subscriptions Tests', () => {
   const chain = 'ethereum';
 
   before('reset database', async () => {
-    await resetDatabase();
+    await tester.seedDb();
     // get logged in address/user with JWT
     const result = await modelUtils.createAndVerifyAddress({ chain });
     loggedInAddr = result.address;

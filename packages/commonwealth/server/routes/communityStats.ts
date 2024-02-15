@@ -1,7 +1,7 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import { Op, QueryTypes } from 'sequelize';
-import type { DB } from '../models';
 import { findAllRoles } from '../util/roles';
 
 const communityStats = async (

@@ -1,15 +1,15 @@
+import {
+  AddressAttributes,
+  DB,
+  GroupAttributes,
+  MembershipAttributes,
+  MembershipInstance,
+  OptionsWithBalances,
+  tokenBalanceCache,
+} from '@hicommonwealth/model';
 import moment from 'moment';
 import { FindOptions, Op, Sequelize } from 'sequelize';
 import { MEMBERSHIP_REFRESH_TTL_SECONDS } from '../../config';
-import { DB } from '../../models';
-import { AddressAttributes } from '../../models/address';
-import { GroupAttributes } from '../../models/group';
-import {
-  MembershipAttributes,
-  MembershipInstance,
-} from '../../models/membership';
-import { TokenBalanceCache } from '../tokenBalanceCache/tokenBalanceCache';
-import { OptionsWithBalances } from '../tokenBalanceCache/types';
 import { makeGetBalancesOptions } from './makeGetBalancesOptions';
 import validateGroupMembership from './validateGroupMembership';
 
@@ -23,7 +23,6 @@ import validateGroupMembership from './validateGroupMembership';
  */
 export async function refreshMembershipsForAddress(
   models: DB,
-  tokenBalanceCache: TokenBalanceCache,
   address: AddressAttributes,
   groups: GroupAttributes[],
   cacheRefresh: boolean,

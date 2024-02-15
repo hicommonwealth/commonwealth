@@ -1,6 +1,6 @@
-import { AppError } from '@hicommonwealth/adapters';
-import { BalanceType } from '@hicommonwealth/core';
-import { UserInstance } from 'server/models/user';
+import { AppError, BalanceType } from '@hicommonwealth/core';
+import { UserInstance } from '@hicommonwealth/model';
+import { Op } from 'sequelize';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 export const Errors = {
@@ -38,9 +38,9 @@ export async function __createChainNode(
     throw new AppError(Errors.ChainIdNaN);
   }
 
-  const chainNode = await this.models.ChainNode.findOne({
-    where: { url },
-  });
+  const where = eth_chain_id ? { [Op.or]: { url, eth_chain_id } } : { url };
+
+  const chainNode = await this.models.ChainNode.findOne({ where });
 
   if (chainNode) {
     throw new AppError(Errors.ChainNodeExists);

@@ -1,14 +1,16 @@
 import { ActionPayload, Session } from '@canvas-js/interfaces';
+import {
+  LinkSource,
+  ThreadAttributes,
+  models,
+  tester,
+} from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from 'server/config';
-import { LinkSource, ThreadAttributes } from 'server/models/thread';
 import { Errors } from 'server/util/linkingValidationHelper';
 import * as modelUtils from 'test/util/modelUtils';
-import { resetDatabase } from '../../../server-test';
-import models from '../../../server/database';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -48,7 +50,7 @@ describe('Linking Tests', () => {
   const link5 = { source: LinkSource.Proposal, identifier: '4' };
 
   before(async () => {
-    await resetDatabase();
+    await tester.seedDb();
 
     const topic = await models.Topic.findOne({
       where: {

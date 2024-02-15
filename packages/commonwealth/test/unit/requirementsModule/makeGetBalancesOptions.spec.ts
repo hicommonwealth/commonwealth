@@ -1,9 +1,11 @@
 import { BalanceSourceType } from '@hicommonwealth/core';
+import {
+  AddressAttributes,
+  GetBalancesOptions,
+  GroupAttributes,
+} from '@hicommonwealth/model';
 import { expect } from 'chai';
-import { AddressAttributes } from 'server/models/address';
-import { GroupAttributes } from 'server/models/group';
 import { makeGetBalancesOptions } from 'server/util/requirementsModule/makeGetBalancesOptions';
-import { GetBalancesOptions } from 'server/util/tokenBalanceCache/types';
 
 describe('makeGetBalancesOptions', () => {
   it('should return empty array', () => {

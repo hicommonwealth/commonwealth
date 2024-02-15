@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
-import { GroupMetadata } from 'server/models/group';
+import { GroupMetadata } from '@hicommonwealth/model';
 
 export default function validateMetadata(
-  metadata: GroupMetadata
+  metadata: GroupMetadata,
 ): Error | null {
   const schema = z.object({
     name: z.string(),

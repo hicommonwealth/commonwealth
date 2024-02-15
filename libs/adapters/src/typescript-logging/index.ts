@@ -7,6 +7,7 @@ import {
   LoggerFactoryOptions,
   getLogControl,
 } from 'typescript-logging';
+import { rollbar } from '../rollbar';
 
 const options = new LoggerFactoryOptions()
   .addLogGroupRule(new LogGroupRule(new RegExp('model.+'), LogLevel.Debug))
@@ -46,6 +47,29 @@ const addPrefix = (filename: string, prefixes?: string[]) => {
 export const TypescriptLoggingLogger = (): Logger => ({
   name: 'TypescriptLoggingLogger',
   dispose: () => Promise.resolve(),
-  getLogger: (filename: string, ...ids: string[]) =>
-    loggerFactory.getLogger(addPrefix(filename, ids)),
+  getLogger: (filename: string, ...ids: string[]) => {
+    const logger = loggerFactory.getLogger(addPrefix(filename, ids));
+    return {
+      trace(msg: string, error?: Error) {
+        logger.trace(msg, error);
+      },
+      debug(msg: string, error?: Error) {
+        logger.debug(msg, error);
+      },
+      info(msg: string, error?: Error) {
+        logger.info(msg, error);
+      },
+      warn(msg: string, error?: Error) {
+        logger.warn(msg, error);
+      },
+      error(msg: string, error?: Error) {
+        logger.error(msg, error);
+        rollbar.error(msg, error);
+      },
+      fatal(msg: string, error?: Error) {
+        logger.fatal(msg, error);
+        rollbar.critical(msg, error);
+      },
+    };
+  },
 });

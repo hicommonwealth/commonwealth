@@ -1,8 +1,8 @@
 import chai from 'chai';
 
+import type { ThreadAttributes } from '@hicommonwealth/model';
 import type { GetThreadsReq } from 'server/api/extApiTypes';
 import { OrderByOptions } from 'server/api/extApiTypes';
-import type { ThreadAttributes } from 'server/models/thread';
 import { get } from 'test/integration/api/external/appHook.spec';
 import 'test/integration/api/external/dbEntityHooks.spec';
 import {

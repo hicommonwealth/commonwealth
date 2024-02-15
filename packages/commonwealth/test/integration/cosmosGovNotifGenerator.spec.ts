@@ -18,14 +18,13 @@ import {
   ChainNetwork,
   ChainType,
 } from '@hicommonwealth/core';
+import { models, tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { Proposal, ProposalStatus } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import {
   QueryProposalResponse,
   QueryProposalsResponse,
 } from 'cosmjs-types/cosmos/gov/v1beta1/query';
-import { resetDatabase } from '../../server-test';
-import models from '../../server/database';
 import { generateCosmosGovNotifications } from '../../server/workers/cosmosGovNotifications/generateCosmosGovNotifications';
 import { CosmosClients } from '../../server/workers/cosmosGovNotifications/proposalFetching/getCosmosClient';
 import {
@@ -227,7 +226,7 @@ export async function createCosmosChains() {
 
 describe('Cosmos Governance Notification Generator', () => {
   before('Reset database', async () => {
-    await resetDatabase();
+    await tester.seedDb();
   });
 
   describe('Utility function tests', () => {

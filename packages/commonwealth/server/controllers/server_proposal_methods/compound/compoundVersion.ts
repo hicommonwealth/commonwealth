@@ -1,4 +1,3 @@
-import { RedisCache } from '@hicommonwealth/adapters';
 import {
   GovernorAlpha,
   GovernorAlpha__factory,
@@ -9,7 +8,7 @@ import {
   GovernorCountingSimple,
   GovernorCountingSimple__factory,
 } from '@hicommonwealth/chains';
-import { RedisNamespaces } from '@hicommonwealth/core';
+import { CacheNamespaces, cache } from '@hicommonwealth/core';
 import { providers } from 'ethers';
 import { GovVersion } from './types';
 
@@ -104,12 +103,11 @@ function getCompoundGovContract(
 }
 
 export async function getCompoundGovContractAndVersion(
-  redis: RedisCache,
   compoundGovAddress: string,
   provider: providers.Web3Provider,
 ): Promise<ContractAndVersion> {
-  const govVersion = (await redis.getKey(
-    RedisNamespaces.Compound_Gov_Version,
+  const govVersion = (await cache().getKey(
+    CacheNamespaces.Compound_Gov_Version,
     compoundGovAddress,
   )) as GovVersion | undefined;
 
@@ -118,8 +116,8 @@ export async function getCompoundGovContractAndVersion(
       compoundGovAddress,
       provider,
     );
-    await redis.setKey(
-      RedisNamespaces.Compound_Gov_Version,
+    await cache().setKey(
+      CacheNamespaces.Compound_Gov_Version,
       compoundGovAddress,
       result.version,
     );

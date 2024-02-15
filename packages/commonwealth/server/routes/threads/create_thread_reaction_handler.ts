@@ -1,6 +1,6 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
+import { ReactionAttributes } from '@hicommonwealth/model';
 import { verifyReaction } from '../../../shared/canvas/serverVerify';
-import { ReactionAttributes } from '../../models/reaction';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -27,7 +27,7 @@ export const createThreadReactionHandler = async (
   >,
   res: TypedResponse<CreateThreadReactionResponse>,
 ) => {
-  const { user, address, community } = req;
+  const { user, address } = req;
   const {
     reaction,
     canvas_action: canvasAction,
@@ -48,7 +48,6 @@ export const createThreadReactionHandler = async (
     await verifyReaction(canvasAction, canvasSession, canvasHash, {
       thread_id: threadId,
       address: address.address,
-      chain: community.id,
       value: reaction,
     });
   }
@@ -58,7 +57,6 @@ export const createThreadReactionHandler = async (
     await controllers.threads.createThreadReaction({
       user,
       address,
-      community,
       reaction,
       threadId,
       canvasAction,

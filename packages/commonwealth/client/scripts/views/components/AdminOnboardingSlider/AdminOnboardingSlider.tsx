@@ -1,4 +1,4 @@
-import { featureFlags } from 'helpers/feature-flags';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import app from 'state';
@@ -6,8 +6,8 @@ import { useFetchGroupsQuery } from 'state/api/groups';
 import { useFetchThreadsQuery } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
-import useNewTopicModalMutationStore from 'state/ui/newTopicModal';
 import Permissions from 'utils/Permissions';
+import { useFlag } from '../../../hooks/useFlag';
 import { CWText } from '../component_kit/cw_text';
 import { CWModal } from '../component_kit/new_designs/CWModal';
 import { CWButton } from '../component_kit/new_designs/cw_button';
@@ -16,6 +16,9 @@ import './AdminOnboardingSlider.scss';
 import { DismissModal } from './DismissModal';
 
 export const AdminOnboardingSlider = () => {
+  const newAdminOnboardingEnabled = useFlag('newAdminOnboarding');
+  useUserActiveAccount();
+
   const community = app.config.chains.getById(app.activeChainId());
   const integrations = {
     snapshot: community?.snapshot?.length > 0,
@@ -34,7 +37,6 @@ export const AdminOnboardingSlider = () => {
     setShouldHideAdminOnboardingCardsForCommunity,
   } = useAdminOnboardingSliderMutationStore();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const { setIsNewTopicModalOpen } = useNewTopicModalMutationStore();
   const { data: topics = [], isLoading: isLoadingTopics = false } =
     useFetchTopicsQuery({
       communityId: app.activeChainId(),
@@ -47,7 +49,7 @@ export const AdminOnboardingSlider = () => {
     });
   const { data: threads = [], isLoading: isLoadingThreads = false } =
     useFetchThreadsQuery({
-      chainId: app.activeChainId(),
+      communityId: app.activeChainId(),
       queryType: 'bulk',
       page: 1,
       limit: 20,
@@ -55,11 +57,16 @@ export const AdminOnboardingSlider = () => {
     });
 
   const redirectToPage = (
-    pageName: 'create-group' | 'create-thread' | 'manage-community',
+    pageName:
+      | 'create-group'
+      | 'create-thread'
+      | 'manage-integrations'
+      | 'create-topic',
   ) => {
     pageName === 'create-group' && navigate(`/members/groups/create`);
     pageName === 'create-thread' && navigate(`/new/discussion`);
-    pageName === 'manage-community' && navigate(`/manage`);
+    pageName === 'manage-integrations' && navigate(`/manage/integrations`);
+    pageName === 'create-topic' && navigate('/manage/topics');
   };
 
   if (
@@ -72,7 +79,7 @@ export const AdminOnboardingSlider = () => {
       threads.length > 0 &&
       hasAnyIntegration) ||
     !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin()) ||
-    !featureFlags.newAdminOnboardingEnabled ||
+    !newAdminOnboardingEnabled ||
     [
       ...shouldHideAdminCardsTemporary,
       ...shouldHideAdminCardsPermanently,
@@ -100,10 +107,8 @@ export const AdminOnboardingSlider = () => {
         <div className="cards">
           <AdminOnboardingCard
             cardType="create-topic"
-            isActionCompleted={topics.length > 0}
-            // TODO: after https://github.com/hicommonwealth/commonwealth/issues/6026,
-            // redirect to specific section on the manage community page
-            onCTAClick={() => setIsNewTopicModalOpen(true)}
+            isActionCompleted={topics.length > 1} // we have a default 'General' topic which is not counted here
+            onCTAClick={() => redirectToPage('create-topic')}
           />
           <AdminOnboardingCard
             cardType="make-group"
@@ -113,9 +118,7 @@ export const AdminOnboardingSlider = () => {
           <AdminOnboardingCard
             cardType="enable-integrations"
             isActionCompleted={hasAnyIntegration}
-            // TODO: after https://github.com/hicommonwealth/commonwealth/issues/6024,
-            // redirect to specific section on the manage community page
-            onCTAClick={() => redirectToPage('manage-community')}
+            onCTAClick={() => redirectToPage('manage-integrations')}
           />
           <AdminOnboardingCard
             cardType="create-thread"

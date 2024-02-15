@@ -2,16 +2,9 @@
 
 .Sublayout {
   display: flex;
-  flex-direction: row;
   height: 100%;
   width: 100%;
-
-  .header-and-body-container {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 100%;
-  }
+  flex-direction: column;
 
   .sidebar-and-body-container {
     display: flex;
@@ -24,6 +17,10 @@
       flex-direction: column;
       transition: margin-left 0.2s ease-in-out;
 
+      @include extraSmall {
+        margin-top: 48px;
+      }
+
       &.resizing {
         transition: none;
       }
@@ -34,10 +31,6 @@
         transition: margin-left 0.2s ease-in-out;
 
         width: calc(100% - (#{$quick-switcher-width} + 1px));
-
-        @include smallInclusive {
-          margin-left: 100vw;
-        }
       }
 
       &.quick-switcher-visible {
@@ -84,6 +77,10 @@
         height: 100%;
         overflow-y: auto;
         width: 100%;
+
+        .breadcrumbContainer {
+          padding: 16px 0px 16px 0px;
+        }
       }
     }
   }

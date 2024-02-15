@@ -1,11 +1,9 @@
+import { ChainNodeInstance, models, tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { BigNumber, ethers } from 'ethers';
-import models from '../../../server/database';
-import { ChainNodeInstance } from '../../../server/models/chain_node';
 import { emitChainEventNotifs } from '../../../server/workers/evmChainEvents/emitChainEventNotifs';
 import { RawEvmEvent } from '../../../server/workers/evmChainEvents/types';
 import { sdk } from '../../devnet/evm/evmChainEvents/util';
-import { resetDatabase } from '../../util/resetDatabase';
 import {
   getTestChainNode,
   getTestCommunityContract,
@@ -23,7 +21,7 @@ describe('emitChainEventNotifs', () => {
   };
 
   before(async () => {
-    await resetDatabase();
+    await tester.seedDb();
     chainNode = await getTestChainNode();
     await getTestSubscription();
     await getTestCommunityContract();

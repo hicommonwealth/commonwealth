@@ -1,8 +1,8 @@
+import type { DB } from '@hicommonwealth/model';
+import { ReactionAttributes } from '@hicommonwealth/model';
 import { query, validationResult } from 'express-validator';
 import Sequelize, { WhereOptions } from 'sequelize';
 import type { GetReactionsReq, GetReactionsResp } from '../../api/extApiTypes';
-import type { DB } from '../../models';
-import { ReactionAttributes } from '../../models/reaction';
 import type { TypedRequestQuery, TypedResponse } from '../../types';
 import { failure, success } from '../../types';
 import { paginationValidation } from '../../util/helperValidations';

@@ -1,10 +1,10 @@
+import type { DB } from '@hicommonwealth/model';
 import { oneOf, query, validationResult } from 'express-validator';
 import type {
   GetCommunitiesReq,
   GetCommunitiesResp,
 } from '../../api/extApiTypes';
 import { needParamErrMsg } from '../../api/extApiTypes';
-import type { DB } from '../../models';
 import type { TypedRequestQuery, TypedResponse } from '../../types';
 import { failure, success } from '../../types';
 import { paginationValidation } from '../../util/helperValidations';

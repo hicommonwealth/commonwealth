@@ -1,13 +1,12 @@
-import { ServerError } from '@hicommonwealth/adapters';
+import { ServerError } from '@hicommonwealth/core';
+import { ThreadAttributes } from '@hicommonwealth/model';
 import moment from 'moment';
 import { QueryTypes } from 'sequelize';
-import { CommunityInstance } from '../../models/community';
-import { ThreadAttributes } from '../../models/thread';
 import { getLastEdited } from '../../util/getLastEdited';
 import { ServerThreadsController } from '../server_threads_controller';
 
 export type GetBulkThreadsOptions = {
-  community?: CommunityInstance;
+  communityId: string;
   stage: string;
   topicId: number;
   includePinnedThreads: boolean;
@@ -29,7 +28,7 @@ export type GetBulkThreadsResult = {
 export async function __getBulkThreads(
   this: ServerThreadsController,
   {
-    community,
+    communityId,
     stage,
     topicId,
     includePinnedThreads,
@@ -54,7 +53,7 @@ export async function __getBulkThreads(
       page: _page,
       limit: _limit,
       offset: _offset,
-      ...(community && { community_id: community.id }),
+      ...(communityId && { community_id: communityId }),
       ...(stage && { stage }),
       ...(topicId && { topic_id: topicId }),
     };
@@ -85,8 +84,10 @@ export async function __getBulkThreads(
         threads.read_only, threads.body, threads.stage, threads.discord_meta,
         threads.has_poll, threads.plaintext,
         threads.url, threads.pinned, COALESCE(threads.number_of_comments,0) as threads_number_of_comments,
-        threads.reaction_ids, threads.reaction_type, threads.addresses_reacted, COALESCE(threads.total_likes, 0)
+        threads.reaction_ids, threads.reaction_timestamps, threads.reaction_weights, threads.reaction_type,
+        threads.addresses_reacted, COALESCE(threads.total_likes, 0)
           as threads_total_likes,
+        threads.reaction_weights_sum,
         threads.links as links,
         topics.id AS topic_id, topics.name AS topic_name, topics.description AS topic_description,
         topics.community_id AS topic_community_id,
@@ -102,7 +103,9 @@ export async function __getBulkThreads(
           t.updated_at AS thread_updated,
           t.locked_at AS thread_locked,
           t.community_id AS thread_chain, t.read_only, t.body, t.discord_meta, t.comment_count AS number_of_comments,
-          reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted, t.reaction_count AS total_likes,
+          reactions.reaction_ids, reactions.reaction_timestamps, reactions.reaction_weights, reactions.reaction_type,
+          reactions.addresses_reacted, t.reaction_count AS total_likes,
+          t.reaction_weights_sum,
           t.has_poll,
           t.plaintext,
           t.stage, t.url, t.pinned, t.topic_id, t.kind, t.links, ARRAY_AGG(DISTINCT
@@ -119,7 +122,9 @@ export async function __getBulkThreads(
             SELECT thread_id,
             STRING_AGG(ad.address::text, ',') AS addresses_reacted,
             STRING_AGG(r.reaction::text, ',') AS reaction_type,
-            STRING_AGG(r.id::text, ',') AS reaction_ids
+            STRING_AGG(r.id::text, ',') AS reaction_ids,
+            STRING_AGG(r.created_at::text, ',') AS reaction_timestamps,
+            STRING_AGG(COALESCE(r.calculated_voting_weight::text, '0'), ',') AS reaction_weights
             FROM "Reactions" as r
             JOIN "Threads" t2
             ON r.thread_id = t2.id and t2.community_id = $community_id ${
@@ -132,14 +137,15 @@ export async function __getBulkThreads(
         ) reactions
         ON t.id = reactions.thread_id
         WHERE t.deleted_at IS NULL
-          ${community ? ` AND t.community_id = $community_id` : ''}
+          ${communityId ? ` AND t.community_id = $community_id` : ''}
           ${topicId ? ` AND t.topic_id = $topic_id ` : ''}
           ${stage ? ` AND t.stage = $stage ` : ''}
           ${archived ? ` AND t.archived_at IS NOT NULL ` : ''}
           AND (${includePinnedThreads ? 't.pinned = true OR' : ''}
           (COALESCE(t.last_commented_on, t.created_at) < $to_date AND t.pinned = false))
           GROUP BY (t.id, t.max_notif_id, t.comment_count,
-          reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted)
+          reactions.reaction_ids, reactions.reaction_timestamps, reactions.reaction_weights, reactions.reaction_type,
+          reactions.addresses_reacted)
           ORDER BY t.pinned DESC, t.max_notif_id DESC
         ) threads
       ON threads.address_id = addr.id
@@ -206,6 +212,13 @@ export async function __getBulkThreads(
       },
       numberOfComments: t.threads_number_of_comments,
       reactionIds: t.reaction_ids ? t.reaction_ids.split(',') : [],
+      reactionTimestamps: t.reaction_timestamps
+        ? t.reaction_timestamps.split(',')
+        : [],
+      reactionWeights: t.reaction_weights
+        ? t.reaction_weights.split(',').map((n) => parseInt(n, 10))
+        : [],
+      reaction_weights_sum: t.reaction_weights_sum,
       addressesReacted: t.addresses_reacted
         ? t.addresses_reacted.split(',')
         : [],
@@ -228,7 +241,7 @@ export async function __getBulkThreads(
 
   const numVotingThreads = await this.models.Thread.count({
     where: {
-      community_id: community?.id,
+      community_id: communityId,
       stage: 'voting',
     },
   });

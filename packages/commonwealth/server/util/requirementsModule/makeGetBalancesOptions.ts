@@ -5,16 +5,16 @@ import {
   CosmosSource,
   NativeSource,
 } from '@hicommonwealth/core';
-import { AddressAttributes } from 'server/models/address';
-import { GroupAttributes } from 'server/models/group';
 import {
+  AddressAttributes,
   GetBalancesOptions,
   GetCosmosBalancesOptions,
   GetCw721BalanceOptions,
   GetErc1155BalanceOptions,
   GetErcBalanceOptions,
   GetEthNativeBalanceOptions,
-} from '../tokenBalanceCache/types';
+  GroupAttributes,
+} from '@hicommonwealth/model';
 
 export function makeGetBalancesOptions(
   groups: GroupAttributes[],

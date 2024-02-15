@@ -2,14 +2,13 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 require('dotenv').config();
+import { models, tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-
 import faker from 'faker';
 import jwt from 'jsonwebtoken';
-import app, { resetDatabase } from '../../../server-test';
+import app from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import models from '../../../server/database';
 import Errors from '../../../server/routes/webhooks/errors';
 import * as modelUtils from '../../util/modelUtils';
 
@@ -38,7 +37,7 @@ describe('Webhook Tests', () => {
   let topicId;
 
   before('reset database', async () => {
-    await resetDatabase();
+    await tester.seedDb();
   });
 
   beforeEach(async () => {
@@ -244,7 +243,7 @@ describe('Webhook Tests', () => {
 
   describe('Integration Tests', () => {
     before('reset database', async () => {
-      await resetDatabase();
+      await tester.seedDb();
     });
     // we want to test that no errors occur up to the point the webhook is hit
     it('should send a webhook for markdown and rich text content', async () => {

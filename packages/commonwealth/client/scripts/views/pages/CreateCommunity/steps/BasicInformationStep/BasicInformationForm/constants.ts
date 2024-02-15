@@ -10,6 +10,20 @@ export const existingCommunityNames = app.config.chains
   .getAll()
   .map((community) => community.name.toLowerCase().trim());
 
+const removeTestCosmosNodes = (nodeInfo: NodeInfo): boolean => {
+  return !(
+    window.location.hostname.includes('commonwealth.im') &&
+    [
+      'evmosdevci',
+      'csdkv1',
+      'csdkbeta',
+      'csdkv1ci',
+      'csdkbetaci',
+      'evmosdev',
+    ].includes(String(nodeInfo.cosmosChainId))
+  );
+};
+
 const particularChainNodes = (nodeInfo: NodeInfo) => {
   const isEth = nodeInfo.ethChainId;
   const isCosmos = nodeInfo.cosmosChainId;
@@ -18,7 +32,10 @@ const particularChainNodes = (nodeInfo: NodeInfo) => {
     nodeInfo.name.toLowerCase().includes('mainnet');
   const isPolygon = nodeInfo.ethChainId === POLYGON_ETH_CHAIN_ID;
 
-  return isEth || isCosmos || isSolana || isPolygon;
+  return (
+    removeTestCosmosNodes(nodeInfo) &&
+    (isEth || isCosmos || isSolana || isPolygon)
+  );
 };
 
 // Get chain id's from the app.config.chains for all eth and cosmos chains

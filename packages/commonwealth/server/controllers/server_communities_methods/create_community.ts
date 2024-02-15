@@ -1,6 +1,6 @@
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
-import { AppError } from '@hicommonwealth/adapters';
 import {
+  AppError,
   BalanceType,
   ChainBase,
   ChainNetwork,
@@ -8,22 +8,21 @@ import {
   DefaultPage,
   NotificationCategories,
 } from '@hicommonwealth/core';
+import type {
+  AddressInstance,
+  ChainNodeAttributes,
+  CommunityAttributes,
+  RoleAttributes,
+} from '@hicommonwealth/model';
+import { Community, UserInstance } from '@hicommonwealth/model';
 import type { Cluster } from '@solana/web3.js';
 import * as solw3 from '@solana/web3.js';
+import axios from 'axios';
 import BN from 'bn.js';
 import { Op } from 'sequelize';
 import Web3 from 'web3';
 import { bech32ToHex, urlHasValidHTTPPrefix } from '../../../shared/utils';
-
 import { COSMOS_REGISTRY_API } from '../../config';
-import type { AddressInstance } from '../../models/address';
-import type { ChainNodeAttributes } from '../../models/chain_node';
-import type { CommunityAttributes } from '../../models/community';
-import type { RoleAttributes } from '../../models/role';
-
-import { Community } from '@hicommonwealth/model';
-import axios from 'axios';
-import { UserInstance } from '../../models/user';
 import { RoleInstanceWithPermission } from '../../util/roles';
 import testSubstrateSpec from '../../util/testSubstrateSpec';
 import { ServerCommunitiesController } from '../server_communities_controller';

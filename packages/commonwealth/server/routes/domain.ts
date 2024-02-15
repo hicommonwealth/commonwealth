@@ -1,5 +1,5 @@
+import type { DB } from '@hicommonwealth/model';
 import type { Request, Response } from 'express';
-import type { DB } from '../models';
 
 const domain = async (models: DB, req: Request, res: Response) => {
   const hostname = req.headers['x-forwarded-host'] || req.hostname;

@@ -1,8 +1,7 @@
 // Helper function to look up a scope, i.e. a chain XOR community.
 // If a community is found, also check that the user is allowed to see it.
 
-import type { DB } from '../models';
-import type { CommunityInstance } from '../models/community';
+import type { CommunityInstance, DB } from '@hicommonwealth/model';
 import { ALL_COMMUNITIES } from './databaseValidationService';
 
 export const CommunityCommunityErrors = {

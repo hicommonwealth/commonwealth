@@ -5,15 +5,13 @@ import type {
   NotificationDataAndCategory,
 } from '@hicommonwealth/core';
 import { NotificationCategories, logger, stats } from '@hicommonwealth/core';
+import type { DB, NotificationInstance } from '@hicommonwealth/model';
 import Sequelize, { QueryTypes } from 'sequelize';
 import { SEND_WEBHOOKS_EMAILS, SERVER_URL } from '../config';
-import type { DB } from '../models';
-import type { NotificationInstance } from '../models/notification';
 import {
   createImmediateNotificationEmailObject,
   sendImmediateNotificationEmail,
 } from '../scripts/emails';
-import { rollbar } from './rollbar';
 import { mapNotificationsDataToSubscriptions } from './subscriptionMapping';
 import { dispatchWebhooks } from './webhooks/dispatchWebhook';
 
@@ -198,7 +196,6 @@ export default async function emitNotifications(
       await dispatchWebhooks(notification_data_and_category);
     } catch (e) {
       log.error('Failed to dispatch webhooks', e);
-      rollbar.error('Failed to dispatch webhooks', e);
     }
   }
 

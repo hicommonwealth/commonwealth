@@ -1,8 +1,8 @@
 import { stats } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import passport from 'passport';
 import passportJWT from 'passport-jwt';
 import { JWT_SECRET } from '../config';
-import type { DB } from '../models';
 import '../types';
 import { initMagicAuth } from './magic';
 

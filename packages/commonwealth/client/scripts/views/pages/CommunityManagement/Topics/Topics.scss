@@ -1,0 +1,56 @@
+@import '../../../../../styles/shared';
+
+.TopicsPage {
+  display: flex;
+  flex-direction: column;
+  padding: 40px;
+
+  header {
+    margin-bottom: 8px;
+
+    .subheader {
+      color: $neutral-500;
+    }
+  }
+
+  .content-container {
+    display: flex;
+
+    main {
+      width: 60%;
+
+      .CWTabsRow {
+        width: 100%;
+        margin-bottom: 16px;
+      }
+    }
+
+    aside {
+      width: 40%;
+      // padding: 150px 40px 40px 40px;
+      padding: 40px;
+    }
+  }
+
+  @include extraSmall {
+    padding: 16px;
+
+    header {
+      margin-bottom: 14px;
+    }
+
+    .content-container {
+      flex-direction: column-reverse;
+      gap: 16px;
+
+      main {
+        width: 100%;
+      }
+
+      aside {
+        padding: 0;
+        width: 100%;
+      }
+    }
+  }
+}

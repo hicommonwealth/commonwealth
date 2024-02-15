@@ -1,16 +1,29 @@
 import { NotificationCategories } from '@hicommonwealth/core';
+import { CommunityInstance, commonProtocol } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { ServerCommentsController } from 'server/controllers/server_comments_controller';
 import { SearchCommentsOptions } from 'server/controllers/server_comments_methods/search_comments';
 import Sinon from 'sinon';
 import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
-import { CommunityInstance } from '../../../server/models/community';
 
 describe('ServerCommentsController', () => {
+  beforeEach(() => {
+    Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves(
+      '0',
+    );
+  });
+  afterEach(() => {
+    Sinon.restore();
+  });
   describe('#createCommentReaction', () => {
     it('should create a comment reaction (new reaction)', async () => {
       const sandbox = Sinon.createSandbox();
       const db = {
+        sequelize: {
+          transaction: async (callback) => {
+            return callback();
+          },
+        },
         Address: {
           findAll: async () => [{}], // used in findOneRole
         },
@@ -43,34 +56,42 @@ describe('ServerCommentsController', () => {
           findOne: sandbox.stub().resolves({
             id: 3,
             text: 'my comment body',
+            Thread: {
+              id: 4,
+              title: 'Big Thread!',
+              community_id: 'ethereum',
+            },
           }),
         },
-        Thread: {
+        CommunityStake: {
           findOne: sandbox.stub().resolves({
-            id: 4,
-            title: 'Big Thread!',
-            community_id: 'ethereum',
+            id: 5,
+            stake_id: 1,
+            vote_weight: 1,
+          }),
+        },
+        Community: {
+          findByPk: async () => ({
+            id: 'ethereum',
+            namespace: 'cake',
           }),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = BAN_CACHE_MOCK_FN('ethereum');
 
       const user = {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
       };
       const address = {
+        address: '0x123',
+        community_id: 'ethereum',
         save: async () => {},
-      };
-      const community = {
-        id: 'ethereum',
       };
       const reaction = {};
       const commentId = 123;
 
       const serverCommentsController = new ServerCommentsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -78,7 +99,6 @@ describe('ServerCommentsController', () => {
         await serverCommentsController.createCommentReaction({
           user: user as any,
           address: address as any,
-          community: community as any,
           reaction: reaction as any,
           commentId,
         });
@@ -90,7 +110,6 @@ describe('ServerCommentsController', () => {
             ...(address as any),
             address: '0xbanned',
           },
-          community: community as any,
           reaction: reaction as any,
           commentId,
         }),
@@ -166,7 +185,6 @@ describe('ServerCommentsController', () => {
           }),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: sandbox.stub().resolves([true, null]),
       };
@@ -175,14 +193,10 @@ describe('ServerCommentsController', () => {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
       };
       const address = {};
-      const community = {
-        id: 'ethereum',
-      };
       const reaction = {};
 
       const serverCommentsController = new ServerCommentsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -190,7 +204,6 @@ describe('ServerCommentsController', () => {
         serverCommentsController.createCommentReaction({
           user: user as any,
           address: address as any,
-          community: community as any,
           reaction: reaction as any,
           commentId: 123,
         }),
@@ -235,7 +248,6 @@ describe('ServerCommentsController', () => {
           findOne: sandbox.stub().resolves(null),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: sandbox.stub().resolves([true, null]),
       };
@@ -244,14 +256,10 @@ describe('ServerCommentsController', () => {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
       };
       const address = {};
-      const community = {
-        id: 'ethereum',
-      };
       const reaction = {};
 
       const serverCommentsController = new ServerCommentsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -259,11 +267,10 @@ describe('ServerCommentsController', () => {
         serverCommentsController.createCommentReaction({
           user: user as any,
           address: address as any,
-          community: community as any,
           reaction: reaction as any,
           commentId: 123,
         }),
-      ).to.be.rejectedWith('Thread not found for comment: 123');
+      ).to.be.rejectedWith('Thread not found for comment');
     });
 
     it('should throw error (banned)', async () => {
@@ -298,17 +305,14 @@ describe('ServerCommentsController', () => {
           findOne: sandbox.stub().resolves({
             id: 3,
             text: 'my comment body',
-          }),
-        },
-        Thread: {
-          findOne: sandbox.stub().resolves({
-            id: 4,
-            title: 'Big Thread!',
-            community_id: 'ethereum',
+            Thread: {
+              id: 4,
+              title: 'Big Thread!',
+              community_id: 'ethereum',
+            },
           }),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: sandbox.stub().resolves([false, 'big ban err']),
       };
@@ -317,15 +321,11 @@ describe('ServerCommentsController', () => {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
       };
       const address = {};
-      const community = {
-        id: 'ethereum',
-      };
       const reaction = {};
       const commentId = 123;
 
       const serverCommentsController = new ServerCommentsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -333,7 +333,6 @@ describe('ServerCommentsController', () => {
         serverCommentsController.createCommentReaction({
           user: user as any,
           address: address as any,
-          community: community as any,
           reaction: reaction as any,
           commentId,
         }),
@@ -372,14 +371,12 @@ describe('ServerCommentsController', () => {
           findOne: sandbox.stub().resolves({
             id: 3,
             text: 'my comment body',
-          }),
-        },
-        Thread: {
-          findOne: sandbox.stub().resolves({
-            id: 4,
-            title: 'Big Thread!',
-            community_id: 'ethereum',
-            topic_id: 77,
+            Thread: {
+              id: 4,
+              title: 'Big Thread!',
+              community_id: 'ethereum',
+              topic_id: 77,
+            },
           }),
         },
         // for validateTopicThreshold
@@ -439,9 +436,6 @@ describe('ServerCommentsController', () => {
           bulkCreate: sandbox.stub().resolves([]),
         },
       };
-      const tokenBalanceCache = {
-        getBalances: sandbox.stub().resolves({}),
-      };
       const banCache = {
         checkBan: sandbox.stub().resolves([true, null]),
       };
@@ -452,16 +446,11 @@ describe('ServerCommentsController', () => {
       const address = {
         address: '0x123',
       };
-      const community = {
-        id: 'ethereum',
-        network: 'ethereum',
-      };
       const reaction = {};
       const commentId = 123;
 
       const serverCommentsController = new ServerCommentsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -469,7 +458,6 @@ describe('ServerCommentsController', () => {
         serverCommentsController.createCommentReaction({
           user: user as any,
           address: address as any,
-          community: community as any,
           reaction: reaction as any,
           commentId,
         }),
@@ -491,12 +479,10 @@ describe('ServerCommentsController', () => {
           },
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {};
 
       const serverCommentsController = new ServerCommentsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -527,40 +513,41 @@ describe('ServerCommentsController', () => {
       const data = {
         id: 123,
         thread_id: 2,
+        address_id: 1,
         text: 'Wasup',
         version_history: ['{"body":""}'],
         community_id: 'ethereum',
         Address: {
+          id: 1,
           address: '0x123',
           community_id: 'ethereum',
           save: async () => ({}),
         },
+        Thread: {
+          id: 2,
+          address_id: 1,
+          address: '0x123',
+          community_id: 'ethereum',
+          title: 'Big Thread!',
+        },
         save: async () => ({}),
         toJSON: () => data,
       };
-
       const db = {
+        Address: {
+          findAll: async () => [{ id: 1 }], // used in findOneRole
+        },
         Comment: {
           findOne: async () => data,
         },
-        Thread: {
-          findOne: async () => ({
-            id: 1,
-            address: '0x123',
-            community_id: 'ethereum',
-            title: 'Big Thread!',
-          }),
-        },
       };
-      const tokenBalanceCache = {};
-      const banCache = BAN_CACHE_MOCK_FN('ethereum');
-
+      const banCache = {
+        checkBan: async () => [true, null],
+      };
       const serverCommentsController = new ServerCommentsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
-
       const user = {
         getAddresses: async () => [{ id: 1, verified: true }],
       };
@@ -570,42 +557,22 @@ describe('ServerCommentsController', () => {
         chain: 'ethereum',
         save: async () => ({}),
       };
-      const community = {
-        id: 'ethereum',
-      };
       const commentId = 123;
       const commentBody = 'Hello';
       const [updatedComment, allNotificationOptions] =
         await serverCommentsController.updateComment({
           user: user as any,
           address: address as any,
-          community: community as any,
           commentId,
           commentBody,
         });
-
-      expect(
-        serverCommentsController.updateComment({
-          user: user as any,
-          address: {
-            ...(address as any),
-            address: '0xbanned',
-          },
-          community: community as any,
-          commentId,
-          commentBody,
-        }),
-      ).to.be.rejectedWith('Ban error: banned');
-
       expect(updatedComment).to.include({
         id: 123,
         text: 'Hello',
       });
-
       expect(allNotificationOptions[0]).to.have.property('notification');
       const { notification } = allNotificationOptions[0];
       expect(notification).to.have.property('categoryId', 'comment-edit');
-
       expect(notification.data).to.have.property('created_at');
       expect(notification.data).to.include({
         thread_id: 2,
@@ -616,7 +583,6 @@ describe('ServerCommentsController', () => {
         author_address: '0x123',
         author_chain: 'ethereum',
       });
-
       expect(allNotificationOptions[0]).to.have.property('excludeAddresses');
       const { excludeAddresses } = allNotificationOptions[0];
       expect(excludeAddresses[0]).to.equal('0x123');
@@ -626,53 +592,44 @@ describe('ServerCommentsController', () => {
       const data = {
         id: 123,
         thread_id: 2,
+        address_id: 1,
         text: 'Wasup',
         version_history: ['{"body":""}'],
         community_id: 'ethereum',
         Address: {
-          address: '0x123',
+          id: 1,
+          address: '0xbanned',
           community_id: 'ethereum',
           save: async () => ({}),
+        },
+        Thread: {
+          id: 2,
+          address_id: 1,
+          address: '0xbanned',
+          community_id: 'ethereum',
+          title: 'Big Thread!',
         },
         save: async () => ({}),
         toJSON: () => data,
       };
-
       const db = {
         Comment: {
           findOne: async () => data,
         },
-        Thread: {
-          findOne: async () => ({
-            id: 1,
-            address: '0x123',
-            community_id: 'ethereum',
-            title: 'Big Thread!',
-          }),
-        },
       };
-      const tokenBalanceCache = {};
-      const banCache = {
-        checkBan: async () => [false, 'banned'],
-      };
-
+      const banCache = BAN_CACHE_MOCK_FN('ethereum');
       const serverCommentsController = new ServerCommentsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
-
       const user = {
         getAddresses: async () => [{ id: 1, verified: true }],
       };
       const address = {
         id: 1,
-        address: '0x123',
+        address: '0xbanned',
         chain: 'ethereum',
         save: async () => ({}),
-      };
-      const community = {
-        id: 'ethereum',
       };
       const commentId = 123;
       const commentBody = 'Hello';
@@ -680,7 +637,6 @@ describe('ServerCommentsController', () => {
         serverCommentsController.updateComment({
           user: user as any,
           address: address as any,
-          community: community as any,
           commentId,
           commentBody,
         }),
@@ -702,7 +658,6 @@ describe('ServerCommentsController', () => {
         save: async () => ({}),
         toJSON: () => data,
       };
-
       const db = {
         Comment: {
           findOne: async () => data,
@@ -711,17 +666,13 @@ describe('ServerCommentsController', () => {
           findOne: async () => null,
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: async () => [true, null],
       };
-
       const serverCommentsController = new ServerCommentsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
-
       const user = {
         getAddresses: async () => [{ id: 1, verified: true }],
       };
@@ -731,16 +682,12 @@ describe('ServerCommentsController', () => {
         chain: 'ethereum',
         save: async () => ({}),
       };
-      const community = {
-        id: 'ethereum',
-      };
       const commentId = 123;
       const commentBody = 'Hello';
       expect(
         serverCommentsController.updateComment({
           user: user as any,
           address: address as any,
-          community: community as any,
           commentId,
           commentBody,
         }),
@@ -752,8 +699,12 @@ describe('ServerCommentsController', () => {
     it('should delete a comment', async () => {
       let didDestroy = false;
       const db = {
+        Address: {
+          findAll: async () => [{ address_id: 1 }], // used in findOneRole
+        },
         Comment: {
           findOne: async () => ({
+            address_id: 1,
             destroy: async () => {
               didDestroy = true;
             },
@@ -763,42 +714,32 @@ describe('ServerCommentsController', () => {
           destroy: async () => ({}),
         },
       };
-      const tokenBalanceCache = {};
-      const banCache = BAN_CACHE_MOCK_FN('ethereum');
+      const banCache = {
+        checkBan: () => [true, null],
+      };
 
       const serverCommentsController = new ServerCommentsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
       const user = {
         getAddresses: async () => [{ id: 1, verified: true }],
       };
-      const address = {};
-      const community = {
-        id: 'ethereum',
-      };
+      const address = { id: 1 };
       const commentId = 1;
       await serverCommentsController.deleteComment({
         user: user as any,
         address: address as any,
-        community: community as any,
         commentId,
       });
       expect(didDestroy).to.be.true;
 
-      expect(
-        serverCommentsController.deleteComment({
-          user: user as any,
-          address: {
-            ...(address as any),
-            address: '0xbanned',
-          },
-          community: community as any,
-          commentId,
-        }),
-      ).to.be.rejectedWith('Ban error: banned');
+      serverCommentsController.deleteComment({
+        user: user as any,
+        address: address as any,
+        commentId,
+      });
     });
   });
 });

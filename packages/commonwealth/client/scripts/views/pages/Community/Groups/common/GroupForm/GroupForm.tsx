@@ -1,14 +1,13 @@
 /* eslint-disable react/no-multi-comp */
 import { isValidEthAddress } from 'helpers/validateTypes';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
-import { getClasses } from 'views/components/component_kit/helpers';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
@@ -34,7 +33,6 @@ import {
 import './GroupForm.scss';
 import RequirementSubForm from './RequirementSubForm';
 import {
-  CWRequirementsLabelInputFieldState,
   FormSubmitValues,
   GroupFormProps,
   RequirementSubFormsState,
@@ -52,7 +50,7 @@ const REQUIREMENTS_TO_FULFILL = {
 };
 
 type CWRequirementsRadioButtonProps = {
-  inputError?: string;
+  maxRequirements: number;
   inputValue: string;
   isSelected: boolean;
   onSelect: () => any;
@@ -67,36 +65,45 @@ interface Cw721Metadata {
 }
 
 const CWRequirementsRadioButton = ({
-  inputError,
+  maxRequirements = 1,
   inputValue,
   isSelected,
   onSelect,
   onInputValueChange,
 }: CWRequirementsRadioButtonProps) => {
-  const inputRef = useRef();
+  const options = useMemo(
+    () =>
+      Array.from({ length: maxRequirements }).map((_, index) => ({
+        label: `${index + 1}`,
+        value: `${index + 1}`,
+      })),
+    [maxRequirements],
+  );
+
+  const value = useMemo(() => {
+    if (inputValue) {
+      return {
+        label: inputValue,
+        value: inputValue,
+      };
+    }
+
+    return options[0];
+  }, [inputValue, options]);
 
   const Label = (
     <span className="requirements-radio-btn-label">
-      At least{' '}
-      {
-        <CWTextInput
-          disabled={!isSelected}
-          inputRef={inputRef}
-          containerClassName={getClasses<{ failure?: boolean }>(
-            { failure: !!inputError },
-            'input',
-          )}
-          value={inputValue}
-          onInput={(e) => {
-            const value = e.target?.value?.trim();
-            // Only allow numbers
-            if (!/[^0-9]/g.test(value)) {
-              onInputValueChange(e.target?.value?.trim());
-            }
-          }}
-        />
-      }{' '}
-      # of all requirements
+      Minimum number of conditions to join{' '}
+      <CWSelectList
+        isDisabled={!isSelected}
+        isSearchable={false}
+        isClearable={false}
+        options={options}
+        value={value}
+        onChange={(selectedOption) => {
+          onInputValueChange(`${selectedOption.value}`);
+        }}
+      />
     </span>
   );
 
@@ -110,18 +117,9 @@ const CWRequirementsRadioButton = ({
         onChange={(e) => {
           if (e.target.checked) {
             onSelect();
-            setTimeout(() =>
-              (inputRef?.current as HTMLInputElement)?.focus?.(),
-            );
           }
         }}
       />
-      {isSelected && (
-        <CWText type="caption" className="requirements-radio-btn-helper-text">
-          Number must be less than or equal to number of requirements added and
-          cannot be 0.
-        </CWText>
-      )}
     </>
   );
 };
@@ -175,8 +173,8 @@ const GroupForm = ({
     initialValues?.requirementsToFulfill &&
       initialValues?.requirementsToFulfill !== 'ALL',
   );
-  const [cwRequiremenetsLabelInputField, setCwRequiremenetsLabelInputField] =
-    useState<CWRequirementsLabelInputFieldState>({ value: '1', error: '' });
+  const [cwRequiremenetsLabelInputValue, setCwRequiremenetsLabelInputValue] =
+    useState('1');
   const [requirementSubForms, setRequirementSubForms] = useState<
     RequirementSubFormsState[]
   >([
@@ -226,10 +224,9 @@ const GroupForm = ({
       initialValues.requirementsToFulfill !==
         REQUIREMENTS_TO_FULFILL.ALL_REQUIREMENTS
     ) {
-      setCwRequiremenetsLabelInputField({
-        ...cwRequiremenetsLabelInputField,
-        value: `${initialValues.requirementsToFulfill}`,
-      });
+      setCwRequiremenetsLabelInputValue(
+        `${initialValues.requirementsToFulfill}`,
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -437,68 +434,19 @@ const GroupForm = ({
     return !!updatedSubForms.find((x) => Object.keys(x.errors).length > 0);
   };
 
-  const validateCustomRequirementsRadioLabelValue = useCallback(
-    (value: string): boolean | number => {
-      // If radio label input has no value
-      if (!value) {
-        setCwRequiremenetsLabelInputField((prevVal) => ({
-          ...prevVal,
-          error: VALIDATION_MESSAGES.NO_INPUT,
-        }));
-        return false;
-      }
-
-      // If radio label input has invalid value
-      const requirementsToFulfill = parseInt(value || '');
-      if (
-        !requirementsToFulfill ||
-        requirementsToFulfill < 1 ||
-        requirementsToFulfill > MAX_REQUIREMENTS ||
-        requirementsToFulfill > requirementSubForms.length
-      ) {
-        setCwRequiremenetsLabelInputField((prevVal) => ({
-          ...prevVal,
-          error: VALIDATION_MESSAGES.INVALID_INPUT,
-        }));
-        return false;
-      }
-
-      return requirementsToFulfill; // return a number indicating the number of requirements to fulfill
-    },
-    [requirementSubForms.length],
-  );
-
-  useEffect(() => {
-    if (isSelectedCustomRequirementsToFulfillOption) {
-      validateCustomRequirementsRadioLabelValue(
-        cwRequiremenetsLabelInputField.value,
-      );
-    }
-  }, [
-    cwRequiremenetsLabelInputField.value,
-    isSelectedCustomRequirementsToFulfillOption,
-    validateCustomRequirementsRadioLabelValue,
-  ]);
-
   const handleSubmit = async (values: FormSubmitValues) => {
     const hasSubFormErrors = await validateSubForms();
-    if (hasSubFormErrors || cwRequiremenetsLabelInputField.error) {
+    if (hasSubFormErrors) {
       return;
     }
 
     // Custom validation for the radio with input label
     let requirementsToFulfill: any = values.requirementsToFulfill;
-    setCwRequiremenetsLabelInputField({
-      ...cwRequiremenetsLabelInputField,
-      error: '',
-    });
+    setCwRequiremenetsLabelInputValue(cwRequiremenetsLabelInputValue);
     if (
       values.requirementsToFulfill === REQUIREMENTS_TO_FULFILL.N_REQUIREMENTS
     ) {
-      requirementsToFulfill = validateCustomRequirementsRadioLabelValue(
-        cwRequiremenetsLabelInputField.value,
-      );
-      if (!requirementsToFulfill) return;
+      requirementsToFulfill = parseInt(cwRequiremenetsLabelInputValue);
     }
 
     const formValues = {
@@ -637,36 +585,27 @@ const GroupForm = ({
                   onChange={(e) => {
                     if (e.target.checked) {
                       setIsSelectedCustomRequirementsToFulfillOption(false);
-                      setCwRequiremenetsLabelInputField((prevVal) => ({
-                        ...prevVal,
-                        error: '',
-                      }));
                     }
                   }}
                 />
 
                 <CWRequirementsRadioButton
-                  inputError={cwRequiremenetsLabelInputField.error}
-                  inputValue={cwRequiremenetsLabelInputField.value}
+                  maxRequirements={requirementSubForms.length}
+                  inputValue={cwRequiremenetsLabelInputValue}
                   isSelected={isSelectedCustomRequirementsToFulfillOption}
                   onSelect={() =>
                     setIsSelectedCustomRequirementsToFulfillOption(true)
                   }
                   onInputValueChange={(value) => {
-                    setCwRequiremenetsLabelInputField({
-                      value,
-                      error: '',
-                    });
+                    setCwRequiremenetsLabelInputValue(value);
                   }}
                 />
 
-                {(formState?.errors?.requirementsToFulfill?.message ||
-                  cwRequiremenetsLabelInputField.error) && (
+                {formState?.errors?.requirementsToFulfill?.message && (
                   <MessageRow
                     hasFeedback
                     statusMessage={
-                      formState?.errors?.requirementsToFulfill?.message ||
-                      cwRequiremenetsLabelInputField.error
+                      formState?.errors?.requirementsToFulfill?.message
                     }
                     validationStatus="failure"
                   />

@@ -3,10 +3,10 @@ import {
   PageRequest,
   ProposalSDKType,
   ProposalStatus,
+  numberToLong,
 } from '@hicommonwealth/chains';
 import { logger } from '@hicommonwealth/core';
-import { numberToLong } from '../../../../../../libs/chains/src/cosmos-ts/src/codegen/helpers';
-import { CommunityInstance } from '../../../models/community';
+import { CommunityInstance } from '@hicommonwealth/model';
 import { getCosmosClient } from './getCosmosClient';
 import { numberToUint8ArrayBE, uint8ArrayToNumberBE } from './util';
 
@@ -39,6 +39,12 @@ export async function fetchLatestCosmosProposalV1(
           nextKey = numberToUint8ArrayBE(0);
         }
       } else nextKey = pagination.next_key;
+    }
+
+    // TODO: temp fix to handle chains that return nextKey as a string instead of Uint8Array
+    // Our v1 API needs to handle this better. To be addressed in #6610
+    if (typeof nextKey === 'string') {
+      nextKey = new Uint8Array(Buffer.from(nextKey, 'base64'));
     }
   } while (uint8ArrayToNumberBE(nextKey) > 0);
 

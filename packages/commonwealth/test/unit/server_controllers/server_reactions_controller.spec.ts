@@ -1,9 +1,18 @@
+import { commonProtocol } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { ServerReactionsController } from 'server/controllers/server_reactions_controller';
 import Sinon from 'sinon';
 import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
 
 describe('ServerReactionsController', () => {
+  beforeEach(() => {
+    Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves(
+      '0',
+    );
+  });
+  afterEach(() => {
+    Sinon.restore();
+  });
   describe('#deleteReaction', () => {
     it('should delete a reaction', async () => {
       const sandbox = Sinon.createSandbox();
@@ -17,6 +26,11 @@ describe('ServerReactionsController', () => {
             },
             destroy: sandbox.stub(),
           }),
+        },
+        sequelize: {
+          transaction: async (callback) => {
+            return callback();
+          },
         },
       };
       const banCache = BAN_CACHE_MOCK_FN('ethereum');
@@ -34,6 +48,7 @@ describe('ServerReactionsController', () => {
       await serverReactionsController.deleteReaction({
         user: user as any,
         reactionId: 777,
+        community: { id: 'ethereum' } as any,
         address: address as any,
       });
 
@@ -41,6 +56,7 @@ describe('ServerReactionsController', () => {
         serverReactionsController.deleteReaction({
           user: user as any,
           reactionId: 777,
+          community: { id: 'ethereum' } as any,
           address: {
             ...(address as any),
             address: '0xbanned',
@@ -75,6 +91,7 @@ describe('ServerReactionsController', () => {
           user: user as any,
           reactionId: 888,
           address: address as any,
+          community: { id: 'ethereum' } as any,
         }),
       ).to.be.rejectedWith(`Reaction not found: 888`);
     });
@@ -112,6 +129,7 @@ describe('ServerReactionsController', () => {
           user: user as any,
           reactionId: 999,
           address: address as any,
+          community: { id: 'ethereum' } as any,
         }),
       ).to.be.rejectedWith('Ban error: big ban err');
     });

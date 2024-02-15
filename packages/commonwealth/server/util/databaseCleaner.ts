@@ -1,9 +1,7 @@
-import { RedisCache } from '@hicommonwealth/adapters';
-import { RedisNamespaces, logger } from '@hicommonwealth/core';
-import Rollbar from 'rollbar';
+import { CacheNamespaces, cache, logger } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
-import type { DB } from '../models';
 
 /**
  * This class hosts a series of 'cleaner' functions that delete unnecessary data from the database. The class schedules
@@ -13,8 +11,6 @@ import type { DB } from '../models';
 export default class DatabaseCleaner {
   private readonly log = logger().getLogger(__filename);
   private _models: DB;
-  private _redisCache: RedisCache;
-  private _rollbar?: Rollbar;
   private _timeToRun: Date;
   private _completed = false;
   private _oneRunMax = false;
@@ -23,41 +19,27 @@ export default class DatabaseCleaner {
   // lock times out in 12 hours
   private _lockTimeoutSeconds = 43200;
 
-  public init(models: DB, rollbar?: Rollbar) {
+  public init(models: DB) {
     this._models = models;
-    this._rollbar = rollbar;
   }
 
   /**
    * @param models An instance of the DB containing the sequelize instance and all the models.
    * @param hourToRun A number in [0, 24) indicating the hour in which to run the cleaner. Uses UTC!
-   * @param redisCache An instance of RedisCache used for locking a key that ensures only 1 dbCleaner is running.
-   * @param rollbar A rollbar instance to report errors
    * @param oneRunMax If set to true the database clean will only occur once and will not be re-scheduled
    */
-  public initLoop(
-    models: DB,
-    hourToRun: number,
-    redisCache: RedisCache,
-    rollbar?: Rollbar,
-    oneRunMax = false,
-  ) {
-    this.init(models, rollbar);
-    this._redisCache = redisCache;
+  public initLoop(models: DB, hourToRun: number, oneRunMax = false) {
+    this.init(models);
     this._oneRunMax = oneRunMax;
 
     if (!hourToRun && hourToRun !== 0) {
       this.log.warn(`No hourToRun given. The cleaner will not run.`);
-      this._rollbar?.warn(`No hourToRun given. The cleaner will not run.`);
       return;
     }
 
     if (hourToRun < 0 || hourToRun >= 24) {
       this.log.error(
         `${hourToRun} is not a valid hour. The given hourToRun must be greater than or equal to 0 and less than 24`,
-      );
-      this._rollbar?.error(
-        `The database cleaner failed to initialize. ${hourToRun} is not a valid hour.`,
       );
       return;
     }
@@ -105,14 +87,12 @@ export default class DatabaseCleaner {
       await this.cleanNotifications(this._oneRunMax);
     } catch (e) {
       this.log.error('Failed to clean notifications', e);
-      this._rollbar?.error('Failed to clean notifications', e);
     }
 
     try {
       await this.cleanSubscriptions(this._oneRunMax);
     } catch (e) {
       this.log.error('Failed to clean subscriptions', e);
-      this._rollbar?.error('Failed to clean subscriptions', e);
     }
 
     this.log.info('Database clean-up finished.');
@@ -312,8 +292,8 @@ export default class DatabaseCleaner {
 
   private async acquireLock() {
     // the lock will automatically time out so there is no need to unlock it
-    return await this._redisCache.setKey(
-      RedisNamespaces.Database_Cleaner,
+    return await cache().setKey(
+      CacheNamespaces.Database_Cleaner,
       this._lockName,
       uuidv4(),
       this._lockTimeoutSeconds,
