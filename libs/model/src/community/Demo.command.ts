@@ -10,7 +10,7 @@ export type Demo = z.infer<typeof schema>;
 export const Demo: CommandMetadata<{ numItems: number }, typeof schema> = {
   schema,
   auth: [],
-  body: async ({ id, payload }) => {
+  body: async ({ payload }) => {
     return {
       numItems: payload.numItems,
     };
