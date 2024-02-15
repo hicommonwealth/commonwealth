@@ -107,12 +107,17 @@ const CommunityProfileForm = () => {
         bannerText: values.communityBanner,
       });
 
+      let customStages = values.customStages;
+      if (customStages && customStages.includes("'")) {
+        customStages = customStages.replaceAll("'", '"');
+      }
+
       await community.updateChainData({
         name: values.communityName,
         description: values.communityDescription,
         social_links: links.map((link) => link.value.trim()),
         stagesEnabled: values.hasStagesEnabled,
-        customStages: values.customStages,
+        customStages: customStages ? JSON.parse(customStages) : [],
         iconUrl: values.communityProfileImageURL,
         defaultOverview: values.defaultPage === DefaultPage.Overview,
       });
@@ -154,9 +159,9 @@ const CommunityProfileForm = () => {
           : DefaultPage.Discussions,
         hasStagesEnabled: community.stagesEnabled,
         customStages:
-          community.customStages === 'true' || !community.customStages
-            ? ''
-            : community.customStages,
+          community.customStages.length > 0
+            ? JSON.stringify(community.customStages)
+            : '',
         communityBanner: community.communityBanner || '',
       }}
       validationSchema={communityProfileValidationSchema}
