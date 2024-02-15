@@ -1,7 +1,5 @@
 import { pluralize } from 'helpers';
-import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
-import app from 'state';
 import CommunityInfo from '../../../../../models/ChainInfo';
 import { CWCard } from '../../../../components/component_kit/cw_card';
 import { CWCommunityAvatar } from '../../../../components/component_kit/cw_community_avatar';
@@ -10,21 +8,19 @@ import './CommunityPreviewCard.scss';
 
 type CommunityPreviewCardProps = {
   community: CommunityInfo;
+  monthlyThreadCount?: number;
+  isCommunityMember?: boolean;
+  hasUnseenPosts?: boolean;
+  onClick?: () => any;
 };
 
-const CommunityPreviewCard = ({ community }: CommunityPreviewCardProps) => {
-  const navigate = useCommonNavigate();
-
-  const { unseenPosts } = app.user;
-  const visitedChain = !!unseenPosts[community.id];
-  const monthlyThreadCount = app.recentActivity.getCommunityThreadCount(
-    community.id,
-  );
-  const isMember = app.roles.isMember({
-    account: app.user.activeAccount,
-    community: community.id,
-  });
-
+const CommunityPreviewCard = ({
+  community,
+  monthlyThreadCount,
+  isCommunityMember,
+  hasUnseenPosts,
+  onClick,
+}: CommunityPreviewCardProps) => {
   return (
     <CWCard
       className="CommunityPreviewCard"
@@ -32,7 +28,7 @@ const CommunityPreviewCard = ({ community }: CommunityPreviewCardProps) => {
       interactive
       onClick={(e) => {
         e.preventDefault();
-        navigate(`/${community.id}`);
+        onClick?.();
       }}
     >
       <div className="card-top">
@@ -44,18 +40,13 @@ const CommunityPreviewCard = ({ community }: CommunityPreviewCardProps) => {
       <CWText className="card-subtext" type="b2">
         {community.description}
       </CWText>
-      {/* if no recently active threads, hide this module altogether */}
-      {!!monthlyThreadCount && (
+      {monthlyThreadCount > 0 && (
         <>
           <CWText className="card-subtext" type="b2" fontWeight="medium">
             {`${pluralize(monthlyThreadCount, 'new thread')} this month`}
           </CWText>
-          {isMember && (
-            <>
-              {app.isLoggedIn() && !visitedChain && (
-                <CWText className="new-activity-tag">New</CWText>
-              )}
-            </>
+          {isCommunityMember && hasUnseenPosts && (
+            <CWText className="new-activity-tag">New</CWText>
           )}
         </>
       )}

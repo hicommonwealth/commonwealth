@@ -17,7 +17,28 @@ export const TrendingCommunitiesPreview = () => {
       return threadCountB - threadCountA;
     })
     .map((community, i) => {
-      return <CommunityPreviewCard key={i} community={community} />;
+      const monthlyThreadCount = app.recentActivity.getCommunityThreadCount(
+        community.id,
+      );
+      const isMember = app.roles.isMember({
+        account: app.user.activeAccount,
+        community: community.id,
+      });
+      const { unseenPosts } = app.user;
+      const hasVisitedCommunity = !!unseenPosts[community.id];
+
+      return (
+        <CommunityPreviewCard
+          key={i}
+          community={community}
+          monthlyThreadCount={monthlyThreadCount}
+          isCommunityMember={isMember}
+          hasUnseenPosts={app.isLoggedIn() && !hasVisitedCommunity}
+          onClick={() => {
+            navigate(`/${community.id}`);
+          }}
+        />
+      );
     });
 
   return (
