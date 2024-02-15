@@ -1,3 +1,4 @@
+import { String } from 'aws-sdk/clients/apigateway';
 import { AbiItem } from 'web3-utils';
 import { namespaceFactoryAbi } from './Abi/NamespaceFactoryAbi';
 import { reservationHookAbi } from './Abi/ReservationHookAbi';
@@ -21,8 +22,11 @@ class NamespaceFactory extends ContractBase {
    * Initializes wallet and contracts.
    * This must be called after instantiation before other methods are available.
    */
-  async initialize(withWallet: boolean = false): Promise<void> {
-    await super.initialize(withWallet);
+  async initialize(
+    withWallet: boolean = false,
+    chainId?: string,
+  ): Promise<void> {
+    await super.initialize(withWallet, chainId);
     const addr = await this.contract.methods.reservationHook().call();
     if (addr.toLowerCase() !== '0x0000000000000000000000000000000000000000') {
       this.reservationHook = new this.web3.eth.Contract(
@@ -81,9 +85,10 @@ class NamespaceFactory extends ContractBase {
     name: string,
     walletAddress: string,
     feeManager: string,
+    chainId: String,
   ): Promise<any> {
     if (!this.initialized || !this.walletEnabled) {
-      await this.initialize(true);
+      await this.initialize(true, chainId);
     }
     // Check if name is available
     const namespaceStatus = await this.checkNamespaceReservation(name);
@@ -116,10 +121,12 @@ class NamespaceFactory extends ContractBase {
     name: string,
     stakesId: number,
     walletAddress: string,
+    chainId: string,
   ): Promise<any> {
     if (!this.initialized || !this.walletEnabled) {
-      await this.initialize(true);
+      await this.initialize(true, chainId);
     }
+
     let txReceipt;
     try {
       txReceipt = await this.contract.methods

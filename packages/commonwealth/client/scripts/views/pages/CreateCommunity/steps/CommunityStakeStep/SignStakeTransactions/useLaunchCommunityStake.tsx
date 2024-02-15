@@ -9,6 +9,7 @@ interface UseLaunchCommunityStakeProps {
   communityId: string;
   goToSuccessStep: () => void;
   selectedAddress: string;
+  chainId: string;
 }
 
 const useLaunchCommunityStake = ({
@@ -16,6 +17,7 @@ const useLaunchCommunityStake = ({
   communityId,
   goToSuccessStep,
   selectedAddress,
+  chainId,
 }: UseLaunchCommunityStakeProps) => {
   const [launchStakeData, setLaunchStakeData] =
     useState<ActionState>(defaultActionState);
@@ -34,6 +36,7 @@ const useLaunchCommunityStake = ({
         namespace,
         commonProtocol.STAKE_ID,
         selectedAddress,
+        chainId,
       );
 
       await updateCommunityStake({

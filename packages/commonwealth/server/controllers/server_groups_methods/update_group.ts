@@ -12,7 +12,7 @@ import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/typ
 import validateMetadata from '../../util/requirementsModule/validateMetadata';
 import validateRequirements from '../../util/requirementsModule/validateRequirements';
 import { validateOwner } from '../../util/validateOwner';
-import { TrackOptions } from '../server_analytics_methods/track';
+import { TrackOptions } from '../server_analytics_controller';
 import { ServerGroupsController } from '../server_groups_controller';
 
 const Errors = {
