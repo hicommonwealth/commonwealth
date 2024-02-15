@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { CWCheckbox } from '../component_kit/cw_checkbox';
-import { CWShareIcon } from '../component_kit/cw_icons/cw_custom_icons';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
 import { CWButton } from '../component_kit/new_designs/cw_button';
 import './AddToHomeScreenPrompt.scss';
@@ -55,7 +55,8 @@ export const AddToHomeScreenPrompt = ({
           </CWText>
           <div className="instructions">
             <CWText className="instruction">
-              1. Tap the share <CWShareIcon /> icon below
+              1. Tap the share{' '}
+              <CWIcon className="share-icon" iconName="export" /> icon below
             </CWText>
             <CWText className="instruction">
               2. Select <span className="highlight">Add to Home Screen</span>

@@ -28,7 +28,7 @@
 
     .title {
       color: $neutral-900;
-      font-family: Silka;
+      font-family: $font-family-silka;
       font-size: 18px;
       font-style: normal;
       font-weight: 500;
@@ -38,7 +38,7 @@
   }
 
   .prompt-content {
-    background-color: #fff;
+    background-color: $white;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
       0 2px 4px -1px rgba(0, 0, 0, 0.06);
     padding: 16px;
@@ -46,7 +46,7 @@
 
     .description {
       margin-top: 16px;
-      color: var(--Neutrals-500, #656167);
+      color: $neutral-500;
       font-variant-numeric: lining-nums tabular-nums;
       font-size: 14px;
       font-style: normal;
@@ -63,9 +63,9 @@
         display: flex;
         margin: 8px 0px;
         font-size: 14px;
-        color: var(--Neutrals-900, #141315);
+        color: $neutral-900;
         font-variant-numeric: lining-nums tabular-nums;
-        font-family: NeueHaasUnica;
+        font-family: $font-family-neue-haas-unica;
         font-size: 14px;
         font-style: normal;
         font-weight: 400;
@@ -74,13 +74,17 @@
         align-items: flex-start;
         gap: 3px;
         align-self: stretch;
+
+        .share-icon {
+          color: $primary-500;
+        }
       }
     }
 
     .hide-prompt {
       font-variant-numeric: lining-nums tabular-nums;
       font-size: 14px;
-      font-family: NeueHaasUnica;
+      font-family: $font-family-neue-haas-unica;
       font-style: normal;
       font-weight: 400;
       line-height: 24px;
@@ -123,7 +127,7 @@
       color: $neutral-900;
       text-align: center;
       font-variant-numeric: lining-nums tabular-nums;
-      font-family: 'Roboto';
+      font-family: $font-family-roboto;
       font-size: 16px;
       font-style: normal;
       font-weight: 400;
@@ -134,7 +138,7 @@
       color: $neutral-500;
       text-align: center;
       font-variant-numeric: lining-nums tabular-nums;
-      font-family: 'Roboto';
+      font-family: $font-family-roboto;
       font-size: 12px;
       font-style: normal;
       font-weight: 400;
@@ -154,18 +158,18 @@
     text-align: right;
     font-variant-numeric: lining-nums tabular-nums;
     font-family: 'Roboto';
-    font-size: 16px !important;
+    font-size: 16px;
     font-style: normal;
     font-weight: 500;
     line-height: 24px;
     letter-spacing: 0.16px;
-    background-color: white !important;
-    padding: 0px !important;
-    margin: 0px !important;
+    background-color: $white;
+    padding: 0px;
+    margin: 0px;
   }
 
   .prompt-content {
-    background-color: #fff;
+    background-color: $white;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
       0 2px 4px -1px rgba(0, 0, 0, 0.06);
     padding: 8px 24px 8px;
@@ -174,7 +178,7 @@
     margin-right: 18px;
 
     .title {
-      font-family: 'Roboto';
+      font-family: $font-family-roboto;
       font-size: 24px;
       font-style: normal;
       font-weight: 400;
@@ -189,7 +193,7 @@
       align-self: stretch;
       color: $neutral-900;
       font-variant-numeric: lining-nums tabular-nums;
-      font-family: 'Roboto';
+      font-family: $font-family-roboto;
       font-size: 16px;
       font-style: normal;
       font-weight: 400;
@@ -202,7 +206,7 @@
       margin-top: 16px;
       color: $neutral-900;
       font-variant-numeric: lining-nums tabular-nums;
-      font-family: 'Roboto';
+      font-family: $font-family-roboto;
       font-size: 16px !important;
       font-style: normal;
       font-weight: 400;
