@@ -5,7 +5,6 @@ import useSidebarStore from 'state/ui/sidebar';
 
 import { WalletSsoSource } from '@hicommonwealth/core';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import useUserMenuItems from 'views/components/SublayoutHeader/UserDropdown/useUserMenuItems';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import MenuContent from 'views/components/component_kit/CWPopoverMenu/MenuContent';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
@@ -14,6 +13,8 @@ import CWDrawer from 'views/components/component_kit/new_designs/CWDrawer';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import CollapsableSidebarButton from 'views/components/sidebar/CollapsableSidebarButton';
 import { User } from 'views/components/user/user';
+
+import useUserMenuItems from '../useUserMenuItems';
 
 import './MobileHeader.scss';
 

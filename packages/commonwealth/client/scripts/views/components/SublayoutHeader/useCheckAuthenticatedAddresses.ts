@@ -1,6 +1,7 @@
+import { useEffect, useState } from 'react';
+
 import { ChainBase } from '@hicommonwealth/core';
 import { chainBaseToCanvasChainId } from 'canvas';
-import { useEffect, useState } from 'react';
 import app from 'state';
 
 interface UseCheckAuthenticatedAddressesProps {

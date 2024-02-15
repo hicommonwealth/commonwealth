@@ -2,7 +2,10 @@ import clsx from 'clsx';
 import React from 'react';
 import app from 'state';
 
-import UserDropdown from 'views/components/SublayoutHeader/UserDropdown';
+import { WalletSsoSource } from '@hicommonwealth/core';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { useCommonNavigate } from 'navigation/helpers';
+import useSidebarStore from 'state/ui/sidebar';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { isWindowSmallInclusive } from 'views/components/component_kit/helpers';
@@ -13,10 +16,8 @@ import { CreateContentPopover } from 'views/menus/create_content_menu';
 import { HelpMenuPopover } from 'views/menus/help_menu';
 import { NotificationsMenuPopover } from 'views/menus/notifications_menu';
 
-import { WalletSsoSource } from '@hicommonwealth/core';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import { useCommonNavigate } from 'navigation/helpers';
-import useSidebarStore from 'state/ui/sidebar';
+import UserDropdown from '../UserDropdown';
+
 import './DesktopHeader.scss';
 
 interface DesktopHeaderProps {

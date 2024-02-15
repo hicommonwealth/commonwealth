@@ -3,14 +3,15 @@ import React, { useEffect, useState } from 'react';
 import { WalletSsoSource } from '@hicommonwealth/core';
 import { useFlag } from 'hooks/useFlag';
 import useSidebarStore from 'state/ui/sidebar';
-import DesktopHeader from 'views/components/SublayoutHeader/DesktopHeader';
-import MobileHeader from 'views/components/SublayoutHeader/MobileHeader';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { AuthModal } from 'views/modals/AuthModal';
 import SessionRevalidationModal from 'views/modals/SessionRevalidationModal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
 import { LoginModal } from 'views/modals/login_modal';
+
+import DesktopHeader from './DesktopHeader';
+import MobileHeader from './MobileHeader';
 
 type SublayoutHeaderProps = {
   onMobile: boolean;

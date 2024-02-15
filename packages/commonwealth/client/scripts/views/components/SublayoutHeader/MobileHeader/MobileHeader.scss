@@ -46,6 +46,10 @@
     border-radius: 0 !important;
     border-width: 0 !important;
     box-shadow: unset !important;
-    padding-block: 8px;
+    padding: 8px;
+
+    .menu-item-text {
+      width: 100%;
+    }
   }
 }

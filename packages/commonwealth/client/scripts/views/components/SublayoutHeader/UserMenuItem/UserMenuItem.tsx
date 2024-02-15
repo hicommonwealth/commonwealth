@@ -1,24 +1,27 @@
 import clsx from 'clsx';
-import { formatAddressShort } from 'helpers';
 import React from 'react';
+
+import { formatAddressShort } from 'helpers';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
-import './UserDropdownItem.scss';
 
-interface UserDropdownItemProps {
+import './UserMenuItem.scss';
+
+interface UserMenuItem {
   username?: string;
   address?: string;
   isSignedIn: boolean;
   hasJoinedCommunity: boolean;
 }
-export const UserDropdownItem = ({
+
+const UserMenuItem = ({
   username,
   address,
   isSignedIn,
   hasJoinedCommunity,
-}: UserDropdownItemProps) => {
+}: UserMenuItem) => {
   return (
-    <div className={clsx('UserDropdownItem', { isSignedIn })}>
+    <div className={clsx('UserMenuItem', { isSignedIn })}>
       <CWText type="b2" className="identification">
         {username || formatAddressShort(address, 6)}
       </CWText>
@@ -31,3 +34,5 @@ export const UserDropdownItem = ({
     </div>
   );
 };
+
+export default UserMenuItem;
