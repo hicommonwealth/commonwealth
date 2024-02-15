@@ -23,9 +23,6 @@
     gap: 16px;
     align-self: stretch;
 
-    .icon {
-    }
-
     .title {
       color: $neutral-900;
       font-family: $font-family-silka;
@@ -83,8 +80,8 @@
 
     .hide-prompt {
       font-variant-numeric: lining-nums tabular-nums;
-      font-size: 14px;
-      font-family: $font-family-neue-haas-unica;
+      font-size: 14px !important;
+      font-family: $font-family-neue-haas-unica !important;
       font-style: normal;
       font-weight: 400;
       line-height: 24px;
@@ -206,7 +203,7 @@
       margin-top: 16px;
       color: $neutral-900;
       font-variant-numeric: lining-nums tabular-nums;
-      font-family: $font-family-roboto;
+      font-family: $font-family-roboto !important;
       font-size: 16px !important;
       font-style: normal;
       font-weight: 400;

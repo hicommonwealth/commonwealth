@@ -65,7 +65,7 @@ export const AddToHomeScreenPrompt = ({
           <CWButton
             buttonType="tertiary"
             label="Show less often"
-            className="hide-prompt"
+            containerClassName="hide-prompt"
             onClick={() => hidePromptForNDays()}
           />
         </div>
