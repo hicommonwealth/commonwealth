@@ -10,7 +10,7 @@ import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/typ
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';
 import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
 import { findOneRole } from '../../util/roles';
-import { TrackOptions } from '../server_analytics_methods/track';
+import { TrackOptions } from '../server_analytics_controller';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 export const Errors = {

@@ -1,4 +1,4 @@
-import { CacheNamespaces } from '../types';
+import { AnalyticsOptions, CacheNamespaces } from '../types';
 
 /**
  * Resource disposer function
@@ -103,4 +103,11 @@ export interface Cache extends Disposable {
     key: string,
     ttlInSeconds: number,
   ): Promise<boolean>;
+}
+
+/**
+ * Analytics port
+ */
+export interface Analytics extends Disposable {
+  track(event: string, payload: AnalyticsOptions): void;
 }
