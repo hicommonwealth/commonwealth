@@ -1,24 +1,22 @@
 @import '../../shared';
 
 .UserDashboard {
-  display: flex;
-  flex: 1;
+  display: grid;
   justify-content: space-between;
-  width: auto;
-  z-index: 0;
+  width: 100%;
+  grid-template-columns: 1fr;
   @media (min-width: $breakpoint-medium-min-px) {
-    /* CommunityPreviewCard 392px width +
-       TrendingCommunitiesPreview 50px right edge */
-    margin-right: 442px;
+    grid-template-columns: 1fr 392px;
+    padding-right: 48px;
   }
 
-  @include contentPadding;
-
-  .dashboard-column {
+  .user-dashboard-activity {
     display: flex;
     flex-direction: column;
     width: 100%;
     min-width: 0;
+
+    @include contentPadding;
 
     .dashboard-header {
       display: flex;

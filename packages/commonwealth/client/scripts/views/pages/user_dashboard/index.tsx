@@ -71,7 +71,7 @@ const UserDashboard = (props: UserDashboardProps) => {
 
   return (
     <div ref={setScrollElement} className="UserDashboard" key={`${isLoggedIn}`}>
-      <div className="dashboard-column">
+      <div className="user-dashboard-activity">
         <div className="dashboard-header">
           <CWText type="h2" fontWeight="medium">
             Home
