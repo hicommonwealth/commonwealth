@@ -39,7 +39,7 @@ module.exports = {
       await queryInterface.sequelize.query(
         `
         ALTER TABLE "Communities"
-        ADD COLUMN temp_custom_stages TEXT[] DEFAULT '{}';
+        ADD COLUMN temp_custom_stages TEXT[];
       `,
         { transaction },
       );
@@ -133,9 +133,18 @@ module.exports = {
         { transaction },
       );
 
+      await queryInterface.sequelize.query(
+        `
+        ALTER TABLE "Communities"
+        ALTER COLUMN "temp_custom_stages" SET DEFAULT '{}';
+    `,
+        { transaction },
+      );
+
       await queryInterface.removeColumn('Communities', 'custom_stages', {
         transaction,
       });
+
       await queryInterface.renameColumn(
         'Communities',
         'temp_custom_stages',
