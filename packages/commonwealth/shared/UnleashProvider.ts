@@ -1,8 +1,6 @@
 import {
-  EvaluationContext,
   GeneralError,
   JsonValue,
-  Logger,
   Provider,
   ProviderMetadata,
   ProviderStatus,
@@ -29,14 +27,13 @@ export class UnleashProvider implements Provider {
     await this.client.start();
     this.flags = this.client.getAllToggles();
     this.status = ProviderStatus.READY;
+    console.log(this.flags);
   }
 
   resolveBooleanEvaluation(
     flagKey: string,
     defaultValue: boolean,
-    context: EvaluationContext,
   ): ResolutionDetails<boolean> {
-    let retVal: ResolutionDetails<boolean>;
     if (
       this.status === ProviderStatus.NOT_READY ||
       this.status !== ProviderStatus.READY
@@ -53,8 +50,6 @@ export class UnleashProvider implements Provider {
   resolveStringEvaluation(
     flagKey: string,
     defaultValue: string,
-    context: EvaluationContext,
-    logger: Logger,
   ): ResolutionDetails<string> {
     throw new GeneralError('string evaluation not supported, implement');
 
@@ -64,8 +59,6 @@ export class UnleashProvider implements Provider {
   resolveNumberEvaluation(
     flagKey: string,
     defaultValue: number,
-    context: EvaluationContext,
-    logger: Logger,
   ): ResolutionDetails<number> {
     throw new GeneralError('number evaluation not supported, implement');
 
@@ -75,8 +68,6 @@ export class UnleashProvider implements Provider {
   resolveObjectEvaluation<U extends JsonValue>(
     flagKey: string,
     defaultValue: U,
-    context: EvaluationContext,
-    logger: Logger,
   ): ResolutionDetails<U> {
     throw new GeneralError('object evaluation not supported, implement');
 

@@ -25,7 +25,7 @@ const Splash = () => {
 const unleashConfig = {
   url: process.env.UNLEASH_FRONTEND_SERVER_URL,
   clientKey: process.env.UNLEASH_FRONTEND_API_TOKEN,
-  refreshInterval: 15,
+  refreshInterval: 120,
   appName: 'commonwealth-web',
 };
 
