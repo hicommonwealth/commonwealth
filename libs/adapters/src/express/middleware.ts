@@ -1,6 +1,8 @@
 import {
+  AnalyticsOptions,
   INVALID_ACTOR_ERROR,
   INVALID_INPUT_ERROR,
+  analytics,
   stats,
 } from '@hicommonwealth/core';
 import { NextFunction, Request, Response } from 'express';
@@ -63,3 +65,32 @@ export const errorMiddleware = (
   }
   res.status(response.status).send(response);
 };
+
+/**
+ * Captures analytics
+ */
+export function analyticsMiddleware<T>(
+  event: any,
+  transformer: (payload: T) => AnalyticsOptions,
+) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // override res.json
+      const originalResJson = res.json;
+
+      let payload: T | null = null;
+
+      res.json = function (data: T) {
+        payload = data;
+        return originalResJson.call(res, data);
+      };
+
+      res.on('finish', () => {
+        analytics().track(event, transformer(payload));
+      });
+    } catch (err: unknown) {
+      console.error(err); // don't use logger port here
+    }
+    next();
+  };
+}
