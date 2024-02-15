@@ -1,15 +1,15 @@
 import React from 'react';
 
-import 'components/community_card.scss';
+import './CommunityCard.scss';
 
 import { isCommandClick } from 'helpers';
 import { useCommonNavigate } from 'navigation/helpers';
-import type ChainInfo from '../../models/ChainInfo';
-import { CWButton } from './component_kit/cw_button';
-import { CWCard } from './component_kit/cw_card';
-import { CWCommunityAvatar } from './component_kit/cw_community_avatar';
-import { CWIconButton } from './component_kit/cw_icon_button';
-import { CWText } from './component_kit/cw_text';
+import type ChainInfo from '../../../models/ChainInfo';
+import { CWButton } from '../component_kit/cw_button';
+import { CWCard } from '../component_kit/cw_card';
+import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
+import { CWIconButton } from '../component_kit/cw_icon_button';
+import { CWText } from '../component_kit/cw_text';
 
 type CommunityCardProps = { community: ChainInfo };
 
