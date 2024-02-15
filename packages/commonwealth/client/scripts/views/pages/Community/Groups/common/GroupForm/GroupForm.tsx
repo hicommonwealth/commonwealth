@@ -1,9 +1,5 @@
 /* eslint-disable react/no-multi-comp */
-import { setupWasmExtension } from '@cosmjs/cosmwasm-stargate';
-import { QueryClient } from '@cosmjs/stargate';
-import { HttpClient, Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import axios from 'axios';
-import { ethers } from 'ethers';
 import { isValidEthAddress } from 'helpers/validateTypes';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -29,6 +25,13 @@ import {
   conditionTypes,
 } from '../../../common/constants';
 import TopicGatingHelpMessage from '../../TopicGatingHelpMessage';
+import {
+  getCosmosContractType,
+  getEVMContractType,
+  getErc20Decimals,
+  isCosmosAddressContract,
+  isEVMAddressContract,
+} from '../helpers';
 import './GroupForm.scss';
 import RequirementSubForm from './RequirementSubForm';
 import {
@@ -62,140 +65,6 @@ interface Cw721Metadata {
   name: string;
   symbol: string;
   // Add other CW721 specific fields
-}
-
-const Abis = {
-  ERC20: ['function decimals() view returns (uint256)'],
-  ERC721: ['function balanceOf(address owner) view returns (uint256)'],
-  ERC1155: [
-    'function isApprovedForAll(address account, address operator) view returns (bool)',
-  ],
-};
-
-async function getErc20Decimals(
-  address: string,
-  network_url,
-): Promise<number | null> {
-  try {
-    const provider = new ethers.providers.JsonRpcProvider(network_url);
-
-    const contractERC20 = new ethers.Contract(address, Abis.ERC20, provider);
-
-    const decimals = await contractERC20.decimals();
-    return decimals;
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
-}
-
-async function isEVMAddressContract(
-  address: string,
-  network_url: string,
-): Promise<boolean> {
-  const provider = new ethers.providers.JsonRpcProvider(network_url);
-  try {
-    const code = await provider.getCode(address);
-    return code !== '0x';
-  } catch (error) {
-    console.error('Error checking address:', error);
-    return false;
-  }
-}
-
-async function isCosmosAddressContract(
-  address: string,
-  network_url: string,
-): Promise<boolean> {
-  try {
-    const client = new HttpClient(network_url);
-    const tmClient = await Tendermint34Client.create(client);
-    const api = QueryClient.withExtensions(tmClient, setupWasmExtension);
-
-    const contractInfo = await api.wasm.getContractInfo(address);
-    if (contractInfo) {
-      return true;
-    } else {
-      return false;
-    }
-  } catch (error) {
-    return false;
-  }
-}
-
-const getEVMContractType = async (
-  contractAddress,
-  network_url,
-): Promise<string | null> => {
-  const provider = new ethers.providers.JsonRpcProvider(network_url);
-
-  const contractERC20 = new ethers.Contract(
-    contractAddress,
-    Abis.ERC20,
-    provider,
-  );
-  const contractERC721 = new ethers.Contract(
-    contractAddress,
-    Abis.ERC721,
-    provider,
-  );
-  const contractERC1155 = new ethers.Contract(
-    contractAddress,
-    Abis.ERC1155,
-    provider,
-  );
-
-  try {
-    // Check for ERC20
-    await contractERC20.decimals();
-    return 'erc20';
-  } catch (e) {
-    /* Not ERC20 */
-  }
-
-  try {
-    // Check for ERC721
-    await contractERC721.balanceOf(ethers.constants.AddressZero);
-    return 'erc721';
-  } catch (e) {
-    /* Not ERC721 */
-  }
-
-  try {
-    // Check for ERC1155
-    await contractERC1155.isApprovedForAll(
-      ethers.constants.AddressZero,
-      ethers.constants.AddressZero,
-    );
-    return 'erc1155';
-  } catch (e) {
-    /* Not ERC1155 */
-  }
-
-  console.log(
-    'Contract type is unknown or does not implement standard interfaces.',
-  );
-  return null;
-};
-
-async function getCosmosContractType(
-  address: string,
-  network_url: string,
-): Promise<string | null> {
-  try {
-    const client = new HttpClient(network_url);
-    const tmClient = await Tendermint34Client.create(client);
-    const api = QueryClient.withExtensions(tmClient, setupWasmExtension);
-
-    const contractInfo = await api.wasm.getContractInfo(address);
-    if (contractInfo && contractInfo.contractInfo.codeId.equals(49)) {
-      return 'cw721';
-    } else {
-      return null;
-    }
-  } catch (error) {
-    return null;
-  }
 }
 
 const CWRequirementsRadioButton = ({
