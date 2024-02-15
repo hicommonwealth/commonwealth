@@ -13,7 +13,7 @@ import {
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
 import { Feed } from '../../components/feed';
-import { DashboardCommunitiesPreview } from './dashboard_communities_preview';
+import { TrendingCommunitiesPreview } from './TrendingCommunitiesPreview';
 import { fetchActivity } from './helpers';
 
 export enum DashboardViews {
@@ -134,7 +134,7 @@ const UserDashboard = (props: UserDashboardProps) => {
           )}
         </>
       </div>
-      <DashboardCommunitiesPreview />
+      <TrendingCommunitiesPreview />
     </div>
   );
 };

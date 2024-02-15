@@ -2,10 +2,11 @@ import { pluralize } from 'helpers';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
-import CommunityInfo from '../../../models/ChainInfo';
-import { CWCard } from '../../components/component_kit/cw_card';
-import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
-import { CWText } from '../../components/component_kit/cw_text';
+import CommunityInfo from '../../../../../models/ChainInfo';
+import { CWCard } from '../../../../components/component_kit/cw_card';
+import { CWCommunityAvatar } from '../../../../components/component_kit/cw_community_avatar';
+import { CWText } from '../../../../components/component_kit/cw_text';
+import './CommunityPreviewCard.scss';
 
 type CommunityPreviewCardProps = {
   community: CommunityInfo;
@@ -62,4 +63,4 @@ const CommunityPreviewCard = ({ community }: CommunityPreviewCardProps) => {
   );
 };
 
-export default CommunityPreviewCard;
+export { CommunityPreviewCard };

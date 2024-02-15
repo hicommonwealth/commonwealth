@@ -1,12 +1,12 @@
 import { useCommonNavigate } from 'navigation/helpers';
-import 'pages/user_dashboard/dashboard_communities_preview.scss';
 import React from 'react';
 import app from 'state';
-import { CWButton } from '../../components/component_kit/cw_button';
-import { CWText } from '../../components/component_kit/cw_text';
-import CommunityPreviewCard from './CommunityPreviewCard';
+import { CWButton } from '../../../components/component_kit/cw_button';
+import { CWText } from '../../../components/component_kit/cw_text';
+import { CommunityPreviewCard } from './CommunityPreviewCard';
+import './TrendingCommunitiesPreview.scss';
 
-export const DashboardCommunitiesPreview = () => {
+export const TrendingCommunitiesPreview = () => {
   const navigate = useCommonNavigate();
 
   const sortedCommunities = app.config.chains
@@ -21,9 +21,9 @@ export const DashboardCommunitiesPreview = () => {
     });
 
   return (
-    <div className="DashboardCommunitiesPreview">
+    <div className="TrendingCommunitiesPreview">
       <CWText type="h4" className="header">
-        Suggested Communities
+        Trending Communities
       </CWText>
       <div className="community-preview-cards-collection">
         {sortedCommunities.length > 3

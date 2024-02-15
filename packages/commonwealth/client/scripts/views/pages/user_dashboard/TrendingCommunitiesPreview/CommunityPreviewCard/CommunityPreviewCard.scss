@@ -1,4 +1,4 @@
-@import '../../shared';
+@import '../../../../../../styles/shared';
 
 .CommunityPreviewCard.Card {
   display: flex;
@@ -31,36 +31,5 @@
     border-radius: $border-radius-rounded-corners;
     color: $white;
     padding: 2px 8px;
-  }
-}
-
-.DashboardCommunitiesPreview {
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-  position: fixed;
-  right: 50px;
-  float: right;
-  top: 100px;
-  z-index: 1;
-  flex-grow: 1;
-  overflow-y: auto;
-  max-height: 100vh;
-  padding-bottom: 100px;
-
-  @include mediumSmallInclusive {
-    display: none;
-  }
-
-  .community-preview-cards-collection {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .buttons {
-    display: flex;
-    gap: 16px;
-    justify-content: center;
   }
 }
