@@ -29,7 +29,7 @@ export const expressCommand =
         actor: { user: req.user as User, address_id: req.body.address_id },
         payload: req.body,
       });
-      res.json(results);
+      return res.json(results);
     } catch (error) {
       next(error);
     }
