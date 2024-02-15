@@ -26,6 +26,7 @@ import {
 } from '../../../components/component_kit/new_designs/CWTabs';
 import { EVMWalletsSubModal } from '../EVMWalletsSubModal';
 import { EmailForm } from '../EmailForm';
+import { MobileWalletConfirmationSubModal } from '../MobileWalletConfirmationSubModal';
 import { AuthModalTabs, BaseModalProps } from '../types';
 import './BaseModal.scss';
 
@@ -47,10 +48,12 @@ const BaseModal = ({ onClose, onSuccess, showWalletsFor }: BaseModalProps) => {
     wallets = [],
     isMagicLoading,
     isWalletConnectEnabled,
+    isMobileWalletVerificationStep,
     onResetWalletConnect,
     onEmailLogin,
     onWalletSelect,
     onSocialLogin,
+    onVerifyMobileWalletSignature,
   } = useWallets({
     onModalClose: handleClose,
     onSuccess,
@@ -242,6 +245,12 @@ const BaseModal = ({ onClose, onSuccess, showWalletsFor }: BaseModalProps) => {
         disabled={isMagicLoading}
         canResetWalletConnect={isWalletConnectEnabled}
         onResetWalletConnect={onResetWalletConnect}
+      />
+      {/* Signature verification modal is only displayed on mobile */}
+      <MobileWalletConfirmationSubModal
+        isOpen={isMobileWalletVerificationStep}
+        onClose={handleClose}
+        onSignatureConfirmation={onVerifyMobileWalletSignature}
       />
     </>
   );

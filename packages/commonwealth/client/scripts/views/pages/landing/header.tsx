@@ -63,6 +63,7 @@ export const Header = ({ onLogin }: HeaderProps) => {
         <AuthModal
           onClose={() => setIsAuthModalOpen(false)}
           isOpen={isAuthModalOpen}
+          onSuccess={onLogin}
         />
       )}
     </>

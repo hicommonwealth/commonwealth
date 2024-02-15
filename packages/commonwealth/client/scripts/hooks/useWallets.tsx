@@ -641,16 +641,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
         setSignerAccount(signingAccount);
         setIsNewlyCreated(newlyCreated);
         setIsLinkingOnMobile(isLinkingWallet);
-        if (featureFlags.newSignInModal) {
-          onAccountVerified(
-            signingAccount,
-            newlyCreated,
-            isLinkingWallet,
-            wallet,
-          );
-        } else {
-          setActiveStep('redirectToSign');
-        }
+        setActiveStep('redirectToSign');
       } else {
         onAccountVerified(
           signingAccount,
@@ -733,15 +724,29 @@ const useWallets = (walletProps: IuseWalletProps) => {
       if (setSignerAccount) setSignerAccount(account);
       if (setIsNewlyCreated) setIsNewlyCreated(false);
       if (setIsLinkingOnMobile) setIsLinkingOnMobile(false);
-      if (featureFlags.newSignInModal) {
-        onAccountVerified(account, false, false);
-      } else {
-        setActiveStep('redirectToSign');
-      }
+      setActiveStep('redirectToSign');
       return;
     } else {
       onAccountVerified(account, false, false);
     }
+  };
+
+  const [isMobileWalletVerificationStep, setIsMobileWalletVerificationStep] =
+    useState(false);
+  useEffect(() => {
+    setIsMobileWalletVerificationStep(
+      isMobile && activeStep === 'redirectToSign',
+    );
+  }, [isMobile, activeStep]);
+  const onVerifyMobileWalletSignature = async () => {
+    await onAccountVerified(
+      signerAccount,
+      isNewlyCreated,
+      isLinkingWallet,
+      selectedWallet,
+    );
+    setIsMobileWalletVerificationStep(false);
+    await walletProps?.onModalClose?.();
   };
 
   return {
@@ -775,6 +780,8 @@ const useWallets = (walletProps: IuseWalletProps) => {
     setUsername,
     setSidebarType,
     onSessionKeyRevalidation,
+    isMobileWalletVerificationStep,
+    onVerifyMobileWalletSignature,
   };
 };
 
