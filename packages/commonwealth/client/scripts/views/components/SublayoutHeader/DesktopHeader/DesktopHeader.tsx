@@ -29,12 +29,14 @@ interface DesktopHeaderProps {
     walletSsoSource: WalletSsoSource;
     walletAddress: string;
   }) => void;
+  onFeedbackModalOpen: (open: boolean) => void;
 }
 
 const DesktopHeader = ({
   onMobile,
   onAuthModalOpen,
   onRevalidationModalData,
+  onFeedbackModalOpen,
 }: DesktopHeaderProps) => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
@@ -119,7 +121,7 @@ const DesktopHeader = ({
             )}
           />
 
-          <HelpMenuPopover />
+          <HelpMenuPopover onFeedbackModalOpen={onFeedbackModalOpen} />
 
           {isLoggedIn && <NotificationsMenuPopover />}
         </div>

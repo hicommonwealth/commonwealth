@@ -6,6 +6,7 @@ import useSidebarStore from 'state/ui/sidebar';
 import { WalletSsoSource } from '@hicommonwealth/core';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import useUserMenuItems from 'views/components/SublayoutHeader/UserDropdown/useUserMenuItems';
+import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import MenuContent from 'views/components/component_kit/CWPopoverMenu/MenuContent';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -27,6 +28,7 @@ interface MobileHeaderProps {
     walletSsoSource: WalletSsoSource;
     walletAddress: string;
   }) => void;
+  onFeedbackModalOpen: (open: boolean) => void;
 }
 
 const MobileHeader = ({
@@ -34,6 +36,7 @@ const MobileHeader = ({
   onAuthModalOpen,
   isInsideCommunity,
   onRevalidationModalData,
+  onFeedbackModalOpen,
 }: MobileHeaderProps) => {
   const [isUserDrawerOpen, setIsUserDrawerOpen] = useState(false);
   const { isLoggedIn } = useUserLoggedIn();
@@ -51,6 +54,26 @@ const MobileHeader = ({
     isMenuOpen: isUserDrawerOpen,
     onAddressItemClick: () => setIsUserDrawerOpen(false),
   });
+
+  const mobileItems = [
+    ...userMenuItems,
+    { type: 'divider' },
+    {
+      type: 'header',
+      label: 'Help',
+    },
+    {
+      label: 'Help documentation',
+      onClick: () => window.open('https://docs.commonwealth.im/commonwealth/'),
+    },
+    {
+      label: 'Send feedback',
+      onClick: () => {
+        onFeedbackModalOpen(true);
+        setIsUserDrawerOpen(false);
+      },
+    },
+  ] as PopoverMenuItem[];
 
   return (
     <>
@@ -115,7 +138,7 @@ const MobileHeader = ({
             />
           </div>
 
-          <MenuContent menuItems={userMenuItems} />
+          <MenuContent menuItems={mobileItems} />
         </div>
       </CWDrawer>
     </>

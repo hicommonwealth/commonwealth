@@ -47,9 +47,13 @@ export const HelpMenu = () => {
   );
 };
 
-export const HelpMenuPopover = () => {
-  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+interface HelpMenuPopoverProps {
+  onFeedbackModalOpen: (open: boolean) => void;
+}
 
+export const HelpMenuPopover = ({
+  onFeedbackModalOpen,
+}: HelpMenuPopoverProps) => {
   return (
     <>
       <PopoverMenu
@@ -61,7 +65,7 @@ export const HelpMenuPopover = () => {
           },
           {
             label: 'Send feedback',
-            onClick: () => setIsModalOpen(true),
+            onClick: () => onFeedbackModalOpen(true),
           },
         ]}
         renderTrigger={(onClick, isMenuOpen) => (
@@ -95,12 +99,6 @@ export const HelpMenuPopover = () => {
             )}
           />
         )}
-      />
-      <CWModal
-        size="small"
-        content={<FeedbackModal onModalClose={() => setIsModalOpen(false)} />}
-        onClose={() => setIsModalOpen(false)}
-        open={isModalOpen}
       />
     </>
   );

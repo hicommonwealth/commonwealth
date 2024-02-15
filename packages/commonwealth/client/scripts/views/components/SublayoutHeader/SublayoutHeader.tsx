@@ -42,12 +42,14 @@ export const SublayoutHeader = ({
           onAuthModalOpen={() => setIsAuthModalOpen(true)}
           isInsideCommunity={isInsideCommunity}
           onRevalidationModalData={setRevalidationModalData}
+          onFeedbackModalOpen={() => setIsFeedbackModalOpen(true)}
         />
       ) : (
         <DesktopHeader
           onMobile={onMobile}
           onAuthModalOpen={() => setIsAuthModalOpen(true)}
           onRevalidationModalData={setRevalidationModalData}
+          onFeedbackModalOpen={() => setIsFeedbackModalOpen(true)}
         />
       )}
 
