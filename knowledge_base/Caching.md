@@ -216,7 +216,7 @@ const wrapFn = cacheDecorator.cacheWrap(
   slowGoodCachingCandidateFn,
   key,
   duration,
-  RedisNamespaces.Function_Response
+  CacheNamespaces.Function_Response
 );
 ```
 
@@ -286,7 +286,7 @@ const wrapFnOverride = cacheDecorator.cacheWrap(
   slowGoodCachingCandidateFn,
   key,
   duration,
-  RedisNamespaces.Function_Response
+  CacheNamespaces.Function_Response
 );
 ```
 
@@ -351,7 +351,7 @@ export const getChainActivity = new Activity(
   getChainStatus,//method to wrap
   'getChainStatus', //cache key
   60 * 5, // 5 minutes ttl
-  RedisNamespaces.Global_Response //namespace
+  CacheNamespaces.Global_Response //namespace
 );
 ```
 

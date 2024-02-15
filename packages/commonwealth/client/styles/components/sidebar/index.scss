@@ -7,6 +7,10 @@
   position: absolute;
   height: calc(100% - #{$global-header-height});
 
+  &.onMobile {
+    height: 100%;
+  }
+
   &.onadd {
     animation: slidein 0.2s ease-in-out;
     display: flex;

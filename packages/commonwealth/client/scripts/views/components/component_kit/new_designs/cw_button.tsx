@@ -26,12 +26,13 @@ type ButtonStyleProps = {
 
 export type ButtonProps = {
   iconLeft?: IconName;
+  iconLeftWeight?: 'bold' | 'light' | 'fill';
   iconRight?: IconName;
   label: string | React.ReactNode;
   type?: 'reset' | 'submit' | 'button';
   containerClassName?: string;
 } & ButtonStyleProps &
-  React.HTMLAttributes<HTMLButtonElement>;
+  React.HTMLAttributes<HTMLButtonElement> & { form?: string };
 
 export const CWButton = (props: ButtonProps) => {
   const {
@@ -42,6 +43,7 @@ export const CWButton = (props: ButtonProps) => {
     className,
     disabled = false,
     iconLeft,
+    iconLeftWeight,
     iconRight,
     label,
     onClick,
@@ -75,7 +77,13 @@ export const CWButton = (props: ButtonProps) => {
         disabled={disabled}
         {...otherProps}
       >
-        {!!iconLeft && <CWIcon iconName={iconLeft} className="button-icon" />}
+        {!!iconLeft && (
+          <CWIcon
+            weight={iconLeftWeight}
+            iconName={iconLeft}
+            className="button-icon"
+          />
+        )}
         <CWText
           type={buttonHeight === 'lg' ? 'buttonLg' : 'buttonSm'}
           className="button-text"

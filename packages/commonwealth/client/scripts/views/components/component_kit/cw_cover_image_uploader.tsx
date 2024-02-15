@@ -1,6 +1,6 @@
 import 'components/component_kit/cw_cover_image_uploader.scss';
 import $ from 'jquery';
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 
 import app from 'state';
 import { replaceBucketWithCDN } from '../../../helpers/awsHelpers';
@@ -8,6 +8,7 @@ import { CWButton as OldCWButton } from './cw_button';
 import { CWIconButton } from './cw_icon_button';
 import { CWButton } from './new_designs/cw_button';
 
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { useFormContext } from 'react-hook-form';
 import { compressImage } from 'utils/ImageCompression';
 import { CWIcon } from './cw_icons/cw_icon';
@@ -89,13 +90,39 @@ export const CWCoverImageUploader = ({
     name &&
     (formContext?.formState?.errors?.[name]?.message as string);
 
+  const canResetValue = useRef(true);
+  const [defaultFormContext, setDefaultFormContext] = React.useState({
+    isSet: false,
+    value: hookToForm && name ? formContext?.getValues?.(name) : null,
+  });
+
+  useNecessaryEffect(() => {
+    if (defaultFormContext.value && !defaultFormContext.isSet) {
+      canResetValue.current = false;
+      attachButton.current.style.display = 'flex';
+
+      setImageURL(defaultFormContext.value);
+      setImageBehavior(ImageBehavior.Circle);
+      setDefaultFormContext({
+        isSet: true,
+        value: defaultFormContext.value,
+      });
+
+      formContext.setValue(name, defaultFormContext.value);
+      formContext.setError(name, null);
+      setTimeout(() => {
+        canResetValue.current = true;
+      }, 1000);
+    }
+  }, [defaultFormContext, imageBehavior, formContext]);
+
   useEffect(() => {
     onImageProcessStatusChange(isUploading || isGenerating);
   }, [isUploading, isGenerating, onImageProcessStatusChange]);
 
-  useEffect(() => {
-    if (!imageURL) {
-      formContext && name && formContext.setValue(name, '');
+  useNecessaryEffect(() => {
+    if (!imageURL && canResetValue.current && formContext && name) {
+      formContext.setValue(name, '');
     }
   }, [imageURL, formContext, name]);
 
@@ -275,15 +302,18 @@ export const CWCoverImageUploader = ({
 
   const isFillImage = imageBehavior === ImageBehavior.Fill;
 
-  const backgroundStyles = {
-    backgroundImage:
-      imageURL && defaultImageBehaviour !== ImageBehavior.Circle
-        ? `url(${imageURL})`
-        : 'none',
-    backgroundSize: isFillImage ? 'cover' : '100px',
-    backgroundRepeat: isFillImage ? 'no-repeat' : 'repeat',
-    backgroundPosition: isFillImage ? 'center' : '0 0',
-  };
+  const backgroundStyles = useMemo(
+    () => ({
+      backgroundImage:
+        imageURL && defaultImageBehaviour !== ImageBehavior.Circle
+          ? `url(${imageURL})`
+          : 'none',
+      backgroundSize: isFillImage ? 'cover' : '100px',
+      backgroundRepeat: isFillImage ? 'no-repeat' : 'repeat',
+      backgroundPosition: isFillImage ? 'center' : '0 0',
+    }),
+    [imageURL, defaultImageBehaviour, isFillImage],
+  );
 
   return (
     <div className="CoverImageUploader">

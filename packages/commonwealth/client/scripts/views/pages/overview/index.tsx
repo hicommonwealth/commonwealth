@@ -12,7 +12,6 @@ import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import type Thread from '../../../models/Thread';
 import type Topic from '../../../models/Topic';
 import { CWDivider } from '../../components/component_kit/cw_divider';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { PageLoading } from '../loading';
 import { TopicSummaryRow } from './TopicSummaryRow';
@@ -25,7 +24,7 @@ const OverviewPage = () => {
 
   const { data: recentlyActiveThreads, isLoading } = useFetchThreadsQuery({
     queryType: 'active',
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     topicsPerThread: 3,
     // TODO: ask for a pinned thread prop here to show pinned threads
   });
@@ -128,19 +127,6 @@ const OverviewPage = () => {
       {topicSummaryRows.map((row, i) => (
         <TopicSummaryRow {...row} key={i} isLoading={isLoading} />
       ))}
-      {isWindowSmallInclusive && (
-        <div className="floating-mobile-button">
-          <CWIconButton
-            iconName="plusCircle"
-            iconButtonTheme="black"
-            iconSize="xl"
-            onClick={() => {
-              navigate('/new/discussion');
-            }}
-            disabled={!hasJoinedCommunity}
-          />
-        </div>
-      )}
     </div>
   );
 };

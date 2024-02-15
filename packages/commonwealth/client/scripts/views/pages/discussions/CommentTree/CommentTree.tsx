@@ -1,6 +1,6 @@
+import { ContentType } from '@hicommonwealth/core';
 import clsx from 'clsx';
 import { SessionKeyError } from 'controllers/server/sessions';
-import { featureFlags } from 'helpers/feature-flags';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { CommentsFeaturedFilterTypes } from 'models/types';
@@ -13,7 +13,6 @@ import {
   useFetchCommentsQuery,
   useToggleCommentSpamStatusMutation,
 } from 'state/api/comments';
-import { ContentType } from 'types';
 import { CreateComment } from 'views/components/Comments/CreateComment';
 import {
   deserializeDelta,
@@ -173,7 +172,7 @@ export const CommentTree = ({
             try {
               await deleteComment({
                 commentId: comment.id,
-                canvasHash: comment.canvas_hash,
+                canvasHash: comment.canvasHash,
                 communityId: app.activeChainId(),
                 address: app.user.activeAccount.address,
                 existingNumberOfComments: thread.numberOfComments,
@@ -452,10 +451,7 @@ export const CommentTree = ({
                   maxReplyLimitReached={comment.maxReplyLimitReached}
                   canReact={
                     !thread.archivedAt &&
-                    (!!hasJoinedCommunity ||
-                      isAdmin ||
-                      (!app.chain.isGatedTopic(thread?.topic?.id) &&
-                        !featureFlags.newGatingEnabled)) &&
+                    (!!hasJoinedCommunity || isAdmin) &&
                     canReact
                   }
                   canEdit={

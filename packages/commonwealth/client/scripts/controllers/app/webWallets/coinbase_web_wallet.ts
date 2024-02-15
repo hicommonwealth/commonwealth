@@ -13,8 +13,8 @@ import { hexToNumber } from 'web3-utils';
 
 import type { SessionPayload } from '@canvas-js/interfaces';
 
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
 import { createSiweMessage } from 'adapters/chain/ethereum/keys';
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
 import app from 'state';
 
@@ -197,6 +197,49 @@ class CoinbaseWebWalletController implements IWebWallet<string> {
         await setActiveAccount(updatedAddress);
       },
     );
+  }
+
+  public async switchNetwork() {
+    try {
+      // Get current chain ID
+      const currentChainId = await this._web3.eth.getChainId();
+      const communityChain = this.getChainId();
+      const chainIdHex = `0x${parseInt(communityChain, 10).toString(16)}`;
+      if (currentChainId !== communityChain) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: `0x${chainIdHex}` }],
+          });
+        } catch (error) {
+          if (error.code === 4902) {
+            const chains = await $.getJSON(
+              'https://chainid.network/chains.json',
+            );
+            const baseChain = chains.find((c) => c.chainId === communityChain);
+            // Check if the string contains '${' and '}'
+            const rpcUrl = baseChain.rpc.filter((r) => !/\${.*?}/.test(r));
+            const url =
+              rpcUrl.length > 0 ? rpcUrl[0] : app.chain.meta.node.altWalletUrl;
+            await this._web3.givenProvider.request({
+              method: 'wallet_addEthereumChain',
+              params: [
+                {
+                  chainId: chainIdHex,
+                  chainName: baseChain.name,
+                  nativeCurrency: baseChain.nativeCurrency,
+                  rpcUrls: [url],
+                },
+              ],
+            });
+          }
+        }
+      } else {
+        console.log('Metamask is already connected to the desired chain.');
+      }
+    } catch (error) {
+      console.error('Error checking and switching chain:', error);
+    }
   }
 }
 

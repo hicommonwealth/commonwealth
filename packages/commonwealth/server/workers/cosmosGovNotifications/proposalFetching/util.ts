@@ -1,12 +1,11 @@
-import { CommunityInstance } from '../../../models/community';
-import { ProposalSDKType } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
+import { ProposalSDKType } from '@hicommonwealth/chains';
+import { logger } from '@hicommonwealth/core';
+import { CommunityInstance } from '@hicommonwealth/model';
 import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
-import { AllCosmosProposals } from './types';
 import { COSMOS_GOV_V1_CHAIN_IDS } from '../../../config';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { rollbar } from '../../../util/rollbar';
+import { AllCosmosProposals } from './types';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 export function uint8ArrayToNumberBE(bytes) {
   if (!bytes) return 0;
@@ -52,29 +51,28 @@ export function mapChainsToProposals(
   v1Chains: CommunityInstance[],
   v1Beta1Chains: CommunityInstance[],
   v1Proposals: ProposalSDKType[][],
-  v1Beta1Proposals: Proposal[][]
+  v1Beta1Proposals: Proposal[][],
 ): AllCosmosProposals {
   return {
     v1: v1Proposals.reduce(
       (acc, proposals, i) => ({ ...acc, [v1Chains[i].id]: proposals }),
-      {}
+      {},
     ),
     v1Beta1: v1Beta1Proposals.reduce(
       (acc, proposals, i) => ({ ...acc, [v1Beta1Chains[i].id]: proposals }),
-      {}
+      {},
     ),
   };
 }
 
 export function processProposalSettledPromises(
   v1ProposalResults: PromiseSettledResult<ProposalSDKType[]>[],
-  v1Beta1ProposalResults: PromiseSettledResult<Proposal[]>[]
+  v1Beta1ProposalResults: PromiseSettledResult<Proposal[]>[],
 ) {
   const v1Proposals: ProposalSDKType[][] = [];
   for (const result of v1ProposalResults) {
     if (result.status === 'rejected') {
       log.error('Fetching v1 proposal failed.', result.reason);
-      rollbar?.error('Fetching v1 proposal failed.', result.reason);
     } else {
       v1Proposals.push(result.value);
     }
@@ -84,7 +82,6 @@ export function processProposalSettledPromises(
   for (const result of v1Beta1ProposalResults) {
     if (result.status === 'rejected') {
       log.error('Fetching v1beta1 proposal failed.', result.reason);
-      rollbar?.error('Fetching v1beta1 proposal failed.', result.reason);
     } else {
       v1Beta1Proposals.push(result.value);
     }

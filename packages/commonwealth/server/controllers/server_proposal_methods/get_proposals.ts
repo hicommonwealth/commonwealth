@@ -1,7 +1,6 @@
+import { ChainNetwork, ServerError } from '@hicommonwealth/core';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
-import { ServerError } from 'common-common/src/errors';
-import { ChainNetwork } from 'common-common/src/types';
 import { providers } from 'ethers';
 import {
   ContractInfo,
@@ -38,7 +37,6 @@ export async function __getProposals(
     const proposals = await getCompoundProposals(
       contractInfo.address,
       provider,
-      this.redisCache,
     );
     formattedProposals = proposals.map((p) => formatCompoundBravoProposal(p));
   } else {

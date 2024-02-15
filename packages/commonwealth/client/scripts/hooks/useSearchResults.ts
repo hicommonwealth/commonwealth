@@ -31,7 +31,9 @@ const useSearchResults = (
 ): {
   searchResults: SearchResults;
 } => {
-  const communityId = app.activeChainId() || 'all_communities';
+  const communityId = filters.includes('communities')
+    ? 'all_communities'
+    : app.activeChainId();
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
   const sharedQueryOptions = {

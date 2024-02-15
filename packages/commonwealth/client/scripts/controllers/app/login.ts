@@ -1,8 +1,8 @@
 /**
  * @file Manages logged-in user accounts and local storage.
  */
+import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/core';
 import { chainBaseToCanvasChainId } from 'canvas/chainMappings';
-import { ChainBase, WalletId, WalletSsoSource } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { signSessionWithMagic } from 'controllers/server/sessions';
 import { isSameAccount } from 'helpers';
@@ -14,9 +14,6 @@ import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import type BlockInfo from '../../models/BlockInfo';
 import type ChainInfo from '../../models/ChainInfo';
-
-import { featureFlags } from 'helpers/feature-flags';
-import { getTokenBalance } from 'helpers/token_balance_helper';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
@@ -161,12 +158,18 @@ export async function updateActiveAddresses({
   app.user.setActiveAccounts(
     app.user.addresses
       .filter((a) => a.community.id === chain.id)
-      .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype, false))
+      .map((addr) => {
+        const tempAddr = app.chain?.accounts.get(
+          addr.address,
+          addr.keytype,
+          false,
+        );
+        tempAddr.lastActive = addr.lastActive;
+        return tempAddr;
+      })
       .filter((addr) => addr),
     shouldRedraw,
   );
-
-  !featureFlags.newGatingEnabled && getTokenBalance();
 
   // select the address that the new chain should be initialized with
   const memberAddresses = app.user.activeAccounts.filter((account) => {
@@ -179,15 +182,39 @@ export async function updateActiveAddresses({
   } else if (app.user.activeAccounts.length === 0) {
     // no addresses - preview the community
   } else {
-    const existingAddress = app.roles.getDefaultAddressInCommunity({
-      community: chain.id,
-    });
+    // Find all addresses in the current community for this account, sorted by last used date/time
+    const communityAddressesSortedByLastUsed = [
+      ...(app.user.addresses.filter((a) => a.community.id === chain.id) || []),
+    ].sort((a, b) => b.lastActive.diff(a.lastActive));
 
-    if (existingAddress) {
+    // From the sorted adddress in the current community, find an address which has an active session key
+    const chainBase = app.chain?.base;
+    const idOrPrefix =
+      chainBase === ChainBase.CosmosSDK
+        ? app.chain?.meta.bech32Prefix
+        : app.chain?.meta.node?.ethChainId;
+    const canvasChainId = chainBaseToCanvasChainId(chainBase, idOrPrefix);
+    let foundAddressWithActiveSessionKey = null;
+    for (const communityAccount of communityAddressesSortedByLastUsed) {
+      const isAuth = await app.sessions
+        .getSessionController(chainBase)
+        .hasAuthenticatedSession(canvasChainId, communityAccount.address);
+
+      if (isAuth) {
+        foundAddressWithActiveSessionKey = communityAccount;
+        break;
+      }
+    }
+
+    // Use the address which has an active session key, if there is none then use the most recently used address
+    const addressToUse =
+      foundAddressWithActiveSessionKey || communityAddressesSortedByLastUsed[0];
+
+    if (addressToUse) {
       const account = app.user.activeAccounts.find((a) => {
         return (
-          a.community.id === existingAddress.community.id &&
-          a.address === existingAddress.address
+          a.community.id === addressToUse.community.id &&
+          a.address === addressToUse.address
         );
       });
       if (account) await setActiveAccount(account, shouldRedraw);
@@ -228,6 +255,7 @@ export function updateActiveUser(data) {
             walletId: a.wallet_id,
             walletSsoSource: a.wallet_sso_source,
             ghostAddress: a.ghost_address,
+            lastActive: a.last_active,
           }),
       ),
     );
@@ -323,7 +351,10 @@ export async function startLoginWithMagicLink({
   if (email) {
     // email-based login
     const bearer = await magic.auth.loginWithMagicLink({ email });
-    const address = await handleSocialLoginCallback({ bearer, isEmail: true });
+    const address = await handleSocialLoginCallback({
+      bearer,
+      walletSsoSource: WalletSsoSource.Email,
+    });
     return { bearer, address };
   } else {
     const params = `?redirectTo=${
@@ -370,7 +401,6 @@ function getProfileMetadata({ provider, userInfo }): {
   } else if (provider === 'google') {
     return { username: userInfo.name, avatarUrl: userInfo.picture };
   }
-
   return {};
 }
 
@@ -379,25 +409,24 @@ export async function handleSocialLoginCallback({
   bearer,
   chain,
   walletSsoSource,
-  isEmail,
 }: {
   bearer?: string;
   chain?: string;
   walletSsoSource?: string;
-  isEmail?: boolean;
 }): Promise<string> {
   // desiredChain may be empty if social login was initialized from
   // a page without a chain, in which case we default to an eth login
   const desiredChain = app.chain?.meta || app.config.chains.getById(chain);
   const isCosmos = desiredChain?.base === ChainBase.CosmosSDK;
   const magic = await constructMagic(isCosmos, desiredChain?.id);
+  const isEmail = walletSsoSource === WalletSsoSource.Email;
 
   // Code up to this line might run multiple times because of extra calls to useEffect().
   // Those runs will be rejected because getRedirectResult purges the browser search param.
   let profileMetadata, magicAddress;
   if (isEmail) {
     const metadata = await magic.user.getMetadata();
-    profileMetadata = { username: metadata.email };
+    profileMetadata = { username: null };
 
     if (isCosmos) {
       magicAddress = metadata.publicAddress;
@@ -426,24 +455,8 @@ export async function handleSocialLoginCallback({
   try {
     // Sign a session
     if (isCosmos && desiredChain) {
-      // Not every chain prefix will succeed, so Magic defaults to osmo... as the Cosmos prefix
       const bech32Prefix = desiredChain.bech32Prefix;
-      try {
-        magicAddress = await magic.cosmos.changeAddress(bech32Prefix);
-      } catch (err) {
-        console.error(
-          `Error changing address to ${bech32Prefix}. Keeping default cosmos prefix and moving on. Error: ${err}`,
-        );
-      }
-
-      // Request the cosmos chain ID, since this is used by Magic to generate
-      // the signed message. The API is already used by the Magic iframe,
-      // but they don't expose the results.
-      const nodeInfo = await $.get(
-        `${document.location.origin}/magicCosmosAPI/${desiredChain.id}/node_info`,
-      );
-      const chainId = nodeInfo.node_info.network;
-
+      const chainId = 'cosmoshub';
       const timestamp = +new Date();
 
       const signer = { signMessage: magic.cosmos.sign };

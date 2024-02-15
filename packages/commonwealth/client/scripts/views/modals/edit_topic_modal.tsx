@@ -2,7 +2,7 @@ import type { DeltaStatic } from 'quill';
 import React, { useState } from 'react';
 
 import { pluralizeWithoutNumberPrefix } from 'helpers';
-import Topic from '../../models/Topic';
+import Topic, { TopicAttributes } from '../../models/Topic';
 import { useCommonNavigate } from '../../navigation/helpers';
 import app from '../../state';
 import {
@@ -33,11 +33,13 @@ import '../../../styles/modals/edit_topic_modal.scss';
 type EditTopicModalProps = {
   onModalClose: () => void;
   topic: Topic;
+  noRedirect?: boolean;
 };
 
 export const EditTopicModal = ({
   topic,
   onModalClose,
+  noRedirect,
 }: EditTopicModalProps) => {
   const {
     defaultOffchainTemplate,
@@ -77,11 +79,11 @@ export const EditTopicModal = ({
       return;
     }
 
-    const topicInfo = {
+    const topicInfo: TopicAttributes = {
       id,
       description: description,
       name: name,
-      chain_id: app.activeChainId(),
+      community_id: app.activeChainId(),
       telegram: null,
       featured_in_sidebar: featuredInSidebar,
       featured_in_new_post: featuredInNewPost,
@@ -93,7 +95,11 @@ export const EditTopicModal = ({
 
     try {
       await editTopic({ topic: new Topic(topicInfo) });
-      navigate(`/discussions/${encodeURI(name.toString().trim())}`);
+      if (noRedirect) {
+        onModalClose();
+      } else {
+        navigate(`/discussions/${encodeURI(name.toString().trim())}`);
+      }
     } catch (err) {
       setErrorMsg(err.message || err);
     } finally {
@@ -121,7 +127,11 @@ export const EditTopicModal = ({
               topicName: name,
               communityId: app.activeChainId(),
             });
-            navigate('/');
+            if (noRedirect) {
+              onModalClose();
+            } else {
+              navigate('/');
+            }
           },
         },
       ],

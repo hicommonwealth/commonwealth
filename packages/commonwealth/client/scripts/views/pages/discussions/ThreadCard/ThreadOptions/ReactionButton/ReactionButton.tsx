@@ -1,5 +1,4 @@
 import { SessionKeyError } from 'controllers/server/sessions';
-import { featureFlags } from 'helpers/feature-flags';
 import type Thread from 'models/Thread';
 import React, { useState } from 'react';
 import app from 'state';
@@ -7,7 +6,6 @@ import {
   useCreateThreadReactionMutation,
   useDeleteThreadReactionMutation,
 } from 'state/api/threads';
-import Permissions from 'utils/Permissions';
 import { getDisplayedReactorsForPopup } from 'views/components/ReactionButton/helpers';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
@@ -17,7 +15,9 @@ import CWPopover, {
 import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
 import { TooltipWrapper } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { CWUpvote } from 'views/components/component_kit/new_designs/cw_upvote';
+import { AuthModal } from 'views/modals/AuthModal';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
+import { useFlag } from '../../../../../../hooks/useFlag';
 import { LoginModal } from '../../../../../modals/login_modal';
 import { ReactionButtonSkeleton } from './ReactionButtonSkeleton';
 
@@ -36,7 +36,8 @@ export const ReactionButton = ({
   showSkeleton,
   tooltipText,
 }: ReactionButtonProps) => {
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const newSignInModalEnabled = useFlag('newSignInModal');
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const reactors = thread?.associatedReactions?.map((t) => t.address);
   const activeAddress = app.user.activeAccount?.address;
   const thisUserReaction = thread?.associatedReactions?.filter(
@@ -79,20 +80,13 @@ export const ReactionButton = ({
   if (showSkeleton) return <ReactionButtonSkeleton />;
   const isLoading = isAddingReaction || isDeletingReaction;
 
-  // token balance check if needed
-  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
-  const isUserForbidden =
-    !isAdmin &&
-    app.chain.isGatedTopic(thread.topic?.id) &&
-    !featureFlags.newGatingEnabled;
-
   const handleVoteClick = async (event) => {
     event.stopPropagation();
     event.preventDefault();
     if (isLoading || disabled) return;
 
     if (!app.isLoggedIn() || !app.user.activeAccount) {
-      setIsModalOpen(true);
+      setIsAuthModalOpen(true);
       return;
     }
     if (hasReacted) {
@@ -126,8 +120,8 @@ export const ReactionButton = ({
     <>
       {size === 'small' ? (
         <CWUpvoteSmall
-          voteCount={reactors.length}
-          disabled={isUserForbidden || disabled}
+          voteCount={thread.reactionWeightsSum || reactors.length}
+          disabled={disabled}
           isThreadArchived={!!thread.archivedAt}
           selected={hasReacted}
           onClick={handleVoteClick}
@@ -140,7 +134,7 @@ export const ReactionButton = ({
         <TooltipWrapper disabled={disabled} text={tooltipText}>
           <CWUpvote
             onClick={handleVoteClick}
-            voteCount={reactors.length}
+            voteCount={thread.reactionWeightsSum || reactors.length}
             disabled={disabled}
             active={hasReacted}
           />
@@ -152,7 +146,7 @@ export const ReactionButton = ({
         >
           <CWUpvote
             onClick={handleVoteClick}
-            voteCount={reactors.length}
+            voteCount={thread.reactionWeightsSum || reactors.length}
             disabled={disabled}
             active={hasReacted}
           />
@@ -167,12 +161,21 @@ export const ReactionButton = ({
           )}
         </div>
       )}
-      <CWModal
-        content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
-        isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-        onClose={() => setIsModalOpen(false)}
-        open={isModalOpen}
-      />
+      {!newSignInModalEnabled ? (
+        <CWModal
+          content={
+            <LoginModal onModalClose={() => setIsAuthModalOpen(false)} />
+          }
+          isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
+          onClose={() => setIsAuthModalOpen(false)}
+          open={isAuthModalOpen}
+        />
+      ) : (
+        <AuthModal
+          onClose={() => setIsAuthModalOpen(false)}
+          isOpen={isAuthModalOpen}
+        />
+      )}
       {RevalidationModal}
     </>
   );

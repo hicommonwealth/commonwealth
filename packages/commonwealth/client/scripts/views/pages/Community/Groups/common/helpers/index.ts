@@ -1,5 +1,9 @@
 import app from 'state';
-import { SPECIFICATIONS, TOKENS } from '../../../common/constants';
+import {
+  CW_SPECIFICATIONS,
+  ERC_SPECIFICATIONS,
+  TOKENS,
+} from '../../../common/constants';
 import { convertRequirementAmountFromTokensToWei } from '../../../common/helpers';
 import { GroupResponseValuesType } from '../GroupForm/index.types';
 
@@ -24,9 +28,9 @@ export const makeGroupDataBaseAPIPayload = (
   formSubmitValues.requirements.map((x) => {
     // for eth base
     if (
-      x.requirementType === SPECIFICATIONS.ERC_20 ||
-      x.requirementType === SPECIFICATIONS.ERC_721 ||
-      x.requirementType === SPECIFICATIONS.ERC_1155 ||
+      x.requirementType === ERC_SPECIFICATIONS.ERC_20 ||
+      x.requirementType === ERC_SPECIFICATIONS.ERC_721 ||
+      x.requirementType === ERC_SPECIFICATIONS.ERC_1155 ||
       x.requirementType === TOKENS.EVM_TOKEN
     ) {
       payload.requirements.push({
@@ -42,7 +46,7 @@ export const makeGroupDataBaseAPIPayload = (
             ...(x.requirementType !== TOKENS.EVM_TOKEN && {
               contract_address: x.requirementContractAddress.trim(),
             }),
-            ...(x.requirementType === SPECIFICATIONS.ERC_1155 && {
+            ...(x.requirementType === ERC_SPECIFICATIONS.ERC_1155 && {
               token_id: x.requirementTokenId.trim(),
             }),
           },
@@ -52,7 +56,10 @@ export const makeGroupDataBaseAPIPayload = (
     }
 
     // for cosmos base
-    if (x.requirementType === TOKENS.COSMOS_TOKEN) {
+    if (
+      x.requirementType === TOKENS.COSMOS_TOKEN ||
+      x.requirementType === CW_SPECIFICATIONS.CW_721
+    ) {
       payload.requirements.push({
         rule: 'threshold',
         data: {
@@ -63,7 +70,12 @@ export const makeGroupDataBaseAPIPayload = (
           source: {
             source_type: x.requirementType,
             cosmos_chain_id: x.requirementChain,
-            token_symbol: 'COS',
+            ...(x.requirementType !== TOKENS.COSMOS_TOKEN && {
+              contract_address: x.requirementContractAddress.trim(),
+            }),
+            ...(x.requirementType === TOKENS.COSMOS_TOKEN && {
+              token_symbol: 'COS',
+            }),
           },
         },
       });

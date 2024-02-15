@@ -1,9 +1,9 @@
-import $ from 'jquery';
+import { AbiType } from '@hicommonwealth/core';
 import type { Response } from 'express';
+import $ from 'jquery';
+import app from 'state';
 import { ContractsStore } from 'stores';
 import Contract from '../../models/Contract';
-import app from 'state';
-import { AbiType } from '../../../../shared/types';
 
 type AddCommunityContractTemplateAttributes = {
   slug: string;
@@ -61,7 +61,7 @@ class ContractsController {
       {
         address,
         jwt: app.user.jwt,
-      }
+      },
     );
     const resultContract = response['result']['contract'];
     const resultAbi = response['result']['contractAbi'];
@@ -75,7 +75,7 @@ class ContractsController {
         address,
         chain_node_id: app.chain.meta.ChainNode.id,
         jwt: app.user.jwt,
-      }
+      },
     );
     const resultAbi = response['result']['contractAbi'];
 
@@ -84,7 +84,7 @@ class ContractsController {
 
   public async update(
     abi: Array<Record<string, unknown>>,
-    contractAttributes: any
+    contractAttributes: any,
   ) {
     // Update contract in store
     if (this._store.getById(contractAttributes.id)) {
@@ -119,7 +119,7 @@ class ContractsController {
         isFactory: is_factory,
         nickname,
         ccts,
-      })
+      }),
     );
   }
 
@@ -289,7 +289,7 @@ class ContractsController {
   }
 
   public async addCommunityContractTemplate(
-    communityContractTemplateAndMetadata: AddCommunityContractTemplateAttributes
+    communityContractTemplateAndMetadata: AddCommunityContractTemplateAttributes,
   ) {
     try {
       const newContract = await $.post(
@@ -298,7 +298,7 @@ class ContractsController {
           ...communityContractTemplateAndMetadata,
           chain_id: app.activeChainId(),
           jwt: app.user.jwt,
-        }
+        },
       );
 
       this.updateTemplate({
@@ -315,7 +315,7 @@ class ContractsController {
   }
 
   public async editCommunityContractTemplate(
-    communityContractTemplateMetadata: EditCommunityContractTemplateAttributes
+    communityContractTemplateMetadata: EditCommunityContractTemplateAttributes,
   ) {
     try {
       const updateContract = await $.ajax({
@@ -436,7 +436,7 @@ class ContractsController {
             abi: abiJson,
             ccts: ccts,
             hasGlobalTemplate: contractWithTemplate.hasGlobalTemplate,
-          })
+          }),
         );
       } catch (e) {
         console.error(e);

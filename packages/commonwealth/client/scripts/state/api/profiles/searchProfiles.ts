@@ -25,7 +25,7 @@ interface SearchProfilesProps {
   orderBy: APIOrderBy;
   orderDirection: APIOrderDirection;
   includeRoles: boolean;
-  includeMembershipTypes?: 'in-group' | 'not-in-group';
+  includeMembershipTypes?: 'in-group' | `in-group:${string}` | 'not-in-group';
   includeGroupIds?: boolean;
   enabled?: boolean;
 }

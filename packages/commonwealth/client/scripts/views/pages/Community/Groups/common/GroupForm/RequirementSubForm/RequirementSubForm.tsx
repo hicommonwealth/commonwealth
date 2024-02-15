@@ -1,12 +1,13 @@
+import { ChainBase } from '@hicommonwealth/core';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { getClasses } from 'views/components/component_kit/helpers';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import { ChainBase } from '../../../../../../../../../../common-common/src/types';
 import {
-  SPECIFICATIONS,
+  CW_SPECIFICATIONS,
+  ERC_SPECIFICATIONS,
   TOKENS,
   chainTypes,
   conditionTypes,
@@ -24,13 +25,16 @@ const RequirementSubForm = ({
 }: RequirementSubFormType) => {
   const [requirementType, setRequirementType] = useState('');
   const isTokenRequirement = Object.values(TOKENS).includes(requirementType);
-  const is1155Requirement = requirementType === SPECIFICATIONS.ERC_1155;
-  const isCosmosRequirement = requirementType === TOKENS.COSMOS_TOKEN;
+  const is1155Requirement = requirementType === ERC_SPECIFICATIONS.ERC_1155;
+  const isCosmosRequirement =
+    requirementType === TOKENS.COSMOS_TOKEN ||
+    requirementType === CW_SPECIFICATIONS.CW_721;
   const helperTextForAmount = {
     [TOKENS.EVM_TOKEN]: 'Using 18 decimal precision',
     [TOKENS.COSMOS_TOKEN]: 'Using 6 decimal precision',
-    [SPECIFICATIONS.ERC_20]: 'Using 18 decimal precision',
-    [SPECIFICATIONS.ERC_721]: '',
+    [ERC_SPECIFICATIONS.ERC_20]: 'Using 18 decimal precision',
+    [ERC_SPECIFICATIONS.ERC_721]: '',
+    [CW_SPECIFICATIONS.CW_721]: '',
   };
 
   useEffect(() => {
@@ -54,10 +58,12 @@ const RequirementSubForm = ({
           options={requirementTypes
             .filter((x) =>
               app.chain.base === ChainBase.CosmosSDK
-                ? x.value === TOKENS.COSMOS_TOKEN
-                : [TOKENS.EVM_TOKEN, ...Object.values(SPECIFICATIONS)].includes(
-                    x.value,
-                  ),
+                ? x.value === TOKENS.COSMOS_TOKEN ||
+                  x.value === CW_SPECIFICATIONS.CW_721
+                : [
+                    TOKENS.EVM_TOKEN,
+                    ...Object.values(ERC_SPECIFICATIONS),
+                  ].includes(x.value),
             )
             .map((requirement) => ({
               label: requirement.label,

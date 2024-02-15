@@ -1,26 +1,13 @@
-import type { RabbitMQController } from 'common-common/src/rabbitmq';
+import { logger } from '@hicommonwealth/core';
 import type { Express } from 'express-serve-static-core';
 import http from 'http';
-import type Rollbar from 'rollbar';
-
-import { cacheDecorator } from 'common-common/src/cacheDecorator';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { RedisCache } from 'common-common/src/redisCache';
 import { PORT } from '../config';
-import type { DB } from '../models';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
-const setupServer = (
-  app: Express,
-  rollbar: Rollbar,
-  models: DB,
-  rabbitMQController: RabbitMQController,
-  redisCache: RedisCache,
-) => {
+const setupServer = (app: Express) => {
   app.set('port', PORT);
   const server = http.createServer(app);
-  cacheDecorator.setCache(redisCache);
 
   const onError = (error) => {
     if (error.syscall !== 'listen') {
@@ -30,11 +17,11 @@ const setupServer = (
       case 'EACCES':
         log.error('Port requires elevated privileges');
         process.exit(1);
-        break;
+      // eslint-disable-next-line no-fallthrough
       case 'EADDRINUSE':
         log.error(`Port ${PORT} is already in use`);
         process.exit(1);
-        break;
+      // eslint-disable-next-line no-fallthrough
       default:
         throw error;
     }

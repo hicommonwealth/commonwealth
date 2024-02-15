@@ -1,8 +1,10 @@
-import { NotificationDataAndCategory } from '../../shared/types';
-import { NotificationCategories } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
+import {
+  NotificationCategories,
+  NotificationDataAndCategory,
+  logger,
+} from '@hicommonwealth/core';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 /**
  * This function maps fields from the different notification data objects to Subscription model fields. It returns an
@@ -12,17 +14,17 @@ const log = factory.getLogger(formatFilename(__filename));
  * @param notification
  */
 export function mapNotificationsDataToSubscriptions(
-  notification: NotificationDataAndCategory
+  notification: NotificationDataAndCategory,
 ): Record<string, unknown> {
   const uniqueData = { category_id: notification.categoryId };
   if (notification.categoryId === NotificationCategories.ChainEvent) {
-    uniqueData['chain_id'] = notification.data.chain;
+    uniqueData['community_id'] = notification.data.chain;
   } else if (
     notification.categoryId === NotificationCategories.SnapshotProposal
   ) {
     uniqueData['snapshot_id'] = notification.data.space;
   } else if (notification.categoryId === NotificationCategories.NewThread) {
-    uniqueData['chain_id'] = notification.data.chain_id;
+    uniqueData['community_id'] = notification.data.chain_id;
   } else if (notification.categoryId === NotificationCategories.NewComment) {
     if (notification.data.parent_comment_id) {
       uniqueData['comment_id'] = notification.data.parent_comment_id;

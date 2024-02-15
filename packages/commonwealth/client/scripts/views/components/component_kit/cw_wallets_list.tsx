@@ -1,12 +1,13 @@
-import type { ChainNetwork } from 'common-common/src/types';
-import { ChainBase, WalletSsoSource } from 'common-common/src/types';
+/* eslint-disable react/no-multi-comp */
+import type { ChainNetwork } from '@hicommonwealth/core';
+import { ChainBase, WalletSsoSource } from '@hicommonwealth/core';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import React from 'react';
 import app from 'state';
 import { addressSwapper } from 'utils';
 import IWebWallet from '../../../models/IWebWallet';
 import { User } from '../user/user';
-import { CWAuthButton, CWNoAuthMethodsAvailable } from './cw_auth_button';
+import { CWAuthButton, CWNoAuthMethodsAvailable } from './CWAuthButtonOld';
 import { CWDivider } from './cw_divider';
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';

@@ -1,3 +1,5 @@
+import { ChainBase } from '@hicommonwealth/core';
+
 export const enum MixpanelPageViewEvent {
   LANDING_PAGE_VIEW = 'Landing Page Viewed',
   COMMUNITY_CREATION_PAGE_VIEW = 'Create Community Page Viewed',
@@ -54,11 +56,10 @@ export const enum MixpanelClickthroughEvent {
 export const enum MixpanelCommunityCreationEvent {
   CREATE_BUTTON_PRESSED = 'Create Community Button Pressed',
   COMMUNITY_TYPE_CHOSEN = 'Create Community Type Chosen',
-  CHAIN_SELECTED = 'Create Community Chain Selected',
-  ADDRESS_ADDED = 'Create Community Address Added',
-  WEBSITE_ADDED = 'Create Community Website Added',
+  CREATE_COMMUNITY_VISITED = '/createCommunity Page Visited',
+  CONNECT_NEW_WALLET_PRESSED = 'Connect New Wallet Button Pressed',
   NEW_COMMUNITY_CREATION = 'New Community Creation',
-  CREATE_COMMUNITY_ATTEMPTED = 'Create Community Attempted',
+  CREATE_COMMUNITY_CANCELLED = 'Create Community Cancel Button Pressed',
 }
 
 export const enum MixpanelSnapshotEvents {
@@ -92,6 +93,7 @@ export interface BaseMixpanelPayload extends AnalyticsPayload {
   userId?: number;
   communitySelected?: string;
   proposalType?: string;
+  chainBase?: ChainBase;
 }
 
 export interface MixpanelLoginPayload extends BaseMixpanelPayload {

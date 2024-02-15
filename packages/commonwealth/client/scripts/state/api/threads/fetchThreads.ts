@@ -23,7 +23,8 @@ const queryTypeToRQMap = {
 
 interface CommonProps {
   queryType: typeof QueryTypes[keyof typeof QueryTypes];
-  chainId: string;
+  communityId: string;
+  apiEnabled?: boolean;
 }
 
 interface FetchBulkThreadsProps extends CommonProps {
@@ -96,7 +97,7 @@ const getFetchThreadsQueryKey = (props) => {
   if (isFetchBulkThreadsProps(props)) {
     return [
       ApiEndpoints.FETCH_THREADS,
-      props.chainId,
+      props.communityId,
       props.queryType,
       props.topicId,
       props.stage,
@@ -110,7 +111,7 @@ const getFetchThreadsQueryKey = (props) => {
   if (isFetchActiveThreadsProps(props)) {
     return [
       ApiEndpoints.FETCH_THREADS,
-      props.chainId,
+      props.communityId,
       props.queryType,
       props.topicsPerThread,
     ];
@@ -118,7 +119,17 @@ const getFetchThreadsQueryKey = (props) => {
 };
 
 const fetchBulkThreads = (props) => {
-  return async ({ pageParam = 1 }) => {
+  return async ({
+    pageParam = 1,
+  }): Promise<{
+    data: {
+      numVotingThreads: number;
+      limit: number;
+      page: number;
+      threads: Thread[];
+    };
+    pageParam: number | undefined;
+  }> => {
     const res = await axios.get(
       `${app.serverUrl()}${ApiEndpoints.FETCH_THREADS}`,
       {
@@ -126,7 +137,7 @@ const fetchBulkThreads = (props) => {
           bulk: true,
           page: pageParam,
           limit: props.limit,
-          community_id: props.chainId,
+          community_id: props.communityId,
           ...(props.topicId && { topic_id: props.topicId }),
           ...(props.stage && { stage: props.stage }),
           ...(props.includePinnedThreads && {
@@ -156,13 +167,13 @@ const fetchBulkThreads = (props) => {
 };
 
 const fetchActiveThreads = (props) => {
-  return async () => {
+  return async (): Promise<Thread[]> => {
     const response = await axios.get(
       `${app.serverUrl()}${ApiEndpoints.FETCH_THREADS}`,
       {
         params: {
           active: true,
-          chain: props.chainId,
+          community_id: props.communityId,
           threads_per_topic: props.topicsPerThread || 3,
         },
       },
@@ -176,6 +187,8 @@ const fetchActiveThreads = (props) => {
 const useFetchThreadsQuery = (
   props: FetchBulkThreadsProps | FetchActiveThreadsProps,
 ) => {
+  const { apiEnabled = true } = props; // destruct to assign default value
+
   // better to use this in case someone updates this props, we wont reflect those changes
   const [queryType] = useState(props.queryType);
 
@@ -194,6 +207,7 @@ const useFetchThreadsQuery = (
     })(),
     staleTime: THREADS_STALE_TIME,
     keepPreviousData: true,
+    enabled: apiEnabled,
   });
 
   if (isFetchBulkThreadsProps(props)) {

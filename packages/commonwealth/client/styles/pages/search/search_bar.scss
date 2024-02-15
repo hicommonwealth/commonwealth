@@ -7,7 +7,7 @@
 }
 
 .SearchBar {
-  width: 608px;
+  width: 100%;
 
   .search-and-icon-container {
     position: relative;
@@ -16,7 +16,7 @@
       @include b1;
 
       border: 1px solid $neutral-300;
-      border-radius: $border-radius-rounded-corners;
+      border-radius: 6px;
       color: $neutral-800;
       height: 40px;
       padding: 8px 16px 8px 48px;

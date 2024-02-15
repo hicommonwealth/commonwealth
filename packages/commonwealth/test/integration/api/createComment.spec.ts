@@ -1,9 +1,9 @@
+import { models } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import app from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import models from '../../../server/database';
 import { Errors } from '../../../server/routes/threads/create_thread_comment_handler';
 import { del, post } from './external/appHook.spec';
 import {
@@ -13,6 +13,7 @@ import {
 } from './external/dbEntityHooks.spec';
 
 chai.use(chaiHttp);
+chai.should();
 
 const getThreadCommentCount = async (threadId) => {
   const thread = await models.Thread.findOne({
@@ -35,7 +36,7 @@ const createValidComment = async (threadId, text, jwtToken) => {
     `/api/threads/${threadId}/comments`,
     validRequest,
     true,
-    app
+    app,
   );
 
   return response;
@@ -44,7 +45,7 @@ const createValidComment = async (threadId, text, jwtToken) => {
 const getUniqueCommentText = async () => {
   const time = new Date().getMilliseconds();
   const text = `testCommentCreated at ${time}`;
-  let comment = await models.Comment.findOne({
+  const comment = await models.Comment.findOne({
     where: { text },
   });
   chai.assert.isNull(comment);
@@ -63,7 +64,7 @@ const deleteComment = async (commentId, jwtToken) => {
     `/api/comments/${commentId}`,
     validRequest,
     false,
-    app
+    app,
   );
 
   return response;
@@ -75,7 +76,7 @@ describe('createComment Integration Tests', () => {
   beforeEach(() => {
     jwtTokenUser1 = jwt.sign(
       { id: testUsers[0].id, email: testUsers[0].email },
-      JWT_SECRET
+      JWT_SECRET,
     );
   });
 
@@ -92,7 +93,7 @@ describe('createComment Integration Tests', () => {
       `/api/threads/${testThreads[0].id}/comments`,
       invalidRequest,
       true,
-      app
+      app,
     );
 
     response.should.have.status(400);
@@ -114,7 +115,7 @@ describe('createComment Integration Tests', () => {
       `/api/threads/${testThreads[0].id}/comments`,
       invalidRequest,
       true,
-      app
+      app,
     );
 
     chai.assert.equal(response.error, Errors.InvalidParent);
@@ -125,9 +126,9 @@ describe('createComment Integration Tests', () => {
     const response = await createValidComment(
       testThreads[0].id,
       text,
-      jwtTokenUser1
+      jwtTokenUser1,
     );
-    let comment = await models.Comment.findOne({
+    const comment = await models.Comment.findOne({
       where: { text },
     });
     chai.assert.isNotNull(comment);
@@ -136,12 +137,12 @@ describe('createComment Integration Tests', () => {
 
   it('should create and delete comment and verify thread comment counts', async () => {
     const text = await getUniqueCommentText();
-    let beforeCommentCount = await getThreadCommentCount(testThreads[0].id);
+    const beforeCommentCount = await getThreadCommentCount(testThreads[0].id);
 
     const response = await createValidComment(
       testThreads[0].id,
       text,
-      jwtTokenUser1
+      jwtTokenUser1,
     );
 
     let comment = await models.Comment.findOne({

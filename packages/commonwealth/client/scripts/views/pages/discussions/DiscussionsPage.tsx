@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 
+import useBrowserWindow from 'hooks/useBrowserWindow';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
@@ -9,7 +10,6 @@ import { useFetchThreadsQuery } from 'state/api/threads';
 import { useDateCursor } from 'state/api/threads/fetchThreads';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import { slugify } from 'utils';
-import useBrowserWindow from '../../../hooks/useBrowserWindow';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import {
   ThreadFeaturedFilterTypes,
@@ -17,7 +17,7 @@ import {
 } from '../../../models/types';
 import app from '../../../state';
 import { useFetchTopicsQuery } from '../../../state/api/topics';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { Breadcrumbs } from '../../components/Breadcrumbs';
 import { HeaderWithFilters } from './HeaderWithFilters';
 import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
@@ -49,6 +49,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const { data: topics } = useFetchTopicsQuery({
     communityId: app.activeChainId(),
   });
+  const [resizing, setResizing] = useState(false);
+  const { isWindowSmallInclusive } = useBrowserWindow({
+    onResize: () => setResizing(true),
+    resizeListenerUpdateDeps: [resizing],
+  });
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
@@ -57,10 +62,10 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const { data: memberships = [] } = useRefreshMembershipQuery({
     chainId: app.activeChainId(),
     address: app?.user?.activeAccount?.address,
+    apiEnabled: !!app?.user?.activeAccount?.address,
   });
 
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
-  const { isWindowSmallInclusive } = useBrowserWindow({});
 
   const { dateCursor } = useDateCursor({
     dateRange: searchParams.get('dateRange') as ThreadTimelineFilterTypes,
@@ -71,7 +76,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const { fetchNextPage, data, isInitialLoading, hasNextPage } =
     useFetchThreadsQuery({
-      chainId: app.activeChainId(),
+      communityId: app.activeChainId(),
       queryType: 'bulk',
       page: 1,
       limit: 20,
@@ -85,6 +90,9 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     });
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
+  //
+  //Checks if the current page is a discussion page and if the window is small enough to render the mobile menu
+  //Checks both for mobile device and inner window size for desktop responsiveness
   const filteredThreads = threads.filter((t) => {
     if (!includeSpamThreads && t.markedAsSpamAt) return null;
 
@@ -166,40 +174,34 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           ),
           // eslint-disable-next-line react/no-multi-comp
           Header: () => (
-            <HeaderWithFilters
-              topic={topicName}
-              stage={stageName}
-              featuredFilter={featuredFilter}
-              dateRange={dateRange}
-              totalThreadCount={
-                isOnArchivePage
-                  ? filteredThreads.length || 0
-                  : threads
-                  ? totalThreadsInCommunity
-                  : 0
-              }
-              isIncludingSpamThreads={includeSpamThreads}
-              onIncludeSpamThreads={setIncludeSpamThreads}
-              isIncludingArchivedThreads={includeArchivedThreads}
-              onIncludeArchivedThreads={setIncludeArchivedThreads}
-              isOnArchivePage={isOnArchivePage}
-            />
+            <>
+              {isWindowSmallInclusive && (
+                <div className="mobileBreadcrumbs">
+                  <Breadcrumbs />
+                </div>
+              )}
+              <HeaderWithFilters
+                topic={topicName}
+                stage={stageName}
+                featuredFilter={featuredFilter}
+                dateRange={dateRange}
+                totalThreadCount={
+                  isOnArchivePage
+                    ? filteredThreads.length || 0
+                    : threads
+                    ? totalThreadsInCommunity
+                    : 0
+                }
+                isIncludingSpamThreads={includeSpamThreads}
+                onIncludeSpamThreads={setIncludeSpamThreads}
+                isIncludingArchivedThreads={includeArchivedThreads}
+                onIncludeArchivedThreads={setIncludeArchivedThreads}
+                isOnArchivePage={isOnArchivePage}
+              />
+            </>
           ),
         }}
       />
-      {isWindowSmallInclusive && (
-        <div className="floating-mobile-button">
-          <CWIconButton
-            iconName="plusCircle"
-            iconButtonTheme="black"
-            iconSize="xl"
-            onClick={() => {
-              navigate('/new/discussion');
-            }}
-            disabled={!hasJoinedCommunity}
-          />
-        </div>
-      )}
     </div>
   );
 };

@@ -51,6 +51,22 @@
       },
       "required": ["source_type", "cosmos_chain_id", "token_symbol"]
     },
+    "CosmosContractSource": {
+      "type": "object",
+      "properties": {
+        "source_type": {
+          "type": "string",
+          "enum": ["cw721"]
+        },
+        "cosmos_chain_id": {
+          "type": "string"
+        },
+        "contract_address": {
+          "type": "string"
+        }
+      },
+      "required": ["source_type", "cosmos_chain_id", "contract_address"]
+    },
     "ThresholdData": {
       "type": "object",
       "properties": {
@@ -62,7 +78,8 @@
           "oneOf": [
             { "$ref": "#/definitions/ContractSource" },
             { "$ref": "#/definitions/NativeSource" },
-            { "$ref": "#/definitions/CosmosSource" }
+            { "$ref": "#/definitions/CosmosSource" },
+            { "$ref": "#/definitions/CosmosContractSource" }
           ]
         }
       },

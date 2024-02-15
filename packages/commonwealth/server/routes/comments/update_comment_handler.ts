@@ -1,5 +1,5 @@
-import { IDiscordMeta } from 'common-common/src/types';
-import { CommentAttributes } from 'server/models/comment';
+import { IDiscordMeta } from '@hicommonwealth/core';
+import { CommentAttributes } from '@hicommonwealth/model';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -18,7 +18,7 @@ export const updateCommentHandler = async (
   req: TypedRequest<UpdateCommentRequestBody, {}, UpdateCommentRequestParams>,
   res: TypedResponse<UpdateCommentResponse>,
 ) => {
-  const { user, chain: community, address } = req;
+  const { user, address } = req;
   const { id: commentId } = req.params;
   const { body: commentBody, discord_meta: discordMeta } = req.body;
 
@@ -26,7 +26,6 @@ export const updateCommentHandler = async (
     await controllers.comments.updateComment({
       user,
       address,
-      community,
       commentId,
       commentBody,
       discordMeta,

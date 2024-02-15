@@ -1,7 +1,8 @@
 //TODO: This should be deleted after view counts are recovered.
+import { models } from '@hicommonwealth/model';
 import dotenv from 'dotenv';
 import { Client } from 'pg';
-import models from '../server/database';
+import { exit } from 'yargs';
 
 dotenv.config();
 
@@ -30,8 +31,9 @@ async function run() {
 
     const batchedQuery = (batchedViewCounts) => `
         UPDATE "Threads"
-        SET new_view_count = CASE 
-            ${batchedViewCounts.rows
+        SET view_count_recovered = true,
+        new_view_count = CASE 
+            ${batchedViewCounts
               .map(
                 (count) =>
                   `WHEN id = ${count.object_id} THEN new_view_count + ${count.view_count}`,
@@ -39,9 +41,10 @@ async function run() {
               .join(' ')}
         ELSE new_view_count
         END
-        WHERE id IN (${batchedViewCounts.rows
+        WHERE id IN (${batchedViewCounts
           .map((count) => count.object_id)
-          .join(', ')});
+          .join(', ')})
+        AND view_count_recovered = false;
         `;
 
     for (let i = 0; i < totalRows; i += batchSize) {
@@ -49,12 +52,16 @@ async function run() {
       await models.sequelize.query(
         batchedQuery(viewCounts.rows.slice(i, endIndex)),
       );
+      console.log(`recovered view counts for threads ${endIndex}/${totalRows}`);
     }
   } catch (error) {
     console.error('Error:', error.message);
+    exit(1, error);
   } finally {
     await recoveryClient.end();
   }
+
+  exit(0, null);
 }
 
 run();

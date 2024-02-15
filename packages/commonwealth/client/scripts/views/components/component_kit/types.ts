@@ -12,12 +12,14 @@ export enum ComponentType {
   Card = 'Card',
   Checkbox = 'Checkbox',
   CircleButton = 'CircleButton',
+  CircleSpinner = 'CircleSpinner',
   Collapsible = 'Collapsible',
   CommunityAvatar = 'CommunityAvatar',
   CommunitySelector = 'CommunitySelector',
   ContentPage = 'ContentPage',
   CustomIcon = 'CustomIcon',
   Divider = 'Divider',
+  Drawer = 'Drawer',
   Form = 'Form',
   FormSection = 'FormSection',
   FormSteps = 'FormSteps',
@@ -26,6 +28,7 @@ export enum ComponentType {
   Icon = 'Icon',
   IconButton = 'IconButton',
   Label = 'Label',
+  LoadingSpinner = 'LoadingSpinner',
   MessageBanner = 'MessageBanner',
   MobileMenu = 'MobileMenu',
   Modal = 'CWModal',
@@ -54,7 +57,6 @@ export enum ComponentType {
   TypeaheadSelectList = 'TypeaheadSelectList',
   Upvote = 'Upvote',
   ValidationText = 'ValidationText',
-  VoteWeightModule = 'VoteWeightModule',
   WalletOptionRow = 'WalletOptionRow',
   SelectList = 'SelectList',
 }
@@ -85,6 +87,7 @@ export type DefaultMenuItem = {
   type?: 'default';
   className?: string;
   preventClosing?: boolean;
+  isButton?: boolean;
 };
 
 type NotificationMenuItem = {

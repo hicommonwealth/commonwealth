@@ -1,27 +1,32 @@
+import {
+  HotShotsStats,
+  RabbitMQController,
+  RascalConfigServices,
+  RascalPublications,
+  ServiceKey,
+  TypescriptLoggingLogger,
+  getRabbitMQConfig,
+  startHealthCheckLoop,
+} from '@hicommonwealth/adapters';
+import {
+  logger,
+  stats,
+  type ISnapshotNotification,
+} from '@hicommonwealth/core';
 import type { Request, Response } from 'express';
 import express from 'express';
-import type { ISnapshotNotification } from 'common-common/src/types';
-import {
-  getRabbitMQConfig,
-  RabbitMQController,
-} from 'common-common/src/rabbitmq';
-import { RascalPublications } from 'common-common/src/rabbitmq/types';
-import fetchNewSnapshotProposal from './utils/fetchSnapshot';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { DEFAULT_PORT, RABBITMQ_URI } from './config';
-import { StatsDController } from 'common-common/src/statsd';
 import v8 from 'v8';
+import { DEFAULT_PORT, RABBITMQ_URI } from './config';
+import fetchNewSnapshotProposal from './utils/fetchSnapshot';
 import {
   methodNotAllowedMiddleware,
   registerRoute,
 } from './utils/methodNotAllowed';
-import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
-import {
-  ServiceKey,
-  startHealthCheckLoop,
-} from 'common-common/src/scripts/startHealthCheckLoop';
 
 let isServiceHealthy = false;
+
+const log = logger(TypescriptLoggingLogger()).getLogger(__filename);
+stats(HotShotsStats());
 
 startHealthCheckLoop({
   service: ServiceKey.SnapshotListener,
@@ -32,12 +37,10 @@ startHealthCheckLoop({
   },
 });
 
-const log = factory.getLogger(formatFilename(__filename));
-
 log.info(
   `Node Option max-old-space-size set to: ${JSON.stringify(
-    v8.getHeapStatistics().heap_size_limit / 1000000000
-  )} GB`
+    v8.getHeapStatistics().heap_size_limit / 1000000000,
+  )} GB`,
 );
 
 const app = express();
@@ -77,14 +80,10 @@ registerRoute(app, 'post', '/snapshot', async (req: Request, res: Response) => {
 
     await controller.publish(event, RascalPublications.SnapshotListener);
 
-    StatsDController.get().increment(
-      'snapshot_listener.received_snapshot_event',
-      1,
-      {
-        event: eventType,
-        space: event.space,
-      }
-    );
+    stats().increment('snapshot_listener.received_snapshot_event', {
+      event: eventType,
+      space: event.space,
+    });
 
     res.status(200).send({ message: 'Snapshot event received', event });
   } catch (err) {
@@ -96,12 +95,12 @@ registerRoute(app, 'post', '/snapshot', async (req: Request, res: Response) => {
 app.use(methodNotAllowedMiddleware());
 
 app.listen(port, async () => {
-  const log = factory.getLogger(formatFilename(__filename));
+  const log = logger().getLogger(__filename);
   log.info(`⚡️[server]: Server is running at https://localhost:${port}`);
 
   try {
     controller = new RabbitMQController(
-      getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.SnapshotService)
+      getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.SnapshotService),
     );
     await controller.init();
     log.info('Connected to RabbitMQ');

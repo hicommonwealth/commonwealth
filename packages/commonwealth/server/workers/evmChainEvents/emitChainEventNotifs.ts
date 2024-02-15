@@ -1,19 +1,20 @@
-import { factory, formatFilename } from 'common-common/src/logging';
 import {
   NotificationCategories,
+  NotificationDataAndCategory,
   SupportedNetwork,
-} from 'common-common/src/types';
+  logger,
+} from '@hicommonwealth/core';
+import {
+  CommunityAttributes,
+  ContractAttributes,
+  NotificationInstance,
+  models,
+} from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
-import { NotificationDataAndCategory } from 'types';
-import models from '../../database';
-import { CommunityAttributes } from '../../models/community';
-import { ContractAttributes } from '../../models/contract';
-import { NotificationInstance } from '../../models/notification';
 import emitNotifications from '../../util/emitNotifications';
-import { rollbar } from '../../util/rollbar';
 import { RawEvmEvent } from './types';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 export async function emitChainEventNotifs(
   chainNodeId: number,
@@ -38,7 +39,7 @@ export async function emitChainEventNotifs(
     SELECT CH.id as chain_id, CH.network as chain_network, C.address as contract_address, C.chain_node_id
     FROM "Contracts" C
              JOIN "CommunityContracts" CC on C.id = CC.contract_id
-             JOIN "Communities" CH ON CC.chain_id = CH.id
+             JOIN "Communities" CH ON CC.community_id = CH.id
     WHERE (C.address, C.chain_node_id) IN (?);
   `,
     { type: QueryTypes.SELECT, raw: true, replacements: [queryFilter] },
@@ -72,7 +73,6 @@ export async function emitChainEventNotifs(
     } catch (e) {
       const msg = `Error formatting event: ${JSON.stringify(event, null, 2)}`;
       log.error(msg, e);
-      rollbar.error(msg, e);
       continue;
     }
 
@@ -84,7 +84,6 @@ export async function emitChainEventNotifs(
           2,
         )}`;
         log.error(msg, e);
-        rollbar.error(msg, e);
       }),
     );
   }

@@ -8,7 +8,7 @@ import clsx from 'clsx';
 import type { BaseStyleProps } from './types';
 import { ComponentType } from './types';
 
-export type CheckboxType = { label?: string; value?: string };
+export type CheckboxType = { label?: string | React.ReactNode; value?: string };
 
 type CheckboxStyleProps = {
   checked?: boolean;

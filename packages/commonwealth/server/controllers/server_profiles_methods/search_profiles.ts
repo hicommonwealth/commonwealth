@@ -1,9 +1,9 @@
 import { Op, QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from 'server/types';
 
+import { AppError } from '@hicommonwealth/core';
+import { CommunityInstance } from '@hicommonwealth/model';
 import { flatten, uniq } from 'lodash';
-import { CommunityInstance } from 'server/models/community';
-import { AppError } from '../../../../common-common/src/errors';
 import {
   PaginationSqlOptions,
   buildPaginatedResponse,
@@ -14,6 +14,11 @@ import { ServerProfilesController } from '../server_profiles_controller';
 
 export const Errors = {};
 
+export type MembershipFilters =
+  | 'in-group'
+  | `in-group:${number}`
+  | 'not-in-group';
+
 export type SearchProfilesOptions = {
   community: CommunityInstance;
   search: string;
@@ -22,7 +27,7 @@ export type SearchProfilesOptions = {
   page?: number;
   orderBy?: string;
   orderDirection?: 'ASC' | 'DESC';
-  memberships?: string;
+  memberships?: MembershipFilters;
   includeGroupIds?: boolean;
 };
 
@@ -96,16 +101,26 @@ export async function __searchProfiles(
     ? `"Addresses".community_id = $community_id AND`
     : '';
 
+  const groupIdFromMemberships = parseInt(
+    ((memberships || '').match(/in-group:(\d+)/) || [`0`, `0`])[1],
+  );
   let membershipsWhere = memberships
     ? `SELECT 1 FROM "Memberships"
     JOIN "Groups" ON "Groups".id = "Memberships".group_id
     WHERE "Memberships".address_id = "Addresses".id
-    AND "Groups".community_id = $community_id`
+    AND "Groups".community_id = $community_id
+    ${
+      groupIdFromMemberships
+        ? `AND "Groups".id = ${groupIdFromMemberships}`
+        : ''
+    }
+    `
     : '';
 
   if (memberships) {
     switch (memberships) {
       case 'in-group':
+      case `in-group:${groupIdFromMemberships}`:
         membershipsWhere = `AND EXISTS (${membershipsWhere} AND "Memberships".reject_reason IS NULL)`;
         break;
       case 'not-in-group':

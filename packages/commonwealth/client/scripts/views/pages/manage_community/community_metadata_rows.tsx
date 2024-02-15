@@ -1,7 +1,6 @@
+import { ChainBase, DefaultPage } from '@hicommonwealth/core';
 import axios from 'axios';
-import { ChainBase, DefaultPage } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { featureFlags } from 'helpers/feature-flags';
 import { uuidv4 } from 'lib/util';
 import 'pages/manage_community/community_metadata_rows.scss';
 import React, { useEffect, useState } from 'react';
@@ -10,6 +9,7 @@ import useFetchDiscordChannelsQuery from 'state/api/fetchDiscordChannels';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { InputRow, SelectRow, ToggleRow } from 'views/components/metadata_rows';
+import { useFlag } from '../../../hooks/useFlag';
 import type CommunityInfo from '../../../models/ChainInfo';
 import type RoleInfo from '../../../models/RoleInfo';
 import { AvatarUpload } from '../../components/Avatar';
@@ -21,7 +21,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWToggle } from '../../components/component_kit/cw_toggle';
 import DirectoryPageSection from './DirectoryPageSection';
 import { DiscordForumConnections } from './DiscordForumConnections';
-import { setCommunityCategories, setSelectedTags } from './helpers';
+import { getCommunityTags, setCommunityCategories } from './helpers';
 import { ManageRoles } from './manage_roles';
 
 type CommunityMetadataRowsProps = {
@@ -39,6 +39,8 @@ export const CommunityMetadataRows = ({
   onRoleUpdate,
   onSave,
 }: CommunityMetadataRowsProps) => {
+  const communityHomepageEnabled = useFlag('communityHomepage');
+
   const params = new URLSearchParams(window.location.search);
   const returningFromDiscordCallback = params.get(
     'returningFromDiscordCallback',
@@ -88,7 +90,7 @@ export const CommunityMetadataRows = ({
   const [defaultPage, setDefaultPage] = useState(community.defaultPage);
   const [hasHomepage, setHasHomepage] = useState(community.hasHomepage);
   const [selectedTags2, setSelectedTags2] = useState(
-    setSelectedTags(community.id),
+    getCommunityTags(community.id),
   );
   const [discordBotConnected, setDiscordBotConnected] = useState(
     returningFromDiscordCallback === 'true'
@@ -339,7 +341,7 @@ export const CommunityMetadataRows = ({
         }
       />
 
-      {featureFlags.communityHomepage && (
+      {communityHomepageEnabled && (
         <ToggleRow
           title="Homepage"
           defaultValue={hasHomepage}
@@ -358,7 +360,7 @@ export const CommunityMetadataRows = ({
           }
         />
       )}
-      {featureFlags.communityHomepage && hasHomepage ? (
+      {communityHomepageEnabled && hasHomepage ? (
         <SelectRow
           title="Default Page"
           options={[
@@ -544,7 +546,9 @@ export const CommunityMetadataRows = ({
                           await refetchTopics();
                           notifySuccess(
                             `#${channel.name} connected to ${
-                              topics.find((topic) => topic.id === topicId)?.name
+                              topics.find(
+                                (topic) => topic.id === Number(topicId),
+                              )?.name
                             }!`,
                           );
                         } catch (e) {
@@ -554,7 +558,11 @@ export const CommunityMetadataRows = ({
                       },
                     };
                   })}
-                  topics={topics}
+                  topics={topics.map((topic) => ({
+                    name: topic.name,
+                    id: `${topic.id}`,
+                    channelId: topic.channelId,
+                  }))}
                   refetchTopics={async () => {
                     await refetchTopics();
                   }}

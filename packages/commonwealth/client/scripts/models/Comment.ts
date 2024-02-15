@@ -7,26 +7,24 @@ import type { IUniqueId } from './interfaces';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export class Comment<T extends IUniqueId> {
-  [x: string]: any;
-
-  public readonly chain: string;
+  public readonly communityId: string;
   public readonly author: string;
   public readonly Address: AddressInfo;
   public readonly text: string;
   public readonly plaintext: string;
   public readonly reactions: Reaction[];
+  public reactionWeightsSum: number;
   public readonly id: number;
-  public readonly created_at: momentType.Moment;
+  public readonly createdAt: momentType.Moment;
   public readonly authorChain?: string;
   public readonly parentComment: number;
   public readonly threadId: number;
-  public readonly version_history: VersionHistory[];
+  public readonly versionHistory: VersionHistory[];
   public readonly lastEdited: string;
   public markedAsSpamAt: momentType.Moment;
   public readonly deleted: boolean;
   public readonly rootThread: string;
   public readonly parentId: number;
-  public readonly deletedAt: any;
 
   public readonly canvasAction: string;
   public readonly canvasSession: string;
@@ -36,13 +34,14 @@ export class Comment<T extends IUniqueId> {
   constructor({
     id,
     text,
-    chain,
+    community_id,
     author,
     Address,
     thread_id,
     parent_id,
     plaintext,
     reactions,
+    reaction_weights_sum,
     created_at,
     deleted_at,
     authorChain,
@@ -74,7 +73,7 @@ export class Comment<T extends IUniqueId> {
         })
       : [];
 
-    this.chain = chain;
+    this.communityId = community_id;
     this.author = Address?.address || author;
     this.text = deleted_at?.length > 0 ? '[deleted]' : decodeURIComponent(text);
     this.plaintext = deleted_at?.length > 0 ? '[deleted]' : plaintext;
@@ -95,6 +94,7 @@ export class Comment<T extends IUniqueId> {
     this.canvasSession = canvas_session;
     this.canvasHash = canvas_hash;
     this.reactions = (reactions || []).map((r) => new Reaction(r));
+    this.reactionWeightsSum = reaction_weights_sum;
     this.rootThread = thread_id;
     this.discord_meta = discord_meta;
   }

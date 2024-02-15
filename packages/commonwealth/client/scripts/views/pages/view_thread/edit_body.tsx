@@ -1,19 +1,18 @@
-import React from 'react';
-
-import type Thread from '../../../models/Thread';
-import 'pages/view_thread/edit_body.scss';
+import { ContentType } from '@hicommonwealth/core';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import app from 'state';
-import { ContentType } from 'types';
-import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
-import { CWButton } from '../../components/component_kit/new_designs/cw_button';
+import { SessionKeyError } from 'controllers/server/sessions';
+import 'pages/view_thread/edit_body.scss';
 import type { DeltaStatic } from 'quill';
-import { ReactQuillEditor } from '../../components/react_quill_editor';
-import { deserializeDelta } from '../../components/react_quill_editor/utils';
-import { openConfirmation } from 'views/modals/confirmation_modal';
+import React from 'react';
+import app from 'state';
 import { useEditThreadMutation } from 'state/api/threads';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
-import { SessionKeyError } from 'controllers/server/sessions';
+import { openConfirmation } from 'views/modals/confirmation_modal';
+import type Thread from '../../../models/Thread';
+import { CWButton } from '../../components/component_kit/new_designs/cw_button';
+import { ReactQuillEditor } from '../../components/react_quill_editor';
+import { deserializeDelta } from '../../components/react_quill_editor/utils';
+import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
 
 type EditBodyProps = {
   title: string;
@@ -83,6 +82,9 @@ export const EditBody = (props: EditBodyProps) => {
             buttonHeight: 'sm',
           },
         ],
+        onClose: () => {
+          return;
+        },
       });
     } else {
       cancelEditing();
@@ -124,6 +126,7 @@ export const EditBody = (props: EditBodyProps) => {
         <ReactQuillEditor
           contentDelta={contentDelta}
           setContentDelta={setContentDelta}
+          cancelEditing={cancelEditing}
         />
         <div className="buttons-row">
           <CWButton

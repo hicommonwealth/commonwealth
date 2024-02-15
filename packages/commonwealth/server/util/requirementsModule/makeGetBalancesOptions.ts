@@ -1,25 +1,26 @@
-import { AddressAttributes } from 'server/models/address';
-import { GroupAttributes } from 'server/models/group';
-import {
-  GetBalancesOptions,
-  GetCosmosBalancesOptions,
-  GetErc1155BalanceOptions,
-  GetErcBalanceOptions,
-  GetEthNativeBalanceOptions,
-} from '../tokenBalanceCache/types';
 import {
   BalanceSourceType,
   ContractSource,
+  CosmosContractSource,
   CosmosSource,
   NativeSource,
-} from './requirementsTypes';
+} from '@hicommonwealth/core';
+import {
+  AddressAttributes,
+  GetBalancesOptions,
+  GetCosmosBalancesOptions,
+  GetCw721BalanceOptions,
+  GetErc1155BalanceOptions,
+  GetErcBalanceOptions,
+  GetEthNativeBalanceOptions,
+  GroupAttributes,
+} from '@hicommonwealth/model';
 
 export function makeGetBalancesOptions(
   groups: GroupAttributes[],
   addresses: AddressAttributes[],
 ): GetBalancesOptions[] {
-  const allOptions: Exclude<GetBalancesOptions, GetErc1155BalanceOptions>[] =
-    [];
+  const allOptions: GetBalancesOptions[] = [];
 
   const addressStrings = addresses.map((a) => a.address);
 
@@ -48,6 +49,34 @@ export function makeGetBalancesOptions(
                 sourceOptions: {
                   contractAddress: castedSource.contract_address,
                   evmChainId: castedSource.evm_chain_id,
+                },
+                addresses: addressStrings,
+              });
+            }
+            break;
+          }
+          case BalanceSourceType.ERC1155: {
+            const castedSource = requirement.data.source as ContractSource;
+            const existingOptions = allOptions.find((opt) => {
+              const castedOpt = opt as GetErc1155BalanceOptions;
+              return (
+                castedOpt.balanceSourceType === BalanceSourceType.ERC1155 &&
+                castedOpt.sourceOptions.evmChainId ===
+                  castedSource.evm_chain_id &&
+                castedOpt.sourceOptions.contractAddress ===
+                  castedSource.contract_address &&
+                castedOpt.sourceOptions.tokenId ===
+                  parseInt(castedSource.token_id, 10)
+              );
+            });
+
+            if (!existingOptions) {
+              allOptions.push({
+                balanceSourceType: BalanceSourceType.ERC1155,
+                sourceOptions: {
+                  evmChainId: castedSource.evm_chain_id,
+                  contractAddress: castedSource.contract_address,
+                  tokenId: parseInt(castedSource.token_id, 10),
                 },
                 addresses: addressStrings,
               });
@@ -91,6 +120,32 @@ export function makeGetBalancesOptions(
               allOptions.push({
                 balanceSourceType: BalanceSourceType.CosmosNative,
                 sourceOptions: {
+                  cosmosChainId: castedSource.cosmos_chain_id,
+                },
+                addresses: addressStrings,
+              });
+            }
+            break;
+          }
+          // CosmosContractSource
+          case BalanceSourceType.CW721: {
+            const castedSource = requirement.data
+              .source as CosmosContractSource;
+            const existingOptions = allOptions.find((opt) => {
+              const castedOpt = opt as GetCw721BalanceOptions;
+              return (
+                castedOpt.balanceSourceType === castedSource.source_type &&
+                castedOpt.sourceOptions.cosmosChainId ===
+                  castedSource.cosmos_chain_id &&
+                castedOpt.sourceOptions.contractAddress ===
+                  castedSource.contract_address
+              );
+            });
+            if (!existingOptions) {
+              allOptions.push({
+                balanceSourceType: BalanceSourceType.CW721,
+                sourceOptions: {
+                  contractAddress: castedSource.contract_address,
                   cosmosChainId: castedSource.cosmos_chain_id,
                 },
                 addresses: addressStrings,

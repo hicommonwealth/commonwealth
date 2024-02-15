@@ -1,27 +1,27 @@
 import { Op } from 'sequelize';
 
-import { AppError } from 'common-common/src/errors';
-import { factory, formatFilename } from 'common-common/src/logging';
 import {
+  AppError,
   ChainBase,
+  DynamicTemplate,
   NotificationCategories,
   WalletId,
   WalletSsoSource,
-} from 'common-common/src/types';
+  logger,
+} from '@hicommonwealth/core';
+import type {
+  CommunityInstance,
+  DB,
+  ProfileAttributes,
+} from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
-import { DynamicTemplate } from '../../shared/types';
 import { addressSwapper } from '../../shared/utils';
-import type { DB } from '../models';
-import type { CommunityInstance } from '../models/community';
-import type { ProfileAttributes } from '../models/profile';
+import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import assertAddressOwnership from '../util/assertAddressOwnership';
 import verifySessionSignature from '../util/verifySessionSignature';
 
-import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
-
-const log = factory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');

@@ -3,19 +3,22 @@ import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/landing/header.scss';
 import React, { useState } from 'react';
 import { LoginModal } from 'views/modals/login_modal';
-import { CWButton } from '../../components/component_kit/cw_button';
+import { useFlag } from '../../../hooks/useFlag';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWModal } from '../../components/component_kit/new_designs/CWModal';
+import { CWButton } from '../../components/component_kit/new_designs/cw_button';
+import { AuthModal } from '../../modals/AuthModal';
 
 type HeaderProps = {
   onLogin: () => void;
 };
 
 export const Header = ({ onLogin }: HeaderProps) => {
+  const newSignInModalEnabled = useFlag('newSignInModal');
   const navigate = useCommonNavigate();
 
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const { isWindowMediumSmallInclusive } = useBrowserWindow({});
 
   return (
@@ -29,7 +32,7 @@ export const Header = ({ onLogin }: HeaderProps) => {
         {isWindowMediumSmallInclusive ? (
           <CWIconButton
             iconName="hamburger"
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => setIsAuthModalOpen(true)}
           />
         ) : (
           <div className="desktop-login">
@@ -37,24 +40,33 @@ export const Header = ({ onLogin }: HeaderProps) => {
               Why Commonwealth?
             </CWText>
             <CWButton
+              buttonType="primary"
+              buttonHeight="sm"
               label="Sign in"
-              buttonType="primary-black"
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => setIsAuthModalOpen(true)}
             />
           </div>
         )}
       </div>
-      <CWModal
-        content={
-          <LoginModal
-            onSuccess={onLogin}
-            onModalClose={() => setIsModalOpen(false)}
-          />
-        }
-        isFullScreen={isWindowMediumSmallInclusive}
-        onClose={() => setIsModalOpen(false)}
-        open={isModalOpen}
-      />
+      {!newSignInModalEnabled ? (
+        <CWModal
+          content={
+            <LoginModal
+              onSuccess={onLogin}
+              onModalClose={() => setIsAuthModalOpen(false)}
+            />
+          }
+          isFullScreen={isWindowMediumSmallInclusive}
+          onClose={() => setIsAuthModalOpen(false)}
+          open={isAuthModalOpen}
+        />
+      ) : (
+        <AuthModal
+          onSuccess={onLogin}
+          isOpen={isAuthModalOpen}
+          onClose={() => setIsAuthModalOpen(false)}
+        />
+      )}
     </>
   );
 };

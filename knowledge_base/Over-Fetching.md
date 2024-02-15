@@ -96,7 +96,7 @@ SELECT
   "Thread->Address"."wallet_id" AS "Thread.Address.wallet_id", 
   "Thread->Address"."user_id" AS "Thread.Address.UserId", 
   "Comment"."id" AS "Comment.id", 
-  "Comment"."chain" AS "Comment.chain", 
+  "Comment"."community_id" AS "Comment.community_id", 
   "Comment"."thread_id" AS "Comment.thread_id", 
   "Comment"."parent_id" AS "Comment.parent_id", 
   "Comment"."address_id" AS "Comment.address_id", 

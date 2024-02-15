@@ -1,8 +1,7 @@
+import { NotificationCategories } from '@hicommonwealth/core';
+import { ContractInstance, models } from '@hicommonwealth/model';
 import { expect } from 'chai';
-import { NotificationCategories } from 'common-common/src/types';
 import sinon from 'sinon';
-import models from '../../../../server/database';
-import { ContractInstance } from '../../../../server/models/contract';
 import { startEvmPolling } from '../../../../server/workers/evmChainEvents/startEvmPolling';
 import {
   getTestAbi,
@@ -101,8 +100,8 @@ describe('EVM Chain Events End to End Tests', () => {
     await getTestSignatures();
 
     // create proposal notification
-    await sdk.getVotingPower(1, '400000', 'aave');
-    propCreatedResult = await sdk.createProposal(1, 'aave');
+    await sdk.getVotingPower(1, '400000');
+    propCreatedResult = await sdk.createProposal(1);
     console.log(
       `Proposal created at block ${propCreatedResult.block} with id ${propCreatedResult.proposalId}`,
     );
@@ -120,7 +119,7 @@ describe('EVM Chain Events End to End Tests', () => {
     const notifications = await models.Notification.findAll();
     expect(notifications.length).to.equal(1);
     const notification = notifications[0].toJSON();
-    expect(notification).to.have.own.property('chain_id', testChainId);
+    expect(notification).to.have.own.property('community_id', testChainId);
     expect(notification).to.have.own.property(
       'category_id',
       NotificationCategories.ChainEvent,

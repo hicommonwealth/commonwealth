@@ -44,11 +44,15 @@
 
   .action-buttons {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
     margin-top: 24px;
     margin-bottom: 24px;
     gap: 10px;
+
+    @include smallInclusive {
+      justify-content: flex-end;
+    }
   }
 }

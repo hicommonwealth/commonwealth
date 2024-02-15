@@ -1,0 +1,9 @@
+@import '../../../../styles/shared.scss';
+
+.ManageCommunityStakeModal {
+  .CWModalHeader {
+    .warning-icon {
+      fill: $yellow-500;
+    }
+  }
+}

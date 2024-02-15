@@ -61,6 +61,7 @@
 
       &.disabled {
         background-color: $neutral-200;
+        cursor: not-allowed;
 
         svg {
           color: $neutral-400;
@@ -88,6 +89,7 @@
 
       &.disabled {
         background-color: $neutral-50;
+        cursor: not-allowed;
 
         svg {
           color: $neutral-400;

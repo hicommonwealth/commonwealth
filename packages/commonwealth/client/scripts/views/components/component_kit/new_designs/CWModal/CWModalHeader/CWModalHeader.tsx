@@ -8,7 +8,7 @@ import './CWModalHeader.scss';
 type HeaderIconType = 'warning' | 'danger';
 
 type CWModalHeaderProps = {
-  label?: string;
+  label?: string | React.ReactNode;
   subheader?: string;
   icon?: HeaderIconType;
   onModalClose: () => void;

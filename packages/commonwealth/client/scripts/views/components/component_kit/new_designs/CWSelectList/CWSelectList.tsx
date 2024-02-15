@@ -33,6 +33,7 @@ export const CWSelectList = <
     classNamePrefix,
     isSearchable,
     customError,
+    components,
   } = props;
   const formContext = useFormContext();
   const formFieldContext = hookToForm
@@ -114,7 +115,7 @@ export const CWSelectList = <
         components={{
           DropdownIndicator,
           MultiValueRemove,
-          Option,
+          Option: components?.Option || Option,
         }}
         className={getClasses<{
           className?: string;

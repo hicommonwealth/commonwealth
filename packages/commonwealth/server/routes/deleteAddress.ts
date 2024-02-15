@@ -1,7 +1,6 @@
-import { AppError, ServerError } from 'common-common/src/errors';
-import { WalletId } from 'common-common/src/types';
+import { AppError, ServerError, WalletId } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-import type { DB } from '../models';
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',
@@ -15,7 +14,7 @@ const deleteAddress = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.user) {
     return next(new AppError(Errors.NotLoggedIn));

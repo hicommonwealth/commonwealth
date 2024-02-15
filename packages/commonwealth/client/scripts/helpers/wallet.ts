@@ -1,5 +1,5 @@
+import { WalletId } from '@hicommonwealth/core';
 import axios from 'axios';
-import { WalletId } from '../../../../common-common/src/types';
 import Near from '../controllers/chain/near/adapter';
 import IWebWallet from '../models/IWebWallet';
 
@@ -44,7 +44,11 @@ const getAddressFromWallet = (wallet: IWebWallet<any>) => {
     }
 
     if (wallet.defaultNetwork === 'terra') {
-      return wallet.accounts[0]?.address;
+      if (wallet.name === WalletId.TerraWalletConnect) {
+        return wallet.accounts[0]?.address;
+      } else {
+        return wallet.accounts[0];
+      }
     }
 
     if (wallet.chain === 'cosmos') {

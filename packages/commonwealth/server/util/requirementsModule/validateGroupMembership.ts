@@ -1,12 +1,14 @@
-import { MembershipRejectReason } from 'server/models/membership';
-import { toBN } from 'web3-utils';
-import { OptionsWithBalances } from '../tokenBalanceCache/types';
 import {
   AllowlistData,
   BalanceSourceType,
   Requirement,
   ThresholdData,
-} from './requirementsTypes';
+} from '@hicommonwealth/core';
+import {
+  MembershipRejectReason,
+  OptionsWithBalances,
+} from '@hicommonwealth/model';
+import { toBN } from 'web3-utils';
 
 export type ValidateGroupMembershipResponse = {
   isValid: boolean;
@@ -21,12 +23,12 @@ export type ValidateGroupMembershipResponse = {
  * @param balances address balances
  * @returns ValidateGroupMembershipResponse validity and messages on requirements that failed
  */
-export default async function validateGroupMembership(
+export default function validateGroupMembership(
   userAddress: string,
   requirements: Requirement[],
   balances: OptionsWithBalances[],
   numRequiredRequirements: number = 0,
-): Promise<ValidateGroupMembershipResponse> {
+): ValidateGroupMembershipResponse {
   const response: ValidateGroupMembershipResponse = {
     isValid: true,
     messages: [],
@@ -34,19 +36,15 @@ export default async function validateGroupMembership(
   let allowListOverride = false;
   let numRequirementsMet = 0;
 
-  const checks = requirements.map(async (requirement) => {
+  requirements.forEach((requirement) => {
     let checkResult: { result: boolean; message: string };
     switch (requirement.rule) {
       case 'threshold': {
-        checkResult = await _thresholdCheck(
-          userAddress,
-          requirement.data,
-          balances,
-        );
+        checkResult = _thresholdCheck(userAddress, requirement.data, balances);
         break;
       }
       case 'allow': {
-        checkResult = await _allowlistCheck(
+        checkResult = _allowlistCheck(
           userAddress,
           requirement.data as AllowlistData,
         );
@@ -74,8 +72,6 @@ export default async function validateGroupMembership(
     }
   });
 
-  await Promise.all(checks);
-
   if (allowListOverride) {
     // allow if address is whitelisted
     return { isValid: true };
@@ -92,11 +88,11 @@ export default async function validateGroupMembership(
   return response;
 }
 
-async function _thresholdCheck(
+function _thresholdCheck(
   userAddress: string,
   thresholdData: ThresholdData,
   balances: OptionsWithBalances[],
-): Promise<{ result: boolean; message: string }> {
+): { result: boolean; message: string } {
   try {
     let balanceSourceType: BalanceSourceType;
     let contractAddress: string;
@@ -133,6 +129,12 @@ async function _thresholdCheck(
         chainId = thresholdData.source.cosmos_chain_id;
         break;
       }
+      case 'cw721': {
+        balanceSourceType = BalanceSourceType.CW721;
+        contractAddress = thresholdData.source.contract_address;
+        chainId = thresholdData.source.cosmos_chain_id;
+        break;
+      }
       default:
         break;
     }
@@ -157,6 +159,11 @@ async function _thresholdCheck(
             return b.options.sourceOptions.evmChainId.toString() === chainId;
           case BalanceSourceType.CosmosNative:
             return b.options.sourceOptions.cosmosChainId.toString() === chainId;
+          case BalanceSourceType.CW721:
+            return (
+              b.options.sourceOptions.contractAddress == contractAddress &&
+              b.options.sourceOptions.cosmosChainId.toString() === chainId
+            );
           default:
             return null;
         }
@@ -181,10 +188,10 @@ async function _thresholdCheck(
   }
 }
 
-async function _allowlistCheck(
+function _allowlistCheck(
   userAddress: string,
   allowlistData: AllowlistData,
-): Promise<{ result: boolean; message: string }> {
+): { result: boolean; message: string } {
   try {
     const result = allowlistData.allow.includes(userAddress);
     return {

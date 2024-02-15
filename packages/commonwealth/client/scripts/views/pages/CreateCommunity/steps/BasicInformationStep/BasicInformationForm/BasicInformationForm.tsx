@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { slugifyPreserveDashes } from 'utils';
 
-import { ChainBase } from 'common-common/src/types';
+import { ChainBase } from '@hicommonwealth/core';
 import { notifyError } from 'controllers/app/notifications';
 import useCreateCommunityMutation from 'state/api/communities/createCommunity';
 import {
@@ -17,7 +17,12 @@ import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelec
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { openConfirmation } from 'views/modals/confirmation_modal';
-
+import {
+  BaseMixpanelPayload,
+  MixpanelCommunityCreationEvent,
+  MixpanelLoginPayload,
+} from '../../../../../../../../shared/analytics/types';
+import { useBrowserAnalyticsTrack } from '../../../../../../hooks/useBrowserAnalyticsTrack';
 import './BasicInformationForm.scss';
 import {
   ETHEREUM_MAINNET_ID,
@@ -31,11 +36,14 @@ import { basicInformationFormValidationSchema } from './validation';
 
 import useSocialLinks from './useSocialLinks';
 
+const socialLinksDisplay = false; // TODO: Set this when design figures out how we will integrate the social links
+
 const BasicInformationForm = ({
   selectedAddress,
   selectedCommunity,
   onSubmit,
   onCancel,
+  handleSelectedChainId,
 }: BasicInformationFormProps) => {
   const [communityName, setCommunityName] = useState('');
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
@@ -48,6 +56,12 @@ const BasicInformationForm = ({
     validateSocialLinks,
     updateAndValidateSocialLinkAtIndex,
   } = useSocialLinks();
+
+  const { trackAnalytics } = useBrowserAnalyticsTrack<
+    MixpanelLoginPayload | BaseMixpanelPayload
+  >({
+    onAction: true,
+  });
 
   const {
     mutateAsync: createCommunityMutation,
@@ -141,13 +155,17 @@ const BasicInformationForm = ({
           bech32Prefix: selectedChainNode.bech32Prefix,
         }),
       });
-      onSubmit(communityId);
+      onSubmit(communityId, values.communityName);
     } catch (err) {
       notifyError(err.response?.data?.error);
     }
   };
 
   const handleCancel = () => {
+    trackAnalytics({
+      event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_CANCELLED,
+    });
+
     openConfirmation({
       title: 'Are you sure you want to cancel?',
       description: 'Your details will not be saved. Cancel create community?',
@@ -167,12 +185,17 @@ const BasicInformationForm = ({
     });
   };
 
+  const handleWatchForm = (values: any) => {
+    handleSelectedChainId(values?.chain?.value);
+  };
+
   return (
     <CWForm
       validationSchema={basicInformationFormValidationSchema}
       onSubmit={handleSubmit}
       className="BasicInformationForm"
       initialValues={getInitialValue()}
+      onWatch={handleWatchForm}
     >
       {/* Form fields */}
       <CWTextInput
@@ -227,57 +250,60 @@ const BasicInformationForm = ({
         enableGenerativeAI
       />
 
-      <section className="header">
-        <CWText type="h4">
-          Community Links{' '}
-          <CWText type="b1" className="optional-label">
-            &#40;Optional&#41;
-          </CWText>
-        </CWText>
-        <CWText type="b1" className="description">
-          Add your Discord, Twitter (X), Telegram, Website, etc.
-        </CWText>
-      </section>
+      {socialLinksDisplay ? (
+        <>
+          <section className="header">
+            <CWText type="h4">
+              Community Links{' '}
+              <CWText type="b1" className="optional-label">
+                &#40;Optional&#41;
+              </CWText>
+            </CWText>
+            <CWText type="b1" className="description">
+              Add your Discord, Twitter (X), Telegram, Website, etc.
+            </CWText>
+          </section>
 
-      {/* Social links */}
-      <section className="social-links">
-        <CWText type="caption">Social Links</CWText>
+          <section className="social-links">
+            <CWText type="caption">Social Links</CWText>
 
-        {socialLinks.map((socialLink, index) => (
-          <div className="link-input-container" key={index}>
-            <CWTextInput
-              containerClassName="w-full"
-              placeholder="https://example.com"
-              fullWidth
-              value={socialLink.value}
-              customError={socialLink.error}
-              onInput={(e) =>
-                updateAndValidateSocialLinkAtIndex(
-                  e.target.value?.trim(),
-                  index,
-                )
-              }
-              onBlur={() =>
-                updateAndValidateSocialLinkAtIndex(socialLink.value, index)
-              }
-              onFocus={() =>
-                updateAndValidateSocialLinkAtIndex(socialLink.value, index)
-              }
-            />
-            <CWIconButton
-              iconButtonTheme="neutral"
-              iconName="trash"
-              iconSize="large"
-              onClick={() => removeLinkAtIndex(index)}
-              disabled={socialLinks.length === 1}
-            />
-          </div>
-        ))}
+            {socialLinks.map((socialLink, index) => (
+              <div className="link-input-container" key={index}>
+                <CWTextInput
+                  containerClassName="w-full"
+                  placeholder="https://example.com"
+                  fullWidth
+                  value={socialLink.value}
+                  customError={socialLink.error}
+                  onInput={(e) =>
+                    updateAndValidateSocialLinkAtIndex(
+                      e.target.value?.trim(),
+                      index,
+                    )
+                  }
+                  onBlur={() =>
+                    updateAndValidateSocialLinkAtIndex(socialLink.value, index)
+                  }
+                  onFocus={() =>
+                    updateAndValidateSocialLinkAtIndex(socialLink.value, index)
+                  }
+                />
+                <CWIconButton
+                  iconButtonTheme="neutral"
+                  iconName="trash"
+                  iconSize="large"
+                  onClick={() => removeLinkAtIndex(index)}
+                  disabled={socialLinks.length === 1}
+                />
+              </div>
+            ))}
 
-        <button type="button" className="add-link-button" onClick={addLink}>
-          + Add social link
-        </button>
-      </section>
+            <button type="button" className="add-link-button" onClick={addLink}>
+              + Add social link
+            </button>
+          </section>
+        </>
+      ) : null}
 
       {/* Action buttons */}
       <section className="action-buttons">

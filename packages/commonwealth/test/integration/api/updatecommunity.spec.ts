@@ -1,12 +1,10 @@
 /* eslint-disable no-unused-expressions */
-
+import { tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import 'chai/register-should';
 import jwt from 'jsonwebtoken';
-import app, { resetDatabase } from '../../../server-test';
+import app from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-
 import { Errors as ChainError } from '../../../server/controllers/server_communities_methods/update_community';
 import * as modelUtils from '../../util/modelUtils';
 
@@ -19,7 +17,7 @@ describe('Update Community/Chain Tests', () => {
   const chain = 'ethereum';
 
   before('reset database', async () => {
-    await resetDatabase();
+    await tester.seedDb();
     // get logged in address/user with JWT
     const result = await modelUtils.createAndVerifyAddress({ chain });
     loggedInAddr = result.address;

@@ -1,11 +1,16 @@
-import { expect } from 'chai';
+import {
+  AddressInstance,
+  CommunityInstance,
+  GroupAttributes,
+  MembershipAttributes,
+  TopicAttributes,
+  UserInstance,
+} from '@hicommonwealth/model';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 import { ServerGroupsController } from 'server/controllers/server_groups_controller';
-import { AddressInstance } from 'server/models/address';
-import { GroupAttributes } from 'server/models/group';
-import { MembershipAttributes } from 'server/models/membership';
-import { TopicAttributes } from 'server/models/topic';
-import { UserInstance } from 'server/models/user';
-import { CommunityInstance } from '../../../server/models/community';
+
+chai.use(chaiAsPromised);
 
 const INVALID_REQUIREMENTS_NOT_ARRAY = 'no an array' as unknown as [];
 
@@ -24,8 +29,7 @@ const createMockedGroupsController = () => {
   const topics: TopicAttributes[] = [
     {
       id: 1,
-      chain_id: 'ethereum',
-      token_threshold: '1000',
+      community_id: 'ethereum',
       name: 'hello',
       featured_in_sidebar: false,
       featured_in_new_post: false,
@@ -79,6 +83,11 @@ const createMockedGroupsController = () => {
         update: async (): Promise<GroupAttributes> => groups[0],
         toJSON: () => groups[0],
       }),
+      findByPk: async () => ({
+        ...groups[0],
+        update: async (): Promise<GroupAttributes> => groups[0],
+        toJSON: () => groups[0],
+      }),
       count: async () => groups.length,
     },
     Membership: {
@@ -99,6 +108,7 @@ const createMockedGroupsController = () => {
       },
       count: async () => memberships.length,
       destroy: async () => {},
+      bulkCreate: async () => {},
     },
     CommunityRole: {
       findAll: async () => [
@@ -120,14 +130,8 @@ const createMockedGroupsController = () => {
       transaction: async (callback) => callback(),
     },
   };
-  const tokenBalanceCache: any = {};
   const banCache: any = {};
-  const controller = new ServerGroupsController(
-    db,
-    tokenBalanceCache,
-    tokenBalanceCache,
-    banCache,
-  );
+  const controller = new ServerGroupsController(db, banCache);
   return controller;
 };
 
@@ -146,10 +150,9 @@ const createMockParams = () => {
 describe('ServerGroupsController', () => {
   describe('#refreshMembership', async () => {
     const controller = createMockedGroupsController();
-    const { user, chain, address } = createMockParams();
+    const { user, address } = createMockParams();
     const results = await controller.refreshMembership({
       user,
-      community: chain,
       address,
       topicId: 1,
     });
@@ -163,7 +166,7 @@ describe('ServerGroupsController', () => {
     const controller = createMockedGroupsController();
     const { chain } = createMockParams();
     const result = await controller.getGroups({
-      community: chain,
+      communityId: chain.id,
     });
     expect(result).to.have.length(1);
     expect(result[0]).to.have.property('id');
@@ -218,10 +221,9 @@ describe('ServerGroupsController', () => {
 
   describe('#updateGroup', async () => {
     const controller = createMockedGroupsController();
-    const { user, chain, address } = createMockParams();
+    const { user, address } = createMockParams();
     const [result, analytics] = await controller.updateGroup({
       user,
-      community: chain,
       address,
       groupId: 1,
       metadata: {
@@ -237,18 +239,17 @@ describe('ServerGroupsController', () => {
 
     expect(analytics).to.eql({
       event: 'Update Group',
-      community: chain.id,
+      community: result.community_id,
       userId: user.id,
     });
   });
 
   describe('#updateGroup (invalid requirements)', async () => {
     const controller = createMockedGroupsController();
-    const { user, chain, address } = createMockParams();
+    const { user, address } = createMockParams();
     expect(
       controller.updateGroup({
         user,
-        community: chain,
         address,
         groupId: 1,
         metadata: {
@@ -262,10 +263,9 @@ describe('ServerGroupsController', () => {
 
   describe('#deleteGroup', async () => {
     const controller = createMockedGroupsController();
-    const { user, chain, address } = createMockParams();
+    const { user, address } = createMockParams();
     const result = await controller.deleteGroup({
       user,
-      community: chain,
       address,
       groupId: 1,
     });

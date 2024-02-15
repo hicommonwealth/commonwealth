@@ -7,7 +7,10 @@ import {
   VALID_SEARCH_SCOPES,
 } from 'models/SearchQuery';
 import 'pages/search/index.scss';
+import useSidebarStore from 'state/ui/sidebar';
+import { Breadcrumbs } from '../../components/Breadcrumbs';
 
+import useWindowResize from 'hooks/useWindowResize';
 import React, { useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
@@ -52,10 +55,15 @@ type SearchQueryParams = {
 const SearchPage = () => {
   const navigate = useNavigate();
   const commonNavigate = useCommonNavigate();
+  const { setMenu } = useSidebarStore();
 
   const location = useLocation();
   const [urlQueryParams] = useSearchParams();
   const [bottomRef, bottomInView] = useInView();
+
+  const { toggleMobileView } = useWindowResize({
+    setMenu,
+  });
 
   const queryParams = useMemo(() => {
     return Object.fromEntries(urlQueryParams.entries()) as SearchQueryParams;
@@ -103,7 +111,7 @@ const SearchPage = () => {
     SORT_MAP[queryParams.sort] || DEFAULT_SORT_OPTIONS;
 
   const sharedQueryOptions = {
-    communityId: app.activeChainId() || 'all_communities',
+    communityId: community,
     searchTerm: queryParams.q,
     limit: 20,
     orderBy,
@@ -265,6 +273,7 @@ const SearchPage = () => {
 
   return (
     <div className="SearchPage">
+      {toggleMobileView && <Breadcrumbs />}
       <div className="search-results">
         <div className="cw-tabs-row-container">
           <CWTabsRow>
@@ -317,7 +326,7 @@ const SearchPage = () => {
                 )}
               <div className="search-results-list">
                 {renderSearchResults(
-                  results as any,
+                  results,
                   queryParams.q,
                   activeTab,
                   commonNavigate,

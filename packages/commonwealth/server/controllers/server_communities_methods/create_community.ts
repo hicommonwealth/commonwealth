@@ -1,30 +1,28 @@
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
-import type { Cluster } from '@solana/web3.js';
-import * as solw3 from '@solana/web3.js';
-import BN from 'bn.js';
-import { AppError } from 'common-common/src/errors';
 import {
+  AppError,
   BalanceType,
   ChainBase,
   ChainNetwork,
   ChainType,
   DefaultPage,
   NotificationCategories,
-} from 'common-common/src/types';
+} from '@hicommonwealth/core';
+import type {
+  AddressInstance,
+  ChainNodeAttributes,
+  CommunityAttributes,
+  RoleAttributes,
+} from '@hicommonwealth/model';
+import { Community, UserInstance } from '@hicommonwealth/model';
+import type { Cluster } from '@solana/web3.js';
+import * as solw3 from '@solana/web3.js';
+import axios from 'axios';
+import BN from 'bn.js';
 import { Op } from 'sequelize';
 import Web3 from 'web3';
-import { z } from 'zod';
-import { createCommunitySchema } from '../../../shared/schemas/createCommunitySchema';
 import { bech32ToHex, urlHasValidHTTPPrefix } from '../../../shared/utils';
-
 import { COSMOS_REGISTRY_API } from '../../config';
-import type { AddressInstance } from '../../models/address';
-import type { ChainNodeAttributes } from '../../models/chain_node';
-import type { CommunityAttributes } from '../../models/community';
-import type { RoleAttributes } from '../../models/role';
-
-import axios from 'axios';
-import { UserInstance } from '../../models/user';
 import { RoleInstanceWithPermission } from '../../util/roles';
 import testSubstrateSpec from '../../util/testSubstrateSpec';
 import { ServerCommunitiesController } from '../server_communities_controller';
@@ -68,7 +66,7 @@ export const Errors = {
 
 export type CreateCommunityOptions = {
   user: UserInstance;
-  community: z.infer<typeof createCommunitySchema>;
+  community: Community.CreateCommunity;
 };
 
 export type CreateCommunityResult = {
@@ -365,42 +363,11 @@ export async function __createCommunity(
     has_homepage: true,
   });
 
-  if (community.address) {
-    const erc20Abi = await this.models.ContractAbi.findOne({
-      where: {
-        nickname: 'erc20',
-      },
-    });
-
-    const [contract] = await this.models.Contract.findOrCreate({
-      where: {
-        address: community.address,
-        chain_node_id: node.id,
-      },
-      defaults: {
-        address: community.address,
-        chain_node_id: node.id,
-        decimals: community.decimals,
-        token_name: createdCommunity.token_name,
-        symbol: createdCommunity.default_symbol,
-        type: createdCommunity.network,
-        abi_id: createdCommunity.network === 'erc20' ? erc20Abi?.id : null,
-      },
-    });
-
-    await this.models.CommunityContract.create({
-      chain_id: createdCommunity.id,
-      contract_id: contract.id,
-    });
-
-    createdCommunity.Contract = contract;
-  }
-
   const nodeJSON = node.toJSON();
   delete nodeJSON.private_url;
 
   await this.models.Topic.create({
-    chain_id: createdCommunity.id,
+    community_id: createdCommunity.id,
     name: 'General',
     featured_in_sidebar: true,
   });
@@ -537,7 +504,7 @@ export async function __createCommunity(
       where: {
         subscriber_id: user.id,
         category_id: NotificationCategories.NewThread,
-        chain_id: createdCommunity.id,
+        community_id: createdCommunity.id,
         is_active: true,
       },
     });

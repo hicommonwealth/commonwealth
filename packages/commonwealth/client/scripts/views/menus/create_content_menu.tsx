@@ -1,5 +1,5 @@
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { featureFlags } from 'helpers/feature-flags';
+/* eslint-disable react/no-multi-comp */
+import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { uuidv4 } from 'lib/util';
@@ -128,18 +128,14 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
 
   const getUniversalCreateItems = (): PopoverMenuItem[] => [
     {
-      label: 'New Community',
-      iconLeft: 'people',
+      label: 'Create community',
+      isButton: true,
+      iconLeft: 'peopleNew',
+      iconLeftWeight: 'bold',
       onClick: (e) => {
         e?.preventDefault();
         resetSidebarState();
-        navigate(
-          featureFlags.newCreateCommunity
-            ? '/createCommunity'
-            : '/createCommunity/starter',
-          {},
-          null,
-        );
+        navigate('/createCommunity', {}, null);
       },
     },
   ];
@@ -204,7 +200,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
               resetSidebarState();
               navigate('/new/discussion');
             },
-            iconLeft: 'write',
+            iconLeft: 'pencil',
           } as PopoverMenuItem,
           ...getOnChainProposalItem(),
           ...getSputnikProposalItem(),

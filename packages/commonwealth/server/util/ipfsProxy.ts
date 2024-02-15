@@ -1,11 +1,13 @@
+import {
+  CacheDecorator,
+  lookupKeyDurationInReq,
+} from '@hicommonwealth/adapters';
 import axios from 'axios';
-import { cacheDecorator } from 'common-common/src/cacheDecorator';
 import type { Express } from 'express';
-import { lookupKeyDurationInReq } from '../../../common-common/src/cacheKeyUtils';
 
 const defaultCacheDuration = 24 * 60 * 60; // 1 day
 
-function setupIpfsProxy(app: Express) {
+function setupIpfsProxy(app: Express, cacheDecorator: CacheDecorator) {
   app.get(
     '/api/ipfsProxy',
     calcIpfsCacheKeyDuration,

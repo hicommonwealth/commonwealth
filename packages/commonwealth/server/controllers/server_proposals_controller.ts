@@ -1,18 +1,16 @@
-import { DB } from '../models';
-import {
-  __getProposals,
-  GetProposalsOptions,
-  GetProposalsResult,
-} from './server_proposal_methods/get_proposals';
-import { RedisCache } from 'common-common/src/redisCache';
+import { AppError, ChainNetwork, ServerError } from '@hicommonwealth/core';
+import { DB } from '@hicommonwealth/model';
 import { providers } from 'ethers';
-import { AppError, ServerError } from 'common-common/src/errors';
-import { ChainNetwork } from 'common-common/src/types';
 import {
-  __getProposalVotes,
   GetProposalVotesOptions,
   GetProposalVotesResult,
+  __getProposalVotes,
 } from './server_proposal_methods/get_proposal_votes';
+import {
+  GetProposalsOptions,
+  GetProposalsResult,
+  __getProposals,
+} from './server_proposal_methods/get_proposals';
 
 export type SupportedProposalNetworks =
   | ChainNetwork.Aave
@@ -24,10 +22,10 @@ export type ContractInfo = {
 };
 
 export class ServerProposalsController {
-  constructor(public models: DB, public redisCache: RedisCache) {}
+  constructor(public models: DB) {}
 
   public async getProposals(
-    options: GetProposalsOptions
+    options: GetProposalsOptions,
   ): Promise<GetProposalsResult> {
     const contractInfo = await this.getContractInfo(options.communityId);
     const provider = await this.createEvmProvider(options.communityId);
@@ -36,12 +34,12 @@ export class ServerProposalsController {
       options,
       provider,
       contractInfo,
-      this.models
+      this.models,
     );
   }
 
   public async getProposalVotes(
-    options: GetProposalVotesOptions
+    options: GetProposalVotesOptions,
   ): Promise<GetProposalVotesResult> {
     const contractInfo = await this.getContractInfo(options.communityId);
     const provider = await this.createEvmProvider(options.communityId);
@@ -51,7 +49,7 @@ export class ServerProposalsController {
   private async getContractInfo(chainId: string): Promise<ContractInfo> {
     const contract = await this.models.CommunityContract.findOne({
       where: {
-        chain_id: chainId,
+        community_id: chainId,
       },
       attributes: [],
       include: [
@@ -73,7 +71,7 @@ export class ServerProposalsController {
         contract.Contract.type !== ChainNetwork.Compound)
     ) {
       throw new AppError(
-        `Proposal fetching not supported for chain ${chainId}`
+        `Proposal fetching not supported for chain ${chainId}`,
       );
     }
 
@@ -84,13 +82,13 @@ export class ServerProposalsController {
   }
 
   private async createEvmProvider(
-    chainId: string
+    chainId: string,
   ): Promise<providers.Web3Provider> {
     const ethNetworkUrl = await this.getRPCUrl(chainId);
 
     if (ethNetworkUrl.slice(0, 4) != 'http')
       throw new ServerError(
-        `Invalid ethNetworkUrl: ${ethNetworkUrl}. Must be an HTTP URL.`
+        `Invalid ethNetworkUrl: ${ethNetworkUrl}. Must be an HTTP URL.`,
       );
 
     try {
@@ -99,7 +97,7 @@ export class ServerProposalsController {
       return new providers.Web3Provider(web3Provider);
     } catch (e) {
       throw new ServerError(
-        `Failed to create EVM provider for ${ethNetworkUrl}. ${e}`
+        `Failed to create EVM provider for ${ethNetworkUrl}. ${e}`,
       );
     }
   }
@@ -134,7 +132,7 @@ export class ServerProposalsController {
         chain.base !== 'ethereum')
     ) {
       throw new AppError(
-        `Proposal fetching not supported for chain ${chainId}`
+        `Proposal fetching not supported for chain ${chainId}`,
       );
     }
 

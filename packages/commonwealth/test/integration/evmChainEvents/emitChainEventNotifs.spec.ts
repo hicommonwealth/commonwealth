@@ -1,29 +1,27 @@
-import { ChainNodeInstance } from '../../../server/models/chain_node';
+import { ChainNodeInstance, models, tester } from '@hicommonwealth/model';
+import { expect } from 'chai';
+import { BigNumber, ethers } from 'ethers';
+import { emitChainEventNotifs } from '../../../server/workers/evmChainEvents/emitChainEventNotifs';
+import { RawEvmEvent } from '../../../server/workers/evmChainEvents/types';
+import { sdk } from '../../devnet/evm/evmChainEvents/util';
 import {
   getTestChainNode,
   getTestCommunityContract,
   getTestSubscription,
 } from './util';
-import { emitChainEventNotifs } from '../../../server/workers/evmChainEvents/emitChainEventNotifs';
-import { resetDatabase } from '../../util/resetDatabase';
-import models from '../../../server/database';
-import { expect } from 'chai';
-import { BigNumber, ethers } from 'ethers';
-import { RawEvmEvent } from '../../../server/workers/evmChainEvents/types';
-import { sdk } from '../../devnet/evm/evmChainEvents/util';
 
 describe('emitChainEventNotifs', () => {
   let chainNode: ChainNodeInstance;
   let emitSuccess = false;
   const validEvent: RawEvmEvent = {
     kind: 'proposal-created',
-    contractAddress: sdk.contractAddrs.aave.governance,
+    contractAddress: sdk.contractAddrs.compound.governance,
     blockNumber: 1,
     args: [BigNumber.from(45)],
   };
 
   before(async () => {
-    await resetDatabase();
+    await tester.seedDb();
     chainNode = await getTestChainNode();
     await getTestSubscription();
     await getTestCommunityContract();
@@ -37,7 +35,7 @@ describe('emitChainEventNotifs', () => {
       validEvent,
       {
         kind: 'proposal-created',
-        contractAddress: sdk.contractAddrs.aave.governance,
+        contractAddress: sdk.contractAddrs.compound.governance,
         blockNumber: 2,
         args: [BigNumber.from(67)],
       },
