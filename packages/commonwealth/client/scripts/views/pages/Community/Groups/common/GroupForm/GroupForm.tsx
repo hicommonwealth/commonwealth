@@ -1,5 +1,4 @@
 /* eslint-disable react/no-multi-comp */
-import axios from 'axios';
 import { isValidEthAddress } from 'helpers/validateTypes';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -368,12 +367,11 @@ const GroupForm = ({
           const amount = subForm.values.requirementAmount;
           const evmId = parseInt(subForm.values.requirementChain); // requirement.data.source.evm_chain_id;
           const cosmosId = subForm.values.requirementChain; // requirement.data.source.cosmos_chain_id;
-          const node = await axios.get(
-            `${app.serverUrl()}/nodes?eth_chain_id=${evmId}`,
-          );
-          const node_url = node?.data?.result?.filter((x) =>
-            isCosmos ? x.cosmos_chain_id === cosmosId : x.eth_chain_id == evmId,
-          )[0].url;
+          const node_url = app.config.nodes
+            ?.getAll()
+            ?.filter((x) =>
+              isCosmos ? x.cosmosChainId === cosmosId : x.ethChainId == evmId,
+            )[0].url;
 
           const isAddressContract = isCosmos
             ? await isCosmosAddressContract(contract_address, node_url)
