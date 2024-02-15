@@ -21,13 +21,8 @@ const Splash = () => {
 
 const App = () => {
   const { customDomain, isLoading } = useInitApp();
-  const {
-    isAddedToHomeScreen,
-    isStandalone,
-    isMarketingPage,
-    isIOS,
-    isAndroid,
-  } = useAppStatus();
+  const { isAddedToHomeScreen, isMarketingPage, isIOS, isAndroid } =
+    useAppStatus();
 
   return (
     <StrictMode>

@@ -10,10 +10,10 @@ interface AddToHomeScreenPromptProps {
   isAndroid: boolean;
 }
 
-export const AddToHomeScreenPrompt: React.FC<AddToHomeScreenPromptProps> = ({
-  isIOS = false,
-  isAndroid = false,
-}) => {
+export const AddToHomeScreenPrompt = ({
+  isIOS,
+  isAndroid,
+}: AddToHomeScreenPromptProps) => {
   const [showPrompt, setShowPrompt] = useState(true);
   const [checkboxChecked, setCheckboxChecked] = useState(false);
 
@@ -22,6 +22,9 @@ export const AddToHomeScreenPrompt: React.FC<AddToHomeScreenPromptProps> = ({
     if (hidePromptTime && new Date().getTime() < Number(hidePromptTime)) {
       setShowPrompt(false);
     }
+
+    localStorage.setItem('hidePromptTime', '0');
+    localStorage.setItem('hidePromptDays', '0');
 
     if (sessionStorage.getItem('hidePrompt')) {
       setShowPrompt(false);
@@ -45,7 +48,10 @@ export const AddToHomeScreenPrompt: React.FC<AddToHomeScreenPromptProps> = ({
         <div className="prompt-content">
           <div className="header">
             <div className="icon">
-              <img src="/static/brand_assets/32x32.png" alt="Commonwealth" />
+              <img
+                src="/static/img/branding/common-logo.svg"
+                alt="Commonwealth"
+              />
             </div>
             <CWText className="title">Add to Home Screen</CWText>
           </div>
@@ -113,7 +119,10 @@ export const AddToHomeScreenPrompt: React.FC<AddToHomeScreenPromptProps> = ({
           <CWText className="title">Install App</CWText>
           <div className="header">
             <div className="icon">
-              <img src="/static/brand_assets/32x32.png" alt="Commonwealth" />
+              <img
+                src="/static/img/branding/common-logo.svg"
+                alt="Commonwealth"
+              />
             </div>
             <div className="app">
               <CWText className="app-name">Common</CWText>
