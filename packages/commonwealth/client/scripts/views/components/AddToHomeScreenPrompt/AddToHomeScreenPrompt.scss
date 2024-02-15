@@ -19,11 +19,11 @@
     display: flex;
     align-items: center;
     border-bottom: 1px solid #ccc; // Change color as needed
-    padding: 16px 16px 8px;
+    padding: 0px 16px 8px 16px;
+    gap: 16px;
+    align-self: stretch;
 
     .icon {
-      margin-right: 0.5rem;
-      padding-right: 16px;
     }
 
     .title {
@@ -32,7 +32,7 @@
       font-size: 18px;
       font-style: normal;
       font-weight: 500;
-      line-height: 24px;
+      line-height: 24px; /* 133.333% */
       letter-spacing: -0.18px;
     }
   }
@@ -44,29 +44,43 @@
     padding: 16px;
     border-radius: 6px;
 
-    .title {
-      font-size: 1.125rem;
-      font-weight: 600;
-    }
-
-    .description,
-    .instructions {
+    .description {
       margin-top: 16px;
-      color: #718096;
+      color: var(--Neutrals-500, #656167);
       font-variant-numeric: lining-nums tabular-nums;
-      font-family: NeueHaasUnica;
       font-size: 14px;
       font-style: normal;
       font-weight: 400;
-      line-height: 24px;
+      line-height: 24px; /* 171.429% */
       letter-spacing: 0.14px;
+      flex: 1 0 0;
+    }
+
+    .instructions {
+      margin-top: 16px;
+
+      .instruction {
+        display: flex;
+        margin: 8px 0px;
+        font-size: 14px;
+        color: var(--Neutrals-900, #141315);
+        font-variant-numeric: lining-nums tabular-nums;
+        font-family: NeueHaasUnica;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 24px; /* 171.429% */
+        letter-spacing: 0.14px;
+        align-items: flex-start;
+        gap: 3px;
+        align-self: stretch;
+      }
     }
 
     .hide-prompt {
-      margin-top: 16px;
       font-variant-numeric: lining-nums tabular-nums;
-      font-family: 'SF Pro Text';
       font-size: 14px;
+      font-family: NeueHaasUnica;
       font-style: normal;
       font-weight: 400;
       line-height: 24px;
@@ -77,6 +91,7 @@
       background: $neutral-50;
       padding-left: 8px;
       padding-right: 8px;
+      color: $neutral-600;
     }
   }
 }

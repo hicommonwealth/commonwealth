@@ -53,18 +53,19 @@ export const AddToHomeScreenPrompt = ({
             For the best mobile experience we recommend installing the Common
             web-app.
           </CWText>
-          <ol className="instructions">
-            <li>
+          <div className="instructions">
+            <CWText className="instruction">
               1. Tap the share <CWShareIcon /> icon below
-            </li>
-            <li>
-              2. Select{' '}
-              <CWText className="highlight">Add to Home Screen</CWText>
-            </li>
-          </ol>
+            </CWText>
+            <CWText className="instruction">
+              2. Select <span className="highlight">Add to Home Screen</span>
+            </CWText>
+          </div>
           <CWButton
+            buttonType="tertiary"
             label="Show less often"
-            className="hide-prompt" /*onClick={() => hidePromptForNDays()}*/
+            className="hide-prompt"
+            onClick={() => hidePromptForNDays()}
           />
         </div>
       </div>
@@ -77,13 +78,12 @@ export const AddToHomeScreenPrompt = ({
     window.addEventListener('beforeinstallprompt', (event) => {
       // Prevent Chrome 67 and earlier from automatically showing the prompt
       event.preventDefault();
+
       installPromptEvent = event;
     });
 
     const handleInstallClick = () => {
-      console.log('Install button clicked');
       installPromptEvent.prompt();
-      console.log('Install prompt displayed');
 
       // Wait for the user to respond to the prompt
       installPromptEvent.userChoice.then((choiceResult) => {
