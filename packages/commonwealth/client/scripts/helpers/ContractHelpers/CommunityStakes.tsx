@@ -127,7 +127,7 @@ class CommunityStakes extends ContractBase {
             type: 'ERC1155',
             options: {
               address: namespaceAddress,
-              tokenId: id,
+              tokenId: id.toString(),
             },
           },
         });
