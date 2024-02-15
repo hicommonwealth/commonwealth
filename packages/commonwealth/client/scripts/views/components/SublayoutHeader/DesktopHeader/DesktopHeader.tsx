@@ -13,6 +13,7 @@ import { CreateContentPopover } from 'views/menus/create_content_menu';
 import { HelpMenuPopover } from 'views/menus/help_menu';
 import { NotificationsMenuPopover } from 'views/menus/notifications_menu';
 
+import { WalletSsoSource } from '@hicommonwealth/core';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import useSidebarStore from 'state/ui/sidebar';
@@ -21,9 +22,20 @@ import './DesktopHeader.scss';
 interface DesktopHeaderProps {
   onMobile: boolean;
   onAuthModalOpen: () => void;
+  onRevalidationModalData: ({
+    walletSsoSource,
+    walletAddress,
+  }: {
+    walletSsoSource: WalletSsoSource;
+    walletAddress: string;
+  }) => void;
 }
 
-const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
+const DesktopHeader = ({
+  onMobile,
+  onAuthModalOpen,
+  onRevalidationModalData,
+}: DesktopHeaderProps) => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
   const {
@@ -111,7 +123,14 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
 
           {isLoggedIn && <NotificationsMenuPopover />}
         </div>
-        {isLoggedIn && <UserDropdown />}
+
+        {isLoggedIn && (
+          <UserDropdown
+            onAuthModalOpen={onAuthModalOpen}
+            onRevalidationModalData={onRevalidationModalData}
+          />
+        )}
+
         {!isLoggedIn && (
           <CWButton
             buttonType="primary"

@@ -6,29 +6,30 @@ import { WalletSsoSource } from '@hicommonwealth/core';
 import useUserMenuItems from 'views/components/SublayoutHeader/UserDropdown/useUserMenuItems';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import { User } from 'views/components/user/user';
-import { AuthModal } from 'views/modals/AuthModal';
-import SessionRevalidationModal from 'views/modals/SessionRevalidationModal';
-import { LoginModal } from 'views/modals/login_modal';
-
-import { useFlag } from '../../../../hooks/useFlag';
-import { CWModal } from '../../component_kit/new_designs/CWModal';
 
 import './UserDropdown.scss';
 
-const UserDropdown = () => {
-  const newSignInModalEnabled = useFlag('newSignInModal');
-  const [isOpen, setIsOpen] = useState(false);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [revalidationModalData, setRevalidationModalData] = useState<{
+interface UserDropdownProps {
+  onAuthModalOpen: (open: boolean) => void;
+  onRevalidationModalData: ({
+    walletSsoSource,
+    walletAddress,
+  }: {
     walletSsoSource: WalletSsoSource;
     walletAddress: string;
-  }>(null);
+  }) => void;
+}
+
+const UserDropdown = ({
+  onAuthModalOpen,
+  onRevalidationModalData,
+}: UserDropdownProps) => {
+  const [isOpen, setIsOpen] = useState(false);
 
   const userMenuItems = useUserMenuItems({
-    setIsAuthModalOpen,
-    setRevalidationModalData,
+    onAuthModalOpen,
+    onRevalidationModalData,
     isMenuOpen: isOpen,
   });
 
@@ -60,33 +61,6 @@ const UserDropdown = () => {
             />
           </button>
         )}
-      />
-      {!newSignInModalEnabled ? (
-        <CWModal
-          content={
-            <LoginModal onModalClose={() => setIsAuthModalOpen(false)} />
-          }
-          isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-          onClose={() => setIsAuthModalOpen(false)}
-          open={isAuthModalOpen}
-        />
-      ) : (
-        <AuthModal
-          onClose={() => setIsAuthModalOpen(false)}
-          isOpen={isAuthModalOpen}
-        />
-      )}
-      <CWModal
-        size="medium"
-        content={
-          <SessionRevalidationModal
-            onModalClose={() => setRevalidationModalData(null)}
-            walletSsoSource={revalidationModalData?.walletSsoSource}
-            walletAddress={revalidationModalData?.walletAddress}
-          />
-        }
-        onClose={() => setRevalidationModalData(null)}
-        open={!!revalidationModalData}
       />
     </>
   );

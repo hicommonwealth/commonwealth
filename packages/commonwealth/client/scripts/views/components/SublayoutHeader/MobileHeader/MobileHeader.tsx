@@ -1,62 +1,53 @@
 import React, { useState } from 'react';
 
 import app from 'state';
+import useSidebarStore from 'state/ui/sidebar';
 
-import { useFlag } from 'hooks/useFlag';
+import { WalletSsoSource } from '@hicommonwealth/core';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
 import useUserMenuItems from 'views/components/SublayoutHeader/UserDropdown/useUserMenuItems';
 import MenuContent from 'views/components/component_kit/CWPopoverMenu/MenuContent';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import CWDrawer from 'views/components/component_kit/new_designs/CWDrawer';
-import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import CollapsableSidebarButton from 'views/components/sidebar/CollapsableSidebarButton';
 import { User } from 'views/components/user/user';
-import { AuthModal } from 'views/modals/AuthModal';
-import { LoginModal } from 'views/modals/login_modal';
 
 import './MobileHeader.scss';
 
 interface MobileHeaderProps {
   onMobile: boolean;
-  onSignInClick: () => void;
   isInsideCommunity: boolean;
-  menuVisible: boolean;
+  onAuthModalOpen: (open: boolean) => void;
+  onRevalidationModalData: ({
+    walletSsoSource,
+    walletAddress,
+  }: {
+    walletSsoSource: WalletSsoSource;
+    walletAddress: string;
+  }) => void;
 }
 
 const MobileHeader = ({
   onMobile,
-  onSignInClick,
+  onAuthModalOpen,
   isInsideCommunity,
-  menuVisible,
+  onRevalidationModalData,
 }: MobileHeaderProps) => {
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isUserDrawerOpen, setIsUserDrawerOpen] = useState(false);
   const { isLoggedIn } = useUserLoggedIn();
-  const newSignInModalEnabled = useFlag('newSignInModal');
-
+  const { menuVisible } = useSidebarStore();
   const user = app?.user?.addresses?.[0];
 
-  // TODO this will be handled in next ticket
   const magnifyingGlassVisible = false;
-  const shouldShow = isInsideCommunity ? !menuVisible : true;
-
-  const { data: users } = useFetchProfilesByAddressesQuery({
-    currentChainId: app.activeChainId(),
-    profileAddresses: [user?.address],
-    profileChainIds: [user?.community?.id],
-    apiCallEnabled: !!(user?.address && user?.community?.id),
-  });
-
-  const profile = users?.[0];
+  const shouldShowCollapsableSidebarButton = isInsideCommunity
+    ? !menuVisible
+    : true;
 
   const userMenuItems = useUserMenuItems({
-    setIsAuthModalOpen,
-    // TODO try to move higher
-    setRevalidationModalData: () => undefined,
+    onAuthModalOpen,
+    onRevalidationModalData,
     isMenuOpen: isUserDrawerOpen,
     onAddressItemClick: () => setIsUserDrawerOpen(false),
   });
@@ -64,7 +55,7 @@ const MobileHeader = ({
   return (
     <>
       <div className="MobileHeader">
-        {shouldShow && (
+        {shouldShowCollapsableSidebarButton && (
           <CollapsableSidebarButton
             onMobile={onMobile}
             isInsideCommunity={isInsideCommunity}
@@ -93,11 +84,12 @@ const MobileHeader = ({
               label="Sign in"
               buttonHeight="sm"
               disabled={location.pathname.includes('/finishsociallogin')}
-              onClick={onSignInClick}
+              onClick={() => onAuthModalOpen(true)}
             />
           )}
         </div>
       </div>
+
       <CWDrawer
         open={isUserDrawerOpen}
         onClose={() => setIsUserDrawerOpen(false)}
@@ -109,7 +101,11 @@ const MobileHeader = ({
               onClick={() => setIsUserDrawerOpen(false)}
             />
             <CWText fontWeight="medium" className="name">
-              {profile?.name}
+              <User
+                shouldHideAvatar
+                userAddress={user?.address}
+                userCommunityId={user?.community?.id}
+              />
             </CWText>
             <User
               shouldShowAvatarOnly
@@ -122,21 +118,6 @@ const MobileHeader = ({
           <MenuContent menuItems={userMenuItems} />
         </div>
       </CWDrawer>
-      {!newSignInModalEnabled ? (
-        <CWModal
-          content={
-            <LoginModal onModalClose={() => setIsAuthModalOpen(false)} />
-          }
-          isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-          onClose={() => setIsAuthModalOpen(false)}
-          open={isAuthModalOpen}
-        />
-      ) : (
-        <AuthModal
-          onClose={() => setIsAuthModalOpen(false)}
-          isOpen={isAuthModalOpen}
-        />
-      )}
     </>
   );
 };
