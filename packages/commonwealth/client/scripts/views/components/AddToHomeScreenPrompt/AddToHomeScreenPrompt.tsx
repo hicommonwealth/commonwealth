@@ -16,14 +16,17 @@ export const AddToHomeScreenPrompt = ({
 }: AddToHomeScreenPromptProps) => {
   const [showPrompt, setShowPrompt] = useState(true);
   const [checkboxChecked, setCheckboxChecked] = useState(false);
+  const HIDE_PROMPT_TIME = 'hidePromptTime';
+  const HIDE_PROMPT_DAYS = 'hidePromptDays';
+  const HIDE_PROMPT = 'hidePrompt';
 
   useEffect(() => {
-    const hidePromptTime = localStorage.getItem('hidePromptTime');
+    const hidePromptTime = localStorage.getItem(HIDE_PROMPT_TIME);
     if (hidePromptTime && new Date().getTime() < Number(hidePromptTime)) {
       setShowPrompt(false);
     }
 
-    if (sessionStorage.getItem('hidePrompt')) {
+    if (sessionStorage.getItem(HIDE_PROMPT)) {
       setShowPrompt(false);
     }
   }, []);
@@ -31,11 +34,11 @@ export const AddToHomeScreenPrompt = ({
   const hidePromptForNDays = () => {
     const maxDays = 30;
 
-    let n = Number(localStorage.getItem('hidePromptDays')) || 1;
+    let n = Number(localStorage.getItem(HIDE_PROMPT_DAYS)) || 1;
     n = n * 2 > maxDays ? maxDays : n * 2;
     const hideUntil = new Date().getTime() + n * 24 * 60 * 60 * 1000;
-    localStorage.setItem('hidePromptTime', hideUntil.toString());
-    localStorage.setItem('hidePromptDays', n.toString());
+    localStorage.setItem(HIDE_PROMPT_TIME, hideUntil.toString());
+    localStorage.setItem(HIDE_PROMPT_DAYS, n.toString());
     setShowPrompt(false);
   };
 
