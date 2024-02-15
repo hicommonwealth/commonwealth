@@ -41,15 +41,15 @@ const App = () => {
   return (
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        {isLoading ? (
-          <Splash />
-        ) : (
-          <OpenFeatureProvider>
+        <OpenFeatureProvider client={undefined}>
+          {isLoading ? (
+            <Splash />
+          ) : (
             <RouterProvider router={router(customDomain)} />
-          </OpenFeatureProvider>
-        )}
-        <ToastContainer />
-        <ReactQueryDevtools />
+          )}
+          <ToastContainer />
+          <ReactQueryDevtools />
+        </OpenFeatureProvider>
       </QueryClientProvider>
     </StrictMode>
   );

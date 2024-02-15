@@ -21,6 +21,15 @@
     width: 100%;
   }
 
+  .CollapsableSidebarButton {
+    margin-left: auto;
+
+    .hover-box.expanded {
+      width: auto;
+      margin-right: 8px;
+    }
+  }
+
   .collapsable-icon {
     padding-right: 4px;
   }
