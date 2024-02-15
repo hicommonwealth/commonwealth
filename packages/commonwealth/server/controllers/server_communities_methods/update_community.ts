@@ -63,7 +63,7 @@ export async function __updateCommunity(
     include: [
       {
         model: this.models.ChainNode,
-        attributes: ['url', 'eth_chain_id'],
+        attributes: ['url', 'eth_chain_id', 'cosmos_chain_id'],
       },
     ],
   });

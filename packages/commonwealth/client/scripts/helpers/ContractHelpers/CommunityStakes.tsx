@@ -1,4 +1,3 @@
-import { String } from 'aws-sdk/clients/acm';
 import { communityStakesAbi } from './Abi/CommunityStakesAbi';
 import ContractBase from './ContractBase';
 import NamespaceFactory from './NamespaceFactory';
@@ -111,6 +110,7 @@ class CommunityStakes extends ContractBase {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true);
     }
+
     const namespaceAddress = await this.getNamespaceAddress(name);
     const totalPrice = await this.contract.methods
       .getBuyPriceAfterFee(namespaceAddress, id.toString(), amount.toString())
@@ -142,6 +142,7 @@ class CommunityStakes extends ContractBase {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true);
     }
+
     const namespaceAddress = await this.getNamespaceAddress(name);
     let txReceipt;
     try {
@@ -226,7 +227,7 @@ class CommunityStakes extends ContractBase {
    * @param walletAddress user wallet address
    * @returns string balance in ETH
    */
-  async getUserEthBalance(walletAddress: String): Promise<string> {
+  async getUserEthBalance(walletAddress: string): Promise<string> {
     if (!this.initialized) {
       await this.initialize();
     }
