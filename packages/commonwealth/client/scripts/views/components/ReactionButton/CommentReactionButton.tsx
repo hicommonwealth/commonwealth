@@ -1,11 +1,11 @@
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
-import { featureFlags } from 'helpers/feature-flags';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import React, { useState } from 'react';
 import app from 'state';
 import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
+import { useFlag } from '../../../hooks/useFlag';
 import type Comment from '../../../models/Comment';
 import {
   useCreateCommentReactionMutation,
@@ -30,6 +30,7 @@ export const CommentReactionButton = ({
   tooltipText = '',
   onReaction,
 }: CommentReactionButtonProps) => {
+  const newSignInModalEnabled = useFlag('newSignInModal');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
@@ -65,7 +66,7 @@ export const CommentReactionButton = ({
   const hasReacted = !!(comment.reactions || []).find(
     (x) => x?.author === activeAddress,
   );
-  const likes = (comment.reactions || []).length;
+  const likes = comment.reactionWeightsSum || comment.reactions.length;
 
   const handleVoteClick = async (e) => {
     e.stopPropagation();
@@ -112,7 +113,7 @@ export const CommentReactionButton = ({
 
   return (
     <>
-      {!featureFlags.newSignInModal ? (
+      {!newSignInModalEnabled ? (
         <CWModal
           content={
             <LoginModal onModalClose={() => setIsAuthModalOpen(false)} />

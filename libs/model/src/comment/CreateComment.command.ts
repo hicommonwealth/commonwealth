@@ -1,7 +1,7 @@
 import { type CommandMetadata } from '@hicommonwealth/core';
 import { z } from 'zod';
 import { models } from '../database';
-import { MustNotExist } from '../middleware/invariants';
+import { mustNotExist } from '../middleware/guards';
 import type { CommentAttributes } from '../models';
 
 const schema = z.object({
@@ -15,7 +15,7 @@ export const CreateComment: CommandMetadata<CommentAttributes, typeof schema> =
     body: async ({ id, payload }) => {
       const comment = await models.Comment.findOne({ where: { id } });
 
-      MustNotExist('Comment', comment);
+      mustNotExist('Comment', comment);
 
       //await models.Comment.create(payload)
       return payload as Partial<CommentAttributes>;

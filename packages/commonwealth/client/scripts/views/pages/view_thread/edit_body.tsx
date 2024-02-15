@@ -82,6 +82,9 @@ export const EditBody = (props: EditBodyProps) => {
             buttonHeight: 'sm',
           },
         ],
+        onClose: () => {
+          return;
+        },
       });
     } else {
       cancelEditing();
@@ -123,6 +126,7 @@ export const EditBody = (props: EditBodyProps) => {
         <ReactQuillEditor
           contentDelta={contentDelta}
           setContentDelta={setContentDelta}
+          cancelEditing={cancelEditing}
         />
         <div className="buttons-row">
           <CWButton

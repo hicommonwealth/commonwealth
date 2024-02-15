@@ -16,6 +16,7 @@ export interface SignStakeTransactionsProps {
   communityStakeData: StakeData;
   selectedAddress: AddressInfo;
   createdCommunityId: string;
+  chainId: string;
 }
 
 export interface EnableStakeProps {

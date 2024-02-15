@@ -130,13 +130,8 @@ const createMockedGroupsController = () => {
       transaction: async (callback) => callback(),
     },
   };
-  const tokenBalanceCache: any = {};
   const banCache: any = {};
-  const controller = new ServerGroupsController(
-    db,
-    tokenBalanceCache,
-    banCache,
-  );
+  const controller = new ServerGroupsController(db, banCache);
   return controller;
 };
 

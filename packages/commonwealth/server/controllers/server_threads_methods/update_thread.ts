@@ -19,7 +19,7 @@ import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/typ
 import { renderQuillDeltaToText, validURL } from '../../../shared/utils';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { findAllRoles } from '../../util/roles';
-import { TrackOptions } from '../server_analytics_methods/track';
+import { TrackOptions } from '../server_analytics_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
 import { ServerThreadsController } from '../server_threads_controller';
 

@@ -18,6 +18,35 @@
     }
   }
 
+  &:first-child {
+    &.boxed.isSelected {
+      border-top-left-radius: $border-radius-corners-wider;
+    }
+  }
+
+  &.boxed {
+    .Text,
+    .Icon {
+      color: $neutral-400;
+    }
+
+    .Icon {
+      font-size: 18px;
+      margin-right: 10px;
+    }
+
+    &.isSelected {
+      border: none;
+      background-color: $white;
+
+      .Text.label,
+      .Icon {
+        color: $primary-500;
+        -webkit-text-stroke: 0.5px $primary-500;
+      }
+    }
+  }
+
   &.isDisabled {
     cursor: not-allowed;
     filter: grayscale(1);
