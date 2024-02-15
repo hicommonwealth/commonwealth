@@ -10,7 +10,7 @@ import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
 import { sidebarStore } from 'state/ui/sidebar';
 import { isWindowSmallInclusive } from '../component_kit/helpers';
-import { verifyCachedToggleTree } from './helpers';
+import { isGovernorCountingSimple, verifyCachedToggleTree } from './helpers';
 import { SidebarSectionGroup } from './sidebar_section';
 import type {
   SectionGroupAttrs,
@@ -64,11 +64,16 @@ export const GovernanceSection = () => {
       app.chain.meta.snapshot?.length);
 
   const isNotOffchain = app.chain?.meta.type !== ChainType.Offchain;
+  const compoundContracts = app.contracts.getByType('compound');
 
   const showCompoundOptions =
     isNotOffchain &&
     app.user.activeAccount &&
-    app.chain?.network === ChainNetwork.Compound;
+    app.chain?.network === ChainNetwork.Compound &&
+    !(
+      compoundContracts.length > 0 &&
+      isGovernorCountingSimple(compoundContracts[0])
+    );
 
   const showSnapshotOptions =
     app.chain?.base === ChainBase.Ethereum &&
