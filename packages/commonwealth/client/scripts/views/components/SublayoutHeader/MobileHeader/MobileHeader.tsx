@@ -10,9 +10,11 @@ import MenuContent from 'views/components/component_kit/CWPopoverMenu/MenuConten
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWDrawer from 'views/components/component_kit/new_designs/CWDrawer';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import CollapsableSidebarButton from 'views/components/sidebar/CollapsableSidebarButton';
 import { User } from 'views/components/user/user';
+import MobileSearchModal from 'views/modals/MobileSearchModal';
 
 import useUserMenuItems from '../useUserMenuItems';
 
@@ -40,6 +42,7 @@ const MobileHeader = ({
   onFeedbackModalOpen,
 }: MobileHeaderProps) => {
   const [isUserDrawerOpen, setIsUserDrawerOpen] = useState(false);
+  const [isModalOpen, isSetModalOpen] = useState(false);
   const { isLoggedIn } = useUserLoggedIn();
   const { menuVisible } = useSidebarStore();
   const user = app?.user?.addresses?.[0];
@@ -91,6 +94,7 @@ const MobileHeader = ({
             <CWIconButton
               iconName="magnifyingGlass"
               iconButtonTheme="neutral"
+              onClick={() => isSetModalOpen(true)}
             />
           )}
 
@@ -142,6 +146,15 @@ const MobileHeader = ({
           <MenuContent menuItems={mobileItems} />
         </div>
       </CWDrawer>
+
+      <CWModal
+        isFullScreen
+        content={
+          <MobileSearchModal onModalClose={() => isSetModalOpen(false)} />
+        }
+        onClose={() => isSetModalOpen(false)}
+        open={isModalOpen}
+      />
     </>
   );
 };

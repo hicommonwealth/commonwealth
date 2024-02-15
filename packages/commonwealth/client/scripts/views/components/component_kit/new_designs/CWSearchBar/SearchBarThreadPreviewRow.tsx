@@ -40,6 +40,9 @@ export const SearchBarThreadPreviewRow: FC<SearchBarThreadPreviewRowProps> = ({
         <CWText type="caption" className="last-updated-text">
           {moment(searchResult.created_at).format('l')}
         </CWText>
+      </div>
+
+      <div className="content-row">
         <CWText type="b2" fontWeight="bold">
           {renderTruncatedHighlights(searchTerm, title)}
         </CWText>

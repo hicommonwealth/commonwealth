@@ -1,7 +1,8 @@
 import { MagnifyingGlass } from '@phosphor-icons/react';
-import React, { ChangeEvent, FC, useState } from 'react';
+import React, { ChangeEvent, FC, useEffect, useRef, useState } from 'react';
 import type { NavigateOptions, To } from 'react-router';
 
+import { CWText } from 'views/components/component_kit/cw_text';
 import { notifyError } from '../../../../../controllers/app/notifications';
 import useSearchResults from '../../../../../hooks/useSearchResults';
 import SearchQuery from '../../../../../models/SearchQuery';
@@ -20,6 +21,7 @@ type BaseSearchBarProps = {
 
 type InputStyleProps = {
   disabled?: boolean;
+  size?: 'small' | 'normal';
 };
 
 type SearchBarProps = BaseSearchBarProps &
@@ -48,8 +50,10 @@ const goToSearchPage = (
 
 export const CWSearchBar: FC<SearchBarProps> = ({
   disabled,
-  placeholder = 'Search Common',
+  size = 'normal',
+  placeholder = size === 'small' ? 'Search' : 'Search Common',
 }) => {
+  const inputRef = useRef<HTMLInputElement>();
   const navigate = useCommonNavigate();
   const [showTag, setShowTag] = useState(true);
   const communityId = showTag
@@ -63,6 +67,12 @@ export const CWSearchBar: FC<SearchBarProps> = ({
     communityId === 'all_communities' ? 'communities' : null,
     'members',
   ]);
+
+  useEffect(() => {
+    if (size === 'small') {
+      inputRef?.current?.focus?.();
+    }
+  }, [size]);
 
   const resetSearchBar = () => setSearchTerm('');
 
@@ -82,7 +92,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
     // fire before resetting the search bar
     if (!resetTimer) {
       resetTimer = setTimeout(() => {
-        resetSearchBar();
+        // resetSearchBar();
         resetTimer = null;
       }, 300);
     }
@@ -105,13 +115,14 @@ export const CWSearchBar: FC<SearchBarProps> = ({
 
   return (
     <div
-      className={getClasses({ container: true }, ComponentType.Searchbar)}
+      className={getClasses({ container: true, size }, ComponentType.Searchbar)}
       onBlur={handleOnBlur}
     >
       <div
         className={getClasses<InputStyleProps>(
           {
             disabled,
+            size,
           },
           ComponentType.Searchbar,
         )}
@@ -132,11 +143,12 @@ export const CWSearchBar: FC<SearchBarProps> = ({
         )}
         <div
           className={getClasses(
-            { inputElement: true },
+            { inputElement: true, size },
             ComponentType.Searchbar,
           )}
         >
           <input
+            ref={inputRef}
             placeholder={placeholder}
             onInput={handleOnInput}
             onKeyUp={handleOnKeyUp}
@@ -151,6 +163,12 @@ export const CWSearchBar: FC<SearchBarProps> = ({
           searchTerm={searchTerm}
           searchResults={searchResults}
         />
+      )}
+
+      {size === 'small' && !searchTerm && (
+        <CWText type="b2" className="mobile-empty">
+          Start typing to see results
+        </CWText>
       )}
     </div>
   );
