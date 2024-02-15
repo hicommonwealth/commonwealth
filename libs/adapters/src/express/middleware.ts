@@ -79,7 +79,6 @@ export function analyticsMiddleware<T>(
       const originalResJson = res.json;
 
       res.json = function (data: T) {
-        console.log(`TRACK [${event}]: ${JSON.stringify(data)}`);
         analytics().track(event, transformer(data));
         return originalResJson.call(res, data);
       };
