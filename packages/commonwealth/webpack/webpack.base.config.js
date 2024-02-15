@@ -80,6 +80,11 @@ module.exports = {
         process.env.FLAG_COMMUNITY_STAKE,
       ),
     }),
+    new webpack.DefinePlugin({
+      'process.env.ROOT_DOMAIN_REBRAND': JSON.stringify(
+        process.env.ROOT_DOMAIN_REBRAND,
+      ),
+    }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../client/index.html'),
       attributes: {
