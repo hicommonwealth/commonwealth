@@ -12,6 +12,9 @@ module.exports = {
         'view_count',
         { transaction: t },
       );
+      await queryInterface.removeColumn('Threads', 'view_count_recovered', {
+        transaction: t,
+      });
     });
   },
 
