@@ -78,16 +78,11 @@ export function analyticsMiddleware<T>(
       // override res.json
       const originalResJson = res.json;
 
-      let payload: T | null = null;
-
       res.json = function (data: T) {
-        payload = data;
+        console.log(`TRACK [${event}]: ${JSON.stringify(data)}`);
+        analytics().track(event, transformer(data));
         return originalResJson.call(res, data);
       };
-
-      res.on('finish', () => {
-        analytics().track(event, transformer(payload));
-      });
     } catch (err: unknown) {
       console.error(err); // don't use logger port here
     }
