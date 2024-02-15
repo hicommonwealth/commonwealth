@@ -154,7 +154,8 @@ export default (
       },
       reaction_weights_sum: {
         type: dataTypes.INTEGER,
-        allowNull: true,
+        allowNull: false,
+        defaultValue: 0,
       },
       comment_count: {
         type: dataTypes.INTEGER,
