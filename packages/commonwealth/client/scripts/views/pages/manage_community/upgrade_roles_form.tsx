@@ -7,11 +7,13 @@ import React, { useMemo, useState } from 'react';
 import app from 'state';
 import { useFlag } from '../../../hooks/useFlag';
 import type RoleInfo from '../../../models/RoleInfo';
+import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import { CWButton } from '../../components/component_kit/new_designs/cw_button';
 import { CWRadioButton } from '../../components/component_kit/new_designs/cw_radio_button';
 import { MembersSearchBar } from '../../components/members_search_bar';
 type UpgradeRolesFormProps = {
+  label?: string;
   onRoleUpdate: (oldRole: RoleInfo, newRole: RoleInfo) => void;
   roleData: RoleInfo[];
   searchTerm: string;
@@ -19,6 +21,7 @@ type UpgradeRolesFormProps = {
 };
 
 export const UpgradeRolesForm = ({
+  label,
   onRoleUpdate,
   roleData,
   searchTerm,
@@ -75,87 +78,90 @@ export const UpgradeRolesForm = ({
   };
 
   return (
-    <div className="UpgradeRolesForm">
-      <MembersSearchBar
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        communityName={app.activeChainId()}
-      />
-      <div className="members-container">
-        <CWRadioGroup
-          name="members/mods"
-          options={options}
-          toggledOption={user}
-          onChange={(e) => {
-            setUser(e.target.value);
-          }}
+    <div>
+      <CWLabel label={label} />
+      <div className="UpgradeRolesForm">
+        <MembersSearchBar
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          communityName={app.activeChainId()}
         />
-      </div>
-      <div className="upgrade-buttons-container">
-        {newAdminOnboardingEnabled ? (
-          <>
-            {newAdminOnboardingEnabledOptions.map((o, i) => {
-              return (
-                <div key={i}>
-                  <CWRadioButton
-                    key={i}
-                    checked={radioButtons[i].checked}
-                    name="roles"
-                    onChange={(e) => {
-                      setRole(e.target.value);
-                      handleRadioButtonChange(i + 1);
-                    }}
-                    value={o.value}
-                  />
-                </div>
-              );
-            })}
-          </>
-        ) : (
+        <div className="members-container">
           <CWRadioGroup
-            name="roles"
-            options={[
-              { label: 'Admin', value: 'Admin' },
-              { label: 'Moderator', value: 'Moderator' },
-            ]}
-            toggledOption={role}
+            name="members/mods"
+            options={options}
+            toggledOption={user}
             onChange={(e) => {
-              setRole(e.target.value);
+              setUser(e.target.value);
             }}
           />
-        )}
-        <CWButton
-          label="Upgrade Member"
-          disabled={!role || !user}
-          onClick={() => {
-            const indexOfName = nonAdminNames.indexOf(user);
+        </div>
+        <div className="upgrade-buttons-container">
+          {newAdminOnboardingEnabled ? (
+            <>
+              {newAdminOnboardingEnabledOptions.map((o, i) => {
+                return (
+                  <div key={i}>
+                    <CWRadioButton
+                      key={i}
+                      checked={radioButtons[i].checked}
+                      name="roles"
+                      onChange={(e) => {
+                        setRole(e.target.value);
+                        handleRadioButtonChange(i + 1);
+                      }}
+                      value={o.value}
+                    />
+                  </div>
+                );
+              })}
+            </>
+          ) : (
+            <CWRadioGroup
+              name="roles"
+              options={[
+                { label: 'Admin', value: 'Admin' },
+                { label: 'Moderator', value: 'Moderator' },
+              ]}
+              toggledOption={role}
+              onChange={(e) => {
+                setRole(e.target.value);
+              }}
+            />
+          )}
+          <CWButton
+            label="Upgrade Member"
+            disabled={!role || !user}
+            onClick={() => {
+              const indexOfName = nonAdminNames.indexOf(user);
 
-            const _user = nonAdmins[indexOfName];
+              const _user = nonAdmins[indexOfName];
 
-            const newRole =
-              role === 'Admin'
-                ? 'admin'
-                : role === 'Moderator'
-                ? 'moderator'
-                : '';
+              const newRole =
+                role === 'Admin'
+                  ? 'admin'
+                  : role === 'Moderator'
+                  ? 'moderator'
+                  : '';
 
-            $.post(`${app.serverUrl()}/upgradeMember`, {
-              new_role: newRole,
-              address: _user.Address.address,
-              ...communityObj,
-              jwt: app.user.jwt,
-            }).then((r) => {
-              if (r.status === 'Success') {
-                notifySuccess('Member upgraded');
-              } else {
-                notifyError('Upgrade failed');
-              }
+              $.post(`${app.serverUrl()}/upgradeMember`, {
+                new_role: newRole,
+                address: _user.Address.address,
+                ...communityObj,
+                jwt: app.user.jwt,
+              }).then((r) => {
+                if (r.status === 'Success') {
+                  notifySuccess('Member upgraded');
+                } else {
+                  notifyError('Upgrade failed');
+                }
 
-              onRoleUpdate(_user, r.result);
-            });
-            zeroOutRadioButtons();
-          }}
-        />
+                onRoleUpdate(_user, r.result);
+              });
+              zeroOutRadioButtons();
+            }}
+          />
+        </div>
       </div>
     </div>
   );

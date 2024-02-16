@@ -2,14 +2,12 @@ import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import useFetchAdminQuery from 'state/api/members/fetchAdmin';
 import { useDebounce } from 'usehooks-ts';
-import { CWText } from 'views/components/component_kit/cw_text';
 import {
   APIOrderBy,
   APIOrderDirection,
 } from '../../../../../scripts/helpers/constants';
 import useSearchProfilesQuery from '../../../../../scripts/state/api/profiles/searchProfiles';
 import RoleInfo from '../../../../models/RoleInfo';
-import { ComponentType } from '../../../components/component_kit/types';
 import { UpgradeRolesForm } from '../../../pages/manage_community/upgrade_roles_form';
 import { ManageRoles } from '../../manage_community/manage_roles';
 import CommunityManagementLayout from '../common/CommunityManagementLayout';
@@ -140,11 +138,8 @@ const AdminsAndModerators = () => {
             roledata={mods}
             onRoleUpdate={handleRoleUpdate}
           />
-          <CWText type="caption" className={ComponentType.Label}>
-            Members
-          </CWText>
-
           <UpgradeRolesForm
+            label="Members"
             roleData={roleData}
             onRoleUpdate={handleRoleUpdate}
             searchTerm={searchTerm}
