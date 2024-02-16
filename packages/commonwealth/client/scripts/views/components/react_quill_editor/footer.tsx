@@ -34,9 +34,6 @@ export const CustomQuillFooter = ({
         </span>
         <CWText type="caption">Drag an image or click to add</CWText>
       </div>
-      <div className="editor-handle">
-        <CWIcon iconName="notches" iconSize="small" />
-      </div>
     </div>
   );
 };
