@@ -22,7 +22,6 @@ export const CreateGroup: CommandMetadata<CommunityAttributes, typeof schema> =
     schema,
     auth: [isCommunityAdminOrModerator],
     body: async ({ payload }) => {
-      console.log(payload);
-      return {};
+      return payload;
     },
   };

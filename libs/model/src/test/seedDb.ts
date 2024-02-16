@@ -12,7 +12,9 @@ import type { ChainNodeAttributes } from '../models/chain_node';
 const checkDb = async () => {
   let sequelize: Sequelize | undefined = undefined;
   try {
-    sequelize = new Sequelize('postgresql://commonwealth:edgeware@localhost');
+    sequelize = new Sequelize('postgresql://commonwealth:edgeware@localhost', {
+      logging: false,
+    });
     const testdbname = 'common_test';
     const [{ count }] = await sequelize.query<{ count: number }>(
       `SELECT COUNT(*) FROM pg_database WHERE datname = '${testdbname}'`,
