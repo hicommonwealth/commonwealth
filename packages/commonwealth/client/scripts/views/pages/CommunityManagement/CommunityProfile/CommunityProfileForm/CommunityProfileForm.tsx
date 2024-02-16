@@ -107,17 +107,14 @@ const CommunityProfileForm = () => {
         bannerText: values.communityBanner,
       });
 
-      let customStages = values.customStages;
-      if (customStages && customStages.includes("'")) {
-        customStages = customStages.replaceAll("'", '"');
-      }
-
       await community.updateChainData({
         name: values.communityName,
         description: values.communityDescription,
         social_links: links.map((link) => link.value.trim()),
         stagesEnabled: values.hasStagesEnabled,
-        customStages: customStages ? JSON.parse(customStages) : [],
+        customStages: values.customStages
+          ? JSON.parse(values.customStages)
+          : [],
         iconUrl: values.communityProfileImageURL,
         defaultOverview: values.defaultPage === DefaultPage.Overview,
       });
