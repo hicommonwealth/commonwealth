@@ -2,6 +2,7 @@ import {
   AnalyticsOptions,
   INVALID_ACTOR_ERROR,
   INVALID_INPUT_ERROR,
+  User,
   analytics,
   stats,
 } from '@hicommonwealth/core';
@@ -71,7 +72,7 @@ export const errorMiddleware = (
  */
 export function analyticsMiddleware<T>(
   event: string,
-  transformer: (req: Request<{ id: string }>, results?: T) => AnalyticsOptions,
+  transformer?: (results?: T) => AnalyticsOptions,
 ) {
   return (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
     try {
@@ -79,7 +80,11 @@ export function analyticsMiddleware<T>(
       const originalResJson = res.json;
 
       res.json = function (results: T) {
-        analytics().track(event, transformer(req, results));
+        analytics().track(event, {
+          userId: (req.user as User).id,
+          aggregateId: req.params.id,
+          ...(transformer ? transformer(results) : {}),
+        });
         return originalResJson.call(res, results);
       };
     } catch (err: unknown) {

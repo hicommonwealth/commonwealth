@@ -3,7 +3,7 @@ import {
   expressCommand,
   expressQuery,
 } from '@hicommonwealth/adapters';
-import { Community, CommunityAttributes } from '@hicommonwealth/model';
+import { Community } from '@hicommonwealth/model';
 import { Router } from 'express';
 import passport from 'passport';
 import { MixpanelCommunityInteractionEvent } from 'shared/analytics/types';
@@ -25,16 +25,13 @@ router.put(
 router.post(
   '/:id/group',
   passport.authenticate('jwt', { session: false }),
-  analyticsMiddleware<CommunityAttributes>(
-    MixpanelCommunityInteractionEvent.CREATE_GROUP,
-    (req, results) => ({ community: results.id, user: req.user.id }),
-  ),
+  analyticsMiddleware(MixpanelCommunityInteractionEvent.CREATE_GROUP),
   expressCommand(Community.CreateGroup),
 );
 
 router.post(
   '/demo',
-  analyticsMiddleware<Community.Demo>('Demo Event', (_, results) => {
+  analyticsMiddleware<Community.Demo>('Demo Event', (results) => {
     return {
       x: results.numItems,
     };
