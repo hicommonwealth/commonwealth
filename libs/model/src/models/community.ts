@@ -12,6 +12,7 @@ import type { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
 import type { CommentAttributes } from './comment';
 import { CommunityStakeAttributes } from './community_stake';
 import type { ContractInstance } from './contract';
+import { GroupAttributes } from './group';
 import type { StarredCommunityAttributes } from './starred_community';
 import type { ThreadAttributes } from './thread';
 import type { TopicAttributes, TopicInstance } from './topic';
@@ -67,6 +68,7 @@ export type CommunityAttributes = {
   ChainObjectVersion?: any; // TODO
   Contract?: ContractInstance;
   CommunityStakes?: CommunityStakeAttributes[];
+  groups?: GroupAttributes[];
 
   created_at?: Date;
   updated_at?: Date;
@@ -194,7 +196,10 @@ export default (
       through: models.CommunityContract,
       foreignKey: 'community_id',
     });
-    models.Community.hasMany(models.Group, { foreignKey: 'community_id' });
+    models.Community.hasMany(models.Group, {
+      as: 'groups',
+      foreignKey: 'community_id',
+    });
     models.Community.hasMany(models.CommunityStake, {
       foreignKey: 'community_id',
     });

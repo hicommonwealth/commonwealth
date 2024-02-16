@@ -4,7 +4,6 @@ import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
-  dispose,
   logger,
 } from '@hicommonwealth/core';
 import { QueryTypes, Sequelize } from 'sequelize';
@@ -35,10 +34,6 @@ export const seedDb = async (debug = false): Promise<void> => {
 
     // connect and seed
     const { models } = await import('..');
-    // dispose sequelize connection before exit
-    dispose(async () => {
-      models.sequelize.close().catch((_) => {});
-    });
 
     await models.sequelize.sync({ force: true });
     log.info('done syncing.');
