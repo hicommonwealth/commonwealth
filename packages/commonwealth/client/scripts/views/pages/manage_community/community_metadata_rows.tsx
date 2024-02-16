@@ -406,7 +406,7 @@ export const CommunityMetadataRows = ({
       )}
       <InputRow
         title="Custom Stages"
-        value={customStages}
+        value={JSON.stringify(customStages)}
         placeholder='["Temperature Check", "Consensus Check"]'
         onChangeHandler={(v) => setCustomStages(v)}
       />
