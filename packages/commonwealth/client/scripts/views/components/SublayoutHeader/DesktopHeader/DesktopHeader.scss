@@ -41,18 +41,6 @@
       padding: 0 20px;
     }
 
-    .MobileMenuContainer {
-      display: none;
-
-      @include extraSmall {
-        display: flex;
-      }
-
-      @include smallInclusive {
-        display: flex;
-      }
-    }
-
     .DesktopMenuContainer {
       align-items: center;
       display: flex;
@@ -78,10 +66,6 @@
       }
 
       @include extraSmall {
-        display: none;
-      }
-
-      @include smallInclusive {
         display: none;
       }
     }

@@ -41,14 +41,8 @@ const DesktopHeader = ({
 }: DesktopHeaderProps) => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
-  const {
-    menuVisible,
-    setMenu,
-    menuName,
-    setMobileMenuName,
-    mobileMenuName,
-    setUserToggledVisibility,
-  } = useSidebarStore();
+  const { menuVisible, setMenu, menuName, setUserToggledVisibility } =
+    useSidebarStore();
 
   const handleToggle = () => {
     const isVisible = !menuVisible;
@@ -71,7 +65,6 @@ const DesktopHeader = ({
               navigate('/', {}, null);
             } else {
               if (isLoggedIn) {
-                setMobileMenuName(null);
                 navigate('/dashboard/for-you', {}, null);
               } else {
                 navigate('/dashboard/global', {}, null);
@@ -92,16 +85,6 @@ const DesktopHeader = ({
         <CWSearchBar />
       </div>
       <div className="header-right">
-        <div className="MobileMenuContainer">
-          <CWIconButton
-            iconName="dotsVertical"
-            iconButtonTheme="black"
-            onClick={() => {
-              setMenu({ name: menuName, isVisible: false });
-              setMobileMenuName(mobileMenuName ? null : 'MainMenu');
-            }}
-          />
-        </div>
         <div
           className={clsx('DesktopMenuContainer', {
             isLoggedIn,
