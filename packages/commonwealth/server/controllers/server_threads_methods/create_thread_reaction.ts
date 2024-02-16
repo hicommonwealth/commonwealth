@@ -117,7 +117,7 @@ export async function __createThreadReaction(
         await commonProtocolService.contractHelpers.getNamespaceBalance(
           community.namespace,
           stake.stake_id,
-          commonProtocol.ValidChains.Sepolia,
+          commonProtocol.ValidChains.Base,
           address.address,
           this.models,
         );

@@ -1,4 +1,8 @@
-import { expressCommand, expressQuery } from '@hicommonwealth/adapters';
+import {
+  analyticsMiddleware,
+  expressCommand,
+  expressQuery,
+} from '@hicommonwealth/adapters';
 import { Community } from '@hicommonwealth/model';
 import { Router } from 'express';
 import passport from 'passport';
@@ -15,6 +19,16 @@ router.put(
   '/:id/stake',
   passport.authenticate('jwt', { session: false }),
   expressCommand(Community.SetCommunityStake),
+);
+
+router.post(
+  '/demo',
+  analyticsMiddleware<Community.Demo>('Demo Event', (payload) => {
+    return {
+      x: payload.numItems,
+    };
+  }),
+  expressCommand(Community.Demo),
 );
 
 export default router;

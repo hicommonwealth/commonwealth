@@ -147,7 +147,10 @@ export const LoginMobile = ({
               onUsernameChangeHandler={handleSetUsername}
               orientation="vertical"
             />
-            <CWButton label="Finish" onClick={onSaveProfileInfo} />
+            <CWButton
+              label="Finish"
+              onClick={async () => await onSaveProfileInfo()}
+            />
           </div>
         )}
 
