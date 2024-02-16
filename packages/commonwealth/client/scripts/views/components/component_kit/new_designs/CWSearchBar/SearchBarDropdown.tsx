@@ -23,17 +23,20 @@ interface SearchBarPreviewSectionProps {
     | SearchProfilesResponse['results'];
   searchTerm: string;
   searchScope: SearchScope;
+  onSearchItemClick?: () => void;
 }
 
 interface SearchBarDropdownProps {
   searchTerm: string;
   searchResults: SearchResults;
+  onSearchItemClick?: () => void;
 }
 
 const SearchBarPreviewSection: FC<SearchBarPreviewSectionProps> = ({
   searchResults,
   searchTerm,
   searchScope,
+  onSearchItemClick,
 }) => {
   const sectionTitles = {
     [SearchScope.Threads]: 'Threads',
@@ -68,6 +71,7 @@ const SearchBarPreviewSection: FC<SearchBarPreviewSectionProps> = ({
           key={i}
           searchResult={res}
           searchTerm={searchTerm}
+          onSearchItemClick={onSearchItemClick}
         />
       ))}
     </div>
@@ -77,6 +81,7 @@ const SearchBarPreviewSection: FC<SearchBarPreviewSectionProps> = ({
 export const SearchBarDropdown: FC<SearchBarDropdownProps> = ({
   searchTerm,
   searchResults,
+  onSearchItemClick,
 }) => {
   const showResults =
     searchTerm.length > 0 && Object.values(searchResults).flat(1).length > 0;
@@ -91,6 +96,7 @@ export const SearchBarDropdown: FC<SearchBarDropdownProps> = ({
               searchResults={results}
               searchTerm={searchTerm}
               searchScope={scope as SearchScope}
+              onSearchItemClick={onSearchItemClick}
             />
           ))}
         </div>

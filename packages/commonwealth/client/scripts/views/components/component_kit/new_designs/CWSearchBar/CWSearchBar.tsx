@@ -17,6 +17,7 @@ import './CWSearchBar.scss';
 
 type BaseSearchBarProps = {
   placeholder?: string;
+  onSearchItemClick?: () => void;
 };
 
 type InputStyleProps = {
@@ -52,6 +53,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
   disabled,
   size = 'normal',
   placeholder = size === 'small' ? 'Search' : 'Search Common',
+  onSearchItemClick,
 }) => {
   const inputRef = useRef<HTMLInputElement>();
   const navigate = useCommonNavigate();
@@ -162,6 +164,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
         <SearchBarDropdown
           searchTerm={searchTerm}
           searchResults={searchResults}
+          onSearchItemClick={onSearchItemClick}
         />
       )}
 
