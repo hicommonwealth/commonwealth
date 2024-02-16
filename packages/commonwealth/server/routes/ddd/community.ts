@@ -1,4 +1,8 @@
-import { expressCommand, expressQuery } from '@hicommonwealth/adapters';
+import {
+  analyticsMiddleware,
+  expressCommand,
+  expressQuery,
+} from '@hicommonwealth/adapters';
 import { Community } from '@hicommonwealth/model';
 import { Router } from 'express';
 import passport from 'passport';
@@ -21,6 +25,16 @@ router.post(
   '/:id/group',
   passport.authenticate('jwt', { session: false }),
   expressCommand(Community.CreateGroup),
+);
+
+router.post(
+  '/demo',
+  analyticsMiddleware<Community.Demo>('Demo Event', (payload) => {
+    return {
+      x: payload.numItems,
+    };
+  }),
+  expressCommand(Community.Demo),
 );
 
 export default router;
