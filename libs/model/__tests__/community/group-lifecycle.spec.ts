@@ -2,7 +2,11 @@ import { InvalidState, command, dispose } from '@hicommonwealth/core';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { Chance } from 'chance';
-import { CreateGroup, MAX_GROUPS_PER_COMMUNITY } from '../../src/community';
+import {
+  CreateGroup,
+  Errors,
+  MAX_GROUPS_PER_COMMUNITY,
+} from '../../src/community/CreateGroup.command';
 import { seedDb } from '../../src/test';
 
 chai.use(chaiAsPromised);
@@ -37,20 +41,21 @@ describe('Group lifecycle', () => {
 
   it('should create group when none exists', async () => {
     const results = await command(CreateGroup, context);
-    expect(results).to.deep.contain({
-      groups: { ...context.payload.metadata },
-    });
+    expect(results?.groups?.at(0)?.metadata).to.includes(
+      context.payload.metadata,
+    );
   });
 
   it('should fail creation when group with same id found', () => {
     expect(command(CreateGroup, context)).to.eventually.be.rejectedWith(
       InvalidState,
+      Errors.GroupAlreadyExists,
     );
   });
 
   it('should fail creation when community reached max number of groups allowed', async () => {
     // create max groups
-    for (let i = 0; i < MAX_GROUPS_PER_COMMUNITY; i++)
+    for (let i = 1; i < MAX_GROUPS_PER_COMMUNITY; i++) {
       await command(CreateGroup, {
         ...context,
         payload: {
@@ -58,6 +63,7 @@ describe('Group lifecycle', () => {
           metadata: { name: chance.name(), description: chance.sentence() },
         },
       });
+    }
 
     const invalid = {
       ...context,
@@ -74,10 +80,12 @@ describe('Group lifecycle', () => {
     };
     expect(command(CreateGroup, invalid)).to.eventually.be.rejectedWith(
       InvalidState,
+      Errors.MaxGroups,
     );
   });
 
   it('should fail creation when sending invalid topics', () => {
+    console.log('testing');
     const invalid = {
       ...context,
       payload: {
@@ -87,12 +95,13 @@ describe('Group lifecycle', () => {
           required_requirements: 1,
           membership_ttl: 100,
         },
-        requirements: [], // TODO:
-        topics: [], // TODO: set invalid topic here
+        requirements: [],
+        topics: [1, 2, 3],
       },
     };
     expect(command(CreateGroup, invalid)).to.eventually.be.rejectedWith(
       InvalidState,
+      Errors.InvalidTopics,
     );
   });
 });
