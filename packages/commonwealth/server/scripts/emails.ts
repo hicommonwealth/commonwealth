@@ -39,7 +39,7 @@ const getForumNotificationCopy = async (
     root_title,
     comment_id,
     comment_text,
-    chain_id,
+    community_id,
     author_address,
     author_chain,
   } = notification_data;
@@ -105,7 +105,7 @@ const getForumNotificationCopy = async (
     : null;
   const objectCopy = decodeURIComponent(root_title).trim();
   const communityObject = await models.Community.findOne({
-    where: { id: chain_id },
+    where: { id: community_id },
   });
   const communityCopy = communityObject ? `in ${communityObject.name}` : '';
   const excerpt = (() => {
@@ -126,7 +126,7 @@ const getForumNotificationCopy = async (
   const pseudoProposal = {
     id: thread_id,
     title: root_title,
-    chain: chain_id,
+    chain: community_id,
   };
   const proposalPath = getThreadUrl(pseudoProposal, comment_id);
   return [
@@ -159,12 +159,14 @@ export const createImmediateNotificationEmailObject = async (
     };
 
     try {
-      const chainEventLabel = ChainEventLabel(ceInstance.chain, evt);
+      const chainEventLabel = ChainEventLabel(ceInstance.community_id, evt);
       if (!chainEventLabel) return;
 
       const subject = `${
         process.env.NODE_ENV !== 'production' ? '[dev] ' : ''
-      }${chainEventLabel.heading} event on ${capitalize(ceInstance.chain)}`;
+      }${chainEventLabel.heading} event on ${capitalize(
+        ceInstance.community_id,
+      )}`;
 
       return {
         from: 'Commonwealth <no-reply@commonwealth.im>',
@@ -174,7 +176,7 @@ export const createImmediateNotificationEmailObject = async (
         templateId: DynamicTemplate.ImmediateEmailNotification,
         dynamic_template_data: {
           notification: {
-            chainId: ceInstance.chain,
+            chainId: ceInstance.community_id,
             blockNumber: ceInstance.block_number,
             subject,
             label: subject,

@@ -172,7 +172,7 @@ export async function __createCommentReaction(
         comment_text: comment.text,
         root_title: thread.title,
         root_type: null, // What is this for?
-        chain_id: thread.community_id,
+        community_id: thread.community_id,
         author_address: address.address,
         author_chain: address.community_id,
       },

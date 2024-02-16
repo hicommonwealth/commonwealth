@@ -56,7 +56,7 @@ const getNotificationFields = (category, data: IForumNotificationData) => {
     comment_id,
     comment_text,
     parent_comment_id,
-    chain_id,
+    community_id,
     author_address,
     author_chain,
   } = data;
@@ -65,7 +65,7 @@ const getNotificationFields = (category, data: IForumNotificationData) => {
   let notificationBody;
 
   const communityName =
-    app.config.chains.getById(chain_id)?.name || 'Unknown chain';
+    app.config.chains.getById(community_id)?.name || 'Unknown chain';
 
   const decodedTitle = decodeURIComponent(root_title).trim();
 
@@ -127,7 +127,7 @@ const getNotificationFields = (category, data: IForumNotificationData) => {
   const pseudoProposal = {
     id: thread_id,
     title: root_title,
-    chain: chain_id,
+    chain: community_id,
   };
 
   const path = getThreadUrl(pseudoProposal, comment_id);
@@ -162,7 +162,7 @@ export const getBatchNotificationFields = (
     comment_id,
     comment_text,
     parent_comment_id,
-    chain_id,
+    community_id,
     author_address,
     author_chain,
   } = data[0];
@@ -174,7 +174,7 @@ export const getBatchNotificationFields = (
   const length = authorInfo.length - 1;
 
   const communityName =
-    app.config.chains.getById(chain_id)?.name || 'Unknown chain';
+    app.config.chains.getById(community_id)?.name || 'Unknown chain';
 
   let notificationHeader;
   let notificationBody;
@@ -250,12 +250,12 @@ export const getBatchNotificationFields = (
   const pseudoProposal = {
     id: thread_id,
     title: root_title,
-    chain: chain_id,
+    chain: community_id,
   };
 
   const path =
     category === NotificationCategories.NewThread
-      ? getCommunityUrl(chain_id)
+      ? getCommunityUrl(community_id)
       : getThreadUrl(pseudoProposal, comment_id);
 
   const pageJump = comment_id
