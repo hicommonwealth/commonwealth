@@ -159,7 +159,7 @@ export async function __createThreadReaction(
         root_type: 'discussion',
         community_id: thread.community_id,
         author_address: address.address,
-        author_chain: address.community_id,
+        author_community_id: address.community_id,
       },
     },
     excludeAddresses: [address.address],

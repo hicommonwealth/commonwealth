@@ -23,7 +23,7 @@ describe('Subscription Mapping Tests', () => {
       root_type: 'type',
       community_id: chain,
       author_address: '0x123',
-      author_chain: chain,
+      author_community_id: chain,
     };
 
     it('should map a new thread notification to subscriptions', () => {

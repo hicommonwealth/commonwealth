@@ -41,7 +41,7 @@ const getForumNotificationCopy = async (
     comment_text,
     community_id,
     author_address,
-    author_chain,
+    author_community_id,
   } = notification_data;
 
   // title
@@ -62,7 +62,7 @@ const getForumNotificationCopy = async (
   // author
   const addressWhere: WhereOptions<AddressAttributes> = {
     address: author_address,
-    community_id: author_chain || null,
+    community_id: author_community_id || null,
   };
   const authorProfile = await models.Profile.findOne({
     include: [
@@ -76,7 +76,7 @@ const getForumNotificationCopy = async (
   let authorName;
   const author_addr_short = formatAddressShort(
     author_address,
-    author_chain,
+    author_community_id,
     true,
   );
   try {
@@ -85,7 +85,9 @@ const getForumNotificationCopy = async (
     authorName = author_addr_short;
   }
   // author profile link
-  const authorPath = `https://commonwealth.im/${author_chain}/account/${author_address}?base=${author_chain}`;
+  const authorPath =
+    `https://commonwealth.im/${author_community_id}` +
+    `/account/${author_address}?base=${author_community_id}`;
 
   // action and community
   const actionCopy = [

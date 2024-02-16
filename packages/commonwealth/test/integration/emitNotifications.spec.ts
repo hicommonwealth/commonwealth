@@ -124,7 +124,7 @@ describe('emitNotifications tests', () => {
         comment_text: '',
         community_id: chain,
         author_address: userAddress2,
-        author_chain: chain,
+        author_community_id: chain,
       };
 
       await emitNotifications(models, {
@@ -181,7 +181,7 @@ describe('emitNotifications tests', () => {
         comment_text: commentBody,
         community_id: chain,
         author_address: userAddress2,
-        author_chain: chain,
+        author_community_id: chain,
       };
       await emitNotifications(models, {
         categoryId: NotificationCategories.NewComment,
@@ -240,7 +240,7 @@ describe('emitNotifications tests', () => {
         root_title: title,
         community_id: chain,
         author_address: userAddress,
-        author_chain: chain,
+        author_community_id: chain,
       };
       await emitNotifications(models, {
         categoryId: NotificationCategories.NewReaction,
@@ -295,7 +295,7 @@ describe('emitNotifications tests', () => {
           root_title: title,
           community_id: chain,
           author_address: userAddress,
-          author_chain: chain,
+          author_community_id: chain,
           mentioned_user_id: userId,
           comment_text: '',
         },
@@ -336,7 +336,7 @@ describe('emitNotifications tests', () => {
           root_title: title,
           community_id: chain,
           author_address: userAddress,
-          author_chain: chain,
+          author_community_id: chain,
           comment_text: '',
           collaborator_user_id: userId,
         },

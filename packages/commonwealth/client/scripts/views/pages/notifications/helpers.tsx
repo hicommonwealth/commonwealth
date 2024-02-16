@@ -58,7 +58,7 @@ const getNotificationFields = (category, data: IForumNotificationData) => {
     parent_comment_id,
     community_id,
     author_address,
-    author_chain,
+    author_community_id,
   } = data;
 
   let notificationHeader;
@@ -78,7 +78,7 @@ const getNotificationFields = (category, data: IForumNotificationData) => {
   const actorName = (
     <User
       userAddress={author_address}
-      userCommunityId={author_chain}
+      userCommunityId={author_community_id}
       shouldHideAvatar
     />
   );
@@ -137,7 +137,7 @@ const getNotificationFields = (category, data: IForumNotificationData) => {
     : () => jumpHighlightNotification('parent');
 
   return {
-    authorInfo: [[author_chain, author_address]],
+    authorInfo: [[author_community_id, author_address]],
     createdAt: moment.utc(created_at),
     notificationHeader,
     notificationBody,
@@ -164,11 +164,11 @@ export const getBatchNotificationFields = (
     parent_comment_id,
     community_id,
     author_address,
-    author_chain,
+    author_community_id,
   } = data[0];
 
   const authorInfo = _.uniq(
-    data.map((d) => `${d.author_chain}#${d.author_address}`),
+    data.map((d) => `${d.author_community_id}#${d.author_address}`),
   ).map((u) => u.split('#'));
 
   const length = authorInfo.length - 1;
@@ -189,7 +189,7 @@ export const getBatchNotificationFields = (
   const actorName = (
     <User
       userAddress={author_address}
-      userCommunityId={author_chain}
+      userCommunityId={author_community_id}
       shouldHideAvatar
     />
   );

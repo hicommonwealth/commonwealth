@@ -174,7 +174,7 @@ export async function __createCommentReaction(
         root_type: null, // What is this for?
         community_id: thread.community_id,
         author_address: address.address,
-        author_chain: address.community_id,
+        author_community_id: address.community_id,
       },
     },
     excludeAddresses: [address.address],

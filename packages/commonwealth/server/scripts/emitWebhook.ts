@@ -151,7 +151,7 @@ async function main() {
       root_type: ProposalType.Thread,
       community_id: thread.community_id,
       author_address: thread.Address.address,
-      author_chain: thread.Address.community_id,
+      author_community_id: thread.Address.community_id,
     };
 
     if (argv.notificationCategory === NotificationCategories.NewThread) {

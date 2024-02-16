@@ -8,7 +8,7 @@ import type DashboardActivityNotification from '../../models/DashboardActivityNo
 import { PageNotFound } from '../pages/404';
 import { UserDashboardRow } from '../pages/user_dashboard/user_dashboard_row';
 
-import { IEventLabel, Label as ChainEventLabel } from 'chain/labelers/util';
+import { Label as ChainEventLabel, IEventLabel } from 'chain/labelers/util';
 
 type FeedProps = {
   fetchData: () => Promise<any>;
@@ -34,13 +34,13 @@ export const Feed = ({
   const [data, setData] = useState<DashboardActivityNotification[]>();
   const [labels, setLabels] = useState<(IEventLabel | undefined)[]>();
   const [currentCount, setCurrentCount] = useState<number>(
-    defaultCount || DEFAULT_COUNT
+    defaultCount || DEFAULT_COUNT,
   );
 
   const loadMore = useCallback(() => {
     return setTimeout(() => {
       setCurrentCount(
-        (prevState) => prevState + (defaultCount || DEFAULT_COUNT)
+        (prevState) => prevState + (defaultCount || DEFAULT_COUNT),
       );
     }, 500);
   }, [setCurrentCount, defaultCount]);
@@ -49,9 +49,10 @@ export const Feed = ({
     const getData = async () => {
       try {
         const response = await fetchData();
-        const notifications = onFetchedDataCallback
-          ? response.result.map((activity) => onFetchedDataCallback(activity))
-          : response.result;
+        const notifications: DashboardActivityNotification[] =
+          onFetchedDataCallback
+            ? response.result.map((activity) => onFetchedDataCallback(activity))
+            : response.result;
 
         const filteredNotifs: DashboardActivityNotification[] = [];
         const labelsArr: (IEventLabel | undefined)[] = [];
@@ -63,7 +64,7 @@ export const Feed = ({
                 network: notif.eventNetwork,
                 data: notif.eventData,
               };
-              const label = ChainEventLabel(notif.chain, chainEvent);
+              const label = ChainEventLabel(notif.communityId, chainEvent);
               filteredNotifs.push(notif);
               labelsArr.push(label);
             } catch (e) {

@@ -48,7 +48,7 @@ export interface IForumNotificationData {
   root_type: string;
   community_id: string;
   author_address: string;
-  author_chain: string;
+  author_community_id: string;
   comment_id?: number;
   comment_text?: string;
   parent_comment_id?: number;
@@ -74,7 +74,7 @@ export interface IBaseForumNotificationData {
   root_type: string;
   community_id: string;
   author_address: string;
-  author_chain: string;
+  author_community_id: string;
 }
 
 export interface INewCommentNotificationData
