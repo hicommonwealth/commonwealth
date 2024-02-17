@@ -13,30 +13,20 @@ const router = Router();
 router.get(
   '/:community_id/stake/:stake_id?',
   passport.authenticate('jwt', { session: false }),
-  expressQuery(Community.GetCommunityStake),
+  expressQuery(Community.GetCommunityStake()),
 );
 
 router.put(
   '/:id/stake',
   passport.authenticate('jwt', { session: false }),
-  expressCommand(Community.SetCommunityStake),
+  expressCommand(Community.SetCommunityStake()),
 );
 
 router.post(
   '/:id/group',
   passport.authenticate('jwt', { session: false }),
   analyticsMiddleware(MixpanelCommunityInteractionEvent.CREATE_GROUP),
-  expressCommand(Community.CreateGroup),
-);
-
-router.post(
-  '/demo',
-  analyticsMiddleware<Community.Demo>('Demo Event', (results) => {
-    return {
-      x: results.numItems,
-    };
-  }),
-  expressCommand(Community.Demo),
+  expressCommand(Community.CreateGroup()),
 );
 
 export default router;

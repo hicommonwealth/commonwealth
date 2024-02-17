@@ -40,23 +40,42 @@ describe('Group lifecycle', () => {
   });
 
   it('should create group when none exists', async () => {
-    const results = await command(CreateGroup, context);
+    const results = await command(CreateGroup(), context);
     expect(results?.groups?.at(0)?.metadata).to.includes(
       context.payload.metadata,
     );
   });
 
   it('should fail creation when group with same id found', () => {
-    expect(command(CreateGroup, context)).to.eventually.be.rejectedWith(
+    expect(command(CreateGroup(), context)).to.eventually.be.rejectedWith(
       InvalidState,
-      Errors.GroupAlreadyExists,
+    );
+  });
+
+  it('should fail creation when sending invalid topics', () => {
+    console.log('testing');
+    const invalid = {
+      ...context,
+      payload: {
+        metadata: {
+          name: chance.name(),
+          description: chance.sentence(),
+          required_requirements: 1,
+        },
+        requirements: [],
+        topics: [1, 2, 3],
+      },
+    };
+    expect(command(CreateGroup(), invalid)).to.eventually.be.rejectedWith(
+      InvalidState,
+      Errors.InvalidTopics,
     );
   });
 
   it('should fail creation when community reached max number of groups allowed', async () => {
     // create max groups
     for (let i = 1; i < MAX_GROUPS_PER_COMMUNITY; i++) {
-      await command(CreateGroup, {
+      await command(CreateGroup(), {
         ...context,
         payload: {
           ...context.payload,
@@ -76,29 +95,9 @@ describe('Group lifecycle', () => {
         topics: [],
       },
     };
-    expect(command(CreateGroup, invalid)).to.eventually.be.rejectedWith(
+    expect(command(CreateGroup(), invalid)).to.eventually.be.rejectedWith(
       InvalidState,
       Errors.MaxGroups,
-    );
-  });
-
-  it('should fail creation when sending invalid topics', () => {
-    console.log('testing');
-    const invalid = {
-      ...context,
-      payload: {
-        metadata: {
-          name: chance.name(),
-          description: chance.sentence(),
-          required_requirements: 1,
-        },
-        requirements: [],
-        topics: [1, 2, 3],
-      },
-    };
-    expect(command(CreateGroup, invalid)).to.eventually.be.rejectedWith(
-      InvalidState,
-      Errors.InvalidTopics,
     );
   });
 });

@@ -12,10 +12,10 @@ export const schema = z.object({
   address: z.string(),
 });
 
-export const UpdateCommunity: CommandMetadata<
+export const UpdateCommunity = (): CommandMetadata<
   CommunityAttributes,
   typeof schema
-> = {
+> => ({
   schema,
   auth: [isCommunityAdmin],
   body: async ({ id, payload }) => {
@@ -33,4 +33,4 @@ export const UpdateCommunity: CommandMetadata<
     community.namespace = payload.namespace;
     return (await community.save()).get({ plain: true });
   },
-};
+});

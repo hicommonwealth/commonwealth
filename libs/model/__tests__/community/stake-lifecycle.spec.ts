@@ -38,7 +38,7 @@ describe('Stake lifecycle', () => {
 
   it('should fail set when community namespace not configured', () => {
     _validateCommunityStakeConfig.onFirstCall().rejects();
-    expect(command(SetCommunityStake, context)).to.eventually.be.rejected;
+    expect(command(SetCommunityStake(), context)).to.eventually.be.rejected;
   });
 
   it('should set and get community stake', async () => {
@@ -51,7 +51,7 @@ describe('Stake lifecycle', () => {
       url: 'https://ethereum-sepolia.publicnode.com',
     };
 
-    const cr = await command(SetCommunityStake, context);
+    const cr = await command(SetCommunityStake(), context);
     expect(cr).to.deep.contains({
       ...community.Chain,
       ChainNode,
@@ -65,7 +65,7 @@ describe('Stake lifecycle', () => {
       ],
     });
 
-    const qr = await query(GetCommunityStake, {
+    const qr = await query(GetCommunityStake(), {
       actor: context.actor,
       payload: { community_id: context.id },
     });
@@ -74,13 +74,13 @@ describe('Stake lifecycle', () => {
 
   it('should fail set when community not found', async () => {
     expect(
-      command(SetCommunityStake, { ...context, id: 'does-not-exist' }),
+      command(SetCommunityStake(), { ...context, id: 'does-not-exist' }),
     ).to.eventually.be.rejectedWith(InvalidActor);
   });
 
   it('should fail set when community stake has been configured', () => {
     expect(
-      command(SetCommunityStake, {
+      command(SetCommunityStake(), {
         ...context,
         actor: {
           user: { id: 2, email: '' },
@@ -95,7 +95,7 @@ describe('Stake lifecycle', () => {
   });
 
   it('should get empty result when community stake not configured', async () => {
-    const qr = await query(GetCommunityStake, {
+    const qr = await query(GetCommunityStake(), {
       actor: context.actor,
       payload: { community_id: 'edgeware' },
     });

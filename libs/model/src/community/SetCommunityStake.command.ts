@@ -15,10 +15,10 @@ const schema = z.object({
 
 export type SetCommunityStake = z.infer<typeof schema>;
 
-export const SetCommunityStake: CommandMetadata<
+export const SetCommunityStake = (): CommandMetadata<
   CommunityAttributes,
   typeof schema
-> = {
+> => ({
   schema,
   auth: [isCommunityAdmin],
   body: async ({ id, payload }) => {
@@ -64,4 +64,4 @@ export const SetCommunityStake: CommandMetadata<
       CommunityStakes: [updated.get({ plain: true })],
     };
   },
-};
+});
