@@ -26,8 +26,8 @@ describe('Group lifecycle', () => {
         required_requirements: 1,
         membership_ttl: 100,
       },
-      requirements: [], // TODO:
-      topics: [], // TODO:
+      requirements: [],
+      topics: [],
     },
   };
 
@@ -71,11 +71,9 @@ describe('Group lifecycle', () => {
         metadata: {
           name: chance.name(),
           description: chance.sentence(),
-          required_requirements: 1,
-          membership_ttl: 100,
         },
-        requirements: [], // TODO:
-        topics: [], // TODO:
+        requirements: [],
+        topics: [],
       },
     };
     expect(command(CreateGroup, invalid)).to.eventually.be.rejectedWith(
@@ -93,7 +91,6 @@ describe('Group lifecycle', () => {
           name: chance.name(),
           description: chance.sentence(),
           required_requirements: 1,
-          membership_ttl: 100,
         },
         requirements: [],
         topics: [1, 2, 3],

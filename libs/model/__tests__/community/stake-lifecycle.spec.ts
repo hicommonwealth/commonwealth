@@ -13,7 +13,7 @@ import { seedDb } from '../../src/test';
 
 chai.use(chaiAsPromised);
 
-describe('Community stake', () => {
+describe('Stake lifecycle', () => {
   const context = {
     id: 'common-protocol',
     actor: {

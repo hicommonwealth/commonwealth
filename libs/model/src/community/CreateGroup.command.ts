@@ -27,12 +27,12 @@ export const Errors = {
 export const CreateGroup: CommandMetadata<CommunityAttributes, typeof schema> =
   {
     schema,
-    auth: [isCommunityAdminOrModerator], // TODO: create reusable middleware to authorize owner, admins, moderators
+    auth: [isCommunityAdminOrModerator],
     body: async ({ id, payload }) => {
       const groups = await models.Group.findAll({
-        where: {
-          community_id: id,
-        }, // TODO: just return the names
+        where: { community_id: id },
+        attributes: ['metadata'],
+        raw: true,
       });
 
       if (groups.find((g) => g.metadata.name === payload.metadata.name))
@@ -87,7 +87,13 @@ export const CreateGroup: CommandMetadata<CommunityAttributes, typeof schema> =
         },
       );
 
-      // TODO: refresh memberships async
+      // TODO: create domain service to refresh community memberships
+      // TODO: create integration policy to connect creation events (like groups) to service above
+      // TODO: creation integration test that validates this refresh flow
+      //.refreshCommunityMemberships({
+      //    communityId: id,
+      //    groupId: newGroup.id,
+      //  })
 
       return { id, groups: [newGroup] };
     },
