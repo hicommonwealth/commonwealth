@@ -1,16 +1,23 @@
 import React, { useState } from 'react';
 
+import AddressInfo from 'models/AddressInfo';
 import EnableStake from './EnableStake';
 import SignStakeTransactions from './SignStakeTransactions';
 
 interface CommunityStakeStepProps {
-  onOptOutEnablingStake: () => void;
+  goToSuccessStep: () => void;
   createdCommunityName: string;
+  createdCommunityId: string;
+  selectedAddress: AddressInfo;
+  chainId: string;
 }
 
 const CommunityStakeStep = ({
-  onOptOutEnablingStake,
+  goToSuccessStep,
   createdCommunityName,
+  createdCommunityId,
+  selectedAddress,
+  chainId,
 }: CommunityStakeStepProps) => {
   const [enableStakePage, setEnableStakePage] = useState(true);
   const [communityStakeData, setCommunityStakeData] = useState({
@@ -27,12 +34,18 @@ const CommunityStakeStep = ({
     <div className="CommunityStakeStep">
       {enableStakePage ? (
         <EnableStake
-          onOptOutEnablingStake={onOptOutEnablingStake}
+          goToSuccessStep={goToSuccessStep}
           onOptInEnablingStake={handleOptInEnablingStake}
           communityStakeData={communityStakeData}
         />
       ) : (
-        <SignStakeTransactions onOptOutEnablingStake={onOptOutEnablingStake} />
+        <SignStakeTransactions
+          goToSuccessStep={goToSuccessStep}
+          communityStakeData={communityStakeData}
+          selectedAddress={selectedAddress}
+          createdCommunityId={createdCommunityId}
+          chainId={chainId}
+        />
       )}
     </div>
   );

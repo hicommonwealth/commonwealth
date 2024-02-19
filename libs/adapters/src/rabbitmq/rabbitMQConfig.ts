@@ -40,10 +40,6 @@ export function getRabbitMQConfig(
       const res = rabbitmq_uri.split('/');
       vhost = res[res.length - 1];
       purge = false;
-    } else if (count == 2) {
-      // this matches for a Vultr URL
-      vhost = '/';
-      purge = true;
     } else {
       throw new Error(
         "Can't create Rascal RabbitMQ Config with an invalid URI!",

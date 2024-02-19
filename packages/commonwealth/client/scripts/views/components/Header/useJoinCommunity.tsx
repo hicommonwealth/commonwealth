@@ -12,15 +12,18 @@ import { TOSModal } from 'views/components/Header/TOSModal';
 import { AccountSelector } from 'views/components/component_kit/cw_wallets_list';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import { LoginModal } from 'views/modals/login_modal';
+import { useFlag } from '../../../hooks/useFlag';
+import { AuthModal } from '../../modals/AuthModal';
 import { CWModal } from '../component_kit/new_designs/CWModal';
 
 const NON_INTEROP_NETWORKS = [ChainNetwork.AxieInfinity];
 
 const useJoinCommunity = () => {
+  const newSignInModalEnabled = useFlag('newSignInModal');
   const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] =
     useState(false);
   const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const activeChainInfo = app.chain?.meta;
   const activeBase = activeChainInfo?.base;
@@ -94,7 +97,7 @@ const useJoinCommunity = () => {
     ) {
       await linkToCommunity(0);
     } else {
-      setIsLoginModalOpen(true);
+      setIsAuthModalOpen(true);
     }
   };
 
@@ -179,7 +182,7 @@ const useJoinCommunity = () => {
       (app.user.activeAccount?.address?.slice(0, 3) === 'inj' &&
         app.chain?.meta.id !== 'injective')
     ) {
-      setIsLoginModalOpen(true);
+      setIsAuthModalOpen(true);
     } else {
       if (hasTermsOfService) {
         setIsTOSModalOpen(true);
@@ -229,12 +232,23 @@ const useJoinCommunity = () => {
   );
 
   const LoginModalWrapper = (
-    <CWModal
-      content={<LoginModal onModalClose={() => setIsLoginModalOpen(false)} />}
-      isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-      onClose={() => setIsLoginModalOpen(false)}
-      open={isLoginModalOpen}
-    />
+    <>
+      {!newSignInModalEnabled ? (
+        <CWModal
+          content={
+            <LoginModal onModalClose={() => setIsAuthModalOpen(false)} />
+          }
+          isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
+          onClose={() => setIsAuthModalOpen(false)}
+          open={isAuthModalOpen}
+        />
+      ) : (
+        <AuthModal
+          onClose={() => setIsAuthModalOpen(false)}
+          isOpen={isAuthModalOpen}
+        />
+      )}
+    </>
   );
 
   const JoinCommunityModals = (

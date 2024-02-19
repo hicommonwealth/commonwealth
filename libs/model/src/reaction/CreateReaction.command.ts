@@ -1,24 +1,25 @@
+import { type CommandMetadata } from '@hicommonwealth/core';
 import { z } from 'zod';
 import { models } from '../database';
+import { mustNotExist } from '../middleware/guards';
 import type { ReactionAttributes } from '../models';
-import type { CommandMetadata } from '../types';
 
 export const schema = z.object({
   content: z.string(),
 });
 
 export const CreateReaction: CommandMetadata<
-  typeof schema,
-  ReactionAttributes
+  ReactionAttributes,
+  typeof schema
 > = {
   schema,
-  fn: async () =>
-    //actor,
-    //id,
-    //payload,
-    {
-      // TODO
-      const reaction = await models.Reaction.findOne();
-      return reaction!;
-    },
+  auth: [],
+  body: async ({ id, payload }) => {
+    const reaction = await models.Reaction.findOne({ where: { id } });
+
+    mustNotExist('Reaction', reaction);
+
+    //await models.Reaction.create(payload)
+    return payload as Partial<ReactionAttributes>;
+  },
 };

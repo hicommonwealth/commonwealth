@@ -3,13 +3,14 @@ import {
   CommunityAttributes,
   UserInstance,
   models,
+  tester,
+  tokenBalanceCache,
 } from '@hicommonwealth/model';
 import { assert } from 'chai';
+import Sinon from 'sinon';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 import { Errors } from '../../../server/controllers/server_communities_methods/update_community';
-import { TokenBalanceCache } from '../../../server/util/tokenBalanceCache/tokenBalanceCache';
 import { buildUser } from '../../unit/unitHelpers';
-import { resetDatabase } from '../../util/resetDatabase';
 
 const baseRequest: CommunityAttributes = {
   id: 'ethereum',
@@ -26,39 +27,43 @@ const baseRequest: CommunityAttributes = {
 
 describe('UpdateChain Tests', () => {
   before(async () => {
-    await resetDatabase();
+    await tester.seedDb();
   });
 
   it('Correctly updates chain', async () => {
-    const controller = new ServerCommunitiesController(models, null, null);
+    const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
       userAttributes: { email: '', id: 1, isAdmin: true },
     }) as UserInstance;
 
     let response = await controller.updateCommunity({
+      ...baseRequest,
       directory_page_enabled: true,
       directory_page_chain_node_id: 1,
-      ...baseRequest,
+      type: ChainType.Offchain,
       user: user,
     });
 
     assert.equal(response.directory_page_enabled, true);
     assert.equal(response.directory_page_chain_node_id, 1);
+    assert.equal(response.type, 'offchain');
 
     response = await controller.updateCommunity({
+      ...baseRequest,
       directory_page_enabled: false,
       directory_page_chain_node_id: null,
-      ...baseRequest,
+      type: ChainType.Chain,
       user: user,
     });
 
     assert.equal(response.directory_page_enabled, false);
     assert.equal(response.directory_page_chain_node_id, null);
+    assert.equal(response.type, 'chain');
   });
 
   it('Fails if namespace present but no transaction hash', async () => {
-    const controller = new ServerCommunitiesController(models, null, null);
+    const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
       userAttributes: { email: '', id: 2, isAdmin: false },
@@ -77,7 +82,7 @@ describe('UpdateChain Tests', () => {
   });
 
   it('Fails if chain node of community does not match supported chain', async () => {
-    const controller = new ServerCommunitiesController(models, null, null);
+    const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
       userAttributes: { email: '', id: 2, isAdmin: false },
@@ -96,18 +101,14 @@ describe('UpdateChain Tests', () => {
     }
   });
 
-  it('Correctly updates namespace', async () => {
-    const tbc = {
-      getBalances: async (_: any) => {
-        return { '0x42D6716549A78c05FD8EF1f999D52751Bbf9F46a': '1' };
-      },
-    };
+  // skipped because public chainNodes are unreliable. If you want to test this functionality, update the goleri
+  // chainNode and do it locally.
+  xit('Correctly updates namespace', async () => {
+    Sinon.stub(tokenBalanceCache, 'getBalances').resolves({
+      '0x42D6716549A78c05FD8EF1f999D52751Bbf9F46a': '1',
+    });
 
-    const controller = new ServerCommunitiesController(
-      models,
-      tbc as unknown as TokenBalanceCache,
-      null,
-    );
+    const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
       userAttributes: { email: '', id: 2, isAdmin: false },
@@ -129,5 +130,6 @@ describe('UpdateChain Tests', () => {
     });
 
     assert.equal(response.namespace, 'IanSpace');
+    Sinon.restore();
   });
 });

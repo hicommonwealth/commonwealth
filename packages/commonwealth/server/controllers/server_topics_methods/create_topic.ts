@@ -1,12 +1,13 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import {
   CommunityInstance,
   TopicAttributes,
   UserInstance,
 } from '@hicommonwealth/model';
+import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { validateOwner } from '../../util/validateOwner';
-import { TrackOptions } from '../server_analytics_methods/track';
+import { TrackOptions } from '../server_analytics_controller';
 import { ServerTopicsController } from '../server_topics_controller';
 
 export const Errors = {
@@ -43,10 +44,15 @@ export async function __createTopic(
 
   const featured_in_sidebar = body.featured_in_sidebar;
   const featured_in_new_post = body.featured_in_new_post;
-  const default_offchain_template = body.default_offchain_template?.trim();
+
+  let default_offchain_template = body.default_offchain_template?.trim();
   if (featured_in_new_post && !default_offchain_template) {
     throw new AppError(Errors.DefaultTemplateRequired);
   }
+  default_offchain_template = sanitizeQuillText(
+    default_offchain_template,
+    true,
+  );
 
   const isAdmin = validateOwner({
     models: this.models,

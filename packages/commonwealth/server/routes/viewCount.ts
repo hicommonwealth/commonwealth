@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import type ViewCountCache from '../util/viewCountCache';
@@ -48,6 +48,7 @@ const viewCount = async (
   if (isNewView) {
     count = await count.update({
       view_count: count.view_count + 1,
+      new_view_count: count.new_view_count + 1, // TODO: Delete this after view count recovery is run
     });
   }
 

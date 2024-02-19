@@ -21,7 +21,7 @@ export const Breadcrumbs = () => {
       location.pathname.split('/')[1].toLowerCase() === 'discussion', //Only call when in discussion pages prevents unnecessary calls.
   });
 
-  const user = app.user.addresses[0];
+  const user = app?.user?.addresses?.[0];
   const profileId = user?.profileId || user?.profile.id;
 
   const currentDiscussion = {

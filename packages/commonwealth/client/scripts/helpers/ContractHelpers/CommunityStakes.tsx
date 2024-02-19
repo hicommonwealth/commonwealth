@@ -1,5 +1,6 @@
+import { communityStakesAbi } from './Abi/CommunityStakesAbi';
 import ContractBase from './ContractBase';
-import NamespaceFactory from './NamspaceFactory';
+import NamespaceFactory from './NamespaceFactory';
 
 export type PriceData = {
   price: string;
@@ -8,12 +9,22 @@ export type PriceData = {
 };
 
 class CommunityStakes extends ContractBase {
+  namespaceFactoryAddress: string;
   namespaceFactory: NamespaceFactory;
   addressCache = { address: '0x0', name: '' };
 
-  constructor(contractAddress: string, factoryAddress: string) {
-    super(contractAddress, []);
-    this.namespaceFactory = new NamespaceFactory(factoryAddress);
+  constructor(contractAddress: string, factoryAddress: string, rpc: string) {
+    super(contractAddress, communityStakesAbi, rpc);
+    this.namespaceFactoryAddress = factoryAddress;
+  }
+
+  async initialize(withWallet: boolean = false): Promise<void> {
+    await super.initialize(withWallet);
+    this.namespaceFactory = new NamespaceFactory(
+      this.namespaceFactoryAddress,
+      this.rpc,
+    );
+    await this.namespaceFactory.initialize();
   }
 
   /**
@@ -28,6 +39,9 @@ class CommunityStakes extends ContractBase {
     id: number,
     amount: number,
   ): Promise<PriceData> {
+    if (!this.initialized) {
+      await this.initialize();
+    }
     const namespaceAddress = await this.getNamespaceAddress(name);
     const totalPrice = this.toBN(
       await this.contract.methods
@@ -40,9 +54,9 @@ class CommunityStakes extends ContractBase {
         .call(),
     );
     return {
-      price: feeFreePrice.div(this.toBN(1e18)).toString(),
-      fees: totalPrice.sub(feeFreePrice).div(this.toBN(1e18)).toString(),
-      totalPrice: totalPrice.div(this.toBN(1e18)).toString(),
+      price: this.web3.utils.fromWei(feeFreePrice),
+      fees: this.web3.utils.fromWei(totalPrice.sub(feeFreePrice)),
+      totalPrice: this.web3.utils.fromWei(totalPrice),
     };
   }
 
@@ -58,6 +72,9 @@ class CommunityStakes extends ContractBase {
     id: number,
     amount: number,
   ): Promise<PriceData> {
+    if (!this.initialized) {
+      await this.initialize();
+    }
     const namespaceAddress = await this.getNamespaceAddress(name);
     const totalPrice = this.toBN(
       await this.contract.methods
@@ -70,9 +87,9 @@ class CommunityStakes extends ContractBase {
         .call(),
     );
     return {
-      price: feeFreePrice.div(this.toBN(1e18)).toString(),
-      fees: totalPrice.sub(feeFreePrice).div(this.toBN(1e18)).toString(),
-      totalPrice: totalPrice.div(this.toBN(1e18)).toString(),
+      price: this.web3.utils.fromWei(feeFreePrice),
+      fees: this.web3.utils.fromWei(totalPrice.sub(feeFreePrice)),
+      totalPrice: this.web3.utils.fromWei(totalPrice),
     };
   }
 
@@ -81,18 +98,42 @@ class CommunityStakes extends ContractBase {
    * @param name namespace name
    * @param id id of community stake
    * @param amount amount to buy
+   * @param walletAddress an active evm wallet addresss to send tx from
    * @returns txReceipt
    */
-  async buyStake(name: string, id: number, amount: number): Promise<any> {
+  async buyStake(
+    name: string,
+    id: number,
+    amount: number,
+    walletAddress: string,
+  ): Promise<any> {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true);
+    }
+
     const namespaceAddress = await this.getNamespaceAddress(name);
     const totalPrice = await this.contract.methods
-      .getBuyPriceAfterFee(namespaceAddress, id, amount)
+      .getBuyPriceAfterFee(namespaceAddress, id.toString(), amount.toString())
       .call();
     let txReceipt;
     try {
       txReceipt = await this.contract.methods
         .buyStake(namespaceAddress, id, amount)
-        .send({ value: totalPrice, from: this.wallet.accounts[0] });
+        .send({ value: totalPrice, from: walletAddress });
+      try {
+        await this.web3.givenProvider.request({
+          method: 'wallet_watchAsset',
+          params: {
+            type: 'ERC1155',
+            options: {
+              address: namespaceAddress,
+              tokenId: id.toString(),
+            },
+          },
+        });
+      } catch (error) {
+        console.log('Failed to watch asset in MM, watch manaually', error);
+      }
     } catch {
       throw new Error('Transaction failed');
     }
@@ -104,14 +145,24 @@ class CommunityStakes extends ContractBase {
    * @param name namespace name
    * @param id id of community stake
    * @param amount amount to sell
+   * @param walletAddress an active evm wallet addresss to send tx from
    */
-  async sellStake(name: string, id: number, amount: number): Promise<any> {
+  async sellStake(
+    name: string,
+    id: number,
+    amount: number,
+    walletAddress: string,
+  ): Promise<any> {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true);
+    }
+
     const namespaceAddress = await this.getNamespaceAddress(name);
     let txReceipt;
     try {
       txReceipt = await this.contract.methods
-        .sellStake(namespaceAddress, id, amount)
-        .send({ from: this.wallet.accounts[0] });
+        .sellStake(namespaceAddress, id.toString(), amount.toString())
+        .send({ from: walletAddress });
     } catch {
       throw new Error('Transaction failed');
     }
@@ -122,12 +173,20 @@ class CommunityStakes extends ContractBase {
    * Get balance of a users community stake
    * @param name namespace name
    * @param id id of community stake
+   * @param walletAddress wallet address to get balance for
    * @returns user balance
    */
-  async getUserStakeBalance(name: string, id: number): Promise<string> {
+  async getUserStakeBalance(
+    name: string,
+    id: number,
+    walletAddress: string,
+  ): Promise<string> {
+    if (!this.initialized) {
+      await this.initialize();
+    }
     const namespaceAddress = await this.getNamespaceAddress(name);
-    const calldata = `0x8f32d59b${this.web3.eth.abi
-      .encodeParameters(['address', 'uint256'], [this.wallet.accounts[0], id])
+    const calldata = `0x00fdd58e${this.web3.eth.abi
+      .encodeParameters(['address', 'uint256'], [walletAddress, id])
       .substring(2)}`;
     const result = await this.web3.eth.call({
       to: namespaceAddress,
@@ -143,9 +202,12 @@ class CommunityStakes extends ContractBase {
    * @returns total supply
    */
   async getUserIdSupply(name: string, id: number): Promise<string> {
+    if (!this.initialized) {
+      await this.initialize();
+    }
     const namespaceAddress = await this.getNamespaceAddress(name);
     const calldata = `0x5a9807be${this.web3.eth.abi
-      .encodeParameters(['uint256'], [this.wallet.accounts[0], id])
+      .encodeParameters(['uint256'], [id])
       .substring(2)}`;
     const result = await this.web3.eth.call({
       to: namespaceAddress,
@@ -160,6 +222,9 @@ class CommunityStakes extends ContractBase {
    * @returns
    */
   async getNamespaceAddress(name: string): Promise<string> {
+    if (!this.initialized) {
+      await this.initialize();
+    }
     if (
       this.addressCache.name !== name ||
       this.addressCache.address === '0x0'
@@ -169,6 +234,19 @@ class CommunityStakes extends ContractBase {
       this.addressCache.name = name;
     }
     return this.addressCache.address;
+  }
+
+  /**
+   * gets current users balance and converts to ETH value
+   * @param walletAddress user wallet address
+   * @returns string balance in ETH
+   */
+  async getUserEthBalance(walletAddress: string): Promise<string> {
+    if (!this.initialized) {
+      await this.initialize();
+    }
+    const balance = await this.web3.eth.getBalance(walletAddress);
+    return this.web3.utils.fromWei(balance);
   }
 }
 

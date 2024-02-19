@@ -1,15 +1,17 @@
-import { featureFlags } from 'helpers/feature-flags';
+import React from 'react';
 import { CWFormStepsProps } from 'views/components/component_kit/new_designs/CWFormSteps/CWFormSteps';
 
 export enum CreateCommunityStep {
-  CommunityTypeSelection = 0,
-  BasicInformation = 1,
-  CommunityStake = featureFlags.communityStake ? 2 : undefined,
-  Success = featureFlags.communityStake ? 3 : 2,
+  CommunityTypeSelection = 'CommunityTypeSelection',
+  BasicInformation = 'BasicInformation',
+  CommunityStake = 'CommunityStake',
+  Success = 'Success',
 }
 
 export const getFormSteps = (
   createCommunityStep: CreateCommunityStep,
+  showCommunityStakeStep: boolean,
+  communityStakeEnabled: boolean,
 ): CWFormStepsProps['steps'] => {
   return [
     {
@@ -28,8 +30,7 @@ export const getFormSteps = (
           ? 'active'
           : 'completed',
     },
-    // TODO When integrating Backend, show only if EVM selected AND Ethereum Mainnet selected
-    ...((featureFlags.communityStake
+    ...((communityStakeEnabled && showCommunityStakeStep
       ? [
           {
             label: 'Community Stake',
@@ -43,4 +44,36 @@ export const getFormSteps = (
         ]
       : []) as CWFormStepsProps['steps']),
   ];
+};
+
+export const handleChangeStep = (
+  forward: boolean,
+  createCommunityStep: CreateCommunityStep,
+  setCreateCommunityStep: React.Dispatch<
+    React.SetStateAction<CreateCommunityStep>
+  >,
+  showCommunityStakeStep: boolean,
+  communityStakeEnabled: boolean,
+) => {
+  switch (createCommunityStep) {
+    case CreateCommunityStep.CommunityTypeSelection:
+      setCreateCommunityStep(CreateCommunityStep.BasicInformation);
+      return;
+    case CreateCommunityStep.BasicInformation:
+      setCreateCommunityStep(
+        forward
+          ? communityStakeEnabled && showCommunityStakeStep
+            ? CreateCommunityStep.CommunityStake
+            : CreateCommunityStep.Success
+          : CreateCommunityStep.CommunityTypeSelection,
+      );
+      return;
+    case CreateCommunityStep.CommunityStake:
+      setCreateCommunityStep(
+        forward
+          ? CreateCommunityStep.Success
+          : CreateCommunityStep.BasicInformation,
+      );
+      return;
+  }
 };

@@ -53,13 +53,13 @@ module.exports = {
       'process.env.COSMOS_GOV_V1': JSON.stringify(process.env.COSMOS_GOV_V1),
     }),
     new webpack.DefinePlugin({
-      'process.env.FLAG_COMMUNITY_HOMEPAGE': JSON.stringify(
-        process.env.FLAG_COMMUNITY_HOMEPAGE,
+      'process.env.COSMOS_REGISTRY_API': JSON.stringify(
+        process.env.COSMOS_REGISTRY_API,
       ),
     }),
     new webpack.DefinePlugin({
-      'process.env.FLAG_SIDEBAR_TOGGLE': JSON.stringify(
-        process.env.FLAG_SIDEBAR_TOGGLE,
+      'process.env.FLAG_COMMUNITY_HOMEPAGE': JSON.stringify(
+        process.env.FLAG_COMMUNITY_HOMEPAGE,
       ),
     }),
     new webpack.DefinePlugin({
@@ -73,6 +73,11 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env.FLAG_NEW_ADMIN_ONBOARDING': JSON.stringify(
         process.env.FLAG_NEW_ADMIN_ONBOARDING,
+      ),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.FLAG_NEW_SIGN_IN_MODAL': JSON.stringify(
+        process.env.FLAG_NEW_SIGN_IN_MODAL,
       ),
     }),
     new webpack.DefinePlugin({

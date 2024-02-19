@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NotificationCategories } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { models, tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import app, { resetDatabase } from '../../../server-test';
+import app from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import { Errors as MarkNotifErrors } from '../../../server/routes/markNotificationsRead';
 import * as modelUtils from '../../util/modelUtils';
@@ -23,7 +23,7 @@ describe('Notification Routes Tests', () => {
   const chain = 'ethereum';
 
   before(async () => {
-    await resetDatabase();
+    await tester.seedDb();
     // get logged in address/user with JWT
     const result = await modelUtils.createAndVerifyAddress({ chain });
     userId = result.user_id;

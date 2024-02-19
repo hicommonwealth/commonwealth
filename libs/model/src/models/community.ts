@@ -10,6 +10,7 @@ import type { DataTypes } from 'sequelize';
 import type { AddressAttributes, AddressInstance } from './address';
 import type { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
 import type { CommentAttributes } from './comment';
+import { CommunityStakeAttributes } from './community_stake';
 import type { ContractInstance } from './contract';
 import type { StarredCommunityAttributes } from './starred_community';
 import type { ThreadAttributes } from './thread';
@@ -31,7 +32,7 @@ export type CommunityAttributes = {
   social_links?: string[];
   ss58_prefix?: number;
   stages_enabled?: boolean;
-  custom_stages?: string;
+  custom_stages?: string[];
   custom_domain?: string;
   block_explorer_ids?: string;
   collapsed_on_homepage?: boolean;
@@ -65,6 +66,7 @@ export type CommunityAttributes = {
   Users?: UserAttributes[] | UserAttributes['id'][];
   ChainObjectVersion?: any; // TODO
   Contract?: ContractInstance;
+  CommunityStakes?: CommunityStakeAttributes[];
 
   created_at?: Date;
   updated_at?: Date;
@@ -118,10 +120,14 @@ export default (
       active: { type: dataTypes.BOOLEAN },
       stages_enabled: {
         type: dataTypes.BOOLEAN,
-        allowNull: true,
+        allowNull: false,
         defaultValue: true,
       },
-      custom_stages: { type: dataTypes.STRING, allowNull: true },
+      custom_stages: {
+        type: dataTypes.ARRAY(dataTypes.TEXT),
+        allowNull: false,
+        defaultValue: [],
+      },
       custom_domain: { type: dataTypes.STRING, allowNull: true },
       block_explorer_ids: { type: dataTypes.STRING, allowNull: true },
       collapsed_on_homepage: {

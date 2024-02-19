@@ -3,13 +3,12 @@ import {
   RascalRoutingKeys,
   publishRmqMsg,
 } from '@hicommonwealth/adapters';
-import { RABBITMQ_API_URI } from '../server/config';
 
 async function publishRmqMessageScript() {
   const snapshot = {};
 
   const publishJson = await publishRmqMsg(
-    RABBITMQ_API_URI,
+    'http://guest:guest@localhost:15672/api',
     RascalExchanges.SnapshotListener,
     RascalRoutingKeys.SnapshotListener,
     snapshot,

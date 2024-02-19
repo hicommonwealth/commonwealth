@@ -13,7 +13,9 @@ import { SublayoutBanners } from './SublayoutBanners';
 import { SublayoutHeader } from './SublayoutHeader';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
-import GatingGrowl from './components/GatingGrowl/GatingGrowl';
+import { ValentineGrowl } from './components/ValentineGrowl';
+import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
+import MobileNavigation from './composition/MobileNavigation';
 
 type SublayoutProps = {
   hideFooter?: boolean;
@@ -28,7 +30,7 @@ const Sublayout = ({
   const forceRerender = useForceRerender();
   const { menuVisible, mobileMenuName, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
-  const { isWindowSmallInclusive } = useBrowserWindow({
+  const { isWindowSmallInclusive, isWindowExtraSmall } = useBrowserWindow({
     onResize: () => setResizing(true),
     resizeListenerUpdateDeps: [resizing],
   });
@@ -65,44 +67,55 @@ const Sublayout = ({
 
   return (
     <div className="Sublayout">
-      <div className="header-and-body-container">
-        <SublayoutHeader onMobile={isWindowSmallInclusive} />
-        <div className="sidebar-and-body-container">
-          <Sidebar isInsideCommunity={isInsideCommunity} />
-          <div
-            className={clsx(
-              'body-and-sticky-headers-container',
-              {
-                'menu-visible': menuVisible,
-                'menu-hidden': !menuVisible,
-                'quick-switcher-visible':
-                  menuName === 'exploreCommunities' ||
-                  menuName === 'createContent' ||
-                  isInsideCommunity,
-              },
-              resizing,
-            )}
-          >
-            <SublayoutBanners banner={banner} chain={chain} terms={terms} />
+      {!isWindowSmallInclusive && (
+        <CollapsableSidebarButton
+          onMobile={isWindowExtraSmall}
+          isInsideCommunity={isInsideCommunity}
+        />
+      )}
+      <SublayoutHeader
+        onMobile={isWindowExtraSmall}
+        isInsideCommunity={isInsideCommunity}
+      />
+      <div className="sidebar-and-body-container">
+        <Sidebar
+          isInsideCommunity={isInsideCommunity}
+          onMobile={isWindowExtraSmall}
+        />
+        <div
+          className={clsx(
+            'body-and-sticky-headers-container',
+            {
+              'menu-visible': menuVisible,
+              'menu-hidden': !menuVisible,
+              'quick-switcher-visible':
+                menuName === 'exploreCommunities' ||
+                menuName === 'createContent' ||
+                isInsideCommunity,
+            },
+            resizing,
+          )}
+        >
+          <SublayoutBanners banner={banner} chain={chain} terms={terms} />
 
-            {isWindowSmallInclusive && mobileMenuName ? (
-              <AppMobileMenus />
-            ) : (
-              <div className="Body">
-                {!toggleMobileView && (
-                  <div className="breadcrumbContainer">
-                    <Breadcrumbs />
-                  </div>
-                )}
-                {isInsideCommunity && <AdminOnboardingSlider />}
-                {children}
-                {!app.isCustomDomain() && !hideFooter && <Footer />}
-              </div>
-            )}
-          </div>
+          {isWindowSmallInclusive && mobileMenuName ? (
+            <AppMobileMenus />
+          ) : (
+            <div className="Body">
+              {!toggleMobileView && (
+                <div className="breadcrumbContainer">
+                  <Breadcrumbs />
+                </div>
+              )}
+              {isInsideCommunity && <AdminOnboardingSlider />}
+              {children}
+              {!app.isCustomDomain() && !hideFooter && <Footer />}
+            </div>
+          )}
         </div>
-        {isInsideCommunity && <GatingGrowl />}
+        <ValentineGrowl />
       </div>
+      {isWindowExtraSmall && <MobileNavigation />}
     </div>
   );
 };

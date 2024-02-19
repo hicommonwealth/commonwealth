@@ -4,15 +4,22 @@ import 'components/sidebar/sidebar_quick_switcher.scss';
 
 import ChainInfo from '../../../models/ChainInfo';
 
+import clsx from 'clsx';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
+import useSidebarStore from 'state/ui/sidebar';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWIconButton } from '../component_kit/cw_icon_button';
-import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import useSidebarStore from 'state/ui/sidebar';
 
-export const SidebarQuickSwitcher = () => {
+export const SidebarQuickSwitcher = ({
+  isInsideCommunity,
+  onMobile,
+}: {
+  isInsideCommunity: boolean;
+  onMobile: boolean;
+}) => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
   const { setMenu } = useSidebarStore();
@@ -21,7 +28,7 @@ export const SidebarQuickSwitcher = () => {
     .getAll()
     .sort((a, b) => a.name.localeCompare(b.name))
     .filter(
-      (item) => !!item.node // only chains with nodes
+      (item) => !!item.node, // only chains with nodes
     );
 
   const starredCommunities = allCommunities.filter((item) => {
@@ -32,12 +39,14 @@ export const SidebarQuickSwitcher = () => {
   });
 
   return (
-    <div className="SidebarQuickSwitcher">
+    <div
+      className={clsx('SidebarQuickSwitcher', { onMobile, isInsideCommunity })}
+    >
       <div className="community-nav-bar">
         {isLoggedIn && (
           <CWIconButton
             iconName="plusCirclePhosphor"
-            iconButtonTheme="black"
+            iconButtonTheme="neutral"
             onClick={() => {
               setMenu({ name: 'createContent' });
             }}
@@ -45,7 +54,7 @@ export const SidebarQuickSwitcher = () => {
         )}
         <CWIconButton
           iconName="compassPhosphor"
-          iconButtonTheme="black"
+          iconButtonTheme="neutral"
           onClick={() => {
             setMenu({ name: 'exploreCommunities' });
           }}

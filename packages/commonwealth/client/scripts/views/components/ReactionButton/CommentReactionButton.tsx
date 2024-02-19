@@ -5,11 +5,13 @@ import React, { useState } from 'react';
 import app from 'state';
 import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
+import { useFlag } from '../../../hooks/useFlag';
 import type Comment from '../../../models/Comment';
 import {
   useCreateCommentReactionMutation,
   useDeleteCommentReactionMutation,
 } from '../../../state/api/comments';
+import { AuthModal } from '../../modals/AuthModal';
 import { LoginModal } from '../../modals/login_modal';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { CWModal } from '../component_kit/new_designs/CWModal';
@@ -19,14 +21,17 @@ type CommentReactionButtonProps = {
   comment: Comment<any>;
   disabled: boolean;
   tooltipText?: string;
+  onReaction?: () => void;
 };
 
 export const CommentReactionButton = ({
   comment,
   disabled,
   tooltipText = '',
+  onReaction,
 }: CommentReactionButtonProps) => {
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const newSignInModalEnabled = useFlag('newSignInModal');
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const {
@@ -61,16 +66,18 @@ export const CommentReactionButton = ({
   const hasReacted = !!(comment.reactions || []).find(
     (x) => x?.author === activeAddress,
   );
-  const likes = (comment.reactions || []).length;
+  const likes = comment.reactionWeightsSum || comment.reactions.length;
 
   const handleVoteClick = async (e) => {
     e.stopPropagation();
     e.preventDefault();
 
     if (!app.isLoggedIn() || !app.user.activeAccount) {
-      setIsModalOpen(true);
+      setIsAuthModalOpen(true);
       return;
     }
+
+    onReaction();
 
     if (hasReacted) {
       const foundReaction = comment.reactions.find((r) => {
@@ -106,12 +113,21 @@ export const CommentReactionButton = ({
 
   return (
     <>
-      <CWModal
-        content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
-        isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-        onClose={() => setIsModalOpen(false)}
-        open={isModalOpen}
-      />
+      {!newSignInModalEnabled ? (
+        <CWModal
+          content={
+            <LoginModal onModalClose={() => setIsAuthModalOpen(false)} />
+          }
+          isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
+          onClose={() => setIsAuthModalOpen(false)}
+          open={isAuthModalOpen}
+        />
+      ) : (
+        <AuthModal
+          onClose={() => setIsAuthModalOpen(false)}
+          isOpen={isAuthModalOpen}
+        />
+      )}
       {RevalidationModal}
       <CWUpvoteSmall
         voteCount={likes}

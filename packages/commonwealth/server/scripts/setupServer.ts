@@ -1,24 +1,13 @@
-import type { RabbitMQController } from '@hicommonwealth/adapters';
-import { RedisCache, cacheDecorator } from '@hicommonwealth/adapters';
 import { logger } from '@hicommonwealth/core';
-import type { DB } from '@hicommonwealth/model';
 import type { Express } from 'express-serve-static-core';
 import http from 'http';
-import type Rollbar from 'rollbar';
 import { PORT } from '../config';
 
 const log = logger().getLogger(__filename);
 
-const setupServer = (
-  app: Express,
-  rollbar: Rollbar,
-  models: DB,
-  rabbitMQController: RabbitMQController,
-  redisCache: RedisCache,
-) => {
+const setupServer = (app: Express) => {
   app.set('port', PORT);
   const server = http.createServer(app);
-  cacheDecorator.setCache(redisCache);
 
   const onError = (error) => {
     if (error.syscall !== 'listen') {

@@ -1,3 +1,4 @@
+import { User } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
 import type { CreateOptions, DataTypes } from 'sequelize';
 import type { DB } from '.';
@@ -8,11 +9,7 @@ import type { ModelInstance, ModelStatic } from './types';
 
 export type EmailNotificationInterval = 'week' | 'never';
 
-export type UserAttributes = {
-  email: string;
-  id?: number;
-  emailVerified?: boolean;
-  isAdmin?: boolean;
+export type UserAttributes = User & {
   disableRichText?: boolean;
   emailNotificationInterval?: EmailNotificationInterval;
   selected_community_id?: number | null;

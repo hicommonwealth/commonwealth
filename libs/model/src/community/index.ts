@@ -1,4 +1,5 @@
 export * from './CreateCommunity.command';
+export * from './Demo.command';
+export * from './GetCommunityStake.query';
 export * from './SetCommunityNamespace.command';
-export * from './getCommunityStake';
-export * from './setCommunityStake';
+export * from './SetCommunityStake.command';

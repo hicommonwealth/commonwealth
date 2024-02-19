@@ -1,9 +1,12 @@
-import { logger, stats } from '@hicommonwealth/core';
-import { INVALID_INPUT_ERROR } from '@hicommonwealth/model';
+import {
+  AnalyticsOptions,
+  INVALID_ACTOR_ERROR,
+  INVALID_INPUT_ERROR,
+  analytics,
+  stats,
+} from '@hicommonwealth/core';
 import { NextFunction, Request, Response } from 'express';
-import { BadRequest, InternalServerError } from './http';
-
-const log = logger().getLogger(__filename);
+import { BadRequest, InternalServerError, Unauthorized } from './http';
 
 /**
  * Captures traffic and latency
@@ -22,9 +25,7 @@ export const statsMiddleware = (
       stats().histogram(`cw.path.latency`, latency, { path });
     });
   } catch (err: unknown) {
-    err instanceof Error
-      ? log.error(err.message, err)
-      : log.error(err as string);
+    console.error(err); // don't use logger port here
   }
   next();
 };
@@ -38,7 +39,7 @@ export const errorMiddleware = (
   res: Response,
   next: NextFunction,
 ): void => {
-  log.error(error.message, error);
+  console.error(error); // don't use logger port here
   if (res.headersSent) return next(error);
 
   let response = InternalServerError(
@@ -49,8 +50,41 @@ export const errorMiddleware = (
     switch (name) {
       case INVALID_INPUT_ERROR:
         response = BadRequest(message, 'details' in error && error.details);
+        break;
+
+      case INVALID_ACTOR_ERROR:
+        response = Unauthorized(message);
+        break;
+
+      default:
+        response = InternalServerError(
+          message,
+          process.env.NODE_ENV !== 'production' ? stack : undefined,
+        );
     }
-    response = InternalServerError(message, stack);
   }
   res.status(response.status).send(response);
 };
+
+/**
+ * Captures analytics
+ */
+export function analyticsMiddleware<T>(
+  event: any,
+  transformer: (payload: T) => AnalyticsOptions,
+) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // override res.json
+      const originalResJson = res.json;
+
+      res.json = function (data: T) {
+        analytics().track(event, transformer(data));
+        return originalResJson.call(res, data);
+      };
+    } catch (err: unknown) {
+      console.error(err); // don't use logger port here
+    }
+    next();
+  };
+}

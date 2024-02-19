@@ -1,6 +1,6 @@
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
-import { AppError } from '@hicommonwealth/adapters';
 import {
+  AppError,
   BalanceType,
   ChainBase,
   ChainNetwork,

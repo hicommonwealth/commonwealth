@@ -1,4 +1,4 @@
-import { ServerError } from '@hicommonwealth/adapters';
+import { ServerError } from '@hicommonwealth/core';
 import type { DB, ReactionInstance } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import { Sequelize } from 'sequelize';

@@ -1,7 +1,8 @@
-import { AppError, ServerError } from '@hicommonwealth/adapters';
 import {
+  AppError,
   DynamicTemplate,
   NotificationCategories,
+  ServerError,
   WalletId,
   logger,
 } from '@hicommonwealth/core';

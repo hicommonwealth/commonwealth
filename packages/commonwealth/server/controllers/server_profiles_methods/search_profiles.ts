@@ -1,7 +1,7 @@
 import { Op, QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from 'server/types';
 
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import { CommunityInstance } from '@hicommonwealth/model';
 import { flatten, uniq } from 'lodash';
 import {

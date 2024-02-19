@@ -1,4 +1,4 @@
-import { CommunityInstance, ThreadAttributes } from '@hicommonwealth/model';
+import { ThreadAttributes } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from 'server/types';
 import {
@@ -10,7 +10,7 @@ import {
 import { ServerThreadsController } from '../server_threads_controller';
 
 export type SearchThreadsOptions = {
-  community: CommunityInstance;
+  communityId: string;
   searchTerm: string;
   threadTitleOnly: boolean;
   limit?: number;
@@ -30,7 +30,7 @@ export type SearchThreadsResult =
 export async function __searchThreads(
   this: ServerThreadsController,
   {
-    community,
+    communityId,
     searchTerm,
     threadTitleOnly,
     limit,
@@ -71,8 +71,8 @@ export async function __searchThreads(
     searchTerm: searchTerm,
     ...paginationBind,
   };
-  if (community) {
-    bind.community = community.id;
+  if (communityId) {
+    bind.community = communityId;
   }
 
   const communityWhere = bind.community

@@ -1,11 +1,14 @@
-import { AppError } from '@hicommonwealth/adapters';
-import { Community, DB } from '@hicommonwealth/model';
-import { CommunityStakeAttributes } from '@hicommonwealth/model/build/models/community_stake';
+import { AppError } from '@hicommonwealth/core';
+import { CommunityStakeAttributes, DB } from '@hicommonwealth/model';
+import {
+  GetCommunityStakeOptions,
+  GetCommunityStakeSchema,
+} from 'server/controllers/server_communities_methods/get_community_stake';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestParams, TypedResponse, success } from '../../types';
 import { formatErrorPretty } from '../../util/errorFormat';
 
-type GetCommunityStakesParams = Community.GetCommunityStake;
+type GetCommunityStakesParams = GetCommunityStakeOptions;
 type GetCommunityStakesResponse = CommunityStakeAttributes;
 
 export const getCommunityStakeHandler = async (
@@ -14,9 +17,7 @@ export const getCommunityStakeHandler = async (
   req: TypedRequestParams<GetCommunityStakesParams>,
   res: TypedResponse<GetCommunityStakesResponse>,
 ) => {
-  const validationResult = Community.GetCommunityStakeSchema.safeParse(
-    req.params,
-  );
+  const validationResult = GetCommunityStakeSchema.safeParse(req.params);
 
   if (validationResult.success === false) {
     throw new AppError(formatErrorPretty(validationResult));

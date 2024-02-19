@@ -1,5 +1,4 @@
-import { AppError } from '@hicommonwealth/adapters';
-import { ChainBase } from '@hicommonwealth/core';
+import { AppError, ChainBase } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import { findAllRoles } from '../util/roles';
