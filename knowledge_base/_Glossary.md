@@ -1,5 +1,44 @@
 # Glossary
 
+## Contents
+
+- [Chain Concepts](#chain-concepts)
+  * [Chain Entity](#chain-entity)
+  * [Chain Node](#chain-node)
+  * [Delegate Contract](#delegate-contract)
+  * [Module](#module)
+- [Common App](#common-app)
+  * [Bridge](#bridge)
+  * [Comment](#comment)
+  * [Community](#community)
+  * [Core](#core)
+  * [Forum](#forum)
+  * [Group](#group)
+  * [Link](#link)
+  * [Member](#member)
+  * [Notification](#notification)
+  * [Page Scope](#page-scope)
+  * [Profile](#profile)
+  * [Reaction](#reaction)
+  * [Poll](#poll)
+  * [Role](#role)
+  * [Sessions](#sessions)
+  * [Sign-In](#sign-in)
+  * [Stake](#stake)
+  * [Subscription](#subscription)
+  * [Template](#template)
+  * [Thread](#thread)
+  * [Topic](#topic)
+  * [User](#user)
+  * [Wallet](#wallet)
+  * [Votes](#votes)
+- [Hexagonal Architecture](#hexagonal-architecture)
+  * [Port](#port)
+  * [Adapter](#adapter)
+- [Praxis](#praxis)
+  * [Fast-Follow](#fast-follow)
+- [Change Log](#change-log)
+
 ## Chain Concepts
 
 ### Chain Entity
@@ -73,6 +112,12 @@ For a list of activity categories which may trigger notification, see [Notificat
 **Knowledge Base:** [Notifications.md](./Notifications.md)
 
 **Related Terms:** [Subscription](#subscription)
+
+### Page Scope
+
+The Common website consists of scoped and unscoped pages. Scoped pages, or "community" pages, belong to Common communities; their URI syntax takes the form of e.g. `/scope/discussion/identifier`. Unscoped pages, or "global" pages, are community-independent. Examples include the landing and `/terms` pages.
+
+For URI parsing, route setup, and the scope-conditional rendering of page layouts, see `CommonDomainRoutes.tsx`,  `setupAppRoutes.ts` and `Layout.tsx`.
 
 ### Profile
 
@@ -172,4 +217,4 @@ A new-feature ticket related to a project that is non-blocking but can be comple
 
 ## Change Log
 
-24012X: Authored by Graham Johnson (#).
+240219: Authored by Graham Johnson (#).
