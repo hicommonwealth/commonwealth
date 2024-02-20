@@ -50,7 +50,6 @@ export function sanitizeQuillText(input: string, noEncode?: boolean): string {
       return input;
     }
   }
-
   const { ops } = parsedObject;
 
   if (!ops) {
