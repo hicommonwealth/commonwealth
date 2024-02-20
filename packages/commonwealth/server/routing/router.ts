@@ -83,7 +83,6 @@ import type ViewCountCache from '../util/viewCountCache';
 import type { DB } from '@hicommonwealth/model';
 import authCallback from '../routes/authCallback';
 import banAddress from '../routes/banAddress';
-import editSubstrateSpec from '../routes/editSubstrateSpec';
 import finishSsoLogin from '../routes/finishSsoLogin';
 import getBannedAddresses from '../routes/getBannedAddresses';
 import setAddressWallet from '../routes/setAddressWallet';
@@ -259,14 +258,6 @@ function setupRouter(
   );
   registerRoute(router, 'get', '/domain', domain.bind(this, models));
   registerRoute(router, 'get', '/status', status.bind(this, models));
-  registerRoute(
-    router,
-    'post',
-    '/editSubstrateSpec',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    editSubstrateSpec.bind(this, models),
-  );
 
   // Creating and Managing Addresses
   registerRoute(
