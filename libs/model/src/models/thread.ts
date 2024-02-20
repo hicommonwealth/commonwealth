@@ -34,6 +34,7 @@ export type ThreadAttributes = {
   pinned?: boolean;
   community_id: string;
   view_count: number;
+  new_view_count: number;
   links: Link[] | null;
 
   read_only?: boolean;
@@ -109,6 +110,11 @@ export default (
         allowNull: false,
         defaultValue: 0,
       },
+      new_view_count: {
+        type: dataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
       read_only: {
         type: dataTypes.BOOLEAN,
         allowNull: false,
@@ -148,7 +154,8 @@ export default (
       },
       reaction_weights_sum: {
         type: dataTypes.INTEGER,
-        allowNull: true,
+        allowNull: false,
+        defaultValue: 0,
       },
       comment_count: {
         type: dataTypes.INTEGER,

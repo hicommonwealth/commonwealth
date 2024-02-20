@@ -2,5 +2,6 @@ export const calculateVoteWeight = (
   stakeBalance: string,
   voteWeight: number,
 ) => {
-  return parseInt(stakeBalance, 10) * voteWeight || 1;
+  // all community members get 1 weight by default
+  return 1 + parseInt(stakeBalance, 10) * voteWeight;
 };

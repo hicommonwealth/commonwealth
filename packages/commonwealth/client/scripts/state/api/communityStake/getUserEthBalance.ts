@@ -17,9 +17,9 @@ const getUserEthBalance = async ({
   const CommunityStakes = await lazyLoadCommunityStakes();
   const communityStakes = new CommunityStakes(
     commonProtocol.factoryContracts[
-      commonProtocol.ValidChains.Sepolia
+      commonProtocol.ValidChains.Base
     ].communityStake,
-    commonProtocol.factoryContracts[commonProtocol.ValidChains.Sepolia].factory,
+    commonProtocol.factoryContracts[commonProtocol.ValidChains.Base].factory,
     chainRpc,
   );
 
