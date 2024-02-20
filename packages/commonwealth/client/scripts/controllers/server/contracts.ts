@@ -193,7 +193,7 @@ class ContractsController {
   }) {
     try {
       const response = await $.post(`${app.serverUrl()}/contract`, {
-        chain_id: app.activeChainId(),
+        community_id: app.activeChainId(),
         chain_node_id,
         jwt: app.user.jwt,
         address,
