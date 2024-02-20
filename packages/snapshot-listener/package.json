@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc -b && tsc-alias",
+    "build": "tsc -b",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
     "lint-all": "eslint './**/*.ts'",
