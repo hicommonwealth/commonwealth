@@ -81,7 +81,7 @@
 
       .stake-selector {
         display: flex;
-        gap: 50px;
+        gap: 25px;
         align-items: center;
 
         @include smallInclusive {
@@ -90,8 +90,20 @@
 
         .number {
           font-size: 29px;
-          min-width: 34px;
-          justify-content: center;
+          background: transparent;
+          font-weight: bold;
+          text-align: center;
+          width: 5ch;
+          border-color: transparent;
+          transition: width 0.2s ease-in-out;
+        }
+
+        .number.expand1 {
+          width: 8ch;
+        }
+
+        .number.expand2 {
+          width: 11ch;
         }
       }
     }

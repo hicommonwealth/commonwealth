@@ -36,6 +36,7 @@ import {
   CustomAddressOptionElement,
 } from './CustomAddressOption';
 
+import { CWTextInput } from 'client/scripts/views/components/component_kit/cw_text_input';
 import './StakeExchangeForm.scss';
 
 type OptionDropdown = {
@@ -76,7 +77,7 @@ const StakeExchangeForm = ({
   } = useStakeExchange({
     mode,
     address: selectedAddress?.value,
-    numberOfStakeToExchange,
+    numberOfStakeToExchange: numberOfStakeToExchange ?? 0,
   });
 
   const { stakeBalance, stakeValue, currentVoteWeight, stakeData } =
@@ -86,7 +87,7 @@ const StakeExchangeForm = ({
   const { mutateAsync: sellStake } = useSellStakeMutation();
 
   const expectedVoteWeight = commonProtocol.calculateVoteWeight(
-    String(numberOfStakeToExchange),
+    numberOfStakeToExchange ? String(numberOfStakeToExchange) : '0',
     stakeData?.vote_weight,
   );
 
@@ -149,9 +150,15 @@ const StakeExchangeForm = ({
     onSetNumberOfStakeToExchange((prevState) => prevState + 1);
   };
 
-  const insufficientFunds =
-    isBuyMode &&
-    parseFloat(userEthBalance) < parseFloat(buyPriceData?.totalPrice);
+  const handleInput = (e) => {
+    onSetNumberOfStakeToExchange(
+      e.target.value === '' ? null : parseInt(e.target.value),
+    );
+  };
+
+  const insufficientFunds = isBuyMode
+    ? parseFloat(userEthBalance) < parseFloat(buyPriceData?.totalPrice)
+    : numberOfStakeToExchange > stakeBalance;
 
   const ctaDisabled = isBuyMode
     ? insufficientFunds || numberOfStakeToExchange <= 0 || !selectedAddress
@@ -190,6 +197,13 @@ const StakeExchangeForm = ({
   const plusDisabled = isBuyMode
     ? false
     : numberOfStakeToExchange >= stakeBalance;
+
+  const inputClassExpanded =
+    numberOfStakeToExchange?.toString().length > 6
+      ? 'number expand2'
+      : numberOfStakeToExchange?.toString().length > 3
+      ? 'number expand1'
+      : 'number';
 
   return (
     <div className="StakeExchangeForm">
@@ -262,9 +276,11 @@ const StakeExchangeForm = ({
                 onClick={handleMinus}
                 disabled={minusDisabled}
               />
-              <CWText type="h3" fontWeight="bold" className="number">
-                {numberOfStakeToExchange}
-              </CWText>
+              <CWTextInput
+                onInput={handleInput}
+                value={numberOfStakeToExchange}
+                inputClassName={inputClassExpanded ?? 'number'}
+              />
               <CWCircleButton
                 buttonType="secondary"
                 iconName="plus"
