@@ -49,6 +49,9 @@ export function sanitizeQuillText(input: string, noEncode?: boolean): string {
       return input;
     }
   }
+  if (!parsedObject.ops) {
+    return '';
+  }
   const { ops } = parsedObject;
   for (const op of ops) {
     const videoEmbedUrl: string | null = op.insert?.video;
