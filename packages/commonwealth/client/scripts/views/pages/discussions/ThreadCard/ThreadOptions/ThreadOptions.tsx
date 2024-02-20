@@ -79,12 +79,7 @@ export const ThreadOptions = ({
 
   return (
     <>
-      <div
-        className="ThreadOptions"
-        onClick={(e) => {
-          e.preventDefault();
-        }}
-      >
+      <div className="ThreadOptions">
         <div className="options-container">
           {!upvoteDrawerBtnBelow && <ViewThreadUpvotesDrawer thread={thread} />}
 
