@@ -27,7 +27,6 @@ export class UnleashProvider implements Provider {
     await this.client.start();
     this.flags = this.client.getAllToggles();
     this.status = ProviderStatus.READY;
-    console.log(this.flags);
   }
 
   resolveBooleanEvaluation(
