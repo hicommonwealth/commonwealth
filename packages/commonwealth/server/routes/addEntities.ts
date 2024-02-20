@@ -8,7 +8,6 @@ import { failure, success } from '../types';
 export async function addEntities<
   M extends Record<string, unknown> = Record<string, unknown>,
 >(
-  chainIdFieldName: string,
   models: DB,
   bulkCreate: (obj) => Promise<number>,
   entities: (req: TypedRequest<M>) => any,
@@ -45,11 +44,6 @@ export async function addEntities<
   }
 
   entityCopy.forEach((c) => {
-    if (chainIdFieldName != 'community_id') {
-      c[chainIdFieldName] = c['community_id'];
-      delete c['community_id'];
-    }
-
     // all the entities use the address_id field. If user passed in address, map it to address_id
     if (addressMap && c.address) {
       c.address_id = addressMap.get(c.address);

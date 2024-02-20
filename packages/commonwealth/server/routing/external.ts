@@ -54,7 +54,6 @@ export function addExternalRoutes(
     putCommentsValidation,
     addEntities.bind(
       this,
-      'community_id',
       models,
       (a) => models.Comment.bulkCreate(a),
       (req: TypedRequest<PutCommentsReq>) => req.body.comments,
@@ -78,7 +77,6 @@ export function addExternalRoutes(
     postReactionsValidation,
     addEntities.bind(
       this,
-      'community_id',
       models,
       (a) => models.Reaction.bulkCreate(a),
       (req: TypedRequest<PostReactionsReq>) => req.body.reactions,
@@ -109,7 +107,6 @@ export function addExternalRoutes(
     postTopicsValidation,
     addEntities.bind(
       this,
-      'community_id',
       models,
       (a) => models.Topic.bulkCreate(a),
       (req: TypedRequest<PostTopicsReq>) => req.body.topics,
