@@ -9,6 +9,7 @@ import {
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 import type { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
 import { useCommonNavigate } from 'navigation/helpers';
+import { DeltaStatic } from 'quill';
 import React, { useState } from 'react';
 import app from 'state';
 import {
@@ -24,15 +25,21 @@ import { Skeleton } from '../../components/Skeleton';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
-import { CWTextArea } from '../../components/component_kit/cw_text_area';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import {
+  ReactQuillEditor,
+  createDeltaFromText,
+  getTextFromDelta,
+} from '../../components/react_quill_editor';
 
 export const CosmosProposalForm = () => {
   const [cosmosProposalType, setCosmosProposalType] = useState<
     'textProposal' | 'communitySpend'
   >('textProposal');
   const [deposit, setDeposit] = useState<number>(0);
-  const [description, setDescription] = useState<string>('');
+  const [descriptionDelta, setDescriptionDelta] = useState<DeltaStatic>(
+    createDeltaFromText(''),
+  );
   const [payoutAmount, setPayoutAmount] = useState<number>(0);
   const [recipient, setRecipient] = useState<string>('');
   const [title, setTitle] = useState<string>('');
@@ -62,6 +69,7 @@ export const CosmosProposalForm = () => {
       deposit,
       meta?.decimals,
     );
+    const description = getTextFromDelta(descriptionDelta);
 
     const _deposit = deposit
       ? new CosmosToken(
@@ -126,15 +134,14 @@ export const CosmosProposalForm = () => {
           setTitle(e.target.value);
         }}
       />
-      <CWTextArea
-        label="Description"
-        placeholder="Enter a description"
-        onInput={(e) => {
-          setDescription(e.target.value);
-        }}
-        value={description}
-        resizeWithText
-      />
+      <div>
+        <CWLabel label="Description" />
+        <ReactQuillEditor
+          placeholder="Enter a description"
+          contentDelta={descriptionDelta}
+          setContentDelta={setDescriptionDelta}
+        />
+      </div>
       {isLoadingDepositParams ? (
         <Skeleton className="TextInput" style={{ height: 62 }} />
       ) : (
