@@ -26,8 +26,8 @@ import { PageLoading } from 'views/pages/loading';
 import useManageDocumentTitle from '../../hooks/useManageDocumentTitle';
 import { getStatusText } from '../components/ProposalCard/helpers';
 import { CardsCollection } from '../components/cards_collection';
-import { CWSpinner } from '../components/component_kit/cw_spinner';
 import { CWText } from '../components/component_kit/cw_text';
+import CWLoadingSpinner from '../components/component_kit/new_designs/CWLoadingSpinner';
 import { AaveProposalCardDetail } from '../components/proposals/aave_proposal_card_detail';
 import { CompoundProposalStats } from '../components/proposals/proposals_explainers';
 
@@ -139,7 +139,7 @@ const ProposalsPage = () => {
       .sort((p1, p2) => p2.data.id - p1.data.id);
 
   const activeProposalContent = isLoadingCosmosActiveProposals ? (
-    <CWSpinner />
+    <CWLoadingSpinner center />
   ) : !activeCosmosProposals?.length &&
     !activeCompoundProposals?.length &&
     !activeAaveProposals?.length &&
@@ -203,7 +203,7 @@ const ProposalsPage = () => {
       .sort((p1, p2) => p2.data.id - p1.data.id);
 
   const inactiveProposalContent = isLoadingCosmosCompletedProposals ? (
-    <CWSpinner />
+    <CWLoadingSpinner center />
   ) : !inactiveCosmosProposals?.length &&
     !inactiveCompoundProposals?.length &&
     !inactiveAaveProposals?.length &&

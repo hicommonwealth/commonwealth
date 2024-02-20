@@ -11,11 +11,11 @@ import {
   CWProfileRow,
   CWProfilesList,
 } from 'views/components/component_kit/cw_profiles_list';
-import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWWalletsList } from 'views/components/component_kit/cw_wallets_list';
 
+import CWLoadingSpinner from '../../components/component_kit/new_designs/CWLoadingSpinner';
 import { LoginBoilerplate } from './login_boilerplate';
 import { LoginDesktopSidebar } from './login_desktop_sidebar';
 import type { LoginProps } from './types';
@@ -125,7 +125,7 @@ export const LoginDesktop = ({
                 </div>
               </div>
             ) : (
-              <CWSpinner />
+              <CWLoadingSpinner center />
             )}
             <div className="header-container">
               <LoginBoilerplate />

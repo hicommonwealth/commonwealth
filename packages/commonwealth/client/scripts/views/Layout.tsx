@@ -10,8 +10,8 @@ import ErrorPage from 'views/pages/error';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import SubLayout from './Sublayout';
 import { CWEmptyState } from './components/component_kit/cw_empty_state';
-import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWText } from './components/component_kit/cw_text';
+import CWLoadingSpinner from './components/component_kit/new_designs/CWLoadingSpinner';
 
 type LayoutAttrs = {
   Component: ReactNode | any;
@@ -99,7 +99,7 @@ const LayoutComponent = ({
 
     const Bobber = (
       <div className="spinner-container">
-        <CWSpinner size="xl" />
+        <CWLoadingSpinner center />
       </div>
     );
 
