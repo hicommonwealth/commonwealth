@@ -139,7 +139,7 @@ export const CommunityMetadataRows = ({
     try {
       axios
         .post(`${app.serverUrl()}/updateBanner`, {
-          chain_id: community.id,
+          community_id: community.id,
           banner_text: communityBanner,
           auth: true,
           jwt: app.user.jwt,
