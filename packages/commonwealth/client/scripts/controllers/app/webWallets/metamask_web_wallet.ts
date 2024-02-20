@@ -2,7 +2,6 @@ declare let window: any;
 
 import $ from 'jquery';
 
-import { providers } from 'ethers';
 import type Web3 from 'web3';
 import type Account from '../../../models/Account';
 import type BlockInfo from '../../../models/BlockInfo';
@@ -76,8 +75,6 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   }
 
   public async getSessionSigner() {
-    const ethersProvider = new providers.Web3Provider(this._web3.givenProvider);
-
     return new SIWESigner({
       // TODO: provider type for ethers 5?
       // @ts-ignore

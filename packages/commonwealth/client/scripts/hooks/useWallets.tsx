@@ -358,6 +358,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
         );
         // TODO: implement account.validate
         // await account.validate(session, );
+        console.log(app);
         app.sessions.authSession(app.chain.base, session);
         await onLogInWithAccount(account, true);
       } catch (e) {
@@ -376,7 +377,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
           setCachedWalletSignature(session.authorizationData.signature);
           setCachedTimestamp(timestamp);
           setCachedChainId(chainId);
-          setCachedSessionPayload(session);
+          setCachedSession(session);
           walletProps.onSuccess?.(account.address);
           setSidebarType('newOrReturning');
           setActiveStep('selectAccountType');
