@@ -1,80 +1,84 @@
+import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import useGrowlStore from 'state/ui/growl';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWGrowl } from 'views/components/component_kit/cw_growl';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from '../component_kit/new_designs/cw_button';
-import './ValentineGrowl.scss';
+import './StakeGrowl.scss';
 
-const LOCALSTORAGE_VALENTINE_GROWL_KEY = 'valentineGrowlHidden';
+const LOCALSTORAGE_STAKE_GROWL_KEY = 'stakeGrowlHidden';
 
-const ValentineGrowl = () => {
+const StakeGrowl = () => {
+  const navigate = useCommonNavigate();
   const { setIsGrowlHidden, isGrowlHidden } = useGrowlStore();
 
   const [shouldHideGrowlPermanently, setShouldHideGrowlPermanently] =
     useState(false);
   const [isDisabled, setIsDisabled] = useState(
-    localStorage.getItem(LOCALSTORAGE_VALENTINE_GROWL_KEY) === 'true' ||
+    localStorage.getItem(LOCALSTORAGE_STAKE_GROWL_KEY) === 'true' ||
       isGrowlHidden,
   );
-
-  const openInviteInCalender = () => {
-    const link = document.createElement('a');
-    link.href = `webcal://${window.location.host}/static/invites/common-community-call.ics`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
 
   const handleExit = () => {
     setIsDisabled(true);
     setIsGrowlHidden(true);
 
     if (shouldHideGrowlPermanently) {
-      localStorage.setItem(LOCALSTORAGE_VALENTINE_GROWL_KEY, 'true');
+      localStorage.setItem(LOCALSTORAGE_STAKE_GROWL_KEY, 'true');
     }
   };
 
   return (
     <CWGrowl disabled={isDisabled} position="bottom-right">
-      <div className="ValentineGrowl">
+      <div className="StakeGrowl">
         <CWIconButton
           iconName="close"
           iconSize="medium"
           className="closeButton"
           onClick={handleExit}
         />
-        <img
-          src="/static/img/valentineGrowlImage.jpeg"
-          alt=""
-          className="img"
-        />
+        <img src="/static/img/stakingGrowlImg.png" alt="" className="img" />
         <div className="container">
-          <CWText type="h1" fontWeight="semiBold" isCentered>
-            Join the community call
-          </CWText>
-          <CWText
-            type="b1"
-            fontWeight="regular"
-            isCentered
-            className="subtitle-text"
-          >
-            and receive a POAP 🎁
+          <CWText type="h2" fontWeight="bold" isCentered>
+            Introducing Community Stake
           </CWText>
           <CWText type="b2" fontWeight="regular" isCentered className="body">
-            Get ready for an exclusive announcement from Common!
-            <br />
-            Join us on February 14th at 11am EST for something special just for
-            you!
+            Empower members with onchain ownership, gated access, adn enhanced
+            voting power with <br />
+            Community Stake
           </CWText>
           <CWButton
             className="CalenderButton"
             buttonType="primary"
             buttonHeight="med"
-            label="Add to calendar"
-            onClick={openInviteInCalender}
+            label="Create community with stake"
+            onClick={() => navigate('/createCommunity')}
           />
+          <CWText type="b2" fontWeight="regular" isCentered className="body">
+            Currently only newly creted communities can enable stake.
+          </CWText>
+          <a
+            href="http://blog.commonwealth.im/community-stake-100-owners-around-any-idea/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <CWText
+              type="b1"
+              fontWeight="link"
+              isCentered
+              className="learnMore"
+            >
+              Learn More
+              <CWIcon
+                iconName="arrowSquareOut"
+                iconSize="medium"
+                className="icon"
+              />
+            </CWText>
+          </a>
         </div>
         <div className="checkboxContainer">
           <CWCheckbox
@@ -90,4 +94,4 @@ const ValentineGrowl = () => {
   );
 };
 
-export default ValentineGrowl;
+export default StakeGrowl;
