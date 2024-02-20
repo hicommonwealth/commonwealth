@@ -4,6 +4,11 @@ export const VALIDATION_MESSAGES = {
   NO_INPUT: 'No input',
   MAX_CHAR_LIMIT_REACHED: 'Max character limit reached',
   INVALID_INPUT: 'Invalid input',
+  INVALID_REQUIREMENTS: 'Invalid requirements',
+  INVALID_ADDRESS: 'Invalid address',
+  CONTRACT_NOT_FOUND: 'Contract not found',
+  INVALID_CONTRACT_TYPE: 'Invalid contract type',
+  INPUT_TOO_SMALL: 'Input too small',
 };
 
 export const requirementSubFormValidationSchema = z.object({

@@ -17,11 +17,19 @@ import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_rad
 import { ZodError, ZodObject } from 'zod';
 import {
   AMOUNT_CONDITIONS,
+  CW_SPECIFICATIONS,
   ERC_SPECIFICATIONS,
   TOKENS,
   conditionTypes,
 } from '../../../common/constants';
 import TopicGatingHelpMessage from '../../TopicGatingHelpMessage';
+import {
+  getCosmosContractType,
+  getEVMContractType,
+  getErc20Decimals,
+  isCosmosAddressContract,
+  isEVMAddressContract,
+} from '../helpers';
 import './GroupForm.scss';
 import RequirementSubForm from './RequirementSubForm';
 import {
@@ -48,6 +56,13 @@ type CWRequirementsRadioButtonProps = {
   onSelect: () => any;
   onInputValueChange: (value: string) => any;
 };
+
+// Interface for the CW721 Metadata
+interface Cw721Metadata {
+  name: string;
+  symbol: string;
+  // Add other CW721 specific fields
+}
 
 const CWRequirementsRadioButton = ({
   maxRequirements = 1,
@@ -319,39 +334,100 @@ const GroupForm = ({
     setRequirementSubForms([...allRequirements]);
   };
 
-  const validateSubForms = () => {
+  const validateSubForms = async () => {
     const updatedSubForms = [...requirementSubForms];
 
-    requirementSubForms.map((subForm, index) => {
-      try {
-        // HACK ALERT: this type of validation change should be done internally by zod, by we are doing this
-        // manually using javascript
-        const schema = getRequirementSubFormSchema(
-          subForm.values.requirementType,
-        );
-        if (subForm.values.requirementType === '') {
-          schema.pick({ requirementType: true }).parse(subForm.values);
-        } else {
-          schema.parse(subForm.values);
+    await Promise.all(
+      requirementSubForms.map(async (subForm, index) => {
+        try {
+          // HACK ALERT: this type of validation change should be done internally by zod, by we are doing this
+          // manually using javascript
+          const schema = getRequirementSubFormSchema(
+            subForm.values.requirementType,
+          );
+          if (subForm.values.requirementType === '') {
+            schema.pick({ requirementType: true }).parse(subForm.values);
+          } else {
+            schema.parse(subForm.values);
+          }
+
+          updatedSubForms[index] = {
+            ...updatedSubForms[index],
+            errors: {},
+          };
+
+          const key = Object.keys(subForm.values)[3];
+          const isCosmos =
+            subForm.values.requirementType === CW_SPECIFICATIONS.CW_721;
+
+          const contract_address = subForm.values.requirementContractAddress;
+          const amount = subForm.values.requirementAmount;
+          const evmId = parseInt(subForm.values.requirementChain); // requirement.data.source.evm_chain_id;
+          const cosmosId = subForm.values.requirementChain; // requirement.data.source.cosmos_chain_id;
+          const node_url = app.config.nodes
+            ?.getAll()
+            ?.filter((x) =>
+              isCosmos ? x.cosmosChainId === cosmosId : x.ethChainId == evmId,
+            )[0].url;
+
+          const isAddressContract = isCosmos
+            ? await isCosmosAddressContract(contract_address, node_url)
+            : await isEVMAddressContract(contract_address, node_url);
+
+          const isContractType = isCosmos
+            ? await getCosmosContractType(contract_address, node_url)
+            : await getEVMContractType(contract_address, node_url);
+
+          if (!isAddressContract) {
+            updatedSubForms[index] = {
+              ...updatedSubForms[index],
+              errors: {
+                ...updatedSubForms[index].errors,
+                [key]: VALIDATION_MESSAGES.CONTRACT_NOT_FOUND,
+              },
+            };
+          } else if (
+            !isContractType ||
+            isContractType !== subForm.values.requirementType
+          ) {
+            updatedSubForms[index] = {
+              ...updatedSubForms[index],
+              errors: {
+                ...updatedSubForms[index].errors,
+                [key]: VALIDATION_MESSAGES.INVALID_CONTRACT_TYPE,
+              },
+            };
+          } else if (isContractType === 'erc20') {
+            const erc20Decimals = await getErc20Decimals(
+              contract_address,
+              node_url,
+            );
+            const amountKey = Object.keys(subForm.values)[0];
+
+            if (erc20Decimals && amount.split('.')[1]?.length > erc20Decimals) {
+              updatedSubForms[index] = {
+                ...updatedSubForms[index],
+                errors: {
+                  ...updatedSubForms[index].errors,
+                  [amountKey]: VALIDATION_MESSAGES.INPUT_TOO_SMALL,
+                },
+              };
+            }
+          }
+        } catch (e: any) {
+          const zodError = e as ZodError;
+          const errors = {};
+          zodError.errors.map((x) => {
+            errors[x.path[0]] = x.message;
+          });
+
+          updatedSubForms[index] = {
+            ...updatedSubForms[index],
+            errors: errors as any,
+          };
         }
-
-        updatedSubForms[index] = {
-          ...updatedSubForms[index],
-          errors: {},
-        };
-      } catch (e: any) {
-        const zodError = e as ZodError;
-        const errors = {};
-        zodError.errors.map((x) => {
-          errors[x.path[0]] = x.message;
-        });
-
-        updatedSubForms[index] = {
-          ...updatedSubForms[index],
-          errors: errors as any,
-        };
-      }
-    });
+      }),
+    );
 
     setRequirementSubForms([...updatedSubForms]);
 
@@ -359,7 +435,7 @@ const GroupForm = ({
   };
 
   const handleSubmit = async (values: FormSubmitValues) => {
-    const hasSubFormErrors = validateSubForms();
+    const hasSubFormErrors = await validateSubForms();
     if (hasSubFormErrors) {
       return;
     }
