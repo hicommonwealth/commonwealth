@@ -1,6 +1,7 @@
 import type { Secp256k1Wallet } from '@cosmjs/amino';
-import { verify as verifyCanvasSessionSignature } from 'canvas';
+import { CANVAS_TOPIC, verify as verifyCanvasSessionSignature } from 'canvas';
 
+import { CosmosSigner } from '@canvas-js/chain-cosmos';
 import type {
   Action,
   ActionArgument,
@@ -47,33 +48,9 @@ export class CosmosSDKSessionController implements ISessionController {
     return this.signers[chainId][fromAddress]?.bech32Address;
   }
 
-  async authSession(
-    chainId: string,
-    fromAddress: string,
-    payload: SessionPayload,
-    signature: string,
-  ) {
-    const valid = await verifyCanvasSessionSignature({
-      session: { type: 'session', payload, signature },
-    });
-    if (!valid) {
-      throw new Error('Invalid signature');
-    }
-    if (payload.sessionAddress !== this.getAddress(chainId, fromAddress)) {
-      throw new Error(
-        `Invalid auth: ${payload.sessionAddress} vs. ${this.getAddress(
-          chainId,
-          fromAddress,
-        )}`,
-      );
-    }
-    this.auths[chainId][fromAddress] = { payload, signature };
-
-    const authStorageKey = `CW_SESSIONS-cosmos-${chainId}-${fromAddress}-auth`;
-    localStorage.setItem(
-      authStorageKey,
-      JSON.stringify(this.auths[chainId][fromAddress]),
-    );
+  async authSession(session: Session) {
+    const sessionSigner = new CosmosSigner();
+    sessionSigner.verifySession(CANVAS_TOPIC, session);
   }
 
   private async getOrCreateSigner(

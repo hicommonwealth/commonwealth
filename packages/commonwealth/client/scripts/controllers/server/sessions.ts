@@ -1,9 +1,13 @@
 import { addressSwapper } from 'commonwealth/shared/utils';
 
-import type { ActionArgument, SessionPayload } from '@canvas-js/interfaces';
+import type { ActionArgument, Session } from '@canvas-js/interfaces';
 import { getADR036SignableSession } from 'adapters/chain/cosmos/keys';
 import { createSiweMessage } from 'adapters/chain/ethereum/keys';
-import { chainBaseToCanvasChainId, createCanvasSessionPayload } from 'canvas';
+import {
+  CANVAS_TOPIC,
+  chainBaseToCanvasChainId,
+  createCanvasSessionPayload,
+} from 'canvas';
 
 import { ChainBase, WalletSsoSource } from '@hicommonwealth/core';
 import app from 'state';
@@ -35,44 +39,20 @@ export async function signSessionWithAccount<T extends { address: string }>(
   account: Account,
   timestamp: number,
 ) {
-  // Try to infer Chain ID from the currently active chain.
-  // `chainBaseToCanvasChainId` will replace idOrPrefix with the
-  // appropriate chainID for non-eth, non-cosmos chains.
-  //
-  // However, also handle the case where app.chain is empty.
-  const idOrPrefix =
-    wallet.chain === ChainBase.CosmosSDK
-      ? app.chain?.meta.bech32Prefix || 'cosmos'
-      : app.chain?.meta.node?.ethChainId || 1;
-  const canvasChainId = chainBaseToCanvasChainId(wallet.chain, idOrPrefix);
-  const sessionPublicAddress = await app.sessions.getOrCreateAddress(
-    wallet.chain,
-    canvasChainId,
-    account.address,
-  );
-
-  const sessionPayload = createCanvasSessionPayload(
-    wallet.chain,
-    canvasChainId,
-    wallet.chain === ChainBase.Substrate
-      ? addressSwapper({
-          address: account.address,
-          currentPrefix: 42,
-        })
-      : account.address,
-    sessionPublicAddress,
+  const sessionSigner = await wallet.getSessionSigner();
+  // TODO: what format should wallet.chain be in?
+  const session = await sessionSigner.getSession(CANVAS_TOPIC, {
+    chain: wallet.chain,
     timestamp,
-    account.validationBlockInfo
-      ? JSON.parse(account.validationBlockInfo).hash
-      : null,
-  );
-
-  const signature = await wallet.signCanvasMessage(account, sessionPayload);
-  return {
-    signature,
-    chainId: canvasChainId,
-    sessionPayload,
-  };
+  });
+  // TODO: what do we do with did/caip?
+  const walletAddress = session.address.split(':')[2];
+  if (walletAddress !== account.address) {
+    throw new Error(
+      `Session signed with wrong address ('${walletAddress}', expected '${account.address}')`,
+    );
+  }
+  return session;
 }
 
 // for eth and cosmos only, assumes chainbase is either Ethereum or CosmosSDK
@@ -164,19 +144,8 @@ class SessionsController {
   }
 
   // Provide authentication for a session address, by presenting a signed SessionPayload.
-  public authSession(
-    chainBase: ChainBase,
-    chainId: string,
-    fromAddress: string,
-    payload: SessionPayload,
-    signature: string,
-  ) {
-    return this.getSessionController(chainBase).authSession(
-      chainId,
-      fromAddress,
-      payload,
-      signature,
-    );
+  public authSession(chainBase: ChainBase, session: Session) {
+    return this.getSessionController(chainBase).authSession(session);
   }
 
   // Sign an arbitrary action, using context from the last authSession() call.

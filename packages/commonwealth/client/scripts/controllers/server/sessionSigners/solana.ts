@@ -1,7 +1,8 @@
 import type * as solw3 from '@solana/web3.js';
 import bs58 from 'bs58';
-import { verify as verifyCanvasSessionSignature } from 'canvas';
+import { CANVAS_TOPIC, verify as verifyCanvasSessionSignature } from 'canvas';
 
+import { SolanaSigner } from '@canvas-js/chain-solana';
 import type {
   Action,
   ActionArgument,
@@ -24,7 +25,7 @@ export class SolanaSessionController implements ISessionController {
 
   async hasAuthenticatedSession(
     chainId: string,
-    fromAddress: string
+    fromAddress: string,
   ): Promise<boolean> {
     this.getOrCreateSigner(chainId, fromAddress);
     return (
@@ -35,45 +36,21 @@ export class SolanaSessionController implements ISessionController {
 
   async getOrCreateAddress(
     chainId: string,
-    fromAddress: string
+    fromAddress: string,
   ): Promise<string> {
     return (
       await this.getOrCreateSigner(chainId, fromAddress)
     ).publicKey.toBase58();
   }
 
-  async authSession(
-    chainId: string,
-    fromAddress: string,
-    payload: SessionPayload,
-    signature: string
-  ) {
-    const valid = await verifyCanvasSessionSignature({
-      session: { type: 'session', payload, signature },
-    });
-    if (!valid) {
-      throw new Error('Invalid signature');
-    }
-    if (payload.sessionAddress !== this.getAddress(chainId, fromAddress)) {
-      throw new Error(
-        `Invalid auth: ${payload.sessionAddress} vs. ${this.getAddress(
-          chainId,
-          fromAddress
-        )}`
-      );
-    }
-    this.auths[chainId][fromAddress] = { payload, signature };
-
-    const authStorageKey = `CW_SESSIONS-solana-${chainId}-${fromAddress}-auth`;
-    localStorage.setItem(
-      authStorageKey,
-      JSON.stringify(this.auths[chainId][fromAddress])
-    );
+  async authSession(session: Session) {
+    const sessionSigner = new SolanaSigner();
+    sessionSigner.verifySession(CANVAS_TOPIC, session);
   }
 
   private async getOrCreateSigner(
     chainId: string,
-    fromAddress: string
+    fromAddress: string,
   ): Promise<solw3.Keypair> {
     this.auths[chainId] = this.auths[chainId] ?? {};
     this.signers[chainId] = this.signers[chainId] ?? {};
@@ -87,7 +64,7 @@ export class SolanaSessionController implements ISessionController {
       const storage = localStorage.getItem(storageKey);
       const { privateKey }: { privateKey: string } = JSON.parse(storage);
       this.signers[chainId][fromAddress] = solw3.Keypair.fromSecretKey(
-        bs58.decode(privateKey)
+        bs58.decode(privateKey),
       );
 
       const authStorageKey = `CW_SESSIONS-solana-${chainId}-${fromAddress}-auth`;
@@ -105,13 +82,13 @@ export class SolanaSessionController implements ISessionController {
         if (payload.sessionAddress === this.getAddress(chainId, fromAddress)) {
           console.log(
             'Restored authenticated session:',
-            this.getAddress(chainId, fromAddress)
+            this.getAddress(chainId, fromAddress),
           );
           this.auths[chainId][fromAddress] = { payload, signature };
         } else {
           console.log(
             'Restored signed-out session:',
-            this.getAddress(chainId, fromAddress)
+            this.getAddress(chainId, fromAddress),
           );
         }
       }
@@ -120,7 +97,7 @@ export class SolanaSessionController implements ISessionController {
       this.signers[chainId][fromAddress] = solw3.Keypair.generate();
       delete this.auths[chainId][fromAddress];
       const privateKey = bs58.encode(
-        this.signers[chainId][fromAddress].secretKey
+        this.signers[chainId][fromAddress].secretKey,
       );
       localStorage.setItem(storageKey, JSON.stringify({ privateKey }));
     }
@@ -131,7 +108,7 @@ export class SolanaSessionController implements ISessionController {
     chainId: string,
     fromAddress: string,
     call: string,
-    callArgs: Record<string, ActionArgument>
+    callArgs: Record<string, ActionArgument>,
   ): Promise<{
     session: Session;
     action: Action;
@@ -161,7 +138,7 @@ export class SolanaSessionController implements ISessionController {
     const nacl = await import('tweetnacl');
 
     const message = new TextEncoder().encode(
-      canvas.serializeActionPayload(actionPayload)
+      canvas.serializeActionPayload(actionPayload),
     );
     const signatureBytes = nacl.sign.detached(message, signer.secretKey);
     const signature = bs58.encode(signatureBytes);
@@ -169,7 +146,7 @@ export class SolanaSessionController implements ISessionController {
       !nacl.sign.detached.verify(
         message,
         signatureBytes,
-        signer.publicKey.toBytes()
+        signer.publicKey.toBytes(),
       )
     ) {
       throw new Error('Invalid signature!');

@@ -1,4 +1,4 @@
-import type { SessionPayload } from '@canvas-js/interfaces';
+import type { SessionPayload, SessionSigner } from '@canvas-js/interfaces';
 import type { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
 
 import type Account from './Account';
@@ -18,6 +18,8 @@ interface IWebWallet<AccountT extends { address: string } | string> {
   getChainId(): string | null;
 
   getRecentBlock: (chainIdentifier: string) => Promise<BlockInfo>;
+
+  getSessionSigner: () => Promise<SessionSigner>;
 
   signCanvasMessage(
     account: Account,
