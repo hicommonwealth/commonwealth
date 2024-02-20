@@ -3,8 +3,16 @@
 .CommunityPreviewCard.Card {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
+  padding: 16px;
   width: 392px;
+  border-radius: 6px;
+
+  @include mediumSmallInclusive {
+    min-height: 144px;
+    max-width: 200px;
+    min-width: 200px;
+  }
 
   .card-top {
     align-items: center;
@@ -16,20 +24,38 @@
     }
   }
 
-  .card-subtext {
-    &.b2 {
-      color: $neutral-600;
-    }
+  &.isExploreMode {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    border: 1px solid $neutral-700;
 
-    &.caption {
-      color: $neutral-500;
+    .explore-label {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 4px;
     }
   }
 
-  .new-activity-tag.Text {
-    background-color: $purple-400;
-    border-radius: $border-radius-rounded-corners;
-    color: $white;
-    padding: 2px 8px;
+  .card-subtext {
+    color: $neutral-500;
+  }
+
+  .thread-counts {
+    margin-top: auto;
+    padding-top: 12px;
+    display: flex;
+    gap: 4px;
+    align-items: flex-start;
+    color: $neutral-500;
+
+    .new-activity-tag.Text {
+      background-color: $purple-400;
+      border-radius: $border-radius-rounded-corners;
+      color: $white;
+      padding: 2px 8px;
+    }
   }
 }
