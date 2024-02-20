@@ -5,14 +5,12 @@ import { success } from '../types';
 import { validateOwner } from '../util/validateOwner';
 
 enum BanAddressErrors {
-  NoChain = 'Must supply a chain ID',
   NoAddress = 'Must supply an address',
   NoPermission = 'You do not have permission to ban an address',
   AlreadyExists = 'Ban for this address already exists',
 }
 
 type BanAddressReq = Omit<BanInstance, 'id'> & {
-  chain_id: string;
   address: string;
 };
 

@@ -12,7 +12,7 @@ export const Errors = {
 type SetAddressWalletReq = {
   address: string;
   wallet_id: WalletId;
-  author_chain: string;
+  author_community_id: string;
   jwt: string;
 };
 
