@@ -202,9 +202,9 @@ const useWallets = (walletProps: IuseWalletProps) => {
       if (walletProps.onSuccess) walletProps.onSuccess(magicAddress);
 
       if (isWindowMediumSmallInclusive(window.innerWidth)) {
-        walletProps.onModalClose();
+        await walletProps?.onModalClose?.();
       } else {
-        walletProps.onModalClose();
+        await walletProps?.onModalClose?.();
       }
 
       trackAnalytics({
@@ -240,9 +240,9 @@ const useWallets = (walletProps: IuseWalletProps) => {
       if (walletProps.onSuccess) walletProps.onSuccess(magicAddress);
 
       if (isWindowMediumSmallInclusive(window.innerWidth)) {
-        walletProps.onModalClose();
+        await walletProps?.onModalClose?.();
       } else {
-        walletProps.onModalClose();
+        await walletProps?.onModalClose?.();
       }
       trackAnalytics({
         event: MixpanelLoginEvent.LOGIN,
@@ -293,7 +293,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     }
 
     if (exitOnComplete) {
-      walletProps.onModalClose();
+      await walletProps?.onModalClose?.();
       if (walletProps.onSuccess) walletProps.onSuccess(account.address);
     }
   };
@@ -463,7 +463,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     } catch (e) {
       console.log(e);
       notifyError('Failed to create account. Please try again.');
-      walletProps.onModalClose();
+      await walletProps?.onModalClose?.();
     }
     setActiveStep('welcome');
   };
@@ -521,11 +521,11 @@ const useWallets = (walletProps: IuseWalletProps) => {
       if (walletProps.onSuccess)
         walletProps.onSuccess(primaryAccountToUse.profile.address);
       app.loginStateEmitter.emit('redraw'); // redraw app state when fully onboarded with new account
-      walletProps.onModalClose();
+      await walletProps?.onModalClose?.();
     } catch (e) {
       console.log(e);
       notifyError('Failed to save profile info');
-      walletProps.onModalClose();
+      await walletProps?.onModalClose?.();
     }
   };
 
