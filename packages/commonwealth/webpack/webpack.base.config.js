@@ -85,20 +85,12 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       'process.env.UNLEASH_FRONTEND_SERVER_URL': JSON.stringify(
-        process.env.UNLEASH_FRONTEND_SERVER_URL ||
-          'http://localhost:4242/api/frontend/',
-      ),
-    }),
-    new webpack.DefinePlugin({
-      'process.env.UNLEASH_FRONTEND_SERVER_URL': JSON.stringify(
-        process.env.UNLEASH_FRONTEND_SERVER_URL ||
-          'http://localhost:4242/api/frontend/',
+        process.env.UNLEASH_FRONTEND_SERVER_URL,
       ),
     }),
     new webpack.DefinePlugin({
       'process.env.UNLEASH_FRONTEND_API_TOKEN': JSON.stringify(
-        process.env.UNLEASH_FRONTEND_API_TOKEN ||
-          'default:development.unleash-insecure-frontend-api-token',
+        process.env.UNLEASH_FRONTEND_API_TOKEN,
       ),
     }),
     new HtmlWebpackPlugin({
