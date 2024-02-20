@@ -120,6 +120,20 @@ class CommunityStakes extends ContractBase {
       txReceipt = await this.contract.methods
         .buyStake(namespaceAddress, id, amount)
         .send({ value: totalPrice, from: walletAddress });
+      try {
+        await this.web3.givenProvider.request({
+          method: 'wallet_watchAsset',
+          params: {
+            type: 'ERC1155',
+            options: {
+              address: namespaceAddress,
+              tokenId: id.toString(),
+            },
+          },
+        });
+      } catch (error) {
+        console.log('Failed to watch asset in MM, watch manaually', error);
+      }
     } catch {
       throw new Error('Transaction failed');
     }
