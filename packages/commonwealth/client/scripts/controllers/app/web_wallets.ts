@@ -63,7 +63,7 @@ export default class WebWalletController {
     try {
       await $.post(`${app.serverUrl()}/setAddressWallet`, {
         address: account.address,
-        author_chain: account.community.id,
+        author_community: account.community.id,
         wallet_id: wallet,
         wallet_sso_source: null,
         jwt: app.user.jwt,
