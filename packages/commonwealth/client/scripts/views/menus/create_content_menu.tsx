@@ -200,7 +200,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
               resetSidebarState();
               navigate('/new/discussion');
             },
-            iconLeft: 'write',
+            iconLeft: 'pencil',
           } as PopoverMenuItem,
           ...getOnChainProposalItem(),
           ...getSputnikProposalItem(),

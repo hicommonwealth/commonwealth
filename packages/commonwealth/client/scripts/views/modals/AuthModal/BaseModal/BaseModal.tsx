@@ -132,7 +132,7 @@ const BaseModal = ({ onClose, onSuccess, showWalletsFor }: BaseModalProps) => {
     },
     {
       name: 'Email or Social',
-      options: ['google', 'discord', 'x', 'github', 'email'],
+      options: ['google', 'discord', 'x', 'apple', 'github', 'email'],
     },
   ];
 

@@ -1,6 +1,5 @@
 import { DefaultPage } from '@hicommonwealth/core';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { featureFlags } from 'helpers/feature-flags';
 import getLinkType from 'helpers/linkType';
 import React, { useState } from 'react';
 import { slugifyPreserveDashes } from 'shared/utils';
@@ -23,6 +22,7 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
+import { useFlag } from '../../../../../hooks/useFlag';
 import { getCommunityTags } from '../../../manage_community/helpers';
 import './CommunityProfileForm.scss';
 import { CommunityTags, FormSubmitValues } from './types';
@@ -32,6 +32,7 @@ import {
 } from './validation';
 
 const CommunityProfileForm = () => {
+  const communityStakeEnabled = useFlag('communityStake');
   const communityTagOptions: CommunityTags[] = ['DeFi', 'DAO'];
   const community = app.config.chains.getById(app.activeChainId());
 
@@ -111,7 +112,9 @@ const CommunityProfileForm = () => {
         description: values.communityDescription,
         social_links: links.map((link) => link.value.trim()),
         stagesEnabled: values.hasStagesEnabled,
-        customStages: values.customStages,
+        customStages: values.customStages
+          ? JSON.parse(values.customStages)
+          : [],
         iconUrl: values.communityProfileImageURL,
         defaultOverview: values.defaultPage === DefaultPage.Overview,
       });
@@ -153,9 +156,9 @@ const CommunityProfileForm = () => {
           : DefaultPage.Discussions,
         hasStagesEnabled: community.stagesEnabled,
         customStages:
-          community.customStages === 'true' || !community.customStages
-            ? ''
-            : community.customStages,
+          community.customStages.length > 0
+            ? JSON.stringify(community.customStages)
+            : '',
         communityBanner: community.communityBanner || '',
       }}
       validationSchema={communityProfileValidationSchema}
@@ -206,7 +209,7 @@ const CommunityProfileForm = () => {
               placeholder="Community URL"
               value={`${window.location.origin}/${communityId}`}
             />
-            {featureFlags.communityStake && (
+            {communityStakeEnabled && (
               <>
                 <CWTextInput
                   disabled

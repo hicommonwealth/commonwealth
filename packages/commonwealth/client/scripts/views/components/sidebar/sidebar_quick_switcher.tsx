@@ -1,10 +1,10 @@
 import React from 'react';
 
 import 'components/sidebar/sidebar_quick_switcher.scss';
-import useBrowserWindow from '../../../hooks/useBrowserWindow';
 
 import ChainInfo from '../../../models/ChainInfo';
 
+import clsx from 'clsx';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
@@ -15,14 +15,14 @@ import { CWIconButton } from '../component_kit/cw_icon_button';
 
 export const SidebarQuickSwitcher = ({
   isInsideCommunity,
+  onMobile,
 }: {
   isInsideCommunity: boolean;
+  onMobile: boolean;
 }) => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
   const { setMenu } = useSidebarStore();
-
-  const { isWindowSmallInclusive } = useBrowserWindow({});
 
   const allCommunities = app.config.chains
     .getAll()
@@ -39,15 +39,14 @@ export const SidebarQuickSwitcher = ({
   });
 
   return (
-    <div className="SidebarQuickSwitcher">
+    <div
+      className={clsx('SidebarQuickSwitcher', { onMobile, isInsideCommunity })}
+    >
       <div className="community-nav-bar">
-        {!isInsideCommunity && !isWindowSmallInclusive && (
-          <div className="collapsable-button-space" />
-        )}
         {isLoggedIn && (
           <CWIconButton
             iconName="plusCirclePhosphor"
-            iconButtonTheme="black"
+            iconButtonTheme="neutral"
             onClick={() => {
               setMenu({ name: 'createContent' });
             }}
@@ -55,7 +54,7 @@ export const SidebarQuickSwitcher = ({
         )}
         <CWIconButton
           iconName="compassPhosphor"
-          iconButtonTheme="black"
+          iconButtonTheme="neutral"
           onClick={() => {
             setMenu({ name: 'exploreCommunities' });
           }}

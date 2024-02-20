@@ -97,7 +97,9 @@ export const LoginDesktopSidebar = ({
           <CWText type="h4" fontWeight="semiBold" className="header-text">
             New or Returning?
           </CWText>
-          <CWAccountCreationButton onClick={onCreateNewAccount} />
+          <CWAccountCreationButton
+            onClick={async () => await onCreateNewAccount()}
+          />
           <CWAccountCreationButton
             creationType="linkAccount"
             onClick={onLinkExistingAccount}

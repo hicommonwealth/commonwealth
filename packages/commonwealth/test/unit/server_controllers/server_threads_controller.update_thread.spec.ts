@@ -125,16 +125,11 @@ describe('ServerThreadsController', () => {
           }),
         },
       };
-      const tokenBalanceCache: any = {};
       const banCache: any = {
         checkBan: () => [true, null],
       };
 
-      const serverThreadsController = new ServerThreadsController(
-        db,
-        tokenBalanceCache,
-        banCache,
-      );
+      const serverThreadsController = new ServerThreadsController(db, banCache);
       const [updatedThread, notificationOptions, analyticsOptions] =
         await serverThreadsController.updateThread(attributes);
 

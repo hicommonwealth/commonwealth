@@ -1,9 +1,9 @@
-import { featureFlags } from 'helpers/feature-flags';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/landing/header.scss';
 import React, { useState } from 'react';
 import { LoginModal } from 'views/modals/login_modal';
+import { useFlag } from '../../../hooks/useFlag';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
@@ -15,6 +15,7 @@ type HeaderProps = {
 };
 
 export const Header = ({ onLogin }: HeaderProps) => {
+  const newSignInModalEnabled = useFlag('newSignInModal');
   const navigate = useCommonNavigate();
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
@@ -47,7 +48,7 @@ export const Header = ({ onLogin }: HeaderProps) => {
           </div>
         )}
       </div>
-      {!featureFlags.newSignInModal ? (
+      {!newSignInModalEnabled ? (
         <CWModal
           content={
             <LoginModal
@@ -61,9 +62,9 @@ export const Header = ({ onLogin }: HeaderProps) => {
         />
       ) : (
         <AuthModal
-          onClose={() => setIsAuthModalOpen(false)}
-          isOpen={isAuthModalOpen}
           onSuccess={onLogin}
+          isOpen={isAuthModalOpen}
+          onClose={() => setIsAuthModalOpen(false)}
         />
       )}
     </>

@@ -1,5 +1,5 @@
 import { command, type CommandMetadata, type User } from '@hicommonwealth/core';
-import type { Request, RequestHandler, Response } from 'express';
+import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import { z, ZodSchema } from 'zod';
 
 /**
@@ -21,10 +21,16 @@ export const expressCommand =
       }
     >,
     res: Response<Partial<T> | undefined>,
+    next: NextFunction,
   ) => {
-    const results = await command(md, req.params.id, req.body, {
-      user: req.user as User,
-      address_id: req.body.address_id,
-    });
-    return res.json(results);
+    try {
+      const results = await command(md, {
+        id: req.params.id,
+        actor: { user: req.user as User, address_id: req.body.address_id },
+        payload: req.body,
+      });
+      return res.json(results);
+    } catch (error) {
+      next(error);
+    }
   };

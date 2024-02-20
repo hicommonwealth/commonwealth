@@ -24,10 +24,12 @@ import {
   CircleNotch,
   CirclesThreePlus,
   ClockCounterClockwise,
+  Code,
   Compass,
   Eye,
   Flag,
   Heart,
+  House,
   ImageSquare,
   Lightbulb,
   Link,
@@ -35,6 +37,7 @@ import {
   LockKey,
   LockKeyOpen,
   LockOpen,
+  MagnifyingGlass,
   Minus,
   NotePencil,
   Notepad,
@@ -107,6 +110,7 @@ export const iconLookup = {
   clock: Icons.CWClock,
   close: Icons.CWClose,
   cloud: Icons.CWCloud,
+  code: withPhosphorIcon(Code),
   collapse: Icons.CWCollapse,
   commonLogo: Icons.CWCommonLogo,
   comment: withPhosphorIcon(ChatCenteredDots),
@@ -150,6 +154,7 @@ export const iconLookup = {
   heartFilled: Icons.CWHeartFilled,
   help: Icons.CWHelp,
   home: Icons.CWHome,
+  house: withPhosphorIcon(House),
   imageUpload: Icons.CWImageUpload,
   infoEmpty: Icons.CWInfoEmpty,
   infoFilled: Icons.CWInfoFilled,
@@ -163,6 +168,7 @@ export const iconLookup = {
   lockOpenNew: withPhosphorIcon(LockOpen),
   logout: Icons.CWLogout,
   mail: Icons.CWMail,
+  magnifyingGlass: withPhosphorIcon(MagnifyingGlass),
   minus: withPhosphorIcon(Minus),
   mute: Icons.CWMute,
   near: Icons.CWNear,
@@ -242,6 +248,7 @@ export const customIconLookup = {
   'terra-walletconnect': CustomIcons.CWWalletConnect,
   coinbase: CustomIcons.CWCoinbase,
   x: CustomIcons.CWX, // twitter
+  apple: CustomIcons.CWApple,
 };
 
 export type IconName = keyof typeof iconLookup;

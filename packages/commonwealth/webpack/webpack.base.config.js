@@ -53,6 +53,11 @@ module.exports = {
       'process.env.COSMOS_GOV_V1': JSON.stringify(process.env.COSMOS_GOV_V1),
     }),
     new webpack.DefinePlugin({
+      'process.env.COSMOS_REGISTRY_API': JSON.stringify(
+        process.env.COSMOS_REGISTRY_API,
+      ),
+    }),
+    new webpack.DefinePlugin({
       'process.env.FLAG_COMMUNITY_HOMEPAGE': JSON.stringify(
         process.env.FLAG_COMMUNITY_HOMEPAGE,
       ),

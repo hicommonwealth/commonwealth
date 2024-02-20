@@ -1,16 +1,13 @@
-import { expressCommand, expressQuery } from '@hicommonwealth/adapters';
+import {
+  analyticsMiddleware,
+  expressCommand,
+  expressQuery,
+} from '@hicommonwealth/adapters';
 import { Community } from '@hicommonwealth/model';
 import { Router } from 'express';
 import passport from 'passport';
 
 const router = Router();
-
-//router.put('/:id', expressCommand(Community.CreateCommunity));
-
-//router.post(
-//  '/set-community-namespace/:id',
-//  expressCommand(Community.SetCommunityNamespace),
-//);
 
 router.get(
   '/:community_id/stake/:stake_id?',
@@ -22,6 +19,16 @@ router.put(
   '/:id/stake',
   passport.authenticate('jwt', { session: false }),
   expressCommand(Community.SetCommunityStake),
+);
+
+router.post(
+  '/demo',
+  analyticsMiddleware<Community.Demo>('Demo Event', (payload) => {
+    return {
+      x: payload.numItems,
+    };
+  }),
+  expressCommand(Community.Demo),
 );
 
 export default router;

@@ -18,10 +18,10 @@ import {
   MixpanelLoginPayload,
 } from '../../../../../../../shared/analytics/types';
 import { useBrowserAnalyticsTrack } from '../../../../../hooks/useBrowserAnalyticsTrack';
+import { useFlag } from '../../../../../hooks/useFlag';
 import { communityTypeOptions } from './helpers';
 
 import { ChainBase } from '@hicommonwealth/core';
-import { featureFlags } from 'helpers/feature-flags';
 import { AuthModal } from 'views/modals/AuthModal';
 import './CommunityTypeStep.scss';
 
@@ -38,6 +38,7 @@ const CommunityTypeStep = ({
   setSelectedAddress,
   handleContinue,
 }: CommunityTypeStepProps) => {
+  const newSignInModalEnabled = useFlag('newSignInModal');
   const [isNewCommunityAdminModalOpen, setIsNewCommunityAdminModalOpen] =
     useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -142,7 +143,7 @@ const CommunityTypeStep = ({
         onClose={() => setIsNewCommunityAdminModalOpen(false)}
         open={isNewCommunityAdminModalOpen}
       />
-      {!featureFlags.newSignInModal ? (
+      {!newSignInModalEnabled ? (
         <CWModal
           rootClassName="CreateCommunityLoginModal"
           content={

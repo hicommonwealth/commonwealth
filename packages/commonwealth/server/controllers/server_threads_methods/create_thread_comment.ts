@@ -18,7 +18,7 @@ import { getCommentDepth } from '../../util/getCommentDepth';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
-import { TrackOptions } from '../server_analytics_methods/track';
+import { TrackOptions } from '../server_analytics_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
 import { ServerThreadsController } from '../server_threads_controller';
 
@@ -136,7 +136,6 @@ export async function __createThreadComment(
   if (!isAdmin) {
     const { isValid, message } = await validateTopicGroupsMembership(
       this.models,
-      this.tokenBalanceCache,
       thread.topic_id,
       thread.community_id,
       address,

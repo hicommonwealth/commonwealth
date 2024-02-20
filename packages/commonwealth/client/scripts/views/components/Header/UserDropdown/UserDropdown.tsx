@@ -19,6 +19,7 @@ import {
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import SessionRevalidationModal from 'views/modals/SessionRevalidationModal';
 import { LoginModal } from 'views/modals/login_modal';
+import { useFlag } from '../../../../hooks/useFlag';
 import { CWModal } from '../../component_kit/new_designs/CWModal';
 import './UserDropdown.scss';
 import { UserDropdownItem } from './UserDropdownItem';
@@ -29,7 +30,6 @@ import axios from 'axios';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import WebWalletController from 'controllers/app/web_wallets';
 import { setDarkMode } from 'helpers/darkMode';
-import { featureFlags } from 'helpers/feature-flags';
 import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
 import useGroupMutationBannerStore from 'state/ui/group';
 import { AuthModal } from 'views/modals/AuthModal';
@@ -58,6 +58,7 @@ const handleLogout = async () => {
 };
 
 const UserDropdown = () => {
+  const newSignInModalEnabled = useFlag('newSignInModal');
   const navigate = useCommonNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
@@ -77,7 +78,7 @@ const UserDropdown = () => {
     recheck: isOpen,
   });
 
-  const user = app.user.addresses[0];
+  const user = app.user?.addresses?.[0];
   const profileId = user?.profileId || user?.profile.id;
 
   const addresses: PopoverMenuItem[] = app.user.activeAccounts.map(
@@ -194,7 +195,7 @@ const UserDropdown = () => {
           </button>
         )}
       />
-      {!featureFlags.newSignInModal ? (
+      {!newSignInModalEnabled ? (
         <CWModal
           content={
             <LoginModal onModalClose={() => setIsAuthModalOpen(false)} />

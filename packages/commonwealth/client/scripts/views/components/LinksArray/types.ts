@@ -42,5 +42,5 @@ export type LinksArrayProps = {
 
 export type LinksArrayHookProps = {
   initialLinks: Link[];
-  linkValidation?: z.ZodEffects<z.ZodString, string, string> | z.ZodString;
+  linkValidation?: z.ZodTypeAny;
 };

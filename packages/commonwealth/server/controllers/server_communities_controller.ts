@@ -1,8 +1,4 @@
-import {
-  CommunityStakeAttributes,
-  DB,
-  TokenBalanceCache,
-} from '@hicommonwealth/model';
+import { CommunityStakeAttributes, DB } from '@hicommonwealth/model';
 import BanCache from '../util/banCheckCache';
 import {
   CreateChainNodeOptions,
@@ -49,6 +45,11 @@ import {
   __searchCommunities,
 } from './server_communities_methods/search_communities';
 import {
+  UpdateChainNodeOptions,
+  UpdateChainNodeResult,
+  __updateChainNode,
+} from './server_communities_methods/update_chain_node';
+import {
   UpdateCommunityOptions,
   UpdateCommunityResult,
   __updateCommunity,
@@ -58,11 +59,7 @@ import {
  * Implements methods related to communities
  */
 export class ServerCommunitiesController {
-  constructor(
-    public models: DB,
-    public tokenBalanceCache: TokenBalanceCache,
-    public banCache: BanCache,
-  ) {}
+  constructor(public models: DB, public banCache: BanCache) {}
 
   async searchCommunities(
     options: SearchCommunitiesOptions,
@@ -104,6 +101,12 @@ export class ServerCommunitiesController {
     options: CreateChainNodeOptions,
   ): Promise<CreateChainNodeResult> {
     return __createChainNode.call(this, options);
+  }
+
+  async updateChainNode(
+    options: UpdateChainNodeOptions,
+  ): Promise<UpdateChainNodeResult> {
+    return __updateChainNode.call(this, options);
   }
 
   async getRelatedCommunities(
