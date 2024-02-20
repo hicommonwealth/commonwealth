@@ -217,17 +217,17 @@ class ChainInfo {
     this.adminsAndMods = [];
     roles.forEach((r) => {
       this.adminsAndMods.push(
-        new RoleInfo(
-          r.id,
-          r.address_id,
-          r.Address.address,
-          r.Address.community_id,
-          r.chain_id,
-          r.permission,
-          r.allow,
-          r.deny,
-          r.is_user_default,
-        ),
+        new RoleInfo({
+          id: r.id,
+          address_id: r.address_id,
+          address: r.Address.address,
+          address_chain: r.Address.community_id,
+          chain_id: r.chain_id,
+          permission: r.permission,
+          allow: r.allow,
+          deny: r.deny,
+          is_user_default: r.is_user_default,
+        }),
       );
     });
   }

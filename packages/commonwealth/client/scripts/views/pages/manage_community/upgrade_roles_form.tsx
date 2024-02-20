@@ -6,7 +6,7 @@ import 'pages/manage_community/upgrade_roles_form.scss';
 import React, { useMemo, useState } from 'react';
 import app from 'state';
 import { useFlag } from '../../../hooks/useFlag';
-import type RoleInfo from '../../../models/RoleInfo';
+import RoleInfo from '../../../models/RoleInfo';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import { CWButton } from '../../components/component_kit/new_designs/cw_button';
 import { CWRadioButton } from '../../components/component_kit/new_designs/cw_radio_button';
@@ -54,8 +54,6 @@ export const UpgradeRolesForm = ({
     )} ${roletext}`;
     return fullText;
   });
-
-  const communityObj = { chain: app.activeChainId() };
 
   const options = useMemo(() => {
     return nonAdminNames.map((n) => ({ label: n, value: n }));
@@ -142,7 +140,7 @@ export const UpgradeRolesForm = ({
             $.post(`${app.serverUrl()}/upgradeMember`, {
               new_role: newRole,
               address: _user.Address.address,
-              ...communityObj,
+              community_id: app.activeChainId(),
               jwt: app.user.jwt,
             }).then((r) => {
               if (r.status === 'Success') {
@@ -151,7 +149,19 @@ export const UpgradeRolesForm = ({
                 notifyError('Upgrade failed');
               }
 
-              onRoleUpdate(_user, r.result);
+              const roleData = r.data.result;
+              const newRole = new RoleInfo({
+                id: roleData.id,
+                address_id: roleData.address_id,
+                address_chain: roleData.community_id,
+                address: roleData.address,
+                chain_id: roleData.community_id,
+                permission: roleData.permission,
+                allow: roleData.allow,
+                deny: roleData.deny,
+                is_user_default: roleData.is_user_default,
+              });
+              onRoleUpdate(_user, newRole);
             });
             zeroOutRadioButtons();
           }}

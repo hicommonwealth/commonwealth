@@ -91,17 +91,17 @@ const AdminsAndModerators = () => {
     }
 
     if (newRole.permission === 'admin' || newRole.permission === 'moderator') {
-      const roleInfo = new RoleInfo(
-        newRole.address_id,
-        newRole.Address?.id || newRole.address_id,
-        newRole.Address.address,
-        newRole.Address.community_id,
-        newRole.chain_id,
-        newRole.permission,
-        newRole.allow,
-        newRole.deny,
-        newRole.is_user_default,
-      );
+      const roleInfo = new RoleInfo({
+        id: newRole.address_id,
+        address_id: newRole.Address?.id || newRole.address_id,
+        address: newRole.Address.address,
+        address_chain: newRole.Address.community_id,
+        chain_id: newRole.chain_id,
+        permission: newRole.permission,
+        allow: newRole.allow,
+        deny: newRole.deny,
+        is_user_default: newRole.is_user_default,
+      });
       adminsAndMods.push(roleInfo);
 
       if (newRole.permission === 'admin') {
