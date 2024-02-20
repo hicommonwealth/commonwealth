@@ -38,6 +38,7 @@ export function sanitizeQuillText(input: string, noEncode?: boolean): string {
   if (!input) {
     return '';
   }
+
   let parsedObject: QuillOps | null = null;
   if (noEncode) {
     parsedObject = JSON.parse(input);
@@ -49,7 +50,12 @@ export function sanitizeQuillText(input: string, noEncode?: boolean): string {
       return input;
     }
   }
+
   const { ops } = parsedObject;
+
+  if (!ops) {
+    return JSON.parse(decodeURIComponent(input));
+  }
   for (const op of ops) {
     const videoEmbedUrl: string | null = op.insert?.video;
     if (videoEmbedUrl) {
