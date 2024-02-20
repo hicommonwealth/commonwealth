@@ -99,7 +99,7 @@ describe('Subscriptions Tests', () => {
           .send({ jwt: jwtToken, category, is_active });
         expect(res.status).to.equal(400);
         expect(res.body).to.not.be.null;
-        expect(res.body.error).to.be.equal(Errors.InvalidChain);
+        expect(res.body.error).to.be.equal(Errors.InvalidCommunity);
 
         res = await chai
           .request(app)
@@ -113,7 +113,7 @@ describe('Subscriptions Tests', () => {
           });
         expect(res.status).to.equal(400);
         expect(res.body).to.not.be.null;
-        expect(res.body.error).to.be.equal(Errors.InvalidChain);
+        expect(res.body.error).to.be.equal(Errors.InvalidCommunity);
       });
 
       it('should not create a duplicate new-thread subscription', async () => {
@@ -541,7 +541,7 @@ describe('Subscriptions Tests', () => {
           .send({ jwt: jwtToken, category, is_active });
         expect(res.status).to.equal(400);
         expect(res.body).to.not.be.null;
-        expect(res.body.error).to.be.equal(Errors.InvalidChain);
+        expect(res.body.error).to.be.equal(Errors.InvalidCommunity);
 
         res = await chai
           .request(app)
@@ -555,7 +555,7 @@ describe('Subscriptions Tests', () => {
           });
         expect(res.status).to.equal(400);
         expect(res.body).to.not.be.null;
-        expect(res.body.error).to.be.equal(Errors.InvalidChain);
+        expect(res.body.error).to.be.equal(Errors.InvalidCommunity);
       });
     });
 
