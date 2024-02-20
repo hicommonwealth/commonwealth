@@ -7,7 +7,6 @@ import type { TypedRequest, TypedResponse } from '../types';
 import { failure, success } from '../types';
 
 export const deleteEntities = async (
-  chainIdFieldName: string,
   models: DB,
   model: ModelStatic<any>,
   req: TypedRequest<DeleteReq>,
@@ -26,7 +25,7 @@ export const deleteEntities = async (
     const addresses = await filterAddressOwnedByUser(
       models,
       req.user.id,
-      entities.map((e) => e[chainIdFieldName]),
+      entities.map((e) => e['community_id']),
       [],
       entities.map((e) => e.address_id),
     );

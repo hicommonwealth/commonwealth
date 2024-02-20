@@ -63,7 +63,7 @@ export function addExternalRoutes(
     '/comments',
     passport.authenticate('jwt', { session: false }),
     onlyIds,
-    deleteEntities.bind(this, 'community_id', models, models.Comment),
+    deleteEntities.bind(this, models, models.Comment),
   );
 
   router.get(
@@ -86,7 +86,7 @@ export function addExternalRoutes(
     '/reactions',
     passport.authenticate('jwt', { session: false }),
     onlyIds,
-    deleteEntities.bind(this, 'community_id', models, models.Reaction),
+    deleteEntities.bind(this, models, models.Reaction),
   );
 
   router.get(
@@ -115,7 +115,7 @@ export function addExternalRoutes(
   router.delete(
     '/topics',
     onlyIds,
-    deleteEntities.bind(this, 'community_id', models, models.Topic),
+    deleteEntities.bind(this, models, models.Topic),
   );
   app.use(endpoint, router);
 
