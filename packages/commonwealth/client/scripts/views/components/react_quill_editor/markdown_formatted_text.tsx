@@ -13,7 +13,7 @@ import { loadScript } from 'helpers';
 import { twitterLinkRegex } from 'helpers/constants';
 import { debounce } from 'lodash';
 import { marked } from 'marked';
-import markedFoodnote from 'marked-footnote';
+import markedFootnote from 'marked-footnote';
 import { markedSmartypants } from 'marked-smartypants';
 import { markedXhtml } from 'marked-xhtml';
 import removeMd from 'remove-markdown';
@@ -49,7 +49,7 @@ marked
     renderer: markdownRenderer,
     gfm: true, // use github flavored markdown
   })
-  .use(markedFoodnote(), markedSmartypants(), markedXhtml());
+  .use(markedFootnote(), markedSmartypants(), markedXhtml());
 
 type MarkdownFormattedTextProps = Omit<QuillRendererProps, 'doc'> & {
   doc: string;

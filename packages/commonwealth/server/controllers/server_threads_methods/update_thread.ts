@@ -583,7 +583,7 @@ async function setThreadStage(
     // fetch available stages
     let customStages = [];
     try {
-      const communityStages = JSON.parse(community.custom_stages);
+      const communityStages = community.custom_stages;
       if (Array.isArray(communityStages)) {
         customStages = Array.from(communityStages)
           .map((s) => s.toString())

@@ -140,6 +140,7 @@ import { ServerTopicsController } from '../controllers/server_topics_controller'
 import { GENERATE_IMAGE_RATE_LIMIT } from 'server/config';
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
+import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
 import { updateChainNodeHandler } from 'server/routes/communities/update_chain_node_handler';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
 import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
@@ -370,6 +371,13 @@ function setupRouter(
     'get',
     '/communityStakes/:community_id/:stake_id?',
     getCommunityStakeHandler.bind(this, models, serverControllers),
+  );
+
+  registerRoute(
+    router,
+    'get',
+    '/namespaceMetadata/:namespace/:stake_id',
+    getNamespaceMetadata.bind(this, models),
   );
 
   registerRoute(
