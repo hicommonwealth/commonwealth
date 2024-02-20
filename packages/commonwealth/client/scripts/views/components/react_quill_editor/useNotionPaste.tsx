@@ -1,14 +1,22 @@
-import { useEffect } from 'react';
+import { Dispatch, SetStateAction, useEffect } from 'react';
+import type { SerializableDeltaStatic } from './utils';
 
-export const useNotionPaste = (setContentDelta, contentDelta, editorRef) => {
+export const useNotionPaste = (
+  setContentDelta: Dispatch<SetStateAction<SerializableDeltaStatic>>,
+  contentDelta: SerializableDeltaStatic,
+  editorRef,
+  isEditorFocused: boolean,
+) => {
   useEffect(() => {
+    const editor = editorRef.current?.getEditor();
     const handlePaste = (event) => {
+      if (!isEditorFocused) return;
       event.preventDefault();
-      const editor = editorRef.current?.getEditor();
       const pastedText = event.clipboardData.getData('text/plain');
 
       if (pastedText) {
         setContentDelta({
+          ...contentDelta,
           ops: [
             {
               insert: pastedText,
@@ -23,10 +31,12 @@ export const useNotionPaste = (setContentDelta, contentDelta, editorRef) => {
       }
     };
 
-    document.addEventListener('paste', handlePaste);
+    const editorElement = editor.root;
+
+    editorElement.addEventListener('paste', handlePaste);
 
     return () => {
-      document.removeEventListener('paste', handlePaste);
+      editorElement.removeEventListener('paste', handlePaste);
     };
-  }, [setContentDelta, editorRef, contentDelta]);
+  }, [setContentDelta, editorRef, contentDelta, isEditorFocused]);
 };

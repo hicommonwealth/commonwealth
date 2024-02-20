@@ -112,7 +112,9 @@ const CommunityProfileForm = () => {
         description: values.communityDescription,
         social_links: links.map((link) => link.value.trim()),
         stagesEnabled: values.hasStagesEnabled,
-        customStages: values.customStages,
+        customStages: values.customStages
+          ? JSON.parse(values.customStages)
+          : [],
         iconUrl: values.communityProfileImageURL,
         defaultOverview: values.defaultPage === DefaultPage.Overview,
       });
@@ -154,9 +156,9 @@ const CommunityProfileForm = () => {
           : DefaultPage.Discussions,
         hasStagesEnabled: community.stagesEnabled,
         customStages:
-          community.customStages === 'true' || !community.customStages
-            ? ''
-            : community.customStages,
+          community.customStages.length > 0
+            ? JSON.stringify(community.customStages)
+            : '',
         communityBanner: community.communityBanner || '',
       }}
       validationSchema={communityProfileValidationSchema}
