@@ -45,10 +45,9 @@ const StakeGrowl = () => {
           <CWText type="h2" fontWeight="bold" isCentered>
             Introducing Community Stake
           </CWText>
-          <CWText type="b2" fontWeight="regular" isCentered className="body">
-            Empower members with onchain ownership, gated access, adn enhanced
-            voting power with <br />
-            Community Stake
+          <CWText type="b1" fontWeight="medium" isCentered className="body">
+            Empower members with onchain ownership, gated access, and enhanced
+            voting power with Community Stake
           </CWText>
           <CWButton
             className="CalenderButton"

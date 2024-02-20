@@ -29,7 +29,7 @@
   .img {
     width: 320px;
     height: 240px;
-    margin-bottom: -25px;
+    margin-bottom: 8px;
     cursor: default;
     border-top-left-radius: 0.3125rem;
     border-top-right-radius: 0.3125rem;
@@ -55,7 +55,7 @@
 
     .body {
       color: $neutral-600;
-      letter-spacing: 1px;
+      font-weight: 400;
     }
   }
 
