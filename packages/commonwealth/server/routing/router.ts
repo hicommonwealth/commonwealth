@@ -89,7 +89,7 @@ import setAddressWallet from '../routes/setAddressWallet';
 import { sendMessage } from '../routes/snapshotAPI';
 import startSsoLogin from '../routes/startSsoLogin';
 import updateAddress from '../routes/updateAddress';
-import viewChainIcons from '../routes/viewChainIcons';
+import viewCommunityIcons from '../routes/viewCommunityIcons';
 import type BanCache from '../util/banCheckCache';
 
 import type DatabaseValidationService from '../middleware/databaseValidationService';
@@ -948,7 +948,7 @@ function setupRouter(
     router,
     'post',
     '/viewChainIcons',
-    viewChainIcons.bind(this, models),
+    viewCommunityIcons.bind(this, models),
   );
   registerRoute(
     router,
