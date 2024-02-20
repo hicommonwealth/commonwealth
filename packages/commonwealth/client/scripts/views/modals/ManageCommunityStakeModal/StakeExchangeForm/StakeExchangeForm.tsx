@@ -151,8 +151,10 @@ const StakeExchangeForm = ({
   };
 
   const handleInput = (e) => {
+    const inputValue = e.target.value;
+    const numericValue = inputValue.replace(/[^0-9]/g, '');
     onSetNumberOfStakeToExchange(
-      e.target.value === '' ? null : parseInt(e.target.value),
+      !numericValue || inputValue === '' ? null : parseInt(numericValue),
     );
   };
 
