@@ -83,8 +83,6 @@ export const CommentCard = ({
   const [commentDelta, setCommentDelta] = useState<DeltaStatic>(commentBody);
   const author = app.chain.accounts.get(comment.author);
 
-  console.log('com', commentDelta);
-
   const [isCanvasVerifyModalVisible, setIsCanvasVerifyDataModalVisible] =
     useState<boolean>(false);
   const [verifiedAction, setVerifiedAction] = useState<Action>();

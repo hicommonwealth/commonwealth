@@ -65,8 +65,6 @@ export const MarkdownFormattedText = ({
   const containerRef = useRef<HTMLDivElement>();
   const [userExpand, setUserExpand] = useState<boolean>(false);
 
-  console.log('doc', doc);
-
   const isTruncated: boolean = useMemo(() => {
     if (userExpand) {
       return false;

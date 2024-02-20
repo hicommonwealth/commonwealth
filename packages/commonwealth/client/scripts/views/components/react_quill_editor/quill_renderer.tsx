@@ -31,7 +31,7 @@ export const QuillRenderer = ({
   const docInfo: DocInfo = useMemo(() => {
     let decodedText: string;
     try {
-      decodedText = decodeURIComponent(doc).toString();
+      decodedText = decodeURIComponent(doc);
     } catch (e) {
       decodedText = doc;
     }
