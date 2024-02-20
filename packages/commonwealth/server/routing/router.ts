@@ -302,7 +302,6 @@ function setupRouter(
     router,
     'post',
     '/getAddressStatus',
-    databaseValidationService.validateAuthor,
     getAddressStatus.bind(this, models),
   );
   registerRoute(

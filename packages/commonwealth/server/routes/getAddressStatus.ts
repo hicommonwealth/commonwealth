@@ -1,30 +1,55 @@
+import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
-import { TypedRequest, TypedResponse } from 'server/types';
+import type { NextFunction, Request, Response } from 'express';
+import Sequelize from 'sequelize';
 
-export const Errors = {};
+const Op = Sequelize.Op;
 
-type GetAddressStatusResponseBody = {
-  exists: boolean;
-  belongsToUser: boolean;
+export const Errors = {
+  NeedAddress: 'Must provide address',
+  NeedCommunity: 'Must provide community',
+  InvalidCommunity: 'Invalid community',
 };
 
 const getAddressStatus = async (
   models: DB,
-  req: TypedRequest<any>,
-  res: TypedResponse<GetAddressStatusResponseBody>,
+  req: Request,
+  res: Response,
+  next: NextFunction,
 ) => {
-  const { user, address } = req;
+  if (!req.body.address) {
+    return next(new AppError(Errors.NeedAddress));
+  }
+  if (!req.body.community_id) {
+    return next(new AppError(Errors.NeedCommunity));
+  }
 
-  let result: GetAddressStatusResponseBody = {
-    exists: false,
-    belongsToUser: false,
-  };
+  const community = await models.Community.findOne({
+    where: { id: req.body.community_id },
+  });
+  if (!community) {
+    return next(new AppError(Errors.InvalidCommunity));
+  }
 
-  if (address) {
-    const belongsToUser = user && address.user_id === user.id;
+  const existingAddress = await models.Address.findOne({
+    where: {
+      community_id: req.body.community_id,
+      address: req.body.address,
+      verified: { [Op.ne]: null },
+    },
+  });
+
+  let result;
+  if (existingAddress) {
+    const belongsToUser = req.user && existingAddress.user_id === req.user.id;
     result = {
       exists: true,
       belongsToUser,
+    };
+  } else {
+    result = {
+      exists: false,
+      belongsToUser: false,
     };
   }
 
