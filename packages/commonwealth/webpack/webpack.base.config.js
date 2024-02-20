@@ -81,8 +81,8 @@ module.exports = {
       ),
     }),
     new webpack.DefinePlugin({
-      'process.env.ROOT_DOMAIN_REBRAND': JSON.stringify(
-        process.env.ROOT_DOMAIN_REBRAND,
+      'process.env.FLAG_ROOT_DOMAIN_REBRAND': JSON.stringify(
+        process.env.FLAG_ROOT_DOMAIN_REBRAND,
       ),
     }),
     new HtmlWebpackPlugin({
