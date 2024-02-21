@@ -6,7 +6,6 @@ import React from 'react';
 import app from 'state';
 import { User } from 'views/components/user/user';
 import { openConfirmation } from 'views/modals/confirmation_modal';
-import { useFlag } from '../../../hooks/useFlag';
 import RoleInfo from '../../../models/RoleInfo';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWLabel } from '../../components/component_kit/cw_label';
@@ -22,7 +21,6 @@ export const ManageRoles = ({
   onRoleUpdate,
   roledata,
 }: ManageRoleRowProps) => {
-  const newAdminOnboardingEnabled = useFlag('newAdminOnboarding');
   const navigate = useCommonNavigate();
 
   const communityObj = { chain: app.activeChainId() };
@@ -111,7 +109,7 @@ export const ManageRoles = ({
           onClick: async () => {
             await removeRole(role);
             if (isLosingAdminPermissions) {
-              navigate(newAdminOnboardingEnabled ? '/manage/moderators' : '/');
+              navigate('/manage/moderators');
             }
           },
         },

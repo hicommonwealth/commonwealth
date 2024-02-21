@@ -63,9 +63,6 @@ const NewContractTemplatePage = lazy(
 );
 const ViewTemplatePage = lazy(() => import('views/pages/view_template'));
 
-const ManageCommunityPage = lazy(
-  () => import('views/pages/manage_community/ManageCommunityPage'),
-);
 const DiscordCallbackPage = lazy(
   () => import('views/pages/manage_community/discord-callback'),
 );
@@ -104,7 +101,6 @@ const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
 const CommonDomainRoutes = ({
   proposalTemplatesEnabled,
-  newAdminOnboardingEnabled,
   communityHomepageEnabled,
 }: RouteFeatureFlags) => [
   <Route
@@ -416,51 +412,34 @@ const CommonDomainRoutes = ({
   />,
 
   // ADMIN
-  ...(newAdminOnboardingEnabled
-    ? [
-        <Route
-          key="/:scope/manage/profile"
-          path="/:scope/manage/profile"
-          element={withLayout(CommunityProfile, {
-            scoped: true,
-          })}
-        />,
-        <Route
-          key="/:scope/manage/integrations"
-          path="/:scope/manage/integrations"
-          element={withLayout(CommunityIntegrations, {
-            scoped: true,
-          })}
-        />,
-        <Route
-          key="/:scope/manage/topics"
-          path="/:scope/manage/topics"
-          element={withLayout(CommunityTopics, {
-            scoped: true,
-          })}
-        />,
-        <Route
-          key="/:scope/manage/moderators"
-          path="/:scope/manage/moderators"
-          element={withLayout(CommunityAdminAndModerators, {
-            scoped: true,
-          })}
-        />,
-      ]
-    : [
-        <Route
-          key="/:scope/manage"
-          path="/:scope/manage"
-          element={withLayout(ManageCommunityPage, {
-            scoped: true,
-          })}
-        />,
-        <Route
-          key="/manage"
-          path="/manage"
-          element={withLayout(ManageCommunityPage, {})}
-        />,
-      ]),
+  <Route
+    key="/:scope/manage/profile"
+    path="/:scope/manage/profile"
+    element={withLayout(CommunityProfile, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    key="/:scope/manage/integrations"
+    path="/:scope/manage/integrations"
+    element={withLayout(CommunityIntegrations, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    key="/:scope/manage/topics"
+    path="/:scope/manage/topics"
+    element={withLayout(CommunityTopics, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    key="/:scope/manage/moderators"
+    path="/:scope/manage/moderators"
+    element={withLayout(CommunityAdminAndModerators, {
+      scoped: true,
+    })}
+  />,
   <Route
     key="/:scope/analytics"
     path="/:scope/analytics"

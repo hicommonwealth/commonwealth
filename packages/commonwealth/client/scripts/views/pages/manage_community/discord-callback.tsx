@@ -2,18 +2,14 @@ import axios from 'axios';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useState } from 'react';
 import app from 'state';
-import { useFlag } from '../../../hooks/useFlag';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 
 const DiscordCallbackPage = () => {
-  const newAdminOnboardingEnabled = useFlag('newAdminOnboarding');
   const navigate = useCommonNavigate();
   const [failed, setFailed] = useState(false);
   const [failureMessage, setFailureMessage] = useState<string>('');
-  const redirectPath = newAdminOnboardingEnabled
-    ? 'manage/integrations'
-    : 'manage';
+  const redirectPath = 'manage/integrations';
 
   const setBotConfig = useCallback(
     async (state: string, guildId: string) => {
