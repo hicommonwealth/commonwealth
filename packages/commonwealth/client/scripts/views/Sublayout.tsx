@@ -1,6 +1,7 @@
 import 'Sublayout.scss';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
+import { useFlag } from 'hooks/useFlag';
 import useForceRerender from 'hooks/useForceRerender';
 import useWindowResize from 'hooks/useWindowResize';
 import React, { useEffect, useState } from 'react';
@@ -13,7 +14,7 @@ import { SublayoutBanners } from './SublayoutBanners';
 import { SublayoutHeader } from './SublayoutHeader';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
-import { ValentineGrowl } from './components/ValentineGrowl';
+import { StakeGrowl } from './components/StakeGrowl';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
 import MobileNavigation from './composition/MobileNavigation';
 
@@ -34,6 +35,7 @@ const Sublayout = ({
     onResize: () => setResizing(true),
     resizeListenerUpdateDeps: [resizing],
   });
+  const communityStakeEnabled = useFlag('communityStake');
 
   const { toggleMobileView } = useWindowResize({
     setMenu,
@@ -113,7 +115,7 @@ const Sublayout = ({
             </div>
           )}
         </div>
-        <ValentineGrowl />
+        {communityStakeEnabled && <StakeGrowl />}
       </div>
       {isWindowExtraSmall && <MobileNavigation />}
     </div>

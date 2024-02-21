@@ -136,7 +136,7 @@ const SessionRevalidationModal = ({
                   label="email address"
                   placeholder="your-email@email.com"
                   onInput={(e) => setEmail(e.target.value)}
-                  onenterkey={onEmailLogin}
+                  onenterkey={async () => await onEmailLogin()}
                 />
               ) : (
                 <CWLoadingSpinner />

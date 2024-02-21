@@ -3,6 +3,10 @@
 //
 // See knowledge_base/Feature-Flags.md for more info.
 
+import { InMemoryProvider } from '@openfeature/web-sdk';
+import { UnleashClient } from 'unleash-proxy-client';
+import { UnleashProvider } from '../../../shared/UnleashProvider';
+
 const buildFlag = (env: string) => {
   return {
     variants: {
@@ -14,12 +18,24 @@ const buildFlag = (env: string) => {
   };
 };
 
-export const featureFlags = {
+const featureFlags = {
   proposalTemplates: buildFlag(process.env.FLAG_PROPOSAL_TEMPLATES),
   communityHomepage: buildFlag(process.env.FLAG_COMMUNITY_HOMEPAGE),
   newAdminOnboarding: buildFlag(process.env.FLAG_NEW_ADMIN_ONBOARDING),
   communityStake: buildFlag(process.env.FLAG_COMMUNITY_STAKE),
   newSignInModal: buildFlag(process.env.FLAG_NEW_SIGN_IN_MODAL),
+  rootDomainRebrand: buildFlag(process.env.FLAG_ROOT_DOMAIN_REBRAND),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;
+
+const unleashConfig = {
+  url: process.env.UNLEASH_FRONTEND_SERVER_URL,
+  clientKey: process.env.UNLEASH_FRONTEND_API_TOKEN,
+  refreshInterval: 120,
+  appName: 'commonwealth-web',
+};
+
+export const openFeatureProvider = process.env.UNLEASH_FRONTEND_API_TOKEN
+  ? new UnleashProvider(new UnleashClient(unleashConfig))
+  : new InMemoryProvider(featureFlags);
