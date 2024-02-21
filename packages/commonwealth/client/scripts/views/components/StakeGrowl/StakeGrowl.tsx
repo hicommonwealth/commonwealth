@@ -54,7 +54,7 @@ const StakeGrowl = () => {
             buttonType="primary"
             buttonHeight="med"
             label="Create community with stake"
-            onClick={() => navigate('/createCommunity')}
+            onClick={() => navigate('/createCommunity', {}, null)}
           />
           <CWText type="b2" fontWeight="regular" isCentered className="body">
             Currently only newly creted communities can enable stake.
