@@ -16,7 +16,6 @@ export const AddToHomeScreenPrompt = ({
 
   useEffect(() => {
     const hidePromptTime = localStorage.getItem(HIDE_PROMPT_TIME);
-    console.log('hidePromptTime', hidePromptTime);
     if (hidePromptTime && new Date().getTime() < Number(hidePromptTime)) {
       setShowPrompt(false);
     }
