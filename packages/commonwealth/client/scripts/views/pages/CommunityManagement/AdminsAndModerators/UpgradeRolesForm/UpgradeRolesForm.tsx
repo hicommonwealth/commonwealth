@@ -2,14 +2,15 @@ import { AccessLevel } from '@hicommonwealth/core';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { formatAddressShort } from 'helpers';
 import $ from 'jquery';
-import 'pages/manage_community/upgrade_roles_form.scss';
 import React, { useMemo, useState } from 'react';
 import app from 'state';
-import type RoleInfo from '../../../models/RoleInfo';
-import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
-import { CWButton } from '../../components/component_kit/new_designs/cw_button';
-import { CWRadioButton } from '../../components/component_kit/new_designs/cw_radio_button';
-import { MembersSearchBar } from '../../components/members_search_bar';
+import type RoleInfo from '../../../../../models/RoleInfo';
+import { CWRadioGroup } from '../../../../components/component_kit/cw_radio_group';
+import { CWButton } from '../../../../components/component_kit/new_designs/cw_button';
+import { CWRadioButton } from '../../../../components/component_kit/new_designs/cw_radio_button';
+import { MembersSearchBar } from '../../../../components/members_search_bar';
+import './UpgradeRolesForm.scss';
+
 type UpgradeRolesFormProps = {
   onRoleUpdate: (oldRole: RoleInfo, newRole: RoleInfo) => void;
   roleData: RoleInfo[];

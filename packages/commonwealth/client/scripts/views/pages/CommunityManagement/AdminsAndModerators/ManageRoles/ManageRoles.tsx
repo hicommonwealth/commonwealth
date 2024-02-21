@@ -1,14 +1,14 @@
 import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
 import { useCommonNavigate } from 'navigation/helpers';
-import 'pages/manage_community/manage_roles.scss';
 import React from 'react';
 import app from 'state';
 import { User } from 'views/components/user/user';
 import { openConfirmation } from 'views/modals/confirmation_modal';
-import RoleInfo from '../../../models/RoleInfo';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { CWLabel } from '../../components/component_kit/cw_label';
+import RoleInfo from '../../../../../models/RoleInfo';
+import { CWIcon } from '../../../../components/component_kit/cw_icons/cw_icon';
+import { CWLabel } from '../../../../components/component_kit/cw_label';
+import './ManageRoles.scss';
 
 type ManageRoleRowProps = {
   label: string;

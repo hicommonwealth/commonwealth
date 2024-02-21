@@ -57,7 +57,8 @@ const NewContractTemplatePage = lazy(
 const ViewTemplatePage = lazy(() => import('views/pages/view_template'));
 
 const DiscordCallbackPage = lazy(
-  () => import('views/pages/manage_community/discord-callback'),
+  () =>
+    import('views/pages/CommunityManagement/Integrations/Discord/CallbackPage'),
 );
 const AnalyticsPage = lazy(() => import('views/pages/stats'));
 
