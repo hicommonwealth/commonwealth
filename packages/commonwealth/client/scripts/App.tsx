@@ -1,5 +1,5 @@
 import { OpenFeatureProvider } from '@openfeature/react-sdk';
-import { InMemoryProvider, OpenFeature } from '@openfeature/web-sdk';
+import { OpenFeature } from '@openfeature/web-sdk';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import useInitApp from 'hooks/useInitApp';
@@ -11,6 +11,8 @@ import { queryClient } from 'state/api/config';
 import { featureFlags } from './helpers/feature-flags';
 import useAppStatus from './hooks/useAppStatus';
 import { AddToHomeScreenPrompt } from './views/components/AddToHomeScreenPrompt';
+import { openFeatureProvider } from './helpers/feature-flags';
+
 import { CWIcon } from './views/components/component_kit/cw_icons/cw_icon';
 
 const Splash = () => {
@@ -22,7 +24,7 @@ const Splash = () => {
   );
 };
 
-OpenFeature.setProvider(new InMemoryProvider(featureFlags));
+OpenFeature.setProvider(openFeatureProvider);
 
 const App = () => {
   const { customDomain, isLoading } = useInitApp();

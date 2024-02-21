@@ -10,8 +10,6 @@ import * as modelUtils from '../../util/modelUtils';
 
 const { JWT_SECRET } = Config;
 
-Sinon.stub(Config, 'REACTION_WEIGHT_OVERRIDE').value('300');
-
 chai.use(chaiHttp);
 
 const deleteReaction = async (reactionId, jwtToken, userAddress) => {
@@ -50,6 +48,7 @@ describe('createReaction Integration Tests', () => {
   let threadId: number;
 
   before(async () => {
+    Sinon.stub(Config, 'REACTION_WEIGHT_OVERRIDE').value('300');
     await tester.seedDb();
 
     const res = await modelUtils.createAndVerifyAddress({ chain: communityId });
@@ -99,6 +98,10 @@ describe('createReaction Integration Tests', () => {
       },
     });
     threadId = thread.id;
+  });
+
+  after(() => {
+    Sinon.restore();
   });
 
   it('should create comment reactions and verify comment reaction count', async () => {
