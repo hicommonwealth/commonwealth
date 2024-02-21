@@ -1,6 +1,7 @@
 import 'Sublayout.scss';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
+import { useFlag } from 'hooks/useFlag';
 import useForceRerender from 'hooks/useForceRerender';
 import useWindowResize from 'hooks/useWindowResize';
 import React, { useEffect, useState } from 'react';
@@ -34,6 +35,7 @@ const Sublayout = ({
     onResize: () => setResizing(true),
     resizeListenerUpdateDeps: [resizing],
   });
+  const communityStakeEnabled = useFlag('communityStake');
 
   const { toggleMobileView } = useWindowResize({
     setMenu,
@@ -113,7 +115,7 @@ const Sublayout = ({
             </div>
           )}
         </div>
-        <StakeGrowl />
+        {communityStakeEnabled && <StakeGrowl />}
       </div>
       {isWindowExtraSmall && <MobileNavigation />}
     </div>
