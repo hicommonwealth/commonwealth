@@ -5,13 +5,12 @@ import { setActiveAccount } from 'controllers/app/login';
 import app from 'state';
 import type Web3 from 'web3';
 
-import type { SessionPayload } from '@canvas-js/interfaces';
+import { CosmosSigner } from '@canvas-js/chain-cosmos';
 import type {
   RLPEncodedTransaction,
   TransactionConfig,
   provider,
 } from 'web3-core';
-import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 
 declare let window: any;
@@ -82,17 +81,19 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
     return this._chainId;
   }
 
-  public async signCanvasMessage(
-    account: Account,
-    canvasSessionPayload: SessionPayload,
-  ): Promise<string> {
-    const canvas = await import('@canvas-js/interfaces');
-    const signature = await this._web3.eth.personal.sign(
-      canvas.serializeSessionPayload(canvasSessionPayload),
-      this._ethAccounts[0],
-      '',
-    );
-    return signature;
+  public async getSessionSigner() {
+    return new CosmosSigner({
+      signer: {
+        type: 'ethereum',
+        signEthereum: (
+          chainId: string,
+          signerAddress: string,
+          message: string,
+        ) => this._web3.eth.personal.sign(message, signerAddress, ''),
+        getAddress: async () => this._ethAccounts[0],
+        getChainId: async () => this._chainId,
+      },
+    });
   }
 
   public async signTransaction(

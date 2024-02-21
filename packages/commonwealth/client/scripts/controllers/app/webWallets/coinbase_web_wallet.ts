@@ -3,18 +3,14 @@ declare let window: any;
 import $ from 'jquery';
 
 import type Web3 from 'web3';
-import type Account from '../../../models/Account';
 import type BlockInfo from '../../../models/BlockInfo';
 import type IWebWallet from '../../../models/IWebWallet';
 
-import * as siwe from 'siwe';
 import type { provider } from 'web3-core';
 import { hexToNumber } from 'web3-utils';
 
-import type { SessionPayload } from '@canvas-js/interfaces';
-
+import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
-import { createSiweMessage } from 'adapters/chain/ethereum/keys';
 import { setActiveAccount } from 'controllers/app/login';
 import app from 'state';
 
@@ -75,22 +71,20 @@ class CoinbaseWebWalletController implements IWebWallet<string> {
     };
   }
 
-  public async signCanvasMessage(
-    account: Account,
-    sessionPayload: SessionPayload,
-  ): Promise<string> {
-    const nonce = siwe.generateNonce();
-    // this must be open-ended, because of custom domains
-    const domain = document.location.origin;
-    const message = createSiweMessage(sessionPayload, domain, nonce);
-
-    const signature = await this._web3.givenProvider.request({
-      method: 'personal_sign',
-      params: [message, account.address],
+  public async getSessionSigner() {
+    return new SIWESigner({
+      // TODO: provider type for ethers 5?
+      // @ts-ignore
+      signer: {
+        signMessage: async (message) =>
+          this._web3.givenProvider.request({
+            method: 'personal_sign',
+            params: [this.accounts[0], message],
+          }),
+        getAddress: async () => this.accounts[0],
+      },
+      chainId: parseInt(this.getChainId()),
     });
-
-    // signature format: https://docs.canvas.xyz/docs/formats#ethereum
-    return `${domain}/${nonce}/${signature}`;
   }
 
   // ACTIONS
