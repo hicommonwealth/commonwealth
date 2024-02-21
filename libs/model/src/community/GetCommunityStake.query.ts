@@ -8,10 +8,10 @@ const schema = z.object({
   stake_id: z.coerce.number().int().optional(),
 });
 
-export const GetCommunityStake: QueryMetadata<
+export const GetCommunityStake = (): QueryMetadata<
   CommunityStakeAttributes,
   typeof schema
-> = {
+> => ({
   schema,
   auth: [],
   body: async ({ payload }) => {
@@ -28,4 +28,4 @@ export const GetCommunityStake: QueryMetadata<
       })
     )?.get({ plain: true });
   },
-};
+});
