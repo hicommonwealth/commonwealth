@@ -126,17 +126,17 @@ const setupAppRoutes = (app, models: DB, templateFile, sendFile) => {
     scope: string,
     req,
     res,
-    chain?: CommunityInstance,
+    community?: CommunityInstance,
   ) => {
     // Retrieve title, description, and author from the database
-    chain = chain || (await getChain(req, scope));
+    community = community || (await getCommunity(req, scope));
 
-    const title = chain ? chain.name : 'Commonwealth';
+    const title = community ? community.name : 'Commonwealth';
     const description = '';
-    const image = chain?.icon_url
-      ? chain.icon_url.match(`^(http|https)://`)
-        ? chain.icon_url
-        : `https://commonwealth.im${chain.icon_url}`
+    const image = community?.icon_url
+      ? community.icon_url.match(`^(http|https)://`)
+        ? community.icon_url
+        : `https://commonwealth.im${community.icon_url}`
       : DEFAULT_COMMONWEALTH_LOGO;
     const author = '';
     const url = getUrl(req);
@@ -145,15 +145,15 @@ const setupAppRoutes = (app, models: DB, templateFile, sendFile) => {
   };
 
   async function renderGeneralPage(req, res) {
-    // Retrieve chain
+    // Retrieve community
     const scope = req.params.scope;
-    const chain = await getChain(req, scope);
-    const title = chain ? chain.name : 'Commonwealth';
-    const description = chain ? chain.description : '';
-    const image = chain?.icon_url
-      ? chain.icon_url.match(`^(http|https)://`)
-        ? chain.icon_url
-        : `https://commonwealth.im${chain.icon_url}`
+    const community = await getCommunity(req, scope);
+    const title = community ? community.name : 'Commonwealth';
+    const description = community ? community.description : '';
+    const image = community?.icon_url
+      ? community.icon_url.match(`^(http|https)://`)
+        ? community.icon_url
+        : `https://commonwealth.im${community.icon_url}`
       : DEFAULT_COMMONWEALTH_LOGO;
     const author = '';
     const url = getUrl(req);
@@ -184,7 +184,7 @@ const setupAppRoutes = (app, models: DB, templateFile, sendFile) => {
 
   app.get('/:scope?/proposal/:identifier', async (req, res) => {
     const scope = req.params.scope;
-    const chain = await getChain(req, scope);
+    const community = await getCommunity(req, scope);
 
     const proposalTypes = new Set([
       ChainNetwork.Sputnik,
@@ -193,17 +193,17 @@ const setupAppRoutes = (app, models: DB, templateFile, sendFile) => {
     ]);
 
     if (
-      !proposalTypes.has(chain?.network) &&
-      chain?.base !== ChainBase.CosmosSDK
+      !proposalTypes.has(community?.network) &&
+      community?.base !== ChainBase.CosmosSDK
     ) {
       renderWithMetaTags(res, '', '', '', null, null);
       return;
     }
 
-    await renderProposal(scope, req, res, chain);
+    await renderProposal(scope, req, res, community);
   });
 
-  async function getChain(req, scope: string) {
+  async function getCommunity(req, scope: string) {
     return scope
       ? await models.Community.findOne({ where: { id: scope } })
       : await models.Community.findOne({

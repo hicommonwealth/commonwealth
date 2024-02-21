@@ -13,14 +13,14 @@ import { numberToUint8ArrayBE, uint8ArrayToNumberBE } from './util';
 const log = logger().getLogger(__filename);
 
 /**
- * Fetches the most recent (latest) proposal from a Cosmos chain that uses the v1 gov module. Depending on the
+ * Fetches the most recent (latest) proposal from a Cosmos community that uses the v1 gov module. Depending on the
  * Cosmos SDK version the chain is built with, the fetching can be optimized by using varying pagination values.
  * See /gov/v1beta1/proposals at https://v1.cosmos.network/rpc/v0.45.1 for more details on pagination values.
  */
 export async function fetchLatestCosmosProposalV1(
-  chain: CommunityInstance,
+  community: CommunityInstance,
 ): Promise<ProposalSDKType[]> {
-  const client = await getCosmosClient<GovV1Client>(chain);
+  const client = await getCosmosClient<GovV1Client>(community);
   let nextKey: Uint8Array, finalProposalsPage: ProposalSDKType[];
   do {
     const { proposals, pagination } = await client.proposals({
@@ -52,22 +52,22 @@ export async function fetchLatestCosmosProposalV1(
     log.info(
       `Fetched proposal ${
         finalProposalsPage[finalProposalsPage.length - 1].id
-      } from ${chain.id}`,
+      } from ${community.id}`,
     );
     return [finalProposalsPage[finalProposalsPage.length - 1]];
   } else return [];
 }
 
 /**
- * Attempts to fetch the proposal at the given proposalId from a Cosmos chain that uses the v1 gov module. If a proposal
+ * Attempts to fetch the proposal at the given proposalId from a Cosmos community that uses the v1 gov module. If a proposal
  * with the given id exists, the function attempts to fetch the next proposal. This process repeats until no proposal
  * is found at which time all the fetched proposals are returned.
  */
 export async function fetchUpToLatestCosmosProposalV1(
   proposalId: number,
-  chain: CommunityInstance,
+  community: CommunityInstance,
 ): Promise<ProposalSDKType[]> {
-  const client = await getCosmosClient<GovV1Client>(chain);
+  const client = await getCosmosClient<GovV1Client>(community);
 
   const proposals: ProposalSDKType[] = [];
   do {

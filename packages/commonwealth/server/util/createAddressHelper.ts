@@ -116,7 +116,7 @@ export async function createAddressHelper(
     },
   );
 
-  const addressExistsOnOtherChain =
+  const addressExistsOnOtherCommunity =
     !!existingAddressWithHex ||
     (await models.Address.scope('withPrivateData').findOne({
       where: {
@@ -237,14 +237,14 @@ export async function createAddressHelper(
     serverAnalyticsController.track(
       {
         event: MixpanelUserSignupEvent.NEW_USER_SIGNUP,
-        chain: req.community_id,
+        community_id: req.community_id,
       },
       req,
     );
 
     return {
       ...newObj.toJSON(),
-      newly_created: !addressExistsOnOtherChain,
+      newly_created: !addressExistsOnOtherCommunity,
       joined_community: !!user,
     };
   }

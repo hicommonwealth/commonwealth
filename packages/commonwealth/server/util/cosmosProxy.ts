@@ -23,7 +23,7 @@ function setupCosmosProxy(
 ) {
   // using bodyParser here because cosmjs generates text/plain type headers
   app.post(
-    '/cosmosAPI/:chain',
+    '/cosmosAPI/:community_id',
     bodyParser.text(),
     calcCosmosRPCCacheKeyDuration,
     cacheDecorator.cacheMiddleware(
@@ -33,16 +33,18 @@ function setupCosmosProxy(
     async function cosmosProxy(req, res) {
       log.trace(`Got request: ${JSON.stringify(req.body, null, 2)}`);
       try {
-        log.trace(`Querying cosmos endpoint for chain: ${req.params.chain}`);
-        const chain = await models.Community.findOne({
-          where: { id: req.params.chain },
+        log.trace(
+          `Querying cosmos endpoint for community: ${req.params.community_id}`,
+        );
+        const community = await models.Community.findOne({
+          where: { id: req.params.community_id },
           include: models.ChainNode,
         });
-        if (!chain) {
-          throw new AppError('Invalid chain');
+        if (!community) {
+          throw new AppError('Invalid community');
         }
-        log.trace(`Found cosmos endpoint: ${chain.ChainNode.url}`);
-        const response = await axios.post(chain.ChainNode.url, req.body, {
+        log.trace(`Found cosmos endpoint: ${community.ChainNode.url}`);
+        const response = await axios.post(community.ChainNode.url, req.body, {
           headers: {
             origin: 'https://commonwealth.im',
           },
@@ -63,7 +65,7 @@ function setupCosmosProxy(
 
   // for gov v1 queries.
   app.use(
-    '/cosmosLCD/:chain',
+    '/cosmosLCD/:community_id',
     bodyParser.text(),
     calcCosmosLCDCacheKeyDuration,
     cacheDecorator.cacheMiddleware(
@@ -73,15 +75,17 @@ function setupCosmosProxy(
     async function cosmosProxy(req, res) {
       log.trace(`Got request: ${JSON.stringify(req.body, null, 2)}`);
       try {
-        log.trace(`Querying cosmos endpoint for chain: ${req.params.chain}`);
-        const chain = await models.Community.findOne({
-          where: { id: req.params.chain },
+        log.trace(
+          `Querying cosmos endpoint for community_id: ${req.params.community_id}`,
+        );
+        const community = await models.Community.findOne({
+          where: { id: req.params.community_id },
           include: models.ChainNode,
         });
-        if (!chain) {
-          throw new AppError('Invalid chain');
+        if (!community) {
+          throw new AppError('Invalid community');
         }
-        const targetUrl = chain.ChainNode?.alt_wallet_url;
+        const targetUrl = community.ChainNode?.alt_wallet_url;
         if (!targetUrl) {
           throw new AppError('No LCD endpoint found');
         }
