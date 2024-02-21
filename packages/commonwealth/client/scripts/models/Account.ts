@@ -174,8 +174,14 @@ class Account {
       wallet_id: this.walletId,
       wallet_sso_source: this.walletSsoSource,
     };
-    const result = await $.post(`${app.serverUrl()}/verifyAddress`, params);
-    if (result.status === 'Success') {
+    const result = await fetch(`${app.serverUrl()}/verifyAddress`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(params),
+    });
+    if (result.ok) {
       // update ghost address for discourse users
       const hasGhostAddress = app.user.addresses.some(
         ({ address, ghostAddress, community }) =>
