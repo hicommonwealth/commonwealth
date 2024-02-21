@@ -153,9 +153,12 @@ const StakeExchangeForm = ({
   const handleInput = (e) => {
     const inputValue = e.target.value;
     const numericValue = inputValue.replace(/[^0-9]/g, '');
-    onSetNumberOfStakeToExchange(
-      !numericValue || inputValue === '' ? null : parseInt(numericValue),
-    );
+    const parsed = parseInt(numericValue);
+    if (parsed < 1000000) {
+      onSetNumberOfStakeToExchange(parsed);
+    } else if (inputValue === '') {
+      onSetNumberOfStakeToExchange(0);
+    }
   };
 
   const insufficientFunds = isBuyMode
