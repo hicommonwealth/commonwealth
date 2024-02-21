@@ -1,7 +1,7 @@
-import { AppError, ServerError } from '@hicommonwealth/adapters';
+import { AppError, ServerError } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import { v4 as uuidv4 } from 'uuid';
 import { AXIE_SHARED_SECRET } from '../config';
-import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { Issuers } from './finishSsoLogin';

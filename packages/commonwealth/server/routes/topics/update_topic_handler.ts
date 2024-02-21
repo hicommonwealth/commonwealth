@@ -1,6 +1,6 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
+import { TopicAttributes } from '@hicommonwealth/model';
 import z from 'zod';
-import { TopicAttributes } from '../../models/topic';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -22,7 +22,6 @@ export const updateTopicHandler = async (
 ) => {
   const {
     user,
-    community,
     params: { topicId },
     body,
   } = req;
@@ -50,7 +49,6 @@ export const updateTopicHandler = async (
 
   const [topic, analyticsOptions] = await controllers.topics.updateTopic({
     user,
-    community,
     body: validationResult.data,
   });
 

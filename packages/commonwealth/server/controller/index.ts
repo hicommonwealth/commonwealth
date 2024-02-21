@@ -1,7 +1,7 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
+import { Role } from '@hicommonwealth/model';
 import type { Request, Response } from 'express';
-import { Role } from 'server/models/role';
-import type { DB } from '../models';
 import { findAllRoles } from '../util/roles';
 
 export const Errors = {

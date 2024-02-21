@@ -13,23 +13,15 @@ export const namespaceFactoryAbi = [
     ],
   },
   {
-    inputs: [],
-    stateMutability: 'view',
-    type: 'function',
-    name: 'reservationHook',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-  },
-  {
     inputs: [
       {
         internalType: 'string',
         name: 'name',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: '_uri',
         type: 'string',
       },
       {
@@ -63,6 +55,21 @@ export const namespaceFactoryAbi = [
       {
         internalType: 'uint256',
         name: 'id',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: 'exchangeToken',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'scalar',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'curve',
         type: 'uint256',
       },
     ],

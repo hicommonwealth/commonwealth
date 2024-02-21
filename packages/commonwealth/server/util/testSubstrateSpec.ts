@@ -1,13 +1,8 @@
-import {
-  AppError,
-  ServerError,
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/adapters';
+import { AppError, ServerError, logger } from '@hicommonwealth/core';
 import type { RegisteredTypes } from '@polkadot/types/types';
 import { constructSubstrateUrl } from '../../shared/substrate';
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 const testSubstrateSpec = async (specString: string, nodeUrl: string) => {
   // test out spec

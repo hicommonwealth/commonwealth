@@ -1,13 +1,14 @@
 import moment from 'moment';
 
-import { AppError, ServerError } from '@hicommonwealth/adapters';
+import { AppError, ServerError } from '@hicommonwealth/core';
+import {
+  AddressInstance,
+  UserInstance,
+  VoteAttributes,
+} from '@hicommonwealth/model';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/community';
-import { UserInstance } from '../../models/user';
-import { VoteAttributes } from '../../models/vote';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
-import { TrackOptions } from '../server_analytics_methods/track';
+import { TrackOptions } from '../server_analytics_controller';
 import { ServerPollsController } from '../server_polls_controller';
 
 export const Errors = {
@@ -24,7 +25,6 @@ export const Errors = {
 export type UpdatePollVoteOptions = {
   user: UserInstance;
   address: AddressInstance;
-  community: CommunityInstance;
   pollId: number;
   option: string;
 };
@@ -33,10 +33,10 @@ export type UpdatePollVoteResult = [VoteAttributes, TrackOptions];
 
 export async function __updatePollVote(
   this: ServerPollsController,
-  { user, address, community, pollId, option }: UpdatePollVoteOptions,
+  { user, address, pollId, option }: UpdatePollVoteOptions,
 ): Promise<UpdatePollVoteResult> {
   const poll = await this.models.Poll.findOne({
-    where: { id: pollId, community_id: community.id },
+    where: { id: pollId },
   });
   if (!poll) {
     throw new AppError(Errors.NoPoll);
@@ -70,9 +70,8 @@ export async function __updatePollVote(
     // check token balance threshold if needed
     const { isValid } = await validateTopicGroupsMembership(
       this.models,
-      this.tokenBalanceCache,
       thread.topic_id,
-      community,
+      poll.community_id,
       address,
     );
     if (!isValid) {
@@ -87,7 +86,7 @@ export async function __updatePollVote(
       poll_id: poll.id,
       address: address.address,
       author_community_id: address.community_id,
-      community_id: community.id,
+      community_id: poll.community_id,
     };
     // delete existing votes
     await this.models.Vote.destroy({
@@ -106,7 +105,7 @@ export async function __updatePollVote(
 
   const analyticsOptions = {
     event: MixpanelCommunityInteractionEvent.SUBMIT_VOTE,
-    community: community.id,
+    community: poll.community_id,
     userId: user.id,
   };
 

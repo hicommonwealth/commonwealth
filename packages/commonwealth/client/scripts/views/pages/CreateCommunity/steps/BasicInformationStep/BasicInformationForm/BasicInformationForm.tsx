@@ -43,6 +43,7 @@ const BasicInformationForm = ({
   selectedCommunity,
   onSubmit,
   onCancel,
+  handleSelectedChainId,
 }: BasicInformationFormProps) => {
   const [communityName, setCommunityName] = useState('');
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
@@ -154,7 +155,7 @@ const BasicInformationForm = ({
           bech32Prefix: selectedChainNode.bech32Prefix,
         }),
       });
-      onSubmit(communityId);
+      onSubmit(communityId, values.communityName);
     } catch (err) {
       notifyError(err.response?.data?.error);
     }
@@ -184,12 +185,17 @@ const BasicInformationForm = ({
     });
   };
 
+  const handleWatchForm = (values: any) => {
+    handleSelectedChainId(values?.chain?.value);
+  };
+
   return (
     <CWForm
       validationSchema={basicInformationFormValidationSchema}
       onSubmit={handleSubmit}
       className="BasicInformationForm"
       initialValues={getInitialValue()}
+      onWatch={handleWatchForm}
     >
       {/* Form fields */}
       <CWTextInput

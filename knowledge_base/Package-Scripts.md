@@ -33,18 +33,10 @@ If you add a script to the `package.json` file, please add documentation for it 
   - [cosmos:stop](#cosmosstop)
 - [Linting & Formatting](#linting--formatting)
   - [format](#format)
-  - [lint](#lint)
   - [lint-all](#lint-all)
   - [lint-branch](#lint-branch)
   - [lint-branch-warnings](#lint-branch-warnings)
   - [style-lint](#style-lint)
-- [Mobile](#mobile)
-  - [build-android](#build-android)
-  - [build-ios](#build-ios)
-  - [open-android](#open-android)
-  - [open-ios](#open-ios)
-  - [start-android](#start-android)
-  - [start-ios](#start-ios)
 - [Other Services](#other-services)
   - [send-cosmos-notifs](#send-cosmos-notifs)
   - [send-notification-digest-emails](#send-notification-digest-emails)
@@ -65,6 +57,7 @@ If you add a script to the `package.json` file, please add documentation for it 
   - [unit-test:watch](#unit-testwatch)
 - [TypeScript](#typescript)
   - [check-types](#check-types)
+  - [sanity](#sanity)
 - [Webpack & TSNode](#webpack--tsnode)
   - [bundle-report](#bundle-report)
   - [listen](#listen)
@@ -72,6 +65,13 @@ If you add a script to the `package.json` file, please add documentation for it 
   - [start-all](#start-all)
   - [start-consumer](#start-consumer)
   - [start-evm-ce](#start-evm-ce)
+- [Devnets](#devnets)
+  - [cosmos:build](#cosmos:build)
+  - [cosmos:start](#cosmos:start)
+  - [cosmos:stop](#cosmos:stop)
+- [Util scripts](#util-scripts)
+  - [add-components-showcase](#add-component-showcase)
+  - [set-super-admin](#set-super-admin)
 
 ## Build Scripts
 
@@ -241,29 +241,17 @@ Definition: `prettier --ignore-path ../../.prettierignore --config ../../.pretti
 
 Description: Autoformats files using config `prettierrc.json` config.
 
-### lint
-
-Definition: `./scripts/lint-new-work.sh`
-
-Description: Lints new work, according to script file `lint-new-work.sh`.
-
-Considerations: Problematically, only checks .ts files. Name is misleading. Redundancy with [lint-branch](#lint-branch) script. **Flagged for possible removal.**
-
 ### lint-all
 
 Definition: `eslint client/\\**/*.{ts,tsx} server/\\**/*.ts`
 
-Description: Only lints changed files on current branch.
-
-Considerations: May be more clearly renamed "lint-changes".
+Description: Lints all TypeScript files within the `client` and `server` directories.
 
 ### lint-branch
 
 Definition: `./scripts/lint-branch.sh`
 
-Description: Redundant with [lint](#lint) script, which uses 'git status' instead of 'git diff' but is build toward the same action (isolating changed files for linting).
-
-Considerations: Recommend eliminating either [lint](#lint) or [lint-branch](#lint-branch) scripts. Problematically, lint-branch only checks .ts files. **Flagged for possible removal.**
+Description: Used in the CI. Lints updated files on the current branch.
 
 ### lint-branch-warnings
 
@@ -277,57 +265,7 @@ Definition: `stylelint client/styles/*`
 
 Description: Lints SCSS files.
 
-Considerations: Why lint styles separately? Why not just include `.scss` file extension in [lint](#lint) and [lint-all](#lint-all) scripts (which currently only target `.ts` files)? **Flagged for possible removal.**
-
-## Mobile
-
-### build-android
-
-Definition: `NODE_ENV=mobile webpack --config webpack/webpack.config.mobile.js --progress && NODE_ENV=mobile npx cap sync android`
-
-Description: Uses Capacitor library to build app for Android based on webpack.config.mobile.js file.
-
-Contributor: Dillon Chen
-
-### build-ios
-
-Definition: `NODE_ENV=mobile webpack --config webpack/webpack.config.mobile.js --progress && NODE_ENV=mobile npx cap sync ios`
-
-Description: Uses Capacitor library to build app for iOS based on webpack.config.mobile.js file.
-
-Contributor: Dillon Chen
-
-### open-android
-
-Definition: `NODE_ENV=mobile npx cap open android`
-
-Description: Uses the Capacitor tool to build and run the app's Android project with a simulator.
-
-Contributor: Dillon Chen
-
-### open-ios
-
-Definition: `NODE_ENV=mobile npx cap open ios`
-
-Description: Uses the Capacitor tool to build and run the app's iOS project with a simulator.
-
-Contributor: Dillon Chen
-
-### start-android
-
-Definition: `npx cap run android`
-
-Description: Uses the Capacitor tool to build and run the app's Android project with a simulator.
-
-Contributor: Dillon Chen
-
-### start-ios
-
-Definition: `npx cap run ios`
-
-Description: Uses the Capacitor tool to build and run the app's iOS project with a simulator.
-
-Contributor: Dillon Chen
+Considerations: Why lint styles separately? Why not just include `.scss` file extension in [lint-branch](#lint-branch) and [lint-all](#lint-all) scripts (which currently only target `.ts` files)? **Flagged for possible removal.**
 
 ## Other services
 
@@ -473,6 +411,12 @@ Definition: `tsc --noEmit`
 
 Description: Runs a compilation of TypeScript files based on tsconfig.json; does not emit files.
 
+### sanity
+
+Definition: `chmod u+x scripts/sanity.sh && ./scripts/sanity.sh`
+
+Description: Sanity scripts developers should run locally before pushing code, comprising a linter, a check-types, and unit tests. Must be run from root.
+
 ## Webpack && TSNode
 
 ### bundle-report
@@ -530,3 +474,29 @@ Description: Starts existing dormant Cosmos devnet containers.
 Definition: `chmod u+x test/util/cosmos-chain-testing/v1/stop.sh && ./test/util/cosmos-chain-testing/v1/stop.sh && chmod u+x test/util/cosmos-chain-testing/v1beta1/stop.sh && ./test/util/cosmos-chain-testing/v1beta1/stop.sh && chmod u+x test/util/cosmos-chain-testing/ethermint/stop.sh && ./test/util/cosmos-chain-testing/ethermint/stop.sh`
 
 Description: Stop all Cosmos devnet containers.
+
+# Util scripts
+
+## add-component-showcase
+
+Definition: `add-component-showcase`
+
+Description: It creates new `tsx` file and modifies `componentsList.ts` file in order to add components to the showcase page easier. Fore more information take a look at [Component-Kit.md](./Component-Kit.md) documentation file.
+
+## set-super-admin
+
+Definition: `chmod u+x scripts/set-super-admin.sh && ./scripts/set-super-admin.sh`
+
+Description: It sets whether a user is a super admin or not. The script accepts 2 optional arguments that indicate the environment in which to set the super admin and whether to enable or disable the super admin. The script enables the super admin by default.
+
+Considerations: This script requires having SUPER_ADMIN_EMAIL or SUPER_ADMIN_WALLET_ADDRESS set in packages/commonwealth/.env. The script also requires having Heroku access on any apps in which a super admin status is being updated.
+
+Examples:
+- `yarn set-super-admin`
+  - This sets the local user specified by the environment variables to a super admin.
+- `yarn set-super-admin false`
+  - This disables super admin for the local user.
+- `yarn set-super-admin [frick | frack | beta | demo]`
+  - This enables super admin for the specified user on the specified app.
+- `yarn set-super-admin [frick | frack | beta | demo] false`
+  - This disables super admin for the specified user on the specified app.

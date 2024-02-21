@@ -1,7 +1,8 @@
+/* eslint-disable max-len */
+import { models } from '@hicommonwealth/model';
 import chai, { expect } from 'chai';
 import chaiHttp from 'chai-http';
 import { Op, QueryTypes } from 'sequelize';
-import models from '../../../server/database';
 import {
   testAddresses,
   testComments,
@@ -74,7 +75,7 @@ async function calcAllCountsFromSourceTables() {
     },
   )) as any;
 
-  let notification_ids = {};
+  const notification_ids = {};
   for (const notification of notifications) {
     if (!notification.thread_id) continue;
     notification_ids[notification.thread_id] = notification.id;
@@ -234,7 +235,7 @@ async function createThreadReactionRaw() {
   const canvas_hash =
     '0x0000000000000000000000000000000000000000000000000000000000000000';
   await models.sequelize.query(`
-    INSERT INTO "Reactions" ("id", "chain", "address_id", "reaction", "thread_id", "comment_id", "canvas_action", "canvas_hash", "canvas_session", "created_at", "updated_at")
+    INSERT INTO "Reactions" ("id", "community_id", "address_id", "reaction", "thread_id", "comment_id", "canvas_action", "canvas_hash", "canvas_session", "created_at", "updated_at")
     VALUES(-300, '${chain}', '${testAddresses[0].id}', 'like', ${testThreads[0].id}, null, '{}', '${canvas_hash}', '{}', now(), now()),
     (-400, '${chain}', '${testAddresses[0].id}', 'like', ${testThreads[0].id}, null, '{}', '${canvas_hash}', '{}', now(), now()),
     (-500, '${chain}', '${testAddresses[0].id}', 'like', ${testThreads[0].id}, null, '{}', '${canvas_hash}', '{}', now(), now())
@@ -246,7 +247,7 @@ async function createCommentReactionRaw() {
   const canvas_hash =
     '0x0000000000000000000000000000000000000000000000000000000000000000';
   await models.sequelize.query(`
-    INSERT INTO "Reactions" ("id", "chain", "address_id", "reaction", "thread_id", "comment_id", "canvas_action", "canvas_hash", "canvas_session", "created_at", "updated_at")
+    INSERT INTO "Reactions" ("id", "community_id", "address_id", "reaction", "thread_id", "comment_id", "canvas_action", "canvas_hash", "canvas_session", "created_at", "updated_at")
     VALUES(-3000, '${chain}', '${testAddresses[0].id}', 'like', null, ${testComments[0].id}, '{}', '${canvas_hash}', '{}', now(), now())
     `);
 }
@@ -390,7 +391,7 @@ describe('recomputeCounts', () => {
       expect(cRes).not.to.be.null;
       expect(cRes.error).not.to.be.null;
 
-      const before = await getCounts(testThreads[0].id, testComments[0].id);
+      await getCounts(testThreads[0].id, testComments[0].id);
       // expect(before.countsFromSourceTable.notification_id).to.be.greaterThan(0);
       await verifyRecomputeCountAll();
     });

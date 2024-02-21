@@ -2,33 +2,32 @@ import { Op } from 'sequelize';
 
 import {
   AppError,
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/adapters';
-import {
   ChainBase,
+  DynamicTemplate,
   NotificationCategories,
   WalletId,
   WalletSsoSource,
+  logger,
 } from '@hicommonwealth/core';
+import type {
+  CommunityInstance,
+  DB,
+  ProfileAttributes,
+} from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
-import { DynamicTemplate } from '../../shared/types';
 import { addressSwapper } from '../../shared/utils';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
-import type { DB } from '../models';
-import type { CommunityInstance } from '../models/community';
-import type { ProfileAttributes } from '../models/profile';
 import assertAddressOwnership from '../util/assertAddressOwnership';
 import verifySessionSignature from '../util/verifySessionSignature';
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');
 export const Errors = {
   NoChain: 'Must provide chain',
-  InvalidChain: 'Invalid chain',
+  InvalidCommunity: 'Invalid community',
   AddressNF: 'Address not found',
   ExpiredToken: 'Token has expired, please re-register',
   InvalidSignature: 'Invalid signature, please re-register',
@@ -42,7 +41,7 @@ export const Errors = {
 
 const processAddress = async (
   models: DB,
-  chain: CommunityInstance,
+  community: CommunityInstance,
   chain_id: string | number,
   address: string,
   wallet_id: WalletId,
@@ -55,7 +54,7 @@ const processAddress = async (
 ): Promise<void> => {
   const addressInstance = await models.Address.scope('withPrivateData').findOne(
     {
-      where: { community_id: chain.id, address },
+      where: { community_id: community.id, address },
     },
   );
   if (!addressInstance) {
@@ -77,7 +76,7 @@ const processAddress = async (
   try {
     const valid = await verifySessionSignature(
       models,
-      chain,
+      community,
       chain_id,
       addressInstance,
       user ? user.id : null,
@@ -172,7 +171,7 @@ const processAddress = async (
         templateId: DynamicTemplate.VerifyAddress,
         dynamic_template_data: {
           address,
-          chain: chain.name,
+          chain: community.name,
         },
       };
       await sgMail.send(msg);
@@ -191,15 +190,15 @@ const verifyAddress = async (
   res: Response,
   next: NextFunction,
 ) => {
-  if (!req.body.chain || !req.body.chain_id) {
+  if (!req.body.community_id || !req.body.chain_id) {
     throw new AppError(Errors.NoChain);
   }
-  const chain = await models.Community.findOne({
-    where: { id: req.body.chain },
+  const community = await models.Community.findOne({
+    where: { id: req.body.community_id },
   });
   const chain_id = req.body.chain_id;
-  if (!chain) {
-    return next(new AppError(Errors.InvalidChain));
+  if (!community) {
+    return next(new AppError(Errors.InvalidCommunity));
   }
 
   if (!req.body.address || !req.body.signature) {
@@ -207,16 +206,16 @@ const verifyAddress = async (
   }
 
   const address =
-    chain.base === ChainBase.Substrate
+    community.base === ChainBase.Substrate
       ? addressSwapper({
           address: req.body.address,
-          currentPrefix: chain.ss58_prefix,
+          currentPrefix: community.ss58_prefix,
         })
       : req.body.address;
 
   await processAddress(
     models,
-    chain,
+    community,
     chain_id,
     address,
     req.body.wallet_id,
@@ -240,7 +239,7 @@ const verifyAddress = async (
   } else {
     // if user isn't logged in, log them in now
     const newAddress = await models.Address.findOne({
-      where: { community_id: req.body.chain, address },
+      where: { community_id: req.body.community_id, address },
     });
     const user = await models.User.scope('withPrivateData').findOne({
       where: { id: newAddress.user_id },

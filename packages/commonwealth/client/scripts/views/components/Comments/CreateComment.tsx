@@ -1,15 +1,13 @@
-import React, { useEffect, useMemo, useState } from 'react';
-
+import { ContentType } from '@hicommonwealth/core';
 import { notifyError } from 'controllers/app/notifications';
-import type { DeltaStatic } from 'quill';
-import Thread from '../../../models/Thread';
-
 import { SessionKeyError } from 'controllers/server/sessions';
 import { useDraft } from 'hooks/useDraft';
+import type { DeltaStatic } from 'quill';
+import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
-import { ContentType } from 'types';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
+import Thread from '../../../models/Thread';
 import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
 import { createDeltaFromText, getTextFromDelta } from '../react_quill_editor';
 import { serializeDelta } from '../react_quill_editor/utils';
@@ -21,7 +19,6 @@ type CreateCommentProps = {
   parentCommentId?: number;
   rootThread: Thread;
   canComment: boolean;
-  shouldFocusEditor?: boolean;
   tooltipText?: string;
 };
 
@@ -30,7 +27,6 @@ export const CreateComment = ({
   parentCommentId,
   rootThread,
   canComment,
-  shouldFocusEditor = false,
   tooltipText = '',
 }: CreateCommentProps) => {
   const { saveDraft, restoreDraft, clearDraft } = useDraft<DeltaStatic>(
@@ -148,7 +144,7 @@ export const CreateComment = ({
             onCancel={handleCancel}
             author={author}
             editorValue={editorValue}
-            shouldFocus={shouldFocusEditor}
+            shouldFocus={canComment}
             tooltipText={tooltipText}
           />
           {RevalidationModal}

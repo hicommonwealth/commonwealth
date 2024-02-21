@@ -16,8 +16,10 @@ export type SidebarMenuName =
 
 export const Sidebar = ({
   isInsideCommunity,
+  onMobile,
 }: {
   isInsideCommunity: boolean;
+  onMobile: boolean;
 }) => {
   const {
     menuName,
@@ -32,20 +34,27 @@ export const Sidebar = ({
 
   const sidebarClass = useMemo(() => {
     return clsx('Sidebar', {
+      onMobile,
       onadd: menuVisible && recentlyUpdatedVisibility,
       onremove: !menuVisible,
     });
-  }, [menuVisible, recentlyUpdatedVisibility]);
+  }, [menuVisible, onMobile, recentlyUpdatedVisibility]);
 
   return (
     <div className={sidebarClass}>
       {isInsideCommunity && (
         <div className="sidebar-header-wrapper">
-          <SidebarHeader />
+          <SidebarHeader
+            isInsideCommunity={isInsideCommunity}
+            onMobile={onMobile}
+          />
         </div>
       )}
       <div className="sidebar-default-menu">
-        <SidebarQuickSwitcher />
+        <SidebarQuickSwitcher
+          isInsideCommunity={isInsideCommunity}
+          onMobile={onMobile}
+        />
         {isInsideCommunity && (
           <CommunitySection showSkeleton={!app.activeChainId()} />
         )}

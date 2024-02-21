@@ -1,0 +1,35 @@
+@import '../../../../../styles/shared.scss';
+
+.CreateContentDrawer {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+
+  .left-side {
+    flex: 1;
+
+    .header {
+      color: $neutral-400;
+      text-transform: uppercase;
+      padding-block: 8px;
+    }
+
+    .item {
+      cursor: pointer;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-block: 8px;
+
+      &.disabled {
+        color: $neutral-400;
+        pointer-events: none;
+
+        .Text {
+          color: $neutral-400;
+        }
+      }
+    }
+  }
+}

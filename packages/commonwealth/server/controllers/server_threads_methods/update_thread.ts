@@ -1,18 +1,25 @@
-import { AppError, ServerError } from '@hicommonwealth/adapters';
-import { NotificationCategories, ProposalType } from '@hicommonwealth/core';
+import {
+  AppError,
+  NotificationCategories,
+  ProposalType,
+  ServerError,
+} from '@hicommonwealth/core';
+import {
+  AddressInstance,
+  CommunityInstance,
+  DB,
+  ThreadAttributes,
+  ThreadInstance,
+  UserInstance,
+} from '@hicommonwealth/model';
 import { uniq } from 'lodash';
 import moment from 'moment';
-import { Op, Sequelize, Transaction } from 'sequelize';
+import { Op, Sequelize, Transaction, WhereOptions } from 'sequelize';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText, validURL } from '../../../shared/utils';
-import { DB } from '../../models';
-import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/community';
-import { ThreadAttributes, ThreadInstance } from '../../models/thread';
-import { UserInstance } from '../../models/user';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { findAllRoles } from '../../util/roles';
-import { TrackOptions } from '../server_analytics_methods/track';
+import { TrackOptions } from '../server_analytics_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
 import { ServerThreadsController } from '../server_threads_controller';
 
@@ -35,7 +42,6 @@ export const Errors = {
 export type UpdateThreadOptions = {
   user: UserInstance;
   address: AddressInstance;
-  community: CommunityInstance;
   threadId?: number;
   title?: string;
   body?: string;
@@ -46,7 +52,6 @@ export type UpdateThreadOptions = {
   archived?: boolean;
   spam?: boolean;
   topicId?: number;
-  topicName?: string;
   collaborators?: {
     toAdd?: number[];
     toRemove?: number[];
@@ -68,7 +73,6 @@ export async function __updateThread(
   {
     user,
     address,
-    community,
     threadId,
     title,
     body,
@@ -79,7 +83,6 @@ export async function __updateThread(
     archived,
     spam,
     topicId,
-    topicName,
     collaborators,
     canvasSession,
     canvasAction,
@@ -88,37 +91,35 @@ export async function __updateThread(
   }: UpdateThreadOptions,
 ): Promise<UpdateThreadResult> {
   // Discobot handling
-  if (!threadId) {
-    if (!discordMeta) {
-      throw new AppError(Errors.ThreadNotFound);
-    }
-    const existingThread = await this.models.Thread.findOne({
-      where: { discord_meta: discordMeta },
-    });
-    if (!existingThread) {
-      throw new AppError(Errors.ThreadNotFound);
-    }
-    threadId = existingThread.id;
+
+  const threadWhere: WhereOptions<ThreadAttributes> = {};
+  if (threadId) {
+    threadWhere.id = threadId;
+  }
+  if (discordMeta) {
+    threadWhere.discord_meta = discordMeta;
   }
 
-  // check if banned
-  const [canInteract, banError] = await this.banCache.checkBan({
-    communityId: community.id,
-    address: address.address,
-  });
-  if (!canInteract) {
-    throw new AppError(`Ban error: ${banError}`);
-  }
-
-  const thread = await this.models.Thread.findByPk(threadId, {
+  const thread = await this.models.Thread.findOne({
+    where: threadWhere,
     include: {
       model: this.models.Address,
       as: 'collaborators',
       required: false,
     },
   });
+
   if (!thread) {
-    throw new AppError(`${Errors.ThreadNotFound}: ${threadId}`);
+    throw new AppError(Errors.ThreadNotFound);
+  }
+
+  // check if banned
+  const [canInteract, banError] = await this.banCache.checkBan({
+    communityId: thread.community_id,
+    address: address.address,
+  });
+  if (!canInteract) {
+    throw new AppError(`Ban error: ${banError}`);
   }
 
   // get various permissions
@@ -128,7 +129,7 @@ export async function __updateThread(
   const roles = await findAllRoles(
     this.models,
     { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
-    community.id,
+    thread.community_id,
     ['moderator', 'admin'],
   );
 
@@ -137,10 +138,10 @@ export async function __updateThread(
   );
   const isThreadOwner = userOwnedAddressIds.includes(thread.address_id);
   const isMod = !!roles.find(
-    (r) => r.chain_id === community.id && r.permission === 'moderator',
+    (r) => r.chain_id === thread.community_id && r.permission === 'moderator',
   );
   const isAdmin = !!roles.find(
-    (r) => r.chain_id === community.id && r.permission === 'admin',
+    (r) => r.chain_id === thread.community_id && r.permission === 'admin',
   );
   const isSuperAdmin = user.isAdmin;
   if (
@@ -184,6 +185,8 @@ export async function __updateThread(
   // build analytics
   const allAnalyticsOptions: TrackOptions[] = [];
 
+  const community = await this.models.Community.findByPk(thread.community_id);
+
   //  patch thread properties
   const transaction = await this.models.sequelize.transaction();
 
@@ -222,9 +225,8 @@ export async function __updateThread(
 
     await setThreadTopic(
       permissions,
-      thread,
+      community,
       topicId,
-      topicName,
       this.models,
       toUpdate,
     );
@@ -581,7 +583,7 @@ async function setThreadStage(
     // fetch available stages
     let customStages = [];
     try {
-      const communityStages = JSON.parse(community.custom_stages);
+      const communityStages = community.custom_stages;
       if (Array.isArray(communityStages)) {
         customStages = Array.from(communityStages)
           .map((s) => s.toString())
@@ -618,35 +620,29 @@ async function setThreadStage(
  */
 async function setThreadTopic(
   permissions: UpdateThreadPermissions,
-  thread: ThreadInstance,
-  topicId: number | undefined,
-  topicName: string | undefined,
+  community: CommunityInstance,
+  topicId: number,
   models: DB,
   toUpdate: Partial<ThreadAttributes>,
 ) {
-  if (typeof topicId !== 'undefined' || typeof topicName !== 'undefined') {
+  if (typeof topicId !== 'undefined') {
     validatePermissions(permissions, {
       isThreadOwner: true,
       isMod: true,
       isAdmin: true,
       isSuperAdmin: true,
     });
+    const topic = await models.Topic.findOne({
+      where: {
+        id: topicId,
+        community_id: community.id,
+      },
+    });
 
-    if (typeof topicId !== 'undefined') {
-      const topic = await models.Topic.findByPk(topicId);
-      if (!topic) {
-        throw new AppError(Errors.InvalidTopic);
-      }
-      toUpdate.topic_id = topic.id;
-    } else if (typeof topicName !== 'undefined') {
-      const [topic] = await models.Topic.findOrCreate({
-        where: {
-          name: topicName,
-          community_id: thread.community_id,
-        },
-      });
-      toUpdate.topic_id = topic.id;
+    if (!topic) {
+      throw new AppError(Errors.InvalidTopic);
     }
+    toUpdate.topic_id = topic.id;
   }
 }
 

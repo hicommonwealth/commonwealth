@@ -2,13 +2,13 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "jsx": "react",
-    "outDir": "build",
     "skipLibCheck": true,
+    "sourceMap": true,
+    "rootDir": ".",
+    "outDir": "build",
     "baseUrl": ".",
     "paths": {
       "@hicommonwealth/*": ["../../libs/*/src"],
-      "common-common": ["../common-common"],
-      "common-common/*": ["../common-common/*"],
       "*": ["./*", "shared/*", "client/scripts/*"]
     }
   },
@@ -24,6 +24,7 @@
   "references": [
     { "path": "../../libs/adapters" },
     { "path": "../../libs/chains" },
-    { "path": "../../libs/core" }
+    { "path": "../../libs/core" },
+    { "path": "../../libs/model" }
   ]
 }

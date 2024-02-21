@@ -44,7 +44,11 @@ const getAddressFromWallet = (wallet: IWebWallet<any>) => {
     }
 
     if (wallet.defaultNetwork === 'terra') {
-      return wallet.accounts[0]?.address;
+      if (wallet.name === WalletId.TerraWalletConnect) {
+        return wallet.accounts[0]?.address;
+      } else {
+        return wallet.accounts[0];
+      }
     }
 
     if (wallet.chain === 'cosmos') {

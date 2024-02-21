@@ -1,9 +1,10 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
+import {
+  AddressInstance,
+  UserInstance,
+  sequelize,
+} from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import { sequelize } from '../../database';
-import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/community';
-import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
@@ -14,7 +15,6 @@ const Errors = {
 
 export type DeleteGroupOptions = {
   user: UserInstance;
-  community: CommunityInstance;
   address: AddressInstance;
   groupId: number;
 };
@@ -23,28 +23,23 @@ export type DeleteGroupResult = void;
 
 export async function __deleteGroup(
   this: ServerCommunitiesController,
-  { user, community, groupId }: DeleteGroupOptions,
+  { user, groupId }: DeleteGroupOptions,
 ): Promise<DeleteGroupResult> {
+  const group = await this.models.Group.findByPk(groupId);
+  if (!group) {
+    throw new AppError(Errors.GroupNotFound);
+  }
+
   const isAdmin = await validateOwner({
     models: this.models,
     user,
-    communityId: community.id,
+    communityId: group.community_id,
     allowMod: true,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError(Errors.Unauthorized);
-  }
-
-  const group = await this.models.Group.findOne({
-    where: {
-      id: groupId,
-      community_id: community.id,
-    },
-  });
-  if (!group) {
-    throw new AppError(Errors.GroupNotFound);
   }
 
   await this.models.sequelize.transaction(async (transaction) => {

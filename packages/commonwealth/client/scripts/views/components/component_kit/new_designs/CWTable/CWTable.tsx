@@ -25,12 +25,22 @@ actual data to be displayed (rowData). These are to be passed in a data structur
     {
       name: 'Stark Industries',
       emp_count: 1000,
-      avatars: { name: 'https://assets.commonwealth.im/f5c5a0c6-0552-40be-bb4b-b25fbd0cfbe2.png' }
+      avatars: {
+        name: {
+          avatarUrl: 'https://assets.commonwealth.im/f5c5a0c6-0552-40be-bb4b-b25fbd0cfbe2.png',
+          address: null,
+        },
+      },
     },
     {
       name: 'Cyberdyne Systems',
       emp_count: 10000,
-      avatars: { name: 'https://assets.commonwealth.im/f5c5a0c6-0552-40be-bb4b-b25fbd0cfbe2.png' }
+      avatars: {
+        name: {
+          avatarUrl: null,
+          address: '0x123abc',
+        },
+      },
     },
   ]
 }
@@ -60,11 +70,20 @@ user experience. Be certain that the column's data can be sorted before designat
 The rowData array has no required keys on the objects within it. However, if any of your columns have data that is
 displayed along with an avatar, you'll need to make use of the `avatars` object. `avatars` is an object with keys
 that correspond to keys in the data that have avatars. For instance, if you would like to display the logo of
-Stark Industries next to the name 'Stark Industries', insert a key-value pair into the `avatars` object where the
-key matches the associated key in the data and the value is the URL where the avatar can be found (see above
-data structure).
+Stark Industries next to the name 'Stark Industries', insert a key-value pair into the `avatars`
+object where the key matches the associated key in the data and the value is an object containing
+ the URL or address where the avatar can be found (see above data structure).
 */
 
+import {
+  ColumnDef,
+  SortingState,
+  flexRender,
+  getCoreRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from '@tanstack/react-table';
+import { getRelativeTimestamp } from 'client/scripts/helpers/dates';
 import clsx from 'clsx';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Avatar } from '../../../Avatar';
@@ -72,20 +91,12 @@ import { CWIcon } from '../../cw_icons/cw_icon';
 import { ComponentType } from '../../types';
 import './CWTable.scss';
 
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  SortingState,
-  useReactTable,
-} from '@tanstack/react-table';
-
 type ColumnDescriptor = {
   key: string;
   header: string;
   numeric: boolean;
   sortable: boolean;
+  chronological?: boolean;
   customElementKey?: string;
   hasCustomSortValue?: boolean;
 };
@@ -136,7 +147,9 @@ export const CWTable = ({
           }),
           cell: (info) => {
             const currentRow = info.row.original as RowData;
-            const avatarUrl = currentRow.avatars?.[col.key];
+            const avatarInfo = currentRow.avatars?.[col.key];
+            const avatarUrl = avatarInfo?.avatarUrl;
+            const avatarAddress = avatarInfo?.address;
 
             if (currentRow[col.key]?.customElement) {
               return currentRow[col.key].customElement;
@@ -146,14 +159,20 @@ export const CWTable = ({
               return currentRow[col.customElementKey];
             }
 
+            const numericColVal = col.chronological
+              ? info.getValue()
+                ? getRelativeTimestamp(info.getValue())
+                : 'N/A'
+              : info.getValue();
+
             if (col.numeric) {
-              return <div className="numeric">{info.getValue()}</div>;
+              return <div className="numeric">{numericColVal}</div>;
             }
 
-            if (avatarUrl) {
+            if (avatarUrl || avatarAddress) {
               return (
                 <div className="avatar-cell">
-                  <Avatar url={avatarUrl} size={20} />
+                  <Avatar url={avatarUrl} address={avatarAddress} size={20} />
                   <div className="text">{info.getValue()}</div>
                 </div>
               );

@@ -147,7 +147,10 @@ export const LoginMobile = ({
               onUsernameChangeHandler={handleSetUsername}
               orientation="vertical"
             />
-            <CWButton label="Finish" onClick={onSaveProfileInfo} />
+            <CWButton
+              label="Finish"
+              onClick={async () => await onSaveProfileInfo()}
+            />
           </div>
         )}
 
@@ -176,14 +179,14 @@ export const LoginMobile = ({
                   placeholder="Email address"
                   className="login-email-field"
                   onInput={handleSetEmail}
-                  onenterkey={onEmailLogin}
+                  onenterkey={async () => await onEmailLogin()}
                 />
                 <div className="buttons-row email-form-buttons">
                   <CWButton
                     label="Sign in with Magic"
                     buttonType="secondary-blue"
                     className="wallet-magic-btn"
-                    onClick={onEmailLogin}
+                    onClick={async () => await onEmailLogin()}
                   />
                   <CWButton
                     iconLeft="arrowLeft"

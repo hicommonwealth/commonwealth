@@ -29,9 +29,9 @@ export const LinkedThreadsCard = ({
   const linkedThreadIds = useMemo(
     () =>
       filterLinks(thread.links, LinkSource.Thread).map(
-        ({ identifier }) => identifier
+        ({ identifier }) => identifier,
       ),
-    [thread.links]
+    [thread.links],
   );
 
   const { data: linkedThreads, isLoading } = useGetThreadsByIdQuery({
@@ -57,7 +57,7 @@ export const LinkedThreadsCard = ({
                     const discussionLink = getProposalUrlPath(
                       t.slug,
                       `${t.identifier}-${slugify(t.title)}`,
-                      false
+                      false,
                     );
 
                     return (

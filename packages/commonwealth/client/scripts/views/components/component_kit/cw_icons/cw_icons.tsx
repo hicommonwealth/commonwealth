@@ -1233,7 +1233,7 @@ export const CWDiscord = (props: IconProps) => {
       width="32"
       height="32"
       viewBox="0 0 32 32"
-      fill="#5865F2"
+      style={{ fill: '#5865F2' }} // Imp: this enforces the discord color
       {...otherProps}
     >
       <path d="M26.182 8.864s-2.918-2.285-6.364-2.546l-.31.622c3.114.763 4.543 1.854 6.037 3.196C22.97 8.822 20.43 7.591 16 7.591c-4.43 0-6.97 1.23-9.545 2.545 1.494-1.342 3.194-2.555 6.037-3.196l-.31-.622c-3.615.34-6.364 2.546-6.364 2.546S2.56 13.589 2 22.864c3.284 3.788 8.273 3.818 8.273 3.818l1.043-1.39a12.748 12.748 0 01-5.498-3.701c2.06 1.559 5.17 3.182 10.182 3.182 5.011 0 8.121-1.623 10.182-3.182a12.74 12.74 0 01-5.498 3.701l1.043 1.39s4.99-.03 8.273-3.818c-.56-9.275-3.818-14-3.818-14zM11.864 20.318c-1.231 0-2.228-1.139-2.228-2.545 0-1.407.997-2.546 2.228-2.546 1.23 0 2.227 1.14 2.227 2.546s-.997 2.545-2.227 2.545zm8.272 0c-1.23 0-2.227-1.139-2.227-2.545 0-1.407.997-2.546 2.227-2.546 1.231 0 2.228 1.14 2.228 2.546s-.997 2.545-2.228 2.545z"></path>
@@ -1439,11 +1439,11 @@ export const CWEdgeware = (props: IconProps) => {
         <circle cx="8" cy="8" r="8" fill="white" />
       </mask>
       <g xmlns="http://www.w3.org/2000/svg" mask="url(#mask0_1396_13825)">
-        <rect width="16" height="16" fill="url(#pattern0)" />
+        <rect width="16" height="16" fill="url(#patternCWEdgeware)" />
       </g>
       <defs xmlns="http://www.w3.org/2000/svg">
         <pattern
-          id="pattern0"
+          id="patternCWEdgeware"
           patternContentUnits="objectBoundingBox"
           width="1"
           height="1"
@@ -1584,6 +1584,41 @@ export const CWEthereum = (props: IconProps) => {
         d="M7.99829 11.6467V15.3275L12.4991 8.98917L7.99829 11.6467Z"
         fill="#656167"
       ></path>
+    </svg>
+  );
+};
+
+export const CWEtherscan = (props: IconProps) => {
+  const {
+    className,
+    componentType,
+    disabled,
+    iconButtonTheme,
+    iconSize,
+    selected,
+    ...otherProps
+  } = props;
+
+  return (
+    <svg
+      width="15"
+      height="14"
+      viewBox="0 0 15 14"
+      fill="none"
+      className={getClasses<IconStyleProps>(
+        { className, disabled, iconButtonTheme, iconSize, selected },
+        componentType,
+      )}
+      {...otherProps}
+    >
+      <path
+        d="M3.41475 6.65794C3.41475 6.33478 3.68022 6.06932 4.00281 6.06932H4.99467C5.31782 6.06932 5.59449 6.33478 5.59449 6.6697V10.4103C5.70986 10.3756 5.8482 10.3409 6.01005 10.3061C6.22904 10.2485 6.39089 10.0524 6.39089 9.82114V5.17995C6.39089 4.85679 6.65636 4.57957 6.99071 4.57957H7.98258C8.30573 4.57957 8.5824 4.84503 8.5824 5.17995V9.48678C8.5824 9.48678 8.8249 9.38261 9.06685 9.279C9.25167 9.19836 9.36704 9.0253 9.36704 8.81696V3.67955C9.36704 3.3564 9.6325 3.07917 9.95566 3.07917H10.9475C11.2707 3.07917 11.5361 3.34464 11.5361 3.67955V7.91694C12.3897 7.2936 13.2667 6.54313 13.9589 5.64255C14.1667 5.37709 14.2244 5.03041 14.109 4.70726C12.8399 1.05905 8.84898 -0.88099 5.20357 0.389219C1.55816 1.65943 -0.379636 5.65375 0.888893 9.30253C1.02723 9.71809 1.21205 10.1107 1.43103 10.4915C1.60409 10.7917 1.92724 10.9648 2.27335 10.9301C2.45817 10.9183 2.68892 10.8953 2.97679 10.8606C3.23049 10.8376 3.41531 10.6181 3.41531 10.3638L3.41475 6.65794Z"
+        fill="#3D3A3E"
+      />
+      <path
+        d="M3.39136 12.6609C6.5176 14.9353 10.89 14.2425 13.1621 11.114C14.0274 9.91328 14.5001 8.47001 14.5001 6.99258C14.5001 6.83072 14.4883 6.66942 14.4771 6.50757C11.9283 10.3288 7.20983 12.1182 3.39136 12.6609Z"
+        fill="#3D3A3E"
+      />
     </svg>
   );
 };
@@ -3381,10 +3416,10 @@ export const CWGoogle = (props: IconProps) => {
       xmlns="http://www.w3.org/2000/svg"
       {...otherProps}
     >
-      <rect width="32" height="32" fill="url(#pattern0)" />
+      <rect width="32" height="32" fill="url(#patternCWGoogle)" />
       <defs>
         <pattern
-          id="pattern0"
+          id="patternCWGoogle"
           patternContentUnits="objectBoundingBox"
           width="1"
           height="1"

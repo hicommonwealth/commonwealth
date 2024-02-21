@@ -1,8 +1,8 @@
+import { ContentType } from '@hicommonwealth/core';
 import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { commentsByDate } from 'helpers/dates';
-import { featureFlags } from 'helpers/feature-flags';
 import { filterLinks, getThreadActionTooltipText } from 'helpers/threads';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
@@ -15,7 +15,6 @@ import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/view_thread/index.scss';
 import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
 import {
@@ -26,13 +25,13 @@ import {
   useAddThreadLinksMutation,
   useGetThreadsByIdQuery,
 } from 'state/api/threads';
-import { ContentType } from 'types';
 import { slugify } from 'utils';
 import ExternalLink from 'views/components/ExternalLink';
 import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import { PageNotFound } from 'views/pages/404';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
+import { useFlag } from '../../../hooks/useFlag';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import Poll from '../../../models/Poll';
 import { Link, LinkDisplay, LinkSource } from '../../../models/Thread';
@@ -81,6 +80,7 @@ type ViewThreadPageProps = {
 };
 
 const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
+  const proposalTemplatesEnabled = useFlag('proposalTemplates');
   const threadId = identifier.split('-')[0];
 
   const navigate = useCommonNavigate();
@@ -108,8 +108,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
-  const [searchParams] = useSearchParams();
-  const shouldFocusCommentEditor = !!searchParams.get('focusEditor');
 
   const { data: groups = [] } = useFetchGroupsQuery({
     communityId: app.activeChainId(),
@@ -252,7 +250,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     // load view count
     axios
       .post(`${app.serverUrl()}/viewCount`, {
-        chain: app.activeChainId(),
+        community_id: app.activeChainId(),
         object_id: thread.id,
       })
       .then((response) => {
@@ -313,9 +311,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     linkedThreads.length > 0 || isAuthor || isAdminOrMod;
 
   const showTemplateOptions =
-    featureFlags.proposalTemplates && (isAuthor || isAdminOrMod);
+    proposalTemplatesEnabled && (isAuthor || isAdminOrMod);
   const showLinkedTemplateOptions =
-    featureFlags.proposalTemplates && linkedTemplates.length > 0;
+    proposalTemplatesEnabled && linkedTemplates.length > 0;
 
   const hasSnapshotProposal = thread.links.find((x) => x.source === 'snapshot');
 
@@ -388,6 +386,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
     isThreadTopicGated: isRestrictedMembership,
+    action: 'comment',
   });
 
   return (
@@ -495,7 +494,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       }
                       slug={linkedTemplates[0]?.identifier.split('/')[2]}
                       setTemplateNickname={null}
-                      isForm={true}
+                      isForm
                     />
                   )}
                 {thread.readOnly || fromDiscordBot ? (
@@ -529,7 +528,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     <CreateComment
                       rootThread={thread}
                       canComment={canComment}
-                      shouldFocusEditor={shouldFocusCommentEditor}
                       tooltipText={disabledActionsTooltipText}
                     />
                     {foundGatedTopic &&

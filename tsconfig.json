@@ -11,12 +11,10 @@
     "traceResolution": false,
     "baseUrl": ".",
     "paths": {
-      "@hicommonwealth/*": ["libs/*/src"],
-      "common-common": ["packages/common-common"],
-      "common-common/*": ["packages/common-common/*"]
+      "@hicommonwealth/*": ["libs/*/src"]
     }
   },
-  "include": [],
+  "include": ["**/src"],
   "exclude": ["node_modules", "**/build"],
   "ts-node": {
     "require": ["tsconfig-paths/register"]

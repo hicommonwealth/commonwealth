@@ -1,11 +1,10 @@
+import { models, tester } from '@hicommonwealth/model';
 import { assert } from 'chai';
-import models from 'server/database';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
-import { resetDatabase } from '../../util/resetDatabase';
 
 describe('GetRelatedCommunities Tests', () => {
   before(async () => {
-    await resetDatabase();
+    await tester.seedDb();
   });
 
   it('Correctly returns nothing if base does not match chainNode', async () => {
@@ -24,7 +23,7 @@ describe('GetRelatedCommunities Tests', () => {
     assert.equal(response.length, 3);
 
     const ethereumCommunity = response.find((r) => r.community === 'Ethereum');
-    assert.equal(ethereumCommunity.address_count, 1);
+    assert.equal(ethereumCommunity.address_count, 2);
     assert.equal(ethereumCommunity.thread_count, 0);
     assert.equal(ethereumCommunity.icon_url, '/static/img/protocols/eth.png');
     assert.equal(ethereumCommunity.description, null);

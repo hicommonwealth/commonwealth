@@ -1,19 +1,21 @@
+import type {
+  AddressInstance,
+  ChainNodeAttributes,
+  CollaborationAttributes,
+  CommentInstance,
+  CommunityInstance,
+  ProfileAttributes,
+  ReactionAttributes,
+  ThreadInstance,
+  TopicAttributes,
+  UserInstance,
+} from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model';
 import jwt from 'jsonwebtoken';
 import moment from 'moment';
 import * as process from 'process';
 import Sequelize from 'sequelize';
-import models from 'server/database';
-import type { AddressInstance } from 'server/models/address';
-import type { ChainNodeAttributes } from 'server/models/chain_node';
-import type { CollaborationAttributes } from 'server/models/collaboration';
-import type { CommentInstance } from 'server/models/comment';
-import type { ReactionAttributes } from 'server/models/reaction';
-import type { ThreadInstance } from 'server/models/thread';
-import type { TopicAttributes } from 'server/models/topic';
-import type { UserInstance } from 'server/models/user';
 import { JWT_SECRET } from '../../../../server/config';
-import type { CommunityInstance } from '../../../../server/models/community';
-import type { ProfileAttributes } from '../../../../server/models/profile';
 
 const Op = Sequelize.Op;
 
@@ -136,7 +138,7 @@ export async function createTestEntities() {
             type: 'offchain',
             base: 'ethereum',
             // collapsed_on_homepage: true,
-            custom_stages: 'true',
+            custom_stages: [],
             // stages_enabled: true,
             // has_chain_events_listener: false,
             icon_url:
@@ -308,7 +310,7 @@ export async function createTestEntities() {
               reaction: 'like',
               address_id: -1,
               thread_id: -1,
-              chain: 'cmntest',
+              community_id: 'cmntest',
             },
           })
         )[0],
@@ -326,7 +328,7 @@ export async function createTestEntities() {
                 reaction: 'like',
                 address_id: -2,
                 comment_id: -2,
-                chain: 'cmntest',
+                community_id: 'cmntest',
               },
             })
           )[0],

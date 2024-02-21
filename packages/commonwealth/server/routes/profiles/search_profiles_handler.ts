@@ -1,5 +1,8 @@
-import { AppError } from '@hicommonwealth/adapters';
-import { SearchProfilesResult } from 'server/controllers/server_profiles_methods/search_profiles';
+import { AppError } from '@hicommonwealth/core';
+import {
+  MembershipFilters,
+  SearchProfilesResult,
+} from 'server/controllers/server_profiles_methods/search_profiles';
 import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
 import { ServerControllers } from '../../routing/router';
 import {
@@ -20,7 +23,7 @@ type SearchCommentsRequestParams = {
   search: string;
   community_id?: string;
   include_roles?: string;
-  memberships?: string;
+  memberships?: MembershipFilters;
   include_group_ids?: string;
 } & PaginationQueryParams;
 

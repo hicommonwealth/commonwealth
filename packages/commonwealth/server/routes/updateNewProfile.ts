@@ -1,8 +1,9 @@
+import type { DB } from '@hicommonwealth/model';
+import { ProfileAttributes } from '@hicommonwealth/model';
 import type { NextFunction } from 'express';
+import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { failure, success } from '../types';
-import type { DB } from '../models';
-import { ProfileAttributes } from '../models/profile';
 
 export const Errors = {
   NotAuthorized: 'Not authorized',
@@ -30,7 +31,7 @@ const updateNewProfile = async (
   models: DB,
   req: TypedRequestBody<UpdateNewProfileReq>,
   res: TypedResponse<UpdateNewProfileResp>,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const profile = await models.Profile.findOne({
     where: {
@@ -40,16 +41,11 @@ const updateNewProfile = async (
 
   if (!profile) return next(new Error(Errors.NoProfileFound));
 
-  const {
-    email,
-    slug,
-    name,
-    bio,
-    website,
-    avatarUrl,
-    socials,
-    backgroundImage,
-  } = req.body;
+  const { email, slug, name, website, avatarUrl, socials, backgroundImage } =
+    req.body;
+
+  let { bio } = req.body;
+  bio = sanitizeQuillText(bio, true);
 
   if (profile.user_id !== req.user.id) {
     return next(new Error(Errors.NotAuthorized));
@@ -71,7 +67,7 @@ const updateNewProfile = async (
         user_id: req.user.id,
       },
       returning: true,
-    }
+    },
   );
 
   if (!updateStatus || !rows) {

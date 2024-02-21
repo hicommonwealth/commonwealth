@@ -14,12 +14,7 @@ export const SERVER_URL =
 export const SESSION_SECRET = process.env.SESSION_SECRET || 'my secret';
 export const JWT_SECRET = process.env.JWT_SECRET || 'jwt secret';
 
-export const LOGIN_TOKEN_EXPIRES_IN = 30;
 export const ADDRESS_TOKEN_EXPIRES_IN = 10;
-
-export const ROLLBAR_SERVER_TOKEN = process.env.ROLLBAR_SERVER_TOKEN;
-
-export const ROLLBAR_ENV = process.env.ROLLBAR_ENV || 'local';
 
 export const SLACK_FEEDBACK_WEBHOOK = process.env.SLACK_FEEDBACK_WEBHOOK;
 
@@ -33,38 +28,17 @@ export const DATABASE_URI = process.env.USES_DOCKER_DB
   ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
   : process.env.DATABASE_URL;
 
-export const VULTR_IP = process.env.VULTR_IP;
-
 export const RABBITMQ_URI = (() => {
   if (!process.env.CLOUDAMQP_URL || process.env.NODE_ENV === 'development') {
-    if (
-      process.env.VULTR_RABBITMQ_CONTAINER_PORT &&
-      process.env.VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT
-    ) {
-      return `amqp://guest:guest@${process.env.VULTR_IP}:${process.env.VULTR_RABBITMQ_CONTAINER_PORT}`;
-    } else return 'amqp://127.0.0.1';
+    return 'amqp://127.0.0.1';
   } else return process.env.CLOUDAMQP_URL;
-})();
-
-export const RABBITMQ_API_URI = (() => {
-  if (
-    process.env.VULTR_RABBITMQ_CONTAINER_PORT &&
-    process.env.VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT
-  )
-    return `http://guest:guest@${process.env.VULTR_IP}:${process.env.VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT}/api`;
-  else return 'http://guest:guest@localhost:15672/api';
 })();
 
 // if a tls redis url is provided then that takes priority over everything else
 // then if a normal non-tls url is provided that is the second best option (local/staging)
-// finally, if no redis url is specified we use the Vultr redis instance (vultr)
 export const REDIS_URL = (() => {
   if (process.env.REDIS_TLS_URL) return process.env.REDIS_TLS_URL; // staging + production
   if (process.env.REDIS_URL) return process.env.REDIS_URL; // local + staging
-  if (process.env.VULTR_IP && process.env.VULTR_REDIS_CONTAINER_PORT)
-    // vultr
-    return `redis://${process.env.VULTR_IP}:${process.env.VULTR_REDIS_CONTAINER_PORT}`;
-
   return undefined;
 })();
 
@@ -72,8 +46,6 @@ export const REDIS_URL = (() => {
 // increased because of chain waitlist registrations
 export const LOGIN_RATE_LIMIT_TRIES = 15;
 export const LOGIN_RATE_LIMIT_MINS = 5;
-
-export const MIXPANEL_TOKEN = process.env.MIXPANEL_TOKEN;
 
 export const MAGIC_API_KEY = process.env.MAGIC_API_KEY;
 export const MAGIC_SUPPORTED_BASES = (process.env.MAGIC_SUPPORTED_BASES?.split(
@@ -115,9 +87,6 @@ export const SEND_WEBHOOKS_EMAILS =
   process.env.NODE_ENV === 'production' &&
   process.env.SEND_WEBHOOKS_EMAILS === 'true';
 
-export const FEATURE_FLAG_GROUP_CHECK_ENABLED =
-  process.env.FEATURE_FLAG_GROUP_CHECK_ENABLED === 'true' || false;
-
 export const MEMBERSHIP_REFRESH_BATCH_SIZE = process.env
   .MEMBERSHIP_REFRESH_BATCH_SIZE
   ? parseInt(process.env.MEMBERSHIP_REFRESH_BATCH_SIZE, 10)
@@ -133,3 +102,11 @@ export const TBC_BALANCE_TTL_SECONDS = process.env.TBC_BALANCE_TTL_SECONDS
   : 300;
 
 export const PRERENDER_TOKEN = process.env.PRERENDER_TOKEN;
+
+export const REACTION_WEIGHT_OVERRIDE = process.env.REACTION_WEIGHT_OVERRIDE
+  ? parseInt(process.env.REACTION_WEIGHT_OVERRIDE, 10)
+  : null;
+
+export const GENERATE_IMAGE_RATE_LIMIT = process.env.GENERATE_IMAGE_RATE_LIMIT
+  ? parseInt(process.env.GENERATE_IMAGE_RATE_LIMIT, 10)
+  : 10;

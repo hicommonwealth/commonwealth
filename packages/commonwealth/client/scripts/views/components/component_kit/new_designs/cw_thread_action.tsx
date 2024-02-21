@@ -21,7 +21,8 @@ export type ActionType =
   | 'reply'
   | 'share'
   | 'subscribe'
-  | 'overflow';
+  | 'overflow'
+  | 'view-upvotes';
 
 const commonProps = (disabled: boolean) => {
   return {
@@ -167,7 +168,7 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
         )}
       >
         {renderPhosphorIcon(action, disabled, selected)}
-        {action !== 'overflow' && action && (
+        {action !== 'overflow' && action && label && (
           <CWText
             className={getClasses({
               disabled,
@@ -176,7 +177,7 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
             type="caption"
             fontWeight="regular"
           >
-            {label || action.charAt(0).toUpperCase() + action.slice(1)}
+            {label}
           </CWText>
         )}
       </button>

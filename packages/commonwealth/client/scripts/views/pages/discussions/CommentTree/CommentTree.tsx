@@ -1,3 +1,4 @@
+import { ContentType } from '@hicommonwealth/core';
 import clsx from 'clsx';
 import { SessionKeyError } from 'controllers/server/sessions';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
@@ -12,7 +13,6 @@ import {
   useFetchCommentsQuery,
   useToggleCommentSpamStatusMutation,
 } from 'state/api/comments';
-import { ContentType } from 'types';
 import { CreateComment } from 'views/components/Comments/CreateComment';
 import {
   deserializeDelta,
@@ -332,6 +332,7 @@ export const CommentTree = ({
             isEditing: false,
           },
         }));
+
         setIsGloballyEditing(false);
         clearEditingLocalStorage(comment.id, ContentType.Comment);
       } catch (err) {

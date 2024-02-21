@@ -1,5 +1,5 @@
+import { sequelize } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
-import { sequelize } from '../../database';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 /**

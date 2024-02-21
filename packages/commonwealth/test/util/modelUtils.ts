@@ -16,7 +16,6 @@ import {
 import { Keyring } from '@polkadot/api';
 import { stringToU8a } from '@polkadot/util';
 import chai from 'chai';
-import 'chai/register-should';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
@@ -25,13 +24,13 @@ import { createRole, findOneRole } from '../../server/util/roles';
 
 import { createCanvasSessionPayload } from '../../shared/canvas';
 
+import type { Role } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model';
 import { mnemonicGenerate } from '@polkadot/util-crypto';
 import Web3 from 'web3-utils';
 import app from '../../server-test';
-import models from '../../server/database';
-import type { Role } from '../../server/models/role';
 
-import { Link, LinkSource, ThreadAttributes } from '../../server/models/thread';
+import { Link, LinkSource, ThreadAttributes } from '@hicommonwealth/model';
 import {
   TEST_BLOCK_INFO_BLOCKHASH,
   TEST_BLOCK_INFO_STRING,
@@ -53,6 +52,18 @@ export const generateEthAddress = () => {
   return { keypair, address };
 };
 
+export const getTopicId = async ({ chain }) => {
+  const res = await chai.request
+    .agent(app)
+    .get('/api/topics')
+    .set('Accept', 'application/json')
+    .query({
+      community_id: chain,
+    });
+  const topicId = res.body.result[0].id;
+  return topicId;
+};
+
 export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
   if (chain === 'ethereum' || chain === 'alex') {
     const wallet_id = 'metamask';
@@ -61,7 +72,12 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .agent(app)
       .post('/api/createAddress')
       .set('Accept', 'application/json')
-      .send({ address, chain, wallet_id, block_info: TEST_BLOCK_INFO_STRING });
+      .send({
+        address,
+        community_id: chain,
+        wallet_id,
+        block_info: TEST_BLOCK_INFO_STRING,
+      });
     const address_id = res.body.result.id;
     const chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
     const sessionWallet = ethers.Wallet.createRandom();
@@ -93,7 +109,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .set('Accept', 'application/json')
       .send({
         address,
-        chain,
+        community_id: chain,
         chain_id,
         signature,
         wallet_id,
@@ -129,7 +145,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .agent(app)
       .post('/api/createAddress')
       .set('Accept', 'application/json')
-      .send({ address: keyPair.address, chain, wallet_id });
+      .send({ address: keyPair.address, community_id: chain, wallet_id });
 
     // generate session wallet
     const sessionKeyring = new Keyring();
@@ -162,7 +178,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .agent(app)
       .post('/api/verifyAddress')
       .set('Accept', 'application/json')
-      .send({ address, chain, signature, wallet_id });
+      .send({ address, community_id: chain, signature, wallet_id });
     const user_id = res.body.result.user.id;
     const email = res.body.result.user.email;
     return {
@@ -205,7 +221,6 @@ export interface ThreadArgs {
   stage?: string;
   chainId: string;
   title: string;
-  topicName?: string;
   topicId?: number;
   body?: string;
   url?: string;
@@ -223,7 +238,6 @@ export const createThread = async (
     jwt,
     title,
     body,
-    topicName,
     topicId,
     readOnly,
     kind,
@@ -268,7 +282,6 @@ export const createThread = async (
       title: encodeURIComponent(title),
       body: encodeURIComponent(body),
       kind,
-      topic_name: topicName,
       topic_id: topicId,
       url,
       readOnly: readOnly || false,
@@ -688,11 +701,11 @@ export const joinCommunity = async (args: JoinCommunityArgs) => {
   try {
     await chai.request
       .agent(app)
-      .post('/api/linkExistingAddressToChain')
+      .post('/api/linkExistingAddressToCommunity')
       .set('Accept', 'application/json')
       .send({
         address,
-        chain,
+        community_id: chain,
         originChain,
         jwt,
       });

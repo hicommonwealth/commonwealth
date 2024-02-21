@@ -1,11 +1,6 @@
 import { Log } from '@ethersproject/providers';
-import {
-  StatsDController,
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/adapters';
+import { logger as _logger, stats } from '@hicommonwealth/core';
 import { ethers } from 'ethers';
-import { rollbar } from '../../util/rollbar';
 import {
   AbiSignatures,
   ContractSources,
@@ -13,7 +8,7 @@ import {
   RawEvmEvent,
 } from './types';
 
-const logger = loggerFactory.getLogger(formatFilename(__filename));
+const logger = _logger().getLogger(__filename);
 
 /**
  * Converts a string or integer number into a hexadecimal string that adheres to the following guidelines
@@ -49,8 +44,7 @@ export async function getLogs(
   const currentBlockNum = await provider.getBlockNumber();
 
   if (Object.keys(evmSource.contracts).length === 0) {
-    logger.warn(`No contracts given`);
-    rollbar.error(`No contracts given`);
+    logger.error(`No contracts given`);
     return { logs: [], lastBlockNum: currentBlockNum };
   }
 
@@ -90,8 +84,7 @@ export async function parseLogs(
     if (!signature) continue;
 
     if (!data.abi || !Array.isArray(data.abi) || data.abi.length === 0) {
-      logger.warn(`Invalid ABI for contract ${address}`);
-      rollbar.error(`Invalid ABI for contract ${address}`);
+      logger.error(`Invalid ABI for contract ${address}`);
       continue;
     }
 
@@ -105,10 +98,9 @@ export async function parseLogs(
     } catch (e) {
       const msg = `Failed to parse log from contract ${address} with signature ${log.topics[0]}`;
       logger.error(msg, e);
-      rollbar.error(msg, e);
       continue;
     }
-    StatsDController.get().increment('ce.evm.event', {
+    stats().increment('ce.evm.event', {
       contractAddress: address,
       kind: signature.kind,
     });

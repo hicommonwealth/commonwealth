@@ -8,7 +8,7 @@ import WebWalletController from 'controllers/app/web_wallets';
 import useWallets from 'hooks/useWallets';
 import app from 'state';
 import _ from 'underscore';
-import { CWAuthButton } from 'views/components/component_kit/cw_auth_button';
+import { CWAuthButton } from 'views/components/component_kit/CWAuthButtonOld';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -136,7 +136,7 @@ const SessionRevalidationModal = ({
                   label="email address"
                   placeholder="your-email@email.com"
                   onInput={(e) => setEmail(e.target.value)}
-                  onenterkey={onEmailLogin}
+                  onenterkey={async () => await onEmailLogin()}
                 />
               ) : (
                 <CWSpinner />
@@ -147,7 +147,10 @@ const SessionRevalidationModal = ({
                   buttonType="secondary-blue"
                   onClick={() => setConnectWithEmail(false)}
                 />
-                <CWButton label="Connect" onClick={onEmailLogin} />
+                <CWButton
+                  label="Connect"
+                  onClick={async () => await onEmailLogin()}
+                />
               </div>
             </div>
           ) : (

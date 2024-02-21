@@ -1,3 +1,4 @@
+import { models } from '@hicommonwealth/model';
 import bodyParser from 'body-parser';
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
@@ -7,8 +8,6 @@ import express from 'express';
 import session from 'express-session';
 import passport from 'passport';
 import { SESSION_SECRET } from 'server/config';
-import models from 'server/database';
-import { addExternalRoutes } from 'server/routing/external';
 import setupPassport from '../../../../server/passport/index';
 
 chai.use(chaiHttp);
@@ -40,8 +39,6 @@ before(async () => {
   setupPassport(models);
   app.use(passport.initialize());
   app.use(passport.session());
-
-  addExternalRoutes('/api', app, models);
 });
 
 export async function get(

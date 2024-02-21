@@ -1,12 +1,13 @@
 import {
+  HotShotsStats,
   RabbitMQController,
   RascalConfigServices,
   ServiceKey,
-  formatFilename,
+  TypescriptLoggingLogger,
   getRabbitMQConfig,
-  loggerFactory,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
+import { logger, stats } from '@hicommonwealth/core';
 import {
   Client,
   IntentsBitField,
@@ -15,14 +16,10 @@ import {
   ThreadChannel,
 } from 'discord.js';
 import v8 from 'v8';
-import {
-  handleMessage,
-  handleThreadChannel,
-} from '../discord-listener/handlers';
 import { DISCORD_TOKEN, RABBITMQ_URI } from '../utils/config';
-import { rollbar } from '../utils/rollbar';
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger(TypescriptLoggingLogger()).getLogger(__filename);
+stats(HotShotsStats());
 
 let isServiceHealthy = false;
 
@@ -42,6 +39,11 @@ log.info(
 );
 
 async function startDiscordListener() {
+  // async imports to delay calling logger
+  const { handleMessage, handleThreadChannel } = await import(
+    '../discord-listener/handlers'
+  );
+
   const controller = new RabbitMQController(
     getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.DiscobotService),
   );
@@ -116,5 +118,5 @@ async function startDiscordListener() {
 }
 
 startDiscordListener().catch((e) => {
-  rollbar.critical(e);
+  log.fatal(e);
 });

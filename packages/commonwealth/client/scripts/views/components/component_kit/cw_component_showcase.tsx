@@ -6,8 +6,8 @@ import 'components/component_kit/new_designs/cw_button.scss';
 
 import { notifySuccess } from 'controllers/app/notifications';
 import { CWAccountCreationButton } from './cw_account_creation_button';
-import { CWAuthButton } from './cw_auth_button';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
+import { CWAuthButton } from './CWAuthButtonOld';
 
 import { DeltaStatic } from 'quill';
 import app from 'state';
@@ -31,7 +31,7 @@ import {
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { AvatarUpload } from '../Avatar';
-import CommunityStakeBanner from '../CommunityStakeBanner';
+import { CommunityStakeBanner, VoteWeightModule } from '../CommunityStake';
 import UpvotePopover from '../UpvotePopover';
 import { CWCard } from './cw_card';
 import { CWCheckbox } from './cw_checkbox';
@@ -56,6 +56,7 @@ import { CWThreadAction } from './new_designs/cw_thread_action';
 import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
 import { CWUpvote } from './new_designs/cw_upvote';
 import { CWCircleButton } from './new_designs/CWCircleButton/CWCircleButton';
+import CWDrawer from './new_designs/CWDrawer';
 import { CWForm } from './new_designs/CWForm';
 import CWIconButton from './new_designs/CWIconButton';
 import { CWModal, CWModalBody, CWModalHeader } from './new_designs/CWModal';
@@ -69,7 +70,6 @@ import { CWTag } from './new_designs/CWTag';
 import { CWTextInput } from './new_designs/CWTextInput';
 import { CWTooltip } from './new_designs/CWTooltip';
 import { CWTypeaheadSelectList } from './new_designs/CWTypeaheadSelectList';
-import CWVoteWeightModule from './new_designs/CWVoteWeightModule';
 import { createColumnInfo, makeData, optionList } from './showcase_helpers';
 
 const displayIcons = (icons) => {
@@ -209,6 +209,16 @@ const tagsList = [
   { label: 'Sixth', id: 5 },
 ];
 
+const tabsList = [
+  { label: 'First boxed tab', id: 0 },
+  {
+    label: 'Second boxed tab is very long so it gets truncated at some point',
+    id: 1,
+  },
+  { label: 'Third is with Icon', id: 2, iconLeft: 'eye' },
+  { label: 'Fourth - disabled', id: 3, disabled: true },
+];
+
 export const ComponentShowcase = () => {
   const [isSmallToggled, setIsSmallToggled] = useState<boolean>(false);
   const [isLargeToggled, setIsLargeToggled] = useState<boolean>(false);
@@ -237,10 +247,13 @@ export const ComponentShowcase = () => {
   const allCommunities = app.config.chains.getAll();
   const [communityId, setCommunityId] = useState(allCommunities[1]);
   const [currentTab, setCurrentTab] = useState(tagsList[0].id);
+  const [currentBoxedTab, setCurrentBoxedTab] = useState(tabsList[0].id);
 
   const unstyledPopoverProps = usePopover();
   const styledPopoverProps = usePopover();
   const upvotePopoverProps = usePopover();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isLeftDrawerOpen, setIsLeftDrawerOpen] = useState(false);
 
   const renderModal = (size?: ModalSize) => {
     return (
@@ -626,7 +639,7 @@ export const ComponentShowcase = () => {
         <div className="tag-row">
           <CWText type="h4">Login User Tag</CWText>
           <CWTag label="mnh7a" type="login" iconName="cosmos" />
-          <CWTag label="mnh7a" type="login" iconName="discordLogin" />
+          <CWTag label="mnh7a" type="login" iconName="discordOld" />
           <CWTag label="mnh7a" type="login" iconName="discord" />
           <CWTag label="mnh7a" type="login" iconName="envelope" />
           <CWTag label="mnh7a" type="login" iconName="ethereum" />
@@ -639,11 +652,7 @@ export const ComponentShowcase = () => {
         <div className="tag-row">
           <CWText type="h4">Address Tags</CWText>
           <CWTag label="0xd83e1...a39bD" type="address" iconName="cosmos" />
-          <CWTag
-            label="0xd83e1...a39bD"
-            type="address"
-            iconName="discordLogin"
-          />
+          <CWTag label="0xd83e1...a39bD" type="address" iconName="discord" />
           <CWTag label="0xd83e1...a39bD" type="address" iconName="envelope" />
           <CWTag label="0xd83e1...a39bD" type="address" iconName="ethereum" />
           <CWTag label="0xd83e1...a39bD" type="address" iconName="octocat" />
@@ -1207,6 +1216,21 @@ export const ComponentShowcase = () => {
               showTag={tab.showTag}
               isSelected={currentTab === tab.id}
               onClick={() => setCurrentTab(tab.id)}
+            />
+          ))}
+        </CWTabsRow>
+
+        <CWText type="h3">Boxed Tabs</CWText>
+        <CWTabsRow boxed={true}>
+          {tabsList.map((tab) => (
+            <CWTab
+              boxed={true}
+              key={tab.id}
+              label={tab.label}
+              isDisabled={tab.disabled}
+              iconLeft={tab.iconLeft as IconName}
+              isSelected={currentBoxedTab === tab.id}
+              onClick={() => setCurrentBoxedTab(tab.id)}
             />
           ))}
         </CWTabsRow>
@@ -2159,12 +2183,58 @@ export const ComponentShowcase = () => {
       </div>
       <div>
         <CWText type="h3">Vote Weight Module</CWText>
-        <CWVoteWeightModule
+        <VoteWeightModule
           voteWeight={100}
           stakeNumber={1}
           stakeValue={0.072}
           denomination="ETH"
+          onOpenStakeModal={() => console.log('open modal')}
         />
+      </div>
+      <div className="drawer-container">
+        <CWButton
+          buttonHeight="sm"
+          label="Open Default Drawer"
+          onClick={() => setIsDrawerOpen(true)}
+        />
+
+        <CWDrawer
+          open={isDrawerOpen}
+          header="Lorem Ipsum"
+          onClose={() => setIsDrawerOpen(false)}
+        >
+          <div>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis
+            porttitor vel erat nec eleifend. Nullam sit amet dui et eros luctus
+            facilisis et id eros. In a lacus in nisl facilisis euismod. In non
+            congue sapien. Donec quis lorem libero. Nunc malesuada nunc ac eros
+            sodales sodales. Nullam tempus justo ut consectetur lacinia.
+            Vestibulum non dui vel ante molestie gravida. Maecenas sed consequat
+            tellus, ac fermentum ex.
+          </div>
+        </CWDrawer>
+
+        <CWButton
+          buttonHeight="sm"
+          label="Open Left Drawer"
+          onClick={() => setIsLeftDrawerOpen(true)}
+        />
+        <CWDrawer
+          open={isLeftDrawerOpen}
+          header="Lorem Ipsum"
+          onClose={() => setIsLeftDrawerOpen(false)}
+          direction="left"
+        >
+          <div>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis
+            porttitor vel erat nec eleifend. Nullam sit amet dui et eros luctus
+            facilisis et id eros. In a lacus in nisl facilisis euismod. In non
+            congue sapien. Donec quis lorem libero. Nunc malesuada nunc ac eros
+            sodales sodales. Nullam tempus justo ut consectetur lacinia.
+            Vestibulum non dui vel ante molestie gravida. Maecenas sed consequat
+            tellus, ac fermentum ex.
+          </div>
+        </CWDrawer>
       </div>
     </div>
   );

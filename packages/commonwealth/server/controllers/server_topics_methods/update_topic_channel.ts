@@ -1,7 +1,6 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
+import { UserInstance } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import { CommunityInstance } from '../../models/community';
-import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
 import { ServerTopicsController } from '../server_topics_controller';
 
@@ -13,7 +12,6 @@ const Errors = {
 
 export type UpdateTopicChannelOptions = {
   user: UserInstance;
-  community: CommunityInstance;
   topicId: number;
   channelId: string;
 };
@@ -22,29 +20,24 @@ export type UpdateTopicChannelResult = void;
 
 export async function __updateTopicChannel(
   this: ServerTopicsController,
-  { user, community, topicId, channelId }: UpdateTopicChannelOptions,
+  { user, topicId, channelId }: UpdateTopicChannelOptions,
 ): Promise<UpdateTopicChannelResult> {
+  const topic = await this.models.Topic.findByPk(topicId);
+  if (!topic) {
+    throw new AppError(Errors.MissingTopic);
+  }
+
   const isAdmin = await validateOwner({
     models: this.models,
     user: user,
-    communityId: community.id,
+    communityId: topic.community_id,
     allowMod: true,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
 
   if (!isAdmin) {
     throw new AppError(Errors.NotAdmin);
-  }
-
-  const topic = await this.models.Topic.findOne({
-    where: {
-      id: topicId,
-    },
-  });
-
-  if (!topic) {
-    throw new AppError(Errors.MissingTopic);
   }
 
   // Find previous topic associated with channel
@@ -88,7 +81,7 @@ export async function __updateTopicChannel(
     // No previous topic associated with channel. Set all threads with channel id to new topic
     const threadsOnTopicFromDiscordBot = await this.models.Thread.findAll({
       where: {
-        community_id: community.id,
+        community_id: topic.community_id,
         // discord meta is not null
         discord_meta: {
           channel_id: channelId,

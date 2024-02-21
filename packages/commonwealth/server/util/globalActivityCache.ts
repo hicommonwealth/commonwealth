@@ -1,18 +1,12 @@
-import {
-  RedisCache,
-  formatFilename,
-  loggerFactory,
-} from '@hicommonwealth/adapters';
-import { RedisNamespaces } from '@hicommonwealth/core';
+import { CacheNamespaces, cache, logger } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
+import { AddressAttributes } from '@hicommonwealth/model';
 import { v4 as uuidv4 } from 'uuid';
-import type { DB } from '../models';
-import { AddressAttributes } from '../models/address';
 import {
   ActivityRow,
   getActivityFeed,
   type GlobalActivity,
 } from './activityQuery';
-import { rollbar } from './rollbar';
 
 type GlobalActivityJson = Array<
   Omit<ActivityRow, 'commenters'> & {
@@ -20,7 +14,7 @@ type GlobalActivityJson = Array<
   }
 >;
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 export default class GlobalActivityCache {
   private _cacheKey = 'global_activity';
@@ -29,7 +23,6 @@ export default class GlobalActivityCache {
 
   constructor(
     private _models: DB,
-    private _redisCache: RedisCache,
     private _cacheTTL: number = 60 * 5, // cache TTL in seconds
   ) {}
 
@@ -42,8 +35,8 @@ export default class GlobalActivityCache {
   public async getGlobalActivity(): Promise<
     GlobalActivityJson | GlobalActivity
   > {
-    const activity = await this._redisCache.getKey(
-      RedisNamespaces.Activity_Cache,
+    const activity = await cache().getKey(
+      CacheNamespaces.Activity_Cache,
       this._cacheKey,
     );
 
@@ -51,7 +44,6 @@ export default class GlobalActivityCache {
       if (this._initialized) {
         const msg = 'Failed to fetch global activity from Redis';
         log.error(msg);
-        rollbar.error(msg);
       }
       return await getActivityFeed(this._models);
     }
@@ -65,8 +57,8 @@ export default class GlobalActivityCache {
     const errorMsg = 'Failed to update global activity in Redis';
 
     try {
-      const res = await this._redisCache.getKey(
-        RedisNamespaces.Activity_Cache,
+      const res = await cache().getKey(
+        CacheNamespaces.Activity_Cache,
         this._cacheKey,
       );
 
@@ -93,18 +85,16 @@ export default class GlobalActivityCache {
 
       if (!updated) return;
 
-      const result = await this._redisCache.setKey(
-        RedisNamespaces.Activity_Cache,
+      const result = await cache().setKey(
+        CacheNamespaces.Activity_Cache,
         this._cacheKey,
         JSON.stringify(activity),
       );
       if (!result) {
         log.error(errorMsg);
-        rollbar.error(errorMsg);
       }
     } catch (e) {
       log.error(errorMsg, e);
-      rollbar.error(errorMsg, e);
     }
   }
 
@@ -118,8 +108,8 @@ export default class GlobalActivityCache {
       }
 
       const activity = await getActivityFeed(this._models);
-      const result = await this._redisCache.setKey(
-        RedisNamespaces.Activity_Cache,
+      const result = await cache().setKey(
+        CacheNamespaces.Activity_Cache,
         this._cacheKey,
         JSON.stringify(activity),
       );
@@ -127,7 +117,6 @@ export default class GlobalActivityCache {
       if (!result) {
         const msg = 'Failed to save global activity in Redis';
         log.error(msg);
-        rollbar.error(msg);
         return;
       }
 
@@ -135,13 +124,12 @@ export default class GlobalActivityCache {
     } catch (e) {
       const msg = 'Failed to refresh the global cache';
       log.error(msg, e);
-      rollbar.error(msg, e);
     }
   }
 
   private async acquireLock() {
-    return await this._redisCache.setKey(
-      RedisNamespaces.Activity_Cache,
+    return await cache().setKey(
+      CacheNamespaces.Activity_Cache,
       this._lockName,
       uuidv4(),
       // shorten by 5 seconds to eliminate any discrepancies

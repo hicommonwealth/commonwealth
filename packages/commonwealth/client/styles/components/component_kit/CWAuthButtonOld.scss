@@ -1,0 +1,56 @@
+@import '../../shared';
+
+.WalletOptionRow {
+  align-items: center;
+  border: 2px solid $neutral-100;
+  border-radius: $border-radius-corners;
+  box-shadow: $elevation-1;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  height: 40px;
+  padding: 2px 16px;
+  width: 272px;
+
+  .CustomIcon,
+  .Icon {
+    margin-right: 16px;
+  }
+
+  &:hover {
+    background-color: $neutral-50;
+  }
+
+  &:active {
+    background-color: $neutral-100;
+    border-color: $neutral-300;
+    box-shadow: none;
+  }
+
+  &.disabled {
+    opacity: 0.2;
+    pointer-events: none;
+  }
+
+  &.darkMode {
+    background-color: $neutral-700;
+    border: 2px solid $neutral-700;
+    box-shadow: none;
+
+    .wallet-option-text.Text {
+      color: $white;
+    }
+
+    &:hover {
+      background-color: $neutral-600;
+    }
+
+    &:active {
+      border-color: $primary-200;
+
+      .wallet-option-text.Text {
+        color: $primary-200;
+      }
+    }
+  }
+}

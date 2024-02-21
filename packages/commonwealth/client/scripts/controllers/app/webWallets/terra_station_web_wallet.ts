@@ -4,18 +4,20 @@ import type IWebWallet from '../../../models/IWebWallet';
 
 import type { SessionPayload } from '@canvas-js/interfaces';
 
-import app from 'state';
-
 type TerraAddress = {
   address: string;
 };
+
+declare global {
+  interface Window {
+    station?: any;
+  }
+}
 
 class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
   private _enabled: boolean;
   private _accounts: TerraAddress[] = [];
   private _enabling = false;
-  private _terra;
-  private _extension;
 
   public readonly name = WalletId.TerraStation;
   public readonly label = 'Station';
@@ -24,7 +26,7 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
   public readonly specificChains = ['terra'];
 
   public get available() {
-    return !!window.isTerraExtensionAvailable;
+    return !!window.station;
   }
 
   public get enabled() {
@@ -44,18 +46,11 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
   // }
 
   public async enable() {
-    this._terra = await import('@terra-money/terra.js');
-    this._extension = new this._terra.Extension();
     console.log('Attempting to enable Station');
     this._enabling = true;
 
-    // use a promise so that this function returns *after* the wallet has connected
-    const accountAddr = await new Promise<TerraAddress>((resolve) => {
-      this._extension.once('onConnect', resolve);
-      this._extension.connect();
-    }).catch((error) => {
-      console.error(`Failed to enabled Station ${error.message}`);
-    });
+    const connectResult = await window.station.connect();
+    const accountAddr = connectResult?.address;
 
     if (accountAddr && !this._accounts.includes(accountAddr)) {
       this._accounts.push(accountAddr);
@@ -71,21 +66,17 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
   }
 
   public async getRecentBlock(chainIdentifier: string) {
-    const client = new this._terra.LCDClient({
-      URL: app.chain.meta.ChainNode.url,
-      chainID: chainIdentifier,
-    });
-    const tmClient = new this._terra.TendermintAPI(client);
-    const blockInfo = await tmClient.blockInfo();
+    const url = `${window.location.origin}/cosmosAPI/${chainIdentifier}`;
+    const cosm = await import('@cosmjs/stargate');
+    const client = await cosm.StargateClient.connect(url);
+    const height = await client.getHeight();
+    const block = await client.getBlock(height - 2); // validator pool may be out of sync
 
     return {
-      number: parseInt(blockInfo.block.header.height),
-      // TODO: is this the hash we should use? the terra.js API has no documentation
-      hash: blockInfo.block.header.data_hash,
+      number: block.header.height,
+      hash: block.id,
       // seconds since epoch
-      timestamp: Math.floor(
-        new Date(blockInfo.block.header.time).getTime() / 1000,
-      ),
+      timestamp: Math.floor(new Date(block.header.time).getTime() / 1000),
     };
   }
 
@@ -95,21 +86,17 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
   ): Promise<string> {
     // timeout?
     const canvas = await import('@canvas-js/interfaces');
-    const result = await new Promise<any>((resolve, reject) => {
-      this._extension.on('onSign', (payload) => {
-        if (payload.result?.signature) resolve(payload.result);
-        else reject();
-      });
-      try {
-        this._extension.signBytes({
-          bytes: Buffer.from(
-            canvas.serializeSessionPayload(canvasSessionPayload),
-          ),
-        });
-      } catch (error) {
-        console.error(error);
-      }
-    });
+    let result;
+
+    try {
+      const signBytesResult = await window.station.signBytes(
+        Buffer.from(canvas.serializeSessionPayload(canvasSessionPayload)),
+      );
+
+      result = signBytesResult;
+    } catch (error) {
+      console.error(error);
+    }
 
     return JSON.stringify({
       pub_key: {

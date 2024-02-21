@@ -1,6 +1,6 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
+import { TopicAttributes } from '@hicommonwealth/model';
 import z from 'zod';
-import { TopicAttributes } from '../../models/topic';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -20,7 +20,7 @@ export const deleteTopicHandler = async (
   req: TypedRequest<DeleteTopicRequestBody, any, DeleteTopicRequestParams>,
   res: TypedResponse<DeleteTopicResponse>,
 ) => {
-  const { user, community } = req;
+  const { user } = req;
   const { topicId } = req.params;
 
   const validationSchema = z.coerce.number();
@@ -33,7 +33,6 @@ export const deleteTopicHandler = async (
 
   await controllers.topics.deleteTopic({
     user,
-    community,
     topicId: validationResult.data,
   });
 

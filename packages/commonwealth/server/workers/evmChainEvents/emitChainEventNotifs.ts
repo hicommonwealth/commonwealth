@@ -1,16 +1,20 @@
-import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
-import { NotificationCategories, SupportedNetwork } from '@hicommonwealth/core';
+import {
+  NotificationCategories,
+  NotificationDataAndCategory,
+  SupportedNetwork,
+  logger,
+} from '@hicommonwealth/core';
+import {
+  CommunityAttributes,
+  ContractAttributes,
+  NotificationInstance,
+  models,
+} from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
-import { NotificationDataAndCategory } from 'types';
-import models from '../../database';
-import { CommunityAttributes } from '../../models/community';
-import { ContractAttributes } from '../../models/contract';
-import { NotificationInstance } from '../../models/notification';
 import emitNotifications from '../../util/emitNotifications';
-import { rollbar } from '../../util/rollbar';
 import { RawEvmEvent } from './types';
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 export async function emitChainEventNotifs(
   chainNodeId: number,
@@ -69,7 +73,6 @@ export async function emitChainEventNotifs(
     } catch (e) {
       const msg = `Error formatting event: ${JSON.stringify(event, null, 2)}`;
       log.error(msg, e);
-      rollbar.error(msg, e);
       continue;
     }
 
@@ -81,7 +84,6 @@ export async function emitChainEventNotifs(
           2,
         )}`;
         log.error(msg, e);
-        rollbar.error(msg, e);
       }),
     );
   }

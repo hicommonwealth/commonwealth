@@ -1,9 +1,9 @@
-import { AppError } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import AWS from 'aws-sdk';
 
+import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
-import type { DB } from '../models';
 
 AWS.config.update({
   signatureVersion: 'v4',

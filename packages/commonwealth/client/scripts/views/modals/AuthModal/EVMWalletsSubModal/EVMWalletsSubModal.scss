@@ -1,0 +1,62 @@
+@import '../../../../../styles/shared';
+
+.EVMWalletsSubModal {
+  background-color: black;
+
+  .CWModal {
+    border-radius: 24px;
+    box-shadow: none;
+    background: transparent;
+  }
+
+  .container {
+    background-color: $gray-900;
+    color: white !important;
+    border-radius: 24px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 370px;
+    padding: 24px 12px;
+    gap: 24px;
+
+    @include extraSmall {
+      min-width: auto;
+    }
+
+    .header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      padding: 0 24px;
+
+      .Text {
+        margin-left: 24px;
+        color: white !important;
+      }
+
+      .Icon {
+        cursor: pointer;
+      }
+    }
+
+    .evm-wallet-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+
+      .wallet-connect-reset-btn {
+        margin-left: auto;
+        color: $neutral-400;
+        outline: none;
+        border: none;
+        background-color: transparent;
+        font-size: 14px;
+        margin-bottom: 16px;
+        cursor: pointer;
+      }
+    }
+  }
+}

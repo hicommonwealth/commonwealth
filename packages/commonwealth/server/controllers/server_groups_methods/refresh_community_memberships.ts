@@ -1,57 +1,63 @@
-import { formatFilename, loggerFactory } from '@hicommonwealth/adapters';
+import { AppError, logger } from '@hicommonwealth/core';
+import {
+  AddressAttributes,
+  Balances,
+  DB,
+  GroupAttributes,
+  MembershipAttributes,
+  MembershipRejectReason,
+  OptionsWithBalances,
+  tokenBalanceCache,
+} from '@hicommonwealth/model';
 import moment from 'moment';
 import { Op, Sequelize } from 'sequelize';
 import {
   MEMBERSHIP_REFRESH_BATCH_SIZE,
   MEMBERSHIP_REFRESH_TTL_SECONDS,
 } from '../../config';
-import { DB } from '../../models';
-import { AddressAttributes } from '../../models/address';
-import { CommunityInstance } from '../../models/community';
-import { GroupAttributes } from '../../models/group';
-import {
-  MembershipAttributes,
-  MembershipRejectReason,
-} from '../../models/membership';
 import { makeGetBalancesOptions } from '../../util/requirementsModule/makeGetBalancesOptions';
 import validateGroupMembership from '../../util/requirementsModule/validateGroupMembership';
-import {
-  Balances,
-  OptionsWithBalances,
-} from '../../util/tokenBalanceCache/types';
 import { ServerGroupsController } from '../server_groups_controller';
 
-const log = loggerFactory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
+
+const Errors = {
+  GroupNotFound: 'Group not found',
+};
 
 export type RefreshCommunityMembershipsOptions = {
-  community: CommunityInstance;
-  group?: GroupAttributes;
+  communityId: string;
+  groupId?: number;
 };
 
 export type RefreshCommunityMembershipsResult = MembershipAttributes[];
 
 export async function __refreshCommunityMemberships(
   this: ServerGroupsController,
-  { community, group }: RefreshCommunityMembershipsOptions,
+  { communityId, groupId }: RefreshCommunityMembershipsOptions,
 ): Promise<void> {
   const communityStartedAt = Date.now();
 
   let groupsToUpdate: GroupAttributes[];
-  if (group) {
+  if (groupId) {
+    const group = await this.models.Group.findByPk(groupId);
+    if (!group) {
+      throw new AppError(Errors.GroupNotFound);
+    }
     groupsToUpdate = [group];
   } else {
-    groupsToUpdate = await this.getGroups({ community });
+    groupsToUpdate = await this.getGroups({ communityId });
   }
 
   log.info(
-    `Paginating addresses in ${groupsToUpdate.length} groups in ${community.id}...`,
+    `Paginating addresses in ${groupsToUpdate.length} groups in ${communityId}...`,
   );
 
   let totalNumCreated = 0;
   let totalNumUpdated = 0;
   let totalNumAddresses = 0;
 
-  await paginateAddresses(this.models, community.id, 0, async (addresses) => {
+  await paginateAddresses(this.models, communityId, 0, async (addresses) => {
     const pageStartedAt = Date.now();
 
     const getBalancesOptions = makeGetBalancesOptions(
@@ -62,7 +68,7 @@ export async function __refreshCommunityMemberships(
       getBalancesOptions.map(async (options) => {
         let result: Balances = {};
         try {
-          result = await this.tokenBalanceCache.getBalances({
+          result = await tokenBalanceCache.getBalances({
             ...options,
             cacheRefresh: false, // get cached balances
           });
@@ -88,18 +94,15 @@ export async function __refreshCommunityMemberships(
     totalNumAddresses += addresses.length;
 
     log.info(
-      `Created ${numCreated} and updated ${numUpdated} memberships in ${
-        community.id
-      } across ${addresses.length} addresses in ${
-        (Date.now() - pageStartedAt) / 1000
-      }s`,
+      `Created ${numCreated} and updated ${numUpdated} memberships in ${communityId} across ${
+        addresses.length
+      } addresses in ${(Date.now() - pageStartedAt) / 1000}s`,
     );
   });
 
   log.info(
-    `Created ${totalNumCreated} and updated ${totalNumUpdated} total memberships in ${
-      community.id
-    } across ${totalNumAddresses} addresses in ${
+    `Created ${totalNumCreated} and updated ${totalNumUpdated} total memberships in
+    ${communityId} across ${totalNumAddresses} addresses in ${
       (Date.now() - communityStartedAt) / 1000
     }s`,
   );

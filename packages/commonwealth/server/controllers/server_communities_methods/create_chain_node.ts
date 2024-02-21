@@ -1,6 +1,6 @@
-import { AppError } from '@hicommonwealth/adapters';
-import { BalanceType } from '@hicommonwealth/core';
-import { UserInstance } from 'server/models/user';
+import { AppError, BalanceType } from '@hicommonwealth/core';
+import { UserInstance } from '@hicommonwealth/model';
+import { Op } from 'sequelize';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 export const Errors = {
@@ -16,6 +16,7 @@ export type CreateChainNodeOptions = {
   bech32?: string;
   balanceType?: string;
   eth_chain_id?: number;
+  cosmos_chain_id?: string;
 };
 export type CreateChainNodeResult = { node_id: number };
 
@@ -28,6 +29,7 @@ export async function __createChainNode(
     bech32,
     balanceType,
     eth_chain_id,
+    cosmos_chain_id,
   }: CreateChainNodeOptions,
 ): Promise<CreateChainNodeResult> {
   if (!user.isAdmin) {
@@ -38,9 +40,16 @@ export async function __createChainNode(
     throw new AppError(Errors.ChainIdNaN);
   }
 
-  const chainNode = await this.models.ChainNode.findOne({
-    where: { url },
-  });
+  let where;
+  if (eth_chain_id) {
+    where = { [Op.or]: { url, eth_chain_id } };
+  } else if (cosmos_chain_id) {
+    where = { [Op.or]: { url, cosmos_chain_id } };
+  } else {
+    where = { url };
+  }
+
+  const chainNode = await this.models.ChainNode.findOne({ where });
 
   if (chainNode) {
     throw new AppError(Errors.ChainNodeExists);
@@ -52,6 +61,7 @@ export async function __createChainNode(
     balance_type: balanceType as BalanceType,
     bech32,
     eth_chain_id,
+    cosmos_chain_id,
   });
 
   return { node_id: newChainNode.id };

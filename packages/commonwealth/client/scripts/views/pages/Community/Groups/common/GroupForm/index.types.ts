@@ -4,11 +4,6 @@ export type RequirementSubFormsState = {
   errors?: RequirementSubType;
 };
 
-export type CWRequirementsLabelInputFieldState = {
-  value: string;
-  error: string;
-};
-
 export type RequirementSubType = {
   requirementType?: string;
   requirementContractAddress?: string;

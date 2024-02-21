@@ -1,6 +1,6 @@
+import type { Link } from '@hicommonwealth/model';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { Link } from 'server/models/thread';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 

@@ -1,6 +1,5 @@
-import { AppError } from '@hicommonwealth/adapters';
-import { WalletId } from '@hicommonwealth/core';
-import type { DB } from '../models';
+import { AppError, WalletId } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
@@ -13,7 +12,7 @@ export const Errors = {
 type SetAddressWalletReq = {
   address: string;
   wallet_id: WalletId;
-  author_chain: string;
+  author_community_id: string;
   jwt: string;
 };
 
