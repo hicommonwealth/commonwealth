@@ -70,6 +70,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
     'members',
   ]);
 
+  //on mobile, focus the input when the component (search modal) mounts
   useEffect(() => {
     if (size === 'small') {
       inputRef?.current?.focus?.();
@@ -84,6 +85,10 @@ export const CWSearchBar: FC<SearchBarProps> = ({
   const handleOnKeyUp = (e) => {
     if (e.key === 'Enter') {
       handleGoToSearchPage();
+
+      if (size === 'small') {
+        onSearchItemClick?.();
+      }
     } else if (e.key === 'Escape') {
       resetSearchBar();
     }
@@ -94,7 +99,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
     // fire before resetting the search bar
     if (!resetTimer) {
       resetTimer = setTimeout(() => {
-        // resetSearchBar();
+        resetSearchBar();
         resetTimer = null;
       }, 300);
     }

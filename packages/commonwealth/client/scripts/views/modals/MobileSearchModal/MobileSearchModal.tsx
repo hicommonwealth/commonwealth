@@ -13,7 +13,7 @@ const MobileSearchModal = ({ onModalClose }: MobileSearchModalProps) => {
   return (
     <div className="MobileSearchModal">
       <div className="header">
-        <CWSearchBar size="small" />
+        <CWSearchBar size="small" onSearchItemClick={onModalClose} />
 
         <CWButton
           onClick={onModalClose}
