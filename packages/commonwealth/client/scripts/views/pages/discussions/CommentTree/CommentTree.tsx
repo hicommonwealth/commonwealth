@@ -332,6 +332,7 @@ export const CommentTree = ({
             isEditing: false,
           },
         }));
+
         setIsGloballyEditing(false);
         clearEditingLocalStorage(comment.id, ContentType.Comment);
       } catch (err) {

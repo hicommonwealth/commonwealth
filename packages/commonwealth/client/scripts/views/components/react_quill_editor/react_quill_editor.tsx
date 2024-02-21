@@ -127,6 +127,7 @@ const ReactQuillEditor = ({
 
   const handleChange = (value, delta, source, editor) => {
     const newContent = convertTwitterLinksToEmbeds(editor.getContents());
+
     setContentDelta({
       ...newContent,
       ___isMarkdown: true,

@@ -20,10 +20,10 @@ export function linkExistingAddressToChainOrCommunity(
   community: string,
   originChain: string,
 ) {
-  return $.post(`${app.serverUrl()}/linkExistingAddressToChain`, {
+  return $.post(`${app.serverUrl()}/linkExistingAddressToCommunity`, {
     address,
-    chain: community,
-    originChain,
+    community_id: community,
+    originChain, // not used
     jwt: app.user.jwt,
   });
 }
@@ -280,7 +280,7 @@ export async function createUserWithAddress(
 }> {
   const response = await $.post(`${app.serverUrl()}/createAddress`, {
     address,
-    chain,
+    community_id: chain,
     jwt: app.user.jwt,
     wallet_id: walletId,
     wallet_sso_source: walletSsoSource,
