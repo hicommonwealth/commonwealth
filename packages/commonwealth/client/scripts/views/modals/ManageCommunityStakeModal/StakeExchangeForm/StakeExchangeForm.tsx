@@ -1,8 +1,12 @@
+import { commonProtocol } from '@hicommonwealth/core';
 import clsx from 'clsx';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
-
-import { commonProtocol } from '@hicommonwealth/core';
+import {
+  BaseMixpanelPayload,
+  MixpanelCommunityStakeEvent,
+} from 'shared/analytics/types';
 import app from 'state';
 import {
   useBuyStakeMutation,
@@ -25,7 +29,6 @@ import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelec
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
-
 import { useStakeExchange } from '../hooks';
 import {
   ManageCommunityStakeModalMode,
@@ -95,6 +98,10 @@ const StakeExchangeForm = ({
 
   const isBuyMode = mode === 'buy';
 
+  const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
+    onAction: true,
+  });
+
   const handleBuy = async () => {
     try {
       onSetModalState(ManageCommunityStakeModalState.Loading);
@@ -109,6 +116,13 @@ const StakeExchangeForm = ({
 
       onSetSuccessTransactionHash(txReceipt?.transactionHash);
       onSetModalState(ManageCommunityStakeModalState.Success);
+
+      trackAnalytics({
+        event: MixpanelCommunityStakeEvent.STAKE_BOUGHT,
+        community: app.activeChainId(),
+        userId: app.user.activeAccount.profile.id,
+        userAddress: selectedAddress?.value,
+      });
     } catch (err) {
       console.log('Error buying: ', err);
       onSetModalState(ManageCommunityStakeModalState.Failure);
@@ -129,6 +143,13 @@ const StakeExchangeForm = ({
 
       onSetSuccessTransactionHash(txReceipt?.transactionHash);
       onSetModalState(ManageCommunityStakeModalState.Success);
+
+      trackAnalytics({
+        event: MixpanelCommunityStakeEvent.STAKE_SOLD,
+        community: app.activeChainId(),
+        userId: app.user.activeAccount.profile.id,
+        userAddress: selectedAddress?.value,
+      });
     } catch (err) {
       console.log('Error selling: ', err);
       onSetModalState(ManageCommunityStakeModalState.Failure);
