@@ -19,7 +19,7 @@ class ChainInfo {
   public description: string;
   public socialLinks: string[];
   public stagesEnabled: boolean;
-  public customStages: string;
+  public customStages: string[];
   public customDomain: string;
   public snapshot: string[];
   public terms: string;
@@ -262,7 +262,7 @@ class ChainInfo {
     social_links?: string[];
     discord?: string;
     stagesEnabled?: boolean;
-    customStages?: string;
+    customStages?: string[];
     customDomain?: string;
     terms?: string;
     snapshot?: string[];

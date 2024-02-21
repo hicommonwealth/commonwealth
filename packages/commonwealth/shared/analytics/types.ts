@@ -69,6 +69,17 @@ export const enum MixpanelSnapshotEvents {
   SNAPSHOT_PROPOSAL_CREATED = 'Snapshot Proposal Created',
 }
 
+export const enum MixpanelGovernanceEvents {
+  SPUTNIK_PROPOSAL_CREATED = 'Sputnik Proposal Created',
+  AAVE_PROPOSAL_CREATED = 'Aave Proposal Created',
+  COMPOUND_PROPOSAL_CREATED = 'Compound Proposal Created',
+  COSMOS_PROPOSAL_CREATED = 'Cosmos Proposal Created',
+  SPUTNIK_VOTE_OCCURRED = 'Sputnik Vote Occurred',
+  AAVE_VOTE_OCCURRED = 'Aave Vote Occurred',
+  COMPOUND_VOTE_OCCURRED = 'Compund Vote Occurred',
+  COSMOS_VOTE_OCCURRED = 'Cosmos Vote Occurred',
+}
+
 export type MixpanelEvents =
   | MixpanelLoginEvent
   | MixpanelUserSignupEvent
@@ -77,7 +88,8 @@ export type MixpanelEvents =
   | MixpanelCommunityInteractionEvent
   | MixpanelSnapshotEvents
   | MixpanelErrorCaptureEvent
-  | MixpanelClickthroughEvent;
+  | MixpanelClickthroughEvent
+  | MixpanelGovernanceEvents;
 
 export type AnalyticsEvent = MixpanelEvents; // add other providers events here
 

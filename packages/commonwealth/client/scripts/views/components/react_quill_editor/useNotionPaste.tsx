@@ -1,32 +1,46 @@
-import { useEffect } from 'react';
+import { Dispatch, SetStateAction, useEffect } from 'react';
+import type { SerializableDeltaStatic } from './utils';
 
-export const useNotionPaste = (setContentDelta, contentDelta, editorRef) => {
+export const useNotionPaste = (
+  setContentDelta: Dispatch<SetStateAction<SerializableDeltaStatic>>,
+  contentDelta: SerializableDeltaStatic,
+  editorRef,
+  isEditorFocused: boolean,
+) => {
   useEffect(() => {
+    const editor = editorRef.current?.getEditor();
     const handlePaste = (event) => {
+      if (!isEditorFocused) return;
       event.preventDefault();
-      const editor = editorRef.current?.getEditor();
       const pastedText = event.clipboardData.getData('text/plain');
 
       if (pastedText) {
-        setContentDelta({
-          ops: [
-            {
-              insert: pastedText,
-            },
-          ],
+        setContentDelta((prevContentDelta) => {
+          return {
+            ...prevContentDelta,
+            ops: [
+              ...prevContentDelta.ops,
+              {
+                insert: pastedText,
+              },
+            ],
+          };
         });
+
         setTimeout(() => {
-          const newCursorPosition = editor.getLength();
+          const newCursorPosition = editor.getLength() - 1;
           editor.setSelection(newCursorPosition, newCursorPosition);
         }, 10);
         return;
       }
     };
 
-    document.addEventListener('paste', handlePaste);
+    const editorElement = editor.root;
+
+    editorElement.addEventListener('paste', handlePaste);
 
     return () => {
-      document.removeEventListener('paste', handlePaste);
+      editorElement.removeEventListener('paste', handlePaste);
     };
-  }, [setContentDelta, editorRef, contentDelta]);
+  }, [setContentDelta, editorRef, contentDelta, isEditorFocused]);
 };

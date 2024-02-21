@@ -13,7 +13,7 @@ import { SublayoutBanners } from './SublayoutBanners';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
-import { ValentineGrowl } from './components/ValentineGrowl';
+import { StakeGrowl } from './components/StakeGrowl';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
 
 type SublayoutProps = {
@@ -108,7 +108,7 @@ const Sublayout = ({
             {!app.isCustomDomain() && !hideFooter && <Footer />}
           </div>
         </div>
-        <ValentineGrowl />
+        <StakeGrowl />
       </div>
       {isWindowExtraSmall && <MobileNavigation />}
     </div>

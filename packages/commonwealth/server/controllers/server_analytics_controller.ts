@@ -1,5 +1,8 @@
+import { analytics } from '@hicommonwealth/core';
+import { AnalyticsPayload } from 'shared/analytics/types';
 import { SERVER_URL } from '../config';
-import { TrackOptions, __track } from './server_analytics_methods/track';
+
+export type TrackOptions = Record<string, any> & AnalyticsPayload;
 
 export class ServerAnalyticsController {
   /**
@@ -17,7 +20,8 @@ export class ServerAnalyticsController {
         ...(host && { isCustomDomain: SERVER_URL.includes(host) }),
       };
     }
-    return __track.call(this, newOptions);
+    const { event, ...payload } = newOptions;
+    analytics().track(event, payload);
   }
 }
 

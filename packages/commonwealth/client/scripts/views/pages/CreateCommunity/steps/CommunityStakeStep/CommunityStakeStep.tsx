@@ -9,6 +9,7 @@ interface CommunityStakeStepProps {
   createdCommunityName: string;
   createdCommunityId: string;
   selectedAddress: AddressInfo;
+  chainId: string;
 }
 
 const CommunityStakeStep = ({
@@ -16,6 +17,7 @@ const CommunityStakeStep = ({
   createdCommunityName,
   createdCommunityId,
   selectedAddress,
+  chainId,
 }: CommunityStakeStepProps) => {
   const [enableStakePage, setEnableStakePage] = useState(true);
   const [communityStakeData, setCommunityStakeData] = useState({
@@ -42,6 +44,7 @@ const CommunityStakeStep = ({
           communityStakeData={communityStakeData}
           selectedAddress={selectedAddress}
           createdCommunityId={createdCommunityId}
+          chainId={chainId}
         />
       )}
     </div>

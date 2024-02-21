@@ -89,7 +89,9 @@ export const openConfirmation = (props: OpenConfirmationProps) => {
   const removeModal = () => {
     root.unmount();
     target.remove();
-    props.onClose();
+    if (typeof props.onClose === 'function') {
+      props.onClose();
+    }
   };
 
   root = createRoot(target);

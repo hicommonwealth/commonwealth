@@ -26,15 +26,13 @@ export const communityProfileValidationSchema = z.object({
       (data) => {
         if (data) {
           try {
-            const validJSONStringArray = data.replace(/'/g, '"');
-            const parsedArray = JSON.parse(validJSONStringArray);
-            if (
+            if (data.includes("'")) return false;
+
+            const parsedArray = JSON.parse(data);
+            return !(
               !Array.isArray(parsedArray) ||
               !parsedArray.every((value) => typeof value === 'string')
-            ) {
-              return false;
-            }
-            return true;
+            );
           } catch {
             return false;
           }
