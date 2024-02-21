@@ -4,9 +4,19 @@ import { CWText } from '../../component_kit/cw_text';
 import { CWButton } from '../../component_kit/new_designs/cw_button';
 import './IOSPrompt.scss';
 
-export const IOSPrompt = (hidePromptAction: () => void) => {
+interface IOSPromptProps {
+  hidePromptAction: () => void;
+  showPrompt: boolean;
+  setShowPrompt: (showPrompt: boolean) => void;
+}
+
+export const IOSPrompt = ({
+  hidePromptAction,
+  showPrompt,
+  setShowPrompt,
+}: IOSPromptProps) => {
   return (
-    <div className="ios-home-screen-prompt">
+    <div className="IOSPrompt">
       <div className="prompt-content">
         <div className="header">
           <div className="icon">

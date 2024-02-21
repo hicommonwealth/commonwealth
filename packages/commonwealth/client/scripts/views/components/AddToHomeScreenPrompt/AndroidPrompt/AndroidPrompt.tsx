@@ -5,9 +5,18 @@ import { CWButton } from '../../component_kit/new_designs/cw_button';
 import { HIDE_PROMPT } from '../constants';
 import './AndroidPrompt.scss';
 
-export const AndroidPrompt = (hidePromptAction: () => void) => {
+interface AndroidPromptProps {
+  hidePromptAction: () => void;
+  showPrompt: boolean;
+  setShowPrompt: (showPrompt: boolean) => void;
+}
+
+export const AndroidPrompt = ({
+  hidePromptAction,
+  showPrompt,
+  setShowPrompt,
+}: AndroidPromptProps) => {
   let installPromptEvent = null;
-  const [showPrompt, setShowPrompt] = useState(true);
   const [checkboxChecked, setCheckboxChecked] = useState(false);
 
   window.addEventListener('beforeinstallprompt', (event) => {
@@ -23,9 +32,14 @@ export const AndroidPrompt = (hidePromptAction: () => void) => {
     // Wait for the user to respond to the prompt
     installPromptEvent.userChoice.then((choiceResult) => {
       if (choiceResult.outcome === 'accepted') {
+        // Hide after install prompt is accepted
         console.log('User accepted the install prompt');
+        sessionStorage.setItem(HIDE_PROMPT, 'true');
+        setShowPrompt(false);
       } else {
-        console.log('User dismissed the install prompt');
+        // Hide after install prompt is dismissed
+        sessionStorage.setItem(HIDE_PROMPT, 'true');
+        setShowPrompt(false);
       }
     });
   };
@@ -45,7 +59,7 @@ export const AndroidPrompt = (hidePromptAction: () => void) => {
   };
 
   return (
-    <div className="android-home-screen-prompt">
+    <div className="AndroidPrompt">
       <div className="prompt-content">
         <CWText className="title">Install App</CWText>
         <div className="header">

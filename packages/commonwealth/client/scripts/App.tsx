@@ -8,10 +8,9 @@ import React, { StrictMode } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { queryClient } from 'state/api/config';
-import { featureFlags } from './helpers/feature-flags';
+import { openFeatureProvider } from './helpers/feature-flags';
 import useAppStatus from './hooks/useAppStatus';
 import { AddToHomeScreenPrompt } from './views/components/AddToHomeScreenPrompt';
-import { openFeatureProvider } from './helpers/feature-flags';
 
 import { CWIcon } from './views/components/component_kit/cw_icons/cw_icon';
 
@@ -40,7 +39,7 @@ const App = () => {
           ) : (
             <>
               <RouterProvider router={router(customDomain)} />
-              {isAddedToHomeScreen || isMarketingPage ? null : (
+              {isAddedToHomeScreen || false ? null : (
                 <AddToHomeScreenPrompt isIOS={isIOS} isAndroid={isAndroid} />
               )}
             </>
