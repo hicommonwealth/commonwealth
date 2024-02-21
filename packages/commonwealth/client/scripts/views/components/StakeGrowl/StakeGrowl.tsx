@@ -1,3 +1,4 @@
+import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import useGrowlStore from 'state/ui/growl';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
@@ -11,6 +12,7 @@ import './StakeGrowl.scss';
 const LOCALSTORAGE_STAKE_GROWL_KEY = 'stakeGrowlHidden';
 
 const StakeGrowl = () => {
+  const navigate = useCommonNavigate();
   const { setIsGrowlHidden, isGrowlHidden } = useGrowlStore();
 
   const [shouldHideGrowlPermanently, setShouldHideGrowlPermanently] =
@@ -52,9 +54,7 @@ const StakeGrowl = () => {
             buttonType="primary"
             buttonHeight="med"
             label="Create community with stake"
-            onClick={() =>
-              (window.location.href = `${window.location.protocol}//${window.location.host}/createCommunity`)
-            }
+            onClick={() => navigate('/createCommunity', {}, null)}
           />
           <CWText type="b2" fontWeight="regular" isCentered className="body">
             Currently only newly creted communities can enable stake.
