@@ -36,11 +36,14 @@ const App = () => {
           {isLoading ? (
             <Splash />
           ) : (
-            <RouterProvider router={router(customDomain)} />
+            <>
+              <RouterProvider router={router(customDomain)} />
+              {isAddedToHomeScreen || isMarketingPage ? null : (
+                <AddToHomeScreenPrompt isIOS={isIOS} isAndroid={isAndroid} />
+              )}
+            </>
           )}
-          {isAddedToHomeScreen || isMarketingPage ? null : (
-            <AddToHomeScreenPrompt isIOS={isIOS} isAndroid={isAndroid} />
-          )}
+
           <ToastContainer />
           <ReactQueryDevtools />
         </OpenFeatureProvider>

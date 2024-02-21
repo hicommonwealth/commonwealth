@@ -9,11 +9,6 @@
   "icons": [
     {
       "src": "/static/img/branding/common.png",
-      "sizes": "212x212",
-      "type": "image/png"
-    },
-    {
-      "src": "/static/img/branding/common.png",
       "sizes": "192x192",
       "type": "image/png"
     }
