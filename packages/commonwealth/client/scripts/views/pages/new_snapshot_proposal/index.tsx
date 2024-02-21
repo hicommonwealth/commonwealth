@@ -213,7 +213,7 @@ export const NewSnapshotProposalForm = ({
     <div className="NewSnapshotProposalForm">
       {loading ? (
         <div className="proposal-loading">
-          <CWLoadingSpinner center />
+          <CWLoadingSpinner />
         </div>
       ) : (
         <>

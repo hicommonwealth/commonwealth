@@ -99,7 +99,7 @@ const LayoutComponent = ({
 
     const Bobber = (
       <div className="spinner-container">
-        <CWLoadingSpinner center />
+        <CWLoadingSpinner />
       </div>
     );
 

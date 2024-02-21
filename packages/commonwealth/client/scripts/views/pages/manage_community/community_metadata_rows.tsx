@@ -586,7 +586,7 @@ export const CommunityMetadataRows = ({
           <>
             <div className="settings-row">
               <div className="spinner-group">
-                <CWLoadingSpinner center />
+                <CWLoadingSpinner />
                 <CWText>Connecting...</CWText>
               </div>
               <CWText>Refresh to check if connection succeeded</CWText>

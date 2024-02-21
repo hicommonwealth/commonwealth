@@ -15,7 +15,7 @@ const Splash = () => {
   return (
     <div className="Splash">
       {/* This can be a moving bobber, atm it is still */}
-      <CWLoadingSpinner center />
+      <CWLoadingSpinner />
     </div>
   );
 };

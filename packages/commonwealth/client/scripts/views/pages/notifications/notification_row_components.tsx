@@ -218,7 +218,11 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
                   });
               }}
             >
-              {markingRead ? <CWLoadingSpinner /> : 'Mark as read'}
+              {markingRead ? (
+                <CWLoadingSpinner center={false} />
+              ) : (
+                'Mark as read'
+              )}
             </div>
           )}
         </div>
@@ -289,7 +293,11 @@ export const SnapshotNotificationRow = (
                   });
               }}
             >
-              {markingRead ? <CWLoadingSpinner /> : 'Mark as read'}
+              {markingRead ? (
+                <CWLoadingSpinner center={false} />
+              ) : (
+                'Mark as read'
+              )}
             </div>
           )}
         </div>

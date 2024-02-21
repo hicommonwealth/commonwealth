@@ -198,7 +198,7 @@ export const LoginMobile = ({
                 </div>
               </div>
             ) : (
-              <CWLoadingSpinner center />
+              <CWLoadingSpinner />
             )}
           </div>
         )}

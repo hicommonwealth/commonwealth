@@ -139,7 +139,7 @@ const ProposalsPage = () => {
       .sort((p1, p2) => p2.data.id - p1.data.id);
 
   const activeProposalContent = isLoadingCosmosActiveProposals ? (
-    <CWLoadingSpinner center />
+    <CWLoadingSpinner />
   ) : !activeCosmosProposals?.length &&
     !activeCompoundProposals?.length &&
     !activeAaveProposals?.length &&
@@ -203,7 +203,7 @@ const ProposalsPage = () => {
       .sort((p1, p2) => p2.data.id - p1.data.id);
 
   const inactiveProposalContent = isLoadingCosmosCompletedProposals ? (
-    <CWLoadingSpinner center />
+    <CWLoadingSpinner />
   ) : !inactiveCosmosProposals?.length &&
     !inactiveCompoundProposals?.length &&
     !inactiveAaveProposals?.length &&

@@ -125,7 +125,7 @@ export const LoginDesktop = ({
                 </div>
               </div>
             ) : (
-              <CWLoadingSpinner center />
+              <CWLoadingSpinner />
             )}
             <div className="header-container">
               <LoginBoilerplate />

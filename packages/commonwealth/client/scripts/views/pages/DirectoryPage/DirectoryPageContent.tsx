@@ -79,7 +79,7 @@ const DirectoryPageContent = ({
   if (isLoading) {
     return (
       <div className="directory-loader-container">
-        <CWLoadingSpinner center />
+        <CWLoadingSpinner />
       </div>
     );
   }

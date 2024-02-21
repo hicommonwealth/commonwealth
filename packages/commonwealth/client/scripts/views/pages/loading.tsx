@@ -13,7 +13,7 @@ export const PageLoading = (props: PageLoadingProps) => {
   return (
     <div className="LoadingPage">
       <div className="inner-content">
-        <CWLoadingSpinner center />
+        <CWLoadingSpinner />
         <CWText>{message}</CWText>
       </div>
     </div>

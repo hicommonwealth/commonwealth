@@ -183,7 +183,7 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
                         <CWText>{output.name}</CWText>
                       </div>
                       <div>
-                        {loading && <CWLoadingSpinner center />}
+                        {loading && <CWLoadingSpinner />}
                         <CWText>
                           {fnOutputArray && fnOutputArray[i].toString()
                             ? fnOutputArray[i].toString()

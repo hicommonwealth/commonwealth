@@ -1095,7 +1095,7 @@ export const ComponentShowcase = () => {
       </div>
       <div className="basic-gallery">
         <CWText type="h3">Spinner</CWText>
-        <CWLoadingSpinner />
+        <CWLoadingSpinner center={false} />
       </div>
       <div className="basic-gallery">
         <CWText type="h3">Breadcrumbs</CWText>

@@ -139,7 +139,7 @@ const SessionRevalidationModal = ({
                   onenterkey={onEmailLogin}
                 />
               ) : (
-                <CWLoadingSpinner center />
+                <CWLoadingSpinner />
               )}
               <div className="buttons-row">
                 <CWButton

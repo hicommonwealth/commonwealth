@@ -103,7 +103,7 @@ const Profile = ({ profileId }: ProfileProps) => {
     return (
       <div className="Profile loading">
         <div className="loading-spinner">
-          <CWLoadingSpinner center />
+          <CWLoadingSpinner />
         </div>
       </div>
     );

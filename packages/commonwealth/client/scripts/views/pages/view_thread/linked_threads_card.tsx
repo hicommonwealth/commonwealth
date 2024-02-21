@@ -47,7 +47,7 @@ export const LinkedThreadsCard = ({
         content={
           linkedThreadIds.length > 0 && isLoading ? (
             <div className="spinner-container">
-              <CWLoadingSpinner center />
+              <CWLoadingSpinner />
             </div>
           ) : (
             <div className="LinkedThreadsCard">

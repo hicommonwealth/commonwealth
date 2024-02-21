@@ -102,7 +102,7 @@ const Analytics = () => {
   return (
     <div className="Analytics">
       {!initialized ? (
-        <CWLoadingSpinner center />
+        <CWLoadingSpinner />
       ) : (
         <>
           <div className="AnalyticsSection">

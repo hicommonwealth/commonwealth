@@ -382,7 +382,7 @@ export const CWCoverImageUploader = ({
               />
             </div>
             {isGenerating ? (
-              <CWLoadingSpinner center />
+              <CWLoadingSpinner />
             ) : (
               <>
                 <CWTextInput
@@ -423,7 +423,7 @@ export const CWCoverImageUploader = ({
           className="pseudo-input"
           ref={pseudoInput}
         />
-        {isUploading && <CWLoadingSpinner center />}
+        {isUploading && <CWLoadingSpinner />}
         <div className="attach-btn" ref={attachButton}>
           {imageURL && defaultImageBehaviour === ImageBehavior.Circle && (
             <img className="circle-img" src={imageURL} />

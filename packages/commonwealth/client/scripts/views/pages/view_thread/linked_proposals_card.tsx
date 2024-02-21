@@ -99,7 +99,7 @@ export const LinkedProposalsCard = ({
         content={
           initialSnapshotLinks.length > 0 && !snapshotProposalsLoaded ? (
             <div className="spinner-container">
-              <CWLoadingSpinner center />
+              <CWLoadingSpinner />
             </div>
           ) : (
             <div className="LinkedProposalsCard">
@@ -134,7 +134,7 @@ export const LinkedProposalsCard = ({
                       </ReactRouterLink>
                     ) : (
                       <div className="snapshot-spinner-container">
-                        <CWLoadingSpinner center />
+                        <CWLoadingSpinner />
                       </div>
                     ))}
                 </div>

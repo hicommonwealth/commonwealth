@@ -202,7 +202,7 @@ const EditProfileComponent = () => {
     return (
       <div className="EditProfile full-height">
         <div className="loading-spinner">
-          <CWLoadingSpinner center />
+          <CWLoadingSpinner />
         </div>
       </div>
     );
