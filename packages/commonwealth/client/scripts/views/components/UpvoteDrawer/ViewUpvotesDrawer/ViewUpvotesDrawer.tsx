@@ -78,7 +78,10 @@ export const ViewUpvotesDrawer = ({
       <CWThreadAction
         label="View upvotes"
         action="view-upvotes"
-        onClick={() => setIsUpvoteDrawerOpen(true)}
+        onClick={(e) => {
+          e.preventDefault();
+          setIsUpvoteDrawerOpen(true);
+        }}
       />
       <CWDrawer
         className="upvote-drawer"

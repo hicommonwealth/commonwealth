@@ -189,7 +189,6 @@ export const ThreadCard = ({
           <div
             className="content-footer"
             onClick={(e) => {
-              e.preventDefault();
               e.stopPropagation();
             }}
           >

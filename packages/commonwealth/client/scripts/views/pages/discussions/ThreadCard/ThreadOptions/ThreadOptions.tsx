@@ -97,7 +97,10 @@ export const ThreadOptions = ({
               label={`${totalComments}`}
               action="comment"
               disabled={!canComment}
-              onClick={onCommentBtnClick}
+              onClick={(e) => {
+                e.preventDefault();
+                onCommentBtnClick();
+              }}
               tooltipText={disabledActionTooltipText}
             />
           )}
