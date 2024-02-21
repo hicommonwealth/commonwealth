@@ -36,7 +36,7 @@ import {
   CustomAddressOptionElement,
 } from './CustomAddressOption';
 
-import { CWTextInput } from 'client/scripts/views/components/component_kit/cw_text_input';
+import { CWTextInput } from 'client/scripts/views/components/component_kit/new_designs/CWTextInput';
 import './StakeExchangeForm.scss';
 
 type OptionDropdown = {
@@ -284,7 +284,12 @@ const StakeExchangeForm = ({
               <CWTextInput
                 onInput={handleInput}
                 value={numberOfStakeToExchange}
-                inputClassName={inputClassExpanded ?? 'number'}
+                inputClassName={clsx('number', {
+                  expanded: numberOfStakeToExchange?.toString().length > 3,
+                })}
+                containerClassName={clsx('number', {
+                  expanded: numberOfStakeToExchange?.toString().length > 3,
+                })}
               />
               <CWCircleButton
                 buttonType="secondary"
