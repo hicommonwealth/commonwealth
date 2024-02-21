@@ -33,7 +33,7 @@ const unleashConfig = {
   url: process.env.UNLEASH_FRONTEND_SERVER_URL,
   clientKey: process.env.UNLEASH_FRONTEND_API_TOKEN,
   refreshInterval: 120,
-  appName: 'commonwealth-web',
+  appName: process.env.HEROKU_APP_NAME,
 };
 
 export const openFeatureProvider = process.env.UNLEASH_FRONTEND_API_TOKEN
