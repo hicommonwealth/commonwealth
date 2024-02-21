@@ -12,7 +12,6 @@ import { ValidationStatus } from 'client/scripts/views/components/component_kit/
 import { CWTextInput } from 'client/scripts/views/components/component_kit/new_designs/CWTextInput';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/cw_button';
 import {
-  ReactQuillEditor,
   createDeltaFromText,
   getTextFromDelta,
 } from 'client/scripts/views/components/react_quill_editor';
@@ -96,6 +95,7 @@ export const CreateTopicSection = () => {
     return ['success', 'Valid topic name'];
   };
 
+  // TODO: implement logic around creating a new thread with new topic
   return (
     <div className="CreateTopicSection">
       <CWForm
@@ -148,7 +148,7 @@ export const CreateTopicSection = () => {
               setFeaturedInSidebar(!featuredInSidebar);
             }}
           />
-          <CWCheckbox
+          {/* <CWCheckbox
             label="Featured in new post"
             checked={featuredInNewPost}
             onChange={() => {
@@ -160,7 +160,7 @@ export const CreateTopicSection = () => {
               contentDelta={contentDelta}
               setContentDelta={setContentDelta}
             />
-          )}
+          )} */}
         </div>
         <div className="actions">
           <CWButton
