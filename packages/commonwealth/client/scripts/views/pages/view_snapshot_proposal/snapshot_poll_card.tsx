@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
-
+import { useBrowserAnalyticsTrack } from 'client/scripts/hooks/useBrowserAnalyticsTrack';
 import 'components/poll_card.scss';
+import React, { useEffect } from 'react';
+import { MixpanelSnapshotEvents } from '../../../../../shared/analytics/types';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWText } from '../../components/component_kit/cw_text';
 
@@ -9,11 +10,11 @@ import type {
   VoteInformation,
 } from '../../components/poll_card';
 import {
-  buildVoteDirectionString,
   CastVoteSection,
   PollOptions,
   ResultsSection,
   VoteDisplay,
+  buildVoteDirectionString,
 } from '../../components/poll_card';
 
 export type SnapshotPollCardProps = Omit<
@@ -44,21 +45,26 @@ export const SnapshotPollCard = (props: SnapshotPollCardProps) => {
   const [internalHasVoted, setInternalHasVoted] =
     React.useState<boolean>(hasVoted);
   const [selectedOptions, setSelectedOptions] = React.useState<Array<string>>(
-    [] // is never updated?
+    [], // is never updated?
   );
   const [internalTotalVoteCount, setInternalTotalVoteCount] =
     React.useState<number>(totalVoteCount);
   const [voteDirectionString, setVoteDirectionString] = React.useState<string>(
-    votedFor ? buildVoteDirectionString(votedFor) : ''
+    votedFor ? buildVoteDirectionString(votedFor) : '',
   );
   const [internalVoteInformation, setInternalVoteInformation] =
     React.useState<Array<VoteInformation>>(voteInformation);
 
   const resultString = 'Results';
 
+  const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
+
   const castVote = () => {
     setVoteDirectionString(buildVoteDirectionString(selectedOptions[0]));
     onSnapshotVoteCast(selectedOptions[0]);
+    trackAnalytics({
+      event: MixpanelSnapshotEvents.SNAPSHOT_VOTE_OCCURRED,
+    });
   };
 
   useEffect(() => {
