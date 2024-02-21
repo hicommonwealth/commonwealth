@@ -4,7 +4,7 @@ import { models } from '../database';
 import { isCommunityAdmin } from '../middleware';
 import { mustExist } from '../middleware/guards';
 import { CommunityAttributes } from '../models';
-import { validateCommunityStakeConfig } from '../services/commonProtocol/communityStakeConfigValidator';
+import { commonProtocol } from '../services';
 
 const schema = z.object({
   stake_id: z.coerce.number().int(),
@@ -15,10 +15,10 @@ const schema = z.object({
 
 export type SetCommunityStake = z.infer<typeof schema>;
 
-export const SetCommunityStake: CommandMetadata<
+export const SetCommunityStake = (): CommandMetadata<
   CommunityAttributes,
   typeof schema
-> = {
+> => ({
   schema,
   auth: [isCommunityAdmin],
   body: async ({ id, payload }) => {
@@ -48,7 +48,10 @@ export const SetCommunityStake: CommandMetadata<
       );
 
     // !domain, application, and infrastructure services (stateless, not related to entities or value objects)
-    await validateCommunityStakeConfig(community, payload.stake_id);
+    await commonProtocol.communityStakeConfigValidator.validateCommunityStakeConfig(
+      community,
+      payload.stake_id,
+    );
 
     // !side effects
     const [updated] = await models.CommunityStake.upsert({
@@ -61,4 +64,4 @@ export const SetCommunityStake: CommandMetadata<
       CommunityStakes: [updated.get({ plain: true })],
     };
   },
-};
+});

@@ -8,7 +8,10 @@ export const schema = z.object({
   content: z.string(),
 });
 
-export const CreateUser: CommandMetadata<UserAttributes, typeof schema> = {
+export const CreateUser = (): CommandMetadata<
+  UserAttributes,
+  typeof schema
+> => ({
   schema,
   auth: [],
   body: async ({ id, payload }) => {
@@ -19,4 +22,4 @@ export const CreateUser: CommandMetadata<UserAttributes, typeof schema> = {
     //await models.User.create(payload)
     return payload as Partial<UserAttributes>;
   },
-};
+});

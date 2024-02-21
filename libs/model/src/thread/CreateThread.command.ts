@@ -8,7 +8,10 @@ export const schema = z.object({
   content: z.string(),
 });
 
-export const CreateThread: CommandMetadata<ThreadAttributes, typeof schema> = {
+export const CreateThread = (): CommandMetadata<
+  ThreadAttributes,
+  typeof schema
+> => ({
   schema,
   auth: [],
   body: async ({ id, payload }) => {
@@ -19,4 +22,4 @@ export const CreateThread: CommandMetadata<ThreadAttributes, typeof schema> = {
     //await models.Thread.create(payload)
     return payload as Partial<ThreadAttributes>;
   },
-};
+});

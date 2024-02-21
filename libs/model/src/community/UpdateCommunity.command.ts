@@ -4,6 +4,7 @@ import { models } from '../database';
 import { isCommunityAdmin } from '../middleware';
 import { mustExist } from '../middleware/guards';
 import type { CommunityAttributes } from '../models';
+import { commonProtocol } from '../services';
 
 export const schema = z.object({
   namespace: z.string(),
@@ -11,10 +12,10 @@ export const schema = z.object({
   address: z.string(),
 });
 
-export const SetCommunityNamespace: CommandMetadata<
+export const UpdateCommunity = (): CommandMetadata<
   CommunityAttributes,
   typeof schema
-> = {
+> => ({
   schema,
   auth: [isCommunityAdmin],
   body: async ({ id, payload }) => {
@@ -22,11 +23,14 @@ export const SetCommunityNamespace: CommandMetadata<
 
     if (!mustExist('Community', community)) return;
 
-    // TODO: validate contract
-    // call protocol api and resolve if tbc should be a singleton
+    await commonProtocol.newNamespaceValidator.validateNamespace(
+      payload.namespace,
+      payload.txHash,
+      payload.address,
+      community,
+    );
 
-    //await validateNamespace(TokenBalanceCache, payload.namespace, payload.txHash, payload.address, community)
     community.namespace = payload.namespace;
     return (await community.save()).get({ plain: true });
   },
-};
+});
