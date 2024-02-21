@@ -12,16 +12,10 @@
 
   .layout-container {
     margin: 0 auto;
-    background-color: #ffffba;
     max-width: 1040px;
 
     @include mediumSmall {
-      background-color: #ffb3ba;
       max-width: 792px;
-    }
-
-    @include smallInclusive {
-      background-color: #baffc9;
     }
   }
 }
