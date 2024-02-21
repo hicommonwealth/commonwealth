@@ -9,7 +9,8 @@ import { numberToUint8ArrayBE, uint8ArrayToNumberBE } from './util';
 const log = logger().getLogger(__filename);
 
 /**
- * See {@Link fetchLatestCosmosProposalV1}. Same logic applies, but for Cosmos communities that use the v1beta1 gov module.
+ * See {@Link fetchLatestCosmosProposalV1}. Same logic applies, but for
+ * Cosmos communities that use the v1beta1 gov module.
  * @param community
  */
 export async function fetchLatestCosmosProposalV1Beta1(

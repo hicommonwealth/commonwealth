@@ -59,7 +59,8 @@ export async function fetchLatestCosmosProposalV1(
 }
 
 /**
- * Attempts to fetch the proposal at the given proposalId from a Cosmos community that uses the v1 gov module. If a proposal
+ * Attempts to fetch the proposal at the given proposalId from a Cosmos
+ * community that uses the v1 gov module. If a proposal
  * with the given id exists, the function attempts to fetch the next proposal. This process repeats until no proposal
  * is found at which time all the fetched proposals are returned.
  */
