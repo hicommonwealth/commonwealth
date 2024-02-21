@@ -3,7 +3,7 @@
 .PageLayout {
   width: 100%;
   padding-inline: 56px;
-  padding-top: 20px; // 20 + 48 = 68px => when breadcrumbs are ready
+  padding-top: 20px;
   padding-bottom: 20px;
 
   @include smallInclusive {
