@@ -3,6 +3,7 @@ import $ from 'jquery';
 import app from 'state';
 import NewProfilesController from '../controllers/server/newProfiles';
 
+import { Session } from '@canvas-js/interfaces';
 import type momentType from 'moment';
 import moment from 'moment';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
@@ -164,31 +165,14 @@ class Account {
     this._sessionPublicAddress = sessionPublicAddress;
   }
 
-  public async validate(
-    signature: string,
-    timestamp: number,
-    chainId: string | number,
-    shouldRedraw = true,
-  ) {
-    if (!signature) {
-      throw new Error('signature required for validation');
-    }
-
+  public async validate(session: Session, shouldRedraw = true) {
     const params = {
       address: this.address,
       chain: this.community.id,
-      chain_id: chainId,
       jwt: app.user.jwt,
-      signature,
+      session,
       wallet_id: this.walletId,
       wallet_sso_source: this.walletSsoSource,
-      session_public_address: await app.sessions.getOrCreateAddress(
-        this.community.base,
-        chainId.toString(),
-        this.address,
-      ),
-      session_timestamp: timestamp,
-      session_block_data: this.validationBlockInfo,
     };
     const result = await $.post(`${app.serverUrl()}/verifyAddress`, params);
     if (result.status === 'Success') {

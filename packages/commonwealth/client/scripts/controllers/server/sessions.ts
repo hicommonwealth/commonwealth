@@ -14,7 +14,7 @@ import app from 'state';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
 import {
-  CosmosSDKSessionController,
+  // CosmosSDKSessionController,
   EthereumSessionController,
   ISessionController,
   NEARSessionController,
@@ -111,14 +111,14 @@ export async function signSessionWithMagic(
 class SessionsController {
   ethereum: EthereumSessionController;
   substrate: SubstrateSessionController;
-  cosmos: CosmosSDKSessionController;
+  // cosmos: CosmosSDKSessionController;
   solana: SolanaSessionController;
   near: NEARSessionController;
 
   constructor() {
     this.ethereum = new EthereumSessionController();
     this.substrate = new SubstrateSessionController();
-    this.cosmos = new CosmosSDKSessionController();
+    // this.cosmos = new CosmosSDKSessionController();
     this.solana = new SolanaSessionController();
     this.near = new NEARSessionController();
   }
@@ -126,7 +126,7 @@ class SessionsController {
   getSessionController(chainBase: ChainBase): ISessionController {
     if (chainBase === 'ethereum') return this.ethereum;
     else if (chainBase === 'substrate') return this.substrate;
-    else if (chainBase === 'cosmos') return this.cosmos;
+    // else if (chainBase === 'cosmos') return this.cosmos;
     else if (chainBase === 'solana') return this.solana;
     else if (chainBase === 'near') return this.near;
   }

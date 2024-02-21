@@ -1,4 +1,4 @@
-export { CosmosSDKSessionController } from './cosmos';
+// export { CosmosSDKSessionController } from './cosmos';
 export { EthereumSessionController } from './ethereum';
 export { NEARSessionController } from './near';
 export { SolanaSessionController } from './solana';
