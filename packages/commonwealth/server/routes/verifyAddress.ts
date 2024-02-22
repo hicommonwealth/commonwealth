@@ -4,22 +4,19 @@ import {
   AppError,
   ChainBase,
   DynamicTemplate,
-  NotificationCategories,
   WalletId,
   WalletSsoSource,
   logger,
 } from '@hicommonwealth/core';
-import type {
-  CommunityInstance,
-  DB,
-  ProfileAttributes,
-} from '@hicommonwealth/model';
+import type { CommunityInstance, DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { addressSwapper } from '../../shared/utils';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import assertAddressOwnership from '../util/assertAddressOwnership';
-import verifySessionSignature from '../util/verifySessionSignature';
+import verifySessionSignature, {
+  markAddressInstanceAsVerified,
+} from '../util/verifySessionSignature';
 
 const log = logger().getLogger(__filename);
 
@@ -39,6 +36,48 @@ export const Errors = {
   WrongWallet: 'Verified with different wallet than created',
 };
 
+const transferAddress = async () => {
+  // reassign the users and profiles of the transferred addresses
+  await models.Address.update(
+    {
+      user_id: addressInstance.user_id,
+      profile_id: addressInstance.profile_id,
+    },
+    {
+      where: {
+        address,
+        user_id: { [Op.ne]: addressInstance.user_id },
+        verified: { [Op.ne]: null },
+      },
+    },
+  );
+
+  try {
+    // send email to the old user (should only ever be one)
+    const oldUser = await models.User.scope('withPrivateData').findOne({
+      where: { id: addressToTransfer.user_id, email: { [Op.ne]: null } },
+    });
+    if (!oldUser?.email) {
+      throw new AppError(Errors.NoEmail);
+    }
+    const msg = {
+      to: user.email,
+      from: 'Commonwealth <no-reply@commonwealth.im>',
+      templateId: DynamicTemplate.VerifyAddress,
+      dynamic_template_data: {
+        address,
+        chain: chain.name,
+      },
+    };
+    await sgMail.send(msg);
+    log.info(
+      `Sent address move email: ${address} transferred to a new account`,
+    );
+  } catch (e) {
+    log.error(`Could not send address move email for: ${address}`);
+  }
+};
+
 const processAddress = async (
   models: DB,
   chain: CommunityInstance,
@@ -48,10 +87,12 @@ const processAddress = async (
   wallet_sso_source: WalletSsoSource,
   signature: string,
   user: Express.User,
+  session,
   sessionAddress: string | null,
   sessionIssued: string | null,
   sessionBlockInfo: string | null,
 ): Promise<void> => {
+  console.log(session);
   const addressInstance = await models.Address.scope('withPrivateData').findOne(
     {
       where: { community_id: chain.id, address },
@@ -73,63 +114,17 @@ const processAddress = async (
   }
 
   // verify the signature matches the session information = verify ownership
-  try {
-    const valid = await verifySessionSignature(
-      models,
-      chain,
-      chain_id,
-      addressInstance,
-      user ? user.id : null,
-      signature,
-      sessionAddress,
-      sessionIssued,
-      sessionBlockInfo,
-    );
-    if (!valid) {
-      throw new AppError(Errors.InvalidSignature);
-    }
-  } catch (e) {
-    log.warn(`Failed to verify signature for ${address}: ${e.stack}`);
-    throw new AppError(Errors.CouldNotVerifySignature);
+  const valid = await verifySessionSignature(session, addressInstance.address);
+  if (!valid) {
+    throw new AppError(Errors.InvalidSignature);
   }
 
   addressInstance.last_active = new Date();
-
-  if (!user?.id) {
-    // user is not logged in
-    addressInstance.verification_token_expires = null;
-    addressInstance.verified = new Date();
-    if (!addressInstance.user_id) {
-      // address is not yet verified => create a new user
-      const newUser = await models.User.createWithProfile(models, {
-        email: null,
-      });
-      addressInstance.profile_id = (
-        newUser.Profiles[0] as ProfileAttributes
-      ).id;
-      await models.Subscription.create({
-        subscriber_id: newUser.id,
-        category_id: NotificationCategories.NewMention,
-        is_active: true,
-      });
-      await models.Subscription.create({
-        subscriber_id: newUser.id,
-        category_id: NotificationCategories.NewCollaboration,
-        is_active: true,
-      });
-      addressInstance.user_id = newUser.id;
-    }
-  } else {
-    // user is already logged in => verify the newly created address
-    addressInstance.verification_token_expires = null;
-    addressInstance.verified = new Date();
-    addressInstance.user_id = user.id;
-    const profile = await models.Profile.findOne({
-      where: { user_id: user.id },
-    });
-    addressInstance.profile_id = profile.id;
-  }
-  await addressInstance.save();
+  await markAddressInstanceAsVerified({
+    addressInstance,
+    models,
+    user_id: user?.id,
+  });
 
   // if address has already been previously verified, update all other addresses
   // to point to the new user = "transfer ownership".
@@ -142,45 +137,6 @@ const processAddress = async (
   });
 
   if (addressToTransfer) {
-    // reassign the users and profiles of the transferred addresses
-    await models.Address.update(
-      {
-        user_id: addressInstance.user_id,
-        profile_id: addressInstance.profile_id,
-      },
-      {
-        where: {
-          address,
-          user_id: { [Op.ne]: addressInstance.user_id },
-          verified: { [Op.ne]: null },
-        },
-      },
-    );
-
-    try {
-      // send email to the old user (should only ever be one)
-      const oldUser = await models.User.scope('withPrivateData').findOne({
-        where: { id: addressToTransfer.user_id, email: { [Op.ne]: null } },
-      });
-      if (!oldUser?.email) {
-        throw new AppError(Errors.NoEmail);
-      }
-      const msg = {
-        to: user.email,
-        from: 'Commonwealth <no-reply@commonwealth.im>',
-        templateId: DynamicTemplate.VerifyAddress,
-        dynamic_template_data: {
-          address,
-          chain: chain.name,
-        },
-      };
-      await sgMail.send(msg);
-      log.info(
-        `Sent address move email: ${address} transferred to a new account`,
-      );
-    } catch (e) {
-      log.error(`Could not send address move email for: ${address}`);
-    }
   }
 };
 
@@ -190,20 +146,24 @@ const verifyAddress = async (
   res: Response,
   next: NextFunction,
 ) => {
-  if (!req.body.chain || !req.body.chain_id) {
-    throw new AppError(Errors.NoChain);
+  if (!req.body.address || !req.body.signature || !req.body.session) {
+    throw new AppError(Errors.InvalidArguments);
   }
+
+  // if (!req.body.chain || !req.body.chain_id) {
+  //   throw new AppError(Errors.NoChain);
+  // }
+
+  const session = req.body.session;
+  const chainId = session.address.split(':')[1];
+
   const chain = await models.Community.findOne({
     where: { id: req.body.chain },
   });
-  const chain_id = req.body.chain_id;
-  if (!chain) {
-    return next(new AppError(Errors.InvalidChain));
-  }
-
-  if (!req.body.address || !req.body.signature) {
-    throw new AppError(Errors.InvalidArguments);
-  }
+  // const chain_id = req.body.chain_id;
+  // if (!chain) {
+  //   return next(new AppError(Errors.InvalidChain));
+  // }
 
   const address =
     chain.base === ChainBase.Substrate
