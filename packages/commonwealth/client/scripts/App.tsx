@@ -4,7 +4,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import useInitApp from 'hooks/useInitApp';
 import router from 'navigation/Router';
-import React, { StrictMode } from 'react';
+import React, { StrictMode, useEffect, useState } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { queryClient } from 'state/api/config';
@@ -30,6 +30,24 @@ const App = () => {
   const { isAddedToHomeScreen, isMarketingPage, isIOS, isAndroid } =
     useAppStatus();
 
+  const [showPrompt, setShowPrompt] = useState(false);
+  const [isSplashUnloaded, setIsSplashUnloaded] = useState(false);
+
+  useEffect(() => {
+    if (!isLoading) {
+      // Delay the unloading of the Splash component
+      setTimeout(() => {
+        setIsSplashUnloaded(true);
+      }, 1000); // Adjust the delay as needed
+    }
+  }, [isLoading]);
+
+  useEffect(() => {
+    if (isSplashUnloaded) {
+      setShowPrompt(true);
+    }
+  }, [isSplashUnloaded]);
+
   return (
     <StrictMode>
       <QueryClientProvider client={queryClient}>
@@ -39,7 +57,7 @@ const App = () => {
           ) : (
             <>
               <RouterProvider router={router(customDomain)} />
-              {isAddedToHomeScreen || isMarketingPage ? null : (
+              {isAddedToHomeScreen || isMarketingPage || !showPrompt ? null : (
                 <AddToHomeScreenPrompt isIOS={isIOS} isAndroid={isAndroid} />
               )}
             </>
