@@ -11,15 +11,10 @@ import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip'
 import { HelpMenuPopover } from 'views/menus/help_menu';
 import { AuthModal } from 'views/modals/AuthModal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
-import { LoginModal } from 'views/modals/login_modal';
-import { useFlag } from '../hooks/useFlag';
 import app from '../state';
 import { CWDivider } from './components/component_kit/cw_divider';
 import { CWIconButton } from './components/component_kit/cw_icon_button';
-import {
-  isWindowMediumSmallInclusive,
-  isWindowSmallInclusive,
-} from './components/component_kit/helpers';
+import { isWindowSmallInclusive } from './components/component_kit/helpers';
 import { CWModal } from './components/component_kit/new_designs/CWModal';
 import { CWSearchBar } from './components/component_kit/new_designs/CWSearchBar';
 import { CWButton } from './components/component_kit/new_designs/cw_button';
@@ -35,7 +30,6 @@ export const SublayoutHeader = ({
   onMobile,
   isInsideCommunity,
 }: SublayoutHeaderProps) => {
-  const newSignInModalEnabled = useFlag('newSignInModal');
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const navigate = useCommonNavigate();
   const {
@@ -164,21 +158,10 @@ export const SublayoutHeader = ({
         onClose={() => setIsFeedbackModalOpen(false)}
         open={isFeedbackModalOpen}
       />
-      {!newSignInModalEnabled ? (
-        <CWModal
-          content={
-            <LoginModal onModalClose={() => setIsAuthModalOpen(false)} />
-          }
-          isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-          onClose={() => setIsAuthModalOpen(false)}
-          open={isAuthModalOpen}
-        />
-      ) : (
-        <AuthModal
-          onClose={() => setIsAuthModalOpen(false)}
-          isOpen={isAuthModalOpen}
-        />
-      )}
+      <AuthModal
+        onClose={() => setIsAuthModalOpen(false)}
+        isOpen={isAuthModalOpen}
+      />
     </>
   );
 };

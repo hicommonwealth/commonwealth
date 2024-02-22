@@ -19,7 +19,6 @@ export const featureFlags = {
   communityHomepage: buildFlag(process.env.FLAG_COMMUNITY_HOMEPAGE),
   newAdminOnboarding: buildFlag(process.env.FLAG_NEW_ADMIN_ONBOARDING),
   communityStake: buildFlag(process.env.FLAG_COMMUNITY_STAKE),
-  newSignInModal: buildFlag(process.env.FLAG_NEW_SIGN_IN_MODAL),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;

@@ -16,10 +16,7 @@ import {
   CWToggle,
   toggleDarkMode,
 } from 'views/components/component_kit/cw_toggle';
-import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import SessionRevalidationModal from 'views/modals/SessionRevalidationModal';
-import { LoginModal } from 'views/modals/login_modal';
-import { useFlag } from '../../../../hooks/useFlag';
 import { CWModal } from '../../component_kit/new_designs/CWModal';
 import './UserDropdown.scss';
 import { UserDropdownItem } from './UserDropdownItem';
@@ -58,7 +55,6 @@ const handleLogout = async () => {
 };
 
 const UserDropdown = () => {
-  const newSignInModalEnabled = useFlag('newSignInModal');
   const navigate = useCommonNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
@@ -195,21 +191,10 @@ const UserDropdown = () => {
           </button>
         )}
       />
-      {!newSignInModalEnabled ? (
-        <CWModal
-          content={
-            <LoginModal onModalClose={() => setIsAuthModalOpen(false)} />
-          }
-          isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-          onClose={() => setIsAuthModalOpen(false)}
-          open={isAuthModalOpen}
-        />
-      ) : (
-        <AuthModal
-          onClose={() => setIsAuthModalOpen(false)}
-          isOpen={isAuthModalOpen}
-        />
-      )}
+      <AuthModal
+        onClose={() => setIsAuthModalOpen(false)}
+        isOpen={isAuthModalOpen}
+      />
       <CWModal
         size="medium"
         content={
