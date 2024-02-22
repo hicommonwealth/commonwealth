@@ -28,7 +28,6 @@ export const CreateTopicSection = () => {
   const [nameErrorMsg, setNameErrorMsg] = useState<string | null>(null);
 
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [description, setDescription] = useState<string>('');
   const [featuredInSidebar, setFeaturedInSidebar] = useState<boolean>(false);
   const [name, setName] = useState<string>('');
 
@@ -41,7 +40,7 @@ export const CreateTopicSection = () => {
         description: values.topicDescription,
         featuredInSidebar,
         featuredInNewPost: false,
-        defaultOffchainTemplate: '',
+        defaultOffchainTemplate: null,
       });
       navigate(`/discussions/${encodeURI(name.toString().trim())}`);
     } catch (err) {
@@ -102,10 +101,6 @@ export const CreateTopicSection = () => {
             placeholder="Enter a description"
             name="topicDescription"
             tabIndex={2}
-            value={description}
-            onInput={(e) => {
-              setDescription(e.target.value);
-            }}
           />
           <CWText type="caption">
             Choose where to feature this topic. Select at least one.
