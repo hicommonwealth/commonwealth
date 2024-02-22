@@ -1,11 +1,11 @@
-import { CWText } from 'views/components/component_kit/cw_text';
 import clsx from 'clsx';
 import React from 'react';
+import { CWText } from 'views/components/component_kit/cw_text';
 import { CWIdentificationTag } from 'views/components/component_kit/new_designs/CWIdentificationTag';
 
-import './AccountConnectionIndicator.scss';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
-import useJoinCommunity from 'views/components/Header/useJoinCommunity';
+import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
+import './AccountConnectionIndicator.scss';
 
 interface AccountConnectionIndicatorProps {
   connected: boolean;
