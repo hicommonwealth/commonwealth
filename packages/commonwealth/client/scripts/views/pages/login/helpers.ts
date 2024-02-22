@@ -12,7 +12,7 @@ export const getLoginText = (
     };
   } else if (activeStep === 'walletList') {
     return {
-      headerText: 'Sign in to Commonwealth',
+      headerText: 'Sign in to Common',
       bodyText: `Many communities require different wallets 
       based on the chain they are built on and 
       the types of tokens members hold.`,
@@ -49,7 +49,7 @@ export const getLoginText = (
   } else if (activeStep === 'connectWithEmail') {
     return {
       headerText: 'Enter your email',
-      bodyText: `Follow the instructions provided to sign in to Commonwealth with your email.`,
+      bodyText: `Follow the instructions provided to sign in to Common with your email.`,
     };
   } else if (activeStep === 'ethWalletList') {
     return {
