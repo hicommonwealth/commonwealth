@@ -30,7 +30,6 @@ export enum ComponentType {
   Label = 'Label',
   LoadingSpinner = 'LoadingSpinner',
   MessageBanner = 'MessageBanner',
-  MobileMenu = 'MobileMenu',
   Modal = 'CWModal',
   ModalSelectButton = 'ModalSelectButton',
   OldTextInput = 'OldTextInput',

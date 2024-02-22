@@ -19,7 +19,7 @@ export const MixpanelAnalytics = (): Analytics => {
   }
 
   return {
-    name: 'mixpanel-analytics',
+    name: 'MixpanelAnalytics',
     dispose: async () => {},
     track: (event: string, payload: AnalyticsOptions) => {
       try {

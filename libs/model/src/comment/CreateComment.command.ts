@@ -8,16 +8,18 @@ const schema = z.object({
   content: z.string(),
 });
 
-export const CreateComment: CommandMetadata<CommentAttributes, typeof schema> =
-  {
-    schema,
-    auth: [],
-    body: async ({ id, payload }) => {
-      const comment = await models.Comment.findOne({ where: { id } });
+export const CreateComment = (): CommandMetadata<
+  CommentAttributes,
+  typeof schema
+> => ({
+  schema,
+  auth: [],
+  body: async ({ id, payload }) => {
+    const comment = await models.Comment.findOne({ where: { id } });
 
-      mustNotExist('Comment', comment);
+    mustNotExist('Comment', comment);
 
-      //await models.Comment.create(payload)
-      return payload as Partial<CommentAttributes>;
-    },
-  };
+    //await models.Comment.create(payload)
+    return payload as Partial<CommentAttributes>;
+  },
+});

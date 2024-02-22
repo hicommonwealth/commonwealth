@@ -1,0 +1,16 @@
+@import '../../../../styles/shared.scss';
+
+.TOSModal {
+  display: flex;
+  flex-direction: column;
+  width: auto;
+  height: auto;
+
+  .Text {
+    display: block;
+
+    > a {
+      margin-left: 4px;
+    }
+  }
+}
