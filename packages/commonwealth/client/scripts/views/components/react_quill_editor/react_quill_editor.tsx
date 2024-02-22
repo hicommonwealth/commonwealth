@@ -2,7 +2,6 @@ import clsx from 'clsx';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { nextTick } from 'process';
 import { RangeStatic } from 'quill';
-import ImageUploader from 'quill-image-uploader';
 import MagicUrl from 'quill-magic-url';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
@@ -10,6 +9,7 @@ import ReactQuill, { Quill } from 'react-quill';
 import { openConfirmation } from '../../modals/confirmation_modal';
 import type { IconName } from '../component_kit/cw_icons/cw_icon_lookup';
 import { CWTab, CWTabsRow } from '../component_kit/new_designs/CWTabs';
+import { CustomQuillFooter } from './CustomQuillFooter';
 import QuillTooltip from './QuillTooltip';
 import { LoadingIndicator } from './loading_indicator';
 import { CustomQuillToolbar, useMarkdownToolbarHandlers } from './toolbar';
@@ -27,7 +27,6 @@ import 'react-quill/dist/quill.snow.css';
 import { MarkdownPreview } from './MarkdownPreview';
 
 Quill.register('modules/magicUrl', MagicUrl);
-Quill.register('modules/imageUploader', ImageUploader);
 
 type ReactQuillEditorProps = {
   className?: string;
@@ -292,9 +291,6 @@ const ReactQuillEditor = ({
                               mention,
                               magicUrl: false,
                               keyboard: markdownKeyboardShortcuts,
-                              imageUploader: {
-                                upload: handleImageUploader,
-                              },
                             }}
                           />
                         </div>
@@ -303,6 +299,7 @@ const ReactQuillEditor = ({
                     )}
                   </Droppable>
                 </DragDropContext>
+                <CustomQuillFooter handleImageUploader={handleImageUploader} />
               </>
             )}
           </div>
