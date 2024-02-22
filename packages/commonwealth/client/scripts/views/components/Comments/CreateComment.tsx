@@ -35,6 +35,9 @@ export const CreateComment = ({
       : `new-comment-reply-${parentCommentId}`,
   );
 
+  const urlParams = new URLSearchParams(location.search);
+  const focusEditorParam = urlParams.get('focusEditor') === 'true';
+
   // get restored draft on init
   const restoredDraft = useMemo(() => {
     return restoreDraft() || createDeltaFromText('');
@@ -144,7 +147,7 @@ export const CreateComment = ({
             onCancel={handleCancel}
             author={author}
             editorValue={editorValue}
-            shouldFocus={canComment}
+            shouldFocus={canComment && focusEditorParam}
             tooltipText={tooltipText}
           />
           {RevalidationModal}

@@ -15,16 +15,20 @@ export const useNotionPaste = (
       const pastedText = event.clipboardData.getData('text/plain');
 
       if (pastedText) {
-        setContentDelta({
-          ...contentDelta,
-          ops: [
-            {
-              insert: pastedText,
-            },
-          ],
+        setContentDelta((prevContentDelta) => {
+          return {
+            ...prevContentDelta,
+            ops: [
+              ...prevContentDelta.ops,
+              {
+                insert: pastedText,
+              },
+            ],
+          };
         });
+
         setTimeout(() => {
-          const newCursorPosition = editor.getLength();
+          const newCursorPosition = editor.getLength() - 1;
           editor.setSelection(newCursorPosition, newCursorPosition);
         }, 10);
         return;
