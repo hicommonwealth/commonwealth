@@ -1,4 +1,3 @@
-import { pluralizeWithoutNumberPrefix } from 'client/scripts/helpers';
 import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import { useCommonNavigate } from 'client/scripts/navigation/helpers';
 import app from 'client/scripts/state';
@@ -54,18 +53,6 @@ export const CreateTopicSection = () => {
 
     if (currentCommunityTopicNames.includes(text.toLowerCase())) {
       const err = 'Topic name already used within community.';
-      setNameErrorMsg(err);
-      return ['failure', err];
-    }
-
-    const disallowedCharMatches = text.match(/["<>%{}|\\/^`]/g);
-
-    if (disallowedCharMatches) {
-      const err = `The ${pluralizeWithoutNumberPrefix(
-        disallowedCharMatches.length,
-        'char',
-      )}
-    ${disallowedCharMatches.join(', ')} are not permitted`;
       setNameErrorMsg(err);
       return ['failure', err];
     }
