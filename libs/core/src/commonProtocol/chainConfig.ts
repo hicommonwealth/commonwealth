@@ -20,8 +20,8 @@ export const factoryContracts: {
     chainId: 11155111,
   },
   [ValidChains.Base]: {
-    factory: '0xD656267Af2E41580d47451Df2e6E21f5367CC04D',
-    communityStake: '0xfef0dEE36609C0B223EEbbC6089356A9D8f5490f',
+    factory: '0xedf43C919f59900C82d963E99d822dA3F95575EA',
+    communityStake: '0xcc752fd15A7Dd0d5301b6A626316E7211352Cf62',
     chainId: 8453,
   },
 };
