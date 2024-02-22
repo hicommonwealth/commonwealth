@@ -60,7 +60,7 @@ export const EditTopicModal = ({
       telegram: null,
       featured_in_sidebar: featuredInSidebar,
       featured_in_new_post: false,
-      default_offchain_template: null,
+      default_offchain_template: '',
       total_threads: topic.totalThreads || 0,
     };
 
