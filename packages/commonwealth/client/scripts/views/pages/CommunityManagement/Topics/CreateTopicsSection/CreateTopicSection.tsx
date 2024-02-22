@@ -76,8 +76,9 @@ export const CreateTopicSection = () => {
             name="topicName"
             value={name}
             onInput={(e) => {
-              setName(e.target.value);
-              handleInputValidation(e.target.value);
+              const inputVal = e.target.value.trim();
+              setName(inputVal);
+              handleInputValidation(inputVal);
             }}
             customError={nameErrorMsg}
             autoFocus
