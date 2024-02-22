@@ -3,8 +3,8 @@ import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWIdentificationTag } from 'views/components/component_kit/new_designs/CWIdentificationTag';
 
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import './AccountConnectionIndicator.scss';
 
 interface AccountConnectionIndicatorProps {
