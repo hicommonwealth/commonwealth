@@ -31,7 +31,7 @@ export const IOSPrompt = ({
         <div className="instructions">
           <CWText className="instruction">
             1. Tap the share <CWIcon className="share-icon" iconName="export" />{' '}
-            icon below
+            icon
           </CWText>
           <CWText className="instruction">
             2. Select <span className="highlight">Add to Home Screen</span>
