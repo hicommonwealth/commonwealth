@@ -1,0 +1,127 @@
+import { CacheNamespaces, cache } from '@hicommonwealth/core';
+import {
+  CommunityAttributes,
+  CommunityInstance,
+  CommunitySnapshotSpaceWithSpaceAttached,
+  sequelize,
+} from '@hicommonwealth/model';
+import { Op, QueryTypes } from 'sequelize';
+import { ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS } from 'server/config';
+import { ServerCommunitiesController } from '../server_communities_controller';
+
+const CACHE_KEY = 'active-communities';
+
+export type GetActiveCommunitiesOptions = {
+  cacheEnabled: boolean;
+};
+export type GetActiveCommunitiesResult = {
+  communitiesWithSnapshots: {
+    community: CommunityAttributes;
+    snapshot: string[];
+  }[];
+  totalCommunitiesCount: number;
+};
+
+export async function __getActiveCommunities(
+  this: ServerCommunitiesController,
+  { cacheEnabled }: GetActiveCommunitiesOptions,
+): Promise<GetActiveCommunitiesResult> {
+  if (cacheEnabled) {
+    const cachedResult = await cache().getKey(
+      CacheNamespaces.Function_Response,
+      CACHE_KEY,
+    );
+    if (cachedResult) {
+      return JSON.parse(cachedResult);
+    }
+  }
+
+  const query = `
+    SELECT
+        c.id,
+        COUNT(DISTINCT t.id) AS topic_count,
+        COUNT(DISTINCT a.id) AS address_count
+    FROM
+        "Communities" c
+        LEFT JOIN "Topics" t ON c.id = t.community_id
+        LEFT JOIN "Addresses" a ON c.id = a.community_id
+    WHERE
+        c.active = true
+    GROUP BY
+        c.id
+    HAVING
+        COUNT(DISTINCT t.id) > 0
+        AND COUNT(DISTINCT a.id) >= 10;
+    `;
+  const activeCommunities = await sequelize.query<CommunityAttributes>(query, {
+    type: QueryTypes.SELECT,
+  });
+
+  const communityIds = activeCommunities.map((community) => community.id);
+  const [communities, snapshotSpaces, totalCommunitiesCount]: [
+    CommunityInstance[],
+    CommunitySnapshotSpaceWithSpaceAttached[],
+    number,
+  ] = await Promise.all([
+    this.models.Community.findAll({
+      where: {
+        id: {
+          [Op.in]: communityIds,
+        },
+      },
+      include: [
+        {
+          model: this.models.Topic,
+          required: true,
+          as: 'topics',
+          attributes: ['id'],
+        },
+      ],
+    }),
+    this.models.CommunitySnapshotSpaces.findAll({
+      where: {
+        community_id: {
+          [Op.in]: communityIds,
+        },
+      },
+      include: {
+        model: this.models.SnapshotSpace,
+        as: 'snapshot_space',
+      },
+    }),
+    this.models.Community.count({
+      where: {
+        active: true,
+      },
+    }),
+  ]);
+
+  const communitiesWithSnapshots = communities.map((community) => {
+    const communitySnapshotSpaces = snapshotSpaces.filter(
+      (space) => space.community_id === community.id,
+    );
+    const snapshotSpaceNames = communitySnapshotSpaces.map(
+      (space) => space.snapshot_space?.snapshot_space,
+    );
+    return {
+      community,
+      snapshot: snapshotSpaceNames.length > 0 ? snapshotSpaceNames : [],
+    };
+  });
+
+  const result = {
+    communitiesWithSnapshots,
+    totalCommunitiesCount,
+  };
+
+  if (cacheEnabled) {
+    cache().setKey(
+      CacheNamespaces.Function_Response,
+      CACHE_KEY,
+      JSON.stringify(result),
+      ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS,
+    );
+  }
+
+  return result;
+}

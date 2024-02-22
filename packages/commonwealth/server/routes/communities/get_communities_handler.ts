@@ -1,5 +1,5 @@
 import { AppError } from '@hicommonwealth/core';
-import { GetCommunitiesResult } from 'server/controllers/server_communities_methods/get_communities';
+import { GetActiveCommunitiesResult } from 'server/controllers/server_communities_methods/get_active_communities';
 import { SearchCommunitiesResult } from 'server/controllers/server_communities_methods/search_communities';
 import { ServerControllers } from '../../routing/router';
 import {
@@ -18,7 +18,9 @@ type GetCommunitiesRequestQuery = {
   search?: string;
 } & PaginationQueryParams;
 
-type GetCommunitiesResponse = GetCommunitiesResult | SearchCommunitiesResult;
+type GetCommunitiesResponse =
+  | GetActiveCommunitiesResult
+  | SearchCommunitiesResult;
 
 export const getCommunitiesHandler = async (
   controllers: ServerControllers,
@@ -27,9 +29,11 @@ export const getCommunitiesHandler = async (
 ) => {
   const options = req.query;
 
-  // get chains, with snapshots
+  // get active communities, with snapshots
   if (options.snapshots === 'true') {
-    const results = await controllers.communities.getCommunities({});
+    const results = await controllers.communities.getActiveCommunities({
+      cacheEnabled: true,
+    });
     return success(res, results);
   }
 

@@ -222,17 +222,15 @@ export async function initAppState(
         app.config.nodes.add(NodeInfo.fromJSON(node));
       });
 
-    communitiesWithSnapshotsRes.result
-      .filter((chainsWithSnapshots) => chainsWithSnapshots.community.active)
-      .forEach((chainsWithSnapshots) => {
-        delete chainsWithSnapshots.community.ChainNode;
+    communitiesWithSnapshotsRes.result.communitiesWithSnapshots
+      .filter((entry) => entry.community.active)
+      .forEach((entry) => {
+        delete entry.community.ChainNode;
         app.config.chains.add(
           ChainInfo.fromJSON({
-            ChainNode: app.config.nodes.getById(
-              chainsWithSnapshots.community.chain_node_id,
-            ),
-            snapshot: chainsWithSnapshots.snapshot,
-            ...chainsWithSnapshots.community,
+            ChainNode: app.config.nodes.getById(entry.community.chain_node_id),
+            snapshot: entry.snapshot,
+            ...entry.community,
           }),
         );
       });
