@@ -12,13 +12,13 @@ import { openFeatureProvider } from './helpers/feature-flags';
 import useAppStatus from './hooks/useAppStatus';
 import { AddToHomeScreenPrompt } from './views/components/AddToHomeScreenPrompt';
 
-import { CWIcon } from './views/components/component_kit/cw_icons/cw_icon';
+import CWLoadingSpinner from './views/components/component_kit/new_designs/CWLoadingSpinner';
 
 const Splash = () => {
   return (
     <div className="Splash">
       {/* This can be a moving bobber, atm it is still */}
-      <CWIcon iconName="cow" iconSize="xxl" />
+      <CWLoadingSpinner />
     </div>
   );
 };

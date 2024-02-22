@@ -73,7 +73,6 @@ export const CustomQuillToolbar = ({
         <button className="ql-link"></button>
         <button className="ql-code-block"></button>
         <button className="ql-blockquote"></button>
-        <button className="ql-image">image</button>
       </div>
       <div className="section">
         <button className="ql-list" value="ordered" />
