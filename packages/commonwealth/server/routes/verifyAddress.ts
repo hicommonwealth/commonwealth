@@ -1,11 +1,11 @@
 import { Op } from 'sequelize';
 
+import { Session } from '@canvas-js/interfaces';
 import {
   AppError,
   ChainBase,
   DynamicTemplate,
   WalletId,
-  WalletSsoSource,
   logger,
 } from '@hicommonwealth/core';
 import type { CommunityInstance, DB } from '@hicommonwealth/model';
@@ -40,18 +40,11 @@ export const Errors = {
 const processAddress = async (
   models: DB,
   chain: CommunityInstance,
-  chain_id: string | number,
   address: string,
   wallet_id: WalletId,
-  wallet_sso_source: WalletSsoSource,
-  signature: string,
   user: Express.User,
-  session,
-  sessionAddress: string | null,
-  sessionIssued: string | null,
-  sessionBlockInfo: string | null,
+  session: Session,
 ): Promise<void> => {
-  console.log(session);
   const addressInstance = await models.Address.scope('withPrivateData').findOne(
     {
       where: { community_id: chain.id, address },
@@ -149,24 +142,18 @@ const verifyAddress = async (
   res: Response,
   next: NextFunction,
 ) => {
-  if (!req.body.address || !req.body.signature || !req.body.session) {
+  if (
+    !req.body.address ||
+    !req.body.signature ||
+    !req.body.session ||
+    !req.body.wallet_id
+  ) {
     throw new AppError(Errors.InvalidArguments);
   }
-
-  // if (!req.body.chain || !req.body.chain_id) {
-  //   throw new AppError(Errors.NoChain);
-  // }
-
-  const session = req.body.session;
-  const chainId = session.address.split(':')[1];
 
   const chain = await models.Community.findOne({
     where: { id: req.body.chain },
   });
-  // const chain_id = req.body.chain_id;
-  // if (!chain) {
-  //   return next(new AppError(Errors.InvalidChain));
-  // }
 
   const address =
     chain.base === ChainBase.Substrate
@@ -179,15 +166,10 @@ const verifyAddress = async (
   await processAddress(
     models,
     chain,
-    chain_id,
     address,
     req.body.wallet_id,
-    req.body.wallet_sso_source,
-    req.body.signature,
     req.user,
-    req.body.session_public_address,
-    req.body.session_timestamp || null, // disallow empty strings
-    req.body.session_block_data || null, // disallow empty strings
+    req.body.session,
   );
 
   // assertion check
