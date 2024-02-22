@@ -30,7 +30,7 @@ export const isAuthorOrAdmin = async (
     );
     if (roles.length === 0) return false;
     const role = roles.find((r) => {
-      return r.chain_id === chain;
+      return r.community_id === chain;
     });
     return !!role;
   } else {

@@ -19,9 +19,7 @@ export type SearchThreadsOptions = {
   orderDirection?: 'ASC' | 'DESC';
 };
 
-type ThreadSearchData = Omit<ThreadAttributes, 'chain'> & {
-  community_id: string;
-};
+type ThreadSearchData = ThreadAttributes;
 
 export type SearchThreadsResult =
   | TypedPaginatedResult<ThreadSearchData[]>
@@ -93,7 +91,7 @@ export async function __searchThreads(
       'thread' as type,
       "Addresses".id as address_id,
       "Addresses".address,
-      "Addresses".community_id as address_chain,
+      "Addresses".community_id as address_community_id,
       "Threads".created_at,
       "Threads".community_id as community_id,
       ts_rank_cd("Threads"._search, query) as rank

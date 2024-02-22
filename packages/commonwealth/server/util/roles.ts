@@ -18,7 +18,7 @@ export type RoleInstanceWithPermissionAttributes = RoleAssignmentAttributes & {
 
 export class RoleInstanceWithPermission {
   _roleAssignmentAttributes: RoleAssignmentAttributes;
-  chain_id: string;
+  community_id: string;
   permission: Role;
   allow: number;
   deny: number;
@@ -31,7 +31,7 @@ export class RoleInstanceWithPermission {
     deny: number,
   ) {
     this._roleAssignmentAttributes = _roleAssignmentInstance;
-    this.chain_id = chain_id;
+    this.community_id = chain_id;
     this.permission = permission;
     this.allow = allow;
     this.deny = deny;
@@ -40,7 +40,7 @@ export class RoleInstanceWithPermission {
   public toJSON(): RoleInstanceWithPermissionAttributes {
     return {
       ...this._roleAssignmentAttributes,
-      chain_id: this.chain_id,
+      chain_id: this.community_id,
       permission: this.permission,
       allow: this.allow,
       deny: this.deny,

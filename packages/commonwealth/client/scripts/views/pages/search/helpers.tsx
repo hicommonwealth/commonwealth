@@ -205,7 +205,7 @@ export type MemberResult = {
   avatar_url: string;
   addresses: {
     id: number;
-    chain: string;
+    community_id: string;
     address: string;
   }[];
   group_ids?: [];

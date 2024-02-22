@@ -138,10 +138,11 @@ export async function __updateThread(
   );
   const isThreadOwner = userOwnedAddressIds.includes(thread.address_id);
   const isMod = !!roles.find(
-    (r) => r.chain_id === thread.community_id && r.permission === 'moderator',
+    (r) =>
+      r.community_id === thread.community_id && r.permission === 'moderator',
   );
   const isAdmin = !!roles.find(
-    (r) => r.chain_id === thread.community_id && r.permission === 'admin',
+    (r) => r.community_id === thread.community_id && r.permission === 'admin',
   );
   const isSuperAdmin = user.isAdmin;
   if (

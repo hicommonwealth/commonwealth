@@ -47,27 +47,15 @@ export async function __getStats(
 
   const oneMonthAgo = new Date();
   oneMonthAgo.setDate(oneMonthAgo.getDate() - 30);
-
-  const where = {
-    created_at: {
-      [Op.gte]: oneMonthAgo,
-    },
-  };
-  const whereChain: WhereOptions<{
-    created_at: any;
-    chain: string;
-  }> = {
-    ...where,
-  };
   const whereCommunityId: WhereOptions<{
     created_at: any;
     community_id: string;
-  }> = { ...where };
-
-  if (community) {
-    whereChain.chain = communityId;
-    whereCommunityId.community_id = communityId;
-  }
+  }> = {
+    created_at: {
+      [Op.gte]: oneMonthAgo,
+    },
+    community_id: communityId,
+  };
 
   const [
     lastMonthNewCommunities,
