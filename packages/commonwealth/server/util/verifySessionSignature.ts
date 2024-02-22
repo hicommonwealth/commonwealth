@@ -22,6 +22,17 @@ const signers: SessionSigner[] = [
 
 export const markAddressInstanceAsVerified = async ({
   addressInstance,
+}: {
+  addressInstance: AddressInstance;
+  models: DB;
+}) => {
+  // mark the address as verified
+  addressInstance.verification_token_expires = null;
+  addressInstance.verified = new Date();
+};
+
+export const attachUserAndProfileToAddressInstance = async ({
+  addressInstance,
   models,
   user_id,
 }: {
@@ -29,10 +40,6 @@ export const markAddressInstanceAsVerified = async ({
   models: DB;
   user_id: number | null;
 }) => {
-  // mark the address as verified
-  addressInstance.verification_token_expires = null;
-  addressInstance.verified = new Date();
-
   if (user_id === null) {
     // if it doesn't have an associated user, create a new user
     if (!addressInstance.user_id) {

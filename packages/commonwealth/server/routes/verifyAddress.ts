@@ -15,6 +15,7 @@ import { addressSwapper } from '../../shared/utils';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import assertAddressOwnership from '../util/assertAddressOwnership';
 import verifySessionSignature, {
+  attachUserAndProfileToAddressInstance,
   markAddressInstanceAsVerified,
 } from '../util/verifySessionSignature';
 
@@ -81,8 +82,13 @@ const processAddress = async (
   await markAddressInstanceAsVerified({
     addressInstance,
     models,
+  });
+  await attachUserAndProfileToAddressInstance({
+    addressInstance,
+    models,
     user_id: user?.id,
   });
+  addressInstance.save();
 
   // if address has already been previously verified, update all other addresses
   // to point to the new user = "transfer ownership".
