@@ -1,1 +1,2 @@
-export { CommunityCard, NewCommunityCard } from './CommunityCard';
+export { CommunityCard } from './CommunityCard';
+export { NewCommunityCard } from './NewCommunityCard';

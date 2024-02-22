@@ -15,7 +15,7 @@ export const TrendingCommunitiesPreview = () => {
       const threadCountB = app.recentActivity.getCommunityThreadCount(b.id);
       return threadCountB - threadCountA;
     })
-    .map((community, i) => {
+    .map((community) => {
       const monthlyThreadCount = app.recentActivity.getCommunityThreadCount(
         community.id,
       );
@@ -26,18 +26,13 @@ export const TrendingCommunitiesPreview = () => {
       const { unseenPosts } = app.user;
       const hasVisitedCommunity = !!unseenPosts[community.id];
 
-      return (
-        <CommunityPreviewCard
-          key={i}
-          community={community}
-          monthlyThreadCount={monthlyThreadCount}
-          isCommunityMember={isMember}
-          hasUnseenPosts={app.isLoggedIn() && !hasVisitedCommunity}
-          onClick={() => {
-            navigate(`/${community.id}`);
-          }}
-        />
-      );
+      return {
+        community,
+        monthlyThreadCount,
+        isMember,
+        hasUnseenPosts: app.isLoggedIn() && !hasVisitedCommunity,
+        onClick: () => navigate(`/${community.id}`),
+      };
     });
 
   return (
@@ -46,9 +41,19 @@ export const TrendingCommunitiesPreview = () => {
         Trending Communities
       </CWText>
       <div className="community-preview-cards-collection">
-        {sortedCommunities.length > 3
+        {(sortedCommunities.length > 3
           ? sortedCommunities.slice(0, 3)
-          : sortedCommunities}
+          : sortedCommunities
+        ).map((sortedCommunity, index) => (
+          <CommunityPreviewCard
+            key={index}
+            community={sortedCommunity.community}
+            monthlyThreadCount={sortedCommunity.monthlyThreadCount}
+            isCommunityMember={sortedCommunity.isMember}
+            hasUnseenPosts={sortedCommunity.hasUnseenPosts}
+            onClick={sortedCommunity.onClick}
+          />
+        ))}
         <CommunityPreviewCard
           isExploreMode
           onClick={() => {
