@@ -2,7 +2,6 @@ import { CacheNamespaces, cache } from '@hicommonwealth/core';
 import {
   CommunityAttributes,
   CommunityInstance,
-  CommunitySnapshotSpaceWithSpaceAttached,
   sequelize,
 } from '@hicommonwealth/model';
 import { Op, QueryTypes } from 'sequelize';
@@ -15,10 +14,7 @@ export type GetActiveCommunitiesOptions = {
   cacheEnabled: boolean;
 };
 export type GetActiveCommunitiesResult = {
-  communitiesWithSnapshots: {
-    community: CommunityAttributes;
-    snapshot: string[];
-  }[];
+  communities: CommunityAttributes[];
   totalCommunitiesCount: number;
 };
 
@@ -58,59 +54,32 @@ export async function __getActiveCommunities(
   });
 
   const communityIds = activeCommunities.map((community) => community.id);
-  const [communities, snapshotSpaces, totalCommunitiesCount]: [
-    CommunityInstance[],
-    CommunitySnapshotSpaceWithSpaceAttached[],
-    number,
-  ] = await Promise.all([
-    this.models.Community.findAll({
-      where: {
-        id: {
-          [Op.in]: communityIds,
+  const [communities, totalCommunitiesCount]: [CommunityInstance[], number] =
+    await Promise.all([
+      this.models.Community.findAll({
+        where: {
+          id: {
+            [Op.in]: communityIds,
+          },
         },
-      },
-      include: [
-        {
-          model: this.models.Topic,
-          required: true,
-          as: 'topics',
-          attributes: ['id'],
+        include: [
+          {
+            model: this.models.Topic,
+            required: true,
+            as: 'topics',
+            attributes: ['id'],
+          },
+        ],
+      }),
+      this.models.Community.count({
+        where: {
+          active: true,
         },
-      ],
-    }),
-    this.models.CommunitySnapshotSpaces.findAll({
-      where: {
-        community_id: {
-          [Op.in]: communityIds,
-        },
-      },
-      include: {
-        model: this.models.SnapshotSpace,
-        as: 'snapshot_space',
-      },
-    }),
-    this.models.Community.count({
-      where: {
-        active: true,
-      },
-    }),
-  ]);
-
-  const communitiesWithSnapshots = communities.map((community) => {
-    const communitySnapshotSpaces = snapshotSpaces.filter(
-      (space) => space.community_id === community.id,
-    );
-    const snapshotSpaceNames = communitySnapshotSpaces.map(
-      (space) => space.snapshot_space?.snapshot_space,
-    );
-    return {
-      community,
-      snapshot: snapshotSpaceNames.length > 0 ? snapshotSpaceNames : [],
-    };
-  });
+      }),
+    ]);
 
   const result = {
-    communitiesWithSnapshots,
+    communities,
     totalCommunitiesCount,
   };
 

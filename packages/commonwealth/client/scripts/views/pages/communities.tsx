@@ -3,6 +3,7 @@ import {
   ChainNetwork,
   CommunityCategoryType,
 } from '@hicommonwealth/core';
+import useFetchActiveCommunitiesQuery from 'client/scripts/state/api/communities/fetchActiveCommunities';
 import numeral from 'numeral';
 import 'pages/communities.scss';
 import React from 'react';
@@ -135,7 +136,14 @@ const CommunitiesPage = () => {
     return res;
   };
 
-  const sortedCommunities = sortCommunities(app.config.chains.getAll());
+  const activeCommunities = useFetchActiveCommunitiesQuery();
+  const sortedCommunities = activeCommunities.data
+    ? sortCommunities(
+        activeCommunities.data.communities.map((c: any) =>
+          CommunityInfo.fromJSON(c),
+        ),
+      )
+    : [];
 
   return (
     <div className="CommunitiesPage">
@@ -145,7 +153,10 @@ const CommunitiesPage = () => {
             Explore Communities
           </CWText>
           <CWText type="h3" fontWeight="semiBold" className="communities-count">
-            {buildCommunityString(sortedCommunities.length)}
+            {activeCommunities.data &&
+              buildCommunityString(
+                activeCommunities.data.totalCommunitiesCount,
+              )}
           </CWText>
         </div>
         <div className="filter-buttons">
