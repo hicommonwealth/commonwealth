@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.describe.configure({ mode: 'parallel' });
 
@@ -33,7 +33,7 @@ test.describe('Community proposals page', () => {
     // these are lazy-loaded after page init
     await page.waitForSelector('.CardsCollection:nth-of-type(2)');
     const collection = await page.locator('.CardsCollection:nth-of-type(2)');
-    await collection.locator('.cards .Spinner');
+    await collection.locator('.cards .LoadingSpinner');
     const p = await collection
       .locator('.cards .ProposalCard .proposal-card-metadata')
       .first();
