@@ -45,7 +45,6 @@ import { CWProgressBar } from './cw_progress_bar';
 import type { RadioButtonType } from './cw_radio_button';
 import { CWRadioButton } from './cw_radio_button';
 import { CWRadioGroup } from './cw_radio_group';
-import { CWSpinner } from './cw_spinner';
 import { CWText } from './cw_text';
 import { CWTextArea } from './cw_text_area';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
@@ -59,6 +58,7 @@ import { CWCircleButton } from './new_designs/CWCircleButton/CWCircleButton';
 import CWDrawer from './new_designs/CWDrawer';
 import { CWForm } from './new_designs/CWForm';
 import CWIconButton from './new_designs/CWIconButton';
+import CWLoadingSpinner from './new_designs/CWLoadingSpinner';
 import { CWModal, CWModalBody, CWModalHeader } from './new_designs/CWModal';
 import { ModalSize } from './new_designs/CWModal/CWModal';
 import { CWRelatedCommunityCard } from './new_designs/CWRelatedCommunityCard';
@@ -1095,7 +1095,7 @@ export const ComponentShowcase = () => {
       </div>
       <div className="basic-gallery">
         <CWText type="h3">Spinner</CWText>
-        <CWSpinner />
+        <CWLoadingSpinner center={false} />
       </div>
       <div className="basic-gallery">
         <CWText type="h3">Breadcrumbs</CWText>
@@ -2198,11 +2198,7 @@ export const ComponentShowcase = () => {
           onClick={() => setIsDrawerOpen(true)}
         />
 
-        <CWDrawer
-          open={isDrawerOpen}
-          header="Lorem Ipsum"
-          onClose={() => setIsDrawerOpen(false)}
-        >
+        <CWDrawer open={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}>
           <div>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis
             porttitor vel erat nec eleifend. Nullam sit amet dui et eros luctus
@@ -2221,7 +2217,6 @@ export const ComponentShowcase = () => {
         />
         <CWDrawer
           open={isLeftDrawerOpen}
-          header="Lorem Ipsum"
           onClose={() => setIsLeftDrawerOpen(false)}
           direction="left"
         >

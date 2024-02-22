@@ -10,7 +10,7 @@ import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/typ
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';
 import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
 import { findOneRole } from '../../util/roles';
-import { TrackOptions } from '../server_analytics_methods/track';
+import { TrackOptions } from '../server_analytics_controller';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 export const Errors = {
@@ -63,7 +63,7 @@ export async function __updateCommunity(
     include: [
       {
         model: this.models.ChainNode,
-        attributes: ['url', 'eth_chain_id'],
+        attributes: ['url', 'eth_chain_id', 'cosmos_chain_id'],
       },
     ],
   });
@@ -194,8 +194,9 @@ export async function __updateCommunity(
   if (hide_projects) community.hide_projects = hide_projects;
   if (typeof stages_enabled === 'boolean')
     community.stages_enabled = stages_enabled;
-  if (typeof custom_stages === 'string')
+  if (Array.isArray(custom_stages)) {
     community.custom_stages = custom_stages;
+  }
   if (typeof terms === 'string') community.terms = terms;
   if (has_homepage) community.has_homepage = has_homepage;
   if (default_page) {

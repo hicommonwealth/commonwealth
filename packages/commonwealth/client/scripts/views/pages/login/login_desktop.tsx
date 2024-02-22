@@ -2,20 +2,20 @@ import React from 'react';
 
 import 'pages/login/login_desktop.scss';
 
+import { CWAddress } from 'views/components/component_kit/cw_address';
+import { CWAvatarUsernameInput } from 'views/components/component_kit/cw_avatar_username_input';
+import { CWButton } from 'views/components/component_kit/cw_button';
+import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import {
   CWProfileRow,
   CWProfilesList,
 } from 'views/components/component_kit/cw_profiles_list';
-import { CWAddress } from 'views/components/component_kit/cw_address';
-import { CWAvatarUsernameInput } from 'views/components/component_kit/cw_avatar_username_input';
-import { CWButton } from 'views/components/component_kit/cw_button';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWWalletsList } from 'views/components/component_kit/cw_wallets_list';
-import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 
+import CWLoadingSpinner from '../../components/component_kit/new_designs/CWLoadingSpinner';
 import { LoginBoilerplate } from './login_boilerplate';
 import { LoginDesktopSidebar } from './login_desktop_sidebar';
 import type { LoginProps } from './types';
@@ -107,13 +107,13 @@ export const LoginDesktop = ({
                   placeholder="Email address"
                   className="login-email-field"
                   onInput={handleSetEmail}
-                  onenterkey={onEmailLogin}
+                  onenterkey={async () => await onEmailLogin()}
                 />
                 <div className="buttons-row email-form-buttons">
                   <CWButton
                     label="Sign in with Magic"
                     className="wallet-magic-btn"
-                    onClick={onEmailLogin}
+                    onClick={async () => await onEmailLogin()}
                   />
                   <CWButton
                     iconLeft="arrowLeft"
@@ -125,7 +125,7 @@ export const LoginDesktop = ({
                 </div>
               </div>
             ) : (
-              <CWSpinner />
+              <CWLoadingSpinner />
             )}
             <div className="header-container">
               <LoginBoilerplate />
@@ -154,7 +154,10 @@ export const LoginDesktop = ({
               onAvatarChangeHandler={handleSetAvatar}
               onUsernameChangeHandler={handleSetUsername}
             />
-            <CWButton label="Finish" onClick={onSaveProfileInfo} />
+            <CWButton
+              label="Finish"
+              onClick={async () => await onSaveProfileInfo()}
+            />
           </div>
         )}
 

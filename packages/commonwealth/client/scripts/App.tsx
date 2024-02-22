@@ -1,5 +1,5 @@
 import { OpenFeatureProvider } from '@openfeature/react-sdk';
-import { InMemoryProvider, OpenFeature } from '@openfeature/web-sdk';
+import { OpenFeature } from '@openfeature/web-sdk';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import useInitApp from 'hooks/useInitApp';
@@ -8,19 +8,19 @@ import React, { StrictMode } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { queryClient } from 'state/api/config';
-import { featureFlags } from './helpers/feature-flags';
-import { CWIcon } from './views/components/component_kit/cw_icons/cw_icon';
+import { openFeatureProvider } from './helpers/feature-flags';
+import CWLoadingSpinner from './views/components/component_kit/new_designs/CWLoadingSpinner';
 
 const Splash = () => {
   return (
     <div className="Splash">
       {/* This can be a moving bobber, atm it is still */}
-      <CWIcon iconName="cow" iconSize="xxl" />
+      <CWLoadingSpinner />
     </div>
   );
 };
 
-OpenFeature.setProvider(new InMemoryProvider(featureFlags));
+OpenFeature.setProvider(openFeatureProvider);
 
 const App = () => {
   const { customDomain, isLoading } = useInitApp();

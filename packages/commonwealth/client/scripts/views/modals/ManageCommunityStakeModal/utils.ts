@@ -20,8 +20,8 @@ export const convertEthToUsd = (
 };
 
 export const buildEtherscanLink = (txHash: string) => {
-  const prefix = 'sepolia.';
-  return `https://${prefix}etherscan.io/tx/${txHash}`;
+  //const prefix = 'Base.';
+  return `https://basescan.org/tx/${txHash}`;
 };
 
 export const capDecimals = (value: string, capNumber = 8) => {

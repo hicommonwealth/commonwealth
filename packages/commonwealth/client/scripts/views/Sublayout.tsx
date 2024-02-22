@@ -1,21 +1,21 @@
 import 'Sublayout.scss';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
+import { useFlag } from 'hooks/useFlag';
 import useForceRerender from 'hooks/useForceRerender';
 import useWindowResize from 'hooks/useWindowResize';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
+import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
-import { AppMobileMenus } from './AppMobileMenus';
 import { Footer } from './Footer';
 import { SublayoutBanners } from './SublayoutBanners';
-import { SublayoutHeader } from './SublayoutHeader';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
-import { ValentineGrowl } from './components/ValentineGrowl';
+import MobileNavigation from './components/MobileNavigation';
+import { StakeGrowl } from './components/StakeGrowl';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
-import MobileNavigation from './composition/MobileNavigation';
 
 type SublayoutProps = {
   hideFooter?: boolean;
@@ -28,12 +28,13 @@ const Sublayout = ({
   isInsideCommunity,
 }: SublayoutProps) => {
   const forceRerender = useForceRerender();
-  const { menuVisible, mobileMenuName, setMenu, menuName } = useSidebarStore();
+  const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
   const { isWindowSmallInclusive, isWindowExtraSmall } = useBrowserWindow({
     onResize: () => setResizing(true),
     resizeListenerUpdateDeps: [resizing],
   });
+  const communityStakeEnabled = useFlag('communityStake');
 
   const { toggleMobileView } = useWindowResize({
     setMenu,
@@ -98,22 +99,18 @@ const Sublayout = ({
         >
           <SublayoutBanners banner={banner} chain={chain} terms={terms} />
 
-          {isWindowSmallInclusive && mobileMenuName ? (
-            <AppMobileMenus />
-          ) : (
-            <div className="Body">
-              {!toggleMobileView && (
-                <div className="breadcrumbContainer">
-                  <Breadcrumbs />
-                </div>
-              )}
-              {isInsideCommunity && <AdminOnboardingSlider />}
-              {children}
-              {!app.isCustomDomain() && !hideFooter && <Footer />}
-            </div>
-          )}
+          <div className="Body">
+            {!toggleMobileView && (
+              <div className="breadcrumbContainer">
+                <Breadcrumbs />
+              </div>
+            )}
+            {isInsideCommunity && <AdminOnboardingSlider />}
+            {children}
+            {!app.isCustomDomain() && !hideFooter && <Footer />}
+          </div>
         </div>
-        <ValentineGrowl />
+        {communityStakeEnabled && <StakeGrowl />}
       </div>
       {isWindowExtraSmall && <MobileNavigation />}
     </div>

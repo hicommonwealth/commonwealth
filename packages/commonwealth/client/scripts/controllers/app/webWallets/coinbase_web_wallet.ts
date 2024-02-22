@@ -94,12 +94,12 @@ class CoinbaseWebWalletController implements IWebWallet<string> {
   }
 
   // ACTIONS
-  public async enable() {
+  public async enable(forceChainId?: string) {
     console.log('Attempting to enable Coinbase');
     this._enabling = true;
     try {
       // default to ETH
-      const chainId = this.getChainId();
+      const chainId = forceChainId ?? this.getChainId();
 
       // ensure we're on the correct chain
 
@@ -199,43 +199,36 @@ class CoinbaseWebWalletController implements IWebWallet<string> {
     );
   }
 
-  public async switchNetwork() {
+  public async switchNetwork(chainId?: string) {
     try {
       // Get current chain ID
-      const currentChainId = await this._web3.eth.getChainId();
-      const communityChain = this.getChainId();
-      const chainIdHex = `0x${parseInt(communityChain, 10).toString(16)}`;
-      if (currentChainId !== communityChain) {
-        try {
-          await window.ethereum.request({
-            method: 'wallet_switchEthereumChain',
-            params: [{ chainId: `0x${chainIdHex}` }],
+      const communityChain = chainId ?? this.getChainId();
+      const chainIdHex = parseInt(communityChain, 10).toString(16);
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: `0x${chainIdHex}` }],
+        });
+      } catch (error) {
+        if (error.code === 4902) {
+          const chains = await $.getJSON('https://chainid.network/chains.json');
+          const baseChain = chains.find((c) => c.chainId === communityChain);
+          // Check if the string contains '${' and '}'
+          const rpcUrl = baseChain.rpc.filter((r) => !/\${.*?}/.test(r));
+          const url =
+            rpcUrl.length > 0 ? rpcUrl[0] : app.chain.meta.node.altWalletUrl;
+          await this._web3.givenProvider.request({
+            method: 'wallet_addEthereumChain',
+            params: [
+              {
+                chainId: chainIdHex,
+                chainName: baseChain.name,
+                nativeCurrency: baseChain.nativeCurrency,
+                rpcUrls: [url],
+              },
+            ],
           });
-        } catch (error) {
-          if (error.code === 4902) {
-            const chains = await $.getJSON(
-              'https://chainid.network/chains.json',
-            );
-            const baseChain = chains.find((c) => c.chainId === communityChain);
-            // Check if the string contains '${' and '}'
-            const rpcUrl = baseChain.rpc.filter((r) => !/\${.*?}/.test(r));
-            const url =
-              rpcUrl.length > 0 ? rpcUrl[0] : app.chain.meta.node.altWalletUrl;
-            await this._web3.givenProvider.request({
-              method: 'wallet_addEthereumChain',
-              params: [
-                {
-                  chainId: chainIdHex,
-                  chainName: baseChain.name,
-                  nativeCurrency: baseChain.nativeCurrency,
-                  rpcUrls: [url],
-                },
-              ],
-            });
-          }
         }
-      } else {
-        console.log('Metamask is already connected to the desired chain.');
       }
     } catch (error) {
       console.error('Error checking and switching chain:', error);

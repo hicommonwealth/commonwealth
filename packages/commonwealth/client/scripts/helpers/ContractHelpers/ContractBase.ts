@@ -20,7 +20,10 @@ abstract class ContractBase {
     this.rpc = rpc;
   }
 
-  async initialize(withWallet: boolean = false): Promise<void> {
+  async initialize(
+    withWallet: boolean = false,
+    chainId?: string,
+  ): Promise<void> {
     if (!this.initialized) {
       try {
         let provider = this.rpc;
@@ -30,8 +33,9 @@ abstract class ContractBase {
           )[0];
 
           if (!this.wallet.api) {
-            await this.wallet.enable();
+            await this.wallet.enable(chainId);
           }
+          await this.wallet.switchNetwork(chainId);
           provider = this.wallet.api.givenProvider;
           this.walletEnabled = true;
         }

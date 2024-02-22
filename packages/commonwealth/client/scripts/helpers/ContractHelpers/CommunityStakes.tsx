@@ -1,4 +1,3 @@
-import { String } from 'aws-sdk/clients/acm';
 import { communityStakesAbi } from './Abi/CommunityStakesAbi';
 import ContractBase from './ContractBase';
 import NamespaceFactory from './NamespaceFactory';
@@ -111,6 +110,7 @@ class CommunityStakes extends ContractBase {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true);
     }
+
     const namespaceAddress = await this.getNamespaceAddress(name);
     const totalPrice = await this.contract.methods
       .getBuyPriceAfterFee(namespaceAddress, id.toString(), amount.toString())
@@ -119,7 +119,26 @@ class CommunityStakes extends ContractBase {
     try {
       txReceipt = await this.contract.methods
         .buyStake(namespaceAddress, id, amount)
-        .send({ value: totalPrice, from: walletAddress });
+        .send({
+          value: totalPrice,
+          from: walletAddress,
+          maxPriorityFeePerGas: null,
+          maxFeePerGas: null,
+        });
+      try {
+        await this.web3.givenProvider.request({
+          method: 'wallet_watchAsset',
+          params: {
+            type: 'ERC1155',
+            options: {
+              address: namespaceAddress,
+              tokenId: id.toString(),
+            },
+          },
+        });
+      } catch (error) {
+        console.log('Failed to watch asset in MM, watch manaually', error);
+      }
     } catch {
       throw new Error('Transaction failed');
     }
@@ -142,12 +161,17 @@ class CommunityStakes extends ContractBase {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true);
     }
+
     const namespaceAddress = await this.getNamespaceAddress(name);
     let txReceipt;
     try {
       txReceipt = await this.contract.methods
         .sellStake(namespaceAddress, id.toString(), amount.toString())
-        .send({ from: walletAddress });
+        .send({
+          from: walletAddress,
+          maxPriorityFeePerGas: null,
+          maxFeePerGas: null,
+        });
     } catch {
       throw new Error('Transaction failed');
     }
@@ -226,7 +250,7 @@ class CommunityStakes extends ContractBase {
    * @param walletAddress user wallet address
    * @returns string balance in ETH
    */
-  async getUserEthBalance(walletAddress: String): Promise<string> {
+  async getUserEthBalance(walletAddress: string): Promise<string> {
     if (!this.initialized) {
       await this.initialize();
     }
