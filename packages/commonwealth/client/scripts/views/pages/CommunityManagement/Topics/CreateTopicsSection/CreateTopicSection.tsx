@@ -11,13 +11,7 @@ import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { ValidationStatus } from 'client/scripts/views/components/component_kit/cw_validation_text';
 import { CWTextInput } from 'client/scripts/views/components/component_kit/new_designs/CWTextInput';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/cw_button';
-import {
-  createDeltaFromText,
-  getTextFromDelta,
-} from 'client/scripts/views/components/react_quill_editor';
-import { serializeDelta } from 'client/scripts/views/components/react_quill_editor/utils';
-import type { DeltaStatic } from 'quill';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import './CreateTopicSection.scss';
 import { FormSubmitValues } from './types';
@@ -32,26 +26,13 @@ export const CreateTopicSection = () => {
 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [nameErrorMsg, setNameErrorMsg] = useState<string | null>(null);
-  const [contentDelta, setContentDelta] = useState<DeltaStatic>(
-    createDeltaFromText(''),
-  );
+
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [description, setDescription] = useState<string>('');
-  const [featuredInNewPost, setFeaturedInNewPost] = useState<boolean>(false);
   const [featuredInSidebar, setFeaturedInSidebar] = useState<boolean>(false);
   const [name, setName] = useState<string>('');
 
   const { isWindowExtraSmall } = useBrowserWindow({});
-
-  const editorText = getTextFromDelta(contentDelta);
-
-  useEffect(() => {
-    if (featuredInNewPost && editorText.length === 0) {
-      setErrorMsg('Must add template.');
-      return;
-    }
-    setErrorMsg(null);
-  }, [featuredInNewPost, editorText]);
 
   const handleCreateTopic = async (values: FormSubmitValues) => {
     try {
@@ -59,8 +40,8 @@ export const CreateTopicSection = () => {
         name: values.topicName,
         description: values.topicDescription,
         featuredInSidebar,
-        featuredInNewPost,
-        defaultOffchainTemplate: serializeDelta(contentDelta),
+        featuredInNewPost: false,
+        defaultOffchainTemplate: '',
       });
       navigate(`/discussions/${encodeURI(name.toString().trim())}`);
     } catch (err) {
@@ -95,7 +76,6 @@ export const CreateTopicSection = () => {
     return ['success', 'Valid topic name'];
   };
 
-  // TODO: implement logic around creating a new thread with new topic
   return (
     <div className="CreateTopicSection">
       <CWForm
@@ -148,19 +128,6 @@ export const CreateTopicSection = () => {
               setFeaturedInSidebar(!featuredInSidebar);
             }}
           />
-          {/* <CWCheckbox
-            label="Featured in new post"
-            checked={featuredInNewPost}
-            onChange={() => {
-              setFeaturedInNewPost(!featuredInNewPost);
-            }}
-          />
-          {featuredInNewPost && (
-            <ReactQuillEditor
-              contentDelta={contentDelta}
-              setContentDelta={setContentDelta}
-            />
-          )} */}
         </div>
         <div className="actions">
           <CWButton
