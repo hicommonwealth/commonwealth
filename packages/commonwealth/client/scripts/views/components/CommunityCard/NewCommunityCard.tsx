@@ -11,8 +11,7 @@ export const NewCommunityCard = () => {
       className="new-community-card"
       onClick={(e) => {
         e.preventDefault();
-        document.location =
-          'https://hicommonwealth.typeform.com/to/cRP27Rp5' as any;
+        document.location = 'https://hicommonwealth.typeform.com/to/cRP27Rp5';
       }}
     >
       <div className="new-community-card-body">
