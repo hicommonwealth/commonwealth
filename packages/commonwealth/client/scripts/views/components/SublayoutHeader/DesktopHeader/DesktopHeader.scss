@@ -1,27 +1,14 @@
-@import 'shared';
+@import '../../../../../styles/shared';
 
-/*
-  Make the titlebar draggable for the desktop app
-  Reference: https://www.todesktop.com/docs/recipes/make-a-transparent-titlebar-draggable 
-*/
-html.todesktop .SublayoutHeader {
-  -webkit-app-region: drag;
-}
-
-.SublayoutHeader,
-html.todesktop .SublayoutHeader {
+.DesktopHeader {
   align-items: center;
   border-bottom: 1px solid $neutral-200;
   display: flex;
   gap: 8px;
-  height: calc(#{$global-header-height} + var(--safe-area-inset-top));
+  height: $global-header-height;
   justify-content: space-between;
   min-height: $global-header-height;
   padding: 0 8px;
-
-  @supports (padding-top: var(--safe-area-inset-top)) {
-    padding-top: var(--safe-area-inset-top);
-  }
 
   .header-left.desktop {
     padding-left: 68px;
@@ -32,12 +19,6 @@ html.todesktop .SublayoutHeader {
     display: flex;
     gap: 8px;
     height: 100%;
-
-    .logo,
-    .community-avatar-container,
-    .IconButton {
-      -webkit-app-region: no-drag;
-    }
   }
 
   .searchbar {
@@ -46,10 +27,6 @@ html.todesktop .SublayoutHeader {
     .SearchBar {
       @include extraSmall {
         display: none;
-      }
-
-      input {
-        -webkit-app-region: no-drag;
       }
     }
   }
@@ -64,22 +41,9 @@ html.todesktop .SublayoutHeader {
       padding: 0 20px;
     }
 
-    .MobileMenuContainer {
-      display: none;
-
-      @include extraSmall {
-        display: flex;
-      }
-
-      @include smallInclusive {
-        display: flex;
-      }
-    }
-
     .DesktopMenuContainer {
       align-items: center;
       display: flex;
-      -webkit-app-region: no-drag;
       gap: 12px;
       height: 40px;
 
@@ -104,22 +68,11 @@ html.todesktop .SublayoutHeader {
       @include extraSmall {
         display: none;
       }
-
-      @include smallInclusive {
-        display: none;
-      }
-    }
-
-    .Button {
-      -webkit-app-region: no-drag;
-    }
-
-    .LoginSelector {
-      -webkit-app-region: no-drag;
     }
 
     .UserDropdownTriggerButton {
       margin-right: 10px;
+
       @include extraSmall {
         margin-right: 2px;
       }

@@ -1,22 +1,22 @@
 import React from 'react';
 
-import app from '../../../state';
-import { CWText } from '../component_kit/cw_text';
-import { CWButton } from '../component_kit/new_designs/cw_button';
+import app from 'state';
+import { CWText } from 'views/components/component_kit/cw_text';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
-} from '../component_kit/new_designs/CWModal';
+} from 'views/components/component_kit/new_designs/CWModal';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
-import '../../../../styles/components/Header/TOSModal.scss';
+import './TOSModal.scss';
 
 type TOSModalProps = {
   onAccept: () => void;
   onModalClose: () => void;
 };
 
-export const TOSModal = ({ onModalClose, onAccept }: TOSModalProps) => {
+const TOSModal = ({ onModalClose, onAccept }: TOSModalProps) => {
   const terms = app.chain?.meta?.terms;
 
   return (
@@ -28,8 +28,8 @@ export const TOSModal = ({ onModalClose, onAccept }: TOSModalProps) => {
       />
       <CWModalBody>
         <CWText className="body">
-          By clicking accept you agree to the community's
-          <a href={terms} target="_blank">
+          By clicking accept you agree to the community&apos;s
+          <a href={terms} target="_blank" rel="noreferrer">
             Terms of Service
           </a>
           .
@@ -52,3 +52,5 @@ export const TOSModal = ({ onModalClose, onAccept }: TOSModalProps) => {
     </div>
   );
 };
+
+export default TOSModal;
