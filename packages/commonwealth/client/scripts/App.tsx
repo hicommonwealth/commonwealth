@@ -9,13 +9,13 @@ import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { queryClient } from 'state/api/config';
 import { openFeatureProvider } from './helpers/feature-flags';
-import { CWIcon } from './views/components/component_kit/cw_icons/cw_icon';
+import CWLoadingSpinner from './views/components/component_kit/new_designs/CWLoadingSpinner';
 
 const Splash = () => {
   return (
     <div className="Splash">
       {/* This can be a moving bobber, atm it is still */}
-      <CWIcon iconName="cow" iconSize="xxl" />
+      <CWLoadingSpinner />
     </div>
   );
 };

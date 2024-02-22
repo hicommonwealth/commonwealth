@@ -4,7 +4,6 @@ import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
-  dispose,
   logger,
 } from '@hicommonwealth/core';
 import { QueryTypes, Sequelize } from 'sequelize';
@@ -13,7 +12,9 @@ import type { ChainNodeAttributes } from '../models/chain_node';
 const checkDb = async () => {
   let sequelize: Sequelize | undefined = undefined;
   try {
-    sequelize = new Sequelize('postgresql://commonwealth:edgeware@localhost');
+    sequelize = new Sequelize('postgresql://commonwealth:edgeware@localhost', {
+      logging: false,
+    });
     const testdbname = 'common_test';
     const [{ count }] = await sequelize.query<{ count: number }>(
       `SELECT COUNT(*) FROM pg_database WHERE datname = '${testdbname}'`,
@@ -35,10 +36,6 @@ export const seedDb = async (debug = false): Promise<void> => {
 
     // connect and seed
     const { models } = await import('..');
-    // dispose sequelize connection before exit
-    dispose(async () => {
-      models.sequelize.close().catch((_) => {});
-    });
 
     await models.sequelize.sync({ force: true });
     log.info('done syncing.');

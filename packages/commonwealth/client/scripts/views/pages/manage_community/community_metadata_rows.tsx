@@ -16,9 +16,9 @@ import { AvatarUpload } from '../../components/Avatar';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWLabel } from '../../components/component_kit/cw_label';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWToggle } from '../../components/component_kit/cw_toggle';
+import CWLoadingSpinner from '../../components/component_kit/new_designs/CWLoadingSpinner';
 import DirectoryPageSection from './DirectoryPageSection';
 import { DiscordForumConnections } from './DiscordForumConnections';
 import { getCommunityTags, setCommunityCategories } from './helpers';
@@ -586,7 +586,7 @@ export const CommunityMetadataRows = ({
           <>
             <div className="settings-row">
               <div className="spinner-group">
-                <CWSpinner />
+                <CWLoadingSpinner />
                 <CWText>Connecting...</CWText>
               </div>
               <CWText>Refresh to check if connection succeeded</CWText>
