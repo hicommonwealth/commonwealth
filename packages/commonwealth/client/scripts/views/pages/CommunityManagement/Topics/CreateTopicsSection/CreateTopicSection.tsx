@@ -23,9 +23,7 @@ export const CreateTopicSection = () => {
     communityId: app.activeChainId(),
   });
 
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [nameErrorMsg, setNameErrorMsg] = useState<string | null>(null);
-
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [featuredInSidebar, setFeaturedInSidebar] = useState<boolean>(false);
   const [name, setName] = useState<string>('');
@@ -43,7 +41,6 @@ export const CreateTopicSection = () => {
       });
       navigate(`/discussions/${encodeURI(name.toString().trim())}`);
     } catch (err) {
-      setErrorMsg('Error creating topic');
       setIsSaving(false);
     }
   };
@@ -76,9 +73,8 @@ export const CreateTopicSection = () => {
             name="topicName"
             value={name}
             onInput={(e) => {
-              const inputVal = e.target.value.trim();
-              setName(inputVal);
-              handleInputValidation(inputVal);
+              setName(e.target.value);
+              handleInputValidation(e.target.value.trim());
             }}
             customError={nameErrorMsg}
             autoFocus
@@ -118,7 +114,7 @@ export const CreateTopicSection = () => {
             buttonType="primary"
             buttonHeight="med"
             buttonWidth={isWindowExtraSmall ? 'full' : 'wide'}
-            disabled={isSaving || !!errorMsg}
+            disabled={isSaving || !!nameErrorMsg}
             type="submit"
           />
         </div>
