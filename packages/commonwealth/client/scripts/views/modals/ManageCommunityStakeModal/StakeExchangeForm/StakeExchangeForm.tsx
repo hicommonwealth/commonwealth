@@ -22,6 +22,7 @@ import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
+import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
@@ -36,7 +37,6 @@ import {
   CustomAddressOptionElement,
 } from './CustomAddressOption';
 
-import { CWTextInput } from 'client/scripts/views/components/component_kit/new_designs/CWTextInput';
 import './StakeExchangeForm.scss';
 
 type OptionDropdown = {
@@ -203,13 +203,6 @@ const StakeExchangeForm = ({
     ? false
     : numberOfStakeToExchange >= stakeBalance;
 
-  const inputClassExpanded =
-    numberOfStakeToExchange?.toString().length > 6
-      ? 'number expand2'
-      : numberOfStakeToExchange?.toString().length > 3
-      ? 'number expand1'
-      : 'number';
-
   return (
     <div className="StakeExchangeForm">
       <CWModalBody>
@@ -287,9 +280,7 @@ const StakeExchangeForm = ({
                 inputClassName={clsx('number', {
                   expanded: numberOfStakeToExchange?.toString().length > 3,
                 })}
-                containerClassName={clsx('number', {
-                  expanded: numberOfStakeToExchange?.toString().length > 3,
-                })}
+                containerClassName="number-container"
               />
               <CWCircleButton
                 buttonType="secondary"
@@ -387,7 +378,9 @@ const StakeExchangeForm = ({
         </div>
 
         <div className="total-cost-row">
-          <CWText type="caption">{isBuyMode ? 'Total cost' : 'Net'}</CWText>
+          <div className="left-side">
+            <CWText type="caption">{isBuyMode ? 'Total cost' : 'Net'}</CWText>
+          </div>
           {isUsdPriceLoading ? (
             <Skeleton className="price-skeleton" />
           ) : (
