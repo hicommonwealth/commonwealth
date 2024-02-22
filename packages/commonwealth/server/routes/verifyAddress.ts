@@ -36,48 +36,6 @@ export const Errors = {
   WrongWallet: 'Verified with different wallet than created',
 };
 
-const transferAddress = async () => {
-  // reassign the users and profiles of the transferred addresses
-  await models.Address.update(
-    {
-      user_id: addressInstance.user_id,
-      profile_id: addressInstance.profile_id,
-    },
-    {
-      where: {
-        address,
-        user_id: { [Op.ne]: addressInstance.user_id },
-        verified: { [Op.ne]: null },
-      },
-    },
-  );
-
-  try {
-    // send email to the old user (should only ever be one)
-    const oldUser = await models.User.scope('withPrivateData').findOne({
-      where: { id: addressToTransfer.user_id, email: { [Op.ne]: null } },
-    });
-    if (!oldUser?.email) {
-      throw new AppError(Errors.NoEmail);
-    }
-    const msg = {
-      to: user.email,
-      from: 'Commonwealth <no-reply@commonwealth.im>',
-      templateId: DynamicTemplate.VerifyAddress,
-      dynamic_template_data: {
-        address,
-        chain: chain.name,
-      },
-    };
-    await sgMail.send(msg);
-    log.info(
-      `Sent address move email: ${address} transferred to a new account`,
-    );
-  } catch (e) {
-    log.error(`Could not send address move email for: ${address}`);
-  }
-};
-
 const processAddress = async (
   models: DB,
   chain: CommunityInstance,
@@ -137,6 +95,45 @@ const processAddress = async (
   });
 
   if (addressToTransfer) {
+    // reassign the users and profiles of the transferred addresses
+    await models.Address.update(
+      {
+        user_id: addressInstance.user_id,
+        profile_id: addressInstance.profile_id,
+      },
+      {
+        where: {
+          address,
+          user_id: { [Op.ne]: addressInstance.user_id },
+          verified: { [Op.ne]: null },
+        },
+      },
+    );
+
+    try {
+      // send email to the old user (should only ever be one)
+      const oldUser = await models.User.scope('withPrivateData').findOne({
+        where: { id: addressToTransfer.user_id, email: { [Op.ne]: null } },
+      });
+      if (!oldUser?.email) {
+        throw new AppError(Errors.NoEmail);
+      }
+      const msg = {
+        to: user.email,
+        from: 'Commonwealth <no-reply@commonwealth.im>',
+        templateId: DynamicTemplate.VerifyAddress,
+        dynamic_template_data: {
+          address,
+          chain: chain.name,
+        },
+      };
+      await sgMail.send(msg);
+      log.info(
+        `Sent address move email: ${address} transferred to a new account`,
+      );
+    } catch (e) {
+      log.error(`Could not send address move email for: ${address}`);
+    }
   }
 };
 
