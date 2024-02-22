@@ -9,7 +9,6 @@ const ComponentsShowcasePage = lazy(
   () => import('views/pages/ComponentsShowcase'),
 );
 const ComponentsPage = lazy(() => import('views/pages/components'));
-const Testing = lazy(() => import('views/pages/testing'));
 
 const GeneralRoutes = () => [
   <Route
@@ -36,11 +35,6 @@ const GeneralRoutes = () => [
     key="/components"
     path="/components"
     element={withLayout(ComponentsShowcasePage, { type: 'common' })}
-  />,
-  <Route
-    key="/testing"
-    path="/testing"
-    element={withLayout(Testing, { type: 'common', scoped: true })}
   />,
 ];
 
