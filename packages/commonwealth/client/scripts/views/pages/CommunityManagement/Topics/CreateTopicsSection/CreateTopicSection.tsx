@@ -87,7 +87,7 @@ export const CreateTopicSection = () => {
             tabIndex={2}
           />
           <CWText type="caption">
-            Choose where to feature this topic. Select at least one.
+            Choose whether topic featured in sidebar.
           </CWText>
           <CWCheckbox
             className="sidebar-feature-checkbox"
