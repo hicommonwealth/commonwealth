@@ -2,7 +2,7 @@
   "name": "Common App",
   "short_name": "Common",
   "description": "Create onchain together - Community forums with onchain rewards, roles and more",
-  "start_url": "/",
+  "start_url": "/dashboard",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
