@@ -18,6 +18,7 @@ export type UpdateCommunityIdResult = CommunityAttributes;
 
 export async function __updateCommunityId(
   this: ServerCommunitiesController,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   { community_id, new_community_id, redirect }: UpdateCommunityIdOptions,
 ): Promise<UpdateCommunityIdResult> {
   const originalCommunity = await this.models.Community.findOne({
@@ -29,6 +30,7 @@ export async function __updateCommunityId(
   if (!originalCommunity) {
     throw new AppError('Community to rename not found!');
   }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { id, ...communityData } = originalCommunity.toJSON();
 
   let newCommunity: CommunityInstance;
