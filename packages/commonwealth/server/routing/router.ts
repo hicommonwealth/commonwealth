@@ -155,6 +155,7 @@ import { deleteCommunityHandler } from '../routes/communities/delete_community_h
 import { getChainNodesHandler } from '../routes/communities/get_chain_nodes_handler';
 import { getCommunitiesHandler } from '../routes/communities/get_communities_handler';
 import { updateCommunityHandler } from '../routes/communities/update_community_handler';
+import { updateCommunityIdHandler } from '../routes/communities/update_community_id_handler';
 import exportMembersList from '../routes/exportMembersList';
 import { createGroupHandler } from '../routes/groups/create_group_handler';
 import { deleteGroupHandler } from '../routes/groups/delete_group_handler';
@@ -334,6 +335,15 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     deleteCommunityHandler.bind(this, serverControllers),
   );
+
+  registerRoute(
+    router,
+    'patch',
+    '/communities/update_id',
+    passport.authenticate('jwt', { session: false }),
+    updateCommunityIdHandler.bind(this, models, serverControllers),
+  );
+
   registerRoute(
     router,
     'patch',
