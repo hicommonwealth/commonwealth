@@ -353,7 +353,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
           chain: walletToUse.chain,
           timestamp,
         });
-        await sessionSigner.verifySession(CANVAS_TOPIC, session);
+        await account.validate(session);
 
         await onLogInWithAccount(account, true);
       } catch (e) {
