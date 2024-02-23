@@ -1,17 +1,17 @@
+import type { DB } from '@hicommonwealth/model';
 import { body, validationResult } from 'express-validator';
 import { Op } from 'sequelize';
-import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { failure } from '../types';
 
 export const getAddressProfileValidation = [
-  body('chains').exists().toArray(),
+  body('communities').exists().toArray(),
   body('addresses').exists().toArray(),
 ];
 
 export type GetAddressProfileReq = {
   addresses: string[];
-  chains: string[];
+  communities: string[];
 };
 
 type GetAddressProfileResp = {
@@ -25,7 +25,7 @@ type GetAddressProfileResp = {
 const getAddressProfiles = async (
   models: DB,
   req: TypedRequestBody<GetAddressProfileReq>,
-  res: TypedResponse<GetAddressProfileResp[]>
+  res: TypedResponse<GetAddressProfileResp[]>,
 ) => {
   const errors = validationResult(req).array();
   if (errors.length !== 0) {
@@ -34,7 +34,7 @@ const getAddressProfiles = async (
 
   const addressEntities = await models.Address.findAll({
     where: {
-      community_id: { [Op.in]: req.body.chains },
+      community_id: { [Op.in]: req.body.communities },
       address: { [Op.in]: req.body.addresses },
     },
     include: [

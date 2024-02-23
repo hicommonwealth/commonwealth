@@ -2,16 +2,16 @@ import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
+import 'pages/discussions/index.scss';
 import 'pages/overview/index.scss';
 import React, { useEffect } from 'react';
 import app from 'state';
 import { useFetchThreadsQuery } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import type Thread from '../../../models/Thread';
 import type Topic from '../../../models/Topic';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDivider } from '../../components/component_kit/cw_divider';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { PageLoading } from '../loading';
 import { TopicSummaryRow } from './TopicSummaryRow';
@@ -19,12 +19,12 @@ import { TopicSummaryRow } from './TopicSummaryRow';
 const OverviewPage = () => {
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
-  const { isWindowExtraSmall } = useBrowserWindow({});
+  const { isWindowSmallInclusive } = useBrowserWindow({});
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const { data: recentlyActiveThreads, isLoading } = useFetchThreadsQuery({
     queryType: 'active',
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     topicsPerThread: 3,
     // TODO: ask for a pinned thread prop here to show pinned threads
   });
@@ -38,7 +38,7 @@ const OverviewPage = () => {
   }, [forceRerender]);
 
   const { data: topics = [] } = useFetchTopicsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const anyTopicsFeatured = topics.some((t) => t.featuredInSidebar);
@@ -62,7 +62,7 @@ const OverviewPage = () => {
         thread.topic?.id &&
         topic.id === thread.topic.id &&
         thread.archivedAt === null &&
-        !thread.markedAsSpamAt
+        !thread.markedAsSpamAt,
     );
 
     return {
@@ -83,7 +83,8 @@ const OverviewPage = () => {
           </CWText>
           <CWButton
             className="latest-button"
-            buttonType="mini-black"
+            buttonType="primary"
+            buttonHeight="sm"
             label="Latest Threads"
             iconLeft="home"
             onClick={() => {
@@ -91,19 +92,11 @@ const OverviewPage = () => {
             }}
           />
         </div>
-        {isWindowExtraSmall ? (
-          <CWIconButton
-            iconName="plusCircle"
-            iconButtonTheme="black"
-            onClick={() => {
-              navigate('/new/discussion');
-            }}
-            disabled={!hasJoinedCommunity}
-          />
-        ) : (
+        {!isWindowSmallInclusive && (
           <CWButton
-            buttonType="mini-black"
-            label="Create Thread"
+            buttonType="primary"
+            buttonHeight="sm"
+            label="Create thread"
             iconLeft="plus"
             onClick={() => {
               navigate('/new/discussion');

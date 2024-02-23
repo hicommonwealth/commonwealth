@@ -1,12 +1,15 @@
 import moment from 'moment';
 
-import { UserInstance } from 'server/models/user';
-import { AppError, ServerError } from '../../../../common-common/src/errors';
-import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/community';
-import { VoteAttributes } from '../../models/vote';
-import validateTopicThreshold from '../../util/validateTopicThreshold';
-import { ServerThreadsController } from '../server_threads_controller';
+import { AppError, ServerError } from '@hicommonwealth/core';
+import {
+  AddressInstance,
+  UserInstance,
+  VoteAttributes,
+} from '@hicommonwealth/model';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
+import { TrackOptions } from '../server_analytics_controller';
+import { ServerPollsController } from '../server_polls_controller';
 
 export const Errors = {
   NoPoll: 'No corresponding poll found',
@@ -22,19 +25,18 @@ export const Errors = {
 export type UpdatePollVoteOptions = {
   user: UserInstance;
   address: AddressInstance;
-  community: CommunityInstance;
   pollId: number;
   option: string;
 };
 
-export type UpdatePollVoteResult = VoteAttributes;
+export type UpdatePollVoteResult = [VoteAttributes, TrackOptions];
 
 export async function __updatePollVote(
-  this: ServerThreadsController,
-  { address, community, pollId, option }: UpdatePollVoteOptions
+  this: ServerPollsController,
+  { user, address, pollId, option }: UpdatePollVoteOptions,
 ): Promise<UpdatePollVoteResult> {
   const poll = await this.models.Poll.findOne({
-    where: { id: pollId, community_id: community.id },
+    where: { id: pollId },
   });
   if (!poll) {
     throw new AppError(Errors.NoPoll);
@@ -66,13 +68,13 @@ export async function __updatePollVote(
 
   try {
     // check token balance threshold if needed
-    const canVote = await validateTopicThreshold(
-      this.tokenBalanceCache,
+    const { isValid } = await validateTopicGroupsMembership(
       this.models,
       thread.topic_id,
-      address.address
+      poll.community_id,
+      address,
     );
-    if (!canVote) {
+    if (!isValid) {
       throw new AppError(Errors.InsufficientTokenBalance);
     }
   } catch (e) {
@@ -84,7 +86,7 @@ export async function __updatePollVote(
       poll_id: poll.id,
       address: address.address,
       author_community_id: address.community_id,
-      community_id: community.id,
+      community_id: poll.community_id,
     };
     // delete existing votes
     await this.models.Vote.destroy({
@@ -97,9 +99,15 @@ export async function __updatePollVote(
         ...voteData,
         option: selectedOption,
       },
-      { transaction }
+      { transaction },
     );
   });
 
-  return vote.toJSON();
+  const analyticsOptions = {
+    event: MixpanelCommunityInteractionEvent.SUBMIT_VOTE,
+    community: poll.community_id,
+    userId: user.id,
+  };
+
+  return [vote.toJSON(), analyticsOptions];
 }

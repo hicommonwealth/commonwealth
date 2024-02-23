@@ -1,6 +1,5 @@
-import { Capacitor } from '@capacitor/core';
+import { CommunityCategoryType } from '@hicommonwealth/core';
 import axios from 'axios';
-import { ChainCategoryType } from 'common-common/src/types';
 import { updateActiveUser } from 'controllers/app/login';
 import RecentActivityController from 'controllers/app/recent_activity';
 import CosmosAccount from 'controllers/chain/cosmos/account';
@@ -15,13 +14,13 @@ import PollsController from 'controllers/server/polls';
 import { RolesController } from 'controllers/server/roles';
 import SearchController from 'controllers/server/search';
 import SessionsController from 'controllers/server/sessions';
-import { WebSocketController } from 'controllers/server/socket';
 import { UserController } from 'controllers/server/user';
 import { EventEmitter } from 'events';
 import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
 import NodeInfo from 'models/NodeInfo';
 import NotificationCategory from 'models/NotificationCategory';
+import StarredCommunity from 'models/StarredCommunity';
 import { ChainStore, NodeStore } from 'stores';
 
 export enum ApiStatus {
@@ -37,7 +36,6 @@ export const enum LoginState {
 }
 
 export interface IApp {
-  socket: WebSocketController;
   chain: IChainAdapter<
     any,
     | CosmosAccount
@@ -95,21 +93,14 @@ export interface IApp {
     defaultChain: string;
     evmTestEnv?: string;
     enforceSessionKeys?: boolean;
-    chainCategoryMap?: { [chain: string]: ChainCategoryType[] };
+    chainCategoryMap?: { [chain: string]: CommunityCategoryType[] };
   };
 
   loginStatusLoaded(): boolean;
 
   isLoggedIn(): boolean;
 
-  isProduction(): boolean;
-
-  isDesktopApp(win): boolean;
-  isNative(win): boolean;
-
   serverUrl(): string;
-
-  platform(): string;
 
   loadingError: string;
 
@@ -131,7 +122,6 @@ const roles = new RolesController(user);
 
 // INITIALIZE MAIN APP
 const app: IApp = {
-  socket: new WebSocketController(),
   chain: null,
   activeChainId: () => app.chain?.id,
 
@@ -184,33 +174,8 @@ const app: IApp = {
   // TODO: Collect all getters into an object
   loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,
   isLoggedIn: () => app.loginState === LoginState.LoggedIn,
-  isNative: () => {
-    const capacitor = window['Capacitor'];
-    return !!(capacitor && capacitor.isNative);
-  },
-  isDesktopApp: (window) => {
-    return window.todesktop;
-  },
-  platform: () => {
-    // Using Desktop API to determine if the platform is desktop
-    if (app.isDesktopApp(window)) {
-      return 'desktop';
-    } else {
-      // If not desktop, get the platform from Capacitor
-      return Capacitor.getPlatform();
-    }
-  },
-  isProduction: () =>
-    document.location.origin.indexOf('commonwealth.im') !== -1,
   serverUrl: () => {
-    //* TODO: @ Used to store the webpack SERVER_URL, should only be set for mobile deployments */
-    const mobileUrl = 'http://127.0.0.1:8080/api'; // Replace with your computer ip, staging, or production url
-
-    if (app.isNative(window)) {
-      return mobileUrl;
-    } else {
-      return '/api';
-    }
+    return '/api';
   },
 
   loadingError: null,
@@ -225,7 +190,8 @@ const app: IApp = {
   },
   skipDeinitChain: false,
 };
-
+//allows for FS.identify to be used
+declare const window: any;
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
 export async function initAppState(
@@ -291,26 +257,20 @@ export async function initAppState(
       : LoginState.LoggedOut;
 
     if (app.loginState === LoginState.LoggedIn) {
-      console.log('Initializing socket connection with JTW:', app.user.jwt);
-      // init the websocket connection and the chain-events namespace
-      app.socket.init(app.user.jwt);
-      app.user.notifications.refresh(); // TODO: redraw if needed
+      app.user.notifications.refresh();
       if (shouldRedraw) {
         app.loginStateEmitter.emit('redraw');
       }
-    } else if (
-      app.loginState === LoginState.LoggedOut &&
-      app.socket.isConnected
-    ) {
-      // TODO: create global deinit function
-      app.socket.disconnect();
-      if (shouldRedraw) {
-        app.loginStateEmitter.emit('redraw');
-      }
+    } else if (app.loginState === LoginState.LoggedOut && shouldRedraw) {
+      app.loginStateEmitter.emit('redraw');
     }
 
     app.user.setStarredCommunities(
-      statusRes.result.user ? statusRes.result.user.starredCommunities : [],
+      statusRes.result.user?.starredCommunities
+        ? statusRes.result.user?.starredCommunities.map(
+            (c) => new StarredCommunity(c),
+          )
+        : [],
     );
     // update the selectedChain, unless we explicitly want to avoid
     // changing the current state (e.g. when logging in through link_new_address_modal)
@@ -323,9 +283,19 @@ export async function initAppState(
         ChainInfo.fromJSON(statusRes.result.user.selectedChain),
       );
     }
+
+    if (statusRes.result.user) {
+      try {
+        window.FS('setIdentity', {
+          uid: statusRes.result.user.profileId,
+        });
+      } catch (e) {
+        console.error('FullStory not found.');
+      }
+    }
   } catch (err) {
     app.loadingError =
-      err.responseJSON?.error || 'Error loading application state';
+      err.response?.data?.error || 'Error loading application state';
     throw err;
   }
 }

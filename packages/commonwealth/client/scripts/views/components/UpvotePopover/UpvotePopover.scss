@@ -1,0 +1,42 @@
+@import '../../../../styles/shared.scss';
+
+.Popover.UpvotePopover {
+  padding: 8px 0;
+  width: 256px;
+
+  .popover-title {
+    padding: 8px 16px;
+    margin-bottom: 0;
+  }
+
+  .upvoters-list {
+    display: flex;
+    flex-direction: column;
+
+    .upvoter-row {
+      display: flex;
+      height: 40px;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      align-self: stretch;
+
+      .User {
+        .user-display-name {
+          font-size: 12px;
+          font-weight: 500;
+          line-height: 16px;
+          letter-spacing: 0.24px;
+        }
+      }
+    }
+  }
+
+  .upvoter-count {
+    height: 40px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    color: $neutral-400;
+  }
+}

@@ -1,0 +1,25 @@
+@import '../../../../../styles/shared';
+
+.EmptyThreadsSkeletonContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 40px;
+
+  @include medium {
+    padding: 40px;
+  }
+
+  @include mediumSmall {
+    padding: 32px;
+  }
+
+  @include smallInclusive {
+    padding: 24px;
+  }
+}
+
+.EmptyThreadsPlaceholderText {
+  color: $neutral-500;
+  margin-left: 40px;
+}

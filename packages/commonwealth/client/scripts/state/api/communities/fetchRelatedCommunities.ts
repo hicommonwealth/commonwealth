@@ -27,7 +27,7 @@ const fetchRelatedCommunities = async ({
       params: {
         chainNodeId,
       },
-    }
+    },
   );
 
   return response.data.result;

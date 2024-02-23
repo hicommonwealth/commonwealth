@@ -7,15 +7,18 @@ import { ApiEndpoints } from 'state/api/config';
 const TOPICS_STALE_TIME = 30 * 1_000; // 30 s
 
 interface FetchTopicsProps {
-  chainId: string;
+  communityId: string;
+  apiEnabled?: boolean;
 }
 
-const fetchTopics = async ({ chainId }: FetchTopicsProps) => {
+const fetchTopics = async ({
+  communityId,
+}: FetchTopicsProps): Promise<Topic[]> => {
   const response = await axios.get(
     `${app.serverUrl()}${ApiEndpoints.BULK_TOPICS}`,
     {
       params: {
-        community_id: chainId || app.activeChainId(),
+        community_id: communityId || app.activeChainId(),
       },
     },
   );
@@ -23,11 +26,15 @@ const fetchTopics = async ({ chainId }: FetchTopicsProps) => {
   return response.data.result.map((t) => new Topic(t));
 };
 
-const useFetchTopicsQuery = ({ chainId }: FetchTopicsProps) => {
+const useFetchTopicsQuery = ({
+  communityId,
+  apiEnabled = true,
+}: FetchTopicsProps) => {
   return useQuery({
-    queryKey: [ApiEndpoints.BULK_TOPICS, chainId],
-    queryFn: () => fetchTopics({ chainId }),
+    queryKey: [ApiEndpoints.BULK_TOPICS, communityId],
+    queryFn: () => fetchTopics({ communityId }),
     staleTime: TOPICS_STALE_TIME,
+    enabled: apiEnabled,
   });
 };
 

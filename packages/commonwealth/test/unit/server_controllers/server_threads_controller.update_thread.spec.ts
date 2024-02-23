@@ -5,8 +5,6 @@ import {
   UpdateThreadPermissions,
   validatePermissions,
 } from 'server/controllers/server_threads_methods/update_thread';
-import { CommunityInstance } from '../../../server/models/community';
-import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
 
 describe('ServerThreadsController', () => {
   describe('#validatePermissions', () => {
@@ -16,6 +14,7 @@ describe('ServerThreadsController', () => {
         isMod: false,
         isAdmin: false,
         isSuperAdmin: false,
+        isCollaborator: false,
       };
       expect(() =>
         validatePermissions(permissions, {
@@ -23,7 +22,7 @@ describe('ServerThreadsController', () => {
           isMod: true,
           isAdmin: true,
           isSuperAdmin: true,
-        })
+        }),
       ).to.throw('Unauthorized');
     });
 
@@ -33,34 +32,35 @@ describe('ServerThreadsController', () => {
         isMod: false,
         isAdmin: true,
         isSuperAdmin: false,
+        isCollaborator: false,
       };
 
       // throws
       expect(() =>
         validatePermissions(permissions, {
           isThreadOwner: true,
-        })
+        }),
       ).to.throw('Unauthorized');
 
       // throws
       expect(() =>
         validatePermissions(permissions, {
           isMod: true,
-        })
+        }),
       ).to.throw('Unauthorized');
 
       // does NOT throw
       expect(() =>
         validatePermissions(permissions, {
           isAdmin: true,
-        })
+        }),
       ).to.not.throw();
 
       // throws
       expect(() =>
         validatePermissions(permissions, {
           isSuperAdmin: true,
-        })
+        }),
       ).to.throw('Unauthorized');
 
       // does NOT throw
@@ -70,7 +70,7 @@ describe('ServerThreadsController', () => {
           isMod: true,
           isAdmin: true,
           isSuperAdmin: true,
-        })
+        }),
       ).to.not.throw();
     });
   });
@@ -83,16 +83,13 @@ describe('ServerThreadsController', () => {
         role: 'admin',
         community_id: 'ethereum',
         verified: true,
-        update: async () => null,
+        update: async () => ({}),
       };
       const attributes: UpdateThreadOptions = {
         user: {
           getAddresses: async () => [address],
         } as any,
         address: address as any,
-        community: {
-          id: 'ethereum',
-        } as CommunityInstance,
         threadId: 1,
         title: 'hello',
         body: 'wasup',
@@ -101,18 +98,25 @@ describe('ServerThreadsController', () => {
 
       const db: any = {
         Thread: {
-          findByPk: async () => ({
-            version_history: ['{"body": ""}'],
-            update: async () => null,
-          }),
           findOne: async () => ({
             Address: address,
+            address_id: address.id,
+            version_history: ['{"body": ""}'],
+            update: async () => null,
             toJSON: () => ({}),
+          }),
+        },
+        Topic: {
+          findOne: async () => ({
+            id: 1,
           }),
         },
         // for findAllRoles
         Address: {
           findAll: async () => [address],
+        },
+        Community: {
+          findByPk: async () => ({ id: 'ethereum' }),
         },
         sequelize: {
           transaction: async () => ({
@@ -121,26 +125,13 @@ describe('ServerThreadsController', () => {
           }),
         },
       };
-      const tokenBalanceCache: any = {};
-      const banCache: any = BAN_CACHE_MOCK_FN('ethereum');
+      const banCache: any = {
+        checkBan: () => [true, null],
+      };
 
-      const serverThreadsController = new ServerThreadsController(
-        db,
-        tokenBalanceCache,
-        banCache
-      );
+      const serverThreadsController = new ServerThreadsController(db, banCache);
       const [updatedThread, notificationOptions, analyticsOptions] =
         await serverThreadsController.updateThread(attributes);
-
-      expect(
-        serverThreadsController.updateThread({
-          ...(attributes as any),
-          address: {
-            ...attributes.address,
-            address: '0xbanned',
-          },
-        })
-      ).to.be.rejectedWith('Ban error: banned');
 
       expect(updatedThread).to.be.ok;
       expect(notificationOptions).to.have.length(1);

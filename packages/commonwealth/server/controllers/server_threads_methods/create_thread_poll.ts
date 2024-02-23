@@ -1,9 +1,9 @@
+import { AppError } from '@hicommonwealth/core';
+import { PollAttributes, UserInstance } from '@hicommonwealth/model';
 import moment from 'moment';
-import { AppError } from '../../../../common-common/src/errors';
-import { CommunityInstance } from '../../models/community';
-import { PollAttributes } from '../../models/poll';
-import { UserInstance } from '../../models/user';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { validateOwner } from '../../util/validateOwner';
+import { TrackOptions } from '../server_analytics_controller';
 import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
@@ -15,24 +15,16 @@ export const Errors = {
 
 export type CreateThreadPollOptions = {
   user: UserInstance;
-  community: CommunityInstance;
   threadId: number;
   prompt: string;
   options: string[];
   customDuration?: number;
 };
-export type CreateThreadPollResult = PollAttributes;
+export type CreateThreadPollResult = [PollAttributes, TrackOptions];
 
 export async function __createThreadPoll(
   this: ServerThreadsController,
-  {
-    user,
-    community,
-    threadId,
-    prompt,
-    options,
-    customDuration,
-  }: CreateThreadPollOptions,
+  { user, threadId, prompt, options, customDuration }: CreateThreadPollOptions,
 ): Promise<CreateThreadPollResult> {
   if (customDuration) {
     if (
@@ -61,23 +53,25 @@ export async function __createThreadPoll(
   const isThreadOwner = await validateOwner({
     models: this.models,
     user,
-    communityId: community.id,
+    communityId: thread.community_id,
     entity: thread,
   });
   if (!isThreadOwner) {
     throw new AppError(Errors.NotAuthor);
   }
 
+  const community = await this.models.Community.findByPk(thread.community_id);
+
   // check if admin_only flag is set
-  if (thread.Chain?.admin_only_polling) {
+  if (community.admin_only_polling) {
     const isAdmin = await validateOwner({
       models: this.models,
       user,
-      communityId: community.id,
+      communityId: thread.community_id,
       allowAdmin: true,
     });
     if (!isAdmin) {
-      new AppError(Errors.MustBeAdmin);
+      throw new AppError(Errors.MustBeAdmin);
     }
   }
 
@@ -87,7 +81,7 @@ export async function __createThreadPoll(
     return this.models.Poll.create(
       {
         thread_id: thread.id,
-        community_id: thread.chain,
+        community_id: thread.community_id,
         prompt,
         options: JSON.stringify(options),
         ends_at,
@@ -96,5 +90,11 @@ export async function __createThreadPoll(
     );
   });
 
-  return poll.toJSON();
+  const analyticsOptions = {
+    event: MixpanelCommunityInteractionEvent.CREATE_POLL,
+    community: thread.community_id,
+    userId: user.id,
+  };
+
+  return [poll.toJSON(), analyticsOptions];
 }

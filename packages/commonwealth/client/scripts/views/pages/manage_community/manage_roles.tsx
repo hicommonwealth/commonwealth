@@ -1,14 +1,12 @@
-import React from 'react';
-
-import { notifyError } from 'controllers/app/notifications';
-
-import 'pages/manage_community/manage_roles.scss';
-
 import axios from 'axios';
+import { notifyError } from 'controllers/app/notifications';
 import { useCommonNavigate } from 'navigation/helpers';
+import 'pages/manage_community/manage_roles.scss';
+import React from 'react';
 import app from 'state';
 import { User } from 'views/components/user/user';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import { useFlag } from '../../../hooks/useFlag';
 import RoleInfo from '../../../models/RoleInfo';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWLabel } from '../../components/component_kit/cw_label';
@@ -24,6 +22,7 @@ export const ManageRoles = ({
   onRoleUpdate,
   roledata,
 }: ManageRoleRowProps) => {
+  const newAdminOnboardingEnabled = useFlag('newAdminOnboarding');
   const navigate = useCommonNavigate();
 
   const communityObj = { chain: app.activeChainId() };
@@ -44,7 +43,7 @@ export const ManageRoles = ({
       const newRole = res.data.result;
       onRoleUpdate(role, newRole);
     } catch (err) {
-      const errMsg = err.responseJSON?.error || 'Failed to alter role.';
+      const errMsg = err.response?.data?.error || 'Failed to alter role.';
       notifyError(errMsg);
     }
   };
@@ -112,7 +111,7 @@ export const ManageRoles = ({
           onClick: async () => {
             await removeRole(role);
             if (isLosingAdminPermissions) {
-              navigate(`/`);
+              navigate(newAdminOnboardingEnabled ? '/manage/moderators' : '/');
             }
           },
         },
@@ -136,7 +135,7 @@ export const ManageRoles = ({
             <div className="role-row" key={addr.id}>
               <User
                 userAddress={addr.address}
-                userChainId={role.chain_id}
+                userCommunityId={role.chain_id}
                 shouldShowPopover
                 shouldLinkProfile
                 shouldHideAvatar

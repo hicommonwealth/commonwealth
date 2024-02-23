@@ -6,23 +6,27 @@ import React, {
   useState,
 } from 'react';
 
-import 'components/quill/markdown_formatted_text.scss';
+import 'components/react_quill/markdown_formatted_text.scss';
 
 import DOMPurify from 'dompurify';
+import { loadScript } from 'helpers';
+import { twitterLinkRegex } from 'helpers/constants';
+import { debounce } from 'lodash';
 import { marked } from 'marked';
+import markedFootnote from 'marked-footnote';
+import { markedSmartypants } from 'marked-smartypants';
+import { markedXhtml } from 'marked-xhtml';
+import removeMd from 'remove-markdown';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { getClasses } from '../component_kit/helpers';
-import { countLinesMarkdown, fetchTwitterEmbedInfo } from './utils';
 import { renderTruncatedHighlights } from './highlighter';
-import removeMd from 'remove-markdown';
 import { QuillRendererProps } from './quill_renderer';
-import { loadScript } from 'helpers';
-import { debounce } from 'lodash';
-import { twitterLinkRegex } from 'helpers/constants';
+import { countLinesMarkdown, fetchTwitterEmbedInfo } from './utils';
 
 const OPEN_LINKS_IN_NEW_TAB = true;
 
 const markdownRenderer = new marked.Renderer();
+
 markdownRenderer.link = (href, title, text) => {
   return `<a ${
     href.indexOf('://commonwealth.im/') !== -1 && 'target="_blank"'
@@ -30,6 +34,7 @@ markdownRenderer.link = (href, title, text) => {
     OPEN_LINKS_IN_NEW_TAB ? 'target="_blank"' : ''
   } href="${href}">${text}</a>`;
 };
+
 markdownRenderer.image = (href, title, text) => {
   if (href?.startsWith('ipfs://')) {
     const hash = href.split('ipfs://')[1];
@@ -39,13 +44,12 @@ markdownRenderer.image = (href, title, text) => {
   }
   return `<img alt="${text}" src="${href}"/>`;
 };
-marked.setOptions({
-  renderer: markdownRenderer,
-  gfm: true, // use github flavored markdown
-  smartypants: true,
-  smartLists: true,
-  xhtml: true,
-});
+marked
+  .setOptions({
+    renderer: markdownRenderer,
+    gfm: true, // use github flavored markdown
+  })
+  .use(markedFootnote(), markedSmartypants(), markedXhtml());
 
 type MarkdownFormattedTextProps = Omit<QuillRendererProps, 'doc'> & {
   doc: string;
@@ -118,7 +122,7 @@ export const MarkdownFormattedText = ({
       // walk through rendered markdown DOM elements
       const walker = document.createTreeWalker(
         containerRef.current,
-        NodeFilter.SHOW_ELEMENT
+        NodeFilter.SHOW_ELEMENT,
       );
 
       while (walker?.nextNode()) {
@@ -138,7 +142,7 @@ export const MarkdownFormattedText = ({
                   embedEl.innerHTML = embedInfo.result.html;
                   walker?.currentNode?.parentElement?.insertBefore(
                     embedEl,
-                    walker.currentNode
+                    walker.currentNode,
                   );
                 }, 1);
               };
@@ -152,7 +156,7 @@ export const MarkdownFormattedText = ({
         }
       }
     }, 300),
-    []
+    [],
   );
 
   // when doc is rendered, convert twitter links to embeds
@@ -172,7 +176,7 @@ export const MarkdownFormattedText = ({
         ref={containerRef}
         className={getClasses<{ collapsed?: boolean }>(
           { collapsed: isTruncated },
-          'MarkdownFormattedText'
+          'MarkdownFormattedText',
         )}
       >
         {finalDoc}

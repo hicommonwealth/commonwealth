@@ -1,29 +1,28 @@
-import type { CWEvent } from '../../shared/chain/types/types';
-import { Label as ChainEventLabel } from '../../shared/chain/labelers/util';
-
-import { factory, formatFilename } from 'common-common/src/logging';
-import { NotificationCategories } from 'common-common/src/types';
-import { capitalize } from 'lodash';
-import { Op, WhereOptions } from 'sequelize';
 import type {
   IChainEventNotificationData,
   IForumNotificationData,
   ISnapshotNotificationData,
-} from '../../shared/types';
+} from '@hicommonwealth/core';
+import {
+  DynamicTemplate,
+  NotificationCategories,
+  logger,
+} from '@hicommonwealth/core';
+import type { UserAttributes } from '@hicommonwealth/model';
+import { AddressAttributes, DB } from '@hicommonwealth/model';
+import { capitalize } from 'lodash';
+import { Op, WhereOptions } from 'sequelize';
+import { Label as ChainEventLabel } from '../../shared/chain/labelers/util';
+import type { CWEvent } from '../../shared/chain/types/types';
 import {
   formatAddressShort,
   getThreadUrl,
   renderQuillDeltaToText,
   smartTrim,
 } from '../../shared/utils';
-
-import { DynamicTemplate } from '../../shared/types';
 import { SENDGRID_API_KEY } from '../config';
-import { DB } from '../models';
-import { AddressAttributes } from '../models/address';
-import type { UserAttributes } from '../models/user';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');
@@ -32,7 +31,7 @@ sgMail.setApiKey(SENDGRID_API_KEY);
 const getForumNotificationCopy = async (
   models: DB,
   notification_data: IForumNotificationData,
-  category_id
+  category_id,
 ) => {
   // unpack notification_data
   const {
@@ -78,7 +77,7 @@ const getForumNotificationCopy = async (
   const author_addr_short = formatAddressShort(
     author_address,
     author_chain,
-    true
+    true,
   );
   try {
     authorName = authorProfile.profile_name || author_addr_short;
@@ -148,7 +147,7 @@ export const createImmediateNotificationEmailObject = async (
     | IChainEventNotificationData
     | ISnapshotNotificationData,
   category_id,
-  models
+  models,
 ) => {
   if (category_id === NotificationCategories.ChainEvent) {
     const ceInstance = <IChainEventNotificationData>notification_data;
@@ -202,7 +201,7 @@ export const createImmediateNotificationEmailObject = async (
     ] = await getForumNotificationCopy(
       models,
       notification_data as IForumNotificationData,
-      category_id
+      category_id,
     );
     return {
       from: 'Commonwealth <no-reply@commonwealth.im>',
@@ -230,7 +229,7 @@ export const createImmediateNotificationEmailObject = async (
 
 export const sendImmediateNotificationEmail = async (
   user: UserAttributes,
-  emailObject
+  emailObject,
 ) => {
   if (!emailObject) {
     console.log('attempted to send empty immediate notification email');
@@ -248,13 +247,13 @@ export const sendImmediateNotificationEmail = async (
   } catch (e) {
     log.error(
       'Failed to send immediate notification email',
-      e?.response?.body?.errors
+      e?.response?.body?.errors,
     );
   }
 };
 
 export const sendBatchedNotificationEmails = async (
-  models
+  models,
 ): Promise<number> => {
   log.info('Sending daily notification emails');
 
@@ -298,7 +297,7 @@ export const sendBatchedNotificationEmails = async (
         } catch (e) {
           console.log('Failed to send batch notification email', e);
         }
-      })
+      }),
     );
     return 0;
   } catch (e) {

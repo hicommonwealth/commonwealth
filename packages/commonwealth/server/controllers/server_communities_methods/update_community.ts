@@ -1,42 +1,44 @@
 /* eslint-disable no-continue */
-import { AppError } from 'common-common/src/errors';
-import { ChainBase } from 'common-common/src/types';
+import { AppError, ChainBase } from '@hicommonwealth/core';
+import type {
+  CommunityAttributes,
+  CommunitySnapshotSpaceWithSpaceAttached,
+} from '@hicommonwealth/model';
+import { UserInstance, commonProtocol } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import type { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
-import { UserInstance } from 'server/models/user';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';
 import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
-import type { CommunityAttributes } from '../../models/community';
 import { findOneRole } from '../../util/roles';
+import { TrackOptions } from '../server_analytics_controller';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',
   NoCommunityId: 'Must provide community ID',
   ReservedId: 'The id is reserved and cannot be used',
-  CantChangeNetwork: 'Cannot change chain network',
+  CantChangeNetwork: 'Cannot change community network',
   NotAdmin: 'Not an admin',
   NoCommunityFound: 'Community not found',
-  InvalidWebsite: 'Website must begin with https://',
-  InvalidDiscord: 'Discord must begin with https://',
-  InvalidElement: 'Element must begin with https://',
-  InvalidTelegram: 'Telegram must begin with https://t.me/',
-  InvalidGithub: 'Github must begin with https://github.com/',
+  InvalidSocialLink: 'Social Link must begin with http(s)://',
   InvalidCustomDomain: 'Custom domain may not include "commonwealth"',
   InvalidSnapshot: 'Snapshot must fit the naming pattern of *.eth or *.xyz',
   SnapshotOnlyOnEthereum:
     'Snapshot data may only be added to chains with Ethereum base',
   InvalidTerms: 'Terms of Service must begin with https://',
   InvalidDefaultPage: 'Default page does not exist',
+  InvalidTransactionHash: 'Valid transaction hash required to verify namespace',
 };
 
 export type UpdateCommunityOptions = CommunityAttributes & {
   user: UserInstance;
   featuredTopics?: string[];
   snapshot?: string[];
+  transactionHash?: string;
 };
 export type UpdateCommunityResult = CommunityAttributes & {
   snapshot: string[];
+  analyticsOptions: TrackOptions;
 };
 
 export async function __updateCommunity(
@@ -56,17 +58,25 @@ export async function __updateCommunity(
     throw new AppError(Errors.CantChangeNetwork);
   }
 
-  const chain = await this.models.Community.findOne({ where: { id: id } });
-  if (!chain) {
+  const community = await this.models.Community.findOne({
+    where: { id },
+    include: [
+      {
+        model: this.models.ChainNode,
+        attributes: ['url', 'eth_chain_id', 'cosmos_chain_id'],
+      },
+    ],
+  });
+  let addresses;
+  if (!community) {
     throw new AppError(Errors.NoCommunityFound);
   } else {
-    const userAddressIds = (await user.getAddresses())
-      .filter((addr) => !!addr.verified)
-      .map((addr) => addr.id);
+    addresses = (await user.getAddresses()).filter((addr) => !!addr.verified);
+    const userAddressIds = addresses.map((addr) => addr.id);
     const userMembership = await findOneRole(
       this.models,
       { where: { address_id: { [Op.in]: userAddressIds } } },
-      chain.id,
+      community.id,
       ['admin'],
     );
     if (!user.isAdmin && !userMembership) {
@@ -81,11 +91,7 @@ export async function __updateCommunity(
     type,
     name,
     description,
-    website,
-    discord,
-    element,
-    telegram,
-    github,
+    social_links,
     hide_projects,
     stages_enabled,
     custom_stages,
@@ -97,6 +103,8 @@ export async function __updateCommunity(
     chain_node_id,
     directory_page_enabled,
     directory_page_chain_node_id,
+    namespace,
+    transactionHash,
   } = rest;
 
   // Handle single string case and undefined case
@@ -107,16 +115,12 @@ export async function __updateCommunity(
     snapshot = [];
   }
 
-  if (website && !urlHasValidHTTPPrefix(website)) {
-    throw new AppError(Errors.InvalidWebsite);
-  } else if (discord && !urlHasValidHTTPPrefix(discord)) {
-    throw new AppError(Errors.InvalidDiscord);
-  } else if (element && !urlHasValidHTTPPrefix(element)) {
-    throw new AppError(Errors.InvalidElement);
-  } else if (telegram && !telegram.startsWith('https://t.me/')) {
-    throw new AppError(Errors.InvalidTelegram);
-  } else if (github && !github.startsWith('https://github.com/')) {
-    throw new AppError(Errors.InvalidGithub);
+  const nonEmptySocialLinks = social_links?.filter((s) => s && s !== '');
+  const invalidSocialLinks = nonEmptySocialLinks?.filter(
+    (s) => !urlHasValidHTTPPrefix(s),
+  );
+  if (nonEmptySocialLinks && invalidSocialLinks.length > 0) {
+    throw new AppError(`${invalidSocialLinks[0]}: ${Errors.InvalidSocialLink}`);
   } else if (custom_domain && custom_domain.includes('commonwealth')) {
     throw new AppError(Errors.InvalidCustomDomain);
   } else if (
@@ -128,7 +132,7 @@ export async function __updateCommunity(
     })
   ) {
     throw new AppError(Errors.InvalidSnapshot);
-  } else if (snapshot.length > 0 && chain.base !== ChainBase.Ethereum) {
+  } else if (snapshot.length > 0 && community.base !== ChainBase.Ethereum) {
     throw new AppError(Errors.SnapshotOnlyOnEthereum);
   } else if (terms && !urlHasValidHTTPPrefix(terms)) {
     throw new AppError(Errors.InvalidTerms);
@@ -136,7 +140,7 @@ export async function __updateCommunity(
 
   const snapshotSpaces: CommunitySnapshotSpaceWithSpaceAttached[] =
     await this.models.CommunitySnapshotSpaces.findAll({
-      where: { chain_id: chain.id },
+      where: { community_id: community.id },
       include: {
         model: this.models.SnapshotSpace,
         as: 'snapshot_space',
@@ -164,7 +168,7 @@ export async function __updateCommunity(
       // if it isnt, create it
       await this.models.CommunitySnapshotSpaces.create({
         snapshot_space_id: spaceModelInstance[0].snapshot_space,
-        chain_id: chain.id,
+        community_id: community.id,
       });
     }
   }
@@ -174,47 +178,84 @@ export async function __updateCommunity(
     await this.models.CommunitySnapshotSpaces.destroy({
       where: {
         snapshot_space_id: removedSpace.snapshot_space_id,
-        chain_id: chain.id,
+        community_id: community.id,
       },
     });
   }
 
-  if (name) chain.name = name;
-  if (description) chain.description = description;
-  if (default_symbol) chain.default_symbol = default_symbol;
-  if (icon_url) chain.icon_url = icon_url;
-  if (active !== undefined) chain.active = active;
-  if (type) chain.type = type;
-  if (website !== null) chain.website = website;
-  if (discord !== null) chain.discord = discord;
-  if (element) chain.element = element;
-  if (telegram !== null) chain.telegram = telegram;
-  if (github !== null) chain.github = github;
-  if (hide_projects) chain.hide_projects = hide_projects;
-  if (stages_enabled) chain.stages_enabled = stages_enabled;
-  if (custom_stages) chain.custom_stages = custom_stages;
-  if (terms) chain.terms = terms;
-  if (has_homepage) chain.has_homepage = has_homepage;
+  if (name) community.name = name;
+  if (description) community.description = description;
+  if (default_symbol) community.default_symbol = default_symbol;
+  if (icon_url) community.icon_url = icon_url;
+  if (active !== undefined) community.active = active;
+  if (type) community.type = type;
+  if (nonEmptySocialLinks !== undefined && nonEmptySocialLinks.length >= 0)
+    community.social_links = nonEmptySocialLinks;
+  if (hide_projects) community.hide_projects = hide_projects;
+  if (typeof stages_enabled === 'boolean')
+    community.stages_enabled = stages_enabled;
+  if (Array.isArray(custom_stages)) {
+    community.custom_stages = custom_stages;
+  }
+  if (typeof terms === 'string') community.terms = terms;
+  if (has_homepage) community.has_homepage = has_homepage;
   if (default_page) {
     if (!has_homepage) {
       throw new AppError(Errors.InvalidDefaultPage);
     } else {
-      chain.default_page = default_page;
+      community.default_page = default_page;
     }
   }
   if (chain_node_id) {
-    chain.chain_node_id = chain_node_id;
+    community.chain_node_id = chain_node_id;
   }
+
+  let mixpanelEvent: MixpanelCommunityInteractionEvent;
+  let communitySelected = null;
+
+  if (community.directory_page_enabled !== directory_page_enabled) {
+    mixpanelEvent = directory_page_enabled
+      ? MixpanelCommunityInteractionEvent.DIRECTORY_PAGE_ENABLED
+      : MixpanelCommunityInteractionEvent.DIRECTORY_PAGE_DISABLED;
+
+    if (directory_page_enabled) {
+      communitySelected = await this.models.Community.findOne({
+        where: { chain_node_id: directory_page_chain_node_id },
+      });
+    }
+  }
+
   if (directory_page_enabled !== undefined) {
-    chain.directory_page_enabled = directory_page_enabled;
+    community.directory_page_enabled = directory_page_enabled;
   }
   if (directory_page_chain_node_id !== undefined) {
-    chain.directory_page_chain_node_id = directory_page_chain_node_id;
+    community.directory_page_chain_node_id = directory_page_chain_node_id;
+  }
+  if (namespace !== undefined) {
+    if (!transactionHash) {
+      throw new AppError(Errors.InvalidTransactionHash);
+    }
+
+    const ownerOfChain = addresses.find(
+      (a) => a.community_id === community.id && a.role === 'admin',
+    );
+    if (!ownerOfChain) {
+      throw new AppError(Errors.NotAdmin);
+    }
+
+    await commonProtocol.newNamespaceValidator.validateNamespace(
+      namespace,
+      transactionHash,
+      ownerOfChain.address,
+      community,
+    );
+
+    community.namespace = namespace;
   }
 
   // TODO Graham 3/31/22: Will this potentially lead to undesirable effects if toggle
   // is left un-updated? Is there a better approach?
-  chain.default_summary_view = default_summary_view || false;
+  community.default_summary_view = default_summary_view || false;
 
   // Under our current security policy, custom domains must be set by trusted
   // administrators only. Otherwise an attacker could configure a custom domain and
@@ -222,7 +263,7 @@ export async function __updateCommunity(
   //
   // chain.custom_domain = custom_domain;
 
-  await chain.save();
+  await community.save();
 
   // Suggested solution for serializing BigInts
   // https://github.com/GoogleChromeLabs/jsbi/issues/30#issuecomment-1006086291
@@ -230,5 +271,13 @@ export async function __updateCommunity(
     return this.toString();
   };
 
-  return { ...chain.toJSON(), snapshot };
+  const analyticsOptions = {
+    event: mixpanelEvent,
+    community: community.id,
+    userId: user.id,
+    isCustomDomain: null,
+    ...(communitySelected && { communitySelected: communitySelected.id }),
+  };
+
+  return { ...community.toJSON(), snapshot, analyticsOptions };
 }

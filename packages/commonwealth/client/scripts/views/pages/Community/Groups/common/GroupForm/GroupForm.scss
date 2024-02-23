@@ -27,26 +27,34 @@
         align-items: center;
         gap: 8px;
 
-        .input {
-          .input-and-icon-container {
-            width: 45px !important;
-          }
+        .CWSelectList {
+          .SelectList {
+            padding: 4px 10px !important;
+            min-height: auto;
 
-          &.failure {
-            .input-and-icon-container > input {
-              border-color: $rorange-600 !important;
-              background-color: $white !important;
+            .cwsl__option {
+              text-align: center;
+              padding: 2px 16px !important;
             }
           }
         }
+      }
+
+      .requirements-radio-btn-helper-text {
+        color: $neutral-500;
       }
     }
   }
 
   .action-buttons {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: baseline;
     gap: 8px;
+
+    @include extraSmall {
+      justify-content: flex-end;
+    }
   }
 }

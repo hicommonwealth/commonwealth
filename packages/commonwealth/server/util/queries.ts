@@ -1,5 +1,3 @@
-import type { IPagination } from 'common-common/src/api/extApiTypes';
-import { OrderByOptions } from 'common-common/src/api/extApiTypes';
 import { TypedPaginatedResult } from 'server/types';
 
 /*
@@ -7,55 +5,6 @@ These methods are for generating the sequelize formatting for
 different types of query options. Enumerated methods here
 for ORDERING, GROUPING, LIMIT, OFFSET
 */
-
-// Yields `LIMIT count`
-export const limitBy = (count: number) => {
-  return { limit: count };
-};
-
-// Yields `LIMIT count OFFSET page`
-export const paginate = (count: number, page: number) => {
-  return { limit: count, offset: count * (page - 1) };
-};
-
-// helper methods
-export type PaginationResult = {
-  limit?: number;
-  offset?: number;
-  order?: any;
-};
-export const formatPagination = (query: IPagination): PaginationResult => {
-  const { limit, page } = query;
-  let pagination: PaginationResult = {};
-  if (limit && page) pagination = paginate(limit, page);
-  else if (limit) pagination = limitBy(limit);
-
-  pagination.order = [[OrderByOptions.CREATED, 'DESC']];
-  if (
-    [OrderByOptions.UPDATED, OrderByOptions.LAST_CHECKED].includes(query.sort)
-  )
-    pagination.order = [[query.sort, 'DESC']];
-  return pagination;
-};
-
-export const formatPaginationNoSort = (query: {
-  limit?: number;
-  page?: number;
-}) => {
-  const { limit, page } = query;
-  let pagination: any = {};
-  if (limit && page) pagination = paginate(limit, page);
-  else if (limit) pagination = limitBy(limit);
-
-  return pagination;
-};
-
-export const flattenIncludedAddresses = (entities) => {
-  entities.forEach((e) => {
-    e.dataValues['address'] = e.dataValues.Address.address;
-    delete e.dataValues.Address;
-  });
-};
 
 export type PaginationSqlOptions = {
   limit?: number;
@@ -78,7 +27,7 @@ export type PaginationSqlBind = PaginationSqlResult['bind'];
 
 export const validateOrderDirection = (
   orderDirection: string,
-  allowEmpty?: boolean
+  allowEmpty?: boolean,
 ): boolean => {
   if (allowEmpty && !orderDirection) {
     return true;
@@ -87,7 +36,7 @@ export const validateOrderDirection = (
 };
 
 export const buildPaginationSql = (
-  options: PaginationSqlOptions
+  options: PaginationSqlOptions,
 ): PaginationSqlResult => {
   const {
     limit,
@@ -134,7 +83,7 @@ export const buildPaginationSql = (
 export function buildPaginatedResponse<T>(
   items: T[],
   totalResults: number,
-  bind: PaginationSqlBind
+  bind: PaginationSqlBind,
 ): TypedPaginatedResult<T> {
   return {
     results: items,

@@ -7,9 +7,9 @@ import 'pages/notification_settings/helper_components.scss';
 import NotificationSubscription from '../../../models/NotificationSubscription';
 
 import { useCommonNavigate } from 'navigation/helpers';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../../components/component_kit/cw_text';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
@@ -18,7 +18,11 @@ import { getNotificationTypeText } from './helpers';
 
 const getTextRows = (
   subscription: NotificationSubscription,
-  setRoute: (url: To, options?: NavigateOptions, prefix?: null | string) => void
+  setRoute: (
+    url: To,
+    options?: NavigateOptions,
+    prefix?: null | string,
+  ) => void,
 ) => {
   if (subscription.Thread) {
     const threadUrl = getNotificationUrlPath(subscription);
@@ -72,9 +76,9 @@ const getTextRows = (
             <User
               shouldHideAvatar
               userAddress={subscription.Comment.author}
-              userChainId={subscription.Comment.chain}
+              userCommunityId={subscription.Comment.communityId}
             />
-            's
+            &apos;
           </CWText>
           <CWText
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}

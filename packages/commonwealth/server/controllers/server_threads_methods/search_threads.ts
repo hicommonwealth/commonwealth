@@ -1,7 +1,6 @@
+import { ThreadAttributes } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from 'server/types';
-import { CommunityInstance } from '../../models/community';
-import { ThreadAttributes } from '../../models/thread';
 import {
   PaginationSqlBind,
   PaginationSqlOptions,
@@ -11,7 +10,7 @@ import {
 import { ServerThreadsController } from '../server_threads_controller';
 
 export type SearchThreadsOptions = {
-  community: CommunityInstance;
+  communityId: string;
   searchTerm: string;
   threadTitleOnly: boolean;
   limit?: number;
@@ -20,21 +19,25 @@ export type SearchThreadsOptions = {
   orderDirection?: 'ASC' | 'DESC';
 };
 
+type ThreadSearchData = Omit<ThreadAttributes, 'chain'> & {
+  community_id: string;
+};
+
 export type SearchThreadsResult =
-  | TypedPaginatedResult<ThreadAttributes[]>
-  | ThreadAttributes[];
+  | TypedPaginatedResult<ThreadSearchData[]>
+  | ThreadSearchData[];
 
 export async function __searchThreads(
   this: ServerThreadsController,
   {
-    community,
+    communityId,
     searchTerm,
     threadTitleOnly,
     limit,
     page,
     orderBy,
     orderDirection,
-  }: SearchThreadsOptions
+  }: SearchThreadsOptions,
 ): Promise<SearchThreadsResult> {
   // sort by rank by default
   let sortOptions: PaginationSqlOptions = {
@@ -68,12 +71,12 @@ export async function __searchThreads(
     searchTerm: searchTerm,
     ...paginationBind,
   };
-  if (community) {
-    bind.community = community.id;
+  if (communityId) {
+    bind.community = communityId;
   }
 
   const communityWhere = bind.community
-    ? '"Threads".chain = $community AND'
+    ? '"Threads".community_id = $community AND'
     : '';
 
   let searchWhere = `"Threads".title ILIKE '%' || $searchTerm || '%'`;
@@ -92,7 +95,7 @@ export async function __searchThreads(
       "Addresses".address,
       "Addresses".community_id as address_chain,
       "Threads".created_at,
-      "Threads".chain,
+      "Threads".community_id as community_id,
       ts_rank_cd("Threads"._search, query) as rank
     FROM "Threads"
     JOIN "Addresses" ON "Threads".address_id = "Addresses".id,
@@ -100,7 +103,7 @@ export async function __searchThreads(
     WHERE
       ${communityWhere}
       "Threads".deleted_at IS NULL AND
-      ${searchWhere}
+      (${searchWhere})
     ${paginationSort}
   `;
 

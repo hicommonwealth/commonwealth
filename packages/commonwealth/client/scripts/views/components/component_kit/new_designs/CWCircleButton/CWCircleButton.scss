@@ -1,0 +1,100 @@
+@import '../../../../../../styles/shared.scss';
+
+.circle-btn-border {
+  cursor: pointer;
+  width: fit-content;
+  border-radius: 50%;
+
+  &.primary,
+  &.secondary {
+    border: 2px solid $transparent;
+  }
+
+  &.primary,
+  &.secondary {
+    padding: 2px;
+
+    &:focus-within {
+      border: 2px solid $neutral-800;
+
+      .CircleButton.secondary {
+        border: 1px solid $transparent;
+      }
+    }
+  }
+
+  .CircleButton {
+    cursor: pointer;
+    line-height: 0;
+    width: fit-content;
+    border-radius: 50%;
+
+    &:focus {
+      outline: none;
+    }
+
+    svg {
+      height: 16px;
+      width: 16px;
+    }
+
+    &.primary {
+      padding: 8px;
+      border: none;
+      background-color: $neutral-700;
+
+      svg {
+        color: $white;
+      }
+
+      &:hover {
+        background-color: $neutral-800;
+      }
+
+      &:active {
+        background-color: $neutral-700;
+      }
+
+      &:focus {
+        background-color: $neutral-800;
+      }
+
+      &.disabled {
+        background-color: $neutral-200;
+        cursor: not-allowed;
+
+        svg {
+          color: $neutral-400;
+        }
+      }
+    }
+
+    &.secondary {
+      padding: 7px;
+      border: 1px solid $neutral-200;
+      background-color: $neutral-50;
+
+      svg {
+        color: $black;
+      }
+
+      &:hover {
+        background-color: $neutral-100;
+      }
+
+      &:active,
+      &:focus {
+        background-color: $neutral-50;
+      }
+
+      &.disabled {
+        background-color: $neutral-50;
+        cursor: not-allowed;
+
+        svg {
+          color: $neutral-400;
+        }
+      }
+    }
+  }
+}

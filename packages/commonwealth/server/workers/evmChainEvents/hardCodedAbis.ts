@@ -703,6 +703,757 @@ export const rawAaveAbi = [
   },
 ];
 
+export const rawCompoundAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      {
+        name: 'tribe',
+        type: 'address',
+        internalType: 'contract ERC20VotesComp',
+      },
+      {
+        name: 'timelock',
+        type: 'address',
+        internalType: 'contract ICompoundTimelock',
+      },
+      { name: 'guardian', type: 'address', internalType: 'address' },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    name: 'ProposalCanceled',
+    type: 'event',
+    inputs: [
+      {
+        name: 'proposalId',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    name: 'ProposalCreated',
+    type: 'event',
+    inputs: [
+      {
+        name: 'proposalId',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+      {
+        name: 'proposer',
+        type: 'address',
+        indexed: false,
+        internalType: 'address',
+      },
+      {
+        name: 'targets',
+        type: 'address[]',
+        indexed: false,
+        internalType: 'address[]',
+      },
+      {
+        name: 'values',
+        type: 'uint256[]',
+        indexed: false,
+        internalType: 'uint256[]',
+      },
+      {
+        name: 'signatures',
+        type: 'string[]',
+        indexed: false,
+        internalType: 'string[]',
+      },
+      {
+        name: 'calldatas',
+        type: 'bytes[]',
+        indexed: false,
+        internalType: 'bytes[]',
+      },
+      {
+        name: 'startBlock',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+      {
+        name: 'endBlock',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+      {
+        name: 'description',
+        type: 'string',
+        indexed: false,
+        internalType: 'string',
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    name: 'ProposalExecuted',
+    type: 'event',
+    inputs: [
+      {
+        name: 'proposalId',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    name: 'ProposalQueued',
+    type: 'event',
+    inputs: [
+      {
+        name: 'proposalId',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+      {
+        name: 'eta',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    name: 'ProposalThresholdUpdated',
+    type: 'event',
+    inputs: [
+      {
+        name: 'oldProposalThreshold',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+      {
+        name: 'newProposalThreshold',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    name: 'QuorumUpdated',
+    type: 'event',
+    inputs: [
+      {
+        name: 'oldQuorum',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+      {
+        name: 'newQuorum',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+    ],
+    anonymous: false,
+  },
+  { name: 'Rollback', type: 'event', inputs: [], anonymous: false },
+  {
+    name: 'RollbackQueued',
+    type: 'event',
+    inputs: [
+      { name: 'eta', type: 'uint256', indexed: false, internalType: 'uint256' },
+    ],
+    anonymous: false,
+  },
+  {
+    name: 'TimelockChange',
+    type: 'event',
+    inputs: [
+      {
+        name: 'oldTimelock',
+        type: 'address',
+        indexed: false,
+        internalType: 'address',
+      },
+      {
+        name: 'newTimelock',
+        type: 'address',
+        indexed: false,
+        internalType: 'address',
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    name: 'VoteCast',
+    type: 'event',
+    inputs: [
+      {
+        name: 'voter',
+        type: 'address',
+        indexed: true,
+        internalType: 'address',
+      },
+      {
+        name: 'proposalId',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+      { name: 'support', type: 'uint8', indexed: false, internalType: 'uint8' },
+      {
+        name: 'weight',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+      {
+        name: 'reason',
+        type: 'string',
+        indexed: false,
+        internalType: 'string',
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    name: 'VotingDelayUpdated',
+    type: 'event',
+    inputs: [
+      {
+        name: 'oldVotingDelay',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+      {
+        name: 'newVotingDelay',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    name: 'VotingPeriodUpdated',
+    type: 'event',
+    inputs: [
+      {
+        name: 'oldVotingPeriod',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+      {
+        name: 'newVotingPeriod',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    name: 'BACKUP_GOVERNOR',
+    type: 'function',
+    inputs: [],
+    outputs: [{ name: '', type: 'address', internalType: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    name: 'BALLOT_TYPEHASH',
+    type: 'function',
+    inputs: [],
+    outputs: [{ name: '', type: 'bytes32', internalType: 'bytes32' }],
+    stateMutability: 'view',
+  },
+  {
+    name: 'COUNTING_MODE',
+    type: 'function',
+    inputs: [],
+    outputs: [{ name: '', type: 'string', internalType: 'string' }],
+    stateMutability: 'pure',
+  },
+  {
+    name: 'ROLLBACK_DEADLINE',
+    type: 'function',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    name: '__acceptAdmin',
+    type: 'function',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    name: '__executeRollback',
+    type: 'function',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    name: '__rollback',
+    type: 'function',
+    inputs: [{ name: 'eta', type: 'uint256', internalType: 'uint256' }],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    name: 'cancel',
+    type: 'function',
+    inputs: [{ name: 'proposalId', type: 'uint256', internalType: 'uint256' }],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    name: 'castVote',
+    type: 'function',
+    inputs: [
+      { name: 'proposalId', type: 'uint256', internalType: 'uint256' },
+      {
+        name: 'support',
+        type: 'uint8',
+        internalType: 'uint8',
+      },
+    ],
+    outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    name: 'castVoteBySig',
+    type: 'function',
+    inputs: [
+      { name: 'proposalId', type: 'uint256', internalType: 'uint256' },
+      {
+        name: 'support',
+        type: 'uint8',
+        internalType: 'uint8',
+      },
+      { name: 'v', type: 'uint8', internalType: 'uint8' },
+      {
+        name: 'r',
+        type: 'bytes32',
+        internalType: 'bytes32',
+      },
+      { name: 's', type: 'bytes32', internalType: 'bytes32' },
+    ],
+    outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    name: 'castVoteWithReason',
+    type: 'function',
+    inputs: [
+      { name: 'proposalId', type: 'uint256', internalType: 'uint256' },
+      {
+        name: 'support',
+        type: 'uint8',
+        internalType: 'uint8',
+      },
+      { name: 'reason', type: 'string', internalType: 'string' },
+    ],
+    outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    name: 'execute',
+    type: 'function',
+    inputs: [
+      { name: 'targets', type: 'address[]', internalType: 'address[]' },
+      {
+        name: 'values',
+        type: 'uint256[]',
+        internalType: 'uint256[]',
+      },
+      { name: 'calldatas', type: 'bytes[]', internalType: 'bytes[]' },
+      {
+        name: 'descriptionHash',
+        type: 'bytes32',
+        internalType: 'bytes32',
+      },
+    ],
+    outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
+    stateMutability: 'payable',
+  },
+  {
+    name: 'execute',
+    type: 'function',
+    inputs: [{ name: 'proposalId', type: 'uint256', internalType: 'uint256' }],
+    outputs: [],
+    stateMutability: 'payable',
+  },
+  {
+    name: 'getActions',
+    type: 'function',
+    inputs: [{ name: 'proposalId', type: 'uint256', internalType: 'uint256' }],
+    outputs: [
+      { name: 'targets', type: 'address[]', internalType: 'address[]' },
+      {
+        name: 'values',
+        type: 'uint256[]',
+        internalType: 'uint256[]',
+      },
+      { name: 'signatures', type: 'string[]', internalType: 'string[]' },
+      {
+        name: 'calldatas',
+        type: 'bytes[]',
+        internalType: 'bytes[]',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    name: 'getReceipt',
+    type: 'function',
+    inputs: [
+      { name: 'proposalId', type: 'uint256', internalType: 'uint256' },
+      {
+        name: 'voter',
+        type: 'address',
+        internalType: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'tuple',
+        components: [
+          { name: 'hasVoted', type: 'bool', internalType: 'bool' },
+          {
+            name: 'support',
+            type: 'uint8',
+            internalType: 'uint8',
+          },
+          { name: 'votes', type: 'uint96', internalType: 'uint96' },
+        ],
+        internalType: 'struct IGovernorCompatibilityBravo.Receipt',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    name: 'getVotes',
+    type: 'function',
+    inputs: [
+      { name: 'account', type: 'address', internalType: 'address' },
+      {
+        name: 'blockNumber',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+    ],
+    outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    name: 'hasVoted',
+    type: 'function',
+    inputs: [
+      { name: 'proposalId', type: 'uint256', internalType: 'uint256' },
+      {
+        name: 'account',
+        type: 'address',
+        internalType: 'address',
+      },
+    ],
+    outputs: [{ name: '', type: 'bool', internalType: 'bool' }],
+    stateMutability: 'view',
+  },
+  {
+    name: 'hashProposal',
+    type: 'function',
+    inputs: [
+      { name: 'targets', type: 'address[]', internalType: 'address[]' },
+      {
+        name: 'values',
+        type: 'uint256[]',
+        internalType: 'uint256[]',
+      },
+      { name: 'calldatas', type: 'bytes[]', internalType: 'bytes[]' },
+      {
+        name: 'descriptionHash',
+        type: 'bytes32',
+        internalType: 'bytes32',
+      },
+    ],
+    outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
+    stateMutability: 'pure',
+  },
+  {
+    name: 'name',
+    type: 'function',
+    inputs: [],
+    outputs: [{ name: '', type: 'string', internalType: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    name: 'proposalDeadline',
+    type: 'function',
+    inputs: [{ name: 'proposalId', type: 'uint256', internalType: 'uint256' }],
+    outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    name: 'proposalEta',
+    type: 'function',
+    inputs: [{ name: 'proposalId', type: 'uint256', internalType: 'uint256' }],
+    outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    name: 'proposalSnapshot',
+    type: 'function',
+    inputs: [{ name: 'proposalId', type: 'uint256', internalType: 'uint256' }],
+    outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    name: 'proposalThreshold',
+    type: 'function',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    name: 'proposals',
+    type: 'function',
+    inputs: [{ name: 'proposalId', type: 'uint256', internalType: 'uint256' }],
+    outputs: [
+      { name: 'id', type: 'uint256', internalType: 'uint256' },
+      {
+        name: 'proposer',
+        type: 'address',
+        internalType: 'address',
+      },
+      { name: 'eta', type: 'uint256', internalType: 'uint256' },
+      {
+        name: 'startBlock',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+      { name: 'endBlock', type: 'uint256', internalType: 'uint256' },
+      {
+        name: 'forVotes',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+      { name: 'againstVotes', type: 'uint256', internalType: 'uint256' },
+      {
+        name: 'abstainVotes',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+      { name: 'canceled', type: 'bool', internalType: 'bool' },
+      {
+        name: 'executed',
+        type: 'bool',
+        internalType: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    name: 'propose',
+    type: 'function',
+    inputs: [
+      { name: 'targets', type: 'address[]', internalType: 'address[]' },
+      {
+        name: 'values',
+        type: 'uint256[]',
+        internalType: 'uint256[]',
+      },
+      { name: 'calldatas', type: 'bytes[]', internalType: 'bytes[]' },
+      {
+        name: 'description',
+        type: 'string',
+        internalType: 'string',
+      },
+    ],
+    outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    name: 'propose',
+    type: 'function',
+    inputs: [
+      { name: 'targets', type: 'address[]', internalType: 'address[]' },
+      {
+        name: 'values',
+        type: 'uint256[]',
+        internalType: 'uint256[]',
+      },
+      { name: 'signatures', type: 'string[]', internalType: 'string[]' },
+      {
+        name: 'calldatas',
+        type: 'bytes[]',
+        internalType: 'bytes[]',
+      },
+      { name: 'description', type: 'string', internalType: 'string' },
+    ],
+    outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    name: 'queue',
+    type: 'function',
+    inputs: [
+      { name: 'targets', type: 'address[]', internalType: 'address[]' },
+      {
+        name: 'values',
+        type: 'uint256[]',
+        internalType: 'uint256[]',
+      },
+      { name: 'calldatas', type: 'bytes[]', internalType: 'bytes[]' },
+      {
+        name: 'descriptionHash',
+        type: 'bytes32',
+        internalType: 'bytes32',
+      },
+    ],
+    outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    name: 'queue',
+    type: 'function',
+    inputs: [{ name: 'proposalId', type: 'uint256', internalType: 'uint256' }],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    name: 'quorum',
+    type: 'function',
+    inputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
+    outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    name: 'quorumVotes',
+    type: 'function',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    name: 'setProposalThreshold',
+    type: 'function',
+    inputs: [
+      {
+        name: 'newProposalThreshold',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    name: 'setQuorum',
+    type: 'function',
+    inputs: [{ name: 'newQuorum', type: 'uint256', internalType: 'uint256' }],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    name: 'setVotingDelay',
+    type: 'function',
+    inputs: [
+      { name: 'newVotingDelay', type: 'uint256', internalType: 'uint256' },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    name: 'setVotingPeriod',
+    type: 'function',
+    inputs: [
+      { name: 'newVotingPeriod', type: 'uint256', internalType: 'uint256' },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    name: 'state',
+    type: 'function',
+    inputs: [{ name: 'proposalId', type: 'uint256', internalType: 'uint256' }],
+    outputs: [
+      { name: '', type: 'uint8', internalType: 'enum IGovernor.ProposalState' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    name: 'supportsInterface',
+    type: 'function',
+    inputs: [{ name: 'interfaceId', type: 'bytes4', internalType: 'bytes4' }],
+    outputs: [{ name: '', type: 'bool', internalType: 'bool' }],
+    stateMutability: 'view',
+  },
+  {
+    name: 'timelock',
+    type: 'function',
+    inputs: [],
+    outputs: [{ name: '', type: 'address', internalType: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    name: 'token',
+    type: 'function',
+    inputs: [],
+    outputs: [
+      { name: '', type: 'address', internalType: 'contract ERC20VotesComp' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    name: 'updateTimelock',
+    type: 'function',
+    inputs: [
+      {
+        name: 'newTimelock',
+        type: 'address',
+        internalType: 'contract ICompoundTimelock',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    name: 'version',
+    type: 'function',
+    inputs: [],
+    outputs: [{ name: '', type: 'string', internalType: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    name: 'votingDelay',
+    type: 'function',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    name: 'votingPeriod',
+    type: 'function',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
+    stateMutability: 'view',
+  },
+];
+
 export const rawDydxAbi = [
   {
     inputs: [

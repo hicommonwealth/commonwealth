@@ -53,7 +53,7 @@ const SnapshotInfoLinkRow = (props: SnapshotInfoLinkRowProps) => {
 
 type SnapshotInformationCardProps = {
   proposal: SnapshotProposal;
-  threads: Array<{ id: string; title: string }> | null;
+  threads: Array<{ id: number; title: string }> | null;
 };
 
 export const SnapshotInformationCard = ({
@@ -61,7 +61,7 @@ export const SnapshotInformationCard = ({
   threads,
 }: SnapshotInformationCardProps) => {
   const votingSystem = capitalize(
-    proposal.type.split('-').join(' ').concat(' voting')
+    proposal.type.split('-').join(' ').concat(' voting'),
   );
 
   return (
@@ -76,7 +76,7 @@ export const SnapshotInformationCard = ({
                 app.chain ? (
                   <User
                     userAddress={proposal.author}
-                    userChainId={app.activeChainId()}
+                    userCommunityId={app.activeChainId()}
                     shouldHideAvatar
                     shouldLinkProfile
                     shouldShowPopover

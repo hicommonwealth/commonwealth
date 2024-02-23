@@ -1,8 +1,8 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
+import { CommunityInstance } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-import { CommunityInstance } from 'server/models/community';
 import { CW_BOT_KEY } from '../config';
-import type { DB } from '../models';
 import lookupAddressIsOwnedByUser from './lookupAddressIsOwnedByUser';
 import {
   validateCommunity,
@@ -30,7 +30,7 @@ export default class DatabaseValidationService {
       query: any,
     ) => Promise<[CommunityInstance, string, boolean]>,
   ) {
-    let chain: CommunityInstance | null = null;
+    let community: CommunityInstance | null = null;
     let error: any = null;
     let bypass: boolean = false;
 
@@ -42,10 +42,10 @@ export default class DatabaseValidationService {
       req.method === 'PATCH'
     ) {
       const source = req.method === 'GET' ? req.query : req.body;
-      [chain, error, bypass] = await validator(this.models, source);
+      [community, error, bypass] = await validator(this.models, source);
     }
 
-    return [chain, error, bypass];
+    return [community, error, bypass];
   }
 
   public validateBotUser = async (
@@ -103,6 +103,7 @@ export default class DatabaseValidationService {
     if (!community) return next(new AppError(Errors.InvalidCommunity));
     // If the chain is valid, add it to the request object
     req.chain = community;
+    req.community = community;
     next();
   };
 
@@ -124,6 +125,7 @@ export default class DatabaseValidationService {
     if (!community) return next(new AppError(Errors.InvalidCommunity));
     // If the chain is valid, add it to the request object
     req.chain = community;
+    req.community = community;
     next();
   };
 }

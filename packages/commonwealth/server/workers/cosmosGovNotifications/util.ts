@@ -1,21 +1,23 @@
-import { ChainBase, NotificationCategories } from 'common-common/src/types';
+import { fromTimestamp } from '@hicommonwealth/chains';
+import {
+  ChainBase,
+  NotificationCategories,
+  SupportedNetwork,
+  logger,
+} from '@hicommonwealth/core';
+import { DB } from '@hicommonwealth/model';
+import { EventKind, coinToCoins } from '../../../shared/chain/types/cosmos';
 import emitNotifications from '../../util/emitNotifications';
-import { SupportedNetwork } from '../../../shared/chain/types/types';
-import { coinToCoins, EventKind } from '../../../shared/chain/types/cosmos';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { fromTimestamp } from 'common-common/src/cosmos-ts/src/codegen/helpers';
-import { DB } from '../../models';
-import Rollbar from 'rollbar';
 import { AllCosmosProposals } from './proposalFetching/types';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 export async function fetchCosmosNotifChains(models: DB) {
   const chainIds = await models.Subscription.findAll({
     attributes: [
       [
-        models.sequelize.fn('DISTINCT', models.sequelize.col('chain_id')),
-        'chain_id',
+        models.sequelize.fn('DISTINCT', models.sequelize.col('community_id')),
+        'community_id',
       ],
     ],
     where: {
@@ -25,7 +27,7 @@ export async function fetchCosmosNotifChains(models: DB) {
 
   const result = await models.Community.findAll({
     where: {
-      id: chainIds.map((c) => c.chain_id),
+      id: chainIds.map((c) => c.community_id),
       base: ChainBase.CosmosSDK,
     },
     include: [
@@ -41,24 +43,24 @@ export async function fetchCosmosNotifChains(models: DB) {
 
 export async function fetchLatestNotifProposalIds(
   models: DB,
-  chainIds: string[]
+  communityIds: string[],
 ): Promise<Record<string, number>> {
-  if (chainIds.length === 0) return {};
+  if (communityIds.length === 0) return {};
 
   const result = (await models.sequelize.query(
     `
     SELECT
-    chain_id, MAX(notification_data::jsonb -> 'event_data' ->> 'id') as proposal_id
+    community_id, MAX(notification_data::jsonb -> 'event_data' ->> 'id') as proposal_id
     FROM "Notifications"
-    WHERE category_id = 'chain-event' AND chain_id IN (?)
-    GROUP BY chain_id;
+    WHERE category_id = 'chain-event' AND community_id IN (?)
+    GROUP BY community_id;
   `,
-    { raw: true, type: 'SELECT', replacements: [chainIds] }
-  )) as { chain_id: string; proposal_id: string }[];
+    { raw: true, type: 'SELECT', replacements: [communityIds] },
+  )) as { community_id: string; proposal_id: string }[];
 
   return result.reduce(
-    (acc, item) => ({ ...acc, [item.chain_id]: +item.proposal_id }),
-    {}
+    (acc, item) => ({ ...acc, [item.community_id]: +item.proposal_id }),
+    {},
   );
 }
 
@@ -103,7 +105,6 @@ function formatProposalDates(date: string | Date): number {
 export async function emitProposalNotifications(
   models: DB,
   proposals: AllCosmosProposals,
-  rollbar?: Rollbar
 ) {
   for (const chainId in proposals.v1) {
     const chainProposals = proposals.v1[chainId];
@@ -132,10 +133,7 @@ export async function emitProposalNotifications(
           },
         });
       } catch (e) {
-        console.error('Error emitting v1 proposal notification', e);
         log.error('Error emitting v1 proposal notification', e);
-        log.error(e);
-        rollbar?.error(e);
       }
     }
   }
@@ -167,10 +165,7 @@ export async function emitProposalNotifications(
           },
         });
       } catch (e) {
-        console.error('Error emitting v1beta1 proposal notification', e);
         log.error('Error emitting v1beta1 proposal notification', e);
-        log.error(e);
-        rollbar?.error(e);
       }
     }
   }

@@ -55,6 +55,10 @@
       }
     }
 
+    .text-input-icon > svg {
+      fill: $neutral-400;
+    }
+
     .text-input-left-icon > svg {
       @include iconPositionStyles;
       left: 8px;
@@ -62,7 +66,7 @@
 
     .text-input-left-onClick-icon > svg {
       @include iconPositionStyles;
-      left: 8x;
+      left: 8px;
     }
 
     .text-input-right-icon > svg {
@@ -73,6 +77,21 @@
     .text-input-right-onClick-icon > svg {
       @include iconPositionStyles;
       right: 8px;
+    }
+
+    .right-text-addon {
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      padding-inline: 12px;
+      background-color: $neutral-50;
+      height: calc(100% - 2px);
+      border-top-right-radius: 6px;
+      border-bottom-right-radius: 6px;
+      color: $neutral-400;
+      position: absolute;
+      right: 1px;
+      border-left: 1px solid $neutral-200;
     }
   }
 }

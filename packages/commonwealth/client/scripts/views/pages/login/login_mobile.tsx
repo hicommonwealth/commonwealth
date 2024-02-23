@@ -12,11 +12,11 @@ import {
   CWProfileRow,
   CWProfilesList,
 } from 'views/components/component_kit/cw_profiles_list';
-import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWWalletsList } from 'views/components/component_kit/cw_wallets_list';
 import { isWindowExtraSmall } from 'views/components/component_kit/helpers';
+import CWLoadingSpinner from '../../components/component_kit/new_designs/CWLoadingSpinner';
 import { getLoginText } from './helpers';
 import { LoginBoilerplate } from './login_boilerplate';
 import { LoginEthAlert } from './login_eth_alert';
@@ -50,6 +50,7 @@ export const LoginMobile = ({
   isNewlyCreated,
   isLinkingOnMobile,
   onNavigateToWalletList,
+  sidebarType,
 }: LoginProps) => {
   const hasBoilerplate =
     activeStep === 'walletList' ||
@@ -57,7 +58,7 @@ export const LoginMobile = ({
     activeStep === 'ethWalletList';
 
   const hasCreationButtons = activeStep === 'selectAccountType';
-  const { headerText, bodyText } = getLoginText(activeStep);
+  const { headerText, bodyText } = getLoginText(activeStep, sidebarType);
 
   return (
     <div className="LoginMobile">
@@ -69,7 +70,7 @@ export const LoginMobile = ({
             const wallet = wallets.find(
               (w) =>
                 w instanceof WalletConnectWebWalletController ||
-                w instanceof TerraWalletConnectWebWalletController
+                w instanceof TerraWalletConnectWebWalletController,
             );
 
             await wallet.reset();
@@ -112,7 +113,7 @@ export const LoginMobile = ({
                 onAccountVerified(
                   signerAccount,
                   isNewlyCreated,
-                  isLinkingOnMobile
+                  isLinkingOnMobile,
                 );
               }}
             />
@@ -146,7 +147,10 @@ export const LoginMobile = ({
               onUsernameChangeHandler={handleSetUsername}
               orientation="vertical"
             />
-            <CWButton label="Finish" onClick={onSaveProfileInfo} />
+            <CWButton
+              label="Finish"
+              onClick={async () => await onSaveProfileInfo()}
+            />
           </div>
         )}
 
@@ -175,14 +179,14 @@ export const LoginMobile = ({
                   placeholder="Email address"
                   className="login-email-field"
                   onInput={handleSetEmail}
-                  onenterkey={onEmailLogin}
+                  onenterkey={async () => await onEmailLogin()}
                 />
                 <div className="buttons-row email-form-buttons">
                   <CWButton
                     label="Sign in with Magic"
                     buttonType="secondary-blue"
                     className="wallet-magic-btn"
-                    onClick={onEmailLogin}
+                    onClick={async () => await onEmailLogin()}
                   />
                   <CWButton
                     iconLeft="arrowLeft"
@@ -194,7 +198,7 @@ export const LoginMobile = ({
                 </div>
               </div>
             ) : (
-              <CWSpinner />
+              <CWLoadingSpinner />
             )}
           </div>
         )}

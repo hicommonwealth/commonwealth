@@ -1,4 +1,4 @@
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
 import 'pages/login/login_desktop_sidebar.scss';
 import React from 'react';
 import app from 'state';
@@ -65,6 +65,22 @@ export const LoginDesktopSidebar = ({
         </div>
       )}
 
+      {sidebarType === 'createCommunityLogin' && (
+        <div className="connect-wallet">
+          <div className="sidebar-content">
+            <LoginText
+              headerText={
+                wallets.length > 0
+                  ? 'Sign in to create your community'
+                  : 'Please Install a Wallet to sign in'
+              }
+              bodyText="To launch your community choose a sign-in option
+              that is compatible with the ecosystem you selected."
+            />
+          </div>
+        </div>
+      )}
+
       {sidebarType === 'emailLogin' && (
         <div className="connect-wallet">
           <div className="sidebar-content">
@@ -81,7 +97,9 @@ export const LoginDesktopSidebar = ({
           <CWText type="h4" fontWeight="semiBold" className="header-text">
             New or Returning?
           </CWText>
-          <CWAccountCreationButton onClick={onCreateNewAccount} />
+          <CWAccountCreationButton
+            onClick={async () => await onCreateNewAccount()}
+          />
           <CWAccountCreationButton
             creationType="linkAccount"
             onClick={onLinkExistingAccount}

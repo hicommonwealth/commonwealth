@@ -1,12 +1,13 @@
+import { ChainBase } from '@hicommonwealth/core';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { getClasses } from 'views/components/component_kit/helpers';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import { ChainBase } from '../../../../../../../../../../common-common/src/types';
 import {
-  SPECIFICATIONS,
+  CW_SPECIFICATIONS,
+  ERC_SPECIFICATIONS,
   TOKENS,
   chainTypes,
   conditionTypes,
@@ -24,7 +25,17 @@ const RequirementSubForm = ({
 }: RequirementSubFormType) => {
   const [requirementType, setRequirementType] = useState('');
   const isTokenRequirement = Object.values(TOKENS).includes(requirementType);
-  const isCosmosRequirement = requirementType === TOKENS.COSMOS_TOKEN;
+  const is1155Requirement = requirementType === ERC_SPECIFICATIONS.ERC_1155;
+  const isCosmosRequirement =
+    requirementType === TOKENS.COSMOS_TOKEN ||
+    requirementType === CW_SPECIFICATIONS.CW_721;
+  const helperTextForAmount = {
+    [TOKENS.EVM_TOKEN]: 'Using 18 decimal precision',
+    [TOKENS.COSMOS_TOKEN]: 'Using 6 decimal precision',
+    [ERC_SPECIFICATIONS.ERC_20]: 'Using 18 decimal precision',
+    [ERC_SPECIFICATIONS.ERC_721]: '',
+    [CW_SPECIFICATIONS.CW_721]: '',
+  };
 
   useEffect(() => {
     defaultValues?.requirementType?.value &&
@@ -47,10 +58,12 @@ const RequirementSubForm = ({
           options={requirementTypes
             .filter((x) =>
               app.chain.base === ChainBase.CosmosSDK
-                ? x.value === TOKENS.COSMOS_TOKEN
-                : [TOKENS.EVM_TOKEN, ...Object.values(SPECIFICATIONS)].includes(
-                    x.value,
-                  ),
+                ? x.value === TOKENS.COSMOS_TOKEN ||
+                  x.value === CW_SPECIFICATIONS.CW_721
+                : [
+                    TOKENS.EVM_TOKEN,
+                    ...Object.values(ERC_SPECIFICATIONS),
+                  ].includes(x.value),
             )
             .map((requirement) => ({
               label: requirement.label,
@@ -80,13 +93,16 @@ const RequirementSubForm = ({
           className={getClasses<{
             'cols-3'?: boolean;
             'cols-4'?: boolean;
-          }>(
-            {
-              'cols-3': isTokenRequirement,
-              'cols-4': !isTokenRequirement,
-            },
-            `row-2`,
-          )}
+            'cols-5'?: boolean;
+            'row-1': boolean;
+            'row-2': boolean;
+          }>({
+            'cols-3': isTokenRequirement,
+            'cols-4': !isTokenRequirement && !is1155Requirement,
+            'cols-5': !isTokenRequirement && is1155Requirement,
+            'row-1': !isTokenRequirement && is1155Requirement,
+            'row-2': !(!isTokenRequirement && is1155Requirement),
+          })}
         >
           <CWSelectList
             key={defaultValues?.requirementChain?.value}
@@ -159,8 +175,10 @@ const RequirementSubForm = ({
           <CWTextInput
             key={defaultValues.requirementAmount}
             name="requirementAmount"
+            alignLabelToRight
             label="Amount"
-            placeholder="Amount"
+            instructionalMessage={helperTextForAmount[requirementType]}
+            placeholder="Enter an integer"
             {...(defaultValues.requirementAmount && {
               defaultValue: defaultValues.requirementAmount,
             })}
@@ -172,6 +190,24 @@ const RequirementSubForm = ({
             customError={errors.requirementAmount}
             fullWidth
           />
+          {is1155Requirement && (
+            <CWTextInput
+              key={defaultValues.requirementTokenId}
+              name="requirementTokenId"
+              label="ID"
+              placeholder="ID"
+              {...(defaultValues.requirementTokenId && {
+                defaultValue: defaultValues.requirementTokenId,
+              })}
+              onInput={(e) => {
+                onChange({
+                  requirementTokenId: (e.target as any).value,
+                });
+              }}
+              customError={errors.requirementTokenId}
+              fullWidth
+            />
+          )}
         </div>
       )}
     </div>

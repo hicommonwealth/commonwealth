@@ -12,21 +12,17 @@ import { DeltaStatic } from 'quill';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router';
 import app from 'state';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { MixpanelSnapshotEvents } from '../../../../../shared/analytics/types';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import CWLoadingSpinner from '../../components/component_kit/new_designs/CWLoadingSpinner';
 import {
   ReactQuillEditor,
   createDeltaFromText,
 } from '../../components/react_quill_editor';
 import { createNewProposal } from './helpers';
 import type { ThreadForm } from './types';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
-
-type NewSnapshotProposalPageProps = {
-  snapshotId: string;
-};
 
 type NewSnapshotProposalFormProps = {
   snapshotId: string;
@@ -49,7 +45,7 @@ export const NewSnapshotProposalForm = ({
   const [form, setForm] = useState<ThreadForm | null>(null);
   const [members, setMembers] = useState<string[]>([]);
   const [contentDelta, setContentDelta] = useState<DeltaStatic>(
-    createDeltaFromText('')
+    createDeltaFromText(''),
   );
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [, setSnapshotScoresFetched] = useState<boolean>(false);
@@ -68,7 +64,7 @@ export const NewSnapshotProposalForm = ({
 
   const clearLocalStorage = () => {
     localStorage.removeItem(
-      `${app.activeChainId()}-new-snapshot-proposal-name`
+      `${app.activeChainId()}-new-snapshot-proposal-name`,
     );
   };
 
@@ -90,7 +86,9 @@ export const NewSnapshotProposalForm = ({
         onSave({ id: response.id, snapshot_title: response.title }); // Pass relevant information
       }
     } catch (err) {
-      notifyError(capitalize(err.message));
+      err.code === 'ACTION_REJECTED'
+        ? notifyError('User rejected signing')
+        : notifyError(capitalize(err.error_description));
     } finally {
       setIsSaving(false);
     }
@@ -154,7 +152,7 @@ export const NewSnapshotProposalForm = ({
 
           const delta = createDeltaFromText(
             thread.plaintext + linkMarkdown,
-            true
+            true,
           );
           setContentDelta(delta);
         } else {
@@ -168,7 +166,7 @@ export const NewSnapshotProposalForm = ({
       const snapshotSpace = app.snapshot.space;
       const scoreResponse = await getScore(
         snapshotSpace,
-        app.user.activeAccount.address
+        app.user.activeAccount.address,
       );
       setUserScore(scoreResponse);
       setSpace(snapshotSpace);
@@ -191,7 +189,7 @@ export const NewSnapshotProposalForm = ({
     author &&
     author.address &&
     !!members.find(
-      (member) => member.toLowerCase() === author.address.toLowerCase()
+      (member) => member.toLowerCase() === author.address.toLowerCase(),
     );
 
   const minScoreFromSpace =
@@ -215,7 +213,7 @@ export const NewSnapshotProposalForm = ({
     <div className="NewSnapshotProposalForm">
       {loading ? (
         <div className="proposal-loading">
-          <CWSpinner />
+          <CWLoadingSpinner />
         </div>
       ) : (
         <>
@@ -246,7 +244,7 @@ export const NewSnapshotProposalForm = ({
               });
               localStorage.setItem(
                 `${app.activeChainId()}-new-snapshot-proposal-name`,
-                form.name
+                form.name,
               );
             }}
             defaultValue={form.name}
@@ -263,7 +261,7 @@ export const NewSnapshotProposalForm = ({
                   setForm({
                     ...form,
                     choices: form.choices.map((choice, i) =>
-                      i === idx ? e.target.value : choice
+                      i === idx ? e.target.value : choice,
                     ),
                   });
                 }}
@@ -291,7 +289,7 @@ export const NewSnapshotProposalForm = ({
                 setForm({
                   ...form,
                   choices: form.choices.concat(
-                    `Option ${form.choices.length + 1}`
+                    `Option ${form.choices.length + 1}`,
                   ),
                 });
               }}
@@ -300,7 +298,7 @@ export const NewSnapshotProposalForm = ({
           <ReactQuillEditor
             contentDelta={contentDelta}
             setContentDelta={setContentDelta}
-            placeholder={'What is your proposal?'}
+            placeholder="What is your proposal?"
           />
           <div className="footer">
             {onModalClose && (
@@ -323,18 +321,4 @@ export const NewSnapshotProposalForm = ({
     </div>
   );
 };
-
-const NewSnapshotProposalPage = ({
-  snapshotId,
-}: NewSnapshotProposalPageProps) => {
-  return (
-    <div className="NewSnapshotProposalPage">
-      <CWText type="h3" fontWeight="medium">
-        New Snapshot Proposal
-      </CWText>
-      <NewSnapshotProposalForm snapshotId={snapshotId} />
-    </div>
-  );
-};
-
-export default NewSnapshotProposalPage;
+export default NewSnapshotProposalForm;

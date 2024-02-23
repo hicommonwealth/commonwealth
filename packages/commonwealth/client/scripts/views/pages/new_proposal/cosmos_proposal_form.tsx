@@ -1,31 +1,31 @@
-import React, { useState } from 'react';
-import type { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
-
+import { useBrowserAnalyticsTrack } from 'client/scripts/hooks/useBrowserAnalyticsTrack';
 import { notifyError } from 'controllers/app/notifications';
 import type CosmosAccount from 'controllers/chain/cosmos/account';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
-import { CosmosToken } from 'controllers/chain/cosmos/types';
 import {
   encodeCommunitySpend,
   encodeTextProposal,
 } from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
+import { CosmosToken } from 'controllers/chain/cosmos/types';
+import type { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
+import { useCommonNavigate } from 'navigation/helpers';
+import React, { useState } from 'react';
+import app from 'state';
 import {
   useDepositParamsQuery,
   useStakingParamsQuery,
 } from 'state/api/chainParams';
-
-import app from 'state';
+import { MixpanelGovernanceEvents } from '../../../../../shared/analytics/types';
+import {
+  minimalToNaturalDenom,
+  naturalDenomToMinimal,
+} from '../../../../../shared/utils';
+import { Skeleton } from '../../components/Skeleton';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import { CWTextArea } from '../../components/component_kit/cw_text_area';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { useCommonNavigate } from 'navigation/helpers';
-import { Skeleton } from '../../components/Skeleton';
-import {
-  minimalToNaturalDenom,
-  naturalDenomToMinimal,
-} from '../../../../../shared/utils';
 
 export const CosmosProposalForm = () => {
   const [cosmosProposalType, setCosmosProposalType] = useState<
@@ -39,6 +39,8 @@ export const CosmosProposalForm = () => {
 
   const navigate = useCommonNavigate();
 
+  const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
+
   const author = app.user.activeAccount as CosmosAccount;
   const cosmos = app.chain as Cosmos;
   const meta = cosmos.meta;
@@ -48,8 +50,59 @@ export const CosmosProposalForm = () => {
     useDepositParamsQuery(stakingDenom);
 
   const minDeposit = parseFloat(
-    minimalToNaturalDenom(+depositParams?.minDeposit, meta?.decimals)
+    minimalToNaturalDenom(+depositParams?.minDeposit, meta?.decimals),
   );
+
+  const handleSendTransaction = async (e) => {
+    e.preventDefault();
+
+    let prop: ProtobufAny;
+
+    const depositInMinimalDenom = naturalDenomToMinimal(
+      deposit,
+      meta?.decimals,
+    );
+
+    const _deposit = deposit
+      ? new CosmosToken(
+          depositParams?.minDeposit?.denom,
+          depositInMinimalDenom,
+          false,
+        )
+      : depositParams?.minDeposit;
+
+    if (cosmosProposalType === 'textProposal') {
+      prop = encodeTextProposal(title, description);
+    } else if (cosmosProposalType === 'communitySpend') {
+      const spendAmountInMinimalDenom = naturalDenomToMinimal(
+        payoutAmount,
+        meta?.decimals,
+      );
+      prop = encodeCommunitySpend(
+        title,
+        description,
+        recipient,
+        spendAmountInMinimalDenom,
+        depositParams?.minDeposit?.denom,
+      );
+    } else {
+      throw new Error('Unknown Cosmos proposal type.');
+    }
+
+    try {
+      const result = await cosmos.governance.submitProposalTx(
+        author,
+        _deposit,
+        prop,
+      );
+      trackAnalytics({
+        event: MixpanelGovernanceEvents.COSMOS_PROPOSAL_CREATED,
+      });
+      navigate(`/proposal/${result}`);
+    } catch (err) {
+      notifyError(err.message);
+    }
+  };
 
   return (
     <>
@@ -114,44 +167,7 @@ export const CosmosProposalForm = () => {
           }}
         />
       )}
-      <CWButton
-        label="Send transaction"
-        onClick={(e) => {
-          e.preventDefault();
-
-          let prop: ProtobufAny;
-
-          const _deposit = deposit
-            ? new CosmosToken(depositParams?.minDeposit?.denom, deposit, false)
-            : depositParams?.minDeposit;
-
-          if (cosmosProposalType === 'textProposal') {
-            prop = encodeTextProposal(title, description);
-          } else if (cosmosProposalType === 'communitySpend') {
-            const spendAmountInMinimalDenom = naturalDenomToMinimal(
-              payoutAmount,
-              meta?.decimals
-            );
-            prop = encodeCommunitySpend(
-              title,
-              description,
-              recipient,
-              spendAmountInMinimalDenom,
-              depositParams?.minDeposit?.denom
-            );
-          } else {
-            throw new Error('Unknown Cosmos proposal type.');
-          }
-
-          // TODO: add disabled / loading
-          cosmos.governance
-            .submitProposalTx(author, _deposit, prop)
-            .then((result) => {
-              navigate(`/proposal/${result}`);
-            })
-            .catch((err) => notifyError(err.message));
-        }}
-      />
+      <CWButton label="Send transaction" onClick={handleSendTransaction} />
     </>
   );
 };

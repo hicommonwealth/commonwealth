@@ -1,9 +1,8 @@
+import { IAaveGovernanceV2__factory } from '@hicommonwealth/chains';
+import { ContractType } from '@hicommonwealth/core';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
-import { IAaveGovernanceV2__factory } from 'common-common/src/eth/types';
-import { ContractType } from 'common-common/src/types';
 import type ChainInfo from '../../../../models/ChainInfo';
 import EthereumChain from '../chain';
-import { attachSigner } from '../contractApi';
 import AaveApi from './api';
 
 // Thin wrapper over EthereumChain to guarantee the `init()` implementation
@@ -15,7 +14,7 @@ export default class AaveChain extends EthereumChain {
     return new EthereumCoin(
       this.app?.chain?.meta.default_symbol || '???',
       n,
-      inDollars
+      inDollars,
     );
   }
 
@@ -31,7 +30,7 @@ export default class AaveChain extends EthereumChain {
     this.aaveApi = new AaveApi(
       IAaveGovernanceV2__factory.connect,
       aaveContract.address,
-      this.api.currentProvider as any
+      this.api.currentProvider as any,
     );
     await this.aaveApi.init();
   }

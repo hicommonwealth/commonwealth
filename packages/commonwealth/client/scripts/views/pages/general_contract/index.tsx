@@ -1,5 +1,7 @@
+/* eslint-disable react/jsx-key */
+/* eslint-disable react-hooks/exhaustive-deps */
+import { ChainBase } from '@hicommonwealth/core';
 import { parseFunctionsFromABI } from 'abi_utils';
-import { ChainBase } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { callContractFunction } from 'controllers/chain/ethereum/callContractFunction';
 import { ethers } from 'ethers';
@@ -12,11 +14,11 @@ import 'pages/general_contract/index.scss';
 import React, { useEffect, useRef, useState } from 'react';
 import app from 'state';
 import { CWButton } from 'views/components/component_kit/cw_button';
-import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import type { AbiInput, AbiItem, AbiOutput } from 'web3-utils/types';
 import type Contract from '../../../models/Contract';
+import CWLoadingSpinner from '../../components/component_kit/new_designs/CWLoadingSpinner';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 
@@ -30,7 +32,7 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
   const [saving, setSaving] = useState(false);
   const [contract, setContract] = useState<Contract>();
   const functionNameToFunctionOutput = useRef<Map<string, Result>>(
-    new Map<string, Result>()
+    new Map<string, Result>(),
   );
   const [abiItems, setAbiItems] = useState<AbiItem[]>([]);
   const functionNameToFunctionInputArgs = useRef<
@@ -46,7 +48,7 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
         // from etherscan, which it does not do rn
       } catch (err) {
         notifyError(
-          err.message || `Fetching ABI for ${_contract.address} failed: ${err}`
+          err.message || `Fetching ABI for ${_contract.address} failed: ${err}`,
         );
       }
     }
@@ -83,7 +85,7 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
 
       functionNameToFunctionOutput.current.set(
         fn.name,
-        ethersInterface.decodeFunctionResult(fn.name, result)
+        ethersInterface.decodeFunctionResult(fn.name, result),
       );
       setSaving(false);
       setLoaded(true);
@@ -155,7 +157,7 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
                               inputIdx,
                               e.target.value,
                               fn.name,
-                              functionNameToFunctionInputArgs.current
+                              functionNameToFunctionInputArgs.current,
                             );
 
                             setLoaded(true);
@@ -181,7 +183,7 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
                         <CWText>{output.name}</CWText>
                       </div>
                       <div>
-                        {loading && <CWSpinner />}
+                        {loading && <CWLoadingSpinner />}
                         <CWText>
                           {fnOutputArray && fnOutputArray[i].toString()
                             ? fnOutputArray[i].toString()
@@ -204,7 +206,7 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
                       callFunction(contractAddress, fn);
                     } catch (err) {
                       notifyError(
-                        err.message || 'Submitting Function Call failed'
+                        err.message || 'Submitting Function Call failed',
                       );
                     } finally {
                       setSaving(false);

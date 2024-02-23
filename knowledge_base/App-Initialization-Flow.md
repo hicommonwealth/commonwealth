@@ -14,7 +14,7 @@ The goal of this document is to describe the current state of the app initializa
     2. When the `/status` fetch is finished, app `isLoading` state is set to false.
 5. The `/status` endpoint is divided into two main data-fetches, `getChainStatus()` and `getUserStatus()`. `getChainStatus()` is always called; `getUserStatus()` is only called if a `user` object has been passed with the request.
     1. `getChainStatus()`: Grabs ChainStore, ChainNodes, NotificationCategories, and CommunitySnapshotSpaces, and threadCountQueryData entries.
-    2. `getUserStatus`: Grabs user associations (e.g. selected chain instance, social accounts, addresses). Once addresses have been grabbed, various rows associated with those addresses (e.g. discussion drafts, roles) are requested in turn.
+    2. `getUserStatus`: Grabs user associations (e.g. selected chain instance, addresses). Once addresses have been grabbed, various rows associated with those addresses (e.g. discussion drafts, roles) are requested in turn.
 6. Once the `/status` data is received on callback, `initAppState()` clears and repopulates app state.
     1. Relevant controllers (e.g. user, config) are cleared.
     2. Nodes, recent activity, snapshot chains, roles, chain categories, notification categories, and notification category types are all repopulated.
@@ -64,7 +64,7 @@ The goal of this document is to describe the current state of the app initializa
         3. If the chain's data is not loaded, `app.chain.initData()` is fired.
             - This call triggers chain-specific setup of governance data in particular. It will (generally, as part of chain-specific setup) also call `activeAddressHasToken` which hits `/tokenBalance` for the logged-in user. It also emits `ready` from the `chainModuleReady` event emitter.
         4. Emit `ready` from the `chainAdapterReady` event emitter, and print `CHAIN started.` from the console.
-    8. If the user is logged in, his addresses for the initialized community are set as his current active addresses, and the `/selectChain` endpoint is hit, to update his last visited community.
+    8. If the user is logged in, his addresses for the initialized community are set as his current active addresses, and the `/selectCommunity` endpoint is hit, to update his last visited community.
 10. Nested within the `Layout` component, the `Sublayout` component renders the header, sidebar, banners, and similar sub-components, as well as wrapping any child content pages.
 
 ## Change Log

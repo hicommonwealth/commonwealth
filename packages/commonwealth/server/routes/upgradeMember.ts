@@ -1,9 +1,10 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
+import { isRole } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { Op } from 'sequelize';
-import type { DB } from '../models';
-import { isRole } from '../models/role';
+import { validateOwner } from 'server/util/validateOwner';
 
 export const Errors = {
   InvalidAddress: 'Invalid address',
@@ -25,38 +26,32 @@ const upgradeMember = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
+  const { user } = req;
   const errors = validationResult(req).array();
   if (errors.length !== 0) {
     return next(new AppError(errors[0].msg));
   }
 
-  if (!req.user) return next(new AppError(Errors.NotLoggedIn));
-
-  const chain = req.chain;
+  const { community } = req;
   const { address, new_role } = req.body;
 
-  // find if the requester has an admin address in the target community
-  const adminAddress = await models.Address.findOne({
-    where: {
-      community_id: chain.id,
-      user_id: req.user.id,
-      verified: {
-        [Op.ne]: null,
-      },
-      role: 'admin',
-    },
+  const isAdmin = await validateOwner({
+    models,
+    user,
+    communityId: community.id,
+    allowAdmin: true,
+    allowSuperAdmin: true,
   });
-
-  if (!adminAddress && !req.user.isAdmin) {
+  if (!isAdmin) {
     return next(new AppError(Errors.MustBeAdmin));
   }
 
   // check if address provided exists
   const targetAddress = await models.Address.findOne({
     where: {
-      community_id: chain.id,
+      community_id: community.id,
       address: address,
     },
   });
@@ -74,7 +69,7 @@ const upgradeMember = async (
   ) {
     const otherExistingAdmin = await models.Address.findOne({
       where: {
-        community_id: chain.id,
+        community_id: community.id,
         role: 'admin',
         id: {
           [Op.ne]: targetAddress.id,

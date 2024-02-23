@@ -65,7 +65,7 @@ export const EditCollaboratorsModal = ({
           app.activeChainId(),
           30,
           1,
-          true
+          true,
         );
 
         const results: Array<RoleInstanceWithPermissionAttributes> =
@@ -75,7 +75,8 @@ export const EditCollaboratorsModal = ({
               Address: profile.addresses[0],
             }))
             .filter(
-              (role) => role.Address.address !== app.user.activeAccount?.address
+              (role) =>
+                role.Address.address !== app.user.activeAccount?.address,
             );
 
         setSearchResults(results);
@@ -129,7 +130,7 @@ export const EditCollaboratorsModal = ({
                 >
                   <User
                     userAddress={c.Address.address}
-                    userChainId={c.chain_id}
+                    userCommunityId={c.chain_id}
                   />
                 </div>
               ))
@@ -148,7 +149,10 @@ export const EditCollaboratorsModal = ({
             <div className="collaborator-rows-container">
               {collaborators.map((c, i) => (
                 <div key={i} className="collaborator-row">
-                  <User userAddress={c.address} userChainId={c.community_id} />
+                  <User
+                    userAddress={c.address}
+                    userCommunityId={c.community_id}
+                  />
                   <CWIconButton
                     iconName="close"
                     iconSize="small"
@@ -181,10 +185,10 @@ export const EditCollaboratorsModal = ({
           onClick={async () => {
             const newCollaborators = collaborators.filter(
               (c1) =>
-                !thread.collaborators.some((c2) => c1.address === c2.address)
+                !thread.collaborators.some((c2) => c1.address === c2.address),
             );
             const removedCollaborators = (thread.collaborators as any).filter(
-              (c1) => !collaborators.some((c2) => c1.address === c2.address)
+              (c1) => !collaborators.some((c2) => c1.address === c2.address),
             );
 
             if (
@@ -210,7 +214,8 @@ export const EditCollaboratorsModal = ({
                   onCollaboratorsUpdated(updatedThread.collaborators);
               } catch (err) {
                 const error =
-                  err?.responseJSON?.error || 'Failed to update collaborators';
+                  err?.response?.data?.error ||
+                  'Failed to update collaborators';
                 notifyError(error);
               }
             }

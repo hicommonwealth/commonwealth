@@ -6,14 +6,14 @@ import { ApiEndpoints } from 'state/api/config';
 import useFetchCommentsQuery from './fetchComments';
 
 interface ToggleCommentSpamStatusProps {
-  chainId: string;
+  communityId: string;
   commentId: number;
   isSpam: boolean;
   address: string;
 }
 
 const toggleCommentSpamStatus = async ({
-  chainId,
+  communityId,
   commentId,
   isSpam,
   address,
@@ -21,28 +21,28 @@ const toggleCommentSpamStatus = async ({
   const method = isSpam ? 'put' : 'delete';
   const body = {
     jwt: app.user.jwt,
-    chain_id: chainId,
+    chain_id: communityId,
     address: address,
-    author_chain: chainId,
+    author_chain: communityId,
   };
   return await axios[method](
     `${app.serverUrl()}/comments/${commentId}/spam`,
-    isSpam ? body : ({ data: { ...body } } as any)
+    isSpam ? body : ({ data: { ...body } } as any),
   );
 };
 
 interface UseToggleCommentSpamStatusMutationProps {
-  chainId: string;
+  communityId: string;
   threadId: number;
 }
 
 const useToggleCommentSpamStatusMutation = ({
-  chainId,
+  communityId,
   threadId,
 }: UseToggleCommentSpamStatusMutationProps) => {
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
-    chainId,
+    communityId,
     threadId,
   });
 
@@ -51,7 +51,7 @@ const useToggleCommentSpamStatusMutation = ({
     onSuccess: async (response) => {
       // find the existing comment index and merge with existing comment
       const foundCommentIndex = comments.findIndex(
-        (x) => x.id === response.data.result.id
+        (x) => x.id === response.data.result.id,
       );
       const updatedComment = new Comment({
         ...comments[foundCommentIndex],
@@ -60,7 +60,7 @@ const useToggleCommentSpamStatusMutation = ({
 
       // update fetch comments query state with updated comment
       if (foundCommentIndex > -1) {
-        const key = [ApiEndpoints.FETCH_COMMENTS, chainId, threadId];
+        const key = [ApiEndpoints.FETCH_COMMENTS, communityId, threadId];
         queryClient.cancelQueries({ queryKey: key });
         queryClient.setQueryData([...key], () => {
           const updatedComments = [...(comments || [])];

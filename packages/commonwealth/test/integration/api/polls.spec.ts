@@ -1,11 +1,10 @@
+import { models, tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import 'chai/register-should';
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from '../../../server/config';
-import app, { resetDatabase } from '../../../server-test';
 import * as modelUtils from 'test/util/modelUtils';
-import { ActionArgument } from '@canvas-js/interfaces';
+import app from '../../../server-test';
+import { JWT_SECRET } from '../../../server/config';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -13,25 +12,29 @@ const { expect } = chai;
 describe('Polls', () => {
   const chain = 'ethereum';
 
-  let userJWT;
-  let userId;
-  let userAddress;
-  let userAddressId;
+  let userJWT: string;
+  let userAddress: string;
 
+  let topicId;
   let threadId = 0;
-  let threadChain = '';
   let pollId = 0;
 
   before(async () => {
-    await resetDatabase();
+    await tester.seedDb();
+
+    const topic = await models.Topic.findOne({
+      where: {
+        community_id: chain,
+        group_ids: [],
+      },
+    });
+    topicId = topic.id;
 
     const userRes = await modelUtils.createAndVerifyAddress({ chain });
     userAddress = userRes.address;
-    userId = userRes.user_id;
-    userAddressId = userRes.address_id;
     userJWT = jwt.sign(
       { id: userRes.user_id, email: userRes.email },
-      JWT_SECRET
+      JWT_SECRET,
     );
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;
@@ -46,8 +49,7 @@ describe('Polls', () => {
       body: 'body1',
       kind: 'discussion',
       stage: 'discussion',
-      topicName: 't1',
-      topicId: undefined,
+      topicId,
       session: {
         type: 'session',
         signature: '',
@@ -61,15 +63,7 @@ describe('Polls', () => {
           block: '',
         },
       },
-      sign: function (actionPayload: {
-        app: string;
-        chain: string;
-        from: string;
-        call: string;
-        callArgs: Record<string, ActionArgument>;
-        timestamp: number;
-        block: string;
-      }): string {
+      sign: function (): string {
         return '';
       },
     });
@@ -84,21 +78,20 @@ describe('Polls', () => {
       .post(`/api/threads/${thread.id}/polls`)
       .set('Accept', 'application/json')
       .send({
-        author_chain: thread.chain,
-        chain: thread.chain,
+        author_chain: thread.community_id,
+        chain: thread.community_id,
         address: userAddress,
         jwt: userJWT,
         ...data,
       });
 
-    expect(res.status).to.equal(200);
+    expect(res.status, JSON.stringify(res)).to.equal(200);
     expect(res.body.result).to.contain({
       prompt: data.prompt,
       options: JSON.stringify(data.options),
     });
 
     threadId = thread.id;
-    threadChain = thread.chain;
     pollId = res.body.result.id;
   });
 
@@ -160,7 +153,7 @@ describe('Polls', () => {
     expect(res.body.result[0].votes[0]).to.have.property('option', 'optionA');
     expect(res.body.result[0].votes[0]).to.have.property(
       'address',
-      userAddress
+      userAddress,
     );
   });
 
@@ -200,7 +193,7 @@ describe('Polls', () => {
     expect(res.body.result[0].votes[0]).to.have.property('option', 'optionB');
     expect(res.body.result[0].votes[0]).to.have.property(
       'address',
-      userAddress
+      userAddress,
     );
   });
 

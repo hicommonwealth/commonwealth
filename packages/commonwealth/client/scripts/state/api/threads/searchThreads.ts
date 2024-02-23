@@ -5,21 +5,13 @@ import {
   APIOrderDirection,
 } from 'client/scripts/helpers/constants';
 import app from 'state';
+import { ThreadResult } from 'views/pages/search/helpers';
 import { ApiEndpoints } from '../config';
 
 const SEARCH_THREADS_STALE_TIME = 10 * 1_000; // 10 s
 
 export type SearchThreadsResponse = {
-  results: {
-    id: number;
-    chain: string;
-    title: string;
-    body: string;
-    address_id: number;
-    address: string;
-    address_chain: string;
-    created_at: string;
-  }[];
+  results: ThreadResult[];
   limit: number;
   page: number;
   totalPages: number;
@@ -27,7 +19,7 @@ export type SearchThreadsResponse = {
 };
 
 interface SearchThreadsProps {
-  chainId: string;
+  communityId: string;
   searchTerm: string;
   limit: number;
   orderBy: APIOrderBy;
@@ -39,13 +31,15 @@ interface SearchThreadsProps {
 
 const searchThreads = async ({
   pageParam = 1,
-  chainId,
+  communityId,
   searchTerm,
   limit,
   orderBy,
   orderDirection,
   threadTitleOnly,
-}: SearchThreadsProps & { pageParam: number }) => {
+}: SearchThreadsProps & {
+  pageParam: number;
+}): Promise<SearchThreadsResponse> => {
   const {
     data: { result },
   } = await axios.get<{ result: SearchThreadsResponse }>(
@@ -55,7 +49,7 @@ const searchThreads = async ({
         'Content-Type': 'application/json',
       },
       params: {
-        community_id: chainId,
+        community_id: communityId,
         search: searchTerm,
         limit: limit.toString(),
         page: pageParam.toString(),
@@ -69,7 +63,7 @@ const searchThreads = async ({
 };
 
 const useSearchThreadsQuery = ({
-  chainId,
+  communityId,
   searchTerm,
   limit,
   orderBy,
@@ -80,7 +74,7 @@ const useSearchThreadsQuery = ({
   const key = [
     ApiEndpoints.searchThreads(searchTerm),
     {
-      chainId,
+      communityId,
       orderBy,
       orderDirection,
     },
@@ -90,7 +84,7 @@ const useSearchThreadsQuery = ({
     ({ pageParam }) =>
       searchThreads({
         pageParam,
-        chainId,
+        communityId,
         searchTerm,
         limit,
         orderBy,

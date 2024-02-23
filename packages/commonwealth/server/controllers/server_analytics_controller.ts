@@ -1,4 +1,8 @@
-import { TrackOptions, __track } from './server_analytics_methods/track';
+import { analytics } from '@hicommonwealth/core';
+import { AnalyticsPayload } from 'shared/analytics/types';
+import { SERVER_URL } from '../config';
+
+export type TrackOptions = Record<string, any> & AnalyticsPayload;
 
 export class ServerAnalyticsController {
   /**
@@ -7,14 +11,17 @@ export class ServerAnalyticsController {
    */
   async track(options: TrackOptions, req?: any) {
     let newOptions = { ...options };
+    const host = req?.get?.('host');
     if (req) {
       const browserInfo = getRequestBrowserInfo(req);
       newOptions = {
         ...newOptions,
         ...browserInfo,
+        ...(host && { isCustomDomain: SERVER_URL.includes(host) }),
       };
     }
-    return __track.call(this, newOptions);
+    const { event, ...payload } = newOptions;
+    analytics().track(event, payload);
   }
 }
 

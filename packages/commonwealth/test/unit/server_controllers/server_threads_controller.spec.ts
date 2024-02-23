@@ -1,18 +1,42 @@
-import BN from 'bn.js';
+import { commonProtocol } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { ServerThreadsController } from 'server/controllers/server_threads_controller';
 import Sinon from 'sinon';
 import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
 
 describe('ServerThreadsController', () => {
+  beforeEach(() => {
+    Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves(
+      '0',
+    );
+  });
+  afterEach(() => {
+    Sinon.restore();
+  });
   describe('#createThreadReaction', () => {
     it('should create a thread reaction (new reaction)', async () => {
       const sandbox = Sinon.createSandbox();
       const db = {
+        // for findAllRoles
+        Address: {
+          findAll: async () => [
+            {
+              toJSON: () => ({}),
+            },
+          ],
+        },
+        Group: {
+          findAll: async () => [],
+        },
+        Topic: {
+          findOne: async () => ({
+            group_ids: [],
+          }),
+        },
         Reaction: {
           findOne: sandbox.stub().resolves({
             id: 2,
-            chain: 'ethereum',
+            community_id: 'ethereum',
             Address: {
               address: '0x123',
               community_id: 'ethereum',
@@ -23,7 +47,7 @@ describe('ServerThreadsController', () => {
           findOrCreate: sandbox.stub().resolves([
             {
               id: 2,
-              chain: 'ethereum',
+              community_id: 'ethereum',
               Address: {
                 address: '0x123',
                 community_id: 'ethereum',
@@ -38,15 +62,35 @@ describe('ServerThreadsController', () => {
           findOne: sandbox.stub().resolves({
             id: 4,
             title: 'Big Thread!',
-            chain: 'ethereum',
+            community_id: 'ethereum',
           }),
         },
+        CommunityStake: {
+          findOne: sandbox.stub().resolves({
+            id: 5,
+            stake_id: 1,
+            vote_weight: 1,
+          }),
+        },
+        Community: {
+          findByPk: async () => ({
+            id: 'ethereum',
+            namespace: 'cake',
+          }),
+        },
+        sequelize: {
+          transaction: async (callback) => {
+            return callback();
+          },
+        },
       };
-      const tokenBalanceCache = {};
       const user = {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
       };
-      const address = {};
+      const address = {
+        address: '0x123',
+        community_id: 'ethereum',
+      };
       const chain = {
         id: 'ethereum',
       };
@@ -56,7 +100,6 @@ describe('ServerThreadsController', () => {
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -64,7 +107,6 @@ describe('ServerThreadsController', () => {
         await serverThreadsController.createThreadReaction({
           user: user as any,
           address: address as any,
-          community: chain as any,
           reaction: reaction as any,
           threadId: threadId,
         });
@@ -76,7 +118,6 @@ describe('ServerThreadsController', () => {
             ...(address as any),
             address: '0xbanned',
           },
-          community: chain as any,
           reaction: reaction as any,
           threadId: threadId,
         }),
@@ -105,7 +146,6 @@ describe('ServerThreadsController', () => {
       expect(analyticsOptions).to.include({
         event: 'Create New Reaction',
         community: 'ethereum',
-        isCustomDomain: null,
       });
     });
 
@@ -141,7 +181,6 @@ describe('ServerThreadsController', () => {
           findOne: sandbox.stub().resolves(null),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: sandbox.stub().resolves([true, null]),
       };
@@ -150,14 +189,10 @@ describe('ServerThreadsController', () => {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
       };
       const address = {};
-      const chain = {
-        id: 'ethereum',
-      };
       const reaction = {};
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -165,7 +200,6 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadReaction({
           user: user as any,
           address: address as any,
-          community: chain as any,
           reaction: reaction as any,
           threadId: 123,
         }),
@@ -204,12 +238,11 @@ describe('ServerThreadsController', () => {
           findOne: sandbox.stub().resolves({
             id: 4,
             title: 'Big Thread!',
-            chain: 'ethereum',
+            community_id: 'ethereum',
             archived_at: Date.now(),
           }),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: sandbox.stub().resolves([true, null]),
       };
@@ -218,15 +251,11 @@ describe('ServerThreadsController', () => {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
       };
       const address = {};
-      const chain = {
-        id: 'ethereum',
-      };
       const reaction = {};
       const threadId = 123;
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -234,7 +263,6 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadReaction({
           user: user as any,
           address: address as any,
-          community: chain as any,
           reaction: reaction as any,
           threadId,
         }),
@@ -273,11 +301,10 @@ describe('ServerThreadsController', () => {
           findOne: sandbox.stub().resolves({
             id: 4,
             title: 'Big Thread!',
-            chain: 'ethereum',
+            community_id: 'ethereum',
           }),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: sandbox.stub().resolves([false, 'big ban err']),
       };
@@ -286,15 +313,11 @@ describe('ServerThreadsController', () => {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
       };
       const address = {};
-      const chain = {
-        id: 'ethereum',
-      };
       const reaction = {};
       const threadId = 123;
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -302,7 +325,6 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadReaction({
           user: user as any,
           address: address as any,
-          community: chain as any,
           reaction: reaction as any,
           threadId,
         }),
@@ -311,6 +333,7 @@ describe('ServerThreadsController', () => {
 
     it('should throw error (token balance)', async () => {
       const sandbox = Sinon.createSandbox();
+      const fakeMembershipReject = 'fake membership rejection message';
       const db = {
         Reaction: {
           findOne: sandbox.stub().resolves({
@@ -341,19 +364,19 @@ describe('ServerThreadsController', () => {
           findOne: sandbox.stub().resolves({
             id: 4,
             title: 'Big Thread!',
-            chain: 'ethereum',
+            community_id: 'ethereum',
             topic_id: 77,
           }),
         },
         // for validateTopicThreshold
         Topic: {
           findOne: sandbox.stub().resolves({
-            chain: {
+            community: {
               ChainNode: {
                 id: 99,
               },
             },
-            token_threshold: 1,
+            group_ids: [1],
           }),
         },
         CommunityContract: {
@@ -363,9 +386,50 @@ describe('ServerThreadsController', () => {
         Address: {
           findAll: sandbox.stub().resolves([]),
         },
-      };
-      const tokenBalanceCache = {
-        fetchUserBalance: sandbox.stub().resolves(new BN(0.5)),
+        Group: {
+          findAll: sandbox.stub().resolves([
+            {
+              id: 1,
+              community_id: 'community-trial',
+              metadata: {
+                name: 'TRIAL Holders',
+                description: 'Autogenerated',
+                required_requirements: 1,
+              },
+              requirements: [
+                {
+                  rule: 'threshold',
+                  data: {
+                    threshold: '1',
+                    source: {
+                      source_type: 'erc721',
+                      evm_chain_id: 1,
+                      contract_address:
+                        '0x301A373beBF0160c0583394855D5b10d00a4168a',
+                    },
+                  },
+                },
+              ],
+              created_at: new Date(),
+              updated_at: new Date(),
+            },
+          ]),
+        },
+        Membership: {
+          findOne: sandbox.stub().resolves({
+            group_id: 1,
+            last_checked: new Date(),
+            reject_reason: fakeMembershipReject,
+          }),
+          findAll: sandbox.stub().resolves([
+            {
+              group_id: 1,
+              last_checked: new Date(),
+              reject_reason: fakeMembershipReject,
+            },
+          ]),
+          bulkCreate: sandbox.stub().resolves([]),
+        },
       };
       const banCache = {
         checkBan: sandbox.stub().resolves([true, null]),
@@ -377,16 +441,11 @@ describe('ServerThreadsController', () => {
       const address = {
         address: '0x123',
       };
-      const chain = {
-        id: 'ethereum',
-        network: 'ethereum',
-      };
       const reaction = {};
       const threadId = 123;
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -394,29 +453,30 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadReaction({
           user: user as any,
           address: address as any,
-          community: chain as any,
           reaction: reaction as any,
           threadId,
         }),
-      ).to.be.rejectedWith('Insufficient token balance');
+      ).to.be.rejectedWith(
+        `Failed to create reaction: ${fakeMembershipReject}`,
+      );
     });
   });
 
   describe('#createThreadComment', () => {
     it('should create a thread comment', async () => {
-      const user = {
-        id: 1,
-        save: async () => ({}),
-        getAddresses: async () => [{}],
-      };
       const address = {
         id: 1,
         address: '0x123',
         save: async () => ({}),
+        toJSON: () => ({
+          id: 1,
+          address: '0x123',
+        }),
       };
-      const chain = {
-        id: 'ethereum',
-        network: 'ethereum',
+      const user = {
+        id: 1,
+        save: async () => ({}),
+        getAddresses: async () => [address],
       };
       const parentId = null;
       const threadId = 1;
@@ -428,6 +488,7 @@ describe('ServerThreadsController', () => {
       const db = {
         Thread: {
           findOne: async () => ({
+            community_id: 'ethereum',
             save: async () => ({}),
           }),
         },
@@ -440,42 +501,40 @@ describe('ServerThreadsController', () => {
           ],
         },
         sequelize: {
-          transaction: async () => ({
-            rollback: async () => ({}),
-            commit: async () => ({}),
-          }),
+          transaction: async (callback: () => any) => callback(),
         },
         Comment: {
-          create: async (data) => ({
-            id: 1,
-            ...data,
-          }),
-          findOne: async () => {
-            const data = {
-              id: 1,
-              thread_id: threadId,
-              text,
-              address_id: address.id,
-              chain: chain.id,
-              Address: address,
-            };
+          create: async (data) => {
             return {
+              id: 1,
               ...data,
-              destroy: async () => ({}),
-              toJSON: () => data,
+              community_id: 'ethereum',
+              toJSON: () => ({
+                id: 1,
+                ...data,
+                community_id: 'ethereum',
+              }),
             };
           },
         },
         Subscription: {
-          create: async () => ({}),
+          bulkCreate: async () => ({}),
+        },
+        Topic: {
+          findOne: async () => ({
+            group_ids: [],
+          }),
+        },
+        Group: {
+          findAll: async () => [],
         },
       };
-      const tokenBalanceCache = {};
-      const banCache = BAN_CACHE_MOCK_FN(chain.id);
+      const banCache = {
+        checkBan: () => [true, null],
+      };
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -483,7 +542,6 @@ describe('ServerThreadsController', () => {
         await serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
-          community: chain as any,
           parentId,
           threadId,
           text,
@@ -492,33 +550,16 @@ describe('ServerThreadsController', () => {
           canvasHash,
         });
 
-      expect(
-        serverThreadsController.createThreadComment({
-          user: user as any,
-          address: {
-            ...(address as any),
-            address: '0xbanned',
-          },
-          community: chain as any,
-          parentId,
-          threadId,
-          text,
-          canvasAction,
-          canvasSession,
-          canvasHash,
-        }),
-      ).to.be.rejectedWith('Ban error: banned');
-
       expect(newComment).to.include({
-        thread_id: threadId,
+        thread_id: String(threadId),
         text,
         address_id: address.id,
-        chain: chain.id,
+        community_id: 'ethereum',
       });
       expect(notificationOptions).to.have.length.greaterThan(0);
       expect(analyticsOptions).to.include({
         event: 'Create New Comment',
-        community: chain.id,
+        community: 'ethereum',
       });
     });
 
@@ -558,14 +599,12 @@ describe('ServerThreadsController', () => {
           create: async () => ({}),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: async () => [false, 'big bad error'],
       };
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -574,10 +613,6 @@ describe('ServerThreadsController', () => {
         id: 1,
         address: '0x123',
         save: async () => ({}),
-      };
-      const chain = {
-        id: 'ethereum',
-        network: 'ethereum',
       };
       const parentId = null;
       const threadId = 1;
@@ -590,7 +625,6 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
-          community: chain as any,
           parentId,
           threadId,
           text,
@@ -635,14 +669,12 @@ describe('ServerThreadsController', () => {
           create: async () => ({}),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: async () => [true, null],
       };
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -651,10 +683,6 @@ describe('ServerThreadsController', () => {
         id: 1,
         address: '0x123',
         save: async () => ({}),
-      };
-      const chain = {
-        id: 'ethereum',
-        network: 'ethereum',
       };
       const parentId = null;
       const threadId = 1;
@@ -667,7 +695,6 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
-          community: chain as any,
           parentId,
           threadId,
           text,
@@ -742,14 +769,12 @@ describe('ServerThreadsController', () => {
           create: async () => ({}),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: async () => [true, null],
       };
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -757,7 +782,6 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
-          community: chain as any,
           parentId,
           threadId,
           text,
@@ -805,14 +829,12 @@ describe('ServerThreadsController', () => {
           create: async () => ({}),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: async () => [true, null],
       };
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -821,10 +843,6 @@ describe('ServerThreadsController', () => {
         id: 1,
         address: '0x123',
         save: async () => ({}),
-      };
-      const chain = {
-        id: 'ethereum',
-        network: 'ethereum',
       };
       const parentId = null;
       const threadId = 1;
@@ -837,7 +855,6 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
-          community: chain as any,
           parentId,
           threadId,
           text,
@@ -890,14 +907,12 @@ describe('ServerThreadsController', () => {
           create: async () => ({}),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: async () => [true, null],
       };
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -906,10 +921,6 @@ describe('ServerThreadsController', () => {
         id: 1,
         address: '0x123',
         save: async () => ({}),
-      };
-      const chain = {
-        id: 'ethereum',
-        network: 'ethereum',
       };
       const threadId = 1;
       const text = 'hello';
@@ -921,7 +932,6 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
-          community: chain as any,
           parentId,
           threadId,
           text,
@@ -952,6 +962,7 @@ describe('ServerThreadsController', () => {
             rollback: async () => ({}),
             commit: async () => ({}),
           }),
+          query: async () => [{ max_depth_reached: true, comment_depth: 8 }],
         },
         Comment: {
           create: async () => ({}),
@@ -970,14 +981,12 @@ describe('ServerThreadsController', () => {
           create: async () => ({}),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: async () => [true, null],
       };
 
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -986,10 +995,6 @@ describe('ServerThreadsController', () => {
         id: 1,
         address: '0x123',
         save: async () => ({}),
-      };
-      const chain = {
-        id: 'ethereum',
-        network: 'ethereum',
       };
       const parentId = 1;
       const threadId = 1;
@@ -1002,7 +1007,6 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
-          community: chain as any,
           parentId,
           threadId,
           text,
@@ -1020,7 +1024,8 @@ describe('ServerThreadsController', () => {
         Thread: {
           findOne: async () => ({
             id: 1,
-            chain: 'ethereum',
+            community_id: 'ethereum',
+            address_id: 1,
             Address: {
               id: 1,
               address: '0x123',
@@ -1042,14 +1047,12 @@ describe('ServerThreadsController', () => {
           findAll: async () => [{}], // used in findOneRole
         },
       };
-      const tokenBalanceCache = {};
       const banCache = BAN_CACHE_MOCK_FN('ethereum');
       const address = {
         address: '0x123',
       };
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
       const user = {
@@ -1091,13 +1094,11 @@ describe('ServerThreadsController', () => {
           destroy: async () => ({}),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: async () => [true, null],
       };
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
       const user = {
@@ -1139,13 +1140,11 @@ describe('ServerThreadsController', () => {
           destroy: async () => ({}),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: async () => [false, 'bad'],
       };
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
       const user = {
@@ -1186,13 +1185,11 @@ describe('ServerThreadsController', () => {
           findAll: async () => [{}], // used in findOneRole
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: async () => [true, null],
       };
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
       const user = {
@@ -1240,8 +1237,14 @@ describe('ServerThreadsController', () => {
           },
           query: async () => ({}),
         },
+        Group: {
+          findAll: async () => [],
+        },
         Topic: {
           findOrCreate: async () => ({}),
+          findOne: async () => ({
+            group_ids: [],
+          }),
         },
         Thread: {
           findOne: async () => ({
@@ -1267,17 +1270,15 @@ describe('ServerThreadsController', () => {
           },
         },
         Subscription: {
-          create: async () => ({}),
+          bulkCreate: async () => ({}),
         },
         Address: {
           findAll: async () => [{}], // used in findOneRole
         },
       };
-      const tokenBalanceCache = {};
       const banCache = BAN_CACHE_MOCK_FN('ethereum');
       const serverThreadsController = new ServerThreadsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
       const user = {
@@ -1296,7 +1297,6 @@ describe('ServerThreadsController', () => {
       const kind = 'discussion';
       const readOnly = false;
       const topicId = 1;
-      const topicName = undefined;
       const title = 'mythread';
       const stage = 'stage';
       const url = 'http://blah';
@@ -1314,7 +1314,6 @@ describe('ServerThreadsController', () => {
           kind,
           readOnly,
           topicId,
-          topicName,
           stage,
           url,
           canvasAction,
@@ -1335,7 +1334,6 @@ describe('ServerThreadsController', () => {
           kind,
           readOnly,
           topicId,
-          topicName,
           stage,
           url,
           canvasAction,

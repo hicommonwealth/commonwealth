@@ -21,6 +21,13 @@
       display: flex;
       flex-direction: column;
     }
+
+    .snapshot-spinner-container {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
 
   .no-proposals-text.Text {

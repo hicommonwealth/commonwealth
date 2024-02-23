@@ -1,6 +1,6 @@
 interface APIResponseFormat {
   id: number;
-  chain_id: string;
+  community_id: string;
   metadata: {
     name: string;
     description?: string;
@@ -9,11 +9,18 @@ interface APIResponseFormat {
   requirements: {
     rule: 'threshold';
     source: {
-      source_type: 'erc20' | 'erc721' | 'cosmos_native' | 'eth_native';
+      source_type:
+        | 'erc20'
+        | 'erc721'
+        | 'erc1155'
+        | 'cosmos_native'
+        | 'eth_native'
+        | 'cw721';
       evm_chain_id?: number;
       cosmos_chain_id?: number;
       contract_address?: string;
       token_symbol?: string;
+      token_id?: string;
     };
   }[];
   topics: any[];
@@ -36,7 +43,7 @@ class Group {
 
   constructor({
     id,
-    chain_id,
+    community_id,
     created_at,
     updated_at,
     metadata,
@@ -45,7 +52,7 @@ class Group {
     memberships,
   }: APIResponseFormat) {
     this.id = id;
-    this.communityId = chain_id;
+    this.communityId = community_id;
     this.createdAt = created_at;
     this.updatedAt = updated_at;
     this.name = metadata.name;

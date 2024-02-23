@@ -1,25 +1,24 @@
+import { AppError, Requirement } from '@hicommonwealth/core';
+import { GroupAttributes, GroupMetadata } from '@hicommonwealth/model';
 import z from 'zod';
-import { AppError } from '../../../../common-common/src/errors';
-import { CreateGroupResult } from '../../controllers/server_groups_methods/create_group';
-import { GroupMetadata } from '../../models/group';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
-import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 
 type CreateGroupBody = {
   metadata: GroupMetadata;
   requirements: Requirement[];
   topics?: number[];
 };
-type CreateGroupResponse = CreateGroupResult;
+type CreateGroupResponse = GroupAttributes;
 
 export const createGroupHandler = async (
   controllers: ServerControllers,
   req: TypedRequestBody<CreateGroupBody>,
   res: TypedResponse<CreateGroupResponse>,
 ) => {
-  const { user, address, chain: community } = req;
+  const { user, address, community } = req;
 
+  // FIXME: this is the command schema
   const schema = z.object({
     body: z.object({
       metadata: z.object({
@@ -39,7 +38,7 @@ export const createGroupHandler = async (
     body: { metadata, requirements, topics },
   } = validationResult.data;
 
-  const result = await controllers.groups.createGroup({
+  const [group, analyticsOptions] = await controllers.groups.createGroup({
     user,
     community,
     address,
@@ -48,10 +47,17 @@ export const createGroupHandler = async (
     topics,
   });
 
+  // FIXME: keep for now, but should be a debounced async integration policy that get's triggered by creation events
   // refresh memberships in background
   controllers.groups
-    .refreshCommunityMemberships({ community })
+    .refreshCommunityMemberships({
+      communityId: community.id,
+      groupId: group.id,
+    })
     .catch(console.error);
 
-  return success(res, result);
+  // FIXME: replace with analytics middleware
+  controllers.analytics.track(analyticsOptions, req).catch(console.error);
+
+  return success(res, group);
 };

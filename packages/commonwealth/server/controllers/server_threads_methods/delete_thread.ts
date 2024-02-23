@@ -1,9 +1,7 @@
-import { Op } from 'sequelize';
-import { AddressInstance } from 'server/models/address';
-import { AppError } from '../../../../common-common/src/errors';
-import { UserInstance } from '../../models/user';
+import { AppError } from '@hicommonwealth/core';
+import { AddressInstance, UserInstance } from '@hicommonwealth/model';
 import deleteThreadFromDb from '../../util/deleteThread';
-import { findOneRole } from '../../util/roles';
+import { validateOwner } from '../../util/validateOwner';
 import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
@@ -52,7 +50,7 @@ export async function __deleteThread(
   if (address) {
     // check ban
     const [canInteract, banError] = await this.banCache.checkBan({
-      communityId: thread.chain,
+      communityId: thread.community_id,
       address: address.address,
     });
     if (!canInteract) {
@@ -61,21 +59,23 @@ export async function __deleteThread(
   }
 
   // check ownership (bypass if admin)
-  const userOwnedAddressIds = (await user.getAddresses())
-    .filter((addr) => !!addr.verified)
-    .map((addr) => addr.id);
-
-  const isAuthor = userOwnedAddressIds.includes(thread.Address.id);
-
-  const isAdminOrMod = await findOneRole(
-    this.models,
-    { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
-    thread.chain,
-    ['admin', 'moderator'],
-  );
-  if (!isAuthor && !isAdminOrMod) {
+  const isOwnerOrAdmin = await validateOwner({
+    models: this.models,
+    user,
+    communityId: thread.community_id,
+    entity: thread,
+    allowMod: true,
+    allowAdmin: true,
+    allowSuperAdmin: true,
+  });
+  if (!isOwnerOrAdmin) {
     throw new AppError(Errors.NotOwned);
   }
 
   await deleteThreadFromDb(this.models, thread.id);
+
+  // use callbacks so route returns and this completes in the background
+  if (this.globalActivityCache) {
+    this.globalActivityCache.deleteActivityFromCache(thread.id);
+  }
 }

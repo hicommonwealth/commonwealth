@@ -1,9 +1,13 @@
+import {
+  CommunityInstance,
+  CommunitySnapshotSpaceWithSpaceAttached,
+} from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import { CommunityInstance } from '../../models/community';
-import { CommunitySnapshotSpaceWithSpaceAttached } from '../../models/community_snapshot_spaces';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
-export type GetCommunitiesOptions = {};
+export type GetCommunitiesOptions = {
+  hasGroups?: boolean; // only return communities with associated groups
+};
 export type GetCommunitiesResult = {
   community: CommunityInstance;
   snapshot: string[];
@@ -11,16 +15,26 @@ export type GetCommunitiesResult = {
 
 export async function __getCommunities(
   this: ServerCommunitiesController,
+  { hasGroups }: GetCommunitiesOptions,
 ): Promise<GetCommunitiesResult> {
+  const communitiesInclude = [];
+  if (hasGroups) {
+    communitiesInclude.push({
+      model: this.models.Group,
+      required: true,
+    });
+  }
+
   const communities = await this.models.Community.findAll({
     where: { active: true },
+    include: communitiesInclude,
   });
 
   const communityIds = communities.map((community) => community.id);
   const snapshotSpaces: CommunitySnapshotSpaceWithSpaceAttached[] =
     await this.models.CommunitySnapshotSpaces.findAll({
       where: {
-        chain_id: {
+        community_id: {
           [Op.in]: communityIds,
         },
       },
@@ -32,7 +46,7 @@ export async function __getCommunities(
 
   const communitiesWithSnapshots = communities.map((community) => {
     const communitySnapshotSpaces = snapshotSpaces.filter(
-      (space) => space.chain_id === community.id,
+      (space) => space.community_id === community.id,
     );
     const snapshotSpaceNames = communitySnapshotSpaces.map(
       (space) => space.snapshot_space?.snapshot_space,

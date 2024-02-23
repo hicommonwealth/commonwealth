@@ -161,7 +161,8 @@
     }
   }
 
-  &.input {
+  &.input,
+  &.group {
     background-color: $neutral-100;
     padding: 2px 8px;
     gap: 8px;
@@ -205,6 +206,14 @@
     }
   }
 
+  &.group {
+    .Text {
+      font-size: 12px;
+      line-height: 16px;
+      color: $neutral-700;
+    }
+  }
+
   &.address,
   &.login {
     background-color: $neutral-200;
@@ -240,6 +249,8 @@
     display: grid;
     align-items: center;
     color: $neutral-500;
+    max-width: 20px;
+    max-height: 20px;
     width: fit-content;
     height: fit-content;
     padding: 0;

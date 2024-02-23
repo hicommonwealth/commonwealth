@@ -1,17 +1,17 @@
-import { deinitChainOrCommunity, selectChain } from 'helpers/chain';
 import 'Layout.scss';
+import { deinitChainOrCommunity, selectChain } from 'helpers/chain';
 import withRouter from 'navigation/helpers';
-import React, { useState, ReactNode, Suspense } from 'react';
+import React, { ReactNode, Suspense, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useParams } from 'react-router-dom';
 import app from 'state';
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
-import { CWEmptyState } from './components/component_kit/cw_empty_state';
-import { CWSpinner } from './components/component_kit/cw_spinner';
-import { CWText } from './components/component_kit/cw_text';
 import SubLayout from './Sublayout';
+import { CWEmptyState } from './components/component_kit/cw_empty_state';
+import { CWText } from './components/component_kit/cw_text';
+import CWLoadingSpinner from './components/component_kit/new_designs/CWLoadingSpinner';
 
 type LayoutAttrs = {
   Component: ReactNode | any;
@@ -99,7 +99,7 @@ const LayoutComponent = ({
 
     const Bobber = (
       <div className="spinner-container">
-        <CWSpinner size="xl" />
+        <CWLoadingSpinner />
       </div>
     );
 
@@ -122,7 +122,7 @@ const LayoutComponent = ({
         {type === 'blank' ? (
           childToRender()
         ) : (
-          <SubLayout hasCommunitySidebar={type === 'community'}>
+          <SubLayout isInsideCommunity={type === 'community'}>
             {childToRender()}
           </SubLayout>
         )}

@@ -29,6 +29,17 @@ module.exports = {
     // this rule has not been updated to ESLint 8 so it is incompatible with our ESLint setup
     // Error: Rules with suggestions must set the `meta.hasSuggestions` property to `true`. `meta.docs.suggestion` is ignored by ESLint.
     "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-namespace": "off"
+    "@typescript-eslint/no-namespace": "off",
+    "@typescript-eslint/no-unused-vars": ["warn", {"argsIgnorePattern": "^_"}],
+    "no-restricted-imports": ["error", {
+      patterns: [{
+        group: [
+          "@hicommonwealth/core/**",
+          "@hicommonwealth/adapters/**",
+          "@hicommonwealth/model/**"
+        ],
+        message: "Avoid importing from 'lib' directories. Import from the main entry point instead.",
+      }]
+    }]
   }
 }

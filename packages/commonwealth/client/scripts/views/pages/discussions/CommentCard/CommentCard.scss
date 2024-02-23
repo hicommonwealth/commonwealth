@@ -1,5 +1,4 @@
 @import '../../../../../styles/shared';
-@import '../../../../../styles/components/component_kit/cw_popover/cw_tooltip';
 
 .thread-connectors-container {
   display: flex;
@@ -37,7 +36,6 @@
 
 .Comment {
   display: flex;
-  //border: 1px solid red;
 
   &.highlighted {
     background-color: $yellow-200;
@@ -55,18 +53,6 @@
     width: 100%;
     padding: 16px 0;
     gap: 16px;
-
-    .comment-text {
-      div,
-      span,
-      p {
-        font-size: 16px !important;
-        line-height: 24px !important;
-        /* identical to box height, or 143% */
-
-        letter-spacing: 0.16px !important;
-      }
-    }
 
     .comment-text {
       padding-left: 8px;
@@ -111,10 +97,6 @@
       align-items: center;
       gap: 1px;
       flex-wrap: wrap;
-
-      .OldTooltip {
-        @include newTempBlackTooltip;
-      }
     }
   }
 }

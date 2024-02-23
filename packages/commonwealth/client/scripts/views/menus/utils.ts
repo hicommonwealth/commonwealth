@@ -1,5 +1,5 @@
 import React from 'react';
-import { AnchorType } from 'views/components/component_kit/cw_popover/cw_popover';
+import { AnchorType } from 'views/components/component_kit/new_designs/CWPopover';
 
 interface MouseEnterOrLeaveProps {
   e: React.MouseEvent<AnchorType>;

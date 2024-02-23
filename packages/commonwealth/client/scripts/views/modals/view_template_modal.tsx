@@ -34,7 +34,7 @@ const ViewTemplateModal = ({
           <CWText type="b2">By</CWText>
           <User
             userAddress={creator.address}
-            userChainId={creator.community?.id || creator?.profile?.chain}
+            userCommunityId={creator.community?.id || creator?.profile?.chain}
             shouldShowAddressWithDisplayName
           />
           <CWText type="b2">•</CWText>

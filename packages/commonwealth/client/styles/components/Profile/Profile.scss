@@ -6,9 +6,25 @@
   flex-direction: column;
   width: 100%;
 
+  .breadcrumbs {
+    padding-left: 32px;
+  }
+
   .header {
-    margin: 0px 80px;
+    margin: 16px 80px;
     padding: 16px 0 0px 0px;
+    @include mediumInclusive {
+      margin: 40px 72px;
+    }
+
+    @include mediumSmallInclusive {
+      margin: 40px 48px;
+    }
+
+    @include smallInclusive {
+      flex-direction: column;
+      margin: 40px 32px;
+    }
   }
 
   &.loading {
@@ -35,7 +51,8 @@
       }
 
       @include smallInclusive {
-        margin: 24px 32px;
+        margin: 0;
+        padding: 16px;
       }
     }
 

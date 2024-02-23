@@ -1,0 +1,16 @@
+@import '../../../../../../styles/shared.scss';
+
+.Drawer {
+  padding-bottom: 46px;
+  overflow: auto;
+
+  &.bottom-drawer {
+    border-top-right-radius: 16px !important;
+    border-top-left-radius: 16px !important;
+    padding: 24px 32px;
+  }
+
+  @include extraSmall {
+    padding-bottom: 56px;
+  }
+}

@@ -1,13 +1,13 @@
 /* eslint-disable react/no-multi-comp */
+import { isValidEthAddress } from 'helpers/validateTypes';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
-import { getClasses } from 'views/components/component_kit/helpers';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
@@ -17,6 +17,7 @@ import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_rad
 import { ZodError, ZodObject } from 'zod';
 import {
   AMOUNT_CONDITIONS,
+  ERC_SPECIFICATIONS,
   TOKENS,
   conditionTypes,
 } from '../../../common/constants';
@@ -24,7 +25,6 @@ import TopicGatingHelpMessage from '../../TopicGatingHelpMessage';
 import './GroupForm.scss';
 import RequirementSubForm from './RequirementSubForm';
 import {
-  CWRequirementsLabelInputFieldState,
   FormSubmitValues,
   GroupFormProps,
   RequirementSubFormsState,
@@ -42,40 +42,70 @@ const REQUIREMENTS_TO_FULFILL = {
 };
 
 type CWRequirementsRadioButtonProps = {
-  inputError?: string;
+  maxRequirements: number;
   inputValue: string;
+  isSelected: boolean;
+  onSelect: () => any;
   onInputValueChange: (value: string) => any;
 };
 
 const CWRequirementsRadioButton = ({
-  inputError,
+  maxRequirements = 1,
   inputValue,
+  isSelected,
+  onSelect,
   onInputValueChange,
 }: CWRequirementsRadioButtonProps) => {
+  const options = useMemo(
+    () =>
+      Array.from({ length: maxRequirements }).map((_, index) => ({
+        label: `${index + 1}`,
+        value: `${index + 1}`,
+      })),
+    [maxRequirements],
+  );
+
+  const value = useMemo(() => {
+    if (inputValue) {
+      return {
+        label: inputValue,
+        value: inputValue,
+      };
+    }
+
+    return options[0];
+  }, [inputValue, options]);
+
   const Label = (
     <span className="requirements-radio-btn-label">
-      At least{' '}
-      {
-        <CWTextInput
-          containerClassName={getClasses<{ failure?: boolean }>(
-            { failure: !!inputError },
-            'input',
-          )}
-          value={inputValue}
-          onInput={(e) => onInputValueChange(e.target?.value?.trim())}
-        />
-      }{' '}
-      # of all requirements
+      Minimum number of conditions to join{' '}
+      <CWSelectList
+        isDisabled={!isSelected}
+        isSearchable={false}
+        isClearable={false}
+        options={options}
+        value={value}
+        onChange={(selectedOption) => {
+          onInputValueChange(`${selectedOption.value}`);
+        }}
+      />
     </span>
   );
 
   return (
-    <CWRadioButton
-      label={Label}
-      value={REQUIREMENTS_TO_FULFILL.N_REQUIREMENTS}
-      name="requirementsToFulfill"
-      hookToForm
-    />
+    <>
+      <CWRadioButton
+        label={Label}
+        value={REQUIREMENTS_TO_FULFILL.N_REQUIREMENTS}
+        name="requirementsToFulfill"
+        hookToForm
+        onChange={(e) => {
+          if (e.target.checked) {
+            onSelect();
+          }
+        }}
+      />
+    </>
   );
 };
 
@@ -85,9 +115,16 @@ const getRequirementSubFormSchema = (
   requirementType: string,
 ): ZodObject<any> => {
   const isTokenRequirement = Object.values(TOKENS).includes(requirementType);
+  const is1155Requirement = requirementType === ERC_SPECIFICATIONS.ERC_1155;
+
   const schema = isTokenRequirement
     ? requirementSubFormValidationSchema.omit({
         requirementContractAddress: true,
+        requirementTokenId: true,
+      })
+    : !is1155Requirement
+    ? requirementSubFormValidationSchema.omit({
+        requirementTokenId: true,
       })
     : requirementSubFormValidationSchema;
   return schema;
@@ -101,20 +138,28 @@ const GroupForm = ({
 }: GroupFormProps) => {
   const navigate = useCommonNavigate();
   const { data: topics } = useFetchTopicsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const { data: groups = [] } = useFetchGroupsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const takenGroupNames = groups.map(({ name }) => name.toLowerCase());
+  const sortedTopics = (topics || []).sort((a, b) =>
+    a?.name?.localeCompare(b.name),
+  );
 
   const [isNameTaken, setIsNameTaken] = useState(false);
-
-  const sortedTopics = (topics || []).sort((a, b) => a?.name?.localeCompare(b));
-  const [cwRequiremenetsLabelInputField, setCwRequiremenetsLabelInputField] =
-    useState<CWRequirementsLabelInputFieldState>({ value: '1', error: '' });
+  const [
+    isSelectedCustomRequirementsToFulfillOption,
+    setIsSelectedCustomRequirementsToFulfillOption,
+  ] = useState(
+    initialValues?.requirementsToFulfill &&
+      initialValues?.requirementsToFulfill !== 'ALL',
+  );
+  const [cwRequiremenetsLabelInputValue, setCwRequiremenetsLabelInputValue] =
+    useState('1');
   const [requirementSubForms, setRequirementSubForms] = useState<
     RequirementSubFormsState[]
   >([
@@ -130,6 +175,7 @@ const GroupForm = ({
         requirementCondition: AMOUNT_CONDITIONS.MORE,
         requirementContractAddress: '',
         requirementType: '',
+        requirementTokenId: '',
       },
       errors: {},
     },
@@ -151,6 +197,7 @@ const GroupForm = ({
             requirementCondition: AMOUNT_CONDITIONS.MORE,
             requirementContractAddress: x?.requirementContractAddress || '',
             requirementType: x?.requirementType?.value || '',
+            requirementTokenId: x?.requirementTokenId || '',
           },
           errors: {},
         })),
@@ -162,10 +209,9 @@ const GroupForm = ({
       initialValues.requirementsToFulfill !==
         REQUIREMENTS_TO_FULFILL.ALL_REQUIREMENTS
     ) {
-      setCwRequiremenetsLabelInputField({
-        ...cwRequiremenetsLabelInputField,
-        value: `${initialValues.requirementsToFulfill}`,
-      });
+      setCwRequiremenetsLabelInputValue(
+        `${initialValues.requirementsToFulfill}`,
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -191,6 +237,7 @@ const GroupForm = ({
           requirementCondition: AMOUNT_CONDITIONS.MORE,
           requirementContractAddress: '',
           requirementType: '',
+          requirementTokenId: '',
         },
         errors: {},
       },
@@ -251,6 +298,24 @@ const GroupForm = ({
       };
     }
 
+    // Validate if contract address is valid based on the selected requirement type
+    if (val.requirementContractAddress) {
+      const isInvalidEthAddress =
+        [...Object.values(ERC_SPECIFICATIONS), TOKENS.EVM_TOKEN].includes(
+          allRequirements[index].values.requirementType,
+        ) && !isValidEthAddress(val.requirementContractAddress);
+
+      if (isInvalidEthAddress) {
+        allRequirements[index] = {
+          ...allRequirements[index],
+          errors: {
+            ...allRequirements[index].errors,
+            [key]: VALIDATION_MESSAGES.INVALID_INPUT,
+          },
+        };
+      }
+    }
+
     setRequirementSubForms([...allRequirements]);
   };
 
@@ -295,44 +360,17 @@ const GroupForm = ({
 
   const handleSubmit = async (values: FormSubmitValues) => {
     const hasSubFormErrors = validateSubForms();
-    if (hasSubFormErrors || cwRequiremenetsLabelInputField.error) {
+    if (hasSubFormErrors) {
       return;
     }
 
     // Custom validation for the radio with input label
     let requirementsToFulfill: any = values.requirementsToFulfill;
-    setCwRequiremenetsLabelInputField({
-      ...cwRequiremenetsLabelInputField,
-      error: '',
-    });
+    setCwRequiremenetsLabelInputValue(cwRequiremenetsLabelInputValue);
     if (
       values.requirementsToFulfill === REQUIREMENTS_TO_FULFILL.N_REQUIREMENTS
     ) {
-      // If radio label input has no value
-      if (!cwRequiremenetsLabelInputField.value) {
-        setCwRequiremenetsLabelInputField({
-          ...cwRequiremenetsLabelInputField,
-          error: VALIDATION_MESSAGES.NO_INPUT,
-        });
-        return;
-      }
-
-      // If radio label input has invalid value
-      requirementsToFulfill = parseInt(
-        cwRequiremenetsLabelInputField.value || '',
-      );
-      if (
-        !requirementsToFulfill ||
-        requirementsToFulfill < 1 ||
-        requirementsToFulfill > MAX_REQUIREMENTS ||
-        /[^0-9]/g.test(cwRequiremenetsLabelInputField.value)
-      ) {
-        setCwRequiremenetsLabelInputField({
-          ...cwRequiremenetsLabelInputField,
-          error: VALIDATION_MESSAGES.INVALID_VALUE,
-        });
-        return;
-      }
+      requirementsToFulfill = parseInt(cwRequiremenetsLabelInputValue);
     }
 
     const formValues = {
@@ -400,7 +438,7 @@ const GroupForm = ({
             <CWTextArea
               name="groupDescription"
               hookToForm
-              label="Description"
+              label="Description (optional)"
               placeholder="Add a description for your group"
               instructionalMessage="Can be up to 250 characters long"
             />
@@ -448,7 +486,10 @@ const GroupForm = ({
                 buttonWidth="full"
                 buttonType="secondary"
                 buttonHeight="med"
-                onClick={addRequirementSubForm}
+                onClick={(e) => {
+                  (e?.target as HTMLButtonElement)?.blur();
+                  addRequirementSubForm();
+                }}
               />
 
               <CWText
@@ -465,26 +506,30 @@ const GroupForm = ({
                   value={REQUIREMENTS_TO_FULFILL.ALL_REQUIREMENTS}
                   name="requirementsToFulfill"
                   hookToForm
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setIsSelectedCustomRequirementsToFulfillOption(false);
+                    }
+                  }}
                 />
 
                 <CWRequirementsRadioButton
-                  inputError={cwRequiremenetsLabelInputField.error}
-                  inputValue={cwRequiremenetsLabelInputField.value}
-                  onInputValueChange={(value) =>
-                    setCwRequiremenetsLabelInputField({
-                      value,
-                      error: '',
-                    })
+                  maxRequirements={requirementSubForms.length}
+                  inputValue={cwRequiremenetsLabelInputValue}
+                  isSelected={isSelectedCustomRequirementsToFulfillOption}
+                  onSelect={() =>
+                    setIsSelectedCustomRequirementsToFulfillOption(true)
                   }
+                  onInputValueChange={(value) => {
+                    setCwRequiremenetsLabelInputValue(value);
+                  }}
                 />
 
-                {(formState?.errors?.requirementsToFulfill?.message ||
-                  cwRequiremenetsLabelInputField.error) && (
+                {formState?.errors?.requirementsToFulfill?.message && (
                   <MessageRow
                     hasFeedback
                     statusMessage={
-                      formState?.errors?.requirementsToFulfill?.message ||
-                      cwRequiremenetsLabelInputField.error
+                      formState?.errors?.requirementsToFulfill?.message
                     }
                     validationStatus="failure"
                   />
@@ -496,11 +541,11 @@ const GroupForm = ({
             <section className="form-section">
               <div className="header-row">
                 <CWText type="h4" fontWeight="semiBold" className="header-text">
-                  Gated topic(s)
+                  Gate topics
                 </CWText>
                 <CWText type="b2">
-                  Add topics to gate to auto-lock it for group members who
-                  satisfy the requirements above
+                  Add topics that only group members who satisfy the
+                  requirements above can participate in.
                 </CWText>
               </div>
 
@@ -519,7 +564,9 @@ const GroupForm = ({
             </section>
           </section>
 
-          {formType === 'create' && <TopicGatingHelpMessage />}
+          {(formType === 'create' || formType === 'edit') && (
+            <TopicGatingHelpMessage />
+          )}
 
           {/* Form action buttons */}
           <div className="action-buttons">

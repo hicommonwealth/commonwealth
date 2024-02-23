@@ -1,13 +1,13 @@
-import React, { FC } from 'react';
 import { ArrowFatUp } from '@phosphor-icons/react';
+import React, { FC } from 'react';
 
+import { formatNumberShort } from 'adapters/currency';
 import { CWText } from '../cw_text';
 import { getClasses } from '../helpers';
-import { formatNumberShort } from 'adapters/currency';
 
 import 'components/component_kit/new_designs/cw_upvote.scss';
+import { AnchorType } from 'views/components/component_kit/new_designs/CWPopover';
 import { ComponentType } from '../types';
-import { AnchorType } from 'views/components/component_kit/cw_popover/cw_popover';
 
 type CWUpvoteProps = {
   voteCount: number;

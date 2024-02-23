@@ -13,11 +13,13 @@ import './SearchBarThreadPreviewRow.scss';
 interface SearchBarThreadPreviewRowProps {
   searchResult: ThreadResult;
   searchTerm?: string;
+  onSearchItemClick?: () => void;
 }
 
 export const SearchBarThreadPreviewRow: FC<SearchBarThreadPreviewRowProps> = ({
   searchResult,
   searchTerm,
+  onSearchItemClick,
 }) => {
   const navigate = useCommonNavigate();
 
@@ -25,15 +27,16 @@ export const SearchBarThreadPreviewRow: FC<SearchBarThreadPreviewRowProps> = ({
   const content = decodeURIComponent(searchResult.body);
 
   const handleClick = () => {
-    const path = `/${searchResult.community}/discussion/${searchResult.id}`;
+    const path = `/${searchResult.community_id}/discussion/${searchResult.id}`;
     navigate(path, {}, null);
+    onSearchItemClick?.();
   };
 
   return (
     <div className="SearchBarThreadPreviewRow" onClick={handleClick}>
       <div className="header-row">
         <User
-          userChainId={searchResult.community}
+          userCommunityId={searchResult.community_id}
           userAddress={searchResult.address}
         />
         <CWText className="last-updated-text">•</CWText>
@@ -41,17 +44,20 @@ export const SearchBarThreadPreviewRow: FC<SearchBarThreadPreviewRowProps> = ({
           {moment(searchResult.created_at).format('l')}
         </CWText>
       </div>
-      <CWText type="b2" fontWeight="bold">
-        {renderTruncatedHighlights(searchTerm, title)}
-      </CWText>
-      <CWText type="caption" className="excerpt-text" fontWeight="medium">
-        <QuillRenderer
-          hideFormatting={true}
-          doc={content}
-          searchTerm={searchTerm}
-          containerClass="SearchQuillRenderer"
-        />
-      </CWText>
+
+      <div className="content-row">
+        <CWText type="b2" fontWeight="bold">
+          {renderTruncatedHighlights(searchTerm, title)}
+        </CWText>
+        <CWText type="caption" className="excerpt-text" fontWeight="medium">
+          <QuillRenderer
+            hideFormatting={true}
+            doc={content}
+            searchTerm={searchTerm}
+            containerClass="SearchQuillRenderer"
+          />
+        </CWText>
+      </div>
     </div>
   );
 };

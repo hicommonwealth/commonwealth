@@ -1,10 +1,8 @@
-import { GroupMetadata } from 'server/models/group';
+import { AppError, Requirement } from '@hicommonwealth/core';
+import { GroupAttributes, GroupMetadata } from '@hicommonwealth/model';
 import z from 'zod';
-import { AppError } from '../../../../common-common/src/errors';
-import { UpdateGroupResult } from '../../controllers/server_groups_methods/update_group';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
-import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 
 type UpdateGroupParams = { id: string };
 type UpdateGroupBody = {
@@ -12,14 +10,14 @@ type UpdateGroupBody = {
   requirements: Requirement[];
   topics?: number[];
 };
-type UpdateGroupResponse = UpdateGroupResult;
+type UpdateGroupResponse = GroupAttributes;
 
 export const updateGroupHandler = async (
   controllers: ServerControllers,
   req: TypedRequest<UpdateGroupBody, null, UpdateGroupParams>,
-  res: TypedResponse<UpdateGroupResponse>
+  res: TypedResponse<UpdateGroupResponse>,
 ) => {
-  const { user, address, chain: community } = req;
+  const { user, address } = req;
 
   const schema = z.object({
     params: z.object({
@@ -46,9 +44,8 @@ export const updateGroupHandler = async (
     body: { metadata, requirements, topics },
   } = validationResult.data;
 
-  const result = await controllers.groups.updateGroup({
+  const [group, analyticsOptions] = await controllers.groups.updateGroup({
     user,
-    community,
     address,
     groupId,
     metadata: metadata as Required<typeof metadata>,
@@ -56,10 +53,17 @@ export const updateGroupHandler = async (
     topics,
   });
 
-  // refresh memberships in background
-  controllers.groups
-    .refreshCommunityMemberships({ community })
-    .catch(console.error);
+  // refresh memberships in background if requirements updated
+  if (requirements?.length > 0) {
+    controllers.groups
+      .refreshCommunityMemberships({
+        communityId: group.community_id,
+        groupId: group.id,
+      })
+      .catch(console.error);
+  }
 
-  return success(res, result);
+  controllers.analytics.track(analyticsOptions, req).catch(console.error);
+
+  return success(res, group);
 };

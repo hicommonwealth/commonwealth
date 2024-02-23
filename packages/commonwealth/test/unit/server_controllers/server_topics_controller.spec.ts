@@ -1,7 +1,6 @@
+import { CommunityInstance, UserInstance } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { ServerTopicsController } from 'server/controllers/server_topics_controller';
-import { CommunityInstance } from '../../../server/models/community';
-import { UserInstance } from 'server/models/user';
 
 const createMockedTopicsController = (isAdmin: boolean = false) => {
   const db: any = {
@@ -14,6 +13,14 @@ const createMockedTopicsController = (isAdmin: boolean = false) => {
         ];
       },
       findOne: async () => {
+        return {
+          id: 1,
+          destroy: async () => {},
+          save: async () => {},
+          toJSON: () => {},
+        };
+      },
+      findByPk: async () => {
         return {
           id: 1,
           destroy: async () => {},
@@ -57,13 +64,8 @@ const createMockedTopicsController = (isAdmin: boolean = false) => {
       },
     },
   };
-  const tokenBalanceCache: any = {};
   const banCache: any = {};
-  const controller = new ServerTopicsController(
-    db,
-    tokenBalanceCache,
-    banCache
-  );
+  const controller = new ServerTopicsController(db, banCache);
   const user = {
     getAddresses: async () => [],
     isAdmin,
@@ -75,28 +77,28 @@ const createMockedTopicsController = (isAdmin: boolean = false) => {
 describe('ServerTopicsController', () => {
   describe('#createTopic', async () => {
     const { controller, user, chain } = createMockedTopicsController();
-    const result = await controller.createTopic({
-      user,
-      community: chain,
-      body: {
-        name: 'hhh',
-        description: 'ddd',
-        featured_in_new_post: false,
-        featured_in_sidebar: false,
-        token_threshold: '0',
-      },
-    });
-    expect(result.name).to.equal('hhh');
-    expect(result.description).to.equal('ddd');
-    expect(result.featured_in_new_post).to.equal(false);
-    expect(result.featured_in_sidebar).to.equal(false);
-    expect(result.token_threshold).to.equal('0');
+    const [topic] = await Promise.all(
+      await controller.createTopic({
+        user,
+        community: chain,
+        body: {
+          name: 'hhh',
+          description: 'ddd',
+          featured_in_new_post: false,
+          featured_in_sidebar: false,
+        },
+      }),
+    );
+
+    expect(topic.name).to.equal('hhh');
+    expect(topic.description).to.equal('ddd');
+    expect(topic.featured_in_new_post).to.equal(false);
+    expect(topic.featured_in_sidebar).to.equal(false);
   });
   describe('#deleteTopic', async () => {
-    const { controller, user, chain } = createMockedTopicsController();
+    const { controller, user } = createMockedTopicsController();
     await controller.deleteTopic({
       user,
-      community: chain,
       topicId: 1,
     });
   });
@@ -108,19 +110,17 @@ describe('ServerTopicsController', () => {
     expect(topics).to.have.length(1);
   });
   describe('#updateTopicChannel', async () => {
-    const { controller, user, chain } = createMockedTopicsController(true);
+    const { controller, user } = createMockedTopicsController(true);
     await controller.updateTopicChannel({
       user,
-      community: chain,
       topicId: 1,
       channelId: 'ccc',
     });
   });
   describe('#updateTopic', async () => {
-    const { controller, user, chain } = createMockedTopicsController(true);
+    const { controller, user } = createMockedTopicsController(true);
     await controller.updateTopic({
       user,
-      community: chain,
       body: {
         id: 1,
         name: 'ddd',

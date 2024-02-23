@@ -1,26 +1,25 @@
-import { DB } from '../models';
+import { DB } from '@hicommonwealth/model';
 import BanCache from '../util/banCheckCache';
-import { TokenBalanceCache } from '../../../token-balance-cache/src';
-import {
-  GetTopicsOptions,
-  GetTopicsResult,
-  __getTopics,
-} from './server_topics_methods/get_topics';
 import {
   CreateTopicOptions,
   CreateTopicResult,
   __createTopic,
 } from './server_topics_methods/create_topic';
 import {
-  UpdateTopicOptions,
-  UpdateTopicResult,
-  __updateTopic,
-} from './server_topics_methods/update_topic';
-import {
   DeleteTopicOptions,
   DeleteTopicResult,
   __deleteTopic,
 } from './server_topics_methods/delete_topic';
+import {
+  GetTopicsOptions,
+  GetTopicsResult,
+  __getTopics,
+} from './server_topics_methods/get_topics';
+import {
+  UpdateTopicOptions,
+  UpdateTopicResult,
+  __updateTopic,
+} from './server_topics_methods/update_topic';
 import {
   UpdateTopicChannelOptions,
   UpdateTopicChannelResult,
@@ -36,11 +35,7 @@ import {
  * Implements methods related to topics
  */
 export class ServerTopicsController {
-  constructor(
-    public models: DB,
-    public tokenBalanceCache: TokenBalanceCache,
-    public banCache: BanCache
-  ) {}
+  constructor(public models: DB, public banCache: BanCache) {}
 
   async getTopics(options: GetTopicsOptions): Promise<GetTopicsResult> {
     return __getTopics.call(this, options);
@@ -59,13 +54,13 @@ export class ServerTopicsController {
   }
 
   async updateTopicsOrder(
-    options: UpdateTopicsOrderOptions
+    options: UpdateTopicsOrderOptions,
   ): Promise<UpdateTopicsOrderResult> {
     return __updateTopicsOrder.call(this, options);
   }
 
   async updateTopicChannel(
-    options: UpdateTopicChannelOptions
+    options: UpdateTopicChannelOptions,
   ): Promise<UpdateTopicChannelResult> {
     return __updateTopicChannel.call(this, options);
   }

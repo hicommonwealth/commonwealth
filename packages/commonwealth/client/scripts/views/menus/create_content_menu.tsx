@@ -1,24 +1,25 @@
-import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
+/* eslint-disable react/no-multi-comp */
+import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { uuidv4 } from 'lib/util';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
+import { isMobile } from 'react-device-detect';
 import app from 'state';
-import { uuidv4 } from 'lib/util';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
-import type { PopoverMenuItem } from '../components/component_kit/cw_popover/cw_popover_menu';
-import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
-import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
-import Permissions from '../../utils/Permissions';
+import type { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import {
   handleIconClick,
   handleMouseEnter,
   handleMouseLeave,
 } from 'views/menus/utils';
-import { isMobile } from 'react-device-detect';
+import Permissions from '../../utils/Permissions';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
+import { getClasses } from '../components/component_kit/helpers';
 
 const resetSidebarState = () => {
   //Bouncer pattern -- I have found isMobile does not always detect screen
@@ -45,10 +46,6 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
     (app.chain?.base === ChainBase.Ethereum &&
       app.chain?.network === ChainNetwork.Aave) ||
     app.chain?.network === ChainNetwork.Compound;
-
-  const showSubstrateProposalItems =
-    app.chain?.base === ChainBase.Substrate &&
-    app.chain?.network !== ChainNetwork.Plasm;
 
   const getTemplateItems = (): PopoverMenuItem[] => {
     const contracts = app.contracts.getCommunityContracts();
@@ -129,20 +126,15 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
       : [];
 
   const getUniversalCreateItems = (): PopoverMenuItem[] => [
-    // {
-    //   label: 'New Crowdfund',
-    //   iconLeft: 'wallet',
-    //   onClick: () => {
-
-    //   }
-    // },
     {
-      label: 'New Community',
-      iconLeft: 'people',
+      label: 'Create community',
+      isButton: true,
+      iconLeft: 'peopleNew',
+      iconLeftWeight: 'bold',
       onClick: (e) => {
         e?.preventDefault();
         resetSidebarState();
-        navigate('/createCommunity/starter', {}, null);
+        navigate('/createCommunity', {}, null);
       },
     },
   ];
@@ -171,7 +163,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
                     !isCustomDomain
                       ? window.location.origin
                       : 'https://commonwealth.im'
-                  }`
+                  }`,
                 )}/discord-callback&response_type=code&scope=bot&state=${encodeURI(
                   JSON.stringify({
                     cw_chain_id: app.activeChainId(),
@@ -179,9 +171,9 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
                     redirect_domain: isCustomDomain
                       ? window.location.origin
                       : undefined,
-                  })
+                  }),
                 )}`,
-                '_parent'
+                '_parent',
               );
             } catch (err) {
               console.log(err);
@@ -207,7 +199,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
               resetSidebarState();
               navigate('/new/discussion');
             },
-            iconLeft: 'write',
+            iconLeft: 'pencil',
           } as PopoverMenuItem,
           ...getOnChainProposalItem(),
           ...getSputnikProposalItem(),
@@ -224,18 +216,29 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   ];
 };
 
-export const CreateContentSidebar = () => {
+export const CreateContentSidebar = ({
+  isInsideCommunity,
+}: {
+  isInsideCommunity: boolean;
+}) => {
   const navigate = useCommonNavigate();
   const { setMenu } = useSidebarStore();
 
   return (
     <CWSidebarMenu
-      className="CreateContentSidebar"
+      className={getClasses<{
+        heightInsideCommunity: boolean;
+      }>(
+        {
+          heightInsideCommunity: isInsideCommunity,
+        },
+        'CreateContentSidebar',
+      )}
       menuHeader={{
         label: 'Create',
         onClick: async () => {
           const sidebar = document.getElementsByClassName(
-            'CreateContentSidebar'
+            'CreateContentSidebar',
           );
           sidebar[0].classList.add('onremove');
           setTimeout(() => {
@@ -244,22 +247,6 @@ export const CreateContentSidebar = () => {
             setMenu({ name: 'default', isVisible: isSidebarOpen });
           }, 200);
         },
-      }}
-      menuItems={getCreateContentMenuItems(navigate)}
-    />
-  );
-};
-
-export const CreateContentMenu = () => {
-  const navigate = useCommonNavigate();
-  const { setMobileMenuName } = useSidebarStore();
-
-  return (
-    <CWMobileMenu
-      className="CreateContentMenu"
-      menuHeader={{
-        label: 'Create',
-        onClick: () => setMobileMenuName('MainMenu'),
       }}
       menuItems={getCreateContentMenuItems(navigate)}
     />

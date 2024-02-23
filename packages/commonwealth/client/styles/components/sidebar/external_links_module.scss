@@ -3,11 +3,12 @@
 .ExternalLinksModule {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
+  margin-left: auto;
+  margin-right: auto;
   margin-top: 24px;
-
-  :not(:last-child) {
-    margin-right: 16px;
-  }
+  width: 80%;
+  gap: 16px;
 
   .telegram-link {
     color: $primary-500;

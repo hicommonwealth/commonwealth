@@ -1,0 +1,12 @@
+@import '../../../../styles/shared.scss';
+
+.NewCommunityAdminModal {
+  .description {
+    color: $neutral-500;
+  }
+
+  .CWModalBody {
+    padding-bottom: 24px;
+    overflow: unset;
+  }
+}

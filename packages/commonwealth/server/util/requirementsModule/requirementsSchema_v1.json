@@ -6,7 +6,7 @@
       "properties": {
         "source_type": {
           "type": "string",
-          "enum": ["erc20", "erc721"]
+          "enum": ["erc20", "erc721", "erc1155"]
         },
         "evm_chain_id": {
           "type": "number"
@@ -14,6 +14,10 @@
         "contract_address": {
           "type": "string",
           "pattern": "^0x[a-fA-F0-9]{40}$"
+        },
+        "token_id": {
+          "type": "string",
+          "pattern": "^[0-9]+$"
         }
       },
       "required": ["source_type", "evm_chain_id", "contract_address"]
@@ -47,6 +51,22 @@
       },
       "required": ["source_type", "cosmos_chain_id", "token_symbol"]
     },
+    "CosmosContractSource": {
+      "type": "object",
+      "properties": {
+        "source_type": {
+          "type": "string",
+          "enum": ["cw721"]
+        },
+        "cosmos_chain_id": {
+          "type": "string"
+        },
+        "contract_address": {
+          "type": "string"
+        }
+      },
+      "required": ["source_type", "cosmos_chain_id", "contract_address"]
+    },
     "ThresholdData": {
       "type": "object",
       "properties": {
@@ -58,7 +78,8 @@
           "oneOf": [
             { "$ref": "#/definitions/ContractSource" },
             { "$ref": "#/definitions/NativeSource" },
-            { "$ref": "#/definitions/CosmosSource" }
+            { "$ref": "#/definitions/CosmosSource" },
+            { "$ref": "#/definitions/CosmosContractSource" }
           ]
         }
       },

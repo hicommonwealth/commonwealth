@@ -1,8 +1,8 @@
-import { featureFlags } from 'helpers/feature-flags';
 import { Navigate } from 'navigation/helpers';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { withLayout } from 'views/Layout';
+import { RouteFeatureFlags } from './Router';
 
 const LandingPage = lazy(() => import('views/pages/landing'));
 const WhyCommonwealthPage = lazy(() => import('views/pages/why_commonwealth'));
@@ -11,26 +11,28 @@ const CommunitiesPage = lazy(() => import('views/pages/communities'));
 const SearchPage = lazy(() => import('views/pages/search'));
 const Web3LoginPage = lazy(() => import('views/pages/web3login'));
 
-const CreateCommunityPage = lazy(() => import('views/pages/create_community'));
+const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
-const MembersPage = lazy(() => import('views/pages/Community/Members/CommunityMembersPage'));
+const MembersPage = lazy(
+  () => import('views/pages/Community/Members/CommunityMembersPage'),
+);
 const CreateMembersGroupPage = lazy(
-  () => import('views/pages/Community/Groups/Create')
+  () => import('views/pages/Community/Groups/Create'),
 );
 const UpdateMembersGroupPage = lazy(
-  () => import('views/pages/Community/Groups/Update')
+  () => import('views/pages/Community/Groups/Update'),
 );
 const DirectoryPage = lazy(() => import('views/pages/DirectoryPage'));
 const SputnikDaosPage = lazy(() => import('views/pages/sputnikdaos'));
 const FinishNearLoginPage = lazy(() => import('views/pages/finish_near_login'));
 const FinishAxieLoginPage = lazy(() => import('views/pages/finish_axie_login'));
 const FinishSocialLoginPage = lazy(
-  () => import('views/pages/finish_social_login')
+  () => import('views/pages/finish_social_login'),
 );
 
 const NotificationsPage = lazy(() => import('views/pages/notifications'));
 const NotificationSettingsPage = lazy(
-  () => import('views/pages/notification_settings')
+  () => import('views/pages/notification_settings'),
 );
 
 const ProposalsPage = lazy(() => import('views/pages/proposals'));
@@ -38,18 +40,18 @@ const ViewProposalPage = lazy(() => import('views/pages/view_proposal/index'));
 const NewProposalPage = lazy(() => import('views/pages/new_proposal/index'));
 
 const DiscussionsPage = lazy(
-  () => import('views/pages/discussions/DiscussionsPage')
+  () => import('views/pages/discussions/DiscussionsPage'),
 );
 const ViewThreadPage = lazy(
-  () => import('../views/pages/view_thread/ViewThreadPage')
+  () => import('../views/pages/view_thread/ViewThreadPage'),
 );
 const ThreadRedirectPage = lazy(() => import('views/pages/thread_redirect'));
 const NewThreadPage = lazy(() => import('views/pages/new_thread'));
 const DiscussionsRedirectPage = lazy(
-  () => import('views/pages/discussions_redirect')
+  () => import('views/pages/discussions_redirect'),
 );
 const SnapshotProposalLinkRedirectPage = lazy(
-  () => import('views/pages/snapshot_proposal_link_redirect')
+  () => import('views/pages/snapshot_proposal_link_redirect'),
 );
 const FeedPage = lazy(() => import('views/pages/feed'));
 
@@ -57,28 +59,42 @@ const ContractsPage = lazy(() => import('views/pages/contracts'));
 const NewContractPage = lazy(() => import('views/pages/new_contract'));
 const GeneralContractPage = lazy(() => import('views/pages/general_contract'));
 const NewContractTemplatePage = lazy(
-  () => import('views/pages/new_contract_template')
+  () => import('views/pages/new_contract_template'),
 );
 const ViewTemplatePage = lazy(() => import('views/pages/view_template'));
 
 const ManageCommunityPage = lazy(
-  () => import('views/pages/manage_community/ManageCommunityPage')
+  () => import('views/pages/manage_community/ManageCommunityPage'),
 );
 const DiscordCallbackPage = lazy(
-  () => import('views/pages/manage_community/discord-callback')
+  () => import('views/pages/manage_community/discord-callback'),
 );
 const AnalyticsPage = lazy(() => import('views/pages/stats'));
+
+const CommunityAdminAndModerators = lazy(
+  () => import('views/pages/CommunityManagement/AdminsAndModerators'),
+);
+const CommunityProfile = lazy(
+  () => import('views/pages/CommunityManagement/CommunityProfile'),
+);
+const CommunityIntegrations = lazy(
+  () => import('views/pages/CommunityManagement/Integrations'),
+);
+const CommunityTopics = lazy(
+  () => import('views/pages/CommunityManagement/Topics'),
+);
+
 const SnapshotProposalPage = lazy(
-  () => import('views/pages/snapshot_proposals')
+  () => import('views/pages/snapshot_proposals'),
 );
 const ViewMultipleSnapshotsPage = lazy(
-  () => import('views/pages/view_multiple_snapshot_spaces')
+  () => import('views/pages/view_multiple_snapshot_spaces'),
 );
 const ViewSnapshotsProposalPage = lazy(
-  () => import('views/pages/view_snapshot_proposal')
+  () => import('views/pages/view_snapshot_proposal'),
 );
 const NewSnapshotProposalPage = lazy(
-  () => import('views/pages/new_snapshot_proposal')
+  () => import('views/pages/new_snapshot_proposal/NewSnapshotProposalPage'),
 );
 const AdminPanelPage = lazy(() => import('views/pages/AdminPanel'));
 
@@ -86,23 +102,33 @@ const NewProfilePage = lazy(() => import('views/pages/new_profile'));
 const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
-const CommonDomainRoutes = () => [
-  <Route
-    key="/"
-    path="/"
-    element={withLayout(LandingPage, {
-      scoped: false,
-      type: 'blank',
-    })}
-  />,
+const CommonDomainRoutes = ({
+  proposalTemplatesEnabled,
+  newAdminOnboardingEnabled,
+  communityHomepageEnabled,
+  rootDomainRebrandEnabled,
+}: RouteFeatureFlags) => [
+  ...(rootDomainRebrandEnabled
+    ? [
+        <Route
+          key="/"
+          path="/"
+          element={withLayout(DashboardPage, { type: 'common' })}
+        />,
+      ]
+    : [
+        <Route
+          key="/"
+          path="/"
+          element={withLayout(LandingPage, {
+            scoped: false,
+            type: 'blank',
+          })}
+        />,
+      ]),
   <Route
     key="/createCommunity"
     path="/createCommunity"
-    element={withLayout(CreateCommunityPage, { type: 'common' })}
-  />,
-  <Route
-    key="/createCommunity/:type"
-    path="/createCommunity/:type"
     element={withLayout(CreateCommunityPage, { type: 'common' })}
   />,
   <Route
@@ -331,7 +357,7 @@ const CommonDomainRoutes = () => [
       scoped: true,
     })}
   />,
-  ...(featureFlags.communityHomepage
+  ...(communityHomepageEnabled
     ? [
         <Route
           key="/:scope/feed"
@@ -352,7 +378,7 @@ const CommonDomainRoutes = () => [
   // DISCUSSIONS END
 
   // CONTRACTS
-  ...(featureFlags.proposalTemplates
+  ...(proposalTemplatesEnabled
     ? [
         <Route
           key="/:scope/contracts"
@@ -401,10 +427,55 @@ const CommonDomainRoutes = () => [
   />,
 
   // ADMIN
+  ...(newAdminOnboardingEnabled
+    ? [
+        <Route
+          key="/:scope/manage/profile"
+          path="/:scope/manage/profile"
+          element={withLayout(CommunityProfile, {
+            scoped: true,
+          })}
+        />,
+        <Route
+          key="/:scope/manage/integrations"
+          path="/:scope/manage/integrations"
+          element={withLayout(CommunityIntegrations, {
+            scoped: true,
+          })}
+        />,
+        <Route
+          key="/:scope/manage/topics"
+          path="/:scope/manage/topics"
+          element={withLayout(CommunityTopics, {
+            scoped: true,
+          })}
+        />,
+        <Route
+          key="/:scope/manage/moderators"
+          path="/:scope/manage/moderators"
+          element={withLayout(CommunityAdminAndModerators, {
+            scoped: true,
+          })}
+        />,
+      ]
+    : [
+        <Route
+          key="/:scope/manage"
+          path="/:scope/manage"
+          element={withLayout(ManageCommunityPage, {
+            scoped: true,
+          })}
+        />,
+        <Route
+          key="/manage"
+          path="/manage"
+          element={withLayout(ManageCommunityPage, {})}
+        />,
+      ]),
   <Route
-    key="/:scope/manage"
-    path="/:scope/manage"
-    element={withLayout(ManageCommunityPage, {
+    key="/:scope/analytics"
+    path="/:scope/analytics"
+    element={withLayout(AnalyticsPage, {
       scoped: true,
     })}
   />,
@@ -412,18 +483,6 @@ const CommonDomainRoutes = () => [
     key="/discord-callback"
     path="/discord-callback"
     element={withLayout(DiscordCallbackPage, {
-      scoped: true,
-    })}
-  />,
-  <Route
-    key="/manage"
-    path="/manage"
-    element={withLayout(ManageCommunityPage, {})}
-  />,
-  <Route
-    key="/:scope/analytics"
-    path="/:scope/analytics"
-    element={withLayout(AnalyticsPage, {
       scoped: true,
     })}
   />,

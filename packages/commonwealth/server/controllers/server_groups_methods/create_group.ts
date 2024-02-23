@@ -1,18 +1,23 @@
+import { AppError, Requirement } from '@hicommonwealth/core';
+import {
+  AddressInstance,
+  CommunityInstance,
+  GroupAttributes,
+  GroupMetadata,
+  UserInstance,
+  sequelize,
+} from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import { AppError } from '../../../../common-common/src/errors';
-import { sequelize } from '../../database';
-import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/community';
-import { GroupAttributes, GroupMetadata } from '../../models/group';
-import { UserInstance } from '../../models/user';
-import { Requirement } from '../../util/requirementsModule/requirementsTypes';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import validateMetadata from '../../util/requirementsModule/validateMetadata';
 import validateRequirements from '../../util/requirementsModule/validateRequirements';
 import { validateOwner } from '../../util/validateOwner';
+import { TrackOptions } from '../server_analytics_controller';
 import { ServerGroupsController } from '../server_groups_controller';
 
 const MAX_GROUPS_PER_COMMUNITY = 20;
 
+// FIXME: validation errors
 const Errors = {
   InvalidMetadata: 'Invalid metadata',
   InvalidRequirements: 'Invalid requirements',
@@ -21,6 +26,7 @@ const Errors = {
   InvalidTopics: 'Invalid topics',
 };
 
+// FIXME: the schema
 export type CreateGroupOptions = {
   user: UserInstance;
   community: CommunityInstance;
@@ -30,29 +36,33 @@ export type CreateGroupOptions = {
   topics?: number[];
 };
 
-export type CreateGroupResult = GroupAttributes;
+// FIXME: should be partial of the aggregate
+export type CreateGroupResult = [GroupAttributes, TrackOptions];
 
 export async function __createGroup(
   this: ServerGroupsController,
   { user, community, metadata, requirements, topics }: CreateGroupOptions,
 ): Promise<CreateGroupResult> {
+  // FIXME: authorization
   const isAdmin = await validateOwner({
     models: this.models,
     user,
     communityId: community.id,
     allowMod: true,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError(Errors.Unauthorized);
   }
 
+  // FIXME: validation
   const metadataValidationErr = validateMetadata(metadata);
   if (metadataValidationErr) {
     throw new AppError(`${Errors.InvalidMetadata}: ${metadataValidationErr}`);
   }
 
+  // FIXME: validation
   const requirementsValidationErr = validateRequirements(requirements);
   if (requirementsValidationErr) {
     throw new AppError(
@@ -60,6 +70,7 @@ export async function __createGroup(
     );
   }
 
+  // FIXME: invariant
   const numCommunityGroups = await this.models.Group.count({
     where: {
       community_id: community.id,
@@ -74,7 +85,7 @@ export async function __createGroup(
       id: {
         [Op.in]: topics || [],
       },
-      chain_id: community.id,
+      community_id: community.id,
     },
   });
   if (topics?.length > 0 && topics.length !== topicsToAssociate.length) {
@@ -117,5 +128,12 @@ export async function __createGroup(
     },
   );
 
-  return newGroup;
+  // FIXME: move to middleware
+  const analyticsOptions = {
+    event: MixpanelCommunityInteractionEvent.CREATE_GROUP,
+    community: community.id,
+    userId: user.id,
+  };
+
+  return [newGroup, analyticsOptions];
 }

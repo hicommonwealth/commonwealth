@@ -1,6 +1,6 @@
+import { AppError } from '@hicommonwealth/core';
+import { TopicAttributes } from '@hicommonwealth/model';
 import z from 'zod';
-import { AppError } from '../../../../common-common/src/errors';
-import { TopicAttributes } from '../../models/topic';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -18,11 +18,10 @@ type UpdateTopicResponse = TopicAttributes;
 export const updateTopicHandler = async (
   controllers: ServerControllers,
   req: TypedRequest<UpdateTopicRequestBody, null, UpdateTopicRequestParams>,
-  res: TypedResponse<UpdateTopicResponse>
+  res: TypedResponse<UpdateTopicResponse>,
 ) => {
   const {
     user,
-    chain: community,
     params: { topicId },
     body,
   } = req;
@@ -31,13 +30,11 @@ export const updateTopicHandler = async (
     id: z.coerce.number(),
     name: z.string().optional(),
     description: z.string().optional(),
-    token_threshold: z.string().optional(),
-    featured_in_sidebar: z.coerce.boolean().optional(),
+    featured_in_sidebar: z.coerce.boolean().nullable().optional(),
     featured_in_new_post: z.coerce.boolean().optional(),
-    default_offchain_template: z.string().optional(),
+    default_offchain_template: z.string().nullable().optional(),
     telegram: z.string().nullable().optional(),
     group_ids: z.array(z.number()).optional(),
-    chain_id: z.string().optional(),
   });
 
   const validationResult = validationSchema.safeParse({
@@ -46,15 +43,16 @@ export const updateTopicHandler = async (
   });
   if (validationResult.success === false) {
     throw new AppError(
-      `${Errors.ValidationError}: ${validationResult.error.message}`
+      `${Errors.ValidationError}: ${validationResult.error.message}`,
     );
   }
 
-  const topic = await controllers.topics.updateTopic({
+  const [topic, analyticsOptions] = await controllers.topics.updateTopic({
     user,
-    community,
     body: validationResult.data,
   });
+
+  controllers.analytics.track(analyticsOptions, req).catch(console.error);
 
   return success(res, topic);
 };

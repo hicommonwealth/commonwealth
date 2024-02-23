@@ -1,33 +1,33 @@
 import { Op } from 'sequelize';
 
-import { AppError } from 'common-common/src/errors';
-import { factory, formatFilename } from 'common-common/src/logging';
 import {
+  AppError,
   ChainBase,
+  DynamicTemplate,
   NotificationCategories,
   WalletId,
   WalletSsoSource,
-} from 'common-common/src/types';
+  logger,
+} from '@hicommonwealth/core';
+import type {
+  CommunityInstance,
+  DB,
+  ProfileAttributes,
+} from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
-import { DynamicTemplate } from '../../shared/types';
 import { addressSwapper } from '../../shared/utils';
-import type { DB } from '../models';
-import type { CommunityInstance } from '../models/community';
-import type { ProfileAttributes } from '../models/profile';
+import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import assertAddressOwnership from '../util/assertAddressOwnership';
 import verifySessionSignature from '../util/verifySessionSignature';
 
-import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
-
-const log = factory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');
 export const Errors = {
   NoChain: 'Must provide chain',
-  InvalidChain: 'Invalid chain',
+  InvalidCommunity: 'Invalid community',
   AddressNF: 'Address not found',
   ExpiredToken: 'Token has expired, please re-register',
   InvalidSignature: 'Invalid signature, please re-register',
@@ -41,7 +41,7 @@ export const Errors = {
 
 const processAddress = async (
   models: DB,
-  chain: CommunityInstance,
+  community: CommunityInstance,
   chain_id: string | number,
   address: string,
   wallet_id: WalletId,
@@ -50,12 +50,12 @@ const processAddress = async (
   user: Express.User,
   sessionAddress: string | null,
   sessionIssued: string | null,
-  sessionBlockInfo: string | null
+  sessionBlockInfo: string | null,
 ): Promise<void> => {
   const addressInstance = await models.Address.scope('withPrivateData').findOne(
     {
-      where: { community_id: chain.id, address },
-    }
+      where: { community_id: community.id, address },
+    },
   );
   if (!addressInstance) {
     throw new AppError(Errors.AddressNF);
@@ -76,14 +76,14 @@ const processAddress = async (
   try {
     const valid = await verifySessionSignature(
       models,
-      chain,
+      community,
       chain_id,
       addressInstance,
       user ? user.id : null,
       signature,
       sessionAddress,
       sessionIssued,
-      sessionBlockInfo
+      sessionBlockInfo,
     );
     if (!valid) {
       throw new AppError(Errors.InvalidSignature);
@@ -154,7 +154,7 @@ const processAddress = async (
           user_id: { [Op.ne]: addressInstance.user_id },
           verified: { [Op.ne]: null },
         },
-      }
+      },
     );
 
     try {
@@ -171,12 +171,12 @@ const processAddress = async (
         templateId: DynamicTemplate.VerifyAddress,
         dynamic_template_data: {
           address,
-          chain: chain.name,
+          chain: community.name,
         },
       };
       await sgMail.send(msg);
       log.info(
-        `Sent address move email: ${address} transferred to a new account`
+        `Sent address move email: ${address} transferred to a new account`,
       );
     } catch (e) {
       log.error(`Could not send address move email for: ${address}`);
@@ -188,17 +188,17 @@ const verifyAddress = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
-  if (!req.body.chain || !req.body.chain_id) {
+  if (!req.body.community_id || !req.body.chain_id) {
     throw new AppError(Errors.NoChain);
   }
-  const chain = await models.Community.findOne({
-    where: { id: req.body.chain },
+  const community = await models.Community.findOne({
+    where: { id: req.body.community_id },
   });
   const chain_id = req.body.chain_id;
-  if (!chain) {
-    return next(new AppError(Errors.InvalidChain));
+  if (!community) {
+    return next(new AppError(Errors.InvalidCommunity));
   }
 
   if (!req.body.address || !req.body.signature) {
@@ -206,16 +206,16 @@ const verifyAddress = async (
   }
 
   const address =
-    chain.base === ChainBase.Substrate
+    community.base === ChainBase.Substrate
       ? addressSwapper({
           address: req.body.address,
-          currentPrefix: chain.ss58_prefix,
+          currentPrefix: community.ss58_prefix,
         })
       : req.body.address;
 
   await processAddress(
     models,
-    chain,
+    community,
     chain_id,
     address,
     req.body.wallet_id,
@@ -224,7 +224,7 @@ const verifyAddress = async (
     req.user,
     req.body.session_public_address,
     req.body.session_timestamp || null, // disallow empty strings
-    req.body.session_block_data || null // disallow empty strings
+    req.body.session_block_data || null, // disallow empty strings
   );
 
   // assertion check
@@ -239,7 +239,7 @@ const verifyAddress = async (
   } else {
     // if user isn't logged in, log them in now
     const newAddress = await models.Address.findOne({
-      where: { community_id: req.body.chain, address },
+      where: { community_id: req.body.community_id, address },
     });
     const user = await models.User.scope('withPrivateData').findOne({
       where: { id: newAddress.user_id },
@@ -250,18 +250,17 @@ const verifyAddress = async (
         serverAnalyticsController.track(
           {
             event: MixpanelLoginEvent.LOGIN_FAILED,
-            isCustomDomain: null,
           },
-          req
+          req,
         );
         return next(err);
       }
       serverAnalyticsController.track(
         {
           event: MixpanelLoginEvent.LOGIN_COMPLETED,
-          isCustomDomain: null,
+          userId: user.id,
         },
-        req
+        req,
       );
 
       return res.json({

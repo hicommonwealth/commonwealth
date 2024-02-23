@@ -1,4 +1,5 @@
-import { DB } from 'server/models';
+import { DB } from '@hicommonwealth/model';
+
 import {
   DeletePollOptions,
   DeletePollResult,
@@ -9,7 +10,6 @@ import {
   GetPollVotesResult,
   __getPollVotes,
 } from './server_polls_methods/get_poll_votes';
-import { TokenBalanceCache } from '../../../token-balance-cache/src';
 import {
   UpdatePollVoteOptions,
   UpdatePollVoteResult,
@@ -21,20 +21,20 @@ import {
  *
  */
 export class ServerPollsController {
-  constructor(public models: DB, public tokenBalanceCache: TokenBalanceCache) {}
+  constructor(public models: DB) {}
 
   async deletePoll(options: DeletePollOptions): Promise<DeletePollResult> {
     return __deletePoll.call(this, options);
   }
 
   async getPollVotes(
-    options: GetPollVotesOptions
+    options: GetPollVotesOptions,
   ): Promise<GetPollVotesResult> {
     return __getPollVotes.call(this, options);
   }
 
   async updatePollVote(
-    options: UpdatePollVoteOptions
+    options: UpdatePollVoteOptions,
   ): Promise<UpdatePollVoteResult> {
     return __updatePollVote.call(this, options);
   }

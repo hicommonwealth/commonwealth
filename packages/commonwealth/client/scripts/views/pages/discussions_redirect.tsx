@@ -1,13 +1,15 @@
+/* eslint-disable react/function-component-definition */
 import React, { useEffect } from 'react';
 import { NavigateOptions } from 'react-router-dom';
 
-import app from 'state';
-import { PageLoading } from './loading';
-import { DefaultPage } from 'common-common/src/types';
+import { DefaultPage } from '@hicommonwealth/core';
 import { useCommonNavigate } from 'navigation/helpers';
-import { featureFlags } from 'helpers/feature-flags';
+import app from 'state';
+import { useFlag } from '../../hooks/useFlag';
+import { PageLoading } from './loading';
 
 export default function DiscussionsRedirect() {
+  const communityHomepageEnabled = useFlag('communityHomepage');
   const navigate = useCommonNavigate();
 
   useEffect(() => {
@@ -16,7 +18,7 @@ export default function DiscussionsRedirect() {
     const { defaultPage, defaultOverview, hasHomepage } = app.chain.meta;
     let view;
 
-    if (featureFlags.communityHomepage && hasHomepage) {
+    if (communityHomepageEnabled && hasHomepage) {
       view = defaultPage;
     } else {
       view = defaultOverview ? DefaultPage.Overview : DefaultPage.Discussions;

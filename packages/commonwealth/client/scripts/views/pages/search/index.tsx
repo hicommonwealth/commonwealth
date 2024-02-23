@@ -4,10 +4,13 @@ import { capitalize } from 'lodash';
 import {
   SearchScope,
   SearchSort,
-  VALID_SEARCH_SCOPES
+  VALID_SEARCH_SCOPES,
 } from 'models/SearchQuery';
 import 'pages/search/index.scss';
+import useSidebarStore from 'state/ui/sidebar';
+import { Breadcrumbs } from '../../components/Breadcrumbs';
 
+import useWindowResize from 'hooks/useWindowResize';
 import React, { useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
@@ -15,7 +18,7 @@ import app from 'state';
 import { PageLoading } from 'views/pages/loading';
 import {
   APIOrderBy,
-  APIOrderDirection
+  APIOrderDirection,
 } from '../../../../scripts/helpers/constants';
 import { useSearchChainsQuery } from '../../../../scripts/state/api/chains';
 import { useSearchCommentsQuery } from '../../../../scripts/state/api/comments';
@@ -26,19 +29,19 @@ import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWText } from '../../components/component_kit/cw_text';
 import {
   CWTab,
-  CWTabsRow
+  CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
 import { renderSearchResults } from './helpers';
 
 const VISIBLE_TABS = VALID_SEARCH_SCOPES.filter(
-  (scope) => ![SearchScope.All, SearchScope.Proposals].includes(scope)
+  (scope) => ![SearchScope.All, SearchScope.Proposals].includes(scope),
 );
 
 // maps client-side sort options to server-side sort options
 const SORT_MAP: Record<string, [APIOrderBy, APIOrderDirection]> = {
   Best: [APIOrderBy.Rank, APIOrderDirection.Desc],
   Newest: [APIOrderBy.CreatedAt, APIOrderDirection.Desc],
-  Oldest: [APIOrderBy.CreatedAt, APIOrderDirection.Asc]
+  Oldest: [APIOrderBy.CreatedAt, APIOrderDirection.Asc],
 };
 const DEFAULT_SORT_OPTIONS = SORT_MAP.Best;
 
@@ -52,10 +55,15 @@ type SearchQueryParams = {
 const SearchPage = () => {
   const navigate = useNavigate();
   const commonNavigate = useCommonNavigate();
+  const { setMenu } = useSidebarStore();
 
   const location = useLocation();
   const [urlQueryParams] = useSearchParams();
   const [bottomRef, bottomInView] = useInView();
+
+  const { toggleMobileView } = useWindowResize({
+    setMenu,
+  });
 
   const queryParams = useMemo(() => {
     return Object.fromEntries(urlQueryParams.entries()) as SearchQueryParams;
@@ -76,7 +84,7 @@ const SearchPage = () => {
     newQueryParams.set('tab', newTab);
     navigate({
       pathname: location.pathname,
-      search: `?${newQueryParams.toString()}`
+      search: `?${newQueryParams.toString()}`,
     });
   };
 
@@ -85,7 +93,7 @@ const SearchPage = () => {
     newQueryParams.set('communityScope', 'all_communities');
     navigate({
       pathname: location.pathname,
-      search: `?${newQueryParams.toString()}`
+      search: `?${newQueryParams.toString()}`,
     });
   };
 
@@ -95,7 +103,7 @@ const SearchPage = () => {
     newQueryParams.set('sort', sort);
     navigate({
       pathname: location.pathname,
-      search: `?${newQueryParams.toString()}`
+      search: `?${newQueryParams.toString()}`,
     });
   };
 
@@ -103,52 +111,52 @@ const SearchPage = () => {
     SORT_MAP[queryParams.sort] || DEFAULT_SORT_OPTIONS;
 
   const sharedQueryOptions = {
-    chainId: app.activeChainId() || 'all_communities',
+    communityId: community,
     searchTerm: queryParams.q,
     limit: 20,
     orderBy,
-    orderDirection
+    orderDirection,
   };
 
   const {
     data: threadsData,
     error: threadsError,
     fetchNextPage: threadsFetchNextPage,
-    isLoading: threadsIsLoading
+    isLoading: threadsIsLoading,
   } = useSearchThreadsQuery({
     ...sharedQueryOptions,
-    enabled: activeTab === SearchScope.Threads
+    enabled: activeTab === SearchScope.Threads,
   });
 
   const {
     data: commentsData,
     error: commentsError,
     fetchNextPage: commentsFetchNextPage,
-    isLoading: commentsIsLoading
+    isLoading: commentsIsLoading,
   } = useSearchCommentsQuery({
     ...sharedQueryOptions,
-    enabled: activeTab === SearchScope.Replies
+    enabled: activeTab === SearchScope.Replies,
   });
 
   const {
     data: communityData,
     error: communityError,
     fetchNextPage: chainsFetchNextPage,
-    isLoading: communityIsLoading
+    isLoading: communityIsLoading,
   } = useSearchChainsQuery({
     ...sharedQueryOptions,
-    enabled: activeTab === SearchScope.Communities
+    enabled: activeTab === SearchScope.Communities,
   });
 
   const {
     data: profilesData,
     error: profilesError,
     fetchNextPage: profilesFetchNextPage,
-    isLoading: profilesIsLoading
+    isLoading: profilesIsLoading,
   } = useSearchProfilesQuery({
     ...sharedQueryOptions,
     includeRoles: true,
-    enabled: activeTab === SearchScope.Members
+    enabled: activeTab === SearchScope.Members,
   });
 
   const results = useMemo(() => {
@@ -239,7 +247,7 @@ const SearchPage = () => {
     threadsFetchNextPage,
     commentsFetchNextPage,
     chainsFetchNextPage,
-    profilesFetchNextPage
+    profilesFetchNextPage,
   ]);
 
   const isLoading = useMemo(() => {
@@ -260,11 +268,12 @@ const SearchPage = () => {
     communityIsLoading,
     commentsIsLoading,
     profilesIsLoading,
-    threadsIsLoading
+    threadsIsLoading,
   ]);
 
   return (
     <div className="SearchPage">
+      {toggleMobileView && <Breadcrumbs />}
       <div className="search-results">
         <div className="cw-tabs-row-container">
           <CWTabsRow>
@@ -297,7 +306,7 @@ const SearchPage = () => {
               </CWText>
               {VISIBLE_TABS.length > 0 &&
                 [SearchScope.Threads, SearchScope.Replies].includes(
-                  activeTab
+                  activeTab,
                 ) && (
                   <div className="search-results-filters">
                     <CWText type="h5">Sort By:</CWText>
@@ -306,21 +315,21 @@ const SearchPage = () => {
                       onSelect={handleSortChange}
                       initialValue={{
                         label: queryParams.sort,
-                        value: queryParams.sort
+                        value: queryParams.sort,
                       }}
                       options={Object.keys(SearchSort).map((k) => ({
                         label: k,
-                        value: k
+                        value: k,
                       }))}
                     />
                   </div>
                 )}
               <div className="search-results-list">
                 {renderSearchResults(
-                  results as any,
+                  results,
                   queryParams.q,
                   activeTab,
-                  commonNavigate
+                  commonNavigate,
                 )}
                 <div ref={bottomRef}></div>
               </div>

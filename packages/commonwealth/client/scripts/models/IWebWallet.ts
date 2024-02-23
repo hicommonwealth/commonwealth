@@ -1,9 +1,5 @@
 import type { SessionPayload } from '@canvas-js/interfaces';
-import type {
-  ChainBase,
-  ChainNetwork,
-  WalletId,
-} from 'common-common/src/types';
+import type { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
 
 import type Account from './Account';
 import type BlockInfo from './BlockInfo';
@@ -16,7 +12,7 @@ interface IWebWallet<AccountT extends { address: string } | string> {
   enabling: boolean;
   accounts: readonly AccountT[];
   api?: any;
-  enable: () => Promise<void>;
+  enable: (forceChainId?: string) => Promise<void>;
   reset?: () => Promise<void>;
 
   getChainId(): string | null;
@@ -25,8 +21,10 @@ interface IWebWallet<AccountT extends { address: string } | string> {
 
   signCanvasMessage(
     account: Account,
-    canvasSessionPayload: SessionPayload
+    canvasSessionPayload: SessionPayload,
   ): Promise<string>;
+
+  switchNetwork?(chainId?: string): Promise<void>;
 
   chain: ChainBase;
   defaultNetwork: ChainNetwork;

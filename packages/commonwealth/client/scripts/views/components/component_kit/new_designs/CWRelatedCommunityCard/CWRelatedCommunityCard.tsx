@@ -1,7 +1,12 @@
 import type ChainInfo from 'client/scripts/models/ChainInfo';
 import { isCommandClick, pluralizeWithoutNumberPrefix } from 'helpers';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback } from 'react';
+import {
+  MixpanelClickthroughEvent,
+  MixpanelClickthroughPayload,
+} from '../../../../../../../shared/analytics/types';
 import { CWCommunityAvatar } from '../../cw_community_avatar';
 import { CWIcon } from '../../cw_icons/cw_icon';
 import { CWText } from '../../cw_text';
@@ -34,16 +39,24 @@ export const CWRelatedCommunityCard = ({
     name: communityName,
   } as ChainInfo;
 
+  const { trackAnalytics } =
+    useBrowserAnalyticsTrack<MixpanelClickthroughPayload>({
+      onAction: true,
+    });
+
   const handleClick = useCallback(
     (e, communityId: string) => {
       e.preventDefault();
+      trackAnalytics({
+        event: MixpanelClickthroughEvent.DIRECTORY_TO_COMMUNITY_PAGE,
+      });
       if (isCommandClick(e)) {
         window.open(`/${communityId}`, '_blank');
         return;
       }
       navigateToCommunity({ navigate, path: '', chain: communityId });
     },
-    [navigate]
+    [navigate, trackAnalytics],
   );
 
   return (

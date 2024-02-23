@@ -1,38 +1,42 @@
+import { IconSize } from 'views/components/component_kit/cw_icons/types';
 import type ChainInfo from '../../../models/ChainInfo';
 import type { IconName } from './cw_icons/cw_icon_lookup';
-import { IconSize } from 'views/components/component_kit/cw_icons/types';
 
 export enum ComponentType {
   AccountCreationButton = 'AccountCreationButton',
-  AddressTooltip = 'AddressTooltip',
   Avatar = 'Avatar',
   AvatarUpload = 'AvatarUpload',
   Banner = 'Banner',
   Breadcrumbs = 'Breadcrumbs',
   Button = 'Button',
-  ButtonGroup = 'ButtonGroup',
   Card = 'Card',
   Checkbox = 'Checkbox',
+  CircleButton = 'CircleButton',
+  CircleSpinner = 'CircleSpinner',
   Collapsible = 'Collapsible',
   CommunityAvatar = 'CommunityAvatar',
+  CommunitySelector = 'CommunitySelector',
   ContentPage = 'ContentPage',
   CustomIcon = 'CustomIcon',
   Divider = 'Divider',
+  Drawer = 'Drawer',
   Form = 'Form',
   FormSection = 'FormSection',
+  FormSteps = 'FormSteps',
   FilterMenu = 'FilterMenu',
-  GradientButton = 'GradientButton',
   Growl = 'Growl',
+  Grid = 'Grid',
   Icon = 'Icon',
   IconButton = 'IconButton',
   Label = 'Label',
+  LoadingSpinner = 'LoadingSpinner',
   MessageBanner = 'MessageBanner',
-  MobileMenu = 'MobileMenu',
   Modal = 'CWModal',
+  ModalSelectButton = 'ModalSelectButton',
   OldTextInput = 'OldTextInput',
-  OldTooltip = 'OldTooltip',
-  Popover = 'Popover',
+  PageLayout = 'PageLayout',
   PopoverMenu = 'PopoverMenu',
+  Popover = 'Popover',
   ProgressBar = 'ProgressBar',
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',
@@ -42,8 +46,6 @@ export enum ComponentType {
   Socials = 'Socials',
   Spinner = 'Spinner',
   Tab = 'Tab',
-  TabDeprecated = 'TabDeprecated',
-  TabBar = 'TabBar',
   Table = 'Table',
   Tag = 'Tag',
   Text = 'Text',
@@ -86,6 +88,7 @@ export type DefaultMenuItem = {
   type?: 'default';
   className?: string;
   preventClosing?: boolean;
+  isButton?: boolean;
 };
 
 type NotificationMenuItem = {

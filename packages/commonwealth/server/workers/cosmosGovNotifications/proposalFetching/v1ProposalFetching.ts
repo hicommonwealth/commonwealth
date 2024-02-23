@@ -1,16 +1,16 @@
-import { CommunityInstance } from '../../../models/community';
 import {
+  GovV1Client,
+  PageRequest,
   ProposalSDKType,
   ProposalStatus,
-} from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
-import { LCDQueryClient as GovV1Client } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/query.lcd';
-import { PageRequest } from 'common-common/src/cosmos-ts/src/codegen/cosmos/base/query/v1beta1/pagination';
-import { numberToLong } from 'common-common/src/cosmos-ts/src/codegen/helpers';
-import { factory, formatFilename } from 'common-common/src/logging';
+  numberToLong,
+} from '@hicommonwealth/chains';
+import { logger } from '@hicommonwealth/core';
+import { CommunityInstance } from '@hicommonwealth/model';
 import { getCosmosClient } from './getCosmosClient';
 import { numberToUint8ArrayBE, uint8ArrayToNumberBE } from './util';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 /**
  * Fetches the most recent (latest) proposal from a Cosmos chain that uses the v1 gov module. Depending on the
@@ -18,7 +18,7 @@ const log = factory.getLogger(formatFilename(__filename));
  * See /gov/v1beta1/proposals at https://v1.cosmos.network/rpc/v0.45.1 for more details on pagination values.
  */
 export async function fetchLatestCosmosProposalV1(
-  chain: CommunityInstance
+  chain: CommunityInstance,
 ): Promise<ProposalSDKType[]> {
   const client = await getCosmosClient<GovV1Client>(chain);
   let nextKey: Uint8Array, finalProposalsPage: ProposalSDKType[];
@@ -40,13 +40,19 @@ export async function fetchLatestCosmosProposalV1(
         }
       } else nextKey = pagination.next_key;
     }
+
+    // TODO: temp fix to handle chains that return nextKey as a string instead of Uint8Array
+    // Our v1 API needs to handle this better. To be addressed in #6610
+    if (typeof nextKey === 'string') {
+      nextKey = new Uint8Array(Buffer.from(nextKey, 'base64'));
+    }
   } while (uint8ArrayToNumberBE(nextKey) > 0);
 
   if (finalProposalsPage.length > 0) {
     log.info(
       `Fetched proposal ${
         finalProposalsPage[finalProposalsPage.length - 1].id
-      } from ${chain.id}`
+      } from ${chain.id}`,
     );
     return [finalProposalsPage[finalProposalsPage.length - 1]];
   } else return [];
@@ -59,7 +65,7 @@ export async function fetchLatestCosmosProposalV1(
  */
 export async function fetchUpToLatestCosmosProposalV1(
   proposalId: number,
-  chain: CommunityInstance
+  chain: CommunityInstance,
 ): Promise<ProposalSDKType[]> {
   const client = await getCosmosClient<GovV1Client>(chain);
 
@@ -72,7 +78,7 @@ export async function fetchUpToLatestCosmosProposalV1(
       });
       proposal = result.proposal;
     } catch (e) {
-      if (!e.message.includes('rpc error: code = NotFound')) {
+      if (!e.message.includes('Request failed with status code 404')) {
         throw e;
       }
     }

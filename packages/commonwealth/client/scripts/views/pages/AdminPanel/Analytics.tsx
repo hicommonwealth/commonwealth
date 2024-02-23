@@ -5,41 +5,39 @@ import 'pages/AdminPanel.scss';
 import React, { useState } from 'react';
 import app from 'state';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
+import CWLoadingSpinner from '../../components/component_kit/new_designs/CWLoadingSpinner';
+
+type Stats = {
+  numCommentsLastMonth: number;
+  numThreadsLastMonth: number;
+  numPollsLastMonth: number;
+  numReactionsLastMonth: number;
+  numProposalVotesLastMonth: number;
+  numMembersLastMonth: number;
+  numGroupsLastMonth: number;
+  averageAddressesPerCommunity: number;
+  populatedCommunities: number;
+};
 
 const Analytics = () => {
   const [initialized, setInitialized] = useState<boolean>(false);
   const [lastMonthNewCommunties, setLastMonthNewCommunities] = useState<
     string[]
   >([]);
-  const [globalStats, setGlobalStats] = useState<{
-    numCommentsLastMonth: number;
-    numThreadsLastMonth: number;
-    numPollsLastMonth: number;
-    numReactionsLastMonth: number;
-    numProposalVotesLastMonth: number;
-    numMembersLastMonth: number;
-  }>();
+  const [globalStats, setGlobalStats] = useState<Stats>();
   const [communityLookupValue, setCommunityLookupValue] = useState<string>('');
   const [communityLookupValidated, setCommunityLookupValidated] =
     useState<boolean>(false);
   const [communityLookupCompleted, setCommunityLookupCompleted] =
     useState<boolean>(false);
-  const [communityAnalytics, setCommunityAnalytics] = useState<{
-    numCommentsLastMonth: number;
-    numThreadsLastMonth: number;
-    numPollsLastMonth: number;
-    numReactionsLastMonth: number;
-    numProposalVotesLastMonth: number;
-    numMembersLastMonth: number;
-  }>();
+  const [communityAnalytics, setCommunityAnalytics] = useState<Stats>();
 
   const getCommunityAnalytics = async (communityId: string) => {
     axios
-      .get(`${app.serverUrl()}/communities/${communityId}/stats`, {
+      .get(`${app.serverUrl()}/admin/analytics?community_id=${communityId}`, {
         params: {
           auth: true,
           jwt: app.user.jwt,
@@ -47,7 +45,7 @@ const Analytics = () => {
       })
       .then((response) => {
         setCommunityLookupCompleted(true);
-        setCommunityAnalytics(response.data.result);
+        setCommunityAnalytics(response.data.result.totalStats);
       })
       .catch((error) => {
         console.log(error);
@@ -59,9 +57,10 @@ const Analytics = () => {
     // Fetch global analytics on load
     const fetchAnalytics = async () => {
       axios
-        .get(`${app.serverUrl()}/adminAnalytics`, {
-          headers: {
-            'content-type': 'application/json',
+        .get(`${app.serverUrl()}/admin/analytics`, {
+          params: {
+            auth: true,
+            jwt: app.user.jwt,
           },
         })
         .then((response) => {
@@ -103,7 +102,7 @@ const Analytics = () => {
   return (
     <div className="Analytics">
       {!initialized ? (
-        <CWSpinner />
+        <CWLoadingSpinner />
       ) : (
         <>
           <div className="AnalyticsSection">
@@ -147,6 +146,28 @@ const Analytics = () => {
                 <CWText fontWeight="medium">Total New Addresses</CWText>
                 <CWText className="StatValue">
                   {globalStats?.numMembersLastMonth}
+                </CWText>
+              </div>
+              <div className="Stat">
+                <CWText fontWeight="medium">Total New Groups</CWText>
+                <CWText className="StatValue">
+                  {globalStats?.numGroupsLastMonth}
+                </CWText>
+              </div>
+              <div className="Stat">
+                <CWText fontWeight="medium">
+                  Average Addresses Per Community
+                </CWText>
+                <CWText className="StatValue">
+                  {Math.round(globalStats?.averageAddressesPerCommunity)}
+                </CWText>
+              </div>
+              <div className="Stat">
+                <CWText fontWeight="medium">
+                  {'Total Communities with > 2 addresses'}
+                </CWText>
+                <CWText className="StatValue">
+                  {Math.round(globalStats?.populatedCommunities)}
                 </CWText>
               </div>
             </div>
@@ -208,6 +229,12 @@ const Analytics = () => {
                   <CWText fontWeight="medium">Total New Addresses</CWText>
                   <CWText className="StatValue">
                     {communityAnalytics?.numMembersLastMonth}
+                  </CWText>
+                </div>
+                <div className="Stat">
+                  <CWText fontWeight="medium">Total New Groups</CWText>
+                  <CWText className="StatValue">
+                    {communityAnalytics?.numGroupsLastMonth}
                   </CWText>
                 </div>
               </div>

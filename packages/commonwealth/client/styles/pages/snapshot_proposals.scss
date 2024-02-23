@@ -7,6 +7,17 @@
   gap: 16px;
   padding: 24px;
 
+  .header {
+    padding-top: 32px;
+
+    @include small {
+      padding-top: 14px;
+    }
+    @include extraSmall {
+      padding-top: 0px;
+    }
+  }
+
   .top-bar {
     display: flex;
     flex-direction: row;

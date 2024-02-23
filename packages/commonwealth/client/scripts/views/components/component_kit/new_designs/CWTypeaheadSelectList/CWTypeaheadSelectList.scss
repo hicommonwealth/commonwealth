@@ -1,10 +1,11 @@
 @import '../../../../../../styles/shared';
 
 .TypeaheadSelectList {
-  .SelectList {
+  .CWSelectList .SelectList {
     @include inputStyles;
     font-family: $font-family-neue-haas-unica;
-    border-radius: $border-radius-corners-wider;
+    max-height: none;
+    padding: 0;
 
     &.disabled {
       .tasl__control {
@@ -31,14 +32,11 @@
 
       .tasl__value-container {
         padding: 0;
+        max-width: none;
+        line-height: 16px;
 
         .tasl__single-value {
           margin: 0;
-        }
-
-        .tasl__input-container {
-          margin: 0;
-          padding: 0;
         }
       }
 
@@ -47,38 +45,28 @@
           padding: 0px;
           color: $neutral-800;
         }
-
-        .tasl__indicator-separator {
-          display: none;
-        }
       }
     }
 
     .tasl__menu {
+      border: none;
+      box-shadow: $elevation-4;
+
       .tasl__menu-list {
-        @include scrollbarStyles;
+        border: 1px solid $neutral-200;
+        border-radius: $border-radius-corners-wider;
+        padding: 8px 0;
 
         .tasl__option {
           padding: 0 8px;
           background-color: #fff;
+          border-radius: 0;
+          margin-bottom: 0;
 
           .text-container {
             padding: 10px 12px;
             border-radius: $border-radius-corners-wider;
-          }
-
-          &.tasl__option--is-focused {
-            .text-container {
-              background-color: $neutral-100;
-              color: $neutral-800;
-            }
-          }
-        }
-
-        .tasl__option--is-selected {
-          .text-container {
-            background-color: $neutral-50;
-            color: $neutral-800;
+            font-size: 14px;
           }
         }
       }

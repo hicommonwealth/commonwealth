@@ -1,32 +1,41 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Session } from '@canvas-js/interfaces';
-import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
+import {
+  ChainBase,
+  NotificationCategories,
+  ServerError,
+  WalletId,
+  WalletSsoSource,
+  logger,
+} from '@hicommonwealth/core';
+import type {
+  DB,
+  ProfileAttributes,
+  ProfileInstance,
+} from '@hicommonwealth/model';
+import {
+  AddressAttributes,
+  AddressInstance,
+  CommunityInstance,
+  SsoTokenInstance,
+  UserAttributes,
+  UserInstance,
+  sequelize,
+} from '@hicommonwealth/model';
+import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import { verify } from 'jsonwebtoken';
 import passport from 'passport';
 import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
 import { Op, Transaction } from 'sequelize';
-
-import { ServerError } from 'common-common/src/errors';
-import { factory, formatFilename } from 'common-common/src/logging';
-import {
-  ChainBase,
-  NotificationCategories,
-  WalletId,
-  WalletSsoSource,
-} from 'common-common/src/types';
+import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { verify as verifyCanvas } from '../../shared/canvas/verify';
 import { JWT_SECRET, MAGIC_API_KEY } from '../config';
-import { sequelize } from '../database';
+import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { validateCommunity } from '../middleware/validateCommunity';
-import type { DB } from '../models';
-import { AddressAttributes, AddressInstance } from '../models/address';
-import { CommunityInstance } from '../models/community';
-import type { ProfileAttributes, ProfileInstance } from '../models/profile';
-import { SsoTokenInstance } from '../models/sso_token';
-import { UserAttributes, UserInstance } from '../models/user';
 import { TypedRequestBody } from '../types';
 import { createRole } from '../util/roles';
 
-const log = factory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 type MagicLoginContext = {
   models: DB;
@@ -40,7 +49,6 @@ type MagicLoginContext = {
 };
 
 const DEFAULT_ETH_CHAIN = 'ethereum';
-const DEFAULT_COSMOS_CHAIN = 'osmosis';
 
 // Creates a trusted address in a community
 async function createMagicAddressInstances(
@@ -48,11 +56,14 @@ async function createMagicAddressInstances(
   generatedAddresses: Array<{ address: string; chain: string }>,
   user: UserAttributes,
   walletSsoSource: WalletSsoSource,
+  decodedMagicToken: MagicUser,
   t?: Transaction,
 ): Promise<AddressInstance[]> {
   const addressInstances: AddressInstance[] = [];
   const user_id = user.id;
   const profile_id = (user.Profiles[0] as ProfileAttributes).id;
+  const serverAnalyticsController = new ServerAnalyticsController();
+
   for (const { chain, address } of generatedAddresses) {
     const [addressInstance, created] = await models.Address.findOrCreate({
       where: {
@@ -63,7 +74,7 @@ async function createMagicAddressInstances(
       defaults: {
         user_id,
         profile_id,
-        verification_token: 'MAGIC',
+        verification_token: decodedMagicToken.claim.tid, // to prevent re-use
         verification_token_expires: null,
         verified: new Date(), // trust addresses from magic
         last_active: new Date(),
@@ -84,14 +95,26 @@ async function createMagicAddressInstances(
     // xx: ?
     if (created) {
       await createRole(models, addressInstance.id, chain, 'member', false, t);
-    } else if (
-      addressInstance.wallet_sso_source === WalletSsoSource.Unknown ||
-      // set wallet_sso_source if it was unknown before
-      addressInstance.wallet_sso_source === undefined ||
-      addressInstance.wallet_sso_source === null
-    ) {
-      addressInstance.wallet_sso_source = walletSsoSource;
-      addressInstance.save({ transaction: t });
+
+      serverAnalyticsController.track({
+        community: chain,
+        userId: user_id,
+        event: MixpanelCommunityInteractionEvent.JOIN_COMMUNITY,
+      });
+    } else {
+      // Update used magic token to prevent replay attacks
+      addressInstance.verification_token = decodedMagicToken.claim.tid;
+
+      if (
+        addressInstance.wallet_sso_source === WalletSsoSource.Unknown ||
+        // set wallet_sso_source if it was unknown before
+        addressInstance.wallet_sso_source === undefined ||
+        addressInstance.wallet_sso_source === null
+      ) {
+        addressInstance.wallet_sso_source = walletSsoSource;
+      }
+
+      await addressInstance.save({ transaction: t });
     }
     addressInstances.push(addressInstance);
   }
@@ -136,6 +159,7 @@ async function createNewMagicUser({
         generatedAddresses,
         newUser,
         walletSsoSource,
+        decodedMagicToken,
         transaction,
       );
 
@@ -256,6 +280,7 @@ async function loginExistingMagicUser({
       generatedAddresses,
       existingUserInstance,
       walletSsoSource,
+      decodedMagicToken,
       transaction,
     );
 
@@ -303,6 +328,7 @@ async function mergeLogins(ctx: MagicLoginContext): Promise<UserInstance> {
     {
       user_id: loggedInUser.id,
       profile_id: loggedInUser.Profiles[0].id,
+      verification_token: ctx.decodedMagicToken.claim.tid,
     },
     {
       where: {
@@ -332,6 +358,7 @@ async function addMagicToUser({
     generatedAddresses,
     loggedInUser,
     walletSsoSource,
+    decodedMagicToken,
   );
 
   // create new token with provided user/address. contract is each address owns an SsoToken.
@@ -379,6 +406,25 @@ async function magicLoginRoute(
   // canonical address is always ethereum
   const canonicalAddress = decodedMagicToken.publicAddress;
 
+  // replay attack check
+  const didTokenId = decodedMagicToken.claim.tid; // single-use token id
+
+  // The same didToken is used for potentially two addresses at the same time
+  // (ex: Eth and cosmos for Cosmos sign-in),
+  // but if a single one is found we reject the token replay
+  const usedMagicToken = await models.Address.findOne({
+    where: {
+      verification_token: didTokenId,
+    },
+  });
+
+  if (usedMagicToken) {
+    log.warn('Replay attack detected.');
+    throw new Error(
+      `Replay attack detected for user ${decodedMagicToken.publicAddress}.`,
+    );
+  }
+
   // validate chain if provided (i.e. logging in on community page)
   if (req.body.chain) {
     [chainToJoin, error] = await validateCommunity(models, req.body);
@@ -411,9 +457,13 @@ async function magicLoginRoute(
     }
   }
 
-  const magicUserMetadata = await magic.users.getMetadataByIssuer(
+  const isCosmos = chainToJoin?.base === ChainBase.CosmosSDK;
+
+  const magicUserMetadata = await magic.users.getMetadataByIssuerAndWallet(
     decodedMagicToken.issuer,
+    isCosmos ? WalletType.COSMOS : WalletType.ETH,
   );
+
   log.trace(
     `MAGIC USER METADATA: ${JSON.stringify(magicUserMetadata, null, 2)}`,
   );
@@ -424,24 +474,25 @@ async function magicLoginRoute(
     const session: Session = {
       type: 'session',
       signature: req.body.signature,
-      payload: JSON.parse(req.body.sessionPayload),
+      payload: req.body.sessionPayload
+        ? JSON.parse(req.body.sessionPayload)
+        : undefined,
     };
-    if (process.env.ENFORCE_SESSION_KEYS === 'true') {
-      if (req.body.magicAddress !== session.payload.from) {
-        throw new Error(
-          'sessionPayload address did not match user-provided magicAddress',
-        );
-      }
-      const valid = await verifyCanvas({ session });
-      if (!valid) {
-        throw new Error('sessionPayload signed with invalid signature');
-      }
-    }
+
     if (chainToJoin) {
-      if (
-        chainToJoin.base === ChainBase.CosmosSDK &&
-        session.payload.chain.startsWith('cosmos:')
-      ) {
+      if (isCosmos) {
+        // (magic bug?): magic typing doesn't match data, so we need to cast as any
+        const magicWallets = magicUserMetadata.wallets as any[];
+        const magicUserMetadataCosmosAddress = magicWallets?.find(
+          (wallet) => wallet.wallet_type === WalletType.COSMOS,
+        )?.public_address;
+
+        if (req.body.magicAddress !== magicUserMetadataCosmosAddress) {
+          throw new Error(
+            'user-provided magicAddress does not match magic metadata Cosmos address',
+          );
+        }
+
         generatedAddresses.push({
           address: req.body.magicAddress,
           chain: chainToJoin.id,
@@ -459,6 +510,21 @@ async function magicLoginRoute(
         log.warn(
           `Cannot create magic account on chain ${chainToJoin.id}. Ignoring.`,
         );
+      }
+    }
+
+    if (process.env.ENFORCE_SESSION_KEYS === 'true') {
+      if (
+        !session.payload?.from ||
+        req.body.magicAddress !== session.payload.from
+      ) {
+        throw new Error(
+          'sessionPayload address did not match user-provided magicAddress',
+        );
+      }
+      const valid = await verifyCanvas({ session });
+      if (!valid) {
+        throw new Error('sessionPayload signed with invalid signature');
       }
     }
   } catch (err) {
@@ -514,6 +580,7 @@ async function magicLoginRoute(
       generatedAddresses,
       loggedInUser,
       walletSsoSource,
+      decodedMagicToken,
     );
     return cb(null, existingUserInstance);
   }
@@ -567,7 +634,11 @@ export function initMagicAuth(models: DB) {
     const magic = new Magic(MAGIC_API_KEY);
     passport.use(
       new MagicStrategy({ passReqToCallback: true }, async (req, user, cb) => {
-        return magicLoginRoute(magic, models, req, user, cb);
+        try {
+          return await magicLoginRoute(magic, models, req, user, cb);
+        } catch (e) {
+          return cb(e, user);
+        }
       }),
     );
   }

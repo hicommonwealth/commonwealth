@@ -1,6 +1,7 @@
+import { tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
-import { scheduleNodeProcessing } from '../../../server/workers/evmChainEvents/nodeProcessing';
 import sinon from 'sinon';
+import { scheduleNodeProcessing } from '../../../server/workers/evmChainEvents/nodeProcessing';
 import {
   getTestAbi,
   getTestCommunityContract,
@@ -8,16 +9,15 @@ import {
   getTestSignatures,
   getTestSubscription,
 } from './util';
-import { resetDatabase } from '../../util/resetDatabase';
 
-describe.only('scheduleNodeProcessing', () => {
+describe('scheduleNodeProcessing', () => {
   const sandbox = sinon.createSandbox();
   let processChainStub: sinon.SinonSpy;
   let clock: sinon.SinonFakeTimers;
   let singleSourceSuccess = false;
 
   before(async () => {
-    await resetDatabase();
+    await tester.seedDb();
   });
 
   beforeEach(() => {

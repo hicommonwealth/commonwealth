@@ -1,15 +1,18 @@
+import { AppError, Requirement } from '@hicommonwealth/core';
+import {
+  AddressInstance,
+  GroupAttributes,
+  GroupMetadata,
+  TopicInstance,
+  UserInstance,
+  sequelize,
+} from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import { TopicInstance } from 'server/models/topic';
-import { AppError } from '../../../../common-common/src/errors';
-import { sequelize } from '../../database';
-import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/community';
-import { GroupAttributes, GroupMetadata } from '../../models/group';
-import { UserInstance } from '../../models/user';
-import { Requirement } from '../../util/requirementsModule/requirementsTypes';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import validateMetadata from '../../util/requirementsModule/validateMetadata';
 import validateRequirements from '../../util/requirementsModule/validateRequirements';
 import { validateOwner } from '../../util/validateOwner';
+import { TrackOptions } from '../server_analytics_controller';
 import { ServerGroupsController } from '../server_groups_controller';
 
 const Errors = {
@@ -22,7 +25,6 @@ const Errors = {
 
 export type UpdateGroupOptions = {
   user: UserInstance;
-  community: CommunityInstance;
   address: AddressInstance;
   groupId: number;
   metadata?: GroupMetadata;
@@ -30,26 +32,24 @@ export type UpdateGroupOptions = {
   topics?: number[];
 };
 
-export type UpdateGroupResult = GroupAttributes;
+export type UpdateGroupResult = [GroupAttributes, TrackOptions];
 
 export async function __updateGroup(
   this: ServerGroupsController,
-  {
-    user,
-    community,
-    groupId,
-    metadata,
-    requirements,
-    topics,
-  }: UpdateGroupOptions,
+  { user, groupId, metadata, requirements, topics }: UpdateGroupOptions,
 ): Promise<UpdateGroupResult> {
+  const group = await this.models.Group.findByPk(groupId);
+  if (!group) {
+    throw new AppError(Errors.GroupNotFound);
+  }
+
   const isAdmin = await validateOwner({
     models: this.models,
     user,
-    communityId: community.id,
+    communityId: group.community_id,
     allowMod: true,
     allowAdmin: true,
-    allowGodMode: true,
+    allowSuperAdmin: true,
   });
   if (!isAdmin) {
     throw new AppError(Errors.Unauthorized);
@@ -78,23 +78,13 @@ export async function __updateGroup(
         id: {
           [Op.in]: topics || [],
         },
-        chain_id: community.id,
+        community_id: group.community_id,
       },
     });
     if (topics?.length > 0 && topics.length !== topicsToAssociate.length) {
       // did not find all specified topics
       throw new AppError(Errors.InvalidTopics);
     }
-  }
-
-  const group = await this.models.Group.findOne({
-    where: {
-      id: groupId,
-      community_id: community.id,
-    },
-  });
-  if (!group) {
-    throw new AppError(Errors.GroupNotFound);
   }
 
   // update the group
@@ -169,5 +159,11 @@ export async function __updateGroup(
     }
   });
 
-  return group.toJSON();
+  const analyticsOptions = {
+    event: MixpanelCommunityInteractionEvent.UPDATE_GROUP,
+    community: group.community_id,
+    userId: user.id,
+  };
+
+  return [group.toJSON(), analyticsOptions];
 }

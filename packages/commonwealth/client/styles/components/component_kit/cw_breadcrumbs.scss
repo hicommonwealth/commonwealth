@@ -4,7 +4,11 @@
   align-items: center;
   display: flex;
   gap: 4px;
-  width: fit-content;
+
+  .Text {
+    text-transform: capitalize;
+    white-space: nowrap;
+  }
 
   .current-text.Text {
     color: $neutral-600;

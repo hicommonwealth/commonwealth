@@ -22,7 +22,7 @@ const editGroup = async ({
   groupDescription,
   topicIds,
   requirementsToFulfill,
-  requirements = [],
+  requirements,
 }: EditGroupProps) => {
   return await axios.put(`${app.serverUrl()}/groups/${groupId}`, {
     jwt: app.user.jwt,
@@ -36,7 +36,7 @@ const editGroup = async ({
         required_requirements: requirementsToFulfill,
       }),
     },
-    requirements,
+    ...(requirements && { requirements }),
     topics: topicIds,
   });
 };

@@ -1,48 +1,38 @@
-import React, { useState } from 'react';
-import type { DeltaStatic } from 'quill';
-
-import app from '../../state';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
-import Topic from '../../models/Topic';
+import React, { useState } from 'react';
+import Topic, { TopicAttributes } from '../../models/Topic';
 import { useCommonNavigate } from '../../navigation/helpers';
+import app from '../../state';
 import {
   useDeleteTopicMutation,
   useEditTopicMutation,
 } from '../../state/api/topics';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
-import {
-  getTextFromDelta,
-  ReactQuillEditor,
-} from '../components/react_quill_editor';
-import {
-  deserializeDelta,
-  serializeDelta,
-} from '../components/react_quill_editor/utils';
-import { openConfirmation } from './confirmation_modal';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
+import { openConfirmation } from './confirmation_modal';
 
 import '../../../styles/modals/edit_topic_modal.scss';
 
 type EditTopicModalProps = {
   onModalClose: () => void;
   topic: Topic;
+  noRedirect?: boolean;
 };
 
 export const EditTopicModal = ({
   topic,
   onModalClose,
+  noRedirect,
 }: EditTopicModalProps) => {
   const {
-    defaultOffchainTemplate,
     description: descriptionProp,
-    featuredInNewPost: featuredInNewPostProp,
     featuredInSidebar: featuredInSidebarProp,
     id,
     name: nameProp,
@@ -52,48 +42,35 @@ export const EditTopicModal = ({
   const { mutateAsync: editTopic } = useEditTopicMutation();
   const { mutateAsync: deleteTopic } = useDeleteTopicMutation();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(
-    deserializeDelta(defaultOffchainTemplate)
-  );
-
   const [description, setDescription] = useState<string>(descriptionProp);
-  const [featuredInNewPost, setFeaturedInNewPost] = useState<boolean>(
-    featuredInNewPostProp
-  );
   const [featuredInSidebar, setFeaturedInSidebar] = useState<boolean>(
-    featuredInSidebarProp
+    featuredInSidebarProp,
   );
   const [name, setName] = useState<string>(nameProp);
-
-  const editorText = getTextFromDelta(contentDelta);
 
   const handleSaveChanges = async () => {
     setIsSaving(true);
 
-    if (featuredInNewPost && editorText.length === 0) {
-      setErrorMsg('Must provide template.');
-      return;
-    }
-
-    const topicInfo = {
+    const topicInfo: TopicAttributes = {
       id,
       description: description,
       name: name,
-      chain_id: app.activeChainId(),
+      community_id: app.activeChainId(),
       telegram: null,
       featured_in_sidebar: featuredInSidebar,
-      featured_in_new_post: featuredInNewPost,
-      default_offchain_template: featuredInNewPost
-        ? serializeDelta(contentDelta)
-        : null,
+      featured_in_new_post: false,
+      default_offchain_template: '',
       total_threads: topic.totalThreads || 0,
     };
 
     try {
       await editTopic({ topic: new Topic(topicInfo) });
-      navigate(`/discussions/${encodeURI(name.toString().trim())}`);
+      if (noRedirect) {
+        onModalClose();
+      } else {
+        navigate(`/discussions/${encodeURI(name.toString().trim())}`);
+      }
     } catch (err) {
       setErrorMsg(err.message || err);
     } finally {
@@ -119,9 +96,13 @@ export const EditTopicModal = ({
             await deleteTopic({
               topicId: id,
               topicName: name,
-              chainId: app.activeChainId(),
+              communityId: app.activeChainId(),
             });
-            navigate('/');
+            if (noRedirect) {
+              onModalClose();
+            } else {
+              navigate('/');
+            }
           },
         },
       ],
@@ -145,7 +126,7 @@ export const EditTopicModal = ({
             if (disallowedCharMatches) {
               newErrorMsg = `The ${pluralizeWithoutNumberPrefix(
                 disallowedCharMatches.length,
-                'char'
+                'char',
               )}
                 ${disallowedCharMatches.join(', ')} are not permitted`;
               setErrorMsg(newErrorMsg);
@@ -176,21 +157,6 @@ export const EditTopicModal = ({
           }}
           value=""
         />
-        <CWCheckbox
-          label="Featured in New Post"
-          checked={featuredInNewPost}
-          onChange={() => {
-            setFeaturedInNewPost(!featuredInNewPost);
-          }}
-          value=""
-        />
-        {featuredInNewPost && (
-          <ReactQuillEditor
-            contentDelta={contentDelta}
-            setContentDelta={setContentDelta}
-            tabIndex={3}
-          />
-        )}
       </CWModalBody>
       <CWModalFooter className="EditTopicModalFooter">
         <div className="action-buttons">

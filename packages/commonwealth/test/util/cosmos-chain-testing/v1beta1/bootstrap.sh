@@ -8,10 +8,12 @@ CONFIG_FOLDER=$CSDK_HOME/config
 GENESIS=$CONFIG_FOLDER/genesis.json
 # You can add this mnemonic to keplr to use the UI
 COW_MNEMONIC="ignore medal pitch lesson catch stadium victory jewel first stairs humble excuse scrap clutch cup daughter bench length sell goose deliver critic favorite thought"
+TEST_ONE_MNEMONIC="jewel disease neglect feel mother dry hire yellow minute main tray famous"
+TEST_TWO_MNEMONIC="wild science ski despair vault sure check car donate slush way window"
 CSDK_CHAIN_ID="csdkbeta-1"
 
 ### start nginx
-sed -i "s/listen\ 80;/listen\ ${PORT:=5051};/" /etc/nginx/nginx.conf
+sed -i "s/listen\ 80;/listen\ ${PORT:=5050};/" /etc/nginx/nginx.conf
 echo "starting nginx"
 nginx
 
@@ -33,7 +35,7 @@ dasel put -t string -r json -f $GENESIS -v "ustake" '.app_state.crisis.constant_
 dasel put -t string -r json -f $GENESIS -v "ustake" '.app_state.mint.params.mint_denom'
 
 # Update gov module
-dasel put -t string -r json -f $GENESIS -v "90s" '.app_state.gov.voting_params.voting_period'
+dasel put -t string -r json -f $GENESIS -v "180s" '.app_state.gov.voting_params.voting_period'
 dasel put -t string -r json -f $GENESIS -v "2000000" '.app_state.gov.deposit_params.min_deposit.[0].amount'
 dasel put -t string -r json -f $GENESIS -v "ustake" '.app_state.gov.deposit_params.min_deposit.[0].denom'
 
@@ -59,6 +61,12 @@ dasel put -t string -r toml -f $CONFIG_FOLDER/config.toml -v "PUT" '.rpc.cors_al
 # Enable unsafe cors and swagger on the api
 dasel put -t bool -r toml -f $CONFIG_FOLDER/app.toml -v "true" '.api.swagger'
 dasel put -t bool -r toml -f $CONFIG_FOLDER/app.toml -v "true" '.api.enabled-unsafe-cors'
+
+# Add test accounts with funds
+echo "$TEST_ONE_MNEMONIC" | simd keys add test_one --recover --keyring-backend=test --home "$CSDK_HOME"
+echo "$TEST_TWO_MNEMONIC" | simd keys add test_two --recover --keyring-backend=test --home "$CSDK_HOME"
+simd add-genesis-account test_one 50000000000ustake
+simd add-genesis-account test_two 30000000000ustake
 
 echo $COW_MNEMONIC | simd keys add cow --recover --keyring-backend=test --home $CSDK_HOME
 # make cow a validator:

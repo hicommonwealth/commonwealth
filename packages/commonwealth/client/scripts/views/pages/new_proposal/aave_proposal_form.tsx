@@ -1,25 +1,26 @@
 import { utils } from 'ethers';
 import React, { useEffect, useState } from 'react';
 
-import 'pages/new_proposal/aave_proposal_form.scss';
-
+import { useBrowserAnalyticsTrack } from 'client/scripts/hooks/useBrowserAnalyticsTrack';
 import { notifyError } from 'controllers/app/notifications';
 import type Aave from 'controllers/chain/ethereum/aave/adapter';
 import { AaveExecutor } from 'controllers/chain/ethereum/aave/api';
 import type { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
+import 'pages/new_proposal/aave_proposal_form.scss';
 import app from 'state';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { User } from 'views/components/user/user';
+import { MixpanelGovernanceEvents } from '../../../../../shared/analytics/types';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWLabel } from '../../components/component_kit/cw_label';
-import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { CWText } from '../../components/component_kit/cw_text';
+import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import {
   CWTab,
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
-import { CWText } from '../../components/component_kit/cw_text';
-import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import type { AaveProposalState } from './types';
 import { defaultStateItem } from './types';
 
@@ -36,6 +37,7 @@ export const AaveProposalForm = () => {
 
   const author = app.user.activeAccount;
   const aave = app.chain as Aave;
+  const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
 
   useEffect(() => {
     const getExecutors = async () => {
@@ -49,11 +51,72 @@ export const AaveProposalForm = () => {
   const updateAaveProposalState = <K extends keyof AaveProposalState>(
     index: number,
     key: K,
-    value: AaveProposalState[K]
+    value: AaveProposalState[K],
   ) => {
     const newAaveProposalState = [...aaveProposalState];
     newAaveProposalState[index][key] = value;
     setAaveProposalState(newAaveProposalState);
+  };
+
+  const handleSendTransaction = async (e) => {
+    e.preventDefault();
+
+    setProposer(app.user?.activeAccount?.address);
+
+    if (!proposer) {
+      throw new Error('Invalid address / not signed in');
+    }
+
+    if (!executor) {
+      throw new Error('Invalid executor');
+    }
+
+    if (!ipfsHash) {
+      throw new Error('No ipfs hash');
+    }
+
+    const targets = [];
+    const values = [];
+    const calldatas = [];
+    const signatures = [];
+    const withDelegateCalls = [];
+
+    for (let i = 0; i < tabCount; i++) {
+      const aaveProposal = aaveProposalState[i];
+
+      if (aaveProposal.target) {
+        targets.push(aaveProposal.target);
+      } else {
+        throw new Error(`No target for Call ${i + 1}`);
+      }
+
+      values.push(aaveProposal.value || '0');
+      calldatas.push(aaveProposal.calldata || '');
+      withDelegateCalls.push(aaveProposal.withDelegateCall || false);
+      signatures.push(aaveProposal.signature || '');
+    }
+
+    // TODO: preload this ipfs value to ensure it's correct
+    const _ipfsHash = utils.formatBytes32String(ipfsHash);
+
+    const details: AaveProposalArgs = {
+      executor,
+      targets,
+      values,
+      calldatas,
+      signatures,
+      withDelegateCalls,
+      ipfsHash: _ipfsHash,
+    };
+
+    try {
+      await aave.governance.propose(details);
+      trackAnalytics({
+        event: MixpanelGovernanceEvents.AAVE_PROPOSAL_CREATED,
+      });
+    } catch (err) {
+      notifyError(err.data?.message || err.message);
+    }
   };
 
   return (
@@ -62,7 +125,7 @@ export const AaveProposalForm = () => {
         <CWLabel label="Proposer (you)" />
         <User
           userAddress={author.address}
-          userChainId={author.community?.id || author.profile?.chain}
+          userCommunityId={author.community?.id || author.profile?.chain}
           shouldLinkProfile
           shouldShowPopover
           shouldShowAddressWithDisplayName
@@ -142,7 +205,7 @@ export const AaveProposalForm = () => {
                 setActiveTabIndex(tabCount - 1);
 
                 const newAaveProposalState = aaveProposalState.filter(
-                  (_, i) => i !== aaveProposalState.length - 1
+                  (_, i) => i !== aaveProposalState.length - 1,
                 );
 
                 setAaveProposalState(newAaveProposalState);
@@ -192,70 +255,13 @@ export const AaveProposalForm = () => {
           updateAaveProposalState(
             activeTabIndex,
             'withDelegateCall',
-            e.target.checked
+            e.target.checked,
           );
         }}
         label="Delegate Call"
         value=""
       />
-      <CWButton
-        label="Send transaction"
-        onClick={(e) => {
-          e.preventDefault();
-
-          setProposer(app.user?.activeAccount?.address);
-
-          if (!proposer) {
-            throw new Error('Invalid address / not signed in');
-          }
-
-          if (!executor) {
-            throw new Error('Invalid executor');
-          }
-
-          if (!ipfsHash) {
-            throw new Error('No ipfs hash');
-          }
-
-          const targets = [];
-          const values = [];
-          const calldatas = [];
-          const signatures = [];
-          const withDelegateCalls = [];
-
-          for (let i = 0; i < tabCount; i++) {
-            const aaveProposal = aaveProposalState[i];
-
-            if (aaveProposal.target) {
-              targets.push(aaveProposal.target);
-            } else {
-              throw new Error(`No target for Call ${i + 1}`);
-            }
-
-            values.push(aaveProposal.value || '0');
-            calldatas.push(aaveProposal.calldata || '');
-            withDelegateCalls.push(aaveProposal.withDelegateCall || false);
-            signatures.push(aaveProposal.signature || '');
-          }
-
-          // TODO: preload this ipfs value to ensure it's correct
-          const _ipfsHash = utils.formatBytes32String(ipfsHash);
-
-          const details: AaveProposalArgs = {
-            executor,
-            targets,
-            values,
-            calldatas,
-            signatures,
-            withDelegateCalls,
-            ipfsHash: _ipfsHash,
-          };
-
-          aave.governance
-            .propose(details)
-            .catch((err) => notifyError(err.data?.message || err.message));
-        }}
-      />
+      <CWButton label="Send transaction" onClick={handleSendTransaction} />
     </div>
   );
 };

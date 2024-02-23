@@ -1,8 +1,6 @@
-import { AppError } from 'common-common/src/errors';
+import { AbiType, AppError } from '@hicommonwealth/core';
 import type { AbiItem } from 'web3-utils';
 import { parseAbiItemsFromABI } from '../../shared/abi_utils';
-import { hasher } from 'node-object-hash';
-import { AbiType } from '../../shared/types';
 
 export const Errors = {
   NoContractId: 'Must provide contract id',
@@ -35,15 +33,4 @@ export default function validateAbi(abiString: string): AbiType {
     throw new AppError(Errors.InvalidABI);
   }
   return abiAsRecord;
-}
-
-export function hashAbi(abi: AbiType): string {
-  const hashInstance = hasher({
-    coerce: true,
-    sort: true,
-    trim: true,
-    alg: 'sha256',
-    enc: 'hex',
-  });
-  return hashInstance.hash(abi);
 }

@@ -1,10 +1,13 @@
+import {
+  AppError,
+  DynamicTemplate,
+  WalletId,
+  logger,
+} from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import sgMail from '@sendgrid/mail';
-import { AppError } from 'common-common/src/errors';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { WalletId } from 'common-common/src/types';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
-import { DynamicTemplate } from '../../shared/types';
 import {
   LOGIN_RATE_LIMIT_MINS,
   LOGIN_RATE_LIMIT_TRIES,
@@ -13,9 +16,9 @@ import {
   SENDGRID_API_KEY,
 } from '../config';
 import { validateCommunity } from '../middleware/validateCommunity';
-import type { DB } from '../models';
+
 sgMail.setApiKey(SENDGRID_API_KEY);
-const log = factory.getLogger(formatFilename(__filename));
+const log = logger().getLogger(__filename);
 
 export const Errors = {
   AlreadyLoggedIn: 'Already signed in',
@@ -116,7 +119,7 @@ const startEmailLogin = async (
   }&email=${encodeURIComponent(email)}`;
   const msg = {
     to: email,
-    from: 'Commonwealth <no-reply@commonwealth.im>',
+    from: 'Common <no-reply@commonwealth.im>',
     templateId: previousUser ? DynamicTemplate.SignIn : DynamicTemplate.SignUp,
     dynamic_template_data: {
       loginLink,

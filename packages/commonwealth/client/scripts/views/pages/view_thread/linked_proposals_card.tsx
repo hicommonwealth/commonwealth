@@ -1,5 +1,6 @@
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 import { filterLinks } from 'helpers/threads';
+
 import {
   chainEntityTypeToProposalName,
   chainEntityTypeToProposalSlug,
@@ -11,33 +12,26 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import app from 'state';
 import type Thread from '../../../models/Thread';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
-import { CWModal } from '../../components/component_kit/new_designs/CWModal';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
+import CWLoadingSpinner from '../../components/component_kit/new_designs/CWLoadingSpinner';
+import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
 
-type LinkedProposalProps = {
-  thread: Thread;
-  title: string;
+type ThreadLinkProps = {
+  threadChain: string;
   identifier: string;
 };
 
-const LinkedProposal = ({ thread, title, identifier }: LinkedProposalProps) => {
+const getThreadLink = ({ threadChain, identifier }: ThreadLinkProps) => {
   const slug = chainEntityTypeToProposalSlug();
 
   const threadLink = `${
-    app.isCustomDomain() ? '' : `/${thread.chain}`
+    app.isCustomDomain() ? '' : `/${threadChain}`
   }${getProposalUrlPath(slug, identifier, true)}`;
 
-  return (
-    <ReactRouterLink to={threadLink}>
-      {`${
-        title ?? chainEntityTypeToProposalName() ?? 'Proposal'
-      } #${identifier}`}
-    </ReactRouterLink>
-  );
+  return threadLink;
 };
 
 type LinkedProposalsCardProps = {
@@ -56,12 +50,12 @@ export const LinkedProposalsCard = ({
 
   const initialSnapshotLinks = useMemo(
     () => filterLinks(thread.links, LinkSource.Snapshot),
-    [thread.links]
+    [thread.links],
   );
 
   const initialProposalLinks = useMemo(
     () => filterLinks(thread.links, LinkSource.Proposal),
-    [thread.links]
+    [thread.links],
   );
 
   useEffect(() => {
@@ -69,22 +63,22 @@ export const LinkedProposalsCard = ({
       const proposal = initialSnapshotLinks[0];
       if (proposal.identifier.includes('/')) {
         setSnapshotUrl(
-          `${app.isCustomDomain() ? '' : `/${thread.chain}`}/snapshot/${
+          `${app.isCustomDomain() ? '' : `/${thread.communityId}`}/snapshot/${
             proposal.identifier
-          }`
+          }`,
         );
       } else {
         loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
           for (const { space: _space, proposals } of data) {
             const matchingSnapshot = proposals.find(
-              (sn) => sn.id === proposal.identifier
+              (sn) => sn.id === proposal.identifier,
             );
             if (matchingSnapshot) {
               setSnapshotTitle(matchingSnapshot.title);
               setSnapshotUrl(
-                `${app.isCustomDomain() ? '' : `/${thread.chain}`}/snapshot/${
-                  _space.id
-                }/${matchingSnapshot.id}`
+                `${
+                  app.isCustomDomain() ? '' : `/${thread.communityId}`
+                }/snapshot/${_space.id}/${matchingSnapshot.id}`,
               );
               break;
             }
@@ -93,7 +87,7 @@ export const LinkedProposalsCard = ({
       }
       setSnapshotProposalsLoaded(true);
     }
-  }, [initialSnapshotLinks]);
+  }, [initialSnapshotLinks, thread.communityId]);
 
   const showSnapshot =
     initialSnapshotLinks.length > 0 && snapshotProposalsLoaded;
@@ -105,7 +99,7 @@ export const LinkedProposalsCard = ({
         content={
           initialSnapshotLinks.length > 0 && !snapshotProposalsLoaded ? (
             <div className="spinner-container">
-              <CWSpinner size="medium" />
+              <CWLoadingSpinner />
             </div>
           ) : (
             <div className="LinkedProposalsCard">
@@ -115,21 +109,34 @@ export const LinkedProposalsCard = ({
                     <div className="linked-proposals">
                       {initialProposalLinks.map((l) => {
                         return (
-                          <LinkedProposal
+                          <ReactRouterLink
                             key={l.identifier}
-                            thread={thread}
-                            title={l.title}
-                            identifier={l.identifier}
-                          />
+                            to={getThreadLink({
+                              threadChain: thread.communityId,
+                              identifier: l.identifier,
+                            })}
+                          >
+                            {`${
+                              l.title ??
+                              chainEntityTypeToProposalName() ??
+                              'Proposal'
+                            } #${l.identifier}`}
+                          </ReactRouterLink>
                         );
                       })}
                     </div>
                   )}
-                  {showSnapshot && (
-                    <ReactRouterLink to={snapshotUrl}>
-                      Snapshot: {initialSnapshotLinks[0].title ?? snapshotTitle}
-                    </ReactRouterLink>
-                  )}
+                  {showSnapshot &&
+                    (snapshotUrl ? (
+                      <ReactRouterLink to={snapshotUrl}>
+                        Snapshot:{' '}
+                        {initialSnapshotLinks[0].title ?? snapshotTitle}
+                      </ReactRouterLink>
+                    ) : (
+                      <div className="snapshot-spinner-container">
+                        <CWLoadingSpinner />
+                      </div>
+                    ))}
                 </div>
               ) : (
                 <CWText type="b2" className="no-proposals-text">
@@ -161,7 +168,6 @@ export const LinkedProposalsCard = ({
         }
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
-        visibleOverflow
       />
     </>
   );

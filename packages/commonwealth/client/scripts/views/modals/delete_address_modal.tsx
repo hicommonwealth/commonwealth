@@ -1,15 +1,14 @@
-import React from 'react';
-import $ from 'jquery';
 import jdenticon from 'jdenticon';
+import $ from 'jquery';
+import React from 'react';
 
-import app from '../../state';
 import {
   notifyError,
   notifySuccess,
 } from '../../controllers/app/notifications';
 import AddressInfo from '../../models/AddressInfo';
 import NewProfile from '../../models/NewProfile';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
+import app from '../../state';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTruncatedAddress } from '../components/component_kit/cw_truncated_address';
 import {
@@ -17,6 +16,7 @@ import {
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
 
 import '../../../styles/modals/delete_address_modal.scss';
 
@@ -31,7 +31,7 @@ type DeleteAddressModalAttrs = {
 export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
   const onDeleteAddress = async (
     e: React.MouseEvent,
-    passedProps: Partial<DeleteAddressModalAttrs>
+    passedProps: Partial<DeleteAddressModalAttrs>,
   ) => {
     const { addresses, address, chain } = passedProps;
 
@@ -39,7 +39,7 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
 
     if (addresses.length === 1) {
       notifyError(
-        'You must have at least one address linked to a profile. Please add another address before removing this one.'
+        'You must have at least one address linked to a profile. Please add another address before removing this one.',
       );
 
       $(e.target).trigger('modalexit');
@@ -56,7 +56,7 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
       const foundAddressInfo = addresses.find((a) => a.address === address);
       app.roles.deleteRole({
         address: foundAddressInfo,
-        chain: chain,
+        community: chain,
       });
 
       if (response?.status === 'Success') {
@@ -90,7 +90,7 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
           ) : (
             <img
               src={`data:image/svg+xml;utf8,${encodeURIComponent(
-                defaultAvatar
+                defaultAvatar,
               )}`}
             />
           )}

@@ -1,7 +1,8 @@
 import { MagnifyingGlass } from '@phosphor-icons/react';
-import React, { ChangeEvent, FC, useState } from 'react';
+import React, { ChangeEvent, FC, useEffect, useRef, useState } from 'react';
 import type { NavigateOptions, To } from 'react-router';
 
+import { CWText } from 'views/components/component_kit/cw_text';
 import { notifyError } from '../../../../../controllers/app/notifications';
 import useSearchResults from '../../../../../hooks/useSearchResults';
 import SearchQuery from '../../../../../models/SearchQuery';
@@ -16,10 +17,12 @@ import './CWSearchBar.scss';
 
 type BaseSearchBarProps = {
   placeholder?: string;
+  onSearchItemClick?: () => void;
 };
 
 type InputStyleProps = {
   disabled?: boolean;
+  size?: 'small' | 'normal';
 };
 
 type SearchBarProps = BaseSearchBarProps &
@@ -48,19 +51,31 @@ const goToSearchPage = (
 
 export const CWSearchBar: FC<SearchBarProps> = ({
   disabled,
-  placeholder = 'Search Common',
+  size = 'normal',
+  placeholder = size === 'small' ? 'Search' : 'Search Common',
+  onSearchItemClick,
 }) => {
+  const inputRef = useRef<HTMLInputElement>();
   const navigate = useCommonNavigate();
   const [showTag, setShowTag] = useState(true);
-  const chainId = app.activeChainId() || 'all_communities';
-  const chain = app.config.chains.getById(chainId);
+  const communityId = showTag
+    ? app.activeChainId() || 'all_communities'
+    : 'all_communities';
+  const community = app.config.chains.getById(communityId);
   const [searchTerm, setSearchTerm] = useState('');
   const { searchResults } = useSearchResults(searchTerm, [
     'threads',
     'replies',
-    chainId === 'all_communities' ? 'communities' : null,
+    communityId === 'all_communities' ? 'communities' : null,
     'members',
   ]);
+
+  //on mobile, focus the input when the component (search modal) mounts
+  useEffect(() => {
+    if (size === 'small') {
+      inputRef?.current?.focus?.();
+    }
+  }, [size]);
 
   const resetSearchBar = () => setSearchTerm('');
 
@@ -70,6 +85,10 @@ export const CWSearchBar: FC<SearchBarProps> = ({
   const handleOnKeyUp = (e) => {
     if (e.key === 'Enter') {
       handleGoToSearchPage();
+
+      if (size === 'small') {
+        onSearchItemClick?.();
+      }
     } else if (e.key === 'Escape') {
       resetSearchBar();
     }
@@ -95,7 +114,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
   const handleGoToSearchPage = () => {
     const searchQuery = new SearchQuery(searchTerm, {
       isSearchPreview: false,
-      chainScope: showTag ? chainId : 'all_communities',
+      communityScope: showTag ? communityId : 'all_communities',
     });
     goToSearchPage(searchQuery, navigate);
     resetSearchBar();
@@ -103,13 +122,14 @@ export const CWSearchBar: FC<SearchBarProps> = ({
 
   return (
     <div
-      className={getClasses({ container: true }, ComponentType.Searchbar)}
+      className={getClasses({ container: true, size }, ComponentType.Searchbar)}
       onBlur={handleOnBlur}
     >
       <div
         className={getClasses<InputStyleProps>(
           {
             disabled,
+            size,
           },
           ComponentType.Searchbar,
         )}
@@ -120,21 +140,22 @@ export const CWSearchBar: FC<SearchBarProps> = ({
           size={24}
           onClick={handleGoToSearchPage}
         />
-        {showTag && !!chain && (
+        {showTag && !!community && (
           <CWTag
-            label={chain.name}
+            label={community.name}
             type="input"
-            community={chain}
+            community={community}
             onClick={() => setShowTag(false)}
           />
         )}
         <div
           className={getClasses(
-            { inputElement: true },
+            { inputElement: true, size },
             ComponentType.Searchbar,
           )}
         >
           <input
+            ref={inputRef}
             placeholder={placeholder}
             onInput={handleOnInput}
             onKeyUp={handleOnKeyUp}
@@ -148,7 +169,14 @@ export const CWSearchBar: FC<SearchBarProps> = ({
         <SearchBarDropdown
           searchTerm={searchTerm}
           searchResults={searchResults}
+          onSearchItemClick={onSearchItemClick}
         />
+      )}
+
+      {size === 'small' && !searchTerm && (
+        <CWText type="b2" className="mobile-empty">
+          Start typing to see results
+        </CWText>
       )}
     </div>
   );

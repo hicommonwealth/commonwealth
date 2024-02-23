@@ -1,6 +1,6 @@
+import { ChainNetwork } from '@hicommonwealth/core';
 import { IAaveVoteResponse } from 'adapters/chain/aave/types';
 import { ICompoundVoteResponse } from 'adapters/chain/compound/types';
-import { ChainNetwork } from 'common-common/src/types';
 import { providers } from 'ethers';
 import { ServerError } from 'near-api-js/lib/utils/rpc_errors';
 import {
@@ -41,7 +41,6 @@ export async function __getProposalVotes(
       contractInfo.address,
       provider,
       proposalId,
-      this.redisCache,
     );
     votes = votesArgs.map((vote) => formatCompoundProposalVote(vote));
   } else {

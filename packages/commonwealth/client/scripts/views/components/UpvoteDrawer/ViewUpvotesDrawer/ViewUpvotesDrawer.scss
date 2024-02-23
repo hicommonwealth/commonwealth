@@ -1,0 +1,70 @@
+@import '../../../../../styles/shared.scss';
+
+.ViewUpvotesDrawer {
+  .Drawer.upvote-drawer {
+    top: 56px !important;
+
+    @include extraSmall {
+      top: 48px !important;
+
+      .content-container {
+        padding: 0 16px;
+      }
+    }
+
+    .empty-upvotes-container {
+      color: $neutral-500;
+    }
+
+    .drawer-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 16px 56px 12px 56px;
+
+      @include extraSmall {
+        gap: 4px;
+        padding: 16px 16px 12px 16px;
+      }
+    }
+
+    .content-container {
+      padding: 20px 56px;
+
+      @include extraSmall {
+        padding: 0 16px;
+      }
+
+      div.h3 {
+        margin-bottom: 16px;
+      }
+
+      .upvoted-content {
+        padding: 16px 0;
+        margin-bottom: 24px;
+
+        .upvoted-content-body {
+          padding: 16px 0 0 18px;
+        }
+      }
+
+      .upvote-totals {
+        display: flex;
+        justify-content: space-evenly;
+
+        .upvotes,
+        .weight {
+          padding: 14px 16px;
+          display: flex;
+          gap: 10px;
+          justify-content: flex-start;
+          flex-basis: 30%;
+
+          .Text.caption {
+            color: $neutral-400;
+          }
+        }
+      }
+    }
+  }
+}

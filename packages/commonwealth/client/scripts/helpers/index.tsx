@@ -1,6 +1,6 @@
+import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
 import type { Coin } from 'adapters/currency';
 import BigNumber from 'bignumber.js';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import moment from 'moment';
 import React from 'react';
 import app from 'state';
@@ -12,7 +12,7 @@ export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
 }
 
-export function threadStageToLabel(stage: ThreadStage) {
+export function threadStageToLabel(stage: string) {
   if (stage === ThreadStage.Discussion) {
     return 'Discussion';
   } else if (stage === ThreadStage.ProposalInReview) {
@@ -35,26 +35,9 @@ export function isDefaultStage(stage: string) {
   );
 }
 
-export function parseCustomStages(str) {
-  // Parse customStages into a `string[]` and then cast to ThreadStage[]
-  // If parsing fails, return an empty array.
-  let arr;
-  const default_stages = [
-    ThreadStage.Discussion,
-    ThreadStage.ProposalInReview,
-    ThreadStage.Voting,
-    ThreadStage.Passed,
-    ThreadStage.Failed,
-  ];
-  try {
-    const stages = JSON.parse(str);
-    arr = Array.isArray(stages) ? Array.from(stages) : default_stages;
-  } catch (e) {
-    return default_stages;
-  }
-  return arr
-    .map((s) => s?.toString())
-    .filter((s) => s) as unknown as ThreadStage[];
+// Provides a default if community has no custom stages.
+export function parseCustomStages(customStages?: string[]): string[] {
+  return customStages ?? Object.values(ThreadStage);
 }
 
 /*
@@ -191,7 +174,7 @@ export function formatPercent(num: number, digits: number) {
 
 export function formatDuration(
   duration: moment.Duration,
-  includeSeconds = true
+  includeSeconds = true,
 ) {
   const days = Math.floor(duration.asDays());
   return [
@@ -210,11 +193,11 @@ export function formatProposalHashShort(hash: string) {
 export function formatAddressShort(
   address: string,
   numberOfVisibleCharacters = 5,
-  numberOfVisibleCharactersTail = 4
+  numberOfVisibleCharactersTail = 4,
 ) {
   if (address.length < 10) return address;
   return `${address.slice(0, numberOfVisibleCharacters)}…${address.slice(
-    -numberOfVisibleCharactersTail
+    -numberOfVisibleCharactersTail,
   )}`;
 }
 
@@ -285,7 +268,7 @@ export const weiToTokens = (input: string, decimals: number) => {
 };
 
 export const isCommandClick = (
-  e: React.MouseEvent<HTMLDivElement, MouseEvent>
+  e: React.MouseEvent<HTMLDivElement, MouseEvent>,
 ) => {
   return e.metaKey || e.altKey || e.shiftKey || e.ctrlKey;
 };
@@ -296,7 +279,7 @@ export const handleRedirectClicks = (
   e: React.MouseEvent<HTMLDivElement, MouseEvent>,
   redirectLink: string,
   activeChainId: string | null,
-  callback: () => any
+  callback: () => any,
 ) => {
   if (isCommandClick(e)) {
     if (activeChainId) {
@@ -341,9 +324,25 @@ export function getDecimals(chain: IChainAdapter<Coin, Account>): number {
     decimals = chain.meta.decimals;
   } else if (chain.network === ChainNetwork.ERC721) {
     decimals = 0;
+  } else if (chain.network === ChainNetwork.ERC1155) {
+    decimals = 0;
   } else if (chain.base === ChainBase.CosmosSDK) {
     decimals = 6;
   }
 
   return decimals;
 }
+
+export const shortenIdentifier = (identifer: string) => {
+  // Check if the string is longer than 6 characters
+  if (identifer.length > 6) {
+    // Extract the first three and last three characters
+    const start = identifer.substring(0, 3);
+    const end = identifer.substring(identifer.length - 3);
+    // Return the formatted string
+    return `${start}...${end}`;
+  } else {
+    // Return the original string if it's 6 characters or shorter
+    return identifer;
+  }
+};

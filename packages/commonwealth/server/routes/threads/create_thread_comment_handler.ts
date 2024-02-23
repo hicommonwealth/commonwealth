@@ -1,8 +1,8 @@
-import { TypedRequest, TypedResponse, success } from '../../types';
-import { ServerControllers } from '../../routing/router';
-import { CommentInstance } from '../../models/comment';
-import { AppError } from '../../../../common-common/src/errors';
+import { AppError } from '@hicommonwealth/core';
+import { CommentInstance } from '@hicommonwealth/model';
 import { verifyComment } from '../../../shared/canvas/serverVerify';
+import { ServerControllers } from '../../routing/router';
+import { TypedRequest, TypedResponse, success } from '../../types';
 
 export const Errors = {
   MissingThreadId: 'Must provide valid thread_id',
@@ -32,9 +32,9 @@ type CreateThreadCommentResponse = CommentInstance;
 export const createThreadCommentHandler = async (
   controllers: ServerControllers,
   req: TypedRequest<CreateThreadCommentRequestBody, null, { id: string }>,
-  res: TypedResponse<CreateThreadCommentResponse>
+  res: TypedResponse<CreateThreadCommentResponse>,
 ) => {
-  const { user, address, chain: community } = req;
+  const { user, address } = req;
   const { id: threadId } = req.params;
   const {
     parent_id: parentId,
@@ -54,10 +54,9 @@ export const createThreadCommentHandler = async (
 
   if (process.env.ENFORCE_SESSION_KEYS === 'true') {
     await verifyComment(canvasAction, canvasSession, canvasHash, {
-      thread_id: parseInt(threadId, 10),
+      thread_id: parseInt(threadId, 10) || undefined,
       text,
       address: address.address,
-      chain: community.id,
       parent_comment_id: parentId,
     });
   }
@@ -66,9 +65,8 @@ export const createThreadCommentHandler = async (
     await controllers.threads.createThreadComment({
       user,
       address,
-      community,
       parentId,
-      threadId: parseInt(threadId, 10),
+      threadId: parseInt(threadId, 10) || undefined,
       text,
       canvasAction,
       canvasSession,

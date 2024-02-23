@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
 
-import type Thread from '../../models/Thread';
-import { parseCustomStages, threadStageToLabel } from '../../helpers';
 import {
-  loadMultipleSpacesData,
   SnapshotProposal,
+  loadMultipleSpacesData,
 } from 'helpers/snapshot_utils';
+import { parseCustomStages, threadStageToLabel } from '../../helpers';
+import type Thread from '../../models/Thread';
 
 import { ThreadStage } from '../../models/types';
 import { SelectList } from '../components/component_kit/cw_select_list';
 
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
+import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 import { notifyError } from 'controllers/app/notifications';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { filterLinks, getAddedAndDeleted } from 'helpers/threads';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { Link, LinkSource } from 'models/Thread';
 import app from 'state';
 import {
@@ -21,16 +23,19 @@ import {
   useDeleteThreadLinksMutation,
   useEditThreadMutation,
 } from 'state/api/threads';
-import { ProposalSelector } from '../components/ProposalSelector';
+import {
+  MixpanelCommunityInteractionEvent,
+  MixpanelCommunityInteractionEventPayload,
+} from '../../../../shared/analytics/types';
 import { CosmosProposalSelector } from '../components/CosmosProposalSelector';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
-import { SnapshotProposalSelector } from '../components/snapshot_proposal_selector';
-import { IAaveProposalResponse } from 'adapters/chain/aave/types';
+import { ProposalSelector } from '../components/ProposalSelector';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
+import { SnapshotProposalSelector } from '../components/snapshot_proposal_selector';
 
 const getInitialSnapshots = (thread: Thread) =>
   filterLinks(thread.links, LinkSource.Snapshot).map((l) => ({
@@ -51,7 +56,7 @@ const getInitialCosmosProposals = (thread: Thread) =>
   }));
 
 type UpdateProposalStatusModalProps = {
-  onChangeHandler?: (stage: ThreadStage, links?: Link[]) => void;
+  onChangeHandler?: (stage: string, links?: Link[]) => void;
   onModalClose: () => void;
   thread: Thread;
 };
@@ -62,18 +67,10 @@ export const UpdateProposalStatusModal = ({
   thread,
 }: UpdateProposalStatusModalProps) => {
   const { customStages } = app.chain.meta;
-  const stages = !customStages
-    ? [
-        ThreadStage.Discussion,
-        ThreadStage.ProposalInReview,
-        ThreadStage.Voting,
-        ThreadStage.Passed,
-        ThreadStage.Failed,
-      ]
-    : parseCustomStages(customStages);
+  const stages = parseCustomStages(customStages);
 
   const [tempStage, setTempStage] = useState(
-    stages.includes(thread.stage) ? thread.stage : null
+    stages.includes(thread.stage) ? thread.stage : null,
   );
   const [tempSnapshotProposals, setTempSnapshotProposals] = useState<
     Array<Pick<SnapshotProposal, 'id' | 'title'>>
@@ -110,6 +107,11 @@ export const UpdateProposalStatusModal = ({
     threadId: thread.id,
   });
 
+  const { trackAnalytics } =
+    useBrowserAnalyticsTrack<MixpanelCommunityInteractionEventPayload>({
+      onAction: true,
+    });
+
   const handleSaveChanges = async () => {
     // set stage
     try {
@@ -121,7 +123,7 @@ export const UpdateProposalStatusModal = ({
       });
     } catch (err) {
       const error =
-        err?.responseJSON?.error ||
+        err.response.data.error ||
         'Failed to update stage. Make sure one is selected.';
       notifyError(error);
       throw new Error(error);
@@ -132,7 +134,7 @@ export const UpdateProposalStatusModal = ({
     try {
       const { toAdd, toDelete } = getAddedAndDeleted(
         tempSnapshotProposals,
-        getInitialSnapshots(thread)
+        getInitialSnapshots(thread),
       );
 
       if (toAdd.length > 0) {
@@ -146,7 +148,7 @@ export const UpdateProposalStatusModal = ({
           await loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
             for (const { space: _space, proposals } of data) {
               const matchingSnapshot = proposals.find(
-                (sn) => sn.id === toAdd[0].id
+                (sn) => sn.id === toAdd[0].id,
               );
               if (matchingSnapshot) {
                 enrichedSnapshot = {
@@ -194,7 +196,7 @@ export const UpdateProposalStatusModal = ({
       const { toAdd, toDelete } = getAddedAndDeleted(
         tempProposals,
         getInitialProposals(thread),
-        'identifier'
+        'identifier',
       );
 
       if (toAdd.length > 0) {
@@ -231,7 +233,7 @@ export const UpdateProposalStatusModal = ({
       const { toAdd, toDelete } = getAddedAndDeleted(
         tempCosmosProposals,
         getInitialCosmosProposals(thread),
-        'identifier'
+        'identifier',
       );
       if (toAdd.length > 0) {
         const updatedThread = await addThreadLinks({
@@ -264,6 +266,10 @@ export const UpdateProposalStatusModal = ({
       throw new Error('Failed to update linked proposals');
     }
 
+    trackAnalytics({
+      event: MixpanelCommunityInteractionEvent.LINK_PROPOSAL_BUTTON_PRESSED,
+    });
+
     onChangeHandler?.(tempStage, links);
     onModalClose();
   };
@@ -281,14 +287,14 @@ export const UpdateProposalStatusModal = ({
     const isSelected = tempSnapshotProposals.find(({ id }) => sn.id === id);
 
     setTempSnapshotProposals(
-      isSelected ? [] : [{ id: sn.id, title: sn.title }]
+      isSelected ? [] : [{ id: sn.id, title: sn.title }],
     );
     setVotingStage();
   };
 
   const handleSelectEvmProposal = (ce: { identifier: string }) => {
     const isSelected = tempProposals.find(
-      ({ identifier }) => ce.identifier === identifier
+      ({ identifier }) => ce.identifier === identifier,
     );
 
     const updatedProposals = isSelected
@@ -304,11 +310,11 @@ export const UpdateProposalStatusModal = ({
     title: string;
   }) => {
     const isSelected = tempCosmosProposals.find(
-      ({ identifier }) => proposal.identifier === String(identifier)
+      ({ identifier }) => proposal.identifier === String(identifier),
     );
     const updatedProposals = isSelected
       ? tempCosmosProposals.filter(
-          ({ identifier }) => proposal.identifier !== String(identifier)
+          ({ identifier }) => proposal.identifier !== String(identifier),
         )
       : [...tempCosmosProposals, proposal];
     setTempCosmosProposals(updatedProposals);
@@ -331,7 +337,7 @@ export const UpdateProposalStatusModal = ({
           placeholder="Select a stage"
           isSearchable={false}
           options={stages.map((stage) => ({
-            value: stage,
+            value: stage as unknown as ThreadStage,
             label: threadStageToLabel(stage),
           }))}
           className="StageSelector"

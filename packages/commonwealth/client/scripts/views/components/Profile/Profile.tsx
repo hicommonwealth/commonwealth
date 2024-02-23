@@ -1,5 +1,5 @@
+import axios from 'axios';
 import 'components/Profile/Profile.scss';
-import $ from 'jquery';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import AddressInfo from '../../../models/AddressInfo';
@@ -9,7 +9,7 @@ import Thread from '../../../models/Thread';
 import { CWText } from '../../components/component_kit/cw_text';
 import { PageNotFound } from '../../pages/404';
 import { ImageBehavior } from '../component_kit/cw_cover_image_uploader';
-import { CWSpinner } from '../component_kit/cw_spinner';
+import CWLoadingSpinner from '../component_kit/new_designs/CWLoadingSpinner';
 import type { CommentWithAssociatedThread } from './ProfileActivity';
 import ProfileActivity from './ProfileActivity';
 import ProfileHeader from './ProfileHeader';
@@ -34,24 +34,31 @@ const Profile = ({ profileId }: ProfileProps) => {
   const [threads, setThreads] = useState<Thread[]>([]);
   const [isOwner, setIsOwner] = useState<boolean>();
 
-  const getProfileData = async (query: string) => {
+  const getProfileData = async (query: string, signal: AbortSignal) => {
     setLoading(true);
     try {
-      const { result } = await $.get(`${app.serverUrl()}/profile/v2`, {
-        profileId: query,
-        jwt: app.user.jwt,
+      const response = await axios.get(`${app.serverUrl()}/profile/v2`, {
+        params: {
+          profileId: query,
+          jwt: app.user.jwt,
+        },
+        signal,
       });
+
+      const { result } = response.data;
 
       setProfile(new NewProfile(result.profile));
       setThreads(result.threads.map((t) => new Thread(t)));
+
       const responseComments = result.comments.map((c) => new Comment(c));
       const commentsWithAssociatedThread = responseComments.map((c) => {
         const thread = result.commentThreads.find(
-          (t) => t.id === parseInt(c.threadId, 10)
+          (t) => t.id === parseInt(c.threadId, 10),
         );
         return { ...c, thread };
       });
       setComments(commentsWithAssociatedThread);
+
       setAddresses(
         result.addresses.map((a) => {
           try {
@@ -68,13 +75,15 @@ const Profile = ({ profileId }: ProfileProps) => {
             console.error(`Could not return AddressInfo: "${err}"`);
             return null;
           }
-        })
+        }),
       );
+
       setIsOwner(result.isOwner);
     } catch (err) {
       if (
-        err.status === 500 &&
-        err.responseJSON.error === NoProfileFoundError
+        err.response &&
+        err.response.status === 500 &&
+        err.response.data.error === NoProfileFoundError
       ) {
         setError(ProfileError.NoProfileFound);
       }
@@ -83,14 +92,18 @@ const Profile = ({ profileId }: ProfileProps) => {
   };
 
   useEffect(() => {
-    getProfileData(profileId);
-  }, []);
+    const abortController = new AbortController();
+    const signal = abortController.signal;
+    getProfileData(profileId, signal);
+
+    return () => abortController.abort();
+  }, [profileId]);
 
   if (loading)
     return (
       <div className="Profile loading">
         <div className="loading-spinner">
-          <CWSpinner />
+          <CWLoadingSpinner />
         </div>
       </div>
     );
@@ -137,7 +150,9 @@ const Profile = ({ profileId }: ProfileProps) => {
       >
         <div className="header">
           <CWText type="h2" fontWeight="medium">
-            {`${profile.name}'s Profile`}
+            {profile.name
+              ? `${profile.name}'s Profile`
+              : `Anonymous user's Profile`}
           </CWText>
         </div>
         <div

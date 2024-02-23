@@ -1,281 +1,319 @@
 @import '../../shared';
 
-.CustomQuillToolbar {
-  display: flex;
-  justify-content: space-between;
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
-  border: none !important;
-  background-color: $neutral-25;
-  border-bottom: 1px solid $neutral-200 !important;
+.editor-and-tabs-container {
+  border: 1px solid $neutral-200;
+  border-radius: $border-radius-corners-wider;
 
-  .left-buttons,
-  .right-buttons {
+  .CWTabsRow.boxed {
+    width: 100%;
+    margin-bottom: 0;
+  }
+
+  .MarkdownPreview {
+    min-height: 255px;
+    padding: 16px;
+  }
+
+  .CustomQuillToolbar {
     display: flex;
-    align-items: center;
+    border: none !important;
+    background-color: $white;
+    border-bottom: 1px solid $neutral-200 !important;
 
-    &.isDisabled {
-      opacity: 0.6;
-      filter: grayscale(1);
-    }
-  }
+    .formatting-buttons-container {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
 
-  .left-buttons {
-    flex-wrap: wrap;
-  }
-
-  .right-buttons {
-    margin-left: auto;
-
-    .markdown-button {
-      border-radius: 6px;
-      font-size: 14px;
-      color: $primary-500;
-      font-weight: 500;
-      padding: 1px 8px !important;
-      outline: none;
-      width: auto;
-
-      &.enabled {
-        background: $primary-50;
-        color: $primary-600;
+      &.isDisabled {
+        opacity: 0.6;
+        filter: grayscale(1);
       }
     }
 
-    .eye-icon {
-      display: flex;
-      align-items: center;
-      padding: 4px;
+    .section {
+      margin-right: 24px;
+
+      button {
+        padding: 4px !important;
+        width: auto !important;
+
+        &:hover {
+          svg {
+            fill: $neutral-600;
+          }
+        }
+
+        svg {
+          height: unset !important;
+          fill: $neutral-500;
+        }
+      }
     }
   }
 
-  .section {
-    margin-right: 24px;
+  .CustomQuillFooter {
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    background-color: $neutral-50;
+    padding: 6px 12px;
+    display: flex;
+    justify-content: space-between;
 
-    button {
-      padding: 4px !important;
-      width: auto !important;
+    #img-file-input {
+      display: none;
+    }
 
-      &:hover {
-        svg {
-          fill: $neutral-600;
+    #img-upload-trigger {
+      cursor: pointer;
+      color: $neutral-500;
+      display: flex;
+      align-items: center;
+
+      .icon-container {
+        padding: 3px 4px 0 4px;
+      }
+
+      .Text {
+        color: $neutral-500;
+        line-height: 22px;
+      }
+    }
+
+    .editor-handle {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+  }
+
+  .QuillEditorContainer {
+    &.isDisabled {
+      cursor: not-allowed;
+    }
+  }
+
+  // IMP: this CSS fixes 2 bugs in the editor
+  // 1- Flickering when pasting some content
+  // 2- Auto scrolling to top when pasting some content
+  .ql-clipboard {
+    position: fixed !important;
+    left: 50% !important;
+    top: 50% !important;
+    opacity: 0;
+  }
+
+  .QuillEditorWrapper {
+    min-height: 255px;
+    position: relative;
+
+    &.isFocused {
+      border: 1px solid $primary-500;
+      box-shadow: 0 0 0 3px rgba(204, 227, 255, 1);
+    }
+
+    &.isDisabled {
+      pointer-events: none;
+      user-select: none;
+
+      .QuillEditor {
+        background: $neutral-50;
+      }
+    }
+
+    .QuillEditor {
+      border-bottom-left-radius: 6px;
+      border-bottom-right-radius: 6px;
+    }
+
+    .markdownEnabled {
+      .ql-container {
+        font-family: $font-family-monospace;
+      }
+    }
+
+    .ql-container {
+      min-height: 212px;
+      max-height: 512px;
+      overflow: auto;
+      border: none !important;
+    }
+
+    .ql-editor {
+      min-height: 212px;
+      max-height: 512px;
+
+      &.ql-blank::before {
+        font-style: normal;
+      }
+
+      & h1 {
+        font-size: 24px !important;
+      }
+
+      & h2 {
+        font-size: 20px !important;
+      }
+    }
+
+    .ondragover {
+      background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' stroke='%23338fff' stroke-width='4' stroke-dasharray='4%2c 4' stroke-dashoffset='0' stroke-linecap='butt'/%3e%3c/svg%3e");
+      caret-color: $primary-500;
+    }
+
+    .LoadingIndicator {
+      position: absolute;
+      left: 50%;
+      top: calc(50% + 15px);
+
+      .outer-circle {
+        width: 10px;
+        height: 10px;
+        background-color: #fff;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: 50%;
+      }
+
+      .inner-circle {
+        border-radius: inherit;
+        background-image: conic-gradient(
+          #fff,
+          rgba(80, 200, 120, 0.3),
+          rgb(80, 200, 120)
+        );
+        position: absolute;
+        z-index: -1;
+        margin: auto;
+        top: -0.8rem;
+        bottom: -0.8rem;
+        left: -0.8rem;
+        right: -0.8rem;
+        animation: circle-anim 0.6s linear infinite;
+      }
+
+      @keyframes circle-anim {
+        0% {
+          transform: rotate(0deg);
+        }
+
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    }
+  }
+
+  .QuillTooltip {
+    font-size: 12px;
+    letter-spacing: 0.24px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, calc(-50% + 20px));
+    border-radius: 4px;
+    background-color: $neutral-900;
+    padding: 4px 8px;
+    color: $white;
+    text-align: center;
+
+    span {
+      height: 16px;
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  .ql-mention-list-container {
+    background: $white;
+    border-top: 1px solid $neutral-200;
+    border-left: 1px solid $neutral-200;
+    border-right: 1px solid $neutral-200;
+    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    z-index: 2;
+
+    max-height: 200px;
+    overflow-y: scroll;
+
+    .ql-mention-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      cursor: pointer;
+
+      li {
+        padding: 8px;
+        border-bottom: 1px solid $neutral-200;
+        margin: 0;
+        display: flex;
+        align-items: center;
+
+        > div {
+          font-size: 17px;
+          display: flex;
+          align-items: center;
+          width: 100%;
+        }
+
+        &:first-child {
+          border-radius: 4px 4px 0 0;
+        }
+
+        &:last-child {
+          border-radius: 0 0 4px 4px;
         }
       }
 
-      svg {
-        height: unset !important;
-        fill: $neutral-500;
+      > .selected {
+        background: $neutral-100;
+        cursor: pointer;
       }
-    }
-  }
-}
 
-.QuillEditorContainer {
-  &.isDisabled {
-    cursor: not-allowed;
-  }
-}
-
-.QuillEditorWrapper {
-  border-radius: 6px;
-  border: 1px solid $neutral-200;
-  min-height: 255px;
-  position: relative;
-
-  &.isFocused {
-    border: 1px solid $primary-500;
-    box-shadow: 0 0 0 3px rgba(204, 227, 255, 1);
-  }
-
-  &.isDisabled {
-    pointer-events: none;
-    user-select: none;
-
-    .QuillEditor {
-      background: $neutral-50;
-    }
-  }
-
-  .QuillEditor {
-    border-bottom-left-radius: 6px;
-    border-bottom-right-radius: 6px;
-  }
-
-  .markdownEnabled {
-    .ql-container {
-      font-family: $font-family-monospace;
-    }
-  }
-
-  .ql-container {
-    min-height: 212px;
-    max-height: 512px;
-    overflow-y: scroll;
-    border: none !important;
-  }
-
-  .ql-editor {
-    min-height: 212px;
-
-    &.ql-blank::before {
-      font-style: normal;
-    }
-  }
-
-  .ondragover {
-    background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' stroke='%23338fff' stroke-width='4' stroke-dasharray='4%2c 4' stroke-dashoffset='0' stroke-linecap='butt'/%3e%3c/svg%3e");
-    caret-color: $primary-500;
-  }
-
-  .LoadingIndicator {
-    position: absolute;
-    left: 50%;
-    top: calc(50% + 15px);
-
-    .outer-circle {
-      width: 10px;
-      height: 10px;
-      background-color: #fff;
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      border-radius: 50%;
-    }
-
-    .inner-circle {
-      border-radius: inherit;
-      background-image: conic-gradient(
-        #fff,
-        rgba(80, 200, 120, 0.3),
-        rgb(80, 200, 120)
-      );
-      position: absolute;
-      z-index: -1;
-      margin: auto;
-      top: -0.8rem;
-      bottom: -0.8rem;
-      left: -0.8rem;
-      right: -0.8rem;
-      animation: circle-anim 0.6s linear infinite;
-    }
-
-    @keyframes circle-anim {
-      0% {
-        transform: rotate(0deg);
-      }
-      100% {
-        transform: rotate(360deg);
-      }
-    }
-  }
-}
-
-.QuillTooltip {
-  font-size: 12px;
-  letter-spacing: 0.24px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, calc(-50% + 20px));
-  border-radius: 4px;
-  background-color: $neutral-900;
-  padding: 4px 8px;
-  color: $white;
-  text-align: center;
-
-  span {
-    height: 16px;
-    display: flex;
-    align-items: center;
-  }
-}
-
-.ql-mention-list-container {
-  background: $white;
-  border-top: 1px solid $neutral-200;
-  border-left: 1px solid $neutral-200;
-  border-right: 1px solid $neutral-200;
-  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
-  z-index: 2;
-
-  max-height: 200px;
-  overflow-y: scroll;
-
-  .ql-mention-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    cursor: pointer;
-
-    li {
-      padding: 8px;
-      border-bottom: 1px solid $neutral-200;
-      margin: 0;
-      display: flex;
-      align-items: center;
-
-      > div {
-        font-size: 17px;
-        display: flex;
-        align-items: center;
+      .ql-mention-text-wrap {
         width: 100%;
+
+        .ql-mention-name {
+          font-size: 16px;
+          margin-right: 16px;
+        }
+
+        .ql-mention-addr {
+          float: right;
+          color: $neutral-500;
+          font-size: 14px;
+        }
+
+        .ql-mention-la {
+          display: block;
+          color: $neutral-500;
+          font-size: 14px;
+          white-space: nowrap;
+          margin-bottom: 2px;
+        }
       }
 
-      &:first-child {
-        border-radius: 4px 4px 0 0;
-      }
+      .ql-mention-avatar {
+        height: 20px;
+        width: 20px;
+        min-height: 20px;
+        min-width: 20px;
+        margin-right: 12px;
+        border-radius: 9999px;
 
-      &:last-child {
-        border-radius: 0 0 4px 4px;
-      }
-    }
-
-    > .selected {
-      background: $neutral-100;
-      cursor: pointer;
-    }
-
-    .ql-mention-text-wrap {
-      width: 100%;
-
-      .ql-mention-name {
-        font-size: 16px;
-        margin-right: 16px;
-      }
-
-      .ql-mention-addr {
-        float: right;
-        color: $neutral-500;
-        font-size: 14px;
-      }
-
-      .ql-mention-la {
-        display: block;
-        color: $neutral-500;
-        font-size: 14px;
-        white-space: nowrap;
-        margin-bottom: 2px;
-      }
-    }
-
-    .ql-mention-avatar {
-      height: 20px;
-      width: 20px;
-      min-height: 20px;
-      min-width: 20px;
-      margin-right: 12px;
-      border-radius: 9999px;
-
-      &.missing {
-        background-color: $neutral-300;
+        &.missing {
+          background-color: $neutral-300;
+        }
       }
     }
   }
-}
 
-.image-uploading {
-  display: none;
+  .image-uploading {
+    display: none;
+  }
 }

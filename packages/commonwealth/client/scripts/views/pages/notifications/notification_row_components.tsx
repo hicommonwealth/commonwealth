@@ -1,4 +1,8 @@
-import { NotificationCategories, ProposalType } from 'common-common/src/types';
+import {
+  NotificationCategories,
+  ProposalType,
+  SupportedNetwork,
+} from '@hicommonwealth/core';
 import { getProposalUrlPath } from 'identifiers';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -10,11 +14,10 @@ import { User } from 'views/components/user/user';
 import type { IEventLabel } from '../../../../../shared/chain/labelers/util';
 import { Label as ChainEventLabel } from '../../../../../shared/chain/labelers/util';
 import type { CWEvent } from '../../../../../shared/chain/types/types';
-import { SupportedNetwork } from '../../../../../shared/chain/types/types';
 import AddressInfo from '../../../models/AddressInfo';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { getClasses } from '../../components/component_kit/helpers';
+import CWLoadingSpinner from '../../components/component_kit/new_designs/CWLoadingSpinner';
 import { UserGallery } from '../../components/user/user_gallery';
 import { getBatchNotificationFields } from './helpers';
 import type { NotificationRowProps } from './notification_row';
@@ -126,6 +129,7 @@ type ExtendedNotificationRowProps = NotificationRowProps & {
   allRead: boolean;
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
   const { handleSetMarkingRead, markingRead, notification, allRead } = props;
   const [isRead, setIsRead] = useState<boolean>(notification.isRead);
@@ -170,7 +174,7 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
       {authorInfo.length === 1 ? (
         <User
           userAddress={(authorInfo[0] as [string, string])[1]}
-          userChainId={(authorInfo[0] as [string, string])[0]}
+          userCommunityId={(authorInfo[0] as [string, string])[0]}
           shouldShowAvatarOnly
           avatarSize={26}
         />
@@ -214,7 +218,11 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
                   });
               }}
             >
-              {markingRead ? <CWSpinner size="small" /> : 'Mark as read'}
+              {markingRead ? (
+                <CWLoadingSpinner center={false} />
+              ) : (
+                'Mark as read'
+              )}
             </div>
           )}
         </div>
@@ -223,6 +231,7 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const SnapshotNotificationRow = (
   props: ExtendedNotificationRowProps,
 ) => {
@@ -284,7 +293,11 @@ export const SnapshotNotificationRow = (
                   });
               }}
             >
-              {markingRead ? <CWSpinner size="small" /> : 'Mark as read'}
+              {markingRead ? (
+                <CWLoadingSpinner center={false} />
+              ) : (
+                'Mark as read'
+              )}
             </div>
           )}
         </div>

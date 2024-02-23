@@ -1,30 +1,42 @@
 import React, { FC } from 'react';
 
 import { SearchScope } from '../../../../../models/SearchQuery';
-import { CWText } from '../../cw_text';
 import { CWDivider } from '../../cw_divider';
+import { CWText } from '../../cw_text';
 import { SearchBarCommentPreviewRow } from './SearchBarCommentPreviewRow';
 import { SearchBarCommunityPreviewRow } from './SearchBarCommunityPreviewRow';
 import { SearchBarMemberPreviewRow } from './SearchBarMemberPreviewRow';
 import { SearchBarThreadPreviewRow } from './SearchBarThreadPreviewRow';
 
+import { SearchResults } from '../../../../../hooks/useSearchResults';
+import { SearchChainsResponse } from '../../../../../state/api/chains/searchChains';
+import { SearchCommentsResponse } from '../../../../../state/api/comments/searchComments';
+import { SearchProfilesResponse } from '../../../../../state/api/profiles/searchProfiles';
+import { SearchThreadsResponse } from '../../../../../state/api/threads/searchThreads';
 import './SearchBarDropdown.scss';
 
 interface SearchBarPreviewSectionProps {
-  searchResults: any;
+  searchResults:
+    | SearchThreadsResponse['results']
+    | SearchCommentsResponse['results']
+    | SearchChainsResponse['results']
+    | SearchProfilesResponse['results'];
   searchTerm: string;
   searchScope: SearchScope;
+  onSearchItemClick?: () => void;
 }
 
 interface SearchBarDropdownProps {
   searchTerm: string;
-  searchResults: any;
+  searchResults: SearchResults;
+  onSearchItemClick?: () => void;
 }
 
 const SearchBarPreviewSection: FC<SearchBarPreviewSectionProps> = ({
   searchResults,
   searchTerm,
   searchScope,
+  onSearchItemClick,
 }) => {
   const sectionTitles = {
     [SearchScope.Threads]: 'Threads',
@@ -59,6 +71,7 @@ const SearchBarPreviewSection: FC<SearchBarPreviewSectionProps> = ({
           key={i}
           searchResult={res}
           searchTerm={searchTerm}
+          onSearchItemClick={onSearchItemClick}
         />
       ))}
     </div>
@@ -68,6 +81,7 @@ const SearchBarPreviewSection: FC<SearchBarPreviewSectionProps> = ({
 export const SearchBarDropdown: FC<SearchBarDropdownProps> = ({
   searchTerm,
   searchResults,
+  onSearchItemClick,
 }) => {
   const showResults =
     searchTerm.length > 0 && Object.values(searchResults).flat(1).length > 0;
@@ -82,6 +96,7 @@ export const SearchBarDropdown: FC<SearchBarDropdownProps> = ({
               searchResults={results}
               searchTerm={searchTerm}
               searchScope={scope as SearchScope}
+              onSearchItemClick={onSearchItemClick}
             />
           ))}
         </div>

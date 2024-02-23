@@ -3,12 +3,12 @@ import Template from 'models/Template';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import app from 'state';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import Account from '../../../models/Account';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { User } from '../../components/user/user';
@@ -99,7 +99,7 @@ export const TemplateDisplayTab = ({
                 <div className="table-column">
                   <User
                     userAddress={creator.address}
-                    userChainId={
+                    userCommunityId={
                       creator.community?.id || creator?.profile?.chain
                     }
                     shouldShowAddressWithDisplayName
@@ -109,7 +109,7 @@ export const TemplateDisplayTab = ({
                   <div className="IconGroup">
                     <CWCommunityAvatar
                       community={app.config.chains.getById(
-                        template.createdForCommunity
+                        template.createdForCommunity,
                       )}
                       size="small"
                     />

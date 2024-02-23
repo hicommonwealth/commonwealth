@@ -1,19 +1,19 @@
-import React, { FC } from 'react';
 import {
   ArrowBendUpRight,
+  ArrowFatUp,
   BellSimple,
   BellSimpleSlash,
-  DotsThree,
   ChatCenteredDots,
-  ArrowFatUp,
+  DotsThree,
 } from '@phosphor-icons/react';
+import React, { FC } from 'react';
 
+import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
 import { CWText } from '../cw_text';
 import { getClasses } from '../helpers';
 import { ComponentType } from '../types';
 
 import 'components/component_kit/new_designs/cw_thread_action.scss';
-import { CWTooltip } from 'views/components/component_kit/cw_popover/cw_tooltip';
 
 export type ActionType =
   | 'upvote'
@@ -21,7 +21,8 @@ export type ActionType =
   | 'reply'
   | 'share'
   | 'subscribe'
-  | 'overflow';
+  | 'overflow'
+  | 'view-upvotes';
 
 const commonProps = (disabled: boolean) => {
   return {
@@ -35,7 +36,7 @@ const commonProps = (disabled: boolean) => {
 const renderPhosphorIcon = (
   action: ActionType,
   disabled: boolean,
-  selected: boolean
+  selected: boolean,
 ) => {
   switch (action) {
     case 'upvote':
@@ -163,11 +164,11 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
             disabled,
             upvoteSelected,
           },
-          ComponentType.ThreadAction
+          ComponentType.ThreadAction,
         )}
       >
         {renderPhosphorIcon(action, disabled, selected)}
-        {action !== 'overflow' && action && (
+        {action !== 'overflow' && action && label && (
           <CWText
             className={getClasses({
               disabled,
@@ -176,7 +177,7 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
             type="caption"
             fontWeight="regular"
           >
-            {label || action.charAt(0).toUpperCase() + action.slice(1)}
+            {label}
           </CWText>
         )}
       </button>

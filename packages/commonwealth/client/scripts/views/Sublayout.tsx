@@ -1,32 +1,43 @@
+import 'Sublayout.scss';
+import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
+import { useFlag } from 'hooks/useFlag';
 import useForceRerender from 'hooks/useForceRerender';
+import useWindowResize from 'hooks/useWindowResize';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
-import 'Sublayout.scss';
+import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
-import { AppMobileMenus } from './AppMobileMenus';
 import { Footer } from './Footer';
 import { SublayoutBanners } from './SublayoutBanners';
-import { SublayoutHeader } from './SublayoutHeader';
-import clsx from 'clsx';
+import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
+import { Breadcrumbs } from './components/Breadcrumbs';
+import MobileNavigation from './components/MobileNavigation';
+import { StakeGrowl } from './components/StakeGrowl';
+import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
 
 type SublayoutProps = {
   hideFooter?: boolean;
-  hasCommunitySidebar?: boolean;
+  isInsideCommunity?: boolean;
 } & React.PropsWithChildren;
 
 const Sublayout = ({
   children,
   hideFooter = true,
-  hasCommunitySidebar,
+  isInsideCommunity,
 }: SublayoutProps) => {
   const forceRerender = useForceRerender();
-  const { menuVisible, mobileMenuName, setMenu, menuName } = useSidebarStore();
+  const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
-  const { isWindowSmallInclusive } = useBrowserWindow({
+  const { isWindowSmallInclusive, isWindowExtraSmall } = useBrowserWindow({
     onResize: () => setResizing(true),
     resizeListenerUpdateDeps: [resizing],
+  });
+  const communityStakeEnabled = useFlag('communityStake');
+
+  const { toggleMobileView } = useWindowResize({
+    setMenu,
   });
 
   useEffect(() => {
@@ -36,10 +47,6 @@ const Sublayout = ({
       app.sidebarRedraw.off('redraw', forceRerender);
     };
   }, [forceRerender]);
-
-  useEffect(() => {
-    setMenu({ name: 'default', isVisible: !isWindowSmallInclusive });
-  }, [isWindowSmallInclusive, setMenu]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -55,55 +62,57 @@ const Sublayout = ({
     };
   }, [resizing]);
 
-  useEffect(() => {
-    const onResize = () => {
-      setMenu({ name: 'default', isVisible: !isWindowSmallInclusive });
-    };
-
-    window.addEventListener('resize', onResize);
-
-    return () => {
-      window.removeEventListener('resize', onResize);
-    };
-  }, [isWindowSmallInclusive, menuVisible, mobileMenuName, setMenu]);
-
   const chain = app.chain ? app.chain.meta : null;
   const terms = app.chain ? chain.terms : null;
   const banner = app.chain ? chain.communityBanner : null;
 
   return (
     <div className="Sublayout">
-      <div className="header-and-body-container">
-        <SublayoutHeader onMobile={isWindowSmallInclusive} />
-        <div className="sidebar-and-body-container">
-          <Sidebar isInsideCommunity={hasCommunitySidebar} />
-          <div
-            className={clsx(
-              'body-and-sticky-headers-container',
-              {
-                'menu-visible': menuVisible,
-                'menu-hidden': !menuVisible,
-                'quick-switcher-visible':
-                  menuName === 'exploreCommunities' ||
-                  menuName === 'createContent' ||
-                  hasCommunitySidebar,
-              },
-              resizing
-            )}
-          >
-            <SublayoutBanners banner={banner} chain={chain} terms={terms} />
+      {!isWindowSmallInclusive && (
+        <CollapsableSidebarButton
+          onMobile={isWindowExtraSmall}
+          isInsideCommunity={isInsideCommunity}
+        />
+      )}
+      <SublayoutHeader
+        onMobile={isWindowExtraSmall}
+        isInsideCommunity={isInsideCommunity}
+      />
+      <div className="sidebar-and-body-container">
+        <Sidebar
+          isInsideCommunity={isInsideCommunity}
+          onMobile={isWindowExtraSmall}
+        />
+        <div
+          className={clsx(
+            'body-and-sticky-headers-container',
+            {
+              'menu-visible': menuVisible,
+              'menu-hidden': !menuVisible,
+              'quick-switcher-visible':
+                menuName === 'exploreCommunities' ||
+                menuName === 'createContent' ||
+                isInsideCommunity,
+            },
+            resizing,
+          )}
+        >
+          <SublayoutBanners banner={banner} chain={chain} terms={terms} />
 
-            {isWindowSmallInclusive && mobileMenuName ? (
-              <AppMobileMenus />
-            ) : (
-              <div className="Body">
-                {children}
-                {!app.isCustomDomain() && !hideFooter && <Footer />}
+          <div className="Body">
+            {!toggleMobileView && (
+              <div className="breadcrumbContainer">
+                <Breadcrumbs />
               </div>
             )}
+            {isInsideCommunity && <AdminOnboardingSlider />}
+            {children}
+            {!app.isCustomDomain() && !hideFooter && <Footer />}
           </div>
         </div>
+        {communityStakeEnabled && <StakeGrowl />}
       </div>
+      {isWindowExtraSmall && <MobileNavigation />}
     </div>
   );
 };

@@ -1,6 +1,6 @@
-import app, { ApiStatus } from 'state';
-import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/core';
 import { updateActiveAddresses } from 'controllers/app/login';
+import app, { ApiStatus } from 'state';
 import ChainInfo from '../models/ChainInfo';
 
 export const deinitChainOrCommunity = async () => {
@@ -17,7 +17,7 @@ export const deinitChainOrCommunity = async () => {
   app.user.setSelectedChain(null);
   app.user.setActiveAccounts([]);
   app.user.ephemerallySetActiveAccount(null);
-  document.title = 'Commonwealth';
+  document.title = 'Common';
 };
 
 // called by the user, when clicking on the chain/node switcher menu
@@ -48,7 +48,7 @@ export const selectChain = async (chain?: ChainInfo): Promise<boolean> => {
     app.skipDeinitChain = false;
   }
   app.chainPreloading = true;
-  document.title = `Commonwealth – ${chain.name}`;
+  document.title = `Common – ${chain.name}`;
 
   // Import top-level chain adapter lazily, to facilitate code split.
   let newChain;
@@ -72,15 +72,6 @@ export const selectChain = async (chain?: ChainInfo): Promise<boolean> => {
       )
     ).default;
     newChain = new Cosmos(chain, app);
-  } else if (chain.network === ChainNetwork.Ethereum) {
-    const Ethereum = (
-      await import(
-        /* webpackMode: "lazy" */
-        /* webpackChunkName: "ethereum-main" */
-        '../controllers/chain/ethereum/tokenAdapter'
-      )
-    ).default;
-    newChain = new Ethereum(chain, app);
   } else if (
     chain.network === ChainNetwork.NEAR ||
     chain.network === ChainNetwork.NEARTestnet
@@ -123,36 +114,9 @@ export const selectChain = async (chain?: ChainInfo): Promise<boolean> => {
     ).default;
     newChain = new Aave(chain, app);
   } else if (
-    chain.network === ChainNetwork.ERC20 ||
-    chain.network === ChainNetwork.AxieInfinity
+    chain.base === ChainBase.Solana ||
+    chain.network === ChainNetwork.SPL
   ) {
-    const ERC20 = (
-      await import(
-        //   /* webpackMode: "lazy" */
-        //   /* webpackChunkName: "erc20-main" */
-        '../controllers/chain/ethereum/tokenAdapter'
-      )
-    ).default;
-    newChain = new ERC20(chain, app);
-  } else if (chain.network === ChainNetwork.ERC721) {
-    const ERC721 = (
-      await import(
-        //   /* webpackMode: "lazy" */
-        //   /* webpackChunkName: "erc721-main" */
-        '../controllers/chain/ethereum/NftAdapter'
-      )
-    ).default;
-    newChain = new ERC721(chain, app);
-  } else if (chain.network === ChainNetwork.SPL) {
-    const SPL = (
-      await import(
-        //   /* webpackMode: "lazy" */
-        //   /* webpackChunkName: "spl-main" */
-        '../controllers/chain/solana/tokenAdapter'
-      )
-    ).default;
-    newChain = new SPL(chain, app);
-  } else if (chain.base === ChainBase.Solana) {
     const Solana = (
       await import(
         /* webpackMode: "lazy" */
@@ -162,8 +126,11 @@ export const selectChain = async (chain?: ChainInfo): Promise<boolean> => {
     ).default;
     newChain = new Solana(chain, app);
   } else if (
-    chain.base === ChainBase.Ethereum &&
-    chain.type === ChainType.Offchain
+    (chain.base === ChainBase.Ethereum && chain.type === ChainType.Offchain) ||
+    chain.network === ChainNetwork.Ethereum ||
+    chain.network === ChainNetwork.ERC721 ||
+    chain.network === ChainNetwork.ERC20 ||
+    chain.network === ChainNetwork.AxieInfinity
   ) {
     const Ethereum = (
       await import(

@@ -1,3 +1,4 @@
+import { SessionKeyError } from 'controllers/server/sessions';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import app from 'state';
@@ -5,25 +6,23 @@ import {
   useDeleteThreadMutation,
   useEditThreadMutation,
 } from 'state/api/threads';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
-import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import { ArchiveThreadModal } from 'views/modals/ArchiveThreadModal';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import { ChangeThreadTopicModal } from 'views/modals/change_thread_topic_modal';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
-import { ArchiveThreadModal } from 'views/modals/ArchiveThreadModal';
 import {
   notifyError,
   notifySuccess,
 } from '../../../../../../controllers/app/notifications';
 import type Thread from '../../../../../../models/Thread';
 import type { IThreadCollaborator } from '../../../../../../models/Thread';
-import { ThreadStage } from '../../../../../../models/types';
 import Permissions from '../../../../../../utils/Permissions';
 import { EditCollaboratorsModal } from '../../../../../modals/edit_collaborators_modal';
 import './AdminActions.scss';
-import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
-import { SessionKeyError } from 'controllers/server/sessions';
 
 export type AdminActionsProps = {
   thread: Thread;
@@ -31,7 +30,7 @@ export type AdminActionsProps = {
   onSpamToggle?: (thread: Thread) => any;
   onLockToggle?: (isLocked: boolean) => any;
   onPinToggle?: (isPinned: boolean) => any;
-  onProposalStageChange?: (newStage: ThreadStage) => any;
+  onProposalStageChange?: (newStage: string) => any;
   onSnapshotProposalFromThread?: () => any;
   onCollaboratorsEdit?: (collaborators: IThreadCollaborator[]) => any;
   onEditStart?: () => any;
@@ -90,7 +89,7 @@ export const AdminActions = ({
     chainId: app.activeChainId(),
     threadId: thread.id,
     currentStage: thread.stage,
-    currentTopicId: thread.topic.id,
+    currentTopicId: thread.topic?.id,
   });
 
   const handleDeleteThread = () => {
@@ -183,7 +182,7 @@ export const AdminActions = ({
                 .then((t: Thread | any) => onSpamToggle && onSpamToggle(t))
                 .catch(() => {
                   notifyError(
-                    `Could not ${!isSpam ? 'mark' : 'unmark'} thread as spam`
+                    `Could not ${!isSpam ? 'mark' : 'unmark'} thread as spam`,
                   );
                 });
             } catch (err) {
@@ -262,7 +261,7 @@ export const AdminActions = ({
     navigate(
       snapshotSpaces.length > 1
         ? '/multiple-snapshots'
-        : `/snapshot/${snapshotSpaces}`
+        : `/snapshot/${snapshotSpaces}`,
     );
   };
 
@@ -278,12 +277,14 @@ export const AdminActions = ({
       })
         .then(() => {
           notifySuccess(
-            `Thread has been ${thread?.archivedAt ? 'unarchived' : 'archived'}!`
+            `Thread has been ${
+              thread?.archivedAt ? 'unarchived' : 'archived'
+            }!`,
           );
         })
         .catch(() => {
           notifyError(
-            `Could not ${thread?.archivedAt ? 'unarchive' : 'archive'} thread.`
+            `Could not ${thread?.archivedAt ? 'unarchive' : 'archive'} thread.`,
           );
         });
     }
@@ -382,7 +383,7 @@ export const AdminActions = ({
                             navigate(
                               snapshotSpaces.length > 1
                                 ? '/multiple-snapshots'
-                                : `/snapshot/${snapshotSpaces}`
+                                : `/snapshot/${snapshotSpaces}`,
                             );
                           },
                         },
@@ -438,6 +439,7 @@ export const AdminActions = ({
 
       <CWModal
         size="medium"
+        visibleOverflow
         content={
           <UpdateProposalStatusModal
             onChangeHandler={(s) =>
@@ -449,7 +451,6 @@ export const AdminActions = ({
         }
         onClose={() => setIsUpdateProposalStatusModalOpen(false)}
         open={isUpdateProposalStatusModalOpen}
-        visibleOverflow
       />
 
       <CWModal

@@ -1,6 +1,6 @@
-import React from 'react';
 import { formatNumberLong } from 'helpers';
 import 'pages/snapshot/snapshot_votes_table.scss';
+import React from 'react';
 import app from 'state';
 import { CWText } from '../../components/component_kit/cw_text';
 import { User } from '../../components/user/user';
@@ -61,14 +61,14 @@ export const SnapshotVotesTable = (props: SnapshotVotesTableProps) => {
             {app.chain ? (
               <User
                 userAddress={vote.voter}
-                userChainId={app.activeChainId()}
+                userCommunityId={app.activeChainId()}
                 shouldLinkProfile
                 shouldShowPopover
               />
             ) : (
               <CWText className="column-text">{`${vote.voter.slice(
                 0,
-                15
+                15,
               )}...`}</CWText>
             )}
             <CWText className="column-text" noWrap>

@@ -1,45 +1,42 @@
 /* eslint-disable no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import type {
+  Action,
+  ActionPayload,
+  Session,
+  SessionPayload,
+} from '@canvas-js/interfaces';
+import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
 import {
+  SignTypedDataVersion,
   personalSign,
   signTypedData,
-  SignTypedDataVersion,
 } from '@metamask/eth-sig-util';
 import { Keyring } from '@polkadot/api';
 import { stringToU8a } from '@polkadot/util';
-import type BN from 'bn.js';
 import chai from 'chai';
-import 'chai/register-should';
-import { BalanceType, ChainBase, ChainNetwork } from 'common-common/src/types';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
-import * as siwe from 'siwe';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
-import { createRole, findOneRole } from 'server/util/roles';
-import type {
-  Action,
-  Session,
-  ActionPayload,
-  SessionPayload,
-} from '@canvas-js/interfaces';
-
-import type { IChainNode } from 'token-balance-cache/src/index';
-import { BalanceProvider } from 'token-balance-cache/src/index';
+import * as siwe from 'siwe';
+import { createRole, findOneRole } from '../../server/util/roles';
 
 import { createCanvasSessionPayload } from '../../shared/canvas';
 
+import type { Role } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model';
 import { mnemonicGenerate } from '@polkadot/util-crypto';
 import Web3 from 'web3-utils';
 import app from '../../server-test';
-import models from '../../server/database';
-import type { Role } from '../../server/models/role';
 
+import { Link, LinkSource, ThreadAttributes } from '@hicommonwealth/model';
 import {
-  getEIP712SignableAction,
-  TEST_BLOCK_INFO_STRING,
   TEST_BLOCK_INFO_BLOCKHASH,
+  TEST_BLOCK_INFO_STRING,
   createSiweMessage,
+  getEIP712SignableAction,
 } from '../../shared/adapters/chain/ethereum/keys';
-import { Link, LinkSource } from 'server/models/thread';
 
 const sortedStringify = configureStableStringify({
   bigint: false,
@@ -55,6 +52,18 @@ export const generateEthAddress = () => {
   return { keypair, address };
 };
 
+export const getTopicId = async ({ chain }) => {
+  const res = await chai.request
+    .agent(app)
+    .get('/api/topics')
+    .set('Accept', 'application/json')
+    .query({
+      community_id: chain,
+    });
+  const topicId = res.body.result[0].id;
+  return topicId;
+};
+
 export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
   if (chain === 'ethereum' || chain === 'alex') {
     const wallet_id = 'metamask';
@@ -63,9 +72,13 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .agent(app)
       .post('/api/createAddress')
       .set('Accept', 'application/json')
-      .send({ address, chain, wallet_id, block_info: TEST_BLOCK_INFO_STRING });
+      .send({
+        address,
+        community_id: chain,
+        wallet_id,
+        block_info: TEST_BLOCK_INFO_STRING,
+      });
     const address_id = res.body.result.id;
-    const token = res.body.result.verification_token;
     const chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
     const sessionWallet = ethers.Wallet.createRandom();
     const timestamp = 1665083987891;
@@ -75,7 +88,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       address,
       sessionWallet.address,
       timestamp,
-      TEST_BLOCK_INFO_BLOCKHASH
+      TEST_BLOCK_INFO_BLOCKHASH,
     );
     const nonce = siwe.generateNonce();
     const domain = 'https://commonwealth.test';
@@ -96,7 +109,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .set('Accept', 'application/json')
       .send({
         address,
-        chain,
+        community_id: chain,
         chain_id,
         signature,
         wallet_id,
@@ -113,14 +126,11 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       email,
       session,
       sign: (actionPayload: ActionPayload) => {
-        const { types, primaryType, domain, message } =
-          getEIP712SignableAction(actionPayload);
-        const signature = signTypedData({
+        return signTypedData({
           privateKey: Buffer.from(sessionWallet.privateKey.slice(2), 'hex'),
           data: getEIP712SignableAction(actionPayload),
           version: SignTypedDataVersion.V4,
         });
-        return signature;
       },
     };
   }
@@ -135,14 +145,14 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .agent(app)
       .post('/api/createAddress')
       .set('Accept', 'application/json')
-      .send({ address: keyPair.address, chain, wallet_id });
+      .send({ address: keyPair.address, community_id: chain, wallet_id });
 
     // generate session wallet
     const sessionKeyring = new Keyring();
     const sessionWallet = sessionKeyring.addFromUri(
       mnemonicGenerate(),
       {},
-      'ed25519'
+      'ed25519',
     );
     const chain_id = ChainNetwork.Edgeware;
     const timestamp = 1665083987891;
@@ -152,10 +162,10 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       address,
       sessionWallet.address,
       timestamp,
-      TEST_BLOCK_INFO_BLOCKHASH
+      TEST_BLOCK_INFO_BLOCKHASH,
     );
     const signature = keyPair.sign(
-      stringToU8a(sortedStringify(sessionPayload))
+      stringToU8a(sortedStringify(sessionPayload)),
     );
     const session: Session = {
       type: 'session',
@@ -168,7 +178,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .agent(app)
       .post('/api/verifyAddress')
       .set('Accept', 'application/json')
-      .send({ address, chain, signature, wallet_id });
+      .send({ address, community_id: chain, signature, wallet_id });
     const user_id = res.body.result.user.id;
     const email = res.body.result.user.email;
     return {
@@ -180,10 +190,9 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       sessionSigner: keyPair,
       sign: (actionPayload: ActionPayload) => {
         const signatureBytes = sessionWallet.sign(
-          stringToU8a(sortedStringify(actionPayload))
+          stringToU8a(sortedStringify(actionPayload)),
         );
-        const signature = new Buffer(signatureBytes).toString('hex');
-        return signature;
+        return new Buffer(signatureBytes).toString('hex');
       },
     };
   }
@@ -212,7 +221,6 @@ export interface ThreadArgs {
   stage?: string;
   chainId: string;
   title: string;
-  topicName?: string;
   topicId?: number;
   body?: string;
   url?: string;
@@ -221,14 +229,15 @@ export interface ThreadArgs {
   sign: (actionPayload: ActionPayload) => string;
 }
 
-export const createThread = async (args: ThreadArgs) => {
+export const createThread = async (
+  args: ThreadArgs,
+): Promise<{ status: string; result?: ThreadAttributes; error?: Error }> => {
   const {
     chainId,
     address,
     jwt,
     title,
     body,
-    topicName,
     topicId,
     readOnly,
     kind,
@@ -273,7 +282,6 @@ export const createThread = async (args: ThreadArgs) => {
       title: encodeURIComponent(title),
       body: encodeURIComponent(body),
       kind,
-      topic_name: topicName,
       topic_id: topicId,
       url,
       readOnly: readOnly || false,
@@ -600,7 +608,7 @@ export const updateRole = async (args: AssignRoleArgs) => {
   const currentRole = await findOneRole(
     models,
     { where: { address_id: args.address_id } },
-    args.chainOrCommObj.chain_id
+    args.chainOrCommObj.chain_id,
   );
   let role;
   // Can only be a promotion
@@ -609,7 +617,7 @@ export const updateRole = async (args: AssignRoleArgs) => {
       models,
       args.address_id,
       args.chainOrCommObj.chain_id,
-      args.role
+      args.role,
     );
   }
   // Can be demoted or promoted
@@ -629,7 +637,7 @@ export const updateRole = async (args: AssignRoleArgs) => {
         models,
         args.address_id,
         args.chainOrCommObj.chain_id,
-        args.role
+        args.role,
       );
     }
   }
@@ -680,43 +688,6 @@ export const createCommunity = async (args: CommunityArgs) => {
   return community;
 };
 
-// always prune both token and non-token holders asap
-export class MockTokenBalanceProvider extends BalanceProvider<
-  any,
-  {
-    tokenAddress: string;
-    contractType: string;
-  }
-> {
-  public name = 'eth-token';
-  public opts = {
-    tokenAddress: 'string',
-    contractType: 'string',
-  };
-  public validBases = [BalanceType.Ethereum];
-  public balanceFn: (tokenAddress: string, userAddress: string) => Promise<BN>;
-
-  public async getExternalProvider(
-    node: IChainNode,
-    opts: { tokenAddress: string; contractType: string }
-  ): Promise<any> {
-    return;
-  }
-
-  public async getBalance(
-    node: IChainNode,
-    address: string,
-    opts: { tokenAddress: string; contractType: string }
-  ): Promise<string> {
-    if (this.balanceFn) {
-      const bal = await this.balanceFn(opts.tokenAddress, address);
-      return bal.toString();
-    } else {
-      throw new Error('unable to fetch token balance');
-    }
-  }
-}
-
 export interface JoinCommunityArgs {
   jwt: string;
   address_id: number;
@@ -724,16 +695,17 @@ export interface JoinCommunityArgs {
   chain: string;
   originChain: string;
 }
+
 export const joinCommunity = async (args: JoinCommunityArgs) => {
   const { jwt, address, chain, originChain, address_id } = args;
   try {
     await chai.request
       .agent(app)
-      .post('/api/linkExistingAddressToChain')
+      .post('/api/linkExistingAddressToCommunity')
       .set('Accept', 'application/json')
       .send({
         address,
-        chain,
+        community_id: chain,
         originChain,
         jwt,
       });

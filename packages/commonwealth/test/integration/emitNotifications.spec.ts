@@ -1,15 +1,18 @@
+import {
+  NotificationCategories,
+  NotificationDataAndCategory,
+  ProposalType,
+  SnapshotEventType,
+  SupportedNetwork,
+} from '@hicommonwealth/core';
+import { models, tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import { resetDatabase } from '../../server-test';
-import * as modelUtils from '../util/modelUtils';
-import { JoinCommunityArgs } from '../util/modelUtils';
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../../server/config';
 import emitNotifications from '../../server/util/emitNotifications';
-import models from '../../server/database';
-import { NotificationCategories, ProposalType } from 'common-common/src/types';
-import { NotificationDataAndCategory, SnapshotEventType } from 'types';
-import { SupportedNetwork } from '../../shared/chain/types/types';
+import * as modelUtils from '../util/modelUtils';
+import { JoinCommunityArgs } from '../util/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -21,11 +24,9 @@ describe('emitNotifications tests', () => {
   // author_chain, which is required for authorship lookup.
   // Therefore, a valid chain MUST be included alongside
   // communityId, unlike in non-test thread creation
-  let thread, comment, reaction;
+  let thread, comment;
   const title = 'test title';
-  const body = 'test body';
   const commentBody = 'test';
-  const topicName = 'test topic';
   const kind = 'discussion';
 
   let userJWT;
@@ -38,7 +39,7 @@ describe('emitNotifications tests', () => {
   let userAddressId2;
 
   before('Reset database', async () => {
-    await resetDatabase();
+    await tester.seedDb();
 
     // creates 2 ethereum users
     const firstUser = await modelUtils.createAndVerifyAddress({ chain });
@@ -84,7 +85,7 @@ describe('emitNotifications tests', () => {
 
     // create a thread manually to bypass emitNotifications in-route
     thread = await models.Thread.create({
-      chain: chain,
+      community_id: chain,
       address_id: userAddressId2,
       title,
       plaintext: '',
@@ -95,11 +96,12 @@ describe('emitNotifications tests', () => {
       thread_id: thread.id,
       address_id: userAddressId2,
       text: commentBody,
-      chain,
+      community_id: chain,
     });
 
-    reaction = await models.Reaction.create({
-      chain,
+    //reaction = await models.Reaction.create({
+    await models.Reaction.create({
+      community_id: chain,
       thread_id: thread.id,
       address_id: userAddressId,
       reaction: 'like',
@@ -111,7 +113,7 @@ describe('emitNotifications tests', () => {
       const subscription = await models.Subscription.create({
         subscriber_id: userId,
         category_id: NotificationCategories.NewThread,
-        chain_id: chain,
+        community_id: chain,
       });
 
       const notification_data = {
@@ -132,7 +134,7 @@ describe('emitNotifications tests', () => {
 
       const notif = await models.Notification.findOne({
         where: {
-          chain_id: chain,
+          community_id: chain,
           category_id: NotificationCategories.NewThread,
           thread_id: thread.id,
         },
@@ -140,7 +142,7 @@ describe('emitNotifications tests', () => {
       expect(notif).to.not.be.null;
       expect(notif.thread_id).to.equal(thread.id);
       expect(notif.toJSON().notification_data).to.deep.equal(
-        JSON.stringify(notification_data)
+        JSON.stringify(notification_data),
       );
 
       const notifRead = await models.NotificationsRead.findOne({
@@ -166,7 +168,7 @@ describe('emitNotifications tests', () => {
       const subscription = await models.Subscription.create({
         subscriber_id: userId,
         category_id: NotificationCategories.NewComment,
-        chain_id: chain,
+        community_id: chain,
         thread_id: thread.id,
       });
 
@@ -188,14 +190,14 @@ describe('emitNotifications tests', () => {
 
       const notif = await models.Notification.findOne({
         where: {
-          chain_id: chain,
+          community_id: chain,
           category_id: NotificationCategories.NewComment,
         },
       });
       expect(notif).to.not.be.null;
       expect(notif.thread_id).to.equal(thread.id);
       expect(notif.toJSON().notification_data).to.deep.equal(
-        JSON.stringify(notifData)
+        JSON.stringify(notifData),
       );
 
       const notifRead = await models.NotificationsRead.findOne({
@@ -227,7 +229,7 @@ describe('emitNotifications tests', () => {
       const subscription = await models.Subscription.create({
         subscriber_id: userId,
         category_id: NotificationCategories.NewReaction,
-        chain_id: chain,
+        community_id: chain,
         thread_id: thread.id,
       });
 
@@ -247,7 +249,7 @@ describe('emitNotifications tests', () => {
 
       const notif = await models.Notification.findOne({
         where: {
-          chain_id: chain,
+          community_id: chain,
           category_id: NotificationCategories.NewReaction,
           thread_id: thread.id,
         },
@@ -255,7 +257,7 @@ describe('emitNotifications tests', () => {
       expect(notif).to.not.be.null;
       expect(notif.thread_id).to.equal(thread.id);
       expect(notif.toJSON().notification_data).to.deep.equal(
-        JSON.stringify(notification_data)
+        JSON.stringify(notification_data),
       );
 
       const notifRead = await models.NotificationsRead.findOne({
@@ -381,7 +383,7 @@ describe('emitNotifications tests', () => {
         expire: String(1680869325),
       };
 
-      const eventType: SnapshotEventType = SnapshotEventType.Created;
+      // const eventType: SnapshotEventType = SnapshotEventType.Created;
       const notififcation_data: NotificationDataAndCategory = {
         categoryId: NotificationCategories.SnapshotProposal,
         data: {
@@ -416,7 +418,7 @@ describe('emitNotifications tests', () => {
       const subscription = await models.Subscription.create({
         subscriber_id: userId,
         category_id: NotificationCategories.ChainEvent,
-        chain_id: chain,
+        community_id: chain,
       });
 
       const chainEventId = -1;
@@ -438,7 +440,7 @@ describe('emitNotifications tests', () => {
 
       const notif = await models.Notification.findOne({
         where: {
-          chain_id: chain,
+          community_id: chain,
           category_id: NotificationCategories.ChainEvent,
           chain_event_id: chainEventId,
         },
