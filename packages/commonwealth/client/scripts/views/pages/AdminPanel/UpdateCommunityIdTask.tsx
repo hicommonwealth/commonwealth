@@ -1,6 +1,7 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import React, { useState } from 'react';
 import app from 'state';
+import { slugifyPreserveDashes } from 'utils';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
@@ -52,24 +53,31 @@ const UpdateCommunityIdTask = () => {
     });
   };
 
-  function validateFn(
-    this: { new: boolean },
+  const validateFn = (
     value: string,
-  ): [ValidationStatus, string] | [] {
+    isNewCommunityId: boolean,
+  ): [ValidationStatus, string] | [] => {
     const communityExists = app.config.chains.getById(value);
 
-    if (communityExists && this.new) {
+    if (communityExists && isNewCommunityId) {
       setNewValueValidated(false);
       return ['failure', 'Community already exists'];
-    } else if (!communityExists && !this.new) {
+    } else if (!communityExists && !isNewCommunityId) {
       setOriginalValueValidated(false);
       return ['failure', 'Community not found'];
+    } else if (isNewCommunityId && value !== slugifyPreserveDashes(value)) {
+      setNewValueValidated(false);
+      return ['failure', 'Incorrect format.'];
+    } else if (!isNewCommunityId && value !== slugifyPreserveDashes(value)) {
+      setOriginalValueValidated(false);
+      return ['failure', 'Incorrect format'];
     }
 
-    if (this.new) setNewValueValidated(true);
-    else setOriginalValueValidated(true);
+    if (isNewCommunityId) {
+      setNewValueValidated(true);
+    } else setOriginalValueValidated(true);
     return [];
-  }
+  };
 
   return (
     <div className="TaskGroup">
@@ -87,8 +95,8 @@ const UpdateCommunityIdTask = () => {
             setOriginalCommunityValue(e.target.value);
             if (e.target.value.length === 0) setOriginalValueValidated(false);
           }}
-          inputValidationFn={validateFn.bind({ new: false })}
-          placeholder="Enter a community id"
+          inputValidationFn={(value) => validateFn(value, false)}
+          placeholder="Enter current community id"
         />
         <CWTextInput
           value={newCommunityValue}
@@ -96,8 +104,8 @@ const UpdateCommunityIdTask = () => {
             setNewCommunityValue(e.target.value);
             if (e.target.value.length === 0) setNewValueValidated(false);
           }}
-          inputValidationFn={validateFn.bind({ new: true })}
-          placeholder="Enter a community id"
+          inputValidationFn={(value) => validateFn(value, true)}
+          placeholder="Enter new community id"
         />
         <CWButton
           label="Update"
