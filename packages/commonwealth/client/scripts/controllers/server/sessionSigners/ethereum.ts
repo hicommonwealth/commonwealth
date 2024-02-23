@@ -2,14 +2,14 @@ import { SIWESigner } from '@canvas-js/chain-ethereum';
 import type {
   Action,
   ActionArgument,
-  ActionPayload,
+  Message,
   Session,
   SessionPayload,
+  Signature,
 } from '@canvas-js/interfaces';
-import { getEIP712SignableAction } from 'adapters/chain/ethereum/keys';
 import { CANVAS_TOPIC, verify as verifyCanvasSessionSignature } from 'canvas';
-import { ethers, utils } from 'ethers';
-import { ISessionController, InvalidSession } from '.';
+import { ethers } from 'ethers';
+import { ISessionController } from '.';
 
 export class EthereumSessionController implements ISessionController {
   private signers: Record<number, Record<string, ethers.Wallet>> = {};
@@ -106,67 +106,38 @@ export class EthereumSessionController implements ISessionController {
     return this.signers[chainId][fromAddress];
   }
 
-  async sign(
+  // TODO: this is completely generic
+  sign(
     chainId: string,
     fromAddress: string,
     call: string,
     callArgs: Record<string, ActionArgument>,
-  ): Promise<{
-    session: Session;
-    action: Action;
-    hash: string;
-  }> {
-    this.signers[chainId] = this.signers[chainId] ?? {};
-    this.auths[chainId] = this.auths[chainId] ?? {};
-
-    const actionSigner = this.signers[chainId][fromAddress];
-    const sessionPayload = this.auths[chainId][fromAddress]?.payload;
-    const sessionSignature = this.auths[chainId][fromAddress]?.signature;
-    // TODO: verify payload is not expired
-
-    if (!sessionPayload || !sessionSignature || !actionSigner)
-      throw new InvalidSession();
-
-    const actionPayload: ActionPayload = {
-      app: sessionPayload.app,
-      from: sessionPayload.from,
-      timestamp: +Date.now(),
-      chain: `eip155:${chainId}`,
-      block: sessionPayload.block,
-      call,
-      callArgs,
-    };
-
-    // const canvasEthereum = await import('@canvas-js/chain-ethereum');
-    // const [domain, types, value] =
-    //   canvasEthereum.getActionSignatureData(actionPayload);
-    const { domain, types, message } = getEIP712SignableAction(actionPayload);
-    delete types.EIP712Domain;
-    const signature = await actionSigner._signTypedData(domain, types, message);
-    const recoveredAddr = utils.verifyTypedData(
-      domain as any,
-      types,
-      message,
-      signature,
-    );
-    const valid = recoveredAddr === this.signers[chainId][fromAddress].address;
-    if (!valid) throw new Error('Invalid signature!');
-
-    const session: Session = {
-      type: 'session',
-      payload: sessionPayload,
-      signature: sessionSignature,
-    };
+  ): {
+    message: Message<Action>;
+    signature: Signature;
+  } {
     const action: Action = {
       type: 'action',
-      payload: actionPayload,
-      session: sessionPayload.sessionAddress,
-      signature,
+      address: fromAddress,
+
+      name: call,
+      args: callArgs,
+
+      timestamp: new Date().getTime(),
+      blockhash: null,
+    };
+    const sessionSigner = new SIWESigner({ chainId: parseInt(chainId) });
+
+    const message: Message<Action> = {
+      clock: 0,
+      parents: [],
+      payload: action,
+      topic: CANVAS_TOPIC,
     };
 
-    const canvas = await import('@canvas-js/interfaces');
-    const hash = canvas.getActionHash(action);
-
-    return { session, action, hash };
+    return {
+      message,
+      signature: sessionSigner.sign(message),
+    };
   }
 }

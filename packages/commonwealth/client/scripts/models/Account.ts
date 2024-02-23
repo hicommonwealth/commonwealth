@@ -1,5 +1,4 @@
 import type { WalletId, WalletSsoSource } from '@hicommonwealth/core';
-import { encode as dagJsonEncode } from '@ipld/dag-json';
 import $ from 'jquery';
 import app from 'state';
 import NewProfilesController from '../controllers/server/newProfiles';
@@ -167,6 +166,7 @@ class Account {
   }
 
   public async validate(session: Session, shouldRedraw = true) {
+    const { encode: dagJsonEncode } = await import('@ipld/dag-json');
     const encodedSession = dagJsonEncode(session);
 
     const params = {

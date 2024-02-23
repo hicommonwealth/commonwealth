@@ -4,7 +4,13 @@ export { NEARSessionController } from './near';
 export { SolanaSessionController } from './solana';
 export { SubstrateSessionController } from './substrate';
 
-import type { Action, ActionArgument, Session } from '@canvas-js/interfaces';
+import type {
+  Action,
+  ActionArgument,
+  Message,
+  Session,
+  Signature,
+} from '@canvas-js/interfaces';
 
 export class InvalidSession extends Error {}
 
@@ -34,9 +40,5 @@ export abstract class ISessionController {
     fromAddress: string,
     call: string,
     args: Record<string, ActionArgument>,
-  ): Promise<{
-    session: Session;
-    action: Action;
-    hash: string;
-  }>;
+  ): { message: Message<Action>; signature: Signature };
 }
