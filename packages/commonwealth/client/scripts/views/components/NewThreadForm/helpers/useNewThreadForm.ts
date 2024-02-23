@@ -53,7 +53,10 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
   );
   const [isSaving, setIsSaving] = useState(false);
 
+  console.log('threadContentDelta', threadContentDelta);
+
   const editorText = getTextFromDelta(threadContentDelta);
+  console.log('editorText', editorText);
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
   const disableSave = isSaving;

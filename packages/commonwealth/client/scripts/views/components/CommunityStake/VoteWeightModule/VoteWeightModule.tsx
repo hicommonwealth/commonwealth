@@ -56,7 +56,7 @@ export const VoteWeightModule = ({
           />
         </div>
         <CWText className="vote-weight" type="h3" fontWeight="bold">
-          {voteWeight}
+          {isNaN(voteWeight) ? 0 : voteWeight}
         </CWText>
         <div className="info-and-actions">
           <div className="info">

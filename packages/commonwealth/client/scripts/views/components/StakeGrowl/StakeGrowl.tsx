@@ -57,7 +57,7 @@ const StakeGrowl = () => {
             onClick={() => navigate('/createCommunity', {}, null)}
           />
           <CWText type="b2" fontWeight="regular" isCentered className="body">
-            Currently only newly creted communities can enable stake.
+            Currently only newly created communities can enable stake.
           </CWText>
           <a
             href="http://blog.commonwealth.im/community-stake-100-owners-around-any-idea/"
