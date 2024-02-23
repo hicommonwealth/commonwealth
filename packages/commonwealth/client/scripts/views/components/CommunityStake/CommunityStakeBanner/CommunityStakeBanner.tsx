@@ -4,7 +4,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
-import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
+import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import { CWText } from '../../component_kit/cw_text';
 import CWBanner from '../../component_kit/new_designs/CWBanner';
 import { CWTag } from '../../component_kit/new_designs/CWTag';
