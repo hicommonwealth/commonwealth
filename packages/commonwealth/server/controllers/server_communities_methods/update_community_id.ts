@@ -30,6 +30,25 @@ export async function __updateCommunityId(
   if (!originalCommunity) {
     throw new AppError('Community to rename not found!');
   }
+
+  const existingRedirect = await this.models.Community.findOne({
+    where: {
+      redirect: community_id,
+    },
+  });
+  if (existingRedirect) {
+    throw new AppError('Community redirect already exists');
+  }
+
+  const existingNewCommunity = await this.models.Community.findOne({
+    where: {
+      id: new_community_id,
+    },
+  });
+  if (existingNewCommunity) {
+    throw new AppError('Community already exists');
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { id, ...communityData } = originalCommunity.toJSON();
 

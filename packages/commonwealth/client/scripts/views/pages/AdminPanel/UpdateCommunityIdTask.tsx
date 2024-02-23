@@ -86,7 +86,7 @@ const UpdateCommunityIdTask = () => {
         Updates a communities url e.g. commonwealth.im/cmn-protocol to
         commonwealth.im/common. This does not update the Community name.
         WARNING: This will set up a redirect from the old community to the new
-        community. The old id will no longer be useable by any other community.
+        community. The old id cannot be used by any other community.
       </CWText>
       <div className="TaskRow">
         <CWTextInput
@@ -96,7 +96,7 @@ const UpdateCommunityIdTask = () => {
             if (e.target.value.length === 0) setOriginalValueValidated(false);
           }}
           inputValidationFn={(value) => validateFn(value, false)}
-          placeholder="Enter current community id"
+          placeholder="Current community id"
         />
         <CWTextInput
           value={newCommunityValue}
@@ -105,7 +105,7 @@ const UpdateCommunityIdTask = () => {
             if (e.target.value.length === 0) setNewValueValidated(false);
           }}
           inputValidationFn={(value) => validateFn(value, true)}
-          placeholder="Enter new community id"
+          placeholder="New community id"
         />
         <CWButton
           label="Update"
