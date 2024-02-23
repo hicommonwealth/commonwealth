@@ -1,12 +1,11 @@
 import Account from 'client/scripts/models/Account';
 import AddressInfo from 'client/scripts/models/AddressInfo';
 import MinimumProfile from 'client/scripts/models/MinimumProfile';
-import React, { useState } from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { CWText } from '../../component_kit/cw_text';
 import CWDrawer from '../../component_kit/new_designs/CWDrawer';
 import { CWTable } from '../../component_kit/new_designs/CWTable';
-import { CWThreadAction } from '../../component_kit/new_designs/cw_thread_action';
 import { QuillRenderer } from '../../react_quill_editor/quill_renderer';
 import { getColumnInfo } from '../util';
 
@@ -20,6 +19,8 @@ type ViewUpvotesDrawerProps = {
   contentBody: string;
   author: Profile;
   publishDate: moment.Moment;
+  isOpen: boolean;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
 };
 
 type Upvoter = {
@@ -36,9 +37,9 @@ export const ViewUpvotesDrawer = ({
   contentBody,
   author,
   publishDate,
+  isOpen,
+  setIsOpen,
 }: ViewUpvotesDrawerProps) => {
-  const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState(false);
-
   const voterRow = (voter: Upvoter) => {
     return {
       name: voter.name,
@@ -75,19 +76,11 @@ export const ViewUpvotesDrawer = ({
 
   return (
     <div className="ViewUpvotesDrawer">
-      <CWThreadAction
-        label="View upvotes"
-        action="view-upvotes"
-        onClick={(e) => {
-          e.preventDefault();
-          setIsUpvoteDrawerOpen(true);
-        }}
-      />
       <CWDrawer
         className="upvote-drawer"
-        open={isUpvoteDrawerOpen}
+        open={isOpen}
         header={header}
-        onClose={() => setIsUpvoteDrawerOpen(false)}
+        onClose={() => setIsOpen(false)}
       >
         <div className="upvoted-content">
           <div className="upvoted-content-header">

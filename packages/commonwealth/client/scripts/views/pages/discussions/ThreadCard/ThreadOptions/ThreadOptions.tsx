@@ -1,7 +1,7 @@
-import { ViewThreadUpvotesDrawer } from 'client/scripts/views/components/UpvoteDrawer';
+import { ViewUpvotesDrawerTrigger } from 'client/scripts/views/components/UpvoteDrawer';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import Thread from 'models/Thread';
-import React, { useState } from 'react';
+import React, { Dispatch, SetStateAction, useState } from 'react';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { SharePopover } from 'views/components/share_popover';
 import {
@@ -25,6 +25,7 @@ type OptionsProps = AdminActionsProps & {
   disabledActionTooltipText?: string;
   onCommentBtnClick?: () => any;
   upvoteDrawerBtnBelow?: boolean;
+  setIsUpvoteDrawerOpen?: Dispatch<SetStateAction<boolean>>;
 };
 
 export const ThreadOptions = ({
@@ -50,6 +51,7 @@ export const ThreadOptions = ({
   disabledActionTooltipText = '',
   onCommentBtnClick = () => null,
   upvoteDrawerBtnBelow,
+  setIsUpvoteDrawerOpen,
 }: OptionsProps) => {
   const [isSubscribed, setIsSubscribed] = useState(
     thread &&
@@ -81,7 +83,14 @@ export const ThreadOptions = ({
     <>
       <div className="ThreadOptions">
         <div className="options-container">
-          {!upvoteDrawerBtnBelow && <ViewThreadUpvotesDrawer thread={thread} />}
+          {!upvoteDrawerBtnBelow && (
+            <ViewUpvotesDrawerTrigger
+              onClick={(e) => {
+                e.preventDefault();
+                setIsUpvoteDrawerOpen(true);
+              }}
+            />
+          )}
 
           {upvoteBtnVisible && thread && (
             <ReactionButton
@@ -134,7 +143,14 @@ export const ThreadOptions = ({
             />
           )}
         </div>
-        {upvoteDrawerBtnBelow && <ViewThreadUpvotesDrawer thread={thread} />}
+        {upvoteDrawerBtnBelow && (
+          <ViewUpvotesDrawerTrigger
+            onClick={(e) => {
+              e.preventDefault();
+              setIsUpvoteDrawerOpen(true);
+            }}
+          />
+        )}
       </div>
       {thread && <></>}
     </>
