@@ -33,6 +33,7 @@ $font-family-neue-haas-unica: NeueHaasUnica, 'Segoe UI', sans-serif,
   'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
 
 $font-family-monospace: 'DM Mono', monospace;
+$font-family-roboto: 'Roboto', sans-serif;
 
 @mixin visibleScrollbar($theme) {
   &::-webkit-scrollbar {

@@ -1,0 +1,18 @@
+{
+  "name": "Common App",
+  "short_name": "Common",
+  "description": "Create onchain together - Community forums with onchain rewards, roles and more",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/static/img/branding/common.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "manifest_version": "0.0.1",
+  "installable": true
+}

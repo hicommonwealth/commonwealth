@@ -152,7 +152,9 @@ class MetamaskWebWalletController implements IWebWallet<string> {
 
           // TODO: we should cache this data!
           const chains = await $.getJSON('https://chainid.network/chains.json');
-          const baseChain = chains.find((c) => c.chainId === chainId);
+          const baseChain = chains.find((c) => c.chainId == chainId);
+          const pubRpcUrl = baseChain.rpc.filter((r) => !/\${.*?}/.test(r));
+          const url = rpcUrl.length > 0 ? pubRpcUrl[0] : rpcUrl;
           await this._web3.givenProvider.request({
             method: 'wallet_addEthereumChain',
             params: [
@@ -160,7 +162,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
                 chainId: chainIdHex,
                 chainName: baseChain.name,
                 nativeCurrency: baseChain.nativeCurrency,
-                rpcUrls: [rpcUrl],
+                rpcUrls: [url],
               },
             ],
           });
@@ -222,7 +224,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       } catch (error) {
         if (error.code === 4902) {
           const chains = await $.getJSON('https://chainid.network/chains.json');
-          const baseChain = chains.find((c) => c.chainId === communityChain);
+          const baseChain = chains.find((c) => c.chainId == communityChain);
           // Check if the string contains '${' and '}'
           const rpcUrl = baseChain.rpc.filter((r) => !/\${.*?}/.test(r));
           const url =

@@ -43,8 +43,7 @@ export const useImageUploader = ({
         );
 
         // insert image op at the selected index
-        // for some reason, must prefix with 3 spaces or else text will be truncated
-        editor.insertText(selectedIndex, `   ![image](${uploadedFileUrl})`);
+        editor.insertText(selectedIndex, `![image](${uploadedFileUrl})`);
 
         setContentDelta({
           ...editor.getContents(),

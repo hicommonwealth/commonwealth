@@ -28,6 +28,7 @@ import {
   ThreadTimelineFilterTypes,
 } from '../../../../models/types';
 
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import useCommunityStakeStore from 'state/ui/communityStake';
 import './HeaderWithFilters.scss';
 
@@ -66,6 +67,7 @@ export const HeaderWithFilters = ({
   const [rightFiltersDropdownPosition, setRightFiltersDropdownPosition] =
     useState<'bottom-end' | 'bottom-start'>('bottom-end');
 
+  const { isLoggedIn } = useUserLoggedIn();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
   const { totalThreadsInCommunityForVoting } =
     useEXCEPTION_CASE_threadCountersStore();
@@ -183,6 +185,7 @@ export const HeaderWithFilters = ({
   };
 
   const stakeBannerEnabled =
+    isLoggedIn &&
     communityStakeEnabled &&
     stakeEnabled &&
     isBannerVisible(app.activeChainId());
