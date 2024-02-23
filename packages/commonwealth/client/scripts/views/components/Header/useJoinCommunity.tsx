@@ -96,6 +96,7 @@ const useJoinCommunity = () => {
       app.activeChainId() !== 'axie-infinity'
     ) {
       await linkToCommunity(0);
+      return true;
     } else {
       setIsAuthModalOpen(true);
     }
@@ -183,11 +184,13 @@ const useJoinCommunity = () => {
         app.chain?.meta.id !== 'injective')
     ) {
       setIsAuthModalOpen(true);
+      return false;
     } else {
       if (hasTermsOfService) {
         setIsTOSModalOpen(true);
+        return false;
       } else {
-        await performJoinCommunityLinking();
+        return await performJoinCommunityLinking();
       }
     }
   };
