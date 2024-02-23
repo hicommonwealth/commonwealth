@@ -10,7 +10,6 @@ import app from 'state';
 import _ from 'underscore';
 import { CWAuthButton } from 'views/components/component_kit/CWAuthButtonOld';
 import { CWButton } from 'views/components/component_kit/cw_button';
-import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWWalletsList } from 'views/components/component_kit/cw_wallets_list';
@@ -20,6 +19,7 @@ import {
 } from 'views/components/component_kit/new_designs/CWModal';
 import { formatAddress } from 'views/components/user/user_block';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import CWLoadingSpinner from '../../components/component_kit/new_designs/CWLoadingSpinner';
 import './SessionRevalidationModal.scss';
 
 interface SessionRevalidationModalProps {
@@ -139,7 +139,7 @@ const SessionRevalidationModal = ({
                   onenterkey={async () => await onEmailLogin()}
                 />
               ) : (
-                <CWSpinner />
+                <CWLoadingSpinner />
               )}
               <div className="buttons-row">
                 <CWButton

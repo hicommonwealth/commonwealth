@@ -103,6 +103,11 @@ module.exports = {
         process.env.UNLEASH_FRONTEND_API_TOKEN,
       ),
     }),
+    new webpack.DefinePlugin({
+      'process.env.HEROKU_APP_NAME': JSON.stringify(
+        process.env.HEROKU_APP_NAME,
+      ),
+    }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../client/index.html'),
       attributes: {

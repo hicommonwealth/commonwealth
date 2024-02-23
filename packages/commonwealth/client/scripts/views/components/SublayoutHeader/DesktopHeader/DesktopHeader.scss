@@ -1,0 +1,81 @@
+@import '../../../../../styles/shared';
+
+.DesktopHeader {
+  align-items: center;
+  border-bottom: 1px solid $neutral-200;
+  display: flex;
+  gap: 8px;
+  height: $global-header-height;
+  justify-content: space-between;
+  min-height: $global-header-height;
+  padding: 0 8px;
+
+  .header-left.desktop {
+    padding-left: 68px;
+  }
+
+  .header-left {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+    height: 100%;
+  }
+
+  .searchbar {
+    width: 608px;
+
+    .SearchBar {
+      @include extraSmall {
+        display: none;
+      }
+    }
+  }
+
+  .header-right {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+    height: 100%;
+
+    .header-loader {
+      padding: 0 20px;
+    }
+
+    .DesktopMenuContainer {
+      align-items: center;
+      display: flex;
+      gap: 12px;
+      height: 40px;
+
+      &.isLoggedIn {
+        padding-right: 20px;
+        border-right: 1px solid $neutral-100;
+        margin-right: 14px;
+      }
+
+      & > div {
+        display: flex;
+      }
+
+      svg {
+        fill: $neutral-500;
+      }
+
+      & div {
+        display: flex;
+      }
+
+      @include extraSmall {
+        display: none;
+      }
+    }
+
+    .UserDropdownTriggerButton {
+      margin-right: 10px;
+
+      @include extraSmall {
+        margin-right: 2px;
+      }
+    }
+  }
+}

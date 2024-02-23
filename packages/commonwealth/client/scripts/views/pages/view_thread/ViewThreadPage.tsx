@@ -27,8 +27,8 @@ import {
 } from 'state/api/threads';
 import { slugify } from 'utils';
 import ExternalLink from 'views/components/ExternalLink';
-import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
+import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { PageNotFound } from 'views/pages/404';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import { useFlag } from '../../../hooks/useFlag';

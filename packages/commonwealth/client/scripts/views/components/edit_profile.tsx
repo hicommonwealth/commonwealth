@@ -21,9 +21,9 @@ import { CWDivider } from './component_kit/cw_divider';
 import { CWForm } from './component_kit/cw_form';
 import { CWFormSection } from './component_kit/cw_form_section';
 import { CWSocials } from './component_kit/cw_socials';
-import { CWSpinner } from './component_kit/cw_spinner';
 import { CWText } from './component_kit/cw_text';
 import { CWTextInput } from './component_kit/cw_text_input';
+import CWLoadingSpinner from './component_kit/new_designs/CWLoadingSpinner';
 import { LinkedAddresses } from './linked_addresses';
 import { ReactQuillEditor, createDeltaFromText } from './react_quill_editor';
 import { deserializeDelta, serializeDelta } from './react_quill_editor/utils';
@@ -202,7 +202,7 @@ const EditProfileComponent = () => {
     return (
       <div className="EditProfile full-height">
         <div className="loading-spinner">
-          <CWSpinner />
+          <CWLoadingSpinner />
         </div>
       </div>
     );
