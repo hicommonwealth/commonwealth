@@ -232,15 +232,44 @@ export const useMarkdownToolbarHandlers = ({
       if (!prefix) {
         throw new Error(`could not get prefix for value: ${value}`);
       }
-      const text = editor.getText(selection.index, selection.length);
+      const selectedText = editor.getText(selection.index, selection.length);
+      const editorText = editor.getText();
+      const editorLength = editor.getLength();
 
       let newText;
 
-      if (text.length > 0) {
-        newText = handleListText(text, prefix);
+      if (selectedText.length > 0) {
+        newText = handleListText(selectedText, prefix);
+        console.log('FIRED 1');
       } else {
-        editor.insertText(0, `${prefix} `);
+        // Check if there's only prefix or prefix with whitespace
+        // console.log('FIRED 3', editorLength, prefix.length, value);
+        // console.log({ editorLength, prefix, editorText });
+
+        //check all of the prefix
+
+        Object.keys(LIST_ITEM_PREFIX).forEach((key) => {
+          const localPrefix = LIST_ITEM_PREFIX[key];
+          const currentPrefix = editorText.replace(/\n/g, '').trim();
+          if (
+            editorText.startsWith(localPrefix) &&
+            currentPrefix === localPrefix
+          ) {
+            editor.deleteText(0, localPrefix.length);
+          }
+        });
+        if (editorLength === prefix.length) {
+          editor.deleteText(0, editorLength);
+          editor.insertText(0, `${prefix} `);
+        }
+        editor.insertText(editorLength, `${prefix} `);
+        setTimeout(() => {
+          const newCursorPosition = editor.getLength() - 1;
+          editor.setSelection(newCursorPosition, newCursorPosition);
+        }, 10);
       }
+
+      // console.log(editor.getLength() - 2, prefix.length);
 
       editor.deleteText(selection.index, selection.length);
       editor.insertText(selection.index, newText);
