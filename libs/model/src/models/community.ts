@@ -54,6 +54,7 @@ export type CommunityAttributes = {
   directory_page_enabled?: boolean;
   directory_page_chain_node_id?: number;
   namespace?: string;
+  redirect?: string;
 
   // associations
   ChainNode?: ChainNodeAttributes;
@@ -169,6 +170,7 @@ export default (
       namespace: { type: dataTypes.STRING, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: true },
       updated_at: { type: dataTypes.DATE, allowNull: true },
+      redirect: { type: dataTypes.TEXT, allowNull: true },
     },
     {
       tableName: 'Communities',

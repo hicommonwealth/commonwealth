@@ -44,6 +44,7 @@ class ChainInfo {
   public directoryPageEnabled?: boolean;
   public directoryPageChainNodeId?: number;
   public namespace?: string;
+  public redirect?: string;
 
   public get node() {
     return this.ChainNode;
@@ -83,6 +84,7 @@ class ChainInfo {
     directoryPageEnabled,
     directoryPageChainNodeId,
     namespace,
+    redirect,
   }) {
     this.id = id;
     this.network = network;
@@ -118,6 +120,7 @@ class ChainInfo {
     this.directoryPageEnabled = directoryPageEnabled;
     this.directoryPageChainNodeId = directoryPageChainNodeId;
     this.namespace = namespace;
+    this.redirect = redirect;
   }
 
   public static fromJSON({
@@ -153,6 +156,7 @@ class ChainInfo {
     directory_page_enabled,
     directory_page_chain_node_id,
     namespace,
+    redirect,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -210,6 +214,7 @@ class ChainInfo {
       directoryPageEnabled: directory_page_enabled,
       directoryPageChainNodeId: directory_page_chain_node_id,
       namespace,
+      redirect,
     });
   }
 

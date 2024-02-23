@@ -107,12 +107,17 @@ export async function __updateCommunityId(
       },
     );
 
-    await this.models.Community.destroy({
-      where: {
-        id: community_id,
+    await this.models.Community.update(
+      {
+        redirect: redirect ? new_community_id : '',
       },
-      transaction,
-    });
+      {
+        where: {
+          id: community_id,
+        },
+        transaction,
+      },
+    );
   });
 
   return newCommunity.toJSON();

@@ -1,6 +1,6 @@
 import 'Layout.scss';
 import { deinitChainOrCommunity, selectChain } from 'helpers/chain';
-import withRouter from 'navigation/helpers';
+import withRouter, { useCommonNavigate } from 'navigation/helpers';
 import React, { ReactNode, Suspense, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useParams } from 'react-router-dom';
@@ -28,6 +28,7 @@ const LayoutComponent = ({
   scoped = false,
   type = 'community',
 }: LayoutAttrs) => {
+  const navigate = useCommonNavigate();
   const routerParams = useParams();
   const pathScope = routerParams?.scope?.toString() || app.customDomainId();
   const selectedScope = scoped ? pathScope : null;
@@ -36,6 +37,20 @@ const LayoutComponent = ({
   const [isLoading, setIsLoading] = useState<boolean>();
 
   const scopeMatchesChain = app.config.chains.getById(selectedScope);
+
+  useNecessaryEffect(() => {
+    // check if scope doesn't match redirect
+    if (
+      scopeMatchesChain?.redirect &&
+      scopeMatchesChain?.redirect !== selectedScope.toLowerCase()
+    ) {
+      const path = window.location.href.split(selectedScope);
+      navigate(
+        `/${scopeMatchesChain.redirect}${path.length > 1 ? path[1] : ''}`,
+      );
+      return;
+    }
+  }, [scopeMatchesChain, selectedScope]);
 
   // If the navigated-to community scope differs from the active chain id at render time,
   // and we have not begun loading the new navigated-to community data, shouldSelectChain is
