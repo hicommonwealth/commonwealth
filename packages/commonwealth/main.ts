@@ -235,7 +235,14 @@ export async function main(app: express.Express) {
       ).default;
       await setupWebpackDevServer(app);
     } else {
-      app.use('/build', express.static('build'));
+      app.use(
+        '/build',
+        express.static('build', {
+          setHeaders: (res) => {
+            res.setHeader('Cache-Control', 'public');
+          },
+        }),
+      );
     }
   }
 

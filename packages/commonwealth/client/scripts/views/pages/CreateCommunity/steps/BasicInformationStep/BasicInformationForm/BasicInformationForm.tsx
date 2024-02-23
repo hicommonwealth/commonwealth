@@ -26,7 +26,7 @@ import {
 import { useBrowserAnalyticsTrack } from '../../../../../../hooks/useBrowserAnalyticsTrack';
 import './BasicInformationForm.scss';
 import {
-  ETHEREUM_MAINNET_ID,
+  BASE_ID,
   OSMOSIS_ID,
   POLYGON_ETH_CHAIN_ID,
   chainTypes,
@@ -116,9 +116,7 @@ const BasicInformationForm = ({
     switch (selectedCommunity.type) {
       case CommunityType.Ethereum:
         return {
-          chain: getChainOptions()?.find(
-            (o) => o.value === ETHEREUM_MAINNET_ID,
-          ),
+          chain: getChainOptions()?.find((o) => o.value === BASE_ID),
         };
       case CommunityType.Cosmos:
         return {

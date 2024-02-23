@@ -24,6 +24,7 @@ export const useNotionPaste = (
                 insert: pastedText,
               },
             ],
+            ___isMarkdown: true,
           };
         });
 
@@ -37,10 +38,12 @@ export const useNotionPaste = (
 
     const editorElement = editor.root;
 
-    editorElement.addEventListener('paste', handlePaste);
+    if (contentDelta) {
+      editorElement.addEventListener('paste', handlePaste);
 
-    return () => {
-      editorElement.removeEventListener('paste', handlePaste);
-    };
+      return () => {
+        editorElement.removeEventListener('paste', handlePaste);
+      };
+    }
   }, [setContentDelta, editorRef, contentDelta, isEditorFocused]);
 };
