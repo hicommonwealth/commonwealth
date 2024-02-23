@@ -1,21 +1,25 @@
-import { sequelize } from '@hicommonwealth/model';
-import { Op, Transaction } from 'sequelize';
+import { Op } from 'sequelize';
 
+import { Session } from '@canvas-js/interfaces';
 import {
   AppError,
   ChainBase,
   DynamicTemplate,
+  NotificationCategories,
+  WalletId,
   logger,
 } from '@hicommonwealth/core';
-import type { AddressInstance, DB } from '@hicommonwealth/model';
+import type {
+  CommunityInstance,
+  DB,
+  ProfileAttributes,
+} from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { addressSwapper } from '../../shared/utils';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import assertAddressOwnership from '../util/assertAddressOwnership';
-import verifySessionSignature, {
-  attachUserAndProfileToAddressInstance,
-} from '../util/verifySessionSignature';
+import verifySessionSignature from '../util/verifySessionSignature';
 
 const log = logger().getLogger(__filename);
 
@@ -23,7 +27,7 @@ const log = logger().getLogger(__filename);
 const sgMail = require('@sendgrid/mail');
 export const Errors = {
   NoChain: 'Must provide chain',
-  InvalidChain: 'Invalid chain',
+  InvalidCommunity: 'Invalid community',
   AddressNF: 'Address not found',
   ExpiredToken: 'Token has expired, please re-register',
   InvalidSignature: 'Invalid signature, please re-register',
@@ -35,44 +39,140 @@ export const Errors = {
   WrongWallet: 'Verified with different wallet than created',
 };
 
-const transferAddress = async ({
-  address,
-  models,
-  addressInstance,
-  transaction,
-}: {
-  address: string;
-  models: DB;
-  addressInstance: AddressInstance;
-  transaction: Transaction;
-}) => {
-  // update addresses
-  // reassign the users and profiles of the transferred addresses
-  await models.Address.update(
+const processAddress = async (
+  models: DB,
+  community: CommunityInstance,
+  address: string,
+  wallet_id: WalletId,
+  user: Express.User,
+  session: Session,
+): Promise<void> => {
+  const addressInstance = await models.Address.scope('withPrivateData').findOne(
     {
-      user_id: addressInstance.user_id,
-      profile_id: addressInstance.profile_id,
-    },
-    {
-      where: {
-        address,
-        user_id: { [Op.ne]: addressInstance.user_id },
-        verified: { [Op.ne]: null },
-      },
-      transaction,
+      where: { community_id: community.id, address },
     },
   );
-};
+  if (!addressInstance) {
+    throw new AppError(Errors.AddressNF);
+  }
 
-const createAddressTransferEmail = async ({ address, chain, user }) => ({
-  to: user.email,
-  from: 'Commonwealth <no-reply@commonwealth.im>',
-  templateId: DynamicTemplate.VerifyAddress,
-  dynamic_template_data: {
-    address,
-    chain: chain.name,
-  },
-});
+  if (addressInstance.wallet_id !== wallet_id) {
+    throw new AppError(Errors.WrongWallet);
+  }
+
+  // check whether the token has expired
+  // (certain login methods e.g. jwt have no expiration token, so we skip the check in that case)
+  const expiration = addressInstance.verification_token_expires;
+  if (expiration && +expiration <= +new Date()) {
+    throw new AppError(Errors.ExpiredToken);
+  }
+
+  // verify the signature matches the session information = verify ownership
+  try {
+    const valid = await verifySessionSignature(
+      models,
+      addressInstance,
+      user ? user.id : null,
+      session,
+    );
+    if (!valid) {
+      throw new AppError(Errors.InvalidSignature);
+    }
+  } catch (e) {
+    log.warn(`Failed to verify signature for ${address}: ${e.stack}`);
+    throw new AppError(Errors.CouldNotVerifySignature);
+  }
+
+  addressInstance.last_active = new Date();
+
+  if (!user?.id) {
+    // user is not logged in
+    addressInstance.verification_token_expires = null;
+    addressInstance.verified = new Date();
+    if (!addressInstance.user_id) {
+      // address is not yet verified => create a new user
+      const newUser = await models.User.createWithProfile(models, {
+        email: null,
+      });
+      addressInstance.profile_id = (
+        newUser.Profiles[0] as ProfileAttributes
+      ).id;
+      await models.Subscription.create({
+        subscriber_id: newUser.id,
+        category_id: NotificationCategories.NewMention,
+        is_active: true,
+      });
+      await models.Subscription.create({
+        subscriber_id: newUser.id,
+        category_id: NotificationCategories.NewCollaboration,
+        is_active: true,
+      });
+      addressInstance.user_id = newUser.id;
+    }
+  } else {
+    // user is already logged in => verify the newly created address
+    addressInstance.verification_token_expires = null;
+    addressInstance.verified = new Date();
+    addressInstance.user_id = user.id;
+    const profile = await models.Profile.findOne({
+      where: { user_id: user.id },
+    });
+    addressInstance.profile_id = profile.id;
+  }
+  await addressInstance.save();
+
+  // if address has already been previously verified, update all other addresses
+  // to point to the new user = "transfer ownership".
+  const addressToTransfer = await models.Address.findOne({
+    where: {
+      address,
+      user_id: { [Op.ne]: addressInstance.user_id },
+      verified: { [Op.ne]: null },
+    },
+  });
+
+  if (addressToTransfer) {
+    // reassign the users and profiles of the transferred addresses
+    await models.Address.update(
+      {
+        user_id: addressInstance.user_id,
+        profile_id: addressInstance.profile_id,
+      },
+      {
+        where: {
+          address,
+          user_id: { [Op.ne]: addressInstance.user_id },
+          verified: { [Op.ne]: null },
+        },
+      },
+    );
+
+    try {
+      // send email to the old user (should only ever be one)
+      const oldUser = await models.User.scope('withPrivateData').findOne({
+        where: { id: addressToTransfer.user_id, email: { [Op.ne]: null } },
+      });
+      if (!oldUser?.email) {
+        throw new AppError(Errors.NoEmail);
+      }
+      const msg = {
+        to: user.email,
+        from: 'Commonwealth <no-reply@commonwealth.im>',
+        templateId: DynamicTemplate.VerifyAddress,
+        dynamic_template_data: {
+          address,
+          chain: community.name,
+        },
+      };
+      await sgMail.send(msg);
+      log.info(
+        `Sent address move email: ${address} transferred to a new account`,
+      );
+    } catch (e) {
+      log.error(`Could not send address move email for: ${address}`);
+    }
+  }
+};
 
 const verifyAddress = async (
   models: DB,
@@ -80,180 +180,83 @@ const verifyAddress = async (
   res: Response,
   next: NextFunction,
 ) => {
-  if (
-    !req.body.address ||
-    !req.body.session ||
-    !req.body.wallet_id ||
-    !req.body.chain
-  ) {
+  if (!req.body.community_id || !req.body.chain_id) {
+    throw new AppError(Errors.NoChain);
+  }
+  const community = await models.Community.findOne({
+    where: { id: req.body.community_id },
+  });
+  const chain_id = req.body.chain_id;
+  if (!community) {
+    return next(new AppError(Errors.InvalidCommunity));
+  }
+
+  if (!req.body.address || !req.body.signature) {
     throw new AppError(Errors.InvalidArguments);
   }
 
-  const transaction = await sequelize.transaction();
+  const address =
+    community.base === ChainBase.Substrate
+      ? addressSwapper({
+          address: req.body.address,
+          currentPrefix: community.ss58_prefix,
+        })
+      : req.body.address;
 
-  try {
-    const chain = await models.Community.findOne({
-      where: { id: req.body.chain },
-      transaction,
+  await processAddress(
+    models,
+    community,
+    address,
+    req.body.wallet_id,
+    req.user,
+    req.body.session,
+  );
+
+  // assertion check
+  await assertAddressOwnership(models, address);
+
+  if (req.user) {
+    // if user was already logged in, we're done
+    return res.json({
+      status: 'Success',
+      result: { address, message: 'Verified signature' },
     });
-
-    const address =
-      chain.base === ChainBase.Substrate
-        ? addressSwapper({
-            address: req.body.address,
-            currentPrefix: chain.ss58_prefix,
-          })
-        : req.body.address;
-
-    const addressInstance = await models.Address.scope(
-      'withPrivateData',
-    ).findOne({
-      where: { community_id: chain.id, address },
-      transaction,
+  } else {
+    // if user isn't logged in, log them in now
+    const newAddress = await models.Address.findOne({
+      where: { community_id: req.body.community_id, address },
     });
-    if (!addressInstance) {
-      throw new AppError(Errors.AddressNF);
-    }
-
-    if (addressInstance.wallet_id !== req.body.wallet_id) {
-      throw new AppError(Errors.WrongWallet);
-    }
-
-    // check whether the token has expired
-    // (certain login methods e.g. jwt have no expiration token, so we skip the check in that case)
-    const expiration = addressInstance.verification_token_expires;
-    if (expiration && +expiration <= +new Date()) {
-      throw new AppError(Errors.ExpiredToken);
-    }
-
-    const newSignature = new Uint8Array(65);
-    for (let i = 0; i < 65; i++) {
-      newSignature[i] = req.body.session.authorizationData.signature[i];
-    }
-    req.body.session.authorizationData.signature = newSignature;
-    console.log(newSignature);
-
-    // req.body.session.authorizationData.signature = new Uint8Array(req.body.session.authorizationData.signature);
-
-    // verify the signature matches the session information = verify ownership
-    const valid = await verifySessionSignature(
-      req.body.session,
-      addressInstance.address,
-    );
-    if (!valid) {
-      throw new AppError(Errors.InvalidSignature);
-    }
-
-    addressInstance.last_active = new Date();
-    // mark the address as verified
-    addressInstance.verification_token_expires = null;
-    addressInstance.verified = new Date();
-
-    await attachUserAndProfileToAddressInstance({
-      addressInstance,
-      models,
-      user_id: req.user?.id,
-      transaction,
+    const user = await models.User.scope('withPrivateData').findOne({
+      where: { id: newAddress.user_id },
     });
-    addressInstance.save({ transaction });
-
-    // if address has already been previously verified, update all other addresses
-    // to point to the new user = "transfer ownership".
-    const addressToTransfer = await models.Address.findOne({
-      where: {
-        address,
-        user_id: { [Op.ne]: addressInstance.user_id },
-        verified: { [Op.ne]: null },
-      },
-      transaction,
-    });
-
-    let emailToSend: any;
-
-    if (addressToTransfer) {
-      await transferAddress({ models, address, addressInstance, transaction });
-
-      try {
-        // send email to the old user (should only ever be one)
-        const oldUser = await models.User.scope('withPrivateData').findOne({
-          where: { id: addressToTransfer.user_id, email: { [Op.ne]: null } },
-          transaction,
-        });
-        if (!oldUser?.email) {
-          throw new AppError(Errors.NoEmail);
-        }
-
-        emailToSend = createAddressTransferEmail({
-          address,
-          chain,
-          user: req.user,
-        });
-        log.info(
-          `Sent address move email: ${address} transferred to a new account`,
-        );
-      } catch (e) {
-        log.error(`Could not send address move email for: ${address}`);
-      }
-    }
-
-    // assertion check
-    await assertAddressOwnership(models, address, transaction);
-
-    // Apply side effects
-    await transaction.commit();
-
-    if (emailToSend) {
-      await sgMail.send();
-    }
-
-    if (req.user) {
-      // if user was already logged in, we're done
-      return res.json({
-        status: 'Success',
-        result: { address, message: 'Verified signature' },
-      });
-    } else {
-      // if user isn't logged in, log them in now
-      const newAddress = await models.Address.findOne({
-        where: { community_id: req.body.chain, address },
-      });
-      const user = await models.User.scope('withPrivateData').findOne({
-        where: { id: newAddress.user_id },
-      });
-      req.login(user, (err) => {
-        const serverAnalyticsController = new ServerAnalyticsController();
-        if (err) {
-          serverAnalyticsController.track(
-            {
-              event: MixpanelLoginEvent.LOGIN_FAILED,
-            },
-            req,
-          );
-          return next(err);
-        }
+    req.login(user, (err) => {
+      const serverAnalyticsController = new ServerAnalyticsController();
+      if (err) {
         serverAnalyticsController.track(
           {
-            event: MixpanelLoginEvent.LOGIN_COMPLETED,
-            userId: user.id,
+            event: MixpanelLoginEvent.LOGIN_FAILED,
           },
           req,
         );
+        return next(err);
+      }
+      serverAnalyticsController.track(
+        {
+          event: MixpanelLoginEvent.LOGIN_COMPLETED,
+          userId: user.id,
+        },
+        req,
+      );
 
-        return res.json({
-          status: 'Success',
-          result: {
-            user,
-            address,
-            message: 'Signed in',
-          },
-        });
+      return res.json({
+        status: 'Success',
+        result: {
+          user,
+          address,
+          message: 'Signed in',
+        },
       });
-    }
-  } catch (e) {
-    await transaction.rollback();
-    console.log(e);
-
-    return res.status(e.status || 500).json({ status: 'Error', result: e });
+    });
   }
 };
 
