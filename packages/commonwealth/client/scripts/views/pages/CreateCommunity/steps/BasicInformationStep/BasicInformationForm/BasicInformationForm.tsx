@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import app from 'state';
 import { slugifyPreserveDashes } from 'utils';
 
 import { ChainBase } from '@hicommonwealth/core';
@@ -29,7 +30,7 @@ import {
   OSMOSIS_ID,
   POLYGON_ETH_CHAIN_ID,
   chainTypes,
-  existingCommunityNames,
+  existingCommunityIds,
 } from './constants';
 import { BasicInformationFormProps, FormSubmitValues } from './types';
 import { basicInformationFormValidationSchema } from './validation';
@@ -69,9 +70,12 @@ const BasicInformationForm = ({
   } = useCreateCommunityMutation();
 
   const communityId = slugifyPreserveDashes(communityName.toLowerCase());
-  const isCommunityNameTaken = existingCommunityNames.find(
-    (name) => name === communityName.trim().toLowerCase(),
-  );
+  let isCommunityNameTaken = !!app.config.redirects[communityId];
+  if (!isCommunityNameTaken) {
+    isCommunityNameTaken = !!existingCommunityIds.find(
+      (id) => id === communityId,
+    );
+  }
 
   const getChainOptions = () => {
     // Since we are treating polygon as an ecosystem, we will only have a single option, which will be

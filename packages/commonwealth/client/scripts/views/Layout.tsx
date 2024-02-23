@@ -36,21 +36,16 @@ const LayoutComponent = ({
   const [scopeToLoad, setScopeToLoad] = useState<string>();
   const [isLoading, setIsLoading] = useState<boolean>();
 
-  const scopeMatchesChain = app.config.chains.getById(selectedScope);
-
   useNecessaryEffect(() => {
-    // check if scope doesn't match redirect
-    if (
-      scopeMatchesChain?.redirect &&
-      scopeMatchesChain?.redirect !== selectedScope.toLowerCase()
-    ) {
+    const redirectTo = app.config.redirects[selectedScope];
+    if (redirectTo && redirectTo !== selectedScope.toLowerCase()) {
       const path = window.location.href.split(selectedScope);
-      navigate(
-        `/${scopeMatchesChain.redirect}${path.length > 1 ? path[1] : ''}`,
-      );
+      navigate(`/${redirectTo}${path.length > 1 ? path[1] : ''}`);
       return;
     }
-  }, [scopeMatchesChain, selectedScope]);
+  }, [selectedScope]);
+
+  const scopeMatchesChain = app.config.chains.getById(selectedScope);
 
   // If the navigated-to community scope differs from the active chain id at render time,
   // and we have not begun loading the new navigated-to community data, shouldSelectChain is

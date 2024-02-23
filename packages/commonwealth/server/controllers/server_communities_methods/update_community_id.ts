@@ -39,6 +39,7 @@ export async function __updateCommunityId(
       {
         id: new_community_id,
         ...communityData,
+        redirect: community_id,
       },
       { transaction },
     );
@@ -107,17 +108,12 @@ export async function __updateCommunityId(
       },
     );
 
-    await this.models.Community.update(
-      {
-        redirect: redirect ? new_community_id : '',
+    await this.models.Community.destroy({
+      where: {
+        id: community_id,
       },
-      {
-        where: {
-          id: community_id,
-        },
-        transaction,
-      },
-    );
+      transaction,
+    });
   });
 
   return newCommunity.toJSON();

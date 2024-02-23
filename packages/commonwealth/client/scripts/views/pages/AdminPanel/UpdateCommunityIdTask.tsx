@@ -85,8 +85,8 @@ const UpdateCommunityIdTask = () => {
       <CWText type="caption">
         Updates a communities url e.g. commonwealth.im/cmn-protocol to
         commonwealth.im/common. This does not update the Community name.
-        WARNING: This does not set up redirects so this will break external
-        links to the original community.
+        WARNING: This will set up a redirect from the old community to the new
+        community. The old id will no longer be useable by any other community.
       </CWText>
       <div className="TaskRow">
         <CWTextInput
