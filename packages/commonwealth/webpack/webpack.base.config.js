@@ -53,6 +53,11 @@ module.exports = {
       'process.env.COSMOS_GOV_V1': JSON.stringify(process.env.COSMOS_GOV_V1),
     }),
     new webpack.DefinePlugin({
+      'process.env.COSMOS_REGISTRY_API': JSON.stringify(
+        process.env.COSMOS_REGISTRY_API,
+      ),
+    }),
+    new webpack.DefinePlugin({
       'process.env.FLAG_COMMUNITY_HOMEPAGE': JSON.stringify(
         process.env.FLAG_COMMUNITY_HOMEPAGE,
       ),
@@ -78,6 +83,29 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env.FLAG_COMMUNITY_STAKE': JSON.stringify(
         process.env.FLAG_COMMUNITY_STAKE,
+      ),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.IS_PRODUCTION': JSON.stringify(process.env.IS_PRODUCTION),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.FLAG_ROOT_DOMAIN_REBRAND': JSON.stringify(
+        process.env.FLAG_ROOT_DOMAIN_REBRAND,
+      ),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.UNLEASH_FRONTEND_SERVER_URL': JSON.stringify(
+        process.env.UNLEASH_FRONTEND_SERVER_URL,
+      ),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.UNLEASH_FRONTEND_API_TOKEN': JSON.stringify(
+        process.env.UNLEASH_FRONTEND_API_TOKEN,
+      ),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.HEROKU_APP_NAME': JSON.stringify(
+        process.env.HEROKU_APP_NAME,
       ),
     }),
     new HtmlWebpackPlugin({

@@ -457,7 +457,7 @@ async function magicLoginRoute(
     }
   }
 
-  const isCosmos = chainToJoin.base === ChainBase.CosmosSDK;
+  const isCosmos = chainToJoin?.base === ChainBase.CosmosSDK;
 
   const magicUserMetadata = await magic.users.getMetadataByIssuerAndWallet(
     decodedMagicToken.issuer,
@@ -634,7 +634,11 @@ export function initMagicAuth(models: DB) {
     const magic = new Magic(MAGIC_API_KEY);
     passport.use(
       new MagicStrategy({ passReqToCallback: true }, async (req, user, cb) => {
-        return magicLoginRoute(magic, models, req, user, cb);
+        try {
+          return await magicLoginRoute(magic, models, req, user, cb);
+        } catch (e) {
+          return cb(e, user);
+        }
       }),
     );
   }

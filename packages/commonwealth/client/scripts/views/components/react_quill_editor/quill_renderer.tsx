@@ -37,8 +37,14 @@ export const QuillRenderer = ({
     }
 
     try {
-      // if JSON with ops, it's richtext
-      const delta = JSON.parse(decodedText) as DeltaStatic;
+      let delta: DeltaStatic;
+      //Checks to ensure it is in JSON format
+      if (decodedText.startsWith('{')) {
+        delta = JSON.parse(decodedText) as DeltaStatic;
+      } else {
+        throw new Error('Not JSON');
+      }
+
       if (!delta.ops) {
         console.error('parsed doc as JSON but has no ops');
         return {
@@ -46,6 +52,7 @@ export const QuillRenderer = ({
           content: null,
         } as UnknownDocInfo;
       }
+
       // if it's markdown but not properly serialized...
       if ((delta as SerializableDeltaStatic).___isMarkdown) {
         return {

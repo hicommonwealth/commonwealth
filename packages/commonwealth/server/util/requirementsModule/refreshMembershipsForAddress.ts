@@ -5,7 +5,7 @@ import {
   MembershipAttributes,
   MembershipInstance,
   OptionsWithBalances,
-  TokenBalanceCache,
+  tokenBalanceCache,
 } from '@hicommonwealth/model';
 import moment from 'moment';
 import { FindOptions, Op, Sequelize } from 'sequelize';
@@ -23,7 +23,6 @@ import validateGroupMembership from './validateGroupMembership';
  */
 export async function refreshMembershipsForAddress(
   models: DB,
-  tokenBalanceCache: TokenBalanceCache,
   address: AddressAttributes,
   groups: GroupAttributes[],
   cacheRefresh: boolean,

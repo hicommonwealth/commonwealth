@@ -18,7 +18,6 @@ import {
 } from 'views/menus/utils';
 import Permissions from '../../utils/Permissions';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
 import { getClasses } from '../components/component_kit/helpers';
 
@@ -200,7 +199,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
               resetSidebarState();
               navigate('/new/discussion');
             },
-            iconLeft: 'write',
+            iconLeft: 'pencil',
           } as PopoverMenuItem,
           ...getOnChainProposalItem(),
           ...getSputnikProposalItem(),
@@ -248,22 +247,6 @@ export const CreateContentSidebar = ({
             setMenu({ name: 'default', isVisible: isSidebarOpen });
           }, 200);
         },
-      }}
-      menuItems={getCreateContentMenuItems(navigate)}
-    />
-  );
-};
-
-export const CreateContentMenu = () => {
-  const navigate = useCommonNavigate();
-  const { setMobileMenuName } = useSidebarStore();
-
-  return (
-    <CWMobileMenu
-      className="CreateContentMenu"
-      menuHeader={{
-        label: 'Create',
-        onClick: () => setMobileMenuName('MainMenu'),
       }}
       menuItems={getCreateContentMenuItems(navigate)}
     />

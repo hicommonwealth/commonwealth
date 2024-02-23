@@ -1,7 +1,6 @@
 import { ChainBase, DefaultPage } from '@hicommonwealth/core';
 import axios from 'axios';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { featureFlags } from 'helpers/feature-flags';
 import { uuidv4 } from 'lib/util';
 import 'pages/manage_community/community_metadata_rows.scss';
 import React, { useEffect, useState } from 'react';
@@ -10,15 +9,16 @@ import useFetchDiscordChannelsQuery from 'state/api/fetchDiscordChannels';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { InputRow, SelectRow, ToggleRow } from 'views/components/metadata_rows';
+import { useFlag } from '../../../hooks/useFlag';
 import type CommunityInfo from '../../../models/ChainInfo';
 import type RoleInfo from '../../../models/RoleInfo';
 import { AvatarUpload } from '../../components/Avatar';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWLabel } from '../../components/component_kit/cw_label';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWToggle } from '../../components/component_kit/cw_toggle';
+import CWLoadingSpinner from '../../components/component_kit/new_designs/CWLoadingSpinner';
 import DirectoryPageSection from './DirectoryPageSection';
 import { DiscordForumConnections } from './DiscordForumConnections';
 import { getCommunityTags, setCommunityCategories } from './helpers';
@@ -39,6 +39,8 @@ export const CommunityMetadataRows = ({
   onRoleUpdate,
   onSave,
 }: CommunityMetadataRowsProps) => {
+  const communityHomepageEnabled = useFlag('communityHomepage');
+
   const params = new URLSearchParams(window.location.search);
   const returningFromDiscordCallback = params.get(
     'returningFromDiscordCallback',
@@ -339,7 +341,7 @@ export const CommunityMetadataRows = ({
         }
       />
 
-      {featureFlags.communityHomepage && (
+      {communityHomepageEnabled && (
         <ToggleRow
           title="Homepage"
           defaultValue={hasHomepage}
@@ -358,7 +360,7 @@ export const CommunityMetadataRows = ({
           }
         />
       )}
-      {featureFlags.communityHomepage && hasHomepage ? (
+      {communityHomepageEnabled && hasHomepage ? (
         <SelectRow
           title="Default Page"
           options={[
@@ -404,7 +406,7 @@ export const CommunityMetadataRows = ({
       )}
       <InputRow
         title="Custom Stages"
-        value={customStages}
+        value={JSON.stringify(customStages)}
         placeholder='["Temperature Check", "Consensus Check"]'
         onChangeHandler={(v) => setCustomStages(v)}
       />
@@ -584,7 +586,7 @@ export const CommunityMetadataRows = ({
           <>
             <div className="settings-row">
               <div className="spinner-group">
-                <CWSpinner />
+                <CWLoadingSpinner />
                 <CWText>Connecting...</CWText>
               </div>
               <CWText>Refresh to check if connection succeeded</CWText>

@@ -6,8 +6,6 @@ import { createCommunityStakeHandler } from '../routes/communities/create_commun
 import { getCommunityStakeHandler } from '../routes/communities/get_community_stakes_handler';
 import ddd from '../routes/ddd';
 
-import { TokenBalanceCache } from '@hicommonwealth/model';
-
 import {
   methodNotAllowedMiddleware,
   registerRoute,
@@ -28,7 +26,7 @@ import getAddressProfile, {
   getAddressProfileValidation,
 } from '../routes/getAddressProfile';
 import getAddressStatus from '../routes/getAddressStatus';
-import linkExistingAddressToChain from '../routes/linkExistingAddressToChain';
+import linkExistingAddressToCommunity from '../routes/linkExistingAddressToCommunity';
 import reactionsCounts from '../routes/reactionsCounts';
 import selectCommunity from '../routes/selectCommunity';
 import starCommunity from '../routes/starCommunity';
@@ -143,6 +141,8 @@ import { ServerTopicsController } from '../controllers/server_topics_controller'
 import { GENERATE_IMAGE_RATE_LIMIT } from 'server/config';
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
+import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
+import { updateChainNodeHandler } from 'server/routes/communities/update_chain_node_handler';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
 import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
 import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_handler';
@@ -204,22 +204,15 @@ function setupRouter(
   app: Express,
   models: DB,
   viewCountCache: ViewCountCache,
-  tokenBalanceCache: TokenBalanceCache,
   banCache: BanCache,
   globalActivityCache: GlobalActivityCache,
   databaseValidationService: DatabaseValidationService,
 ) {
   // controllers
   const serverControllers: ServerControllers = {
-    threads: new ServerThreadsController(
-      models,
-      tokenBalanceCache,
-      banCache,
-      globalActivityCache,
-    ),
+    threads: new ServerThreadsController(models, banCache, globalActivityCache),
     comments: new ServerCommentsController(
       models,
-      tokenBalanceCache,
       banCache,
       globalActivityCache,
     ),
@@ -227,14 +220,10 @@ function setupRouter(
     notifications: new ServerNotificationsController(models),
     analytics: new ServerAnalyticsController(),
     profiles: new ServerProfilesController(models),
-    communities: new ServerCommunitiesController(
-      models,
-      tokenBalanceCache,
-      banCache,
-    ),
-    polls: new ServerPollsController(models, tokenBalanceCache),
+    communities: new ServerCommunitiesController(models, banCache),
+    polls: new ServerPollsController(models),
     proposals: new ServerProposalsController(models),
-    groups: new ServerGroupsController(models, tokenBalanceCache, banCache),
+    groups: new ServerGroupsController(models, banCache),
     topics: new ServerTopicsController(models, banCache),
     admin: new ServerAdminController(models),
   };
@@ -251,6 +240,8 @@ function setupRouter(
     'post',
     '/updateAddress',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateCommunity,
     updateAddress.bind(this, models),
   );
   registerRoute(
@@ -296,14 +287,16 @@ function setupRouter(
     'post',
     '/deleteAddress',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateCommunity,
     deleteAddress.bind(this, models),
   );
   registerRoute(
     router,
     'post',
-    '/linkExistingAddressToChain',
+    '/linkExistingAddressToCommunity',
     passport.authenticate('jwt', { session: false }),
-    linkExistingAddressToChain.bind(this, models),
+    databaseValidationService.validateCommunity,
+    linkExistingAddressToCommunity.bind(this, models),
   );
   registerRoute(
     router,
@@ -369,6 +362,13 @@ function setupRouter(
   );
   registerRoute(
     router,
+    'put',
+    '/nodes/:id',
+    passport.authenticate('jwt', { session: false }),
+    updateChainNodeHandler.bind(this, serverControllers),
+  );
+  registerRoute(
+    router,
     'get',
     '/relatedCommunities',
     getRelatedCommunitiesHandler.bind(this, serverControllers),
@@ -379,6 +379,13 @@ function setupRouter(
     'get',
     '/communityStakes/:community_id/:stake_id?',
     getCommunityStakeHandler.bind(this, models, serverControllers),
+  );
+
+  registerRoute(
+    router,
+    'get',
+    '/namespaceMetadata/:namespace/:stake_id',
+    getNamespaceMetadata.bind(this, models),
   );
 
   registerRoute(

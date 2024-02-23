@@ -9,6 +9,7 @@ interface UseReserveCommunityNamespaceProps {
   namespace: string;
   symbol: string;
   userAddress: string;
+  chainId: string;
 }
 
 const useReserveCommunityNamespace = ({
@@ -16,6 +17,7 @@ const useReserveCommunityNamespace = ({
   namespace,
   symbol,
   userAddress,
+  chainId,
 }: UseReserveCommunityNamespaceProps) => {
   const [reserveNamespaceData, setReserveNamespaceData] =
     useState<ActionState>(defaultActionState);
@@ -34,6 +36,7 @@ const useReserveCommunityNamespace = ({
         namespace,
         userAddress,
         userAddress,
+        chainId,
       );
 
       await updateCommunity({

@@ -56,10 +56,10 @@ const schema = z.object({
 
 export type CreateCommunity = z.infer<typeof schema>;
 
-export const CreateCommunity: CommandMetadata<
+export const CreateCommunity = (): CommandMetadata<
   CommunityAttributes,
   typeof schema
-> = {
+> => ({
   schema,
   auth: [],
   body: async ({ id, payload }) => {
@@ -70,4 +70,4 @@ export const CreateCommunity: CommandMetadata<
     //await models.Community.create(payload)
     return payload as Partial<CommunityAttributes>;
   },
-};
+});
