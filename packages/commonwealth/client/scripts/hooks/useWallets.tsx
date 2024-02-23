@@ -77,8 +77,6 @@ const useWallets = (walletProps: IuseWalletProps) => {
   const [selectedWallet, setSelectedWallet] = useState<IWebWallet<any>>();
   const [selectedLinkingWallet, setSelectedLinkingWallet] =
     useState<IWebWallet<any>>();
-  const [cachedWalletSignature, setCachedWalletSignature] = useState<string>();
-  const [cachedTimestamp, setCachedTimestamp] = useState<number>();
   const [cachedSession, setCachedSession] = useState<Session>();
   const [primaryAccount, setPrimaryAccount] = useState<Account>();
   const [secondaryLinkAccount, setSecondaryLinkAccount] = useState<Account>();
@@ -371,9 +369,6 @@ const useWallets = (walletProps: IuseWalletProps) => {
             timestamp,
           );
           // Can't call authSession now, since chain.base is unknown, so we wait till action
-          setCachedWalletSignature(session.authorizationData.signature);
-          setCachedTimestamp(timestamp);
-          // setCachedChainId(chainId);
           setCachedSession(session);
           walletProps.onSuccess?.(account.address);
           setSidebarType('newOrReturning');
@@ -381,14 +376,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
           if (newSignInModalEnabled) {
             // Create the account with default values
-            await onCreateNewAccount(
-              walletToUse,
-              signature,
-              timestamp,
-              chainId,
-              sessionPayload,
-              account,
-            );
+            await onCreateNewAccount(walletToUse, session, account);
             await onSaveProfileInfo(account);
           }
         } catch (e) {
@@ -404,8 +392,6 @@ const useWallets = (walletProps: IuseWalletProps) => {
   // Handle Logic for creating a new account, including validating signature
   const onCreateNewAccount = async (
     currentWallet?: IWebWallet<any>,
-    currentCachedWalletSignature?: string,
-    currentCachedTimestamp?: number,
     currentCachedSession?: Session,
     currentPrimaryAccount?: Account,
   ) => {
