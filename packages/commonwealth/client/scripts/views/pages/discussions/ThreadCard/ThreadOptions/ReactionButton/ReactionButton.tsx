@@ -23,6 +23,7 @@ import { ReactionButtonSkeleton } from './ReactionButtonSkeleton';
 
 type ReactionButtonProps = {
   thread: Thread;
+  currentVoteWeight?: number;
   size: 'small' | 'big';
   showSkeleton?: boolean;
   disabled: boolean;
@@ -31,6 +32,7 @@ type ReactionButtonProps = {
 
 export const ReactionButton = ({
   thread,
+  currentVoteWeight,
   size,
   disabled,
   showSkeleton,
@@ -56,6 +58,8 @@ export const ReactionButton = ({
   } = useCreateThreadReactionMutation({
     chainId: app.activeChainId(),
     threadId: thread.id,
+    voteWeight: currentVoteWeight,
+    threadReactionWeightsSum: thread.reactionWeightsSum,
   });
   const {
     mutateAsync: deleteThreadReaction,
@@ -66,6 +70,8 @@ export const ReactionButton = ({
     chainId: app.activeChainId(),
     address: app.user.activeAccount?.address,
     threadId: thread.id,
+    voteWeight: currentVoteWeight,
+    threadReactionWeightsSum: thread.reactionWeightsSum,
   });
 
   const resetSessionRevalidationModal = createThreadReactionError
@@ -95,6 +101,7 @@ export const ReactionButton = ({
         address: app.user.activeAccount?.address,
         threadId: thread.id,
         reactionId: reactedId as number,
+        voteWeight: currentVoteWeight,
       }).catch((e) => {
         if (e instanceof SessionKeyError) {
           return;
@@ -107,6 +114,7 @@ export const ReactionButton = ({
         address: activeAddress,
         threadId: thread.id,
         reactionType: 'like',
+        voteWeight: currentVoteWeight,
       }).catch((e) => {
         if (e instanceof SessionKeyError) {
           return;

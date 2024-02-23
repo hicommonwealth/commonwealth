@@ -19,6 +19,7 @@ import { getDisplayedReactorsForPopup } from './helpers';
 
 type CommentReactionButtonProps = {
   comment: Comment<any>;
+  voteWeight?: number;
   disabled: boolean;
   tooltipText?: string;
   onReaction?: () => void;
@@ -26,6 +27,7 @@ type CommentReactionButtonProps = {
 
 export const CommentReactionButton = ({
   comment,
+  voteWeight,
   disabled,
   tooltipText = '',
   onReaction,
@@ -42,6 +44,7 @@ export const CommentReactionButton = ({
     threadId: comment.threadId,
     commentId: comment.id,
     communityId: app.activeChainId(),
+    voteWeight: voteWeight,
   });
   const {
     mutateAsync: deleteCommentReaction,
@@ -51,6 +54,7 @@ export const CommentReactionButton = ({
     commentId: comment.id,
     communityId: app.activeChainId(),
     threadId: comment.threadId,
+    voteWeight: voteWeight,
   });
 
   const resetSessionRevalidationModal = createCommentReactionError

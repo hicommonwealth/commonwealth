@@ -23,6 +23,7 @@ import { AdminActionsProps } from './ThreadOptions/AdminActions';
 import { ReactionButton } from './ThreadOptions/ReactionButton';
 
 type CardProps = AdminActionsProps & {
+  currentVoteWeight?: number;
   onBodyClick?: () => any;
   onStageTagClick?: (stage: ThreadStage) => any;
   threadHref?: string;
@@ -35,6 +36,7 @@ type CardProps = AdminActionsProps & {
 
 export const ThreadCard = ({
   thread,
+  currentVoteWeight,
   onDelete,
   onSpamToggle,
   onLockToggle,
@@ -103,6 +105,7 @@ export const ThreadCard = ({
         {!isWindowSmallInclusive && (
           <ReactionButton
             thread={thread}
+            currentVoteWeight={currentVoteWeight}
             size="big"
             disabled={!canReact}
             tooltipText={disabledActionsTooltipText}

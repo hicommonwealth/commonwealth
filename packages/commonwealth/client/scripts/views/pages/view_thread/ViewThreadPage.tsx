@@ -38,6 +38,7 @@ import { Link, LinkDisplay, LinkSource } from '../../../models/Thread';
 import { CommentsFeaturedFilterTypes } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
+import { useCommunityStake } from '../../components/CommunityStake';
 import { Select } from '../../components/Select';
 import type { SidebarComponents } from '../../components/component_kit/CWContentPage';
 import { CWContentPage } from '../../components/component_kit/CWContentPage';
@@ -144,6 +145,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     address: app?.user?.activeAccount?.address,
     apiEnabled: !!app?.user?.activeAccount?.address,
   });
+
+  const { currentVoteWeight } = useCommunityStake();
 
   const isTopicGated = !!(memberships || []).find((membership) =>
     membership.topicIds.includes(thread?.topic?.id),
@@ -433,6 +436,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           )
         }
         thread={thread}
+        currentVoteWeight={currentVoteWeight}
         onLockToggle={() => {
           setIsGloballyEditing(false);
           setIsEditingBody(false);
@@ -589,6 +593,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               comments={sortedComments}
               includeSpams={includeSpamThreads}
               thread={thread}
+              currentVoteWeight={currentVoteWeight}
               setIsGloballyEditing={setIsGloballyEditing}
               isReplying={isReplying}
               setIsReplying={setIsReplying}

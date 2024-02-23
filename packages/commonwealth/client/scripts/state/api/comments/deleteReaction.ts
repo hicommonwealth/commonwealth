@@ -9,6 +9,7 @@ interface DeleteReactionProps {
   address: string;
   canvasHash: string;
   reactionId: number;
+  voteWeight?: number;
 }
 
 const deleteReaction = async ({
@@ -52,12 +53,14 @@ interface UseDeleteCommentReactionMutationProps {
   communityId: string;
   threadId: number;
   commentId: number;
+  voteWeight?: number;
 }
 
 const useDeleteCommentReactionMutation = ({
   threadId,
   commentId,
   communityId,
+  voteWeight,
 }: UseDeleteCommentReactionMutationProps) => {
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
@@ -80,6 +83,9 @@ const useDeleteCommentReactionMutation = ({
             return {
               ...comment,
               reactions: comment.reactions.filter((r) => r.id !== reactionId),
+              ...(voteWeight && {
+                reactionWeightsSum: comment.reactionWeightsSum - voteWeight,
+              }),
             };
           }
           return comment;

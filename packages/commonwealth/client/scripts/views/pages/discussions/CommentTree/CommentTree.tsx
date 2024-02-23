@@ -33,6 +33,7 @@ import usePrepareCommentsList from './usePrepareCommentsList';
 type CommentsTreeAttrs = {
   comments: Array<CommentType<any>>;
   thread: Thread;
+  currentVoteWeight?: number;
   setIsGloballyEditing?: (status: boolean) => void;
   includeSpams: boolean;
   isReplying: boolean;
@@ -50,6 +51,7 @@ type CommentsTreeAttrs = {
 export const CommentTree = ({
   comments,
   thread,
+  currentVoteWeight,
   setIsGloballyEditing,
   includeSpams,
   fromDiscordBot,
@@ -483,6 +485,7 @@ export const CommentTree = ({
                     !isLocked && (comment.isCommentAuthor || isAdminOrMod)
                   }
                   comment={comment}
+                  currentVoteWeight={currentVoteWeight}
                 />
               </div>
               {isReplying && parentCommentId === comment.id && (

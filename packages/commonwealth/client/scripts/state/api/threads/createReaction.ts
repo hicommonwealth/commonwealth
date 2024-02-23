@@ -6,6 +6,8 @@ import { updateThreadInAllCaches } from './helpers/cache';
 interface IuseCreateThreadReactionMutation {
   threadId: number;
   chainId: string;
+  threadReactionWeightsSum?: number;
+  voteWeight?: number;
 }
 interface CreateReactionProps extends IuseCreateThreadReactionMutation {
   address: string;
@@ -13,7 +15,6 @@ interface CreateReactionProps extends IuseCreateThreadReactionMutation {
 }
 
 const createReaction = async ({
-  chainId,
   address,
   reactionType = 'like',
   threadId,
@@ -43,6 +44,8 @@ const createReaction = async ({
 const useCreateThreadReactionMutation = ({
   chainId,
   threadId,
+  threadReactionWeightsSum,
+  voteWeight,
 }: IuseCreateThreadReactionMutation) => {
   return useMutation({
     mutationFn: createReaction,
@@ -60,6 +63,11 @@ const useCreateThreadReactionMutation = ({
         { associatedReactions: [reaction] },
         'combineAndRemoveDups',
       );
+      updateThreadInAllCaches(chainId, threadId, {
+        ...(voteWeight && {
+          reactionWeightsSum: threadReactionWeightsSum + voteWeight,
+        }),
+      });
     },
   });
 };

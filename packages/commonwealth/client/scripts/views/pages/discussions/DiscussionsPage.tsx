@@ -26,6 +26,7 @@ import { getThreadActionTooltipText } from 'helpers/threads';
 import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
+import { useCommunityStake } from '../../components/CommunityStake';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 
 type DiscussionsPageProps = {
@@ -34,6 +35,7 @@ type DiscussionsPageProps = {
 
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const navigate = useCommonNavigate();
+  const { currentVoteWeight } = useCommunityStake();
   const { totalThreadsInCommunity } = useEXCEPTION_CASE_threadCountersStore();
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
   const [includeArchivedThreads, setIncludeArchivedThreads] =
@@ -142,6 +144,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             <ThreadCard
               key={thread?.id + '-' + thread.readOnly}
               thread={thread}
+              currentVoteWeight={currentVoteWeight}
               canReact={!disabledActionsTooltipText}
               canComment={!disabledActionsTooltipText}
               onEditStart={() => navigate(`${discussionLink}`)}

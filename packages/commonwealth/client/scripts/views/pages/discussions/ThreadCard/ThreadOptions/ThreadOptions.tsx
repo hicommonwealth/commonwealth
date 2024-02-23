@@ -15,6 +15,7 @@ import './ThreadOptions.scss';
 
 type OptionsProps = AdminActionsProps & {
   thread?: Thread;
+  currentVoteWeight?: number;
   upvoteBtnVisible?: boolean;
   commentBtnVisible?: boolean;
   shareEndpoint?: string;
@@ -29,6 +30,7 @@ type OptionsProps = AdminActionsProps & {
 
 export const ThreadOptions = ({
   thread,
+  currentVoteWeight,
   upvoteBtnVisible = false,
   commentBtnVisible = true,
   shareEndpoint,
@@ -91,6 +93,7 @@ export const ThreadOptions = ({
           {upvoteBtnVisible && thread && (
             <ReactionButton
               thread={thread}
+              currentVoteWeight={currentVoteWeight}
               size="small"
               disabled={!canReact}
               tooltipText={disabledActionTooltipText}
