@@ -11,8 +11,8 @@ import useFetchActiveCommunitiesQuery from 'state/api/communities/fetchActiveCom
 import CommunityInfo from '../../models/ChainInfo';
 import { CommunityCard, NewCommunityCard } from '../components/community_card';
 import { CWButton } from '../components/component_kit/cw_button';
-import { CWSpinner } from '../components/component_kit/cw_spinner';
 import { CWText } from '../components/component_kit/cw_text';
+import CWLoadingSpinner from '../components/component_kit/new_designs/CWLoadingSpinner';
 
 const buildCommunityString = (numCommunities: number) =>
   numCommunities >= 1000
@@ -205,7 +205,7 @@ const CommunitiesPage = () => {
         </div>
       </div>
       {isLoading ? (
-        <CWSpinner />
+        <CWLoadingSpinner />
       ) : (
         <div className="communities-list">
           {sortedCommunities}
