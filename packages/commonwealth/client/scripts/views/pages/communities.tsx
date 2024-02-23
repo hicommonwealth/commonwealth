@@ -3,14 +3,15 @@ import {
   ChainNetwork,
   CommunityCategoryType,
 } from '@hicommonwealth/core';
-import useFetchActiveCommunitiesQuery from 'client/scripts/state/api/communities/fetchActiveCommunities';
 import numeral from 'numeral';
 import 'pages/communities.scss';
 import React from 'react';
 import app from 'state';
+import useFetchActiveCommunitiesQuery from 'state/api/communities/fetchActiveCommunities';
 import CommunityInfo from '../../models/ChainInfo';
 import { CommunityCard, NewCommunityCard } from '../components/community_card';
 import { CWButton } from '../components/component_kit/cw_button';
+import { CWSpinner } from '../components/component_kit/cw_spinner';
 import { CWText } from '../components/component_kit/cw_text';
 
 const buildCommunityString = (numCommunities: number) =>
@@ -136,10 +137,11 @@ const CommunitiesPage = () => {
     return res;
   };
 
-  const activeCommunities = useFetchActiveCommunitiesQuery();
-  const sortedCommunities = activeCommunities.data
+  const { data: activeCommunities, isLoading } =
+    useFetchActiveCommunitiesQuery();
+  const sortedCommunities = activeCommunities
     ? sortCommunities(
-        activeCommunities.data.communities.map((c: any) =>
+        activeCommunities.communities.map((c: any) =>
           CommunityInfo.fromJSON(c),
         ),
       )
@@ -153,10 +155,8 @@ const CommunitiesPage = () => {
             Explore Communities
           </CWText>
           <CWText type="h3" fontWeight="semiBold" className="communities-count">
-            {activeCommunities.data &&
-              buildCommunityString(
-                activeCommunities.data.totalCommunitiesCount,
-              )}
+            {activeCommunities &&
+              buildCommunityString(activeCommunities.totalCommunitiesCount)}
           </CWText>
         </div>
         <div className="filter-buttons">
@@ -204,10 +204,14 @@ const CommunitiesPage = () => {
           })}
         </div>
       </div>
-      <div className="communities-list">
-        {sortedCommunities}
-        <NewCommunityCard />
-      </div>
+      {isLoading ? (
+        <CWSpinner />
+      ) : (
+        <div className="communities-list">
+          {sortedCommunities}
+          <NewCommunityCard />
+        </div>
+      )}
     </div>
   );
 };
