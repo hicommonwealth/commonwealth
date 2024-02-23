@@ -10,7 +10,7 @@ const TransactionLoading = () => {
   return (
     <div className="TransactionLoading">
       <CWModalBody>
-        <CWLoadingSpinner center />
+        <CWLoadingSpinner />
         <CWText fontWeight="medium">Waiting for transaction</CWText>
       </CWModalBody>
     </div>

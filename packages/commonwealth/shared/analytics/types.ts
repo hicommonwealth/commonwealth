@@ -33,6 +33,11 @@ export const enum MixpanelCommunityInteractionEvent {
   DIRECTORY_PAGE_DISABLED = 'Directory Page Disabled',
 }
 
+export const enum MixpanelCommunityStakeEvent {
+  STAKE_BOUGHT = 'Stake Bought',
+  STAKE_SOLD = 'Stake Sold',
+}
+
 export const enum MixpanelLoginEvent {
   LOGIN = 'Login',
   LOGIN_COMPLETED = 'Login Completed',
@@ -84,6 +89,7 @@ export type MixpanelEvents =
   | MixpanelLoginEvent
   | MixpanelUserSignupEvent
   | MixpanelCommunityCreationEvent
+  | MixpanelCommunityStakeEvent
   | MixpanelPageViewEvent
   | MixpanelCommunityInteractionEvent
   | MixpanelSnapshotEvents

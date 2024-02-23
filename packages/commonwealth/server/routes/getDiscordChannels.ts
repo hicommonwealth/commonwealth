@@ -6,7 +6,7 @@ import { success } from '../types';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 enum SetDiscordBotConfigErrors {
   NotAdmin = 'Not an admin',
-  CommonbotConnected = 'Discord is already connected to another Commonwealth community',
+  CommonbotConnected = 'Discord is already connected to another Common community',
   Error = 'Could not get discord bot config',
   TokenExpired = 'Token expired',
 }

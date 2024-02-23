@@ -33,12 +33,18 @@
     }
   }
 
+  .content-row {
+    .Text {
+      display: inline;
+    }
+  }
+
   .excerpt-text.Text {
     color: $neutral-600;
   }
 }
 
 .SearchQuillRenderer {
-  max-height: 66px;
+  max-height: 72px;
   overflow-y: hidden;
 }

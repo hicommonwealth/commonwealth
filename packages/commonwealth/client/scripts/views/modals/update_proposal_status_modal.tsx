@@ -56,7 +56,7 @@ const getInitialCosmosProposals = (thread: Thread) =>
   }));
 
 type UpdateProposalStatusModalProps = {
-  onChangeHandler?: (stage: ThreadStage, links?: Link[]) => void;
+  onChangeHandler?: (stage: string, links?: Link[]) => void;
   onModalClose: () => void;
   thread: Thread;
 };
@@ -67,15 +67,7 @@ export const UpdateProposalStatusModal = ({
   thread,
 }: UpdateProposalStatusModalProps) => {
   const { customStages } = app.chain.meta;
-  const stages = !customStages
-    ? [
-        ThreadStage.Discussion,
-        ThreadStage.ProposalInReview,
-        ThreadStage.Voting,
-        ThreadStage.Passed,
-        ThreadStage.Failed,
-      ]
-    : parseCustomStages(customStages);
+  const stages = parseCustomStages(customStages);
 
   const [tempStage, setTempStage] = useState(
     stages.includes(thread.stage) ? thread.stage : null,
@@ -345,7 +337,7 @@ export const UpdateProposalStatusModal = ({
           placeholder="Select a stage"
           isSearchable={false}
           options={stages.map((stage) => ({
-            value: stage,
+            value: stage as unknown as ThreadStage,
             label: threadStageToLabel(stage),
           }))}
           className="StageSelector"

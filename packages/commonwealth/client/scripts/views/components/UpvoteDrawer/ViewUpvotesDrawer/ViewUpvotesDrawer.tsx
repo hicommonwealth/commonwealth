@@ -2,6 +2,7 @@ import Account from 'client/scripts/models/Account';
 import AddressInfo from 'client/scripts/models/AddressInfo';
 import MinimumProfile from 'client/scripts/models/MinimumProfile';
 import React, { useState } from 'react';
+import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { CWText } from '../../component_kit/cw_text';
 import CWDrawer from '../../component_kit/new_designs/CWDrawer';
@@ -81,50 +82,60 @@ export const ViewUpvotesDrawer = ({
         onClick={() => setIsUpvoteDrawerOpen(true)}
       />
       <CWDrawer
+        overlayOpacity={0}
         className="upvote-drawer"
         open={isUpvoteDrawerOpen}
-        header={header}
         onClose={() => setIsUpvoteDrawerOpen(false)}
       >
-        <div className="upvoted-content">
-          <div className="upvoted-content-header">
-            <AuthorAndPublishInfo
-              authorAddress={author?.address}
-              authorChainId={getAuthorCommunityId(author)}
-              publishDate={publishDate}
-              showUserAddressWithInfo={false}
-            />
-          </div>
-          <div className="upvoted-content-body">
-            <QuillRenderer doc={contentBody} cutoffLines={10} />
-          </div>
+        <div className="drawer-actions">
+          <CWIconButton
+            iconName="caretDoubleRight"
+            onClick={() => setIsUpvoteDrawerOpen(false)}
+            buttonSize="sm"
+          />
         </div>
-        {reactorData?.length > 0 ? (
-          <>
-            <CWTable
-              columnInfo={getColumnInfo()}
-              rowData={getRowData(reactorData)}
-            />
-            <div className="upvote-totals">
-              <div className="upvotes">
-                <CWText type="caption" fontWeight="uppercase">
-                  Upvotes
-                </CWText>
-                <CWText type="b2">{reactorData.length}</CWText>
-              </div>
-              <div className="weight">
-                <CWText type="caption" fontWeight="uppercase">
-                  Total
-                </CWText>
-                <CWText type="b2">{getVoteWeightTotal(reactorData)}</CWText>
-              </div>
+        <div className="content-container">
+          <CWText type="h3">{header}</CWText>
+          <div className="upvoted-content">
+            <div className="upvoted-content-header">
+              <AuthorAndPublishInfo
+                authorAddress={author?.address}
+                authorChainId={getAuthorCommunityId(author)}
+                publishDate={publishDate}
+                showUserAddressWithInfo={false}
+              />
             </div>
-          </>
-        ) : (
-          <CWText className="empty-upvotes-container" type="b1">
-            There are no upvotes to view.
-          </CWText>
-        )}
+            <div className="upvoted-content-body">
+              <QuillRenderer doc={contentBody} cutoffLines={10} />
+            </div>
+          </div>
+          {reactorData?.length > 0 ? (
+            <>
+              <CWTable
+                columnInfo={getColumnInfo()}
+                rowData={getRowData(reactorData)}
+              />
+              <div className="upvote-totals">
+                <div className="upvotes">
+                  <CWText type="caption" fontWeight="uppercase">
+                    Upvotes
+                  </CWText>
+                  <CWText type="b2">{reactorData.length}</CWText>
+                </div>
+                <div className="weight">
+                  <CWText type="caption" fontWeight="uppercase">
+                    Total
+                  </CWText>
+                  <CWText type="b2">{getVoteWeightTotal(reactorData)}</CWText>
+                </div>
+              </div>
+            </>
+          ) : (
+            <CWText className="empty-upvotes-container" type="b1">
+              There are no upvotes to view.
+            </CWText>
+          )}
+        </div>
       </CWDrawer>
     </div>
   );

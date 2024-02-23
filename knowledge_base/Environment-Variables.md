@@ -76,6 +76,8 @@ If you add a new environment variable, you must add documentation here. Please d
 - [SLACK_FEEDBACK_WEBHOOK](#slack_feedback_webhook)
 - [SLACK_WEBHOOK_URL_DEV](#slack_webhook_url_dev)
 - [SNAPSHOT_HUB_URL](#snapshot_hub_url)
+- [SUPER_ADMIN_EMAIL](#super_admin_email)
+- [SUPER_ADMIN_WALLET_ADDRESS](#super_admin_wallet_address)
 - [TELEGRAM_BOT_TOKEN_DEV](#telegram_bot_token_dev)
 - [TEST_ENV](#test_env)
 - [WITH_PRERENDER](#with_prerender)
@@ -362,6 +364,14 @@ Connects to the #testing-webhooks Slack channel on the Common workspace. Require
 ## SNAPSHOT_HUB_URL
 
 Snapshot Hub URL used for Snapshot API requests. As of 231201 the default value is `https://hub.snapshot.org`.
+
+## SUPER_ADMIN_EMAIL
+
+Used by the `set-super-admin` package script to give super-admin status to the user account which owns the supplied email. Alternatively, SUPER_ADMIN_WALLET_ADDRESS may be set in its stead.
+
+## SUPER_ADMIN_WALLET_ADDRESS
+
+Used by the `set-super-admin` package script to give super-admin status to the user account which owns the supplied address. Alternatively, SUPER_ADMIN_EMAIL may be set in its stead.
 
 ## TELEGRAM_BOT_TOKEN_DEV
 

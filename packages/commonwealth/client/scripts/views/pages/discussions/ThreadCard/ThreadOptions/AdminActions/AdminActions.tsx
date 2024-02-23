@@ -20,7 +20,6 @@ import {
 } from '../../../../../../controllers/app/notifications';
 import type Thread from '../../../../../../models/Thread';
 import type { IThreadCollaborator } from '../../../../../../models/Thread';
-import { ThreadStage } from '../../../../../../models/types';
 import Permissions from '../../../../../../utils/Permissions';
 import { EditCollaboratorsModal } from '../../../../../modals/edit_collaborators_modal';
 import './AdminActions.scss';
@@ -31,7 +30,7 @@ export type AdminActionsProps = {
   onSpamToggle?: (thread: Thread) => any;
   onLockToggle?: (isLocked: boolean) => any;
   onPinToggle?: (isPinned: boolean) => any;
-  onProposalStageChange?: (newStage: ThreadStage) => any;
+  onProposalStageChange?: (newStage: string) => any;
   onSnapshotProposalFromThread?: () => any;
   onCollaboratorsEdit?: (collaborators: IThreadCollaborator[]) => any;
   onEditStart?: () => any;

@@ -211,7 +211,7 @@ const finishSsoLogin = async (
         }
         const msg = {
           to: oldUser.email,
-          from: 'Commonwealth <no-reply@commonwealth.im>',
+          from: 'Common <no-reply@commonwealth.im>',
           templateId: DynamicTemplate.VerifyAddress,
           dynamic_template_data: {
             address: existingAddress,
