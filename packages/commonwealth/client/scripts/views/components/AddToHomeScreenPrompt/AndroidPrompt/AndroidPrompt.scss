@@ -1,0 +1,117 @@
+@import '../../../../../styles/shared';
+
+.AndroidPrompt {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1002;
+
+  .header {
+    display: flex;
+    align-items: center;
+    padding-top: 8px;
+
+    .icon {
+      margin-right: 16px;
+    }
+  }
+
+  .app {
+    .app-name {
+      color: $neutral-900;
+      text-align: center;
+      font-variant-numeric: lining-nums tabular-nums;
+      font-family: $font-family-roboto;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 16px;
+      letter-spacing: 0.16px;
+    }
+    .app-url {
+      color: $neutral-500;
+      text-align: center;
+      font-variant-numeric: lining-nums tabular-nums;
+      font-family: $font-family-roboto;
+      font-size: 12px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 16px;
+      letter-spacing: 0.24px;
+    }
+  }
+
+  .button-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 32px;
+  }
+
+  .prompt-button {
+    color: $primary-500;
+    text-align: right;
+    font-variant-numeric: lining-nums tabular-nums;
+    font-family: 'Roboto';
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px;
+    letter-spacing: 0.16px;
+    background-color: $white;
+    padding: 0px;
+    margin: 0px;
+  }
+
+  .prompt-content {
+    background-color: $white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    padding: 8px 24px 8px;
+    border-radius: 26px;
+    margin-left: 18px;
+    margin-right: 18px;
+
+    .title {
+      font-family: $font-family-roboto;
+      font-size: 24px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 24px;
+      letter-spacing: -0.24px;
+      color: $neutral-900;
+      padding: 24px 0px 8px;
+    }
+
+    .description {
+      margin-top: 16px;
+      align-self: stretch;
+      color: $neutral-900;
+      font-variant-numeric: lining-nums tabular-nums;
+      font-family: $font-family-roboto;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 24px;
+      letter-spacing: 0.16px;
+    }
+
+    .hide-prompt {
+      flex: 1 0 0;
+      margin-top: 16px;
+      color: $neutral-900;
+      font-variant-numeric: lining-nums tabular-nums;
+      font-family: $font-family-roboto !important;
+      font-size: 16px !important;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 24px;
+      letter-spacing: 0.16px;
+    }
+  }
+}

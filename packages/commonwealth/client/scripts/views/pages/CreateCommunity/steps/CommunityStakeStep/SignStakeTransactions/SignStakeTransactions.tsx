@@ -78,7 +78,7 @@ const SignStakeTransactions = ({
 
   const handleCancel = () => {
     openConfirmation({
-      title: 'Are you sure yo want to cancel?',
+      title: 'Are you sure you want to cancel?',
       description:
         'Community Stake has not been enabled for your community yet',
       buttons: [

@@ -26,7 +26,7 @@ import getAddressProfile, {
   getAddressProfileValidation,
 } from '../routes/getAddressProfile';
 import getAddressStatus from '../routes/getAddressStatus';
-import linkExistingAddressToChain from '../routes/linkExistingAddressToChain';
+import linkExistingAddressToCommunity from '../routes/linkExistingAddressToCommunity';
 import reactionsCounts from '../routes/reactionsCounts';
 import selectCommunity from '../routes/selectCommunity';
 import starCommunity from '../routes/starCommunity';
@@ -240,6 +240,8 @@ function setupRouter(
     'post',
     '/updateAddress',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateCommunity,
     updateAddress.bind(this, models),
   );
   registerRoute(
@@ -285,14 +287,16 @@ function setupRouter(
     'post',
     '/deleteAddress',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateCommunity,
     deleteAddress.bind(this, models),
   );
   registerRoute(
     router,
     'post',
-    '/linkExistingAddressToChain',
+    '/linkExistingAddressToCommunity',
     passport.authenticate('jwt', { session: false }),
-    linkExistingAddressToChain.bind(this, models),
+    databaseValidationService.validateCommunity,
+    linkExistingAddressToCommunity.bind(this, models),
   );
   registerRoute(
     router,

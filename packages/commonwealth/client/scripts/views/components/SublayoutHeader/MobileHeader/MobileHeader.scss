@@ -1,0 +1,55 @@
+@import '../../../../../styles/shared';
+
+.MobileHeader {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  position: absolute;
+  width: 100%;
+  border-bottom: 1px solid $neutral-200;
+
+  .right-side {
+    display: flex;
+    margin-left: auto;
+    gap: 24px;
+    margin-right: 14px;
+    align-items: center;
+
+    .Avatar {
+      border: 1px solid $neutral-200;
+    }
+  }
+}
+
+.UserDrawer {
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    padding: 12px 14px;
+
+    .Avatar {
+      border: 1px solid $neutral-200;
+    }
+
+    .name {
+      max-width: 220px;
+      display: inline-block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .PopoverMenu {
+    border-radius: 0 !important;
+    border-width: 0 !important;
+    box-shadow: unset !important;
+    padding: 8px;
+
+    .menu-item-text {
+      width: 100%;
+    }
+  }
+}

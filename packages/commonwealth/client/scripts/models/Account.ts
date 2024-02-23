@@ -170,7 +170,7 @@ class Account {
   public async validate(session: Session, shouldRedraw = true) {
     const params = {
       address: this.address,
-      chain: this.community.id,
+      community_id: this.community.id,
       jwt: app.user.jwt,
       session,
       wallet_id: this.walletId,

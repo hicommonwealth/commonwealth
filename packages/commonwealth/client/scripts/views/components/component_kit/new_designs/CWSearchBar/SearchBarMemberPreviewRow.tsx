@@ -9,10 +9,12 @@ import './SearchBarMemberPreviewRow.scss';
 interface SearchBarMemberPreviewRowProps {
   searchResult: MemberResult;
   searchTerm?: string;
+  onSearchItemClick?: () => void;
 }
 
 export const SearchBarMemberPreviewRow: FC<SearchBarMemberPreviewRowProps> = ({
   searchResult,
+  onSearchItemClick,
 }) => {
   const community = searchResult.addresses[0].chain;
   const address = searchResult.addresses[0].address;
@@ -21,6 +23,7 @@ export const SearchBarMemberPreviewRow: FC<SearchBarMemberPreviewRowProps> = ({
 
   const handleClick = () => {
     navigate(`/profile/id/${searchResult.id}`, {}, null);
+    onSearchItemClick?.();
   };
 
   return (

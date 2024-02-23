@@ -1,7 +1,5 @@
-import type { DeltaStatic } from 'quill';
-import React, { useState } from 'react';
-
 import { pluralizeWithoutNumberPrefix } from 'helpers';
+import React, { useState } from 'react';
 import Topic, { TopicAttributes } from '../../models/Topic';
 import { useCommonNavigate } from '../../navigation/helpers';
 import app from '../../state';
@@ -18,14 +16,6 @@ import {
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
-import {
-  ReactQuillEditor,
-  getTextFromDelta,
-} from '../components/react_quill_editor';
-import {
-  deserializeDelta,
-  serializeDelta,
-} from '../components/react_quill_editor/utils';
 import { openConfirmation } from './confirmation_modal';
 
 import '../../../styles/modals/edit_topic_modal.scss';
@@ -42,9 +32,7 @@ export const EditTopicModal = ({
   noRedirect,
 }: EditTopicModalProps) => {
   const {
-    defaultOffchainTemplate,
     description: descriptionProp,
-    featuredInNewPost: featuredInNewPostProp,
     featuredInSidebar: featuredInSidebarProp,
     id,
     name: nameProp,
@@ -54,30 +42,15 @@ export const EditTopicModal = ({
   const { mutateAsync: editTopic } = useEditTopicMutation();
   const { mutateAsync: deleteTopic } = useDeleteTopicMutation();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(
-    deserializeDelta(defaultOffchainTemplate),
-  );
-
   const [description, setDescription] = useState<string>(descriptionProp);
-  const [featuredInNewPost, setFeaturedInNewPost] = useState<boolean>(
-    featuredInNewPostProp,
-  );
   const [featuredInSidebar, setFeaturedInSidebar] = useState<boolean>(
     featuredInSidebarProp,
   );
   const [name, setName] = useState<string>(nameProp);
 
-  const editorText = getTextFromDelta(contentDelta);
-
   const handleSaveChanges = async () => {
     setIsSaving(true);
-
-    if (featuredInNewPost && editorText.length === 0) {
-      setErrorMsg('Must provide template.');
-      return;
-    }
 
     const topicInfo: TopicAttributes = {
       id,
@@ -86,10 +59,8 @@ export const EditTopicModal = ({
       community_id: app.activeChainId(),
       telegram: null,
       featured_in_sidebar: featuredInSidebar,
-      featured_in_new_post: featuredInNewPost,
-      default_offchain_template: featuredInNewPost
-        ? serializeDelta(contentDelta)
-        : null,
+      featured_in_new_post: false,
+      default_offchain_template: '',
       total_threads: topic.totalThreads || 0,
     };
 
@@ -186,21 +157,6 @@ export const EditTopicModal = ({
           }}
           value=""
         />
-        <CWCheckbox
-          label="Featured in New Post"
-          checked={featuredInNewPost}
-          onChange={() => {
-            setFeaturedInNewPost(!featuredInNewPost);
-          }}
-          value=""
-        />
-        {featuredInNewPost && (
-          <ReactQuillEditor
-            contentDelta={contentDelta}
-            setContentDelta={setContentDelta}
-            tabIndex={3}
-          />
-        )}
       </CWModalBody>
       <CWModalFooter className="EditTopicModalFooter">
         <div className="action-buttons">

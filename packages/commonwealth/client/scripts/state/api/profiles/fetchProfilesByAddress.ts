@@ -21,7 +21,7 @@ const fetchProfilesByAddress = async ({
     `${app.serverUrl()}${ApiEndpoints.FETCH_PROFILES}`,
     {
       addresses: profileAddresses,
-      chains: profileChainIds,
+      communities: profileChainIds,
       jwt: app.user.jwt,
     },
   );
