@@ -203,13 +203,17 @@ const verifyAddress = async (
         })
       : req.body.address;
 
+  const { decode: dagJsonDecode } = await import('@ipld/dag-json');
+  const sessionBytes = Buffer.from(req.body.session, 'hex');
+  const decodedSession = dagJsonDecode(sessionBytes) as Session;
+
   await processAddress(
     models,
     community,
     address,
     req.body.wallet_id,
     req.user,
-    req.body.session,
+    decodedSession,
   );
 
   // assertion check
