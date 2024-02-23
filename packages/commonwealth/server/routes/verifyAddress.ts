@@ -180,18 +180,18 @@ const verifyAddress = async (
   res: Response,
   next: NextFunction,
 ) => {
-  if (!req.body.community_id || !req.body.chain_id) {
+  if (!req.body.community_id) {
     throw new AppError(Errors.NoChain);
   }
   const community = await models.Community.findOne({
     where: { id: req.body.community_id },
   });
-  const chain_id = req.body.chain_id;
+
   if (!community) {
     return next(new AppError(Errors.InvalidCommunity));
   }
 
-  if (!req.body.address || !req.body.signature) {
+  if (!req.body.address) {
     throw new AppError(Errors.InvalidArguments);
   }
 
