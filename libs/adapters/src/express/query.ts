@@ -25,7 +25,7 @@ export const expressQuery =
     try {
       const results = await query(md, {
         actor: { user: req.user as User, address_id: req.body.address_id },
-        payload: { ...req.body, ...req.params } as z.infer<P>,
+        payload: { ...req.query, ...req.params } as z.infer<P>,
       });
       return res.json(results);
     } catch (error) {
