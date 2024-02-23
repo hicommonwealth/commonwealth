@@ -55,7 +55,6 @@ const DesktopHeader = ({
   return (
     <div className="DesktopHeader">
       <div className="header-left">
-        <CWDivider isVertical />
         <CWIconButton
           iconName="commonLogo"
           iconButtonTheme="black"
