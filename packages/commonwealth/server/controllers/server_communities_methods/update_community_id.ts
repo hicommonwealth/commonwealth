@@ -41,40 +41,12 @@ export async function __updateCommunityId(
       { transaction },
     );
 
-    await this.models.Address.update(
-      {
-        community_id: new_community_id,
-      },
-      {
-        where: {
-          community_id,
-        },
-        transaction,
-      },
-    );
-    await this.models.Ban.update(
-      {
-        community_id: new_community_id,
-      },
-      {
-        where: {
-          community_id,
-        },
-        transaction,
-      },
-    );
-
-    // TODO: a txn like this could easily deadlock DB.
+    // TODO: a txn like this could cause deadlocks.
     //  A more thorough process where we disable the original community
     //  and gradually transfer data to the new community is likely required
     //  in the long-term. Alternative is to gradually duplicate the data
     //  and then delete the old data once redirect from old to new community
-    // is enabled
-
-    // TODO: execute query to find all columns that contain 'community_id'
-    //  if any columns are missing updates in this route then return a warning
-    //  this utility can be used to ensure we delete all references for community
-    //  deletion as well ---> do this either via DB query or Sequelize model manipulation
+    //  is enabled
     const models = [
       this.models.Address,
       this.models.Ban,
@@ -86,7 +58,6 @@ export async function __updateCommunityId(
       this.models.Poll,
       this.models.Reaction,
       this.models.StarredCommunity,
-      this.models.User,
       this.models.Vote,
       this.models.Webhook,
       this.models.CommunityContract,
