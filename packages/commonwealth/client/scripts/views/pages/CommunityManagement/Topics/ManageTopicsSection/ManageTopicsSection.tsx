@@ -1,4 +1,7 @@
-import { notifyError } from 'client/scripts/controllers/app/notifications';
+import {
+  notifyError,
+  notifySuccess,
+} from 'client/scripts/controllers/app/notifications';
 import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import type Topic from 'client/scripts/models/Topic';
 import app from 'client/scripts/state';
@@ -76,8 +79,9 @@ export const ManageTopicsSection = () => {
   const handleSave = async () => {
     try {
       await updateFeaturedTopicsOrder({ featuredTopics: featuredTopics });
+      notifySuccess('Topic order updated!');
     } catch (err) {
-      notifyError('Failed to update order');
+      notifyError('Failed to update topic order');
     }
   };
 
