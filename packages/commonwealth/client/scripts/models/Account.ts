@@ -1,3 +1,4 @@
+import { SIWESigner } from '@canvas-js/chain-ethereum';
 import type { WalletId, WalletSsoSource } from '@hicommonwealth/core';
 import $ from 'jquery';
 import app from 'state';
@@ -6,6 +7,7 @@ import NewProfilesController from '../controllers/server/newProfiles';
 import { Session } from '@canvas-js/interfaces';
 import type momentType from 'moment';
 import moment from 'moment';
+import { CANVAS_TOPIC } from 'shared/canvas';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import type ChainInfo from './ChainInfo';
 import MinimumProfile from './MinimumProfile';
@@ -174,6 +176,11 @@ class Account {
       wallet_id: this.walletId,
       wallet_sso_source: this.walletSsoSource,
     };
+
+    console.log('verifying session on client side');
+    console.log(session);
+    new SIWESigner().verifySession(CANVAS_TOPIC, session);
+
     const result = await fetch(`${app.serverUrl()}/verifyAddress`, {
       method: 'POST',
       headers: {

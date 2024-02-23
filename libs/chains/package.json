@@ -1,6 +1,5 @@
 {
   "name": "@hicommonwealth/chains",
-  "private": "true",
   "version": "0.1.0",
   "description": "Chain types",
   "files": [

@@ -65,6 +65,7 @@ export const getTopicId = async ({ chain }) => {
 };
 
 export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
+  console.log(`called createAndVerifyAddress`);
   if (chain === 'ethereum' || chain === 'alex') {
     const wallet_id = 'metamask';
     const { keypair, address } = generateEthAddress();

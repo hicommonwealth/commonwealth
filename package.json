@@ -150,6 +150,7 @@
     "tsconfig-paths": "^4.2.0",
     "tsconfig-paths-webpack-plugin": "^4.1.0",
     "tslint": "^5.13.0",
+    "tsx": "^4.7.1",
     "typescript": "^5.0.0",
     "webpack": "^5.75.0",
     "webpack-bundle-analyzer": "^4.4.0",

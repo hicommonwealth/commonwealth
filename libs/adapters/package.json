@@ -1,6 +1,5 @@
 {
   "name": "@hicommonwealth/adapters",
-  "private": "true",
   "version": "0.1.0",
   "description": "External adapters",
   "files": [
@@ -19,8 +18,8 @@
     "express": "^4.18.2",
     "hot-shots": "^9",
     "mixpanel": "^0.14.0",
-    "pg": "^8.11.3",
     "node-fetch": "2",
+    "pg": "^8.11.3",
     "rascal": "^14.4.5",
     "redis": "4.2.0",
     "rollbar": "^2.6.1",

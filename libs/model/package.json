@@ -1,6 +1,5 @@
 {
   "name": "@hicommonwealth/model",
-  "private": "true",
   "version": "0.1.0",
   "description": "Core Model - Server Side",
   "files": [

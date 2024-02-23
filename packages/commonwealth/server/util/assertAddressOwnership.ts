@@ -1,18 +1,20 @@
 import { ServerError, logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
-import { Op } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 
 const log = logger().getLogger(__filename);
 
 export default async function assertAddressOwnership(
   models: DB,
   address: string,
+  transaction?: Transaction,
 ) {
   const addressUsers = await models.Address.findAll({
     where: {
       address,
       verified: { [Op.ne]: null },
     },
+    transaction,
   });
   const numUserIds = new Set(addressUsers.map((au) => au.user_id)).size;
   if (numUserIds !== 1) {
