@@ -58,7 +58,7 @@ const DesktopHeader = ({
         <CWIconButton
           iconName="commonLogo"
           iconButtonTheme="black"
-          iconSize="xl"
+          iconSize="header"
           onClick={() => {
             if (app.isCustomDomain()) {
               navigate('/', {}, null);
