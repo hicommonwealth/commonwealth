@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
-
+import { useBrowserAnalyticsTrack } from 'client/scripts/hooks/useBrowserAnalyticsTrack';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type Compound from 'controllers/chain/ethereum/compound/adapter';
 import type { CompoundProposalArgs } from 'controllers/chain/ethereum/compound/governance';
-
 import 'pages/new_proposal/compound_proposal_form.scss';
-
+import React, { useState } from 'react';
 import app from 'state';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { User } from 'views/components/user/user';
+import { MixpanelGovernanceEvents } from '../../../../../shared/analytics/types';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWLabel } from '../../components/component_kit/cw_label';
@@ -32,6 +31,70 @@ export const CompoundProposalForm = () => {
   const [title, setTitle] = useState('');
 
   const author = app.user.activeAccount;
+
+  const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
+
+  const handleSendTransaction = async (e) => {
+    e.preventDefault();
+
+    setProposer(app.user?.activeAccount?.address);
+
+    if (!proposer) {
+      throw new Error('Invalid address / not signed in');
+    }
+
+    if (!description) {
+      throw new Error('Invalid description');
+    }
+
+    const targets = [];
+    const values = [];
+    const calldatas = [];
+    const signatures = [];
+
+    for (let i = 0; i < tabCount; i++) {
+      const aaveProposal = aaveProposalState[i];
+      if (aaveProposal.target) {
+        targets.push(aaveProposal.target);
+      } else {
+        throw new Error(`No target for Call ${i + 1}`);
+      }
+
+      values.push(aaveProposal.value || '0');
+      calldatas.push(aaveProposal.calldata || '');
+      signatures.push(aaveProposal.signature || '');
+    }
+
+    // if they passed a title, use the JSON format for description.
+    // otherwise, keep description raw
+
+    if (title) {
+      setDescription(
+        JSON.stringify({
+          description,
+          title,
+        }),
+      );
+    }
+
+    const details: CompoundProposalArgs = {
+      description,
+      targets,
+      values,
+      calldatas,
+      signatures,
+    };
+
+    try {
+      const result = await (app.chain as Compound).governance.propose(details);
+      notifySuccess(`Proposal ${result} created successfully!`);
+      trackAnalytics({
+        event: MixpanelGovernanceEvents.COMPOUND_PROPOSAL_CREATED,
+      });
+    } catch (err) {
+      notifyError(err.data?.message || err.message);
+    }
+  };
 
   return (
     <div className="CompoundProposalForm">
@@ -141,67 +204,7 @@ export const CompoundProposalForm = () => {
           aaveProposalState[activeTabIndex].signature = e.target.value;
         }}
       />
-      <CWButton
-        label="Send transaction"
-        onClick={(e) => {
-          e.preventDefault();
-
-          setProposer(app.user?.activeAccount?.address);
-
-          if (!proposer) {
-            throw new Error('Invalid address / not signed in');
-          }
-
-          if (!description) {
-            throw new Error('Invalid description');
-          }
-
-          const targets = [];
-          const values = [];
-          const calldatas = [];
-          const signatures = [];
-
-          for (let i = 0; i < tabCount; i++) {
-            const aaveProposal = aaveProposalState[i];
-            if (aaveProposal.target) {
-              targets.push(aaveProposal.target);
-            } else {
-              throw new Error(`No target for Call ${i + 1}`);
-            }
-
-            values.push(aaveProposal.value || '0');
-            calldatas.push(aaveProposal.calldata || '');
-            signatures.push(aaveProposal.signature || '');
-          }
-
-          // if they passed a title, use the JSON format for description.
-          // otherwise, keep description raw
-
-          if (title) {
-            setDescription(
-              JSON.stringify({
-                description,
-                title,
-              }),
-            );
-          }
-
-          const details: CompoundProposalArgs = {
-            description,
-            targets,
-            values,
-            calldatas,
-            signatures,
-          };
-
-          (app.chain as Compound).governance
-            .propose(details)
-            .then((result: string) => {
-              notifySuccess(`Proposal ${result} created successfully!`);
-            })
-            .catch((err) => notifyError(err.data?.message || err.message));
-        }}
-      />
+      <CWButton label="Send transaction" onClick={handleSendTransaction} />
     </div>
   );
 };

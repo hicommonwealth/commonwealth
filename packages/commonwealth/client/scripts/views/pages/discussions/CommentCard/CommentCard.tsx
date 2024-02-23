@@ -153,6 +153,7 @@ export const CommentCard = ({
                 e.preventDefault();
                 const hasContentChanged =
                   JSON.stringify(commentBody) !== JSON.stringify(commentDelta);
+
                 onEditCancel(hasContentChanged);
               }}
             />

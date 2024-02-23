@@ -8,10 +8,10 @@ export const schema = z.object({
   content: z.string(),
 });
 
-export const CreateReaction: CommandMetadata<
+export const CreateReaction = (): CommandMetadata<
   ReactionAttributes,
   typeof schema
-> = {
+> => ({
   schema,
   auth: [],
   body: async ({ id, payload }) => {
@@ -22,4 +22,4 @@ export const CreateReaction: CommandMetadata<
     //await models.Reaction.create(payload)
     return payload as Partial<ReactionAttributes>;
   },
-};
+});

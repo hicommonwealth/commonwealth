@@ -23,12 +23,18 @@
   border-radius: 6px;
   color: $neutral-800;
 
-  @include mediumSmallMid {
-    width: 100%;
+  &.small {
+    height: 34px;
+    padding: 8px;
+    gap: 4px;
+
+    .previews-section {
+      padding: 0;
+    }
   }
 
-  @include extraSmall {
-    display: none;
+  @include mediumSmallMid {
+    width: 100%;
   }
 
   &:hover {
@@ -49,9 +55,16 @@
     position: relative;
     padding: 0;
     border: none;
+    width: 100%;
 
     &:hover {
       border: none;
+    }
+
+    @include extraSmall {
+      // on mobile, dropdown should be relative to header container
+      // so the result list is full width of the device
+      position: static;
     }
   }
 
@@ -99,9 +112,15 @@
     width: fit-content;
     padding: 0;
     height: fit-content;
-    background-color: inherit;
+    background-color: transparent;
     border: none;
     box-shadow: none;
     border-radius: 0;
+  }
+
+  .mobile-empty {
+    position: absolute;
+    top: 54px;
+    left: 10px;
   }
 }

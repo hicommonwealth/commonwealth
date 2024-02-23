@@ -15,16 +15,21 @@ export const useNotionPaste = (
       const pastedText = event.clipboardData.getData('text/plain');
 
       if (pastedText) {
-        setContentDelta({
-          ...contentDelta,
-          ops: [
-            {
-              insert: pastedText,
-            },
-          ],
+        setContentDelta((prevContentDelta) => {
+          return {
+            ...prevContentDelta,
+            ops: [
+              ...prevContentDelta.ops,
+              {
+                insert: pastedText,
+              },
+            ],
+            ___isMarkdown: true,
+          };
         });
+
         setTimeout(() => {
-          const newCursorPosition = editor.getLength();
+          const newCursorPosition = editor.getLength() - 1;
           editor.setSelection(newCursorPosition, newCursorPosition);
         }, 10);
         return;
@@ -33,10 +38,12 @@ export const useNotionPaste = (
 
     const editorElement = editor.root;
 
-    editorElement.addEventListener('paste', handlePaste);
+    if (contentDelta) {
+      editorElement.addEventListener('paste', handlePaste);
 
-    return () => {
-      editorElement.removeEventListener('paste', handlePaste);
-    };
+      return () => {
+        editorElement.removeEventListener('paste', handlePaste);
+      };
+    }
   }, [setContentDelta, editorRef, contentDelta, isEditorFocused]);
 };

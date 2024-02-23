@@ -1,0 +1,46 @@
+@import '../../../../../../styles/shared';
+
+.UserDropdown {
+  width: 256px;
+
+  .menu-section-header-text:first-child {
+    padding-top: 6px;
+  }
+  .menu-section-divider {
+    margin-top: 8px;
+    margin-bottom: 6px;
+  }
+  .menu-item-text {
+    width: 100%;
+  }
+}
+
+.UserDropdownTriggerButton {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid $neutral-200;
+  background-color: $white;
+  cursor: pointer;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  &:hover {
+    background-color: $neutral-50;
+  }
+
+  &.isOpen {
+    background-color: $neutral-100;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  .caret-icon {
+    fill: $neutral-500;
+    margin-left: 8px;
+  }
+}
