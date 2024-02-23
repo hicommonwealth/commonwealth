@@ -70,6 +70,11 @@ export async function __updateCommunityId(
     //  in the long-term. Alternative is to gradually duplicate the data
     //  and then delete the old data once redirect from old to new community
     // is enabled
+
+    // TODO: execute query to find all columns that contain 'community_id'
+    //  if any columns are missing updates in this route then return a warning
+    //  this utility can be used to ensure we delete all references for community
+    //  deletion as well ---> do this either via DB query or Sequelize model manipulation
     const models = [
       this.models.Address,
       this.models.Ban,
