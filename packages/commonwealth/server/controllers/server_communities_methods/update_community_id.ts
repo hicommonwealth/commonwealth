@@ -134,7 +134,7 @@ export async function __updateCommunityId(
       },
     );
 
-    await this.models.Comment.destroy({
+    await this.models.Community.destroy({
       where: {
         id: community_id,
       },

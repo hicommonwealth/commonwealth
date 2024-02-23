@@ -335,6 +335,15 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     deleteCommunityHandler.bind(this, serverControllers),
   );
+
+  registerRoute(
+    router,
+    'patch',
+    '/communities/update_id',
+    passport.authenticate('jwt', { session: false }),
+    updateCommunityIdHandler.bind(this, models, serverControllers),
+  );
+
   registerRoute(
     router,
     'patch',
@@ -380,14 +389,6 @@ function setupRouter(
     'get',
     '/communityStakes/:community_id/:stake_id?',
     getCommunityStakeHandler.bind(this, models, serverControllers),
-  );
-
-  registerRoute(
-    router,
-    'patch',
-    '/communities/update_id',
-    passport.authenticate('jwt', { session: false }),
-    updateCommunityIdHandler.bind(this, models, serverControllers),
   );
 
   registerRoute(
