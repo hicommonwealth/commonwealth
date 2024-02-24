@@ -1,11 +1,8 @@
-import { errorMiddleware, statsMiddleware } from '@hicommonwealth/adapters';
-import { Router } from 'express';
+import { trpc } from '@hicommonwealth/adapters';
 import community from './community';
 
-const router = Router();
+export const router = trpc.router({ community });
+// TODO: add stats middleware
 
-// sub-routes
-router.use('/community', statsMiddleware, community);
-router.use(errorMiddleware);
-
-export default router;
+export const api = trpc.toExpress(router);
+export const panel = (url) => trpc.toPanel(router, url);

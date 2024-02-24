@@ -4,7 +4,7 @@ import useragent from 'express-useragent';
 import passport from 'passport';
 import { createCommunityStakeHandler } from '../routes/communities/create_community_stakes_handler';
 import { getCommunityStakeHandler } from '../routes/communities/get_community_stakes_handler';
-import ddd from '../routes/ddd';
+import * as ddd from '../routes/ddd';
 
 import {
   methodNotAllowedMiddleware,
@@ -1294,7 +1294,8 @@ function setupRouter(
   app.use(endpoint, router);
 
   // ddd-routes
-  app.use('/ddd', ddd);
+  app.use('/ddd/panel', (req, res) => res.send(ddd.panel(req)));
+  app.use('/ddd', ddd.api);
 
   app.use(methodNotAllowedMiddleware());
 }

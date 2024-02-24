@@ -14,7 +14,6 @@
     "test": "NODE_ENV=test ts-mocha '__tests__/**/*.spec.ts'"
   },
   "dependencies": {
-    "@trpc/server": "^10.45.1",
     "zod": "^3.22.4"
   }
 }
