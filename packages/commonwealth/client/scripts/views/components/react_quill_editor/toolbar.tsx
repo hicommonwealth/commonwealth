@@ -240,14 +240,8 @@ export const useMarkdownToolbarHandlers = ({
 
       if (selectedText.length > 0) {
         newText = handleListText(selectedText, prefix);
-        console.log('FIRED 1');
       } else {
-        // Check if there's only prefix or prefix with whitespace
-        // console.log('FIRED 3', editorLength, prefix.length, value);
-        // console.log({ editorLength, prefix, editorText });
-
         //check all of the prefix
-
         Object.keys(LIST_ITEM_PREFIX).forEach((key) => {
           const localPrefix = LIST_ITEM_PREFIX[key];
           const currentPrefix = editorText.replace(/\n/g, '').trim();
@@ -258,6 +252,7 @@ export const useMarkdownToolbarHandlers = ({
             editor.deleteText(0, localPrefix.length);
           }
         });
+
         if (editorLength === prefix.length) {
           editor.deleteText(0, editorLength);
           editor.insertText(0, `${prefix} `);
@@ -268,8 +263,6 @@ export const useMarkdownToolbarHandlers = ({
           editor.setSelection(newCursorPosition, newCursorPosition);
         }, 10);
       }
-
-      // console.log(editor.getLength() - 2, prefix.length);
 
       editor.deleteText(selection.index, selection.length);
       editor.insertText(selection.index, newText);
