@@ -64,6 +64,14 @@ export const deleteCommunity = async ({ id }: { id: string }) => {
   });
 };
 
+export const updateCommunityId = async ({ community_id, new_community_id }) => {
+  await axios.patch(`${app.serverUrl()}/communities/update_id`, {
+    jwt: app.user.jwt,
+    community_id,
+    new_community_id,
+  });
+};
+
 export const updateSiteAdmin = async ({
   address,
   siteAdmin,

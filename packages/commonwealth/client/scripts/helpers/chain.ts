@@ -17,7 +17,7 @@ export const deinitChainOrCommunity = async () => {
   app.user.setSelectedChain(null);
   app.user.setActiveAccounts([]);
   app.user.ephemerallySetActiveAccount(null);
-  document.title = 'Commonwealth';
+  document.title = 'Common';
 };
 
 // called by the user, when clicking on the chain/node switcher menu
@@ -48,7 +48,7 @@ export const selectChain = async (chain?: ChainInfo): Promise<boolean> => {
     app.skipDeinitChain = false;
   }
   app.chainPreloading = true;
-  document.title = `Commonwealth – ${chain.name}`;
+  document.title = `Common – ${chain.name}`;
 
   // Import top-level chain adapter lazily, to facilitate code split.
   let newChain;

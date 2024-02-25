@@ -69,6 +69,8 @@ export const ManageTopicsSection = () => {
     getRegularTopics(rawTopics),
   );
 
+  const initialFeaturedTopics = getFeaturedTopics(rawTopics);
+
   const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
 
   const handleSave = async () => {
@@ -80,7 +82,7 @@ export const ManageTopicsSection = () => {
   };
 
   const handleReversion = () => {
-    setFeaturedTopics(getFeaturedTopics(rawTopics));
+    setFeaturedTopics(initialFeaturedTopics);
   };
 
   useEffect(() => {
@@ -148,6 +150,9 @@ export const ManageTopicsSection = () => {
           buttonWidth={isWindowExtraSmall ? 'full' : 'narrow'}
           buttonHeight="med"
           onClick={handleReversion}
+          disabled={initialFeaturedTopics.every(
+            (value, index) => value.id === featuredTopics[index].id,
+          )}
         />
         <CWButton
           buttonType="primary"
