@@ -35,7 +35,6 @@ import DatabaseValidationService from './server/middleware/databaseValidationSer
 import setupPassport from './server/passport';
 import setupAPI from './server/routing/router';
 import { sendBatchedNotificationEmails } from './server/scripts/emails';
-import setupAppRoutes from './server/scripts/setupAppRoutes';
 import setupServer from './server/scripts/setupServer';
 import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
@@ -246,7 +245,7 @@ export async function main(app: express.Express) {
     }
   }
 
-  setupAppRoutes(app, models, templateFile, sendFile);
+  // setupAppRoutes(app, models, templateFile, sendFile);
 
   setupErrorHandlers(app);
 
