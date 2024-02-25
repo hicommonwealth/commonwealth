@@ -247,6 +247,11 @@ export async function main(app: express.Express) {
 
   // setupAppRoutes(app, models, templateFile, sendFile);
 
+  app.get('*', (req, res) => {
+    log.info(`setupAppRoutes sendFiles ${req.path}`);
+    sendFile(res);
+  });
+
   setupErrorHandlers(app);
 
   setupServer(app);
