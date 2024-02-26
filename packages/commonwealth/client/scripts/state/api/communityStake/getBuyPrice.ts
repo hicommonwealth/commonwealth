@@ -50,6 +50,7 @@ const useGetBuyPriceQuery = ({
       stakeId,
       amount,
       chainRpc,
+      ethChainId,
     ],
     queryFn: () =>
       getBuyPrice({ namespace, stakeId, amount, chainRpc, ethChainId }),

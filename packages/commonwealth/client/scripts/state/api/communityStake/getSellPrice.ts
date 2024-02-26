@@ -48,6 +48,7 @@ const useGetSellPriceQuery = ({
       stakeId,
       amount,
       chainRpc,
+      ethChainId,
     ],
     queryFn: () =>
       getSellPrice({ namespace, stakeId, amount, chainRpc, ethChainId }),

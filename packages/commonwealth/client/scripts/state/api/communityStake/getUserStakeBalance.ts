@@ -57,6 +57,7 @@ const useGetUserStakeBalanceQuery = ({
       stakeId,
       chainRpc,
       walletAddress,
+      ethChainId,
     ],
     queryFn: () =>
       getUserStakeBalance({
