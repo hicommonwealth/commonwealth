@@ -4,13 +4,16 @@ import type {
   QueryMetadata,
 } from '@hicommonwealth/core';
 import * as core from '@hicommonwealth/core';
-import { MiddlewareBuilder, TRPCError, initTRPC } from '@trpc/server';
+import {
+  TRPCError,
+  initTRPC,
+  type MiddlewareBuilder,
+  type ProcedureParams,
+} from '@trpc/server';
 import {
   CreateExpressContextOptions,
   createExpressMiddleware,
 } from '@trpc/server/adapters/express';
-import { ProcedureParams } from '@trpc/server/src';
-import { Request } from 'express';
 import passport from 'passport';
 import { renderTrpcPanel } from 'trpc-panel';
 import { ZodSchema } from 'zod';
@@ -80,7 +83,4 @@ export const toExpress = (router) =>
     }),
   });
 
-export const toPanel = (router, req: Request) => {
-  const url = req.protocol + '://' + req.get('host') + '/ddd';
-  return renderTrpcPanel(router, { url });
-};
+export const toPanel = (router, url) => renderTrpcPanel(router, { url });

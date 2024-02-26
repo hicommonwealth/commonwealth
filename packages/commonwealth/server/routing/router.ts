@@ -1304,8 +1304,8 @@ function setupRouter(
   app.use(endpoint, router);
 
   // ddd-routes
-  app.use('/ddd/panel', (req, res) => res.send(ddd.panel(req)));
-  app.use('/ddd', ddd.api);
+  app.use('/ddd', ddd.expressRouter);
+  app.use('/ddd', ddd.trpcExpressRouter);
 
   app.use(methodNotAllowedMiddleware());
 }

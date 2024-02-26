@@ -1,4 +1,4 @@
-export * from './express';
+export * as express from './express';
 export * from './hot-shots';
 export * from './mixpanel';
 export * from './rabbitmq';

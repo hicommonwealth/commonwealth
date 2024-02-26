@@ -1,8 +1,25 @@
-import { trpc } from '@hicommonwealth/adapters';
-import community from './community';
+import { express, trpc } from '@hicommonwealth/adapters';
+import { Router } from 'express';
+import * as community from './community';
 
-export const router = trpc.router({ community });
-// TODO: add stats middleware
+// express router
+export const expressRouter = Router();
+expressRouter.use(
+  '/community',
+  express.statsMiddleware,
+  community.expressRouter,
+);
+expressRouter.use(express.errorMiddleware);
 
-export const api = trpc.toExpress(router);
-export const panel = (url) => trpc.toPanel(router, url);
+// trpc router
+export const trpcExpressRouter = Router();
+const trpcRouter = trpc.router({ community: community.trpcRouter });
+trpcExpressRouter.use('/trpc/panel', (req, res) => {
+  const url = req.protocol + '://' + req.get('host') + '/ddd/trpc';
+  res.send(trpc.toPanel(trpcRouter, url));
+});
+trpcExpressRouter.use(
+  '/trpc',
+  express.statsMiddleware,
+  trpc.toExpress(trpcRouter),
+);
