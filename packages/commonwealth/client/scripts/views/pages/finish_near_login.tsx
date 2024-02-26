@@ -2,7 +2,6 @@ import { createCanvasSessionPayload } from 'canvas';
 
 import { ChainBase, WalletId } from '@hicommonwealth/core';
 import BN from 'bn.js';
-import { verifySession } from 'client/scripts/controllers/server/sessions';
 import {
   completeClientLogin,
   createUserWithAddress,
@@ -18,6 +17,7 @@ import { WalletAccount } from 'near-api-js';
 import type { FunctionCallOptions } from 'near-api-js/lib/account';
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { verifySession } from 'shared/canvas/verify';
 import app, { initAppState } from 'state';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';

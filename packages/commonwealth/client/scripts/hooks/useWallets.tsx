@@ -17,13 +17,13 @@ import type Substrate from 'controllers/chain/substrate/adapter';
 import {
   getSessionFromWallet,
   signSessionWithAccount,
-  verifySession,
 } from 'controllers/server/sessions';
 import $ from 'jquery';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { CANVAS_TOPIC } from 'shared/canvas';
+import { verifySession } from 'shared/canvas/verify';
 import app, { initAppState } from 'state';
 import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
 import { addressSwapper } from 'utils';
