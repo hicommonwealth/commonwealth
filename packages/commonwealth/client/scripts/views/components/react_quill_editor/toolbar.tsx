@@ -196,27 +196,22 @@ export const useMarkdownToolbarHandlers = ({
 
     return text.split('\n').reduce((acc, line) => {
       if (line.trim().length === 0) {
-        console.log('fired1');
         return acc;
       }
 
       if (line.startsWith(prefix)) {
-        console.log('fired2');
         return acc + `${line.trim()}\n`;
       }
 
       if (prefix === '1.') {
-        console.log('fired3');
         const numberedPrefix = `${counter++}.`;
         if (line.trim() === '' && !hasIncremented) {
           hasIncremented = true; // Mark the counter as incremented
           return acc + `${numberedPrefix} ${line}\n`;
         }
-        console.log('fired4');
         hasIncremented = false;
         return acc + `${numberedPrefix} ${line}\n`;
       }
-      console.log('fired5');
       return acc + `${prefix} ${line}\n`;
     }, '');
   };
@@ -239,12 +234,11 @@ export const useMarkdownToolbarHandlers = ({
       }
       const selectedText = editor.getText(selection.index, selection.length);
       const editorText = editor.getText();
-      const editorLength = editor.getLength();
+      const editorLength = editor.getLength() || 0;
 
       let newText;
 
       if (selectedText.length > 0) {
-        console.log('fired');
         newText = handleListText(selectedText, prefix);
       } else {
         //check all of the prefix
@@ -253,21 +247,45 @@ export const useMarkdownToolbarHandlers = ({
           const currentPrefix = editorText.replace(/\n/g, '').trim();
           if (
             editorText.startsWith(localPrefix) &&
-            currentPrefix === localPrefix
+            currentPrefix === localPrefix &&
+            localPrefix !== prefix
           ) {
             editor.deleteText(0, localPrefix.length);
+            editor.insertText(0, prefix);
           }
         });
 
-        if (editorLength === prefix.length) {
-          editor.deleteText(0, editorLength);
-          editor.insertText(0, `${prefix} `);
+        const [currentLine, offset] = editor.getLeaf(selection.index);
+        const currentLineIdx = editor.getIndex(currentLine);
+        if (currentLineIdx === 0) {
+          editor.setText(`${prefix} `);
+          editor.setSelection(prefix.length + 1, prefix.length + 1);
+          return;
         }
-        editor.insertText(editorLength, `${prefix} `);
-        setTimeout(() => {
-          const newCursorPosition = editor.getLength() - 1;
-          editor.setSelection(newCursorPosition, newCursorPosition);
-        }, 10);
+        if (
+          currentLine &&
+          currentLine.text.startsWith(prefix) &&
+          editorLength > prefix.length
+        ) {
+          const currentLineText = currentLine.text.replace(prefix, '');
+          editor.deleteText(currentLineIdx, currentLine.text.length);
+          editor.insertText(currentLineIdx, currentLineText.trim());
+
+          return;
+        } else if (
+          (currentLine.text && currentLine.text.trim() === prefix) ||
+          currentLine.text.startsWith(prefix)
+        ) {
+          editor.deleteText(currentLineIdx, editorLength || prefix.length);
+          return;
+        } else {
+          editor.insertText(currentLineIdx || 0, `${prefix} `);
+        }
+
+        // setTimeout(() => {
+        //   const newCursorPosition = editor.getLength() - 1;
+        //   editor.setSelection(newCursorPosition, newCursorPosition);
+        // }, 10);
       }
 
       editor.deleteText(selection.index, selection.length);
