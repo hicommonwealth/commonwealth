@@ -21,7 +21,15 @@ export const SharePopover = ({
 
   const defaultRenderTrigger = (
     onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
-  ) => <CWThreadAction action="share" onClick={onClick} />;
+  ) => (
+    <CWThreadAction
+      action="share"
+      onClick={(e) => {
+        e.preventDefault();
+        onClick(e);
+      }}
+    />
+  );
 
   return (
     <PopoverMenu
