@@ -34,7 +34,6 @@ export type ThreadAttributes = {
   pinned?: boolean;
   community_id: string;
   view_count: number;
-  new_view_count: number;
   links: Link[] | null;
 
   read_only?: boolean;
@@ -106,11 +105,6 @@ export default (
       },
       community_id: { type: dataTypes.STRING, allowNull: false },
       view_count: {
-        type: dataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
-      },
-      new_view_count: {
         type: dataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0,

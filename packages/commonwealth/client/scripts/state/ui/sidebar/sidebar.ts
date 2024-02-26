@@ -1,13 +1,10 @@
 import { createBoundedUseStore } from 'state/ui/utils';
-import { MobileMenuName } from 'views/AppMobileMenus';
 import { isWindowSmallInclusive } from 'views/components/component_kit/helpers';
 import { SidebarMenuName } from 'views/components/sidebar';
 import { devtools, persist } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 
 interface SidebarStore {
-  mobileMenuName: MobileMenuName;
-  setMobileMenuName: (name: MobileMenuName) => void;
   menuName: SidebarMenuName;
   menuVisible: boolean;
   setUserToggledVisibility: (toggled: 'open' | 'closed' | null) => void;
@@ -27,8 +24,6 @@ export const sidebarStore = createStore<SidebarStore>()(
   devtools(
     persist(
       (set) => ({
-        mobileMenuName: null,
-        setMobileMenuName: (name) => set(() => ({ mobileMenuName: name })),
         menuName: 'default',
         menuVisible: true,
         userToggledVisibility: null,

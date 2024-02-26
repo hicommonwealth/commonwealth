@@ -8,6 +8,10 @@
 
   @include everyRowStyles;
 
+  .Text {
+    display: inline;
+  }
+
   .last-updated-text.Text {
     color: $neutral-500;
   }

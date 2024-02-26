@@ -6,29 +6,27 @@ import {
 import { Community } from '@hicommonwealth/model';
 import { Router } from 'express';
 import passport from 'passport';
+import { MixpanelCommunityInteractionEvent } from 'shared/analytics/types';
 
 const router = Router();
 
 router.get(
   '/:community_id/stake/:stake_id?',
   passport.authenticate('jwt', { session: false }),
-  expressQuery(Community.GetCommunityStake),
+  expressQuery(Community.GetCommunityStake()),
 );
 
 router.put(
   '/:id/stake',
   passport.authenticate('jwt', { session: false }),
-  expressCommand(Community.SetCommunityStake),
+  expressCommand(Community.SetCommunityStake()),
 );
 
 router.post(
-  '/demo',
-  analyticsMiddleware<Community.Demo>('Demo Event', (payload) => {
-    return {
-      x: payload.numItems,
-    };
-  }),
-  expressCommand(Community.Demo),
+  '/:id/group',
+  passport.authenticate('jwt', { session: false }),
+  analyticsMiddleware(MixpanelCommunityInteractionEvent.CREATE_GROUP),
+  expressCommand(Community.CreateGroup()),
 );
 
 export default router;

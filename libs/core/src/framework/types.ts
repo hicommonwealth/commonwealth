@@ -123,9 +123,9 @@ export type QueryHandler<T, P extends ZodSchema> = (
  * - `body`: function implementing core domain logic, and returning side effects (mutations)
  */
 export type CommandMetadata<T, P extends ZodSchema> = {
-  schema: P;
-  auth: CommandHandler<T, P>[];
-  body: CommandHandler<T, P>;
+  readonly schema: P;
+  readonly auth: CommandHandler<T, P>[];
+  readonly body: CommandHandler<T, P>;
 };
 
 /**
@@ -135,7 +135,7 @@ export type CommandMetadata<T, P extends ZodSchema> = {
  * - `body`: function implementing the query logic
  */
 export type QueryMetadata<T, P extends ZodSchema> = {
-  schema: P;
-  auth: QueryHandler<T, P>[];
-  body: QueryHandler<T, P>;
+  readonly schema: P;
+  readonly auth: QueryHandler<T, P>[];
+  readonly body: QueryHandler<T, P>;
 };
