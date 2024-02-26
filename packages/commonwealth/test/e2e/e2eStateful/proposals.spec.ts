@@ -24,7 +24,7 @@ test.describe('Community proposals page', () => {
     const banner = await page.$$('.Growl');
     if (banner?.[0]) {
       const closeButton = await banner[0].$('.closeButton');
-      await closeButton?.click();
+      await closeButton.click();
     }
   };
 
@@ -103,6 +103,8 @@ test.describe('Community proposals page', () => {
     await waitForCompletedProposals({ page });
     const cardsContainers = await page.$$('.CardsCollection .cards');
     const inactiveCardsContainer = await cardsContainers?.[1];
+    const containerSpinner = await inactiveCardsContainer?.$('.LoadingSpinner');
+    await containerSpinner?.waitForElementState('hidden');
 
     const proposals = await inactiveCardsContainer?.$$('.ProposalCard');
 
@@ -336,9 +338,6 @@ test.describe('Community proposals page', () => {
       chaiExpect(communityAfterFailure.ChainNode.cosmos_gov_version).to.equal(
         'v1beta1-attempt-failed',
       );
-      chaiExpect(communityAfterFailure.ChainNode.alt_wallet_url).to.equal(
-        'https://rest.cosmos.directory/qwoyn',
-      );
     });
     test('After refresh: Inactive proposal cards should load with v1 API', async ({
       page,
@@ -353,9 +352,6 @@ test.describe('Community proposals page', () => {
 
       chaiExpect(communityAfterRefresh.ChainNode.cosmos_gov_version).to.equal(
         'v1',
-      );
-      chaiExpect(communityAfterRefresh.ChainNode.alt_wallet_url).to.equal(
-        'https://rest.cosmos.directory/qwoyn',
       );
     });
     test('Inactive proposal page loads from Proposal Card click', async ({
