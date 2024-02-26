@@ -36,6 +36,8 @@ const LayoutComponent = ({
   const [scopeToLoad, setScopeToLoad] = useState<string>();
   const [isLoading, setIsLoading] = useState<boolean>();
 
+  // If community id was updated ex: `commonwealth.im/{community-id}/**/*`
+  // redirect to new community id ex: `commonwealth.im/{new-community-id}/**/*`
   useNecessaryEffect(() => {
     const redirectTo = app.config.redirects[selectedScope];
     if (redirectTo && redirectTo !== selectedScope.toLowerCase()) {
