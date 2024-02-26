@@ -12,10 +12,9 @@ import bodyParser from 'body-parser';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
-import express from 'express';
+import express, { type Request, type Response } from 'express';
 import { redirectToHTTPS } from 'express-http-to-https';
 import session from 'express-session';
-import fs from 'fs';
 import logger from 'morgan';
 import passport from 'passport';
 import prerenderNode from 'prerender-node';
@@ -168,16 +167,6 @@ export async function main(app: express.Express) {
     }
   };
 
-  const templateFile = (() => {
-    try {
-      return fs.readFileSync('./build/index.html');
-    } catch (e) {
-      console.error(`Failed to read template file: ${e.message}`);
-    }
-  })();
-
-  const sendFile = (res) => res.sendFile(`${__dirname}/index.html`);
-
   setupMiddleware();
   setupPassport(models);
 
@@ -245,11 +234,9 @@ export async function main(app: express.Express) {
     }
   }
 
-  // setupAppRoutes(app, models, templateFile, sendFile);
-
-  app.get('*', (req, res) => {
+  app.get('*', (req: Request, res: Response) => {
     log.info(`setupAppRoutes sendFiles ${req.path}`);
-    sendFile(res);
+    res.sendFile(`${__dirname}/index.html`);
   });
 
   setupErrorHandlers(app);
