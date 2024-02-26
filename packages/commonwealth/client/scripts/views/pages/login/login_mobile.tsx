@@ -16,7 +16,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWWalletsList } from 'views/components/component_kit/cw_wallets_list';
 import { isWindowExtraSmall } from 'views/components/component_kit/helpers';
-import CWLoadingSpinner from '../../components/component_kit/new_designs/CWLoadingSpinner';
+import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { getLoginText } from './helpers';
 import { LoginBoilerplate } from './login_boilerplate';
 import { LoginEthAlert } from './login_eth_alert';
@@ -198,7 +198,7 @@ export const LoginMobile = ({
                 </div>
               </div>
             ) : (
-              <CWLoadingSpinner />
+              <CWCircleMultiplySpinner />
             )}
           </div>
         )}

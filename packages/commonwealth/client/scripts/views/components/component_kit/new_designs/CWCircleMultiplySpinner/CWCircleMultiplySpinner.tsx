@@ -1,17 +1,18 @@
 import clsx from 'clsx';
 import React from 'react';
-
 import { ComponentType } from 'views/components/component_kit/types';
 
-import './CWLoadingSpinner.scss';
+import './CWCircleMultiplySpinner.scss';
 
-interface CWLoadingSpinnerProps {
+interface CWCircleMultiplySpinnerProps {
   center?: boolean;
 }
 
-const CWLoadingSpinner = ({ center = true }: CWLoadingSpinnerProps) => {
+const CWCircleMultiplySpinner = ({
+  center = true,
+}: CWCircleMultiplySpinnerProps) => {
   return (
-    <div className={clsx(ComponentType.LoadingSpinner, { center })}>
+    <div className={clsx(ComponentType.CircleMultiplySpinner, { center })}>
       <div className="container">
         <div className="pink-1"></div>
         <div className="blue"></div>
@@ -21,4 +22,4 @@ const CWLoadingSpinner = ({ center = true }: CWLoadingSpinnerProps) => {
   );
 };
 
-export default CWLoadingSpinner;
+export default CWCircleMultiplySpinner;

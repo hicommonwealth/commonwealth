@@ -18,7 +18,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import type { AbiInput, AbiItem, AbiOutput } from 'web3-utils/types';
 import type Contract from '../../../models/Contract';
-import CWLoadingSpinner from '../../components/component_kit/new_designs/CWLoadingSpinner';
+import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 
@@ -183,7 +183,7 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
                         <CWText>{output.name}</CWText>
                       </div>
                       <div>
-                        {loading && <CWLoadingSpinner />}
+                        {loading && <CWCircleMultiplySpinner />}
                         <CWText>
                           {fnOutputArray && fnOutputArray[i].toString()
                             ? fnOutputArray[i].toString()
