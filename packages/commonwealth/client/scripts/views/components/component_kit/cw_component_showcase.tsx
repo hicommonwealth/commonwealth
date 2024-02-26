@@ -56,7 +56,7 @@ import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
 import { CWUpvote } from './new_designs/cw_upvote';
 import { CWCircleButton } from './new_designs/CWCircleButton/CWCircleButton';
 import CWCircleMultiplySpinner from './new_designs/CWCircleMultiplySpinner';
-import CWCircleSpinner from './new_designs/CWCircleSpinner';
+import CWCircleRingSpinner from './new_designs/CWCircleRingSpinner';
 import CWDrawer from './new_designs/CWDrawer';
 import { CWForm } from './new_designs/CWForm';
 import CWIconButton from './new_designs/CWIconButton';
@@ -1095,9 +1095,11 @@ export const ComponentShowcase = () => {
         />
       </div>
       <div className="basic-gallery">
-        <CWText type="h3">Spinner</CWText>
-        <CWCircleMultiplySpinner center={false} />
-        <CWCircleSpinner />
+        <CWText type="h3">Spinners</CWText>
+        <CWText type="h4">Circle Multiply Spinner</CWText>
+        <CWCircleMultiplySpinner />
+        <CWText type="h4">Circle Ring Spinner</CWText>
+        <CWCircleRingSpinner />
       </div>
       <div className="basic-gallery">
         <CWText type="h3">Breadcrumbs</CWText>
