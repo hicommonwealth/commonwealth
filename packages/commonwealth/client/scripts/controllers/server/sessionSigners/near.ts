@@ -42,10 +42,6 @@ export class NEARSessionController implements ISessionController {
       .toString();
   }
 
-  async authSession(session: Session) {
-    throw new Error('not implemented');
-  }
-
   private async getOrCreateSigner(
     chainId: string,
     fromAddress: string,

@@ -2,6 +2,7 @@ import { createCanvasSessionPayload } from 'canvas';
 
 import { ChainBase, WalletId } from '@hicommonwealth/core';
 import BN from 'bn.js';
+import { verifySession } from 'client/scripts/controllers/server/sessions';
 import {
   completeClientLogin,
   createUserWithAddress,
@@ -128,9 +129,7 @@ const FinishNearLogin = () => {
         chainId,
       );
 
-      app.sessions
-        .getSessionController(ChainBase.NEAR)
-        .authSession(chainId, acct.address, canvasSessionPayload, signature);
+      verifySession(canvasSessionPayload);
 
       if (!app.isLoggedIn()) {
         await initAppState();

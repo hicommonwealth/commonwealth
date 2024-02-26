@@ -14,7 +14,10 @@ import WalletConnectWebWalletController from 'controllers/app/webWallets/walletc
 import WebWalletController from 'controllers/app/web_wallets';
 import type Near from 'controllers/chain/near/adapter';
 import type Substrate from 'controllers/chain/substrate/adapter';
-import { signSessionWithAccount } from 'controllers/server/sessions';
+import {
+  signSessionWithAccount,
+  verifySession,
+} from 'controllers/server/sessions';
 import $ from 'jquery';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
@@ -402,7 +405,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     try {
       if (walletToUse.chain !== 'near') {
         await primaryAccountToUse.validate(cachedSessionToUse, false);
-        app.sessions.authSession(walletToUse.chain, cachedSessionToUse);
+        verifySession(cachedSessionToUse);
       }
       await onLogInWithAccount(primaryAccountToUse, false, false);
       // Important: when we first create an account and verify it, the user id
@@ -675,7 +678,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     const session = await signSessionWithAccount(wallet, account, timestamp);
 
     await account.validate(session);
-    app.sessions.authSession(wallet.chain, session);
+    verifySession(session);
     console.log('Started new session for', wallet.chain);
 
     // ensure false for newlyCreated / linking vars on revalidate

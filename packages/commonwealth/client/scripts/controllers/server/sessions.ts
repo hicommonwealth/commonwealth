@@ -9,6 +9,7 @@ import {
   createCanvasSessionPayload,
 } from 'canvas';
 
+import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { ChainBase, WalletSsoSource } from '@hicommonwealth/core';
 import app from 'state';
 import Account from '../../models/Account';
@@ -108,6 +109,19 @@ export async function signSessionWithMagic(
   }
 }
 
+const sessionSigners = [new SIWESigner()];
+
+export function verifySession(session: Session) {
+  for (const signer of sessionSigners) {
+    if (signer.match(session.address)) {
+      return signer.verifySession(CANVAS_TOPIC, session);
+    }
+  }
+  throw new Error(
+    `No signer found for session with address ${session.address}`,
+  );
+}
+
 class SessionsController {
   ethereum: EthereumSessionController;
   substrate: SubstrateSessionController;
@@ -141,11 +155,6 @@ class SessionsController {
       chainId,
       fromAddress,
     );
-  }
-
-  // Provide authentication for a session address, by presenting a signed SessionPayload.
-  public authSession(chainBase: ChainBase, session: Session) {
-    return this.getSessionController(chainBase).authSession(session);
   }
 
   // Sign an arbitrary action, using context from the last authSession() call.

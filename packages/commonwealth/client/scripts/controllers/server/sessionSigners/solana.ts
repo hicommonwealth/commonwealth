@@ -1,8 +1,7 @@
 import type * as solw3 from '@solana/web3.js';
 import bs58 from 'bs58';
-import { CANVAS_TOPIC, verify as verifyCanvasSessionSignature } from 'canvas';
+import { verify as verifyCanvasSessionSignature } from 'canvas';
 
-import { SolanaSigner } from '@canvas-js/chain-solana';
 import type {
   Action,
   ActionArgument,
@@ -41,11 +40,6 @@ export class SolanaSessionController implements ISessionController {
     return (
       await this.getOrCreateSigner(chainId, fromAddress)
     ).publicKey.toBase58();
-  }
-
-  async authSession(session: Session) {
-    const sessionSigner = new SolanaSigner();
-    sessionSigner.verifySession(CANVAS_TOPIC, session);
   }
 
   private async getOrCreateSigner(

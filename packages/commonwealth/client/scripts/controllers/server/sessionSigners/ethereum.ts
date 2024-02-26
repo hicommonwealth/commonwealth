@@ -3,7 +3,6 @@ import type {
   Action,
   ActionArgument,
   Message,
-  Session,
   SessionPayload,
   Signature,
 } from '@canvas-js/interfaces';
@@ -38,11 +37,6 @@ export class EthereumSessionController implements ISessionController {
     fromAddress: string,
   ): Promise<string> {
     return (await this.getOrCreateSigner(chainId, fromAddress)).address;
-  }
-
-  async authSession(session: Session) {
-    const sessionSigner = new SIWESigner();
-    sessionSigner.verifySession(CANVAS_TOPIC, session);
   }
 
   private async getOrCreateSigner(

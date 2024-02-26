@@ -5,7 +5,6 @@ import type {
   Session,
   Signature,
 } from '@canvas-js/interfaces';
-import { verifySignedValue } from '@canvas-js/signed-cid';
 
 import assert from 'assert';
 import { configure } from 'safe-stable-stringify';
@@ -30,6 +29,7 @@ export const verify = async ({
   sessionMessageSignature,
   expectedAddress,
 }: VerifyArgs) => {
+  const { verifySignedValue } = await import('@canvas-js/signed-cid');
   // get the signer? or assume this has already been done?
   sessionMessage.payload;
 

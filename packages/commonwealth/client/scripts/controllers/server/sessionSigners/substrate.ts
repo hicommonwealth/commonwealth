@@ -1,4 +1,3 @@
-import { SubstrateSigner } from '@canvas-js/chain-substrate';
 import type {
   Action,
   ActionArgument,
@@ -8,7 +7,7 @@ import type {
 } from '@canvas-js/interfaces';
 import { Keyring } from '@polkadot/api';
 import { IKeyringPair } from '@polkadot/types/types';
-import { CANVAS_TOPIC, verify as verifyCanvasSessionSignature } from 'canvas';
+import { verify as verifyCanvasSessionSignature } from 'canvas';
 import { ISessionController, InvalidSession } from '.';
 import { addressSwapper } from '../../../../../shared/utils';
 
@@ -49,11 +48,6 @@ export class SubstrateSessionController implements ISessionController {
       address: (await this.getOrCreateSigner(chainId, fromAddress)).address,
       currentPrefix: 42,
     });
-  }
-
-  async authSession(session: Session) {
-    const sessionSigner = new SubstrateSigner();
-    sessionSigner.verifySession(CANVAS_TOPIC, session);
   }
 
   private async getOrCreateSigner(

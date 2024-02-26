@@ -8,7 +8,6 @@ import type {
   Action,
   ActionArgument,
   Message,
-  Session,
   Signature,
 } from '@canvas-js/interfaces';
 
@@ -30,9 +29,6 @@ export abstract class ISessionController {
     chainId: string,
     fromAddress: string,
   ): Promise<string>;
-
-  // Authenticate a session by submitting a signature.
-  abstract authSession(session: Session): void;
 
   // Sign an action, using the current authenticated session.
   abstract sign(

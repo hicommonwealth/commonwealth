@@ -1,7 +1,6 @@
 import type { Secp256k1Wallet } from '@cosmjs/amino';
-import { CANVAS_TOPIC, verify as verifyCanvasSessionSignature } from 'canvas';
+import { verify as verifyCanvasSessionSignature } from 'canvas';
 
-import { CosmosSigner } from '@canvas-js/chain-cosmos';
 import type {
   Action,
   ActionArgument,
@@ -46,11 +45,6 @@ export class CosmosSDKSessionController implements ISessionController {
   ): Promise<string> {
     await this.getOrCreateSigner(chainId, fromAddress);
     return this.signers[chainId][fromAddress]?.bech32Address;
-  }
-
-  async authSession(session: Session) {
-    const sessionSigner = new CosmosSigner();
-    sessionSigner.verifySession(CANVAS_TOPIC, session);
   }
 
   private async getOrCreateSigner(
