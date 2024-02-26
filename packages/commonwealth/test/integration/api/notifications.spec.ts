@@ -12,7 +12,7 @@ import * as modelUtils from '../../util/modelUtils';
 chai.use(chaiHttp);
 const { expect } = chai;
 
-describe.only('Notification Routes Tests', () => {
+describe('Notification Routes Tests', () => {
   let jwtToken,
     userId,
     notification,
