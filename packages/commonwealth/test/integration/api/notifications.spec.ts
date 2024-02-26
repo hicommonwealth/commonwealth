@@ -12,7 +12,7 @@ import * as modelUtils from '../../util/modelUtils';
 chai.use(chaiHttp);
 const { expect } = chai;
 
-describe('Notification Routes Tests', () => {
+describe.only('Notification Routes Tests', () => {
   let jwtToken,
     userId,
     notification,
@@ -20,12 +20,14 @@ describe('Notification Routes Tests', () => {
     notificationThree,
     newThreadSub,
     chainEventSub;
-  const chain = 'ethereum';
+  const community_id = 'ethereum';
 
   before(async () => {
     await tester.seedDb();
     // get logged in address/user with JWT
-    const result = await modelUtils.createAndVerifyAddress({ chain });
+    const result = await modelUtils.createAndVerifyAddress({
+      chain: community_id,
+    });
     userId = result.user_id;
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
@@ -36,31 +38,31 @@ describe('Notification Routes Tests', () => {
       jwt: jwtToken,
       is_active: true,
       category: NotificationCategories.NewThread,
-      chain_id: chain,
+      community_id,
     });
 
     chainEventSub = await modelUtils.createSubscription({
       jwt: jwtToken,
       is_active: true,
       category: NotificationCategories.NewThread,
-      chain_id: chain,
+      community_id,
     });
 
     notification = await models.Notification.create({
       category_id: NotificationCategories.NewThread,
-      community_id: chain,
+      community_id,
       notification_data: '',
     });
 
     notificationTwo = await models.Notification.create({
       category_id: NotificationCategories.NewThread,
-      community_id: chain,
+      community_id,
       notification_data: '',
     });
 
     notificationThree = await models.Notification.create({
       category_id: NotificationCategories.ChainEvent,
-      community_id: chain,
+      community_id,
       notification_data: '',
     });
 
@@ -142,11 +144,11 @@ describe('Notification Routes Tests', () => {
     });
 
     it('should return only notifications with active_only turned on', async () => {
-      const newSub = await modelUtils.createSubscription({
+      await modelUtils.createSubscription({
         jwt: jwtToken,
         is_active: false,
         category: NotificationCategories.NewThread,
-        chain_id: chain,
+        community_id: community_id,
       });
 
       const res = await chai
@@ -185,7 +187,7 @@ describe('Notification Routes Tests', () => {
     it('should pass when notification id is a string instead of an array', async () => {
       const notif = await models.Notification.create({
         category_id: NotificationCategories.NewThread,
-        community_id: chain,
+        community_id: community_id,
         notification_data: '',
       });
 

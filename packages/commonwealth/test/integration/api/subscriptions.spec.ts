@@ -18,14 +18,16 @@ import * as modelUtils from '../../util/modelUtils';
 chai.use(chaiHttp);
 const { expect } = chai;
 
-describe('Subscriptions Tests', () => {
+describe.only('Subscriptions Tests', () => {
   let jwtToken, loggedInAddr, loggedInSession, thread, comment, userId: number;
-  const chain = 'ethereum';
+  const community_id = 'ethereum';
 
   before('reset database', async () => {
     await tester.seedDb();
     // get logged in address/user with JWT
-    const result = await modelUtils.createAndVerifyAddress({ chain });
+    const result = await modelUtils.createAndVerifyAddress({
+      chain: community_id,
+    });
     loggedInAddr = result.address;
     loggedInSession = { session: result.session, sign: result.sign };
     jwtToken = jwt.sign(
@@ -36,13 +38,13 @@ describe('Subscriptions Tests', () => {
 
     const topic = await models.Topic.findOne({
       where: {
-        community_id: chain,
+        community_id,
         group_ids: [],
       },
     });
 
     let res = await modelUtils.createThread({
-      chainId: chain,
+      chainId: community_id,
       address: loggedInAddr,
       jwt: jwtToken,
       title: 't',
@@ -58,7 +60,7 @@ describe('Subscriptions Tests', () => {
     thread = res.result;
 
     res = await modelUtils.createComment({
-      chain,
+      chain: community_id,
       address: loggedInAddr,
       jwt: jwtToken,
       text: 'cw4eva',
@@ -80,11 +82,11 @@ describe('Subscriptions Tests', () => {
           .request(app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
-          .send({ jwt: jwtToken, category, chain_id: chain, is_active });
+          .send({ jwt: jwtToken, category, community_id, is_active });
         expect(res.body).to.not.be.null;
         expect(res.body.status).to.be.equal('Success');
         expect(res.body.result.category_id).to.be.equal(category);
-        expect(res.body.result.community_id).to.equal(chain);
+        expect(res.body.result.community_id).to.equal(community_id);
         expect(res.body.result.is_active).to.be.equal(true);
         expect(res.body.result.thread_id).to.be.null;
       });
@@ -109,7 +111,7 @@ describe('Subscriptions Tests', () => {
             jwt: jwtToken,
             category,
             is_active,
-            chain_id: 'very_random_chain_name_yee_haw',
+            community_id: 'very_random_chain_name_yee_haw',
           });
         expect(res.status).to.equal(400);
         expect(res.body).to.not.be.null;
@@ -123,7 +125,12 @@ describe('Subscriptions Tests', () => {
           .request(app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
-          .send({ jwt: jwtToken, category, chain_id: 'edgeware', is_active });
+          .send({
+            jwt: jwtToken,
+            category,
+            community_id: 'edgeware',
+            is_active,
+          });
         expect(res.status).to.equal(200);
         expect(res.body).to.not.be.null;
         expect(res.body.status).to.be.equal('Success');
@@ -133,7 +140,12 @@ describe('Subscriptions Tests', () => {
           .request(app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
-          .send({ jwt: jwtToken, category, chain_id: 'edgeware', is_active });
+          .send({
+            jwt: jwtToken,
+            category,
+            community_id: 'edgeware',
+            is_active,
+          });
         expect(res.status).to.equal(200);
         expect(res.body).to.not.be.null;
         expect(res.body.status).to.be.equal('Success');
@@ -163,7 +175,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body.result.category_id).to.be.equal(category);
         expect(res.body.result.is_active).to.be.equal(true);
         expect(res.body.result.thread_id).to.be.equal(thread.id);
-        expect(res.body.result.community_id).to.be.equal(chain);
+        expect(res.body.result.community_id).to.be.equal(community_id);
         expect(res.body.result.comment_id).to.be.null;
         rootCommmentSubscription = res.body.result;
       });
@@ -186,7 +198,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body.result.category_id).to.be.equal(category);
         expect(res.body.result.is_active).to.be.equal(true);
         expect(res.body.result.thread_id).to.be.null;
-        expect(res.body.result.community_id).to.be.equal(chain);
+        expect(res.body.result.community_id).to.be.equal(community_id);
         expect(res.body.result.comment_id).to.be.equal(comment.id);
         commentSubscription = res.body.result;
       });
@@ -321,7 +333,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body.result.category_id).to.be.equal(category);
         expect(res.body.result.is_active).to.be.equal(true);
         expect(res.body.result.thread_id).to.be.equal(thread.id);
-        expect(res.body.result.community_id).to.be.equal(chain);
+        expect(res.body.result.community_id).to.be.equal(community_id);
         expect(res.body.result.comment_id).to.be.null;
         rootCommmentSubscription = res.body.result;
       });
@@ -344,7 +356,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body.result.category_id).to.be.equal(category);
         expect(res.body.result.is_active).to.be.equal(true);
         expect(res.body.result.thread_id).to.be.null;
-        expect(res.body.result.community_id).to.be.equal(chain);
+        expect(res.body.result.community_id).to.be.equal(community_id);
         expect(res.body.result.comment_id).to.be.equal(comment.id);
         commentSubscription = res.body.result;
       });
@@ -506,11 +518,11 @@ describe('Subscriptions Tests', () => {
           .request(app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
-          .send({ jwt: jwtToken, category, is_active, chain_id: chain });
+          .send({ jwt: jwtToken, category, is_active, community_id });
         expect(res.body).to.not.be.null;
         expect(res.body.status).to.be.equal('Success');
         expect(res.body.result.category_id).to.be.equal(category);
-        expect(res.body.result.community_id).to.equal(chain);
+        expect(res.body.result.community_id).to.equal(community_id);
         expect(res.body.result.is_active).to.be.equal(true);
         chainSubscription = res.body.result;
       });
@@ -522,11 +534,11 @@ describe('Subscriptions Tests', () => {
           .request(app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
-          .send({ jwt: jwtToken, category, is_active, chain_id: chain });
+          .send({ jwt: jwtToken, category, is_active, community_id });
         expect(res.body).to.not.be.null;
         expect(res.body.status).to.be.equal('Success');
         expect(res.body.result.category_id).to.be.equal(category);
-        expect(res.body.result.community_id).to.equal(chain);
+        expect(res.body.result.community_id).to.equal(community_id);
         expect(res.body.result.is_active).to.be.equal(true);
         expect(res.body.result.id).to.equal(chainSubscription.id);
       });
@@ -677,13 +689,13 @@ describe('Subscriptions Tests', () => {
         jwt: jwtToken,
         is_active: true,
         category: NotificationCategories.NewThread,
-        chain_id: chain,
+        community_id: community_id,
       });
       chainEventSub = await modelUtils.createSubscription({
         jwt: jwtToken,
         is_active: false,
         category: NotificationCategories.ChainEvent,
-        chain_id: chain,
+        community_id: community_id,
       });
     });
 
@@ -712,7 +724,9 @@ describe('Subscriptions Tests', () => {
     });
 
     it('should not fetch subscriptions of another user', async () => {
-      const result = await modelUtils.createAndVerifyAddress({ chain });
+      const result = await modelUtils.createAndVerifyAddress({
+        chain: community_id,
+      });
       const newJWT = jwt.sign(
         { id: result.user_id, email: result.email },
         JWT_SECRET,
@@ -722,7 +736,7 @@ describe('Subscriptions Tests', () => {
         jwt: newJWT,
         is_active: true,
         category: NotificationCategories.NewThread,
-        chain_id: chain,
+        community_id,
       });
 
       const res = await chai
@@ -756,7 +770,7 @@ describe('Subscriptions Tests', () => {
         jwt: jwtToken,
         is_active: true,
         category: NotificationCategories.NewThread,
-        chain_id: chain,
+        community_id,
       });
     });
 
@@ -815,7 +829,7 @@ describe('Subscriptions Tests', () => {
             jwt: jwtToken,
             is_active: true,
             category: category,
-            chain_id: chain,
+            community_id,
           }),
         );
       }
@@ -840,7 +854,9 @@ describe('Subscriptions Tests', () => {
 
     it('should fail to enable and disable subscriptions not owned by the requester', async () => {
       expect(subscription).to.not.be.null;
-      const result = await modelUtils.createAndVerifyAddress({ chain });
+      const result = await modelUtils.createAndVerifyAddress({
+        chain: community_id,
+      });
       const newJWT = jwt.sign(
         { id: result.user_id, email: result.email },
         JWT_SECRET,
@@ -890,7 +906,7 @@ describe('Subscriptions Tests', () => {
         jwt: jwtToken,
         is_active: true,
         category: NotificationCategories.NewThread,
-        chain_id: chain,
+        community_id,
       });
     });
 
@@ -957,7 +973,9 @@ describe('Subscriptions Tests', () => {
     });
 
     it('should fail to enable and disable immediate emails when requester does not own the subscription', async () => {
-      const result = await modelUtils.createAndVerifyAddress({ chain });
+      const result = await modelUtils.createAndVerifyAddress({
+        chain: community_id,
+      });
       const newJwt = jwt.sign(
         { id: result.user_id, email: result.email },
         JWT_SECRET,
@@ -987,7 +1005,7 @@ describe('Subscriptions Tests', () => {
         jwt: jwtToken,
         is_active: true,
         category: NotificationCategories.NewThread,
-        chain_id: chain,
+        community_id,
       });
     });
 
@@ -1119,7 +1137,7 @@ describe('Subscriptions Tests', () => {
           await models.Subscription.create({
             subscriber_id: userId,
             category_id,
-            community_id: chain,
+            community_id,
             thread_id: 1,
             comment_id: 1,
           });
@@ -1137,7 +1155,7 @@ describe('Subscriptions Tests', () => {
           await models.Subscription.create({
             subscriber_id: userId,
             category_id,
-            community_id: chain,
+            community_id,
           });
           expect.fail(subscriptionCreateErrMsg);
         } catch (e) {
@@ -1170,7 +1188,7 @@ describe('Subscriptions Tests', () => {
           await models.Subscription.create({
             subscriber_id: userId,
             category_id,
-            community_id: chain,
+            community_id,
             thread_id: 1,
             comment_id: 1,
           });
@@ -1188,7 +1206,7 @@ describe('Subscriptions Tests', () => {
           await models.Subscription.create({
             subscriber_id: userId,
             category_id,
-            community_id: chain,
+            community_id,
           });
           expect.fail(subscriptionCreateErrMsg);
         } catch (e) {
