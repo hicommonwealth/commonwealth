@@ -87,6 +87,8 @@ export default (
         // The validation checks defined here are replicated exactly at the database level using CONSTRAINTS
         // on the Subscriptions table itself. Any update here MUST be made at the database level too.
         validSubscription() {
+          if (!this.category_id) return;
+
           switch (this.category_id) {
             case NotificationCategories.ChainEvent:
             case NotificationCategories.NewThread:
