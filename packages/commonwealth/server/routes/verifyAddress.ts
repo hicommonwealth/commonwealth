@@ -203,9 +203,10 @@ const verifyAddress = async (
         })
       : req.body.address;
 
-  const { decode: dagJsonDecode } = await import('@ipld/dag-json');
-  const sessionBytes = Buffer.from(req.body.session, 'hex');
-  const decodedSession = dagJsonDecode(sessionBytes) as Session;
+  const ipldDagJson = await import('@ipld/dag-json');
+  const decodedSession: Session = ipldDagJson.decode(
+    ipldDagJson.parse(req.body.session),
+  );
 
   await processAddress(
     models,

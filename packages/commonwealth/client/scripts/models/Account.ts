@@ -166,14 +166,13 @@ class Account {
   }
 
   public async validate(session: Session, shouldRedraw = true) {
-    const { encode: dagJsonEncode } = await import('@ipld/dag-json');
-    const encodedSession = dagJsonEncode(session);
+    const ipldDagJson = await import('@ipld/dag-json');
 
     const params = {
       address: this.address,
       community_id: this.community.id,
       jwt: app.user.jwt,
-      session: Buffer.from(encodedSession).toString('hex'),
+      session: ipldDagJson.stringify(ipldDagJson.encode(session)),
       wallet_id: this.walletId,
       wallet_sso_source: this.walletSsoSource,
     };
