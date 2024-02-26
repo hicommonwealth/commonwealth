@@ -18,7 +18,7 @@ type CommunityPreviewCardProps = {
 };
 
 const CommunityPreviewCard = ({
-  community = {} as any,
+  community = {} as CommunityInfo,
   monthlyThreadCount,
   isCommunityMember,
   hasUnseenPosts,
