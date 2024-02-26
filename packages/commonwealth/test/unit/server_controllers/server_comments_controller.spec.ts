@@ -76,6 +76,12 @@ describe('ServerCommentsController', () => {
             namespace: 'cake',
           }),
         },
+        ChainNode: {
+          findByPk: async () => ({
+            eth_chain_id: 8453,
+            url: 'test.com',
+          }),
+        },
       };
       const banCache = BAN_CACHE_MOCK_FN('ethereum');
 
