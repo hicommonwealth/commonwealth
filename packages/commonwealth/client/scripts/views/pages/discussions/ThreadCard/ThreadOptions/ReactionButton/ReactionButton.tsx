@@ -39,10 +39,11 @@ export const ReactionButton = ({
   const newSignInModalEnabled = useFlag('newSignInModal');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const reactors = thread?.associatedReactions?.map((t) => t.address);
-  const reactionWeightsSum = thread?.associatedReactions.reduce(
-    (acc, curr) => acc + (curr.voting_weight || 1),
-    0,
-  );
+  const reactionWeightsSum =
+    thread?.associatedReactions?.reduce(
+      (acc, curr) => acc + (curr.voting_weight || 1),
+      0,
+    ) || 0;
   const activeAddress = app.user.activeAccount?.address;
   const thisUserReaction = thread?.associatedReactions?.filter(
     (r) => r.address === activeAddress,
