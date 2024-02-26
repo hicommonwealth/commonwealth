@@ -49,21 +49,16 @@ test.describe('Community proposals page', () => {
 
   const waitForCompletedProposals = async ({ page }) => {
     // these are lazy-loaded after page init
-    // await page.waitForSelector('.CardsCollection:nth-of-type(2)');
-    // const collection = await page.locator('.CardsCollection:nth-of-type(2)');
-    // await collection.locator('.cards .LoadingSpinner');
-    // const p = await collection
-    //   .locator('.cards .ProposalCard .proposal-card-metadata')
-    //   .first();
-    // await p.waitFor({ state: 'visible', timeout: 60000 });
-
     await page.waitForSelector('.CardsCollection');
     const collections = await page.$$('.CardsCollection');
     const inactive = collections[1];
-    await inactive?.$('.cards .LoadingSpinner');
-    await inactive?.$$('.cards .ProposalCard .proposal-card-metadata');
     const spinner = await inactive?.$('.LoadingSpinner');
     await spinner?.waitForElementState('hidden');
+    const metadata = await inactive?.$$(
+      '.cards .ProposalCard .proposal-card-metadata',
+    );
+    const firstMetadata = metadata[0];
+    await firstMetadata?.waitForElementState('visible');
   };
 
   const waitForIpfsRequests = async ({ page }) => {
@@ -118,6 +113,7 @@ test.describe('Community proposals page', () => {
     }
 
     const title = await firstProposal?.$('.Text.b1.semiBold.noWrap');
+    title.waitForElementState('stable');
     const expectedTitle = await title?.innerText();
 
     const navigationPromise = page.waitForNavigation();
