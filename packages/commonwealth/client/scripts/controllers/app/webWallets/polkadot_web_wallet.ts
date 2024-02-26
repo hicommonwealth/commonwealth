@@ -1,17 +1,12 @@
-import type { Signer } from '@polkadot/api/types';
-
 import { web3Enable } from '@polkadot/extension-dapp';
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
-import type { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
-import { stringToHex } from '@polkadot/util';
 
-import type { SessionPayload } from '@canvas-js/interfaces';
+import { SubstrateSigner } from '@canvas-js/chain-substrate';
+import type { SessionSigner } from '@canvas-js/interfaces';
 
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
-import { addressSwapper } from 'utils';
 
 import app from 'state';
-import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 
 declare let window: any;
@@ -46,15 +41,10 @@ class PolkadotWebWalletController
     return this._accounts || [];
   }
 
-  public async getSigner(who: string): Promise<Signer> {
-    // finds an injector for an address
-    // web wallet stores addresses in testnet format for now, so we have to re-encode
-    const reencodedAddress = addressSwapper({
-      address: who,
-      currentPrefix: 42,
+  public async getSessionSigner(): Promise<SessionSigner> {
+    return new SubstrateSigner({
+      extension: this.polkadot,
     });
-    const injector = await this.polkadot.web3FromAddress(reencodedAddress);
-    return injector.signer;
   }
 
   public getChainId() {
@@ -67,25 +57,6 @@ class PolkadotWebWalletController
   }
 
   // ACTIONS
-  public async signCanvasMessage(
-    account: Account,
-    canvasSessionPayload: SessionPayload,
-  ): Promise<string> {
-    const canvas = await import('@canvas-js/interfaces');
-    const message = stringToHex(
-      canvas.serializeSessionPayload(canvasSessionPayload),
-    );
-
-    const signer = await this.getSigner(account.address);
-    const payload: SignerPayloadRaw = {
-      address: account.address,
-      data: message,
-      type: 'bytes',
-    };
-    const signature = (await signer.signRaw(payload)).signature;
-    return signature;
-  }
-
   public async enable() {
     this.polkadot = await import('@polkadot/extension-dapp');
     console.log('Attempting to enable Substrate web wallet');

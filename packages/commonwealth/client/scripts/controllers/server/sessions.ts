@@ -40,12 +40,7 @@ export async function signSessionWithAccount<T extends { address: string }>(
   account: Account,
   timestamp: number,
 ) {
-  const sessionSigner = await wallet.getSessionSigner();
-  // TODO: what format should wallet.chain be in?
-  const session = await sessionSigner.getSession(CANVAS_TOPIC, {
-    chain: wallet.chain,
-    timestamp,
-  });
+  const session = await getSessionFromWallet(wallet, { timestamp });
   // TODO: what do we do with did/caip?
   const walletAddress = session.address.split(':')[2];
   if (walletAddress !== account.address) {
@@ -109,6 +104,20 @@ export async function signSessionWithMagic(
   }
 }
 
+export async function getSessionFromWallet(
+  wallet: IWebWallet<any>,
+  opts?: { timestamp?: number },
+) {
+  const sessionSigner = await wallet.getSessionSigner();
+  const session = await sessionSigner.getSession(CANVAS_TOPIC, {
+    timestamp: opts.timestamp,
+  });
+  return session;
+}
+
+// TODO: create the full list of these
+// do we know all of the session signers?
+// should chainId actually be in the constructor?
 const sessionSigners = [new SIWESigner()];
 
 export function verifySession(session: Session) {

@@ -1,8 +1,8 @@
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
-import type Account from '../../../models/Account';
 import type IWebWallet from '../../../models/IWebWallet';
 
-import type { SessionPayload } from '@canvas-js/interfaces';
+import { CosmosSigner } from '@canvas-js/chain-cosmos';
+import type { SessionSigner } from '@canvas-js/interfaces';
 
 type TerraAddress = {
   address: string;
@@ -80,30 +80,16 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
     };
   }
 
-  public async signCanvasMessage(
-    account: Account,
-    canvasSessionPayload: SessionPayload,
-  ): Promise<string> {
-    // timeout?
-    const canvas = await import('@canvas-js/interfaces');
-    let result;
-
-    try {
-      const signBytesResult = await window.station.signBytes(
-        Buffer.from(canvas.serializeSessionPayload(canvasSessionPayload)),
-      );
-
-      result = signBytesResult;
-    } catch (error) {
-      console.error(error);
-    }
-
-    return JSON.stringify({
-      pub_key: {
-        type: 'tendermint/PubKeySecp256k1',
-        value: result.public_key,
+  public async getSessionSigner(): Promise<SessionSigner> {
+    return new CosmosSigner({
+      signer: {
+        type: 'bytes',
+        signBytes: async (message) => {
+          return await window.station.signBytes(Buffer.from(message));
+        },
+        getAddress: async () => this._accounts[0].address,
+        getChainId: async () => this.getChainId(),
       },
-      signature: result.signature,
     });
   }
 }

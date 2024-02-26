@@ -1,11 +1,10 @@
-import type { SessionPayload } from '@canvas-js/interfaces';
 import type {
   ConnectedWallet,
   WalletController,
 } from '@terra-money/wallet-provider';
 
+import { CosmosSigner } from '@canvas-js/chain-cosmos';
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
-import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 
 // TODO: ensure this only opens on mobile
@@ -62,29 +61,24 @@ class TerraWalletConnectWebWalletController
     };
   }
 
-  public async signCanvasMessage(
-    account: Account,
-    canvasSessionPayload: SessionPayload,
-  ): Promise<string> {
-    const canvas = await import('@canvas-js/interfaces');
-    try {
-      const result = await this._wallet.signBytes(
-        Buffer.from(canvas.serializeSessionPayload(canvasSessionPayload)),
-      );
-      if (!result.success) {
-        throw new Error('SignBytes unsuccessful');
-      }
-      return JSON.stringify({
-        pub_key: {
-          type: 'tendermint/PubKeySecp256k1',
-          value: result.result.public_key.toAmino().value,
+  public async getSessionSigner() {
+    return new CosmosSigner({
+      signer: {
+        type: 'bytes',
+        getAddress: async () => this._accounts[0].address,
+        getChainId: async () => this.getChainId(),
+        signBytes: async (bytes) => {
+          const result = await this._wallet.signBytes(Buffer.from(bytes));
+          if (!result.success) {
+            throw new Error('SignBytes unsuccessful');
+          }
+          return {
+            public_key: result.result.public_key.toAmino().value as string,
+            signature: Buffer.from(result.result.signature).toString('base64'),
+          };
         },
-        signature: Buffer.from(result.result.signature).toString('base64'),
-      });
-    } catch (error) {
-      console.error(error);
-      throw new Error(`Failed to sign with account: ${error.message}`);
-    }
+      },
+    });
   }
 
   public async reset() {

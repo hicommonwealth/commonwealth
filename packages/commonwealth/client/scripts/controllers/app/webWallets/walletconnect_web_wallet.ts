@@ -1,13 +1,10 @@
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
-import { createSiweMessage } from 'adapters/chain/ethereum/keys';
 import { setActiveAccount } from 'controllers/app/login';
-import * as siwe from 'siwe';
 import app from 'state';
 import type Web3 from 'web3';
 
-import type { SessionPayload } from '@canvas-js/interfaces';
+import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { hexToNumber } from 'web3-utils';
-import Account from '../../../models/Account';
 import BlockInfo from '../../../models/BlockInfo';
 import ChainInfo from '../../../models/ChainInfo';
 import IWebWallet from '../../../models/IWebWallet';
@@ -66,22 +63,11 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     };
   }
 
-  public async signCanvasMessage(
-    account: Account,
-    sessionPayload: SessionPayload,
-  ): Promise<string> {
-    const nonce = siwe.generateNonce();
-    // this must be open-ended, because of custom domains
-    const domain = document.location.origin;
-    const message = createSiweMessage(sessionPayload, domain, nonce);
-    const signature = await this._provider.request({
-      method: 'personal_sign',
-      params: [message, account.address],
-      jsonrpc: '2.0',
+  public async getSessionSigner() {
+    return new SIWESigner({
+      signer: this._provider,
+      chainId: parseInt(this.getChainId()),
     });
-
-    // signature format: https://docs.canvas.xyz/docs/formats#ethereum
-    return `${domain}/${nonce}/${signature}`;
   }
 
   public async reset() {

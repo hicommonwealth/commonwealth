@@ -15,6 +15,7 @@ import WebWalletController from 'controllers/app/web_wallets';
 import type Near from 'controllers/chain/near/adapter';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import {
+  getSessionFromWallet,
   signSessionWithAccount,
   verifySession,
 } from 'controllers/server/sessions';
@@ -315,13 +316,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
     // Handle Logged in and joining community of different chain base
     if (isInCommunityPage && app.isLoggedIn()) {
-      const timestamp = +new Date();
-      const sessionSigner = await walletToUse.getSessionSigner();
-      const session = await sessionSigner.getSession(CANVAS_TOPIC, {
-        chain: walletToUse.chain,
-        timestamp,
-      });
-      await sessionSigner.verifySession(CANVAS_TOPIC, session);
+      await getSessionFromWallet(walletToUse);
 
       await onLogInWithAccount(account, true);
       return;

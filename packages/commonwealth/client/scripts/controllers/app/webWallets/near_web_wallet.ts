@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import type { SessionPayload } from '@canvas-js/interfaces';
+import type { SessionSigner } from '@canvas-js/interfaces';
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
-import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 
 // Stub wallet to satisfy the spec that does nothing -- the actual function of NEAR login
@@ -33,10 +32,7 @@ class NearWebWalletController implements IWebWallet<any> {
     return null;
   }
 
-  public async signCanvasMessage(
-    account: Account,
-    canvasSessionPayload: SessionPayload,
-  ): Promise<string> {
+  public async getSessionSigner(): Promise<SessionSigner> {
     throw new Error('not implemented');
   }
 
