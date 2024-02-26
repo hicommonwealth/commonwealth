@@ -20,9 +20,6 @@ const fetchCosmosProposalMetadata = async (
 
     if (!isIPFSFile) {
       // TODO: fetch non-ipfs files. https://github.com/hicommonwealth/commonwealth/issues/4233
-      console.error(
-        `Non-IPFS metadata fetching is not yet implemented. Did not fetch ${fileURI}.`,
-      );
       return {};
     }
 
