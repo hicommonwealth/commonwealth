@@ -8,12 +8,32 @@ import type {
 
 import assert from 'assert';
 import { configure } from 'safe-stable-stringify';
+import { CANVAS_TOPIC } from './constants';
 export const stringify = configure({
   bigint: false,
   circularValue: Error,
   strict: true,
   deterministic: true,
 });
+
+// can we do this without needing an async method?
+// we should just be using ESM
+const getSessionSigners = async () => {
+  const { SIWESigner } = await import('@canvas-js/chain-ethereum');
+  return [new SIWESigner()];
+};
+
+export async function verifySession(session: Session) {
+  for (const signer of await getSessionSigners()) {
+    if (signer.match(session.address)) {
+      signer.verifySession(CANVAS_TOPIC, session);
+      return;
+    }
+  }
+  throw new Error(
+    `No signer found for session with address ${session.address}`,
+  );
+}
 
 type VerifyArgs = {
   actionMessage: Message<Action>;
@@ -30,8 +50,7 @@ export const verify = async ({
   expectedAddress,
 }: VerifyArgs) => {
   const { verifySignedValue } = await import('@canvas-js/signed-cid');
-  // get the signer? or assume this has already been done?
-  sessionMessage.payload;
+  await verifySession(sessionMessage.payload);
 
   // assert address matches
   assert(

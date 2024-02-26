@@ -1,6 +1,6 @@
 import { addressSwapper } from 'commonwealth/shared/utils';
 
-import type { ActionArgument, Session } from '@canvas-js/interfaces';
+import type { Signature } from '@canvas-js/interfaces';
 import { getADR036SignableSession } from 'adapters/chain/cosmos/keys';
 import { createSiweMessage } from 'adapters/chain/ethereum/keys';
 import {
@@ -9,7 +9,6 @@ import {
   createCanvasSessionPayload,
 } from 'canvas';
 
-import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { ChainBase, WalletSsoSource } from '@hicommonwealth/core';
 import app from 'state';
 import Account from '../../models/Account';
@@ -115,22 +114,6 @@ export async function getSessionFromWallet(
   return session;
 }
 
-// TODO: create the full list of these
-// do we know all of the session signers?
-// should chainId actually be in the constructor?
-const sessionSigners = [new SIWESigner()];
-
-export function verifySession(session: Session) {
-  for (const signer of sessionSigners) {
-    if (signer.match(session.address)) {
-      return signer.verifySession(CANVAS_TOPIC, session);
-    }
-  }
-  throw new Error(
-    `No signer found for session with address ${session.address}`,
-  );
-}
-
 class SessionsController {
   ethereum: EthereumSessionController;
   substrate: SubstrateSessionController;
@@ -174,58 +157,26 @@ class SessionsController {
   private async sign(
     address: string,
     call: string,
-    args: Record<string, ActionArgument>,
-  ): Promise<{ session: string; action: string; hash: string }> {
-    const chainBase = app.chain?.base;
-
-    // Try to infer Chain ID from the currently active chain. Note that
-    // `chainBaseToCanvasChainId` replaces idOrPrefix with the appropriate
-    // chainID for non-eth, non-cosmos chains.
-    const idOrPrefix =
-      chainBase === ChainBase.CosmosSDK
-        ? app.chain?.meta.bech32Prefix
-        : app.chain?.meta.node?.ethChainId;
-    const canvasChainId = chainBaseToCanvasChainId(chainBase, idOrPrefix);
-
-    // Try to request a new session from the user, if one was not found.
-    const controller = this.getSessionController(chainBase);
-
-    // Load any past session
-    const hasAuthenticatedSession = await controller.hasAuthenticatedSession(
-      canvasChainId,
-      address,
-    );
-
-    // Get a new session signature.
-    if (app.config.enforceSessionKeys && !hasAuthenticatedSession) {
-      const matchingAccount = app.user.addresses.find(
-        (a) => a.address === address,
-      );
-
-      throw new SessionKeyError({
-        name: 'Authentication Error',
-        message: 'Session key expired',
-        address,
-        ssoSource: matchingAccount.walletSsoSource,
-      });
+    args: any,
+  ): Promise<Signature> {
+    for (const signer of sessionSigners) {
+      if (signer.match(address)) {
+        return signer.sign({
+          clock: 0,
+          parents: [],
+          payload: {
+            type: 'action',
+            address,
+            blockhash: null,
+            name: call,
+            args,
+            timestamp: Date.now(),
+          },
+          topic: CANVAS_TOPIC,
+        });
+      }
     }
-
-    if (!hasAuthenticatedSession) {
-      return { session: '', action: '', hash: '' };
-    }
-
-    const { session, action, hash } = await controller.sign(
-      canvasChainId,
-      address,
-      call,
-      args,
-    );
-
-    return {
-      session: JSON.stringify(session),
-      action: JSON.stringify(action),
-      hash,
-    };
+    throw new Error(`No signer found for address ${address}`);
   }
 
   // Public signer methods
