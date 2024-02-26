@@ -366,7 +366,6 @@ function setupCosmosProxy(
         { cosmos_gov_version: CosmosGovernanceVersion.v1beta1Failed },
         { where: { id: chainNode.id } },
       );
-      await setDefaultRestEndpointIfNeeded(chainNode);
     }
   };
 
@@ -380,21 +379,6 @@ function setupCosmosProxy(
     if (shouldUpdate) {
       await models.ChainNode.update(
         { cosmos_gov_version: CosmosGovernanceVersion.v1 },
-        { where: { id: chainNode.id } },
-      );
-    }
-    await setDefaultRestEndpointIfNeeded(chainNode);
-  };
-
-  // TODO: this can be removed when #5157 is implemented
-  const setDefaultRestEndpointIfNeeded = async (chainNode) => {
-    const dbRestEndpoint = chainNode?.alt_wallet_url;
-    const cosmosChainId = chainNode?.cosmos_chain_id;
-    if (!dbRestEndpoint && !!cosmosChainId) {
-      const defaultRestEndpoint = `https://rest.cosmos.directory/${cosmosChainId}`;
-
-      await models.ChainNode.update(
-        { alt_wallet_url: defaultRestEndpoint },
         { where: { id: chainNode.id } },
       );
     }
