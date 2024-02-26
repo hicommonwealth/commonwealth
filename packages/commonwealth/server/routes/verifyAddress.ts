@@ -26,7 +26,7 @@ const log = logger().getLogger(__filename);
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');
 export const Errors = {
-  NoCommunity: 'Must provide community',
+  NoChain: 'Must provide chain',
   InvalidCommunity: 'Invalid community',
   AddressNF: 'Address not found',
   ExpiredToken: 'Token has expired, please re-register',
@@ -42,6 +42,7 @@ export const Errors = {
 const processAddress = async (
   models: DB,
   community: CommunityInstance,
+  chain_id: string | number,
   address: string,
   wallet_id: WalletId,
   wallet_sso_source: WalletSsoSource,
@@ -76,7 +77,7 @@ const processAddress = async (
     const valid = await verifySessionSignature(
       models,
       community,
-      community.id,
+      chain_id,
       addressInstance,
       user ? user.id : null,
       signature,
@@ -189,12 +190,13 @@ const verifyAddress = async (
   res: Response,
   next: NextFunction,
 ) => {
-  if (!req.body.community_id) {
-    throw new AppError(Errors.NoCommunity);
+  if (!req.body.community_id || !req.body.chain_id) {
+    throw new AppError(Errors.NoChain);
   }
   const community = await models.Community.findOne({
     where: { id: req.body.community_id },
   });
+  const chain_id = req.body.chain_id;
   if (!community) {
     return next(new AppError(Errors.InvalidCommunity));
   }
@@ -214,6 +216,7 @@ const verifyAddress = async (
   await processAddress(
     models,
     community,
+    chain_id,
     address,
     req.body.wallet_id,
     req.body.wallet_sso_source,
