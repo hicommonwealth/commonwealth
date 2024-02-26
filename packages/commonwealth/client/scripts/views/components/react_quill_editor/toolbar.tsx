@@ -196,22 +196,27 @@ export const useMarkdownToolbarHandlers = ({
 
     return text.split('\n').reduce((acc, line) => {
       if (line.trim().length === 0) {
+        console.log('fired1');
         return acc;
       }
 
       if (line.startsWith(prefix)) {
+        console.log('fired2');
         return acc + `${line.trim()}\n`;
       }
 
       if (prefix === '1.') {
+        console.log('fired3');
         const numberedPrefix = `${counter++}.`;
         if (line.trim() === '' && !hasIncremented) {
           hasIncremented = true; // Mark the counter as incremented
           return acc + `${numberedPrefix} ${line}\n`;
         }
+        console.log('fired4');
         hasIncremented = false;
         return acc + `${numberedPrefix} ${line}\n`;
       }
+      console.log('fired5');
       return acc + `${prefix} ${line}\n`;
     }, '');
   };
@@ -239,6 +244,7 @@ export const useMarkdownToolbarHandlers = ({
       let newText;
 
       if (selectedText.length > 0) {
+        console.log('fired');
         newText = handleListText(selectedText, prefix);
       } else {
         //check all of the prefix
