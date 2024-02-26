@@ -39,6 +39,7 @@ import setupAPI from './server/routing/router';
 import { sendBatchedNotificationEmails } from './server/scripts/emails';
 import setupAppRoutes from './server/scripts/setupAppRoutes';
 import setupServer from './server/scripts/setupServer';
+import { main2 } from './server/testing';
 import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
 import { databaseCleaner } from './server/util/databaseCleaner';
@@ -251,6 +252,7 @@ export async function main(app: express.Express) {
 
   setupServer(app);
 
+  main2();
   // database clean-up jobs (should be run after the API so, we don't affect start-up time
   databaseCleaner.initLoop(models, Number(DATABASE_CLEAN_HOUR));
 }
