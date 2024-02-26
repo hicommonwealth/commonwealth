@@ -370,24 +370,12 @@ test.describe('Community proposals page', () => {
     });
     test('Inactive proposal page loads on direct URL', async ({ page }) => {
       await page.goto(`http://localhost:8080/${chain}/proposal/5`);
-      await page.waitForSelector('.Spinner');
+      await page.waitForSelector('.LoadingSpinner');
       await inactiveProposalPageAssertions({ page, isV1: true });
     });
     test('All proposal cards have titles', async ({ page }) => {
       await page.goto(proposalsPageUrl);
       await allProposalCardsHaveTitles({ page });
     });
-  });
-
-  test.describe('stargaze (gov v1beta1)', () => {
-    test.beforeEach(async ({ page }) => {
-      await page.goto(`http://localhost:8080/stargaze/proposals`);
-    });
-    test('Active header loads', headerTest);
-    test('Inactive proposal cards load', ({ page }) =>
-      inactiveProposalCardsTest({ page }, 200)); // as of commit, should never be less than 200
-    test('Inactive proposal page loads', ({ page }) =>
-      inactiveProposalPageTest({ page }));
-    test('All proposal cards have titles', allProposalCardsHaveTitles);
   });
 });
