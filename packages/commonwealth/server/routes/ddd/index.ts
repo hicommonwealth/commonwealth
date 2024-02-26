@@ -2,24 +2,25 @@ import { express, trpc } from '@hicommonwealth/adapters';
 import { Router } from 'express';
 import * as community from './community';
 
-// express router
+// root express router
 export const expressRouter = Router();
+// aggregate sub-routers
 expressRouter.use(
   '/community',
   express.statsMiddleware,
   community.expressRouter,
 );
+// catch-all middleware
 expressRouter.use(express.errorMiddleware);
 
-// trpc router
+// root trpc router
 export const trpcExpressRouter = Router();
+// aggregate sub-routers
 const trpcRouter = trpc.router({ community: community.trpcRouter });
-trpcExpressRouter.use('/trpc/panel', (req, res) => {
-  const url = req.protocol + '://' + req.get('host') + '/ddd/trpc';
+// trpc specs
+trpcExpressRouter.use('/panel', (req, res) => {
+  const url = req.protocol + '://' + req.get('host') + '/trpc';
   res.send(trpc.toPanel(trpcRouter, url));
 });
-trpcExpressRouter.use(
-  '/trpc',
-  express.statsMiddleware,
-  trpc.toExpress(trpcRouter),
-);
+// use stats middleware on all trpc routes
+trpcExpressRouter.use('/', express.statsMiddleware, trpc.toExpress(trpcRouter));

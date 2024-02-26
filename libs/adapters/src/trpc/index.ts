@@ -15,6 +15,7 @@ import {
   createExpressMiddleware,
 } from '@trpc/server/adapters/express';
 import passport from 'passport';
+//import superjson from 'superjson';
 import { renderTrpcPanel } from 'trpc-panel';
 import { ZodSchema } from 'zod';
 
@@ -23,8 +24,9 @@ interface Context {
   actor: Actor;
 }
 
-//const trpc = initTRPC.meta<OpenApiMeta>().context<Context>().create();
-const trpc = initTRPC.context<Context>().create();
+const trpc = initTRPC.context<Context>().create({
+  //transformer: superjson,
+});
 
 export const router = trpc.router;
 
@@ -83,4 +85,5 @@ export const toExpress = (router) =>
     }),
   });
 
-export const toPanel = (router, url) => renderTrpcPanel(router, { url });
+export const toPanel = (router, url) =>
+  renderTrpcPanel(router, { url, transformer: 'superjson' });

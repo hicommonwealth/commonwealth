@@ -1305,7 +1305,7 @@ function setupRouter(
 
   // ddd-routes
   app.use('/ddd', ddd.expressRouter);
-  app.use('/ddd', ddd.trpcExpressRouter);
+  app.use('/trpc', ddd.trpcExpressRouter);
 
   app.use(methodNotAllowedMiddleware());
 }
