@@ -12,11 +12,11 @@ import {
   CWProfileRow,
   CWProfilesList,
 } from 'views/components/component_kit/cw_profiles_list';
-import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWWalletsList } from 'views/components/component_kit/cw_wallets_list';
 import { isWindowExtraSmall } from 'views/components/component_kit/helpers';
+import CWLoadingSpinner from '../../components/component_kit/new_designs/CWLoadingSpinner';
 import { getLoginText } from './helpers';
 import { LoginBoilerplate } from './login_boilerplate';
 import { LoginEthAlert } from './login_eth_alert';
@@ -198,7 +198,7 @@ export const LoginMobile = ({
                 </div>
               </div>
             ) : (
-              <CWSpinner />
+              <CWLoadingSpinner />
             )}
           </div>
         )}

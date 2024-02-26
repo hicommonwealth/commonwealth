@@ -1,8 +1,12 @@
+import { commonProtocol } from '@hicommonwealth/core';
 import clsx from 'clsx';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
-
-import { commonProtocol } from '@hicommonwealth/core';
+import {
+  BaseMixpanelPayload,
+  MixpanelCommunityStakeEvent,
+} from 'shared/analytics/types';
 import app from 'state';
 import {
   useBuyStakeMutation,
@@ -22,9 +26,9 @@ import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
+import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
-
 import { useStakeExchange } from '../hooks';
 import {
   ManageCommunityStakeModalMode,
@@ -76,7 +80,7 @@ const StakeExchangeForm = ({
   } = useStakeExchange({
     mode,
     address: selectedAddress?.value,
-    numberOfStakeToExchange,
+    numberOfStakeToExchange: numberOfStakeToExchange ?? 0,
   });
 
   const { stakeBalance, stakeValue, currentVoteWeight, stakeData } =
@@ -86,13 +90,17 @@ const StakeExchangeForm = ({
   const { mutateAsync: sellStake } = useSellStakeMutation();
 
   const expectedVoteWeight = commonProtocol.calculateVoteWeight(
-    String(numberOfStakeToExchange),
+    numberOfStakeToExchange ? String(numberOfStakeToExchange) : '0',
     stakeData?.vote_weight,
   );
 
   const popoverProps = usePopover();
 
   const isBuyMode = mode === 'buy';
+
+  const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
+    onAction: true,
+  });
 
   const handleBuy = async () => {
     try {
@@ -108,6 +116,13 @@ const StakeExchangeForm = ({
 
       onSetSuccessTransactionHash(txReceipt?.transactionHash);
       onSetModalState(ManageCommunityStakeModalState.Success);
+
+      trackAnalytics({
+        event: MixpanelCommunityStakeEvent.STAKE_BOUGHT,
+        community: app.activeChainId(),
+        userId: app.user.activeAccount.profile.id,
+        userAddress: selectedAddress?.value,
+      });
     } catch (err) {
       console.log('Error buying: ', err);
       onSetModalState(ManageCommunityStakeModalState.Failure);
@@ -128,6 +143,13 @@ const StakeExchangeForm = ({
 
       onSetSuccessTransactionHash(txReceipt?.transactionHash);
       onSetModalState(ManageCommunityStakeModalState.Success);
+
+      trackAnalytics({
+        event: MixpanelCommunityStakeEvent.STAKE_SOLD,
+        community: app.activeChainId(),
+        userId: app.user.activeAccount.profile.id,
+        userAddress: selectedAddress?.value,
+      });
     } catch (err) {
       console.log('Error selling: ', err);
       onSetModalState(ManageCommunityStakeModalState.Failure);
@@ -149,9 +171,20 @@ const StakeExchangeForm = ({
     onSetNumberOfStakeToExchange((prevState) => prevState + 1);
   };
 
-  const insufficientFunds =
-    isBuyMode &&
-    parseFloat(userEthBalance) < parseFloat(buyPriceData?.totalPrice);
+  const handleInput = (e) => {
+    const inputValue = e.target.value;
+    const numericValue = inputValue.replace(/[^0-9]/g, '');
+    const parsed = parseInt(numericValue);
+    if (parsed < 1000000) {
+      onSetNumberOfStakeToExchange(parsed);
+    } else if (inputValue === '') {
+      onSetNumberOfStakeToExchange(0);
+    }
+  };
+
+  const insufficientFunds = isBuyMode
+    ? parseFloat(userEthBalance) < parseFloat(buyPriceData?.totalPrice)
+    : numberOfStakeToExchange > stakeBalance;
 
   const ctaDisabled = isBuyMode
     ? insufficientFunds || numberOfStakeToExchange <= 0 || !selectedAddress
@@ -262,9 +295,14 @@ const StakeExchangeForm = ({
                 onClick={handleMinus}
                 disabled={minusDisabled}
               />
-              <CWText type="h3" fontWeight="bold" className="number">
-                {numberOfStakeToExchange}
-              </CWText>
+              <CWTextInput
+                onInput={handleInput}
+                value={numberOfStakeToExchange}
+                inputClassName={clsx('number', {
+                  expanded: numberOfStakeToExchange?.toString().length > 3,
+                })}
+                containerClassName="number-container"
+              />
               <CWCircleButton
                 buttonType="secondary"
                 iconName="plus"
@@ -361,7 +399,9 @@ const StakeExchangeForm = ({
         </div>
 
         <div className="total-cost-row">
-          <CWText type="caption">{isBuyMode ? 'Total cost' : 'Net'}</CWText>
+          <div className="left-side">
+            <CWText type="caption">{isBuyMode ? 'Total cost' : 'Net'}</CWText>
+          </div>
           {isUsdPriceLoading ? (
             <Skeleton className="price-skeleton" />
           ) : (

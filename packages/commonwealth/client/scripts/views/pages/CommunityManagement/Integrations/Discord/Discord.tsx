@@ -7,8 +7,8 @@ import useFetchDiscordChannelsQuery from 'state/api/fetchDiscordChannels';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
-import { DiscordForumConnections } from '../../../manage_community/DiscordForumConnections';
 import './Discord.scss';
+import { DiscordConnections } from './DiscordConnections';
 import { ConnectionStatus } from './types';
 
 const CTA_TEXT = {
@@ -129,7 +129,7 @@ const Discord = () => {
 
             {discordChannels && (
               <div className="channels">
-                <DiscordForumConnections
+                <DiscordConnections
                   channels={(discordChannels.forumChannels || [])?.map(
                     (channel) => {
                       return {

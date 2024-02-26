@@ -142,8 +142,10 @@ async function createNewMagicUser({
     const newUser = await models.User.createWithProfile(
       models,
       {
-        email: magicUserMetadata.email || null,
-        emailVerified: true,
+        // never use emails from magic, even for "email" login -- magic maintains the mapping
+        // of emails/socials -> addresses, and we rely ONLY on the address as a canonical piece
+        // of login information.
+        email: null,
       },
       { transaction },
     );
@@ -543,37 +545,25 @@ async function magicLoginRoute(
   // attempt to locate an existing magic user by canonical address.
   // this is the properly modern method of identifying users, as it conforms to
   // the DID standard.
-  let existingUserInstance = await models.User.scope('withPrivateData').findOne(
-    {
-      include: [
-        {
-          model: models.Address,
-          where: {
-            wallet_id: WalletId.Magic,
-            address: canonicalAddress,
-            verified: { [Op.ne]: null },
-          },
-          required: true,
+  const existingUserInstance = await models.User.scope(
+    'withPrivateData',
+  ).findOne({
+    include: [
+      {
+        model: models.Address,
+        where: {
+          wallet_id: WalletId.Magic,
+          address: canonicalAddress,
+          verified: { [Op.ne]: null },
         },
-        {
-          model: models.Profile,
-        },
-      ],
-    },
-  );
-  if (!existingUserInstance && magicUserMetadata.email) {
-    // if unable to locate a magic user by address, attempt to locate by email.
-    // only legacy users (pre-magic or magic but with broken assumptions) should
-    // trigger this case, as it was formerly canonical.
-    existingUserInstance = await models.User.scope('withPrivateData').findOne({
-      where: { email: magicUserMetadata.email },
-      include: [
-        {
-          model: models.Profile,
-        },
-      ],
-    });
-  }
+        required: true,
+      },
+      {
+        model: models.Profile,
+      },
+    ],
+  });
+
   log.trace(
     `EXISTING USER INSTANCE: ${JSON.stringify(existingUserInstance, null, 2)}`,
   );

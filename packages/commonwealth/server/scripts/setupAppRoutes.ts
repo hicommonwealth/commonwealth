@@ -9,10 +9,6 @@ const log = logger().getLogger(__filename);
 const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true';
 const DEV = process.env.NODE_ENV !== 'production';
 
-function cleanMalformedUrl(str: string) {
-  return str.replace(/.*(https:\/\/.*https:\/\/)/, '$1');
-}
-
 const decodeTitle = (title: string) => {
   try {
     return decodeURIComponent(title);
@@ -77,6 +73,13 @@ const setupAppRoutes = (app, models: DB, templateFile, sendFile) => {
       /<meta name="twitter:image:src" content="(.*?)">/g,
       '<meta name="twitter:image" content="$1">',
     );
+
+    // Don't cache initial html for too long on CDN so that we do not run into cache invalidation issues
+    res.setHeader(
+      'Cache-Control',
+      'no-store, no-cache, must-revalidate, max-age=0',
+    );
+    res.setHeader('CDN-Cache-Control', 'max-age=10');
 
     res.send(twitterSafeHtml);
   };

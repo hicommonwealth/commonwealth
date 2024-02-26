@@ -13,7 +13,6 @@ import GeneralRoutes from './GeneralRoutes';
 
 export type RouteFeatureFlags = {
   proposalTemplatesEnabled: boolean;
-  newAdminOnboardingEnabled: boolean;
   communityHomepageEnabled: boolean;
   rootDomainRebrandEnabled: boolean;
 };
@@ -22,10 +21,6 @@ const Router = (customDomain: string) => {
   const client = OpenFeature.getClient();
   const proposalTemplatesEnabled = client.getBooleanValue(
     'proposalTemplates',
-    false,
-  );
-  const newAdminOnboardingEnabled = client.getBooleanValue(
-    'newAdminOnboarding',
     false,
   );
   const communityHomepageEnabled = client.getBooleanValue(
@@ -38,7 +33,6 @@ const Router = (customDomain: string) => {
   );
   const flags = {
     proposalTemplatesEnabled,
-    newAdminOnboardingEnabled,
     communityHomepageEnabled,
     rootDomainRebrandEnabled,
   };

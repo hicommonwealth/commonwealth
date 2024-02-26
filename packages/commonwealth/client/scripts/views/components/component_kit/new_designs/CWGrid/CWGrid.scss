@@ -1,0 +1,13 @@
+@import '../../../../../../styles/shared.scss';
+
+.Grid {
+  display: grid;
+  grid-template-columns: 648px 1fr;
+  grid-template-rows: 1fr;
+  grid-column-gap: 56px;
+  grid-row-gap: 16px;
+
+  @include mediumSmallInclusive {
+    grid-template-columns: 1fr;
+  }
+}

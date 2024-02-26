@@ -21,7 +21,6 @@ const buildFlag = (env: string) => {
 const featureFlags = {
   proposalTemplates: buildFlag(process.env.FLAG_PROPOSAL_TEMPLATES),
   communityHomepage: buildFlag(process.env.FLAG_COMMUNITY_HOMEPAGE),
-  newAdminOnboarding: buildFlag(process.env.FLAG_NEW_ADMIN_ONBOARDING),
   communityStake: buildFlag(process.env.FLAG_COMMUNITY_STAKE),
   newSignInModal: buildFlag(process.env.FLAG_NEW_SIGN_IN_MODAL),
   rootDomainRebrand: buildFlag(process.env.FLAG_ROOT_DOMAIN_REBRAND),
@@ -33,7 +32,7 @@ const unleashConfig = {
   url: process.env.UNLEASH_FRONTEND_SERVER_URL,
   clientKey: process.env.UNLEASH_FRONTEND_API_TOKEN,
   refreshInterval: 120,
-  appName: 'commonwealth-web',
+  appName: process.env.HEROKU_APP_NAME,
 };
 
 export const openFeatureProvider = process.env.UNLEASH_FRONTEND_API_TOKEN

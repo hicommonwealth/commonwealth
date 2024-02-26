@@ -4,7 +4,10 @@ import type { DeltaStatic } from 'quill';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 
-import { ViewCommentUpvotesDrawer } from 'client/scripts/views/components/UpvoteDrawer';
+import {
+  ViewCommentUpvotesDrawer,
+  ViewUpvotesDrawerTrigger,
+} from 'client/scripts/views/components/UpvoteDrawer';
 import type Comment from 'models/Comment';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
@@ -88,6 +91,7 @@ export const CommentCard = ({
   const [verifiedAction, setVerifiedAction] = useState<Action>();
   const [verifiedSession, setVerifiedSession] = useState<Session>();
   const [onReaction, setOnReaction] = useState<boolean>(false);
+  const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
 
   useEffect(() => {
     try {
@@ -182,7 +186,18 @@ export const CommentCard = ({
                 onReaction={handleReaction}
               />
 
-              <ViewCommentUpvotesDrawer comment={comment} />
+              <ViewUpvotesDrawerTrigger
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsUpvoteDrawerOpen(true);
+                }}
+              />
+
+              <ViewCommentUpvotesDrawer
+                comment={comment}
+                isOpen={isUpvoteDrawerOpen}
+                setIsOpen={setIsUpvoteDrawerOpen}
+              />
 
               <SharePopover commentId={comment.id} />
 
