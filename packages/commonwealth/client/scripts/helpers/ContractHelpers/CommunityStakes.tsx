@@ -119,7 +119,12 @@ class CommunityStakes extends ContractBase {
     try {
       txReceipt = await this.contract.methods
         .buyStake(namespaceAddress, id, amount)
-        .send({ value: totalPrice, from: walletAddress });
+        .send({
+          value: totalPrice,
+          from: walletAddress,
+          maxPriorityFeePerGas: null,
+          maxFeePerGas: null,
+        });
       try {
         await this.web3.givenProvider.request({
           method: 'wallet_watchAsset',
@@ -162,7 +167,11 @@ class CommunityStakes extends ContractBase {
     try {
       txReceipt = await this.contract.methods
         .sellStake(namespaceAddress, id.toString(), amount.toString())
-        .send({ from: walletAddress });
+        .send({
+          from: walletAddress,
+          maxPriorityFeePerGas: null,
+          maxFeePerGas: null,
+        });
     } catch {
       throw new Error('Transaction failed');
     }

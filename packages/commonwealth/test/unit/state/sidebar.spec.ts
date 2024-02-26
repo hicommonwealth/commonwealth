@@ -1,5 +1,5 @@
-import { sidebarStore } from 'state/ui/sidebar';
 import { expect } from 'chai';
+import { sidebarStore } from 'state/ui/sidebar';
 
 describe('sidebar store', () => {
   const initialStore = sidebarStore.getState();
@@ -21,15 +21,6 @@ describe('sidebar store', () => {
       const previousVisibility = sidebarStore.getState().menuVisible;
       sidebarStore.getState().setMenu({ name: 'createContent' });
       expect(sidebarStore.getState().menuVisible).to.equal(previousVisibility);
-    });
-  });
-
-  describe('mobile menu', () => {
-    it('should set mobile menu name', () => {
-      sidebarStore.getState().setMobileMenuName('CreateContentMenu');
-      expect(sidebarStore.getState().mobileMenuName).to.equal(
-        'CreateContentMenu'
-      );
     });
   });
 });

@@ -175,6 +175,7 @@ export async function __createThreadComment(
     reaction_count: 0,
     reaction_weights_sum: 0,
   };
+
   if (parentId) {
     Object.assign(commentContent, { parent_id: parentId });
   }

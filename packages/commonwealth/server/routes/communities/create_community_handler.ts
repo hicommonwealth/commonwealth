@@ -24,7 +24,7 @@ export const createCommunityHandler = async (
   }
 
   const validationResult =
-    await Community.CreateCommunity.schema.safeParseAsync(req.body);
+    await Community.CreateCommunity().schema.safeParseAsync(req.body);
 
   if (validationResult.success === false) {
     throw new AppError(formatErrorPretty(validationResult));

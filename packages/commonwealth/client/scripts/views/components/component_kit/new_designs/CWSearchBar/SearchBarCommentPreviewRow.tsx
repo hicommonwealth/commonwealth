@@ -12,11 +12,12 @@ import './SearchBarCommentPreviewRow.scss';
 interface SearchBarCommentPreviewRowProps {
   searchResult: ReplyResult;
   searchTerm?: string;
+  onSearchItemClick?: () => void;
 }
 
 export const SearchBarCommentPreviewRow: FC<
   SearchBarCommentPreviewRowProps
-> = ({ searchResult, searchTerm }) => {
+> = ({ searchResult, searchTerm, onSearchItemClick }) => {
   const navigate = useCommonNavigate();
 
   const title = decodeURIComponent(searchResult.title);
@@ -25,6 +26,7 @@ export const SearchBarCommentPreviewRow: FC<
   const handleClick = () => {
     const path = `/${searchResult.community_id}/discussion/${searchResult.proposalid}?comment=${searchResult.id}`;
     navigate(path, {}, null);
+    onSearchItemClick?.();
   };
 
   return (

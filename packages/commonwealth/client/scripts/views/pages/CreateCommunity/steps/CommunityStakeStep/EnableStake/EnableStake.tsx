@@ -104,7 +104,7 @@ const EnableStake = ({
           <a
             target="_blank"
             rel="noopener noreferrer"
-            href="https://commonwealth.im"
+            href="https://docs.commonwealth.im/commonwealth/community-overview/community-stake"
           >
             Learn more about community stake
           </a>

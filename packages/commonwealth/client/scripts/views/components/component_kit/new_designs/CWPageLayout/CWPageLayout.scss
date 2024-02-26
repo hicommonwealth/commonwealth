@@ -1,0 +1,21 @@
+@import '../../../../../../styles/shared.scss';
+
+.PageLayout {
+  width: 100%;
+  padding-inline: 56px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+
+  @include smallInclusive {
+    padding-inline: 16px;
+  }
+
+  .layout-container {
+    margin: 0 auto;
+    max-width: 1040px;
+
+    @include mediumSmall {
+      max-width: 792px;
+    }
+  }
+}

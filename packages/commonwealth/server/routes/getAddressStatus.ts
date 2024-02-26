@@ -7,8 +7,8 @@ const Op = Sequelize.Op;
 
 export const Errors = {
   NeedAddress: 'Must provide address',
-  NeedChain: 'Must provide chain',
-  InvalidChain: 'Invalid chain',
+  NeedCommunity: 'Must provide community',
+  InvalidCommunity: 'Invalid community',
 };
 
 const getAddressStatus = async (
@@ -20,20 +20,20 @@ const getAddressStatus = async (
   if (!req.body.address) {
     return next(new AppError(Errors.NeedAddress));
   }
-  if (!req.body.chain) {
-    return next(new AppError(Errors.NeedChain));
+  if (!req.body.community_id) {
+    return next(new AppError(Errors.NeedCommunity));
   }
 
-  const chain = await models.Community.findOne({
-    where: { id: req.body.chain },
+  const community = await models.Community.findOne({
+    where: { id: req.body.community_id },
   });
-  if (!chain) {
-    return next(new AppError(Errors.InvalidChain));
+  if (!community) {
+    return next(new AppError(Errors.InvalidCommunity));
   }
 
   const existingAddress = await models.Address.findOne({
     where: {
-      community_id: req.body.chain,
+      community_id: req.body.community_id,
       address: req.body.address,
       verified: { [Op.ne]: null },
     },

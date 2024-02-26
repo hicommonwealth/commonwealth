@@ -12,3 +12,4 @@ node_modules/
 *.rabbitmq
 redis-data
 **/.nyc_output
+**/dependency-graph.svg

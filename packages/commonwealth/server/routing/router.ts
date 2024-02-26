@@ -26,7 +26,7 @@ import getAddressProfile, {
   getAddressProfileValidation,
 } from '../routes/getAddressProfile';
 import getAddressStatus from '../routes/getAddressStatus';
-import linkExistingAddressToChain from '../routes/linkExistingAddressToChain';
+import linkExistingAddressToCommunity from '../routes/linkExistingAddressToCommunity';
 import reactionsCounts from '../routes/reactionsCounts';
 import selectCommunity from '../routes/selectCommunity';
 import starCommunity from '../routes/starCommunity';
@@ -155,6 +155,7 @@ import { deleteCommunityHandler } from '../routes/communities/delete_community_h
 import { getChainNodesHandler } from '../routes/communities/get_chain_nodes_handler';
 import { getCommunitiesHandler } from '../routes/communities/get_communities_handler';
 import { updateCommunityHandler } from '../routes/communities/update_community_handler';
+import { updateCommunityIdHandler } from '../routes/communities/update_community_id_handler';
 import exportMembersList from '../routes/exportMembersList';
 import { createGroupHandler } from '../routes/groups/create_group_handler';
 import { deleteGroupHandler } from '../routes/groups/delete_group_handler';
@@ -240,6 +241,8 @@ function setupRouter(
     'post',
     '/updateAddress',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateCommunity,
     updateAddress.bind(this, models),
   );
   registerRoute(
@@ -285,14 +288,16 @@ function setupRouter(
     'post',
     '/deleteAddress',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateCommunity,
     deleteAddress.bind(this, models),
   );
   registerRoute(
     router,
     'post',
-    '/linkExistingAddressToChain',
+    '/linkExistingAddressToCommunity',
     passport.authenticate('jwt', { session: false }),
-    linkExistingAddressToChain.bind(this, models),
+    databaseValidationService.validateCommunity,
+    linkExistingAddressToCommunity.bind(this, models),
   );
   registerRoute(
     router,
@@ -330,6 +335,15 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     deleteCommunityHandler.bind(this, serverControllers),
   );
+
+  registerRoute(
+    router,
+    'patch',
+    '/communities/update_id',
+    passport.authenticate('jwt', { session: false }),
+    updateCommunityIdHandler.bind(this, models, serverControllers),
+  );
+
   registerRoute(
     router,
     'patch',

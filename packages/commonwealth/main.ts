@@ -33,8 +33,6 @@ import {
 } from './server/config';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
-import { addSwagger } from './server/routing/addSwagger';
-import { addExternalRoutes } from './server/routing/external';
 import setupAPI from './server/routing/router';
 import { sendBatchedNotificationEmails } from './server/scripts/emails';
 import setupAppRoutes from './server/scripts/setupAppRoutes';
@@ -226,10 +224,6 @@ export async function main(app: express.Express) {
     dbValidationService,
   );
 
-  // new API
-  addExternalRoutes('/external', app, models);
-  addSwagger('/docs', app);
-
   setupCosmosProxy(app, models, cacheDecorator);
   setupIpfsProxy(app, cacheDecorator);
 
@@ -241,7 +235,14 @@ export async function main(app: express.Express) {
       ).default;
       await setupWebpackDevServer(app);
     } else {
-      app.use('/build', express.static('build'));
+      app.use(
+        '/build',
+        express.static('build', {
+          setHeaders: (res) => {
+            res.setHeader('Cache-Control', 'public');
+          },
+        }),
+      );
     }
   }
 

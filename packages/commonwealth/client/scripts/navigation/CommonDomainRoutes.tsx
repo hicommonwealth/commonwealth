@@ -103,15 +103,26 @@ const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 const CommonDomainRoutes = ({
   proposalTemplatesEnabled,
   communityHomepageEnabled,
+  rootDomainRebrandEnabled,
 }: RouteFeatureFlags) => [
-  <Route
-    key="/"
-    path="/"
-    element={withLayout(LandingPage, {
-      scoped: false,
-      type: 'blank',
-    })}
-  />,
+  ...(rootDomainRebrandEnabled
+    ? [
+        <Route
+          key="/"
+          path="/"
+          element={withLayout(DashboardPage, { type: 'common' })}
+        />,
+      ]
+    : [
+        <Route
+          key="/"
+          path="/"
+          element={withLayout(LandingPage, {
+            scoped: false,
+            type: 'blank',
+          })}
+        />,
+      ]),
   <Route
     key="/createCommunity"
     path="/createCommunity"
