@@ -25,6 +25,7 @@ expressRouter.post(
 // TRPC
 // TODO: are there better ways to chain middleware?
 // TODO: how to configure custom paths (adapters, open api)?
+// TODO: adapters should be strict
 export const trpcRouter = trpc.router({
   getStake: trpc.query(Community.GetCommunityStake(), trpc.authenticate),
   setStake: trpc.command(Community.SetCommunityStake(), trpc.authenticate),
