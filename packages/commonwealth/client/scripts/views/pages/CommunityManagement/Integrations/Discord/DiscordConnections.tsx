@@ -1,22 +1,22 @@
 import React, { useState } from 'react';
-import app from '../../../state/index';
-import { CWDropdown } from '../../components/component_kit/cw_dropdown';
-import { CWClose } from '../../components/component_kit/cw_icons/cw_icons';
-import { CWText } from '../../components/component_kit/cw_text';
-import { openConfirmation } from '../../modals/confirmation_modal';
+import app from '../../../../../state/index';
+import { CWDropdown } from '../../../../components/component_kit/cw_dropdown';
+import { CWClose } from '../../../../components/component_kit/cw_icons/cw_icons';
+import { CWText } from '../../../../components/component_kit/cw_text';
+import { openConfirmation } from '../../../../modals/confirmation_modal';
 
-type DiscordChannelConnection = {
+type DiscordChannels = {
   channelName: string;
   channelId: string;
   onConnect: (topicId: string) => void;
 };
 
-export const DiscordForumConnections = ({
+export const DiscordConnections = ({
   channels,
   topics,
   refetchTopics,
 }: {
-  channels: DiscordChannelConnection[];
+  channels: DiscordChannels[];
   topics: { id: string; name: string; channelId: string | null }[];
   refetchTopics: () => Promise<void>;
 }) => {
@@ -61,7 +61,7 @@ export const DiscordForumConnections = ({
   };
 
   return (
-    <div className="DiscordForumConnections">
+    <div className="DiscordConnections">
       {channels.length > 0 ? (
         <div className="TopicRow">
           <CWText className="HeaderText">Channel</CWText>

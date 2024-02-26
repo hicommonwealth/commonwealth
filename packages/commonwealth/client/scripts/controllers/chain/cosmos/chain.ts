@@ -112,7 +112,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
     if (chain?.cosmosGovernanceVersion === 'v1') {
       try {
-        const lcdUrl = `${window.location.origin}/cosmosLCD/${chain.id}`;
+        const lcdUrl = `${window.location.origin}/cosmosAPI/v1/${chain.id}`;
         console.log(`Starting LCD API at ${lcdUrl}...`);
         const lcd = await getLCDClient(lcdUrl);
         this._lcd = lcd;
@@ -206,7 +206,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
       client = await EthSigningClient(
         {
-          restUrl: `${window.location.origin}/cosmosLCD/${dbId}`,
+          restUrl: `${window.location.origin}/cosmosAPI/v1/${dbId}`,
           chainId,
           path: dbId,
         },

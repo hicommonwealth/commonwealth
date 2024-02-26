@@ -7,7 +7,6 @@ import { useFetchThreadsQuery } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
 import Permissions from 'utils/Permissions';
-import { useFlag } from '../../../hooks/useFlag';
 import { CWText } from '../component_kit/cw_text';
 import { CWModal } from '../component_kit/new_designs/CWModal';
 import { CWButton } from '../component_kit/new_designs/cw_button';
@@ -16,7 +15,6 @@ import './AdminOnboardingSlider.scss';
 import { DismissModal } from './DismissModal';
 
 export const AdminOnboardingSlider = () => {
-  const newAdminOnboardingEnabled = useFlag('newAdminOnboarding');
   useUserActiveAccount();
 
   const community = app.config.chains.getById(app.activeChainId());
@@ -79,7 +77,6 @@ export const AdminOnboardingSlider = () => {
       threads.length > 0 &&
       hasAnyIntegration) ||
     !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin()) ||
-    !newAdminOnboardingEnabled ||
     [
       ...shouldHideAdminCardsTemporary,
       ...shouldHideAdminCardsPermanently,

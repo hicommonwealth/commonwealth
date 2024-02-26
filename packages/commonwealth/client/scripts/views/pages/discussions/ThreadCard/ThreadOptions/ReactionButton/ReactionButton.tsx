@@ -39,6 +39,10 @@ export const ReactionButton = ({
   const newSignInModalEnabled = useFlag('newSignInModal');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const reactors = thread?.associatedReactions?.map((t) => t.address);
+  const reactionWeightsSum = thread?.associatedReactions.reduce(
+    (acc, curr) => acc + (curr.voting_weight || 1),
+    0,
+  );
   const activeAddress = app.user.activeAccount?.address;
   const thisUserReaction = thread?.associatedReactions?.filter(
     (r) => r.address === activeAddress,
@@ -120,7 +124,7 @@ export const ReactionButton = ({
     <>
       {size === 'small' ? (
         <CWUpvoteSmall
-          voteCount={thread.reactionWeightsSum || reactors.length}
+          voteCount={reactionWeightsSum}
           disabled={disabled}
           isThreadArchived={!!thread.archivedAt}
           selected={hasReacted}
@@ -134,7 +138,7 @@ export const ReactionButton = ({
         <TooltipWrapper disabled={disabled} text={tooltipText}>
           <CWUpvote
             onClick={handleVoteClick}
-            voteCount={thread.reactionWeightsSum || reactors.length}
+            voteCount={reactionWeightsSum}
             disabled={disabled}
             active={hasReacted}
           />
@@ -146,7 +150,7 @@ export const ReactionButton = ({
         >
           <CWUpvote
             onClick={handleVoteClick}
-            voteCount={thread.reactionWeightsSum || reactors.length}
+            voteCount={reactionWeightsSum}
             disabled={disabled}
             active={hasReacted}
           />
