@@ -5,7 +5,6 @@ import {
 } from '@hicommonwealth/core';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
-import { DB } from '../../models';
 import { getBalances } from '../tokenBalanceCache';
 
 export const getNamespace = async (
@@ -57,17 +56,11 @@ export const getNamespaceBalance = async (
   tokenId: number,
   chain: commonProtocol.ValidChains,
   address: string,
-  model: DB,
+  nodeUrl: string,
 ): Promise<string> => {
   const factoryData = commonProtocol.factoryContracts[chain];
-  const node = await model.ChainNode.findOne({
-    where: {
-      eth_chain_id: factoryData.chainId,
-    },
-    attributes: ['url'],
-  });
-  if (node) {
-    const web3 = new Web3(node.url);
+  if (nodeUrl) {
+    const web3 = new Web3(nodeUrl);
     const activeNamespace = await getNamespace(
       web3,
       namespace,

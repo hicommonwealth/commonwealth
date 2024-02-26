@@ -12,13 +12,12 @@ const getBuyPrice = async ({
   stakeId,
   amount,
   chainRpc,
+  ethChainId,
 }: GetBuyPriceProps) => {
   const CommunityStakes = await lazyLoadCommunityStakes();
   const communityStakes = new CommunityStakes(
-    commonProtocol.factoryContracts[
-      commonProtocol.ValidChains.Base
-    ].communityStake,
-    commonProtocol.factoryContracts[commonProtocol.ValidChains.Base].factory,
+    commonProtocol.factoryContracts[ethChainId].communityStake,
+    commonProtocol.factoryContracts[ethChainId].factory,
     chainRpc,
   );
 
@@ -32,6 +31,7 @@ interface UseGetBuyPriceQueryProps {
   apiEnabled: boolean;
   chainRpc: string;
   keepPreviousData?: boolean;
+  ethChainId: number;
 }
 
 const useGetBuyPriceQuery = ({
@@ -40,6 +40,7 @@ const useGetBuyPriceQuery = ({
   amount,
   apiEnabled,
   chainRpc,
+  ethChainId,
   keepPreviousData = false,
 }: UseGetBuyPriceQueryProps) => {
   return useQuery({
@@ -50,7 +51,8 @@ const useGetBuyPriceQuery = ({
       amount,
       chainRpc,
     ],
-    queryFn: () => getBuyPrice({ namespace, stakeId, amount, chainRpc }),
+    queryFn: () =>
+      getBuyPrice({ namespace, stakeId, amount, chainRpc, ethChainId }),
     enabled: apiEnabled,
     staleTime: GET_BUY_PRICE_STALE_TIME,
     keepPreviousData,
