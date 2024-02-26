@@ -11,7 +11,6 @@ interface CreateReactionProps {
   communityId: string;
   threadId: number;
   commentId: number;
-  voteWeight?: number;
 }
 
 const createReaction = async ({
@@ -49,7 +48,6 @@ const useCreateCommentReactionMutation = ({
   threadId,
   commentId,
   communityId,
-  voteWeight,
 }: Partial<CreateReactionProps>) => {
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
@@ -69,10 +67,6 @@ const useCreateCommentReactionMutation = ({
         const tempComments = [...comments];
         const commentToUpdate = tempComments.find((x) => x.id === commentId);
         commentToUpdate.reactions.push(new Reaction(reaction));
-        if (voteWeight) {
-          commentToUpdate.reactionWeightsSum =
-            commentToUpdate.reactionWeightsSum + voteWeight;
-        }
         return tempComments;
       });
 

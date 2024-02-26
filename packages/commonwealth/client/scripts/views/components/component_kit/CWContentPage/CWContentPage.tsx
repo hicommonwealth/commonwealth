@@ -36,7 +36,6 @@ export type SidebarComponents = [
 
 type ContentPageProps = {
   thread?: Thread;
-  currentVoteWeight?: number;
   createdAt?: moment.Moment | number;
   title?: string | ReactNode;
   updatedAt?: moment.Moment;
@@ -81,7 +80,6 @@ type ContentPageProps = {
 
 export const CWContentPage = ({
   thread,
-  currentVoteWeight,
   author,
   discord_meta,
   body,
@@ -225,7 +223,6 @@ export const CWContentPage = ({
             upvoteDrawerBtnBelow={true}
             commentBtnVisible={!thread?.readOnly}
             thread={thread}
-            currentVoteWeight={currentVoteWeight}
             totalComments={thread?.numberOfComments}
             onLockToggle={onLockToggle}
             onSpamToggle={onSpamToggle}

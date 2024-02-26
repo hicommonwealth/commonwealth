@@ -48,7 +48,6 @@ type CommentCardProps = {
   canToggleSpam?: boolean;
   // actual comment
   comment: Comment<any>;
-  currentVoteWeight?: number;
   isThreadArchived: boolean;
 };
 
@@ -78,7 +77,6 @@ export const CommentCard = ({
   canToggleSpam,
   // actual comment
   comment,
-  currentVoteWeight,
   isThreadArchived,
 }: CommentCardProps) => {
   const commentBody = deserializeDelta(editDraft || comment.text);
@@ -177,7 +175,6 @@ export const CommentCard = ({
             <div className="comment-footer">
               <CommentReactionButton
                 comment={comment}
-                voteWeight={currentVoteWeight}
                 disabled={!canReact}
                 tooltipText={
                   disabledActionsTooltipText ? 'Join community to upvote' : ''

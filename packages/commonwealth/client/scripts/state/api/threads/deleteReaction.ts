@@ -7,8 +7,6 @@ interface UseDeleteThreadReactionMutationProps {
   chainId: string;
   address: string;
   threadId: number;
-  threadReactionWeightsSum?: number;
-  voteWeight?: number;
 }
 
 interface DeleteReactionProps extends UseDeleteThreadReactionMutationProps {
@@ -59,8 +57,6 @@ const deleteReaction = async ({
 const useDeleteThreadReactionMutation = ({
   chainId,
   threadId,
-  threadReactionWeightsSum,
-  voteWeight,
 }: UseDeleteThreadReactionMutationProps) => {
   return useMutation({
     mutationFn: deleteReaction,
@@ -75,11 +71,6 @@ const useDeleteThreadReactionMutation = ({
         },
         'removeFromExisting',
       );
-      updateThreadInAllCaches(chainId, threadId, {
-        ...(voteWeight && {
-          reactionWeightsSum: threadReactionWeightsSum - voteWeight,
-        }),
-      });
     },
   });
 };

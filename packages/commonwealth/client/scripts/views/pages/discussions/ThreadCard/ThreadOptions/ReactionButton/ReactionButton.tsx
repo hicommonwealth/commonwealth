@@ -23,7 +23,6 @@ import { ReactionButtonSkeleton } from './ReactionButtonSkeleton';
 
 type ReactionButtonProps = {
   thread: Thread;
-  currentVoteWeight?: number;
   size: 'small' | 'big';
   showSkeleton?: boolean;
   disabled: boolean;
@@ -32,7 +31,6 @@ type ReactionButtonProps = {
 
 export const ReactionButton = ({
   thread,
-  currentVoteWeight,
   size,
   disabled,
   showSkeleton,
@@ -41,6 +39,10 @@ export const ReactionButton = ({
   const newSignInModalEnabled = useFlag('newSignInModal');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const reactors = thread?.associatedReactions?.map((t) => t.address);
+  const reactionWeightsSum = thread?.associatedReactions.reduce(
+    (acc, curr) => acc + (curr.voting_weight || 1),
+    0,
+  );
   const activeAddress = app.user.activeAccount?.address;
   const thisUserReaction = thread?.associatedReactions?.filter(
     (r) => r.address === activeAddress,
@@ -58,8 +60,6 @@ export const ReactionButton = ({
   } = useCreateThreadReactionMutation({
     chainId: app.activeChainId(),
     threadId: thread.id,
-    voteWeight: currentVoteWeight,
-    threadReactionWeightsSum: thread.reactionWeightsSum,
   });
   const {
     mutateAsync: deleteThreadReaction,
@@ -70,8 +70,6 @@ export const ReactionButton = ({
     chainId: app.activeChainId(),
     address: app.user.activeAccount?.address,
     threadId: thread.id,
-    voteWeight: currentVoteWeight,
-    threadReactionWeightsSum: thread.reactionWeightsSum,
   });
 
   const resetSessionRevalidationModal = createThreadReactionError
@@ -101,7 +99,6 @@ export const ReactionButton = ({
         address: app.user.activeAccount?.address,
         threadId: thread.id,
         reactionId: reactedId as number,
-        voteWeight: currentVoteWeight,
       }).catch((e) => {
         if (e instanceof SessionKeyError) {
           return;
@@ -114,7 +111,6 @@ export const ReactionButton = ({
         address: activeAddress,
         threadId: thread.id,
         reactionType: 'like',
-        voteWeight: currentVoteWeight,
       }).catch((e) => {
         if (e instanceof SessionKeyError) {
           return;
@@ -128,7 +124,7 @@ export const ReactionButton = ({
     <>
       {size === 'small' ? (
         <CWUpvoteSmall
-          voteCount={thread.reactionWeightsSum || reactors.length}
+          voteCount={reactionWeightsSum}
           disabled={disabled}
           isThreadArchived={!!thread.archivedAt}
           selected={hasReacted}
@@ -142,7 +138,7 @@ export const ReactionButton = ({
         <TooltipWrapper disabled={disabled} text={tooltipText}>
           <CWUpvote
             onClick={handleVoteClick}
-            voteCount={thread.reactionWeightsSum || reactors.length}
+            voteCount={reactionWeightsSum}
             disabled={disabled}
             active={hasReacted}
           />
@@ -154,7 +150,7 @@ export const ReactionButton = ({
         >
           <CWUpvote
             onClick={handleVoteClick}
-            voteCount={thread.reactionWeightsSum || reactors.length}
+            voteCount={reactionWeightsSum}
             disabled={disabled}
             active={hasReacted}
           />
