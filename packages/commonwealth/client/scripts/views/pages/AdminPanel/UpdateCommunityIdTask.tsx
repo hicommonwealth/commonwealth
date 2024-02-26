@@ -21,9 +21,7 @@ const UpdateCommunityIdTask = () => {
   const openConfirmationModal = () => {
     openConfirmation({
       title: 'Update Community Id',
-      description:
-        `Are you sure you want to update ${originalCommunityValue} to ${newCommunityValue}? WARNING: this ` +
-        'does not set up redirects so this will break external links to the original community.',
+      description: `Are you sure you want to update ${originalCommunityValue} to ${newCommunityValue}?`,
       buttons: [
         {
           label: 'Update',
