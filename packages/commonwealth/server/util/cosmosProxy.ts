@@ -38,7 +38,7 @@ function setupCosmosProxy(
       log.trace(`Got request: ${JSON.stringify(req.body, null, 2)}`);
       let cosmos_chain_id, chainNodeUrl, previouslyFailed;
       try {
-        const communityId = req.params.chain;
+        const communityId = req.params.community_id;
         const community = await models.Community.findOne({
           where: { id: communityId },
           include: models.ChainNode,
@@ -118,7 +118,7 @@ function setupCosmosProxy(
    *  Used for Cosmos chains that use v1 of the gov module.
    */
   app.use(
-    '/cosmosAPI/v1/:chain',
+    '/cosmosAPI/v1/:community_id',
     bodyParser.text(),
     calcCosmosLCDCacheKeyDuration,
     cacheDecorator.cacheMiddleware(
@@ -129,7 +129,7 @@ function setupCosmosProxy(
       log.info(`Got request: ${JSON.stringify(req.body, null, 2)}`);
       let cosmos_chain_id, chainNodeRestUrl, previouslyFailed;
       try {
-        const communityId = req.params.chain;
+        const communityId = req.params.community_id;
         const community = await models.Community.findOne({
           where: { id: communityId },
           include: models.ChainNode,
