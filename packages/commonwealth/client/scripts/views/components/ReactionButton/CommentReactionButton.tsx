@@ -66,7 +66,10 @@ export const CommentReactionButton = ({
   const hasReacted = !!(comment.reactions || []).find(
     (x) => x?.author === activeAddress,
   );
-  const likes = comment.reactionWeightsSum || comment.reactions.length;
+  const reactionWeightsSum = comment.reactions.reduce(
+    (acc, curr) => acc + (curr.calculatedVotingWeight || 1),
+    0,
+  );
 
   const handleVoteClick = async (e) => {
     e.stopPropagation();
@@ -130,7 +133,7 @@ export const CommentReactionButton = ({
       )}
       {RevalidationModal}
       <CWUpvoteSmall
-        voteCount={likes}
+        voteCount={reactionWeightsSum}
         disabled={!hasJoinedCommunity || disabled}
         selected={hasReacted}
         onClick={handleVoteClick}
