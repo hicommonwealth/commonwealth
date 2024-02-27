@@ -26,7 +26,7 @@ function setupCosmosProxy(
 ) {
   // using bodyParser here because cosmjs generates text/plain type headers
   app.post(
-    '/cosmosAPI/:chain',
+    '/cosmosAPI/:community_id',
     express.text() as express.RequestHandler,
     calcCosmosRPCCacheKeyDuration,
     cacheDecorator.cacheMiddleware(
@@ -117,7 +117,7 @@ function setupCosmosProxy(
    *  Used for Cosmos chains that use v1 of the gov module.
    */
   app.use(
-    '/cosmosAPI/v1/:chain',
+    '/cosmosAPI/v1/:community_id',
     express.text() as express.RequestHandler,
     calcCosmosLCDCacheKeyDuration,
     cacheDecorator.cacheMiddleware(
