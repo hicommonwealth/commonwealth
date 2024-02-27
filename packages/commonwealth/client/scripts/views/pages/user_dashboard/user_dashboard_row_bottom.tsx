@@ -21,6 +21,7 @@ type UserDashboardRowBottomProps = {
   commenters: ProfileWithAddress[];
   showSkeleton?: boolean;
   discussionLink?: string;
+  isLoggedIn?: boolean;
 };
 
 export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
@@ -31,6 +32,7 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
     commenters,
     showSkeleton,
     discussionLink,
+    isLoggedIn,
   } = props;
   const forceRerender = useForceRerender();
 
@@ -82,6 +84,7 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
+          if (!isLoggedIn) return;
           setSubscription(
             threadId,
             bothActive,

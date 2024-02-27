@@ -15,6 +15,7 @@ type UserDashboardRowProps = {
   showSkeleton?: boolean;
   isChainEventsRow?: boolean;
   label?: IEventLabel;
+  isLoggedIn?: boolean;
 };
 
 export const UserDashboardRow = ({
@@ -22,6 +23,7 @@ export const UserDashboardRow = ({
   showSkeleton,
   isChainEventsRow,
   label,
+  isLoggedIn,
 }: UserDashboardRowProps) => {
   if (showSkeleton) {
     if (isChainEventsRow) {
@@ -85,6 +87,7 @@ export const UserDashboardRow = ({
         commentCount={commentCount}
         commenters={commenters}
         discussionLink={path}
+        isLoggedIn={isLoggedIn}
       />
     </Link>
   );
