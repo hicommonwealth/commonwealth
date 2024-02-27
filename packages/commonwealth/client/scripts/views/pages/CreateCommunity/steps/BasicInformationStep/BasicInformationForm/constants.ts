@@ -1,3 +1,4 @@
+import { commonProtocol } from '@hicommonwealth/core';
 import NodeInfo from 'models/NodeInfo';
 import app from 'state';
 
@@ -39,6 +40,10 @@ const particularChainNodes = (nodeInfo: NodeInfo) => {
   );
 };
 
+const chainIdsWithStakeEnabled = Object.values(
+  commonProtocol.factoryContracts,
+).map((c) => c.chainId);
+
 // Get chain id's from the app.config.chains for all eth and cosmos chains
 export const chainTypes = app.config.nodes
   .getAll()
@@ -54,4 +59,14 @@ export const chainTypes = app.config.nodes
     value: chain.ethChainId || chain.cosmosChainId || 'solana',
     label: chain.name.replace(/\b\w/g, (l) => l.toUpperCase()),
     bech32Prefix: chain.bech32,
+    hasStakeEnabled: chainIdsWithStakeEnabled.includes(chain.ethChainId),
   }));
+
+// Sort chains alphabetically by labels
+export const alphabeticallySortedChains = [...chainTypes].sort((a, b) =>
+  (a?.label || '').toLowerCase().localeCompare(b?.label || ''),
+);
+
+// Sort chains by stake, chains having stake enabled will come first
+export const alphabeticallyStakeWiseSortedChains =
+  alphabeticallySortedChains.sort((a) => (a.hasStakeEnabled ? -1 : 0));
