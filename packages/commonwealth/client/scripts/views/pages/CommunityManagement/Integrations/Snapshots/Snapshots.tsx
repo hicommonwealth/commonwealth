@@ -1,6 +1,7 @@
 import { notifySuccess } from 'controllers/app/notifications';
 import React, { useState } from 'react';
 import app from 'state';
+import _ from 'underscore';
 import { LinksArray, useLinksArray } from 'views/components/LinksArray';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
@@ -33,7 +34,18 @@ const Snapshots = () => {
     if (!areLinksValid()) return;
 
     try {
-      const newSnapshots = [...new Set(snapshots.map((x) => x.value))];
+      // get unique snapshot names from links (if any value in array was link)
+      const newSnapshots = [
+        ...new Set(
+          snapshots
+            .map((x) => x.value)
+            .map((link) => {
+              const splitLink = link.split('/');
+              const sanitizedLink = splitLink[splitLink.length - 1];
+              return sanitizedLink;
+            }),
+        ),
+      ];
       await community.updateChainData({
         snapshot: newSnapshots,
       });
@@ -68,6 +80,7 @@ const Snapshots = () => {
         <LinksArray
           label="Snapshot Space"
           addLinkButtonCTA="+ Add Snapshot Space"
+          placeholder="examplesnapshotspace.eth"
           links={snapshots}
           onLinkAdd={onLinkAdd}
           onLinkUpdatedAtIndex={onLinkUpdatedAtIndex}
@@ -79,7 +92,12 @@ const Snapshots = () => {
         <CWButton
           buttonType="secondary"
           label="Save Changes"
-          disabled={snapshots.length === community.snapshot.length}
+          disabled={_.isEqual(
+            [...snapshots.map((x) => x.value.trim())].sort((a, b) =>
+              a.localeCompare(b),
+            ),
+            [...(community.snapshot || [])].sort((a, b) => a.localeCompare(b)),
+          )}
           onClick={onSaveChanges}
         />
       ) : (

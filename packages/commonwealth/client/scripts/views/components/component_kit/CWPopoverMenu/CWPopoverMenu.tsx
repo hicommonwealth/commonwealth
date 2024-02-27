@@ -5,20 +5,16 @@ import { PopperOwnProps, PopperPlacementType } from '@mui/base/Popper';
 
 import './CWPopoverMenu.scss';
 
+import MenuContent from 'views/components/component_kit/CWPopoverMenu/MenuContent';
 import CWPopover, {
   PopoverTriggerProps,
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
-import { CWIcon } from '../cw_icons/cw_icon';
-import { CWText } from '../cw_text';
-import { getClasses } from '../helpers';
-import { CWButton } from '../new_designs/cw_button';
 import type {
   DefaultMenuItem,
   DividerMenuItem,
   HeaderMenuItem,
 } from '../types';
-import { ComponentType } from '../types';
 
 export type PopoverMenuItem =
   | DividerMenuItem
@@ -57,92 +53,11 @@ export const PopoverMenu = ({
           modifiers={modifiers}
           placement={placement}
           content={
-            <div className={`${ComponentType.PopoverMenu} ${className}`}>
-              {menuItems.map((item, i) => {
-                if (item.type === 'header') {
-                  return (
-                    <CWText
-                      className={`menu-section-header-text ${item.className}`}
-                      type="caption"
-                      key={i}
-                    >
-                      {item.label}
-                    </CWText>
-                  );
-                } else if (item.type === 'divider') {
-                  return (
-                    <div
-                      className={`menu-section-divider ${item.className}`}
-                      key={i}
-                    />
-                  );
-                } else {
-                  const {
-                    disabled,
-                    isSecondary,
-                    iconLeft,
-                    iconLeftWeight,
-                    iconLeftSize,
-                    label,
-                    onClick,
-                    isButton,
-                  } = item;
-
-                  const clickHandler = (e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    onClick(e);
-
-                    if (item.type === 'default' && item.preventClosing) {
-                      return;
-                    }
-
-                    handleInteraction(e);
-                  };
-
-                  if (isButton) {
-                    return (
-                      <CWButton
-                        containerClassName={`${className} m-auto no-outline`}
-                        key={label as string}
-                        label={label}
-                        buttonHeight="sm"
-                        iconLeft={iconLeft}
-                        iconLeftWeight={iconLeftWeight}
-                        disabled={disabled}
-                        onClick={clickHandler}
-                      />
-                    );
-                  }
-
-                  return (
-                    <div
-                      className={getClasses<{
-                        disabled?: boolean;
-                        isSecondary?: boolean;
-                      }>(
-                        { disabled, isSecondary },
-                        `PopoverMenuItem ${item.className}`,
-                      )}
-                      onClick={clickHandler}
-                      key={i}
-                    >
-                      {iconLeft && (
-                        <CWIcon
-                          className="menu-item-icon"
-                          iconName={iconLeft}
-                          iconSize={iconLeftSize || 'small'}
-                          weight={iconLeftWeight}
-                        />
-                      )}
-                      <CWText type="b2" className="menu-item-text">
-                        {label}
-                      </CWText>
-                    </div>
-                  );
-                }
-              })}
-            </div>
+            <MenuContent
+              className={className}
+              handleInteraction={handleInteraction}
+              menuItems={menuItems}
+            />
           }
           {...popoverProps}
         />

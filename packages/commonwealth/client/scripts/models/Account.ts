@@ -176,7 +176,7 @@ class Account {
 
     const params = {
       address: this.address,
-      chain: this.community.id,
+      community_id: this.community.id,
       chain_id: chainId,
       jwt: app.user.jwt,
       signature,

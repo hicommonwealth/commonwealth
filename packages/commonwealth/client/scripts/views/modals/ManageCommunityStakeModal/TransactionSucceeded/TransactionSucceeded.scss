@@ -6,6 +6,10 @@
     align-items: center;
     min-height: 440px;
 
+    @include heightSmallInclusive {
+      min-height: unset;
+    }
+
     .emoji {
       font-size: 28px;
     }

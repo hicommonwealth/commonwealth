@@ -1,4 +1,3 @@
-import { featureFlags } from 'helpers/feature-flags';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
@@ -48,7 +47,7 @@ export const AdminOnboardingSlider = () => {
     });
   const { data: threads = [], isLoading: isLoadingThreads = false } =
     useFetchThreadsQuery({
-      chainId: app.activeChainId(),
+      communityId: app.activeChainId(),
       queryType: 'bulk',
       page: 1,
       limit: 20,
@@ -78,7 +77,6 @@ export const AdminOnboardingSlider = () => {
       threads.length > 0 &&
       hasAnyIntegration) ||
     !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin()) ||
-    !featureFlags.newAdminOnboardingEnabled ||
     [
       ...shouldHideAdminCardsTemporary,
       ...shouldHideAdminCardsPermanently,

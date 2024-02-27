@@ -16,12 +16,14 @@ export interface SignStakeTransactionsProps {
   communityStakeData: StakeData;
   selectedAddress: AddressInfo;
   createdCommunityId: string;
+  chainId: string;
 }
 
 export interface EnableStakeProps {
   goToSuccessStep: () => void;
   onOptInEnablingStake: ({ namespace, symbol }: StakeData) => void;
   communityStakeData: StakeData;
+  chainId: string;
 }
 
 export const defaultActionState: ActionState = {

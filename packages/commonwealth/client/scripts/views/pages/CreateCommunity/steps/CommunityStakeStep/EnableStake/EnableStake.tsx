@@ -17,10 +17,11 @@ const EnableStake = ({
   goToSuccessStep,
   onOptInEnablingStake,
   communityStakeData,
+  chainId,
 }: EnableStakeProps) => {
   const [namespaceError, setNamespaceError] = useState('');
 
-  const { namespaceFactory } = useNamespaceFactory();
+  const { namespaceFactory } = useNamespaceFactory(parseInt(chainId));
 
   const clearNamespaceError = () => {
     setNamespaceError('');
@@ -104,7 +105,7 @@ const EnableStake = ({
           <a
             target="_blank"
             rel="noopener noreferrer"
-            href="https://commonwealth.im"
+            href="https://docs.commonwealth.im/commonwealth/community-overview/community-stake"
           >
             Learn more about community stake
           </a>

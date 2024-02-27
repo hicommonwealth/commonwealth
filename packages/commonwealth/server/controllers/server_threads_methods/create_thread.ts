@@ -11,12 +11,13 @@ import {
   ThreadAttributes,
   UserInstance,
 } from '@hicommonwealth/model';
+import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
-import { TrackOptions } from '../server_analytics_methods/track';
+import { TrackOptions } from '../server_analytics_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
 import { ServerThreadsController } from '../server_threads_controller';
 
@@ -73,6 +74,9 @@ export async function __createThread(
     discordMeta,
   }: CreateThreadOptions,
 ): Promise<CreateThreadResult> {
+  // sanitize text
+  body = sanitizeQuillText(body);
+
   if (kind === 'discussion') {
     if (!title || !title.trim()) {
       throw new AppError(Errors.DiscussionMissingTitle);
@@ -148,9 +152,8 @@ export async function __createThread(
   if (!isAdmin) {
     const { isValid, message } = await validateTopicGroupsMembership(
       this.models,
-      this.tokenBalanceCache,
       topicId,
-      community,
+      community.id,
       address,
     );
     if (!isValid) {

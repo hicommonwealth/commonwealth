@@ -35,6 +35,15 @@ export async function dispatchWebhooks(
     return;
   }
 
+  if (
+    notification.categoryId === NotificationCategories.NewComment &&
+    notification.data?.parent_comment_id
+  ) {
+    // If parent comment exists we don't want to send a webhook.
+    // Otherwise we will duplicate send a webhook for every reply to a comment.
+    return;
+  }
+
   if (!webhooks) {
     webhooks = await fetchWebhooks(notification);
   }

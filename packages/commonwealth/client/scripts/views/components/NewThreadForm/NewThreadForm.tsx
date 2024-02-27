@@ -14,8 +14,8 @@ import {
 } from 'state/api/groups';
 import { useCreateThreadMutation } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
-import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
+import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';

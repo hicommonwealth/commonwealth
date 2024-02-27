@@ -20,6 +20,7 @@ const SignStakeTransactions = ({
   communityStakeData,
   selectedAddress,
   createdCommunityId,
+  chainId,
 }: SignStakeTransactionsProps) => {
   const { handleReserveCommunityNamespace, reserveNamespaceData } =
     useReserveCommunityNamespace({
@@ -27,6 +28,7 @@ const SignStakeTransactions = ({
       namespace: communityStakeData.namespace,
       symbol: communityStakeData.symbol,
       userAddress: selectedAddress.address,
+      chainId,
     });
 
   const { handleLaunchCommunityStake, launchStakeData } =
@@ -34,6 +36,8 @@ const SignStakeTransactions = ({
       namespace: communityStakeData.namespace,
       communityId: createdCommunityId,
       goToSuccessStep,
+      selectedAddress: selectedAddress.address,
+      chainId,
     });
 
   const isPreventLeaveEnabled = reserveNamespaceData.state !== 'not-started';
@@ -74,7 +78,7 @@ const SignStakeTransactions = ({
 
   const handleCancel = () => {
     openConfirmation({
-      title: 'Are you sure yo want to cancel?',
+      title: 'Are you sure you want to cancel?',
       description:
         'Community Stake has not been enabled for your community yet',
       buttons: [

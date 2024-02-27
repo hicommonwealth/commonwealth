@@ -9,7 +9,7 @@ interface CWLoadingSpinnerProps {
   center?: boolean;
 }
 
-const CWLoadingSpinner = ({ center }: CWLoadingSpinnerProps) => {
+const CWLoadingSpinner = ({ center = true }: CWLoadingSpinnerProps) => {
   return (
     <div className={clsx(ComponentType.LoadingSpinner, { center })}>
       <div className="container">

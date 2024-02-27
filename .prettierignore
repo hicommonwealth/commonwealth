@@ -3,8 +3,6 @@
 **/.github
 **/*.env
 **/node_modules
-**/android
-**/ios
 **/.mocharc.json
 **/.nyc_output
 **/.nycrc
@@ -18,5 +16,4 @@
 **/eth/types
 **/eth/artifacts
 **/.eslintrc.js
-**/ios/App/App
 

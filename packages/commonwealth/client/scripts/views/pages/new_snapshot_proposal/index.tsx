@@ -14,9 +14,9 @@ import { useLocation } from 'react-router';
 import app from 'state';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { MixpanelSnapshotEvents } from '../../../../../shared/analytics/types';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import CWLoadingSpinner from '../../components/component_kit/new_designs/CWLoadingSpinner';
 import {
   ReactQuillEditor,
   createDeltaFromText,
@@ -87,7 +87,9 @@ export const NewSnapshotProposalForm = ({
         onSave({ id: response.id, snapshot_title: response.title }); // Pass relevant information
       }
     } catch (err) {
-      notifyError(capitalize(err.error_description));
+      err.code === 'ACTION_REJECTED'
+        ? notifyError('User rejected signing')
+        : notifyError(capitalize(err.error_description));
     } finally {
       setIsSaving(false);
     }
@@ -224,6 +226,9 @@ export const NewSnapshotProposalForm = ({
             <CWSpinner />
           </div>
         )
+        <div className="proposal-loading">
+          <CWLoadingSpinner />
+        </div>
       ) : (
         <>
           {space.filters?.onlyMembers && !isMember && (

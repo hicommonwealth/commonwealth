@@ -1,14 +1,14 @@
 /* eslint-disable no-unused-expressions */
 import { ChainBase } from '@hicommonwealth/core';
+import { tester } from '@hicommonwealth/model';
 import { personalSign } from '@metamask/eth-sig-util';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
 import { bech32ToHex } from 'shared/utils';
 import * as siwe from 'siwe';
-import app, { resetDatabase } from '../../../server-test';
+import app from '../../../server-test';
 import {
   TEST_BLOCK_INFO_BLOCKHASH,
   TEST_BLOCK_INFO_STRING,
@@ -22,7 +22,7 @@ const { expect } = chai;
 
 describe('API Tests', () => {
   before('reset database', async () => {
-    await resetDatabase();
+    await tester.seedDb();
   });
 
   describe('address tests', () => {
@@ -45,7 +45,7 @@ describe('API Tests', () => {
         .set('Accept', 'application/json')
         .send({
           address,
-          chain,
+          community_id: chain,
           wallet_id,
           block_info: TEST_BLOCK_INFO_STRING,
         });
@@ -68,7 +68,7 @@ describe('API Tests', () => {
         .set('Accept', 'application/json')
         .send({
           address,
-          chain: community_id,
+          community_id,
           wallet_id,
           block_info: TEST_BLOCK_INFO_STRING,
         });
@@ -91,7 +91,7 @@ describe('API Tests', () => {
         .set('Accept', 'application/json')
         .send({
           address,
-          chain: community_id,
+          community_id,
           wallet_id,
           block_info: TEST_BLOCK_INFO_STRING,
         });
@@ -119,7 +119,7 @@ describe('API Tests', () => {
         .set('Accept', 'application/json')
         .send({
           address,
-          chain: community_id,
+          community_id,
           chain_id,
           signature,
           wallet_id,

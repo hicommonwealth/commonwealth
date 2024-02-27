@@ -1,17 +1,19 @@
-import { ValidChains } from '@hicommonwealth/chains';
-import { AppError, NotificationCategories } from '@hicommonwealth/core';
+import {
+  AppError,
+  NotificationCategories,
+  commonProtocol,
+} from '@hicommonwealth/core';
 import {
   AddressInstance,
-  CommunityInstance,
   ReactionAttributes,
   UserInstance,
-  contractHelpers,
+  commonProtocol as commonProtocolService,
 } from '@hicommonwealth/model';
 import { REACTION_WEIGHT_OVERRIDE } from 'server/config';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
-import { TrackOptions } from '../server_analytics_methods/track';
+import { TrackOptions } from '../server_analytics_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
 import { ServerThreadsController } from '../server_threads_controller';
 
@@ -22,12 +24,12 @@ export const Errors = {
   BalanceCheckFailed: 'Could not verify user token balance',
   ThreadArchived: 'Thread is archived',
   FailedCreateReaction: 'Failed to create reaction',
+  CommunityNotFound: 'Community not found',
 };
 
 export type CreateThreadReactionOptions = {
   user: UserInstance;
   address: AddressInstance;
-  community: CommunityInstance;
   reaction: string;
   threadId: number;
   canvasAction?: any;
@@ -46,7 +48,6 @@ export async function __createThreadReaction(
   {
     user,
     address,
-    community,
     reaction,
     threadId,
     canvasAction,
@@ -57,7 +58,6 @@ export async function __createThreadReaction(
   const thread = await this.models.Thread.findOne({
     where: { id: threadId },
   });
-
   if (!thread) {
     throw new AppError(`${Errors.ThreadNotFound}: ${threadId}`);
   }
@@ -68,21 +68,19 @@ export async function __createThreadReaction(
   }
 
   // check address ban
-  if (community) {
-    const [canInteract, banError] = await this.banCache.checkBan({
-      communityId: community.id,
-      address: address.address,
-    });
-    if (!canInteract) {
-      throw new AppError(`${Errors.BanError}: ${banError}`);
-    }
+  const [canInteract, banError] = await this.banCache.checkBan({
+    communityId: thread.community_id,
+    address: address.address,
+  });
+  if (!canInteract) {
+    throw new AppError(`${Errors.BanError}: ${banError}`);
   }
 
   // check balance (bypass for admin)
   const isAdmin = await validateOwner({
     models: this.models,
     user,
-    communityId: community.id!,
+    communityId: thread.community_id,
     entity: thread,
     allowAdmin: true,
     allowSuperAdmin: true,
@@ -90,9 +88,8 @@ export async function __createThreadReaction(
   if (!isAdmin) {
     const { isValid, message } = await validateTopicGroupsMembership(
       this.models,
-      this.tokenBalanceCache,
-      thread.topic_id!,
-      community,
+      thread.topic_id,
+      thread.community_id,
       address,
     );
     if (!isValid) {
@@ -106,19 +103,31 @@ export async function __createThreadReaction(
   } else {
     // calculate voting weight
     const stake = await this.models.CommunityStake.findOne({
-      where: { community_id: community.id },
+      where: { community_id: thread.community_id },
     });
     if (stake) {
-      const vote_weight = stake.vote_weight;
-      const stakeBalance = await contractHelpers.getNamespaceBalance(
-        this.tokenBalanceCache,
-        community.namespace,
-        stake.stake_id,
-        ValidChains.Goerli,
-        address.address,
-        this.models,
+      const voteWeight = stake.vote_weight;
+      const community = await this.models.Community.findByPk(
+        thread.community_id,
       );
-      calculatedVotingWeight = parseInt(stakeBalance, 10) * vote_weight;
+      if (!community) {
+        throw new AppError(Errors.CommunityNotFound);
+      }
+      const node = await this.models.ChainNode.findByPk(
+        community.chain_node_id,
+      );
+      const stakeBalance =
+        await commonProtocolService.contractHelpers.getNamespaceBalance(
+          community.namespace,
+          stake.stake_id,
+          node.eth_chain_id,
+          address.address,
+          node.url,
+        );
+      calculatedVotingWeight = commonProtocol.calculateVoteWeight(
+        stakeBalance,
+        voteWeight,
+      );
     }
   }
 
@@ -126,7 +135,7 @@ export async function __createThreadReaction(
   const reactionWhere: Partial<ReactionAttributes> = {
     reaction,
     address_id: address.id,
-    community_id: community.id,
+    community_id: thread.community_id,
     thread_id: thread.id,
   };
   const reactionData: Partial<ReactionAttributes> = {
@@ -151,7 +160,7 @@ export async function __createThreadReaction(
         thread_id: thread.id,
         root_title: thread.title,
         root_type: 'discussion',
-        chain_id: community.id,
+        chain_id: thread.community_id,
         author_address: address.address,
         author_chain: address.community_id,
       },
@@ -162,7 +171,7 @@ export async function __createThreadReaction(
   // build analytics options
   const analyticsOptions: TrackOptions = {
     event: MixpanelCommunityInteractionEvent.CREATE_REACTION,
-    community: community.id,
+    community: thread.community_id,
   };
 
   const finalReactionWithAddress: ReactionAttributes = {

@@ -5,7 +5,7 @@ import {
   setupErrorHandlers,
 } from '@hicommonwealth/adapters';
 import { cache, logger } from '@hicommonwealth/core';
-import { TokenBalanceCache, models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model';
 import bodyParser from 'body-parser';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
@@ -14,7 +14,7 @@ import session from 'express-session';
 import http from 'http';
 import passport from 'passport';
 import favicon from 'serve-favicon';
-import { SESSION_SECRET, TBC_BALANCE_TTL_SECONDS } from './server/config';
+import { SESSION_SECRET } from './server/config';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
 import setupAPI from './server/routing/router'; // performance note: this takes 15 seconds
@@ -34,10 +34,6 @@ const app = express();
 const SequelizeStore = SessionSequelizeStore(session.Store);
 // set cache TTL to 1 second to test invalidation
 const viewCountCache = new ViewCountCache(1, 10 * 60);
-const tokenBalanceCache = new TokenBalanceCache(
-  models,
-  TBC_BALANCE_TTL_SECONDS,
-);
 const databaseValidationService = new DatabaseValidationService(models);
 let server;
 
@@ -116,7 +112,6 @@ setupAPI(
   app,
   models,
   viewCountCache,
-  tokenBalanceCache,
   banCache,
   globalActivityCache,
   databaseValidationService,
@@ -126,7 +121,6 @@ setupCosmosProxy(app, models, cacheDecorator);
 setupErrorHandlers(app);
 setupServer();
 
-export { resetDatabase } from './test/util/resetDatabase';
 export { cacheDecorator, redisCache };
 
 export default app;

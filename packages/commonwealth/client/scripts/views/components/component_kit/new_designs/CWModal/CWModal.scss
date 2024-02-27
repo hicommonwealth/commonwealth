@@ -28,7 +28,6 @@ $modal-padding: 16px;
   background: $white;
   border-radius: $border-radius-corners;
   box-shadow: $elevation-3;
-  overflow: auto;
   min-height: 168px;
   max-height: 84vh;
   max-width: 100vw;
@@ -48,7 +47,7 @@ $modal-padding: 16px;
 
   &.isFullScreen {
     border-radius: 0;
-    min-height: 100vh;
+    min-height: 100dvh;
     min-width: 100vw;
   }
 

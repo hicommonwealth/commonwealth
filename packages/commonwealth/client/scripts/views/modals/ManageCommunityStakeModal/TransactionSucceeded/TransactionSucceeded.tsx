@@ -1,6 +1,7 @@
 import React from 'react';
 
 import app from 'state';
+import { saveToClipboard } from 'utils/clipboard';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -11,25 +12,29 @@ import {
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
 import { ManageCommunityStakeModalMode } from '../types';
+import { buildEtherscanLink } from '../utils';
 
-import { saveToClipboard } from 'utils/clipboard';
 import './TransactionSucceeded.scss';
 
 interface TransactionSucceededProps {
   onModalClose: () => void;
   mode: ManageCommunityStakeModalMode;
+  successTransactionHash: string;
 }
 
 const TransactionSucceeded = ({
   onModalClose,
   mode,
+  successTransactionHash,
 }: TransactionSucceededProps) => {
+  const etherscanLink = buildEtherscanLink(successTransactionHash);
+
   const handleOpenExternalLink = () => {
-    window.open('https://etherscan.io', '_blank');
+    window.open(etherscanLink, '_blank');
   };
 
   const handleCopyLink = async () => {
-    await saveToClipboard('link to copy', true);
+    await saveToClipboard(etherscanLink, true);
   };
 
   const conditionalText =

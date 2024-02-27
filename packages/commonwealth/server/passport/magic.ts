@@ -22,7 +22,7 @@ import {
   UserInstance,
   sequelize,
 } from '@hicommonwealth/model';
-import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
+import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import { verify } from 'jsonwebtoken';
 import passport from 'passport';
 import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
@@ -49,7 +49,6 @@ type MagicLoginContext = {
 };
 
 const DEFAULT_ETH_CHAIN = 'ethereum';
-const DEFAULT_COSMOS_CHAIN = 'osmosis';
 
 // Creates a trusted address in a community
 async function createMagicAddressInstances(
@@ -57,6 +56,7 @@ async function createMagicAddressInstances(
   generatedAddresses: Array<{ address: string; chain: string }>,
   user: UserAttributes,
   walletSsoSource: WalletSsoSource,
+  decodedMagicToken: MagicUser,
   t?: Transaction,
 ): Promise<AddressInstance[]> {
   const addressInstances: AddressInstance[] = [];
@@ -74,7 +74,7 @@ async function createMagicAddressInstances(
       defaults: {
         user_id,
         profile_id,
-        verification_token: 'MAGIC',
+        verification_token: decodedMagicToken.claim.tid, // to prevent re-use
         verification_token_expires: null,
         verified: new Date(), // trust addresses from magic
         last_active: new Date(),
@@ -101,13 +101,19 @@ async function createMagicAddressInstances(
         userId: user_id,
         event: MixpanelCommunityInteractionEvent.JOIN_COMMUNITY,
       });
-    } else if (
-      addressInstance.wallet_sso_source === WalletSsoSource.Unknown ||
-      // set wallet_sso_source if it was unknown before
-      addressInstance.wallet_sso_source === undefined ||
-      addressInstance.wallet_sso_source === null
-    ) {
-      addressInstance.wallet_sso_source = walletSsoSource;
+    } else {
+      // Update used magic token to prevent replay attacks
+      addressInstance.verification_token = decodedMagicToken.claim.tid;
+
+      if (
+        addressInstance.wallet_sso_source === WalletSsoSource.Unknown ||
+        // set wallet_sso_source if it was unknown before
+        addressInstance.wallet_sso_source === undefined ||
+        addressInstance.wallet_sso_source === null
+      ) {
+        addressInstance.wallet_sso_source = walletSsoSource;
+      }
+
       await addressInstance.save({ transaction: t });
     }
     addressInstances.push(addressInstance);
@@ -129,8 +135,10 @@ async function createNewMagicUser({
     const newUser = await models.User.createWithProfile(
       models,
       {
-        email: magicUserMetadata.email || null,
-        emailVerified: true,
+        // never use emails from magic, even for "email" login -- magic maintains the mapping
+        // of emails/socials -> addresses, and we rely ONLY on the address as a canonical piece
+        // of login information.
+        email: null,
       },
       { transaction },
     );
@@ -153,6 +161,7 @@ async function createNewMagicUser({
         generatedAddresses,
         newUser,
         walletSsoSource,
+        decodedMagicToken,
         transaction,
       );
 
@@ -273,6 +282,7 @@ async function loginExistingMagicUser({
       generatedAddresses,
       existingUserInstance,
       walletSsoSource,
+      decodedMagicToken,
       transaction,
     );
 
@@ -320,6 +330,7 @@ async function mergeLogins(ctx: MagicLoginContext): Promise<UserInstance> {
     {
       user_id: loggedInUser.id,
       profile_id: loggedInUser.Profiles[0].id,
+      verification_token: ctx.decodedMagicToken.claim.tid,
     },
     {
       where: {
@@ -349,6 +360,7 @@ async function addMagicToUser({
     generatedAddresses,
     loggedInUser,
     walletSsoSource,
+    decodedMagicToken,
   );
 
   // create new token with provided user/address. contract is each address owns an SsoToken.
@@ -396,6 +408,25 @@ async function magicLoginRoute(
   // canonical address is always ethereum
   const canonicalAddress = decodedMagicToken.publicAddress;
 
+  // replay attack check
+  const didTokenId = decodedMagicToken.claim.tid; // single-use token id
+
+  // The same didToken is used for potentially two addresses at the same time
+  // (ex: Eth and cosmos for Cosmos sign-in),
+  // but if a single one is found we reject the token replay
+  const usedMagicToken = await models.Address.findOne({
+    where: {
+      verification_token: didTokenId,
+    },
+  });
+
+  if (usedMagicToken) {
+    log.warn('Replay attack detected.');
+    throw new Error(
+      `Replay attack detected for user ${decodedMagicToken.publicAddress}.`,
+    );
+  }
+
   // validate chain if provided (i.e. logging in on community page)
   if (req.body.chain) {
     [chainToJoin, error] = await validateCommunity(models, req.body);
@@ -428,9 +459,13 @@ async function magicLoginRoute(
     }
   }
 
-  const magicUserMetadata = await magic.users.getMetadataByIssuer(
+  const isCosmos = chainToJoin?.base === ChainBase.CosmosSDK;
+
+  const magicUserMetadata = await magic.users.getMetadataByIssuerAndWallet(
     decodedMagicToken.issuer,
+    isCosmos ? WalletType.COSMOS : WalletType.ETH,
   );
+
   log.trace(
     `MAGIC USER METADATA: ${JSON.stringify(magicUserMetadata, null, 2)}`,
   );
@@ -441,24 +476,25 @@ async function magicLoginRoute(
     const session: Session = {
       type: 'session',
       signature: req.body.signature,
-      payload: JSON.parse(req.body.sessionPayload),
+      payload: req.body.sessionPayload
+        ? JSON.parse(req.body.sessionPayload)
+        : undefined,
     };
-    if (process.env.ENFORCE_SESSION_KEYS === 'true') {
-      if (req.body.magicAddress !== session.payload.from) {
-        throw new Error(
-          'sessionPayload address did not match user-provided magicAddress',
-        );
-      }
-      const valid = await verifyCanvas({ session });
-      if (!valid) {
-        throw new Error('sessionPayload signed with invalid signature');
-      }
-    }
+
     if (chainToJoin) {
-      if (
-        chainToJoin.base === ChainBase.CosmosSDK &&
-        session.payload.chain.startsWith('cosmos:')
-      ) {
+      if (isCosmos) {
+        // (magic bug?): magic typing doesn't match data, so we need to cast as any
+        const magicWallets = magicUserMetadata.wallets as any[];
+        const magicUserMetadataCosmosAddress = magicWallets?.find(
+          (wallet) => wallet.wallet_type === WalletType.COSMOS,
+        )?.public_address;
+
+        if (req.body.magicAddress !== magicUserMetadataCosmosAddress) {
+          throw new Error(
+            'user-provided magicAddress does not match magic metadata Cosmos address',
+          );
+        }
+
         generatedAddresses.push({
           address: req.body.magicAddress,
           chain: chainToJoin.id,
@@ -478,6 +514,21 @@ async function magicLoginRoute(
         );
       }
     }
+
+    if (process.env.ENFORCE_SESSION_KEYS === 'true') {
+      if (
+        !session.payload?.from ||
+        req.body.magicAddress !== session.payload.from
+      ) {
+        throw new Error(
+          'sessionPayload address did not match user-provided magicAddress',
+        );
+      }
+      const valid = await verifyCanvas({ session });
+      if (!valid) {
+        throw new Error('sessionPayload signed with invalid signature');
+      }
+    }
   } catch (err) {
     log.warn(
       `Could not set up a valid client-side magic address ${req.body.magicAddress}`,
@@ -487,37 +538,25 @@ async function magicLoginRoute(
   // attempt to locate an existing magic user by canonical address.
   // this is the properly modern method of identifying users, as it conforms to
   // the DID standard.
-  let existingUserInstance = await models.User.scope('withPrivateData').findOne(
-    {
-      include: [
-        {
-          model: models.Address,
-          where: {
-            wallet_id: WalletId.Magic,
-            address: canonicalAddress,
-            verified: { [Op.ne]: null },
-          },
-          required: true,
+  const existingUserInstance = await models.User.scope(
+    'withPrivateData',
+  ).findOne({
+    include: [
+      {
+        model: models.Address,
+        where: {
+          wallet_id: WalletId.Magic,
+          address: canonicalAddress,
+          verified: { [Op.ne]: null },
         },
-        {
-          model: models.Profile,
-        },
-      ],
-    },
-  );
-  if (!existingUserInstance && magicUserMetadata.email) {
-    // if unable to locate a magic user by address, attempt to locate by email.
-    // only legacy users (pre-magic or magic but with broken assumptions) should
-    // trigger this case, as it was formerly canonical.
-    existingUserInstance = await models.User.scope('withPrivateData').findOne({
-      where: { email: magicUserMetadata.email },
-      include: [
-        {
-          model: models.Profile,
-        },
-      ],
-    });
-  }
+        required: true,
+      },
+      {
+        model: models.Profile,
+      },
+    ],
+  });
+
   log.trace(
     `EXISTING USER INSTANCE: ${JSON.stringify(existingUserInstance, null, 2)}`,
   );
@@ -531,6 +570,7 @@ async function magicLoginRoute(
       generatedAddresses,
       loggedInUser,
       walletSsoSource,
+      decodedMagicToken,
     );
     return cb(null, existingUserInstance);
   }
@@ -584,7 +624,11 @@ export function initMagicAuth(models: DB) {
     const magic = new Magic(MAGIC_API_KEY);
     passport.use(
       new MagicStrategy({ passReqToCallback: true }, async (req, user, cb) => {
-        return magicLoginRoute(magic, models, req, user, cb);
+        try {
+          return await magicLoginRoute(magic, models, req, user, cb);
+        } catch (e) {
+          return cb(e, user);
+        }
       }),
     );
   }

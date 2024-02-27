@@ -55,9 +55,8 @@ const communities = [
 
 const LandingPage = () => {
   const forceRerender = useForceRerender();
-  console.log(app.config.chains);
 
-  if (app.loginState !== LoginState.LoggedIn && app.platform() === 'web') {
+  if (app.loginState !== LoginState.LoggedIn) {
     return (
       <div className="LandingPage">
         <Header onLogin={forceRerender} />

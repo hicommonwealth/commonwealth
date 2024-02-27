@@ -1,3 +1,4 @@
+import { String } from 'aws-sdk/clients/apigateway';
 import { AbiItem } from 'web3-utils';
 import { namespaceFactoryAbi } from './Abi/NamespaceFactoryAbi';
 import { reservationHookAbi } from './Abi/ReservationHookAbi';
@@ -13,16 +14,19 @@ class NamespaceFactory extends ContractBase {
    * Initializes a namespace instance at factory address
    * @param factoryAddress the address of the active factory to use
    */
-  constructor(factoryAddress: string) {
-    super(factoryAddress, namespaceFactoryAbi);
+  constructor(factoryAddress: string, rpc: string) {
+    super(factoryAddress, namespaceFactoryAbi, rpc);
   }
 
   /**
    * Initializes wallet and contracts.
    * This must be called after instantiation before other methods are available.
    */
-  async initialize(): Promise<void> {
-    await super.initialize();
+  async initialize(
+    withWallet: boolean = false,
+    chainId?: string,
+  ): Promise<void> {
+    await super.initialize(withWallet, chainId);
     const addr = await this.contract.methods.reservationHook().call();
     if (addr.toLowerCase() !== '0x0000000000000000000000000000000000000000') {
       this.reservationHook = new this.web3.eth.Contract(
@@ -38,7 +42,9 @@ class NamespaceFactory extends ContractBase {
    * @returns contract address 0x...
    */
   async getNamespaceAddress(name: string): Promise<string> {
-    this.isInitialized();
+    if (!this.initialized) {
+      await this.initialize();
+    }
     const hexString = this.web3.utils.utf8ToHex(name);
     const activeNamespace = await this.contract.methods
       .getNamespace(hexString)
@@ -53,7 +59,9 @@ class NamespaceFactory extends ContractBase {
    * @returns Boolean: true when namespace is available, otherwise false
    */
   async checkNamespaceReservation(name: string): Promise<boolean> {
-    this.isInitialized();
+    if (!this.initialized) {
+      await this.initialize();
+    }
     const activeNamespace = await this.getNamespaceAddress(name);
     if (activeNamespace !== '0x0000000000000000000000000000000000000000') {
       return false;
@@ -69,11 +77,19 @@ class NamespaceFactory extends ContractBase {
   /**
    * Deploys a new namespace. Note current wallet will be admin of namespace
    * @param name New Namespace name
+   * @param walletAddress an active evm wallet addresss to send tx from
    * @param feeManager wallet or contract address to send community fees
    * @returns txReceipt or Error if name is taken or tx fails
    */
-  async deployNamespace(name: string, feeManager: string): Promise<any> {
-    this.isInitialized();
+  async deployNamespace(
+    name: string,
+    walletAddress: string,
+    feeManager: string,
+    chainId: String,
+  ): Promise<any> {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true, chainId);
+    }
     // Check if name is available
     const namespaceStatus = await this.checkNamespaceReservation(name);
     if (!namespaceStatus) {
@@ -82,9 +98,14 @@ class NamespaceFactory extends ContractBase {
 
     let txReceipt;
     try {
+      const uri = `${window.location.origin}/api/namespaceMetadata/${name}/{id}`;
       txReceipt = await this.contract.methods
-        .deployNamespace(name, feeManager, [])
-        .send({ from: this.wallet.accounts[0] });
+        .deployNamespace(name, uri, feeManager, [])
+        .send({
+          from: walletAddress,
+          maxPriorityFeePerGas: null,
+          maxFeePerGas: null,
+        });
     } catch (error) {
       throw new Error('Transaction failed: ' + error);
     }
@@ -97,15 +118,35 @@ class NamespaceFactory extends ContractBase {
    * Note: current wallet address must be an admin on the namespace specified
    * @param name Namespace name
    * @param stakesId the id on the namespace to use for stake
+   * @param walletAddress an active evm wallet addresss to send tx from
    * @returns tx receipt or failure message
    */
-  async configureCommunityStakes(name: string, stakesId: number): Promise<any> {
-    this.isInitialized();
+  async configureCommunityStakes(
+    name: string,
+    stakesId: number,
+    walletAddress: string,
+    chainId: string,
+  ): Promise<any> {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true, chainId);
+    }
+
     let txReceipt;
     try {
       txReceipt = await this.contract.methods
-        .configureCommunityStakesId(name, name + ' Community Stake', stakesId)
-        .send({ from: this.wallet.accounts[0] });
+        .configureCommunityStakeId(
+          name,
+          name + ' Community Stake',
+          stakesId,
+          '0x0000000000000000000000000000000000000000',
+          100000000,
+          0,
+        )
+        .send({
+          from: walletAddress,
+          maxPriorityFeePerGas: null,
+          maxFeePerGas: null,
+        });
     } catch {
       throw new Error('Transaction failed');
     }

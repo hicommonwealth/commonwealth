@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import app, { resetDatabase } from '../../../server-test';
+import app from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import { Errors as updateEmailErrors } from '../../../server/routes/updateEmail';
 import * as modelUtils from '../../util/modelUtils';
@@ -15,7 +16,7 @@ const markdownThread = require('../../util/fixtures/markdownThread');
 
 describe('User Model Routes', () => {
   before('reset database', async () => {
-    await resetDatabase();
+    await tester.seedDb();
   });
 
   describe('/updateEmail', () => {

@@ -19,7 +19,7 @@ class ChainInfo {
   public description: string;
   public socialLinks: string[];
   public stagesEnabled: boolean;
-  public customStages: string;
+  public customStages: string[];
   public customDomain: string;
   public snapshot: string[];
   public terms: string;
@@ -255,13 +255,14 @@ class ChainInfo {
     discord_bot_webhooks_enabled,
     directory_page_enabled,
     directory_page_chain_node_id,
+    type,
   }: {
     name?: string;
     description?: string;
     social_links?: string[];
     discord?: string;
     stagesEnabled?: boolean;
-    customStages?: string;
+    customStages?: string[];
     customDomain?: string;
     terms?: string;
     snapshot?: string[];
@@ -274,6 +275,7 @@ class ChainInfo {
     discord_bot_webhooks_enabled?: boolean;
     directory_page_enabled?: boolean;
     directory_page_chain_node_id?: number;
+    type?: string;
   }) {
     const id = app.activeChainId() ?? this.id;
     const r = await axios.patch(`${app.serverUrl()}/communities/${id}`, {
@@ -295,6 +297,7 @@ class ChainInfo {
       discord_bot_webhooks_enabled,
       directory_page_enabled,
       directory_page_chain_node_id,
+      type,
       jwt: app.user.jwt,
     });
     const updatedChain = r.data.result;
@@ -314,6 +317,7 @@ class ChainInfo {
     this.discordBotWebhooksEnabled = updatedChain.discord_bot_webhooks_enabled;
     this.directoryPageEnabled = updatedChain.directory_page_enabled;
     this.directoryPageChainNodeId = updatedChain.directory_page_chain_node_id;
+    this.type = updatedChain.type;
   }
 
   public categorizeSocialLinks(): CategorizedSocialLinks {

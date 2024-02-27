@@ -13,11 +13,13 @@ import './SearchBarThreadPreviewRow.scss';
 interface SearchBarThreadPreviewRowProps {
   searchResult: ThreadResult;
   searchTerm?: string;
+  onSearchItemClick?: () => void;
 }
 
 export const SearchBarThreadPreviewRow: FC<SearchBarThreadPreviewRowProps> = ({
   searchResult,
   searchTerm,
+  onSearchItemClick,
 }) => {
   const navigate = useCommonNavigate();
 
@@ -27,6 +29,7 @@ export const SearchBarThreadPreviewRow: FC<SearchBarThreadPreviewRowProps> = ({
   const handleClick = () => {
     const path = `/${searchResult.community_id}/discussion/${searchResult.id}`;
     navigate(path, {}, null);
+    onSearchItemClick?.();
   };
 
   return (
@@ -40,6 +43,9 @@ export const SearchBarThreadPreviewRow: FC<SearchBarThreadPreviewRowProps> = ({
         <CWText type="caption" className="last-updated-text">
           {moment(searchResult.created_at).format('l')}
         </CWText>
+      </div>
+
+      <div className="content-row">
         <CWText type="b2" fontWeight="bold">
           {renderTruncatedHighlights(searchTerm, title)}
         </CWText>

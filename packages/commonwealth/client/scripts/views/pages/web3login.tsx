@@ -4,19 +4,22 @@ import 'pages/web3login.scss';
 import React from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import app from 'state';
+import { useFlag } from '../../hooks/useFlag';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 import { CWModal } from '../components/component_kit/new_designs/CWModal';
+import { AuthModal } from '../modals/AuthModal';
 import { LoginModal } from '../modals/login_modal';
 import { PageNotFound } from './404';
 import { PageLoading } from './loading';
 
 const Web3LoginPage = () => {
+  const newSignInModalEnabled = useFlag('newSignInModal');
   const [searchParams] = useSearchParams();
   const [errorMsg, setErrorMsg] = React.useState<string>('');
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = React.useState<boolean>(false);
 
   const token = searchParams.get('connect');
   const prev = searchParams.get('prev');
@@ -62,12 +65,21 @@ const Web3LoginPage = () => {
 
   return (
     <>
-      <CWModal
-        content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
-        isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-        onClose={() => setIsModalOpen(false)}
-        open={isModalOpen}
-      />
+      {!newSignInModalEnabled ? (
+        <CWModal
+          content={
+            <LoginModal onModalClose={() => setIsAuthModalOpen(false)} />
+          }
+          isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
+          onClose={() => setIsAuthModalOpen(false)}
+          open={isAuthModalOpen}
+        />
+      ) : (
+        <AuthModal
+          onClose={() => setIsAuthModalOpen(false)}
+          isOpen={isAuthModalOpen}
+        />
+      )}
       <div className="Web3LoginPage">
         <div className="web3-login-container">
           <CWButton
@@ -77,7 +89,7 @@ const Web3LoginPage = () => {
               if (app.isLoggedIn()) {
                 onSuccess();
               } else {
-                setIsModalOpen(true);
+                setIsAuthModalOpen(true);
               }
             }}
           />

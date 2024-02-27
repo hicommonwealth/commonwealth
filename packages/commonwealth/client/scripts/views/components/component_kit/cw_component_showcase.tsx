@@ -31,7 +31,7 @@ import {
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { AvatarUpload } from '../Avatar';
-import CommunityStakeBanner from '../CommunityStakeBanner';
+import { CommunityStakeBanner, VoteWeightModule } from '../CommunityStake';
 import UpvotePopover from '../UpvotePopover';
 import { CWCard } from './cw_card';
 import { CWCheckbox } from './cw_checkbox';
@@ -45,7 +45,6 @@ import { CWProgressBar } from './cw_progress_bar';
 import type { RadioButtonType } from './cw_radio_button';
 import { CWRadioButton } from './cw_radio_button';
 import { CWRadioGroup } from './cw_radio_group';
-import { CWSpinner } from './cw_spinner';
 import { CWText } from './cw_text';
 import { CWTextArea } from './cw_text_area';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
@@ -59,6 +58,7 @@ import { CWCircleButton } from './new_designs/CWCircleButton/CWCircleButton';
 import CWDrawer from './new_designs/CWDrawer';
 import { CWForm } from './new_designs/CWForm';
 import CWIconButton from './new_designs/CWIconButton';
+import CWLoadingSpinner from './new_designs/CWLoadingSpinner';
 import { CWModal, CWModalBody, CWModalHeader } from './new_designs/CWModal';
 import { ModalSize } from './new_designs/CWModal/CWModal';
 import { CWRelatedCommunityCard } from './new_designs/CWRelatedCommunityCard';
@@ -70,7 +70,6 @@ import { CWTag } from './new_designs/CWTag';
 import { CWTextInput } from './new_designs/CWTextInput';
 import { CWTooltip } from './new_designs/CWTooltip';
 import { CWTypeaheadSelectList } from './new_designs/CWTypeaheadSelectList';
-import CWVoteWeightModule from './new_designs/CWVoteWeightModule';
 import { createColumnInfo, makeData, optionList } from './showcase_helpers';
 
 const displayIcons = (icons) => {
@@ -210,6 +209,16 @@ const tagsList = [
   { label: 'Sixth', id: 5 },
 ];
 
+const tabsList = [
+  { label: 'First boxed tab', id: 0 },
+  {
+    label: 'Second boxed tab is very long so it gets truncated at some point',
+    id: 1,
+  },
+  { label: 'Third is with Icon', id: 2, iconLeft: 'eye' },
+  { label: 'Fourth - disabled', id: 3, disabled: true },
+];
+
 export const ComponentShowcase = () => {
   const [isSmallToggled, setIsSmallToggled] = useState<boolean>(false);
   const [isLargeToggled, setIsLargeToggled] = useState<boolean>(false);
@@ -238,6 +247,7 @@ export const ComponentShowcase = () => {
   const allCommunities = app.config.chains.getAll();
   const [communityId, setCommunityId] = useState(allCommunities[1]);
   const [currentTab, setCurrentTab] = useState(tagsList[0].id);
+  const [currentBoxedTab, setCurrentBoxedTab] = useState(tabsList[0].id);
 
   const unstyledPopoverProps = usePopover();
   const styledPopoverProps = usePopover();
@@ -1085,7 +1095,7 @@ export const ComponentShowcase = () => {
       </div>
       <div className="basic-gallery">
         <CWText type="h3">Spinner</CWText>
-        <CWSpinner />
+        <CWLoadingSpinner center={false} />
       </div>
       <div className="basic-gallery">
         <CWText type="h3">Breadcrumbs</CWText>
@@ -1206,6 +1216,21 @@ export const ComponentShowcase = () => {
               showTag={tab.showTag}
               isSelected={currentTab === tab.id}
               onClick={() => setCurrentTab(tab.id)}
+            />
+          ))}
+        </CWTabsRow>
+
+        <CWText type="h3">Boxed Tabs</CWText>
+        <CWTabsRow boxed={true}>
+          {tabsList.map((tab) => (
+            <CWTab
+              boxed={true}
+              key={tab.id}
+              label={tab.label}
+              isDisabled={tab.disabled}
+              iconLeft={tab.iconLeft as IconName}
+              isSelected={currentBoxedTab === tab.id}
+              onClick={() => setCurrentBoxedTab(tab.id)}
             />
           ))}
         </CWTabsRow>
@@ -2158,11 +2183,12 @@ export const ComponentShowcase = () => {
       </div>
       <div>
         <CWText type="h3">Vote Weight Module</CWText>
-        <CWVoteWeightModule
+        <VoteWeightModule
           voteWeight={100}
           stakeNumber={1}
           stakeValue={0.072}
           denomination="ETH"
+          onOpenStakeModal={() => console.log('open modal')}
         />
       </div>
       <div className="drawer-container">
@@ -2172,11 +2198,7 @@ export const ComponentShowcase = () => {
           onClick={() => setIsDrawerOpen(true)}
         />
 
-        <CWDrawer
-          open={isDrawerOpen}
-          header="Lorem Ipsum"
-          onClose={() => setIsDrawerOpen(false)}
-        >
+        <CWDrawer open={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}>
           <div>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis
             porttitor vel erat nec eleifend. Nullam sit amet dui et eros luctus
@@ -2195,7 +2217,6 @@ export const ComponentShowcase = () => {
         />
         <CWDrawer
           open={isLeftDrawerOpen}
-          header="Lorem Ipsum"
           onClose={() => setIsLeftDrawerOpen(false)}
           direction="left"
         >

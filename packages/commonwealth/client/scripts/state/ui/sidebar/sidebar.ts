@@ -1,15 +1,10 @@
-import { createStore } from 'zustand/vanilla';
-import { persist } from 'zustand/middleware';
-import { devtools } from 'zustand/middleware';
 import { createBoundedUseStore } from 'state/ui/utils';
-import { SidebarMenuName } from 'views/components/sidebar';
-import { MobileMenuName } from 'views/AppMobileMenus';
 import { isWindowSmallInclusive } from 'views/components/component_kit/helpers';
-import { featureFlags } from '../../../helpers/feature-flags';
+import { SidebarMenuName } from 'views/components/sidebar';
+import { devtools, persist } from 'zustand/middleware';
+import { createStore } from 'zustand/vanilla';
 
 interface SidebarStore {
-  mobileMenuName: MobileMenuName;
-  setMobileMenuName: (name: MobileMenuName) => void;
   menuName: SidebarMenuName;
   menuVisible: boolean;
   setUserToggledVisibility: (toggled: 'open' | 'closed' | null) => void;
@@ -28,13 +23,10 @@ interface SidebarStore {
 export const sidebarStore = createStore<SidebarStore>()(
   devtools(
     persist(
-      (set, get) => ({
-        mobileMenuName: null,
-        setMobileMenuName: (name) => set(() => ({ mobileMenuName: name })),
+      (set) => ({
         menuName: 'default',
         menuVisible: true,
-        userToggledVisibility:
-          featureFlags.sidebarToggle !== true ? 'closed' : null,
+        userToggledVisibility: null,
         setUserToggledVisibility: (toggled) => {
           set(() => ({ userToggledVisibility: toggled }));
           set((state) => ({
@@ -62,9 +54,9 @@ export const sidebarStore = createStore<SidebarStore>()(
           userToggledVisibility: state.userToggledVisibility,
           menuVisible: state.menuVisible,
         }), // persist only userToggledVisibility and menuVisible
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 const useSidebarStore = createBoundedUseStore(sidebarStore);

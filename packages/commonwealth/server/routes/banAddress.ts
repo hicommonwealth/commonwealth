@@ -5,14 +5,12 @@ import { success } from '../types';
 import { validateOwner } from '../util/validateOwner';
 
 enum BanAddressErrors {
-  NoChain = 'Must supply a chain ID',
   NoAddress = 'Must supply an address',
   NoPermission = 'You do not have permission to ban an address',
   AlreadyExists = 'Ban for this address already exists',
 }
 
 type BanAddressReq = Omit<BanInstance, 'id'> & {
-  chain_id: string;
   address: string;
 };
 
@@ -23,12 +21,12 @@ const banAddress = async (
   req: TypedRequestBody<BanAddressReq>,
   res: TypedResponse<BanAddressResp>,
 ) => {
-  const chain = req.chain;
+  const { community } = req;
 
   const isAdmin = await validateOwner({
     models: models,
     user: req.user,
-    communityId: chain.id,
+    communityId: community.id,
     allowAdmin: true,
     allowSuperAdmin: true,
   });
@@ -43,11 +41,11 @@ const banAddress = async (
   // find or create Ban
   const [ban, created] = await models.Ban.findOrCreate({
     where: {
-      community_id: chain.id,
+      community_id: community.id,
       address,
     },
     defaults: {
-      community_id: chain.id,
+      community_id: community.id,
       address,
     },
   });

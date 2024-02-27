@@ -1,0 +1,21 @@
+@import '../../../../../styles/shared.scss';
+
+.NavigationButton {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 4px 16px 0;
+  min-width: 80px;
+
+  svg {
+    fill: $neutral-600;
+  }
+
+  .Text {
+    font-size: 8px;
+    color: $neutral-500;
+    line-height: 16px;
+  }
+}
