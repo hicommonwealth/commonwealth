@@ -1,12 +1,12 @@
-import type {
+import {
   ChainBase,
   ChainNetwork,
   ChainType,
   DefaultPage,
 } from '@hicommonwealth/core';
-import type { RegisteredTypes } from '@polkadot/types/types';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
+import { z } from 'zod';
 import type { AddressAttributes, AddressInstance } from './address';
 import type { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
 import type { CommentAttributes } from './comment';
@@ -19,42 +19,46 @@ import type { TopicAttributes, TopicInstance } from './topic';
 import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes } from './user';
 
-export type CommunityAttributes = {
-  name: string;
-  chain_node_id: number;
-  default_symbol: string;
-  network: ChainNetwork;
-  base: ChainBase;
-  icon_url: string;
-  active: boolean;
-  type: ChainType;
-  id?: string;
-  description?: string;
-  social_links?: string[];
-  ss58_prefix?: number;
-  stages_enabled?: boolean;
-  custom_stages?: string[];
-  custom_domain?: string;
-  block_explorer_ids?: string;
-  collapsed_on_homepage?: boolean;
-  substrate_spec?: RegisteredTypes;
-  has_chain_events_listener?: boolean;
-  default_summary_view?: boolean;
-  default_page?: DefaultPage;
-  has_homepage?: boolean;
-  terms?: string;
-  admin_only_polling?: boolean;
-  bech32_prefix?: string;
-  hide_projects?: boolean;
-  token_name?: string;
-  ce_verbose?: boolean;
-  discord_config_id?: number;
-  category?: any;
-  discord_bot_webhooks_enabled?: boolean;
-  directory_page_enabled?: boolean;
-  directory_page_chain_node_id?: number;
-  namespace?: string;
+export const CommunitySchema = z.object({
+  name: z.string(),
+  chain_node_id: z.number(),
+  default_symbol: z.string(),
+  network: z.nativeEnum(ChainNetwork),
+  base: z.nativeEnum(ChainBase),
+  icon_url: z.string(),
+  active: z.boolean(),
+  type: z.nativeEnum(ChainType),
+  id: z.string().optional(),
+  description: z.string().optional(),
+  social_links: z.array(z.string()).optional(),
+  ss58_prefix: z.number().optional(),
+  stages_enabled: z.boolean().optional(),
+  custom_stages: z.array(z.string()).optional(),
+  custom_domain: z.string().optional(),
+  block_explorer_ids: z.string().optional(),
+  collapsed_on_homepage: z.boolean().optional(),
+  substrate_spec: z.string().optional(),
+  has_chain_events_listener: z.boolean().optional(),
+  default_summary_view: z.boolean().optional(),
+  default_page: z.nativeEnum(DefaultPage).optional(),
+  has_homepage: z.boolean().optional(),
+  terms: z.string().optional(),
+  admin_only_polling: z.boolean().optional(),
+  bech32_prefix: z.string().optional(),
+  hide_projects: z.boolean().optional(),
+  token_name: z.string().optional(),
+  ce_verbose: z.boolean().optional(),
+  discord_config_id: z.number().optional(),
+  category: z.unknown().optional(), // Assuming category can be any type
+  discord_bot_webhooks_enabled: z.boolean().optional(),
+  directory_page_enabled: z.boolean().optional(),
+  directory_page_chain_node_id: z.number().optional(),
+  namespace: z.string().optional(),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
+});
 
+export type CommunityAttributes = z.infer<typeof CommunitySchema> & {
   // associations
   ChainNode?: ChainNodeAttributes;
   Addresses?: AddressAttributes[] | AddressAttributes['id'][];
@@ -69,9 +73,6 @@ export type CommunityAttributes = {
   Contract?: ContractInstance;
   CommunityStakes?: CommunityStakeAttributes[];
   groups?: GroupAttributes[];
-
-  created_at?: Date;
-  updated_at?: Date;
 };
 
 export type CommunityInstance = ModelInstance<CommunityAttributes> & {
