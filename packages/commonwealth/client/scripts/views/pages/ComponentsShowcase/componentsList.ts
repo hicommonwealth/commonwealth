@@ -7,6 +7,7 @@ import ButtonsIconShowcase from 'views/pages/ComponentsShowcase/components/Butto
 import ColorsShowcase from 'views/pages/ComponentsShowcase/components/Colors.showcase';
 import DividersShowcase from 'views/pages/ComponentsShowcase/components/Dividers.showcase';
 import ElevationsShowcase from 'views/pages/ComponentsShowcase/components/Elevations.showcase';
+import RadioButtonsShowcase from 'views/pages/ComponentsShowcase/components/RadioButtons.showcase';
 import TypographyShowcase from 'views/pages/ComponentsShowcase/components/Typography.showcase';
 
 export const ComponentPageName = {
@@ -20,6 +21,7 @@ export const ComponentPageName = {
   Buttons: 'Buttons',
   ButtonsIcon: 'ButtonsIcon',
   ButtonsCircle: 'ButtonsCircle',
+  RadioButtons: 'RadioButtons',
 };
 
 export const ComponentType = {
@@ -76,6 +78,11 @@ export const componentItems = [
   {
     ComponentPage: ButtonsCircleShowcase,
     displayName: ComponentPageName.ButtonsCircle,
+    type: ComponentType.Components,
+  },
+  {
+    ComponentPage: RadioButtonsShowcase,
+    displayName: ComponentPageName.RadioButtons,
     type: ComponentType.Components,
   },
 ];
