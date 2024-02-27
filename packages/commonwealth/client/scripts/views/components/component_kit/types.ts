@@ -51,7 +51,6 @@ export enum ComponentType {
   TextArea = 'TextArea',
   TextInput = 'TextInput',
   ThreadAction = 'ThreadAction',
-  ThreadVoteButton = 'ThreadVoteButton',
   Toggle = 'Toggle',
   Tooltip = 'Tooltip',
   TypeaheadSelectList = 'TypeaheadSelectList',

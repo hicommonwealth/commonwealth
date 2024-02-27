@@ -46,7 +46,6 @@ import { CWRadioButton } from './cw_radio_button';
 import { CWRadioGroup } from './cw_radio_group';
 import { CWText } from './cw_text';
 import { CWTextArea } from './cw_text_area';
-import { CWThreadVoteButton } from './cw_thread_vote_button';
 import type { ValidationStatus } from './cw_validation_text';
 import { CWContentPageCard } from './CWContentPageCard';
 import { CWButton } from './new_designs/cw_button';
@@ -222,7 +221,6 @@ const tabsList = [
 export const ComponentShowcase = () => {
   const [isSmallToggled, setIsSmallToggled] = useState<boolean>(false);
   const [isLargeToggled, setIsLargeToggled] = useState<boolean>(false);
-  const [voteCount, setVoteCount] = useState<number>(0);
   const [isRadioButtonChecked, setIsRadioButtonChecked] =
     useState<boolean>(false);
   const [isCheckboxChecked, setIsCheckboxChecked] = useState<boolean>(false);
@@ -1198,15 +1196,6 @@ export const ComponentShowcase = () => {
             <CWText type="caption">Large disabled checked</CWText>
           </div>
         </div>
-      </div>
-      <div className="basic-gallery">
-        <CWText type="h3">Vote Button</CWText>
-        <CWThreadVoteButton
-          updateVoteCount={(newCount: number) => {
-            setVoteCount(newCount);
-          }}
-          voteCount={voteCount}
-        />
       </div>
       <div className="new-tabs">
         <CWText type="h3">New Tabs</CWText>
