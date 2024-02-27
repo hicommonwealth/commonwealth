@@ -82,17 +82,6 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
     }
     saveDraft(draft);
 
-    if (!threadContentDelta && threadTopic?.defaultOffchainTemplate) {
-      try {
-        const template = JSON.parse(
-          threadTopic.defaultOffchainTemplate,
-        ) as DeltaStatic;
-        setThreadContentDelta(template);
-      } catch (e) {
-        console.log(e);
-      }
-    }
-
     if (!threadTopic && defaultTopic) {
       setThreadTopic(defaultTopic);
     }
