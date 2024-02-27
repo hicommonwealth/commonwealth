@@ -51,7 +51,11 @@ export class Daemons {
     this.tasks = new Map();
   }
 
-  backgroundJob(label: string, fn: DaemonTask, ms: number): NodeJS.Timeout {
+  backgroundJob(
+    label: string,
+    fn: DaemonTask,
+    ms: number,
+  ): NodeJS.Timeout | undefined {
     // don't accept to run jobs more often than 1 minute
     if (ms < 60 * 1000) return;
 

@@ -23,7 +23,7 @@ export type TRmqMessages =
   | RmqDiscordMessage.RmqMsgType;
 
 export interface RmqMsgNamespace<MsgType> {
-  getInvalidFormatError(...args): RmqMsgFormatError;
+  getInvalidFormatError(...args: any[]): RmqMsgFormatError;
   isValidMsgFormat(data: any): data is MsgType;
   checkMsgFormat(data: any): void;
 }

@@ -1,5 +1,6 @@
-import { express } from '@hicommonwealth/adapters';
-import { Router } from 'express';
+import { express, trpc } from '@hicommonwealth/adapters';
+import { RequestHandler, Router } from 'express';
+import swaggerUi from 'swagger-ui-express';
 import * as community from './community';
 
 // root express router
@@ -14,13 +15,24 @@ expressRouter.use(
 expressRouter.use(express.errorMiddleware);
 
 // root trpc router
-// export const trpcExpressRouter = Router();
-// // aggregate sub-routers
-// const trpcRouter = trpc.router({ community: community.trpcRouter });
-// // trpc specs
-// trpcExpressRouter.use('/panel', (req, res) => {
-//   const url = req.protocol + '://' + req.get('host') + '/trpc';
-//   res.send(trpc.toPanel(trpcRouter, url));
-// });
-// // use stats middleware on all trpc routes
-// trpcExpressRouter.use('/', express.statsMiddleware, trpc.toExpress(trpcRouter));
+export const trpcExpressRouter = Router();
+// aggregate sub-routers
+const trpcRouter = trpc.router({ community: community.trpcRouter });
+// openapi
+let spec: RequestHandler | undefined = undefined;
+trpcExpressRouter.use('/openapi', swaggerUi.serve);
+trpcExpressRouter.get('/openapi', (req, res, next) => {
+  if (!spec) {
+    const baseUrl = req.protocol + '://' + req.get('host') + '/trpc';
+    const doc = trpc.toOpenApiDocument(trpcRouter, {
+      title: 'Common API',
+      version: '1.0.0',
+      tags: ['User', 'Community', 'Thread', 'Comment', 'Reaction'],
+      baseUrl,
+    });
+    spec = swaggerUi.setup(doc);
+  }
+  return spec(req, res, next);
+});
+// use stats middleware on all trpc routes
+trpcExpressRouter.use('/', express.statsMiddleware, trpc.toExpress(trpcRouter));

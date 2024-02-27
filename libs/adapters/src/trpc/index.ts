@@ -1,99 +1,150 @@
-import type { CommandMetadata, QueryMetadata } from '@hicommonwealth/core';
 import * as core from '@hicommonwealth/core';
 import {
-  TRPCError,
-  initTRPC,
-  type MiddlewareBuilder,
-  type ProcedureParams,
-} from '@trpc/server';
-import {
-  CreateExpressContextOptions,
-  createExpressMiddleware,
-} from '@trpc/server/adapters/express';
-import passport from 'passport';
-//import superjson from 'superjson';
+  INVALID_ACTOR_ERROR,
+  INVALID_INPUT_ERROR,
+  type CommandMetadata,
+  type QueryMetadata,
+} from '@hicommonwealth/core';
+import { TRPCError, initTRPC } from '@trpc/server';
 import { Request } from 'express';
-import { renderTrpcPanel } from 'trpc-panel';
-import { AnyZodObject, z } from 'zod';
+import passport from 'passport';
+import {
+  createOpenApiExpressMiddleware,
+  generateOpenApiDocument,
+  type GenerateOpenApiDocumentOptions,
+  type OpenApiMeta,
+  type OpenApiRouter,
+} from 'trpc-openapi';
+import { ZodObject, z } from 'zod';
 
 interface Context {
   req: Request;
 }
 
-const trpc = initTRPC.context<Context>().create({
-  //transformer: superjson,
-});
+const trpc = initTRPC.meta<OpenApiMeta>().context<Context>().create();
 
 export const router = trpc.router;
 
-export const authenticate = trpc.middleware(async ({ ctx, next }) => {
+const authenticate = async (req: Request) => {
   try {
     await passport.authenticate('jwt', { session: false });
-    if (!ctx.req.user) throw new Error('Not authenticated');
-    return next();
+    if (!req.user) throw new Error('Not authenticated');
   } catch (error) {
-    throw new TRPCError({ message: error.message, code: 'UNAUTHORIZED' });
+    throw new TRPCError({
+      message: error instanceof Error ? error.message : (error as string),
+      code: 'UNAUTHORIZED',
+    });
   }
-});
+};
 
-export const command = <T, P extends AnyZodObject>(
-  md: CommandMetadata<T, P>,
-  middleware?: MiddlewareBuilder<ProcedureParams, ProcedureParams>,
-) =>
-  (middleware ? trpc.procedure.use(middleware) : trpc.procedure)
+const trpcerror = (error: unknown): TRPCError => {
+  if (error instanceof Error) {
+    const { name, message } = error;
+    switch (name) {
+      case INVALID_INPUT_ERROR:
+        return new TRPCError({ code: 'BAD_REQUEST', message });
+
+      case INVALID_ACTOR_ERROR:
+        return new TRPCError({ code: 'UNAUTHORIZED', message });
+
+      default:
+        return new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message,
+          cause: process.env.NODE_ENV !== 'production' ? error : undefined,
+        });
+    }
+  }
+  return new TRPCError({
+    code: 'INTERNAL_SERVER_ERROR',
+    message: 'Oops, something went wrong!',
+  });
+};
+
+export const command = <T, P extends ZodObject<any>>(
+  aggregate: string,
+  factory: () => CommandMetadata<T, P>,
+  auth = false,
+) => {
+  const md = factory();
+  return trpc.procedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: `/{id}/${factory.name}`,
+        tags: [aggregate],
+        protect: auth,
+      },
+    })
     .input(
-      z
-        .object({
-          id: z.string().optional(),
-          address_id: z.string().optional(),
-        })
-        .merge(md.schema),
+      md.schema.extend({
+        id: z.string(),
+        address_id: z.string().optional(),
+      }),
     )
-    //.output(z.object({})); // TODO
+    .output(z.object({}).optional()) // TODO: use output schemas
     .mutation(async ({ ctx, input }) => {
-      return await core.command(
-        md,
-        {
-          id: ctx.req.params.id || input.id,
-          actor: {
-            user: ctx.req.user as core.User,
-            address_id:
-              ctx.req.body.address_id ||
-              ctx.req.query.address_id ||
-              input.address_id,
+      if (auth) await authenticate(ctx.req);
+      try {
+        const { id, address_id, ...payload } = input;
+        return await core.command(
+          md,
+          {
+            id,
+            actor: {
+              user: ctx.req.user as core.User,
+              address_id,
+            },
+            payload,
           },
-          payload: input,
-        },
-        false,
-      );
+          false,
+        );
+      } catch (error) {
+        throw trpcerror(error);
+      }
     });
+};
 
-export const query = <T, P extends AnyZodObject>(
-  md: QueryMetadata<T, P>,
-  middleware?: MiddlewareBuilder<ProcedureParams, ProcedureParams>,
-) =>
-  (middleware ? trpc.procedure.use(middleware) : trpc.procedure)
-    .input(z.object({ address_id: z.string().optional() }).merge(md.schema))
-    //.output(z.object({})); // TODO
+export const query = <T, P extends ZodObject<any>>(
+  factory: () => QueryMetadata<T, P>,
+  auth = false,
+) => {
+  const md = factory();
+  return trpc.procedure
+    .meta({
+      openapi: { method: 'GET', path: `/${factory.name}`, tags: ['Queries'] },
+      protect: auth,
+    })
+    .input(md.schema.extend({ address_id: z.string().optional() }))
+    .output(z.object({}).optional()) // TODO: use output schema
     .query(async ({ ctx, input }) => {
-      return await core.query(
-        md,
-        {
-          actor: {
-            user: ctx.req.user as core.User,
-            address_id:
-              (ctx.req.query.address_id as string) || input.address_id,
+      if (auth) await authenticate(ctx.req);
+      try {
+        const { address_id, ...payload } = input;
+        return await core.query(
+          md,
+          {
+            actor: {
+              user: ctx.req.user as core.User,
+              address_id,
+            },
+            payload,
           },
-          payload: input,
-        },
-        false,
-      );
+          false,
+        );
+      } catch (error) {
+        throw trpcerror(error);
+      }
     });
+};
 
-export const toExpress = (router) =>
-  createExpressMiddleware({
+export const toExpress = (router: OpenApiRouter) =>
+  createOpenApiExpressMiddleware({
     router,
-    createContext: ({ req }: CreateExpressContextOptions) => ({ req }),
+    createContext: ({ req }) => ({ req }),
   });
 
-export const toPanel = (router, url) => renderTrpcPanel(router, { url }); //, transformer: 'superjson' });
+export const toOpenApiDocument = (
+  router: OpenApiRouter,
+  opts: GenerateOpenApiDocumentOptions,
+) => generateOpenApiDocument(router, opts);

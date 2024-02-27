@@ -8,6 +8,8 @@ import {
 import {
   ConnectionTimeoutError,
   ReconnectStrategyError,
+  RedisClientOptions,
+  RedisClientType,
   SocketClosedUnexpectedlyError,
   createClient,
 } from 'redis';
@@ -30,7 +32,7 @@ export function redisRetryStrategy(retries: number) {
  */
 export class RedisCache implements Cache {
   private _initialized = false;
-  private _client;
+  private _client: any;
   private _log: ILogger;
 
   constructor() {
@@ -56,7 +58,7 @@ export class RedisCache implements Cache {
     this._log.info(`Connecting to Redis at: ${redis_url}`);
 
     if (!this._client) {
-      const redisOptions = {};
+      const redisOptions: RedisClientOptions = {};
       redisOptions['url'] = redis_url;
 
       if (redis_url.includes('rediss')) {
@@ -71,10 +73,10 @@ export class RedisCache implements Cache {
         };
       }
 
-      this._client = createClient(redisOptions);
+      this._client = createClient(redisOptions) as RedisClientType;
     }
 
-    this._client.on('error', (err) => {
+    this._client.on('error', (err: any) => {
       if (err instanceof ConnectionTimeoutError) {
         const msg = `RedisCache connection to ${redis_url} timed out!`;
         this._log.error(msg);
@@ -92,15 +94,15 @@ export class RedisCache implements Cache {
     });
 
     this._client.on('ready', () => {
-      this._initialized = !!this._client.isOpen;
+      this._initialized = !!this._client!.isOpen;
       this._log.info(`RedisCache connection ready ${this._initialized}`);
     });
     this._client.on('reconnecting', () => {
-      this._initialized = !!this._client.isOpen;
+      this._initialized = !!this._client!.isOpen;
       this._log.info(`RedisCache reconnecting ${this._initialized}`);
     });
     this._client.on('end', () => {
-      this._initialized = !!this._client.isOpen;
+      this._initialized = !!this._client!.isOpen;
       this._log.info(`RedisCache disconnected ${this._initialized}`);
     });
 
@@ -150,7 +152,7 @@ export class RedisCache implements Cache {
           value = JSON.stringify(value);
         }
         if (duration > 0) {
-          res = await this._client.set(finalKey, value, {
+          res = await this._client!.set(finalKey, value, {
             EX: duration,
             NX: notExists,
           });
@@ -162,7 +164,7 @@ export class RedisCache implements Cache {
       }
     } catch (e) {
       const msg = `An error occurred while setting the following key value pair '${namespace} ${key}: ${value}'`;
-      this._log.error(msg, e);
+      this._log.error(msg, e as Error);
       return false;
     }
 
@@ -173,15 +175,15 @@ export class RedisCache implements Cache {
   public async getKey(
     namespace: CacheNamespaces,
     key: string,
-  ): Promise<string> {
+  ): Promise<string | undefined> {
     try {
       if (this.initialized()) {
         const finalKey = RedisCache.getNamespaceKey(namespace, key);
-        return await this._client.get(finalKey);
+        return (await this._client!.get(finalKey)) ?? '';
       }
     } catch (e) {
       const msg = `An error occurred while getting the following key '${key}'`;
-      this._log.error(msg, e);
+      this._log.error(msg, e as Error);
     }
   }
 
@@ -201,13 +203,13 @@ export class RedisCache implements Cache {
     data: { [key: string]: string },
     duration = 0,
     transaction = true,
-  ): Promise<false | Array<'OK' | null>> {
+  ): Promise<false | Array<'OK' | null> | undefined> {
     if (this.initialized()) {
       // add the namespace prefix to all keys
       const transformedData = Object.keys(data).reduce((result, key) => {
         result[RedisCache.getNamespaceKey(namespace, key)] = data[key];
         return result;
-      }, {});
+      }, {} as any);
 
       if (duration > 0) {
         // MSET doesn't support setting TTL, so we need use
@@ -226,7 +228,7 @@ export class RedisCache implements Cache {
           const msg =
             `Error occurred while setting multiple keys ` +
             `${transaction ? 'in a transaction' : 'in a pipeline'}`;
-          this._log.error(msg, e);
+          this._log.error(msg, e as Error);
           return false;
         }
       } else {
@@ -234,7 +236,7 @@ export class RedisCache implements Cache {
           return await this._client.MSET(transformedData);
         } catch (e) {
           const msg = 'Error occurred while setting multiple keys';
-          this._log.error(msg, e);
+          this._log.error(msg, e as Error);
           return false;
         }
       }
@@ -244,7 +246,7 @@ export class RedisCache implements Cache {
   public async getKeys(
     namespace: CacheNamespaces,
     keys: string[],
-  ): Promise<false | Record<string, unknown>> {
+  ): Promise<false | Record<string, unknown> | undefined> {
     if (this.initialized()) {
       const transformedKeys = keys.map((k) =>
         RedisCache.getNamespaceKey(namespace, k),
@@ -257,10 +259,10 @@ export class RedisCache implements Cache {
             obj[key] = values[index];
           }
           return obj;
-        }, {});
+        }, {} as any);
       } catch (e) {
         const msg = 'An error occurred while getting many keys';
-        this._log.error(msg, e);
+        this._log.error(msg, e as Error);
         return false;
       }
       return result;
@@ -278,7 +280,7 @@ export class RedisCache implements Cache {
     namespace: CacheNamespaces,
     key: string,
     increment = 1,
-  ): Promise<number | null> {
+  ): Promise<number | null | undefined> {
     try {
       if (this.initialized()) {
         const finalKey = RedisCache.getNamespaceKey(namespace, key);
@@ -286,7 +288,7 @@ export class RedisCache implements Cache {
       }
     } catch (e) {
       const msg = `An error occurred while incrementing the key: ${key}`;
-      this._log.error(msg, e);
+      this._log.error(msg, e as Error);
       return null;
     }
   }
@@ -302,7 +304,7 @@ export class RedisCache implements Cache {
     namespace: CacheNamespaces,
     key: string,
     decrement = 1,
-  ): Promise<number | null> {
+  ): Promise<number | null | undefined> {
     try {
       if (this.initialized()) {
         const finalKey = RedisCache.getNamespaceKey(namespace, key);
@@ -310,7 +312,7 @@ export class RedisCache implements Cache {
       }
     } catch (e) {
       const msg = `An error occurred while decrementing the key: ${key}`;
-      this._log.error(msg, e);
+      this._log.error(msg, e as Error);
       return null;
     }
   }
@@ -342,7 +344,7 @@ export class RedisCache implements Cache {
       }
     } catch (e) {
       const msg = `An error occurred while setting the expiration of the key: ${key}`;
-      this._log.error(msg, e);
+      this._log.error(msg, e as Error);
     }
     return false;
   }
@@ -365,7 +367,7 @@ export class RedisCache implements Cache {
       }
     } catch (e) {
       const msg = `An error occurred while retrieving the TTL of the key: ${key}`;
-      this._log.error(msg, e);
+      this._log.error(msg, e as Error);
     }
     return -2;
   }
@@ -378,9 +380,9 @@ export class RedisCache implements Cache {
   public async getNamespaceKeys(
     namespace: CacheNamespaces,
     maxResults = 1000,
-  ): Promise<{ [key: string]: string } | boolean> {
+  ): Promise<{ [key: string]: string } | boolean | undefined> {
     const keys = [];
-    const data = {};
+    const data = {} as any;
     try {
       if (this.initialized()) {
         for await (const key of this._client.scanIterator({
@@ -396,7 +398,7 @@ export class RedisCache implements Cache {
       }
     } catch (e) {
       const msg = 'An error occurred while fetching the namespace keys';
-      this._log.error(msg, e);
+      this._log.error(msg, e as Error);
       return false;
     }
   }
@@ -449,14 +451,14 @@ export class RedisCache implements Cache {
             this._log.trace(`deleted key ${key} ${resp} ${count}`);
           } catch (err) {
             this._log.trace(`error deleting key ${key}`);
-            this._log.trace(err);
+            this._log.trace((err as Error).message);
           }
         }
       }
       return count;
     } catch (e) {
       const msg = `An error occurred while deleting a all keys in the ${namespace} namespace`;
-      this._log.error(msg, e);
+      this._log.error(msg, e as Error);
       return false;
     }
   }
@@ -464,7 +466,7 @@ export class RedisCache implements Cache {
   public async deleteKey(
     namespace: CacheNamespaces,
     key: string,
-  ): Promise<number> {
+  ): Promise<number | undefined> {
     const finalKey = RedisCache.getNamespaceKey(namespace, key);
     try {
       if (this.initialized()) {
@@ -472,7 +474,7 @@ export class RedisCache implements Cache {
       }
     } catch (e) {
       const msg = `An error occurred while deleting the following key: ${finalKey}`;
-      this._log.error(msg, e);
+      this._log.error(msg, e as Error);
       return 0;
     }
   }

@@ -15,9 +15,8 @@ export const command =
   <T, P extends ZodSchema>(md: CommandMetadata<T, P>): RequestHandler =>
   async (
     req: Request<
-      { id: string },
-      T,
       z.infer<P> & {
+        id?: string;
         address_id?: string;
       }
     >,
