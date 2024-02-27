@@ -11,7 +11,7 @@ import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import SubLayout from './Sublayout';
 import { CWEmptyState } from './components/component_kit/cw_empty_state';
 import { CWText } from './components/component_kit/cw_text';
-import CWLoadingSpinner from './components/component_kit/new_designs/CWLoadingSpinner';
+import CWCircleMultiplySpinner from './components/component_kit/new_designs/CWCircleMultiplySpinner';
 
 type LayoutAttrs = {
   Component: ReactNode | any;
@@ -99,7 +99,7 @@ const LayoutComponent = ({
 
     const Bobber = (
       <div className="spinner-container">
-        <CWLoadingSpinner />
+        <CWCircleMultiplySpinner />
       </div>
     );
 

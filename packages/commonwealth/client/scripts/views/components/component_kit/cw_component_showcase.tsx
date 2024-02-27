@@ -54,10 +54,11 @@ import { CWThreadAction } from './new_designs/cw_thread_action';
 import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
 import { CWUpvote } from './new_designs/cw_upvote';
 import { CWCircleButton } from './new_designs/CWCircleButton/CWCircleButton';
+import CWCircleMultiplySpinner from './new_designs/CWCircleMultiplySpinner';
+import CWCircleRingSpinner from './new_designs/CWCircleRingSpinner';
 import CWDrawer from './new_designs/CWDrawer';
 import { CWForm } from './new_designs/CWForm';
 import CWIconButton from './new_designs/CWIconButton';
-import CWLoadingSpinner from './new_designs/CWLoadingSpinner';
 import { CWModal, CWModalBody, CWModalHeader } from './new_designs/CWModal';
 import { ModalSize } from './new_designs/CWModal/CWModal';
 import { CWRelatedCommunityCard } from './new_designs/CWRelatedCommunityCard';
@@ -1093,8 +1094,11 @@ export const ComponentShowcase = () => {
         />
       </div>
       <div className="basic-gallery">
-        <CWText type="h3">Spinner</CWText>
-        <CWLoadingSpinner center={false} />
+        <CWText type="h3">Spinners</CWText>
+        <CWText type="h4">Circle Multiply Spinner</CWText>
+        <CWCircleMultiplySpinner />
+        <CWText type="h4">Circle Ring Spinner</CWText>
+        <CWCircleRingSpinner />
       </div>
       <div className="basic-gallery">
         <CWText type="h3">Breadcrumbs</CWText>
