@@ -7,7 +7,6 @@ const ButtonsIconShowcase = () => {
   return (
     <>
       <CWText type="h5">Size</CWText>
-
       <div className="flex-row">
         <CWText>Sm</CWText>
         <CWIconButton iconName="plusCirclePhosphor" buttonSize="sm" />
@@ -18,10 +17,12 @@ const ButtonsIconShowcase = () => {
       </div>
 
       <CWText type="h5">Disabled</CWText>
-
       <div className="flex-row">
+        <CWText>Sm</CWText>
         <CWIconButton iconName="plusCirclePhosphor" buttonSize="sm" disabled />
+        <CWText>Md</CWText>
         <CWIconButton iconName="plusCirclePhosphor" buttonSize="med" disabled />
+        <CWText>Lg</CWText>
         <CWIconButton iconName="plusCirclePhosphor" buttonSize="lg" disabled />
       </div>
     </>

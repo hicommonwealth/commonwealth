@@ -2,6 +2,7 @@ import AuthButtonsShowcase from 'views/pages/ComponentsShowcase/components/AuthB
 import AvatarsShowcase from 'views/pages/ComponentsShowcase/components/Avatars.showcase';
 import BannersAndAlertsShowcase from 'views/pages/ComponentsShowcase/components/BannersAndAlerts.showcase';
 import ButtonsShowcase from 'views/pages/ComponentsShowcase/components/Buttons.showcase';
+import ButtonsCircleShowcase from 'views/pages/ComponentsShowcase/components/ButtonsCircle.showcase';
 import ButtonsIconShowcase from 'views/pages/ComponentsShowcase/components/ButtonsIcon.showcase';
 import ColorsShowcase from 'views/pages/ComponentsShowcase/components/Colors.showcase';
 import DividersShowcase from 'views/pages/ComponentsShowcase/components/Dividers.showcase';
@@ -18,6 +19,7 @@ export const ComponentPageName = {
   Dividers: 'Dividers',
   Buttons: 'Buttons',
   ButtonsIcon: 'ButtonsIcon',
+  ButtonsCircle: 'ButtonsCircle',
 };
 
 export const ComponentType = {
@@ -69,6 +71,11 @@ export const componentItems = [
   {
     ComponentPage: ButtonsIconShowcase,
     displayName: ComponentPageName.ButtonsIcon,
+    type: ComponentType.Components,
+  },
+  {
+    ComponentPage: ButtonsCircleShowcase,
+    displayName: ComponentPageName.ButtonsCircle,
     type: ComponentType.Components,
   },
 ];
