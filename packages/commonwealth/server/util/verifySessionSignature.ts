@@ -40,7 +40,7 @@ const sortedStringify = configureStableStringify({
 
 const verifySessionSignature = async (
   models: DB,
-  chain: Readonly<CommunityInstance>,
+  community: Readonly<CommunityInstance>,
   chain_id: string | number,
   addressModel: AddressInstance,
   user_id: number,
@@ -49,18 +49,18 @@ const verifySessionSignature = async (
   sessionIssued: string | null, // used when signing a block to login
   sessionBlockInfo: string | null, // used when signing a block to login
 ): Promise<boolean> => {
-  if (!chain) {
-    log.error('no chain provided to verifySignature');
+  if (!community) {
+    log.error('no community provided to verifySignature');
     return false;
   }
 
   // Reconstruct the expected canvas message.
-  const canvasChainId = chainBaseToCanvasChainId(chain.base, chain_id);
+  const canvasChainId = chainBaseToCanvasChainId(community.base, chain_id);
 
   const canvasSessionPayload = createCanvasSessionPayload(
-    chain.base,
+    community.base,
     canvasChainId,
-    chain.base === ChainBase.Substrate
+    community.base === ChainBase.Substrate
       ? addressSwapper({
           address: addressModel.address,
           currentPrefix: 42,
@@ -76,7 +76,7 @@ const verifySessionSignature = async (
   );
 
   let isValid: boolean;
-  if (chain.base === ChainBase.Substrate) {
+  if (community.base === ChainBase.Substrate) {
     //
     // substrate address handling
     //
@@ -91,7 +91,7 @@ const verifySessionSignature = async (
       if (addressModel.keytype) {
         keyringOptions.type = addressModel.keytype as KeypairType;
       }
-      keyringOptions.ss58Format = chain.ss58_prefix ?? 42;
+      keyringOptions.ss58Format = community.ss58_prefix ?? 42;
       const signerKeyring = new polkadot.Keyring(keyringOptions).addFromAddress(
         address,
       );
@@ -107,7 +107,7 @@ const verifySessionSignature = async (
       isValid = false;
     }
   } else if (
-    chain.base === ChainBase.CosmosSDK &&
+    community.base === ChainBase.CosmosSDK &&
     (addressModel.wallet_id === WalletId.CosmosEvmMetamask ||
       addressModel.wallet_id === WalletId.KeplrEthereum)
   ) {
@@ -134,7 +134,7 @@ const verifySessionSignature = async (
         lowercaseAddress.toString(),
       ).toBuffer();
       const b32Address = bech32.encode(
-        chain.bech32_prefix,
+        community.bech32_prefix,
         bech32.toWords(b32AddrBuf),
       );
       if (addressModel.address === b32Address) isValid = true;
@@ -142,8 +142,8 @@ const verifySessionSignature = async (
       isValid = false;
     }
   } else if (
-    chain.base === ChainBase.CosmosSDK &&
-    chain.bech32_prefix === 'terra'
+    community.base === ChainBase.CosmosSDK &&
+    community.bech32_prefix === 'terra'
   ) {
     //
     // cosmos-sdk address handling
@@ -156,7 +156,7 @@ const verifySessionSignature = async (
     // this prevents people from using a different key to sign the message than
     // the account they registered with.
     // TODO: ensure ion works
-    const bech32Prefix = chain.bech32_prefix;
+    const bech32Prefix = community.bech32_prefix;
 
     const cosmCrypto = await import('@cosmjs/crypto');
     if (!bech32Prefix) {
@@ -189,13 +189,13 @@ const verifySessionSignature = async (
         }
       }
     }
-  } else if (chain.base === ChainBase.CosmosSDK) {
+  } else if (community.base === ChainBase.CosmosSDK) {
     //
     // cosmos-sdk address handling
     //
     const stdSignature = JSON.parse(signatureString);
 
-    const bech32Prefix = chain.bech32_prefix;
+    const bech32Prefix = community.bech32_prefix;
     if (!bech32Prefix) {
       log.error('No bech32 prefix found.');
       isValid = false;
@@ -247,7 +247,7 @@ const verifySessionSignature = async (
         isValid = false;
       }
     }
-  } else if (chain.base === ChainBase.Ethereum) {
+  } else if (community.base === ChainBase.Ethereum) {
     //
     // ethereum address handling
     //
@@ -287,7 +287,7 @@ const verifySessionSignature = async (
       );
       isValid = false;
     }
-  } else if (chain.base === ChainBase.NEAR) {
+  } else if (community.base === ChainBase.NEAR) {
     //
     // near address handling
     //
@@ -301,7 +301,7 @@ const verifySessionSignature = async (
       Buffer.from(sigObj, 'base64'),
       Buffer.from(publicKey, 'base64'),
     );
-  } else if (chain.base === ChainBase.Solana) {
+  } else if (community.base === ChainBase.Solana) {
     //
     // solana address handling
     //
@@ -324,7 +324,7 @@ const verifySessionSignature = async (
     }
   } else {
     // invalid network
-    log.error(`invalid network: ${chain.network}`);
+    log.error(`invalid network: ${community.network}`);
     isValid = false;
   }
 

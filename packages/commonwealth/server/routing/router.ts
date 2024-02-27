@@ -1033,7 +1033,7 @@ function setupRouter(
     setAddressWallet.bind(this, models),
   );
 
-  // chain categories
+  // community categories
   registerRoute(
     router,
     'post',
