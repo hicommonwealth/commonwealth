@@ -18,6 +18,7 @@ import {
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { openConfirmation } from './confirmation_modal';
 
+import { notifySuccess } from 'client/scripts/controllers/app/notifications';
 import '../../../styles/modals/edit_topic_modal.scss';
 
 type EditTopicModalProps = {
@@ -68,6 +69,7 @@ export const EditTopicModal = ({
       await editTopic({ topic: new Topic(topicInfo) });
       if (noRedirect) {
         onModalClose();
+        notifySuccess('Topic updated!');
       } else {
         navigate(`/discussions/${encodeURI(name.toString().trim())}`);
       }
