@@ -125,13 +125,16 @@ export async function __createCommentReaction(
       if (!community) {
         throw new AppError(Errors.CommunityNotFound);
       }
+      const node = await this.models.ChainNode.findByPk(
+        community.chain_node_id,
+      );
       const stakeBalance =
         await commonProtocolService.contractHelpers.getNamespaceBalance(
           community.namespace,
           stake.stake_id,
-          commonProtocol.ValidChains.Base,
+          node.eth_chain_id,
           address.address,
-          this.models,
+          node.url,
         );
       calculatedVotingWeight = commonProtocol.calculateVoteWeight(
         stakeBalance,

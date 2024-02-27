@@ -1,15 +1,19 @@
 import type Thread from 'client/scripts/models/Thread';
 import { useFetchProfilesByAddressesQuery } from 'client/scripts/state/api/profiles';
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import app from 'state';
 import { ViewUpvotesDrawer } from './ViewUpvotesDrawer';
 
 type ViewThreadUpvotesDrawerProps = {
   thread?: Thread;
+  isOpen: boolean;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
 };
 
 export const ViewThreadUpvotesDrawer = ({
   thread,
+  isOpen,
+  setIsOpen,
 }: ViewThreadUpvotesDrawerProps) => {
   const reactors = thread?.associatedReactions;
   const reactorAddresses = reactors?.map((t) => t.address);
@@ -34,6 +38,8 @@ export const ViewThreadUpvotesDrawer = ({
 
   return (
     <ViewUpvotesDrawer
+      isOpen={isOpen}
+      setIsOpen={setIsOpen}
       contentBody={thread.body}
       header="Thread upvotes"
       reactorData={reactorData}
