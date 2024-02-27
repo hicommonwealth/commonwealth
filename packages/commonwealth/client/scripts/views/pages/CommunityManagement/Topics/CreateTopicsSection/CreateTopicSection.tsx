@@ -36,8 +36,6 @@ export const CreateTopicSection = () => {
         name: values.topicName,
         description: values.topicDescription,
         featuredInSidebar,
-        featuredInNewPost: false,
-        defaultOffchainTemplate: '',
       });
       navigate(`/discussions/${encodeURI(name.toString().trim())}`);
     } catch (err) {

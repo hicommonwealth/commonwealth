@@ -9,8 +9,6 @@ interface CreateTopicProps {
   description: string;
   telegram?: string;
   featuredInSidebar: boolean;
-  featuredInNewPost: boolean;
-  defaultOffchainTemplate: string;
 }
 
 const createTopic = async ({
@@ -18,16 +16,12 @@ const createTopic = async ({
   description,
   telegram,
   featuredInSidebar,
-  featuredInNewPost,
-  defaultOffchainTemplate,
 }: CreateTopicProps) => {
   const response = await axios.post(`${app.serverUrl()}/topics`, {
     name,
     description,
     telegram,
     featured_in_sidebar: featuredInSidebar,
-    featured_in_new_post: featuredInNewPost,
-    default_offchain_template: defaultOffchainTemplate,
     jwt: app.user.jwt,
     community_id: app.activeChainId(),
   });
