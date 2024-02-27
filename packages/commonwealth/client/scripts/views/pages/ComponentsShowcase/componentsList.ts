@@ -8,6 +8,7 @@ import ColorsShowcase from 'views/pages/ComponentsShowcase/components/Colors.sho
 import DividersShowcase from 'views/pages/ComponentsShowcase/components/Dividers.showcase';
 import DrawersShowcase from 'views/pages/ComponentsShowcase/components/Drawers.showcase';
 import ElevationsShowcase from 'views/pages/ComponentsShowcase/components/Elevations.showcase';
+import FormStepsShowcase from 'views/pages/ComponentsShowcase/components/FormSteps.showcase';
 import LoadersShowcase from 'views/pages/ComponentsShowcase/components/Loaders.showcase';
 import RadioButtonsShowcase from 'views/pages/ComponentsShowcase/components/RadioButtons.showcase';
 import TypographyShowcase from 'views/pages/ComponentsShowcase/components/Typography.showcase';
@@ -26,6 +27,7 @@ export const ComponentPageName = {
   RadioButtons: 'RadioButtons',
   Drawers: 'Drawers',
   Loaders: 'Loaders',
+  FormSteps: 'FormSteps',
 };
 
 export const ComponentType = {
@@ -97,6 +99,11 @@ export const componentItems = [
   {
     ComponentPage: LoadersShowcase,
     displayName: ComponentPageName.Loaders,
+    type: ComponentType.Components,
+  },
+  {
+    ComponentPage: FormStepsShowcase,
+    displayName: ComponentPageName.FormSteps,
     type: ComponentType.Components,
   },
 ];
