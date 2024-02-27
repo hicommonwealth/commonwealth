@@ -93,7 +93,9 @@ const UserDashboard = (props: UserDashboardProps) => {
       }
     };
 
-    window.addEventListener('wheel', listener);
+    if (shouldAddStickyTabs) {
+      window.addEventListener('wheel', listener);
+    }
 
     return () => {
       window.removeEventListener('wheel', listener);
