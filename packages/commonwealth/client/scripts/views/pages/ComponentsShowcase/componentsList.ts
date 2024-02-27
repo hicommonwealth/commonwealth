@@ -6,6 +6,7 @@ import ButtonsCircleShowcase from 'views/pages/ComponentsShowcase/components/But
 import ButtonsIconShowcase from 'views/pages/ComponentsShowcase/components/ButtonsIcon.showcase';
 import ColorsShowcase from 'views/pages/ComponentsShowcase/components/Colors.showcase';
 import DividersShowcase from 'views/pages/ComponentsShowcase/components/Dividers.showcase';
+import DrawersShowcase from 'views/pages/ComponentsShowcase/components/Drawers.showcase';
 import ElevationsShowcase from 'views/pages/ComponentsShowcase/components/Elevations.showcase';
 import RadioButtonsShowcase from 'views/pages/ComponentsShowcase/components/RadioButtons.showcase';
 import TypographyShowcase from 'views/pages/ComponentsShowcase/components/Typography.showcase';
@@ -22,6 +23,7 @@ export const ComponentPageName = {
   ButtonsIcon: 'ButtonsIcon',
   ButtonsCircle: 'ButtonsCircle',
   RadioButtons: 'RadioButtons',
+  Drawers: 'Drawers',
 };
 
 export const ComponentType = {
@@ -83,6 +85,11 @@ export const componentItems = [
   {
     ComponentPage: RadioButtonsShowcase,
     displayName: ComponentPageName.RadioButtons,
+    type: ComponentType.Components,
+  },
+  {
+    ComponentPage: DrawersShowcase,
+    displayName: ComponentPageName.Drawers,
     type: ComponentType.Components,
   },
 ];
