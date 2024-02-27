@@ -98,6 +98,14 @@
         width: 48%;
       }
 
+      cursor: pointer;
+      transition: 0.1s ease-in-out;
+
+      &:hover {
+        transform: scale(1.1);
+        transition: 0.1s ease-in-out;
+      }
+
       .color-field {
         height: 80px;
         border-top-left-radius: 8px;
@@ -110,6 +118,25 @@
         box-shadow: 0 4px 6px -2px rgba(16, 24, 40, 0.3);
         border-bottom-left-radius: 8px;
         border-bottom-right-radius: 8px;
+      }
+    }
+  }
+
+  .Dividers {
+    .isVertical {
+      height: 24px;
+    }
+  }
+
+  .Elevations {
+    .Card {
+      width: max(100px, 19%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      @include extraSmall {
+        width: 100%;
       }
     }
   }

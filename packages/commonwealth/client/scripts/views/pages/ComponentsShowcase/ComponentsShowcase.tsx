@@ -13,6 +13,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import './ComponentsShowcase.scss';
 
 const NAVBAR_HEIGHT = 56;
+const BREADCRUMBS_HEIGHT = 40;
 const BODY_CLASS_NAME = 'page-body';
 
 const ComponentsShowcase = () => {
@@ -24,7 +25,7 @@ const ComponentsShowcase = () => {
 
     if (scrollableContainer && selectedItemElement) {
       scrollableContainer.scrollTop =
-        selectedItemElement.offsetTop - NAVBAR_HEIGHT;
+        selectedItemElement.offsetTop - NAVBAR_HEIGHT - BREADCRUMBS_HEIGHT;
     }
   };
 
@@ -89,7 +90,7 @@ const ComponentsShowcase = () => {
               ({ displayName, ComponentPage }) => (
                 <div key={displayName} id={displayName}>
                   <CWText className="component-header" type="h4">
-                    {pascalCaseToNormalText(displayName)}
+                    {pascalCaseToNormalText(displayName).toUpperCase()}
                   </CWText>
 
                   <div className={clsx(displayName, 'component-content')}>
