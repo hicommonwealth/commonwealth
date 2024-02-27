@@ -223,12 +223,9 @@ export const NewSnapshotProposalForm = ({
           </CWText>
         ) : (
           <div className="proposal-loading">
-            <CWSpinner />
+            <CWLoadingSpinner />
           </div>
         )
-        <div className="proposal-loading">
-          <CWLoadingSpinner />
-        </div>
       ) : (
         <>
           {space.filters?.onlyMembers && !isMember && (
