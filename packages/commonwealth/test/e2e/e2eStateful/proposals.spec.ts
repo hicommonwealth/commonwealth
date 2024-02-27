@@ -1,6 +1,7 @@
 import { models } from '@hicommonwealth/model';
 import { expect, test } from '@playwright/test';
 import chai from 'chai';
+import sleep from 'sleep-promise';
 const chaiExpect = chai.expect;
 
 test.describe.configure({ mode: 'parallel' });
@@ -111,9 +112,9 @@ test.describe('Community proposals page', () => {
     const firstProposal = proposals[proposals.length - 1];
     if (isV1) {
       await waitForIpfsRequests({ page });
-      await waitForIpfsRequests({ page });
     }
 
+    await sleep(1000); // a little extra time for title to re-render
     const title = await firstProposal?.$('.Text.b1.semiBold.noWrap');
     title.waitForElementState('stable');
     const expectedTitle = await title?.innerText();
