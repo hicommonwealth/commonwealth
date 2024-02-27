@@ -8,6 +8,7 @@ class NodeInfo {
   public readonly balanceType?: string;
   public readonly bech32?: string;
   public readonly cosmosGovernanceVersion?: string;
+  public readonly slip44?: number;
 
   constructor({
     id,
@@ -19,6 +20,7 @@ class NodeInfo {
     balance_type,
     bech32,
     cosmos_gov_version,
+    slip44,
   }) {
     this.id = id;
     this.name = name;
@@ -29,6 +31,7 @@ class NodeInfo {
     this.balanceType = balance_type;
     this.bech32 = bech32;
     this.cosmosGovernanceVersion = cosmos_gov_version;
+    this.slip44 = slip44;
   }
 
   public static fromJSON(json) {

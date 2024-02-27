@@ -8,7 +8,7 @@ import {
   NodeHealth,
   logger,
 } from '@hicommonwealth/core';
-import { DB } from '@hicommonwealth/model';
+import { ChainNodeAttributes, DB } from '@hicommonwealth/model';
 import axios from 'axios';
 import * as express from 'express';
 import _ from 'lodash';
@@ -20,17 +20,18 @@ import {
 const log = logger().getLogger(__filename);
 const DEFAULT_CACHE_DURATION = 60 * 10; // 10 minutes
 const FALLBACK_NODE_DURATION = +process.env.FALLBACK_NODE_DURATION_S || 300; // 5 min
-const Errors = {
-  NeedCosmosChainId: 'cosmos_chain_id is required',
-};
+const ALLOW_FAIL_RE = /^(tx)|(auth)/;
 const DEVNET_COSMOS_ID_RE = /^(csdk|evmosdev)/;
+enum NonLivenessErrors {
+  NeedCosmosChainId = 'cosmos_chain_id is required',
+}
 
 function setupCosmosProxy(
   app: express.Express,
   models: DB,
   cacheDecorator: CacheDecorator,
 ) {
-  // using bodyParser here because cosmjs generates text/plain type headers
+  // using express.text() here because cosmjs generates text/plain type headers
   app.post(
     '/cosmosAPI/:community_id',
     express.text() as express.RequestHandler,
@@ -40,9 +41,10 @@ function setupCosmosProxy(
       lookupKeyDurationInReq,
     ),
     async function cosmosProxy(req, res) {
-      log.trace(`Got request: ${JSON.stringify(req.body, null, 2)}`);
-      let cosmos_chain_id, chainNodeUrl, previouslyFailed;
+      log.trace('Got request:', null, { body: req.body });
+      let cosmos_chain_id, chainNodeUrl, previouslyFailed, isAllowedToFail;
       try {
+        isAllowedToFail = ALLOW_FAIL_RE.test(req.body?.method); // all Cosmos chains do TX via RPC
         const communityId = req.params.community_id;
         const community = await models.Community.findOne({
           where: { id: communityId },
@@ -57,6 +59,9 @@ function setupCosmosProxy(
         chainNodeUrl = chainNode?.url?.trim();
         let useProxy = !chainNodeUrl;
         cosmos_chain_id = chainNode?.cosmos_chain_id;
+
+        await updateSlip44IfNeeded(chainNode, cosmos_chain_id);
+
         previouslyFailed = chainNode?.health === NodeHealth.Failed;
         if (previouslyFailed) {
           const lastUpdate = chainNode?.updated_at?.getTime();
@@ -67,7 +72,7 @@ function setupCosmosProxy(
         }
 
         if (chainNodeUrl && !useProxy) {
-          log.trace(`Found cosmos endpoint: ${chainNodeUrl}`);
+          log.trace('Found cosmos endpoint:', null, { chainNodeUrl });
           response = await axios
             .post(chainNodeUrl, req.body, {
               headers: {
@@ -77,6 +82,7 @@ function setupCosmosProxy(
             .catch(async (err) => {
               log.trace(`Error: ${err.message}`);
               await flagFailedNode(
+                isAllowedToFail,
                 previouslyFailed,
                 cosmos_chain_id,
                 chainNodeUrl,
@@ -97,25 +103,18 @@ function setupCosmosProxy(
 
         await upgradeBetaNodeIfNeeded(req, response, community.ChainNode);
 
-        log.trace(
-          `Got response from endpoint: ${JSON.stringify(
-            response.data,
-            null,
-            2,
-          )}`,
-        );
-
+        log.trace('Got response from endpoint:', null, { data: response.data });
         return res.send(response.data);
       } catch (err) {
+        const error = { message: err.response?.data?.message ?? err.message };
         await flagFailedNode(
+          isAllowedToFail,
           previouslyFailed,
           cosmos_chain_id,
           chainNodeUrl,
-          err,
+          error,
         );
-        res.status(500).json({
-          message: err.message,
-        });
+        res.status(500).json(error);
       }
     },
   );
@@ -133,8 +132,8 @@ function setupCosmosProxy(
       lookupKeyDurationInReq,
     ),
     async function cosmosProxy(req, res) {
-      log.info(`Got request: ${JSON.stringify(req.body, null, 2)}`);
-      let cosmos_chain_id, chainNodeRestUrl, previouslyFailed;
+      log.trace('Got request:', null, { request: req.originalUrl });
+      let cosmos_chain_id, chainNodeRestUrl, previouslyFailed, isAllowedToFail;
       try {
         const communityId = req.params.community_id;
         const community = await models.Community.findOne({
@@ -151,6 +150,7 @@ function setupCosmosProxy(
         chainNodeRestUrl = chainNode?.alt_wallet_url?.trim();
         let useProxy = !chainNodeRestUrl;
         previouslyFailed = chainNode?.health === NodeHealth.Failed;
+        isAllowedToFail = ALLOW_FAIL_RE.test(req.originalUrl); // don't flag health for tx/auth failures
 
         if (previouslyFailed) {
           const lastUpdate = chainNode?.updated_at?.getTime();
@@ -175,8 +175,9 @@ function setupCosmosProxy(
               },
             })
             .catch(async (err) => {
-              log.trace(`Error: ${err.message}`);
+              log.error('Error:', err, { cosmos_chain_id, chainNodeRestUrl });
               await flagFailedNode(
+                isAllowedToFail,
                 previouslyFailed,
                 cosmos_chain_id,
                 chainNodeRestUrl,
@@ -200,15 +201,15 @@ function setupCosmosProxy(
         log.trace(`Got response: ${JSON.stringify(response.data, null, 2)}`);
         return res.send(response.data);
       } catch (err) {
+        const error = { message: err.response?.data?.message ?? err.message };
         await flagFailedNode(
+          isAllowedToFail,
           previouslyFailed,
           cosmos_chain_id,
           chainNodeRestUrl,
-          err,
+          error,
         );
-        res.status(500).json({
-          message: err.message,
-        });
+        res.status(500).json(error);
       }
     },
   );
@@ -224,6 +225,7 @@ function setupCosmosProxy(
     web_protocol: 'rpc' | 'rest',
   ) => {
     if (!cosmos_chain_id || DEVNET_COSMOS_ID_RE.test(cosmos_chain_id)) return;
+
     const proxyUrl = `https://${web_protocol}.cosmos.directory/${cosmos_chain_id}`;
     const rewrite = rewriteUrl(req, proxyUrl, web_protocol);
     const body = _.isEmpty(req.body) ? null : req.body;
@@ -248,14 +250,22 @@ function setupCosmosProxy(
   };
 
   const flagFailedNode = async (
+    isAllowedToFail: boolean,
     previouslyFailed: boolean,
     cosmos_chain_id: string,
     failedUrl: string,
     error?: any,
   ) => {
-    if (error?.message === Errors.NeedCosmosChainId) return; // not a health issue
-    if (previouslyFailed || !cosmos_chain_id) return; // no need to hit db again
+    if (isAllowedToFail || previouslyFailed || !cosmos_chain_id) return; // no need to hit db
     if (DEVNET_COSMOS_ID_RE.test(cosmos_chain_id)) return; // skip devnets
+    // exclude failed transaction attempts from affecting node health
+    if (
+      Object.values(NonLivenessErrors).some((nonLivenessError) =>
+        error?.message?.includes(nonLivenessError),
+      )
+    ) {
+      return; // not a health issue
+    }
 
     const failedChainNode = await models.ChainNode.findOne({
       where: { cosmos_chain_id },
@@ -266,8 +276,9 @@ function setupCosmosProxy(
     await failedChainNode.save();
     log.trace(
       `Problem with endpoint ${failedUrl}.
-       Marking node as 'failed' for ${FALLBACK_NODE_DURATION} seconds.
-      ${JSON.stringify(error)}`,
+       Marking node as 'failed' for ${FALLBACK_NODE_DURATION} seconds.`,
+      null,
+      { failedUrl, cosmos_chain_id, error },
     );
   };
 
@@ -287,6 +298,46 @@ function setupCosmosProxy(
       if (!healthyChainNode) return;
       healthyChainNode.health = NodeHealth.Healthy;
       await healthyChainNode.save();
+    }
+  };
+
+  const updateSlip44IfNeeded = async (
+    communityChainNode: ChainNodeAttributes,
+    cosmos_chain_id: string,
+  ) => {
+    try {
+      const slip44 = communityChainNode?.slip44;
+      if (slip44 || DEVNET_COSMOS_ID_RE.test(cosmos_chain_id)) return;
+
+      const registeredChain = await axios.get(
+        `https://chains.cosmos.directory/${cosmos_chain_id}`,
+        {
+          headers: {
+            origin: 'https://commonwealth.im',
+            Referer:
+              process.env.COSMOS_PROXY_REFERER || 'https://commonwealth.im',
+          },
+        },
+      );
+
+      if (registeredChain && registeredChain?.data?.chain?.slip44) {
+        const chainNode = await models.ChainNode.findOne({
+          where: { cosmos_chain_id },
+        });
+        if (!chainNode) return;
+        chainNode.slip44 = registeredChain.data.chain.slip44;
+        log.trace('Registered chain found. slip44 recorded.', null, {
+          cosmos_chain_id,
+          slip44: registeredChain?.data?.chain?.slip44,
+        });
+        await chainNode.save();
+      }
+    } catch (err) {
+      // don't need to throw here, just trying to update slip44 if available
+      log.error('Error querying for registered chain', err, {
+        cosmos_chain_id,
+        communityChainNode,
+      });
     }
   };
 
@@ -317,7 +368,7 @@ function setupCosmosProxy(
       });
       const targetRestUrl = chainNode?.alt_wallet_url;
       const targetRpcUrl = chainNode?.url;
-      log.trace(`Found cosmos endpoint: ${targetRestUrl}, ${targetRpcUrl}`);
+      log.trace('Found cosmos endpoint', null, { targetRestUrl, targetRpcUrl });
 
       try {
         let response;
@@ -328,13 +379,7 @@ function setupCosmosProxy(
             },
           });
         }
-        log.trace(
-          `Got response from endpoint: ${JSON.stringify(
-            response.data,
-            null,
-            2,
-          )}`,
-        );
+        log.trace('Got response from endpoint', null, { data: response.data });
 
         // magicCosmosAPI is CORS-approved for the magic iframe
         res.setHeader('Access-Control-Allow-Origin', 'https://auth.magic.link');
@@ -342,7 +387,7 @@ function setupCosmosProxy(
         res.setHeader('Access-Control-Allow-Headers', 'content-type');
         return res.send(response.data);
       } catch (err) {
-        console.error(err);
+        log.error('Error', err, { targetRestUrl, targetRpcUrl });
         res.status(500).json({ message: err.message });
       }
     },
