@@ -32,7 +32,6 @@ export enum ComponentType {
   Label = 'Label',
   MessageBanner = 'MessageBanner',
   Modal = 'CWModal',
-  ModalSelectButton = 'ModalSelectButton',
   OldTextInput = 'OldTextInput',
   PageLayout = 'PageLayout',
   PopoverMenu = 'PopoverMenu',
