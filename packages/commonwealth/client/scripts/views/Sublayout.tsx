@@ -110,7 +110,7 @@ const Sublayout = ({
             {!app.isCustomDomain() && !hideFooter && <Footer />}
           </div>
         </div>
-        {communityStakeEnabled && <StakeGrowl />}
+        {communityStakeEnabled && !isWindowExtraSmall && <StakeGrowl />}
       </div>
       {isWindowExtraSmall && <MobileNavigation />}
     </div>

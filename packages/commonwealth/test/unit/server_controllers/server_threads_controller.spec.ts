@@ -72,10 +72,17 @@ describe('ServerThreadsController', () => {
             vote_weight: 1,
           }),
         },
+
         Community: {
           findByPk: async () => ({
             id: 'ethereum',
             namespace: 'cake',
+          }),
+        },
+        ChainNode: {
+          findByPk: async () => ({
+            eth_chain_id: 8453,
+            url: 'test.com',
           }),
         },
         sequelize: {

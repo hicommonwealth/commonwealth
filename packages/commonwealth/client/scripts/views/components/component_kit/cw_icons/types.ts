@@ -13,7 +13,8 @@ export type IconSize =
   | 'medium'
   | 'large'
   | 'xl'
-  | 'xxl';
+  | 'xxl'
+  | 'header';
 
 export type IconStyleProps = {
   className?: string;
