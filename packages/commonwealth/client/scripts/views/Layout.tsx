@@ -1,6 +1,6 @@
 import 'Layout.scss';
 import { deinitChainOrCommunity, selectChain } from 'helpers/chain';
-import withRouter from 'navigation/helpers';
+import withRouter, { useCommonNavigate } from 'navigation/helpers';
 import React, { ReactNode, Suspense, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useParams } from 'react-router-dom';
@@ -28,12 +28,24 @@ const LayoutComponent = ({
   scoped = false,
   type = 'community',
 }: LayoutAttrs) => {
+  const navigate = useCommonNavigate();
   const routerParams = useParams();
   const pathScope = routerParams?.scope?.toString() || app.customDomainId();
   const selectedScope = scoped ? pathScope : null;
 
   const [scopeToLoad, setScopeToLoad] = useState<string>();
   const [isLoading, setIsLoading] = useState<boolean>();
+
+  // If community id was updated ex: `commonwealth.im/{community-id}/**/*`
+  // redirect to new community id ex: `commonwealth.im/{new-community-id}/**/*`
+  useNecessaryEffect(() => {
+    const redirectTo = app.config.redirects[selectedScope];
+    if (redirectTo && redirectTo !== selectedScope.toLowerCase()) {
+      const path = window.location.href.split(selectedScope);
+      navigate(`/${redirectTo}${path.length > 1 ? path[1] : ''}`);
+      return;
+    }
+  }, [selectedScope]);
 
   const scopeMatchesChain = app.config.chains.getById(selectedScope);
 
