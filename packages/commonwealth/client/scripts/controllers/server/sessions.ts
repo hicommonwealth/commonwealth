@@ -109,7 +109,7 @@ export async function getSessionFromWallet(
 ) {
   const sessionSigner = await wallet.getSessionSigner();
   const session = await sessionSigner.getSession(CANVAS_TOPIC, {
-    timestamp: opts.timestamp,
+    timestamp: opts?.timestamp,
   });
   return session;
 }
@@ -135,18 +135,6 @@ class SessionsController {
     // else if (chainBase === 'cosmos') return this.cosmos;
     else if (chainBase === 'solana') return this.solana;
     else if (chainBase === 'near') return this.near;
-  }
-
-  // Get a session address. Generate one and cache in localStorage if none exists.
-  public getOrCreateAddress(
-    chainBase: ChainBase,
-    chainId: string,
-    fromAddress: string,
-  ): Promise<string> {
-    return this.getSessionController(chainBase).getOrCreateAddress(
-      chainId,
-      fromAddress,
-    );
   }
 
   // Sign an arbitrary action, using context from the last authSession() call.

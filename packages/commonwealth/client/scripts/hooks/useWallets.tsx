@@ -565,11 +565,8 @@ const useWallets = (walletProps: IuseWalletProps) => {
     }
 
     try {
-      const sessionPublicAddress = await app.sessions.getOrCreateAddress(
-        wallet.chain,
-        wallet.getChainId().toString(),
-        selectedAddress,
-      );
+      const session = await getSessionFromWallet(wallet);
+
       const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
 
       let validationBlockInfo;
@@ -590,7 +587,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
         wallet.name,
         null, // no sso source
         chainIdentifier,
-        sessionPublicAddress,
+        session.publicKey,
         validationBlockInfo,
       );
 
@@ -642,12 +639,8 @@ const useWallets = (walletProps: IuseWalletProps) => {
     wallet: IWebWallet<any>,
     selectedAddress: string,
   ) => {
-    const timestamp = +new Date();
-    const sessionAddress = await app.sessions.getOrCreateAddress(
-      wallet.chain,
-      wallet.getChainId().toString(),
-      selectedAddress,
-    );
+    const session = await getSessionFromWallet(wallet);
+
     const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
     let validationBlockInfo;
     try {
@@ -663,14 +656,13 @@ const useWallets = (walletProps: IuseWalletProps) => {
       wallet.name,
       null, // no sso source?
       chainIdentifier,
-      sessionAddress,
+      // TODO: I don't think we need this field in Account at all
+      session.publicKey,
       validationBlockInfo,
     );
     account.setValidationBlockInfo(
       validationBlockInfo ? JSON.stringify(validationBlockInfo) : null,
     );
-
-    const session = await signSessionWithAccount(wallet, account, timestamp);
 
     await account.validate(session);
     verifySession(session);
