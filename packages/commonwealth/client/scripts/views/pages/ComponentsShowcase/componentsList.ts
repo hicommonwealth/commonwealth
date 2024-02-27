@@ -4,6 +4,7 @@ import BannersAndAlertsShowcase from 'views/pages/ComponentsShowcase/components/
 import ButtonsShowcase from 'views/pages/ComponentsShowcase/components/Buttons.showcase';
 import ButtonsCircleShowcase from 'views/pages/ComponentsShowcase/components/ButtonsCircle.showcase';
 import ButtonsIconShowcase from 'views/pages/ComponentsShowcase/components/ButtonsIcon.showcase';
+import CheckboxesShowcase from 'views/pages/ComponentsShowcase/components/Checkboxes.showcase';
 import ColorsShowcase from 'views/pages/ComponentsShowcase/components/Colors.showcase';
 import DividersShowcase from 'views/pages/ComponentsShowcase/components/Dividers.showcase';
 import DrawersShowcase from 'views/pages/ComponentsShowcase/components/Drawers.showcase';
@@ -28,6 +29,7 @@ export const ComponentPageName = {
   Drawers: 'Drawers',
   Loaders: 'Loaders',
   FormSteps: 'FormSteps',
+  Checkboxes: 'Checkboxes',
 };
 
 export const ComponentType = {
@@ -104,6 +106,11 @@ export const componentItems = [
   {
     ComponentPage: FormStepsShowcase,
     displayName: ComponentPageName.FormSteps,
+    type: ComponentType.Components,
+  },
+  {
+    ComponentPage: CheckboxesShowcase,
+    displayName: ComponentPageName.Checkboxes,
     type: ComponentType.Components,
   },
 ];
