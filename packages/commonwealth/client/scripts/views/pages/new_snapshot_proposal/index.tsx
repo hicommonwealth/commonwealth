@@ -51,6 +51,7 @@ export const NewSnapshotProposalForm = ({
   const [, setSnapshotScoresFetched] = useState<boolean>(false);
   const [space, setSpace] = useState<SnapshotSpace | null>(null);
   const [userScore, setUserScore] = useState<number>(0);
+  const [errorMessage, setErrorMessage] = useState(false);
 
   const location = useLocation();
   const pathVars = useMemo(() => {
@@ -96,9 +97,11 @@ export const NewSnapshotProposalForm = ({
 
   useEffect(() => {
     const init = async () => {
-      await app.snapshot.init(snapshotId);
+      const snapshotNullResponse = await app.snapshot.init(snapshotId);
+      if (snapshotNullResponse === null) {
+        setErrorMessage(true);
+      }
     };
-
     // Add event listener for SnapshotController
     const handleInitialized = async () => {
       if (!app.snapshot.initialized) {
@@ -176,6 +179,7 @@ export const NewSnapshotProposalForm = ({
     };
 
     init();
+
     app.snapshot.snapshotEmitter.on('initialized', handleInitialized);
 
     return () => {
@@ -212,9 +216,16 @@ export const NewSnapshotProposalForm = ({
   return (
     <div className="NewSnapshotProposalForm">
       {loading ? (
-        <div className="proposal-loading">
-          <CWCircleMultiplySpinner />
-        </div>
+        errorMessage ? (
+          <CWText className="error-text">
+            Snapshot space not found. Check your Snapshot space name and try
+            again.
+          </CWText>
+        ) : (
+          <div className="proposal-loading">
+            <CWCircleMultiplySpinner />
+          </div>
+        )
       ) : (
         <>
           {space.filters?.onlyMembers && !isMember && (
