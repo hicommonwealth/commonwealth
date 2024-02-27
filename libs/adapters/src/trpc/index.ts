@@ -23,8 +23,6 @@ interface Context {
 
 const trpc = initTRPC.meta<OpenApiMeta>().context<Context>().create();
 
-export const router = trpc.router;
-
 const authenticate = async (req: Request) => {
   try {
     await passport.authenticate('jwt', { session: false });
@@ -62,9 +60,8 @@ const trpcerror = (error: unknown): TRPCError => {
 };
 
 export const command = <T, P extends ZodObject<any>>(
-  aggregate: string,
   factory: () => CommandMetadata<T, P>,
-  auth = false,
+  tag?: string,
 ) => {
   const md = factory();
   return trpc.procedure
@@ -72,8 +69,8 @@ export const command = <T, P extends ZodObject<any>>(
       openapi: {
         method: 'POST',
         path: `/{id}/${factory.name}`,
-        tags: [aggregate],
-        protect: auth,
+        tags: [tag ?? 'Commands'],
+        protect: md.secure,
       },
     })
     .input(
@@ -84,7 +81,7 @@ export const command = <T, P extends ZodObject<any>>(
     )
     .output(z.object({}).optional()) // TODO: use output schemas
     .mutation(async ({ ctx, input }) => {
-      if (auth) await authenticate(ctx.req);
+      if (md.secure) await authenticate(ctx.req);
       try {
         const { id, address_id, ...payload } = input;
         return await core.command(
@@ -107,18 +104,17 @@ export const command = <T, P extends ZodObject<any>>(
 
 export const query = <T, P extends ZodObject<any>>(
   factory: () => QueryMetadata<T, P>,
-  auth = false,
 ) => {
   const md = factory();
   return trpc.procedure
     .meta({
       openapi: { method: 'GET', path: `/${factory.name}`, tags: ['Queries'] },
-      protect: auth,
+      protect: md.secure,
     })
     .input(md.schema.extend({ address_id: z.string().optional() }))
     .output(z.object({}).optional()) // TODO: use output schema
     .query(async ({ ctx, input }) => {
-      if (auth) await authenticate(ctx.req);
+      if (md.secure) await authenticate(ctx.req);
       try {
         const { address_id, ...payload } = input;
         return await core.query(
@@ -148,3 +144,5 @@ export const toOpenApiDocument = (
   router: OpenApiRouter,
   opts: GenerateOpenApiDocumentOptions,
 ) => generateOpenApiDocument(router, opts);
+
+export const router = trpc.router;

@@ -24,8 +24,8 @@ expressRouter.post(
 
 // TRPC
 export const trpcRouter = trpc.router({
-  getStake: trpc.query(Community.GetCommunityStake, true),
-  setStake: trpc.command('Community', Community.SetCommunityStake, true),
-  createGroup: trpc.command('Community', Community.CreateGroup, true),
+  getStake: trpc.query(Community.GetCommunityStake),
+  setStake: trpc.command(Community.SetCommunityStake, 'Community'),
+  createGroup: trpc.command(Community.CreateGroup, 'Community'),
   // TODO: trpc analyticsMiddleware(MixpanelCommunityInteractionEvent.CREATE_GROUP),
 });

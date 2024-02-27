@@ -3,7 +3,9 @@ import { RequestHandler, Router } from 'express';
 import swaggerUi from 'swagger-ui-express';
 import * as community from './community';
 
-// root express router
+/**
+ * Express router
+ */
 export const expressRouter = Router();
 // aggregate sub-routers
 expressRouter.use(
@@ -14,11 +16,17 @@ expressRouter.use(
 // catch-all middleware
 expressRouter.use(express.errorMiddleware);
 
-// root trpc router
+/**
+ * tRPC router
+ */
 export const trpcExpressRouter = Router();
 // aggregate sub-routers
 const trpcRouter = trpc.router({ community: community.trpcRouter });
-// openapi
+trpcExpressRouter.use('/', express.statsMiddleware, trpc.toExpress(trpcRouter));
+
+/**
+ * OpenAPI Specs from tRPC router
+ */
 let spec: RequestHandler | undefined = undefined;
 trpcExpressRouter.use('/openapi', swaggerUi.serve);
 trpcExpressRouter.get('/openapi', (req, res, next) => {
@@ -34,5 +42,3 @@ trpcExpressRouter.get('/openapi', (req, res, next) => {
   }
   return spec(req, res, next);
 });
-// use stats middleware on all trpc routes
-trpcExpressRouter.use('/', express.statsMiddleware, trpc.toExpress(trpcRouter));
