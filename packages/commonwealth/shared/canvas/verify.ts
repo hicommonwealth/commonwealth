@@ -18,7 +18,7 @@ export const stringify = configure({
 
 // can we do this without needing an async method?
 // we should just be using ESM
-const getSessionSigners = async () => {
+export const getSessionSigners = async () => {
   const { SIWESigner } = await import('@canvas-js/chain-ethereum');
   return [new SIWESigner()];
 };

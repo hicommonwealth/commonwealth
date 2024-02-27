@@ -7,6 +7,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { signSessionWithMagic } from 'controllers/server/sessions';
 import { isSameAccount } from 'helpers';
 import $ from 'jquery';
+import { getSessionSigners } from 'shared/canvas/verify';
 import { initAppState } from 'state';
 
 import app from 'state';
@@ -188,19 +189,17 @@ export async function updateActiveAddresses({
     ].sort((a, b) => b.lastActive.diff(a.lastActive));
 
     // From the sorted adddress in the current community, find an address which has an active session key
-    const chainBase = app.chain?.base;
-    const idOrPrefix =
-      chainBase === ChainBase.CosmosSDK
-        ? app.chain?.meta.bech32Prefix
-        : app.chain?.meta.node?.ethChainId;
-    const canvasChainId = chainBaseToCanvasChainId(chainBase, idOrPrefix);
     let foundAddressWithActiveSessionKey = null;
-    for (const communityAccount of communityAddressesSortedByLastUsed) {
-      const isAuth = await app.sessions
-        .getSessionController(chainBase)
-        .hasAuthenticatedSession(canvasChainId, communityAccount.address);
 
-      if (isAuth) {
+    const sessionSigners = await getSessionSigners();
+    for (const communityAccount of communityAddressesSortedByLastUsed) {
+      const matchedSessionSigner = sessionSigners.find((sessionSigner) =>
+        sessionSigner.match(communityAccount.address),
+      );
+      if (!matchedSessionSigner) {
+        continue;
+      }
+      if (matchedSessionSigner.hasSession(communityAccount.address)) {
         foundAddressWithActiveSessionKey = communityAccount;
         break;
       }

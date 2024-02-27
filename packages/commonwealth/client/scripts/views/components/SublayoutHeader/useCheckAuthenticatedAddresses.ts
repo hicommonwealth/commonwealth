@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { ChainBase } from '@hicommonwealth/core';
 import { chainBaseToCanvasChainId } from 'canvas';
+import { getSessionSigners } from 'shared/canvas/verify';
 import app from 'state';
 
 interface UseCheckAuthenticatedAddressesProps {
@@ -24,19 +25,24 @@ const useCheckAuthenticatedAddresses = ({
   }>({});
 
   useEffect(() => {
-    const promises = userActiveAccounts.map(async (activeAccount) => {
-      const isAuth = await app.sessions
-        .getSessionController(chainBase)
-        ?.hasAuthenticatedSession(canvasChainId, activeAccount.address);
+    getSessionSigners().then((sessionSigners) => {
+      const newAuthenticatedAddresses: Record<string, boolean> = {};
 
-      return {
-        [activeAccount.address]: isAuth,
-      };
-    });
+      for (const account of userActiveAccounts) {
+        // find a session signer that matches
+        const matchedSessionSigner = sessionSigners.find((sessionSigner) =>
+          sessionSigner.match(account.address),
+        );
+        if (!matchedSessionSigner) {
+          newAuthenticatedAddresses[account.address] = false;
+          continue;
+        }
+        // check if it has an authorised session
+        newAuthenticatedAddresses[account.address] =
+          matchedSessionSigner.hasSession(account.address);
+      }
 
-    Promise.all(promises).then((response) => {
-      const reduced = response.reduce((acc, curr) => ({ ...acc, ...curr }), {});
-      setAuthenticatedAddresses(reduced);
+      setAuthenticatedAddresses(newAuthenticatedAddresses);
     });
   }, [canvasChainId, chainBase, userActiveAccounts, recheck]);
 
