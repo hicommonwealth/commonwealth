@@ -5,7 +5,6 @@ import 'components/component_kit/cw_component_showcase.scss';
 import 'components/component_kit/new_designs/cw_button.scss';
 
 import { notifySuccess } from 'controllers/app/notifications';
-import { CWAccountCreationButton } from './cw_account_creation_button';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
 import { CWAuthButton } from './CWAuthButtonOld';
 
@@ -1265,12 +1264,6 @@ export const ComponentShowcase = () => {
           label="Progress Bar (Ongoing) With Token"
           progressStatus="ongoing"
           subtext={`${Math.min(100, Math.floor(50 * 1000) / 1000)} CMN`}
-        />
-      </div>
-      <div className="card-gallery">
-        <CWText type="h3">Account Creation Button</CWText>
-        <CWAccountCreationButton
-          onClick={() => notifySuccess('Account creation button clicked!')}
         />
       </div>
       <div className="basic-gallery">
