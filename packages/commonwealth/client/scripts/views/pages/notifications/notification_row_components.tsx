@@ -17,7 +17,7 @@ import type { CWEvent } from '../../../../../shared/chain/types/types';
 import AddressInfo from '../../../models/AddressInfo';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { getClasses } from '../../components/component_kit/helpers';
-import CWLoadingSpinner from '../../components/component_kit/new_designs/CWLoadingSpinner';
+import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { UserGallery } from '../../components/user/user_gallery';
 import { getBatchNotificationFields } from './helpers';
 import type { NotificationRowProps } from './notification_row';
@@ -219,7 +219,7 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
               }}
             >
               {markingRead ? (
-                <CWLoadingSpinner center={false} />
+                <CWCircleMultiplySpinner center={false} />
               ) : (
                 'Mark as read'
               )}
@@ -294,7 +294,7 @@ export const SnapshotNotificationRow = (
               }}
             >
               {markingRead ? (
-                <CWLoadingSpinner center={false} />
+                <CWCircleMultiplySpinner center={false} />
               ) : (
                 'Mark as read'
               )}

@@ -13,13 +13,12 @@ type GetUserEthBalanceProps = Omit<
 const getUserEthBalance = async ({
   chainRpc,
   walletAddress,
+  ethChainId,
 }: GetUserEthBalanceProps) => {
   const CommunityStakes = await lazyLoadCommunityStakes();
   const communityStakes = new CommunityStakes(
-    commonProtocol.factoryContracts[
-      commonProtocol.ValidChains.Base
-    ].communityStake,
-    commonProtocol.factoryContracts[commonProtocol.ValidChains.Base].factory,
+    commonProtocol.factoryContracts[ethChainId].communityStake,
+    commonProtocol.factoryContracts[ethChainId].factory,
     chainRpc,
   );
 
@@ -30,16 +29,23 @@ interface UseGetUserEthBalanceQueryProps {
   chainRpc: string;
   walletAddress: string;
   apiEnabled: boolean;
+  ethChainId: number;
 }
 
 const useGetUserEthBalanceQuery = ({
   chainRpc,
   walletAddress,
   apiEnabled,
+  ethChainId,
 }: UseGetUserEthBalanceQueryProps) => {
   return useQuery({
-    queryKey: [ContractMethods.GET_USER_ETH_BALANCE, chainRpc, walletAddress],
-    queryFn: () => getUserEthBalance({ chainRpc, walletAddress }),
+    queryKey: [
+      ContractMethods.GET_USER_ETH_BALANCE,
+      chainRpc,
+      walletAddress,
+      ethChainId,
+    ],
+    queryFn: () => getUserEthBalance({ chainRpc, walletAddress, ethChainId }),
     staleTime: GET_USER_ETH_BALANCE_STALE_TIME,
     enabled: apiEnabled,
   });

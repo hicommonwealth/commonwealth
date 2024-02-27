@@ -1,13 +1,10 @@
+import CWCircleRingSpinner from 'client/scripts/views/components/component_kit/new_designs/CWCircleRingSpinner';
 import React from 'react';
-
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
-import CWCircleSpinner from 'views/components/component_kit/new_designs/CWCircleSpinner';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
-
-import { ActionStepProps } from './types';
-
 import './ActionStep.scss';
+import { ActionStepProps } from './types';
 
 const ActionStep = ({ state, index, label, actionButton }: ActionStepProps) => {
   const isCompleted = state === 'completed';
@@ -23,7 +20,7 @@ const ActionStep = ({ state, index, label, actionButton }: ActionStepProps) => {
             iconSize="large"
           />
         ) : isLoading ? (
-          <CWCircleSpinner />
+          <CWCircleRingSpinner />
         ) : (
           <CWText type="h5" className="index">
             {index}

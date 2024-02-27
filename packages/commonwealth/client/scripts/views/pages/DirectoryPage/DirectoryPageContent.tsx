@@ -3,7 +3,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWRelatedCommunityCard } from 'views/components/component_kit/new_designs/CWRelatedCommunityCard';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { ViewType } from 'views/pages/DirectoryPage/useDirectoryPageData';
-import CWLoadingSpinner from '../../components/component_kit/new_designs/CWLoadingSpinner';
+import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import './DirectoryPageContent.scss';
 
 type RowType = {
@@ -79,7 +79,7 @@ const DirectoryPageContent = ({
   if (isLoading) {
     return (
       <div className="directory-loader-container">
-        <CWLoadingSpinner />
+        <CWCircleMultiplySpinner />
       </div>
     );
   }

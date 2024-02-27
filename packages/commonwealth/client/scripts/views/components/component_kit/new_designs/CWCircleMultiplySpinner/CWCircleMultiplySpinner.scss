@@ -7,14 +7,17 @@ $size: 24px;
     opacity: 0.7;
     transform: translate(0, 0);
   }
+
   49.99% {
     opacity: 0.7;
     transform: translate($size, 0);
   }
+
   50% {
     opacity: 0;
     transform: translate($size, 0);
   }
+
   100% {
     opacity: 0.5;
     transform: translate(0, 0);
@@ -25,15 +28,17 @@ $size: 24px;
   0% {
     transform: translate(0, 0);
   }
+
   50% {
     transform: translate($size, 0);
   }
+
   100% {
     transform: translate(0, 0);
   }
 }
 
-.LoadingSpinner {
+.CircleMultiplySpinner {
   width: fit-content;
 
   &.center {
