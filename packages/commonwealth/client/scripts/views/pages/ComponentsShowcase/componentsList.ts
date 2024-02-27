@@ -1,6 +1,7 @@
 import AuthButtonsShowcase from 'views/pages/ComponentsShowcase/components/AuthButtons.showcase';
 import AvatarsShowcase from 'views/pages/ComponentsShowcase/components/Avatars.showcase';
 import BannersAndAlertsShowcase from 'views/pages/ComponentsShowcase/components/BannersAndAlerts.showcase';
+import ButtonsShowcase from 'views/pages/ComponentsShowcase/components/Buttons.showcase';
 import ColorsShowcase from 'views/pages/ComponentsShowcase/components/Colors.showcase';
 import DividersShowcase from 'views/pages/ComponentsShowcase/components/Dividers.showcase';
 import ElevationsShowcase from 'views/pages/ComponentsShowcase/components/Elevations.showcase';
@@ -14,6 +15,7 @@ export const ComponentPageName = {
   Typography: 'Typography',
   Elevations: 'Elevations',
   Dividers: 'Dividers',
+  Buttons: 'Buttons',
 };
 
 export const ComponentType = {
@@ -56,5 +58,10 @@ export const componentItems = [
     ComponentPage: DividersShowcase,
     displayName: ComponentPageName.Dividers,
     type: ComponentType.Foundations,
+  },
+  {
+    ComponentPage: ButtonsShowcase,
+    displayName: ComponentPageName.Buttons,
+    type: ComponentType.Components,
   },
 ];
