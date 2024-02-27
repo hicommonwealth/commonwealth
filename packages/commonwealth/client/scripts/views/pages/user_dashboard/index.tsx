@@ -1,5 +1,7 @@
 import { notifyInfo } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import useBrowserWindow from 'hooks/useBrowserWindow';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/user_dashboard/index.scss';
@@ -29,6 +31,8 @@ type UserDashboardProps = {
 const UserDashboard = (props: UserDashboardProps) => {
   const { type } = props;
   const { isLoggedIn } = useUserLoggedIn();
+  const { isWindowExtraSmall } = useBrowserWindow({});
+  const shouldAddStickyTabs = !!isWindowExtraSmall;
 
   const [activePage, setActivePage] = React.useState<DashboardViews>(
     DashboardViews.Global,
@@ -63,7 +67,40 @@ const UserDashboard = (props: UserDashboardProps) => {
       ? DashboardViews.ForYou
       : DashboardViews.Global;
 
-  React.useEffect(() => {
+  // This hook logic adds sticky behavior to the tabs on this page when shouldAddStickyTabs is true
+  useNecessaryEffect(() => {
+    const tabsHeader = document.getElementById('dashboard-header');
+
+    const updateStickyBehaviour = (isSticky = false) => {
+      if (tabsHeader?.style) {
+        tabsHeader.style.position = isSticky ? 'sticky' : 'initial';
+        tabsHeader.style.top = isSticky ? '0' : 'initial';
+        tabsHeader.style.zIndex = isSticky ? '999' : 'initial';
+      }
+    };
+
+    if (!shouldAddStickyTabs) {
+      updateStickyBehaviour(false);
+    }
+
+    const listener = () => {
+      if (tabsHeader?.getBoundingClientRect) {
+        const tabsHeaderPos = tabsHeader.getBoundingClientRect();
+        // checks if user scroll past element
+        const hasTabsSectionReachedTop =
+          tabsHeaderPos.top - tabsHeaderPos.height <= 0;
+        updateStickyBehaviour(hasTabsSectionReachedTop);
+      }
+    };
+
+    window.addEventListener('wheel', listener);
+
+    return () => {
+      window.removeEventListener('wheel', listener);
+    };
+  }, [shouldAddStickyTabs]);
+
+  useEffect(() => {
     if (!activePage || activePage !== subpage) {
       setActivePage(subpage);
     }
@@ -76,7 +113,7 @@ const UserDashboard = (props: UserDashboardProps) => {
       </CWText>
       <div ref={setScrollElement} className="content">
         <div className="user-dashboard-activity">
-          <div className="dashboard-header">
+          <div className="dashboard-header" id="dashboard-header">
             <CWTabsRow>
               <CWTab
                 label={DashboardViews.ForYou}

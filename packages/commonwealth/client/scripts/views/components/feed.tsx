@@ -127,7 +127,7 @@ export const Feed = ({
         customScrollParent={customScrollParent}
         totalCount={currentCount}
         endReached={loadMore}
-        style={{ height: '70%', maxHeight: '70%', overflowY: 'scroll' }}
+        style={{ height: '100%' }}
         itemContent={(i) => {
           return (
             <UserDashboardRow
