@@ -10,17 +10,10 @@ import {
 } from 'canvas';
 
 import { ChainBase, WalletSsoSource } from '@hicommonwealth/core';
+import { getSessionSigners } from 'shared/canvas/verify';
 import app from 'state';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
-import {
-  // CosmosSDKSessionController,
-  EthereumSessionController,
-  ISessionController,
-  NEARSessionController,
-  SolanaSessionController,
-  SubstrateSessionController,
-} from './sessionSigners';
 
 export class SessionKeyError extends Error {
   readonly address: string;
@@ -115,28 +108,6 @@ export async function getSessionFromWallet(
 }
 
 class SessionsController {
-  ethereum: EthereumSessionController;
-  substrate: SubstrateSessionController;
-  // cosmos: CosmosSDKSessionController;
-  solana: SolanaSessionController;
-  near: NEARSessionController;
-
-  constructor() {
-    this.ethereum = new EthereumSessionController();
-    this.substrate = new SubstrateSessionController();
-    // this.cosmos = new CosmosSDKSessionController();
-    this.solana = new SolanaSessionController();
-    this.near = new NEARSessionController();
-  }
-
-  getSessionController(chainBase: ChainBase): ISessionController {
-    if (chainBase === 'ethereum') return this.ethereum;
-    else if (chainBase === 'substrate') return this.substrate;
-    // else if (chainBase === 'cosmos') return this.cosmos;
-    else if (chainBase === 'solana') return this.solana;
-    else if (chainBase === 'near') return this.near;
-  }
-
   // Sign an arbitrary action, using context from the last authSession() call.
   //
   // The signing methods are stateful, which simplifies implementation greatly
@@ -147,6 +118,7 @@ class SessionsController {
     call: string,
     args: any,
   ): Promise<Signature> {
+    const sessionSigners = await getSessionSigners();
     for (const signer of sessionSigners) {
       if (signer.match(address)) {
         return signer.sign({
