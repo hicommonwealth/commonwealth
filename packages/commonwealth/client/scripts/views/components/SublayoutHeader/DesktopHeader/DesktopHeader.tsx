@@ -55,11 +55,10 @@ const DesktopHeader = ({
   return (
     <div className="DesktopHeader">
       <div className="header-left">
-        <CWDivider isVertical />
         <CWIconButton
           iconName="commonLogo"
           iconButtonTheme="black"
-          iconSize="xl"
+          iconSize="header"
           onClick={() => {
             if (app.isCustomDomain()) {
               navigate('/', {}, null);
