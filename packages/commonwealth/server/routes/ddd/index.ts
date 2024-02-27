@@ -20,9 +20,7 @@ expressRouter.use(express.errorMiddleware);
  * tRPC router
  */
 export const trpcExpressRouter = Router();
-// aggregate sub-routers
 const trpcRouter = trpc.router({ community: community.trpcRouter });
-trpcExpressRouter.use('/', express.statsMiddleware, trpc.toExpress(trpcRouter));
 
 /**
  * OpenAPI Specs from tRPC router
@@ -42,3 +40,6 @@ trpcExpressRouter.get('/openapi', (req, res, next) => {
   }
   return spec(req, res, next);
 });
+
+// tRPC root
+trpcExpressRouter.use('/', express.statsMiddleware, trpc.toExpress(trpcRouter));

@@ -61,15 +61,15 @@ const trpcerror = (error: unknown): TRPCError => {
 
 export const command = <T, P extends ZodObject<any>>(
   factory: () => CommandMetadata<T, P>,
-  tag?: string,
+  tag: string,
 ) => {
   const md = factory();
   return trpc.procedure
     .meta({
       openapi: {
         method: 'POST',
-        path: `/{id}/${factory.name}`,
-        tags: [tag ?? 'Commands'],
+        path: `/${tag.toLowerCase()}/{id}/${factory.name}`,
+        tags: [tag],
         protect: md.secure,
       },
     })
