@@ -27,7 +27,7 @@ function setupCosmosProxy(
 ) {
   // using bodyParser here because cosmjs generates text/plain type headers
   app.post(
-    '/cosmosAPI/:chain',
+    '/cosmosAPI/:community_id',
     bodyParser.text(),
     calcCosmosRPCCacheKeyDuration,
     cacheDecorator.cacheMiddleware(
@@ -38,17 +38,17 @@ function setupCosmosProxy(
       log.trace(`Got request: ${JSON.stringify(req.body, null, 2)}`);
       let cosmos_chain_id, chainNodeUrl, previouslyFailed;
       try {
-        const chainParam = req.params.chain;
-        const chain = await models.Community.findOne({
-          where: { id: chainParam },
+        const communityId = req.params.community_id;
+        const community = await models.Community.findOne({
+          where: { id: communityId },
           include: models.ChainNode,
         });
-        if (!chain) {
-          throw new AppError(`Invalid chain: ${chainParam}`);
+        if (!community) {
+          throw new AppError(`Invalid chain: ${communityId}`);
         }
 
         let response;
-        const chainNode = chain.ChainNode;
+        const chainNode = community.ChainNode;
         chainNodeUrl = chainNode?.url?.trim();
         let useProxy = !chainNodeUrl;
         cosmos_chain_id = chainNode?.cosmos_chain_id;
@@ -118,7 +118,7 @@ function setupCosmosProxy(
    *  Used for Cosmos chains that use v1 of the gov module.
    */
   app.use(
-    '/cosmosAPI/v1/:chain',
+    '/cosmosAPI/v1/:community_id',
     bodyParser.text(),
     calcCosmosLCDCacheKeyDuration,
     cacheDecorator.cacheMiddleware(
@@ -129,17 +129,17 @@ function setupCosmosProxy(
       log.info(`Got request: ${JSON.stringify(req.body, null, 2)}`);
       let cosmos_chain_id, chainNodeRestUrl, previouslyFailed;
       try {
-        const chainParam = req.params.chain;
-        const chain = await models.Community.findOne({
-          where: { id: chainParam },
+        const communityId = req.params.community_id;
+        const community = await models.Community.findOne({
+          where: { id: communityId },
           include: models.ChainNode,
         });
-        if (!chain) {
-          throw new AppError(`Invalid chain: ${chainParam}`);
+        if (!community) {
+          throw new AppError(`Invalid chain: ${communityId}`);
         }
 
         let response;
-        const chainNode = chain.ChainNode;
+        const chainNode = community.ChainNode;
         cosmos_chain_id = chainNode?.cosmos_chain_id;
         chainNodeRestUrl = chainNode?.alt_wallet_url?.trim();
         let useProxy = !chainNodeRestUrl;
