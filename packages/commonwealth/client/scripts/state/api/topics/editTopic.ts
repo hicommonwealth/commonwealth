@@ -17,8 +17,6 @@ const editTopic = async ({ topic, featuredOrder }: EditTopicProps) => {
     description: topic.description,
     telegram: topic.telegram,
     featured_in_sidebar: topic.featuredInSidebar,
-    featured_in_new_post: topic.featuredInNewPost,
-    default_offchain_template: topic.defaultOffchainTemplate,
     featured_order: featuredOrder,
     address: app.user.activeAccount.address,
     jwt: app.user.jwt,

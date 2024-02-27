@@ -16,7 +16,6 @@ export const Errors = {
   NotVerified: 'Must have a verified address to edit or feature topics',
   TopicNotFound: 'Topic not found',
   TopicRequired: 'Topic name required',
-  DefaultTemplateRequired: 'Default Template required',
   InvalidTopicName: 'Topic uses disallowed special characters',
 };
 
@@ -29,8 +28,6 @@ type EditTopicReq = {
   telegram?: string;
   featured_order: number;
   featured_in_sidebar: boolean;
-  featured_in_new_post: boolean;
-  default_offchain_template: string;
 };
 
 type EditTopicResp = TopicAttributes;
@@ -53,11 +50,6 @@ const editTopic = async (
   }
 
   const featured_in_sidebar = req.body.featured_in_sidebar;
-  const featured_in_new_post = req.body.featured_in_new_post;
-  const default_offchain_template = req.body.default_offchain_template?.trim();
-  if (featured_in_new_post && !default_offchain_template) {
-    return next(new AppError(Errors.DefaultTemplateRequired));
-  }
 
   const isAdmin = await validateOwner({
     models: models,
@@ -78,8 +70,6 @@ const editTopic = async (
     if (name || description) topic.description = description || '';
     if (name || telegram) topic.telegram = telegram || '';
     topic.featured_in_sidebar = featured_in_sidebar;
-    topic.featured_in_new_post = featured_in_new_post;
-    topic.default_offchain_template = default_offchain_template || '';
     await topic.save();
 
     return success(res, topic.toJSON());

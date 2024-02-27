@@ -31,8 +31,6 @@ export const updateTopicHandler = async (
     name: z.string().optional(),
     description: z.string().optional(),
     featured_in_sidebar: z.coerce.boolean().nullable().optional(),
-    featured_in_new_post: z.coerce.boolean().optional(),
-    default_offchain_template: z.string().nullable().optional(),
     telegram: z.string().nullable().optional(),
     group_ids: z.array(z.number()).optional(),
   });

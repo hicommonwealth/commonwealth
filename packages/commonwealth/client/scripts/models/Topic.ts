@@ -5,9 +5,7 @@ export type TopicAttributes = {
   telegram?: string;
   community_id?: string;
   featured_in_sidebar?: boolean;
-  featured_in_new_post?: boolean;
   order?: number;
-  default_offchain_template?: string;
   total_threads: number;
   channel_id?: string;
 };
@@ -20,9 +18,7 @@ class Topic {
   public readonly communityId: string;
   public readonly channelId?: string;
   public readonly featuredInSidebar?: boolean;
-  public readonly featuredInNewPost?: boolean;
   public order?: number;
-  public readonly defaultOffchainTemplate?: string;
   public totalThreads?: number;
 
   constructor({
@@ -32,9 +28,7 @@ class Topic {
     telegram,
     community_id,
     featured_in_sidebar,
-    featured_in_new_post,
     order,
-    default_offchain_template,
     total_threads,
     channel_id,
   }: TopicAttributes) {
@@ -44,9 +38,7 @@ class Topic {
     this.telegram = telegram;
     this.communityId = community_id;
     this.featuredInSidebar = featured_in_sidebar;
-    this.featuredInNewPost = featured_in_new_post;
     this.order = order;
-    this.defaultOffchainTemplate = default_offchain_template;
     this.totalThreads = total_threads || 0;
     this.channelId = channel_id;
   }
