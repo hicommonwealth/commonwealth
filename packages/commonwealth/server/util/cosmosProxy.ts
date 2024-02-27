@@ -2,7 +2,12 @@ import {
   CacheDecorator,
   lookupKeyDurationInReq,
 } from '@hicommonwealth/adapters';
-import { AppError, NodeHealth, logger } from '@hicommonwealth/core';
+import {
+  AppError,
+  CosmosGovernanceVersion,
+  NodeHealth,
+  logger,
+} from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
 import axios from 'axios';
 import bodyParser from 'body-parser';
@@ -89,6 +94,8 @@ function setupCosmosProxy(
         } else {
           response = await queryExternalProxy(req, cosmos_chain_id, 'rpc');
         }
+
+        await upgradeBetaNodeIfNeeded(req, response, chain.ChainNode);
 
         log.trace(
           `Got response from endpoint: ${JSON.stringify(
@@ -187,6 +194,8 @@ function setupCosmosProxy(
         } else {
           response = await queryExternalProxy(req, cosmos_chain_id, 'rest');
         }
+
+        await updateV1NodeIfNeeded(req, response, chain.ChainNode);
 
         log.trace(`Got response: ${JSON.stringify(response.data, null, 2)}`);
         return res.send(response.data);
@@ -344,6 +353,36 @@ function setupCosmosProxy(
       }
     },
   );
+
+  const upgradeBetaNodeIfNeeded = async (req, response, chainNode) => {
+    if (!req.body?.params?.path?.includes('/cosmos.gov.v1beta1.Query')) return;
+
+    if (
+      response.data?.result?.response?.log?.includes(
+        `can't convert a gov/v1 Proposal to gov/v1beta1 Proposal`,
+      )
+    ) {
+      await models.ChainNode.update(
+        { cosmos_gov_version: CosmosGovernanceVersion.v1beta1Failed },
+        { where: { id: chainNode.id } },
+      );
+    }
+  };
+
+  const updateV1NodeIfNeeded = async (req, response, chainNode) => {
+    if (!req.originalUrl?.includes('cosmos/gov/v1')) return;
+
+    const dbGovVersion = chainNode.cosmos_gov_version;
+    const shouldUpdate =
+      !dbGovVersion || dbGovVersion === CosmosGovernanceVersion.v1beta1Failed;
+
+    if (shouldUpdate) {
+      await models.ChainNode.update(
+        { cosmos_gov_version: CosmosGovernanceVersion.v1 },
+        { where: { id: chainNode.id } },
+      );
+    }
+  };
 }
 
 export default setupCosmosProxy;
