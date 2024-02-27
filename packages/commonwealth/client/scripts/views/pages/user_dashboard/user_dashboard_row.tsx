@@ -40,7 +40,6 @@ export const UserDashboardRow = ({
         <UserDashboardRowTop activityData="" category="" showSkeleton />
         <UserDashboardRowBottom
           threadId=""
-          commentId=""
           communityId=""
           commentCount={0}
           commenters={[]}
@@ -65,7 +64,7 @@ export const UserDashboardRow = ({
     );
   }
 
-  const { chain_id, thread_id, root_type, comment_id } = JSON.parse(
+  const { chain_id, thread_id, root_type } = JSON.parse(
     notification.notificationData,
   );
 
@@ -82,10 +81,10 @@ export const UserDashboardRow = ({
       <UserDashboardRowTop activityData={notification} category={categoryId} />
       <UserDashboardRowBottom
         threadId={threadId}
-        commentId={comment_id}
         communityId={chain_id}
         commentCount={commentCount}
         commenters={commenters}
+        discussionLink={path}
       />
     </Link>
   );

@@ -67,7 +67,7 @@ export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
         userAddress={author_address}
         userCommunityId={author_chain}
         shouldLinkProfile
-        avatarSize={16}
+        avatarSize={32}
       />
     </span>
   );
@@ -103,7 +103,7 @@ export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
         </CWText>
       </div>
       <div className="comment-preview">
-        {<QuillRenderer doc={comment_text} />}
+        <QuillRenderer doc={comment_text} />
       </div>
     </div>
   );
