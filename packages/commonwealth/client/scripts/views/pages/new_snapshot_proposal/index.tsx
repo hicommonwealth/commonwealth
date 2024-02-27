@@ -94,19 +94,12 @@ export const NewSnapshotProposalForm = ({
   };
 
   useEffect(() => {
-    const errorTimeout = setTimeout(() => {
-      // setLoading(false);
-      setErrorMessage(true);
-    }, 6000);
-
-    return () => clearTimeout(errorTimeout);
-  }, [loading]);
-
-  useEffect(() => {
     const init = async () => {
-      await app.snapshot.init(snapshotId);
+      const snapshotNullResponse = await app.snapshot.init(snapshotId);
+      if (snapshotNullResponse === null) {
+        setErrorMessage(true);
+      }
     };
-
     // Add event listener for SnapshotController
     const handleInitialized = async () => {
       if (!app.snapshot.initialized) {
@@ -184,6 +177,7 @@ export const NewSnapshotProposalForm = ({
     };
 
     init();
+
     app.snapshot.snapshotEmitter.on('initialized', handleInitialized);
 
     return () => {
@@ -221,11 +215,10 @@ export const NewSnapshotProposalForm = ({
     <div className="NewSnapshotProposalForm">
       {loading ? (
         errorMessage ? (
-          <div className="error-text">
-            <CWText>
-              Snapshot space not found. Check your Snapshot name and try again.
-            </CWText>
-          </div>
+          <CWText className="error-text">
+            Snapshot space not found. Check your Snapshot space name and try
+            again.
+          </CWText>
         ) : (
           <div className="proposal-loading">
             <CWSpinner />

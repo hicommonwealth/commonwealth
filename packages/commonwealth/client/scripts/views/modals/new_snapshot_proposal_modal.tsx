@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import type Thread from '../../models/Thread';
 import app from '../../state';
-import { NewSnapshotProposalForm } from '../pages/new_snapshot_proposal';
 import { CWDropdown } from '../components/component_kit/cw_dropdown';
 import {
   CWModalBody,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
+import { NewSnapshotProposalForm } from '../pages/new_snapshot_proposal';
 
 import '../../../styles/modals/new_snapshot_proposal_modal.scss';
 
@@ -23,7 +23,7 @@ export const NewSnapshotProposalModal = ({
   onModalClose,
 }: NewSnapshotProposalModalProps) => {
   const [selectedSnapshotId, setSelectedSnapshotId] = useState<string | null>(
-    null
+    null,
   );
 
   const snapshotOptions = useMemo(
@@ -32,14 +32,14 @@ export const NewSnapshotProposalModal = ({
         value: snapshot,
         label: snapshot,
       })) || [],
-    []
+    [],
   );
 
   useEffect(() => {
     if (snapshotOptions.length > 0) {
       setSelectedSnapshotId(snapshotOptions[0].value);
     }
-  }, [snapshotOptions]);
+  }, [snapshotOptions, selectedSnapshotId]);
 
   return (
     <div className="NewSnapshotProposalModal">
