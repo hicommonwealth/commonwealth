@@ -1,4 +1,4 @@
-import useNecessaryEffect from './useNecessaryEffect';
+import { useEffect } from 'react';
 
 type StickyHeaderProps = {
   elementId: string;
@@ -13,7 +13,7 @@ const useStickyHeader = ({
   zIndex = 999,
   stickyBehaviourEnabled = true,
 }: StickyHeaderProps) => {
-  useNecessaryEffect(() => {
+  useEffect(() => {
     const stickyElement = document.getElementById(elementId);
 
     const updateStickyBehaviour = (isSticky = false) => {
@@ -44,7 +44,7 @@ const useStickyHeader = ({
     return () => {
       window.removeEventListener('wheel', listener);
     };
-  }, [stickyBehaviourEnabled]);
+  }, [stickyBehaviourEnabled, elementId, zIndex]);
 };
 
 export default useStickyHeader;
