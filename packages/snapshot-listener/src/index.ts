@@ -13,8 +13,8 @@ import {
   stats,
   type ISnapshotNotification,
 } from '@hicommonwealth/core';
-import type { Request, Response } from 'express';
-import express from 'express';
+import type { Request, RequestHandler, Response } from 'express';
+import express, { json } from 'express';
 import v8 from 'v8';
 import { DEFAULT_PORT, RABBITMQ_URI } from './config';
 import fetchNewSnapshotProposal from './utils/fetchSnapshot';
@@ -45,7 +45,7 @@ log.info(
 
 const app = express();
 const port = process.env.PORT || DEFAULT_PORT;
-app.use(express.json());
+app.use(json() as RequestHandler);
 
 let controller: RabbitMQController;
 

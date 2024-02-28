@@ -10,8 +10,7 @@ import {
 } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
 import axios from 'axios';
-import bodyParser from 'body-parser';
-import { Express } from 'express';
+import * as express from 'express';
 import _ from 'lodash';
 import {
   calcCosmosLCDCacheKeyDuration,
@@ -26,14 +25,14 @@ const Errors = {
 };
 
 function setupCosmosProxy(
-  app: Express,
+  app: express.Express,
   models: DB,
   cacheDecorator: CacheDecorator,
 ) {
   // using bodyParser here because cosmjs generates text/plain type headers
   app.post(
     '/cosmosAPI/:community_id',
-    bodyParser.text(),
+    express.text() as express.RequestHandler,
     calcCosmosRPCCacheKeyDuration,
     cacheDecorator.cacheMiddleware(
       DEFAULT_CACHE_DURATION,
@@ -126,7 +125,7 @@ function setupCosmosProxy(
    */
   app.use(
     '/cosmosAPI/v1/:community_id',
-    bodyParser.text(),
+    express.text() as express.RequestHandler,
     calcCosmosLCDCacheKeyDuration,
     cacheDecorator.cacheMiddleware(
       DEFAULT_CACHE_DURATION,
@@ -314,7 +313,7 @@ function setupCosmosProxy(
 
   app.use(
     '/magicCosmosAPI/:chain/?(node_info)?',
-    bodyParser.text(),
+    express.text() as express.RequestHandler,
     async (req, res) => {
       log.trace(`Got request: ${JSON.stringify(req.body, null, 2)}`);
       // always use cosmoshub for simplicity

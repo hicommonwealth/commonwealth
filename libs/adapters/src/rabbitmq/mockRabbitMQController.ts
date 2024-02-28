@@ -12,7 +12,7 @@ import { AbstractRabbitMQController, RmqMsgFormatError } from './types';
  * testing and scripts that need to use eventHandlers without a live RabbitMQ instance.
  */
 export class MockRabbitMQController extends AbstractRabbitMQController {
-  private _queuedMessages = {};
+  private _queuedMessages: Record<string, RascalSubscriptions[]> = {};
   private subscribedIntervals: Partial<
     Record<RascalSubscriptions, NodeJS.Timeout>
   >[] = [];
@@ -31,10 +31,12 @@ export class MockRabbitMQController extends AbstractRabbitMQController {
     this._initialized = true;
 
     const config =
-      this._rabbitMQConfig.vhosts[Object.keys(this._rabbitMQConfig.vhosts)[0]];
+      this._rabbitMQConfig.vhosts![
+        Object.keys(this._rabbitMQConfig.vhosts!)[0]
+      ];
 
     // initialize the message queue arrays
-    for (const subName of Object.keys(config.subscriptions)) {
+    for (const subName of Object.keys(config.subscriptions!)) {
       this._queuedMessages[subName] = [];
     }
   }
@@ -96,7 +98,7 @@ export class MockRabbitMQController extends AbstractRabbitMQController {
       );
     }
     const subscription = this.routeMessage(publisherName);
-    this._queuedMessages[subscription].push(data);
+    this._queuedMessages[subscription].push(data as any);
     console.log('Message published');
   }
 
@@ -126,10 +128,12 @@ export class MockRabbitMQController extends AbstractRabbitMQController {
 
   private routeMessage(publication: RascalPublications): RascalSubscriptions {
     const config =
-      this._rabbitMQConfig.vhosts[Object.keys(this._rabbitMQConfig.vhosts)[0]];
-    const { exchange, routingKey } = config.publications[publication];
+      this._rabbitMQConfig.vhosts![
+        Object.keys(this._rabbitMQConfig.vhosts!)[0]
+      ];
+    const { exchange, routingKey } = config.publications![publication];
     const queue = (
-      Object.values(config.bindings).find(
+      Object.values(config.bindings!).find(
         (binding: Rascal.BindingConfig) =>
           binding.source === exchange && binding.bindingKey === routingKey,
       ) as Rascal.BindingConfig
@@ -141,7 +145,7 @@ export class MockRabbitMQController extends AbstractRabbitMQController {
       );
     }
 
-    for (const [subName, sub] of Object.entries(config.subscriptions)) {
+    for (const [subName, sub] of Object.entries(config.subscriptions!)) {
       if (sub.queue === queue) return subName as RascalSubscriptions;
     }
 

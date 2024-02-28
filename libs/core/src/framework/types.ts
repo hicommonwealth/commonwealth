@@ -140,11 +140,13 @@ export type QueryHandler<T, P extends ZodSchema> = (
  * - `schema`: zod schema of the command payload
  * - `auth`: authorization chain, may preload the aggregate when necessary
  * - `body`: function implementing core domain logic, and returning side effects (mutations)
+ * - `secure`: true when user requires authentication
  */
 export type CommandMetadata<T, P extends ZodSchema> = {
   readonly schema: P;
   readonly auth: CommandHandler<T, P>[];
   readonly body: CommandHandler<T, P>;
+  readonly secure?: boolean;
 };
 
 /**
@@ -152,11 +154,13 @@ export type CommandMetadata<T, P extends ZodSchema> = {
  * - `schema`: zod schema of the query payload (filters)
  * - `auth`: authorization chain, may inject more filters to the payload
  * - `body`: function implementing the query logic
+ * - `secure`: true when user requires authentication
  */
 export type QueryMetadata<T, P extends ZodSchema> = {
   readonly schema: P;
   readonly auth: QueryHandler<T, P>[];
   readonly body: QueryHandler<T, P>;
+  readonly secure?: boolean;
 };
 
 type Events = Record<string, Record<string, any>>;
