@@ -8,19 +8,10 @@ import React, { StrictMode } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { queryClient } from 'state/api/config';
+import { Splash } from './Splash';
 import { openFeatureProvider } from './helpers/feature-flags';
 import useAppStatus from './hooks/useAppStatus';
 import { AddToHomeScreenPrompt } from './views/components/AddToHomeScreenPrompt';
-import CWCircleMultiplySpinner from './views/components/component_kit/new_designs/CWCircleMultiplySpinner';
-
-const Splash = () => {
-  return (
-    <div className="Splash">
-      {/* This can be a moving bobber, atm it is still */}
-      <CWCircleMultiplySpinner />
-    </div>
-  );
-};
 
 OpenFeature.setProvider(openFeatureProvider);
 
