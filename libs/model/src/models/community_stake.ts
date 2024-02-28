@@ -1,21 +1,13 @@
+import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
 import { z } from 'zod';
 import { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
 
-export const CommunityStakeSchema = z.object({
-  id: z.number().optional(),
-  community_id: z.string().optional(),
-  stake_id: z.number().optional(),
-  stake_token: z.string().optional(),
-  vote_weight: z.number().optional(),
-  stake_enabled: z.boolean().optional(),
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
-});
-
-export type CommunityStakeAttributes = z.infer<typeof CommunityStakeSchema> & {
+export type CommunityStakeAttributes = z.infer<
+  typeof schemas.CommunityStake
+> & {
   // associations
   Chain?: CommunityAttributes;
 };

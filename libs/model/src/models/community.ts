@@ -1,9 +1,4 @@
-import {
-  ChainBase,
-  ChainNetwork,
-  ChainType,
-  DefaultPage,
-} from '@hicommonwealth/core';
+import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
 import { z } from 'zod';
@@ -19,46 +14,7 @@ import type { TopicAttributes, TopicInstance } from './topic';
 import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes } from './user';
 
-export const CommunitySchema = z.object({
-  name: z.string(),
-  chain_node_id: z.number(),
-  default_symbol: z.string(),
-  network: z.nativeEnum(ChainNetwork),
-  base: z.nativeEnum(ChainBase),
-  icon_url: z.string(),
-  active: z.boolean(),
-  type: z.nativeEnum(ChainType),
-  id: z.string().optional(),
-  description: z.string().optional(),
-  social_links: z.array(z.string()).optional(),
-  ss58_prefix: z.number().optional(),
-  stages_enabled: z.boolean().optional(),
-  custom_stages: z.array(z.string()).optional(),
-  custom_domain: z.string().optional(),
-  block_explorer_ids: z.string().optional(),
-  collapsed_on_homepage: z.boolean().optional(),
-  substrate_spec: z.string().optional(),
-  has_chain_events_listener: z.boolean().optional(),
-  default_summary_view: z.boolean().optional(),
-  default_page: z.nativeEnum(DefaultPage).optional(),
-  has_homepage: z.boolean().optional(),
-  terms: z.string().optional(),
-  admin_only_polling: z.boolean().optional(),
-  bech32_prefix: z.string().optional(),
-  hide_projects: z.boolean().optional(),
-  token_name: z.string().optional(),
-  ce_verbose: z.boolean().optional(),
-  discord_config_id: z.number().optional(),
-  category: z.unknown().optional(), // Assuming category can be any type
-  discord_bot_webhooks_enabled: z.boolean().optional(),
-  directory_page_enabled: z.boolean().optional(),
-  directory_page_chain_node_id: z.number().optional(),
-  namespace: z.string().optional(),
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
-});
-
-export type CommunityAttributes = z.infer<typeof CommunitySchema> & {
+export type CommunityAttributes = z.infer<typeof schemas.Community> & {
   // associations
   ChainNode?: ChainNodeAttributes;
   Addresses?: AddressAttributes[] | AddressAttributes['id'][];
