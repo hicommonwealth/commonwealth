@@ -88,7 +88,7 @@ export const AndroidPrompt = ({
           web-app.
         </CWText>
         <CWText className="manual-install" id="manual-install" type="b2">
-          Having issues with install? Try these manual steps:
+          Having issues? Try these steps to manually install:
           <CWText type="b2">
             1. Tap the 3 dots icon&nbsp;
             <CWIcon
