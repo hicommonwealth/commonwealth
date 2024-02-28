@@ -1,6 +1,6 @@
 import { command, type CommandMetadata, type User } from '@hicommonwealth/core';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
-import { z, ZodSchema } from 'zod';
+import { ZodSchema } from 'zod';
 
 /**
  * Adapts commands to express handlers
@@ -13,13 +13,7 @@ import { z, ZodSchema } from 'zod';
 export const expressCommand =
   <T, P extends ZodSchema>(md: CommandMetadata<T, P>): RequestHandler =>
   async (
-    req: Request<
-      { id: string },
-      T,
-      z.infer<P> & {
-        address_id?: string;
-      }
-    >,
+    req: Request<{ id: string }>,
     res: Response<Partial<T> | undefined>,
     next: NextFunction,
   ) => {

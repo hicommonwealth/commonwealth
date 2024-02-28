@@ -9,19 +9,7 @@ import { z, ZodSchema } from 'zod';
  */
 export const expressQuery =
   <T, P extends ZodSchema>(md: QueryMetadata<T, P>): RequestHandler =>
-  async (
-    req: Request<
-      Partial<z.infer<P>>,
-      T,
-      Partial<
-        z.infer<P> & {
-          address_id?: string;
-        }
-      >
-    >,
-    res: Response<T | undefined>,
-    next: NextFunction,
-  ) => {
+  async (req: Request, res: Response<T | undefined>, next: NextFunction) => {
     try {
       const results = await query(md, {
         actor: { user: req.user as User, address_id: req.body.address_id },
