@@ -4,6 +4,7 @@ $small-icon: 16px;
 $regular-icon: 20px;
 $medium-icon: 24px;
 $large-icon: 32px;
+$header-icon: 36px;
 $xl-icon: 48px;
 $xxl-icon: 60px;
 
@@ -35,6 +36,10 @@ $xxl-icon: 60px;
 
   &.large {
     font-size: $large-icon;
+  }
+
+  &.header {
+    font-size: $header-icon;
   }
 
   &.xl {

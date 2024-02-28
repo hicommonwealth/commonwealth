@@ -9,35 +9,40 @@ export const CosmosClients: Record<string, CosmosClientType> = {};
 
 export async function getCosmosClient<
   CosmosClient extends GovV1Beta1ClientType | GovV1Client,
->(chain: CommunityInstance): Promise<CosmosClient> {
-  if (CosmosClients[chain.id]) return CosmosClients[chain.id] as CosmosClient;
+>(community: CommunityInstance): Promise<CosmosClient> {
+  if (CosmosClients[community.id])
+    return CosmosClients[community.id] as CosmosClient;
 
-  if (COSMOS_GOV_V1_CHAIN_IDS.includes(chain.id)) {
+  if (COSMOS_GOV_V1_CHAIN_IDS.includes(community.id)) {
     const result = await createLCDClient({
-      restEndpoint: chain.ChainNode.alt_wallet_url,
+      restEndpoint: community.ChainNode.alt_wallet_url,
     });
 
-    CosmosClients[chain.id] = result.cosmos.gov.v1;
+    CosmosClients[community.id] = result.cosmos.gov.v1;
 
-    if (!CosmosClients[chain.id]) {
-      throw new Error(`Failed to create Cosmos client for chain ${chain.id}`);
+    if (!CosmosClients[community.id]) {
+      throw new Error(
+        `Failed to create Cosmos client for community ${community.id}`,
+      );
     }
-    return CosmosClients[chain.id] as CosmosClient;
+    return CosmosClients[community.id] as CosmosClient;
   } else {
     const tmClient = await tm.Tendermint34Client.connect(
-      chain.ChainNode.url || chain.ChainNode.private_url,
+      community.ChainNode.url || community.ChainNode.private_url,
     );
-    CosmosClients[chain.id] = QueryClient.withExtensions(
+    CosmosClients[community.id] = QueryClient.withExtensions(
       tmClient,
       setupGovExtension,
     );
 
     if (
-      !CosmosClients[chain.id] ||
-      !(<GovV1Beta1ClientType>CosmosClients[chain.id]).gov
+      !CosmosClients[community.id] ||
+      !(<GovV1Beta1ClientType>CosmosClients[community.id]).gov
     ) {
-      throw new Error(`Failed to create Cosmos client for chain ${chain.id}`);
+      throw new Error(
+        `Failed to create Cosmos client for community ${community.id}`,
+      );
     }
-    return CosmosClients[chain.id] as CosmosClient;
+    return CosmosClients[community.id] as CosmosClient;
   }
 }

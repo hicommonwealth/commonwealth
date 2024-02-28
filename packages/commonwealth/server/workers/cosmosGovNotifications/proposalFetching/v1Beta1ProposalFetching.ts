@@ -9,13 +9,14 @@ import { numberToUint8ArrayBE, uint8ArrayToNumberBE } from './util';
 const log = logger().getLogger(__filename);
 
 /**
- * See {@Link fetchLatestCosmosProposalV1}. Same logic applies, but for Cosmos chains that use the v1beta1 gov module.
- * @param chain
+ * See {@Link fetchLatestCosmosProposalV1}. Same logic applies, but for
+ * Cosmos communities that use the v1beta1 gov module.
+ * @param community
  */
 export async function fetchLatestCosmosProposalV1Beta1(
-  chain: CommunityInstance,
+  community: CommunityInstance,
 ): Promise<Proposal[]> {
-  const client = await getCosmosClient<GovV1Beta1ClientType>(chain);
+  const client = await getCosmosClient<GovV1Beta1ClientType>(community);
   let nextKey: Uint8Array, finalProposalsPage: Proposal[];
   do {
     const result = await client.gov.proposals(
@@ -25,7 +26,7 @@ export async function fetchLatestCosmosProposalV1Beta1(
       nextKey,
     );
     if (!result) {
-      console.error(`Result is undefined for ${chain.id}`);
+      console.error(`Result is undefined for ${community.id}`);
     }
     finalProposalsPage = result?.proposals;
     if (result?.pagination) {
@@ -46,7 +47,7 @@ export async function fetchLatestCosmosProposalV1Beta1(
     log.info(
       `Fetched proposal ${finalProposalsPage[
         finalProposalsPage.length - 1
-      ].proposalId.toNumber()} from ${chain.id}`,
+      ].proposalId.toNumber()} from ${community.id}`,
     );
     return [finalProposalsPage[finalProposalsPage.length - 1]];
   } else return [];
@@ -58,12 +59,12 @@ export async function fetchLatestCosmosProposalV1Beta1(
  */
 export async function fetchUpToLatestCosmosProposalV1Beta1(
   proposalId: number,
-  chain: CommunityInstance,
+  community: CommunityInstance,
 ): Promise<Proposal[]> {
   log.info(
-    `Fetching proposals from '${chain.id}' starting at proposal id ${proposalId}`,
+    `Fetching proposals from '${community.id}' starting at proposal id ${proposalId}`,
   );
-  const client = await getCosmosClient<GovV1Beta1ClientType>(chain);
+  const client = await getCosmosClient<GovV1Beta1ClientType>(community);
 
   const proposals: Proposal[] = [];
   do {
@@ -83,6 +84,6 @@ export async function fetchUpToLatestCosmosProposalV1Beta1(
     } else break;
   } while (true);
 
-  log.info(`Fetched ${proposals.length} proposals from ${chain.id}.`);
+  log.info(`Fetched ${proposals.length} proposals from ${community.id}.`);
   return proposals;
 }

@@ -6,13 +6,28 @@ import { HIDE_PROMPT, HIDE_PROMPT_DAYS, HIDE_PROMPT_TIME } from './constants';
 interface AddToHomeScreenPromptProps {
   isIOS: boolean;
   isAndroid: boolean;
+  displayDelayMilliseconds?: number;
 }
 
 export const AddToHomeScreenPrompt = ({
   isIOS,
   isAndroid,
+  displayDelayMilliseconds,
 }: AddToHomeScreenPromptProps) => {
-  const [showPrompt, setShowPrompt] = useState(true);
+  const [showPrompt, setShowPrompt] = useState(
+    displayDelayMilliseconds ? false : true,
+  );
+
+  useEffect(() => {
+    let timeout;
+    if (displayDelayMilliseconds) {
+      timeout = setTimeout(() => setShowPrompt(true), displayDelayMilliseconds);
+    }
+
+    return () => {
+      timeout && clearTimeout(timeout);
+    };
+  }, [displayDelayMilliseconds]);
 
   useEffect(() => {
     const hidePromptTime = localStorage.getItem(HIDE_PROMPT_TIME);
