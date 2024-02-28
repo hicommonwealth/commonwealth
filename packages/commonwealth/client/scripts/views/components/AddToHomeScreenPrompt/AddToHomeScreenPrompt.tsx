@@ -12,7 +12,21 @@ export const AddToHomeScreenPrompt = ({
   isIOS,
   isAndroid,
 }: AddToHomeScreenPromptProps) => {
-  const [showPrompt, setShowPrompt] = useState(true);
+  const [showPrompt, setShowPrompt] = useState(false);
+  const [isSplashUnloaded, setIsSplashUnloaded] = useState(false);
+
+  useEffect(() => {
+    // Delay the unloading of the Splash component
+    setTimeout(() => {
+      setIsSplashUnloaded(true);
+    }, 1000); // Adjust the delay as needed
+  }, []);
+
+  useEffect(() => {
+    if (isSplashUnloaded) {
+      setShowPrompt(true);
+    }
+  }, [isSplashUnloaded]);
 
   useEffect(() => {
     const hidePromptTime = localStorage.getItem(HIDE_PROMPT_TIME);
