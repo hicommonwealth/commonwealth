@@ -27,7 +27,7 @@
     "redis": "4.2.0",
     "rollbar": "^2.6.1",
     "sequelize": "^6.32.1",
-    "trpc-openapi": "^1.2.0",
+    "trpc-openapi": "1.1.2",
     "typescript-logging": "^0.6.4",
     "zod": "^3.22.4"
   }

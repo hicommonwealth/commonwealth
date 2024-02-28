@@ -59,9 +59,17 @@ const trpcerror = (error: unknown): TRPCError => {
   });
 };
 
+export enum Tag {
+  User = 'User',
+  Community = 'Community',
+  Thread = 'Thread',
+  Comment = 'Comment',
+  Reaction = 'Reaction',
+}
+
 export const command = <T, P extends ZodObject<any>>(
   factory: () => CommandMetadata<T, P>,
-  tag: string,
+  tag: Tag,
 ) => {
   const md = factory();
   return trpc.procedure
@@ -143,6 +151,6 @@ export const toExpress = (router: OpenApiRouter) =>
 export const toOpenApiDocument = (
   router: OpenApiRouter,
   opts: GenerateOpenApiDocumentOptions,
-) => generateOpenApiDocument(router, opts);
+) => generateOpenApiDocument(router, { ...opts, tags: Object.keys(Tag) });
 
 export const router = trpc.router;
