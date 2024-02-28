@@ -52,7 +52,7 @@ export const Community = z.object({
   updated_at: z.date().optional(),
 });
 
-export const GetCommunityStakeSchema = {
+export const GetCommunityStake = {
   input: z.object({
     community_id: z.string(),
     stake_id: z.coerce
@@ -64,7 +64,7 @@ export const GetCommunityStakeSchema = {
   output: CommunityStake,
 };
 
-export const SetCommunityStakeSchema = {
+export const SetCommunityStake = {
   input: z.object({
     stake_id: z.coerce.number().int(),
     stake_token: z.string().default(''),
