@@ -95,7 +95,7 @@ function setupCosmosProxy(
           response = await queryExternalProxy(req, cosmos_chain_id, 'rpc');
         }
 
-        await upgradeBetaNodeIfNeeded(req, response, chain.ChainNode);
+        await upgradeBetaNodeIfNeeded(req, response, community.ChainNode);
 
         log.trace(
           `Got response from endpoint: ${JSON.stringify(
@@ -195,7 +195,7 @@ function setupCosmosProxy(
           response = await queryExternalProxy(req, cosmos_chain_id, 'rest');
         }
 
-        await updateV1NodeIfNeeded(req, response, chain.ChainNode);
+        await updateV1NodeIfNeeded(req, response, community.ChainNode);
 
         log.trace(`Got response: ${JSON.stringify(response.data, null, 2)}`);
         return res.send(response.data);
