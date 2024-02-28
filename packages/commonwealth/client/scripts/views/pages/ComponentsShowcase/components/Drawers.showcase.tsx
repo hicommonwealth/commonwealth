@@ -17,56 +17,58 @@ const DrawersShowcase = () => {
 
   return (
     <>
-      <div>
-        <CWButton
-          buttonHeight="sm"
-          label="Left"
-          onClick={() => {
-            setLeftOpen(true);
-          }}
-        />
-        <CWDrawer
-          open={leftOpen}
-          onClose={() => setLeftOpen(false)}
-          direction="left"
-        >
-          <div>{content}</div>
-        </CWDrawer>
-      </div>
+      <div className="flex-row">
+        <div>
+          <CWButton
+            buttonHeight="sm"
+            label="Left"
+            onClick={() => {
+              setLeftOpen(true);
+            }}
+          />
+          <CWDrawer
+            open={leftOpen}
+            onClose={() => setLeftOpen(false)}
+            direction="left"
+          >
+            <div>{content}</div>
+          </CWDrawer>
+        </div>
 
-      <div>
-        <CWButton
-          buttonHeight="sm"
-          label="Bottom"
-          onClick={() => {
-            setBottomOpen(true);
-          }}
-        />
-        <CWDrawer
-          open={rightOpen}
-          onClose={() => setRightOpen(false)}
-          direction="right"
-        >
-          <div>{content}</div>
-        </CWDrawer>
-      </div>
+        <div>
+          <CWButton
+            buttonHeight="sm"
+            label="Bottom"
+            onClick={() => {
+              setBottomOpen(true);
+            }}
+          />
+          <CWDrawer
+            open={rightOpen}
+            onClose={() => setRightOpen(false)}
+            direction="right"
+          >
+            <div>{content}</div>
+          </CWDrawer>
+        </div>
 
-      <div>
-        <CWButton
-          buttonHeight="sm"
-          label="Rigth"
-          onClick={() => {
-            setRightOpen(true);
-          }}
-        />
+        <div>
+          <CWButton
+            buttonHeight="sm"
+            label="Rigth"
+            onClick={() => {
+              setRightOpen(true);
+            }}
+          />
 
-        <CWDrawer
-          open={bottomOpen}
-          onClose={() => setBottomOpen(false)}
-          direction="bottom"
-        >
-          <div>{content}</div>
-        </CWDrawer>
+          <CWDrawer
+            open={bottomOpen}
+            onClose={() => setBottomOpen(false)}
+            direction="bottom"
+          >
+            <div>{content}</div>
+          </CWDrawer>
+        </div>
       </div>
     </>
   );

@@ -11,6 +11,7 @@ import DrawersShowcase from 'views/pages/ComponentsShowcase/components/Drawers.s
 import ElevationsShowcase from 'views/pages/ComponentsShowcase/components/Elevations.showcase';
 import FormStepsShowcase from 'views/pages/ComponentsShowcase/components/FormSteps.showcase';
 import LoadersShowcase from 'views/pages/ComponentsShowcase/components/Loaders.showcase';
+import ModalsShowcase from 'views/pages/ComponentsShowcase/components/Modals.showcase';
 import RadioButtonsShowcase from 'views/pages/ComponentsShowcase/components/RadioButtons.showcase';
 import TypographyShowcase from 'views/pages/ComponentsShowcase/components/Typography.showcase';
 
@@ -30,6 +31,7 @@ export const ComponentPageName = {
   Loaders: 'Loaders',
   FormSteps: 'FormSteps',
   Checkboxes: 'Checkboxes',
+  Modals: 'Modals',
 };
 
 export const ComponentType = {
@@ -111,6 +113,11 @@ export const componentItems = [
   {
     ComponentPage: CheckboxesShowcase,
     displayName: ComponentPageName.Checkboxes,
+    type: ComponentType.Components,
+  },
+  {
+    ComponentPage: ModalsShowcase,
+    displayName: ComponentPageName.Modals,
     type: ComponentType.Components,
   },
 ];
