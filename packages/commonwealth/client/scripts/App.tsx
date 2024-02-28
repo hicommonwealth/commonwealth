@@ -39,7 +39,11 @@ const App = () => {
             <>
               <RouterProvider router={router(customDomain)} />
               {isAddedToHomeScreen || isMarketingPage ? null : (
-                <AddToHomeScreenPrompt isIOS={isIOS} isAndroid={isAndroid} />
+                <AddToHomeScreenPrompt
+                  isIOS={isIOS}
+                  isAndroid={isAndroid}
+                  displayDelayMilliseconds={1000}
+                />
               )}
             </>
           )}
