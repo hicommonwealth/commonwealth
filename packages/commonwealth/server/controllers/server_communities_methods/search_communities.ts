@@ -1,10 +1,10 @@
+import { QueryTypes } from 'sequelize';
+import { TypedPaginatedResult } from '../../types';
 import {
   PaginationSqlOptions,
   buildPaginatedResponse,
   buildPaginationSql,
 } from '../../util/queries';
-import { QueryTypes } from 'sequelize';
-import { TypedPaginatedResult } from 'server/types';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 export type SearchCommunitiesOptions = {
@@ -21,7 +21,7 @@ export type SearchCommunitiesResult = TypedPaginatedResult<{
 
 export async function __searchCommunities(
   this: ServerCommunitiesController,
-  { search, limit, page, orderBy, orderDirection }: SearchCommunitiesOptions
+  { search, limit, page, orderBy, orderDirection }: SearchCommunitiesOptions,
 ): Promise<SearchCommunitiesResult> {
   let sortOptions: PaginationSqlOptions = {
     limit: Math.min(limit, 100) || 10,
@@ -80,7 +80,7 @@ export async function __searchCommunities(
       {
         bind,
         type: QueryTypes.SELECT,
-      }
+      },
     ),
   ]);
 

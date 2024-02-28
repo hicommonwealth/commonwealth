@@ -138,12 +138,10 @@ import { ServerReactionsController } from '../controllers/server_reactions_contr
 import { ServerThreadsController } from '../controllers/server_threads_controller';
 import { ServerTopicsController } from '../controllers/server_topics_controller';
 
-import { GENERATE_IMAGE_RATE_LIMIT } from 'server/config';
-import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
-import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
-import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
-import { updateChainNodeHandler } from 'server/routes/communities/update_chain_node_handler';
+import { GENERATE_IMAGE_RATE_LIMIT } from '../config';
+import { rateLimiterMiddleware } from '../middleware/rateLimiter';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
+import { getTopUsersHandler } from '../routes/admin/get_top_users_handler';
 import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
 import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_handler';
 import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
@@ -154,6 +152,8 @@ import { createCommunityHandler } from '../routes/communities/create_community_h
 import { deleteCommunityHandler } from '../routes/communities/delete_community_handler';
 import { getChainNodesHandler } from '../routes/communities/get_chain_nodes_handler';
 import { getCommunitiesHandler } from '../routes/communities/get_communities_handler';
+import { getNamespaceMetadata } from '../routes/communities/get_namespace_metadata';
+import { updateChainNodeHandler } from '../routes/communities/update_chain_node_handler';
 import { updateCommunityHandler } from '../routes/communities/update_community_handler';
 import { updateCommunityIdHandler } from '../routes/communities/update_community_id_handler';
 import exportMembersList from '../routes/exportMembersList';

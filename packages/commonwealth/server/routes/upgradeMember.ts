@@ -4,7 +4,7 @@ import { isRole } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { Op } from 'sequelize';
-import { validateOwner } from 'server/util/validateOwner';
+import { validateOwner } from '../util/validateOwner';
 
 export const Errors = {
   InvalidAddress: 'Invalid address',

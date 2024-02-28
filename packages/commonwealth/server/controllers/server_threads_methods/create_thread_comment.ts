@@ -11,12 +11,12 @@ import {
   UserInstance,
 } from '@hicommonwealth/model';
 import moment from 'moment';
-import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import { getCommentDepth } from '../../util/getCommentDepth';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
+import { sanitizeQuillText } from '../../util/sanitizeQuillText';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';

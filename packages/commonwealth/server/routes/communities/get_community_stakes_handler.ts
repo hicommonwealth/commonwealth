@@ -3,7 +3,7 @@ import { CommunityStakeAttributes, DB } from '@hicommonwealth/model';
 import {
   GetCommunityStakeOptions,
   GetCommunityStakeSchema,
-} from 'server/controllers/server_communities_methods/get_community_stake';
+} from '../../controllers/server_communities_methods/get_community_stake';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestParams, TypedResponse, success } from '../../types';
 import { formatErrorPretty } from '../../util/errorFormat';

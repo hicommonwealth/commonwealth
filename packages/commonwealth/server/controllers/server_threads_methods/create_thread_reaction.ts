@@ -9,8 +9,8 @@ import {
   UserInstance,
   commonProtocol as commonProtocolService,
 } from '@hicommonwealth/model';
-import { REACTION_WEIGHT_OVERRIDE } from 'server/config';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { REACTION_WEIGHT_OVERRIDE } from '../../config';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_controller';

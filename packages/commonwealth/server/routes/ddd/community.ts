@@ -6,7 +6,7 @@ import {
 import { Community } from '@hicommonwealth/model';
 import { Router } from 'express';
 import passport from 'passport';
-import { MixpanelCommunityInteractionEvent } from 'shared/analytics/types';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 
 const router = Router();
 

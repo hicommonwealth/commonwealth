@@ -1,7 +1,7 @@
 import { AppError } from '@hicommonwealth/core';
 import { TopicAttributes, UserInstance } from '@hicommonwealth/model';
-import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { sanitizeQuillText } from '../../util/sanitizeQuillText';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_controller';
 import { ServerTopicsController } from '../server_topics_controller';

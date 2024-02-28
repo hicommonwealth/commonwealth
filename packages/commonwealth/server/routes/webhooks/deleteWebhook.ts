@@ -1,7 +1,7 @@
 import { AppError } from '@hicommonwealth/core';
+import { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-import { validateOwner } from 'server/util/validateOwner';
-import { DB } from '../../../../../libs/model/src/models';
+import { validateOwner } from '../../util/validateOwner';
 import Errors from './errors';
 
 const deleteWebhook = async (

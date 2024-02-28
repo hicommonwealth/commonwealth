@@ -1,7 +1,7 @@
 import type { DB } from '@hicommonwealth/model';
-import type { GlobalActivity } from 'server/util/activityQuery';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
+import type { GlobalActivity } from '../util/activityQuery';
 import type GlobalActivityCache from '../util/globalActivityCache';
 
 const viewGlobalActivity = async (

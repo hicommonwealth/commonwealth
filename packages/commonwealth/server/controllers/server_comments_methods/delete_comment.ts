@@ -5,7 +5,7 @@ import {
   UserInstance,
 } from '@hicommonwealth/model';
 import { WhereOptions } from 'sequelize';
-import { validateOwner } from 'server/util/validateOwner';
+import { validateOwner } from '../../util/validateOwner';
 import { ServerCommentsController } from '../server_comments_controller';
 
 const Errors = {

@@ -1,4 +1,4 @@
-import { TypedPaginatedResult } from 'server/types';
+import { TypedPaginatedResult } from '../types';
 
 /*
 These methods are for generating the sequelize formatting for

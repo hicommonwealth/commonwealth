@@ -1,8 +1,8 @@
 import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import type { Request, Response } from 'express';
-import { validateOwner } from 'server/util/validateOwner';
 import { success } from '../../types';
+import { validateOwner } from '../../util/validateOwner';
 
 export const Errors = {
   InvalidCommentId: 'Comment ID invalid',

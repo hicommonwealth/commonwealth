@@ -1,11 +1,11 @@
 import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
+import isValidJson from '../../shared/validateJson';
 import type {
   TypedRequestBody,
   TypedRequestQuery,
   TypedResponse,
-} from 'server/types';
-import isValidJson from '../../shared/validateJson';
+} from '../types';
 import { success } from '../types';
 import { validateOwner } from '../util/validateOwner';
 

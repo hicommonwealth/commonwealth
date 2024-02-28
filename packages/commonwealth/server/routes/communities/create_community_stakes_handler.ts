@@ -4,12 +4,12 @@ import {
   DB,
   commonProtocol,
 } from '@hicommonwealth/model';
+import { z } from 'zod';
 import {
   SetCommunityStakeBodySchema,
   SetCommunityStakeParams,
   SetCommunityStakeParamsSchema,
-} from 'server/controllers/server_communities_methods/create_community_stake';
-import { z } from 'zod';
+} from '../../controllers/server_communities_methods/create_community_stake';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 import { formatErrorPretty } from '../../util/errorFormat';

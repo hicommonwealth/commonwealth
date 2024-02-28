@@ -21,7 +21,6 @@ import passport from 'passport';
 import prerenderNode from 'prerender-node';
 import type { BrokerConfig } from 'rascal';
 import favicon from 'serve-favicon';
-import expressStatsInit from 'server/scripts/setupExpressStats';
 import * as v8 from 'v8';
 import {
   DATABASE_CLEAN_HOUR,
@@ -36,6 +35,7 @@ import setupPassport from './server/passport';
 import setupAPI from './server/routing/router';
 import { sendBatchedNotificationEmails } from './server/scripts/emails';
 import setupAppRoutes from './server/scripts/setupAppRoutes';
+import expressStatsInit from './server/scripts/setupExpressStats';
 import setupServer from './server/scripts/setupServer';
 import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';

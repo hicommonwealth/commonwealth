@@ -1,6 +1,6 @@
 import { ThreadAttributes } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
-import { TypedPaginatedResult } from 'server/types';
+import { TypedPaginatedResult } from '../../types';
 import {
   PaginationSqlBind,
   PaginationSqlOptions,

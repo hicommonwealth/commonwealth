@@ -1,6 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
-import { GetCommunitiesResult } from 'server/controllers/server_communities_methods/get_communities';
-import { SearchCommunitiesResult } from 'server/controllers/server_communities_methods/search_communities';
+import { GetCommunitiesResult } from '../../controllers/server_communities_methods/get_communities';
+import { SearchCommunitiesResult } from '../../controllers/server_communities_methods/search_communities';
 import { ServerControllers } from '../../routing/router';
 import {
   PaginationQueryParams,

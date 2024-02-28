@@ -1,5 +1,5 @@
 import { analytics } from '@hicommonwealth/core';
-import { AnalyticsPayload } from 'shared/analytics/types';
+import { AnalyticsPayload } from '../../shared/analytics/types';
 import { SERVER_URL } from '../config';
 
 export type TrackOptions = Record<string, any> & AnalyticsPayload;

@@ -1,5 +1,5 @@
 import { AppError } from '@hicommonwealth/core';
-import { ServerControllers } from 'server/routing/router';
+import { ServerControllers } from '../../routing/router';
 import { TypedRequestParams, TypedResponse, success } from '../../types';
 
 const Errors = {

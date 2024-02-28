@@ -1,5 +1,5 @@
 import { Op, QueryTypes } from 'sequelize';
-import { TypedPaginatedResult } from 'server/types';
+import { TypedPaginatedResult } from '../../types';
 
 import { AppError } from '@hicommonwealth/core';
 import { CommunityInstance } from '@hicommonwealth/model';
