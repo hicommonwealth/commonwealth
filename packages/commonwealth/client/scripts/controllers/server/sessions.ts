@@ -1,17 +1,9 @@
-import { addressSwapper } from 'commonwealth/shared/utils';
-
 import type { Signature } from '@canvas-js/interfaces';
-import { getADR036SignableSession } from 'adapters/chain/cosmos/keys';
-import { createSiweMessage } from 'adapters/chain/ethereum/keys';
-import {
-  CANVAS_TOPIC,
-  chainBaseToCanvasChainId,
-  createCanvasSessionPayload,
-} from 'canvas';
+import { CANVAS_TOPIC } from 'canvas';
 
-import { ChainBase, WalletSsoSource } from '@hicommonwealth/core';
+import { CosmosSigner } from '@canvas-js/chain-cosmos';
+import { WalletSsoSource } from '@hicommonwealth/core';
 import { getSessionSigners } from 'shared/canvas/verify';
-import app from 'state';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
 
@@ -43,58 +35,25 @@ export async function signSessionWithAccount<T extends { address: string }>(
   return session;
 }
 
-// for eth and cosmos only, assumes chainbase is either Ethereum or CosmosSDK
-export async function signSessionWithMagic(
-  walletChain = ChainBase.Ethereum,
-  signer,
-  signerAddress,
-  timestamp: number,
-  blockhash = '',
-) {
-  const idOrPrefix =
-    walletChain === ChainBase.CosmosSDK
-      ? app.chain?.meta.bech32Prefix || 'cosmos'
-      : app.chain?.meta.node?.ethChainId || 1;
-  const canvasChainId = chainBaseToCanvasChainId(walletChain, idOrPrefix);
-  const sessionPublicAddress = await app.sessions.getOrCreateAddress(
-    walletChain,
-    canvasChainId,
-    signerAddress,
-  );
-
-  const sessionPayload = createCanvasSessionPayload(
-    walletChain,
-    canvasChainId,
-    walletChain === ChainBase.Substrate
-      ? addressSwapper({
-          address: signerAddress,
-          currentPrefix: 42,
-        })
-      : signerAddress,
-    sessionPublicAddress,
-    timestamp,
-    blockhash,
-  );
-
-  // skip wallet.signCanvasMessage(), do the logic here instead
-  if (walletChain === ChainBase.CosmosSDK) {
-    const canvas = await import('@canvas-js/interfaces');
-    const { msgs, fee } = await getADR036SignableSession(
-      Buffer.from(canvas.serializeSessionPayload(sessionPayload)),
-      signerAddress,
-    );
-    const signature = await signer.signMessage(msgs, fee); // this is a cosmos tx
-    return { signature, sessionPayload };
-  } else {
-    // signature format: https://docs.canvas.xyz/docs/formats#ethereum
-    const siwe = await require('siwe');
-    const nonce = siwe.generateNonce();
-    const domain = document.location.origin;
-    const message = createSiweMessage(sessionPayload, domain, nonce);
-    const signatureData = await signer.signMessage(message);
-    return { signature: `${domain}/${nonce}/${signatureData}`, sessionPayload };
-  }
-}
+export const getMagicCosmosSessionSigner = (
+  signer: { signMessage: any },
+  address: string,
+  chainId: string,
+) =>
+  new CosmosSigner({
+    signer: {
+      type: 'amino',
+      getAddress: async () => address,
+      getChainId: async () => chainId,
+      signAmino: async (chainIdIgnore, signerIgnore, signDoc) => {
+        const { msgs, fee } = signDoc;
+        return {
+          signed: signDoc,
+          signature: await signer.signMessage(msgs, fee),
+        };
+      },
+    },
+  });
 
 export async function getSessionFromWallet(
   wallet: IWebWallet<any>,

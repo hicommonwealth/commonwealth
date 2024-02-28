@@ -4,12 +4,14 @@
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/core';
 import { chainBaseToCanvasChainId } from 'canvas/chainMappings';
 import { notifyError } from 'controllers/app/notifications';
-import { signSessionWithMagic } from 'controllers/server/sessions';
+import { getMagicCosmosSessionSigner } from 'controllers/server/sessions';
 import { isSameAccount } from 'helpers';
 import $ from 'jquery';
 import { getSessionSigners } from 'shared/canvas/verify';
 import { initAppState } from 'state';
 
+import { SIWESigner } from '@canvas-js/chain-ethereum';
+import { CANVAS_TOPIC } from 'shared/canvas';
 import app from 'state';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
@@ -450,32 +452,23 @@ export async function handleSocialLoginCallback({
     }
   }
 
-  let authedSessionPayload, authedSignature;
+  let session;
   try {
     // Sign a session
     if (isCosmos && desiredChain) {
-      const bech32Prefix = desiredChain.bech32Prefix;
-      const chainId = 'cosmoshub';
-      const timestamp = +new Date();
-
       const signer = { signMessage: magic.cosmos.sign };
-      const { signature, sessionPayload } = await signSessionWithMagic(
+      const prefix = app.chain?.meta.bech32Prefix || 'cosmos';
+      const canvasChainId = chainBaseToCanvasChainId(
         ChainBase.CosmosSDK,
+        prefix,
+      );
+      const sessionSigner = getMagicCosmosSessionSigner(
         signer,
         magicAddress,
-        timestamp,
+        canvasChainId,
       );
-      // TODO: provide blockhash as last argument to signSessionWithMagic
-      signature.signatures[0].chain_id = chainId;
-      await app.sessions.authSession(
-        ChainBase.CosmosSDK, // could be desiredChain.base in the future?
-        chainBaseToCanvasChainId(ChainBase.CosmosSDK, bech32Prefix), // not the cosmos chain id, since that might change
-        magicAddress,
-        sessionPayload,
-        JSON.stringify(signature.signatures[0]),
-      );
-      authedSessionPayload = JSON.stringify(sessionPayload);
-      authedSignature = JSON.stringify(signature.signatures[0]);
+      session = await sessionSigner.getSession(CANVAS_TOPIC);
+
       console.log(
         'Reauthenticated Cosmos session from magic address:',
         magicAddress,
@@ -488,24 +481,13 @@ export async function handleSocialLoginCallback({
       const signer = provider.getSigner();
       const checksumAddress = utils.getAddress(magicAddress); // get checksum-capitalized eth address
 
-      const timestamp = +new Date();
-      const { signature, sessionPayload } = await signSessionWithMagic(
-        ChainBase.Ethereum,
-        signer,
-        checksumAddress,
-        timestamp,
-      );
-      // TODO: provide blockhash as last argument to signSessionWithMagic
-
-      await app.sessions.authSession(
-        ChainBase.Ethereum, // could be desiredChain.base in the future?
-        chainBaseToCanvasChainId(ChainBase.Ethereum, 1), // magic defaults to mainnet
-        checksumAddress,
-        sessionPayload,
-        signature,
-      );
-      authedSessionPayload = JSON.stringify(sessionPayload);
-      authedSignature = signature;
+      const sessionSigner = new SIWESigner({
+        // @ts-ignore
+        signer: signer,
+        chainId: app.chain?.meta.node?.ethChainId || 1,
+      });
+      // TODO: provide blockhash
+      session = await sessionSigner.getSession(CANVAS_TOPIC);
       console.log(
         'Reauthenticated Ethereum session from magic address:',
         checksumAddress,
@@ -530,8 +512,7 @@ export async function handleSocialLoginCallback({
       username: profileMetadata?.username,
       avatarUrl: profileMetadata?.avatarUrl,
       magicAddress,
-      sessionPayload: authedSessionPayload,
-      signature: authedSignature,
+      session,
       walletSsoSource,
     },
   });
