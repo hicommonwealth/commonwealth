@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import app from 'state';
 import { slugifyPreserveDashes } from 'utils';
 
 import { ChainBase } from '@hicommonwealth/core';
@@ -28,7 +29,7 @@ import {
   BASE_ID,
   OSMOSIS_ID,
   POLYGON_ETH_CHAIN_ID,
-  existingCommunityNames,
+  existingCommunityIds,
   alphabeticallyStakeWiseSortedChains as sortedChains,
 } from './constants';
 import { BasicInformationFormProps, FormSubmitValues } from './types';
@@ -69,9 +70,12 @@ const BasicInformationForm = ({
   } = useCreateCommunityMutation();
 
   const communityId = slugifyPreserveDashes(communityName.toLowerCase());
-  const isCommunityNameTaken = existingCommunityNames.find(
-    (name) => name === communityName.trim().toLowerCase(),
-  );
+  let isCommunityNameTaken = !!app.config.redirects[communityId];
+  if (!isCommunityNameTaken) {
+    isCommunityNameTaken = !!existingCommunityIds.find(
+      (id) => id === communityId,
+    );
+  }
 
   const getChainOptions = () => {
     const mappedChainValue = (chainType) => ({

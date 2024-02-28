@@ -306,13 +306,22 @@ export async function __createCommunity(
   }
 
   const oldCommunity = await this.models.Community.findOne({
-    where: { [Op.or]: [{ name: community.name }, { id: community.id }] },
+    where: {
+      [Op.or]: [
+        { name: community.name },
+        { id: community.id },
+        { redirect: community.id },
+      ],
+    },
   });
   if (oldCommunity && oldCommunity.id === community.id) {
     throw new AppError(Errors.CommunityIDExists);
   }
   if (oldCommunity && oldCommunity.name === community.name) {
     throw new AppError(Errors.CommunityNameExists);
+  }
+  if (oldCommunity && oldCommunity.redirect === community.id) {
+    throw new AppError(Errors.CommunityIDExists);
   }
 
   const [node] = await this.models.ChainNode.scope(
