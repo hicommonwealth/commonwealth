@@ -19,7 +19,7 @@ import {
 } from 'views/components/component_kit/new_designs/CWModal';
 import { formatAddress } from 'views/components/user/user_block';
 import { openConfirmation } from 'views/modals/confirmation_modal';
-import CWLoadingSpinner from '../../components/component_kit/new_designs/CWLoadingSpinner';
+import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import './SessionRevalidationModal.scss';
 
 interface SessionRevalidationModalProps {
@@ -139,7 +139,7 @@ const SessionRevalidationModal = ({
                   onenterkey={async () => await onEmailLogin()}
                 />
               ) : (
-                <CWLoadingSpinner />
+                <CWCircleMultiplySpinner />
               )}
               <div className="buttons-row">
                 <CWButton

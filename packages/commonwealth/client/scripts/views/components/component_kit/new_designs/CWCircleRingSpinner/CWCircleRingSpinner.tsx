@@ -4,18 +4,18 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { IconSize } from 'views/components/component_kit/cw_icons/types';
 import { ComponentType } from 'views/components/component_kit/types';
 
-import './CWCircleSpinner.scss';
+import './CWCircleRingSpinner.scss';
 
-interface CWCircleSpinnerProps {
+interface CWCircleRingSpinnerProps {
   size?: IconSize;
 }
 
-const CWCircleSpinner = ({ size = 'large' }: CWCircleSpinnerProps) => {
+const CWCircleRingSpinner = ({ size = 'large' }: CWCircleRingSpinnerProps) => {
   return (
-    <div className={ComponentType.CircleSpinner}>
+    <div className={ComponentType.CircleRingSpinner}>
       <CWIcon iconName="circleNotch" iconSize={size} />
     </div>
   );
 };
 
-export default CWCircleSpinner;
+export default CWCircleRingSpinner;

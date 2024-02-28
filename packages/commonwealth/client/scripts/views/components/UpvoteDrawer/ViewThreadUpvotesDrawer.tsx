@@ -15,6 +15,7 @@ export const ViewThreadUpvotesDrawer = ({
   isOpen,
   setIsOpen,
 }: ViewThreadUpvotesDrawerProps) => {
+  if (!thread) return null;
   const reactors = thread?.associatedReactions;
   const reactorAddresses = reactors?.map((t) => t.address);
 

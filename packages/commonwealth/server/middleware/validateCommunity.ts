@@ -47,7 +47,7 @@ export const validateCommunity = async (
 ): Promise<[CommunityInstance, string, boolean]> => {
   const communityId = params.chain || params.chain_id || params.community_id;
   if (communityId === ALL_COMMUNITIES) {
-    // if all chains, then bypass validation
+    // if all communities, then bypass validation
     return [null, null, true];
   }
   if (!communityId) {
@@ -56,7 +56,7 @@ export const validateCommunity = async (
   const community = await models.Community.findOne(
     getCommunityQuery(communityId, models, includeTopics),
   );
-  // searching for chain that doesn't exist
+  // searching for communities that doesn't exist
   if (!community) {
     return [null, CommunityCommunityErrors.CommunityDNE, false];
   }
