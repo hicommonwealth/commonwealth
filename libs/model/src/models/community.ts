@@ -14,7 +14,9 @@ import type { TopicAttributes, TopicInstance } from './topic';
 import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes } from './user';
 
-export type CommunityAttributes = z.infer<typeof schemas.Community> & {
+export type CommunityAttributes = z.infer<
+  typeof schemas.community.Community
+> & {
   // associations
   ChainNode?: ChainNodeAttributes;
   Addresses?: AddressAttributes[] | AddressAttributes['id'][];

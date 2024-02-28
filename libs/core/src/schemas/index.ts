@@ -1,1 +1,1 @@
-export * from './community.schema';
+export * as community from './community.schema';

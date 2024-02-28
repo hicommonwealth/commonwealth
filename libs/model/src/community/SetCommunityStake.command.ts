@@ -7,9 +7,9 @@ import { commonProtocol } from '../services';
 
 export const SetCommunityStake = (): CommandMetadata<
   CommunityAttributes,
-  typeof schemas.SetCommunityStake.input
+  typeof schemas.community.SetCommunityStake.input
 > => ({
-  schema: schemas.SetCommunityStake.input,
+  schema: schemas.community.SetCommunityStake.input,
   auth: [isCommunityAdmin],
   body: async ({ id, payload }) => {
     // !load

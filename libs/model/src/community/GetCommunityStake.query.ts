@@ -3,10 +3,10 @@ import { z } from 'zod';
 import { models } from '../database';
 
 export const GetCommunityStake = (): QueryMetadata<
-  z.infer<typeof schemas.GetCommunityStake.output>,
-  typeof schemas.GetCommunityStake.input
+  z.infer<typeof schemas.community.GetCommunityStake.output>,
+  typeof schemas.community.GetCommunityStake.input
 > => ({
-  schema: schemas.GetCommunityStake.input,
+  schema: schemas.community.GetCommunityStake.input,
   auth: [],
   body: async ({ payload }) => {
     return (

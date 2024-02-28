@@ -6,7 +6,7 @@ import { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type CommunityStakeAttributes = z.infer<
-  typeof schemas.CommunityStake
+  typeof schemas.community.CommunityStake
 > & {
   // associations
   Chain?: CommunityAttributes;
