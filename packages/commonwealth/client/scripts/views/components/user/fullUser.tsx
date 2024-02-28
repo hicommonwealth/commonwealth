@@ -3,7 +3,6 @@ import 'components/user/user.scss';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
-import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
 import { Avatar } from 'views/components/Avatar';
 import CWPopover, {
   usePopover,
@@ -15,15 +14,13 @@ import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
 import { CWModal } from '../component_kit/new_designs/CWModal';
 import { UserSkeleton } from './UserSkeleton';
-import type { UserAttrsWithSkeletonProp } from './user.types';
+import { FullUserAttrsWithSkeletonProp } from './user.types';
 
-// TODO: When this is no longer used, this should be removed in favour of fullUser.tsx
-export const User = ({
+export const FullUser = ({
   shouldLinkProfile,
   shouldShowPopover,
   shouldShowRole,
   shouldShowAsDeleted = false,
-  userAddress,
   userCommunityId,
   shouldHideAvatar,
   shouldShowAvatarOnly,
@@ -32,14 +29,9 @@ export const User = ({
   role,
   showSkeleton,
   popoverPlacement,
-}: UserAttrsWithSkeletonProp) => {
+  profile,
+}: FullUserAttrsWithSkeletonProp) => {
   const popoverProps = usePopover();
-  const { data: users } = useFetchProfilesByAddressesQuery({
-    currentChainId: app.activeChainId(),
-    profileAddresses: [userAddress],
-    profileChainIds: [userCommunityId],
-    apiCallEnabled: !!(userAddress && userCommunityId),
-  });
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   if (showSkeleton) {
@@ -53,11 +45,9 @@ export const User = ({
     );
   }
 
-  const profile = users?.[0] || {};
-
-  const fullAddress = formatAddressShort(userAddress, userCommunityId);
+  const fullAddress = formatAddressShort(profile.address, userCommunityId);
   const redactedAddress = formatAddressShort(
-    userAddress,
+    profile.address,
     userCommunityId,
     true,
     undefined,
@@ -70,12 +60,13 @@ export const User = ({
     app.config.chains.getById(userCommunityId)?.name;
   const adminsAndMods = app.chain?.meta.adminsAndMods || [];
   const isGhostAddress = app.user.addresses.some(
-    ({ address, ghostAddress }) => userAddress === address && ghostAddress,
+    ({ address, ghostAddress }) => profile.address === address && ghostAddress,
   );
   const roleInCommunity =
     role ||
     adminsAndMods.find(
-      (r) => r.address === userAddress && r.address_chain === userCommunityId,
+      (r) =>
+        r.address === profile.address && r.address_chain === userCommunityId,
     );
 
   const roleTags = (
@@ -92,7 +83,7 @@ export const User = ({
 
   const isSelfSelected = app.user.addresses
     .map((a) => a.address)
-    .includes(userAddress);
+    .includes(profile.address);
 
   const userBasisInfo = (
     <>
@@ -191,8 +182,10 @@ export const User = ({
                 to={profile?.id ? `/profile/id/${profile?.id}` : undefined}
               >
                 {!profile || !profile?.id ? (
-                  !profile?.id && userAddress ? (
-                    `${userAddress.slice(0, 8)}...${userAddress.slice(-5)}`
+                  !profile?.id && profile.address ? (
+                    `${profile.address.slice(0, 8)}...${profile.address.slice(
+                      -5,
+                    )}`
                   ) : (
                     redactedAddress
                   )
@@ -232,7 +225,7 @@ export const User = ({
         size="small"
         content={
           <BanUserModal
-            address={userAddress}
+            address={profile.address}
             onModalClose={() => setIsModalOpen(false)}
           />
         }

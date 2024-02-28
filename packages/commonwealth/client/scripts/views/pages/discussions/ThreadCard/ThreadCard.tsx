@@ -13,6 +13,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import useBrowserWindow from '../../../../hooks/useBrowserWindow';
+import { UserProfile } from '../../../../models/MinimumProfile';
 import { ThreadStage } from '../../../../models/types';
 import Permissions from '../../../../utils/Permissions';
 import { isHot } from '../helpers';
@@ -32,6 +33,7 @@ type CardProps = AdminActionsProps & {
   canComment?: boolean;
   disabledActionsTooltipText?: string;
   onCommentBtnClick?: () => any;
+  addressToProfiles?: Map<string, UserProfile>;
 };
 
 export const ThreadCard = ({
@@ -55,6 +57,7 @@ export const ThreadCard = ({
   canComment = true,
   disabledActionsTooltipText = '',
   onCommentBtnClick = () => null,
+  addressToProfiles,
 }: CardProps) => {
   const { isLoggedIn } = useUserLoggedIn();
   const { isWindowSmallInclusive } = useBrowserWindow({});
@@ -126,6 +129,7 @@ export const ThreadCard = ({
               })}
               discord_meta={thread.discord_meta}
               archivedAt={thread.archivedAt}
+              addressToProfiles={addressToProfiles}
             />
             <div className="content-header-icons">
               {thread.pinned && <CWIcon iconName="pin" />}

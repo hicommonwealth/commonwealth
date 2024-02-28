@@ -13,8 +13,10 @@ import CWPopover, {
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { User } from 'views/components/user/user';
+import { UserProfile } from '../../../../../models/MinimumProfile';
 import { IThreadCollaborator } from '../../../../../models/Thread';
 import { ThreadStage } from '../../../../../models/types';
+import { UserInterop } from '../../../../components/user/userInterop';
 import { NewThreadTag } from '../../NewThreadTag';
 import './AuthorAndPublishInfo.scss';
 import useAuthorMetadataCustomWrap from './useAuthorMetadataCustomWrap';
@@ -43,6 +45,7 @@ export type AuthorAndPublishInfoProps = {
   onThreadStageLabelClick?: (threadStage: ThreadStage) => Promise<any>;
   archivedAt?: moment.Moment;
   popoverPlacement?: PopperPlacementType;
+  addressToProfiles?: Map<string, UserProfile>;
 };
 
 export const AuthorAndPublishInfo = ({
@@ -65,6 +68,7 @@ export const AuthorAndPublishInfo = ({
   collaboratorsInfo,
   archivedAt,
   popoverPlacement,
+  addressToProfiles,
 }: AuthorAndPublishInfoProps) => {
   const popoverProps = usePopover();
   const containerRef = useRef(null);
@@ -122,11 +126,12 @@ export const AuthorAndPublishInfo = ({
                 <div className="collaborators">
                   {collaboratorsInfo.map(({ address, community_id }) => {
                     return (
-                      <User
+                      <UserInterop
                         shouldLinkProfile
                         key={address}
                         userAddress={address}
                         userCommunityId={community_id}
+                        profile={addressToProfiles.get(address)}
                       />
                     );
                   })}

@@ -92,7 +92,7 @@ export async function __getBulkThreads(
         topics.id AS topic_id, topics.name AS topic_name, topics.description AS topic_description,
         topics.community_id AS topic_community_id,
         topics.telegram AS topic_telegram,
-        collaborators
+        collaborators, pr.profile_name, pr.avatar_url, addr.last_active as address_last_active
       FROM "Addresses" AS addr
       RIGHT JOIN (
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id, t.last_commented_on,
@@ -149,6 +149,10 @@ export async function __getBulkThreads(
           ORDER BY t.pinned DESC, t.max_notif_id DESC
         ) threads
       ON threads.address_id = addr.id
+      LEFT JOIN "Users" us
+      ON us.id = addr.user_id
+      LEFT JOIN "Profiles" pr
+      ON pr.user_id = us.id
       LEFT JOIN "Topics" topics
       ON threads.topic_id = topics.id
       ${fromDate ? ' WHERE threads.thread_created > $from_date ' : ''}
@@ -226,6 +230,9 @@ export async function __getBulkThreads(
       marked_as_spam_at: t.marked_as_spam_at,
       archived_at: t.archived_at,
       latest_activity: t.latest_activity,
+      avatar_url: t.avatar_url,
+      address_last_active: t.address_last_active,
+      profile_name: t.profile_name,
     };
     if (t.topic_id) {
       data['topic'] = {

@@ -1,5 +1,12 @@
 import jdenticon from 'jdenticon';
 
+export type UserProfile = {
+  name: string;
+  address: string;
+  lastActive: string;
+  avatarUrl: string;
+};
+
 class MinimumProfile {
   private _name: string;
   private _address: string;

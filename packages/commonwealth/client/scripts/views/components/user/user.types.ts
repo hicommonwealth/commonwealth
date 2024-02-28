@@ -1,6 +1,7 @@
 // Address can be shown in full, autotruncated with formatAddressShort(),
 // or set to a custom max character length
 import { PopperPlacementType } from '@mui/base/Popper';
+import { UserProfile } from '../../../models/MinimumProfile';
 
 export type AddressDisplayOptions = {
   autoTruncate?: boolean;
@@ -36,5 +37,15 @@ export type UserAttrs = {
 };
 
 export type UserAttrsWithSkeletonProp = UserAttrs & {
+  showSkeleton?: boolean;
+};
+
+export type UserInteropAttrsWithSkeletonProp = UserAttrs & {
+  profile?: UserProfile;
+  showSkeleton?: boolean;
+};
+
+export type FullUserAttrsWithSkeletonProp = UserAttrs & {
+  profile: UserProfile;
   showSkeleton?: boolean;
 };
