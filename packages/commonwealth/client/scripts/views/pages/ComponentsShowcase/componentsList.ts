@@ -5,6 +5,7 @@ import ButtonsShowcase from 'views/pages/ComponentsShowcase/components/Buttons.s
 import ButtonsCircleShowcase from 'views/pages/ComponentsShowcase/components/ButtonsCircle.showcase';
 import ButtonsIconShowcase from 'views/pages/ComponentsShowcase/components/ButtonsIcon.showcase';
 import CheckboxesShowcase from 'views/pages/ComponentsShowcase/components/Checkboxes.showcase';
+import CollapsiblesShowcase from 'views/pages/ComponentsShowcase/components/Collapsibles.showcase';
 import ColorsShowcase from 'views/pages/ComponentsShowcase/components/Colors.showcase';
 import DividersShowcase from 'views/pages/ComponentsShowcase/components/Dividers.showcase';
 import DrawersShowcase from 'views/pages/ComponentsShowcase/components/Drawers.showcase';
@@ -34,6 +35,7 @@ export const ComponentPageName = {
   Checkboxes: 'Checkboxes',
   Modals: 'Modals',
   ProgressBars: 'ProgressBars',
+  Collapsibles: 'Collapsibles',
 };
 
 export const ComponentType = {
@@ -125,6 +127,11 @@ export const componentItems = [
   {
     ComponentPage: ProgressBarsShowcase,
     displayName: ComponentPageName.ProgressBars,
+    type: ComponentType.Components,
+  },
+  {
+    ComponentPage: CollapsiblesShowcase,
+    displayName: ComponentPageName.Collapsibles,
     type: ComponentType.Components,
   },
 ];
