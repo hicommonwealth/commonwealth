@@ -179,7 +179,7 @@ export class RedisCache implements Cache {
     try {
       if (this.initialized()) {
         const finalKey = RedisCache.getNamespaceKey(namespace, key);
-        return (await this._client!.get(finalKey)) ?? '';
+        return await this._client!.get(finalKey);
       }
     } catch (e) {
       const msg = `An error occurred while getting the following key '${key}'`;
