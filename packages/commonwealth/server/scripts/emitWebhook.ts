@@ -75,7 +75,7 @@ async function main() {
   const webhooks: WebhookInstance[] = [];
   const genericWebhookOptions = {
     community_id: community.id,
-    categories: [argv.notificationCategory],
+    categories: [argv.notificationCategory as WebhookCategory],
   };
   if (argv.url) {
     url = argv.url;

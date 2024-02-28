@@ -1,6 +1,6 @@
+import { initChain } from 'helpers/chain';
 import { useEffect, useRef } from 'react';
 import { IApp } from 'state';
-import { initChain } from 'helpers/chain';
 
 /**
  * Use in cases where chain data is needed but hasn't been fetched yet.

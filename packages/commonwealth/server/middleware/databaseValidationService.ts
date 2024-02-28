@@ -101,7 +101,7 @@ export default class DatabaseValidationService {
     }
     if (error) return next(new AppError(error));
     if (!community) return next(new AppError(Errors.InvalidCommunity));
-    // If the chain is valid, add it to the request object
+    // If the community is valid, add it to the request object
     req.chain = community;
     req.community = community;
     next();
@@ -123,7 +123,7 @@ export default class DatabaseValidationService {
     }
     if (error) return next(new AppError(error));
     if (!community) return next(new AppError(Errors.InvalidCommunity));
-    // If the chain is valid, add it to the request object
+    // If the community is valid, add it to the request object
     req.chain = community;
     req.community = community;
     next();

@@ -8,17 +8,19 @@ import { CommandContext, CommandMetadata, InvalidInput } from './types';
  * @param payload command payload
  * @param actor command actor
  * @param id aggregate id
+ * @param validate true to validate payload
  * @returns side effects
  * @throws {@link InvalidInput} when user invokes command with invalid payload or attributes, or rethrows internal domain errors
  */
 export const command = async <T, P extends ZodSchema>(
   { schema, auth, body }: CommandMetadata<T, P>,
   { id, actor, payload }: CommandContext<P>,
+  validate = true,
 ): Promise<Partial<T> | undefined> => {
   try {
     const context: CommandContext<P> = {
       actor,
-      payload: schema.parse(payload),
+      payload: validate ? schema.parse(payload) : payload,
       id,
     };
     let state: Partial<T> | undefined = undefined;

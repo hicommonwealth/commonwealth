@@ -1,5 +1,5 @@
 import { AppError, ServerError, logger } from '@hicommonwealth/core';
-import type { Express, Request, Response } from 'express';
+import type { Express, NextFunction, Request, Response } from 'express';
 
 // Handle server and application errors.
 // 401 Unauthorized errors are handled by Express' middleware and returned
@@ -19,7 +19,7 @@ export const setupErrorHandlers = (app: Express) => {
 
   // Handle our ServerErrors (500), AppErrors (400), or unknown errors.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  app.use((error, req, res: Response, next) => {
+  app.use((error: any, req: Request, res: Response, next: NextFunction) => {
     error.req = req;
     if (error instanceof ServerError) {
       log.error(error.message, error);
