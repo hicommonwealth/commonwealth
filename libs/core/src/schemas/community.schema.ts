@@ -47,6 +47,7 @@ export const Community = z.object({
   directory_page_enabled: z.boolean().optional(),
   directory_page_chain_node_id: z.number().optional(),
   namespace: z.string().optional(),
+  redirect: z.string().optional(),
   created_at: z.date().optional(),
   updated_at: z.date().optional(),
 });
@@ -54,7 +55,11 @@ export const Community = z.object({
 export const GetCommunityStakeSchema = {
   input: z.object({
     community_id: z.string(),
-    stake_id: z.coerce.number().int().optional(),
+    stake_id: z.coerce
+      .number()
+      .int()
+      .optional()
+      .describe('The stake id or all stakes when undefined'),
   }),
   output: CommunityStake,
 };
