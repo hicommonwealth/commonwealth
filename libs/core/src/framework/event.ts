@@ -32,10 +32,10 @@ export const event = async <T, P extends ZodSchema>(
         const details = (error as ZodError).issues.map(
           ({ path, message }) => `${path.join('.')}: ${message}`,
         );
-        throw new InvalidInput('Invalid command payload', details);
+        throw new InvalidInput('Invalid event payload', details);
       }
       throw error;
     }
-    throw new InvalidInput('Invalid command', [error as string]);
+    throw new InvalidInput('Invalid event', [error as string]);
   }
 };
