@@ -14,10 +14,14 @@
     "test": "NODE_ENV=test ts-mocha '__tests__/**/*.spec.ts'"
   },
   "dependencies": {
+    "@anatine/zod-mock": "^3.13.3",
     "@cosmjs/stargate": "^0.31.3",
     "@cosmjs/tendermint-rpc": "^0.31.3",
+    "@faker-js/faker": "^8.4.1",
+    "@types/seedrandom": "^3.0.8",
     "node-object-hash": "^3.0.0",
     "pg": "^8.11.3",
+    "seedrandom": "^3.0.5",
     "sequelize": "^6.32.1",
     "web3": "1.8.2",
     "web3-core": "1.8.2",
