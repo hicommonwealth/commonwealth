@@ -84,7 +84,6 @@ describe('ServerTopicsController', () => {
         body: {
           name: 'hhh',
           description: 'ddd',
-          featured_in_new_post: false,
           featured_in_sidebar: false,
         },
       }),
@@ -92,7 +91,6 @@ describe('ServerTopicsController', () => {
 
     expect(topic.name).to.equal('hhh');
     expect(topic.description).to.equal('ddd');
-    expect(topic.featured_in_new_post).to.equal(false);
     expect(topic.featured_in_sidebar).to.equal(false);
   });
   describe('#deleteTopic', async () => {
