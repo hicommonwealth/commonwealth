@@ -15,6 +15,7 @@ import LoadersShowcase from 'views/pages/ComponentsShowcase/components/Loaders.s
 import ModalsShowcase from 'views/pages/ComponentsShowcase/components/Modals.showcase';
 import ProgressBarsShowcase from 'views/pages/ComponentsShowcase/components/ProgressBars.showcase';
 import RadioButtonsShowcase from 'views/pages/ComponentsShowcase/components/RadioButtons.showcase';
+import TablesShowcase from 'views/pages/ComponentsShowcase/components/Tables.showcase';
 import TypographyShowcase from 'views/pages/ComponentsShowcase/components/Typography.showcase';
 
 export const ComponentPageName = {
@@ -36,6 +37,7 @@ export const ComponentPageName = {
   Modals: 'Modals',
   ProgressBars: 'ProgressBars',
   Collapsibles: 'Collapsibles',
+  Tables: 'Tables',
 };
 
 export const ComponentType = {
@@ -132,6 +134,11 @@ export const componentItems = [
   {
     ComponentPage: CollapsiblesShowcase,
     displayName: ComponentPageName.Collapsibles,
+    type: ComponentType.Components,
+  },
+  {
+    ComponentPage: TablesShowcase,
+    displayName: ComponentPageName.Tables,
     type: ComponentType.Components,
   },
 ];
