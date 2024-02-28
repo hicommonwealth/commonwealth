@@ -1,4 +1,5 @@
 import z, { ZodSchema } from 'zod';
+import { events } from '../schemas';
 
 /**
  * Error names as constants
@@ -86,8 +87,8 @@ export type CommandContext<P extends ZodSchema> = {
  * - `name`: event name
  * - `payload`: validated event payload
  */
-export type EventContext<P extends ZodSchema> = {
-  readonly name: string;
+export type EventContext<E, P extends ZodSchema> = {
+  readonly name: E;
   readonly payload: z.infer<P>;
 };
 
@@ -120,9 +121,9 @@ export type CommandHandler<T, P extends ZodSchema> = (
  * @param context event execution context
  * @returns may return updated state - side effects
  */
-export type EventHandler<T, P extends ZodSchema> = (
-  context: EventContext<P>,
-) => Promise<Partial<T> | void>;
+export type EventHandler<T, E, P> = P extends ZodSchema
+  ? (context: EventContext<E, P>) => Promise<Partial<T> | void>
+  : never;
 
 /**
  * Query handler - can be chained to authorize query actors
@@ -163,12 +164,13 @@ export type QueryMetadata<T, P extends ZodSchema> = {
   readonly secure?: boolean;
 };
 
-type Events = Record<string, Record<string, any>>;
-type EventsSchemas<E extends Events> = { [K in keyof E]: ZodSchema<E[K]> };
-type EventsHandler<T, E extends Events> = {
-  readonly schemas: EventsSchemas<E>;
+export type EventSchemas = {
+  [K in events.Events]?: typeof events.schemas[K];
+};
+export type EventsHandler<T, S extends EventSchemas = EventSchemas> = {
+  readonly schemas: S;
   readonly body: {
-    readonly [K in keyof E]: EventHandler<T, ZodSchema<E[K]>>;
+    readonly [K in keyof S]: EventHandler<T, K, S[K]>;
   };
 };
 
@@ -178,9 +180,10 @@ type EventsHandler<T, E extends Events> = {
  * - `schemas`: zod schemas of the events handled by the policy
  * - `body`: functions implementing the core policy handlers, and returning side effects
  */
-export type PolicyMetadata<T, Z> = Z extends EventsSchemas<infer E>
-  ? EventsHandler<T, E>
-  : never;
+export type PolicyMetadata<
+  T,
+  S extends EventSchemas = EventSchemas,
+> = EventsHandler<T, S>;
 
 /**
  * Declarative metadata to "enforce" the conventional requirements of projections.
@@ -188,6 +191,7 @@ export type PolicyMetadata<T, Z> = Z extends EventsSchemas<infer E>
  * - `schemas`: zod schemas of the events projected by the projection
  * - `body`: functions implementing the projections, and returning new state
  */
-export type ProjectionMetadata<T, Z> = Z extends EventsSchemas<infer E>
-  ? EventsHandler<T, E>
-  : never;
+export type ProjectionMetadata<
+  T,
+  S extends EventSchemas = EventSchemas,
+> = EventsHandler<T, S>;
