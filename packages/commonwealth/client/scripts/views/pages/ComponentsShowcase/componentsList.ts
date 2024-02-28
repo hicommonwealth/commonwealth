@@ -12,6 +12,7 @@ import ElevationsShowcase from 'views/pages/ComponentsShowcase/components/Elevat
 import FormStepsShowcase from 'views/pages/ComponentsShowcase/components/FormSteps.showcase';
 import LoadersShowcase from 'views/pages/ComponentsShowcase/components/Loaders.showcase';
 import ModalsShowcase from 'views/pages/ComponentsShowcase/components/Modals.showcase';
+import ProgressBarsShowcase from 'views/pages/ComponentsShowcase/components/ProgressBars.showcase';
 import RadioButtonsShowcase from 'views/pages/ComponentsShowcase/components/RadioButtons.showcase';
 import TypographyShowcase from 'views/pages/ComponentsShowcase/components/Typography.showcase';
 
@@ -32,6 +33,7 @@ export const ComponentPageName = {
   FormSteps: 'FormSteps',
   Checkboxes: 'Checkboxes',
   Modals: 'Modals',
+  ProgressBars: 'ProgressBars',
 };
 
 export const ComponentType = {
@@ -118,6 +120,11 @@ export const componentItems = [
   {
     ComponentPage: ModalsShowcase,
     displayName: ComponentPageName.Modals,
+    type: ComponentType.Components,
+  },
+  {
+    ComponentPage: ProgressBarsShowcase,
+    displayName: ComponentPageName.ProgressBars,
     type: ComponentType.Components,
   },
 ];
