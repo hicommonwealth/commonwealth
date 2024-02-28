@@ -7,9 +7,9 @@ export const ETHEREUM_MAINNET_ID = '1';
 export const BASE_ID = '8453';
 export const OSMOSIS_ID = 'osmosis';
 
-export const existingCommunityNames = app.config.chains
+export const existingCommunityIds = app.config.chains
   .getAll()
-  .map((community) => community.name.toLowerCase().trim());
+  .map((community) => community.id);
 
 const removeTestCosmosNodes = (nodeInfo: NodeInfo): boolean => {
   return !(

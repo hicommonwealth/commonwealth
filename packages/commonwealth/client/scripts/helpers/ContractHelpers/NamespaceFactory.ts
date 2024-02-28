@@ -139,7 +139,7 @@ class NamespaceFactory extends ContractBase {
           name + ' Community Stake',
           stakesId,
           '0x0000000000000000000000000000000000000000',
-          100000000,
+          2000000,
           0,
         )
         .send({

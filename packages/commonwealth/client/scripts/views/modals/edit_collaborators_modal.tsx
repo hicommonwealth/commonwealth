@@ -130,7 +130,7 @@ export const EditCollaboratorsModal = ({
                 >
                   <User
                     userAddress={c.Address.address}
-                    userCommunityId={c.chain_id}
+                    userCommunityId={c.community_id}
                   />
                 </div>
               ))

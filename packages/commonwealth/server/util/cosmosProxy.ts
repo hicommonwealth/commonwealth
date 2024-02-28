@@ -2,7 +2,12 @@ import {
   CacheDecorator,
   lookupKeyDurationInReq,
 } from '@hicommonwealth/adapters';
-import { AppError, NodeHealth, logger } from '@hicommonwealth/core';
+import {
+  AppError,
+  CosmosGovernanceVersion,
+  NodeHealth,
+  logger,
+} from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
 import axios from 'axios';
 import bodyParser from 'body-parser';
@@ -27,7 +32,7 @@ function setupCosmosProxy(
 ) {
   // using bodyParser here because cosmjs generates text/plain type headers
   app.post(
-    '/cosmosAPI/:chain',
+    '/cosmosAPI/:community_id',
     bodyParser.text(),
     calcCosmosRPCCacheKeyDuration,
     cacheDecorator.cacheMiddleware(
@@ -38,17 +43,17 @@ function setupCosmosProxy(
       log.trace(`Got request: ${JSON.stringify(req.body, null, 2)}`);
       let cosmos_chain_id, chainNodeUrl, previouslyFailed;
       try {
-        const chainParam = req.params.chain;
-        const chain = await models.Community.findOne({
-          where: { id: chainParam },
+        const communityId = req.params.community_id;
+        const community = await models.Community.findOne({
+          where: { id: communityId },
           include: models.ChainNode,
         });
-        if (!chain) {
-          throw new AppError(`Invalid chain: ${chainParam}`);
+        if (!community) {
+          throw new AppError(`Invalid chain: ${communityId}`);
         }
 
         let response;
-        const chainNode = chain.ChainNode;
+        const chainNode = community.ChainNode;
         chainNodeUrl = chainNode?.url?.trim();
         let useProxy = !chainNodeUrl;
         cosmos_chain_id = chainNode?.cosmos_chain_id;
@@ -90,6 +95,8 @@ function setupCosmosProxy(
           response = await queryExternalProxy(req, cosmos_chain_id, 'rpc');
         }
 
+        await upgradeBetaNodeIfNeeded(req, response, community.ChainNode);
+
         log.trace(
           `Got response from endpoint: ${JSON.stringify(
             response.data,
@@ -118,7 +125,7 @@ function setupCosmosProxy(
    *  Used for Cosmos chains that use v1 of the gov module.
    */
   app.use(
-    '/cosmosAPI/v1/:chain',
+    '/cosmosAPI/v1/:community_id',
     bodyParser.text(),
     calcCosmosLCDCacheKeyDuration,
     cacheDecorator.cacheMiddleware(
@@ -129,17 +136,17 @@ function setupCosmosProxy(
       log.info(`Got request: ${JSON.stringify(req.body, null, 2)}`);
       let cosmos_chain_id, chainNodeRestUrl, previouslyFailed;
       try {
-        const chainParam = req.params.chain;
-        const chain = await models.Community.findOne({
-          where: { id: chainParam },
+        const communityId = req.params.community_id;
+        const community = await models.Community.findOne({
+          where: { id: communityId },
           include: models.ChainNode,
         });
-        if (!chain) {
-          throw new AppError(`Invalid chain: ${chainParam}`);
+        if (!community) {
+          throw new AppError(`Invalid chain: ${communityId}`);
         }
 
         let response;
-        const chainNode = chain.ChainNode;
+        const chainNode = community.ChainNode;
         cosmos_chain_id = chainNode?.cosmos_chain_id;
         chainNodeRestUrl = chainNode?.alt_wallet_url?.trim();
         let useProxy = !chainNodeRestUrl;
@@ -187,6 +194,8 @@ function setupCosmosProxy(
         } else {
           response = await queryExternalProxy(req, cosmos_chain_id, 'rest');
         }
+
+        await updateV1NodeIfNeeded(req, response, community.ChainNode);
 
         log.trace(`Got response: ${JSON.stringify(response.data, null, 2)}`);
         return res.send(response.data);
@@ -344,6 +353,36 @@ function setupCosmosProxy(
       }
     },
   );
+
+  const upgradeBetaNodeIfNeeded = async (req, response, chainNode) => {
+    if (!req.body?.params?.path?.includes('/cosmos.gov.v1beta1.Query')) return;
+
+    if (
+      response.data?.result?.response?.log?.includes(
+        `can't convert a gov/v1 Proposal to gov/v1beta1 Proposal`,
+      )
+    ) {
+      await models.ChainNode.update(
+        { cosmos_gov_version: CosmosGovernanceVersion.v1beta1Failed },
+        { where: { id: chainNode.id } },
+      );
+    }
+  };
+
+  const updateV1NodeIfNeeded = async (req, response, chainNode) => {
+    if (!req.originalUrl?.includes('cosmos/gov/v1')) return;
+
+    const dbGovVersion = chainNode.cosmos_gov_version;
+    const shouldUpdate =
+      !dbGovVersion || dbGovVersion === CosmosGovernanceVersion.v1beta1Failed;
+
+    if (shouldUpdate) {
+      await models.ChainNode.update(
+        { cosmos_gov_version: CosmosGovernanceVersion.v1 },
+        { where: { id: chainNode.id } },
+      );
+    }
+  };
 }
 
 export default setupCosmosProxy;
