@@ -20,6 +20,7 @@ import SearchbarsShowcase from 'views/pages/ComponentsShowcase/components/Search
 import TablesShowcase from 'views/pages/ComponentsShowcase/components/Tables.showcase';
 import TabsShowcase from 'views/pages/ComponentsShowcase/components/Tabs.showcase';
 import TagsShowcase from 'views/pages/ComponentsShowcase/components/Tags.showcase';
+import TooltipsShowcase from 'views/pages/ComponentsShowcase/components/Tooltips.showcase';
 import TypographyShowcase from 'views/pages/ComponentsShowcase/components/Typography.showcase';
 
 export const ComponentPageName = {
@@ -46,6 +47,7 @@ export const ComponentPageName = {
   Cards: 'Cards',
   Searchbars: 'Searchbars',
   Tabs: 'Tabs',
+  Tooltips: 'Tooltips',
 };
 
 export const ComponentType = {
@@ -167,6 +169,11 @@ export const componentItems = [
   {
     ComponentPage: TabsShowcase,
     displayName: ComponentPageName.Tabs,
+    type: ComponentType.Components,
+  },
+  {
+    ComponentPage: TooltipsShowcase,
+    displayName: ComponentPageName.Tooltips,
     type: ComponentType.Components,
   },
 ];
