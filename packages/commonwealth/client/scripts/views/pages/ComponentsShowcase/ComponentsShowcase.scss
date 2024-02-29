@@ -92,6 +92,14 @@
     }
   }
 
+  .Cards {
+    .ContentPageCard {
+      .Text.content {
+        padding: 16px;
+      }
+    }
+  }
+
   .Colors {
     .ColorCard {
       @include extraSmall {

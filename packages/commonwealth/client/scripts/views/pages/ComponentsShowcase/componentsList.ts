@@ -4,6 +4,7 @@ import BannersAndAlertsShowcase from 'views/pages/ComponentsShowcase/components/
 import ButtonsShowcase from 'views/pages/ComponentsShowcase/components/Buttons.showcase';
 import ButtonsCircleShowcase from 'views/pages/ComponentsShowcase/components/ButtonsCircle.showcase';
 import ButtonsIconShowcase from 'views/pages/ComponentsShowcase/components/ButtonsIcon.showcase';
+import CardsShowcase from 'views/pages/ComponentsShowcase/components/Cards.showcase';
 import CheckboxesShowcase from 'views/pages/ComponentsShowcase/components/Checkboxes.showcase';
 import CollapsiblesShowcase from 'views/pages/ComponentsShowcase/components/Collapsibles.showcase';
 import ColorsShowcase from 'views/pages/ComponentsShowcase/components/Colors.showcase';
@@ -40,6 +41,7 @@ export const ComponentPageName = {
   Collapsibles: 'Collapsibles',
   Tables: 'Tables',
   Tags: 'Tags',
+  Cards: 'Cards',
 };
 
 export const ComponentType = {
@@ -146,6 +148,11 @@ export const componentItems = [
   {
     ComponentPage: TagsShowcase,
     displayName: ComponentPageName.Tags,
+    type: ComponentType.Components,
+  },
+  {
+    ComponentPage: CardsShowcase,
+    displayName: ComponentPageName.Cards,
     type: ComponentType.Components,
   },
 ];
