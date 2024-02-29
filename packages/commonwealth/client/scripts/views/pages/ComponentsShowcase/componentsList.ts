@@ -11,6 +11,7 @@ import CollapsiblesShowcase from 'views/pages/ComponentsShowcase/components/Coll
 import ColorsShowcase from 'views/pages/ComponentsShowcase/components/Colors.showcase';
 import DividersShowcase from 'views/pages/ComponentsShowcase/components/Dividers.showcase';
 import DrawersShowcase from 'views/pages/ComponentsShowcase/components/Drawers.showcase';
+import DropdownsShowcase from 'views/pages/ComponentsShowcase/components/Dropdowns.showcase';
 import ElevationsShowcase from 'views/pages/ComponentsShowcase/components/Elevations.showcase';
 import FormStepsShowcase from 'views/pages/ComponentsShowcase/components/FormSteps.showcase';
 import LoadersShowcase from 'views/pages/ComponentsShowcase/components/Loaders.showcase';
@@ -58,6 +59,7 @@ export const ComponentPageName = {
   ThreadActions: 'ThreadActions',
   Upvotes: 'Upvotes',
   Breadcrumbs: 'Breadcrumbs',
+  Dropdowns: 'Dropdowns',
 };
 
 export const ComponentType = {
@@ -209,6 +211,11 @@ export const componentItems = [
   {
     ComponentPage: BreadcrumbsShowcase,
     displayName: ComponentPageName.Breadcrumbs,
+    type: ComponentType.Components,
+  },
+  {
+    ComponentPage: DropdownsShowcase,
+    displayName: ComponentPageName.Dropdowns,
     type: ComponentType.Components,
   },
 ];
