@@ -162,4 +162,10 @@
       width: 100%;
     }
   }
+
+  .Tabs {
+    .CWTabsRow {
+      overflow-x: auto;
+    }
+  }
 }
