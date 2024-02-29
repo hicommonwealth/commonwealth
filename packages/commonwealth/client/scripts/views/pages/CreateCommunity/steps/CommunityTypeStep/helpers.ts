@@ -8,7 +8,8 @@ export const communityTypeOptions = [
     title: 'Blast',
     isRecommended: true,
     description:
-      'Blast is an Ethereum Layer 2 network with high TVL, offering native yield, and secure decentralized app platform.',
+      'Blast is an Ethereum Layer 2 network with high TVL, offering native yield,' +
+      'and secure decentralized app platform.',
   },
 
   {
