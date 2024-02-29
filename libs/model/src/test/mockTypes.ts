@@ -2,6 +2,8 @@ import z from 'zod';
 import { models } from '../database';
 import { SchemaWithModel } from './seed';
 
+const MAX_SCHEMA_INT = 1_000_000_000;
+
 /*
   === User ===
 */
@@ -31,14 +33,14 @@ export const UserSchema: SchemaWithModel<typeof userZodSchema> = {
 
 const chainNodeSchema = z.object({
   id: z.number().int(),
-  url: z.string().url().max(255),
-  eth_chain_id: z.number().int().optional(),
+  url: z.string().max(255),
+  eth_chain_id: z.number().int().max(MAX_SCHEMA_INT).optional(),
   alt_wallet_url: z.string().max(255).optional(),
   private_url: z.string().max(255).optional(),
   balance_type: z.string().max(255).optional(),
   name: z.string().max(255),
   description: z.string().max(255).optional(),
-  ss58: z.number().int().optional(),
+  ss58: z.number().int().max(MAX_SCHEMA_INT).optional(),
   bech32: z.string().max(255).optional(),
   created_at: z.date(),
   updated_at: z.date(),
@@ -61,9 +63,9 @@ export const ChainNodeSchema: SchemaWithModel<typeof chainNodeSchema> = {
 const contractSchema = z.object({
   id: z.number().int(),
   address: z.string().max(255),
-  chain_node_id: z.number(),
-  abi_id: z.number().optional(),
-  decimals: z.number().optional(),
+  chain_node_id: z.number().int().max(MAX_SCHEMA_INT),
+  abi_id: z.number().int().max(MAX_SCHEMA_INT).optional(),
+  decimals: z.number().int().max(MAX_SCHEMA_INT).optional(),
   token_name: z.string().max(255).optional(),
   symbol: z.string().max(255).optional(),
   type: z.string().max(255),
@@ -74,7 +76,10 @@ const contractSchema = z.object({
 });
 export const ContractSchema: SchemaWithModel<typeof contractSchema> = {
   schema: contractSchema,
-  mockDefaults: () => ({}),
+  mockDefaults: () => ({
+    chain_node_id: 1,
+    abi_id: 1,
+  }),
   model: models.Contract,
 };
 

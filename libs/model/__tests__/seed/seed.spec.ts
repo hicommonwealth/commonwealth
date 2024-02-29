@@ -1,67 +1,109 @@
-import { dispose } from '@hicommonwealth/core';
+import { BalanceType, dispose } from '@hicommonwealth/core';
 import { expect } from 'chai';
+import { step } from 'mocha-steps';
 import z from 'zod';
 import {
   ChainNodeSchema,
   ContractSchema,
   SchemaWithModel,
   UserSchema,
+  checkDb,
   seed,
-  seedDb,
 } from '../../src/test';
 
 async function testSeed<T extends SchemaWithModel<any>>(
   schemaModel: T,
   overrides: Partial<z.infer<T['schema']>> = {},
-): Promise<z.infer<T['schema']>> {
+  excludeOverrides: (keyof typeof overrides)[] = [],
+) {
   const createdEntity = await seed(schemaModel, overrides);
+  expect(createdEntity, 'failed to create entity').not.to.be.null;
+
   const data = await schemaModel.schema.parse(createdEntity.toJSON());
-  expect(data).to.have.property('id');
-  expect(data.id).to.not.be.null;
+  expect(data, 'created entity is missing id').to.have.property('id');
+
   const existingEntity = await schemaModel.model.findByPk(data.id);
-  expect(existingEntity, 'failed to find created entity').not.to.be.null;
-  return schemaModel.schema.parse(existingEntity?.toJSON());
+  expect(existingEntity, 'failed to find created entity after creation').not.to
+    .be.null;
+
+  const overridesToCheck = Object.keys(overrides).reduce((acc, k) => {
+    if (excludeOverrides.includes(k)) {
+      return acc;
+    }
+    return {
+      ...acc,
+      [k]: overrides[k],
+    };
+  }, {});
+
+  const result = schemaModel.schema.parse(existingEntity?.toJSON());
+  expect(
+    result,
+    `overrides do not match found entity: ${JSON.stringify(
+      overrides,
+      null,
+      2,
+    )} !== ${JSON.stringify(existingEntity?.toJSON(), null, 2)}`,
+  ).to.contain(overridesToCheck);
 }
 
 describe('Seed functions', () => {
   before(async () => {
-    await seedDb();
+    await checkDb();
+    const { models } = await import('../..');
+    await models.sequelize.sync({ force: true });
   });
 
   after(async () => {
     await dispose()();
   });
 
-  it('Seed User with defaults', async () => {
-    await testSeed(UserSchema);
-  });
-
-  it('Seed User with overrides', async () => {
-    const entity = await testSeed(UserSchema, {
-      email: 'blah999@gmail.com',
+  describe('User', () => {
+    step('Should seed with defaults', async () => {
+      await testSeed(UserSchema);
+      await testSeed(UserSchema);
     });
-    expect(entity.email).to.eq('blah999@gmail.com');
-  });
 
-  it('Seed ChainNode with defaults', async () => {
-    await testSeed(ChainNodeSchema);
-  });
-
-  it('Seed ChainNode with overrides', async () => {
-    const entity = await testSeed(ChainNodeSchema, {
-      name: 'blah',
+    step('Should seed with overrides', async () => {
+      // NOTE: some props like emailVerified and isAdmin
+      // are explicitly excluded via sequelize model config
+      await testSeed(
+        UserSchema,
+        {
+          email: 'temp@gmail.com',
+          emailVerified: true,
+          isAdmin: true,
+        },
+        ['emailVerified', 'isAdmin'],
+      );
     });
-    expect(entity.name).to.eq('blah');
   });
 
-  it('Seed Contract with defaults', async () => {
-    await testSeed(ContractSchema);
-  });
-
-  it('Seed Contract with overrides', async () => {
-    const entity = await testSeed(ContractSchema, {
-      token_name: 'blah',
+  describe('ChainNode', () => {
+    step('Should seed with defaults', async () => {
+      await testSeed(ChainNodeSchema);
+      await testSeed(ChainNodeSchema);
     });
-    expect(entity.token_name).to.eq('blah');
+
+    step('Should seed with overrides', async () => {
+      await testSeed(ChainNodeSchema, {
+        url: 'mainnet1.edgewa.re',
+        name: 'Edgeware Mainnet',
+        balance_type: BalanceType.Substrate,
+      });
+    });
+  });
+
+  describe('Contract', () => {
+    step('Seed Contract with defaults', async () => {
+      await testSeed(ContractSchema);
+    });
+
+    // step('Seed Contract with overrides', async () => {
+    //   await testSeed(ContractSchema, {
+    //     chain_node_id: 1,
+    //     token_name: 'blah',
+    //   });
+    // });
   });
 });

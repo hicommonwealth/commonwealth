@@ -9,7 +9,7 @@ import {
 import { QueryTypes, Sequelize } from 'sequelize';
 import type { ChainNodeAttributes } from '../models/chain_node';
 
-const checkDb = async () => {
+export const checkDb = async () => {
   let sequelize: Sequelize | undefined = undefined;
   try {
     sequelize = new Sequelize('postgresql://commonwealth:edgeware@localhost', {
