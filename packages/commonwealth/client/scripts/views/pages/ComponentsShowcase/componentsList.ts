@@ -21,6 +21,7 @@ import SearchbarsShowcase from 'views/pages/ComponentsShowcase/components/Search
 import TablesShowcase from 'views/pages/ComponentsShowcase/components/Tables.showcase';
 import TabsShowcase from 'views/pages/ComponentsShowcase/components/Tabs.showcase';
 import TagsShowcase from 'views/pages/ComponentsShowcase/components/Tags.showcase';
+import ThreadActionsShowcase from 'views/pages/ComponentsShowcase/components/ThreadActions.showcase';
 import TogglesShowcase from 'views/pages/ComponentsShowcase/components/Toggles.showcase';
 import TooltipsShowcase from 'views/pages/ComponentsShowcase/components/Tooltips.showcase';
 import TypographyShowcase from 'views/pages/ComponentsShowcase/components/Typography.showcase';
@@ -52,6 +53,7 @@ export const ComponentPageName = {
   Tooltips: 'Tooltips',
   Popovers: 'Popovers',
   Toggles: 'Toggles',
+  ThreadActions: 'ThreadActions',
 };
 
 export const ComponentType = {
@@ -188,6 +190,11 @@ export const componentItems = [
   {
     ComponentPage: TogglesShowcase,
     displayName: ComponentPageName.Toggles,
+    type: ComponentType.Components,
+  },
+  {
+    ComponentPage: ThreadActionsShowcase,
+    displayName: ComponentPageName.ThreadActions,
     type: ComponentType.Components,
   },
 ];
