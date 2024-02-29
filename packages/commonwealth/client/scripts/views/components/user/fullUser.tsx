@@ -21,6 +21,7 @@ export const FullUser = ({
   shouldShowPopover,
   shouldShowRole,
   shouldShowAsDeleted = false,
+  userAddress,
   userCommunityId,
   shouldHideAvatar,
   shouldShowAvatarOnly,
@@ -45,9 +46,9 @@ export const FullUser = ({
     );
   }
 
-  const fullAddress = formatAddressShort(profile.address, userCommunityId);
+  const fullAddress = formatAddressShort(userAddress, userCommunityId);
   const redactedAddress = formatAddressShort(
-    profile.address,
+    userAddress,
     userCommunityId,
     true,
     undefined,
@@ -60,13 +61,12 @@ export const FullUser = ({
     app.config.chains.getById(userCommunityId)?.name;
   const adminsAndMods = app.chain?.meta.adminsAndMods || [];
   const isGhostAddress = app.user.addresses.some(
-    ({ address, ghostAddress }) => profile.address === address && ghostAddress,
+    ({ address, ghostAddress }) => userAddress === address && ghostAddress,
   );
   const roleInCommunity =
     role ||
     adminsAndMods.find(
-      (r) =>
-        r.address === profile.address && r.address_chain === userCommunityId,
+      (r) => r.address === userAddress && r.address_chain === userCommunityId,
     );
 
   const roleTags = (
@@ -83,7 +83,7 @@ export const FullUser = ({
 
   const isSelfSelected = app.user.addresses
     .map((a) => a.address)
-    .includes(profile.address);
+    .includes(userAddress);
 
   const userBasisInfo = (
     <>
@@ -182,10 +182,8 @@ export const FullUser = ({
                 to={profile?.id ? `/profile/id/${profile?.id}` : undefined}
               >
                 {!profile || !profile?.id ? (
-                  !profile?.id && profile.address ? (
-                    `${profile.address.slice(0, 8)}...${profile.address.slice(
-                      -5,
-                    )}`
+                  !profile?.id && userAddress ? (
+                    `${userAddress.slice(0, 8)}...${userAddress.slice(-5)}`
                   ) : (
                     redactedAddress
                   )
@@ -225,7 +223,7 @@ export const FullUser = ({
         size="small"
         content={
           <BanUserModal
-            address={profile.address}
+            address={userAddress}
             onModalClose={() => setIsModalOpen(false)}
           />
         }

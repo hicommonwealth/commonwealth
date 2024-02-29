@@ -40,11 +40,6 @@ export type UserAttrsWithSkeletonProp = UserAttrs & {
   showSkeleton?: boolean;
 };
 
-export type UserInteropAttrsWithSkeletonProp = UserAttrs & {
-  profile?: UserProfile;
-  showSkeleton?: boolean;
-};
-
 export type FullUserAttrsWithSkeletonProp = UserAttrs & {
   profile: UserProfile;
   showSkeleton?: boolean;

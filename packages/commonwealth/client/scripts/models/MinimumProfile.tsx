@@ -1,6 +1,7 @@
 import jdenticon from 'jdenticon';
 
 export type UserProfile = {
+  id: number;
   name: string;
   address: string;
   lastActive: string;

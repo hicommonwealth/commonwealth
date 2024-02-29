@@ -1,5 +1,6 @@
 import { ProposalType } from '@hicommonwealth/core';
 import type MinimumProfile from 'models/MinimumProfile';
+import { UserProfile } from 'models/MinimumProfile';
 import moment, { Moment } from 'moment';
 import type { ReactionType } from './Reaction';
 import Topic from './Topic';
@@ -39,6 +40,10 @@ function processVersionHistory(versionHistory: any[]) {
   return versionHistoryProcessed;
 }
 
+function emptyStringToNull(input: string) {
+  return input === '' ? null : input;
+}
+
 function processAssociatedReactions(
   reactions: any[],
   reactionIds: any[],
@@ -46,6 +51,9 @@ function processAssociatedReactions(
   reactionTimestamps: string[],
   reactionWeights: number[],
   addressesReacted: any[],
+  reactedProfileName: string[],
+  reactedProfileAvatarUrl: string[],
+  reactedAddressLastActive: string[],
 ) {
   const temp = [];
   const tempReactionIds =
@@ -80,6 +88,11 @@ function processAssociatedReactions(
         address: tempAddressesReacted[i],
         updated_at: tempReactionTimestamps[i],
         voting_weight: tempReactionWeights[i] || 1,
+        reactedProfileName: emptyStringToNull(reactedProfileName[i]),
+        reactedProfileAvatarUrl: emptyStringToNull(reactedProfileAvatarUrl[i]),
+        reactedAddressLastActive: emptyStringToNull(
+          reactedAddressLastActive[i],
+        ),
       });
     }
   }
@@ -103,6 +116,9 @@ export type AssociatedReaction = {
   address: string;
   updated_at: string;
   voting_weight: number;
+  profile_name?: string;
+  avatar_url?: string;
+  last_active?: string;
 };
 
 export enum LinkSource {
@@ -168,6 +184,8 @@ export class Thread implements IUniqueId {
   public readonly discord_meta: any;
   public readonly latestActivity: Moment;
 
+  public readonly profile: UserProfile;
+
   public get uniqueIdentifier() {
     return `${this.slug}_${this.identifier}`;
   }
@@ -203,11 +221,18 @@ export class Thread implements IUniqueId {
     reactionWeights,
     reaction_weights_sum,
     addressesReacted,
+    reactedProfileName,
+    reactedProfileAvatarUrl,
+    reactedAddressLastActive,
     canvasAction,
     canvasSession,
     canvasHash,
     links,
     discord_meta,
+    profile_id,
+    profile_name,
+    avatar_url,
+    address_last_active,
   }: {
     marked_as_spam_at: string;
     title: string;
@@ -237,6 +262,9 @@ export class Thread implements IUniqueId {
     reactions?: any[]; // TODO: fix type
     reactionIds: any[]; // TODO: fix type
     addressesReacted: any[]; //TODO: fix type,
+    reactedProfileName: string[];
+    reactedProfileAvatarUrl: string[];
+    reactedAddressLastActive: string[];
     reactionType: any[]; // TODO: fix type
     reactionTimestamps: string[];
     reactionWeights: number[];
@@ -244,6 +272,10 @@ export class Thread implements IUniqueId {
     version_history: any[]; // TODO: fix type
     Address: any; // TODO: fix type
     discord_meta?: any;
+    profile_id: number;
+    profile_name: string;
+    avatar_url: string;
+    address_last_active: string;
   }) {
     this.author = Address.address;
     this.title = getDecodedString(title);
@@ -287,10 +319,20 @@ export class Thread implements IUniqueId {
       reactionTimestamps,
       reactionWeights,
       addressesReacted,
+      reactedProfileName,
+      reactedProfileAvatarUrl,
+      reactedAddressLastActive,
     );
     this.latestActivity = last_commented_on
       ? moment(last_commented_on)
       : moment(created_at);
+    this.profile = {
+      id: profile_id,
+      name: profile_name,
+      address: Address.address,
+      lastActive: address_last_active,
+      avatarUrl: avatar_url,
+    };
   }
 }
 
