@@ -133,6 +133,7 @@
     "mock-express-request": "^0.2.2",
     "nyc": "^15.1.0",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
+    "pino-pretty": "^10.3.1",
     "playwright-json-summary-reporter": "^1.0.0",
     "playwright-test": "^8.2.0",
     "prettier": "2.7.1",
@@ -169,5 +170,8 @@
   },
   "engines": {
     "node": "18.x"
+  },
+  "dependencies": {
+    "pino": "^8.19.0"
   }
 }
