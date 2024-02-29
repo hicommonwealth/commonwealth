@@ -16,6 +16,7 @@ import { CWModal } from '../component_kit/new_designs/CWModal';
 import { UserSkeleton } from './UserSkeleton';
 import { FullUserAttrsWithSkeletonProp } from './user.types';
 
+// TODO: When we remove all usages of User component (user.tsx). We should rename this file and component to User
 export const FullUser = ({
   shouldLinkProfile,
   shouldShowPopover,
