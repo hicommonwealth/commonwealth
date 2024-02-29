@@ -16,6 +16,7 @@ import ModalsShowcase from 'views/pages/ComponentsShowcase/components/Modals.sho
 import ProgressBarsShowcase from 'views/pages/ComponentsShowcase/components/ProgressBars.showcase';
 import RadioButtonsShowcase from 'views/pages/ComponentsShowcase/components/RadioButtons.showcase';
 import TablesShowcase from 'views/pages/ComponentsShowcase/components/Tables.showcase';
+import TagsShowcase from 'views/pages/ComponentsShowcase/components/Tags.showcase';
 import TypographyShowcase from 'views/pages/ComponentsShowcase/components/Typography.showcase';
 
 export const ComponentPageName = {
@@ -38,6 +39,7 @@ export const ComponentPageName = {
   ProgressBars: 'ProgressBars',
   Collapsibles: 'Collapsibles',
   Tables: 'Tables',
+  Tags: 'Tags',
 };
 
 export const ComponentType = {
@@ -139,6 +141,11 @@ export const componentItems = [
   {
     ComponentPage: TablesShowcase,
     displayName: ComponentPageName.Tables,
+    type: ComponentType.Components,
+  },
+  {
+    ComponentPage: TagsShowcase,
+    displayName: ComponentPageName.Tags,
     type: ComponentType.Components,
   },
 ];
