@@ -8,11 +8,10 @@ import {
 } from '@hicommonwealth/adapters';
 import { logger as _logger, cache } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
-import bodyParser from 'body-parser';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
-import express from 'express';
+import express, { RequestHandler, json, urlencoded } from 'express';
 import { redirectToHTTPS } from 'express-http-to-https';
 import session from 'express-session';
 import fs from 'fs';
@@ -155,10 +154,10 @@ export async function main(app: express.Express) {
     app.use('/static', express.static('static'));
 
     // add other middlewares
-    app.use(logger('dev'));
+    app.use(logger('dev') as RequestHandler);
     app.use(expressStatsInit());
-    app.use(bodyParser.json({ limit: '1mb' }));
-    app.use(bodyParser.urlencoded({ limit: '1mb', extended: false }));
+    app.use(json({ limit: '1mb' }) as RequestHandler);
+    app.use(urlencoded({ limit: '1mb', extended: false }) as RequestHandler);
     app.use(cookieParser());
     app.use(sessionParser);
     app.use(passport.initialize());

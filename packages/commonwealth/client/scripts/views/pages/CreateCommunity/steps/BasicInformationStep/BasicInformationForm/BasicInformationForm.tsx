@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import app from 'state';
 import { slugifyPreserveDashes } from 'utils';
 
 import { ChainBase } from '@hicommonwealth/core';
@@ -28,8 +29,8 @@ import {
   BASE_ID,
   OSMOSIS_ID,
   POLYGON_ETH_CHAIN_ID,
-  chainTypes,
-  existingCommunityNames,
+  existingCommunityIds,
+  alphabeticallyStakeWiseSortedChains as sortedChains,
 } from './constants';
 import { BasicInformationFormProps, FormSubmitValues } from './types';
 import { basicInformationFormValidationSchema } from './validation';
@@ -69,32 +70,35 @@ const BasicInformationForm = ({
   } = useCreateCommunityMutation();
 
   const communityId = slugifyPreserveDashes(communityName.toLowerCase());
-  const isCommunityNameTaken = existingCommunityNames.find(
-    (name) => name === communityName.trim().toLowerCase(),
-  );
+  let isCommunityNameTaken = !!app.config.redirects[communityId];
+  if (!isCommunityNameTaken) {
+    isCommunityNameTaken = !!existingCommunityIds.find(
+      (id) => id === communityId,
+    );
+  }
 
   const getChainOptions = () => {
+    const mappedChainValue = (chainType) => ({
+      helpText: chainType.hasStakeEnabled ? 'Community Stake' : '',
+      label: chainType.label,
+      value: `${chainType.value}`,
+    });
+
     // Since we are treating polygon as an ecosystem, we will only have a single option, which will be
     // preselected and further input's will be disabled
     if (selectedCommunity.type === CommunityType.Polygon) {
-      return chainTypes
+      return sortedChains
         .filter((chainType) => chainType.value === POLYGON_ETH_CHAIN_ID)
-        .map((chainType) => ({
-          label: chainType.label,
-          value: `${chainType.value}`,
-        }));
+        .map(mappedChainValue);
     }
 
     if (selectedCommunity.type === CommunityType.Solana) {
-      return chainTypes
+      return sortedChains
         .filter((chainType) => chainType.chainBase === CommunityType.Solana)
-        .map((chainType) => ({
-          label: chainType.label,
-          value: `${chainType.value}`,
-        }));
+        .map(mappedChainValue);
     }
 
-    return chainTypes
+    return sortedChains
       .filter(
         (chainType) =>
           chainType.chainBase ===
@@ -102,10 +106,7 @@ const BasicInformationForm = ({
             ? CommunityType.Cosmos
             : CommunityType.Ethereum),
       )
-      .map((chainType) => ({
-        label: chainType.label,
-        value: `${chainType.value}`,
-      }));
+      .map(mappedChainValue);
   };
 
   const getInitialValue = () => {
@@ -130,7 +131,7 @@ const BasicInformationForm = ({
     if (isCommunityNameTaken || hasLinksError) return;
     values.links = socialLinks.map((link) => link.value).filter(Boolean);
 
-    const selectedChainNode = chainTypes.find(
+    const selectedChainNode = sortedChains.find(
       (chain) => String(chain.value) === values.chain.value,
     );
 

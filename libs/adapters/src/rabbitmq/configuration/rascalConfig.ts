@@ -43,7 +43,7 @@ type allBindingsType = Record<keyof OmittedRascalBindings, BindingConfig>;
 type allPublicationsType = Record<RascalPublications, PublicationConfig>;
 type allSubscriptionsType = Record<RascalSubscriptions, SubscriptionConfig>;
 
-type getAllRascalConfigsType = {
+export type getAllRascalConfigsType = {
   baseConfig: BrokerConfig;
   allExchanges: allExchangesType;
   allQueues: allQueuesType;

@@ -28,14 +28,16 @@ export async function getWebhookData(
       blockNumber: notification.data.block_number,
       data: notification.data.event_data,
       network: notification.data.network,
-      chain: notification.data.chain,
+      chain: notification.data.community_id,
     };
-    const eventLabel = chainEventLabel(notification.data.chain, event);
+    const eventLabel = chainEventLabel(notification.data.community_id, event);
 
     const previewImage = await getPreviewImageUrl(notification, community);
 
     return {
-      title: `${eventLabel.heading} on ${capitalize(notification.data.chain)}`,
+      title: `${eventLabel.heading} on ${capitalize(
+        notification.data.community_id,
+      )}`,
       description: eventLabel.label,
       url: SERVER_URL + eventLabel.linkUrl,
       previewImageUrl: previewImage.previewImageUrl,
@@ -86,7 +88,7 @@ export async function getWebhookData(
     const previewImage = await getPreviewImageUrl(notification);
 
     return {
-      communityId: notification.data.chain_id,
+      communityId: notification.data.community_id,
       titlePrefix,
       previewImageUrl: previewImage.previewImageUrl,
       previewImageAltText: previewImage.previewAltText,

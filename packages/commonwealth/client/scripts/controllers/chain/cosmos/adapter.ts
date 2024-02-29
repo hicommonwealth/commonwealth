@@ -21,7 +21,7 @@ class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
     this.chain = new CosmosChain(this.app);
     this.accounts = new CosmosAccounts(this.app);
     this.governance =
-      meta.cosmosGovernanceVersion === 'v1'
+      meta.ChainNode.cosmosGovernanceVersion === 'v1'
         ? new CosmosGovernanceV1(this.app)
         : new CosmosGovernance(this.app);
   }

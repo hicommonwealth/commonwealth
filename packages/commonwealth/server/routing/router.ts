@@ -1033,7 +1033,7 @@ function setupRouter(
     setAddressWallet.bind(this, models),
   );
 
-  // chain categories
+  // community categories
   registerRoute(
     router,
     'post',
@@ -1303,7 +1303,7 @@ function setupRouter(
 
   app.use(endpoint, router);
 
-  // ddd-routes
+  // new ddd routes
   app.use('/ddd', ddd);
 
   app.use(methodNotAllowedMiddleware());
