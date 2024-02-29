@@ -220,48 +220,36 @@ export const useMarkdownToolbarHandlers = ({
     return (value: string) => {
       const editor = editorRef?.current?.getEditor();
 
-      if (!editor) {
-        return;
-      }
-      const selection = editor.getSelection();
-      if (!selection) {
-        return;
-      }
-      const prefix = LIST_ITEM_PREFIX[value];
+      if (!editor) return;
 
+      const selection = editor.getSelection();
+      if (!selection) return;
+
+      const prefix = LIST_ITEM_PREFIX[value];
       if (!prefix) {
         throw new Error(`could not get prefix for value: ${value}`);
       }
+
       const selectedText = editor.getText(selection.index, selection.length);
-      const editorText = editor.getText();
       const editorLength = editor.getLength() || 0;
 
-      let newText;
-
+      // If there is a selection, format the selected text
       if (selectedText.length > 0) {
-        newText = handleListText(selectedText, prefix);
+        const newText = handleListText(selectedText, prefix);
+        editor.deleteText(selection.index, selection.length);
+        editor.insertText(selection.index, newText);
       } else {
-        //check all of the prefix
-        Object.keys(LIST_ITEM_PREFIX).forEach((key) => {
-          const localPrefix = LIST_ITEM_PREFIX[key];
-          const currentPrefix = editorText.replace(/\n/g, '').trim();
-          if (
-            editorText.startsWith(localPrefix) &&
-            currentPrefix === localPrefix &&
-            localPrefix !== prefix
-          ) {
-            editor.deleteText(0, localPrefix.length);
-            editor.insertText(0, prefix);
-          }
-        });
-
         const [currentLine, offset] = editor.getLeaf(selection.index);
         const currentLineIdx = editor.getIndex(currentLine);
-        if (currentLineIdx === 0) {
+
+        //if there is no text in the editor, insert the prefix and a space
+        if (currentLineIdx === 0 && prefix !== currentLine.text?.trim()) {
           editor.setText(`${prefix} `);
           editor.setSelection(prefix.length + 1, prefix.length + 1);
           return;
         }
+
+        //if the current line has a prefix and there is text after the prefix, replace the prefix
         if (
           currentLine &&
           currentLine.text.startsWith(prefix) &&
@@ -270,26 +258,21 @@ export const useMarkdownToolbarHandlers = ({
           const currentLineText = currentLine.text.replace(prefix, '');
           editor.deleteText(currentLineIdx, currentLine.text.length);
           editor.insertText(currentLineIdx, currentLineText.trim());
-
           return;
-        } else if (
+        }
+
+        //if the current line has a prefix and there is no text after the prefix, remove the prefix
+        if (
           (currentLine.text && currentLine.text.trim() === prefix) ||
           currentLine.text.startsWith(prefix)
         ) {
           editor.deleteText(currentLineIdx, editorLength || prefix.length);
           return;
-        } else {
-          editor.insertText(currentLineIdx || 0, `${prefix} `);
         }
 
-        // setTimeout(() => {
-        //   const newCursorPosition = editor.getLength() - 1;
-        //   editor.setSelection(newCursorPosition, newCursorPosition);
-        // }, 10);
+        editor.insertText(currentLineIdx || 0, `${prefix} `);
       }
 
-      editor.deleteText(selection.index, selection.length);
-      editor.insertText(selection.index, newText);
       setContentDelta({
         ...editor.getContents(),
         ___isMarkdown: true,
