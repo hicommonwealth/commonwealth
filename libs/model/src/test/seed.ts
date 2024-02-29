@@ -33,6 +33,7 @@ export async function seed<T extends SchemaWithModel<any>>(
     ...mockDefaults?.(),
     ...overrides,
   };
+
   console.log(`data #${seedNum} [${model.name}]: `, data);
   return model.create(data);
 }

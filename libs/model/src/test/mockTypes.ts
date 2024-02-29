@@ -64,7 +64,7 @@ const contractSchema = z.object({
   id: z.number().int(),
   address: z.string().max(255),
   chain_node_id: z.number().int().max(MAX_SCHEMA_INT),
-  abi_id: z.number().int().max(MAX_SCHEMA_INT).optional(),
+  abi_id: z.number().int().max(MAX_SCHEMA_INT).optional().nullable(),
   decimals: z.number().int().max(MAX_SCHEMA_INT).optional(),
   token_name: z.string().max(255).optional(),
   symbol: z.string().max(255).optional(),
@@ -78,7 +78,7 @@ export const ContractSchema: SchemaWithModel<typeof contractSchema> = {
   schema: contractSchema,
   mockDefaults: () => ({
     chain_node_id: 1,
-    abi_id: 1,
+    abi_id: null,
   }),
   model: models.Contract,
 };
