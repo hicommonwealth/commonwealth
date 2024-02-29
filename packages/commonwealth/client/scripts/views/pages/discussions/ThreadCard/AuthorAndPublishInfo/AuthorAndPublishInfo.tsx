@@ -79,6 +79,8 @@ export const AuthorAndPublishInfo = ({
 
   const fromDiscordBot = discord_meta !== null && discord_meta !== undefined;
 
+  console.log(collaboratorsInfo);
+
   return (
     <div className="AuthorAndPublishInfo" ref={containerRef}>
       <FullUser
@@ -124,14 +126,14 @@ export const AuthorAndPublishInfo = ({
             <CWPopover
               content={
                 <div className="collaborators">
-                  {collaboratorsInfo.map(({ address, community_id }) => {
+                  {collaboratorsInfo.map(({ address, community_id, User }) => {
                     return (
                       <FullUser
                         shouldLinkProfile
                         key={address}
                         userAddress={address}
                         userCommunityId={community_id}
-                        profile={profile}
+                        profile={User.Profiles[0]}
                       />
                     );
                   })}

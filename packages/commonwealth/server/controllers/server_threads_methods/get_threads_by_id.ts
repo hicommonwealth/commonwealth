@@ -51,7 +51,11 @@ export async function __getThreadsById(
                 model: this.models.Profile,
                 as: 'Profiles',
                 required: true,
-                attributes: ['id', 'avatar_url', 'profile_name'],
+                attributes: [
+                  'id',
+                  ['avatar_url', 'avatarUrl'],
+                  ['profile_name', 'name'],
+                ],
               },
             ],
           },

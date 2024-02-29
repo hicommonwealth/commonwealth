@@ -110,6 +110,7 @@ export interface VersionHistory {
 export interface IThreadCollaborator {
   address: string;
   community_id: string;
+  User: { Profiles: UserProfile[] };
 }
 
 export type AssociatedReaction = {
