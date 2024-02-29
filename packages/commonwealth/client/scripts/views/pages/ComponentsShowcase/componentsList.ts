@@ -14,6 +14,7 @@ import DrawersShowcase from 'views/pages/ComponentsShowcase/components/Drawers.s
 import DropdownsShowcase from 'views/pages/ComponentsShowcase/components/Dropdowns.showcase';
 import ElevationsShowcase from 'views/pages/ComponentsShowcase/components/Elevations.showcase';
 import FormStepsShowcase from 'views/pages/ComponentsShowcase/components/FormSteps.showcase';
+import InputsShowcase from 'views/pages/ComponentsShowcase/components/Inputs.showcase';
 import LoadersShowcase from 'views/pages/ComponentsShowcase/components/Loaders.showcase';
 import ModalsShowcase from 'views/pages/ComponentsShowcase/components/Modals.showcase';
 import PopoversShowcase from 'views/pages/ComponentsShowcase/components/Popovers.showcase';
@@ -60,6 +61,7 @@ export const ComponentPageName = {
   Upvotes: 'Upvotes',
   Breadcrumbs: 'Breadcrumbs',
   Dropdowns: 'Dropdowns',
+  Inputs: 'Inputs',
 };
 
 export const ComponentType = {
@@ -216,6 +218,11 @@ export const componentItems = [
   {
     ComponentPage: DropdownsShowcase,
     displayName: ComponentPageName.Dropdowns,
+    type: ComponentType.Components,
+  },
+  {
+    ComponentPage: InputsShowcase,
+    displayName: ComponentPageName.Inputs,
     type: ComponentType.Components,
   },
 ];
