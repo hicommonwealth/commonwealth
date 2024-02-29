@@ -2,6 +2,7 @@ import { VersionHistory } from 'models/Thread';
 import type momentType from 'moment';
 import moment from 'moment';
 import AddressInfo from './AddressInfo';
+import { UserProfile } from './MinimumProfile';
 import Reaction from './Reaction';
 import type { IUniqueId } from './interfaces';
 
@@ -30,6 +31,8 @@ export class Comment<T extends IUniqueId> {
   public readonly canvasSession: string;
   public readonly canvasHash: string;
   public readonly discord_meta: any;
+
+  public readonly profile: UserProfile;
 
   constructor({
     id,
@@ -97,6 +100,17 @@ export class Comment<T extends IUniqueId> {
     this.reactionWeightsSum = reaction_weights_sum;
     this.rootThread = thread_id;
     this.discord_meta = discord_meta;
+
+    const profile = Address?.User?.Profiles[0];
+    if (profile) {
+      this.profile = {
+        id: profile.id,
+        avatarUrl: profile.avatar_url,
+        name: profile.profile_name,
+        address: Address.address,
+        lastActive: Address.last_active,
+      };
+    }
   }
 }
 

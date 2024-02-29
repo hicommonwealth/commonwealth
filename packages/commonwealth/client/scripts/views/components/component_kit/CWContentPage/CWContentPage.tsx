@@ -12,7 +12,7 @@ import Permissions from 'utils/Permissions';
 import { isHot } from 'views/pages/discussions/helpers';
 import Account from '../../../../models/Account';
 import AddressInfo from '../../../../models/AddressInfo';
-import MinimumProfile, { UserProfile } from '../../../../models/MinimumProfile';
+import MinimumProfile from '../../../../models/MinimumProfile';
 import { Thread } from '../../../../models/Thread';
 import { ThreadStage } from '../../../../models/types';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
@@ -77,7 +77,6 @@ type ContentPageProps = {
   showSkeleton?: boolean;
   isEditing?: boolean;
   sidebarComponentsSkeletonCount?: number;
-  profile?: UserProfile;
 };
 
 export const CWContentPage = ({
@@ -114,7 +113,6 @@ export const CWContentPage = ({
   showSkeleton,
   isEditing = false,
   sidebarComponentsSkeletonCount = 2,
-  profile,
 }: ContentPageProps) => {
   const navigate = useNavigate();
   const [urlQueryParams] = useSearchParams();
@@ -197,7 +195,7 @@ export const CWContentPage = ({
         threadStage={stageLabel}
         archivedAt={thread?.archivedAt}
         isHot={isHot(thread)}
-        profile={profile}
+        profile={thread.profile}
       />
     </div>
   );
