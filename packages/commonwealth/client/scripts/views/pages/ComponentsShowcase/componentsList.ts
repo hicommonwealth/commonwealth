@@ -14,6 +14,7 @@ import ElevationsShowcase from 'views/pages/ComponentsShowcase/components/Elevat
 import FormStepsShowcase from 'views/pages/ComponentsShowcase/components/FormSteps.showcase';
 import LoadersShowcase from 'views/pages/ComponentsShowcase/components/Loaders.showcase';
 import ModalsShowcase from 'views/pages/ComponentsShowcase/components/Modals.showcase';
+import PopoversShowcase from 'views/pages/ComponentsShowcase/components/Popovers.showcase';
 import ProgressBarsShowcase from 'views/pages/ComponentsShowcase/components/ProgressBars.showcase';
 import RadioButtonsShowcase from 'views/pages/ComponentsShowcase/components/RadioButtons.showcase';
 import SearchbarsShowcase from 'views/pages/ComponentsShowcase/components/Searchbars.showcase';
@@ -48,6 +49,7 @@ export const ComponentPageName = {
   Searchbars: 'Searchbars',
   Tabs: 'Tabs',
   Tooltips: 'Tooltips',
+  Popovers: 'Popovers',
 };
 
 export const ComponentType = {
@@ -174,6 +176,11 @@ export const componentItems = [
   {
     ComponentPage: TooltipsShowcase,
     displayName: ComponentPageName.Tooltips,
+    type: ComponentType.Components,
+  },
+  {
+    ComponentPage: PopoversShowcase,
+    displayName: ComponentPageName.Popovers,
     type: ComponentType.Components,
   },
 ];
