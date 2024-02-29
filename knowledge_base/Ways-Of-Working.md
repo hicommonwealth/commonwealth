@@ -28,6 +28,7 @@ _Throughout this page, "ticket" and "story" are used interchangeably to refer to
 1. We follow an Agile work philosophy. See [Agile Manifesto](https://agilemanifesto.org/) for context.
 2. We track work through GitHub's project board, using tickets' "Project" metadata. See [Project Management Flow](#project-management-flow) for full context.
 3. We use team standups to sync up on project status and share updates. Standups take place on Mondays, Tuesdays, and Thursdays at 12:00 EST. See [Standup Meetings](#standup-meetings) section for full context.
+4. Informally, we are divided into three teams. The Product team builds and maintains our UI; the Platform team is responsible for backend and business logic; and the Protocol team handles smart contracts.
 
 ## Project Management Flow
 
@@ -85,7 +86,7 @@ NB. Points != Time! Points are an estimate of complexity, not time. Having said 
 - 8 points ~= 1 sprint / 1-week task
 - 13 points ~= more than a single sprint
 
-Points may always be increased mid-implementation, but a justification must be provided.
+Points may always be increased mid-implementation, but a justification must be provided. Moreover, the original point estimation _must_ be left as a tag, rather than deleted.
 
 ### Branches
 
