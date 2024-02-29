@@ -1,6 +1,7 @@
 import AuthButtonsShowcase from 'views/pages/ComponentsShowcase/components/AuthButtons.showcase';
 import AvatarsShowcase from 'views/pages/ComponentsShowcase/components/Avatars.showcase';
 import BannersAndAlertsShowcase from 'views/pages/ComponentsShowcase/components/BannersAndAlerts.showcase';
+import BreadcrumbsShowcase from 'views/pages/ComponentsShowcase/components/Breadcrumbs.showcase';
 import ButtonsShowcase from 'views/pages/ComponentsShowcase/components/Buttons.showcase';
 import ButtonsCircleShowcase from 'views/pages/ComponentsShowcase/components/ButtonsCircle.showcase';
 import ButtonsIconShowcase from 'views/pages/ComponentsShowcase/components/ButtonsIcon.showcase';
@@ -56,6 +57,7 @@ export const ComponentPageName = {
   Toggles: 'Toggles',
   ThreadActions: 'ThreadActions',
   Upvotes: 'Upvotes',
+  Breadcrumbs: 'Breadcrumbs',
 };
 
 export const ComponentType = {
@@ -202,6 +204,11 @@ export const componentItems = [
   {
     ComponentPage: UpvotesShowcase,
     displayName: ComponentPageName.Upvotes,
+    type: ComponentType.Components,
+  },
+  {
+    ComponentPage: BreadcrumbsShowcase,
+    displayName: ComponentPageName.Breadcrumbs,
     type: ComponentType.Components,
   },
 ];

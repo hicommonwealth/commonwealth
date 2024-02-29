@@ -78,17 +78,18 @@
   }
 
   .BannersAndAlerts {
-    .CWBanner,
-    .MessageBanner,
-    .TermsBanner {
+    .CWBanner {
       width: 100%;
     }
+  }
 
-    .MessageBanner,
-    .TermsBanner {
-      width: 100%;
-      margin-left: unset !important;
-      padding-left: 16px !important;
+  .Breadcrumbs.component-content {
+    position: static;
+    margin-top: unset;
+
+    .Breadcrumbs {
+      position: static;
+      margin-top: unset;
     }
   }
 
