@@ -54,7 +54,13 @@ export const SharePopover = ({
                 urlToCopy = `${domain}${discussionLink}`;
               } else {
                 const communityId = urlParts[1];
-                urlToCopy = `${domain}/${communityId}${discussionLink}`;
+                if (
+                  ['dashboard', 'overview'].includes(communityId.toLowerCase())
+                ) {
+                  urlToCopy = `${domain}${discussionLink}`;
+                } else {
+                  urlToCopy = `${domain}/${communityId}${discussionLink}`;
+                }
               }
             }
 

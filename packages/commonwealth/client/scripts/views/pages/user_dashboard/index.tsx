@@ -1,5 +1,7 @@
 import { notifyInfo } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import useBrowserWindow from 'hooks/useBrowserWindow';
+import useStickyHeader from 'hooks/useStickyHeader';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/user_dashboard/index.scss';
@@ -29,6 +31,11 @@ type UserDashboardProps = {
 const UserDashboard = (props: UserDashboardProps) => {
   const { type } = props;
   const { isLoggedIn } = useUserLoggedIn();
+  const { isWindowExtraSmall } = useBrowserWindow({});
+  useStickyHeader({
+    elementId: 'dashboard-header',
+    stickyBehaviourEnabled: !!isWindowExtraSmall,
+  });
 
   const [activePage, setActivePage] = React.useState<DashboardViews>(
     DashboardViews.Global,
@@ -63,7 +70,7 @@ const UserDashboard = (props: UserDashboardProps) => {
       ? DashboardViews.ForYou
       : DashboardViews.Global;
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!activePage || activePage !== subpage) {
       setActivePage(subpage);
     }
@@ -76,7 +83,7 @@ const UserDashboard = (props: UserDashboardProps) => {
       </CWText>
       <div ref={setScrollElement} className="content">
         <div className="user-dashboard-activity">
-          <div className="dashboard-header">
+          <div className="dashboard-header" id="dashboard-header">
             <CWTabsRow>
               <CWTab
                 label={DashboardViews.ForYou}

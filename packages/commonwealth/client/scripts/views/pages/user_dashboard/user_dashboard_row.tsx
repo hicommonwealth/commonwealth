@@ -15,6 +15,7 @@ type UserDashboardRowProps = {
   showSkeleton?: boolean;
   isChainEventsRow?: boolean;
   label?: IEventLabel;
+  isLoggedIn?: boolean;
 };
 
 export const UserDashboardRow = ({
@@ -22,6 +23,7 @@ export const UserDashboardRow = ({
   showSkeleton,
   isChainEventsRow,
   label,
+  isLoggedIn,
 }: UserDashboardRowProps) => {
   if (showSkeleton) {
     if (isChainEventsRow) {
@@ -40,7 +42,6 @@ export const UserDashboardRow = ({
         <UserDashboardRowTop activityData="" category="" showSkeleton />
         <UserDashboardRowBottom
           threadId=""
-          commentId=""
           communityId=""
           commentCount={0}
           commenters={[]}
@@ -71,7 +72,7 @@ export const UserDashboardRow = ({
     );
   }
 
-  const { community_id, thread_id, root_type, comment_id } = JSON.parse(
+  const { community_id, thread_id, root_type } = JSON.parse(
     notification.notificationData,
   );
 
@@ -88,10 +89,11 @@ export const UserDashboardRow = ({
       <UserDashboardRowTop activityData={notification} category={categoryId} />
       <UserDashboardRowBottom
         threadId={threadId}
-        commentId={comment_id}
         communityId={community_id}
         commentCount={commentCount}
         commenters={commenters}
+        discussionLink={path}
+        isLoggedIn={isLoggedIn}
       />
     </Link>
   );
