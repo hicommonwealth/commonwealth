@@ -24,7 +24,7 @@ const linkExistingAddressToCommunity = async (
   res: Response,
 ) => {
   const userId = req.user.id;
-  const { community } = req;
+  const { community_id } = req.body;
 
   if (!req.body.address) {
     throw new AppError(Errors.NeedAddress);
@@ -32,12 +32,16 @@ const linkExistingAddressToCommunity = async (
   if (!req.user?.id) {
     throw new AppError(Errors.NeedLoggedIn);
   }
-  if (community.id == 'injective') {
+  if (community_id == 'injective') {
     if (req.body.address.slice(0, 3) !== 'inj')
       throw new AppError('Must join with Injective address');
   } else if (req.body.address.slice(0, 3) === 'inj') {
     throw new AppError('Cannot join with an injective address');
   }
+
+  const community = await models.Community.findOne({
+    where: { id: req.body.community_id },
+  });
 
   // check if the original address is verified and is owned by the user
   const originalAddress = await models.Address.scope('withPrivateData').findOne(
