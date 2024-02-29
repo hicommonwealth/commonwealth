@@ -25,6 +25,7 @@ import ThreadActionsShowcase from 'views/pages/ComponentsShowcase/components/Thr
 import TogglesShowcase from 'views/pages/ComponentsShowcase/components/Toggles.showcase';
 import TooltipsShowcase from 'views/pages/ComponentsShowcase/components/Tooltips.showcase';
 import TypographyShowcase from 'views/pages/ComponentsShowcase/components/Typography.showcase';
+import UpvotesShowcase from 'views/pages/ComponentsShowcase/components/Upvotes.showcase';
 
 export const ComponentPageName = {
   AuthButtons: 'AuthButtons',
@@ -54,6 +55,7 @@ export const ComponentPageName = {
   Popovers: 'Popovers',
   Toggles: 'Toggles',
   ThreadActions: 'ThreadActions',
+  Upvotes: 'Upvotes',
 };
 
 export const ComponentType = {
@@ -195,6 +197,11 @@ export const componentItems = [
   {
     ComponentPage: ThreadActionsShowcase,
     displayName: ComponentPageName.ThreadActions,
+    type: ComponentType.Components,
+  },
+  {
+    ComponentPage: UpvotesShowcase,
+    displayName: ComponentPageName.Upvotes,
     type: ComponentType.Components,
   },
 ];
