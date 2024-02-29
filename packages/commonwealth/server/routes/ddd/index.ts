@@ -2,6 +2,7 @@ import { express, trpc } from '@hicommonwealth/adapters';
 import { Router } from 'express';
 import swaggerUi from 'swagger-ui-express';
 import * as community from './community';
+import * as integrations from './integrations';
 
 /**
  * Express router
@@ -13,7 +14,10 @@ router.use(express.errorMiddleware);
 /**
  * tRPC router
  */
-const trpcRouter = trpc.router({ community: community.trpcRouter });
+const trpcRouter = trpc.router({
+  community: community.trpcRouter,
+  integrations: integrations.trpcRouter,
+});
 
 /**
  * OpenAPI spec

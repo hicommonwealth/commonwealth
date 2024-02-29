@@ -3,6 +3,8 @@ import {
   INVALID_ACTOR_ERROR,
   INVALID_INPUT_ERROR,
   type CommandMetadata,
+  type EventSchemas,
+  type EventsHandler,
   type QueryMetadata,
 } from '@hicommonwealth/core';
 import { TRPCError, initTRPC } from '@trpc/server';
@@ -65,6 +67,10 @@ export enum Tag {
   Thread = 'Thread',
   Comment = 'Comment',
   Reaction = 'Reaction',
+  Query = 'Query',
+  Policy = 'Policy',
+  Projection = 'Projection',
+  Integration = 'Integration',
 }
 
 export const command = <T, P extends ZodObject<any>>(
@@ -110,13 +116,43 @@ export const command = <T, P extends ZodObject<any>>(
     });
 };
 
+// TODO: add security options (API key, IP range, internal, etc)
+export const event = <T, S extends EventSchemas>(
+  factory: () => EventsHandler<T, S>,
+  tag: Tag.Policy | Tag.Projection | Tag.Integration,
+) => {
+  const md = factory();
+  return trpc.procedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: `/${factory.name}`,
+        tags: [tag],
+      },
+    })
+    .input(z.object(md.schemas))
+    .output(z.object({}).optional()) // TODO: use output schemas
+    .mutation(async ({ input }) => {
+      try {
+        const [[name, payload]] = Object.entries(input as object);
+        return await core.event(
+          md,
+          { name: name as core.events.Events, payload },
+          false,
+        );
+      } catch (error) {
+        throw trpcerror(error);
+      }
+    });
+};
+
 export const query = <T, P extends ZodObject<any>>(
   factory: () => QueryMetadata<T, P>,
 ) => {
   const md = factory();
   return trpc.procedure
     .meta({
-      openapi: { method: 'GET', path: `/${factory.name}`, tags: ['Queries'] },
+      openapi: { method: 'GET', path: `/${factory.name}`, tags: [Tag.Query] },
       protect: md.secure,
     })
     .input(md.schema.extend({ address_id: z.string().optional() }))
