@@ -36,6 +36,7 @@
   * [Port](#port)
   * [Adapter](#adapter)
 - [Praxis](#praxis)
+  * [Blocked](#blocked)
   * [Fast-Follow](#fast-follow)
 - [Change Log](#change-log)
 
@@ -208,6 +209,10 @@ An interface between an application and some external system. Either incoming or
 A component linked to a PORT, which translates incoming and outoing data and messages.
 
 ## Praxis
+
+### Blocked
+
+A project is BLOCKED when some process, out of the direct control of the developer, must be resolved before work on the project can continue. A blocker may be the Slack response of a lead, the merging of an outstanding PR, or the version release of an external package.
 
 ### Fast-Follow
 
