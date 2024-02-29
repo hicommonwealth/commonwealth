@@ -18,9 +18,10 @@ export type CommentAttributes = {
   parent_id?: string;
   version_history?: string[];
 
-  canvas_action: string;
-  canvas_session: string;
-  canvas_hash: string;
+  canvas_action_message: string;
+  canvas_action_message_signature: string;
+  canvas_session_message: string;
+  canvas_session_message_signature: string;
 
   created_at?: Date;
   updated_at?: Date;

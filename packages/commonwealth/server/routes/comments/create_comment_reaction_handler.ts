@@ -1,6 +1,10 @@
 import { AppError } from '@hicommonwealth/core';
 import { ReactionAttributes } from '@hicommonwealth/model';
-import { verifyReaction } from '../../../shared/canvas/serverVerify';
+import {
+  CanvasArguments,
+  unpackCanvasArguments,
+  verifyReaction,
+} from '../../../shared/canvas/serverVerify';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -12,10 +16,7 @@ const Errors = {
 type CreateCommentReactionRequestParams = { id: string };
 type CreateCommentReactionRequestBody = {
   reaction: string;
-  canvas_action?: any;
-  canvas_session?: any;
-  canvas_hash?: any;
-};
+} & CanvasArguments;
 type CreateCommentReactionResponse = ReactionAttributes;
 
 export const createCommentReactionHandler = async (
@@ -28,12 +29,7 @@ export const createCommentReactionHandler = async (
   res: TypedResponse<CreateCommentReactionResponse>,
 ) => {
   const { user, address } = req;
-  const {
-    reaction,
-    canvas_action: canvasAction,
-    canvas_session: canvasSession,
-    canvas_hash: canvasHash,
-  } = req.body;
+  const { reaction } = req.body;
 
   if (!reaction) {
     throw new AppError(Errors.InvalidReaction);
@@ -45,7 +41,8 @@ export const createCommentReactionHandler = async (
   }
 
   if (process.env.ENFORCE_SESSION_KEYS === 'true') {
-    await verifyReaction(canvasAction, canvasSession, canvasHash, {
+    const parsedCanvasArguments = await unpackCanvasArguments(req.body);
+    await verifyReaction(parsedCanvasArguments, {
       comment_id: commentId,
       address: address.address,
       value: reaction,
@@ -59,9 +56,10 @@ export const createCommentReactionHandler = async (
       address,
       reaction,
       commentId,
-      canvasAction,
-      canvasSession,
-      canvasHash,
+      canvasActionMessage: req.body.canvas_action_message,
+      canvasActionMessageSignature: req.body.canvas_action_message_signature,
+      canvasSessionMessage: req.body.canvas_session_message,
+      canvasSessionMessageSignature: req.body.canvas_session_message_signature,
     });
 
   // emit notifications

@@ -18,6 +18,7 @@ export const stringify = configure({
 
 // can we do this without needing an async method?
 // we should just be using ESM
+// TODO: add the other signers
 export const getSessionSigners = async () => {
   const { SIWESigner } = await import('@canvas-js/chain-ethereum');
   return [new SIWESigner()];
@@ -40,30 +41,28 @@ type VerifyArgs = {
   actionMessageSignature: Signature;
   sessionMessage: Message<Session>;
   sessionMessageSignature: Signature;
-  expectedAddress: string;
 };
 export const verify = async ({
   actionMessage,
   actionMessageSignature,
   sessionMessage,
   sessionMessageSignature,
-  expectedAddress,
 }: VerifyArgs) => {
   const { verifySignedValue } = await import('@canvas-js/signed-cid');
+  // verify the session
   await verifySession(sessionMessage.payload);
 
   // assert address matches
   assert(
-    actionMessage.payload.address === expectedAddress,
+    actionMessage.payload.address === sessionMessage.payload.address,
     'Action message must be signed by wallet address',
   );
+
+  // verify the action message and session message
   verifySignedValue(actionMessageSignature, actionMessage);
-  assert(
-    sessionMessage.payload.address === expectedAddress,
-    'Session message must be signed by wallet address',
-  );
   verifySignedValue(sessionMessageSignature, sessionMessage);
 
+  // assert that the session is not expired
   const sessionExpirationTime =
     sessionMessage.payload.timestamp + sessionMessage.payload.duration;
   assert(

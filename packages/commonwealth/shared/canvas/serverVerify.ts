@@ -1,4 +1,19 @@
+import { Action, Message, Session, Signature } from '@canvas-js/interfaces';
 import { verify } from './verify';
+
+export type CanvasArguments = {
+  canvas_action_message?: any;
+  canvas_action_message_signature?: any;
+  canvas_session_message?: any;
+  canvas_session_message_signature?: any;
+};
+
+type ParsedCanvasArguments = {
+  actionMessage: Message<Action>;
+  actionMessageSignature: Signature;
+  sessionMessage: Message<Session>;
+  sessionMessageSignature: Signature;
+};
 
 function assert(condition: unknown, message?: string): asserts condition {
   if (!condition) {
@@ -18,114 +33,121 @@ function assertMatches(a, b, obj: string, field: string) {
 // Skip io-ts validation since it produces an import error even though
 // we're already using an async import, and because we're upgrading
 // to the new Canvas packages soon anyway.
-const verifyUnpack = async (canvas_action, canvas_session) => {
-  // const { actionType, sessionType } = await import('@canvas-js/core/codecs');
-  const action = canvas_action && JSON.parse(canvas_action);
-  const session = canvas_session && JSON.parse(canvas_session);
-  // assert(actionType.is(action), 'Invalid signed action (typecheck)');
-  // assert(sessionType.is(session), 'Invalid signed session (typecheck)');
-  const [verifiedAction, verifiedSession] = await Promise.all([
-    verify({ action, actionSignerAddress: action.session }),
-    verify({ session }),
-  ]);
-  assert(verifiedAction === true, 'Invalid signed action (signature)');
-  assert(verifiedSession === true, 'Invalid signed session (signature)');
-  assert(
-    action.session === session.payload.sessionAddress,
-    'Invalid action/session pair',
+export const unpackCanvasArguments = async ({
+  canvas_action_message,
+  canvas_action_message_signature,
+  canvas_session_message,
+  canvas_session_message_signature,
+}: CanvasArguments): Promise<ParsedCanvasArguments> => {
+  if (
+    !canvas_action_message ||
+    !canvas_action_message_signature ||
+    !canvas_session_message ||
+    !canvas_session_message_signature
+  ) {
+    return;
+  }
+  const ipldDagJson = await import('@ipld/dag-json');
+  const actionMessage: Message<Action> = ipldDagJson.decode(
+    ipldDagJson.parse(canvas_action_message),
   );
-  return { action, session };
+  const actionMessageSignature: Signature = ipldDagJson.decode(
+    ipldDagJson.parse(canvas_action_message_signature),
+  );
+
+  const sessionMessage: Message<Session> = ipldDagJson.decode(
+    ipldDagJson.parse(canvas_session_message),
+  );
+  const sessionMessageSignature: Signature = ipldDagJson.decode(
+    ipldDagJson.parse(canvas_session_message_signature),
+  );
+
+  // TODO: run time type check these values
+  return {
+    actionMessage,
+    actionMessageSignature,
+    sessionMessage,
+    sessionMessageSignature,
+  };
 };
 
 export const verifyComment = async (
-  canvas_action,
-  canvas_session,
-  canvas_hash,
+  parsedCanvasArguments: ParsedCanvasArguments,
   fields,
 ) => {
-  if (
-    canvas_action === undefined &&
-    canvas_session === undefined &&
-    canvas_hash === undefined
-  )
-    return;
   const { thread_id, text, address, parent_comment_id } = fields;
-  const { action } = await verifyUnpack(canvas_action, canvas_session);
 
-  assertMatches(action.payload.call, 'comment', 'comment', 'call');
+  await verify(parsedCanvasArguments);
+
+  const { actionMessage } = parsedCanvasArguments;
+  assertMatches(actionMessage.payload.name, 'comment', 'comment', 'call');
   assertMatches(
     thread_id,
-    action.payload.callArgs.thread_id,
+    actionMessage.payload.args.thread_id,
     'comment',
     'identifier',
   );
-  assertMatches(text, action.payload.callArgs.body, 'comment', 'text');
+  assertMatches(text, actionMessage.payload.args.body, 'comment', 'text');
   assertMatches(
     parent_comment_id ?? null,
-    action.payload.callArgs.parent_comment_id ?? null,
+    actionMessage.payload.args.parent_comment_id ?? null,
     'comment',
     'parent',
   );
-  assertMatches(address, action.payload.from, 'comment', 'origin');
+  assertMatches(address, actionMessage.payload.address, 'comment', 'origin');
   // assertMatches(chainBaseToCanvasChain(chain), action.payload.chain)
 };
 
 export const verifyThread = async (
-  canvas_action,
-  canvas_session,
-  canvas_hash,
+  parsedCanvasArguments: ParsedCanvasArguments,
   fields,
 ) => {
-  if (
-    canvas_action === undefined &&
-    canvas_session === undefined &&
-    canvas_hash === undefined
-  )
-    return;
   const { title, body, address, community, link, topic } = fields;
-  const { action } = await verifyUnpack(canvas_action, canvas_session);
 
-  assertMatches(action.payload.call, 'thread', 'thread', 'call');
+  await verify(parsedCanvasArguments);
+
+  const { actionMessage } = parsedCanvasArguments;
+  assertMatches(actionMessage.payload.name, 'thread', 'thread', 'call');
   assertMatches(
     community,
-    action.payload.callArgs.community,
+    actionMessage.payload.args.community,
     'thread',
     'community',
   );
-  assertMatches(title, action.payload.callArgs.title, 'thread', 'title');
-  assertMatches(body, action.payload.callArgs.body, 'thread', 'body');
-  assertMatches(link ?? '', action.payload.callArgs.link, 'thread', 'link');
-  assertMatches(topic ?? '', action.payload.callArgs.topic, 'thread', 'topic');
-  assertMatches(address, action.payload.from, 'thread', 'origin');
+  assertMatches(title, actionMessage.payload.args.title, 'thread', 'title');
+  assertMatches(body, actionMessage.payload.args.body, 'thread', 'body');
+  assertMatches(link ?? '', actionMessage.payload.args.link, 'thread', 'link');
+  assertMatches(
+    topic ?? '',
+    actionMessage.payload.args.topic,
+    'thread',
+    'topic',
+  );
+  assertMatches(address, actionMessage.payload.address, 'thread', 'origin');
   // assertMatches(chainBaseToCanvasChain(chain), action.payload.chain)
 };
 
 export const verifyReaction = async (
-  canvas_action,
-  canvas_session,
-  canvas_hash,
+  parsedCanvasArguments: ParsedCanvasArguments,
   fields,
 ) => {
-  if (
-    canvas_action === undefined &&
-    canvas_session === undefined &&
-    canvas_hash === undefined
-  )
-    return;
   const { thread_id, comment_id, proposal_id, address, value } = fields;
-  const { action } = await verifyUnpack(canvas_action, canvas_session);
+
+  await verify(parsedCanvasArguments);
+
+  const { actionMessage } = parsedCanvasArguments;
   assert(
-    (action.payload.call === 'reactThread' &&
-      thread_id === action.payload.callArgs.thread_id &&
+    (actionMessage.payload.name === 'reactThread' &&
+      thread_id === actionMessage.payload.args.thread_id &&
       comment_id === undefined &&
       proposal_id === undefined) ||
-      (action.payload.call === 'reactComment' &&
-        comment_id === action.payload.callArgs.comment_id &&
+      (actionMessage.payload.name === 'reactComment' &&
+        comment_id === actionMessage.payload.args.comment_id &&
         thread_id === undefined &&
         proposal_id === undefined),
     'Invalid signed reaction (identifier)',
   );
-  assertMatches(value, action.payload.callArgs.value, 'reaction', 'value');
-  assertMatches(address, action.payload.from, 'reaction', 'origin');
+  assertMatches(value, actionMessage.payload.args.value, 'reaction', 'value');
+  assertMatches(address, actionMessage.payload.address, 'reaction', 'origin');
   // assertMatches(chainBaseToCanvasChain(chain), action.payload.chain)
 };

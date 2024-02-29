@@ -32,9 +32,10 @@ export type CreateThreadReactionOptions = {
   address: AddressInstance;
   reaction: string;
   threadId: number;
-  canvasAction?: any;
-  canvasSession?: any;
-  canvasHash?: any;
+  canvasActionMessage?: any;
+  canvasActionMessageSignature?: any;
+  canvasSessionMessage?: any;
+  canvasSessionMessageSignature?: any;
 };
 
 export type CreateThreadReactionResult = [

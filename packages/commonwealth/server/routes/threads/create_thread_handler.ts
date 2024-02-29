@@ -1,6 +1,10 @@
 import { IDiscordMeta } from '@hicommonwealth/core';
 import { ThreadAttributes } from '@hicommonwealth/model';
-import { verifyThread } from '../../../shared/canvas/serverVerify';
+import {
+  CanvasArguments,
+  unpackCanvasArguments,
+  verifyThread,
+} from '../../../shared/canvas/serverVerify';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 
@@ -13,11 +17,8 @@ type CreateThreadRequestBody = {
   stage: string;
   url?: string;
   readOnly: boolean;
-  canvas_action?: any;
-  canvas_session?: any;
-  canvas_hash?: any;
   discord_meta?: IDiscordMeta;
-};
+} & CanvasArguments;
 type CreateThreadResponse = ThreadAttributes;
 
 export const createThreadHandler = async (
@@ -34,14 +35,12 @@ export const createThreadHandler = async (
     stage,
     url,
     readOnly,
-    canvas_action: canvasAction,
-    canvas_session: canvasSession,
-    canvas_hash: canvasHash,
     discord_meta,
   } = req.body;
 
   if (process.env.ENFORCE_SESSION_KEYS === 'true') {
-    await verifyThread(canvasAction, canvasSession, canvasHash, {
+    const parsedCanvasArguments = await unpackCanvasArguments(req.body);
+    await verifyThread(parsedCanvasArguments, {
       title,
       body,
       address: address.address,
@@ -62,9 +61,10 @@ export const createThreadHandler = async (
       topicId: parseInt(topicId, 10) || undefined,
       stage,
       url,
-      canvasAction,
-      canvasSession,
-      canvasHash,
+      canvasActionMessage: req.body.canvas_action_message,
+      canvasActionMessageSignature: req.body.canvas_action_message_signature,
+      canvasSessionMessage: req.body.canvas_session_message,
+      canvasSessionMessageSignature: req.body.canvas_session_message_signature,
       discordMeta: discord_meta,
     });
 

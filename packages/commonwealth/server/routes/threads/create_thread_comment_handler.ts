@@ -1,6 +1,10 @@
 import { AppError } from '@hicommonwealth/core';
 import { CommentInstance } from '@hicommonwealth/model';
-import { verifyComment } from '../../../shared/canvas/serverVerify';
+import {
+  CanvasArguments,
+  unpackCanvasArguments,
+  verifyComment,
+} from '../../../shared/canvas/serverVerify';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -22,11 +26,8 @@ type CreateThreadCommentRequestBody = {
   parent_id;
   thread_id;
   text;
-  canvas_action;
-  canvas_session;
-  canvas_hash;
   discord_meta;
-};
+} & CanvasArguments;
 type CreateThreadCommentResponse = CommentInstance;
 
 export const createThreadCommentHandler = async (
@@ -36,14 +37,7 @@ export const createThreadCommentHandler = async (
 ) => {
   const { user, address } = req;
   const { id: threadId } = req.params;
-  const {
-    parent_id: parentId,
-    text,
-    canvas_action: canvasAction,
-    canvas_session: canvasSession,
-    canvas_hash: canvasHash,
-    discord_meta,
-  } = req.body;
+  const { parent_id: parentId, text, discord_meta } = req.body;
 
   if (!threadId) {
     throw new AppError(Errors.MissingThreadId);
@@ -53,7 +47,9 @@ export const createThreadCommentHandler = async (
   }
 
   if (process.env.ENFORCE_SESSION_KEYS === 'true') {
-    await verifyComment(canvasAction, canvasSession, canvasHash, {
+    const parsedCanvasArguments = await unpackCanvasArguments(req.body);
+
+    await verifyComment(parsedCanvasArguments, {
       thread_id: parseInt(threadId, 10) || undefined,
       text,
       address: address.address,
@@ -68,9 +64,10 @@ export const createThreadCommentHandler = async (
       parentId,
       threadId: parseInt(threadId, 10) || undefined,
       text,
-      canvasAction,
-      canvasSession,
-      canvasHash,
+      canvasActionMessage: req.body.canvas_action_message,
+      canvasActionMessageSignature: req.body.canvas_action_message_signature,
+      canvasSessionMessage: req.body.canvas_session_message,
+      canvasSessionMessageSignature: req.body.canvas_session_message_signature,
       discordMeta: discord_meta,
     });
 

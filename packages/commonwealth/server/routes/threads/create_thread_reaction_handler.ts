@@ -1,6 +1,10 @@
 import { AppError } from '@hicommonwealth/core';
 import { ReactionAttributes } from '@hicommonwealth/model';
-import { verifyReaction } from '../../../shared/canvas/serverVerify';
+import {
+  CanvasArguments,
+  unpackCanvasArguments,
+  verifyReaction,
+} from '../../../shared/canvas/serverVerify';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -12,10 +16,7 @@ const Errors = {
 type CreateThreadReactionRequestParams = { id: string };
 type CreateThreadReactionRequestBody = {
   reaction: string;
-  canvas_action?: any;
-  canvas_session?: any;
-  canvas_hash?: any;
-};
+} & CanvasArguments;
 type CreateThreadReactionResponse = ReactionAttributes;
 
 export const createThreadReactionHandler = async (
@@ -28,12 +29,7 @@ export const createThreadReactionHandler = async (
   res: TypedResponse<CreateThreadReactionResponse>,
 ) => {
   const { user, address } = req;
-  const {
-    reaction,
-    canvas_action: canvasAction,
-    canvas_session: canvasSession,
-    canvas_hash: canvasHash,
-  } = req.body;
+  const { reaction } = req.body;
 
   if (!reaction) {
     throw new AppError(Errors.InvalidReaction);
@@ -45,7 +41,8 @@ export const createThreadReactionHandler = async (
   }
 
   if (process.env.ENFORCE_SESSION_KEYS === 'true') {
-    await verifyReaction(canvasAction, canvasSession, canvasHash, {
+    const parsedCanvasArguments = await unpackCanvasArguments(req.body);
+    await verifyReaction(parsedCanvasArguments, {
       thread_id: threadId,
       address: address.address,
       value: reaction,
@@ -59,9 +56,10 @@ export const createThreadReactionHandler = async (
       address,
       reaction,
       threadId,
-      canvasAction,
-      canvasSession,
-      canvasHash,
+      canvasActionMessage: req.body.canvas_action_message,
+      canvasActionMessageSignature: req.body.canvas_action_message_signature,
+      canvasSessionMessage: req.body.canvas_session_message,
+      canvasSessionMessageSignature: req.body.canvas_session_message_signature,
     });
 
   // update address last active

@@ -18,9 +18,10 @@ export type ReactionAttributes = {
 
   calculated_voting_weight: number;
 
-  canvas_action: string;
-  canvas_session: string;
-  canvas_hash: string;
+  canvas_action_message: string;
+  canvas_action_message_signature: string;
+  canvas_session_message: string;
+  canvas_session_message_signature: string;
 
   created_at?: Date;
   updated_at?: Date;
