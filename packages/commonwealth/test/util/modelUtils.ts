@@ -3,40 +3,26 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type {
   Action,
-  ActionPayload,
+  Message,
   Session,
-  SessionPayload,
+  Signature,
 } from '@canvas-js/interfaces';
-import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
-import {
-  SignTypedDataVersion,
-  personalSign,
-  signTypedData,
-} from '@metamask/eth-sig-util';
-import { Keyring } from '@polkadot/api';
-import { stringToU8a } from '@polkadot/util';
 import chai from 'chai';
 import wallet from 'ethereumjs-wallet';
-import { ethers } from 'ethers';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
-import * as siwe from 'siwe';
 import { createRole, findOneRole } from '../../server/util/roles';
 
-import { createCanvasSessionPayload } from '../../shared/canvas';
+import { CANVAS_TOPIC } from '../../shared/canvas';
 
 import type { Role } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model';
-import { mnemonicGenerate } from '@polkadot/util-crypto';
 import Web3 from 'web3-utils';
 import app from '../../server-test';
 
+import { SIWESigner } from '@canvas-js/chain-ethereum';
+import { SubstrateSigner } from '@canvas-js/chain-substrate';
 import { Link, LinkSource, ThreadAttributes } from '@hicommonwealth/model';
-import {
-  TEST_BLOCK_INFO_BLOCKHASH,
-  TEST_BLOCK_INFO_STRING,
-  createSiweMessage,
-  getEIP712SignableAction,
-} from '../../shared/adapters/chain/ethereum/keys';
+import { TEST_BLOCK_INFO_STRING } from '../../shared/adapters/chain/ethereum/keys';
 
 const sortedStringify = configureStableStringify({
   bigint: false,
@@ -65,135 +51,84 @@ export const getTopicId = async ({ chain }) => {
 };
 
 export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
+  const timestamp = 1665083987891;
+
   if (chain === 'ethereum' || chain === 'alex') {
     const wallet_id = 'metamask';
-    const { keypair, address } = generateEthAddress();
+    const chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
+    const sessionSigner = new SIWESigner({ chainId: parseInt(chain_id) });
+    const session = await sessionSigner.getSession(CANVAS_TOPIC, { timestamp });
+
     let res = await chai.request
       .agent(app)
       .post('/api/createAddress')
       .set('Accept', 'application/json')
       .send({
-        address,
+        address: session.address,
         community_id: chain,
         wallet_id,
         block_info: TEST_BLOCK_INFO_STRING,
       });
     const address_id = res.body.result.id;
-    const chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
-    const sessionWallet = ethers.Wallet.createRandom();
-    const timestamp = 1665083987891;
-    const sessionPayload = createCanvasSessionPayload(
-      'ethereum' as ChainBase,
-      chain_id,
-      address,
-      sessionWallet.address,
-      timestamp,
-      TEST_BLOCK_INFO_BLOCKHASH,
-    );
-    const nonce = siwe.generateNonce();
-    const domain = 'https://commonwealth.test';
-    const siweMessage = createSiweMessage(sessionPayload, domain, nonce);
-    const signatureData = personalSign({
-      privateKey: keypair.getPrivateKey(),
-      data: siweMessage,
-    });
-    const signature = `${domain}/${nonce}/${signatureData}`;
-    const session: Session = {
-      type: 'session',
-      payload: sessionPayload,
-      signature: signature,
-    };
+
     res = await chai.request
       .agent(app)
       .post('/api/verifyAddress')
       .set('Accept', 'application/json')
       .send({
-        address,
+        address: session.address,
         community_id: chain,
         chain_id,
-        signature,
         wallet_id,
-        session_public_address: sessionWallet.address,
-        session_timestamp: timestamp,
-        session_block_data: TEST_BLOCK_INFO_STRING,
+        session,
       });
     const user_id = res.body.result.user.id;
     const email = res.body.result.user.email;
     return {
       address_id,
-      address,
+      address: session.address,
       user_id,
       email,
       session,
-      sign: (actionPayload: ActionPayload) => {
-        return signTypedData({
-          privateKey: Buffer.from(sessionWallet.privateKey.slice(2), 'hex'),
-          data: getEIP712SignableAction(actionPayload),
-          version: SignTypedDataVersion.V4,
-        });
-      },
+      sessionSigner,
     };
   }
   if (chain === 'edgeware') {
+    const sessionSigner = new SubstrateSigner();
+    const session = await sessionSigner.getSession(CANVAS_TOPIC, { timestamp });
     const wallet_id = 'polkadot';
-    const keyPair = new Keyring({
-      type: 'sr25519',
-      ss58Format: 7,
-    }).addFromMnemonic(mnemonic);
-    const address = keyPair.address;
     let res = await chai.request
       .agent(app)
       .post('/api/createAddress')
       .set('Accept', 'application/json')
-      .send({ address: keyPair.address, community_id: chain, wallet_id });
+      .send({
+        address: session.address,
+        community_id: chain,
+        wallet_id,
+      });
 
-    // generate session wallet
-    const sessionKeyring = new Keyring();
-    const sessionWallet = sessionKeyring.addFromUri(
-      mnemonicGenerate(),
-      {},
-      'ed25519',
-    );
-    const chain_id = ChainNetwork.Edgeware;
-    const timestamp = 1665083987891;
-    const sessionPayload: SessionPayload = createCanvasSessionPayload(
-      'substrate' as ChainBase,
-      chain_id,
-      address,
-      sessionWallet.address,
-      timestamp,
-      TEST_BLOCK_INFO_BLOCKHASH,
-    );
-    const signature = keyPair.sign(
-      stringToU8a(sortedStringify(sessionPayload)),
-    );
-    const session: Session = {
-      type: 'session',
-      payload: sessionPayload,
-      signature: new Buffer(signature).toString('hex'),
-    };
-
+    const user_id = res.body.result.user.id;
+    const email = res.body.result.user.email;
     const address_id = res.body.result.id;
     res = await chai.request
       .agent(app)
       .post('/api/verifyAddress')
       .set('Accept', 'application/json')
-      .send({ address, community_id: chain, signature, wallet_id });
-    const user_id = res.body.result.user.id;
-    const email = res.body.result.user.email;
+      .send({
+        address_id,
+        address: session.address,
+        user_id,
+        email,
+        session,
+        sessionSigner,
+      });
     return {
       address_id,
-      address,
+      address: session.address,
       user_id,
       email,
       session,
-      sessionSigner: keyPair,
-      sign: (actionPayload: ActionPayload) => {
-        const signatureBytes = sessionWallet.sign(
-          stringToU8a(sortedStringify(actionPayload)),
-        );
-        return new Buffer(signatureBytes).toString('hex');
-      },
+      sessionSigner,
     };
   }
   throw new Error('invalid chain');
@@ -495,7 +430,7 @@ export interface CreateThreadReactionArgs {
   jwt: string;
   thread_id?: number;
   session: Session;
-  sign: (actionPayload: ActionPayload) => string;
+  sign: (message: Message<Action | Session>) => Signature;
 }
 
 export const createThreadReaction = async (args: CreateThreadReactionArgs) => {
@@ -510,25 +445,28 @@ export const createThreadReaction = async (args: CreateThreadReactionArgs) => {
     sign,
   } = args;
 
-  const actionPayload: ActionPayload = {
-    app: session.payload.app,
-    block: session.payload.block,
-    call: 'reactThread',
-    callArgs: { thread_id, value: reaction },
-    chain: 'eip155:1',
-    from: session.payload.from,
-    timestamp: Date.now(),
+  const messageSession = {
+    clock: 0,
+    parents: [],
+    payload: session,
+    topic: CANVAS_TOPIC,
   };
-  const action: Action = {
-    type: 'action',
-    payload: actionPayload,
-    session: session.payload.sessionAddress,
-    signature: sign(actionPayload),
+  const messageSessionSignature = sign(messageSession);
+
+  const messageAction = {
+    clock: 0,
+    parents: [],
+    payload: {
+      type: 'action' as const,
+      address,
+      blockhash: null,
+      name: 'reactThread',
+      args: { thread_id, value: reaction },
+      timestamp: Date.now(),
+    },
+    topic: CANVAS_TOPIC,
   };
-  const canvas_session = sortedStringify(session);
-  const canvas_action = sortedStringify(action);
-  const canvas_hash = ''; // getActionHash(action)
-  // TODO
+  const messageActionSignature = sign(messageAction);
 
   const res = await chai.request
     .agent(app)
