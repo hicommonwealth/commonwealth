@@ -113,7 +113,7 @@ export async function emitProposalNotifications(
         await emitNotifications(models, {
           categoryId: NotificationCategories.ChainEvent,
           data: {
-            chain: chainId,
+            community_id: chainId,
             network: SupportedNetwork.Cosmos,
             event_data: {
               kind: EventKind.SubmitProposal,
@@ -145,7 +145,7 @@ export async function emitProposalNotifications(
         await emitNotifications(models, {
           categoryId: NotificationCategories.ChainEvent,
           data: {
-            chain: chainId,
+            community_id: chainId,
             network: SupportedNetwork.Cosmos,
             event_data: {
               kind: EventKind.SubmitProposal,

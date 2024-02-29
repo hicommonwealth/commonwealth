@@ -38,7 +38,9 @@ export function startHealthCheckLoop({
       await checkFn();
       stats().on(key);
     } catch (err) {
-      log.error(`${service}: ${err.message}`);
+      log.error(
+        `${service}: ${err instanceof Error ? err.message : (err as string)}`,
+      );
       stats().off(key);
     }
     const durationUntilNextCheck = nextCheckAt - Date.now();

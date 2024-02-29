@@ -51,9 +51,10 @@ export const Feed = ({
     const getData = async () => {
       try {
         const response = await fetchData();
-        const notifications = onFetchedDataCallback
-          ? response.result.map((activity) => onFetchedDataCallback(activity))
-          : response.result;
+        const notifications: DashboardActivityNotification[] =
+          onFetchedDataCallback
+            ? response.result.map((activity) => onFetchedDataCallback(activity))
+            : response.result;
 
         const filteredNotifs: DashboardActivityNotification[] = [];
         const labelsArr: (IEventLabel | undefined)[] = [];
@@ -65,7 +66,7 @@ export const Feed = ({
                 network: notif.eventNetwork,
                 data: notif.eventData,
               };
-              const label = ChainEventLabel(notif.chain, chainEvent);
+              const label = ChainEventLabel(notif.communityId, chainEvent);
               filteredNotifs.push(notif);
               labelsArr.push(label);
             } catch (e) {
