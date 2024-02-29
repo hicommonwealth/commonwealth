@@ -116,7 +116,7 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
               avatarSize={18}
               shouldShowAvatarOnly
               userAddress={roles[0].address}
-              userCommunityId={roles[0].address_chain || roles[0].chain_id}
+              userCommunityId={roles[0].address_chain || roles[0].community_id}
             />
             <div
               className={isStarred ? 'star-filled' : 'star-empty'}

@@ -29,7 +29,7 @@ class PublishError extends RabbitMQControllerError {
  * through this class as it implements error handling that is crucial to avoid data loss.
  */
 export class RabbitMQController extends AbstractRabbitMQController {
-  public broker: Rascal.BrokerAsPromised;
+  public broker: Rascal.BrokerAsPromised | undefined;
   public readonly subscribers: string[];
   public readonly publishers: string[];
   protected readonly _rawVhost: any;
@@ -42,7 +42,7 @@ export class RabbitMQController extends AbstractRabbitMQController {
 
     // sets the first vhost config to _rawVhost
     this._rawVhost =
-      _rabbitMQConfig.vhosts[Object.keys(_rabbitMQConfig.vhosts)[0]];
+      _rabbitMQConfig.vhosts![Object.keys(_rabbitMQConfig.vhosts!)[0]];
 
     // array of subscribers
     this.subscribers = Object.keys(this._rawVhost.subscriptions);
@@ -109,7 +109,7 @@ export class RabbitMQController extends AbstractRabbitMQController {
 
     try {
       this._log.info(`Subscribing to ${subscriptionName}`);
-      subscription = await this.broker.subscribe(subscriptionName);
+      subscription = await this.broker!.subscribe(subscriptionName);
 
       subscription.on('message', (message, content, ackOrNack) => {
         messageProcessor
@@ -145,7 +145,7 @@ export class RabbitMQController extends AbstractRabbitMQController {
         ackOrNack(err, { strategy: 'nack' });
       });
     } catch (err) {
-      throw new RabbitMQControllerError(`${err.message}`);
+      throw new RabbitMQControllerError(`${(err as Error).message}`);
     }
     return subscription;
   }
@@ -167,7 +167,7 @@ export class RabbitMQController extends AbstractRabbitMQController {
 
     let publication;
     try {
-      publication = await this.broker.publish(publisherName, data);
+      publication = await this.broker!.publish(publisherName, data);
 
       publication.on('error', (err, messageId) => {
         this._log.error(`Publisher error ${messageId}`, err);
@@ -177,7 +177,7 @@ export class RabbitMQController extends AbstractRabbitMQController {
       if (err instanceof PublishError) throw err;
       else
         throw new RabbitMQControllerError(
-          `Rascal config error: ${err.message}`,
+          `Rascal config error: ${(err as Error).message}`,
         );
     }
   }
@@ -239,14 +239,14 @@ export class RabbitMQController extends AbstractRabbitMQController {
       } else {
         this._log.error(
           `Sequelize error occurred while setting queued to -1 for ${DB.model.getTableName()} with id: ${objectId}`,
-          e,
+          e as Error,
         );
       }
     }
   }
 
   public async shutdown() {
-    await this.broker.shutdown();
+    await this.broker!.shutdown();
     this._initialized = false;
   }
 

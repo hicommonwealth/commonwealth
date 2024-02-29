@@ -3,38 +3,15 @@
 .UserDashboardRowBottom {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 4px;
   justify-content: space-between;
   width: 100%;
 
-  .comments {
-    display: flex;
-    align-items: center;
-
-    .count {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      align-items: center;
-      width: fit-content;
-      color: $neutral-500;
-      border: 0;
-    }
-
-    .icon,
-    .text {
-      color: $neutral-500;
-    }
-
-    .icon {
-      margin-right: 8px;
-    }
+  .avatar-group {
+    margin-left: auto;
   }
 
-  .actions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 16px;
+  .subscribe-btn {
+    margin-left: auto;
   }
 }

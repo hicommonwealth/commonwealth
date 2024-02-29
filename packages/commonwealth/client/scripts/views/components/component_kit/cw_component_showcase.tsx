@@ -5,7 +5,6 @@ import 'components/component_kit/cw_component_showcase.scss';
 import 'components/component_kit/new_designs/cw_button.scss';
 
 import { notifySuccess } from 'controllers/app/notifications';
-import { CWAccountCreationButton } from './cw_account_creation_button';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
 import { CWAuthButton } from './CWAuthButtonOld';
 
@@ -55,10 +54,11 @@ import { CWThreadAction } from './new_designs/cw_thread_action';
 import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
 import { CWUpvote } from './new_designs/cw_upvote';
 import { CWCircleButton } from './new_designs/CWCircleButton/CWCircleButton';
+import CWCircleMultiplySpinner from './new_designs/CWCircleMultiplySpinner';
+import CWCircleRingSpinner from './new_designs/CWCircleRingSpinner';
 import CWDrawer from './new_designs/CWDrawer';
 import { CWForm } from './new_designs/CWForm';
 import CWIconButton from './new_designs/CWIconButton';
-import CWLoadingSpinner from './new_designs/CWLoadingSpinner';
 import { CWModal, CWModalBody, CWModalHeader } from './new_designs/CWModal';
 import { ModalSize } from './new_designs/CWModal/CWModal';
 import { CWRelatedCommunityCard } from './new_designs/CWRelatedCommunityCard';
@@ -1094,8 +1094,11 @@ export const ComponentShowcase = () => {
         />
       </div>
       <div className="basic-gallery">
-        <CWText type="h3">Spinner</CWText>
-        <CWLoadingSpinner center={false} />
+        <CWText type="h3">Spinners</CWText>
+        <CWText type="h4">Circle Multiply Spinner</CWText>
+        <CWCircleMultiplySpinner />
+        <CWText type="h4">Circle Ring Spinner</CWText>
+        <CWCircleRingSpinner />
       </div>
       <div className="basic-gallery">
         <CWText type="h3">Breadcrumbs</CWText>
@@ -1265,12 +1268,6 @@ export const ComponentShowcase = () => {
           label="Progress Bar (Ongoing) With Token"
           progressStatus="ongoing"
           subtext={`${Math.min(100, Math.floor(50 * 1000) / 1000)} CMN`}
-        />
-      </div>
-      <div className="card-gallery">
-        <CWText type="h3">Account Creation Button</CWText>
-        <CWAccountCreationButton
-          onClick={() => notifySuccess('Account creation button clicked!')}
         />
       </div>
       <div className="basic-gallery">

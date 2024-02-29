@@ -15,7 +15,7 @@ import type Thread from '../../../models/Thread';
 import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
-import CWLoadingSpinner from '../../components/component_kit/new_designs/CWLoadingSpinner';
+import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
 
@@ -99,7 +99,7 @@ export const LinkedProposalsCard = ({
         content={
           initialSnapshotLinks.length > 0 && !snapshotProposalsLoaded ? (
             <div className="spinner-container">
-              <CWLoadingSpinner />
+              <CWCircleMultiplySpinner />
             </div>
           ) : (
             <div className="LinkedProposalsCard">
@@ -134,7 +134,7 @@ export const LinkedProposalsCard = ({
                       </ReactRouterLink>
                     ) : (
                       <div className="snapshot-spinner-container">
-                        <CWLoadingSpinner />
+                        <CWCircleMultiplySpinner />
                       </div>
                     ))}
                 </div>

@@ -6,7 +6,7 @@ import {
   UpdateCommunityIdSchema,
 } from '../../controllers/server_communities_methods/update_community_id';
 import { ServerControllers } from '../../routing/router';
-import { success, TypedRequestBody, TypedResponse } from '../../types';
+import { TypedRequestBody, TypedResponse, success } from '../../types';
 import { formatErrorPretty } from '../../util/errorFormat';
 
 type UpdateCommunityIdParams = UpdateCommunityIdOptions;

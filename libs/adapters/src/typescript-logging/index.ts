@@ -29,7 +29,7 @@ factoryControl.change({
   logLevel,
 } as LogGroupControlSettings);
 
-const formatFilename = (name) => {
+const formatFilename = (name: string) => {
   const t = name.split('/');
   return t[t.length - 1];
 };
@@ -64,11 +64,11 @@ export const TypescriptLoggingLogger = (): Logger => ({
       },
       error(msg: string, error?: Error) {
         logger.error(msg, error);
-        rollbar.error(msg, error);
+        rollbar.error(msg, error ?? '');
       },
       fatal(msg: string, error?: Error) {
         logger.fatal(msg, error);
-        rollbar.critical(msg, error);
+        rollbar.critical(msg, error ?? '');
       },
     };
   },
