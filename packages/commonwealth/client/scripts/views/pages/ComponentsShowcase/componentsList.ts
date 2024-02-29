@@ -16,6 +16,7 @@ import LoadersShowcase from 'views/pages/ComponentsShowcase/components/Loaders.s
 import ModalsShowcase from 'views/pages/ComponentsShowcase/components/Modals.showcase';
 import ProgressBarsShowcase from 'views/pages/ComponentsShowcase/components/ProgressBars.showcase';
 import RadioButtonsShowcase from 'views/pages/ComponentsShowcase/components/RadioButtons.showcase';
+import SearchbarsShowcase from 'views/pages/ComponentsShowcase/components/Searchbars.showcase';
 import TablesShowcase from 'views/pages/ComponentsShowcase/components/Tables.showcase';
 import TagsShowcase from 'views/pages/ComponentsShowcase/components/Tags.showcase';
 import TypographyShowcase from 'views/pages/ComponentsShowcase/components/Typography.showcase';
@@ -42,6 +43,7 @@ export const ComponentPageName = {
   Tables: 'Tables',
   Tags: 'Tags',
   Cards: 'Cards',
+  Searchbars: 'Searchbars',
 };
 
 export const ComponentType = {
@@ -153,6 +155,11 @@ export const componentItems = [
   {
     ComponentPage: CardsShowcase,
     displayName: ComponentPageName.Cards,
+    type: ComponentType.Components,
+  },
+  {
+    ComponentPage: SearchbarsShowcase,
+    displayName: ComponentPageName.Searchbars,
     type: ComponentType.Components,
   },
 ];
