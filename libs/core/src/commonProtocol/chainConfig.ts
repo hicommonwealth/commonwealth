@@ -3,6 +3,7 @@ export enum ValidChains {
   Base = 8453,
   SepoliaBase = 84532,
   Sepolia = 11155111,
+  Blast = 81457,
 }
 
 export const STAKE_ID = 2;
@@ -24,6 +25,11 @@ export const factoryContracts: {
     factory: '0xD8a357847cABA76133D5f2cB51317D3C74609710',
     communityStake: '0xd097926d8765A7717206559E7d19EECCbBa68c18',
     chainId: 84532,
+  },
+  [ValidChains.Blast]: {
+    factory: '0xedf43C919f59900C82d963E99d822dA3F95575EA',
+    communityStake: '0xcc752fd15A7Dd0d5301b6A626316E7211352Cf62',
+    chainId: 81457,
   },
   [ValidChains.Base]: {
     factory: '0xedf43C919f59900C82d963E99d822dA3F95575EA',
