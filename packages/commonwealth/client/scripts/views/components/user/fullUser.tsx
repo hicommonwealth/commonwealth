@@ -87,7 +87,7 @@ export const FullUser = ({
 
   const userBasisInfo = (
     <>
-      {!profile ? (
+      {!profile?.name ? (
         shouldShowAsDeleted ? (
           'Deleted'
         ) : (

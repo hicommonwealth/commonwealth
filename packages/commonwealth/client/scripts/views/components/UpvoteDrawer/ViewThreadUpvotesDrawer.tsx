@@ -17,7 +17,7 @@ export const ViewThreadUpvotesDrawer = ({
   if (!thread) return null;
   const reactors = thread?.associatedReactions;
 
-  const reactorData = thread.associatedReactions?.map((profile) => {
+  const reactorData = reactors?.map((profile) => {
     const reactor = reactors.find((r) => r.address === profile.address);
 
     return {

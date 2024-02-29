@@ -135,6 +135,7 @@ export const CommentCard = ({
             discord_meta={comment.discord_meta}
             popoverPlacement="top"
             showUserAddressWithInfo={false}
+            profile={comment.profile}
           />
         )}
       </div>

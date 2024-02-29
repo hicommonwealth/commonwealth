@@ -105,10 +105,10 @@ export class Comment<T extends IUniqueId> {
     if (profile) {
       this.profile = {
         id: profile.id,
-        avatarUrl: profile.avatar_url,
-        name: profile.profile_name,
-        address: Address.address,
-        lastActive: Address.last_active,
+        avatarUrl: profile?.avatar_url,
+        name: profile?.profile_name,
+        address: Address?.address,
+        lastActive: Address?.last_active,
       };
     }
   }

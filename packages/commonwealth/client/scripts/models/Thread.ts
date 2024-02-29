@@ -328,13 +328,27 @@ export class Thread implements IUniqueId {
     this.latestActivity = last_commented_on
       ? moment(last_commented_on)
       : moment(created_at);
-    this.profile = {
-      id: profile_id,
-      name: profile_name,
-      address: Address.address,
-      lastActive: address_last_active,
-      avatarUrl: avatar_url,
-    };
+
+    if (Address.User) {
+      const profile = Address?.User?.Profiles[0];
+      if (profile) {
+        this.profile = {
+          id: profile.id,
+          avatarUrl: profile?.avatar_url,
+          name: profile?.profile_name,
+          address: Address?.address,
+          lastActive: Address?.last_active,
+        };
+      }
+    } else {
+      this.profile = {
+        id: profile_id,
+        name: profile_name,
+        address: Address.address,
+        lastActive: address_last_active,
+        avatarUrl: avatar_url,
+      };
+    }
   }
 }
 
