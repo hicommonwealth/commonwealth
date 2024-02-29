@@ -24,13 +24,13 @@ const ProgressBarsShowcase = () => {
         progress={150}
         label="Progress Bar (Neutral) With Token"
         progressStatus="neutral"
-        subtext={`${Math.min(100, Math.floor(50 * 1000) / 1000)} CMN`}
+        subtext="50 CMN"
       />
       <CWProgressBar
         progress={75}
         label="Progress Bar (Ongoing) With Token"
         progressStatus="ongoing"
-        subtext={`${Math.min(100, Math.floor(50 * 1000) / 1000)} CMN`}
+        subtext="50 CMN"
       />
     </>
   );

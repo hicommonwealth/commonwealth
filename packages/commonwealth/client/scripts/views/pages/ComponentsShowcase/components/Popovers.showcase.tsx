@@ -1,3 +1,4 @@
+import { notifySuccess } from 'controllers/app/notifications';
 import React from 'react';
 import {
   PopoverMenu,
@@ -16,42 +17,42 @@ const popoverMenuOptions = (): Array<PopoverMenuItem> => {
       type: 'default',
       label: 'Create Thread',
       iconLeft: 'write',
-      onClick: () => console.log('Create thread clicked'),
+      onClick: () => notifySuccess('Create thread clicked'),
     },
     {
       label: 'Create Proposal',
       iconLeft: 'write',
-      onClick: () => console.log('Create proposal clicked'),
+      onClick: () => notifySuccess('Create proposal clicked'),
     },
     {
       label: 'Create Poll',
       iconLeft: 'write',
-      onClick: () => console.log('Create poll clicked'),
+      onClick: () => notifySuccess('Create poll clicked'),
     },
     {
       label: 'Create Snapshot',
       iconLeft: 'write',
       disabled: true,
-      onClick: () => console.log('Create snapshot clicked'),
+      onClick: () => notifySuccess('Create snapshot clicked'),
     },
     { type: 'divider' },
     { type: 'header', label: 'Universal' },
     {
       label: 'Create Community',
       iconLeft: 'people',
-      onClick: () => console.log('Create community clicked'),
+      onClick: () => notifySuccess('Create community clicked'),
     },
     {
       label: 'Create Crowdfund',
       iconLeft: 'wallet',
-      onClick: () => console.log('Create crowdfund clicked'),
+      onClick: () => notifySuccess('Create crowdfund clicked'),
     },
     { type: 'divider' },
     {
       label: 'Report',
       iconLeft: 'cautionCircle',
       isSecondary: true,
-      onClick: () => console.log('Report clicked'),
+      onClick: () => notifySuccess('Report clicked'),
     },
   ];
 };
@@ -99,11 +100,11 @@ const PopoversShowcase = () => {
       <CWText type="h5">Menu Popover</CWText>
       <PopoverMenu
         menuItems={popoverMenuOptions()}
-        renderTrigger={(onclick) => (
+        renderTrigger={(onClick) => (
           <CWIconButton
             buttonSize="med"
             iconName="plusCirclePhosphor"
-            onClick={onclick}
+            onClick={onClick}
           />
         )}
       />
