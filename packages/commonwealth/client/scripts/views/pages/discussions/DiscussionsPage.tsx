@@ -17,6 +17,7 @@ import {
 } from '../../../models/types';
 import app from '../../../state';
 import { useFetchTopicsQuery } from '../../../state/api/topics';
+import { trpc } from '../../../utils/trpcClient';
 import { Breadcrumbs } from '../../components/Breadcrumbs';
 import { HeaderWithFilters } from './HeaderWithFilters';
 import { ThreadCard } from './ThreadCard';
@@ -73,6 +74,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const isOnArchivePage =
     location.pathname === `/${app.activeChainId()}/archived`;
+
+  const getBulkThreads = trpc.thread.getBulkThreads.useQuery({
+    community_id: 'dydx',
+    temp: 3,
+  });
 
   const { fetchNextPage, data, isInitialLoading, hasNextPage } =
     useFetchThreadsQuery({

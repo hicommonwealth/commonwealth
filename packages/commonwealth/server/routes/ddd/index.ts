@@ -3,12 +3,14 @@ import { Router } from 'express';
 import swaggerUi from 'swagger-ui-express';
 import * as community from './community';
 import * as integrations from './integrations';
+import * as thread from './threads';
 
 /**
  * Express router
  */
 const router = Router();
 router.use('/community', express.statsMiddleware, community.expressRouter);
+router.use('/thread', express.statsMiddleware, thread.expressRouter);
 router.use(express.errorMiddleware);
 
 /**
@@ -16,8 +18,11 @@ router.use(express.errorMiddleware);
  */
 const trpcRouter = trpc.router({
   community: community.trpcRouter,
+  thread: thread.trpcRouter,
   integrations: integrations.trpcRouter,
 });
+
+export type AppRouter = typeof trpcRouter;
 
 /**
  * OpenAPI spec

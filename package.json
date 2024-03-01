@@ -65,6 +65,8 @@
     "@playwright/test": "^1.31.2",
     "@tanstack/eslint-plugin-query": "^4.29.4",
     "@tharsis/address-converter": "^0.1.8",
+    "@trpc/client": "^10.45.1",
+    "@trpc/react-query": "^10.45.1",
     "@types/amqplib": "^0.8.2",
     "@types/bn.js": "^4.11.6",
     "@types/bs58": "^4.0.1",
