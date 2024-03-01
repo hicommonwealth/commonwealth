@@ -2,6 +2,7 @@ import { express, trpc } from '@hicommonwealth/adapters';
 import { Router } from 'express';
 import swaggerUi from 'swagger-ui-express';
 import * as community from './community';
+import * as integrations from './integrations';
 
 /**
  * Express router
@@ -13,14 +14,17 @@ router.use(express.errorMiddleware);
 /**
  * tRPC router
  */
-const trpcRouter = trpc.router({ community: community.trpcRouter });
+const trpcRouter = trpc.router({
+  community: community.trpcRouter,
+  integrations: integrations.trpcRouter,
+});
 
 /**
  * OpenAPI spec
  */
 router.get('/trpc/openapi.json', (req, res) => {
   const baseUrl = req.protocol + '://' + req.get('host') + '/ddd/trpc';
-  res.set('Cache-Control', `public, max-age=${5 * 60 * 1000}`);
+  res.set('Cache-Control', 'public, max-age=300');
   return res.json(
     trpc.toOpenApiDocument(trpcRouter, {
       title: 'Common API',
