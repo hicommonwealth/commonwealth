@@ -126,7 +126,7 @@ export const event = <T, S extends EventSchemas>(
     .meta({
       openapi: {
         method: 'POST',
-        path: `/${factory.name}`,
+        path: `/${tag.toLowerCase()}/${factory.name}`,
         tags: [tag],
       },
     })
@@ -152,7 +152,11 @@ export const query = <T, P extends ZodObject<any>>(
   const md = factory();
   return trpc.procedure
     .meta({
-      openapi: { method: 'GET', path: `/${factory.name}`, tags: [Tag.Query] },
+      openapi: {
+        method: 'GET',
+        path: `/${Tag.Query.toLowerCase()}/${factory.name}`,
+        tags: [Tag.Query],
+      },
       protect: md.secure,
     })
     .input(md.schema.extend({ address_id: z.string().optional() }))

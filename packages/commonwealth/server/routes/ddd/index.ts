@@ -24,7 +24,7 @@ const trpcRouter = trpc.router({
  */
 router.get('/trpc/openapi.json', (req, res) => {
   const baseUrl = req.protocol + '://' + req.get('host') + '/ddd/trpc';
-  res.set('Cache-Control', `public, max-age=${5 * 60 * 1000}`);
+  res.set('Cache-Control', 'public, max-age=300');
   return res.json(
     trpc.toOpenApiDocument(trpcRouter, {
       title: 'Common API',
