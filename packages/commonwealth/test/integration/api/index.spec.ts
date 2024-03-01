@@ -4,12 +4,10 @@ import { tester } from '@hicommonwealth/model';
 import ipldDagJson from '@ipld/dag-json';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import wallet from 'ethereumjs-wallet';
 import { bech32ToHex } from 'shared/utils';
 import app from '../../../server-test';
 import { TEST_BLOCK_INFO_STRING } from '../../../shared/adapters/chain/ethereum/keys';
 import { CANVAS_TOPIC } from '../../../shared/canvas';
-import * as modelUtils from '../../util/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -29,8 +27,9 @@ describe('API Tests', () => {
     });
 
     it('should create an ETH address', async () => {
-      const keypair = wallet.generate();
-      const address = `0x${keypair.getAddress().toString('hex')}`;
+      const wallet = new SIWESigner({ chainId: 1 });
+      const session = await wallet.getSession(CANVAS_TOPIC);
+
       const chain = 'ethereum';
       const wallet_id = 'metamask';
       const res = await chai
@@ -38,7 +37,7 @@ describe('API Tests', () => {
         .post('/api/createAddress')
         .set('Accept', 'application/json')
         .send({
-          address,
+          address: session.address,
           community_id: chain,
           wallet_id,
           block_info: TEST_BLOCK_INFO_STRING,
@@ -46,7 +45,7 @@ describe('API Tests', () => {
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.equal('Success');
       expect(res.body.result).to.be.not.null;
-      expect(res.body.result.address).to.be.equal(address);
+      expect(res.body.result.address).to.be.equal(session.address);
       expect(res.body.result.community_id).to.equal(chain);
       expect(res.body.result.verification_token).to.be.not.null;
     });
@@ -76,19 +75,6 @@ describe('API Tests', () => {
     });
 
     it('should verify an ETH address', async () => {
-      const { keypair, address } = modelUtils.generateEthAddress();
-      const community_id = 'ethereum';
-      const wallet_id = 'metamask';
-      let res = await chai
-        .request(app)
-        .post('/api/createAddress')
-        .set('Accept', 'application/json')
-        .send({
-          address,
-          community_id,
-          wallet_id,
-          block_info: TEST_BLOCK_INFO_STRING,
-        });
       const chainId = '1'; // use ETH mainnet for testing
 
       const sessionSigner = new SIWESigner({ chainId: parseInt(chainId) });
@@ -97,12 +83,25 @@ describe('API Tests', () => {
         timestamp,
       });
 
+      const community_id = 'ethereum';
+      const wallet_id = 'metamask';
+      let res = await chai
+        .request(app)
+        .post('/api/createAddress')
+        .set('Accept', 'application/json')
+        .send({
+          address: session.address,
+          community_id,
+          wallet_id,
+          block_info: TEST_BLOCK_INFO_STRING,
+        });
+
       res = await chai
         .request(app)
         .post('/api/verifyAddress')
         .set('Accept', 'application/json')
         .send({
-          address,
+          address: session.address,
           community_id,
           wallet_id,
           session: ipldDagJson.stringify(ipldDagJson.encode(session)),

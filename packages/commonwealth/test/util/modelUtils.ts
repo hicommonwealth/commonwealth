@@ -8,7 +8,6 @@ import type {
   Signature,
 } from '@canvas-js/interfaces';
 import chai from 'chai';
-import wallet from 'ethereumjs-wallet';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
 import { createRole, findOneRole } from '../../server/util/roles';
 
@@ -16,7 +15,6 @@ import { CANVAS_TOPIC } from '../../shared/canvas';
 
 import type { Role } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model';
-import Web3 from 'web3-utils';
 import app from '../../server-test';
 
 import { SIWESigner } from '@canvas-js/chain-ethereum';
@@ -30,13 +28,6 @@ const sortedStringify = configureStableStringify({
   strict: true,
   deterministic: true,
 });
-
-export const generateEthAddress = () => {
-  const keypair = wallet.generate();
-  const lowercaseAddress = `0x${keypair.getAddress().toString('hex')}`;
-  const address = Web3.toChecksumAddress(lowercaseAddress);
-  return { keypair, address };
-};
 
 export const getTopicId = async ({ chain }) => {
   const res = await chai.request
