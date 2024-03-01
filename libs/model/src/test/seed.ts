@@ -37,29 +37,27 @@ export async function seed<T extends SchemaWithModel<any>>(
   overrides: Partial<z.infer<T['schema']>> = {},
   options?: SeedOptions,
 ): Promise<Model<z.infer<T['schema']>>> {
-  const mockData = (() => {
-    if (options?.noMock) {
-      return {};
-    }
-    const m = generateMock(schema, {
+  let data: Partial<z.infer<T['schema']>> = {};
+
+  if (!options?.noMock) {
+    const generatedMockData = generateMock(schema, {
       seed: seedNum++,
     });
     for (const prop of GENERATED_PROPS) {
       if (!allowedGeneratedProps?.includes(prop)) {
-        delete m[prop];
+        delete generatedMockData[prop];
       }
     }
-    return m;
-  })();
+    data = { ...data, ...generatedMockData, ...(mockDefaults?.() || {}) };
+  }
 
-  const data = {
-    ...mockData,
-    ...mockDefaults?.(),
+  data = {
+    ...data,
     ...overrides,
   };
 
   // console.log(`data #${seedNum} [${model.name}]: `, data);
-  return model.create(data);
+  return model.create(data as z.infer<T['schema']>);
 }
 
 // TODO: implement proper bulkCreate
