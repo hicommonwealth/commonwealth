@@ -7,6 +7,10 @@ export const schemas = {
     groupId: z.string(),
     userId: z.string(),
   }),
+  CommunityCreated: z.object({
+    communityId: z.string(),
+    userId: z.string(),
+  }),
 };
 
 export type Events = keyof typeof schemas;

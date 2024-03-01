@@ -1,4 +1,4 @@
-import z, { ZodSchema } from 'zod';
+import z, { ZodSchema, ZodUndefined } from 'zod';
 import { events } from '../schemas';
 
 /**
@@ -72,7 +72,10 @@ export class InvalidState extends Error {
 /**
  * Endpoint schemas
  */
-export type Schemas<Input extends ZodSchema, Output extends ZodSchema> = {
+export type Schemas<
+  Input extends ZodSchema = ZodSchema,
+  Output extends ZodSchema = ZodSchema,
+> = {
   readonly input: Input;
   readonly output: Output;
 };
@@ -122,8 +125,8 @@ export type QueryContext<Input extends ZodSchema> = {
 export type CommandHandler<S> = S extends Schemas<infer Input, infer Output>
   ? (
       context: CommandContext<Input>,
-      state?: Partial<Output>,
-    ) => Promise<Partial<Output> | void>
+      state?: Partial<z.infer<Output>>,
+    ) => Promise<Partial<z.infer<Output>> | void>
   : never;
 
 /**
@@ -132,7 +135,9 @@ export type CommandHandler<S> = S extends Schemas<infer Input, infer Output>
  * @returns may return updated state - side effects
  */
 export type EventHandler<Name, S> = S extends Schemas<infer Input, infer Output>
-  ? (context: EventContext<Name, Input>) => Promise<Partial<Output> | void>
+  ? (
+      context: EventContext<Name, Input>,
+    ) => Promise<Partial<z.infer<Output>> | void>
   : never;
 
 /**
@@ -142,7 +147,7 @@ export type EventHandler<Name, S> = S extends Schemas<infer Input, infer Output>
  * @throws {@link InvalidActor} when unauthorized
  */
 export type QueryHandler<S> = S extends Schemas<infer Input, infer Output>
-  ? (context: QueryContext<Input>) => Promise<Output | undefined>
+  ? (context: QueryContext<Input>) => Promise<z.infer<Output> | undefined>
   : never;
 
 /**
@@ -153,15 +158,12 @@ export type QueryHandler<S> = S extends Schemas<infer Input, infer Output>
  * - `body`: function implementing core domain logic, and returning side effects (mutations)
  * - `secure`: true when user requires authentication
  */
-export type CommandMetadata<S> = S extends Schemas<infer Input, infer Output>
-  ? {
-      readonly input: Input;
-      readonly output: Output;
-      readonly auth: CommandHandler<S>[];
-      readonly body: CommandHandler<S>;
-      readonly secure?: boolean;
-    }
-  : never;
+export type CommandMetadata<S extends Schemas> = {
+  readonly schemas: S;
+  readonly auth: CommandHandler<S>[];
+  readonly body: CommandHandler<S>;
+  readonly secure?: boolean;
+};
 
 /**
  * Declarative metadata to enforce the conventional requirements of a query as a chain of responsibility.
@@ -170,15 +172,12 @@ export type CommandMetadata<S> = S extends Schemas<infer Input, infer Output>
  * - `body`: function implementing the query logic
  * - `secure`: true when user requires authentication
  */
-export type QueryMetadata<S> = S extends Schemas<infer Input, infer Output>
-  ? {
-      readonly input: Input;
-      readonly output: Output;
-      readonly auth: QueryHandler<S>[];
-      readonly body: QueryHandler<S>;
-      readonly secure?: boolean;
-    }
-  : never;
+export type QueryMetadata<S extends Schemas> = {
+  readonly schemas: S;
+  readonly auth: QueryHandler<S>[];
+  readonly body: QueryHandler<S>;
+  readonly secure?: boolean;
+};
 
 /**
  * Domain event schemas
@@ -195,9 +194,10 @@ export type EventSchemas = {
  */
 export type EventsHandlerMetadata<
   Inputs extends EventSchemas,
-  Output extends ZodSchema,
+  Output extends ZodSchema = ZodUndefined,
 > = {
-  readonly schemas: Inputs;
+  readonly inputs: Inputs;
+  readonly output?: Output;
   readonly body: {
     readonly [Name in keyof Inputs]: EventHandler<
       Name,
@@ -211,7 +211,7 @@ export type EventsHandlerMetadata<
  */
 export type PolicyMetadata<
   Inputs extends EventSchemas,
-  Output extends ZodSchema,
+  Output extends ZodSchema = ZodUndefined,
 > = EventsHandlerMetadata<Inputs, Output>;
 
 /**
@@ -219,5 +219,5 @@ export type PolicyMetadata<
  */
 export type ProjectionMetadata<
   Inputs extends EventSchemas,
-  Output extends ZodSchema,
+  Output extends ZodSchema = ZodUndefined,
 > = EventsHandlerMetadata<Inputs, Output>;

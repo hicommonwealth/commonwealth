@@ -1,4 +1,4 @@
-import type { QueryMetadata, User } from '@hicommonwealth/core';
+import type { QueryMetadata, Schemas, User } from '@hicommonwealth/core';
 import * as core from '@hicommonwealth/core';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import { ZodSchema, z } from 'zod';
@@ -9,12 +9,22 @@ import { ZodSchema, z } from 'zod';
  * @returns express query handler
  */
 export const query =
-  <T, P extends ZodSchema>(md: QueryMetadata<T, P>): RequestHandler =>
-  async (req: Request, res: Response<T | undefined>, next: NextFunction) => {
+  <
+    Input extends ZodSchema,
+    Output extends ZodSchema,
+    S extends Schemas<Input, Output>,
+  >(
+    md: QueryMetadata<S>,
+  ): RequestHandler =>
+  async (
+    req: Request,
+    res: Response<z.infer<Output> | undefined>,
+    next: NextFunction,
+  ) => {
     try {
       const results = await core.query(md, {
         actor: { user: req.user as User, address_id: req.body.address_id },
-        payload: { ...req.query, ...req.params } as z.infer<P>,
+        payload: { ...req.query, ...req.params } as z.infer<Input>,
       });
       return res.json(results);
     } catch (error) {

@@ -1,10 +1,10 @@
-import { ZodError } from 'zod';
+import { ZodError, ZodSchema } from 'zod';
 import { events } from '../schemas';
 import {
-  EventContext,
-  EventSchemas,
-  EventsHandlerMetadata,
   InvalidInput,
+  type EventContext,
+  type EventSchemas,
+  type EventsHandlerMetadata,
 } from './types';
 
 /**
@@ -16,16 +16,20 @@ import {
  * @returns side effects
  * @throws {@link InvalidInput} when user invokes event with invalid payload, or rethrows internal domain errors
  */
-export const event = async <T, S extends EventSchemas, E extends events.Events>(
-  { schemas, body }: EventsHandlerMetadata<T, S>,
-  { name, payload }: EventContext<E, typeof events.schemas[E]>,
+export const event = async <
+  Name extends events.Events,
+  Input extends EventSchemas,
+  Output extends ZodSchema,
+>(
+  { inputs, body }: EventsHandlerMetadata<Input, Output>,
+  { name, payload }: EventContext<Name, typeof events.schemas[Name]>,
   validate = true,
-): Promise<Partial<T> | undefined> => {
+): Promise<Partial<Output> | undefined> => {
   try {
     return (
       (await body[name]({
         name,
-        payload: validate ? (schemas[name]!.parse(payload) as any) : payload,
+        payload: validate ? inputs[name]!.parse(payload) : payload,
       })) ?? undefined
     );
   } catch (error) {
