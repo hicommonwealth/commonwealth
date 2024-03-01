@@ -5,7 +5,6 @@ import {
   type Window as KeplrWindow,
 } from '@keplr-wallet/types';
 
-import { CosmosSigner } from '@canvas-js/chain-cosmos';
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
 import app from 'state';
 import IWebWallet from '../../../models/IWebWallet';
@@ -75,6 +74,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   }
 
   public async getSessionSigner() {
+    const { CosmosSigner } = await import('@canvas-js/chain-cosmos');
     return new CosmosSigner({
       signer: {
         type: 'ethereum',

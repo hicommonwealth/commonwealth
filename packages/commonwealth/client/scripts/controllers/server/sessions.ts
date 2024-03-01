@@ -1,7 +1,6 @@
 import type { Signature } from '@canvas-js/interfaces';
 import { CANVAS_TOPIC } from 'canvas';
 
-import { CosmosSigner } from '@canvas-js/chain-cosmos';
 import { WalletSsoSource } from '@hicommonwealth/core';
 import { getSessionSigners } from 'shared/canvas/verify';
 import Account from '../../models/Account';
@@ -34,12 +33,13 @@ export async function signSessionWithAccount<T extends { address: string }>(
   return session;
 }
 
-export const getMagicCosmosSessionSigner = (
+export const getMagicCosmosSessionSigner = async (
   signer: { signMessage: any },
   address: string,
   chainId: string,
-) =>
-  new CosmosSigner({
+) => {
+  const { CosmosSigner } = await import('@canvas-js/chain-cosmos');
+  return new CosmosSigner({
     signer: {
       type: 'amino',
       getAddress: async () => address,
@@ -53,6 +53,7 @@ export const getMagicCosmosSessionSigner = (
       },
     },
   });
+};
 
 export async function getSessionFromWallet(
   wallet: IWebWallet<any>,

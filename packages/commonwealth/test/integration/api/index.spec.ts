@@ -1,7 +1,5 @@
 /* eslint-disable no-unused-expressions */
-import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { tester } from '@hicommonwealth/model';
-import ipldDagJson from '@ipld/dag-json';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { bech32ToHex } from 'shared/utils';
@@ -27,6 +25,7 @@ describe('API Tests', () => {
     });
 
     it('should create an ETH address', async () => {
+      const { SIWESigner } = await import('@canvas-js/chain-ethereum');
       const wallet = new SIWESigner({ chainId: 1 });
       const session = await wallet.getSession(CANVAS_TOPIC);
 
@@ -75,6 +74,8 @@ describe('API Tests', () => {
     });
 
     it('should verify an ETH address', async () => {
+      const { SIWESigner } = await import('@canvas-js/chain-ethereum');
+      const ipldDagJson = await import('@ipld/dag-json');
       const chainId = '1'; // use ETH mainnet for testing
 
       const sessionSigner = new SIWESigner({ chainId: parseInt(chainId) });

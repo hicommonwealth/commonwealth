@@ -8,7 +8,6 @@ import type {
   Signature,
 } from '@canvas-js/interfaces';
 import chai from 'chai';
-import { configure as configureStableStringify } from 'safe-stable-stringify';
 import { createRole, findOneRole } from '../../server/util/roles';
 
 import { CANVAS_TOPIC } from '../../shared/canvas';
@@ -17,17 +16,8 @@ import type { Role } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model';
 import app from '../../server-test';
 
-import { SIWESigner } from '@canvas-js/chain-ethereum';
-import { SubstrateSigner } from '@canvas-js/chain-substrate';
 import { Link, LinkSource, ThreadAttributes } from '@hicommonwealth/model';
 import { TEST_BLOCK_INFO_STRING } from '../../shared/adapters/chain/ethereum/keys';
-
-const sortedStringify = configureStableStringify({
-  bigint: false,
-  circularValue: Error,
-  strict: true,
-  deterministic: true,
-});
 
 export const getTopicId = async ({ chain }) => {
   const res = await chai.request
@@ -45,6 +35,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
   const timestamp = 1665083987891;
 
   if (chain === 'ethereum' || chain === 'alex') {
+    const { SIWESigner } = await import('@canvas-js/chain-ethereum');
     const wallet_id = 'metamask';
     const chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
     const sessionSigner = new SIWESigner({ chainId: parseInt(chain_id) });
@@ -85,6 +76,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     };
   }
   if (chain === 'edgeware') {
+    const { SubstrateSigner } = await import('@canvas-js/chain-substrate');
     const sessionSigner = new SubstrateSigner();
     const session = await sessionSigner.getSession(CANVAS_TOPIC, { timestamp });
     const wallet_id = 'polkadot';
@@ -152,7 +144,7 @@ export interface ThreadArgs {
   url?: string;
   readOnly?: boolean;
   session: Session;
-  sign: (actionPayload: ActionPayload) => string;
+  sign: (message: Message<Action | Session>) => Signature;
 }
 
 export const createThread = async (
@@ -172,30 +164,34 @@ export const createThread = async (
     sign,
   } = args;
 
-  const actionPayload: ActionPayload = {
-    app: session.payload.app,
-    block: session.payload.block,
-    call: 'thread',
-    callArgs: {
-      community: chainId || '',
-      title: encodeURIComponent(title),
-      body: encodeURIComponent(body),
-      link: url || '',
-      topic: topicId || '',
+  const canvasSessionMessage = {
+    clock: 0,
+    parents: [],
+    payload: session,
+    topic: CANVAS_TOPIC,
+  };
+  const canvasSessionMessageSignature = sign(canvasSessionMessage);
+
+  const canvasActionMessage = {
+    clock: 0,
+    parents: [],
+    payload: {
+      type: 'action' as const,
+      address,
+      blockhash: null,
+      name: 'thread',
+      args: {
+        community: chainId || '',
+        title: encodeURIComponent(title),
+        body: encodeURIComponent(body),
+        link: url || '',
+        topic: topicId || '',
+      },
+      timestamp: Date.now(),
     },
-    chain: 'eip155:1',
-    from: session.payload.from,
-    timestamp: Date.now(),
+    topic: CANVAS_TOPIC,
   };
-  const action: Action = {
-    type: 'action',
-    payload: actionPayload,
-    session: session.payload.sessionAddress,
-    signature: sign(actionPayload),
-  };
-  const canvas_session = sortedStringify(session);
-  const canvas_action = sortedStringify(action);
-  const canvas_hash = ''; // getActionHash(action)
+  const canvasActionMessageSignature = sign(canvasActionMessage);
 
   const res = await chai.request
     .agent(app)
@@ -212,9 +208,10 @@ export const createThread = async (
       url,
       readOnly: readOnly || false,
       jwt,
-      canvas_action,
-      canvas_session,
-      canvas_hash,
+      canvas_action_message: canvasActionMessage,
+      canvas_action_message_signature: canvasActionMessageSignature,
+      canvas_session_message: canvasSessionMessage,
+      canvas_session_message_signature: canvasSessionMessageSignature,
     });
   return res.body;
 };
@@ -266,7 +263,7 @@ export interface CommentArgs {
   parentCommentId?: any;
   thread_id?: any;
   session: Session;
-  sign: (actionPayload: ActionPayload) => string;
+  sign: (message: Message<Action | Session>) => Signature;
 }
 
 export const createComment = async (args: CommentArgs) => {
@@ -281,28 +278,32 @@ export const createComment = async (args: CommentArgs) => {
     sign,
   } = args;
 
-  const actionPayload: ActionPayload = {
-    app: session.payload.app,
-    block: session.payload.block,
-    call: 'comment',
-    callArgs: {
-      body: text,
-      thread_id,
-      parent_comment_id: parentCommentId,
+  const canvasSessionMessage = {
+    clock: 0,
+    parents: [],
+    payload: session,
+    topic: CANVAS_TOPIC,
+  };
+  const canvasSessionMessageSignature = sign(canvasSessionMessage);
+
+  const canvasActionMessage = {
+    clock: 0,
+    parents: [],
+    payload: {
+      type: 'action' as const,
+      address,
+      blockhash: null,
+      name: 'comment',
+      args: {
+        body: text,
+        thread_id,
+        parent_comment_id: parentCommentId,
+      },
+      timestamp: Date.now(),
     },
-    chain: 'eip155:1',
-    from: session.payload.from,
-    timestamp: Date.now(),
+    topic: CANVAS_TOPIC,
   };
-  const action: Action = {
-    type: 'action',
-    payload: actionPayload,
-    session: session.payload.sessionAddress,
-    signature: sign(actionPayload),
-  };
-  const canvas_session = sortedStringify(session);
-  const canvas_action = sortedStringify(action);
-  const canvas_hash = ''; // getActionHash(action)
+  const canvasActionMessageSignature = sign(canvasActionMessage);
   // TODO
 
   const res = await chai.request
@@ -316,9 +317,10 @@ export const createComment = async (args: CommentArgs) => {
       parent_id: parentCommentId,
       text,
       jwt,
-      canvas_action,
-      canvas_session,
-      canvas_hash,
+      canvas_action_message: canvasActionMessage,
+      canvas_action_message_signature: canvasActionMessageSignature,
+      canvas_session_message: canvasSessionMessage,
+      canvas_session_message_signature: canvasSessionMessageSignature,
     });
   return res.body;
 };
@@ -358,7 +360,7 @@ export interface CreateReactionArgs {
   comment_id?: number;
   thread_id?: number;
   session: Session;
-  sign: (actionPayload: ActionPayload) => string;
+  sign: (message: Message<Action | Session>) => Signature;
 }
 
 export const createReaction = async (args: CreateReactionArgs) => {
@@ -374,24 +376,28 @@ export const createReaction = async (args: CreateReactionArgs) => {
     sign,
   } = args;
 
-  const actionPayload: ActionPayload = {
-    app: session.payload.app,
-    block: session.payload.block,
-    call: 'reactComment',
-    callArgs: { comment_id, value: reaction },
-    chain: 'eip155:1',
-    from: session.payload.from,
-    timestamp: Date.now(),
+  const canvasSessionMessage = {
+    clock: 0,
+    parents: [],
+    payload: session,
+    topic: CANVAS_TOPIC,
   };
-  const action: Action = {
-    type: 'action',
-    payload: actionPayload,
-    session: session.payload.sessionAddress,
-    signature: sign(actionPayload),
+  const canvasSessionMessageSignature = sign(canvasSessionMessage);
+
+  const canvasActionMessage = {
+    clock: 0,
+    parents: [],
+    payload: {
+      type: 'action' as const,
+      address,
+      blockhash: null,
+      name: 'reactComment',
+      args: { comment_id, value: reaction },
+      timestamp: Date.now(),
+    },
+    topic: CANVAS_TOPIC,
   };
-  const canvas_session = sortedStringify(session);
-  const canvas_action = sortedStringify(action);
-  const canvas_hash = ''; // getActionHash(action)
+  const canvasActionMessageSignature = sign(canvasActionMessage);
   // TODO
 
   const res = await chai.request
@@ -406,9 +412,10 @@ export const createReaction = async (args: CreateReactionArgs) => {
       author_chain,
       jwt,
       thread_id,
-      canvas_session,
-      canvas_action,
-      canvas_hash,
+      canvas_action_message: canvasActionMessage,
+      canvas_action_message_signature: canvasActionMessageSignature,
+      canvas_session_message: canvasSessionMessage,
+      canvas_session_message_signature: canvasSessionMessageSignature,
     });
   return res.body;
 };
@@ -436,15 +443,15 @@ export const createThreadReaction = async (args: CreateThreadReactionArgs) => {
     sign,
   } = args;
 
-  const messageSession = {
+  const canvasSessionMessage = {
     clock: 0,
     parents: [],
     payload: session,
     topic: CANVAS_TOPIC,
   };
-  const messageSessionSignature = sign(messageSession);
+  const canvasSessionMessageSignature = sign(canvasSessionMessage);
 
-  const messageAction = {
+  const canvasActionMessage = {
     clock: 0,
     parents: [],
     payload: {
@@ -457,7 +464,7 @@ export const createThreadReaction = async (args: CreateThreadReactionArgs) => {
     },
     topic: CANVAS_TOPIC,
   };
-  const messageActionSignature = sign(messageAction);
+  const canvasActionMessageSignature = sign(canvasActionMessage);
 
   const res = await chai.request
     .agent(app)
@@ -470,9 +477,10 @@ export const createThreadReaction = async (args: CreateThreadReactionArgs) => {
       author_chain,
       jwt,
       thread_id,
-      canvas_session,
-      canvas_action,
-      canvas_hash,
+      canvas_action_message: canvasActionMessage,
+      canvas_action_message_signature: canvasActionMessageSignature,
+      canvas_session_message: canvasSessionMessage,
+      canvas_session_message_signature: canvasSessionMessageSignature,
     });
   return res.body;
 };

@@ -10,7 +10,6 @@ import $ from 'jquery';
 import { getSessionSigners } from 'shared/canvas/verify';
 import { initAppState } from 'state';
 
-import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { CANVAS_TOPIC } from 'shared/canvas';
 import app from 'state';
 import Account from '../../models/Account';
@@ -415,6 +414,7 @@ export async function handleSocialLoginCallback({
   chain?: string;
   walletSsoSource?: string;
 }): Promise<string> {
+  const { SIWESigner } = await import('@canvas-js/chain-ethereum');
   // desiredChain may be empty if social login was initialized from
   // a page without a chain, in which case we default to an eth login
   const desiredChain = app.chain?.meta || app.config.chains.getById(chain);
@@ -462,7 +462,7 @@ export async function handleSocialLoginCallback({
         ChainBase.CosmosSDK,
         prefix,
       );
-      const sessionSigner = getMagicCosmosSessionSigner(
+      const sessionSigner = await getMagicCosmosSessionSigner(
         signer,
         magicAddress,
         canvasChainId,
