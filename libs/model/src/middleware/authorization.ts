@@ -8,7 +8,6 @@ import {
   thread,
 } from '@hicommonwealth/core';
 import { Op } from 'sequelize';
-import { ZodAny } from 'zod';
 import { AddressAttributes, Role, models } from '..';
 
 /**
@@ -51,15 +50,15 @@ const authorizeAddress = async (
 };
 
 type CommunityMiddleware = CommandHandler<{
-  input: ZodAny;
+  input: any;
   output: typeof community.Community;
 }>;
 type ThreadMiddleware = CommandHandler<{
-  input: ZodAny;
+  input: any;
   output: typeof thread.Thread;
 }>;
 type CommentMiddleware = CommandHandler<{
-  input: ZodAny;
+  input: any;
   output: typeof comment.Comment;
 }>;
 

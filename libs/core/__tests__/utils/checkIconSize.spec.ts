@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { getFileSizeBytes } from '../../src/utils/getFileSizeBytes';
+import { getFileSizeBytes } from '../../src';
 
 describe('checkIconSize', () => {
   it("should return zero if url provided doesn't exist", async () => {

@@ -124,11 +124,9 @@ export const SetCommunityStake = {
     vote_weight: z.coerce.number().default(1),
     stake_enabled: z.coerce.boolean().default(true),
   }),
-  output: Community.merge(
-    z.object({
-      CommunityStakes: z.array(CommunityStake),
-    }),
-  ),
+  output: Community.extend({
+    CommunityStakes: z.array(CommunityStake).optional(),
+  }),
 };
 
 export const UpdateCommunity = {
