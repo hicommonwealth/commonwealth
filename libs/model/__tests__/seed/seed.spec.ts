@@ -1,11 +1,20 @@
-import { BalanceType, dispose } from '@hicommonwealth/core';
+import {
+  BalanceType,
+  ChainBase,
+  ChainNetwork,
+  ChainType,
+  dispose,
+} from '@hicommonwealth/core';
 import { expect } from 'chai';
 import { step } from 'mocha-steps';
 import z from 'zod';
 import {
   ChainNodeSchema,
+  CommunitySchema,
+  CommunityStakeSchema,
   ContractSchema,
   SchemaWithModel,
+  TopicSchema,
   UserSchema,
   checkDb,
   seed,
@@ -14,20 +23,43 @@ import {
 async function testSeed<T extends SchemaWithModel<any>>(
   schemaModel: T,
   overrides: Partial<z.infer<T['schema']>> = {},
-  excludeOverrides: (keyof typeof overrides)[] = [],
+  options?: {
+    exclude?: (keyof typeof overrides)[];
+  },
 ) {
   const createdEntity = await seed(schemaModel, overrides);
   expect(createdEntity, 'failed to create entity').not.to.be.null;
 
   const data = await schemaModel.schema.parse(createdEntity.toJSON());
-  expect(data, 'created entity is missing id').to.have.property('id');
 
-  const existingEntity = await schemaModel.model.findByPk(data.id);
+  // build query that will find the entity, or default to using `id`
+  const findQuery: Partial<z.infer<T['schema']>> = (() => {
+    if (schemaModel.buildFindQuery) {
+      // not all entities have a single primary key
+      const q = schemaModel.buildFindQuery(data);
+      const attributes = Object.keys(q.where);
+      for (const attribute of attributes) {
+        expect(data, 'created entity is missing id').to.have.property(
+          attribute,
+        );
+      }
+      return q;
+    } else {
+      expect(data, 'created entity is missing id').to.have.property('id');
+      return {
+        where: {
+          id: data.id,
+        },
+      };
+    }
+  })();
+
+  const existingEntity = await schemaModel.model.findOne(findQuery);
   expect(existingEntity, 'failed to find created entity after creation').not.to
     .be.null;
 
   const overridesToCheck = Object.keys(overrides).reduce((acc, k) => {
-    if (excludeOverrides.includes(k)) {
+    if (options?.exclude?.includes(k)) {
       return acc;
     }
     return {
@@ -74,7 +106,9 @@ describe('Seed functions', () => {
           emailVerified: true,
           isAdmin: true,
         },
-        ['emailVerified', 'isAdmin'],
+        {
+          exclude: ['emailVerified', 'isAdmin'],
+        },
       );
     });
   });
@@ -95,15 +129,72 @@ describe('Seed functions', () => {
   });
 
   describe('Contract', () => {
-    step('Seed Contract with defaults', async () => {
+    step('Should seed with defaults', async () => {
+      await testSeed(ContractSchema);
       await testSeed(ContractSchema);
     });
 
-    // step('Seed Contract with overrides', async () => {
-    //   await testSeed(ContractSchema, {
-    //     chain_node_id: 1,
-    //     token_name: 'blah',
-    //   });
-    // });
+    step('Should seed with overrides', async () => {
+      await testSeed(ContractSchema, {
+        address: '0x6b3595068778dd592e39a122f4f5a5cf09c90fe2',
+        token_name: 'sushi',
+        symbol: 'SUSHI',
+        type: ChainNetwork.ERC20,
+        chain_node_id: 1,
+      });
+    });
+  });
+
+  describe('Community', () => {
+    step('Should seed with defaults', async () => {
+      await testSeed(CommunitySchema);
+      await testSeed(CommunitySchema);
+    });
+
+    step('Should seed with overrides', async () => {
+      await testSeed(CommunitySchema, {
+        id: 'ethereum',
+        network: ChainNetwork.Ethereum,
+        default_symbol: 'ETH',
+        name: 'Ethereum',
+        icon_url: '/static/img/protocols/eth.png',
+        active: true,
+        type: ChainType.Chain,
+        base: ChainBase.Ethereum,
+        has_chain_events_listener: false,
+        chain_node_id: 1,
+      });
+    });
+  });
+
+  describe('Topic', () => {
+    step('Should seed with defaults', async () => {
+      await testSeed(TopicSchema);
+      await testSeed(TopicSchema);
+    });
+
+    step('Should seed with overrides', async () => {
+      await testSeed(TopicSchema, {
+        community_id: 'ethereum',
+        name: 'General',
+      });
+    });
+  });
+
+  describe('CommunityStake', () => {
+    step('Should seed with defaults', async () => {
+      await testSeed(CommunityStakeSchema);
+      await testSeed(CommunityStakeSchema);
+    });
+
+    step('Should seed with overrides', async () => {
+      await testSeed(CommunityStakeSchema, {
+        community_id: 'ethereum',
+        stake_id: 1,
+        stake_token: '',
+        vote_weight: 1,
+        stake_enabled: true,
+      });
+    });
   });
 });

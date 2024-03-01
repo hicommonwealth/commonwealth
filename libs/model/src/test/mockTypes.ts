@@ -1,8 +1,17 @@
+import {
+  ChainBase,
+  ChainNetwork,
+  ChainType,
+  DefaultPage,
+} from '@hicommonwealth/core';
 import z from 'zod';
 import { models } from '../database';
 import { SchemaWithModel } from './seed';
 
 const MAX_SCHEMA_INT = 1_000_000_000;
+
+// TODO: Replace these mock zod schemas with
+//       real schemas for single source of truth
 
 /*
   === User ===
@@ -19,12 +28,12 @@ const userZodSchema = z.object({
 });
 export const UserSchema: SchemaWithModel<typeof userZodSchema> = {
   schema: userZodSchema,
+  model: models.User,
   mockDefaults: () => ({
     isAdmin: false,
     emailVerified: true,
     selected_community_id: 'etheruem',
   }),
-  model: models.User,
 };
 
 /*
@@ -52,8 +61,8 @@ const chainNodeSchema = z.object({
 });
 export const ChainNodeSchema: SchemaWithModel<typeof chainNodeSchema> = {
   schema: chainNodeSchema,
-  mockDefaults: () => ({}),
   model: models.ChainNode,
+  mockDefaults: () => ({}),
 };
 
 /*
@@ -76,44 +85,117 @@ const contractSchema = z.object({
 });
 export const ContractSchema: SchemaWithModel<typeof contractSchema> = {
   schema: contractSchema,
+  model: models.Contract,
   mockDefaults: () => ({
     chain_node_id: 1,
     abi_id: null,
   }),
-  model: models.Contract,
-};
-
-/*
-  === Topic ===
-*/
-
-const topicSchema = z.object({});
-export const TopicSchema: SchemaWithModel<typeof topicSchema> = {
-  schema: topicSchema,
-  mockDefaults: () => ({}),
-  model: models.Topic,
 };
 
 /*
   === Community ===
 */
 
-const communitySchema = z.object({});
+const communitySchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  chain_node_id: z.number().int().max(MAX_SCHEMA_INT),
+  default_symbol: z.string(),
+  network: z.nativeEnum(ChainNetwork),
+  base: z.nativeEnum(ChainBase),
+  icon_url: z.string(),
+  active: z.boolean(),
+  type: z.nativeEnum(ChainType),
+  description: z.string().optional(),
+  social_links: z.array(z.string()).optional(),
+  ss58_prefix: z.number().int().max(MAX_SCHEMA_INT).optional(),
+  stages_enabled: z.boolean().optional(),
+  custom_stages: z.array(z.string()).optional(),
+  custom_domain: z.string().optional(),
+  block_explorer_ids: z.string().optional(),
+  collapsed_on_homepage: z.boolean().optional(),
+  substrate_spec: z.string().optional(),
+  has_chain_events_listener: z.boolean().optional(),
+  default_summary_view: z.boolean().optional(),
+  default_page: z.nativeEnum(DefaultPage).optional(),
+  has_homepage: z.boolean().optional(),
+  terms: z.string().optional(),
+  admin_only_polling: z.boolean().optional(),
+  bech32_prefix: z.string().optional(),
+  hide_projects: z.boolean().optional(),
+  token_name: z.string().optional(),
+  ce_verbose: z.boolean().optional(),
+  discord_config_id: z.number().int().max(MAX_SCHEMA_INT).optional(),
+  category: z.unknown().optional(), // Assuming category can be any type
+  discord_bot_webhooks_enabled: z.boolean().optional(),
+  directory_page_enabled: z.boolean().optional(),
+  directory_page_chain_node_id: z.number().int().max(MAX_SCHEMA_INT).optional(),
+  namespace: z.string().optional(),
+  redirect: z.string().optional(),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
+});
 export const CommunitySchema: SchemaWithModel<typeof communitySchema> = {
   schema: communitySchema,
-  mockDefaults: () => ({}),
   model: models.Community,
+  allowedGeneratedProps: ['id'],
+  mockDefaults: () => ({
+    chain_node_id: 1,
+  }),
+};
+
+/*
+  === Topic ===
+*/
+
+const topicSchema = z.object({
+  id: z.number().int(),
+  name: z.string().max(255),
+  community_id: z.string().max(255),
+  description: z.string().default(''),
+  telegram: z.string().max(255).optional().nullable(),
+  featured_in_sidebar: z.boolean().default(false),
+  featured_in_new_post: z.boolean().default(false),
+  default_offchain_template: z.string().optional().nullable(),
+  order: z.number().int().max(MAX_SCHEMA_INT).optional(),
+  channel_id: z.string().max(255).optional().nullable(),
+  group_ids: z.array(z.number().max(MAX_SCHEMA_INT)).default([]),
+  default_offchain_template_backup: z.string().optional().nullable(),
+});
+export const TopicSchema: SchemaWithModel<typeof topicSchema> = {
+  schema: topicSchema,
+  model: models.Topic,
+  mockDefaults: () => ({
+    community_id: 'ethereum',
+  }),
 };
 
 /*
   === CommunityStake ===
 */
 
-const communityStake = z.object({});
+const communityStake = z.object({
+  community_id: z.string().optional(),
+  stake_id: z.number().int().max(MAX_SCHEMA_INT).optional(),
+  stake_token: z.string().optional(),
+  vote_weight: z.number().int().max(MAX_SCHEMA_INT).optional(),
+  stake_enabled: z.boolean().optional(),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
+});
 export const CommunityStakeSchema: SchemaWithModel<typeof communityStake> = {
   schema: communityStake,
-  mockDefaults: () => ({}),
   model: models.CommunityStake,
+  mockDefaults: () => ({
+    community_id: 'ethereum',
+    stake_enabled: true,
+  }),
+  buildFindQuery: (data) => ({
+    where: {
+      community_id: data.community_id,
+      stake_id: data.stake_id,
+    },
+  }),
 };
 
 /*
@@ -123,8 +205,8 @@ export const CommunityStakeSchema: SchemaWithModel<typeof communityStake> = {
 const addressSchema = z.object({});
 export const AddressSchema: SchemaWithModel<typeof addressSchema> = {
   schema: addressSchema,
-  mockDefaults: () => ({}),
   model: models.Address,
+  mockDefaults: () => ({}),
 };
 
 /*
@@ -136,8 +218,8 @@ export const NotificationCategorySchema: SchemaWithModel<
   typeof notificationSchema
 > = {
   schema: notificationSchema,
-  mockDefaults: () => ({}),
   model: models.NotificationCategory,
+  mockDefaults: () => ({}),
 };
 
 /*
@@ -147,8 +229,8 @@ export const NotificationCategorySchema: SchemaWithModel<
 const subscriptionSchema = z.object({});
 export const SubscriptionSchema: SchemaWithModel<typeof subscriptionSchema> = {
   schema: subscriptionSchema,
-  mockDefaults: () => ({}),
   model: models.Subscription,
+  mockDefaults: () => ({}),
 };
 
 /*
@@ -160,8 +242,8 @@ export const SnapshotProposalSchema: SchemaWithModel<
   typeof snapshotSpaceSchema
 > = {
   schema: snapshotSpaceSchema,
-  mockDefaults: () => ({}),
   model: models.SnapshotProposal,
+  mockDefaults: () => ({}),
 };
 
 /*
@@ -173,6 +255,6 @@ export const SnapshotSpaceSchema: SchemaWithModel<
   typeof snapshotProposalSchema
 > = {
   schema: snapshotProposalSchema,
-  mockDefaults: () => ({}),
   model: models.SnapshotSpace,
+  mockDefaults: () => ({}),
 };
