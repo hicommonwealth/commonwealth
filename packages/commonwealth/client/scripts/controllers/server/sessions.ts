@@ -25,7 +25,6 @@ export async function signSessionWithAccount<T extends { address: string }>(
   timestamp: number,
 ) {
   const session = await getSessionFromWallet(wallet, { timestamp });
-  // TODO: what do we do with did/caip?
   const walletAddress = session.address.split(':')[2];
   if (walletAddress !== account.address) {
     throw new Error(
