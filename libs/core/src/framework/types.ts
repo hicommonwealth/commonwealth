@@ -1,4 +1,5 @@
 import z, { ZodSchema } from 'zod';
+import { events } from '../schemas';
 
 /**
  * Error names as constants
@@ -82,6 +83,16 @@ export type CommandContext<P extends ZodSchema> = {
 };
 
 /**
+ * Event execution context
+ * - `name`: event name
+ * - `payload`: validated event payload
+ */
+export type EventContext<E, P extends ZodSchema> = {
+  readonly name: E;
+  readonly payload: z.infer<P>;
+};
+
+/**
  * Query execution context
  * - `actor`: user actor
  * - `payload`: validated query payload (filters)
@@ -94,7 +105,7 @@ export type QueryContext<P extends ZodSchema> = {
 };
 
 /**
- * Middleware utility to authorize command actors (chain of responsibility)
+ * Command handler - can be chained to authorize command actors
  * @param context command execution context
  * @param state aggregate state, loaded and modified by domain rules (side effects)
  * @returns may return updated state when preloading aggreggate to verify authority
@@ -106,7 +117,16 @@ export type CommandHandler<T, P extends ZodSchema> = (
 ) => Promise<Partial<T> | void>;
 
 /**
- * Middleware utility to authorize query actors (chain of responsibility)
+ * Event handler
+ * @param context event execution context
+ * @returns may return updated state - side effects
+ */
+export type EventHandler<T, E, P> = P extends ZodSchema
+  ? (context: EventContext<E, P>) => Promise<Partial<T> | void>
+  : never;
+
+/**
+ * Query handler - can be chained to authorize query actors
  * @param context query execution context
  * @returns query results
  * @throws {@link InvalidActor} when unauthorized
@@ -143,3 +163,35 @@ export type QueryMetadata<T, P extends ZodSchema> = {
   readonly body: QueryHandler<T, P>;
   readonly secure?: boolean;
 };
+
+export type EventSchemas = {
+  [K in events.Events]?: typeof events.schemas[K];
+};
+export type EventsHandler<T, S extends EventSchemas = EventSchemas> = {
+  readonly schemas: S;
+  readonly body: {
+    readonly [K in keyof S]: EventHandler<T, K, S[K]>;
+  };
+};
+
+/**
+ * Declarative metadata to "enforce" the conventional requirements of policies.
+ * Decouples infrastructure concerns from core domain logic, allowing a simpler development and testing pattern.
+ * - `schemas`: zod schemas of the events handled by the policy
+ * - `body`: functions implementing the core policy handlers, and returning side effects
+ */
+export type PolicyMetadata<
+  T,
+  S extends EventSchemas = EventSchemas,
+> = EventsHandler<T, S>;
+
+/**
+ * Declarative metadata to "enforce" the conventional requirements of projections.
+ * Decouples infrastructure concerns from core domain logic, allowing a simpler development and testing pattern.
+ * - `schemas`: zod schemas of the events projected by the projection
+ * - `body`: functions implementing the projections, and returning new state
+ */
+export type ProjectionMetadata<
+  T,
+  S extends EventSchemas = EventSchemas,
+> = EventsHandler<T, S>;
