@@ -44,6 +44,11 @@ const BaseModal = ({ onClose, onSuccess, showWalletsFor }: BaseModalProps) => {
     await onClose();
   };
 
+  const handleSuccess = async () => {
+    await onSuccess?.();
+    await handleClose();
+  };
+
   const {
     wallets = [],
     isMagicLoading,
@@ -56,7 +61,7 @@ const BaseModal = ({ onClose, onSuccess, showWalletsFor }: BaseModalProps) => {
     onVerifyMobileWalletSignature,
   } = useWallets({
     onModalClose: handleClose,
-    onSuccess,
+    onSuccess: handleSuccess,
   });
 
   const filterWalletNames = (byChain: ChainBase) =>
