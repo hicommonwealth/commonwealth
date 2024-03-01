@@ -23,7 +23,7 @@ export type SchemaWithModel<T extends z.AnyZodObject> = {
   model: ModelStatic<Model>;
   mockDefaults?: () => Partial<z.infer<T>>;
   allowedGeneratedProps?: GeneratedProp[];
-  buildFindQuery?: (data: z.infer<T>) => {
+  buildQuery?: (data: z.infer<T>) => {
     where: Partial<z.infer<T>>;
   };
 };

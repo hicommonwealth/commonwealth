@@ -3,6 +3,7 @@ import {
   ChainNetwork,
   ChainType,
   DefaultPage,
+  NotificationCategories,
 } from '@hicommonwealth/core';
 import z from 'zod';
 import { models } from '../database';
@@ -20,9 +21,9 @@ const MAX_SCHEMA_INT = 1_000_000_000;
 const userZodSchema = z.object({
   id: z.number().int(),
   email: z.string().max(255).email().optional(),
-  isAdmin: z.boolean().optional(),
+  isAdmin: z.boolean().optional(), // excluded
   disableRichText: z.boolean().optional(),
-  emailVerified: z.boolean().optional(),
+  emailVerified: z.boolean().optional(), // excluded
   selected_community_id: z.string().max(255).optional(),
   emailNotificationInterval: z.enum(['week', 'never']).optional(),
 });
@@ -190,7 +191,7 @@ export const CommunityStakeSchema: SchemaWithModel<typeof communityStake> = {
     community_id: 'ethereum',
     stake_enabled: true,
   }),
-  buildFindQuery: (data) => ({
+  buildQuery: (data) => ({
     where: {
       community_id: data.community_id,
       stake_id: data.stake_id,
@@ -199,62 +200,163 @@ export const CommunityStakeSchema: SchemaWithModel<typeof communityStake> = {
 };
 
 /*
+  === Profile ===
+*/
+
+const profileSchema = z.object({
+  id: z.number().int(),
+  user_id: z.number().int().max(MAX_SCHEMA_INT),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
+  profile_name: z.string().max(255).optional(),
+  email: z.string().max(255).optional(),
+  website: z.string().max(255).optional(),
+  bio: z.string().optional(),
+  avatar_url: z.string().max(255).optional(),
+  slug: z.string().max(255).optional(),
+  socials: z.array(z.string()).optional(),
+  background_image: z.any().optional(),
+  bio_backup: z.string().optional(),
+  profile_name_backup: z.string().max(255).optional(),
+});
+export const ProfileSchema: SchemaWithModel<typeof profileSchema> = {
+  schema: profileSchema,
+  model: models.Profile,
+  mockDefaults: () => ({
+    user_id: 1,
+  }),
+};
+
+/*
   === Address ===
 */
 
-const addressSchema = z.object({});
+const addressSchema = z.object({
+  id: z.number().int(),
+  address: z.string().max(255),
+  community_id: z.string().max(255),
+  user_id: z.number().int().max(MAX_SCHEMA_INT),
+  verification_token: z.string().max(255).optional(), // excluded
+  verification_token_expires: z.date().nullable().optional(), // excluded
+  verified: z.date().nullable().optional(),
+  keytype: z.string().max(255).optional(),
+  last_active: z.date().nullable().optional(),
+  is_councillor: z.boolean().default(false),
+  is_validator: z.boolean().default(false),
+  ghost_address: z.boolean().optional(),
+  profile_id: z.number().int().max(MAX_SCHEMA_INT).optional(),
+  wallet_id: z.string().max(255).optional(),
+  block_info: z.string().max(255).optional(), // excluded
+  is_user_default: z.boolean().default(false),
+  role: z.enum(['member', 'admin', 'moderator']).default('member'),
+  wallet_sso_source: z.string().max(255).optional(),
+  hex: z.string().max(64).optional(),
+});
 export const AddressSchema: SchemaWithModel<typeof addressSchema> = {
   schema: addressSchema,
   model: models.Address,
-  mockDefaults: () => ({}),
+  mockDefaults: () => ({
+    community_id: 'ethereum',
+    user_id: 1,
+    profile_id: 1,
+  }),
 };
 
 /*
   === NotificationCategory ===
 */
 
-const notificationSchema = z.object({});
+const notificationCategorySchema = z.object({
+  name: z.string().max(255),
+  description: z.string(),
+  created_at: z.date(),
+  updated_at: z.date(),
+});
 export const NotificationCategorySchema: SchemaWithModel<
-  typeof notificationSchema
+  typeof notificationCategorySchema
 > = {
-  schema: notificationSchema,
+  schema: notificationCategorySchema,
   model: models.NotificationCategory,
   mockDefaults: () => ({}),
+  buildQuery: (data) => ({
+    where: {
+      name: data.name,
+    },
+  }),
 };
 
 /*
   === Subscription ===
 */
 
-const subscriptionSchema = z.object({});
+const subscriptionSchema = z.object({
+  id: z.number(),
+  subscriber_id: z.number().int().max(MAX_SCHEMA_INT),
+  category_id: z.nativeEnum(NotificationCategories),
+  is_active: z.boolean().default(true),
+  created_at: z.date(),
+  updated_at: z.date(),
+  immediate_email: z.boolean().default(false),
+  community_id: z.string().max(255).optional().nullable(),
+  thread_id: z.number().int().max(MAX_SCHEMA_INT).optional().nullable(),
+  comment_id: z.number().int().max(MAX_SCHEMA_INT).optional().nullable(),
+  snapshot_id: z.string().max(255).optional().nullable(),
+});
 export const SubscriptionSchema: SchemaWithModel<typeof subscriptionSchema> = {
   schema: subscriptionSchema,
   model: models.Subscription,
-  mockDefaults: () => ({}),
+  mockDefaults: () => ({
+    subscriber_id: 1,
+    category_id: NotificationCategories.NewThread,
+    community_id: 'ethereum',
+    thread_id: null,
+    comment_id: null,
+  }),
 };
 
 /*
   === SnapshotProposal ===
 */
 
-const snapshotSpaceSchema = z.object({});
-export const SnapshotProposalSchema: SchemaWithModel<
-  typeof snapshotSpaceSchema
-> = {
-  schema: snapshotSpaceSchema,
-  model: models.SnapshotProposal,
-  mockDefaults: () => ({}),
-};
+const snapshotSpaceSchema = z.object({
+  snapshot_space: z.string().max(255),
+  created_at: z.date(),
+  updated_at: z.date(),
+});
+export const SnapshotSpaceSchema: SchemaWithModel<typeof snapshotSpaceSchema> =
+  {
+    schema: snapshotSpaceSchema,
+    model: models.SnapshotSpace,
+    mockDefaults: () => ({}),
+    buildQuery: (data) => ({
+      where: {
+        snapshot_space: data.snapshot_space,
+      },
+    }),
+  };
 
 /*
-  === SnapshotSpace ===
+  === SnapshotProposal ===
 */
 
-const snapshotProposalSchema = z.object({});
-export const SnapshotSpaceSchema: SchemaWithModel<
+const snapshotProposalSchema = z.object({
+  id: z.string().max(255),
+  title: z.string().max(255).optional(),
+  body: z.string(),
+  choices: z.array(z.string().max(255)),
+  space: z.string().max(255),
+  event: z.string().max(255).optional(),
+  start: z.string().max(255).optional(),
+  expire: z.string().max(255).optional(),
+  is_upstream_deleted: z.string().default('false'),
+});
+export const SnapshotProposalSchema: SchemaWithModel<
   typeof snapshotProposalSchema
 > = {
   schema: snapshotProposalSchema,
-  model: models.SnapshotSpace,
-  mockDefaults: () => ({}),
+  model: models.SnapshotProposal,
+  mockDefaults: () => ({
+    // is_upstream_deleted: 'false',
+  }),
+  allowedGeneratedProps: ['id'],
 };
