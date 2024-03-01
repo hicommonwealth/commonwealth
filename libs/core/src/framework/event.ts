@@ -3,7 +3,7 @@ import { events } from '../schemas';
 import {
   EventContext,
   EventSchemas,
-  EventsHandler,
+  EventsHandlerMetadata,
   InvalidInput,
 } from './types';
 
@@ -17,7 +17,7 @@ import {
  * @throws {@link InvalidInput} when user invokes event with invalid payload, or rethrows internal domain errors
  */
 export const event = async <T, S extends EventSchemas, E extends events.Events>(
-  { schemas, body }: EventsHandler<T, S>,
+  { schemas, body }: EventsHandlerMetadata<T, S>,
   { name, payload }: EventContext<E, typeof events.schemas[E]>,
   validate = true,
 ): Promise<Partial<T> | undefined> => {

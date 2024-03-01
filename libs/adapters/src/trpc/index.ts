@@ -4,7 +4,7 @@ import {
   INVALID_INPUT_ERROR,
   type CommandMetadata,
   type EventSchemas,
-  type EventsHandler,
+  type EventsHandlerMetadata,
   type QueryMetadata,
 } from '@hicommonwealth/core';
 import { TRPCError, initTRPC } from '@trpc/server';
@@ -118,7 +118,7 @@ export const command = <T, P extends ZodObject<any>>(
 
 // TODO: add security options (API key, IP range, internal, etc)
 export const event = <T, S extends EventSchemas>(
-  factory: () => EventsHandler<T, S>,
+  factory: () => EventsHandlerMetadata<T, S>,
   tag: Tag.Policy | Tag.Projection | Tag.Integration,
 ) => {
   const md = factory();
