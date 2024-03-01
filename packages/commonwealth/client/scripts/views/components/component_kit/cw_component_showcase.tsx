@@ -5,7 +5,6 @@ import 'components/component_kit/cw_component_showcase.scss';
 import 'components/component_kit/new_designs/cw_button.scss';
 
 import { notifySuccess } from 'controllers/app/notifications';
-import { CWAccountCreationButton } from './cw_account_creation_button';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
 import { CWAuthButton } from './CWAuthButtonOld';
 
@@ -45,7 +44,6 @@ import { CWProgressBar } from './cw_progress_bar';
 import type { RadioButtonType } from './cw_radio_button';
 import { CWRadioButton } from './cw_radio_button';
 import { CWRadioGroup } from './cw_radio_group';
-import { CWSpinner } from './cw_spinner';
 import { CWText } from './cw_text';
 import { CWTextArea } from './cw_text_area';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
@@ -56,6 +54,8 @@ import { CWThreadAction } from './new_designs/cw_thread_action';
 import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
 import { CWUpvote } from './new_designs/cw_upvote';
 import { CWCircleButton } from './new_designs/CWCircleButton/CWCircleButton';
+import CWCircleMultiplySpinner from './new_designs/CWCircleMultiplySpinner';
+import CWCircleRingSpinner from './new_designs/CWCircleRingSpinner';
 import CWDrawer from './new_designs/CWDrawer';
 import { CWForm } from './new_designs/CWForm';
 import CWIconButton from './new_designs/CWIconButton';
@@ -1094,8 +1094,11 @@ export const ComponentShowcase = () => {
         />
       </div>
       <div className="basic-gallery">
-        <CWText type="h3">Spinner</CWText>
-        <CWSpinner />
+        <CWText type="h3">Spinners</CWText>
+        <CWText type="h4">Circle Multiply Spinner</CWText>
+        <CWCircleMultiplySpinner />
+        <CWText type="h4">Circle Ring Spinner</CWText>
+        <CWCircleRingSpinner />
       </div>
       <div className="basic-gallery">
         <CWText type="h3">Breadcrumbs</CWText>
@@ -1265,12 +1268,6 @@ export const ComponentShowcase = () => {
           label="Progress Bar (Ongoing) With Token"
           progressStatus="ongoing"
           subtext={`${Math.min(100, Math.floor(50 * 1000) / 1000)} CMN`}
-        />
-      </div>
-      <div className="card-gallery">
-        <CWText type="h3">Account Creation Button</CWText>
-        <CWAccountCreationButton
-          onClick={() => notifySuccess('Account creation button clicked!')}
         />
       </div>
       <div className="basic-gallery">
@@ -2198,11 +2195,7 @@ export const ComponentShowcase = () => {
           onClick={() => setIsDrawerOpen(true)}
         />
 
-        <CWDrawer
-          open={isDrawerOpen}
-          header="Lorem Ipsum"
-          onClose={() => setIsDrawerOpen(false)}
-        >
+        <CWDrawer open={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}>
           <div>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis
             porttitor vel erat nec eleifend. Nullam sit amet dui et eros luctus
@@ -2221,7 +2214,6 @@ export const ComponentShowcase = () => {
         />
         <CWDrawer
           open={isLeftDrawerOpen}
-          header="Lorem Ipsum"
           onClose={() => setIsLeftDrawerOpen(false)}
           direction="left"
         >

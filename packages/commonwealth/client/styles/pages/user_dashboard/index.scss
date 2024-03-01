@@ -1,42 +1,70 @@
 @import '../../shared';
 
 .UserDashboard {
-  display: flex;
-  flex: 1;
-  justify-content: space-between;
-  width: auto;
-  z-index: 0;
-  @media (min-width: $breakpoint-medium-min-px) {
-    /* CommunityPreviewCard 392px width +
-       DashboardCommunitiesPreview 50px right edge */
-    margin-right: 442px;
-  }
+  .page-header {
+    padding: 24px 56px;
 
-  @include contentPadding;
+    @include medium {
+      padding: 20px 40px;
+    }
 
-  .dashboard-column {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    min-width: 0;
+    @include mediumSmall {
+      padding: 16px 32px;
+    }
 
-    .dashboard-header {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      width: 100%;
-      margin-bottom: 16px;
-
-      @include small {
-        margin-top: 12px;
-      }
+    @include smallInclusive {
+      padding: 16px;
+      padding-top: 0 !important;
     }
   }
 
-  .Divider {
-    margin-top: 8px;
-    min-width: 100%;
-    max-width: 0;
+  .content {
+    display: grid;
+    width: 100%;
+    grid-template-rows: 1fr;
+
+    @include mediumSmallInclusive {
+      gap: 16px;
+    }
+
+    @media (min-width: $breakpoint-medium-min-px) {
+      grid-template-columns: 1fr 392px;
+      padding-right: 48px;
+    }
+
+    .user-dashboard-activity {
+      order: 2;
+
+      @media (min-width: $breakpoint-medium-min-px) {
+        order: unset;
+      }
+
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      min-width: 0;
+
+      @include contentPadding;
+      padding-top: 0 !important;
+
+      .dashboard-header {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        width: 100%;
+        margin-bottom: 16px;
+
+        @include small {
+          margin-top: 12px;
+        }
+      }
+    }
+
+    .Divider {
+      margin-top: 8px;
+      min-width: 100%;
+      max-width: 0;
+    }
   }
 }
 

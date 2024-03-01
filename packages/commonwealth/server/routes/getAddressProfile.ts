@@ -5,13 +5,13 @@ import type { TypedRequestBody, TypedResponse } from '../types';
 import { failure } from '../types';
 
 export const getAddressProfileValidation = [
-  body('chains').exists().toArray(),
+  body('communities').exists().toArray(),
   body('addresses').exists().toArray(),
 ];
 
 export type GetAddressProfileReq = {
   addresses: string[];
-  chains: string[];
+  communities: string[];
 };
 
 type GetAddressProfileResp = {
@@ -34,7 +34,7 @@ const getAddressProfiles = async (
 
   const addressEntities = await models.Address.findAll({
     where: {
-      community_id: { [Op.in]: req.body.chains },
+      community_id: { [Op.in]: req.body.communities },
       address: { [Op.in]: req.body.addresses },
     },
     include: [

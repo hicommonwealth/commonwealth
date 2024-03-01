@@ -101,7 +101,11 @@ class NamespaceFactory extends ContractBase {
       const uri = `${window.location.origin}/api/namespaceMetadata/${name}/{id}`;
       txReceipt = await this.contract.methods
         .deployNamespace(name, uri, feeManager, [])
-        .send({ from: walletAddress });
+        .send({
+          from: walletAddress,
+          maxPriorityFeePerGas: null,
+          maxFeePerGas: null,
+        });
     } catch (error) {
       throw new Error('Transaction failed: ' + error);
     }
@@ -135,10 +139,14 @@ class NamespaceFactory extends ContractBase {
           name + ' Community Stake',
           stakesId,
           '0x0000000000000000000000000000000000000000',
-          100000000,
+          2000000,
           0,
         )
-        .send({ from: walletAddress });
+        .send({
+          from: walletAddress,
+          maxPriorityFeePerGas: null,
+          maxFeePerGas: null,
+        });
     } catch {
       throw new Error('Transaction failed');
     }

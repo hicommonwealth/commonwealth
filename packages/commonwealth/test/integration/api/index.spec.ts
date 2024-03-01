@@ -45,7 +45,7 @@ describe('API Tests', () => {
         .set('Accept', 'application/json')
         .send({
           address,
-          chain,
+          community_id: chain,
           wallet_id,
           block_info: TEST_BLOCK_INFO_STRING,
         });
@@ -68,7 +68,7 @@ describe('API Tests', () => {
         .set('Accept', 'application/json')
         .send({
           address,
-          chain: community_id,
+          community_id,
           wallet_id,
           block_info: TEST_BLOCK_INFO_STRING,
         });
@@ -91,7 +91,7 @@ describe('API Tests', () => {
         .set('Accept', 'application/json')
         .send({
           address,
-          chain: community_id,
+          community_id,
           wallet_id,
           block_info: TEST_BLOCK_INFO_STRING,
         });
@@ -119,7 +119,7 @@ describe('API Tests', () => {
         .set('Accept', 'application/json')
         .send({
           address,
-          chain: community_id,
+          community_id,
           chain_id,
           signature,
           wallet_id,

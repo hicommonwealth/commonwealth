@@ -30,16 +30,9 @@ export async function fetchWebhooks(
     { categoryId: NotificationCategories.SnapshotProposal }
   >,
 ): Promise<WebhookInstance[]> {
-  let communityId: string;
-  if (notifDataCategory.categoryId === NotificationCategories.ChainEvent) {
-    communityId = notifDataCategory.data.chain;
-  } else {
-    communityId = notifDataCategory.data.chain_id;
-  }
-
   return await models.Webhook.findAll({
     where: {
-      community_id: communityId,
+      community_id: notifDataCategory.data.community_id,
       categories: {
         [Op.contains]: [notifDataCategory.categoryId],
       },
@@ -64,7 +57,7 @@ export async function getActorProfile(
   const address = await models.Address.findOne({
     where: {
       address: notif.data.author_address,
-      community_id: notif.data.chain_id,
+      community_id: notif.data.community_id,
     },
     include: [models.Profile],
   });
@@ -137,9 +130,9 @@ export function getThreadUrlFromNotification(
   }
 
   const data = notification.data;
-  return `${SERVER_URL}/${data.chain_id}/discussion/${data.thread_id}-${slugify(
-    data.root_title,
-  )}${commentId}`;
+  return `${SERVER_URL}/${data.community_id}/discussion/${
+    data.thread_id
+  }-${slugify(data.root_title)}${commentId}`;
 }
 
 export function getWebhookDestination(webhookUrl: string): WebhookDestinations {

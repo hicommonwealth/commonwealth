@@ -3,7 +3,7 @@ import { truncate } from 'helpers/truncate';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { IThreadCollaborator } from 'models/Thread';
 import moment from 'moment';
-import React, { ReactNode, useMemo } from 'react';
+import React, { ReactNode, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import app from 'state';
@@ -17,6 +17,7 @@ import { Thread } from '../../../../models/Thread';
 import { ThreadStage } from '../../../../models/types';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { ThreadOptions } from '../../../pages/discussions/ThreadCard/ThreadOptions';
+import { ViewThreadUpvotesDrawer } from '../../UpvoteDrawer';
 import { CWTab, CWTabsRow } from '../new_designs/CWTabs';
 import { ComponentType } from '../types';
 import './CWContentPage.scss';
@@ -116,6 +117,7 @@ export const CWContentPage = ({
   const navigate = useNavigate();
   const [urlQueryParams] = useSearchParams();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
     chainId: app.activeChainId(),
@@ -239,6 +241,7 @@ export const CWContentPage = ({
             onProposalStageChange={onProposalStageChange}
             disabledActionTooltipText={disabledActionsTooltipText}
             onSnapshotProposalFromThread={onSnapshotProposalFromThread}
+            setIsUpvoteDrawerOpen={setIsUpvoteDrawerOpen}
           />,
         )}
 
@@ -295,6 +298,11 @@ export const CWContentPage = ({
             sidebarComponents[2].item}
         </div>
       )}
+      <ViewThreadUpvotesDrawer
+        thread={thread}
+        isOpen={isUpvoteDrawerOpen}
+        setIsOpen={setIsUpvoteDrawerOpen}
+      />
     </div>
   );
 };

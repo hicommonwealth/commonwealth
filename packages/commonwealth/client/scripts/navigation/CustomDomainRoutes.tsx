@@ -56,11 +56,9 @@ const NewContractTemplatePage = lazy(
 );
 const ViewTemplatePage = lazy(() => import('views/pages/view_template'));
 
-const ManageCommunityPage = lazy(
-  () => import('views/pages/manage_community/ManageCommunityPage'),
-);
 const DiscordCallbackPage = lazy(
-  () => import('views/pages/manage_community/discord-callback'),
+  () =>
+    import('views/pages/CommunityManagement/Integrations/Discord/CallbackPage'),
 );
 const AnalyticsPage = lazy(() => import('views/pages/stats'));
 
@@ -96,7 +94,6 @@ const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
 const CustomDomainRoutes = ({
   proposalTemplatesEnabled,
-  newAdminOnboardingEnabled,
 }: RouteFeatureFlags) => {
   return [
     <Route
@@ -324,51 +321,34 @@ const CustomDomainRoutes = ({
     // CONTRACTS END
 
     // ADMIN
-    ...(newAdminOnboardingEnabled
-      ? [
-          <Route
-            key="/manage/profile"
-            path="/manage/profile"
-            element={withLayout(CommunityProfile, {
-              scoped: true,
-            })}
-          />,
-          <Route
-            key="/manage/integrations"
-            path="/manage/integrations"
-            element={withLayout(CommunityIntegrations, {
-              scoped: true,
-            })}
-          />,
-          <Route
-            key="/manage/topics"
-            path="/manage/topics"
-            element={withLayout(CommunityTopics, {
-              scoped: true,
-            })}
-          />,
-          <Route
-            key="/manage/moderators"
-            path="/manage/moderators"
-            element={withLayout(CommunityAdminAndModerators, {
-              scoped: true,
-            })}
-          />,
-        ]
-      : [
-          <Route
-            key="/:scope/manage"
-            path="/:scope/manage"
-            element={<Navigate to="/manage" />}
-          />,
-          <Route
-            key="/manage"
-            path="/manage"
-            element={withLayout(ManageCommunityPage, {
-              scoped: true,
-            })}
-          />,
-        ]),
+    <Route
+      key="/manage/profile"
+      path="/manage/profile"
+      element={withLayout(CommunityProfile, {
+        scoped: true,
+      })}
+    />,
+    <Route
+      key="/manage/integrations"
+      path="/manage/integrations"
+      element={withLayout(CommunityIntegrations, {
+        scoped: true,
+      })}
+    />,
+    <Route
+      key="/manage/topics"
+      path="/manage/topics"
+      element={withLayout(CommunityTopics, {
+        scoped: true,
+      })}
+    />,
+    <Route
+      key="/manage/moderators"
+      path="/manage/moderators"
+      element={withLayout(CommunityAdminAndModerators, {
+        scoped: true,
+      })}
+    />,
     <Route
       key="/discord-callback"
       path="/discord-callback"

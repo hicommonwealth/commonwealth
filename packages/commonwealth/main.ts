@@ -8,11 +8,10 @@ import {
 } from '@hicommonwealth/adapters';
 import { logger as _logger, cache } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
-import bodyParser from 'body-parser';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
-import express from 'express';
+import express, { RequestHandler, json, urlencoded } from 'express';
 import { redirectToHTTPS } from 'express-http-to-https';
 import session from 'express-session';
 import fs from 'fs';
@@ -33,8 +32,6 @@ import {
 } from './server/config';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
-import { addSwagger } from './server/routing/addSwagger';
-import { addExternalRoutes } from './server/routing/external';
 import setupAPI from './server/routing/router';
 import { sendBatchedNotificationEmails } from './server/scripts/emails';
 import setupAppRoutes from './server/scripts/setupAppRoutes';
@@ -157,10 +154,10 @@ export async function main(app: express.Express) {
     app.use('/static', express.static('static'));
 
     // add other middlewares
-    app.use(logger('dev'));
+    app.use(logger('dev') as RequestHandler);
     app.use(expressStatsInit());
-    app.use(bodyParser.json({ limit: '1mb' }));
-    app.use(bodyParser.urlencoded({ limit: '1mb', extended: false }));
+    app.use(json({ limit: '1mb' }) as RequestHandler);
+    app.use(urlencoded({ limit: '1mb', extended: false }) as RequestHandler);
     app.use(cookieParser());
     app.use(sessionParser);
     app.use(passport.initialize());
@@ -226,10 +223,6 @@ export async function main(app: express.Express) {
     dbValidationService,
   );
 
-  // new API
-  addExternalRoutes('/external', app, models);
-  addSwagger('/docs', app);
-
   setupCosmosProxy(app, models, cacheDecorator);
   setupIpfsProxy(app, cacheDecorator);
 
@@ -241,7 +234,14 @@ export async function main(app: express.Express) {
       ).default;
       await setupWebpackDevServer(app);
     } else {
-      app.use('/build', express.static('build'));
+      app.use(
+        '/build',
+        express.static('build', {
+          setHeaders: (res) => {
+            res.setHeader('Cache-Control', 'public');
+          },
+        }),
+      );
     }
   }
 

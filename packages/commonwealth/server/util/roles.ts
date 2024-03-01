@@ -10,7 +10,7 @@ import type { FindOptions, Transaction, WhereOptions } from 'sequelize';
 import { Op } from 'sequelize';
 
 export type RoleInstanceWithPermissionAttributes = RoleAssignmentAttributes & {
-  chain_id: string;
+  community_id: string;
   permission: Role;
   allow: number;
   deny: number;
@@ -18,20 +18,20 @@ export type RoleInstanceWithPermissionAttributes = RoleAssignmentAttributes & {
 
 export class RoleInstanceWithPermission {
   _roleAssignmentAttributes: RoleAssignmentAttributes;
-  chain_id: string;
+  community_id: string;
   permission: Role;
   allow: number;
   deny: number;
 
   constructor(
     _roleAssignmentInstance: RoleAssignmentAttributes,
-    chain_id: string,
+    community_id: string,
     permission: Role,
     allow: number,
     deny: number,
   ) {
     this._roleAssignmentAttributes = _roleAssignmentInstance;
-    this.chain_id = chain_id;
+    this.community_id = community_id;
     this.permission = permission;
     this.allow = allow;
     this.deny = deny;
@@ -40,7 +40,7 @@ export class RoleInstanceWithPermission {
   public toJSON(): RoleInstanceWithPermissionAttributes {
     return {
       ...this._roleAssignmentAttributes,
-      chain_id: this.chain_id,
+      community_id: this.community_id,
       permission: this.permission,
       allow: this.allow,
       deny: this.deny,
@@ -73,7 +73,7 @@ function convertToAddressQuery(findOptions: FindOptions) {
 export async function findAllCommunityRolesWithRoleAssignments(
   models: DB,
   findOptions: FindOptions<AddressInstance | { address_id: number }>,
-  chain_id?: string,
+  community_id?: string,
   permissions?: Role[],
 ): Promise<CommunityRoleAttributes[]> {
   const roleWhereOptions: WhereOptions<AddressAttributes> = {};
@@ -84,8 +84,8 @@ export async function findAllCommunityRolesWithRoleAssignments(
     roleWhereOptions.role = { [Op.in]: permissions };
   }
 
-  if (chain_id) {
-    roleWhereOptions.community_id = chain_id;
+  if (community_id) {
+    roleWhereOptions.community_id = community_id;
   }
 
   // if where exists, replace address_id with id, append it to our where
@@ -135,7 +135,7 @@ export async function findAllCommunityRolesWithRoleAssignments(
     const communityRole: CommunityRoleAttributes = {
       id: a.id,
       name: a.role,
-      chain_id: a.community_id,
+      community_id: a.community_id,
       allow: 0 as any,
       deny: 0 as any,
       created_at: a.created_at,
@@ -149,15 +149,15 @@ export async function findAllCommunityRolesWithRoleAssignments(
 export async function findAllRoles(
   models: DB,
   findOptions: FindOptions<AddressInstance | { address_id: number }>,
-  chain_id?: string,
+  community_id?: string,
   permissions?: Role[],
 ): Promise<RoleInstanceWithPermission[]> {
-  // find all CommunityRoles with chain id, permissions and find options given
+  // find all CommunityRoles with community id, permissions and find options given
   const communityRoles: CommunityRoleAttributes[] =
     await findAllCommunityRolesWithRoleAssignments(
       models,
       findOptions,
-      chain_id,
+      community_id,
       permissions,
     );
   const roles: RoleInstanceWithPermission[] = [];
@@ -168,7 +168,7 @@ export async function findAllRoles(
         for (const roleAssignment of roleAssignments) {
           const role = new RoleInstanceWithPermission(
             roleAssignment,
-            communityRole.chain_id,
+            communityRole.community_id,
             communityRole.name,
             communityRole.allow,
             communityRole.deny,
@@ -185,14 +185,14 @@ export async function findAllRoles(
 export async function findOneRole(
   models: DB,
   findOptions: FindOptions<RoleAssignmentAttributes>,
-  chain_id: string,
+  community_id: string,
   permissions?: Role[],
 ): Promise<RoleInstanceWithPermission> {
   const communityRoles: CommunityRoleAttributes[] =
     await findAllCommunityRolesWithRoleAssignments(
       models,
       findOptions,
-      chain_id,
+      community_id,
       permissions,
     );
   let communityRole: CommunityRoleAttributes;
@@ -212,7 +212,7 @@ export async function findOneRole(
     const roleAssignment = communityRole.RoleAssignments[0];
     role = new RoleInstanceWithPermission(
       roleAssignment,
-      chain_id,
+      community_id,
       communityRole.name,
       communityRole.allow,
       communityRole.deny,
@@ -224,7 +224,7 @@ export async function findOneRole(
 export async function createRole(
   models: DB,
   address_id: number,
-  chain_id: string,
+  community_id: string,
   role_name?: Role,
   is_user_default?: boolean,
   transaction?: Transaction,
@@ -237,7 +237,13 @@ export async function createRole(
       community_role_id: 1,
       address_id: address_id,
     };
-    return new RoleInstanceWithPermission(attributes, chain_id, 'member', 0, 0);
+    return new RoleInstanceWithPermission(
+      attributes,
+      community_id,
+      'member',
+      0,
+      0,
+    );
   }
 
   // update the role to be either the highest role either assigned or called on the address.
@@ -261,5 +267,11 @@ export async function createRole(
     address_id: address_id,
   };
 
-  return new RoleInstanceWithPermission(assignment, chain_id, role_name, 0, 0);
+  return new RoleInstanceWithPermission(
+    assignment,
+    community_id,
+    role_name,
+    0,
+    0,
+  );
 }

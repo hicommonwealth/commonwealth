@@ -2,8 +2,8 @@ import { Any } from 'cosmjs-types/google/protobuf/any';
 
 import type { ICosmosProposal } from 'controllers/chain/cosmos/types';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
-import type { ITXModalData } from 'models/interfaces';
 import ProposalModule from 'models/ProposalModule';
+import type { ITXModalData } from 'models/interfaces';
 import type CosmosAccount from '../../account';
 import type CosmosAccounts from '../../accounts';
 import type CosmosChain from '../../chain';
@@ -32,7 +32,7 @@ class CosmosGovernance extends ProposalModule<
 
   public async init(
     ChainInfo: CosmosChain,
-    Accounts: CosmosAccounts
+    Accounts: CosmosAccounts,
   ): Promise<void> {
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
@@ -53,7 +53,7 @@ class CosmosGovernance extends ProposalModule<
         this._Chain,
         this._Accounts,
         this,
-        msgToIProposal(proposal)
+        msgToIProposal(proposal),
       );
       cosmosProposal.init();
       return cosmosProposal;
@@ -68,7 +68,7 @@ class CosmosGovernance extends ProposalModule<
     description: string,
     initialDeposit: CosmosToken,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    memo = ''
+    memo = '',
   ): ITXModalData {
     throw new Error('unsupported');
   }
@@ -77,12 +77,12 @@ class CosmosGovernance extends ProposalModule<
   public async submitProposalTx(
     sender: CosmosAccount,
     initialDeposit: CosmosToken,
-    content: Any
+    content: Any,
   ): Promise<number> {
     const msg = encodeMsgSubmitProposal(
       sender.address,
       initialDeposit,
-      content
+      content,
     );
 
     // fetch completed proposal from returned events
@@ -91,7 +91,7 @@ class CosmosGovernance extends ProposalModule<
     const submitEvent = events.find((e) => e.type === 'submit_proposal');
     const cosm = await import('@cosmjs/encoding');
     const idAttribute = submitEvent.attributes.find(
-      ({ key }) => cosm.fromAscii(key) === 'proposal_id'
+      ({ key }) => cosm.fromAscii(key) === 'proposal_id',
     );
     const id = +cosm.fromAscii(idAttribute.value);
     await this._initProposal(id);

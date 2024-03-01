@@ -50,11 +50,17 @@ export const UserDashboardRow = ({
     );
   }
 
-  const { commentCount, categoryId, threadId, blockNumber, chain, commenters } =
-    notification;
+  const {
+    commentCount,
+    categoryId,
+    threadId,
+    blockNumber,
+    communityId,
+    commenters,
+  } = notification;
 
   if (categoryId === 'chain-event') {
-    const communityInfo = app.config.chains.getById(chain);
+    const communityInfo = app.config.chains.getById(communityId);
 
     return (
       <UserDashboardChainEventRow
@@ -65,11 +71,11 @@ export const UserDashboardRow = ({
     );
   }
 
-  const { chain_id, thread_id, root_type, comment_id } = JSON.parse(
+  const { community_id, thread_id, root_type, comment_id } = JSON.parse(
     notification.notificationData,
   );
 
-  const path = getProposalUrlPath(root_type, thread_id, false, chain_id);
+  const path = getProposalUrlPath(root_type, thread_id, false, community_id);
 
   return (
     <Link
@@ -83,7 +89,7 @@ export const UserDashboardRow = ({
       <UserDashboardRowBottom
         threadId={threadId}
         commentId={comment_id}
-        communityId={chain_id}
+        communityId={community_id}
         commentCount={commentCount}
         commenters={commenters}
       />

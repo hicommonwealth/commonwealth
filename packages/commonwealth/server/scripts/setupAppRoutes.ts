@@ -9,10 +9,6 @@ const log = logger().getLogger(__filename);
 const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true';
 const DEV = process.env.NODE_ENV !== 'production';
 
-function cleanMalformedUrl(str: string) {
-  return str.replace(/.*(https:\/\/.*https:\/\/)/, '$1');
-}
-
 const decodeTitle = (title: string) => {
   try {
     return decodeURIComponent(title);
@@ -78,6 +74,13 @@ const setupAppRoutes = (app, models: DB, templateFile, sendFile) => {
       '<meta name="twitter:image" content="$1">',
     );
 
+    // Don't cache initial html for too long on CDN so that we do not run into cache invalidation issues
+    res.setHeader(
+      'Cache-Control',
+      'no-store, no-cache, must-revalidate, max-age=0',
+    );
+    res.setHeader('CDN-Cache-Control', 'max-age=10');
+
     res.send(twitterSafeHtml);
   };
 
@@ -126,17 +129,17 @@ const setupAppRoutes = (app, models: DB, templateFile, sendFile) => {
     scope: string,
     req,
     res,
-    chain?: CommunityInstance,
+    community?: CommunityInstance,
   ) => {
     // Retrieve title, description, and author from the database
-    chain = chain || (await getChain(req, scope));
+    community = community || (await getCommunity(req, scope));
 
-    const title = chain ? chain.name : 'Commonwealth';
+    const title = community ? community.name : 'Commonwealth';
     const description = '';
-    const image = chain?.icon_url
-      ? chain.icon_url.match(`^(http|https)://`)
-        ? chain.icon_url
-        : `https://commonwealth.im${chain.icon_url}`
+    const image = community?.icon_url
+      ? community.icon_url.match(`^(http|https)://`)
+        ? community.icon_url
+        : `https://commonwealth.im${community.icon_url}`
       : DEFAULT_COMMONWEALTH_LOGO;
     const author = '';
     const url = getUrl(req);
@@ -145,15 +148,15 @@ const setupAppRoutes = (app, models: DB, templateFile, sendFile) => {
   };
 
   async function renderGeneralPage(req, res) {
-    // Retrieve chain
+    // Retrieve community
     const scope = req.params.scope;
-    const chain = await getChain(req, scope);
-    const title = chain ? chain.name : 'Commonwealth';
-    const description = chain ? chain.description : '';
-    const image = chain?.icon_url
-      ? chain.icon_url.match(`^(http|https)://`)
-        ? chain.icon_url
-        : `https://commonwealth.im${chain.icon_url}`
+    const community = await getCommunity(req, scope);
+    const title = community ? community.name : 'Commonwealth';
+    const description = community ? community.description : '';
+    const image = community?.icon_url
+      ? community.icon_url.match(`^(http|https)://`)
+        ? community.icon_url
+        : `https://commonwealth.im${community.icon_url}`
       : DEFAULT_COMMONWEALTH_LOGO;
     const author = '';
     const url = getUrl(req);
@@ -184,7 +187,7 @@ const setupAppRoutes = (app, models: DB, templateFile, sendFile) => {
 
   app.get('/:scope?/proposal/:identifier', async (req, res) => {
     const scope = req.params.scope;
-    const chain = await getChain(req, scope);
+    const community = await getCommunity(req, scope);
 
     const proposalTypes = new Set([
       ChainNetwork.Sputnik,
@@ -193,17 +196,17 @@ const setupAppRoutes = (app, models: DB, templateFile, sendFile) => {
     ]);
 
     if (
-      !proposalTypes.has(chain?.network) &&
-      chain?.base !== ChainBase.CosmosSDK
+      !proposalTypes.has(community?.network) &&
+      community?.base !== ChainBase.CosmosSDK
     ) {
       renderWithMetaTags(res, '', '', '', null, null);
       return;
     }
 
-    await renderProposal(scope, req, res, chain);
+    await renderProposal(scope, req, res, community);
   });
 
-  async function getChain(req, scope: string) {
+  async function getCommunity(req, scope: string) {
     return scope
       ? await models.Community.findOne({ where: { id: scope } })
       : await models.Community.findOne({

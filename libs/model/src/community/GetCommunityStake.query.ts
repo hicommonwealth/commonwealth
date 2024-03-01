@@ -4,14 +4,18 @@ import { models } from '../database';
 import { CommunityStakeAttributes } from '../models/community_stake';
 
 const schema = z.object({
-  community_id: z.string(),
-  stake_id: z.coerce.number().int().optional(),
+  community_id: z.string().describe('The community id'),
+  stake_id: z.coerce
+    .number()
+    .int()
+    .optional()
+    .describe('The stake id or all stakes when undefined'),
 });
 
-export const GetCommunityStake: QueryMetadata<
+export const GetCommunityStake = (): QueryMetadata<
   CommunityStakeAttributes,
   typeof schema
-> = {
+> => ({
   schema,
   auth: [],
   body: async ({ payload }) => {
@@ -28,4 +32,4 @@ export const GetCommunityStake: QueryMetadata<
       })
     )?.get({ plain: true });
   },
-};
+});
