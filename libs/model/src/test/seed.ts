@@ -66,7 +66,7 @@ export async function bulkSeed<T extends SchemaWithModel<any>>(
   allOverrides: Partial<z.infer<T['schema']>>[] = [],
   options?: SeedOptions,
 ): Promise<Model<z.infer<T['schema']>>[]> {
-  let createdEntities: Model<z.infer<T['schema']>>[] = [];
+  const createdEntities: Model<z.infer<T['schema']>>[] = [];
   for (const overrides of allOverrides) {
     const entity = await seed(params, overrides, options);
     createdEntities.push(entity);
