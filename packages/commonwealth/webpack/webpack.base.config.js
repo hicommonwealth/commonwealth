@@ -89,11 +89,6 @@ module.exports = {
       'process.env.IS_PRODUCTION': JSON.stringify(process.env.IS_PRODUCTION),
     }),
     new webpack.DefinePlugin({
-      'process.env.FLAG_ROOT_DOMAIN_REBRAND': JSON.stringify(
-        process.env.FLAG_ROOT_DOMAIN_REBRAND,
-      ),
-    }),
-    new webpack.DefinePlugin({
       'process.env.UNLEASH_FRONTEND_SERVER_URL': JSON.stringify(
         process.env.UNLEASH_FRONTEND_SERVER_URL,
       ),
