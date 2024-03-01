@@ -22,7 +22,6 @@ const featureFlags = {
   proposalTemplates: buildFlag(process.env.FLAG_PROPOSAL_TEMPLATES),
   communityHomepage: buildFlag(process.env.FLAG_COMMUNITY_HOMEPAGE),
   communityStake: buildFlag(process.env.FLAG_COMMUNITY_STAKE),
-  newSignInModal: buildFlag(process.env.FLAG_NEW_SIGN_IN_MODAL),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;

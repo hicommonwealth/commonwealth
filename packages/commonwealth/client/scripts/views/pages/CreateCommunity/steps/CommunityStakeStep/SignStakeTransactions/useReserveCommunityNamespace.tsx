@@ -27,7 +27,7 @@ const useReserveCommunityNamespace = ({
   const [reserveNamespaceData, setReserveNamespaceData] =
     useState<ActionState>(defaultActionState);
 
-  const { namespaceFactory } = useNamespaceFactory();
+  const { namespaceFactory } = useNamespaceFactory(parseInt(chainId));
   const { mutateAsync: updateCommunity } = useUpdateCommunityMutation();
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
