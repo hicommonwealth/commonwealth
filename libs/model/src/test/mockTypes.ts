@@ -94,6 +94,28 @@ export const ContractSchema: SchemaWithModel<typeof contractSchema> = {
 };
 
 /*
+  === Contract ===
+*/
+
+const communityContractSchema = z.object({
+  id: z.number().int(),
+  community_id: z.string().max(255),
+  contract_id: z.number().int().max(MAX_SCHEMA_INT),
+  created_at: z.date(),
+  updated_at: z.date(),
+});
+export const CommunityContractSchema: SchemaWithModel<
+  typeof communityContractSchema
+> = {
+  schema: communityContractSchema,
+  model: models.CommunityContract,
+  mockDefaults: () => ({
+    community_id: 'ethereum',
+    contract_id: 1,
+  }),
+};
+
+/*
   === Community ===
 */
 
@@ -355,8 +377,6 @@ export const SnapshotProposalSchema: SchemaWithModel<
 > = {
   schema: snapshotProposalSchema,
   model: models.SnapshotProposal,
-  mockDefaults: () => ({
-    // is_upstream_deleted: 'false',
-  }),
+  mockDefaults: () => ({}),
   allowedGeneratedProps: ['id'],
 };

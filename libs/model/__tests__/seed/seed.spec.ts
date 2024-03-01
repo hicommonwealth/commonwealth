@@ -12,6 +12,7 @@ import z from 'zod';
 import {
   AddressSchema,
   ChainNodeSchema,
+  CommunityContractSchema,
   CommunitySchema,
   CommunityStakeSchema,
   ContractSchema,
@@ -30,14 +31,25 @@ import {
 // testSeed creates an entity using the `seed` function
 // then attempts to find the entity and validate it
 async function testSeed<T extends SchemaWithModel<any>>(
-  schemaModel: T,
-  overrides: Partial<z.infer<T['schema']>> = {},
+  schemaModel: T, // zod schema
+  overrides: Partial<z.infer<T['schema']>> = {}, // override attributes
   options?: {
-    excludeOverrideChecks?: (keyof typeof overrides)[];
+    seedOptions?: {
+      // options for seeding
+      noMock: boolean;
+    };
+    testOptions?: {
+      // options for test
+      excludeOverrideChecks?: (keyof typeof overrides)[];
+    };
   },
 ) {
   // create entity
-  const createdEntity = await seed(schemaModel, overrides);
+  const createdEntity = await seed(
+    schemaModel,
+    overrides,
+    options?.seedOptions,
+  );
   expect(createdEntity, 'failed to create entity').not.to.be.null;
 
   // perform schema validation on created entity (throws)
@@ -78,7 +90,7 @@ async function testSeed<T extends SchemaWithModel<any>>(
   // check that the final entity matches the specified overrides,
   // except for explicitly excluded attributes
   const overridesToCheck = Object.keys(overrides).reduce((acc, k) => {
-    if (options?.excludeOverrideChecks?.includes(k)) {
+    if (options?.testOptions?.excludeOverrideChecks?.includes(k)) {
       return acc;
     }
     return {
@@ -113,6 +125,25 @@ describe('Seed functions', () => {
       await testSeed(UserSchema);
     });
 
+    step('Should not mock data if noMock option is provided', async () => {
+      let seedErr = null;
+      try {
+        await testSeed(
+          UserSchema,
+          {},
+          {
+            seedOptions: {
+              noMock: true,
+            },
+          },
+        );
+      } catch (err) {
+        seedErr = err;
+      }
+      expect(seedErr).to.be.an('error');
+      expect(seedErr).to.have.property('name', 'ZodError');
+    });
+
     step('Should seed with overrides', async () => {
       // NOTE: some props like emailVerified and isAdmin
       // are explicitly excluded via sequelize model config
@@ -124,7 +155,9 @@ describe('Seed functions', () => {
           isAdmin: true,
         },
         {
-          excludeOverrideChecks: ['emailVerified', 'isAdmin'],
+          testOptions: {
+            excludeOverrideChecks: ['emailVerified', 'isAdmin'],
+          },
         },
       );
     });
@@ -180,6 +213,33 @@ describe('Seed functions', () => {
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
         chain_node_id: 1,
+      });
+      await testSeed(CommunitySchema, {
+        id: 'superEth',
+        network: ChainNetwork.Ethereum,
+        default_symbol: 'SETH',
+        name: 'Super Eth',
+        icon_url: '/static/img/protocols/eth.png',
+        active: true,
+        type: ChainType.Chain,
+        base: ChainBase.Ethereum,
+        has_chain_events_listener: false,
+        chain_node_id: 2,
+      });
+    });
+  });
+
+  describe('CommunityContract', () => {
+    step('Should seed with defaults', async () => {
+      // has community ID unique constraint,
+      // so can only seed with default values once
+      await testSeed(CommunityContractSchema);
+    });
+
+    step('Should seed with overrides', async () => {
+      await testSeed(CommunityContractSchema, {
+        community_id: 'superEth',
+        contract_id: 2,
       });
     });
   });
@@ -249,11 +309,13 @@ describe('Seed functions', () => {
           is_user_default: false,
         },
         {
-          excludeOverrideChecks: [
-            'verification_token',
-            'verification_token_expires',
-            'verified',
-          ],
+          testOptions: {
+            excludeOverrideChecks: [
+              'verification_token',
+              'verification_token_expires',
+              'verified',
+            ],
+          },
         },
       );
     });

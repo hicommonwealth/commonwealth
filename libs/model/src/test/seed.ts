@@ -28,24 +28,50 @@ export type SchemaWithModel<T extends z.AnyZodObject> = {
   };
 };
 
+export type SeedOptions = {
+  noMock: boolean;
+};
+
 export async function seed<T extends SchemaWithModel<any>>(
   { schema, model, mockDefaults, allowedGeneratedProps }: T,
   overrides: Partial<z.infer<T['schema']>> = {},
+  options?: SeedOptions,
 ): Promise<Model<z.infer<T['schema']>>> {
-  const mockData = generateMock(schema, {
-    seed: seedNum++,
-  });
-  for (const prop of GENERATED_PROPS) {
-    if (!allowedGeneratedProps?.includes(prop)) {
-      delete mockData[prop];
+  const mockData = (() => {
+    if (options?.noMock) {
+      return {};
     }
-  }
+    const m = generateMock(schema, {
+      seed: seedNum++,
+    });
+    for (const prop of GENERATED_PROPS) {
+      if (!allowedGeneratedProps?.includes(prop)) {
+        delete m[prop];
+      }
+    }
+    return m;
+  })();
+
   const data = {
     ...mockData,
     ...mockDefaults?.(),
     ...overrides,
   };
 
-  console.log(`data #${seedNum} [${model.name}]: `, data);
+  // console.log(`data #${seedNum} [${model.name}]: `, data);
   return model.create(data);
+}
+
+// TODO: implement proper bulkCreate
+export async function bulkSeed<T extends SchemaWithModel<any>>(
+  params: T,
+  allOverrides: Partial<z.infer<T['schema']>>[] = [],
+  options?: SeedOptions,
+): Promise<Model<z.infer<T['schema']>>[]> {
+  let createdEntities: Model<z.infer<T['schema']>>[] = [];
+  for (const overrides of allOverrides) {
+    const entity = await seed(params, overrides, options);
+    createdEntities.push(entity);
+  }
+  return createdEntities;
 }
