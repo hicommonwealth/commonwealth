@@ -126,6 +126,7 @@ export default (
       namespace: { type: dataTypes.STRING, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: true },
       updated_at: { type: dataTypes.DATE, allowNull: true },
+      redirect: { type: dataTypes.TEXT, allowNull: true },
     },
     {
       tableName: 'Communities',
