@@ -1,12 +1,12 @@
-import { QueryMetadata, schemas } from '@hicommonwealth/core';
+import { QueryMetadata, community } from '@hicommonwealth/core';
 import { z } from 'zod';
 import { models } from '../database';
 
 export const GetCommunityStake = (): QueryMetadata<
-  z.infer<typeof schemas.community.GetCommunityStake.output>,
-  typeof schemas.community.GetCommunityStake.input
+  z.infer<typeof community.GetCommunityStake.output>,
+  typeof community.GetCommunityStake.input
 > => ({
-  schema: schemas.community.GetCommunityStake.input,
+  schema: community.GetCommunityStake.input,
   auth: [],
   body: async ({ payload }) => {
     return (
