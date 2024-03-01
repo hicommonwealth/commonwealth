@@ -27,6 +27,7 @@ import { useBrowserAnalyticsTrack } from '../../../../../../hooks/useBrowserAnal
 import './BasicInformationForm.scss';
 import {
   BASE_ID,
+  BLAST_ID,
   OSMOSIS_ID,
   POLYGON_ETH_CHAIN_ID,
   existingCommunityIds,
@@ -118,6 +119,10 @@ const BasicInformationForm = ({
       case CommunityType.Cosmos:
         return {
           chain: getChainOptions()?.find((o) => o.value === OSMOSIS_ID),
+        };
+      case CommunityType.Blast:
+        return {
+          chain: getChainOptions()?.find((o) => o.value === BLAST_ID),
         };
       case CommunityType.Polygon:
       case CommunityType.Solana:
