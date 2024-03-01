@@ -1,29 +1,8 @@
 import faker from 'faker';
 import React from 'react';
-import { CWTag } from '../../components/component_kit/new_designs/CWTag';
-import { CWButton } from './new_designs/cw_button';
-
-// CWTypeaheadSelectList
-export const optionList = [
-  { value: '1inch', label: '1 Inch' },
-  { value: 'atom-blockchain', label: 'Atom Blockchain' },
-  { value: 'dydx', label: 'dydx' },
-  { value: 'edgeware', label: 'Edgeware' },
-  { value: 'maia-dao', label: 'Maia Dao' },
-  { value: 'oraichain', label: 'Oraichain' },
-  { value: 'stargate-finance', label: 'Stargate Finance' },
-  { value: 'stargaze', label: 'Stargaze' },
-  { value: 'terra-classic', label: 'Terra Classic' },
-];
-
-// CWTable
-const range = (len: number) => {
-  const arr = [];
-  for (let i = 0; i < len; i++) {
-    arr.push(i);
-  }
-  return arr;
-};
+import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
 const tagTypes = [
   'passed',
@@ -38,6 +17,14 @@ const tagTypes = [
 const buttonTypes = ['primary', 'secondary', 'tertiary', 'destructive'];
 
 const iconNames = ['cloud', 'mail', 'sun', 'cow'];
+
+const range = (len: number) => {
+  const arr = [];
+  for (let i = 0; i < len; i++) {
+    arr.push(i);
+  }
+  return arr;
+};
 
 const newCommunity = (): any => {
   const tagType = faker.helpers.shuffle(tagTypes)[0];
@@ -62,15 +49,15 @@ const newCommunity = (): any => {
   };
 };
 
-export function makeData(num: number) {
+const makeData = (num: number) => {
   return range(num).map((): any => {
     return {
       ...newCommunity(),
     };
   });
-}
+};
 
-export function createColumnInfo() {
+const createColumnInfo = () => {
   return [
     {
       key: 'name',
@@ -109,4 +96,17 @@ export function createColumnInfo() {
       sortable: false,
     },
   ];
-}
+};
+
+const rowData = makeData(6);
+const columnInfo = createColumnInfo();
+
+const TablesShowcase = () => {
+  return (
+    <>
+      <CWTable columnInfo={columnInfo} rowData={rowData} />
+    </>
+  );
+};
+
+export default TablesShowcase;
