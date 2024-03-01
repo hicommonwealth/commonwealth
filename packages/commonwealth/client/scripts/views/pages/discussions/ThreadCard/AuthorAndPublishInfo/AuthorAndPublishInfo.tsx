@@ -79,8 +79,6 @@ export const AuthorAndPublishInfo = ({
 
   const fromDiscordBot = discord_meta !== null && discord_meta !== undefined;
 
-  console.log(collaboratorsInfo);
-
   return (
     <div className="AuthorAndPublishInfo" ref={containerRef}>
       <FullUser
