@@ -5,14 +5,17 @@ import { rollbar } from '../rollbar';
 let logLevel: 'info' | 'debug';
 let transport: DestinationStream;
 
-if (process.env.NODE_ENV !== 'production') {
+const node_env = process.env.NODE_ENV;
+
+if (node_env !== 'production') {
   transport = pino.transport({
     target: 'pino-pretty',
     options: {
-      destination: 1,
-      include: 'time,level,name',
-      sync: process.env.NODE_ENV === 'test',
-    }, // STDOUT
+      destination: 1, // STDOUT
+      ignore: 'pid,hostname',
+      errorLikeObjectKeys: ['e', 'err', 'error'],
+      sync: node_env === 'test',
+    },
   });
   logLevel = 'debug';
 } else logLevel = 'info';
@@ -39,7 +42,9 @@ export const PinoLogger = (): Logger => ({
               time: bindings.time,
               hostname: bindings.hostname,
               pid: bindings.pid,
-              filename: bindings.name,
+              filename: node_env === 'production' ? bindings.name : undefined,
+              name: node_env !== 'production' ? bindings.name : undefined,
+              ids: ids.length > 0 ? ids : undefined,
             };
           },
         },
@@ -53,31 +58,29 @@ export const PinoLogger = (): Logger => ({
     );
 
     return {
-      trace(msg: string, error?: Error) {
-        if (error) logger.trace(error, msg);
-        else logger.trace(msg);
+      trace(msg: string, error?: Error, context?: Record<string, unknown>) {
+        logger.trace({ ...context, err: error }, msg);
       },
-      debug(msg: string, error?: Error) {
-        if (error) logger.debug(error, msg);
-        else logger.debug(msg);
+      debug(msg: string, error?: Error, context?: Record<string, unknown>) {
+        logger.debug({ ...context, err: error }, msg);
       },
-      info(msg: string, error?: Error) {
-        if (error) logger.info(error, msg);
-        else logger.info(msg);
+      info(msg: string, error?: Error, context?: Record<string, unknown>) {
+        logger.info({ ...context, err: error }, msg);
       },
-      warn(msg: string, error?: Error) {
-        if (error) logger.warn(error, msg);
-        else logger.warn(msg);
+      warn(msg: string, error?: Error, context?: Record<string, unknown>) {
+        logger.warn({ ...context, err: error }, msg);
       },
-      error(msg: string, error?: Error) {
-        if (error) logger.error(error, msg);
-        else logger.error(msg);
-        rollbar.critical(msg, error ?? '');
+      error(msg: string, error?: Error, context?: Record<string, unknown>) {
+        logger.error({ ...context, err: error }, msg);
+
+        if (context) rollbar.error(msg, error ?? '', context);
+        else rollbar.error(msg, error ?? '');
       },
-      fatal(msg: string, error?: Error) {
-        if (error) logger.error(error, msg);
-        else logger.error(msg);
-        rollbar.critical(msg, error ?? '');
+      fatal(msg: string, error?: Error, context?: Record<string, unknown>) {
+        logger.fatal({ ...context, err: error }, msg);
+
+        if (context) rollbar.critical(msg, error ?? '', context);
+        else rollbar.critical(msg, error ?? '');
       },
     };
   },
