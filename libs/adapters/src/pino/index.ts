@@ -8,10 +8,19 @@ let transport: DestinationStream;
 if (process.env.NODE_ENV !== 'production') {
   transport = pino.transport({
     target: 'pino-pretty',
-    options: { destination: 1 }, // STDOUT
+    options: {
+      destination: 1,
+      include: 'time,level,name',
+      sync: process.env.NODE_ENV === 'test',
+    }, // STDOUT
   });
   logLevel = 'debug';
 } else logLevel = 'info';
+
+const formatFilename = (name: string) => {
+  const t = name.split('/');
+  return t[t.length - 1];
+};
 
 export const PinoLogger = (): Logger => ({
   name: 'PinoLogger',
@@ -25,13 +34,20 @@ export const PinoLogger = (): Logger => ({
             return { level: label.toUpperCase() };
           },
           bindings: (bindings) => {
-            return { filename, ...bindings };
+            return {
+              level: bindings.level,
+              time: bindings.time,
+              hostname: bindings.hostname,
+              pid: bindings.pid,
+              filename: bindings.name,
+            };
           },
         },
         redact: {
           paths: [],
           censor: '[PINO REDACTED]',
         },
+        name: formatFilename(filename),
       },
       transport,
     );

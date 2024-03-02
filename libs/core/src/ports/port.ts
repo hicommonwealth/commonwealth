@@ -26,7 +26,7 @@ export function port<T extends Disposable>(factory: AdapterFactory<T>) {
       const instance = factory(adapter);
       adapters.set(factory.name, instance);
       logger()
-        .getLogger('ports')
+        .getLogger(__filename)
         .info(`[binding adapter] ${instance.name || factory.name}`);
       return instance;
     }
@@ -52,7 +52,7 @@ const disposeAndExit = async (code: ExitCode = 'UNIT_TEST'): Promise<void> => {
   await Promise.all(
     [...adapters].reverse().map(async ([key, adapter]) => {
       logger()
-        .getLogger('ports')
+        .getLogger(__filename)
         .info(`[disposing adapter] ${adapter.name || key}`);
       await adapter.dispose();
     }),
