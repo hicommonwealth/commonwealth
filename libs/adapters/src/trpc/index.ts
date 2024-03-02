@@ -74,11 +74,7 @@ export enum Tag {
   Integration = 'Integration',
 }
 
-export const command = <
-  Input extends ZodObject<any>,
-  Output extends ZodObject<any>,
-  S extends Schemas<Input, Output>,
->(
+export const command = <S extends Schemas>(
   factory: () => CommandMetadata<S>,
   tag: Tag,
 ) => {
@@ -93,7 +89,7 @@ export const command = <
       },
     })
     .input(
-      md.schemas.input.extend({
+      (md.schemas.input as ZodObject<any>).extend({
         id: z.string(),
         address_id: z.string().optional(),
       }),
@@ -154,13 +150,7 @@ export const event = <
     });
 };
 
-export const query = <
-  Input extends ZodObject<any>,
-  Output extends ZodObject<any>,
-  S extends Schemas<Input, Output>,
->(
-  factory: () => QueryMetadata<S>,
-) => {
+export const query = <S extends Schemas>(factory: () => QueryMetadata<S>) => {
   const md = factory();
   return trpc.procedure
     .meta({
@@ -171,7 +161,11 @@ export const query = <
       },
       protect: md.secure,
     })
-    .input(md.schemas.input.extend({ address_id: z.string().optional() }))
+    .input(
+      (md.schemas.input as ZodObject<any>).extend({
+        address_id: z.string().optional(),
+      }),
+    )
     .output(md.schemas.output)
     .query(async ({ ctx, input }) => {
       if (md.secure) await authenticate(ctx.req);
