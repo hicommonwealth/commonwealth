@@ -1,4 +1,4 @@
-import { ZodError, ZodSchema } from 'zod';
+import { z, ZodError } from 'zod';
 import {
   InvalidInput,
   type QueryContext,
@@ -16,17 +16,13 @@ import {
  * @returns query results
  * @throws {@link InvalidInput} when user invokes query with invalid payload or attributes, or rethrows internal errors
  */
-export const query = async <
-  Input extends ZodSchema,
-  Output extends ZodSchema,
-  S extends Schemas<Input, Output>,
->(
+export const query = async <S extends Schemas>(
   { schemas, auth, body }: QueryMetadata<S>,
-  { actor, payload }: QueryContext<Input>,
+  { actor, payload }: QueryContext<S>,
   validate = true,
-): Promise<Output | undefined> => {
+): Promise<z.infer<S['output']> | undefined> => {
   try {
-    const context: QueryContext<Input> = {
+    const context: QueryContext<S> = {
       actor,
       payload: validate
         ? Object.fromEntries(

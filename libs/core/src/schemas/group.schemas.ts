@@ -58,6 +58,22 @@ export const Requirement = z.union([
   }),
 ]);
 
+export const GroupMetadata = z.object({
+  name: z.string(),
+  description: z.string(),
+  required_requirements: z.number().optional(),
+  membership_ttl: z.number().optional(), // NOT USED
+});
+
+export const Group = z.object({
+  id: z.number(),
+  community_id: z.string(),
+  metadata: GroupMetadata,
+  requirements: z.array(Requirement),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
+});
+
 export const CreateGroup = {
   input: z.object({
     metadata: z.object({
@@ -69,5 +85,5 @@ export const CreateGroup = {
     requirements: z.array(Requirement),
     topics: z.array(z.number()).optional(),
   }),
-  output: Community,
+  output: Community.extend({ groups: z.array(Group).optional() }),
 };
