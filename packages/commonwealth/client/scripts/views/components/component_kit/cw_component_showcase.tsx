@@ -2116,22 +2116,12 @@ export const ComponentShowcase = () => {
       <div className="community-card">
         <CWText type="h3"> Community Card </CWText>
         <CWRelatedCommunityCard
-          id="id"
-          communityName={app.config.chains.getById('basindao').name}
-          communityDescription={
-            app.config.chains.getById('basindao').description
-          }
-          communityIconUrl={app.config.chains.getById('basindao').iconUrl}
-          memberCount="2623"
-          threadCount="437"
-          actions={
-            <CWButton
-              buttonType="primary"
-              disabled={false}
-              className="action-btn"
-              label="Action"
-            />
-          }
+          community={app.config.chains.getAll()[30]}
+          connected={false}
+          memberCount={123}
+          threadCount={456}
+          stakeValue={789.2}
+          stakeChange={-3.5}
         />
       </div>
 
