@@ -77,6 +77,31 @@ export const UpgradeRolesForm = ({
     setRadioButtons(updatedRadioButtons);
   };
 
+  const handleUpgrade = () => {
+    const indexOfName = nonAdminNames.indexOf(user);
+
+    const _user = nonAdmins[indexOfName];
+
+    const newRole =
+      role === 'Admin' ? 'admin' : role === 'Moderator' ? 'moderator' : '';
+
+    $.post(`${app.serverUrl()}/upgradeMember`, {
+      new_role: newRole,
+      address: _user.Address.address,
+      ...communityObj,
+      jwt: app.user.jwt,
+    }).then((r) => {
+      if (r.status === 'Success') {
+        notifySuccess('Member upgraded');
+      } else {
+        notifyError('Upgrade failed');
+      }
+
+      onRoleUpdate(_user, r.result);
+    });
+    zeroOutRadioButtons();
+  };
+
   return (
     <div>
       <CWLabel label={label} />
@@ -132,34 +157,7 @@ export const UpgradeRolesForm = ({
           <CWButton
             label="Upgrade Member"
             disabled={!role || !user}
-            onClick={() => {
-              const indexOfName = nonAdminNames.indexOf(user);
-
-              const _user = nonAdmins[indexOfName];
-
-              const newRole =
-                role === 'Admin'
-                  ? 'admin'
-                  : role === 'Moderator'
-                  ? 'moderator'
-                  : '';
-
-              $.post(`${app.serverUrl()}/upgradeMember`, {
-                new_role: newRole,
-                address: _user.Address.address,
-                ...communityObj,
-                jwt: app.user.jwt,
-              }).then((r) => {
-                if (r.status === 'Success') {
-                  notifySuccess('Member upgraded');
-                } else {
-                  notifyError('Upgrade failed');
-                }
-
-                onRoleUpdate(_user, r.result);
-              });
-              zeroOutRadioButtons();
-            }}
+            onClick={handleUpgrade}
           />
         </div>
       </div>
