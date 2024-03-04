@@ -11,10 +11,15 @@ import { models } from '@hicommonwealth/model';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
-import express, { RequestHandler, json, urlencoded } from 'express';
+import express, {
+  RequestHandler,
+  json,
+  urlencoded,
+  type Request,
+  type Response,
+} from 'express';
 import { redirectToHTTPS } from 'express-http-to-https';
 import session from 'express-session';
-import fs from 'fs';
 import passport from 'passport';
 import pinoHttp from 'pino-http';
 import prerenderNode from 'prerender-node';
@@ -34,7 +39,6 @@ import DatabaseValidationService from './server/middleware/databaseValidationSer
 import setupPassport from './server/passport';
 import setupAPI from './server/routing/router';
 import { sendBatchedNotificationEmails } from './server/scripts/emails';
-import setupAppRoutes from './server/scripts/setupAppRoutes';
 import setupServer from './server/scripts/setupServer';
 import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
@@ -181,16 +185,6 @@ export async function main(app: express.Express) {
     }
   };
 
-  const templateFile = (() => {
-    try {
-      return fs.readFileSync('./build/index.html');
-    } catch (e) {
-      console.error(`Failed to read template file: ${e.message}`);
-    }
-  })();
-
-  const sendFile = (res) => res.sendFile(`${__dirname}/index.html`);
-
   setupMiddleware();
   setupPassport(models);
 
@@ -258,7 +252,10 @@ export async function main(app: express.Express) {
     }
   }
 
-  setupAppRoutes(app, models, templateFile, sendFile);
+  app.get('*', (req: Request, res: Response) => {
+    log.info(`setupAppRoutes sendFiles ${req.path}`);
+    res.sendFile(`${__dirname}/index.html`);
+  });
 
   setupErrorHandlers(app);
 

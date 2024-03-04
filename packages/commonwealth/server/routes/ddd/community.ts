@@ -2,7 +2,7 @@ import { express, trpc } from '@hicommonwealth/adapters';
 import { Community } from '@hicommonwealth/model';
 import { Router } from 'express';
 import passport from 'passport';
-import { MixpanelCommunityInteractionEvent } from 'shared/analytics/types';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 
 export const expressRouter = Router();
 expressRouter.get(
@@ -26,5 +26,5 @@ export const trpcRouter = trpc.router({
   getStake: trpc.query(Community.GetCommunityStake),
   setStake: trpc.command(Community.SetCommunityStake, trpc.Tag.Community),
   createGroup: trpc.command(Community.CreateGroup, trpc.Tag.Community),
-  // TODO: integrate via events: analyticsMiddleware(MixpanelCommunityInteractionEvent.CREATE_GROUP),
+  // TODO: integrate via async analytics policy: analyticsMiddleware(MixpanelCommunityInteractionEvent.CREATE_GROUP),
 });
