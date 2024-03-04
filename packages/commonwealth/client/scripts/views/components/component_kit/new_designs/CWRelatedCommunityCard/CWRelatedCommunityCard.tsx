@@ -54,7 +54,7 @@ export const CWRelatedCommunityCard = ({
       }
       navigateToCommunity({ navigate, path: '', chain: community.id });
     },
-    [navigate, trackAnalytics],
+    [navigate, trackAnalytics, community.id],
   );
 
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
