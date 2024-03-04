@@ -1,10 +1,8 @@
+import { NotificationCategories } from '@hicommonwealth/core';
 import {
-  ChainBase,
-  ChainNetwork,
-  ChainType,
-  DefaultPage,
-  NotificationCategories,
-} from '@hicommonwealth/core';
+  Community,
+  CommunityStake,
+} from '@hicommonwealth/core/src/schemas/community.schema';
 import z from 'zod';
 import { models } from '../database';
 import { SchemaWithModel } from './seed';
@@ -18,7 +16,7 @@ const MAX_SCHEMA_INT = 1_000_000_000;
   === User ===
 */
 
-const userZodSchema = z.object({
+const userSchema = z.object({
   id: z.number().int(),
   email: z.string().max(255).email().optional(),
   isAdmin: z.boolean().optional(), // excluded
@@ -27,8 +25,8 @@ const userZodSchema = z.object({
   selected_community_id: z.string().max(255).optional(),
   emailNotificationInterval: z.enum(['week', 'never']).optional(),
 });
-export const UserSchema: SchemaWithModel<typeof userZodSchema> = {
-  schema: userZodSchema,
+export const UserSchema: SchemaWithModel<typeof userSchema> = {
+  schema: userSchema,
   model: models.User,
   mockDefaults: () => ({
     isAdmin: false,
@@ -119,51 +117,15 @@ export const CommunityContractSchema: SchemaWithModel<
   === Community ===
 */
 
-const communitySchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  chain_node_id: z.number().int().max(MAX_SCHEMA_INT),
-  default_symbol: z.string(),
-  network: z.nativeEnum(ChainNetwork),
-  base: z.nativeEnum(ChainBase),
-  icon_url: z.string(),
-  active: z.boolean(),
-  type: z.nativeEnum(ChainType),
-  description: z.string().optional(),
-  social_links: z.array(z.string()).optional(),
-  ss58_prefix: z.number().int().max(MAX_SCHEMA_INT).optional(),
-  stages_enabled: z.boolean().optional(),
-  custom_stages: z.array(z.string()).optional(),
-  custom_domain: z.string().optional(),
-  block_explorer_ids: z.string().optional(),
-  collapsed_on_homepage: z.boolean().optional(),
-  substrate_spec: z.string().optional(),
-  has_chain_events_listener: z.boolean().optional(),
-  default_summary_view: z.boolean().optional(),
-  default_page: z.nativeEnum(DefaultPage).optional(),
-  has_homepage: z.boolean().optional(),
-  terms: z.string().optional(),
-  admin_only_polling: z.boolean().optional(),
-  bech32_prefix: z.string().optional(),
-  hide_projects: z.boolean().optional(),
-  token_name: z.string().optional(),
-  ce_verbose: z.boolean().optional(),
-  discord_config_id: z.number().int().max(MAX_SCHEMA_INT).optional(),
-  category: z.unknown().optional(), // Assuming category can be any type
-  discord_bot_webhooks_enabled: z.boolean().optional(),
-  directory_page_enabled: z.boolean().optional(),
-  directory_page_chain_node_id: z.number().int().max(MAX_SCHEMA_INT).optional(),
-  namespace: z.string().optional(),
-  redirect: z.string().optional(),
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
-});
-export const CommunitySchema: SchemaWithModel<typeof communitySchema> = {
-  schema: communitySchema,
+export const CommunitySchema: SchemaWithModel<typeof Community> = {
+  schema: Community,
   model: models.Community,
   allowedGeneratedProps: ['id'],
-  mockDefaults: () => ({
+  mockDefaults: (seedNum) => ({
     chain_node_id: 1,
+    ss58_prefix: 50_000 + seedNum,
+    discord_config_id: 50_000 + seedNum,
+    directory_page_chain_node_id: 50_000 + seedNum,
   }),
 };
 
@@ -197,21 +159,14 @@ export const TopicSchema: SchemaWithModel<typeof topicSchema> = {
   === CommunityStake ===
 */
 
-const communityStake = z.object({
-  community_id: z.string().optional(),
-  stake_id: z.number().int().max(MAX_SCHEMA_INT).optional(),
-  stake_token: z.string().optional(),
-  vote_weight: z.number().int().max(MAX_SCHEMA_INT).optional(),
-  stake_enabled: z.boolean().optional(),
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
-});
-export const CommunityStakeSchema: SchemaWithModel<typeof communityStake> = {
-  schema: communityStake,
+export const CommunityStakeSchema: SchemaWithModel<typeof CommunityStake> = {
+  schema: CommunityStake,
   model: models.CommunityStake,
-  mockDefaults: () => ({
+  mockDefaults: (seedNum) => ({
     community_id: 'ethereum',
     stake_enabled: true,
+    stake_id: 50_000 + seedNum,
+    vote_weight: 50_000 + seedNum,
   }),
   buildQuery: (data) => ({
     where: {
