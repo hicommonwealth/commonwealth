@@ -129,7 +129,7 @@ async function main() {
           kind: 'proposal-created',
         },
         network: SupportedNetwork.Aave,
-        chain: community.id,
+        community_id: community.id,
       },
     };
   } else {
@@ -149,9 +149,9 @@ async function main() {
       thread_id: thread.id,
       root_title: thread.title,
       root_type: ProposalType.Thread,
-      chain_id: thread.community_id,
+      community_id: thread.community_id,
       author_address: thread.Address.address,
-      author_chain: thread.Address.community_id,
+      author_community_id: thread.Address.community_id,
     };
 
     if (argv.notificationCategory === NotificationCategories.NewThread) {

@@ -2,8 +2,6 @@
 
 .ViewUpvotesDrawer {
   .Drawer.upvote-drawer {
-    top: 56px !important;
-
     @include extraSmall {
       top: 48px !important;
 
@@ -17,10 +15,12 @@
     }
 
     .drawer-actions {
+      position: sticky;
+      top: 0;
       display: flex;
       gap: 8px;
       align-items: center;
-      padding: 16px 56px 12px 56px;
+      padding: 16px 56px 12px 25px;
 
       @include extraSmall {
         gap: 4px;

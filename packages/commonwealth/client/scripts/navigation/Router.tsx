@@ -14,7 +14,6 @@ import GeneralRoutes from './GeneralRoutes';
 export type RouteFeatureFlags = {
   proposalTemplatesEnabled: boolean;
   communityHomepageEnabled: boolean;
-  rootDomainRebrandEnabled: boolean;
 };
 
 const Router = (customDomain: string) => {
@@ -27,14 +26,9 @@ const Router = (customDomain: string) => {
     'communityHomepage',
     false,
   );
-  const rootDomainRebrandEnabled = client.getBooleanValue(
-    'rootDomainRebrand',
-    false,
-  );
   const flags = {
     proposalTemplatesEnabled,
     communityHomepageEnabled,
-    rootDomainRebrandEnabled,
   };
 
   return createBrowserRouter(
