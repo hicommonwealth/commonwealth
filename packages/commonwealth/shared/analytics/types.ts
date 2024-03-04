@@ -1,8 +1,6 @@
 import { ChainBase } from '@hicommonwealth/core';
 
 export const enum MixpanelPageViewEvent {
-  LANDING_PAGE_VIEW = 'Landing Page Viewed',
-  COMMUNITY_CREATION_PAGE_VIEW = 'Create Community Page Viewed',
   THREAD_PAGE_VIEW = 'Thread Page Viewed',
   DASHBOARD_VIEW = 'Dashbboard Page Viewed',
   MEMBERS_PAGE_VIEW = 'Members Page Viewed',

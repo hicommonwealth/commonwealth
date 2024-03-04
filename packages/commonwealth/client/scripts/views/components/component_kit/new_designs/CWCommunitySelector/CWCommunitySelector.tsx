@@ -9,6 +9,7 @@ import { ChainBase } from '@hicommonwealth/core';
 import './CWCommunitySelector.scss';
 
 export enum CommunityType {
+  Blast = 'blast',
   Ethereum = 'ethereum',
   Cosmos = 'cosmos',
   Polygon = 'polygon',
@@ -28,6 +29,9 @@ interface CWCommunitySelectorProps {
   onClick: () => void;
 }
 
+const BLAST_LOGO =
+  'https://assets-global.website-files.com/65a6baa1a3f8ed336f415cb4/65a6c39bae6093c6653dd016_Logo%20Yellow%20on%20Black%20Background%202x-p-500.png';
+
 const CWCommunitySelector = ({
   type,
   title,
@@ -38,7 +42,14 @@ const CWCommunitySelector = ({
   return (
     <div className={ComponentType.CommunitySelector} onClick={onClick}>
       <div className="chain-logo-container">
-        <img src={`/static/img/communitySelector/${type}.svg`} alt={title} />
+        <img
+          src={
+            type === CommunityType.Blast
+              ? BLAST_LOGO
+              : `/static/img/communitySelector/${type}.svg`
+          }
+          alt={title}
+        />
       </div>
       <div className="content-container">
         <div className="title-row">
