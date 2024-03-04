@@ -1,4 +1,4 @@
-import { AbiType } from '@hicommonwealth/core';
+import type { AbiType } from '@hicommonwealth/core';
 import { hasher } from 'node-object-hash';
 
 export function hashAbi(abi: AbiType): string {

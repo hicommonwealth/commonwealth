@@ -1,21 +1,32 @@
 import { trpc } from '@hicommonwealth/adapters';
-import {
-  analytics,
-  events,
-  type EventSchemas,
-  type PolicyMetadata,
-} from '@hicommonwealth/core';
+import { analytics, events, type PolicyMetadata } from '@hicommonwealth/core';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 
-const schemas: EventSchemas = {
+const inputs = {
   GroupCreated: events.schemas.GroupCreated,
+  ThreadCreated: events.schemas.ThreadCreated,
+  CommentCreated: events.schemas.CommentCreated,
 };
 
-const Analytics: () => PolicyMetadata<never, typeof schemas> = () => ({
-  schemas,
+const Analytics: () => PolicyMetadata<typeof inputs> = () => ({
+  inputs,
   body: {
     GroupCreated: async ({ name, payload }) => {
       analytics().track(MixpanelCommunityInteractionEvent.CREATE_GROUP, {
+        name,
+        ...payload,
+      });
+    },
+
+    ThreadCreated: async ({ name, payload }) => {
+      analytics().track(MixpanelCommunityInteractionEvent.CREATE_THREAD, {
+        name,
+        ...payload,
+      });
+    },
+
+    CommentCreated: async ({ name, payload }) => {
+      analytics().track(MixpanelCommunityInteractionEvent.CREATE_COMMENT, {
         name,
         ...payload,
       });
