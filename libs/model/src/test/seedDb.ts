@@ -56,7 +56,7 @@ export const seedDb = async (debug = false): Promise<void> => {
     log.info('done syncing.');
     if (debug) log.info('Initializing default models...');
 
-    const seedOptions: SeedOptions = { noMock: true };
+    const seedOptions: SeedOptions = { mock: false };
 
     const drew = await seed(
       UserSchema,

@@ -19,6 +19,7 @@ import {
   NotificationCategorySchema,
   ProfileSchema,
   SchemaWithModel,
+  SeedOptions,
   SnapshotProposalSchema,
   SnapshotSpaceSchema,
   SubscriptionSchema,
@@ -34,10 +35,7 @@ async function testSeed<T extends SchemaWithModel<any>>(
   schemaModel: T, // zod schema
   overrides: Partial<z.infer<T['schema']>> = {}, // override attributes
   options?: {
-    seedOptions?: {
-      // options for seeding
-      noMock: boolean;
-    };
+    seedOptions?: SeedOptions;
     testOptions?: {
       // options for test
       excludeOverrideChecks?: (keyof typeof overrides)[];
@@ -133,7 +131,7 @@ describe('Seed functions', () => {
           {},
           {
             seedOptions: {
-              noMock: true,
+              mock: false,
             },
           },
         );

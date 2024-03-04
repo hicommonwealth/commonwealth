@@ -29,7 +29,7 @@ export type SchemaWithModel<T extends z.AnyZodObject> = {
 };
 
 export type SeedOptions = {
-  noMock: boolean;
+  mock: boolean;
 };
 
 export async function seed<T extends SchemaWithModel<any>>(
@@ -39,7 +39,9 @@ export async function seed<T extends SchemaWithModel<any>>(
 ): Promise<Model<z.infer<T['schema']>>> {
   let data: Partial<z.infer<T['schema']>> = {};
 
-  if (!options?.noMock) {
+  const disableMock = options?.mock === false;
+
+  if (!disableMock) {
     const generatedMockData = generateMock(schema, {
       seed: seedNum++,
     });
