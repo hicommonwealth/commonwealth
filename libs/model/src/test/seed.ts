@@ -35,13 +35,11 @@ export type SeedOptions = {
 export async function seed<T extends SchemaWithModel<any>>(
   { schema, model, mockDefaults, allowedGeneratedProps }: T,
   overrides: Partial<z.infer<T['schema']>> = {},
-  options?: SeedOptions,
+  options: SeedOptions = { mock: true },
 ): Promise<Model<z.infer<T['schema']>>> {
   let data: Partial<z.infer<T['schema']>> = {};
 
-  const disableMock = options?.mock === false;
-
-  if (!disableMock) {
+  if (options?.mock) {
     const generatedMockData = generateMock(schema, {
       seed: seedNum++,
     });
