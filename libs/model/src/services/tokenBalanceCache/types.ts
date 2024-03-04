@@ -57,6 +57,13 @@ type GetCosmosNativeBalanceOptions = GetCosmosBalancesBase & {
   balanceSourceType: BalanceSourceType.CosmosNative;
 };
 
+export type GetCw20BalanceOptions = GetCosmosBalancesBase & {
+  balanceSourceType: BalanceSourceType.CW20;
+  sourceOptions: {
+    contractAddress: string;
+  };
+};
+
 export type GetCw721BalanceOptions = GetCosmosBalancesBase & {
   balanceSourceType: BalanceSourceType.CW721;
   sourceOptions: {
@@ -75,6 +82,11 @@ export type GetEvmBalancesOptions =
 
 export type GetCosmosBalancesOptions =
   | GetCosmosNativeBalanceOptions
+  | GetCw20BalanceOptions
+  | GetCw721BalanceOptions;
+
+export type GetCwBalancesOptions =
+  | GetCw20BalanceOptions
   | GetCw721BalanceOptions;
 
 export type GetBalancesOptions =

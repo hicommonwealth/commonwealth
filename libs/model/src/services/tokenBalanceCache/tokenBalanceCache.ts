@@ -25,6 +25,7 @@ export async function getBalances(
   try {
     if (
       options.balanceSourceType === BalanceSourceType.CosmosNative ||
+      options.balanceSourceType === BalanceSourceType.CW20 ||
       options.balanceSourceType === BalanceSourceType.CW721
     ) {
       balances = await getCosmosBalances(options, ttl);
