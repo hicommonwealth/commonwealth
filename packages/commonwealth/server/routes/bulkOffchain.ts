@@ -22,7 +22,6 @@ export const Errors = {};
 
 // Topics, comments, reactions, members+admins, threads
 const bulkOffchain = async (models: DB, req: TypedRequest, res: Response) => {
-  throw new ServerError('Testing Rollbar and Datadog integration');
   const { community } = req;
   // globally shared SQL replacements
   const communityOptions = 'community_id = :community_id';
