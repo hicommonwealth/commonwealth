@@ -6,6 +6,6 @@
     "tsBuildInfoFile": "build/.tsbuildinfo",
     "strict": true
   },
-  "include": ["src", "../core/src/utils"],
+  "include": ["src"],
   "references": [{ "path": "../core" }, { "path": "../chains" }]
 }
