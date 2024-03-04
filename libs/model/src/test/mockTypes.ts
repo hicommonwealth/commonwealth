@@ -25,10 +25,6 @@ export const UserSchema: SchemaWithModel<typeof user.User> = {
 export const ChainNodeSchema: SchemaWithModel<typeof chainNode.ChainNode> = {
   schema: chainNode.ChainNode,
   model: models.ChainNode,
-  mockDefaults: (seedNum) => ({
-    eth_chain_id: 50_000 + seedNum,
-    ss58: 50_000 + seedNum,
-  }),
 };
 
 export const ContractSchema: SchemaWithModel<typeof community.Contract> = {
@@ -37,7 +33,6 @@ export const ContractSchema: SchemaWithModel<typeof community.Contract> = {
   mockDefaults: () => ({
     chain_node_id: 1,
     abi_id: null,
-    decimals: 18,
   }),
 };
 
@@ -56,11 +51,8 @@ export const CommunitySchema: SchemaWithModel<typeof community.Community> = {
   schema: community.Community,
   model: models.Community,
   allowedGeneratedProps: ['id'],
-  mockDefaults: (seedNum) => ({
+  mockDefaults: () => ({
     chain_node_id: 1,
-    ss58_prefix: 50_000 + seedNum,
-    discord_config_id: 50_000 + seedNum,
-    directory_page_chain_node_id: 50_000 + seedNum,
   }),
 };
 
@@ -79,11 +71,9 @@ export const CommunityStakeSchema: SchemaWithModel<
 > = {
   schema: community.CommunityStake,
   model: models.CommunityStake,
-  mockDefaults: (seedNum) => ({
+  mockDefaults: () => ({
     community_id: 'ethereum',
     stake_enabled: true,
-    stake_id: 50_000 + seedNum,
-    vote_weight: 50_000 + seedNum,
   }),
   buildQuery: (data) => ({
     where: {

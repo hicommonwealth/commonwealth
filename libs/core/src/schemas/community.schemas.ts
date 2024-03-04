@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../constants';
 import {
   ChainBase,
   ChainNetwork,
@@ -9,11 +10,16 @@ import {
 import { ALL_COMMUNITIES, checkIconSize } from '../utils';
 
 export const CommunityStake = z.object({
-  id: z.number().optional(),
+  id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),
   community_id: z.string().optional(),
-  stake_id: z.number().optional(),
+  stake_id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),
   stake_token: z.string().optional(),
-  vote_weight: z.number().optional(),
+  vote_weight: z
+    .number()
+    .int()
+    .min(MIN_SCHEMA_INT)
+    .max(MAX_SCHEMA_INT)
+    .optional(),
   stake_enabled: z.boolean().optional(),
   created_at: z.date().optional(),
   updated_at: z.date().optional(),
@@ -21,7 +27,7 @@ export const CommunityStake = z.object({
 
 export const Community = z.object({
   name: z.string(),
-  chain_node_id: z.number(),
+  chain_node_id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
   default_symbol: z.string(),
   network: z.nativeEnum(ChainNetwork),
   base: z.nativeEnum(ChainBase),
@@ -31,7 +37,12 @@ export const Community = z.object({
   id: z.string().optional(),
   description: z.string().optional(),
   social_links: z.array(z.string()).optional(),
-  ss58_prefix: z.number().optional(),
+  ss58_prefix: z
+    .number()
+    .int()
+    .min(MIN_SCHEMA_INT)
+    .max(MAX_SCHEMA_INT)
+    .optional(),
   stages_enabled: z.boolean().optional(),
   custom_stages: z.array(z.string()).optional(),
   custom_domain: z.string().optional(),
@@ -48,11 +59,21 @@ export const Community = z.object({
   hide_projects: z.boolean().optional(),
   token_name: z.string().optional(),
   ce_verbose: z.boolean().optional(),
-  discord_config_id: z.number().optional(),
+  discord_config_id: z
+    .number()
+    .int()
+    .min(MIN_SCHEMA_INT)
+    .max(MAX_SCHEMA_INT)
+    .optional(),
   category: z.unknown().optional(), // Assuming category can be any type
   discord_bot_webhooks_enabled: z.boolean().optional(),
   directory_page_enabled: z.boolean().optional(),
-  directory_page_chain_node_id: z.number().optional(),
+  directory_page_chain_node_id: z
+    .number()
+    .int()
+    .min(MIN_SCHEMA_INT)
+    .max(MAX_SCHEMA_INT)
+    .optional(),
   namespace: z.string().optional(),
   redirect: z.string().optional(),
   created_at: z.date().optional(),
@@ -65,6 +86,8 @@ export const GetCommunityStake = {
     stake_id: z.coerce
       .number()
       .int()
+      .min(MIN_SCHEMA_INT)
+      .max(MAX_SCHEMA_INT)
       .optional()
       .describe('The stake id or all stakes when undefined'),
   }),
@@ -80,7 +103,12 @@ export const CreateCommunity = {
       .refine((data) => !data.includes(ALL_COMMUNITIES), {
         message: `String must not contain '${ALL_COMMUNITIES}'`,
       }),
-    chain_node_id: z.number().optional(), // corresponds to the chain field
+    chain_node_id: z
+      .number()
+      .int()
+      .min(MIN_SCHEMA_INT)
+      .max(MAX_SCHEMA_INT)
+      .optional(), // corresponds to the chain field
     description: z.string().optional(),
     icon_url: z
       .string()
@@ -96,10 +124,20 @@ export const CreateCommunity = {
     // hidden optional params
     user_address: z.string().optional(), // address for the user
     alt_wallet_url: z.string().url().optional(),
-    eth_chain_id: z.coerce.number().optional(),
+    eth_chain_id: z.coerce
+      .number()
+      .int()
+      .min(MIN_SCHEMA_INT)
+      .max(MAX_SCHEMA_INT)
+      .optional(),
     cosmos_chain_id: z.string().optional(),
     address: z.string().optional(), // address for the contract of the chain
-    decimals: z.number().optional(),
+    decimals: z
+      .number()
+      .int()
+      .min(MIN_SCHEMA_INT)
+      .max(MAX_SCHEMA_INT)
+      .optional(),
     substrate_spec: z.string().optional(),
     bech32_prefix: z.string().optional(), // required for cosmos communities
     token_name: z.string().optional(),
@@ -119,9 +157,14 @@ export const CreateCommunity = {
 
 export const SetCommunityStake = {
   input: z.object({
-    stake_id: z.coerce.number().int(),
+    stake_id: z.coerce.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
     stake_token: z.string().default(''),
-    vote_weight: z.coerce.number().default(1),
+    vote_weight: z.coerce
+      .number()
+      .int()
+      .min(MIN_SCHEMA_INT)
+      .max(MAX_SCHEMA_INT)
+      .default(1),
     stake_enabled: z.coerce.boolean().default(true),
   }),
   output: Community.extend({
@@ -139,19 +182,25 @@ export const UpdateCommunity = {
 };
 
 export const CommunityContract = z.object({
-  id: z.number().int(),
+  id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
   community_id: z.string().max(255),
-  contract_id: z.number().int(),
+  contract_id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
   created_at: z.date(),
   updated_at: z.date(),
 });
 
 export const Contract = z.object({
-  id: z.number().int(),
+  id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
   address: z.string().max(255),
-  chain_node_id: z.number().int(),
-  abi_id: z.number().int().optional().nullable(),
-  decimals: z.number().int().optional(),
+  chain_node_id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
+  abi_id: z
+    .number()
+    .int()
+    .min(MIN_SCHEMA_INT)
+    .max(MAX_SCHEMA_INT)
+    .optional()
+    .nullable(),
+  decimals: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),
   token_name: z.string().max(255).optional(),
   symbol: z.string().max(255).optional(),
   type: z.string().max(255),
@@ -162,7 +211,7 @@ export const Contract = z.object({
 });
 
 export const Topic = z.object({
-  id: z.number().int(),
+  id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
   name: z.string().max(255),
   community_id: z.string().max(255),
   description: z.string().default(''),
@@ -170,7 +219,7 @@ export const Topic = z.object({
   featured_in_sidebar: z.boolean().default(false),
   featured_in_new_post: z.boolean().default(false),
   default_offchain_template: z.string().optional().nullable(),
-  order: z.number().int().optional(),
+  order: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),
   channel_id: z.string().max(255).optional().nullable(),
   group_ids: z.array(z.number()).default([]),
   default_offchain_template_backup: z.string().optional().nullable(),

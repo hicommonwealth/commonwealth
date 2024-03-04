@@ -21,7 +21,7 @@ let seedNum = 1;
 export type SchemaWithModel<T extends z.AnyZodObject> = {
   schema: T;
   model: ModelStatic<Model>;
-  mockDefaults?: (seedNum: number) => Partial<z.infer<T>>;
+  mockDefaults?: () => Partial<z.infer<T>>;
   allowedGeneratedProps?: GeneratedProp[];
   buildQuery?: (data: z.infer<T>) => {
     where: Partial<z.infer<T>>;
@@ -51,7 +51,7 @@ export async function seed<T extends SchemaWithModel<any>>(
     data = {
       ...data,
       ...generatedMockData,
-      ...(mockDefaults?.(seedNum) || {}),
+      ...(mockDefaults?.() || {}),
     };
   }
 

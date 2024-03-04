@@ -1,7 +1,8 @@
 import z from 'zod';
+import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../constants';
 
 export const User = z.object({
-  id: z.number().int(),
+  id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
   email: z.string().max(255).email().optional(),
   isAdmin: z.boolean().optional(),
   disableRichText: z.boolean().optional(),
@@ -13,8 +14,8 @@ export const User = z.object({
 });
 
 export const Profile = z.object({
-  id: z.number().int(),
-  user_id: z.number().int(),
+  id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
+  user_id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
   created_at: z.date().optional(),
   updated_at: z.date().optional(),
   profile_name: z.string().max(255).optional(),
