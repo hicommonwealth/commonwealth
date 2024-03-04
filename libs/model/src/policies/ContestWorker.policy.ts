@@ -1,12 +1,12 @@
-import { EventSchemas, PolicyMetadata, events } from '@hicommonwealth/core';
+import { PolicyMetadata, events } from '@hicommonwealth/core';
 
-const schemas: EventSchemas = {
+const inputs = {
   ThreadCreated: events.schemas.ThreadCreated,
   CommentCreated: events.schemas.CommentCreated,
 };
 
-export const ContestWorker = (): PolicyMetadata<never, typeof schemas> => ({
-  schemas,
+export const ContestWorker = (): PolicyMetadata<typeof inputs> => ({
+  inputs,
   body: {
     ThreadCreated: async ({ name, payload }) => {
       console.log(name, payload.thread);
