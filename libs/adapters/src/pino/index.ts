@@ -15,6 +15,8 @@ if (node_env !== 'production') {
       ignore: 'pid,hostname',
       errorLikeObjectKeys: ['e', 'err', 'error'],
       sync: node_env === 'test',
+      colorizeObjects: false,
+      singleLine: true,
     },
   });
   logLevel = 'debug';
@@ -49,7 +51,7 @@ export const PinoLogger = (): Logger => ({
           },
         },
         redact: {
-          paths: [],
+          paths: ['jwt', 'query.jwt', 'params.jwt', 'body.jwt'],
           censor: '[PINO REDACTED]',
         },
         name: formatFilename(filename),
@@ -59,25 +61,25 @@ export const PinoLogger = (): Logger => ({
 
     return {
       trace(msg: string, error?: Error, context?: Record<string, unknown>) {
-        logger.trace({ ...context, err: error }, msg);
+        logger.trace({ ...context, err: error || undefined }, msg);
       },
       debug(msg: string, error?: Error, context?: Record<string, unknown>) {
-        logger.debug({ ...context, err: error }, msg);
+        logger.debug({ ...context, err: error || undefined }, msg);
       },
       info(msg: string, error?: Error, context?: Record<string, unknown>) {
-        logger.info({ ...context, err: error }, msg);
+        logger.info({ ...context, err: error || undefined }, msg);
       },
       warn(msg: string, error?: Error, context?: Record<string, unknown>) {
-        logger.warn({ ...context, err: error }, msg);
+        logger.warn({ ...context, err: error || undefined }, msg);
       },
       error(msg: string, error?: Error, context?: Record<string, unknown>) {
-        logger.error({ ...context, err: error }, msg);
+        logger.error({ ...context, err: error || undefined }, msg);
 
         if (context) rollbar.error(msg, error ?? '', context);
         else rollbar.error(msg, error ?? '');
       },
       fatal(msg: string, error?: Error, context?: Record<string, unknown>) {
-        logger.fatal({ ...context, err: error }, msg);
+        logger.fatal({ ...context, err: error || undefined }, msg);
 
         if (context) rollbar.critical(msg, error ?? '', context);
         else rollbar.critical(msg, error ?? '');

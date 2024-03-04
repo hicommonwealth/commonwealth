@@ -80,22 +80,22 @@ export const dispose = (
  */
 process.once('SIGINT', async (arg?: any) => {
   logger()
-    .getLogger('ports')
+    .getLogger(__filename)
     .info(`SIGINT ${arg !== 'SIGINT' ? arg : ''}`);
   await disposeAndExit('EXIT');
 });
 process.once('SIGTERM', async (arg?: any) => {
   logger()
-    .getLogger('ports')
+    .getLogger(__filename)
     .info(`SIGTERM ${arg !== 'SIGTERM' ? arg : ''}`);
   await disposeAndExit('EXIT');
 });
 process.once('uncaughtException', async (arg?: any) => {
-  logger().getLogger('ports').error('Uncaught Exception', arg);
+  logger().getLogger(__filename).error('Uncaught Exception', arg);
   await disposeAndExit('ERROR');
 });
 process.once('unhandledRejection', async (arg?: any) => {
-  logger().getLogger('ports').error('Unhandled Rejection', arg);
+  logger().getLogger(__filename).error('Unhandled Rejection', arg);
   await disposeAndExit('ERROR');
 });
 
