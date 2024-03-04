@@ -1,7 +1,9 @@
 import React from 'react';
+import app from 'state';
+import { CWContentPageCard } from 'views/components/component_kit/CWContentPageCard';
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWContentPageCard } from 'views/components/component_kit/CWContentPageCard';
+import { CWRelatedCommunityCard } from 'views/components/component_kit/new_designs/CWRelatedCommunityCard';
 
 const CardsShowcase = () => {
   return (
@@ -31,6 +33,16 @@ const CardsShowcase = () => {
       <CWContentPageCard
         header="Information"
         content={<CWText className="content">Content page card content</CWText>}
+      />
+
+      <CWText type="h5">Related Community Card</CWText>
+      <CWRelatedCommunityCard
+        community={app.config.chains.getAll()[30]}
+        connected={false}
+        memberCount={123}
+        threadCount={456}
+        stakeValue={78.91}
+        stakeChange={-3.5}
       />
     </>
   );

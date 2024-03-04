@@ -32,14 +32,44 @@
         gap: 8px;
 
         .header {
+          width: 100%;
           display: flex;
-          align-items: center;
-          gap: 8px;
+          justify-content: space-between;
 
-          .Text {
-            color: $neutral-900;
-            letter-spacing: -0.18px;
-            word-break: break-word;
+          .community-name {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            .Text {
+              color: $neutral-900;
+              letter-spacing: -0.18px;
+              word-break: break-word;
+            }
+          }
+
+          .stake-info {
+            .stake-value {
+              color: $neutral-900;
+            }
+
+            .stake-change {
+              gap: 4px;
+
+              .percentage {
+                &.positive {
+                  color: $green-600;
+                }
+
+                &.negative {
+                  color: $rorange-600;
+                }
+              }
+
+              .hours {
+                color: $neutral-500;
+              }
+            }
           }
         }
 
@@ -50,30 +80,6 @@
           font-weight: 400;
           line-height: 20px;
           word-break: break-word;
-        }
-      }
-
-      .stake-info {
-        .stake-value {
-          color: $neutral-900;
-        }
-
-        .stake-change {
-          gap: 4px;
-
-          .percentage {
-            &.positive {
-              color: $green-600;
-            }
-
-            &.negative {
-              color: $rorange-600;
-            }
-          }
-
-          .hours {
-            color: $neutral-500;
-          }
         }
       }
     }
@@ -138,6 +144,7 @@
 
     .actions {
       display: flex;
+      gap: 12px;
     }
   }
 }

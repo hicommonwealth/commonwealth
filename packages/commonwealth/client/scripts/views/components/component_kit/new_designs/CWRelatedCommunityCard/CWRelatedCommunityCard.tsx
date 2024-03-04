@@ -69,32 +69,35 @@ export const CWRelatedCommunityCard = ({
           <div className="top-content">
             <div className="community-info">
               <div className="header">
-                <CWCommunityAvatar community={community} size="large" />
-                <CWText type="h5" title={community.name} fontWeight="medium">
-                  {community.name}
-                </CWText>
+                <div className="community-name">
+                  <CWCommunityAvatar community={community} size="large" />
+                  <CWText type="h5" title={community.name} fontWeight="medium">
+                    {community.name}
+                  </CWText>
+                </div>
+
+                <div className="stake-info">
+                  <CWText type="h5" className="stake-value">
+                    ${stakeValue}
+                  </CWText>
+                  <div>
+                    <CWText type="caption" className="stake-change">
+                      <span
+                        className={`percentage ${
+                          stakeChange >= 0 ? 'positive' : 'negative'
+                        }`}
+                      >
+                        {stakeChange}%
+                      </span>
+                      <span className="hours">24h</span>
+                    </CWText>
+                  </div>
+                </div>
               </div>
               <div className="description">
                 {community.description
                   ? addPeriodToText(community.description)
                   : null}
-              </div>
-            </div>
-            <div className="stake-info">
-              <CWText type="h5" className="stake-value">
-                ${stakeValue}
-              </CWText>
-              <div>
-                <CWText type="caption" className="stake-change">
-                  <span
-                    className={`percentage ${
-                      stakeChange >= 0 ? 'positive' : 'negative'
-                    }`}
-                  >
-                    {stakeChange}%
-                  </span>
-                  <span className="hours">24h</span>
-                </CWText>
               </div>
             </div>
           </div>
