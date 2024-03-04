@@ -1,5 +1,9 @@
-import { NotificationCategories } from '@hicommonwealth/core';
-import { address, community, group } from '@hicommonwealth/core/src/schemas';
+import {
+  NotificationCategories,
+  address,
+  community,
+  group,
+} from '@hicommonwealth/core';
 import z from 'zod';
 import { models } from '../database';
 import { SchemaWithModel } from './seed';
