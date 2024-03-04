@@ -1,5 +1,6 @@
-import { BalanceSourceType } from '@hicommonwealth/core';
 import { z } from 'zod';
+import { BalanceSourceType } from '../requirements-types';
+import { Community } from './community.schemas';
 
 const ContractSource = z.object({
   source_type: z.enum([
@@ -56,3 +57,33 @@ export const Requirement = z.union([
     data: AllowlistData,
   }),
 ]);
+
+export const GroupMetadata = z.object({
+  name: z.string(),
+  description: z.string(),
+  required_requirements: z.number().optional(),
+  membership_ttl: z.number().optional(), // NOT USED
+});
+
+export const Group = z.object({
+  id: z.number(),
+  community_id: z.string(),
+  metadata: GroupMetadata,
+  requirements: z.array(Requirement),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
+});
+
+export const CreateGroup = {
+  input: z.object({
+    metadata: z.object({
+      name: z.string(),
+      description: z.string(),
+      required_requirements: z.number().optional(),
+      membership_ttl: z.number().optional(),
+    }),
+    requirements: z.array(Requirement),
+    topics: z.array(z.number()).optional(),
+  }),
+  output: Community.extend({ groups: z.array(Group).optional() }),
+};
