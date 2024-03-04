@@ -30,6 +30,7 @@ export const setupErrorHandlers = (app: Express) => {
       user: {
         id: (req?.user as Record<string, unknown>)?.id,
       },
+      status: error.status || 500,
     };
     if (error instanceof ServerError) {
       log.error(error.message, error, reqContext);
@@ -45,7 +46,7 @@ export const setupErrorHandlers = (app: Express) => {
         error: error.message,
       });
     } else {
-      log.error(error.message, error, { reqContext, status: 500 });
+      log.error(error.message, error, reqContext);
       res.status(500);
       res.json({
         status: error.status,
