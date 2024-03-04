@@ -5,7 +5,7 @@ import type { RoleAssignmentAttributes } from './role_assignment';
 export type CommunityRoleAttributes = {
   name: Role;
   id?: number;
-  chain_id: string;
+  community_id: string;
   allow: number;
   deny: number;
   created_at?: Date;

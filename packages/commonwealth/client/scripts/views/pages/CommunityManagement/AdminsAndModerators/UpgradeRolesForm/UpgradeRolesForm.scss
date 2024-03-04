@@ -1,0 +1,79 @@
+@import '../../../../../../styles/shared';
+
+@mixin sharedIconStyles {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.UpgradeRolesForm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .members-container {
+    border: 1px solid $neutral-300;
+    border-radius: $border-radius-corners;
+    display: flex;
+    flex-direction: column;
+    height: 200px;
+    overflow-y: auto;
+    padding: 0 8px;
+    width: 100%;
+
+    @include visibleScrollbar(light);
+  }
+
+  .upgrade-buttons-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .SearchBar {
+    width: 100%;
+
+    .search-and-icon-container {
+      position: relative;
+
+      input {
+        @include b1;
+
+        border: 1px solid $neutral-300;
+        border-radius: 6px;
+        color: $neutral-800;
+        height: 40px;
+        padding: 8px 16px 8px 48px;
+        width: 100%;
+
+        &.isClearable {
+          padding: 8px 48px;
+        }
+
+        &::placeholder {
+          color: $neutral-500;
+        }
+
+        &:focus {
+          outline: none;
+        }
+
+        &:focus-within {
+          border-color: $primary-500;
+        }
+      }
+
+      .search-icon {
+        @include sharedIconStyles;
+
+        left: 16px;
+      }
+
+      .clear-icon {
+        @include sharedIconStyles;
+
+        right: 16px;
+      }
+    }
+  }
+}

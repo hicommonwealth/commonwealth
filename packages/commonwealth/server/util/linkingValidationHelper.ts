@@ -15,7 +15,7 @@ export const isAuthorOrAdmin = async (
   models: DB,
   address: AddressInstance[],
   address_id: number,
-  chain: string,
+  communityId: string,
 ) => {
   const userOwnedAddressIds = address
     .filter((addr) => !!addr.verified)
@@ -25,12 +25,12 @@ export const isAuthorOrAdmin = async (
     const roles = await findAllRoles(
       models,
       { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
-      chain,
+      communityId,
       ['admin', 'moderator'],
     );
     if (roles.length === 0) return false;
     const role = roles.find((r) => {
-      return r.chain_id === chain;
+      return r.community_id === communityId;
     });
     return !!role;
   } else {

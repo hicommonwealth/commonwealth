@@ -41,9 +41,8 @@ const EVMWalletsSubModal = ({
 
           <section className="evm-wallet-list">
             {availableWallets.map((wallet) => (
-              <>
+              <React.Fragment key={wallet}>
                 <AuthButton
-                  key={wallet}
                   type={wallet}
                   rounded
                   variant="dark"
@@ -60,7 +59,7 @@ const EVMWalletsSubModal = ({
                     Reset WalletConnect
                   </button>
                 )}
-              </>
+              </React.Fragment>
             ))}
           </section>
         </section>

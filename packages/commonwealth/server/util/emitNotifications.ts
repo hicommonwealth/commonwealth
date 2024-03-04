@@ -116,13 +116,13 @@ export default async function emitNotifications(
         notification_data: JSON.stringify(chainEvent),
         chain_event_id: chainEvent.id,
         category_id: 'chain-event',
-        community_id: chainEvent.chain,
+        community_id: chainEvent.community_id,
       });
     } else {
       notification = await models.Notification.create({
         notification_data: JSON.stringify(notification_data),
         category_id,
-        community_id: (<IForumNotificationData>notification_data).chain_id,
+        community_id: (<IForumNotificationData>notification_data).community_id,
         thread_id:
           Number((<IForumNotificationData>notification_data).thread_id) ||
           undefined,
@@ -182,8 +182,8 @@ export default async function emitNotifications(
   if (SEND_WEBHOOKS_EMAILS) {
     // emails
     for (const subscription of subscriptions) {
-      if (msg && isChainEventData && chainEvent.chain) {
-        msg.dynamic_template_data.notification.path = `${SERVER_URL}/${chainEvent.chain}/notifications?id=${notification.id}`;
+      if (msg && isChainEventData && chainEvent.community_id) {
+        msg.dynamic_template_data.notification.path = `${SERVER_URL}/${chainEvent.community_id}/notifications?id=${notification.id}`;
       }
       if (msg && subscription?.immediate_email && subscription?.User) {
         // kick off async call and immediately return

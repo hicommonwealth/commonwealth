@@ -34,6 +34,7 @@
       line-height: 16px;
       letter-spacing: 0.16px;
     }
+
     .app-url {
       color: $neutral-500;
       text-align: center;
@@ -99,6 +100,35 @@
       font-weight: 400;
       line-height: 24px;
       letter-spacing: 0.16px;
+    }
+
+    .manual-install {
+      display: none;
+      flex-direction: column;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 16px;
+      margin-bottom: 16px;
+
+      .Text {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        color: $neutral-500 !important;
+
+        .settings-icon {
+          color: $primary-500;
+        }
+
+        .highlight {
+          background: $neutral-50;
+          margin-left: 8px;
+          margin-right: 8px;
+          padding: 2px;
+          border-radius: 6px;
+          color: $neutral-600;
+        }
+      }
     }
 
     .hide-prompt {

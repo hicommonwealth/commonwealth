@@ -41,19 +41,19 @@ type MagicLoginContext = {
   models: DB;
   decodedMagicToken: MagicUser;
   magicUserMetadata: MagicUserMetadata;
-  generatedAddresses: Array<{ address: string; chain: string }>;
+  generatedAddresses: Array<{ address: string; community_id: string }>;
   existingUserInstance?: UserInstance;
   loggedInUser?: UserInstance;
   profileMetadata?: { username?: string; avatarUrl?: string };
   walletSsoSource: WalletSsoSource;
 };
 
-const DEFAULT_ETH_CHAIN = 'ethereum';
+const DEFAULT_ETH_COMMUNITY_ID = 'ethereum';
 
 // Creates a trusted address in a community
 async function createMagicAddressInstances(
   models: DB,
-  generatedAddresses: Array<{ address: string; chain: string }>,
+  generatedAddresses: Array<{ address: string; community_id: string }>,
   user: UserAttributes,
   walletSsoSource: WalletSsoSource,
   decodedMagicToken: MagicUser,
@@ -64,11 +64,11 @@ async function createMagicAddressInstances(
   const profile_id = (user.Profiles[0] as ProfileAttributes).id;
   const serverAnalyticsController = new ServerAnalyticsController();
 
-  for (const { chain, address } of generatedAddresses) {
+  for (const { community_id, address } of generatedAddresses) {
     const [addressInstance, created] = await models.Address.findOrCreate({
       where: {
         address,
-        community_id: chain,
+        community_id,
         wallet_id: WalletId.Magic,
       },
       defaults: {
@@ -94,10 +94,17 @@ async function createMagicAddressInstances(
 
     // xx: ?
     if (created) {
-      await createRole(models, addressInstance.id, chain, 'member', false, t);
+      await createRole(
+        models,
+        addressInstance.id,
+        community_id,
+        'member',
+        false,
+        t,
+      );
 
       serverAnalyticsController.track({
-        community: chain,
+        community: community_id,
         userId: user_id,
         event: MixpanelCommunityInteractionEvent.JOIN_COMMUNITY,
       });
@@ -135,8 +142,10 @@ async function createNewMagicUser({
     const newUser = await models.User.createWithProfile(
       models,
       {
-        email: magicUserMetadata.email || null,
-        emailVerified: true,
+        // never use emails from magic, even for "email" login -- magic maintains the mapping
+        // of emails/socials -> addresses, and we rely ONLY on the address as a canonical piece
+        // of login information.
+        email: null,
       },
       { transaction },
     );
@@ -185,7 +194,7 @@ async function createNewMagicUser({
 
     // create token with provided user/address
     const canonicalAddressInstance = addressInstances.find(
-      (a) => a.community_id === DEFAULT_ETH_CHAIN,
+      (a) => a.community_id === DEFAULT_ETH_COMMUNITY_ID,
     );
     await models.SsoToken.create(
       {
@@ -287,7 +296,7 @@ async function loginExistingMagicUser({
     // once addresses have been created and/or located, we finalize the migration of malformed sso
     // tokens, or create a new one if absent entirely
     const canonicalAddressInstance = addressInstances.find(
-      (a) => a.community_id === DEFAULT_ETH_CHAIN,
+      (a) => a.community_id === DEFAULT_ETH_COMMUNITY_ID,
     );
     if (malformedSsoToken) {
       malformedSsoToken.address_id = canonicalAddressInstance.id;
@@ -363,7 +372,7 @@ async function addMagicToUser({
 
   // create new token with provided user/address. contract is each address owns an SsoToken.
   const canonicalAddressInstance = addressInstances.find(
-    (a) => a.community_id === DEFAULT_ETH_CHAIN,
+    (a) => a.community_id === DEFAULT_ETH_COMMUNITY_ID,
   );
   await models.SsoToken.create({
     issuer: decodedMagicToken.issuer,
@@ -380,7 +389,7 @@ async function magicLoginRoute(
   magic: Magic,
   models: DB,
   req: TypedRequestBody<{
-    chain?: string;
+    community_id?: string;
     jwt?: string;
     username?: string;
     avatarUrl?: string;
@@ -393,13 +402,13 @@ async function magicLoginRoute(
   cb: DoneFunc,
 ) {
   log.trace(`MAGIC TOKEN: ${JSON.stringify(decodedMagicToken, null, 2)}`);
-  let chainToJoin: CommunityInstance, error, loggedInUser: UserInstance;
+  let communityToJoin: CommunityInstance, error, loggedInUser: UserInstance;
 
   const walletSsoSource = req.body.walletSsoSource;
   const generatedAddresses = [
     {
       address: decodedMagicToken.publicAddress,
-      chain: DEFAULT_ETH_CHAIN,
+      community_id: DEFAULT_ETH_COMMUNITY_ID,
     },
   ];
 
@@ -425,9 +434,9 @@ async function magicLoginRoute(
     );
   }
 
-  // validate chain if provided (i.e. logging in on community page)
-  if (req.body.chain) {
-    [chainToJoin, error] = await validateCommunity(models, req.body);
+  // validate community if provided (i.e. logging in on community page)
+  if (req.body.community_id) {
+    [communityToJoin, error] = await validateCommunity(models, req.body);
     if (error) return cb(error);
   }
 
@@ -457,7 +466,7 @@ async function magicLoginRoute(
     }
   }
 
-  const isCosmos = chainToJoin?.base === ChainBase.CosmosSDK;
+  const isCosmos = communityToJoin?.base === ChainBase.CosmosSDK;
 
   const magicUserMetadata = await magic.users.getMetadataByIssuerAndWallet(
     decodedMagicToken.issuer,
@@ -479,7 +488,7 @@ async function magicLoginRoute(
         : undefined,
     };
 
-    if (chainToJoin) {
+    if (communityToJoin) {
       if (isCosmos) {
         // (magic bug?): magic typing doesn't match data, so we need to cast as any
         const magicWallets = magicUserMetadata.wallets as any[];
@@ -495,20 +504,20 @@ async function magicLoginRoute(
 
         generatedAddresses.push({
           address: req.body.magicAddress,
-          chain: chainToJoin.id,
+          community_id: communityToJoin.id,
         });
       } else if (
-        chainToJoin.base === ChainBase.Ethereum &&
+        communityToJoin.base === ChainBase.Ethereum &&
         session.payload.chain.startsWith('eip155:')
       ) {
         generatedAddresses.push({
           address: req.body.magicAddress,
-          chain: chainToJoin.id,
+          community_id: communityToJoin.id,
         });
       } else {
-        // ignore invalid chain base
+        // ignore invalid community base
         log.warn(
-          `Cannot create magic account on chain ${chainToJoin.id}. Ignoring.`,
+          `Cannot create magic account on community ${communityToJoin.id}. Ignoring.`,
         );
       }
     }
@@ -536,37 +545,25 @@ async function magicLoginRoute(
   // attempt to locate an existing magic user by canonical address.
   // this is the properly modern method of identifying users, as it conforms to
   // the DID standard.
-  let existingUserInstance = await models.User.scope('withPrivateData').findOne(
-    {
-      include: [
-        {
-          model: models.Address,
-          where: {
-            wallet_id: WalletId.Magic,
-            address: canonicalAddress,
-            verified: { [Op.ne]: null },
-          },
-          required: true,
+  const existingUserInstance = await models.User.scope(
+    'withPrivateData',
+  ).findOne({
+    include: [
+      {
+        model: models.Address,
+        where: {
+          wallet_id: WalletId.Magic,
+          address: canonicalAddress,
+          verified: { [Op.ne]: null },
         },
-        {
-          model: models.Profile,
-        },
-      ],
-    },
-  );
-  if (!existingUserInstance && magicUserMetadata.email) {
-    // if unable to locate a magic user by address, attempt to locate by email.
-    // only legacy users (pre-magic or magic but with broken assumptions) should
-    // trigger this case, as it was formerly canonical.
-    existingUserInstance = await models.User.scope('withPrivateData').findOne({
-      where: { email: magicUserMetadata.email },
-      include: [
-        {
-          model: models.Profile,
-        },
-      ],
-    });
-  }
+        required: true,
+      },
+      {
+        model: models.Profile,
+      },
+    ],
+  });
+
   log.trace(
     `EXISTING USER INSTANCE: ${JSON.stringify(existingUserInstance, null, 2)}`,
   );

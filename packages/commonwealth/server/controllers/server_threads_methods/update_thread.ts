@@ -138,10 +138,11 @@ export async function __updateThread(
   );
   const isThreadOwner = userOwnedAddressIds.includes(thread.address_id);
   const isMod = !!roles.find(
-    (r) => r.chain_id === thread.community_id && r.permission === 'moderator',
+    (r) =>
+      r.community_id === thread.community_id && r.permission === 'moderator',
   );
   const isAdmin = !!roles.find(
-    (r) => r.chain_id === thread.community_id && r.permission === 'admin',
+    (r) => r.community_id === thread.community_id && r.permission === 'admin',
   );
   const isSuperAdmin = user.isAdmin;
   if (
@@ -288,9 +289,9 @@ export async function __updateThread(
         thread_id: +finalThread.id,
         root_type: ProposalType.Thread,
         root_title: finalThread.title,
-        chain_id: finalThread.community_id,
+        community_id: finalThread.community_id,
         author_address: finalThread.Address.address,
-        author_chain: finalThread.Address.community_id,
+        author_community_id: finalThread.Address.community_id,
       },
     },
     excludeAddresses: [address.address],
@@ -352,9 +353,9 @@ export async function __updateThread(
             root_type: ProposalType.Thread,
             root_title: finalThread.title,
             comment_text: finalThread.body,
-            chain_id: finalThread.community_id,
+            community_id: finalThread.community_id,
             author_address: finalThread.Address.address,
-            author_chain: finalThread.Address.community_id,
+            author_community_id: finalThread.Address.community_id,
           },
         },
         excludeAddresses: [finalThread.Address.address],

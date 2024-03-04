@@ -1,25 +1,13 @@
-import { CommandMetadata, InvalidState } from '@hicommonwealth/core';
-import { z } from 'zod';
+import { CommandMetadata, InvalidState, community } from '@hicommonwealth/core';
 import { models } from '../database';
 import { isCommunityAdmin } from '../middleware';
 import { mustExist } from '../middleware/guards';
-import { CommunityAttributes } from '../models';
 import { commonProtocol } from '../services';
 
-const schema = z.object({
-  stake_id: z.coerce.number().int(),
-  stake_token: z.string().default(''),
-  vote_weight: z.coerce.number().default(1),
-  stake_enabled: z.coerce.boolean().default(true),
-});
-
-export type SetCommunityStake = z.infer<typeof schema>;
-
 export const SetCommunityStake = (): CommandMetadata<
-  CommunityAttributes,
-  typeof schema
+  typeof community.SetCommunityStake
 > => ({
-  schema,
+  schemas: community.SetCommunityStake,
   auth: [isCommunityAdmin],
   body: async ({ id, payload }) => {
     // !load

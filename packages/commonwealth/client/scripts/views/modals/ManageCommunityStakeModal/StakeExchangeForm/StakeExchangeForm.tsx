@@ -69,6 +69,7 @@ const StakeExchangeForm = ({
   onSetNumberOfStakeToExchange,
 }: StakeExchangeFormProps) => {
   const chainRpc = app?.chain?.meta?.ChainNode?.url;
+  const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
   const activeAccountAddress = app?.user?.activeAccount?.address;
 
   const {
@@ -112,6 +113,7 @@ const StakeExchangeForm = ({
         namespace: stakeData?.Chain?.namespace,
         chainRpc,
         walletAddress: selectedAddress?.value,
+        ethChainId,
       });
 
       onSetSuccessTransactionHash(txReceipt?.transactionHash);
@@ -139,6 +141,7 @@ const StakeExchangeForm = ({
         namespace: stakeData?.Chain?.namespace,
         chainRpc,
         walletAddress: selectedAddress?.value,
+        ethChainId,
       });
 
       onSetSuccessTransactionHash(txReceipt?.transactionHash);
