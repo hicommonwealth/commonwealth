@@ -4,6 +4,7 @@ import { isCommandClick, pluralizeWithoutNumberPrefix } from 'helpers';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback } from 'react';
+import app from 'state';
 import {
   MixpanelClickthroughEvent,
   MixpanelClickthroughPayload,
@@ -21,7 +22,6 @@ import { addPeriodToText } from './utils';
 type CWRelatedCommunityCardProps = {
   community: ChainInfo | CommunityData;
   memberCount: string;
-  connected?: boolean;
   threadCount: string;
   stakeValue?: number;
   stakeChange?: number;
@@ -29,7 +29,6 @@ type CWRelatedCommunityCardProps = {
 
 export const CWRelatedCommunityCard = ({
   community,
-  connected,
   memberCount,
   threadCount,
   stakeValue,
@@ -57,6 +56,9 @@ export const CWRelatedCommunityCard = ({
     },
     [navigate, trackAnalytics, community.id],
   );
+
+  const isCommunityMember =
+    app.roles.getAllRolesInCommunity({ community: community.id }).length > 0;
 
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
 
@@ -134,19 +136,17 @@ export const CWRelatedCommunityCard = ({
             </div>
           </div>
           <div className="actions">
-            {connected !== undefined && (
-              <CWButton
-                {...(connected ? { iconLeft: 'checkCircleFilled' } : {})}
-                buttonHeight="sm"
-                buttonWidth="narrow"
-                label={connected ? 'Joined' : 'Join'}
-                disabled={connected}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleJoinCommunity();
-                }}
-              />
-            )}
+            <CWButton
+              {...(isCommunityMember ? { iconLeft: 'checkCircleFilled' } : {})}
+              buttonHeight="sm"
+              buttonWidth="narrow"
+              label={isCommunityMember ? 'Joined' : 'Join'}
+              disabled={isCommunityMember}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleJoinCommunity();
+              }}
+            />
 
             {stakeEnabled && (
               <CWButton
