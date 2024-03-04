@@ -2,9 +2,9 @@ import { VersionHistory } from 'models/Thread';
 import type momentType from 'moment';
 import moment from 'moment';
 import AddressInfo from './AddressInfo';
-import { UserProfile } from './MinimumProfile';
-import Reaction from './Reaction';
 import type { IUniqueId } from './interfaces';
+import { addressToUserProfile, UserProfile } from './MinimumProfile';
+import Reaction from './Reaction';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export class Comment<T extends IUniqueId> {
@@ -101,16 +101,7 @@ export class Comment<T extends IUniqueId> {
     this.rootThread = thread_id;
     this.discord_meta = discord_meta;
 
-    const profile = Address?.User?.Profiles[0];
-    if (profile) {
-      this.profile = {
-        id: profile.id,
-        avatarUrl: profile?.avatar_url,
-        name: profile?.profile_name,
-        address: Address?.address,
-        lastActive: Address?.last_active,
-      };
-    }
+    this.profile = addressToUserProfile(Address);
   }
 }
 

@@ -1,6 +1,6 @@
 export type ReactionType = 'like';
 import type moment from 'moment';
-import { UserProfile } from './MinimumProfile';
+import { addressToUserProfile, UserProfile } from './MinimumProfile';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class Reaction {
@@ -49,14 +49,8 @@ class Reaction {
     this.canvasHash = canvas_hash;
     this.calculatedVotingWeight = calculated_voting_weight || 1;
     this.updatedAt = updated_at;
-    const profile = Address.User.Profiles[0];
-    this.profile = {
-      id: profile.id,
-      avatarUrl: profile.avatar_url,
-      name: profile.profile_name,
-      address: Address.address,
-      lastActive: Address.last_active,
-    };
+
+    this.profile = addressToUserProfile(Address);
   }
 }
 

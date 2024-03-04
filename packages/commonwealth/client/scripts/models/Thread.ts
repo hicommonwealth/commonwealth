@@ -1,10 +1,10 @@
 import { ProposalType } from '@hicommonwealth/core';
 import type MinimumProfile from 'models/MinimumProfile';
-import { UserProfile } from 'models/MinimumProfile';
+import { addressToUserProfile, UserProfile } from 'models/MinimumProfile';
 import moment, { Moment } from 'moment';
+import type { IUniqueId } from './interfaces';
 import type { ReactionType } from './Reaction';
 import Topic from './Topic';
-import type { IUniqueId } from './interfaces';
 import type { ThreadKind, ThreadStage } from './types';
 
 function getDecodedString(str: string) {
@@ -331,16 +331,7 @@ export class Thread implements IUniqueId {
       : moment(created_at);
 
     if (Address.User) {
-      const profile = Address?.User?.Profiles[0];
-      if (profile) {
-        this.profile = {
-          id: profile.id,
-          avatarUrl: profile?.avatar_url,
-          name: profile?.profile_name,
-          address: Address?.address,
-          lastActive: Address?.last_active,
-        };
-      }
+      this.profile = addressToUserProfile(Address);
     } else {
       this.profile = {
         id: profile_id,
