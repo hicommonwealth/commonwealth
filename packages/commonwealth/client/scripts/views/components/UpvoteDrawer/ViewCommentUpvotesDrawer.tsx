@@ -17,7 +17,7 @@ export const ViewCommentUpvotesDrawer = ({
   const reactors = comment?.reactions;
   const reactorData = reactors?.map((reactor) => {
     const reactorMiscData = reactors.find(
-      (r) => r.author === reactor.profile.address,
+      (r) => r.author === reactor?.profile?.address,
     );
 
     return {
