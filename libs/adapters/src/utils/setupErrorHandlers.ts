@@ -1,5 +1,4 @@
 import { AppError, ServerError, logger } from '@hicommonwealth/core';
-import { UserInstance } from '@hicommonwealth/model';
 import type { Express, NextFunction, Request, Response } from 'express';
 
 // Handle server and application errors.
@@ -29,7 +28,7 @@ export const setupErrorHandlers = (app: Express) => {
         referer: req.headers.referer,
       },
       user: {
-        id: (req?.user as UserInstance)?.id,
+        id: (req?.user as Record<string, unknown>)?.id,
       },
     };
     if (error instanceof ServerError) {
