@@ -1,4 +1,5 @@
 import type ChainInfo from 'client/scripts/models/ChainInfo';
+import { CommunityData } from 'client/scripts/views/pages/DirectoryPage/DirectoryPageContent';
 import { isCommandClick, pluralizeWithoutNumberPrefix } from 'helpers';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
@@ -18,12 +19,12 @@ import './CWRelatedCommunityCard.scss';
 import { addPeriodToText } from './utils';
 
 type CWRelatedCommunityCardProps = {
-  community: ChainInfo;
-  memberCount: number;
-  connected: boolean;
-  threadCount: number;
-  stakeValue: number;
-  stakeChange: number;
+  community: ChainInfo | CommunityData;
+  memberCount: string;
+  connected?: boolean;
+  threadCount: string;
+  stakeValue?: number;
+  stakeChange?: number;
 };
 
 export const CWRelatedCommunityCard = ({
@@ -70,29 +71,34 @@ export const CWRelatedCommunityCard = ({
             <div className="community-info">
               <div className="header">
                 <div className="community-name">
-                  <CWCommunityAvatar community={community} size="large" />
+                  <CWCommunityAvatar
+                    community={community as ChainInfo}
+                    size="large"
+                  />
                   <CWText type="h5" title={community.name} fontWeight="medium">
                     {community.name}
                   </CWText>
                 </div>
 
-                <div className="stake-info">
-                  <CWText type="h5" className="stake-value">
-                    ${stakeValue}
-                  </CWText>
-                  <div>
-                    <CWText type="caption" className="stake-change">
-                      <span
-                        className={`percentage ${
-                          stakeChange >= 0 ? 'positive' : 'negative'
-                        }`}
-                      >
-                        {stakeChange}%
-                      </span>
-                      <span className="hours">24h</span>
+                {stakeValue && (
+                  <div className="stake-info">
+                    <CWText type="h5" className="stake-value">
+                      ${stakeValue}
                     </CWText>
+                    <div>
+                      <CWText type="caption" className="stake-change">
+                        <span
+                          className={`percentage ${
+                            stakeChange >= 0 ? 'positive' : 'negative'
+                          }`}
+                        >
+                          {stakeChange}%
+                        </span>
+                        <span className="hours">24h</span>
+                      </CWText>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
               <div className="description">
                 {community.description
@@ -128,17 +134,20 @@ export const CWRelatedCommunityCard = ({
             </div>
           </div>
           <div className="actions">
-            <CWButton
-              {...(connected ? { iconLeft: 'checkCircleFilled' } : {})}
-              buttonHeight="sm"
-              buttonWidth="narrow"
-              label={connected ? 'Joined' : 'Join'}
-              disabled={connected}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleJoinCommunity();
-              }}
-            />
+            {connected !== undefined && (
+              <CWButton
+                {...(connected ? { iconLeft: 'checkCircleFilled' } : {})}
+                buttonHeight="sm"
+                buttonWidth="narrow"
+                label={connected ? 'Joined' : 'Join'}
+                disabled={connected}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleJoinCommunity();
+                }}
+              />
+            )}
+
             {stakeEnabled && (
               <CWButton
                 label="Buy Stake"

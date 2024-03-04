@@ -17,7 +17,7 @@ type RowType = {
   id: string;
 };
 
-type CommunityData = {
+export type CommunityData = {
   name: string;
   nameLower: string;
   description: string;
@@ -111,10 +111,7 @@ const DirectoryPageContent = ({
       {filteredRelatedCommunitiesData.map((community) => (
         <CWRelatedCommunityCard
           key={community.id}
-          id={community.id}
-          communityName={community.name}
-          communityDescription={community.description}
-          communityIconUrl={community.iconUrl}
+          community={community}
           memberCount={community.members}
           threadCount={community.threads}
         />
