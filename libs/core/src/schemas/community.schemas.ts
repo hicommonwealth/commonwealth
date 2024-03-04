@@ -137,3 +137,41 @@ export const UpdateCommunity = {
   }),
   output: Community,
 };
+
+export const CommunityContract = z.object({
+  id: z.number().int(),
+  community_id: z.string().max(255),
+  contract_id: z.number().int(),
+  created_at: z.date(),
+  updated_at: z.date(),
+});
+
+export const Contract = z.object({
+  id: z.number().int(),
+  address: z.string().max(255),
+  chain_node_id: z.number().int(),
+  abi_id: z.number().int().optional().nullable(),
+  decimals: z.number().int().optional(),
+  token_name: z.string().max(255).optional(),
+  symbol: z.string().max(255).optional(),
+  type: z.string().max(255),
+  created_at: z.date(),
+  updated_at: z.date(),
+  is_factory: z.boolean().default(false),
+  nickname: z.string().max(255).optional(),
+});
+
+export const Topic = z.object({
+  id: z.number().int(),
+  name: z.string().max(255),
+  community_id: z.string().max(255),
+  description: z.string().default(''),
+  telegram: z.string().max(255).optional().nullable(),
+  featured_in_sidebar: z.boolean().default(false),
+  featured_in_new_post: z.boolean().default(false),
+  default_offchain_template: z.string().optional().nullable(),
+  order: z.number().int().optional(),
+  channel_id: z.string().max(255).optional().nullable(),
+  group_ids: z.array(z.number()).default([]),
+  default_offchain_template_backup: z.string().optional().nullable(),
+});

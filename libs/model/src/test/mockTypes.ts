@@ -1,33 +1,19 @@
 import {
   NotificationCategories,
   address,
+  chainNode,
   community,
   group,
+  notification,
+  snapshot,
+  subscription,
+  user,
 } from '@hicommonwealth/core';
-import z from 'zod';
 import { models } from '../database';
 import { SchemaWithModel } from './seed';
 
-const MAX_SCHEMA_INT = 1_000_000_000;
-
-// TODO: Replace these mock zod schemas with
-//       real schemas for single source of truth
-
-/*
-  === User ===
-*/
-
-const userSchema = z.object({
-  id: z.number().int(),
-  email: z.string().max(255).email().optional(),
-  isAdmin: z.boolean().optional(), // excluded
-  disableRichText: z.boolean().optional(),
-  emailVerified: z.boolean().optional(), // excluded
-  selected_community_id: z.string().max(255).optional(),
-  emailNotificationInterval: z.enum(['week', 'never']).optional(),
-});
-export const UserSchema: SchemaWithModel<typeof userSchema> = {
-  schema: userSchema,
+export const UserSchema: SchemaWithModel<typeof user.User> = {
+  schema: user.User,
   model: models.User,
   mockDefaults: () => ({
     isAdmin: false,
@@ -36,87 +22,35 @@ export const UserSchema: SchemaWithModel<typeof userSchema> = {
   }),
 };
 
-/*
-  === ChainNode ===
-*/
-
-const chainNodeSchema = z.object({
-  id: z.number().int(),
-  url: z.string().max(255),
-  eth_chain_id: z.number().int().max(MAX_SCHEMA_INT).optional(),
-  alt_wallet_url: z.string().max(255).optional(),
-  private_url: z.string().max(255).optional(),
-  balance_type: z.string().max(255).optional(),
-  name: z.string().max(255),
-  description: z.string().max(255).optional(),
-  ss58: z.number().int().max(MAX_SCHEMA_INT).optional(),
-  bech32: z.string().max(255).optional(),
-  created_at: z.date(),
-  updated_at: z.date(),
-  cosmos_chain_id: z
-    .string()
-    .regex(/[a-z0-9]+/)
-    .optional(),
-  health: z.string().max(255).optional(),
-});
-export const ChainNodeSchema: SchemaWithModel<typeof chainNodeSchema> = {
-  schema: chainNodeSchema,
+export const ChainNodeSchema: SchemaWithModel<typeof chainNode.ChainNode> = {
+  schema: chainNode.ChainNode,
   model: models.ChainNode,
-  mockDefaults: () => ({}),
+  mockDefaults: (seedNum) => ({
+    eth_chain_id: 50_000 + seedNum,
+    ss58: 50_000 + seedNum,
+  }),
 };
 
-/*
-  === Contract ===
-*/
-
-const contractSchema = z.object({
-  id: z.number().int(),
-  address: z.string().max(255),
-  chain_node_id: z.number().int().max(MAX_SCHEMA_INT),
-  abi_id: z.number().int().max(MAX_SCHEMA_INT).optional().nullable(),
-  decimals: z.number().int().max(MAX_SCHEMA_INT).optional(),
-  token_name: z.string().max(255).optional(),
-  symbol: z.string().max(255).optional(),
-  type: z.string().max(255),
-  created_at: z.date(),
-  updated_at: z.date(),
-  is_factory: z.boolean().default(false),
-  nickname: z.string().max(255).optional(),
-});
-export const ContractSchema: SchemaWithModel<typeof contractSchema> = {
-  schema: contractSchema,
+export const ContractSchema: SchemaWithModel<typeof community.Contract> = {
+  schema: community.Contract,
   model: models.Contract,
   mockDefaults: () => ({
     chain_node_id: 1,
     abi_id: null,
+    decimals: 18,
   }),
 };
 
-/*
-  === Contract ===
-*/
-
-const communityContractSchema = z.object({
-  id: z.number().int(),
-  community_id: z.string().max(255),
-  contract_id: z.number().int().max(MAX_SCHEMA_INT),
-  created_at: z.date(),
-  updated_at: z.date(),
-});
 export const CommunityContractSchema: SchemaWithModel<
-  typeof communityContractSchema
+  typeof community.CommunityContract
 > = {
-  schema: communityContractSchema,
+  schema: community.CommunityContract,
   model: models.CommunityContract,
   mockDefaults: () => ({
     community_id: 'ethereum',
     contract_id: 1,
   }),
 };
-
-/*
-  === Community ===
-*/
 
 export const CommunitySchema: SchemaWithModel<typeof community.Community> = {
   schema: community.Community,
@@ -130,35 +64,15 @@ export const CommunitySchema: SchemaWithModel<typeof community.Community> = {
   }),
 };
 
-/*
-  === Topic ===
-*/
-
-const topicSchema = z.object({
-  id: z.number().int(),
-  name: z.string().max(255),
-  community_id: z.string().max(255),
-  description: z.string().default(''),
-  telegram: z.string().max(255).optional().nullable(),
-  featured_in_sidebar: z.boolean().default(false),
-  featured_in_new_post: z.boolean().default(false),
-  default_offchain_template: z.string().optional().nullable(),
-  order: z.number().int().max(MAX_SCHEMA_INT).optional(),
-  channel_id: z.string().max(255).optional().nullable(),
-  group_ids: z.array(z.number().max(MAX_SCHEMA_INT)).default([]),
-  default_offchain_template_backup: z.string().optional().nullable(),
-});
-export const TopicSchema: SchemaWithModel<typeof topicSchema> = {
-  schema: topicSchema,
+export const TopicSchema: SchemaWithModel<typeof community.Topic> = {
+  schema: community.Topic,
   model: models.Topic,
   mockDefaults: () => ({
     community_id: 'ethereum',
+    order: 1,
+    group_ids: [],
   }),
 };
-
-/*
-  === CommunityStake ===
-*/
 
 export const CommunityStakeSchema: SchemaWithModel<
   typeof community.CommunityStake
@@ -179,37 +93,13 @@ export const CommunityStakeSchema: SchemaWithModel<
   }),
 };
 
-/*
-  === Profile ===
-*/
-
-const profileSchema = z.object({
-  id: z.number().int(),
-  user_id: z.number().int().max(MAX_SCHEMA_INT),
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
-  profile_name: z.string().max(255).optional(),
-  email: z.string().max(255).optional(),
-  website: z.string().max(255).optional(),
-  bio: z.string().optional(),
-  avatar_url: z.string().max(255).optional(),
-  slug: z.string().max(255).optional(),
-  socials: z.array(z.string()).optional(),
-  background_image: z.any().optional(),
-  bio_backup: z.string().optional(),
-  profile_name_backup: z.string().max(255).optional(),
-});
-export const ProfileSchema: SchemaWithModel<typeof profileSchema> = {
-  schema: profileSchema,
+export const ProfileSchema: SchemaWithModel<typeof user.Profile> = {
+  schema: user.Profile,
   model: models.Profile,
   mockDefaults: () => ({
     user_id: 1,
   }),
 };
-
-/*
-  === Address ===
-*/
 
 export const AddressSchema: SchemaWithModel<typeof address.Address> = {
   schema: address.Address,
@@ -221,20 +111,10 @@ export const AddressSchema: SchemaWithModel<typeof address.Address> = {
   }),
 };
 
-/*
-  === NotificationCategory ===
-*/
-
-const notificationCategorySchema = z.object({
-  name: z.string().max(255),
-  description: z.string(),
-  created_at: z.date(),
-  updated_at: z.date(),
-});
 export const NotificationCategorySchema: SchemaWithModel<
-  typeof notificationCategorySchema
+  typeof notification.NotificationCategory
 > = {
-  schema: notificationCategorySchema,
+  schema: notification.NotificationCategory,
   model: models.NotificationCategory,
   mockDefaults: () => ({}),
   buildQuery: (data) => ({
@@ -244,25 +124,10 @@ export const NotificationCategorySchema: SchemaWithModel<
   }),
 };
 
-/*
-  === Subscription ===
-*/
-
-const subscriptionSchema = z.object({
-  id: z.number(),
-  subscriber_id: z.number().int().max(MAX_SCHEMA_INT),
-  category_id: z.nativeEnum(NotificationCategories),
-  is_active: z.boolean().default(true),
-  created_at: z.date(),
-  updated_at: z.date(),
-  immediate_email: z.boolean().default(false),
-  community_id: z.string().max(255).optional().nullable(),
-  thread_id: z.number().int().max(MAX_SCHEMA_INT).optional().nullable(),
-  comment_id: z.number().int().max(MAX_SCHEMA_INT).optional().nullable(),
-  snapshot_id: z.string().max(255).optional().nullable(),
-});
-export const SubscriptionSchema: SchemaWithModel<typeof subscriptionSchema> = {
-  schema: subscriptionSchema,
+export const SubscriptionSchema: SchemaWithModel<
+  typeof subscription.Subscription
+> = {
+  schema: subscription.Subscription,
   model: models.Subscription,
   mockDefaults: () => ({
     subscriber_id: 1,
@@ -273,54 +138,27 @@ export const SubscriptionSchema: SchemaWithModel<typeof subscriptionSchema> = {
   }),
 };
 
-/*
-  === SnapshotProposal ===
-*/
-
-const snapshotSpaceSchema = z.object({
-  snapshot_space: z.string().max(255),
-  created_at: z.date(),
-  updated_at: z.date(),
-});
-export const SnapshotSpaceSchema: SchemaWithModel<typeof snapshotSpaceSchema> =
-  {
-    schema: snapshotSpaceSchema,
-    model: models.SnapshotSpace,
-    mockDefaults: () => ({}),
-    buildQuery: (data) => ({
-      where: {
-        snapshot_space: data.snapshot_space,
-      },
-    }),
-  };
-
-/*
-  === SnapshotProposal ===
-*/
-
-const snapshotProposalSchema = z.object({
-  id: z.string().max(255),
-  title: z.string().max(255).optional(),
-  body: z.string(),
-  choices: z.array(z.string().max(255)),
-  space: z.string().max(255),
-  event: z.string().max(255).optional(),
-  start: z.string().max(255).optional(),
-  expire: z.string().max(255).optional(),
-  is_upstream_deleted: z.string().default('false'),
-});
-export const SnapshotProposalSchema: SchemaWithModel<
-  typeof snapshotProposalSchema
+export const SnapshotSpaceSchema: SchemaWithModel<
+  typeof snapshot.SnapshotSpace
 > = {
-  schema: snapshotProposalSchema,
+  schema: snapshot.SnapshotSpace,
+  model: models.SnapshotSpace,
+  mockDefaults: () => ({}),
+  buildQuery: (data) => ({
+    where: {
+      snapshot_space: data.snapshot_space,
+    },
+  }),
+};
+
+export const SnapshotProposalSchema: SchemaWithModel<
+  typeof snapshot.SnapshotProposal
+> = {
+  schema: snapshot.SnapshotProposal,
   model: models.SnapshotProposal,
   mockDefaults: () => ({}),
   allowedGeneratedProps: ['id'],
 };
-
-/*
-  === Group ===
-*/
 
 export const GroupSchema: SchemaWithModel<typeof group.Group> = {
   schema: group.Group,
