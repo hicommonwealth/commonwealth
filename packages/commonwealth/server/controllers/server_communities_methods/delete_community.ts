@@ -118,6 +118,10 @@ export async function __deleteCommunity(
           );
 
           const models = [
+            this.models.CommunitySnapshotSpaces,
+            this.models.CommunityStake,
+            this.models.DiscordBotConfig,
+            this.models.Ban,
             this.models.Reaction,
             this.models.Comment,
             this.models.Topic,
@@ -137,6 +141,7 @@ export async function __deleteCommunity(
           for (const model of models) {
             await (model as ModelStatic<any>).destroy({
               where: { community_id: community.id },
+              force: true,
               transaction: t,
             });
           }
