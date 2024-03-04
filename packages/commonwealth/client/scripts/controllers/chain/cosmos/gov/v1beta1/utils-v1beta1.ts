@@ -1,4 +1,5 @@
 import BN from 'bn.js';
+import { CommunityPoolSpendProposal } from 'cosmjs-types/cosmos/distribution/v1beta1/distribution';
 import type {
   Proposal,
   TallyResult,
@@ -7,15 +8,14 @@ import {
   ProposalStatus,
   TextProposal,
 } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
-import { CommunityPoolSpendProposal } from 'cosmjs-types/cosmos/distribution/v1beta1/distribution';
 import moment from 'moment';
 
-import { Any } from 'cosmjs-types/google/protobuf/any';
 import {
   MsgSubmitProposalEncodeObject,
   MsgVoteEncodeObject,
 } from '@cosmjs/stargate';
 import { longify } from '@cosmjs/stargate/build/queryclient';
+import { Any } from 'cosmjs-types/google/protobuf/any';
 
 import type {
   CoinObject,
@@ -25,14 +25,14 @@ import type {
   ICosmosProposalTally,
 } from 'controllers/chain/cosmos/types';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
-import { CosmosApiType } from '../../chain';
 import Cosmos from '../../adapter';
+import { CosmosApiType } from '../../chain';
 import CosmosGovernance from './governance-v1beta1';
 
 /* -- v1beta1-specific methods: -- */
 
 export const stateEnumToString = (
-  status: ProposalStatus
+  status: ProposalStatus,
 ): CosmosProposalState => {
   switch (status) {
     case ProposalStatus.PROPOSAL_STATUS_DEPOSIT_PERIOD:
@@ -71,7 +71,7 @@ export const marshalTally = (tally: TallyResult): ICosmosProposalTally => {
 
 const fetchProposalsByStatus = async (
   api: CosmosApiType,
-  status: ProposalStatus
+  status: ProposalStatus,
 ): Promise<Proposal[]> => {
   if (!api?.gov) {
     console.error('API not initialized');
@@ -89,7 +89,7 @@ const fetchProposalsByStatus = async (
         status,
         '',
         '',
-        nextKey
+        nextKey,
       );
       proposalsByStatus.push(...proposals);
       nextKey = nextPage.nextKey;
@@ -102,40 +102,40 @@ const fetchProposalsByStatus = async (
     // If an error message is preferred, throw here instead of returning [].
     console.error(
       `Error fetching proposals by status ${ProposalStatus[status]}`,
-      e
+      e,
     );
     return [];
   }
 };
 
 export const getActiveProposalsV1Beta1 = async (
-  api: CosmosApiType
+  api: CosmosApiType,
 ): Promise<ICosmosProposal[]> => {
   const votingPeriodProposals = await fetchProposalsByStatus(
     api,
-    ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD
+    ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD,
   );
   const depositPeriodProposals = await fetchProposalsByStatus(
     api,
-    ProposalStatus.PROPOSAL_STATUS_DEPOSIT_PERIOD
+    ProposalStatus.PROPOSAL_STATUS_DEPOSIT_PERIOD,
   );
   return sortProposals([...votingPeriodProposals, ...depositPeriodProposals]);
 };
 
 export const getCompletedProposalsV1Beta1 = async (
-  api: CosmosApiType
+  api: CosmosApiType,
 ): Promise<ICosmosProposal[]> => {
   const passedProposals = await fetchProposalsByStatus(
     api,
-    ProposalStatus.PROPOSAL_STATUS_PASSED
+    ProposalStatus.PROPOSAL_STATUS_PASSED,
   );
   const failedProposals = await fetchProposalsByStatus(
     api,
-    ProposalStatus.PROPOSAL_STATUS_FAILED
+    ProposalStatus.PROPOSAL_STATUS_FAILED,
   );
   const rejectedProposals = await fetchProposalsByStatus(
     api,
-    ProposalStatus.PROPOSAL_STATUS_REJECTED
+    ProposalStatus.PROPOSAL_STATUS_REJECTED,
   );
   const combined = [
     ...passedProposals,
@@ -158,7 +158,7 @@ export const msgToIProposal = (p: Proposal): ICosmosProposal | null => {
   // TODO: support more types
   const { title, description } = TextProposal.decode(content.value);
   const isCommunitySpend = content.typeUrl?.includes(
-    'CommunityPoolSpendProposal'
+    'CommunityPoolSpendProposal',
   );
   let type: CosmosProposalType = 'text';
   let spendRecipient: string;
@@ -171,7 +171,7 @@ export const msgToIProposal = (p: Proposal): ICosmosProposal | null => {
       ? [
           new CosmosToken(
             spend.amount[0]?.denom,
-            spend.amount[0]?.amount
+            spend.amount[0]?.amount,
           ).toCoinObject(),
         ]
       : [];
@@ -213,7 +213,7 @@ export const isCompleted = (status: string): boolean => {
 export const encodeMsgSubmitProposal = (
   sender: string,
   initialDeposit: CosmosToken,
-  content: Any
+  content: Any,
 ): MsgSubmitProposalEncodeObject => {
   return {
     typeUrl: '/cosmos.gov.v1beta1.MsgSubmitProposal',
@@ -228,7 +228,7 @@ export const encodeMsgSubmitProposal = (
 export const encodeMsgVote = (
   voter: string,
   proposalId: number | Long | string,
-  option: number
+  option: number,
 ): MsgVoteEncodeObject => {
   return {
     typeUrl: '/cosmos.gov.v1beta1.MsgVote',
@@ -254,7 +254,7 @@ export const encodeCommunitySpend = (
   description: string,
   recipient: string,
   amount: string,
-  denom: string
+  denom: string,
 ): Any => {
   const coinAmount = [{ amount, denom }];
   const spend = CommunityPoolSpendProposal.fromPartial({
@@ -276,7 +276,7 @@ export interface CosmosDepositParams {
 
 export const getDepositParams = async (
   cosmosChain: Cosmos,
-  stakingDenom?: string
+  stakingDenom?: string,
 ): Promise<CosmosDepositParams> => {
   const govController = cosmosChain.governance as CosmosGovernance;
   let minDeposit;
@@ -284,17 +284,17 @@ export const getDepositParams = async (
 
   // TODO: support off-denom deposits
   const depositCoins = depositParams.minDeposit.find(
-    ({ denom }) => denom === stakingDenom
+    ({ denom }) => denom === stakingDenom,
   );
   if (depositCoins) {
     minDeposit = new CosmosToken(
       depositCoins.denom,
-      new BN(depositCoins.amount)
+      new BN(depositCoins.amount),
     );
   } else {
     throw new Error(
       `Gov minDeposit in wrong denom (${minDeposit}) or stake denom not loaded: 
-      ${cosmosChain.chain.denom}`
+      ${cosmosChain.chain.denom}`,
     );
   }
   govController.setMinDeposit(minDeposit);

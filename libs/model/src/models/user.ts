@@ -12,7 +12,7 @@ export type EmailNotificationInterval = 'week' | 'never';
 export type UserAttributes = User & {
   disableRichText?: boolean;
   emailNotificationInterval?: EmailNotificationInterval;
-  selected_community_id?: number | null;
+  selected_community_id?: string | null;
   created_at?: Date;
   updated_at?: Date;
 

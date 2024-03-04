@@ -16,7 +16,7 @@ import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { MixpanelSnapshotEvents } from '../../../../../shared/analytics/types';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import CWLoadingSpinner from '../../components/component_kit/new_designs/CWLoadingSpinner';
+import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import {
   ReactQuillEditor,
   createDeltaFromText,
@@ -213,7 +213,7 @@ export const NewSnapshotProposalForm = ({
     <div className="NewSnapshotProposalForm">
       {loading ? (
         <div className="proposal-loading">
-          <CWLoadingSpinner />
+          <CWCircleMultiplySpinner />
         </div>
       ) : (
         <>

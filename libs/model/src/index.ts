@@ -14,4 +14,4 @@ export * as tester from './test';
 // Internals - Should not be exported once we finish the migrations to models
 export * from './database';
 export * from './models';
-export * from './utils/abi';
+export * from './utils';

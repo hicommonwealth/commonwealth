@@ -46,7 +46,7 @@ interface UseFetchProfilesByAddressesQuery extends FetchProfilesByAddressProps {
 const useFetchProfilesByAddressesQuery = ({
   currentChainId,
   profileChainIds,
-  profileAddresses,
+  profileAddresses = [],
   apiCallEnabled = true,
 }: UseFetchProfilesByAddressesQuery) => {
   return useQuery({

@@ -1,4 +1,4 @@
 export * from './command';
-export * from './pagination';
+export * from './event';
 export * from './query';
 export * from './types';

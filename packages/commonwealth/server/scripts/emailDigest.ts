@@ -46,7 +46,7 @@ export const digestLevels = {
 export const getTopThreads = async (
   communityId: string,
 ): Promise<ThreadData[]> => {
-  const res = await models.sequelize.query(`SELECT 
+  const res = await models.sequelize.query(`SELECT
         t.title,
         SUBSTRING(t.plaintext, 1, 300) AS body,
         COUNT(DISTINCT c.id) AS comment_count,
@@ -54,17 +54,17 @@ export const getTopThreads = async (
         a.address AS author_address,
         t.id AS thread_id,
         t.created_at AS created_at
-      FROM 
+      FROM
         "Threads" t
         LEFT JOIN "Comments" c ON t.id = c.thread_id
         LEFT JOIN "Reactions" r ON t.id = r.thread_id
         INNER JOIN "Addresses" a ON t.address_id = a.id
-      WHERE 
-        t.community_id='${communityId}' 
+      WHERE
+        t.community_id='${communityId}'
         AND c.created_at > NOW() - INTERVAL '1 WEEK' AND r.created_at > NOW() - INTERVAL '1 WEEK'
-      GROUP BY 
+      GROUP BY
         t.id, a.address
-      ORDER BY 
+      ORDER BY
         0.6 * COUNT(DISTINCT c.id) + 0.4 * COUNT(DISTINCT r.id) DESC
       LIMIT 3;`);
 
@@ -126,15 +126,15 @@ export const getTopThreads = async (
 const getCommunityActivityScore = async (
   communityId: string,
 ): Promise<number> => {
-  const activityScore = await models.sequelize.query(`SELECT 
+  const activityScore = await models.sequelize.query(`SELECT
           0.4 * COUNT(DISTINCT t.id) +
           0.3 * COUNT(DISTINCT c.id) +
           0.3 * COUNT(DISTINCT r.id) AS activity_score
-        FROM 
+        FROM
           "Threads" t
           LEFT JOIN "Comments" c ON t.id = c.thread_id
           LEFT JOIN "Reactions" r ON t.id = r.thread_id
-        WHERE 
+        WHERE
           t.community_id='${communityId}' AND
           (t.created_at > NOW() - INTERVAL '1 WEEK' OR
           c.created_at > NOW() - INTERVAL '1 WEEK' OR
@@ -240,8 +240,8 @@ export const emailDigestBuilder = async (
       return acc;
     }, [] as string[]);
 
-    for (const chain_id of userCommunities) {
-      const communityDigest = communityDigestInfo[chain_id];
+    for (const community_id of userCommunities) {
+      const communityDigest = communityDigestInfo[community_id];
       if (!communityDigest || communityDigest.top_threads.length < 1) continue;
       emailObject.push(communityDigest);
     }

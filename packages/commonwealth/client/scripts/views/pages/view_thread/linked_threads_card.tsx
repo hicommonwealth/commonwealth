@@ -11,7 +11,7 @@ import { LinkSource } from '../../../models/Thread';
 import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
-import CWLoadingSpinner from '../../components/component_kit/new_designs/CWLoadingSpinner';
+import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { LinkedThreadModal } from '../../modals/linked_thread_modal';
 
@@ -47,7 +47,7 @@ export const LinkedThreadsCard = ({
         content={
           linkedThreadIds.length > 0 && isLoading ? (
             <div className="spinner-container">
-              <CWLoadingSpinner />
+              <CWCircleMultiplySpinner />
             </div>
           ) : (
             <div className="LinkedThreadsCard">

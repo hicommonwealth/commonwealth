@@ -113,13 +113,16 @@ export async function __createThreadReaction(
       if (!community) {
         throw new AppError(Errors.CommunityNotFound);
       }
+      const node = await this.models.ChainNode.findByPk(
+        community.chain_node_id,
+      );
       const stakeBalance =
         await commonProtocolService.contractHelpers.getNamespaceBalance(
           community.namespace,
           stake.stake_id,
-          commonProtocol.ValidChains.Base,
+          node.eth_chain_id,
           address.address,
-          this.models,
+          node.url,
         );
       calculatedVotingWeight = commonProtocol.calculateVoteWeight(
         stakeBalance,
@@ -157,9 +160,9 @@ export async function __createThreadReaction(
         thread_id: thread.id,
         root_title: thread.title,
         root_type: 'discussion',
-        chain_id: thread.community_id,
+        community_id: thread.community_id,
         author_address: address.address,
-        author_chain: address.community_id,
+        author_community_id: address.community_id,
       },
     },
     excludeAddresses: [address.address],

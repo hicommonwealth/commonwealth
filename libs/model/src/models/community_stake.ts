@@ -1,19 +1,13 @@
+import { community } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
+import { z } from 'zod';
 import { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
 
-export type CommunityStakeAttributes = {
-  id?: number;
-  community_id?: string;
-  stake_id?: number;
-  stake_token?: string;
-  vote_weight?: number;
-  stake_enabled?: boolean;
-
-  created_at?: Date;
-  updated_at?: Date;
-
+export type CommunityStakeAttributes = z.infer<
+  typeof community.CommunityStake
+> & {
   // associations
   Chain?: CommunityAttributes;
 };

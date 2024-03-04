@@ -8,7 +8,7 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
-import CWLoadingSpinner from '../../components/component_kit/new_designs/CWLoadingSpinner';
+import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 
 type Stats = {
   numCommentsLastMonth: number;
@@ -102,7 +102,7 @@ const Analytics = () => {
   return (
     <div className="Analytics">
       {!initialized ? (
-        <CWLoadingSpinner />
+        <CWCircleMultiplySpinner />
       ) : (
         <>
           <div className="AnalyticsSection">

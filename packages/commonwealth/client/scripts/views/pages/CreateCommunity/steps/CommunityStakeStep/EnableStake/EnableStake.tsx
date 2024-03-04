@@ -17,10 +17,11 @@ const EnableStake = ({
   goToSuccessStep,
   onOptInEnablingStake,
   communityStakeData,
+  chainId,
 }: EnableStakeProps) => {
   const [namespaceError, setNamespaceError] = useState('');
 
-  const { namespaceFactory } = useNamespaceFactory();
+  const { namespaceFactory } = useNamespaceFactory(parseInt(chainId));
 
   const clearNamespaceError = () => {
     setNamespaceError('');

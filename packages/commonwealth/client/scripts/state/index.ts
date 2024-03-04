@@ -88,6 +88,7 @@ export interface IApp {
   // stored on server-side
   config: {
     chains: ChainStore;
+    redirects: Record<string, string>;
     nodes: NodeStore;
     notificationCategories?: NotificationCategory[];
     defaultChain: string;
@@ -168,6 +169,7 @@ const app: IApp = {
 
   config: {
     chains: new ChainStore(),
+    redirects: {},
     nodes: new NodeStore(),
     defaultChain: 'edgeware',
   },
@@ -226,15 +228,17 @@ export async function initAppState(
       .filter((chainsWithSnapshots) => chainsWithSnapshots.community.active)
       .forEach((chainsWithSnapshots) => {
         delete chainsWithSnapshots.community.ChainNode;
-        app.config.chains.add(
-          ChainInfo.fromJSON({
-            ChainNode: app.config.nodes.getById(
-              chainsWithSnapshots.community.chain_node_id,
-            ),
-            snapshot: chainsWithSnapshots.snapshot,
-            ...chainsWithSnapshots.community,
-          }),
-        );
+        const chainInfo = ChainInfo.fromJSON({
+          ChainNode: app.config.nodes.getById(
+            chainsWithSnapshots.community.chain_node_id,
+          ),
+          snapshot: chainsWithSnapshots.snapshot,
+          ...chainsWithSnapshots.community,
+        });
+        app.config.chains.add(chainInfo);
+        if (chainInfo.redirect) {
+          app.config.redirects[chainInfo.redirect] = chainInfo.id;
+        }
       });
 
     app.roles.setRoles(statusRes.result.roles);

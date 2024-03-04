@@ -1,4 +1,8 @@
-import type { BalanceType } from '@hicommonwealth/core';
+import type {
+  BalanceType,
+  CosmosGovernanceVersion,
+  NodeHealth,
+} from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
 import type { ModelInstance, ModelStatic } from './types';
@@ -12,9 +16,12 @@ export type ChainNodeAttributes = {
   private_url?: string;
   balance_type: BalanceType;
   bech32?: string;
+  cosmos_gov_version?: CosmosGovernanceVersion;
   ss58?: number;
   name: string;
   description?: string;
+  health?: NodeHealth;
+  updated_at?: Date;
 };
 
 export type ChainNodeInstance = ModelInstance<ChainNodeAttributes>;
@@ -41,8 +48,10 @@ export default (
       balance_type: { type: dataTypes.STRING, allowNull: false },
       name: { type: dataTypes.STRING, allowNull: false },
       description: { type: dataTypes.TEXT, allowNull: true },
+      health: { type: dataTypes.STRING, allowNull: true },
       ss58: { type: dataTypes.INTEGER, allowNull: true },
       bech32: { type: dataTypes.STRING, allowNull: true },
+      cosmos_gov_version: { type: dataTypes.STRING, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
     },

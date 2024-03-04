@@ -42,10 +42,13 @@ const useCreateCommunity = () => {
   ].includes(createCommunityStep);
   const isEthereumMainnetSelected =
     // selectedChainId === ETHEREUM_MAINNET_ID ||
-    selectedChainId === String(commonProtocol.ValidChains.Base);
+    Object.values(commonProtocol.ValidChains).includes(
+      parseInt(selectedChainId),
+    );
   const showCommunityStakeStep =
     isValidStepToShowCommunityStakeFormStep &&
-    selectedCommunity.type === 'ethereum' &&
+    (selectedCommunity.type === 'ethereum' ||
+      selectedCommunity.type === 'blast') &&
     isEthereumMainnetSelected;
 
   return {
