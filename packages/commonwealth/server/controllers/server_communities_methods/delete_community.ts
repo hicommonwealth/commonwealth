@@ -1,5 +1,5 @@
 import { AppError } from '@hicommonwealth/core';
-import { UserInstance, sequelize } from '@hicommonwealth/model';
+import { ModelStatic, UserInstance, sequelize } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
@@ -59,11 +59,6 @@ export async function __deleteCommunity(
             },
           );
 
-          await this.models.Reaction.destroy({
-            where: { community_id: community.id },
-            transaction: t,
-          });
-
           // Add the created by field to comments for redundancy
           await sequelize.query(
             `UPDATE "Comments" SET
@@ -72,54 +67,10 @@ export async function __deleteCommunity(
             { transaction: t },
           );
 
-          await this.models.Comment.destroy({
-            where: { community_id: community.id },
-            transaction: t,
-          });
-
-          await this.models.Topic.destroy({
-            where: { community_id: community.id },
-            transaction: t,
-          });
-
-          await this.models.Subscription.destroy({
-            where: { community_id: community.id },
-            transaction: t,
-          });
-
-          await this.models.CommunityContract.destroy({
-            where: {
-              community_id: community.id,
-            },
-            transaction: t,
-          });
-
-          await this.models.Webhook.destroy({
-            where: { community_id: community.id },
-            transaction: t,
-          });
-
           const threads = await this.models.Thread.findAll({
             where: { community_id: community.id },
             attributes: ['id'],
             paranoid: false, // necessary in order to delete associations with soft-deleted threads
-          });
-
-          await this.models.Collaboration.destroy({
-            where: {
-              thread_id: { [Op.in]: threads.map((thread) => thread.id) },
-            },
-            transaction: t,
-          });
-
-          await this.models.Vote.destroy({
-            where: { community_id: community.id },
-            transaction: t,
-          });
-
-          await this.models.Poll.destroy({
-            where: { community_id: community.id },
-            transaction: t,
           });
 
           // Add the created by field to threads for redundancy
@@ -129,31 +80,6 @@ export async function __deleteCommunity(
              WHERE community_id = :community_id`,
             { transaction: t, replacements: { community_id: community.id } },
           );
-
-          await this.models.Thread.destroy({
-            where: { community_id: community.id },
-            transaction: t,
-          });
-
-          await this.models.StarredCommunity.destroy({
-            where: { community_id: community.id },
-            transaction: t,
-          });
-
-          await this.models.Address.findAll({
-            where: { community_id: community.id },
-          });
-
-          await this.models.CommunityBanner.destroy({
-            where: { community_id: community.id },
-            transaction: t,
-          });
-
-          // notifications + notifications_read (cascade)
-          await this.models.Notification.destroy({
-            where: { community_id: community.id },
-            transaction: t,
-          });
 
           await this.models.sequelize.query(
             `
@@ -173,13 +99,6 @@ export async function __deleteCommunity(
             },
           );
 
-          await this.models.Group.destroy({
-            where: {
-              community_id: community.id,
-            },
-            transaction: t,
-          });
-
           await this.models.sequelize.query(
             `
             WITH addresses_to_delete AS (
@@ -198,8 +117,41 @@ export async function __deleteCommunity(
             },
           );
 
-          await this.models.Address.destroy({
-            where: { community_id: community.id },
+          const models = [
+            this.models.Reaction,
+            this.models.Comment,
+            this.models.Topic,
+            this.models.Subscription,
+            this.models.CommunityContract,
+            this.models.Webhook,
+            this.models.Vote,
+            this.models.Poll,
+            this.models.Thread,
+            this.models.StarredCommunity,
+            this.models.CommunityBanner,
+            this.models.Notification,
+            this.models.Group,
+            this.models.Address,
+          ];
+
+          for (const model of models) {
+            await (model as ModelStatic<any>).destroy({
+              where: { community_id: community.id },
+              transaction: t,
+            });
+          }
+
+          await this.models.Collaboration.destroy({
+            where: {
+              thread_id: { [Op.in]: threads.map((thread) => thread.id) },
+            },
+            transaction: t,
+          });
+
+          await this.models.Template.destroy({
+            where: {
+              created_for_community: community.id,
+            },
             transaction: t,
           });
 
