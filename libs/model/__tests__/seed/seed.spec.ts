@@ -16,6 +16,7 @@ import {
   CommunitySchema,
   CommunityStakeSchema,
   ContractSchema,
+  GroupSchema,
   NotificationCategorySchema,
   ProfileSchema,
   SchemaWithModel,
@@ -385,6 +386,30 @@ describe('Seed functions', () => {
           new Date().getTime() + 100 * 24 * 60 * 60 * 1000,
         ).toString(),
       });
+    });
+  });
+
+  describe('Group', () => {
+    step('Should seed with defaults', async () => {
+      await testSeed(GroupSchema);
+      await testSeed(GroupSchema);
+    });
+
+    step('Should seed with overrides', async () => {
+      await testSeed(
+        GroupSchema,
+        {
+          metadata: {
+            name: 'hello',
+            description: 'blah',
+          },
+        },
+        {
+          testOptions: {
+            excludeOverrideChecks: ['metadata'],
+          },
+        },
+      );
     });
   });
 });

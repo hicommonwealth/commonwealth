@@ -1,6 +1,25 @@
 import z from 'zod';
 
-// TODO: move attributes from models
 export const Address = z.object({
-  address: z.string(),
+  id: z.number().int(),
+  address: z.string().max(255),
+  community_id: z.string().max(255),
+  user_id: z.number().int(),
+  verification_token: z.string().max(255).optional(),
+  verification_token_expires: z.date().nullable().optional(),
+  verified: z.date().nullable().optional(),
+  keytype: z.string().max(255).optional(),
+  last_active: z.date().nullable().optional(),
+  is_councillor: z.boolean().default(false),
+  is_validator: z.boolean().default(false),
+  ghost_address: z.boolean().optional(),
+  profile_id: z.number().int().optional(),
+  wallet_id: z.string().max(255).optional(),
+  block_info: z.string().max(255).optional(),
+  is_user_default: z.boolean().default(false),
+  role: z.enum(['member', 'admin', 'moderator']).default('member'),
+  wallet_sso_source: z.string().max(255).optional(),
+  hex: z.string().max(64).optional(),
+  created_at: z.any(),
+  updated_at: z.any(),
 });

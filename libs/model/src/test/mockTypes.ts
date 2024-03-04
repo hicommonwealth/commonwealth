@@ -1,8 +1,5 @@
 import { NotificationCategories } from '@hicommonwealth/core';
-import {
-  Community,
-  CommunityStake,
-} from '@hicommonwealth/core/src/schemas/community.schema';
+import { address, community, group } from '@hicommonwealth/core/src/schemas';
 import z from 'zod';
 import { models } from '../database';
 import { SchemaWithModel } from './seed';
@@ -117,8 +114,8 @@ export const CommunityContractSchema: SchemaWithModel<
   === Community ===
 */
 
-export const CommunitySchema: SchemaWithModel<typeof Community> = {
-  schema: Community,
+export const CommunitySchema: SchemaWithModel<typeof community.Community> = {
+  schema: community.Community,
   model: models.Community,
   allowedGeneratedProps: ['id'],
   mockDefaults: (seedNum) => ({
@@ -159,8 +156,10 @@ export const TopicSchema: SchemaWithModel<typeof topicSchema> = {
   === CommunityStake ===
 */
 
-export const CommunityStakeSchema: SchemaWithModel<typeof CommunityStake> = {
-  schema: CommunityStake,
+export const CommunityStakeSchema: SchemaWithModel<
+  typeof community.CommunityStake
+> = {
+  schema: community.CommunityStake,
   model: models.CommunityStake,
   mockDefaults: (seedNum) => ({
     community_id: 'ethereum',
@@ -208,29 +207,8 @@ export const ProfileSchema: SchemaWithModel<typeof profileSchema> = {
   === Address ===
 */
 
-const addressSchema = z.object({
-  id: z.number().int(),
-  address: z.string().max(255),
-  community_id: z.string().max(255),
-  user_id: z.number().int().max(MAX_SCHEMA_INT),
-  verification_token: z.string().max(255).optional(), // excluded
-  verification_token_expires: z.date().nullable().optional(), // excluded
-  verified: z.date().nullable().optional(),
-  keytype: z.string().max(255).optional(),
-  last_active: z.date().nullable().optional(),
-  is_councillor: z.boolean().default(false),
-  is_validator: z.boolean().default(false),
-  ghost_address: z.boolean().optional(),
-  profile_id: z.number().int().max(MAX_SCHEMA_INT).optional(),
-  wallet_id: z.string().max(255).optional(),
-  block_info: z.string().max(255).optional(), // excluded
-  is_user_default: z.boolean().default(false),
-  role: z.enum(['member', 'admin', 'moderator']).default('member'),
-  wallet_sso_source: z.string().max(255).optional(),
-  hex: z.string().max(64).optional(),
-});
-export const AddressSchema: SchemaWithModel<typeof addressSchema> = {
-  schema: addressSchema,
+export const AddressSchema: SchemaWithModel<typeof address.Address> = {
+  schema: address.Address,
   model: models.Address,
   mockDefaults: () => ({
     community_id: 'ethereum',
@@ -334,4 +312,16 @@ export const SnapshotProposalSchema: SchemaWithModel<
   model: models.SnapshotProposal,
   mockDefaults: () => ({}),
   allowedGeneratedProps: ['id'],
+};
+
+/*
+  === Group ===
+*/
+
+export const GroupSchema: SchemaWithModel<typeof group.Group> = {
+  schema: group.Group,
+  model: models.Group,
+  mockDefaults: () => ({
+    community_id: 'ethereum',
+  }),
 };
