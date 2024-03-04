@@ -20,16 +20,14 @@ export type CircleButtonProps = {
 } & CircleButtonStyleProps &
   React.HTMLAttributes<HTMLButtonElement>;
 
-export const CWCircleButton = (props: CircleButtonProps) => {
-  const {
-    className,
-    iconName,
-    buttonType,
-    disabled = false,
-    onClick,
-    ...otherProps
-  } = props;
-
+export const CWCircleButton = ({
+  className,
+  iconName,
+  buttonType,
+  disabled = false,
+  onClick,
+  ...otherProps
+}: CircleButtonProps) => {
   return (
     <div
       className={getClasses({

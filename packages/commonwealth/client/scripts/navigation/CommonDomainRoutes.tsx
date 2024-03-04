@@ -4,7 +4,6 @@ import { Route } from 'react-router-dom';
 import { withLayout } from 'views/Layout';
 import { RouteFeatureFlags } from './Router';
 
-const LandingPage = lazy(() => import('views/pages/landing'));
 const WhyCommonwealthPage = lazy(() => import('views/pages/why_commonwealth'));
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
 const CommunitiesPage = lazy(() => import('views/pages/communities'));
@@ -103,26 +102,12 @@ const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 const CommonDomainRoutes = ({
   proposalTemplatesEnabled,
   communityHomepageEnabled,
-  rootDomainRebrandEnabled,
 }: RouteFeatureFlags) => [
-  ...(rootDomainRebrandEnabled
-    ? [
-        <Route
-          key="/"
-          path="/"
-          element={withLayout(DashboardPage, { type: 'common' })}
-        />,
-      ]
-    : [
-        <Route
-          key="/"
-          path="/"
-          element={withLayout(LandingPage, {
-            scoped: false,
-            type: 'blank',
-          })}
-        />,
-      ]),
+  <Route
+    key="/"
+    path="/"
+    element={withLayout(DashboardPage, { type: 'common' })}
+  />,
   <Route
     key="/createCommunity"
     path="/createCommunity"
