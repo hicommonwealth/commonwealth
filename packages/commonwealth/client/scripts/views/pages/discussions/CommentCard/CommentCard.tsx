@@ -1,5 +1,4 @@
 import type { Action, Session } from '@canvas-js/interfaces';
-import { verify } from 'canvas';
 import type { DeltaStatic } from 'quill';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
@@ -95,23 +94,24 @@ export const CommentCard = ({
 
   useEffect(() => {
     try {
+      // TODO: implement this using the new canvas fields
       // suppress "unexpected error while verifying" error message on non-synced comments
-      if (!comment.canvasSession || !comment.canvasAction) return;
-      const session: Session = JSON.parse(comment.canvasSession);
-      const action: Action = JSON.parse(comment.canvasAction);
-      const actionSignerAddress = session?.payload?.sessionAddress;
-      if (
-        !comment.canvasSession ||
-        !comment.canvasAction ||
-        !actionSignerAddress
-      )
-        return;
-      verify({ session })
-        .then(() => setVerifiedSession(session))
-        .catch((err) => console.log('Could not verify session', err.stack));
-      verify({ action, actionSignerAddress })
-        .then(() => setVerifiedAction(action))
-        .catch((err) => console.log('Could not verify action', err.stack));
+      // if (!comment.canvasSession || !comment.canvasAction) return;
+      // const session: Session = JSON.parse(comment.canvasSession);
+      // const action: Action = JSON.parse(comment.canvasAction);
+      // const actionSignerAddress = session?.payload?.sessionAddress;
+      // if (
+      //   !comment.canvasSession ||
+      //   !comment.canvasAction ||
+      //   !actionSignerAddress
+      // )
+      //   return;
+      // verify({ session })
+      //   .then(() => setVerifiedSession(session))
+      //   .catch((err) => console.log('Could not verify session', err.stack));
+      // verify({ action, actionSignerAddress })
+      //   .then(() => setVerifiedAction(action))
+      //   .catch((err) => console.log('Could not verify action', err.stack));
     } catch (err) {
       console.log('Unexpected error while verifying action/session');
       return;

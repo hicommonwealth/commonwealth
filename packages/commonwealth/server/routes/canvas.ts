@@ -2,8 +2,8 @@ import type { DB } from '@hicommonwealth/model';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
-import type { Action, Session } from '@canvas-js/interfaces';
 import {
+  unpackCanvasArguments,
   verifyComment,
   verifyReaction,
   verifyThread,
@@ -66,9 +66,10 @@ ORDER BY updated_at DESC LIMIT 50;
 };
 
 type CanvasPostReq = {
-  canvas_action: Action;
-  canvas_session: Session;
-  canvas_hash: string;
+  canvas_action_message: string;
+  canvas_action_message_signature: string;
+  canvas_session_message: string;
+  canvas_session_message_signature: string;
 };
 type CanvasPostResp = {};
 
@@ -77,16 +78,16 @@ export const postCanvasData = async (
   req: TypedRequestBody<CanvasPostReq>,
   res: TypedResponse<CanvasPostResp>,
 ) => {
-  const { canvas_action, canvas_session, canvas_hash } = req.body;
-
+  const parsedCanvasArguments = await unpackCanvasArguments(req.body);
+  const { actionMessage } = parsedCanvasArguments;
   // TODO: Implement verification and call the create
   // thread/comment/reaction server method with POST data pre-filled.
-  if (canvas_action.payload.call === 'thread') {
-    await verifyThread(canvas_action, canvas_session, canvas_hash, {});
-  } else if (canvas_action.payload.call === 'comment') {
-    await verifyComment(canvas_action, canvas_session, canvas_hash, {});
-  } else if (canvas_action.payload.call === 'reaction') {
-    await verifyReaction(canvas_action, canvas_session, canvas_hash, {});
+  if (actionMessage.payload.name === 'thread') {
+    await verifyThread(parsedCanvasArguments, {});
+  } else if (actionMessage.payload.name === 'comment') {
+    await verifyComment(parsedCanvasArguments, {});
+  } else if (actionMessage.payload.name === 'reaction') {
+    await verifyReaction(parsedCanvasArguments, {});
   }
 
   // TODO: Return some kind of identifier for the generated data.

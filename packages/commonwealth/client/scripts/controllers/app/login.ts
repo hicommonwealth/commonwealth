@@ -10,6 +10,7 @@ import $ from 'jquery';
 import { getSessionSigners } from 'shared/canvas/verify';
 import { initAppState } from 'state';
 
+import { Session } from '@canvas-js/interfaces';
 import { CANVAS_TOPIC } from 'shared/canvas';
 import app from 'state';
 import Account from '../../models/Account';
@@ -424,6 +425,7 @@ export async function handleSocialLoginCallback({
   chain?: string;
   walletSsoSource?: string;
 }): Promise<string> {
+  const ipldDagJson = await import('@ipld/dag-json');
   const { SIWESigner } = await import('@canvas-js/chain-ethereum');
   // desiredChain may be empty if social login was initialized from
   // a page without a chain, in which case we default to an eth login
@@ -462,7 +464,7 @@ export async function handleSocialLoginCallback({
     }
   }
 
-  let session;
+  let session: Session;
   try {
     // Sign a session
     if (isCosmos && desiredChain) {
@@ -522,7 +524,7 @@ export async function handleSocialLoginCallback({
       username: profileMetadata?.username,
       avatarUrl: profileMetadata?.avatarUrl,
       magicAddress,
-      session,
+      session: ipldDagJson.stringify(ipldDagJson.encode(session)),
       walletSsoSource,
     },
   });

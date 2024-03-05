@@ -27,8 +27,9 @@ import { verify } from 'jsonwebtoken';
 import passport from 'passport';
 import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
 import { Op, Transaction } from 'sequelize';
+import { CANVAS_TOPIC } from 'shared/canvas';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
-import { verify as verifyCanvas } from '../../shared/canvas/verify';
+import { getSessionSignerForAddress } from '../../shared/canvas/verify';
 import { JWT_SECRET, MAGIC_API_KEY } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { validateCommunity } from '../middleware/validateCommunity';
@@ -387,13 +388,14 @@ async function magicLoginRoute(
     username?: string;
     avatarUrl?: string;
     signature: string;
-    sessionPayload?: string; // optional because session keys are feature-flagged
+    session?: string;
     magicAddress?: string; // optional because session keys are feature-flagged
     walletSsoSource: WalletSsoSource;
   }>,
   decodedMagicToken: MagicUser,
   cb: DoneFunc,
 ) {
+  const ipldDagJson = await import('@ipld/dag-json');
   log.trace(`MAGIC TOKEN: ${JSON.stringify(decodedMagicToken, null, 2)}`);
   let chainToJoin: CommunityInstance, error, loggedInUser: UserInstance;
 
@@ -473,13 +475,16 @@ async function magicLoginRoute(
   // the user should have signed a sessionPayload with the client-side
   // magic address. validate the signature and add that address
   try {
-    const session: Session = {
-      type: 'session',
-      signature: req.body.signature,
-      payload: req.body.sessionPayload
-        ? JSON.parse(req.body.sessionPayload)
-        : undefined,
-    };
+    // const session: Session = {
+    //   type: 'session',
+    //   signature: req.body.signature,
+    //   payload: req.body.sessionPayload
+    //     ? JSON.parse(req.body.sessionPayload)
+    //     : undefined,
+    // };
+    const session: Session = ipldDagJson.decode(
+      ipldDagJson.parse(req.body.session),
+    );
 
     if (chainToJoin) {
       if (isCosmos) {
@@ -501,7 +506,7 @@ async function magicLoginRoute(
         });
       } else if (
         chainToJoin.base === ChainBase.Ethereum &&
-        session.payload.chain.startsWith('eip155:')
+        session.address.startsWith('eip155:')
       ) {
         generatedAddresses.push({
           address: req.body.magicAddress,
@@ -516,18 +521,12 @@ async function magicLoginRoute(
     }
 
     if (process.env.ENFORCE_SESSION_KEYS === 'true') {
-      if (
-        !session.payload?.from ||
-        req.body.magicAddress !== session.payload.from
-      ) {
-        throw new Error(
-          'sessionPayload address did not match user-provided magicAddress',
-        );
+      // verify the session signature using session signer
+      const sessionSigner = await getSessionSignerForAddress(session.address);
+      if (!sessionSigner) {
+        throw new Error('No session signer found for address');
       }
-      const valid = await verifyCanvas({ session });
-      if (!valid) {
-        throw new Error('sessionPayload signed with invalid signature');
-      }
+      sessionSigner.verifySession(CANVAS_TOPIC, session);
     }
   } catch (err) {
     log.warn(

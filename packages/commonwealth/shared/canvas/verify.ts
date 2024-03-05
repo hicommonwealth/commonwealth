@@ -24,6 +24,15 @@ export const getSessionSigners = async () => {
   return [new SIWESigner()];
 };
 
+export const getSessionSignerForAddress = async (address: string) => {
+  const sessionSigners = await getSessionSigners();
+  for (const signer of sessionSigners) {
+    if (signer.match(address)) {
+      return signer;
+    }
+  }
+};
+
 export async function verifySession(session: Session) {
   for (const signer of await getSessionSigners()) {
     if (signer.match(session.address)) {

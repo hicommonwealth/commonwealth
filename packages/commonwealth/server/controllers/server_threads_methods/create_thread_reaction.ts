@@ -51,9 +51,10 @@ export async function __createThreadReaction(
     address,
     reaction,
     threadId,
-    canvasAction,
-    canvasSession,
-    canvasHash,
+    canvasActionMessage,
+    canvasActionMessageSignature,
+    canvasSessionMessage,
+    canvasSessionMessageSignature,
   }: CreateThreadReactionOptions,
 ): Promise<CreateThreadReactionResult> {
   const thread = await this.models.Thread.findOne({
@@ -142,9 +143,10 @@ export async function __createThreadReaction(
   const reactionData: Partial<ReactionAttributes> = {
     ...reactionWhere,
     calculated_voting_weight: calculatedVotingWeight,
-    canvas_action: canvasAction,
-    canvas_session: canvasSession,
-    canvas_hash: canvasHash,
+    canvas_action_message: canvasActionMessage,
+    canvas_action_message_signature: canvasActionMessageSignature,
+    canvas_session_message: canvasSessionMessage,
+    canvas_session_message_signature: canvasSessionMessageSignature,
   };
 
   const [finalReaction] = await this.models.Reaction.findOrCreate({

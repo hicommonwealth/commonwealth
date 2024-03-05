@@ -84,9 +84,10 @@ export async function __updateThread(
     spam,
     topicId,
     collaborators,
-    canvasSession,
-    canvasAction,
-    canvasHash,
+    canvasActionMessage,
+    canvasActionMessageSignature,
+    canvasSessionMessage,
+    canvasSessionMessageSignature,
     discordMeta,
   }: UpdateThreadOptions,
 ): Promise<UpdateThreadResult> {
@@ -200,9 +201,10 @@ export async function __updateThread(
         title,
         body,
         url,
-        canvasSession,
-        canvasAction,
-        canvasHash,
+        canvasActionMessage,
+        canvasActionMessageSignature,
+        canvasSessionMessage,
+        canvasSessionMessageSignature,
       },
       toUpdate,
     );
@@ -404,9 +406,10 @@ export type UpdatableThreadAttributes = {
   title?: string;
   body?: string;
   url?: string;
-  canvasSession?: string;
-  canvasAction?: string;
-  canvasHash?: string;
+  canvasActionMessage?: any;
+  canvasActionMessageSignature?: any;
+  canvasSessionMessage?: any;
+  canvasSessionMessageSignature?: any;
 };
 
 /**
@@ -419,9 +422,10 @@ async function setThreadAttributes(
     title,
     body,
     url,
-    canvasSession,
-    canvasAction,
-    canvasHash,
+    canvasActionMessage,
+    canvasActionMessageSignature,
+    canvasSessionMessage,
+    canvasSessionMessageSignature,
   }: UpdatableThreadAttributes,
   toUpdate: Partial<ThreadAttributes>,
 ) {
@@ -469,11 +473,10 @@ async function setThreadAttributes(
       toUpdate.url = url;
     }
 
-    if (typeof canvasSession !== 'undefined') {
-      toUpdate.canvas_session = canvasSession;
-      toUpdate.canvas_action = canvasAction;
-      toUpdate.canvas_hash = canvasHash;
-    }
+    toUpdate.canvas_action_message = canvasActionMessage;
+    toUpdate.canvas_action_message_signature = canvasActionMessageSignature;
+    toUpdate.canvas_session_message = canvasSessionMessage;
+    toUpdate.canvas_session_message_signature = canvasSessionMessageSignature;
   }
 }
 
