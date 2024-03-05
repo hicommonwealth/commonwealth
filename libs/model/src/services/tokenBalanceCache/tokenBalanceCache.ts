@@ -32,8 +32,19 @@ export async function getBalances(
       balances = await getEvmBalances(options, ttl);
     }
   } catch (e) {
-    const msg = `Failed to fetch balance(s) for ${options.addresses.length}`;
+    const chainId =
+      (options as GetEvmBalancesOptions).sourceOptions.evmChainId ||
+      (options as GetCosmosBalancesOptions).sourceOptions.cosmosChainId;
+    const contractAddress = (options as GetErcBalanceOptions).sourceOptions
+      .contractAddress;
+    const msg =
+      `Failed to fetch balance(s) for ${options.addresses.length} address(es)` +
+      `on chain ${chainId}${contractAddress && ' for contract '}${
+        contractAddress || ''
+      }`;
+
     log.error(msg, e instanceof Error ? e : undefined, {
+      fingerprint: `TBC: ${chainId} - ${contractAddress}`,
       addresses: options.addresses.slice(0, 5),
       contractAddress: (options as GetErcBalanceOptions).sourceOptions
         .contractAddress,

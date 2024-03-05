@@ -36,9 +36,13 @@ export async function getCosmosBalances(
       addressMap[encodedAddress] = address;
     } catch (e) {
       if (address != '0xdiscordbot') {
-        log.error(`Skipping address`, e instanceof Error ? e : undefined, {
-          address,
-        });
+        log.error(
+          `Failed to decode Cosmos address`,
+          e instanceof Error ? e : undefined,
+          {
+            address,
+          },
+        );
       }
     }
   }
