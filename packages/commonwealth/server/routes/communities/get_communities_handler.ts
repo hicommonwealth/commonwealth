@@ -40,6 +40,12 @@ export const getCommunitiesHandler = async (
     return success(res, results);
   }
 
+  // get communities, with snapshots
+  if (options.snapshots === 'true') {
+    const results = await controllers.communities.getCommunities({});
+    return success(res, results);
+  }
+
   // search communities
   if (options.search) {
     const results = await controllers.communities.searchCommunities({
