@@ -32,27 +32,15 @@ export async function getBalances(
       balances = await getEvmBalances(options, ttl);
     }
   } catch (e) {
-    let chainId: string;
-    if ((options as GetEvmBalancesOptions).sourceOptions.evmChainId) {
-      chainId = `evm chain id ${
-        (options as GetEvmBalancesOptions).sourceOptions.evmChainId
-      }`;
-    } else {
-      chainId = `cosmos chain id ${
-        (options as GetCosmosBalancesOptions).sourceOptions.cosmosChainId
-      }`;
-    }
-
-    let contractAddress: string = '';
-    if ((options as GetErcBalanceOptions).sourceOptions.contractAddress) {
-      contractAddress = ` for contract address ${
-        (options as GetErcBalanceOptions).sourceOptions.contractAddress
-      }`;
-    }
-    const msg =
-      `Failed to fetch balance(s) for ${options.addresses.length}` +
-      ` address(es) on ${chainId}${contractAddress}`;
-    log.error(msg, e instanceof Error ? e : undefined);
+    const msg = `Failed to fetch balance(s) for ${options.addresses.length}`;
+    log.error(msg, e instanceof Error ? e : undefined, {
+      addresses: options.addresses.slice(0, 5),
+      contractAddress: (options as GetErcBalanceOptions).sourceOptions
+        .contractAddress,
+      evmChainId: (options as GetEvmBalancesOptions).sourceOptions.evmChainId,
+      cosmosChainId: (options as GetCosmosBalancesOptions).sourceOptions
+        .cosmosChainId,
+    });
   }
 
   stats().incrementBy(

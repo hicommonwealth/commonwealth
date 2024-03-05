@@ -34,8 +34,8 @@ export async function getEvmBalances(
   });
 
   if (!chainNode) {
-    const msg = `ChainNode with eth_chain_id ${options.sourceOptions.evmChainId} does not exist`;
-    log.error(msg);
+    const msg = `ChainNode does not exist`;
+    log.error(msg, undefined, { evmChainId: options.sourceOptions.evmChainId });
     return {};
   }
 
