@@ -146,13 +146,24 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       } catch (switchError) {
         // This error code indicates that the chain has not been added to MetaMask.
         if (switchError.code === 4902) {
-          const wsRpcUrl = new URL(app.chain.meta.node.url);
+          const wsRpcUrl = app.chain?.meta?.node.url ?? '';
           const rpcUrl =
-            app.chain.meta.node.altWalletUrl || `https://${wsRpcUrl.host}`;
+            app.chain?.meta?.node.altWalletUrl ?? wsRpcUrl
+              ? new URL(wsRpcUrl).host
+              : '';
 
           // TODO: we should cache this data!
           const chains = await $.getJSON('https://chainid.network/chains.json');
-          const baseChain = chains.find((c) => c.chainId === chainId);
+          const baseChain = chains.find((c) => c.chainId == chainId);
+          const pubRpcUrl = baseChain.rpc.filter((r) => !/\${.*?}/.test(r));
+          // remove duplicate https b/c chain list has a bug in their sepolia endpoint
+          const url =
+            pubRpcUrl.length > 0
+              ? pubRpcUrl[0].replace(/(https:\/\/)+/, 'https://')
+              : rpcUrl;
+          if (url === '') {
+            throw new Error('Could not find rpc for new network');
+          }
           await this._web3.givenProvider.request({
             method: 'wallet_addEthereumChain',
             params: [
@@ -160,7 +171,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
                 chainId: chainIdHex,
                 chainName: baseChain.name,
                 nativeCurrency: baseChain.nativeCurrency,
-                rpcUrls: [rpcUrl],
+                rpcUrls: [url],
               },
             ],
           });
@@ -213,20 +224,22 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     try {
       // Get current chain ID
       const communityChain = chainId ?? this.getChainId();
-      const chainIdHex = parseInt(communityChain, 10).toString(16);
+      const chainIdHex = `0x${parseInt(communityChain, 10).toString(16)}`;
       try {
         await window.ethereum.request({
           method: 'wallet_switchEthereumChain',
-          params: [{ chainId: `0x${chainIdHex}` }],
+          params: [{ chainId: chainIdHex }],
         });
       } catch (error) {
         if (error.code === 4902) {
           const chains = await $.getJSON('https://chainid.network/chains.json');
-          const baseChain = chains.find((c) => c.chainId === communityChain);
+          const baseChain = chains.find((c) => c.chainId == communityChain);
           // Check if the string contains '${' and '}'
           const rpcUrl = baseChain.rpc.filter((r) => !/\${.*?}/.test(r));
           const url =
-            rpcUrl.length > 0 ? rpcUrl[0] : app.chain.meta.node.altWalletUrl;
+            rpcUrl.length > 0
+              ? rpcUrl[0].replace(/(https:\/\/)+/, 'https://')
+              : app.chain.meta.node.altWalletUrl;
           await this._web3.givenProvider.request({
             method: 'wallet_addEthereumChain',
             params: [

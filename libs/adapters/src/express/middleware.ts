@@ -2,6 +2,7 @@ import {
   AnalyticsOptions,
   INVALID_ACTOR_ERROR,
   INVALID_INPUT_ERROR,
+  User,
   analytics,
   stats,
 } from '@hicommonwealth/core';
@@ -70,17 +71,21 @@ export const errorMiddleware = (
  * Captures analytics
  */
 export function analyticsMiddleware<T>(
-  event: any,
-  transformer: (payload: T) => AnalyticsOptions,
+  event: string,
+  transformer?: (results?: T) => AnalyticsOptions,
 ) {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
     try {
       // override res.json
       const originalResJson = res.json;
 
-      res.json = function (data: T) {
-        analytics().track(event, transformer(data));
-        return originalResJson.call(res, data);
+      res.json = function (results: T) {
+        analytics().track(event, {
+          userId: (req.user as User).id,
+          aggregateId: req.params.id,
+          ...(transformer ? transformer(results) : {}),
+        });
+        return originalResJson.call(res, results);
       };
     } catch (err: unknown) {
       console.error(err); // don't use logger port here

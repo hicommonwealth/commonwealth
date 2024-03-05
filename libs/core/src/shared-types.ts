@@ -46,9 +46,9 @@ export interface IForumNotificationData {
   thread_id: number | string;
   root_title: string;
   root_type: string;
-  chain_id: string;
+  community_id: string;
   author_address: string;
-  author_chain: string;
+  author_community_id: string;
   comment_id?: number;
   comment_text?: string;
   parent_comment_id?: number;
@@ -72,9 +72,9 @@ export interface IBaseForumNotificationData {
   thread_id: number | string;
   root_title: string;
   root_type: string;
-  chain_id: string;
+  community_id: string;
   author_address: string;
-  author_chain: string;
+  author_community_id: string;
 }
 
 export interface INewCommentNotificationData
@@ -122,7 +122,7 @@ export interface IChainEventNotificationData {
   block_number?: number;
   event_data: any;
   network: SupportedNetwork;
-  chain: string;
+  community_id: string;
 }
 
 export type NotificationDataTypes =

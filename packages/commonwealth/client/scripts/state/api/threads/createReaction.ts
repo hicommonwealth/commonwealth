@@ -13,7 +13,6 @@ interface CreateReactionProps extends IuseCreateThreadReactionMutation {
 }
 
 const createReaction = async ({
-  chainId,
   address,
   reactionType = 'like',
   threadId,
@@ -52,7 +51,7 @@ const useCreateThreadReactionMutation = ({
         address: response.data.result.Address.address,
         type: 'like',
         updated_at: response.data.result.updated_at,
-        voting_weight: response.data.result.calculated_voting_weight,
+        voting_weight: response.data.result.calculated_voting_weight || 1,
       };
       updateThreadInAllCaches(
         chainId,

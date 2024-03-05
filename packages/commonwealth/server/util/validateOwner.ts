@@ -57,7 +57,9 @@ export const validateOwner = async ({
     requiredRoles,
   );
   const role = roles.find((r) => {
-    return r.chain_id === communityId && requiredRoles.includes(r.permission);
+    return (
+      r.community_id === communityId && requiredRoles.includes(r.permission)
+    );
   });
   if (role) {
     return true;

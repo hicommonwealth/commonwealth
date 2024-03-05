@@ -8,7 +8,7 @@ import 'pages/communities.scss';
 import React from 'react';
 import app from 'state';
 import CommunityInfo from '../../models/ChainInfo';
-import { CommunityCard, NewCommunityCard } from '../components/community_card';
+import { CommunityCard, NewCommunityCard } from '../components/CommunityCard';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 

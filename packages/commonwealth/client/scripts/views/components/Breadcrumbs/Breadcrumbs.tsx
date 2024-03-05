@@ -25,7 +25,7 @@ export const Breadcrumbs = () => {
   const profileId = user?.profileId || user?.profile.id;
 
   const currentDiscussion = {
-    currentThreadName: linkedThreads?.[0].title,
+    currentThreadName: linkedThreads?.[0]?.title,
     currentTopic: linkedThreads?.[0]?.topic.name,
     topicURL: `/discussions/${encodeURI(linkedThreads?.[0]?.topic.name)}`,
   };

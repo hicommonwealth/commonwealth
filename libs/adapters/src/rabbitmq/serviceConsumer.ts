@@ -52,7 +52,10 @@ export class ServiceConsumer {
       try {
         await this.rabbitMQController.init();
       } catch (e) {
-        this.log.error('Failed to initialize the RabbitMQ Controller', e);
+        this.log.error(
+          'Failed to initialize the RabbitMQ Controller',
+          e as Error,
+        );
       }
     }
 
@@ -71,7 +74,7 @@ export class ServiceConsumer {
             `processor function using context: ${JSON.stringify(
               sub.msgProcessorContext,
             )}`,
-          e,
+          e as Error,
         );
       }
     }

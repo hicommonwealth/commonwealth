@@ -32,7 +32,7 @@ export const defaultUserKeyGenerator = (
 
 export function lookupKeyDurationInReq(
   req: CustomRequest,
-): CacheKeyDuration | string {
+): CacheKeyDuration | string | null {
   let cacheKey = null;
   let cacheDuration = null;
 

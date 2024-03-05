@@ -44,7 +44,7 @@ class Reaction {
     this.canvasAction = canvas_action;
     this.canvasSession = canvas_session;
     this.canvasHash = canvas_hash;
-    this.calculatedVotingWeight = calculated_voting_weight;
+    this.calculatedVotingWeight = calculated_voting_weight || 1;
     this.updatedAt = updated_at;
   }
 }

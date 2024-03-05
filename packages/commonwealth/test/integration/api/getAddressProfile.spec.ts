@@ -9,7 +9,7 @@ import { testAddresses, testProfiles } from './external/dbEntityHooks.spec';
 describe('getAddressProfile tests', () => {
   it('should return profile of a single address', async () => {
     const r: GetAddressProfileReq = {
-      chains: [testAddresses[0].community_id],
+      communities: [testAddresses[0].community_id],
       addresses: [testAddresses[0].address],
     } as GetAddressProfileReq;
 
@@ -35,7 +35,7 @@ describe('getAddressProfile tests', () => {
     chai.assert.equal(testAddresses[0].profile_id, testAddresses[1].profile_id);
 
     const r: GetAddressProfileReq = {
-      chains: [testAddresses[0].community_id],
+      communities: [testAddresses[0].community_id],
       addresses: [testAddresses[0].address, testAddresses[1].address],
     } as GetAddressProfileReq;
 
@@ -75,7 +75,7 @@ describe('getAddressProfile tests', () => {
     );
 
     const r: GetAddressProfileReq = {
-      chains: [testAddresses[0].community_id],
+      communities: [testAddresses[0].community_id],
       addresses: [
         testAddresses[0].address,
         testAddresses[1].address,
