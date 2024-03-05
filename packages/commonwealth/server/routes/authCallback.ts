@@ -76,7 +76,7 @@ const authCallback = async (
   }
 
   // 4. construct object containing CB data
-  // TODO: filter addresses by base/chain/etc, if provided by CMN Bot
+  // TODO: filter addresses by base/community/etc, if provided by CMN Bot
   const allAddresses = await models.Address.findAll({
     where: {
       profile_id: profile.id,

@@ -23,12 +23,10 @@ export const ManageRoles = ({
 }: ManageRoleRowProps) => {
   const navigate = useCommonNavigate();
 
-  const communityObj = { chain: app.activeChainId() };
-
   const removeRole = async (role: RoleInfo) => {
     try {
       const res = await axios.post(`${app.serverUrl()}/upgradeMember`, {
-        ...communityObj,
+        community_id: app.activeChainId(),
         new_role: 'member',
         address: role.Address.address,
         jwt: app.user.jwt,
@@ -38,7 +36,18 @@ export const ManageRoles = ({
         throw new Error(`Got unsuccessful status: ${res.data.status}`);
       }
 
-      const newRole = res.data.result;
+      const roleData = res.data.result;
+      const newRole = new RoleInfo({
+        id: roleData.id,
+        address_id: roleData.address_id,
+        address_chain: roleData.community_id,
+        address: roleData.address,
+        community_id: roleData.community_id,
+        permission: roleData.permission,
+        allow: roleData.allow,
+        deny: roleData.deny,
+        is_user_default: roleData.is_user_default,
+      });
       onRoleUpdate(role, newRole);
     } catch (err) {
       const errMsg = err.response?.data?.error || 'Failed to alter role.';

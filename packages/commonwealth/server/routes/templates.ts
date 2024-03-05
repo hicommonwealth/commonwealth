@@ -14,7 +14,7 @@ type CreateTemplateAndMetadataReq = {
   name: string;
   template: string;
   description: string;
-  chain_id: string;
+  community_id: string;
   created_by: string;
   created_for_community: string;
 };
@@ -36,7 +36,7 @@ export async function createTemplate(
     contract_id,
     name,
     template,
-    chain_id,
+    community_id,
     description,
     created_by,
     created_for_community,
@@ -45,7 +45,7 @@ export async function createTemplate(
   const isAdmin = await validateOwner({
     models: models,
     user: req.user,
-    communityId: chain_id,
+    communityId: community_id,
     allowAdmin: true,
     allowSuperAdmin: true,
   });
