@@ -15,7 +15,12 @@ import { CWModal } from '../component_kit/new_designs/CWModal';
 
 const NON_INTEROP_NETWORKS = [ChainNetwork.AxieInfinity];
 
-const useJoinCommunity = () => {
+interface UseJoinCommunityProps {
+  communityToJoin?: string;
+}
+
+const useJoinCommunity = (props: UseJoinCommunityProps = {}) => {
+  const { communityToJoin } = props;
   const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] =
     useState(false);
   const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
@@ -105,7 +110,9 @@ const useJoinCommunity = () => {
     if (originAddressInfo) {
       try {
         const targetCommunity =
-          activeCommunityId || originAddressInfo.community.id;
+          communityToJoin ||
+          activeCommunityId ||
+          originAddressInfo.community.id;
 
         const address = originAddressInfo.address;
 

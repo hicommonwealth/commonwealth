@@ -1,9 +1,10 @@
+import { notifyError } from 'client/scripts/controllers/app/notifications';
 import type ChainInfo from 'client/scripts/models/ChainInfo';
 import { CommunityData } from 'client/scripts/views/pages/DirectoryPage/DirectoryPageContent';
 import { isCommandClick, pluralizeWithoutNumberPrefix } from 'helpers';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import app from 'state';
 import {
   MixpanelClickthroughEvent,
@@ -36,13 +37,18 @@ export const CWRelatedCommunityCard = ({
 }: CWRelatedCommunityCardProps) => {
   const navigate = useCommonNavigate();
   const { stakeEnabled } = useCommunityStake({ communityId: community.id });
+  const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity({
+    communityToJoin: community.id,
+  });
+
+  const [hasJoinedCommunity, setHasJoinedCommunity] = useState(false);
 
   const { trackAnalytics } =
     useBrowserAnalyticsTrack<MixpanelClickthroughPayload>({
       onAction: true,
     });
 
-  const handleClick = useCallback(
+  const handleCommunityClick = useCallback(
     (e) => {
       e.preventDefault();
       trackAnalytics({
@@ -60,13 +66,11 @@ export const CWRelatedCommunityCard = ({
   const isCommunityMember =
     app.roles.getAllRolesInCommunity({ community: community.id }).length > 0;
 
-  const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
-
   return (
     <>
       <div
         className={ComponentType.RelatedCommunityCard}
-        onClick={(e) => handleClick(e)}
+        onClick={(e) => handleCommunityClick(e)}
       >
         <div className="content-container">
           <div className="top-content">
@@ -137,14 +141,20 @@ export const CWRelatedCommunityCard = ({
           </div>
           <div className="actions">
             <CWButton
-              {...(isCommunityMember ? { iconLeft: 'checkCircleFilled' } : {})}
+              {...(isCommunityMember || hasJoinedCommunity
+                ? { iconLeft: 'checkCircleFilled' }
+                : {})}
               buttonHeight="sm"
               buttonWidth="narrow"
-              label={isCommunityMember ? 'Joined' : 'Join'}
-              disabled={isCommunityMember}
+              label={
+                isCommunityMember || hasJoinedCommunity ? 'Joined' : 'Join'
+              }
+              disabled={isCommunityMember || hasJoinedCommunity}
               onClick={(e) => {
                 e.stopPropagation();
-                handleJoinCommunity();
+                handleJoinCommunity()
+                  .then(() => setHasJoinedCommunity(true))
+                  .catch(() => notifyError(`Could not join ${community.name}`));
               }}
             />
 
