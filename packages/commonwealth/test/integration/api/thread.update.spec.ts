@@ -1,4 +1,9 @@
-import { ActionPayload, Session } from '@canvas-js/interfaces';
+import type {
+  Action,
+  Message,
+  Session,
+  Signature,
+} from '@canvas-js/interfaces';
 import { models, tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
@@ -20,7 +25,7 @@ describe('Thread Patch Update', () => {
   let userAddress: string;
   let userSession: {
     session: Session;
-    sign: (payload: ActionPayload) => string;
+    sign: (payload: Message<Action | Session>) => Signature;
   };
   let topicId: number;
 

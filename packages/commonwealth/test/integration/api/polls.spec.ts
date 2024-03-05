@@ -1,3 +1,9 @@
+import type {
+  Action,
+  Message,
+  Session,
+  Signature,
+} from '@canvas-js/interfaces';
 import { models, tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
@@ -14,6 +20,10 @@ describe('Polls', () => {
 
   let userJWT: string;
   let userAddress: string;
+  let userSession: {
+    session: Session;
+    sign: (payload: Message<Action | Session>) => Signature;
+  };
 
   let topicId;
   let threadId = 0;
@@ -36,6 +46,10 @@ describe('Polls', () => {
       { id: userRes.user_id, email: userRes.email },
       JWT_SECRET,
     );
+    userSession = {
+      session: userRes.session,
+      sign: userRes.sign,
+    };
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;
   });
@@ -50,22 +64,8 @@ describe('Polls', () => {
       kind: 'discussion',
       stage: 'discussion',
       topicId,
-      session: {
-        type: 'session',
-        signature: '',
-        payload: {
-          app: '',
-          chain: '',
-          from: '',
-          sessionAddress: '',
-          sessionDuration: 0,
-          sessionIssued: 0,
-          block: '',
-        },
-      },
-      sign: function (): string {
-        return '';
-      },
+      session: userSession.session,
+      sign: userSession.sign,
     });
 
     const data = {

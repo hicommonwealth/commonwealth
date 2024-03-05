@@ -1,4 +1,9 @@
-import { ActionPayload, Session } from '@canvas-js/interfaces';
+import type {
+  Action,
+  Message,
+  Session,
+  Signature,
+} from '@canvas-js/interfaces';
 import {
   LinkSource,
   ThreadAttributes,
@@ -28,13 +33,13 @@ describe('Linking Tests', () => {
     adminAddress: string,
     adminSession: {
       session: Session;
-      sign: (payload: ActionPayload) => string;
+      sign: (payload: Message<Action | Session>) => Signature;
     },
     userJWT: string,
     userAddress: string,
     userSession: {
       session: Session;
-      sign: (payload: ActionPayload) => string;
+      sign: (payload: Message<Action | Session>) => Signature;
     },
     thread1: ThreadAttributes,
     thread2: ThreadAttributes;

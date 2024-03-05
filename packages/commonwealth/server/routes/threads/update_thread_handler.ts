@@ -22,9 +22,10 @@ type UpdateThreadRequestBody = {
     toAdd?: number[];
     toRemove?: number[];
   };
-  canvasSession?: any;
-  canvasAction?: any;
-  canvasHash?: any;
+  canvasActionMessage?: any;
+  canvasActionMessageSignature?: any;
+  canvasSessionMessage?: any;
+  canvasSessionMessageSignature?: any;
   discord_meta?: IDiscordMeta; // Only comes from the discord bot
 };
 type UpdateThreadResponse = ThreadAttributes;
@@ -47,9 +48,10 @@ export const updateThreadHandler = async (
     spam,
     topicId,
     collaborators,
-    canvasSession,
-    canvasAction,
-    canvasHash,
+    canvasActionMessage,
+    canvasActionMessageSignature,
+    canvasSessionMessage,
+    canvasSessionMessageSignature,
     discord_meta: discordMeta,
   } = req.body;
 
@@ -72,9 +74,10 @@ export const updateThreadHandler = async (
       spam,
       topicId,
       collaborators,
-      canvasSession,
-      canvasAction,
-      canvasHash,
+      canvasActionMessage,
+      canvasActionMessageSignature,
+      canvasSessionMessage,
+      canvasSessionMessageSignature,
       discordMeta,
     });
 

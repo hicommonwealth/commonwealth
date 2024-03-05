@@ -72,7 +72,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       user_id,
       email,
       session,
-      sessionSigner,
+      sign: sessionSigner.sign,
     };
   }
   if (chain === 'edgeware') {
@@ -103,7 +103,6 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
         user_id,
         email,
         session,
-        sessionSigner,
       });
     return {
       address_id,
@@ -111,7 +110,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       user_id,
       email,
       session,
-      sessionSigner,
+      sign: sessionSigner.sign,
     };
   }
   throw new Error('invalid chain');
