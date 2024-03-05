@@ -1,9 +1,21 @@
+import z from 'zod';
+
 export type TypedPaginatedResult<T> = {
   results: T[];
   limit: number;
   page: number;
   totalPages: number;
   totalResults: number;
+};
+
+export const PaginatedResultSchema = (innerSchema: z.AnyZodObject) => {
+  return z.object({
+    results: innerSchema.array(),
+    limit: z.number().int(),
+    page: z.number().int(),
+    totalPages: z.number().int(),
+    totalResults: z.number().int(),
+  });
 };
 
 /*

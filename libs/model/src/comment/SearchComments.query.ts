@@ -1,29 +1,17 @@
 import {
   PaginationSqlOptions,
   QueryMetadata,
-  TypedPaginatedResult,
   buildPaginatedResponse,
   buildPaginationSql,
+  comment,
 } from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
-import { z } from 'zod';
 import { models } from '../database';
-import type { CommentAttributes } from '../models';
-
-const schema = z.object({
-  community_id: z.string(),
-  search: z.string(),
-  limit: z.number().optional().default(20),
-  page: z.number().optional().default(1),
-  orderBy: z.string().optional().default('created_at'),
-  orderDirection: z.enum(['ASC', 'DESC']).default('DESC'),
-});
 
 export const SearchComments = (): QueryMetadata<
-  TypedPaginatedResult<CommentAttributes>,
-  typeof schema
+  typeof comment.SearchComments
 > => ({
-  schema,
+  schemas: comment.SearchComments,
   auth: [],
   body: async ({ payload }) => {
     const { community_id, search, limit, page, orderBy, orderDirection } =
