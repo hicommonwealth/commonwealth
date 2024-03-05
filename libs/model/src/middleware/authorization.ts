@@ -1,4 +1,12 @@
-import { Actor, ActorMiddleware } from '@hicommonwealth/core';
+import {
+  CommandContext,
+  CommandHandler,
+  InvalidActor,
+  InvalidInput,
+  comment,
+  community,
+  thread,
+} from '@hicommonwealth/core';
 import { Op } from 'sequelize';
 import { AddressAttributes, Role, models } from '..';
 
@@ -12,98 +20,123 @@ import { AddressAttributes, Role, models } from '..';
 
 /**
  * Finds one active community address that meets the arguments
- * @param actor actor context
+ * @param actor command actor
+ * @param id community id
  * @param roles roles filter
- * @returns found or undefined
+ * @returns authorized address or throws
  */
-const findAddress = async (
-  actor: Actor,
+const authorizeAddress = async (
+  { actor, id }: CommandContext<any>,
   roles: Role[],
-): Promise<AddressAttributes | null> => {
+): Promise<AddressAttributes> => {
+  if (!id) throw new InvalidActor(actor, 'Must provide a community id');
+  if (!actor.address_id)
+    throw new InvalidActor(actor, 'Must provide an address');
   // TODO: cache
-  return await models.Address.findOne({
-    where: {
-      user_id: actor.user.id,
-      address: actor.address_id,
-      community_id: actor.aggregate_id,
-      verified: { [Op.not]: undefined },
-      role: { [Op.in]: roles },
-    },
-    order: ['role', 'DESC'],
-  });
+  const addr = (
+    await models.Address.findOne({
+      where: {
+        user_id: actor.user.id,
+        address: actor.address_id,
+        community_id: id,
+        role: { [Op.in]: roles },
+      },
+      order: [['role', 'DESC']],
+    })
+  )?.get({ plain: true });
+  if (!addr)
+    throw new InvalidActor(actor, `User is not ${roles} in the community`);
+  return addr;
+};
+
+type CommunityMiddleware = CommandHandler<{
+  input: any;
+  output: typeof community.Community;
+}>;
+type ThreadMiddleware = CommandHandler<{
+  input: any;
+  output: typeof thread.Thread;
+}>;
+type CommentMiddleware = CommandHandler<{
+  input: any;
+  output: typeof comment.Comment;
+}>;
+
+/**
+ * Community middleware
+ */
+export const isCommunityAdmin: CommunityMiddleware = async (ctx) => {
+  // super admin is always allowed
+  if (ctx.actor.user.isAdmin) return;
+  await authorizeAddress(ctx, ['admin']);
+};
+
+export const isCommunityModerator: CommunityMiddleware = async (ctx) => {
+  // super admin is always allowed
+  if (ctx.actor.user.isAdmin) return;
+  await authorizeAddress(ctx, ['moderator']);
+};
+
+export const isCommunityAdminOrModerator: CommunityMiddleware = async (ctx) => {
+  // super admin is always allowed
+  if (ctx.actor.user.isAdmin) return;
+  await authorizeAddress(ctx, ['admin', 'moderator']);
 };
 
 /**
- * Community admin middleware
+ * Thread middleware
  */
-export const isCommunityAdmin: ActorMiddleware = async (actor) => {
+export const loadThread: ThreadMiddleware = async ({ id }) => {
+  if (!id) throw new InvalidInput('Must provide a thread id');
+  const thread = (
+    await models.Thread.findOne({
+      where: { id },
+      include: {
+        model: models.Address,
+        required: true,
+        attributes: ['address'],
+      },
+    })
+  )?.get({ plain: true });
+  if (!thread) throw new InvalidInput(`Thread ${id} not found`);
+  return thread;
+};
+
+export const isThreadAuthor: ThreadMiddleware = async ({ actor }, state) => {
   // super admin is always allowed
-  if (actor.user.isAdmin) return actor;
-  if (!actor.address_id) return 'Must provide an address';
-  if (!actor.aggregate_id) return 'Must provide a community id';
-  const addr = await findAddress(actor, ['admin']);
-  if (!addr) return 'User is not the administrator of the community';
-  return { ...actor, author: true };
+  if (actor.user.isAdmin) return;
+  if (!actor.address_id)
+    throw new InvalidActor(actor, 'Must provide an address');
+  if (!state) throw new InvalidActor(actor, 'Must load thread');
+  if (state.Address?.address !== actor.address_id)
+    throw new InvalidActor(actor, 'User is not the author of the thread');
 };
 
 /**
- * Community moderator middleware
+ * Comment middleware
  */
-export const isCommunityModerator: ActorMiddleware = async (actor) => {
-  // super admin is always allowed
-  if (actor.user.isAdmin) return actor;
-  if (!actor.address_id) return 'Must provide an address';
-  if (!actor.aggregate_id) return 'Must provide a community id';
-  const addr = await findAddress(actor, ['moderator']);
-  if (!addr) return 'User is not a moderator in the community';
-  return { ...actor, author: false };
+export const loadComment: CommentMiddleware = async ({ id }) => {
+  if (!id) throw new InvalidInput('Must provide a comment id');
+  const comment = (
+    await models.Comment.findOne({
+      where: { id },
+      include: {
+        model: models.Address,
+        required: true,
+        attributes: ['address'],
+      },
+    })
+  )?.get({ plain: true });
+  if (!comment) throw new InvalidInput(`Comment ${id} not found`);
+  return comment;
 };
 
-/**
- * Community admin or moderator middleware
- */
-export const isCommunityAdminOrModerator: ActorMiddleware = async (actor) => {
+export const isCommentAuthor: CommentMiddleware = async ({ actor }, state) => {
   // super admin is always allowed
-  if (actor.user.isAdmin) return actor;
-  if (!actor.address_id) return 'Must provide an address';
-  if (!actor.aggregate_id) return 'Must provide a community id';
-  const addr = await findAddress(actor, ['admin', 'moderator']);
-  if (!addr) return 'User is not an admin or moderator in the community';
-  return { ...actor, author: addr.role === 'admin' };
-};
-
-/**
- * Thread author middleware
- */
-export const isThreadAuthor: ActorMiddleware = async (actor) => {
-  // super admin is always allowed
-  if (actor.user.isAdmin) return actor;
-  if (!actor.address_id) return 'Must provide an address';
-  if (!actor.aggregate_id) return 'Must provide a thread id';
-  const address = await models.Thread.findOne({
-    where: {
-      id: actor.aggregate_id,
-      address_id: actor.address_id,
-    },
-  });
-  if (!address) return 'User not the author of the thread';
-  return { ...actor, author: true };
-};
-
-/**
- * Comment author middleware
- */
-export const isCommentAuthor: ActorMiddleware = async (actor) => {
-  // super admin is always allowed
-  if (actor.user.isAdmin) return actor;
-  if (!actor.address_id) return 'Must provide an address';
-  if (!actor.aggregate_id) return 'Must provide a comment id';
-  const address = await models.Comment.findOne({
-    where: {
-      id: actor.aggregate_id,
-      address_id: actor.address_id,
-    },
-  });
-  if (!address) return 'User not the author of the comment';
-  return { ...actor, author: true };
+  if (actor.user.isAdmin) return;
+  if (!actor.address_id)
+    throw new InvalidActor(actor, 'Must provide an address');
+  if (!state) throw new InvalidActor(actor, 'Must load comment');
+  if (state.Address?.address !== actor.address_id)
+    throw new InvalidActor(actor, 'User is not the author of the comment');
 };

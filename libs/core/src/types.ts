@@ -1,5 +1,3 @@
-import { z, ZodSchema } from 'zod';
-
 export enum SupportedNetwork {
   Substrate = 'substrate',
   Aave = 'aave',
@@ -81,6 +79,7 @@ export enum WalletSsoSource {
   Github = 'github',
   Discord = 'discord',
   Twitter = 'twitter',
+  apple = 'apple',
   Email = 'email',
   Unknown = 'unknown', // address created after we launched SSO, before we started recording WalletSsoSource
 }
@@ -242,59 +241,19 @@ export type ChainEventNotification = {
   ChainEvent: ChainEventAttributes;
 };
 
-/**
- * Authenticated user
- */
-export type User = {
-  email: string;
-  id?: number;
-  emailVerified?: boolean;
-  isAdmin?: boolean;
-};
+export type AnalyticsOptions = Record<string, any>;
+
+export enum NodeHealth {
+  Failed = 'failed',
+  Healthy = 'healthy',
+}
 
 /**
- * "Core" abstraction representing the "user acting on the system", either invoking a command on an aggregate, or querying a projection
- * - Common actors are identified by their unique `user.id` (jwt signin flow)
- *   - `user`: user profile attributes
- * - Actors can "optionally" carry the following unique ids:
- *   - `address_id`: the current web wallet address (TODO: is this optional?)
- *   - `aggregate_id`: the aggregate id when invoking a command
- * - Actors can also pre-load and validate state via chained {@link ActorMiddleware} reusable utilities
- *   - `author`: user is the author of the aggregate
+ * Cosmos gov module version of a chain
  */
-export type Actor = {
-  // must be signed in
-  user: User;
-  address_id?: string;
-  aggregate_id?: string;
-  author?: boolean;
-};
-
-/**
- * Command action signature
- * @param actor command actor
- * @param id aggregate id
- * @param payload command payload
- */
-export type Command<M extends ZodSchema, R> = (
-  actor: Actor,
-  id: string,
-  payload: z.infer<M>,
-) => Promise<R>;
-
-/**
- * Middleware signature to loads and/or validates actor state in a chain of responsibility pattern
- * @param actor the current actor state
- * @returns the updated actor state or error string
- * - TODO: should we use [error, actor] tuples instead of returning string?
- */
-export type ActorMiddleware = (actor: Actor) => Promise<Actor | string>;
-
-/**
- * Command definition
- */
-export type CommandMetadata<M extends ZodSchema, R> = {
-  fn: Command<M, R>;
-  schema: M;
-  middleware?: ActorMiddleware[];
-};
+export enum CosmosGovernanceVersion {
+  v1 = 'v1',
+  v1beta1 = 'v1beta1',
+  v1beta1Failed = 'v1beta1-attempt-failed',
+  v1Failed = 'v1-attempt-failed',
+}

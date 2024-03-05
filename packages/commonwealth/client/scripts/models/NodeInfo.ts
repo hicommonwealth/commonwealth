@@ -7,6 +7,7 @@ class NodeInfo {
   public readonly altWalletUrl?: string;
   public readonly balanceType?: string;
   public readonly bech32?: string;
+  public readonly cosmosGovernanceVersion?: string;
 
   constructor({
     id,
@@ -17,6 +18,7 @@ class NodeInfo {
     alt_wallet_url,
     balance_type,
     bech32,
+    cosmos_gov_version,
   }) {
     this.id = id;
     this.name = name;
@@ -26,6 +28,7 @@ class NodeInfo {
     this.altWalletUrl = alt_wallet_url;
     this.balanceType = balance_type;
     this.bech32 = bech32;
+    this.cosmosGovernanceVersion = cosmos_gov_version;
   }
 
   public static fromJSON(json) {

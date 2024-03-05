@@ -10,15 +10,17 @@ import './SearchBarCommunityPreviewRow.scss';
 interface SearchBarCommunityPreviewRowProps {
   searchResult: CommunityResult;
   searchTerm?: string;
+  onSearchItemClick?: () => void;
 }
 
 export const SearchBarCommunityPreviewRow: FC<
   SearchBarCommunityPreviewRowProps
-> = ({ searchResult }) => {
+> = ({ searchResult, onSearchItemClick }) => {
   const navigate = useCommonNavigate();
 
   const handleClick = () => {
     navigate(`/${searchResult.id}`, {}, null);
+    onSearchItemClick?.();
   };
 
   const communityInfo = ChainInfo.fromJSON(searchResult as any);

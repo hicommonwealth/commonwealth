@@ -12,11 +12,12 @@ import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/typ
 import validateMetadata from '../../util/requirementsModule/validateMetadata';
 import validateRequirements from '../../util/requirementsModule/validateRequirements';
 import { validateOwner } from '../../util/validateOwner';
-import { TrackOptions } from '../server_analytics_methods/track';
+import { TrackOptions } from '../server_analytics_controller';
 import { ServerGroupsController } from '../server_groups_controller';
 
 const MAX_GROUPS_PER_COMMUNITY = 20;
 
+// FIXME: validation errors
 const Errors = {
   InvalidMetadata: 'Invalid metadata',
   InvalidRequirements: 'Invalid requirements',
@@ -25,6 +26,7 @@ const Errors = {
   InvalidTopics: 'Invalid topics',
 };
 
+// FIXME: the schema
 export type CreateGroupOptions = {
   user: UserInstance;
   community: CommunityInstance;
@@ -34,12 +36,14 @@ export type CreateGroupOptions = {
   topics?: number[];
 };
 
+// FIXME: should be partial of the aggregate
 export type CreateGroupResult = [GroupAttributes, TrackOptions];
 
 export async function __createGroup(
   this: ServerGroupsController,
   { user, community, metadata, requirements, topics }: CreateGroupOptions,
 ): Promise<CreateGroupResult> {
+  // FIXME: authorization
   const isAdmin = await validateOwner({
     models: this.models,
     user,
@@ -52,11 +56,13 @@ export async function __createGroup(
     throw new AppError(Errors.Unauthorized);
   }
 
+  // FIXME: validation
   const metadataValidationErr = validateMetadata(metadata);
   if (metadataValidationErr) {
     throw new AppError(`${Errors.InvalidMetadata}: ${metadataValidationErr}`);
   }
 
+  // FIXME: validation
   const requirementsValidationErr = validateRequirements(requirements);
   if (requirementsValidationErr) {
     throw new AppError(
@@ -64,6 +70,7 @@ export async function __createGroup(
     );
   }
 
+  // FIXME: invariant
   const numCommunityGroups = await this.models.Group.count({
     where: {
       community_id: community.id,
@@ -121,6 +128,7 @@ export async function __createGroup(
     },
   );
 
+  // FIXME: move to middleware
   const analyticsOptions = {
     event: MixpanelCommunityInteractionEvent.CREATE_GROUP,
     community: community.id,

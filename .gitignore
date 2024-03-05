@@ -11,3 +11,5 @@ node_modules/
 *.postgres
 *.rabbitmq
 redis-data
+**/.nyc_output
+**/dependency-graph.svg

@@ -6,12 +6,37 @@ import {
   NotificationCategories,
   logger,
 } from '@hicommonwealth/core';
-import { ChainNodeAttributes, models } from '..';
+import { QueryTypes, Sequelize } from 'sequelize';
+import type { ChainNodeAttributes } from '../models/chain_node';
+
+const checkDb = async () => {
+  let sequelize: Sequelize | undefined = undefined;
+  try {
+    sequelize = new Sequelize('postgresql://commonwealth:edgeware@localhost', {
+      logging: false,
+    });
+    const testdbname = 'common_test';
+    const [{ count }] = await sequelize.query<{ count: number }>(
+      `SELECT COUNT(*) FROM pg_database WHERE datname = '${testdbname}'`,
+      { type: QueryTypes.SELECT },
+    );
+    if (!+count) await sequelize.query(`CREATE DATABASE ${testdbname};`);
+  } catch (error) {
+    console.error('Error creating test db:', error);
+  } finally {
+    sequelize && sequelize.close();
+  }
+};
 
 export const seedDb = async (debug = false): Promise<void> => {
   const log = logger().getLogger(__filename);
-  if (debug) log.info('Resetting database...');
+  if (debug) log.info('Seeding test db...');
   try {
+    await checkDb();
+
+    // connect and seed
+    const { models } = await import('..');
+
     await models.sequelize.sync({ force: true });
     log.info('done syncing.');
     if (debug) log.info('Initializing default models...');

@@ -1,3 +1,4 @@
+import { OpenFeature } from '@openfeature/web-sdk';
 import CustomDomainRoutes from 'navigation/CustomDomainRoutes';
 import React from 'react';
 import {
@@ -10,12 +11,32 @@ import { PageNotFound } from 'views/pages/404';
 import CommonDomainRoutes from './CommonDomainRoutes';
 import GeneralRoutes from './GeneralRoutes';
 
-const Router = (customDomain: string) =>
-  createBrowserRouter(
+export type RouteFeatureFlags = {
+  proposalTemplatesEnabled: boolean;
+  communityHomepageEnabled: boolean;
+};
+
+const Router = (customDomain: string) => {
+  const client = OpenFeature.getClient();
+  const proposalTemplatesEnabled = client.getBooleanValue(
+    'proposalTemplates',
+    false,
+  );
+  const communityHomepageEnabled = client.getBooleanValue(
+    'communityHomepage',
+    false,
+  );
+  const flags = {
+    proposalTemplatesEnabled,
+    communityHomepageEnabled,
+  };
+
+  return createBrowserRouter(
     createRoutesFromElements([
       ...GeneralRoutes(),
-      ...(customDomain ? CustomDomainRoutes() : CommonDomainRoutes()),
+      ...(customDomain ? CustomDomainRoutes(flags) : CommonDomainRoutes(flags)),
       <Route path="*" element={withLayout(PageNotFound, {})} />,
-    ])
+    ]),
   );
+};
 export default Router;

@@ -1,15 +1,16 @@
 import React from 'react';
 
 import { handleRedirectClicks } from 'helpers';
-import { featureFlags } from 'helpers/feature-flags';
 import { useCommonNavigate } from 'navigation/helpers';
 import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
+import { useFlag } from '../../../../hooks/useFlag';
 import { SidebarSectionGroup } from '../sidebar_section';
 import type { SectionGroupAttrs, SidebarSectionAttrs } from '../types';
 import { useSidebarTreeToggle } from '../useSidebarTreeToggle';
 
 const AdminSection = () => {
+  const proposalTemplatesEnabled = useFlag('proposalTemplates');
   const navigate = useCommonNavigate();
   const location = useLocation();
   const { resetSidebarState, setToggleTree, toggledTreeState } =
@@ -176,7 +177,7 @@ const AdminSection = () => {
         );
       },
     },
-    ...(featureFlags.proposalTemplates
+    ...(proposalTemplatesEnabled
       ? [
           {
             title: 'Contract Templates',

@@ -1,21 +1,16 @@
-import type { CommandMetadata } from '@hicommonwealth/core';
-import { z } from 'zod';
+import { todo, type CommandMetadata } from '@hicommonwealth/core';
 import { models } from '../database';
-import type { UserAttributes } from '../models';
+import { mustNotExist } from '../middleware/guards';
 
-export const schema = z.object({
-  content: z.string(),
+export const CreateUser = (): CommandMetadata<typeof todo.CreateTodo> => ({
+  schemas: todo.CreateTodo,
+  auth: [],
+  body: async ({ id, payload }) => {
+    const user = await models.User.findOne({ where: { id } });
+
+    mustNotExist('User', user);
+
+    //await models.User.create(payload)
+    return payload;
+  },
 });
-
-export const CreateUser: CommandMetadata<typeof schema, UserAttributes> = {
-  schema,
-  fn: async () =>
-    //actor,
-    //id,
-    //payload,
-    {
-      // TODO
-      const user = await models.User.findOne();
-      return user!;
-    },
-};

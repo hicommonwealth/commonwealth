@@ -10,9 +10,7 @@ import {
   useCreateCommentReactionMutation,
   useDeleteCommentReactionMutation,
 } from '../../../state/api/comments';
-import { LoginModal } from '../../modals/login_modal';
-import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
-import { CWModal } from '../component_kit/new_designs/CWModal';
+import { AuthModal } from '../../modals/AuthModal';
 import { getDisplayedReactorsForPopup } from './helpers';
 
 type CommentReactionButtonProps = {
@@ -28,7 +26,7 @@ export const CommentReactionButton = ({
   tooltipText = '',
   onReaction,
 }: CommentReactionButtonProps) => {
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const {
@@ -63,14 +61,17 @@ export const CommentReactionButton = ({
   const hasReacted = !!(comment.reactions || []).find(
     (x) => x?.author === activeAddress,
   );
-  const likes = (comment.reactions || []).length;
+  const reactionWeightsSum = comment.reactions.reduce(
+    (acc, curr) => acc + (curr.calculatedVotingWeight || 1),
+    0,
+  );
 
   const handleVoteClick = async (e) => {
     e.stopPropagation();
     e.preventDefault();
 
     if (!app.isLoggedIn() || !app.user.activeAccount) {
-      setIsModalOpen(true);
+      setIsAuthModalOpen(true);
       return;
     }
 
@@ -110,15 +111,13 @@ export const CommentReactionButton = ({
 
   return (
     <>
-      <CWModal
-        content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
-        isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-        onClose={() => setIsModalOpen(false)}
-        open={isModalOpen}
+      <AuthModal
+        onClose={() => setIsAuthModalOpen(false)}
+        isOpen={isAuthModalOpen}
       />
       {RevalidationModal}
       <CWUpvoteSmall
-        voteCount={likes}
+        voteCount={reactionWeightsSum}
         disabled={!hasJoinedCommunity || disabled}
         selected={hasReacted}
         onClick={handleVoteClick}

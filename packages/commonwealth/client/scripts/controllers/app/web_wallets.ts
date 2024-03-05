@@ -63,7 +63,7 @@ export default class WebWalletController {
     try {
       await $.post(`${app.serverUrl()}/setAddressWallet`, {
         address: account.address,
-        author_chain: account.community.id,
+        author_community_id: account.community.id,
         wallet_id: wallet,
         wallet_sso_source: null,
         jwt: app.user.jwt,
@@ -88,9 +88,17 @@ export default class WebWalletController {
       throw new Error('No wallet available');
     }
 
+    if (app.user.addresses[0].walletId === 'magic') {
+      throw new Error(
+        'On-chain Transactions not currently available for magic',
+      );
+    }
     for (const wallet of availableWallets) {
-      if (!wallet.enabled) {
+      const countEnabled = availableWallets.filter((x) => x.enabled).length;
+      if (countEnabled == 0) {
         await wallet.enable();
+      } else if (!wallet.enabled) {
+        continue;
       }
       // TODO: ensure that we can find any wallet, even if non-string accounts
       if (wallet.accounts.find((acc) => acc === account.address)) {

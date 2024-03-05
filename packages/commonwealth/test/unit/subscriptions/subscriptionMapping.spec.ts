@@ -21,9 +21,9 @@ describe('Subscription Mapping Tests', () => {
       thread_id: threadId,
       root_title: 'title',
       root_type: 'type',
-      chain_id: chain,
+      community_id: chain,
       author_address: '0x123',
-      author_chain: chain,
+      author_community_id: chain,
     };
 
     it('should map a new thread notification to subscriptions', () => {
@@ -167,7 +167,7 @@ describe('Subscription Mapping Tests', () => {
           block_number: 1,
           event_data: {},
           network: SupportedNetwork.Aave,
-          chain,
+          community_id: chain,
         },
       };
       const uniqueSubData = mapNotificationsDataToSubscriptions(notification);

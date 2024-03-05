@@ -6,7 +6,7 @@ import {
 } from './proposalFetching/allProposalFetching';
 import {
   emitProposalNotifications,
-  fetchCosmosNotifChains,
+  fetchCosmosNotifCommunities,
   fetchLatestNotifProposalIds,
   filterProposals,
 } from './util';
@@ -17,18 +17,18 @@ const log = logger().getLogger(__filename);
  * Entry-point to generate Cosmos proposal notifications. Uses a polling scheme to fetch created proposals.
  */
 export async function generateCosmosGovNotifications() {
-  // fetch chains to generate notifications for
-  const chains = await fetchCosmosNotifChains(models);
+  // fetch communities to generate notifications for
+  const communities = await fetchCosmosNotifCommunities(models);
 
-  if (chains.length === 0) {
-    log.info('No chains to generate notifications for.');
+  if (communities.length === 0) {
+    log.info('No communities to generate notifications for.');
     return;
   }
 
-  // fetch proposal id of the latest proposal notification for each chain
+  // fetch proposal id of the latest proposal notification for each community
   const latestProposalIds = await fetchLatestNotifProposalIds(
     models,
-    chains.map((c) => c.id),
+    communities.map((c) => c.id),
   );
   log.info(
     `Fetched the following latest proposal ids: ${JSON.stringify(
@@ -36,11 +36,13 @@ export async function generateCosmosGovNotifications() {
     )}`,
   );
 
-  // fetch new proposals for each chain
-  const chainsWithPropId = chains.filter((c) => latestProposalIds[c.id]);
-  if (chainsWithPropId.length > 0) {
+  // fetch new proposals for each community
+  const communitiesWithPropId = communities.filter(
+    (c) => latestProposalIds[c.id],
+  );
+  if (communitiesWithPropId.length > 0) {
     const newProposals: any = await fetchUpToLatestCosmosProposals(
-      chainsWithPropId,
+      communitiesWithPropId,
       latestProposalIds,
     );
     // filter proposals e.g. proposals that happened long ago, proposals that don't have full deposits, etc
@@ -48,10 +50,14 @@ export async function generateCosmosGovNotifications() {
     await emitProposalNotifications(models, filteredProposals);
   }
 
-  // if a proposal id cannot be found, fetch the latest proposal from the chain
-  const missingPropIdChains = chains.filter((c) => !latestProposalIds[c.id]);
-  if (missingPropIdChains.length > 0) {
-    const missingProposals = await fetchLatestProposals(missingPropIdChains);
+  // if a proposal id cannot be found, fetch the latest proposal from the community
+  const missingPropIdCommunities = communities.filter(
+    (c) => !latestProposalIds[c.id],
+  );
+  if (missingPropIdCommunities.length > 0) {
+    const missingProposals = await fetchLatestProposals(
+      missingPropIdCommunities,
+    );
     const filteredProposals = filterProposals(missingProposals);
     await emitProposalNotifications(models, filteredProposals);
   }

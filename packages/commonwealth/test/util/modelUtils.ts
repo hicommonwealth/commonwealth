@@ -72,7 +72,12 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .agent(app)
       .post('/api/createAddress')
       .set('Accept', 'application/json')
-      .send({ address, chain, wallet_id, block_info: TEST_BLOCK_INFO_STRING });
+      .send({
+        address,
+        community_id: chain,
+        wallet_id,
+        block_info: TEST_BLOCK_INFO_STRING,
+      });
     const address_id = res.body.result.id;
     const chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
     const sessionWallet = ethers.Wallet.createRandom();
@@ -104,7 +109,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .set('Accept', 'application/json')
       .send({
         address,
-        chain,
+        community_id: chain,
         chain_id,
         signature,
         wallet_id,
@@ -140,7 +145,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .agent(app)
       .post('/api/createAddress')
       .set('Accept', 'application/json')
-      .send({ address: keyPair.address, chain, wallet_id });
+      .send({ address: keyPair.address, community_id: chain, wallet_id });
 
     // generate session wallet
     const sessionKeyring = new Keyring();
@@ -173,7 +178,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .agent(app)
       .post('/api/verifyAddress')
       .set('Accept', 'application/json')
-      .send({ address, chain, signature, wallet_id });
+      .send({ address, community_id: chain, signature, wallet_id });
     const user_id = res.body.result.user.id;
     const email = res.body.result.user.email;
     return {
@@ -696,11 +701,11 @@ export const joinCommunity = async (args: JoinCommunityArgs) => {
   try {
     await chai.request
       .agent(app)
-      .post('/api/linkExistingAddressToChain')
+      .post('/api/linkExistingAddressToCommunity')
       .set('Accept', 'application/json')
       .send({
         address,
-        chain,
+        community_id: chain,
         originChain,
         jwt,
       });

@@ -1,17 +1,14 @@
 import React, { useState } from 'react';
 
-import WebWalletController from 'controllers/app/web_wallets';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import AddressInfo from 'models/AddressInfo';
 import app from 'state';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import CWCommunitySelector, {
   SelectedCommunity,
 } from 'views/components/component_kit/new_designs/CWCommunitySelector';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import NewCommunityAdminModal from 'views/modals/NewCommunityAdminModal';
-import { LoginModal } from 'views/modals/login_modal';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityCreationEvent,
@@ -20,6 +17,8 @@ import {
 import { useBrowserAnalyticsTrack } from '../../../../../hooks/useBrowserAnalyticsTrack';
 import { communityTypeOptions } from './helpers';
 
+import { ChainBase } from '@hicommonwealth/core';
+import { AuthModal } from 'views/modals/AuthModal';
 import './CommunityTypeStep.scss';
 
 interface CommunityTypeStepProps {
@@ -37,7 +36,7 @@ const CommunityTypeStep = ({
 }: CommunityTypeStepProps) => {
   const [isNewCommunityAdminModalOpen, setIsNewCommunityAdminModalOpen] =
     useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const { isLoggedIn } = useUserLoggedIn();
 
@@ -60,19 +59,14 @@ const CommunityTypeStep = ({
     setSelectedCommunity({ type: selectedType, chainBase: selectedChainBase });
 
     if (!isLoggedIn) {
-      setIsLoginModalOpen(true);
+      setIsAuthModalOpen(true);
     } else {
       setIsNewCommunityAdminModalOpen(true);
     }
   };
 
-  const availableWallets = WebWalletController.Instance.availableWallets(
-    communityTypeOptions.find((c) => c.type === selectedCommunity.type)
-      ?.chainBase,
-  );
-
   const handleClickConnectNewWallet = () => {
-    setIsLoginModalOpen(true);
+    setIsAuthModalOpen(true);
     setIsNewCommunityAdminModalOpen(false);
   };
 
@@ -84,7 +78,8 @@ const CommunityTypeStep = ({
     handleContinue();
   };
 
-  const [ethereumOption, ...advancedOptions] = communityTypeOptions;
+  const [blastOption, ethereumOption, ...advancedOptions] =
+    communityTypeOptions;
 
   return (
     <div className="CommunityTypeStep">
@@ -95,21 +90,35 @@ const CommunityTypeStep = ({
         a community. Members must also have a compatible wallet type to join
         your community.
       </CWText>
+      <div className="advanced-options-container">
+        <CWCommunitySelector
+          key={blastOption.type}
+          type={blastOption.type}
+          title={blastOption.title}
+          description={blastOption.description}
+          isRecommended={true}
+          onClick={() =>
+            handleCommunitySelection({
+              type: blastOption.type,
+              chainBase: ethereumOption.chainBase,
+            })
+          }
+        />
 
-      <CWCommunitySelector
-        key={ethereumOption.type}
-        type={ethereumOption.type}
-        title={ethereumOption.title}
-        description={ethereumOption.description}
-        isRecommended={ethereumOption.isRecommended}
-        onClick={() =>
-          handleCommunitySelection({
-            type: ethereumOption.type,
-            chainBase: ethereumOption.chainBase,
-          })
-        }
-      />
-
+        <CWCommunitySelector
+          key={ethereumOption.type}
+          type={ethereumOption.type}
+          title={ethereumOption.title}
+          description={ethereumOption.description}
+          isRecommended={false}
+          onClick={() =>
+            handleCommunitySelection({
+              type: ethereumOption.type,
+              chainBase: ethereumOption.chainBase,
+            })
+          }
+        />
+      </div>
       <div className="advanced-options-container">
         <CWText type="h4">Advanced Options</CWText>
 
@@ -139,21 +148,16 @@ const CommunityTypeStep = ({
         onClose={() => setIsNewCommunityAdminModalOpen(false)}
         open={isNewCommunityAdminModalOpen}
       />
-      <CWModal
-        rootClassName="CreateCommunityLoginModal"
-        content={
-          <LoginModal
-            initialSidebar="createCommunityLogin"
-            initialWallets={availableWallets}
-            onModalClose={() => setIsLoginModalOpen(false)}
-            onSuccess={() => {
-              setIsNewCommunityAdminModalOpen(true);
-            }}
-          />
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onSuccess={() => {
+          setIsNewCommunityAdminModalOpen(true);
+        }}
+        showWalletsFor={
+          communityTypeOptions.find((c) => c.type === selectedCommunity.type)
+            ?.chainBase as Exclude<ChainBase, ChainBase.NEAR>
         }
-        isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-        onClose={() => setIsLoginModalOpen(false)}
-        open={isLoginModalOpen}
       />
     </div>
   );

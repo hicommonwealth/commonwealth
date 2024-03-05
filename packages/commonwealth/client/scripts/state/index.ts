@@ -1,4 +1,3 @@
-import { Capacitor } from '@capacitor/core';
 import { CommunityCategoryType } from '@hicommonwealth/core';
 import axios from 'axios';
 import { updateActiveUser } from 'controllers/app/login';
@@ -89,6 +88,7 @@ export interface IApp {
   // stored on server-side
   config: {
     chains: ChainStore;
+    redirects: Record<string, string>;
     nodes: NodeStore;
     notificationCategories?: NotificationCategory[];
     defaultChain: string;
@@ -101,15 +101,7 @@ export interface IApp {
 
   isLoggedIn(): boolean;
 
-  isProduction(): boolean;
-
-  isDesktopApp(win): boolean;
-
-  isNative(win): boolean;
-
   serverUrl(): string;
-
-  platform(): string;
 
   loadingError: string;
 
@@ -177,39 +169,15 @@ const app: IApp = {
 
   config: {
     chains: new ChainStore(),
+    redirects: {},
     nodes: new NodeStore(),
     defaultChain: 'edgeware',
   },
   // TODO: Collect all getters into an object
   loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,
   isLoggedIn: () => app.loginState === LoginState.LoggedIn,
-  isNative: () => {
-    const capacitor = window['Capacitor'];
-    return !!(capacitor && capacitor.isNative);
-  },
-  isDesktopApp: (window) => {
-    return window.todesktop;
-  },
-  platform: () => {
-    // Using Desktop API to determine if the platform is desktop
-    if (app.isDesktopApp(window)) {
-      return 'desktop';
-    } else {
-      // If not desktop, get the platform from Capacitor
-      return Capacitor.getPlatform();
-    }
-  },
-  isProduction: () =>
-    document.location.origin.indexOf('commonwealth.im') !== -1,
   serverUrl: () => {
-    //* TODO: @ Used to store the webpack SERVER_URL, should only be set for mobile deployments */
-    const mobileUrl = 'http://127.0.0.1:8080/api'; // Replace with your computer ip, staging, or production url
-
-    if (app.isNative(window)) {
-      return mobileUrl;
-    } else {
-      return '/api';
-    }
+    return '/api';
   },
 
   loadingError: null,
@@ -260,15 +228,17 @@ export async function initAppState(
       .filter((chainsWithSnapshots) => chainsWithSnapshots.community.active)
       .forEach((chainsWithSnapshots) => {
         delete chainsWithSnapshots.community.ChainNode;
-        app.config.chains.add(
-          ChainInfo.fromJSON({
-            ChainNode: app.config.nodes.getById(
-              chainsWithSnapshots.community.chain_node_id,
-            ),
-            snapshot: chainsWithSnapshots.snapshot,
-            ...chainsWithSnapshots.community,
-          }),
-        );
+        const chainInfo = ChainInfo.fromJSON({
+          ChainNode: app.config.nodes.getById(
+            chainsWithSnapshots.community.chain_node_id,
+          ),
+          snapshot: chainsWithSnapshots.snapshot,
+          ...chainsWithSnapshots.community,
+        });
+        app.config.chains.add(chainInfo);
+        if (chainInfo.redirect) {
+          app.config.redirects[chainInfo.redirect] = chainInfo.id;
+        }
       });
 
     app.roles.setRoles(statusRes.result.roles);

@@ -1,14 +1,12 @@
 import { models } from '@hicommonwealth/model';
-import bodyParser from 'body-parser';
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
-import express from 'express';
+import express, { RequestHandler, json, urlencoded } from 'express';
 import session from 'express-session';
 import passport from 'passport';
 import { SESSION_SECRET } from 'server/config';
-import { addExternalRoutes } from 'server/routing/external';
 import setupPassport from '../../../../server/passport/index';
 
 chai.use(chaiHttp);
@@ -33,15 +31,13 @@ export const app = express();
 before(async () => {
   app.use('/static', express.static('static'));
 
-  app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({ extended: false }));
+  app.use(json() as RequestHandler);
+  app.use(urlencoded({ extended: false }) as RequestHandler);
   app.use(cookieParser());
   app.use(sessionParser);
   setupPassport(models);
   app.use(passport.initialize());
   app.use(passport.session());
-
-  addExternalRoutes('/api', app, models);
 });
 
 export async function get(

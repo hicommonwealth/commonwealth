@@ -7,15 +7,19 @@ import {
   setupErrorHandlers,
 } from '@hicommonwealth/adapters';
 import { logger as _logger, cache } from '@hicommonwealth/core';
-import { TokenBalanceCache, models } from '@hicommonwealth/model';
-import bodyParser from 'body-parser';
+import { models } from '@hicommonwealth/model';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
-import express from 'express';
+import express, {
+  RequestHandler,
+  json,
+  urlencoded,
+  type Request,
+  type Response,
+} from 'express';
 import { redirectToHTTPS } from 'express-http-to-https';
 import session from 'express-session';
-import fs from 'fs';
 import logger from 'morgan';
 import passport from 'passport';
 import prerenderNode from 'prerender-node';
@@ -30,15 +34,11 @@ import {
   REDIS_URL,
   SERVER_URL,
   SESSION_SECRET,
-  TBC_BALANCE_TTL_SECONDS,
 } from './server/config';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
-import { addSwagger } from './server/routing/addSwagger';
-import { addExternalRoutes } from './server/routing/external';
 import setupAPI from './server/routing/router';
 import { sendBatchedNotificationEmails } from './server/scripts/emails';
-import setupAppRoutes from './server/scripts/setupAppRoutes';
 import setupServer from './server/scripts/setupServer';
 import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
@@ -107,16 +107,7 @@ export async function main(app: express.Express) {
   const setupMiddleware = () => {
     // redirect from commonwealthapp.herokuapp.com to commonwealth.im
     app.all(/.*/, (req, res, next) => {
-      const host = req.header('host');
-      const origin = req.get('origin');
-
-      // For development only - need to figure out prod solution
-      // if host is native mobile app, don't redirect
-      if (origin?.includes('capacitor://')) {
-        res.header('Access-Control-Allow-Origin', '*');
-      }
-
-      if (host?.match(/commonwealthapp.herokuapp.com/i)) {
+      if (req.header('host')?.match(/commonwealthapp.herokuapp.com/i)) {
         res.redirect(301, `https://commonwealth.im${req.url}`);
       } else {
         next();
@@ -167,10 +158,10 @@ export async function main(app: express.Express) {
     app.use('/static', express.static('static'));
 
     // add other middlewares
-    app.use(logger('dev'));
+    app.use(logger('dev') as RequestHandler);
     app.use(expressStatsInit());
-    app.use(bodyParser.json({ limit: '1mb' }));
-    app.use(bodyParser.urlencoded({ limit: '1mb', extended: false }));
+    app.use(json({ limit: '1mb' }) as RequestHandler);
+    app.use(urlencoded({ limit: '1mb', extended: false }) as RequestHandler);
     app.use(cookieParser());
     app.use(sessionParser);
     app.use(passport.initialize());
@@ -180,16 +171,6 @@ export async function main(app: express.Express) {
       app.use(prerenderNode.set('prerenderToken', PRERENDER_TOKEN));
     }
   };
-
-  const templateFile = (() => {
-    try {
-      return fs.readFileSync('./build/index.html');
-    } catch (e) {
-      console.error(`Failed to read template file: ${e.message}`);
-    }
-  })();
-
-  const sendFile = (res) => res.sendFile(`${__dirname}/index.html`);
 
   setupMiddleware();
   setupPassport(models);
@@ -215,11 +196,6 @@ export async function main(app: express.Express) {
     );
   }
 
-  const tokenBalanceCache = new TokenBalanceCache(
-    models,
-    TBC_BALANCE_TTL_SECONDS,
-  );
-
   const banCache = new BanCache(models);
   const globalActivityCache = new GlobalActivityCache(models);
 
@@ -236,15 +212,10 @@ export async function main(app: express.Express) {
     app,
     models,
     viewCountCache,
-    tokenBalanceCache,
     banCache,
     globalActivityCache,
     dbValidationService,
   );
-
-  // new API
-  addExternalRoutes('/external', app, models);
-  addSwagger('/docs', app);
 
   setupCosmosProxy(app, models, cacheDecorator);
   setupIpfsProxy(app, cacheDecorator);
@@ -257,11 +228,21 @@ export async function main(app: express.Express) {
       ).default;
       await setupWebpackDevServer(app);
     } else {
-      app.use('/build', express.static('build'));
+      app.use(
+        '/build',
+        express.static('build', {
+          setHeaders: (res) => {
+            res.setHeader('Cache-Control', 'public');
+          },
+        }),
+      );
     }
   }
 
-  setupAppRoutes(app, models, templateFile, sendFile);
+  app.get('*', (req: Request, res: Response) => {
+    log.info(`setupAppRoutes sendFiles ${req.path}`);
+    res.sendFile(`${__dirname}/index.html`);
+  });
 
   setupErrorHandlers(app);
 

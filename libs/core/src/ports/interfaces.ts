@@ -1,4 +1,4 @@
-import { CacheNamespaces } from '../types';
+import { AnalyticsOptions, CacheNamespaces } from '../types';
 
 /**
  * Resource disposer function
@@ -62,7 +62,7 @@ export interface Stats extends Disposable {
  * Cache port
  */
 export interface Cache extends Disposable {
-  getKey(namespace: CacheNamespaces, key: string): Promise<string>;
+  getKey(namespace: CacheNamespaces, key: string): Promise<string | undefined>;
   setKey(
     namespace: CacheNamespaces,
     key: string,
@@ -73,34 +73,44 @@ export interface Cache extends Disposable {
   getKeys(
     namespace: CacheNamespaces,
     keys: string[],
-  ): Promise<false | Record<string, unknown>>;
+  ): Promise<false | Record<string, unknown> | undefined>;
   setKeys(
     namespace: CacheNamespaces,
     data: { [key: string]: string },
     duration?: number,
     transaction?: boolean,
-  ): Promise<false | Array<'OK' | null>>;
+  ): Promise<false | Array<'OK' | null> | undefined>;
   getNamespaceKeys(
     namespace: CacheNamespaces,
     maxResults?: number,
-  ): Promise<{ [key: string]: string } | boolean>;
-  deleteKey(namespace: CacheNamespaces, key: string): Promise<number>;
+  ): Promise<{ [key: string]: string } | boolean | undefined>;
+  deleteKey(
+    namespace: CacheNamespaces,
+    key: string,
+  ): Promise<number | undefined>;
   deleteNamespaceKeys(namespace: CacheNamespaces): Promise<number | boolean>;
   flushAll(): Promise<void>;
   incrementKey(
     namespace: CacheNamespaces,
     key: string,
     increment?: number,
-  ): Promise<number | null>;
+  ): Promise<number | null | undefined>;
   decrementKey(
     namespace: CacheNamespaces,
     key: string,
     decrement?: number,
-  ): Promise<number | null>;
+  ): Promise<number | null | undefined>;
   getKeyTTL(namespace: CacheNamespaces, key: string): Promise<number>;
   setKeyTTL(
     namespace: CacheNamespaces,
     key: string,
     ttlInSeconds: number,
   ): Promise<boolean>;
+}
+
+/**
+ * Analytics port
+ */
+export interface Analytics extends Disposable {
+  track(event: string, payload: AnalyticsOptions): void;
 }

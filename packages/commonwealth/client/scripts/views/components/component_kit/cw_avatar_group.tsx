@@ -2,6 +2,7 @@ import React from 'react';
 
 import type MinimumProfile from '../../../models/MinimumProfile';
 
+import clsx from 'clsx';
 import 'components/component_kit/cw_avatar_group.scss';
 import { CWAvatar, CWJdenticon } from './cw_avatar';
 import { CWText } from './cw_text';
@@ -19,12 +20,14 @@ type AvatarGroupProps = {
   profiles: ProfileWithAddress[];
   communityId: string;
   totalProfiles?: number;
+  className?: string;
 };
 
 export const CWAvatarGroup = ({
   profiles,
   communityId,
   totalProfiles,
+  className,
 }: AvatarGroupProps) => {
   if (!profiles || profiles?.filter((p) => !!p && p.Addresses).length === 0)
     return;
@@ -50,7 +53,7 @@ export const CWAvatarGroup = ({
   }
 
   return (
-    <div className="AvatarGroup">
+    <div className={clsx('AvatarGroup', className)}>
       <div className="avatar-group-icons">
         {truncatedProfiles.map((profile, i) => {
           if (profile.avatarUrl) {

@@ -7,16 +7,14 @@ import {
   useDeleteThreadReactionMutation,
 } from 'state/api/threads';
 import { getDisplayedReactorsForPopup } from 'views/components/ReactionButton/helpers';
-import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
-import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
 import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
 import { TooltipWrapper } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { CWUpvote } from 'views/components/component_kit/new_designs/cw_upvote';
+import { AuthModal } from 'views/modals/AuthModal';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
-import { LoginModal } from '../../../../../modals/login_modal';
 import { ReactionButtonSkeleton } from './ReactionButtonSkeleton';
 
 type ReactionButtonProps = {
@@ -34,8 +32,13 @@ export const ReactionButton = ({
   showSkeleton,
   tooltipText,
 }: ReactionButtonProps) => {
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const reactors = thread?.associatedReactions?.map((t) => t.address);
+  const reactionWeightsSum =
+    thread?.associatedReactions?.reduce(
+      (acc, curr) => acc + (curr.voting_weight || 1),
+      0,
+    ) || 0;
   const activeAddress = app.user.activeAccount?.address;
   const thisUserReaction = thread?.associatedReactions?.filter(
     (r) => r.address === activeAddress,
@@ -83,7 +86,7 @@ export const ReactionButton = ({
     if (isLoading || disabled) return;
 
     if (!app.isLoggedIn() || !app.user.activeAccount) {
-      setIsModalOpen(true);
+      setIsAuthModalOpen(true);
       return;
     }
     if (hasReacted) {
@@ -117,7 +120,7 @@ export const ReactionButton = ({
     <>
       {size === 'small' ? (
         <CWUpvoteSmall
-          voteCount={reactors.length}
+          voteCount={reactionWeightsSum}
           disabled={disabled}
           isThreadArchived={!!thread.archivedAt}
           selected={hasReacted}
@@ -131,7 +134,7 @@ export const ReactionButton = ({
         <TooltipWrapper disabled={disabled} text={tooltipText}>
           <CWUpvote
             onClick={handleVoteClick}
-            voteCount={reactors.length}
+            voteCount={reactionWeightsSum}
             disabled={disabled}
             active={hasReacted}
           />
@@ -143,7 +146,7 @@ export const ReactionButton = ({
         >
           <CWUpvote
             onClick={handleVoteClick}
-            voteCount={reactors.length}
+            voteCount={reactionWeightsSum}
             disabled={disabled}
             active={hasReacted}
           />
@@ -158,11 +161,9 @@ export const ReactionButton = ({
           )}
         </div>
       )}
-      <CWModal
-        content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
-        isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-        onClose={() => setIsModalOpen(false)}
-        open={isModalOpen}
+      <AuthModal
+        onClose={() => setIsAuthModalOpen(false)}
+        isOpen={isAuthModalOpen}
       />
       {RevalidationModal}
     </>

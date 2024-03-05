@@ -1,8 +1,6 @@
 import { ChainBase } from '@hicommonwealth/core';
 
 export const enum MixpanelPageViewEvent {
-  LANDING_PAGE_VIEW = 'Landing Page Viewed',
-  COMMUNITY_CREATION_PAGE_VIEW = 'Create Community Page Viewed',
   THREAD_PAGE_VIEW = 'Thread Page Viewed',
   DASHBOARD_VIEW = 'Dashbboard Page Viewed',
   MEMBERS_PAGE_VIEW = 'Members Page Viewed',
@@ -31,6 +29,13 @@ export const enum MixpanelCommunityInteractionEvent {
   UPDATE_GROUP = 'Update Group',
   DIRECTORY_PAGE_ENABLED = 'Directory Page Enabled',
   DIRECTORY_PAGE_DISABLED = 'Directory Page Disabled',
+}
+
+export const enum MixpanelCommunityStakeEvent {
+  STAKE_BOUGHT = 'Stake Bought',
+  STAKE_SOLD = 'Stake Sold',
+  RESERVED_COMMUNITY_NAMESPACE = 'Community Namespace Reserved',
+  LAUNCHED_COMMUNITY_STAKE = 'Community Stake Launched',
 }
 
 export const enum MixpanelLoginEvent {
@@ -69,15 +74,28 @@ export const enum MixpanelSnapshotEvents {
   SNAPSHOT_PROPOSAL_CREATED = 'Snapshot Proposal Created',
 }
 
+export const enum MixpanelGovernanceEvents {
+  SPUTNIK_PROPOSAL_CREATED = 'Sputnik Proposal Created',
+  AAVE_PROPOSAL_CREATED = 'Aave Proposal Created',
+  COMPOUND_PROPOSAL_CREATED = 'Compound Proposal Created',
+  COSMOS_PROPOSAL_CREATED = 'Cosmos Proposal Created',
+  SPUTNIK_VOTE_OCCURRED = 'Sputnik Vote Occurred',
+  AAVE_VOTE_OCCURRED = 'Aave Vote Occurred',
+  COMPOUND_VOTE_OCCURRED = 'Compund Vote Occurred',
+  COSMOS_VOTE_OCCURRED = 'Cosmos Vote Occurred',
+}
+
 export type MixpanelEvents =
   | MixpanelLoginEvent
   | MixpanelUserSignupEvent
   | MixpanelCommunityCreationEvent
+  | MixpanelCommunityStakeEvent
   | MixpanelPageViewEvent
   | MixpanelCommunityInteractionEvent
   | MixpanelSnapshotEvents
   | MixpanelErrorCaptureEvent
-  | MixpanelClickthroughEvent;
+  | MixpanelClickthroughEvent
+  | MixpanelGovernanceEvents;
 
 export type AnalyticsEvent = MixpanelEvents; // add other providers events here
 

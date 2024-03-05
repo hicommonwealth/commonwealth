@@ -35,21 +35,25 @@ export async function dispatchWebhooks(
     return;
   }
 
+  if (
+    notification.categoryId === NotificationCategories.NewComment &&
+    notification.data?.parent_comment_id
+  ) {
+    // If parent comment exists we don't want to send a webhook.
+    // Otherwise we will duplicate send a webhook for every reply to a comment.
+    return;
+  }
+
   if (!webhooks) {
     webhooks = await fetchWebhooks(notification);
   }
 
-  let communityId: string;
-  if (notification.categoryId === NotificationCategories.ChainEvent) {
-    communityId = notification.data.chain;
-  } else {
-    communityId = notification.data.chain_id;
-  }
+  // const communityId =
 
   const community: CommunityInstance | undefined =
     await models.Community.findOne({
       where: {
-        id: communityId,
+        id: notification.data.community_id,
       },
     });
 

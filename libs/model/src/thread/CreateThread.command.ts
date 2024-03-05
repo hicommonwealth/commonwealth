@@ -1,21 +1,16 @@
-import type { CommandMetadata } from '@hicommonwealth/core';
-import { z } from 'zod';
+import { todo, type CommandMetadata } from '@hicommonwealth/core';
 import { models } from '../database';
-import type { ThreadAttributes } from '../models';
+import { mustNotExist } from '../middleware/guards';
 
-export const schema = z.object({
-  content: z.string(),
+export const CreateThread = (): CommandMetadata<typeof todo.CreateTodo> => ({
+  schemas: todo.CreateTodo,
+  auth: [],
+  body: async ({ id, payload }) => {
+    const thread = await models.Thread.findOne({ where: { id } });
+
+    mustNotExist('Thread', thread);
+
+    //await models.Thread.create(payload)
+    return payload;
+  },
 });
-
-export const CreateThread: CommandMetadata<typeof schema, ThreadAttributes> = {
-  schema,
-  fn: async () =>
-    //actor,
-    //id,
-    //payload,
-    {
-      // TODO
-      const thread = await models.Thread.findOne();
-      return thread!;
-    },
-};

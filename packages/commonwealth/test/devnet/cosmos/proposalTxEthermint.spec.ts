@@ -83,7 +83,7 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-ci)', () => {
   let rpc: CosmosApiType;
   let signerAddr: string;
   const rpcUrl = `http://localhost:8080/cosmosAPI/${id}`;
-  const lcdUrl = `http://localhost:8080/cosmosLCD/${id}`;
+  const lcdUrl = `http://localhost:8080/cosmosAPI/v1/${id}`;
 
   before(async () => {
     const tm = await getTMClient(rpcUrl);

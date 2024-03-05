@@ -18,7 +18,7 @@ import { getCommentDepth } from '../../util/getCommentDepth';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
-import { TrackOptions } from '../server_analytics_methods/track';
+import { TrackOptions } from '../server_analytics_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
 import { ServerThreadsController } from '../server_threads_controller';
 
@@ -136,7 +136,6 @@ export async function __createThreadComment(
   if (!isAdmin) {
     const { isValid, message } = await validateTopicGroupsMembership(
       this.models,
-      this.tokenBalanceCache,
       thread.topic_id,
       thread.community_id,
       address,
@@ -176,6 +175,7 @@ export async function __createThreadComment(
     reaction_count: 0,
     reaction_weights_sum: 0,
   };
+
   if (parentId) {
     Object.assign(commentContent, { parent_id: parentId });
   }
@@ -257,9 +257,9 @@ export async function __createThreadComment(
         root_type: ProposalType.Thread,
         comment_id: +comment.id,
         comment_text: comment.text,
-        chain_id: comment.community_id,
+        community_id: comment.community_id,
         author_address: address.address,
-        author_chain: address.community_id,
+        author_community_id: address.community_id,
       },
     },
     excludeAddresses: rootNotifExcludeAddresses,
@@ -279,9 +279,9 @@ export async function __createThreadComment(
           comment_text: comment.text,
           parent_comment_id: +parentId,
           parent_comment_text: parentComment.text,
-          chain_id: comment.community_id,
+          community_id: comment.community_id,
           author_address: address.address,
-          author_chain: address.community_id,
+          author_community_id: address.community_id,
         },
       },
       excludeAddresses: excludedAddrs,
@@ -306,9 +306,9 @@ export async function __createThreadComment(
                 root_type: ProposalType.Thread,
                 comment_id: +comment.id,
                 comment_text: comment.text,
-                chain_id: comment.community_id,
+                community_id: comment.community_id,
                 author_address: address.address,
-                author_chain: address.community_id,
+                author_community_id: address.community_id,
               },
             },
             excludeAddresses: [address.address],

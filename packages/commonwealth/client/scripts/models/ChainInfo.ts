@@ -19,7 +19,7 @@ class ChainInfo {
   public description: string;
   public socialLinks: string[];
   public stagesEnabled: boolean;
-  public customStages: string;
+  public customStages: string[];
   public customDomain: string;
   public snapshot: string[];
   public terms: string;
@@ -39,11 +39,11 @@ class ChainInfo {
   public adminOnlyPolling: boolean;
   public communityBanner?: string;
   public discordConfigId?: string;
-  public cosmosGovernanceVersion?: string;
   public discordBotWebhooksEnabled?: boolean;
   public directoryPageEnabled?: boolean;
   public directoryPageChainNodeId?: number;
   public namespace?: string;
+  public redirect?: string;
 
   public get node() {
     return this.ChainNode;
@@ -78,11 +78,11 @@ class ChainInfo {
     tokenName,
     adminOnlyPolling,
     discord_config_id,
-    cosmosGovernanceVersion,
     discordBotWebhooksEnabled,
     directoryPageEnabled,
     directoryPageChainNodeId,
     namespace,
+    redirect,
   }) {
     this.id = id;
     this.network = network;
@@ -113,11 +113,11 @@ class ChainInfo {
     this.adminOnlyPolling = adminOnlyPolling;
     this.communityBanner = null;
     this.discordConfigId = discord_config_id;
-    this.cosmosGovernanceVersion = cosmosGovernanceVersion;
     this.discordBotWebhooksEnabled = discordBotWebhooksEnabled;
     this.directoryPageEnabled = directoryPageEnabled;
     this.directoryPageChainNodeId = directoryPageChainNodeId;
     this.namespace = namespace;
+    this.redirect = redirect;
   }
 
   public static fromJSON({
@@ -153,6 +153,7 @@ class ChainInfo {
     directory_page_enabled,
     directory_page_chain_node_id,
     namespace,
+    redirect,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -170,11 +171,6 @@ class ChainInfo {
     if (COSMOS_EVM_CHAINS.some((c) => c === id)) {
       decimals = 18;
     }
-
-    // TODO: this is temporary until we have a better way to handle governance versions
-    // see: https://github.com/hicommonwealth/commonwealth/issues/3292
-    const v1Chains = process.env.COSMOS_GOV_V1?.split(',');
-    const cosmos_governance_version = v1Chains?.includes(id) ? 'v1' : 'v1beta1';
 
     return new ChainInfo({
       id,
@@ -205,11 +201,11 @@ class ChainInfo {
       ChainNode,
       adminOnlyPolling: admin_only_polling,
       discord_config_id,
-      cosmosGovernanceVersion: cosmos_governance_version,
       discordBotWebhooksEnabled: discord_bot_webhooks_enabled,
       directoryPageEnabled: directory_page_enabled,
       directoryPageChainNodeId: directory_page_chain_node_id,
       namespace,
+      redirect,
     });
   }
 
@@ -250,18 +246,19 @@ class ChainInfo {
     defaultOverview,
     defaultPage,
     hasHomepage,
-    cosmos_governance_version,
+    cosmos_gov_version,
     chain_node_id,
     discord_bot_webhooks_enabled,
     directory_page_enabled,
     directory_page_chain_node_id,
+    type,
   }: {
     name?: string;
     description?: string;
     social_links?: string[];
     discord?: string;
     stagesEnabled?: boolean;
-    customStages?: string;
+    customStages?: string[];
     customDomain?: string;
     terms?: string;
     snapshot?: string[];
@@ -269,11 +266,12 @@ class ChainInfo {
     defaultOverview?: boolean;
     defaultPage?: DefaultPage;
     hasHomepage?: boolean;
-    cosmos_governance_version?: string;
+    cosmos_gov_version?: string;
     chain_node_id?: string;
     discord_bot_webhooks_enabled?: boolean;
     directory_page_enabled?: boolean;
     directory_page_chain_node_id?: number;
+    type?: string;
   }) {
     const id = app.activeChainId() ?? this.id;
     const r = await axios.patch(`${app.serverUrl()}/communities/${id}`, {
@@ -291,10 +289,11 @@ class ChainInfo {
       default_page: defaultPage,
       has_homepage: hasHomepage,
       chain_node_id,
-      cosmos_governance_version,
+      cosmos_gov_version,
       discord_bot_webhooks_enabled,
       directory_page_enabled,
       directory_page_chain_node_id,
+      type,
       jwt: app.user.jwt,
     });
     const updatedChain = r.data.result;
@@ -310,10 +309,10 @@ class ChainInfo {
     this.defaultOverview = updatedChain.default_summary_view;
     this.defaultPage = updatedChain.default_page;
     this.hasHomepage = updatedChain.has_homepage;
-    this.cosmosGovernanceVersion = updatedChain.cosmos_governance_version;
     this.discordBotWebhooksEnabled = updatedChain.discord_bot_webhooks_enabled;
     this.directoryPageEnabled = updatedChain.directory_page_enabled;
     this.directoryPageChainNodeId = updatedChain.directory_page_chain_node_id;
+    this.type = updatedChain.type;
   }
 
   public categorizeSocialLinks(): CategorizedSocialLinks {

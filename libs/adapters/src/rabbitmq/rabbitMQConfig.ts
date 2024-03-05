@@ -40,10 +40,6 @@ export function getRabbitMQConfig(
       const res = rabbitmq_uri.split('/');
       vhost = res[res.length - 1];
       purge = false;
-    } else if (count == 2) {
-      // this matches for a Vultr URL
-      vhost = '/';
-      purge = true;
     } else {
       throw new Error(
         "Can't create Rascal RabbitMQ Config with an invalid URI!",
@@ -51,8 +47,15 @@ export function getRabbitMQConfig(
     }
   }
 
-  const copyConfigs = (source, target, keys) =>
-    keys.forEach((key) => (target[key] = source[key]));
+  type Keys =
+    | RascalExchanges
+    | RascalQueues
+    | RascalBindings
+    | RascalPublications
+    | RascalSubscriptions;
+
+  const copyConfigs = (source: any, target: any, keys: Array<Keys>) =>
+    target && source && keys.forEach((key) => (target[key] = source[key]));
 
   const {
     baseConfig,
@@ -63,7 +66,7 @@ export function getRabbitMQConfig(
     allBindings,
   } = getAllRascalConfigs(rabbitmq_uri, vhost, purge);
   const config = baseConfig;
-  const vhostConfig = config.vhosts[vhost];
+  const vhostConfig = config.vhosts![vhost];
   if (service === RascalConfigServices.CommonwealthService) {
     copyConfigs(allExchanges, vhostConfig.exchanges, [
       RascalExchanges.SnapshotListener,
