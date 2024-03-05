@@ -96,7 +96,7 @@ const AdminsAndModerators = () => {
         address_id: newRole.Address?.id || newRole.address_id,
         address: newRole.Address.address,
         address_chain: newRole.Address.community_id,
-        chain_id: newRole.chain_id,
+        community_id: newRole.chain_id,
         permission: newRole.permission,
         allow: newRole.allow,
         deny: newRole.deny,

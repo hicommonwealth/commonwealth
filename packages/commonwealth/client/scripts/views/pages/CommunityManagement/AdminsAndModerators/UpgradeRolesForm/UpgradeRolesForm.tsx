@@ -4,7 +4,7 @@ import { formatAddressShort } from 'helpers';
 import $ from 'jquery';
 import React, { useMemo, useState } from 'react';
 import app from 'state';
-import type RoleInfo from '../../../../../models/RoleInfo';
+import RoleInfo from '../../../../../models/RoleInfo';
 import { CWRadioGroup } from '../../../../components/component_kit/cw_radio_group';
 import { CWButton } from '../../../../components/component_kit/new_designs/cw_button';
 import { CWRadioButton } from '../../../../components/component_kit/new_designs/cw_radio_button';
@@ -130,19 +130,18 @@ export const UpgradeRolesForm = ({
                 notifyError('Upgrade failed');
               }
 
-              const roleData = r.data.result;
-              const newRole = new RoleInfo({
-                id: roleData.id,
-                address_id: roleData.address_id,
-                address_chain: roleData.community_id,
-                address: roleData.address,
-                chain_id: roleData.community_id,
-                permission: roleData.permission,
-                allow: roleData.allow,
-                deny: roleData.deny,
-                is_user_default: roleData.is_user_default,
+              const createdRole = new RoleInfo({
+                id: r.data.result.id,
+                address_id: r.data.result.address_id,
+                address_chain: r.data.result.community_id,
+                address: r.data.result.address,
+                community_id: r.data.result.community_id,
+                permission: r.data.result.permission,
+                allow: r.data.result.allow,
+                deny: r.data.result.deny,
+                is_user_default: r.data.result.is_user_default,
               });
-              onRoleUpdate(_user, newRole);
+              onRoleUpdate(_user, createdRole);
             });
             zeroOutRadioButtons();
           }}

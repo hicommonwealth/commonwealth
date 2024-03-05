@@ -218,7 +218,7 @@ class ChainInfo {
           address_id: r.address_id,
           address: r.Address.address,
           address_chain: r.Address.community_id,
-          chain_id: r.chain_id,
+          community_id: r.chain_id,
           permission: r.permission,
           allow: r.allow,
           deny: r.deny,

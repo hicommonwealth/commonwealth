@@ -42,7 +42,7 @@ export const ManageRoles = ({
         address_id: roleData.address_id,
         address_chain: roleData.community_id,
         address: roleData.address,
-        chain_id: roleData.community_id,
+        community_id: roleData.community_id,
         permission: roleData.permission,
         allow: roleData.allow,
         deny: roleData.deny,
