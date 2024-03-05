@@ -124,7 +124,7 @@ export type EventContext<Name, Input extends ZodSchema> = {
  */
 export type CommandHandler<S extends Schemas> = (
   context: CommandContext<S>,
-  state?: Partial<z.infer<S['input']>>,
+  state?: Partial<z.infer<S['output']>>,
 ) => Promise<Partial<z.infer<S['output']>> | void>;
 
 /**

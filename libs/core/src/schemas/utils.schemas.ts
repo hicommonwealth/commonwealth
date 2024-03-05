@@ -19,6 +19,7 @@ export const paginationSchema = {
     .int()
     .default(0)
     .describe('The amount of objects offset from the beginning'),
+  page: z.coerce.number().int().default(1).describe('The page returned'),
 };
 
 export const discordMetaSchema = {

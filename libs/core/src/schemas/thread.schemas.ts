@@ -1,4 +1,5 @@
 import z from 'zod';
+import { Address } from './address.schemas';
 import {
   discordMetaSchema,
   linksSchema,
@@ -6,6 +7,7 @@ import {
 } from './utils.schemas';
 
 export const Thread = z.object({
+  Address: Address.optional(),
   address_id: z.number(),
   title: z.string(),
   kind: z.string(),
@@ -48,7 +50,7 @@ export const Thread = z.object({
   max_notif_id: z.number(),
 });
 
-const OrderByQueriesKeys = z.enum([
+export const OrderByQueriesKeys = z.enum([
   'createdAt:asc',
   'createdAt:desc',
   'numberOfComments:asc',
@@ -59,33 +61,71 @@ const OrderByQueriesKeys = z.enum([
   'latestActivity:desc',
 ]);
 
-export const orderByQueries: Record<
-  z.infer<typeof OrderByQueriesKeys>,
-  string
-> = {
-  'createdAt:asc': 'threads.thread_created ASC',
-  'createdAt:desc': 'threads.thread_created DESC',
-  'numberOfComments:asc': 'threads_number_of_comments ASC',
-  'numberOfComments:desc': 'threads_number_of_comments DESC',
-  'numberOfLikes:asc': 'threads_total_likes ASC',
-  'numberOfLikes:desc': 'threads_total_likes DESC',
-  'latestActivity:asc': 'latest_activity ASC',
-  'latestActivity:desc': 'latest_activity DESC',
-} as const;
-
 export const GetBulkThreads = {
   input: z.object({
-    communityId: z.string().describe('The community id'),
-    fromDate: z.date().describe('Filters out threads before this date'),
-    toDate: z.date().describe('Filters out threads before this date'),
-    archived: z.boolean().default(false),
-    includePinnedThreads: z.boolean().default(false),
+    community_id: z.string().describe('The community id'),
+    fromDate: z
+      .date()
+      .describe('Filters out threads before this date')
+      .optional(),
+    toDate: z
+      .date()
+      .describe('Filters out threads before this date')
+      .optional(),
+    // archived: z.coerce.boolean().default(false),
+    // includePinnedThreads: z.coerce.boolean().default(false),
     topicId: z.string().optional(),
     stage: z.string().optional(),
-    orderBy: OrderByQueriesKeys.optional(),
+    orderBy: OrderByQueriesKeys.default('createdAt:desc'),
     ...paginationSchema,
   }),
   output: z.object({
-    results: Thread.array(),
+    limit: z.number(),
+    page: z.number(),
+    numVotingThreads: z.number(),
+    threads: z
+      .object({
+        id: z.number(),
+        title: z.string(),
+        url: z.string(),
+        body: z.string(),
+        last_edited: z.date().optional(),
+        kind: z.string(),
+        stage: z.string(),
+        read_only: z.boolean(),
+        discord_meta: z.object(discordMetaSchema).optional(),
+        pinned: z.boolean(),
+        chain: z.string(),
+        created_at: z.date(),
+        updated_at: z.date(),
+        locked_at: z.date().optional(),
+        links: z.object(linksSchema).array().optional(),
+        collaborators: z.string().array(),
+        has_poll: z.boolean().optional(),
+        last_commented_on: z.date().optional(),
+        plaintext: z.string(),
+        Address: z.object({
+          id: z.number(),
+          address: z.string(),
+          community_id: z.string(),
+        }),
+        numberOfComments: z.number(),
+        reactionIds: z.number().array(),
+        reactionTimestamps: z.date().array(),
+        reactionWeights: z.number().array(),
+        reaction_weights_sum: z.number(),
+        addressesReacted: z.string().array(),
+        reactionType: z.string().array(),
+        marked_as_spam_at: z.string().optional(),
+        archived_at: z.date().optional(),
+        latest_activity: z.date().optional(),
+        topic: z.object({
+          id: z.number(),
+          name: z.string(),
+          description: z.string(),
+          chainId: z.string(),
+        }),
+      })
+      .array(),
   }),
 };
