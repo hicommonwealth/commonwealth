@@ -1,5 +1,6 @@
 import { notifyError } from 'client/scripts/controllers/app/notifications';
 import type ChainInfo from 'client/scripts/models/ChainInfo';
+import { useManageCommunityStakeModalStore } from 'client/scripts/state/ui/modals';
 import { CommunityData } from 'client/scripts/views/pages/DirectoryPage/DirectoryPageContent';
 import { isCommandClick, pluralizeWithoutNumberPrefix } from 'helpers';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
@@ -37,11 +38,16 @@ export const CWRelatedCommunityCard = ({
 }: CWRelatedCommunityCardProps) => {
   const navigate = useCommonNavigate();
   const { stakeEnabled } = useCommunityStake({ communityId: community.id });
+
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity({
     communityToJoin: community.id,
   });
-
   const [hasJoinedCommunity, setHasJoinedCommunity] = useState(false);
+  const isCommunityMember =
+    app.roles.getAllRolesInCommunity({ community: community.id }).length > 0;
+
+  const { setModeOfManageCommunityStakeModal } =
+    useManageCommunityStakeModalStore();
 
   const { trackAnalytics } =
     useBrowserAnalyticsTrack<MixpanelClickthroughPayload>({
@@ -63,8 +69,17 @@ export const CWRelatedCommunityCard = ({
     [navigate, trackAnalytics, community.id],
   );
 
-  const isCommunityMember =
-    app.roles.getAllRolesInCommunity({ community: community.id }).length > 0;
+  const handleBuyStakeClick = async () => {
+    if (!isCommunityMember && !hasJoinedCommunity) {
+      const joined = await handleJoinCommunity();
+
+      if (joined) {
+        setModeOfManageCommunityStakeModal('buy');
+      }
+    } else {
+      setModeOfManageCommunityStakeModal('buy');
+    }
+  };
 
   return (
     <>
@@ -167,6 +182,7 @@ export const CWRelatedCommunityCard = ({
                 buttonWidth="narrow"
                 onClick={(e) => {
                   e.stopPropagation();
+                  handleBuyStakeClick();
                 }}
               />
             )}
