@@ -1,25 +1,16 @@
-import { QueryMetadata, threads } from '@hicommonwealth/core';
-import { z } from 'zod';
+import { QueryMetadata, thread } from '@hicommonwealth/core';
 import { models } from '../database';
 
 export const GetBulkThread = (): QueryMetadata<
-  z.infer<typeof threads.GetBulkThreads.output>,
-  typeof threads.GetBulkThreads.input
+  typeof thread.GetBulkThreads
 > => ({
-  schema: threads.GetBulkThreads.input,
+  schemas: thread.GetBulkThreads,
   auth: [],
   body: async ({ payload }) => {
     return (
-      await models.CommunityStake.findOne({
+      await models.Thread.findOne({
         where: payload,
-        include: [
-          {
-            model: models.Community,
-            required: true,
-            attributes: ['namespace'],
-          },
-        ],
       })
-    )?.get({ plain: true });
+    )?.get({ plain: true }) as any;
   },
 });
