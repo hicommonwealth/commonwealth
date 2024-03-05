@@ -19,7 +19,7 @@ export async function getCosmosBalances(
   });
 
   if (!chainNode) {
-    const msg = `ChainNode does not exist`;
+    const msg = `ChainNode with Cosmos chain id ${options.sourceOptions.cosmosChainId} does not exist`;
     log.error(msg, undefined, {
       cosmosChainId: options.sourceOptions.cosmosChainId,
     });
