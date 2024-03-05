@@ -23,12 +23,12 @@ export type AdapterFactory<T extends Disposable> = (adapter?: T) => T;
  * Logs messages at different levels
  */
 export interface ILogger {
-  trace(msg: string, error?: Error): void;
-  debug(msg: string, error?: Error): void;
-  info(msg: string, error?: Error): void;
-  warn(msg: string, error?: Error): void;
-  error(msg: string, error?: Error): void;
-  fatal(msg: string, error?: Error): void;
+  trace(msg: string, error?: Error, context?: Record<string, unknown>): void;
+  debug(msg: string, error?: Error, context?: Record<string, unknown>): void;
+  info(msg: string, error?: Error, context?: Record<string, unknown>): void;
+  warn(msg: string, error?: Error, context?: Record<string, unknown>): void;
+  error(msg: string, error?: Error, context?: Record<string, unknown>): void;
+  fatal(msg: string, error?: Error, context?: Record<string, unknown>): void;
 }
 /**
  * Logger factory

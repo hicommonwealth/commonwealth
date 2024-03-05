@@ -35,17 +35,17 @@ export const searchProfilesHandler = async (
   res: TypedResponse<SearchCommentsResponse>,
 ) => {
   const options = req.query;
-  if (!req.chain && options.community_id !== ALL_COMMUNITIES) {
-    // if no chain resolved, ensure that client explicitly requested all communities
+  if (!req.community && options.community_id !== ALL_COMMUNITIES) {
+    // if no community resolved, ensure that client explicitly requested all communities
     throw new AppError(Errors.NoCommunity);
   }
 
-  if (options.memberships && !req.chain) {
+  if (options.memberships && !req.community) {
     throw new AppError(Errors.NoCommunityForMemberships);
   }
 
   const profileSearchResults = await controllers.profiles.searchProfiles({
-    community: req.chain,
+    community: req.community,
     search: options.search,
     includeRoles: options.include_roles === 'true',
     limit: parseInt(options.limit, 10) || 0,

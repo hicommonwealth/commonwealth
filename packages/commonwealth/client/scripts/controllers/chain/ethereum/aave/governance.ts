@@ -1,16 +1,16 @@
 import type { IAaveProposalResponse } from 'adapters/chain/aave/types';
-import ProposalModule from '../../../../models/ProposalModule';
 import type { IApp } from 'state';
+import ProposalModule from '../../../../models/ProposalModule';
 import type EthereumAccounts from '../accounts';
 import { attachSigner } from '../contractApi';
 import type AaveApi from './api';
 import type AaveChain from './chain';
 
-import AaveProposal from './proposal';
-import Aave from 'controllers/chain/ethereum/aave/adapter';
 import axios from 'axios';
-import { ApiEndpoints } from 'state/api/config';
+import Aave from 'controllers/chain/ethereum/aave/adapter';
 import { deserializeBigNumbers } from 'controllers/chain/ethereum/util';
+import { ApiEndpoints } from 'state/api/config';
+import AaveProposal from './proposal';
 
 export interface AaveProposalArgs {
   executor: string;
@@ -85,7 +85,7 @@ export default class AaveGovernance extends ProposalModule<
       await executorContract.isPropositionPowerEnough(
         this._api.Governance.address,
         address,
-        blockNumber - 1
+        blockNumber - 1,
       );
     if (!isPropositionPowerEnough) {
       throw new Error('user does not have enough proposition power');
@@ -94,7 +94,7 @@ export default class AaveGovernance extends ProposalModule<
     // send transaction
     const contract = await attachSigner(
       this.app.user.activeAccount,
-      this._api.Governance
+      this._api.Governance,
     );
     const tx = await contract.create(
       executorContract.address,
@@ -104,7 +104,7 @@ export default class AaveGovernance extends ProposalModule<
       calldatas,
       withDelegateCalls,
       ipfsHash,
-      { gasLimit: this._api.gasLimit }
+      { gasLimit: this._api.gasLimit },
     );
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
@@ -126,9 +126,9 @@ export default class AaveGovernance extends ProposalModule<
       `${chain.app.serverUrl()}${ApiEndpoints.FETCH_PROPOSALS}`,
       {
         params: {
-          chainId: meta.id,
+          communityId: meta.id,
         },
-      }
+      },
     );
 
     const proposals: IAaveProposalResponse[] = res.data.result.proposals;
@@ -143,7 +143,7 @@ export default class AaveGovernance extends ProposalModule<
     await Promise.all(
       governance.store.getAll().map((p) => {
         p.init();
-      })
+      }),
     );
 
     return governance.store.getAll();
