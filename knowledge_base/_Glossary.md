@@ -85,9 +85,9 @@ See [models/comment.ts](../libs/model/src/models/comment.ts).
 
 ### Community
 
-<!-- TODO: Update in light of new permissioning system. -->
+<!-- TODO: Review & update in light of new permissioning system; blocked pending meeting with Product. -->
 
-A community is a space on Common, joinable by PROFILES, that owns metadata and is defined by a set of (ROLES) and PERMISSIONS for participation.
+A community is a space on Common, joinable by PROFILES, that owns metadata and is defined by a set of ROLES and PERMISSIONS for participation.
 
 See [models/community.ts](../libs/model/src/models/community.ts)
 
@@ -97,21 +97,23 @@ A set of features considered central to Common, which interface out with first-p
 
 ### Forum
 
-The Common forum is Common's flagship first-party app. Its primary organizational primitive is the COMMUNITY. The forum app provides UI for off-chain discussions, and for interacting with community-associated CHAINS.
+The Common forum is Common's flagship first-party app. Its primary organizational primitive is the COMMUNITY. The forum app provides UI for off-chain discussions, and for interacting with community-associated chains.
 
 ### Group
 
-`Groups` are used by community admins to handle permissioning across the forum, using associated `Membership` objects that link `Addresses` to Groups. For more thorough documentation, see [Groups](./Groups.md) entry.
+<!-- TODO: Review & update in light of new permissioning system; blocked pending meeting with Product. -->
 
-See [models/group.ts](../libs/model/src/models/group.ts).
+Groups are used by community admins to handle permissioning across the forum, using associated membership objects that LINK ADDRESSES to Groups.
+
+See [models/group.ts](../libs/model/src/models/group.ts) and the knowledgebase [Groups](./Groups.md) entry.
 
 ### Link
 
-Some Common content can be inter-linked, so that the content's UI prominently reflects its relationship to other content. As of 240123, THREADS can be linked to other THREADS as well as to PROPOSALS (both Snapshot and on-chain).
+Some content on Common can be inter-linked, so that the content's UI prominently reflects its relationship to other content. As of 240123, THREADS can be linked to other THREADS as well as to PROPOSALS (both Snapshot and on-chain).
 
 ### Member
 
-<!-- TODO: Update in light of new permissioning system. -->
+<!-- TODO: Review & update in light of new permissioning system; blocked pending meeting with Product. -->
 
 Generically, a member is a PROFILE that holds a (ROLE) within a COMMUNITY.
 
@@ -153,6 +155,8 @@ See [models/poll.ts](../libs/model/src/models/poll.ts).
 
 <!-- TODO: Investigate status of our legacy (e.g. models/role.ts) Roles code. -->
 
+<!-- TODO: Review & update in light of new permissioning system; blocked pending meeting with Product. -->
+
 As of 231215, Roles are considered deprecated ontology at Common. In their place is a GROUPS and PERMISSIONS system.
 
 ### Sessions
@@ -167,9 +171,7 @@ System which allows USERS to enter into sessions on the Common app and perform u
 
 ### Stake
 
-Community Stake is a feature whereby COMMUNITY ADMINS allow MEMBER PROFILES' ADDRESSES to deposit Ethereum into a smart contract in exchange for ERC1155 tokens. The received tokens are considered "stake."
-
-Stake is used for GATING content and features across a COMMUNITY FORUM.
+Community Stake is a feature whereby COMMUNITY ADMINS allow MEMBER PROFILES' ADDRESSES to deposit Ethereum into a smart contract in exchange for ERC1155 tokens. The received tokens are considered "stake." Stake is used for GATING content and features across a FORUM COMMUNITY.
 
 See [models/community_stake.ts](../libs/model/src/models/community_stake.ts).
 
