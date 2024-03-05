@@ -62,7 +62,10 @@ export interface Stats extends Disposable {
  * Cache port
  */
 export interface Cache extends Disposable {
-  getKey(namespace: CacheNamespaces, key: string): Promise<string | undefined>;
+  getKey(
+    namespace: CacheNamespaces,
+    key: string,
+  ): Promise<string | undefined | null>;
   setKey(
     namespace: CacheNamespaces,
     key: string,

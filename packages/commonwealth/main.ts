@@ -58,8 +58,7 @@ export async function main(app: express.Express) {
     )} GB`,
   );
 
-  const redisCache = new RedisCache();
-  await redisCache.init(REDIS_URL);
+  const redisCache = new RedisCache(REDIS_URL);
   const cacheDecorator = new CacheDecorator(redisCache);
   cache(redisCache);
 

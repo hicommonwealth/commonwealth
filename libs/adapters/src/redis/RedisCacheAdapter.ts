@@ -2,25 +2,19 @@ import {
   Cache,
   ILogger,
   logger,
-  timeoutPromise,
   type CacheNamespaces,
 } from '@hicommonwealth/core';
-import {
-  ConnectionTimeoutError,
-  ReconnectStrategyError,
-  RedisClientOptions,
-  RedisClientType,
-  SocketClosedUnexpectedlyError,
-  createClient,
-} from 'redis';
+import { RedisClientOptions, createClient, type RedisClientType } from 'redis';
 
 export function redisRetryStrategy(retries: number) {
-  if (retries > 5) {
-    return new Error('Redis max connection retries exceeded');
-  }
+  // Don't stop retrying while app is running
+  // if (retries > 5) {
+  //   return new Error('Redis max connection retries exceeded');
+  // }
+
   // timetable: 0, 1000, 8000, 27000, 64000, 125000, 216000, 343000, 512000, 729000, 1000000
   // from 1 sec to 16.67 minutes
-  return (retries * 10) ** 3;
+  return Math.min((retries * 10) ** 3, 10 * 60 * 1000);
 }
 
 /**
@@ -31,12 +25,53 @@ export function redisRetryStrategy(retries: number) {
  * in order to avoid blocking the client for other requests that may be occurring.
  */
 export class RedisCache implements Cache {
-  private _initialized = false;
-  private _client: any;
+  private _client: RedisClientType | undefined;
   private _log: ILogger;
 
-  constructor() {
+  constructor(redis_url?: string) {
     this._log = logger().getLogger(__filename);
+    redis_url =
+      redis_url ??
+      process.env.REDIS_URL ??
+      process.env.NODE_ENV === 'development'
+        ? 'redis://localhost:6379'
+        : undefined;
+    if (!redis_url) {
+      this._log.warn(
+        'Redis Url is undefined. Some services (e.g. chat) may not be available.',
+      );
+      return;
+    }
+    this._log.info(`Connecting to Redis at: ${redis_url}`);
+
+    const redisOptions: RedisClientOptions = {};
+    redisOptions['url'] = redis_url;
+    if (redis_url.includes('rediss')) {
+      redisOptions['socket'] = {
+        tls: true,
+        rejectUnauthorized: false,
+        reconnectStrategy: redisRetryStrategy,
+        connectTimeout: 3000,
+      };
+    } else {
+      redisOptions['socket'] = {
+        reconnectStrategy: redisRetryStrategy,
+        connectTimeout: 3000,
+      };
+    }
+
+    this._client = createClient(redisOptions) as RedisClientType;
+    this._client.on('ready', () =>
+      this._log.info(`RedisCache connection ready`),
+    );
+    this._client.on('reconnecting', () =>
+      this._log.info(`RedisCache reconnecting...`),
+    );
+    this._client.on('end', () => this._log.info(`RedisCache disconnected`));
+    this._client.on('error', (err: Error) => {
+      this._log.error(err.message, err);
+    });
+    void this._client.connect();
   }
 
   // get namespace key for redis
@@ -44,83 +79,27 @@ export class RedisCache implements Cache {
     return `${namespace}_${key}`;
   }
 
-  /**
-   * Initializes the Redis client. Must be run before any Redis command can be executed.
-   */
-  public async init(redis_url: string) {
-    if (!redis_url) {
-      this._log.warn(
-        'Redis Url is undefined. Some services (e.g. chat) may not be available.',
-      );
-      this._initialized = false;
-      return;
-    }
-    this._log.info(`Connecting to Redis at: ${redis_url}`);
-
-    if (!this._client) {
-      const redisOptions: RedisClientOptions = {};
-      redisOptions['url'] = redis_url;
-
-      if (redis_url.includes('rediss')) {
-        redisOptions['socket'] = {
-          tls: true,
-          rejectUnauthorized: false,
-          reconnectStrategy: redisRetryStrategy,
-        };
-      } else {
-        redisOptions['socket'] = {
-          reconnectStrategy: redisRetryStrategy,
-        };
-      }
-
-      this._client = createClient(redisOptions) as RedisClientType;
-    }
-
-    this._client.on('error', (err: any) => {
-      if (err instanceof ConnectionTimeoutError) {
-        const msg = `RedisCache connection to ${redis_url} timed out!`;
-        this._log.error(msg);
-      } else if (err instanceof ReconnectStrategyError) {
-        const msg =
-          'RedisCache max connection retries exceeded! RedisCache client shutting down!';
-        this._log.fatal(msg);
-      } else if (err instanceof SocketClosedUnexpectedlyError) {
-        const msg = 'RedisCache socket closed unexpectedly';
-        this._log.error(msg);
-      } else {
-        const msg = 'RedisCache unknown connection error:';
-        this._log.error(msg, err);
-      }
-    });
-
-    this._client.on('ready', () => {
-      this._initialized = !!this._client!.isOpen;
-      this._log.info(`RedisCache connection ready ${this._initialized}`);
-    });
-    this._client.on('reconnecting', () => {
-      this._initialized = !!this._client!.isOpen;
-      this._log.info(`RedisCache reconnecting ${this._initialized}`);
-    });
-    this._client.on('end', () => {
-      this._initialized = !!this._client!.isOpen;
-      this._log.info(`RedisCache disconnected ${this._initialized}`);
-    });
-
-    if (!this._client.isOpen) {
-      await this._client.connect();
-    }
-
-    this._initialized = !!this._client.isOpen;
+  public get name(): string {
+    return 'RedisCache';
   }
 
-  private initialized() {
-    if (!this._initialized) {
-      this._log.warn(
-        'Redis client is not initialized. Run RedisCache.init() first!',
-      );
-      return false;
+  public async dispose(): Promise<void> {
+    if (this._client) {
+      try {
+        await this._client.disconnect();
+        await this._client.quit();
+      } catch {
+        // ignore this
+      }
     }
-    return true;
+  }
+
+  /**
+   * Check if redis is initialized
+   * @returns boolean
+   */
+  public initialized(): boolean {
+    return this._client?.isReady ?? false;
   }
 
   /**
@@ -144,42 +123,40 @@ export class RedisCache implements Cache {
     duration = 0,
     notExists = false,
   ): Promise<boolean> {
-    let res;
     try {
       if (this.initialized()) {
+        const options: { NX: boolean; EX?: number } = {
+          NX: notExists,
+        };
+        duration > 0 && (options.EX = duration);
         const finalKey = RedisCache.getNamespaceKey(namespace, key);
         if (typeof value !== 'string') {
           value = JSON.stringify(value);
         }
-        if (duration > 0) {
-          res = await this._client!.set(finalKey, value, {
-            EX: duration,
-            NX: notExists,
-          });
-        } else {
-          res = await this._client.set(finalKey, value, {
-            NX: notExists,
-          });
-        }
+        const res = await this._client?.set(
+          finalKey as any,
+          value,
+          options as any,
+        );
+        return res === 'OK';
       }
     } catch (e) {
       const msg = `An error occurred while setting the following key value pair '${namespace} ${key}: ${value}'`;
       this._log.error(msg, e as Error);
-      return false;
     }
 
     // redis returns 'OK' on successful write but if nothing is updated e.g. NX true then it returns null
-    return res === 'OK';
+    return false;
   }
 
   public async getKey(
     namespace: CacheNamespaces,
     key: string,
-  ): Promise<string | undefined> {
+  ): Promise<string | undefined | null> {
     try {
       if (this.initialized()) {
         const finalKey = RedisCache.getNamespaceKey(namespace, key);
-        return await this._client!.get(finalKey);
+        return await this._client?.get(finalKey);
       }
     } catch (e) {
       const msg = `An error occurred while getting the following key '${key}'`;
@@ -214,16 +191,14 @@ export class RedisCache implements Cache {
       if (duration > 0) {
         // MSET doesn't support setting TTL, so we need use
         // a multi-exec to process many SET commands
-        const multi = this._client.multi();
+        const multi = this._client!.multi();
         for (const key of Object.keys(transformedData)) {
           multi.set(key, transformedData[key], { EX: duration });
         }
 
         try {
-          let result: Array<'OK' | null>;
-          if (transaction) result = await multi.exec();
-          else result = await multi.execAsPipeline();
-          return result;
+          if (transaction) return (await multi.exec()) as Array<'OK' | null>;
+          else return (await multi.execAsPipeline()) as Array<'OK' | null>;
         } catch (e) {
           const msg =
             `Error occurred while setting multiple keys ` +
@@ -233,7 +208,7 @@ export class RedisCache implements Cache {
         }
       } else {
         try {
-          return await this._client.MSET(transformedData);
+          await this._client?.MSET(transformedData);
         } catch (e) {
           const msg = 'Error occurred while setting multiple keys';
           this._log.error(msg, e as Error);
@@ -253,7 +228,7 @@ export class RedisCache implements Cache {
       );
       let result: Record<string, unknown>;
       try {
-        const values = await this._client.MGET(transformedKeys);
+        const values = (await this._client?.MGET(transformedKeys)) ?? [];
         result = transformedKeys.reduce((obj, key, index) => {
           if (values[index] !== null) {
             obj[key] = values[index];
@@ -284,7 +259,7 @@ export class RedisCache implements Cache {
     try {
       if (this.initialized()) {
         const finalKey = RedisCache.getNamespaceKey(namespace, key);
-        return await this._client.incr(finalKey, increment);
+        return await this._client?.incrBy(finalKey, increment);
       }
     } catch (e) {
       const msg = `An error occurred while incrementing the key: ${key}`;
@@ -308,7 +283,7 @@ export class RedisCache implements Cache {
     try {
       if (this.initialized()) {
         const finalKey = RedisCache.getNamespaceKey(namespace, key);
-        return await this._client.decr(finalKey, decrement);
+        return await this._client?.decrBy(finalKey, decrement);
       }
     } catch (e) {
       const msg = `An error occurred while decrementing the key: ${key}`;
@@ -335,11 +310,11 @@ export class RedisCache implements Cache {
 
         // If ttlInSeconds is 0, remove the expiration (PERSIST command).
         if (ttlInSeconds === 0) {
-          await this._client.persist(finalKey);
+          await this._client?.persist(finalKey);
         } else {
           // Set the expiration using the EXPIRE command.
-          const result = await this._client.expire(finalKey, ttlInSeconds);
-          return result === 1; // EXPIRE returns 1 if the key exists and the expiration is set.
+          const result = await this._client!.expire(finalKey, ttlInSeconds);
+          return !!result; // EXPIRE returns 1 if the key exists and the expiration is set.
         }
       }
     } catch (e) {
@@ -362,7 +337,7 @@ export class RedisCache implements Cache {
     try {
       if (this.initialized()) {
         const finalKey = RedisCache.getNamespaceKey(namespace, key);
-        const ttl = await this._client.ttl(finalKey);
+        const ttl = (await this._client?.ttl(finalKey)) ?? 0;
         return ttl; // TTL in seconds; -2 if the key does not exist, -1 if the key exists but has no associated expire.
       }
     } catch (e) {
@@ -385,14 +360,14 @@ export class RedisCache implements Cache {
     const data = {} as any;
     try {
       if (this.initialized()) {
-        for await (const key of this._client.scanIterator({
+        for await (const key of this._client!.scanIterator({
           MATCH: `${namespace}*`,
           COUNT: maxResults,
         })) {
           keys.push(key);
         }
         for (const key of keys) {
-          data[key] = await this._client.get(key);
+          data[key] = await this._client?.get(key);
         }
         return data;
       }
@@ -401,36 +376,6 @@ export class RedisCache implements Cache {
       this._log.error(msg, e as Error);
       return false;
     }
-  }
-
-  /**
-   * Run this function when you are done utilizing the Redis client. Do not run this function if the Redis client is
-   * expected to be long-lived and utilized frequently. In other words don't create a client and then disconnect for
-   * every API route. Instead, if you need the Redis client in an API route you should initialize a RedisCache instance
-   * alongside the server initialization so that the instance can be used by all routes.
-   */
-  public async closeClient(): Promise<boolean> {
-    if (this._initialized) {
-      await this._client.quit();
-      this._initialized = false;
-    }
-    return true;
-  }
-
-  public get name(): string {
-    return 'RedisCache';
-  }
-
-  public async dispose(): Promise<void> {
-    await this.closeClient();
-  }
-
-  /**
-   * Check if redis is initialized
-   * @returns boolean
-   */
-  public isInitialized(): boolean {
-    return this._initialized;
   }
 
   /**
@@ -446,8 +391,8 @@ export class RedisCache implements Cache {
       if (data) {
         for (const key of Object.keys(data)) {
           try {
-            const resp = await this._client.del(key);
-            count += resp;
+            const resp = await this._client?.del(key);
+            count += resp ?? 0;
             this._log.trace(`deleted key ${key} ${resp} ${count}`);
           } catch (err) {
             this._log.trace(`error deleting key ${key}`);
@@ -470,7 +415,7 @@ export class RedisCache implements Cache {
     const finalKey = RedisCache.getNamespaceKey(namespace, key);
     try {
       if (this.initialized()) {
-        return this._client.del(finalKey);
+        return this._client?.del(finalKey);
       }
     } catch (e) {
       const msg = `An error occurred while deleting the following key: ${finalKey}`;
@@ -480,13 +425,12 @@ export class RedisCache implements Cache {
   }
 
   public async flushAll(): Promise<void> {
-    await this._client.flushAll();
+    try {
+      if (this.initialized()) {
+        await this._client?.flushAll();
+      }
+    } catch (e) {
+      this._log.error('An error occurred while flushing redis', e as Error);
+    }
   }
-}
-
-export async function connectToRedis(redisCache: RedisCache) {
-  const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
-  if (!REDIS_URL) throw new Error('REDIS_URL not set');
-  await Promise.race([timeoutPromise(10000), redisCache.init(REDIS_URL)]);
-  if (!redisCache.isInitialized) throw new Error('Redis Cache not initialized');
 }

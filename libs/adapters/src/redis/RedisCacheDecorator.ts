@@ -421,6 +421,6 @@ export class CacheDecorator {
   }
 
   private isEnabled(): boolean {
-    return (this._redisCache && this._redisCache.isInitialized()) || false;
+    return (this._redisCache && this._redisCache.initialized()) || false;
   }
 }

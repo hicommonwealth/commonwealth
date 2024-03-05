@@ -82,8 +82,7 @@ describe('Token Balance Cache EVM Tests', function () {
   const ethChainId = 1337;
 
   before(async () => {
-    const redisCache = new RedisCache();
-    await redisCache.init('redis://localhost:6379');
+    const redisCache = new RedisCache('redis://localhost:6379');
     cache(redisCache);
   });
 
