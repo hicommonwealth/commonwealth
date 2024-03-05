@@ -1,9 +1,9 @@
 import axios from 'axios';
-import { notifyError } from 'controllers/app/notifications';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/manage_community/manage_roles.scss';
 import React from 'react';
 import app from 'state';
+import removeRole from 'state/api/members/removeRole';
 import { User } from 'views/components/user/user';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { useFlag } from '../../../hooks/useFlag';
@@ -24,29 +24,6 @@ export const ManageRoles = ({
 }: ManageRoleRowProps) => {
   const newAdminOnboardingEnabled = useFlag('newAdminOnboarding');
   const navigate = useCommonNavigate();
-
-  const communityObj = { chain: app.activeChainId() };
-
-  const removeRole = async (role: RoleInfo) => {
-    try {
-      const res = await axios.post(`${app.serverUrl()}/upgradeMember`, {
-        ...communityObj,
-        new_role: 'member',
-        address: role.Address.address,
-        jwt: app.user.jwt,
-      });
-
-      if (res.data.status !== 'Success') {
-        throw new Error(`Got unsuccessful status: ${res.data.status}`);
-      }
-
-      const newRole = res.data.result;
-      onRoleUpdate(role, newRole);
-    } catch (err) {
-      const errMsg = err.response?.data?.error || 'Failed to alter role.';
-      notifyError(errMsg);
-    }
-  };
 
   const handleDeleteRole = async (role: RoleInfo) => {
     const isSelf =
@@ -109,7 +86,7 @@ export const ManageRoles = ({
           buttonType: 'destructive',
           buttonHeight: 'sm',
           onClick: async () => {
-            await removeRole(role);
+            await removeRole({ role, onRoleUpdate });
             if (isLosingAdminPermissions) {
               navigate(newAdminOnboardingEnabled ? '/manage/moderators' : '/');
             }

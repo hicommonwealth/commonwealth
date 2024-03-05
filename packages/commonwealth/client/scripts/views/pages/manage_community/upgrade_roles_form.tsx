@@ -1,10 +1,9 @@
 import { AccessLevel } from '@hicommonwealth/core';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { formatAddressShort } from 'helpers';
-import $ from 'jquery';
 import 'pages/manage_community/upgrade_roles_form.scss';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import app from 'state';
+import upgradeRoles from 'state/api/members/upgradeRoles';
 import { useFlag } from '../../../hooks/useFlag';
 import type RoleInfo from '../../../models/RoleInfo';
 import { CWLabel } from '../../components/component_kit/cw_label';
@@ -12,17 +11,22 @@ import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import { CWButton } from '../../components/component_kit/new_designs/cw_button';
 import { CWRadioButton } from '../../components/component_kit/new_designs/cw_radio_button';
 import { MembersSearchBar } from '../../components/members_search_bar';
+
 type UpgradeRolesFormProps = {
   label?: string;
   onRoleUpdate: (oldRole: RoleInfo, newRole: RoleInfo) => void;
+  refetchMembers: () => any;
   roleData: RoleInfo[];
   searchTerm: string;
   setSearchTerm: (v: string) => void;
+  isLoadingProfiles: boolean;
 };
 
 export const UpgradeRolesForm = ({
   label,
+  isLoadingProfiles,
   onRoleUpdate,
+  refetchMembers,
   roleData,
   searchTerm,
   setSearchTerm,
@@ -34,6 +38,24 @@ export const UpgradeRolesForm = ({
     { id: 1, checked: false },
     { id: 2, checked: false },
   ]);
+
+  const membersRef = useRef();
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && !isLoadingProfiles) {
+        refetchMembers?.();
+      }
+    });
+
+    if (membersRef.current) {
+      observer.observe(membersRef.current);
+    }
+
+    return () => {
+      observer?.disconnect();
+    };
+  }, [isLoadingProfiles, membersRef, refetchMembers]);
 
   const zeroOutRadioButtons = () => {
     const zeroedOutRadioButtons = radioButtons.map((radioButton) => ({
@@ -58,8 +80,6 @@ export const UpgradeRolesForm = ({
     return fullText;
   });
 
-  const communityObj = { chain: app.activeChainId() };
-
   const options = useMemo(() => {
     return nonAdminNames.map((n) => ({ label: n, value: n }));
   }, [nonAdminNames]);
@@ -77,28 +97,13 @@ export const UpgradeRolesForm = ({
     setRadioButtons(updatedRadioButtons);
   };
 
-  const handleUpgrade = () => {
+  const handleUpgrade = async () => {
     const indexOfName = nonAdminNames.indexOf(user);
 
     const _user = nonAdmins[indexOfName];
-
     const newRole =
       role === 'Admin' ? 'admin' : role === 'Moderator' ? 'moderator' : '';
-
-    $.post(`${app.serverUrl()}/upgradeMember`, {
-      new_role: newRole,
-      address: _user.Address.address,
-      ...communityObj,
-      jwt: app.user.jwt,
-    }).then((r) => {
-      if (r.status === 'Success') {
-        notifySuccess('Member upgraded');
-      } else {
-        notifyError('Upgrade failed');
-      }
-
-      onRoleUpdate(_user, r.result);
-    });
+    await upgradeRoles({ _user, onRoleUpdate, newRole });
     zeroOutRadioButtons();
   };
 
@@ -124,22 +129,21 @@ export const UpgradeRolesForm = ({
         <div className="upgrade-buttons-container">
           {newAdminOnboardingEnabled ? (
             <>
-              {newAdminOnboardingEnabledOptions.map((o, i) => {
-                return (
-                  <div key={i}>
-                    <CWRadioButton
-                      key={i}
-                      checked={radioButtons[i].checked}
-                      name="roles"
-                      onChange={(e) => {
-                        setRole(e.target.value);
-                        handleRadioButtonChange(i + 1);
-                      }}
-                      value={o.value}
-                    />
-                  </div>
-                );
-              })}
+              {newAdminOnboardingEnabledOptions.map((o, i) => (
+                <div key={i}>
+                  <CWRadioButton
+                    key={i}
+                    checked={radioButtons[i].checked}
+                    name="roles"
+                    onChange={(e) => {
+                      setRole(e.target.value);
+                      handleRadioButtonChange(i + 1);
+                    }}
+                    value={o.value}
+                  />
+                </div>
+              ))}
+              <div ref={membersRef} style={{ height: '1px' }}></div>
             </>
           ) : (
             <CWRadioGroup
