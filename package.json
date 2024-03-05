@@ -1,6 +1,7 @@
 {
   "private": true,
   "keywords": [],
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hicommonwealth/commonwealth.git"
