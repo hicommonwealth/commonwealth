@@ -47,23 +47,29 @@ Glossary terms referenced in a given term's definition are designated with CAPIT
 
 ## Chain Concepts
 
+### Chain Base
+
+An architectural layer of blockchain atop which NETWORK protocols are built.
+
 ### Chain Entity
 
 A Chain Entity is a backend object, stored in the ChainEntities table, which consists of chain event bundles and values received from a smart contract.
 
 ### Chain Node
 
-An endpoint or set of endpoints for querying arbitrary data from a specified chain.
-
-<!-- TODO: Expand, clarify -->
+An endpoint, referring to external RPC servers, used to fetch updates and query data from blockchains.
 
 ### Delegate Contract
 
-A delegate contract is a smart CONTRACT that contains the functions, events, and all business logic for a proxy contract.
+A delegate contract is a smart contract that contains the functions, events, and all business logic for a proxy contract.
 
 ### Module
 
-Some CHAINS use modules rather than CONTRACTS. Modules are used predominantly within the Cosmos and Substrate ecosystems.
+Some CHAINS use modules rather than contracts. Modules are used predominantly within the Cosmos and Substrate ecosystems.
+
+### Network
+
+An ecosystem of CHAIN NODES, or blockchain, built atop a CHAIN BASE.
 
 ## Common App
 
@@ -73,9 +79,13 @@ The Product Team uses "bridge" and "bridging" language, in user-facing comms, to
 
 ### Comment
 
+A short Markdown text object responding to a THREAD, which can be REACTED to.
+
 See [models/comment.ts](../libs/model/src/models/comment.ts).
 
 ### Community
+
+<!-- TODO: Update in light of new permissioning system. -->
 
 A community is a space on Common, joinable by PROFILES, that owns metadata and is defined by a set of (ROLES) and PERMISSIONS for participation.
 
@@ -101,11 +111,13 @@ Some Common content can be inter-linked, so that the content's UI prominently re
 
 ### Member
 
+<!-- TODO: Update in light of new permissioning system. -->
+
 Generically, a member is a PROFILE that holds a (ROLE) within a COMMUNITY.
 
 More specifically, "Member" is the lowest-ranking (ROLE) in COMMUNITIES, below MODERATOR and ADMIN.
 
-<!-- TODO: UPDATE IN LIGHT OF NEW PERMISSIONS -->
+See [models/membership.ts](../libs/model/src/models/membership.ts).
 
 ### Notification
 
@@ -125,9 +137,11 @@ For URI parsing, route setup, and the scope-conditional rendering of page layout
 
 A profile is one or more ADDRESS, grouped together as a single identity, representing a single USER.
 
-**Model:** [profile.ts](../libs/model/src/models/profile.ts)
+See [models/profile.ts](../libs/model/src/models/profile.ts).
 
 ### Reaction
+
+<!-- TODO -->
 
 ### Poll
 
@@ -137,21 +151,27 @@ See [models/poll.ts](../libs/model/src/models/poll.ts).
 
 ### Role
 
+<!-- TODO: Investigate status of our legacy (e.g. models/role.ts) Roles code. -->
+
 As of 231215, Roles are considered deprecated ontology at Common. In their place is a GROUPS and PERMISSIONS system.
 
 ### Sessions
 
-Active or not
+<!-- TODO: Expand entry. -->
+
+A session may be active or inactive.
 
 ### Sign-In
 
-All "log-in" and similar language is deprecated and semantically incorrect.
+System which allows USERS to enter into sessions on the Common app and perform user actions. All "log-in" and similar language is deprecated and semantically incorrect.
 
 ### Stake
 
-Community Stake is a feature whereby COMMUNITY ADMINS allow MEMBER PROFILES' ADDRESSES (?) to deposit Ethereum into a smart contract in exchange for ERC1155 tokens. The received tokens are considered "stake."
+Community Stake is a feature whereby COMMUNITY ADMINS allow MEMBER PROFILES' ADDRESSES to deposit Ethereum into a smart contract in exchange for ERC1155 tokens. The received tokens are considered "stake."
 
 Stake is used for GATING content and features across a COMMUNITY FORUM.
+
+See [models/community_stake.ts](../libs/model/src/models/community_stake.ts).
 
 ### Subscription
 
