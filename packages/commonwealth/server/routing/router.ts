@@ -294,7 +294,7 @@ function setupRouter(
     router,
     'post',
     '/getAddressStatus',
-    databaseValidationService.validateAuthor,
+    passport.authenticate('jwt', { session: false }),
     getAddressStatus.bind(this, models),
   );
   registerRoute(
