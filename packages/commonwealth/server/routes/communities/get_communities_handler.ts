@@ -27,13 +27,13 @@ export const getCommunitiesHandler = async (
 ) => {
   const options = req.query;
 
-  // get chains, with snapshots
+  // get communities with snapshots
   if (options.snapshots === 'true') {
     const results = await controllers.communities.getCommunities({});
     return success(res, results);
   }
 
-  // search chains
+  // search communities
   if (options.search) {
     const results = await controllers.communities.searchCommunities({
       search: options.search,

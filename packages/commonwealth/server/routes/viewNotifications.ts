@@ -38,9 +38,9 @@ export default async (
       },
     });
   }
-  if (req.body.chain_filter) {
+  if (req.body.community_filter) {
     searchParams.push({
-      chain_id: req.body.chain_filter,
+      community_id: req.body.community_filter,
     });
   }
 

@@ -28,7 +28,7 @@ export const searchCommentsHandler = async (
 ) => {
   const options = req.query;
   if (!req.community && options.community_id !== ALL_COMMUNITIES) {
-    // if no chain resolved, ensure that client explicitly requested all communities
+    // if no community resolved, ensure that client explicitly requested all communities
     throw new AppError(Errors.NoCommunity);
   }
 

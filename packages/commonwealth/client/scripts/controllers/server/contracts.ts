@@ -193,7 +193,7 @@ class ContractsController {
   }) {
     try {
       const response = await $.post(`${app.serverUrl()}/contract`, {
-        chain_id: app.activeChainId(),
+        community_id: app.activeChainId(),
         chain_node_id,
         jwt: app.user.jwt,
         address,
@@ -240,7 +240,7 @@ class ContractsController {
     try {
       const response = await $.post(`${app.serverUrl()}/contract/template`, {
         jwt: app.user.jwt,
-        chain_id: app.activeChainId(),
+        community_id: app.activeChainId(),
         name,
         template,
         contract_id,
@@ -296,7 +296,7 @@ class ContractsController {
         `${app.serverUrl()}/contract/community_template_and_metadata`,
         {
           ...communityContractTemplateAndMetadata,
-          chain_id: app.activeChainId(),
+          community_id: app.activeChainId(),
           jwt: app.user.jwt,
         },
       );
@@ -322,6 +322,7 @@ class ContractsController {
         url: `${app.serverUrl()}/contract/community_template`,
         data: {
           ...communityContractTemplateMetadata,
+          community_id: app.activeChainId(),
           jwt: app.user.jwt,
         },
         type: 'PUT',
@@ -350,7 +351,7 @@ class ContractsController {
         data: {
           ...contract,
           jwt: app.user.jwt,
-          chain_id: app.activeChainId(),
+          community_id: app.activeChainId(),
         },
         type: 'DELETE',
       });
@@ -384,7 +385,7 @@ class ContractsController {
         data: {
           ...contract,
           jwt: app.user.jwt,
-          chain_id: app.activeChainId(),
+          community_id: app.activeChainId(),
         },
         type: 'DELETE',
       });

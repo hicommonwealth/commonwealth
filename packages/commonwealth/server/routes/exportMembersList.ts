@@ -8,11 +8,11 @@ export const Errors = {
   NotLoggedIn: 'Not signed in',
   NotAdmin: 'Must be a site admin',
   CannotExportMembersList: 'Cannot export members list',
-  NoChain: 'Chain not found',
+  NoCommunity: 'Community not found',
 };
 
 type exportMembersListReq = {
-  chainId: string;
+  communityId: string;
 };
 
 type exportMembersListResp = {
@@ -29,16 +29,16 @@ const exportMembersList = async (
     return next(new AppError(Errors.NotAdmin));
   }
 
-  const { chainId } = req.body;
+  const { communityId } = req.body;
 
-  const chain = await models.Community.findOne({
+  const community = await models.Community.findOne({
     where: {
-      id: chainId,
+      id: communityId,
     },
   });
 
-  if (!chain) {
-    return next(new AppError(Errors.NoChain));
+  if (!community) {
+    return next(new AppError(Errors.NoCommunity));
   }
 
   try {
@@ -55,18 +55,18 @@ const exportMembersList = async (
       LEFT JOIN 
           "Profiles" "p" ON "a"."profile_id" = "p"."id"
       LEFT JOIN 
-          "Threads" "t" ON "a"."id" = "t"."address_id" AND "t"."community_id" = :chainId
+          "Threads" "t" ON "a"."id" = "t"."address_id" AND "t"."community_id" = :communityId
       LEFT JOIN 
-          "Comments" "c" ON "a"."id" = "c"."address_id" AND "c"."community_id" = :chainId
+          "Comments" "c" ON "a"."id" = "c"."address_id" AND "c"."community_id" = :communityId
       LEFT JOIN 
-          "Reactions" "r" ON "a"."id" = "r"."address_id" AND "r"."community_id" = :chainId
+          "Reactions" "r" ON "a"."id" = "r"."address_id" AND "r"."community_id" = :communityId
       WHERE 
-          "a"."community_id" = :chainId
+          "a"."community_id" = :communityId
       GROUP BY 
           "a"."address", "p"."profile_name"
     `,
       {
-        replacements: { chainId },
+        replacements: { communityId },
       },
     );
 

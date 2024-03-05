@@ -106,14 +106,14 @@ class NotificationsController {
       const untypedData: {
         categoryId: NotificationCategories;
         options?: {
-          chainId?: string;
+          communityId?: string;
           threadId?: number;
           commentId?: number;
           snapshotId?: string;
         };
       } = data;
       const requestData = {
-        chain_id: untypedData.options?.chainId,
+        community_id: untypedData.options?.communityId,
         thread_id: untypedData.options?.threadId,
         comment_id: untypedData.options?.commentId,
         snapshot_id: untypedData.options?.snapshotId,
