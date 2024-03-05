@@ -103,6 +103,18 @@ export async function __updateCommunityId(
       );
     }
 
+    await this.models.Template.update(
+      {
+        created_for_community: new_community_id,
+      },
+      {
+        where: {
+          created_for_community: community_id,
+        },
+        transaction,
+      },
+    );
+
     await this.models.User.update(
       {
         selected_community_id: new_community_id,
