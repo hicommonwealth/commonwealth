@@ -6,6 +6,8 @@ import {
 } from '@hicommonwealth/core';
 import { RedisClientOptions, createClient, type RedisClientType } from 'redis';
 
+const CONNECT_TIMEOUT = 5000;
+
 export function redisRetryStrategy(retries: number) {
   // Don't stop retrying while app is running
   // if (retries > 5) {
@@ -51,12 +53,12 @@ export class RedisCache implements Cache {
         tls: true,
         rejectUnauthorized: false,
         reconnectStrategy: redisRetryStrategy,
-        connectTimeout: 3000,
+        connectTimeout: CONNECT_TIMEOUT,
       };
     } else {
       redisOptions['socket'] = {
         reconnectStrategy: redisRetryStrategy,
-        connectTimeout: 3000,
+        connectTimeout: CONNECT_TIMEOUT,
       };
     }
 
