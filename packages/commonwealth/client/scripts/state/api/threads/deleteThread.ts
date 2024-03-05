@@ -1,3 +1,4 @@
+import ipldDagJson from '@ipld/dag-json';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { ThreadStage } from 'models/types';
@@ -17,9 +18,10 @@ const deleteThread = async ({
   address,
 }: DeleteThreadProps) => {
   const {
-    session = null,
-    action = null,
-    hash = null,
+    sessionMessage,
+    sessionMessageSignature,
+    actionMessage,
+    actionMessageSignature,
   } = await app.sessions.signDeleteThread(address, {
     thread_id: threadId,
   });
@@ -30,9 +32,18 @@ const deleteThread = async ({
       community_id: chainId,
       address: address,
       jwt: app.user.jwt,
-      canvas_action: action,
-      canvas_session: session,
-      canvas_hash: hash,
+      canvas_action_message: actionMessage
+        ? ipldDagJson.stringify(ipldDagJson.encode(actionMessage))
+        : null,
+      canvas_action_message_signature: actionMessageSignature
+        ? ipldDagJson.stringify(ipldDagJson.encode(actionMessageSignature))
+        : null,
+      canvas_session_message: sessionMessage
+        ? ipldDagJson.stringify(ipldDagJson.encode(sessionMessage))
+        : null,
+      canvas_session_message_signature: sessionMessageSignature
+        ? ipldDagJson.stringify(ipldDagJson.encode(sessionMessageSignature))
+        : null,
     },
   });
 };

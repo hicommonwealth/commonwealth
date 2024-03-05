@@ -83,6 +83,7 @@ const FinishNearLogin = () => {
 
       // create canvas thing
       const chainId = 'mainnet';
+      // @ts-ignore
       const sessionPublicAddress = await app.sessions.getOrCreateAddress(
         ChainBase.NEAR,
         chainId,
@@ -99,6 +100,7 @@ const FinishNearLogin = () => {
         null,
       );
 
+      // @ts-ignore
       const canvasSessionPayload = createCanvasSessionPayload(
         'near' as ChainBase,
         chainId,
@@ -118,12 +120,14 @@ const FinishNearLogin = () => {
 
       const canvas = await import('@canvas-js/interfaces');
       const signature = await acct.signMessage(
+        // @ts-ignore
         canvas.serializeSessionPayload(canvasSessionPayload),
       );
 
       await acct.validate(
         signature,
         canvasSessionPayload.sessionIssued,
+        // @ts-ignore
         chainId,
       );
 

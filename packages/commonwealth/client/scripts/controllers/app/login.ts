@@ -200,7 +200,17 @@ export async function updateActiveAddresses({
       if (!matchedSessionSigner) {
         continue;
       }
-      if (matchedSessionSigner.hasSession(communityAccount.address)) {
+      let hasSession = false;
+      try {
+        await matchedSessionSigner.getCachedSession(
+          CANVAS_TOPIC,
+          communityAccount.address,
+        );
+        hasSession = true;
+      } catch (e) {
+        // do nothing
+      }
+      if (hasSession) {
         foundAddressWithActiveSessionKey = communityAccount;
         break;
       }

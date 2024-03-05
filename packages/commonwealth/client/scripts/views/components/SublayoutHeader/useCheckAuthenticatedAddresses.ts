@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { ChainBase } from '@hicommonwealth/core';
-import { chainBaseToCanvasChainId } from 'canvas';
+import { CANVAS_TOPIC, chainBaseToCanvasChainId } from 'canvas';
 import { getSessionSigners } from 'shared/canvas/verify';
 import app from 'state';
 
@@ -25,7 +25,9 @@ const useCheckAuthenticatedAddresses = ({
   }>({});
 
   useEffect(() => {
-    getSessionSigners().then((sessionSigners) => {
+    const updateAuthenticatedAddresses = async () => {
+      const sessionSigners = await getSessionSigners();
+
       const newAuthenticatedAddresses: Record<string, boolean> = {};
 
       for (const account of userActiveAccounts) {
@@ -38,12 +40,22 @@ const useCheckAuthenticatedAddresses = ({
           continue;
         }
         // check if it has an authorised session
-        newAuthenticatedAddresses[account.address] =
-          matchedSessionSigner.hasSession(account.address);
+        let hasSession = false;
+        try {
+          await matchedSessionSigner.getCachedSession(
+            CANVAS_TOPIC,
+            account.address,
+          );
+          hasSession = true;
+        } catch (e) {
+          // do nothing
+        }
+        newAuthenticatedAddresses[account.address] = hasSession;
       }
 
       setAuthenticatedAddresses(newAuthenticatedAddresses);
-    });
+    };
+    updateAuthenticatedAddresses();
   }, [canvasChainId, chainBase, userActiveAccounts, recheck]);
 
   return { authenticatedAddresses };

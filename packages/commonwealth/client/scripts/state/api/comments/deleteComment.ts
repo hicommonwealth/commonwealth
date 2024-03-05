@@ -1,3 +1,4 @@
+import ipldDagJson from '@ipld/dag-json';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
@@ -20,9 +21,10 @@ const deleteComment = async ({
   canvasHash,
 }: DeleteCommentProps) => {
   const {
-    session = null,
-    action = null,
-    hash = null,
+    sessionMessage,
+    sessionMessageSignature,
+    actionMessage,
+    actionMessageSignature,
   } = await app.sessions.signDeleteComment(app.user.activeAccount.address, {
     comment_id: canvasHash,
   });
@@ -46,9 +48,18 @@ const deleteComment = async ({
       text: '[deleted]',
       plaintext: '[deleted]',
       versionHistory: [],
-      canvas_action: action,
-      canvas_session: session,
-      canvas_hash: hash,
+      canvas_action_message: actionMessage
+        ? ipldDagJson.stringify(ipldDagJson.encode(actionMessage))
+        : null,
+      canvas_action_message_signature: actionMessageSignature
+        ? ipldDagJson.stringify(ipldDagJson.encode(actionMessageSignature))
+        : null,
+      canvas_session_message: sessionMessage
+        ? ipldDagJson.stringify(ipldDagJson.encode(sessionMessage))
+        : null,
+      canvas_session_message_signature: sessionMessageSignature
+        ? ipldDagJson.stringify(ipldDagJson.encode(sessionMessageSignature))
+        : null,
     },
   };
 };
