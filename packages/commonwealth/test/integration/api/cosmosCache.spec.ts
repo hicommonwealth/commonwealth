@@ -12,7 +12,11 @@ import {
   cosmosRPCDuration,
   cosmosRPCKey,
 } from 'server/util/cosmosCache';
-import app, { cacheDecorator, redisCache } from '../../../server-test';
+import app, {
+  cacheDecorator,
+  cacheReady,
+  redisCache,
+} from '../../../server-test';
 const V1BETA1_CHAIN_ID = 'csdk-beta';
 const V1_CHAIN_ID = 'csdk';
 const V1BETA1_API = `/cosmosAPI`;
@@ -41,6 +45,7 @@ describe('Cosmos Cache', () => {
 
   before(async () => {
     await tester.seedDb();
+    await cacheReady();
   });
 
   after(async () => {
