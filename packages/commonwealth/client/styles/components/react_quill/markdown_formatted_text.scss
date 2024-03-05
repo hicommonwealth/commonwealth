@@ -57,8 +57,9 @@
   }
 
   table {
-    width: 100%;
+    display: inline-block;
     overflow-x: auto;
+    max-width: 615px;
     border-spacing: 0;
     border-radius: $border-radius-corners-wider;
     border: 1px solid $neutral-200;
@@ -122,6 +123,11 @@
           border-right: 1px solid $neutral-200;
         }
       }
+    }
+
+    th,
+    td {
+      min-width: 125px;
     }
   }
 

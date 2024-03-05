@@ -23,8 +23,8 @@ import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import { useFlag } from '../../../../../hooks/useFlag';
-import { getCommunityTags } from '../../../manage_community/helpers';
 import './CommunityProfileForm.scss';
+import { getCommunityTags } from './helpers';
 import { CommunityTags, FormSubmitValues } from './types';
 import {
   communityProfileValidationSchema,

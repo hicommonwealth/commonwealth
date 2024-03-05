@@ -59,6 +59,11 @@ import {
   UpdateCommunityResult,
   __updateCommunity,
 } from './server_communities_methods/update_community';
+import {
+  UpdateCommunityIdOptions,
+  UpdateCommunityIdResult,
+  __updateCommunityId,
+} from './server_communities_methods/update_community_id';
 
 /**
  * Implements methods related to communities
@@ -136,5 +141,11 @@ export class ServerCommunitiesController {
     options: GetCommunityStakeOptions,
   ): Promise<GetCommunityStakeResult> {
     return __getCommunityStake.call(this, options);
+  }
+
+  async updateCommunityId(
+    options: UpdateCommunityIdOptions,
+  ): Promise<UpdateCommunityIdResult> {
+    return __updateCommunityId.call(this, options);
   }
 }

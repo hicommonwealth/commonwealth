@@ -26,6 +26,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
   const activeCommunityId = app?.chain?.id;
   const activeCommunityNamespace = app?.chain?.meta?.namespace;
   const chainRpc = app?.chain?.meta?.ChainNode?.url;
+  const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
   const activeAccountAddress = app?.user?.activeAccount?.address;
 
   const { isInitialLoading: communityStakeLoading, data: stakeResponse } =
@@ -55,6 +56,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     chainRpc,
     walletAddress: walletAddress || activeAccountAddress,
     keepPreviousData: true,
+    ethChainId,
   });
 
   const { isInitialLoading: buyPriceDataLoading, data: buyPriceData } =
@@ -64,6 +66,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
       amount: Number(userStakeBalanceData),
       apiEnabled: apiEnabled && !isNaN(Number(userStakeBalanceData)),
       chainRpc,
+      ethChainId,
       keepPreviousData: true,
     });
 

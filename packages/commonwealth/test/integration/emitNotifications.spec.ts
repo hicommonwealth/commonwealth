@@ -122,9 +122,9 @@ describe('emitNotifications tests', () => {
         root_type: ProposalType.Thread,
         root_title: title,
         comment_text: '',
-        chain_id: chain,
+        community_id: chain,
         author_address: userAddress2,
-        author_chain: chain,
+        author_community_id: chain,
       };
 
       await emitNotifications(models, {
@@ -179,9 +179,9 @@ describe('emitNotifications tests', () => {
         root_title: title,
         comment_id: comment.id,
         comment_text: commentBody,
-        chain_id: chain,
+        community_id: chain,
         author_address: userAddress2,
-        author_chain: chain,
+        author_community_id: chain,
       };
       await emitNotifications(models, {
         categoryId: NotificationCategories.NewComment,
@@ -238,9 +238,9 @@ describe('emitNotifications tests', () => {
         thread_id: thread.id,
         root_type: ProposalType.Thread,
         root_title: title,
-        chain_id: chain,
+        community_id: chain,
         author_address: userAddress,
-        author_chain: chain,
+        author_community_id: chain,
       };
       await emitNotifications(models, {
         categoryId: NotificationCategories.NewReaction,
@@ -293,9 +293,9 @@ describe('emitNotifications tests', () => {
           thread_id: thread.id,
           root_type: ProposalType.Thread,
           root_title: title,
-          chain_id: chain,
+          community_id: chain,
           author_address: userAddress,
-          author_chain: chain,
+          author_community_id: chain,
           mentioned_user_id: userId,
           comment_text: '',
         },
@@ -334,9 +334,9 @@ describe('emitNotifications tests', () => {
           thread_id: thread.id,
           root_type: ProposalType.Thread,
           root_title: title,
-          chain_id: chain,
+          community_id: chain,
           author_address: userAddress,
-          author_chain: chain,
+          author_community_id: chain,
           comment_text: '',
           collaborator_user_id: userId,
         },
@@ -428,7 +428,7 @@ describe('emitNotifications tests', () => {
         event_data: '',
         queued: 1,
         network: SupportedNetwork.Compound,
-        chain: chain,
+        community_id: chain,
         created_at: new Date(),
         updated_at: new Date(),
       };

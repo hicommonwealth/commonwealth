@@ -2,7 +2,7 @@ import 'components/component_kit/cw_query_list.scss';
 import React from 'react';
 import type { Components, ItemContent } from 'react-virtuoso';
 import { Virtuoso } from 'react-virtuoso';
-import CWLoadingSpinner from './new_designs/CWLoadingSpinner';
+import CWCircleMultiplySpinner from './new_designs/CWCircleMultiplySpinner';
 
 interface QueryListProps<ListItem> {
   loading: boolean;
@@ -20,7 +20,7 @@ export const QueryList = <T,>({
   return (
     <div className="QueryList">
       {loading ? (
-        <CWLoadingSpinner />
+        <CWCircleMultiplySpinner />
       ) : (
         <Virtuoso
           data={options}

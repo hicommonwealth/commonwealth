@@ -83,14 +83,13 @@ import type ViewCountCache from '../util/viewCountCache';
 import type { DB } from '@hicommonwealth/model';
 import authCallback from '../routes/authCallback';
 import banAddress from '../routes/banAddress';
-import editSubstrateSpec from '../routes/editSubstrateSpec';
 import finishSsoLogin from '../routes/finishSsoLogin';
 import getBannedAddresses from '../routes/getBannedAddresses';
 import setAddressWallet from '../routes/setAddressWallet';
 import { sendMessage } from '../routes/snapshotAPI';
 import startSsoLogin from '../routes/startSsoLogin';
 import updateAddress from '../routes/updateAddress';
-import viewChainIcons from '../routes/viewChainIcons';
+import viewCommunityIcons from '../routes/viewCommunityIcons';
 import type BanCache from '../util/banCheckCache';
 
 import type DatabaseValidationService from '../middleware/databaseValidationService';
@@ -155,6 +154,7 @@ import { deleteCommunityHandler } from '../routes/communities/delete_community_h
 import { getChainNodesHandler } from '../routes/communities/get_chain_nodes_handler';
 import { getCommunitiesHandler } from '../routes/communities/get_communities_handler';
 import { updateCommunityHandler } from '../routes/communities/update_community_handler';
+import { updateCommunityIdHandler } from '../routes/communities/update_community_id_handler';
 import exportMembersList from '../routes/exportMembersList';
 import { createGroupHandler } from '../routes/groups/create_group_handler';
 import { deleteGroupHandler } from '../routes/groups/delete_group_handler';
@@ -260,14 +260,6 @@ function setupRouter(
   );
   registerRoute(router, 'get', '/domain', domain.bind(this, models));
   registerRoute(router, 'get', '/status', status.bind(this, models));
-  registerRoute(
-    router,
-    'post',
-    '/editSubstrateSpec',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    editSubstrateSpec.bind(this, models),
-  );
 
   // Creating and Managing Addresses
   registerRoute(
@@ -302,6 +294,7 @@ function setupRouter(
     router,
     'post',
     '/getAddressStatus',
+    databaseValidationService.validateAuthor,
     getAddressStatus.bind(this, models),
   );
   registerRoute(
@@ -334,6 +327,15 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     deleteCommunityHandler.bind(this, serverControllers),
   );
+
+  registerRoute(
+    router,
+    'patch',
+    '/communities/update_id',
+    passport.authenticate('jwt', { session: false }),
+    updateCommunityIdHandler.bind(this, models, serverControllers),
+  );
+
   registerRoute(
     router,
     'patch',
@@ -964,7 +966,7 @@ function setupRouter(
     router,
     'post',
     '/viewChainIcons',
-    viewChainIcons.bind(this, models),
+    viewCommunityIcons.bind(this, models),
   );
   registerRoute(
     router,
@@ -1023,7 +1025,7 @@ function setupRouter(
     setAddressWallet.bind(this, models),
   );
 
-  // chain categories
+  // community categories
   registerRoute(
     router,
     'post',
@@ -1293,7 +1295,7 @@ function setupRouter(
 
   app.use(endpoint, router);
 
-  // ddd-routes
+  // new ddd routes
   app.use('/ddd', ddd);
 
   app.use(methodNotAllowedMiddleware());

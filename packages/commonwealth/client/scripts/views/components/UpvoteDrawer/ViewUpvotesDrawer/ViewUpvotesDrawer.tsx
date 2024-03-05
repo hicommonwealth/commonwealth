@@ -1,13 +1,12 @@
 import Account from 'client/scripts/models/Account';
 import AddressInfo from 'client/scripts/models/AddressInfo';
 import MinimumProfile from 'client/scripts/models/MinimumProfile';
-import React, { useState } from 'react';
-import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
+import React, { Dispatch, SetStateAction } from 'react';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { CWText } from '../../component_kit/cw_text';
 import CWDrawer from '../../component_kit/new_designs/CWDrawer';
+import CWIconButton from '../../component_kit/new_designs/CWIconButton';
 import { CWTable } from '../../component_kit/new_designs/CWTable';
-import { CWThreadAction } from '../../component_kit/new_designs/cw_thread_action';
 import { QuillRenderer } from '../../react_quill_editor/quill_renderer';
 import { getColumnInfo } from '../util';
 
@@ -21,6 +20,8 @@ type ViewUpvotesDrawerProps = {
   contentBody: string;
   author: Profile;
   publishDate: moment.Moment;
+  isOpen: boolean;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
 };
 
 type Upvoter = {
@@ -37,9 +38,9 @@ export const ViewUpvotesDrawer = ({
   contentBody,
   author,
   publishDate,
+  isOpen,
+  setIsOpen,
 }: ViewUpvotesDrawerProps) => {
-  const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState(false);
-
   const voterRow = (voter: Upvoter) => {
     return {
       name: voter.name,
@@ -76,21 +77,16 @@ export const ViewUpvotesDrawer = ({
 
   return (
     <div className="ViewUpvotesDrawer">
-      <CWThreadAction
-        label="View upvotes"
-        action="view-upvotes"
-        onClick={() => setIsUpvoteDrawerOpen(true)}
-      />
       <CWDrawer
         overlayOpacity={0}
         className="upvote-drawer"
-        open={isUpvoteDrawerOpen}
-        onClose={() => setIsUpvoteDrawerOpen(false)}
+        open={isOpen}
+        onClose={() => setIsOpen(false)}
       >
         <div className="drawer-actions">
           <CWIconButton
             iconName="caretDoubleRight"
-            onClick={() => setIsUpvoteDrawerOpen(false)}
+            onClick={() => setIsOpen(false)}
             buttonSize="sm"
           />
         </div>

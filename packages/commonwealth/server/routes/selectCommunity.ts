@@ -4,8 +4,8 @@ import type { NextFunction, Request, Response } from 'express';
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',
-  NoChain: 'Must provide chain',
-  ChainNF: 'Chain not found',
+  NoCommunity: 'Must provide community',
+  CommunityNF: 'Community not found',
 };
 
 const selectCommunity = async (
@@ -17,15 +17,15 @@ const selectCommunity = async (
   if (!req.user) {
     return next(new AppError(Errors.NotLoggedIn));
   }
-  if (!req.body.chain) {
-    return next(new AppError(Errors.NoChain));
+  if (!req.body.community_id) {
+    return next(new AppError(Errors.NoCommunity));
   }
 
   const community = await models.Community.findOne({
-    where: { id: req.body.chain },
+    where: { id: req.body.community_id },
   });
   if (!community) {
-    return next(new AppError(Errors.ChainNF));
+    return next(new AppError(Errors.CommunityNF));
   }
   req.user.setSelectedCommunity(community);
   await req.user.save();

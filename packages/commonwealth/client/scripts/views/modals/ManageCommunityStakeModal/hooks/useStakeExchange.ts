@@ -21,12 +21,14 @@ const useStakeExchange = ({
 }: UseStakeExchangeProps) => {
   const activeCommunityNamespace = app?.chain?.meta?.namespace;
   const chainRpc = app?.chain?.meta?.ChainNode?.url;
+  const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
 
   const { data: userEthBalance, isLoading: userEthBalanceLoading } =
     useGetUserEthBalanceQuery({
       chainRpc,
       walletAddress: address,
       apiEnabled: !!address,
+      ethChainId,
     });
 
   const { data: buyPriceData } = useGetBuyPriceQuery({
@@ -35,6 +37,7 @@ const useStakeExchange = ({
     amount: numberOfStakeToExchange,
     apiEnabled: mode === 'buy' && !!address,
     chainRpc,
+    ethChainId,
   });
 
   const { data: sellPriceData } = useGetSellPriceQuery({
@@ -43,6 +46,7 @@ const useStakeExchange = ({
     amount: numberOfStakeToExchange,
     apiEnabled: mode === 'sell',
     chainRpc,
+    ethChainId,
   });
 
   const { data: ethUsdRateData } = useFetchEthUsdRateQuery();

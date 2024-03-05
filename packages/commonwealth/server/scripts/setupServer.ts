@@ -1,5 +1,5 @@
 import { logger } from '@hicommonwealth/core';
-import type { Express } from 'express-serve-static-core';
+import type { Express } from 'express';
 import http from 'http';
 import { PORT } from '../config';
 

@@ -1,6 +1,11 @@
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useState } from 'react';
+import {
+  BaseMixpanelPayload,
+  MixpanelCommunityStakeEvent,
+} from 'shared/analytics/types';
+import app from 'state';
 import { useUpdateCommunityMutation } from 'state/api/communities';
-
 import { ActionState, defaultActionState } from '../types';
 import useNamespaceFactory from '../useNamespaceFactory';
 
@@ -22,8 +27,12 @@ const useReserveCommunityNamespace = ({
   const [reserveNamespaceData, setReserveNamespaceData] =
     useState<ActionState>(defaultActionState);
 
-  const { namespaceFactory } = useNamespaceFactory();
+  const { namespaceFactory } = useNamespaceFactory(parseInt(chainId));
   const { mutateAsync: updateCommunity } = useUpdateCommunityMutation();
+
+  const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
+    onAction: true,
+  });
 
   const handleReserveCommunityNamespace = async () => {
     try {
@@ -49,6 +58,13 @@ const useReserveCommunityNamespace = ({
       setReserveNamespaceData({
         state: 'completed',
         errorText: '',
+      });
+
+      trackAnalytics({
+        event: MixpanelCommunityStakeEvent.RESERVED_COMMUNITY_NAMESPACE,
+        community: chainId,
+        userId: app.user.activeAccount.profile.id,
+        userAddress: userAddress,
       });
     } catch (err) {
       console.log(err);

@@ -1,6 +1,8 @@
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 
+import { notifySuccess } from 'controllers/app/notifications';
+import { saveToClipboard } from 'utils/clipboard';
 import * as colors from '../../../../../styles/mixins/colors.scss';
 
 const colorKeys = [
@@ -23,8 +25,13 @@ interface ColorCardProps {
 const ColorCard = ({ color, variant }: ColorCardProps) => {
   const colorHex = colors[`${color}-${variant}`];
 
+  const handleCardClick = async () => {
+    await saveToClipboard(colorHex);
+    notifySuccess('Color copied');
+  };
+
   return (
-    <div className="ColorCard">
+    <div className="ColorCard" onClick={handleCardClick}>
       <div
         className="color-field"
         style={{
@@ -39,6 +46,7 @@ const ColorCard = ({ color, variant }: ColorCardProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 const ColorsShowcase = () => {
   return (
     <>

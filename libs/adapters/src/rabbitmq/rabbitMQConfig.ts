@@ -47,8 +47,15 @@ export function getRabbitMQConfig(
     }
   }
 
-  const copyConfigs = (source, target, keys) =>
-    keys.forEach((key) => (target[key] = source[key]));
+  type Keys =
+    | RascalExchanges
+    | RascalQueues
+    | RascalBindings
+    | RascalPublications
+    | RascalSubscriptions;
+
+  const copyConfigs = (source: any, target: any, keys: Array<Keys>) =>
+    target && source && keys.forEach((key) => (target[key] = source[key]));
 
   const {
     baseConfig,
@@ -59,7 +66,7 @@ export function getRabbitMQConfig(
     allBindings,
   } = getAllRascalConfigs(rabbitmq_uri, vhost, purge);
   const config = baseConfig;
-  const vhostConfig = config.vhosts[vhost];
+  const vhostConfig = config.vhosts![vhost];
   if (service === RascalConfigServices.CommonwealthService) {
     copyConfigs(allExchanges, vhostConfig.exchanges, [
       RascalExchanges.SnapshotListener,

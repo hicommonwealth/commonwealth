@@ -25,7 +25,7 @@ class ChainEvent {
     return new ChainEvent(
       json.data || json.event_data,
       json.id,
-      json.chain,
+      json.community_id,
       json.network,
       json.blockNumber || json.block_number,
     );

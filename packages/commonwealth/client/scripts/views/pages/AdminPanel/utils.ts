@@ -64,6 +64,15 @@ export const deleteCommunity = async ({ id }: { id: string }) => {
   });
 };
 
+export const updateCommunityId = async ({ community_id, new_community_id }) => {
+  await axios.patch(`${app.serverUrl()}/communities/update_id`, {
+    jwt: app.user.jwt,
+    community_id,
+    new_community_id,
+    redirect: true,
+  });
+};
+
 export const updateSiteAdmin = async ({
   address,
   siteAdmin,
@@ -80,7 +89,7 @@ export const updateSiteAdmin = async ({
 
 export const getCSVContent = async ({ id }: { id: string }) => {
   const res = await axios.post(`${app.serverUrl()}/exportMembersList`, {
-    chainId: id,
+    communityId: id,
     jwt: app.user.jwt,
   });
 

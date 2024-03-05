@@ -72,6 +72,8 @@ type CWThreadActionProps = {
   selected?: boolean;
   isThreadArchived?: boolean;
   tooltipText?: string;
+  hideToolTip?: boolean;
+  className?: string;
 };
 
 interface TooltipWrapperProps {
@@ -141,6 +143,8 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
   selected,
   isThreadArchived,
   tooltipText,
+  hideToolTip,
+  className,
 }) => {
   const handleClick = (e) => {
     if (disabled) {
@@ -155,7 +159,9 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
   return (
     <TooltipWrapper
       disabled={disabled}
-      text={tooltipText || getTooltipCopy(action, isThreadArchived)}
+      {...(!hideToolTip && {
+        text: tooltipText || getTooltipCopy(action, isThreadArchived),
+      })}
     >
       <button
         onClick={handleClick}
@@ -163,6 +169,7 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
           {
             disabled,
             upvoteSelected,
+            className,
           },
           ComponentType.ThreadAction,
         )}

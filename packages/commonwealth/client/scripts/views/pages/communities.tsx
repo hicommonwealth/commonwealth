@@ -9,7 +9,7 @@ import React from 'react';
 import app from 'state';
 import useFetchActiveCommunitiesQuery from 'state/api/communities/fetchActiveCommunities';
 import CommunityInfo from '../../models/ChainInfo';
-import { CommunityCard, NewCommunityCard } from '../components/community_card';
+import { CommunityCard, NewCommunityCard } from '../components/CommunityCard';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import CWLoadingSpinner from '../components/component_kit/new_designs/CWLoadingSpinner';
