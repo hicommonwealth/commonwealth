@@ -13,9 +13,7 @@ import GeneralRoutes from './GeneralRoutes';
 
 export type RouteFeatureFlags = {
   proposalTemplatesEnabled: boolean;
-  newAdminOnboardingEnabled: boolean;
   communityHomepageEnabled: boolean;
-  rootDomainRebrandEnabled: boolean;
 };
 
 const Router = (customDomain: string) => {
@@ -24,23 +22,13 @@ const Router = (customDomain: string) => {
     'proposalTemplates',
     false,
   );
-  const newAdminOnboardingEnabled = client.getBooleanValue(
-    'newAdminOnboarding',
-    false,
-  );
   const communityHomepageEnabled = client.getBooleanValue(
     'communityHomepage',
     false,
   );
-  const rootDomainRebrandEnabled = client.getBooleanValue(
-    'rootDomainRebrand',
-    false,
-  );
   const flags = {
     proposalTemplatesEnabled,
-    newAdminOnboardingEnabled,
     communityHomepageEnabled,
-    rootDomainRebrandEnabled,
   };
 
   return createBrowserRouter(

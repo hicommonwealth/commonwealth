@@ -12,8 +12,8 @@ import { AllCosmosProposals } from './proposalFetching/types';
 
 const log = logger().getLogger(__filename);
 
-export async function fetchCosmosNotifChains(models: DB) {
-  const chainIds = await models.Subscription.findAll({
+export async function fetchCosmosNotifCommunities(models: DB) {
+  const subscriptions = await models.Subscription.findAll({
     attributes: [
       [
         models.sequelize.fn('DISTINCT', models.sequelize.col('community_id')),
@@ -27,7 +27,7 @@ export async function fetchCosmosNotifChains(models: DB) {
 
   const result = await models.Community.findAll({
     where: {
-      id: chainIds.map((c) => c.community_id),
+      id: subscriptions.map((c) => c.community_id),
       base: ChainBase.CosmosSDK,
     },
     include: [
@@ -113,7 +113,7 @@ export async function emitProposalNotifications(
         await emitNotifications(models, {
           categoryId: NotificationCategories.ChainEvent,
           data: {
-            chain: chainId,
+            community_id: chainId,
             network: SupportedNetwork.Cosmos,
             event_data: {
               kind: EventKind.SubmitProposal,
@@ -145,7 +145,7 @@ export async function emitProposalNotifications(
         await emitNotifications(models, {
           categoryId: NotificationCategories.ChainEvent,
           data: {
-            chain: chainId,
+            community_id: chainId,
             network: SupportedNetwork.Cosmos,
             event_data: {
               kind: EventKind.SubmitProposal,

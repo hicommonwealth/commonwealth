@@ -10,7 +10,7 @@ AWS.config.update({
 
 // This should only be run once. Delete it as soon as you run it on prod.
 const staticFileToBucketMigrator = async () => {
-  const chainsWithStaticImages = await models.Community.findAll({
+  const communitiesWithStaticImages = await models.Community.findAll({
     where: {
       icon_url: {
         [Op.like]: '/static/img%',
@@ -18,10 +18,10 @@ const staticFileToBucketMigrator = async () => {
     },
   });
 
-  for (const chain of chainsWithStaticImages) {
-    console.log('updating chain: ', chain.id);
+  for (const community of communitiesWithStaticImages) {
+    console.log('updating community: ', community.id);
 
-    const iconPath = chain.icon_url;
+    const iconPath = community.icon_url;
     const fileName = iconPath.split('/').pop();
 
     let fileBlob;
@@ -56,8 +56,8 @@ const staticFileToBucketMigrator = async () => {
 
     console.log('updated url', url);
 
-    chain.icon_url = url;
-    await chain.save();
+    community.icon_url = url;
+    await community.save();
   }
 
   return;

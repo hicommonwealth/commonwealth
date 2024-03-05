@@ -526,7 +526,7 @@ export async function handleSocialLoginCallback({
       withCredentials: true,
     },
     data: {
-      chain: desiredChain?.id,
+      community_id: desiredChain?.id,
       jwt: app.user.jwt,
       username: profileMetadata?.username,
       avatarUrl: profileMetadata?.avatarUrl,

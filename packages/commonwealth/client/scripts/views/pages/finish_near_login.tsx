@@ -22,9 +22,7 @@ import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
-import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
-import { CWModal } from '../components/component_kit/new_designs/CWModal';
-import { LoginModal } from '../modals/login_modal';
+import { AuthModal } from '../modals/AuthModal';
 
 // TODO:
 //  - figure out how account switching will work
@@ -255,21 +253,14 @@ const FinishNearLogin = () => {
     }
 
     return (
-      <CWModal
-        content={
-          <LoginModal
-            onModalClose={() => {
-              setIsModalOpen(false);
-              redirectToNextPage(navigate);
-            }}
-            initialBody="welcome"
-            initialSidebar="newOrReturning"
-            initialAccount={validatedAccount}
-          />
-        }
-        isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-        onClose={() => setIsModalOpen(false)}
-        open={isModalOpen}
+      <AuthModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          redirectToNextPage(navigate);
+        }}
+        onSuccess={() => setIsModalOpen(false)}
+        showWalletsFor={validatedAccount.walletId as any}
       />
     );
   } else if (!validating) {

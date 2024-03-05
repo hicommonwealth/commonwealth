@@ -30,6 +30,25 @@ export async function __updateCommunityId(
   if (!originalCommunity) {
     throw new AppError('Community to rename not found!');
   }
+
+  const existingRedirect = await this.models.Community.findOne({
+    where: {
+      redirect: community_id,
+    },
+  });
+  if (existingRedirect) {
+    throw new AppError('Community redirect already exists');
+  }
+
+  const existingNewCommunity = await this.models.Community.findOne({
+    where: {
+      id: new_community_id,
+    },
+  });
+  if (existingNewCommunity) {
+    throw new AppError('Community already exists');
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { id, ...communityData } = originalCommunity.toJSON();
 
@@ -39,6 +58,7 @@ export async function __updateCommunityId(
       {
         id: new_community_id,
         ...communityData,
+        redirect: community_id,
       },
       { transaction },
     );
@@ -82,6 +102,18 @@ export async function __updateCommunityId(
         },
       );
     }
+
+    await this.models.Template.update(
+      {
+        created_for_community: new_community_id,
+      },
+      {
+        where: {
+          created_for_community: community_id,
+        },
+        transaction,
+      },
+    );
 
     await this.models.User.update(
       {

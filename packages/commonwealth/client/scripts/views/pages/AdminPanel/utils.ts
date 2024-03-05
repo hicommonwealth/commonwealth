@@ -69,6 +69,7 @@ export const updateCommunityId = async ({ community_id, new_community_id }) => {
     jwt: app.user.jwt,
     community_id,
     new_community_id,
+    redirect: true,
   });
 };
 

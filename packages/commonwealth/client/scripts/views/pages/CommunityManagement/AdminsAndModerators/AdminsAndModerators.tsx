@@ -10,9 +10,9 @@ import {
 import useSearchProfilesQuery from '../../../../../scripts/state/api/profiles/searchProfiles';
 import RoleInfo from '../../../../models/RoleInfo';
 import { ComponentType } from '../../../components/component_kit/types';
-import { UpgradeRolesForm } from '../../../pages/manage_community/upgrade_roles_form';
-import { ManageRoles } from '../../manage_community/manage_roles';
 import CommunityManagementLayout from '../common/CommunityManagementLayout';
+import ManageRoles from './ManageRoles';
+import UpgradeRolesForm from './UpgradeRolesForm';
 
 const AdminsAndModerators = () => {
   const [admins, setAdmins] = useState([]);

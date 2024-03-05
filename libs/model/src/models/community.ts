@@ -1,12 +1,7 @@
-import type {
-  ChainBase,
-  ChainNetwork,
-  ChainType,
-  DefaultPage,
-} from '@hicommonwealth/core';
-import type { RegisteredTypes } from '@polkadot/types/types';
+import { community } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
+import { z } from 'zod';
 import type { AddressAttributes, AddressInstance } from './address';
 import type { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
 import type { CommentAttributes } from './comment';
@@ -19,42 +14,7 @@ import type { TopicAttributes, TopicInstance } from './topic';
 import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes } from './user';
 
-export type CommunityAttributes = {
-  name: string;
-  chain_node_id: number;
-  default_symbol: string;
-  network: ChainNetwork;
-  base: ChainBase;
-  icon_url: string;
-  active: boolean;
-  type: ChainType;
-  id?: string;
-  description?: string;
-  social_links?: string[];
-  ss58_prefix?: number;
-  stages_enabled?: boolean;
-  custom_stages?: string[];
-  custom_domain?: string;
-  block_explorer_ids?: string;
-  collapsed_on_homepage?: boolean;
-  substrate_spec?: RegisteredTypes;
-  has_chain_events_listener?: boolean;
-  default_summary_view?: boolean;
-  default_page?: DefaultPage;
-  has_homepage?: boolean;
-  terms?: string;
-  admin_only_polling?: boolean;
-  bech32_prefix?: string;
-  hide_projects?: boolean;
-  token_name?: string;
-  ce_verbose?: boolean;
-  discord_config_id?: number;
-  category?: any;
-  discord_bot_webhooks_enabled?: boolean;
-  directory_page_enabled?: boolean;
-  directory_page_chain_node_id?: number;
-  namespace?: string;
-
+export type CommunityAttributes = z.infer<typeof community.Community> & {
   // associations
   ChainNode?: ChainNodeAttributes;
   Addresses?: AddressAttributes[] | AddressAttributes['id'][];
@@ -69,9 +29,6 @@ export type CommunityAttributes = {
   Contract?: ContractInstance;
   CommunityStakes?: CommunityStakeAttributes[];
   groups?: GroupAttributes[];
-
-  created_at?: Date;
-  updated_at?: Date;
 };
 
 export type CommunityInstance = ModelInstance<CommunityAttributes> & {
@@ -169,6 +126,7 @@ export default (
       namespace: { type: dataTypes.STRING, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: true },
       updated_at: { type: dataTypes.DATE, allowNull: true },
+      redirect: { type: dataTypes.TEXT, allowNull: true },
     },
     {
       tableName: 'Communities',

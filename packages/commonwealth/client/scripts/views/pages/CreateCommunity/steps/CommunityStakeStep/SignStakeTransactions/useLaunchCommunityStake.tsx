@@ -28,7 +28,7 @@ const useLaunchCommunityStake = ({
   const [launchStakeData, setLaunchStakeData] =
     useState<ActionState>(defaultActionState);
 
-  const { namespaceFactory } = useNamespaceFactory();
+  const { namespaceFactory } = useNamespaceFactory(parseInt(chainId));
   const { mutateAsync: updateCommunityStake } = useUpdateCommunityStake();
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({

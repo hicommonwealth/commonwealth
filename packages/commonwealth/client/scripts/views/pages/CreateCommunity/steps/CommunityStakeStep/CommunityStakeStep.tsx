@@ -37,6 +37,7 @@ const CommunityStakeStep = ({
           goToSuccessStep={goToSuccessStep}
           onOptInEnablingStake={handleOptInEnablingStake}
           communityStakeData={communityStakeData}
+          chainId={chainId}
         />
       ) : (
         <SignStakeTransactions
