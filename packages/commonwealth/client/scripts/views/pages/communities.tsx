@@ -12,7 +12,7 @@ import CommunityInfo from '../../models/ChainInfo';
 import { CommunityCard, NewCommunityCard } from '../components/CommunityCard';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
-import CWLoadingSpinner from '../components/component_kit/new_designs/CWLoadingSpinner';
+import CWCircleMultiplySpinner from '../components/component_kit/new_designs/CWCircleMultiplySpinner';
 
 const buildCommunityString = (numCommunities: number) =>
   numCommunities >= 1000
@@ -205,7 +205,7 @@ const CommunitiesPage = () => {
         </div>
       </div>
       {isLoading ? (
-        <CWLoadingSpinner />
+        <CWCircleMultiplySpinner />
       ) : (
         <div className="communities-list">
           {sortedCommunities}

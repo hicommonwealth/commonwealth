@@ -36,18 +36,24 @@ export async function __getActiveCommunities(
     SELECT
         c.id,
         COUNT(DISTINCT t.id) AS topic_count,
-        COUNT(DISTINCT a.id) AS address_count
+        COUNT(DISTINCT a.id) AS address_count,
+        COUNT(DISTINCT cs.community_id) AS community_stake_count
     FROM
         "Communities" c
         LEFT JOIN "Topics" t ON c.id = t.community_id
         LEFT JOIN "Addresses" a ON c.id = a.community_id
+        LEFT JOIN "CommunityStakes" cs ON c.id = cs.community_id
     WHERE
-        c.active = true
+      c.active = true
     GROUP BY
         c.id
     HAVING
+      (
         COUNT(DISTINCT t.id) > 0
-        AND COUNT(DISTINCT a.id) >= 10;
+        AND
+        COUNT(DISTINCT a.id) >= 10
+      ) OR
+      COUNT(DISTINCT cs.community_id) > 0;
     `;
   const activeCommunities = await sequelize.query<CommunityAttributes>(query, {
     type: QueryTypes.SELECT,
