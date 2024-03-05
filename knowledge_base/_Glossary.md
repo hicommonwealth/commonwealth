@@ -1,5 +1,9 @@
 # Glossary
 
+As of 240305, this starter glossary is in-progress and needs improvement. If you notice unclear wording or conceptual confusions, please open a PR tethered to the #4800 general documentation ticket!
+
+Glossary terms referenced in a given term's definition are designated with CAPITAL letters. Relevant models and related entries may also be referenced; see [Subscription](#subscription) for an example.
+
 ## Contents
 
 - [Chain Concepts](#chain-concepts)
@@ -38,13 +42,14 @@
 - [Praxis](#praxis)
   * [Blocked](#blocked)
   * [Fast-Follow](#fast-follow)
+  * [Issues, Tickets, & Stories](#issues-tickets--stories)
 - [Change Log](#change-log)
 
 ## Chain Concepts
 
 ### Chain Entity
 
-A Chain Entity is a backend object, stored in the ChainEntities table, which consists of chain event bundles and values received from a smart CONTRACT.
+A Chain Entity is a backend object, stored in the ChainEntities table, which consists of chain event bundles and values received from a smart contract.
 
 ### Chain Node
 
@@ -104,15 +109,11 @@ More specifically, "Member" is the lowest-ranking (ROLE) in COMMUNITIES, below M
 
 ### Notification
 
+*Related Terms:* [Subscription](#subscription)
+
 Notifications are messages emitted to users who are SUBSCRIBED to a given category of activity atop a given forum entity (e.g. a THREAD or COMMUNITY).
 
-For a list of activity categories which may trigger notification, see [NotificationCategories](../libs/core/src/types.ts).
-
-**Model:** [notification.ts](../libs/model/src/models/notification.ts)
-
-**Knowledge Base:** [Notifications.md](./Notifications.md)
-
-**Related Terms:** [Subscription](#subscription)
+See also [models/notification.ts](../libs/model/src/models/notification.ts) and our KB entry [Notifications.md](./Notifications.md). For a list of activity categories which may trigger notification, see [NotificationCategories](../libs/core/src/types.ts).
 
 ### Page Scope
 
@@ -154,29 +155,27 @@ Stake is used for GATING content and features across a COMMUNITY FORUM.
 
 ### Subscription
 
+*Related Terms:* [Notification](#notification)
+
 USERS subscribe (and are autosubscribed) to new events, e.g. in COMMUNITIES they join or on THREADS and COMMENTS they author. Users receive all NOTIFICATION objects which match the entity and category  ids of their subscriptions.
 
-**Related Terms:** [Notification](#notification)
-
-**Model:** [subscription.ts](../libs/model/src/models/subscription.ts).
+See [models/subscription.ts](../libs/model/src/models/subscription.ts).
 
 ### Template
 
-Used for THREADS within TOPICS.
+A starter form for creating THREADS within a given TOPIC. As of 240305, this feature is only half-supported by Common App UX.
 
-See See [models/template.ts](../libs/model/src/models/template.ts).
+See [models/template.ts](../libs/model/src/models/template.ts).
 
 ### Thread
 
-A THREAD is a discussion space created via the Common FORUM app. "THREAD" may refer either specifically to the original post (OP) object which opens the discussion, or more broadly to the group of discussion COMMENTS which includes and responds to OP. A thread may be REACTED to; it may be LINKED to other THREADS and PROPOSALS; and it may house a related POLL.
+A thread is a discussion space created via the Common FORUM app. "Thread" may refer either specifically to the original post ('OP') object which opens a discussion, or more broadly to the group of discussion COMMENTS which includes and responds to OP. A thread may be REACTED to; it may be LINKED to other THREADS and PROPOSALS; and it may house a related POLL.
 
 See [models/thread.ts](../libs/model/src/models/thread.ts)
 
 ### Topic
 
 A topic is a sub-section of a COMMUNITY FORUM. It may be GATED or require PERMISSIONS to participate in.
-
-<!-- TODO: Investigate GATING and PERMISSIONS -->
 
 See [models/topic.ts](../libs/model/src/models/topic.ts)
 
@@ -190,36 +189,40 @@ See [models/user.ts](../libs/model/src/models/user.ts).
 
 ### Wallet
 
-A tool, typically a browser plugin or hardware device, that manages keys for signing transactions for blockchains.
+A tool, typically a browser plugin or hardware device, that manages keys for signing transactions for blockchains. The Common App delegates transaction signing to web wallets for a variety of USER actions, from signing in to voting on proposals.
 
-<!-- TODO: Make Common-specific -->
+See [web_wallets.ts](../packages/commonwealth/client/scripts/controllers/app/web_wallets.ts).
 
 ### Votes
 
-Votes are responses by ADDRESSES to POLL prompts. See [models/vote.ts](../libs/model/src/models/vote.ts).
+Votes are responses by ADDRESSES to POLL prompts.
+
+See [models/vote.ts](../libs/model/src/models/vote.ts).
 
 ## Hexagonal Architecture
 
-### Port
-
-An interface between an application and some external system. Either incoming or outgoing.
-
 ### Adapter
 
-A component linked to a PORT, which translates incoming and outoing data and messages.
+A component linked to a PORT, which translates incoming and outgoing data.
+
+### Port
+
+An interface between an application and some external system; may be incoming or outgoing.
 
 ## Praxis
 
 ### Blocked
 
-A project is BLOCKED when some process, out of the direct control of the developer, must be resolved before work on the project can continue. A blocker may be the Slack response of a lead, the merging of an outstanding PR, or the version release of an external package.
+A project is considered blocked when some process outside the direct control of the developer—i.e. the blocker—must be resolved before work on the blocked project can continue.
 
 ### Fast-Follow
 
-A new-feature ticket related to a project that is non-blocking but can be completed within a week, to be completed after the project is complete.
+Fast-follow tickets are change requests tethered to new feature projects, intended to be completed within a week of the feature project being completed and merged.
 
-<!-- TODO: IMPROVE WORDING FOR CLARITY -->
+### Issues, Tickets, & Stories
+
+<!-- Blocked pending meeting with Forest -->
 
 ## Change Log
 
-240219: Authored by Graham Johnson (#).
+240305: Authored by Graham Johnson (#6985).
