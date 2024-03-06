@@ -12,6 +12,7 @@ import { Splash } from './Splash';
 import { openFeatureProvider } from './helpers/feature-flags';
 import useAppStatus from './hooks/useAppStatus';
 import { AddToHomeScreenPrompt } from './views/components/AddToHomeScreenPrompt';
+import FeedDiscovery from 'views/components/FeedDiscovery/FeedDiscovery';
 
 OpenFeature.setProvider(openFeatureProvider);
 
@@ -36,6 +37,7 @@ const App = () => {
                   displayDelayMilliseconds={1000}
                 />
               )}
+              <FeedDiscovery/>
             </>
           )}
 
