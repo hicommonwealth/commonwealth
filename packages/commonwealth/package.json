@@ -61,7 +61,7 @@
     "build-contracts": "npx hardhat compile"
   },
   "engines": {
-    "node": "18.x"
+    "node": "20.x"
   },
   "repository": {
     "type": "git",
@@ -136,6 +136,7 @@
     "express-session": "^1.17.0",
     "express-useragent": "^1.0.15",
     "express-validator": "^6.14.2",
+    "feed": "^4.2.2",
     "graphql": "^15.5.0",
     "graphql-tag": "^2.12.4",
     "highlight-words-core": "^1.2.2",
@@ -181,6 +182,7 @@
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
     "react-error-boundary": "^3.1.4",
+    "react-helmet": "^6.1.0",
     "react-hook-form": "^7.46.1",
     "react-intersection-observer": "^9.5.2",
     "react-jdenticon": "^1.0.0",

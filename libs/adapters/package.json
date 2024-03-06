@@ -18,7 +18,7 @@
     "amqplib": "^0.10.3",
     "async-rwlock": "^1.1.1",
     "express": "^4.18.2",
-    "hot-shots": "^9",
+    "hot-shots": "^10",
     "mixpanel": "^0.14.0",
     "node-fetch": "2",
     "passport": "^0.4.0",
