@@ -39,7 +39,7 @@ const verifySessionSignature = async (
     signer.match(session.address),
   );
   const signer = matchingSigners[0];
-  let isValid: boolean;
+  let isValid = false;
   try {
     await signer.verifySession(CANVAS_TOPIC, session);
     isValid = true;

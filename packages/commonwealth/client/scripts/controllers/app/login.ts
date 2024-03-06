@@ -66,8 +66,8 @@ export async function setActiveAccount(
   try {
     const response = await $.post(`${app.serverUrl()}/setDefaultRole`, {
       address: account.address,
-      author_chain: account.community.id,
-      chain: community,
+      author_community_id: account.community.id,
+      community_id: community,
       jwt: app.user.jwt,
       auth: true,
     });
@@ -519,7 +519,7 @@ export async function handleSocialLoginCallback({
       withCredentials: true,
     },
     data: {
-      chain: desiredChain?.id,
+      community_id: desiredChain?.id,
       jwt: app.user.jwt,
       username: profileMetadata?.username,
       avatarUrl: profileMetadata?.avatarUrl,

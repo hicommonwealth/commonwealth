@@ -1,6 +1,5 @@
+import type { SubscriptionAttributes } from '@hicommonwealth/model';
 import moment from 'moment';
-
-import type ChainInfo from './ChainInfo';
 import { Comment as CommentT } from './Comment';
 import { Thread as ThreadT } from './Thread';
 import type { IUniqueId } from './interfaces';
@@ -9,7 +8,7 @@ class NotificationSubscription {
   public readonly category: string;
   public readonly snapshotId: string;
   public readonly createdAt: moment.Moment;
-  public readonly Chain: ChainInfo;
+  public readonly communityId?: string;
   public readonly Comment: CommentT<IUniqueId>;
   public readonly Thread: ThreadT;
 
@@ -41,10 +40,6 @@ class NotificationSubscription {
     return this._isActive;
   }
 
-  public get chainId() {
-    return this.Chain?.id;
-  }
-
   public get threadId() {
     return this.Thread?.id;
   }
@@ -58,12 +53,12 @@ class NotificationSubscription {
   }
 
   constructor(
-    id,
-    category,
-    isActive,
-    createdAt,
-    immediateEmail,
-    Chain?,
+    id: number,
+    category: string,
+    isActive: boolean,
+    createdAt: Date,
+    immediateEmail: boolean,
+    communityId?: string,
     comment?: CommentT<IUniqueId>,
     thread?: ThreadT,
     snapshotId?: string,
@@ -73,21 +68,26 @@ class NotificationSubscription {
     this._isActive = isActive;
     this.createdAt = moment(createdAt);
     this._immediateEmail = immediateEmail;
-    this.Chain = Chain;
+    this.communityId = communityId;
     this.Comment = comment;
     this.Thread = thread;
     this.snapshotId = snapshotId;
   }
 }
 
-export const modelFromServer = (subscription) => {
+export const modelFromServer = (
+  subscription: SubscriptionAttributes & {
+    Thread?: any;
+    Comment?: any;
+  },
+) => {
   const {
     id,
     category_id,
     is_active,
     created_at,
     immediate_email,
-    Community,
+    community_id,
     Comment,
     Thread,
     snapshot_id,
@@ -122,7 +122,7 @@ export const modelFromServer = (subscription) => {
     is_active,
     created_at,
     immediate_email,
-    Community,
+    community_id,
     modeledComment,
     modeledThread,
     snapshot_id,

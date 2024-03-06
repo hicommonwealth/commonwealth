@@ -608,7 +608,7 @@ export interface SubscriptionArgs {
   jwt: any;
   is_active: boolean;
   category: string;
-  chain_id: string;
+  community_id: string;
 }
 
 export const createSubscription = async (args: SubscriptionArgs) => {

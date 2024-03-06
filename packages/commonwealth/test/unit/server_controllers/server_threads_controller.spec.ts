@@ -141,9 +141,9 @@ describe('ServerThreadsController', () => {
         thread_id: 4,
         root_title: 'Big Thread!',
         root_type: 'discussion',
-        chain_id: 'ethereum',
+        community_id: 'ethereum',
         author_address: '0x123',
-        author_chain: 'ethereum',
+        author_community_id: 'ethereum',
       });
 
       expect(notificationOptions).to.have.property('excludeAddresses');
@@ -1379,9 +1379,9 @@ describe('ServerThreadsController', () => {
         thread_id: 1,
         root_type: 'discussion',
         root_title: 'mythread',
-        chain_id: 'ethereum',
+        community_id: 'ethereum',
         author_address: '0x123',
-        author_chain: 'ethereum',
+        author_community_id: 'ethereum',
       });
       expect(notificationOptions[0].excludeAddresses[0]).to.equal('0x123');
     });

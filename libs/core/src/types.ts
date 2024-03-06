@@ -247,3 +247,13 @@ export enum NodeHealth {
   Failed = 'failed',
   Healthy = 'healthy',
 }
+
+/**
+ * Cosmos gov module version of a chain
+ */
+export enum CosmosGovernanceVersion {
+  v1 = 'v1',
+  v1beta1 = 'v1beta1',
+  v1beta1Failed = 'v1beta1-attempt-failed',
+  v1Failed = 'v1-attempt-failed',
+}

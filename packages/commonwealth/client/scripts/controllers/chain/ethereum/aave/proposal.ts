@@ -264,7 +264,7 @@ export default class AaveProposal extends Proposal<
       `${chain.app.serverUrl()}${ApiEndpoints.FETCH_PROPOSAL_VOTES}`,
       {
         params: {
-          chainId: meta.id,
+          communityId: meta.id,
           proposalId: proposalId,
         },
       },
