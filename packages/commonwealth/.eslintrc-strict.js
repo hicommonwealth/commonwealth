@@ -12,9 +12,14 @@ module.exports = {
     }
   },
   plugins: ['@tanstack/query'],
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    project: `./tsconfig.json`
+  },
   rules: {
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'error',
+    'react/jsx-key': 'error',
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/camelcase': 'off',
     '@typescript-eslint/ban-types': 'off',
@@ -81,6 +86,10 @@ module.exports = {
     '@typescript-eslint/no-shadow': 'error',
     '@typescript-eslint/explicit-module-boundary-types': 0,
     'prettier/prettier': 0,
+    // '@typescript-eslint/no-floating-promises': 'error',
+    // '@typescript-eslint/require-await': 'error',
+    // '@typescript-eslint/no-misused-promises': 'error',
+    // '@typescript-eslint/await-thenable': 'error',
     '@typescript-eslint/no-empty-interface': [
       'error',
       {
@@ -94,7 +103,6 @@ module.exports = {
     'react/no-multi-comp': [1, { "ignoreStateless": false }],
     'react/jsx-curly-brace-presence': [1, { props: "never", children: "never" }],
     '@typescript-eslint/no-unused-vars': 1,
-    'react/jsx-key': 1,
     "no-restricted-imports": ["error", {
       patterns: [{
         group: [
