@@ -97,7 +97,9 @@ describe('Token Balance Cache Cosmos Tests', function () {
   const addressTwoBalance = '30000000000';
 
   before(async () => {
-    cache(new RedisCache());
+    const redisCache = new RedisCache();
+    await redisCache.ready();
+    cache(redisCache);
   });
 
   after(async () => {
