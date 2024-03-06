@@ -184,6 +184,7 @@ import { getTopicsHandler } from '../routes/topics/get_topics_handler';
 import { updateTopicChannelHandler } from '../routes/topics/update_topic_channel_handler';
 import { updateTopicHandler } from '../routes/topics/update_topic_handler';
 import { updateTopicsOrderHandler } from '../routes/topics/update_topics_order_handler';
+import { getFeedHandler } from '../routes/feed';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -627,6 +628,15 @@ function setupRouter(
     databaseValidationService.validateCommunity,
     getThreadsHandler.bind(this, serverControllers),
   );
+
+  registerRoute(
+    router,
+    'get',
+    '/feed',
+    databaseValidationService.validateCommunity,
+    getFeedHandler.bind(this, models, serverControllers),
+  );
+
   registerRoute(
     router,
     'get',

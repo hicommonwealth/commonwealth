@@ -18,21 +18,21 @@ const Errors = {
   NoCommunity: 'No community resolved to execute search',
 };
 
-type GetThreadsRequestQuery = {
+export type GetThreadsRequestQuery = {
   community_id: string;
   thread_ids?: string[];
   bulk?: string;
   active?: string;
   search?: string;
 };
-type ActiveThreadsRequestQuery = {
+export type ActiveThreadsRequestQuery = {
   threads_per_topic: string;
 };
-type SearchThreadsRequestQuery = {
+export type SearchThreadsRequestQuery = {
   search: string;
   thread_title_only?: string;
 } & PaginationQueryParams;
-type BulkThreadsRequestQuery = {
+export type BulkThreadsRequestQuery = {
   topic_id: string;
   stage?: string;
   includePinnedThreads?: string;
@@ -43,7 +43,7 @@ type BulkThreadsRequestQuery = {
   to_date?: string;
   archived?: string;
 };
-type GetThreadsResponse = any;
+export type GetThreadsResponse = any;
 
 export const getThreadsHandler = async (
   controllers: ServerControllers,
