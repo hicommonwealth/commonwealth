@@ -2,16 +2,11 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 require('dotenv').config();
-import { CacheNamespaces, delay } from '@hicommonwealth/core';
+import { CacheNamespaces, delay, dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import express from 'express';
-import {
-  CacheDecorator,
-  RedisCache,
-  XCACHE_VALUES,
-  connectToRedis,
-} from '../../src/redis';
+import express, { RequestHandler, json } from 'express';
+import { CacheDecorator, RedisCache, XCACHE_VALUES } from '../../src/redis';
 import {
   CACHE_ENDPOINTS,
   setupCacheTestEndpoints,
@@ -20,7 +15,7 @@ import {
 chai.use(chaiHttp);
 const expect = chai.expect;
 const app = express();
-app.use(express.json());
+app.use(json() as RequestHandler);
 
 const content_type = {
   json: 'application/json; charset=utf-8',
@@ -53,7 +48,7 @@ async function makePostRequest(endpoint, body, headers = {}) {
 }
 
 describe('Cache Decorator', () => {
-  const redisCache: RedisCache = new RedisCache();
+  const redisCache = new RedisCache();
   const route_namespace: CacheNamespaces = CacheNamespaces.Route_Response;
   const cacheDecorator = new CacheDecorator(redisCache);
   setupCacheTestEndpoints(app, cacheDecorator);
@@ -65,18 +60,18 @@ describe('Cache Decorator', () => {
     expect(valFromRedis).to.not.be.null;
     if (key === CACHE_ENDPOINTS.JSON) {
       // to avoid unhandled exceptions when response is not json
-      expect(JSON.parse(valFromRedis)).to.be.deep.equal(res.body);
-      expect(JSON.parse(valFromRedis)).to.be.deep.equal(resEarlier.body);
+      expect(JSON.parse(valFromRedis!)).to.be.deep.equal(res.body);
+      expect(JSON.parse(valFromRedis!)).to.be.deep.equal(resEarlier.body);
     }
   }
 
   before(async () => {
-    await connectToRedis(redisCache);
+    await redisCache.ready();
   });
 
   after(async () => {
     await redisCache.deleteNamespaceKeys(route_namespace);
-    await redisCache.closeClient();
+    await dispose()();
   });
 
   it(`verify cache route ${CACHE_ENDPOINTS.TEXT} route and expire`, async () => {

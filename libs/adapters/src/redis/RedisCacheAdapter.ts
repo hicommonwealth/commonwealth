@@ -1,6 +1,7 @@
 import {
   Cache,
   ILogger,
+  delay,
   logger,
   type CacheNamespaces,
 } from '@hicommonwealth/core';
@@ -35,7 +36,8 @@ export class RedisCache implements Cache {
     redis_url =
       redis_url ??
       process.env.REDIS_URL ??
-      process.env.NODE_ENV === 'development'
+      (process.env.NODE_ENV === 'development' ||
+        process.env.NODE_ENV === 'test')
         ? 'redis://localhost:6379'
         : undefined;
     if (!redis_url) {
@@ -102,6 +104,24 @@ export class RedisCache implements Cache {
    */
   public initialized(): boolean {
     return this._client?.isReady ?? false;
+  }
+
+  /**
+   * Awaits redis connection / cache ready
+   * @returns
+   */
+  public ready(retries = 3, retryDelay = 1000) {
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise<boolean>(async (resolve, reject) => {
+      for (let i = 0; i < retries; i++) {
+        if (this.initialized()) {
+          resolve(true);
+          return;
+        }
+        await delay(retryDelay);
+      }
+      reject('RedisCache ready timeout');
+    });
   }
 
   /**

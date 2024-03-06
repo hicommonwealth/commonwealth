@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // import { describe, it, beforeEach, afterEach } from 'mocha';
-import { CacheNamespaces } from '@hicommonwealth/core';
+import { CacheNamespaces, dispose } from '@hicommonwealth/core';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
@@ -23,6 +23,10 @@ describe('CacheDecorator', () => {
     sinon.restore();
   });
 
+  after(async () => {
+    await dispose()();
+  });
+
   describe('cacheWrap', () => {
     describe('verify general flow', () => {
       const keys = [
@@ -39,7 +43,7 @@ describe('CacheDecorator', () => {
 
           mockRedis.getKey.resolves(undefined);
           mockRedis.setKey.resolves(true);
-          mockRedis.isInitialized.returns(true);
+          mockRedis.initialized.returns(true);
 
           const wrapFn = cacheDecorator.cacheWrap(
             false,
@@ -61,7 +65,7 @@ describe('CacheDecorator', () => {
 
           mockRedis.getKey.resolves(JSON.stringify('cached-result'));
           mockRedis.setKey.resolves(true);
-          mockRedis.isInitialized.returns(true);
+          mockRedis.initialized.returns(true);
 
           const wrapFn = cacheDecorator.cacheWrap(
             false,
@@ -82,7 +86,7 @@ describe('CacheDecorator', () => {
           const key = 'test-key';
           const duration = 60;
 
-          mockRedis.isInitialized.returns(false);
+          mockRedis.initialized.returns(false);
 
           const wrapFn = cacheDecorator.cacheWrap(
             false,
@@ -104,7 +108,7 @@ describe('CacheDecorator', () => {
           const duration = 60;
 
           mockRedis.setKey.resolves(true);
-          mockRedis.isInitialized.returns(true);
+          mockRedis.initialized.returns(true);
 
           const wrapFn = cacheDecorator.cacheWrap(
             true,
@@ -124,7 +128,7 @@ describe('CacheDecorator', () => {
           const fn = async () => 'test-result';
           const key = 'test-key';
           const duration = null;
-          mockRedis.isInitialized.returns(true);
+          mockRedis.initialized.returns(true);
 
           const wrapFn = cacheDecorator.cacheWrap(
             false,
@@ -144,7 +148,7 @@ describe('CacheDecorator', () => {
           const fn = async () => 'test-result';
           const key = 'test-key';
           const duration = 0;
-          mockRedis.isInitialized.returns(true);
+          mockRedis.initialized.returns(true);
 
           const wrapFn = cacheDecorator.cacheWrap(
             false,
@@ -164,7 +168,7 @@ describe('CacheDecorator', () => {
           const fn = async () => null;
           const key = 'test-key';
           const duration = 60;
-          mockRedis.isInitialized.returns(true);
+          mockRedis.initialized.returns(true);
 
           const wrapFn = cacheDecorator.cacheWrap(
             false,
@@ -185,7 +189,7 @@ describe('CacheDecorator', () => {
           const key = 'test-key';
           const duration = 60;
           mockRedis.getKey.resolves('0');
-          mockRedis.isInitialized.returns(true);
+          mockRedis.initialized.returns(true);
 
           const wrapFn = cacheDecorator.cacheWrap(
             false,
@@ -205,7 +209,7 @@ describe('CacheDecorator', () => {
           const fn = async () => 0;
           const key = 'test-key';
           const duration = 60;
-          mockRedis.isInitialized.returns(true);
+          mockRedis.initialized.returns(true);
 
           const wrapFn = cacheDecorator.cacheWrap(
             false,
@@ -226,7 +230,7 @@ describe('CacheDecorator', () => {
         it('key null skip caching', async () => {
           const fn = async () => 'test-result';
           const duration = 60;
-          mockRedis.isInitialized.returns(true);
+          mockRedis.initialized.returns(true);
 
           const wrapFn = cacheDecorator.cacheWrap(
             false,
@@ -251,7 +255,7 @@ describe('CacheDecorator', () => {
         const keyfn = () => {
           return {} as unknown as CacheKeyDuration;
         };
-        mockRedis.isInitialized.returns(true);
+        mockRedis.initialized.returns(true);
 
         const wrapFn = cacheDecorator.cacheWrap(
           false,
@@ -273,7 +277,7 @@ describe('CacheDecorator', () => {
         const key = () => {
           return { cacheKey: 'test-key' } as unknown as CacheKeyDuration;
         };
-        mockRedis.isInitialized.returns(true);
+        mockRedis.initialized.returns(true);
 
         const wrapFn = cacheDecorator.cacheWrap(
           false,
@@ -299,7 +303,7 @@ describe('CacheDecorator', () => {
           } as CacheKeyDuration;
         };
         mockRedis.getKey.resolves(JSON.stringify('cached-result'));
-        mockRedis.isInitialized.returns(true);
+        mockRedis.initialized.returns(true);
 
         const wrapFn = cacheDecorator.cacheWrap(
           false,
@@ -331,7 +335,7 @@ describe('CacheDecorator', () => {
           } as CacheKeyDuration;
         };
         mockRedis.getKey.resolves(undefined);
-        mockRedis.isInitialized.returns(true);
+        mockRedis.initialized.returns(true);
 
         const wrapFn = cacheDecorator.cacheWrap(
           false,
@@ -370,7 +374,7 @@ describe('CacheDecorator', () => {
 
         mockRedis.getKey.rejects('test-error');
         mockRedis.setKey.resolves(true);
-        mockRedis.isInitialized.returns(true);
+        mockRedis.initialized.returns(true);
 
         const wrapFn = cacheDecorator.cacheWrap(
           false,
@@ -394,7 +398,7 @@ describe('CacheDecorator', () => {
 
         mockRedis.getKey.resolves(undefined);
         mockRedis.setKey.rejects('test-error');
-        mockRedis.isInitialized.returns(true);
+        mockRedis.initialized.returns(true);
 
         const wrapFn = cacheDecorator.cacheWrap(
           false,
@@ -419,7 +423,7 @@ describe('CacheDecorator', () => {
 
         mockRedis.getKey.resolves(undefined);
         mockRedis.setKey.rejects();
-        mockRedis.isInitialized.returns(true);
+        mockRedis.initialized.returns(true);
 
         const wrapFn = cacheDecorator.cacheWrap(
           false,
@@ -428,7 +432,7 @@ describe('CacheDecorator', () => {
           duration,
           CacheNamespaces.Function_Response,
         );
-        await expect(wrapFn()).to.be.rejectedWith('Error: test-error');
+        await expect(wrapFn()).to.be.rejectedWith('test-error');
 
         // expect(result).to.equal('test-result');
         expect(mockRedis.getKey.calledOnce).to.be.true;
@@ -468,7 +472,7 @@ describe('CacheDecorator', () => {
       it('should cache the function result and return it', async () => {
         mockRedis.getKey.resolves(undefined);
         mockRedis.setKey.resolves(true);
-        mockRedis.isInitialized.returns(true);
+        mockRedis.initialized.returns(true);
 
         const activityWrapper = new Activity(
           ActivityLabel,
@@ -502,7 +506,7 @@ describe('CacheDecorator', () => {
       it('should return the cached result if it exists', async () => {
         mockRedis.getKey.resolves(JSON.stringify(8));
         mockRedis.setKey.resolves(true);
-        mockRedis.isInitialized.returns(true);
+        mockRedis.initialized.returns(true);
 
         const activityWrapper = new Activity(
           ActivityLabel,
@@ -527,7 +531,7 @@ describe('CacheDecorator', () => {
 
       it('should not lookup cache, and override the cache', async () => {
         mockRedis.setKey.resolves(true);
-        mockRedis.isInitialized.returns(true);
+        mockRedis.initialized.returns(true);
 
         const activityWrapper = new Activity(
           ActivityLabel,

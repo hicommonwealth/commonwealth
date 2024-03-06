@@ -18,6 +18,7 @@ import {
   ChainType,
   cache,
   delay,
+  dispose,
 } from '@hicommonwealth/core';
 import { models, tokenBalanceCache } from '@hicommonwealth/model';
 import BN from 'bn.js';
@@ -96,7 +97,11 @@ describe('Token Balance Cache Cosmos Tests', function () {
   const addressTwoBalance = '30000000000';
 
   before(async () => {
-    cache(new RedisCache('redis://localhost:6379'));
+    cache(new RedisCache());
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   describe('Cosmos Native', function () {

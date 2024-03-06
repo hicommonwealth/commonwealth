@@ -4,7 +4,7 @@ import {
   RedisCache,
   setupErrorHandlers,
 } from '@hicommonwealth/adapters';
-import { cache, delay, logger } from '@hicommonwealth/core';
+import { cache, logger } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
@@ -26,18 +26,6 @@ const log = logger().getLogger(__filename);
 const redisCache = new RedisCache();
 const cacheDecorator = new CacheDecorator(redisCache);
 cache(redisCache);
-
-const cacheReady = () =>
-  new Promise<Boolean>(async (resolve, reject) => {
-    for (let i = 0; i < 3; i++) {
-      if (redisCache.initialized()) {
-        resolve(true);
-        return;
-      }
-      await delay(3000);
-    }
-    reject('Timeout');
-  });
 
 require('express-async-errors');
 
@@ -132,6 +120,6 @@ setupCosmosProxy(app, models, cacheDecorator);
 setupErrorHandlers(app);
 setupServer();
 
-export { cacheDecorator, cacheReady, redisCache };
+export { cacheDecorator, redisCache };
 
 export default app;

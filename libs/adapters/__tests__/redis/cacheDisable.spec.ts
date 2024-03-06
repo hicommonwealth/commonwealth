@@ -2,16 +2,11 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 require('dotenv').config();
-import { CacheNamespaces } from '@hicommonwealth/core';
+import { CacheNamespaces, dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import express from 'express';
-import {
-  CacheDecorator,
-  connectToRedis,
-  RedisCache,
-  XCACHE_VALUES,
-} from '../../src/redis';
+import express, { RequestHandler, json } from 'express';
+import { CacheDecorator, RedisCache, XCACHE_VALUES } from '../../src/redis';
 import {
   CACHE_ENDPOINTS,
   setupCacheTestEndpoints,
@@ -20,7 +15,7 @@ import {
 chai.use(chaiHttp);
 const expect = chai.expect;
 const app = express();
-app.use(express.json());
+app.use(json() as RequestHandler);
 
 const content_type = {
   json: 'application/json; charset=utf-8',
@@ -64,12 +59,12 @@ describe('Cache Disable Tests', () => {
   process.env.DISABLE_CACHE = 'false';
 
   before(async () => {
-    await connectToRedis(redisCache);
+    await redisCache.ready();
   });
 
   after(async () => {
     await redisCache.deleteNamespaceKeys(route_namespace);
-    await redisCache.closeClient();
+    await dispose()();
   });
 
   it(`verify cache route ${CACHE_ENDPOINTS.TEXT} route and expire`, async () => {

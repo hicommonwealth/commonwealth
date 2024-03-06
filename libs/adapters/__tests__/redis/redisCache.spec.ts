@@ -3,8 +3,8 @@
 /* eslint-disable no-unused-expressions */
 const chai = require('chai');
 const expect = chai.expect;
-import { CacheNamespaces, delay } from '@hicommonwealth/core';
-import { RedisCache, connectToRedis } from '../../src';
+import { CacheNamespaces, delay, dispose } from '@hicommonwealth/core';
+import { RedisCache } from '../../src';
 
 async function addRandomKeys(
   redisCache: RedisCache,
@@ -44,17 +44,16 @@ export async function testExpiry(
 }
 
 describe('RedisCache', () => {
-  let redisCache: RedisCache;
+  const redisCache = new RedisCache();
   const test_namespace: CacheNamespaces = CacheNamespaces.Test_Redis;
 
   before(async () => {
-    redisCache = new RedisCache();
-    await connectToRedis(redisCache);
+    await redisCache.ready();
     await redisCache.deleteNamespaceKeys(test_namespace);
   });
 
   after(async () => {
-    await redisCache.closeClient();
+    await dispose()();
   });
 
   afterEach(async () => {
