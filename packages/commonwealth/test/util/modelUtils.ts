@@ -19,6 +19,19 @@ import app from '../../server-test';
 import { Link, LinkSource, ThreadAttributes } from '@hicommonwealth/model';
 import { TEST_BLOCK_INFO_STRING } from '../../shared/adapters/chain/ethereum/keys';
 
+// This is an ugly hack, but then so is the JavaScript ecosystem
+// Our codebase is currently configured to use CommonJS, but we want to import some
+// ESM modules (@ipld/dag-json, @canvas-js chains).
+// Usually this is done by importing them using `await import(...)` but ts-node
+// replaces this with require, which then fails because you can't call require on ESM modules.
+// So the trick here is to use eval to call `await import`, which then doesn't get replaced
+// by ts-node.
+// https://stackoverflow.com/questions/65265420/how-to-prevent-typescript-from-transpiling-dynamic-imports-into-require
+export async function importEsmModule<T>(name: string): Promise<T> {
+  const module = eval(`(async () => {return await import("${name}")})()`);
+  return module as T;
+}
+
 export const getTopicId = async ({ chain }) => {
   const res = await chai.request
     .agent(app)
@@ -35,7 +48,8 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
   const timestamp = 1665083987891;
 
   if (chain === 'ethereum' || chain === 'alex') {
-    const { SIWESigner } = await import('@canvas-js/chain-ethereum');
+    // @ts-ignore
+    const { SIWESigner } = await importEsmModule('@canvas-js/chain-ethereum');
     const wallet_id = 'metamask';
     const chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
     const sessionSigner = new SIWESigner({ chainId: parseInt(chain_id) });
@@ -46,11 +60,12 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .post('/api/createAddress')
       .set('Accept', 'application/json')
       .send({
-        address: session.address,
+        address: session.address.split(':')[2],
         community_id: chain,
         wallet_id,
         block_info: TEST_BLOCK_INFO_STRING,
       });
+    console.log(res.body);
     const address_id = res.body.result.id;
 
     res = await chai.request
@@ -58,12 +73,13 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .post('/api/verifyAddress')
       .set('Accept', 'application/json')
       .send({
-        address: session.address,
+        address: session.address.split(':')[2],
         community_id: chain,
         chain_id,
         wallet_id,
         session,
       });
+    console.log(res.body);
     const user_id = res.body.result.user.id;
     const email = res.body.result.user.email;
     return {
@@ -76,7 +92,10 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     };
   }
   if (chain === 'edgeware') {
-    const { SubstrateSigner } = await import('@canvas-js/chain-substrate');
+    // @ts-ignore
+    const { SubstrateSigner } = await importEsmModule(
+      '@canvas-js/chain-substrate',
+    );
     const sessionSigner = new SubstrateSigner();
     const session = await sessionSigner.getSession(CANVAS_TOPIC, { timestamp });
     const wallet_id = 'polkadot';
@@ -85,7 +104,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .post('/api/createAddress')
       .set('Accept', 'application/json')
       .send({
-        address: session.address,
+        address: session.address.split(':')[2],
         community_id: chain,
         wallet_id,
       });
@@ -99,7 +118,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .set('Accept', 'application/json')
       .send({
         address_id,
-        address: session.address,
+        address: session.address.split(':')[2],
         user_id,
         email,
         session,
