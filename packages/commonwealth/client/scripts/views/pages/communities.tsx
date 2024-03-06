@@ -8,9 +8,10 @@ import 'pages/communities.scss';
 import React from 'react';
 import app from 'state';
 import CommunityInfo from '../../models/ChainInfo';
-import { CommunityCard, NewCommunityCard } from '../components/CommunityCard';
+import { NewCommunityCard } from '../components/CommunityCard';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
+import { CWRelatedCommunityCard } from '../components/component_kit/new_designs/CWRelatedCommunityCard';
 
 const buildCommunityString = (numCommunities: number) =>
   numCommunities >= 1000
@@ -129,7 +130,14 @@ const CommunitiesPage = () => {
         return threadCountB - threadCountA;
       })
       .map((community: CommunityInfo, i) => {
-        return <CommunityCard key={i} community={community} />;
+        return (
+          <CWRelatedCommunityCard
+            key={i}
+            community={community}
+            memberCount={community.members}
+            threadCount={community.threads}
+          />
+        );
       });
 
     return res;
