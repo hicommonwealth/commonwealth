@@ -21,6 +21,7 @@ const Errors = {
   Unauthorized: 'Unauthorized',
   GroupNotFound: 'Group not found',
   InvalidTopics: 'Invalid topics',
+  SystemManaged: 'Cannot update group that is system-managed',
 };
 
 export type UpdateGroupOptions = {
@@ -53,6 +54,10 @@ export async function __updateGroup(
   });
   if (!isAdmin) {
     throw new AppError(Errors.Unauthorized);
+  }
+
+  if (group.is_system_managed) {
+    throw new AppError(Errors.SystemManaged);
   }
 
   // allow metadata and requirements to be omitted
