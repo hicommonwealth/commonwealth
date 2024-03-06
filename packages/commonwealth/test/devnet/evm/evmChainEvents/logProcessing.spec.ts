@@ -1,8 +1,9 @@
 import { Log } from '@ethersproject/providers';
 import { AbiType, dispose } from '@hicommonwealth/core';
-import { models, tester } from '@hicommonwealth/model';
+import { tester } from '@hicommonwealth/model';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import { getTestAbi } from 'test/integration/evmChainEvents/util';
 import {
   getEvents,
   getLogs,
@@ -38,13 +39,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
 
   before(async () => {
     await tester.seedDb();
-    const abiRes = await models.ContractAbi.findOne({
-      where: {
-        nickname: 'FeiDAO',
-      },
-    });
-
-    abi = abiRes.abi;
+    abi = (await getTestAbi()).abi;
   });
 
   after(async () => {
