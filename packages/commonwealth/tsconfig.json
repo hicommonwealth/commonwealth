@@ -1,7 +1,5 @@
 {
   "extends": "../../tsconfig.json",
-  "module": "esnext",
-  "moduleResolution": "nodenext",
   "compilerOptions": {
     "jsx": "react",
     "skipLibCheck": true,
