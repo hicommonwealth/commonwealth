@@ -513,7 +513,7 @@ async function magicLoginRoute(
         });
       } else if (
         communityToJoin.base === ChainBase.Ethereum &&
-        session.payload.chain.startsWith('eip155:')
+        session.address.startsWith('eip155:')
       ) {
         generatedAddresses.push({
           address: req.body.magicAddress,
