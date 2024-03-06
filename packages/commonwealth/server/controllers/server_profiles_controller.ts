@@ -1,5 +1,10 @@
 import { DB } from '@hicommonwealth/model';
 import {
+  GetMemberProfilesOptions,
+  GetMemberProfilesResult,
+  __getMemberProfiles,
+} from './server_profiles_methods/get_member_profiles';
+import {
   SearchProfilesOptions,
   SearchProfilesResult,
   __searchProfiles,
@@ -16,5 +21,11 @@ export class ServerProfilesController {
     options: SearchProfilesOptions,
   ): Promise<SearchProfilesResult> {
     return __searchProfiles.call(this, options);
+  }
+
+  async getMemberProfiles(
+    options: GetMemberProfilesOptions,
+  ): Promise<GetMemberProfilesResult> {
+    return __getMemberProfiles.call(this, options);
   }
 }

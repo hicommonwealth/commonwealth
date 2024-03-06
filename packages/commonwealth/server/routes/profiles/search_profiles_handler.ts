@@ -44,7 +44,8 @@ export const searchProfilesHandler = async (
     throw new AppError(Errors.NoCommunityForMemberships);
   }
 
-  const profileSearchResults = await controllers.profiles.searchProfiles({
+  // const profileSearchResults = await controllers.profiles.searchProfiles({
+  const profileSearchResults = await controllers.profiles.getMemberProfiles({
     community: req.community,
     search: options.search,
     includeRoles: options.include_roles === 'true',
