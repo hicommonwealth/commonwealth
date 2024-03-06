@@ -84,7 +84,7 @@ describe('Token Balance Cache EVM Tests', function () {
 
   before(async () => {
     const redisCache = new RedisCache();
-    await redisCache.ready();
+    await redisCache.ready(4, 3000);
     cache(redisCache);
   });
 
