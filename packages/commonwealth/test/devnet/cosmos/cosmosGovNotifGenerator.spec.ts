@@ -1,5 +1,5 @@
 import { isDeliverTxSuccess } from '@cosmjs/stargate';
-import { models } from '@hicommonwealth/model';
+import { models, tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import {
   encodeMsgSubmitProposal,
@@ -8,6 +8,7 @@ import {
 import { Any } from 'cosmjs-types/google/protobuf/any';
 import sinon from 'sinon';
 // eslint-disable-next-line max-len
+import { dispose } from '@hicommonwealth/core';
 import { generateCosmosGovNotifications } from '../../../server/workers/cosmosGovNotifications/generateCosmosGovNotifications';
 import { deposit, sendTx, setupTestSigner } from './utils/helpers';
 
@@ -71,6 +72,13 @@ async function enableChains(chains: string[]) {
 }
 
 describe('Cosmos Governance Notification Generator with real proposals', () => {
+  before(async () => {
+    await tester.seedDb();
+  });
+  after(async () => {
+    await dispose()();
+  });
+
   beforeEach('Clear notifications', async () => {
     await models.sequelize.query(`
       DELETE FROM "NotificationsRead";

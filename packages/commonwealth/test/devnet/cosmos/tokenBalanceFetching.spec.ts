@@ -98,6 +98,7 @@ describe('Token Balance Cache Cosmos Tests', function () {
 
   before(async () => {
     await tester.seedDb();
+    await resetChainNode();
     const redisCache = new RedisCache();
     await redisCache.ready();
     cache(redisCache);
@@ -278,10 +279,6 @@ describe('Token Balance Cache Cosmos Tests', function () {
     const addressWithoutNft = 'stars18q3tlnx8vguv2fadqslm7x59ejauvsmntc09ae';
     const contractAddress =
       'stars183uw93940vj49tmpzez09c03w6qn6cgmy03v9srh8n2ntmt9lh3qzn2lac'; // slime world
-
-    before(async () => {
-      await resetChainNode();
-    });
 
     it('should return a single cw721 balance', async () => {
       const balance = await tokenBalanceCache.getBalances({
