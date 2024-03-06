@@ -6,12 +6,16 @@ import {
   delay,
   dispose,
 } from '@hicommonwealth/core';
-import { Balances, models, tokenBalanceCache } from '@hicommonwealth/model';
+import {
+  Balances,
+  models,
+  tester,
+  tokenBalanceCache,
+} from '@hicommonwealth/model';
 import BN from 'bn.js';
 import { expect } from 'chai';
 import Web3 from 'web3';
 import { toWei } from 'web3-utils';
-import { seedDb } from '../../../../../libs/model/src/test';
 import { ChainTesting } from '../../util/evm-chain-testing/sdk/chainTesting';
 import { ERC1155 } from '../../util/evm-chain-testing/sdk/erc1155';
 import { ERC721 } from '../../util/evm-chain-testing/sdk/nft';
@@ -84,7 +88,7 @@ describe('Token Balance Cache EVM Tests', function () {
   const ethChainId = 1337;
 
   before(async () => {
-    await seedDb();
+    await tester.seedDb();
     const redisCache = new RedisCache();
     await redisCache.ready(4, 3000);
     cache(redisCache);

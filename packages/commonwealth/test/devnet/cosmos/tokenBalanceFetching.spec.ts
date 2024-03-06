@@ -20,7 +20,7 @@ import {
   delay,
   dispose,
 } from '@hicommonwealth/core';
-import { models, tokenBalanceCache } from '@hicommonwealth/model';
+import { models, tester, tokenBalanceCache } from '@hicommonwealth/model';
 import BN from 'bn.js';
 import { use as chaiUse, expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -97,6 +97,7 @@ describe('Token Balance Cache Cosmos Tests', function () {
   const addressTwoBalance = '30000000000';
 
   before(async () => {
+    await tester.seedDb();
     const redisCache = new RedisCache();
     await redisCache.ready();
     cache(redisCache);
