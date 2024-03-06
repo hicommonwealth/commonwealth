@@ -1,4 +1,4 @@
-import { ZodError, ZodSchema } from 'zod';
+import { ZodError, ZodObject, ZodRawShape, ZodUndefined, z } from 'zod';
 import { events } from '../schemas';
 import {
   InvalidInput,
@@ -19,12 +19,12 @@ import {
 export const event = async <
   Name extends events.Events,
   Input extends EventSchemas,
-  Output extends ZodSchema,
+  Output extends ZodObject<ZodRawShape> | ZodUndefined = ZodUndefined,
 >(
   { inputs, body }: EventsHandlerMetadata<Input, Output>,
-  { name, payload }: EventContext<Name, typeof events.schemas[Name]>,
+  { name, payload }: EventContext<Name>,
   validate = true,
-): Promise<Partial<Output> | undefined> => {
+): Promise<Partial<z.infer<Output>> | undefined> => {
   try {
     return (
       (await body[name]({

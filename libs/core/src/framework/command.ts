@@ -28,7 +28,7 @@ export const command = async <S extends Schemas>(
       payload: validate ? schemas.input.parse(payload) : payload,
       id,
     };
-    let state: Partial<S['output']> | undefined = undefined;
+    let state: Partial<z.infer<S['output']>> | undefined = undefined;
     for (const fn of auth) {
       // can use deep clone to make it pure
       state = (await fn(context, state)) ?? state;
