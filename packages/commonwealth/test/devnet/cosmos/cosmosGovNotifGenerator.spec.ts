@@ -58,25 +58,26 @@ async function enableChains(chains: string[]) {
 
   for (const id of possibleChains) {
     if (chains.includes(id)) {
-      const [chain] = await models.ChainNode.findOrCreate({
+      const [chainNode] = await models.ChainNode.findOrCreate({
         where: {
-          cosmos_chain_id: 'cosmoz',
+          cosmos_chain_id: id,
           balance_type: BalanceType.Cosmos,
           name: 'Osmosis',
-          url: 'https://osmosis-mainnet.g.com/2',
+          url: `http://localhost:8080/cosmosAPI/${id}`,
+          alt_wallet_url: `http://localhost:8080/cosmosAPI/v1/${id}`,
         },
       });
       const [community] = await models.Community.findOrCreate({
         where: {
           id,
-          chain_node_id: chain.id,
         },
         defaults: {
           name: id,
-          network: ChainNetwork.Compound,
+          network: ChainNetwork.Osmosis,
           type: ChainType.Chain,
           base: ChainBase.CosmosSDK,
           default_symbol: id,
+          chain_node_id: chainNode.id,
         },
       });
       await models.Subscription.findOrCreate({
