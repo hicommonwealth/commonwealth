@@ -3,6 +3,7 @@ import { tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { bech32ToHex } from 'shared/utils';
+import { importEsmModule } from 'test/util/modelUtils';
 import app from '../../../server-test';
 import { TEST_BLOCK_INFO_STRING } from '../../../shared/adapters/chain/ethereum/keys';
 import { CANVAS_TOPIC } from '../../../shared/canvas';
@@ -25,7 +26,8 @@ describe('API Tests', () => {
     });
 
     it('should create an ETH address', async () => {
-      const { SIWESigner } = await import('@canvas-js/chain-ethereum');
+      // @ts-ignore
+      const { SIWESigner } = await importEsmModule('@canvas-js/chain-ethereum');
       const wallet = new SIWESigner({ chainId: 1 });
       const session = await wallet.getSession(CANVAS_TOPIC);
 
@@ -74,8 +76,10 @@ describe('API Tests', () => {
     });
 
     it('should verify an ETH address', async () => {
-      const { SIWESigner } = await import('@canvas-js/chain-ethereum');
-      const ipldDagJson = await import('@ipld/dag-json');
+      // @ts-ignore
+      const { SIWESigner } = await importEsmModule('@canvas-js/chain-ethereum');
+      // @ts-ignore
+      const ipldDagJson = await importEsmModule('@ipld/dag-json');
       const chainId = '1'; // use ETH mainnet for testing
 
       const sessionSigner = new SIWESigner({ chainId: parseInt(chainId) });
