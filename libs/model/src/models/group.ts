@@ -16,6 +16,7 @@ export type GroupAttributes = {
   community_id: string;
   metadata: GroupMetadata;
   requirements: Requirement[];
+  is_system_managed: boolean;
 
   created_at?: Date;
   updated_at?: Date;
@@ -38,6 +39,7 @@ export default (
       community_id: { type: dataTypes.STRING, allowNull: false },
       metadata: { type: dataTypes.JSON, allowNull: false },
       requirements: { type: dataTypes.JSON, allowNull: false },
+      is_system_managed: { type: dataTypes.BOOLEAN, allowNull: false },
 
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },

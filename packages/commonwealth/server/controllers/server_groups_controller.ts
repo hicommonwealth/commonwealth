@@ -11,6 +11,10 @@ import {
   __deleteGroup,
 } from './server_groups_methods/delete_group';
 import {
+  GenerateStakeholderGroupOptions,
+  __generateStakeholderGroup,
+} from './server_groups_methods/generate_stakeholder_group';
+import {
   GetGroupsOptions,
   GetGroupsResult,
   __getGroups,
@@ -63,5 +67,11 @@ export class ServerGroupsController {
 
   async deleteGroup(options: DeleteGroupOptions): Promise<DeleteGroupResult> {
     return __deleteGroup.call(this, options);
+  }
+
+  async generateStakeholderGroup(
+    options: GenerateStakeholderGroupOptions,
+  ): Promise<GenerateStakeholderGroupOptions> {
+    return __generateStakeholderGroup.call(this, options);
   }
 }

@@ -84,5 +84,11 @@ export const createCommunityStakeHandler = async (
     },
   });
 
+  await controllers.groups.generateStakeholderGroup({
+    user: req.user,
+    community: community,
+    address: req.address,
+  });
+
   return success(res, results);
 };

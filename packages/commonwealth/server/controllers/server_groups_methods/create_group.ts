@@ -1,7 +1,7 @@
 import { AppError, Requirement } from '@hicommonwealth/core';
 import {
   AddressInstance,
-  CommunityInstance,
+  CommunityAttributes,
   GroupAttributes,
   GroupMetadata,
   UserInstance,
@@ -29,7 +29,7 @@ const Errors = {
 // FIXME: the schema
 export type CreateGroupOptions = {
   user: UserInstance;
-  community: CommunityInstance;
+  community: CommunityAttributes;
   address: AddressInstance;
   metadata: GroupMetadata;
   requirements: Requirement[];
