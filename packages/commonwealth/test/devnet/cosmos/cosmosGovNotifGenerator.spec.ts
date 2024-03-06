@@ -19,12 +19,12 @@ import { deposit, sendTx, setupTestSigner } from './utils/helpers';
 
 const { expect } = chai;
 
-const v1ChainId = 'csdk-v1';
-const v1RpcUrl = `http://localhost:8080/cosmosAPI/${v1ChainId}`;
+const v1CommunityId = 'csdk-v1';
+const v1RpcUrl = `http://localhost:8080/cosmosAPI/${v1CommunityId}`;
 const v1Content = encodeTextProposal(`v1 title`, `v1 description`);
 
-const v1Beta1ChainId = 'csdk-beta-ci';
-const v1Beta1RpcUrl = `http://localhost:8080/cosmosAPI/${v1Beta1ChainId}`;
+const v1Beta1CommunityId = 'csdk-beta-ci';
+const v1Beta1RpcUrl = `http://localhost:8080/cosmosAPI/${v1Beta1CommunityId}`;
 const v1Beta1Content = encodeTextProposal(
   `beta text title`,
   `beta text description`,
@@ -39,8 +39,8 @@ async function createTestProposal(rpcUrl: string, content: Any) {
   expect(isDeliverTxSuccess(resp), 'TX failed').to.be.true;
 }
 
-async function enableChains(chains: string[]) {
-  const possibleChains = [v1ChainId, v1Beta1ChainId];
+async function enableCommunities(communities: string[]) {
+  const possibleCommunities = [v1CommunityId, v1Beta1CommunityId];
   await models.sequelize.query(`
       DELETE FROM "NotificationsRead";
     `);
@@ -56,13 +56,13 @@ async function enableChains(chains: string[]) {
     },
   });
 
-  for (const id of possibleChains) {
-    if (chains.includes(id)) {
+  for (const id of possibleCommunities) {
+    if (communities.includes(id)) {
       const [chainNode] = await models.ChainNode.findOrCreate({
         where: {
           cosmos_chain_id: id,
           balance_type: BalanceType.Cosmos,
-          name: 'Osmosis',
+          name: `${id}Node`,
           url: `http://localhost:8080/cosmosAPI/${id}`,
           alt_wallet_url: `http://localhost:8080/cosmosAPI/v1/${id}`,
         },
@@ -101,7 +101,7 @@ async function enableChains(chains: string[]) {
 describe('Cosmos Governance Notification Generator with real proposals', () => {
   before(async () => {
     await tester.seedDb();
-    await enableChains([v1ChainId, v1Beta1ChainId]);
+    await enableCommunities([v1CommunityId, v1Beta1CommunityId]);
     await createTestProposal(v1RpcUrl, v1Content);
     await createTestProposal(v1Beta1RpcUrl, v1Beta1Content);
   });
