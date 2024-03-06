@@ -41,7 +41,6 @@ export const createGroupHandler = async (
   const [group, analyticsOptions] = await controllers.groups.createGroup({
     user,
     community,
-    address,
     metadata: metadata as Required<typeof metadata>,
     requirements,
     topics,

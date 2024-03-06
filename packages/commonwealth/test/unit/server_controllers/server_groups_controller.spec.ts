@@ -181,7 +181,6 @@ describe('ServerGroupsController', () => {
     const [result, analytics] = await controller.createGroup({
       user,
       community: chain,
-      address,
       metadata: {
         name: 'blah',
         description: 'blah',

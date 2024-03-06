@@ -7,6 +7,7 @@ import { ServerCommunitiesController } from '../server_communities_controller';
 
 export type GetCommunitiesOptions = {
   hasGroups?: boolean; // only return communities with associated groups
+  includeStakes?: boolean; // include community stakes
 };
 export type GetCommunitiesResult = {
   community: CommunityInstance;
@@ -15,13 +16,19 @@ export type GetCommunitiesResult = {
 
 export async function __getCommunities(
   this: ServerCommunitiesController,
-  { hasGroups }: GetCommunitiesOptions,
+  { hasGroups, includeStakes }: GetCommunitiesOptions,
 ): Promise<GetCommunitiesResult> {
   const communitiesInclude = [];
   if (hasGroups) {
     communitiesInclude.push({
       model: this.models.Group,
       required: true,
+    });
+  }
+  if (includeStakes) {
+    communitiesInclude.push({
+      model: this.models.CommunityStake,
+      required: false,
     });
   }
 

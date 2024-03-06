@@ -1,6 +1,5 @@
 import { AppError, Requirement } from '@hicommonwealth/core';
 import {
-  AddressInstance,
   CommunityAttributes,
   GroupAttributes,
   GroupMetadata,
@@ -30,10 +29,10 @@ const Errors = {
 export type CreateGroupOptions = {
   user: UserInstance;
   community: CommunityAttributes;
-  address: AddressInstance;
   metadata: GroupMetadata;
   requirements: Requirement[];
   topics?: number[];
+  systemManaged?: boolean;
 };
 
 // FIXME: should be partial of the aggregate
@@ -41,7 +40,14 @@ export type CreateGroupResult = [GroupAttributes, TrackOptions];
 
 export async function __createGroup(
   this: ServerGroupsController,
-  { user, community, metadata, requirements, topics }: CreateGroupOptions,
+  {
+    user,
+    community,
+    metadata,
+    requirements,
+    topics,
+    systemManaged,
+  }: CreateGroupOptions,
 ): Promise<CreateGroupResult> {
   // FIXME: authorization
   const isAdmin = await validateOwner({
@@ -101,6 +107,7 @@ export async function __createGroup(
           community_id: community.id,
           metadata,
           requirements,
+          is_system_managed: !!systemManaged,
         },
         { transaction },
       );
