@@ -50,7 +50,7 @@ module.exports = {
 
       await queryInterface.sequelize.query(
         `
-        UPDATE "Threads"
+        UPDATE "Comments"
         SET text = REGEXP_REPLACE(text, '_\\d+_\\d+x\\d+(?=\\.\\w+)', '', 'g')
         WHERE community_id = 'sushi';
       `,
