@@ -1,5 +1,6 @@
 {
   "name": "@hicommonwealth/adapters",
+  "private": "true",
   "version": "0.1.0",
   "description": "External adapters",
   "files": [
