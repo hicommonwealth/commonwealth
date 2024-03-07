@@ -85,14 +85,6 @@ export class RedisCache implements Cache {
   }
 
   /**
-   * Check if redis is initialized
-   * @returns boolean
-   */
-  public initialized(): boolean {
-    return this._client.isReady;
-  }
-
-  /**
    * Awaits redis connection / cache ready
    * @returns
    */
@@ -100,7 +92,7 @@ export class RedisCache implements Cache {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise<boolean>(async (resolve, reject) => {
       for (let i = 0; i < retries; i++) {
-        if (this.initialized()) {
+        if (this.isReady()) {
           resolve(true);
           return;
         }
@@ -108,6 +100,14 @@ export class RedisCache implements Cache {
       }
       reject('RedisCache ready timeout');
     });
+  }
+
+  /**
+   * Check if redis is initialized
+   * @returns boolean
+   */
+  public isReady(): boolean {
+    return this._client.isReady;
   }
 
   /**
@@ -131,7 +131,7 @@ export class RedisCache implements Cache {
     duration = 0,
     notExists = false,
   ): Promise<boolean> {
-    if (!this.initialized()) return false;
+    if (!this.isReady()) return false;
     try {
       const options: { NX: boolean; EX?: number } = {
         NX: notExists,
@@ -158,7 +158,7 @@ export class RedisCache implements Cache {
     namespace: CacheNamespaces,
     key: string,
   ): Promise<string | null> {
-    if (!this.initialized()) return null;
+    if (!this.isReady()) return null;
     try {
       const finalKey = RedisCache.getNamespaceKey(namespace, key);
       return await this._client.get(finalKey);
@@ -186,7 +186,7 @@ export class RedisCache implements Cache {
     duration = 0,
     transaction = true,
   ): Promise<false | Array<'OK' | null>> {
-    if (!this.initialized()) return false;
+    if (!this.isReady()) return false;
 
     // add the namespace prefix to all keys
     const transformedData = Object.keys(data).reduce((result, key) => {
@@ -227,7 +227,7 @@ export class RedisCache implements Cache {
     namespace: CacheNamespaces,
     keys: string[],
   ): Promise<false | Record<string, unknown>> {
-    if (!this.initialized()) return false;
+    if (!this.isReady()) return false;
     const transformedKeys = keys.map((k) =>
       RedisCache.getNamespaceKey(namespace, k),
     );
@@ -258,7 +258,7 @@ export class RedisCache implements Cache {
     key: string,
     increment = 1,
   ): Promise<number | null> {
-    if (!this.initialized()) return null;
+    if (!this.isReady()) return null;
     try {
       const finalKey = RedisCache.getNamespaceKey(namespace, key);
       return await this._client.incrBy(finalKey, increment);
@@ -281,7 +281,7 @@ export class RedisCache implements Cache {
     key: string,
     decrement = 1,
   ): Promise<number | null> {
-    if (!this.initialized()) return null;
+    if (!this.isReady()) return null;
     try {
       const finalKey = RedisCache.getNamespaceKey(namespace, key);
       return await this._client.decrBy(finalKey, decrement);
@@ -304,7 +304,7 @@ export class RedisCache implements Cache {
     key: string,
     ttlInSeconds: number,
   ): Promise<boolean> {
-    if (!this.initialized()) return false;
+    if (!this.isReady()) return false;
     try {
       const finalKey = RedisCache.getNamespaceKey(namespace, key);
       if (ttlInSeconds === 0) {
@@ -331,7 +331,7 @@ export class RedisCache implements Cache {
     namespace: CacheNamespaces,
     key: string,
   ): Promise<number> {
-    if (!this.initialized()) return -2;
+    if (!this.isReady()) return -2;
     try {
       const finalKey = RedisCache.getNamespaceKey(namespace, key);
       // TTL in seconds; -2 if the key does not exist, -1 if the key exists but has no associated expire.
@@ -354,7 +354,7 @@ export class RedisCache implements Cache {
   ): Promise<{ [key: string]: string } | boolean> {
     const keys = [];
     const data = {} as any;
-    if (!this.initialized()) return false;
+    if (!this.isReady()) return false;
     try {
       for await (const key of this._client.scanIterator({
         MATCH: `${namespace}*`,
@@ -380,7 +380,7 @@ export class RedisCache implements Cache {
   public async deleteNamespaceKeys(
     namespace: CacheNamespaces,
   ): Promise<number | boolean> {
-    if (!this.initialized()) return false;
+    if (!this.isReady()) return false;
     try {
       let count = 0;
       const data = await this.getNamespaceKeys(namespace);
@@ -408,7 +408,7 @@ export class RedisCache implements Cache {
     namespace: CacheNamespaces,
     key: string,
   ): Promise<number> {
-    if (!this.initialized()) return 0;
+    if (!this.isReady()) return 0;
     const finalKey = RedisCache.getNamespaceKey(namespace, key);
     try {
       return this._client.del(finalKey);
@@ -418,7 +418,7 @@ export class RedisCache implements Cache {
   }
 
   public async flushAll(): Promise<void> {
-    if (!this.initialized()) return;
+    if (!this.isReady()) return;
     try {
       await this._client.flushAll();
     } catch (e) {

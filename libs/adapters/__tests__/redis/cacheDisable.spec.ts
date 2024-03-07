@@ -48,19 +48,19 @@ async function makePostRequest(endpoint, body, headers = {}) {
 }
 
 describe('Cache Disable Tests', () => {
-  process.env.DISABLE_CACHE = 'true';
   console.log(
     `Cache Disable Tests: DISABLE_CACHE ${process.env.DISABLE_CACHE}`,
   );
   const route_namespace: CacheNamespaces = CacheNamespaces.Route_Response;
   let cacheDecorator;
-  process.env.DISABLE_CACHE = 'false';
 
   before(async () => {
+    process.env.DISABLE_CACHE = 'true';
     cache(new RedisCache('redis://localhost:6379'));
     cacheDecorator = new CacheDecorator();
     await cache().ready();
     setupCacheTestEndpoints(app, cacheDecorator);
+    process.env.DISABLE_CACHE = 'false';
   });
 
   after(async () => {

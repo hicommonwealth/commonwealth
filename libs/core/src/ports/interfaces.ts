@@ -63,6 +63,7 @@ export interface Stats extends Disposable {
  */
 export interface Cache extends Disposable {
   ready(): Promise<boolean>;
+  isReady(): boolean;
   getKey(namespace: CacheNamespaces, key: string): Promise<string | null>;
   setKey(
     namespace: CacheNamespaces,

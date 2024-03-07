@@ -25,7 +25,7 @@ describe('CacheDecorator', () => {
   beforeEach(() => {
     sinon.restore();
     mockCache = sinon.stub(cache());
-    //mockCache.ready.resolves(true);
+    mockCache.isReady.returns(true);
   });
 
   describe('cacheWrap', () => {
@@ -79,26 +79,26 @@ describe('CacheDecorator', () => {
           expect(mockCache.setKey.called).to.be.false;
         });
 
-        // it('should call the function if redis cache not initialized', async () => {
-        //   const fn = async () => 'test-result';
-        //   const key = 'test-key';
-        //   const duration = 60;
+        it('should call the function if redis cache not initialized', async () => {
+          const fn = async () => 'test-result';
+          const key = 'test-key';
+          const duration = 60;
 
-        //   mockCache.ready.resolves(false);
+          mockCache.isReady.returns(false);
 
-        //   const wrapFn = cacheDecorator.cacheWrap(
-        //     false,
-        //     fn,
-        //     key,
-        //     duration,
-        //     CacheNamespaces.Function_Response,
-        //   );
-        //   const result = await wrapFn();
+          const wrapFn = cacheDecorator.cacheWrap(
+            false,
+            fn,
+            key,
+            duration,
+            CacheNamespaces.Function_Response,
+          );
+          const result = await wrapFn();
 
-        //   expect(result).to.equal('test-result');
-        //   expect(mockCache.getKey.called).to.be.false;
-        //   expect(mockCache.setKey.called).to.be.false;
-        // });
+          expect(result).to.equal('test-result');
+          expect(mockCache.getKey.called).to.be.false;
+          expect(mockCache.setKey.called).to.be.false;
+        });
 
         it('if override is true skip lookup and still set cache', async () => {
           const fn = async () => 'test-result';

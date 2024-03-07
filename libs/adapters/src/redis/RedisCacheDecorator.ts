@@ -30,13 +30,14 @@ export class FuncExecError extends Error {
 
 export class CacheDecorator {
   private _log?: ILogger;
+  private _disabled = false;
 
   constructor() {
     this._log = logger().getLogger(__filename);
     // If cache is disabled, skip caching
     if (process.env.DISABLE_CACHE === 'true') {
       this._log.info(`cacheMiddleware: cache disabled`);
-      return;
+      this._disabled = true;
     }
   }
 
@@ -412,7 +413,7 @@ export class CacheDecorator {
     return { cacheKey, cacheDuration };
   }
 
-  private async isEnabled() {
-    return cache().ready();
+  private isEnabled() {
+    return !this._disabled && cache().isReady();
   }
 }
