@@ -4,7 +4,6 @@ import {
   commonProtocol,
 } from '@hicommonwealth/core';
 import {
-  AddressAttributes,
   CommunityAttributes,
   GroupAttributes,
   UserInstance,
@@ -23,7 +22,6 @@ const Errors = {
 export type GenerateStakeholderGroupOptions = {
   user: UserInstance;
   community: CommunityAttributes;
-  address: AddressAttributes;
 };
 
 export type GenerateStakeholderGroupResult = GroupAttributes | null;

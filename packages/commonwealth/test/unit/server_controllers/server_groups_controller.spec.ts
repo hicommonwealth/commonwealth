@@ -177,7 +177,7 @@ describe('ServerGroupsController', () => {
 
   describe('#createGroup', async () => {
     const controller = createMockedGroupsController();
-    const { user, chain, address } = createMockParams();
+    const { user, chain } = createMockParams();
     const [result, analytics] = await controller.createGroup({
       user,
       community: chain,
@@ -202,12 +202,11 @@ describe('ServerGroupsController', () => {
 
   describe('#createGroup (invalid requirements)', async () => {
     const controller = createMockedGroupsController();
-    const { user, chain, address } = createMockParams();
+    const { user, chain } = createMockParams();
     expect(
       controller.createGroup({
         user,
         community: chain,
-        address,
         metadata: {
           name: 'blah',
           description: 'blah',
