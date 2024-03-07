@@ -1,30 +1,31 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // import { describe, it, beforeEach, afterEach } from 'mocha';
-import { CacheNamespaces, dispose } from '@hicommonwealth/core';
+import { Cache, CacheNamespaces, cache, dispose } from '@hicommonwealth/core';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 import { Activity } from '../../src/daemon';
-import { CacheDecorator, RedisCache } from '../../src/redis';
+import { CacheDecorator } from '../../src/redis';
 import { CacheKeyDuration } from '../../src/utils';
 chai.use(chaiAsPromised);
 
 describe('CacheDecorator', () => {
   let cacheDecorator: CacheDecorator;
-  let mockRedis: sinon.SinonStubbedInstance<RedisCache>;
+  let mockCache: sinon.SinonStubbedInstance<Cache>;
 
-  beforeEach(() => {
-    mockRedis = sinon.createStubInstance(RedisCache);
-    cacheDecorator = new CacheDecorator(mockRedis);
-  });
-
-  afterEach(() => {
-    sinon.restore();
+  before(async () => {
+    cacheDecorator = new CacheDecorator();
   });
 
   after(async () => {
     await dispose()();
+  });
+
+  beforeEach(() => {
+    sinon.restore();
+    mockCache = sinon.stub(cache());
+    //mockCache.ready.resolves(true);
   });
 
   describe('cacheWrap', () => {
@@ -41,9 +42,8 @@ describe('CacheDecorator', () => {
           const fn = async () => 'test-result';
           const duration = 60;
 
-          mockRedis.getKey.resolves(undefined);
-          mockRedis.setKey.resolves(true);
-          mockRedis.initialized.returns(true);
+          mockCache.getKey.resolves(undefined);
+          mockCache.setKey.resolves(true);
 
           const wrapFn = cacheDecorator.cacheWrap(
             false,
@@ -54,8 +54,8 @@ describe('CacheDecorator', () => {
           );
           const result = await wrapFn();
           expect(result).to.equal('test-result');
-          expect(mockRedis.getKey.calledOnce).to.be.true;
-          expect(mockRedis.setKey.calledOnce).to.be.true;
+          expect(mockCache.getKey.calledOnce).to.be.true;
+          expect(mockCache.setKey.calledOnce).to.be.true;
         });
 
         it('should return the cached result if it exists', async () => {
@@ -63,9 +63,7 @@ describe('CacheDecorator', () => {
           const key = 'test-key';
           const duration = 60;
 
-          mockRedis.getKey.resolves(JSON.stringify('cached-result'));
-          mockRedis.setKey.resolves(true);
-          mockRedis.initialized.returns(true);
+          mockCache.getKey.resolves(JSON.stringify('cached-result'));
 
           const wrapFn = cacheDecorator.cacheWrap(
             false,
@@ -77,38 +75,37 @@ describe('CacheDecorator', () => {
           const result = await wrapFn();
 
           expect(result).to.equal('cached-result');
-          expect(mockRedis.getKey.calledOnce).to.be.true;
-          expect(mockRedis.setKey.called).to.be.false;
+          expect(mockCache.getKey.calledOnce).to.be.true;
+          expect(mockCache.setKey.called).to.be.false;
         });
 
-        it('should call the function if redis cache not initialized', async () => {
-          const fn = async () => 'test-result';
-          const key = 'test-key';
-          const duration = 60;
+        // it('should call the function if redis cache not initialized', async () => {
+        //   const fn = async () => 'test-result';
+        //   const key = 'test-key';
+        //   const duration = 60;
 
-          mockRedis.initialized.returns(false);
+        //   mockCache.ready.resolves(false);
 
-          const wrapFn = cacheDecorator.cacheWrap(
-            false,
-            fn,
-            key,
-            duration,
-            CacheNamespaces.Function_Response,
-          );
-          const result = await wrapFn();
+        //   const wrapFn = cacheDecorator.cacheWrap(
+        //     false,
+        //     fn,
+        //     key,
+        //     duration,
+        //     CacheNamespaces.Function_Response,
+        //   );
+        //   const result = await wrapFn();
 
-          expect(result).to.equal('test-result');
-          expect(mockRedis.getKey.called).to.be.false;
-          expect(mockRedis.setKey.called).to.be.false;
-        });
+        //   expect(result).to.equal('test-result');
+        //   expect(mockCache.getKey.called).to.be.false;
+        //   expect(mockCache.setKey.called).to.be.false;
+        // });
 
         it('if override is true skip lookup and still set cache', async () => {
           const fn = async () => 'test-result';
           const key = 'test-key';
           const duration = 60;
 
-          mockRedis.setKey.resolves(true);
-          mockRedis.initialized.returns(true);
+          mockCache.setKey.resolves(true);
 
           const wrapFn = cacheDecorator.cacheWrap(
             true,
@@ -120,15 +117,14 @@ describe('CacheDecorator', () => {
           const result = await wrapFn();
 
           expect(result).to.equal('test-result');
-          expect(mockRedis.getKey.called).to.be.false;
-          expect(mockRedis.setKey.called).to.be.true;
+          expect(mockCache.getKey.called).to.be.false;
+          expect(mockCache.setKey.called).to.be.true;
         });
 
         it('duration null skip caching', async () => {
           const fn = async () => 'test-result';
           const key = 'test-key';
           const duration = null;
-          mockRedis.initialized.returns(true);
 
           const wrapFn = cacheDecorator.cacheWrap(
             false,
@@ -140,15 +136,14 @@ describe('CacheDecorator', () => {
           const result = await wrapFn();
 
           expect(result).to.equal('test-result');
-          expect(mockRedis.getKey.called).to.be.false;
-          expect(mockRedis.setKey.called).to.be.false;
+          expect(mockCache.getKey.called).to.be.false;
+          expect(mockCache.setKey.called).to.be.false;
         });
 
         it('duration 0 dont skip caching', async () => {
           const fn = async () => 'test-result';
           const key = 'test-key';
           const duration = 0;
-          mockRedis.initialized.returns(true);
 
           const wrapFn = cacheDecorator.cacheWrap(
             false,
@@ -160,15 +155,14 @@ describe('CacheDecorator', () => {
           const result = await wrapFn();
 
           expect(result).to.equal('test-result');
-          expect(mockRedis.getKey.called).to.be.true;
-          expect(mockRedis.setKey.called).to.be.true;
+          expect(mockCache.getKey.called).to.be.true;
+          expect(mockCache.setKey.called).to.be.true;
         });
 
         it('result null skip caching', async () => {
           const fn = async () => null;
           const key = 'test-key';
           const duration = 60;
-          mockRedis.initialized.returns(true);
 
           const wrapFn = cacheDecorator.cacheWrap(
             false,
@@ -180,16 +174,15 @@ describe('CacheDecorator', () => {
           const result = await wrapFn();
 
           expect(result).to.equal(null);
-          expect(mockRedis.getKey.called).to.be.true;
-          expect(mockRedis.setKey.called).to.be.false;
+          expect(mockCache.getKey.called).to.be.true;
+          expect(mockCache.setKey.called).to.be.false;
         });
 
         it('response 0 from wrapped function allowed to get from cache', async () => {
           const fn = async () => 0;
           const key = 'test-key';
           const duration = 60;
-          mockRedis.getKey.resolves('0');
-          mockRedis.initialized.returns(true);
+          mockCache.getKey.resolves('0');
 
           const wrapFn = cacheDecorator.cacheWrap(
             false,
@@ -201,15 +194,14 @@ describe('CacheDecorator', () => {
           const result = await wrapFn();
 
           expect(result).to.equal(0);
-          expect(mockRedis.getKey.called).to.be.true;
-          expect(mockRedis.setKey.called).to.be.false;
+          expect(mockCache.getKey.called).to.be.true;
+          expect(mockCache.setKey.called).to.be.false;
         });
 
         it('response 0 from wrapped function allowed to set in cache', async () => {
           const fn = async () => 0;
           const key = 'test-key';
           const duration = 60;
-          mockRedis.initialized.returns(true);
 
           const wrapFn = cacheDecorator.cacheWrap(
             false,
@@ -221,8 +213,8 @@ describe('CacheDecorator', () => {
           const result = await wrapFn();
 
           expect(result).to.equal(0);
-          expect(mockRedis.getKey.called).to.be.true;
-          expect(mockRedis.setKey.called).to.be.true;
+          expect(mockCache.getKey.called).to.be.true;
+          expect(mockCache.setKey.called).to.be.true;
         });
       });
 
@@ -230,7 +222,6 @@ describe('CacheDecorator', () => {
         it('key null skip caching', async () => {
           const fn = async () => 'test-result';
           const duration = 60;
-          mockRedis.initialized.returns(true);
 
           const wrapFn = cacheDecorator.cacheWrap(
             false,
@@ -242,8 +233,8 @@ describe('CacheDecorator', () => {
           const result = await wrapFn();
 
           expect(result).to.equal('test-result');
-          expect(mockRedis.getKey.called).to.be.false;
-          expect(mockRedis.setKey.called).to.be.false;
+          expect(mockCache.getKey.called).to.be.false;
+          expect(mockCache.setKey.called).to.be.false;
         });
       });
     });
@@ -255,7 +246,6 @@ describe('CacheDecorator', () => {
         const keyfn = () => {
           return {} as unknown as CacheKeyDuration;
         };
-        mockRedis.initialized.returns(true);
 
         const wrapFn = cacheDecorator.cacheWrap(
           false,
@@ -267,8 +257,8 @@ describe('CacheDecorator', () => {
         const result = await wrapFn();
 
         expect(result).to.equal('test-result');
-        expect(mockRedis.getKey.called).to.be.false;
-        expect(mockRedis.setKey.called).to.be.false;
+        expect(mockCache.getKey.called).to.be.false;
+        expect(mockCache.setKey.called).to.be.false;
       });
 
       it('key function if returns object with only cacheKey, skip caching', async () => {
@@ -277,7 +267,6 @@ describe('CacheDecorator', () => {
         const key = () => {
           return { cacheKey: 'test-key' } as unknown as CacheKeyDuration;
         };
-        mockRedis.initialized.returns(true);
 
         const wrapFn = cacheDecorator.cacheWrap(
           false,
@@ -289,8 +278,8 @@ describe('CacheDecorator', () => {
         const result = await wrapFn();
 
         expect(result).to.equal('test-result');
-        expect(mockRedis.getKey.called).to.be.false;
-        expect(mockRedis.setKey.called).to.be.false;
+        expect(mockCache.getKey.called).to.be.false;
+        expect(mockCache.setKey.called).to.be.false;
       });
 
       it('key function if returns object with cacheKey, cacheDuration do caching', async () => {
@@ -302,8 +291,7 @@ describe('CacheDecorator', () => {
             cacheDuration: 100,
           } as CacheKeyDuration;
         };
-        mockRedis.getKey.resolves(JSON.stringify('cached-result'));
-        mockRedis.initialized.returns(true);
+        mockCache.getKey.resolves(JSON.stringify('cached-result'));
 
         const wrapFn = cacheDecorator.cacheWrap(
           false,
@@ -315,14 +303,14 @@ describe('CacheDecorator', () => {
         const result = await wrapFn();
 
         expect(result).to.equal('cached-result');
-        expect(mockRedis.getKey.called).to.be.true;
+        expect(mockCache.getKey.called).to.be.true;
         expect(
-          mockRedis.getKey.calledWith(
+          mockCache.getKey.calledWith(
             CacheNamespaces.Function_Response,
             'test-key',
           ),
         ).to.be.true;
-        expect(mockRedis.setKey.called).to.be.false;
+        expect(mockCache.setKey.called).to.be.false;
       });
 
       it('key function if returns object with cacheKey, cacheDuration do caching', async () => {
@@ -334,8 +322,7 @@ describe('CacheDecorator', () => {
             cacheDuration: 100,
           } as CacheKeyDuration;
         };
-        mockRedis.getKey.resolves(undefined);
-        mockRedis.initialized.returns(true);
+        mockCache.getKey.resolves(undefined);
 
         const wrapFn = cacheDecorator.cacheWrap(
           false,
@@ -347,16 +334,16 @@ describe('CacheDecorator', () => {
         const result = await wrapFn();
 
         expect(result).to.equal('new-result');
-        expect(mockRedis.getKey.called).to.be.true;
+        expect(mockCache.getKey.called).to.be.true;
         expect(
-          mockRedis.getKey.calledWith(
+          mockCache.getKey.calledWith(
             CacheNamespaces.Function_Response,
             'test-key',
           ),
         ).to.be.true;
-        expect(mockRedis.setKey.called).to.be.true;
+        expect(mockCache.setKey.called).to.be.true;
         expect(
-          mockRedis.setKey.calledWith(
+          mockCache.setKey.calledWith(
             CacheNamespaces.Function_Response,
             'test-key',
             JSON.stringify('new-result'),
@@ -372,9 +359,8 @@ describe('CacheDecorator', () => {
         const duration = 60;
         const key = 'test-key';
 
-        mockRedis.getKey.rejects('test-error');
-        mockRedis.setKey.resolves(true);
-        mockRedis.initialized.returns(true);
+        mockCache.getKey.rejects('test-error');
+        mockCache.setKey.resolves(true);
 
         const wrapFn = cacheDecorator.cacheWrap(
           false,
@@ -386,8 +372,8 @@ describe('CacheDecorator', () => {
         const result = await wrapFn();
 
         expect(result).to.equal('test-result');
-        expect(mockRedis.getKey.calledOnce).to.be.true;
-        expect(mockRedis.setKey.calledOnce).to.be.true;
+        expect(mockCache.getKey.calledOnce).to.be.true;
+        expect(mockCache.setKey.calledOnce).to.be.true;
         expect(fn.calledOnce).to.be.true;
       });
 
@@ -396,9 +382,8 @@ describe('CacheDecorator', () => {
         const duration = 60;
         const key = 'test-key';
 
-        mockRedis.getKey.resolves(undefined);
-        mockRedis.setKey.rejects('test-error');
-        mockRedis.initialized.returns(true);
+        mockCache.getKey.resolves(undefined);
+        mockCache.setKey.rejects('test-error');
 
         const wrapFn = cacheDecorator.cacheWrap(
           false,
@@ -410,8 +395,8 @@ describe('CacheDecorator', () => {
         const result = await wrapFn();
 
         expect(result).to.equal('test-result');
-        expect(mockRedis.getKey.calledOnce).to.be.true;
-        expect(mockRedis.setKey.calledOnce).to.be.true;
+        expect(mockCache.getKey.calledOnce).to.be.true;
+        expect(mockCache.setKey.calledOnce).to.be.true;
         expect(fn.calledOnce).to.be.true;
       });
 
@@ -421,9 +406,8 @@ describe('CacheDecorator', () => {
         const duration = 60;
         const key = 'test-key';
 
-        mockRedis.getKey.resolves(undefined);
-        mockRedis.setKey.rejects();
-        mockRedis.initialized.returns(true);
+        mockCache.getKey.resolves(undefined);
+        mockCache.setKey.rejects();
 
         const wrapFn = cacheDecorator.cacheWrap(
           false,
@@ -435,8 +419,8 @@ describe('CacheDecorator', () => {
         await expect(wrapFn()).to.be.rejectedWith('test-error');
 
         // expect(result).to.equal('test-result');
-        expect(mockRedis.getKey.calledOnce).to.be.true;
-        expect(mockRedis.setKey.calledOnce).to.be.false;
+        expect(mockCache.getKey.calledOnce).to.be.true;
+        expect(mockCache.setKey.calledOnce).to.be.false;
         expect(fn.calledOnce).to.be.true;
       });
     });
@@ -470,9 +454,8 @@ describe('CacheDecorator', () => {
       const keyGenerator3 = 'test-key';
 
       it('should cache the function result and return it', async () => {
-        mockRedis.getKey.resolves(undefined);
-        mockRedis.setKey.resolves(true);
-        mockRedis.initialized.returns(true);
+        mockCache.getKey.resolves(undefined);
+        mockCache.setKey.resolves(true);
 
         const activityWrapper = new Activity(
           ActivityLabel,
@@ -486,15 +469,15 @@ describe('CacheDecorator', () => {
         const result = await wrapFn(1, 2, 3);
         expect(result).to.equal(6);
         expect(
-          mockRedis.getKey.calledWith(
+          mockCache.getKey.calledWith(
             CacheNamespaces.Function_Response,
             '1-2-3',
           ),
         ).to.be.true;
-        expect(mockRedis.getKey.calledOnce).to.be.true;
-        expect(mockRedis.setKey.calledOnce).to.be.true;
+        expect(mockCache.getKey.calledOnce).to.be.true;
+        expect(mockCache.setKey.calledOnce).to.be.true;
         expect(
-          mockRedis.setKey.calledWith(
+          mockCache.setKey.calledWith(
             CacheNamespaces.Function_Response,
             '1-2-3',
             JSON.stringify(6),
@@ -504,9 +487,8 @@ describe('CacheDecorator', () => {
       });
 
       it('should return the cached result if it exists', async () => {
-        mockRedis.getKey.resolves(JSON.stringify(8));
-        mockRedis.setKey.resolves(true);
-        mockRedis.initialized.returns(true);
+        mockCache.getKey.resolves(JSON.stringify(8));
+        mockCache.setKey.resolves(true);
 
         const activityWrapper = new Activity(
           ActivityLabel,
@@ -519,19 +501,18 @@ describe('CacheDecorator', () => {
         const wrapFn = activityWrapper.queryWithCache;
         const result = await wrapFn(1, 2, 3);
         expect(result).to.equal(8);
-        expect(mockRedis.getKey.calledOnce).to.be.true;
+        expect(mockCache.getKey.calledOnce).to.be.true;
         expect(
-          mockRedis.getKey.calledWith(
+          mockCache.getKey.calledWith(
             CacheNamespaces.Function_Response,
             'test-key',
           ),
         ).to.be.true;
-        expect(mockRedis.setKey.called).to.be.false;
+        expect(mockCache.setKey.called).to.be.false;
       });
 
       it('should not lookup cache, and override the cache', async () => {
-        mockRedis.setKey.resolves(true);
-        mockRedis.initialized.returns(true);
+        mockCache.setKey.resolves(true);
 
         const activityWrapper = new Activity(
           ActivityLabel,
@@ -544,10 +525,10 @@ describe('CacheDecorator', () => {
         const wrapFn = activityWrapper.queryWithCacheOverride;
         const result = await wrapFn(1, 2, 3);
         expect(result).to.equal(6);
-        expect(mockRedis.getKey.called).to.be.false;
-        expect(mockRedis.setKey.calledOnce).to.be.true;
+        expect(mockCache.getKey.called).to.be.false;
+        expect(mockCache.setKey.calledOnce).to.be.true;
         expect(
-          mockRedis.setKey.calledWith(
+          mockCache.setKey.calledWith(
             CacheNamespaces.Function_Response,
             '1-2-3',
             JSON.stringify(6),

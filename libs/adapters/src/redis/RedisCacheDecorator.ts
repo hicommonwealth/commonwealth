@@ -6,7 +6,6 @@ import {
   defaultKeyGenerator,
   isCacheKeyDuration,
 } from '../utils/cacheKeyUtils';
-import { RedisCache } from './RedisCacheAdapter';
 
 const XCACHE_HEADER = 'X-Cache';
 export enum XCACHE_VALUES {
@@ -31,7 +30,6 @@ export class FuncExecError extends Error {
 
 export class CacheDecorator {
   private _log?: ILogger;
-  private _redisCache?: RedisCache;
 
   constructor() {
     this._log = logger().getLogger(__filename);
@@ -40,7 +38,6 @@ export class CacheDecorator {
       this._log.info(`cacheMiddleware: cache disabled`);
       return;
     }
-    cache().name === 'RedisCache' && (this._redisCache = cache() as RedisCache);
   }
 
   /**
@@ -212,7 +209,7 @@ export class CacheDecorator {
     duration: seconds,
     keyGenerator: (
       req: CustomRequest,
-    ) => string | CacheKeyDuration = defaultKeyGenerator,
+    ) => string | CacheKeyDuration | null = defaultKeyGenerator,
     namespace: CacheNamespaces = CacheNamespaces.Route_Response,
   ): RequestHandler {
     return async function cache(
@@ -396,7 +393,7 @@ export class CacheDecorator {
     req: Request,
     keyGenerator: (
       req: CustomRequest,
-    ) => string | CacheKeyDuration = defaultKeyGenerator,
+    ) => string | CacheKeyDuration | null = defaultKeyGenerator,
     duration: seconds,
   ) {
     // if you like to skip caching based on some condition, return null from keyGenerator
@@ -415,7 +412,7 @@ export class CacheDecorator {
     return { cacheKey, cacheDuration };
   }
 
-  private isEnabled(): boolean {
-    return this._redisCache?.initialized() ?? false;
+  private async isEnabled() {
+    return cache().ready();
   }
 }

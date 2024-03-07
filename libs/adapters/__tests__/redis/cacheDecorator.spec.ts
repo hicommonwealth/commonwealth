@@ -2,7 +2,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 require('dotenv').config();
-import { CacheNamespaces, delay, dispose } from '@hicommonwealth/core';
+import { CacheNamespaces, cache, delay, dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import express, { RequestHandler, json } from 'express';
@@ -48,10 +48,8 @@ async function makePostRequest(endpoint, body, headers = {}) {
 }
 
 describe('Cache Decorator', () => {
-  const redisCache = new RedisCache('redis://localhost:6379');
+  let cacheDecorator: CacheDecorator;
   const route_namespace: CacheNamespaces = CacheNamespaces.Route_Response;
-  const cacheDecorator = new CacheDecorator(redisCache);
-  setupCacheTestEndpoints(app, cacheDecorator);
 
   async function verifyCacheResponse(key, res, resEarlier) {
     expect(res).to.have.status(200);
@@ -66,11 +64,14 @@ describe('Cache Decorator', () => {
   }
 
   before(async () => {
-    await redisCache.ready();
+    cache(new RedisCache('redis://localhost:6379'));
+    cacheDecorator = new CacheDecorator();
+    setupCacheTestEndpoints(app, cacheDecorator);
+    await cache().ready();
   });
 
   after(async () => {
-    await redisCache.deleteNamespaceKeys(route_namespace);
+    await cache().deleteNamespaceKeys(route_namespace);
     await dispose()();
   });
 
