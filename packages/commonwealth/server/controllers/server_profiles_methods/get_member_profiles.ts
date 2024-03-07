@@ -148,6 +148,41 @@ export async function __getMemberProfiles(
     type: QueryTypes.SELECT,
   });
   const totalResults = fullResults.length;
+
+  // TODO: batch fetch stake balance for all addresses
+  if (includeStakeBalances) {
+    const stakeholderGroup = await this.models.Group.findOne({
+      where: {
+        community_id: community.id,
+        is_system_managed: true,
+      },
+    });
+    if (!stakeholderGroup) {
+      throw new AppError(Errors.StakeholderGroup);
+    }
+    const groups = [stakeholderGroup];
+    const addresses = fullResults.map((p) => p.addresses).flat();
+    const getBalancesOptions = makeGetBalancesOptions(groups, addresses);
+    const balancesResult = await Promise.all(
+      getBalancesOptions.map(async (options) => {
+        return {
+          options,
+          balances: await tokenBalanceCache.getBalances({
+            ...options,
+          }),
+        };
+      }),
+    );
+    console.log('RESULT: ', balancesResult);
+    const balances = balancesResult?.[0]?.balances || {};
+    // add balances to profiles
+    for (const profile of profilesWithAddresses) {
+      for (const address of profile.addresses) {
+        address.stake_balance = balances[address.address];
+      }
+    }
+  }
+
   const paginatedResults = fullResults
     .slice()
     .sort((a, b) => {
@@ -184,42 +219,6 @@ export async function __getMemberProfiles(
       };
     },
   );
-
-  // TODO: batch fetch stake balance for all addresses
-  if (includeStakeBalances) {
-    const stakeholderGroup = await this.models.Group.findOne({
-      where: {
-        community_id: community.id,
-        is_system_managed: true,
-      },
-    });
-    if (!stakeholderGroup) {
-      throw new AppError(Errors.StakeholderGroup);
-    }
-    const groups = [stakeholderGroup];
-    const addresses = profilesWithAddresses
-      .map((p) => p.addresses.map((a) => a.address))
-      .flat();
-    const getBalancesOptions = makeGetBalancesOptions(groups, addresses);
-    const balancesResult = await Promise.all(
-      getBalancesOptions.map(async (options) => {
-        return {
-          options,
-          balances: await tokenBalanceCache.getBalances({
-            ...options,
-          }),
-        };
-      }),
-    );
-    console.log('RESULT: ', balancesResult);
-    const balances = balancesResult?.[0]?.balances || {};
-    // add balances to profiles
-    for (const profile of profilesWithAddresses) {
-      for (const address of profile.addresses) {
-        address.stake_balance = balances[address.address];
-      }
-    }
-  }
 
   if (includeRoles) {
     const profileAddressIds = profilesWithAddresses.reduce((acc, p) => {
