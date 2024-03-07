@@ -30,7 +30,7 @@ export const GetBulkThread = (): QueryMetadata<
       stage,
       topicId,
       includePinnedThreads,
-      page,
+      cursor,
       limit,
       orderBy,
       fromDate,
@@ -40,14 +40,14 @@ export const GetBulkThread = (): QueryMetadata<
     // query params that bind to sql query
     const bind = (() => {
       const _limit = limit ? (limit > 500 ? 500 : limit) : 20;
-      const _page = page || 1;
-      const _offset = _limit * (_page - 1) || 0;
+      const _cursor = cursor || 1;
+      const _offset = _limit * (_cursor - 1) || 0;
       const _to_date = toDate || moment().toISOString();
 
       return {
         from_date: fromDate,
         to_date: _to_date,
-        page: _page,
+        cursor: _cursor,
         limit: _limit,
         offset: _offset,
         ...(community_id && { community_id: community_id }),
@@ -247,7 +247,7 @@ export const GetBulkThread = (): QueryMetadata<
 
     return {
       limit: bind.limit,
-      page: bind.page,
+      cursor: bind.cursor,
       // data params
       threads,
       numVotingThreads,

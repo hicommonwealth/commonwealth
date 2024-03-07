@@ -9,6 +9,7 @@ import {
   type Schemas,
 } from '@hicommonwealth/core';
 import { TRPCError, initTRPC } from '@trpc/server';
+import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { Request } from 'express';
 import passport from 'passport';
 import {
@@ -161,11 +162,7 @@ export const query = <S extends Schemas>(factory: () => QueryMetadata<S>) => {
       },
       protect: md.secure,
     })
-    .input(
-      md.schemas.input.extend({
-        address_id: z.string().optional(),
-      }),
-    )
+    .input(md.schemas.input)
     .output(md.schemas.output)
     .query(async ({ ctx, input }) => {
       if (md.secure) await authenticate(ctx.req);
@@ -188,7 +185,15 @@ export const query = <S extends Schemas>(factory: () => QueryMetadata<S>) => {
     });
 };
 
+// used for TRPC like routes (Internal)
 export const toExpress = (router: OpenApiRouter) =>
+  createExpressMiddleware({
+    router,
+    createContext: ({ req }) => ({ req }),
+  });
+
+// used for REST like routes (External)
+export const toOpenApiExpress = (router: OpenApiRouter) =>
   createOpenApiExpressMiddleware({
     router,
     createContext: ({ req }) => ({ req }),

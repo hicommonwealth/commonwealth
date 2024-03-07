@@ -6,7 +6,6 @@ import useBrowserWindow from 'hooks/useBrowserWindow';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
-import { useFetchThreadsQuery } from 'state/api/threads';
 import { useDateCursor } from 'state/api/threads/fetchThreads';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import { slugify } from 'utils';
@@ -75,25 +74,25 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const isOnArchivePage =
     location.pathname === `/${app.activeChainId()}/archived`;
 
-  const getBulkThreads = trpc.thread.getBulkThreads.useQuery({
-    community_id: 'dydx',
-    temp: 3,
-  });
-
   const { fetchNextPage, data, isInitialLoading, hasNextPage } =
-    useFetchThreadsQuery({
-      communityId: app.activeChainId(),
-      queryType: 'bulk',
-      page: 1,
-      limit: 20,
-      topicId,
-      stage: stageName,
-      includePinnedThreads: true,
-      orderBy: featuredFilter,
-      toDate: dateCursor.toDate,
-      fromDate: dateCursor.fromDate,
-      isOnArchivePage: isOnArchivePage,
-    });
+    trpc.thread.getBulkThreads.useQuery(
+      {
+        community_id: app.activeChainId(),
+        queryType: 'bulk',
+        limit: 20,
+        topicId,
+        temp: '3',
+        stage: stageName,
+        includePinnedThreads: true,
+        orderBy: featuredFilter,
+        toDate: dateCursor.toDate,
+        fromDate: dateCursor.fromDate,
+        isOnArchivePage: isOnArchivePage,
+      },
+      {
+        getNextPageParam: (lastPage) => lastPage.nextCursor,
+      },
+    );
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
   //

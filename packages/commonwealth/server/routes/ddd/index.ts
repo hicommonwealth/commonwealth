@@ -28,8 +28,7 @@ export type AppRouter = typeof trpcRouter;
  * OpenAPI spec
  */
 router.get('/trpc/openapi.json', (req, res) => {
-  const baseUrl = req.protocol + '://' + req.get('host') + '/ddd/trpc';
-  res.set('Cache-Control', 'public, max-age=300');
+  const baseUrl = req.protocol + '://' + req.get('host') + '/ddd/trpc/rest';
   return res.json(
     trpc.toOpenApiDocument(trpcRouter, {
       title: 'Common API',
@@ -43,6 +42,7 @@ router.get(
   '/trpc/docs',
   swaggerUi.setup(null, { swaggerUrl: '../openapi.json' }),
 );
+// router.use('/trpc/rest', express.statsMiddleware, trpc.toOpenApiExpress(trpcRouter));
 router.use('/trpc', express.statsMiddleware, trpc.toExpress(trpcRouter));
 
 export default router;
