@@ -18,7 +18,7 @@ import {
   type OpenApiMeta,
   type OpenApiRouter,
 } from 'trpc-openapi';
-import { ZodObject, ZodUndefined, z } from 'zod';
+import { ZodObject, ZodRawShape, ZodUndefined, z } from 'zod';
 
 interface Context {
   req: Request;
@@ -89,7 +89,7 @@ export const command = <S extends Schemas>(
       },
     })
     .input(
-      (md.schemas.input as ZodObject<any>).extend({
+      md.schemas.input.extend({
         id: z.string(),
         address_id: z.string().optional(),
       }),
@@ -120,7 +120,7 @@ export const command = <S extends Schemas>(
 // TODO: add security options (API key, IP range, internal, etc)
 export const event = <
   Input extends EventSchemas,
-  Output extends ZodObject<any> | ZodUndefined,
+  Output extends ZodObject<ZodRawShape> | ZodUndefined = ZodUndefined,
 >(
   factory: () => EventsHandlerMetadata<Input, Output>,
   tag: Tag.Policy | Tag.Projection | Tag.Integration,
@@ -162,7 +162,7 @@ export const query = <S extends Schemas>(factory: () => QueryMetadata<S>) => {
       protect: md.secure,
     })
     .input(
-      (md.schemas.input as ZodObject<any>).extend({
+      md.schemas.input.extend({
         address_id: z.string().optional(),
       }),
     )

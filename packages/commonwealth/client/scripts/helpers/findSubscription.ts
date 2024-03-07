@@ -6,7 +6,7 @@ export type SubUniqueData =
       categoryId:
         | NotificationCategories.ChainEvent
         | NotificationCategories.NewThread;
-      options: { chainId: string };
+      options: { communityId: string };
     }
   | {
       categoryId: NotificationCategories.SnapshotProposal;
@@ -46,7 +46,7 @@ export function findSubscription(
     categoryId === NotificationCategories.ChainEvent ||
     categoryId === NotificationCategories.NewThread
   ) {
-    if (!findOptions.options.chainId) {
+    if (!findOptions.options.communityId) {
       console.error(
         `Must provide the chain id to find a ${categoryId} subscription`,
       );
@@ -55,7 +55,7 @@ export function findSubscription(
     return subs.find(
       (s) =>
         s.categoryId === categoryId &&
-        s.chainId === findOptions.options.chainId,
+        s.communityId === findOptions.options.communityId,
     );
   } else if (
     categoryId === NotificationCategories.NewCollaboration ||

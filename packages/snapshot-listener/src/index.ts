@@ -1,10 +1,10 @@
 import {
   HotShotsStats,
+  PinoLogger,
   RabbitMQController,
   RascalConfigServices,
   RascalPublications,
   ServiceKey,
-  TypescriptLoggingLogger,
   getRabbitMQConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
@@ -25,7 +25,7 @@ import {
 
 let isServiceHealthy = false;
 
-const log = logger(TypescriptLoggingLogger()).getLogger(__filename);
+const log = logger(PinoLogger()).getLogger(__filename);
 stats(HotShotsStats());
 
 startHealthCheckLoop({

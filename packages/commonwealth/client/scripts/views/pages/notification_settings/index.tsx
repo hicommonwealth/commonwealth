@@ -313,7 +313,7 @@ const NotificationSettingsPage = () => {
                     app.user.notifications
                       .subscribe({
                         categoryId: NotificationCategories.ChainEvent,
-                        options: { chainId: community.id },
+                        options: { communityId: community.id },
                       })
                       .then(() => {
                         forceRerender();

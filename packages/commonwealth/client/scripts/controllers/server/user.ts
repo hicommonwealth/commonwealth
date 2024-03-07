@@ -232,7 +232,7 @@ export class UserController {
 
   public selectChain(options: { chain: string }): JQueryPromise<void> {
     return $.post(`${app.serverUrl()}/selectCommunity`, {
-      chain: options.chain,
+      community_id: options.chain,
       auth: true,
       jwt: this._jwt,
     })
