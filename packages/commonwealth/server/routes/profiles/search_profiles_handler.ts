@@ -25,6 +25,7 @@ type SearchCommentsRequestParams = {
   include_roles?: string;
   memberships?: MembershipFilters;
   include_group_ids?: string;
+  include_stake_balances?: string;
 } & PaginationQueryParams;
 
 type SearchCommentsResponse = SearchProfilesResult;
@@ -55,6 +56,7 @@ export const searchProfilesHandler = async (
     orderDirection: options.order_direction as any,
     memberships: options.memberships,
     includeGroupIds: options.include_group_ids === 'true',
+    includeStakeBalances: options.include_stake_balances === 'true',
   });
 
   return success(res, profileSearchResults);

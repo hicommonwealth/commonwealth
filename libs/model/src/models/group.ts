@@ -16,7 +16,7 @@ export type GroupAttributes = {
   community_id: string;
   metadata: GroupMetadata;
   requirements: Requirement[];
-  is_system_managed: boolean;
+  is_system_managed?: boolean;
 
   created_at?: Date;
   updated_at?: Date;

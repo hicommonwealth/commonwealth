@@ -2,14 +2,17 @@ import { Op, QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from 'server/types';
 
 import { AppError } from '@hicommonwealth/core';
-import { CommunityInstance } from '@hicommonwealth/model';
+import { CommunityInstance, tokenBalanceCache } from '@hicommonwealth/model';
 import { flatten, uniq } from 'lodash';
 import moment from 'moment';
+import { makeGetBalancesOptions } from 'server/util/requirementsModule/makeGetBalancesOptions';
 import { buildPaginatedResponse } from '../../util/queries';
 import { RoleInstanceWithPermission, findAllRoles } from '../../util/roles';
 import { ServerProfilesController } from '../server_profiles_controller';
 
-export const Errors = {};
+export const Errors = {
+  StakeholderGroup: 'Stakeholder group not found',
+};
 
 export type MembershipFilters =
   | 'in-group'
@@ -26,6 +29,7 @@ export type GetMemberProfilesOptions = {
   orderDirection?: 'ASC' | 'DESC';
   memberships?: MembershipFilters;
   includeGroupIds?: boolean;
+  includeStakeBalances?: boolean;
 };
 
 type Profile = {
@@ -37,6 +41,7 @@ type Profile = {
     id: number;
     chain: string;
     address: string;
+    stake_balance?: string;
   }[];
   roles?: any[];
   group_ids: number[];
@@ -55,6 +60,7 @@ export async function __getMemberProfiles(
     orderDirection,
     memberships,
     includeGroupIds,
+    includeStakeBalances,
   }: GetMemberProfilesOptions,
 ): Promise<GetMemberProfilesResult> {
   page = Math.min(1, page);
@@ -178,6 +184,42 @@ export async function __getMemberProfiles(
       };
     },
   );
+
+  // TODO: batch fetch stake balance for all addresses
+  if (includeStakeBalances) {
+    const stakeholderGroup = await this.models.Group.findOne({
+      where: {
+        community_id: community.id,
+        is_system_managed: true,
+      },
+    });
+    if (!stakeholderGroup) {
+      throw new AppError(Errors.StakeholderGroup);
+    }
+    const groups = [stakeholderGroup];
+    const addresses = profilesWithAddresses
+      .map((p) => p.addresses.map((a) => a.address))
+      .flat();
+    const getBalancesOptions = makeGetBalancesOptions(groups, addresses);
+    const balancesResult = await Promise.all(
+      getBalancesOptions.map(async (options) => {
+        return {
+          options,
+          balances: await tokenBalanceCache.getBalances({
+            ...options,
+          }),
+        };
+      }),
+    );
+    console.log('RESULT: ', balancesResult);
+    const balances = balancesResult?.[0]?.balances || {};
+    // add balances to profiles
+    for (const profile of profilesWithAddresses) {
+      for (const address of profile.addresses) {
+        address.stake_balance = balances[address.address];
+      }
+    }
+  }
 
   if (includeRoles) {
     const profileAddressIds = profilesWithAddresses.reduce((acc, p) => {
