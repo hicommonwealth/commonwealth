@@ -49,6 +49,7 @@ export const CWRelatedCommunityCard = ({
       trackAnalytics({
         event: MixpanelClickthroughEvent.DIRECTORY_TO_COMMUNITY_PAGE,
       });
+
       if (isCommandClick(e)) {
         window.open(`/${community.id}`, '_blank');
         return;
@@ -148,7 +149,7 @@ export const CWRelatedCommunityCard = ({
               />
             )}
 
-            {stakeEnabled && (
+            {stakeEnabled && stakeValue && (
               <CWButton
                 label="Buy Stake"
                 buttonType="secondary"
