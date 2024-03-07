@@ -356,7 +356,7 @@ jobs:
       - name: Discord-Bot Typecheck
         run: yarn --cwd packages/discord-bot check-types
 
-# These tests run quickly, so run them in a separate job
+  # These tests run quickly, so run them in a separate job
   commonwealth-unit-integration:
     strategy:
       matrix:
@@ -525,4 +525,3 @@ jobs:
           PORT: 8080
           USES_DOCKER_PGSQL: true
           COSMOS_GOV_V1: ${{ secrets.COSMOS_GOV_V1 }}
-
