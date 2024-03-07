@@ -34,5 +34,5 @@ export const discordMetaSchema = {
 export const linksSchema = {
   source: z.nativeEnum(LinkSource),
   identifier: z.string(),
-  title: z.string().optional(),
+  title: z.string().nullable().optional(),
 };

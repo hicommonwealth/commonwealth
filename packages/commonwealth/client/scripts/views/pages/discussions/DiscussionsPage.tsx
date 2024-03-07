@@ -90,11 +90,15 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         isOnArchivePage: isOnArchivePage,
       },
       {
-        getNextPageParam: (lastPage) => lastPage.nextCursor,
+        getNextPageParam: (lastPage) => {
+          return lastPage.cursor + 1;
+        },
         initialCursor: 1,
       },
     );
 
+  console.log(data?.pages?.length, 'length');
+  console.log(fetchNextPage, 'length');
   const threadData = data?.pages.flatMap((page) =>
     page.threads.map((t) => new Thread(t)),
   );

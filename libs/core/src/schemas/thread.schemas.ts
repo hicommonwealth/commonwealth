@@ -77,6 +77,7 @@ export const GetBulkThreads = {
   output: z.object({
     limit: z.number(),
     numVotingThreads: z.number(),
+    cursor: z.number(),
     threads: z
       .object({
         id: z.number(),
