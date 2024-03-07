@@ -1,12 +1,12 @@
 import {
   HotShotsStats,
+  PinoLogger,
   RabbitMQController,
   RabbitMQSubscription,
   RascalConfigServices,
   RascalSubscriptions,
   ServiceConsumer,
   ServiceKey,
-  TypescriptLoggingLogger,
   getRabbitMQConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
@@ -14,7 +14,7 @@ import { logger, stats } from '@hicommonwealth/core';
 import type { BrokerConfig } from 'rascal';
 import { RABBITMQ_URI } from '../../config';
 
-const log = logger(TypescriptLoggingLogger()).getLogger(__filename);
+const log = logger(PinoLogger()).getLogger(__filename);
 stats(HotShotsStats());
 
 let isServiceHealthy = false;

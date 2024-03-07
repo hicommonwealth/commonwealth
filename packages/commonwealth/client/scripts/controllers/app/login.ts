@@ -63,8 +63,8 @@ export async function setActiveAccount(
   try {
     const response = await $.post(`${app.serverUrl()}/setDefaultRole`, {
       address: account.address,
-      author_chain: account.community.id,
-      chain: community,
+      author_community_id: account.community.id,
+      community_id: community,
       jwt: app.user.jwt,
       auth: true,
     });
