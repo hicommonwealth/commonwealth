@@ -16,7 +16,7 @@ import {
  * @returns side effects
  * @throws {@link InvalidInput} when user invokes event with invalid payload, or rethrows internal domain errors
  */
-export const event = async <
+export const eventHandler = async <
   Name extends events.Events,
   Input extends EventSchemas,
   Output extends ZodSchema,

@@ -1,4 +1,10 @@
-import { AnalyticsOptions, CacheNamespaces } from '../types';
+import {
+  EventContext,
+  EventSchemas,
+  EventsHandlerMetadata,
+} from '../framework';
+import { events } from '../schemas';
+import { AnalyticsOptions, BrokerTopics, CacheNamespaces } from '../types';
 
 /**
  * Resource disposer function
@@ -30,6 +36,7 @@ export interface ILogger {
   error(msg: string, error?: Error, context?: Record<string, unknown>): void;
   fatal(msg: string, error?: Error, context?: Record<string, unknown>): void;
 }
+
 /**
  * Logger factory
  * Builds a named logger
@@ -113,4 +120,19 @@ export interface Cache extends Disposable {
  */
 export interface Analytics extends Disposable {
   track(event: string, payload: AnalyticsOptions): void;
+}
+
+/**
+ * Broker Port
+ */
+export interface Broker extends Disposable {
+  publish<Name extends events.Events>(
+    event: EventContext<Name, typeof events.schemas[Name]>,
+    topic?: BrokerTopics,
+  ): Promise<boolean>;
+
+  subscribe(
+    topic: BrokerTopics,
+    handler: EventsHandlerMetadata<EventSchemas>,
+  ): Promise<boolean>;
 }

@@ -3,6 +3,7 @@ import { getInMemoryLogger } from './in-memory-logger';
 import {
   AdapterFactory,
   Analytics,
+  Broker,
   Cache,
   Disposable,
   Disposer,
@@ -154,13 +155,27 @@ export const cache = port(function cache(cache?: Cache) {
 /**
  * Analytics port factory
  */
-
 export const analytics = port(function analytics(analytics?: Analytics) {
   return (
     analytics || {
       name: 'in-memory-analytics',
       dispose: () => Promise.resolve(),
       track: () => {},
+    }
+  );
+});
+
+/**
+ * Broker port factory
+ */
+export const broker = port(function broker(broker?: Broker) {
+  return (
+    broker || {
+      name: 'in-memory-broker',
+      dispose: () => Promise.resolve(),
+      publish: () => Promise.resolve(true),
+      subscribe: () => Promise.resolve(true),
+      isHealthy: () => Promise.resolve(true),
     }
   );
 });
