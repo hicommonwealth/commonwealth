@@ -12,7 +12,7 @@
     "test": "ts-mocha --exit './test/**/*.spec.ts'"
   },
   "engines": {
-    "node": "18.x"
+    "node": "20.x"
   },
   "keywords": [],
   "author": "",
