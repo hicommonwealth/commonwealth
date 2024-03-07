@@ -84,15 +84,16 @@ export function buildPaginatedResponse<T>(
   items: T[],
   totalResults: number,
   options: {
-    limit: number;
-    offset: number;
+    limit?: number;
+    offset?: number;
   },
 ): TypedPaginatedResult<T> {
+  const limit = options.limit || 10;
   return {
     results: items,
     limit: options.limit,
-    page: Math.floor(options.offset / options.limit) + 1,
-    totalPages: Math.floor(totalResults / options.limit) + 1,
+    page: Math.floor(options.offset / limit) + 1,
+    totalPages: Math.floor(totalResults / limit) + 1,
     totalResults,
   };
 }
