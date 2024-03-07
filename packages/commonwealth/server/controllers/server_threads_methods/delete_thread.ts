@@ -72,7 +72,7 @@ export async function __deleteThread(
     throw new AppError(Errors.NotOwned);
   }
 
-  await deleteThreadFromDb(this.models, thread.id);
+  await deleteThreadFromDb(this.models, thread);
 
   // use callbacks so route returns and this completes in the background
   if (this.globalActivityCache) {

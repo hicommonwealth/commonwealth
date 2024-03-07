@@ -1,6 +1,7 @@
 import { WalletId, WalletSsoSource } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
+import { models } from '../database';
 import type { CommunityAttributes, CommunityInstance } from './community';
 import { MembershipAttributes } from './membership';
 import type { ProfileAttributes, ProfileInstance } from './profile';
@@ -143,6 +144,42 @@ export default (
       },
       scopes: {
         withPrivateData: {},
+      },
+      hooks: {
+        afterCreate: async (
+          address: AddressInstance,
+          options: Sequelize.CreateOptions<AddressAttributes>,
+        ) => {
+          // when address created, increment Community.address_count
+          const { community_id } = address;
+          if (!community_id) {
+            return;
+          }
+          const community = await models.Community.findByPk(community_id);
+          if (!community) {
+            return;
+          }
+          await community.increment('address_count', {
+            transaction: options.transaction,
+          });
+        },
+        afterDestroy: async (
+          address: AddressInstance,
+          options: Sequelize.InstanceDestroyOptions,
+        ) => {
+          // when address deleted, decrement Community.address_count
+          const { community_id } = address;
+          if (!community_id) {
+            return;
+          }
+          const community = await models.Community.findByPk(community_id);
+          if (!community) {
+            return;
+          }
+          await community.decrement('address_count', {
+            transaction: options.transaction,
+          });
+        },
       },
     },
   );

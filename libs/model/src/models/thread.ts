@@ -1,6 +1,7 @@
 import { IDiscordMeta } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
+import { models } from '../database';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import { NotificationAttributes } from './notification';
@@ -181,6 +182,42 @@ export default (
         { fields: ['community_id', 'has_poll'] },
         { fields: ['canvas_hash'] },
       ],
+      hooks: {
+        afterCreate: async (
+          thread: ThreadInstance,
+          options: Sequelize.CreateOptions<ThreadAttributes>,
+        ) => {
+          // when thread created, increment Community.thread_count
+          const { community_id } = thread;
+          if (!community_id) {
+            return;
+          }
+          const community = await models.Community.findByPk(community_id);
+          if (!community) {
+            return;
+          }
+          await community.increment('thread_count', {
+            transaction: options.transaction,
+          });
+        },
+        afterDestroy: async (
+          thread: ThreadInstance,
+          options: Sequelize.InstanceDestroyOptions,
+        ) => {
+          // when thread deleted, decrement Community.thread_count
+          const { community_id } = thread;
+          if (!community_id) {
+            return;
+          }
+          const community = await models.Community.findByPk(community_id);
+          if (!community) {
+            return;
+          }
+          await community.decrement('thread_count', {
+            transaction: options.transaction,
+          });
+        },
+      },
     },
   );
 

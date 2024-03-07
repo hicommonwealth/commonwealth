@@ -1,18 +1,14 @@
-import type { DB } from '@hicommonwealth/model';
+import type { DB, ThreadInstance } from '@hicommonwealth/model';
 
 export default async function deleteThread(
   models: DB,
-  thread_id: number,
+  thread: ThreadInstance,
 ): Promise<void> {
   models.Subscription.destroy({
     where: {
-      thread_id: thread_id,
+      thread_id: thread.id,
     },
   });
 
-  await models.Thread.destroy({
-    where: {
-      id: thread_id,
-    },
-  });
+  await thread.destroy();
 }
