@@ -1037,6 +1037,7 @@ describe('ServerThreadsController', () => {
               id: 1,
               address: '0x123',
             },
+            destroy: async () => ({}),
           }),
           destroy: async () => ({}),
         },
