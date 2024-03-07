@@ -1,22 +1,27 @@
 import {
   HotShotsStats,
   PinoLogger,
-  RabbitMQController,
+  RabbitMQAdapter,
   RascalConfigServices,
-  RascalSubscriptions,
   ServiceKey,
-  TRmqMessages,
   getRabbitMQConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import {
+  Broker,
+  BrokerTopics,
   CommentDiscordActions,
+  EventHandler,
   IDiscordMessage,
+  PolicyMetadata,
   ThreadDiscordActions,
+  broker,
+  events,
   logger,
   stats,
 } from '@hicommonwealth/core';
 import v8 from 'v8';
+import { ZodUndefined } from 'zod';
 import { CW_BOT_KEY, DISCOBOT_ADDRESS, RABBITMQ_URI } from '../utils/config';
 
 const log = logger(PinoLogger()).getLogger(__filename);
@@ -39,7 +44,10 @@ log.info(
   )} GB`,
 );
 
-async function processMessage(data: TRmqMessages) {
+const processDiscordMessageCreated: EventHandler<
+  'DiscordMessageCreated',
+  ZodUndefined
+> = async ({ payload }) => {
   // async imports to delay calling logger
   const { handleCommentMessages, handleThreadMessages } = await import(
     '../discord-consumer/handlers'
@@ -47,7 +55,7 @@ async function processMessage(data: TRmqMessages) {
   const { getForumLinkedTopic } = await import('../utils/util');
 
   try {
-    const parsedMessage = data as IDiscordMessage;
+    const parsedMessage = payload as IDiscordMessage;
     const topic = await getForumLinkedTopic(parsedMessage.parent_channel_id);
     const action = parsedMessage.action;
     const sharedReqData = {
@@ -100,23 +108,45 @@ async function processMessage(data: TRmqMessages) {
       log.error(`Failed to process Message:`, error);
     }
   }
-}
+};
 
-async function consumeMessages() {
-  const controller = new RabbitMQController(
-    getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.DiscobotService),
+async function main() {
+  let brokerInstance: Broker;
+  try {
+    const rmqAdapter = new RabbitMQAdapter(
+      getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.DiscobotService),
+    );
+    await rmqAdapter.init();
+    broker(rmqAdapter);
+    brokerInstance = rmqAdapter;
+  } catch (e) {
+    log.error('Broker setup failed', e);
+    throw e;
+  }
+
+  const inputs = {
+    DiscordMessageCreated: events.schemas.DiscordMessageCreated,
+  };
+
+  const Discord: () => PolicyMetadata<typeof inputs> = () => ({
+    inputs,
+    body: {
+      DiscordMessageCreated: processDiscordMessageCreated,
+    },
+  });
+
+  const result = await brokerInstance.subscribe(
+    BrokerTopics.DiscordListener,
+    Discord(),
   );
 
-  await controller.init();
-
-  await controller.startSubscription(
-    processMessage,
-    RascalSubscriptions.DiscordListener,
-  );
+  if (!result) {
+    throw new Error(`Failed to subscribe to ${BrokerTopics.DiscordListener}`);
+  }
 
   isServiceHealthy = true;
 }
 
-consumeMessages().catch((err) => {
-  console.error(err);
+main().catch((err) => {
+  log.fatal(err);
 });
