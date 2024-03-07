@@ -81,8 +81,8 @@ export class RabbitMQAdapter implements Broker {
   }
 
   public async publish<Name extends events.Events>(
+    topic: BrokerTopics,
     event: EventContext<Name>,
-    topic?: BrokerTopics,
   ): Promise<boolean> {
     if (!this.initialized) {
       return false;
@@ -126,9 +126,13 @@ export class RabbitMQAdapter implements Broker {
         });
       });
     } catch (e) {
-      this._log.fatal('Publication does not exist', undefined, {
-        publication: rascalPubName,
-      });
+      this._log.fatal(
+        'Publication does not exist',
+        e instanceof Error ? e : undefined,
+        {
+          publication: rascalPubName,
+        },
+      );
     }
 
     return false;
