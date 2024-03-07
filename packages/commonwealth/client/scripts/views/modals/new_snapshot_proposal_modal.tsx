@@ -57,7 +57,6 @@ export const NewSnapshotProposalModal = ({
             <CWDropdown
               label="Select Snapshot Space"
               options={snapshotOptions}
-              // onSelect={(item) => setSelectedSnapshotId(item.value)}
               onSelect={handleSelect}
             />
             {selectedSnapshotId && (
