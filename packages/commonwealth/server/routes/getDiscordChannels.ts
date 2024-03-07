@@ -3,16 +3,8 @@ import axios from 'axios';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-enum SetDiscordBotConfigErrors {
-  NotAdmin = 'Not an admin',
-  CommonbotConnected = 'Discord is already connected to another Commonwealth community',
-  Error = 'Could not get discord bot config',
-  TokenExpired = 'Token expired',
-}
-
 type GetDiscordChannelsReq = {
-  chain_id: string;
+  community_id: string;
 };
 
 type GetDiscordChannelsResp = {

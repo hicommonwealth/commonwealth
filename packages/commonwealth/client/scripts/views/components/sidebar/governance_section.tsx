@@ -96,12 +96,6 @@ export const GovernanceSection = () => {
           children: {},
         },
       }),
-      ...(showCompoundOptions && {
-        Delegate: {
-          toggledState: true,
-          children: {},
-        },
-      }),
       ...(showProposals && {
         Proposals: {
           toggledState: false,
@@ -133,11 +127,6 @@ export const GovernanceSection = () => {
 
   const matchesProposalRoute = matchRoutes(
     [{ path: '/proposals' }, { path: ':scope/proposals' }],
-    location,
-  );
-
-  const matchesDelegateRoute = matchRoutes(
-    [{ path: '/delegate' }, { path: ':scope/delegate' }],
     location,
   );
 
@@ -241,35 +230,9 @@ export const GovernanceSection = () => {
     displayData: null,
   };
 
-  // Delegate
-  const delegateData: SectionGroupAttrs = {
-    title: 'Delegate',
-    containsChildren: false,
-    hasDefaultToggle: showCompoundOptions
-      ? toggleTreeState['children']['Delegate']['toggledState']
-      : false,
-    isVisible: showCompoundOptions,
-    isUpdated: true,
-    isActive: !!matchesDelegateRoute,
-    onClick: (e, toggle: boolean) => {
-      e.preventDefault();
-      handleRedirectClicks(
-        navigate,
-        e,
-        '/delegate',
-        app.activeChainId(),
-        () => {
-          setGovernanceToggleTree('children.Delegate.toggledState', toggle);
-        },
-      );
-    },
-    displayData: null,
-  };
-
   let governanceGroupData: SectionGroupAttrs[] = [
     membersData,
     snapshotData,
-    delegateData,
     proposalsData,
   ];
 

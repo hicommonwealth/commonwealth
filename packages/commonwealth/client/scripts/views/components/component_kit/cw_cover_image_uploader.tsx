@@ -13,11 +13,11 @@ import { useFormContext } from 'react-hook-form';
 import { compressImage } from 'utils/ImageCompression';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWRadioGroup } from './cw_radio_group';
-import { CWSpinner } from './cw_spinner';
 import { CWText } from './cw_text';
 import { CWTextInput, MessageRow } from './cw_text_input';
 import type { ValidationStatus } from './cw_validation_text';
 import { getClasses } from './helpers';
+import CWCircleMultiplySpinner from './new_designs/CWCircleMultiplySpinner';
 import { MessageRow as NewMessageRow } from './new_designs/CWTextInput/MessageRow';
 
 // TODO: currently it doesn't support "edit more", i.e if we set url in CWForm "initialValues", this component won't
@@ -382,7 +382,7 @@ export const CWCoverImageUploader = ({
               />
             </div>
             {isGenerating ? (
-              <CWSpinner size="large" />
+              <CWCircleMultiplySpinner />
             ) : (
               <>
                 <CWTextInput
@@ -423,7 +423,7 @@ export const CWCoverImageUploader = ({
           className="pseudo-input"
           ref={pseudoInput}
         />
-        {isUploading && <CWSpinner size="large" />}
+        {isUploading && <CWCircleMultiplySpinner />}
         <div className="attach-btn" ref={attachButton}>
           {imageURL && defaultImageBehaviour === ImageBehavior.Circle && (
             <img className="circle-img" src={imageURL} />

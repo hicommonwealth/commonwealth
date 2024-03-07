@@ -71,6 +71,7 @@ If you add a script to the `package.json` file, please add documentation for it 
   - [cosmos:stop](#cosmos:stop)
 - [Util scripts](#util-scripts)
   - [add-components-showcase](#add-component-showcase)
+  - [set-super-admin](#set-super-admin)
 
 ## Build Scripts
 
@@ -481,3 +482,21 @@ Description: Stop all Cosmos devnet containers.
 Definition: `add-component-showcase`
 
 Description: It creates new `tsx` file and modifies `componentsList.ts` file in order to add components to the showcase page easier. Fore more information take a look at [Component-Kit.md](./Component-Kit.md) documentation file.
+
+## set-super-admin
+
+Definition: `chmod u+x scripts/set-super-admin.sh && ./scripts/set-super-admin.sh`
+
+Description: It sets whether a user is a super admin or not. The script accepts 2 optional arguments that indicate the environment in which to set the super admin and whether to enable or disable the super admin. The script enables the super admin by default.
+
+Considerations: This script requires having SUPER_ADMIN_EMAIL or SUPER_ADMIN_WALLET_ADDRESS set in packages/commonwealth/.env. The script also requires having Heroku access on any apps in which a super admin status is being updated.
+
+Examples:
+- `yarn set-super-admin`
+  - This sets the local user specified by the environment variables to a super admin.
+- `yarn set-super-admin false`
+  - This disables super admin for the local user.
+- `yarn set-super-admin [frick | frack | beta | demo]`
+  - This enables super admin for the specified user on the specified app.
+- `yarn set-super-admin [frick | frack | beta | demo] false`
+  - This disables super admin for the specified user on the specified app.

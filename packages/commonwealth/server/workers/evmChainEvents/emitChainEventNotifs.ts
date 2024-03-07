@@ -58,7 +58,7 @@ export async function emitChainEventNotifs(
       notification = {
         categoryId: NotificationCategories.ChainEvent,
         data: {
-          chain: chain.chain_id,
+          community_id: chain.chain_id,
           network: chain.chain_network as unknown as SupportedNetwork,
           block_number: event.blockNumber,
           event_data: {

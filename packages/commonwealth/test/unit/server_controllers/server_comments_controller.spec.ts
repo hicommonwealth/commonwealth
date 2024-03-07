@@ -1,5 +1,5 @@
 import { NotificationCategories } from '@hicommonwealth/core';
-import { CommunityInstance, contractHelpers } from '@hicommonwealth/model';
+import { CommunityInstance, commonProtocol } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { ServerCommentsController } from 'server/controllers/server_comments_controller';
 import { SearchCommentsOptions } from 'server/controllers/server_comments_methods/search_comments';
@@ -8,7 +8,9 @@ import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
 
 describe('ServerCommentsController', () => {
   beforeEach(() => {
-    Sinon.stub(contractHelpers, 'getNamespaceBalance').resolves('0');
+    Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves(
+      '0',
+    );
   });
   afterEach(() => {
     Sinon.restore();
@@ -74,8 +76,13 @@ describe('ServerCommentsController', () => {
             namespace: 'cake',
           }),
         },
+        ChainNode: {
+          findByPk: async () => ({
+            eth_chain_id: 8453,
+            url: 'test.com',
+          }),
+        },
       };
-      const tokenBalanceCache = {};
       const banCache = BAN_CACHE_MOCK_FN('ethereum');
 
       const user = {
@@ -91,7 +98,6 @@ describe('ServerCommentsController', () => {
 
       const serverCommentsController = new ServerCommentsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -131,9 +137,9 @@ describe('ServerCommentsController', () => {
         comment_text: 'my comment body',
         root_title: 'Big Thread!',
         root_type: null,
-        chain_id: 'ethereum',
+        community_id: 'ethereum',
         author_address: '0x123',
-        author_chain: 'ethereum',
+        author_community_id: 'ethereum',
       });
 
       expect(allNotificationOptions[0]).to.have.property('excludeAddresses');
@@ -185,7 +191,6 @@ describe('ServerCommentsController', () => {
           }),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: sandbox.stub().resolves([true, null]),
       };
@@ -198,7 +203,6 @@ describe('ServerCommentsController', () => {
 
       const serverCommentsController = new ServerCommentsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -250,7 +254,6 @@ describe('ServerCommentsController', () => {
           findOne: sandbox.stub().resolves(null),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: sandbox.stub().resolves([true, null]),
       };
@@ -263,7 +266,6 @@ describe('ServerCommentsController', () => {
 
       const serverCommentsController = new ServerCommentsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -317,7 +319,6 @@ describe('ServerCommentsController', () => {
           }),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: sandbox.stub().resolves([false, 'big ban err']),
       };
@@ -331,7 +332,6 @@ describe('ServerCommentsController', () => {
 
       const serverCommentsController = new ServerCommentsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -442,9 +442,6 @@ describe('ServerCommentsController', () => {
           bulkCreate: sandbox.stub().resolves([]),
         },
       };
-      const tokenBalanceCache = {
-        getBalances: sandbox.stub().resolves({}),
-      };
       const banCache = {
         checkBan: sandbox.stub().resolves([true, null]),
       };
@@ -460,7 +457,6 @@ describe('ServerCommentsController', () => {
 
       const serverCommentsController = new ServerCommentsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -489,12 +485,10 @@ describe('ServerCommentsController', () => {
           },
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {};
 
       const serverCommentsController = new ServerCommentsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 
@@ -553,13 +547,11 @@ describe('ServerCommentsController', () => {
           findOne: async () => data,
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: async () => [true, null],
       };
       const serverCommentsController = new ServerCommentsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
       const user = {
@@ -593,9 +585,9 @@ describe('ServerCommentsController', () => {
         comment_id: 123,
         comment_text: 'Hello',
         root_title: 'Big Thread!',
-        chain_id: 'ethereum',
+        community_id: 'ethereum',
         author_address: '0x123',
-        author_chain: 'ethereum',
+        author_community_id: 'ethereum',
       });
       expect(allNotificationOptions[0]).to.have.property('excludeAddresses');
       const { excludeAddresses } = allNotificationOptions[0];
@@ -631,11 +623,9 @@ describe('ServerCommentsController', () => {
           findOne: async () => data,
         },
       };
-      const tokenBalanceCache = {};
       const banCache = BAN_CACHE_MOCK_FN('ethereum');
       const serverCommentsController = new ServerCommentsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
       const user = {
@@ -682,13 +672,11 @@ describe('ServerCommentsController', () => {
           findOne: async () => null,
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: async () => [true, null],
       };
       const serverCommentsController = new ServerCommentsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
       const user = {
@@ -732,14 +720,12 @@ describe('ServerCommentsController', () => {
           destroy: async () => ({}),
         },
       };
-      const tokenBalanceCache = {};
       const banCache = {
         checkBan: () => [true, null],
       };
 
       const serverCommentsController = new ServerCommentsController(
         db as any,
-        tokenBalanceCache as any,
         banCache as any,
       );
 

@@ -48,7 +48,7 @@ function isAxieInfinityJwt(token: any): token is AxieInfinityJwt {
   );
 }
 
-const AXIE_INFINITY_CHAIN_ID = 'axie-infinity';
+const AXIE_INFINITY_COMMUNITY_ID = 'axie-infinity';
 const EXPIRATION_TIME = 60 * 5; // 5 minutes
 
 const Errors = {
@@ -211,11 +211,11 @@ const finishSsoLogin = async (
         }
         const msg = {
           to: oldUser.email,
-          from: 'Commonwealth <no-reply@commonwealth.im>',
+          from: 'Common <no-reply@commonwealth.im>',
           templateId: DynamicTemplate.VerifyAddress,
           dynamic_template_data: {
             address: existingAddress,
-            chain: AXIE_INFINITY_CHAIN_ID,
+            chain: AXIE_INFINITY_COMMUNITY_ID,
           },
         };
         await sgMail.send(msg);
@@ -328,7 +328,7 @@ const finishSsoLogin = async (
       const newAddress = await models.Address.create(
         {
           address: checksumAddress,
-          community_id: AXIE_INFINITY_CHAIN_ID,
+          community_id: AXIE_INFINITY_COMMUNITY_ID,
           verification_token: 'SSO',
           verification_token_expires: null,
           verified: new Date(), // trust addresses from magic
@@ -344,7 +344,7 @@ const finishSsoLogin = async (
       await createRole(
         models,
         newAddress.id,
-        AXIE_INFINITY_CHAIN_ID,
+        AXIE_INFINITY_COMMUNITY_ID,
         'member',
         false,
         t,

@@ -8,12 +8,14 @@ export const createChainNode = async ({
   bech32,
   balance_type,
   eth_chain_id,
+  cosmos_chain_id,
 }: {
   url: string;
   name: string;
   bech32: string;
   balance_type: BalanceType;
   eth_chain_id: number;
+  cosmos_chain_id: string;
 }) => {
   return await axios.post(`${app.serverUrl()}/nodes`, {
     url,
@@ -21,6 +23,35 @@ export const createChainNode = async ({
     bech32,
     balance_type,
     eth_chain_id,
+    cosmos_chain_id,
+    jwt: app.user.jwt,
+  });
+};
+
+export const updateChainNode = async ({
+  id,
+  url,
+  name,
+  bech32,
+  balance_type,
+  eth_chain_id,
+  cosmos_chain_id,
+}: {
+  id: number;
+  url: string;
+  name: string;
+  bech32: string;
+  balance_type: BalanceType;
+  eth_chain_id: number;
+  cosmos_chain_id: string;
+}) => {
+  return await axios.put(`${app.serverUrl()}/nodes/${id}`, {
+    url,
+    name,
+    bech32,
+    balance_type,
+    eth_chain_id,
+    cosmos_chain_id,
     jwt: app.user.jwt,
   });
 };
@@ -30,6 +61,15 @@ export const deleteCommunity = async ({ id }: { id: string }) => {
     data: {
       jwt: app.user.jwt,
     },
+  });
+};
+
+export const updateCommunityId = async ({ community_id, new_community_id }) => {
+  await axios.patch(`${app.serverUrl()}/communities/update_id`, {
+    jwt: app.user.jwt,
+    community_id,
+    new_community_id,
+    redirect: true,
   });
 };
 
@@ -49,7 +89,7 @@ export const updateSiteAdmin = async ({
 
 export const getCSVContent = async ({ id }: { id: string }) => {
   const res = await axios.post(`${app.serverUrl()}/exportMembersList`, {
-    chainId: id,
+    communityId: id,
     jwt: app.user.jwt,
   });
 

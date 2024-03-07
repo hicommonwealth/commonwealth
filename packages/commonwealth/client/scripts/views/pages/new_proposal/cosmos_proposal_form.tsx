@@ -1,6 +1,4 @@
-import type { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
-import React, { useState } from 'react';
-
+import { useBrowserAnalyticsTrack } from 'client/scripts/hooks/useBrowserAnalyticsTrack';
 import { notifyError } from 'controllers/app/notifications';
 import type CosmosAccount from 'controllers/chain/cosmos/account';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
@@ -9,13 +7,16 @@ import {
   encodeTextProposal,
 } from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
+import type { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
+import { useCommonNavigate } from 'navigation/helpers';
+import { DeltaStatic } from 'quill';
+import React, { useState } from 'react';
+import app from 'state';
 import {
   useDepositParamsQuery,
   useStakingParamsQuery,
 } from 'state/api/chainParams';
-
-import { useCommonNavigate } from 'navigation/helpers';
-import app from 'state';
+import { MixpanelGovernanceEvents } from '../../../../../shared/analytics/types';
 import {
   minimalToNaturalDenom,
   naturalDenomToMinimal,
@@ -24,20 +25,28 @@ import { Skeleton } from '../../components/Skeleton';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
-import { CWTextArea } from '../../components/component_kit/cw_text_area';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import {
+  ReactQuillEditor,
+  createDeltaFromText,
+  getTextFromDelta,
+} from '../../components/react_quill_editor';
 
 export const CosmosProposalForm = () => {
   const [cosmosProposalType, setCosmosProposalType] = useState<
     'textProposal' | 'communitySpend'
   >('textProposal');
   const [deposit, setDeposit] = useState<number>(0);
-  const [description, setDescription] = useState<string>('');
+  const [descriptionDelta, setDescriptionDelta] = useState<DeltaStatic>(
+    createDeltaFromText(''),
+  );
   const [payoutAmount, setPayoutAmount] = useState<number>(0);
   const [recipient, setRecipient] = useState<string>('');
   const [title, setTitle] = useState<string>('');
 
   const navigate = useCommonNavigate();
+
+  const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
 
   const author = app.user.activeAccount as CosmosAccount;
   const cosmos = app.chain as Cosmos;
@@ -48,8 +57,60 @@ export const CosmosProposalForm = () => {
     useDepositParamsQuery(stakingDenom);
 
   const minDeposit = parseFloat(
-    minimalToNaturalDenom(+depositParams?.minDeposit, meta?.decimals)
+    minimalToNaturalDenom(+depositParams?.minDeposit, meta?.decimals),
   );
+
+  const handleSendTransaction = async (e) => {
+    e.preventDefault();
+
+    let prop: ProtobufAny;
+
+    const depositInMinimalDenom = naturalDenomToMinimal(
+      deposit,
+      meta?.decimals,
+    );
+    const description = getTextFromDelta(descriptionDelta);
+
+    const _deposit = deposit
+      ? new CosmosToken(
+          depositParams?.minDeposit?.denom,
+          depositInMinimalDenom,
+          false,
+        )
+      : depositParams?.minDeposit;
+
+    if (cosmosProposalType === 'textProposal') {
+      prop = encodeTextProposal(title, description);
+    } else if (cosmosProposalType === 'communitySpend') {
+      const spendAmountInMinimalDenom = naturalDenomToMinimal(
+        payoutAmount,
+        meta?.decimals,
+      );
+      prop = encodeCommunitySpend(
+        title,
+        description,
+        recipient,
+        spendAmountInMinimalDenom,
+        depositParams?.minDeposit?.denom,
+      );
+    } else {
+      throw new Error('Unknown Cosmos proposal type.');
+    }
+
+    try {
+      const result = await cosmos.governance.submitProposalTx(
+        author,
+        _deposit,
+        prop,
+      );
+      trackAnalytics({
+        event: MixpanelGovernanceEvents.COSMOS_PROPOSAL_CREATED,
+      });
+      navigate(`/proposal/${result}`);
+    } catch (err) {
+      notifyError(err.message);
+    }
+  };
 
   return (
     <>
@@ -73,15 +134,14 @@ export const CosmosProposalForm = () => {
           setTitle(e.target.value);
         }}
       />
-      <CWTextArea
-        label="Description"
-        placeholder="Enter a description"
-        onInput={(e) => {
-          setDescription(e.target.value);
-        }}
-        value={description}
-        resizeWithText
-      />
+      <div>
+        <CWLabel label="Description" />
+        <ReactQuillEditor
+          placeholder="Enter a description"
+          contentDelta={descriptionDelta}
+          setContentDelta={setDescriptionDelta}
+        />
+      </div>
       {isLoadingDepositParams ? (
         <Skeleton className="TextInput" style={{ height: 62 }} />
       ) : (
@@ -114,53 +174,7 @@ export const CosmosProposalForm = () => {
           }}
         />
       )}
-      <CWButton
-        label="Send transaction"
-        onClick={(e) => {
-          e.preventDefault();
-
-          let prop: ProtobufAny;
-
-          const depositInMinimalDenom = naturalDenomToMinimal(
-            deposit,
-            meta?.decimals
-          );
-
-          const _deposit = deposit
-            ? new CosmosToken(
-                depositParams?.minDeposit?.denom,
-                depositInMinimalDenom,
-                false
-              )
-            : depositParams?.minDeposit;
-
-          if (cosmosProposalType === 'textProposal') {
-            prop = encodeTextProposal(title, description);
-          } else if (cosmosProposalType === 'communitySpend') {
-            const spendAmountInMinimalDenom = naturalDenomToMinimal(
-              payoutAmount,
-              meta?.decimals
-            );
-            prop = encodeCommunitySpend(
-              title,
-              description,
-              recipient,
-              spendAmountInMinimalDenom,
-              depositParams?.minDeposit?.denom
-            );
-          } else {
-            throw new Error('Unknown Cosmos proposal type.');
-          }
-
-          // TODO: add disabled / loading
-          cosmos.governance
-            .submitProposalTx(author, _deposit, prop)
-            .then((result) => {
-              navigate(`/proposal/${result}`);
-            })
-            .catch((err) => notifyError(err.message));
-        }}
-      />
+      <CWButton label="Send transaction" onClick={handleSendTransaction} />
     </>
   );
 };

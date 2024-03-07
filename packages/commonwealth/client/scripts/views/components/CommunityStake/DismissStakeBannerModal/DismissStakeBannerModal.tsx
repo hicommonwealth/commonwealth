@@ -37,7 +37,7 @@ const DismissStakeBannerModal = ({
           You can mint community stake for any community where it is enabled.
           Read more here:{' '}
           <a
-            href="https://common.xyz/faq/stake"
+            href="https://docs.commonwealth.im/commonwealth/community-overview/community-stake"
             target="_blank"
             rel="noopener noreferrer"
           >

@@ -5,16 +5,15 @@ import {
   setupErrorHandlers,
 } from '@hicommonwealth/adapters';
 import { cache, logger } from '@hicommonwealth/core';
-import { TokenBalanceCache, models } from '@hicommonwealth/model';
-import bodyParser from 'body-parser';
+import { models } from '@hicommonwealth/model';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
-import express from 'express';
+import express, { RequestHandler, json, urlencoded } from 'express';
 import session from 'express-session';
 import http from 'http';
 import passport from 'passport';
 import favicon from 'serve-favicon';
-import { SESSION_SECRET, TBC_BALANCE_TTL_SECONDS } from './server/config';
+import { SESSION_SECRET } from './server/config';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
 import setupAPI from './server/routing/router'; // performance note: this takes 15 seconds
@@ -34,10 +33,6 @@ const app = express();
 const SequelizeStore = SessionSequelizeStore(session.Store);
 // set cache TTL to 1 second to test invalidation
 const viewCountCache = new ViewCountCache(1, 10 * 60);
-const tokenBalanceCache = new TokenBalanceCache(
-  models,
-  TBC_BALANCE_TTL_SECONDS,
-);
 const databaseValidationService = new DatabaseValidationService(models);
 let server;
 
@@ -63,8 +58,8 @@ app.use('/static', express.static('static'));
 
 // add other middlewares
 // app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(json() as RequestHandler);
+app.use(urlencoded({ extended: false }) as RequestHandler);
 app.use(cookieParser());
 app.use(sessionParser);
 app.use(passport.initialize());
@@ -116,7 +111,6 @@ setupAPI(
   app,
   models,
   viewCountCache,
-  tokenBalanceCache,
   banCache,
   globalActivityCache,
   databaseValidationService,

@@ -1,5 +1,5 @@
+import CWCircleMultiplySpinner from 'client/scripts/views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import React from 'react';
-import CWLoadingSpinner from 'views/components/component_kit/new_designs/CWLoadingSpinner';
 import { CWForm } from '../../../components/component_kit/new_designs/CWForm';
 import { CWTextInput } from '../../../components/component_kit/new_designs/CWTextInput';
 import { CWButton } from '../../../components/component_kit/new_designs/cw_button';
@@ -20,7 +20,7 @@ const EmailForm = ({ onSubmit, onCancel, isLoading }: EmailFormProps) => {
       onSubmit={!isLoading ? onSubmit : () => {}}
     >
       {isLoading ? (
-        <CWLoadingSpinner />
+        <CWCircleMultiplySpinner />
       ) : (
         <>
           <CWTextInput

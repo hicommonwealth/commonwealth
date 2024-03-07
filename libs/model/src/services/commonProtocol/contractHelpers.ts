@@ -5,8 +5,7 @@ import {
 } from '@hicommonwealth/core';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
-import { DB } from '../../models';
-import { TokenBalanceCache } from '../tokenBalanceCache';
+import { getBalances } from '../tokenBalanceCache';
 
 export const getNamespace = async (
   web3: Web3,
@@ -45,7 +44,6 @@ export const getNamespace = async (
 
 /**
  * gets the balance of an id for an address on a namespace
- * @param tbc TokenBalanceCache instance
  * @param namespace namespace name
  * @param tokenId ERC1155 id(ie 0 for admin token, default 2 for CommunityStake)
  * @param chain chainNode to use(must be chain with deployed protocol)
@@ -54,22 +52,15 @@ export const getNamespace = async (
  * @returns balance in wei
  */
 export const getNamespaceBalance = async (
-  tbc: TokenBalanceCache,
   namespace: string,
   tokenId: number,
   chain: commonProtocol.ValidChains,
   address: string,
-  model: DB,
+  nodeUrl: string,
 ): Promise<string> => {
   const factoryData = commonProtocol.factoryContracts[chain];
-  const node = await model.ChainNode.findOne({
-    where: {
-      eth_chain_id: factoryData.chainId,
-    },
-    attributes: ['url'],
-  });
-  if (node) {
-    const web3 = new Web3(node.url);
+  if (nodeUrl) {
+    const web3 = new Web3(nodeUrl);
     const activeNamespace = await getNamespace(
       web3,
       namespace,
@@ -78,7 +69,7 @@ export const getNamespaceBalance = async (
     if (activeNamespace === '0x0000000000000000000000000000000000000000') {
       throw new AppError('Namespace not found for this name');
     }
-    const balance = await tbc.getBalances({
+    const balance = await getBalances({
       balanceSourceType: BalanceSourceType.ERC1155,
       addresses: [address],
       sourceOptions: {

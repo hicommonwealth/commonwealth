@@ -7,13 +7,13 @@ import {
   AddressInstance,
   ReactionAttributes,
   UserInstance,
-  contractHelpers,
+  commonProtocol as commonProtocolService,
 } from '@hicommonwealth/model';
 import { REACTION_WEIGHT_OVERRIDE } from 'server/config';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
-import { TrackOptions } from '../server_analytics_methods/track';
+import { TrackOptions } from '../server_analytics_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
 import { ServerThreadsController } from '../server_threads_controller';
 
@@ -88,7 +88,6 @@ export async function __createThreadReaction(
   if (!isAdmin) {
     const { isValid, message } = await validateTopicGroupsMembership(
       this.models,
-      this.tokenBalanceCache,
       thread.topic_id,
       thread.community_id,
       address,
@@ -114,14 +113,17 @@ export async function __createThreadReaction(
       if (!community) {
         throw new AppError(Errors.CommunityNotFound);
       }
-      const stakeBalance = await contractHelpers.getNamespaceBalance(
-        this.tokenBalanceCache,
-        community.namespace,
-        stake.stake_id,
-        commonProtocol.ValidChains.Sepolia,
-        address.address,
-        this.models,
+      const node = await this.models.ChainNode.findByPk(
+        community.chain_node_id,
       );
+      const stakeBalance =
+        await commonProtocolService.contractHelpers.getNamespaceBalance(
+          community.namespace,
+          stake.stake_id,
+          node.eth_chain_id,
+          address.address,
+          node.url,
+        );
       calculatedVotingWeight = commonProtocol.calculateVoteWeight(
         stakeBalance,
         voteWeight,
@@ -158,9 +160,9 @@ export async function __createThreadReaction(
         thread_id: thread.id,
         root_title: thread.title,
         root_type: 'discussion',
-        chain_id: thread.community_id,
+        community_id: thread.community_id,
         author_address: address.address,
-        author_chain: address.community_id,
+        author_community_id: address.community_id,
       },
     },
     excludeAddresses: [address.address],

@@ -119,7 +119,7 @@ const startEmailLogin = async (
   }&email=${encodeURIComponent(email)}`;
   const msg = {
     to: email,
-    from: 'Commonwealth <no-reply@commonwealth.im>',
+    from: 'Common <no-reply@commonwealth.im>',
     templateId: previousUser ? DynamicTemplate.SignIn : DynamicTemplate.SignUp,
     dynamic_template_data: {
       loginLink,

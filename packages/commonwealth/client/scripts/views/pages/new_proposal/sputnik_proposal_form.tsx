@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 
+import { useBrowserAnalyticsTrack } from 'client/scripts/hooks/useBrowserAnalyticsTrack';
 import { notifyError } from 'controllers/app/notifications';
 import type NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import type { NearSputnikProposalKind } from 'controllers/chain/near/sputnik/types';
-
 import app from 'state';
+import { MixpanelGovernanceEvents } from '../../../../../shared/analytics/types';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
@@ -33,9 +34,51 @@ export const SputnikProposalForm = () => {
   const [member, setMember] = useState('');
   const [payoutAmount, setPayoutAmount] = useState(0);
   const [sputnikProposalType, setSputnikProposalType] = useState(
-    sputnikProposalOptions[0].value
+    sputnikProposalOptions[0].value,
   );
   const [tokenId, setTokenId] = useState('');
+  const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
+
+  const handleSendTransaction = async (e) => {
+    e.preventDefault();
+
+    let propArgs: NearSputnikProposalKind;
+
+    if (sputnikProposalType === 'addMember') {
+      propArgs = {
+        AddMemberToRole: { role: 'council', member_id: member },
+      };
+    } else if (sputnikProposalType === 'removeMember') {
+      propArgs = {
+        RemoveMemberFromRole: { role: 'council', member_id: member },
+      };
+    } else if (sputnikProposalType === 'payout') {
+      let amount: string;
+      // treat NEAR as in dollars but tokens as whole #s
+      if (!tokenId) {
+        amount = app.chain.chain.coins(+payoutAmount, true).asBN.toString();
+      } else {
+        amount = `${+payoutAmount}`;
+      }
+
+      propArgs = {
+        Transfer: { receiver_id: member, token_id: tokenId, amount },
+      };
+    } else if (sputnikProposalType === 'vote') {
+      propArgs = 'Vote';
+    } else {
+      throw new Error('unsupported sputnik proposal type');
+    }
+
+    try {
+      await (app.chain as NearSputnik).dao.proposeTx(description, propArgs);
+      trackAnalytics({
+        event: MixpanelGovernanceEvents.SPUTNIK_PROPOSAL_CREATED,
+      });
+    } catch (err) {
+      notifyError(err.message);
+    }
+  };
 
   return (
     <>
@@ -81,46 +124,7 @@ export const SputnikProposalForm = () => {
           }}
         />
       )}
-      <CWButton
-        label="Send transaction"
-        onClick={(e) => {
-          e.preventDefault();
-
-          let propArgs: NearSputnikProposalKind;
-
-          if (sputnikProposalType === 'addMember') {
-            propArgs = {
-              AddMemberToRole: { role: 'council', member_id: member },
-            };
-          } else if (sputnikProposalType === 'removeMember') {
-            propArgs = {
-              RemoveMemberFromRole: { role: 'council', member_id: member },
-            };
-          } else if (sputnikProposalType === 'payout') {
-            let amount: string;
-            // treat NEAR as in dollars but tokens as whole #s
-            if (!tokenId) {
-              amount = app.chain.chain
-                .coins(+payoutAmount, true)
-                .asBN.toString();
-            } else {
-              amount = `${+payoutAmount}`;
-            }
-
-            propArgs = {
-              Transfer: { receiver_id: member, token_id: tokenId, amount },
-            };
-          } else if (sputnikProposalType === 'vote') {
-            propArgs = 'Vote';
-          } else {
-            throw new Error('unsupported sputnik proposal type');
-          }
-
-          (app.chain as NearSputnik).dao
-            .proposeTx(description, propArgs)
-            .catch((err) => notifyError(err.message));
-        }}
-      />
+      <CWButton label="Send transaction" onClick={handleSendTransaction} />
     </>
   );
 };

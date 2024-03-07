@@ -1,10 +1,11 @@
+import { ViewThreadUpvotesDrawer } from 'client/scripts/views/components/UpvoteDrawer';
 import { QuillRenderer } from 'client/scripts/views/components/react_quill_editor/quill_renderer';
 import { isDefaultStage, threadStageToLabel } from 'helpers';
 import { filterLinks } from 'helpers/threads';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
 import { LinkSource } from 'models/Thread';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { slugify } from 'utils';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -57,6 +58,7 @@ export const ThreadCard = ({
 }: CardProps) => {
   const { isLoggedIn } = useUserLoggedIn();
   const { isWindowSmallInclusive } = useBrowserWindow({});
+  const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
 
   useEffect(() => {
     if (localStorage.getItem('dark-mode-state') === 'on') {
@@ -189,7 +191,6 @@ export const ThreadCard = ({
           <div
             className="content-footer"
             onClick={(e) => {
-              e.preventDefault();
               e.stopPropagation();
             }}
           >
@@ -218,10 +219,16 @@ export const ThreadCard = ({
               hasPendingEdits={hasPendingEdits}
               onCommentBtnClick={onCommentBtnClick}
               disabledActionTooltipText={disabledActionsTooltipText}
+              setIsUpvoteDrawerOpen={setIsUpvoteDrawerOpen}
             />
           </div>
         </div>
       </Link>
+      <ViewThreadUpvotesDrawer
+        thread={thread}
+        isOpen={isUpvoteDrawerOpen}
+        setIsOpen={setIsUpvoteDrawerOpen}
+      />
     </>
   );
 };

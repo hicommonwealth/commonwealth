@@ -1,6 +1,5 @@
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
-import { featureFlags } from 'helpers/feature-flags';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import React, { useState } from 'react';
 import app from 'state';
@@ -12,9 +11,6 @@ import {
   useDeleteCommentReactionMutation,
 } from '../../../state/api/comments';
 import { AuthModal } from '../../modals/AuthModal';
-import { LoginModal } from '../../modals/login_modal';
-import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
-import { CWModal } from '../component_kit/new_designs/CWModal';
 import { getDisplayedReactorsForPopup } from './helpers';
 
 type CommentReactionButtonProps = {
@@ -65,7 +61,10 @@ export const CommentReactionButton = ({
   const hasReacted = !!(comment.reactions || []).find(
     (x) => x?.author === activeAddress,
   );
-  const likes = comment.reactionWeightsSum || comment.reactions.length;
+  const reactionWeightsSum = comment.reactions.reduce(
+    (acc, curr) => acc + (curr.calculatedVotingWeight || 1),
+    0,
+  );
 
   const handleVoteClick = async (e) => {
     e.stopPropagation();
@@ -112,24 +111,13 @@ export const CommentReactionButton = ({
 
   return (
     <>
-      {!featureFlags.newSignInModal ? (
-        <CWModal
-          content={
-            <LoginModal onModalClose={() => setIsAuthModalOpen(false)} />
-          }
-          isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-          onClose={() => setIsAuthModalOpen(false)}
-          open={isAuthModalOpen}
-        />
-      ) : (
-        <AuthModal
-          onClose={() => setIsAuthModalOpen(false)}
-          isOpen={isAuthModalOpen}
-        />
-      )}
+      <AuthModal
+        onClose={() => setIsAuthModalOpen(false)}
+        isOpen={isAuthModalOpen}
+      />
       {RevalidationModal}
       <CWUpvoteSmall
-        voteCount={likes}
+        voteCount={reactionWeightsSum}
         disabled={!hasJoinedCommunity || disabled}
         selected={hasReacted}
         onClick={handleVoteClick}

@@ -10,6 +10,7 @@ interface SellStakeProps {
   amount: number;
   chainRpc: string;
   walletAddress: string;
+  ethChainId: number;
 }
 
 const sellStake = async ({
@@ -18,13 +19,12 @@ const sellStake = async ({
   amount,
   chainRpc,
   walletAddress,
+  ethChainId,
 }: SellStakeProps) => {
   const CommunityStakes = await lazyLoadCommunityStakes();
   const communityStakes = new CommunityStakes(
-    commonProtocol.factoryContracts[
-      commonProtocol.ValidChains.Sepolia
-    ].communityStake,
-    commonProtocol.factoryContracts[commonProtocol.ValidChains.Sepolia].factory,
+    commonProtocol.factoryContracts[ethChainId].communityStake,
+    commonProtocol.factoryContracts[ethChainId].factory,
     chainRpc,
   );
 

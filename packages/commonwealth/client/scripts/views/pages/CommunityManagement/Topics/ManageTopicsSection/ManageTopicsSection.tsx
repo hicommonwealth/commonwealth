@@ -1,4 +1,7 @@
-import { notifyError } from 'client/scripts/controllers/app/notifications';
+import {
+  notifyError,
+  notifySuccess,
+} from 'client/scripts/controllers/app/notifications';
 import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import type Topic from 'client/scripts/models/Topic';
 import app from 'client/scripts/state';
@@ -69,18 +72,21 @@ export const ManageTopicsSection = () => {
     getRegularTopics(rawTopics),
   );
 
+  const initialFeaturedTopics = getFeaturedTopics(rawTopics);
+
   const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
 
   const handleSave = async () => {
     try {
       await updateFeaturedTopicsOrder({ featuredTopics: featuredTopics });
+      notifySuccess('Topic order updated!');
     } catch (err) {
-      notifyError('Failed to update order');
+      notifyError('Failed to update topic order');
     }
   };
 
   const handleReversion = () => {
-    setFeaturedTopics(getFeaturedTopics(rawTopics));
+    setFeaturedTopics(initialFeaturedTopics);
   };
 
   useEffect(() => {
@@ -148,6 +154,9 @@ export const ManageTopicsSection = () => {
           buttonWidth={isWindowExtraSmall ? 'full' : 'narrow'}
           buttonHeight="med"
           onClick={handleReversion}
+          disabled={initialFeaturedTopics.every(
+            (value, index) => value.id === featuredTopics[index].id,
+          )}
         />
         <CWButton
           buttonType="primary"

@@ -1,34 +1,23 @@
-import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import { sequelize } from '@hicommonwealth/model';
-import type { NextFunction, Request, Response } from 'express';
+import type { Request, Response } from 'express';
 
 export const Errors = {
-  NoChain: 'Must provide chain',
+  NoCommunity: 'Must provide community',
   NoAddress: 'Must provide address',
 };
 
 // update ghost address for imported discourse users by new address
-const updateAddress = async (
-  models: DB,
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { address, chain } = req.body;
-  if (!address) {
-    return next(new AppError(Errors.NoAddress));
-  }
-  if (!chain) {
-    return next(new AppError(Errors.NoChain));
-  }
+const updateAddress = async (models: DB, req: Request, res: Response) => {
+  const { address, community } = req;
+
   const transaction = await sequelize.transaction();
   try {
     if (req.user.id) {
       const { id: ghostAddressId } =
         (await models.Address.scope('withPrivateData').findOne({
           where: {
-            community_id: chain,
+            community_id: community.id,
             ghost_address: true,
             user_id: req.user.id,
           },
@@ -36,7 +25,11 @@ const updateAddress = async (
 
       const { id: newAddressId } =
         (await models.Address.scope('withPrivateData').findOne({
-          where: { community_id: chain, user_id: req.user.id, address },
+          where: {
+            community_id: community.id,
+            user_id: req.user.id,
+            address: address.address,
+          },
         })) || {};
 
       if (ghostAddressId && newAddressId) {

@@ -79,6 +79,7 @@ export enum WalletSsoSource {
   Github = 'github',
   Discord = 'discord',
   Twitter = 'twitter',
+  apple = 'apple',
   Email = 'email',
   Unknown = 'unknown', // address created after we launched SSO, before we started recording WalletSsoSource
 }
@@ -239,3 +240,20 @@ export type ChainEventNotification = {
   created_at: Date;
   ChainEvent: ChainEventAttributes;
 };
+
+export type AnalyticsOptions = Record<string, any>;
+
+export enum NodeHealth {
+  Failed = 'failed',
+  Healthy = 'healthy',
+}
+
+/**
+ * Cosmos gov module version of a chain
+ */
+export enum CosmosGovernanceVersion {
+  v1 = 'v1',
+  v1beta1 = 'v1beta1',
+  v1beta1Failed = 'v1beta1-attempt-failed',
+  v1Failed = 'v1-attempt-failed',
+}

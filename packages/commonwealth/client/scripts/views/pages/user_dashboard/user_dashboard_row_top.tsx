@@ -26,19 +26,19 @@ export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
 
   const {
     created_at,
-    chain_id,
+    community_id,
     thread_id,
     root_title,
-    author_chain,
+    author_community_id,
     author_address,
     comment_text,
     root_type,
   } = JSON.parse(activityData.notificationData);
 
   const communityName =
-    app.config.chains.getById(chain_id)?.name || 'Unknown chain';
+    app.config.chains.getById(community_id)?.name || 'Unknown chain';
 
-  const communityIcon = app.config.chains.getById(chain_id)?.iconUrl;
+  const communityIcon = app.config.chains.getById(community_id)?.iconUrl;
 
   let decodedTitle;
 
@@ -60,14 +60,14 @@ export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
       onClick={(e: any) => {
         e.preventDefault();
         e.stopPropagation();
-        navigate(`/${author_chain}/account/${author_address}`);
+        navigate(`/${author_community_id}/account/${author_address}`);
       }}
     >
       <User
         userAddress={author_address}
-        userCommunityId={author_chain}
+        userCommunityId={author_community_id}
         shouldLinkProfile
-        avatarSize={16}
+        avatarSize={32}
       />
     </span>
   );
@@ -83,7 +83,7 @@ export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
             onClick={(e) => {
               e.stopPropagation();
             }}
-            to={`/${chain_id}`}
+            to={`/${community_id}`}
           >
             {communityName}
           </Link>
@@ -103,7 +103,7 @@ export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
         </CWText>
       </div>
       <div className="comment-preview">
-        {<QuillRenderer doc={comment_text} />}
+        <QuillRenderer doc={comment_text} />
       </div>
     </div>
   );

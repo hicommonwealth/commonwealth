@@ -17,7 +17,7 @@ import { renderQuillDeltaToText } from '../../../shared/utils';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
-import { TrackOptions } from '../server_analytics_methods/track';
+import { TrackOptions } from '../server_analytics_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
 import { ServerThreadsController } from '../server_threads_controller';
 
@@ -152,7 +152,6 @@ export async function __createThread(
   if (!isAdmin) {
     const { isValid, message } = await validateTopicGroupsMembership(
       this.models,
-      this.tokenBalanceCache,
       topicId,
       community.id,
       address,
@@ -249,9 +248,9 @@ export async function __createThread(
         root_type: ProposalType.Thread,
         root_title: finalThread.title,
         comment_text: finalThread.body,
-        chain_id: finalThread.community_id,
+        community_id: finalThread.community_id,
         author_address: finalThread.Address.address,
-        author_chain: finalThread.Address.community_id,
+        author_community_id: finalThread.Address.community_id,
       },
     },
     excludeAddresses: excludedAddrs,
@@ -273,9 +272,9 @@ export async function __createThread(
             root_type: ProposalType.Thread,
             root_title: finalThread.title,
             comment_text: finalThread.body,
-            chain_id: finalThread.community_id,
+            community_id: finalThread.community_id,
             author_address: finalThread.Address.address,
-            author_chain: finalThread.Address.community_id,
+            author_community_id: finalThread.Address.community_id,
           },
         },
         excludeAddresses: [finalThread.Address.address],

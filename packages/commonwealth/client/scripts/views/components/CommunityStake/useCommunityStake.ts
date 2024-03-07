@@ -1,5 +1,4 @@
 import { commonProtocol } from '@hicommonwealth/core';
-import { featureFlags } from 'helpers/feature-flags';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import app from 'state';
 import {
@@ -7,6 +6,7 @@ import {
   useGetBuyPriceQuery,
   useGetUserStakeBalanceQuery,
 } from 'state/api/communityStake';
+import { useFlag } from '../../../hooks/useFlag';
 
 interface UseCommunityStakeProps {
   communityId?: string;
@@ -15,6 +15,7 @@ interface UseCommunityStakeProps {
 }
 
 const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
+  const communityStakeEnabled = useFlag('communityStake');
   const {
     communityId,
     stakeId = commonProtocol.STAKE_ID,
@@ -25,19 +26,20 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
   const activeCommunityId = app?.chain?.id;
   const activeCommunityNamespace = app?.chain?.meta?.namespace;
   const chainRpc = app?.chain?.meta?.ChainNode?.url;
+  const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
   const activeAccountAddress = app?.user?.activeAccount?.address;
 
   const { isInitialLoading: communityStakeLoading, data: stakeResponse } =
     useFetchCommunityStakeQuery({
       communityId: communityId || activeCommunityId,
       stakeId,
-      apiEnabled: featureFlags.communityStake && !!activeCommunityId,
+      apiEnabled: communityStakeEnabled && !!activeCommunityId,
     });
 
   const stakeData = stakeResponse?.data?.result;
   const stakeEnabled = stakeData?.stake_enabled;
   const apiEnabled = Boolean(
-    featureFlags.communityStake &&
+    communityStakeEnabled &&
       stakeEnabled &&
       (walletAddress || activeAccountAddress) &&
       !!activeCommunityNamespace &&
@@ -54,6 +56,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     chainRpc,
     walletAddress: walletAddress || activeAccountAddress,
     keepPreviousData: true,
+    ethChainId,
   });
 
   const { isInitialLoading: buyPriceDataLoading, data: buyPriceData } =
@@ -63,6 +66,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
       amount: Number(userStakeBalanceData),
       apiEnabled: apiEnabled && !isNaN(Number(userStakeBalanceData)),
       chainRpc,
+      ethChainId,
       keepPreviousData: true,
     });
 

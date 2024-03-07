@@ -17,6 +17,7 @@ If you add a new environment variable, you must add documentation here. Please d
 - [CHAIN_PORT](#chain_port)
 - [CLOUDAMQP_URL](#cloudamqp_url)
 - [COSMOS_GOV_V1](#cosmos_gov_v1)
+- [COSMOS_PROXY_REFERER](#cosmos_proxy_referer)
 - [COSMOS_REGISTRY_API](#cosmos_registry_api)
 - [CW_BOT_KEY](#cw_bot_key)
 - [DATABASE_CLEAN_HOUR](#database_clean_hour)
@@ -40,6 +41,7 @@ If you add a new environment variable, you must add documentation here. Please d
 - [ETH_ALCHEMY_API_KEY](#eth_alchemy_api_key)
 - [ETH_RPC](#eth_rpc)
 - [ETHERSCAN_JS_API_KEY](#etherscan_js_api_key)
+- [FALLBACK_NODE_DURATION_S](#fallback_node_duration_s)
 - [FLAG_COMMUNITY_HOMEPAGE](#flag_community_homepage)
 - [FLAG_PROPOSAL_TEMPLATES](#flag_proposal_templates)
 - [HEROKU_APP_NAME](#heroku_app_name)
@@ -76,6 +78,8 @@ If you add a new environment variable, you must add documentation here. Please d
 - [SLACK_FEEDBACK_WEBHOOK](#slack_feedback_webhook)
 - [SLACK_WEBHOOK_URL_DEV](#slack_webhook_url_dev)
 - [SNAPSHOT_HUB_URL](#snapshot_hub_url)
+- [SUPER_ADMIN_EMAIL](#super_admin_email)
+- [SUPER_ADMIN_WALLET_ADDRESS](#super_admin_wallet_address)
 - [TELEGRAM_BOT_TOKEN_DEV](#telegram_bot_token_dev)
 - [TEST_ENV](#test_env)
 - [WITH_PRERENDER](#with_prerender)
@@ -108,6 +112,14 @@ Required in production. The URI of our RabbitMQ instance. This value is usually 
 ## COSMOS_GOV_V1
 
 Comma-separated list (e.g. "kyve,csdk") of Cosmos chains using v1 (not v1beta1). As of 231212, this should be `kyve,csdk,csdk-v1,quicksilver-protocol,juno,regen` by default.
+
+Owner: Mark Hagelberg.
+
+## COSMOS_PROXY_REFERER
+
+Optional.
+A whitelist Referer header that will prevent us getting rate-limited by the [proxy maintainers](https://github.com/cosmos/chain-registry/).
+Only used for cosmosAPI requests.
 
 Owner: Mark Hagelberg.
 
@@ -212,6 +224,12 @@ Owner: Ian Rowan
 ## ETHERSCAN_JS_API_KEY
 
 API key for Ethereum data.
+
+## FALLBACK_NODE_DURATION_S
+
+Optional. Defaults to 5 minutes (300 seconds).
+This is number, in seconds. It configures the length of time we will use a community-maintained public endpoint if a given ChainNode fails.
+After this time, the server will try the original DB endpoint again.
 
 ## FLAG_COMMUNITY_HOMEPAGE
 
@@ -362,6 +380,14 @@ Connects to the #testing-webhooks Slack channel on the Common workspace. Require
 ## SNAPSHOT_HUB_URL
 
 Snapshot Hub URL used for Snapshot API requests. As of 231201 the default value is `https://hub.snapshot.org`.
+
+## SUPER_ADMIN_EMAIL
+
+Used by the `set-super-admin` package script to give super-admin status to the user account which owns the supplied email. Alternatively, SUPER_ADMIN_WALLET_ADDRESS may be set in its stead.
+
+## SUPER_ADMIN_WALLET_ADDRESS
+
+Used by the `set-super-admin` package script to give super-admin status to the user account which owns the supplied address. Alternatively, SUPER_ADMIN_EMAIL may be set in its stead.
 
 ## TELEGRAM_BOT_TOKEN_DEV
 

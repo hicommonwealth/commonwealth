@@ -1,15 +1,17 @@
 import {
   HotShotsStats,
+  MixpanelAnalytics,
+  PinoLogger,
   ServiceKey,
-  TypescriptLoggingLogger,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { logger, stats } from '@hicommonwealth/core';
+import { analytics, logger, stats } from '@hicommonwealth/core';
 import express from 'express';
 
 // bootstrap production adapters
-const log = logger(TypescriptLoggingLogger()).getLogger(__filename);
+const log = logger(PinoLogger()).getLogger(__filename);
 stats(HotShotsStats());
+analytics(MixpanelAnalytics());
 
 let isServiceHealthy = false;
 startHealthCheckLoop({

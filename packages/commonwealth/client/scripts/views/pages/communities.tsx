@@ -7,10 +7,12 @@ import numeral from 'numeral';
 import 'pages/communities.scss';
 import React from 'react';
 import app from 'state';
+import useFetchActiveCommunitiesQuery from 'state/api/communities/fetchActiveCommunities';
 import CommunityInfo from '../../models/ChainInfo';
-import { CommunityCard, NewCommunityCard } from '../components/community_card';
+import { CommunityCard, NewCommunityCard } from '../components/CommunityCard';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
+import CWCircleMultiplySpinner from '../components/component_kit/new_designs/CWCircleMultiplySpinner';
 
 const buildCommunityString = (numCommunities: number) =>
   numCommunities >= 1000
@@ -135,7 +137,15 @@ const CommunitiesPage = () => {
     return res;
   };
 
-  const sortedCommunities = sortCommunities(app.config.chains.getAll());
+  const { data: activeCommunities, isLoading } =
+    useFetchActiveCommunitiesQuery();
+  const sortedCommunities = activeCommunities
+    ? sortCommunities(
+        activeCommunities.communities.map((c: any) =>
+          CommunityInfo.fromJSON(c),
+        ),
+      )
+    : [];
 
   return (
     <div className="CommunitiesPage">
@@ -145,7 +155,8 @@ const CommunitiesPage = () => {
             Explore Communities
           </CWText>
           <CWText type="h3" fontWeight="semiBold" className="communities-count">
-            {buildCommunityString(sortedCommunities.length)}
+            {activeCommunities &&
+              buildCommunityString(activeCommunities.totalCommunitiesCount)}
           </CWText>
         </div>
         <div className="filter-buttons">
@@ -193,10 +204,14 @@ const CommunitiesPage = () => {
           })}
         </div>
       </div>
-      <div className="communities-list">
-        {sortedCommunities}
-        <NewCommunityCard />
-      </div>
+      {isLoading ? (
+        <CWCircleMultiplySpinner />
+      ) : (
+        <div className="communities-list">
+          {sortedCommunities}
+          <NewCommunityCard />
+        </div>
+      )}
     </div>
   );
 };

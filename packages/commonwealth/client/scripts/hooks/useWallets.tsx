@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import type { SessionPayload } from '@canvas-js/interfaces';
 import { ChainBase, WalletSsoSource } from '@hicommonwealth/core';
-import 'components/component_kit/cw_wallets_list.scss';
 import {
   completeClientLogin,
   createUserWithAddress,
@@ -30,7 +29,6 @@ import {
 } from '../../../shared/analytics/types';
 import NewProfilesController from '../controllers/server/newProfiles';
 import { setDarkMode } from '../helpers/darkMode';
-import { featureFlags } from '../helpers/feature-flags';
 import {
   getAddressFromWallet,
   loginToAxie,
@@ -39,17 +37,38 @@ import {
 import Account from '../models/Account';
 import IWebWallet from '../models/IWebWallet';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from '../state/api/profiles/fetchProfilesByAddress';
-import type { ProfileRowProps } from '../views/components/component_kit/cw_profiles_list';
 import {
   breakpointFnValidator,
   isWindowMediumSmallInclusive,
 } from '../views/components/component_kit/helpers';
-import type {
-  LoginActiveStep,
-  LoginSidebarType,
-} from '../views/pages/login/types';
 import { useBrowserAnalyticsTrack } from './useBrowserAnalyticsTrack';
 import useBrowserWindow from './useBrowserWindow';
+
+type ProfileRowProps = {
+  name: string;
+  onClick?: () => void;
+  darkMode?: boolean;
+  isSelected?: boolean;
+};
+
+type LoginSidebarType =
+  | 'connectWallet'
+  | 'emailLogin'
+  | 'communityWalletOptions'
+  | 'newAddressLinked'
+  | 'newOrReturning'
+  | 'createCommunityLogin';
+
+type LoginActiveStep =
+  | 'allSet'
+  | 'connectWithEmail'
+  | 'redirectToSign'
+  | 'ethWalletList'
+  | 'selectAccountType'
+  | 'selectPrevious'
+  | 'selectProfile'
+  | 'walletList'
+  | 'welcome';
 
 type IuseWalletProps = {
   initialBody?: LoginActiveStep;
@@ -62,13 +81,14 @@ type IuseWalletProps = {
 };
 
 const useWallets = (walletProps: IuseWalletProps) => {
+  const createAccountWithDefaultValues = true;
   const [avatarUrl, setAvatarUrl] = useState<string>();
   const [address, setAddress] = useState<string>();
   const [activeStep, setActiveStep] = useState<LoginActiveStep>();
   const [profiles, setProfiles] = useState<Array<ProfileRowProps>>();
   const [sidebarType, setSidebarType] = useState<LoginSidebarType>();
   const [username, setUsername] = useState<string>(
-    featureFlags.newSignInModal ? 'Anonymous' : '',
+    createAccountWithDefaultValues ? 'Anonymous' : '',
   );
   const [email, setEmail] = useState<string>();
   const [wallets, setWallets] = useState<Array<IWebWallet<any>>>();
@@ -382,7 +402,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
           setSidebarType('newOrReturning');
           setActiveStep('selectAccountType');
 
-          if (featureFlags.newSignInModal) {
+          if (createAccountWithDefaultValues) {
             // Create the account with default values
             await onCreateNewAccount(
               walletToUse,
@@ -593,7 +613,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
                 ),
               })
             : selectedAddress,
-        chain: app.activeChainId() ?? wallet.chain,
+        community_id: app.activeChainId() ?? wallet.chain,
         jwt: app.user.jwt,
       });
       if (result.exists && result.belongsToUser) {
@@ -641,7 +661,16 @@ const useWallets = (walletProps: IuseWalletProps) => {
         setSignerAccount(signingAccount);
         setIsNewlyCreated(newlyCreated);
         setIsLinkingOnMobile(isLinkingWallet);
-        setActiveStep('redirectToSign');
+        if (createAccountWithDefaultValues) {
+          onAccountVerified(
+            signingAccount,
+            newlyCreated,
+            isLinkingWallet,
+            wallet,
+          );
+        } else {
+          setActiveStep('redirectToSign');
+        }
       } else {
         onAccountVerified(
           signingAccount,
@@ -724,7 +753,11 @@ const useWallets = (walletProps: IuseWalletProps) => {
       if (setSignerAccount) setSignerAccount(account);
       if (setIsNewlyCreated) setIsNewlyCreated(false);
       if (setIsLinkingOnMobile) setIsLinkingOnMobile(false);
-      setActiveStep('redirectToSign');
+      if (createAccountWithDefaultValues) {
+        onAccountVerified(account, false, false);
+      } else {
+        setActiveStep('redirectToSign');
+      }
       return;
     } else {
       onAccountVerified(account, false, false);

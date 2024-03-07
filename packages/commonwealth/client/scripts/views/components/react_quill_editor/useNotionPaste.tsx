@@ -1,45 +1,49 @@
-import { useEffect } from 'react';
+import { Dispatch, SetStateAction, useEffect } from 'react';
+import type { SerializableDeltaStatic } from './utils';
 
-export const useNotionPaste = (setContentDelta, contentDelta, editorRef) => {
+export const useNotionPaste = (
+  setContentDelta: Dispatch<SetStateAction<SerializableDeltaStatic>>,
+  contentDelta: SerializableDeltaStatic,
+  editorRef,
+  isEditorFocused: boolean,
+) => {
   useEffect(() => {
+    const editor = editorRef.current?.getEditor();
     const handlePaste = (event) => {
+      if (!isEditorFocused) return;
       event.preventDefault();
-      const editor = editorRef.current?.getEditor();
       const pastedText = event.clipboardData.getData('text/plain');
-      if (pastedText) {
-        const lines = pastedText.split('\n');
-        const fixedLines = lines.map((line) => {
-          if (line.trim().startsWith('[ ]')) {
-            return `- ${line.trim()}`;
-          }
-          return line;
-        });
-        const fixedText = fixedLines.join('\n');
 
-        if (fixedText !== contentDelta.ops[0]?.insert) {
-          setContentDelta((prevDelta) => ({
-            ...prevDelta,
+      if (pastedText) {
+        setContentDelta((prevContentDelta) => {
+          return {
+            ...prevContentDelta,
             ops: [
-              ...prevDelta.ops,
+              ...prevContentDelta.ops,
               {
-                insert: fixedText,
+                insert: pastedText,
               },
             ],
-          }));
+            ___isMarkdown: true,
+          };
+        });
 
-          //Setting a delay to reset cursor position
-          setTimeout(() => {
-            const newCursorPosition = editor.getLength();
-            editor.setSelection(newCursorPosition, newCursorPosition);
-          }, 10);
-        }
+        setTimeout(() => {
+          const newCursorPosition = editor.getLength() - 1;
+          editor.setSelection(newCursorPosition, newCursorPosition);
+        }, 10);
+        return;
       }
     };
 
-    document.addEventListener('paste', handlePaste);
+    const editorElement = editor.root;
 
-    return () => {
-      document.removeEventListener('paste', handlePaste);
-    };
-  }, [setContentDelta, editorRef, contentDelta]);
+    if (contentDelta) {
+      editorElement.addEventListener('paste', handlePaste);
+
+      return () => {
+        editorElement.removeEventListener('paste', handlePaste);
+      };
+    }
+  }, [setContentDelta, editorRef, contentDelta, isEditorFocused]);
 };

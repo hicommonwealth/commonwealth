@@ -1,0 +1,54 @@
+@import '../../../../styles/shared';
+
+.new-community-card.Card {
+  height: 336px;
+  width: 240px;
+
+  @include smallInclusive {
+    height: 220px;
+    width: 136px;
+  }
+
+  .new-community-card-body {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+
+    .new-community-header.Text {
+      margin-bottom: 48px;
+      text-align: center;
+
+      @include smallInclusive {
+        font-family: $font-family-silka;
+        font-size: 18px;
+        line-height: 24px;
+        margin-bottom: 8px;
+        width: 96px;
+      }
+    }
+
+    .new-community.Text {
+      margin-bottom: 48px;
+      text-align: center;
+
+      @include smallInclusive {
+        font-family: $font-family-neue-haas-unica;
+        font-size: 12px;
+        letter-spacing: 0.02em;
+        line-height: 16px;
+        margin-bottom: 8px;
+      }
+    }
+
+    @include smallInclusive {
+      a.learn-more {
+        font-family: $font-family-neue-haas-unica;
+        font-size: 12px;
+        letter-spacing: 0.02em;
+        line-height: 16px;
+      }
+    }
+  }
+}

@@ -1,25 +1,13 @@
-import { CommandMetadata, InvalidState } from '@hicommonwealth/core';
-import { z } from 'zod';
+import { CommandMetadata, InvalidState, community } from '@hicommonwealth/core';
 import { models } from '../database';
 import { isCommunityAdmin } from '../middleware';
 import { mustExist } from '../middleware/guards';
-import { CommunityAttributes } from '../models';
-import { validateCommunityStakeConfig } from '../services/commonProtocol/communityStakeConfigValidator';
+import { commonProtocol } from '../services';
 
-const schema = z.object({
-  stake_id: z.coerce.number().int(),
-  stake_token: z.string().default(''),
-  vote_weight: z.coerce.number().default(1),
-  stake_enabled: z.coerce.boolean().default(true),
-});
-
-export type SetCommunityStake = z.infer<typeof schema>;
-
-export const SetCommunityStake: CommandMetadata<
-  CommunityAttributes,
-  typeof schema
-> = {
-  schema,
+export const SetCommunityStake = (): CommandMetadata<
+  typeof community.SetCommunityStake
+> => ({
+  schemas: community.SetCommunityStake,
   auth: [isCommunityAdmin],
   body: async ({ id, payload }) => {
     // !load
@@ -48,7 +36,10 @@ export const SetCommunityStake: CommandMetadata<
       );
 
     // !domain, application, and infrastructure services (stateless, not related to entities or value objects)
-    await validateCommunityStakeConfig(community, payload.stake_id);
+    await commonProtocol.communityStakeConfigValidator.validateCommunityStakeConfig(
+      community,
+      payload.stake_id,
+    );
 
     // !side effects
     const [updated] = await models.CommunityStake.upsert({
@@ -61,4 +52,4 @@ export const SetCommunityStake: CommandMetadata<
       CommunityStakes: [updated.get({ plain: true })],
     };
   },
-};
+});

@@ -11,14 +11,13 @@ class DashboardActivityNotification {
   public readonly notificationData?: string;
   public readonly threadId?: string;
   public readonly commenters?: ProfileWithAddress[];
-  public readonly chainId?: string;
 
   // Chain Event Notifications
   public readonly blockNumber?: number;
   public readonly eventData?: IChainEventData;
   public readonly updatedAt?: moment.Moment;
   public readonly eventNetwork?: SupportedNetwork;
-  public readonly chain?: string;
+  public readonly communityId?: string;
 
   constructor({
     createdAt,
@@ -30,9 +29,8 @@ class DashboardActivityNotification {
     eventData,
     updatedAt,
     eventNetwork,
-    chain,
+    communityId,
     commenters,
-    chainId,
   }: {
     createdAt: string;
     threadId?: string;
@@ -47,9 +45,8 @@ class DashboardActivityNotification {
     id?: number;
     updatedAt?: string;
     eventNetwork?: SupportedNetwork;
-    chain?: string;
+    communityId?: string;
     commenters?: ProfileWithAddress[];
-    chainId?: string;
   }) {
     this.categoryId = categoryId || 'chain-event';
     this.threadId = threadId;
@@ -60,9 +57,8 @@ class DashboardActivityNotification {
     this.eventData = eventData;
     this.updatedAt = moment(updatedAt);
     this.eventNetwork = eventNetwork;
-    this.chain = chain;
+    this.communityId = communityId;
     this.commenters = commenters;
-    this.chainId = chainId;
   }
 
   public static fromJSON(json) {
@@ -76,9 +72,8 @@ class DashboardActivityNotification {
       eventData: json.event_data,
       updatedAt: json.updated_at,
       eventNetwork: json.network || json.event_network,
-      chain: json.chain,
+      communityId: json.community_id,
       commenters: json.commenters,
-      chainId: json.chain_id,
     });
   }
 }

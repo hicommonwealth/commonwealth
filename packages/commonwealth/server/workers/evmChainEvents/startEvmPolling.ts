@@ -1,7 +1,7 @@
-import { TypescriptLoggingLogger } from '@hicommonwealth/adapters';
+import { PinoLogger } from '@hicommonwealth/adapters';
 import { logger } from '@hicommonwealth/core';
 
-const log = logger(TypescriptLoggingLogger()).getLogger(__filename);
+const log = logger(PinoLogger()).getLogger(__filename);
 
 /**
  * Starts an infinite loop that periodically fetches and parses blocks from

@@ -21,11 +21,11 @@ export const Breadcrumbs = () => {
       location.pathname.split('/')[1].toLowerCase() === 'discussion', //Only call when in discussion pages prevents unnecessary calls.
   });
 
-  const user = app.user.addresses[0];
+  const user = app?.user?.addresses?.[0];
   const profileId = user?.profileId || user?.profile.id;
 
   const currentDiscussion = {
-    currentThreadName: linkedThreads?.[0].title,
+    currentThreadName: linkedThreads?.[0]?.title,
     currentTopic: linkedThreads?.[0]?.topic.name,
     topicURL: `/discussions/${encodeURI(linkedThreads?.[0]?.topic.name)}`,
   };

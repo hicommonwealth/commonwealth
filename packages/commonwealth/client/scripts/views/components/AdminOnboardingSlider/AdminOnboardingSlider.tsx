@@ -1,4 +1,3 @@
-import { featureFlags } from 'helpers/feature-flags';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
@@ -78,7 +77,6 @@ export const AdminOnboardingSlider = () => {
       threads.length > 0 &&
       hasAnyIntegration) ||
     !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin()) ||
-    !featureFlags.newAdminOnboardingEnabled ||
     [
       ...shouldHideAdminCardsTemporary,
       ...shouldHideAdminCardsPermanently,

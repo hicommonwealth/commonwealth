@@ -1,5 +1,14 @@
 import { ExitCode } from './enums';
-import { AdapterFactory, Disposable, Disposer } from './interfaces';
+import { getInMemoryLogger } from './in-memory-logger';
+import {
+  AdapterFactory,
+  Analytics,
+  Cache,
+  Disposable,
+  Disposer,
+  Logger,
+  Stats,
+} from './interfaces';
 
 /**
  * Map of disposable adapter instances
@@ -16,7 +25,9 @@ export function port<T extends Disposable>(factory: AdapterFactory<T>) {
     if (!adapters.has(factory.name)) {
       const instance = factory(adapter);
       adapters.set(factory.name, instance);
-      console.log('[binding adapter]', instance.name || factory.name);
+      logger()
+        .getLogger(__filename)
+        .info(`[binding adapter] ${instance.name || factory.name}`);
       return instance;
     }
     return adapters.get(factory.name) as T;
@@ -33,14 +44,22 @@ const disposers: Disposer[] = [];
  * @param code exit code, defaults to unit testing
  */
 const disposeAndExit = async (code: ExitCode = 'UNIT_TEST'): Promise<void> => {
+  // don't kill process when errors are caught in production
+  if (code === 'ERROR' && process.env.NODE_ENV === 'production') return;
+
+  // call disposers
   await Promise.all(disposers.map((disposer) => disposer()));
   await Promise.all(
-    [...adapters].map(async ([key, adapter]) => {
-      console.log('[disposing adapter]', adapter.name || key);
+    [...adapters].reverse().map(async ([key, adapter]) => {
+      logger()
+        .getLogger(__filename)
+        .info(`[disposing adapter] ${adapter.name || key}`);
       await adapter.dispose();
     }),
   );
   adapters.clear();
+
+  // exit when not unit testing
   code !== 'UNIT_TEST' && process.exit(code === 'ERROR' ? 1 : 0);
 };
 
@@ -60,18 +79,88 @@ export const dispose = (
  * Handlers to dispose registered resources on exit or unhandled exceptions
  */
 process.once('SIGINT', async (arg?: any) => {
-  console.log('SIGINT', arg !== 'SIGINT' ? arg : '');
+  logger()
+    .getLogger(__filename)
+    .info(`SIGINT ${arg !== 'SIGINT' ? arg : ''}`);
   await disposeAndExit('EXIT');
 });
 process.once('SIGTERM', async (arg?: any) => {
-  console.log('SIGTERM', arg !== 'SIGTERM' ? arg : '');
+  logger()
+    .getLogger(__filename)
+    .info(`SIGTERM ${arg !== 'SIGTERM' ? arg : ''}`);
   await disposeAndExit('EXIT');
 });
 process.once('uncaughtException', async (arg?: any) => {
-  console.error('Uncaught Exception', arg);
+  logger().getLogger(__filename).error('Uncaught Exception', arg);
   await disposeAndExit('ERROR');
 });
 process.once('unhandledRejection', async (arg?: any) => {
-  console.error('Unhandled Rejection', arg);
+  logger().getLogger(__filename).error('Unhandled Rejection', arg);
   await disposeAndExit('ERROR');
+});
+
+/**
+ * Logger port factory
+ */
+export const logger = port(function logger(logger?: Logger) {
+  return logger || getInMemoryLogger();
+});
+
+/**
+ * Stats port factory
+ */
+export const stats = port(function stats(stats?: Stats) {
+  return (
+    stats || {
+      name: 'in-memory-stats',
+      dispose: () => Promise.resolve(),
+      histogram: () => {},
+      set: () => {},
+      increment: () => {},
+      incrementBy: () => {},
+      decrement: () => {},
+      decrementBy: () => {},
+      on: () => {},
+      off: () => {},
+      timing: () => {},
+    }
+  );
+});
+
+/**
+ * Cache port factory
+ */
+export const cache = port(function cache(cache?: Cache) {
+  return (
+    cache || {
+      name: 'in-memory-cache',
+      dispose: () => Promise.resolve(),
+      getKey: () => Promise.resolve(''),
+      setKey: () => Promise.resolve(false),
+      getKeys: () => Promise.resolve(false),
+      setKeys: () => Promise.resolve(false),
+      getNamespaceKeys: () => Promise.resolve(false),
+      deleteKey: () => Promise.resolve(0),
+      deleteNamespaceKeys: () => Promise.resolve(0),
+      flushAll: () => Promise.resolve(),
+      incrementKey: () => Promise.resolve(0),
+      decrementKey: () => Promise.resolve(0),
+      getKeyTTL: () => Promise.resolve(0),
+      setKeyTTL: () => Promise.resolve(false),
+    }
+  );
+});
+
+/**
+ * Analytics port factory
+ */
+
+export const analytics = port(function analytics(analytics?: Analytics) {
+  return (
+    analytics || {
+      name: 'in-memory-analytics',
+      dispose: () => Promise.resolve(),
+      track: () => {},
+    }
+  );
 });

@@ -1,5 +1,4 @@
 import 'components/sidebar/CommunitySection/CommunitySection.scss';
-import { featureFlags } from 'helpers/feature-flags';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -14,6 +13,7 @@ import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { SubscriptionButton } from 'views/components/subscription_button';
 import ManageCommunityStakeModal from 'views/modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
+import { useFlag } from '../../../../hooks/useFlag';
 import useManageCommunityStakeModalStore from '../../../../state/ui/modals/manageCommunityStakeModal';
 import Permissions from '../../../../utils/Permissions';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
@@ -25,7 +25,6 @@ import DirectoryMenuItem from '../DirectoryMenuItem';
 import { DiscussionSection } from '../discussion_section';
 import { ExternalLinksModule } from '../external_links_module';
 import { GovernanceSection } from '../governance_section';
-import { AdminSection as OldAdminSection } from '../old_admin_section';
 import { CommunitySectionSkeleton } from './CommunitySectionSkeleton';
 
 interface CommunitySectionProps {
@@ -33,6 +32,8 @@ interface CommunitySectionProps {
 }
 
 export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
+  const communityHomepageEnabled = useFlag('communityHomepage');
+  const communityStakeEnabled = useFlag('communityStake');
   const navigate = useCommonNavigate();
   const { pathname } = useLocation();
   const { isLoggedIn } = useUserLoggedIn();
@@ -66,7 +67,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
               address={activeAccount?.address}
             />
 
-            {featureFlags.communityStake && stakeEnabled && (
+            {communityStakeEnabled && stakeEnabled && (
               <VoteWeightModule
                 voteWeight={currentVoteWeight}
                 stakeNumber={stakeBalance}
@@ -83,14 +84,10 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
         {showAdmin && (
           <>
             <CWDivider />
-            {featureFlags.newAdminOnboardingEnabled ? (
-              <AdminSection />
-            ) : (
-              <OldAdminSection />
-            )}
+            <AdminSection />
           </>
         )}
-        {featureFlags.communityHomepage && app.chain?.meta.hasHomepage && (
+        {communityHomepageEnabled && app.chain?.meta.hasHomepage && (
           <div
             className={onHomeRoute ? 'home-button active' : 'home-button'}
             onClick={() => navigate('/feed')}

@@ -3,7 +3,7 @@ import RWLock from 'async-rwlock';
 // Maintains a cache with periodic, atomic jobs that also permits direct,
 // non-atomic, write access to the cache.
 export abstract class JobRunner<CacheT> {
-  private _timeoutHandle: NodeJS.Timeout;
+  private _timeoutHandle: NodeJS.Timeout | undefined;
 
   // we use a mutex here to avoid updating views while pruning, as it could cause errors
   // due to object deletion.

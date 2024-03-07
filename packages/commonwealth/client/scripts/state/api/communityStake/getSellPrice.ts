@@ -12,13 +12,12 @@ const getSellPrice = async ({
   stakeId,
   amount,
   chainRpc,
+  ethChainId,
 }: GetSellPriceProps) => {
   const CommunityStakes = await lazyLoadCommunityStakes();
   const communityStakes = new CommunityStakes(
-    commonProtocol.factoryContracts[
-      commonProtocol.ValidChains.Sepolia
-    ].communityStake,
-    commonProtocol.factoryContracts[commonProtocol.ValidChains.Sepolia].factory,
+    commonProtocol.factoryContracts[ethChainId].communityStake,
+    commonProtocol.factoryContracts[ethChainId].factory,
     chainRpc,
   );
 
@@ -31,6 +30,7 @@ interface UseGetSellPriceQueryProps {
   amount: number;
   apiEnabled: boolean;
   chainRpc: string;
+  ethChainId: number;
 }
 
 const useGetSellPriceQuery = ({
@@ -39,6 +39,7 @@ const useGetSellPriceQuery = ({
   amount,
   apiEnabled,
   chainRpc,
+  ethChainId,
 }: UseGetSellPriceQueryProps) => {
   return useQuery({
     queryKey: [
@@ -47,8 +48,10 @@ const useGetSellPriceQuery = ({
       stakeId,
       amount,
       chainRpc,
+      ethChainId,
     ],
-    queryFn: () => getSellPrice({ namespace, stakeId, amount, chainRpc }),
+    queryFn: () =>
+      getSellPrice({ namespace, stakeId, amount, chainRpc, ethChainId }),
     enabled: apiEnabled,
     staleTime: GET_SELL_PRICE_STALE_TIME,
   });

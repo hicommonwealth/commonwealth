@@ -14,6 +14,12 @@ class NodeStore extends IdStore<NodeInfo> {
 
     return this._store.find((node) => urlVariants.includes(node.url));
   }
+
+  public getByCosmosChainId(cosmosChainId: string) {
+    if (!cosmosChainId) return undefined;
+
+    return this._store.find((node) => cosmosChainId === node.cosmosChainId);
+  }
 }
 
 export default NodeStore;
