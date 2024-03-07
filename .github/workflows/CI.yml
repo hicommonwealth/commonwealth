@@ -266,158 +266,158 @@ jobs:
           name: code-coverage-report
           path: coverage
 
-#  # Lint with recommendations
-#  commonwealth-code-quality-recommendations:
-#    strategy:
-#      matrix:
-#        node: [ 20 ]
-#    name: Code Quality Recommendations
-#    runs-on: ubuntu-latest
-#    timeout-minutes: 10
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v3
-#        with:
-#          fetch-depth: 0
-#
-#      - name: Setup Node
-#        uses: actions/setup-node@v3
-#        with:
-#          node-version: ${{ matrix.node }}
-#
-#      - name: Add node-gyp
-#        run: yarn global add node-gyp
-#
-#      - name: Cache dependencies
-#        id: cache
-#        uses: actions/cache@v3
-#        with:
-#          path: '**/node_modules'
-#          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-#
-#      - name: Install dependencies
-#        run: yarn --ignore-engines
-#
-#      - name: Run linter
-#        env:
-#          GITHUB_BASE_REF: ${{ github.base_ref }}
-#        run: yarn lint-branch-warnings
+  # Lint with recommendations
+  commonwealth-code-quality-recommendations:
+    strategy:
+      matrix:
+        node: [ 20 ]
+    name: Code Quality Recommendations
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-#  # Lint and Typecheck
-#  commonwealth-code-quality:
-#    strategy:
-#      matrix:
-#        node: [ 20 ]
-#    name: Code Quality checks
-#    runs-on: ubuntu-latest
-#    timeout-minutes: 10
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v3
-#        with:
-#          fetch-depth: 0
-#
-#      - name: Setup Node
-#        uses: actions/setup-node@v3
-#        with:
-#          node-version: ${{ matrix.node }}
-#
-#      - name: Cache dependencies
-#        id: cache
-#        uses: actions/cache@v3
-#        with:
-#          path: '**/node_modules'
-#          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-#
-#      - name: Add node-gyp
-#        run: yarn global add node-gyp
-#
-#      - name: Install dependencies
-#        run: yarn --ignore-engines
-#
-#      - name: Assert yarn.lock is correct
-#        run: |
-#          if ! git diff --quiet; then
-#            echo 'You need to update the yarn.lock file'
-#            exit 1
-#          fi
-#
-#      - name: Build
-#        run: yarn build
-#
-#      - name: Run linter
-#        env:
-#          GITHUB_BASE_REF: ${{ github.base_ref }}
-#        run: yarn lint-branch
-#
-#      - name: Commonwealth Typecheck
-#        run: yarn --cwd packages/commonwealth check-types
-#
-#      - name: Discord-Bot Typecheck
-#        run: yarn --cwd packages/discord-bot check-types
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
 
-  # These tests run quickly, so run them in a separate job
-#  commonwealth-unit-integration:
-#    strategy:
-#      matrix:
-#        node: [ 20 ]
-#    name: Commonwealth Unit And Integration Tests
-#    runs-on: ubuntu-latest
-#    timeout-minutes: 20
-#
-#    services:
-#      postgres:
-#        image: postgres
-#        env:
-#          POSTGRES_USER: commonwealth
-#          POSTGRES_DB: commonwealth
-#          POSTGRES_PASSWORD: edgeware
-#        # Set health checks to wait until postgres has started
-#        options: >-
-#          --health-cmd pg_isready
-#          --health-interval 10s
-#          --health-timeout 5s
-#          --health-retries 5
-#        ports:
-#          # Maps tcp port 5432 on service container to the host
-#          - 5432:5432
-#      redis:
-#        image: redis:latest
-#        ports:
-#          - 6379:6379
-#
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v3
-#
-#      - name: Setup Node
-#        uses: actions/setup-node@v3
-#        with:
-#          node-version: ${{ matrix.node }}
-#
-#      - name: Cache dependencies
-#        id: cache
-#        uses: actions/cache@v3
-#        with:
-#          path: '**/node_modules'
-#          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-#
-#      - name: Build CI
-#        run: yarn build-ci
-#
-#      - name: Run unit tests
-#        run: yarn --cwd packages/commonwealth unit-test --forbid-only
-#
-#      - name: Run API tests
-#        run: yarn --cwd packages/commonwealth test-api --forbid-only
-#        env:
-#          NO_CLIENT: true
-#
-#      - name: Run util integration tests
-#        run: yarn --cwd packages/commonwealth test-integration-util --forbid-only
-#        env:
-#          NO_CLIENT: true
-#          COSMOS_GOV_V1: ${{ secrets.COSMOS_GOV_V1 }}
+      - name: Add node-gyp
+        run: yarn global add node-gyp
+
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependencies
+        run: yarn --ignore-engines
+
+      - name: Run linter
+        env:
+          GITHUB_BASE_REF: ${{ github.base_ref }}
+        run: yarn lint-branch-warnings
+
+  # Lint and Typecheck
+  commonwealth-code-quality:
+    strategy:
+      matrix:
+        node: [ 20 ]
+    name: Code Quality checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Add node-gyp
+        run: yarn global add node-gyp
+
+      - name: Install dependencies
+        run: yarn --ignore-engines
+
+      - name: Assert yarn.lock is correct
+        run: |
+          if ! git diff --quiet; then
+            echo 'You need to update the yarn.lock file'
+            exit 1
+          fi
+
+      - name: Build
+        run: yarn build
+
+      - name: Run linter
+        env:
+          GITHUB_BASE_REF: ${{ github.base_ref }}
+        run: yarn lint-branch
+
+      - name: Commonwealth Typecheck
+        run: yarn --cwd packages/commonwealth check-types
+
+      - name: Discord-Bot Typecheck
+        run: yarn --cwd packages/discord-bot check-types
+
+# These tests run quickly, so run them in a separate job
+  commonwealth-unit-integration:
+    strategy:
+      matrix:
+        node: [ 20 ]
+    name: Commonwealth Unit And Integration Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: commonwealth
+          POSTGRES_DB: commonwealth
+          POSTGRES_PASSWORD: edgeware
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Build CI
+        run: yarn build-ci
+
+      - name: Run unit tests
+        run: yarn --cwd packages/commonwealth unit-test --forbid-only
+
+      - name: Run API tests
+        run: yarn --cwd packages/commonwealth test-api --forbid-only
+        env:
+          NO_CLIENT: true
+
+      - name: Run util integration tests
+        run: yarn --cwd packages/commonwealth test-integration-util --forbid-only
+        env:
+          NO_CLIENT: true
+          COSMOS_GOV_V1: ${{ secrets.COSMOS_GOV_V1 }}
 
   # These tests run slowly, so run them in a separate job
   commonwealth-devnet-tests:
