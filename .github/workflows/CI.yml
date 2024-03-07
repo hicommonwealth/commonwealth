@@ -525,3 +525,4 @@ jobs:
           PORT: 8080
           USES_DOCKER_PGSQL: true
           COSMOS_GOV_V1: ${{ secrets.COSMOS_GOV_V1 }}
+
