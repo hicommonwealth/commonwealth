@@ -1,4 +1,4 @@
-import z, { ZodSchema, ZodUndefined } from 'zod';
+import z, { ZodObject, ZodRawShape, ZodSchema, ZodUndefined } from 'zod';
 import { events } from '../schemas';
 
 /**
@@ -110,9 +110,9 @@ export type QueryContext<S extends Schemas> = {
  * - `name`: event name
  * - `payload`: validated event payload
  */
-export type EventContext<Name, Input extends ZodSchema> = {
+export type EventContext<Name extends events.Events> = {
   readonly name: Name;
-  readonly payload: z.infer<Input>;
+  readonly payload: z.infer<typeof events.schemas[Name]>;
 };
 
 /**
@@ -142,11 +142,10 @@ export type QueryHandler<S extends Schemas> = (
  * @param context event execution context
  * @returns may return updated state - side effects
  */
-export type EventHandler<Name, S> = S extends Schemas
-  ? (
-      context: EventContext<Name, S['input']>,
-    ) => Promise<Partial<z.infer<S['output']>> | void>
-  : never;
+export type EventHandler<
+  Name extends events.Events,
+  Output extends ZodObject<ZodRawShape> | ZodUndefined,
+> = (context: EventContext<Name>) => Promise<Partial<z.infer<Output>> | void>;
 
 /**
  * Declarative metadata to "enforce" the conventional requirements of a command as a chain of responsibility.
@@ -192,15 +191,12 @@ export type EventSchemas = {
  */
 export type EventsHandlerMetadata<
   Inputs extends EventSchemas,
-  Output extends ZodSchema = ZodUndefined,
+  Output extends ZodObject<ZodRawShape> | ZodUndefined = ZodUndefined,
 > = {
   readonly inputs: Inputs;
   readonly output?: Output;
   readonly body: {
-    readonly [Name in keyof Inputs]: EventHandler<
-      Name,
-      { input: Inputs[Name]; output: Output }
-    >;
+    readonly [Name in keyof Inputs & events.Events]: EventHandler<Name, Output>;
   };
 };
 
@@ -209,7 +205,7 @@ export type EventsHandlerMetadata<
  */
 export type PolicyMetadata<
   Inputs extends EventSchemas,
-  Output extends ZodSchema = ZodUndefined,
+  Output extends ZodObject<ZodRawShape> | ZodUndefined = ZodUndefined,
 > = EventsHandlerMetadata<Inputs, Output>;
 
 /**
@@ -217,5 +213,5 @@ export type PolicyMetadata<
  */
 export type ProjectionMetadata<
   Inputs extends EventSchemas,
-  Output extends ZodSchema = ZodUndefined,
+  Output extends ZodObject<ZodRawShape> | ZodUndefined = ZodUndefined,
 > = EventsHandlerMetadata<Inputs, Output>;

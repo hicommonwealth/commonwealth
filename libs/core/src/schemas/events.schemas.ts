@@ -11,6 +11,16 @@ export const schemas = {
     communityId: z.string(),
     userId: z.string(),
   }),
+  SnapshotProposalCreated: z.object({
+    id: z.string().optional(),
+    title: z.string().optional(),
+    body: z.string().optional(),
+    choices: z.array(z.string()).optional(),
+    space: z.string().optional(),
+    event: z.string().optional(),
+    start: z.string().optional(),
+    expire: z.string().optional(),
+  }),
 };
 
 export type Events = keyof typeof schemas;

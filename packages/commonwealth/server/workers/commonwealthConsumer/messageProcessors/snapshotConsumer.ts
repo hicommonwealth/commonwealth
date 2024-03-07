@@ -1,27 +1,29 @@
-import { RmqSnapshotNotification } from '@hicommonwealth/adapters';
+import { PinoLogger } from '@hicommonwealth/adapters';
 import {
-  ILogger,
+  EventHandler,
   NotificationCategories,
   SnapshotEventType,
+  events,
+  logger,
   stats,
 } from '@hicommonwealth/core';
-import type { DB } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model';
 import axios from 'axios';
 import emitNotifications from '../../../util/emitNotifications';
 
-export async function processSnapshotMessage(
-  this: { models: DB; log: ILogger },
-  data: RmqSnapshotNotification.RmqMsgType,
-) {
-  const { space, id, title, body, choices, start, expire } = data;
+const log = logger(PinoLogger()).getLogger(__filename);
 
-  const eventType = data.event as SnapshotEventType;
+export const processSnapshotProposalCreated: EventHandler<
+  'SnapshotProposalCreated',
+  typeof events.schemas['SnapshotProposalCreated']
+> = async ({ payload }) => {
+  const { space, id, title, body, choices, start, expire, event } = payload;
 
   // Sometimes snapshot-listener will receive a webhook event from a
   // proposal that no longer exists. In that event, we will receive null data
   // from the listener. We can't do anything with that data, so we skip it.
-  if (!space && eventType !== SnapshotEventType.Deleted) {
-    this.log.info('Event received with invalid proposal, skipping');
+  if (!space && event !== SnapshotEventType.Deleted) {
+    log.info('Event received with invalid proposal, skipping');
     return;
   }
 
@@ -35,25 +37,25 @@ export async function processSnapshotMessage(
     expire,
   };
 
-  this.log.info(`Processing snapshot message: ${JSON.stringify(data)}`);
+  log.info(`Processing snapshot message`, undefined, payload);
 
   let proposal;
 
   try {
-    proposal = await this.models.SnapshotProposal.findOne({
-      where: { id: data.id },
+    proposal = await models.SnapshotProposal.findOne({
+      where: { id },
     });
   } catch (e) {
-    this.log.error(`Error fetching proposal: ${e}`);
+    log.error(`Error fetching proposal: ${e}`);
   }
 
-  if (eventType === SnapshotEventType.Deleted) {
+  if (event === SnapshotEventType.Deleted) {
     if (!proposal || proposal?.is_upstream_deleted) {
-      this.log.info(`Proposal ${id} does not exist, skipping`);
+      log.info(`Proposal ${id} does not exist, skipping`);
       return;
     }
 
-    this.log.info(`Proposal deleted, marking as deleted in DB`);
+    log.info(`Proposal deleted, marking as deleted in DB`);
 
     // Pull data from DB (not included in the webhook event)
     snapshotNotificationData = {
@@ -70,34 +72,33 @@ export async function processSnapshotMessage(
     await proposal.save();
 
     stats().increment('cw.deleted_snapshot_proposal_record', {
-      event: eventType,
+      event,
       space,
     });
   }
 
   try {
     if (space || proposal.space) {
-      await this.models.SnapshotSpace.findOrCreate({
+      await models.SnapshotSpace.findOrCreate({
         where: { snapshot_space: space ?? proposal.space },
       });
     }
   } catch (e) {
-    this.log.error(`Error creating snapshot space: ${e}`);
+    log.error(`Error creating snapshot space: ${e}`);
   }
 
   if (
-    eventType === SnapshotEventType.Created &&
+    event === SnapshotEventType.Created &&
     proposal &&
     !proposal.is_upstream_deleted
   ) {
-    this.log.info(`Proposal ${id} already exists`);
+    log.info(`Proposal ${id} already exists`);
     return;
   }
 
-  if (!proposal && eventType !== SnapshotEventType.Deleted) {
-    this.log.info(`Proposal ${id} does not exist, creating record`);
-    // TODO: fix here
-    proposal = await this.models.SnapshotProposal.create({
+  if (!proposal && event !== SnapshotEventType.Deleted) {
+    log.info(`Proposal ${id} does not exist, creating record`);
+    proposal = await models.SnapshotProposal.create({
       id,
       title,
       body,
@@ -105,31 +106,30 @@ export async function processSnapshotMessage(
       space,
       start,
       expire,
-      event: eventType,
+      event,
       is_upstream_deleted: false,
     });
   }
 
   stats().increment('cw.created_snapshot_proposal_record', {
-    event: eventType,
+    event,
     space,
   });
 
-  const associatedCommunities =
-    await this.models.CommunitySnapshotSpaces.findAll({
-      where: { snapshot_space_id: proposal?.space },
-    });
+  const associatedCommunities = await models.CommunitySnapshotSpaces.findAll({
+    where: { snapshot_space_id: proposal?.space },
+  });
 
-  this.log.info(
+  log.info(
     `Found ${associatedCommunities.length} associated communities for snapshot space ${space} `,
   );
 
   if (associatedCommunities.length > 0) {
     // Notifications
-    emitNotifications(this.models, {
+    emitNotifications(models, {
       categoryId: NotificationCategories.SnapshotProposal,
       data: {
-        eventType,
+        eventType: event as SnapshotEventType,
         ...snapshotNotificationData,
       },
     });
@@ -137,7 +137,7 @@ export async function processSnapshotMessage(
 
   for (const community of associatedCommunities) {
     const communityId = community.community_id;
-    const communityDiscordConfig = await this.models.DiscordBotConfig.findAll({
+    const communityDiscordConfig = await models.DiscordBotConfig.findAll({
       where: {
         community_id: communityId,
       },
@@ -147,7 +147,7 @@ export async function processSnapshotMessage(
       if (config.snapshot_channel_id) {
         // Pass data to Discord bot
         try {
-          this.log.info(
+          log.info(
             `Sending snapshot notification to discord bot for community ${communityId} and snapshot space ${space} `,
           );
           await axios.post(
@@ -156,7 +156,7 @@ export async function processSnapshotMessage(
               snapshotNotificationData,
               guildId: config.guild_id,
               channelId: config.snapshot_channel_id,
-              eventType,
+              eventType: event,
             },
             {
               headers: {
@@ -167,10 +167,10 @@ export async function processSnapshotMessage(
           );
         } catch (e) {
           // TODO: should we NACK the message if sending to discord fails or just rollbar report it and continue?
-          this.log.error('Error sending snapshot notification to discord', e);
+          log.error('Error sending snapshot notification to discord', e);
           console.log('Error sending snapshot notification to discord bot', e);
         }
       }
     }
   }
-}
+};

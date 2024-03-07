@@ -81,7 +81,7 @@ export class RabbitMQAdapter implements Broker {
   }
 
   public async publish<Name extends events.Events>(
-    event: EventContext<Name, typeof events.schemas[Name]>,
+    event: EventContext<Name>,
     topic?: BrokerTopics,
   ): Promise<boolean> {
     if (!this.initialized) {
