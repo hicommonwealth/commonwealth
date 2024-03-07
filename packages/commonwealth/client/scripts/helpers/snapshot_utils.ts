@@ -301,7 +301,7 @@ export async function getMultipleSpaces(space: string): Promise<SnapshotSpace> {
 }
 
 export async function getMultipleSpacesById(
-  id_in: Array<string>
+  id_in: Array<string>,
 ): Promise<Array<SnapshotSpace>> {
   await getApolloClient();
   const spaceObj = await apolloClient.query({
@@ -315,7 +315,7 @@ export async function getMultipleSpacesById(
 }
 
 export async function getProposal(
-  id: string
+  id: string,
 ): Promise<{ title: string; space: string }> {
   await getApolloClient();
   const proposalObj = await apolloClient.query({
@@ -343,7 +343,7 @@ export async function getProposals(space: string): Promise<SnapshotProposal[]> {
 }
 
 export async function getVotes(
-  proposalHash: string
+  proposalHash: string,
 ): Promise<SnapshotProposalVote[]> {
   await getApolloClient();
   const response = await apolloClient.query({
@@ -382,7 +382,7 @@ export async function getScore(space: SnapshotSpace, address: string) {
     space.id,
     space.strategies,
     space.network,
-    [address]
+    [address],
     // Snapshot.utils.getProvider(space.network),
   );
 }
@@ -402,7 +402,7 @@ export type VoteResults = {
 
 export async function getResults(
   space: SnapshotSpace,
-  proposal: SnapshotProposal
+  proposal: SnapshotProposal,
 ): Promise<VoteResults> {
   try {
     let votes = await getVotes(proposal.id);
@@ -418,13 +418,13 @@ export async function getResults(
             strategies,
             space.network,
             votes.map((vote) => vote.voter),
-            parseInt(proposal.snapshot, 10)
+            parseInt(proposal.snapshot, 10),
             // provider,
           );
           votes = votes
             .map((vote: any) => {
               vote.scores = strategies.map(
-                (strategy, i) => scores[i][vote.voter] || 0
+                (strategy, i) => scores[i][vote.voter] || 0,
               );
               vote.balance = vote.scores.reduce((a, b: any) => a + b, 0);
               return vote;
@@ -448,7 +448,7 @@ export async function getResults(
     const votingClass = new snapshot.utils.voting[proposal.type](
       proposal,
       votes,
-      strategies
+      strategies,
     );
     const results = {
       resultsByVoteBalance: votingClass.getScores(),
@@ -471,11 +471,11 @@ export type Power = {
 export async function getPower(
   space: SnapshotSpace,
   proposal: SnapshotProposal,
-  address: string
+  address: string,
 ): Promise<Power> {
   const snapshot = await SnapshotLazyLoader.getSnapshot();
   const blockNumber = await snapshot.utils.getBlockNumber(
-    snapshot.utils.getProvider(space.network)
+    snapshot.utils.getProvider(space.network),
   );
   const blockTag =
     +proposal.snapshot > blockNumber ? 'latest' : +proposal.snapshot;
@@ -485,11 +485,11 @@ export async function getPower(
       proposal.strategies,
       space.network,
       [address],
-      blockTag
+      blockTag,
       // Snapshot.utils.getProvider(space.network),
     );
   const summedScores = scores.map((score) =>
-    Object.values(score).reduce((a, b) => a + b, 0)
+    Object.values(score).reduce((a, b) => a + b, 0),
   );
   return {
     scores: summedScores,
