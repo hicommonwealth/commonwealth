@@ -3,19 +3,19 @@ import {
   EventHandler,
   NotificationCategories,
   SnapshotEventType,
-  events,
   logger,
   stats,
 } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import axios from 'axios';
+import { ZodUndefined } from 'zod';
 import emitNotifications from '../../../util/emitNotifications';
 
 const log = logger(PinoLogger()).getLogger(__filename);
 
 export const processSnapshotProposalCreated: EventHandler<
   'SnapshotProposalCreated',
-  typeof events.schemas['SnapshotProposalCreated']
+  ZodUndefined
 > = async ({ payload }) => {
   const { space, id, title, body, choices, start, expire, event } = payload;
 

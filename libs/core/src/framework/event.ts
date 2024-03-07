@@ -22,7 +22,7 @@ export const eventHandler = async <
   Output extends ZodSchema,
 >(
   { inputs, body }: EventsHandlerMetadata<Input, Output>,
-  { name, payload }: EventContext<Name, typeof events.schemas[Name]>,
+  { name, payload }: EventContext<Name>,
   validate = true,
 ): Promise<Partial<Output> | undefined> => {
   try {

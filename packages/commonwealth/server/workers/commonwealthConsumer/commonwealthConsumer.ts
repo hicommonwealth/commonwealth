@@ -10,14 +10,13 @@ import {
 import {
   Broker,
   BrokerTopics,
+  PolicyMetadata,
   broker,
   events,
   logger,
   stats,
 } from '@hicommonwealth/core';
-import type { BrokerConfig } from 'rascal';
 import { RABBITMQ_URI } from '../../config';
-import { processSnapshotProposalCreated } from './messageProcessors/snapshotConsumer';
 
 const log = logger(PinoLogger()).getLogger(__filename);
 stats(HotShotsStats());
@@ -45,16 +44,12 @@ startHealthCheckLoop({
 export async function setupCommonwealthConsumer(): Promise<void> {
   let brokerInstance: Broker;
   try {
-    const rmqController = new RabbitMQAdapter(
-      <BrokerConfig>(
-        getRabbitMQConfig(
-          RABBITMQ_URI,
-          RascalConfigServices.CommonwealthService,
-        )
-      ),
+    const rmqAdapter = new RabbitMQAdapter(
+      getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.CommonwealthService),
     );
-    await rmqController.init();
-    broker(rmqController);
+    await rmqAdapter.init();
+    broker(rmqAdapter);
+    brokerInstance = rmqAdapter;
   } catch (e) {
     log.error(
       'Rascal consumer setup failed. Please check the Rascal configuration',
@@ -62,14 +57,25 @@ export async function setupCommonwealthConsumer(): Promise<void> {
     throw e;
   }
 
-  const result = await brokerInstance.subscribe(BrokerTopics.SnapshotListener, {
-    inputs: {
-      SnapshotProposalCreated: events.schemas.SnapshotProposalCreated,
-    },
+  const { processSnapshotProposalCreated } = await import(
+    './messageProcessors/snapshotConsumer'
+  );
+
+  const inputs = {
+    SnapshotProposalCreated: events.schemas.SnapshotProposalCreated,
+  };
+
+  const Snapshot: () => PolicyMetadata<typeof inputs> = () => ({
+    inputs,
     body: {
       SnapshotProposalCreated: processSnapshotProposalCreated,
     },
   });
+
+  const result = await brokerInstance.subscribe(
+    BrokerTopics.SnapshotListener,
+    Snapshot(),
+  );
 
   if (!result) {
     throw new Error(`Failed to subscribe to ${BrokerTopics.SnapshotListener}`);

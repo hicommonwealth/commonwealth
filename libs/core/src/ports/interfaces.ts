@@ -127,12 +127,12 @@ export interface Analytics extends Disposable {
  */
 export interface Broker extends Disposable {
   publish<Name extends events.Events>(
-    event: EventContext<Name, typeof events.schemas[Name]>,
+    event: EventContext<Name>,
     topic?: BrokerTopics,
   ): Promise<boolean>;
 
-  subscribe(
+  subscribe<Inputs extends EventSchemas>(
     topic: BrokerTopics,
-    handler: EventsHandlerMetadata<EventSchemas>,
+    handler: EventsHandlerMetadata<Inputs>,
   ): Promise<boolean>;
 }
