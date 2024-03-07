@@ -76,7 +76,7 @@ async function enableCommunities(communities: string[]) {
           network: ChainNetwork.Osmosis,
           type: ChainType.Chain,
           base: ChainBase.CosmosSDK,
-          default_symbol: id,
+          default_symbol: 'STAKE',
           chain_node_id: chainNode.id,
         },
       });
@@ -106,10 +106,6 @@ describe('Cosmos Governance Notification Generator with real proposals', () => {
     await createTestProposal(v1Beta1RpcUrl, v1Beta1Content);
   });
 
-  after(async () => {
-    await dispose()();
-  });
-
   beforeEach('Clear notifications', async () => {
     await models.sequelize.query(`
       DELETE FROM "NotificationsRead";
@@ -117,6 +113,10 @@ describe('Cosmos Governance Notification Generator with real proposals', () => {
     await models.sequelize.query(`
       DELETE FROM "Notifications";
     `);
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   describe('v1 proposals', () => {
