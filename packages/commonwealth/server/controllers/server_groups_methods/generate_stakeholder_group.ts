@@ -1,14 +1,29 @@
-import { BalanceSourceType } from '@hicommonwealth/core';
 import {
+  AppError,
+  BalanceSourceType,
+  commonProtocol,
+} from '@hicommonwealth/core';
+import {
+  AddressAttributes,
   CommunityAttributes,
   GroupAttributes,
   UserInstance,
 } from '@hicommonwealth/model';
+import Web3 from 'web3';
+import { getNamespace } from '../../../../../libs/model/src/services/commonProtocol/contractHelpers';
 import { ServerGroupsController } from '../server_groups_controller';
+
+const Errors = {
+  StakeNotFound: 'Stake not found',
+  StakeholderGroup: 'Stakeholder group not found',
+  ChainNodeNotFound: 'Chain node not found',
+  NamespaceNotFound: 'Namespace not found for this name',
+};
 
 export type GenerateStakeholderGroupOptions = {
   user: UserInstance;
   community: CommunityAttributes;
+  address: AddressAttributes;
 };
 
 export type GenerateStakeholderGroupResult = GroupAttributes | null;
@@ -28,6 +43,37 @@ export async function __generateStakeholderGroup(
     return null;
   }
 
+  // get contract address
+  const stake = await this.models.CommunityStake.findOne({
+    where: { community_id: community.id },
+  });
+  if (!stake) {
+    throw new AppError(Errors.StakeNotFound);
+  }
+  const stakeholderGroup = await this.models.Group.findOne({
+    where: {
+      community_id: community.id,
+      is_system_managed: true,
+    },
+  });
+  if (!stakeholderGroup) {
+    throw new AppError(Errors.StakeholderGroup);
+  }
+  const node = await this.models.ChainNode.findByPk(community.chain_node_id);
+  if (!node) {
+    throw new AppError(Errors.ChainNodeNotFound);
+  }
+  const factoryData = commonProtocol.factoryContracts[node.eth_chain_id];
+  const web3 = new Web3(node.url);
+  const contractAddress = await getNamespace(
+    web3,
+    community.namespace,
+    factoryData.factory,
+  );
+  if (contractAddress === '0x0000000000000000000000000000000000000000') {
+    throw new AppError(Errors.NamespaceNotFound);
+  }
+
   const [group] = await this.createGroup({
     user,
     community,
@@ -42,8 +88,8 @@ export async function __generateStakeholderGroup(
           threshold: '0',
           source: {
             source_type: BalanceSourceType.ERC1155,
-            evm_chain_id: 1, // TODO: fix
-            contract_address: '0x0000000000000000000000000000000000000000', // TODO: fix
+            evm_chain_id: node.eth_chain_id,
+            contract_address: contractAddress,
           },
         },
       },

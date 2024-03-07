@@ -91,7 +91,9 @@ describe('Reaction vote weight', () => {
   });
 
   it('should set thread reaction vote weight and thread vote sum correctly', async () => {
-    Sinon.stub(contractHelpers, 'getNamespaceBalance').resolves('50');
+    Sinon.stub(contractHelpers, 'getNamespaceBalance').resolves({
+      [address.address]: '50',
+    });
     const thread = await createThread();
     const [reaction] = await threadsController.createThreadReaction({
       user,
@@ -106,7 +108,9 @@ describe('Reaction vote weight', () => {
   });
 
   it('should set comment reaction vote weight and comment vote sum correctly', async () => {
-    Sinon.stub(contractHelpers, 'getNamespaceBalance').resolves('50');
+    Sinon.stub(contractHelpers, 'getNamespaceBalance').resolves({
+      [address.address]: '50',
+    });
     const thread = await createThread();
     const comment = await createComment(thread.id);
     const [reaction] = await commentsController.createCommentReaction({
@@ -122,7 +126,9 @@ describe('Reaction vote weight', () => {
   });
 
   it('should set thread reaction vote weight to min 1', async () => {
-    Sinon.stub(contractHelpers, 'getNamespaceBalance').resolves('0');
+    Sinon.stub(contractHelpers, 'getNamespaceBalance').resolves({
+      [address.address]: '0',
+    });
     const thread = await createThread();
     const [reaction] = await threadsController.createThreadReaction({
       user,
@@ -135,7 +141,9 @@ describe('Reaction vote weight', () => {
   });
 
   it('should set comment reaction vote weight to min 1', async () => {
-    Sinon.stub(contractHelpers, 'getNamespaceBalance').resolves('0');
+    Sinon.stub(contractHelpers, 'getNamespaceBalance').resolves({
+      [address.address]: '0',
+    });
     const thread = await createThread();
     const comment = await createComment(thread.id);
     const [reaction] = await commentsController.createCommentReaction({

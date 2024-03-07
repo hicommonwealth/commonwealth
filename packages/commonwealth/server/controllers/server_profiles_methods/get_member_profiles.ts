@@ -2,16 +2,18 @@ import { Op, QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from 'server/types';
 
 import { AppError } from '@hicommonwealth/core';
-import { CommunityInstance, tokenBalanceCache } from '@hicommonwealth/model';
+import { CommunityInstance } from '@hicommonwealth/model';
 import { flatten, uniq } from 'lodash';
 import moment from 'moment';
-import { makeGetBalancesOptions } from 'server/util/requirementsModule/makeGetBalancesOptions';
+import { contractHelpers } from '../../../../../libs/model/src/services/commonProtocol';
 import { buildPaginatedResponse } from '../../util/queries';
 import { RoleInstanceWithPermission, findAllRoles } from '../../util/roles';
 import { ServerProfilesController } from '../server_profiles_controller';
 
 export const Errors = {
+  StakeNotFound: 'Stake not found',
   StakeholderGroup: 'Stakeholder group not found',
+  ChainNodeNotFound: 'Chain node not found',
 };
 
 export type MembershipFilters =
@@ -142,6 +144,7 @@ export async function __getMemberProfiles(
     address_id: string[];
     chains: string[];
     addresses: string[];
+    stake_balances: string[];
     last_active: string;
   }>(`${sqlWithoutPagination}`, {
     bind,
@@ -149,8 +152,13 @@ export async function __getMemberProfiles(
   });
   const totalResults = fullResults.length;
 
-  // TODO: batch fetch stake balance for all addresses
   if (includeStakeBalances) {
+    const stake = await this.models.CommunityStake.findOne({
+      where: { community_id: community.id },
+    });
+    if (!stake) {
+      throw new AppError(Errors.StakeNotFound);
+    }
     const stakeholderGroup = await this.models.Group.findOne({
       where: {
         community_id: community.id,
@@ -160,25 +168,23 @@ export async function __getMemberProfiles(
     if (!stakeholderGroup) {
       throw new AppError(Errors.StakeholderGroup);
     }
-    const groups = [stakeholderGroup];
+    const node = await this.models.ChainNode.findByPk(community.chain_node_id);
+    if (!node) {
+      throw new AppError(Errors.ChainNodeNotFound);
+    }
     const addresses = fullResults.map((p) => p.addresses).flat();
-    const getBalancesOptions = makeGetBalancesOptions(groups, addresses);
-    const balancesResult = await Promise.all(
-      getBalancesOptions.map(async (options) => {
-        return {
-          options,
-          balances: await tokenBalanceCache.getBalances({
-            ...options,
-          }),
-        };
-      }),
+    const balances = await contractHelpers.getNamespaceBalance(
+      community.namespace,
+      stake.stake_id,
+      node.eth_chain_id,
+      addresses,
+      node.url,
     );
-    console.log('RESULT: ', balancesResult);
-    const balances = balancesResult?.[0]?.balances || {};
     // add balances to profiles
-    for (const profile of profilesWithAddresses) {
+    for (const profile of fullResults) {
       for (const address of profile.addresses) {
-        address.stake_balance = balances[address.address];
+        profile.stake_balances ||= [];
+        profile.stake_balances.push(balances[address] || '0');
       }
     }
   }
@@ -213,6 +219,7 @@ export async function __getMemberProfiles(
           id: profile.address_ids[i],
           chain: profile.chains[i],
           address: profile.addresses[i],
+          stake_balance: profile.stake_balances[i],
         })),
         roles: [],
         group_ids: [],
