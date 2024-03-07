@@ -10,6 +10,7 @@ import { useDateCursor } from 'state/api/threads/fetchThreads';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import { slugify } from 'utils';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
+import Thread from '../../../models/Thread';
 import {
   ThreadFeaturedFilterTypes,
   ThreadTimelineFilterTypes,
@@ -75,13 +76,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     location.pathname === `/${app.activeChainId()}/archived`;
 
   const { fetchNextPage, data, isInitialLoading, hasNextPage } =
-    trpc.thread.getBulkThreads.useQuery(
+    trpc.thread.getBulkThreads.useInfiniteQuery(
       {
         community_id: app.activeChainId(),
         queryType: 'bulk',
         limit: 20,
         topicId,
-        temp: '3',
         stage: stageName,
         includePinnedThreads: true,
         orderBy: featuredFilter,
@@ -91,20 +91,27 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       },
       {
         getNextPageParam: (lastPage) => lastPage.nextCursor,
+        initialCursor: 1,
       },
     );
 
-  const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
+  const threadData = data?.pages.flatMap((page) =>
+    page.threads.map((t) => new Thread(t)),
+  );
+
+  const threads = sortPinned(
+    sortByFeaturedFilter(threadData || [], featuredFilter),
+  );
   //
   //Checks if the current page is a discussion page and if the window is small enough to render the mobile menu
   //Checks both for mobile device and inner window size for desktop responsiveness
   const filteredThreads = threads.filter((t) => {
     if (!includeSpamThreads && t.markedAsSpamAt) return null;
 
-    if (!isOnArchivePage && !includeArchivedThreads && t.archivedAt !== null)
+    if (!isOnArchivePage && !includeArchivedThreads && t.archivedAt)
       return null;
 
-    if (isOnArchivePage && t.archivedAt === null) return null;
+    if (isOnArchivePage && t.archivedAt) return null;
 
     return t;
   });

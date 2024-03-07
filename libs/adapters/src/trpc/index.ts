@@ -162,7 +162,11 @@ export const query = <S extends Schemas>(factory: () => QueryMetadata<S>) => {
       },
       protect: md.secure,
     })
-    .input(md.schemas.input)
+    .input(
+      md.schemas.input.extend({
+        address_id: z.string().optional(),
+      }),
+    )
     .output(md.schemas.output)
     .query(async ({ ctx, input }) => {
       if (md.secure) await authenticate(ctx.req);

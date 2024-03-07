@@ -1,5 +1,4 @@
 import { QueryMetadata, ServerError, thread } from '@hicommonwealth/core';
-import { OrderByQueriesKeys } from '@hicommonwealth/core/build/schemas/thread.schemas';
 import moment from 'moment';
 import { QueryTypes } from 'sequelize';
 import z from 'zod';
@@ -57,7 +56,10 @@ export const GetBulkThread = (): QueryMetadata<
     })();
 
     // sql query parts that order results by provided query param
-    const orderByQueries: Record<z.infer<typeof OrderByQueriesKeys>, string> = {
+    const orderByQueries: Record<
+      z.infer<typeof thread.OrderByQueriesKeys>,
+      string
+    > = {
       'createdAt:asc': 'threads.thread_created ASC',
       'createdAt:desc': 'threads.thread_created DESC',
       'numberOfComments:asc': 'threads_number_of_comments ASC',
@@ -69,7 +71,7 @@ export const GetBulkThread = (): QueryMetadata<
     };
 
     // get response threads from query
-    let responseThreads;
+    let responseThreads: any;
     try {
       responseThreads = await models.sequelize.query(
         `
@@ -155,11 +157,11 @@ export const GetBulkThread = (): QueryMetadata<
             ' threads.thread_created < $to_date '
           : ''
       }
-      ${includePinnedThreads || orderByQueries[orderBy] ? 'ORDER BY ' : ''}
+      ${includePinnedThreads || orderByQueries[orderBy!] ? 'ORDER BY ' : ''}
       ${includePinnedThreads ? ' threads.pinned DESC' : ''}
       ${
-        orderByQueries[orderBy]
-          ? (includePinnedThreads ? ',' : '') + orderByQueries[orderBy]
+        orderByQueries[orderBy!]
+          ? (includePinnedThreads ? ',' : '') + orderByQueries[orderBy!]
           : ''
       }
       LIMIT $limit OFFSET $offset
@@ -175,14 +177,14 @@ export const GetBulkThread = (): QueryMetadata<
     }
 
     // transform thread response
-    let threads = responseThreads.map(async (t) => {
+    let threads = responseThreads.map(async (t: any) => {
       const collaborators = JSON.parse(t.collaborators[0]).address?.length
-        ? t.collaborators.map((c) => JSON.parse(c))
+        ? t.collaborators.map((c: any) => JSON.parse(c))
         : [];
 
       const last_edited = getLastEdited(t);
 
-      const data = {
+      const data: any = {
         id: t.thread_id,
         title: t.thread_title,
         url: t.url,
@@ -213,7 +215,7 @@ export const GetBulkThread = (): QueryMetadata<
           ? t.reaction_timestamps.split(',')
           : [],
         reactionWeights: t.reaction_weights
-          ? t.reaction_weights.split(',').map((n) => parseInt(n, 10))
+          ? t.reaction_weights.split(',').map((n: any) => parseInt(n, 10))
           : [],
         reaction_weights_sum: t.reaction_weights_sum,
         addressesReacted: t.addresses_reacted

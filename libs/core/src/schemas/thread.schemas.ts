@@ -70,8 +70,8 @@ export const GetBulkThreads = {
     includePinnedThreads: z.boolean().default(false),
     topicId: z.string().optional(),
     stage: z.string().nullable().optional(),
-    orderBy: OrderByQueriesKeys.nullable().default('createdAt:desc'),
-    cursor: z.number().default(1),
+    orderBy: OrderByQueriesKeys.default('createdAt:desc').nullable(),
+    cursor: z.number().nullish(),
     ...paginationSchema,
   }),
   output: z.object({
