@@ -2,6 +2,7 @@ import React from 'react';
 
 import { useBanProfileByAddressMutation } from 'state/api/profiles';
 import { CWText } from 'views/components/component_kit/cw_text';
+import '../../../styles/modals/ban_user_modal.scss';
 import {
   notifyError,
   notifySuccess,
