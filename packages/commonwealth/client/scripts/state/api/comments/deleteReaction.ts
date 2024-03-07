@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import useFetchCommentsQuery from './fetchComments';
@@ -17,13 +18,10 @@ const deleteReaction = async ({
   canvasHash,
   reactionId,
 }: DeleteReactionProps) => {
-  const {
-    session = null,
-    action = null,
-    hash = null,
-  } = await app.sessions.signDeleteCommentReaction(address, {
-    comment_id: canvasHash,
-  });
+  const serializedCanvasSignedData =
+    await app.sessions.signDeleteCommentReaction(address, {
+      comment_id: canvasHash,
+    });
   return await axios
     .delete(`${app.serverUrl()}/reactions/${reactionId}`, {
       data: {
@@ -31,9 +29,7 @@ const deleteReaction = async ({
         address: address,
         community_id: communityId,
         jwt: app.user.jwt,
-        canvas_action: action,
-        canvas_session: session,
-        canvas_hash: hash,
+        ...toCanvasSignedDataApiArgs(serializedCanvasSignedData),
       },
     })
     .then((r) => ({

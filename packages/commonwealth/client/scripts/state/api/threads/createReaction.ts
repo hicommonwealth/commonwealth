@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
+import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { updateThreadInAllCaches } from './helpers/cache';
 
@@ -17,14 +18,13 @@ const createReaction = async ({
   reactionType = 'like',
   threadId,
 }: CreateReactionProps) => {
-  const {
-    session = null,
-    action = null,
-    hash = null,
-  } = await app.sessions.signThreadReaction(address, {
-    thread_id: threadId,
-    like: reactionType === 'like',
-  });
+  const serializedCanvasSignedData = await app.sessions.signThreadReaction(
+    address,
+    {
+      thread_id: threadId,
+      like: reactionType === 'like',
+    },
+  );
 
   return await axios.post(`${app.serverUrl()}/threads/${threadId}/reactions`, {
     author_community_id: app.user.activeAccount.community.id,
@@ -33,9 +33,7 @@ const createReaction = async ({
     address,
     reaction: reactionType,
     jwt: app.user.jwt,
-    canvas_action: action,
-    canvas_session: session,
-    canvas_hash: hash,
+    ...toCanvasSignedDataApiArgs(serializedCanvasSignedData),
   });
 };
 

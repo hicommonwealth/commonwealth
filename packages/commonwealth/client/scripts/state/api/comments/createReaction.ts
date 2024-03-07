@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import Reaction from 'models/Reaction';
+import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import useFetchCommentsQuery from './fetchComments';
@@ -19,14 +20,13 @@ const createReaction = async ({
   communityId,
   commentId,
 }: CreateReactionProps) => {
-  const {
-    session = null,
-    action = null,
-    hash = null,
-  } = await app.sessions.signCommentReaction(address, {
-    comment_id: commentId,
-    like: reactionType === 'like',
-  });
+  const serializedCanvasSignedData = await app.sessions.signCommentReaction(
+    address,
+    {
+      comment_id: commentId,
+      like: reactionType === 'like',
+    },
+  );
 
   return await axios.post(
     `${app.serverUrl()}/comments/${commentId}/reactions`,
@@ -36,9 +36,7 @@ const createReaction = async ({
       address,
       reaction: reactionType,
       jwt: app.user.jwt,
-      canvas_action: action,
-      canvas_session: session,
-      canvas_hash: hash,
+      ...toCanvasSignedDataApiArgs(serializedCanvasSignedData),
       comment_id: commentId,
     },
   );

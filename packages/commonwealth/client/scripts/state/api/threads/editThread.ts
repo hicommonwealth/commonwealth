@@ -3,6 +3,7 @@ import axios from 'axios';
 import MinimumProfile from 'models/MinimumProfile';
 import Thread from 'models/Thread';
 import { ThreadStage } from 'models/types';
+import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import {
   updateThreadInAllCaches,
@@ -62,11 +63,7 @@ const editThread = async ({
   // for editing thread collaborators
   collaborators,
 }: EditThreadProps): Promise<Thread> => {
-  const {
-    action = null,
-    session = null,
-    hash = null,
-  } = await app.sessions.signThread(address, {
+  const serializedCanvasSignedData = await app.sessions.signThread(address, {
     community: app.activeChainId(),
     title: newTitle,
     body: newBody,
@@ -99,9 +96,7 @@ const editThread = async ({
     ...(topicId !== undefined && { topicId }),
     // for editing thread collaborators
     ...(collaborators !== undefined && { collaborators }),
-    canvas_action: action,
-    canvas_session: session,
-    canvas_hash: hash,
+    ...toCanvasSignedDataApiArgs(serializedCanvasSignedData),
   });
 
   return new Thread(response.data.result);

@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import Comment from 'models/Comment';
+import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import useFetchCommentsQuery from './fetchComments';
@@ -22,15 +23,14 @@ const editComment = async ({
   commentId,
   updatedBody,
 }: EditCommentProps) => {
-  const {
-    session = null,
-    action = null,
-    hash = null,
-  } = await app.sessions.signComment(app.user.activeAccount.address, {
-    thread_id: threadId,
-    body: updatedBody,
-    parent_comment_id: parentCommentId,
-  });
+  const serializedCanvasSignedData = await app.sessions.signComment(
+    app.user.activeAccount.address,
+    {
+      thread_id: threadId,
+      body: updatedBody,
+      parent_comment_id: parentCommentId,
+    },
+  );
 
   const response = await axios.patch(
     `${app.serverUrl()}/comments/${commentId}`,
@@ -41,9 +41,7 @@ const editComment = async ({
       community_id: communityId,
       body: encodeURIComponent(updatedBody),
       jwt: app.user.jwt,
-      canvas_action: action,
-      canvas_session: session,
-      canvas_hash: hash,
+      ...toCanvasSignedDataApiArgs(serializedCanvasSignedData),
     },
   );
 

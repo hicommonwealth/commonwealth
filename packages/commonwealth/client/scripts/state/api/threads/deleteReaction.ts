@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
+import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { updateThreadInAllCaches } from './helpers/cache';
 
@@ -19,13 +20,10 @@ const deleteReaction = async ({
   reactionId,
   threadId,
 }: DeleteReactionProps) => {
-  const {
-    session = null,
-    action = null,
-    hash = null,
-  } = await app.sessions.signDeleteThreadReaction(address, {
-    thread_id: threadId,
-  });
+  const serializedCanvasSignedData =
+    await app.sessions.signDeleteThreadReaction(address, {
+      thread_id: threadId,
+    });
 
   const response = await axios.delete(
     `${app.serverUrl()}/reactions/${reactionId}`,
@@ -35,9 +33,7 @@ const deleteReaction = async ({
         address: address,
         community_id: app.chain.id,
         jwt: app.user.jwt,
-        canvas_action: action,
-        canvas_session: session,
-        canvas_hash: hash,
+        ...toCanvasSignedDataApiArgs(serializedCanvasSignedData),
       },
     },
   );
