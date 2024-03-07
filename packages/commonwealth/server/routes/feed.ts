@@ -1,5 +1,11 @@
-import { TypedRequestQuery, TypedResponse } from '../types';
+import { AppError } from '@hicommonwealth/core';
+import { Thread, ThreadAttributes, type DB } from '@hicommonwealth/model';
+import { Feed } from 'feed';
+import { slugify } from 'utils';
+import { GetBulkThreadsResult } from '../controllers/server_threads_methods/get_bulk_threads';
 import { ServerControllers } from '../routing/router';
+import { TypedRequestQuery, TypedResponse } from '../types';
+import { formatErrorPretty } from '../util/errorFormat';
 import {
   ActiveThreadsRequestQuery,
   BulkThreadsRequestQuery,
@@ -7,31 +13,40 @@ import {
   GetThreadsResponse,
   SearchThreadsRequestQuery,
 } from './threads/get_threads_handler';
-import { Feed } from "feed";
-import {
-  GetBulkThreadsParamsSchema,
-  GetThreadsParamsSchema,
-} from '@hicommonwealth/model/build/thread';
-import { AppError } from '@hicommonwealth/core';
-import { formatErrorPretty } from '../util/errorFormat';
-import { type DB, ThreadAttributes } from '@hicommonwealth/model';
-import { slugify } from 'utils';
 
+function toDate(t: ThreadAttributes): Date {
+  return t.last_edited ?? t.created_at;
+}
+
+function sorter(a: ThreadAttributes, b: ThreadAttributes) {
+  return toDate(a).getTime() - toDate(b).getTime();
+}
+
+function computeUpdated(bulkThreads: GetBulkThreadsResult): Date {
+  if (bulkThreads.threads.length === 0) {
+    // there are no threads
+    return new Date();
+  }
+
+  const sorted = [...bulkThreads.threads].sort(sorter);
+
+  // return the most recent thread and get its date
+  return toDate(sorted.reverse()[0]);
+}
 export const getFeedHandler = async (
   models: DB,
   controllers: ServerControllers,
   req: TypedRequestQuery<
     GetThreadsRequestQuery &
-    (
-      | ActiveThreadsRequestQuery
-      | SearchThreadsRequestQuery
-      | BulkThreadsRequestQuery
+      (
+        | ActiveThreadsRequestQuery
+        | SearchThreadsRequestQuery
+        | BulkThreadsRequestQuery
       )
   >,
   res: TypedResponse<GetThreadsResponse>,
 ) => {
-
-  const queryValidationResult = GetThreadsParamsSchema.safeParse(
+  const queryValidationResult = Thread.GetThreadsParamsSchema.safeParse(
     req.query,
   );
 
@@ -43,13 +58,13 @@ export const getFeedHandler = async (
     queryValidationResult.data;
 
   if (active || search || thread_ids) {
-    throw new Error("Not implemented")
+    throw new Error('Not implemented');
   }
 
   // get bulk threads
   if (bulk) {
     const bulkQueryValidationResult =
-      GetBulkThreadsParamsSchema.safeParse(req.query);
+      Thread.GetBulkThreadsParamsSchema.safeParse(req.query);
 
     if (bulkQueryValidationResult.success === false) {
       throw new AppError(formatErrorPretty(bulkQueryValidationResult));
@@ -85,29 +100,7 @@ export const getFeedHandler = async (
         id: community_id,
       },
     });
-
-    function toDate(t: ThreadAttributes): Date {
-      return t.last_edited ?? t.created_at
-    }
-
-    function sorter(a: ThreadAttributes, b: ThreadAttributes) {
-      return toDate(a).getTime() - toDate(b).getTime()
-    }
-
-    function computeUpdated(): Date {
-      if (bulkThreads.threads.length === 0) {
-        // there are no threads
-        return new Date()
-      }
-
-      const sorted = [...bulkThreads.threads].sort(sorter)
-
-      // return the most recent thread and get its date
-      return toDate(sorted.reverse()[0])
-
-    }
-
-    const updated = computeUpdated()
+    const updated = computeUpdated(bulkThreads);
 
     const feed = new Feed({
       title: community.name,
@@ -115,14 +108,14 @@ export const getFeedHandler = async (
       id: `https://common.xyz/${community_id}/discussions`,
       link: `https://common.xyz/${community_id}/discussions`,
       image: community.icon_url,
-      copyright: "All rights Reserved 2024, common.xyz",
+      copyright: 'All rights Reserved 2024, common.xyz',
       updated,
-      generator: "common.xyz",
+      generator: 'common.xyz',
     });
 
-    bulkThreads.threads.forEach(thread => {
-      const title = decodeURIComponent(thread.title)
-      const slug = slugify(title)
+    bulkThreads.threads.forEach((thread) => {
+      const title = decodeURIComponent(thread.title);
+      const slug = slugify(title);
       feed.addItem({
         title: title,
         id: thread.url,
@@ -131,15 +124,13 @@ export const getFeedHandler = async (
         content: thread.body,
         description: thread.plaintext,
       });
-    })
+    });
 
     // set the content type in the response header.
     // res.setHeader('content-type', 'text/xml.');
     res.setHeader('content-type', 'application/atom+xml.');
 
-    res.write(feed.atom1())
-    res.end()
-
+    res.write(feed.atom1());
+    res.end();
   }
-
-}
+};
