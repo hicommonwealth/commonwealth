@@ -1,9 +1,6 @@
 import {
   CacheDecorator,
-  RabbitMQController,
-  RascalConfigServices,
   RedisCache,
-  getRabbitMQConfig,
   setupErrorHandlers,
 } from '@hicommonwealth/adapters';
 import { cache, logger } from '@hicommonwealth/core';
@@ -23,14 +20,12 @@ import session from 'express-session';
 import passport from 'passport';
 import pinoHttp from 'pino-http';
 import prerenderNode from 'prerender-node';
-import type { BrokerConfig } from 'rascal';
 import favicon from 'serve-favicon';
 import expressStatsInit from 'server/scripts/setupExpressStats';
 import * as v8 from 'v8';
 import {
   DATABASE_CLEAN_HOUR,
   PRERENDER_TOKEN,
-  RABBITMQ_URI,
   REDIS_URL,
   SERVER_URL,
   SESSION_SECRET,
@@ -187,27 +182,6 @@ export async function main(app: express.Express) {
 
   setupMiddleware();
   setupPassport(models);
-
-  let rabbitMQController: RabbitMQController;
-  try {
-    rabbitMQController = new RabbitMQController(
-      <BrokerConfig>(
-        getRabbitMQConfig(
-          RABBITMQ_URI,
-          RascalConfigServices.CommonwealthService,
-        )
-      ),
-    );
-    await rabbitMQController.init();
-  } catch (e) {
-    log.error('The main service RabbitMQController failed to initialize!', e);
-  }
-
-  if (!rabbitMQController.initialized) {
-    log.error(
-      'The RabbitMQController is not initialized! Some services may be unavailable',
-    );
-  }
 
   const banCache = new BanCache(models);
   const globalActivityCache = new GlobalActivityCache(models);
