@@ -62,10 +62,8 @@ export interface Stats extends Disposable {
  * Cache port
  */
 export interface Cache extends Disposable {
-  getKey(
-    namespace: CacheNamespaces,
-    key: string,
-  ): Promise<string | undefined | null>;
+  ready(): Promise<boolean>;
+  getKey(namespace: CacheNamespaces, key: string): Promise<string | null>;
   setKey(
     namespace: CacheNamespaces,
     key: string,
@@ -76,33 +74,30 @@ export interface Cache extends Disposable {
   getKeys(
     namespace: CacheNamespaces,
     keys: string[],
-  ): Promise<false | Record<string, unknown> | undefined>;
+  ): Promise<false | Record<string, unknown>>;
   setKeys(
     namespace: CacheNamespaces,
     data: { [key: string]: string },
     duration?: number,
     transaction?: boolean,
-  ): Promise<false | Array<'OK' | null> | undefined>;
+  ): Promise<false | Array<'OK' | null>>;
   getNamespaceKeys(
     namespace: CacheNamespaces,
     maxResults?: number,
-  ): Promise<{ [key: string]: string } | boolean | undefined>;
-  deleteKey(
-    namespace: CacheNamespaces,
-    key: string,
-  ): Promise<number | undefined>;
+  ): Promise<{ [key: string]: string } | boolean>;
+  deleteKey(namespace: CacheNamespaces, key: string): Promise<number>;
   deleteNamespaceKeys(namespace: CacheNamespaces): Promise<number | boolean>;
   flushAll(): Promise<void>;
   incrementKey(
     namespace: CacheNamespaces,
     key: string,
     increment?: number,
-  ): Promise<number | null | undefined>;
+  ): Promise<number | null>;
   decrementKey(
     namespace: CacheNamespaces,
     key: string,
     decrement?: number,
-  ): Promise<number | null | undefined>;
+  ): Promise<number | null>;
   getKeyTTL(namespace: CacheNamespaces, key: string): Promise<number>;
   setKeyTTL(
     namespace: CacheNamespaces,

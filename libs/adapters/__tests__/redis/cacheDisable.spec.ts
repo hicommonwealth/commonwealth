@@ -52,7 +52,7 @@ describe('Cache Disable Tests', () => {
   console.log(
     `Cache Disable Tests: DISABLE_CACHE ${process.env.DISABLE_CACHE}`,
   );
-  const redisCache: RedisCache = new RedisCache();
+  const redisCache: RedisCache = new RedisCache('redis://localhost:6379');
   const route_namespace: CacheNamespaces = CacheNamespaces.Route_Response;
   const cacheDecorator = new CacheDecorator(redisCache);
   setupCacheTestEndpoints(app, cacheDecorator);

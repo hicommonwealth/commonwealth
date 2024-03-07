@@ -3,7 +3,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable max-len */
 require('dotenv').config();
-import { CacheNamespaces, dispose } from '@hicommonwealth/core';
+import { CacheNamespaces, cache, dispose } from '@hicommonwealth/core';
 import { tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
@@ -12,7 +12,7 @@ import {
   cosmosRPCDuration,
   cosmosRPCKey,
 } from 'server/util/cosmosCache';
-import app, { cacheDecorator, redisCache } from '../../../server-test';
+import app, { cacheDecorator } from '../../../server-test';
 const V1BETA1_CHAIN_ID = 'csdk-beta';
 const V1_CHAIN_ID = 'csdk';
 const V1BETA1_API = `/cosmosAPI`;
@@ -41,11 +41,11 @@ describe('Cosmos Cache', () => {
 
   before(async () => {
     await tester.seedDb();
-    await redisCache.ready();
+    await cache().ready();
   });
 
   after(async () => {
-    await redisCache.deleteNamespaceKeys(route_namespace);
+    await cache().deleteNamespaceKeys(route_namespace);
     await dispose()();
   });
 

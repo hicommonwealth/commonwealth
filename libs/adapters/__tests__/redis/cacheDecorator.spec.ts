@@ -48,7 +48,7 @@ async function makePostRequest(endpoint, body, headers = {}) {
 }
 
 describe('Cache Decorator', () => {
-  const redisCache = new RedisCache();
+  const redisCache = new RedisCache('redis://localhost:6379');
   const route_namespace: CacheNamespaces = CacheNamespaces.Route_Response;
   const cacheDecorator = new CacheDecorator(redisCache);
   setupCacheTestEndpoints(app, cacheDecorator);

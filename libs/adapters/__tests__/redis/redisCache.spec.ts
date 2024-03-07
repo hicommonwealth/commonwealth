@@ -44,7 +44,7 @@ export async function testExpiry(
 }
 
 describe('RedisCache', () => {
-  const redisCache = new RedisCache();
+  const redisCache = new RedisCache('redis://localhost:6379');
   const test_namespace: CacheNamespaces = CacheNamespaces.Test_Redis;
 
   before(async () => {

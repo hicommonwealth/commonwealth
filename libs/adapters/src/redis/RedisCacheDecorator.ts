@@ -1,4 +1,4 @@
-import { CacheNamespaces, ILogger, logger } from '@hicommonwealth/core';
+import { CacheNamespaces, ILogger, cache, logger } from '@hicommonwealth/core';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import {
   CacheKeyDuration,
@@ -33,14 +33,14 @@ export class CacheDecorator {
   private _log?: ILogger;
   private _redisCache?: RedisCache;
 
-  constructor(redisCache: RedisCache) {
+  constructor() {
     this._log = logger().getLogger(__filename);
     // If cache is disabled, skip caching
     if (process.env.DISABLE_CACHE === 'true') {
       this._log.info(`cacheMiddleware: cache disabled`);
       return;
     }
-    this._redisCache = redisCache;
+    cache().name === 'RedisCache' && (this._redisCache = cache() as RedisCache);
   }
 
   /**
@@ -325,12 +325,7 @@ export class CacheDecorator {
   ): Promise<boolean> {
     if (!this.isEnabled()) return false;
 
-    return await this._redisCache!.setKey(
-      namespace,
-      cacheKey,
-      valueToCache,
-      duration,
-    );
+    return await cache().setKey(namespace, cacheKey, valueToCache, duration);
   }
 
   // Check if the response is already cached, if yes, return it
@@ -338,7 +333,7 @@ export class CacheDecorator {
     cacheKey: string,
     namespace: CacheNamespaces = CacheNamespaces.Route_Response,
   ): Promise<string | undefined> {
-    const ret = await this._redisCache!.getKey(namespace, cacheKey);
+    const ret = await cache().getKey(namespace, cacheKey);
     if (ret) {
       return ret;
     }
@@ -421,6 +416,6 @@ export class CacheDecorator {
   }
 
   private isEnabled(): boolean {
-    return (this._redisCache && this._redisCache.initialized()) || false;
+    return this._redisCache?.initialized() ?? false;
   }
 }

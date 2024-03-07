@@ -58,9 +58,8 @@ export async function main(app: express.Express) {
     )} GB`,
   );
 
-  const redisCache = new RedisCache(REDIS_URL);
-  const cacheDecorator = new CacheDecorator(redisCache);
-  cache(redisCache);
+  REDIS_URL && cache(new RedisCache(REDIS_URL));
+  const cacheDecorator = new CacheDecorator();
 
   const DEV = process.env.NODE_ENV !== 'production';
 

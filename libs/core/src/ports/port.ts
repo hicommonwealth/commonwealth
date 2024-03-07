@@ -135,6 +135,7 @@ export const cache = port(function cache(cache?: Cache) {
     cache || {
       name: 'in-memory-cache',
       dispose: () => Promise.resolve(),
+      ready: () => Promise.resolve(true),
       getKey: () => Promise.resolve(''),
       setKey: () => Promise.resolve(false),
       getKeys: () => Promise.resolve(false),
