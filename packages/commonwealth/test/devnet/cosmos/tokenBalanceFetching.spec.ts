@@ -98,9 +98,9 @@ describe('Token Balance Cache Cosmos Tests', function () {
 
   before(async () => {
     await tester.seedDb();
-    await resetChainNode();
     cache(new RedisCache('redis://localhost:6379'));
     await cache().ready();
+    await resetChainNode();
   });
 
   after(async () => {

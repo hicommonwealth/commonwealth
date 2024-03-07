@@ -94,6 +94,22 @@ export const seedDb = async (debug = false): Promise<void> => {
         cosmos_chain_id: 'csdkv1',
         bech32: 'cosmos',
       },
+      csdkBetaCi: {
+        url: 'http://localhost:5051/rpc',
+        name: 'CI: Cosmos SDK v0.45.0 devnet',
+        balance_type: BalanceType.Cosmos,
+        alt_wallet_url: 'http://localhost:5051/lcd/',
+        cosmos_chain_id: 'csdkbetacilocal',
+        bech32: 'cosmos',
+      },
+      csdkV1Ci: {
+        url: 'http://localhost:5050/rpc',
+        name: 'CI: Cosmos SDK v0.46.11 devnet',
+        balance_type: BalanceType.Cosmos,
+        alt_wallet_url: 'http://localhost:5050/lcd/',
+        cosmos_chain_id: 'csdkv1cilocal',
+        bech32: 'cosmos',
+      },
     };
 
     const [
@@ -103,6 +119,8 @@ export const seedDb = async (debug = false): Promise<void> => {
       osmosisNode,
       csdkBetaNode,
       csdkV1Node,
+      csdkBetaCiNode,
+      csdkV1CiNode,
     ] = await models.ChainNode.bulkCreate(Object.values(nodes));
 
     // Initialize different chain + node URLs
@@ -204,6 +222,40 @@ export const seedDb = async (debug = false): Promise<void> => {
     });
     await models.Topic.create({
       community_id: 'csdk',
+      name: 'General',
+    });
+    await models.Community.create({
+      id: 'csdk-beta-ci-local',
+      network: ChainNetwork.Osmosis,
+      default_symbol: 'STAKE',
+      name: 'CI: Cosmos SDK v0.45 devnet',
+      icon_url: '/static/img/protocols/cosmos.png',
+      active: true,
+      type: ChainType.Chain,
+      base: ChainBase.CosmosSDK,
+      has_chain_events_listener: true,
+      chain_node_id: csdkBetaCiNode.id!,
+      bech32_prefix: 'cosmos',
+    });
+    await models.Topic.create({
+      community_id: 'csdk-beta-ci-local',
+      name: 'General',
+    });
+    await models.Community.create({
+      id: 'csdk-v1-ci-local',
+      network: ChainNetwork.Osmosis,
+      default_symbol: 'STAKE',
+      name: 'CI: Cosmos SDK v0.46.11 devnet',
+      icon_url: '/static/img/protocols/cosmos.png',
+      active: true,
+      type: ChainType.Chain,
+      base: ChainBase.CosmosSDK,
+      has_chain_events_listener: true,
+      chain_node_id: csdkV1CiNode.id!,
+      bech32_prefix: 'cosmos',
+    });
+    await models.Topic.create({
+      community_id: 'csdk-v1-ci-local',
       name: 'General',
     });
     const alexContract = await models.Contract.create({

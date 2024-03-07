@@ -1,11 +1,5 @@
 import { isDeliverTxSuccess } from '@cosmjs/stargate';
-import {
-  BalanceType,
-  ChainBase,
-  ChainNetwork,
-  ChainType,
-  dispose,
-} from '@hicommonwealth/core';
+import { dispose } from '@hicommonwealth/core';
 import { models, tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import {
@@ -19,11 +13,11 @@ import { deposit, sendTx, setupTestSigner } from './utils/helpers';
 
 const { expect } = chai;
 
-const v1CommunityId = 'csdk-v1';
+const v1CommunityId = 'csdk-v1-ci-local';
 const v1RpcUrl = `http://localhost:8080/cosmosAPI/${v1CommunityId}`;
 const v1Content = encodeTextProposal(`v1 title`, `v1 description`);
 
-const v1Beta1CommunityId = 'csdk-beta-ci';
+const v1Beta1CommunityId = 'csdk-beta-ci-local';
 const v1Beta1RpcUrl = `http://localhost:8080/cosmosAPI/${v1Beta1CommunityId}`;
 const v1Beta1Content = encodeTextProposal(
   `beta text title`,
@@ -58,32 +52,10 @@ async function enableCommunities(communities: string[]) {
 
   for (const id of possibleCommunities) {
     if (communities.includes(id)) {
-      const [chainNode] = await models.ChainNode.findOrCreate({
-        where: {
-          cosmos_chain_id: id,
-          balance_type: BalanceType.Cosmos,
-          name: `${id}Node`,
-          url: `http://localhost:8080/cosmosAPI/${id}`,
-          alt_wallet_url: `http://localhost:8080/cosmosAPI/v1/${id}`,
-        },
-      });
-      const [community] = await models.Community.findOrCreate({
-        where: {
-          id,
-        },
-        defaults: {
-          name: id,
-          network: ChainNetwork.Osmosis,
-          type: ChainType.Chain,
-          base: ChainBase.CosmosSDK,
-          default_symbol: 'STAKE',
-          chain_node_id: chainNode.id,
-        },
-      });
       await models.Subscription.findOrCreate({
         where: {
           subscriber_id: user.id,
-          community_id: community.id,
+          community_id: id,
           category_id: 'chain-event',
         },
       });
