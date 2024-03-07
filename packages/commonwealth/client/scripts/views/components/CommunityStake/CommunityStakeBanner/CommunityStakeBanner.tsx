@@ -56,7 +56,9 @@ export const CommunityStakeBanner = ({
             label: 'Learn More',
             buttonType: 'tertiary',
             onClick: () => {
-              open('https://blog.commonwealth.im/community-stake-100-owners-around-any-idea/')
+              open(
+                'https://blog.commonwealth.im/community-stake-100-owners-around-any-idea/',
+              );
             },
             iconRight: 'externalLink',
           },

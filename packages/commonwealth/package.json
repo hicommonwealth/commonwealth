@@ -156,7 +156,6 @@
     "marked-xhtml": "1.0.8",
     "mixpanel-browser": "^2.45.0",
     "moment": "^2.23.0",
-    "morgan": "^1.9.1",
     "near-api-js": "^0.42.0",
     "node-fetch": "2",
     "node-jose": "^2.2.0",

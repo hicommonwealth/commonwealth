@@ -16,9 +16,8 @@ type CreateCommunityContractTemplateAndMetadataReq = {
   display_name: string;
   display_options: string;
   contract_id: number;
-  community_id: number;
+  community_id: string;
   template_id: number;
-  chain_id: string;
   enabled_by: string;
 };
 
@@ -47,14 +46,13 @@ export async function createCommunityContractTemplateAndMetadata(
     community_id,
     contract_id,
     template_id,
-    chain_id,
     enabled_by,
   } = req.body;
 
   const isAdmin = await validateOwner({
     models: models,
     user: req.user,
-    communityId: chain_id,
+    communityId: community_id,
     allowAdmin: true,
     allowSuperAdmin: true,
   });
@@ -75,7 +73,7 @@ export async function createCommunityContractTemplateAndMetadata(
   }
 
   const communityContract = await models.CommunityContract.findOne({
-    where: { contract_id: contract_id, community_id: chain_id },
+    where: { contract_id: contract_id, community_id },
   });
 
   if (!communityContract) {
@@ -193,13 +191,13 @@ export async function updateCommunityContractTemplate(
       display_options,
       contract_id,
       cct_id,
-      chain_id,
+      community_id,
     } = req.body;
 
     const isAdmin = await validateOwner({
       models: models,
       user: req.user,
-      communityId: chain_id,
+      communityId: community_id,
       allowAdmin: true,
       allowSuperAdmin: true,
     });
@@ -266,12 +264,12 @@ export async function deleteCommunityContractTemplate(
       throw new AppError('Must provide community_contract_id and template_id');
     }
 
-    const { contract_id, template_id, cctmd_id, chain_id } = req.body;
+    const { contract_id, template_id, cctmd_id, community_id } = req.body;
 
     const isAdmin = await validateOwner({
       models: models,
       user: req.user,
-      communityId: chain_id,
+      communityId: community_id,
       allowAdmin: true,
       allowSuperAdmin: true,
     });
@@ -283,7 +281,7 @@ export async function deleteCommunityContractTemplate(
     const contractTemplate: CommunityContractTemplateAttributes = req.body;
 
     const communityContract = await models.CommunityContract.findOne({
-      where: { contract_id, community_id: chain_id },
+      where: { contract_id, community_id },
     });
 
     const communityContractId = communityContract.id;
@@ -414,7 +412,7 @@ export async function updateCommunityContractTemplateMetadata(
     const isAdmin = await validateOwner({
       models: models,
       user: req.user,
-      communityId: req.body.chain_id,
+      communityId: req.body.community_id,
       allowAdmin: true,
       allowSuperAdmin: true,
     });
@@ -475,7 +473,7 @@ export async function deleteCommunityContractTemplateMetadata(
     const isAdmin = await validateOwner({
       models: models,
       user: req.user,
-      communityId: req.body.chain_id,
+      communityId: req.body.community_id,
       allowAdmin: true,
       allowSuperAdmin: true,
     });
