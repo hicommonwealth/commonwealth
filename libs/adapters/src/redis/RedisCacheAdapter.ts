@@ -232,7 +232,7 @@ export class RedisCache implements Cache {
       RedisCache.getNamespaceKey(namespace, k),
     );
     try {
-      const values = [await this._client.MGET(transformedKeys)];
+      const values = await this._client.MGET(transformedKeys);
       return transformedKeys.reduce((obj, key, index) => {
         if (values[index] !== null) {
           obj[key] = values[index];
