@@ -5,7 +5,12 @@ import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import { NotificationAttributes } from './notification';
 import type { TopicAttributes } from './topic';
-import type { ModelInstance, ModelStatic } from './types';
+import {
+  canvasModelSequelizeColumns,
+  type CanvasModelAttributes,
+  type ModelInstance,
+  type ModelStatic,
+} from './types';
 
 export enum LinkSource {
   Snapshot = 'snapshot',
@@ -41,10 +46,6 @@ export type ThreadAttributes = {
 
   has_poll?: boolean;
 
-  canvas_action: string;
-  canvas_session: string;
-  canvas_hash: string;
-
   created_at?: Date;
   updated_at?: Date;
   last_edited?: Date;
@@ -69,7 +70,7 @@ export type ThreadAttributes = {
 
   //notifications
   max_notif_id: number;
-};
+} & CanvasModelAttributes;
 
 export type ThreadInstance = ModelInstance<ThreadAttributes> & {
   // no mixins used
@@ -124,9 +125,7 @@ export default (
       has_poll: { type: dataTypes.BOOLEAN, allowNull: true },
 
       // signed data
-      canvas_action: { type: dataTypes.JSONB, allowNull: true },
-      canvas_session: { type: dataTypes.JSONB, allowNull: true },
-      canvas_hash: { type: dataTypes.STRING, allowNull: true },
+      ...canvasModelSequelizeColumns(dataTypes),
       // timestamps
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },

@@ -4,7 +4,12 @@ import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import { ThreadAttributes } from './thread';
-import type { ModelInstance, ModelStatic } from './types';
+import {
+  canvasModelSequelizeColumns,
+  type CanvasModelAttributes,
+  type ModelInstance,
+  type ModelStatic,
+} from './types';
 
 const log = logger().getLogger(__filename);
 
@@ -17,10 +22,6 @@ export type CommentAttributes = {
   community_id: string;
   parent_id?: string;
   version_history?: string[];
-
-  canvas_action: string;
-  canvas_session: string;
-  canvas_hash: string;
 
   created_at?: Date;
   updated_at?: Date;
@@ -36,7 +37,7 @@ export type CommentAttributes = {
   //counts
   reaction_count: number;
   reaction_weights_sum: number;
-};
+} & CanvasModelAttributes;
 
 export type CommentInstance = ModelInstance<CommentAttributes>;
 
@@ -70,9 +71,8 @@ export default (
         allowNull: false,
       },
       // signed data
-      canvas_action: { type: dataTypes.JSONB, allowNull: true },
-      canvas_session: { type: dataTypes.JSONB, allowNull: true },
-      canvas_hash: { type: dataTypes.STRING, allowNull: true },
+      ...canvasModelSequelizeColumns(dataTypes),
+
       // timestamps
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
