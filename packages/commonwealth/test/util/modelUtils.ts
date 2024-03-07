@@ -23,6 +23,10 @@ import * as siwe from 'siwe';
 import { createRole, findOneRole } from '../../server/util/roles';
 
 import { createCanvasSessionPayload } from '../../shared/canvas';
+import {
+  serializeCanvasSignedData,
+  toCanvasSignedDataApiArgs,
+} from '../../shared/canvas/types';
 
 import type { Role } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model';
@@ -267,9 +271,12 @@ export const createThread = async (
     session: session.payload.sessionAddress,
     signature: sign(actionPayload),
   };
-  const canvas_session = sortedStringify(session);
-  const canvas_action = sortedStringify(action);
-  const canvas_hash = ''; // getActionHash(action)
+
+  const serializedCanvasSignedData = serializeCanvasSignedData({
+    session,
+    action,
+    hash: '',
+  });
 
   const res = await chai.request
     .agent(app)
@@ -286,9 +293,7 @@ export const createThread = async (
       url,
       readOnly: readOnly || false,
       jwt,
-      canvas_action,
-      canvas_session,
-      canvas_hash,
+      ...toCanvasSignedDataApiArgs(serializedCanvasSignedData),
     });
   return res.body;
 };
@@ -374,9 +379,11 @@ export const createComment = async (args: CommentArgs) => {
     session: session.payload.sessionAddress,
     signature: sign(actionPayload),
   };
-  const canvas_session = sortedStringify(session);
-  const canvas_action = sortedStringify(action);
-  const canvas_hash = ''; // getActionHash(action)
+  const serializedCanvasSignedData = serializeCanvasSignedData({
+    session,
+    action,
+    hash: '',
+  });
   // TODO
 
   const res = await chai.request
@@ -390,9 +397,7 @@ export const createComment = async (args: CommentArgs) => {
       parent_id: parentCommentId,
       text,
       jwt,
-      canvas_action,
-      canvas_session,
-      canvas_hash,
+      ...toCanvasSignedDataApiArgs(serializedCanvasSignedData),
     });
   return res.body;
 };
@@ -463,9 +468,12 @@ export const createReaction = async (args: CreateReactionArgs) => {
     session: session.payload.sessionAddress,
     signature: sign(actionPayload),
   };
-  const canvas_session = sortedStringify(session);
-  const canvas_action = sortedStringify(action);
-  const canvas_hash = ''; // getActionHash(action)
+  const serializedCanvasSignedData = serializeCanvasSignedData({
+    session,
+    action,
+    hash: '',
+  });
+
   // TODO
 
   const res = await chai.request
@@ -480,9 +488,7 @@ export const createReaction = async (args: CreateReactionArgs) => {
       author_chain,
       jwt,
       thread_id,
-      canvas_session,
-      canvas_action,
-      canvas_hash,
+      ...toCanvasSignedDataApiArgs(serializedCanvasSignedData),
     });
   return res.body;
 };
@@ -525,9 +531,11 @@ export const createThreadReaction = async (args: CreateThreadReactionArgs) => {
     session: session.payload.sessionAddress,
     signature: sign(actionPayload),
   };
-  const canvas_session = sortedStringify(session);
-  const canvas_action = sortedStringify(action);
-  const canvas_hash = ''; // getActionHash(action)
+  const serializedCanvasSignedData = serializeCanvasSignedData({
+    session,
+    action,
+    hash: '',
+  });
   // TODO
 
   const res = await chai.request
@@ -541,9 +549,7 @@ export const createThreadReaction = async (args: CreateThreadReactionArgs) => {
       author_chain,
       jwt,
       thread_id,
-      canvas_session,
-      canvas_action,
-      canvas_hash,
+      ...toCanvasSignedDataApiArgs(serializedCanvasSignedData),
     });
   return res.body;
 };
