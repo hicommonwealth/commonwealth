@@ -35,7 +35,7 @@ export async function filterV1GovCommunities(communities: CommunityInstance[]) {
   const v1Communities = [];
   const v1Beta1Communities = [];
 
-  communities.forEach(async (c) => {
+  const promises = communities.map(async (c) => {
     const chainNode = await c.getChainNode();
     if (chainNode?.cosmos_gov_version === CosmosGovernanceVersion.v1) {
       v1Communities.push(c);
@@ -44,6 +44,7 @@ export async function filterV1GovCommunities(communities: CommunityInstance[]) {
     }
   });
 
+  await Promise.all(promises);
   return { v1Communities, v1Beta1Communities };
 }
 
