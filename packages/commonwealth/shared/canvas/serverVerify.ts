@@ -60,20 +60,9 @@ export const verifyComment = async (args: CanvasSignedDataApiArgs, fields) => {
   // assertMatches(chainBaseToCanvasChain(chain), action.payload.chain)
 };
 
-export const verifyThread = async (
-  canvas_action,
-  canvas_session,
-  canvas_hash,
-  fields,
-) => {
-  if (
-    canvas_action === undefined &&
-    canvas_session === undefined &&
-    canvas_hash === undefined
-  )
-    return;
+export const verifyThread = async (args: CanvasSignedDataApiArgs, fields) => {
   const { title, body, address, community, link, topic } = fields;
-  const { action } = await verifyUnpack(canvas_action, canvas_session);
+  const { action } = await verifyUnpack(args);
 
   assertMatches(action.payload.call, 'thread', 'thread', 'call');
   assertMatches(

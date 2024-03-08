@@ -36,9 +36,6 @@ export const createThreadHandler = async (
     stage,
     url,
     readOnly,
-    canvas_action: canvasAction,
-    canvas_session: canvasSession,
-    canvas_hash: canvasHash,
     discord_meta,
   } = req.body;
 
@@ -58,7 +55,7 @@ export const createThreadHandler = async (
 
   if (process.env.ENFORCE_SESSION_KEYS === 'true') {
     if (isCanvasSignedDataApiArgs(req.body)) {
-      await verifyThread(canvasAction, canvasSession, canvasHash, {
+      await verifyThread(req.body, {
         title,
         body,
         address: address.address,

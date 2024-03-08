@@ -1,5 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
 import { ReactionAttributes } from '@hicommonwealth/model';
+import { CreateThreadReactionOptions } from 'server/controllers/server_threads_methods/create_thread_reaction';
 import { isCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import { verifyReaction } from '../../../shared/canvas/serverVerify';
 import { ServerControllers } from '../../routing/router';
@@ -29,12 +30,7 @@ export const createThreadReactionHandler = async (
   res: TypedResponse<CreateThreadReactionResponse>,
 ) => {
   const { user, address } = req;
-  const {
-    reaction,
-    canvas_action: canvasAction,
-    canvas_session: canvasSession,
-    canvas_hash: canvasHash,
-  } = req.body;
+  const { reaction } = req.body;
 
   if (!reaction) {
     throw new AppError(Errors.InvalidReaction);
@@ -45,6 +41,13 @@ export const createThreadReactionHandler = async (
     throw new AppError(Errors.InvalidThreadId);
   }
 
+  const reactionFields: CreateThreadReactionOptions = {
+    user,
+    address,
+    reaction,
+    threadId,
+  };
+
   if (process.env.ENFORCE_SESSION_KEYS === 'true') {
     if (isCanvasSignedDataApiArgs(req.body)) {
       await verifyReaction(req.body, {
@@ -52,20 +55,15 @@ export const createThreadReactionHandler = async (
         address: address.address,
         value: reaction,
       });
+      reactionFields.canvasAction = req.body.canvas_action;
+      reactionFields.canvasSession = req.body.canvas_session;
+      reactionFields.canvasHash = req.body.canvas_hash;
     }
   }
 
   // create thread reaction
   const [newReaction, notificationOptions, analyticsOptions] =
-    await controllers.threads.createThreadReaction({
-      user,
-      address,
-      reaction,
-      threadId,
-      canvasAction,
-      canvasSession,
-      canvasHash,
-    });
+    await controllers.threads.createThreadReaction(reactionFields);
 
   // update address last active
   address.last_active = new Date();
