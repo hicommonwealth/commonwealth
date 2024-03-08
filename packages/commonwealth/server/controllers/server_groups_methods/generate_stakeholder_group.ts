@@ -25,7 +25,7 @@ export type GenerateStakeholderGroupOptions = {
 };
 
 export type GenerateStakeholderGroupResult = [
-  GroupAttributes,
+  group: GroupAttributes,
   created: boolean,
 ];
 

@@ -32,7 +32,7 @@ async function main() {
     if (process.env.COMMUNITY_ID && process.env.COMMUNITY_ID !== community.id)
       continue;
     if (community.CommunityStakes.length > 0) {
-      const [group, created] = await groupsController.generateStakeholderGroup({
+      const [created] = await groupsController.generateStakeholderGroup({
         user: { isAdmin: true } as UserInstance,
         community,
       });

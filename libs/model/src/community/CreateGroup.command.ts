@@ -47,6 +47,7 @@ export const CreateGroup = (): CommandMetadata<typeof group.CreateGroup> => ({
           community_id: id!,
           metadata: payload.metadata,
           requirements: payload.requirements,
+          is_system_managed: false,
         } as GroupAttributes,
         { transaction },
       );
