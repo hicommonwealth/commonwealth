@@ -2,7 +2,6 @@ import { Op, QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from 'server/types';
 
 import { AppError } from '@hicommonwealth/core';
-import { CommunityInstance } from '@hicommonwealth/model';
 import { flatten, uniq } from 'lodash';
 import moment from 'moment';
 import { contractHelpers } from '../../../../../libs/model/src/services/commonProtocol';
@@ -14,6 +13,7 @@ export const Errors = {
   StakeNotFound: 'Stake not found',
   StakeholderGroup: 'Stakeholder group not found',
   ChainNodeNotFound: 'Chain node not found',
+  CommunityNotFound: 'Community not found',
 };
 
 export type MembershipFilters =
@@ -22,7 +22,7 @@ export type MembershipFilters =
   | 'not-in-group';
 
 export type GetMemberProfilesOptions = {
-  community: CommunityInstance;
+  communityId: string;
   search: string;
   includeRoles?: boolean;
   limit?: number;
@@ -48,12 +48,12 @@ type Profile = {
   roles?: any[];
   group_ids: number[];
 };
-export type GetMemberProfilesResult = TypedPaginatedResult<Profile>;
+export type GetCommunityMembersResult = TypedPaginatedResult<Profile>;
 
-export async function __getMemberProfiles(
+export async function __getCommunityMembers(
   this: ServerProfilesController,
   {
-    community,
+    communityId,
     search,
     includeRoles,
     limit,
@@ -64,7 +64,11 @@ export async function __getMemberProfiles(
     includeGroupIds,
     includeStakeBalances,
   }: GetMemberProfilesOptions,
-): Promise<GetMemberProfilesResult> {
+): Promise<GetCommunityMembersResult> {
+  const community = await this.models.Community.findByPk(communityId);
+  if (!community) {
+    throw new AppError(Errors.CommunityNotFound);
+  }
   page = Math.min(1, page);
 
   const bind: any = {

@@ -25,15 +25,14 @@ type SearchCommentsRequestParams = {
   include_roles?: string;
   memberships?: MembershipFilters;
   include_group_ids?: string;
-  include_stake_balances?: string;
 } & PaginationQueryParams;
 
-type SearchCommentsResponse = SearchProfilesResult;
+type SearchProfilesResponse = SearchProfilesResult;
 
 export const searchProfilesHandler = async (
   controllers: ServerControllers,
   req: TypedRequestQuery<SearchCommentsRequestParams>,
-  res: TypedResponse<SearchCommentsResponse>,
+  res: TypedResponse<SearchProfilesResponse>,
 ) => {
   const options = req.query;
   if (!req.community && options.community_id !== ALL_COMMUNITIES) {
@@ -45,8 +44,7 @@ export const searchProfilesHandler = async (
     throw new AppError(Errors.NoCommunityForMemberships);
   }
 
-  // const profileSearchResults = await controllers.profiles.searchProfiles({
-  const profileSearchResults = await controllers.profiles.getMemberProfiles({
+  const profileSearchResults = await controllers.profiles.searchProfiles({
     community: req.community,
     search: options.search,
     includeRoles: options.include_roles === 'true',
@@ -56,7 +54,6 @@ export const searchProfilesHandler = async (
     orderDirection: options.order_direction as any,
     memberships: options.memberships,
     includeGroupIds: options.include_group_ids === 'true',
-    includeStakeBalances: options.include_stake_balances === 'true',
   });
 
   return success(res, profileSearchResults);

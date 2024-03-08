@@ -1,3 +1,4 @@
+import useGetCommunityMembersQuery from 'client/scripts/state/api/profiles/getCommunityMembers';
 import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
@@ -10,7 +11,6 @@ import {
   useFetchGroupsQuery,
   useRefreshMembershipQuery,
 } from 'state/api/groups';
-import { useSearchProfilesQuery } from 'state/api/profiles';
 import { SearchProfilesResponse } from 'state/api/profiles/searchProfiles';
 import useGroupMutationBannerStore from 'state/ui/group';
 import { useDebounce } from 'usehooks-ts';
@@ -77,7 +77,7 @@ const CommunityMembersPage = () => {
     data: members,
     fetchNextPage,
     isLoading: isLoadingMembers,
-  } = useSearchProfilesQuery({
+  } = useGetCommunityMembersQuery({
     communityId: app.activeChainId(),
     searchTerm: '',
     limit: 30,
@@ -272,7 +272,7 @@ const CommunityMembersPage = () => {
               type="info"
               title="Don't see your group right away?"
               body={`
-            Our app is crunching numbers, which takes some time. 
+            Our app is crunching numbers, which takes some time.
             Give it a few minutes and refresh to see your group.
           `}
               onClose={() =>

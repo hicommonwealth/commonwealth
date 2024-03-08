@@ -1,9 +1,9 @@
 import { DB } from '@hicommonwealth/model';
 import {
-  GetMemberProfilesOptions,
-  GetMemberProfilesResult,
-  __getMemberProfiles,
-} from './server_profiles_methods/get_member_profiles';
+  GetMemberProfilesOptions as GetCommunityMembersOptions,
+  GetCommunityMembersResult,
+  __getCommunityMembers,
+} from './server_profiles_methods/get_community_members';
 import {
   SearchProfilesOptions,
   SearchProfilesResult,
@@ -23,9 +23,9 @@ export class ServerProfilesController {
     return __searchProfiles.call(this, options);
   }
 
-  async getMemberProfiles(
-    options: GetMemberProfilesOptions,
-  ): Promise<GetMemberProfilesResult> {
-    return __getMemberProfiles.call(this, options);
+  async getCommunityMembers(
+    options: GetCommunityMembersOptions,
+  ): Promise<GetCommunityMembersResult> {
+    return __getCommunityMembers.call(this, options);
   }
 }

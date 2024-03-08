@@ -10,7 +10,7 @@ import { ApiEndpoints } from '../config';
 
 const SEARCH_PROFILES_STALE_TIME = 60 * 1_000; // 60 s
 
-export type SearchProfilesResponse = {
+export type GetCommunityMembersResponse = {
   results: MemberResult[];
   limit: number;
   page: number;
@@ -18,7 +18,7 @@ export type SearchProfilesResponse = {
   totalResults: number;
 };
 
-interface SearchProfilesProps {
+interface GetCommunityMembersProps {
   communityId: string;
   searchTerm: string;
   limit: number;
@@ -30,19 +30,21 @@ interface SearchProfilesProps {
   enabled?: boolean;
 }
 
-const searchProfiles = async ({
+const getCommunityMembers = async ({
   pageParam = 1,
   communityId,
   searchTerm,
   limit,
   orderBy,
   orderDirection,
+  includeMembershipTypes,
+  includeGroupIds,
   includeRoles,
-}: SearchProfilesProps & { pageParam: number }) => {
+}: GetCommunityMembersProps & { pageParam: number }) => {
   const {
     data: { result },
-  } = await axios.get<{ result: SearchProfilesResponse }>(
-    `${app.serverUrl()}/profiles`,
+  } = await axios.get<{ result: GetCommunityMembersResponse }>(
+    `${app.serverUrl()}/members`,
     {
       headers: {
         'Content-Type': 'application/json',
@@ -55,21 +57,25 @@ const searchProfiles = async ({
         order_by: orderBy,
         order_direction: orderDirection,
         include_roles: includeRoles,
+        ...(includeMembershipTypes && { memberships: includeMembershipTypes }),
+        ...(includeGroupIds && { include_group_ids: includeGroupIds }),
       },
     },
   );
   return result;
 };
 
-const useSearchProfilesQuery = ({
+const useGetCommunityMembersQuery = ({
   communityId,
   searchTerm,
   limit,
   orderBy,
   orderDirection,
   includeRoles,
+  includeGroupIds,
+  includeMembershipTypes,
   enabled = true,
-}: SearchProfilesProps) => {
+}: GetCommunityMembersProps) => {
   const key = [
     ApiEndpoints.searchProfiles(searchTerm),
     {
@@ -77,18 +83,22 @@ const useSearchProfilesQuery = ({
       orderBy,
       orderDirection,
       includeRoles,
+      includeGroupIds,
+      includeMembershipTypes,
     },
   ];
   return useInfiniteQuery(
     key,
     ({ pageParam }) =>
-      searchProfiles({
+      getCommunityMembers({
         pageParam,
         communityId,
         searchTerm,
         limit,
         orderBy,
         orderDirection,
+        includeMembershipTypes,
+        includeGroupIds,
         includeRoles,
       }),
     {
@@ -105,4 +115,4 @@ const useSearchProfilesQuery = ({
   );
 };
 
-export default useSearchProfilesQuery;
+export default useGetCommunityMembersQuery;
