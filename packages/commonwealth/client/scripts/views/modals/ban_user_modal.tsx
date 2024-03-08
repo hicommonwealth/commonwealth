@@ -25,6 +25,11 @@ export const BanUserModal = ({ address, onModalClose }: BanUserModalAttrs) => {
     address: address,
   });
 
+  const handleModalClose = (e) => {
+    e.stopPropagation();
+    onModalClose();
+  };
+
   const onBanConfirmation = async () => {
     // ZAK TODO: Update Banned User Table with userProfile
     if (!address) {
@@ -62,7 +67,7 @@ export const BanUserModal = ({ address, onModalClose }: BanUserModalAttrs) => {
           label="Cancel"
           buttonType="secondary"
           buttonHeight="sm"
-          onClick={onModalClose}
+          onClick={handleModalClose}
         />
         <CWButton
           label="Ban Address"
