@@ -20,10 +20,12 @@ const deleteReaction = async ({
   reactionId,
   threadId,
 }: DeleteReactionProps) => {
-  const serializedCanvasSignedData =
-    await app.sessions.signDeleteThreadReaction(address, {
+  const canvasSignedData = await app.sessions.signDeleteThreadReaction(
+    address,
+    {
       thread_id: threadId,
-    });
+    },
+  );
 
   const response = await axios.delete(
     `${app.serverUrl()}/reactions/${reactionId}`,
@@ -33,7 +35,7 @@ const deleteReaction = async ({
         address: address,
         community_id: app.chain.id,
         jwt: app.user.jwt,
-        ...toCanvasSignedDataApiArgs(serializedCanvasSignedData),
+        ...toCanvasSignedDataApiArgs(canvasSignedData),
       },
     },
   );

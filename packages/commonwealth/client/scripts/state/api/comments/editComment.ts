@@ -23,7 +23,7 @@ const editComment = async ({
   commentId,
   updatedBody,
 }: EditCommentProps) => {
-  const serializedCanvasSignedData = await app.sessions.signComment(
+  const canvasSignedData = await app.sessions.signComment(
     app.user.activeAccount.address,
     {
       thread_id: threadId,
@@ -41,7 +41,7 @@ const editComment = async ({
       community_id: communityId,
       body: encodeURIComponent(updatedBody),
       jwt: app.user.jwt,
-      ...toCanvasSignedDataApiArgs(serializedCanvasSignedData),
+      ...toCanvasSignedDataApiArgs(canvasSignedData),
     },
   );
 

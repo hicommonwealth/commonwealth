@@ -20,13 +20,10 @@ const createReaction = async ({
   communityId,
   commentId,
 }: CreateReactionProps) => {
-  const serializedCanvasSignedData = await app.sessions.signCommentReaction(
-    address,
-    {
-      comment_id: commentId,
-      like: reactionType === 'like',
-    },
-  );
+  const canvasSignedData = await app.sessions.signCommentReaction(address, {
+    comment_id: commentId,
+    like: reactionType === 'like',
+  });
 
   return await axios.post(
     `${app.serverUrl()}/comments/${commentId}/reactions`,
@@ -36,7 +33,7 @@ const createReaction = async ({
       address,
       reaction: reactionType,
       jwt: app.user.jwt,
-      ...toCanvasSignedDataApiArgs(serializedCanvasSignedData),
+      ...toCanvasSignedDataApiArgs(canvasSignedData),
       comment_id: commentId,
     },
   );

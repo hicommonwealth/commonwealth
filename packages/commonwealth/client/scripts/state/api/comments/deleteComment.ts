@@ -20,7 +20,7 @@ const deleteComment = async ({
   commentId,
   canvasHash,
 }: DeleteCommentProps) => {
-  const serializedCanvasSignedData = await app.sessions.signDeleteComment(
+  const canvasSignedData = await app.sessions.signDeleteComment(
     app.user.activeAccount.address,
     {
       comment_id: canvasHash,
@@ -46,7 +46,7 @@ const deleteComment = async ({
       text: '[deleted]',
       plaintext: '[deleted]',
       versionHistory: [],
-      ...toCanvasSignedDataApiArgs(serializedCanvasSignedData),
+      ...toCanvasSignedDataApiArgs(canvasSignedData),
     },
   };
 };

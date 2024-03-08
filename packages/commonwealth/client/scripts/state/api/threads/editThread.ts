@@ -63,7 +63,7 @@ const editThread = async ({
   // for editing thread collaborators
   collaborators,
 }: EditThreadProps): Promise<Thread> => {
-  const serializedCanvasSignedData = await app.sessions.signThread(address, {
+  const canvasSignedData = await app.sessions.signThread(address, {
     community: app.activeChainId(),
     title: newTitle,
     body: newBody,
@@ -96,7 +96,7 @@ const editThread = async ({
     ...(topicId !== undefined && { topicId }),
     // for editing thread collaborators
     ...(collaborators !== undefined && { collaborators }),
-    ...toCanvasSignedDataApiArgs(serializedCanvasSignedData),
+    ...toCanvasSignedDataApiArgs(canvasSignedData),
   });
 
   return new Thread(response.data.result);

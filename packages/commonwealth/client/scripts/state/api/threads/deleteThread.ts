@@ -17,12 +17,9 @@ const deleteThread = async ({
   threadId,
   address,
 }: DeleteThreadProps) => {
-  const serializedCanvasSignedData = await app.sessions.signDeleteThread(
-    address,
-    {
-      thread_id: threadId,
-    },
-  );
+  const canvasSignedData = await app.sessions.signDeleteThread(address, {
+    thread_id: threadId,
+  });
 
   return await axios.delete(`${app.serverUrl()}/threads/${threadId}`, {
     data: {
@@ -30,7 +27,7 @@ const deleteThread = async ({
       community_id: chainId,
       address: address,
       jwt: app.user.jwt,
-      ...toCanvasSignedDataApiArgs(serializedCanvasSignedData),
+      ...toCanvasSignedDataApiArgs(canvasSignedData),
     },
   });
 };

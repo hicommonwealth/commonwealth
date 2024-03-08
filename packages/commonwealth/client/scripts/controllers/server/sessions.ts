@@ -6,7 +6,7 @@ import { createSiweMessage } from 'adapters/chain/ethereum/keys';
 import { chainBaseToCanvasChainId, createCanvasSessionPayload } from 'canvas';
 
 import { ChainBase, WalletSsoSource } from '@hicommonwealth/core';
-import { serializeCanvasSignedData } from 'shared/canvas/types';
+import { CanvasSignedData } from 'shared/canvas/types';
 import app from 'state';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
@@ -189,7 +189,7 @@ class SessionsController {
     address: string,
     call: string,
     args: Record<string, ActionArgument>,
-  ): Promise<{ session: string; action: string; hash: string }> {
+  ): Promise<CanvasSignedData> {
     const chainBase = app.chain?.base;
 
     // Try to infer Chain ID from the currently active chain. Note that
@@ -225,17 +225,10 @@ class SessionsController {
     }
 
     if (!hasAuthenticatedSession) {
-      return { session: '', action: '', hash: '' };
+      return;
     }
 
-    const signResult = await controller.sign(
-      canvasChainId,
-      address,
-      call,
-      args,
-    );
-
-    return serializeCanvasSignedData(signResult);
+    return await controller.sign(canvasChainId, address, call, args);
   }
 
   // Public signer methods

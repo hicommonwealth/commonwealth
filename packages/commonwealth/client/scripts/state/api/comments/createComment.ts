@@ -23,7 +23,7 @@ const createComment = async ({
   unescapedText,
   parentCommentId = null,
 }: CreateCommentProps) => {
-  const serializedCanvasSignedData = await app.sessions.signComment(address, {
+  const canvasSignedData = await app.sessions.signComment(address, {
     thread_id: threadId,
     body: unescapedText,
     parent_comment_id: parentCommentId,
@@ -38,7 +38,7 @@ const createComment = async ({
       parent_id: parentCommentId,
       text: encodeURIComponent(unescapedText),
       jwt: app.user.jwt,
-      ...toCanvasSignedDataApiArgs(serializedCanvasSignedData),
+      ...toCanvasSignedDataApiArgs(canvasSignedData),
     },
   );
 

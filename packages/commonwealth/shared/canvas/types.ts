@@ -21,13 +21,13 @@ const sortedStringify = configureStableStringify({
   deterministic: true,
 });
 
-export const serializeCanvasSignedData = (
-  data: CanvasSignedData,
-): SerializedCanvasSignedData => ({
-  session: sortedStringify(data.session),
-  action: sortedStringify(data.action),
+export const toCanvasSignedDataApiArgs = (
+  data: undefined | CanvasSignedData,
+): CanvasSignedDataApiArgs => ({
+  canvas_action: sortedStringify(data.action),
+  canvas_session: sortedStringify(data.session),
   // hash is already a string so it doesn't need to be serialized
-  hash: data.hash,
+  canvas_hash: data.hash,
 });
 
 export type CanvasSignedDataApiArgs = {
@@ -35,14 +35,6 @@ export type CanvasSignedDataApiArgs = {
   canvas_session: string;
   canvas_hash: string;
 };
-
-export const toCanvasSignedDataApiArgs = (
-  data: SerializedCanvasSignedData,
-): CanvasSignedDataApiArgs => ({
-  canvas_action: data.action,
-  canvas_session: data.session,
-  canvas_hash: data.hash,
-});
 
 export const fromCanvasSignedDataApiArgs = (
   data: CanvasSignedDataApiArgs,

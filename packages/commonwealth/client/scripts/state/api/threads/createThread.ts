@@ -34,7 +34,7 @@ const createThread = async ({
   readOnly,
   authorProfile,
 }: CreateThreadProps): Promise<Thread> => {
-  const serializedCanvasSignedData = await app.sessions.signThread(address, {
+  const canvasSignedData = await app.sessions.signThread(address, {
     community: chainId,
     title,
     body,
@@ -56,7 +56,7 @@ const createThread = async ({
     url,
     readOnly,
     jwt: app.user.jwt,
-    ...toCanvasSignedDataApiArgs(serializedCanvasSignedData),
+    ...toCanvasSignedDataApiArgs(canvasSignedData),
   });
 
   return new Thread(response.data.result);

@@ -18,13 +18,10 @@ const createReaction = async ({
   reactionType = 'like',
   threadId,
 }: CreateReactionProps) => {
-  const serializedCanvasSignedData = await app.sessions.signThreadReaction(
-    address,
-    {
-      thread_id: threadId,
-      like: reactionType === 'like',
-    },
-  );
+  const canvasSignedData = await app.sessions.signThreadReaction(address, {
+    thread_id: threadId,
+    like: reactionType === 'like',
+  });
 
   return await axios.post(`${app.serverUrl()}/threads/${threadId}/reactions`, {
     author_community_id: app.user.activeAccount.community.id,
@@ -33,7 +30,7 @@ const createReaction = async ({
     address,
     reaction: reactionType,
     jwt: app.user.jwt,
-    ...toCanvasSignedDataApiArgs(serializedCanvasSignedData),
+    ...toCanvasSignedDataApiArgs(canvasSignedData),
   });
 };
 
