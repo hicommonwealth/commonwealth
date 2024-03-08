@@ -15,7 +15,7 @@ jobs:
   e2e-tests-Parallel:
     strategy:
       matrix:
-        node: [ 18 ]
+        node: [ 20 ]
     name: Commonwealth E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -106,7 +106,7 @@ jobs:
   e2e-tests-Mature:
     strategy:
       matrix:
-        node: [ 18 ]
+        node: [ 20 ]
     name: Commonwealth Mature E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -196,7 +196,7 @@ jobs:
   e2e-tests-serial:
     strategy:
       matrix:
-        node: [ 18 ]
+        node: [ 20 ]
     name: Commonwealth E2E Tests Serial
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -270,7 +270,7 @@ jobs:
   commonwealth-code-quality-recommendations:
     strategy:
       matrix:
-        node: [ 18 ]
+        node: [ 20 ]
     name: Code Quality Recommendations
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -307,7 +307,7 @@ jobs:
   commonwealth-code-quality:
     strategy:
       matrix:
-        node: [ 18 ]
+        node: [ 20 ]
     name: Code Quality checks
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -360,7 +360,7 @@ jobs:
   commonwealth-unit-integration:
     strategy:
       matrix:
-        node: [ 18 ]
+        node: [ 20 ]
     name: Commonwealth Unit And Integration Tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -425,7 +425,7 @@ jobs:
     timeout-minutes: 25
     strategy:
       matrix:
-        node: [ 18 ]
+        node: [ 20 ]
     services:
       postgres:
         image: postgres
