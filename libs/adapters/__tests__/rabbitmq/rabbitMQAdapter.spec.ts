@@ -41,7 +41,10 @@ describe('RabbitMQ', () => {
 
   before(async () => {
     rmqAdapter = new RabbitMQAdapter(
-      getRabbitMQConfig('', RascalConfigServices.SnapshotService),
+      getRabbitMQConfig(
+        'amqp://127.0.0.1',
+        RascalConfigServices.SnapshotService,
+      ),
     );
   });
 
