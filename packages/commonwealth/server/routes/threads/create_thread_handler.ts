@@ -1,5 +1,7 @@
 import { IDiscordMeta } from '@hicommonwealth/core';
 import { ThreadAttributes } from '@hicommonwealth/model';
+import { CreateThreadOptions } from 'server/controllers/server_threads_methods/create_thread';
+import { isCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import { verifyThread } from '../../../shared/canvas/serverVerify';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
@@ -40,33 +42,37 @@ export const createThreadHandler = async (
     discord_meta,
   } = req.body;
 
+  const threadFields: CreateThreadOptions = {
+    user,
+    address,
+    community,
+    title,
+    body,
+    kind,
+    readOnly,
+    topicId: parseInt(topicId, 10) || undefined,
+    stage,
+    url,
+    discordMeta: discord_meta,
+  };
+
   if (process.env.ENFORCE_SESSION_KEYS === 'true') {
-    await verifyThread(canvasAction, canvasSession, canvasHash, {
-      title,
-      body,
-      address: address.address,
-      community: community.id,
-      topic: topicId ? parseInt(topicId, 10) : null,
-    });
+    if (isCanvasSignedDataApiArgs(req.body)) {
+      await verifyThread(canvasAction, canvasSession, canvasHash, {
+        title,
+        body,
+        address: address.address,
+        community: community.id,
+        topic: topicId ? parseInt(topicId, 10) : null,
+      });
+      threadFields.canvasAction = req.body.canvas_action;
+      threadFields.canvasSession = req.body.canvas_session;
+      threadFields.canvasHash = req.body.canvas_hash;
+    }
   }
 
   const [thread, notificationOptions, analyticsOptions] =
-    await controllers.threads.createThread({
-      user,
-      address,
-      community,
-      title,
-      body,
-      kind,
-      readOnly,
-      topicId: parseInt(topicId, 10) || undefined,
-      stage,
-      url,
-      canvasAction,
-      canvasSession,
-      canvasHash,
-      discordMeta: discord_meta,
-    });
+    await controllers.threads.createThread(threadFields);
 
   for (const n of notificationOptions) {
     controllers.notifications.emit(n).catch(console.error);
