@@ -90,14 +90,14 @@ describe('POST communityStakes Tests', () => {
   it('The community stake routes work correctly', async () => {
     const jwtToken = jwt.sign({ id: 2, email: testUsers[0].email }, JWT_SECRET);
 
-    const actualPutResponse = (
-      await post(
-        `/api/communityStakes/${baseRequest.community_id}/${baseRequest.stake_id}`,
-        { ...baseRequest, jwt: jwtToken },
-        true,
-        app,
-      )
-    ).result;
+    const res = await post(
+      `/api/communityStakes/${baseRequest.community_id}/${baseRequest.stake_id}`,
+      { ...baseRequest, jwt: jwtToken },
+      true,
+      app,
+    );
+    console.log(res);
+    const actualPutResponse = res.result;
 
     assert.equal(
       actualPutResponse.community_id,
