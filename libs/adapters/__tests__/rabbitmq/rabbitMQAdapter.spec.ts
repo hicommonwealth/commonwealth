@@ -1,5 +1,6 @@
 import {
   BrokerTopics,
+  delay,
   EventContext,
   EventHandler,
   events,
@@ -20,7 +21,7 @@ const processSnapshot: EventHandler<
   ZodUndefined
 > = async ({ payload }) => {
   const { id } = payload;
-  idOutput = id;
+  idOutput = id!;
 };
 
 const eventName: events.Events = 'SnapshotProposalCreated';
@@ -136,9 +137,10 @@ describe('RabbitMQ', () => {
         Snapshot() as any,
       );
       expect(res).to.be.true;
-      new Promise((resolve) => setTimeout(resolve, 2000));
+      await delay(5000);
+
       expect(idOutput).to.equal(idInput);
-    });
+    }).timeout(20000);
   });
 
   after(async () => {

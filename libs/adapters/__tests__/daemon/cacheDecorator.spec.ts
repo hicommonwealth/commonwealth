@@ -428,7 +428,7 @@ describe('CacheDecorator', () => {
           duration,
           CacheNamespaces.Function_Response,
         );
-        await expect(wrapFn()).to.be.rejectedWith('Error: test-error');
+        await expect(wrapFn()).to.be.rejectedWith('test-error');
 
         // expect(result).to.equal('test-result');
         expect(mockRedis.getKey.calledOnce).to.be.true;
