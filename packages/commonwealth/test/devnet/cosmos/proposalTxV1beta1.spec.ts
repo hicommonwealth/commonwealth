@@ -168,6 +168,9 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-local)', () 
 });
 
 describe('Cosmos Governance v1beta1 util Tests', () => {
+  before(async () => {
+    await tester.seedDb();
+  });
   describe('getActiveProposals', () => {
     it('should fetch active proposals (csdk-beta-local)', async () => {
       const id = 'csdk-beta-local'; // CI devnet for v1beta1

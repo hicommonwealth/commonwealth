@@ -188,6 +188,7 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
 describe('Cosmos Governance v1 util Tests (csdk-v1-local)', () => {
   let lcd: LCD;
   before(async () => {
+    await tester.seedDb();
     lcd = await getLCDClient(lcdUrl);
   });
 

@@ -273,7 +273,7 @@ export const seedDb = async (debug = false): Promise<void> => {
     });
     await models.Community.create({
       id: 'evmos-dev-local',
-      network: ChainNetwork.Osmosis,
+      network: ChainNetwork.Evmos,
       default_symbol: 'STAKE',
       name: 'CI: Ethermint devnet',
       icon_url: '/static/img/protocols/cosmos.png',
