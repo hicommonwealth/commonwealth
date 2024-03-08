@@ -188,7 +188,7 @@ export default class CompoundGovernance extends ProposalModule<
       `${chain.app.serverUrl()}${ApiEndpoints.FETCH_PROPOSALS}`,
       {
         params: {
-          chainId: meta.id,
+          communityId: meta.id,
         },
       },
     );

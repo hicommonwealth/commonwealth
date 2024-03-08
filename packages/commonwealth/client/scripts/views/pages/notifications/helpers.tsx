@@ -56,16 +56,16 @@ const getNotificationFields = (category, data: IForumNotificationData) => {
     comment_id,
     comment_text,
     parent_comment_id,
-    chain_id,
+    community_id,
     author_address,
-    author_chain,
+    author_community_id,
   } = data;
 
   let notificationHeader;
   let notificationBody;
 
   const communityName =
-    app.config.chains.getById(chain_id)?.name || 'Unknown chain';
+    app.config.chains.getById(community_id)?.name || 'Unknown chain';
 
   const decodedTitle = decodeURIComponent(root_title).trim();
 
@@ -78,7 +78,7 @@ const getNotificationFields = (category, data: IForumNotificationData) => {
   const actorName = (
     <User
       userAddress={author_address}
-      userCommunityId={author_chain}
+      userCommunityId={author_community_id}
       shouldHideAvatar
     />
   );
@@ -127,7 +127,7 @@ const getNotificationFields = (category, data: IForumNotificationData) => {
   const pseudoProposal = {
     id: thread_id,
     title: root_title,
-    chain: chain_id,
+    chain: community_id,
   };
 
   const path = getThreadUrl(pseudoProposal, comment_id);
@@ -137,7 +137,7 @@ const getNotificationFields = (category, data: IForumNotificationData) => {
     : () => jumpHighlightNotification('parent');
 
   return {
-    authorInfo: [[author_chain, author_address]],
+    authorInfo: [[author_community_id, author_address]],
     createdAt: moment.utc(created_at),
     notificationHeader,
     notificationBody,
@@ -162,19 +162,19 @@ export const getBatchNotificationFields = (
     comment_id,
     comment_text,
     parent_comment_id,
-    chain_id,
+    community_id,
     author_address,
-    author_chain,
+    author_community_id,
   } = data[0];
 
   const authorInfo = _.uniq(
-    data.map((d) => `${d.author_chain}#${d.author_address}`),
+    data.map((d) => `${d.author_community_id}#${d.author_address}`),
   ).map((u) => u.split('#'));
 
   const length = authorInfo.length - 1;
 
   const communityName =
-    app.config.chains.getById(chain_id)?.name || 'Unknown chain';
+    app.config.chains.getById(community_id)?.name || 'Unknown chain';
 
   let notificationHeader;
   let notificationBody;
@@ -189,7 +189,7 @@ export const getBatchNotificationFields = (
   const actorName = (
     <User
       userAddress={author_address}
-      userCommunityId={author_chain}
+      userCommunityId={author_community_id}
       shouldHideAvatar
     />
   );
@@ -250,12 +250,12 @@ export const getBatchNotificationFields = (
   const pseudoProposal = {
     id: thread_id,
     title: root_title,
-    chain: chain_id,
+    chain: community_id,
   };
 
   const path =
     category === NotificationCategories.NewThread
-      ? getCommunityUrl(chain_id)
+      ? getCommunityUrl(community_id)
       : getThreadUrl(pseudoProposal, comment_id);
 
   const pageJump = comment_id

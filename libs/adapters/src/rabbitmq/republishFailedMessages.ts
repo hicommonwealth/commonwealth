@@ -1,7 +1,7 @@
 import type { RabbitMQController } from './rabbitMQController';
 
 export abstract class RepublishFailedMessages<DB> {
-  private _timeoutHandle: NodeJS.Timeout;
+  private _timeoutHandle: NodeJS.Timeout | undefined;
 
   protected constructor(
     protected readonly _rmqController: RabbitMQController,

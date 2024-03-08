@@ -6,13 +6,11 @@ import 'pages/user_dashboard/user_dashboard_row_bottom.scss';
 
 import useForceRerender from 'hooks/useForceRerender';
 import app from 'state';
-import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import type NotificationSubscription from '../../../models/NotificationSubscription';
 import type { ProfileWithAddress } from '../../components/component_kit/cw_avatar_group';
 import { CWAvatarGroup } from '../../components/component_kit/cw_avatar_group';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { CWText } from '../../components/component_kit/cw_text';
+import { CWThreadAction } from '../../components/component_kit/new_designs/cw_thread_action';
+import { SharePopover } from '../../components/share_popover';
 import { UserDashboardRowBottomSkeleton } from './UserDashboardRowBottomSkeleton';
 import { subscribeToThread } from './helpers';
 
@@ -20,19 +18,21 @@ type UserDashboardRowBottomProps = {
   commentCount: number;
   threadId: string;
   communityId: string;
-  commentId?: string;
   commenters: ProfileWithAddress[];
   showSkeleton?: boolean;
+  discussionLink?: string;
+  isLoggedIn?: boolean;
 };
 
 export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
   const {
     threadId,
     commentCount,
-    commentId,
     communityId,
     commenters,
     showSkeleton,
+    discussionLink,
+    isLoggedIn,
   } = props;
   const forceRerender = useForceRerender();
 
@@ -70,97 +70,37 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
   const bothActive =
     commentSubscription?.isActive && reactionSubscription?.isActive;
 
-  const domain = document.location.origin;
-
   return (
     <div className="UserDashboardRowBottom">
-      <div className="comments">
-        <div className="count">
-          <CWIcon iconName="comment" iconSize="small" />
-          <CWText type="caption" className="text">
-            {commentCount} {commentCount == 1 ? 'Comment' : 'Comments'}
-          </CWText>
-        </div>
-        <div>
-          <CWAvatarGroup
-            profiles={commenters}
-            communityId={communityId}
-            totalProfiles={commentCount}
-          />
-        </div>
-      </div>
-      <div
-        className="actions"
+      <CWThreadAction label={`${commentCount}`} action="comment" hideToolTip />
+      <CWAvatarGroup
+        className="avatar-group"
+        profiles={commenters}
+        communityId={communityId}
+        totalProfiles={commentCount}
+      />
+      <CWThreadAction
+        action="subscribe"
         onClick={(e) => {
-          e.stopPropagation();
           e.preventDefault();
+          e.stopPropagation();
+          if (!isLoggedIn) return;
+          setSubscription(
+            threadId,
+            bothActive,
+            commentSubscription,
+            reactionSubscription,
+          );
         }}
-      >
-        <PopoverMenu
-          menuItems={[
-            {
-              onClick: () => {
-                setSubscription(
-                  threadId,
-                  bothActive,
-                  commentSubscription,
-                  reactionSubscription,
-                );
-              },
-              label: bothActive ? 'Unsubscribe' : 'Subscribe',
-              iconLeft: bothActive ? 'unsubscribe' : 'bell',
-            },
-          ]}
-          renderTrigger={(onClick) => (
-            <CWIconButton
-              iconName={bothActive ? 'unsubscribe' : 'bell'}
-              iconSize="small"
-              onClick={onClick}
-            />
-          )}
-        />
-        <PopoverMenu
-          menuItems={[
-            {
-              iconLeft: 'linkPhosphor',
-              iconLeftSize: 'regular',
-              label: 'Copy link',
-              onClick: async () => {
-                if (commentId) {
-                  await navigator.clipboard.writeText(
-                    `${domain}/${communityId}/discussion/${threadId}?comment=${commentId}`,
-                  );
-                  return;
-                }
-                await navigator.clipboard.writeText(
-                  `${domain}/${communityId}/discussion/${threadId}`,
-                );
-              },
-            },
-            {
-              iconLeft: 'twitterOutline',
-              iconLeftSize: 'regular',
-              label: 'Share on Twitter',
-              onClick: async () => {
-                if (commentId) {
-                  await window.open(
-                    `https://twitter.com/intent/tweet?text=${domain}/${communityId}/discussion/${threadId}
-                      ?comment=${commentId}`,
-                  );
-                  return;
-                }
-                await window.open(
-                  `https://twitter.com/intent/tweet?text=${domain}/${communityId}/discussion/${threadId}`,
-                  '_blank',
-                );
-              },
-            },
-          ]}
-          renderTrigger={(onClick) => (
-            <CWIconButton iconName="share" iconSize="small" onClick={onClick} />
-          )}
-        />
-      </div>
+        selected={bothActive}
+        className="subscribe-btn"
+      />
+      <SharePopover
+        // if share endpoint is present it will be used, else the current url will be used
+        discussionLink={
+          discussionLink.startsWith('/') ? discussionLink : `/${discussionLink}`
+        }
+      />
     </div>
   );
 };

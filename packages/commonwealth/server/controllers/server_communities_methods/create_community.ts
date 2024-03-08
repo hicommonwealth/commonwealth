@@ -7,6 +7,7 @@ import {
   ChainType,
   DefaultPage,
   NotificationCategories,
+  community as community_schemas,
 } from '@hicommonwealth/core';
 import type {
   AddressInstance,
@@ -14,13 +15,14 @@ import type {
   CommunityAttributes,
   RoleAttributes,
 } from '@hicommonwealth/model';
-import { Community, UserInstance } from '@hicommonwealth/model';
+import { UserInstance } from '@hicommonwealth/model';
 import type { Cluster } from '@solana/web3.js';
 import * as solw3 from '@solana/web3.js';
 import axios from 'axios';
 import BN from 'bn.js';
 import { Op } from 'sequelize';
 import Web3 from 'web3';
+import { z } from 'zod';
 import { bech32ToHex, urlHasValidHTTPPrefix } from '../../../shared/utils';
 import { COSMOS_REGISTRY_API } from '../../config';
 import { RoleInstanceWithPermission } from '../../util/roles';
@@ -67,7 +69,7 @@ export const Errors = {
 
 export type CreateCommunityOptions = {
   user: UserInstance;
-  community: Community.CreateCommunity;
+  community: z.infer<typeof community_schemas.CreateCommunity.input>;
 };
 
 export type CreateCommunityResult = {
