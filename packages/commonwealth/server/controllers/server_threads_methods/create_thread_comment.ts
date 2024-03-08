@@ -43,9 +43,9 @@ export type CreateThreadCommentOptions = {
   parentId: number;
   threadId: number;
   text: string;
-  canvasAction?: any;
-  canvasSession?: any;
-  canvasHash?: any;
+  canvasAction?: string;
+  canvasSession?: string;
+  canvasHash?: string;
   discordMeta?: any;
 };
 

@@ -14,9 +14,6 @@ const Errors = {
 type CreateCommentReactionRequestParams = { id: string };
 type CreateCommentReactionRequestBody = {
   reaction: string;
-  canvas_action?: any;
-  canvas_session?: any;
-  canvas_hash?: any;
 };
 type CreateCommentReactionResponse = ReactionAttributes;
 
@@ -48,16 +45,17 @@ export const createCommentReactionHandler = async (
     commentId,
   };
 
-  if (process.env.ENFORCE_SESSION_KEYS === 'true') {
-    if (isCanvasSignedDataApiArgs(req.body)) {
+  if (isCanvasSignedDataApiArgs(req.body)) {
+    commentReactionFields.canvasAction = req.body.canvas_action;
+    commentReactionFields.canvasSession = req.body.canvas_session;
+    commentReactionFields.canvasHash = req.body.canvas_hash;
+
+    if (process.env.ENFORCE_SESSION_KEYS === 'true') {
       await verifyReaction(req.body, {
         comment_id: commentId,
         address: address.address,
         value: reaction,
       });
-      commentReactionFields.canvasAction = req.body.canvas_action;
-      commentReactionFields.canvasSession = req.body.canvas_session;
-      commentReactionFields.canvasHash = req.body.canvas_hash;
     }
   }
 

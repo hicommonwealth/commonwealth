@@ -24,9 +24,6 @@ type CreateThreadCommentRequestBody = {
   parent_id;
   thread_id;
   text;
-  canvas_action;
-  canvas_session;
-  canvas_hash;
   discord_meta;
 };
 type CreateThreadCommentResponse = CommentInstance;
@@ -56,17 +53,18 @@ export const createThreadCommentHandler = async (
     discordMeta: discord_meta,
   };
 
-  if (process.env.ENFORCE_SESSION_KEYS === 'true') {
-    if (isCanvasSignedDataApiArgs(req.body)) {
+  if (isCanvasSignedDataApiArgs(req.body)) {
+    threadCommentFields.canvasAction = req.body.canvas_action;
+    threadCommentFields.canvasSession = req.body.canvas_session;
+    threadCommentFields.canvasHash = req.body.canvas_hash;
+
+    if (process.env.ENFORCE_SESSION_KEYS === 'true') {
       await verifyComment(req.body, {
         thread_id: parseInt(threadId, 10) || undefined,
         text,
         address: address.address,
         parent_comment_id: parentId,
       });
-      threadCommentFields.canvasAction = req.body.canvas_action;
-      threadCommentFields.canvasSession = req.body.canvas_session;
-      threadCommentFields.canvasHash = req.body.canvas_hash;
     }
   }
 

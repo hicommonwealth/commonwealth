@@ -14,9 +14,6 @@ const Errors = {
 type CreateThreadReactionRequestParams = { id: string };
 type CreateThreadReactionRequestBody = {
   reaction: string;
-  canvas_action?: any;
-  canvas_session?: any;
-  canvas_hash?: any;
 };
 type CreateThreadReactionResponse = ReactionAttributes;
 
@@ -48,16 +45,18 @@ export const createThreadReactionHandler = async (
     threadId,
   };
 
-  if (process.env.ENFORCE_SESSION_KEYS === 'true') {
-    if (isCanvasSignedDataApiArgs(req.body)) {
+  if (isCanvasSignedDataApiArgs(req.body)) {
+    // Only save the canvas fields if they are given and they are strings
+    reactionFields.canvasAction = req.body.canvas_action;
+    reactionFields.canvasSession = req.body.canvas_session;
+    reactionFields.canvasHash = req.body.canvas_hash;
+
+    if (process.env.ENFORCE_SESSION_KEYS === 'true') {
       await verifyReaction(req.body, {
         thread_id: threadId,
         address: address.address,
         value: reaction,
       });
-      reactionFields.canvasAction = req.body.canvas_action;
-      reactionFields.canvasSession = req.body.canvas_session;
-      reactionFields.canvasHash = req.body.canvas_hash;
     }
   }
 

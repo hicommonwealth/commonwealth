@@ -43,9 +43,9 @@ export type CreateThreadOptions = {
   topicId?: number;
   stage?: string;
   url?: string;
-  canvasAction?: any;
-  canvasSession?: any;
-  canvasHash?: any;
+  canvasAction?: string;
+  canvasSession?: string;
+  canvasHash?: string;
   discordMeta?: any;
 };
 

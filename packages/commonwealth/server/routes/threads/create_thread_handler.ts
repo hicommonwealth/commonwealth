@@ -15,9 +15,6 @@ type CreateThreadRequestBody = {
   stage: string;
   url?: string;
   readOnly: boolean;
-  canvas_action?: any;
-  canvas_session?: any;
-  canvas_hash?: any;
   discord_meta?: IDiscordMeta;
 };
 type CreateThreadResponse = ThreadAttributes;
@@ -53,8 +50,12 @@ export const createThreadHandler = async (
     discordMeta: discord_meta,
   };
 
-  if (process.env.ENFORCE_SESSION_KEYS === 'true') {
-    if (isCanvasSignedDataApiArgs(req.body)) {
+  if (isCanvasSignedDataApiArgs(req.body)) {
+    threadFields.canvasAction = req.body.canvas_action;
+    threadFields.canvasSession = req.body.canvas_session;
+    threadFields.canvasHash = req.body.canvas_hash;
+
+    if (process.env.ENFORCE_SESSION_KEYS === 'true') {
       await verifyThread(req.body, {
         title,
         body,
@@ -62,9 +63,6 @@ export const createThreadHandler = async (
         community: community.id,
         topic: topicId ? parseInt(topicId, 10) : null,
       });
-      threadFields.canvasAction = req.body.canvas_action;
-      threadFields.canvasSession = req.body.canvas_session;
-      threadFields.canvasHash = req.body.canvas_hash;
     }
   }
 
