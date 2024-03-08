@@ -7,13 +7,6 @@ export type CanvasSignedData = {
   hash: string;
 };
 
-// maybe these fields should be called canvas_action, canvas_session, canvas_hash?
-export type SerializedCanvasSignedData = {
-  action: string;
-  session: string;
-  hash: string;
-};
-
 const sortedStringify = configureStableStringify({
   bigint: false,
   circularValue: Error,
