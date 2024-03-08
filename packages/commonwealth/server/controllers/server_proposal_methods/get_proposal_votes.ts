@@ -1,8 +1,8 @@
 import { ChainNetwork } from '@hicommonwealth/core';
-import { IAaveVoteResponse } from 'adapters/chain/aave/types';
-import { ICompoundVoteResponse } from 'adapters/chain/compound/types';
 import { providers } from 'ethers';
 import { ServerError } from 'near-api-js/lib/utils/rpc_errors';
+import { IAaveVoteResponse } from '../../../shared/adapters/chain/aave/types';
+import { ICompoundVoteResponse } from '../../../shared/adapters/chain/compound/types';
 import {
   ContractInfo,
   ServerProposalsController,

@@ -1,7 +1,7 @@
 import { ChainNetwork, ServerError } from '@hicommonwealth/core';
-import { IAaveProposalResponse } from 'adapters/chain/aave/types';
-import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
 import { providers } from 'ethers';
+import { IAaveProposalResponse } from '../../../shared/adapters/chain/aave/types';
+import { ICompoundProposalResponse } from '../../../shared/adapters/chain/compound/types';
 import {
   ContractInfo,
   ServerProposalsController,

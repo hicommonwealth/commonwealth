@@ -5,8 +5,8 @@ import {
   GovernorCountingSimple,
   TypedEvent,
 } from '@hicommonwealth/chains';
-import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
 import { ethers, providers, utils } from 'ethers';
+import { ICompoundProposalResponse } from '../../../../shared/adapters/chain/compound/types';
 import { ProposalState } from '../../../../shared/chain/types/compound';
 import { getCompoundGovContractAndVersion } from './compoundVersion';
 import {

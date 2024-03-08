@@ -4,8 +4,8 @@ import {
   GovernorCompatibilityBravo,
   GovernorCountingSimple,
 } from '@hicommonwealth/chains';
-import { ICompoundVoteResponse } from 'adapters/chain/compound/types';
 import { BigNumber, providers } from 'ethers';
+import { ICompoundVoteResponse } from '../../../../shared/adapters/chain/compound/types';
 import { getCompoundGovContractAndVersion } from './compoundVersion';
 import { CompoundVoteEvents, GovVersion } from './types';
 
