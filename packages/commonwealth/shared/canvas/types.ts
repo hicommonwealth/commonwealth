@@ -23,12 +23,19 @@ const sortedStringify = configureStableStringify({
 
 export const toCanvasSignedDataApiArgs = (
   data: undefined | CanvasSignedData,
-): CanvasSignedDataApiArgs => ({
-  canvas_action: sortedStringify(data.action),
-  canvas_session: sortedStringify(data.session),
-  // hash is already a string so it doesn't need to be serialized
-  canvas_hash: data.hash,
-});
+): CanvasSignedDataApiArgs => {
+  // ignore undefined data
+  if (data === undefined) {
+    return;
+  }
+
+  return {
+    canvas_action: sortedStringify(data.action),
+    canvas_session: sortedStringify(data.session),
+    // hash is already a string so it doesn't need to be serialized
+    canvas_hash: data.hash,
+  };
+};
 
 export type CanvasSignedDataApiArgs = {
   canvas_action: string;
