@@ -151,34 +151,38 @@ export default (
           options: Sequelize.CreateOptions<AddressAttributes>,
         ) => {
           // when address created, increment Community.address_count
-          const { community_id } = address;
-          if (!community_id) {
-            return;
-          }
-          const community = await models.Community.findByPk(community_id);
-          if (!community) {
-            return;
-          }
-          await community.increment('address_count', {
-            transaction: options.transaction,
-          });
+          await models.sequelize.query(
+            `
+            UPDATE "Communities"
+            SET address_count = address_count + 1
+            WHERE id = :communityId
+          `,
+            {
+              replacements: {
+                communityId: address.community_id,
+              },
+              transaction: options.transaction,
+            },
+          );
         },
         afterDestroy: async (
           address: AddressInstance,
           options: Sequelize.InstanceDestroyOptions,
         ) => {
           // when address deleted, decrement Community.address_count
-          const { community_id } = address;
-          if (!community_id) {
-            return;
-          }
-          const community = await models.Community.findByPk(community_id);
-          if (!community) {
-            return;
-          }
-          await community.decrement('address_count', {
-            transaction: options.transaction,
-          });
+          await models.sequelize.query(
+            `
+            UPDATE "Communities"
+            SET address_count = address_count - 1
+            WHERE id = :communityId
+          `,
+            {
+              replacements: {
+                communityId: address.community_id,
+              },
+              transaction: options.transaction,
+            },
+          );
         },
       },
     },

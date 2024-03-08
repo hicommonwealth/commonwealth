@@ -188,34 +188,38 @@ export default (
           options: Sequelize.CreateOptions<ThreadAttributes>,
         ) => {
           // when thread created, increment Community.thread_count
-          const { community_id } = thread;
-          if (!community_id) {
-            return;
-          }
-          const community = await models.Community.findByPk(community_id);
-          if (!community) {
-            return;
-          }
-          await community.increment('thread_count', {
-            transaction: options.transaction,
-          });
+          await models.sequelize.query(
+            `
+            UPDATE "Communities"
+            SET thread_count = thread_count + 1
+            WHERE id = :communityId
+          `,
+            {
+              replacements: {
+                communityId: thread.community_id,
+              },
+              transaction: options.transaction,
+            },
+          );
         },
         afterDestroy: async (
           thread: ThreadInstance,
           options: Sequelize.InstanceDestroyOptions,
         ) => {
           // when thread deleted, decrement Community.thread_count
-          const { community_id } = thread;
-          if (!community_id) {
-            return;
-          }
-          const community = await models.Community.findByPk(community_id);
-          if (!community) {
-            return;
-          }
-          await community.decrement('thread_count', {
-            transaction: options.transaction,
-          });
+          await models.sequelize.query(
+            `
+            UPDATE "Communities"
+            SET thread_count = thread_count - 1
+            WHERE id = :communityId
+          `,
+            {
+              replacements: {
+                communityId: thread.community_id,
+              },
+              transaction: options.transaction,
+            },
+          );
         },
       },
     },
