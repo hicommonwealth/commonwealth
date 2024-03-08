@@ -27,6 +27,7 @@ interface GetCommunityMembersProps {
   includeRoles: boolean;
   includeMembershipTypes?: 'in-group' | `in-group:${string}` | 'not-in-group';
   includeGroupIds?: boolean;
+  includeStakeBalances?: boolean;
   enabled?: boolean;
 }
 
@@ -40,6 +41,7 @@ const getCommunityMembers = async ({
   includeMembershipTypes,
   includeGroupIds,
   includeRoles,
+  includeStakeBalances,
 }: GetCommunityMembersProps & { pageParam: number }) => {
   const {
     data: { result },
@@ -59,6 +61,9 @@ const getCommunityMembers = async ({
         include_roles: includeRoles,
         ...(includeMembershipTypes && { memberships: includeMembershipTypes }),
         ...(includeGroupIds && { include_group_ids: includeGroupIds }),
+        ...(includeStakeBalances && {
+          include_stake_balances: includeStakeBalances,
+        }),
       },
     },
   );
@@ -74,10 +79,11 @@ const useGetCommunityMembersQuery = ({
   includeRoles,
   includeGroupIds,
   includeMembershipTypes,
+  includeStakeBalances,
   enabled = true,
 }: GetCommunityMembersProps) => {
   const key = [
-    ApiEndpoints.searchProfiles(searchTerm),
+    ApiEndpoints.getCommunityMembers(searchTerm),
     {
       communityId,
       orderBy,
@@ -99,6 +105,7 @@ const useGetCommunityMembersQuery = ({
         orderDirection,
         includeMembershipTypes,
         includeGroupIds,
+        includeStakeBalances,
         includeRoles,
       }),
     {

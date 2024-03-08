@@ -93,6 +93,9 @@ const CommunityMembersPage = () => {
       searchFilters.groupFilter && {
         includeMembershipTypes: `in-group:${searchFilters.groupFilter}`,
       }),
+    // only include stake balances if community has staking enabled
+    includeStakeBalances: !!app.config.chains.getById(app.activeChainId())
+      .namespace,
   });
 
   const { data: groups } = useFetchGroupsQuery({

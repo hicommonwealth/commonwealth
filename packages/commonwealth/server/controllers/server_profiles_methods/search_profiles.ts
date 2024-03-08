@@ -13,11 +13,6 @@ import { ServerProfilesController } from '../server_profiles_controller';
 
 export const Errors = {};
 
-export type MembershipFilters =
-  | 'in-group'
-  | `in-group:${number}`
-  | 'not-in-group';
-
 export type SearchProfilesOptions = {
   community: CommunityInstance;
   search: string;
@@ -26,7 +21,6 @@ export type SearchProfilesOptions = {
   page?: number;
   orderBy?: string;
   orderDirection?: 'ASC' | 'DESC';
-  memberships?: MembershipFilters;
   includeGroupIds?: boolean;
 };
 
