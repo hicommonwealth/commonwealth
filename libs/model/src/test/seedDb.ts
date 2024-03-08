@@ -86,7 +86,6 @@ export const seedDb = async (debug = false): Promise<void> => {
         alt_wallet_url: 'https://cosmos-devnet-beta.herokuapp.com/lcd/',
         cosmos_chain_id: 'csdkbetaci',
         bech32: 'cosmos',
-        cosmos_gov_version: CosmosGovernanceVersion.v1beta1,
       },
       csdkV1: {
         url: 'https://cosmos-devnet.herokuapp.com/rpc',
@@ -97,32 +96,31 @@ export const seedDb = async (debug = false): Promise<void> => {
         bech32: 'cosmos',
         cosmos_gov_version: CosmosGovernanceVersion.v1,
       },
-      csdkBetaCi: {
+      csdkBetaLocal: {
         url: 'http://localhost:5051/rpc',
         name: 'CI: Cosmos SDK v0.45.0 devnet',
         balance_type: BalanceType.Cosmos,
         alt_wallet_url: 'http://localhost:5051/lcd/',
-        cosmos_chain_id: 'csdkbetaci',
+        cosmos_chain_id: 'csdkbetalocal',
         bech32: 'cosmos',
         cosmos_gov_version: CosmosGovernanceVersion.v1beta1,
       },
-      csdkV1Ci: {
+      csdkV1CLocal: {
         url: 'http://localhost:5050/rpc',
         name: 'CI: Cosmos SDK v0.46.11 devnet',
         balance_type: BalanceType.Cosmos,
         alt_wallet_url: 'http://localhost:5050/lcd/',
-        cosmos_chain_id: 'csdkv1ci',
+        cosmos_chain_id: 'csdkv1local',
         bech32: 'cosmos',
         cosmos_gov_version: CosmosGovernanceVersion.v1,
       },
-      evmosDevCi: {
+      ethermintLocal: {
         url: 'http://localhost:5052/rpc',
         name: 'CI: Ethermint devnet',
         balance_type: BalanceType.Cosmos,
         alt_wallet_url: 'http://localhost:5052/lcd/',
-        cosmos_chain_id: 'evmosdevci',
+        cosmos_chain_id: 'evmosdevlocal',
         bech32: 'cosmos',
-        cosmos_gov_version: CosmosGovernanceVersion.v1beta1,
       },
     };
 
@@ -133,9 +131,9 @@ export const seedDb = async (debug = false): Promise<void> => {
       osmosisNode,
       csdkBetaNode,
       csdkV1Node,
-      csdkBetaCiNode,
-      csdkV1CiNode,
-      evmosDevCiNode,
+      csdkBetaLocalNode,
+      csdkV1LocalNode,
+      ethermintLocalNode,
     ] = await models.ChainNode.bulkCreate(Object.values(nodes));
 
     // Initialize different chain + node URLs
@@ -240,7 +238,7 @@ export const seedDb = async (debug = false): Promise<void> => {
       name: 'General',
     });
     await models.Community.create({
-      id: 'csdk-beta-ci',
+      id: 'csdk-beta-local',
       network: ChainNetwork.Osmosis,
       default_symbol: 'STAKE',
       name: 'CI: Cosmos SDK v0.45 devnet',
@@ -249,15 +247,15 @@ export const seedDb = async (debug = false): Promise<void> => {
       type: ChainType.Chain,
       base: ChainBase.CosmosSDK,
       has_chain_events_listener: true,
-      chain_node_id: csdkBetaCiNode.id!,
+      chain_node_id: csdkBetaLocalNode.id!,
       bech32_prefix: 'cosmos',
     });
     await models.Topic.create({
-      community_id: 'csdk-beta-ci',
+      community_id: 'csdk-beta-local',
       name: 'General',
     });
     await models.Community.create({
-      id: 'csdk-v1-ci',
+      id: 'csdk-v1-local',
       network: ChainNetwork.Osmosis,
       default_symbol: 'STAKE',
       name: 'CI: Cosmos SDK v0.46.11 devnet',
@@ -266,16 +264,16 @@ export const seedDb = async (debug = false): Promise<void> => {
       type: ChainType.Chain,
       base: ChainBase.CosmosSDK,
       has_chain_events_listener: true,
-      chain_node_id: csdkV1CiNode.id!,
+      chain_node_id: csdkV1LocalNode.id!,
       bech32_prefix: 'cosmos',
     });
     await models.Topic.create({
-      community_id: 'csdk-v1-ci',
+      community_id: 'csdk-v1-local',
       name: 'General',
     });
     await models.Community.create({
-      id: 'evmos-dev-ci',
-      network: ChainNetwork.Evmos,
+      id: 'evmos-dev-local',
+      network: ChainNetwork.Osmosis,
       default_symbol: 'STAKE',
       name: 'CI: Ethermint devnet',
       icon_url: '/static/img/protocols/cosmos.png',
@@ -283,11 +281,11 @@ export const seedDb = async (debug = false): Promise<void> => {
       type: ChainType.Chain,
       base: ChainBase.CosmosSDK,
       has_chain_events_listener: true,
-      chain_node_id: evmosDevCiNode.id!,
+      chain_node_id: ethermintLocalNode.id!,
       bech32_prefix: 'cosmos',
     });
     await models.Topic.create({
-      community_id: 'evmos-dev-ci',
+      community_id: 'evmos-dev-local',
       name: 'General',
     });
     const alexContract = await models.Contract.create({

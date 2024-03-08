@@ -26,11 +26,11 @@ import {
 
 const { expect, assert } = chai;
 
-describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => {
+describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-local)', () => {
   let rpc: CosmosApiType;
   let signer: string;
   // v1beta1 CI devnet
-  const betaId = 'csdk-beta-ci';
+  const betaId = 'csdk-beta-local';
   const rpcUrlBeta = `http://localhost:8080/cosmosAPI/${betaId}`;
 
   before(async () => {
@@ -169,8 +169,8 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => 
 
 describe('Cosmos Governance v1beta1 util Tests', () => {
   describe('getActiveProposals', () => {
-    it('should fetch active proposals (csdk-beta-ci)', async () => {
-      const id = 'csdk-beta-ci'; // CI devnet for v1beta1
+    it('should fetch active proposals (csdk-beta-local)', async () => {
+      const id = 'csdk-beta-local'; // CI devnet for v1beta1
       const tmClient = await getTMClient(
         `http://localhost:8080/cosmosAPI/${id}`,
       );

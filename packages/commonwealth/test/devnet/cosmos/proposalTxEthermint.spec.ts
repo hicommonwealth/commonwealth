@@ -32,7 +32,7 @@ const mnemonic =
   'pony duck remind short find feature tooth steak fix assault vote sad cattle roof';
 
 export const setupTestSigner = async (lcdUrl: string) => {
-  const dbId = 'evmos-dev-ci';
+  const dbId = 'evmos-dev-local';
   const chainId = 'evmos_9000-5';
   const hdPath = [
     Slip10RawIndex.hardened(44),
@@ -79,8 +79,8 @@ export const sendTx = async (lcdUrl, tx) => {
   return result;
 };
 
-describe('Proposal Transaction Tests - ethermint chain (evmos-dev-ci)', () => {
-  const id = 'evmos-dev-ci';
+describe('Proposal Transaction Tests - ethermint chain (evmos-dev-local)', () => {
+  const id = 'evmos-dev-local';
   let rpc: CosmosApiType;
   let signerAddr: string;
   const rpcUrl = `http://localhost:8080/cosmosAPI/${id}`;
@@ -168,8 +168,8 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-ci)', () => {
 
 describe('Ethermint Governance v1beta1 util Tests', () => {
   describe('getActiveProposals', () => {
-    it('should fetch active proposals (evmos-dev-ci)', async () => {
-      const id = 'evmos-dev-ci'; // CI devnet
+    it('should fetch active proposals (evmos-dev-local)', async () => {
+      const id = 'evmos-dev-local'; // CI devnet
       const tmClient = await getTMClient(
         `http://localhost:8080/cosmosAPI/${id}`,
       );

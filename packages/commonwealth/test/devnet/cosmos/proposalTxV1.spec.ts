@@ -29,11 +29,11 @@ import {
 
 const { expect, assert } = chai;
 
-const idV1 = 'csdk-v1-ci'; // V1 CI devnet
+const idV1 = 'csdk-v1-local'; // V1 CI devnet
 const rpcUrl = `http://localhost:8080/cosmosAPI/${idV1}`;
 const lcdUrl = `http://localhost:8080/cosmosAPI/v1/${idV1}`;
 
-describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1-ci)', () => {
+describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1-local)', () => {
   let lcd: LCD;
   let signer: string;
   before(async () => {
@@ -185,7 +185,7 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
 });
 
 // Cosmos gov v1 query tests
-describe('Cosmos Governance v1 util Tests (csdk-v1-ci)', () => {
+describe('Cosmos Governance v1 util Tests (csdk-v1-local)', () => {
   let lcd: LCD;
   before(async () => {
     lcd = await getLCDClient(lcdUrl);
