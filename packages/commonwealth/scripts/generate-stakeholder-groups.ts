@@ -32,11 +32,11 @@ async function main() {
     if (process.env.COMMUNITY_ID && process.env.COMMUNITY_ID !== community.id)
       continue;
     if (community.CommunityStakes.length > 0) {
-      const createdGroup = await groupsController.generateStakeholderGroup({
+      const [group, created] = await groupsController.generateStakeholderGroup({
         user: { isAdmin: true } as UserInstance,
         community,
       });
-      if (createdGroup) {
+      if (created) {
         console.log(
           `created stakeholder group for ${community.id} – refreshing memberships...`,
         );

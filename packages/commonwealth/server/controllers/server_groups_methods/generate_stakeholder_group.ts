@@ -24,21 +24,24 @@ export type GenerateStakeholderGroupOptions = {
   community: CommunityAttributes;
 };
 
-export type GenerateStakeholderGroupResult = GroupAttributes | null;
+export type GenerateStakeholderGroupResult = [
+  GroupAttributes,
+  created: boolean,
+];
 
 export async function __generateStakeholderGroup(
   this: ServerGroupsController,
   { user, community }: GenerateStakeholderGroupOptions,
 ): Promise<GenerateStakeholderGroupResult> {
   // if stakeholder group already exists, skip
-  const existingGroups = await this.getGroups({
-    communityId: community.id,
+  const existingStakeholderGroup = await this.models.Group.findOne({
+    where: {
+      community_id: community.id,
+      is_system_managed: true,
+    },
   });
-  const existingStakeholderGroup = existingGroups.find(
-    (g) => g.is_system_managed,
-  );
   if (existingStakeholderGroup) {
-    return null;
+    return [existingStakeholderGroup, false];
   }
 
   // get contract address
@@ -48,23 +51,13 @@ export async function __generateStakeholderGroup(
   if (!stake) {
     throw new AppError(Errors.StakeNotFound);
   }
-  const stakeholderGroup = await this.models.Group.findOne({
-    where: {
-      community_id: community.id,
-      is_system_managed: true,
-    },
-  });
-  if (!stakeholderGroup) {
-    throw new AppError(Errors.StakeholderGroup);
-  }
   const node = await this.models.ChainNode.findByPk(community.chain_node_id);
   if (!node) {
     throw new AppError(Errors.ChainNodeNotFound);
   }
   const factoryData = commonProtocol.factoryContracts[node.eth_chain_id];
-  const web3 = new Web3(node.url);
   const contractAddress = await getNamespace(
-    web3,
+    new Web3(node.url),
     community.namespace,
     factoryData.factory,
   );
@@ -95,5 +88,5 @@ export async function __generateStakeholderGroup(
     systemManaged: true,
   });
 
-  return group;
+  return [group, true];
 }

@@ -62,7 +62,6 @@ export const createCommunityStakeHandler = async (
         attributes: ['eth_chain_id', 'url'],
       },
     ],
-    attributes: ['namespace'],
   });
 
   await commonProtocol.communityStakeConfigValidator.validateCommunityStakeConfig(
@@ -84,13 +83,14 @@ export const createCommunityStakeHandler = async (
     },
   });
 
-  await controllers.groups.generateStakeholderGroup({
+  const [stakeholderGroup] = await controllers.groups.generateStakeholderGroup({
     user: req.user,
     community: community,
   });
-  // refresh memberships in background
+  // refresh group memberships in background
   controllers.groups.refreshCommunityMemberships({
     communityId: community.id,
+    groupId: stakeholderGroup.id,
   });
 
   return success(res, results);

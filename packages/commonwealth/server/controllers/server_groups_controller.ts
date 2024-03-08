@@ -12,6 +12,7 @@ import {
 } from './server_groups_methods/delete_group';
 import {
   GenerateStakeholderGroupOptions,
+  GenerateStakeholderGroupResult,
   __generateStakeholderGroup,
 } from './server_groups_methods/generate_stakeholder_group';
 import {
@@ -71,7 +72,7 @@ export class ServerGroupsController {
 
   async generateStakeholderGroup(
     options: GenerateStakeholderGroupOptions,
-  ): Promise<GenerateStakeholderGroupOptions> {
+  ): Promise<GenerateStakeholderGroupResult> {
     return __generateStakeholderGroup.call(this, options);
   }
 }
