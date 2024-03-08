@@ -1,9 +1,16 @@
-import {
-  MembershipFilters,
-  SearchProfilesResult,
-} from 'server/controllers/server_profiles_methods/search_profiles';
+import { SearchProfilesResult } from 'server/controllers/server_profiles_methods/search_profiles';
 import { ServerControllers } from '../../routing/router';
-import { PaginationQueryParams, TypedResponse, success } from '../../types';
+import {
+  PaginationQueryParams,
+  TypedRequestQuery,
+  TypedResponse,
+  success,
+} from '../../types';
+
+export type MembershipFilters =
+  | 'in-group'
+  | `in-group:${number}`
+  | 'not-in-group';
 
 type GetCommunityMembersQuery = {
   search: string;
@@ -18,7 +25,7 @@ type GetCommunityMembersResponse = SearchProfilesResult;
 
 export const getCommunityMembersHandler = async (
   controllers: ServerControllers,
-  req: TypedRequest<GetCommunityMembersQuery>,
+  req: TypedRequestQuery<GetCommunityMembersQuery>,
   res: TypedResponse<GetCommunityMembersResponse>,
 ) => {
   const options = req.query;
