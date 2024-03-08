@@ -22,6 +22,7 @@ export async function __getCommunities(
   if (hasGroups) {
     communitiesInclude.push({
       model: this.models.Group,
+      as: 'groups',
       required: true,
     });
   }

@@ -83,14 +83,9 @@ export const createCommunityStakeHandler = async (
     },
   });
 
-  const [stakeholderGroup] = await controllers.groups.generateStakeholderGroup({
+  await controllers.groups.generateStakeholderGroup({
     user: req.user,
     community: community,
-  });
-  // refresh group memberships in background
-  controllers.groups.refreshCommunityMemberships({
-    communityId: community.id,
-    groupId: stakeholderGroup.id,
   });
 
   return success(res, results);
