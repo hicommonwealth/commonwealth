@@ -77,6 +77,11 @@ export const User = ({
       (r) => r.address === userAddress && r.address_chain === userCommunityId,
     );
 
+  const handleCloseModal = (e) => {
+    e.stopPropagation();
+    setIsModalOpen(false);
+  };
+
   const roleTags = (
     <>
       {shouldShowRole && roleInCommunity && (
@@ -230,10 +235,7 @@ export const User = ({
       <CWModal
         size="small"
         content={
-          <BanUserModal
-            address={userAddress}
-            onModalClose={() => setIsModalOpen(false)}
-          />
+          <BanUserModal address={userAddress} onModalClose={handleCloseModal} />
         }
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
