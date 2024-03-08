@@ -3,6 +3,7 @@ import {
   ChainBase,
   ChainNetwork,
   ChainType,
+  CosmosGovernanceVersion,
   NotificationCategories,
   logger,
 } from '@hicommonwealth/core';
@@ -101,6 +102,7 @@ export const seedDb = async (debug = false): Promise<void> => {
         alt_wallet_url: 'http://localhost:5051/lcd/',
         cosmos_chain_id: 'csdkbetacilocal',
         bech32: 'cosmos',
+        cosmos_gov_version: CosmosGovernanceVersion.v1beta1,
       },
       csdkV1Ci: {
         url: 'http://localhost:5050/rpc',
@@ -109,6 +111,7 @@ export const seedDb = async (debug = false): Promise<void> => {
         alt_wallet_url: 'http://localhost:5050/lcd/',
         cosmos_chain_id: 'csdkv1cilocal',
         bech32: 'cosmos',
+        cosmos_gov_version: CosmosGovernanceVersion.v1,
       },
     };
 

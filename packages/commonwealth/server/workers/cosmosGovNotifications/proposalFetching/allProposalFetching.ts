@@ -73,7 +73,9 @@ export async function fetchLatestProposals(
 ): Promise<AllCosmosProposals> {
   if (chains.length === 0) return { v1: {}, v1Beta1: {} };
 
-  const { v1Communities, v1Beta1Communities } = filterV1GovCommunities(chains);
+  const { v1Communities, v1Beta1Communities } = await filterV1GovCommunities(
+    chains,
+  );
   log.info(
     `Fetching the latest proposals from ${JSON.stringify(
       v1Communities.map((c) => c.id),
