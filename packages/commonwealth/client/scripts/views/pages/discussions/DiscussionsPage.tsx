@@ -34,6 +34,7 @@ type DiscussionsPageProps = {
 };
 
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
+  const community_id = app.activeChainId();
   const navigate = useCommonNavigate();
   const { totalThreadsInCommunity } = useEXCEPTION_CASE_threadCountersStore();
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
@@ -48,7 +49,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     'dateRange',
   ) as ThreadTimelineFilterTypes;
   const { data: topics } = useFetchTopicsQuery({
-    communityId: app.activeChainId(),
+    communityId: community_id,
   });
   const [resizing, setResizing] = useState(false);
   const { isWindowSmallInclusive } = useBrowserWindow({
@@ -61,7 +62,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const topicId = (topics || []).find(({ name }) => name === topicName)?.id;
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
-    chainId: app.activeChainId(),
+    chainId: community_id,
     address: app?.user?.activeAccount?.address,
     apiEnabled: !!app?.user?.activeAccount?.address,
   });
@@ -72,13 +73,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     dateRange: searchParams.get('dateRange') as ThreadTimelineFilterTypes,
   });
 
-  const isOnArchivePage =
-    location.pathname === `/${app.activeChainId()}/archived`;
+  const isOnArchivePage = location.pathname === `/${community_id}/archived`;
 
   const { fetchNextPage, data, isInitialLoading, hasNextPage } =
     trpc.thread.getBulkThreads.useInfiniteQuery(
       {
-        community_id: app.activeChainId(),
+        community_id,
         queryType: 'bulk',
         limit: 20,
         topicId,
@@ -100,7 +100,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   console.log(data?.pages?.length, 'length');
   console.log(fetchNextPage, 'length');
   const threadData = data?.pages.flatMap((page) =>
-    page.threads.map((t) => new Thread(t)),
+    page.threads.map((t) => new Thread(t as any)),
   );
 
   const threads = sortPinned(
@@ -168,7 +168,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               onBodyClick={() => {
                 const scrollEle = document.getElementsByClassName('Body')[0];
 
-                localStorage[`${app.activeChainId()}-discussions-scrollY`] =
+                localStorage[`${community_id}-discussions-scrollY`] =
                   scrollEle.scrollTop;
               }}
               onCommentBtnClick={() =>

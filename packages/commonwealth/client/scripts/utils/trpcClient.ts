@@ -16,4 +16,5 @@ export const trpcClient = trpc.createClient({
       },
     }),
   ],
+  transformer: undefined,
 });

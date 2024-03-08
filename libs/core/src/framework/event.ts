@@ -1,4 +1,4 @@
-import { ZodError, ZodObject, ZodRawShape, ZodUndefined, z } from 'zod';
+import { ZodError, ZodSchema, ZodUndefined, z } from 'zod';
 import { events } from '../schemas';
 import {
   InvalidInput,
@@ -19,7 +19,7 @@ import {
 export const event = async <
   Name extends events.Events,
   Input extends EventSchemas,
-  Output extends ZodObject<ZodRawShape> | ZodUndefined = ZodUndefined,
+  Output extends ZodSchema | ZodUndefined = ZodUndefined,
 >(
   { inputs, body }: EventsHandlerMetadata<Input, Output>,
   { name, payload }: EventContext<Name>,

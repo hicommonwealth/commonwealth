@@ -1,9 +1,8 @@
-import { z, ZodError } from 'zod';
+import { z, ZodError, ZodSchema } from 'zod';
 import {
   InvalidInput,
   type CommandContext,
   type CommandMetadata,
-  type Schemas,
 } from './types';
 
 /**
@@ -17,18 +16,21 @@ import {
  * @returns side effects
  * @throws {@link InvalidInput} when user invokes command with invalid payload or attributes, or rethrows internal domain errors
  */
-export const command = async <S extends Schemas>(
-  { schemas, auth, body }: CommandMetadata<S>,
-  { id, actor, payload }: CommandContext<S>,
+export const command = async <
+  Input extends ZodSchema,
+  Output extends ZodSchema,
+>(
+  { input, auth, body }: CommandMetadata<Input, Output>,
+  { id, actor, payload }: CommandContext<Input>,
   validate = true,
-): Promise<Partial<z.infer<S['output']>> | undefined> => {
+): Promise<Partial<z.infer<Output>> | undefined> => {
   try {
-    const context: CommandContext<S> = {
+    const context: CommandContext<Input> = {
       actor,
-      payload: validate ? schemas.input.parse(payload) : payload,
+      payload: validate ? input.parse(payload) : payload,
       id,
     };
-    let state: Partial<z.infer<S['output']>> | undefined = undefined;
+    let state: Partial<z.infer<Output>> | undefined = undefined;
     for (const fn of auth) {
       // can use deep clone to make it pure
       state = (await fn(context, state)) ?? state;

@@ -1,4 +1,4 @@
-import { QueryMetadata, ServerError, thread } from '@hicommonwealth/core';
+import { ServerError, thread, type Query } from '@hicommonwealth/core';
 import moment from 'moment';
 import { QueryTypes } from 'sequelize';
 import z from 'zod';
@@ -18,10 +18,8 @@ const getLastEdited = (post: CommentAttributes) => {
   return lastEdited;
 };
 
-export const GetBulkThread = (): QueryMetadata<
-  typeof thread.GetBulkThreads
-> => ({
-  schemas: thread.GetBulkThreads,
+export const GetBulkThread: Query<typeof thread.GetBulkThreads> = () => ({
+  ...thread.GetBulkThreads,
   auth: [],
   body: async ({ payload }) => {
     const {
