@@ -89,7 +89,7 @@ async function generateCosmosAddresses(numberOfAddresses: number) {
 describe('Token Balance Cache Cosmos Tests', function () {
   this.timeout(80_000);
   // mnemonic + token allocation can be found in cosmos-chain-test/[version]/bootstrap.sh files
-  const cosmosChainId = 'csdkv1cilocal';
+  const cosmosChainId = 'csdkv1ci';
   const addressOne = 'cosmos1zf45elxg5alxxeewvumpprfqtxmy2ufhzvetgx';
   const addressTwo = 'cosmos1f85wzgz83gkq09g9gj79c6w9gydu87a7e6hax7';
   const discobotAddress = '0xdiscordbot';

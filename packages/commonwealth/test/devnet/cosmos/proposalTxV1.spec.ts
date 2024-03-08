@@ -7,6 +7,7 @@ import {
   VoteOption as VoteOptionV1,
   voteOptionToJSON,
 } from '@hicommonwealth/chains';
+import { tester } from '@hicommonwealth/model';
 import { getLCDClient } from 'controllers/chain/cosmos/chain.utils';
 import {
   getActiveProposalsV1,
@@ -28,14 +29,15 @@ import {
 
 const { expect, assert } = chai;
 
-const idV1 = 'csdk-v1'; // V1 CI devnet
+const idV1 = 'csdk-v1-ci'; // V1 CI devnet
 const rpcUrl = `http://localhost:8080/cosmosAPI/${idV1}`;
 const lcdUrl = `http://localhost:8080/cosmosAPI/v1/${idV1}`;
 
-describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1)', () => {
+describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1-ci)', () => {
   let lcd: LCD;
   let signer: string;
   before(async () => {
+    await tester.seedDb();
     lcd = await getLCDClient(lcdUrl);
     const { signerAddress } = await setupTestSigner(rpcUrl);
     signer = signerAddress;
@@ -183,7 +185,7 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
 });
 
 // Cosmos gov v1 query tests
-describe('Cosmos Governance v1 util Tests (csdk-v1)', () => {
+describe('Cosmos Governance v1 util Tests (csdk-v1-ci)', () => {
   let lcd: LCD;
   before(async () => {
     lcd = await getLCDClient(lcdUrl);

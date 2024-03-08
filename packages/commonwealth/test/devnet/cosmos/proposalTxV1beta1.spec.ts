@@ -1,4 +1,5 @@
 import { isDeliverTxSuccess } from '@cosmjs/stargate';
+import { tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import { CosmosApiType } from 'controllers/chain/cosmos/chain';
 import {
@@ -33,6 +34,7 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => 
   const rpcUrlBeta = `http://localhost:8080/cosmosAPI/${betaId}`;
 
   before(async () => {
+    await tester.seedDb();
     const tm = await getTMClient(rpcUrlBeta);
     rpc = await getRPCClient(tm);
     const { signerAddress } = await setupTestSigner(rpcUrlBeta);

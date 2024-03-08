@@ -194,7 +194,6 @@ export async function createCosmosChains() {
       alt_wallet_url: 'https://rest.cosmos.directory/osmosis',
       name: 'Osmosis',
       balance_type: BalanceType.Cosmos,
-      cosmos_gov_version: CosmosGovernanceVersion.v1beta1,
     });
 
     await models.Community.create(

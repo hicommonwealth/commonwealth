@@ -13,11 +13,11 @@ import { deposit, sendTx, setupTestSigner } from './utils/helpers';
 
 const { expect } = chai;
 
-const v1CommunityId = 'csdk-v1-ci-local';
+const v1CommunityId = 'csdk-v1-ci';
 const v1RpcUrl = `http://localhost:8080/cosmosAPI/${v1CommunityId}`;
 const v1Content = encodeTextProposal(`v1 title`, `v1 description`);
 
-const v1Beta1CommunityId = 'csdk-beta-ci-local';
+const v1Beta1CommunityId = 'csdk-beta-ci';
 const v1Beta1RpcUrl = `http://localhost:8080/cosmosAPI/${v1Beta1CommunityId}`;
 const v1Beta1Content = encodeTextProposal(
   `beta text title`,

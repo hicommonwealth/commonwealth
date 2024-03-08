@@ -2,6 +2,7 @@ import { StdFee } from '@cosmjs/amino';
 import { Slip10RawIndex } from '@cosmjs/crypto';
 import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
 import { Wallet as EthWallet } from '@ethersproject/wallet';
+import { tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import { CosmosToken } from 'client/scripts/controllers/chain/cosmos/types';
 import { CosmosApiType } from 'controllers/chain/cosmos/chain';
@@ -86,6 +87,7 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-ci)', () => {
   const lcdUrl = `http://localhost:8080/cosmosAPI/v1/${id}`;
 
   before(async () => {
+    await tester.seedDb();
     const tm = await getTMClient(rpcUrl);
     rpc = await getRPCClient(tm);
     const { signerAddress } = await setupTestSigner(lcdUrl);

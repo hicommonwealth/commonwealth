@@ -417,7 +417,6 @@ jobs:
         run: yarn --cwd packages/commonwealth test-integration-util --forbid-only
         env:
           NO_CLIENT: true
-          COSMOS_GOV_V1: ${{ secrets.COSMOS_GOV_V1 }}
 
   # These tests run slowly, so run them in a separate job
   commonwealth-devnet-tests:
@@ -524,4 +523,3 @@ jobs:
         env:
           PORT: 8080
           USES_DOCKER_PGSQL: true
-          COSMOS_GOV_V1: ${{ secrets.COSMOS_GOV_V1 }}
