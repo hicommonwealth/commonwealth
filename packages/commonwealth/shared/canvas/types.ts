@@ -43,3 +43,49 @@ export const toCanvasSignedDataApiArgs = (
   canvas_session: data.session,
   canvas_hash: data.hash,
 });
+
+export const fromCanvasSignedDataApiArgs = (
+  data: CanvasSignedDataApiArgs,
+): CanvasSignedData => {
+  // try to deserialize
+  return {
+    action: JSON.parse(data.canvas_action),
+    session: JSON.parse(data.canvas_session),
+    hash: data.canvas_hash,
+  };
+};
+
+export const isCanvasSignedDataApiArgs = (
+  args: any,
+): args is CanvasSignedDataApiArgs => {
+  /**
+   * There are three canvas signed data arguments: action, session and hash
+   * The input is valid if either all three are present or all three are absent
+   */
+
+  if (
+    args.canvas_action === undefined &&
+    args.canvas_session === undefined &&
+    args.canvas_hash === undefined
+  ) {
+    return false;
+  }
+
+  if (
+    args.canvas_action === undefined ||
+    args.canvas_session === undefined ||
+    args.canvas_hash === undefined
+  ) {
+    throw new Error('Missing canvas signed data');
+  }
+
+  if (
+    typeof args.canvas_action !== 'string' ||
+    typeof args.canvas_session !== 'string' ||
+    typeof args.canvas_hash !== 'string'
+  ) {
+    throw new Error('Canvas signed data fields should be strings (if present)');
+  }
+
+  return true;
+};

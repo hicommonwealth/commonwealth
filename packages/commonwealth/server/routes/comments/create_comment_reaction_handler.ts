@@ -1,5 +1,7 @@
 import { AppError } from '@hicommonwealth/core';
 import { ReactionAttributes } from '@hicommonwealth/model';
+import { CreateCommentReactionOptions } from 'server/controllers/server_comments_methods/create_comment_reaction';
+import { isCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import { verifyReaction } from '../../../shared/canvas/serverVerify';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
@@ -28,12 +30,7 @@ export const createCommentReactionHandler = async (
   res: TypedResponse<CreateCommentReactionResponse>,
 ) => {
   const { user, address } = req;
-  const {
-    reaction,
-    canvas_action: canvasAction,
-    canvas_session: canvasSession,
-    canvas_hash: canvasHash,
-  } = req.body;
+  const { reaction } = req.body;
 
   if (!reaction) {
     throw new AppError(Errors.InvalidReaction);
@@ -44,25 +41,29 @@ export const createCommentReactionHandler = async (
     throw new AppError(Errors.InvalidCommentId);
   }
 
+  const commentReactionFields: CreateCommentReactionOptions = {
+    user,
+    address,
+    reaction,
+    commentId,
+  };
+
   if (process.env.ENFORCE_SESSION_KEYS === 'true') {
-    await verifyReaction(canvasAction, canvasSession, canvasHash, {
-      comment_id: commentId,
-      address: address.address,
-      value: reaction,
-    });
+    if (isCanvasSignedDataApiArgs(req.body)) {
+      await verifyReaction(req.body, {
+        comment_id: commentId,
+        address: address.address,
+        value: reaction,
+      });
+      commentReactionFields.canvasAction = req.body.canvas_action;
+      commentReactionFields.canvasSession = req.body.canvas_session;
+      commentReactionFields.canvasHash = req.body.canvas_hash;
+    }
   }
 
   // create comment reaction
   const [newReaction, notificationOptions, analyticsOptions] =
-    await controllers.comments.createCommentReaction({
-      user,
-      address,
-      reaction,
-      commentId,
-      canvasAction,
-      canvasSession,
-      canvasHash,
-    });
+    await controllers.comments.createCommentReaction(commentReactionFields);
 
   // emit notifications
   for (const n of notificationOptions) {

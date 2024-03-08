@@ -1,3 +1,4 @@
+import { CanvasSignedDataApiArgs, fromCanvasSignedDataApiArgs } from './types';
 import { verify } from './verify';
 
 function assert(condition: unknown, message?: string): asserts condition {
@@ -18,10 +19,10 @@ function assertMatches(a, b, obj: string, field: string) {
 // Skip io-ts validation since it produces an import error even though
 // we're already using an async import, and because we're upgrading
 // to the new Canvas packages soon anyway.
-const verifyUnpack = async (canvas_action, canvas_session) => {
+const verifyUnpack = async (args: CanvasSignedDataApiArgs) => {
+  const { action, session } = fromCanvasSignedDataApiArgs(args);
+  // TODO:
   // const { actionType, sessionType } = await import('@canvas-js/core/codecs');
-  const action = canvas_action && JSON.parse(canvas_action);
-  const session = canvas_session && JSON.parse(canvas_session);
   // assert(actionType.is(action), 'Invalid signed action (typecheck)');
   // assert(sessionType.is(session), 'Invalid signed session (typecheck)');
   const [verifiedAction, verifiedSession] = await Promise.all([
@@ -100,20 +101,9 @@ export const verifyThread = async (
   // assertMatches(chainBaseToCanvasChain(chain), action.payload.chain)
 };
 
-export const verifyReaction = async (
-  canvas_action,
-  canvas_session,
-  canvas_hash,
-  fields,
-) => {
-  if (
-    canvas_action === undefined &&
-    canvas_session === undefined &&
-    canvas_hash === undefined
-  )
-    return;
+export const verifyReaction = async (args: CanvasSignedDataApiArgs, fields) => {
   const { thread_id, comment_id, proposal_id, address, value } = fields;
-  const { action } = await verifyUnpack(canvas_action, canvas_session);
+  const { action } = await verifyUnpack(args);
   assert(
     (action.payload.call === 'reactThread' &&
       thread_id === action.payload.callArgs.thread_id &&

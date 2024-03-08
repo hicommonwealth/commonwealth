@@ -1,5 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
 import { ReactionAttributes } from '@hicommonwealth/model';
+import { isCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import { verifyReaction } from '../../../shared/canvas/serverVerify';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
@@ -45,11 +46,13 @@ export const createThreadReactionHandler = async (
   }
 
   if (process.env.ENFORCE_SESSION_KEYS === 'true') {
-    await verifyReaction(canvasAction, canvasSession, canvasHash, {
-      thread_id: threadId,
-      address: address.address,
-      value: reaction,
-    });
+    if (isCanvasSignedDataApiArgs(req.body)) {
+      await verifyReaction(req.body, {
+        thread_id: threadId,
+        address: address.address,
+        value: reaction,
+      });
+    }
   }
 
   // create thread reaction
