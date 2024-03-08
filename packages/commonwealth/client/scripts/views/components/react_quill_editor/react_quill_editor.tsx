@@ -69,6 +69,9 @@ const ReactQuillEditor = ({
   const [isHovering, setIsHovering] = useState(false);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [selectedTab, setSelectedTab] = useState(TABS[0].label);
+  const [currentFormat, setCurrentFormat] = useState<
+    'ordered' | 'bullet' | 'check' | null
+  >(null);
 
   // ref is used to prevent rerenders when selection
   // is changed, since rerenders bug out the editor
@@ -124,9 +127,23 @@ const ReactQuillEditor = ({
     });
   };
 
+  const [prevKeyPress, setPrevKeyPress] = useState(null);
+
+  // setTimeout(() => {
+  //   setPrevKeyPress(null);
+  // }, 2000);
+
   const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && prevKeyPress === 'Enter') {
+      e.preventDefault();
+      setPrevKeyPress(null);
+      setCurrentFormat(null);
+      return;
+    }
     if (e.key === 'Enter') {
       e.preventDefault();
+      setPrevKeyPress('Enter');
+
       const lines = contentDelta.ops[0].insert
         .split('\n')
         .filter((line) => line !== '');
@@ -136,7 +153,8 @@ const ReactQuillEditor = ({
       const matchUnsortedList = lastLine.match(/^-/);
       const matchCheckboxList = lastLine.match(/^- \[[ xX]\] /);
 
-      if (matchNumberedList) {
+      if (matchNumberedList && currentFormat === 'ordered') {
+        console.log('fired', lastLine);
         const nextNumber = parseInt(matchNumberedList[0]) + 1;
 
         const newContent = {
@@ -158,6 +176,7 @@ const ReactQuillEditor = ({
         }, 10);
       } else if (matchUnsortedList || matchCheckboxList) {
         const suffix = matchCheckboxList ? '- [ ]' : '-';
+        console.log('enter23');
         const newContent = {
           ...contentDelta,
           ops: [
@@ -173,6 +192,7 @@ const ReactQuillEditor = ({
           quillEditor.setSelection(newCursorPosition, newCursorPosition);
         }, 10);
       } else {
+        console.log('her');
         return;
       }
     }
@@ -259,6 +279,11 @@ const ReactQuillEditor = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const handleSelectedFormat: MouseEventHandler<HTMLButtonElement> = (e) => {
+    const formatValue = e.currentTarget.value;
+    setCurrentFormat(formatValue);
+  };
+
   const showTooltip = isDisabled && isHovering;
 
   return (
@@ -298,6 +323,7 @@ const ReactQuillEditor = ({
                 <CustomQuillToolbar
                   toolbarId={toolbarId}
                   isDisabled={isDisabled}
+                  selectedFormat={handleSelectedFormat}
                 />
                 <DragDropContext onDragEnd={handleDragStop}>
                   <Droppable droppableId="quillEditor">

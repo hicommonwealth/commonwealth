@@ -16,7 +16,7 @@ import {
 import clsx from 'clsx';
 import 'components/react_quill/react_quill_editor.scss';
 import { DeltaStatic } from 'quill';
-import React, { MutableRefObject, useMemo } from 'react';
+import React, { MouseEventHandler, MutableRefObject, useMemo } from 'react';
 import ReactQuill from 'react-quill';
 import { SerializableDeltaStatic, renderToolbarIcon } from './utils';
 
@@ -51,11 +51,13 @@ const LIST_ITEM_PREFIX = {
 type CustomQuillToolbarProps = {
   toolbarId: string;
   isDisabled?: boolean;
+  selectedFormat?: MouseEventHandler;
 };
 
 export const CustomQuillToolbar = ({
   toolbarId,
   isDisabled = false,
+  selectedFormat,
 }: CustomQuillToolbarProps) => (
   <div id={toolbarId} className="CustomQuillToolbar">
     <div className={clsx('formatting-buttons-container', { isDisabled })}>
@@ -75,7 +77,7 @@ export const CustomQuillToolbar = ({
         <button className="ql-blockquote"></button>
       </div>
       <div className="section">
-        <button className="ql-list" value="ordered" />
+        <button className="ql-list" value="ordered" onClick={selectedFormat} />
         <button className="ql-list" value="bullet" />
         <button className="ql-list" value="check" />
       </div>
@@ -289,13 +291,21 @@ export const useMarkdownToolbarHandlers = ({
 
         //if the current line has a prefix and there is text after the prefix, replace the prefix
         Object.values(LIST_ITEM_PREFIX).forEach((p) => {
+          console.log('1', p === prefix);
           if (p === prefix) {
+            //If the current line is a br tag, insert the prefix and a space
+            if (currentLine.domNode.outerHTML === '<br>') {
+              console.log('3');
+              editor.insertText(currentLineIdx, `${prefix} `);
+              return;
+            }
             const currentLineText = currentLine.text.replace(prefix, '');
             editor.deleteText(currentLineIdx, currentLine.text.length);
             editor.insertText(currentLineIdx, currentLineText.trim());
           }
           if (currentLine.text.startsWith(p)) {
             const currentLineText = currentLine.text.replace(p, '');
+            console.log('3');
             editor.deleteText(currentLineIdx, currentLine.text.length);
             editor.insertText(currentLineIdx, currentLineText.trim());
             return;
