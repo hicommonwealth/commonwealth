@@ -2,7 +2,10 @@ import type { DB } from '@hicommonwealth/model';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
-import type { Action, Session } from '@canvas-js/interfaces';
+import {
+  fromCanvasSignedDataApiArgs,
+  isCanvasSignedDataApiArgs,
+} from 'shared/canvas/types';
 import {
   verifyComment,
   verifyReaction,
@@ -65,11 +68,7 @@ ORDER BY updated_at DESC LIMIT 50;
   return success(res, result);
 };
 
-type CanvasPostReq = {
-  canvas_action: Action;
-  canvas_session: Session;
-  canvas_hash: string;
-};
+type CanvasPostReq = {};
 type CanvasPostResp = {};
 
 export const postCanvasData = async (
@@ -77,16 +76,22 @@ export const postCanvasData = async (
   req: TypedRequestBody<CanvasPostReq>,
   res: TypedResponse<CanvasPostResp>,
 ) => {
-  const { canvas_action, canvas_session, canvas_hash } = req.body;
+  if (!isCanvasSignedDataApiArgs(req.body)) {
+    throw new Error('Invalid canvas data');
+  }
+
+  // verifyThread etc are also deserializing the canvas fields - we should just do
+  // this once and pass the deserialized fields to the verify functions
+  const { action: canvas_action } = fromCanvasSignedDataApiArgs(req.body);
 
   // TODO: Implement verification and call the create
   // thread/comment/reaction server method with POST data pre-filled.
   if (canvas_action.payload.call === 'thread') {
-    await verifyThread(canvas_action, canvas_session, canvas_hash, {});
+    await verifyThread(req.body, {});
   } else if (canvas_action.payload.call === 'comment') {
-    await verifyComment(canvas_action, canvas_session, canvas_hash, {});
+    await verifyComment(req.body, {});
   } else if (canvas_action.payload.call === 'reaction') {
-    await verifyReaction(canvas_action, canvas_session, canvas_hash, {});
+    await verifyReaction(req.body, {});
   }
 
   // TODO: Return some kind of identifier for the generated data.
