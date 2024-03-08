@@ -1,3 +1,4 @@
+import NodeInfo from 'client/scripts/models/NodeInfo';
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWRelatedCommunityCard } from 'views/components/component_kit/new_designs/CWRelatedCommunityCard';
@@ -25,6 +26,8 @@ export type CommunityData = {
   threads: string;
   iconUrl: string;
   id: string;
+  namespace: string;
+  ChainNode: NodeInfo;
 };
 
 interface DirectoryPageContentProps {

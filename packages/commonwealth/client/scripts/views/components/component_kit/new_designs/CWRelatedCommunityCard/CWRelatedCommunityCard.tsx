@@ -25,7 +25,6 @@ type CWRelatedCommunityCardProps = {
   community: ChainInfo | CommunityData;
   memberCount: string;
   threadCount: string;
-  stakeValue?: number;
   stakeChange?: number;
 };
 
@@ -33,11 +32,12 @@ export const CWRelatedCommunityCard = ({
   community,
   memberCount,
   threadCount,
-  stakeValue,
   stakeChange,
 }: CWRelatedCommunityCardProps) => {
   const navigate = useCommonNavigate();
-  const { stakeEnabled } = useCommunityStake({ communityId: community.id });
+  const { stakeEnabled, stakeValue } = useCommunityStake({
+    community: community,
+  });
 
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity({
     communityToJoin: community.id,
@@ -101,7 +101,7 @@ export const CWRelatedCommunityCard = ({
                   </CWText>
                 </div>
 
-                {stakeValue && (
+                {!isNaN(stakeValue) && stakeChange && (
                   <div className="stake-info">
                     <CWText type="h5" className="stake-value">
                       ${stakeValue}
