@@ -28,8 +28,9 @@ export async function fetchUpToLatestCosmosProposals(
 ): Promise<AllCosmosProposals> {
   if (communities.length === 0) return { v1: {}, v1Beta1: {} };
 
-  const { v1Communities, v1Beta1Communities: v1Beta1Communities } =
-    filterV1GovCommunities(communities);
+  const { v1Communities, v1Beta1Communities } = await filterV1GovCommunities(
+    communities,
+  );
   log.info(
     `Fetching up to the latest proposals from ${JSON.stringify(
       v1Communities.map((c) => c.id),
