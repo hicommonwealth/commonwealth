@@ -81,6 +81,7 @@ export async function __generateStakeholderGroup(
             source_type: BalanceSourceType.ERC1155,
             evm_chain_id: node.eth_chain_id,
             contract_address: contractAddress,
+            token_id: stake.stake_id.toString(),
           },
         },
       },

@@ -215,12 +215,17 @@ export async function __getMemberProfiles(
         user_id: profile.user_id,
         profile_name: profile.profile_name,
         avatar_url: profile.avatar_url,
-        addresses: profile.address_ids.map((_, i) => ({
-          id: profile.address_ids[i],
-          chain: profile.chains[i],
-          address: profile.addresses[i],
-          stake_balance: profile.stake_balances[i],
-        })),
+        addresses: profile.address_ids.map((_, i) => {
+          const address: any = {
+            id: profile.address_ids[i],
+            chain: profile.chains[i],
+            address: profile.addresses[i],
+          };
+          if (profile.stake_balances) {
+            address.stake_balance = profile.stake_balances?.[i] || '0';
+          }
+          return address;
+        }),
         roles: [],
         group_ids: [],
       };
