@@ -236,84 +236,64 @@ class SessionsController {
     address: string,
     { community, title, body, link, topic },
   ) {
-    const { session, action, hash } = await this.sign(address, 'thread', {
+    return await this.sign(address, 'thread', {
       community: community || '',
       title: encodeURIComponent(title),
       body: encodeURIComponent(body),
       link: link || '',
       topic: topic || '',
     });
-    return { session, action, hash };
   }
 
   public async signDeleteThread(address: string, { thread_id }) {
-    const { session, action, hash } = await this.sign(address, 'deleteThread', {
+    return await this.sign(address, 'deleteThread', {
       thread_id,
     });
-    return { session, action, hash };
   }
 
   public async signComment(
     address: string,
     { thread_id, body, parent_comment_id },
   ) {
-    const { session, action, hash } = await this.sign(address, 'comment', {
+    return await this.sign(address, 'comment', {
       thread_id,
       body: encodeURIComponent(body),
       parent_comment_id,
     });
-    return { session, action, hash };
   }
 
   public async signDeleteComment(address: string, { comment_id }) {
-    const { session, action, hash } = await this.sign(
-      address,
-      'deleteComment',
-      {
-        comment_id,
-      },
-    );
-    return { session, action, hash };
+    return await this.sign(address, 'deleteComment', {
+      comment_id,
+    });
   }
 
   public async signThreadReaction(address: string, { thread_id, like }) {
     const value = like ? 'like' : 'dislike';
-    const { session, action, hash } = await this.sign(address, 'reactThread', {
+    return await this.sign(address, 'reactThread', {
       thread_id,
       value,
     });
-    return { session, action, hash };
   }
 
   public async signDeleteThreadReaction(address: string, { thread_id }) {
-    const { session, action, hash } = await this.sign(
-      address,
-      'unreactThread',
-      {
-        thread_id,
-      },
-    );
-    return { session, action, hash };
+    return await this.sign(address, 'unreactThread', {
+      thread_id,
+    });
   }
 
   public async signCommentReaction(address: string, { comment_id, like }) {
     const value = like ? 'like' : 'dislike';
-    const { session, action, hash } = await this.sign(address, 'reactComment', {
+    return await this.sign(address, 'reactComment', {
       comment_id,
       value,
     });
-    return { session, action, hash };
   }
 
   public async signDeleteCommentReaction(address: string, { comment_id }) {
-    const { session, action, hash } = await this.sign(
-      address,
-      'unreactComment',
-      {
-        comment_id,
-      },
-    );
-    return { session, action, hash };
+    return await this.sign(address, 'unreactComment', {
+      comment_id,
+    });
   }
 }
 
