@@ -38,20 +38,9 @@ const verifyUnpack = async (args: CanvasSignedDataApiArgs) => {
   return { action, session };
 };
 
-export const verifyComment = async (
-  canvas_action,
-  canvas_session,
-  canvas_hash,
-  fields,
-) => {
-  if (
-    canvas_action === undefined &&
-    canvas_session === undefined &&
-    canvas_hash === undefined
-  )
-    return;
+export const verifyComment = async (args: CanvasSignedDataApiArgs, fields) => {
   const { thread_id, text, address, parent_comment_id } = fields;
-  const { action } = await verifyUnpack(canvas_action, canvas_session);
+  const { action } = await verifyUnpack(args);
 
   assertMatches(action.payload.call, 'comment', 'comment', 'call');
   assertMatches(
