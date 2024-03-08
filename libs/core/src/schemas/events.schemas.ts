@@ -29,7 +29,7 @@ export const schemas = {
       })
       .optional(),
     title: z.string().optional(),
-    content: z.string(),
+    content: z.string().optional(),
     message_id: z.string(),
     channel_id: z.string().optional(),
     parent_channel_id: z.string().optional(),

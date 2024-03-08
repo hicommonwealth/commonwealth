@@ -25,10 +25,6 @@ const BrokerTopicSubscriptionMap = {
   [BrokerTopics.SnapshotListener]: RascalSubscriptions.SnapshotListener,
 };
 
-const EventNamePublicationMap: { [K in events.Events]?: RascalPublications } = {
-  ThreadCreated: RascalPublications.SnapshotListener,
-};
-
 export class RabbitMQAdapter implements Broker {
   protected _initialized = false;
 
@@ -88,13 +84,19 @@ export class RabbitMQAdapter implements Broker {
       return false;
     }
 
-    const rascalPubName: RascalPublications | undefined = topic
-      ? BrokerTopicPublicationMap[topic]
-      : EventNamePublicationMap[event.name];
+    const logContext = {
+      topic,
+      event,
+    };
+
+    const rascalPubName: RascalPublications | undefined =
+      BrokerTopicPublicationMap[topic];
     if (!rascalPubName) {
-      this._log.error(`Unsupported event: ${event.name}`, undefined, {
-        eventName: event.name,
-      });
+      this._log.error(
+        `Unsupported event: ${event.name}`,
+        undefined,
+        logContext,
+      );
       return false;
     }
 
@@ -103,8 +105,20 @@ export class RabbitMQAdapter implements Broker {
         `${rascalPubName} not supported by this adapter instance`,
         undefined,
         {
+          ...logContext,
           rascalPublication: rascalPubName,
         },
+      );
+      return false;
+    }
+
+    const schema = events.schemas[event.name];
+    const validationResult = schema.safeParse(event.payload);
+    if (!validationResult.success) {
+      this._log.error(
+        'Event schema validation failed',
+        validationResult.error,
+        logContext,
       );
       return false;
     }
@@ -114,13 +128,17 @@ export class RabbitMQAdapter implements Broker {
 
       return new Promise<boolean>((resolve, reject) => {
         publication.on('success', (messageId) => {
-          this._log.debug('Message published', undefined, { messageId });
+          this._log.debug('Message published', undefined, {
+            messageId,
+            ...logContext,
+          });
           resolve(true);
         });
         // errors that occur after RabbitMQ has acknowledged the message
         publication.on('error', (err, messageId) => {
           this._log.error(`Publisher error ${messageId}`, err, {
-            message: event,
+            messageId,
+            ...logContext,
           });
           reject(false);
         });
@@ -130,6 +148,7 @@ export class RabbitMQAdapter implements Broker {
         'Publication does not exist',
         e instanceof Error ? e : undefined,
         {
+          ...logContext,
           publication: rascalPubName,
         },
       );
@@ -147,6 +166,22 @@ export class RabbitMQAdapter implements Broker {
     }
 
     const rascalSubName = BrokerTopicSubscriptionMap[topic];
+    if (!rascalSubName) {
+      this._log.error(`Unsupported topic`, undefined, { topic });
+      return false;
+    }
+
+    if (!this.subscribers.includes(rascalSubName)) {
+      this._log.error(
+        `${rascalSubName} not supported by this adapter instance`,
+        undefined,
+        {
+          topic,
+          rascalSubscription: rascalSubName,
+        },
+      );
+      return false;
+    }
 
     try {
       this._log.info(`${this.name} subscribing to ${rascalSubName}`);
