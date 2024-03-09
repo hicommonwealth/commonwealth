@@ -19,8 +19,10 @@ export async function getCosmosBalances(
   });
 
   if (!chainNode) {
-    const msg = `ChainNode with cosmos_chain_id ${options.sourceOptions.cosmosChainId} does not exist`;
-    log.error(msg);
+    const msg = `ChainNode with Cosmos chain id ${options.sourceOptions.cosmosChainId} does not exist`;
+    log.error(msg, undefined, {
+      cosmosChainId: options.sourceOptions.cosmosChainId,
+    });
     return {};
   }
 
@@ -35,8 +37,11 @@ export async function getCosmosBalances(
     } catch (e) {
       if (address != '0xdiscordbot') {
         log.error(
-          `Skipping address: ${address}`,
+          `Failed to decode Cosmos address`,
           e instanceof Error ? e : undefined,
+          {
+            address,
+          },
         );
       }
     }

@@ -17,6 +17,7 @@ import {
   ChainBase,
   ChainNetwork,
   ChainType,
+  CosmosGovernanceVersion,
 } from '@hicommonwealth/core';
 import { models, tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
@@ -185,6 +186,7 @@ export async function createCosmosChains() {
       alt_wallet_url: 'https://api-eu-1.kyve.network/',
       name: 'KYVE Network',
       balance_type: BalanceType.Cosmos,
+      cosmos_gov_version: CosmosGovernanceVersion.v1,
     });
 
     const osmosisNode = await models.ChainNode.create({

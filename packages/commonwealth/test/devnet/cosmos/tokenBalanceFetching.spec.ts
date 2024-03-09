@@ -16,6 +16,7 @@ import {
   ChainBase,
   ChainNetwork,
   ChainType,
+  CosmosGovernanceVersion,
   cache,
   delay,
   dispose,
@@ -52,6 +53,7 @@ const resetChainNode = async (): Promise<void> => {
       balance_type: BalanceType.Cosmos,
       cosmos_chain_id: 'stargaze',
       bech32: 'stars',
+      cosmos_gov_version: CosmosGovernanceVersion.v1,
     });
     await models.Community.create({
       id: 'stargaze',
@@ -89,7 +91,7 @@ async function generateCosmosAddresses(numberOfAddresses: number) {
 describe('Token Balance Cache Cosmos Tests', function () {
   this.timeout(80_000);
   // mnemonic + token allocation can be found in cosmos-chain-test/[version]/bootstrap.sh files
-  const cosmosChainId = 'csdkv1cilocal';
+  const cosmosChainId = 'csdkv1local';
   const addressOne = 'cosmos1zf45elxg5alxxeewvumpprfqtxmy2ufhzvetgx';
   const addressTwo = 'cosmos1f85wzgz83gkq09g9gj79c6w9gydu87a7e6hax7';
   const discobotAddress = '0xdiscordbot';
