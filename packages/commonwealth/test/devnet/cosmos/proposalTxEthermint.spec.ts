@@ -167,10 +167,10 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-local)', () =>
 });
 
 describe('Ethermint Governance v1beta1 util Tests', () => {
-  before(async () => {
-    await tester.seedDb();
-  });
   describe('getActiveProposals', () => {
+    before(async () => {
+      await tester.seedDb();
+    });
     it('should fetch active proposals (evmos-dev-local)', async () => {
       const id = 'evmos-dev-local'; // CI devnet
       const tmClient = await getTMClient(

@@ -7,6 +7,7 @@ import {
   VoteOption as VoteOptionV1,
   voteOptionToJSON,
 } from '@hicommonwealth/chains';
+import { dispose } from '@hicommonwealth/core';
 import { tester } from '@hicommonwealth/model';
 import { getLCDClient } from 'controllers/chain/cosmos/chain.utils';
 import {
@@ -37,10 +38,14 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
   let lcd: LCD;
   let signer: string;
   before(async () => {
-    await tester.seedDb();
+    await tester.seedDb(true);
     lcd = await getLCDClient(lcdUrl);
     const { signerAddress } = await setupTestSigner(rpcUrl);
     signer = signerAddress;
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   const getActiveVotingProposals = async () => {
