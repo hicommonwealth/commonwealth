@@ -520,7 +520,7 @@ jobs:
 
       - name: Run Cosmos Devnet tests
         if: steps.changed-files-specific.outputs.any_changed == 'true'
-        run: yarn --cwd packages/commonwealth start & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-devnet cosmos --forbid-only)
+        run: NODE_ENV=test yarn --cwd packages/commonwealth start & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-devnet cosmos --forbid-only)
         env:
           PORT: 8080
           USES_DOCKER_PGSQL: true
