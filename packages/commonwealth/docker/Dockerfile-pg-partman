@@ -15,7 +15,9 @@
 FROM postgres:15.1-alpine
 
 USER root
-RUN install_packages gcc make build-essential git
+
+RUN apt update && \
+apt install -y git make gcc
 
 RUN git clone https://github.com/pgpartman/pg_partman
 RUN cd pg_partman && make NO_BGW=1 install
