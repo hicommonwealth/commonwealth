@@ -129,18 +129,21 @@ const ReactQuillEditor = ({
 
   const [prevKeyPress, setPrevKeyPress] = useState(null);
 
-  // setTimeout(() => {
-  //   setPrevKeyPress(null);
-  // }, 2000);
+  const [prevKeyPressTime, setPrevKeyPressTime] = useState(null);
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && prevKeyPress === 'Enter') {
-      e.preventDefault();
-      setPrevKeyPress(null);
-      setCurrentFormat(null);
-      return;
-    }
     if (e.key === 'Enter') {
+      const currentTime = new Date().getTime();
+
+      if (prevKeyPress === 'Enter' && currentTime - prevKeyPressTime < 300) {
+        e.preventDefault();
+        setPrevKeyPress(null);
+        setCurrentFormat(null);
+        return;
+      }
+
+      setPrevKeyPressTime(currentTime); // Update the previous key press time
+
       e.preventDefault();
       setPrevKeyPress('Enter');
 
@@ -153,8 +156,9 @@ const ReactQuillEditor = ({
       const matchUnsortedList = lastLine.match(/^-/);
       const matchCheckboxList = lastLine.match(/^- \[[ xX]\] /);
 
+      const unorderedLists = ['bullet', 'check'];
+
       if (matchNumberedList && currentFormat === 'ordered') {
-        console.log('fired', lastLine);
         const nextNumber = parseInt(matchNumberedList[0]) + 1;
 
         const newContent = {
@@ -174,9 +178,11 @@ const ReactQuillEditor = ({
           const newCursorPosition = quillEditor.getLength();
           quillEditor.setSelection(newCursorPosition, newCursorPosition);
         }, 10);
-      } else if (matchUnsortedList || matchCheckboxList) {
+      } else if (
+        matchUnsortedList ||
+        (matchCheckboxList && unorderedLists.includes(currentFormat))
+      ) {
         const suffix = matchCheckboxList ? '- [ ]' : '-';
-        console.log('enter23');
         const newContent = {
           ...contentDelta,
           ops: [
@@ -192,7 +198,6 @@ const ReactQuillEditor = ({
           quillEditor.setSelection(newCursorPosition, newCursorPosition);
         }, 10);
       } else {
-        console.log('her');
         return;
       }
     }

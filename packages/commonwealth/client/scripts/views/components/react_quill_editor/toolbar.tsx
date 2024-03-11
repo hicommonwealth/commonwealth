@@ -78,8 +78,8 @@ export const CustomQuillToolbar = ({
       </div>
       <div className="section">
         <button className="ql-list" value="ordered" onClick={selectedFormat} />
-        <button className="ql-list" value="bullet" />
-        <button className="ql-list" value="check" />
+        <button className="ql-list" value="bullet" onClick={selectedFormat} />
+        <button className="ql-list" value="check" onClick={selectedFormat} />
       </div>
     </div>
   </div>
@@ -220,10 +220,10 @@ export const useMarkdownToolbarHandlers = ({
                 prefix,
               );
             }
+
             return modifiedLine;
           }, line);
         }
-
         if (/^\s*\d+\./.test(line)) {
           return line.replace(/^\s*\d+\./, prefix);
         }
@@ -256,8 +256,15 @@ export const useMarkdownToolbarHandlers = ({
      * Applies list markdown to the selected text in the editor.
      * @param {string} value - The value representing the type of list (e.g., 'ordered', 'bullet', 'check').
      */
+    let toggledList = null;
     return (value: string) => {
       const editor = editorRef?.current?.getEditor();
+
+      if (toggledList === value) {
+        toggledList = null;
+      } else {
+        toggledList = value;
+      }
 
       if (!editor) return;
 
@@ -271,6 +278,7 @@ export const useMarkdownToolbarHandlers = ({
       }
 
       const selectedText = editor.getText(selection.index, selection.length);
+
       const editorLength = editor.getLength() || 0;
 
       // If there is a selection, format the selected text
@@ -291,11 +299,9 @@ export const useMarkdownToolbarHandlers = ({
 
         //if the current line has a prefix and there is text after the prefix, replace the prefix
         Object.values(LIST_ITEM_PREFIX).forEach((p) => {
-          console.log('1', p === prefix);
           if (p === prefix) {
             //If the current line is a br tag, insert the prefix and a space
             if (currentLine.domNode.outerHTML === '<br>') {
-              console.log('3');
               editor.insertText(currentLineIdx, `${prefix} `);
               return;
             }
@@ -305,7 +311,6 @@ export const useMarkdownToolbarHandlers = ({
           }
           if (currentLine.text.startsWith(p)) {
             const currentLineText = currentLine.text.replace(p, '');
-            console.log('3');
             editor.deleteText(currentLineIdx, currentLine.text.length);
             editor.insertText(currentLineIdx, currentLineText.trim());
             return;
