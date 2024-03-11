@@ -97,8 +97,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       },
     );
 
-  console.log(data?.pages?.length, 'length');
-  console.log(fetchNextPage, 'length');
   const threadData = data?.pages.flatMap((page) =>
     page.threads.map((t) => new Thread(t as any)),
   );
