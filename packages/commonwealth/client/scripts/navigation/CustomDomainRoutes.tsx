@@ -9,14 +9,17 @@ const SearchPage = lazy(() => import('views/pages/search'));
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(
-  () => import('views/pages/Community/Members/CommunityMembersPage'),
+  () =>
+    import(
+      'views/pages/CommunityGroupsAndMembers/Members/CommunityMembersPage'
+    ),
 );
 const DirectoryPage = lazy(() => import('views/pages/DirectoryPage'));
 const CreateMembersGroupPage = lazy(
-  () => import('views/pages/Community/Groups/Create'),
+  () => import('views/pages/CommunityGroupsAndMembers/Groups/Create'),
 );
 const UpdateMembersGroupPage = lazy(
-  () => import('views/pages/Community/Groups/Update'),
+  () => import('views/pages/CommunityGroupsAndMembers/Groups/Update'),
 );
 const SputnikDaosPage = lazy(() => import('views/pages/sputnikdaos'));
 const FinishNearLoginPage = lazy(() => import('views/pages/finish_near_login'));
@@ -75,6 +78,8 @@ const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
 );
 
+const MyCommunityStake = lazy(() => import('views/pages/MyCommunityStake'));
+
 const SnapshotProposalPage = lazy(
   () => import('views/pages/snapshot_proposals'),
 );
@@ -94,6 +99,7 @@ const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
 const CustomDomainRoutes = ({
   proposalTemplatesEnabled,
+  myCommunityStakePageEnabled,
 }: RouteFeatureFlags) => {
   return [
     <Route
@@ -174,6 +180,17 @@ const CustomDomainRoutes = ({
       path="/finishsociallogin"
       element={withLayout(FinishSocialLoginPage, { type: 'common' })}
     />,
+    ...[
+      myCommunityStakePageEnabled ? (
+        <Route
+          key="/myCommunityStake"
+          path="/myCommunityStake"
+          element={withLayout(MyCommunityStake, { type: 'common' })}
+        />
+      ) : (
+        []
+      ),
+    ],
 
     // NOTIFICATIONS
     <Route
