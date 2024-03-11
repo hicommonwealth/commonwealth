@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-expressions */
+import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { ChainBase } from '@hicommonwealth/core';
 import { tester } from '@hicommonwealth/model';
 import { personalSign } from '@metamask/eth-sig-util';
@@ -26,7 +27,9 @@ describe('API Tests', () => {
   });
 
   describe('address tests', () => {
-    it('should call the /api/status route', async () => {
+    it.only('should call the /api/status route', async () => {
+      console.log(SIWESigner.name);
+
       const res = await chai
         .request(app)
         .get('/api/status')
