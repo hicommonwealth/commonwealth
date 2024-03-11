@@ -523,3 +523,4 @@ jobs:
         env:
           PORT: 8080
           USES_DOCKER_PGSQL: true
+          REDIS_URL: redis://localhost:6379
