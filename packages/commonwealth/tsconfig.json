@@ -1,8 +1,9 @@
 {
   "extends": "../../tsconfig.json",
-  "module": "esnext",
-  "moduleResolution": "nodenext",
   "compilerOptions": {
+    "module": "ESNext",
+    "target": "es2020",
+    "moduleResolution": "node",
     "jsx": "react",
     "skipLibCheck": true,
     "sourceMap": true,
