@@ -61,7 +61,7 @@
     "build-contracts": "npx hardhat compile"
   },
   "engines": {
-    "node": "18.x"
+    "node": "20.x"
   },
   "repository": {
     "type": "git",

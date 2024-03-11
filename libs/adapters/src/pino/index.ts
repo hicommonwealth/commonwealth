@@ -1,4 +1,4 @@
-import { Logger } from '@hicommonwealth/core';
+import { LogContext, Logger } from '@hicommonwealth/core';
 import pino, { DestinationStream } from 'pino';
 import { rollbar } from '../rollbar';
 
@@ -60,25 +60,25 @@ export const PinoLogger = (): Logger => ({
     );
 
     return {
-      trace(msg: string, error?: Error, context?: Record<string, unknown>) {
+      trace(msg: string, error?: Error, context?: LogContext) {
         logger.trace({ ...context, err: error || undefined }, msg);
       },
-      debug(msg: string, error?: Error, context?: Record<string, unknown>) {
+      debug(msg: string, error?: Error, context?: LogContext) {
         logger.debug({ ...context, err: error || undefined }, msg);
       },
-      info(msg: string, error?: Error, context?: Record<string, unknown>) {
+      info(msg: string, error?: Error, context?: LogContext) {
         logger.info({ ...context, err: error || undefined }, msg);
       },
-      warn(msg: string, error?: Error, context?: Record<string, unknown>) {
+      warn(msg: string, error?: Error, context?: LogContext) {
         logger.warn({ ...context, err: error || undefined }, msg);
       },
-      error(msg: string, error?: Error, context?: Record<string, unknown>) {
+      error(msg: string, error?: Error, context?: LogContext) {
         logger.error({ ...context, err: error || undefined }, msg);
 
         if (context) rollbar.error(msg, error ?? '', context);
         else rollbar.error(msg, error ?? '');
       },
-      fatal(msg: string, error?: Error, context?: Record<string, unknown>) {
+      fatal(msg: string, error?: Error, context?: LogContext) {
         logger.fatal({ ...context, err: error || undefined }, msg);
 
         if (context) rollbar.critical(msg, error ?? '', context);
