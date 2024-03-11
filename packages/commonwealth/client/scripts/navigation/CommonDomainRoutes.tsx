@@ -13,13 +13,16 @@ const Web3LoginPage = lazy(() => import('views/pages/web3login'));
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(
-  () => import('views/pages/Community/Members/CommunityMembersPage'),
+  () =>
+    import(
+      'views/pages/CommunityGroupsAndMembers/Members/CommunityMembersPage'
+    ),
 );
 const CreateMembersGroupPage = lazy(
-  () => import('views/pages/Community/Groups/Create'),
+  () => import('views/pages/CommunityGroupsAndMembers/Groups/Create'),
 );
 const UpdateMembersGroupPage = lazy(
-  () => import('views/pages/Community/Groups/Update'),
+  () => import('views/pages/CommunityGroupsAndMembers/Groups/Update'),
 );
 const DirectoryPage = lazy(() => import('views/pages/DirectoryPage'));
 const SputnikDaosPage = lazy(() => import('views/pages/sputnikdaos'));
