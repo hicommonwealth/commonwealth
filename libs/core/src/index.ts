@@ -9,6 +9,7 @@ export {
   community,
   events,
   group,
+  outbox,
   thread,
   todo,
 } from './schemas';
