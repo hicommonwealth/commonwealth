@@ -34,7 +34,7 @@ const UserDashboard = (props: UserDashboardProps) => {
   const { isWindowExtraSmall } = useBrowserWindow({});
   useStickyHeader({
     elementId: 'dashboard-header',
-    zIndex: 500,
+    zIndex: 70,
     stickyBehaviourEnabled: !!isWindowExtraSmall,
   });
 
