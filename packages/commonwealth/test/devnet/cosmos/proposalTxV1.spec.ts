@@ -187,42 +187,37 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
       );
     });
   });
-});
 
-// Cosmos gov v1 query tests
-describe('Cosmos Governance v1 util Tests (csdk-v1-local)', () => {
-  let lcd: LCD;
-  before(async () => {
-    await tester.seedDb();
-    lcd = await getLCDClient(lcdUrl);
-  });
+  // Cosmos gov v1 query tests
+  describe('Cosmos Governance v1 util Tests (csdk-v1-local)', () => {
+    describe('getActiveProposals', () => {
+      it('should fetch active proposals', async () => {
+        const proposals = await getActiveProposalsV1(lcd);
+        expect(proposals.length).to.be.greaterThan(0);
 
-  describe('getActiveProposals', () => {
-    it('should fetch active proposals', async () => {
-      const proposals = await getActiveProposalsV1(lcd);
-      expect(proposals.length).to.be.greaterThan(0);
-
-      proposals.forEach((proposal) => {
-        expect(proposal.state.completed).to.eq(false);
-        expect(proposal.state.status).to.be.oneOf([
-          'VotingPeriod',
-          'DepositPeriod',
-        ]);
-        expect(proposal.state.tally).to.not.be.null;
+        proposals.forEach((proposal) => {
+          expect(proposal.state.completed).to.eq(false);
+          expect(proposal.state.status).to.be.oneOf([
+            'VotingPeriod',
+            'DepositPeriod',
+          ]);
+          expect(proposal.state.tally).to.not.be.null;
+        });
       });
     });
-  });
-  describe('getCompletedProposals', () => {
-    it('should fetch completed proposals', async () => {
-      const proposals = await getCompletedProposalsV1(lcd);
 
-      proposals.forEach((proposal) => {
-        expect(proposal.state.completed).to.eq(true);
-        expect(proposal.state.status).to.be.oneOf([
-          'Passed',
-          'Rejected',
-          'Failed',
-        ]);
+    describe('getCompletedProposals', () => {
+      it('should fetch completed proposals', async () => {
+        const proposals = await getCompletedProposalsV1(lcd);
+
+        proposals.forEach((proposal) => {
+          expect(proposal.state.completed).to.eq(true);
+          expect(proposal.state.status).to.be.oneOf([
+            'Passed',
+            'Rejected',
+            'Failed',
+          ]);
+        });
       });
     });
   });
