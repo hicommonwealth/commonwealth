@@ -86,7 +86,7 @@ export const createCommunityStakeHandler = async (
   // since the stake is already created, generate group in background
   // so this request doesn't fail
   controllers.groups
-    .generateStakeholderGroup({
+    .generateStakeholderGroups({
       user: req.user,
       community: community,
     })

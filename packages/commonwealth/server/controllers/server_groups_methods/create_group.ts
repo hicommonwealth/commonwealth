@@ -6,7 +6,7 @@ import {
   UserInstance,
   sequelize,
 } from '@hicommonwealth/model';
-import { Op } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import validateMetadata from '../../util/requirementsModule/validateMetadata';
 import validateRequirements from '../../util/requirementsModule/validateRequirements';
@@ -33,6 +33,7 @@ export type CreateGroupOptions = {
   requirements: Requirement[];
   topics?: number[];
   systemManaged?: boolean;
+  transaction?: Transaction;
 };
 
 // FIXME: should be partial of the aggregate
@@ -47,6 +48,7 @@ export async function __createGroup(
     requirements,
     topics,
     systemManaged,
+    transaction,
   }: CreateGroupOptions,
 ): Promise<CreateGroupResult> {
   // FIXME: authorization
@@ -99,41 +101,49 @@ export async function __createGroup(
     throw new AppError(Errors.InvalidTopics);
   }
 
-  const newGroup = await this.models.sequelize.transaction(
-    async (transaction) => {
-      // create group
-      const group = await this.models.Group.create(
+  const createGroupWithTransaction = async (t: Transaction) => {
+    const group = await this.models.Group.create(
+      {
+        community_id: community.id,
+        metadata,
+        requirements,
+        is_system_managed: !!systemManaged,
+      },
+      { transaction },
+    );
+    if (topicsToAssociate.length > 0) {
+      // add group to all specified topics
+      await this.models.Topic.update(
         {
-          community_id: community.id,
-          metadata,
-          requirements,
-          is_system_managed: !!systemManaged,
+          group_ids: sequelize.fn(
+            'array_append',
+            sequelize.col('group_ids'),
+            group.id,
+          ),
         },
-        { transaction },
-      );
-      if (topicsToAssociate.length > 0) {
-        // add group to all specified topics
-        await this.models.Topic.update(
-          {
-            group_ids: sequelize.fn(
-              'array_append',
-              sequelize.col('group_ids'),
-              group.id,
-            ),
-          },
-          {
-            where: {
-              id: {
-                [Op.in]: topicsToAssociate.map(({ id }) => id),
-              },
+        {
+          where: {
+            id: {
+              [Op.in]: topicsToAssociate.map(({ id }) => id),
             },
-            transaction,
           },
-        );
-      }
-      return group.toJSON();
-    },
-  );
+          transaction,
+        },
+      );
+    }
+    return group.toJSON();
+  };
+
+  let newGroup: GroupAttributes;
+  if (transaction) {
+    // use existing transaction
+    newGroup = await createGroupWithTransaction(transaction);
+  } else {
+    // create new transaction
+    newGroup = await this.models.sequelize.transaction(async (tx) => {
+      return createGroupWithTransaction(tx);
+    });
+  }
 
   // FIXME: move to middleware
   const analyticsOptions = {

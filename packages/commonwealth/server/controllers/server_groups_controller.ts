@@ -11,10 +11,10 @@ import {
   __deleteGroup,
 } from './server_groups_methods/delete_group';
 import {
-  GenerateStakeholderGroupOptions,
-  GenerateStakeholderGroupResult,
-  __generateStakeholderGroup,
-} from './server_groups_methods/generate_stakeholder_group';
+  GenerateStakeholderGroupsOptions,
+  GenerateStakeholderGroupsResult,
+  __generateStakeholderGroups,
+} from './server_groups_methods/generate_stakeholder_groups';
 import {
   GetGroupsOptions,
   GetGroupsResult,
@@ -70,9 +70,9 @@ export class ServerGroupsController {
     return __deleteGroup.call(this, options);
   }
 
-  async generateStakeholderGroup(
-    options: GenerateStakeholderGroupOptions,
-  ): Promise<GenerateStakeholderGroupResult> {
-    return __generateStakeholderGroup.call(this, options);
+  async generateStakeholderGroups(
+    options: GenerateStakeholderGroupsOptions,
+  ): Promise<GenerateStakeholderGroupsResult> {
+    return __generateStakeholderGroups.call(this, options);
   }
 }

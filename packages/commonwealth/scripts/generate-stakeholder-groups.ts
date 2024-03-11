@@ -32,21 +32,22 @@ async function main() {
     if (process.env.COMMUNITY_ID && process.env.COMMUNITY_ID !== community.id)
       continue;
     if (community.CommunityStakes.length > 0) {
-      const [stakeholderGroup, created] =
-        await groupsController.generateStakeholderGroup({
+      const [stakeholderGroups, created] =
+        await groupsController.generateStakeholderGroups({
           user: { isAdmin: true } as UserInstance,
           community,
         });
       if (created) {
         console.log(
-          `created stakeholder group for ${community.id} – refreshing memberships...`,
+          `created ${stakeholderGroups.length} stakeholder groups for ${community.id} – refreshing memberships...`,
         );
         await groupsController.refreshCommunityMemberships({
           communityId: community.id,
-          groupId: stakeholderGroup.id,
         });
       } else {
-        console.log(`stakeholder group already exists for ${community.id}`);
+        console.log(
+          `stakeholder groups (${stakeholderGroups.length}) already exist for ${community.id}`,
+        );
       }
     }
   }
