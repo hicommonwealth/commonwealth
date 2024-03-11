@@ -179,8 +179,8 @@ const ReactQuillEditor = ({
           quillEditor.setSelection(newCursorPosition, newCursorPosition);
         }, 10);
       } else if (
-        matchUnsortedList ||
-        (matchCheckboxList && unorderedLists.includes(currentFormat))
+        (matchUnsortedList || matchCheckboxList) &&
+        unorderedLists.includes(currentFormat)
       ) {
         const suffix = matchCheckboxList ? '- [ ]' : '-';
         const newContent = {
