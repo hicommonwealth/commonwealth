@@ -109,7 +109,7 @@ export async function __createGroup(
         requirements,
         is_system_managed: !!systemManaged,
       },
-      { transaction },
+      { transaction: t },
     );
     if (topicsToAssociate.length > 0) {
       // add group to all specified topics

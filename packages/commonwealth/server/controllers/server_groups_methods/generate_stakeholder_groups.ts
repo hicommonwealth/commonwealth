@@ -89,6 +89,7 @@ export async function __generateStakeholderGroups(
             metadata: {
               name: `Stakeholder`,
               description:
+                // eslint-disable-next-line max-len
                 'Any member who acquires your community stake is a stakeholder of your community, and therefore a member of this group.',
               required_requirements: 1,
             },
