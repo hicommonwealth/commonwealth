@@ -89,7 +89,6 @@ async function generateCosmosAddresses(numberOfAddresses: number) {
 }
 
 describe('Token Balance Cache Cosmos Tests', function () {
-  this.timeout(80_000);
   // mnemonic + token allocation can be found in cosmos-chain-test/[version]/bootstrap.sh files
   const cosmosChainId = 'csdkv1local';
   const addressOne = 'cosmos1zf45elxg5alxxeewvumpprfqtxmy2ufhzvetgx';
@@ -269,7 +268,7 @@ describe('Token Balance Cache Cosmos Tests', function () {
         expect(balanceThree[addressOne]).to.equal(
           finalBn.subn(500).subn(76).toString(10),
         );
-      });
+      }).timeout(30_000);
     });
   });
 
@@ -424,4 +423,4 @@ describe('Token Balance Cache Cosmos Tests', function () {
       });
     });
   });
-});
+}).timeout(80_000);

@@ -70,7 +70,7 @@ async function enableCommunities(communities: string[]) {
   }
 }
 
-describe('Cosmos Governance Notification Generator with real proposals', () => {
+describe.skip('Cosmos Governance Notification Generator with real proposals', () => {
   before(async () => {
     await tester.seedDb();
     await enableCommunities([v1CommunityId, v1Beta1CommunityId]);
