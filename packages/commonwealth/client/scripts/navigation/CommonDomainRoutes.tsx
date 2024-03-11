@@ -84,6 +84,8 @@ const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
 );
 
+const MyCommunityStake = lazy(() => import('views/pages/MyCommunityStake'));
+
 const SnapshotProposalPage = lazy(
   () => import('views/pages/snapshot_proposals'),
 );
@@ -105,6 +107,7 @@ const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 const CommonDomainRoutes = ({
   proposalTemplatesEnabled,
   communityHomepageEnabled,
+  myCommunityStakePageEnabled,
 }: RouteFeatureFlags) => [
   <Route
     key="/"
@@ -150,6 +153,17 @@ const CommonDomainRoutes = ({
     path="/web3login"
     element={withLayout(Web3LoginPage, { type: 'common' })}
   />,
+  ...[
+    myCommunityStakePageEnabled ? (
+      <Route
+        key="/myCommunityStake"
+        path="/myCommunityStake"
+        element={withLayout(MyCommunityStake, { type: 'common' })}
+      />
+    ) : (
+      []
+    ),
+  ],
   // scoped
   <Route
     key="/:scope/overview"
