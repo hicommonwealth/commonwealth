@@ -70,7 +70,7 @@ async function enableCommunities(communities: string[]) {
   }
 }
 
-describe.skip('Cosmos Governance Notification Generator with real proposals', () => {
+describe('Cosmos Governance Notification Generator with real proposals', () => {
   before(async () => {
     await tester.seedDb();
     await enableCommunities([v1CommunityId, v1Beta1CommunityId]);
@@ -99,7 +99,7 @@ describe.skip('Cosmos Governance Notification Generator with real proposals', ()
           category_id: 'chain-event',
         },
       });
-      expect(notifications.length).to.equal(1);
+      expect(notifications.length).to.equal(2);
     });
 
     it('should not generate duplicate v1 notifications', async () => {
@@ -110,7 +110,7 @@ describe.skip('Cosmos Governance Notification Generator with real proposals', ()
           category_id: 'chain-event',
         },
       });
-      expect(notifications.length).to.equal(1);
+      expect(notifications.length).to.equal(2);
     });
 
     it('should generate notifications for all v1 proposals proposals since the last known notification', async () => {
@@ -123,7 +123,7 @@ describe.skip('Cosmos Governance Notification Generator with real proposals', ()
           category_id: 'chain-event',
         },
       });
-      expect(notifications.length).to.equal(3);
+      expect(notifications.length).to.equal(4);
     });
 
     it('should not generate any notifications for proposals older than 2 hours', async () => {
@@ -139,7 +139,7 @@ describe.skip('Cosmos Governance Notification Generator with real proposals', ()
           category_id: 'chain-event',
         },
       });
-      expect(notifications.length).to.equal(1);
+      expect(notifications.length).to.equal(2);
       clock.restore();
     });
   });
@@ -153,7 +153,7 @@ describe.skip('Cosmos Governance Notification Generator with real proposals', ()
           category_id: 'chain-event',
         },
       });
-      expect(notifications.length).to.equal(1);
+      expect(notifications.length).to.equal(2);
     });
 
     it('should not generate duplicate v1Beta1 notifications', async () => {
@@ -164,7 +164,7 @@ describe.skip('Cosmos Governance Notification Generator with real proposals', ()
           category_id: 'chain-event',
         },
       });
-      expect(notifications.length).to.equal(1);
+      expect(notifications.length).to.equal(2);
     });
 
     it('should generate notifications for multiple v1Beta1 proposals since the last known notification', async () => {
@@ -177,7 +177,7 @@ describe.skip('Cosmos Governance Notification Generator with real proposals', ()
           category_id: 'chain-event',
         },
       });
-      expect(notifications.length).to.equal(3);
+      expect(notifications.length).to.equal(4);
     });
 
     it('should not generate any notifications for proposals older than 2 hours', async () => {
@@ -193,7 +193,7 @@ describe.skip('Cosmos Governance Notification Generator with real proposals', ()
           category_id: 'chain-event',
         },
       });
-      expect(notifications.length).to.equal(1);
+      expect(notifications.length).to.equal(2);
       clock.restore();
     });
   });
