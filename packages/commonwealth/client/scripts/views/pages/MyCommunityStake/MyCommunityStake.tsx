@@ -12,10 +12,7 @@ import './MyCommunityStake.scss';
 import Stakes from './Stakes';
 import Transactions from './Transactions';
 
-const TABS = {
-  MY_STAKES: 'My Stakes',
-  TRANSACTION_HISTORY: 'Transaction History',
-} as const;
+const TABS = ['My Stakes', 'Transaction History'] as const;
 
 const FILTERS = {
   ALL_ADDRESSES: 'All addresses',
@@ -23,9 +20,7 @@ const FILTERS = {
 
 const MyCommunityStake = () => {
   const { isLoggedIn } = useUserLoggedIn();
-  const [activeTab, setActiveTab] = useState<typeof TABS[keyof typeof TABS]>(
-    TABS.MY_STAKES,
-  );
+  const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
   const [activeFilter, setActiveFilter] = useState<any>(FILTERS.ALL_ADDRESSES);
 
   if (!isLoggedIn) return <PageNotFound />;
@@ -54,17 +49,17 @@ const MyCommunityStake = () => {
       </section>
 
       <CWTabsRow>
-        {Object.values(TABS).map((tab, index) => (
+        {TABS.map((tab, index) => (
           <CWTab
             key={index}
             label={tab}
-            isSelected={activeTab === tab}
-            onClick={() => setActiveTab(tab)}
+            isSelected={activeTabIndex === index}
+            onClick={() => setActiveTabIndex(index)}
           />
         ))}
       </CWTabsRow>
 
-      {activeTab === TABS.MY_STAKES ? <Stakes /> : <Transactions />}
+      {activeTabIndex === 0 ? <Stakes /> : <Transactions />}
     </section>
   );
 };
