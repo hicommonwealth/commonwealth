@@ -88,9 +88,9 @@ export const postCanvasData = async (
   // thread/comment/reaction server method with POST data pre-filled.
   if (actionMessage.payload.name === 'thread') {
     await verifyThread(req.body, {});
-  } else if (actionMessage.payload.call === 'comment') {
+  } else if (actionMessage.payload.name === 'comment') {
     await verifyComment(req.body, {});
-  } else if (actionMessage.payload.call === 'reaction') {
+  } else if (actionMessage.payload.name === 'reaction') {
     await verifyReaction(req.body, {});
   }
 
