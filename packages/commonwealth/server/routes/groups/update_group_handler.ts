@@ -54,14 +54,12 @@ export const updateGroupHandler = async (
   });
 
   // refresh memberships in background if requirements updated
-  if (requirements?.length > 0) {
-    controllers.groups
-      .refreshCommunityMemberships({
-        communityId: group.community_id,
-        groupId: group.id,
-      })
-      .catch(console.error);
-  }
+  // controllers.groups
+  //   .refreshCommunityMemberships({
+  //     communityId: group.community_id,
+  //     groupId: group.id,
+  //   })
+  //   .catch(console.error);
 
   controllers.analytics.track(analyticsOptions, req).catch(console.error);
 
