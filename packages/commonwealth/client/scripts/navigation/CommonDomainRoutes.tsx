@@ -141,25 +141,6 @@ const CommonDomainRoutes = ({
     path="/search"
     element={withLayout(SearchPage, { type: 'common' })}
   />,
-<<<<<<< HEAD
-  <Route
-    key="/web3login"
-    path="/web3login"
-    element={withLayout(Web3LoginPage, { type: 'common' })}
-  />,
-=======
-  ...[
-    myCommunityStakePageEnabled ? (
-      <Route
-        key="/myCommunityStake"
-        path="/myCommunityStake"
-        element={withLayout(MyCommunityStake, { type: 'common' })}
-      />
-    ) : (
-      []
-    ),
-  ],
->>>>>>> c2be65d00 (Remove legacy web3login page. (#7074))
   // scoped
   <Route
     key="/:scope/overview"
