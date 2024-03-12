@@ -1,21 +1,3 @@
-# https://github.com/dbsystel/postgresql-partman-container/blob/main/Dockerfile
-#FROM postgres:15.1-alpine
-#ARG PARTMAN_VERSION="v5.0.1"
-#ARG PARTMAN_CHECKSUM="28e4fdb83ecc16525959ae9593bfbfd077db429285f5f7d8e2468bfff6cbdbf2c81ace79a9ddeb4f00f51eb709163dbd713fe6b221a432ac2ff766f98d4cf8e4"
-#USER root
-#RUN install_packages wget gcc make build-essential
-#RUN cd /tmp \
-#    && wget "https://github.com/pgpartman/pg_partman/archive/refs/tags/${PARTMAN_VERSION}.tar.gz" \
-#    && echo "${PARTMAN_CHECKSUM} ${PARTMAN_VERSION}.tar.gz" | sha512sum --check \
-#    && tar zxf ${PARTMAN_VERSION}.tar.gz && cd pg_partman-${PARTMAN_VERSION#v}\
-#    && make \
-#    && make install \
-#    && cd .. && rm -r pg_partman-${PARTMAN_VERSION#v} ${PARTMAN_VERSION}.tar.gz
-#
-#USER 1001
-
-
-# https://gist.github.com/anandpathak/fea0251f3ba8b6f71f4457011da51df7
 FROM postgres:15.1-alpine
 
 USER root
@@ -27,36 +9,4 @@ RUN git clone https://github.com/pgpartman/pg_partman
 RUN cd pg_partman && git checkout v5.0.1
 RUN cd pg_partman && make NO_BGW=1 install
 
-
-# https://gist.github.com/jgould22/3280fc0f531485f4fe19a2ef1ef67361
-#FROM postgres:15-alpine
-#ENV PG_PARTMAN_VERSION v5.0.1
-#
-#RUN wget -O pg_partman.tar.gz "https://github.com/pgpartman/pg_partman/archive/$PG_PARTMAN_VERSION.tar.gz"
-#RUN mkdir -p /usr/src/pg_partman
-#RUN apk add make gcc
-#RUN apk add libc-dev
-#RUN apk add clang=15
-#RUN set -ex \
-#    && tar \
-#        --extract \
-#        --file pg_partman.tar.gz \
-#        --directory /usr/src/pg_partman \
-#        --strip-components 1 \
-#    # Delete src file tar
-#    && rm pg_partman.tar.gz \
-#    # Move to src file folder
-#    && cd /usr/src/pg_partman \
-#    # Build the extension
-#    && make \
-#    # Install the extension
-#    && make install \
-#    # Delete the src files for pg_partman
-#    && rm -rf /usr/src/pg_partman \
-#    # Delete the dependancies for downloading and building the extensions, we no longer need them
-#    && apk del .fetch-deps .build-deps
-
-# Copy the init script
-# The Docker Postgres initd script will run anything
-# in the directory /docker-entrypoint-initdb.d
-#COPY initdb.sh /docker-entrypoint-initdb.d/initdb.sh
+USER 1001
