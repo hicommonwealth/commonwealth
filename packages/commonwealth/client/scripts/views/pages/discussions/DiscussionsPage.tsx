@@ -72,7 +72,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   });
 
   const isOnArchivePage =
-    location.pathname === `/${app.activeChainId()}/archived`;
+    location.pathname ===
+    (app.isCustomDomain() ? `/archived` : `/${app.activeChainId()}/archived`);
 
   const { fetchNextPage, data, isInitialLoading, hasNextPage } =
     useFetchThreadsQuery({
