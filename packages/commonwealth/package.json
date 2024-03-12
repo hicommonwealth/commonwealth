@@ -67,6 +67,10 @@
     "type": "git",
     "url": "git+https://github.com/hicommonwealth/commonwealth.git"
   },
+  "resolutions": {
+    "@canvas-js/chain-cosmos/ethers": "^6.9.0",
+    "@canvas-js/chain-ethereum/ethers": "^6.9.0"
+  },
   "keywords": [],
   "dependencies": {
     "@apollo/client": "^3.3.18",
@@ -76,7 +80,6 @@
     "@canvas-js/chain-solana": "0.8.26",
     "@canvas-js/chain-substrate": "0.8.26",
     "@canvas-js/interfaces": "0.8.26",
-    "@canvas-js/signed-cid": "0.8.26",
     "@cosmjs/amino": "^0.31.3",
     "@cosmjs/cosmwasm-stargate": "^0.31.3",
     "@cosmjs/proto-signing": "^0.31.3",
