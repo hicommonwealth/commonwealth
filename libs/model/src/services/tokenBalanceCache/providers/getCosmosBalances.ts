@@ -4,6 +4,7 @@ import { models } from '../../../database';
 import { Balances, GetCosmosBalancesOptions } from '../types';
 import { cacheBalances, getCachedBalances } from './cacheBalances';
 import { __getCosmosNativeBalances } from './get_cosmos_balances';
+import { __getCw20Balances } from './get_cw20_balances';
 import { __getCw721Balances } from './get_cw721_balances';
 
 const log = logger().getLogger(__filename);
@@ -58,6 +59,14 @@ export async function getCosmosBalances(
       freshBalances = await __getCosmosNativeBalances({
         chainNode,
         addresses: validatedAddresses,
+        batchSize: options.batchSize,
+      });
+      break;
+    case BalanceSourceType.CW20:
+      freshBalances = await __getCw20Balances({
+        chainNode,
+        addresses: validatedAddresses,
+        contractAddress: options.sourceOptions.contractAddress,
         batchSize: options.batchSize,
       });
       break;
