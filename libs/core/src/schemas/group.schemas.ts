@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../constants';
 import { BalanceSourceType } from '../requirements-types';
 import { Community } from './community.schemas';
 
@@ -28,7 +29,7 @@ const CosmosSource = z.object({
 });
 
 const CosmosContractSource = z.object({
-  source_type: z.enum([BalanceSourceType.CW721]),
+  source_type: z.enum([BalanceSourceType.CW721, BalanceSourceType.CW20]),
   cosmos_chain_id: z.string(),
   contract_address: z.string(),
 });
@@ -79,11 +80,23 @@ export const CreateGroup = {
     metadata: z.object({
       name: z.string(),
       description: z.string(),
-      required_requirements: z.number().optional(),
-      membership_ttl: z.number().optional(),
+      required_requirements: z
+        .number()
+        .int()
+        .min(MIN_SCHEMA_INT)
+        .max(MAX_SCHEMA_INT)
+        .optional(),
+      membership_ttl: z
+        .number()
+        .int()
+        .min(MIN_SCHEMA_INT)
+        .max(MAX_SCHEMA_INT)
+        .optional(),
     }),
     requirements: z.array(Requirement),
-    topics: z.array(z.number()).optional(),
+    topics: z
+      .array(z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT))
+      .optional(),
   }),
   output: Community.extend({ groups: z.array(Group).optional() }),
 };

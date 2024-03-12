@@ -20,7 +20,7 @@ export type CosmosSource = {
 };
 
 export type CosmosContractSource = {
-  source_type: BalanceSourceType.CW721;
+  source_type: BalanceSourceType.CW20 | BalanceSourceType.CW721;
   cosmos_chain_id: string;
   contract_address: string;
 };
@@ -50,5 +50,6 @@ export enum BalanceSourceType {
   ERC721 = 'erc721',
   ERC1155 = 'erc1155',
   CosmosNative = 'cosmos_native',
+  CW20 = 'cw20',
   CW721 = 'cw721',
 }
