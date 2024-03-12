@@ -16,44 +16,45 @@
 
 
 # https://gist.github.com/anandpathak/fea0251f3ba8b6f71f4457011da51df7
-#FROM postgres:15.1-alpine
-#
-#USER root
-#
-#RUN apt update && \
-#apt install -y git make gcc
-#
-#RUN git clone https://github.com/pgpartman/pg_partman
-#RUN cd pg_partman && make NO_BGW=1 install
+FROM postgres:15.1-alpine
+
+USER root
+
+RUN apk update && \
+apk add git make gcc
+
+RUN git clone https://github.com/pgpartman/pg_partman
+RUN cd pg_partman && git checkout v5.0.1
+RUN cd pg_partman && make NO_BGW=1 install
 
 
 # https://gist.github.com/jgould22/3280fc0f531485f4fe19a2ef1ef67361
-FROM postgres:15-alpine
-ENV PG_PARTMAN_VERSION v5.0.1
-
-RUN set -ex \
-    # Download pg_partman
-    && wget -O pg_partman.tar.gz "https://github.com/pgpartman/pg_partman/archive/$PG_PARTMAN_VERSION.tar.gz" \
-    # Create a folder to put the src files in
-    && mkdir -p /usr/src/pg_partman \
-    # Extract the src files
-    && tar \
-        --extract \
-        --file pg_partman.tar.gz \
-        --directory /usr/src/pg_partman \
-        --strip-components 1 \
-    # Delete src file tar
-    && rm pg_partman.tar.gz \
-    # Move to src file folder
-    && cd /usr/src/pg_partman \
-    # Build the extension
-    && make \
-    # Install the extension
-    && make install \
-    # Delete the src files for pg_partman
-    && rm -rf /usr/src/pg_partman \
-    # Delete the dependancies for downloading and building the extensions, we no longer need them
-    && apk del .fetch-deps .build-deps
+#FROM postgres:15-alpine
+#ENV PG_PARTMAN_VERSION v5.0.1
+#
+#RUN wget -O pg_partman.tar.gz "https://github.com/pgpartman/pg_partman/archive/$PG_PARTMAN_VERSION.tar.gz"
+#RUN mkdir -p /usr/src/pg_partman
+#RUN apk add make gcc
+#RUN apk add libc-dev
+#RUN apk add clang=15
+#RUN set -ex \
+#    && tar \
+#        --extract \
+#        --file pg_partman.tar.gz \
+#        --directory /usr/src/pg_partman \
+#        --strip-components 1 \
+#    # Delete src file tar
+#    && rm pg_partman.tar.gz \
+#    # Move to src file folder
+#    && cd /usr/src/pg_partman \
+#    # Build the extension
+#    && make \
+#    # Install the extension
+#    && make install \
+#    # Delete the src files for pg_partman
+#    && rm -rf /usr/src/pg_partman \
+#    # Delete the dependancies for downloading and building the extensions, we no longer need them
+#    && apk del .fetch-deps .build-deps
 
 # Copy the init script
 # The Docker Postgres initd script will run anything
