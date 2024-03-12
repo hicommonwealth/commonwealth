@@ -8,7 +8,6 @@ const WhyCommonwealthPage = lazy(() => import('views/pages/why_commonwealth'));
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
 const CommunitiesPage = lazy(() => import('views/pages/communities'));
 const SearchPage = lazy(() => import('views/pages/search'));
-const Web3LoginPage = lazy(() => import('views/pages/web3login'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
@@ -147,11 +146,6 @@ const CommonDomainRoutes = ({
     key="/search"
     path="/search"
     element={withLayout(SearchPage, { type: 'common' })}
-  />,
-  <Route
-    key="/web3login"
-    path="/web3login"
-    element={withLayout(Web3LoginPage, { type: 'common' })}
   />,
   ...[
     myCommunityStakePageEnabled ? (
