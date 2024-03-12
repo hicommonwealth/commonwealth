@@ -235,7 +235,10 @@ export const User = ({
             onModalClose={() => setIsModalOpen(false)}
           />
         }
-        onClose={() => setIsModalOpen(false)}
+        onClose={(e) => {
+          e.stopPropagation();
+          setIsModalOpen(false);
+        }}
         open={isModalOpen}
       />
     </>
