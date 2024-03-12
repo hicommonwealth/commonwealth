@@ -49,7 +49,7 @@ Glossary terms referenced in a given term's definition are designated with CAPIT
 
 ### Chain Base
 
-An architectural layer of blockchain atop which NETWORK protocols are built.
+A blockchain ecosystem, or L0, atop which NETWORK protocols are built.
 
 ### Chain Entity
 
