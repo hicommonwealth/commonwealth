@@ -74,10 +74,13 @@ class SessionsController {
   // because we always request an authSession immediately before signing.
   // The user should never be able to switch accounts in the intervening time.
   private async sign(
-    address: string,
+    address_: string,
     call: string,
     args: any,
   ): Promise<CanvasSignedData> {
+    // TODO: REPLACE THIS - this is a temporary solution to get the signer to sign the message
+    // We should have some way to get the CAIP-2 style address
+    const address = `eip155:1:${address_}`;
     const sessionSigners = await getSessionSigners();
     for (const signer of sessionSigners) {
       if (signer.match(address)) {
