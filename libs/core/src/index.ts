@@ -8,6 +8,7 @@ export {
   comment,
   community,
   events,
+  feed,
   group,
   thread,
   todo,
