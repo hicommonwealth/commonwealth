@@ -3,7 +3,7 @@ import { hexToU8a, stringToHex } from '@polkadot/util';
 import type { KeypairType } from '@polkadot/util-crypto/types';
 import { bech32 } from 'bech32';
 import bs58 from 'bs58';
-import { verifyMessage } from 'ethers/lib/utils';
+import { verifyMessage } from 'ethers/utils';
 
 import {
   ChainBase,
