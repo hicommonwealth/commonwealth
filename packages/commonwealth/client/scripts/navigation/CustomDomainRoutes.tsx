@@ -115,7 +115,6 @@ const CustomDomainRoutes = ({
       path="/search"
       element={withLayout(SearchPage, { type: 'common' })}
     />,
-    <Route key="/web3login" path="/web3login" element={<Navigate to="/" />} />,
     <Route
       key="/overview"
       path="/overview"
@@ -438,11 +437,6 @@ const CustomDomainRoutes = ({
       key="/:scope/search"
       path="/:scope/search"
       element={<Navigate to="/search" />}
-    />,
-    <Route
-      key="/:scope/web3login"
-      path="/:scope/web3login"
-      element={<Navigate to="/web3login" />}
     />,
     <Route
       key="/:scope/overview"

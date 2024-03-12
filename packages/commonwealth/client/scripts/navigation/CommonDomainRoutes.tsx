@@ -8,7 +8,6 @@ const WhyCommonwealthPage = lazy(() => import('views/pages/why_commonwealth'));
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
 const CommunitiesPage = lazy(() => import('views/pages/communities'));
 const SearchPage = lazy(() => import('views/pages/search'));
-const Web3LoginPage = lazy(() => import('views/pages/web3login'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
@@ -142,11 +141,25 @@ const CommonDomainRoutes = ({
     path="/search"
     element={withLayout(SearchPage, { type: 'common' })}
   />,
+<<<<<<< HEAD
   <Route
     key="/web3login"
     path="/web3login"
     element={withLayout(Web3LoginPage, { type: 'common' })}
   />,
+=======
+  ...[
+    myCommunityStakePageEnabled ? (
+      <Route
+        key="/myCommunityStake"
+        path="/myCommunityStake"
+        element={withLayout(MyCommunityStake, { type: 'common' })}
+      />
+    ) : (
+      []
+    ),
+  ],
+>>>>>>> c2be65d00 (Remove legacy web3login page. (#7074))
   // scoped
   <Route
     key="/:scope/overview"
