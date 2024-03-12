@@ -450,8 +450,8 @@ describe('Token Balance Cache Cosmos Tests', function () {
         expect(balanceAfterTTL[addressWithNft]).to.equal(
           expectedAddressOneBalance,
         );
-      });
-    }).timeout(30_000);
+      }).timeout(30_000);
+    });
   });
 
   describe('CW20', function () {
@@ -604,7 +604,7 @@ describe('Token Balance Cache Cosmos Tests', function () {
         expect(balanceAfterTTL[addressWithToken]).to.equal(
           expectedAddressOneBalance,
         );
-      });
-    }).timeout(30_000);
+      }).timeout(30_000);
+    });
   });
 }).timeout(80_000);
