@@ -320,6 +320,7 @@ describe('Token Balance Cache Cosmos Tests', function () {
       expect(Object.keys(balance).length).to.equal(1);
       expect(balance[addressWithNft]).to.equal('1');
     });
+
     it('should return many cw721 balances', async () => {
       const balances = await tokenBalanceCache.getBalances({
         balanceSourceType: BalanceSourceType.CW721,
@@ -335,6 +336,7 @@ describe('Token Balance Cache Cosmos Tests', function () {
       expect(balances[addressWithNft]).to.equal('1');
       expect(balances[addressWithoutNft]).to.equal('0');
     });
+
     it('should not throw if a single address fails', async () => {
       const balance = await tokenBalanceCache.getBalances({
         balanceSourceType: BalanceSourceType.CW721,
@@ -348,6 +350,7 @@ describe('Token Balance Cache Cosmos Tests', function () {
 
       expect(Object.keys(balance).length).to.equal(0);
     });
+
     it('should not throw if a single address out of many fails', async () => {
       const balance = await tokenBalanceCache.getBalances({
         balanceSourceType: BalanceSourceType.CW721,
@@ -362,6 +365,7 @@ describe('Token Balance Cache Cosmos Tests', function () {
       expect(Object.keys(balance).length).to.equal(1);
       expect(balance[addressWithNft]).to.equal('1');
     });
+
     it('should correctly batch balance requests', async () => {
       const bulkAddresses = await generateCosmosAddresses(20);
       bulkAddresses.splice(4, 0, addressWithNft);
@@ -447,7 +451,7 @@ describe('Token Balance Cache Cosmos Tests', function () {
           expectedAddressOneBalance,
         );
       });
-    });
+    }).timeout(30_000);
   });
 
   describe('CW20', function () {
@@ -472,6 +476,7 @@ describe('Token Balance Cache Cosmos Tests', function () {
       expect(Object.keys(balance).length).to.equal(1);
       expect(balance[addressWithToken]).to.equal('3000000');
     });
+
     it('should return many cw20 balances', async () => {
       const balances = await tokenBalanceCache.getBalances({
         balanceSourceType: BalanceSourceType.CW20,
@@ -487,6 +492,7 @@ describe('Token Balance Cache Cosmos Tests', function () {
       expect(balances[addressWithToken]).to.equal('3000000');
       expect(balances[addressWithoutToken]).to.equal('0');
     });
+
     it('should not throw if a single address fails', async () => {
       const balance = await tokenBalanceCache.getBalances({
         balanceSourceType: BalanceSourceType.CW20,
@@ -500,6 +506,7 @@ describe('Token Balance Cache Cosmos Tests', function () {
 
       expect(Object.keys(balance).length).to.equal(0);
     });
+
     it('should not throw if a single address out of many fails', async () => {
       const balance = await tokenBalanceCache.getBalances({
         balanceSourceType: BalanceSourceType.CW20,
@@ -514,6 +521,7 @@ describe('Token Balance Cache Cosmos Tests', function () {
       expect(Object.keys(balance).length).to.equal(1);
       expect(balance[addressWithToken]).to.equal('3000000');
     });
+
     it('should correctly batch balance requests', async () => {
       const bulkAddresses = await generateCosmosAddresses(20);
       bulkAddresses.splice(4, 0, addressWithToken);
@@ -597,6 +605,6 @@ describe('Token Balance Cache Cosmos Tests', function () {
           expectedAddressOneBalance,
         );
       });
-    });
+    }).timeout(30_000);
   });
 }).timeout(80_000);
