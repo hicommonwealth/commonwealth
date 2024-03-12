@@ -129,6 +129,12 @@ function _thresholdCheck(
         chainId = thresholdData.source.cosmos_chain_id;
         break;
       }
+      case 'cw20': {
+        balanceSourceType = BalanceSourceType.CW20;
+        contractAddress = thresholdData.source.contract_address;
+        chainId = thresholdData.source.cosmos_chain_id;
+        break;
+      }
       case 'cw721': {
         balanceSourceType = BalanceSourceType.CW721;
         contractAddress = thresholdData.source.contract_address;
@@ -159,6 +165,7 @@ function _thresholdCheck(
             return b.options.sourceOptions.evmChainId.toString() === chainId;
           case BalanceSourceType.CosmosNative:
             return b.options.sourceOptions.cosmosChainId.toString() === chainId;
+          case BalanceSourceType.CW20:
           case BalanceSourceType.CW721:
             return (
               b.options.sourceOptions.contractAddress == contractAddress &&

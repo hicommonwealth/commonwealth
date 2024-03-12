@@ -28,7 +28,7 @@ const CosmosSource = z.object({
 });
 
 const CosmosContractSource = z.object({
-  source_type: z.enum([BalanceSourceType.CW721]),
+  source_type: z.enum([BalanceSourceType.CW721, BalanceSourceType.CW20]),
   cosmos_chain_id: z.string(),
   contract_address: z.string(),
 });
