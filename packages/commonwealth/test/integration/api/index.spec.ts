@@ -109,6 +109,7 @@ describe('API Tests', () => {
           address: session.address,
           community_id,
           wallet_id,
+          // @ts-ignore
           session: ipldDagJson.stringify(ipldDagJson.encode(session)),
         });
       expect(res.body).to.not.be.null;

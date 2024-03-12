@@ -524,6 +524,7 @@ export async function handleSocialLoginCallback({
       username: profileMetadata?.username,
       avatarUrl: profileMetadata?.avatarUrl,
       magicAddress,
+      // @ts-ignore
       session: ipldDagJson.stringify(ipldDagJson.encode(session)),
       walletSsoSource,
     },
