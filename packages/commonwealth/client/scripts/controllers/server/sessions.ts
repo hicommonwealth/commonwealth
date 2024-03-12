@@ -2,6 +2,7 @@ import type { Action, Message, Session } from '@canvas-js/interfaces';
 import { CANVAS_TOPIC } from 'canvas';
 
 import { WalletSsoSource } from '@hicommonwealth/core';
+import { CanvasSignedData } from 'shared/canvas/types';
 import { getSessionSigners } from 'shared/canvas/verify';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
@@ -72,7 +73,11 @@ class SessionsController {
   // The signing methods are stateful, which simplifies implementation greatly
   // because we always request an authSession immediately before signing.
   // The user should never be able to switch accounts in the intervening time.
-  private async sign(address: string, call: string, args: any) {
+  private async sign(
+    address: string,
+    call: string,
+    args: any,
+  ): Promise<CanvasSignedData> {
     const sessionSigners = await getSessionSigners();
     for (const signer of sessionSigners) {
       if (signer.match(address)) {

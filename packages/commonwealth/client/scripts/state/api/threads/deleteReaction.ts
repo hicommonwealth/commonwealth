@@ -1,6 +1,6 @@
-import ipldDagJson from '@ipld/dag-json';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
+import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { updateThreadInAllCaches } from './helpers/cache';
 
@@ -20,14 +20,12 @@ const deleteReaction = async ({
   reactionId,
   threadId,
 }: DeleteReactionProps) => {
-  const {
-    sessionMessage,
-    sessionMessageSignature,
-    actionMessage,
-    actionMessageSignature,
-  } = await app.sessions.signDeleteThreadReaction(address, {
-    thread_id: threadId,
-  });
+  const canvasSignedData = await app.sessions.signDeleteThreadReaction(
+    address,
+    {
+      thread_id: threadId,
+    },
+  );
 
   const response = await axios.delete(
     `${app.serverUrl()}/reactions/${reactionId}`,
@@ -37,18 +35,7 @@ const deleteReaction = async ({
         address: address,
         community_id: app.chain.id,
         jwt: app.user.jwt,
-        canvas_action_message: actionMessage
-          ? ipldDagJson.stringify(ipldDagJson.encode(actionMessage))
-          : null,
-        canvas_action_message_signature: actionMessageSignature
-          ? ipldDagJson.stringify(ipldDagJson.encode(actionMessageSignature))
-          : null,
-        canvas_session_message: sessionMessage
-          ? ipldDagJson.stringify(ipldDagJson.encode(sessionMessage))
-          : null,
-        canvas_session_message_signature: sessionMessageSignature
-          ? ipldDagJson.stringify(ipldDagJson.encode(sessionMessageSignature))
-          : null,
+        ...toCanvasSignedDataApiArgs(canvasSignedData),
       },
     },
   );

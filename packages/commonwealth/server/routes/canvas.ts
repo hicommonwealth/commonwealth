@@ -3,7 +3,10 @@ import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
 import {
-  unpackCanvasArguments,
+  fromCanvasSignedDataApiArgs,
+  isCanvasSignedDataApiArgs,
+} from 'shared/canvas/types';
+import {
   verifyComment,
   verifyReaction,
   verifyThread,
@@ -65,12 +68,7 @@ ORDER BY updated_at DESC LIMIT 50;
   return success(res, result);
 };
 
-type CanvasPostReq = {
-  canvas_action_message: string;
-  canvas_action_message_signature: string;
-  canvas_session_message: string;
-  canvas_session_message_signature: string;
-};
+type CanvasPostReq = {};
 type CanvasPostResp = {};
 
 export const postCanvasData = async (
@@ -78,16 +76,22 @@ export const postCanvasData = async (
   req: TypedRequestBody<CanvasPostReq>,
   res: TypedResponse<CanvasPostResp>,
 ) => {
-  const parsedCanvasArguments = await unpackCanvasArguments(req.body);
-  const { actionMessage } = parsedCanvasArguments;
+  if (!isCanvasSignedDataApiArgs(req.body)) {
+    throw new Error('Invalid canvas data');
+  }
+
+  // verifyThread etc are also deserializing the canvas fields - we should just do
+  // this once and pass the deserialized fields to the verify functions
+  const { actionMessage } = fromCanvasSignedDataApiArgs(req.body);
+
   // TODO: Implement verification and call the create
   // thread/comment/reaction server method with POST data pre-filled.
   if (actionMessage.payload.name === 'thread') {
-    await verifyThread(parsedCanvasArguments, {});
-  } else if (actionMessage.payload.name === 'comment') {
-    await verifyComment(parsedCanvasArguments, {});
-  } else if (actionMessage.payload.name === 'reaction') {
-    await verifyReaction(parsedCanvasArguments, {});
+    await verifyThread(req.body, {});
+  } else if (actionMessage.payload.call === 'comment') {
+    await verifyComment(req.body, {});
+  } else if (actionMessage.payload.call === 'reaction') {
+    await verifyReaction(req.body, {});
   }
 
   // TODO: Return some kind of identifier for the generated data.

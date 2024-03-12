@@ -3,7 +3,12 @@ import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
-import type { ModelInstance, ModelStatic } from './types';
+import {
+  canvasModelSequelizeColumns,
+  type CanvasModelAttributes,
+  type ModelInstance,
+  type ModelStatic,
+} from './types';
 
 const log = logger().getLogger(__filename);
 
@@ -18,17 +23,12 @@ export type ReactionAttributes = {
 
   calculated_voting_weight: number;
 
-  canvas_action_message: string;
-  canvas_action_message_signature: string;
-  canvas_session_message: string;
-  canvas_session_message_signature: string;
-
   created_at?: Date;
   updated_at?: Date;
 
   Chain?: CommunityAttributes;
   Address?: AddressAttributes;
-};
+} & CanvasModelAttributes;
 
 export type ReactionInstance = ModelInstance<ReactionAttributes>;
 
@@ -50,9 +50,7 @@ export default (
       reaction: { type: dataTypes.STRING, allowNull: false },
       calculated_voting_weight: { type: dataTypes.INTEGER, allowNull: true },
       // signed data
-      canvas_action: { type: dataTypes.JSONB, allowNull: true },
-      canvas_session: { type: dataTypes.JSONB, allowNull: true },
-      canvas_hash: { type: dataTypes.STRING, allowNull: true },
+      ...canvasModelSequelizeColumns(dataTypes),
     },
     {
       hooks: {

@@ -47,7 +47,6 @@ export type CreateThreadOptions = {
   canvasActionMessageSignature?: any;
   canvasSessionMessage?: any;
   canvasSessionMessageSignature?: any;
-  canvasHash?: any;
   discordMeta?: any;
 };
 

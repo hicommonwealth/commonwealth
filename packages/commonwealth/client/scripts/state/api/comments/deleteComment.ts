@@ -1,6 +1,6 @@
-import ipldDagJson from '@ipld/dag-json';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
@@ -20,14 +20,12 @@ const deleteComment = async ({
   commentId,
   canvasHash,
 }: DeleteCommentProps) => {
-  const {
-    sessionMessage,
-    sessionMessageSignature,
-    actionMessage,
-    actionMessageSignature,
-  } = await app.sessions.signDeleteComment(app.user.activeAccount.address, {
-    comment_id: canvasHash,
-  });
+  const canvasSignedData = await app.sessions.signDeleteComment(
+    app.user.activeAccount.address,
+    {
+      comment_id: canvasHash,
+    },
+  );
 
   await axios.delete(`${app.serverUrl()}/comments/${commentId}`, {
     data: {
@@ -48,18 +46,7 @@ const deleteComment = async ({
       text: '[deleted]',
       plaintext: '[deleted]',
       versionHistory: [],
-      canvas_action_message: actionMessage
-        ? ipldDagJson.stringify(ipldDagJson.encode(actionMessage))
-        : null,
-      canvas_action_message_signature: actionMessageSignature
-        ? ipldDagJson.stringify(ipldDagJson.encode(actionMessageSignature))
-        : null,
-      canvas_session_message: sessionMessage
-        ? ipldDagJson.stringify(ipldDagJson.encode(sessionMessage))
-        : null,
-      canvas_session_message_signature: sessionMessageSignature
-        ? ipldDagJson.stringify(ipldDagJson.encode(sessionMessageSignature))
-        : null,
+      ...toCanvasSignedDataApiArgs(canvasSignedData),
     },
   };
 };

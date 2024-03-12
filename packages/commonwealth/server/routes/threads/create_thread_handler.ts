@@ -1,10 +1,8 @@
 import { IDiscordMeta } from '@hicommonwealth/core';
 import { ThreadAttributes } from '@hicommonwealth/model';
-import {
-  CanvasArguments,
-  unpackCanvasArguments,
-  verifyThread,
-} from '../../../shared/canvas/serverVerify';
+import { CreateThreadOptions } from 'server/controllers/server_threads_methods/create_thread';
+import { isCanvasSignedDataApiArgs } from 'shared/canvas/types';
+import { verifyThread } from '../../../shared/canvas/serverVerify';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 
@@ -18,7 +16,7 @@ type CreateThreadRequestBody = {
   url?: string;
   readOnly: boolean;
   discord_meta?: IDiscordMeta;
-} & CanvasArguments;
+};
 type CreateThreadResponse = ThreadAttributes;
 
 export const createThreadHandler = async (
@@ -38,35 +36,41 @@ export const createThreadHandler = async (
     discord_meta,
   } = req.body;
 
-  if (process.env.ENFORCE_SESSION_KEYS === 'true') {
-    const parsedCanvasArguments = await unpackCanvasArguments(req.body);
-    await verifyThread(parsedCanvasArguments, {
-      title,
-      body,
-      address: address.address,
-      community: community.id,
-      topic: topicId ? parseInt(topicId, 10) : null,
-    });
+  const threadFields: CreateThreadOptions = {
+    user,
+    address,
+    community,
+    title,
+    body,
+    kind,
+    readOnly,
+    topicId: parseInt(topicId, 10) || undefined,
+    stage,
+    url,
+    discordMeta: discord_meta,
+  };
+
+  if (isCanvasSignedDataApiArgs(req.body)) {
+    threadFields.canvasActionMessage = req.body.canvas_action_message;
+    threadFields.canvasActionMessageSignature =
+      req.body.canvas_action_message_signature;
+    threadFields.canvasSessionMessage = req.body.canvas_session_message;
+    threadFields.canvasSessionMessageSignature =
+      req.body.canvas_session_message_signature;
+
+    if (process.env.ENFORCE_SESSION_KEYS === 'true') {
+      await verifyThread(req.body, {
+        title,
+        body,
+        address: address.address,
+        community: community.id,
+        topic: topicId ? parseInt(topicId, 10) : null,
+      });
+    }
   }
 
   const [thread, notificationOptions, analyticsOptions] =
-    await controllers.threads.createThread({
-      user,
-      address,
-      community,
-      title,
-      body,
-      kind,
-      readOnly,
-      topicId: parseInt(topicId, 10) || undefined,
-      stage,
-      url,
-      canvasActionMessage: req.body.canvas_action_message,
-      canvasActionMessageSignature: req.body.canvas_action_message_signature,
-      canvasSessionMessage: req.body.canvas_session_message,
-      canvasSessionMessageSignature: req.body.canvas_session_message_signature,
-      discordMeta: discord_meta,
-    });
+    await controllers.threads.createThread(threadFields);
 
   for (const n of notificationOptions) {
     controllers.notifications.emit(n).catch(console.error);

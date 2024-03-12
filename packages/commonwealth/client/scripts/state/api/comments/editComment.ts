@@ -1,7 +1,7 @@
-import ipldDagJson from '@ipld/dag-json';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import Comment from 'models/Comment';
+import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import useFetchCommentsQuery from './fetchComments';
@@ -23,16 +23,14 @@ const editComment = async ({
   commentId,
   updatedBody,
 }: EditCommentProps) => {
-  const {
-    sessionMessage,
-    sessionMessageSignature,
-    actionMessage,
-    actionMessageSignature,
-  } = await app.sessions.signComment(app.user.activeAccount.address, {
-    thread_id: threadId,
-    body: updatedBody,
-    parent_comment_id: parentCommentId,
-  });
+  const canvasSignedData = await app.sessions.signComment(
+    app.user.activeAccount.address,
+    {
+      thread_id: threadId,
+      body: updatedBody,
+      parent_comment_id: parentCommentId,
+    },
+  );
 
   const response = await axios.patch(
     `${app.serverUrl()}/comments/${commentId}`,
@@ -43,18 +41,7 @@ const editComment = async ({
       community_id: communityId,
       body: encodeURIComponent(updatedBody),
       jwt: app.user.jwt,
-      canvas_action_message: actionMessage
-        ? ipldDagJson.stringify(ipldDagJson.encode(actionMessage))
-        : null,
-      canvas_action_message_signature: actionMessageSignature
-        ? ipldDagJson.stringify(ipldDagJson.encode(actionMessageSignature))
-        : null,
-      canvas_session_message: sessionMessage
-        ? ipldDagJson.stringify(ipldDagJson.encode(sessionMessage))
-        : null,
-      canvas_session_message_signature: sessionMessageSignature
-        ? ipldDagJson.stringify(ipldDagJson.encode(sessionMessageSignature))
-        : null,
+      ...toCanvasSignedDataApiArgs(canvasSignedData),
     },
   );
 

@@ -1,10 +1,8 @@
 import { AppError } from '@hicommonwealth/core';
 import { ReactionAttributes } from '@hicommonwealth/model';
-import {
-  CanvasArguments,
-  unpackCanvasArguments,
-  verifyReaction,
-} from '../../../shared/canvas/serverVerify';
+import { CreateCommentReactionOptions } from 'server/controllers/server_comments_methods/create_comment_reaction';
+import { isCanvasSignedDataApiArgs } from 'shared/canvas/types';
+import { verifyReaction } from '../../../shared/canvas/serverVerify';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -16,7 +14,7 @@ const Errors = {
 type CreateCommentReactionRequestParams = { id: string };
 type CreateCommentReactionRequestBody = {
   reaction: string;
-} & CanvasArguments;
+};
 type CreateCommentReactionResponse = ReactionAttributes;
 
 export const createCommentReactionHandler = async (
@@ -40,27 +38,34 @@ export const createCommentReactionHandler = async (
     throw new AppError(Errors.InvalidCommentId);
   }
 
-  if (process.env.ENFORCE_SESSION_KEYS === 'true') {
-    const parsedCanvasArguments = await unpackCanvasArguments(req.body);
-    await verifyReaction(parsedCanvasArguments, {
-      comment_id: commentId,
-      address: address.address,
-      value: reaction,
-    });
+  const commentReactionFields: CreateCommentReactionOptions = {
+    user,
+    address,
+    reaction,
+    commentId,
+  };
+
+  if (isCanvasSignedDataApiArgs(req.body)) {
+    commentReactionFields.canvasActionMessage = req.body.canvas_action_message;
+    commentReactionFields.canvasActionMessageSignature =
+      req.body.canvas_action_message_signature;
+    commentReactionFields.canvasSessionMessage =
+      req.body.canvas_session_message;
+    commentReactionFields.canvasSessionMessageSignature =
+      req.body.canvas_session_message_signature;
+
+    if (process.env.ENFORCE_SESSION_KEYS === 'true') {
+      await verifyReaction(req.body, {
+        comment_id: commentId,
+        address: address.address,
+        value: reaction,
+      });
+    }
   }
 
   // create comment reaction
   const [newReaction, notificationOptions, analyticsOptions] =
-    await controllers.comments.createCommentReaction({
-      user,
-      address,
-      reaction,
-      commentId,
-      canvasActionMessage: req.body.canvas_action_message,
-      canvasActionMessageSignature: req.body.canvas_action_message_signature,
-      canvasSessionMessage: req.body.canvas_session_message,
-      canvasSessionMessageSignature: req.body.canvas_session_message_signature,
-    });
+    await controllers.comments.createCommentReaction(commentReactionFields);
 
   // emit notifications
   for (const n of notificationOptions) {

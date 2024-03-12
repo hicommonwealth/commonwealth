@@ -1,19 +1,5 @@
-import { Action, Message, Session, Signature } from '@canvas-js/interfaces';
+import { CanvasSignedDataApiArgs, fromCanvasSignedDataApiArgs } from './types';
 import { verify } from './verify';
-
-export type CanvasArguments = {
-  canvas_action_message?: any;
-  canvas_action_message_signature?: any;
-  canvas_session_message?: any;
-  canvas_session_message_signature?: any;
-};
-
-type ParsedCanvasArguments = {
-  actionMessage: Message<Action>;
-  actionMessageSignature: Signature;
-  sessionMessage: Message<Session>;
-  sessionMessageSignature: Signature;
-};
 
 function assert(condition: unknown, message?: string): asserts condition {
   if (!condition) {
@@ -30,52 +16,9 @@ function assertMatches(a, b, obj: string, field: string) {
   );
 }
 
-// Skip io-ts validation since it produces an import error even though
-// we're already using an async import, and because we're upgrading
-// to the new Canvas packages soon anyway.
-export const unpackCanvasArguments = async ({
-  canvas_action_message,
-  canvas_action_message_signature,
-  canvas_session_message,
-  canvas_session_message_signature,
-}: CanvasArguments): Promise<ParsedCanvasArguments> => {
-  if (
-    !canvas_action_message ||
-    !canvas_action_message_signature ||
-    !canvas_session_message ||
-    !canvas_session_message_signature
-  ) {
-    return;
-  }
-  const ipldDagJson = await import('@ipld/dag-json');
-  const actionMessage: Message<Action> = ipldDagJson.decode(
-    ipldDagJson.parse(canvas_action_message),
-  );
-  const actionMessageSignature: Signature = ipldDagJson.decode(
-    ipldDagJson.parse(canvas_action_message_signature),
-  );
-
-  const sessionMessage: Message<Session> = ipldDagJson.decode(
-    ipldDagJson.parse(canvas_session_message),
-  );
-  const sessionMessageSignature: Signature = ipldDagJson.decode(
-    ipldDagJson.parse(canvas_session_message_signature),
-  );
-
-  // TODO: run time type check these values
-  return {
-    actionMessage,
-    actionMessageSignature,
-    sessionMessage,
-    sessionMessageSignature,
-  };
-};
-
-export const verifyComment = async (
-  parsedCanvasArguments: ParsedCanvasArguments,
-  fields,
-) => {
+export const verifyComment = async (args: CanvasSignedDataApiArgs, fields) => {
   const { thread_id, text, address, parent_comment_id } = fields;
+  const parsedCanvasArguments = fromCanvasSignedDataApiArgs(args);
 
   await verify(parsedCanvasArguments);
 
@@ -98,11 +41,9 @@ export const verifyComment = async (
   // assertMatches(chainBaseToCanvasChain(chain), action.payload.chain)
 };
 
-export const verifyThread = async (
-  parsedCanvasArguments: ParsedCanvasArguments,
-  fields,
-) => {
+export const verifyThread = async (args: CanvasSignedDataApiArgs, fields) => {
   const { title, body, address, community, link, topic } = fields;
+  const parsedCanvasArguments = fromCanvasSignedDataApiArgs(args);
 
   await verify(parsedCanvasArguments);
 
@@ -127,11 +68,9 @@ export const verifyThread = async (
   // assertMatches(chainBaseToCanvasChain(chain), action.payload.chain)
 };
 
-export const verifyReaction = async (
-  parsedCanvasArguments: ParsedCanvasArguments,
-  fields,
-) => {
+export const verifyReaction = async (args: CanvasSignedDataApiArgs, fields) => {
   const { thread_id, comment_id, proposal_id, address, value } = fields;
+  const parsedCanvasArguments = fromCanvasSignedDataApiArgs(args);
 
   await verify(parsedCanvasArguments);
 

@@ -1,10 +1,10 @@
-import ipldDagJson from '@ipld/dag-json';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import MinimumProfile from 'models/MinimumProfile';
 import Thread from 'models/Thread';
 import Topic from 'models/Topic';
 import { ThreadStage } from 'models/types';
+import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import { addThreadInAllCaches } from './helpers/cache';
@@ -34,12 +34,7 @@ const createThread = async ({
   readOnly,
   authorProfile,
 }: CreateThreadProps): Promise<Thread> => {
-  const {
-    sessionMessage,
-    sessionMessageSignature,
-    actionMessage,
-    actionMessageSignature,
-  } = await app.sessions.signThread(address, {
+  const canvasSignedData = await app.sessions.signThread(address, {
     community: chainId,
     title,
     body,
@@ -61,18 +56,7 @@ const createThread = async ({
     url,
     readOnly,
     jwt: app.user.jwt,
-    canvas_action_message: actionMessage
-      ? ipldDagJson.stringify(ipldDagJson.encode(actionMessage))
-      : null,
-    canvas_action_message_signature: actionMessageSignature
-      ? ipldDagJson.stringify(ipldDagJson.encode(actionMessageSignature))
-      : null,
-    canvas_session_message: sessionMessage
-      ? ipldDagJson.stringify(ipldDagJson.encode(sessionMessage))
-      : null,
-    canvas_session_message_signature: sessionMessageSignature
-      ? ipldDagJson.stringify(ipldDagJson.encode(sessionMessageSignature))
-      : null,
+    ...toCanvasSignedDataApiArgs(canvasSignedData),
   });
 
   return new Thread(response.data.result);

@@ -1,4 +1,4 @@
-import type { BuildOptions, Model } from 'sequelize';
+import type { BuildOptions, DataTypes, Model } from 'sequelize';
 import type { DB } from '.';
 
 export type ModelInstance<Attrs extends Record<string, unknown>> =
@@ -7,3 +7,16 @@ export type ModelInstance<Attrs extends Record<string, unknown>> =
 export type ModelStatic<T extends Model> = typeof Model & {
   associate: (models: DB) => void;
 } & { new (values?: Record<string, unknown>, options?: BuildOptions): T };
+
+export type CanvasModelAttributes = {
+  canvas_action_message: string;
+  canvas_action_message_signature: string;
+  canvas_session_message: string;
+  canvas_session_message_signature: string;
+};
+
+export const canvasModelSequelizeColumns = (dataTypes: typeof DataTypes) => ({
+  canvas_action: { type: dataTypes.JSONB, allowNull: true },
+  canvas_session: { type: dataTypes.JSONB, allowNull: true },
+  canvas_hash: { type: dataTypes.STRING, allowNull: true },
+});
