@@ -570,7 +570,8 @@ async function magicLoginRoute(
 
   if (
     !existingUserInstance &&
-    magicUserMetadata.oauthProvider === 'email' &&
+    (!magicUserMetadata.oauthProvider ||
+      magicUserMetadata.oauthProvider === 'email') &&
     magicUserMetadata.email
   ) {
     // if unable to locate a magic user by address, attempt to locate by email.
