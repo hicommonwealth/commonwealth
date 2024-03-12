@@ -13,8 +13,9 @@ interface APIResponseFormat {
         | 'erc20'
         | 'erc721'
         | 'erc1155'
-        | 'cosmos_native'
         | 'eth_native'
+        | 'cosmos_native'
+        | 'cw20'
         | 'cw721';
       evm_chain_id?: number;
       cosmos_chain_id?: number;

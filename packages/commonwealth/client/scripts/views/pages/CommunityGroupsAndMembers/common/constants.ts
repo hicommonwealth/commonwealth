@@ -13,6 +13,7 @@ export const ERC_SPECIFICATIONS = {
 
 export const CW_SPECIFICATIONS = {
   CW_721: 'cw721',
+  CW_20: 'cw20',
 };
 
 export const BLOCKCHAINS = {
@@ -31,6 +32,7 @@ export const AMOUNT_CONDITIONS = {
 
 export const requirementTypes = [
   { value: TOKENS.COSMOS_TOKEN, label: 'Cosmos base tokens' },
+  { value: CW_SPECIFICATIONS.CW_20, label: 'CW-20' },
   { value: CW_SPECIFICATIONS.CW_721, label: 'CW-721' },
   { value: ERC_SPECIFICATIONS.ERC_20, label: 'ERC-20' },
   { value: ERC_SPECIFICATIONS.ERC_721, label: 'ERC-721' },

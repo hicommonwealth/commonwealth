@@ -18,17 +18,23 @@ export interface Disposable {
  */
 export type AdapterFactory<T extends Disposable> = (adapter?: T) => T;
 
+export type LogContext = {
+  // fingerprint is a Rollbar concept that helps Rollbar group error occurrences together
+  fingerprint?: string;
+  [key: string]: unknown;
+};
+
 /**
  * Logger port
  * Logs messages at different levels
  */
 export interface ILogger {
-  trace(msg: string, error?: Error, context?: Record<string, unknown>): void;
-  debug(msg: string, error?: Error, context?: Record<string, unknown>): void;
-  info(msg: string, error?: Error, context?: Record<string, unknown>): void;
-  warn(msg: string, error?: Error, context?: Record<string, unknown>): void;
-  error(msg: string, error?: Error, context?: Record<string, unknown>): void;
-  fatal(msg: string, error?: Error, context?: Record<string, unknown>): void;
+  trace(msg: string, error?: Error, context?: LogContext): void;
+  debug(msg: string, error?: Error, context?: LogContext): void;
+  info(msg: string, error?: Error, context?: LogContext): void;
+  warn(msg: string, error?: Error, context?: LogContext): void;
+  error(msg: string, error?: Error, context?: LogContext): void;
+  fatal(msg: string, error?: Error, context?: LogContext): void;
 }
 /**
  * Logger factory

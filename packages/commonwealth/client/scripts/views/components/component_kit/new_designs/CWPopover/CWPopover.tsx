@@ -102,6 +102,7 @@ const CWPopover = ({
   return (
     <PopperUnstyled
       id={id}
+      style={{ zIndex: 'unset' }}
       open={open}
       anchorEl={anchorEl}
       disablePortal={disablePortal}

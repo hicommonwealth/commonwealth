@@ -21,6 +21,7 @@
 - [Database Monitoring](Database-Monitoring.md)
 - [Database Migration Best Practices](Database-Migrations.md)
 - [Database Optimization](Database-Optimization.md)
+- [Enabling Community Governance](Enabling-Community-Governance.md)
 - [Sequelize](Sequelize.md)
 
 ## Services & Tooling

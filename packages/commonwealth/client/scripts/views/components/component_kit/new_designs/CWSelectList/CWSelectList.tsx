@@ -34,6 +34,7 @@ export const CWSelectList = <
     isSearchable,
     customError,
     components,
+    isMulti,
   } = props;
   const formContext = useFormContext();
   const formFieldContext = hookToForm
@@ -74,7 +75,9 @@ export const CWSelectList = <
   return (
     <div
       className={getClasses<{ disabled?: boolean }>(
-        { disabled: isDisabled },
+        {
+          disabled: isDisabled,
+        },
         'CWSelectList',
       )}
     >
@@ -122,12 +125,14 @@ export const CWSelectList = <
           failure?: boolean;
           disabled?: boolean;
           searchable?: boolean;
+          isMulti?: boolean;
         }>(
           {
             className: className,
             failure: !!formFieldErrorMessage || !!customError,
             searchable: isSearchable,
             disabled: isDisabled,
+            isMulti: isMulti,
           },
           ComponentType.SelectList,
         )}
