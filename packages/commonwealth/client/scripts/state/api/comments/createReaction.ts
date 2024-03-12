@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import { signCommentReaction } from 'client/scripts/controllers/server/sessions';
 import Reaction from 'models/Reaction';
 import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
@@ -20,7 +21,7 @@ const createReaction = async ({
   communityId,
   commentId,
 }: CreateReactionProps) => {
-  const canvasSignedData = await app.sessions.signCommentReaction(address, {
+  const canvasSignedData = await signCommentReaction(address, {
     comment_id: commentId,
     like: reactionType === 'like',
   });

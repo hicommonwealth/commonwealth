@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import { signComment } from 'client/scripts/controllers/server/sessions';
 import Comment from 'models/Comment';
 import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
@@ -23,7 +24,7 @@ const createComment = async ({
   unescapedText,
   parentCommentId = null,
 }: CreateCommentProps) => {
-  const canvasSignedData = await app.sessions.signComment(address, {
+  const canvasSignedData = await signComment(address, {
     thread_id: threadId,
     body: unescapedText,
     parent_comment_id: parentCommentId,

@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
+import { signThread } from 'client/scripts/controllers/server/sessions';
 import MinimumProfile from 'models/MinimumProfile';
 import Thread from 'models/Thread';
 import { ThreadStage } from 'models/types';
@@ -63,7 +64,7 @@ const editThread = async ({
   // for editing thread collaborators
   collaborators,
 }: EditThreadProps): Promise<Thread> => {
-  const canvasSignedData = await app.sessions.signThread(address, {
+  const canvasSignedData = await signThread(address, {
     community: app.activeChainId(),
     title: newTitle,
     body: newBody,
