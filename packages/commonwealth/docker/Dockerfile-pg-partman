@@ -58,4 +58,4 @@ RUN set -ex \
 # Copy the init script
 # The Docker Postgres initd script will run anything
 # in the directory /docker-entrypoint-initdb.d
-COPY initdb.sh /docker-entrypoint-initdb.d/initdb.sh
+#COPY initdb.sh /docker-entrypoint-initdb.d/initdb.sh
