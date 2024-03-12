@@ -78,7 +78,7 @@ class SessionsController {
       if (signer.match(address)) {
         // assume for now that we are using SIWESigner
         // TODO: add getCachedSession for other session signers
-        const session = await signer.getCachedSession(CANVAS_TOPIC, address);
+        const { session } = signer.getCachedSession(CANVAS_TOPIC, address);
 
         const sessionMessage: Message<Session> = {
           clock: 0,

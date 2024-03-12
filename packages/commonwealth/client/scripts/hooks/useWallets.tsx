@@ -367,7 +367,6 @@ const useWallets = (walletProps: IuseWalletProps) => {
         const timestamp = +new Date();
         const sessionSigner = await walletToUse.getSessionSigner();
         const session = await sessionSigner.getSession(CANVAS_TOPIC, {
-          chain: walletToUse.chain,
           timestamp,
         });
         await account.validate(session);
