@@ -38,7 +38,7 @@ const createComment = async ({
       parent_id: parentCommentId,
       text: encodeURIComponent(unescapedText),
       jwt: app.user.jwt,
-      ...toCanvasSignedDataApiArgs(canvasSignedData),
+      ...(await toCanvasSignedDataApiArgs(canvasSignedData)),
     },
   );
 

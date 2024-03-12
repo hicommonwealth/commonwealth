@@ -237,7 +237,7 @@ export const createThread = async (
       url,
       readOnly: readOnly || false,
       jwt,
-      ...toCanvasSignedDataApiArgs(canvasSignedData),
+      ...(await toCanvasSignedDataApiArgs(canvasSignedData)),
     });
   return res.body;
 };
@@ -350,7 +350,7 @@ export const createComment = async (args: CommentArgs) => {
       parent_id: parentCommentId,
       text,
       jwt,
-      ...toCanvasSignedDataApiArgs(canvasSignedData),
+      ...(await toCanvasSignedDataApiArgs(canvasSignedData)),
     });
   return res.body;
 };
@@ -449,7 +449,7 @@ export const createReaction = async (args: CreateReactionArgs) => {
       author_chain,
       jwt,
       thread_id,
-      ...toCanvasSignedDataApiArgs(canvasSignedData),
+      ...(await toCanvasSignedDataApiArgs(canvasSignedData)),
     });
   return res.body;
 };
@@ -518,7 +518,7 @@ export const createThreadReaction = async (args: CreateThreadReactionArgs) => {
       author_chain,
       jwt,
       thread_id,
-      ...toCanvasSignedDataApiArgs(canvasSignedData),
+      ...(await toCanvasSignedDataApiArgs(canvasSignedData)),
     });
   return res.body;
 };

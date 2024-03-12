@@ -18,7 +18,7 @@ function assertMatches(a, b, obj: string, field: string) {
 
 export const verifyComment = async (args: CanvasSignedDataApiArgs, fields) => {
   const { thread_id, text, address, parent_comment_id } = fields;
-  const parsedCanvasArguments = fromCanvasSignedDataApiArgs(args);
+  const parsedCanvasArguments = await fromCanvasSignedDataApiArgs(args);
 
   await verify(parsedCanvasArguments);
 
@@ -43,7 +43,7 @@ export const verifyComment = async (args: CanvasSignedDataApiArgs, fields) => {
 
 export const verifyThread = async (args: CanvasSignedDataApiArgs, fields) => {
   const { title, body, address, community, link, topic } = fields;
-  const parsedCanvasArguments = fromCanvasSignedDataApiArgs(args);
+  const parsedCanvasArguments = await fromCanvasSignedDataApiArgs(args);
 
   await verify(parsedCanvasArguments);
 
@@ -70,7 +70,7 @@ export const verifyThread = async (args: CanvasSignedDataApiArgs, fields) => {
 
 export const verifyReaction = async (args: CanvasSignedDataApiArgs, fields) => {
   const { thread_id, comment_id, proposal_id, address, value } = fields;
-  const parsedCanvasArguments = fromCanvasSignedDataApiArgs(args);
+  const parsedCanvasArguments = await fromCanvasSignedDataApiArgs(args);
 
   await verify(parsedCanvasArguments);
 

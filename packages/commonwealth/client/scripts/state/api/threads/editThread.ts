@@ -96,7 +96,7 @@ const editThread = async ({
     ...(topicId !== undefined && { topicId }),
     // for editing thread collaborators
     ...(collaborators !== undefined && { collaborators }),
-    ...toCanvasSignedDataApiArgs(canvasSignedData),
+    ...(await toCanvasSignedDataApiArgs(canvasSignedData)),
   });
 
   return new Thread(response.data.result);

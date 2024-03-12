@@ -27,7 +27,7 @@ const deleteThread = async ({
       community_id: chainId,
       address: address,
       jwt: app.user.jwt,
-      ...toCanvasSignedDataApiArgs(canvasSignedData),
+      ...(await toCanvasSignedDataApiArgs(canvasSignedData)),
     },
   });
 };

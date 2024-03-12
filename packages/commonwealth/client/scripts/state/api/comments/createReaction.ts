@@ -33,7 +33,7 @@ const createReaction = async ({
       address,
       reaction: reactionType,
       jwt: app.user.jwt,
-      ...toCanvasSignedDataApiArgs(canvasSignedData),
+      ...(await toCanvasSignedDataApiArgs(canvasSignedData)),
       comment_id: commentId,
     },
   );
