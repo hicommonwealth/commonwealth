@@ -7,10 +7,10 @@ Glossary terms referenced in a given term's definition are designated with CAPIT
 ## Contents
 
 - [Chain Concepts](#chain-concepts)
-  * [Chain Entity](#chain-entity)
+  * [Chain Base](#chain-base)
   * [Chain Node](#chain-node)
-  * [Delegate Contract](#delegate-contract)
   * [Module](#module)
+  * [Network](#network)
 - [Common App](#common-app)
   * [Bridge](#bridge)
   * [Comment](#comment)
@@ -47,29 +47,23 @@ Glossary terms referenced in a given term's definition are designated with CAPIT
 
 ## Chain Concepts
 
+_NB: The meaning of these terms within the Common context is idiosyncratic and specific; these terms should not be taken as canonical Web3 concepts._
+
 ### Chain Base
 
 A blockchain ecosystem, or L0, atop which NETWORK protocols are built.
-
-### Chain Entity
-
-A Chain Entity is a backend object, stored in the ChainEntities table, which consists of chain event bundles and values received from a smart contract.
 
 ### Chain Node
 
 An endpoint, referring to external RPC servers, used to fetch updates and query data from blockchains.
 
-### Delegate Contract
-
-A delegate contract is a smart contract that contains the functions, events, and all business logic for a proxy contract.
-
 ### Module
 
-Some CHAINS use modules rather than contracts. Modules are used predominantly within the Cosmos and Substrate ecosystems.
+Whereas contracts rely on a virtual machine running code atop a blockchain, modules are native extensions to a chain, seen predominantly within the Cosmos and Substrate ecosystems.
 
 ### Network
 
-An ecosystem of CHAIN NODES, or blockchain, built atop a CHAIN BASE.
+Network, as defined in the codebase, is a kludge of chains and chain ecosystems. Semantically, it refers only to the relevant `Chains` table database field; it has not been standardized, and lacks a real referent beyond determining which client code to load. (See step 4 of [App-Initialization-Flow.md](./App-Initialization-Flow.md))
 
 ## Common App
 
