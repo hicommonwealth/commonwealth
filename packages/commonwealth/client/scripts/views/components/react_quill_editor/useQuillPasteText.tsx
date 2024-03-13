@@ -9,10 +9,12 @@ import type { SerializableDeltaStatic } from './utils';
  * @param clipboardContents The content obtained from the clipboard.
  * @returns The modified content with consecutive newline characters halved.
  */
-
 const handleTextPaste = (clipboardContents: string) => {
   if (typeof clipboardContents === 'string') {
     const modifiedContent = clipboardContents.replace(/\n{2,}/g, (match) => {
+      if (match.length === 2) {
+        return match;
+      }
       const halfLength = Math.ceil(match.length / 2);
       return '\n'.repeat(halfLength);
     });
@@ -28,7 +30,6 @@ const handleTextPaste = (clipboardContents: string) => {
  * @param editorRef Ref to the React Quill editor sent down from parent.
  * @param isEditorFocused Boolean indicating whether the editor is currently focused.
  */
-
 export const useQuillPasteText = (
   setContentDelta: Dispatch<SetStateAction<SerializableDeltaStatic>>,
   contentDelta: SerializableDeltaStatic,
