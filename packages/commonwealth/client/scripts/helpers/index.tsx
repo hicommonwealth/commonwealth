@@ -333,12 +333,12 @@ export function getDecimals(chain: IChainAdapter<Coin, Account>): number {
   return decimals;
 }
 
-export const shortenIdentifier = (identifer: string) => {
+export const shortenIdentifier = (identifer: string, substrLength = 3) => {
   // Check if the string is longer than 6 characters
-  if (identifer.length > 6) {
+  if (identifer.length > substrLength * 2) {
     // Extract the first three and last three characters
-    const start = identifer.substring(0, 3);
-    const end = identifer.substring(identifer.length - 3);
+    const start = identifer.substring(0, substrLength);
+    const end = identifer.substring(identifer.length - substrLength);
     // Return the formatted string
     return `${start}...${end}`;
   } else {
