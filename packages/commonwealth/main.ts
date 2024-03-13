@@ -53,12 +53,11 @@ export async function main(app: express.Express) {
     )} GB`,
   );
 
-  const redisCache = new RedisCache();
-  await redisCache.init(REDIS_URL);
-  const cacheDecorator = new CacheDecorator(redisCache);
-  cache(redisCache);
+  REDIS_URL && cache(new RedisCache(REDIS_URL));
+  const cacheDecorator = new CacheDecorator();
 
   const DEV = process.env.NODE_ENV !== 'production';
+  !DEV && !REDIS_URL && log.error('Missing REDIS_URL in production!');
 
   // CLI parameters for which task to run
   const SHOULD_SEND_EMAILS = process.env.SEND_EMAILS === 'true';

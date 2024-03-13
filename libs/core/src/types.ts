@@ -119,6 +119,7 @@ export enum ChainNetwork {
   ERC20 = 'erc20',
   ERC721 = 'erc721',
   ERC1155 = 'erc1155',
+  CW20 = 'cw20',
   CW721 = 'cw721',
   Clover = 'clover',
   HydraDX = 'hydradx',
@@ -133,6 +134,7 @@ export enum ChainNetwork {
   Kava = 'kava',
   Kyve = 'kyve',
   Stargaze = 'stargaze',
+  Cosmos = 'cosmos',
 }
 
 export enum BalanceType {

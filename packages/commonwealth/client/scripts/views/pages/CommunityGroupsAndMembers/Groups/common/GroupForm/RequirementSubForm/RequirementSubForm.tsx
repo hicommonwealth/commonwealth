@@ -28,13 +28,15 @@ const RequirementSubForm = ({
   const is1155Requirement = requirementType === ERC_SPECIFICATIONS.ERC_1155;
   const isCosmosRequirement =
     requirementType === TOKENS.COSMOS_TOKEN ||
-    requirementType === CW_SPECIFICATIONS.CW_721;
+    requirementType === CW_SPECIFICATIONS.CW_721 ||
+    requirementType === CW_SPECIFICATIONS.CW_20;
   const helperTextForAmount = {
     [TOKENS.EVM_TOKEN]: 'Using 18 decimal precision',
     [TOKENS.COSMOS_TOKEN]: 'Using 6 decimal precision',
     [ERC_SPECIFICATIONS.ERC_20]: 'Using 18 decimal precision',
     [ERC_SPECIFICATIONS.ERC_721]: '',
     [CW_SPECIFICATIONS.CW_721]: '',
+    [CW_SPECIFICATIONS.CW_20]: 'Using 6 decimal precision',
   };
 
   useEffect(() => {
@@ -58,8 +60,10 @@ const RequirementSubForm = ({
           options={requirementTypes
             .filter((x) =>
               app.chain.base === ChainBase.CosmosSDK
-                ? x.value === TOKENS.COSMOS_TOKEN ||
-                  x.value === CW_SPECIFICATIONS.CW_721
+                ? [
+                    TOKENS.COSMOS_TOKEN,
+                    ...Object.values(CW_SPECIFICATIONS),
+                  ].includes(x.value)
                 : [
                     TOKENS.EVM_TOKEN,
                     ...Object.values(ERC_SPECIFICATIONS),
