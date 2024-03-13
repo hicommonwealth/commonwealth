@@ -1,5 +1,5 @@
-import { NotificationCategories } from '@hicommonwealth/core';
-import { ContractInstance, models } from '@hicommonwealth/model';
+import { NotificationCategories, dispose } from '@hicommonwealth/core';
+import { ContractInstance, models, tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import sinon from 'sinon';
 import { startEvmPolling } from '../../../../server/workers/evmChainEvents/startEvmPolling';
@@ -55,6 +55,7 @@ describe('EVM Chain Events End to End Tests', () => {
   let contract: ContractInstance;
 
   before(async () => {
+    await tester.seedDb();
     const currentBlock = (await sdk.getBlock()).number;
     // advance time to avoid test interaction issues
     await sdk.safeAdvanceTime(currentBlock + 501);
@@ -64,6 +65,10 @@ describe('EVM Chain Events End to End Tests', () => {
     await models.EvmEventSource.destroy({
       where: {},
     });
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   beforeEach(async () => {

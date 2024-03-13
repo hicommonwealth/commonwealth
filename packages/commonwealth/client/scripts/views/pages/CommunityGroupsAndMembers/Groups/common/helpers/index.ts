@@ -58,7 +58,8 @@ export const makeGroupDataBaseAPIPayload = (
     // for cosmos base
     if (
       x.requirementType === TOKENS.COSMOS_TOKEN ||
-      x.requirementType === CW_SPECIFICATIONS.CW_721
+      x.requirementType === CW_SPECIFICATIONS.CW_721 ||
+      x.requirementType === CW_SPECIFICATIONS.CW_20
     ) {
       payload.requirements.push({
         rule: 'threshold',

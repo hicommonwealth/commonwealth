@@ -134,6 +134,7 @@ function computeMembership(
     address.address,
     requirements,
     balances,
+    group.metadata.required_requirements,
   );
   return {
     group_id: group.id,

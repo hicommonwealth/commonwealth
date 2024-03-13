@@ -23,9 +23,8 @@ import GlobalActivityCache from './server/util/globalActivityCache';
 import ViewCountCache from './server/util/viewCountCache';
 
 const log = logger().getLogger(__filename);
-const redisCache = new RedisCache();
-const cacheDecorator = new CacheDecorator(redisCache);
-cache(redisCache);
+cache(new RedisCache('redis://localhost:6379'));
+export const cacheDecorator = new CacheDecorator();
 
 require('express-async-errors');
 
@@ -119,7 +118,5 @@ setupCosmosProxy(app, models, cacheDecorator);
 
 setupErrorHandlers(app);
 setupServer();
-
-export { cacheDecorator, redisCache };
 
 export default app;
