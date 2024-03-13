@@ -9,6 +9,7 @@ import RoleInfo from './RoleInfo';
 
 class ChainInfo {
   public readonly id: string;
+  public readonly chain_node_id: string;
   public readonly ChainNode: NodeInfo;
   public readonly tokenName: string;
   public readonly default_symbol: string;
@@ -74,6 +75,7 @@ class ChainInfo {
     type,
     decimals,
     substrateSpec,
+    chain_node_id,
     ChainNode,
     tokenName,
     adminOnlyPolling,
@@ -108,6 +110,7 @@ class ChainInfo {
     this.bech32Prefix = bech32_prefix;
     this.decimals = decimals;
     this.substrateSpec = substrateSpec;
+    this.chain_node_id = chain_node_id;
     this.ChainNode = ChainNode;
     this.tokenName = tokenName;
     this.adminOnlyPolling = adminOnlyPolling;
@@ -146,6 +149,7 @@ class ChainInfo {
     substrate_spec,
     token_name,
     Contracts,
+    chain_node_id,
     ChainNode,
     admin_only_polling,
     discord_config_id,
@@ -198,7 +202,8 @@ class ChainInfo {
       decimals: parseInt(decimals, 10),
       substrateSpec: substrate_spec,
       tokenName: token_name,
-      ChainNode,
+      chain_node_id,
+      ChainNode: app.config.nodes.getById(chain_node_id),
       adminOnlyPolling: admin_only_polling,
       discord_config_id,
       discordBotWebhooksEnabled: discord_bot_webhooks_enabled,
