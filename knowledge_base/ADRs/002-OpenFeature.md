@@ -8,10 +8,7 @@ Proposed: 240212 by Kurtis Assad (@kurtisassad)
 
 ## Context
 
-We need a more robust feature flagging system than what we currently had. We were using .env variables directly.
-This was a problem because webpack eagerly evaluates these, which means that if we want to change a feature flag
-on production, we would need to perform a re-deploy which would take about 20 minutes. We need a system that would
-allow us to toggle these features at runtime.
+We need a more robust feature flagging system than what we currently had. We were using .env variables directly. This was a problem because webpack eagerly evaluates these, which means that if we want to change a feature flag on production, we would need to perform a re-deploy which would take about 20 minutes. We need a system that would allow us to toggle these features at runtime.
 
 ## Decision
 
@@ -27,5 +24,4 @@ OpenFeature allows us to:
 
 ## Consequences
 
-As OpenFeature is an interface across many feature flagging providers, it can impose constraints on some providers,
-which would not allow us to utilize their full functionality.
+As OpenFeature is an interface across many feature flagging providers, it can impose constraints on some providers, which would not allow us to utilize their full functionality.

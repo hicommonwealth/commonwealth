@@ -10,7 +10,7 @@ The goal of this document is to describe the current state of the app initializa
     3. Returns the local variables `customDomain` and `isLoading`, which are used to define their respective equivalents in `useInitApp()`.
 4. `initAppState()` (`state/index.ts`) receives a `customDomain` argument from `useInitApp()`, and hits our `/status` endpoint.
     1. The `app` state variable is defined within `state/index.ts`, and its values are updated by the `initAppState`, using the `data` object returned by the `/status` route.
-        - More broadly, `initAppState()` is called on:app initialization, user login, user logout, and chain community creation.
+        - More broadly, `initAppState()` is called on:app initialization, user sign-in, user logout, and chain community creation.
     2. When the `/status` fetch is finished, app `isLoading` state is set to false.
 5. The `/status` endpoint is divided into two main data-fetches, `getChainStatus()` and `getUserStatus()`. `getChainStatus()` is always called; `getUserStatus()` is only called if a `user` object has been passed with the request.
     1. `getChainStatus()`: Grabs ChainStore, ChainNodes, NotificationCategories, and CommunitySnapshotSpaces, and threadCountQueryData entries.
@@ -18,7 +18,7 @@ The goal of this document is to describe the current state of the app initializa
 6. Once the `/status` data is received on callback, `initAppState()` clears and repopulates app state.
     1. Relevant controllers (e.g. user, config) are cleared.
     2. Nodes, recent activity, snapshot chains, roles, chain categories, notification categories, and notification category types are all repopulated.
-    3. Active user and login state are updated.
+    3. Active user and sign-in state are updated.
         - The websocket connection is initialized or disconnected depending on whether the user is logged in or out, respectively.
         - Sets the users’ starred communities, selected chain, and display name
     4. If a custom domain is passed as an argument to the invocation of `initAppState`, the `setCustomDomain` setter is fired. If the function's `shouldRedraw` param is set to true, then the app's `loginStateEmitter` emits a redraw.

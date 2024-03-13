@@ -5,6 +5,7 @@
 - [Commonwealth ReadMe](../packages/commonwealth/README.md)
 - [Ways of Working](Ways-Of-Working.md)
 - [Code Style (under development)](Code-Style.md)
+- [Glossary](Glossary.md)
 - [React Best Practices](React-Best-Practices-And-Improvements.md)
 - [Platform Coding Guidelines](Platform-Coding-Guidelines.md)
 - [Environment Variables](Environment-Variables.md)
