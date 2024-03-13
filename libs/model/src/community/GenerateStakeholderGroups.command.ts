@@ -20,36 +20,43 @@ const Errors = {
   NamespaceNotFound: 'Namespace not found for this name',
 };
 
-export const GenerateStakeholderGroups = (Command<
+export const GenerateStakeholderGroups: Command<
   typeof community.GenerateStakeholderGroups
 > = () => ({
   ...community.GenerateStakeholderGroups,
   auth: [],
-  body: async ({ id, payload }) => {
-    const community = await models.Community.findByPk(id);
+  body: async ({ id }) => {
+    const community = await models.Community.findByPk(id, {
+      include: [
+        {
+          model: models.Group,
+          as: 'groups',
+          where: {
+            community_id: id!,
+            is_system_managed: true,
+          },
+        },
+        {
+          model: models.CommunityStake,
+          as: 'communityStakes',
+          where: {
+            community_id: id!,
+          },
+        },
+      ],
+    });
+
     if (!community) {
       throw new InvalidState(Errors.CommunityNotFound);
     }
 
-    // get existing stakeholder groups
-    const existingStakeholderGroups = await models.Group.findAll({
-      where: {
-        community_id: id!,
-        is_system_managed: true,
-      },
-    });
-
-    // get stakes
-    const stakes = await models.CommunityStake.findAll({
-      where: { community_id: id },
-    });
-    if (stakes.length === 0) {
+    if (community.CommunityStakes?.length === 0) {
       throw new InvalidState(Errors.StakesNotFound);
     }
 
     // check which stakes need a stakeholder group
-    const stakesWithoutGroup = stakes.filter((stake) => {
-      return !existingStakeholderGroups.find(
+    const stakesWithoutGroup = community.CommunityStakes!.filter((stake) => {
+      return !community.groups!.find(
         (g) =>
           (
             (g.requirements?.[0]?.data as ThresholdData)
@@ -60,8 +67,8 @@ export const GenerateStakeholderGroups = (Command<
 
     if (stakesWithoutGroup.length === 0) {
       return {
-        ...community.get({ plain: true }),
-        groups: existingStakeholderGroups,
+        groups: community.groups,
+        created: false,
       };
     }
 
@@ -114,14 +121,14 @@ export const GenerateStakeholderGroups = (Command<
             { transaction },
           );
 
-          return group.toJSON();
+          return group.get({ plain: true });
         }),
       );
     });
 
     return {
-      ...community.get({ plain: true }),
       groups,
+      created: true,
     };
   },
-}));
+});

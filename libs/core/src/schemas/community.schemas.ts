@@ -228,7 +228,8 @@ export const Topic = z.object({
 
 export const GenerateStakeholderGroups = {
   input: z.object({}),
-  output: Community.extend({
-    groups: z.array(Group).optional(),
+  output: z.object({
+    groups: z.array(Group),
+    created: z.boolean(),
   }),
 };

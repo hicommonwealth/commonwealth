@@ -67,7 +67,7 @@ export const GroupMetadata = z.object({
 });
 
 export const Group = z.object({
-  id: z.number(),
+  id: z.number().optional(),
   community_id: z.string(),
   metadata: GroupMetadata,
   requirements: z.array(Requirement),
