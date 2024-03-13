@@ -19,12 +19,7 @@ const CommunityInfo = ({
   communityId = '',
 }: CommunityInfoProps) => {
   return (
-    <Link
-      className="CommunityInfo"
-      target="_blank"
-      rel="noreferrer"
-      to={`/${communityId}`}
-    >
+    <Link className="CommunityInfo" rel="noreferrer" to={`/${communityId}`}>
       <CWCommunityAvatar
         size="medium"
         community={{ iconUrl, name } as ChainInfo}
