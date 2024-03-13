@@ -10,9 +10,7 @@ import BanCache from '../server/util/banCheckCache';
 dotenv.config();
 
 async function main() {
-  const redisCache = new RedisCache();
-  await redisCache.init(REDIS_URL);
-  cache(redisCache);
+  REDIS_URL && cache(new RedisCache(REDIS_URL));
 
   const banCache = new BanCache(models);
 

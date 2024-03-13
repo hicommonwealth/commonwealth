@@ -3,24 +3,26 @@ import {
   ChainBase,
   ChainNetwork,
   ChainType,
+  CosmosGovernanceVersion,
   NotificationCategories,
   logger,
 } from '@hicommonwealth/core';
 import { QueryTypes, Sequelize } from 'sequelize';
+import {
+  CommunityAttributes,
+  CommunityContractAttributes,
+  ContractAttributes,
+  TopicAttributes,
+  UserAttributes,
+} from '../models';
 import type { ChainNodeAttributes } from '../models/chain_node';
 import {
   AddressSchema,
-  ChainNodeSchema,
-  CommunityContractSchema,
-  CommunitySchema,
   CommunityStakeSchema,
-  ContractSchema,
   NotificationCategorySchema,
   SnapshotProposalSchema,
   SnapshotSpaceSchema,
   SubscriptionSchema,
-  TopicSchema,
-  UserSchema,
 } from './mockTypes';
 import { SeedOptions, bulkSeed, seed } from './seed';
 
@@ -58,25 +60,19 @@ export const seedDb = async (debug = false): Promise<void> => {
 
     const seedOptions: SeedOptions = { mock: false };
 
-    const drew = await seed(
-      UserSchema,
+    const users: UserAttributes[] = [
       {
         email: 'drewstone329@gmail.com',
         emailVerified: true,
         isAdmin: true,
       },
-      seedOptions,
-    );
-
-    await seed(
-      UserSchema,
       {
         email: 'temp@gmail.com',
         emailVerified: true,
         isAdmin: true,
       },
-      seedOptions,
-    );
+    ];
+    const [drew] = await models.User.bulkCreate(users);
 
     const nodes: Record<string, ChainNodeAttributes> = {
       edgeware: {
@@ -119,9 +115,35 @@ export const seedDb = async (debug = false): Promise<void> => {
         alt_wallet_url: 'https://cosmos-devnet.herokuapp.com/lcd/',
         cosmos_chain_id: 'csdkv1',
         bech32: 'cosmos',
+        cosmos_gov_version: CosmosGovernanceVersion.v1,
+      },
+      csdkBetaLocal: {
+        url: 'http://localhost:5050/rpc',
+        name: 'CI: Cosmos SDK v0.45.0 devnet',
+        balance_type: BalanceType.Cosmos,
+        alt_wallet_url: 'http://localhost:5050/lcd/',
+        cosmos_chain_id: 'csdkbetalocal',
+        bech32: 'cosmos',
+        cosmos_gov_version: CosmosGovernanceVersion.v1beta1,
+      },
+      csdkV1CLocal: {
+        url: 'http://localhost:5051/rpc',
+        name: 'CI: Cosmos SDK v0.46.11 devnet',
+        balance_type: BalanceType.Cosmos,
+        alt_wallet_url: 'http://localhost:5051/lcd/',
+        cosmos_chain_id: 'csdkv1local',
+        bech32: 'cosmos',
+        cosmos_gov_version: CosmosGovernanceVersion.v1,
+      },
+      ethermintLocal: {
+        url: 'http://localhost:5052/rpc',
+        name: 'CI: Ethermint devnet',
+        balance_type: BalanceType.Cosmos,
+        alt_wallet_url: 'http://localhost:5052/lcd/',
+        cosmos_chain_id: 'evmosdevlocal',
+        bech32: 'cosmos',
       },
     };
-
     const [
       edgewareNode,
       mainnetNode,
@@ -129,60 +151,12 @@ export const seedDb = async (debug = false): Promise<void> => {
       osmosisNode,
       csdkBetaNode,
       csdkV1Node,
-    ] = await bulkSeed(ChainNodeSchema, Object.values(nodes), seedOptions);
+      csdkBetaLocalNode,
+      csdkV1LocalNode,
+      ethermintLocalNode,
+    ] = await models.ChainNode.bulkCreate(Object.values(nodes));
 
-    // Initialize different chain + node URLs
-    await seed(
-      CommunitySchema,
-      {
-        id: 'edgeware',
-        network: ChainNetwork.Edgeware,
-        default_symbol: 'EDG',
-        name: 'Edgeware',
-        icon_url: '/static/img/protocols/edg.png',
-        active: true,
-        type: ChainType.Chain,
-        base: ChainBase.Substrate,
-        ss58_prefix: 7,
-        has_chain_events_listener: false,
-        chain_node_id: edgewareNode.toJSON().id,
-      },
-      seedOptions,
-    );
-    await seed(
-      TopicSchema,
-      {
-        community_id: 'edgeware',
-        name: 'General',
-      },
-      seedOptions,
-    );
-    await seed(
-      CommunitySchema,
-      {
-        id: 'ethereum',
-        network: ChainNetwork.Ethereum,
-        default_symbol: 'ETH',
-        name: 'Ethereum',
-        icon_url: '/static/img/protocols/eth.png',
-        active: true,
-        type: ChainType.Chain,
-        base: ChainBase.Ethereum,
-        has_chain_events_listener: false,
-        chain_node_id: mainnetNode.toJSON().id,
-      },
-      seedOptions,
-    );
-    await seed(
-      TopicSchema,
-      {
-        community_id: 'ethereum',
-        name: 'General',
-      },
-      seedOptions,
-    );
-    const alex = await seed(
-      CommunitySchema,
+    const communities: CommunityAttributes[] = [
       {
         id: 'alex',
         network: ChainNetwork.ERC20,
@@ -193,114 +167,8 @@ export const seedDb = async (debug = false): Promise<void> => {
         type: ChainType.Token,
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
-        chain_node_id: testnetNode.toJSON().id,
+        chain_node_id: testnetNode.toJSON().id!,
       },
-      seedOptions,
-    );
-    await seed(
-      TopicSchema,
-      {
-        community_id: 'alex',
-        name: 'General',
-      },
-      seedOptions,
-    );
-    await seed(
-      CommunitySchema,
-      {
-        id: 'osmosis',
-        network: ChainNetwork.Osmosis,
-        default_symbol: 'OSMO',
-        name: 'Osmosis',
-        icon_url: '/static/img/protocols/cosmos.png',
-        active: true,
-        type: ChainType.Chain,
-        base: ChainBase.CosmosSDK,
-        has_chain_events_listener: false,
-        chain_node_id: osmosisNode.toJSON().id,
-        bech32_prefix: 'osmo',
-      },
-      seedOptions,
-    );
-    await seed(
-      TopicSchema,
-      {
-        community_id: 'osmosis',
-        name: 'General',
-      },
-      seedOptions,
-    );
-    await seed(
-      CommunitySchema,
-      {
-        id: 'csdk-beta',
-        network: ChainNetwork.Osmosis,
-        default_symbol: 'STAKE',
-        name: 'Cosmos SDK v0.45.0 devnet',
-        icon_url: '/static/img/protocols/cosmos.png',
-        active: true,
-        type: ChainType.Chain,
-        base: ChainBase.CosmosSDK,
-        has_chain_events_listener: false,
-        chain_node_id: csdkBetaNode.toJSON().id,
-        bech32_prefix: 'cosmos',
-      },
-      seedOptions,
-    );
-    await seed(
-      TopicSchema,
-      {
-        community_id: 'csdk-beta',
-        name: 'General',
-      },
-      seedOptions,
-    );
-    await seed(
-      CommunitySchema,
-      {
-        id: 'csdk',
-        network: ChainNetwork.Osmosis,
-        default_symbol: 'STAKE',
-        name: 'Cosmos SDK v0.46.11 devnet',
-        icon_url: '/static/img/protocols/cosmos.png',
-        active: true,
-        type: ChainType.Chain,
-        base: ChainBase.CosmosSDK,
-        has_chain_events_listener: true,
-        chain_node_id: csdkV1Node.toJSON().id,
-        bech32_prefix: 'cosmos',
-      },
-      seedOptions,
-    );
-    await seed(
-      TopicSchema,
-      {
-        community_id: 'csdk',
-        name: 'General',
-      },
-      seedOptions,
-    );
-    const alexContract = await seed(
-      ContractSchema,
-      {
-        address: '0xFab46E002BbF0b4509813474841E0716E6730136',
-        token_name: 'Alex',
-        symbol: 'ALEX',
-        type: ChainNetwork.ERC20,
-        chain_node_id: testnetNode.toJSON().id,
-      },
-      seedOptions,
-    );
-    await seed(
-      CommunityContractSchema,
-      {
-        community_id: alex.toJSON().id,
-        contract_id: alexContract.toJSON().id!,
-      },
-      seedOptions,
-    );
-    const yearn = await seed(
-      CommunitySchema,
       {
         id: 'yearn',
         network: ChainNetwork.ERC20,
@@ -311,39 +179,8 @@ export const seedDb = async (debug = false): Promise<void> => {
         type: ChainType.Token,
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
-        chain_node_id: mainnetNode.toJSON().id,
+        chain_node_id: mainnetNode.toJSON().id!,
       },
-      seedOptions,
-    );
-    await seed(
-      TopicSchema,
-      {
-        community_id: 'yearn',
-        name: 'General',
-      },
-      seedOptions,
-    );
-    const yearnContract = await seed(
-      ContractSchema,
-      {
-        address: '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e',
-        token_name: 'yearn',
-        symbol: 'YFI',
-        type: ChainNetwork.ERC20,
-        chain_node_id: mainnetNode.toJSON().id,
-      },
-      seedOptions,
-    );
-    await seed(
-      CommunityContractSchema,
-      {
-        community_id: yearn.toJSON().id,
-        contract_id: yearnContract.toJSON().id!,
-      },
-      seedOptions,
-    );
-    const sushi = await seed(
-      CommunitySchema,
       {
         id: 'sushi',
         network: ChainNetwork.ERC20,
@@ -355,39 +192,75 @@ export const seedDb = async (debug = false): Promise<void> => {
         type: ChainType.Token,
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
-        chain_node_id: mainnetNode.toJSON().id,
+        chain_node_id: mainnetNode.toJSON().id!,
       },
-      seedOptions,
-    );
-    await seed(
-      TopicSchema,
       {
-        community_id: 'sushi',
-        name: 'General',
+        id: 'edgeware',
+        network: ChainNetwork.Edgeware,
+        default_symbol: 'EDG',
+        name: 'Edgeware',
+        icon_url: '/static/img/protocols/edg.png',
+        active: true,
+        type: ChainType.Chain,
+        base: ChainBase.Substrate,
+        ss58_prefix: 7,
+        has_chain_events_listener: false,
+        chain_node_id: edgewareNode.toJSON().id!,
       },
-      seedOptions,
-    );
-    const sushiContract = await seed(
-      ContractSchema,
       {
-        address: '0x6b3595068778dd592e39a122f4f5a5cf09c90fe2',
-        token_name: 'sushi',
-        symbol: 'SUSHI',
-        type: ChainNetwork.ERC20,
-        chain_node_id: mainnetNode.toJSON().id,
+        id: 'ethereum',
+        network: ChainNetwork.Ethereum,
+        default_symbol: 'ETH',
+        name: 'Ethereum',
+        icon_url: '/static/img/protocols/eth.png',
+        active: true,
+        type: ChainType.Chain,
+        base: ChainBase.Ethereum,
+        has_chain_events_listener: false,
+        chain_node_id: mainnetNode.toJSON().id!,
       },
-      seedOptions,
-    );
-    await seed(
-      CommunityContractSchema,
+
       {
-        community_id: sushi.toJSON().id,
-        contract_id: sushiContract.toJSON().id!,
+        id: 'osmosis',
+        network: ChainNetwork.Osmosis,
+        default_symbol: 'OSMO',
+        name: 'Osmosis',
+        icon_url: '/static/img/protocols/cosmos.png',
+        active: true,
+        type: ChainType.Chain,
+        base: ChainBase.CosmosSDK,
+        has_chain_events_listener: false,
+        chain_node_id: osmosisNode.toJSON().id!,
+        bech32_prefix: 'osmo',
       },
-      seedOptions,
-    );
-    await seed(
-      CommunitySchema,
+      {
+        id: 'csdk-beta',
+        network: ChainNetwork.Osmosis,
+        default_symbol: 'STAKE',
+        name: 'Cosmos SDK v0.45.0 devnet',
+        icon_url: '/static/img/protocols/cosmos.png',
+        active: true,
+        type: ChainType.Chain,
+        base: ChainBase.CosmosSDK,
+        has_chain_events_listener: false,
+        chain_node_id: csdkBetaNode.toJSON().id!,
+        bech32_prefix: 'cosmos',
+      },
+
+      {
+        id: 'csdk',
+        network: ChainNetwork.Osmosis,
+        default_symbol: 'STAKE',
+        name: 'Cosmos SDK v0.46.11 devnet',
+        icon_url: '/static/img/protocols/cosmos.png',
+        active: true,
+        type: ChainType.Chain,
+        base: ChainBase.CosmosSDK,
+        has_chain_events_listener: true,
+        chain_node_id: csdkV1Node.toJSON().id!,
+        bech32_prefix: 'cosmos',
+      },
+
       {
         id: 'common-protocol',
         network: ChainNetwork.ERC20,
@@ -402,8 +275,143 @@ export const seedDb = async (debug = false): Promise<void> => {
         chain_node_id: 1263,
         namespace: 'IanSpace',
       },
-      seedOptions,
-    );
+      {
+        id: 'csdk-beta-local',
+        network: ChainNetwork.Osmosis,
+        default_symbol: 'STAKE',
+        name: 'CI: Cosmos SDK v0.45 devnet',
+        icon_url: '/static/img/protocols/cosmos.png',
+        active: true,
+        type: ChainType.Chain,
+        base: ChainBase.CosmosSDK,
+        has_chain_events_listener: true,
+        chain_node_id: csdkBetaLocalNode.id!,
+        bech32_prefix: 'cosmos',
+      },
+      {
+        id: 'csdk-v1-local',
+        network: ChainNetwork.Osmosis,
+        default_symbol: 'STAKE',
+        name: 'CI: Cosmos SDK v0.46.11 devnet',
+        icon_url: '/static/img/protocols/cosmos.png',
+        active: true,
+        type: ChainType.Chain,
+        base: ChainBase.CosmosSDK,
+        has_chain_events_listener: true,
+        chain_node_id: csdkV1LocalNode.id!,
+        bech32_prefix: 'cosmos',
+      },
+      {
+        id: 'evmos-dev-local',
+        network: ChainNetwork.Evmos,
+        default_symbol: 'STAKE',
+        name: 'CI: Ethermint devnet',
+        icon_url: '/static/img/protocols/cosmos.png',
+        active: true,
+        type: ChainType.Chain,
+        base: ChainBase.CosmosSDK,
+        has_chain_events_listener: true,
+        chain_node_id: ethermintLocalNode.id!,
+        bech32_prefix: 'cosmos',
+      },
+    ];
+    const [alex, yearn, sushi] = await models.Community.bulkCreate(communities);
+
+    const topics: TopicAttributes[] = [
+      {
+        community_id: 'sushi',
+        name: 'General',
+      },
+      {
+        community_id: 'edgeware',
+        name: 'General',
+      },
+      {
+        community_id: 'ethereum',
+        name: 'General',
+      },
+      {
+        community_id: 'alex',
+        name: 'General',
+      },
+      {
+        community_id: 'osmosis',
+        name: 'General',
+      },
+      {
+        community_id: 'csdk-beta',
+        name: 'General',
+      },
+      {
+        community_id: 'csdk',
+        name: 'General',
+      },
+      {
+        community_id: 'yearn',
+        name: 'General',
+      },
+      {
+        community_id: 'csdk-beta-local',
+        name: 'General',
+      },
+      {
+        community_id: 'csdk-v1-local',
+        name: 'General',
+      },
+      {
+        community_id: 'evmos-dev-local',
+        name: 'General',
+      },
+      {
+        name: 'Test Topic',
+        description: 'A topic made for testing',
+        community_id: 'ethereum',
+      },
+    ];
+    await models.Topic.bulkCreate(topics);
+
+    const contracts: ContractAttributes[] = [
+      {
+        address: '0xFab46E002BbF0b4509813474841E0716E6730136',
+        token_name: 'Alex',
+        symbol: 'ALEX',
+        type: ChainNetwork.ERC20,
+        chain_node_id: testnetNode.toJSON().id!,
+      },
+      {
+        address: '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e',
+        token_name: 'yearn',
+        symbol: 'YFI',
+        type: ChainNetwork.ERC20,
+        chain_node_id: mainnetNode.toJSON().id!,
+      },
+      {
+        address: '0x6b3595068778dd592e39a122f4f5a5cf09c90fe2',
+        token_name: 'sushi',
+        symbol: 'SUSHI',
+        type: ChainNetwork.ERC20,
+        chain_node_id: mainnetNode.toJSON().id!,
+      },
+    ];
+    const [alexContract, yearnContract, sushiContract] =
+      await models.Contract.bulkCreate(contracts);
+
+    const communityContracts: CommunityContractAttributes[] = [
+      {
+        community_id: alex.toJSON().id!,
+        contract_id: alexContract.toJSON().id!,
+      },
+      {
+        community_id: yearn.toJSON().id!,
+        contract_id: yearnContract.toJSON().id!,
+      },
+      {
+        community_id: sushi.toJSON().id!,
+        contract_id: sushiContract.toJSON().id!,
+      },
+    ];
+    await models.CommunityContract.bulkCreate(communityContracts);
+
     await seed(
       CommunityStakeSchema,
       {
@@ -551,6 +559,7 @@ export const seedDb = async (debug = false): Promise<void> => {
       },
       seedOptions,
     );
+
     await seed(
       SnapshotSpaceSchema,
       {
@@ -558,6 +567,7 @@ export const seedDb = async (debug = false): Promise<void> => {
       },
       seedOptions,
     );
+
     await seed(
       SnapshotProposalSchema,
       {
@@ -571,16 +581,6 @@ export const seedDb = async (debug = false): Promise<void> => {
         expire: new Date(
           new Date().getTime() + 100 * 24 * 60 * 60 * 1000,
         ).toString(),
-      },
-      seedOptions,
-    );
-
-    await seed(
-      TopicSchema,
-      {
-        name: 'Test Topic',
-        description: 'A topic made for testing',
-        community_id: 'ethereum',
       },
       seedOptions,
     );

@@ -80,9 +80,9 @@ export default function validateGroupMembership(
   if (numRequiredRequirements) {
     if (numRequirementsMet >= numRequiredRequirements) {
       // allow if minimum number of requirements met
-      return { isValid: true, numRequirementsMet };
+      return { ...response, isValid: true, numRequirementsMet };
     } else {
-      return { isValid: false, numRequirementsMet };
+      return { ...response, isValid: false, numRequirementsMet };
     }
   }
   return response;
