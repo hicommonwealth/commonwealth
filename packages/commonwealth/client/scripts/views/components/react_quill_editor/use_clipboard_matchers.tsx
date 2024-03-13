@@ -16,7 +16,7 @@ export const useClipboardMatchers = () => {
               align: false,
               color: false,
               background: false,
-            })
+            }),
           );
         },
       ],
