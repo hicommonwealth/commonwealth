@@ -47,7 +47,7 @@ export const setupErrorHandlers = (app: Express) => {
       });
     } else {
       if (error?.status < 500) {
-        log.warn(error.message || '', error, reqContext);
+        log.warn(error.message || 'Unknown client error', error, reqContext);
         res.status(error.status);
         res.json({
           error,
