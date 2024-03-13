@@ -2,9 +2,13 @@ import { PinoLogger } from '@hicommonwealth/adapters';
 import { logger } from '@hicommonwealth/core';
 import { S3 } from 'aws-sdk';
 import { execSync } from 'child_process';
+import * as dotenv from 'dotenv';
 import { createReadStream, createWriteStream } from 'fs';
 import { QueryTypes } from 'sequelize';
 import { createGzip } from 'zlib';
+
+// REQUIRED for S3 env var
+dotenv.config();
 
 const log = logger(PinoLogger()).getLogger(__filename);
 const S3_BUCKET_NAME = 'outbox-event-stream-archive';
@@ -138,7 +142,15 @@ async function getTablesToBackup(): Promise<string[]> {
 
   const tablesToArchive: string[] = [];
   for (let i = 0; i < tablesInPg.length; i++) {
-    if (!archiveExists[i]) tablesToArchive.push(tablesInPg[i]);
+    const s3Res = archiveExists[i];
+    if (s3Res.status === 'fulfilled' && !s3Res.value) {
+      tablesToArchive.push(tablesInPg[i]);
+    } else if (s3Res.status === 'rejected') {
+      log.error('Error fetching headObject from S3', undefined, {
+        reason: s3Res.reason,
+        table: tablesInPg[i],
+      });
+    }
   }
 
   return tablesToArchive;
