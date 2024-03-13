@@ -22,6 +22,8 @@ import { RTFtoMD, SerializableDeltaStatic, getTextFromDelta } from './utils';
 
 import { useQuillPasteText } from './useQuillPasteText';
 
+import { useClipboardMatchers } from './use_clipboard_matchers';
+
 import 'components/react_quill/react_quill_editor.scss';
 import 'react-quill/dist/quill.snow.css';
 import { MarkdownPreview } from './MarkdownPreview';
@@ -77,6 +79,8 @@ const ReactQuillEditor = ({
     editorRef,
     lastSelectionRef,
   });
+
+  const { clipboardMatchers } = useClipboardMatchers();
 
   // handle image upload for drag and drop
   const { handleImageDropAndPaste } = useImageDropAndPaste({
