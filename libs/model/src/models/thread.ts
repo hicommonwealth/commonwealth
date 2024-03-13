@@ -2,6 +2,7 @@ import { thread } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import { z } from 'zod';
+import { models } from '../database';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import { NotificationAttributes } from './notification';
@@ -141,6 +142,46 @@ export default (
         { fields: ['community_id', 'has_poll'] },
         { fields: ['canvas_hash'] },
       ],
+      hooks: {
+        afterCreate: async (
+          thread: ThreadInstance,
+          options: Sequelize.CreateOptions<ThreadAttributes>,
+        ) => {
+          // when thread created, increment Community.thread_count
+          await models.sequelize.query(
+            `
+            UPDATE "Communities"
+            SET thread_count = thread_count + 1
+            WHERE id = :communityId
+          `,
+            {
+              replacements: {
+                communityId: thread.community_id,
+              },
+              transaction: options.transaction,
+            },
+          );
+        },
+        afterDestroy: async (
+          thread: ThreadInstance,
+          options: Sequelize.InstanceDestroyOptions,
+        ) => {
+          // when thread deleted, decrement Community.thread_count
+          await models.sequelize.query(
+            `
+            UPDATE "Communities"
+            SET thread_count = thread_count - 1
+            WHERE id = :communityId
+          `,
+            {
+              replacements: {
+                communityId: thread.community_id,
+              },
+              transaction: options.transaction,
+            },
+          );
+        },
+      },
     },
   );
 

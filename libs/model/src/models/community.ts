@@ -29,6 +29,8 @@ export type CommunityAttributes = z.infer<typeof community.Community> & {
   Contract?: ContractInstance;
   CommunityStakes?: CommunityStakeAttributes[];
   groups?: GroupAttributes[];
+  thread_count?: number;
+  address_count?: number;
 };
 
 export type CommunityInstance = ModelInstance<CommunityAttributes> & {
@@ -122,6 +124,16 @@ export default (
         type: dataTypes.INTEGER,
         allowNull: true,
         defaultValue: null,
+      },
+      thread_count: {
+        type: dataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      address_count: {
+        type: dataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
       },
       namespace: { type: dataTypes.STRING, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: true },
