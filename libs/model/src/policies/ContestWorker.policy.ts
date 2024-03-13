@@ -1,8 +1,8 @@
-import { PolicyMetadata, events } from '@hicommonwealth/core';
+import { PolicyMetadata, schemas } from '@hicommonwealth/core';
 
 const inputs = {
-  ThreadCreated: events.schemas.ThreadCreated,
-  CommentCreated: events.schemas.CommentCreated,
+  ThreadCreated: schemas.events.ThreadCreated,
+  CommentCreated: schemas.events.CommentCreated,
 };
 
 export const ContestWorker = (): PolicyMetadata<typeof inputs> => ({

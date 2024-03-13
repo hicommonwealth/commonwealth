@@ -141,7 +141,7 @@ export const event = <
         const [[name, payload]] = Object.entries(input as object);
         return await core.event(
           md,
-          { name: name as core.events.Events, payload },
+          { name: name as core.schemas.Events, payload },
           false,
         );
       } catch (error) {

@@ -1,5 +1,5 @@
 import z, { ZodSchema, ZodUndefined } from 'zod';
-import { events } from '../schemas';
+import { Events, events } from '../schemas';
 
 /**
  * Error names as constants
@@ -181,7 +181,7 @@ export type QueryMetadata<S extends Schemas> = {
  * Domain event schemas
  */
 export type EventSchemas = {
-  [Name in events.Events]?: typeof events.schemas[Name];
+  [Name in Events]?: typeof events[Name];
 };
 
 /**

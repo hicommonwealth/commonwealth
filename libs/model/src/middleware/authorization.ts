@@ -3,9 +3,7 @@ import {
   CommandHandler,
   InvalidActor,
   InvalidInput,
-  comment,
-  community,
-  thread,
+  schemas,
 } from '@hicommonwealth/core';
 import { Op } from 'sequelize';
 import { AddressAttributes, Role, models } from '..';
@@ -51,15 +49,15 @@ const authorizeAddress = async (
 
 type CommunityMiddleware = CommandHandler<{
   input: any;
-  output: typeof community.Community;
+  output: typeof schemas.entities.Community;
 }>;
 type ThreadMiddleware = CommandHandler<{
   input: any;
-  output: typeof thread.Thread;
+  output: typeof schemas.entities.Thread;
 }>;
 type CommentMiddleware = CommandHandler<{
   input: any;
-  output: typeof comment.Comment;
+  output: typeof schemas.entities.Comment;
 }>;
 
 /**

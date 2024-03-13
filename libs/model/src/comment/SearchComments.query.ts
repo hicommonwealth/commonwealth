@@ -1,23 +1,17 @@
-import {
-  PaginationSqlOptions,
-  QueryMetadata,
-  buildPaginatedResponse,
-  buildPaginationSql,
-  comment,
-} from '@hicommonwealth/core';
+import { QueryMetadata, schemas } from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
 import { models } from '../database';
 
 export const SearchComments = (): QueryMetadata<
-  typeof comment.SearchComments
+  typeof schemas.queries.SearchComments
 > => ({
-  schemas: comment.SearchComments,
+  schemas: schemas.queries.SearchComments,
   auth: [],
   body: async ({ payload }) => {
     const { community_id, search, limit, page, orderBy, orderDirection } =
       payload;
     // sort by rank by default
-    let sortOptions: PaginationSqlOptions = {
+    let sortOptions: schemas.queries.PaginationSqlOptions = {
       limit: Math.min(limit, 100) || 10,
       page: page || 1,
       orderDirection,
@@ -39,7 +33,7 @@ export const SearchComments = (): QueryMetadata<
     }
 
     const { sql: paginationSort, bind: paginationBind } =
-      buildPaginationSql(sortOptions);
+      schemas.queries.buildPaginationSql(sortOptions);
 
     const bind: {
       searchTerm?: string;
@@ -107,6 +101,6 @@ export const SearchComments = (): QueryMetadata<
 
     const totalResults = parseInt(count, 10);
 
-    return buildPaginatedResponse(results, totalResults, bind);
+    return schemas.queries.buildPaginatedResponse(results, totalResults, bind);
   },
 });

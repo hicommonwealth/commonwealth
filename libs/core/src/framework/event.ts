@@ -1,5 +1,5 @@
 import { ZodError, ZodSchema } from 'zod';
-import { events } from '../schemas';
+import { Events, events } from '../schemas';
 import {
   InvalidInput,
   type EventContext,
@@ -17,12 +17,12 @@ import {
  * @throws {@link InvalidInput} when user invokes event with invalid payload, or rethrows internal domain errors
  */
 export const event = async <
-  Name extends events.Events,
+  Name extends Events,
   Input extends EventSchemas,
   Output extends ZodSchema,
 >(
   { inputs, body }: EventsHandlerMetadata<Input, Output>,
-  { name, payload }: EventContext<Name, typeof events.schemas[Name]>,
+  { name, payload }: EventContext<Name, typeof events[Name]>,
   validate = true,
 ): Promise<Partial<Output> | undefined> => {
   try {

@@ -1,10 +1,10 @@
-import { QueryMetadata, community } from '@hicommonwealth/core';
+import { QueryMetadata, schemas } from '@hicommonwealth/core';
 import { models } from '../database';
 
 export const GetCommunityStake = (): QueryMetadata<
-  typeof community.GetCommunityStake
+  typeof schemas.queries.GetCommunityStake
 > => ({
-  schemas: community.GetCommunityStake,
+  schemas: schemas.queries.GetCommunityStake,
   auth: [],
   body: async ({ payload }) => {
     return (
