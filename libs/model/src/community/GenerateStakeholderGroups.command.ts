@@ -1,11 +1,11 @@
 import {
   BalanceSourceType,
-  CommandMetadata,
   ContractSource,
   InvalidState,
   ThresholdData,
   commonProtocol,
   community,
+  type Command,
 } from '@hicommonwealth/core';
 import { ValidChains } from 'core/src/commonProtocol';
 import Web3 from 'web3';
@@ -20,10 +20,10 @@ const Errors = {
   NamespaceNotFound: 'Namespace not found for this name',
 };
 
-export const GenerateStakeholderGroups = (): CommandMetadata<
+export const GenerateStakeholderGroups = (Command<
   typeof community.GenerateStakeholderGroups
-> => ({
-  schemas: community.GenerateStakeholderGroups,
+> = () => ({
+  ...community.GenerateStakeholderGroups,
   auth: [],
   body: async ({ id, payload }) => {
     const community = await models.Community.findByPk(id);
@@ -124,4 +124,4 @@ export const GenerateStakeholderGroups = (): CommandMetadata<
       groups,
     };
   },
-});
+}));
