@@ -1,5 +1,5 @@
 import { AppError, Requirement } from '@hicommonwealth/core';
-import { GroupAttributes, GroupMetadata } from '@hicommonwealth/model';
+import { GroupAttributes, GroupMetadata, models } from '@hicommonwealth/model';
 import z from 'zod';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
@@ -44,6 +44,10 @@ export const updateGroupHandler = async (
     body: { metadata, requirements, topics },
   } = validationResult.data;
 
+  const { metadata: oldGroupMetadata } = await models.Group.findByPk(groupId, {
+    attributes: ['metadata'],
+  });
+
   const [group, analyticsOptions] = await controllers.groups.updateGroup({
     user,
     address,
@@ -53,8 +57,13 @@ export const updateGroupHandler = async (
     topics,
   });
 
-  // refresh memberships in background if requirements updated
-  if (requirements?.length > 0) {
+  // refresh memberships in background if requirements or
+  // required requirements updated
+  if (
+    requirements?.length > 0 ||
+    group.metadata.required_requirements !==
+      oldGroupMetadata.required_requirements
+  ) {
     controllers.groups
       .refreshCommunityMemberships({
         communityId: group.community_id,

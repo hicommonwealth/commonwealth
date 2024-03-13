@@ -2,14 +2,12 @@ import { CommandMetadata, InvalidState, community } from '@hicommonwealth/core';
 import { models } from '../database';
 import { isCommunityAdmin } from '../middleware';
 import { mustExist } from '../middleware/guards';
-import { CommunityAttributes } from '../models/index';
 import { commonProtocol } from '../services';
 
 export const SetCommunityStake = (): CommandMetadata<
-  CommunityAttributes,
-  typeof community.SetCommunityStake.input
+  typeof community.SetCommunityStake
 > => ({
-  schema: community.SetCommunityStake.input,
+  schemas: community.SetCommunityStake,
   auth: [isCommunityAdmin],
   body: async ({ id, payload }) => {
     // !load

@@ -15,7 +15,7 @@ const fetchRawEvmProposals = async (
     `${app.serverUrl()}${ApiEndpoints.FETCH_PROPOSALS}`,
     {
       params: {
-        chainId: communityId,
+        communityId: communityId,
       },
     },
   );

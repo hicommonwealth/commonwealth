@@ -8,6 +8,7 @@ import numeral from 'numeral';
 import 'pages/communities.scss';
 import React from 'react';
 import app from 'state';
+import useFetchActiveCommunitiesQuery from 'state/api/communities/fetchActiveCommunities';
 import {
   default as ChainInfo,
   default as CommunityInfo,
@@ -15,6 +16,7 @@ import {
 import { NewCommunityCard } from '../components/CommunityCard';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
+import CWCircleMultiplySpinner from '../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWModal } from '../components/component_kit/new_designs/CWModal';
 import { CWRelatedCommunityCard } from '../components/component_kit/new_designs/CWRelatedCommunityCard';
 import ManageCommunityStakeModal from '../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
@@ -159,7 +161,15 @@ const CommunitiesPage = () => {
     return res;
   };
 
-  const sortedCommunities = sortCommunities(app.config.chains.getAll());
+  const { data: activeCommunities, isLoading } =
+    useFetchActiveCommunitiesQuery();
+  const sortedCommunities = activeCommunities
+    ? sortCommunities(
+        activeCommunities.communities.map((c: any) =>
+          CommunityInfo.fromJSON(c),
+        ),
+      )
+    : [];
 
   return (
     <div className="CommunitiesPage">
@@ -169,7 +179,8 @@ const CommunitiesPage = () => {
             Explore Communities
           </CWText>
           <CWText type="h3" fontWeight="semiBold" className="communities-count">
-            {buildCommunityString(sortedCommunities.length)}
+            {activeCommunities &&
+              buildCommunityString(activeCommunities.totalCommunitiesCount)}
           </CWText>
         </div>
         <div className="filter-buttons">
@@ -217,10 +228,14 @@ const CommunitiesPage = () => {
           })}
         </div>
       </div>
-      <div className="communities-list">
-        {sortedCommunities}
-        <NewCommunityCard />
-      </div>
+      {isLoading ? (
+        <CWCircleMultiplySpinner />
+      ) : (
+        <div className="communities-list">
+          {sortedCommunities}
+          <NewCommunityCard />
+        </div>
+      )}
       <CWModal
         size="small"
         content={

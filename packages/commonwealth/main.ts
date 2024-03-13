@@ -6,7 +6,7 @@ import {
   getRabbitMQConfig,
   setupErrorHandlers,
 } from '@hicommonwealth/adapters';
-import { logger as _logger, cache } from '@hicommonwealth/core';
+import { cache, logger } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
@@ -20,8 +20,8 @@ import express, {
 } from 'express';
 import { redirectToHTTPS } from 'express-http-to-https';
 import session from 'express-session';
-import logger from 'morgan';
 import passport from 'passport';
+import pinoHttp from 'pino-http';
 import prerenderNode from 'prerender-node';
 import type { BrokerConfig } from 'rascal';
 import favicon from 'serve-favicon';
@@ -51,19 +51,18 @@ import ViewCountCache from './server/util/viewCountCache';
 require('express-async-errors');
 
 export async function main(app: express.Express) {
-  const log = _logger().getLogger(__filename);
+  const log = logger().getLogger(__filename);
   log.info(
     `Node Option max-old-space-size set to: ${JSON.stringify(
       v8.getHeapStatistics().heap_size_limit / 1000000000,
     )} GB`,
   );
 
-  const redisCache = new RedisCache();
-  await redisCache.init(REDIS_URL);
-  const cacheDecorator = new CacheDecorator(redisCache);
-  cache(redisCache);
+  REDIS_URL && cache(new RedisCache(REDIS_URL));
+  const cacheDecorator = new CacheDecorator();
 
   const DEV = process.env.NODE_ENV !== 'production';
+  !DEV && !REDIS_URL && log.error('Missing REDIS_URL in production!');
 
   // CLI parameters for which task to run
   const SHOULD_SEND_EMAILS = process.env.SEND_EMAILS === 'true';
@@ -157,8 +156,21 @@ export async function main(app: express.Express) {
     app.use(favicon(`${__dirname}/favicon.ico`));
     app.use('/static', express.static('static'));
 
-    // add other middlewares
-    app.use(logger('dev') as RequestHandler);
+    app.use(
+      pinoHttp({
+        quietReqLogger: false,
+        transport: {
+          target: 'pino-http-print',
+          options: {
+            destination: 1,
+            all: false,
+            colorize: true,
+            relativeUrl: true,
+            translateTime: 'HH:MM:ss.l',
+          },
+        },
+      }),
+    );
     app.use(expressStatsInit());
     app.use(json({ limit: '1mb' }) as RequestHandler);
     app.use(urlencoded({ limit: '1mb', extended: false }) as RequestHandler);
