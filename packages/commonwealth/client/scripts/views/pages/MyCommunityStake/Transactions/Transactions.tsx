@@ -51,8 +51,7 @@ const columnInfo = [
   },
   {
     key: 'etherscanLink',
-    // TODO: add ReactNode type in CWTable allow list
-    header: (<CWIcon iconName="etherscan" iconSize="regular" />) as any,
+    header: () => <CWIcon iconName="etherscan" iconSize="regular" />,
     numeric: false,
     sortable: false,
   },
