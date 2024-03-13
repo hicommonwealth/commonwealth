@@ -18,7 +18,7 @@ function dumpTablesSync(table: string, outputFile: string): boolean {
   const databaseUrl = process.env.DATABASE_URL;
 
   if (!databaseUrl) {
-    console.error('DATABASE_URL environment variable is not set.');
+    log.error('DATABASE_URL environment variable is not set.');
     return false;
   }
 
@@ -100,18 +100,30 @@ async function getTablesToBackup(): Promise<string[]> {
   `,
     { type: QueryTypes.SELECT, raw: true },
   );
+
+  if (result.length === 0) {
+    log.error(
+      'No possible archival tables found! Check the Outbox partition policy (pg_partman).',
+    );
+    return [];
+  }
+
   const tablesInPg = result.map((t) => t.table_name);
+  log.info('Possible tables found', undefined, {
+    tablesInPg,
+  });
 
   const s3 = new S3();
   const archiveExists = await Promise.allSettled(
     tablesInPg.map(async (t) => {
       try {
-        await s3
+        const res = await s3
           .headObject({
             Bucket: S3_BUCKET_NAME,
             Key: t,
           })
           .promise();
+        console.log('>>>>>>>>', res);
         return true;
       } catch (e) {
         if (e.statusCode === 404) return false;
@@ -119,6 +131,10 @@ async function getTablesToBackup(): Promise<string[]> {
       }
     }),
   );
+
+  log.info('Existing archives retrieved', undefined, {
+    archiveExists,
+  });
 
   const tablesToArchive: string[] = [];
   for (let i = 0; i < tablesInPg.length; i++) {
@@ -131,28 +147,40 @@ async function getTablesToBackup(): Promise<string[]> {
 async function main() {
   log.info('Checking outbox child table archive status...');
   const tables = await getTablesToBackup();
+  log.info(`Found ${tables.length} to archive`, undefined, {
+    tables,
+  });
 
   for (const table of tables) {
     const dumpName = `${table}/dump.sql`;
     const compressedName = `${dumpName}.gz`;
 
+    log.info(`Dumping table`, undefined, { table });
     const res = dumpTablesSync(table, dumpName);
     if (!res) continue;
+    log.info(`Dump complete`, undefined, { dumpName });
 
+    log.info('Compressing dump', undefined, { table });
     try {
       await compressFile(dumpName, compressedName);
     } catch (e) {
       log.error(`Failed to compress ${dumpName} to ${compressedName}`);
       continue;
     }
+    log.info('Compression complete beginning S3 upload', undefined, {
+      compressedName,
+    });
 
     await uploadToS3(compressedName);
+    log.info('S3 upload complete!');
   }
 
   if (tables.length > 0) {
     log.info('Archive outbox complete', undefined, {
       tables,
     });
+  } else {
+    log.info('No tables needed to be archived');
   }
 }
 
