@@ -44,3 +44,5 @@ export async function checkIconSize(val: string, ctx: z.RefinementCtx) {
     });
   }
 }
+
+export const zBoolean = z.preprocess((v) => v === 'true', z.boolean());

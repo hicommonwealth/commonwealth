@@ -18,7 +18,7 @@ import {
   type OpenApiMeta,
   type OpenApiRouter,
 } from 'trpc-openapi';
-import { ZodSchema, ZodUndefined, z } from 'zod';
+import { ZodObject, ZodSchema, ZodUndefined, z } from 'zod';
 
 interface Context {
   req: Request;
@@ -40,10 +40,10 @@ const authenticate = async (req: Request) => {
 
 const trpcerror = (error: unknown): TRPCError => {
   if (error instanceof Error) {
-    const { name, message } = error;
+    const { name, message, ...other } = error;
     switch (name) {
       case INVALID_INPUT_ERROR:
-        return new TRPCError({ code: 'BAD_REQUEST', message });
+        return new TRPCError({ code: 'BAD_REQUEST', message, ...other });
 
       case INVALID_ACTOR_ERROR:
         return new TRPCError({ code: 'UNAUTHORIZED', message });
@@ -74,7 +74,7 @@ export enum Tag {
   Integration = 'Integration',
 }
 
-export const command = <Input extends ZodSchema, Output extends ZodSchema>(
+export const command = <Input extends ZodObject<any>, Output extends ZodSchema>(
   factory: () => CommandMetadata<Input, Output>,
   tag: Tag,
 ) => {
@@ -85,10 +85,11 @@ export const command = <Input extends ZodSchema, Output extends ZodSchema>(
         method: 'POST',
         path: `/${tag.toLowerCase()}/{id}/${factory.name}`,
         tags: [tag],
+        headers: [{ name: 'address_id' }],
         protect: md.secure,
       },
     })
-    .input(md.input)
+    .input(md.input.extend({ id: z.string() })) // this might cause client typing issues
     .output(md.output)
     .mutation(async ({ ctx, input }) => {
       if (md.secure) await authenticate(ctx.req);
@@ -99,9 +100,9 @@ export const command = <Input extends ZodSchema, Output extends ZodSchema>(
             id: input?.id,
             actor: {
               user: ctx.req.user as core.User,
-              address_id: input?.address_id,
+              address_id: ctx.req.headers['address_id'] as string,
             },
-            payload: input,
+            payload: input!,
           },
           false,
         );
@@ -135,7 +136,7 @@ export const event = <
         const [[name, payload]] = Object.entries(input as object);
         return await core.event(
           md,
-          { name: name as core.events.Events, payload },
+          { name: name as core.schemas.Events, payload },
           false,
         );
       } catch (error) {
@@ -148,12 +149,14 @@ export const query = <Input extends ZodSchema, Output extends ZodSchema>(
   factory: () => QueryMetadata<Input, Output>,
 ) => {
   const md = factory();
+  //const input = md.input.extend({ address_id: z.string().optional() });
   return trpc.procedure
     .meta({
       openapi: {
         method: 'GET',
         path: `/${Tag.Query.toLowerCase()}/${factory.name}`,
         tags: [Tag.Query],
+        headers: [{ name: 'address_id' }],
       },
       protect: md.secure,
     })
@@ -167,9 +170,9 @@ export const query = <Input extends ZodSchema, Output extends ZodSchema>(
           {
             actor: {
               user: ctx.req.user as core.User,
-              address_id: input?.address_id,
+              address_id: ctx.req.headers['address_id'] as string,
             },
-            payload: input,
+            payload: input!,
           },
           false,
         );
@@ -191,6 +194,9 @@ export const toOpenApiExpress = (router: OpenApiRouter) =>
   createOpenApiExpressMiddleware({
     router,
     createContext: ({ req }) => ({ req }),
+    onError: ({ error }) => {
+      console.error(error.code, JSON.stringify(error.cause));
+    },
   });
 
 export const toOpenApiDocument = (
