@@ -4,8 +4,14 @@ import {
   BalanceType,
   cache,
   delay,
+  dispose,
 } from '@hicommonwealth/core';
-import { Balances, models, tokenBalanceCache } from '@hicommonwealth/model';
+import {
+  Balances,
+  models,
+  tester,
+  tokenBalanceCache,
+} from '@hicommonwealth/model';
 import BN from 'bn.js';
 import { expect } from 'chai';
 import Web3 from 'web3';
@@ -82,9 +88,13 @@ describe('Token Balance Cache EVM Tests', function () {
   const ethChainId = 1337;
 
   before(async () => {
-    const redisCache = new RedisCache();
-    await redisCache.init('redis://localhost:6379');
-    cache(redisCache);
+    await tester.seedDb();
+    cache(new RedisCache('redis://localhost:6379'));
+    await cache().ready();
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   describe('ERC20', () => {

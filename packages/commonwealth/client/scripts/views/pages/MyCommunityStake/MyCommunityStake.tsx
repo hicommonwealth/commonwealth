@@ -12,7 +12,7 @@ import './MyCommunityStake.scss';
 import Stakes from './Stakes';
 import Transactions from './Transactions';
 
-const TABS = ['My Stakes', 'Transaction History'] as const;
+const TABS = ['My stake', 'Transaction history'] as const;
 
 const FILTERS = {
   ALL_ADDRESSES: 'All addresses',
@@ -28,7 +28,7 @@ const MyCommunityStake = () => {
   return (
     <section className="MyCommunityStake">
       <CWText type="h2" className="header">
-        My community stake
+        My Community Stake
       </CWText>
 
       <section className="filters">

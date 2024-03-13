@@ -1,8 +1,8 @@
 import { QueryClient, setupGovExtension } from '@cosmjs/stargate';
 import * as tm from '@cosmjs/tendermint-rpc';
 import { GovV1Client, createLCDClient } from '@hicommonwealth/chains';
+import { CosmosGovernanceVersion } from '@hicommonwealth/core';
 import { CommunityInstance } from '@hicommonwealth/model';
-import { COSMOS_GOV_V1_CHAIN_IDS } from '../../../config';
 import { CosmosClientType, GovV1Beta1ClientType } from './types';
 
 export const CosmosClients: Record<string, CosmosClientType> = {};
@@ -13,7 +13,8 @@ export async function getCosmosClient<
   if (CosmosClients[community.id])
     return CosmosClients[community.id] as CosmosClient;
 
-  if (COSMOS_GOV_V1_CHAIN_IDS.includes(community.id)) {
+  const chainNode = await community.getChainNode();
+  if (chainNode?.cosmos_gov_version === CosmosGovernanceVersion.v1) {
     const result = await createLCDClient({
       restEndpoint: community.ChainNode.alt_wallet_url,
     });

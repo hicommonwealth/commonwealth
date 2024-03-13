@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction, useEffect } from 'react';
 import ReactQuill from 'react-quill';
 import type { SerializableDeltaStatic } from './utils';
 
+<<<<<<< HEAD
 /**
  * Helper function to eliminate extra new lines when pasting text
  * Since when you copy from Quill it adds n * 2 \n characters
@@ -29,6 +30,8 @@ const handleTextPaste = (clipboardContents: string) => {
  * @param isEditorFocused Boolean indicating whether the editor is currently focused.
  */
 
+=======
+>>>>>>> 4eafe1e2d1def96ad77c591de61698113205a1db
 export const useQuillPasteText = (
   setContentDelta: Dispatch<SetStateAction<SerializableDeltaStatic>>,
   contentDelta: SerializableDeltaStatic,
@@ -42,19 +45,29 @@ export const useQuillPasteText = (
     const handlePaste = (event) => {
       if (!isEditorFocused) return;
       event.preventDefault();
+<<<<<<< HEAD
       const pastedText = handleTextPaste(
         event.clipboardData.getData('text/plain'),
       );
 
       // Trick to get current cursor position
+=======
+      const pastedText = event.clipboardData.getData('text/plain');
+
+      //Trick to get current cursor position
+>>>>>>> 4eafe1e2d1def96ad77c591de61698113205a1db
       const selection = editor.getSelection(true);
 
       if (pastedText) {
         editor.insertText(selection.index, pastedText, 'user');
 
         setTimeout(() => {
+<<<<<<< HEAD
           const newCursorPosition = selection.index + pastedText.length;
           editor.setSelection(newCursorPosition as number, 0, 'silent');
+=======
+          editor.setSelection(selection.index + pastedText.length, 'silent');
+>>>>>>> 4eafe1e2d1def96ad77c591de61698113205a1db
         }, 10);
         return;
       }
