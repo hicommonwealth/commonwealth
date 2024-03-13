@@ -52,6 +52,10 @@ export const DATABASE_URI =
     ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
     : process.env.DATABASE_URL;
 
+!process.env.DATABASE_URL &&
+  process.env.NODE_ENV !== 'production' &&
+  log.warn(`NODE_ENV=${process.env.NODE_ENV} DB_URI=${DATABASE_URI}`);
+
 export const sequelize = new Sequelize(DATABASE_URI, {
   // disable string operators (https://github.com/sequelize/sequelize/issues/8417)
   // operatorsAliases: false,

@@ -1,8 +1,9 @@
 import { Log } from '@ethersproject/providers';
-import { AbiType } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { AbiType, dispose } from '@hicommonwealth/core';
+import { tester } from '@hicommonwealth/model';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import { getTestAbi } from 'test/integration/evmChainEvents/util';
 import {
   getEvents,
   getLogs,
@@ -37,13 +38,12 @@ describe('EVM Chain Events Log Processing Tests', () => {
     propQueuedLog: Log;
 
   before(async () => {
-    const abiRes = await models.ContractAbi.findOne({
-      where: {
-        nickname: 'FeiDAO',
-      },
-    });
+    await tester.seedDb();
+    abi = (await getTestAbi()).abi;
+  });
 
-    abi = abiRes.abi;
+  after(async () => {
+    await dispose()();
   });
 
   const expectAbi = () => expect(abi, 'ABI must be defined to run this test');
