@@ -17,7 +17,8 @@ export default (
   const outbox = <OutboxModelStatic>sequelize.define(
     'Outbox',
     {
-      id: { type: dataTypes.BIGINT, autoIncrement: true, primaryKey: false },
+      // Sequelize v6 doesn't support having an id column that isn't a primary key
+      // id: { type: dataTypes.BIGINT, autoIncrement: true, primaryKey: false },
       event_name: { type: dataTypes.STRING, allowNull: false },
       event_payload: { type: dataTypes.JSONB, allowNull: false },
       relayed: {
