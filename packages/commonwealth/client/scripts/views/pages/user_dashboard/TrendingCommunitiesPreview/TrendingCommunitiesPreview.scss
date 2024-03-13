@@ -34,7 +34,7 @@
   .community-preview-cards-collection {
     display: flex;
     flex-direction: column;
-    z-index: 10;
+    z-index: auto;
 
     @include mediumSmallInclusive {
       flex-direction: row;

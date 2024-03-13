@@ -1,8 +1,8 @@
 // Note, this login will not work for the homepage
+import { DATABASE_URI } from '@hicommonwealth/model';
 import { expect } from '@playwright/test';
 import * as process from 'process';
 import { Sequelize } from 'sequelize';
-import { DATABASE_URI } from '../../../server/config';
 
 // Logs in user for specific chain
 export async function login(page) {
