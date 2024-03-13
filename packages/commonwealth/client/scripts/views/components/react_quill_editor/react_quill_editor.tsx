@@ -21,11 +21,6 @@ import { useMention } from './use_mention';
 import { RTFtoMD, SerializableDeltaStatic, getTextFromDelta } from './utils';
 
 import { useQuillPasteText } from './useQuillPasteText';
-<<<<<<< HEAD
-
-import { useClipboardMatchers } from './use_clipboard_matchers';
-=======
->>>>>>> 4eafe1e2d1def96ad77c591de61698113205a1db
 
 import 'components/react_quill/react_quill_editor.scss';
 import 'react-quill/dist/quill.snow.css';
