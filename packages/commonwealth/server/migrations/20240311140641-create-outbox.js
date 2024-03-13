@@ -47,7 +47,7 @@ module.exports = {
           p_parent_table := 'public.outbox_relayed', -- parent natively paritioned table
           p_control := 'updated_at', -- TIMESTAMP column to partition over
           p_type := 'native', -- use PostgreSQL native partitioning func
-          p_interval := 'monthly', -- each table contains 1 month worth of events
+          p_interval := '1 month', -- each table contains 1 month worth of events
           p_premake := 2, -- create tables 2 months in advance
           p_jobmon := false -- Heroku Postgres doesn't have jobmon installed
         );
