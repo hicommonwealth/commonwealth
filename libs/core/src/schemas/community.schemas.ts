@@ -7,6 +7,7 @@ import {
   DefaultPage,
 } from '../types';
 import { ALL_COMMUNITIES, checkIconSize } from '../utils';
+import { Group } from './group.schemas';
 
 export const CommunityStake = z.object({
   id: z.number().optional(),
@@ -136,4 +137,11 @@ export const UpdateCommunity = {
     address: z.string(),
   }),
   output: Community,
+};
+
+export const GenerateStakeholderGroups = {
+  input: z.object({}),
+  output: Community.extend({
+    groups: z.array(Group).optional(),
+  }),
 };

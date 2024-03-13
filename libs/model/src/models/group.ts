@@ -12,7 +12,7 @@ export type GroupMetadata = {
 };
 
 export type GroupAttributes = {
-  id: number;
+  id?: number;
   community_id: string;
   metadata: GroupMetadata;
   requirements: Requirement[];
