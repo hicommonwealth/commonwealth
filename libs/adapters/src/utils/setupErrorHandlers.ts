@@ -50,6 +50,7 @@ export const setupErrorHandlers = (app: Express) => {
         log.warn(error.message || 'Unknown client error', error, reqContext);
         res.status(error.status);
         res.json({
+          status: error.status,
           error,
         });
       } else {
