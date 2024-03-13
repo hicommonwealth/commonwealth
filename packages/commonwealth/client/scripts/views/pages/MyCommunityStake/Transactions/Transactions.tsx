@@ -1,4 +1,4 @@
-import { shortenIdentifier } from 'helpers';
+import { formatAddressShort } from 'helpers';
 import React, { useEffect, useState } from 'react';
 import TimeAgo from 'react-timeago';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
@@ -114,7 +114,7 @@ const Transactions = ({ filterOptions }: TransactionsProps) => {
                     onMouseEnter={handleInteraction}
                     onMouseLeave={handleInteraction}
                   >
-                    {shortenIdentifier(tx.address, 5)}
+                    {formatAddressShort(tx.address, 5, 5)}
                   </span>
                 )}
               />
