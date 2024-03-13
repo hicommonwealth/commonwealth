@@ -180,19 +180,9 @@ jobs:
           yarn --cwd packages/commonwealth e2e-start-server --forbid-only &
           yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e-mature --forbid-only
 
-      - name: Setup tmate session
-        env:
-          PORT: 8080
-          IS_CI: true
-          USES_DOCKER_PGSQL: true
-          ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
-          ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
-          ETH_RPC: e2e-test
-        uses: mxschmitt/action-tmate@v3
-
       - name: Run e2e tests against prod
         env:
-          PORT: 8080
+          PORT: 8081
           IS_CI: true
           USES_DOCKER_PGSQL: true
           ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
