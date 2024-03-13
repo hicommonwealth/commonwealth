@@ -1,4 +1,6 @@
 import { commonProtocol } from '@hicommonwealth/core';
+import ChainInfo from 'client/scripts/models/ChainInfo';
+import { CommunityData } from 'client/scripts/views/pages/DirectoryPage/DirectoryPageContent';
 import app from 'state';
 import {
   useFetchEthUsdRateQuery,
@@ -12,16 +14,21 @@ interface UseStakeExchangeProps {
   mode: ManageCommunityStakeModalMode;
   address: string;
   numberOfStakeToExchange: number;
+  community?: ChainInfo | CommunityData;
 }
 
 const useStakeExchange = ({
   mode,
   address,
   numberOfStakeToExchange,
+  community,
 }: UseStakeExchangeProps) => {
-  const activeCommunityNamespace = app?.chain?.meta?.namespace;
-  const chainRpc = app?.chain?.meta?.ChainNode?.url;
-  const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
+  const activeCommunityNamespace =
+    community?.namespace || app?.chain?.meta?.namespace;
+  const chainRpc =
+    community?.ChainNode?.url || app?.chain?.meta?.ChainNode?.url;
+  const ethChainId =
+    community?.ChainNode?.ethChainId || app?.chain?.meta?.ChainNode?.ethChainId;
 
   const { data: userEthBalance, isLoading: userEthBalanceLoading } =
     useGetUserEthBalanceQuery({

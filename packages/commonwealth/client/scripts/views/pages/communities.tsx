@@ -3,15 +3,22 @@ import {
   ChainNetwork,
   CommunityCategoryType,
 } from '@hicommonwealth/core';
+import { useManageCommunityStakeModalStore } from 'client/scripts/state/ui/modals';
 import numeral from 'numeral';
 import 'pages/communities.scss';
 import React from 'react';
 import app from 'state';
-import CommunityInfo from '../../models/ChainInfo';
+import {
+  default as ChainInfo,
+  default as CommunityInfo,
+} from '../../models/ChainInfo';
 import { NewCommunityCard } from '../components/CommunityCard';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
+import { CWModal } from '../components/component_kit/new_designs/CWModal';
 import { CWRelatedCommunityCard } from '../components/component_kit/new_designs/CWRelatedCommunityCard';
+import ManageCommunityStakeModal from '../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
+import { CommunityData } from './DirectoryPage/DirectoryPageContent';
 
 const buildCommunityString = (numCommunities: number) =>
   numCommunities >= 1000
@@ -46,6 +53,14 @@ const CommunitiesPage = () => {
   const [filterMap, setFilterMap] = React.useState<Record<string, unknown>>(
     getInitialFilterMap(),
   );
+  const {
+    setModeOfManageCommunityStakeModal,
+    modeOfManageCommunityStakeModal,
+  } = useManageCommunityStakeModalStore();
+
+  const [selectedCommunity, setSelectedCommunity] = React.useState<
+    ChainInfo | CommunityData
+  >(null);
 
   const handleSetFilterMap = (key: string) => {
     setFilterMap((prevState) => ({ ...prevState, [key]: !filterMap[key] }));
@@ -134,8 +149,9 @@ const CommunitiesPage = () => {
           <CWRelatedCommunityCard
             key={i}
             community={community}
-            memberCount={community.members}
-            threadCount={community.threads}
+            memberCount="123"
+            threadCount="456"
+            setSelectedCommunity={setSelectedCommunity}
           />
         );
       });
@@ -205,6 +221,18 @@ const CommunitiesPage = () => {
         {sortedCommunities}
         <NewCommunityCard />
       </div>
+      <CWModal
+        size="small"
+        content={
+          <ManageCommunityStakeModal
+            mode={modeOfManageCommunityStakeModal}
+            onModalClose={() => setModeOfManageCommunityStakeModal(null)}
+            community={selectedCommunity}
+          />
+        }
+        onClose={() => setModeOfManageCommunityStakeModal(null)}
+        open={!!modeOfManageCommunityStakeModal}
+      />
     </div>
   );
 };

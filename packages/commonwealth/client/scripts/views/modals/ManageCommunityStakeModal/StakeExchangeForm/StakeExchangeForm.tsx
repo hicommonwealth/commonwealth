@@ -40,6 +40,8 @@ import {
   CustomAddressOptionElement,
 } from './CustomAddressOption';
 
+import ChainInfo from 'client/scripts/models/ChainInfo';
+import { CommunityData } from 'client/scripts/views/pages/DirectoryPage/DirectoryPageContent';
 import './StakeExchangeForm.scss';
 
 type OptionDropdown = {
@@ -56,6 +58,7 @@ interface StakeExchangeFormProps {
   addressOptions: OptionDropdown[];
   numberOfStakeToExchange: number;
   onSetNumberOfStakeToExchange: React.Dispatch<React.SetStateAction<number>>;
+  community?: ChainInfo | CommunityData;
 }
 
 const StakeExchangeForm = ({
@@ -67,6 +70,7 @@ const StakeExchangeForm = ({
   addressOptions,
   numberOfStakeToExchange,
   onSetNumberOfStakeToExchange,
+  community,
 }: StakeExchangeFormProps) => {
   const chainRpc = app?.chain?.meta?.ChainNode?.url;
   const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
@@ -82,10 +86,11 @@ const StakeExchangeForm = ({
     mode,
     address: selectedAddress?.value,
     numberOfStakeToExchange: numberOfStakeToExchange ?? 0,
+    community,
   });
 
   const { stakeBalance, stakeValue, currentVoteWeight, stakeData } =
-    useCommunityStake({ walletAddress: selectedAddress?.value });
+    useCommunityStake({ walletAddress: selectedAddress?.value, community });
 
   const { mutateAsync: buyStake } = useBuyStakeMutation();
   const { mutateAsync: sellStake } = useSellStakeMutation();

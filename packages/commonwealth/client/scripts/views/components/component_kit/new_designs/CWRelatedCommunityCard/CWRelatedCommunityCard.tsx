@@ -26,6 +26,9 @@ type CWRelatedCommunityCardProps = {
   memberCount: string;
   threadCount: string;
   stakeChange?: number;
+  setSelectedCommunity?: React.Dispatch<
+    React.SetStateAction<ChainInfo | CommunityData>
+  >;
 };
 
 export const CWRelatedCommunityCard = ({
@@ -33,6 +36,7 @@ export const CWRelatedCommunityCard = ({
   memberCount,
   threadCount,
   stakeChange,
+  setSelectedCommunity,
 }: CWRelatedCommunityCardProps) => {
   const navigate = useCommonNavigate();
   const { stakeEnabled, stakeValue } = useCommunityStake({
@@ -70,6 +74,7 @@ export const CWRelatedCommunityCard = ({
   );
 
   const handleBuyStakeClick = async () => {
+    setSelectedCommunity(community);
     if (!isCommunityMember && !hasJoinedCommunity) {
       const joined = await handleJoinCommunity();
 
