@@ -1,36 +1,30 @@
 import { Dispatch, SetStateAction, useEffect } from 'react';
+import ReactQuill from 'react-quill';
 import type { SerializableDeltaStatic } from './utils';
 
-export const useNotionPaste = (
+export const useQuillPasteText = (
   setContentDelta: Dispatch<SetStateAction<SerializableDeltaStatic>>,
   contentDelta: SerializableDeltaStatic,
-  editorRef,
+  editorRef: React.RefObject<ReactQuill>,
   isEditorFocused: boolean,
 ) => {
   useEffect(() => {
-    const editor = editorRef.current?.getEditor();
+    const editor = editorRef?.current?.getEditor();
+
+    if (!editor) return;
     const handlePaste = (event) => {
       if (!isEditorFocused) return;
       event.preventDefault();
       const pastedText = event.clipboardData.getData('text/plain');
 
+      //Trick to get current cursor position
+      const selection = editor.getSelection(true);
+
       if (pastedText) {
-        setContentDelta((prevContentDelta) => {
-          return {
-            ...prevContentDelta,
-            ops: [
-              ...prevContentDelta.ops,
-              {
-                insert: pastedText,
-              },
-            ],
-            ___isMarkdown: true,
-          };
-        });
+        editor.insertText(selection.index, pastedText, 'user');
 
         setTimeout(() => {
-          const newCursorPosition = editor.getLength() - 1;
-          editor.setSelection(newCursorPosition, newCursorPosition);
+          editor.setSelection(selection.index + pastedText.length, 'silent');
         }, 10);
         return;
       }

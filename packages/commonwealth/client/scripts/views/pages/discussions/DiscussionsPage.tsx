@@ -73,7 +73,9 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     dateRange: searchParams.get('dateRange') as ThreadTimelineFilterTypes,
   });
 
-  const isOnArchivePage = location.pathname === `/${community_id}/archived`;
+  const isOnArchivePage =
+    location.pathname ===
+    (app.isCustomDomain() ? `/archived` : `/${app.activeChainId()}/archived`);
 
   const { fetchNextPage, data, isInitialLoading, hasNextPage } =
     trpc.thread.getBulkThreads.useInfiniteQuery(

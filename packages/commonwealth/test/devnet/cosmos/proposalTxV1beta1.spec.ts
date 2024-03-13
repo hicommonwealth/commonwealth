@@ -1,4 +1,5 @@
 import { isDeliverTxSuccess } from '@cosmjs/stargate';
+import { tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import { CosmosApiType } from 'controllers/chain/cosmos/chain';
 import {
@@ -25,14 +26,15 @@ import {
 
 const { expect, assert } = chai;
 
-describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => {
+describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-local)', () => {
   let rpc: CosmosApiType;
   let signer: string;
   // v1beta1 CI devnet
-  const betaId = 'csdk-beta-ci';
+  const betaId = 'csdk-beta-local';
   const rpcUrlBeta = `http://localhost:8080/cosmosAPI/${betaId}`;
 
   before(async () => {
+    await tester.seedDb();
     const tm = await getTMClient(rpcUrlBeta);
     rpc = await getRPCClient(tm);
     const { signerAddress } = await setupTestSigner(rpcUrlBeta);
@@ -166,9 +168,12 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => 
 });
 
 describe('Cosmos Governance v1beta1 util Tests', () => {
+  before(async () => {
+    await tester.seedDb();
+  });
   describe('getActiveProposals', () => {
-    it('should fetch active proposals (csdk-beta-ci)', async () => {
-      const id = 'csdk-beta-ci'; // CI devnet for v1beta1
+    it('should fetch active proposals (csdk-beta-local)', async () => {
+      const id = 'csdk-beta-local'; // CI devnet for v1beta1
       const tmClient = await getTMClient(
         `http://localhost:8080/cosmosAPI/${id}`,
       );

@@ -13,6 +13,20 @@ body {
   //Prevents overscroll on macOS
   position: fixed;
   overflow: hidden;
+
+  // Target safari versions from 12.x to 16.3 which don't support the `dvh`
+  // unit, here 12.x is chosen as arbitrary lower limit (released in 2015)
+  // see https://caniuse.com/?search=dvh%20 for reference
+  &[class^='safari_'][class*='12.'],
+  &[class^='safari_'][class*='13.'],
+  &[class^='safari_'][class*='14.'],
+  &[class^='safari_'][class*='15.'],
+  &[class^='safari_'][class*='16.0'],
+  &[class^='safari_'][class*='16.1'],
+  &[class^='safari_'][class*='16.2'],
+  &[class^='safari_'][class*='16.3'] {
+    height: 100vh;
+  }
 }
 
 #root {
