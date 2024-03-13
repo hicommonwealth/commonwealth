@@ -1,12 +1,14 @@
-export * as address from './address.schemas';
-export * as chainNode from './chainNode.schemas';
-export * as comment from './comment.schemas';
-export * as community from './community.schemas';
-export * as events from './events.schemas';
-export * as group from './group.schemas';
-export * as notification from './notification.schemas';
-export * as snapshot from './snapshot.schemas';
-export * as subscription from './subscription.schemas';
-export * as thread from './thread.schemas';
-export * as todo from './todo.schemas';
-export * as user from './user.schemas';
+import * as events from './events.schemas';
+export type Events = keyof typeof events;
+export { events };
+
+import * as entities from './entities.schemas';
+export type Entities = keyof typeof entities;
+export type Aggregates = Extract<
+  Entities,
+  'User' | 'Community' | 'Thread' | 'Comment' | 'Contract'
+>;
+export { entities };
+
+export * as commands from './commands';
+export * as queries from './queries';
