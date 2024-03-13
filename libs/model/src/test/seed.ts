@@ -1,5 +1,4 @@
 import { generateMock } from '@anatine/zod-mock';
-import { schemas } from '@hicommonwealth/core';
 import { Model, ModelStatic } from 'sequelize';
 import z from 'zod';
 
@@ -19,7 +18,7 @@ type GeneratedProp = typeof GENERATED_PROPS[number];
 // for deterministic randomness when the order of calls is preserved
 let seedNum = 1;
 
-type E = keyof typeof schemas;
+//type E = keyof typeof schemas;
 
 export type SchemaWithModel<T extends z.AnyZodObject> = {
   schema: T;

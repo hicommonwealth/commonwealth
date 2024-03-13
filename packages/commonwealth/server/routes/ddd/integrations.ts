@@ -1,5 +1,5 @@
 import { trpc } from '@hicommonwealth/adapters';
-import { analytics, schemas, type PolicyMetadata } from '@hicommonwealth/core';
+import { analytics, schemas, type Policy } from '@hicommonwealth/core';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 
 const inputs = {
@@ -8,7 +8,7 @@ const inputs = {
   CommentCreated: schemas.events.CommentCreated,
 };
 
-const Analytics: () => PolicyMetadata<typeof inputs> = () => ({
+const Analytics: Policy<typeof inputs> = () => ({
   inputs,
   body: {
     GroupCreated: async ({ name, payload }) => {

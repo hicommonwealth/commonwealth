@@ -1,11 +1,11 @@
-import { QueryMetadata, schemas } from '@hicommonwealth/core';
+import { schemas, type Query } from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
 import { models } from '../database';
 
-export const SearchComments = (): QueryMetadata<
+export const SearchComments: Query<
   typeof schemas.queries.SearchComments
-> => ({
-  schemas: schemas.queries.SearchComments,
+> = () => ({
+  ...schemas.queries.SearchComments,
   auth: [],
   body: async ({ payload }) => {
     const { community_id, search, limit, page, orderBy, orderDirection } =
