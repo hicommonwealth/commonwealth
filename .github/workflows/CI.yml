@@ -22,7 +22,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres
+        image: hicommonwealth/cw_postgres:latest
         env:
           POSTGRES_USER: commonwealth
           POSTGRES_DB: commonwealth
@@ -113,7 +113,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres
+        image: hicommonwealth/cw_postgres:latest
         env:
           POSTGRES_USER: commonwealth
           POSTGRES_DB: commonwealth
@@ -203,7 +203,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres
+        image: hicommonwealth/cw_postgres:latest
         env:
           POSTGRES_USER: commonwealth
           POSTGRES_DB: commonwealth
@@ -367,7 +367,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres
+        image: hicommonwealth/cw_postgres:latest
         env:
           POSTGRES_USER: commonwealth
           POSTGRES_DB: commonwealth
@@ -429,7 +429,7 @@ jobs:
         node: [ 20 ]
     services:
       postgres:
-        image: postgres
+        image: hicommonwealth/cw_postgres:latest
         env:
           POSTGRES_USER: commonwealth
           POSTGRES_DB: commonwealth

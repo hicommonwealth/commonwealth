@@ -6,7 +6,7 @@ module.exports = {
       // https://stackoverflow.com/questions/66475018/install-pg-partman-on-macos
       await queryInterface.sequelize.query(
         `
-        CREATE EXTENSION pg_partman;
+        CREATE EXTENSION IF NOT EXISTS pg_partman;
       `,
         { transaction },
       );
