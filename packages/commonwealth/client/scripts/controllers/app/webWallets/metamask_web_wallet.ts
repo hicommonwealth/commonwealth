@@ -187,7 +187,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       ).map((addr) => {
         return Web3.utils.toChecksumAddress(addr);
       });
-      this._provider = this._web3.currentProvider;
+      this._provider = this._web3.currentProvider ?? this._web3.givenProvider;
       if (this._accounts.length === 0) {
         throw new Error('Metamask fetched no accounts');
       }
