@@ -14,10 +14,10 @@ export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: typeof DataTypes,
 ): OutboxModelStatic => {
-  return <OutboxModelStatic>sequelize.define(
+  const outbox = <OutboxModelStatic>sequelize.define(
     'Outbox',
     {
-      id: { type: dataTypes.BIGINT, autoIncrement: true },
+      id: { type: dataTypes.BIGINT, autoIncrement: true, primaryKey: false },
       event_name: { type: dataTypes.STRING, allowNull: false },
       event_payload: { type: dataTypes.JSONB, allowNull: false },
       relayed: {
@@ -36,4 +36,7 @@ export default (
       underscored: false,
     },
   );
+
+  outbox.removeAttribute('id');
+  return outbox;
 };
