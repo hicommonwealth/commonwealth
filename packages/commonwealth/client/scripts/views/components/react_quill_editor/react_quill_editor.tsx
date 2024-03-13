@@ -78,8 +78,6 @@ const ReactQuillEditor = ({
     lastSelectionRef,
   });
 
-  const { clipboardMatchers } = useClipboardMatchers();
-
   // handle image upload for drag and drop
   const { handleImageDropAndPaste } = useImageDropAndPaste({
     editorRef,
