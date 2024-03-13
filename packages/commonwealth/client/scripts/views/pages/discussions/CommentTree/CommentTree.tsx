@@ -5,7 +5,7 @@ import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { CommentsFeaturedFilterTypes } from 'models/types';
 import type { DeltaStatic } from 'quill';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import app from 'state';
 import {
   useDeleteCommentMutation,
@@ -147,6 +147,16 @@ export const CommentTree = ({
     fromDiscordBot,
     isLoggedIn,
   });
+
+  const scrollToRef = useRef(null);
+
+  const scrollToElement = () => {
+    if (scrollToRef.current) {
+      scrollToRef.current.scrollIntoView({
+        behavior: 'smooth',
+      });
+    }
+  };
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
   const handleIsReplying = (isReplying: boolean, id?: number) => {
@@ -444,6 +454,7 @@ export const CommentTree = ({
                   </div>
                 )}
                 <CommentCard
+                  scrollToElement={scrollToElement}
                   disabledActionsTooltipText={disabledActionsTooltipText}
                   isThreadArchived={!!thread.archivedAt}
                   canReply={
@@ -485,6 +496,7 @@ export const CommentTree = ({
                   comment={comment}
                 />
               </div>
+              <div ref={scrollToRef}></div>
               {isReplying && parentCommentId === comment.id && (
                 <CreateComment
                   handleIsReplying={handleIsReplying}
