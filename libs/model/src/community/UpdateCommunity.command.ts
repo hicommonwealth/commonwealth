@@ -1,13 +1,13 @@
-import { CommandMetadata, community } from '@hicommonwealth/core';
+import { community, type Command } from '@hicommonwealth/core';
 import { models } from '../database';
 import { isCommunityAdmin } from '../middleware';
 import { mustExist } from '../middleware/guards';
 import { commonProtocol } from '../services';
 
-export const UpdateCommunity = (): CommandMetadata<
+export const UpdateCommunity: Command<
   typeof community.UpdateCommunity
-> => ({
-  schemas: community.UpdateCommunity,
+> = () => ({
+  ...community.UpdateCommunity,
   auth: [isCommunityAdmin],
   body: async ({ id, payload }) => {
     const community = await models.Community.findOne({ where: { id } });
