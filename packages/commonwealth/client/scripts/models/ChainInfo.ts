@@ -12,6 +12,8 @@ class ChainInfo {
   public readonly chain_node_id: string;
   public readonly ChainNode: NodeInfo;
   public readonly tokenName: string;
+  public readonly thread_count: number;
+  public readonly address_count: number;
   public readonly default_symbol: string;
   public name: string;
   public readonly network: ChainNetwork;
@@ -85,6 +87,8 @@ class ChainInfo {
     directoryPageChainNodeId,
     namespace,
     redirect,
+    thread_count,
+    address_count,
   }) {
     this.id = id;
     this.network = network;
@@ -121,6 +125,8 @@ class ChainInfo {
     this.directoryPageChainNodeId = directoryPageChainNodeId;
     this.namespace = namespace;
     this.redirect = redirect;
+    this.thread_count = thread_count;
+    this.address_count = address_count;
   }
 
   public static fromJSON({
@@ -158,6 +164,8 @@ class ChainInfo {
     directory_page_chain_node_id,
     namespace,
     redirect,
+    thread_count,
+    address_count,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -211,6 +219,8 @@ class ChainInfo {
       directoryPageChainNodeId: directory_page_chain_node_id,
       namespace,
       redirect,
+      thread_count,
+      address_count,
     });
   }
 

@@ -23,8 +23,8 @@ import { addPeriodToText } from './utils';
 
 type CWRelatedCommunityCardProps = {
   community: ChainInfo | CommunityData;
-  memberCount: string;
-  threadCount: string;
+  memberCount: number;
+  threadCount: number;
   stakeChange?: number;
   setSelectedCommunity?: React.Dispatch<
     React.SetStateAction<ChainInfo | CommunityData>
@@ -137,11 +137,11 @@ export const CWRelatedCommunityCard = ({
             <div className="member-data">
               <CWIcon iconName="users" iconSize="small" />
               <span className="count">
-                {Number(memberCount).toLocaleString('en-US')}
+                {memberCount.toLocaleString('en-US')}
               </span>
 
               <span className="text">
-                {pluralizeWithoutNumberPrefix(Number(memberCount), 'member')}
+                {pluralizeWithoutNumberPrefix(memberCount, 'member')}
               </span>
             </div>
 
@@ -152,10 +152,10 @@ export const CWRelatedCommunityCard = ({
             <div className="thread-data">
               <CWIcon iconName="notepad" />
               <span className="count">
-                {Number(threadCount).toLocaleString('en-US')}
+                {threadCount.toLocaleString('en-US')}
               </span>
               <span className="text">
-                {pluralizeWithoutNumberPrefix(Number(threadCount), 'thread')}
+                {pluralizeWithoutNumberPrefix(threadCount, 'thread')}
               </span>
             </div>
           </div>
