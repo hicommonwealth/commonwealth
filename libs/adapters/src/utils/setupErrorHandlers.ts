@@ -54,7 +54,7 @@ export const setupErrorHandlers = (app: Express) => {
         });
       } else {
         log.error(error.message, error, reqContext);
-        res.status(500);
+        res.status(error.status || 500);
         res.json({
           status: error.status || 500,
           error:
