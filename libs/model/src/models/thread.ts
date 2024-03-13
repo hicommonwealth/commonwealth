@@ -1,6 +1,7 @@
-import { IDiscordMeta } from '@hicommonwealth/core';
+import { thread } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
+import { z } from 'zod';
 import { models } from '../database';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
@@ -22,54 +23,13 @@ export type Link = {
   title?: string;
 };
 
-export type ThreadAttributes = {
-  address_id: number;
-  title: string;
-  kind: string;
-  stage: string;
-  id?: number;
-  body?: string;
-  plaintext?: string;
-  url?: string;
-  topic_id?: number;
-  pinned?: boolean;
-  community_id: string;
-  view_count: number;
-  links: Link[] | null;
-
-  read_only?: boolean;
-  version_history?: string[];
-
-  has_poll?: boolean;
-
-  canvas_action: string;
-  canvas_session: string;
-  canvas_hash: string;
-
-  created_at?: Date;
-  updated_at?: Date;
-  last_edited?: Date;
-  deleted_at?: Date;
-  last_commented_on?: Date;
-  marked_as_spam_at?: Date;
-  archived_at?: Date;
-  locked_at?: Date;
-  discord_meta?: IDiscordMeta;
-
+export type ThreadAttributes = z.infer<typeof thread.Thread> & {
   // associations
   Community?: CommunityAttributes;
   Address?: AddressAttributes;
   collaborators?: AddressAttributes[];
   topic?: TopicAttributes;
   Notifications?: NotificationAttributes[];
-
-  //counts
-  reaction_count: number;
-  reaction_weights_sum: number;
-  comment_count: number;
-
-  //notifications
-  max_notif_id: number;
 };
 
 export type ThreadInstance = ModelInstance<ThreadAttributes> & {
