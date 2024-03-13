@@ -54,7 +54,7 @@ export const useQuillPasteText = (
 
         setTimeout(() => {
           const newCursorPosition = selection.index + pastedText.length;
-          editor.setSelection(newCursorPosition satisfies number, 0, 'silent');
+          editor.setSelection(newCursorPosition as number, 0, 'silent');
         }, 10);
         return;
       }
