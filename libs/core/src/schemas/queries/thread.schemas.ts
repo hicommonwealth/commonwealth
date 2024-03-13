@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { zBoolean } from '../../utils';
 import {
   discordMetaSchema,
   linksSchema,
@@ -21,12 +22,12 @@ export const GetBulkThreads = {
     community_id: z.string(),
     fromDate: z.coerce.date().optional(),
     toDate: z.coerce.date().optional(),
-    archived: z.boolean().default(false),
-    includePinnedThreads: z.boolean().default(false),
+    archived: zBoolean.default(false),
+    includePinnedThreads: zBoolean.default(false),
     topicId: z.string().optional(),
-    stage: z.string().nullable().optional(),
-    orderBy: OrderByQueriesKeys.default('createdAt:desc').nullable(),
-    cursor: z.number().nullish(),
+    stage: z.string().optional(),
+    orderBy: OrderByQueriesKeys.default('createdAt:desc'),
+    cursor: z.number().optional(),
     ...paginationSchema,
   }),
   output: z.object({

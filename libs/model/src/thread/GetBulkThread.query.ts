@@ -18,7 +18,7 @@ const getLastEdited = (post: CommentAttributes) => {
   return lastEdited;
 };
 
-export const GetBulkThread: Query<
+export const GetBulkThreads: Query<
   typeof schemas.queries.GetBulkThreads
 > = () => ({
   ...schemas.queries.GetBulkThreads,

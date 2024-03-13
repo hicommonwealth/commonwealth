@@ -13,5 +13,5 @@ export const GetCommunityStake = {
       .optional()
       .describe('The stake id or all stakes when undefined'),
   }),
-  output: CommunityStake,
+  output: CommunityStake.optional(),
 };
