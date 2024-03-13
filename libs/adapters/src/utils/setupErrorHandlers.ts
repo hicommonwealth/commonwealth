@@ -46,14 +46,22 @@ export const setupErrorHandlers = (app: Express) => {
         error: error.message,
       });
     } else {
-      log.error(error.message, error, reqContext);
-      res.status(500);
-      res.json({
-        status: error.status,
-        error:
-          error.message ||
-          'Server error, unknown error thrown. Please try again later.',
-      });
+      if (error?.status < 500) {
+        log.warn(error.message || '', error, reqContext);
+        res.status(error.status);
+        res.json({
+          error,
+        });
+      } else {
+        log.error(error.message, error, reqContext);
+        res.status(500);
+        res.json({
+          status: error.status || 500,
+          error:
+            error.message ||
+            'Server error, unknown error thrown. Please try again later.',
+        });
+      }
     }
   });
 };
