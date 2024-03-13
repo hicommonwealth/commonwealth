@@ -1,17 +1,15 @@
 import {
   PaginationSqlOptions,
-  QueryMetadata,
   buildPaginatedResponse,
   buildPaginationSql,
   comment,
+  type Query,
 } from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
 import { models } from '../database';
 
-export const SearchComments = (): QueryMetadata<
-  typeof comment.SearchComments
-> => ({
-  schemas: comment.SearchComments,
+export const SearchComments: Query<typeof comment.SearchComments> = () => ({
+  ...comment.SearchComments,
   auth: [],
   body: async ({ payload }) => {
     const { community_id, search, limit, page, orderBy, orderDirection } =

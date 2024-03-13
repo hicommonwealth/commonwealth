@@ -61,7 +61,7 @@
     "build-contracts": "npx hardhat compile"
   },
   "engines": {
-    "node": "18.x"
+    "node": "20.x"
   },
   "repository": {
     "type": "git",
@@ -106,6 +106,8 @@
     "@tanstack/react-table": "^8.9.7",
     "@terra-money/terra.js": "^3.1.7",
     "@terra-money/wallet-provider": "^3.11.2",
+    "@trpc/client": "^10.45.1",
+    "@trpc/react-query": "^10.45.1",
     "@types/swagger-ui-express": "^4.1.6",
     "@walletconnect/ethereum-provider": "^2.10.1",
     "@walletconnect/modal": "^2.4.6",

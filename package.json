@@ -167,6 +167,6 @@
     "esbuild-darwin-64": "^0.15.12"
   },
   "engines": {
-    "node": "18.x"
+    "node": "20.x"
   }
 }

@@ -6,17 +6,18 @@ import useBrowserWindow from 'hooks/useBrowserWindow';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
-import { useFetchThreadsQuery } from 'state/api/threads';
 import { useDateCursor } from 'state/api/threads/fetchThreads';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import { slugify } from 'utils';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
+import Thread from '../../../models/Thread';
 import {
   ThreadFeaturedFilterTypes,
   ThreadTimelineFilterTypes,
 } from '../../../models/types';
 import app from '../../../state';
 import { useFetchTopicsQuery } from '../../../state/api/topics';
+import { trpc } from '../../../utils/trpcClient';
 import { Breadcrumbs } from '../../components/Breadcrumbs';
 import { HeaderWithFilters } from './HeaderWithFilters';
 import { ThreadCard } from './ThreadCard';
@@ -33,6 +34,7 @@ type DiscussionsPageProps = {
 };
 
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
+  const community_id = app.activeChainId();
   const navigate = useCommonNavigate();
   const { totalThreadsInCommunity } = useEXCEPTION_CASE_threadCountersStore();
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
@@ -47,7 +49,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     'dateRange',
   ) as ThreadTimelineFilterTypes;
   const { data: topics } = useFetchTopicsQuery({
-    communityId: app.activeChainId(),
+    communityId: community_id,
   });
   const [resizing, setResizing] = useState(false);
   const { isWindowSmallInclusive } = useBrowserWindow({
@@ -60,7 +62,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const topicId = (topics || []).find(({ name }) => name === topicName)?.id;
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
-    chainId: app.activeChainId(),
+    chainId: community_id,
     address: app?.user?.activeAccount?.address,
     apiEnabled: !!app?.user?.activeAccount?.address,
   });
@@ -72,34 +74,48 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   });
 
   const isOnArchivePage =
-    location.pathname === `/${app.activeChainId()}/archived`;
+    location.pathname ===
+    (app.isCustomDomain() ? `/archived` : `/${app.activeChainId()}/archived`);
 
   const { fetchNextPage, data, isInitialLoading, hasNextPage } =
-    useFetchThreadsQuery({
-      communityId: app.activeChainId(),
-      queryType: 'bulk',
-      page: 1,
-      limit: 20,
-      topicId,
-      stage: stageName,
-      includePinnedThreads: true,
-      orderBy: featuredFilter,
-      toDate: dateCursor.toDate,
-      fromDate: dateCursor.fromDate,
-      isOnArchivePage: isOnArchivePage,
-    });
+    trpc.thread.getBulkThreads.useInfiniteQuery(
+      {
+        community_id,
+        queryType: 'bulk',
+        limit: 20,
+        topicId,
+        stage: stageName,
+        includePinnedThreads: true,
+        orderBy: featuredFilter,
+        toDate: dateCursor.toDate,
+        fromDate: dateCursor.fromDate,
+        isOnArchivePage: isOnArchivePage,
+      },
+      {
+        getNextPageParam: (lastPage) => {
+          return lastPage.cursor + 1;
+        },
+        initialCursor: 1,
+      },
+    );
 
-  const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
+  const threadData = data?.pages.flatMap((page) =>
+    page.threads.map((t) => new Thread(t as any)),
+  );
+
+  const threads = sortPinned(
+    sortByFeaturedFilter(threadData || [], featuredFilter),
+  );
   //
   //Checks if the current page is a discussion page and if the window is small enough to render the mobile menu
   //Checks both for mobile device and inner window size for desktop responsiveness
   const filteredThreads = threads.filter((t) => {
     if (!includeSpamThreads && t.markedAsSpamAt) return null;
 
-    if (!isOnArchivePage && !includeArchivedThreads && t.archivedAt !== null)
+    if (!isOnArchivePage && !includeArchivedThreads && t.archivedAt)
       return null;
 
-    if (isOnArchivePage && t.archivedAt === null) return null;
+    if (isOnArchivePage && t.archivedAt) return null;
 
     return t;
   });
@@ -152,7 +168,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               onBodyClick={() => {
                 const scrollEle = document.getElementsByClassName('Body')[0];
 
-                localStorage[`${app.activeChainId()}-discussions-scrollY`] =
+                localStorage[`${community_id}-discussions-scrollY`] =
                   scrollEle.scrollTop;
               }}
               onCommentBtnClick={() =>

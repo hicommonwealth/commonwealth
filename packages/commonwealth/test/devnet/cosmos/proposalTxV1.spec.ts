@@ -7,6 +7,8 @@ import {
   VoteOption as VoteOptionV1,
   voteOptionToJSON,
 } from '@hicommonwealth/chains';
+import { dispose } from '@hicommonwealth/core';
+import { tester } from '@hicommonwealth/model';
 import { getLCDClient } from 'controllers/chain/cosmos/chain.utils';
 import {
   getActiveProposalsV1,
@@ -28,17 +30,22 @@ import {
 
 const { expect, assert } = chai;
 
-const idV1 = 'csdk-v1'; // V1 CI devnet
+const idV1 = 'csdk-v1-local'; // V1 CI devnet
 const rpcUrl = `http://localhost:8080/cosmosAPI/${idV1}`;
 const lcdUrl = `http://localhost:8080/cosmosAPI/v1/${idV1}`;
 
-describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1)', () => {
+describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1-local)', () => {
   let lcd: LCD;
   let signer: string;
   before(async () => {
+    await tester.seedDb(true);
     lcd = await getLCDClient(lcdUrl);
     const { signerAddress } = await setupTestSigner(rpcUrl);
     signer = signerAddress;
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   const getActiveVotingProposals = async () => {
@@ -180,41 +187,37 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
       );
     });
   });
-});
 
-// Cosmos gov v1 query tests
-describe('Cosmos Governance v1 util Tests (csdk-v1)', () => {
-  let lcd: LCD;
-  before(async () => {
-    lcd = await getLCDClient(lcdUrl);
-  });
+  // Cosmos gov v1 query tests
+  describe('Cosmos Governance v1 util Tests (csdk-v1-local)', () => {
+    describe('getActiveProposals', () => {
+      it('should fetch active proposals', async () => {
+        const proposals = await getActiveProposalsV1(lcd);
+        expect(proposals.length).to.be.greaterThan(0);
 
-  describe('getActiveProposals', () => {
-    it('should fetch active proposals', async () => {
-      const proposals = await getActiveProposalsV1(lcd);
-      expect(proposals.length).to.be.greaterThan(0);
-
-      proposals.forEach((proposal) => {
-        expect(proposal.state.completed).to.eq(false);
-        expect(proposal.state.status).to.be.oneOf([
-          'VotingPeriod',
-          'DepositPeriod',
-        ]);
-        expect(proposal.state.tally).to.not.be.null;
+        proposals.forEach((proposal) => {
+          expect(proposal.state.completed).to.eq(false);
+          expect(proposal.state.status).to.be.oneOf([
+            'VotingPeriod',
+            'DepositPeriod',
+          ]);
+          expect(proposal.state.tally).to.not.be.null;
+        });
       });
     });
-  });
-  describe('getCompletedProposals', () => {
-    it('should fetch completed proposals', async () => {
-      const proposals = await getCompletedProposalsV1(lcd);
 
-      proposals.forEach((proposal) => {
-        expect(proposal.state.completed).to.eq(true);
-        expect(proposal.state.status).to.be.oneOf([
-          'Passed',
-          'Rejected',
-          'Failed',
-        ]);
+    describe('getCompletedProposals', () => {
+      it('should fetch completed proposals', async () => {
+        const proposals = await getCompletedProposalsV1(lcd);
+
+        proposals.forEach((proposal) => {
+          expect(proposal.state.completed).to.eq(true);
+          expect(proposal.state.status).to.be.oneOf([
+            'Passed',
+            'Rejected',
+            'Failed',
+          ]);
+        });
       });
     });
   });

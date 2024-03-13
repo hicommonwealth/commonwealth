@@ -950,7 +950,7 @@ export const CWCommonLogo = (props: IconProps) => {
       {...otherProps}
     >
       <g clipPath="url(#clip0_234_14690)">
-        <rect width="32" height="32" fill="white" />
+        <rect width="32" height="32" fill="none" />
         <g style={{ mixBlendMode: 'multiply' }}>
           <ellipse cx="16" cy="10.215" rx="9.645" ry="9.645" fill="#0079CC" />
         </g>
@@ -975,7 +975,7 @@ export const CWCommonLogo = (props: IconProps) => {
       </g>
       <defs>
         <clipPath id="clip0_234_14690">
-          <rect width="32" height="32" fill="white" />
+          <rect width="32" height="32" fill="none" />
         </clipPath>
       </defs>
     </svg>
