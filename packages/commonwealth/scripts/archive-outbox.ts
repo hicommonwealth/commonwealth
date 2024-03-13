@@ -87,33 +87,20 @@ async function uploadToS3(filePath: string): Promise<boolean> {
 
 async function getTablesToBackup(): Promise<string[]> {
   const { models } = await import('@hicommonwealth/model');
-  const tablesInPg: string[] = [];
 
   const result = await models.sequelize.query<{
     table_name: string;
   }>(
     `
-    SELECT child.relname AS table_name
-    FROM pg_inherits
-    JOIN pg_class parent ON pg_inherits.inhparent = parent.oid
-    JOIN pg_class child ON pg_inherits.inhrelid = child.oid
-    WHERE parent.relname = 'outbox_relayed';
+    SELECT tablename as table_name
+    FROM pg_tables
+    WHERE schemaname = 'public' -- Adjust this to your schema if different
+    AND tablename LIKE 'outbox_relayed_p%' -- Adjust 'parent_table' to your actual parent table's name
+    AND to_date(SUBSTRING(tablename FROM 'p(\\d{8})$'), 'YYYYMMDD') < date_trunc('month', CURRENT_DATE);
   `,
     { type: QueryTypes.SELECT, raw: true },
   );
-
-  const now = new Date();
-  for (const { table_name } of result) {
-    const match = table_name.match(/p(\d{4})_(\d{2})/);
-    if (!match) continue;
-
-    const tableDate = new Date(parseInt(match[1]), parseInt(match[2]));
-    const lastMonth = new Date(now.getFullYear(), now.getMonth());
-
-    if (tableDate < lastMonth) {
-      tablesInPg.push(table_name);
-    }
-  }
+  const tablesInPg = result.map((t) => t.table_name);
 
   const s3 = new S3();
   const archiveExists = await Promise.allSettled(
@@ -176,7 +163,7 @@ if (require.main === module) {
       process.exit(0);
     })
     .catch((err) => {
-      log.error('Failed to archive outbox child partitions to S3', err);
+      log.fatal('Failed to archive outbox child partitions to S3', err);
       process.exit(1);
     });
 }
