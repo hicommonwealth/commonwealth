@@ -206,17 +206,34 @@ export const useMarkdownToolbarHandlers = ({
           return line;
         }
 
+        // Check if the line starts with any ordered list prefix
         const startsWithPrefix = Object.values(LIST_ITEM_PREFIX).some((p) =>
           line.trim().startsWith(p),
         );
 
-        if (startsWithPrefix) {
+        const testForNumberedLists = /\d+\./.test(line.trim());
+
+        if (startsWithPrefix || testForNumberedLists) {
           return Object.keys(LIST_ITEM_PREFIX).reduce((modifiedLine, key) => {
-            if (line.trim().startsWith(LIST_ITEM_PREFIX[key])) {
-              return modifiedLine.replace(
-                new RegExp(`^\\s*(${LIST_ITEM_PREFIX[key]})`),
-                prefix,
-              );
+            if (
+              line.trim().startsWith(LIST_ITEM_PREFIX[key]) ||
+              testForNumberedLists
+            ) {
+              // If the line starts with the specified prefix, replace it with the new prefix
+              if (LIST_ITEM_PREFIX[key] === prefix || testForNumberedLists) {
+                return line.replace(
+                  /\d+\./ || new RegExp(`^\\s*(${LIST_ITEM_PREFIX[key]})`),
+                  '',
+                );
+              } else if (prefix === LIST_ITEM_PREFIX.ordered) {
+                const numberedPrefix = `${counter++}.`;
+                if (line.trim() === '' && !hasIncremented) {
+                  hasIncremented = true; // Mark the counter as incremented
+                  return `${numberedPrefix} ${line}`;
+                }
+                hasIncremented = false;
+                return `${numberedPrefix} ${line}`;
+              }
             }
             return modifiedLine;
           }, line);
