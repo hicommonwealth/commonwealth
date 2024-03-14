@@ -154,6 +154,7 @@ export const CommentTree = ({
     if (scrollToRef.current) {
       scrollToRef.current.scrollIntoView({
         behavior: 'smooth',
+        block: 'center',
       });
     }
   };
@@ -454,7 +455,6 @@ export const CommentTree = ({
                   </div>
                 )}
                 <CommentCard
-                  scrollToElement={scrollToElement}
                   disabledActionsTooltipText={disabledActionsTooltipText}
                   isThreadArchived={!!thread.archivedAt}
                   canReply={
@@ -486,6 +486,7 @@ export const CommentTree = ({
                   onReply={() => {
                     setParentCommentId(comment.id);
                     setIsReplying(true);
+                    scrollToElement();
                   }}
                   onDelete={async () => await handleDeleteComment(comment)}
                   isSpam={!!comment.markedAsSpamAt}

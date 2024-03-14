@@ -48,7 +48,6 @@ type CommentCardProps = {
   // Spam
   isSpam?: boolean;
   onSpamToggle?: () => any;
-  scrollToElement?: () => any;
   canToggleSpam?: boolean;
   // actual comment
   comment: Comment<any>;
@@ -78,7 +77,6 @@ export const CommentCard = ({
   // spam
   isSpam,
   onSpamToggle,
-  scrollToElement,
   canToggleSpam,
   // actual comment
   comment,
@@ -218,7 +216,6 @@ export const CommentCard = ({
                   onClick={async (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    scrollToElement();
                     await onReply();
                   }}
                 />
