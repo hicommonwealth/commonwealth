@@ -195,9 +195,17 @@ export const useMarkdownToolbarHandlers = ({
    * @param {string} prefix - The new prefix to be applied to the list items.
    * @returns {string} The text with list item prefixes replaced or added.
    */
-  const handleListText = (text: string, prefix: string) => {
+  const handleListText = (text: string, prefix: string, listType) => {
     let counter = 1;
     let hasIncremented = false;
+
+    const isPreviousList = text.split('\n').some((line) => {
+      return Object.values(LIST_ITEM_PREFIX).some((p) =>
+        line.trim().startsWith(p),
+      );
+    });
+
+    console.log('test', isPreviousList);
 
     return text
       .split('\n')
@@ -219,20 +227,22 @@ export const useMarkdownToolbarHandlers = ({
               line.trim().startsWith(LIST_ITEM_PREFIX[key]) ||
               testForNumberedLists
             ) {
-              // If the line starts with the specified prefix, replace it with the new prefix
-              if (LIST_ITEM_PREFIX[key] === prefix || testForNumberedLists) {
+              if (isPreviousList && listType !== 'ordered') {
+                return line.replace(
+                  /\d+\./ || new RegExp(`^\\s*(${LIST_ITEM_PREFIX[key]})`),
+                  prefix,
+                );
+              } else if (listType === 'ordered' && !testForNumberedLists) {
+                return line.replace(
+                  new RegExp(`^\\s*(${LIST_ITEM_PREFIX[key]})`),
+                  `${counter++}.`,
+                );
+              } else {
+                console.log('fired2');
                 return line.replace(
                   /\d+\./ || new RegExp(`^\\s*(${LIST_ITEM_PREFIX[key]})`),
                   '',
                 );
-              } else if (prefix === LIST_ITEM_PREFIX.ordered) {
-                const numberedPrefix = `${counter++}.`;
-                if (line.trim() === '' && !hasIncremented) {
-                  hasIncremented = true; // Mark the counter as incremented
-                  return `${numberedPrefix} ${line}`;
-                }
-                hasIncremented = false;
-                return `${numberedPrefix} ${line}`;
               }
             }
             return modifiedLine;
@@ -289,7 +299,7 @@ export const useMarkdownToolbarHandlers = ({
 
       // If there is a selection, format the selected text
       if (selectedText.length > 0) {
-        const newText = handleListText(selectedText, prefix);
+        const newText = handleListText(selectedText, prefix, value);
         editor.deleteText(selection.index, selection.length);
         editor.insertText(selection.index, newText);
       } else {
