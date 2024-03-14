@@ -79,6 +79,7 @@ function buildCacheKey(options: GetBalancesOptions, address: string): string {
       );
     case BalanceSourceType.CosmosNative:
       return `${options.sourceOptions.cosmosChainId}_${address}`;
+    case BalanceSourceType.CW20:
     case BalanceSourceType.CW721:
       return (
         `${options.sourceOptions.cosmosChainId}_` +

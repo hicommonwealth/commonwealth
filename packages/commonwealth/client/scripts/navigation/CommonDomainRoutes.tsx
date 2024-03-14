@@ -8,18 +8,20 @@ const WhyCommonwealthPage = lazy(() => import('views/pages/why_commonwealth'));
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
 const CommunitiesPage = lazy(() => import('views/pages/communities'));
 const SearchPage = lazy(() => import('views/pages/search'));
-const Web3LoginPage = lazy(() => import('views/pages/web3login'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(
-  () => import('views/pages/Community/Members/CommunityMembersPage'),
+  () =>
+    import(
+      'views/pages/CommunityGroupsAndMembers/Members/CommunityMembersPage'
+    ),
 );
 const CreateMembersGroupPage = lazy(
-  () => import('views/pages/Community/Groups/Create'),
+  () => import('views/pages/CommunityGroupsAndMembers/Groups/Create'),
 );
 const UpdateMembersGroupPage = lazy(
-  () => import('views/pages/Community/Groups/Update'),
+  () => import('views/pages/CommunityGroupsAndMembers/Groups/Update'),
 );
 const DirectoryPage = lazy(() => import('views/pages/DirectoryPage'));
 const SputnikDaosPage = lazy(() => import('views/pages/sputnikdaos'));
@@ -81,6 +83,8 @@ const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
 );
 
+const MyCommunityStake = lazy(() => import('views/pages/MyCommunityStake'));
+
 const SnapshotProposalPage = lazy(
   () => import('views/pages/snapshot_proposals'),
 );
@@ -102,6 +106,7 @@ const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 const CommonDomainRoutes = ({
   proposalTemplatesEnabled,
   communityHomepageEnabled,
+  myCommunityStakePageEnabled,
 }: RouteFeatureFlags) => [
   <Route
     key="/"
@@ -142,11 +147,17 @@ const CommonDomainRoutes = ({
     path="/search"
     element={withLayout(SearchPage, { type: 'common' })}
   />,
-  <Route
-    key="/web3login"
-    path="/web3login"
-    element={withLayout(Web3LoginPage, { type: 'common' })}
-  />,
+  ...[
+    myCommunityStakePageEnabled ? (
+      <Route
+        key="/myCommunityStake"
+        path="/myCommunityStake"
+        element={withLayout(MyCommunityStake, { type: 'common' })}
+      />
+    ) : (
+      []
+    ),
+  ],
   // scoped
   <Route
     key="/:scope/overview"
