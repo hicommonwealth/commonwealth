@@ -164,7 +164,7 @@ async function main() {
   });
 
   for (const table of tables) {
-    const dumpName = `${table}/dump.sql`;
+    const dumpName = `${table}.dump.sql`;
     const compressedName = `${dumpName}.gz`;
 
     log.info(`Dumping table`, undefined, { table });
