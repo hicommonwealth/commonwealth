@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
-import { nextTick } from 'process';
 import { RangeStatic } from 'quill';
 import MagicUrl from 'quill-magic-url';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -115,17 +114,6 @@ const ReactQuillEditor = ({
     editorRef,
     setContentDelta,
   });
-
-  // refreshQuillComponent unmounts and remounts the
-  // React Quill component, as this is the only way
-  // to refresh the component if the 'modules'
-  // prop is changed
-  const refreshQuillComponent = () => {
-    setIsVisible(false);
-    nextTick(() => {
-      setIsVisible(true);
-    });
-  };
 
   const [prevKeyPress, setPrevKeyPress] = useState(null);
 
