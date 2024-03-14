@@ -44,7 +44,7 @@ export const SetCommunityStake: Command<
     // !side effects
     const [updated] = await models.CommunityStake.upsert({
       ...payload,
-      community_id: id,
+      community_id: id!,
     });
 
     return {

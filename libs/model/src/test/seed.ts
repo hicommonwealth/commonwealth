@@ -1,6 +1,9 @@
 import { generateMock } from '@anatine/zod-mock';
+import { DeepPartial, schemas } from '@hicommonwealth/core';
+import { Entities } from 'core/src/schemas';
 import { Model, ModelStatic } from 'sequelize';
 import z from 'zod';
+import { models } from '../database';
 
 // props that are not mocked unless otherwise specified
 // via `allowedGeneratedProps`
@@ -14,68 +17,75 @@ const GENERATED_PROPS = [
 ] as const;
 type GeneratedProp = typeof GENERATED_PROPS[number];
 
-// incrementing seed number for each call to the `seed` function
-// for deterministic randomness when the order of calls is preserved
-let seedNum = 1;
-
-//type E = keyof typeof schemas;
-
-export type SchemaWithModel<T extends z.AnyZodObject> = {
-  schema: T;
-  model: ModelStatic<Model>;
-  mockDefaults?: () => Partial<z.infer<T>>;
-  allowedGeneratedProps?: GeneratedProp[];
-  buildQuery?: (data: z.infer<T>) => {
-    where: Partial<z.infer<T>>;
-  };
-};
-
+/**
+ * Seed options
+ *
+ * @param mock true to auto mock values in schemas
+ * @param skip array of field names to remove from schemas when auto mocked
+ */
 export type SeedOptions = {
   mock: boolean;
+  skip?: GeneratedProp[];
 };
 
-export async function seed<T extends SchemaWithModel<any>>(
-  { schema, model, mockDefaults, allowedGeneratedProps }: T,
-  overrides: Partial<z.infer<T['schema']>> = {},
+/**
+ * Seeds aggregates for unit testing
+ *
+ * @param name the name of the entity
+ * @param values custom seed values specific to the unit test
+ * @param options seed options - defaults to mocking without skips
+ * @returns tuple with main aggreate record and array of total records created
+ */
+export async function seed<T extends schemas.Aggregates>(
+  name: T,
+  values?: DeepPartial<z.infer<typeof schemas.entities[T]>>,
   options: SeedOptions = { mock: true },
-): Promise<Model<z.infer<T['schema']>>> {
-  let data: Partial<z.infer<T['schema']>> = {};
-
-  if (options?.mock) {
-    const generatedMockData = generateMock(schema, {
-      seed: seedNum++,
-    });
-    for (const prop of GENERATED_PROPS) {
-      if (!allowedGeneratedProps?.includes(prop)) {
-        delete generatedMockData[prop];
-      }
-    }
-    data = {
-      ...data,
-      ...generatedMockData,
-      ...(mockDefaults?.() || {}),
-    };
-  }
-
-  data = {
-    ...data,
-    ...overrides,
-  };
-
-  // console.log(`data #${seedNum} [${model.name}]: `, data);
-  return model.create(data as z.infer<T['schema']>);
+): Promise<
+  [z.infer<typeof schemas.entities[T]> | undefined, Record<string, any>[]]
+> {
+  const records: Record<string, any>[] = [];
+  await _seed(models[name], values ?? {}, options, records);
+  return [records.at(0) as any, records];
 }
 
-// TODO: implement proper bulkCreate
-export async function bulkSeed<T extends SchemaWithModel<any>>(
-  params: T,
-  allOverrides: Partial<z.infer<T['schema']>>[] = [],
-  options?: SeedOptions,
-): Promise<Model<z.infer<T['schema']>>[]> {
-  const createdEntities: Model<z.infer<T['schema']>>[] = [];
-  for (const overrides of allOverrides) {
-    const entity = await seed(params, overrides, options);
-    createdEntities.push(entity);
+async function _seed(
+  model: ModelStatic<Model>,
+  values: Record<string, any>,
+  options: SeedOptions,
+  records: Record<string, any>[],
+) {
+  if (options.mock && schemas.entities[model.name as Entities]) {
+    const mocked: Record<string, any> = generateMock(
+      schemas.entities[model.name as Entities],
+    );
+    if (options.skip) for (const key in options.skip) delete mocked[key];
+    values = {
+      ...mocked,
+      ...values,
+    };
+    //console.log('mocked', model.name, values);
   }
-  return createdEntities;
+  //console.log(model.name, values);
+  const record = await model.create(values);
+  records.push(record.toJSON());
+
+  if (typeof values === 'object') {
+    for (const [key, value] of Object.entries(values)) {
+      const association = model.associations[key];
+      if (association && Array.isArray(value)) {
+        for (const child of value) {
+          await _seed(
+            association.target,
+            {
+              ...child,
+              [association.foreignKey]:
+                record.dataValues[model.primaryKeyAttribute],
+            },
+            options,
+            records,
+          );
+        }
+      }
+    }
+  }
 }
