@@ -1,8 +1,8 @@
-import { Query, thread } from '@hicommonwealth/core';
+import { Query, feed } from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
 import { models } from '../database';
 
-export const GetUserActivity: Query<typeof thread.GetBulkThreads> = () => ({
+export const GetUserActivity: Query<typeof feed.> = () => ({
   ...thread.GetBulkThreads,
   auth: [],
   body: async ({ payload }) => {

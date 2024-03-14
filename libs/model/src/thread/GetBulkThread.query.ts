@@ -247,6 +247,18 @@ export const GetBulkThreads: Query<
 
     threads = await Promise.all(threads);
 
+    try {
+      schemas.queries.GetBulkThreads.output.parse({
+        limit: bind.limit,
+        cursor: bind.cursor,
+        // data params
+        threads,
+        numVotingThreads,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+
     return {
       limit: bind.limit,
       cursor: bind.cursor,
