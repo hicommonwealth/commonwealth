@@ -2,7 +2,13 @@ import clsx from 'clsx';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { RangeStatic } from 'quill';
 import MagicUrl from 'quill-magic-url';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  MouseEventHandler,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import ReactQuill, { Quill } from 'react-quill';
 import { openConfirmation } from '../../modals/confirmation_modal';
@@ -274,7 +280,7 @@ const ReactQuillEditor = ({
 
   const handleSelectedFormat: MouseEventHandler<HTMLButtonElement> = (e) => {
     const formatValue = e.currentTarget.value;
-    setCurrentFormat(formatValue);
+    setCurrentFormat(formatValue as 'ordered' | 'bullet' | 'check');
   };
 
   const showTooltip = isDisabled && isHovering;
