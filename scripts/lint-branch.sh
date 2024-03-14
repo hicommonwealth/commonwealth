@@ -1,8 +1,6 @@
 # The base branch is provided by GitHub Actions. If it's not set, default to "master".
 BASE_BRANCH=${GITHUB_BASE_REF:-master}
 
-echo "Running against base branch: ${BASE_BRANCH}"
-
 # Fetch the base branch only if this script is running in GitHub Actions
 # and the base branch hasn't been fetched yet
 if [ -n "$GITHUB_BASE_REF" ]; then
@@ -13,8 +11,6 @@ fi
 
 # Get a list of changed .ts files
 LINES=$(git diff origin/$BASE_BRANCH...HEAD --name-only --diff-filter=d | grep -E '\.tsx?$' | grep -v 'libs/chains/src/cosmos-ts/')
-
-echo $LINES
 
 if [ -z "$LINES" ]
 then

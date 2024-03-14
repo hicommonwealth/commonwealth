@@ -156,6 +156,7 @@ import { getCommunitiesHandler } from '../routes/communities/get_communities_han
 import { updateCommunityHandler } from '../routes/communities/update_community_handler';
 import { updateCommunityIdHandler } from '../routes/communities/update_community_id_handler';
 import exportMembersList from '../routes/exportMembersList';
+import { getFeedHandler } from '../routes/feed';
 import { createGroupHandler } from '../routes/groups/create_group_handler';
 import { deleteGroupHandler } from '../routes/groups/delete_group_handler';
 import { getGroupsHandler } from '../routes/groups/get_groups_handler';
@@ -183,7 +184,6 @@ import { getTopicsHandler } from '../routes/topics/get_topics_handler';
 import { updateTopicChannelHandler } from '../routes/topics/update_topic_channel_handler';
 import { updateTopicHandler } from '../routes/topics/update_topic_handler';
 import { updateTopicsOrderHandler } from '../routes/topics/update_topics_order_handler';
-import { getFeedHandler } from '../routes/feed';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
