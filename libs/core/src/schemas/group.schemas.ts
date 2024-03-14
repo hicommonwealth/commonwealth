@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../constants';
-import { BalanceSourceType } from '../requirements-types';
+import { BalanceSourceType } from '../types';
 
 const ContractSource = z.object({
   source_type: z.enum([
@@ -28,7 +27,7 @@ const CosmosSource = z.object({
 });
 
 const CosmosContractSource = z.object({
-  source_type: z.enum([BalanceSourceType.CW721, BalanceSourceType.CW20]),
+  source_type: z.enum([BalanceSourceType.CW721]),
   cosmos_chain_id: z.string(),
   contract_address: z.string(),
 });
@@ -80,23 +79,11 @@ export const CreateGroup = {
     metadata: z.object({
       name: z.string(),
       description: z.string(),
-      required_requirements: z
-        .number()
-        .int()
-        .min(MIN_SCHEMA_INT)
-        .max(MAX_SCHEMA_INT)
-        .optional(),
-      membership_ttl: z
-        .number()
-        .int()
-        .min(MIN_SCHEMA_INT)
-        .max(MAX_SCHEMA_INT)
-        .optional(),
+      required_requirements: z.number().optional(),
+      membership_ttl: z.number().optional(),
     }),
     requirements: z.array(Requirement),
-    topics: z
-      .array(z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT))
-      .optional(),
+    topics: z.array(z.number()).optional(),
   }),
   output: z.object({ groups: z.array(Group).optional() }),
 };

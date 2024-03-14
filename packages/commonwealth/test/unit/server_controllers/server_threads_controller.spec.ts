@@ -1037,6 +1037,7 @@ describe('ServerThreadsController', () => {
               id: 1,
               address: '0x123',
             },
+            destroy: async () => ({}),
           }),
           destroy: async () => ({}),
         },
@@ -1052,6 +1053,9 @@ describe('ServerThreadsController', () => {
         },
         Address: {
           findAll: async () => [{}], // used in findOneRole
+        },
+        sequelize: {
+          transaction: async (callback) => callback({}),
         },
       };
       const banCache = BAN_CACHE_MOCK_FN('ethereum');
