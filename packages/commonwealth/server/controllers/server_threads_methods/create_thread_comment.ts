@@ -43,10 +43,8 @@ export type CreateThreadCommentOptions = {
   parentId: number;
   threadId: number;
   text: string;
-  canvasActionMessage?: any;
-  canvasActionMessageSignature?: any;
-  canvasSessionMessage?: any;
-  canvasSessionMessageSignature?: any;
+  canvasSignedData?: string;
+  canvasHash?: string;
   discordMeta?: any;
 };
 
@@ -64,10 +62,8 @@ export async function __createThreadComment(
     parentId,
     threadId,
     text,
-    canvasActionMessage,
-    canvasActionMessageSignature,
-    canvasSessionMessage,
-    canvasSessionMessageSignature,
+    canvasSignedData,
+    canvasHash,
     discordMeta,
   }: CreateThreadCommentOptions,
 ): Promise<CreateThreadCommentResult> {
@@ -170,10 +166,8 @@ export async function __createThreadComment(
     address_id: address.id,
     community_id: thread.community_id,
     parent_id: null,
-    canvas_action_message: canvasActionMessage,
-    canvas_action_message_signature: canvasActionMessageSignature,
-    canvas_session_message: canvasSessionMessage,
-    canvas_session_message_signature: canvasSessionMessageSignature,
+    canvas_signed_data: canvasSignedData,
+    canvas_hash: canvasHash,
     discord_meta: discordMeta,
     reaction_count: 0,
     reaction_weights_sum: 0,

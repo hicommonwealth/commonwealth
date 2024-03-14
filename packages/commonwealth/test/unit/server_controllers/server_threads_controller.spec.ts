@@ -488,10 +488,6 @@ describe('ServerThreadsController', () => {
       const parentId = null;
       const threadId = 1;
       const text = 'hello';
-      const canvasActionMessage = null;
-      const canvasActionMessageSignature = null;
-      const canvasSessionMessage = null;
-      const canvasSessionMessageSignature = null;
 
       const db = {
         Thread: {
@@ -553,10 +549,8 @@ describe('ServerThreadsController', () => {
           parentId,
           threadId,
           text,
-          canvasActionMessage,
-          canvasActionMessageSignature,
-          canvasSessionMessage,
-          canvasSessionMessageSignature,
+          canvasHash: undefined,
+          canvasSignedData: undefined,
         });
 
       expect(newComment).to.include({
@@ -626,10 +620,6 @@ describe('ServerThreadsController', () => {
       const parentId = null;
       const threadId = 1;
       const text = 'hello';
-      const canvasActionMessage = null;
-      const canvasActionMessageSignature = null;
-      const canvasSessionMessage = null;
-      const canvasSessionMessageSignature = null;
 
       expect(
         serverThreadsController.createThreadComment({
@@ -638,10 +628,8 @@ describe('ServerThreadsController', () => {
           parentId,
           threadId,
           text,
-          canvasActionMessage,
-          canvasActionMessageSignature,
-          canvasSessionMessage,
-          canvasSessionMessageSignature,
+          canvasHash: undefined,
+          canvasSignedData: undefined,
         }),
       ).to.be.rejectedWith('Ban error: big bad error');
     });
@@ -698,10 +686,6 @@ describe('ServerThreadsController', () => {
       const parentId = null;
       const threadId = 1;
       const text = 'hello';
-      const canvasActionMessage = null;
-      const canvasActionMessageSignature = null;
-      const canvasSessionMessage = null;
-      const canvasSessionMessageSignature = null;
 
       expect(
         serverThreadsController.createThreadComment({
@@ -710,10 +694,8 @@ describe('ServerThreadsController', () => {
           parentId,
           threadId,
           text,
-          canvasActionMessage,
-          canvasActionMessageSignature,
-          canvasSessionMessage,
-          canvasSessionMessageSignature,
+          canvasHash: undefined,
+          canvasSignedData: undefined,
         }),
       ).to.be.rejectedWith('Thread not found');
     });
@@ -732,10 +714,6 @@ describe('ServerThreadsController', () => {
       const parentId = null;
       const threadId = 1;
       const text = 'hello';
-      const canvasActionMessage = null;
-      const canvasActionMessageSignature = null;
-      const canvasSessionMessage = null;
-      const canvasSessionMessageSignature = null;
 
       const db = {
         Thread: {
@@ -799,10 +777,8 @@ describe('ServerThreadsController', () => {
           parentId,
           threadId,
           text,
-          canvasActionMessage,
-          canvasActionMessageSignature,
-          canvasSessionMessage,
-          canvasSessionMessageSignature,
+          canvasHash: undefined,
+          canvasSignedData: undefined,
         }),
       ).to.be.rejectedWith('Thread is archived');
     });
@@ -862,10 +838,6 @@ describe('ServerThreadsController', () => {
       const parentId = null;
       const threadId = 1;
       const text = 'hello';
-      const canvasActionMessage = null;
-      const canvasActionMessageSignature = null;
-      const canvasSessionMessage = null;
-      const canvasSessionMessageSignature = null;
 
       expect(
         serverThreadsController.createThreadComment({
@@ -874,10 +846,8 @@ describe('ServerThreadsController', () => {
           parentId,
           threadId,
           text,
-          canvasActionMessage,
-          canvasActionMessageSignature,
-          canvasSessionMessage,
-          canvasSessionMessageSignature,
+          canvasHash: undefined,
+          canvasSignedData: undefined,
         }),
       ).to.be.rejectedWith('Cannot comment when thread is read_only');
     });
@@ -941,10 +911,6 @@ describe('ServerThreadsController', () => {
       };
       const threadId = 1;
       const text = 'hello';
-      const canvasActionMessage = null;
-      const canvasActionMessageSignature = null;
-      const canvasSessionMessage = null;
-      const canvasSessionMessageSignature = null;
 
       expect(
         serverThreadsController.createThreadComment({
@@ -953,10 +919,8 @@ describe('ServerThreadsController', () => {
           parentId,
           threadId,
           text,
-          canvasActionMessage,
-          canvasActionMessageSignature,
-          canvasSessionMessage,
-          canvasSessionMessageSignature,
+          canvasHash: undefined,
+          canvasSignedData: undefined,
         }),
       ).to.be.rejectedWith('Invalid parent');
     });
@@ -1018,10 +982,6 @@ describe('ServerThreadsController', () => {
       const parentId = 1;
       const threadId = 1;
       const text = 'hello';
-      const canvasActionMessage = null;
-      const canvasActionMessageSignature = null;
-      const canvasSessionMessage = null;
-      const canvasSessionMessageSignature = null;
 
       expect(
         serverThreadsController.createThreadComment({
@@ -1030,10 +990,8 @@ describe('ServerThreadsController', () => {
           parentId,
           threadId,
           text,
-          canvasActionMessage,
-          canvasActionMessageSignature,
-          canvasSessionMessage,
-          canvasSessionMessageSignature,
+          canvasHash: undefined,
+          canvasSignedData: undefined,
         }),
       ).to.be.rejectedWith('Comments can only be nested 8 levels deep');
     });
@@ -1321,10 +1279,6 @@ describe('ServerThreadsController', () => {
       const title = 'mythread';
       const stage = 'stage';
       const url = 'http://blah';
-      const canvasActionMessage = null;
-      const canvasActionMessageSignature = null;
-      const canvasSessionMessage = null;
-      const canvasSessionMessageSignature = null;
 
       const [thread, notificationOptions] =
         await serverThreadsController.createThread({
@@ -1338,10 +1292,8 @@ describe('ServerThreadsController', () => {
           topicId,
           stage,
           url,
-          canvasActionMessage,
-          canvasActionMessageSignature,
-          canvasSessionMessage,
-          canvasSessionMessageSignature,
+          canvasHash: undefined,
+          canvasSignedData: undefined,
         });
 
       expect(
@@ -1359,10 +1311,8 @@ describe('ServerThreadsController', () => {
           topicId,
           stage,
           url,
-          canvasActionMessage,
-          canvasActionMessageSignature,
-          canvasSessionMessage,
-          canvasSessionMessageSignature,
+          canvasHash: undefined,
+          canvasSignedData: undefined,
         }),
       ).to.be.rejectedWith('Ban error: banned');
 

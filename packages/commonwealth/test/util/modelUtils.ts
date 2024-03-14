@@ -12,6 +12,7 @@ import { createRole, findOneRole } from '../../server/util/roles';
 
 import { CANVAS_TOPIC } from '../../shared/canvas';
 import {
+  CanvasSignResult,
   CanvasSignedData,
   toCanvasSignedDataApiArgs,
 } from '../../shared/canvas/types';
@@ -154,6 +155,42 @@ export const updateProfile = async ({
   return res.body;
 };
 
+async function createCanvasThing({
+  session,
+  sign,
+  action,
+}): Promise<CanvasSignResult> {
+  const { encode } = await import('@ipld/dag-json');
+
+  const sessionMessage = {
+    clock: 0,
+    parents: [],
+    payload: session,
+    topic: CANVAS_TOPIC,
+  };
+  const sessionMessageSignature = sign(sessionMessage);
+
+  const actionMessage = {
+    clock: 0,
+    parents: [],
+    payload: action,
+    topic: CANVAS_TOPIC,
+  };
+  const actionMessageSignature = sign(actionMessage);
+
+  const canvasSignedData: CanvasSignedData = {
+    actionMessage,
+    actionMessageSignature,
+    sessionMessage,
+    sessionMessageSignature,
+  };
+  const canvasHash = Buffer.from(encode(actionMessage)).toString('hex');
+  return {
+    canvasSignedData,
+    canvasHash,
+  };
+}
+
 export interface ThreadArgs {
   jwt: any;
   address: string;
@@ -186,41 +223,22 @@ export const createThread = async (
     sign,
   } = args;
 
-  const sessionMessage = {
-    clock: 0,
-    parents: [],
-    payload: session,
-    topic: CANVAS_TOPIC,
-  };
-  const sessionMessageSignature = sign(sessionMessage);
-
-  const actionMessage = {
-    clock: 0,
-    parents: [],
-    payload: {
-      type: 'action' as const,
-      address,
-      blockhash: null,
-      name: 'thread',
-      args: {
-        community: chainId || '',
-        title: encodeURIComponent(title),
-        body: encodeURIComponent(body),
-        link: url || '',
-        topic: topicId || '',
-      },
-      timestamp: Date.now(),
+  const action = {
+    type: 'action' as const,
+    address,
+    blockhash: null,
+    name: 'thread',
+    args: {
+      community: chainId || '',
+      title: encodeURIComponent(title),
+      body: encodeURIComponent(body),
+      link: url || '',
+      topic: topicId || '',
     },
-    topic: CANVAS_TOPIC,
+    timestamp: Date.now(),
   };
-  const actionMessageSignature = sign(actionMessage);
 
-  const canvasSignedData: CanvasSignedData = {
-    actionMessage,
-    actionMessageSignature,
-    sessionMessage,
-    sessionMessageSignature,
-  };
+  const canvasSignResult = await createCanvasThing({ session, sign, action });
 
   const res = await chai.request
     .agent(app)
@@ -237,7 +255,7 @@ export const createThread = async (
       url,
       readOnly: readOnly || false,
       jwt,
-      ...(await toCanvasSignedDataApiArgs(canvasSignedData)),
+      ...(await toCanvasSignedDataApiArgs(canvasSignResult)),
     });
   return res.body;
 };
@@ -304,40 +322,19 @@ export const createComment = async (args: CommentArgs) => {
     sign,
   } = args;
 
-  const sessionMessage = {
-    clock: 0,
-    parents: [],
-    payload: session,
-    topic: CANVAS_TOPIC,
-  };
-  const sessionMessageSignature = sign(sessionMessage);
-
-  const actionMessage = {
-    clock: 0,
-    parents: [],
-    payload: {
-      type: 'action' as const,
-      address,
-      blockhash: null,
-      name: 'comment',
-      args: {
-        body: text,
-        thread_id,
-        parent_comment_id: parentCommentId,
-      },
-      timestamp: Date.now(),
+  const action = {
+    type: 'action' as const,
+    address,
+    blockhash: null,
+    name: 'comment',
+    args: {
+      body: text,
+      thread_id,
+      parent_comment_id: parentCommentId,
     },
-    topic: CANVAS_TOPIC,
+    timestamp: Date.now(),
   };
-  const actionMessageSignature = sign(actionMessage);
-  // TODO
-
-  const canvasSignedData: CanvasSignedData = {
-    actionMessage,
-    actionMessageSignature,
-    sessionMessage,
-    sessionMessageSignature,
-  };
+  const canvasSignResult = await createCanvasThing({ session, sign, action });
 
   const res = await chai.request
     .agent(app)
@@ -350,7 +347,7 @@ export const createComment = async (args: CommentArgs) => {
       parent_id: parentCommentId,
       text,
       jwt,
-      ...(await toCanvasSignedDataApiArgs(canvasSignedData)),
+      ...(await toCanvasSignedDataApiArgs(canvasSignResult)),
     });
   return res.body;
 };
@@ -406,36 +403,15 @@ export const createReaction = async (args: CreateReactionArgs) => {
     sign,
   } = args;
 
-  const sessionMessage = {
-    clock: 0,
-    parents: [],
-    payload: session,
-    topic: CANVAS_TOPIC,
+  const action = {
+    type: 'action' as const,
+    address,
+    blockhash: null,
+    name: 'reactComment',
+    args: { comment_id, value: reaction },
+    timestamp: Date.now(),
   };
-  const sessionMessageSignature = sign(sessionMessage);
-
-  const actionMessage = {
-    clock: 0,
-    parents: [],
-    payload: {
-      type: 'action' as const,
-      address,
-      blockhash: null,
-      name: 'reactComment',
-      args: { comment_id, value: reaction },
-      timestamp: Date.now(),
-    },
-    topic: CANVAS_TOPIC,
-  };
-  const actionMessageSignature = sign(actionMessage);
-
-  const canvasSignedData: CanvasSignedData = {
-    actionMessage,
-    actionMessageSignature,
-    sessionMessage,
-    sessionMessageSignature,
-  };
-  // TODO
+  const canvasSignResult = await createCanvasThing({ session, sign, action });
 
   const res = await chai.request
     .agent(app)
@@ -449,7 +425,7 @@ export const createReaction = async (args: CreateReactionArgs) => {
       author_chain,
       jwt,
       thread_id,
-      ...(await toCanvasSignedDataApiArgs(canvasSignedData)),
+      ...(await toCanvasSignedDataApiArgs(canvasSignResult)),
     });
   return res.body;
 };
@@ -477,35 +453,15 @@ export const createThreadReaction = async (args: CreateThreadReactionArgs) => {
     sign,
   } = args;
 
-  const sessionMessage = {
-    clock: 0,
-    parents: [],
-    payload: session,
-    topic: CANVAS_TOPIC,
+  const action = {
+    type: 'action' as const,
+    address,
+    blockhash: null,
+    name: 'reactThread',
+    args: { thread_id, value: reaction },
+    timestamp: Date.now(),
   };
-  const canvasSessionMessageSignature = sign(sessionMessage);
-
-  const actionMessage = {
-    clock: 0,
-    parents: [],
-    payload: {
-      type: 'action' as const,
-      address,
-      blockhash: null,
-      name: 'reactThread',
-      args: { thread_id, value: reaction },
-      timestamp: Date.now(),
-    },
-    topic: CANVAS_TOPIC,
-  };
-  const actionMessageSignature = sign(actionMessage);
-
-  const canvasSignedData: CanvasSignedData = {
-    actionMessage,
-    actionMessageSignature,
-    sessionMessage,
-    sessionMessageSignature: canvasSessionMessageSignature,
-  };
+  const canvasSignResult = await createCanvasThing({ session, sign, action });
 
   const res = await chai.request
     .agent(app)
@@ -518,7 +474,7 @@ export const createThreadReaction = async (args: CreateThreadReactionArgs) => {
       author_chain,
       jwt,
       thread_id,
-      ...(await toCanvasSignedDataApiArgs(canvasSignedData)),
+      ...(await toCanvasSignedDataApiArgs(canvasSignResult)),
     });
   return res.body;
 };

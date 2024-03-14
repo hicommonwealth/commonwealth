@@ -54,12 +54,8 @@ export const createThreadCommentHandler = async (
   };
 
   if (isCanvasSignedDataApiArgs(req.body)) {
-    threadCommentFields.canvasActionMessage = req.body.canvas_action_message;
-    threadCommentFields.canvasActionMessageSignature =
-      req.body.canvas_action_message_signature;
-    threadCommentFields.canvasSessionMessage = req.body.canvas_session_message;
-    threadCommentFields.canvasSessionMessageSignature =
-      req.body.canvas_session_message_signature;
+    threadCommentFields.canvasSignedData = req.body.canvas_signed_data;
+    threadCommentFields.canvasHash = req.body.canvas_hash;
 
     if (process.env.ENFORCE_SESSION_KEYS === 'true') {
       await verifyComment(req.body, {

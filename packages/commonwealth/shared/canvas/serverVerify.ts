@@ -18,11 +18,11 @@ function assertMatches(a, b, obj: string, field: string) {
 
 export const verifyComment = async (args: CanvasSignedDataApiArgs, fields) => {
   const { thread_id, text, address, parent_comment_id } = fields;
-  const parsedCanvasArguments = await fromCanvasSignedDataApiArgs(args);
+  const { canvasSignedData } = await fromCanvasSignedDataApiArgs(args);
 
-  await verify(parsedCanvasArguments);
+  await verify(canvasSignedData);
 
-  const { actionMessage } = parsedCanvasArguments;
+  const { actionMessage } = canvasSignedData;
   assertMatches(actionMessage.payload.name, 'comment', 'comment', 'call');
   assertMatches(
     thread_id,
@@ -43,11 +43,11 @@ export const verifyComment = async (args: CanvasSignedDataApiArgs, fields) => {
 
 export const verifyThread = async (args: CanvasSignedDataApiArgs, fields) => {
   const { title, body, address, community, link, topic } = fields;
-  const parsedCanvasArguments = await fromCanvasSignedDataApiArgs(args);
+  const { canvasSignedData } = await fromCanvasSignedDataApiArgs(args);
 
-  await verify(parsedCanvasArguments);
+  await verify(canvasSignedData);
 
-  const { actionMessage } = parsedCanvasArguments;
+  const { actionMessage } = canvasSignedData;
   assertMatches(actionMessage.payload.name, 'thread', 'thread', 'call');
   assertMatches(
     community,
@@ -70,11 +70,11 @@ export const verifyThread = async (args: CanvasSignedDataApiArgs, fields) => {
 
 export const verifyReaction = async (args: CanvasSignedDataApiArgs, fields) => {
   const { thread_id, comment_id, proposal_id, address, value } = fields;
-  const parsedCanvasArguments = await fromCanvasSignedDataApiArgs(args);
+  const { canvasSignedData } = await fromCanvasSignedDataApiArgs(args);
 
-  await verify(parsedCanvasArguments);
+  await verify(canvasSignedData);
 
-  const { actionMessage } = parsedCanvasArguments;
+  const { actionMessage } = canvasSignedData;
   assert(
     (actionMessage.payload.name === 'reactThread' &&
       thread_id === actionMessage.payload.args.thread_id &&

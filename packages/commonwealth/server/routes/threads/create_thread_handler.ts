@@ -51,12 +51,8 @@ export const createThreadHandler = async (
   };
 
   if (isCanvasSignedDataApiArgs(req.body)) {
-    threadFields.canvasActionMessage = req.body.canvas_action_message;
-    threadFields.canvasActionMessageSignature =
-      req.body.canvas_action_message_signature;
-    threadFields.canvasSessionMessage = req.body.canvas_session_message;
-    threadFields.canvasSessionMessageSignature =
-      req.body.canvas_session_message_signature;
+    threadFields.canvasSignedData = req.body.canvas_signed_data;
+    threadFields.canvasHash = req.body.canvas_hash;
 
     if (process.env.ENFORCE_SESSION_KEYS === 'true') {
       await verifyThread(req.body, {

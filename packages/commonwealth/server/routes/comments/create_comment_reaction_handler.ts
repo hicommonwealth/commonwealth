@@ -46,13 +46,8 @@ export const createCommentReactionHandler = async (
   };
 
   if (isCanvasSignedDataApiArgs(req.body)) {
-    commentReactionFields.canvasActionMessage = req.body.canvas_action_message;
-    commentReactionFields.canvasActionMessageSignature =
-      req.body.canvas_action_message_signature;
-    commentReactionFields.canvasSessionMessage =
-      req.body.canvas_session_message;
-    commentReactionFields.canvasSessionMessageSignature =
-      req.body.canvas_session_message_signature;
+    commentReactionFields.canvasSignedData = req.body.canvas_signed_data;
+    commentReactionFields.canvasHash = req.body.canvas_hash;
 
     if (process.env.ENFORCE_SESSION_KEYS === 'true') {
       await verifyReaction(req.body, {

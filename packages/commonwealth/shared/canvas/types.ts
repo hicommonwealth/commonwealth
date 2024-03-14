@@ -7,8 +7,13 @@ export type CanvasSignedData = {
   actionMessageSignature: Signature;
 };
 
+export type CanvasSignResult = {
+  canvasSignedData: CanvasSignedData;
+  canvasHash: string;
+};
+
 export const toCanvasSignedDataApiArgs = async (
-  data: undefined | CanvasSignedData,
+  data: undefined | CanvasSignResult,
 ): Promise<CanvasSignedDataApiArgs> => {
   const { encode, stringify } = await import('@ipld/dag-json');
   // ignore undefined data
@@ -16,37 +21,32 @@ export const toCanvasSignedDataApiArgs = async (
     return;
   }
 
+  const { canvasSignedData, canvasHash } = data;
+
   return {
-    canvas_action_message: stringify(encode(data.actionMessage)),
-    canvas_action_message_signature: stringify(
-      encode(data.actionMessageSignature),
-    ),
-    canvas_session_message: stringify(encode(data.sessionMessage)),
-    canvas_session_message_signature: stringify(
-      encode(data.sessionMessageSignature),
-    ),
+    canvas_signed_data: stringify(encode(canvasSignedData)),
+    canvas_hash: canvasHash,
   };
 };
 
 export type CanvasSignedDataApiArgs = {
-  canvas_action_message: string;
-  canvas_action_message_signature: string;
-  canvas_session_message: string;
-  canvas_session_message_signature: string;
+  canvas_signed_data: string;
+  canvas_hash: string;
 };
 
 export const fromCanvasSignedDataApiArgs = async (
   data: CanvasSignedDataApiArgs,
-): Promise<CanvasSignedData> => {
+): Promise<CanvasSignResult> => {
   const { decode, parse } = await import('@ipld/dag-json');
+
+  const canvasSignedData: CanvasSignedData = decode(
+    parse(data.canvas_signed_data),
+  );
+
   // try to deserialize
   return {
-    actionMessage: decode(parse(data.canvas_action_message)),
-    actionMessageSignature: decode(parse(data.canvas_action_message_signature)),
-    sessionMessage: decode(parse(data.canvas_session_message)),
-    sessionMessageSignature: decode(
-      parse(data.canvas_session_message_signature),
-    ),
+    canvasSignedData,
+    canvasHash: data.canvas_hash,
   };
 };
 
@@ -58,29 +58,17 @@ export const isCanvasSignedDataApiArgs = (
    * The input is valid if either all three are present or all three are absent
    */
 
-  if (
-    args.canvas_action_message === undefined &&
-    args.canvas_action_message_signature === undefined &&
-    args.canvas_session_message === undefined &&
-    args.canvas_session_message_signature === undefined
-  ) {
+  if (args.canvas_signed_data === undefined && args.canvas_hash === undefined) {
     return false;
   }
 
-  if (
-    args.canvas_action_message === undefined ||
-    args.canvas_action_message_signature === undefined ||
-    args.canvas_session_message === undefined ||
-    args.canvas_session_message_signature === undefined
-  ) {
+  if (args.canvas_signed_data === undefined || args.canvas_hash === undefined) {
     throw new Error('Missing canvas signed data');
   }
 
   if (
-    typeof args.canvas_action_message !== 'string' ||
-    typeof args.canvas_action_message_signature !== 'string' ||
-    typeof args.canvas_session_message !== 'string' ||
-    typeof args.canvas_session_message_signature !== 'string'
+    typeof args.canvas_signed_data !== 'string' ||
+    typeof args.canvas_hash !== 'string'
   ) {
     throw new Error('Canvas signed data fields should be strings (if present)');
   }

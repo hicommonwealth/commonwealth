@@ -43,10 +43,8 @@ export type CreateThreadOptions = {
   topicId?: number;
   stage?: string;
   url?: string;
-  canvasActionMessage?: any;
-  canvasActionMessageSignature?: any;
-  canvasSessionMessage?: any;
-  canvasSessionMessageSignature?: any;
+  canvasSignedData?: string;
+  canvasHash?: string;
   discordMeta?: any;
 };
 
@@ -69,10 +67,8 @@ export async function __createThread(
     topicId,
     stage,
     url,
-    canvasActionMessage,
-    canvasActionMessageSignature,
-    canvasSessionMessage,
-    canvasSessionMessageSignature,
+    canvasSignedData,
+    canvasHash,
     discordMeta,
   }: CreateThreadOptions,
 ): Promise<CreateThreadResult> {
@@ -137,10 +133,8 @@ export async function __createThread(
     stage,
     url,
     read_only: readOnly,
-    canvas_action_message: canvasActionMessage,
-    canvas_action_message_signature: canvasActionMessageSignature,
-    canvas_session_message: canvasSessionMessage,
-    canvas_session_message_signature: canvasSessionMessageSignature,
+    canvas_signed_data: canvasSignedData,
+    canvas_hash: canvasHash,
     discord_meta: discordMeta,
     topic_id: +topicId,
   };

@@ -82,7 +82,8 @@ export const postCanvasData = async (
 
   // verifyThread etc are also deserializing the canvas fields - we should just do
   // this once and pass the deserialized fields to the verify functions
-  const { actionMessage } = await fromCanvasSignedDataApiArgs(req.body);
+  const { canvasSignedData } = await fromCanvasSignedDataApiArgs(req.body);
+  const { actionMessage } = canvasSignedData;
 
   // TODO: Implement verification and call the create
   // thread/comment/reaction server method with POST data pre-filled.

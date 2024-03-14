@@ -2,7 +2,7 @@ import type { Action, Message, Session } from '@canvas-js/interfaces';
 import { CANVAS_TOPIC } from 'canvas';
 
 import { WalletSsoSource } from '@hicommonwealth/core';
-import { CanvasSignedData } from 'shared/canvas/types';
+import { CanvasSignResult } from 'shared/canvas/types';
 import { getSessionSigners } from 'shared/canvas/verify';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
@@ -76,7 +76,10 @@ async function sign(
   address_: string,
   call: string,
   args: any,
-): Promise<CanvasSignedData> {
+): Promise<CanvasSignResult> {
+  const { sha256 } = await import('@noble/hashes/sha256');
+  const { encode } = await import('@ipld/dag-json');
+
   // TODO: REPLACE THIS - this is a temporary solution to get the signer to sign the message
   // We should have some way to get the CAIP-2 style address
   const address = `eip155:1:${address_}`;
@@ -113,10 +116,13 @@ async function sign(
       const actionMessageSignature = await signer.sign(actionMessage);
 
       return {
-        sessionMessage,
-        sessionMessageSignature,
-        actionMessage,
-        actionMessageSignature,
+        canvasSignedData: {
+          sessionMessage,
+          sessionMessageSignature,
+          actionMessage,
+          actionMessageSignature,
+        },
+        canvasHash: Buffer.from(sha256(encode(actionMessage))).toString('hex'),
       };
     }
   }

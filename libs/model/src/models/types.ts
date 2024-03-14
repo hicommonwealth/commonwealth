@@ -9,14 +9,11 @@ export type ModelStatic<T extends Model> = typeof Model & {
 } & { new (values?: Record<string, unknown>, options?: BuildOptions): T };
 
 export type CanvasModelAttributes = {
-  canvas_action_message: string;
-  canvas_action_message_signature: string;
-  canvas_session_message: string;
-  canvas_session_message_signature: string;
+  canvas_signed_data: string;
+  canvas_hash: string;
 };
 
 export const canvasModelSequelizeColumns = (dataTypes: typeof DataTypes) => ({
-  canvas_action: { type: dataTypes.JSONB, allowNull: true },
-  canvas_session: { type: dataTypes.JSONB, allowNull: true },
+  canvas_signed_data: { type: dataTypes.JSONB, allowNull: true },
   canvas_hash: { type: dataTypes.STRING, allowNull: true },
 });

@@ -56,10 +56,8 @@ export type UpdateThreadOptions = {
     toAdd?: number[];
     toRemove?: number[];
   };
-  canvasActionMessage?: any;
-  canvasActionMessageSignature?: any;
-  canvasSessionMessage?: any;
-  canvasSessionMessageSignature?: any;
+  canvasSignedData?: any;
+  canvasHash?: any;
   discordMeta?: any;
 };
 
@@ -85,10 +83,8 @@ export async function __updateThread(
     spam,
     topicId,
     collaborators,
-    canvasActionMessage,
-    canvasActionMessageSignature,
-    canvasSessionMessage,
-    canvasSessionMessageSignature,
+    canvasHash,
+    canvasSignedData,
     discordMeta,
   }: UpdateThreadOptions,
 ): Promise<UpdateThreadResult> {
@@ -203,10 +199,8 @@ export async function __updateThread(
         title,
         body,
         url,
-        canvasActionMessage,
-        canvasActionMessageSignature,
-        canvasSessionMessage,
-        canvasSessionMessageSignature,
+        canvasHash,
+        canvasSignedData,
       },
       toUpdate,
     );
@@ -408,10 +402,8 @@ export type UpdatableThreadAttributes = {
   title?: string;
   body?: string;
   url?: string;
-  canvasActionMessage?: any;
-  canvasActionMessageSignature?: any;
-  canvasSessionMessage?: any;
-  canvasSessionMessageSignature?: any;
+  canvasSignedData?: string;
+  canvasHash?: string;
 };
 
 /**
@@ -420,15 +412,7 @@ export type UpdatableThreadAttributes = {
 async function setThreadAttributes(
   permissions: UpdateThreadPermissions,
   thread: ThreadInstance,
-  {
-    title,
-    body,
-    url,
-    canvasActionMessage,
-    canvasActionMessageSignature,
-    canvasSessionMessage,
-    canvasSessionMessageSignature,
-  }: UpdatableThreadAttributes,
+  { title, body, url, canvasSignedData, canvasHash }: UpdatableThreadAttributes,
   toUpdate: Partial<ThreadAttributes>,
 ) {
   if (
@@ -475,10 +459,8 @@ async function setThreadAttributes(
       toUpdate.url = url;
     }
 
-    toUpdate.canvas_action_message = canvasActionMessage;
-    toUpdate.canvas_action_message_signature = canvasActionMessageSignature;
-    toUpdate.canvas_session_message = canvasSessionMessage;
-    toUpdate.canvas_session_message_signature = canvasSessionMessageSignature;
+    toUpdate.canvas_signed_data = canvasSignedData;
+    toUpdate.canvas_hash = canvasHash;
   }
 }
 
