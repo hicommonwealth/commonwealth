@@ -1,6 +1,7 @@
 // Core Domain
 export * as Comment from './comment';
 export * as Community from './community';
+export * as Feed from './feed';
 export * as Reaction from './reaction';
 export * as Thread from './thread';
 export * as User from './user';

@@ -1,16 +1,18 @@
-import { Query, feed } from '@hicommonwealth/core';
+import { Query, schemas } from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
 import { models } from '../database';
 
-export const GetUserActivity: Query<typeof feed.> = () => ({
-  ...thread.GetBulkThreads,
+export const GetUserActivity: Query<
+  typeof schemas.queries.GetUserActivity
+> = () => ({
+  ...schemas.queries.GetUserActivity,
   auth: [],
-  body: async ({ payload }) => {
+  body: async ({ actor }) => {
     /**
      * Last 50 updated threads
      */
 
-    const filterByCommunityForUsers = id
+    const filterByCommunityForUsers = actor.user.id
       ? 'JOIN "Addresses" a on a.community_id=t.community_id and a.user_id = ?'
       : '';
 
@@ -51,14 +53,12 @@ export const GetUserActivity: Query<typeof feed.> = () => ({
     ORDER BY nts.created_at DESC;
   `;
 
-    const notifications: any = await models.sequelize.query<GlobalActivity>(
-      query,
-      {
-        type: QueryTypes.SELECT,
-        raw: true,
-        replacements: [id],
-      },
-    );
+    const notifications: any = await models.sequelize.query(query, {
+      type: QueryTypes.SELECT,
+      raw: true,
+      replacements: [actor.user.id],
+    });
 
     return notifications;
-  });
+  },
+});
