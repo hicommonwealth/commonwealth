@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const GetUserActivity = {
+export const ThreadFeed = {
   input: z.object({}),
   output: z.object({
     result: z.array(
@@ -22,6 +22,23 @@ export const GetUserActivity = {
             ),
           }),
         ),
+      }),
+    ),
+  }),
+};
+
+export const ChainFeed = {
+  input: z.object({}),
+  output: z.object({
+    result: z.array(
+      z.object({
+        network: z.string(),
+        event_data: z.object({
+          id: z.string(),
+          kind: z.string(),
+        }),
+        block_number: z.number(),
+        community_id: z.string(),
       }),
     ),
   }),

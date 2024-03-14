@@ -3,9 +3,9 @@ import { QueryTypes } from 'sequelize';
 import { models } from '../database';
 
 export const GetUserActivity: Query<
-  typeof schemas.queries.GetUserActivity
+  typeof schemas.queries.ThreadFeed
 > = () => ({
-  ...schemas.queries.GetUserActivity,
+  ...schemas.queries.ThreadFeed,
   auth: [],
   body: async ({ actor }) => {
     /**
