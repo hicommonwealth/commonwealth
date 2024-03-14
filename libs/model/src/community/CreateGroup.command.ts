@@ -1,7 +1,6 @@
 import { InvalidState, group, type Command } from '@hicommonwealth/core';
 import { Op } from 'sequelize';
 import { models, sequelize } from '../database';
-import { isCommunityAdminOrModerator } from '../middleware';
 import { mustNotExist } from '../middleware/guards';
 import { GroupAttributes } from '../models';
 
@@ -13,7 +12,7 @@ export const Errors = {
 
 export const CreateGroup: Command<typeof group.CreateGroup> = () => ({
   ...group.CreateGroup,
-  auth: [isCommunityAdminOrModerator],
+  auth: [],
   body: async ({ id, payload }) => {
     const groups = await models.Group.findAll({
       where: { community_id: id },

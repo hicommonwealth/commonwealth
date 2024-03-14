@@ -18,6 +18,7 @@ async function main() {
       },
       {
         model: models.CommunityStake,
+        as: 'CommunityStakes',
         required: false,
       },
     ],

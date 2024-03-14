@@ -38,7 +38,7 @@ export const GenerateStakeholderGroups: Command<
         },
         {
           model: models.CommunityStake,
-          as: 'communityStakes',
+          as: 'CommunityStakes',
           where: {
             community_id: id!,
           },

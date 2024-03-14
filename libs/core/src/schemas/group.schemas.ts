@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../constants';
 import { BalanceSourceType } from '../requirements-types';
-import { Community } from './community.schemas';
 
 const ContractSource = z.object({
   source_type: z.enum([
@@ -99,5 +98,5 @@ export const CreateGroup = {
       .array(z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT))
       .optional(),
   }),
-  output: Community.extend({ groups: z.array(Group).optional() }),
+  output: z.object({ groups: z.array(Group).optional() }),
 };
