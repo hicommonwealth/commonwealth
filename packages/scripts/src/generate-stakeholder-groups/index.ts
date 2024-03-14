@@ -1,6 +1,5 @@
 import { command } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
-import { GenerateStakeholderGroups } from 'libs/model/src/community';
+import { Community, models } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
 
 async function main() {
@@ -27,13 +26,16 @@ async function main() {
   // generate stakeholder group for each staked community
   for (const c of stakedCommunitiesWithGroups) {
     if ((c.CommunityStakes || []).length > 0) {
-      const { groups, created } = await command(GenerateStakeholderGroups(), {
-        id: c.id,
-        actor: {
-          user: undefined,
+      const { groups, created } = await command(
+        Community.GenerateStakeholderGroups(),
+        {
+          id: c.id,
+          actor: {
+            user: undefined,
+          },
+          payload: {},
         },
-        payload: {},
-      });
+      );
 
       if (created) {
         console.log(
