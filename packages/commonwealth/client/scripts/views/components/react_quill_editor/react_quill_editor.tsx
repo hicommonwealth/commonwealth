@@ -20,7 +20,7 @@ import { useMarkdownShortcuts } from './use_markdown_shortcuts';
 import { useMention } from './use_mention';
 import { RTFtoMD, SerializableDeltaStatic, getTextFromDelta } from './utils';
 
-import { useNotionPaste } from './useNotionPaste';
+import { useQuillPasteText } from './useQuillPasteText';
 
 import 'components/react_quill/react_quill_editor.scss';
 import 'react-quill/dist/quill.snow.css';
@@ -90,7 +90,7 @@ const ReactQuillEditor = ({
 
   //Handles the incomplete notion checkbox syntax when pasting
   //We may end up expanding this hook to handle other pasting issues
-  const handleNotionPaste = useNotionPaste(
+  const handleTextPaste = useQuillPasteText(
     setContentDelta,
     contentDelta,
     editorRef,
@@ -372,7 +372,7 @@ const ReactQuillEditor = ({
                               },
                               clipboard: {
                                 matchVisual: false,
-                                handler: handleNotionPaste,
+                                handler: handleTextPaste,
                               },
                               mention,
                               magicUrl: false,

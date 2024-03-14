@@ -309,6 +309,7 @@ export async function createTestEntities() {
                 community_id: 'cmntest',
                 topic_id: -1,
                 kind: 'discussion',
+                plaintext: 'text',
               },
             })
           )[0],
@@ -329,6 +330,7 @@ export async function createTestEntities() {
                   community_id: 'cmntest',
                   topic_id: -2,
                   kind: 'discussion',
+                  plaintext: 'text',
                 },
               })
             )[0],

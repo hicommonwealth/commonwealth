@@ -143,7 +143,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     }
 
     // adds a union between SELECT queries if the number of SELECT queries is greater than 1
-    if (i != 0) query += ' UNION ';
+    if (query !== '') query += ' UNION ';
     // add the community and timestamp to replacements so that we can safely populate the query with dynamic parameters
     replacements.push(name, date);
     // append the SELECT query
@@ -197,7 +197,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     }
 
     // adds a union between SELECT queries if the number of SELECT queries is greater than 1
-    if (i !== 0) query += ' UNION ';
+    if (query !== '') query += ' UNION ';
     // add the community and timestamp to replacements so that we can safely populate the query with dynamic parameters
     replacements.push(name, date);
     // append the SELECT query
