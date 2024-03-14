@@ -41,7 +41,7 @@ export const NewSnapshotProposalModal = ({
       })) || [],
     [],
   );
-  console.log('snapshotOptions', snapshotOptions);
+
   useEffect(() => {
     if (snapshotOptions.length > 0) {
       setSelectedSnapshotId(snapshotOptions[0].value);
