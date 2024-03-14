@@ -8,7 +8,6 @@ import React, { StrictMode } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { queryClient } from 'state/api/config';
-import { FeedDiscovery } from 'views/components/FeedDiscovery/FeedDiscovery';
 import { Splash } from './Splash';
 import { openFeatureProvider } from './helpers/feature-flags';
 import useAppStatus from './hooks/useAppStatus';
@@ -39,7 +38,6 @@ const App = () => {
                     displayDelayMilliseconds={1000}
                   />
                 )}
-                <FeedDiscovery />
               </>
             )}
 
