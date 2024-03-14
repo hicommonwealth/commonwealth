@@ -213,19 +213,24 @@ export async function createAddressHelper(
       profile_id = existingAddressWithHex.profile_id;
     }
 
-    const newObj = await models.Address.create({
-      user_id,
-      profile_id,
-      community_id: req.community_id,
-      address: encodedAddress,
-      hex: addressHex,
-      verification_token,
-      verification_token_expires,
-      block_info: req.block_info,
-      keytype: req.keytype,
-      last_active,
-      wallet_id: req.wallet_id,
-      wallet_sso_source: req.wallet_sso_source,
+    const newObj = await models.sequelize.transaction(async (transaction) => {
+      return models.Address.create(
+        {
+          user_id,
+          profile_id,
+          community_id: req.community_id,
+          address: encodedAddress,
+          hex: addressHex,
+          verification_token,
+          verification_token_expires,
+          block_info: req.block_info,
+          keytype: req.keytype,
+          last_active,
+          wallet_id: req.wallet_id,
+          wallet_sso_source: req.wallet_sso_source,
+        },
+        { transaction },
+      );
     });
 
     // if user.id is undefined, the address is being used to create a new user,

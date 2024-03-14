@@ -1,13 +1,13 @@
-import { InvalidState, community, type Command } from '@hicommonwealth/core';
+import { InvalidState, schemas, type Command } from '@hicommonwealth/core';
 import { models } from '../database';
 import { isCommunityAdmin } from '../middleware';
 import { mustExist } from '../middleware/guards';
 import { commonProtocol } from '../services';
 
 export const SetCommunityStake: Command<
-  typeof community.SetCommunityStake
+  typeof schemas.commands.SetCommunityStake
 > = () => ({
-  ...community.SetCommunityStake,
+  ...schemas.commands.SetCommunityStake,
   auth: [isCommunityAdmin],
   body: async ({ id, payload }) => {
     // !load
