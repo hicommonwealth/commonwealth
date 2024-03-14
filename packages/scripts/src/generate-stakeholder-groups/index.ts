@@ -13,11 +13,11 @@ async function main() {
     include: [
       {
         model: models.Group,
-        as: 'group',
+        as: 'groups',
         required: true,
       },
       {
-        model: this.models.CommunityStake,
+        model: models.CommunityStake,
         required: false,
       },
     ],
