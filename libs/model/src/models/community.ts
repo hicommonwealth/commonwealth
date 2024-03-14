@@ -1,4 +1,4 @@
-import { community } from '@hicommonwealth/core';
+import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
 import { z } from 'zod';
@@ -14,7 +14,7 @@ import type { TopicAttributes, TopicInstance } from './topic';
 import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes } from './user';
 
-export type CommunityAttributes = z.infer<typeof community.Community> & {
+export type CommunityAttributes = z.infer<typeof schemas.entities.Community> & {
   // associations
   ChainNode?: ChainNodeAttributes;
   Addresses?: AddressAttributes[] | AddressAttributes['id'][];
@@ -29,6 +29,8 @@ export type CommunityAttributes = z.infer<typeof community.Community> & {
   Contract?: ContractInstance;
   CommunityStakes?: CommunityStakeAttributes[];
   groups?: GroupAttributes[];
+  thread_count?: number;
+  address_count?: number;
 };
 
 export type CommunityInstance = ModelInstance<CommunityAttributes> & {
@@ -122,6 +124,16 @@ export default (
         type: dataTypes.INTEGER,
         allowNull: true,
         defaultValue: null,
+      },
+      thread_count: {
+        type: dataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      address_count: {
+        type: dataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
       },
       namespace: { type: dataTypes.STRING, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: true },

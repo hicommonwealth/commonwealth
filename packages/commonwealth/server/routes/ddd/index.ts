@@ -6,14 +6,6 @@ import * as integrations from './integrations';
 import * as thread from './threads';
 
 /**
- * Express router
- */
-const router = Router();
-router.use('/community', express.statsMiddleware, community.expressRouter);
-router.use('/thread', express.statsMiddleware, thread.expressRouter);
-router.use(express.errorMiddleware);
-
-/**
  * tRPC router
  */
 const trpcRouter = trpc.router({
@@ -24,6 +16,7 @@ const trpcRouter = trpc.router({
 
 export type AppRouter = typeof trpcRouter;
 
+const router = Router();
 /**
  * OpenAPI spec
  */
@@ -42,7 +35,13 @@ router.get(
   '/trpc/docs',
   swaggerUi.setup(null, { swaggerUrl: '../openapi.json' }),
 );
-// router.use('/trpc/rest', express.statsMiddleware, trpc.toOpenApiExpress(trpcRouter));
+
+router.use(
+  '/trpc/rest',
+  express.statsMiddleware,
+  trpc.toOpenApiExpress(trpcRouter),
+);
+
 router.use('/trpc', express.statsMiddleware, trpc.toExpress(trpcRouter));
 
 export default router;

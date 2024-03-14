@@ -1,54 +1,10 @@
-import z from 'zod';
-import { Address } from './address.schemas';
+import { z } from 'zod';
+import { zBoolean } from '../../utils';
 import {
   discordMetaSchema,
   linksSchema,
   paginationSchema,
-} from './utils.schemas';
-
-export const Thread = z.object({
-  Address: Address.optional(),
-  address_id: z.number(),
-  title: z.string(),
-  kind: z.string(),
-  stage: z.string(),
-  id: z.number().optional(),
-  body: z.string().optional(),
-  plaintext: z.string().optional(),
-  url: z.string().optional(),
-  topic_id: z.number().optional(),
-  pinned: z.boolean().optional(),
-  community_id: z.string(),
-  view_count: z.number(),
-  links: z.object(linksSchema).array().optional(),
-
-  read_only: z.boolean().optional(),
-  version_history: z.array(z.string()).optional(),
-
-  has_poll: z.boolean().optional(),
-
-  canvas_action: z.string(),
-  canvas_session: z.string(),
-  canvas_hash: z.string(),
-
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
-  last_edited: z.date().optional(),
-  deleted_at: z.date().optional(),
-  last_commented_on: z.date().optional(),
-  marked_as_spam_at: z.date().optional(),
-  archived_at: z.date().optional(),
-  locked_at: z.date().optional(),
-  discord_meta: z.object(discordMetaSchema).optional(),
-
-  //counts
-  reaction_count: z.number(),
-  reaction_weights_sum: z.number(),
-  comment_count: z.number(),
-
-  //notifications
-  max_notif_id: z.number(),
-});
+} from '../utils.schemas';
 
 export const OrderByQueriesKeys = z.enum([
   'createdAt:asc',
@@ -66,12 +22,12 @@ export const GetBulkThreads = {
     community_id: z.string(),
     fromDate: z.coerce.date().optional(),
     toDate: z.coerce.date().optional(),
-    archived: z.boolean().default(false),
-    includePinnedThreads: z.boolean().default(false),
+    archived: zBoolean.default(false),
+    includePinnedThreads: zBoolean.default(false),
     topicId: z.string().optional(),
-    stage: z.string().nullable().optional(),
-    orderBy: OrderByQueriesKeys.default('createdAt:desc').nullable(),
-    cursor: z.number().nullish(),
+    stage: z.string().optional(),
+    orderBy: OrderByQueriesKeys.default('createdAt:desc'),
+    cursor: z.number().optional(),
     ...paginationSchema,
   }),
   output: z.object({
