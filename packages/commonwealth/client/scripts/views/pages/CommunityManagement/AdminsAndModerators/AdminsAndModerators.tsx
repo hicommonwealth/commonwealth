@@ -67,14 +67,6 @@ const AdminsAndModerators = () => {
       fetchNextPage();
     }
   };
-  // useEffect(() => {
-  //   if (!isFetchAdminQueryLoading && returnedAdmins.length > 0) {
-  //     setAdmins(returnedAdmins);
-  //   }
-  //   if (!isFetchAdminQueryLoading && returnedMods.length > 0) {
-  //     setMods(returnedMods);
-  //   }
-  // }, [returnedAdmins, returnedMods, isFetchAdminQueryLoading]);
 
   const handleRoleUpdate = (oldRole, newRole) => {
     // newRole doesn't have the Address property that oldRole has,

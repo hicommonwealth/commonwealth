@@ -65,10 +65,10 @@ export const UpgradeRolesForm = ({
   const handleUpgrade = async () => {
     const indexOfName = nonAdminNames.indexOf(user);
 
-    const _user = nonAdmins[indexOfName];
+    const upgradedUser = nonAdmins[indexOfName];
     const newRole =
       role === 'Admin' ? 'admin' : role === 'Moderator' ? 'moderator' : '';
-    await upgradeRoles({ _user, onRoleUpdate, newRole });
+    await upgradeRoles({ upgradedUser, onRoleUpdate, newRole });
     zeroOutRadioButtons();
   };
 
@@ -146,43 +146,3 @@ export const UpgradeRolesForm = ({
     </div>
   );
 };
-
-// () => {
-//   const indexOfName = nonAdminNames.indexOf(user);
-
-//   const _user = nonAdmins[indexOfName];
-
-//   const newRole =
-//     role === 'Admin'
-//       ? 'admin'
-//       : role === 'Moderator'
-//       ? 'moderator'
-//       : '';
-
-//   $.post(`${app.serverUrl()}/upgradeMember`, {
-//     new_role: newRole,
-//     address: _user.Address.address,
-//     community_id: app.activeChainId(),
-//     jwt: app.user.jwt,
-//   }).then((r) => {
-//     if (r.status === 'Success') {
-//       notifySuccess('Member upgraded');
-//     } else {
-//       notifyError('Upgrade failed');
-//     }
-
-//     const createdRole = new RoleInfo({
-//       id: r.data.result.id,
-//       address_id: r.data.result.address_id,
-//       address_chain: r.data.result.community_id,
-//       address: r.data.result.address,
-//       community_id: r.data.result.community_id,
-//       permission: r.data.result.permission,
-//       allow: r.data.result.allow,
-//       deny: r.data.result.deny,
-//       is_user_default: r.data.result.is_user_default,
-//     });
-//     onRoleUpdate(_user, createdRole);
-//   });
-//   zeroOutRadioButtons();
-// }
