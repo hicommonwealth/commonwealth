@@ -207,6 +207,8 @@
     "stream-http": "^3.2.0",
     "superagent": "^5.2.2",
     "swagger-ui-express": "^5.0.0",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "tweetnacl": "^1.0.3",
     "underscore": "^1.13.1",
     "unleash-proxy-client": "^3.3.1",
