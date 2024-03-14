@@ -18,8 +18,8 @@ function toDate(t: ThreadAttributes): Date {
   return t.last_edited ?? t.created_at;
 }
 
-function sorter(a: ThreadAttributes, b: ThreadAttributes) {
-  return toDate(a).getTime() - toDate(b).getTime();
+function sortByDateDesc(a: ThreadAttributes, b: ThreadAttributes) {
+  return toDate(b).getTime() - toDate(a).getTime();
 }
 
 function computeUpdated(bulkThreads: GetBulkThreadsResult): Date {
@@ -28,10 +28,10 @@ function computeUpdated(bulkThreads: GetBulkThreadsResult): Date {
     return new Date();
   }
 
-  const sorted = [...bulkThreads.threads].sort(sorter);
+  const sortedByDateDesc = [...bulkThreads.threads].sort(sortByDateDesc);
 
   // return the most recent thread and get its date
-  return toDate(sorted.reverse()[0]);
+  return toDate(sortedByDateDesc[0]);
 }
 export const getFeedHandler = async (
   models: DB,
