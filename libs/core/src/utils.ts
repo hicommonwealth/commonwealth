@@ -45,4 +45,4 @@ export async function checkIconSize(val: string, ctx: z.RefinementCtx) {
   }
 }
 
-export const zBoolean = z.preprocess((v) => v && v !== 'false', z.boolean());
+export const zBoolean = z.preprocess((v) => !!v && v !== 'false', z.boolean());
