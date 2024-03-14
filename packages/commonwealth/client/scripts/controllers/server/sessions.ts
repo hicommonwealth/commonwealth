@@ -97,8 +97,6 @@ async function sign(
   const sessionSigners = await getSessionSigners();
   for (const signer of sessionSigners) {
     if (signer.match(address)) {
-      // assume for now that we are using SIWESigner
-      // TODO: add getCachedSession for other session signers
       const { session } = signer.getCachedSession(CANVAS_TOPIC, address);
 
       const sessionMessage: Message<Session> = {
