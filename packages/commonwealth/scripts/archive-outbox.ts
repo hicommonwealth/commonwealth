@@ -121,13 +121,16 @@ async function getTablesToBackup(): Promise<string[]> {
   const archiveExists = await Promise.allSettled(
     tablesInPg.map(async (t) => {
       try {
-        const res = await s3
+        const objectKey = getCompressedDumpName(getDumpName(t));
+        log.info(
+          `Searching for ${objectKey} in S3 bucket ${S3_BUCKET_NAME}...`,
+        );
+        await s3
           .headObject({
             Bucket: S3_BUCKET_NAME,
-            Key: t,
+            Key: objectKey,
           })
           .promise();
-        console.log('>>>>>>>>', res);
         return true;
       } catch (e) {
         if (e.statusCode === 404) return false;
@@ -156,6 +159,14 @@ async function getTablesToBackup(): Promise<string[]> {
   return tablesToArchive;
 }
 
+function getDumpName(tableName: string): string {
+  return `${tableName}.dump.sql`;
+}
+
+function getCompressedDumpName(dumpName: string): string {
+  return `${dumpName}.gz`;
+}
+
 async function main() {
   log.info('Checking outbox child table archive status...');
   const tables = await getTablesToBackup();
@@ -164,8 +175,8 @@ async function main() {
   });
 
   for (const table of tables) {
-    const dumpName = `${table}.dump.sql`;
-    const compressedName = `${dumpName}.gz`;
+    const dumpName = getDumpName(table);
+    const compressedName = getCompressedDumpName(dumpName);
 
     log.info(`Dumping table`, undefined, { table });
     const res = dumpTablesSync(table, dumpName);
