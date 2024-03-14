@@ -1,7 +1,9 @@
 import type { Action, Message, Session } from '@canvas-js/interfaces';
 import { CANVAS_TOPIC } from 'canvas';
 
-import { WalletSsoSource } from '@hicommonwealth/core';
+import { ChainBase, WalletSsoSource } from '@hicommonwealth/core';
+import app from 'client/scripts/state';
+import { chainBaseToCaip2 } from 'shared/canvas/chainMappings';
 import { CanvasSignResult } from 'shared/canvas/types';
 import { getSessionSigners } from 'shared/canvas/verify';
 import Account from '../../models/Account';
@@ -67,6 +69,17 @@ export async function getSessionFromWallet(
   return session;
 }
 
+function getCaip2Address(address: string) {
+  const caip2Prefix = chainBaseToCaip2(app.chain.base);
+
+  const idOrPrefix =
+    app.chain.base === ChainBase.CosmosSDK
+      ? app.chain?.meta.bech32Prefix || 'cosmos'
+      : app.chain?.meta.node?.ethChainId || 1;
+
+  return `${caip2Prefix}:${idOrPrefix}:${address}`;
+}
+
 // Sign an arbitrary action, using context from the last authSession() call.
 //
 // The signing methods are stateful, which simplifies implementation greatly
@@ -80,9 +93,7 @@ async function sign(
   const { sha256 } = await import('@noble/hashes/sha256');
   const { encode } = await import('@ipld/dag-json');
 
-  // TODO: REPLACE THIS - this is a temporary solution to get the signer to sign the message
-  // We should have some way to get the CAIP-2 style address
-  const address = `eip155:1:${address_}`;
+  const address = getCaip2Address(address_);
   const sessionSigners = await getSessionSigners();
   for (const signer of sessionSigners) {
     if (signer.match(address)) {
