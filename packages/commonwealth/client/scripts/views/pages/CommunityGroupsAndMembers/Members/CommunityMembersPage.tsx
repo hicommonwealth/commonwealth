@@ -1,4 +1,3 @@
-import useGetCommunityMembersQuery from 'client/scripts/state/api/profiles/getCommunityMembers';
 import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
@@ -11,6 +10,7 @@ import {
   useFetchGroupsQuery,
   useRefreshMembershipQuery,
 } from 'state/api/groups';
+import useGetCommunityMembersQuery from 'state/api/profiles/getCommunityMembers';
 import { SearchProfilesResponse } from 'state/api/profiles/searchProfiles';
 import useGroupMutationBannerStore from 'state/ui/group';
 import { useDebounce } from 'usehooks-ts';
