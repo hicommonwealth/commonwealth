@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { BalanceSourceType } from '../requirements-types';
-import { Community } from './community.schemas';
+import { BalanceSourceType } from '../types';
+import { Community } from './entities.schemas';
 
 const ContractSource = z.object({
   source_type: z.enum([
