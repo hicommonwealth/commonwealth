@@ -1,6 +1,6 @@
 import { formatAddressShort } from 'helpers';
+import { getRelativeTimestamp } from 'helpers/dates';
 import React, { useEffect, useState } from 'react';
-import TimeAgo from 'react-timeago';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import CommunityInfo from '../common/CommunityInfo';
 import { transactionHistoryData } from '../common/sampleData'; // TODO: get data from API
@@ -131,7 +131,7 @@ const Transactions = ({ filterOptions }: TransactionsProps) => {
                     onMouseEnter={handleInteraction}
                     onMouseLeave={handleInteraction}
                   >
-                    <TimeAgo date={tx.timestamp} title="" />
+                    {getRelativeTimestamp(tx.timestamp)}
                   </span>
                 )}
               />
