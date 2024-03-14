@@ -7,7 +7,7 @@ import {
   ChainType,
   DefaultPage,
   NotificationCategories,
-  community as community_schemas,
+  schemas,
 } from '@hicommonwealth/core';
 import type {
   AddressInstance,
@@ -69,7 +69,7 @@ export const Errors = {
 
 export type CreateCommunityOptions = {
   user: UserInstance;
-  community: z.infer<typeof community_schemas.CreateCommunity.input>;
+  community: z.infer<typeof schemas.commands.CreateCommunity.input>;
 };
 
 export type CreateCommunityResult = {

@@ -8,11 +8,12 @@ import React, { StrictMode } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { queryClient } from 'state/api/config';
+import FeedDiscovery from 'views/components/FeedDiscovery/FeedDiscovery';
 import { Splash } from './Splash';
 import { openFeatureProvider } from './helpers/feature-flags';
 import useAppStatus from './hooks/useAppStatus';
+import { trpc, trpcClient } from './utils/trpcClient';
 import { AddToHomeScreenPrompt } from './views/components/AddToHomeScreenPrompt';
-import FeedDiscovery from 'views/components/FeedDiscovery/FeedDiscovery';
 
 OpenFeature.setProvider(openFeatureProvider);
 
@@ -24,26 +25,28 @@ const App = () => {
   return (
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <OpenFeatureProvider client={undefined}>
-          {isLoading ? (
-            <Splash />
-          ) : (
-            <>
-              <RouterProvider router={router(customDomain)} />
-              {isAddedToHomeScreen || isMarketingPage ? null : (
-                <AddToHomeScreenPrompt
-                  isIOS={isIOS}
-                  isAndroid={isAndroid}
-                  displayDelayMilliseconds={1000}
-                />
-              )}
-              <FeedDiscovery/>
-            </>
-          )}
+        <trpc.Provider client={trpcClient} queryClient={queryClient}>
+          <OpenFeatureProvider client={undefined}>
+            {isLoading ? (
+              <Splash />
+            ) : (
+              <>
+                <RouterProvider router={router(customDomain)} />
+                {isAddedToHomeScreen || isMarketingPage ? null : (
+                  <AddToHomeScreenPrompt
+                    isIOS={isIOS}
+                    isAndroid={isAndroid}
+                    displayDelayMilliseconds={1000}
+                  />
+                )}
+                <FeedDiscovery />
+              </>
+            )}
 
-          <ToastContainer />
-          <ReactQueryDevtools />
-        </OpenFeatureProvider>
+            <ToastContainer />
+            <ReactQueryDevtools />
+          </OpenFeatureProvider>
+        </trpc.Provider>
       </QueryClientProvider>
     </StrictMode>
   );

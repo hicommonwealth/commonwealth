@@ -1,18 +1,17 @@
-import type { DB } from '@hicommonwealth/model';
+import type { DB, ThreadInstance } from '@hicommonwealth/model';
+import { Transaction } from 'sequelize';
 
 export default async function deleteThread(
   models: DB,
-  thread_id: number,
+  thread: ThreadInstance,
+  transaction: Transaction,
 ): Promise<void> {
   models.Subscription.destroy({
     where: {
-      thread_id: thread_id,
+      thread_id: thread.id,
     },
+    transaction,
   });
 
-  await models.Thread.destroy({
-    where: {
-      id: thread_id,
-    },
-  });
+  await thread.destroy({ transaction });
 }

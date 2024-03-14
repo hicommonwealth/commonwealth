@@ -66,6 +66,14 @@ export const generateBreadcrumbs = (
       case 'profile':
         link = `profile/id/${profileId}`;
         break;
+      case 'members':
+        if (
+          pathSegments[index] === 'members' &&
+          pathSegments[index + 1] === 'update'
+        ) {
+          link = 'members';
+        }
+        break;
       case 'snapshot':
         //Match the header on the snapshots page
         pathSegments.splice(index + 1, 1);

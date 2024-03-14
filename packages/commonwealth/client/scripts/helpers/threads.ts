@@ -7,7 +7,7 @@ export function detectURL(str: string) {
 }
 
 export const filterLinks = (links: Link[] = [], source: LinkSource) => {
-  return links.filter((l) => l?.source === source);
+  return links?.filter((l) => l?.source === source);
 };
 
 export const getAddedAndDeleted = <T>(

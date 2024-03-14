@@ -1,4 +1,4 @@
-import { community } from '@hicommonwealth/core';
+import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
 import { z } from 'zod';
@@ -6,7 +6,7 @@ import { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type CommunityStakeAttributes = z.infer<
-  typeof community.CommunityStake
+  typeof schemas.entities.CommunityStake
 > & {
   // associations
   Chain?: CommunityAttributes;
