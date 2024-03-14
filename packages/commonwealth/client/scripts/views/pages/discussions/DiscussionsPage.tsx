@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
+import { isWindowSmallInclusive } from 'views/components/component_kit/helpers';
 
-import useBrowserWindow from 'hooks/useBrowserWindow';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
@@ -51,11 +51,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const { data: topics } = useFetchTopicsQuery({
     communityId: community_id,
   });
-  const [resizing, setResizing] = useState(false);
-  const { isWindowSmallInclusive } = useBrowserWindow({
-    onResize: () => setResizing(true),
-    resizeListenerUpdateDeps: [resizing],
-  });
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
@@ -84,9 +79,9 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         queryType: 'bulk',
         limit: 20,
         topicId,
-        stage: stageName,
+        stage: stageName ?? undefined,
         includePinnedThreads: true,
-        orderBy: featuredFilter,
+        orderBy: featuredFilter ?? undefined,
         toDate: dateCursor.toDate,
         fromDate: dateCursor.fromDate,
         isOnArchivePage: isOnArchivePage,

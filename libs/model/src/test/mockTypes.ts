@@ -1,19 +1,9 @@
-import {
-  NotificationCategories,
-  address,
-  chainNode,
-  community,
-  group,
-  notification,
-  snapshot,
-  subscription,
-  user,
-} from '@hicommonwealth/core';
+import { NotificationCategories, schemas } from '@hicommonwealth/core';
 import { models } from '../database';
 import { SchemaWithModel } from './seed';
 
-export const UserSchema: SchemaWithModel<typeof user.User> = {
-  schema: user.User,
+export const UserSchema: SchemaWithModel<typeof schemas.entities.User> = {
+  schema: schemas.entities.User,
   model: models.User,
   mockDefaults: () => ({
     isAdmin: false,
@@ -22,24 +12,27 @@ export const UserSchema: SchemaWithModel<typeof user.User> = {
   }),
 };
 
-export const ChainNodeSchema: SchemaWithModel<typeof chainNode.ChainNode> = {
-  schema: chainNode.ChainNode,
+export const ChainNodeSchema: SchemaWithModel<
+  typeof schemas.entities.ChainNode
+> = {
+  schema: schemas.entities.ChainNode,
   model: models.ChainNode,
 };
 
-export const ContractSchema: SchemaWithModel<typeof community.Contract> = {
-  schema: community.Contract,
-  model: models.Contract,
-  mockDefaults: () => ({
-    chain_node_id: 1,
-    abi_id: null,
-  }),
-};
+export const ContractSchema: SchemaWithModel<typeof schemas.entities.Contract> =
+  {
+    schema: schemas.entities.Contract,
+    model: models.Contract,
+    mockDefaults: () => ({
+      chain_node_id: 1,
+      abi_id: null,
+    }),
+  };
 
 export const CommunityContractSchema: SchemaWithModel<
-  typeof community.CommunityContract
+  typeof schemas.entities.CommunityContract
 > = {
-  schema: community.CommunityContract,
+  schema: schemas.entities.CommunityContract,
   model: models.CommunityContract,
   mockDefaults: () => ({
     community_id: 'ethereum',
@@ -47,8 +40,10 @@ export const CommunityContractSchema: SchemaWithModel<
   }),
 };
 
-export const CommunitySchema: SchemaWithModel<typeof community.Community> = {
-  schema: community.Community,
+export const CommunitySchema: SchemaWithModel<
+  typeof schemas.entities.Community
+> = {
+  schema: schemas.entities.Community,
   model: models.Community,
   allowedGeneratedProps: ['id'],
   mockDefaults: () => ({
@@ -56,8 +51,8 @@ export const CommunitySchema: SchemaWithModel<typeof community.Community> = {
   }),
 };
 
-export const TopicSchema: SchemaWithModel<typeof community.Topic> = {
-  schema: community.Topic,
+export const TopicSchema: SchemaWithModel<typeof schemas.entities.Topic> = {
+  schema: schemas.entities.Topic,
   model: models.Topic,
   mockDefaults: () => ({
     community_id: 'ethereum',
@@ -67,9 +62,9 @@ export const TopicSchema: SchemaWithModel<typeof community.Topic> = {
 };
 
 export const CommunityStakeSchema: SchemaWithModel<
-  typeof community.CommunityStake
+  typeof schemas.entities.CommunityStake
 > = {
-  schema: community.CommunityStake,
+  schema: schemas.entities.CommunityStake,
   model: models.CommunityStake,
   mockDefaults: () => ({
     community_id: 'ethereum',
@@ -83,16 +78,16 @@ export const CommunityStakeSchema: SchemaWithModel<
   }),
 };
 
-export const ProfileSchema: SchemaWithModel<typeof user.Profile> = {
-  schema: user.Profile,
+export const ProfileSchema: SchemaWithModel<typeof schemas.entities.Profile> = {
+  schema: schemas.entities.Profile,
   model: models.Profile,
   mockDefaults: () => ({
     user_id: 1,
   }),
 };
 
-export const AddressSchema: SchemaWithModel<typeof address.Address> = {
-  schema: address.Address,
+export const AddressSchema: SchemaWithModel<typeof schemas.entities.Address> = {
+  schema: schemas.entities.Address,
   model: models.Address,
   mockDefaults: () => ({
     community_id: 'ethereum',
@@ -102,9 +97,9 @@ export const AddressSchema: SchemaWithModel<typeof address.Address> = {
 };
 
 export const NotificationCategorySchema: SchemaWithModel<
-  typeof notification.NotificationCategory
+  typeof schemas.entities.NotificationCategory
 > = {
-  schema: notification.NotificationCategory,
+  schema: schemas.entities.NotificationCategory,
   model: models.NotificationCategory,
   mockDefaults: () => ({}),
   buildQuery: (data) => ({
@@ -115,9 +110,9 @@ export const NotificationCategorySchema: SchemaWithModel<
 };
 
 export const SubscriptionSchema: SchemaWithModel<
-  typeof subscription.Subscription
+  typeof schemas.entities.Subscription
 > = {
-  schema: subscription.Subscription,
+  schema: schemas.entities.Subscription,
   model: models.Subscription,
   mockDefaults: () => ({
     subscriber_id: 1,
@@ -129,9 +124,9 @@ export const SubscriptionSchema: SchemaWithModel<
 };
 
 export const SnapshotSpaceSchema: SchemaWithModel<
-  typeof snapshot.SnapshotSpace
+  typeof schemas.entities.SnapshotSpace
 > = {
-  schema: snapshot.SnapshotSpace,
+  schema: schemas.entities.SnapshotSpace,
   model: models.SnapshotSpace,
   mockDefaults: () => ({}),
   buildQuery: (data) => ({
@@ -142,16 +137,16 @@ export const SnapshotSpaceSchema: SchemaWithModel<
 };
 
 export const SnapshotProposalSchema: SchemaWithModel<
-  typeof snapshot.SnapshotProposal
+  typeof schemas.entities.SnapshotProposal
 > = {
-  schema: snapshot.SnapshotProposal,
+  schema: schemas.entities.SnapshotProposal,
   model: models.SnapshotProposal,
   mockDefaults: () => ({}),
   allowedGeneratedProps: ['id'],
 };
 
-export const GroupSchema: SchemaWithModel<typeof group.Group> = {
-  schema: group.Group,
+export const GroupSchema: SchemaWithModel<typeof schemas.entities.Group> = {
+  schema: schemas.entities.Group,
   model: models.Group,
   mockDefaults: () => ({
     community_id: 'ethereum',
