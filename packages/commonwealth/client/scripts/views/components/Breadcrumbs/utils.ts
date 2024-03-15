@@ -106,8 +106,6 @@ export const generateBreadcrumbs = (
 
     const splitLinks = link.split('/').filter((val) => val.length > 0);
 
-    console.log('split', splitLinks);
-
     // Removed IDs from the breadcrumb
     const removedThreadId = decodeURIComponent(pathSegments[index]).replace(
       /^\d+-/,
