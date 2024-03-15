@@ -62,7 +62,7 @@ const CallbackPage = () => {
         setFailureMessage(e.message);
       });
     }
-  }, [state, guildId, state, setBotConfig]);
+  }, [state, guildId, setBotConfig]);
 
   if (!state || !guildId) {
     return <PageNotFound message="No callback data provided." />;

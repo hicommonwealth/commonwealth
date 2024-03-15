@@ -105,7 +105,7 @@ const Discord = () => {
       console.error(e);
       notifyError('Failed to disconnect Discord');
     }
-  }, [connectionStatus]);
+  }, [connectionStatus, queryParams, queryClient]);
 
   const onToggleWebhooks = useCallback(async () => {
     const toggleMsgType = isDiscordWebhooksEnabled ? 'disable' : 'enable';
