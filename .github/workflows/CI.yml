@@ -524,3 +524,37 @@ jobs:
           PORT: 8080
           USES_DOCKER_PGSQL: true
           REDIS_URL: redis://localhost:6379
+
+  snapshot-test:
+    name: Snapshot Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # We only run snapshot tests if any files in the following folders changes
+      - name: Get changed Cosmos devnet-related files
+        id: changed-files-specific
+        uses: tj-actions/changed-files@v35
+        with:
+          files: packages/snapshot/**/*
+
+      - name: Run following steps if any file(s) in the snapshot package changes
+        if: steps.changed-files-specific.outputs.all_changed_files
+        run: |
+          echo "One or more snapshot pacakge files has changed."
+          echo "List all the files that have changed: ${{ steps.changed-files-specific.outputs.all_changed_files }}"
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
