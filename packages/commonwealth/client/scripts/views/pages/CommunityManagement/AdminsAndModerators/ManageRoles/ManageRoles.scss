@@ -28,6 +28,9 @@
           color: $neutral-600;
         }
       }
+      &:hover {
+        background-color: $neutral-100;
+      }
     }
   }
 }

@@ -1,15 +1,12 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
+import React, { useMemo, useState } from 'react';
 import app from 'state';
 import useFetchAdminQuery from 'state/api/members/fetchAdmin';
+import useSearchProfilesQuery, {
+  SearchProfilesResponse,
+} from 'state/api/profiles/searchProfiles';
 import { useDebounce } from 'usehooks-ts';
-import { CWText } from 'views/components/component_kit/cw_text';
-import {
-  APIOrderBy,
-  APIOrderDirection,
-} from '../../../../../scripts/helpers/constants';
-import useSearchProfilesQuery from '../../../../../scripts/state/api/profiles/searchProfiles';
 import RoleInfo from '../../../../models/RoleInfo';
-import { ComponentType } from '../../../components/component_kit/types';
 import CommunityManagementLayout from '../common/CommunityManagementLayout';
 import ManageRoles from './ManageRoles';
 import UpgradeRolesForm from './UpgradeRolesForm';
@@ -30,37 +27,54 @@ const AdminsAndModerators = () => {
     communityId: app.activeChainId(),
   });
 
-  const { data: searchResults, refetch } = useSearchProfilesQuery({
+  const {
+    data: members,
+    isLoading: isLoadingProfiles,
+    refetch,
+    fetchNextPage,
+  } = useSearchProfilesQuery({
     communityId: app.activeChainId(),
     searchTerm: debouncedSearchTerm,
-    limit: 100,
+    limit: 30,
     orderBy: APIOrderBy.LastActive,
     orderDirection: APIOrderDirection.Desc,
     includeRoles: true,
   });
 
   const roleData = useMemo(() => {
-    if (!searchResults?.pages?.length) {
+    if (!members?.pages?.length) {
       return [];
     }
-    return searchResults.pages[0].results.map((profile) => {
-      return {
-        ...(profile.roles[0] || {}),
-        Address: profile.addresses[0],
-        id: profile.addresses[0].id,
-        displayName: profile.profile_name || 'Anonymous',
-      };
-    });
-  }, [searchResults]);
+    const clonedMembersPages = [...members.pages];
 
-  useEffect(() => {
-    if (!isFetchAdminQueryLoading && returnedAdmins.length > 0) {
-      setAdmins(returnedAdmins);
+    const results = clonedMembersPages
+      .reduce((acc, page) => {
+        return [...acc, ...page.results];
+      }, [] as SearchProfilesResponse['results'])
+      .map((profile) => {
+        return {
+          ...(profile.roles[0] || {}),
+          Address: profile.addresses[0],
+          id: profile.addresses[0].id,
+          displayName: profile.profile_name || 'Anonymous',
+        };
+      });
+    return results;
+  }, [members]);
+
+  const refetchMembers = () => {
+    if (members?.pages?.[0]?.totalResults > roleData.length) {
+      fetchNextPage();
     }
-    if (!isFetchAdminQueryLoading && returnedMods.length > 0) {
-      setMods(returnedMods);
-    }
-  }, [returnedAdmins, returnedMods, isFetchAdminQueryLoading]);
+  };
+  // useEffect(() => {
+  //   if (!isFetchAdminQueryLoading && returnedAdmins.length > 0) {
+  //     setAdmins(returnedAdmins);
+  //   }
+  //   if (!isFetchAdminQueryLoading && returnedMods.length > 0) {
+  //     setMods(returnedMods);
+  //   }
+  // }, [returnedAdmins, returnedMods, isFetchAdminQueryLoading]);
 
   const handleRoleUpdate = (oldRole, newRole) => {
     // newRole doesn't have the Address property that oldRole has,
@@ -132,23 +146,22 @@ const AdminsAndModerators = () => {
         <section className="admins-moderators">
           <ManageRoles
             label="Admins"
-            roledata={admins}
+            roledata={returnedAdmins}
             onRoleUpdate={handleRoleUpdate}
           />
           <ManageRoles
             label="Moderators"
-            roledata={mods}
+            roledata={returnedMods}
             onRoleUpdate={handleRoleUpdate}
           />
-          <CWText type="caption" className={ComponentType.Label}>
-            Members
-          </CWText>
-
           <UpgradeRolesForm
+            label="Members"
             roleData={roleData}
+            refetchMembers={refetchMembers}
             onRoleUpdate={handleRoleUpdate}
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
+            isLoadingProfiles={isLoadingProfiles}
           />
         </section>
       )}
