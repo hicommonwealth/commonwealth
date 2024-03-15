@@ -356,6 +356,9 @@ jobs:
       - name: Discord-Bot Typecheck
         run: yarn --cwd packages/discord-bot check-types
 
+      - name: Snapshot-listener Typecheck
+        run: yarn --cwd packages/snapshot-listener check-types
+
   # These tests run quickly, so run them in a separate job
   commonwealth-unit-integration:
     strategy:
