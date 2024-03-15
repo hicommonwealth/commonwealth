@@ -22,6 +22,7 @@ const CallbackPage = () => {
             community_id: stateJSON.cw_chain_id,
             guild_id: guildId,
             verification_token: stateJSON.verification_token,
+            jwt: app.user.jwt,
           },
           {
             headers: { 'Content-Type': 'application/json' },

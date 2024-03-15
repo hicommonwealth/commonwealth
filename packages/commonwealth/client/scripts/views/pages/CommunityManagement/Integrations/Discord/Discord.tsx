@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { useFetchTopicsQuery } from 'client/scripts/state/api/topics';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { uuidv4 } from 'lib/util';
@@ -12,7 +13,7 @@ import { DiscordConnections } from './DiscordConnections';
 import { ConnectionStatus } from './types';
 
 const CTA_TEXT = {
-  connected: 'Reconnect Discord',
+  connected: 'Disconnect Discord',
   none: 'Connect Discord',
   connecting: 'Connecting Discord...',
 };
@@ -39,7 +40,7 @@ const Discord = () => {
   }, [community]);
 
   const onConnect = useCallback(async () => {
-    if (connectionStatus === 'connecting') return;
+    if (connectionStatus === 'connecting' || 'connected') return;
     setConnectionStatus('connecting');
 
     try {
@@ -62,8 +63,22 @@ const Discord = () => {
 
       setConnectionStatus('none');
     } catch (e) {
-      notifyError('Failed to connect discord!');
+      notifyError('Failed to connect Discord!');
       setConnectionStatus('none');
+    }
+  }, [connectionStatus]);
+
+  const onDisconnect = useCallback(async () => {
+    if (connectionStatus === 'connecting' || 'none') return;
+    try {
+      await axios.post(`${app.serverUrl()}/removeDiscordBotConfig`, {
+        community_id: app.activeChainId(),
+        jwt: app.user.jwt,
+      });
+      setConnectionStatus('none');
+    } catch (e) {
+      console.error(e);
+      notifyError('Failed to disconnect Discord');
     }
   }, [connectionStatus]);
 
@@ -176,7 +191,7 @@ const Discord = () => {
         buttonType="secondary"
         label={CTA_TEXT[connectionStatus]}
         disabled={connectionStatus === 'connecting'}
-        onClick={onConnect}
+        onClick={connectionStatus === 'none' ? onConnect : onDisconnect}
       />
     </section>
   );

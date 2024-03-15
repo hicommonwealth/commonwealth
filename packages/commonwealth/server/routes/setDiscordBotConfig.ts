@@ -3,6 +3,7 @@ import type { DB } from '@hicommonwealth/model';
 import { validateCommunity } from '../middleware/validateCommunity';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
+import { validateOwner } from '../util/validateOwner';
 
 enum SetDiscordBotConfigErrors {
   NoCommunity = 'Must supply a community ID',
@@ -30,6 +31,17 @@ const setDiscordBotConfig = async (
 ) => {
   const { community_id, guild_id, verification_token, snapshot_channel_id } =
     req.body;
+
+  const isAdmin = await validateOwner({
+    models: models,
+    user: req.user,
+    communityId: community_id,
+    allowAdmin: true,
+    allowSuperAdmin: true,
+  });
+  if (!isAdmin) {
+    throw new AppError(SetDiscordBotConfigErrors.NotAdmin);
+  }
 
   const [community, error] = await validateCommunity(models, { community_id });
   if (!community || error)
