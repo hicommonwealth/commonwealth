@@ -1,5 +1,5 @@
-import { ZodError, ZodObject, ZodRawShape, ZodUndefined, z } from 'zod';
-import { events } from '../schemas';
+import { ZodError, ZodSchema, ZodUndefined, z } from 'zod';
+import { Events } from '../schemas';
 import {
   InvalidInput,
   type EventContext,
@@ -16,10 +16,10 @@ import {
  * @returns side effects
  * @throws {@link InvalidInput} when user invokes event with invalid payload, or rethrows internal domain errors
  */
-export const eventHandler = async <
-  Name extends events.Events,
+export const event = async <
+  Name extends Events,
   Input extends EventSchemas,
-  Output extends ZodObject<ZodRawShape> | ZodUndefined = ZodUndefined,
+  Output extends ZodSchema | ZodUndefined = ZodUndefined,
 >(
   { inputs, body }: EventsHandlerMetadata<Input, Output>,
   { name, payload }: EventContext<Name>,
