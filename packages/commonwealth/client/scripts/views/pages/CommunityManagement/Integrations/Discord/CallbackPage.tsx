@@ -30,16 +30,15 @@ const CallbackPage = () => {
         );
 
         const idParam = res?.data?.result?.discordConfigId
-          ? `&discordConfigId=${res?.data?.result?.discordConfigId}`
+          ? `?discordConfigId=${res?.data?.result?.discordConfigId}`
           : '';
 
         if (stateJSON.redirect_domain) {
           window.location.href =
-            `${stateJSON.redirect_domain}/${redirectPath}` +
-            `?returningFromDiscordCallback=true${idParam}`;
+            `${stateJSON.redirect_domain}/${redirectPath}` + `${idParam}`;
         } else {
           navigate(
-            `/${stateJSON.cw_chain_id}/${redirectPath}?returningFromDiscordCallback=true${idParam}`,
+            `/${stateJSON.cw_chain_id}/${redirectPath}${idParam}`,
             {},
             null,
           );

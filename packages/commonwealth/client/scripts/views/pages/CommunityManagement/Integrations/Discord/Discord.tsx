@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { useFetchTopicsQuery } from 'client/scripts/state/api/topics';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -8,6 +9,7 @@ import useFetchDiscordChannelsQuery from 'state/api/fetchDiscordChannels';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
+import { ApiEndpoints } from '../../../../../state/api/config';
 import './Discord.scss';
 import { DiscordConnections } from './DiscordConnections';
 import { ConnectionStatus } from './types';
@@ -23,6 +25,8 @@ const Discord = () => {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(
     community.discordConfigId ? 'connected' : 'none',
   );
+
+  const queryClient = useQueryClient();
 
   const queryParams = new URLSearchParams(window.location.search);
   if (queryParams.has('discordConfigId')) {
@@ -85,6 +89,17 @@ const Discord = () => {
         community_id: app.activeChainId(),
         jwt: app.user.jwt,
       });
+      // remove channel query from cache to force refresh
+      queryClient.removeQueries([ApiEndpoints.DISCORD_CHANNELS], {
+        exact: true,
+      });
+
+      if (queryParams.has('discordConfigId')) {
+        const url = new URL(window.location.href);
+        queryParams.delete('discordConfigId');
+        url.search = queryParams.toString();
+        history.replaceState(null, '', url.toString());
+      }
       setConnectionStatus('none');
     } catch (e) {
       console.error(e);
