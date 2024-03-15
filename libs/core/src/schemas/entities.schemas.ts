@@ -8,7 +8,7 @@ import {
   DefaultPage,
   NotificationCategories,
 } from '../types';
-import { schemas } from './events.schemas';
+import * as schemas from './events.schemas';
 import { discordMetaSchema, linksSchema } from './utils.schemas';
 
 export const User = z.object({
