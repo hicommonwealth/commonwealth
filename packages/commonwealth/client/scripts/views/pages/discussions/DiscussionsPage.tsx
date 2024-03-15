@@ -78,7 +78,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         community_id,
         queryType: 'bulk',
         limit: 20,
-        topicId,
+        topicId: topicId ? `${topicId}` : undefined,
         stage: stageName ?? undefined,
         includePinnedThreads: true,
         orderBy: featuredFilter ?? undefined,
