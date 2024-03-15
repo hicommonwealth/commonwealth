@@ -29,7 +29,7 @@ const CallbackPage = () => {
           },
         );
 
-        let idParam = res?.data?.result?.discordConfigId
+        const idParam = res?.data?.result?.discordConfigId
           ? `&discordConfigId=${res?.data?.result?.discordConfigId}`
           : '';
 
@@ -63,7 +63,7 @@ const CallbackPage = () => {
         setFailureMessage(e.message);
       });
     }
-  }, []);
+  }, [state, guildId, state]);
 
   if (!state || !guildId) {
     return <PageNotFound message="No callback data provided." />;

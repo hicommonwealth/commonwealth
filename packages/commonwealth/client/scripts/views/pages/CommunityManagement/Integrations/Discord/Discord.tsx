@@ -64,7 +64,10 @@ const Discord = () => {
           redirect_domain: isCustomDomain ? window.location.origin : undefined,
         }),
       );
-      const link = `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&permissions=1024&scope=applications.commands%20bot&redirect_uri=${redirectURL}/discord-callback&response_type=code&scope=bot&state=${currentState}`;
+      const link =
+        `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}` +
+        `&permissions=1024&scope=applications.commands%20bot&redirect_uri=${redirectURL}` +
+        `/discord-callback&response_type=code&scope=bot&state=${currentState}`;
       window.open(link, '_parent');
 
       setConnectionStatus('none');
