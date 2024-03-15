@@ -37,7 +37,12 @@ export const verifyComment = async (args: CanvasSignedDataApiArgs, fields) => {
     'comment',
     'parent',
   );
-  assertMatches(address, actionMessage.payload.address, 'comment', 'origin');
+  assertMatches(
+    address,
+    actionMessage.payload.address.split(':')[2],
+    'comment',
+    'origin',
+  );
   // assertMatches(chainBaseToCanvasChain(chain), action.payload.chain)
 };
 
@@ -64,7 +69,12 @@ export const verifyThread = async (args: CanvasSignedDataApiArgs, fields) => {
     'thread',
     'topic',
   );
-  assertMatches(address, actionMessage.payload.address, 'thread', 'origin');
+  assertMatches(
+    address,
+    actionMessage.payload.address.split(':')[2],
+    'thread',
+    'origin',
+  );
   // assertMatches(chainBaseToCanvasChain(chain), action.payload.chain)
 };
 
@@ -87,6 +97,11 @@ export const verifyReaction = async (args: CanvasSignedDataApiArgs, fields) => {
     'Invalid signed reaction (identifier)',
   );
   assertMatches(value, actionMessage.payload.args.value, 'reaction', 'value');
-  assertMatches(address, actionMessage.payload.address, 'reaction', 'origin');
+  assertMatches(
+    address,
+    actionMessage.payload.address.split(':')[2],
+    'reaction',
+    'origin',
+  );
   // assertMatches(chainBaseToCanvasChain(chain), action.payload.chain)
 };

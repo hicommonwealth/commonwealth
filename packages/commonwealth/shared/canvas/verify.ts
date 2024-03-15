@@ -57,7 +57,7 @@ export const verify = async ({
   sessionMessage,
   sessionMessageSignature,
 }: VerifyArgs) => {
-  const { verifySignedValue } = await import('@canvas-js/signed-cid');
+  const { Ed25519DelegateSigner } = await import('@canvas-js/signatures');
   // verify the session
   await verifySession(sessionMessage.payload);
 
@@ -68,16 +68,18 @@ export const verify = async ({
   );
 
   // verify the action message and session message
-  verifySignedValue(actionMessageSignature, actionMessage);
-  verifySignedValue(sessionMessageSignature, sessionMessage);
+  Ed25519DelegateSigner.verify(actionMessageSignature, actionMessage);
+  Ed25519DelegateSigner.verify(sessionMessageSignature, sessionMessage);
 
-  // assert that the session is not expired
-  const sessionExpirationTime =
-    sessionMessage.payload.timestamp + sessionMessage.payload.duration;
-  assert(
-    actionMessage.payload.timestamp < sessionExpirationTime,
-    'Invalid action: Signed by a session that was expired at the time of action',
-  );
+  if (sessionMessage.payload.duration !== null) {
+    // if the session has an expiry, assert that the session is not expired
+    const sessionExpirationTime =
+      sessionMessage.payload.timestamp + sessionMessage.payload.duration;
+    assert(
+      actionMessage.payload.timestamp < sessionExpirationTime,
+      'Invalid action: Signed by a session that was expired at the time of action',
+    );
+  }
   assert(
     actionMessage.payload.timestamp >= sessionMessage.payload.timestamp,
     'Invalid action: Signed by a session after the action',
