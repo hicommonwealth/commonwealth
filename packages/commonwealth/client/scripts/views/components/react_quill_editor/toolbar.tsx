@@ -195,9 +195,17 @@ export const useMarkdownToolbarHandlers = ({
    * @param {string} prefix - The new prefix to be applied to the list items.
    * @returns {string} The text with list item prefixes replaced or added.
    */
-  const handleListText = (text: string, prefix: string) => {
+  const handleListText = (text: string, prefix: string, listType) => {
     let counter = 1;
     let hasIncremented = false;
+
+    const isPreviousList = text.split('\n').some((line) => {
+      return Object.values(LIST_ITEM_PREFIX).some((p) =>
+        line.trim().startsWith(p),
+      );
+    });
+
+    console.log('test', isPreviousList);
 
     return text
       .split('\n')
@@ -206,17 +214,36 @@ export const useMarkdownToolbarHandlers = ({
           return line;
         }
 
+        // Check if the line starts with any ordered list prefix
         const startsWithPrefix = Object.values(LIST_ITEM_PREFIX).some((p) =>
           line.trim().startsWith(p),
         );
 
-        if (startsWithPrefix) {
+        const testForNumberedLists = /\d+\./.test(line.trim());
+
+        if (startsWithPrefix || testForNumberedLists) {
           return Object.keys(LIST_ITEM_PREFIX).reduce((modifiedLine, key) => {
-            if (line.trim().startsWith(LIST_ITEM_PREFIX[key])) {
-              return modifiedLine.replace(
-                new RegExp(`^\\s*(${LIST_ITEM_PREFIX[key]})`),
-                prefix,
-              );
+            if (
+              line.trim().startsWith(LIST_ITEM_PREFIX[key]) ||
+              testForNumberedLists
+            ) {
+              if (isPreviousList && listType !== 'ordered') {
+                return line.replace(
+                  /\d+\./ || new RegExp(`^\\s*(${LIST_ITEM_PREFIX[key]})`),
+                  prefix,
+                );
+              } else if (listType === 'ordered' && !testForNumberedLists) {
+                return line.replace(
+                  new RegExp(`^\\s*(${LIST_ITEM_PREFIX[key]})`),
+                  `${counter++}.`,
+                );
+              } else {
+                console.log('fired2');
+                return line.replace(
+                  /\d+\./ || new RegExp(`^\\s*(${LIST_ITEM_PREFIX[key]})`),
+                  '',
+                );
+              }
             }
             return modifiedLine;
           }, line);
@@ -272,7 +299,7 @@ export const useMarkdownToolbarHandlers = ({
 
       // If there is a selection, format the selected text
       if (selectedText.length > 0) {
-        const newText = handleListText(selectedText, prefix);
+        const newText = handleListText(selectedText, prefix, value);
         editor.deleteText(selection.index, selection.length);
         editor.insertText(selection.index, newText);
       } else {
