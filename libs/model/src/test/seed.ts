@@ -105,8 +105,8 @@ async function _seed(
 DATABASE_URI.endsWith('common_test') &&
   dispose(async () => {
     const tables = Object.entries(models)
-      .filter(([k, v]) => !k.endsWith('equelize'))
-      .map(([_, v]) => `"${(v as ModelStatic<Model>).tableName}"`)
+      .filter(([k]) => !k.endsWith('equelize'))
+      .map(([, v]) => `"${(v as ModelStatic<Model>).tableName}"`)
       .join(',');
     await sequelize.query(`TRUNCATE TABLE ${tables} RESTART IDENTITY CASCADE;`);
   });
