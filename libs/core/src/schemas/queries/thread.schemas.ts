@@ -73,12 +73,14 @@ export const GetBulkThreads = {
         marked_as_spam_at: z.date().nullable().optional(),
         archived_at: z.date().nullable().optional(),
         latest_activity: z.date().nullable().optional(),
-        topic: z.object({
-          id: z.number(),
-          name: z.string(),
-          description: z.string(),
-          chainId: z.string(),
-        }),
+        topic: z
+          .object({
+            id: z.number(),
+            name: z.string(),
+            description: z.string(),
+            chainId: z.string(),
+          })
+          .optional(),
         profile_id: z.number(),
         avatar_url: z.string().nullable(),
         address_last_active: z.date(),
