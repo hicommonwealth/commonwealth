@@ -11,19 +11,21 @@ export const SetCommunityStake: Command<
   auth: [isCommunityAdmin],
   body: async ({ id, payload }) => {
     // !load
-    const community = await models.Community.findOne({
-      where: { id },
-      include: [
-        {
-          model: models.ChainNode,
-          attributes: ['eth_chain_id', 'url'],
-        },
-        {
-          model: models.CommunityStake,
-        },
-      ],
-      attributes: ['namespace'],
-    });
+    const community = (
+      await models.Community.findOne({
+        where: { id },
+        include: [
+          {
+            model: models.ChainNode,
+            attributes: ['eth_chain_id', 'url'],
+          },
+          {
+            model: models.CommunityStake,
+          },
+        ],
+        attributes: ['namespace'],
+      })
+    )?.toJSON();
 
     // !domain logic - invariants on loaded state & payload
     if (!mustExist('Community', community)) return;
@@ -48,8 +50,8 @@ export const SetCommunityStake: Command<
     });
 
     return {
-      ...community.get({ plain: true }),
-      CommunityStakes: [updated.get({ plain: true })],
+      ...community,
+      CommunityStakes: [updated.toJSON()],
     };
   },
 });

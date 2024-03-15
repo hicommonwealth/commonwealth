@@ -22,10 +22,12 @@ type GeneratedProp = typeof GENERATED_PROPS[number];
  *
  * @param mock true to auto mock values in schemas
  * @param skip array of field names to remove from schemas when auto mocked
+ * @param log log new records to console
  */
 export type SeedOptions = {
   mock: boolean;
   skip?: GeneratedProp[];
+  log?: boolean;
 };
 
 /**
@@ -44,7 +46,7 @@ export async function seed<T extends schemas.Aggregates>(
   [z.infer<typeof schemas.entities[T]> | undefined, Record<string, any>[]]
 > {
   const records: Record<string, any>[] = [];
-  await _seed(models[name], values ?? {}, options, records);
+  await _seed(models[name], values ?? {}, options, records, 0);
   return [records.at(0) as any, records];
 }
 
@@ -53,10 +55,12 @@ async function _seed(
   values: Record<string, any>,
   options: SeedOptions,
   records: Record<string, any>[],
+  level: number,
 ) {
   if (options.mock && schemas.entities[model.name as Entities]) {
     const mocked: Record<string, any> = generateMock(
       schemas.entities[model.name as Entities],
+      {},
     );
     if (options.skip) for (const key in options.skip) delete mocked[key];
     values = {
@@ -66,26 +70,31 @@ async function _seed(
     //console.log('mocked', model.name, values);
   }
   //console.log(model.name, values);
-  const record = await model.create(values);
-  records.push(record.toJSON());
+  const record = (await model.create(values)).toJSON();
+  records.push(record);
 
   if (typeof values === 'object') {
     for (const [key, value] of Object.entries(values)) {
       const association = model.associations[key];
       if (association && Array.isArray(value)) {
-        for (const child of value) {
-          await _seed(
+        record[key] = [];
+        for (const el of value) {
+          const child = await _seed(
             association.target,
             {
-              ...child,
-              [association.foreignKey]:
-                record.dataValues[model.primaryKeyAttribute],
+              ...el,
+              [association.foreignKey]: record[model.primaryKeyAttribute],
             },
             options,
             records,
+            level + 1,
           );
+          record[key].push(child);
         }
       }
     }
   }
+
+  level === 0 && options.log && console.log(model, record);
+  return record;
 }

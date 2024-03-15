@@ -112,6 +112,7 @@ describe('Seed functions', () => {
   describe('Community', () => {
     step('Should seed with overrides', async () => {
       const node = await testSeed('ChainNode', { contracts: undefined });
+      const user = await testSeed('User');
       await testSeed('Community', {
         id: 'ethereum',
         network: ChainNetwork.Ethereum,
@@ -125,7 +126,7 @@ describe('Seed functions', () => {
         chain_node_id: node!.id,
         Addresses: [
           {
-            user_id: undefined,
+            user_id: user.id,
             profile_id: undefined,
             address: '0x34C3A5ea06a3A67229fb21a7043243B0eB3e853f',
             community_id: 'ethereum',
@@ -152,7 +153,7 @@ describe('Seed functions', () => {
         chain_node_id: node!.id,
         Addresses: [
           {
-            user_id: undefined,
+            user_id: user.id,
             profile_id: undefined,
             address: '0x34C3A5ea06a3A67229fb21a7043243B0eB3e853f',
             community_id: 'ethereum',

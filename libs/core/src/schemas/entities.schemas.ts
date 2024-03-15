@@ -63,6 +63,7 @@ export const Address = z.object({
     .int()
     .min(MIN_SCHEMA_INT)
     .max(MAX_SCHEMA_INT)
+    .nullish()
     .optional(),
   wallet_id: z.string().max(255).optional(),
   block_info: z.string().max(255).optional(),
@@ -399,7 +400,7 @@ export const Subscription = z.object({
 });
 
 export const ChainNode = z.object({
-  id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
+  id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),
   url: z.string().max(255),
   eth_chain_id: z
     .number()
