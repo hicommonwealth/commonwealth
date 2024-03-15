@@ -7,8 +7,8 @@ import {
   ILogger,
   InvalidInput,
   eventHandler,
-  events,
   logger,
+  schemas,
 } from '@hicommonwealth/core';
 import { Message } from 'amqplib';
 import * as Rascal from 'rascal';
@@ -76,7 +76,7 @@ export class RabbitMQAdapter implements Broker {
     this._initialized = true;
   }
 
-  public async publish<Name extends events.Events>(
+  public async publish<Name extends schemas.Events>(
     topic: BrokerTopics,
     event: EventContext<Name>,
   ): Promise<boolean> {
@@ -112,7 +112,7 @@ export class RabbitMQAdapter implements Broker {
       return false;
     }
 
-    const schema = events.schemas[event.name];
+    const schema = schemas.events[event.name];
     const validationResult = schema.safeParse(event.payload);
     if (!validationResult.success) {
       this._log.error(
@@ -198,7 +198,7 @@ export class RabbitMQAdapter implements Broker {
               });
               ackOrNackFn();
             })
-            .catch((err) => {
+            .catch((err: Error | undefined) => {
               if (err instanceof InvalidInput) {
                 this._log.error(`Invalid event`, err, {
                   topic,

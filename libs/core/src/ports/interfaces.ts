@@ -3,7 +3,7 @@ import {
   EventSchemas,
   EventsHandlerMetadata,
 } from '../framework';
-import { events } from '../schemas';
+import { Events } from '../schemas';
 import { AnalyticsOptions, BrokerTopics, CacheNamespaces } from '../types';
 
 /**
@@ -131,7 +131,7 @@ export interface Analytics extends Disposable {
  * Broker Port
  */
 export interface Broker extends Disposable {
-  publish<Name extends events.Events>(
+  publish<Name extends Events>(
     topic: BrokerTopics,
     event: EventContext<Name>,
   ): Promise<boolean>;

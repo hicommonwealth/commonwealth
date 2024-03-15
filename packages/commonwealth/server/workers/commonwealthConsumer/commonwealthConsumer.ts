@@ -10,12 +10,13 @@ import {
 import {
   Broker,
   BrokerTopics,
-  PolicyMetadata,
+  Policy,
   broker,
-  events,
   logger,
+  schemas,
   stats,
 } from '@hicommonwealth/core';
+import { ZodUndefined } from 'zod';
 import { RABBITMQ_URI } from '../../config';
 
 const log = logger(PinoLogger()).getLogger(__filename);
@@ -62,10 +63,11 @@ export async function setupCommonwealthConsumer(): Promise<void> {
   );
 
   const inputs = {
-    SnapshotProposalCreated: events.schemas.SnapshotProposalCreated,
+    SnapshotProposalCreated: schemas.events.SnapshotProposalCreated,
   };
 
-  const Snapshot: () => PolicyMetadata<typeof inputs> = () => ({
+  type SnapshotPolicy = () => Policy<typeof inputs, ZodUndefined>;
+  const Snapshot: ReturnType<SnapshotPolicy> = () => ({
     inputs,
     body: {
       SnapshotProposalCreated: processSnapshotProposalCreated,
