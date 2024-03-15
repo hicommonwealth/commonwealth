@@ -558,3 +558,6 @@ jobs:
         with:
           path: '**/node_modules'
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Run API tests
+        run: yarn --cwd packages/snapshot test --forbid-only
