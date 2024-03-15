@@ -233,7 +233,6 @@ export function updateActiveUser(data) {
     app.user.setAddresses([]);
 
     app.user.setSiteAdmin(false);
-    app.user.setDisableRichText(false);
     app.user.setUnseenPosts({});
 
     app.user.setActiveAccounts([]);
@@ -261,7 +260,6 @@ export function updateActiveUser(data) {
     );
 
     app.user.setSiteAdmin(data.isAdmin);
-    app.user.setDisableRichText(data.disableRichText);
     app.user.setUnseenPosts(data.unseenPosts);
   }
 }

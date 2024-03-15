@@ -104,15 +104,6 @@ export class UserController {
     this._isSiteAdmin = isAdmin;
   }
 
-  private _disableRichText: boolean;
-  public get disableRichText(): boolean {
-    return this._disableRichText;
-  }
-
-  private _setDisableRichText(disableRichText: boolean): void {
-    this._disableRichText = disableRichText;
-  }
-
   private _notifications: NotificationsController =
     new NotificationsController();
   public get notifications(): NotificationsController {
@@ -250,10 +241,6 @@ export class UserController {
 
   public setSiteAdmin(isAdmin: boolean): void {
     this._setSiteAdmin(isAdmin);
-  }
-
-  public setDisableRichText(disableRichText: boolean): void {
-    this._setDisableRichText(disableRichText);
   }
 
   public setNotifications(notifications: NotificationsController): void {
