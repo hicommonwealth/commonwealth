@@ -69,7 +69,7 @@ export async function __getCommunityMembers(
   if (!community) {
     throw new AppError(Errors.CommunityNotFound);
   }
-  page = Math.min(1, page);
+  page = Math.max(1, page);
 
   const bind: any = {
     searchTerm: `%${search}%`,
