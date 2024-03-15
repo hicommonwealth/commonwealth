@@ -535,11 +535,11 @@ jobs:
         uses: actions/checkout@v3
 
       # We only run snapshot tests if any files in the following folders changes
-      - name: Get changed Cosmos devnet-related files
+      - name: Get changed Snapshot package files
         id: changed-files-specific
         uses: tj-actions/changed-files@v35
         with:
-          files: packages/snapshot/**/*
+          files: packages/snapshot-listener/**/*
 
       - name: Run following steps if any file(s) in the snapshot package changes
         if: steps.changed-files-specific.outputs.all_changed_files
