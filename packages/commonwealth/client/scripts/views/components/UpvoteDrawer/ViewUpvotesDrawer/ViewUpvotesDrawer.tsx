@@ -83,7 +83,7 @@ export const ViewUpvotesDrawer = ({
         address: author['profile'].address,
         name: author['profile'].name,
       }
-    : {};
+    : null;
 
   return (
     <div className="ViewUpvotesDrawer">

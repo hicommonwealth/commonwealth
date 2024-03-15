@@ -190,14 +190,14 @@ export const GetBulkThreads: Query<
     }
 
     // transform thread response
-    let threads = responseThreads.map(async (t) => {
+    let threads = responseThreads.map(async (t: any) => {
       const collaborators = JSON.parse(t.collaborators[0]).address?.length
-        ? t.collaborators.map((c) => JSON.parse(c))
+        ? t.collaborators.map((c: any) => JSON.parse(c))
         : [];
 
       const last_edited = getLastEdited(t);
 
-      const data = {
+      const data: any = {
         id: t.thread_id,
         title: t.thread_title,
         url: t.url,
@@ -228,7 +228,7 @@ export const GetBulkThreads: Query<
           ? t.reaction_timestamps.split(',')
           : [],
         reactionWeights: t.reaction_weights
-          ? t.reaction_weights.split(',').map((n) => parseInt(n, 10))
+          ? t.reaction_weights.split(',').map((n: any) => parseInt(n, 10))
           : [],
         reaction_weights_sum: t.reaction_weights_sum,
         addressesReacted: t.addresses_reacted
