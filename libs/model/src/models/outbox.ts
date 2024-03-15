@@ -1,10 +1,10 @@
-import { outbox } from '@hicommonwealth/core';
+import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
 import { z } from 'zod';
 import { ModelInstance, ModelStatic } from './types';
 
-export type OutboxAttributes = z.infer<typeof outbox.Outbox>;
+export type OutboxAttributes = z.infer<typeof schemas.entities.Outbox>;
 
 export type OutboxInstance = ModelInstance<OutboxAttributes>;
 
