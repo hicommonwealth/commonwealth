@@ -16,8 +16,11 @@ type SnapshotProposalCardProps = {
   showSkeleton?: boolean;
 };
 
-export const SnapshotProposalCard = (props: SnapshotProposalCardProps) => {
-  const { proposal, snapshotId } = props;
+export const SnapshotProposalCard = ({
+  showSkeleton,
+  snapshotId,
+  proposal,
+}: SnapshotProposalCardProps) => {
   const navigate = useCommonNavigate();
 
   const proposalLink = `/snapshot/${snapshotId}/${proposal.id}`;
@@ -25,7 +28,7 @@ export const SnapshotProposalCard = (props: SnapshotProposalCardProps) => {
   const time = moment(+proposal.end * 1000);
   const now = moment();
 
-  if (props.showSkeleton) return <SnapshotProposalCardSkeleton />;
+  if (showSkeleton) return <SnapshotProposalCardSkeleton />;
 
   // TODO: display proposal.scores and proposal.scores_total on card
   return (
