@@ -90,7 +90,7 @@ export const CommentCard = ({
     useState<boolean>(false);
   const [verifiedAction, setVerifiedAction] = useState<Action>();
   const [verifiedSession, setVerifiedSession] = useState<Session>();
-  const [onReaction, setOnReaction] = useState<boolean>(false);
+  const [, setOnReaction] = useState<boolean>(false);
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
 
   useEffect(() => {
