@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 
@@ -123,20 +123,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   });
 
   useManageDocumentTitle('Discussions');
-
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-
-    if (resizing) {
-      timer = setTimeout(() => {
-        setResizing(false);
-      }, 200); // Adjust delay as needed
-    }
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [resizing]);
 
   return (
     <div className="DiscussionsPage">
