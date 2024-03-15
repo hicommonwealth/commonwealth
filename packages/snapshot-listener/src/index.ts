@@ -16,7 +16,7 @@ import {
 import type { Request, RequestHandler, Response } from 'express';
 import express, { json } from 'express';
 import v8 from 'v8';
-import { DEFAULT_PORT, RABBITMQ_URI } from './config';
+import { DEFAULT_PORT, NODE_ENV, RABBITMQ_URI } from './config';
 import fetchNewSnapshotProposal from './utils/fetchSnapshot';
 import {
   methodNotAllowedMiddleware,
@@ -43,7 +43,7 @@ log.info(
   )} GB`,
 );
 
-const app = express();
+export const app = express();
 const port = process.env.PORT || DEFAULT_PORT;
 app.use(json() as RequestHandler);
 
@@ -78,7 +78,7 @@ registerRoute(app, 'post', '/snapshot', async (req: Request, res: Response) => {
     event.start = response.data.proposal?.start ?? null;
     event.expire = response.data.proposal?.end ?? null;
 
-    await controller.publish(event, RascalPublications.SnapshotListener);
+    await controller?.publish(event, RascalPublications.SnapshotListener);
 
     stats().increment('snapshot_listener.received_snapshot_event', {
       event: eventType,
@@ -98,16 +98,17 @@ app.listen(port, async () => {
   const log = logger().getLogger(__filename);
   log.info(`⚡️[server]: Server is running at https://localhost:${port}`);
 
-  try {
-    controller = new RabbitMQController(
-      getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.SnapshotService),
-    );
-    await controller.init();
-    log.info('Connected to RabbitMQ');
-  } catch (err) {
-    log.error(`Error starting server: ${err}`);
+  if (NODE_ENV != 'test') {
+    try {
+      controller = new RabbitMQController(
+        getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.SnapshotService),
+      );
+      await controller.init();
+      log.info('Connected to RabbitMQ');
+    } catch (err) {
+      log.error(`Error starting server: ${err}`);
+    }
   }
-  app.bind;
 
   isServiceHealthy = true;
 });
