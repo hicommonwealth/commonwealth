@@ -1,8 +1,7 @@
 {
   "name": "snapshot-listener",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
   "scripts": {
     "build": "tsc -b && tsc-alias",
     "clean": "rm -rf build",
