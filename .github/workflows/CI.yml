@@ -565,8 +565,8 @@ jobs:
           path: '**/node_modules'
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Install dependencies
-        run: 'yarn global add node-gyp && yarn --ignore-engines'
+      - name: Prepare
+        run: yarn build-ci
 
       - name: Run API tests
         run: yarn --cwd packages/snapshot-listener test --forbid-only
