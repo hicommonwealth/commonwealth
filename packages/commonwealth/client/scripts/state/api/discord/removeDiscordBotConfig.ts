@@ -11,7 +11,7 @@ const removeDiscordBotConfig = async ({
   communityId,
 }: RemoveDiscordBotConfigProps) => {
   await axios.post(`${app.serverUrl()}/removeDiscordBotConfig`, {
-    community_id: app.activeChainId(),
+    community_id: communityId,
     jwt: app.user.jwt,
   });
 };

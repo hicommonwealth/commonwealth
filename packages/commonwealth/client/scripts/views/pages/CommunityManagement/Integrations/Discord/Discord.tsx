@@ -28,7 +28,7 @@ const Discord = () => {
 
   const queryParams = useMemo(() => {
     return new URLSearchParams(window.location.search);
-  }, [window.location.search]);
+  }, []);
 
   if (queryParams.has('discordConfigId')) {
     app.chain.meta.discordConfigId = queryParams.get('discordConfigId');
@@ -106,7 +106,7 @@ const Discord = () => {
       console.error(e);
       notifyError('Failed to disconnect Discord');
     }
-  }, [connectionStatus]);
+  }, [connectionStatus, queryParams, removeDiscordBotConfig]);
 
   const onToggleWebhooks = useCallback(async () => {
     const toggleMsgType = isDiscordWebhooksEnabled ? 'disable' : 'enable';
