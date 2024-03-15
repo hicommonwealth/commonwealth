@@ -8,6 +8,7 @@ import {
   DefaultPage,
   NotificationCategories,
 } from '../types';
+import { schemas } from './events.schemas';
 import { discordMetaSchema, linksSchema } from './utils.schemas';
 
 export const User = z.object({
@@ -409,4 +410,19 @@ export const Subscription = z.object({
     .optional()
     .nullable(),
   snapshot_id: z.string().max(255).optional().nullable(),
+});
+
+export const Outbox = z.object({
+  id: z.number(),
+  event_name: z.string(),
+  // TODO: should automatically include all event schemas
+  event_payload: z.union([
+    schemas.ThreadCreated,
+    schemas.CommentCreated,
+    schemas.GroupCreated,
+    schemas.CommunityCreated,
+  ]),
+  relayed: z.boolean(),
+  created_at: z.date(),
+  updated_at: z.date(),
 });

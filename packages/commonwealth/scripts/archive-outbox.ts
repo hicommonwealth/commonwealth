@@ -195,7 +195,6 @@ async function main() {
     });
 
     await uploadToS3(compressedName);
-    log.info('S3 upload complete!');
   }
 
   if (tables.length > 0) {
