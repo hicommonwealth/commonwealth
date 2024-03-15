@@ -9,7 +9,7 @@ module.exports = {
           "Communities"
         SET
           type = 'offchain',
-          chain_node_id = 37,
+          chain_node_id = (SELECT id FROM "ChainNodes" WHERE eth_chain_id = 1),
           network = 'ethereum'
         WHERE
           id = 'axie-infinity'
