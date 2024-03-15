@@ -13,11 +13,11 @@ import {
   CommentDiscordActions,
   EventHandler,
   IDiscordMessage,
-  PolicyMetadata,
+  Policy,
   ThreadDiscordActions,
   broker,
-  events,
   logger,
+  schemas,
   stats,
 } from '@hicommonwealth/core';
 import v8 from 'v8';
@@ -125,10 +125,10 @@ async function main() {
   }
 
   const inputs = {
-    DiscordMessageCreated: events.schemas.DiscordMessageCreated,
+    DiscordMessageCreated: schemas.events.DiscordMessageCreated,
   };
 
-  const Discord: () => PolicyMetadata<typeof inputs> = () => ({
+  const Discord: Policy<typeof inputs> = () => ({
     inputs,
     body: {
       DiscordMessageCreated: processDiscordMessageCreated,

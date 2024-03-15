@@ -66,8 +66,7 @@ export async function setupCommonwealthConsumer(): Promise<void> {
     SnapshotProposalCreated: schemas.events.SnapshotProposalCreated,
   };
 
-  type SnapshotPolicy = () => Policy<typeof inputs, ZodUndefined>;
-  const Snapshot: ReturnType<SnapshotPolicy> = () => ({
+  const Snapshot: Policy<typeof inputs, ZodUndefined> = () => ({
     inputs,
     body: {
       SnapshotProposalCreated: processSnapshotProposalCreated,
