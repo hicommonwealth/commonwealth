@@ -1,15 +1,15 @@
-import { useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
 import { useFetchTopicsQuery } from 'client/scripts/state/api/topics';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { uuidv4 } from 'lib/util';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import app from 'state';
-import useFetchDiscordChannelsQuery from 'state/api/fetchDiscordChannels';
+import {
+  useFetchDiscordChannelsQuery,
+  useRemoveDiscordBotConfigMutation,
+} from 'state/api/discord';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
-import { ApiEndpoints } from '../../../../../state/api/config';
 import './Discord.scss';
 import { DiscordConnections } from './DiscordConnections';
 import { ConnectionStatus } from './types';
@@ -26,9 +26,10 @@ const Discord = () => {
     community.discordConfigId ? 'connected' : 'none',
   );
 
-  const queryClient = useQueryClient();
+  const queryParams = useMemo(() => {
+    return new URLSearchParams(window.location.search);
+  }, [window.location.search]);
 
-  const queryParams = new URLSearchParams(window.location.search);
   if (queryParams.has('discordConfigId')) {
     app.chain.meta.discordConfigId = queryParams.get('discordConfigId');
   }
@@ -41,6 +42,11 @@ const Discord = () => {
   const { data: topics = [], refetch: refetchTopics } = useFetchTopicsQuery({
     communityId: app.activeChainId(),
   });
+
+  const {
+    mutateAsync: removeDiscordBotConfig,
+    isLoading: isRemovingDiscordBotConfig,
+  } = useRemoveDiscordBotConfigMutation();
 
   useEffect(() => {
     if (community.discordConfigId) {
@@ -85,13 +91,8 @@ const Discord = () => {
     if (connectionStatus === 'connecting' || connectionStatus === 'none')
       return;
     try {
-      await axios.post(`${app.serverUrl()}/removeDiscordBotConfig`, {
-        community_id: app.activeChainId(),
-        jwt: app.user.jwt,
-      });
-      // remove channel query from cache to force refresh
-      queryClient.removeQueries([ApiEndpoints.DISCORD_CHANNELS], {
-        exact: true,
+      await removeDiscordBotConfig({
+        communityId: app.activeChainId(),
       });
 
       if (queryParams.has('discordConfigId')) {
@@ -105,7 +106,7 @@ const Discord = () => {
       console.error(e);
       notifyError('Failed to disconnect Discord');
     }
-  }, [connectionStatus, queryParams, queryClient]);
+  }, [connectionStatus]);
 
   const onToggleWebhooks = useCallback(async () => {
     const toggleMsgType = isDiscordWebhooksEnabled ? 'disable' : 'enable';
