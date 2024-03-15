@@ -15,7 +15,7 @@ jobs:
   e2e-tests-Parallel:
     strategy:
       matrix:
-        node: [ 18 ]
+        node: [ 20 ]
     name: Commonwealth E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -106,7 +106,7 @@ jobs:
   e2e-tests-Mature:
     strategy:
       matrix:
-        node: [ 18 ]
+        node: [ 20 ]
     name: Commonwealth Mature E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -196,7 +196,7 @@ jobs:
   e2e-tests-serial:
     strategy:
       matrix:
-        node: [ 18 ]
+        node: [ 20 ]
     name: Commonwealth E2E Tests Serial
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -270,7 +270,7 @@ jobs:
   commonwealth-code-quality-recommendations:
     strategy:
       matrix:
-        node: [ 18 ]
+        node: [ 20 ]
     name: Code Quality Recommendations
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -307,7 +307,7 @@ jobs:
   commonwealth-code-quality:
     strategy:
       matrix:
-        node: [ 18 ]
+        node: [ 20 ]
     name: Code Quality checks
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -360,7 +360,7 @@ jobs:
   commonwealth-unit-integration:
     strategy:
       matrix:
-        node: [ 18 ]
+        node: [ 20 ]
     name: Commonwealth Unit And Integration Tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -417,16 +417,15 @@ jobs:
         run: yarn --cwd packages/commonwealth test-integration-util --forbid-only
         env:
           NO_CLIENT: true
-          COSMOS_GOV_V1: ${{ secrets.COSMOS_GOV_V1 }}
 
   # These tests run slowly, so run them in a separate job
   commonwealth-devnet-tests:
     name: Devnet Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     strategy:
       matrix:
-        node: [ 18 ]
+        node: [ 20 ]
     services:
       postgres:
         image: postgres
@@ -520,8 +519,8 @@ jobs:
 
       - name: Run Cosmos Devnet tests
         if: steps.changed-files-specific.outputs.any_changed == 'true'
-        run: yarn --cwd packages/commonwealth start & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-devnet cosmos --forbid-only)
+        run: NODE_ENV=test yarn --cwd packages/commonwealth start & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-devnet cosmos --forbid-only)
         env:
           PORT: 8080
           USES_DOCKER_PGSQL: true
-          COSMOS_GOV_V1: ${{ secrets.COSMOS_GOV_V1 }}
+          REDIS_URL: redis://localhost:6379

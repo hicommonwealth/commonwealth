@@ -85,7 +85,7 @@ import {
 } from '@tanstack/react-table';
 import { getRelativeTimestamp } from 'client/scripts/helpers/dates';
 import clsx from 'clsx';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { Avatar } from '../../../Avatar';
 import { CWIcon } from '../../cw_icons/cw_icon';
 import { ComponentType } from '../../types';
@@ -93,7 +93,7 @@ import './CWTable.scss';
 
 type ColumnDescriptor = {
   key: string;
-  header: string;
+  header: string | (() => ReactNode);
   numeric: boolean;
   sortable: boolean;
   chronological?: boolean;
@@ -197,7 +197,6 @@ export const CWTable = ({
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    debugTable: false,
   });
 
   const displaySortIcon = (

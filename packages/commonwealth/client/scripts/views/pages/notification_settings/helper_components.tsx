@@ -8,6 +8,7 @@ import NotificationSubscription from '../../../models/NotificationSubscription';
 
 import { useCommonNavigate } from 'navigation/helpers';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
+import app from '../../../state';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -100,7 +101,7 @@ const getTextRows = (
     return (
       <div
         className="header-row"
-        onClick={() => setRoute(`/${subscription.chainId}`)}
+        onClick={() => setRoute(`/${subscription.communityId}`)}
       >
         <CWText
           type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
@@ -112,7 +113,7 @@ const getTextRows = (
           type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
           fontWeight="bold"
         >
-          {subscription.Chain?.name}
+          {app.config.chains.getById(subscription.communityId)?.name}
         </CWText>
       </div>
     );

@@ -8,7 +8,7 @@
     "dev": "$(which -a canvas | tail -1) run contract.js --chain eip155:* --chain cosmos:* --chain solana:* --chain substrate:* --chain near:* --syncModule $PWD/syncModule.js"
   },
   "engines": {
-    "node": "18.x"
+    "node": "20.x"
   },
   "repository": {
     "type": "git",

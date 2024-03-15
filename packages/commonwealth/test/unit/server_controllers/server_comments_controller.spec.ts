@@ -137,9 +137,9 @@ describe('ServerCommentsController', () => {
         comment_text: 'my comment body',
         root_title: 'Big Thread!',
         root_type: null,
-        chain_id: 'ethereum',
+        community_id: 'ethereum',
         author_address: '0x123',
-        author_chain: 'ethereum',
+        author_community_id: 'ethereum',
       });
 
       expect(allNotificationOptions[0]).to.have.property('excludeAddresses');
@@ -585,9 +585,9 @@ describe('ServerCommentsController', () => {
         comment_id: 123,
         comment_text: 'Hello',
         root_title: 'Big Thread!',
-        chain_id: 'ethereum',
+        community_id: 'ethereum',
         author_address: '0x123',
-        author_chain: 'ethereum',
+        author_community_id: 'ethereum',
       });
       expect(allNotificationOptions[0]).to.have.property('excludeAddresses');
       const { excludeAddresses } = allNotificationOptions[0];

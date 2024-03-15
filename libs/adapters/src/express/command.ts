@@ -12,15 +12,17 @@ import { ZodSchema, z } from 'zod';
  * @returns express command handler
  */
 export const command =
-  <T, P extends ZodSchema>(md: CommandMetadata<T, P>): RequestHandler =>
+  <Input extends ZodSchema, Output extends ZodSchema>(
+    md: CommandMetadata<Input, Output>,
+  ): RequestHandler =>
   async (
     req: Request<
-      z.infer<P> & {
+      z.infer<Input> & {
         id?: string;
         address_id?: string;
       }
     >,
-    res: Response<Partial<T> | undefined>,
+    res: Response<Partial<z.infer<Output>> | undefined>,
     next: NextFunction,
   ) => {
     try {

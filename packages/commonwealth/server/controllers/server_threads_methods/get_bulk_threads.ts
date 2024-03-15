@@ -148,7 +148,7 @@ export async function __getBulkThreads(
           ${communityId ? ` AND t.community_id = $community_id` : ''}
           ${topicId ? ` AND t.topic_id = $topic_id ` : ''}
           ${stage ? ` AND t.stage = $stage ` : ''}
-          ${archived ? ` AND t.archived_at IS NOT NULL ` : ''}
+          ${` AND t.archived_at IS ${archived ? 'NOT' : ''} NULL `}
           AND (${includePinnedThreads ? 't.pinned = true OR' : ''}
           (COALESCE(t.last_commented_on, t.created_at) < $to_date AND t.pinned = false))
           GROUP BY (t.id, t.max_notif_id, t.comment_count,

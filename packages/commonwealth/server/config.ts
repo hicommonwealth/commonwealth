@@ -22,12 +22,6 @@ export const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 
 export const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 
-export const DATABASE_URI = process.env.USES_DOCKER_DB
-  ? 'postgresql://commonwealth:edgeware@postgres/commonwealth' // this is because url will be hidden in CI.yaml
-  : !process.env.DATABASE_URL || process.env.NODE_ENV === 'development'
-  ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
-  : process.env.DATABASE_URL;
-
 export const RABBITMQ_URI = (() => {
   if (!process.env.CLOUDAMQP_URL || process.env.NODE_ENV === 'development') {
     return 'amqp://127.0.0.1';
@@ -110,3 +104,8 @@ export const REACTION_WEIGHT_OVERRIDE = process.env.REACTION_WEIGHT_OVERRIDE
 export const GENERATE_IMAGE_RATE_LIMIT = process.env.GENERATE_IMAGE_RATE_LIMIT
   ? parseInt(process.env.GENERATE_IMAGE_RATE_LIMIT, 10)
   : 10;
+
+export const ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS = process.env
+  .ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS
+  ? parseInt(process.env.ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS, 10)
+  : 60;

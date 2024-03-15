@@ -25,7 +25,12 @@ export const BanUserModal = ({ address, onModalClose }: BanUserModalAttrs) => {
     address: address,
   });
 
-  const onBanConfirmation = async () => {
+  const handleModalClose = (e) => {
+    e.stopPropagation();
+    onModalClose();
+  };
+
+  const onBanConfirmation = async (event) => {
     // ZAK TODO: Update Banned User Table with userProfile
     if (!address) {
       notifyError('CW Data error');
@@ -33,14 +38,14 @@ export const BanUserModal = ({ address, onModalClose }: BanUserModalAttrs) => {
     }
 
     try {
+      handleModalClose(event);
       await banUser({
         address,
         chainId: app.activeChainId(),
       });
-      onModalClose();
       notifySuccess('Banned Address');
-    } catch (e) {
-      notifyError(e.response.data.error);
+    } catch (err) {
+      notifyError(err.response.data.error);
     }
   };
 
@@ -62,7 +67,7 @@ export const BanUserModal = ({ address, onModalClose }: BanUserModalAttrs) => {
           label="Cancel"
           buttonType="secondary"
           buttonHeight="sm"
-          onClick={onModalClose}
+          onClick={handleModalClose}
         />
         <CWButton
           label="Ban Address"

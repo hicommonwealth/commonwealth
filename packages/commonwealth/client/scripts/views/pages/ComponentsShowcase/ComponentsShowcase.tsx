@@ -4,27 +4,24 @@ import React from 'react';
 
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
-import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 
 import { componentItems } from './componentsList';
 import { alphabetically, pascalCaseToNormalText } from './utils';
 
-import { useCommonNavigate } from 'navigation/helpers';
 import './ComponentsShowcase.scss';
 
 const NAVBAR_HEIGHT = 56;
+const BREADCRUMBS_HEIGHT = 40;
 const BODY_CLASS_NAME = 'page-body';
 
 const ComponentsShowcase = () => {
-  const navigate = useCommonNavigate();
-
   const handleClick = (itemId: string) => {
     const scrollableContainer = document.querySelector(`.${BODY_CLASS_NAME}`);
     const selectedItemElement = document.getElementById(itemId);
 
     if (scrollableContainer && selectedItemElement) {
       scrollableContainer.scrollTop =
-        selectedItemElement.offsetTop - NAVBAR_HEIGHT;
+        selectedItemElement.offsetTop - NAVBAR_HEIGHT - BREADCRUMBS_HEIGHT;
     }
   };
 
@@ -65,18 +62,6 @@ const ComponentsShowcase = () => {
 
       {/* Body */}
       <div className={BODY_CLASS_NAME}>
-        <CWBanner
-          title="This page is still under construction"
-          body="We are working on a new components page. Currently, only few components are available here.
-          If you are looking for the old components page, click button below to be redirected."
-          onClose={() => undefined}
-          buttons={[
-            {
-              label: 'Visit old components page',
-              onClick: () => navigate('/components-old'),
-            },
-          ]}
-        />
         {componentTypesKeys.map((key) => (
           <React.Fragment key={key}>
             <div className="page-header">
@@ -89,7 +74,7 @@ const ComponentsShowcase = () => {
               ({ displayName, ComponentPage }) => (
                 <div key={displayName} id={displayName}>
                   <CWText className="component-header" type="h4">
-                    {pascalCaseToNormalText(displayName)}
+                    {pascalCaseToNormalText(displayName).toUpperCase()}
                   </CWText>
 
                   <div className={clsx(displayName, 'component-content')}>
