@@ -69,7 +69,6 @@ export const AuthorAndPublishInfo = ({
   popoverPlacement,
   profile,
 }: AuthorAndPublishInfoProps) => {
-  console.log(profile);
   const popoverProps = usePopover();
   const containerRef = useRef(null);
   useAuthorMetadataCustomWrap(containerRef);

@@ -338,7 +338,7 @@ export class Thread implements IUniqueId {
         name: profile_name,
         address: Address.address,
         lastActive: address_last_active,
-        avatarUrl: avatar_url,
+        avatarUrl: avatar_url ?? undefined,
       };
     }
   }
