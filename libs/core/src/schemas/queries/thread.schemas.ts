@@ -54,7 +54,7 @@ export const GetBulkThreads = {
         collaborators: z.any().array(),
         has_poll: z.boolean().nullable().optional(),
         last_commented_on: z.date().nullable().optional(),
-        plaintext: z.string(),
+        plaintext: z.string().nullable().optional(),
         Address: z.object({
           id: z.number(),
           address: z.string(),
@@ -83,7 +83,7 @@ export const GetBulkThreads = {
           .optional(),
         profile_id: z.number(),
         avatar_url: z.string().nullable(),
-        address_last_active: z.date(),
+        address_last_active: z.date().nullable(),
         profile_name: z.string().nullable(),
       })
       .array(),
