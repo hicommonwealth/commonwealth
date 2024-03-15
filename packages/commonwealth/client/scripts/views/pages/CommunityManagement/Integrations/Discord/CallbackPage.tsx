@@ -16,7 +16,7 @@ const CallbackPage = () => {
       const stateJSON = JSON.parse(decodeURI(state));
 
       try {
-        await axios.post(
+        const res = await axios.post(
           `${app.serverUrl()}/setDiscordBotConfig`,
           {
             community_id: stateJSON.cw_chain_id,
@@ -29,16 +29,23 @@ const CallbackPage = () => {
           },
         );
 
+        let idParam = res?.data?.result?.discordConfigId
+          ? `&discordConfigId=${res?.data?.result?.discordConfigId}`
+          : '';
+
         if (stateJSON.redirect_domain) {
-          window.location.href = `${stateJSON.redirect_domain}/${redirectPath}?returningFromDiscordCallback=true`;
+          window.location.href =
+            `${stateJSON.redirect_domain}/${redirectPath}` +
+            `?returningFromDiscordCallback=true${idParam}`;
         } else {
           navigate(
-            `/${stateJSON.cw_chain_id}/${redirectPath}?returningFromDiscordCallback=true`,
+            `/${stateJSON.cw_chain_id}/${redirectPath}?returningFromDiscordCallback=true${idParam}`,
             {},
             null,
           );
         }
       } catch (e) {
+        console.error(e);
         throw new Error(e.response.data.error);
       }
     },

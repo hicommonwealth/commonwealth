@@ -23,6 +23,11 @@ const Discord = () => {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(
     community.discordConfigId ? 'connected' : 'none',
   );
+
+  const queryParams = new URLSearchParams(window.location.search);
+  if (queryParams.has('discordConfigId')) {
+    app.chain.meta.discordConfigId = queryParams.get('discordConfigId');
+  }
   const [isDiscordWebhooksEnabled, setIsDiscordWebhooksEnabled] = useState(
     community.discordBotWebhooksEnabled,
   );

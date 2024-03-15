@@ -1,9 +1,12 @@
-import { AppError } from '@hicommonwealth/core';
+import { PinoLogger } from '@hicommonwealth/adapters';
+import { AppError, logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import { validateCommunity } from '../middleware/validateCommunity';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { validateOwner } from '../util/validateOwner';
+
+const log = logger(PinoLogger()).getLogger(__filename);
 
 enum SetDiscordBotConfigErrors {
   NoCommunity = 'Must supply a community ID',
@@ -22,6 +25,7 @@ type SetDiscordBotConfigReq = {
 
 type SetDiscordBotConfigResp = {
   message: string;
+  discordConfigId: number;
 };
 
 const setDiscordBotConfig = async (
@@ -59,6 +63,7 @@ const setDiscordBotConfig = async (
     await configEntry.save();
     return success(res, {
       message: 'Updated channel id',
+      discordConfigId: community.discord_config_id,
     });
   }
 
@@ -89,47 +94,49 @@ const setDiscordBotConfig = async (
     existingCommunityWithGuildConnected.length > 0
   ) {
     // Handle discord already linked to another CW community
-    try {
-      communityInstance.discord_config_id = null;
-      await communityInstance.save();
+    communityInstance.discord_config_id = null;
+    await communityInstance.save();
 
-      await models.DiscordBotConfig.destroy({
-        where: {
-          community_id,
-        },
-      });
-      console.log(
-        'Attempted to add a guild that was already connected to another CW community.',
-      );
-    } catch (e) {
-      console.log(e);
-    }
+    await models.DiscordBotConfig.destroy({
+      where: {
+        community_id,
+      },
+    });
+    log.info(
+      'Attempted to add a guild that was already connected to another CW community.',
+    );
 
     throw new AppError(SetDiscordBotConfigErrors.CommonbotConnected);
   } else {
-    try {
-      const profile = await models.Profile.findOne({
-        where: {
-          profile_name: 'Discord Bot',
-        },
-      });
-      await models.Address.create({
+    const profile = await models.Profile.findOne({
+      where: {
+        profile_name: 'Discord Bot',
+      },
+    });
+
+    const [address, created] = await models.Address.findOrCreate({
+      where: {
         user_id: profile.user_id,
         profile_id: profile.id,
         address: '0xdiscordbot',
         community_id,
+      },
+      defaults: {
         role: 'admin',
         verification_token: '123456',
         verification_token_expires: new Date(2030, 1, 1),
         verified: new Date(),
         last_active: new Date(),
-      });
+      },
+    });
 
-      communityInstance.discord_config_id = configEntry.id;
-      await communityInstance.save();
-    } catch (e) {
-      console.log(e);
+    if (!created && address.role !== 'admin') {
+      address.role = 'admin';
+      await address.save();
     }
+
+    communityInstance.discord_config_id = configEntry.id;
+    await communityInstance.save();
   }
 
   try {
@@ -150,6 +157,7 @@ const setDiscordBotConfig = async (
 
     return success(res, {
       message: 'created a new discord bot config',
+      discordConfigId: communityInstance.discord_config_id,
     });
   } catch (e) {
     console.log(e);
