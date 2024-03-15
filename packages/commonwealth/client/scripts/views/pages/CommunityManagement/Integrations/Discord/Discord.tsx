@@ -40,7 +40,8 @@ const Discord = () => {
   }, [community]);
 
   const onConnect = useCallback(async () => {
-    if (connectionStatus === 'connecting' || 'connected') return;
+    if (connectionStatus === 'connecting' || connectionStatus === 'connected')
+      return;
     setConnectionStatus('connecting');
 
     try {
@@ -69,7 +70,8 @@ const Discord = () => {
   }, [connectionStatus]);
 
   const onDisconnect = useCallback(async () => {
-    if (connectionStatus === 'connecting' || 'none') return;
+    if (connectionStatus === 'connecting' || connectionStatus === 'none')
+      return;
     try {
       await axios.post(`${app.serverUrl()}/removeDiscordBotConfig`, {
         community_id: app.activeChainId(),
