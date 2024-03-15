@@ -4,10 +4,9 @@ import {
   InvalidState,
   ThresholdData,
   commonProtocol,
-  community,
+  schemas,
   type Command,
 } from '@hicommonwealth/core';
-import { ValidChains } from 'core/src/commonProtocol';
 import Web3 from 'web3';
 import { models } from '../database';
 import { getNamespace } from '../services/commonProtocol/contractHelpers';
@@ -21,9 +20,9 @@ const Errors = {
 };
 
 export const GenerateStakeholderGroups: Command<
-  typeof community.GenerateStakeholderGroups
+  typeof schemas.commands.GenerateStakeholderGroups
 > = () => ({
-  ...community.GenerateStakeholderGroups,
+  ...schemas.commands.GenerateStakeholderGroups,
   auth: [],
   body: async ({ id }) => {
     const community = await models.Community.findByPk(id, {
@@ -78,7 +77,9 @@ export const GenerateStakeholderGroups: Command<
       throw new InvalidState(Errors.ChainNodeNotFound);
     }
     const factoryData =
-      commonProtocol.factoryContracts[node.eth_chain_id! as ValidChains];
+      commonProtocol.factoryContracts[
+        node.eth_chain_id! as commonProtocol.ValidChains
+      ];
     const contractAddress = await getNamespace(
       new Web3(node.url),
       community.namespace!,

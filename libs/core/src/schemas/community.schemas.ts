@@ -8,7 +8,6 @@ import {
   DefaultPage,
 } from '../types';
 import { ALL_COMMUNITIES, checkIconSize } from '../utils';
-import { Group } from './group.schemas';
 
 export const CommunityStake = z.object({
   id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),
@@ -225,11 +224,3 @@ export const Topic = z.object({
   group_ids: z.array(z.number()).default([]),
   default_offchain_template_backup: z.string().optional().nullable(),
 });
-
-export const GenerateStakeholderGroups = {
-  input: z.object({}),
-  output: z.object({
-    groups: z.array(Group),
-    created: z.boolean(),
-  }),
-};

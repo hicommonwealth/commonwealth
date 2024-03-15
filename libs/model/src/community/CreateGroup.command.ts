@@ -1,6 +1,7 @@
 import { InvalidState, schemas, type Command } from '@hicommonwealth/core';
 import { Op } from 'sequelize';
 import { models, sequelize } from '../database';
+import { isCommunityAdminOrModerator } from '../middleware';
 import { mustNotExist } from '../middleware/guards';
 import { GroupAttributes } from '../models';
 
