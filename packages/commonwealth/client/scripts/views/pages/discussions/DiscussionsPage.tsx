@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
-import { isWindowSmallInclusive } from 'views/components/component_kit/helpers';
 
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { getProposalUrlPath } from 'identifiers';
@@ -9,7 +8,6 @@ import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import { useDateCursor } from 'state/api/threads/fetchThreads';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import { slugify } from 'utils';
-import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import Thread from '../../../models/Thread';
 import {
   ThreadFeaturedFilterTypes,
@@ -24,6 +22,8 @@ import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 
 import { getThreadActionTooltipText } from 'helpers/threads';
+import useBrowserWindow from 'hooks/useBrowserWindow';
+import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
@@ -50,6 +50,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   ) as ThreadTimelineFilterTypes;
   const { data: topics } = useFetchTopicsQuery({
     communityId: community_id,
+  });
+
+  const [resizing, setResizing] = useState(false);
+  const { isWindowSmallInclusive } = useBrowserWindow({
+    onResize: () => setResizing(true),
+    resizeListenerUpdateDeps: [resizing],
   });
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
@@ -88,6 +94,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       },
       {
         getNextPageParam: (lastPage) => {
+          if (lastPage.threads.length < 20) return undefined;
           return lastPage.cursor + 1;
         },
         initialCursor: 1,
@@ -101,7 +108,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const threads = sortPinned(
     sortByFeaturedFilter(threadData || [], featuredFilter),
   );
-  //
+
   //Checks if the current page is a discussion page and if the window is small enough to render the mobile menu
   //Checks both for mobile device and inner window size for desktop responsiveness
   const filteredThreads = threads.filter((t) => {
@@ -116,6 +123,20 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   });
 
   useManageDocumentTitle('Discussions');
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
+    if (resizing) {
+      timer = setTimeout(() => {
+        setResizing(false);
+      }, 200); // Adjust delay as needed
+    }
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [resizing]);
 
   return (
     <div className="DiscussionsPage">
