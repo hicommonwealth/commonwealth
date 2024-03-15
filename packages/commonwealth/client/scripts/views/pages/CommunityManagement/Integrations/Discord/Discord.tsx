@@ -215,7 +215,11 @@ const Discord = () => {
 
       <CWButton
         buttonType="secondary"
-        label={CTA_TEXT[connectionStatus]}
+        label={
+          isRemovingDiscordBotConfig
+            ? 'Disconnecting Discord...'
+            : CTA_TEXT[connectionStatus]
+        }
         disabled={connectionStatus === 'connecting'}
         onClick={connectionStatus === 'none' ? onConnect : onDisconnect}
       />
