@@ -31,12 +31,12 @@ describe('Group lifecycle', () => {
     const [node] = await seed(
       'ChainNode',
       { contracts: [] },
-      { mock: true, log: true },
+      // { mock: true, log: true },
     );
     const [user] = await seed(
       'User',
       { isAdmin: true },
-      { mock: true, log: true },
+      // { mock: true, log: true },
     );
     const [community] = await seed(
       'Community',
@@ -53,7 +53,7 @@ describe('Group lifecycle', () => {
         topics: [],
         groups: [],
       },
-      { mock: true, log: true },
+      // { mock: true, log: true },
     );
 
     id = community!.id!;

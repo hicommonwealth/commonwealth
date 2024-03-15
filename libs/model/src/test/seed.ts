@@ -1,9 +1,9 @@
 import { generateMock } from '@anatine/zod-mock';
-import { DeepPartial, schemas } from '@hicommonwealth/core';
+import { DeepPartial, dispose, schemas } from '@hicommonwealth/core';
 import { Entities } from 'core/src/schemas';
 import { Model, ModelStatic } from 'sequelize';
 import z from 'zod';
-import { models } from '../database';
+import { DATABASE_URI, models, sequelize } from '../database';
 
 // props that are not mocked unless otherwise specified
 // via `allowedGeneratedProps`
@@ -45,6 +45,9 @@ export async function seed<T extends schemas.Aggregates>(
 ): Promise<
   [z.infer<typeof schemas.entities[T]> | undefined, Record<string, any>[]]
 > {
+  if (!DATABASE_URI.endsWith('common_test'))
+    throw new Error('Seeds only work when testing!');
+
   const records: Record<string, any>[] = [];
   await _seed(models[name], values ?? {}, options, records, 0);
   return [records.at(0) as any, records];
@@ -98,3 +101,12 @@ async function _seed(
   level === 0 && options.log && console.log(model, record);
   return record;
 }
+
+DATABASE_URI.endsWith('common_test') &&
+  dispose(async () => {
+    const tables = Object.entries(models)
+      .filter(([k, v]) => !k.endsWith('equelize'))
+      .map(([_, v]) => `"${(v as ModelStatic<Model>).tableName}"`)
+      .join(',');
+    await sequelize.query(`TRUNCATE TABLE ${tables} RESTART IDENTITY CASCADE;`);
+  });

@@ -33,12 +33,12 @@ describe('Stake lifecycle', () => {
     const [node] = await seed(
       'ChainNode',
       { contracts: [] },
-      { mock: true, log: true },
+      // { mock: true, log: true },
     );
     const [user] = await seed(
       'User',
       { isAdmin: true },
-      { mock: true, log: true },
+      // { mock: true, log: true },
     );
     const [community_with_stake] = await seed(
       'Community',
@@ -62,7 +62,7 @@ describe('Stake lifecycle', () => {
         topics: [],
         groups: [],
       },
-      { mock: true, log: true },
+      // { mock: true, log: true },
     );
     const [community_without_stake_to_set] = await seed(
       'Community',
@@ -79,7 +79,7 @@ describe('Stake lifecycle', () => {
         topics: [],
         groups: [],
       },
-      { mock: true, log: true },
+      // { mock: true, log: true },
     );
     const [community_without_stake] = await seed(
       'Community',
@@ -96,7 +96,7 @@ describe('Stake lifecycle', () => {
         topics: [],
         groups: [],
       },
-      { mock: true, log: true },
+      // { mock: true, log: true },
     );
 
     id_with_stake = community_with_stake!.id!;
