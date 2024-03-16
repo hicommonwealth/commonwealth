@@ -28,6 +28,7 @@ module.exports = {
     }
   },
   plugins: ['@tanstack/query'],
+  // TODO: I won't be able to turn this on as it will break the normal dev workflow
   parser: '@typescript-eslint/parser',
   parserOptions: {
     project: `./tsconfig.json`
@@ -110,9 +111,9 @@ module.exports = {
     'react/destructuring-assignment': [1, 'always'],
     'react/function-component-definition': [1, { "namedComponents": "arrow-function" }],
     'react/no-multi-comp': [1, { "ignoreStateless": false }],
-    'react/jsx-curly-brace-presence': [1, { props: "never", children: "never" }],
+    'react/jsx-curly-brace-presence': ['error', { props: "never", children: "never" }],
     '@typescript-eslint/no-unused-vars': 1,
-    'react/jsx-key': 1,
+    'react/jsx-key': 'error',
     "no-restricted-imports": ["error", {
       patterns: [{
         group: [
@@ -145,5 +146,5 @@ module.exports = {
     "plugin:react-hooks/recommended",
     "plugin:react/recommended",
     ENABLE_ESLINT_DIFF_PLUGIN !== 'false' ? 'plugin:diff/diff' : null,
-  ],
+  ].filter(current => current !== null),
 }
