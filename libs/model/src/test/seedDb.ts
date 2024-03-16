@@ -148,7 +148,7 @@ export const seedDb = async (debug = false): Promise<void> => {
         type: ChainType.Token,
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
-        chain_node_id: testnetNode.toJSON().id!,
+        chain_node_id: testnetNode.id!,
       },
       {
         id: 'yearn',
@@ -160,7 +160,7 @@ export const seedDb = async (debug = false): Promise<void> => {
         type: ChainType.Token,
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
-        chain_node_id: mainnetNode.toJSON().id!,
+        chain_node_id: mainnetNode.id!,
       },
       {
         id: 'sushi',
@@ -173,7 +173,7 @@ export const seedDb = async (debug = false): Promise<void> => {
         type: ChainType.Token,
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
-        chain_node_id: mainnetNode.toJSON().id!,
+        chain_node_id: mainnetNode.id!,
       },
       {
         id: 'edgeware',
@@ -186,7 +186,7 @@ export const seedDb = async (debug = false): Promise<void> => {
         base: ChainBase.Substrate,
         ss58_prefix: 7,
         has_chain_events_listener: false,
-        chain_node_id: edgewareNode.toJSON().id!,
+        chain_node_id: edgewareNode.id!,
       },
       {
         id: 'ethereum',
@@ -198,7 +198,7 @@ export const seedDb = async (debug = false): Promise<void> => {
         type: ChainType.Chain,
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
-        chain_node_id: mainnetNode.toJSON().id!,
+        chain_node_id: mainnetNode.id!,
       },
       {
         id: 'osmosis',
@@ -210,7 +210,7 @@ export const seedDb = async (debug = false): Promise<void> => {
         type: ChainType.Chain,
         base: ChainBase.CosmosSDK,
         has_chain_events_listener: false,
-        chain_node_id: osmosisNode.toJSON().id!,
+        chain_node_id: osmosisNode.id!,
         bech32_prefix: 'osmo',
       },
       {
@@ -223,7 +223,7 @@ export const seedDb = async (debug = false): Promise<void> => {
         type: ChainType.Chain,
         base: ChainBase.CosmosSDK,
         has_chain_events_listener: false,
-        chain_node_id: csdkBetaNode.toJSON().id!,
+        chain_node_id: csdkBetaNode.id!,
         bech32_prefix: 'cosmos',
       },
       {
@@ -236,7 +236,7 @@ export const seedDb = async (debug = false): Promise<void> => {
         type: ChainType.Chain,
         base: ChainBase.CosmosSDK,
         has_chain_events_listener: true,
-        chain_node_id: csdkV1Node.toJSON().id!,
+        chain_node_id: csdkV1Node.id!,
         bech32_prefix: 'cosmos',
       },
       {
@@ -353,36 +353,36 @@ export const seedDb = async (debug = false): Promise<void> => {
           token_name: 'Alex',
           symbol: 'ALEX',
           type: ChainNetwork.ERC20,
-          chain_node_id: testnetNode.toJSON().id!,
+          chain_node_id: testnetNode.id!,
         },
         {
           address: '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e',
           token_name: 'yearn',
           symbol: 'YFI',
           type: ChainNetwork.ERC20,
-          chain_node_id: mainnetNode.toJSON().id!,
+          chain_node_id: mainnetNode.id!,
         },
         {
           address: '0x6b3595068778dd592e39a122f4f5a5cf09c90fe2',
           token_name: 'sushi',
           symbol: 'SUSHI',
           type: ChainNetwork.ERC20,
-          chain_node_id: mainnetNode.toJSON().id!,
+          chain_node_id: mainnetNode.id!,
         },
       ]);
 
     await models.CommunityContract.bulkCreate([
       {
-        community_id: alex.toJSON().id!,
-        contract_id: alexContract.toJSON().id!,
+        community_id: alex.id!,
+        contract_id: alexContract.id!,
       },
       {
-        community_id: yearn.toJSON().id!,
-        contract_id: yearnContract.toJSON().id!,
+        community_id: yearn.id!,
+        contract_id: yearnContract.id!,
       },
       {
-        community_id: sushi.toJSON().id!,
-        contract_id: sushiContract.toJSON().id!,
+        community_id: sushi.id!,
+        contract_id: sushiContract.id!,
       },
     ]);
 
@@ -505,12 +505,12 @@ export const seedDb = async (debug = false): Promise<void> => {
     // Admins need to be subscribed to mentions and collaborations
     await models.Subscription.bulkCreate([
       {
-        subscriber_id: drew.toJSON().id!,
+        subscriber_id: drew.id!,
         category_id: NotificationCategories.NewMention,
         is_active: true,
       },
       {
-        subscriber_id: drew.toJSON().id!,
+        subscriber_id: drew.id!,
         category_id: NotificationCategories.NewCollaboration,
         is_active: true,
       },
