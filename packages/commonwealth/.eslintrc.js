@@ -14,6 +14,8 @@ const path = require('path');
  */
 process.env.ESLINT_PLUGIN_DIFF_COMMIT = 'origin/MASTER_CIRCA_2024_03_16'
 
+const ENABLE_ESLINT_DIFF_PLUGIN = process.env.ENABLE_ESLINT_DIFF_PLUGIN || 'true'
+
 module.exports = {
   settings: {
     'import/resolver': {
@@ -26,6 +28,10 @@ module.exports = {
     }
   },
   plugins: ['@tanstack/query'],
+  // parser: '@typescript-eslint/parser',
+  // parserOptions: {
+  //   project: `./tsconfig.json`
+  // },
   rules: {
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/camelcase': 'off',
@@ -116,12 +122,20 @@ module.exports = {
         ],
         message: "Avoid importing from 'lib' directories. Import from the main entry point instead.",
       }]
-    }]
+    }],
+
+    // TODO: needs parser services and when these are on we run out of memory
+    // "@typescript-eslint/no-floating-promises": "error",
+    // "@typescript-eslint/require-await": "error",
+    // "@typescript-eslint/no-misused-promises": "error",
+    // "@typescript-eslint/await-thenable": "error",
+
   },
   ignorePatterns: ['server/scripts/setupPrerenderService.ts'],
   extends: [
     'plugin:@tanstack/eslint-plugin-query/recommended',
     "plugin:react-hooks/recommended",
-    "plugin:react/recommended"
+    "plugin:react/recommended",
+    ENABLE_ESLINT_DIFF_PLUGIN !== 'false' ? 'plugin:diff/diff' : null,
   ],
 }
