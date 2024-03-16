@@ -33,7 +33,7 @@ export type SeedOptions = {
 /**
  * Seeds aggregates for unit testing
  *
- * @param name the name of the entity
+ * @param name of the entity
  * @param values custom seed values specific to the unit test
  * @param options seed options - defaults to mocking without skips
  * @returns tuple with main aggreate record and array of total records created
@@ -70,9 +70,7 @@ async function _seed(
       ...mocked,
       ...values,
     };
-    //console.log('mocked', model.name, values);
   }
-  //console.log(model.name, values);
   const record = (await model.create(values)).toJSON();
   records.push(record);
 
