@@ -350,6 +350,9 @@ jobs:
           GITHUB_BASE_REF: ${{ github.base_ref }}
         run: yarn lint-branch
 
+      - name: Run eslint-diff
+        run: yarn workspace commonwealth run lint-diff
+
       - name: Commonwealth Typecheck
         run: yarn --cwd packages/commonwealth check-types
 
