@@ -28,10 +28,10 @@ module.exports = {
     }
   },
   plugins: ['@tanstack/query'],
-  // parser: '@typescript-eslint/parser',
-  // parserOptions: {
-  //   project: `./tsconfig.json`
-  // },
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    project: `./tsconfig.json`
+  },
   rules: {
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/camelcase': 'off',
@@ -125,18 +125,18 @@ module.exports = {
     }],
 
     // TODO: needs parser services and when these are on we run out of memory
-    // "@typescript-eslint/no-floating-promises": "error",
-    // "@typescript-eslint/require-await": "error",
-    // "@typescript-eslint/no-misused-promises": "error",
-    // "@typescript-eslint/await-thenable": "error",
+    "@typescript-eslint/no-floating-promises": "error",
+    "@typescript-eslint/require-await": "error",
+    "@typescript-eslint/no-misused-promises": "error",
+    "@typescript-eslint/await-thenable": "error",
 
     // ** 'any' issues...
-    // "@typescript-eslint/no-explicit-any": "error",
-    // "@typescript-eslint/no-unsafe-argument": "error",
-    // "@typescript-eslint/no-unsafe-assignment": "error",
-    // "@typescript-eslint/no-unsafe-call": "error",
-    // "@typescript-eslint/no-unsafe-member-access": "error",
-    // "@typescript-eslint/no-unsafe-return": "error",
+    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/no-unsafe-argument": "error",
+    "@typescript-eslint/no-unsafe-assignment": "error",
+    "@typescript-eslint/no-unsafe-call": "error",
+    "@typescript-eslint/no-unsafe-member-access": "error",
+    "@typescript-eslint/no-unsafe-return": "error",
 
   },
   ignorePatterns: ['server/scripts/setupPrerenderService.ts'],
