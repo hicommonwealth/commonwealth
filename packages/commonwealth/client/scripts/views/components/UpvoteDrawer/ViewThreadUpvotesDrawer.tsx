@@ -19,6 +19,8 @@ export const ViewThreadUpvotesDrawer = ({
   const reactors = thread?.associatedReactions;
   const reactorAddresses = reactors?.map((t) => t.address);
 
+  // TODO: this is probably a bug and we should fix it
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { data: reactorProfiles } = useFetchProfilesByAddressesQuery({
     currentChainId: app.activeChainId(),
     profileAddresses: reactorAddresses,

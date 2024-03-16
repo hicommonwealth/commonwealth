@@ -47,15 +47,16 @@ const WhyCommonwealthPage = () => {
         </CWText>
         <CWText>
           No matter what protocol you build on, give easy access to your
-          project's most important on-chain actions like staking and voting.
-          Commonwealth has a growing list of integrations--including Ethereum,
-          NEAR, Cosmos, Substrate, and popular DAO frameworks like Aragon.
+          project&apos;s most important on-chain actions like staking and
+          voting. Commonwealth has a growing list of integrations--including
+          Ethereum, NEAR, Cosmos, Substrate, and popular DAO frameworks like
+          Aragon.
         </CWText>
         <CWText>
           Fork, develop, alter, share - Commonwealth is explicitly designed for
           open-source ecosystems. Existing solutions like chat and email lock
-          your data, users, and brand into platforms you don't control. Default
-          openness allows new members to discover you through SEO.
+          your data, users, and brand into platforms you don&apos;t control.
+          Default openness allows new members to discover you through SEO.
         </CWText>
         <CWText>
           Commonwealth combines all the features of your favorite tools into a

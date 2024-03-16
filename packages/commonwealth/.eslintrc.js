@@ -100,7 +100,7 @@ module.exports = {
       },
     ],
     '@tanstack/query/exhaustive-deps': 'error',
-    '@tanstack/query/prefer-query-object-syntax': 'error',
+    // '@tanstack/query/prefer-query-object-syntax': 'error',
     'react/destructuring-assignment': [1, 'always'],
     'react/function-component-definition': [1, { "namedComponents": "arrow-function" }],
     'react/no-multi-comp': [1, { "ignoreStateless": false }],

@@ -103,6 +103,7 @@ const RPCEndpointTask = () => {
     return [];
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   const checkIfCosmosChainNodeExists = (cosmosChainId: string): void => {
     const cosmosNodeInfo = app.config.nodes.getByCosmosChainId(cosmosChainId);
 
@@ -130,6 +131,7 @@ const RPCEndpointTask = () => {
   };
 
   const idValidationFn = (value: string): [ValidationStatus, string] | [] => {
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     const communityInfo = app.config.chains.getById(value);
     if (!communityInfo) {
       setCommunityInfoValueValidated(false);
@@ -220,6 +222,7 @@ const RPCEndpointTask = () => {
   };
 
   const getCosmosChainIds = async (): Promise<DropdownItemType[]> => {
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     let cosmosChainIds = [{ label: '', value: '' }];
 
     const { data: chains } = await axios.get(

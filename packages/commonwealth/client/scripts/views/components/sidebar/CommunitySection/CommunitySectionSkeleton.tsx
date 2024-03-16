@@ -3,7 +3,9 @@ import React from 'react';
 import { Skeleton } from '../../Skeleton';
 
 export const CommunitySectionSkeleton = ({
+  // eslint-disable-next-line react/prop-types
   sections = 3,
+  // eslint-disable-next-line react/prop-types
   itemsPerSection = 5,
 }) => {
   return (

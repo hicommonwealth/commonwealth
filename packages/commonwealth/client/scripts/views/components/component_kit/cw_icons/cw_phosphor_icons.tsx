@@ -6,6 +6,7 @@ import React from 'react';
 import { getClasses } from '../helpers';
 import type { IconProps, IconStyleProps } from './types';
 
+// eslint-disable-next-line react/display-name
 export const withPhosphorIcon = (Icon: PhosphorIcon) => (props: IconProps) => {
   const {
     className,
@@ -22,7 +23,7 @@ export const withPhosphorIcon = (Icon: PhosphorIcon) => (props: IconProps) => {
     <Icon
       className={getClasses<IconStyleProps>(
         { className, disabled, iconButtonTheme, iconSize, selected },
-        componentType
+        componentType,
       )}
       onClick={otherProps.onClick}
       onMouseEnter={otherProps.onMouseEnter}
