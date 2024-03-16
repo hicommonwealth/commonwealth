@@ -21,6 +21,7 @@
     "heroku-postbuild": "NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) webpack --config webpack/webpack.prod.config.js --progress && yarn build-consumer",
     "integration-test": "nyc ts-mocha -r tsconfig-paths/register './test/integration/**/*.spec.ts'",
     "lint-all": "eslint client/\\**/*.{ts,tsx} server/\\**/*.ts",
+    "lint-diff": "NODE_OPTIONS='--max-old-space-size=16384' eslint -c .eslintrc-diff.js client/\\**/*.{ts,tsx} server/\\**/*.ts",
     "lint-branch": "./scripts/lint-branch.sh",
     "load-db": "chmod u+x scripts/load-db.sh && ./scripts/load-db.sh",
     "migrate-db": "npx sequelize db:migrate",
