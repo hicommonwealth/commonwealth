@@ -249,7 +249,7 @@ export const User = ({
     <div
       className="user-popover-wrapper"
       onMouseEnter={popoverProps.handleInteraction}
-      // onMouseLeave={popoverProps.handleInteraction}
+      onMouseLeave={popoverProps.handleInteraction}
     >
       {userFinal}
       {profile && (
