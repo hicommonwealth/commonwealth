@@ -11,8 +11,8 @@ import {
   NodeHealth,
   NotificationCategories,
 } from '../types';
-import * as schemas from './events.schemas';
-import { discordMetaSchema, linksSchema } from './utils.schemas';
+import * as events from './events.schemas';
+import { EventNames, discordMetaSchema, linksSchema } from './utils.schemas';
 
 export const User = z.object({
   id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),
@@ -432,13 +432,26 @@ export const Chain = Community;
 
 export const Outbox = z.object({
   id: z.number(),
-  event_name: z.string(),
-  // TODO: should automatically include all event schemas
+  event_name: z.nativeEnum(EventNames),
   event_payload: z.union([
-    schemas.ThreadCreated,
-    schemas.CommentCreated,
-    schemas.GroupCreated,
-    schemas.CommunityCreated,
+    events.ThreadCreated.extend({
+      event_name: z.literal(EventNames.ThreadCreated),
+    }),
+    events.CommentCreated.extend({
+      event_name: z.literal(EventNames.CommentCreated),
+    }),
+    events.GroupCreated.extend({
+      event_name: z.literal(EventNames.GroupCreated),
+    }),
+    events.CommunityCreated.extend({
+      event_name: z.literal(EventNames.CommunityCreated),
+    }),
+    events.SnapshotProposalCreated.extend({
+      event_name: z.literal(EventNames.SnapshotProposalCreated),
+    }),
+    events.DiscordMessageCreated.extend({
+      event_name: z.literal(EventNames.DiscordMessageCreated),
+    }),
   ]),
   relayed: z.boolean(),
   created_at: z.date(),
