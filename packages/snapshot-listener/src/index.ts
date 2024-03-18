@@ -1,17 +1,19 @@
 import {
   HotShotsStats,
   PinoLogger,
-  RabbitMQController,
+  RabbitMQAdapter,
   RascalConfigServices,
-  RascalPublications,
   ServiceKey,
   getRabbitMQConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import {
+  Broker,
+  BrokerTopics,
+  EventContext,
+  broker,
   logger,
   stats,
-  type ISnapshotNotification,
 } from '@hicommonwealth/core';
 import type { Request, RequestHandler, Response } from 'express';
 import express, { json } from 'express';
@@ -47,7 +49,7 @@ export const app = express();
 const port = process.env.PORT || DEFAULT_PORT;
 app.use(json() as RequestHandler);
 
-let controller: RabbitMQController;
+let controller: Broker;
 
 registerRoute(app, 'get', '/', (req: Request, res: Response) => {
   res.send('OK!');
@@ -55,34 +57,53 @@ registerRoute(app, 'get', '/', (req: Request, res: Response) => {
 
 registerRoute(app, 'post', '/snapshot', async (req: Request, res: Response) => {
   try {
-    const event: ISnapshotNotification = req.body;
-    if (!event) {
+    if (!req.body) {
       log.error('No event found in request body');
-      res.status(500).send('Error sending snapshot event');
+      res.status(400).send('Error sending snapshot event');
     }
 
-    if (process.env.LOG_LEVEL === 'debug') {
-      const eventLog = JSON.stringify(event);
-      log.info('snapshot received');
-      log.info(eventLog);
+    log.debug('Snapshot received', undefined, { requestBody: req.body });
+
+    const parsedId = req.body.id?.replace(/.*\//, '');
+    const eventType = req.body.event?.split('/')[1];
+
+    if (!parsedId || !eventType) {
+      log.error('No id or event in request body', undefined, {
+        requestBody: req.body,
+      });
+      res.status(400).send('Error sending snapshot event');
     }
 
-    const parsedId = event.id.replace(/.*\//, '');
-    const eventType = event.event.split('/')[1];
     const response = await fetchNewSnapshotProposal(parsedId, eventType);
-    event.id = parsedId;
-    event.title = response.data.proposal?.title ?? null;
-    event.body = response.data.proposal?.body ?? null;
-    event.choices = response.data.proposal?.choices ?? null;
-    event.space = response.data.proposal?.space.id ?? null;
-    event.start = response.data.proposal?.start ?? null;
-    event.expire = response.data.proposal?.end ?? null;
 
-    await controller?.publish(event, RascalPublications.SnapshotListener);
+    const event: EventContext<'SnapshotProposalCreated'> = {
+      name: 'SnapshotProposalCreated',
+      payload: {
+        id: parsedId,
+        title: response.data.proposal?.title ?? null,
+        body: response.data.proposal?.body ?? null,
+        choices: response.data.proposal?.choices ?? null,
+        space: response.data.proposal?.space.id ?? null,
+        start: response.data.proposal?.start ?? null,
+        expire: response.data.proposal?.end ?? null,
+      },
+    };
+
+    const result = await controller?.publish(
+      BrokerTopics.SnapshotListener,
+      event,
+    );
+
+    if (!result) {
+      log.error('Failed to publish snapshot message', undefined, {
+        event,
+      });
+      res.status(500).send('Failed to publish snapshot');
+    }
 
     stats().increment('snapshot_listener.received_snapshot_event', {
       event: eventType,
-      space: event.space,
+      space: event.payload.space,
     });
 
     res.status(200).send({ message: 'Snapshot event received', event });
@@ -98,17 +119,18 @@ app.listen(port, async () => {
   const log = logger().getLogger(__filename);
   log.info(`⚡️[server]: Server is running at https://localhost:${port}`);
 
-  if (NODE_ENV != 'test') {
+  if (NODE_ENV !== 'test') {
     try {
-      controller = new RabbitMQController(
+      const rmqAdapter = new RabbitMQAdapter(
         getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.SnapshotService),
       );
-      await controller.init();
-      log.info('Connected to RabbitMQ');
+      await rmqAdapter.init();
+      broker(rmqAdapter);
+      controller = rmqAdapter;
+      isServiceHealthy = true;
     } catch (err) {
-      log.error(`Error starting server: ${err}`);
+      log.fatal(`Error starting server: ${err}`);
+      isServiceHealthy = false;
     }
   }
-
-  isServiceHealthy = true;
 });

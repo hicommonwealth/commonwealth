@@ -246,7 +246,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       );
       console.log(result);
       if (cosm.isDeliverTxFailure(result)) {
-        throw new Error('TX execution failed.');
+        throw new Error(`TX execution failed: ${result?.rawLog}`);
       } else if (cosm.isDeliverTxSuccess(result)) {
         const txHash = result.transactionHash;
         const txResult = await this._tmClient.tx({

@@ -61,9 +61,5 @@ export const validateOwner = async ({
       r.community_id === communityId && requiredRoles.includes(r.permission)
     );
   });
-  if (role) {
-    return true;
-  }
-
-  return false;
+  return !!role;
 };

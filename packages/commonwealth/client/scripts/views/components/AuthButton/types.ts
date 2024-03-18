@@ -16,7 +16,6 @@ export type SolanaWallets = 'phantom';
 export type EVMWallets = 'walletconnect' | 'metamask' | 'coinbase';
 export type CommunitySpecificWallets =
   | 'near'
-  | 'ronin'
   | 'terrastation'
   | 'terra-walletconnect'
   | 'cosm-metamask'
