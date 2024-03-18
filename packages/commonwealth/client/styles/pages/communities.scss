@@ -4,7 +4,6 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  padding: 0 24px;
 
   .header-section {
     align-items: center;
@@ -13,10 +12,14 @@
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-between;
-    padding: 24px;
+    padding-bottom: 24px;
     position: sticky;
-    top: 0;
+    top: 42px;
     z-index: 1;
+
+    @include smallInclusive {
+      top: 0;
+    }
 
     .filter-buttons {
       display: flex;
@@ -33,7 +36,7 @@
     display: grid;
     grid-gap: 24px;
     grid-template-columns: repeat(auto-fit, 240px);
-    justify-content: center;
+    justify-content: left;
     padding-bottom: 24px;
 
     @include smallInclusive {

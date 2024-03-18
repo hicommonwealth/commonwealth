@@ -8,6 +8,7 @@ import 'pages/communities.scss';
 import React from 'react';
 import app from 'state';
 import useFetchActiveCommunitiesQuery from 'state/api/communities/fetchActiveCommunities';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import CommunityInfo from '../../models/ChainInfo';
 import { CommunityCard, NewCommunityCard } from '../components/CommunityCard';
 import { CWButton } from '../components/component_kit/cw_button';
@@ -148,71 +149,81 @@ const CommunitiesPage = () => {
     : [];
 
   return (
-    <div className="CommunitiesPage">
-      <div className="header-section">
-        <div>
-          <CWText type="h3" fontWeight="semiBold" className="communities-count">
-            Explore Communities
-          </CWText>
-          <CWText type="h3" fontWeight="semiBold" className="communities-count">
-            {activeCommunities &&
-              buildCommunityString(activeCommunities.totalCommunitiesCount)}
-          </CWText>
+    <CWPageLayout>
+      <div className="CommunitiesPage">
+        <div className="header-section">
+          <div>
+            <CWText
+              type="h3"
+              fontWeight="semiBold"
+              className="communities-count"
+            >
+              Explore Communities
+            </CWText>
+            <CWText
+              type="h3"
+              fontWeight="semiBold"
+              className="communities-count"
+            >
+              {activeCommunities &&
+                buildCommunityString(activeCommunities.totalCommunitiesCount)}
+            </CWText>
+          </div>
+          <div className="filter-buttons">
+            {communityCategories.map((cat, i) => {
+              return (
+                <CWButton
+                  key={i}
+                  label={cat}
+                  buttonType={
+                    filterMap[cat] ? 'primary-black' : 'secondary-black'
+                  }
+                  onClick={() => {
+                    handleSetFilterMap(cat);
+                  }}
+                />
+              );
+            })}
+            {communityNetworks.map((network, i) => {
+              return (
+                <CWButton
+                  key={i}
+                  label={network}
+                  buttonType={
+                    filterMap[network] ? 'primary-black' : 'secondary-black'
+                  }
+                  onClick={() => {
+                    handleSetFilterMap(network);
+                  }}
+                />
+              );
+            })}
+            {communityBases.map((base, i) => {
+              return (
+                <CWButton
+                  key={i}
+                  label={base}
+                  buttonType={
+                    filterMap[base] ? 'primary-black' : 'secondary-black'
+                  }
+                  onClick={() => {
+                    handleSetFilterMap(base);
+                  }}
+                />
+              );
+            })}
+          </div>
         </div>
-        <div className="filter-buttons">
-          {communityCategories.map((cat, i) => {
-            return (
-              <CWButton
-                key={i}
-                label={cat}
-                buttonType={
-                  filterMap[cat] ? 'primary-black' : 'secondary-black'
-                }
-                onClick={() => {
-                  handleSetFilterMap(cat);
-                }}
-              />
-            );
-          })}
-          {communityNetworks.map((network, i) => {
-            return (
-              <CWButton
-                key={i}
-                label={network}
-                buttonType={
-                  filterMap[network] ? 'primary-black' : 'secondary-black'
-                }
-                onClick={() => {
-                  handleSetFilterMap(network);
-                }}
-              />
-            );
-          })}
-          {communityBases.map((base, i) => {
-            return (
-              <CWButton
-                key={i}
-                label={base}
-                buttonType={
-                  filterMap[base] ? 'primary-black' : 'secondary-black'
-                }
-                onClick={() => {
-                  handleSetFilterMap(base);
-                }}
-              />
-            );
-          })}
-        </div>
+        {isLoading ? (
+          <CWCircleMultiplySpinner />
+        ) : (
+          <div className="communities-list">
+            {sortedCommunities}
+            <NewCommunityCard />
+          </div>
+        )}
       </div>
-      {isLoading ? (
-        <CWCircleMultiplySpinner />
-      ) : (
-        <div className="communities-list">
-          {sortedCommunities}
-          <NewCommunityCard />
-        </div>
-      )}
-    </div>
+    </CWPageLayout>
   );
 };
 
