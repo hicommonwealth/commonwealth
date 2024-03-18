@@ -247,7 +247,6 @@ export const customIconLookup = {
   near: CustomIcons.CWNearWallet,
   phantom: CustomIcons.CWPhantom,
   polkadot: CustomIcons.CWPolkadot,
-  ronin: CustomIcons.CWRonin,
   terrastation: CustomIcons.CWTerraStation2,
   unreads: CustomIcons.CWUnreads,
   walletconnect: CustomIcons.CWWalletConnect,
