@@ -8,12 +8,12 @@ import {
   logger,
 } from '@hicommonwealth/core';
 import { QueryTypes, Sequelize } from 'sequelize';
-import { TEST_DB_NAME } from '../database';
+import { DATABASE_URI, TEST_DB_NAME } from '../database';
 
 export const checkDb = async () => {
   let sequelize: Sequelize | undefined = undefined;
   try {
-    sequelize = new Sequelize('postgresql://commonwealth:edgeware@localhost', {
+    sequelize = new Sequelize(DATABASE_URI, {
       logging: false,
     });
     const [{ count }] = await sequelize.query<{ count: number }>(
