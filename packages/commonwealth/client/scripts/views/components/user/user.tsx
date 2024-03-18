@@ -229,6 +229,7 @@ export const User = ({
       )}
       <CWModal
         size="small"
+        zIndex={10001}
         content={
           <BanUserModal
             address={userAddress}
@@ -248,7 +249,7 @@ export const User = ({
     <div
       className="user-popover-wrapper"
       onMouseEnter={popoverProps.handleInteraction}
-      onMouseLeave={popoverProps.handleInteraction}
+      // onMouseLeave={popoverProps.handleInteraction}
     >
       {userFinal}
       {profile && (
