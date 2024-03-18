@@ -90,7 +90,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       },
       {
         getNextPageParam: (lastPage) => {
-          if (lastPage.threads.length < 20) return undefined;
+          if (lastPage.threads?.length < 20) return undefined;
           return lastPage.cursor + 1;
         },
         initialCursor: 1,
