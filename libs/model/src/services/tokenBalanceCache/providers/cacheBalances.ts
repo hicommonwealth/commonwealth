@@ -24,7 +24,7 @@ export async function getCachedBalances(
       CacheNamespaces.Token_Balance,
       addresses.map((address) => buildCacheKey(options, address)),
     );
-    if (result !== false) {
+    if (result) {
       for (const [key, balance] of Object.entries(result)) {
         const address = getAddressFromCacheKey(key);
         balances[address] = balance as string;
@@ -79,6 +79,7 @@ function buildCacheKey(options: GetBalancesOptions, address: string): string {
       );
     case BalanceSourceType.CosmosNative:
       return `${options.sourceOptions.cosmosChainId}_${address}`;
+    case BalanceSourceType.CW20:
     case BalanceSourceType.CW721:
       return (
         `${options.sourceOptions.cosmosChainId}_` +

@@ -6,10 +6,9 @@ import {
 } from '@hicommonwealth/adapters';
 import { cache, logger } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
-import bodyParser from 'body-parser';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
-import express from 'express';
+import express, { RequestHandler, json, urlencoded } from 'express';
 import session from 'express-session';
 import http from 'http';
 import passport from 'passport';
@@ -24,9 +23,8 @@ import GlobalActivityCache from './server/util/globalActivityCache';
 import ViewCountCache from './server/util/viewCountCache';
 
 const log = logger().getLogger(__filename);
-const redisCache = new RedisCache();
-const cacheDecorator = new CacheDecorator(redisCache);
-cache(redisCache);
+cache(new RedisCache('redis://localhost:6379'));
+export const cacheDecorator = new CacheDecorator();
 
 require('express-async-errors');
 
@@ -59,8 +57,8 @@ app.use('/static', express.static('static'));
 
 // add other middlewares
 // app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(json() as RequestHandler);
+app.use(urlencoded({ extended: false }) as RequestHandler);
 app.use(cookieParser());
 app.use(sessionParser);
 app.use(passport.initialize());
@@ -120,7 +118,5 @@ setupCosmosProxy(app, models, cacheDecorator);
 
 setupErrorHandlers(app);
 setupServer();
-
-export { cacheDecorator, redisCache };
 
 export default app;

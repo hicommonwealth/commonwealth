@@ -135,10 +135,12 @@ const CWTextInput = (props: TextInputProps) => {
       className={getClasses<{
         containerClassName?: string;
         validationStatus?: ValidationStatus;
+        fullWidth?: boolean;
       }>(
         {
           containerClassName,
           validationStatus: validationStatus,
+          fullWidth,
         },
         ComponentType.TextInput,
       )}

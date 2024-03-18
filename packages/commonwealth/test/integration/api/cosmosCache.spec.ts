@@ -3,8 +3,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable max-len */
 require('dotenv').config();
-import { connectToRedis } from '@hicommonwealth/adapters';
-import { CacheNamespaces } from '@hicommonwealth/core';
+import { CacheNamespaces, cache, dispose } from '@hicommonwealth/core';
 import { tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
@@ -13,9 +12,11 @@ import {
   cosmosRPCDuration,
   cosmosRPCKey,
 } from 'server/util/cosmosCache';
-import app, { cacheDecorator, redisCache } from '../../../server-test';
-const v1beta1ChainId = 'csdk-beta';
-const v1ChainId = 'csdk';
+import app, { cacheDecorator } from '../../../server-test';
+const V1BETA1_CHAIN_ID = 'csdk-beta';
+const V1_CHAIN_ID = 'csdk';
+const V1BETA1_API = `/cosmosAPI`;
+const V1_API = `/cosmosAPI/v1`;
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -40,18 +41,18 @@ describe('Cosmos Cache', () => {
 
   before(async () => {
     await tester.seedDb();
-    await connectToRedis(redisCache);
+    await cache().ready();
   });
 
   after(async () => {
-    await redisCache.deleteNamespaceKeys(route_namespace);
-    await redisCache.closeClient();
+    await cache().deleteNamespaceKeys(route_namespace);
+    await dispose()();
   });
 
   describe('cosmosAPI', () => {
     async function makeRPCRequest(
       body,
-      path = `/cosmosAPI/${v1beta1ChainId}`,
+      path = `/cosmosAPI/${V1BETA1_CHAIN_ID}`,
       headers = {
         'content-type': 'text/plain;charset=UTF-8',
         'accept-language': 'en-US,en;q=0.9',
@@ -69,7 +70,7 @@ describe('Cosmos Cache', () => {
 
     function rpcTestKeyAndDuration(body, expectedKey, expectedDuration) {
       const request = {
-        originalUrl: `/cosmosAPI/${v1beta1ChainId}`,
+        originalUrl: `${V1BETA1_API}/${V1BETA1_CHAIN_ID}`,
       };
       const key = cosmosRPCKey(request, body);
       const duration = cosmosRPCDuration(body);
@@ -83,7 +84,7 @@ describe('Cosmos Cache', () => {
       expectedDuration: number,
     ) => {
       const request = {
-        originalUrl: `/cosmosAPI/${v1beta1ChainId}`,
+        originalUrl: `${V1BETA1_API}/${V1BETA1_CHAIN_ID}`,
       };
       const params = {
         path: '/cosmos.gov.v1beta1.Query/Proposals',
@@ -97,7 +98,7 @@ describe('Cosmos Cache', () => {
         params: params,
       };
       const bodyString = JSON.stringify(body);
-      const expectedKey = `/cosmosAPI/${v1beta1ChainId}_{"path":"/cosmos.gov.v1beta1.Query/Proposals","data":"${proposalStatus}","prove":false}`;
+      const expectedKey = `${V1BETA1_API}/${V1BETA1_CHAIN_ID}_{"path":"/cosmos.gov.v1beta1.Query/Proposals","data":"${proposalStatus}","prove":false}`;
 
       const key = cosmosRPCKey(request, body);
       expect(key).to.be.equal(expectedKey);
@@ -143,7 +144,7 @@ describe('Cosmos Cache', () => {
         },
       };
       const bodyString = JSON.stringify(body);
-      const expectedKey = `/cosmosAPI/${v1beta1ChainId}_{"path":"/cosmos.gov.v1beta1.Query/Proposal","data":"08b502","prove":false}`;
+      const expectedKey = `${V1BETA1_API}/${V1BETA1_CHAIN_ID}_{"path":"/cosmos.gov.v1beta1.Query/Proposal","data":"08b502","prove":false}`;
 
       rpcTestKeyAndDuration(body, expectedKey, 60 * 60 * 24 * 7);
       await rpcTestIsCached(bodyString, expectedKey);
@@ -161,7 +162,7 @@ describe('Cosmos Cache', () => {
         params: params,
       };
       const bodyString = JSON.stringify(body);
-      const expectedKey = `/cosmosAPI/${v1beta1ChainId}_{"path":"/cosmos.gov.v1beta1.Query/Votes","data":"08b502","prove":false}`;
+      const expectedKey = `${V1BETA1_API}/${V1BETA1_CHAIN_ID}_{"path":"/cosmos.gov.v1beta1.Query/Votes","data":"08b502","prove":false}`;
 
       rpcTestKeyAndDuration(body, expectedKey, 6);
       await rpcTestIsCached(bodyString, expectedKey);
@@ -179,7 +180,7 @@ describe('Cosmos Cache', () => {
         params,
       };
       const bodyString = JSON.stringify(body);
-      const expectedKey = `/cosmosAPI/${v1beta1ChainId}_${params.path}`;
+      const expectedKey = `${V1BETA1_API}/${V1BETA1_CHAIN_ID}_${params.path}`;
 
       rpcTestKeyAndDuration(body, expectedKey, 60 * 60 * 24 * 5);
       await rpcTestIsCached(bodyString, expectedKey);
@@ -197,7 +198,7 @@ describe('Cosmos Cache', () => {
         params,
       };
       const bodyString = JSON.stringify(body);
-      const expectedKey = `/cosmosAPI/${v1beta1ChainId}_${JSON.stringify(
+      const expectedKey = `${V1BETA1_API}/${V1BETA1_CHAIN_ID}_${JSON.stringify(
         params,
       )}`;
 
@@ -217,7 +218,7 @@ describe('Cosmos Cache', () => {
         params,
       };
       const bodyString = JSON.stringify(body);
-      const expectedKey = `/cosmosAPI/${v1beta1ChainId}_${params.path}`;
+      const expectedKey = `${V1BETA1_API}/${V1BETA1_CHAIN_ID}_${params.path}`;
 
       rpcTestKeyAndDuration(body, expectedKey, 60 * 60 * 24 * 5);
       await rpcTestIsCached(bodyString, expectedKey);
@@ -230,7 +231,7 @@ describe('Cosmos Cache', () => {
         params: {},
       };
       const bodyString = JSON.stringify(body);
-      const expectedKey = `/cosmosAPI/${v1beta1ChainId}_${bodyString}`;
+      const expectedKey = `${V1BETA1_API}/${V1BETA1_CHAIN_ID}_${bodyString}`;
 
       rpcTestKeyAndDuration(body, expectedKey, 6);
       await rpcTestIsCached(bodyString, expectedKey);
@@ -244,19 +245,19 @@ describe('Cosmos Cache', () => {
       };
       const bodyString = JSON.stringify(body);
 
-      const expectedKey = `/cosmosAPI/${v1beta1ChainId}_${bodyString}`;
+      const expectedKey = `${V1BETA1_API}/${V1BETA1_CHAIN_ID}_${bodyString}`;
 
       rpcTestKeyAndDuration(body, expectedKey, 6);
       await rpcTestIsCached(bodyString, expectedKey);
     });
   }).timeout(5000);
 
-  describe('cosmosLCD', () => {
+  describe('cosmosAPI/v1', () => {
     const lcdProposalsCacheExpectedTest = async (
       proposalStatus: string,
       expectedDuration: number,
     ) => {
-      const url = `/cosmosLCD/${v1ChainId}/cosmos/gov/v1/proposals?proposal_status=${proposalStatus}&voter=&depositor=`;
+      const url = `${V1_API}/${V1_CHAIN_ID}/cosmos/gov/v1/proposals?proposal_status=${proposalStatus}&voter=&depositor=`;
       lcdTestDuration(expectedDuration, url, {
         proposal_status: proposalStatus,
       });
@@ -267,7 +268,7 @@ describe('Cosmos Cache', () => {
       param: string,
       expectedDuration: number,
     ) => {
-      const url = `/cosmosLCD/${v1ChainId}/cosmos/gov/v1/params/${param}`;
+      const url = `${V1_API}/${V1_CHAIN_ID}/cosmos/gov/v1/params/${param}`;
       lcdTestDuration(expectedDuration, url);
       await lcdTestIsCached(url);
     };
@@ -295,19 +296,19 @@ describe('Cosmos Cache', () => {
     }
 
     it('should have 7-day duration for an an individual proposal', async () => {
-      const url = `/cosmosLCD/${v1ChainId}/cosmos/gov/v1/proposals/1`;
+      const url = `${V1_API}/${V1_CHAIN_ID}/cosmos/gov/v1/proposals/1`;
       lcdTestDuration(60 * 60 * 24 * 7, url);
     });
     it("should have 6-second duration for an an individual proposal's live votes", async () => {
-      const url = `/cosmosLCD/${v1ChainId}/cosmos/gov/v1/proposals/1/votes`;
+      const url = `${V1_API}/${V1_CHAIN_ID}/cosmos/gov/v1/proposals/1/votes`;
       lcdTestDuration(6, url);
     });
     it("should have 6-second duration for an individual proposal's live tally", async () => {
-      const url = `/cosmosLCD/${v1ChainId}/cosmos/gov/v1/proposals/1/tally`;
+      const url = `${V1_API}/${V1_CHAIN_ID}/cosmos/gov/v1/proposals/1/tally`;
       lcdTestDuration(6, url);
     });
     it("should have 6-second duration for an individual proposal's live deposits", async () => {
-      const url = `/cosmosLCD/${v1ChainId}/cosmos/gov/v1/proposals/1/deposits`;
+      const url = `${V1_API}/${V1_CHAIN_ID}/cosmos/gov/v1/proposals/1/deposits`;
       lcdTestDuration(6, url);
     });
     it('should cache deposit period proposals', async () => {

@@ -9,7 +9,7 @@ import Thread from '../../../models/Thread';
 import { CWText } from '../../components/component_kit/cw_text';
 import { PageNotFound } from '../../pages/404';
 import { ImageBehavior } from '../component_kit/cw_cover_image_uploader';
-import CWLoadingSpinner from '../component_kit/new_designs/CWLoadingSpinner';
+import CWCircleMultiplySpinner from '../component_kit/new_designs/CWCircleMultiplySpinner';
 import type { CommentWithAssociatedThread } from './ProfileActivity';
 import ProfileActivity from './ProfileActivity';
 import ProfileHeader from './ProfileHeader';
@@ -103,7 +103,7 @@ const Profile = ({ profileId }: ProfileProps) => {
     return (
       <div className="Profile loading">
         <div className="loading-spinner">
-          <CWLoadingSpinner />
+          <CWCircleMultiplySpinner />
         </div>
       </div>
     );

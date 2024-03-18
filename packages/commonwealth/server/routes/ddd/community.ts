@@ -1,32 +1,9 @@
-import {
-  analyticsMiddleware,
-  expressCommand,
-  expressQuery,
-} from '@hicommonwealth/adapters';
+import { trpc } from '@hicommonwealth/adapters';
 import { Community } from '@hicommonwealth/model';
-import { Router } from 'express';
-import passport from 'passport';
-import { MixpanelCommunityInteractionEvent } from 'shared/analytics/types';
 
-const router = Router();
-
-router.get(
-  '/:community_id/stake/:stake_id?',
-  passport.authenticate('jwt', { session: false }),
-  expressQuery(Community.GetCommunityStake()),
-);
-
-router.put(
-  '/:id/stake',
-  passport.authenticate('jwt', { session: false }),
-  expressCommand(Community.SetCommunityStake()),
-);
-
-router.post(
-  '/:id/group',
-  passport.authenticate('jwt', { session: false }),
-  analyticsMiddleware(MixpanelCommunityInteractionEvent.CREATE_GROUP),
-  expressCommand(Community.CreateGroup()),
-);
-
-export default router;
+export const trpcRouter = trpc.router({
+  getStake: trpc.query(Community.GetCommunityStake),
+  setStake: trpc.command(Community.SetCommunityStake, trpc.Tag.Community),
+  createGroup: trpc.command(Community.CreateGroup, trpc.Tag.Community),
+  // TODO: integrate via async analytics policy: analyticsMiddleware(MixpanelCommunityInteractionEvent.CREATE_GROUP),
+});

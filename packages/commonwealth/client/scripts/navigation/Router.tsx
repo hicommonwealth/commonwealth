@@ -13,9 +13,8 @@ import GeneralRoutes from './GeneralRoutes';
 
 export type RouteFeatureFlags = {
   proposalTemplatesEnabled: boolean;
-  newAdminOnboardingEnabled: boolean;
   communityHomepageEnabled: boolean;
-  rootDomainRebrandEnabled: boolean;
+  myCommunityStakePageEnabled: boolean;
 };
 
 const Router = (customDomain: string) => {
@@ -24,30 +23,25 @@ const Router = (customDomain: string) => {
     'proposalTemplates',
     false,
   );
-  const newAdminOnboardingEnabled = client.getBooleanValue(
-    'newAdminOnboarding',
-    false,
-  );
   const communityHomepageEnabled = client.getBooleanValue(
     'communityHomepage',
     false,
   );
-  const rootDomainRebrandEnabled = client.getBooleanValue(
-    'rootDomainRebrand',
+  const myCommunityStakePageEnabled = client.getBooleanValue(
+    'myCommunityStakePageEnabled',
     false,
   );
   const flags = {
     proposalTemplatesEnabled,
-    newAdminOnboardingEnabled,
     communityHomepageEnabled,
-    rootDomainRebrandEnabled,
+    myCommunityStakePageEnabled,
   };
 
   return createBrowserRouter(
     createRoutesFromElements([
       ...GeneralRoutes(),
       ...(customDomain ? CustomDomainRoutes(flags) : CommonDomainRoutes(flags)),
-      <Route path="*" element={withLayout(PageNotFound, {})} />,
+      <Route key="routes" path="*" element={withLayout(PageNotFound, {})} />,
     ]),
   );
 };

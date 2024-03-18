@@ -1,4 +1,5 @@
 @import '../../../../../../styles/shared.scss';
+
 .CWSelectList {
   &.disabled {
     cursor: not-allowed !important;
@@ -14,6 +15,10 @@
     max-height: 40px;
     padding: 10px 16px;
 
+    &.isMulti {
+      max-height: initial !important;
+    }
+
     .cwsl__control {
       gap: 8px;
       letter-spacing: 0.02em;
@@ -27,6 +32,10 @@
         max-height: 24px;
         line-height: 14px;
 
+        &.cwsl__value-container--is-multi {
+          max-height: initial !important;
+        }
+
         .cwsl__single-value {
           line-height: 18px;
         }
@@ -36,6 +45,8 @@
           border-radius: 6px;
           margin: 0px !important;
           margin-right: 8px !important;
+          margin-top: 2px !important;
+          margin-bottom: 2px !important;
           background-color: $neutral-100;
 
           .cwsl__multi-value__label {
@@ -116,6 +127,9 @@
           text-align: left;
           cursor: pointer;
           margin-bottom: 4px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
 
           &:hover,
           &:focus,

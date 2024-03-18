@@ -1,8 +1,7 @@
 import { ProposalSDKType } from '@hicommonwealth/chains';
-import { logger } from '@hicommonwealth/core';
+import { CosmosGovernanceVersion, logger } from '@hicommonwealth/core';
 import { CommunityInstance } from '@hicommonwealth/model';
 import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
-import { COSMOS_GOV_V1_CHAIN_IDS } from '../../../config';
 import { AllCosmosProposals } from './types';
 
 const log = logger().getLogger(__filename);
@@ -32,34 +31,39 @@ export function numberToUint8ArrayBE(num, byteLength = 8) {
   return bytes;
 }
 
-export function filterV1GovChains(chains: CommunityInstance[]) {
-  const v1Chains = [];
-  const v1Beta1Chains = [];
+export async function filterV1GovCommunities(communities: CommunityInstance[]) {
+  const v1Communities = [];
+  const v1Beta1Communities = [];
 
-  chains.forEach((c) => {
-    if (COSMOS_GOV_V1_CHAIN_IDS.includes(c.id)) {
-      v1Chains.push(c);
+  const promises = communities.map(async (c) => {
+    const chainNode = await c.getChainNode();
+    if (chainNode?.cosmos_gov_version === CosmosGovernanceVersion.v1) {
+      v1Communities.push(c);
     } else {
-      v1Beta1Chains.push(c);
+      v1Beta1Communities.push(c);
     }
   });
 
-  return { v1Chains, v1Beta1Chains };
+  await Promise.all(promises);
+  return { v1Communities, v1Beta1Communities };
 }
 
-export function mapChainsToProposals(
-  v1Chains: CommunityInstance[],
-  v1Beta1Chains: CommunityInstance[],
+export function mapCommunitiesToProposals(
+  v1Communities: CommunityInstance[],
+  v1Beta1Communities: CommunityInstance[],
   v1Proposals: ProposalSDKType[][],
   v1Beta1Proposals: Proposal[][],
 ): AllCosmosProposals {
   return {
     v1: v1Proposals.reduce(
-      (acc, proposals, i) => ({ ...acc, [v1Chains[i].id]: proposals }),
+      (acc, proposals, i) => ({ ...acc, [v1Communities[i].id]: proposals }),
       {},
     ),
     v1Beta1: v1Beta1Proposals.reduce(
-      (acc, proposals, i) => ({ ...acc, [v1Beta1Chains[i].id]: proposals }),
+      (acc, proposals, i) => ({
+        ...acc,
+        [v1Beta1Communities[i].id]: proposals,
+      }),
       {},
     ),
   };

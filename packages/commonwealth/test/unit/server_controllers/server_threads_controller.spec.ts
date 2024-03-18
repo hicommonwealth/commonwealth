@@ -72,10 +72,17 @@ describe('ServerThreadsController', () => {
             vote_weight: 1,
           }),
         },
+
         Community: {
           findByPk: async () => ({
             id: 'ethereum',
             namespace: 'cake',
+          }),
+        },
+        ChainNode: {
+          findByPk: async () => ({
+            eth_chain_id: 8453,
+            url: 'test.com',
           }),
         },
         sequelize: {
@@ -134,9 +141,9 @@ describe('ServerThreadsController', () => {
         thread_id: 4,
         root_title: 'Big Thread!',
         root_type: 'discussion',
-        chain_id: 'ethereum',
+        community_id: 'ethereum',
         author_address: '0x123',
-        author_chain: 'ethereum',
+        author_community_id: 'ethereum',
       });
 
       expect(notificationOptions).to.have.property('excludeAddresses');
@@ -1030,6 +1037,7 @@ describe('ServerThreadsController', () => {
               id: 1,
               address: '0x123',
             },
+            destroy: async () => ({}),
           }),
           destroy: async () => ({}),
         },
@@ -1045,6 +1053,9 @@ describe('ServerThreadsController', () => {
         },
         Address: {
           findAll: async () => [{}], // used in findOneRole
+        },
+        sequelize: {
+          transaction: async (callback) => callback({}),
         },
       };
       const banCache = BAN_CACHE_MOCK_FN('ethereum');
@@ -1355,9 +1366,9 @@ describe('ServerThreadsController', () => {
         thread_id: 1,
         root_type: 'discussion',
         root_title: 'mythread',
-        chain_id: 'ethereum',
+        community_id: 'ethereum',
         author_address: '0x123',
-        author_chain: 'ethereum',
+        author_community_id: 'ethereum',
       });
       expect(notificationOptions[0].excludeAddresses[0]).to.equal('0x123');
     });

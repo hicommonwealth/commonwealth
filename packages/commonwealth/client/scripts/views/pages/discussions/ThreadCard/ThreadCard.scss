@@ -82,8 +82,19 @@
         @include multiline-text-ellipsis($max-lines: 2);
         word-break: break-word;
 
+        @include extraSmall {
+          overflow: hidden !important;
+          max-height: 54px !important;
+        }
+
         .MarkdownFormattedText {
           @include caption;
+
+          @include extraSmall {
+            p {
+              line-height: 18px !important;
+            }
+          }
 
           h1,
           h2,

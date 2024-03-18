@@ -1,5 +1,5 @@
 const Errors = {
-  NotAdmin: 'Not an admin of chain or community',
+  NotAdmin: 'Not an admin of community',
   NotLoggedIn: 'Not signed in',
   NoCategory: 'Must provide a category',
   InvalidNotificationCategory: 'invalid notification category',
@@ -13,7 +13,7 @@ const Errors = {
     'Cannot make New Collaboration Subscription from this route',
   NoComment: 'Cannot find comment model for new subscription',
   NoThread: 'Cannot find thread model for new subscription',
-  InvalidChain: 'Invalid chain',
+  InvalidCommunity: 'Invalid community',
   InvalidChainEventId: 'Invalid ChainEvent id',
   InvalidSnapshotSpace: 'Invalid snapshot space',
   NoMentionDelete: 'Cannot delete mention subscription',

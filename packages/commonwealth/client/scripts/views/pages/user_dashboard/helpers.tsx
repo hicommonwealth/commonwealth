@@ -96,7 +96,3 @@ export const fetchActivity = async (requestType: DashboardViews) => {
 
   return activity;
 };
-
-export const notificationsRemaining = (contentLength, count) => {
-  return contentLength >= 10 && count < contentLength;
-};

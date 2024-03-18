@@ -1,0 +1,53 @@
+@import '../../../../../styles/shared';
+
+.TrendingCommunitiesPreview {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  top: 100px;
+  flex-grow: 1;
+  overflow-y: auto;
+  max-height: 100vh;
+  padding-bottom: 100px;
+
+  @include mediumSmallInclusive {
+    max-height: auto;
+    padding-bottom: 0;
+    overflow-x: scroll;
+    gap: 16px;
+
+    padding: 0 56px;
+
+    @include medium {
+      padding: 0 40px;
+    }
+
+    @include mediumSmall {
+      padding: 0 32px;
+    }
+
+    @include smallInclusive {
+      padding: 0 16px;
+    }
+  }
+
+  .community-preview-cards-collection {
+    display: flex;
+    flex-direction: column;
+    z-index: auto;
+
+    @include mediumSmallInclusive {
+      flex-direction: row;
+      z-index: inherit;
+      overflow-x: scroll;
+    }
+
+    gap: 16px;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+  }
+}

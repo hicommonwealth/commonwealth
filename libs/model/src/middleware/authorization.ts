@@ -1,18 +1,13 @@
 import {
-  CommandContext,
-  CommandHandler,
   InvalidActor,
   InvalidInput,
+  schemas,
+  type CommandContext,
+  type CommandHandler,
 } from '@hicommonwealth/core';
 import { Op } from 'sequelize';
-import {
-  AddressAttributes,
-  CommentAttributes,
-  CommunityAttributes,
-  Role,
-  ThreadAttributes,
-  models,
-} from '..';
+import { ZodSchema } from 'zod';
+import { AddressAttributes, Role, models } from '..';
 
 /**
  * TODO: review rules
@@ -53,31 +48,35 @@ const authorizeAddress = async (
   return addr;
 };
 
+type CommunityMiddleware = CommandHandler<
+  ZodSchema,
+  typeof schemas.entities.Community
+>;
+type ThreadMiddleware = CommandHandler<
+  ZodSchema,
+  typeof schemas.entities.Thread
+>;
+type CommentMiddleware = CommandHandler<
+  ZodSchema,
+  typeof schemas.entities.Comment
+>;
+
 /**
  * Community middleware
  */
-export const isCommunityAdmin: CommandHandler<
-  CommunityAttributes,
-  any
-> = async (ctx) => {
+export const isCommunityAdmin: CommunityMiddleware = async (ctx) => {
   // super admin is always allowed
   if (ctx.actor.user.isAdmin) return;
   await authorizeAddress(ctx, ['admin']);
 };
 
-export const isCommunityModerator: CommandHandler<
-  CommunityAttributes,
-  any
-> = async (ctx) => {
+export const isCommunityModerator: CommunityMiddleware = async (ctx) => {
   // super admin is always allowed
   if (ctx.actor.user.isAdmin) return;
   await authorizeAddress(ctx, ['moderator']);
 };
 
-export const isCommunityAdminOrModerator: CommandHandler<
-  CommunityAttributes,
-  any
-> = async (ctx) => {
+export const isCommunityAdminOrModerator: CommunityMiddleware = async (ctx) => {
   // super admin is always allowed
   if (ctx.actor.user.isAdmin) return;
   await authorizeAddress(ctx, ['admin', 'moderator']);
@@ -86,9 +85,7 @@ export const isCommunityAdminOrModerator: CommandHandler<
 /**
  * Thread middleware
  */
-export const loadThread: CommandHandler<ThreadAttributes, any> = async ({
-  id,
-}) => {
+export const loadThread: ThreadMiddleware = async ({ id }) => {
   if (!id) throw new InvalidInput('Must provide a thread id');
   const thread = (
     await models.Thread.findOne({
@@ -104,10 +101,7 @@ export const loadThread: CommandHandler<ThreadAttributes, any> = async ({
   return thread;
 };
 
-export const isThreadAuthor: CommandHandler<ThreadAttributes, any> = async (
-  { actor },
-  state,
-) => {
+export const isThreadAuthor: ThreadMiddleware = async ({ actor }, state) => {
   // super admin is always allowed
   if (actor.user.isAdmin) return;
   if (!actor.address_id)
@@ -120,9 +114,7 @@ export const isThreadAuthor: CommandHandler<ThreadAttributes, any> = async (
 /**
  * Comment middleware
  */
-export const loadComment: CommandHandler<CommentAttributes, any> = async ({
-  id,
-}) => {
+export const loadComment: CommentMiddleware = async ({ id }) => {
   if (!id) throw new InvalidInput('Must provide a comment id');
   const comment = (
     await models.Comment.findOne({
@@ -138,10 +130,7 @@ export const loadComment: CommandHandler<CommentAttributes, any> = async ({
   return comment;
 };
 
-export const isCommentAuthor: CommandHandler<CommentAttributes, any> = async (
-  { actor },
-  state,
-) => {
+export const isCommentAuthor: CommentMiddleware = async ({ actor }, state) => {
   // super admin is always allowed
   if (actor.user.isAdmin) return;
   if (!actor.address_id)

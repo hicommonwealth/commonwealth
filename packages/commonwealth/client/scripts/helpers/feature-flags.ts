@@ -21,10 +21,10 @@ const buildFlag = (env: string) => {
 const featureFlags = {
   proposalTemplates: buildFlag(process.env.FLAG_PROPOSAL_TEMPLATES),
   communityHomepage: buildFlag(process.env.FLAG_COMMUNITY_HOMEPAGE),
-  newAdminOnboarding: buildFlag(process.env.FLAG_NEW_ADMIN_ONBOARDING),
   communityStake: buildFlag(process.env.FLAG_COMMUNITY_STAKE),
-  newSignInModal: buildFlag(process.env.FLAG_NEW_SIGN_IN_MODAL),
-  rootDomainRebrand: buildFlag(process.env.FLAG_ROOT_DOMAIN_REBRAND),
+  myCommunityStakePageEnabled: buildFlag(
+    process.env.FLAG_MY_COMMUNITY_STAKE_PAGE_ENABLED,
+  ),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;

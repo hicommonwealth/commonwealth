@@ -8,35 +8,43 @@ import React, { StrictMode } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { queryClient } from 'state/api/config';
+import { Splash } from './Splash';
 import { openFeatureProvider } from './helpers/feature-flags';
-import CWLoadingSpinner from './views/components/component_kit/new_designs/CWLoadingSpinner';
-
-const Splash = () => {
-  return (
-    <div className="Splash">
-      {/* This can be a moving bobber, atm it is still */}
-      <CWLoadingSpinner />
-    </div>
-  );
-};
+import useAppStatus from './hooks/useAppStatus';
+import { trpc, trpcClient } from './utils/trpcClient';
+import { AddToHomeScreenPrompt } from './views/components/AddToHomeScreenPrompt';
 
 OpenFeature.setProvider(openFeatureProvider);
 
 const App = () => {
   const { customDomain, isLoading } = useInitApp();
+  const { isAddedToHomeScreen, isMarketingPage, isIOS, isAndroid } =
+    useAppStatus();
 
   return (
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <OpenFeatureProvider client={undefined}>
-          {isLoading ? (
-            <Splash />
-          ) : (
-            <RouterProvider router={router(customDomain)} />
-          )}
-          <ToastContainer />
-          <ReactQueryDevtools />
-        </OpenFeatureProvider>
+        <trpc.Provider client={trpcClient} queryClient={queryClient}>
+          <OpenFeatureProvider client={undefined}>
+            {isLoading ? (
+              <Splash />
+            ) : (
+              <>
+                <RouterProvider router={router(customDomain)} />
+                {isAddedToHomeScreen || isMarketingPage ? null : (
+                  <AddToHomeScreenPrompt
+                    isIOS={isIOS}
+                    isAndroid={isAndroid}
+                    displayDelayMilliseconds={1000}
+                  />
+                )}
+              </>
+            )}
+
+            <ToastContainer />
+            <ReactQueryDevtools />
+          </OpenFeatureProvider>
+        </trpc.Provider>
       </QueryClientProvider>
     </StrictMode>
   );
