@@ -43,7 +43,6 @@ import setupServer from './server/scripts/setupServer';
 import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
 import { databaseCleaner } from './server/util/databaseCleaner';
-import GlobalActivityCache from './server/util/globalActivityCache';
 import setupIpfsProxy from './server/util/ipfsProxy';
 import ViewCountCache from './server/util/viewCountCache';
 
@@ -209,7 +208,7 @@ export async function main(app: express.Express) {
   }
 
   const banCache = new BanCache(models);
-  const globalActivityCache = new GlobalActivityCache(models);
+  const globalActivityCache = GlobalActivityCache.getInstance(models);
 
   // initialize async to avoid blocking startup
   if (!NO_GLOBAL_ACTIVITY_CACHE) globalActivityCache.start();

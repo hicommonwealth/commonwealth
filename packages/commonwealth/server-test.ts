@@ -5,7 +5,7 @@ import {
   setupErrorHandlers,
 } from '@hicommonwealth/adapters';
 import { cache, logger } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { GlobalActivityCache, models } from '@hicommonwealth/model';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
 import express, { RequestHandler, json, urlencoded } from 'express';
@@ -19,7 +19,6 @@ import setupPassport from './server/passport';
 import setupAPI from './server/routing/router'; // performance note: this takes 15 seconds
 import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
-import GlobalActivityCache from './server/util/globalActivityCache';
 import ViewCountCache from './server/util/viewCountCache';
 
 const log = logger().getLogger(__filename);
@@ -101,7 +100,7 @@ const setupServer = () => {
 };
 
 const banCache = new BanCache(models);
-const globalActivityCache = new GlobalActivityCache(models);
+const globalActivityCache = new GlobalActivityCache.getInstance(models);
 globalActivityCache.start();
 
 setupPassport(models);

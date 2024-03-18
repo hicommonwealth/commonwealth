@@ -82,5 +82,4 @@ export async function __deleteComment(
       parseInt(comment.thread_id, 10),
       comment.id,
     );
-  }
 }

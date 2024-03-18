@@ -1,4 +1,6 @@
 import { Query, schemas } from '@hicommonwealth/core';
+import { models } from '../database';
+import { GlobalActivityCache } from '../globalActivityCache';
 
 export const GetGlobalActivity: Query<
   typeof schemas.queries.ThreadFeed
@@ -6,8 +8,6 @@ export const GetGlobalActivity: Query<
   ...schemas.queries.ThreadFeed,
   auth: [],
   body: async () => {
-    // todo implement
-    // return await globalActivityCache.getGlobalActivity();
-    return {} as any;
+    return await GlobalActivityCache.getInstance(models).getGlobalActivity();
   },
 });
