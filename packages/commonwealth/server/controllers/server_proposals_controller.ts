@@ -84,9 +84,9 @@ export class ServerProposalsController {
   }
 
   private async createEvmProvider(
-    chainId: string,
+    communityId: string,
   ): Promise<providers.Web3Provider> {
-    const ethNetworkUrl = await this.getRPCUrl(chainId);
+    const ethNetworkUrl = await this.getRPCUrl(communityId);
 
     if (ethNetworkUrl.slice(0, 4) != 'http')
       throw new ServerError(
@@ -104,10 +104,10 @@ export class ServerProposalsController {
     }
   }
 
-  private async getRPCUrl(chainId: string): Promise<string> {
+  private async getRPCUrl(communityId: string): Promise<string> {
     const community = await this.models.Community.findOne({
       where: {
-        id: chainId,
+        id: communityId,
       },
       attributes: ['network', 'base'],
       include: [
@@ -119,7 +119,7 @@ export class ServerProposalsController {
     });
 
     if (!community.ChainNode.private_url && !community.ChainNode.url) {
-      throw new ServerError(`No RPC URL found for chain ${chainId}`);
+      throw new ServerError(`No RPC URL found for community ${communityId}`);
     }
 
     // only Aave and Compound contracts on Ethereum are supported
@@ -134,7 +134,7 @@ export class ServerProposalsController {
         community.base !== 'ethereum')
     ) {
       throw new AppError(
-        `Proposal fetching not supported for chain ${chainId}`,
+        `Proposal fetching not supported for community ${communityId}`,
       );
     }
 
