@@ -10,10 +10,13 @@ interface RemoveDiscordBotConfigProps {
 const removeDiscordBotConfig = async ({
   communityId,
 }: RemoveDiscordBotConfigProps) => {
-  await axios.post(`${app.serverUrl()}/removeDiscordBotConfig`, {
-    community_id: communityId,
-    jwt: app.user.jwt,
-  });
+  await axios.post(
+    `${app.serverUrl()}${ApiEndpoints.REMOVE_DISCORD_BOT_CONFIG}`,
+    {
+      community_id: communityId,
+      jwt: app.user.jwt,
+    },
+  );
 };
 
 const useRemoveDiscordBotConfigMutation = () => {
