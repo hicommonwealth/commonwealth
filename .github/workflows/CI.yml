@@ -409,13 +409,13 @@ jobs:
         run: yarn build-ci
 
       - name: Run adapters tests
-      - run: yarn workspace @hicommonwealth/adapters test
+        run: yarn workspace @hicommonwealth/adapters test
 
       - name: Run core tests
-      - run: yarn workspace @hicommonwealth/core test
+        run: yarn workspace @hicommonwealth/core test
 
       - name: Run model tests
-      - run: yarn workspace @hicommonwealth/model test
+        run: yarn workspace @hicommonwealth/model test
 
       - name: Run unit tests
         run: yarn --cwd packages/commonwealth unit-test --forbid-only
