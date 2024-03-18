@@ -87,7 +87,7 @@ class KeplrLikeWebWalletController implements IWebWallet<AccountData> {
     return new CosmosSigner({
       signer: {
         type: 'amino',
-        signAmino: window.wallet.keplr.signAmino,
+        signAmino: window.wallet.signAmino,
         getAddress: async () => this.accounts[0].address,
         getChainId: async () => this.getChainId(),
       },
