@@ -52,11 +52,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     communityId: community_id,
   });
 
-  const [resizing, setResizing] = useState(false);
-  const { isWindowSmallInclusive } = useBrowserWindow({
-    onResize: () => setResizing(true),
-    resizeListenerUpdateDeps: [resizing],
-  });
+  const { isWindowSmallInclusive } = useBrowserWindow({});
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
