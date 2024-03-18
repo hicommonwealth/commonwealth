@@ -19,6 +19,8 @@ export const SnapshotProposalCreated = z.object({
   event: z.string().optional(),
   start: z.string().optional(),
   expire: z.string().optional(),
+  token: z.string().optional(),
+  secret: z.string().optional(),
 });
 export const DiscordMessageCreated = z.object({
   user: z
