@@ -51,8 +51,6 @@ export const MAGIC_DEFAULT_CHAIN =
 export const DEFAULT_COMMONWEALTH_LOGO =
   'https://commonwealth.im/static/brand_assets/logo_stacked.png';
 
-export const AXIE_SHARED_SECRET = process.env.AXIE_SHARED_SECRET;
-
 export const DISCORD_BOT_SUCCESS_URL =
   process.env.DISCORD_BOT_SUCCESS_URL || 'http://localhost:3000';
 

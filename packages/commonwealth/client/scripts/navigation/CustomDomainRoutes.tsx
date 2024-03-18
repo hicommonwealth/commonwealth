@@ -23,7 +23,6 @@ const UpdateMembersGroupPage = lazy(
 );
 const SputnikDaosPage = lazy(() => import('views/pages/sputnikdaos'));
 const FinishNearLoginPage = lazy(() => import('views/pages/finish_near_login'));
-const FinishAxieLoginPage = lazy(() => import('views/pages/finish_axie_login'));
 const FinishSocialLoginPage = lazy(
   () => import('views/pages/finish_social_login'),
 );
@@ -168,11 +167,6 @@ const CustomDomainRoutes = ({
         scoped: true,
         type: 'common',
       })}
-    />,
-    <Route
-      key="/finishaxielogin"
-      path="/finishaxielogin"
-      element={withLayout(FinishAxieLoginPage, { type: 'common' })}
     />,
     <Route
       key="/finishsociallogin"
@@ -474,11 +468,6 @@ const CustomDomainRoutes = ({
       key="/:scope/finishNearLogin"
       path="/:scope/finishNearLogin"
       element={<Navigate to="/finishNearLogin" />}
-    />,
-    <Route
-      key="/:scope/finishaxielogin"
-      path="/:scope/finishaxielogin"
-      element={<Navigate to="/finishaxielogin" />}
     />,
     <Route
       key="/:scope/finishsociallogin"
