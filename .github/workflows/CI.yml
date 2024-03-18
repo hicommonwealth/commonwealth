@@ -388,6 +388,11 @@ jobs:
         image: redis:latest
         ports:
           - 6379:6379
+      cw_rabbitmq:
+        image: rabbitmq:3.11-management
+        ports:
+          - 5672:5672
+          - 15672:15672
 
     steps:
       - name: Checkout
