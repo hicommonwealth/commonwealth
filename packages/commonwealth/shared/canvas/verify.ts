@@ -21,7 +21,8 @@ export const stringify = configure({
 // TODO: add the other signers
 export const getSessionSigners = async () => {
   const { SIWESigner } = await import('@canvas-js/chain-ethereum');
-  return [new SIWESigner()];
+  const { CosmosSigner } = await import('@canvas-js/chain-cosmos');
+  return [new SIWESigner(), new CosmosSigner()];
 };
 
 export const getSessionSignerForAddress = async (address: string) => {

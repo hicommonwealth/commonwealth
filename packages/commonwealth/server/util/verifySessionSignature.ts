@@ -1,4 +1,4 @@
-import { Session, SessionSigner } from '@canvas-js/interfaces';
+import { Session } from '@canvas-js/interfaces';
 import { NotificationCategories, logger } from '@hicommonwealth/core';
 import type {
   AddressInstance,
@@ -7,6 +7,7 @@ import type {
 } from '@hicommonwealth/model';
 import Sequelize from 'sequelize';
 
+import { getSessionSigners } from 'shared/canvas/verify';
 import { CANVAS_TOPIC } from '../../shared/canvas';
 
 const log = logger().getLogger(__filename);
@@ -17,15 +18,7 @@ const verifySessionSignature = async (
   user_id: number,
   session: Session,
 ): Promise<boolean> => {
-  const { SIWESigner } = await import('@canvas-js/chain-ethereum');
-  // const { SolanaSigner } = await import('@canvas-js/chain-solana');
-  // const { SubstrateSigner } = await import('@canvas-js/chain-substrate');
-
-  const signers: SessionSigner[] = [
-    new SIWESigner(),
-    // new SubstrateSigner(),
-    // new SolanaSigner(),
-  ];
+  const signers = await getSessionSigners();
 
   const expectedAddress = addressModel.address;
   const sessionAddress = session.address.split(':')[2];
