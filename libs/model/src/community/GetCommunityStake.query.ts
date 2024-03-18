@@ -18,6 +18,6 @@ export const GetCommunityStake: Query<
           },
         ],
       })
-    )?.get({ plain: true });
+    )?.toJSON();
   },
 });
