@@ -29,11 +29,7 @@ import {
 } from '../../../shared/analytics/types';
 import NewProfilesController from '../controllers/server/newProfiles';
 import { setDarkMode } from '../helpers/darkMode';
-import {
-  getAddressFromWallet,
-  loginToAxie,
-  loginToNear,
-} from '../helpers/wallet';
+import { getAddressFromWallet, loginToNear } from '../helpers/wallet';
 import Account from '../models/Account';
 import IWebWallet from '../models/IWebWallet';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from '../state/api/profiles/fetchProfilesByAddress';
@@ -570,8 +566,6 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
     if (wallet.chain === 'near') {
       await loginToNear(app.chain as Near, app.isCustomDomain());
-    } else if (wallet.defaultNetwork === 'axie-infinity') {
-      await loginToAxie(`${app.serverUrl()}/auth/sso`);
     } else {
       const selectedAddress = getAddressFromWallet(wallet);
 

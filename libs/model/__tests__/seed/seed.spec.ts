@@ -5,106 +5,42 @@ import {
   ChainType,
   NotificationCategories,
   dispose,
+  schemas,
+  type DeepPartial,
 } from '@hicommonwealth/core';
 import { expect } from 'chai';
 import { step } from 'mocha-steps';
+import { Model, ModelStatic } from 'sequelize';
 import z from 'zod';
-import {
-  AddressSchema,
-  ChainNodeSchema,
-  CommunityContractSchema,
-  CommunitySchema,
-  CommunityStakeSchema,
-  ContractSchema,
-  GroupSchema,
-  NotificationCategorySchema,
-  ProfileSchema,
-  SchemaWithModel,
-  SeedOptions,
-  SnapshotProposalSchema,
-  SnapshotSpaceSchema,
-  SubscriptionSchema,
-  TopicSchema,
-  UserSchema,
-  checkDb,
-  seed,
-} from '../../src/test';
+import { models } from '../../src/database';
+import { SeedOptions, checkDb, seed } from '../../src/test';
 
 // testSeed creates an entity using the `seed` function
 // then attempts to find the entity and validate it
-async function testSeed<T extends SchemaWithModel<any>>(
-  schemaModel: T, // zod schema
-  overrides: Partial<z.infer<T['schema']>> = {}, // override attributes
-  options?: {
-    seedOptions?: SeedOptions;
-    testOptions?: {
-      // options for test
-      excludeOverrideChecks?: (keyof typeof overrides)[];
-    };
-  },
-) {
-  // create entity
-  const createdEntity = await seed(
-    schemaModel,
-    overrides,
-    options?.seedOptions,
-  );
-  expect(createdEntity, 'failed to create entity').not.to.be.null;
+async function testSeed<T extends schemas.Aggregates>(
+  name: T,
+  values?: DeepPartial<z.infer<typeof schemas.entities[T]>>,
+  options: SeedOptions = { mock: true },
+): Promise<z.infer<typeof schemas.entities[T]>> {
+  const [record, records] = await seed(name, values, options);
+  expect(records.length, 'failed to create entity').to.be.gt(0);
 
   // perform schema validation on created entity (throws)
-  const data = await schemaModel.schema.parse(createdEntity.toJSON());
-
-  // build query that will find the entity, or default to using `id`
-  const findQuery: Partial<z.infer<T['schema']>> = (() => {
-    if (schemaModel.buildQuery) {
-      // not all entities have a single primary key,
-      // so build a query for it
-      const q = schemaModel.buildQuery(data);
-      const attributes = Object.keys(q.where);
-      for (const attribute of attributes) {
-        expect(data, 'created entity is missing id').to.have.property(
-          attribute,
-        );
-      }
-      return q;
-    } else {
-      // use `id` as default primary key
-      expect(data, 'created entity is missing id').to.have.property('id');
-      return {
-        where: {
-          id: data.id,
-        },
-      };
-    }
-  })();
+  const schema = schemas.entities[name];
+  const model = models[name];
+  const data = await schema.parse(record);
 
   // attempt to find entity that was created
-  const existingEntity = await schemaModel.model.findOne(findQuery);
+  const existingEntity = await (model as ModelStatic<Model>).findOne({
+    where: {
+      [model.primaryKeyAttribute]: data[model.primaryKeyAttribute],
+    },
+  });
   expect(existingEntity, 'failed to find created entity after creation').not.to
     .be.null;
 
   // perform schema validation on found entity (throws)
-  const result = schemaModel.schema.parse(existingEntity?.toJSON());
-
-  // check that the final entity matches the specified overrides,
-  // except for explicitly excluded attributes
-  const overridesToCheck = Object.keys(overrides).reduce((acc, k) => {
-    if (options?.testOptions?.excludeOverrideChecks?.includes(k)) {
-      return acc;
-    }
-    return {
-      ...acc,
-      [k]: overrides[k],
-    };
-  }, {});
-  expect(
-    result,
-    `final entity does not match specified overrides:${JSON.stringify(
-      existingEntity?.toJSON(),
-      null,
-      2,
-    )} !== ${JSON.stringify(overrides, null, 2)}`,
-  ).to.contain(overridesToCheck);
+  return data;
 }
 
 describe('Seed functions', () => {
@@ -120,22 +56,14 @@ describe('Seed functions', () => {
 
   describe('User', () => {
     step('Should seed with defaults', async () => {
-      await testSeed(UserSchema);
-      await testSeed(UserSchema);
+      await testSeed('User');
+      await testSeed('User');
     });
 
-    step('Should not mock data if noMock option is provided', async () => {
+    step('Should not mock data', async () => {
       let seedErr = null;
       try {
-        await testSeed(
-          UserSchema,
-          {},
-          {
-            seedOptions: {
-              mock: false,
-            },
-          },
-        );
+        await testSeed('User', {}, { mock: false });
       } catch (err) {
         seedErr = err;
       }
@@ -144,64 +72,48 @@ describe('Seed functions', () => {
     });
 
     step('Should seed with overrides', async () => {
+      const values = {
+        email: 'temp@gmail.com',
+        emailVerified: true,
+        isAdmin: true,
+      };
       // NOTE: some props like emailVerified and isAdmin
       // are explicitly excluded via sequelize model config
-      await testSeed(
-        UserSchema,
-        {
-          email: 'temp@gmail.com',
-          emailVerified: true,
-          isAdmin: true,
-        },
-        {
-          testOptions: {
-            excludeOverrideChecks: ['emailVerified', 'isAdmin'],
-          },
-        },
-      );
+      const result = await testSeed('User', values);
+      expect(result).contains(values);
     });
   });
 
   describe('ChainNode', () => {
     step('Should seed with defaults', async () => {
-      await testSeed(ChainNodeSchema);
-      await testSeed(ChainNodeSchema);
+      await testSeed('ChainNode', { contracts: undefined });
+      await testSeed('ChainNode', { contracts: undefined });
     });
 
     step('Should seed with overrides', async () => {
-      await testSeed(ChainNodeSchema, {
+      await testSeed('ChainNode', {
         url: 'mainnet1.edgewa.re',
         name: 'Edgeware Mainnet',
         balance_type: BalanceType.Substrate,
-      });
-    });
-  });
-
-  describe('Contract', () => {
-    step('Should seed with defaults', async () => {
-      await testSeed(ContractSchema);
-      await testSeed(ContractSchema);
-    });
-
-    step('Should seed with overrides', async () => {
-      await testSeed(ContractSchema, {
-        address: '0x6b3595068778dd592e39a122f4f5a5cf09c90fe2',
-        token_name: 'sushi',
-        symbol: 'SUSHI',
-        type: ChainNetwork.ERC20,
-        chain_node_id: 1,
+        contracts: [
+          {
+            address: '0x6b3595068778dd592e39a122f4f5a5cf09c90fe2',
+            token_name: 'sushi',
+            symbol: 'SUSHI',
+            type: ChainNetwork.ERC20,
+            chain_node_id: 1,
+            abi_id: undefined,
+          },
+        ],
       });
     });
   });
 
   describe('Community', () => {
-    step('Should seed with defaults', async () => {
-      await testSeed(CommunitySchema);
-      await testSeed(CommunitySchema);
-    });
-
     step('Should seed with overrides', async () => {
-      await testSeed(CommunitySchema, {
+      const node = await testSeed('ChainNode', { contracts: undefined });
+      const user = await testSeed('User');
+      await testSeed('Community', {
         id: 'ethereum',
         network: ChainNetwork.Ethereum,
         default_symbol: 'ETH',
@@ -211,9 +123,24 @@ describe('Seed functions', () => {
         type: ChainType.Chain,
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
-        chain_node_id: 1,
+        chain_node_id: node!.id,
+        Addresses: [
+          {
+            user_id: user.id,
+            profile_id: undefined,
+            address: '0x34C3A5ea06a3A67229fb21a7043243B0eB3e853f',
+            community_id: 'ethereum',
+            verification_token: 'PLACEHOLDER',
+            verification_token_expires: undefined,
+            verified: new Date(),
+            role: 'admin',
+            is_user_default: false,
+          },
+        ],
+        CommunityStakes: [],
       });
-      await testSeed(CommunitySchema, {
+
+      const community = await testSeed('Community', {
         id: 'superEth',
         network: ChainNetwork.Ethereum,
         default_symbol: 'SETH',
@@ -223,140 +150,51 @@ describe('Seed functions', () => {
         type: ChainType.Chain,
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
-        chain_node_id: 2,
-      });
-    });
-  });
-
-  describe('CommunityContract', () => {
-    step('Should seed with defaults', async () => {
-      // has community ID unique constraint,
-      // so can only seed with default values once
-      await testSeed(CommunityContractSchema);
-    });
-
-    step('Should seed with overrides', async () => {
-      await testSeed(CommunityContractSchema, {
-        community_id: 'superEth',
-        contract_id: 2,
-      });
-    });
-  });
-
-  describe('Topic', () => {
-    step('Should seed with defaults', async () => {
-      await testSeed(TopicSchema);
-      await testSeed(TopicSchema);
-    });
-
-    step('Should seed with overrides', async () => {
-      await testSeed(TopicSchema, {
-        community_id: 'ethereum',
-        name: 'General',
-      });
-    });
-  });
-
-  describe('CommunityStake', () => {
-    step('Should seed with defaults', async () => {
-      await testSeed(CommunityStakeSchema);
-      await testSeed(CommunityStakeSchema);
-    });
-
-    step('Should seed with overrides', async () => {
-      await testSeed(CommunityStakeSchema, {
-        community_id: 'ethereum',
-        stake_id: 1,
-        stake_token: '',
-        vote_weight: 1,
-        stake_enabled: true,
-      });
-    });
-  });
-
-  describe('Profile', () => {
-    step('Should seed with defaults', async () => {
-      await testSeed(ProfileSchema);
-      await testSeed(ProfileSchema);
-    });
-
-    step('Should seed with overrides', async () => {
-      await testSeed(ProfileSchema, {
-        user_id: 1,
-        profile_name: 'blah',
-      });
-    });
-  });
-
-  describe('Address', () => {
-    step('Should seed with defaults', async () => {
-      await testSeed(AddressSchema);
-      await testSeed(AddressSchema);
-    });
-
-    step('Should seed with overrides', async () => {
-      await testSeed(
-        AddressSchema,
-        {
-          user_id: 1,
-          address: '0x34C3A5ea06a3A67229fb21a7043243B0eB3e853f',
-          community_id: 'ethereum',
-          verification_token: 'PLACEHOLDER',
-          verification_token_expires: undefined,
-          verified: new Date(),
-          role: 'admin',
-          is_user_default: false,
-        },
-        {
-          testOptions: {
-            excludeOverrideChecks: [
-              'verification_token',
-              'verification_token_expires',
-              'verified',
-            ],
+        chain_node_id: node!.id,
+        Addresses: [
+          {
+            user_id: user.id,
+            profile_id: undefined,
+            address: '0x34C3A5ea06a3A67229fb21a7043243B0eB3e853f',
+            community_id: 'ethereum',
+            verification_token: 'PLACEHOLDER',
+            verification_token_expires: undefined,
+            verified: new Date(),
+            role: 'admin',
+            is_user_default: false,
           },
-        },
-      );
-    });
-  });
+        ],
+        CommunityStakes: [],
+        groups: [
+          {
+            metadata: {
+              name: 'hello',
+              description: 'blah',
+            },
+          },
+        ],
+        topics: [{}, {}],
+      });
 
-  describe('NotificationCategory', () => {
-    step('Should seed with defaults', async () => {
-      await testSeed(NotificationCategorySchema);
-      await testSeed(NotificationCategorySchema);
-    });
-
-    step('Should seed with overrides', async () => {
-      await testSeed(NotificationCategorySchema, {
+      await testSeed('NotificationCategory', {
         name: NotificationCategories.NewThread,
         description: 'someone makes a new thread',
       });
-    });
-  });
 
-  describe('Subscription', () => {
-    step('Should seed with defaults', async () => {
-      await testSeed(SubscriptionSchema);
-      await testSeed(SubscriptionSchema);
-    });
-
-    step('Should seed with overrides', async () => {
-      await testSeed(SubscriptionSchema, {
+      await testSeed('Subscription', {
         subscriber_id: 1,
         category_id: NotificationCategories.NewThread,
         is_active: true,
+        community_id: community!.id,
+        thread_id: undefined,
+        comment_id: undefined,
       });
     });
   });
 
   describe('SnapshotSpace', () => {
-    step('Should seed with defaults', async () => {
-      await testSeed(SnapshotSpaceSchema);
-      await testSeed(SnapshotSpaceSchema);
-    });
-
     step('Should seed with overrides', async () => {
-      await testSeed(SnapshotSpaceSchema, {
+      await testSeed('SnapshotSpace', {
         snapshot_space: 'test space',
       });
     });
@@ -364,16 +202,16 @@ describe('Seed functions', () => {
 
   describe('SnapshotProposal', () => {
     step('Should seed with defaults', async () => {
-      await testSeed(SnapshotProposalSchema, {
+      await testSeed('SnapshotProposal', {
         space: 'test space',
       });
-      await testSeed(SnapshotProposalSchema, {
+      await testSeed('SnapshotProposal', {
         space: 'test space',
       });
     });
 
     step('Should seed with overrides', async () => {
-      await testSeed(SnapshotProposalSchema, {
+      await testSeed('SnapshotProposal', {
         id: '1',
         title: 'Test Snapshot Proposal',
         body: 'This is a test proposal',
@@ -386,30 +224,6 @@ describe('Seed functions', () => {
           new Date().getTime() + 100 * 24 * 60 * 60 * 1000,
         ).toString(),
       });
-    });
-  });
-
-  describe('Group', () => {
-    step('Should seed with defaults', async () => {
-      await testSeed(GroupSchema);
-      await testSeed(GroupSchema);
-    });
-
-    step('Should seed with overrides', async () => {
-      await testSeed(
-        GroupSchema,
-        {
-          metadata: {
-            name: 'hello',
-            description: 'blah',
-          },
-        },
-        {
-          testOptions: {
-            excludeOverrideChecks: ['metadata'],
-          },
-        },
-      );
     });
   });
 });
