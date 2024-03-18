@@ -1,4 +1,4 @@
-import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/core';
 import {
   linkExistingAddressToChainOrCommunity,
   setActiveAccount,
@@ -12,8 +12,6 @@ import { AccountSelector } from 'views/components/component_kit/cw_wallets_list'
 import TOSModal from 'views/modals/TOSModal';
 import { AuthModal } from '../../modals/AuthModal';
 import { CWModal } from '../component_kit/new_designs/CWModal';
-
-const NON_INTEROP_NETWORKS = [ChainNetwork.AxieInfinity];
 
 interface UseJoinCommunityProps {
   communityToJoin?: string;
@@ -64,14 +62,6 @@ const useJoinCommunity = (props: UseJoinCommunityProps = {}) => {
       return false;
     }
 
-    // filter additionally by chain network if in list of non-interop, unless we are on that chain
-    // TODO: make this related to wallet.specificChains
-    if (
-      NON_INTEROP_NETWORKS.includes(addressChainInfo?.network) &&
-      activeChainInfo?.network !== addressChainInfo?.network
-    ) {
-      return false;
-    }
     return true;
   });
 
@@ -87,15 +77,9 @@ const useJoinCommunity = (props: UseJoinCommunityProps = {}) => {
   );
 
   const performJoinCommunityLinking = async () => {
-    if (
-      sameBaseAddressesRemoveDuplicates.length > 1 &&
-      app.activeChainId() !== 'axie-infinity'
-    ) {
+    if (sameBaseAddressesRemoveDuplicates.length > 1) {
       setIsAccountSelectorModalOpen(true);
-    } else if (
-      sameBaseAddressesRemoveDuplicates.length === 1 &&
-      app.activeChainId() !== 'axie-infinity'
-    ) {
+    } else if (sameBaseAddressesRemoveDuplicates.length === 1) {
       await linkToCommunity(0);
       return true;
     } else {

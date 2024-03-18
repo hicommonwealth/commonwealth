@@ -13,7 +13,6 @@ If you add a new environment variable, you must add documentation here. Please d
 - [AWS_ACCESS_KEY_ID](#aws_access_key_id)
 - [AWS_REGION](#aws_region)
 - [AWS_SECRET_ACCESS_KEY](#aws_secret_access_key)
-- [AXIE_SHARED_SECRET](#axie_shared_secret)
 - [CHAIN_PORT](#chain_port)
 - [CLOUDAMQP_URL](#cloudamqp_url)
 - [COSMOS_GOV_V1](#cosmos_gov_v1)
@@ -96,10 +95,6 @@ AWS region used primarily for uploading local image files. Common uses `us-east-
 ## AWS_SECRET_ACCESS_KEY
 
 AWS secret used alongside `AWS_ACCESS_KEY_ID`. Read by our `aws4`, `aws-sdk`, and `rollbar` libraries.
-
-## AXIE_SHARED_SECRET
-
-Secret token used for Axie Infinity login integration.
 
 ## CHAIN_PORT
 
