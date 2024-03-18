@@ -80,12 +80,15 @@ registerRoute(app, 'post', '/snapshot', async (req: Request, res: Response) => {
       name: 'SnapshotProposalCreated',
       payload: {
         id: parsedId,
+        event: req.body.event,
         title: response.data.proposal?.title ?? null,
         body: response.data.proposal?.body ?? null,
         choices: response.data.proposal?.choices ?? null,
         space: response.data.proposal?.space.id ?? null,
         start: response.data.proposal?.start ?? null,
         expire: response.data.proposal?.end ?? null,
+        token: req.body.token,
+        secret: req.body.secret,
       },
     };
 
