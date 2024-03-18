@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../../constants';
 import { ChainBase, ChainType, CommunityCategoryType } from '../../types';
 import { ALL_COMMUNITIES, checkIconSize } from '../../utils';
-import { Community, CommunityStake, Group } from '../entities.schemas';
+import { Community, Group } from '../entities.schemas';
 
 export const CreateCommunity = {
   input: z.object({
@@ -77,9 +77,7 @@ export const SetCommunityStake = {
       .default(1),
     stake_enabled: z.coerce.boolean().default(true),
   }),
-  output: Community.extend({
-    CommunityStakes: z.array(CommunityStake).optional(),
-  }),
+  output: Community,
 };
 
 export const UpdateCommunity = {
