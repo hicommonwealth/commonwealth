@@ -126,11 +126,12 @@ app.listen(port, async () => {
       );
       await rmqAdapter.init();
       broker(rmqAdapter);
-      controller = rmqAdapter;
       isServiceHealthy = true;
     } catch (err) {
       log.fatal(`Error starting server: ${err}`);
       isServiceHealthy = false;
     }
   }
+
+  controller = broker();
 });
