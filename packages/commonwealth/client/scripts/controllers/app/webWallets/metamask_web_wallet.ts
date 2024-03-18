@@ -1,6 +1,6 @@
-declare let window: any;
+import axios from 'axios';
 
-import $ from 'jquery';
+declare let window: any;
 
 import type Web3 from 'web3';
 import type Account from '../../../models/Account';
@@ -153,8 +153,8 @@ class MetamaskWebWalletController implements IWebWallet<string> {
               : '';
 
           // TODO: we should cache this data!
-          const chains = await $.getJSON('https://chainid.network/chains.json');
-          const baseChain = chains.find((c) => c.chainId == chainId);
+          const chains = await axios.get('https://chainid.network/chains.json');
+          const baseChain = chains.data.find((c) => c.chainId == chainId);
           const pubRpcUrl = baseChain.rpc.filter((r) => !/\${.*?}/.test(r));
           // remove duplicate https b/c chain list has a bug in their sepolia endpoint
           const url =
@@ -232,8 +232,10 @@ class MetamaskWebWalletController implements IWebWallet<string> {
         });
       } catch (error) {
         if (error.code === 4902) {
-          const chains = await $.getJSON('https://chainid.network/chains.json');
-          const baseChain = chains.find((c) => c.chainId == communityChain);
+          const chains = await axios.get('https://chainid.network/chains.json');
+          const baseChain = chains.data.find(
+            (c) => c.chainId == communityChain,
+          );
           // Check if the string contains '${' and '}'
           const rpcUrl = baseChain.rpc.filter((r) => !/\${.*?}/.test(r));
           const url =
