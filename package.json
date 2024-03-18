@@ -76,7 +76,6 @@
     "@types/cors": "^2.8.13",
     "@types/expect": "^24.3.0",
     "@types/filesystem": "^0.0.29",
-    "@types/jquery": "^3.5.4",
     "@types/jsonwebtoken": "^8.3.9",
     "@types/lodash": "^4.14.123",
     "@types/marked": "^4.0.1",

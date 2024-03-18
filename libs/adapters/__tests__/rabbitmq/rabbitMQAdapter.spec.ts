@@ -2,38 +2,30 @@ import {
   BrokerTopics,
   delay,
   EventContext,
-  EventHandler,
-  events,
-  PolicyMetadata,
+  Policy,
+  schemas,
 } from '@hicommonwealth/core';
 import chai from 'chai';
-import { ZodUndefined } from 'zod';
 import { RabbitMQAdapter } from '../../build';
 import { getRabbitMQConfig, RascalConfigServices } from '../../src';
 
 const expect = chai.expect;
 
 const idInput = '123';
-let idOutput: string;
-
-const processSnapshot: EventHandler<
-  'SnapshotProposalCreated',
-  ZodUndefined
-> = async ({ payload }) => {
-  const { id } = payload;
-  idOutput = id!;
-};
-
-const eventName: events.Events = 'SnapshotProposalCreated';
+let idOutput: string | undefined;
+const eventName: schemas.Events = 'SnapshotProposalCreated';
 
 const inputs = {
-  SnapshotProposalCreated: events.schemas.SnapshotProposalCreated,
+  SnapshotProposalCreated: schemas.events.SnapshotProposalCreated,
 };
 
-const Snapshot: () => PolicyMetadata<typeof inputs> = () => ({
+const Snapshot: Policy<typeof inputs> = () => ({
   inputs,
   body: {
-    SnapshotProposalCreated: processSnapshot,
+    SnapshotProposalCreated: async ({ payload }) => {
+      const { id } = payload;
+      idOutput = id;
+    },
   },
 });
 
@@ -118,7 +110,7 @@ describe('RabbitMQ', () => {
     it('should return false if the subscription cannot be found', async () => {
       const res = await rmqAdapter.subscribe(
         'Testing' as BrokerTopics,
-        Snapshot() as any,
+        Snapshot(),
       );
       expect(res).to.be.false;
     });
@@ -126,7 +118,7 @@ describe('RabbitMQ', () => {
     it('should return false if the topic is not included in the current instance', async () => {
       const res = await rmqAdapter.subscribe(
         BrokerTopics.DiscordListener,
-        Snapshot() as any,
+        Snapshot(),
       );
       expect(res).to.be.false;
     });
@@ -134,7 +126,7 @@ describe('RabbitMQ', () => {
     it('should successfully subscribe, return true, and process a message', async () => {
       const res = await rmqAdapter.subscribe(
         BrokerTopics.SnapshotListener,
-        Snapshot() as any,
+        Snapshot(),
       );
       expect(res).to.be.true;
       await delay(5000);

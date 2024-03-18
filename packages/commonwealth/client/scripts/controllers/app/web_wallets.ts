@@ -1,5 +1,5 @@
 import type { ChainBase, WalletId } from '@hicommonwealth/core';
-import $ from 'jquery';
+import axios from 'axios';
 import app from 'state';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
@@ -60,7 +60,7 @@ export default class WebWalletController {
     }
     // do nothing on failure
     try {
-      await $.post(`${app.serverUrl()}/setAddressWallet`, {
+      await axios.post(`${app.serverUrl()}/setAddressWallet`, {
         address: account.address,
         author_community_id: account.community.id,
         wallet_id: wallet,
