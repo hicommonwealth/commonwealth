@@ -1,5 +1,4 @@
 import jdenticon from 'jdenticon';
-import $ from 'jquery';
 import React from 'react';
 
 import {
@@ -42,9 +41,6 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
       notifyError(
         'You must have at least one address linked to a profile. Please add another address before removing this one.',
       );
-
-      $(e.target).trigger('modalexit');
-      return;
     }
 
     try {
