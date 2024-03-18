@@ -8,6 +8,7 @@ import {
   logger,
 } from '@hicommonwealth/core';
 import { QueryTypes, Sequelize } from 'sequelize';
+import { TEST_DB_NAME } from '../database';
 
 export const checkDb = async () => {
   let sequelize: Sequelize | undefined = undefined;
@@ -15,12 +16,11 @@ export const checkDb = async () => {
     sequelize = new Sequelize('postgresql://commonwealth:edgeware@localhost', {
       logging: false,
     });
-    const testdbname = 'common_test';
     const [{ count }] = await sequelize.query<{ count: number }>(
-      `SELECT COUNT(*) FROM pg_database WHERE datname = '${testdbname}'`,
+      `SELECT COUNT(*) FROM pg_database WHERE datname = '${TEST_DB_NAME}'`,
       { type: QueryTypes.SELECT },
     );
-    if (!+count) await sequelize.query(`CREATE DATABASE ${testdbname};`);
+    if (!+count) await sequelize.query(`CREATE DATABASE ${TEST_DB_NAME};`);
   } catch (error) {
     console.error('Error creating test db:', error);
   } finally {

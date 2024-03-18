@@ -3,7 +3,7 @@ import { DeepPartial, dispose, schemas } from '@hicommonwealth/core';
 import { Entities } from 'core/src/schemas';
 import { Model, ModelStatic } from 'sequelize';
 import z from 'zod';
-import { DATABASE_URI, models, sequelize } from '../database';
+import { DATABASE_URI, TEST_DB_NAME, models, sequelize } from '../database';
 
 // props that are not mocked unless otherwise specified
 // via `allowedGeneratedProps`
@@ -31,10 +31,11 @@ export type SeedOptions = {
 };
 
 /**
- * Seeds aggregates for unit testing
+ * Seeds aggregate for unit testing
+ * - Partial seed values can be provided to define attributes specific to the unit test, and to drive how many child entities are created
  *
- * @param name of the entity
- * @param values custom seed values specific to the unit test
+ * @param name name of the aggregate to seed
+ * @param values partial seed values specific to the unit test
  * @param options seed options - defaults to mocking without skips
  * @returns tuple with main aggreate record and array of total records created
  */
@@ -45,7 +46,7 @@ export async function seed<T extends schemas.Aggregates>(
 ): Promise<
   [z.infer<typeof schemas.entities[T]> | undefined, Record<string, any>[]]
 > {
-  if (!DATABASE_URI.endsWith('common_test'))
+  if (!DATABASE_URI.endsWith(TEST_DB_NAME))
     throw new Error('Seeds only work when testing!');
 
   const records: Record<string, any>[] = [];
@@ -100,7 +101,7 @@ async function _seed(
   return record;
 }
 
-DATABASE_URI.endsWith('common_test') &&
+DATABASE_URI.endsWith(TEST_DB_NAME) &&
   dispose(async () => {
     const tables = Object.entries(models)
       .filter(([k]) => !k.endsWith('equelize'))
