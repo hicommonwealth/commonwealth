@@ -1,6 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
 import { CommunityAttributes, UserInstance } from '@hicommonwealth/model';
-import { Op, QueryTypes, WhereOptions } from 'sequelize';
+import { CountOptions, Op, QueryTypes } from 'sequelize';
 import { ServerAdminController } from '../server_admin_controller';
 
 export const Errors = {
@@ -47,15 +47,24 @@ export async function __getStats(
 
   const oneMonthAgo = new Date();
   oneMonthAgo.setDate(oneMonthAgo.getDate() - 30);
-  const whereCommunityId: WhereOptions<{
+
+  const countQuery: CountOptions<{
     created_at: any;
     community_id: string;
   }> = {
-    created_at: {
-      [Op.gte]: oneMonthAgo,
+    where: {
+      created_at: {
+        [Op.gte]: oneMonthAgo,
+      },
     },
-    community_id: communityId,
   };
+
+  if (communityId) {
+    countQuery.where = {
+      ...countQuery.where,
+      community_id: communityId,
+    };
+  }
 
   const [
     lastMonthNewCommunities,
@@ -73,27 +82,13 @@ export async function __getStats(
       `SELECT id FROM "Communities" WHERE created_at >= NOW() - INTERVAL '30 days'`,
       { type: QueryTypes.SELECT },
     ),
-    this.models.Comment.count({
-      where: whereCommunityId,
-    }),
-    this.models.Thread.count({
-      where: whereCommunityId,
-    }),
-    this.models.Reaction.count({
-      where: whereCommunityId,
-    }),
-    this.models.Vote.count({
-      where: whereCommunityId,
-    }),
-    this.models.Poll.count({
-      where: whereCommunityId,
-    }),
-    this.models.Address.count({
-      where: whereCommunityId,
-    }),
-    this.models.Group.count({
-      where: whereCommunityId,
-    }),
+    this.models.Comment.count(countQuery),
+    this.models.Thread.count(countQuery),
+    this.models.Reaction.count(countQuery),
+    this.models.Vote.count(countQuery),
+    this.models.Poll.count(countQuery),
+    this.models.Address.count(countQuery),
+    this.models.Group.count(countQuery),
     this.models.sequelize.query<{ result: number }>(
       `
       SELECT AVG(address_count) as result
