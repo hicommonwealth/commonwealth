@@ -1,4 +1,8 @@
-import { web3Enable } from '@polkadot/extension-dapp';
+import {
+  web3Accounts,
+  web3Enable,
+  web3FromAddress,
+} from '@polkadot/extension-dapp';
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 
 import { SubstrateSigner } from '@canvas-js/chain-substrate';
@@ -42,9 +46,10 @@ class PolkadotWebWalletController
   }
 
   public async getSessionSigner(): Promise<SessionSigner> {
-    return new SubstrateSigner({
-      extension: this.polkadot,
-    });
+    const accounts = await web3Accounts();
+    const address = accounts[0].address;
+    const extension = await web3FromAddress(address);
+    return new SubstrateSigner({ extension });
   }
 
   public getChainId() {
@@ -58,7 +63,6 @@ class PolkadotWebWalletController
 
   // ACTIONS
   public async enable() {
-    this.polkadot = await import('@polkadot/extension-dapp');
     console.log('Attempting to enable Substrate web wallet');
 
     // returns an array of all the injected sources
@@ -69,7 +73,7 @@ class PolkadotWebWalletController
 
       // returns an array of { address, meta: { name, source } }
       // meta.source contains the name of the extension that provides this account
-      this._accounts = await this.polkadot.web3Accounts();
+      this._accounts = await web3Accounts();
 
       this._enabled = true;
       this._enabling = false;
