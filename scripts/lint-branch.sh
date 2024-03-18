@@ -10,7 +10,7 @@ if [ -n "$GITHUB_BASE_REF" ]; then
 fi
 
 # Get a list of changed .ts files
-LINES=$(git diff origin/$BASE_BRANCH...HEAD --name-only --diff-filter=d | grep '\.ts$\|\.tsx$' | grep -v 'libs/chains/src/cosmos-ts/')
+LINES=$(git diff origin/$BASE_BRANCH...HEAD --name-only --diff-filter=d | grep -E '\.tsx?$' | grep -v 'libs/chains/src/cosmos-ts/')
 
 if [ -z "$LINES" ]
 then
@@ -20,6 +20,6 @@ else
     if [ -n "$FAIL_WARNINGS" ]; then
         NODE_OPTIONS="--max-old-space-size=8192" eslint --max-warnings=0 $LINES --no-ignore
     else
-        NODE_OPTIONS="--max-old-space-size=8192" eslint $LINES
+        NODE_OPTIONS="--max-old-space-size=8192" eslint $LINES --rule 'prettier/prettier: error'
     fi
 fi
