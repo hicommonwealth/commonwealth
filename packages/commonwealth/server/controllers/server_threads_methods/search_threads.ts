@@ -1,3 +1,4 @@
+import { ALL_COMMUNITIES } from '@hicommonwealth/core';
 import { ThreadAttributes } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from 'server/types';
@@ -69,7 +70,7 @@ export async function __searchThreads(
     searchTerm: searchTerm,
     ...paginationBind,
   };
-  if (communityId) {
+  if (communityId && communityId !== ALL_COMMUNITIES) {
     bind.community = communityId;
   }
 
