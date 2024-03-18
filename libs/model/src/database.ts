@@ -1,4 +1,5 @@
 import { logger } from '@hicommonwealth/core';
+import * as dotenv from 'dotenv';
 import { DataTypes, Sequelize } from 'sequelize';
 import type { DB, Models } from './models';
 import AddressFactory from './models/address';
@@ -39,6 +40,8 @@ import TopicFactory from './models/topic';
 import UserModelFactory from './models/user';
 import VoteFactory from './models/vote';
 import WebhookFactory from './models/webhook';
+
+dotenv.config();
 
 const log = logger().getLogger(__filename);
 
