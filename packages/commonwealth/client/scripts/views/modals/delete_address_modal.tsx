@@ -18,6 +18,7 @@ import {
 } from '../components/component_kit/new_designs/CWModal';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
 
+import axios from 'axios';
 import '../../../styles/modals/delete_address_modal.scss';
 
 type DeleteAddressModalAttrs = {
@@ -47,7 +48,7 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
     }
 
     try {
-      const response: any = await $.post(`${app.serverUrl()}/deleteAddress`, {
+      const response = await axios.post(`${app.serverUrl()}/deleteAddress`, {
         address,
         chain,
         jwt: app.user.jwt,
@@ -59,7 +60,7 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
         community: chain,
       });
 
-      if (response?.status === 'Success') {
+      if (response?.data.status === 'Success') {
         notifySuccess('Address has been successfully removed.');
       }
     } catch (err) {

@@ -1,6 +1,6 @@
+import axios from 'axios';
 import { updateActiveAddresses } from 'controllers/app/login';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
-import $ from 'jquery';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import type { NavigateOptions, To } from 'react-router';
@@ -14,12 +14,16 @@ const validate = async (
   token: string,
   stateId: string,
   chain: string,
-  setRoute: (url: To, options?: NavigateOptions, prefix?: null | string) => void
+  setRoute: (
+    url: To,
+    options?: NavigateOptions,
+    prefix?: null | string,
+  ) => void,
 ): Promise<void | string> => {
   // verifyAddress against token, returns user if not logged in
   let result;
   try {
-    result = await $.post(`${app.serverUrl()}/auth/sso/callback`, {
+    result = await axios.post(`${app.serverUrl()}/auth/sso/callback`, {
       token,
       issuer: 'AxieInfinity',
       stateId,
@@ -28,15 +32,15 @@ const validate = async (
     console.error(`Post request error: ${e.responseText}`);
     return `Sign in Error: ${e.responseText}`;
   }
-  if (result.status === 'Success') {
+  if (result.data.status === 'Success') {
     await initAppState();
     const selectedChainMeta = app.config.chains.getById('axie-infinity');
     await updateActiveAddresses({ chain: selectedChainMeta });
     console.log('Navigating to axie infinite community');
     setRoute('/axie-infinity');
   } else {
-    console.error(`Got sign in error: ${JSON.stringify(result)}`);
-    return `Sign in error: ${JSON.stringify(result)}`;
+    console.error(`Got sign in error: ${JSON.stringify(result.data)}`);
+    return `Sign in error: ${JSON.stringify(result.data)}`;
   }
 };
 
