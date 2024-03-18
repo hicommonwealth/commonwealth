@@ -6,7 +6,10 @@ import { isWindowSmallInclusive } from 'views/components/component_kit/helpers';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
-import { useDateCursor } from 'state/api/threads/fetchThreads';
+import {
+  featuredFilterQueryMap,
+  useDateCursor,
+} from 'state/api/threads/fetchThreads';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import { slugify } from 'utils';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
@@ -81,7 +84,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         topicId,
         stage: stageName ?? undefined,
         includePinnedThreads: true,
-        orderBy: featuredFilter ?? undefined,
+        orderBy: featuredFilterQueryMap[featuredFilter] ?? undefined,
         toDate: dateCursor.toDate,
         fromDate: dateCursor.fromDate,
         isOnArchivePage: isOnArchivePage,
