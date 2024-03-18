@@ -7,6 +7,7 @@ export const GetUserActivity: Query<
 > = () => ({
   ...schemas.queries.ThreadFeed,
   auth: [],
+  secure: true,
   body: async ({ actor }) => {
     /**
      * Last 50 updated threads
