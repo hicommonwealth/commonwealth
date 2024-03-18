@@ -7,7 +7,7 @@ import {
   setupErrorHandlers,
 } from '@hicommonwealth/adapters';
 import { cache, logger } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { GlobalActivityCache, models } from '@hicommonwealth/model';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';

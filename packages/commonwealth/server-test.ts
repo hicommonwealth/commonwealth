@@ -100,7 +100,7 @@ const setupServer = () => {
 };
 
 const banCache = new BanCache(models);
-const globalActivityCache = new GlobalActivityCache.getInstance(models);
+const globalActivityCache = GlobalActivityCache.getInstance(models);
 globalActivityCache.start();
 
 setupPassport(models);

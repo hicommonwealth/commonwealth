@@ -80,7 +80,7 @@ import getWebhooks from '../routes/webhooks/getWebhooks';
 import updateWebhook from '../routes/webhooks/updateWebhook';
 import type ViewCountCache from '../util/viewCountCache';
 
-import type { DB } from '@hicommonwealth/model';
+import type { DB, GlobalActivityCache } from '@hicommonwealth/model';
 import authCallback from '../routes/authCallback';
 import banAddress from '../routes/banAddress';
 import finishSsoLogin from '../routes/finishSsoLogin';
@@ -99,7 +99,6 @@ import getDiscordChannels from '../routes/getDiscordChannels';
 import getSnapshotProposal from '../routes/getSnapshotProposal';
 import { getSubscribedCommunities } from '../routes/getSubscribedCommunities';
 import setDiscordBotConfig from '../routes/setDiscordBotConfig';
-import type GlobalActivityCache from '../util/globalActivityCache';
 
 import {
   createCommunityContractTemplateAndMetadata,
