@@ -20,6 +20,6 @@ else
     if [ -n "$FAIL_WARNINGS" ]; then
         NODE_OPTIONS="--max-old-space-size=8192" eslint --max-warnings=0 $LINES --no-ignore
     else
-        NODE_OPTIONS="--max-old-space-size=8192" eslint $LINES --rule 'prettier/prettier: error'
+        NODE_OPTIONS="--max-old-space-size=8192" eslint $LINES
     fi
 fi

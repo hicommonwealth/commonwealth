@@ -78,7 +78,7 @@ module.exports = {
     'no-shadow': 'off',
     '@typescript-eslint/no-shadow': 'error',
     '@typescript-eslint/explicit-module-boundary-types': 0,
-    'prettier/prettier': 'off',
+    'prettier/prettier': 'warn',
     '@typescript-eslint/no-empty-interface': [
       'error',
       {
