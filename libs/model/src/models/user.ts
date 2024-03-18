@@ -1,6 +1,7 @@
-import { User } from '@hicommonwealth/core';
+import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
 import type { CreateOptions, DataTypes } from 'sequelize';
+import { z } from 'zod';
 import type { DB } from '.';
 import type { AddressAttributes, AddressInstance } from './address';
 import type { CommunityAttributes, CommunityInstance } from './community';
@@ -9,13 +10,7 @@ import type { ModelInstance, ModelStatic } from './types';
 
 export type EmailNotificationInterval = 'week' | 'never';
 
-export type UserAttributes = User & {
-  disableRichText?: boolean;
-  emailNotificationInterval?: EmailNotificationInterval;
-  selected_community_id?: string | null;
-  created_at?: Date;
-  updated_at?: Date;
-
+export type UserAttributes = z.infer<typeof schemas.entities.User> & {
   // associations (see https://vivacitylabs.com/setup-typescript-sequelize/)
   selectedCommunity?: CommunityAttributes | CommunityAttributes['id'];
   Addresses?: AddressAttributes[] | AddressAttributes['id'][];

@@ -78,6 +78,7 @@ export const generateBreadcrumbs = (
         //Match the header on the snapshots page
         pathSegments.splice(index + 1, 1);
         pathSegments[index] = 'snapshots';
+        link = 'snapshots';
         break;
       case 'proposal':
         link = 'proposals';
