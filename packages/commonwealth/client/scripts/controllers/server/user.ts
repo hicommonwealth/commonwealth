@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 import { EventEmitter } from 'events';
-import $ from 'jquery';
 
 import app from 'state';
 import Account from '../../models/Account';
@@ -12,6 +11,7 @@ import StarredCommunity from '../../models/StarredCommunity';
 import { notifyError } from '../app/notifications';
 
 // eslint-disable-next-line
+import axios from 'axios';
 import NotificationsController from './notifications';
 
 export class UserController {
@@ -144,11 +144,11 @@ export class UserController {
     this._setEmail(email);
   }
 
-  public updateEmail(email: string): void {
+  public async updateEmail(email: string): Promise<void> {
     this._setEmail(email);
 
     try {
-      $.post(`${app.serverUrl()}/updateEmail`, {
+      await axios.post(`${app.serverUrl()}/updateEmail`, {
         email: email,
         jwt: app.user.jwt,
       });
@@ -162,9 +162,9 @@ export class UserController {
     this._setEmailInterval(emailInterval);
   }
 
-  public updateEmailInterval(emailInterval: string): void {
+  public async updateEmailInterval(emailInterval: string): Promise<void> {
     try {
-      $.post(`${app.serverUrl()}/writeUserSetting`, {
+      await axios.post(`${app.serverUrl()}/writeUserSetting`, {
         jwt: app.user.jwt,
         key: 'updateEmailInterval',
         value: emailInterval,
@@ -221,22 +221,26 @@ export class UserController {
     this._setSelectedChain(selectedChain);
   }
 
-  public selectChain(options: { chain: string }): JQueryPromise<void> {
-    return $.post(`${app.serverUrl()}/selectCommunity`, {
-      community_id: options.chain,
-      auth: true,
-      jwt: this._jwt,
-    })
-      .then((res) => {
-        if (res.status !== 'Success') {
-          throw new Error(`got unsuccessful status: ${res.status}`);
-        } else {
-          const chain = app.config.chains.getById(options.chain);
-          if (!chain) throw new Error('unexpected chain');
-          this.setSelectedChain(chain);
+  public async selectChain(options: { chain: string }): Promise<void> {
+    try {
+      const res = await axios.post(`${app.serverUrl()}/selectCommunity`, {
+        community_id: options.chain,
+        auth: true,
+        jwt: this._jwt,
+      });
+
+      if (res.data.status !== 'Success') {
+        throw new Error(`got unsuccessful status: ${res.data.status}`);
+      } else {
+        const chain = app.config.chains.getById(options.chain);
+        if (!chain) {
+          throw new Error('unexpected chain');
         }
-      })
-      .catch(() => console.error('Failed to select node on server'));
+        this.setSelectedChain(chain);
+      }
+    } catch (error) {
+      console.error('Failed to select node on server', error);
+    }
   }
 
   public setSiteAdmin(isAdmin: boolean): void {
