@@ -315,3 +315,8 @@ export enum BalanceSourceType {
   CW20 = 'cw20',
   CW721 = 'cw721',
 }
+
+export enum BrokerTopics {
+  SnapshotListener = 'SnapshotListener',
+  DiscordListener = 'DiscordMessage',
+}
