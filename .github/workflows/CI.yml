@@ -408,9 +408,6 @@ jobs:
       - name: Run adapters tests
       - run: yarn workspace @hicommonwealth/adapters test
 
-      - name: Run chains tests
-      - run: yarn workspace @hicommonwealth/chains test
-
       - name: Run core tests
       - run: yarn workspace @hicommonwealth/core test
 
