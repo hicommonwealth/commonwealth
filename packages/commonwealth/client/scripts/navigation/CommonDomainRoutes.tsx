@@ -26,7 +26,6 @@ const UpdateMembersGroupPage = lazy(
 const DirectoryPage = lazy(() => import('views/pages/DirectoryPage'));
 const SputnikDaosPage = lazy(() => import('views/pages/sputnikdaos'));
 const FinishNearLoginPage = lazy(() => import('views/pages/finish_near_login'));
-const FinishAxieLoginPage = lazy(() => import('views/pages/finish_axie_login'));
 const FinishSocialLoginPage = lazy(
   () => import('views/pages/finish_social_login'),
 );
@@ -212,11 +211,6 @@ const CommonDomainRoutes = ({
     element={withLayout(FinishNearLoginPage, {
       scoped: true,
     })}
-  />,
-  <Route
-    key="/finishaxielogin"
-    path="/finishaxielogin"
-    element={withLayout(FinishAxieLoginPage, { type: 'common' })}
   />,
   <Route
     key="/finishsociallogin"

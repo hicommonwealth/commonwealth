@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
-import { isWindowSmallInclusive } from 'views/components/component_kit/helpers';
 
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import useFetchThreadsQuery, {
+  featuredFilterQueryMap,
   useDateCursor,
 } from 'state/api/threads/fetchThreads';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import { slugify } from 'utils';
-import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import {
   ThreadFeaturedFilterTypes,
   ThreadTimelineFilterTypes,
@@ -24,6 +23,8 @@ import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 
 import { getThreadActionTooltipText } from 'helpers/threads';
+import useBrowserWindow from 'hooks/useBrowserWindow';
+import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
@@ -52,6 +53,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     communityId,
   });
 
+  const { isWindowSmallInclusive } = useBrowserWindow({});
+
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const topicId = (topics || []).find(({ name }) => name === topicName)?.id;
@@ -79,9 +82,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       page: 1,
       limit: 20,
       topicId,
-      stage: stageName,
+      stage: stageName ?? undefined,
       includePinnedThreads: true,
-      orderBy: featuredFilter,
+      ...(featuredFilterQueryMap[featuredFilter] && {
+        orderBy: featuredFilterQueryMap[featuredFilter],
+      }),
       toDate: dateCursor.toDate,
       fromDate: dateCursor.fromDate,
       isOnArchivePage: isOnArchivePage,
