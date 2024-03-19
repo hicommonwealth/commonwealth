@@ -151,8 +151,8 @@ const CommunitiesPage = () => {
           <CWRelatedCommunityCard
             key={i}
             community={community}
-            memberCount={community.address_count}
-            threadCount={community.thread_count}
+            memberCount={community.addressCount}
+            threadCount={community.threadCount}
             setSelectedCommunity={setSelectedCommunity}
           />
         );

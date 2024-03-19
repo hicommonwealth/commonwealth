@@ -37,7 +37,7 @@
     padding-bottom: 24px;
 
     @include smallInclusive {
-      grid-template-columns: repeat(auto-fit, 136px);
+      grid-template-columns: repeat(auto-fit, 320px);
     }
   }
 }

@@ -42,11 +42,13 @@ export const CWRelatedCommunityCard = ({
   const { stakeEnabled, stakeValue } = useCommunityStake({
     community: community,
   });
+  const [hasJoinedCommunity, setHasJoinedCommunity] = useState(false);
 
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity({
     communityToJoin: community.id,
+    onJoin: setHasJoinedCommunity,
   });
-  const [hasJoinedCommunity, setHasJoinedCommunity] = useState(false);
+
   const isCommunityMember =
     app.roles.getAllRolesInCommunity({ community: community.id }).length > 0;
 
@@ -172,9 +174,9 @@ export const CWRelatedCommunityCard = ({
               disabled={isCommunityMember || hasJoinedCommunity}
               onClick={(e) => {
                 e.stopPropagation();
-                handleJoinCommunity()
-                  .then(() => setHasJoinedCommunity(true))
-                  .catch(() => notifyError(`Could not join ${community.name}`));
+                handleJoinCommunity().catch(() =>
+                  notifyError(`Could not join ${community.name}`),
+                );
               }}
             />
 

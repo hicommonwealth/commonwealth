@@ -15,10 +15,11 @@ import { CWModal } from '../component_kit/new_designs/CWModal';
 
 interface UseJoinCommunityProps {
   communityToJoin?: string;
+  onJoin?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const useJoinCommunity = (props: UseJoinCommunityProps = {}) => {
-  const { communityToJoin } = props;
+  const { communityToJoin, onJoin } = props;
   const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] =
     useState(false);
   const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
@@ -194,6 +195,7 @@ const useJoinCommunity = (props: UseJoinCommunityProps = {}) => {
           walletChain={activeChainInfo?.base}
           onSelect={async (accountIndex) => {
             await linkToCommunity(accountIndex);
+            onJoin(true);
             setIsAccountSelectorModalOpen(false);
           }}
           onModalClose={() => setIsAccountSelectorModalOpen(false)}
@@ -211,6 +213,7 @@ const useJoinCommunity = (props: UseJoinCommunityProps = {}) => {
         <TOSModal
           onAccept={async () => {
             await performJoinCommunityLinking();
+            onJoin(true);
             setIsTOSModalOpen(false);
           }}
           onModalClose={() => setIsTOSModalOpen(false)}

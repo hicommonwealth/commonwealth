@@ -9,11 +9,11 @@ import RoleInfo from './RoleInfo';
 
 class ChainInfo {
   public readonly id: string;
-  public readonly chain_node_id: string;
+  public readonly chainNodeId: string;
   public readonly ChainNode: NodeInfo;
   public readonly tokenName: string;
-  public readonly thread_count: number;
-  public readonly address_count: number;
+  public readonly threadCount: number;
+  public readonly addressCount: number;
   public readonly default_symbol: string;
   public name: string;
   public readonly network: ChainNetwork;
@@ -114,7 +114,7 @@ class ChainInfo {
     this.bech32Prefix = bech32_prefix;
     this.decimals = decimals;
     this.substrateSpec = substrateSpec;
-    this.chain_node_id = chain_node_id;
+    this.chainNodeId = chain_node_id;
     this.ChainNode = ChainNode;
     this.tokenName = tokenName;
     this.adminOnlyPolling = adminOnlyPolling;
@@ -125,8 +125,8 @@ class ChainInfo {
     this.directoryPageChainNodeId = directoryPageChainNodeId;
     this.namespace = namespace;
     this.redirect = redirect;
-    this.thread_count = thread_count;
-    this.address_count = address_count;
+    this.threadCount = thread_count;
+    this.addressCount = address_count;
   }
 
   public static fromJSON({
@@ -211,7 +211,7 @@ class ChainInfo {
       substrateSpec: substrate_spec,
       tokenName: token_name,
       chain_node_id,
-      ChainNode: app.config.nodes.getById(chain_node_id),
+      ChainNode: app.config.nodes.getById(chain_node_id) || ChainNode,
       adminOnlyPolling: admin_only_polling,
       discord_config_id,
       discordBotWebhooksEnabled: discord_bot_webhooks_enabled,
