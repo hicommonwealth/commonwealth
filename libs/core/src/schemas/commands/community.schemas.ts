@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../../constants';
 import { ChainBase, ChainType, CommunityCategoryType } from '../../types';
 import { ALL_COMMUNITIES, checkIconSize } from '../../utils';
-import { Community } from '../entities.schemas';
+import { Community, StakeTransaction } from '../entities.schemas';
 
 export const CreateCommunity = {
   input: z.object({
@@ -78,6 +78,36 @@ export const SetCommunityStake = {
     stake_enabled: z.coerce.boolean().default(true),
   }),
   output: Community,
+};
+
+export const CreateStakeTransaction = {
+  input: StakeTransaction.omit({ id: true, created_at: true }),
+  output: StakeTransaction,
+};
+
+export const GetStakeTransaction = {
+  input: z.object({
+    address: z.string().optional(),
+    community_id: z.string().optional(),
+  }),
+  output: StakeTransaction.and(z.object({ address: z.string() })).array(),
+};
+
+export const GetPriceChange = {
+  input: z.object({
+    past_date_epoch: z.number().min(1),
+    community_id: z.string(),
+    stake_id: z
+      .number()
+      .int()
+      .min(MIN_SCHEMA_INT)
+      .max(MAX_SCHEMA_INT)
+      .default(2),
+  }),
+  output: z.object({
+    new_price: z.string().optional(),
+    old_price: z.string().optional(),
+  }),
 };
 
 export const UpdateCommunity = {

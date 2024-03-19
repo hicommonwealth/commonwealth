@@ -1,4 +1,5 @@
 import {
+  Actor,
   InvalidActor,
   InvalidInput,
   schemas,
@@ -138,4 +139,31 @@ export const isCommentAuthor: CommentMiddleware = async ({ actor }, state) => {
   if (!state) throw new InvalidActor(actor, 'Must load comment');
   if (state.Address?.address !== actor.address_id)
     throw new InvalidActor(actor, 'User is not the author of the comment');
+};
+
+/**
+ * Check if the User owns the address
+ * @param actor The actor, contains the user id
+ * @param address The address that
+ */
+export const authorizeUser = async (
+  actor: Actor,
+  address: string,
+  community_id: string,
+): Promise<AddressAttributes> => {
+  if (!address) throw new InvalidActor(actor, 'Must provide an address');
+  if (!actor?.user?.id)
+    throw new InvalidActor(actor, 'Must provide an actor with a user id');
+  const addr = (
+    await models.Address.findOne({
+      where: {
+        address: address,
+        user_id: actor.user.id,
+        community_id,
+      },
+    })
+  )?.get({ plain: true });
+  if (!addr)
+    throw new InvalidActor(actor, `User is not authorized to perform action`);
+  return addr;
 };

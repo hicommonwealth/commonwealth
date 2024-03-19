@@ -243,6 +243,16 @@ export const CommunityStake = z.object({
   updated_at: z.date().optional(),
 });
 
+export const StakeTransaction = z.object({
+  id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),
+  community_id: z.string(),
+  stake_id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).default(2),
+  address: z.string(),
+  stake_price: z.string().default('0'),
+  stake_direction: z.enum(['buy', 'sell']),
+  created_at: z.date().optional(),
+});
+
 export const Topic = z.object({
   id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),
   name: z.string().max(255).default('General'),

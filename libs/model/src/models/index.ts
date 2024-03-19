@@ -29,6 +29,7 @@ import type { ReactionModelStatic } from './reaction';
 import type { SnapshotProposalModelStatic } from './snapshot_proposal';
 import type { SnapshotSpaceModelStatic } from './snapshot_spaces';
 import type { SsoTokenModelStatic } from './sso_token';
+import { StakeTransactionModelStatic } from './stake_transaction';
 import type { StarredCommunityModelStatic } from './starred_community';
 import type { SubscriptionModelStatic } from './subscription';
 import type { TaggedThreadModelStatic } from './tagged_threads';
@@ -50,6 +51,7 @@ export type Models = {
   CommunityContractTemplate: CommunityContractTemplateStatic;
   CommunityContractTemplateMetadata: CommunityContractTemplateMetadataStatic;
   CommunityStake: CommunityStakeModelStatic;
+  StakeTransaction: StakeTransactionModelStatic;
   Template: TemplateModelStatic;
   CommunitySnapshotSpaces: CommunitySnapshotSpaceModelStatic;
   Collaboration: CollaborationModelStatic;
