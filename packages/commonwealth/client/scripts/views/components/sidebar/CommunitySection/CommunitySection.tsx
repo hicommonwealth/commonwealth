@@ -44,7 +44,8 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
     currentVoteWeight,
     stakeValue,
     isLoading,
-  } = useCommunityStake();
+    // TODO: all user to select address
+  } = useCommunityStake({ walletAddress: app.user.addresses[0].address });
   const {
     modeOfManageCommunityStakeModal,
     setModeOfManageCommunityStakeModal,
