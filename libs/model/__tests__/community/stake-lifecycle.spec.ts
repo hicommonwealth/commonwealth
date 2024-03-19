@@ -130,7 +130,7 @@ describe('Stake lifecycle', () => {
       .to.eventually.be.rejected;
   });
 
-  it.skip('should set and get community stake', async () => {
+  it('should set and get community stake', async () => {
     const cr = await command(SetCommunityStake(), {
       id: id_without_stake_to_set,
       actor,
