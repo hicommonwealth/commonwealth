@@ -12,6 +12,7 @@ import SuccessStep from './steps/SuccessStep';
 import useCreateCommunity from './useCreateCommunity';
 import { CreateCommunityStep, getFormSteps } from './utils';
 
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import './CreateCommunity.scss';
 
 const CreateCommunity = () => {
@@ -77,19 +78,21 @@ const CreateCommunity = () => {
   };
 
   return (
-    <div className="CreateCommunity">
-      {!isSuccessStep && (
-        <CWFormSteps
-          steps={getFormSteps(
-            createCommunityStep,
-            showCommunityStakeStep,
-            communityStakeEnabled,
-          )}
-        />
-      )}
+    <CWPageLayout>
+      <div className="CreateCommunity">
+        {!isSuccessStep && (
+          <CWFormSteps
+            steps={getFormSteps(
+              createCommunityStep,
+              showCommunityStakeStep,
+              communityStakeEnabled,
+            )}
+          />
+        )}
 
-      {getCurrentStep()}
-    </div>
+        {getCurrentStep()}
+      </div>
+    </CWPageLayout>
   );
 };
 
