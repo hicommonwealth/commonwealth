@@ -3,6 +3,7 @@ import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import 'pages/stats.scss';
 import React, { useState } from 'react';
 import app from 'state';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
 import { CWText } from '../components/component_kit/cw_text';
@@ -155,54 +156,56 @@ const StatsPage = () => {
   } = batchedData;
 
   return (
-    <div className="StatsPage">
-      <div className="header">
-        <CWText type="h2" fontWeight="medium">
-          Analytics
-        </CWText>
+    <CWPageLayout>
+      <div className="StatsPage">
+        <div className="header">
+          <CWText type="h2" fontWeight="medium">
+            Analytics
+          </CWText>
+        </div>
+        <div className="stat-row dark top">
+          <CWText fontWeight="medium">Duration</CWText>
+          <CWText fontWeight="medium">New Addresses</CWText>
+          <CWText fontWeight="medium">New Comments</CWText>
+          <CWText fontWeight="medium">New Threads</CWText>
+          <CWText fontWeight="medium">Active Addresses</CWText>
+        </div>
+        <div className="stat-row">
+          <CWText>24 hours</CWText>
+          <CWText>{batchedRoles['day']}</CWText>
+          <CWText>{batchedComments['day']}</CWText>
+          <CWText>{batchedThreads['day']}</CWText>
+          <CWText>{batchedActiveAccounts['day']}</CWText>
+        </div>
+        <div className="stat-row">
+          <CWText>1 week</CWText>
+          <CWText>{batchedRoles['week']}</CWText>
+          <CWText>{batchedComments['week']}</CWText>
+          <CWText>{batchedThreads['week']}</CWText>
+          <CWText>{batchedActiveAccounts['week']}</CWText>
+        </div>
+        <div className="stat-row">
+          <CWText>2 weeks</CWText>
+          <CWText>{batchedRoles['twoWeek']}</CWText>
+          <CWText>{batchedComments['twoWeek']}</CWText>
+          <CWText>{batchedThreads['twoWeek']}</CWText>
+          <CWText>{batchedActiveAccounts['twoWeek']}</CWText>
+        </div>
+        <div className="stat-row">
+          <CWText>1 month</CWText>
+          <CWText>{batchedRoles['month']}</CWText>
+          <CWText>{batchedComments['month']}</CWText>
+          <CWText>{batchedThreads['month']}</CWText>
+          <CWText>{batchedActiveAccounts['month']}</CWText>
+        </div>
+        <div className="stat-row dark bottom">
+          <CWText fontWeight="medium">{'Total (all time)'}</CWText>
+          <CWText fontWeight="medium">{totalData.totalRoles}</CWText>
+          <CWText fontWeight="medium">{totalData.totalComments}</CWText>
+          <CWText fontWeight="medium">{totalData.totalThreads}</CWText>
+        </div>
       </div>
-      <div className="stat-row dark top">
-        <CWText fontWeight="medium">Duration</CWText>
-        <CWText fontWeight="medium">New Addresses</CWText>
-        <CWText fontWeight="medium">New Comments</CWText>
-        <CWText fontWeight="medium">New Threads</CWText>
-        <CWText fontWeight="medium">Active Addresses</CWText>
-      </div>
-      <div className="stat-row">
-        <CWText>24 hours</CWText>
-        <CWText>{batchedRoles['day']}</CWText>
-        <CWText>{batchedComments['day']}</CWText>
-        <CWText>{batchedThreads['day']}</CWText>
-        <CWText>{batchedActiveAccounts['day']}</CWText>
-      </div>
-      <div className="stat-row">
-        <CWText>1 week</CWText>
-        <CWText>{batchedRoles['week']}</CWText>
-        <CWText>{batchedComments['week']}</CWText>
-        <CWText>{batchedThreads['week']}</CWText>
-        <CWText>{batchedActiveAccounts['week']}</CWText>
-      </div>
-      <div className="stat-row">
-        <CWText>2 weeks</CWText>
-        <CWText>{batchedRoles['twoWeek']}</CWText>
-        <CWText>{batchedComments['twoWeek']}</CWText>
-        <CWText>{batchedThreads['twoWeek']}</CWText>
-        <CWText>{batchedActiveAccounts['twoWeek']}</CWText>
-      </div>
-      <div className="stat-row">
-        <CWText>1 month</CWText>
-        <CWText>{batchedRoles['month']}</CWText>
-        <CWText>{batchedComments['month']}</CWText>
-        <CWText>{batchedThreads['month']}</CWText>
-        <CWText>{batchedActiveAccounts['month']}</CWText>
-      </div>
-      <div className="stat-row dark bottom">
-        <CWText fontWeight="medium">{'Total (all time)'}</CWText>
-        <CWText fontWeight="medium">{totalData.totalRoles}</CWText>
-        <CWText fontWeight="medium">{totalData.totalComments}</CWText>
-        <CWText fontWeight="medium">{totalData.totalThreads}</CWText>
-      </div>
-    </div>
+    </CWPageLayout>
   );
 };
 
