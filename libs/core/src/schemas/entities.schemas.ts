@@ -21,7 +21,7 @@ export const User = z.object({
   emailVerified: z.boolean().default(false).optional(),
   selected_community_id: z.string().max(255).optional(),
   emailNotificationInterval: z
-    .enum(['week', 'never'])
+    .enum(['weekly', 'never'])
     .default('never')
     .optional(),
   created_at: z.any().optional(),
