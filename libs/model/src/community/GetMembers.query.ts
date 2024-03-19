@@ -1,12 +1,11 @@
 import { InvalidState, schemas, type Query } from '@hicommonwealth/core';
-import { buildPaginatedResponse } from 'core/src/schemas/queries';
 import { uniq } from 'lodash';
 import moment from 'moment';
 import { Op, QueryTypes } from 'sequelize';
 import { models } from '../database';
 import { contractHelpers } from '../services/commonProtocol';
 
-export const Errors = {
+const Errors = {
   StakeNotFound: 'Stake not found',
   StakeholderGroup: 'Stakeholder group not found',
   ChainNodeNotFound: 'Chain node not found',
@@ -250,9 +249,13 @@ export const GetMembers: Query<
       }
     }
 
-    return buildPaginatedResponse(profilesWithAddresses, totalResults, {
-      limit: payload.limit,
-      offset: payload.limit * (payload.page - 1),
-    });
+    return schemas.queries.buildPaginatedResponse(
+      profilesWithAddresses,
+      totalResults,
+      {
+        limit: payload.limit,
+        offset: payload.limit * (payload.page - 1),
+      },
+    );
   },
 });

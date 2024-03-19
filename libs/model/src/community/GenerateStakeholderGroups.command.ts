@@ -35,6 +35,7 @@ export const GenerateStakeholderGroups: Command<
             community_id: id!,
             is_system_managed: true,
           },
+          required: false,
         },
         {
           model: models.CommunityStake,
@@ -42,6 +43,7 @@ export const GenerateStakeholderGroups: Command<
           where: {
             community_id: id!,
           },
+          required: false,
         },
       ],
     });
