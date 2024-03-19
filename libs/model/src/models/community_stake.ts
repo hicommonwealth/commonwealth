@@ -30,7 +30,8 @@ export default (
       },
       stake_id: { type: dataTypes.INTEGER, allowNull: false, primaryKey: true },
       stake_token: { type: dataTypes.STRING, allowNull: false },
-      vote_weight: { type: dataTypes.NUMERIC, allowNull: false },
+      // https://github.com/sequelize/sequelize/issues/10440
+      vote_weight: { type: dataTypes.DECIMAL, allowNull: false },
       stake_enabled: { type: dataTypes.BOOLEAN, allowNull: false },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
