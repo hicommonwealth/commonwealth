@@ -23,6 +23,7 @@ import type { MembershipModelStatic } from './membership';
 import type { NotificationModelStatic } from './notification';
 import type { NotificationCategoryModelStatic } from './notification_category';
 import type { NotificationsReadModelStatic } from './notifications_read';
+import type { OutboxModelStatic } from './outbox';
 import type { PollModelStatic } from './poll';
 import type { ProfileModelStatic } from './profile';
 import type { ReactionModelStatic } from './reaction';
@@ -78,6 +79,7 @@ export type Models = {
   TaggedThread: TaggedThreadModelStatic;
   User: UserModelStatic;
   Webhook: WebhookModelStatic;
+  Outbox: OutboxModelStatic;
 };
 
 export type DB = Models & {
@@ -109,6 +111,7 @@ export * from './membership';
 export * from './notification';
 export * from './notification_category';
 export * from './notifications_read';
+export * from './outbox';
 export * from './poll';
 export * from './profile';
 export * from './reaction';

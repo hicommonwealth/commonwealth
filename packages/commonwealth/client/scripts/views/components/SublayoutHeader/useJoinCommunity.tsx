@@ -99,8 +99,9 @@ const useJoinCommunity = () => {
           originAddressInfo.community.id,
         );
 
-        if (res && res.result) {
-          const { verification_token, addresses, encodedAddress } = res.result;
+        if (res && res.data.result) {
+          const { verification_token, addresses, encodedAddress } =
+            res.data.result;
           app.user.setAddresses(
             addresses.map((a) => {
               return new AddressInfo({

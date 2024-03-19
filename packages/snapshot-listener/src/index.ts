@@ -18,7 +18,7 @@ import {
 import type { Request, RequestHandler, Response } from 'express';
 import express, { json } from 'express';
 import v8 from 'v8';
-import { DEFAULT_PORT, RABBITMQ_URI } from './config';
+import { DEFAULT_PORT, NODE_ENV, RABBITMQ_URI } from './config';
 import fetchNewSnapshotProposal from './utils/fetchSnapshot';
 import {
   methodNotAllowedMiddleware,
@@ -45,7 +45,7 @@ log.info(
   )} GB`,
 );
 
-const app = express();
+export const app = express();
 const port = process.env.PORT || DEFAULT_PORT;
 app.use(json() as RequestHandler);
 
@@ -80,16 +80,19 @@ registerRoute(app, 'post', '/snapshot', async (req: Request, res: Response) => {
       name: 'SnapshotProposalCreated',
       payload: {
         id: parsedId,
+        event: req.body.event,
         title: response.data.proposal?.title ?? null,
         body: response.data.proposal?.body ?? null,
         choices: response.data.proposal?.choices ?? null,
         space: response.data.proposal?.space.id ?? null,
         start: response.data.proposal?.start ?? null,
         expire: response.data.proposal?.end ?? null,
+        token: req.body.token,
+        secret: req.body.secret,
       },
     };
 
-    const result = await controller.publish(
+    const result = await controller?.publish(
       BrokerTopics.SnapshotListener,
       event,
     );
@@ -119,16 +122,19 @@ app.listen(port, async () => {
   const log = logger().getLogger(__filename);
   log.info(`⚡️[server]: Server is running at https://localhost:${port}`);
 
-  try {
-    const rmqAdapter = new RabbitMQAdapter(
-      getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.SnapshotService),
-    );
-    await rmqAdapter.init();
-    broker(rmqAdapter);
-    controller = rmqAdapter;
-    isServiceHealthy = true;
-  } catch (err) {
-    log.fatal(`Error starting server: ${err}`);
-    isServiceHealthy = false;
+  if (NODE_ENV !== 'test') {
+    try {
+      const rmqAdapter = new RabbitMQAdapter(
+        getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.SnapshotService),
+      );
+      await rmqAdapter.init();
+      broker(rmqAdapter);
+      isServiceHealthy = true;
+    } catch (err) {
+      log.fatal(`Error starting server: ${err}`);
+      isServiceHealthy = false;
+    }
   }
+
+  controller = broker();
 });

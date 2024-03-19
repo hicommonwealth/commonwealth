@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
-import { isWindowSmallInclusive } from 'views/components/component_kit/helpers';
 
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
-import { useDateCursor } from 'state/api/threads/fetchThreads';
+import {
+  featuredFilterQueryMap,
+  useDateCursor,
+} from 'state/api/threads/fetchThreads';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import { slugify } from 'utils';
-import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import Thread from '../../../models/Thread';
 import {
   ThreadFeaturedFilterTypes,
@@ -24,6 +25,8 @@ import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 
 import { getThreadActionTooltipText } from 'helpers/threads';
+import useBrowserWindow from 'hooks/useBrowserWindow';
+import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
@@ -51,6 +54,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const { data: topics } = useFetchTopicsQuery({
     communityId: community_id,
   });
+
+  const { isWindowSmallInclusive } = useBrowserWindow({});
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
@@ -83,13 +88,14 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         topicId,
         stage: stageName ?? undefined,
         includePinnedThreads: true,
-        orderBy: featuredFilter ?? undefined,
+        orderBy: featuredFilterQueryMap[featuredFilter] ?? undefined,
         toDate: dateCursor.toDate,
         fromDate: dateCursor.fromDate,
         isOnArchivePage: isOnArchivePage,
       },
       {
         getNextPageParam: (lastPage) => {
+          if (lastPage.threads?.length < 20) return undefined;
           return lastPage.cursor + 1;
         },
         initialCursor: 1,
@@ -103,7 +109,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const threads = sortPinned(
     sortByFeaturedFilter(threadData || [], featuredFilter),
   );
-  //
+
   //Checks if the current page is a discussion page and if the window is small enough to render the mobile menu
   //Checks both for mobile device and inner window size for desktop responsiveness
   const filteredThreads = threads.filter((t) => {

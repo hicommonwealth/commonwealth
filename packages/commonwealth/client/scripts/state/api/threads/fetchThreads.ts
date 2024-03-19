@@ -50,7 +50,7 @@ interface FetchActiveThreadsProps extends CommonProps {
   topicsPerThread?: number;
 }
 
-const featuredFilterQueryMap = {
+export const featuredFilterQueryMap = {
   newest: 'createdAt:desc',
   oldest: 'createdAt:asc',
   mostLikes: 'numberOfLikes:desc',

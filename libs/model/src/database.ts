@@ -24,6 +24,7 @@ import MembershipFactory from './models/membership';
 import NotificationFactory from './models/notification';
 import NotificationCategoryFactory from './models/notification_category';
 import NotificationsReadFactory from './models/notifications_read';
+import OutboxFactory from './models/outbox';
 import PollFactory from './models/poll';
 import ProfileFactory from './models/profile';
 import ReactionFactory from './models/reaction';
@@ -125,6 +126,7 @@ const _models: Models = {
   User: UserModelFactory(sequelize, DataTypes),
   Webhook: WebhookFactory(sequelize, DataTypes),
   CommunityStake: CommunityStakeFactory(sequelize, DataTypes),
+  Outbox: OutboxFactory(sequelize, DataTypes),
 };
 
 export const models: DB = {
