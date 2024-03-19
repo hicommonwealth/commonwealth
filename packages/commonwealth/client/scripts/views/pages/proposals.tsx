@@ -20,8 +20,8 @@ import {
   useCompoundProposalsQuery,
 } from 'state/api/proposals';
 import { ProposalCard } from 'views/components/ProposalCard';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
-import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
 import useManageDocumentTitle from '../../hooks/useManageDocumentTitle';
 import { getStatusText } from '../components/ProposalCard/helpers';
@@ -103,9 +103,9 @@ const ProposalsPage = () => {
     return <PageLoading message="Connecting to chain" />;
   }
 
-  if (isAaveError || isCompoundError) {
-    return <ErrorPage message="Could not connect to chain" />;
-  }
+  // if (isAaveError || isCompoundError) {
+  //   return <ErrorPage message="Could not connect to chain" />;
+  // }
 
   let aaveProposals: AaveProposal[];
   if (onAave)
@@ -247,16 +247,18 @@ const ProposalsPage = () => {
   );
 
   return (
-    <div className="ProposalsPage">
-      <div className="header">
-        <CWText type="h2" fontWeight="medium">
-          Proposals
-        </CWText>
+    <CWPageLayout>
+      <div className="ProposalsPage">
+        <div className="header">
+          <CWText type="h2" fontWeight="medium">
+            Proposals
+          </CWText>
+        </div>
+        {onCompound && <CompoundProposalStats chain={app.chain as Compound} />}
+        <CardsCollection content={activeProposalContent} header="Active" />
+        <CardsCollection content={inactiveProposalContent} header="Inactive" />
       </div>
-      {onCompound && <CompoundProposalStats chain={app.chain as Compound} />}
-      <CardsCollection content={activeProposalContent} header="Active" />
-      <CardsCollection content={inactiveProposalContent} header="Inactive" />
-    </div>
+    </CWPageLayout>
   );
 };
 
