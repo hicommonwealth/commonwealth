@@ -24,7 +24,7 @@ export const GetBulkThreads = {
     toDate: z.coerce.date().optional(),
     archived: zBoolean.default(false),
     includePinnedThreads: zBoolean.default(false),
-    topicId: z.string().optional(),
+    topicId: z.number().optional(),
     stage: z.string().optional(),
     orderBy: OrderByQueriesKeys.default('createdAt:desc'),
     cursor: z.number().optional(),

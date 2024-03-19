@@ -10,43 +10,6 @@ import { getCommunityUrl, getThreadUrl } from 'utils';
 import { User } from 'views/components/user/user';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 
-const jumpHighlightNotification = (
-  commentId,
-  shouldScroll = true,
-  animationDelayTime = 2000,
-) => {
-  const $div =
-    commentId === 'parent' || commentId === 'body'
-      ? $('html, body').find('.ProposalHeader')
-      : $('html, body').find(`.comment-${commentId}`);
-
-  if ($div.length === 0) return; // if the passed comment was invalid, abort
-
-  const divTop = $div.position().top;
-
-  const scrollTime = 500; // time to scroll
-
-  // clear any previous animation
-  $div.removeClass('highlighted highlightAnimationComplete');
-
-  // scroll to comment if necessary, set highlight, wait, then fade out the highlight
-  if (shouldScroll) {
-    $('html, body').animate({ scrollTop: divTop }, scrollTime);
-
-    $div.addClass('highlighted');
-
-    setTimeout(() => {
-      $div.addClass('highlightAnimationComplete');
-    }, animationDelayTime + scrollTime);
-  } else {
-    $div.addClass('highlighted');
-
-    setTimeout(() => {
-      $div.addClass('highlightAnimationComplete');
-    }, animationDelayTime);
-  }
-};
-
 const getNotificationFields = (category, data: IForumNotificationData) => {
   const {
     created_at,
@@ -132,17 +95,12 @@ const getNotificationFields = (category, data: IForumNotificationData) => {
 
   const path = getThreadUrl(pseudoProposal, comment_id);
 
-  const pageJump = comment_id
-    ? () => jumpHighlightNotification(comment_id)
-    : () => jumpHighlightNotification('parent');
-
   return {
     authorInfo: [[author_community_id, author_address]],
     createdAt: moment.utc(created_at),
     notificationHeader,
     notificationBody,
     path,
-    pageJump,
   };
 };
 
@@ -258,16 +216,11 @@ export const getBatchNotificationFields = (
       ? getCommunityUrl(community_id)
       : getThreadUrl(pseudoProposal, comment_id);
 
-  const pageJump = comment_id
-    ? () => jumpHighlightNotification(comment_id)
-    : () => jumpHighlightNotification('parent');
-
   return {
     authorInfo,
     createdAt: moment.utc(created_at),
     notificationHeader,
     notificationBody,
     path,
-    pageJump,
   };
 };

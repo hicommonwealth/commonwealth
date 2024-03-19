@@ -129,8 +129,7 @@ export const selectChain = async (chain?: ChainInfo): Promise<boolean> => {
     (chain.base === ChainBase.Ethereum && chain.type === ChainType.Offchain) ||
     chain.network === ChainNetwork.Ethereum ||
     chain.network === ChainNetwork.ERC721 ||
-    chain.network === ChainNetwork.ERC20 ||
-    chain.network === ChainNetwork.AxieInfinity
+    chain.network === ChainNetwork.ERC20
   ) {
     const Ethereum = (
       await import(

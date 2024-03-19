@@ -9,6 +9,15 @@ export const INVALID_ACTOR_ERROR = 'Invalid Actor Error';
 export const INVALID_STATE_ERROR = 'Invalid State Error';
 
 /**
+ * Deep partial utility
+ */
+export type DeepPartial<T> = T extends Array<infer I>
+  ? Array<DeepPartial<I>>
+  : T extends object
+  ? { [K in keyof T]?: DeepPartial<T[K]> }
+  : T;
+
+/**
  * Represents a user in the system with attributes commonly provided by authentication infrastructure
  */
 export type User = {
