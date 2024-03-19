@@ -1,13 +1,13 @@
-import { AppError, Requirement } from '@hicommonwealth/core';
+import { AppError, Requirement, schemas } from '@hicommonwealth/core';
 import {
   AddressInstance,
   GroupAttributes,
-  GroupMetadata,
   TopicInstance,
   UserInstance,
   sequelize,
 } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
+import z from 'zod';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import validateMetadata from '../../util/requirementsModule/validateMetadata';
 import validateRequirements from '../../util/requirementsModule/validateRequirements';
@@ -28,7 +28,7 @@ export type UpdateGroupOptions = {
   user: UserInstance;
   address: AddressInstance;
   groupId: number;
-  metadata?: GroupMetadata;
+  metadata?: z.infer<typeof schemas.entities.GroupMetadata>;
   requirements?: Requirement[];
   topics?: number[];
 };
