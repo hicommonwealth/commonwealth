@@ -31,7 +31,12 @@ export default (
       stake_id: { type: dataTypes.INTEGER, allowNull: false, primaryKey: true },
       stake_token: { type: dataTypes.STRING, allowNull: false },
       // https://github.com/sequelize/sequelize/issues/10440
-      vote_weight: { type: dataTypes.DECIMAL, allowNull: false },
+      // https://github.com/sequelize/sequelize/issues/8019#issuecomment-1280853048
+      // Decimals are a PITA -- the below type will return a number if used with models.sync
+      // but the migration: 20240108174142-community-stake.js ensures that a string is
+      // returned since the DECIMAL type is used instead. Switching to DECIMAL here does
+      // nothing
+      vote_weight: { type: dataTypes.REAL, allowNull: false },
       stake_enabled: { type: dataTypes.BOOLEAN, allowNull: false },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
