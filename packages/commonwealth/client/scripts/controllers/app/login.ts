@@ -543,8 +543,8 @@ export async function handleSocialLoginCallback({
     // This is code from before desiredChain was implemented, and
     // may not be necessary anymore:
     if (app.chain) {
-      const c = app.user.selectedChain
-        ? app.user.selectedChain
+      const c = app.user.selectedCommunity
+        ? app.user.selectedCommunity
         : app.config.chains.getById(app.activeChainId());
       await updateActiveAddresses({ chain: c });
     }

@@ -67,8 +67,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     apiEnabled: !!app?.user?.activeAccount?.address,
   });
 
-  console.log('data', community_id);
-
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const { dateCursor } = useDateCursor({
