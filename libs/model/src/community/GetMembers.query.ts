@@ -13,7 +13,7 @@ export const Errors = {
   CommunityNotFound: 'Community not found',
 };
 
-export const GetCommunityMembers: Query<
+export const GetMembers: Query<
   typeof schemas.queries.GetCommunityMembers
 > = () => ({
   ...schemas.queries.GetCommunityMembers,
