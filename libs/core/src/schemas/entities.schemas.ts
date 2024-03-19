@@ -75,6 +75,20 @@ export const Address = z.object({
   updated_at: z.any(),
 });
 
+export const CommunityMember = z.object({
+  id: z.number(),
+  user_id: z.string(),
+  profile_name: z.string(),
+  avatar_url: z.string(),
+  addresses: z.array(
+    Address.extend({
+      stake_balance: z.string().optional(),
+    }),
+  ),
+  roles: z.array(z.unknown()).optional(),
+  group_ids: z.array(z.number()),
+});
+
 const ContractSource = z.object({
   source_type: z.enum([
     BalanceSourceType.ERC20,

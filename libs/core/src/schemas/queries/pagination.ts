@@ -1,5 +1,12 @@
 import z from 'zod';
 
+export const PaginationParamsSchema = z.object({
+  limit: z.coerce.number().int().min(1).max(50).optional().default(10),
+  page: z.coerce.number().int().min(1).optional().default(1),
+  order_by: z.string().optional(),
+  order_direction: z.enum(['ASC', 'DESC']).optional(),
+});
+
 export type TypedPaginatedResult<T> = {
   results: T[];
   limit: number;
