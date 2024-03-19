@@ -25,11 +25,11 @@ startHealthCheckLoop({
   },
 });
 
-function setServiceHealthy(healthy: boolean) {
+function setServiceHealth(healthy: boolean) {
   isServiceHealthy = healthy;
 }
 
-async function startMessageRelayer(maxRelayIterations?: number) {
+export async function startMessageRelayer(maxRelayIterations?: number) {
   const { models } = await import('@hicommonwealth/model');
 
   try {
@@ -53,8 +53,8 @@ async function startMessageRelayer(maxRelayIterations?: number) {
     }),
   );
 
-  const subscriber = setupSubscriber(setServiceHealthy);
-  await connectToPostgres(subscriber, setServiceHealthy);
+  const subscriber = setupSubscriber(setServiceHealth);
+  await connectToPostgres(subscriber);
 
   isServiceHealthy = true;
   return relayForever(maxRelayIterations);

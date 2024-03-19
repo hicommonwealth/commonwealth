@@ -8,7 +8,7 @@ const log = logger(PinoLogger()).getLogger(__filename);
 const OUTBOX_CHANNEL = 'outbox-channel';
 
 export function setupSubscriber(
-  setServiceHealthy: (healthy: boolean) => void,
+  setServiceHealth: (healthy: boolean) => void,
 ): Subscriber<Record<string, any>> {
   const subscriber = createSubscriber({ connectionString: DATABASE_URI });
 
@@ -27,7 +27,7 @@ export function setupSubscriber(
 
   subscriber.events.on('error', (error) => {
     log.fatal('Fatal database connection error:', error);
-    setServiceHealthy(false);
+    setServiceHealth(false);
     // restart dyno after multiple reconnection failures
     process.exit(1);
   });
@@ -41,9 +41,7 @@ export function setupSubscriber(
 
 export async function connectToPostgres(
   subscriber: Subscriber<Record<string, any>>,
-  setServiceHealthy: (healthy: boolean) => void,
 ) {
   await subscriber.connect();
   await subscriber.listenTo(OUTBOX_CHANNEL);
-  setServiceHealthy(true);
 }

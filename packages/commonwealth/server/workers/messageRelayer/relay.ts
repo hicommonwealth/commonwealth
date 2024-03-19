@@ -3,6 +3,7 @@ import { Broker, BrokerTopics, logger, schemas } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
+import { MESSAGE_RELAYER_PREFETCH } from '../../config';
 
 const log = logger(PinoLogger()).getLogger(__filename);
 
@@ -30,10 +31,14 @@ export async function relay(broker: Broker): Promise<number> {
       FROM "Outbox"
       WHERE relayed = false
       ORDER BY created_at ASC
-      LIMIT 20
+      LIMIT :prefetch
       FOR UPDATE SKIP LOCKED;
     `,
-      { transaction, type: QueryTypes.SELECT },
+      {
+        transaction,
+        type: QueryTypes.SELECT,
+        replacements: { prefetch: MESSAGE_RELAYER_PREFETCH },
+      },
     );
 
     for (const event of events) {
