@@ -69,7 +69,6 @@ export enum WalletId {
   TerraWalletConnect = 'terra-walletconnect',
   CosmosEvmMetamask = 'cosm-metamask',
   Phantom = 'phantom',
-  Ronin = 'ronin',
   Coinbase = 'coinbase',
 }
 
@@ -129,7 +128,6 @@ export enum ChainNetwork {
   SolanaTestnet = 'solana-testnet',
   Solana = 'solana',
   SPL = 'spl', // solana token
-  AxieInfinity = 'axie-infinity',
   Evmos = 'evmos',
   Kava = 'kava',
   Kyve = 'kyve',
@@ -138,7 +136,6 @@ export enum ChainNetwork {
 }
 
 export enum BalanceType {
-  AxieInfinity = 'axie-infinity',
   Terra = 'terra',
   Ethereum = 'ethereum',
   Solana = 'solana',
@@ -314,4 +311,9 @@ export enum BalanceSourceType {
   CosmosNative = 'cosmos_native',
   CW20 = 'cw20',
   CW721 = 'cw721',
+}
+
+export enum BrokerTopics {
+  SnapshotListener = 'SnapshotListener',
+  DiscordListener = 'DiscordMessage',
 }

@@ -6,7 +6,15 @@ import * as entities from './entities.schemas';
 export type Entities = keyof typeof entities;
 export type Aggregates = Extract<
   Entities,
-  'User' | 'Community' | 'Thread' | 'Comment' | 'Contract'
+  | 'ChainNode'
+  | 'Comment'
+  | 'Community'
+  | 'NotificationCategory'
+  | 'SnapshotProposal'
+  | 'SnapshotSpace'
+  | 'Subscription'
+  | 'Thread'
+  | 'User'
 >;
 export { entities };
 
