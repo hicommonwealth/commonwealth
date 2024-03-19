@@ -1,15 +1,18 @@
 import {
+  getRabbitMQConfig,
   PinoLogger,
+  RabbitMQAdapter,
+  RascalConfigServices,
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { logger } from '@hicommonwealth/core';
-import { DATABASE_URI } from '@hicommonwealth/model';
-import createSubscriber from 'pg-listen';
+import { broker, logger } from '@hicommonwealth/core';
+import { RABBITMQ_URI } from '../../config';
+import { connectToPostgres, setupSubscriber } from './pgListener';
+import { incrementNumUnrelayedEvents, relayForever } from './relayForever';
 
 const log = logger(PinoLogger()).getLogger(__filename);
 
-const OUTBOX_CHANNEL = 'outbox-channel';
 let isServiceHealthy = false;
 
 startHealthCheckLoop({
@@ -22,48 +25,43 @@ startHealthCheckLoop({
   },
 });
 
-const subscriber = createSubscriber({ connectionString: DATABASE_URI });
-
-subscriber.events.on('connected', () => {
-  log.info('Message relayer connected to Postgres');
-});
-
-subscriber.events.on('reconnect', () => {
-  log.warn('Message relayer reconnecting to Postgres');
-});
-subscriber.notifications.on(OUTBOX_CHANNEL, async (payload) => {
-  relay();
-});
-
-subscriber.events.on('error', (error) => {
-  log.fatal('Fatal database connection error:', error);
-  isServiceHealthy = false;
-  // restart dyno after multiple reconnection failures
-  process.exit(1);
-});
-
-process.on('exit', () => {
-  subscriber.close();
-});
-
-async function connectToPostgres() {
-  await subscriber.connect();
-  await subscriber.listenTo(OUTBOX_CHANNEL);
-  isServiceHealthy = true;
+function setServiceHealthy(healthy: boolean) {
+  isServiceHealthy = healthy;
 }
 
-async function relay() {}
+async function startMessageRelayer(maxRelayIterations?: number) {
+  const { models } = await import('@hicommonwealth/model');
 
-async function main() {
-  // init broker port (rabbitMQ)
+  try {
+    const rmqAdapter = new RabbitMQAdapter(
+      getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.CommonwealthService),
+    );
+    await rmqAdapter.init();
+    broker(rmqAdapter);
+  } catch (e) {
+    log.error(
+      'Rascal consumer setup failed. Please check the Rascal configuration',
+    );
+    throw e;
+  }
 
-  // use PG to start LISTEN command
+  incrementNumUnrelayedEvents(
+    await models.Outbox.count({
+      where: {
+        relayed: false,
+      },
+    }),
+  );
+
+  const subscriber = setupSubscriber(setServiceHealthy);
+  await connectToPostgres(subscriber, setServiceHealthy);
 
   isServiceHealthy = true;
+  return relayForever(maxRelayIterations);
+}
 
-  // react to events inserted into Outbox by querying with FOR UPDATE SKIP LOCKED
-
-  // In the same txn publish to RMQ
-
-  // set relayed = true
+if (require.main === module) {
+  startMessageRelayer().catch((err) => {
+    log.fatal('Unknown error fatal requires immediate attention', err);
+  });
 }
