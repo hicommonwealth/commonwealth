@@ -24,11 +24,13 @@ export const GetMembers: Query<
     }
 
     const bind: any = {
-      searchTerm: `%${payload.search}%`,
+      searchTerm: `%${payload.search || ''}%`,
     };
     if (community) {
       bind.community_id = community.id;
     }
+
+    console.log('bind: ', bind);
 
     const communityWhere = bind.community_id
       ? `"Addresses".community_id = $community_id AND`
