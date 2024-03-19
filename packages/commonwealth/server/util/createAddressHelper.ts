@@ -1,7 +1,6 @@
 import {
   AppError,
   ChainBase,
-  ChainNetwork,
   WalletId,
   WalletSsoSource,
 } from '@hicommonwealth/core';
@@ -57,7 +56,7 @@ export async function createAddressHelper(
     where: { id: req.community_id },
   });
 
-  if (!community || community.network === ChainNetwork.AxieInfinity) {
+  if (!community) {
     throw new AppError(Errors.InvalidCommunity);
   }
 

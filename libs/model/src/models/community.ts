@@ -2,33 +2,27 @@ import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
 import { z } from 'zod';
-import type { AddressAttributes, AddressInstance } from './address';
+import type { AddressInstance } from './address';
 import type { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
 import type { CommentAttributes } from './comment';
-import { CommunityStakeAttributes } from './community_stake';
 import type { ContractInstance } from './contract';
-import { GroupAttributes } from './group';
 import type { StarredCommunityAttributes } from './starred_community';
 import type { ThreadAttributes } from './thread';
-import type { TopicAttributes, TopicInstance } from './topic';
+import type { TopicInstance } from './topic';
 import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes } from './user';
 
 export type CommunityAttributes = z.infer<typeof schemas.entities.Community> & {
   // associations
   ChainNode?: ChainNodeAttributes;
-  Addresses?: AddressAttributes[] | AddressAttributes['id'][];
   StarredCommunities?:
     | StarredCommunityAttributes[]
     | StarredCommunityAttributes['id'][];
-  topics?: TopicAttributes[] | TopicAttributes['id'][];
   Threads?: ThreadAttributes[] | ThreadAttributes['id'][];
   Comments?: CommentAttributes[] | CommentAttributes['id'][];
   Users?: UserAttributes[] | UserAttributes['id'][];
   ChainObjectVersion?: any; // TODO
   Contract?: ContractInstance;
-  CommunityStakes?: CommunityStakeAttributes[];
-  groups?: GroupAttributes[];
   thread_count?: number;
   address_count?: number;
 };

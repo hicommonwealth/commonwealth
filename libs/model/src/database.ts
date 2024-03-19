@@ -42,9 +42,10 @@ import WebhookFactory from './models/webhook';
 
 const log = logger().getLogger(__filename);
 
+export const TEST_DB_NAME = 'common_test';
 export const DATABASE_URI =
   process.env.NODE_ENV === 'test'
-    ? 'postgresql://commonwealth:edgeware@localhost/common_test'
+    ? `postgresql://commonwealth:edgeware@localhost/${TEST_DB_NAME}`
     : process.env.USES_DOCKER_DB
     ? 'postgresql://commonwealth:edgeware@postgres/commonwealth' // this is because url will be hidden in CI.yaml
     : !process.env.DATABASE_URL || process.env.NODE_ENV === 'development'

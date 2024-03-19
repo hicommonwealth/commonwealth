@@ -145,7 +145,6 @@
     "is-ipfs": "^8.0.1",
     "is-my-json-valid": "^2.20.6",
     "jdenticon": "^2.1.1",
-    "jquery": "^3.3.1",
     "jsdom-global": "^3.0.2",
     "jsonwebtoken": "^9.0.0",
     "lodash": "^4.17.21",
