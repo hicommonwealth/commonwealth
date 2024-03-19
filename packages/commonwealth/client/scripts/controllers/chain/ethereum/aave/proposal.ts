@@ -10,7 +10,6 @@ import BN from 'bn.js';
 import bs58 from 'bs58';
 import { EventEmitter } from 'events';
 import { blocknumToTime } from 'helpers';
-import $ from 'jquery';
 import moment from 'moment';
 import Web3 from 'web3-utils';
 import { ProposalState } from '../../../../../../shared/chain/types/aave';
@@ -240,12 +239,13 @@ export default class AaveProposal extends Proposal<
 
   public async init() {
     // fetch IPFS information
-    $.get(`${this._Gov.app.serverUrl()}/ipfsProxy?hash=${this._ipfsAddress}`)
+    axios
+      .get(`${this._Gov.app.serverUrl()}/ipfsProxy?hash=${this._ipfsAddress}`)
       .then((ipfsData) => {
-        if (typeof ipfsData === 'string') {
-          this._ipfsData = JSON.parse(ipfsData);
+        if (typeof ipfsData.data === 'string') {
+          this._ipfsData = JSON.parse(ipfsData.data);
         } else if (typeof ipfsData === 'object') {
-          this._ipfsData = ipfsData;
+          this._ipfsData = ipfsData.data;
         } else {
           throw new Error('Invalid IPFS data format');
         }

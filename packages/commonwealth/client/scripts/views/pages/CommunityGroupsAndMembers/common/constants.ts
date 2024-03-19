@@ -17,7 +17,6 @@ export const CW_SPECIFICATIONS = {
 };
 
 export const BLOCKCHAINS = {
-  AXIE_INFINITY: 'axie-infinity',
   COSMOS: 'cosmos',
   ETHEREUM: 'ethereum',
   INJECTIVE: 'injective',

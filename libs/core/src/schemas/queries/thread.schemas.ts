@@ -24,7 +24,7 @@ export const GetBulkThreads = {
     toDate: z.coerce.date().optional(),
     archived: zBoolean.default(false),
     includePinnedThreads: zBoolean.default(false),
-    topicId: z.string().optional(),
+    topicId: z.number().optional(),
     stage: z.string().optional(),
     orderBy: OrderByQueriesKeys.default('createdAt:desc'),
     cursor: z.number().optional(),
@@ -70,12 +70,14 @@ export const GetBulkThreads = {
         marked_as_spam_at: z.date().nullable().optional(),
         archived_at: z.date().nullable().optional(),
         latest_activity: z.date().nullable().optional(),
-        topic: z.object({
-          id: z.number(),
-          name: z.string(),
-          description: z.string(),
-          chainId: z.string(),
-        }),
+        topic: z
+          .object({
+            id: z.number(),
+            name: z.string(),
+            description: z.string(),
+            chainId: z.string(),
+          })
+          .optional(),
       })
       .array(),
   }),
