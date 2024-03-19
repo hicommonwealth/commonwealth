@@ -143,6 +143,7 @@ export const Group = z.object({
   community_id: z.string(),
   metadata: GroupMetadata,
   requirements: z.array(Requirement),
+  is_system_managed: z.boolean().optional(),
   created_at: z.date().optional(),
   updated_at: z.date().optional(),
 });

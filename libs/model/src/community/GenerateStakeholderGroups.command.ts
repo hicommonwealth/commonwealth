@@ -9,6 +9,7 @@ import {
 } from '@hicommonwealth/core';
 import Web3 from 'web3';
 import { models } from '../database';
+import { GroupAttributes } from '../models';
 import { getNamespace } from '../services/commonProtocol/contractHelpers';
 
 const Errors = {
@@ -118,7 +119,7 @@ export const GenerateStakeholderGroups: Command<
                 },
               ],
               is_system_managed: true,
-            },
+            } as GroupAttributes,
             { transaction },
           );
 
