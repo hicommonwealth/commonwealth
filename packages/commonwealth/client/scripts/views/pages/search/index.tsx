@@ -15,6 +15,7 @@ import React, { useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import app from 'state';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageLoading } from 'views/pages/loading';
 import {
   APIOrderBy,
@@ -272,72 +273,74 @@ const SearchPage = () => {
   ]);
 
   return (
-    <div className="SearchPage">
-      {toggleMobileView && <Breadcrumbs />}
-      <div className="search-results">
-        <div className="cw-tabs-row-container">
-          <CWTabsRow>
-            {VISIBLE_TABS.map((s, i) => (
-              <CWTab
-                key={i}
-                label={s}
-                isSelected={activeTab === s}
-                onClick={() => setActiveTab(s)}
-              />
-            ))}
-          </CWTabsRow>
+    <CWPageLayout>
+      <div className="SearchPage">
+        {toggleMobileView && <Breadcrumbs />}
+        <div className="search-results">
+          <div className="cw-tabs-row-container">
+            <CWTabsRow>
+              {VISIBLE_TABS.map((s, i) => (
+                <CWTab
+                  key={i}
+                  label={s}
+                  isSelected={activeTab === s}
+                  onClick={() => setActiveTab(s)}
+                />
+              ))}
+            </CWTabsRow>
+          </div>
+          <>
+            {isLoading && <PageLoading />}
+            {!isLoading && (
+              <>
+                <CWText className="search-results-caption">
+                  {totalResultsText} matching &apos;{queryParams.q}&apos;{' '}
+                  {scopeText}
+                  {community !== 'all_communities' && !app.isCustomDomain() && (
+                    <a
+                      href="#"
+                      className="search-all-communities"
+                      onClick={handleSearchAllCommunities}
+                    >
+                      Search all communities?
+                    </a>
+                  )}
+                </CWText>
+                {VISIBLE_TABS.length > 0 &&
+                  [SearchScope.Threads, SearchScope.Replies].includes(
+                    activeTab,
+                  ) && (
+                    <div className="search-results-filters">
+                      <CWText type="h5">Sort By:</CWText>
+                      <CWDropdown
+                        label=""
+                        onSelect={handleSortChange}
+                        initialValue={{
+                          label: queryParams.sort,
+                          value: queryParams.sort,
+                        }}
+                        options={Object.keys(SearchSort).map((k) => ({
+                          label: k,
+                          value: k,
+                        }))}
+                      />
+                    </div>
+                  )}
+                <div className="search-results-list">
+                  {renderSearchResults(
+                    results,
+                    queryParams.q,
+                    activeTab,
+                    commonNavigate,
+                  )}
+                  <div ref={bottomRef}></div>
+                </div>
+              </>
+            )}
+          </>
         </div>
-        <>
-          {isLoading && <PageLoading />}
-          {!isLoading && (
-            <>
-              <CWText className="search-results-caption">
-                {totalResultsText} matching &apos;{queryParams.q}&apos;{' '}
-                {scopeText}
-                {community !== 'all_communities' && !app.isCustomDomain() && (
-                  <a
-                    href="#"
-                    className="search-all-communities"
-                    onClick={handleSearchAllCommunities}
-                  >
-                    Search all communities?
-                  </a>
-                )}
-              </CWText>
-              {VISIBLE_TABS.length > 0 &&
-                [SearchScope.Threads, SearchScope.Replies].includes(
-                  activeTab,
-                ) && (
-                  <div className="search-results-filters">
-                    <CWText type="h5">Sort By:</CWText>
-                    <CWDropdown
-                      label=""
-                      onSelect={handleSortChange}
-                      initialValue={{
-                        label: queryParams.sort,
-                        value: queryParams.sort,
-                      }}
-                      options={Object.keys(SearchSort).map((k) => ({
-                        label: k,
-                        value: k,
-                      }))}
-                    />
-                  </div>
-                )}
-              <div className="search-results-list">
-                {renderSearchResults(
-                  results,
-                  queryParams.q,
-                  activeTab,
-                  commonNavigate,
-                )}
-                <div ref={bottomRef}></div>
-              </div>
-            </>
-          )}
-        </>
       </div>
-    </div>
+    </CWPageLayout>
   );
 };
 
