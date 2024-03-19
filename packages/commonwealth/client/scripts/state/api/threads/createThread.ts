@@ -12,7 +12,7 @@ interface CreateThreadProps {
   address: string;
   kind: 'discussion' | 'link';
   stage: string;
-  chainId: string;
+  communityId: string;
   title: string;
   topic: Topic;
   body?: string;
@@ -25,7 +25,7 @@ const createThread = async ({
   address,
   kind,
   stage,
-  chainId,
+  communityId,
   title,
   topic,
   body,
@@ -38,7 +38,7 @@ const createThread = async ({
     session = null,
     hash = null,
   } = await app.sessions.signThread(address, {
-    community: chainId,
+    community: communityId,
     title,
     body,
     link: url,
@@ -46,8 +46,8 @@ const createThread = async ({
   });
 
   const response = await axios.post(`${app.serverUrl()}/threads`, {
-    author_chain: chainId,
-    community_id: chainId,
+    author_chain: communityId,
+    community_id: communityId,
     address,
     author: JSON.stringify(authorProfile),
     title: encodeURIComponent(title),
@@ -67,11 +67,13 @@ const createThread = async ({
   return new Thread(response.data.result);
 };
 
-const useCreateThreadMutation = ({ chainId }: Partial<CreateThreadProps>) => {
+const useCreateThreadMutation = ({
+  communityId,
+}: Partial<CreateThreadProps>) => {
   return useMutation({
     mutationFn: createThread,
     onSuccess: async (newThread) => {
-      addThreadInAllCaches(chainId, newThread);
+      addThreadInAllCaches(communityId, newThread);
       // Update community level thread counters variables
       EXCEPTION_CASE_threadCountersStore.setState(
         ({ totalThreadsInCommunity, totalThreadsInCommunityForVoting }) => ({

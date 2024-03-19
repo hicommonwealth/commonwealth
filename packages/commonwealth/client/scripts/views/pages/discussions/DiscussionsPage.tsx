@@ -57,10 +57,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const topicId = (topics || []).find(({ name }) => name === topicName)?.id;
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
-    chainId: community_id,
+    communityId: community_id,
     address: app?.user?.activeAccount?.address,
     apiEnabled: !!app?.user?.activeAccount?.address,
   });
+
+  console.log('data', community_id);
 
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 

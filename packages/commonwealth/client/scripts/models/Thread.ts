@@ -129,7 +129,7 @@ export type Link = {
 export class Thread implements IUniqueId {
   public readonly author: string;
   public collaborators?: IThreadCollaborator[];
-  public readonly authorChain: string;
+  public readonly authorCommunity: string;
   public readonly title: string;
   public readonly body: string;
   public readonly plaintext: string;
@@ -256,7 +256,7 @@ export class Thread implements IUniqueId {
     this.topic = topic?.id ? new Topic({ ...(topic || {}) } as any) : null;
     this.kind = kind;
     this.stage = stage;
-    this.authorChain = Address.community_id;
+    this.authorCommunity = Address.community_id;
     this.pinned = pinned;
     this.url = url;
     this.communityId = community_id;

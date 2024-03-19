@@ -18,11 +18,13 @@ export const ThreadSelectorItem = ({
   isSelected,
 }: ThreadSelectorItemProps) => {
   const { data: users } = useFetchProfilesByAddressesQuery({
-    profileChainIds: [(thread?.authorChain as any)?.id || thread?.authorChain],
+    profileChainIds: [
+      (thread?.authorCommunity as any)?.id || thread?.authorCommunity,
+    ],
     profileAddresses: [thread?.author],
     currentChainId: app.activeChainId(),
     apiCallEnabled: !!(
-      ((thread?.authorChain as any)?.id || thread?.authorChain) &&
+      ((thread?.authorCommunity as any)?.id || thread?.authorCommunity) &&
       thread?.author
     ),
   });

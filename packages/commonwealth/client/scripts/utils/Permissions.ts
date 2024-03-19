@@ -47,7 +47,7 @@ const isThreadCollaborator = (thread: Thread) => {
 const isThreadAuthor = (thread: Thread) => {
   return (
     app.user.activeAccount?.address === thread.author &&
-    app.user.activeAccount?.community.id === thread.authorChain
+    app.user.activeAccount?.community.id === thread.authorCommunity
   );
 };
 

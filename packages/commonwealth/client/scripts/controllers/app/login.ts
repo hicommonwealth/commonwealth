@@ -106,7 +106,7 @@ export async function completeClientLogin(account: Account) {
       addressInfo = new AddressInfo({
         id: account.addressId,
         address: account.address,
-        chainId: account.community.id,
+        communityId: account.community.id,
         walletId: account.walletId,
         walletSsoSource: account.walletSsoSource,
       });
@@ -250,7 +250,7 @@ export function updateActiveUser(data) {
           new AddressInfo({
             id: a.id,
             address: a.address,
-            chainId: a.community_id,
+            communityId: a.community_id,
             keytype: a.keytype,
             walletId: a.wallet_id,
             walletSsoSource: a.wallet_sso_source,
@@ -456,7 +456,7 @@ export async function handleSocialLoginCallback({
     // Sign a session
     if (isCosmos && desiredChain) {
       const bech32Prefix = desiredChain.bech32Prefix;
-      const chainId = 'cosmoshub';
+      const communityId = 'cosmoshub';
       const timestamp = +new Date();
 
       const signer = { signMessage: magic.cosmos.sign };
@@ -467,7 +467,7 @@ export async function handleSocialLoginCallback({
         timestamp,
       );
       // TODO: provide blockhash as last argument to signSessionWithMagic
-      signature.signatures[0].chain_id = chainId;
+      signature.signatures[0].chain_id = communityId;
       await app.sessions.authSession(
         ChainBase.CosmosSDK, // could be desiredChain.base in the future?
         chainBaseToCanvasChainId(ChainBase.CosmosSDK, bech32Prefix), // not the cosmos chain id, since that might change

@@ -15,7 +15,7 @@ export const Breadcrumbs = () => {
   const getThreadId = location.pathname.match(/\/(\d+)-/);
 
   const { data: linkedThreads } = useGetThreadsByIdQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     ids: [getThreadId && Number(getThreadId[1])],
     apiCallEnabled:
       location.pathname.split('/')[1].toLowerCase() === 'discussion', //Only call when in discussion pages prevents unnecessary calls.
