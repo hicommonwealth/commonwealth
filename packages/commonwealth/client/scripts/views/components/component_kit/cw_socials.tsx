@@ -18,11 +18,11 @@ export const CWSocials = ({ handleInputChange, socials }: SocialsProps) => {
   const [propSocials, setPropSocials] = useState(socials ?? []);
 
   const addInputRow = () => {
-    setPropSocials([...socials, '']);
+    setPropSocials([...propSocials, '']);
   };
 
   const deleteInputRow = (index: number) => {
-    const newSocials = socials.filter((_, i) => i !== index);
+    const newSocials = propSocials.filter((_, i) => i !== index);
     setPropSocials(newSocials);
     handleInputChange(newSocials);
   };
@@ -38,7 +38,7 @@ export const CWSocials = ({ handleInputChange, socials }: SocialsProps) => {
       placeholder = 'https://discord.com/...';
     } else if (social.includes('twitter.com/')) {
       name = 'X (Twitter)';
-      icon = 'twitter';
+      icon = 'twitterX';
       placeholder = 'https://twitter.com/...';
     } else if (social.includes('telegram.org/')) {
       name = 'telegram';
@@ -69,7 +69,7 @@ export const CWSocials = ({ handleInputChange, socials }: SocialsProps) => {
           iconRight={icon}
           placeholder={placeholder}
           onInput={(e) => {
-            const newSocials = [...socials];
+            const newSocials = [...propSocials];
             newSocials[i] = e.target.value;
             setPropSocials(newSocials);
             handleInputChange(newSocials);
