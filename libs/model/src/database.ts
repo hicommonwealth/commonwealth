@@ -1,4 +1,5 @@
 import { logger } from '@hicommonwealth/core';
+import * as dotenv from 'dotenv';
 import { DataTypes, Sequelize } from 'sequelize';
 import type { DB, Models } from './models';
 import AddressFactory from './models/address';
@@ -33,13 +34,14 @@ import SnapshotSpaceFactory from './models/snapshot_spaces';
 import SsoTokenFactory from './models/sso_token';
 import StarredCommunityFactory from './models/starred_community';
 import SubscriptionFactory from './models/subscription';
-import TaggedThreadFactory from './models/tagged_threads';
 import TemplateFactory from './models/template';
 import ThreadFactory from './models/thread';
 import TopicFactory from './models/topic';
 import UserModelFactory from './models/user';
 import VoteFactory from './models/vote';
 import WebhookFactory from './models/webhook';
+
+dotenv.config();
 
 const log = logger().getLogger(__filename);
 
@@ -122,7 +124,6 @@ const _models: Models = {
   SnapshotProposal: SnapshotProposalFactory(sequelize, DataTypes),
   SnapshotSpace: SnapshotSpaceFactory(sequelize, DataTypes),
   Subscription: SubscriptionFactory(sequelize, DataTypes),
-  TaggedThread: TaggedThreadFactory(sequelize, DataTypes),
   User: UserModelFactory(sequelize, DataTypes),
   Webhook: WebhookFactory(sequelize, DataTypes),
   CommunityStake: CommunityStakeFactory(sequelize, DataTypes),

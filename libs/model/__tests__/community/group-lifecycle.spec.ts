@@ -35,7 +35,7 @@ describe('Group lifecycle', () => {
     );
     const [user] = await seed(
       'User',
-      { isAdmin: true },
+      { isAdmin: true, selected_community_id: null },
       // { mock: true, log: true },
     );
     const [community] = await seed(
@@ -52,6 +52,7 @@ describe('Group lifecycle', () => {
         CommunityStakes: [],
         topics: [],
         groups: [],
+        discord_config_id: null,
       },
       // { mock: true, log: true },
     );
