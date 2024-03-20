@@ -265,7 +265,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
           />
           <CWAuthButton
             type="twitter"
-            label="Twitter"
+            label="X (Twitter)"
             darkMode={darkMode}
             onClick={() =>
               onSocialLogin(
