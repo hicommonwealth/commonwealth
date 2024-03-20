@@ -1,3 +1,4 @@
+import { addressSwapper } from 'shared/utils';
 import { CanvasSignedDataApiArgs, fromCanvasSignedDataApiArgs } from './types';
 import { verify } from './verify';
 
@@ -69,8 +70,17 @@ export const verifyThread = async (args: CanvasSignedDataApiArgs, fields) => {
     'thread',
     'topic',
   );
+
+  let addressToCompare = address;
+  if (actionMessage.payload.address.split(':')[0] == 'polkadot') {
+    addressToCompare = addressSwapper({
+      currentPrefix: 42,
+      address: address,
+    });
+  }
+
   assertMatches(
-    address,
+    addressToCompare,
     actionMessage.payload.address.split(':')[2],
     'thread',
     'origin',

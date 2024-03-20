@@ -43,14 +43,9 @@ export async function constructSolanaSignerCWClass() {
 
   class SolanaSignerCW extends SolanaSigner {
     protected getSessionKey = (topic: string, address: string) => {
-      console.log(
-        `getSessionKey called with topic: ${topic} and address: ${address}`,
-      );
       const walletAddress = address.split(':')[2];
       const cwAddress = `solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp:${walletAddress}`;
-      const res = `canvas/${topic}/${cwAddress}`;
-      console.log(`getSessionKey returning: ${res}`);
-      return res;
+      return `canvas/${topic}/${cwAddress}`;
     };
   }
 
