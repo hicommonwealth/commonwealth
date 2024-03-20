@@ -57,8 +57,6 @@ export const TEST_DB_NAME = 'common_test';
 export const DATABASE_URI =
   process.env.NODE_ENV === 'test'
     ? `postgresql://commonwealth:edgeware@localhost/${TEST_DB_NAME}`
-    : process.env.USES_DOCKER_DB
-    ? 'postgresql://commonwealth:edgeware@postgres/commonwealth' // this is because url will be hidden in CI.yaml
     : !process.env.DATABASE_URL || process.env.NODE_ENV === 'development'
     ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
     : process.env.DATABASE_URL;
@@ -231,7 +229,6 @@ export const bootstrap_testing = async () => {
 
     // register hook to truncate db after calling dispose()()
     dispose(async () => {
-      console.warn(`Truncating ${TEST_DB_NAME}...`);
       const tables = Object.entries(models)
         .filter(([k]) => !k.endsWith('equelize'))
         .map(([, v]) => `"${(v as ModelStatic<Model>).tableName}"`)
