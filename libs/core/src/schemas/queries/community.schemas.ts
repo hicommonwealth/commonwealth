@@ -21,7 +21,7 @@ export const GetCommunityMembers = {
   input: PaginationParamsSchema.extend({
     search: z.string().optional(),
     community_id: z.string(),
-    include_roles: z.string().optional(),
+    include_roles: z.boolean().optional(),
     memberships: z
       .union([
         z.literal('in-group'),
@@ -32,5 +32,7 @@ export const GetCommunityMembers = {
     include_group_ids: z.coerce.boolean().optional(),
     include_stake_balances: z.coerce.boolean().optional(),
   }),
-  output: PaginatedResultSchema(CommunityMember),
+  output: PaginatedResultSchema.extend({
+    results: CommunityMember.array(),
+  }),
 };

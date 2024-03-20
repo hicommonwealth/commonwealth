@@ -30,8 +30,6 @@ export const GetMembers: Query<
       bind.community_id = community.id;
     }
 
-    console.log('bind: ', bind);
-
     const communityWhere = bind.community_id
       ? `"Addresses".community_id = $community_id AND`
       : '';
@@ -76,7 +74,7 @@ export const GetMembers: Query<
       "Profiles".avatar_url,
       "Profiles".created_at,
       array_agg("Addresses".id) as address_ids,
-      array_agg("Addresses".community_id) as chains,
+      array_agg("Addresses".community_id) as community_ids,
       array_agg("Addresses".address) as addresses,
       MAX("Addresses".last_active) as last_active
     FROM
@@ -95,14 +93,14 @@ export const GetMembers: Query<
       "Profiles".id
   `;
 
-    const fullResults = await models.sequelize.query<{
+    const allCommunityProfiles = await models.sequelize.query<{
       id: number;
       user_id: number;
       profile_name: string;
       avatar_url: string;
       created_at: string;
       address_ids: string[];
-      chains: string[];
+      community_ids: string[];
       addresses: string[];
       stake_balances: string[];
       last_active: string;
@@ -110,7 +108,7 @@ export const GetMembers: Query<
       bind,
       type: QueryTypes.SELECT,
     });
-    const totalResults = fullResults.length;
+    const totalResults = allCommunityProfiles.length;
 
     if (payload.include_stake_balances) {
       const stake = await models.CommunityStake.findOne({
@@ -132,7 +130,7 @@ export const GetMembers: Query<
       if (!node) {
         throw new InvalidState(Errors.ChainNodeNotFound);
       }
-      const addresses = fullResults.map((p) => p.addresses).flat();
+      const addresses = allCommunityProfiles.map((p) => p.addresses).flat();
       const balances = await contractHelpers.getNamespaceBalance(
         community.namespace!,
         stake.stake_id,
@@ -141,7 +139,7 @@ export const GetMembers: Query<
         node.url,
       );
       // add balances to profiles
-      for (const profile of fullResults) {
+      for (const profile of allCommunityProfiles) {
         for (const address of profile.addresses) {
           profile.stake_balances ||= [];
           profile.stake_balances.push(balances[address] || '0');
@@ -149,7 +147,7 @@ export const GetMembers: Query<
       }
     }
 
-    const paginatedResults = fullResults
+    const paginatedResults = allCommunityProfiles
       .slice()
       .sort((a, b) => {
         let comparison = 0;
@@ -165,7 +163,10 @@ export const GetMembers: Query<
         }
         return payload.order_direction === 'DESC' ? -comparison : comparison;
       })
-      .slice((payload.page - 1) * payload.limit, payload.page * payload.limit);
+      .slice(
+        (payload.cursor - 1) * payload.limit,
+        payload.cursor * payload.limit,
+      );
 
     const profilesWithAddresses = paginatedResults.map((profile) => {
       return {
@@ -176,7 +177,7 @@ export const GetMembers: Query<
         addresses: profile.address_ids.map((_, i) => {
           const address: any = {
             id: profile.address_ids[i],
-            chain: profile.chains[i],
+            community_id: profile.community_ids[i],
             address: profile.addresses[i],
           };
           if (profile.stake_balances) {
@@ -209,7 +210,7 @@ export const GetMembers: Query<
         (acc, address) => {
           return {
             ...acc,
-            [address.id!]: address.role,
+            [`${address.id!}`]: address.role,
           };
         },
         {},
@@ -219,7 +220,7 @@ export const GetMembers: Query<
       for (const profile of profilesWithAddresses) {
         for (const address of profile.addresses) {
           profile.roles ||= [];
-          profile.roles.push(addressIdRoles[address]);
+          profile.roles.push(addressIdRoles[address.id]);
         }
       }
     }
@@ -256,7 +257,7 @@ export const GetMembers: Query<
       totalResults,
       {
         limit: payload.limit,
-        offset: payload.limit * (payload.page - 1),
+        offset: payload.limit * (payload.cursor - 1),
       },
     );
   },
