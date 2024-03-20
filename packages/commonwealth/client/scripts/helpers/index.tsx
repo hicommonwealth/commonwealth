@@ -195,7 +195,13 @@ export function formatAddressShort(
   numberOfVisibleCharacters = 5,
   numberOfVisibleCharactersTail = 4,
 ) {
-  if (address.length < 10) return address;
+  if (
+    address.length <
+    numberOfVisibleCharacters + numberOfVisibleCharactersTail + 1
+  ) {
+    return address;
+  }
+
   return `${address.slice(0, numberOfVisibleCharacters)}…${address.slice(
     -numberOfVisibleCharactersTail,
   )}`;
