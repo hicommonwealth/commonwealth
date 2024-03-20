@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "add-component-showcase": "npx ts-node -T ./scripts/add-component-showcase.ts",
+    "archive-outbox": "npx ts-node -r tsconfig-paths/register -T ./scripts/archive-outbox.ts",
     "build": "tsc -b && tsc-alias",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",

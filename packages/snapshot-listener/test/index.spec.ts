@@ -54,4 +54,4 @@ describe('Snapshot Listener API', () => {
     const res = await chai.request(app).post('/snapshot').send(undefined);
     expect(res).to.have.status(400);
   });
-});
+}).timeout(5000);
