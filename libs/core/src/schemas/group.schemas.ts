@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { BalanceSourceType } from '../types';
-import { Community } from './entities.schemas';
 
 const ContractSource = z.object({
   source_type: z.enum([
@@ -66,7 +65,7 @@ export const GroupMetadata = z.object({
 });
 
 export const Group = z.object({
-  id: z.number(),
+  id: z.number().optional(),
   community_id: z.string(),
   metadata: GroupMetadata,
   requirements: z.array(Requirement),
@@ -86,5 +85,5 @@ export const CreateGroup = {
     requirements: z.array(Requirement),
     topics: z.array(z.number()).optional(),
   }),
-  output: Community.extend({ groups: z.array(Group).optional() }),
+  output: z.object({ groups: z.array(Group).optional() }),
 };

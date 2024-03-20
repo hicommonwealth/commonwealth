@@ -1,26 +1,11 @@
-import { Requirement } from '@hicommonwealth/core';
+import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
 import { DataTypes } from 'sequelize';
+import z from 'zod';
 import { CommunityAttributes } from './community';
 import { ModelInstance, ModelStatic } from './types';
 
-export type GroupMetadata = {
-  name: string;
-  description: string;
-  required_requirements?: number;
-  membership_ttl?: number; // NOT USED
-};
-
-export type GroupAttributes = {
-  id: number;
-  community_id: string;
-  metadata: GroupMetadata;
-  requirements: Requirement[];
-  is_system_managed?: boolean;
-
-  created_at?: Date;
-  updated_at?: Date;
-
+export type GroupAttributes = z.infer<typeof schemas.entities.Group> & {
   // associations
   community?: CommunityAttributes;
 };

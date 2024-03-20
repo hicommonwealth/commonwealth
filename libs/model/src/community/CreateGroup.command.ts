@@ -5,8 +5,8 @@ import { isCommunityAdminOrModerator } from '../middleware';
 import { mustNotExist } from '../middleware/guards';
 import { GroupAttributes } from '../models';
 
-export const MAX_GROUPS_PER_COMMUNITY = 20;
-export const Errors = {
+const MAX_GROUPS_PER_COMMUNITY = 20;
+const Errors = {
   MaxGroups: 'Exceeded max number of groups',
   InvalidTopics: 'Invalid topics',
 };

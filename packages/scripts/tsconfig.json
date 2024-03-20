@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "lib": ["es2020"],
+    "typeRoots": ["./node_modules/@types"],
+    "skipLibCheck": true,
+    "rootDir": "src",
+    "outDir": "build",
+    "paths": {
+      "@hicommonwealth/*": ["../../libs/*/src"]
+    }
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../../libs/adapters" },
+    { "path": "../../libs/core" },
+    { "path": "../../libs/model" }
+  ]
+}

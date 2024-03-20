@@ -1,28 +1,10 @@
-import type {
-  BalanceType,
-  CosmosGovernanceVersion,
-  NodeHealth,
-} from '@hicommonwealth/core';
+import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
+import { z } from 'zod';
 import type { ModelInstance, ModelStatic } from './types';
 
-export type ChainNodeAttributes = {
-  url: string;
-  id?: number;
-  eth_chain_id?: number;
-  cosmos_chain_id?: string;
-  alt_wallet_url?: string;
-  private_url?: string;
-  balance_type: BalanceType;
-  bech32?: string;
-  cosmos_gov_version?: CosmosGovernanceVersion;
-  ss58?: number;
-  name: string;
-  description?: string;
-  health?: NodeHealth;
-  updated_at?: Date;
-};
+export type ChainNodeAttributes = z.infer<typeof schemas.entities.ChainNode>;
 
 export type ChainNodeInstance = ModelInstance<ChainNodeAttributes>;
 
@@ -74,6 +56,10 @@ export default (
 
   ChainNode.associate = (models) => {
     models.ChainNode.hasMany(models.Community, { foreignKey: 'chain_node_id' });
+    models.ChainNode.hasMany(models.Contract, {
+      foreignKey: 'chain_node_id',
+      as: 'contracts',
+    });
   };
 
   return ChainNode;

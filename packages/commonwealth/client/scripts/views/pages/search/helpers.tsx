@@ -207,6 +207,7 @@ export type MemberResult = {
     id: number;
     chain: string;
     address: string;
+    stake_balance?: string;
   }[];
   group_ids?: [];
   roles?: any[];
