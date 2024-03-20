@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 
@@ -30,6 +30,7 @@ import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 
 type DiscussionsPageProps = {
@@ -54,6 +55,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const { data: topics } = useFetchTopicsQuery({
     communityId: community_id,
   });
+
+  const containerRef = useRef();
 
   const { isWindowSmallInclusive } = useBrowserWindow({});
 
@@ -124,102 +127,108 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   useManageDocumentTitle('Discussions');
 
   return (
-    <div className="DiscussionsPage">
-      <Virtuoso
-        className="thread-list"
-        style={{ height: '100%', width: '100%' }}
-        data={isInitialLoading ? [] : filteredThreads}
-        itemContent={(i, thread) => {
-          const discussionLink = getProposalUrlPath(
-            thread.slug,
-            `${thread.identifier}-${slugify(thread.title)}`,
-          );
+    <CWPageLayout ref={containerRef} className="DiscussionsPageLayout">
+      <div className="DiscussionsPage">
+        <Virtuoso
+          customScrollParent={containerRef?.current}
+          className="thread-list"
+          style={{ height: '100%', width: '100%' }}
+          data={isInitialLoading ? [] : filteredThreads}
+          itemContent={(i, thread) => {
+            const discussionLink = getProposalUrlPath(
+              thread.slug,
+              `${thread.identifier}-${slugify(thread.title)}`,
+            );
 
-          const isTopicGated = !!(memberships || []).find((membership) =>
-            membership.topicIds.includes(thread?.topic?.id),
-          );
+            const isTopicGated = !!(memberships || []).find((membership) =>
+              membership.topicIds.includes(thread?.topic?.id),
+            );
 
-          const isActionAllowedInGatedTopic = !!(memberships || []).find(
-            (membership) =>
-              membership.topicIds.includes(thread?.topic?.id) &&
-              membership.isAllowed,
-          );
+            const isActionAllowedInGatedTopic = !!(memberships || []).find(
+              (membership) =>
+                membership.topicIds.includes(thread?.topic?.id) &&
+                membership.isAllowed,
+            );
 
-          const isRestrictedMembership =
-            !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
+            const isRestrictedMembership =
+              !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
-          const disabledActionsTooltipText = getThreadActionTooltipText({
-            isCommunityMember: !!hasJoinedCommunity,
-            isThreadArchived: !!thread?.archivedAt,
-            isThreadLocked: !!thread?.lockedAt,
-            isThreadTopicGated: isRestrictedMembership,
-          });
+            const disabledActionsTooltipText = getThreadActionTooltipText({
+              isCommunityMember: !!hasJoinedCommunity,
+              isThreadArchived: !!thread?.archivedAt,
+              isThreadLocked: !!thread?.lockedAt,
+              isThreadTopicGated: isRestrictedMembership,
+            });
 
-          return (
-            <ThreadCard
-              key={thread?.id + '-' + thread.readOnly}
-              thread={thread}
-              canReact={!disabledActionsTooltipText}
-              canComment={!disabledActionsTooltipText}
-              onEditStart={() => navigate(`${discussionLink}`)}
-              onStageTagClick={() => {
-                navigate(`/discussions?stage=${thread.stage}`);
-              }}
-              threadHref={`${getScopePrefix()}${discussionLink}`}
-              onBodyClick={() => {
-                const scrollEle = document.getElementsByClassName('Body')[0];
+            return (
+              <ThreadCard
+                key={thread?.id + '-' + thread.readOnly}
+                thread={thread}
+                canReact={!disabledActionsTooltipText}
+                canComment={!disabledActionsTooltipText}
+                onEditStart={() => navigate(`${discussionLink}`)}
+                onStageTagClick={() => {
+                  navigate(`/discussions?stage=${thread.stage}`);
+                }}
+                threadHref={`${getScopePrefix()}${discussionLink}`}
+                onBodyClick={() => {
+                  const scrollEle = document.getElementsByClassName('Body')[0];
 
-                localStorage[`${community_id}-discussions-scrollY`] =
-                  scrollEle.scrollTop;
-              }}
-              onCommentBtnClick={() =>
-                navigate(`${discussionLink}?focusEditor=true`)
-              }
-              disabledActionsTooltipText={disabledActionsTooltipText}
-            />
-          );
-        }}
-        endReached={() => hasNextPage && fetchNextPage()}
-        overscan={200}
-        components={{
-          // eslint-disable-next-line react/no-multi-comp
-          EmptyPlaceholder: () => (
-            <EmptyThreadsPlaceholder
-              isInitialLoading={isInitialLoading}
-              isOnArchivePage={isOnArchivePage}
-            />
-          ),
-          // eslint-disable-next-line react/no-multi-comp
-          Header: () => (
-            <>
-              {isWindowSmallInclusive && (
-                <div className="mobileBreadcrumbs">
-                  <Breadcrumbs />
-                </div>
-              )}
-              <HeaderWithFilters
-                topic={topicName}
-                stage={stageName}
-                featuredFilter={featuredFilter}
-                dateRange={dateRange}
-                totalThreadCount={
-                  isOnArchivePage
-                    ? filteredThreads.length || 0
-                    : threads
-                    ? totalThreadsInCommunity
-                    : 0
+                  localStorage[`${community_id}-discussions-scrollY`] =
+                    scrollEle.scrollTop;
+                }}
+                onCommentBtnClick={() =>
+                  navigate(`${discussionLink}?focusEditor=true`)
                 }
-                isIncludingSpamThreads={includeSpamThreads}
-                onIncludeSpamThreads={setIncludeSpamThreads}
-                isIncludingArchivedThreads={includeArchivedThreads}
-                onIncludeArchivedThreads={setIncludeArchivedThreads}
+                disabledActionsTooltipText={disabledActionsTooltipText}
+              />
+            );
+          }}
+          endReached={(index) => {
+            console.log('index', index);
+            hasNextPage && fetchNextPage();
+          }}
+          overscan={50}
+          components={{
+            // eslint-disable-next-line react/no-multi-comp
+            EmptyPlaceholder: () => (
+              <EmptyThreadsPlaceholder
+                isInitialLoading={isInitialLoading}
                 isOnArchivePage={isOnArchivePage}
               />
-            </>
-          ),
-        }}
-      />
-    </div>
+            ),
+            // eslint-disable-next-line react/no-multi-comp
+            Header: () => (
+              <>
+                {isWindowSmallInclusive && (
+                  <div className="mobileBreadcrumbs">
+                    <Breadcrumbs />
+                  </div>
+                )}
+                <HeaderWithFilters
+                  topic={topicName}
+                  stage={stageName}
+                  featuredFilter={featuredFilter}
+                  dateRange={dateRange}
+                  totalThreadCount={
+                    isOnArchivePage
+                      ? filteredThreads.length || 0
+                      : threads
+                      ? totalThreadsInCommunity
+                      : 0
+                  }
+                  isIncludingSpamThreads={includeSpamThreads}
+                  onIncludeSpamThreads={setIncludeSpamThreads}
+                  isIncludingArchivedThreads={includeArchivedThreads}
+                  onIncludeArchivedThreads={setIncludeArchivedThreads}
+                  isOnArchivePage={isOnArchivePage}
+                />
+              </>
+            ),
+          }}
+        />
+      </div>
+    </CWPageLayout>
   );
 };
 
