@@ -9,7 +9,10 @@ import type {
 import assert from 'assert';
 import { configure } from 'safe-stable-stringify';
 import { CANVAS_TOPIC } from './constants';
-import { constructCosmosSignerCWClass } from './sessionSigners';
+import {
+  constructCosmosSignerCWClass,
+  constructSubstrateSignerCWClass,
+} from './sessionSigners';
 export const stringify = configure({
   bigint: false,
   circularValue: Error,
@@ -23,7 +26,8 @@ export const stringify = configure({
 export const getSessionSigners = async () => {
   const { SIWESigner } = await import('@canvas-js/chain-ethereum');
   const CosmosSignerCW = await constructCosmosSignerCWClass();
-  return [new SIWESigner(), new CosmosSignerCW()];
+  const SubstrateSignerCW = await constructSubstrateSignerCWClass();
+  return [new SIWESigner(), new CosmosSignerCW(), new SubstrateSignerCW()];
 };
 
 export const getSessionSignerForAddress = async (address: string) => {

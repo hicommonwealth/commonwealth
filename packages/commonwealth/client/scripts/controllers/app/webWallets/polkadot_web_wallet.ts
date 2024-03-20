@@ -5,11 +5,12 @@ import {
 } from '@polkadot/extension-dapp';
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 
-import { SubstrateSigner } from '@canvas-js/chain-substrate';
 import type { SessionSigner } from '@canvas-js/interfaces';
 
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
 
+import { constructSubstrateSignerCWClass } from 'shared/canvas/sessionSigners';
+import { addressSwapper } from 'shared/utils';
 import app from 'state';
 import IWebWallet from '../../../models/IWebWallet';
 
@@ -48,8 +49,16 @@ class PolkadotWebWalletController
   public async getSessionSigner(): Promise<SessionSigner> {
     const accounts = await web3Accounts();
     const address = accounts[0].address;
-    const extension = await web3FromAddress(address);
-    return new SubstrateSigner({ extension });
+
+    const reencodedAddress = addressSwapper({
+      address,
+      currentPrefix: 42,
+    });
+
+    const extension = await web3FromAddress(reencodedAddress);
+    const SubstrateSignerCW = await constructSubstrateSignerCWClass();
+    // @ts-ignore
+    return new SubstrateSignerCW({ extension });
   }
 
   public getChainId() {

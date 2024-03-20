@@ -22,6 +22,7 @@ import { models } from '@hicommonwealth/model';
 import app from '../../server-test';
 
 import { Link, LinkSource, ThreadAttributes } from '@hicommonwealth/model';
+import { constructSubstrateSignerCWClass } from 'shared/canvas/sessionSigners';
 import { TEST_BLOCK_INFO_STRING } from '../../shared/adapters/chain/ethereum/keys';
 
 // This is an ugly hack, but then so is the JavaScript ecosystem
@@ -97,11 +98,8 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     };
   }
   if (chain === 'edgeware') {
-    // @ts-ignore
-    const { SubstrateSigner } = await importEsmModule(
-      '@canvas-js/chain-substrate',
-    );
-    const sessionSigner = new SubstrateSigner();
+    const SubstrateSignerCW = await constructSubstrateSignerCWClass();
+    const sessionSigner = new SubstrateSignerCW();
     const session = await sessionSigner.getSession(CANVAS_TOPIC, { timestamp });
     const wallet_id = 'polkadot';
     let res = await chai.request

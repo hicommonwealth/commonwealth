@@ -23,3 +23,17 @@ export async function constructCosmosSignerCWClass() {
   }
   return CosmosSignerCW;
 }
+
+export async function constructSubstrateSignerCWClass() {
+  const { SubstrateSigner } = await import('@canvas-js/chain-substrate');
+
+  class SubstrateSignerCW extends SubstrateSigner {
+    protected getSessionKey = (topic: string, address: string) => {
+      const walletAddress = address.split(':')[2];
+      const cwAddress = `polkadot:42:${walletAddress}`;
+      return `canvas/${topic}/${cwAddress}`;
+    };
+  }
+
+  return SubstrateSignerCW;
+}

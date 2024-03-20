@@ -10,6 +10,7 @@ import {
 import { constructCosmosSignerCWClass } from 'shared/canvas/sessionSigners';
 import { CanvasSignResult } from 'shared/canvas/types';
 import { getSessionSigners } from 'shared/canvas/verify';
+import { addressSwapper } from 'shared/utils';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
 
@@ -105,12 +106,12 @@ async function sign(
       let lookupAddress = address;
 
       if (app.chain.base == ChainBase.Substrate) {
+        const chainIdFromAddress = address.split(':')[1];
         const swappedWalletAddress = addressSwapper({
           address: address.split(':')[2],
           currentPrefix: 42,
         });
-        lookupAddress = `polkadot:42:${swappedWalletAddress}`;
-        console.log(`Substrate address (swapped): ${address}`);
+        lookupAddress = `polkadot:${chainIdFromAddress}:${swappedWalletAddress}`;
       }
 
       const { session } = signer.getCachedSession(CANVAS_TOPIC, lookupAddress);
@@ -130,7 +131,7 @@ async function sign(
         topic: CANVAS_TOPIC,
         payload: {
           type: 'action' as const,
-          address,
+          address: session.address,
           blockhash: null,
           name: call,
           args,
