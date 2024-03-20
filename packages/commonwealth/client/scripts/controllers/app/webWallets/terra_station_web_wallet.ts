@@ -1,8 +1,8 @@
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
 import type IWebWallet from '../../../models/IWebWallet';
 
-import { CosmosSigner } from '@canvas-js/chain-cosmos';
 import type { SessionSigner } from '@canvas-js/interfaces';
+import { constructCosmosSignerCWClass } from 'shared/canvas/sessionSigners';
 
 type TerraAddress = {
   address: string;
@@ -81,7 +81,8 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
   }
 
   public async getSessionSigner(): Promise<SessionSigner> {
-    return new CosmosSigner({
+    const CosmosSignerCW = await constructCosmosSignerCWClass();
+    return new CosmosSignerCW({
       signer: {
         type: 'bytes',
         signBytes: async (message) => {

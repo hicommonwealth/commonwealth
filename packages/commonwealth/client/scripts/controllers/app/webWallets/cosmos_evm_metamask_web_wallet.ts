@@ -5,7 +5,7 @@ import { setActiveAccount } from 'controllers/app/login';
 import app from 'state';
 import type Web3 from 'web3';
 
-import { CosmosSigner } from '@canvas-js/chain-cosmos';
+import { constructCosmosSignerCWClass } from 'shared/canvas/sessionSigners';
 import type {
   RLPEncodedTransaction,
   TransactionConfig,
@@ -82,7 +82,8 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
   }
 
   public async getSessionSigner() {
-    return new CosmosSigner({
+    const CosmosSignerCW = await constructCosmosSignerCWClass();
+    return new CosmosSignerCW({
       signer: {
         type: 'ethereum',
         signEthereum: (

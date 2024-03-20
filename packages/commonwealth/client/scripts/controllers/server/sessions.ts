@@ -3,7 +3,11 @@ import { CANVAS_TOPIC } from 'canvas';
 
 import { ChainBase, WalletSsoSource } from '@hicommonwealth/core';
 import app from 'client/scripts/state';
-import { chainBaseToCaip2 } from 'shared/canvas/chainMappings';
+import {
+  chainBaseToCaip2,
+  chainBaseToCanvasChainId,
+} from 'shared/canvas/chainMappings';
+import { constructCosmosSignerCWClass } from 'shared/canvas/sessionSigners';
 import { CanvasSignResult } from 'shared/canvas/types';
 import { getSessionSigners } from 'shared/canvas/verify';
 import Account from '../../models/Account';
@@ -41,8 +45,8 @@ export const getMagicCosmosSessionSigner = async (
   address: string,
   chainId: string,
 ) => {
-  const { CosmosSigner } = await import('@canvas-js/chain-cosmos');
-  return new CosmosSigner({
+  const CosmosSignerCW = await constructCosmosSignerCWClass();
+  return new CosmosSignerCW({
     signer: {
       type: 'amino',
       getAddress: async () => address,
@@ -76,8 +80,9 @@ function getCaip2Address(address: string) {
     app.chain.base === ChainBase.CosmosSDK
       ? app.chain?.meta.bech32Prefix || 'cosmos'
       : app.chain?.meta.node?.ethChainId || 1;
+  const canvasChainId = chainBaseToCanvasChainId(app.chain.base, idOrPrefix);
 
-  return `${caip2Prefix}:${idOrPrefix}:${address}`;
+  return `${caip2Prefix}:${canvasChainId}:${address}`;
 }
 
 // Sign an arbitrary action, using context from the last authSession() call.
@@ -97,7 +102,18 @@ async function sign(
   const sessionSigners = await getSessionSigners();
   for (const signer of sessionSigners) {
     if (signer.match(address)) {
-      const { session } = signer.getCachedSession(CANVAS_TOPIC, address);
+      let lookupAddress = address;
+
+      if (app.chain.base == ChainBase.Substrate) {
+        const swappedWalletAddress = addressSwapper({
+          address: address.split(':')[2],
+          currentPrefix: 42,
+        });
+        lookupAddress = `polkadot:42:${swappedWalletAddress}`;
+        console.log(`Substrate address (swapped): ${address}`);
+      }
+
+      const { session } = signer.getCachedSession(CANVAS_TOPIC, lookupAddress);
 
       const sessionMessage: Message<Session> = {
         clock: 0,

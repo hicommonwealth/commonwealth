@@ -5,8 +5,8 @@ import type {
 } from '@cosmjs/proto-signing';
 import type { ChainInfo } from '@keplr-wallet/types';
 
-import { CosmosSigner } from '@canvas-js/chain-cosmos';
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
+import { constructCosmosSignerCWClass } from 'shared/canvas/sessionSigners';
 import app from 'state';
 import IWebWallet from '../../../models/IWebWallet';
 
@@ -84,7 +84,8 @@ class KeplrLikeWebWalletController implements IWebWallet<AccountData> {
   }
 
   public async getSessionSigner() {
-    return new CosmosSigner({
+    const CosmosSignerCW = await constructCosmosSignerCWClass();
+    return new CosmosSignerCW({
       signer: {
         type: 'amino',
         signAmino: window.wallet.signAmino,

@@ -3,8 +3,8 @@ import type {
   WalletController,
 } from '@terra-money/wallet-provider';
 
-import { CosmosSigner } from '@canvas-js/chain-cosmos';
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
+import { constructCosmosSignerCWClass } from 'shared/canvas/sessionSigners';
 import IWebWallet from '../../../models/IWebWallet';
 
 // TODO: ensure this only opens on mobile
@@ -62,7 +62,8 @@ class TerraWalletConnectWebWalletController
   }
 
   public async getSessionSigner() {
-    return new CosmosSigner({
+    const CosmosSignerCW = await constructCosmosSignerCWClass();
+    return new CosmosSignerCW({
       signer: {
         type: 'bytes',
         getAddress: async () => this._accounts[0].address,
