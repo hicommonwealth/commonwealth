@@ -1,6 +1,14 @@
-import { logger } from '@hicommonwealth/core';
+import { dispose, logger } from '@hicommonwealth/core';
 import * as dotenv from 'dotenv';
-import { DataTypes, Sequelize } from 'sequelize';
+import path from 'node:path';
+import {
+  DataTypes,
+  Model,
+  ModelStatic,
+  QueryTypes,
+  Sequelize,
+} from 'sequelize';
+import { SequelizeStorage, Umzug } from 'umzug';
 import type { DB, Models } from './models';
 import AddressFactory from './models/address';
 import BanFactory from './models/ban';
@@ -141,3 +149,97 @@ Object.keys(_models).forEach((key) => {
   const model = _models[key as keyof Models];
   'associate' in model && model.associate(models);
 });
+
+/**
+ * Verifies the existence of TEST_DB_NAME on the server,
+ * creating a fresh instance if it doesn't exist.
+ */
+const verify_testdb = async () => {
+  let server: Sequelize | undefined = undefined;
+  try {
+    server = new Sequelize('postgresql://commonwealth:edgeware@localhost', {
+      logging: false,
+    });
+    const [{ count }] = await server.query<{ count: number }>(
+      `SELECT COUNT(*) FROM pg_database WHERE datname = '${TEST_DB_NAME}'`,
+      { type: QueryTypes.SELECT },
+    );
+    if (!+count) await server.query(`CREATE DATABASE ${TEST_DB_NAME};`);
+  } catch (error) {
+    console.error('Error bootstrapping test db:', error);
+    throw error;
+  } finally {
+    server && server.close();
+  }
+};
+
+/**
+ * Executes migrations on existing sequelize instance
+ * @param instance sequelize instance
+ */
+export const migrate_db = async (instance: Sequelize) => {
+  const umzug = new Umzug({
+    // TODO: move sequelize config and migrations to libs/model
+    migrations: {
+      glob: path.join(
+        __dirname,
+        '../../../packages/commonwealth/server/migrations/*.js',
+      ),
+      // migration resolver since we use v2 migration interface
+      resolve: ({ name, path, context }) => {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const migration = require(path!);
+        return {
+          name,
+          up: async () => migration.up(context, Sequelize),
+          down: async () => migration.down(context, Sequelize),
+        };
+      },
+    },
+    context: instance.getQueryInterface(),
+    storage: new SequelizeStorage({ sequelize: instance }),
+    logger: console,
+  });
+  await umzug.up();
+  Umzug.defaultResolver;
+};
+
+/**
+ * TODO: Validates if existing sequelize model is in sync with migrations
+ * - Create database A from migrations
+ * - Create database B from model (sync)
+ * - Compare schemas A & B for differences
+ */
+export const verify_model_vs_migrations = async () => {
+  return Promise.resolve();
+};
+
+/**
+ * Standard test bootstrapping
+ */
+let testing_bootstrapped = false;
+const testing = DATABASE_URI.endsWith(TEST_DB_NAME);
+
+/**
+ * Bootstraps testing, by verifying the existence of TEST_DB_NAME on the server,
+ * and creating/migrating a fresh instance if it doesn't exist.
+ */
+export const bootstrap_testing = async () => {
+  if (!testing_bootstrapped && testing) {
+    testing_bootstrapped = true;
+    await verify_testdb();
+    await migrate_db(sequelize);
+
+    // register hook to truncate db after calling dispose()()
+    dispose(async () => {
+      console.warn(`Truncating ${TEST_DB_NAME}...`);
+      const tables = Object.entries(models)
+        .filter(([k]) => !k.endsWith('equelize'))
+        .map(([, v]) => `"${(v as ModelStatic<Model>).tableName}"`)
+        .join(',');
+      await sequelize.query(
+        `TRUNCATE TABLE ${tables} RESTART IDENTITY CASCADE;`,
+      );
+    });
+  }
+};

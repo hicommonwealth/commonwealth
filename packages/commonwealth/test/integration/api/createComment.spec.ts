@@ -1,9 +1,8 @@
 import { dispose } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { models, tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import { seedDb } from '../../../../../libs/model/src/test';
 import app from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import { Errors } from '../../../server/routes/threads/create_thread_comment_handler';
@@ -80,7 +79,7 @@ describe('createComment Integration Tests', () => {
   before(async () => {
     // TODO: Notification categories and subscriptions are completely out of sync with schemas!!!
     // FIXME: This test was relying on data created by other tests
-    await seedDb();
+    await tester.seedDb();
   });
 
   after(async () => {
