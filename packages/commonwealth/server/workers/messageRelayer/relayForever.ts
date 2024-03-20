@@ -4,7 +4,7 @@ import { MESSAGE_RELAYER_TIMEOUT_MS } from '../../config';
 import { relay } from './relay';
 
 const log = logger(PinoLogger()).getLogger(__filename);
-let numUnrelayedEvents = 0;
+export let numUnrelayedEvents = 0;
 
 export function incrementNumUnrelayedEvents(numEvents: number) {
   numUnrelayedEvents += numEvents;
