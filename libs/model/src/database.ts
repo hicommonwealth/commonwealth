@@ -201,7 +201,6 @@ export const migrate_db = async (instance: Sequelize) => {
     logger: console,
   });
   await umzug.up();
-  Umzug.defaultResolver;
 };
 
 /**

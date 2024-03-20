@@ -6,12 +6,11 @@ import {
   CosmosGovernanceVersion,
   NotificationCategories,
 } from '@hicommonwealth/core';
-import { seed } from './seed';
 
 /**
  * Legacy test seeder
  *
- * @deprecated Use {@link seed} instead
+ * @deprecated Use `seed` from `libs/model/src/tester/seed.ts` instead
  *
  * Seeding entities in bulk obscures many specific details required for each test,
  * such as associated IDs and seed values. Additionally, not all tests require every
