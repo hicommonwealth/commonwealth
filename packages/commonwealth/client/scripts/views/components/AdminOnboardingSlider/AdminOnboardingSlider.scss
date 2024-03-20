@@ -5,12 +5,6 @@
   display: flex;
   gap: 16px;
   flex-direction: column;
-  padding: 40px;
-  padding-bottom: 0px;
-
-  @include smallInclusive {
-    padding: 16px;
-  }
 
   .header {
     display: flex;
