@@ -22,10 +22,6 @@ const BASE_ADDRESS_FILTER = {
   value: '',
 };
 
-const FILTERS = {
-  ALL_ADDRESSES: 'All addresses',
-} as const;
-
 const MyCommunityStake = () => {
   const { isLoggedIn } = useUserLoggedIn();
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
