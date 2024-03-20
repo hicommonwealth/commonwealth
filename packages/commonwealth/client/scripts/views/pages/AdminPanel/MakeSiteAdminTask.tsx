@@ -65,7 +65,7 @@ const MakeSiteAdminTask = () => {
       <CWText type="h4">Make Site Admin</CWText>
       <CWText type="caption">
         Makes a user (corresponding to a specified address) a site-wide admin.
-        Don't do this unless you know what you're doing.
+        Don&apos;t do this unless you know what you&apos;re doing.
       </CWText>
       <div className="TaskRow">
         <CWTextInput

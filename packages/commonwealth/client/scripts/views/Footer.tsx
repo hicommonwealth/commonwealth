@@ -52,6 +52,7 @@ export const Footer = () => {
               className="footer-link"
               key={item.text}
               href={item.externalLink}
+              rel="noreferrer"
               target="_blank"
             >
               {item.text}

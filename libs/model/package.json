@@ -15,8 +15,8 @@
   },
   "dependencies": {
     "@anatine/zod-mock": "^3.13.3",
-    "@cosmjs/stargate": "^0.31.3",
-    "@cosmjs/tendermint-rpc": "^0.31.3",
+    "@cosmjs/stargate": "^0.32.3",
+    "@cosmjs/tendermint-rpc": "^0.32.3",
     "@faker-js/faker": "^8.4.1",
     "mocha-steps": "^1.3.0",
     "node-object-hash": "^3.0.0",
