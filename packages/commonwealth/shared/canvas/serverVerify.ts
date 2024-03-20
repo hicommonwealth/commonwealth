@@ -38,8 +38,18 @@ export const verifyComment = async (args: CanvasSignedDataApiArgs, fields) => {
     'comment',
     'parent',
   );
+
+  // TODO: Can this be moved somewhere where it doesn't need to be repeated?
+  let addressToCompare = address;
+  if (actionMessage.payload.address.split(':')[0] == 'polkadot') {
+    addressToCompare = addressSwapper({
+      currentPrefix: 42,
+      address: address,
+    });
+  }
+
   assertMatches(
-    address,
+    addressToCompare,
     actionMessage.payload.address.split(':')[2],
     'comment',
     'origin',
@@ -107,8 +117,17 @@ export const verifyReaction = async (args: CanvasSignedDataApiArgs, fields) => {
     'Invalid signed reaction (identifier)',
   );
   assertMatches(value, actionMessage.payload.args.value, 'reaction', 'value');
+
+  let addressToCompare = address;
+  if (actionMessage.payload.address.split(':')[0] == 'polkadot') {
+    addressToCompare = addressSwapper({
+      currentPrefix: 42,
+      address: address,
+    });
+  }
+
   assertMatches(
-    address,
+    addressToCompare,
     actionMessage.payload.address.split(':')[2],
     'reaction',
     'origin',
