@@ -1,8 +1,9 @@
 import { formatAddressShort } from 'helpers';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import CommunityInfo from '../common/CommunityInfo';
 import { stakeHistoryData } from '../common/sampleData'; // TODO: get data from API
+import { FilterOptions } from '../types';
 import './Stakes.scss';
 import { CWIcon } from '/views/components/component_kit/cw_icons/cw_icon';
 import { CWTable } from '/views/components/component_kit/new_designs/CWTable';
@@ -48,12 +49,34 @@ const columnInfo = [
   },
 ];
 
-const Stakes = () => {
+type StakesProps = {
+  filterOptions: FilterOptions;
+};
+
+const Stakes = ({ filterOptions }: StakesProps) => {
+  const [filteredStakeHistoryData, setFilteredStakeHistoryData] =
+    useState(stakeHistoryData);
+
+  useEffect(() => {
+    let tempFilteredData = [...stakeHistoryData];
+
+    // check if community name and symbol contains 'searchText'
+    if (filterOptions.searchText) {
+      tempFilteredData = tempFilteredData.filter((tx) =>
+        (tx.community.symbol + tx.community.name)
+          .toLowerCase()
+          .includes(filterOptions.searchText.toLowerCase()),
+      );
+    }
+
+    setFilteredStakeHistoryData(tempFilteredData);
+  }, [filterOptions.searchText]);
+
   return (
     <section className="Stakes">
       <CWTable
         columnInfo={columnInfo}
-        rowData={stakeHistoryData.map((tx) => ({
+        rowData={filteredStakeHistoryData.map((tx) => ({
           ...tx,
           community: {
             sortValue: tx.community.name.toLowerCase(),

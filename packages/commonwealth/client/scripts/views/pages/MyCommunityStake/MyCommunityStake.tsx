@@ -1,16 +1,18 @@
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import React, { useState } from 'react';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
-import { CWSearchBar } from '../../components/component_kit/new_designs/CWSearchBar';
 import { CWSelectList } from '../../components/component_kit/new_designs/CWSelectList';
 import {
   CWTab,
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
+import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
 import { PageNotFound } from '../404';
 import './MyCommunityStake.scss';
 import Stakes from './Stakes';
 import Transactions from './Transactions';
+import { FilterOptions } from './types';
 
 const TABS = ['My stake', 'Transaction history'] as const;
 
@@ -22,6 +24,9 @@ const MyCommunityStake = () => {
   const { isLoggedIn } = useUserLoggedIn();
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
   const [activeFilter, setActiveFilter] = useState<any>(FILTERS.ALL_ADDRESSES);
+  const [filterOptions, setFilterOptions] = useState<FilterOptions>({
+    searchText: '',
+  });
 
   if (!isLoggedIn) return <PageNotFound />;
 
@@ -32,7 +37,20 @@ const MyCommunityStake = () => {
       </CWText>
 
       <section className="filters">
-        <CWSearchBar placeholder="Search community name or symbol" />
+        <CWTextInput
+          size="large"
+          fullWidth
+          placeholder="Search community name or symbol"
+          containerClassName="search-input-container"
+          inputClassName="search-input"
+          iconLeft={<CWIcon iconName="search" className="search-icon" />}
+          onInput={(e) =>
+            setFilterOptions((options) => ({
+              ...options,
+              searchText: e.target.value?.trim(),
+            }))
+          }
+        />
         <div className="select-list-container">
           <CWText fontWeight="medium">Filter</CWText>
           <CWSelectList
@@ -59,7 +77,11 @@ const MyCommunityStake = () => {
         ))}
       </CWTabsRow>
 
-      {activeTabIndex === 0 ? <Stakes /> : <Transactions />}
+      {activeTabIndex === 0 ? (
+        <Stakes filterOptions={filterOptions} />
+      ) : (
+        <Transactions />
+      )}
     </section>
   );
 };
