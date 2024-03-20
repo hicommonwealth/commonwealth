@@ -16,7 +16,7 @@ import {
   toggleDarkMode,
 } from 'views/components/component_kit/cw_toggle';
 
-import { OpenFeature } from '@openfeature/web-sdk';
+import { useFlag } from 'hooks/useFlag';
 import UserMenuItem from './UserMenuItem';
 import useCheckAuthenticatedAddresses from './useCheckAuthenticatedAddresses';
 
@@ -112,11 +112,7 @@ const useUserMenuItems = ({
     },
   );
 
-  const client = OpenFeature.getClient();
-  const myCommunityStakePageEnabled = client.getBooleanValue(
-    'myCommunityStakePageEnabled',
-    false,
-  );
+  const myCommunityStakePageEnabled = useFlag('myCommunityStakePageEnabled');
 
   return [
     ...(app.user.activeAccounts.length > 0
