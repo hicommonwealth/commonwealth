@@ -16,7 +16,7 @@ module.exports = {
         { transaction },
       );
 
-      await queryinterface.query(
+      await queryInterface.query(
         `
         CREATE TRIGGER outbox_insert_trigger
         AFTER INSERT ON "Outbox"
