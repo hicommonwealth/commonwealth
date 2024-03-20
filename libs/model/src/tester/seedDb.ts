@@ -6,6 +6,7 @@ import {
   CosmosGovernanceVersion,
   NotificationCategories,
 } from '@hicommonwealth/core';
+import { bootstrap_testing } from './bootstrap';
 
 /**
  * Legacy test seeder
@@ -18,11 +19,7 @@ import {
  */
 export const seedDb = async (): Promise<void> => {
   try {
-    const { bootstrap_testing, models, DATABASE_URI, TEST_DB_NAME } =
-      await import('..');
-    if (!DATABASE_URI.endsWith(TEST_DB_NAME))
-      throw new Error('Seeds only work when testing!');
-    await bootstrap_testing();
+    const models = await bootstrap_testing();
 
     const [drew] = await models.User.bulkCreate([
       {

@@ -1,79 +1,22 @@
 import { dispose, logger } from '@hicommonwealth/core';
-import * as dotenv from 'dotenv';
-import path from 'node:path';
-import {
-  DataTypes,
-  Model,
-  ModelStatic,
-  QueryTypes,
-  Sequelize,
-} from 'sequelize';
-import { SequelizeStorage, Umzug } from 'umzug';
-import type { DB, Models } from './models';
-import AddressFactory from './models/address';
-import BanFactory from './models/ban';
-import ChainNodeFactory from './models/chain_node';
-import CollaborationFactory from './models/collaboration';
-import CommentFactory from './models/comment';
-import ChainFactory from './models/community';
-import CommunityBannerFactory from './models/community_banner';
-import CommunityContractFactory from './models/community_contract';
-import CommunityContractTemplateMetadataFactory from './models/community_contract_metadata';
-import CommunityContractTemplateFactory from './models/community_contract_template';
-import CommunitySnapshotSpaceFactory from './models/community_snapshot_spaces';
-import CommunityStakeFactory from './models/community_stake';
-import ContractFactory from './models/contract';
-import ContractAbiFactory from './models/contract_abi';
-import DiscordBotConfigFactory from './models/discord_bot_config';
-import EvmEventSourceFactory from './models/evmEventSource';
-import GroupFactory from './models/group';
-import LastProcessedEvmBlockFactory from './models/lastProcessedEvmBlock';
-import LoginTokenFactory from './models/login_token';
-import MembershipFactory from './models/membership';
-import NotificationFactory from './models/notification';
-import NotificationCategoryFactory from './models/notification_category';
-import NotificationsReadFactory from './models/notifications_read';
-import OutboxFactory from './models/outbox';
-import PollFactory from './models/poll';
-import ProfileFactory from './models/profile';
-import ReactionFactory from './models/reaction';
-import SnapshotProposalFactory from './models/snapshot_proposal';
-import SnapshotSpaceFactory from './models/snapshot_spaces';
-import SsoTokenFactory from './models/sso_token';
-import StarredCommunityFactory from './models/starred_community';
-import SubscriptionFactory from './models/subscription';
-import TemplateFactory from './models/template';
-import ThreadFactory from './models/thread';
-import TopicFactory from './models/topic';
-import UserModelFactory from './models/user';
-import VoteFactory from './models/vote';
-import WebhookFactory from './models/webhook';
-
-dotenv.config();
+import { Model, ModelStatic, Sequelize } from 'sequelize';
+import { DATABASE_URI, TESTING } from './config';
+import { buildDb } from './models';
 
 const log = logger().getLogger(__filename);
 
-export const TEST_DB_NAME = 'common_test';
-export const DATABASE_URI =
-  process.env.NODE_ENV === 'test'
-    ? `postgresql://commonwealth:edgeware@localhost/${TEST_DB_NAME}`
-    : !process.env.DATABASE_URL || process.env.NODE_ENV === 'development'
-    ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
-    : process.env.DATABASE_URL;
-
 !process.env.DATABASE_URL &&
   process.env.NODE_ENV !== 'production' &&
-  log.warn(`NODE_ENV=${process.env.NODE_ENV} DB_URI=${DATABASE_URI}`);
+  console.warn(`NODE_ENV=${process.env.NODE_ENV} DB_URI=${DATABASE_URI}`);
 
 export const sequelize = new Sequelize(DATABASE_URI, {
   // disable string operators (https://github.com/sequelize/sequelize/issues/8417)
   // operatorsAliases: false,
-  logging:
-    process.env.NODE_ENV === 'test'
-      ? false
-      : (msg) => {
-          log.trace(msg);
-        },
+  logging: TESTING
+    ? false
+    : (msg) => {
+        log.trace(msg);
+      },
   dialectOptions:
     process.env.NODE_ENV !== 'production' || process.env.NO_SSL
       ? { requestTimeout: 40000 }
@@ -89,156 +32,14 @@ export const sequelize = new Sequelize(DATABASE_URI, {
   },
 });
 
-const _models: Models = {
-  Address: AddressFactory(sequelize, DataTypes),
-  Ban: BanFactory(sequelize, DataTypes),
-  Community: ChainFactory(sequelize, DataTypes),
-  ChainNode: ChainNodeFactory(sequelize, DataTypes),
-  Collaboration: CollaborationFactory(sequelize, DataTypes),
-  Contract: ContractFactory(sequelize, DataTypes),
-  ContractAbi: ContractAbiFactory(sequelize, DataTypes),
-  CommunityContract: CommunityContractFactory(sequelize, DataTypes),
-  CommunityContractTemplate: CommunityContractTemplateFactory(
-    sequelize,
-    DataTypes,
-  ),
-  CommunityContractTemplateMetadata: CommunityContractTemplateMetadataFactory(
-    sequelize,
-    DataTypes,
-  ),
-  Template: TemplateFactory(sequelize, DataTypes),
-  CommunityBanner: CommunityBannerFactory(sequelize, DataTypes),
-  CommunitySnapshotSpaces: CommunitySnapshotSpaceFactory(sequelize, DataTypes),
-  DiscordBotConfig: DiscordBotConfigFactory(sequelize, DataTypes),
-  EvmEventSource: EvmEventSourceFactory(sequelize, DataTypes),
-  LastProcessedEvmBlock: LastProcessedEvmBlockFactory(sequelize, DataTypes),
-  LoginToken: LoginTokenFactory(sequelize, DataTypes),
-  Notification: NotificationFactory(sequelize, DataTypes),
-  NotificationCategory: NotificationCategoryFactory(sequelize, DataTypes),
-  NotificationsRead: NotificationsReadFactory(sequelize, DataTypes),
-  Comment: CommentFactory(sequelize, DataTypes),
-  Poll: PollFactory(sequelize, DataTypes),
-  Group: GroupFactory(sequelize, DataTypes),
-  Membership: MembershipFactory(sequelize, DataTypes),
-  Reaction: ReactionFactory(sequelize, DataTypes),
-  Thread: ThreadFactory(sequelize, DataTypes),
-  Topic: TopicFactory(sequelize, DataTypes),
-  Vote: VoteFactory(sequelize, DataTypes),
-  Profile: ProfileFactory(sequelize, DataTypes),
-  SsoToken: SsoTokenFactory(sequelize, DataTypes),
-  StarredCommunity: StarredCommunityFactory(sequelize, DataTypes),
-  SnapshotProposal: SnapshotProposalFactory(sequelize, DataTypes),
-  SnapshotSpace: SnapshotSpaceFactory(sequelize, DataTypes),
-  Subscription: SubscriptionFactory(sequelize, DataTypes),
-  User: UserModelFactory(sequelize, DataTypes),
-  Webhook: WebhookFactory(sequelize, DataTypes),
-  CommunityStake: CommunityStakeFactory(sequelize, DataTypes),
-  Outbox: OutboxFactory(sequelize, DataTypes),
-};
+export const models = buildDb(sequelize);
 
-export const models: DB = {
-  sequelize,
-  Sequelize,
-  ..._models,
-};
-
-// setup associations
-Object.keys(_models).forEach((key) => {
-  const model = _models[key as keyof Models];
-  'associate' in model && model.associate(models);
-});
-
-/**
- * Verifies the existence of TEST_DB_NAME on the server,
- * creating a fresh instance if it doesn't exist.
- */
-const verify_testdb = async () => {
-  let server: Sequelize | undefined = undefined;
-  try {
-    server = new Sequelize(
-      'postgresql://commonwealth:edgeware@localhost/postgres',
-      {
-        logging: false,
-      },
-    );
-    const [{ count }] = await server.query<{ count: number }>(
-      `SELECT COUNT(*) FROM pg_database WHERE datname = '${TEST_DB_NAME}'`,
-      { type: QueryTypes.SELECT },
-    );
-    if (!+count) await server.query(`CREATE DATABASE ${TEST_DB_NAME};`);
-  } catch (error) {
-    console.error('Error bootstrapping test db:', error);
-    throw error;
-  } finally {
-    server && server.close();
-  }
-};
-
-/**
- * Executes migrations on existing sequelize instance
- * @param instance sequelize instance
- */
-export const migrate_db = async (instance: Sequelize) => {
-  const umzug = new Umzug({
-    // TODO: move sequelize config and migrations to libs/model
-    migrations: {
-      glob: path.join(
-        __dirname,
-        '../../../packages/commonwealth/server/migrations/*.js',
-      ),
-      // migration resolver since we use v2 migration interface
-      resolve: ({ name, path, context }) => {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const migration = require(path!);
-        return {
-          name,
-          up: async () => migration.up(context, Sequelize),
-          down: async () => migration.down(context, Sequelize),
-        };
-      },
-    },
-    context: instance.getQueryInterface(),
-    storage: new SequelizeStorage({ sequelize: instance }),
-    logger: console,
+// register hook to truncate test db after calling dispose()()
+TESTING &&
+  dispose(async () => {
+    const tables = Object.entries(models)
+      .filter(([k]) => !k.endsWith('equelize'))
+      .map(([, v]) => `"${(v as ModelStatic<Model>).tableName}"`)
+      .join(',');
+    await sequelize.query(`TRUNCATE TABLE ${tables} RESTART IDENTITY CASCADE;`);
   });
-  await umzug.up();
-};
-
-/**
- * TODO: Validates if existing sequelize model is in sync with migrations
- * - Create database A from migrations
- * - Create database B from model (sync)
- * - Compare schemas A & B for differences
- */
-export const verify_model_vs_migrations = async () => {
-  return Promise.resolve();
-};
-
-/**
- * Standard test bootstrapping
- */
-let testing_bootstrapped = false;
-const testing = DATABASE_URI.endsWith(TEST_DB_NAME);
-
-/**
- * Bootstraps testing, by verifying the existence of TEST_DB_NAME on the server,
- * and creating/migrating a fresh instance if it doesn't exist.
- */
-export const bootstrap_testing = async () => {
-  if (!testing_bootstrapped && testing) {
-    testing_bootstrapped = true;
-    await verify_testdb();
-    await migrate_db(sequelize);
-
-    // register hook to truncate db after calling dispose()()
-    dispose(async () => {
-      const tables = Object.entries(models)
-        .filter(([k]) => !k.endsWith('equelize'))
-        .map(([, v]) => `"${(v as ModelStatic<Model>).tableName}"`)
-        .join(',');
-      await sequelize.query(
-        `TRUNCATE TABLE ${tables} RESTART IDENTITY CASCADE;`,
-      );
-    });
-  }
-};
