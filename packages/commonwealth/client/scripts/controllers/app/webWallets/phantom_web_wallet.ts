@@ -34,7 +34,8 @@ class PhantomWebWalletController implements IWebWallet<string> {
   }
 
   public getChainId() {
-    return 'mainnet';
+    // 5ey... is the solana mainnet genesis hash
+    return '5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp';
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

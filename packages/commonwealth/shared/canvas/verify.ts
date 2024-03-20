@@ -11,6 +11,7 @@ import { configure } from 'safe-stable-stringify';
 import { CANVAS_TOPIC } from './constants';
 import {
   constructCosmosSignerCWClass,
+  constructSolanaSignerCWClass,
   constructSubstrateSignerCWClass,
 } from './sessionSigners';
 export const stringify = configure({
@@ -27,7 +28,13 @@ export const getSessionSigners = async () => {
   const { SIWESigner } = await import('@canvas-js/chain-ethereum');
   const CosmosSignerCW = await constructCosmosSignerCWClass();
   const SubstrateSignerCW = await constructSubstrateSignerCWClass();
-  return [new SIWESigner(), new CosmosSignerCW(), new SubstrateSignerCW()];
+  const SolanaSignerCW = await constructSolanaSignerCWClass();
+  return [
+    new SIWESigner(),
+    new CosmosSignerCW(),
+    new SubstrateSignerCW(),
+    new SolanaSignerCW(),
+  ];
 };
 
 export const getSessionSignerForAddress = async (address: string) => {

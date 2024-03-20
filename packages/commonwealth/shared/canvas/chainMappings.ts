@@ -50,8 +50,9 @@ export function chainBaseToCanvasChainId(
     return 'mainnet';
   } else if (chainBase === ChainBase.Solana) {
     // Temporarily locked to mainnet
+    // 5ey... is the solana mainnet genesis hash
     // See also: client/scripts/controllers/app/webWallets/phantom_web_wallet.ts
-    return 'mainnet';
+    return '5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp';
   } else if (chainBase === ChainBase.Substrate) {
     // Temporarily locked to generic Substrate chain id
     // See also: client/scripts/controllers/app/webWallets/polkadot_web_wallet.ts
