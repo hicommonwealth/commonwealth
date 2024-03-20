@@ -151,13 +151,7 @@ const CommunityMembersPage = () => {
         id: p.id,
         avatarUrl: p.avatar_url,
         name: p.profile_name || 'Anonymous',
-        role: p.roles.find(
-          (role) =>
-            role.chain_id === app.activeChainId() &&
-            [Permissions.ROLES.ADMIN, Permissions.ROLES.MODERATOR].includes(
-              role.permission,
-            ),
-        )?.permission,
+        role: p.roles[0],
         groups: (p.group_ids || [])
           .map(
             (groupId) =>
@@ -165,6 +159,7 @@ const CommunityMembersPage = () => {
           )
           .filter(Boolean)
           .sort((a, b) => a.localeCompare(b)),
+        stakeBalance: p.addresses[0].stake_balance,
       }))
       .filter((p) =>
         debouncedSearchTerm
@@ -377,6 +372,9 @@ const CommunityMembersPage = () => {
             }
           }}
           isLoadingMoreMembers={isLoadingMembers}
+          isStakedCommunity={
+            !!app.config.chains.getById(app.activeChainId()).namespace
+          }
         />
       )}
     </section>
