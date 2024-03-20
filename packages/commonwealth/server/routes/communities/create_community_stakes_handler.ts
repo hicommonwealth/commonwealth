@@ -86,16 +86,13 @@ export const createCommunityStakeHandler = async (
 
   // since the stake is already created, generate group in background
   // so this request doesn't fail
-  const { groups, created } = await command(
-    Community.GenerateStakeholderGroups(),
-    {
-      id: community.id,
-      actor: {
-        user: undefined,
-      },
-      payload: {},
+  await command(Community.GenerateStakeholderGroups(), {
+    id: community.id,
+    actor: {
+      user: undefined,
     },
-  ).catch((err) => console.error(err));
+    payload: {},
+  }).catch((err) => console.error(err));
 
   return success(res, results);
 };
