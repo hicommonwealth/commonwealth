@@ -141,7 +141,6 @@ import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
 import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
 import { updateChainNodeHandler } from 'server/routes/communities/update_chain_node_handler';
-import { getCommunityMembersHandler } from 'server/routes/profiles/get_community_members_handler';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
 import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
 import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_handler';
@@ -348,13 +347,6 @@ function setupRouter(
     'get',
     '/communities',
     getCommunitiesHandler.bind(this, serverControllers),
-  );
-
-  registerRoute(
-    router,
-    'get',
-    '/members',
-    getCommunityMembersHandler.bind(this, serverControllers),
   );
 
   registerRoute(

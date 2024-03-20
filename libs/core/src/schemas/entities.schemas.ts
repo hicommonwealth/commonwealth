@@ -79,7 +79,7 @@ export const Address = z.object({
 export const CommunityMember = z.object({
   id: z.number().int(),
   user_id: z.number().int(),
-  profile_name: z.string(),
+  profile_name: z.string().optional().nullable(),
   avatar_url: z.string().optional().nullable(),
   addresses: z.array(
     z.object({
@@ -89,7 +89,7 @@ export const CommunityMember = z.object({
       stake_balance: z.string().optional(),
     }),
   ),
-  roles: z.array(z.unknown()).optional(),
+  roles: z.array(z.string()).optional(),
   group_ids: z.array(z.number().int()),
 });
 
