@@ -95,7 +95,7 @@ export const createCommunityStakeHandler = async (
       },
       payload: {},
     },
-  );
+  ).catch((err) => console.error(err));
 
   return success(res, results);
 };
