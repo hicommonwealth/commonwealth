@@ -2,6 +2,7 @@ name: CI
 
 env:
   ROLLBAR_ENV: 'GitHubCI'
+  NODE_ENV: 'test'
 
 on:
   pull_request:
@@ -22,10 +23,10 @@ jobs:
 
     services:
       postgres:
-        image: postgres
+        image: hicommonwealth/cw_postgres:latest
         env:
           POSTGRES_USER: commonwealth
-          POSTGRES_DB: commonwealth
+          POSTGRES_DB: common_test
           POSTGRES_PASSWORD: edgeware
         # Set health checks to wait until postgres has started
         options: >-
@@ -113,10 +114,10 @@ jobs:
 
     services:
       postgres:
-        image: postgres
+        image: hicommonwealth/cw_postgres:latest
         env:
           POSTGRES_USER: commonwealth
-          POSTGRES_DB: commonwealth
+          POSTGRES_DB: common_test
           POSTGRES_PASSWORD: edgeware
         # Set health checks to wait until postgres has started
         options: >-
@@ -203,10 +204,10 @@ jobs:
 
     services:
       postgres:
-        image: postgres
+        image: hicommonwealth/cw_postgres:latest
         env:
           POSTGRES_USER: commonwealth
-          POSTGRES_DB: commonwealth
+          POSTGRES_DB: common_test
           POSTGRES_PASSWORD: edgeware
         # Set health checks to wait until postgres has started
         options: >-
@@ -359,6 +360,9 @@ jobs:
       - name: Discord-Bot Typecheck
         run: yarn --cwd packages/discord-bot check-types
 
+      - name: Snapshot-listener Typecheck
+        run: yarn --cwd packages/snapshot-listener check-types
+
   # These tests run quickly, so run them in a separate job
   commonwealth-unit-integration:
     strategy:
@@ -370,10 +374,10 @@ jobs:
 
     services:
       postgres:
-        image: postgres
+        image: hicommonwealth/cw_postgres:latest
         env:
           POSTGRES_USER: commonwealth
-          POSTGRES_DB: commonwealth
+          POSTGRES_DB: common_test
           POSTGRES_PASSWORD: edgeware
         # Set health checks to wait until postgres has started
         options: >-
@@ -388,6 +392,11 @@ jobs:
         image: redis:latest
         ports:
           - 6379:6379
+      rabbitmq:
+        image: rabbitmq:3.11-management
+        ports:
+          - 5672:5672
+          - 15672:15672
 
     steps:
       - name: Checkout
@@ -407,6 +416,15 @@ jobs:
 
       - name: Build CI
         run: yarn build-ci
+
+      - name: Run adapters tests
+        run: yarn workspace @hicommonwealth/adapters test
+
+      - name: Run core tests
+        run: yarn workspace @hicommonwealth/core test
+
+      - name: Run model tests
+        run: yarn workspace @hicommonwealth/model test
 
       - name: Run unit tests
         run: yarn --cwd packages/commonwealth unit-test --forbid-only
@@ -431,10 +449,10 @@ jobs:
         node: [ 20 ]
     services:
       postgres:
-        image: postgres
+        image: hicommonwealth/cw_postgres:latest
         env:
           POSTGRES_USER: commonwealth
-          POSTGRES_DB: commonwealth
+          POSTGRES_DB: common_test
           POSTGRES_PASSWORD: edgeware
         # Set health checks to wait until postgres has started
         options: >-
@@ -527,3 +545,49 @@ jobs:
           PORT: 8080
           USES_DOCKER_PGSQL: true
           REDIS_URL: redis://localhost:6379
+
+  snapshot-test:
+    strategy:
+      matrix:
+        node: [ 20 ]
+    name: Snapshot Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # We only run snapshot tests if any files in the following folders changes
+      - name: Get changed Snapshot package files
+        id: changed-files-specific
+        uses: tj-actions/changed-files@v35
+        with:
+          files: packages/snapshot-listener/**/*
+
+      - name: Run following steps if any file(s) in the snapshot package changes
+        if: steps.changed-files-specific.outputs.all_changed_files
+        run: |
+          echo "One or more snapshot pacakge files has changed."
+          echo "List all the files that have changed: ${{ steps.changed-files-specific.outputs.all_changed_files }}"
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependencies
+        run: yarn global add node-gyp && yarn --ignore-engines
+
+      - name: Build
+        run: yarn --cwd packages/snapshot-listener build
+
+      - name: Run API tests
+        run: yarn --cwd packages/snapshot-listener test --forbid-only

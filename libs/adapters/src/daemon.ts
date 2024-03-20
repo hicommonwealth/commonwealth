@@ -64,7 +64,7 @@ export class Daemons {
         log.info(`Running task ${label}`);
         fn();
       } catch (err) {
-        console.error(`Error running task ${label}`, err);
+        log.error(`Error running task ${label}`, err as Error);
         // cancel task
         clearInterval(jobId);
         this.cancelTask(label);
@@ -97,7 +97,7 @@ export class Daemons {
     try {
       fn();
     } catch (err) {
-      console.error(`Error running task ${label}`, err);
+      log.error(`Error running task ${label}`, err as Error);
       // cancel task
       clearInterval(jobId);
       this.cancelTask(label);
@@ -113,7 +113,7 @@ export class Daemons {
       try {
         clearInterval(jobId);
       } catch (err) {
-        console.warn('Error cancelling task', err);
+        log.warn('Error cancelling task', err as Error);
         // remove from map
         return this.tasks.delete(label);
       }
