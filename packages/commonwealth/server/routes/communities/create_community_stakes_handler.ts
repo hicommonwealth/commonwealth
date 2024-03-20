@@ -1,5 +1,6 @@
-import { AppError } from '@hicommonwealth/core';
+import { AppError, command } from '@hicommonwealth/core';
 import {
+  Community,
   CommunityStakeAttributes,
   DB,
   commonProtocol,
@@ -85,12 +86,16 @@ export const createCommunityStakeHandler = async (
 
   // since the stake is already created, generate group in background
   // so this request doesn't fail
-  controllers.groups
-    .generateStakeholderGroups({
-      user: req.user,
-      community: community,
-    })
-    .catch((err) => console.error(err));
+  const { groups, created } = await command(
+    Community.GenerateStakeholderGroups(),
+    {
+      id: community.id,
+      actor: {
+        user: undefined,
+      },
+      payload: {},
+    },
+  );
 
   return success(res, results);
 };
