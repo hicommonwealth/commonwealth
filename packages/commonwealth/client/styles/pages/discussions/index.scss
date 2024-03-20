@@ -4,6 +4,16 @@ $size: 48px;
 
 .DiscussionsPageLayout {
   overflow: auto;
+  padding-top: 0;
+
+  .BreadcrumbsPageLayout {
+    padding-inline: 0;
+    padding-bottom: 52px;
+
+    @include smallInclusive {
+      padding-bottom: initial;
+    }
+  }
 
   .DiscussionsPage {
     display: flex;

@@ -8,7 +8,6 @@ import {
 } from 'models/SearchQuery';
 import 'pages/search/index.scss';
 import useSidebarStore from 'state/ui/sidebar';
-import { Breadcrumbs } from '../../components/Breadcrumbs';
 
 import useWindowResize from 'hooks/useWindowResize';
 import React, { useEffect, useMemo } from 'react';
@@ -62,7 +61,7 @@ const SearchPage = () => {
   const [urlQueryParams] = useSearchParams();
   const [bottomRef, bottomInView] = useInView();
 
-  const { toggleMobileView } = useWindowResize({
+  useWindowResize({
     setMenu,
   });
 
@@ -275,7 +274,6 @@ const SearchPage = () => {
   return (
     <CWPageLayout>
       <div className="SearchPage">
-        {toggleMobileView && <Breadcrumbs />}
         <div className="search-results">
           <div className="cw-tabs-row-container">
             <CWTabsRow>

@@ -184,8 +184,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               />
             );
           }}
-          endReached={(index) => {
-            console.log('index', index);
+          endReached={() => {
             hasNextPage && fetchNextPage();
           }}
           overscan={50}
@@ -200,11 +199,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             // eslint-disable-next-line react/no-multi-comp
             Header: () => (
               <>
-                {isWindowSmallInclusive && (
-                  <div className="mobileBreadcrumbs">
-                    <Breadcrumbs />
-                  </div>
-                )}
+                <Breadcrumbs />
                 <HeaderWithFilters
                   topic={topicName}
                   stage={stageName}

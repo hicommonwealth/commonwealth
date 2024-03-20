@@ -88,7 +88,7 @@ export const AdminOnboardingSlider = () => {
 
   return (
     <>
-      <CWPageLayout>
+      <CWPageLayout className="AdminOnboardingSliderPageLayout">
         <section className="AdminOnboardingSlider">
           <div className="header">
             <CWText type="h4">Finish setting up your community</CWText>

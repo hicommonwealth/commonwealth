@@ -21,6 +21,7 @@
 
     .user-dashboard-activity {
       order: 2;
+      min-height: 20px;
 
       @media (min-width: $breakpoint-medium-min-px) {
         order: unset;

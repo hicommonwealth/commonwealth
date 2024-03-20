@@ -14,8 +14,18 @@
     justify-content: space-between;
     padding-bottom: 24px;
     position: sticky;
-    top: 42px;
     z-index: 1;
+    top: 68px;
+
+    &:before {
+      content: '';
+      display: block;
+      width: 100%;
+      position: absolute;
+      height: 20px;
+      top: -17px;
+      background-color: white;
+    }
 
     @include smallInclusive {
       top: 0;
