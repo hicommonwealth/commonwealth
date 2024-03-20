@@ -155,9 +155,12 @@ Object.keys(_models).forEach((key) => {
 const verify_testdb = async () => {
   let server: Sequelize | undefined = undefined;
   try {
-    server = new Sequelize('postgresql://commonwealth:edgeware@localhost', {
-      logging: false,
-    });
+    server = new Sequelize(
+      'postgresql://commonwealth:edgeware@localhost/postgres',
+      {
+        logging: false,
+      },
+    );
     const [{ count }] = await server.query<{ count: number }>(
       `SELECT COUNT(*) FROM pg_database WHERE datname = '${TEST_DB_NAME}'`,
       { type: QueryTypes.SELECT },
