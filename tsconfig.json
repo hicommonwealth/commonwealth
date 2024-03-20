@@ -9,6 +9,7 @@
     "esModuleInterop": true,
     "downlevelIteration": true,
     "traceResolution": false,
+    "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
       "@hicommonwealth/*": ["libs/*/src"]
