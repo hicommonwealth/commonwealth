@@ -162,7 +162,10 @@
     "webpack-deduplication-plugin": "^0.0.8",
     "webpack-dev-middleware": "^5.3.3",
     "webpack-hot-middleware": "^2.25.2",
-    "webpack-merge": "^5.8.0"
+    "webpack-merge": "^5.8.0",
+    "eslint-plugin-diff": "^2.0.3",
+    "eslint-plugin-functional": "^6.1.1",
+    "eslint-plugin-promise": "^6.1.1"
   },
   "optionalDependencies": {
     "esbuild-darwin-64": "^0.15.12"
