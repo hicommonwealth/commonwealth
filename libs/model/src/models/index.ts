@@ -23,7 +23,7 @@ import type { MembershipModelStatic } from './membership';
 import type { NotificationModelStatic } from './notification';
 import type { NotificationCategoryModelStatic } from './notification_category';
 import type { NotificationsReadModelStatic } from './notifications_read';
-import type { OutboxModelStatic } from './outbox';
+// import type { OutboxModelStatic } from './outbox';
 import type { PollModelStatic } from './poll';
 import type { ProfileModelStatic } from './profile';
 import type { ReactionModelStatic } from './reaction';
@@ -77,7 +77,7 @@ export type Models = {
   SnapshotSpace: SnapshotSpaceModelStatic;
   User: UserModelStatic;
   Webhook: WebhookModelStatic;
-  Outbox: OutboxModelStatic;
+  // Outbox: OutboxModelStatic;
 };
 
 export type DB = Models & {

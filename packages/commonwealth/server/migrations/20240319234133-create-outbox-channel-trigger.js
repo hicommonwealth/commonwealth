@@ -8,7 +8,9 @@ module.exports = {
         CREATE OR REPLACE FUNCTION notify_insert_outbox_function()
         RETURNS TRIGGER AS $$
         BEGIN
-          PERFORM pg_notify('outbox_channel', NEW.event_name);
+          IF NEW.relayed = false THEN
+            PERFORM pg_notify('outbox_channel', NEW.event_name);
+          END IF;
           RETURN NEW;
         END;
         $$ LANGUAGE plpgsql;
