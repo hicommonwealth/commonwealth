@@ -14,7 +14,7 @@ module.exports = {
       await queryInterface.sequelize.query(
         `
         CREATE TABLE "Outbox" (
-          id BIGINT GENERATED ALWAYS AS IDENTITY,
+          event_id BIGINT GENERATED ALWAYS AS IDENTITY,
           event_name TEXT NOT NULL,
           event_payload JSONB NOT NULL,
           relayed BOOLEAN DEFAULT FALSE NOT NULL,
