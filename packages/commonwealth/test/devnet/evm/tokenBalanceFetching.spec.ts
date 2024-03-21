@@ -59,7 +59,7 @@ describe('Token Balance Cache EVM Tests', function () {
   // ganache chain id
   const ethChainId = 1337;
 
-  async function resetChainNode(ethChainId: number) {
+  async function resetChainNode(eth_chain_id: number) {
     const ganacheChainNode = await models.ChainNode.findOne({
       where: {
         url: 'http://localhost:8545',
@@ -69,7 +69,7 @@ describe('Token Balance Cache EVM Tests', function () {
     if (ganacheChainNode) {
       await models.ChainNode.update(
         {
-          eth_chain_id: ethChainId,
+          eth_chain_id: eth_chain_id,
           balance_type: BalanceType.Ethereum,
           name: 'Local EVM Chain',
         },
@@ -82,7 +82,7 @@ describe('Token Balance Cache EVM Tests', function () {
     } else {
       await models.ChainNode.create({
         url: 'http://localhost:8545',
-        eth_chain_id: ethChainId,
+        eth_chain_id: eth_chain_id,
         balance_type: BalanceType.Ethereum,
         name: 'Local EVM Chain',
       });
