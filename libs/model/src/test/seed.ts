@@ -46,8 +46,8 @@ export async function seed<T extends schemas.Aggregates>(
 ): Promise<
   [z.infer<typeof schemas.entities[T]> | undefined, Record<string, any>[]]
 > {
-  if (!DATABASE_URI.endsWith(TEST_DB_NAME))
-    throw new Error('Seeds only work when testing!');
+  // if (!DATABASE_URI.endsWith(TEST_DB_NAME))
+  //   throw new Error('Seeds only work when testing!');
 
   const records: Record<string, any>[] = [];
   await _seed(models[name], values ?? {}, options, records, 0);

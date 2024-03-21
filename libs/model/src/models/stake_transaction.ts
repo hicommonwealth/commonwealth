@@ -24,8 +24,8 @@ export default (
   const StakeTransaction = <StakeTransactionModelStatic>sequelize.define(
     'StakeTransactions',
     {
-      id: {
-        type: dataTypes.INTEGER,
+      transaction_hash: {
+        type: dataTypes.STRING,
         allowNull: false,
         primaryKey: true,
       },
@@ -34,17 +34,16 @@ export default (
         allowNull: false,
       },
       stake_id: { type: dataTypes.INTEGER, allowNull: false },
-      address_id: { type: dataTypes.INTEGER, allowNull: false },
+      address: { type: dataTypes.STRING, allowNull: false },
+      stake_amount: { type: dataTypes.INTEGER, allowNull: false },
       stake_price: { type: dataTypes.STRING, allowNull: false },
       stake_direction: {
         type: dataTypes.ENUM('buy', 'sell'),
         allowNull: false,
       },
-      created_at: { type: dataTypes.DATE, allowNull: false },
+      timestamp: { type: dataTypes.BIGINT, allowNull: false },
     },
     {
-      timestamps: true,
-      createdAt: 'created_at',
       underscored: true,
       tableName: 'StakeTransactions',
       indexes: [{ fields: ['address'] }, { fields: ['community_id'] }],
@@ -59,10 +58,6 @@ export default (
     models.StakeTransaction.belongsTo(models.CommunityStake, {
       foreignKey: 'stake_id',
       targetKey: 'stake_id',
-    });
-    models.StakeTransaction.belongsTo(models.Address, {
-      foreignKey: 'address',
-      targetKey: 'id',
     });
   };
 

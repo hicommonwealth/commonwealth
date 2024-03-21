@@ -30,6 +30,7 @@ import ReactionFactory from './models/reaction';
 import SnapshotProposalFactory from './models/snapshot_proposal';
 import SnapshotSpaceFactory from './models/snapshot_spaces';
 import SsoTokenFactory from './models/sso_token';
+import StakeTransactionFactory from './models/stake_transaction';
 import StarredCommunityFactory from './models/starred_community';
 import SubscriptionFactory from './models/subscription';
 import TaggedThreadFactory from './models/tagged_threads';
@@ -125,6 +126,7 @@ const _models: Models = {
   User: UserModelFactory(sequelize, DataTypes),
   Webhook: WebhookFactory(sequelize, DataTypes),
   CommunityStake: CommunityStakeFactory(sequelize, DataTypes),
+  StakeTransaction: StakeTransactionFactory(sequelize, DataTypes),
 };
 
 export const models: DB = {

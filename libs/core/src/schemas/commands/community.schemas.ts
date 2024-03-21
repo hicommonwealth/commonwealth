@@ -81,33 +81,11 @@ export const SetCommunityStake = {
 };
 
 export const CreateStakeTransaction = {
-  input: StakeTransaction.omit({ id: true, created_at: true }),
-  output: StakeTransaction,
-};
-
-export const GetStakeTransaction = {
   input: z.object({
-    address: z.string().optional(),
-    community_id: z.string().optional(),
-  }),
-  output: StakeTransaction.and(z.object({ address: z.string() })).array(),
-};
-
-export const GetPriceChange = {
-  input: z.object({
-    past_date_epoch: z.number().min(1),
+    transaction_hash: z.string().length(66),
     community_id: z.string(),
-    stake_id: z
-      .number()
-      .int()
-      .min(MIN_SCHEMA_INT)
-      .max(MAX_SCHEMA_INT)
-      .default(2),
   }),
-  output: z.object({
-    new_price: z.string().optional(),
-    old_price: z.string().optional(),
-  }),
+  output: StakeTransaction,
 };
 
 export const UpdateCommunity = {

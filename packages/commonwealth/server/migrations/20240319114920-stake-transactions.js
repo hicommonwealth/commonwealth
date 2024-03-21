@@ -6,9 +6,8 @@ module.exports = {
       .createTable(
         'StakeTransactions',
         {
-          id: {
-            type: Sequelize.INTEGER,
-            autoIncrement: true,
+          transaction_hash: {
+            type: Sequelize.STRING,
             primaryKey: true,
           },
           community_id: {
@@ -19,21 +18,18 @@ module.exports = {
             type: Sequelize.INTEGER,
             allowNull: false,
           },
-          address_id: {
-            type: Sequelize.INTEGER,
-            references: {
-              model: 'Addresses',
-              key: 'id',
-            },
+          address: {
+            type: Sequelize.STRING,
             allowNull: false,
           },
+          stake_amount: { type: Sequelize.INTEGER, allowNull: false },
           stake_price: { type: Sequelize.STRING, allowNull: false },
           stake_direction: {
             type: Sequelize.ENUM('buy', 'sell'),
             default: false,
             allowNull: false,
           },
-          created_at: { type: Sequelize.DATE, allowNull: false },
+          timestamp: { type: Sequelize.BIGINT, allowNull: false },
         },
         {
           indexes: [{ fields: ['address'] }, { fields: ['community_id'] }],

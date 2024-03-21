@@ -7,7 +7,7 @@ import type {
 } from 'web3-utils/types';
 
 export function parseAbiItemsFromABI(
-  abi: Array<Record<string, unknown>>
+  abi: Array<Record<string, unknown>>,
 ): AbiItem[] {
   try {
     return abi.map((item) => {
@@ -28,7 +28,7 @@ export function parseAbiItemsFromABI(
 }
 
 export function parseFunctionsFromABI(
-  abi: Array<Record<string, unknown>>
+  abi: Array<Record<string, unknown>>,
 ): AbiItem[] {
   let fns: AbiItem[] = [];
   if (abi) {
@@ -41,7 +41,7 @@ export function parseFunctionsFromABI(
 }
 
 export function parseWriteFunctionsFromABI(
-  abi: Array<Record<string, unknown>>
+  abi: Array<Record<string, unknown>>,
 ): AbiItem[] {
   let fns: AbiItem[] = [];
   if (abi) {
@@ -52,7 +52,7 @@ export function parseWriteFunctionsFromABI(
           x.type === 'function' &&
           x.stateMutability !== 'view' &&
           x.stateMutability !== 'pure' &&
-          x.constant !== true
+          x.constant !== true,
       )
       .sort((a, b) => a.name.localeCompare(b.name));
   }
@@ -61,11 +61,11 @@ export function parseWriteFunctionsFromABI(
 
 export function parseFunctionFromABI(
   abi: Array<Record<string, unknown>>,
-  functionName: string
+  functionName: string,
 ): AbiItem {
   const abiFunctions = parseFunctionsFromABI(abi);
   const functionItem = abiFunctions.find(
-    (abiItem) => abiItem.name === functionName
+    (abiItem) => abiItem.name === functionName,
   );
   if (!functionItem) {
     throw new Error(`Could not find function ${functionName} in ABI`);
@@ -74,7 +74,7 @@ export function parseFunctionFromABI(
 }
 
 export function parseEventsFromABI(
-  abi: Array<Record<string, unknown>>
+  abi: Array<Record<string, unknown>>,
 ): AbiItem[] {
   let events: AbiItem[] = [];
   if (abi) {
@@ -88,7 +88,7 @@ export function parseEventsFromABI(
 
 export function parseEventFromABI(
   abi: Array<Record<string, unknown>>,
-  eventName: string
+  eventName: string,
 ): AbiItem {
   const abiEvents = parseEventsFromABI(abi);
   const eventItem = abiEvents.find((abiItem) => abiItem.name === eventName);
@@ -97,3 +97,166 @@ export function parseEventFromABI(
   }
   return eventItem;
 }
+
+export const communityStakesAbi = [
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'sharesSubject',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'id',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'getBuyPrice',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'sharesSubject',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'id',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'getBuyPriceAfterFee',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'sharesSubject',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'id',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'getSellPrice',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'sharesSubject',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'id',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'getSellPriceAfterFee',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'sharesSubject',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'id',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'payable',
+    type: 'function',
+    name: 'buyStake',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'sharesSubject',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'id',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'payable',
+    type: 'function',
+    name: 'sellStake',
+  },
+];

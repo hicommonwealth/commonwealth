@@ -1,11 +1,11 @@
-import type { Command } from '@hicommonwealth/core';
+import type { Query } from '@hicommonwealth/core';
 import { schemas } from '@hicommonwealth/core';
 import { models } from '../database';
 
-export const GetStakeTransaction: Command<
-  typeof schemas.commands.GetStakeTransaction
+export const GetStakeTransaction: Query<
+  typeof schemas.queries.GetStakeTransaction
 > = () => ({
-  ...schemas.commands.GetStakeTransaction,
+  ...schemas.queries.GetStakeTransaction,
   auth: [],
   secure: true,
   body: async ({ payload }) => {
@@ -30,6 +30,8 @@ export const GetStakeTransaction: Command<
       });
     }
 
-    return response?.get({ plain: true });
+    return response;
+
+    // return response?.get({ plain: true });
   },
 });

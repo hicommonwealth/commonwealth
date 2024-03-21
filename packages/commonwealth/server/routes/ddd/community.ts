@@ -4,7 +4,7 @@ import { Community } from '@hicommonwealth/model';
 export const trpcRouter = trpc.router({
   getStake: trpc.query(Community.GetCommunityStake),
   getStakeTransaction: trpc.query(Community.GetStakeTransaction),
-  getStakePriceChange: trpc.query(Community.GetStakePriceChange),
+  getStakeHistoricalPrice: trpc.query(Community.GetStakeHistoricalPrice),
   setStake: trpc.command(Community.SetCommunityStake, trpc.Tag.Community),
   createGroup: trpc.command(Community.CreateGroup, trpc.Tag.Community),
   createStakeTransaction: trpc.command(
