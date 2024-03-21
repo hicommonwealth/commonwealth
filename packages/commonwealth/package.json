@@ -39,6 +39,7 @@
     "start-all": "concurrently -p '{name}' -c red,green -n app,consumer 'yarn start' 'yarn start-consumer'",
     "start-ci": "FETCH_INTERVAL_MS=500 ts-node -r tsconfig-paths/register server.ts",
     "start-consumer": "ts-node -r tsconfig-paths/register server/workers/commonwealthConsumer/commonwealthConsumer.ts -T run-as-script",
+    "start-message-relayer": "ts-node -r tsconfig-paths/register -T ./server/workers/messageRelayer/messageRelayer.ts",
     "start-external-webpack": "NODE_ENV=production NO_PRERENDER=true NO_SSL=true ts-node -T -r tsconfig-paths/register server.ts",
     "stylelint": "stylelint client/styles/*",
     "test": "nyc ts-mocha './test/**/*.spec.ts'",
