@@ -46,7 +46,7 @@ const createThread = async ({
   });
 
   const response = await axios.post(`${app.serverUrl()}/threads`, {
-    author_chain: communityId,
+    author_community_id: communityId,
     community_id: communityId,
     address,
     author: JSON.stringify(authorProfile),
