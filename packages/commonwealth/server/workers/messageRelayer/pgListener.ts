@@ -1,6 +1,7 @@
 import { PinoLogger } from '@hicommonwealth/adapters';
 import { delay, logger } from '@hicommonwealth/core';
 import { Client } from 'pg';
+import { NODE_ENV } from '../../config';
 import { incrementNumUnrelayedEvents } from './relayForever';
 
 const log = logger(PinoLogger()).getLogger(__filename);
@@ -41,7 +42,12 @@ async function reconnect(client: Client) {
 export async function setupListener(): Promise<Client> {
   log.info('Setting up listener...');
   const { DATABASE_URI } = await import('@hicommonwealth/model');
-  const client = new Client({ connectionString: DATABASE_URI, ssl: false });
+  const client = new Client({
+    connectionString: DATABASE_URI,
+    ssl: ['test', 'development'].includes(NODE_ENV)
+      ? false
+      : { rejectUnauthorized: false },
+  });
 
   client.on('notification', (payload) => {
     log.info('RECEIVED', undefined, { payload });

@@ -21,13 +21,16 @@ export async function insertOutbox(
   for (let index = 0; index < events.length; index++) {
     const event = events[index];
     // TODO: validate event.payload with Zod?
-    values += `(:eventName${index}, :eventPayload${index}, false, :createdAt${index}, CURRENT_TIMESTAMP),`;
+    values += `(:eventName${index}, :eventPayload${index}, false, `;
+    values += `${
+      event.created_at ? `:createdAt${index}` : 'CURRENT_TIMESTAMP'
+    }, CURRENT_TIMESTAMP),`;
     replacements[`eventName${index}`] = event.name;
     replacements[`eventPayload${index}`] = JSON.stringify({
       ...event.payload,
       event_name: event.name,
     });
-    replacements[`createdAt${index}`] = event.created_at;
+    if (event.created_at) replacements[`createdAt${index}`] = event.created_at;
   }
 
   // remove trailing comma
