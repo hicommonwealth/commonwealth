@@ -416,7 +416,6 @@ export const ChainNode = z.object({
   description: z.string().max(255).optional(),
   ss58: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),
   bech32: z.string().max(255).optional(),
-  slip44: z.number().optional(),
   created_at: z.any(),
   updated_at: z.any(),
   cosmos_chain_id: z
