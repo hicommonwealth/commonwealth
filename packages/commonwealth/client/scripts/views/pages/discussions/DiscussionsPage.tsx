@@ -5,17 +5,18 @@ import { Virtuoso } from 'react-virtuoso';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
-import { useDateCursor } from 'state/api/threads/fetchThreads';
+import useFetchThreadsQuery, {
+  featuredFilterQueryMap,
+  useDateCursor,
+} from 'state/api/threads/fetchThreads';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import { slugify } from 'utils';
-import Thread from '../../../models/Thread';
 import {
   ThreadFeaturedFilterTypes,
   ThreadTimelineFilterTypes,
 } from '../../../models/types';
 import app from '../../../state';
 import { useFetchTopicsQuery } from '../../../state/api/topics';
-import { trpc } from '../../../utils/trpcClient';
 import { Breadcrumbs } from '../../components/Breadcrumbs';
 import { HeaderWithFilters } from './HeaderWithFilters';
 import { ThreadCard } from './ThreadCard';
@@ -35,7 +36,7 @@ type DiscussionsPageProps = {
 };
 
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
-  const community_id = app.activeChainId();
+  const communityId = app.activeChainId();
   const navigate = useCommonNavigate();
   const { totalThreadsInCommunity } = useEXCEPTION_CASE_threadCountersStore();
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
@@ -50,7 +51,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     'dateRange',
   ) as ThreadTimelineFilterTypes;
   const { data: topics } = useFetchTopicsQuery({
-    communityId: community_id,
+    communityId,
   });
 
   const { isWindowSmallInclusive } = useBrowserWindow({});
@@ -60,7 +61,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const topicId = (topics || []).find(({ name }) => name === topicName)?.id;
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
-    chainId: community_id,
+    chainId: communityId,
     address: app?.user?.activeAccount?.address,
     apiEnabled: !!app?.user?.activeAccount?.address,
   });
@@ -76,38 +77,26 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     (app.isCustomDomain() ? `/archived` : `/${app.activeChainId()}/archived`);
 
   const { fetchNextPage, data, isInitialLoading, hasNextPage } =
-    trpc.thread.getBulkThreads.useInfiniteQuery(
-      {
-        community_id,
-        queryType: 'bulk',
-        limit: 20,
-        topicId,
-        stage: stageName ?? undefined,
-        includePinnedThreads: true,
-        orderBy: featuredFilter ?? undefined,
-        toDate: dateCursor.toDate,
-        fromDate: dateCursor.fromDate,
-        isOnArchivePage: isOnArchivePage,
-      },
-      {
-        getNextPageParam: (lastPage) => {
-          if (lastPage.threads?.length < 20) return undefined;
-          return lastPage.cursor + 1;
-        },
-        initialCursor: 1,
-      },
-    );
+    useFetchThreadsQuery({
+      communityId: app.activeChainId(),
+      queryType: 'bulk',
+      page: 1,
+      limit: 20,
+      topicId,
+      stage: stageName ?? undefined,
+      includePinnedThreads: true,
+      ...(featuredFilterQueryMap[featuredFilter] && {
+        orderBy: featuredFilterQueryMap[featuredFilter],
+      }),
+      toDate: dateCursor.toDate,
+      fromDate: dateCursor.fromDate,
+      isOnArchivePage: isOnArchivePage,
+    });
 
-  const threadData = data?.pages.flatMap((page) =>
-    page.threads.map((t) => new Thread(t as any)),
-  );
+  const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
 
-  const threads = sortPinned(
-    sortByFeaturedFilter(threadData || [], featuredFilter),
-  );
-
-  //Checks if the current page is a discussion page and if the window is small enough to render the mobile menu
-  //Checks both for mobile device and inner window size for desktop responsiveness
+  // Checks if the current page is a discussion page and if the window is small enough to render the mobile menu
+  // Checks both for mobile device and inner window size for desktop responsiveness
   const filteredThreads = threads.filter((t) => {
     if (!includeSpamThreads && t.markedAsSpamAt) return null;
 
@@ -172,7 +161,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               onBodyClick={() => {
                 const scrollEle = document.getElementsByClassName('Body')[0];
 
-                localStorage[`${community_id}-discussions-scrollY`] =
+                localStorage[`${communityId}-discussions-scrollY`] =
                   scrollEle.scrollTop;
               }}
               onCommentBtnClick={() =>

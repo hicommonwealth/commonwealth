@@ -95,6 +95,12 @@ export default class DatabaseCleaner {
       this.log.error('Failed to clean subscriptions', e);
     }
 
+    try {
+      await this.runMaintenance();
+    } catch (e) {
+      this.log.error('Failed to run pg_partman maintenance', e);
+    }
+
     this.log.info('Database clean-up finished.');
   }
 
@@ -262,6 +268,18 @@ export default class DatabaseCleaner {
     }
 
     this.log.info(`Deleted ${totalSubsDeleted} subscriptions`);
+  }
+
+  /**
+   * This function executes the run_maintenance function of the pg_partman
+   * Postgres extension. This creates new child partition tables and drops
+   * any outdated ones according to the retention policy.
+   * See: https://github.com/pgpartman/pg_partman/blob/master/doc/pg_partman.md#maintenance-functions
+   */
+  public async runMaintenance() {
+    await this._models.sequelize.query(`
+      SELECT run_maintenance();
+    `);
   }
 
   public getTimeout() {

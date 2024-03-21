@@ -2,6 +2,7 @@ name: CI
 
 env:
   ROLLBAR_ENV: 'GitHubCI'
+  NODE_ENV: 'test'
 
 on:
   pull_request:
@@ -22,10 +23,10 @@ jobs:
 
     services:
       postgres:
-        image: postgres
+        image: hicommonwealth/cw_postgres:latest
         env:
           POSTGRES_USER: commonwealth
-          POSTGRES_DB: commonwealth
+          POSTGRES_DB: common_test
           POSTGRES_PASSWORD: edgeware
         # Set health checks to wait until postgres has started
         options: >-
@@ -113,10 +114,10 @@ jobs:
 
     services:
       postgres:
-        image: postgres
+        image: hicommonwealth/cw_postgres:latest
         env:
           POSTGRES_USER: commonwealth
-          POSTGRES_DB: commonwealth
+          POSTGRES_DB: common_test
           POSTGRES_PASSWORD: edgeware
         # Set health checks to wait until postgres has started
         options: >-
@@ -203,10 +204,10 @@ jobs:
 
     services:
       postgres:
-        image: postgres
+        image: hicommonwealth/cw_postgres:latest
         env:
           POSTGRES_USER: commonwealth
-          POSTGRES_DB: commonwealth
+          POSTGRES_DB: common_test
           POSTGRES_PASSWORD: edgeware
         # Set health checks to wait until postgres has started
         options: >-
@@ -370,10 +371,10 @@ jobs:
 
     services:
       postgres:
-        image: postgres
+        image: hicommonwealth/cw_postgres:latest
         env:
           POSTGRES_USER: commonwealth
-          POSTGRES_DB: commonwealth
+          POSTGRES_DB: common_test
           POSTGRES_PASSWORD: edgeware
         # Set health checks to wait until postgres has started
         options: >-
@@ -388,6 +389,11 @@ jobs:
         image: redis:latest
         ports:
           - 6379:6379
+      rabbitmq:
+        image: rabbitmq:3.11-management
+        ports:
+          - 5672:5672
+          - 15672:15672
 
     steps:
       - name: Checkout
@@ -409,13 +415,13 @@ jobs:
         run: yarn build-ci
 
       - name: Run adapters tests
-      - run: yarn workspace @hicommonwealth/adapters test
+        run: yarn workspace @hicommonwealth/adapters test
 
       - name: Run core tests
-      - run: yarn workspace @hicommonwealth/core test
+        run: yarn workspace @hicommonwealth/core test
 
       - name: Run model tests
-      - run: yarn workspace @hicommonwealth/model test
+        run: yarn workspace @hicommonwealth/model test
 
       - name: Run unit tests
         run: yarn --cwd packages/commonwealth unit-test --forbid-only
@@ -440,10 +446,10 @@ jobs:
         node: [ 20 ]
     services:
       postgres:
-        image: postgres
+        image: hicommonwealth/cw_postgres:latest
         env:
           POSTGRES_USER: commonwealth
-          POSTGRES_DB: commonwealth
+          POSTGRES_DB: common_test
           POSTGRES_PASSWORD: edgeware
         # Set health checks to wait until postgres has started
         options: >-
