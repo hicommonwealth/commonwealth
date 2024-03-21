@@ -114,7 +114,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     <div className="DiscussionsPage">
       <DiscussionsFeedDiscovery
         orderBy={featuredFilter}
-        community={community_id}
+        community={communityId}
         includePinnedThreads={true}
       />
       <Virtuoso
