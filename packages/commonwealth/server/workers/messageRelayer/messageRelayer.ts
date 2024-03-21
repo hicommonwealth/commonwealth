@@ -62,6 +62,10 @@ export async function startMessageRelayer(maxRelayIterations?: number) {
 
 if (require.main === module) {
   startMessageRelayer().catch((err) => {
-    log.fatal('Unknown error fatal requires immediate attention', err);
+    log.fatal(
+      'Unknown error fatal requires immediate attention. Restart REQUIRED!',
+      err,
+    );
+    // if we process.exit(1) here we start an infinite loop of retrying to publish events
   });
 }
