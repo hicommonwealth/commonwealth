@@ -7,7 +7,7 @@ import { useLocation } from 'react-router-dom';
 import app from 'state';
 import {
   VoteWeightModule,
-  useCommunityStake
+  useCommunityStake,
 } from 'views/components/CommunityStake';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
@@ -44,11 +44,11 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
     currentVoteWeight,
     stakeValue,
     isLoading,
-    activeChainId
+    activeChainId,
   } = useCommunityStake();
   const {
     modeOfManageCommunityStakeModal,
-    setModeOfManageCommunityStakeModal
+    setModeOfManageCommunityStakeModal,
   } = useManageCommunityStakeModalStore();
 
   if (showSkeleton || isLoading) return <CommunitySectionSkeleton />;
@@ -62,7 +62,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
     return {
       Ethereum: selectedStakeChain.toLowerCase().includes('ethereum') && 'ETH',
       Base: selectedStakeChain.toLowerCase().includes('base') && 'BASE',
-      Blast: selectedStakeChain.toLowerCase().includes('blast') && 'BLAST'
+      Blast: selectedStakeChain.toLowerCase().includes('blast') && 'BLAST',
     }[selectedStakeChain];
   };
 

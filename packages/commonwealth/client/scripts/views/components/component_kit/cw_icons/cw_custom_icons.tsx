@@ -138,7 +138,7 @@ export const CWLeap = (props: CustomIconProps) => {
           <path
             d="M0 0h34.31v22.29H0z"
             style={{
-              fill: 'none'
+              fill: 'none',
             }}
           />
         </clipPath>
@@ -150,7 +150,7 @@ export const CWLeap = (props: CustomIconProps) => {
         <path
           d="M30.91 15.39c0 4.91-5.99 6.9-13.43 6.9s-13.52-2-13.52-6.9S10 6.51 17.43 6.51s13.47 3.98 13.47 8.88Z"
           style={{
-            fill: '#4baf74'
+            fill: '#4baf74',
           }}
         />
         <path
@@ -224,7 +224,7 @@ export const CWMagic = (props: CustomIconProps) => {
       {...otherProps}
       className={getClasses<CustomIconStyleProps>(
         { iconSize, className },
-        componentType
+        componentType,
       )}
       xmlns="http://www.w3.org/2000/svg"
       width="32"
@@ -251,7 +251,7 @@ export const CWBlast = ({
       {...otherProps}
       className={getClasses<CustomIconStyleProps>(
         { iconSize, className },
-        componentType
+        componentType,
       )}
       width="12"
       height="12"
@@ -301,7 +301,7 @@ export const CWBase = ({
       {...otherProps}
       className={getClasses<CustomIconStyleProps>(
         { iconSize, className },
-        componentType
+        componentType,
       )}
       width="12"
       height="12"
@@ -457,7 +457,7 @@ export const CWPhantom = (props: CustomIconProps) => {
     <svg
       className={getClasses<CustomIconStyleProps>(
         { ...customIconStyleAttrs },
-        componentType
+        componentType,
       )}
       xmlns="http://www.w3.org/2000/svg"
       width="32"
@@ -804,7 +804,7 @@ export const CWEth = ({
       {...otherProps}
       className={getClasses<CustomIconStyleProps>(
         { iconSize, className },
-        componentType
+        componentType,
       )}
       xmlns="http://www.w3.org/2000/svg"
       width="16"
@@ -851,7 +851,7 @@ export const CWCosmos = ({
       {...otherProps}
       className={getClasses<CustomIconStyleProps>(
         { iconSize, className },
-        componentType
+        componentType,
       )}
       xmlns="http://www.w3.org/2000/svg"
       width="16"
@@ -904,7 +904,7 @@ export const CWNearIcon = ({
       {...otherProps}
       className={getClasses<CustomIconStyleProps>(
         { iconSize, className },
-        componentType
+        componentType,
       )}
       xmlns="http://www.w3.org/2000/svg"
       width="12"
@@ -938,7 +938,7 @@ export const CWDiscord = ({
       {...otherProps}
       className={getClasses<CustomIconStyleProps>(
         { iconSize, className },
-        componentType
+        componentType,
       )}
       width="16"
       height="16"
@@ -965,7 +965,7 @@ export const CWGithub = ({
       {...otherProps}
       className={getClasses<CustomIconStyleProps>(
         { iconSize, className },
-        componentType
+        componentType,
       )}
       width="16"
       height="16"
@@ -991,7 +991,7 @@ export const CWTwitter = ({
     <svg
       className={getClasses<CustomIconStyleProps>(
         { iconSize, className },
-        componentType
+        componentType,
       )}
       width="16"
       height="16"
@@ -1018,7 +1018,7 @@ export const CWEnvelop = ({
     <svg
       className={getClasses<CustomIconStyleProps>(
         { iconSize, className },
-        componentType
+        componentType,
       )}
       {...otherProps}
       width="16"

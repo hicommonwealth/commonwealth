@@ -8,7 +8,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import CWPopover, {
-  usePopover
+  usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { ManageCommunityStakeModalMode } from 'views/modals/ManageCommunityStakeModal/types';
@@ -31,7 +31,7 @@ export const VoteWeightModule = ({
   stakeNumber,
   stakeValue,
   denomination,
-  onOpenStakeModal
+  onOpenStakeModal,
 }: VoteWeightModuleProps) => {
   const popoverProps = usePopover();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
@@ -54,7 +54,7 @@ export const VoteWeightModule = ({
     return {
       BLAST: <CWCustomIcon iconName="blast" iconSize="xs" />,
       ETH: <CWIcon iconName="ethereum" iconSize="xs" />,
-      BASE: <CWCustomIcon iconName="base" iconSize="xs" />
+      BASE: <CWCustomIcon iconName="base" iconSize="xs" />,
     }[denomination];
   };
 

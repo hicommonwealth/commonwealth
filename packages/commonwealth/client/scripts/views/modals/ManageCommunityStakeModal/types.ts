@@ -10,5 +10,5 @@ export enum ManageCommunityStakeModalState {
   Exchange = 'Exchange',
   Loading = 'Loading',
   Failure = 'Failure',
-  Success = 'Success'
+  Success = 'Success',
 }

@@ -11,7 +11,7 @@ import { useFetchTopicsQuery } from 'state/api/topics';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import {
   CommunityStakeBanner,
-  useCommunityStake
+  useCommunityStake,
 } from 'views/components/CommunityStake';
 import DismissStakeBannerModal from 'views/components/CommunityStake/DismissStakeBannerModal';
 import { Select } from 'views/components/Select';
@@ -25,7 +25,7 @@ import type Topic from '../../../../models/Topic';
 import {
   ThreadFeaturedFilterTypes,
   ThreadStage,
-  ThreadTimelineFilterTypes
+  ThreadTimelineFilterTypes,
 } from '../../../../models/types';
 
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
@@ -55,7 +55,7 @@ export const HeaderWithFilters = ({
   onIncludeSpamThreads,
   isIncludingArchivedThreads,
   onIncludeArchivedThreads,
-  isOnArchivePage
+  isOnArchivePage,
 }: HeaderWithFiltersProps) => {
   const communityStakeEnabled = useFlag('communityStake');
   const navigate = useCommonNavigate();
@@ -77,14 +77,14 @@ export const HeaderWithFilters = ({
   const onFilterResize = () => {
     if (filterRowRef.current) {
       setRightFiltersDropdownPosition(
-        filterRowRef.current.clientHeight > 40 ? 'bottom-start' : 'bottom-end'
+        filterRowRef.current.clientHeight > 40 ? 'bottom-start' : 'bottom-end',
       );
     }
   };
 
   useBrowserWindow({
     onResize: onFilterResize,
-    resizeListenerUpdateDeps: []
+    resizeListenerUpdateDeps: [],
   });
 
   useEffect(() => {
@@ -104,7 +104,7 @@ export const HeaderWithFilters = ({
   const { stagesEnabled, customStages } = app.chain?.meta || {};
 
   const { data: topics } = useFetchTopicsQuery({
-    communityId: app.activeChainId()
+    communityId: app.activeChainId(),
   });
 
   const featuredTopics = (topics || [])
@@ -124,7 +124,7 @@ export const HeaderWithFilters = ({
         ThreadStage.ProposalInReview,
         ThreadStage.Voting,
         ThreadStage.Passed,
-        ThreadStage.Failed
+        ThreadStage.Failed,
       ]
     : parseCustomStages(customStages);
 
@@ -132,21 +132,21 @@ export const HeaderWithFilters = ({
 
   const matchesDiscussionsTopicRoute = matchRoutes(
     [{ path: '/discussions/:topic' }, { path: ':scope/discussions/:topic' }],
-    location
+    location,
   );
 
   const matchesArchivedRoute = matchRoutes(
     [{ path: '/archived' }, { path: ':scope/archived' }],
-    location
+    location,
   );
 
   const onFilterSelect = ({
     pickedTopic = matchesDiscussionsTopicRoute?.[0]?.params?.topic || '',
     filterKey = '',
-    filterVal = ''
+    filterVal = '',
   }) => {
     const urlParams = Object.fromEntries(
-      new URLSearchParams(window.location.search)
+      new URLSearchParams(window.location.search),
     );
     urlParams[filterKey] = filterVal;
 
@@ -159,28 +159,28 @@ export const HeaderWithFilters = ({
         `/archived?` +
           Object.keys(urlParams)
             .map((x) => `${x}=${urlParams[x]}`)
-            .join('&')
+            .join('&'),
       );
     } else {
       navigate(
         `/discussions${pickedTopic ? `/${pickedTopic}` : ''}?` +
           Object.keys(urlParams)
             .map((x) => `${x}=${urlParams[x]}`)
-            .join('&')
+            .join('&'),
       );
     }
   };
 
   const handleDismissStakeBannerModal = (
     dismissForThisCommunity: boolean,
-    dismissForAnyCommunity: boolean
+    dismissForAnyCommunity: boolean,
   ) => {
     setIsDismissStakeBannerModalOpen(false);
 
     dismissBanner({
       communityId: app.activeChainId(),
       communityDismissal: dismissForThisCommunity,
-      allCommunitiesDismissal: dismissForAnyCommunity
+      allCommunitiesDismissal: dismissForAnyCommunity,
     });
   };
 
@@ -222,7 +222,9 @@ export const HeaderWithFilters = ({
               iconLeft="plus"
               onClick={() => {
                 navigate(
-                  `/new/discussion${topic ? `?topic=${selectedTopic?.id}` : ''}`
+                  `/new/discussion${
+                    topic ? `?topic=${selectedTopic?.id}` : ''
+                  }`,
                 );
               }}
               disabled={!hasJoinedCommunity}
@@ -252,7 +254,7 @@ export const HeaderWithFilters = ({
               onSelect={(item: any) => {
                 onFilterSelect({
                   filterKey: 'featured',
-                  filterVal: item.value as ThreadFeaturedFilterTypes
+                  filterVal: item.value as ThreadFeaturedFilterTypes,
                 });
               }}
               options={[
@@ -260,32 +262,32 @@ export const HeaderWithFilters = ({
                   id: 1,
                   value: ThreadFeaturedFilterTypes.Newest,
                   label: 'Newest',
-                  iconLeft: 'sparkle'
+                  iconLeft: 'sparkle',
                 },
                 {
                   id: 2,
                   value: ThreadFeaturedFilterTypes.Oldest,
                   label: 'Oldest',
-                  iconLeft: 'clockCounterClockwise'
+                  iconLeft: 'clockCounterClockwise',
                 },
                 {
                   id: 3,
                   value: ThreadFeaturedFilterTypes.MostLikes,
                   label: 'Upvotes',
-                  iconLeft: 'upvote'
+                  iconLeft: 'upvote',
                 },
                 {
                   id: 4,
                   value: ThreadFeaturedFilterTypes.MostComments,
                   label: 'Comments',
-                  iconLeft: 'chatDots'
+                  iconLeft: 'chatDots',
                 },
                 {
                   id: 5,
                   value: ThreadFeaturedFilterTypes.LatestActivity,
                   label: 'Latest Activity',
-                  iconLeft: 'bellRinging'
-                }
+                  iconLeft: 'bellRinging',
+                },
               ]}
             />
           </div>
@@ -301,30 +303,30 @@ export const HeaderWithFilters = ({
                   }
                   onSelect={(item: any) =>
                     onFilterSelect({
-                      pickedTopic: item === 'All Topics' ? '' : item.value
+                      pickedTopic: item === 'All Topics' ? '' : item.value,
                     })
                   }
                   options={[
                     {
                       id: 0,
                       label: 'All Topics',
-                      value: 'All Topics'
+                      value: 'All Topics',
                     },
                     ...[...featuredTopics, ...otherTopics].map((t) => ({
                       id: t.id,
                       value: t.name,
-                      label: t.name
-                    }))
+                      label: t.name,
+                    })),
                   ]}
                   dropdownPosition={rightFiltersDropdownPosition}
                   canEditOption={app.roles?.isAdminOfEntity({
-                    community: app.activeChainId()
+                    community: app.activeChainId(),
                   })}
                   onOptionEdit={(item: any) =>
                     setTopicSelectedToEdit(
                       [...featuredTopics, ...otherTopics].find(
-                        (x) => x.id === item.id
-                      )
+                        (x) => x.id === item.id,
+                      ),
                     )
                   }
                 />
@@ -335,14 +337,14 @@ export const HeaderWithFilters = ({
                   onSelect={(item: any) =>
                     onFilterSelect({
                       filterKey: 'stage',
-                      filterVal: item.value === 'All Stages' ? '' : item.value
+                      filterVal: item.value === 'All Stages' ? '' : item.value,
                     })
                   }
                   options={[
                     {
                       id: 0,
                       label: 'All Stages',
-                      value: 'All Stages'
+                      value: 'All Stages',
                     },
                     ...stages.map((s) => ({
                       id: s,
@@ -351,8 +353,8 @@ export const HeaderWithFilters = ({
                         s === ThreadStage.Voting
                           ? totalThreadsInCommunityForVoting
                           : ''
-                      }`
-                    }))
+                      }`,
+                    })),
                   ]}
                   dropdownPosition={rightFiltersDropdownPosition}
                 />
@@ -362,25 +364,25 @@ export const HeaderWithFilters = ({
                 onSelect={(item: any) => {
                   onFilterSelect({
                     filterKey: 'dateRange',
-                    filterVal: item.value as ThreadTimelineFilterTypes
+                    filterVal: item.value as ThreadTimelineFilterTypes,
                   });
                 }}
                 options={[
                   {
                     id: 1,
                     value: ThreadTimelineFilterTypes.AllTime,
-                    label: 'All Time'
+                    label: 'All Time',
                   },
                   {
                     id: 2,
                     value: ThreadTimelineFilterTypes.ThisMonth,
-                    label: 'Month'
+                    label: 'Month',
                   },
                   {
                     id: 3,
                     value: ThreadTimelineFilterTypes.ThisWeek,
-                    label: 'Week'
-                  }
+                    label: 'Week',
+                  },
                 ]}
                 dropdownPosition={rightFiltersDropdownPosition}
               />

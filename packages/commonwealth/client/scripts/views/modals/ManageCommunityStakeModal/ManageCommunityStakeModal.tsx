@@ -10,7 +10,7 @@ import TransactionSucceeded from './TransactionSucceeded';
 import { useStakeAddresses } from './hooks';
 import {
   ManageCommunityStakeModalProps,
-  ManageCommunityStakeModalState
+  ManageCommunityStakeModalState,
 } from './types';
 
 import './ManageCommunityStakeModal.scss';
@@ -18,10 +18,10 @@ import './ManageCommunityStakeModal.scss';
 const ManageCommunityStakeModal = ({
   onModalClose,
   mode,
-  denomination
+  denomination,
 }: ManageCommunityStakeModalProps) => {
   const [modalState, setModalState] = useState(
-    ManageCommunityStakeModalState.Exchange
+    ManageCommunityStakeModalState.Exchange,
   );
   const [successTransactionHash, setSuccessTransactionHash] = useState('');
   const [numberOfStakeToExchange, setNumberOfStakeToExchange] = useState(1);

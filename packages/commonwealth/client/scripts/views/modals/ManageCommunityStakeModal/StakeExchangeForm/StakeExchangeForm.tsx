@@ -5,12 +5,12 @@ import React from 'react';
 import { isMobile } from 'react-device-detect';
 import {
   BaseMixpanelPayload,
-  MixpanelCommunityStakeEvent
+  MixpanelCommunityStakeEvent,
 } from 'shared/analytics/types';
 import app from 'state';
 import {
   useBuyStakeMutation,
-  useSellStakeMutation
+  useSellStakeMutation,
 } from 'state/api/communityStake';
 import { useCommunityStake } from 'views/components/CommunityStake';
 import { Skeleton } from 'views/components/Skeleton';
@@ -22,10 +22,10 @@ import CWCircleButton from 'views/components/component_kit/new_designs/CWCircleB
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import {
   CWModalBody,
-  CWModalFooter
+  CWModalFooter,
 } from 'views/components/component_kit/new_designs/CWModal';
 import CWPopover, {
-  usePopover
+  usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
@@ -34,12 +34,12 @@ import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { useStakeExchange } from '../hooks';
 import {
   ManageCommunityStakeModalMode,
-  ManageCommunityStakeModalState
+  ManageCommunityStakeModalState,
 } from '../types';
 import { capDecimals, convertEthToUsd } from '../utils';
 import {
   CustomAddressOption,
-  CustomAddressOptionElement
+  CustomAddressOptionElement,
 } from './CustomAddressOption';
 
 import './StakeExchangeForm.scss';
@@ -70,7 +70,7 @@ const StakeExchangeForm = ({
   addressOptions,
   numberOfStakeToExchange,
   onSetNumberOfStakeToExchange,
-  denomination
+  denomination,
 }: StakeExchangeFormProps) => {
   const chainRpc = app?.chain?.meta?.ChainNode?.url;
   const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
@@ -81,11 +81,11 @@ const StakeExchangeForm = ({
     ethUsdRate,
     userEthBalance,
     userEthBalanceLoading,
-    sellPriceData
+    sellPriceData,
   } = useStakeExchange({
     mode,
     address: selectedAddress?.value,
-    numberOfStakeToExchange: numberOfStakeToExchange ?? 0
+    numberOfStakeToExchange: numberOfStakeToExchange ?? 0,
   });
 
   const { stakeBalance, stakeValue, currentVoteWeight, stakeData } =
@@ -96,7 +96,7 @@ const StakeExchangeForm = ({
 
   const expectedVoteWeight = commonProtocol.calculateVoteWeight(
     numberOfStakeToExchange ? String(numberOfStakeToExchange) : '0',
-    stakeData?.vote_weight
+    stakeData?.vote_weight,
   );
 
   const popoverProps = usePopover();
@@ -104,7 +104,7 @@ const StakeExchangeForm = ({
   const isBuyMode = mode === 'buy';
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
-    onAction: true
+    onAction: true,
   });
 
   const handleBuy = async () => {
@@ -117,7 +117,7 @@ const StakeExchangeForm = ({
         namespace: stakeData?.Chain?.namespace,
         chainRpc,
         walletAddress: selectedAddress?.value,
-        ethChainId
+        ethChainId,
       });
 
       onSetSuccessTransactionHash(txReceipt?.transactionHash);
@@ -127,7 +127,7 @@ const StakeExchangeForm = ({
         event: MixpanelCommunityStakeEvent.STAKE_BOUGHT,
         community: app.activeChainId(),
         userId: app.user.activeAccount.profile.id,
-        userAddress: selectedAddress?.value
+        userAddress: selectedAddress?.value,
       });
     } catch (err) {
       console.log('Error buying: ', err);
@@ -145,7 +145,7 @@ const StakeExchangeForm = ({
         namespace: stakeData?.Chain?.namespace,
         chainRpc,
         walletAddress: selectedAddress?.value,
-        ethChainId
+        ethChainId,
       });
 
       onSetSuccessTransactionHash(txReceipt?.transactionHash);
@@ -155,7 +155,7 @@ const StakeExchangeForm = ({
         event: MixpanelCommunityStakeEvent.STAKE_SOLD,
         community: app.activeChainId(),
         userId: app.user.activeAccount.profile.id,
-        userAddress: selectedAddress?.value
+        userAddress: selectedAddress?.value,
       });
     } catch (err) {
       console.log('Error selling: ', err);
@@ -194,7 +194,7 @@ const StakeExchangeForm = ({
     return {
       BLAST: <CWCustomIcon iconName="blast" iconSize="xs" />,
       ETH: <CWIcon iconName="ethereum" iconSize="xs" />,
-      BASE: <CWCustomIcon iconName="base" iconSize="xs" />
+      BASE: <CWCustomIcon iconName="base" iconSize="xs" />,
     }[denomination];
   };
 
@@ -249,8 +249,8 @@ const StakeExchangeForm = ({
             Option: (originalProps) =>
               CustomAddressOption({
                 originalProps,
-                selectedAddressValue: activeAccountAddress
-              })
+                selectedAddressValue: activeAccountAddress,
+              }),
           }}
           noOptionsMessage={() => 'No available Metamask address'}
           value={selectedAddress}
@@ -291,7 +291,7 @@ const StakeExchangeForm = ({
             style={{
               display: 'flex',
               alignItems: 'center',
-              flexDirection: 'row'
+              flexDirection: 'row',
             }}
           >
             <CWText type="caption">You have {stakeBalance} stake</CWText>
@@ -327,7 +327,7 @@ const StakeExchangeForm = ({
                 onInput={handleInput}
                 value={numberOfStakeToExchange}
                 inputClassName={clsx('number', {
-                  expanded: numberOfStakeToExchange?.toString().length > 3
+                  expanded: numberOfStakeToExchange?.toString().length > 3,
                 })}
                 containerClassName="number-container"
               />
