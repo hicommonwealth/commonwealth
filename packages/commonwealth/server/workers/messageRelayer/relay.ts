@@ -59,7 +59,8 @@ export async function relay(broker: Broker, models: DB): Promise<number> {
     await models.sequelize.query(
       `
       UPDATE "Outbox"
-      SET relayed = true
+      SET relayed = true,
+          updated_at = CURRENT_TIMESTAMP
       WHERE relayed = false -- ensures query ignores irrelevant child partitions
         AND id IN (:eventIds)
     `,
