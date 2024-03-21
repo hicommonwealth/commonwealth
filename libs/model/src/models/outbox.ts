@@ -8,12 +8,14 @@ import { DB } from './index';
 
 export type OutboxAttributes = z.infer<typeof schemas.entities.Outbox>;
 
+export type InsertOutboxEvent = EventContext<schemas.Events> & {
+  created_at?: Date;
+};
+
 export async function insertOutbox(
   models: DB,
-  events: (EventContext<schemas.Events> & { created_at?: Date })[],
+  events: [InsertOutboxEvent, ...InsertOutboxEvent[]],
 ): Promise<number[]> {
-  if (!events.length) return;
-
   let values = '';
   const replacements: Record<string, unknown> = {};
   for (let index = 0; index < events.length; index++) {
@@ -31,16 +33,16 @@ export async function insertOutbox(
   // remove trailing comma
   values = values.slice(0, -1);
 
-  const res = await models.sequelize.query(
+  const res = (await models.sequelize.query(
     `
     INSERT INTO "Outbox"(event_name, event_payload, relayed, created_at, updated_at) VALUES
     ${values} RETURNING id;
   `,
     { replacements, type: QueryTypes.INSERT },
-  );
+  )) as unknown as [{ id: string }[], number];
 
-  const ids: number = [];
-  for (const obj: { id: string } of res[0]) {
+  const ids: number[] = [];
+  for (const obj of res[0]) {
     ids.push(parseInt(obj.id));
   }
   return ids;
