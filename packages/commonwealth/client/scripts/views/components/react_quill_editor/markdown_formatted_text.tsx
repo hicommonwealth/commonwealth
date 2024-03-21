@@ -170,7 +170,7 @@ export const MarkdownFormattedText = ({
     return () => {
       convertTwitterLinks.cancel();
     };
-  }, [finalDoc]);
+  }, [finalDoc, convertTwitterLinks]);
 
   return (
     <>
