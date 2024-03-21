@@ -8,7 +8,7 @@ import {
 } from '@hicommonwealth/adapters';
 import { broker, logger } from '@hicommonwealth/core';
 import { RABBITMQ_URI } from '../../config';
-import { connectToPostgres, setupSubscriber } from './pgListener';
+import { setupListener } from './pgListener';
 import { incrementNumUnrelayedEvents, relayForever } from './relayForever';
 
 const log = logger(PinoLogger()).getLogger(__filename);
@@ -53,8 +53,7 @@ export async function startMessageRelayer(maxRelayIterations?: number) {
     }),
   );
 
-  const subscriber = setupSubscriber(setServiceHealth);
-  await connectToPostgres(subscriber);
+  await setupListener();
 
   isServiceHealthy = true;
   return relayForever(maxRelayIterations);

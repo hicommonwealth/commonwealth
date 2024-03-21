@@ -1,6 +1,6 @@
 import { PinoLogger } from '@hicommonwealth/adapters';
 import { Broker, BrokerTopics, logger, schemas } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import type { DB } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { MESSAGE_RELAYER_PREFETCH } from '../../config';
@@ -12,15 +12,7 @@ const EventNameTopicMap: Partial<Record<schemas.Events, BrokerTopics>> = {
   DiscordMessageCreated: BrokerTopics.DiscordListener,
 } as const;
 
-// lock to ensure only a single call to relay is executing at all times
-let relayingState = false;
-
-export function isRelaying() {
-  return relayingState;
-}
-
-export async function relay(broker: Broker): Promise<number> {
-  relayingState = true;
+export async function relay(broker: Broker, models: DB): Promise<number> {
   const publishedEventIds: number[] = [];
   await models.sequelize.transaction(async (transaction) => {
     const events = await models.sequelize.query<
@@ -81,6 +73,5 @@ export async function relay(broker: Broker): Promise<number> {
     );
   });
 
-  relayingState = false;
   return publishedEventIds.length;
 }

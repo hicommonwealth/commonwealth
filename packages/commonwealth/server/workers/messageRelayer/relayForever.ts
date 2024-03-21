@@ -11,6 +11,7 @@ export function incrementNumUnrelayedEvents(numEvents: number) {
 }
 
 export async function relayForever(maxIterations?: number) {
+  const { models } = await import('@hicommonwealth/model');
   const brokerInstance = broker();
   let iteration = 0;
   while (true) {
@@ -19,7 +20,7 @@ export async function relayForever(maxIterations?: number) {
     }
 
     if (numUnrelayedEvents > 0) {
-      const numRelayedEvents = await relay(brokerInstance);
+      const numRelayedEvents = await relay(brokerInstance, models);
       numUnrelayedEvents -= numRelayedEvents;
     }
 

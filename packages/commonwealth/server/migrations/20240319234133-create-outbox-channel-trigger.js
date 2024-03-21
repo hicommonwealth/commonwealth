@@ -8,7 +8,7 @@ module.exports = {
         CREATE OR REPLACE FUNCTION notify_insert_outbox_function()
         RETURNS TRIGGER AS $$
         BEGIN
-          NOTIFY outbox_channel;
+          PERFORM pg_notify('outbox_channel', NEW.event_name);
           RETURN NEW;
         END;
         $$ LANGUAGE plpgsql;
@@ -16,7 +16,7 @@ module.exports = {
         { transaction },
       );
 
-      await queryInterface.query(
+      await queryInterface.sequelize.query(
         `
         CREATE TRIGGER outbox_insert_trigger
         AFTER INSERT ON "Outbox"

@@ -1,47 +1,72 @@
 import { PinoLogger } from '@hicommonwealth/adapters';
-import { logger } from '@hicommonwealth/core';
-import { DATABASE_URI } from '@hicommonwealth/model';
-import createSubscriber, { Subscriber } from 'pg-listen';
+import { delay, logger } from '@hicommonwealth/core';
+import { Client } from 'pg';
 import { incrementNumUnrelayedEvents } from './relayForever';
 
 const log = logger(PinoLogger()).getLogger(__filename);
-const OUTBOX_CHANNEL = 'outbox-channel';
+const OUTBOX_CHANNEL = 'outbox_channel';
+let retryCount = 0;
+const maxRetries = 5;
 
-export function setupSubscriber(
-  setServiceHealth: (healthy: boolean) => void,
-): Subscriber<Record<string, any>> {
-  const subscriber = createSubscriber({ connectionString: DATABASE_URI });
+async function connectListener(client: Client) {
+  try {
+    await client.query(`LISTEN "${OUTBOX_CHANNEL}";`);
+  } catch (err) {
+    log.fatal('Failed to setup Postgres listener. Exiting...', err);
+    process.exit(1);
+  }
+}
 
-  subscriber.events.on('connected', () => {
-    log.info('Message relayer connected to Postgres');
-  });
+async function reconnect(client: Client) {
+  if (retryCount < maxRetries) {
+    // Exponential backoff strategy for reconnection attempts
+    const timeout = Math.pow(2, retryCount) * 1000;
+    log.warn(`Attempting to reconnect in ${timeout / 1000} seconds...`);
+    retryCount++;
 
-  subscriber.events.on('reconnect', () => {
-    // log error so it is reported to rollbar
-    // frequent reconnections could indicate an issue
-    log.error('Message relayer reconnecting to Postgres');
-  });
-  subscriber.notifications.on(OUTBOX_CHANNEL, async () => {
+    try {
+      await client.connect();
+    } catch (err) {
+      log.error('Subscriber failed to reconnect', err);
+      await delay(timeout);
+      return reconnect(client);
+    }
+  } else {
+    log.fatal('Max retry attempts reached. Exiting...');
+    await client.end();
+    process.exit(1);
+  }
+}
+
+export async function setupListener(): Promise<Client> {
+  log.info('Setting up listener...');
+  const { DATABASE_URI } = await import('@hicommonwealth/model');
+  const client = new Client({ connectionString: DATABASE_URI, ssl: false });
+
+  client.on('notification', (payload) => {
+    log.info('RECEIVED', undefined, { payload });
     incrementNumUnrelayedEvents(1);
   });
 
-  subscriber.events.on('error', (error) => {
-    log.fatal('Fatal database connection error:', error);
-    setServiceHealth(false);
-    // restart dyno after multiple reconnection failures
-    process.exit(1);
+  client.on('error', async (err: Error) => {
+    log.error(
+      'PG subscriber encountered an error. Attempting to reconnect...',
+      err,
+    );
+    await reconnect(client);
+    await connectListener(client);
   });
 
-  process.on('exit', () => {
-    subscriber.close();
-  });
+  // client will either connect/reconnect or the process will exit
+  try {
+    await client.connect();
+  } catch (err) {
+    log.error('Subscriber failed to connect to Postgres', err);
+    await reconnect(client);
+  }
 
-  return subscriber;
-}
+  await connectListener(client);
 
-export async function connectToPostgres(
-  subscriber: Subscriber<Record<string, any>>,
-) {
-  await subscriber.connect();
-  await subscriber.listenTo(OUTBOX_CHANNEL);
+  log.info('Listener ready');
+  return client;
 }
