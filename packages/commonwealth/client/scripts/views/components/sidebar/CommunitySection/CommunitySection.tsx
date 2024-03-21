@@ -7,7 +7,7 @@ import { useLocation } from 'react-router-dom';
 import app from 'state';
 import {
   VoteWeightModule,
-  useCommunityStake,
+  useCommunityStake
 } from 'views/components/CommunityStake';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
@@ -44,10 +44,11 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
     currentVoteWeight,
     stakeValue,
     isLoading,
+    activeChainId
   } = useCommunityStake();
   const {
     modeOfManageCommunityStakeModal,
-    setModeOfManageCommunityStakeModal,
+    setModeOfManageCommunityStakeModal
   } = useManageCommunityStakeModalStore();
 
   if (showSkeleton || isLoading) return <CommunitySectionSkeleton />;
@@ -56,6 +57,14 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
   const isMod = Permissions.isCommunityModerator();
   const showAdmin = app.user && (isAdmin || isMod);
+
+  const findDenomination = (selectedStakeChain: string) => {
+    return {
+      Ethereum: selectedStakeChain.toLowerCase().includes('ethereum') && 'ETH',
+      Base: selectedStakeChain.toLowerCase().includes('base') && 'BASE',
+      Blast: selectedStakeChain.toLowerCase().includes('blast') && 'BLAST'
+    }[selectedStakeChain];
+  };
 
   return (
     <>
@@ -72,7 +81,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
                 voteWeight={currentVoteWeight}
                 stakeNumber={stakeBalance}
                 stakeValue={stakeValue}
-                denomination="ETH"
+                denomination={findDenomination(activeChainId)}
                 onOpenStakeModal={setModeOfManageCommunityStakeModal}
               />
             )}
@@ -128,6 +137,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
           <ManageCommunityStakeModal
             mode={modeOfManageCommunityStakeModal}
             onModalClose={() => setModeOfManageCommunityStakeModal(null)}
+            denomination={findDenomination(activeChainId)}
           />
         }
         onClose={() => setModeOfManageCommunityStakeModal(null)}

@@ -4,7 +4,7 @@ import app from 'state';
 import {
   useFetchCommunityStakeQuery,
   useGetBuyPriceQuery,
-  useGetUserStakeBalanceQuery,
+  useGetUserStakeBalanceQuery
 } from 'state/api/communityStake';
 import { useFlag } from '../../../hooks/useFlag';
 
@@ -19,7 +19,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
   const {
     communityId,
     stakeId = commonProtocol.STAKE_ID,
-    walletAddress,
+    walletAddress
   } = props;
   const { isLoggedIn } = useUserLoggedIn();
 
@@ -28,12 +28,13 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
   const chainRpc = app?.chain?.meta?.ChainNode?.url;
   const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
   const activeAccountAddress = app?.user?.activeAccount?.address;
+  const activeChainId = app?.chain?.meta?.ChainNode?.name.split('-')[0];
 
   const { isInitialLoading: communityStakeLoading, data: stakeResponse } =
     useFetchCommunityStakeQuery({
       communityId: communityId || activeCommunityId,
       stakeId,
-      apiEnabled: communityStakeEnabled && !!activeCommunityId,
+      apiEnabled: communityStakeEnabled && !!activeCommunityId
     });
 
   const stakeData = stakeResponse?.data?.result;
@@ -43,12 +44,12 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
       stakeEnabled &&
       (walletAddress || activeAccountAddress) &&
       !!activeCommunityNamespace &&
-      isLoggedIn,
+      isLoggedIn
   );
 
   const {
     isInitialLoading: userStakeBalanceLoading,
-    data: userStakeBalanceData,
+    data: userStakeBalanceData
   } = useGetUserStakeBalanceQuery({
     namespace: activeCommunityNamespace,
     stakeId: commonProtocol.STAKE_ID,
@@ -56,7 +57,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     chainRpc,
     walletAddress: walletAddress || activeAccountAddress,
     keepPreviousData: true,
-    ethChainId,
+    ethChainId
   });
 
   const { isInitialLoading: buyPriceDataLoading, data: buyPriceData } =
@@ -67,12 +68,12 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
       apiEnabled: apiEnabled && !isNaN(Number(userStakeBalanceData)),
       chainRpc,
       ethChainId,
-      keepPreviousData: true,
+      keepPreviousData: true
     });
 
   const currentVoteWeight = commonProtocol.calculateVoteWeight(
     userStakeBalanceData,
-    stakeData?.vote_weight,
+    stakeData?.vote_weight
   );
   const stakeBalance = Number(userStakeBalanceData);
   const stakeValue = Number(buyPriceData?.price);
@@ -86,6 +87,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     currentVoteWeight,
     stakeValue,
     isLoading,
+    activeChainId
   };
 };
 

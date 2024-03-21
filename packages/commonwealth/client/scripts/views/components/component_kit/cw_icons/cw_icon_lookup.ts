@@ -58,7 +58,7 @@ import {
   TwitterLogo,
   Users,
   UsersThree,
-  Warning,
+  Warning
 } from '@phosphor-icons/react';
 import * as CustomIcons from './cw_custom_icons';
 import * as Icons from './cw_icons';
@@ -226,10 +226,12 @@ export const iconLookup = {
   warning: (props) => withPhosphorIcon(Warning)(props),
   website: Icons.CWWebsite,
   write: Icons.CWWrite,
-  members: Icons.CWMembers,
+  members: Icons.CWMembers
 };
 
 export const customIconLookup = {
+  base: CustomIcons.CWBase,
+  blast: CustomIcons.CWBlast,
   email: CustomIcons.CWEmail,
   eth: CustomIcons.CWEth,
   cosmos: CustomIcons.CWCosmos,
@@ -253,7 +255,7 @@ export const customIconLookup = {
   'terra-walletconnect': CustomIcons.CWWalletConnect,
   coinbase: CustomIcons.CWCoinbase,
   x: CustomIcons.CWX, // twitter
-  apple: CustomIcons.CWApple,
+  apple: CustomIcons.CWApple
 };
 
 export type IconName = keyof typeof iconLookup;
