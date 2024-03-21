@@ -13,6 +13,7 @@ import type {
 } from 'web3-core';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
+import { getCosmosChains } from './utils';
 
 declare let window: any;
 
@@ -37,7 +38,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
   public readonly label = 'Metamask';
   public readonly chain = ChainBase.CosmosSDK;
   public readonly defaultNetwork = ChainNetwork.Injective;
-  public readonly specificChains = ['injective', 'evmos'];
+  public readonly specificChains = getCosmosChains(true);
 
   public get available() {
     return !!window.ethereum;

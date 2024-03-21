@@ -90,6 +90,7 @@ export const seedDb = async (debug = false): Promise<void> => {
           balance_type: BalanceType.Cosmos,
           cosmos_chain_id: 'osmosis',
           bech32: 'osmo',
+          slip44: 118,
         },
         csdkBeta: {
           url: 'https://cosmos-devnet-beta.herokuapp.com/rpc',
@@ -98,6 +99,7 @@ export const seedDb = async (debug = false): Promise<void> => {
           alt_wallet_url: 'https://cosmos-devnet-beta.herokuapp.com/lcd/',
           cosmos_chain_id: 'csdkbetaci',
           bech32: 'cosmos',
+          slip44: 118,
         },
         csdkV1: {
           url: 'https://cosmos-devnet.herokuapp.com/rpc',
@@ -107,6 +109,7 @@ export const seedDb = async (debug = false): Promise<void> => {
           cosmos_chain_id: 'csdkv1',
           bech32: 'cosmos',
           cosmos_gov_version: CosmosGovernanceVersion.v1,
+          slip44: 118,
         },
         csdkBetaLocal: {
           url: 'http://localhost:5050/rpc',
@@ -116,6 +119,7 @@ export const seedDb = async (debug = false): Promise<void> => {
           cosmos_chain_id: 'csdkbetalocal',
           bech32: 'cosmos',
           cosmos_gov_version: CosmosGovernanceVersion.v1beta1,
+          slip44: 118,
         },
         csdkV1CLocal: {
           url: 'http://localhost:5051/rpc',
@@ -125,6 +129,7 @@ export const seedDb = async (debug = false): Promise<void> => {
           cosmos_chain_id: 'csdkv1local',
           bech32: 'cosmos',
           cosmos_gov_version: CosmosGovernanceVersion.v1,
+          slip44: 118,
         },
         ethermintLocal: {
           url: 'http://localhost:5052/rpc',
@@ -133,6 +138,7 @@ export const seedDb = async (debug = false): Promise<void> => {
           alt_wallet_url: 'http://localhost:5052/lcd/',
           cosmos_chain_id: 'evmosdevlocal',
           bech32: 'cosmos',
+          slip44: 60,
         },
       }),
     );

@@ -6,13 +6,12 @@ import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
 import app from 'state';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
+import { getCosmosChains } from './utils';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
   interface Window extends KeplrWindow {}
 }
-
-export const COSMOS_EVM_CHAINS = ['evmos', 'injective', 'evmos-dev'];
 
 class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   // GETTERS/SETTERS
@@ -26,7 +25,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   public readonly label = 'Keplr';
   public readonly chain = ChainBase.CosmosSDK;
   public readonly defaultNetwork = ChainNetwork.Evmos;
-  public readonly specificChains = COSMOS_EVM_CHAINS;
+  public readonly specificChains = getCosmosChains(true);
 
   public get available() {
     return !!window.keplr;
