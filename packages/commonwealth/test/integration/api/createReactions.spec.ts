@@ -1,4 +1,5 @@
 import { ActionArgument } from '@canvas-js/interfaces';
+import { dispose } from '@hicommonwealth/core';
 import { models, tester } from '@hicommonwealth/model';
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
@@ -100,8 +101,9 @@ describe('createReaction Integration Tests', () => {
     threadId = thread.id;
   });
 
-  after(() => {
+  after(async () => {
     Sinon.restore();
+    await dispose()();
   });
 
   it('should create comment reactions and verify comment reaction count', async () => {

@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable global-require */
 /* eslint-disable no-unused-expressions */
+import { dispose } from '@hicommonwealth/core';
 import { tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
@@ -79,6 +80,10 @@ describe.skip('Thread Tests', () => {
     userSession2 = { session: res.session, sign: res.sign };
     expect(userAddress2).to.not.be.null;
     expect(userJWT2).to.not.be.null;
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   describe('POST /threads', () => {

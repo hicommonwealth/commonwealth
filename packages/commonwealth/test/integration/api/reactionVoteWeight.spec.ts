@@ -1,3 +1,4 @@
+import { dispose } from '@hicommonwealth/core';
 import {
   AddressInstance,
   CommunityInstance,
@@ -84,6 +85,10 @@ describe('Reaction vote weight', () => {
         },
       },
     );
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   afterEach(() => {

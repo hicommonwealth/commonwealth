@@ -4,6 +4,7 @@ import {
   ProposalType,
   SnapshotEventType,
   SupportedNetwork,
+  dispose,
 } from '@hicommonwealth/core';
 import { models, tester } from '@hicommonwealth/model';
 import chai from 'chai';
@@ -106,6 +107,10 @@ describe('emitNotifications tests', () => {
       address_id: userAddressId,
       reaction: 'like',
     });
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   describe('Forum Notifications', () => {

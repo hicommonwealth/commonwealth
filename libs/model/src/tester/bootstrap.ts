@@ -1,5 +1,6 @@
+import { dispose } from '@hicommonwealth/core';
 import path from 'node:path';
-import { QueryTypes, Sequelize } from 'sequelize';
+import { Model, ModelStatic, QueryTypes, Sequelize } from 'sequelize';
 import { SequelizeStorage, Umzug } from 'umzug';
 import { TESTING, TEST_DB_NAME } from '../config';
 import { DB, buildDb } from '../models';
@@ -96,6 +97,16 @@ export const bootstrap_testing = async (): Promise<DB> => {
     // TODO: use migrate instead of sync
     //await migrate_db(testdb.sequelize);
     await testdb.sequelize.sync({ force: true });
+    // register hook to truncate test db after calling dispose()()
+    dispose(async () => {
+      const tables = Object.entries(testdb!)
+        .filter(([k]) => !k.endsWith('equelize'))
+        .map(([, v]) => `"${(v as ModelStatic<Model>).tableName}"`)
+        .join(',');
+      await testdb!.sequelize.query(
+        `TRUNCATE TABLE ${tables} RESTART IDENTITY CASCADE;`,
+      );
+    });
   }
   return testdb;
 };

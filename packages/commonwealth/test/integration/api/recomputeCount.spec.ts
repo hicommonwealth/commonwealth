@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { models } from '@hicommonwealth/model';
+import { models, tester } from '@hicommonwealth/model';
 import chai, { expect } from 'chai';
 import chaiHttp from 'chai-http';
 import { Op, QueryTypes } from 'sequelize';
@@ -10,6 +10,7 @@ import {
   testThreads,
 } from './external/dbEntityHooks.spec';
 
+import { dispose } from '@hicommonwealth/core';
 import { recomputeCounts } from '../../../scripts/recompute-count-job';
 import * as modelUtils from '../../util/modelUtils';
 
@@ -290,9 +291,14 @@ async function verifyRecomputeCountAll() {
 
 describe('recomputeCounts', () => {
   before(async () => {
+    await tester.seedDb();
     testVerifiedChainAddress = await modelUtils.createAndVerifyAddress({
       chain: 'alex',
     });
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   describe('counts ', () => {

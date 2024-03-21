@@ -1,3 +1,4 @@
+import { dispose } from '@hicommonwealth/core';
 import { models, tester, ThreadAttributes } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
@@ -130,6 +131,10 @@ describe('User Dashboard API', () => {
     const threadTwo = await modelUtils.createThread(threadTwoArgs);
     expect(threadTwo.status).to.equal('Success');
     expect(threadTwo.result).to.not.be.null;
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   describe('/viewUserActivity', () => {

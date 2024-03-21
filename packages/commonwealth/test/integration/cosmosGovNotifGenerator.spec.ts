@@ -18,6 +18,7 @@ import {
   ChainNetwork,
   ChainType,
   CosmosGovernanceVersion,
+  dispose,
 } from '@hicommonwealth/core';
 import { models, tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
@@ -229,6 +230,10 @@ export async function createCosmosChains() {
 describe('Cosmos Governance Notification Generator', () => {
   before('Reset database', async () => {
     await tester.seedDb();
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   describe('Utility function tests', () => {

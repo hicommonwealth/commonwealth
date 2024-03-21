@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-expressions */
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase, dispose } from '@hicommonwealth/core';
 import { tester } from '@hicommonwealth/model';
 import { personalSign } from '@metamask/eth-sig-util';
 import chai from 'chai';
@@ -23,6 +23,10 @@ const { expect } = chai;
 describe('API Tests', () => {
   before('reset database', async () => {
     await tester.seedDb();
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   describe('address tests', () => {

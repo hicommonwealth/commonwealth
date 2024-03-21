@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { NotificationCategories } from '@hicommonwealth/core';
+import { NotificationCategories, dispose } from '@hicommonwealth/core';
 import { models, tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
@@ -86,6 +86,10 @@ describe('Notification Routes Tests', () => {
       subscription_id: chainEventSub.id,
       is_read: false,
     });
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   describe('/viewNotifications: return notifications to user', () => {

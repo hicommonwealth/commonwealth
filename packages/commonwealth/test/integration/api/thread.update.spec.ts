@@ -1,4 +1,5 @@
 import { ActionPayload, Session } from '@canvas-js/interfaces';
+import { dispose } from '@hicommonwealth/core';
 import { models, tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
@@ -62,6 +63,10 @@ describe('Thread Patch Update', () => {
       },
     });
     topicId = topic.id;
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   describe('update thread', () => {

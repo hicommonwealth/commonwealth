@@ -1,4 +1,5 @@
 import { ActionPayload, Session } from '@canvas-js/interfaces';
+import { dispose } from '@hicommonwealth/core';
 import {
   LinkSource,
   ThreadAttributes,
@@ -109,6 +110,10 @@ describe('Linking Tests', () => {
         sign: adminSession.sign,
       })
     ).result;
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   describe('/linking/addThreadLinks', () => {

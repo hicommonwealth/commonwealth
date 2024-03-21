@@ -1,4 +1,4 @@
-import { ChainBase, ChainType } from '@hicommonwealth/core';
+import { ChainBase, ChainType, dispose } from '@hicommonwealth/core';
 import {
   CommunityAttributes,
   UserInstance,
@@ -28,6 +28,10 @@ const baseRequest: CommunityAttributes = {
 describe('UpdateChain Tests', () => {
   before(async () => {
     await tester.seedDb();
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   it('Correctly updates chain', async () => {

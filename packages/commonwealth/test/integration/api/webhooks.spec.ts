@@ -2,6 +2,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 require('dotenv').config();
+import { dispose } from '@hicommonwealth/core';
 import { models, tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
@@ -38,6 +39,10 @@ describe('Webhook Tests', () => {
 
   before('reset database', async () => {
     await tester.seedDb();
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   beforeEach(async () => {
@@ -242,9 +247,6 @@ describe('Webhook Tests', () => {
   });
 
   describe('Integration Tests', () => {
-    before('reset database', async () => {
-      await tester.seedDb();
-    });
     // we want to test that no errors occur up to the point the webhook is hit
     it('should send a webhook for markdown and rich text content', async () => {
       const webhookUrl = process.env.SLACK_FEEDBACK_WEBHOOK;

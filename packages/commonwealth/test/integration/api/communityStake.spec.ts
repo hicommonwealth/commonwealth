@@ -1,3 +1,4 @@
+import { dispose } from '@hicommonwealth/core';
 import {
   UserInstance,
   commonProtocol,
@@ -36,6 +37,10 @@ const expectedCreateResp = {
 describe('POST communityStakes Tests', () => {
   beforeEach(async () => {
     await tester.seedDb();
+  });
+
+  afterEach(async () => {
+    await dispose()();
   });
 
   it('The handler creates and updates community stake', async () => {

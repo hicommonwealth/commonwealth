@@ -1,3 +1,4 @@
+import { dispose } from '@hicommonwealth/core';
 import { ChainNodeInstance, models, tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { BigNumber, ethers } from 'ethers';
@@ -25,6 +26,10 @@ describe('emitChainEventNotifs', () => {
     chainNode = await getTestChainNode();
     await getTestSubscription();
     await getTestCommunityContract();
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   it('should emit a notification for each given proposal event', async () => {

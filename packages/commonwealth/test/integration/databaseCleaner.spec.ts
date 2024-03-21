@@ -1,4 +1,4 @@
-import { NotificationCategories } from '@hicommonwealth/core';
+import { NotificationCategories, dispose } from '@hicommonwealth/core';
 import { models, tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
@@ -12,6 +12,10 @@ const { expect } = chai;
 describe('DatabaseCleaner Tests', () => {
   before('Reset database', async () => {
     await tester.seedDb();
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   describe('Tests when the cleaner runs', () => {

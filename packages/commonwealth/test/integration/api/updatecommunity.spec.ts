@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-expressions */
+import { dispose } from '@hicommonwealth/core';
 import { tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
@@ -46,6 +47,10 @@ describe('Update Community/Chain Tests', () => {
     };
 
     await modelUtils.createCommunity(communityArgs);
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   describe('/updateChain route tests', () => {

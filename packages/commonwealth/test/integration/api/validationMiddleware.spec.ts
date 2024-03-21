@@ -1,6 +1,7 @@
 /* eslint-disable global-require */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { dispose } from '@hicommonwealth/core';
 import { models, tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
@@ -46,6 +47,10 @@ describe('DatabaseValidationService Tests', () => {
     userId = res.user_id;
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   describe('validateAuthor', () => {

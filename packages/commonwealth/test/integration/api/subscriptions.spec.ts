@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { NotificationCategories } from '@hicommonwealth/core';
+import { dispose, NotificationCategories } from '@hicommonwealth/core';
 import {
   models,
   SubscriptionValidationErrors,
@@ -71,6 +71,10 @@ describe('Subscriptions Tests', () => {
     expect(res).to.not.be.null;
     expect(res.status).to.be.equal('Success');
     comment = res.result;
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   describe('/createSubscription test', () => {

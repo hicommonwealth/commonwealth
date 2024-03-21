@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { dispose } from '@hicommonwealth/core';
 import { tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
@@ -17,6 +18,10 @@ const markdownThread = require('../../util/fixtures/markdownThread');
 describe('User Model Routes', () => {
   before('reset database', async () => {
     await tester.seedDb();
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   describe('/updateEmail', () => {

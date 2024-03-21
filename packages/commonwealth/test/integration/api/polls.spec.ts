@@ -1,3 +1,4 @@
+import { dispose } from '@hicommonwealth/core';
 import { models, tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
@@ -38,6 +39,10 @@ describe('Polls', () => {
     );
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   it('should create a poll for a thread', async () => {
