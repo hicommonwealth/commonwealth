@@ -1,0 +1,10 @@
+FROM postgres:15.1-alpine
+
+USER root
+
+RUN apk update && \
+apk add git make gcc
+
+RUN git clone https://github.com/pgpartman/pg_partman
+RUN cd pg_partman && git checkout v5.0.1
+RUN cd pg_partman && make NO_BGW=1 install

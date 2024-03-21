@@ -8,7 +8,7 @@ import type { CommunityAttributes, CommunityInstance } from './community';
 import type { ProfileAttributes, ProfileInstance } from './profile';
 import type { ModelInstance, ModelStatic } from './types';
 
-export type EmailNotificationInterval = 'week' | 'never';
+export type EmailNotificationInterval = 'weekly' | 'never';
 
 export type UserAttributes = z.infer<typeof schemas.entities.User> & {
   // associations (see https://vivacitylabs.com/setup-typescript-sequelize/)
