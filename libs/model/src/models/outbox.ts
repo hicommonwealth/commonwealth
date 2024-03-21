@@ -1,10 +1,51 @@
-// import { schemas } from '@hicommonwealth/core';
+import { EventContext, schemas } from '@hicommonwealth/core';
 // import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 // import type { DataTypes } from 'sequelize';
-// import { z } from 'zod';
+import { QueryTypes } from 'sequelize';
+import { z } from 'zod';
+import { DB } from './index';
 // import { ModelInstance, ModelStatic } from './types';
-//
-// export type OutboxAttributes = z.infer<typeof schemas.entities.Outbox>;
+
+export type OutboxAttributes = z.infer<typeof schemas.entities.Outbox>;
+
+export async function insertOutbox(
+  models: DB,
+  events: (EventContext<schemas.Events> & { created_at?: Date })[],
+): Promise<number[]> {
+  if (!events.length) return;
+
+  let values = '';
+  const replacements: Record<string, unknown> = {};
+  for (let index = 0; index < events.length; index++) {
+    const event = events[index];
+    // TODO: validate event.payload with Zod?
+    values += `(:eventName${index}, :eventPayload${index}, false, :createdAt${index}, CURRENT_TIMESTAMP),`;
+    replacements[`eventName${index}`] = event.name;
+    replacements[`eventPayload${index}`] = JSON.stringify({
+      ...event.payload,
+      event_name: event.name,
+    });
+    replacements[`createdAt${index}`] = event.created_at;
+  }
+
+  // remove trailing comma
+  values = values.slice(0, -1);
+
+  const res = await models.sequelize.query(
+    `
+    INSERT INTO "Outbox"(event_name, event_payload, relayed, created_at, updated_at) VALUES
+    ${values} RETURNING id;
+  `,
+    { replacements, type: QueryTypes.INSERT },
+  );
+
+  const ids: number = [];
+  for (const obj: { id: string } of res[0]) {
+    ids.push(parseInt(obj.id));
+  }
+  return ids;
+}
+
 //
 // export type OutboxInstance = ModelInstance<OutboxAttributes>;
 //

@@ -7,6 +7,7 @@ import {
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import { broker, logger } from '@hicommonwealth/core';
+import { QueryTypes } from 'sequelize';
 import { RABBITMQ_URI } from '../../config';
 import { setupListener } from './pgListener';
 import { incrementNumUnrelayedEvents, relayForever } from './relayForever';
@@ -25,10 +26,6 @@ startHealthCheckLoop({
   },
 });
 
-function setServiceHealth(healthy: boolean) {
-  isServiceHealthy = healthy;
-}
-
 export async function startMessageRelayer(maxRelayIterations?: number) {
   const { models } = await import('@hicommonwealth/model');
 
@@ -45,13 +42,17 @@ export async function startMessageRelayer(maxRelayIterations?: number) {
     throw e;
   }
 
-  incrementNumUnrelayedEvents(
-    await models.Outbox.count({
-      where: {
-        relayed: false,
-      },
-    }),
+  const count = parseInt(
+    (
+      await models.sequelize.query<{ count: string }>(
+        `
+        SELECT COUNT(*) FROM "Outbox";
+      `,
+        { type: QueryTypes.SELECT, raw: true },
+      )
+    )[0].count,
   );
+  incrementNumUnrelayedEvents(count);
 
   await setupListener();
 

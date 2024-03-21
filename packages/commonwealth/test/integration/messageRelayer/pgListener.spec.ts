@@ -1,5 +1,5 @@
-import { delay } from '@hicommonwealth/core';
-import { tester } from '@hicommonwealth/model';
+import { delay, schemas } from '@hicommonwealth/core';
+import { insertOutbox, tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { Client } from 'pg';
 import { QueryTypes } from 'sequelize';
@@ -31,17 +31,15 @@ describe('pgListener', () => {
     );
     expect(count).to.equal(0);
     client = await setupListener();
-    eventId = parseInt(
-      (
-        await models.sequelize.query(
-          `
-        INSERT INTO "Outbox"(event_name, event_payload, relayed, created_at, updated_at) VALUES
-          ('test', '{"test": 1}', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) RETURNING id;
-      `,
-          { raw: true },
-        )
-      )[0][0].id,
-    );
+    eventId = (
+      await insertOutbox(models, [
+        {
+          name: 'test' as schemas.Events,
+          payload: {},
+          created_at: new Date('2024-01-02T00:00:00.000Z'),
+        },
+      ])
+    )[0];
     await delay(1000);
     expect(numUnrelayedEvents).to.equal(1);
   });

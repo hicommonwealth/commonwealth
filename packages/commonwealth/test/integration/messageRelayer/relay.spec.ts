@@ -1,11 +1,21 @@
-import { Broker, successfulInMemoryBroker } from '@hicommonwealth/core';
-import { tester } from '@hicommonwealth/model';
+import {
+  Broker,
+  schemas,
+  successfulInMemoryBroker,
+} from '@hicommonwealth/core';
+import {
+  DB,
+  OutboxAttributes,
+  insertOutbox,
+  tester,
+} from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { QueryTypes } from 'sequelize';
 import { relay } from '../../../server/workers/messageRelayer/relay';
+import { testOutboxEvents } from './util';
 
 describe('relay', () => {
-  let models;
+  let models: DB;
 
   before(async () => {
     const res = await import('@hicommonwealth/model');
@@ -19,13 +29,13 @@ describe('relay', () => {
   });
 
   it('Should relay a single event and update relayed column', async () => {
-    await models.sequelize.query(
-      `
-      INSERT INTO "Outbox"(event_name, event_payload, relayed, created_at, updated_at) VALUES
-        ('test', '{"test": 1}', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) RETURNING id;
-    `,
-      { raw: true },
-    );
+    await insertOutbox(models, [
+      {
+        name: 'test' as schemas.Events,
+        payload: {},
+        created_at: new Date('2024-01-02T00:00:00.000Z'),
+      },
+    ]);
     const numRelayed = await relay(successfulInMemoryBroker, models);
     expect(numRelayed).to.equal(1);
     const events = await models.sequelize.query<OutboxAttributes>(
@@ -47,15 +57,7 @@ describe('relay', () => {
         return true;
       },
     };
-    await models.sequelize.query(
-      `
-      INSERT INTO "Outbox"(event_name, event_payload, relayed, created_at, updated_at) VALUES
-        ('second', '{"event_name": "second", "event_payload": "{}"}', false, '2024-01-02T00:00:00.000Z', CURRENT_TIMESTAMP),
-        ('third', '{"event_name": "third", "event_payload": "{}"}', false, '2024-01-03T00:00:00.000Z', CURRENT_TIMESTAMP),
-        ('first', '{"event_name": "first", "event_payload": "{}"}', false, '2024-01-01T00:00:00.000Z', CURRENT_TIMESTAMP);
-    `,
-      { raw: true },
-    );
+    await insertOutbox(models, testOutboxEvents);
     const numRelayed = await relay(spyBroker, models);
     expect(numRelayed).to.equal(3);
     const events = await models.sequelize.query<OutboxAttributes>(
@@ -82,15 +84,7 @@ describe('relay', () => {
         return true;
       },
     };
-    await models.sequelize.query(
-      `
-      INSERT INTO "Outbox"(event_name, event_payload, relayed, created_at, updated_at) VALUES
-        ('second', '{"event_name": "second", "event_payload": "{}"}', false, '2024-01-02T00:00:00.000Z', CURRENT_TIMESTAMP),
-        ('third', '{"event_name": "third", "event_payload": "{}"}', false, '2024-01-03T00:00:00.000Z', CURRENT_TIMESTAMP),
-        ('first', '{"event_name": "first", "event_payload": "{}"}', false, '2024-01-01T00:00:00.000Z', CURRENT_TIMESTAMP);
-    `,
-      { raw: true },
-    );
+    await insertOutbox(models, testOutboxEvents);
     const numRelayed = await relay(spyBroker, models);
     expect(numRelayed).to.equal(1);
     expect(publishedEvents.length).to.equal(1);
