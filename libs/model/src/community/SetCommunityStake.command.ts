@@ -1,41 +1,31 @@
-import { CommandMetadata, InvalidState } from '@hicommonwealth/core';
-import { z } from 'zod';
+import { InvalidState, schemas, type Command } from '@hicommonwealth/core';
 import { models } from '../database';
 import { isCommunityAdmin } from '../middleware';
 import { mustExist } from '../middleware/guards';
-import { CommunityAttributes } from '../models';
 import { commonProtocol } from '../services';
 
-const schema = z.object({
-  stake_id: z.coerce.number().int(),
-  stake_token: z.string().default(''),
-  vote_weight: z.coerce.number().default(1),
-  stake_enabled: z.coerce.boolean().default(true),
-});
-
-export type SetCommunityStake = z.infer<typeof schema>;
-
-export const SetCommunityStake = (): CommandMetadata<
-  CommunityAttributes,
-  typeof schema
-> => ({
-  schema,
+export const SetCommunityStake: Command<
+  typeof schemas.commands.SetCommunityStake
+> = () => ({
+  ...schemas.commands.SetCommunityStake,
   auth: [isCommunityAdmin],
   body: async ({ id, payload }) => {
     // !load
-    const community = await models.Community.findOne({
-      where: { id },
-      include: [
-        {
-          model: models.ChainNode,
-          attributes: ['eth_chain_id', 'url'],
-        },
-        {
-          model: models.CommunityStake,
-        },
-      ],
-      attributes: ['namespace'],
-    });
+    const community = (
+      await models.Community.findOne({
+        where: { id },
+        include: [
+          {
+            model: models.ChainNode,
+            attributes: ['eth_chain_id', 'url'],
+          },
+          {
+            model: models.CommunityStake,
+          },
+        ],
+        attributes: ['namespace'],
+      })
+    )?.toJSON();
 
     // !domain logic - invariants on loaded state & payload
     if (!mustExist('Community', community)) return;
@@ -56,12 +46,12 @@ export const SetCommunityStake = (): CommandMetadata<
     // !side effects
     const [updated] = await models.CommunityStake.upsert({
       ...payload,
-      community_id: id,
+      community_id: id!,
     });
 
     return {
-      ...community.get({ plain: true }),
-      CommunityStakes: [updated.get({ plain: true })],
+      ...community,
+      CommunityStakes: [updated.toJSON()],
     };
   },
 });

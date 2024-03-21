@@ -229,13 +229,17 @@ export const User = ({
       )}
       <CWModal
         size="small"
+        zIndex={10001}
         content={
           <BanUserModal
             address={userAddress}
             onModalClose={() => setIsModalOpen(false)}
           />
         }
-        onClose={() => setIsModalOpen(false)}
+        onClose={(e) => {
+          e.stopPropagation();
+          setIsModalOpen(false);
+        }}
         open={isModalOpen}
       />
     </>

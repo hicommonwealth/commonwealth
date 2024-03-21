@@ -1,7 +1,9 @@
+import { dispose } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
+import { seedDb } from '../../../../../libs/model/src/test';
 import app from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import { Errors } from '../../../server/routes/threads/create_thread_comment_handler';
@@ -11,9 +13,11 @@ import {
   testThreads,
   testUsers,
 } from './external/dbEntityHooks.spec';
+import Chance = require('chance');
 
 chai.use(chaiHttp);
 chai.should();
+const chance = new Chance();
 
 const getThreadCommentCount = async (threadId) => {
   const thread = await models.Thread.findOne({
@@ -44,7 +48,7 @@ const createValidComment = async (threadId, text, jwtToken) => {
 
 const getUniqueCommentText = async () => {
   const time = new Date().getMilliseconds();
-  const text = `testCommentCreated at ${time}`;
+  const text = `${chance.name()} at ${time}`;
   const comment = await models.Comment.findOne({
     where: { text },
   });
@@ -72,6 +76,16 @@ const deleteComment = async (commentId, jwtToken) => {
 
 describe('createComment Integration Tests', () => {
   let jwtTokenUser1;
+
+  before(async () => {
+    // TODO: Notification categories and subscriptions are completely out of sync with schemas!!!
+    // FIXME: This test was relying on data created by other tests
+    await seedDb();
+  });
+
+  after(async () => {
+    await dispose()();
+  });
 
   beforeEach(() => {
     jwtTokenUser1 = jwt.sign(

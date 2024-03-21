@@ -88,7 +88,7 @@ export const ThreadCard = ({
 
   const isStageDefault = isDefaultStage(thread.stage);
   const isTagsRowVisible =
-    (thread.stage && !isStageDefault) || linkedProposals.length > 0;
+    (thread.stage && !isStageDefault) || linkedProposals?.length > 0;
   const stageLabel = threadStageToLabel(thread.stage);
 
   return (

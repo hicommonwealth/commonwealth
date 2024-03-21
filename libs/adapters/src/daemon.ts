@@ -51,21 +51,25 @@ export class Daemons {
     this.tasks = new Map();
   }
 
-  backgroundJob(label: string, fn: DaemonTask, ms: number): NodeJS.Timeout {
+  backgroundJob(
+    label: string,
+    fn: DaemonTask,
+    timeoutMs: number,
+  ): NodeJS.Timeout | undefined {
     // don't accept to run jobs more often than 1 minute
-    if (ms < 60 * 1000) return;
+    if (timeoutMs < 60 * 1000) return;
 
     const jobId = setInterval(async () => {
       try {
         log.info(`Running task ${label}`);
         fn();
       } catch (err) {
-        console.error(`Error running task ${label}`, err);
+        log.error(`Error running task ${label}`, err as Error);
         // cancel task
         clearInterval(jobId);
         this.cancelTask(label);
       }
-    }, ms);
+    }, timeoutMs);
 
     return jobId;
   }
@@ -93,7 +97,7 @@ export class Daemons {
     try {
       fn();
     } catch (err) {
-      console.error(`Error running task ${label}`, err);
+      log.error(`Error running task ${label}`, err as Error);
       // cancel task
       clearInterval(jobId);
       this.cancelTask(label);
@@ -109,7 +113,7 @@ export class Daemons {
       try {
         clearInterval(jobId);
       } catch (err) {
-        console.warn('Error cancelling task', err);
+        log.warn('Error cancelling task', err as Error);
         // remove from map
         return this.tasks.delete(label);
       }

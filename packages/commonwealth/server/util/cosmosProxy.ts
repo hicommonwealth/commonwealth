@@ -10,8 +10,7 @@ import {
 } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
 import axios from 'axios';
-import bodyParser from 'body-parser';
-import { Express } from 'express';
+import * as express from 'express';
 import _ from 'lodash';
 import {
   calcCosmosLCDCacheKeyDuration,
@@ -24,16 +23,17 @@ const FALLBACK_NODE_DURATION = +process.env.FALLBACK_NODE_DURATION_S || 300; // 
 const Errors = {
   NeedCosmosChainId: 'cosmos_chain_id is required',
 };
+const DEVNET_COSMOS_ID_RE = /^(csdk|evmosdev)/;
 
 function setupCosmosProxy(
-  app: Express,
+  app: express.Express,
   models: DB,
   cacheDecorator: CacheDecorator,
 ) {
   // using bodyParser here because cosmjs generates text/plain type headers
   app.post(
     '/cosmosAPI/:community_id',
-    bodyParser.text(),
+    express.text() as express.RequestHandler,
     calcCosmosRPCCacheKeyDuration,
     cacheDecorator.cacheMiddleware(
       DEFAULT_CACHE_DURATION,
@@ -126,7 +126,7 @@ function setupCosmosProxy(
    */
   app.use(
     '/cosmosAPI/v1/:community_id',
-    bodyParser.text(),
+    express.text() as express.RequestHandler,
     calcCosmosLCDCacheKeyDuration,
     cacheDecorator.cacheMiddleware(
       DEFAULT_CACHE_DURATION,
@@ -223,9 +223,7 @@ function setupCosmosProxy(
     cosmos_chain_id: string,
     web_protocol: 'rpc' | 'rest',
   ) => {
-    if (!cosmos_chain_id) {
-      throw new AppError(Errors.NeedCosmosChainId);
-    }
+    if (!cosmos_chain_id || DEVNET_COSMOS_ID_RE.test(cosmos_chain_id)) return;
     const proxyUrl = `https://${web_protocol}.cosmos.directory/${cosmos_chain_id}`;
     const rewrite = rewriteUrl(req, proxyUrl, web_protocol);
     const body = _.isEmpty(req.body) ? null : req.body;
@@ -256,10 +254,8 @@ function setupCosmosProxy(
     error?: any,
   ) => {
     if (error?.message === Errors.NeedCosmosChainId) return; // not a health issue
-    if (previouslyFailed) return; // no need to hit db again
-    if (!cosmos_chain_id) {
-      throw new AppError(Errors.NeedCosmosChainId);
-    }
+    if (previouslyFailed || !cosmos_chain_id) return; // no need to hit db again
+    if (DEVNET_COSMOS_ID_RE.test(cosmos_chain_id)) return; // skip devnets
 
     const failedChainNode = await models.ChainNode.findOne({
       where: { cosmos_chain_id },
@@ -281,12 +277,10 @@ function setupCosmosProxy(
     cosmos_chain_id: string,
     dbUrl: string,
   ) => {
+    if (!cosmos_chain_id || DEVNET_COSMOS_ID_RE.test(cosmos_chain_id)) return;
     // update if the request was successfully made to the DB URL
     // and the node was previously marked as failed
     if (dbUrl?.includes(response.request.host) && previouslyFailed) {
-      if (!cosmos_chain_id) {
-        throw new AppError(Errors.NeedCosmosChainId);
-      }
       const healthyChainNode = await models.ChainNode.findOne({
         where: { cosmos_chain_id },
       });
@@ -314,7 +308,7 @@ function setupCosmosProxy(
 
   app.use(
     '/magicCosmosAPI/:chain/?(node_info)?',
-    bodyParser.text(),
+    express.text() as express.RequestHandler,
     async (req, res) => {
       log.trace(`Got request: ${JSON.stringify(req.body, null, 2)}`);
       // always use cosmoshub for simplicity

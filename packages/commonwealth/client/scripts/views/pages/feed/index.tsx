@@ -16,7 +16,8 @@ const FeedPage = () => {
         .map((item) => DashboardActivityNotification.fromJSON(item))
         .filter(
           (item) =>
-            JSON.parse(item.notificationData).chain_id === app.activeChainId()
+            JSON.parse(item.notificationData).community_id ===
+            app.activeChainId(),
         );
       return formattedData;
     } catch (err) {

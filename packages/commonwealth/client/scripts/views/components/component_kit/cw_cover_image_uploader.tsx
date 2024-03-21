@@ -1,5 +1,4 @@
 import 'components/component_kit/cw_cover_image_uploader.scss';
-import $ from 'jquery';
 import React, { useEffect, useMemo, useRef } from 'react';
 
 import app from 'state';
@@ -8,6 +7,7 @@ import { CWButton as OldCWButton } from './cw_button';
 import { CWIconButton } from './cw_icon_button';
 import { CWButton } from './new_designs/cw_button';
 
+import axios from 'axios';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { useFormContext } from 'react-hook-form';
 import { compressImage } from 'utils/ImageCompression';
@@ -130,7 +130,7 @@ export const CWCoverImageUploader = ({
     file: File,
   ): Promise<[string, ValidationStatus]> => {
     try {
-      const signatureResponse = await $.post(
+      const signatureResponse = await axios.post(
         `${app.serverUrl()}/getUploadSignature`,
         {
           name: file.name,
@@ -139,11 +139,11 @@ export const CWCoverImageUploader = ({
           jwt: app.user.jwt,
         },
       );
-      if (signatureResponse.status !== 'Success') throw new Error();
+      if (signatureResponse.data.status !== 'Success') throw new Error();
 
       const compressedImage = await compressImage(file);
 
-      const uploadURL = signatureResponse.result;
+      const uploadURL = signatureResponse.data.result;
       const uploadResponse = await fetch(uploadURL, {
         method: 'put',
         body: compressedImage,
@@ -161,12 +161,12 @@ export const CWCoverImageUploader = ({
   const generateImage = async () => {
     try {
       setImageURL('');
-      const res = await $.post(`${app.serverUrl()}/generateImage`, {
+      const res = await axios.post(`${app.serverUrl()}/generateImage`, {
         description: prompt,
         jwt: app.user.jwt,
       });
 
-      const generatedImageURL = res.result.imageUrl;
+      const generatedImageURL = res.data.result.imageUrl;
 
       if (isPrompting) {
         setImageURL(generatedImageURL);

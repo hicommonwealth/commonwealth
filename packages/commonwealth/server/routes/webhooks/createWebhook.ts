@@ -10,7 +10,7 @@ const createWebhook = async (
   next: NextFunction,
 ) => {
   const { community } = req;
-  // if chain is present we know we are dealing with a chain first community
+  // if community is present we know we are dealing with a chain first community
 
   // only admins should be able to get webhooks
   if (!req.user) return next(new AppError(Errors.NotLoggedIn));
