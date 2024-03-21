@@ -8,6 +8,7 @@ const log = logger(PinoLogger()).getLogger(__filename);
 const OUTBOX_CHANNEL = 'outbox_channel';
 let retryCount = 0;
 const maxRetries = 5;
+let connected = false;
 
 async function connectListener(client: Client) {
   try {
@@ -26,7 +27,10 @@ async function reconnect(client: Client) {
     retryCount++;
 
     try {
-      await client.connect();
+      if (!connected) {
+        await client.connect();
+        connected = true;
+      }
     } catch (err) {
       log.error('Subscriber failed to reconnect', err);
       await delay(timeout);
@@ -59,18 +63,26 @@ export async function setupListener(): Promise<Client> {
       'PG subscriber encountered an error. Attempting to reconnect...',
       err,
     );
+    connected = false;
     await reconnect(client);
     await connectListener(client);
   });
 
+  client.on('end', () => {
+    connected = false;
+  });
+
   // client will either connect/reconnect or the process will exit
   try {
-    await client.connect();
+    if (!connected) {
+      await client.connect();
+    }
   } catch (err) {
     log.error('Subscriber failed to connect to Postgres', err);
     await reconnect(client);
   }
 
+  connected = true;
   await connectListener(client);
 
   log.info('Listener ready');
