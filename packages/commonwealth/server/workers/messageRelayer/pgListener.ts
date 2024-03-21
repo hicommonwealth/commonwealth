@@ -1,5 +1,5 @@
 import { PinoLogger } from '@hicommonwealth/adapters';
-import { delay, logger } from '@hicommonwealth/core';
+import { delay, logger, stats } from '@hicommonwealth/core';
 import { Client } from 'pg';
 import { NODE_ENV } from '../../config';
 import { incrementNumUnrelayedEvents } from './relayForever';
@@ -54,8 +54,9 @@ export async function setupListener(): Promise<Client> {
   });
 
   client.on('notification', (payload) => {
-    log.info('RECEIVED', undefined, { payload });
+    log.info('Notification received', undefined, { payload });
     incrementNumUnrelayedEvents(1);
+    stats().increment('messageRelayerNotificationReceived');
   });
 
   client.on('error', async (err: Error) => {

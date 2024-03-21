@@ -1,5 +1,11 @@
 import { PinoLogger } from '@hicommonwealth/adapters';
-import { Broker, BrokerTopics, logger, schemas } from '@hicommonwealth/core';
+import {
+  Broker,
+  BrokerTopics,
+  logger,
+  schemas,
+  stats,
+} from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
@@ -48,6 +54,10 @@ export async function relay(broker: Broker, models: DB): Promise<number> {
           break;
         }
         publishedEventIds.push(event.id);
+        stats().incrementBy(
+          'messageRelayerPublished',
+          publishedEventIds.length,
+        );
       } catch (e) {
         log.fatal('Message relayer failed to publish event', e, {
           event,

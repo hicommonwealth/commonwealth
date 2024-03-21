@@ -13,9 +13,13 @@ import { TEST_DB_NAME } from '../database';
 export const checkDb = async () => {
   let sequelize: Sequelize | undefined = undefined;
   try {
-    sequelize = new Sequelize('postgresql://commonwealth:edgeware@localhost', {
-      logging: false,
-    });
+    // TODO: this is broken -- even without DB name it tries to connect to commonwealth database
+    sequelize = new Sequelize(
+      `postgresql://commonwealth:edgeware@localhost/${TEST_DB_NAME}`,
+      {
+        logging: false,
+      },
+    );
     const [{ count }] = await sequelize.query<{ count: number }>(
       `SELECT COUNT(*) FROM pg_database WHERE datname = '${TEST_DB_NAME}'`,
       { type: QueryTypes.SELECT },

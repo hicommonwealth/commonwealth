@@ -1,5 +1,5 @@
 import { PinoLogger } from '@hicommonwealth/adapters';
-import { broker, logger } from '@hicommonwealth/core';
+import { broker, logger, stats } from '@hicommonwealth/core';
 import { MESSAGE_RELAYER_TIMEOUT_MS } from '../../config';
 import { relay } from './relay';
 
@@ -8,6 +8,7 @@ export let numUnrelayedEvents = 0;
 
 export function incrementNumUnrelayedEvents(numEvents: number) {
   numUnrelayedEvents += numEvents;
+  stats().gauge('messageRelayerNumUnrelayedEvents', numUnrelayedEvents);
 }
 
 export async function relayForever(maxIterations?: number) {
@@ -22,6 +23,7 @@ export async function relayForever(maxIterations?: number) {
     if (numUnrelayedEvents > 0) {
       const numRelayedEvents = await relay(brokerInstance, models);
       numUnrelayedEvents -= numRelayedEvents;
+      stats().gauge('messageRelayerNumUnrelayedEvents', numUnrelayedEvents);
     }
 
     if (numUnrelayedEvents === 0) {
