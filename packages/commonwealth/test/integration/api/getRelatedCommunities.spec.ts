@@ -1,11 +1,13 @@
 import { dispose } from '@hicommonwealth/core';
-import { models, tester } from '@hicommonwealth/model';
+import { tester, type DB } from '@hicommonwealth/model';
 import { assert } from 'chai';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 
-describe('GetRelatedCommunities Tests', () => {
+describe('GetRelatedCommunities Tests', async () => {
+  let models: DB;
+
   before(async () => {
-    await tester.seedDb();
+    models = await tester.seedDb();
   });
 
   after(async () => {

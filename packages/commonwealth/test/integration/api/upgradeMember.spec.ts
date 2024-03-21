@@ -1,8 +1,8 @@
-import { models } from '@hicommonwealth/model';
+import { dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import app from '../../../server-test';
+import { TestServer, testServer } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import { Errors } from '../../../server/routes/upgradeMember';
 import { post } from './external/appHook.spec';
@@ -12,6 +12,15 @@ chai.use(chaiHttp);
 
 describe('upgradeMember Integration Tests', () => {
   let jwtToken;
+  let server: TestServer;
+
+  before(async () => {
+    server = await testServer();
+  });
+
+  after(async () => {
+    await dispose()();
+  });
 
   beforeEach(() => {
     jwtToken = jwt.sign(
@@ -33,7 +42,7 @@ describe('upgradeMember Integration Tests', () => {
       '/api/upgradeMember',
       invalidRequest,
       true,
-      app,
+      server.app,
     );
 
     response.should.have.status(400);
@@ -53,7 +62,7 @@ describe('upgradeMember Integration Tests', () => {
       '/api/upgradeMember',
       invalidRequest,
       true,
-      app,
+      server.app,
     );
 
     response.should.have.status(400);
@@ -61,7 +70,7 @@ describe('upgradeMember Integration Tests', () => {
   });
 
   it('should upgrade member and return a success response', async () => {
-    await models.Address.update(
+    await server.models.Address.update(
       {
         role: 'admin',
       },
@@ -79,10 +88,15 @@ describe('upgradeMember Integration Tests', () => {
       address: testAddresses[1].address,
     };
 
-    const response = await post('/api/upgradeMember', validRequest, false, app);
+    const response = await post(
+      '/api/upgradeMember',
+      validRequest,
+      false,
+      server.app,
+    );
 
     chai.assert.equal(response.status, 'Success');
-    const address = await models.Address.findOne({
+    const address = await server.models.Address.findOne({
       where: { id: testAddresses[1].id },
     });
 

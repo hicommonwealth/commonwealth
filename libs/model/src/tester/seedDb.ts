@@ -17,9 +17,9 @@ import { bootstrap_testing } from './bootstrap';
  * such as associated IDs and seed values. Additionally, not all tests require every
  * entity to be seeded, so focus should be on seeding only what is explicitly needed.
  */
-export const seedDb = async (): Promise<void> => {
+export const seedDb = async () => {
   try {
-    const models = await bootstrap_testing();
+    const models = await bootstrap_testing(true);
 
     const [drew] = await models.User.bulkCreate([
       {
@@ -512,6 +512,8 @@ export const seedDb = async (): Promise<void> => {
         new Date().getTime() + 100 * 24 * 60 * 60 * 1000,
       ).toString(),
     });
+
+    return models;
   } catch (error) {
     console.error('seedDB', error);
     throw error;

@@ -20,7 +20,7 @@ import {
   CosmosGovernanceVersion,
   dispose,
 } from '@hicommonwealth/core';
-import { models, tester } from '@hicommonwealth/model';
+import { tester, type DB } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { Proposal, ProposalStatus } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import {
@@ -37,24 +37,6 @@ import {
   fetchLatestNotifProposalIds,
   filterProposals,
 } from '../../server/workers/cosmosGovNotifications/util';
-
-async function createFakeProposalNotification(
-  proposalId: string,
-  chainId: string,
-): Promise<{ event_data: { id: string } }> {
-  const notifData = {
-    event_data: {
-      id: proposalId,
-    },
-  };
-  await models.Notification.create({
-    category_id: 'chain-event',
-    community_id: chainId,
-    notification_data: JSON.stringify(notifData),
-  });
-
-  return notifData;
-}
 
 type GovTypeMapping = {
   v1: ProposalSDKType;
@@ -177,59 +159,79 @@ function createMockClients(
   } as unknown as GovV1Beta1ClientType;
 }
 
-/**
- * Creates a Cosmos ChainNode and Chain that uses v1 governance and another one that uses v1beta1 governance.
- */
-export async function createCosmosChains() {
-  await models.sequelize.transaction(async (transaction) => {
-    const kyveNode = await models.ChainNode.create({
-      url: 'https://rpc-eu-1.kyve.network/',
-      alt_wallet_url: 'https://api-eu-1.kyve.network/',
-      name: 'KYVE Network',
-      balance_type: BalanceType.Cosmos,
-      cosmos_gov_version: CosmosGovernanceVersion.v1,
-    });
-
-    const osmosisNode = await models.ChainNode.create({
-      url: 'https://rpc.osmosis.zone',
-      alt_wallet_url: 'https://rest.cosmos.directory/osmosis',
-      name: 'Osmosis',
-      balance_type: BalanceType.Cosmos,
-    });
-
-    await models.Community.create(
-      {
-        id: 'kyve',
-        name: 'KYVE',
-        network: ChainNetwork.Kyve,
-        type: ChainType.Chain,
-        base: ChainBase.CosmosSDK,
-        has_chain_events_listener: true,
-        chain_node_id: kyveNode.id,
-        default_symbol: 'KYVE',
-      },
-      { transaction },
-    );
-
-    await models.Community.create(
-      {
-        id: 'osmosis',
-        name: 'Osmosis',
-        network: ChainNetwork.Osmosis,
-        type: ChainType.Chain,
-        base: ChainBase.CosmosSDK,
-        has_chain_events_listener: true,
-        chain_node_id: osmosisNode.id,
-        default_symbol: 'OSMO',
-      },
-      { transaction },
-    );
-  });
-}
-
 describe('Cosmos Governance Notification Generator', () => {
-  before('Reset database', async () => {
-    await tester.seedDb();
+  let models: DB;
+
+  async function createFakeProposalNotification(
+    proposalId: string,
+    chainId: string,
+  ): Promise<{ event_data: { id: string } }> {
+    const notifData = {
+      event_data: {
+        id: proposalId,
+      },
+    };
+    await models.Notification.create({
+      category_id: 'chain-event',
+      community_id: chainId,
+      notification_data: JSON.stringify(notifData),
+    });
+
+    return notifData;
+  }
+
+  /**
+   * Creates a Cosmos ChainNode and Chain that uses v1 governance and another one that uses v1beta1 governance.
+   */
+  async function createCosmosChains() {
+    await models.sequelize.transaction(async (transaction) => {
+      const kyveNode = await models.ChainNode.create({
+        url: 'https://rpc-eu-1.kyve.network/',
+        alt_wallet_url: 'https://api-eu-1.kyve.network/',
+        name: 'KYVE Network',
+        balance_type: BalanceType.Cosmos,
+        cosmos_gov_version: CosmosGovernanceVersion.v1,
+      });
+
+      const osmosisNode = await models.ChainNode.create({
+        url: 'https://rpc.osmosis.zone',
+        alt_wallet_url: 'https://rest.cosmos.directory/osmosis',
+        name: 'Osmosis',
+        balance_type: BalanceType.Cosmos,
+      });
+
+      await models.Community.create(
+        {
+          id: 'kyve',
+          name: 'KYVE',
+          network: ChainNetwork.Kyve,
+          type: ChainType.Chain,
+          base: ChainBase.CosmosSDK,
+          has_chain_events_listener: true,
+          chain_node_id: kyveNode.id,
+          default_symbol: 'KYVE',
+        },
+        { transaction },
+      );
+
+      await models.Community.create(
+        {
+          id: 'osmosis',
+          name: 'Osmosis',
+          network: ChainNetwork.Osmosis,
+          type: ChainType.Chain,
+          base: ChainBase.CosmosSDK,
+          has_chain_events_listener: true,
+          chain_node_id: osmosisNode.id,
+          default_symbol: 'OSMO',
+        },
+        { transaction },
+      );
+    });
+  }
+
+  before(async () => {
+    models = await tester.seedDb();
   });
 
   after(async () => {

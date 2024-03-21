@@ -2,14 +2,13 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { dispose } from '@hicommonwealth/core';
-import { models, tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import MockExpressRequest from 'mock-express-request';
+import { TestServer, testServer } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import DatabaseValidationService from '../../../server/middleware/databaseValidationService';
-import * as modelUtils from '../../util/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -28,20 +27,21 @@ describe('DatabaseValidationService Tests', () => {
   let user2JWT;
   let user2Id;
   let databaseValidationService;
+  let server: TestServer;
 
   before(async function () {
     this.timeout(300000);
-    await tester.seedDb();
+    server = await testServer();
     console.log('Database reset');
-    databaseValidationService = new DatabaseValidationService(models);
-    let res = await modelUtils.createAndVerifyAddress({ chain });
+    databaseValidationService = new DatabaseValidationService(server.models);
+    let res = await server.seeder.createAndVerifyAddress({ chain }, 'Alice');
     user2Address = res.address;
     user2JWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
     user2Id = res.user_id;
     expect(user2Address).to.not.be.null;
     expect(user2JWT).to.not.be.null;
 
-    res = await modelUtils.createAndVerifyAddress({ chain });
+    res = await server.seeder.createAndVerifyAddress({ chain }, 'Alice');
     userAddress = res.address;
     userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
     userId = res.user_id;

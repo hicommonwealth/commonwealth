@@ -1,14 +1,9 @@
 import { dispose } from '@hicommonwealth/core';
-import {
-  UserInstance,
-  commonProtocol,
-  models,
-  tester,
-} from '@hicommonwealth/model';
+import { commonProtocol, type UserInstance } from '@hicommonwealth/model';
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import app from '../../../server-test';
+import { TestServer, testServer } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 import { buildUser } from '../../unit/unitHelpers';
@@ -35,18 +30,20 @@ const expectedCreateResp = {
 };
 
 describe('POST communityStakes Tests', () => {
-  beforeEach(async () => {
-    await tester.seedDb();
+  let server: TestServer;
+
+  before(async () => {
+    server = await testServer();
   });
 
-  afterEach(async () => {
+  after(async () => {
     await dispose()();
   });
 
   it('The handler creates and updates community stake', async () => {
-    const controller = new ServerCommunitiesController(models, null);
+    const controller = new ServerCommunitiesController(server.models, null);
     const user: UserInstance = buildUser({
-      models,
+      models: server.models,
       userAttributes: { email: '', id: 1, isAdmin: true },
     }) as UserInstance;
 
@@ -93,14 +90,15 @@ describe('POST communityStakes Tests', () => {
   });
 
   it('The community stake routes work correctly', async () => {
+    const stake_id = 3;
     const jwtToken = jwt.sign({ id: 2, email: testUsers[0].email }, JWT_SECRET);
 
     const actualPutResponse = (
       await post(
-        `/api/communityStakes/${baseRequest.community_id}/${baseRequest.stake_id}`,
-        { ...baseRequest, jwt: jwtToken },
+        `/api/communityStakes/${baseRequest.community_id}/${stake_id}`,
+        { ...baseRequest, stake_id, jwt: jwtToken },
         true,
-        app,
+        server.app,
       )
     ).result;
 
@@ -108,7 +106,7 @@ describe('POST communityStakes Tests', () => {
       actualPutResponse.community_id,
       expectedCreateResp.community_id,
     );
-    assert.equal(actualPutResponse.stake_id, expectedCreateResp.stake_id);
+    assert.equal(actualPutResponse.stake_id, stake_id);
     assert.equal(actualPutResponse.stake_token, expectedCreateResp.stake_token);
     assert.equal(actualPutResponse.vote_weight, expectedCreateResp.vote_weight);
     assert.equal(
@@ -118,10 +116,10 @@ describe('POST communityStakes Tests', () => {
 
     const actualGetResponse = (
       await get(
-        `/api/communityStakes/${baseRequest.community_id}/${baseRequest.stake_id}`,
+        `/api/communityStakes/${baseRequest.community_id}/${stake_id}`,
         null,
         true,
-        app,
+        server.app,
       )
     ).result;
 
@@ -129,7 +127,7 @@ describe('POST communityStakes Tests', () => {
       actualGetResponse.community_id,
       expectedCreateResp.community_id,
     );
-    assert.equal(actualGetResponse.stake_id, expectedCreateResp.stake_id);
+    assert.equal(actualGetResponse.stake_id, stake_id);
     assert.equal(actualGetResponse.stake_token, expectedCreateResp.stake_token);
     assert.equal(actualGetResponse.vote_weight, expectedCreateResp.vote_weight);
     assert.equal(
@@ -139,13 +137,13 @@ describe('POST communityStakes Tests', () => {
   });
 
   it('The integration with protocol works', async () => {
-    const community = await models.Community.findOne({
+    const community = await server.models.Community.findOne({
       where: {
         id: 'common-protocol',
       },
       include: [
         {
-          model: models.ChainNode,
+          model: server.models.ChainNode,
           attributes: ['eth_chain_id', 'url'],
         },
       ],

@@ -1,9 +1,9 @@
 import { dispose } from '@hicommonwealth/core';
 import path from 'node:path';
-import { Model, ModelStatic, QueryTypes, Sequelize } from 'sequelize';
+import { QueryTypes, Sequelize } from 'sequelize';
 import { SequelizeStorage, Umzug } from 'umzug';
 import { TESTING, TEST_DB_NAME } from '../config';
-import { DB, buildDb } from '../models';
+import { buildDb, type DB } from '../models';
 
 /**
  * Verifies the existence of TEST_DB_NAME on the server,
@@ -76,6 +76,24 @@ export const migrate_db = async (sequelize: Sequelize) => {
 };
 
 /**
+ * Truncates all tables
+ * @param db database models
+ */
+export const truncate_db = async (db?: DB) => {
+  if (!db) return;
+  try {
+    const tables = Object.values(db.sequelize.models)
+      .map((model) => `"${model.tableName}"`)
+      .join(',');
+    await db.sequelize.query(
+      `TRUNCATE TABLE ${tables} RESTART IDENTITY CASCADE;`,
+    );
+  } catch {
+    // ignore failed truncate
+  }
+};
+
+/**
  * TODO: Validates if existing sequelize model is in sync with migrations
  * - Create database A from migrations
  * - Create database B from model (sync)
@@ -89,24 +107,17 @@ let testdb: DB | undefined = undefined;
 /**
  * Bootstraps testing, by verifying the existence of TEST_DB_NAME on the server,
  * and creating/migrating a fresh instance if it doesn't exist.
+ * @param truncate when true, truncates all tables in model
  */
-export const bootstrap_testing = async (): Promise<DB> => {
+export const bootstrap_testing = async (truncate = false): Promise<DB> => {
   if (!TESTING) throw new Error('Seeds only work when testing!');
   if (!testdb) {
     testdb = await verify_testdb();
     // TODO: use migrate instead of sync
     //await migrate_db(testdb.sequelize);
     await testdb.sequelize.sync({ force: true });
-    // register hook to truncate test db after calling dispose()()
-    dispose(async () => {
-      const tables = Object.entries(testdb!)
-        .filter(([k]) => !k.endsWith('equelize'))
-        .map(([, v]) => `"${(v as ModelStatic<Model>).tableName}"`)
-        .join(',');
-      await testdb!.sequelize.query(
-        `TRUNCATE TABLE ${tables} RESTART IDENTITY CASCADE;`,
-      );
-    });
-  }
+  } else if (truncate) await truncate_db(testdb);
   return testdb;
 };
+
+TESTING && dispose(async () => truncate_db(testdb));

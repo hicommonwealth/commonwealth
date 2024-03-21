@@ -1,5 +1,5 @@
 import { NotificationCategories, dispose } from '@hicommonwealth/core';
-import { models, tester } from '@hicommonwealth/model';
+import { tester, type DB } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { Sequelize } from 'sequelize';
@@ -9,9 +9,11 @@ import DatabaseCleaner from '../../server/util/databaseCleaner';
 chai.use(chaiHttp);
 const { expect } = chai;
 
-describe('DatabaseCleaner Tests', () => {
-  before('Reset database', async () => {
-    await tester.seedDb();
+describe('DatabaseCleaner Tests', async () => {
+  let models: DB;
+
+  before(async () => {
+    models = await tester.seedDb();
   });
 
   after(async () => {

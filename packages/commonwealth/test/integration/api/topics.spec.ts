@@ -1,9 +1,8 @@
 import { dispose } from '@hicommonwealth/core';
-import { tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { ApiEndpoints } from 'state/api/config';
-import app from '../../../server-test';
+import { testServer, TestServer } from '../../../server-test';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -13,8 +12,10 @@ let adminJWT;
 describe('Topic Tests', () => {
   const chain = 'ethereum';
 
+  let server: TestServer;
+
   before('reset database', async () => {
-    await tester.seedDb();
+    server = await testServer();
   });
 
   after(async () => {
@@ -24,7 +25,7 @@ describe('Topic Tests', () => {
   describe('Bulk Topics', () => {
     it('Should pass /bulkTopics', async () => {
       const res = await chai.request
-        .agent(app)
+        .agent(server.app)
         .get(`/api${ApiEndpoints.BULK_TOPICS}`)
         .set('Accept', 'application/json')
         .query({

@@ -1,12 +1,14 @@
 import { BalanceType, dispose } from '@hicommonwealth/core';
-import { UserInstance, models, tester } from '@hicommonwealth/model';
+import { tester, type DB, type UserInstance } from '@hicommonwealth/model';
 import { assert, expect } from 'chai';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 import { buildUser } from '../../unit/unitHelpers';
 
 describe('ChainNode Tests', () => {
+  let models: DB;
+
   before(async () => {
-    await tester.seedDb();
+    models = await tester.seedDb();
   });
 
   after(async () => {

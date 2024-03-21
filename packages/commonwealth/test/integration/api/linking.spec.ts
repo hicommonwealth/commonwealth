@@ -1,24 +1,20 @@
 import { ActionPayload, Session } from '@canvas-js/interfaces';
 import { dispose } from '@hicommonwealth/core';
-import {
-  LinkSource,
-  ThreadAttributes,
-  models,
-  tester,
-} from '@hicommonwealth/model';
+import { LinkSource, ThreadAttributes } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from 'server/config';
 import { Errors } from 'server/util/linkingValidationHelper';
-import * as modelUtils from 'test/util/modelUtils';
+import { TestServer, testServer } from '../../../server-test';
 
 chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('Linking Tests', () => {
-  const chain = 'ethereum';
+  let server: TestServer;
 
+  const chain = 'ethereum';
   const title = 'test title';
   const body = 'test body';
   const kind = 'discussion';
@@ -51,9 +47,9 @@ describe('Linking Tests', () => {
   const link5 = { source: LinkSource.Proposal, identifier: '4' };
 
   before(async () => {
-    await tester.seedDb();
+    server = await testServer();
 
-    const topic = await models.Topic.findOne({
+    const topic = await server.models.Topic.findOne({
       where: {
         community_id: chain,
         group_ids: [],
@@ -61,11 +57,11 @@ describe('Linking Tests', () => {
     });
     topicId = topic.id;
 
-    let res = await modelUtils.createAndVerifyAddress({ chain });
+    let res = await server.seeder.createAndVerifyAddress({ chain }, 'Alice');
     adminAddress = res.address;
     adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
-    const isAdmin = await modelUtils.updateRole({
-      address_id: res.address_id,
+    const isAdmin = await server.seeder.updateRole({
+      address_id: +res.address_id,
       chainOrCommObj: { chain_id: chain },
       role: 'admin',
     });
@@ -74,7 +70,7 @@ describe('Linking Tests', () => {
     expect(adminJWT).to.not.be.null;
     expect(isAdmin).to.not.be.null;
 
-    res = await modelUtils.createAndVerifyAddress({ chain });
+    res = await server.seeder.createAndVerifyAddress({ chain }, 'Alice');
     userAddress = res.address;
     userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
     userSession = { session: res.session, sign: res.sign };
@@ -82,7 +78,7 @@ describe('Linking Tests', () => {
     expect(userJWT).to.not.be.null;
 
     thread1 = (
-      await modelUtils.createThread({
+      await server.seeder.createThread({
         address: userAddress,
         kind,
         stage,
@@ -97,7 +93,7 @@ describe('Linking Tests', () => {
     ).result;
 
     thread2 = (
-      await modelUtils.createThread({
+      await server.seeder.createThread({
         address: adminAddress,
         kind,
         stage,
@@ -118,7 +114,7 @@ describe('Linking Tests', () => {
 
   describe('/linking/addThreadLinks', () => {
     it('should add first new link to exising thread', async () => {
-      const result = await modelUtils.createLink({
+      const result = await server.seeder.createLink({
         jwt: userJWT,
         thread_id: thread1.id,
         links: [link1],
@@ -130,7 +126,7 @@ describe('Linking Tests', () => {
       expect(result.result.links[0].title).to.equal('my snapshot');
     });
     it('should add multiple links to existing links', async () => {
-      const result = await modelUtils.createLink({
+      const result = await server.seeder.createLink({
         jwt: userJWT,
         thread_id: thread1.id,
         links: [link2, link3],
@@ -145,7 +141,7 @@ describe('Linking Tests', () => {
       expect(result.result.links[2].identifier).to.equal(link3.identifier);
     });
     it('should revert adding existing link', async () => {
-      const result = await modelUtils.createLink({
+      const result = await server.seeder.createLink({
         jwt: userJWT,
         thread_id: thread1.id,
         links: [link2],
@@ -155,7 +151,7 @@ describe('Linking Tests', () => {
       expect(result.error).to.be.equal(Errors.LinksExist);
     });
     it('should access control adding links', async () => {
-      const result2 = await modelUtils.createLink({
+      const result2 = await server.seeder.createLink({
         jwt: userJWT,
         thread_id: thread2.id,
         links: [link3],
@@ -163,7 +159,7 @@ describe('Linking Tests', () => {
       expect(result2).to.not.be.null;
       expect(result2.error).to.not.be.null;
       expect(result2.error).to.be.equal(Errors.NotAdminOrOwner);
-      const result = await modelUtils.createLink({
+      const result = await server.seeder.createLink({
         jwt: adminJWT,
         thread_id: thread2.id,
         links: [link3],
@@ -172,7 +168,7 @@ describe('Linking Tests', () => {
       expect(result.result).to.not.be.null;
     });
     it('should filter duplicate links and add new', async () => {
-      const result = await modelUtils.createLink({
+      const result = await server.seeder.createLink({
         jwt: userJWT,
         thread_id: thread1.id,
         links: [link2, link4],
@@ -184,7 +180,7 @@ describe('Linking Tests', () => {
       expect(result.result.links[3].identifier).to.equal(link4.identifier);
     });
     it('should allow admin to link any Thread', async () => {
-      const result = await modelUtils.createLink({
+      const result = await server.seeder.createLink({
         jwt: adminJWT,
         thread_id: thread1.id,
         links: [link5],
@@ -192,7 +188,7 @@ describe('Linking Tests', () => {
       expect(result.status).to.equal('Success');
       expect(result.result).to.not.be.null;
       expect(result.result.links.length).to.equal(5);
-      const result2 = await modelUtils.deleteLink({
+      const result2 = await server.seeder.deleteLink({
         jwt: adminJWT,
         thread_id: thread1.id,
         links: [link5],
@@ -205,7 +201,7 @@ describe('Linking Tests', () => {
 
   describe('/linking/getLinks', () => {
     it('Can get all links for thread', async () => {
-      const result = await modelUtils.getLinks({
+      const result = await server.seeder.getLinks({
         thread_id: thread1.id,
         jwt: userJWT,
       });
@@ -219,7 +215,7 @@ describe('Linking Tests', () => {
       expect(result.result.links[2].identifier).to.equal(link3.identifier);
     });
     it('Can get filtered links', async () => {
-      const result = await modelUtils.getLinks({
+      const result = await server.seeder.getLinks({
         thread_id: thread1.id,
         linkType: [LinkSource.Snapshot],
         jwt: userJWT,
@@ -228,7 +224,7 @@ describe('Linking Tests', () => {
       expect(result.result).to.not.be.null;
       expect(result.result.links[0].source).to.equal(link1.source.toString());
       expect(result.result.links[0].identifier).to.equal(link1.identifier);
-      const result2 = await modelUtils.getLinks({
+      const result2 = await server.seeder.getLinks({
         thread_id: thread1.id,
         linkType: [LinkSource.Snapshot, LinkSource.Proposal],
         jwt: userJWT,
@@ -240,7 +236,10 @@ describe('Linking Tests', () => {
       expect(result2.result.links[1].source).to.equal(link3.source.toString());
     });
     it('Can get all threads linked to a link', async () => {
-      const result = await modelUtils.getLinks({ link: link3, jwt: userJWT });
+      const result = await server.seeder.getLinks({
+        link: link3,
+        jwt: userJWT,
+      });
       expect(result.status).to.equal('Success');
       expect(result.result).to.not.be.null;
       expect(result.result.threads.length).to.equal(2);
@@ -255,7 +254,7 @@ describe('Linking Tests', () => {
 
   describe('/linking/deleteLinks', () => {
     it('Does access control delete links', async () => {
-      const result = await modelUtils.deleteLink({
+      const result = await server.seeder.deleteLink({
         jwt: userJWT,
         thread_id: thread2.id,
         links: [link3],
@@ -265,7 +264,7 @@ describe('Linking Tests', () => {
       expect(result.error).to.be.equal(Errors.NotAdminOrOwner);
     });
     it('Does delete single Link', async () => {
-      const result = await modelUtils.deleteLink({
+      const result = await server.seeder.deleteLink({
         jwt: userJWT,
         thread_id: thread1.id,
         links: [link4],
@@ -277,7 +276,7 @@ describe('Linking Tests', () => {
       expect(result.result.links[2].identifier).to.equal(link3.identifier);
     });
     it('Does delete multiple links', async () => {
-      const result = await modelUtils.deleteLink({
+      const result = await server.seeder.deleteLink({
         jwt: userJWT,
         thread_id: thread1.id,
         links: [link3, link2],
@@ -289,7 +288,7 @@ describe('Linking Tests', () => {
       expect(result.result.links[0].identifier).to.equal(link1.identifier);
     });
     it('Reverts when trying to delete non-existant links', async () => {
-      const result = await modelUtils.deleteLink({
+      const result = await server.seeder.deleteLink({
         jwt: userJWT,
         thread_id: thread1.id,
         links: [link3, link2],
