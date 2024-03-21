@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 
-import { WalletId, WalletSsoSource } from '@hicommonwealth/core';
+import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/core';
 import { setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import WebWalletController from 'controllers/app/web_wallets';
@@ -16,6 +16,10 @@ import {
   toggleDarkMode,
 } from 'views/components/component_kit/cw_toggle';
 
+import {
+  chainBaseToCaip2,
+  chainBaseToCanvasChainId,
+} from 'shared/canvas/chainMappings';
 import UserMenuItem from './UserMenuItem';
 import useCheckAuthenticatedAddresses from './useCheckAuthenticatedAddresses';
 
@@ -79,7 +83,18 @@ const useUserMenuItems = ({
 
   const addresses: PopoverMenuItem[] = app.user.activeAccounts.map(
     (account) => {
-      const signed = authenticatedAddresses[account.address];
+      const communityCaip2Prefix = chainBaseToCaip2(account.community.base);
+      const communityIdOrPrefix =
+        account.community.base === ChainBase.CosmosSDK
+          ? account.community.ChainNode?.bech32
+          : account.community.ChainNode?.ethChainId;
+      const communityCanvasChainId = chainBaseToCanvasChainId(
+        account.community.base,
+        communityIdOrPrefix,
+      );
+      const caip2Address = `${communityCaip2Prefix}:${communityCanvasChainId}:${account.address}`;
+
+      const signed = authenticatedAddresses[caip2Address];
       const isActive = app.user.activeAccount?.address === account.address;
       const walletSsoSource = app.user.addresses.find(
         (address) => address.address === account.address,
