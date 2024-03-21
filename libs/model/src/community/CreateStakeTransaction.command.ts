@@ -33,11 +33,11 @@ export const CreateStakeTransaction: Command<
       throw Error('Chain does not have deployed namespace factory');
     }
 
-    const web3 = new Web3(community.ChainNode.url);
+    const web3 = new Web3('https://ethereum-sepolia.publicnode.com');
 
     const [transaction, txReceipt] = await Promise.all([
       web3.eth.getTransaction(payload.transaction_hash),
-      await web3.eth.getTransactionReceipt(payload.transaction_hash),
+      web3.eth.getTransactionReceipt(payload.transaction_hash),
     ]);
     const timestamp: number = (
       await web3.eth.getBlock(transaction.blockHash as string)
@@ -59,18 +59,16 @@ export const CreateStakeTransaction: Command<
       );
     }
 
-    const abi: any = [];
-    const data = web3.eth.abi.decodeLog(
-      abi,
+    const data = web3.eth.abi.decodeParameters(
+      ['uint256', 'uint256'],
       txReceipt.logs[0].data,
-      txReceipt.logs[0].topics,
     );
 
     const stakeAggregate = await models.StakeTransaction.create({
       transaction_hash: payload.transaction_hash,
       community_id: community.id,
-      stake_id: parseInt(data.id),
-      stake_amount: parseInt(data.value),
+      stake_id: parseInt(data[0]),
+      stake_amount: parseInt(data[1]),
       stake_price: transaction.value,
       address,
       stake_direction: direction,

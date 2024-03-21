@@ -3,6 +3,7 @@ import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { Chance } from 'chance';
 import { GetStakeHistoricalPrice } from '../../src/community/GetStakeHistoricalPrice.query';
+import { seed } from '../../src/test';
 
 chai.use(chaiAsPromised);
 const chance = Chance();
@@ -14,17 +15,13 @@ describe('Stake Historical Price', () => {
   let payload;
 
   before(async () => {
-    // const [communityStakes] = await seed(
-    //   'StakeTransaction',
-    //   {
-    //     transaction_hash: '0x111',
-    //     timestamp: 1000,
-    //     Communities: [],
-    //     CommunityStakes: [],
-    //   },
-    // );
-    //
-    // payload = { community_id: communityStakes.community_id}
+    const [communityStakes] = await seed('StakeTransaction', {
+      timestamp: 1000,
+      Communities: [{}],
+      CommunityStakes: [{}],
+    });
+
+    payload = { community_id: communityStakes.community_id };
   });
 
   after(async () => {

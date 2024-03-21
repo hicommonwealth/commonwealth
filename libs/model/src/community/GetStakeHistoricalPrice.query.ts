@@ -18,7 +18,7 @@ export const GetStakeHistoricalPrice: Query<
       FROM "StakeTransactions"
       WHERE community_id = :community_id AND stake_id = :stake_id
       AND timestamp <= :past_date_epoch
-      ORDER BY created_at
+      ORDER BY timestamp DESC
       LIMIT 1`,
       {
         replacements: { past_date_epoch, community_id, stake_id },

@@ -22,7 +22,7 @@ export default (
   dataTypes: typeof DataTypes,
 ): StakeTransactionModelStatic => {
   const StakeTransaction = <StakeTransactionModelStatic>sequelize.define(
-    'StakeTransactions',
+    'StakeTransaction',
     {
       transaction_hash: {
         type: dataTypes.STRING,
@@ -45,6 +45,7 @@ export default (
     },
     {
       underscored: true,
+      timestamps: false,
       tableName: 'StakeTransactions',
       indexes: [{ fields: ['address'] }, { fields: ['community_id'] }],
     },
