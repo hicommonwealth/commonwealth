@@ -16,7 +16,6 @@ import { useCommunityStake } from 'views/components/CommunityStake';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWCustomIcon } from 'views/components/component_kit/cw_icons/cw_custom_icon';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWCircleButton from 'views/components/component_kit/new_designs/CWCircleButton';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
@@ -193,7 +192,7 @@ const StakeExchangeForm = ({
     if (!denomination) return;
     return {
       BLAST: <CWCustomIcon iconName="blast" iconSize="xs" />,
-      ETH: <CWIcon iconName="ethereum" iconSize="xs" />,
+      ETH: <CWCustomIcon iconName="eth" iconSize="xs" />,
       BASE: <CWCustomIcon iconName="base" iconSize="xs" />,
     }[denomination];
   };
@@ -287,13 +286,7 @@ const StakeExchangeForm = ({
         <CWDivider />
 
         <div className="stake-valued-row">
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              flexDirection: 'row',
-            }}
-          >
+          <div className="container">
             <CWText type="caption">You have {stakeBalance} stake</CWText>
             <CWText type="caption" className="valued">
               valued at

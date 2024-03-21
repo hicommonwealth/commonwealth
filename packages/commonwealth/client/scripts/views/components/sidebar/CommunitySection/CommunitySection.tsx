@@ -59,6 +59,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   const showAdmin = app.user && (isAdmin || isMod);
 
   const findDenomination = (selectedStakeChain: string) => {
+    if (!selectedStakeChain) return;
     return {
       Ethereum: selectedStakeChain.toLowerCase().includes('ethereum') && 'ETH',
       Base: selectedStakeChain.toLowerCase().includes('base') && 'BASE',
@@ -81,7 +82,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
                 voteWeight={currentVoteWeight}
                 stakeNumber={stakeBalance}
                 stakeValue={stakeValue}
-                denomination={findDenomination(activeChainId)}
+                denomination={findDenomination(activeChainId) || 'ETH'}
                 onOpenStakeModal={setModeOfManageCommunityStakeModal}
               />
             )}
@@ -137,7 +138,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
           <ManageCommunityStakeModal
             mode={modeOfManageCommunityStakeModal}
             onModalClose={() => setModeOfManageCommunityStakeModal(null)}
-            denomination={findDenomination(activeChainId)}
+            denomination={findDenomination(activeChainId) || 'ETH'}
           />
         }
         onClose={() => setModeOfManageCommunityStakeModal(null)}

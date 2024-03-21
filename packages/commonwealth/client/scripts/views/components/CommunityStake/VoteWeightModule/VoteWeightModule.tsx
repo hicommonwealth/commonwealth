@@ -2,7 +2,6 @@ import React from 'react';
 import { isMobile } from 'react-device-detect';
 
 import { CWCustomIcon } from 'views/components/component_kit/cw_icons/cw_custom_icon';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 
 import { CWText } from 'views/components/component_kit/cw_text';
 
@@ -53,7 +52,7 @@ export const VoteWeightModule = ({
     if (!denomination) return;
     return {
       BLAST: <CWCustomIcon iconName="blast" iconSize="xs" />,
-      ETH: <CWIcon iconName="ethereum" iconSize="xs" />,
+      ETH: <CWCustomIcon iconName="eth" iconSize="xs" />,
       BASE: <CWCustomIcon iconName="base" iconSize="xs" />,
     }[denomination];
   };

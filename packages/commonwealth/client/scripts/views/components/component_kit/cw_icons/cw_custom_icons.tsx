@@ -218,7 +218,6 @@ export const CWApple = (props: CustomIconProps) => {
 export const CWMagic = (props: CustomIconProps) => {
   const { componentType, iconSize, className, ...otherProps } = props;
 
-  console.log('otherProps', otherProps);
   return (
     <svg
       {...otherProps}
@@ -249,10 +248,7 @@ export const CWBlast = ({
   return (
     <svg
       {...otherProps}
-      className={getClasses<CustomIconStyleProps>(
-        { iconSize, className },
-        componentType,
-      )}
+      className={getClasses<CustomIconStyleProps>({ iconSize }, componentType)}
       width="12"
       height="12"
       viewBox="0 0 12 12"
@@ -298,17 +294,14 @@ export const CWBase = ({
 }: CustomIconProps) => {
   return (
     <svg
-      {...otherProps}
-      className={getClasses<CustomIconStyleProps>(
-        { iconSize, className },
-        componentType,
-      )}
+      className={getClasses<CustomIconStyleProps>({ iconSize }, componentType)}
       width="12"
       height="12"
       viewBox="0 0 12 12"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       xmlnsXlink="http://www.w3.org/1999/xlink"
+      {...otherProps}
     >
       <rect width="12" height="12" fill="url(#pattern0)" />
       <defs>

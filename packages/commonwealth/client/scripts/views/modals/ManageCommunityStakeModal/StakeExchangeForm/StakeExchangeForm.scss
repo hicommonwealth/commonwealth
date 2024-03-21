@@ -47,6 +47,12 @@
   }
 
   .stake-valued-row {
+    .container {
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+    }
+
     .Text {
       display: inline;
     }
