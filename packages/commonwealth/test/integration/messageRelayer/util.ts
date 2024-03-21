@@ -1,8 +1,7 @@
-import { EventContext, schemas } from '@hicommonwealth/core';
+import { schemas } from '@hicommonwealth/core';
+import { InsertOutboxEvent } from '@hicommonwealth/model';
 
-export const testOutboxEvents: (EventContext<schemas.Events> & {
-  created_at?: Date;
-})[] = [
+export const testOutboxEvents: [InsertOutboxEvent, ...InsertOutboxEvent[]] = [
   {
     name: 'second' as schemas.Events,
     payload: {},
