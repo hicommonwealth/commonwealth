@@ -208,18 +208,16 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
 
     // adds user if it doesn't exist. Subsequent login will not need to go through the profile creation screen
     addAddressIfNone: async function (chain) {
-      const addresses = await testDb.sequelize.query(
+      const [addresses] = await testDb.sequelize.query(
         `select * from "Addresses" where address = '${testAddress}'`,
       );
 
       // address already exists
-      if (addresses[0].some((u) => u['chain'] === chain)) return;
+      if (addresses.length && addresses.some((u) => u['chain'] === chain))
+        return;
 
-      await createAddress(
-        chain,
-        addresses[0][0]['profile_id'],
-        addresses[0][0]['user_id'],
-      );
+      const profile = e2eEntities.testProfiles[0];
+      await createAddress(chain, profile.id, profile.user_id);
     },
   };
 };
