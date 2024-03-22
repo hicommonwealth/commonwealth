@@ -7,7 +7,7 @@ import {
 import { Op } from 'sequelize';
 import Web3 from 'web3';
 import { models } from '../database';
-import { behindFeatureFlag, mustExist } from '../middleware/guards';
+import { mustExist } from '../middleware/guards';
 import { StakeTransactionInstance } from '../models/stake_transaction';
 
 async function createStake(
@@ -89,8 +89,6 @@ export const CreateStakeTransaction: Command<
   ...schemas.commands.CreateStakeTransaction,
   auth: [],
   body: async ({ payload }) => {
-    await behindFeatureFlag('FLAG_STAKE_TRANSACTION');
-
     // Find transactions that already exist in database
     const existingTransactions = await models.StakeTransaction.findAll({
       where: {

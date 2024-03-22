@@ -64,6 +64,7 @@ describe('Stake Historical Price', () => {
         community_id,
         timestamp: Date.now(),
         stake_price: 88,
+        stake_amount: 1,
       },
       // { mock: true, log: true },
     );
@@ -76,6 +77,7 @@ describe('Stake Historical Price', () => {
         community_id,
         timestamp: 1000,
         stake_price: 10,
+        stake_amount: 1,
       },
       // { mock: true, log: true },
     );
@@ -87,6 +89,7 @@ describe('Stake Historical Price', () => {
         community_id,
         timestamp: 1,
         stake_price: 99,
+        stake_amount: 1,
       },
       // { mock: true, log: true },
     );
