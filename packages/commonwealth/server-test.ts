@@ -5,7 +5,7 @@ import {
   setupErrorHandlers,
 } from '@hicommonwealth/adapters';
 import { cache, dispose, logger } from '@hicommonwealth/core';
-import type { DB } from '@hicommonwealth/model';
+import type { DB, E2E_TestEntities } from '@hicommonwealth/model';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
 import express, { RequestHandler, json, urlencoded } from 'express';
@@ -29,14 +29,17 @@ import { ModelSeeder, modelSeeder } from './test/util/modelUtils';
  * - cacheDecorator: Redis cache decorator used to cache requests
  * - models: Direct access to the sequelize models
  * - seeder: Model seeding utilities
+ * - e2eTestEntities: Some integrations are coupled with entities generated in e2e tests 😱
  *
  * @remarks An pre-seeded test db is generated for each test
+ * @deprecated Not a good practice to generalize and hide test details, use new `seed` instead
  */
 export type TestServer = {
   app: express.Express;
   cacheDecorator: CacheDecorator;
   models: DB;
   seeder: ModelSeeder;
+  e2eTestEntities: E2E_TestEntities;
   truncate: () => Promise<void>;
 };
 
@@ -134,6 +137,9 @@ export const testServer = async (): Promise<TestServer> => {
 
   const seeder = modelSeeder(app, models);
 
+  // seed these too
+  const e2eTestEntities = await tester.e2eTestEntities(models);
+
   // auto dispose server
   dispose(async () => {
     await server.close();
@@ -144,6 +150,7 @@ export const testServer = async (): Promise<TestServer> => {
     cacheDecorator,
     models,
     seeder,
+    e2eTestEntities,
     truncate: () => tester.truncate_db(models),
   };
 };

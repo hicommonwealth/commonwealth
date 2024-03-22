@@ -8,7 +8,6 @@ import { JWT_SECRET } from '../../../server/config';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 import { buildUser } from '../../unit/unitHelpers';
 import { get, post } from './external/appHook.spec';
-import { testUsers } from './external/dbEntityHooks.spec';
 
 chai.use(chaiHttp);
 chai.should();
@@ -91,7 +90,10 @@ describe('POST communityStakes Tests', () => {
 
   it('The community stake routes work correctly', async () => {
     const stake_id = 3;
-    const jwtToken = jwt.sign({ id: 2, email: testUsers[0].email }, JWT_SECRET);
+    const jwtToken = jwt.sign(
+      { id: 2, email: server.e2eTestEntities.testUsers[0].email },
+      JWT_SECRET,
+    );
 
     const actualPutResponse = (
       await post(
