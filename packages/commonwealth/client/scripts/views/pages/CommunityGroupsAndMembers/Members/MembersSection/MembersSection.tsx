@@ -33,7 +33,7 @@ const columns = [
     header: 'Groups',
     hasCustomSortValue: true,
     numeric: false,
-    sortable: true,
+    sortable: false,
   },
 ];
 
