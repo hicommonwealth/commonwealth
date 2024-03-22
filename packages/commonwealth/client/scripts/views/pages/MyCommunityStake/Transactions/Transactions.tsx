@@ -74,7 +74,7 @@ const Transactions = ({ filterOptions }: TransactionsProps) => {
   useEffect(() => {
     let tempFilteredData = [...transactionHistoryData];
 
-    // check if community name and symbol contains 'searchText'
+    // filter by community name and symbol
     if (filterOptions.searchText) {
       tempFilteredData = tempFilteredData.filter((tx) =>
         (tx.community.symbol + tx.community.name)
@@ -83,8 +83,17 @@ const Transactions = ({ filterOptions }: TransactionsProps) => {
       );
     }
 
+    // filter by selected address
+    if (filterOptions?.selectedAddress?.value) {
+      tempFilteredData = tempFilteredData.filter(
+        (tx) =>
+          tx.address.toLowerCase() ===
+          filterOptions.selectedAddress.value.toLowerCase(),
+      );
+    }
+
     setFilteredTransactionHistoryData(tempFilteredData);
-  }, [filterOptions.searchText]);
+  }, [filterOptions]);
 
   return (
     <section className="Transactions">
