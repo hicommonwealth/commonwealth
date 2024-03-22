@@ -12,50 +12,41 @@ describe('Stake transactions', () => {
   let community_id;
 
   before(async () => {
-    const [node] = await seed(
-      'ChainNode',
-      {
-        url: 'https://ethereum-sepolia.publicnode.com',
-        name: 'Sepolia Testnet',
-        eth_chain_id: 11155111,
-        balance_type: BalanceType.Ethereum,
-        contracts: [],
-      },
-      // { mock: true, log: true },
-    );
+    const [node] = await seed('ChainNode', {
+      url: 'https://ethereum-sepolia.publicnode.com',
+      name: 'Sepolia Testnet',
+      eth_chain_id: 11155111,
+      balance_type: BalanceType.Ethereum,
+      contracts: [],
+    });
 
-    const [user] = await seed(
-      'User',
-      { isAdmin: true, selected_community_id: null },
-      // { mock: true, log: true },
-    );
-    const [community] = await seed(
-      'Community',
-      {
-        namespace: 'qaa',
-        chain_node_id: node?.id,
-        Addresses: [
-          {
-            role: 'admin',
-            user_id: user!.id,
-            profile_id: undefined,
-          },
-        ],
-        CommunityStakes: [
-          {
-            stake_id: 2,
-            stake_token: '',
-            stake_weight: 1,
-            vote_weight: 1,
-            stake_enabled: true,
-          },
-        ],
-        topics: [],
-        groups: [],
-        discord_config_id: null,
-      },
-      // { mock: true, log: true },
-    );
+    const [user] = await seed('User', {
+      isAdmin: true,
+      selected_community_id: null,
+    });
+    const [community] = await seed('Community', {
+      namespace: 'qaa',
+      chain_node_id: node?.id,
+      Addresses: [
+        {
+          role: 'admin',
+          user_id: user!.id,
+          profile_id: undefined,
+        },
+      ],
+      CommunityStakes: [
+        {
+          stake_id: 2,
+          stake_token: '',
+          stake_weight: 1,
+          vote_weight: 1,
+          stake_enabled: true,
+        },
+      ],
+      topics: [],
+      groups: [],
+      discord_config_id: null,
+    });
 
     community_id = community!.id!;
   });
