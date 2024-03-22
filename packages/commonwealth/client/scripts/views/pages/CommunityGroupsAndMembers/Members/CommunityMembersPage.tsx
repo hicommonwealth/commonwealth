@@ -1,8 +1,9 @@
 import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import { throttle } from 'lodash';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router';
 import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
@@ -79,7 +80,7 @@ const CommunityMembersPage = () => {
     isLoading: isLoadingMembers,
   } = useSearchProfilesQuery({
     communityId: app.activeChainId(),
-    searchTerm: '',
+    searchTerm: debouncedSearchTerm,
     limit: 30,
     orderBy: APIOrderBy.LastActive,
     orderDirection: APIOrderDirection.Desc,
@@ -94,6 +95,13 @@ const CommunityMembersPage = () => {
         includeMembershipTypes: `in-group:${searchFilters.groupFilter}`,
       }),
   });
+
+  const throttledFetchNextPage = useCallback(
+    throttle(() => {
+      fetchNextPage?.();
+    }, 1_000),
+    [fetchNextPage],
+  );
 
   const { data: groups } = useFetchGroupsQuery({
     communityId: app.activeChainId(),
@@ -272,7 +280,7 @@ const CommunityMembersPage = () => {
               type="info"
               title="Don't see your group right away?"
               body={`
-            Our app is crunching numbers, which takes some time. 
+            Our app is crunching numbers, which takes some time.
             Give it a few minutes and refresh to see your group.
           `}
               onClose={() =>
@@ -362,7 +370,7 @@ const CommunityMembersPage = () => {
           filteredMembers={formattedMembers}
           onLoadMoreMembers={() => {
             if (members?.pages?.[0]?.totalResults > formattedMembers.length) {
-              fetchNextPage();
+              throttledFetchNextPage();
             }
           }}
           isLoadingMoreMembers={isLoadingMembers}

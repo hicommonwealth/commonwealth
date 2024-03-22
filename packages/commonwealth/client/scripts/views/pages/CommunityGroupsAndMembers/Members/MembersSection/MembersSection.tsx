@@ -26,7 +26,7 @@ const columns = [
     header: 'Name',
     hasCustomSortValue: true,
     numeric: false,
-    sortable: true,
+    sortable: false,
   },
   {
     key: 'groups',
