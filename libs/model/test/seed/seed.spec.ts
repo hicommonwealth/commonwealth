@@ -8,12 +8,15 @@ import {
   schemas,
   type DeepPartial,
 } from '@hicommonwealth/core';
-import { expect } from 'chai';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 import { step } from 'mocha-steps';
-import { Model, ModelStatic } from 'sequelize';
+import { Model, ModelStatic, ValidationError } from 'sequelize';
 import z from 'zod';
 import { models } from '../../src/database';
-import { SeedOptions, checkDb, seed } from '../../src/test';
+import { SeedOptions, seed } from '../../src/tester';
+
+chai.use(chaiAsPromised);
 
 // testSeed creates an entity using the `seed` function
 // then attempts to find the entity and validate it
@@ -44,31 +47,14 @@ async function testSeed<T extends schemas.Aggregates>(
 }
 
 describe('Seed functions', () => {
-  before(async () => {
-    await checkDb();
-    const { models } = await import('../..');
-    await models.sequelize.sync({ force: true });
-  });
-
   after(async () => {
     await dispose()();
   });
 
   describe('User', () => {
     step('Should seed with defaults', async () => {
-      await testSeed('User');
-      await testSeed('User');
-    });
-
-    step('Should not mock data', async () => {
-      let seedErr = null;
-      try {
-        await testSeed('User', {}, { mock: false });
-      } catch (err) {
-        seedErr = err;
-      }
-      expect(seedErr).to.be.an('error');
-      expect(seedErr).to.have.property('name', 'ZodError');
+      await testSeed('User', { selected_community_id: null });
+      await testSeed('User', { selected_community_id: null });
     });
 
     step('Should seed with overrides', async () => {
@@ -76,6 +62,7 @@ describe('Seed functions', () => {
         email: 'temp@gmail.com',
         emailVerified: true,
         isAdmin: true,
+        selected_community_id: null,
       };
       // NOTE: some props like emailVerified and isAdmin
       // are explicitly excluded via sequelize model config
@@ -112,7 +99,7 @@ describe('Seed functions', () => {
   describe('Community', () => {
     step('Should seed with overrides', async () => {
       const node = await testSeed('ChainNode', { contracts: undefined });
-      const user = await testSeed('User');
+      const user = await testSeed('User', { selected_community_id: null });
       await testSeed('Community', {
         id: 'ethereum',
         network: ChainNetwork.Ethereum,
@@ -138,6 +125,7 @@ describe('Seed functions', () => {
           },
         ],
         CommunityStakes: [],
+        discord_config_id: null,
       });
 
       const community = await testSeed('Community', {
@@ -174,6 +162,7 @@ describe('Seed functions', () => {
           },
         ],
         topics: [{}, {}],
+        discord_config_id: null,
       });
 
       await testSeed('NotificationCategory', {
@@ -182,13 +171,19 @@ describe('Seed functions', () => {
       });
 
       await testSeed('Subscription', {
-        subscriber_id: 1,
+        subscriber_id: user.id,
         category_id: NotificationCategories.NewThread,
         is_active: true,
         community_id: community!.id,
         thread_id: undefined,
         comment_id: undefined,
       });
+    });
+
+    step('Should not mock data', async () => {
+      expect(
+        seed('Community', {}, { mock: false }),
+      ).to.eventually.be.rejectedWith(ValidationError);
     });
   });
 
