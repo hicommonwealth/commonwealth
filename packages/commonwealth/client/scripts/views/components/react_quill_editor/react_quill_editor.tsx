@@ -1,9 +1,14 @@
 import clsx from 'clsx';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
-import { nextTick } from 'process';
 import { RangeStatic } from 'quill';
 import MagicUrl from 'quill-magic-url';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  MouseEventHandler,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import ReactQuill, { Quill } from 'react-quill';
 import { openConfirmation } from '../../modals/confirmation_modal';
@@ -63,12 +68,14 @@ const ReactQuillEditor = ({
 
   const editorRef = useRef<ReactQuill>();
 
-  const [isVisible, setIsVisible] = useState<boolean>(true);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [isFocused, setIsFocused] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [selectedTab, setSelectedTab] = useState(TABS[0].label);
+  const [currentFormat, setCurrentFormat] = useState<
+    'ordered' | 'bullet' | 'check' | null
+  >(null);
 
   // ref is used to prevent rerenders when selection
   // is changed, since rerenders bug out the editor
@@ -113,15 +120,80 @@ const ReactQuillEditor = ({
     setContentDelta,
   });
 
-  // refreshQuillComponent unmounts and remounts the
-  // React Quill component, as this is the only way
-  // to refresh the component if the 'modules'
-  // prop is changed
-  const refreshQuillComponent = () => {
-    setIsVisible(false);
-    nextTick(() => {
-      setIsVisible(true);
-    });
+  const [prevKeyPress, setPrevKeyPress] = useState(null);
+
+  const [prevKeyPressTime, setPrevKeyPressTime] = useState(null);
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      const currentTime = new Date().getTime();
+
+      if (prevKeyPress === 'Enter' && currentTime - prevKeyPressTime < 300) {
+        e.preventDefault();
+        setPrevKeyPress(null);
+        setCurrentFormat(null);
+        return;
+      }
+
+      setPrevKeyPressTime(currentTime); // Update the previous key press time
+
+      e.preventDefault();
+      setPrevKeyPress('Enter');
+
+      const lines = contentDelta.ops[0].insert
+        .split('\n')
+        .filter((line) => line !== '');
+
+      const lastLine = lines[lines.length - 1];
+      const matchNumberedList = lastLine.match(/^\d+\./);
+      const matchUnsortedList = lastLine.match(/^-/);
+      const matchCheckboxList = lastLine.match(/^- \[[ xX]\] /);
+
+      const unorderedLists = ['bullet', 'check'];
+
+      if (matchNumberedList && currentFormat === 'ordered') {
+        const nextNumber = parseInt(matchNumberedList[0]) + 1;
+
+        const newContent = {
+          ...contentDelta,
+          ops: [
+            {
+              insert: `${contentDelta.ops[0].insert.slice(
+                0,
+                -1,
+              )}${nextNumber}. `,
+            },
+          ],
+        };
+        setContentDelta(newContent);
+        setTimeout(() => {
+          const quillEditor = editorRef.current.editor;
+          const newCursorPosition = quillEditor.getLength();
+          quillEditor.setSelection(newCursorPosition, newCursorPosition);
+        }, 10);
+      } else if (
+        (matchUnsortedList || matchCheckboxList) &&
+        unorderedLists.includes(currentFormat)
+      ) {
+        const suffix = matchCheckboxList ? '- [ ]' : '-';
+        const newContent = {
+          ...contentDelta,
+          ops: [
+            {
+              insert: `${contentDelta.ops[0].insert.slice(0, -1)}${suffix} `, // Removing the last newline character
+            },
+          ],
+        };
+        setContentDelta(newContent);
+        setTimeout(() => {
+          const quillEditor = editorRef.current.editor;
+          const newCursorPosition = quillEditor.getLength();
+          quillEditor.setSelection(newCursorPosition, newCursorPosition);
+        }, 10);
+      } else {
+        return;
+      }
+    }
   };
 
   const handleChange = (value, delta, source, editor) => {
@@ -205,6 +277,11 @@ const ReactQuillEditor = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const handleSelectedFormat: MouseEventHandler<HTMLButtonElement> = (e) => {
+    const formatValue = e.currentTarget.value;
+    setCurrentFormat(formatValue as 'ordered' | 'bullet' | 'check');
+  };
+
   const showTooltip = isDisabled && isHovering;
 
   return (
@@ -239,69 +316,69 @@ const ReactQuillEditor = ({
             {showTooltip && <QuillTooltip label={tooltipLabel} />}
             {isUploading && <LoadingIndicator />}
 
-            {isVisible && (
-              <>
-                <CustomQuillToolbar
-                  toolbarId={toolbarId}
-                  isDisabled={isDisabled}
-                />
-                <DragDropContext onDragEnd={handleDragStop}>
-                  <Droppable droppableId="quillEditor">
-                    {(provided) => (
-                      <div
-                        className={`${isDraggingOver ? 'ondragover' : ''}`}
-                        {...provided.droppableProps}
-                        ref={provided.innerRef}
-                        onDragOver={handleDragStart}
-                        onDragLeave={handleDragStop}
-                        onDrop={handleDragStop}
-                      >
-                        <div data-text-editor="name">
-                          <ReactQuill
-                            ref={editorRef}
-                            className={`QuillEditor markdownEnabled ${className}`}
-                            scrollingContainer="ql-container"
-                            placeholder={placeholder}
-                            tabIndex={tabIndex}
-                            theme="snow"
-                            bounds={`[data-text-editor="name"]`}
-                            value={contentDelta}
-                            onFocus={() => setIsFocused(true)}
-                            onBlur={() => setIsFocused(false)}
-                            onChange={handleChange}
-                            onChangeSelection={(selection: RangeStatic) => {
-                              if (!selection) {
-                                return;
-                              }
-                              lastSelectionRef.current = selection;
-                            }}
-                            formats={[]}
-                            modules={{
-                              toolbar: {
-                                container: `#${toolbarId}`,
-                                handlers: markdownToolbarHandlers,
-                              },
-                              imageDropAndPaste: {
-                                handler: handleImageDropAndPaste,
-                              },
-                              clipboard: {
-                                matchVisual: false,
-                                handler: handleTextPaste,
-                              },
-                              mention,
-                              magicUrl: false,
-                              keyboard: markdownKeyboardShortcuts,
-                            }}
-                          />
-                        </div>
-                        {provided.placeholder}
+            <>
+              <CustomQuillToolbar
+                toolbarId={toolbarId}
+                isDisabled={isDisabled}
+                selectedFormat={handleSelectedFormat}
+              />
+              <DragDropContext onDragEnd={handleDragStop}>
+                <Droppable droppableId="quillEditor">
+                  {(provided) => (
+                    <div
+                      className={`${isDraggingOver ? 'ondragover' : ''}`}
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
+                      onDragOver={handleDragStart}
+                      onDragLeave={handleDragStop}
+                      onDrop={handleDragStop}
+                    >
+                      <div data-text-editor="name">
+                        <ReactQuill
+                          ref={editorRef}
+                          className={`QuillEditor markdownEnabled ${className}`}
+                          scrollingContainer="ql-container"
+                          onKeyDown={handleKeyDown}
+                          placeholder={placeholder}
+                          tabIndex={tabIndex}
+                          theme="snow"
+                          bounds={`[data-text-editor="name"]`}
+                          value={contentDelta}
+                          onFocus={() => setIsFocused(true)}
+                          onBlur={() => setIsFocused(false)}
+                          onChange={handleChange}
+                          onChangeSelection={(selection: RangeStatic) => {
+                            if (!selection) {
+                              return;
+                            }
+                            lastSelectionRef.current = selection;
+                          }}
+                          formats={[]}
+                          modules={{
+                            toolbar: {
+                              container: `#${toolbarId}`,
+                              handlers: markdownToolbarHandlers,
+                            },
+                            imageDropAndPaste: {
+                              handler: handleImageDropAndPaste,
+                            },
+                            clipboard: {
+                              matchVisual: false,
+                              handler: handleTextPaste,
+                            },
+                            mention,
+                            magicUrl: false,
+                            keyboard: markdownKeyboardShortcuts,
+                          }}
+                        />
                       </div>
-                    )}
-                  </Droppable>
-                </DragDropContext>
-                <CustomQuillFooter handleImageUploader={handleImageUploader} />
-              </>
-            )}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </DragDropContext>
+              <CustomQuillFooter handleImageUploader={handleImageUploader} />
+            </>
           </div>
         </div>
       ) : (

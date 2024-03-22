@@ -16,7 +16,7 @@ import {
 import clsx from 'clsx';
 import 'components/react_quill/react_quill_editor.scss';
 import { DeltaStatic } from 'quill';
-import React, { MutableRefObject, useMemo } from 'react';
+import React, { MouseEventHandler, MutableRefObject, useMemo } from 'react';
 import ReactQuill from 'react-quill';
 import { SerializableDeltaStatic, renderToolbarIcon } from './utils';
 
@@ -51,11 +51,13 @@ const LIST_ITEM_PREFIX = {
 type CustomQuillToolbarProps = {
   toolbarId: string;
   isDisabled?: boolean;
+  selectedFormat?: MouseEventHandler;
 };
 
 export const CustomQuillToolbar = ({
   toolbarId,
   isDisabled = false,
+  selectedFormat,
 }: CustomQuillToolbarProps) => (
   <div id={toolbarId} className="CustomQuillToolbar">
     <div className={clsx('formatting-buttons-container', { isDisabled })}>
@@ -75,9 +77,9 @@ export const CustomQuillToolbar = ({
         <button className="ql-blockquote"></button>
       </div>
       <div className="section">
-        <button className="ql-list" value="ordered" />
-        <button className="ql-list" value="bullet" />
-        <button className="ql-list" value="check" />
+        <button className="ql-list" value="ordered" onClick={selectedFormat} />
+        <button className="ql-list" value="bullet" onClick={selectedFormat} />
+        <button className="ql-list" value="check" onClick={selectedFormat} />
       </div>
     </div>
   </div>
@@ -218,10 +220,10 @@ export const useMarkdownToolbarHandlers = ({
                 prefix,
               );
             }
+
             return modifiedLine;
           }, line);
         }
-
         if (/^\s*\d+\./.test(line)) {
           return line.replace(/^\s*\d+\./, prefix);
         }
@@ -254,8 +256,15 @@ export const useMarkdownToolbarHandlers = ({
      * Applies list markdown to the selected text in the editor.
      * @param {string} value - The value representing the type of list (e.g., 'ordered', 'bullet', 'check').
      */
+    let toggledList = null;
     return (value: string) => {
       const editor = editorRef?.current?.getEditor();
+
+      if (toggledList === value) {
+        toggledList = null;
+      } else {
+        toggledList = value;
+      }
 
       if (!editor) return;
 
@@ -263,11 +272,13 @@ export const useMarkdownToolbarHandlers = ({
       if (!selection) return;
 
       const prefix = LIST_ITEM_PREFIX[value];
+
       if (!prefix) {
         throw new Error(`could not get prefix for value: ${value}`);
       }
 
       const selectedText = editor.getText(selection.index, selection.length);
+
       const editorLength = editor.getLength() || 0;
 
       // If there is a selection, format the selected text
@@ -289,6 +300,11 @@ export const useMarkdownToolbarHandlers = ({
         //if the current line has a prefix and there is text after the prefix, replace the prefix
         Object.values(LIST_ITEM_PREFIX).forEach((p) => {
           if (p === prefix) {
+            //If the current line is a br tag, insert the prefix and a space
+            if (currentLine.domNode.outerHTML === '<br>') {
+              editor.insertText(currentLineIdx, `${prefix} `);
+              return;
+            }
             const currentLineText = currentLine.text.replace(prefix, '');
             editor.deleteText(currentLineIdx, currentLine.text.length);
             editor.insertText(currentLineIdx, currentLineText.trim());
