@@ -125,7 +125,7 @@ export const CreateStakeTransaction: Command<
 
     mustExist('Community', community);
     mustExist('Chain Node', community!.ChainNode);
-    mustExist('Chain Node', community!.namespace);
+    mustExist('Community namespace', community!.namespace);
 
     if (
       !Object.values(ValidChains).includes(community!.ChainNode!.eth_chain_id!)

@@ -8,7 +8,6 @@ export const GetStakeTransaction: Query<
 > = () => ({
   ...schemas.queries.GetStakeTransaction,
   auth: [],
-  secure: true,
   body: async ({ payload }) => {
     await behindFeatureFlag('FLAG_STAKE_TRANSACTION');
 
@@ -34,7 +33,5 @@ export const GetStakeTransaction: Query<
     }
 
     return response;
-
-    // return response?.get({ plain: true });
   },
 });

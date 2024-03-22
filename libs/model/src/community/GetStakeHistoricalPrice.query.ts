@@ -9,7 +9,6 @@ export const GetStakeHistoricalPrice: Query<
 > = () => ({
   ...schemas.queries.GetStakeHistoricalPrice,
   auth: [],
-  secure: true,
   body: async ({ payload }) => {
     await behindFeatureFlag('FLAG_STAKE_TRANSACTION');
 
@@ -29,6 +28,6 @@ export const GetStakeHistoricalPrice: Query<
       },
     );
 
-    return { old_price: response[0]?.stake_price };
+    return { old_price: response[0]?.stake_price ?? null };
   },
 });
