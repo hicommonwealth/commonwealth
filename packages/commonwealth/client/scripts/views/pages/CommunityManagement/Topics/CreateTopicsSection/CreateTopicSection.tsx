@@ -71,7 +71,7 @@ export const CreateTopicSection = () => {
   };
 
   useMemo(() => {
-    if (descriptionDelta.ops[0].insert.length > 250) {
+    if (descriptionDelta?.ops[0]?.insert?.length > 250) {
       setDescErrorMsg('Description must be 250 characters or less');
     } else {
       setDescErrorMsg(null);

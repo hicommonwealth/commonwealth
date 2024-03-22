@@ -21,15 +21,6 @@ const createTopic = async ({
   featuredInNewPost,
   defaultOffchainTemplate,
 }: CreateTopicProps) => {
-  console.log(
-    'createTopic',
-    name,
-    description,
-    telegram,
-    featuredInSidebar,
-    featuredInNewPost,
-    defaultOffchainTemplate,
-  );
   const response = await axios.post(`${app.serverUrl()}/topics`, {
     name,
     description,
