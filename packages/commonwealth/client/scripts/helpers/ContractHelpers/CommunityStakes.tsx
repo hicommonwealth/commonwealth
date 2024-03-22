@@ -1,4 +1,4 @@
-import { communityStakesAbi } from '../../../../shared/abi_utils';
+import { communityStakesAbi } from './Abi/CommunityStakesAbi';
 import ContractBase from './ContractBase';
 import NamespaceFactory from './NamespaceFactory';
 
