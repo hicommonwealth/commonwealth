@@ -23,7 +23,7 @@ module.exports = {
             allowNull: false,
           },
           stake_amount: { type: Sequelize.INTEGER, allowNull: false },
-          stake_price: { type: Sequelize.INTEGER, allowNull: false },
+          stake_price: { type: Sequelize.BIGINT, allowNull: false },
           stake_direction: {
             type: Sequelize.ENUM('buy', 'sell'),
             default: false,
