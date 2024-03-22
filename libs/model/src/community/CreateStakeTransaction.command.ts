@@ -43,10 +43,10 @@ async function createStake(
   };
 
   const response = await web3.eth.call(callData);
-  const name: string = web3.eth.abi.decodeParameter(
+  const name = web3.eth.abi.decodeParameter(
     'string',
     response,
-  ) as string;
+  ) as unknown as string;
   if (name !== namespace) {
     throw new Error('Transaction is not associated with provided community');
   }
