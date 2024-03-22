@@ -7,7 +7,7 @@ import { Events, events } from '../schemas';
 export const INVALID_INPUT_ERROR = 'Invalid Input Error';
 export const INVALID_ACTOR_ERROR = 'Invalid Actor Error';
 export const INVALID_STATE_ERROR = 'Invalid State Error';
-export const ENDPOINT_OFF_ERROR = 'Endpoint Off Error';
+export const ENDPOINT_DISABLED = 'Endpoint Off Error';
 
 /**
  * Deep partial utility
@@ -89,7 +89,7 @@ export class EndpointOff extends Error {
     public readonly payload?: unknown,
   ) {
     super(message);
-    this.name = ENDPOINT_OFF_ERROR;
+    this.name = ENDPOINT_DISABLED;
   }
 }
 

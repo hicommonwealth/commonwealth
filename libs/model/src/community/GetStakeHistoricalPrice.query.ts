@@ -13,7 +13,7 @@ export const GetStakeHistoricalPrice: Query<
 
     const response: any = await models.sequelize.query(
       `
-      SELECT stake_price / stake_amount::REAL
+      SELECT stake_price / stake_amount::REAL as old_price
       FROM "StakeTransactions"
       WHERE community_id = :community_id AND stake_id = :stake_id
       AND timestamp <= :past_date_epoch
@@ -25,6 +25,6 @@ export const GetStakeHistoricalPrice: Query<
       },
     );
 
-    return { old_price: response[0]?.stake_price ?? null };
+    return { old_price: response[0]?.old_price ?? null };
   },
 });

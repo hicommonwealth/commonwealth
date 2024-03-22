@@ -36,6 +36,6 @@ export const GetStakeHistoricalPrice = {
       .default(2),
   }),
   output: z.object({
-    old_price: z.string().nullable(),
+    old_price: z.number().nullable(),
   }),
 };
