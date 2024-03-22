@@ -69,7 +69,7 @@ async function createStake(
     community_id: communityId,
     stake_id: parseInt(stakeId),
     stake_amount: parseInt(value),
-    stake_price: parseInt(ethAmount),
+    stake_price: ethAmount,
     address: trader,
     stake_direction: isBuy ? 'buy' : 'sell',
     timestamp,

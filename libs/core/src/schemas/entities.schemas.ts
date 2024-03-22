@@ -1,10 +1,5 @@
 import z from 'zod';
-import {
-  MAX_SCHEMA_BIGINT,
-  MAX_SCHEMA_INT,
-  MIN_SCHEMA_BIGINT,
-  MIN_SCHEMA_INT,
-} from '../constants';
+import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../constants';
 import {
   BalanceSourceType,
   BalanceType,
@@ -239,9 +234,9 @@ export const StakeTransaction = z.object({
   stake_id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).default(2),
   address: z.string(),
   stake_amount: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
-  stake_price: z.bigint().min(MIN_SCHEMA_BIGINT).max(MAX_SCHEMA_BIGINT),
+  stake_price: z.string(),
   stake_direction: z.enum(['buy', 'sell']),
-  timestamp: z.bigint().min(MIN_SCHEMA_BIGINT).max(MAX_SCHEMA_BIGINT),
+  timestamp: z.string(),
 });
 
 export const CommunityStake = z.object({
