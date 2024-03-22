@@ -107,3 +107,15 @@ export const ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS = process.env
   .ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS
   ? parseInt(process.env.ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS, 10)
   : 60;
+
+export const featureFlags = {
+  FLAG_STAKE_TRANSACTION: {
+    variants: {
+      on: true,
+      off: false,
+    },
+    disabled: false,
+    defaultVariant:
+      process.env.FLAG_STAKE_TRANSACTION === 'true' ? 'on' : 'off',
+  },
+};

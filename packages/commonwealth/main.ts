@@ -5,6 +5,7 @@ import {
 } from '@hicommonwealth/adapters';
 import { cache, logger } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
+import { InMemoryProvider, OpenFeature } from '@openfeature/server-sdk';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
@@ -29,6 +30,7 @@ import {
   REDIS_URL,
   SERVER_URL,
   SESSION_SECRET,
+  featureFlags,
 } from './server/config';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
@@ -52,6 +54,8 @@ export async function main(app: express.Express) {
       v8.getHeapStatistics().heap_size_limit / 1000000000,
     )} GB`,
   );
+
+  OpenFeature.setProvider(new InMemoryProvider(featureFlags));
 
   REDIS_URL && cache(new RedisCache(REDIS_URL));
   const cacheDecorator = new CacheDecorator();

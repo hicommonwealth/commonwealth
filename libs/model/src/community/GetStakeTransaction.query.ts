@@ -1,6 +1,7 @@
 import type { Query } from '@hicommonwealth/core';
 import { schemas } from '@hicommonwealth/core';
 import { models } from '../database';
+import { behindFeatureFlag } from '../middleware/guards';
 
 export const GetStakeTransaction: Query<
   typeof schemas.queries.GetStakeTransaction
@@ -9,6 +10,8 @@ export const GetStakeTransaction: Query<
   auth: [],
   secure: true,
   body: async ({ payload }) => {
+    await behindFeatureFlag('FLAG_STAKE_TRANSACTION');
+
     const { address, community_id } = payload;
 
     let response;

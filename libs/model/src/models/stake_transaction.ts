@@ -36,7 +36,7 @@ export default (
       stake_id: { type: dataTypes.INTEGER, allowNull: false },
       address: { type: dataTypes.STRING, allowNull: false },
       stake_amount: { type: dataTypes.INTEGER, allowNull: false },
-      stake_price: { type: dataTypes.STRING, allowNull: false },
+      stake_price: { type: dataTypes.INTEGER, allowNull: false },
       stake_direction: {
         type: dataTypes.ENUM('buy', 'sell'),
         allowNull: false,

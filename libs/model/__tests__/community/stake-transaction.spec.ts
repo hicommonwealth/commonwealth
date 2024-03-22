@@ -32,6 +32,7 @@ describe('Stake transactions', () => {
     const [community] = await seed(
       'Community',
       {
+        namespace: 'qaa',
         chain_node_id: node?.id,
         Addresses: [
           {
@@ -57,13 +58,6 @@ describe('Stake transactions', () => {
     );
 
     community_id = community!.id!;
-    payload = {
-      transaction_hashes: [
-        '0x924f40cfea663b2579816173f048b61ab2b118e0c7c055d7b00dbd9cd15eb7c0',
-        '0xa888cc839e3ba03f689b0c2e88dd4205a82fa8894c2a8098679277b96c24fd4f',
-      ],
-      community_id: community_id,
-    };
   });
 
   after(async () => {
@@ -71,6 +65,14 @@ describe('Stake transactions', () => {
   });
 
   it('should create stake transactions and be able to query them', async () => {
+    payload = {
+      transaction_hashes: [
+        '0x924f40cfea663b2579816173f048b61ab2b118e0c7c055d7b00dbd9cd15eb7c0',
+        '0xa888cc839e3ba03f689b0c2e88dd4205a82fa8894c2a8098679277b96c24fd4f',
+      ],
+      community_id,
+    };
+
     const results = await command(CreateStakeTransaction(), {
       payload,
     });
@@ -102,5 +104,29 @@ describe('Stake transactions', () => {
           '0xa888cc839e3ba03f689b0c2e88dd4205a82fa8894c2a8098679277b96c24fd4f',
       ),
     ).to.exist;
+  }).timeout(10000); // increase timeout because crypto calls take a while
+
+  it('should fail if transaction is not related to community', async () => {
+    payload = {
+      transaction_hashes: [
+        '0x84939478bc5fbcca178e006dccdfaab6aebed40ef0a7b02684487780c10d8ce8',
+      ],
+      community_id,
+    };
+
+    try {
+      await command(CreateStakeTransaction(), {
+        payload,
+      });
+    } catch (e) {
+      expect(e.message).to.equal(
+        'Transaction is not associated with provided community',
+      );
+      return;
+    }
+
+    throw Error(
+      'Create stake transaction passed on unrelated community, it should fail!',
+    );
   }).timeout(10000); // increase timeout because crypto calls take a while
 });

@@ -7,6 +7,7 @@ import { Events, events } from '../schemas';
 export const INVALID_INPUT_ERROR = 'Invalid Input Error';
 export const INVALID_ACTOR_ERROR = 'Invalid Actor Error';
 export const INVALID_STATE_ERROR = 'Invalid State Error';
+export const ENDPOINT_OFF_ERROR = 'Endpoint Off Error';
 
 /**
  * Deep partial utility
@@ -75,6 +76,20 @@ export class InvalidState extends Error {
   ) {
     super(message);
     this.name = INVALID_STATE_ERROR;
+  }
+}
+
+/**
+ * Endpoint off error - The api is disabled via feature flags
+ */
+export class EndpointOff extends Error {
+  constructor(
+    message: string,
+    public readonly state?: unknown,
+    public readonly payload?: unknown,
+  ) {
+    super(message);
+    this.name = ENDPOINT_OFF_ERROR;
   }
 }
 
