@@ -26,6 +26,6 @@ export const GetStakeHistoricalPrice: Query<
       },
     );
 
-    return { old_price: response.stake_price };
+    return { old_price: response[0]?.stake_price };
   },
 });
