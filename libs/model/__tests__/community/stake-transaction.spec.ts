@@ -2,12 +2,14 @@ import { BalanceType, command, dispose } from '@hicommonwealth/core';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { CreateStakeTransaction } from '../../src/community/CreateStakeTransaction.command';
+import { GetStakeTransaction } from '../../src/community/GetStakeTransaction.query';
 import { seed } from '../../src/test/index';
 
 chai.use(chaiAsPromised);
 
 describe('Stake transactions', () => {
   let payload;
+  let community_id;
 
   before(async () => {
     const [node] = await seed(
@@ -54,12 +56,13 @@ describe('Stake transactions', () => {
       // { mock: true, log: true },
     );
 
+    community_id = community!.id!;
     payload = {
       transaction_hashes: [
         '0x924f40cfea663b2579816173f048b61ab2b118e0c7c055d7b00dbd9cd15eb7c0',
         '0xa888cc839e3ba03f689b0c2e88dd4205a82fa8894c2a8098679277b96c24fd4f',
       ],
-      community_id: community!.id!,
+      community_id: community_id,
     };
   });
 
@@ -67,7 +70,7 @@ describe('Stake transactions', () => {
     await dispose()();
   });
 
-  it('should create stake transactions', async () => {
+  it('should create stake transactions and be able to query them', async () => {
     const results = await command(CreateStakeTransaction(), {
       payload,
     });
@@ -80,5 +83,24 @@ describe('Stake transactions', () => {
       '0xf6885b5aC5AE36689038dAf30184AeEB266E61f5',
     );
     expect(results[1].stake_direction).to.equal('sell');
+
+    const getResult = await command(GetStakeTransaction(), {
+      payload: { community_id },
+    });
+
+    expect(
+      getResult.find(
+        (t) =>
+          t.transaction_hash ===
+          '0x924f40cfea663b2579816173f048b61ab2b118e0c7c055d7b00dbd9cd15eb7c0',
+      ),
+    ).to.exist;
+    expect(
+      getResult.find(
+        (t) =>
+          t.transaction_hash ===
+          '0xa888cc839e3ba03f689b0c2e88dd4205a82fa8894c2a8098679277b96c24fd4f',
+      ),
+    ).to.exist;
   }).timeout(10000); // increase timeout because crypto calls take a while
 });
