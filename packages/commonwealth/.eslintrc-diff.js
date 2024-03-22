@@ -158,6 +158,7 @@ module.exports = {
     'plugin:@tanstack/eslint-plugin-query/recommended',
     'plugin:react-hooks/recommended',
     'plugin:react/recommended',
+    'plugin:@typescript-eslint/recommended',
     ENABLE_ESLINT_DIFF_PLUGIN !== 'false' ? 'plugin:diff/diff' : null,
   ].filter((current) => current !== null),
 };
