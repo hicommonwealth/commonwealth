@@ -141,6 +141,7 @@ import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
 import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
 import { updateChainNodeHandler } from 'server/routes/communities/update_chain_node_handler';
+import { createWalletHandler } from 'server/routes/wallet/createWallet';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
 import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
 import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_handler';
@@ -1290,6 +1291,14 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     deleteGroupHandler.bind(this, serverControllers),
+  );
+
+  registerRoute(
+    router,
+    'post',
+    '/wallet',
+    passport.authenticate('jwt', { session: false }),
+    createWalletHandler.bind(this, models),
   );
 
   app.use(endpoint, router);

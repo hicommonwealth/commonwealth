@@ -246,7 +246,7 @@ export const CommunityStake = z.object({
 
 export const Wallets = z.object({
   id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),
-  user_id: z.string(),
+  user_id: z.number().int(),
   user_address: z.string().startsWith('0x').length(42),
   relay_address: z.string().startsWith('0x').length(42),
   wallet_address: z.string().startsWith('0x').length(42),
