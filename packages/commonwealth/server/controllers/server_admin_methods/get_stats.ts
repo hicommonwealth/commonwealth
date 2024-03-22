@@ -13,16 +13,19 @@ export type GetStatsOptions = {
   communityId?: string;
 };
 
+type TableCounts = {
+  numCommentsLastMonth: number;
+  numThreadsLastMonth: number;
+  numPollsLastMonth: number;
+  numReactionsLastMonth: number;
+  numProposalVotesLastMonth: number;
+  numMembersLastMonth: number;
+  numGroupsLastMonth: number;
+};
+
 export type GetStatsResult = {
   lastMonthNewCommunities: Array<string>;
-  totalStats: {
-    numCommentsLastMonth: number;
-    numThreadsLastMonth: number;
-    numPollsLastMonth: number;
-    numReactionsLastMonth: number;
-    numProposalVotesLastMonth: number;
-    numMembersLastMonth: number;
-    numGroupsLastMonth: number;
+  totalStats: TableCounts & {
     averageAddressesPerCommunity: number;
     populatedCommunities: number;
   };
@@ -68,13 +71,7 @@ export async function __getStats(
 
   const [
     lastMonthNewCommunities,
-    numCommentsLastMonth,
-    numThreadsLastMonth,
-    numReactionsLastMonth,
-    numProposalVotesLastMonth,
-    numPollsLastMonth,
-    numMembersLastMonth,
-    numGroupsLastMonth,
+    [{ monthlySummary }],
     [{ result: averageAddressesPerCommunity }],
     [{ result: populatedCommunities }],
   ] = await Promise.all([
@@ -82,13 +79,38 @@ export async function __getStats(
       `SELECT id FROM "Communities" WHERE created_at >= NOW() - INTERVAL '30 days'`,
       { type: QueryTypes.SELECT },
     ),
-    this.models.Comment.count(countQuery),
-    this.models.Thread.count(countQuery),
-    this.models.Reaction.count(countQuery),
-    this.models.Vote.count(countQuery),
-    this.models.Poll.count(countQuery),
-    this.models.Address.count(countQuery),
-    this.models.Group.count(countQuery),
+    this.models.sequelize.query<{ monthlySummary: TableCounts }>(
+      `
+      WITH MonthlyStats AS (
+        SELECT 'numCommentsLastMonth' as label, COUNT(*) as count FROM "Comments" WHERE "created_at" >= :oneMonthAgo
+        UNION ALL
+        SELECT 'numThreadsLastMonth' as label, COUNT(*) FROM "Threads" WHERE "created_at" >= :oneMonthAgo
+        UNION ALL
+        SELECT 'numReactionsLastMonth' as label, COUNT(*) FROM "Reactions" WHERE "created_at" >= :oneMonthAgo
+        UNION ALL
+        SELECT 'numProposalVotesLastMonth' as label, COUNT(*) FROM "Votes" WHERE "created_at" >= :oneMonthAgo
+        UNION ALL
+        SELECT 'numPolls' as label, COUNT(*) FROM "Polls" WHERE "created_at" >= :oneMonthAgo
+        UNION ALL
+        SELECT 'numMembersLastMonth' as label, COUNT(*) FROM "Addresses" WHERE "created_at" >= :oneMonthAgo
+        UNION ALL
+        SELECT 'numGroupsLastMonth' as label, COUNT(*) FROM "Groups" WHERE "created_at" >= :oneMonthAgo
+      )
+      SELECT json_build_object(
+        'numCommentsLastMonth', (SELECT count FROM MonthlyStats WHERE label = 'numCommentsLastMonth'),
+        'numThreadsLastMonth', (SELECT count FROM MonthlyStats WHERE label = 'numThreadsLastMonth'),
+        'numReactionsLastMonth', (SELECT count FROM MonthlyStats WHERE label = 'numReactionsLastMonth'),
+        'numProposalVotesLastMonth', (SELECT count FROM MonthlyStats WHERE label = 'numProposalVotesLastMonth'),
+        'numPolls', (SELECT count FROM MonthlyStats WHERE label = 'numPolls'),
+        'numMembersLastMonth', (SELECT count FROM MonthlyStats WHERE label = 'numMembersLastMonth'),
+        'numGroupsLastMonth', (SELECT count FROM MonthlyStats WHERE label = 'numGroupsLastMonth')
+      ) AS "monthlySummary";
+    `,
+      {
+        replacements: { oneMonthAgo: oneMonthAgo },
+        type: QueryTypes.SELECT,
+      },
+    ),
     this.models.sequelize.query<{ result: number }>(
       `
       SELECT AVG(address_count) as result
@@ -118,13 +140,7 @@ export async function __getStats(
   return {
     lastMonthNewCommunities: lastMonthNewCommunities.map(({ id }) => id),
     totalStats: {
-      numCommentsLastMonth,
-      numThreadsLastMonth,
-      numReactionsLastMonth,
-      numProposalVotesLastMonth,
-      numPollsLastMonth,
-      numMembersLastMonth,
-      numGroupsLastMonth,
+      ...monthlySummary,
       averageAddressesPerCommunity,
       populatedCommunities,
     },
