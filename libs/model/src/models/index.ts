@@ -37,6 +37,7 @@ import type { ThreadModelStatic } from './thread';
 import type { TopicModelStatic } from './topic';
 import type { UserModelStatic } from './user';
 import type { VoteModelStatic } from './vote';
+import { WalletModelStatic } from './wallets';
 import type { WebhookModelStatic } from './webhook';
 
 export type Models = {
@@ -78,6 +79,7 @@ export type Models = {
   User: UserModelStatic;
   Webhook: WebhookModelStatic;
   Outbox: OutboxModelStatic;
+  Wallets: WalletModelStatic;
 };
 
 export type DB = Models & {
@@ -126,4 +128,5 @@ export * from './topic';
 export * from './types';
 export * from './user';
 export * from './vote';
+export * from './wallets';
 export * from './webhook';
