@@ -41,7 +41,7 @@ export default (
         type: dataTypes.ENUM('buy', 'sell'),
         allowNull: false,
       },
-      timestamp: { type: dataTypes.BIGINT, allowNull: false },
+      timestamp: { type: dataTypes.INTEGER, allowNull: false },
     },
     {
       underscored: true,

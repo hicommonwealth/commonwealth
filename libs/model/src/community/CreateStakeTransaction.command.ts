@@ -33,7 +33,6 @@ async function createStake(
   );
 
   const callData = {
-    // to: web3.eth.abi.decodeParameter('address', txReceipt.logs[0].topics[1]), // src of Transfer single
     to: txReceipt.logs[0].address, // src of Transfer single
     data: '06fdde03', // name function selector
   };
@@ -68,7 +67,7 @@ async function createStake(
     stake_price: ethAmount,
     address: trader,
     stake_direction: isBuy ? 'buy' : 'sell',
-    timestamp,
+    timestamp: timestamp,
   });
 
   return stakeAggregate?.get({ plain: true });

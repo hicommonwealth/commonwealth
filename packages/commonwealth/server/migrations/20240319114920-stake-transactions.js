@@ -29,7 +29,7 @@ module.exports = {
             default: false,
             allowNull: false,
           },
-          timestamp: { type: Sequelize.BIGINT, allowNull: false },
+          timestamp: { type: Sequelize.INTEGER, allowNull: false },
         },
         {
           indexes: [{ fields: ['address'] }, { fields: ['community_id'] }],

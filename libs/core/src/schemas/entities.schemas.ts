@@ -236,7 +236,7 @@ export const StakeTransaction = z.object({
   stake_amount: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
   stake_price: z.string(),
   stake_direction: z.enum(['buy', 'sell']),
-  timestamp: z.string(),
+  timestamp: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
 });
 
 export const CommunityStake = z.object({
