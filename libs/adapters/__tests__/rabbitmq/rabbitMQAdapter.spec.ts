@@ -2,6 +2,7 @@ import {
   BrokerTopics,
   delay,
   EventContext,
+  InvalidInput,
   Policy,
   schemas,
 } from '@hicommonwealth/core';
@@ -32,7 +33,7 @@ const Snapshot: Policy<typeof inputs> = () => ({
 describe('RabbitMQ', () => {
   let rmqAdapter: RabbitMQAdapter;
 
-  before(async () => {
+  before(() => {
     rmqAdapter = new RabbitMQAdapter(
       getRabbitMQConfig(
         'amqp://127.0.0.1',
@@ -85,16 +86,6 @@ describe('RabbitMQ', () => {
       expect(res).to.be.false;
     });
 
-    it('should return false if the event schema is invalid', async () => {
-      const res = await rmqAdapter.publish(BrokerTopics.SnapshotListener, {
-        name: eventName,
-        payload: {
-          id: 10,
-        },
-      } as unknown as EventContext<typeof eventName>);
-      expect(res).to.be.false;
-    });
-
     it('should publish a valid event and return true', async () => {
       const res = await rmqAdapter.publish(BrokerTopics.SnapshotListener, {
         name: eventName,
@@ -133,6 +124,36 @@ describe('RabbitMQ', () => {
 
       expect(idOutput).to.equal(idInput);
     }).timeout(20000);
+
+    it('should execute a retry strategy if the payload schema is invalid', async () => {
+      let shouldNotExecute = true;
+      const inputs = {
+        SnapshotProposalCreated: schemas.events.SnapshotProposalCreated,
+      };
+
+      const FailingSnapshot: Policy<typeof inputs> = () => ({
+        inputs,
+        body: {
+          SnapshotProposalCreated: async () => {
+            shouldNotExecute = false;
+          },
+        },
+      });
+
+      let retryExecuted = false;
+      const res = await rmqAdapter.subscribe(
+        BrokerTopics.SnapshotListener,
+        FailingSnapshot(),
+        (err: Error | undefined) => {
+          if (err instanceof InvalidInput) {
+            retryExecuted = true;
+          }
+        },
+      );
+      expect(res).to.be.true;
+      expect(retryExecuted).to.be.true;
+      expect(shouldNotExecute).to.be.true;
+    });
   });
 
   after(async () => {
