@@ -1,9 +1,5 @@
 import type { Command } from '@hicommonwealth/core';
-import { schemas } from '@hicommonwealth/core';
-import {
-  factoryContracts,
-  ValidChains,
-} from '@hicommonwealth/core/build/commonProtocol/index';
+import { commonProtocol, schemas } from '@hicommonwealth/core';
 import { Op } from 'sequelize';
 import Web3 from 'web3';
 import { models } from '../database';
@@ -126,7 +122,9 @@ export const CreateStakeTransaction: Command<
     mustExist('Community namespace', community!.namespace);
 
     if (
-      !Object.values(ValidChains).includes(community!.ChainNode!.eth_chain_id!)
+      !Object.values(commonProtocol.ValidChains).includes(
+        community!.ChainNode!.eth_chain_id!,
+      )
     ) {
       throw Error('Chain does not have deployed namespace factory');
     }
@@ -134,8 +132,9 @@ export const CreateStakeTransaction: Command<
     const web3 = new Web3(community!.ChainNode!.url);
 
     const communityStakeAddress: string =
-      factoryContracts[community!.ChainNode!.eth_chain_id as ValidChains]
-        .communityStake;
+      commonProtocol.factoryContracts[
+        community!.ChainNode!.eth_chain_id as commonProtocol.ValidChains
+      ].communityStake;
 
     return [
       ...stakeAggregates,
