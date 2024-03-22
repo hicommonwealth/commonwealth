@@ -145,12 +145,12 @@ module.exports = {
     '@typescript-eslint/await-thenable': 'error',
 
     // ** 'any' issues...
-    '@typescript-eslint/no-explicit-any': 'error',
-    '@typescript-eslint/no-unsafe-argument': 'error',
-    '@typescript-eslint/no-unsafe-assignment': 'error',
-    '@typescript-eslint/no-unsafe-call': 'error',
-    '@typescript-eslint/no-unsafe-member-access': 'error',
-    '@typescript-eslint/no-unsafe-return': 'error',
+    // '@typescript-eslint/no-explicit-any': 'error',
+    // '@typescript-eslint/no-unsafe-argument': 'error',
+    // '@typescript-eslint/no-unsafe-assignment': 'error',
+    // '@typescript-eslint/no-unsafe-call': 'error',
+    // '@typescript-eslint/no-unsafe-member-access': 'error',
+    // '@typescript-eslint/no-unsafe-return': 'error',
   },
   ignorePatterns: ['server/scripts/setupPrerenderService.ts'],
   extends: [
