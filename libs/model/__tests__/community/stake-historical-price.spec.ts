@@ -51,7 +51,7 @@ describe('Stake Historical Price', () => {
       transaction_hash: '1',
       stake_id: 2,
       community_id,
-      timestamp: Date.now(),
+      timestamp: Math.floor(Date.now() / 1000),
       stake_price: 88,
       stake_amount: 1,
     });
@@ -82,16 +82,16 @@ describe('Stake Historical Price', () => {
     const results = await query(GetStakeHistoricalPrice(), {
       payload: { past_date_epoch: 1, community_id: 'non-existing' },
     });
-    expect(results?.old_price).to.equal(undefined);
+    expect(results?.old_price).to.equal(null);
   });
 
   it('should return the historical price', async () => {
     const results = await query(GetStakeHistoricalPrice(), {
       payload: {
-        past_date_epoch: (Date.now() - 24 * 60 * 60 * 1000) / 1000, // date 24 horus ago
+        past_date_epoch: Math.floor(Date.now() / 1000) - 24 * 60 * 60, // date 24 horus ago
         community_id,
       },
     });
-    expect(results?.old_price).to.equal('10');
+    expect(results?.old_price).to.equal(10);
   });
 });
