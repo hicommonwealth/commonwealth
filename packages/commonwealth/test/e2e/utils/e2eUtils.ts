@@ -2,8 +2,6 @@
 import { tester, type DB, type E2E_TestEntities } from '@hicommonwealth/model';
 import { expect } from '@playwright/test';
 import * as process from 'process';
-import Sequelize from 'sequelize';
-const Op = Sequelize.Op;
 
 export type E2E_Seeder = E2E_TestEntities & {
   testDb: DB;
