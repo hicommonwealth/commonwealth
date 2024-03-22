@@ -4,15 +4,99 @@ import {
   factoryContracts,
   ValidChains,
 } from '@hicommonwealth/core/build/commonProtocol/index';
+import { Op } from 'sequelize';
 import Web3 from 'web3';
 import { models } from '../database';
+import { mustExist } from '../middleware/guards';
 
+async function createStake(
+  web3: Web3,
+  transactionHash: string,
+  communityId: string,
+  communityStakeAddress: string,
+) {
+  const [transaction, txReceipt] = await Promise.all([
+    web3.eth.getTransaction(transactionHash),
+    web3.eth.getTransactionReceipt(transactionHash),
+  ]);
+  const timestamp: number = (
+    await web3.eth.getBlock(transaction.blockHash as string)
+  ).timestamp as number;
+
+  if (![transaction.from, transaction.to].includes(communityStakeAddress)) {
+    throw new Error(
+      'This transaction is not associated with a community stake',
+    );
+  }
+
+  const { 0: stakeId, 1: value } = web3.eth.abi.decodeParameters(
+    ['uint256', 'uint256'],
+    txReceipt.logs[0].data,
+  );
+
+  const {
+    0: trader,
+    // 1: namespace,
+    2: isBuy,
+    // 3: communityTokenAmount,
+    4: ethAmount,
+    // 5: protocolEthAmount,
+    // 6: nameSpaceEthAmount,
+  } = web3.eth.abi.decodeParameters(
+    ['address', 'address', 'bool', 'uint256', 'uint256', 'uint256', 'uint256'],
+    txReceipt.logs[1].data,
+  );
+
+  const stakeAggregate = await models.StakeTransaction.create({
+    transaction_hash: transactionHash,
+    community_id: communityId,
+    stake_id: parseInt(stakeId),
+    stake_amount: parseInt(value),
+    stake_price: ethAmount,
+    address: trader,
+    stake_direction: isBuy ? 'buy' : 'sell',
+    timestamp,
+  });
+
+  return stakeAggregate?.get({ plain: true });
+}
+
+/**
+ * This function will first search the database for existing transactions,
+ * and create and persist all remaining transactions
+ * @constructor
+ */
 export const CreateStakeTransaction: Command<
   typeof schemas.commands.CreateStakeTransaction
 > = () => ({
   ...schemas.commands.CreateStakeTransaction,
   auth: [],
   body: async ({ payload }) => {
+    // Find transactions that already exist in database
+    const existingTransactions = await models.StakeTransaction.findAll({
+      where: {
+        transaction_hash: { [Op.in]: payload.transaction_hashes },
+        community_id: payload.community_id,
+      },
+    });
+
+    const stakeAggregates =
+      existingTransactions.length > 0
+        ? existingTransactions?.get({ plain: true })
+        : [];
+
+    const existingTransactionIds = new Set(
+      stakeAggregates.map((t) => t.transaction_hash),
+    );
+    const newTransactionIds = payload.transaction_hashes.filter(
+      (t) => !existingTransactionIds.has(t),
+    );
+
+    if (newTransactionIds.length === 0) {
+      return stakeAggregates;
+    }
+
+    // newTransactionIds are the remaining transactions that we must query web3 for.
     const community = await models.Community.findOne({
       where: { id: payload.community_id },
       include: [
@@ -20,12 +104,16 @@ export const CreateStakeTransaction: Command<
           model: models.ChainNode,
           attributes: ['eth_chain_id', 'url'],
         },
+        {
+          model: models.CommunityStake,
+          attributes: ['community_id'],
+        },
       ],
     });
 
-    if (!community || !community.id || !community.ChainNode) {
-      throw Error(`${community ? 'Community' : 'ChainNode'} not found`);
-    }
+    mustExist('Community', community);
+    mustExist('Chain Node', community.ChainNode);
+    mustExist('Community Stake', community.CommunityStakes);
 
     if (
       !Object.values(ValidChains).includes(community.ChainNode.eth_chain_id!)
@@ -33,48 +121,19 @@ export const CreateStakeTransaction: Command<
       throw Error('Chain does not have deployed namespace factory');
     }
 
-    const web3 = new Web3('https://ethereum-sepolia.publicnode.com');
+    const web3 = new Web3(community.ChainNode.url);
 
-    const [transaction, txReceipt] = await Promise.all([
-      web3.eth.getTransaction(payload.transaction_hash),
-      web3.eth.getTransactionReceipt(payload.transaction_hash),
-    ]);
-    const timestamp: number = (
-      await web3.eth.getBlock(transaction.blockHash as string)
-    ).timestamp as number;
-
-    let direction: 'buy' | 'sell', address: string;
     const communityStakeAddress: string =
       factoryContracts[community.ChainNode.eth_chain_id as ValidChains]
         .communityStake;
-    if (transaction.to === communityStakeAddress) {
-      direction = 'buy';
-      address = transaction.from;
-    } else if (transaction.from === communityStakeAddress) {
-      direction = 'sell';
-      address = transaction.to!;
-    } else {
-      throw new Error(
-        'This transaction is not associated with a community stake',
-      );
-    }
 
-    const data = web3.eth.abi.decodeParameters(
-      ['uint256', 'uint256'],
-      txReceipt.logs[0].data,
-    );
-
-    const stakeAggregate = await models.StakeTransaction.create({
-      transaction_hash: payload.transaction_hash,
-      community_id: community.id,
-      stake_id: parseInt(data[0]),
-      stake_amount: parseInt(data[1]),
-      stake_price: transaction.value,
-      address,
-      stake_direction: direction,
-      timestamp,
-    });
-
-    return stakeAggregate?.get({ plain: true });
+    return [
+      ...stakeAggregates,
+      ...(await Promise.all(
+        newTransactionIds.map((txHash) =>
+          createStake(web3, txHash, community.id, communityStakeAddress),
+        ),
+      )),
+    ];
   },
 });
