@@ -1,7 +1,7 @@
 import { AppError } from '@hicommonwealth/core';
 import { Thread, ThreadAttributes, type DB } from '@hicommonwealth/model';
 import { Feed } from 'feed';
-import { slugify } from 'utils';
+import { slugify } from '../../shared/utils';
 import { GetBulkThreadsResult } from '../controllers/server_threads_methods/get_bulk_threads';
 import { ServerControllers } from '../routing/router';
 import { TypedRequestQuery, TypedResponse } from '../types';
