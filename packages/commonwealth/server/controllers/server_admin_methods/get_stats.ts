@@ -90,7 +90,7 @@ export async function __getStats(
         UNION ALL
         SELECT 'numProposalVotesLastMonth' as label, COUNT(*) FROM "Votes" WHERE "created_at" >= :oneMonthAgo
         UNION ALL
-        SELECT 'numPolls' as label, COUNT(*) FROM "Polls" WHERE "created_at" >= :oneMonthAgo
+        SELECT 'numPollsLastMonth' as label, COUNT(*) FROM "Polls" WHERE "created_at" >= :oneMonthAgo
         UNION ALL
         SELECT 'numMembersLastMonth' as label, COUNT(*) FROM "Addresses" WHERE "created_at" >= :oneMonthAgo
         UNION ALL
@@ -101,7 +101,7 @@ export async function __getStats(
         'numThreadsLastMonth', (SELECT count FROM MonthlyStats WHERE label = 'numThreadsLastMonth'),
         'numReactionsLastMonth', (SELECT count FROM MonthlyStats WHERE label = 'numReactionsLastMonth'),
         'numProposalVotesLastMonth', (SELECT count FROM MonthlyStats WHERE label = 'numProposalVotesLastMonth'),
-        'numPolls', (SELECT count FROM MonthlyStats WHERE label = 'numPolls'),
+        'numPollsLastMonth', (SELECT count FROM MonthlyStats WHERE label = 'numPollsLastMonth'),
         'numMembersLastMonth', (SELECT count FROM MonthlyStats WHERE label = 'numMembersLastMonth'),
         'numGroupsLastMonth', (SELECT count FROM MonthlyStats WHERE label = 'numGroupsLastMonth')
       ) AS "monthlySummary";
