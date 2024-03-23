@@ -471,7 +471,7 @@ describe('recomputeCounts', () => {
         server.e2eTestEntities.testThreads[0].id,
         server.e2eTestEntities.testComments[0].id,
       );
-      // TODO: review expect(before.countsFromSourceTable.notification_id).to.be.equal(0);
+      expect(before.countsFromSourceTable.notification_id).to.be.gt(0);
       await verifyRecomputeCountAll();
     });
 
@@ -494,7 +494,7 @@ describe('recomputeCounts', () => {
         server.e2eTestEntities.testThreads[0].id,
         server.e2eTestEntities.testComments[0].id,
       );
-      // TODO: review expect(before.countsFromSourceTable.notification_id).to.be.equal(0);
+      expect(before.countsFromSourceTable.notification_id).to.be.gt(0);
       await verifyRecomputeCountAll();
     });
   });
