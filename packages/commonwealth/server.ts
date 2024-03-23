@@ -31,8 +31,9 @@ const app = express();
  * - Once we fully decouple the models, we can remove the import from `main.ts` that's causing this issue
  */
 const start = async () => {
+  const { models } = await import('@hicommonwealth/model');
   const { main } = await import('./main');
-  main(app)
+  main(app, models)
     .then(() => {
       isServiceHealthy = true;
     })

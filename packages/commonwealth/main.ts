@@ -4,7 +4,7 @@ import {
   setupErrorHandlers,
 } from '@hicommonwealth/adapters';
 import { cache, logger } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import type { DB } from '@hicommonwealth/model';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
@@ -45,7 +45,14 @@ import ViewCountCache from './server/util/viewCountCache';
 // set up express async error handling hack
 require('express-async-errors');
 
-export async function main(app: express.Express, isTestServer = false) {
+/**
+ * Bootstraps express app
+ */
+export async function main(
+  app: express.Express,
+  models: DB,
+  isTestServer = false,
+) {
   const log = logger().getLogger(__filename);
   log.info(
     `Node Option max-old-space-size set to: ${JSON.stringify(
