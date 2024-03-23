@@ -148,8 +148,7 @@ describe('Notification Routes Tests', () => {
       expect(NR.is_read).to.be.false;
     });
 
-    // TODO: investigate why failing
-    it.skip('should return only notifications with active_only turned on', async () => {
+    it('should return only notifications with active_only turned on', async () => {
       await server.seeder.createSubscription({
         jwt: jwtToken,
         is_active: false,

@@ -56,16 +56,20 @@ export async function main(app: express.Express) {
   REDIS_URL && cache(new RedisCache(REDIS_URL));
   const cacheDecorator = new CacheDecorator();
 
+  const TESTING = process.env.NODE_ENV === 'test';
   const DEV = process.env.NODE_ENV !== 'production';
-  !DEV && !REDIS_URL && log.error('Missing REDIS_URL in production!');
+  !TESTING &&
+    !DEV &&
+    !REDIS_URL &&
+    log.error('Missing REDIS_URL in production!');
 
   // CLI parameters for which task to run
-  const SHOULD_SEND_EMAILS = process.env.SEND_EMAILS === 'true';
+  const SHOULD_SEND_EMAILS = !TESTING && process.env.SEND_EMAILS === 'true';
 
   const NO_GLOBAL_ACTIVITY_CACHE =
-    process.env.NO_GLOBAL_ACTIVITY_CACHE === 'true';
+    TESTING || process.env.NO_GLOBAL_ACTIVITY_CACHE === 'true';
   const NO_CLIENT_SERVER =
-    process.env.NO_CLIENT === 'true' || SHOULD_SEND_EMAILS;
+    TESTING || process.env.NO_CLIENT === 'true' || SHOULD_SEND_EMAILS;
 
   let rc = null;
   if (SHOULD_SEND_EMAILS) {
@@ -99,74 +103,79 @@ export async function main(app: express.Express) {
   });
 
   const setupMiddleware = () => {
-    // redirect from commonwealthapp.herokuapp.com to commonwealth.im
-    app.all(/.*/, (req, res, next) => {
-      if (req.header('host')?.match(/commonwealthapp.herokuapp.com/i)) {
-        res.redirect(301, `https://commonwealth.im${req.url}`);
-      } else {
+    if (!TESTING) {
+      // redirect from commonwealthapp.herokuapp.com to commonwealth.im
+      app.all(/.*/, (req, res, next) => {
+        if (req.header('host')?.match(/commonwealthapp.herokuapp.com/i)) {
+          res.redirect(301, `https://commonwealth.im${req.url}`);
+        } else {
+          next();
+        }
+      });
+
+      // redirect to https:// unless we are using a test domain or using 192.168.1.range (local network range)
+      app.use(
+        redirectToHTTPS(
+          [
+            /localhost:(\d{4})/,
+            /127.0.0.1:(\d{4})/,
+            /192.168.1.(\d{1,3}):(\d{4})/,
+          ],
+          [],
+          301,
+        ),
+      );
+
+      // dynamic compression settings used
+      app.use(compression());
+
+      // static compression settings unused
+      // app.get('*.js', (req, res, next) => {
+      //   req.url = req.url + '.gz';
+      //   res.set('Content-Encoding', 'gzip');
+      //   res.set('Content-Type', 'application/javascript; charset=UTF-8');
+      //   next();
+      // });
+
+      // // static compression settings unused
+      // app.get('bundle.**.css', (req, res, next) => {
+      //   req.url = req.url + '.gz';
+      //   res.set('Content-Encoding', 'gzip');
+      //   res.set('Content-Type', 'text/css');
+      //   next();
+      // });
+
+      // add security middleware
+      app.use(function applyXFrameAndCSP(req, res, next) {
+        res.set('X-Frame-Options', 'DENY');
+        res.set('Content-Security-Policy', "frame-ancestors 'none';");
         next();
-      }
-    });
-
-    // redirect to https:// unless we are using a test domain or using 192.168.1.range (local network range)
-    app.use(
-      redirectToHTTPS(
-        [
-          /localhost:(\d{4})/,
-          /127.0.0.1:(\d{4})/,
-          /192.168.1.(\d{1,3}):(\d{4})/,
-        ],
-        [],
-        301,
-      ),
-    );
-
-    // dynamic compression settings used
-    app.use(compression());
-
-    // static compression settings unused
-    // app.get('*.js', (req, res, next) => {
-    //   req.url = req.url + '.gz';
-    //   res.set('Content-Encoding', 'gzip');
-    //   res.set('Content-Type', 'application/javascript; charset=UTF-8');
-    //   next();
-    // });
-
-    // // static compression settings unused
-    // app.get('bundle.**.css', (req, res, next) => {
-    //   req.url = req.url + '.gz';
-    //   res.set('Content-Encoding', 'gzip');
-    //   res.set('Content-Type', 'text/css');
-    //   next();
-    // });
-
-    // add security middleware
-    app.use(function applyXFrameAndCSP(req, res, next) {
-      res.set('X-Frame-Options', 'DENY');
-      res.set('Content-Security-Policy', "frame-ancestors 'none';");
-      next();
-    });
+      });
+    }
 
     // serve static files
     app.use(favicon(`${__dirname}/favicon.ico`));
     app.use('/static', express.static('static'));
 
-    app.use(
-      pinoHttp({
-        quietReqLogger: false,
-        transport: {
-          target: 'pino-http-print',
-          options: {
-            destination: 1,
-            all: false,
-            colorize: true,
-            relativeUrl: true,
-            translateTime: 'HH:MM:ss.l',
+    if (!TESTING) {
+      app.use(
+        pinoHttp({
+          quietReqLogger: false,
+          transport: {
+            target: 'pino-http-print',
+            options: {
+              destination: 1,
+              all: false,
+              colorize: true,
+              relativeUrl: true,
+              translateTime: 'HH:MM:ss.l',
+            },
           },
-        },
-      }),
-    );
-    app.use(expressStatsInit());
+        }),
+      );
+      app.use(expressStatsInit());
+    }
+
     app.use(json({ limit: '1mb' }) as RequestHandler);
     app.use(urlencoded({ limit: '1mb', extended: false }) as RequestHandler);
     app.use(cookieParser());
@@ -174,7 +183,12 @@ export async function main(app: express.Express) {
     app.use(passport.initialize());
     app.use(passport.session());
 
-    if (!DEV && !NO_PRERENDER && SERVER_URL.includes('commonwealth.im')) {
+    if (
+      !TESTING &&
+      !DEV &&
+      !NO_PRERENDER &&
+      SERVER_URL.includes('commonwealth.im')
+    ) {
       app.use(prerenderNode.set('prerenderToken', PRERENDER_TOKEN));
     }
   };
@@ -232,8 +246,10 @@ export async function main(app: express.Express) {
 
   setupErrorHandlers(app);
 
-  setupServer(app);
+  const server = setupServer(app);
 
   // database clean-up jobs (should be run after the API so, we don't affect start-up time
-  databaseCleaner.initLoop(models, Number(DATABASE_CLEAN_HOUR));
+  !TESTING && databaseCleaner.initLoop(models, Number(DATABASE_CLEAN_HOUR));
+
+  return { server, cacheDecorator };
 }

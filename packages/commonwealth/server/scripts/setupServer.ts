@@ -39,6 +39,8 @@ const setupServer = (app: Express) => {
   server.listen(PORT);
   server.on('error', onError);
   server.on('listening', onListen);
+
+  return server;
 };
 
 export default setupServer;
