@@ -26,7 +26,6 @@ import * as v8 from 'v8';
 import {
   DATABASE_CLEAN_HOUR,
   PRERENDER_TOKEN,
-  REDIS_URL,
   SERVER_URL,
   SESSION_SECRET,
 } from './server/config';
@@ -51,7 +50,15 @@ require('express-async-errors');
 export async function main(
   app: express.Express,
   models: DB,
-  isTestServer = false,
+  {
+    port,
+    redis_url,
+    testing = false,
+  }: {
+    port: number;
+    redis_url: string;
+    testing?: boolean;
+  },
 ) {
   const log = logger().getLogger(__filename);
   log.info(
@@ -60,20 +67,17 @@ export async function main(
     )} GB`,
   );
 
-  REDIS_URL && cache(new RedisCache(REDIS_URL));
+  redis_url && cache(new RedisCache(redis_url));
   const cacheDecorator = new CacheDecorator();
 
   const DEV = process.env.NODE_ENV !== 'production';
-  !isTestServer &&
-    !DEV &&
-    !REDIS_URL &&
-    log.error('Missing REDIS_URL in production!');
+  !DEV && !redis_url && log.error('Missing REDIS_URL in production!');
 
   // CLI parameters for which task to run
   const SHOULD_SEND_EMAILS = process.env.SEND_EMAILS === 'true';
 
   const NO_GLOBAL_ACTIVITY_CACHE =
-    isTestServer || process.env.NO_GLOBAL_ACTIVITY_CACHE === 'true';
+    testing || process.env.NO_GLOBAL_ACTIVITY_CACHE === 'true';
   const NO_CLIENT_SERVER =
     process.env.NO_CLIENT === 'true' || SHOULD_SEND_EMAILS;
 
@@ -161,7 +165,7 @@ export async function main(
     app.use(favicon(`${__dirname}/favicon.ico`));
     app.use('/static', express.static('static'));
 
-    if (!isTestServer) {
+    if (!testing) {
       app.use(
         pinoHttp({
           quietReqLogger: false,
@@ -188,7 +192,7 @@ export async function main(
     app.use(passport.session());
 
     if (
-      !isTestServer &&
+      !testing &&
       !DEV &&
       !NO_PRERENDER &&
       SERVER_URL.includes('commonwealth.im')
@@ -225,7 +229,7 @@ export async function main(
   setupIpfsProxy(app, cacheDecorator);
 
   if (!NO_CLIENT_SERVER) {
-    if (!isTestServer && DEV) {
+    if (!testing && DEV) {
       // lazy import because we want to keep all of webpacks dependencies in devDependencies
       const setupWebpackDevServer = (
         await import('./server/scripts/setupWebpackDevServer')
@@ -250,11 +254,10 @@ export async function main(
 
   setupErrorHandlers(app);
 
-  const server = setupServer(app);
+  const server = setupServer(app, port);
 
   // database clean-up jobs (should be run after the API so, we don't affect start-up time
-  !isTestServer &&
-    databaseCleaner.initLoop(models, Number(DATABASE_CLEAN_HOUR));
+  !testing && databaseCleaner.initLoop(models, Number(DATABASE_CLEAN_HOUR));
 
   return { server, cacheDecorator };
 }

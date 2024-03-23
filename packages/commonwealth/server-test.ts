@@ -26,10 +26,6 @@ export type TestServer = {
   truncate: () => Promise<void>;
 };
 
-// set default test server variables
-process.env.PORT = '8081';
-process.env.REDIS_URL = 'redis://localhost:6379';
-
 /**
  * Creates local test server connected to test db and seeder utils
  * @returns test server
@@ -38,7 +34,11 @@ export const testServer = async (): Promise<TestServer> => {
   const { tester } = await import('@hicommonwealth/model');
   const models = await tester.seedDb();
   const app = express();
-  const { server, cacheDecorator } = await main(app, models, true);
+  const { server, cacheDecorator } = await main(app, models, {
+    testing: true,
+    port: 8081,
+    redis_url: 'redis://localhost:6379',
+  });
   const seeder = modelSeeder(app, models);
   const e2eTestEntities = await tester.e2eTestEntities(models);
 

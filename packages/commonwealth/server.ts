@@ -7,6 +7,7 @@ import {
 } from '@hicommonwealth/adapters';
 import { analytics, logger, stats } from '@hicommonwealth/core';
 import express from 'express';
+import { PORT, REDIS_URL } from 'server/config';
 
 // bootstrap production adapters
 const log = logger(PinoLogger()).getLogger(__filename);
@@ -33,7 +34,7 @@ const app = express();
 const start = async () => {
   const { models } = await import('@hicommonwealth/model');
   const { main } = await import('./main');
-  main(app, models)
+  main(app, models, { port: +PORT, redis_url: REDIS_URL })
     .then(() => {
       isServiceHealthy = true;
     })
