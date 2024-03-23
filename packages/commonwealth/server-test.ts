@@ -36,7 +36,7 @@ export const testServer = async (): Promise<TestServer> => {
   const { tester } = await import('@hicommonwealth/model');
   const models = await tester.seedDb();
   const app = express();
-  const { server, cacheDecorator } = await main(app);
+  const { server, cacheDecorator } = await main(app, true);
   const seeder = modelSeeder(app, models);
   const e2eTestEntities = await tester.e2eTestEntities(models);
 

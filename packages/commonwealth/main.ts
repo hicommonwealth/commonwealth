@@ -45,7 +45,7 @@ import ViewCountCache from './server/util/viewCountCache';
 // set up express async error handling hack
 require('express-async-errors');
 
-export async function main(app: express.Express) {
+export async function main(app: express.Express, isTestServer = false) {
   const log = logger().getLogger(__filename);
   log.info(
     `Node Option max-old-space-size set to: ${JSON.stringify(
@@ -56,20 +56,20 @@ export async function main(app: express.Express) {
   REDIS_URL && cache(new RedisCache(REDIS_URL));
   const cacheDecorator = new CacheDecorator();
 
-  const TESTING = process.env.NODE_ENV === 'test';
   const DEV = process.env.NODE_ENV !== 'production';
-  !TESTING &&
+  !isTestServer &&
     !DEV &&
     !REDIS_URL &&
     log.error('Missing REDIS_URL in production!');
 
   // CLI parameters for which task to run
-  const SHOULD_SEND_EMAILS = !TESTING && process.env.SEND_EMAILS === 'true';
+  const SHOULD_SEND_EMAILS =
+    !isTestServer && process.env.SEND_EMAILS === 'true';
 
   const NO_GLOBAL_ACTIVITY_CACHE =
-    TESTING || process.env.NO_GLOBAL_ACTIVITY_CACHE === 'true';
+    isTestServer || process.env.NO_GLOBAL_ACTIVITY_CACHE === 'true';
   const NO_CLIENT_SERVER =
-    TESTING || process.env.NO_CLIENT === 'true' || SHOULD_SEND_EMAILS;
+    process.env.NO_CLIENT === 'true' || SHOULD_SEND_EMAILS;
 
   let rc = null;
   if (SHOULD_SEND_EMAILS) {
@@ -103,61 +103,59 @@ export async function main(app: express.Express) {
   });
 
   const setupMiddleware = () => {
-    if (!TESTING) {
-      // redirect from commonwealthapp.herokuapp.com to commonwealth.im
-      app.all(/.*/, (req, res, next) => {
-        if (req.header('host')?.match(/commonwealthapp.herokuapp.com/i)) {
-          res.redirect(301, `https://commonwealth.im${req.url}`);
-        } else {
-          next();
-        }
-      });
-
-      // redirect to https:// unless we are using a test domain or using 192.168.1.range (local network range)
-      app.use(
-        redirectToHTTPS(
-          [
-            /localhost:(\d{4})/,
-            /127.0.0.1:(\d{4})/,
-            /192.168.1.(\d{1,3}):(\d{4})/,
-          ],
-          [],
-          301,
-        ),
-      );
-
-      // dynamic compression settings used
-      app.use(compression());
-
-      // static compression settings unused
-      // app.get('*.js', (req, res, next) => {
-      //   req.url = req.url + '.gz';
-      //   res.set('Content-Encoding', 'gzip');
-      //   res.set('Content-Type', 'application/javascript; charset=UTF-8');
-      //   next();
-      // });
-
-      // // static compression settings unused
-      // app.get('bundle.**.css', (req, res, next) => {
-      //   req.url = req.url + '.gz';
-      //   res.set('Content-Encoding', 'gzip');
-      //   res.set('Content-Type', 'text/css');
-      //   next();
-      // });
-
-      // add security middleware
-      app.use(function applyXFrameAndCSP(req, res, next) {
-        res.set('X-Frame-Options', 'DENY');
-        res.set('Content-Security-Policy', "frame-ancestors 'none';");
+    // redirect from commonwealthapp.herokuapp.com to commonwealth.im
+    app.all(/.*/, (req, res, next) => {
+      if (req.header('host')?.match(/commonwealthapp.herokuapp.com/i)) {
+        res.redirect(301, `https://commonwealth.im${req.url}`);
+      } else {
         next();
-      });
-    }
+      }
+    });
+
+    // redirect to https:// unless we are using a test domain or using 192.168.1.range (local network range)
+    app.use(
+      redirectToHTTPS(
+        [
+          /localhost:(\d{4})/,
+          /127.0.0.1:(\d{4})/,
+          /192.168.1.(\d{1,3}):(\d{4})/,
+        ],
+        [],
+        301,
+      ),
+    );
+
+    // dynamic compression settings used
+    app.use(compression());
+
+    // static compression settings unused
+    // app.get('*.js', (req, res, next) => {
+    //   req.url = req.url + '.gz';
+    //   res.set('Content-Encoding', 'gzip');
+    //   res.set('Content-Type', 'application/javascript; charset=UTF-8');
+    //   next();
+    // });
+
+    // // static compression settings unused
+    // app.get('bundle.**.css', (req, res, next) => {
+    //   req.url = req.url + '.gz';
+    //   res.set('Content-Encoding', 'gzip');
+    //   res.set('Content-Type', 'text/css');
+    //   next();
+    // });
+
+    // add security middleware
+    app.use(function applyXFrameAndCSP(req, res, next) {
+      res.set('X-Frame-Options', 'DENY');
+      res.set('Content-Security-Policy', "frame-ancestors 'none';");
+      next();
+    });
 
     // serve static files
     app.use(favicon(`${__dirname}/favicon.ico`));
     app.use('/static', express.static('static'));
 
-    if (!TESTING) {
+    if (!isTestServer) {
       app.use(
         pinoHttp({
           quietReqLogger: false,
@@ -184,7 +182,7 @@ export async function main(app: express.Express) {
     app.use(passport.session());
 
     if (
-      !TESTING &&
+      !isTestServer &&
       !DEV &&
       !NO_PRERENDER &&
       SERVER_URL.includes('commonwealth.im')
@@ -221,7 +219,7 @@ export async function main(app: express.Express) {
   setupIpfsProxy(app, cacheDecorator);
 
   if (!NO_CLIENT_SERVER) {
-    if (DEV) {
+    if (!isTestServer && DEV) {
       // lazy import because we want to keep all of webpacks dependencies in devDependencies
       const setupWebpackDevServer = (
         await import('./server/scripts/setupWebpackDevServer')
@@ -249,7 +247,8 @@ export async function main(app: express.Express) {
   const server = setupServer(app);
 
   // database clean-up jobs (should be run after the API so, we don't affect start-up time
-  !TESTING && databaseCleaner.initLoop(models, Number(DATABASE_CLEAN_HOUR));
+  !isTestServer &&
+    databaseCleaner.initLoop(models, Number(DATABASE_CLEAN_HOUR));
 
   return { server, cacheDecorator };
 }
