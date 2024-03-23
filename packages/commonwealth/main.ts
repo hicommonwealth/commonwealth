@@ -63,8 +63,7 @@ export async function main(app: express.Express, isTestServer = false) {
     log.error('Missing REDIS_URL in production!');
 
   // CLI parameters for which task to run
-  const SHOULD_SEND_EMAILS =
-    !isTestServer || process.env.SEND_EMAILS === 'true';
+  const SHOULD_SEND_EMAILS = process.env.SEND_EMAILS === 'true';
 
   const NO_GLOBAL_ACTIVITY_CACHE =
     isTestServer || process.env.NO_GLOBAL_ACTIVITY_CACHE === 'true';
