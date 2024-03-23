@@ -26,7 +26,9 @@ export type TestServer = {
   truncate: () => Promise<void>;
 };
 
+// set default test server variables
 process.env.PORT = '8081';
+process.env.REDIS_URL = 'redis://localhost:6379';
 
 /**
  * Creates local test server connected to test db and seeder utils
