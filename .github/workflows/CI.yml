@@ -360,6 +360,14 @@ jobs:
       - name: Snapshot-listener Typecheck
         run: yarn --cwd packages/snapshot-listener check-types
 
+      # take the tests from 'sanity' and run these.  We should really be running
+      # yarn workspaces run test but that's not executing.
+      - name: Run tests
+        run: |
+          yarn workspace @hicommonwealth/core test
+          yarn workspace @hicommonwealth/model test
+          yarn workspace commonwealth unit-test
+
   # These tests run quickly, so run them in a separate job
   commonwealth-unit-integration:
     strategy:
