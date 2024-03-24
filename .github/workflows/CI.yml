@@ -58,6 +58,9 @@ jobs:
           path: '**/node_modules'
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
+      - name: Yarn install
+        run: yarn install
+
       - name: Build CI
         run: yarn build-ci
 
