@@ -8,7 +8,6 @@
     "outDir": "build",
     "baseUrl": ".",
     "paths": {
-      "@hicommonwealth/*": ["../../libs/*/src"],
       "*": ["./*", "shared/*", "client/scripts/*"]
     }
   },
