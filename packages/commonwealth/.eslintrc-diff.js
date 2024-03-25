@@ -29,7 +29,6 @@ module.exports = {
     },
   },
   plugins: ['@tanstack/query'],
-  // TODO: I won't be able to turn this on as it will break the normal dev workflow
   parser: '@typescript-eslint/parser',
   parserOptions: {
     project: `./tsconfig.json`,
@@ -138,7 +137,6 @@ module.exports = {
       },
     ],
 
-    // TODO: needs parser services and when these are on we run out of memory
     '@typescript-eslint/no-floating-promises': 'error',
     '@typescript-eslint/require-await': 'error',
     '@typescript-eslint/no-misused-promises': 'error',
