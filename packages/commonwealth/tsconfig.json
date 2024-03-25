@@ -8,7 +8,6 @@
     "outDir": "build",
     "baseUrl": ".",
     "paths": {
-      "@hicommonwealth/*": ["../../libs/*/src"],
       "*": ["./*", "shared/*", "client/scripts/*"]
     }
   },
@@ -20,11 +19,5 @@
     "./server",
     "./server.ts",
     "./scripts"
-  ],
-  "references": [
-    { "path": "../../libs/adapters" },
-    { "path": "../../libs/chains" },
-    { "path": "../../libs/core" },
-    { "path": "../../libs/model" }
   ]
 }
