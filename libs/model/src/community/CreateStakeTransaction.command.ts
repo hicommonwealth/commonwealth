@@ -70,7 +70,7 @@ async function createStake(
     timestamp: timestamp,
   });
 
-  return stakeAggregate?.get({ plain: true });
+  return stakeAggregate?.toJSON();
 }
 
 /**
