@@ -164,6 +164,7 @@ describe('RabbitMQ', () => {
         BrokerTopics.SnapshotListener,
         FailingSnapshot(),
         (err: Error | undefined) => {
+          console.log(err);
           if (err instanceof InvalidInput) {
             retryExecuted = true;
           }
@@ -173,7 +174,7 @@ describe('RabbitMQ', () => {
       const pubRes = await rmqAdapter.publish(BrokerTopics.SnapshotListener, {
         name: eventName,
         payload: {
-          randomStuff: 'random',
+          id: 1,
         } as any,
       });
       expect(pubRes).to.be.true;
