@@ -1,6 +1,7 @@
 import { generateMock } from '@anatine/zod-mock';
 import { DeepPartial, schemas } from '@hicommonwealth/core';
-import { Entities } from 'core/src/schemas';
+// eslint-disable-next-line no-restricted-imports
+import { Entities } from '@hicommonwealth/core/src/schemas';
 import { Model, ModelStatic } from 'sequelize';
 import z from 'zod';
 import { bootstrap_testing } from './bootstrap';

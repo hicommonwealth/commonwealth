@@ -1,7 +1,7 @@
 {
   "name": "@hicommonwealth/adapters",
   "private": "true",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "description": "External adapters",
   "files": [
     "build"
@@ -32,7 +32,8 @@
     "sequelize": "^6.32.1",
     "trpc-openapi": "1.1.2",
     "typescript-logging": "^0.6.4",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "@hicommonwealth/core": "0.0.0"
   },
   "devDependencies": {
     "pino-pretty": "^10.3.1"
