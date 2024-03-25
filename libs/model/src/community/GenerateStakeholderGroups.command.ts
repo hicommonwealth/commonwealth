@@ -45,6 +45,11 @@ export const GenerateStakeholderGroups: Command<
           },
           required: false,
         },
+        {
+          model: models.ChainNode,
+          as: 'ChainNode',
+          required: false,
+        },
       ],
     });
 
@@ -75,16 +80,15 @@ export const GenerateStakeholderGroups: Command<
     }
 
     // get contract address
-    const node = await models.ChainNode.findByPk(community.chain_node_id);
-    if (!node) {
+    if (!community.ChainNode) {
       throw new InvalidState(Errors.ChainNodeNotFound);
     }
     const factoryData =
       commonProtocol.factoryContracts[
-        node.eth_chain_id! as commonProtocol.ValidChains
+        community.ChainNode.eth_chain_id! as commonProtocol.ValidChains
       ];
     const contractAddress = await getNamespace(
-      new Web3(node.url),
+      new Web3(community.ChainNode.url),
       community.namespace!,
       factoryData.factory,
     );
@@ -113,7 +117,7 @@ export const GenerateStakeholderGroups: Command<
                     threshold: '0',
                     source: {
                       source_type: BalanceSourceType.ERC1155,
-                      evm_chain_id: node.eth_chain_id!,
+                      evm_chain_id: community.ChainNode!.eth_chain_id!,
                       contract_address: contractAddress,
                       token_id: stake.stake_id!.toString(),
                     },
