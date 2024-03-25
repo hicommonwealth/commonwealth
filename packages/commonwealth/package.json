@@ -215,7 +215,7 @@
     "vm-browserify": "^1.1.2",
     "web3": "1.8.2",
     "web3-core": "1.8.2",
-    "web3-utils": "1.8.2",
+    "web3-utils": "4.2.1",
     "yargs": "^17.7.2",
     "zod": "^3.22.4",
     "zustand": "^4.3.8"
