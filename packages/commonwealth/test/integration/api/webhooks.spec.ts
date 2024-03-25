@@ -175,8 +175,7 @@ describe('Webhook Tests', () => {
       expect(webhookUrls).to.have.length(0);
     });
 
-    // TODO: investigate why test server not handling error in pipeline
-    it.skip('should fail to delete a non-existent webhook', async () => {
+    it('should fail to delete a non-existent webhook', async () => {
       const webhookUrl = faker.internet.url();
       const errorRes = await chai.request
         .agent(server.app)
@@ -248,8 +247,7 @@ describe('Webhook Tests', () => {
 
   describe('Integration Tests', () => {
     // we want to test that no errors occur up to the point the webhook is hit
-    // TODO: investigate why test server not handling error in pipeline
-    it.skip('should send a webhook for markdown and rich text content', async () => {
+    it('should send a webhook for markdown and rich text content', async () => {
       const webhookUrl = process.env.SLACK_FEEDBACK_WEBHOOK;
       await server.seeder.createWebhook({
         chain,
