@@ -81,6 +81,7 @@ If you add a new environment variable, you must add documentation here. Please d
 - [SUPER_ADMIN_WALLET_ADDRESS](#super_admin_wallet_address)
 - [TELEGRAM_BOT_TOKEN_DEV](#telegram_bot_token_dev)
 - [TEST_ENV](#test_env)
+- [TEST_WITH_LOGS](#test_with_logs)
 - [WITH_PRERENDER](#with_prerender)
 - [ZAPIER_WEBHOOK_URL_DEV](#zapier_webhook_url_dev)
 
@@ -395,6 +396,12 @@ Owner: Timothee Legros.
 Used and defined on-the-fly in Playwright scripts.
 
 Owner: Kurtis Assad.
+
+## TEST_WITH_LOGS
+
+If `true`, enables logs when testing
+
+Owner: Roger Torres, Timothee Legros.
 
 ## WITH_PRERENDER
 

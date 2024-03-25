@@ -1,7 +1,7 @@
 import { dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { seedDb } from '../../src/test';
+import { seedDb } from '../../src/tester';
 
 chai.use(chaiAsPromised);
 

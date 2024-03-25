@@ -1,10 +1,9 @@
-import {
+import { dispose } from '@hicommonwealth/core';
+import type {
   AddressInstance,
   CommunityInstance,
   TopicInstance,
   UserInstance,
-  models,
-  tester,
 } from '@hicommonwealth/model';
 import chai, { expect } from 'chai';
 import chaiHttp from 'chai-http';
@@ -12,8 +11,8 @@ import { ServerCommentsController } from 'server/controllers/server_comments_con
 import { ServerThreadsController } from 'server/controllers/server_threads_controller';
 import BanCache from 'server/util/banCheckCache';
 import Sinon from 'sinon';
-import { createAndVerifyAddress } from 'test/util/modelUtils';
 import { contractHelpers } from '../../../../../libs/model/src/services/commonProtocol';
+import { TestServer, testServer } from '../../../server-test';
 
 chai.use(chaiHttp);
 
@@ -21,48 +20,62 @@ const mockBanCache = {
   checkBan: async () => [true, null],
 } as any as BanCache;
 describe('Reaction vote weight', () => {
-  const threadsController = new ServerThreadsController(models, mockBanCache);
-  const commentsController = new ServerCommentsController(models, mockBanCache);
+  let server: TestServer;
 
   let user: UserInstance | null = null;
   let address: AddressInstance | null = null;
   let community: CommunityInstance | null = null;
   let topic: TopicInstance | null = null;
 
-  const createThread = async () => {
-    const t = await threadsController.createThread({
-      user,
-      address,
-      community,
-      topicId: topic.id,
-      title: 'Hey',
-      body: 'Cool',
-      kind: 'discussion',
-      readOnly: false,
-    });
-    return t[0];
-  };
-  const createComment = async (threadId: number) => {
-    const c = await threadsController.createThreadComment({
-      user,
-      address,
-      parentId: 0,
-      threadId,
-      text: 'hello',
-    });
-    return c[0];
-  };
+  let threadsController, commentsController;
+  let createThread, createComment;
 
   before(async () => {
-    await tester.seedDb();
+    server = await testServer();
 
-    const userRes = await createAndVerifyAddress({
-      chain: 'ethereum',
-    });
-    user = await models.User.findByPk(userRes.user_id);
-    address = await models.Address.findByPk(userRes.address_id);
-    community = await models.Community.findByPk('ethereum');
-    topic = await models.Topic.findOne({
+    threadsController = new ServerThreadsController(
+      server.models,
+      mockBanCache,
+    );
+    commentsController = new ServerCommentsController(
+      server.models,
+      mockBanCache,
+    );
+
+    const userRes = await server.seeder.createAndVerifyAddress(
+      { chain: 'ethereum' },
+      'Alice',
+    );
+
+    createThread = async () => {
+      const t = await threadsController.createThread({
+        user,
+        address,
+        community,
+        topicId: topic.id,
+        title: 'Hey',
+        body: 'Cool',
+        kind: 'discussion',
+        readOnly: false,
+      });
+      return t[0];
+    };
+
+    createComment = async (threadId: number) => {
+      const c = await threadsController.createThreadComment({
+        user,
+        address,
+        parentId: 0,
+        threadId,
+        text: 'hello',
+      });
+      return c[0];
+    };
+
+    user = await server.models.User.findByPk(userRes.user_id);
+    address = await server.models.Address.findByPk(userRes.address_id);
+    community = await server.models.Community.findByPk('ethereum');
+    topic = await server.models.Topic.findOne({
       where: {
         community_id: 'ethereum',
       },
@@ -74,7 +87,7 @@ describe('Reaction vote weight', () => {
     expect(topic).not.to.be.null;
 
     // existing ethereum seed data
-    await models.CommunityStake.update(
+    await server.models.CommunityStake.update(
       {
         vote_weight: 200,
       },
@@ -84,6 +97,10 @@ describe('Reaction vote weight', () => {
         },
       },
     );
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   afterEach(() => {
@@ -101,7 +118,7 @@ describe('Reaction vote weight', () => {
     });
     const expectedWeight = 1 + 50 * 200;
     expect(reaction.calculated_voting_weight).to.eq(expectedWeight);
-    const t = await models.Thread.findByPk(thread.id);
+    const t = await server.models.Thread.findByPk(thread.id);
     expect(t.reaction_weights_sum).to.eq(expectedWeight);
   });
 
@@ -117,7 +134,7 @@ describe('Reaction vote weight', () => {
     });
     const expectedWeight = 1 + 50 * 200;
     expect(reaction.calculated_voting_weight).to.eq(expectedWeight);
-    const c = await models.Comment.findByPk(comment.id);
+    const c = await server.models.Comment.findByPk(comment.id);
     expect(c.reaction_weights_sum).to.eq(expectedWeight);
   });
 
