@@ -5,10 +5,7 @@
     "typeRoots": ["./node_modules/@types"],
     "skipLibCheck": true,
     "rootDir": "src",
-    "outDir": "build",
-    "paths": {
-      "@hicommonwealth/*": ["../../libs/*/src"]
-    }
+    "outDir": "build"
   },
   "include": ["src"],
   "references": [
