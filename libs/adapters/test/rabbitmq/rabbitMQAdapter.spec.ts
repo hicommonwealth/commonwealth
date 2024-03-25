@@ -7,8 +7,8 @@ import {
   schemas,
 } from '@hicommonwealth/core';
 import chai from 'chai';
-import { RabbitMQAdapter } from '../../build';
 import { getRabbitMQConfig, RascalConfigServices } from '../../src';
+import { RabbitMQAdapter } from '../../src/rabbitmq/RabbitMQAdapter';
 
 const expect = chai.expect;
 
@@ -60,13 +60,17 @@ describe('RabbitMQ', () => {
       );
       expect(res).to.be.false;
     });
-
-    after(async () => {
-      await rmqAdapter.init();
-    });
   });
 
   describe('Publishing', () => {
+    before(async () => {
+      await rmqAdapter.init();
+    });
+
+    after(async () => {
+      await rmqAdapter.dispose();
+    });
+
     it('should return false if a publication cannot be found', async () => {
       const res = await rmqAdapter.publish(
         'Testing' as BrokerTopics,
@@ -98,6 +102,14 @@ describe('RabbitMQ', () => {
   });
 
   describe('Subscribing', () => {
+    before(async () => {
+      await rmqAdapter.init();
+    });
+
+    after(async () => {
+      await rmqAdapter.dispose();
+    });
+
     it('should return false if the subscription cannot be found', async () => {
       const res = await rmqAdapter.subscribe(
         'Testing' as BrokerTopics,
@@ -115,12 +127,19 @@ describe('RabbitMQ', () => {
     });
 
     it('should successfully subscribe, return true, and process a message', async () => {
-      const res = await rmqAdapter.subscribe(
+      const subRes = await rmqAdapter.subscribe(
         BrokerTopics.SnapshotListener,
         Snapshot(),
       );
-      expect(res).to.be.true;
-      await delay(5000);
+      expect(subRes).to.be.true;
+      const pubRes = await rmqAdapter.publish(BrokerTopics.SnapshotListener, {
+        name: eventName,
+        payload: {
+          id: idInput,
+        },
+      });
+      expect(pubRes).to.be.true;
+      await delay(2000);
 
       expect(idOutput).to.equal(idInput);
     }).timeout(20000);
@@ -141,7 +160,7 @@ describe('RabbitMQ', () => {
       });
 
       let retryExecuted = false;
-      const res = await rmqAdapter.subscribe(
+      const subRes = await rmqAdapter.subscribe(
         BrokerTopics.SnapshotListener,
         FailingSnapshot(),
         (err: Error | undefined) => {
@@ -150,13 +169,17 @@ describe('RabbitMQ', () => {
           }
         },
       );
-      expect(res).to.be.true;
+      expect(subRes).to.be.true;
+      const pubRes = await rmqAdapter.publish(BrokerTopics.SnapshotListener, {
+        name: eventName,
+        payload: {
+          randomStuff: 'random',
+        } as any,
+      });
+      expect(pubRes).to.be.true;
+      await delay(2000);
       expect(retryExecuted).to.be.true;
       expect(shouldNotExecute).to.be.true;
     });
-  });
-
-  after(async () => {
-    await rmqAdapter.dispose();
   });
 });
