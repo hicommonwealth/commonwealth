@@ -1,11 +1,10 @@
-import { ALL_COMMUNITIES } from '@hicommonwealth/core';
+import { ALL_COMMUNITIES, schemas } from '@hicommonwealth/core';
 import { ThreadAttributes } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from 'server/types';
 import {
   PaginationSqlBind,
   PaginationSqlOptions,
-  buildPaginatedResponse,
   buildPaginationSql,
 } from '../../util/queries';
 import { ServerThreadsController } from '../server_threads_controller';
@@ -131,5 +130,5 @@ export async function __searchThreads(
 
   const totalResults = parseInt(count, 10);
 
-  return buildPaginatedResponse(results, totalResults, bind);
+  return schemas.queries.buildPaginatedResponse(results, totalResults, bind);
 }

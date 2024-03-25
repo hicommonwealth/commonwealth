@@ -113,13 +113,17 @@ export const buildPaginationSql = (
 export function buildPaginatedResponse<T>(
   items: T[],
   totalResults: number,
-  bind: PaginationSqlBind,
+  options: {
+    limit?: number;
+    offset?: number;
+  },
 ): TypedPaginatedResult<T> {
+  const limit = options.limit || 10;
   return {
     results: items,
-    limit: bind.limit!,
-    page: Math.floor(bind.offset! / bind.limit!) + 1,
-    totalPages: Math.floor(totalResults / bind.limit!) + 1,
+    limit: options.limit!,
+    page: Math.floor(options.offset! / limit) + 1,
+    totalPages: Math.floor(totalResults / limit) + 1,
     totalResults,
   };
 }
