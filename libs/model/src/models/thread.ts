@@ -2,7 +2,6 @@ import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import { z } from 'zod';
-import { models } from '../database';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import { NotificationAttributes } from './notification';
@@ -148,7 +147,7 @@ export default (
           options: Sequelize.CreateOptions<ThreadAttributes>,
         ) => {
           // when thread created, increment Community.thread_count
-          await models.sequelize.query(
+          await sequelize.query(
             `
             UPDATE "Communities"
             SET thread_count = thread_count + 1
@@ -167,7 +166,7 @@ export default (
           options: Sequelize.InstanceDestroyOptions,
         ) => {
           // when thread deleted, decrement Community.thread_count
-          await models.sequelize.query(
+          await sequelize.query(
             `
             UPDATE "Communities"
             SET thread_count = thread_count - 1

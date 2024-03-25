@@ -12,7 +12,7 @@ import chaiAsPromised from 'chai-as-promised';
 import Sinon from 'sinon';
 import { GetCommunityStake, SetCommunityStake } from '../../src/community';
 import { commonProtocol } from '../../src/services';
-import { seed } from '../../src/test';
+import { seed } from '../../src/tester';
 
 chai.use(chaiAsPromised);
 

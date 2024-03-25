@@ -31,7 +31,7 @@ type Profile = {
   avatar_url: string;
   addresses: {
     id: number;
-    chain: string;
+    community_id: string;
     address: string;
   }[];
   roles?: any[];
@@ -100,7 +100,7 @@ export async function __searchProfiles(
       "Profiles".avatar_url,
       "Profiles".created_at,
       array_agg("Addresses".id) as address_ids,
-      array_agg("Addresses".community_id) as chains,
+      array_agg("Addresses".community_id) as community_ids,
       array_agg("Addresses".address) as addresses,
       MAX("Addresses".last_active) as last_active
     FROM
@@ -143,7 +143,7 @@ export async function __searchProfiles(
       avatar_url: profile.avatar_url,
       addresses: profile.address_ids.map((_, i) => ({
         id: profile.address_ids[i],
-        chain: profile.chains[i],
+        community_id: profile.community_ids[i],
         address: profile.addresses[i],
       })),
       roles: [],

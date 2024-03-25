@@ -1,6 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
 import { CommunityAttributes, UserInstance } from '@hicommonwealth/model';
-import { Op, QueryTypes, WhereOptions } from 'sequelize';
+import { BindOrReplacements, QueryTypes } from 'sequelize';
 import { ServerAdminController } from '../server_admin_controller';
 
 export const Errors = {
@@ -13,16 +13,19 @@ export type GetStatsOptions = {
   communityId?: string;
 };
 
+type TableCounts = {
+  numCommentsLastMonth: number;
+  numThreadsLastMonth: number;
+  numPollsLastMonth: number;
+  numReactionsLastMonth: number;
+  numProposalVotesLastMonth: number;
+  numMembersLastMonth: number;
+  numGroupsLastMonth: number;
+};
+
 export type GetStatsResult = {
   lastMonthNewCommunities: Array<string>;
-  totalStats: {
-    numCommentsLastMonth: number;
-    numThreadsLastMonth: number;
-    numPollsLastMonth: number;
-    numReactionsLastMonth: number;
-    numProposalVotesLastMonth: number;
-    numMembersLastMonth: number;
-    numGroupsLastMonth: number;
+  totalStats: TableCounts & {
     averageAddressesPerCommunity: number;
     populatedCommunities: number;
   };
@@ -48,36 +51,14 @@ export async function __getStats(
   const oneMonthAgo = new Date();
   oneMonthAgo.setDate(oneMonthAgo.getDate() - 30);
 
-  const where = {
-    created_at: {
-      [Op.gte]: oneMonthAgo,
-    },
+  const monthlyStatsReplacements: BindOrReplacements = {
+    oneMonthAgo,
+    ...(community ? { communityId: community.id } : {}),
   };
-  const whereChain: WhereOptions<{
-    created_at: any;
-    chain: string;
-  }> = {
-    ...where,
-  };
-  const whereCommunityId: WhereOptions<{
-    created_at: any;
-    community_id: string;
-  }> = { ...where };
-
-  if (community) {
-    whereChain.chain = communityId;
-    whereCommunityId.community_id = communityId;
-  }
 
   const [
     lastMonthNewCommunities,
-    numCommentsLastMonth,
-    numThreadsLastMonth,
-    numReactionsLastMonth,
-    numProposalVotesLastMonth,
-    numPollsLastMonth,
-    numMembersLastMonth,
-    numGroupsLastMonth,
+    [{ monthlySummary }],
     [{ result: averageAddressesPerCommunity }],
     [{ result: populatedCommunities }],
   ] = await Promise.all([
@@ -85,27 +66,45 @@ export async function __getStats(
       `SELECT id FROM "Communities" WHERE created_at >= NOW() - INTERVAL '30 days'`,
       { type: QueryTypes.SELECT },
     ),
-    this.models.Comment.count({
-      where: whereCommunityId,
-    }),
-    this.models.Thread.count({
-      where: whereCommunityId,
-    }),
-    this.models.Reaction.count({
-      where: whereCommunityId,
-    }),
-    this.models.Vote.count({
-      where: whereCommunityId,
-    }),
-    this.models.Poll.count({
-      where: whereCommunityId,
-    }),
-    this.models.Address.count({
-      where: whereCommunityId,
-    }),
-    this.models.Group.count({
-      where: whereCommunityId,
-    }),
+    this.models.sequelize.query<{ monthlySummary: TableCounts }>(
+      `
+      WITH MonthlyStats AS (
+        SELECT 'numCommentsLastMonth' as label, COUNT(*) as count FROM "Comments" WHERE "created_at" >= :oneMonthAgo
+          ${community ? `AND community_id = :communityId` : ''}
+        UNION ALL
+        SELECT 'numThreadsLastMonth' as label, COUNT(*) FROM "Threads" WHERE "created_at" >= :oneMonthAgo
+          ${community ? `AND community_id = :communityId` : ''}
+        UNION ALL
+        SELECT 'numReactionsLastMonth' as label, COUNT(*) FROM "Reactions" WHERE "created_at" >= :oneMonthAgo
+          ${community ? `AND community_id = :communityId` : ''}
+        UNION ALL
+        SELECT 'numProposalVotesLastMonth' as label, COUNT(*) FROM "Votes" WHERE "created_at" >= :oneMonthAgo
+          ${community ? `AND community_id = :communityId` : ''}
+        UNION ALL
+        SELECT 'numPollsLastMonth' as label, COUNT(*) FROM "Polls" WHERE "created_at" >= :oneMonthAgo
+          ${community ? `AND community_id = :communityId` : ''}
+        UNION ALL
+        SELECT 'numMembersLastMonth' as label, COUNT(*) FROM "Addresses" WHERE "created_at" >= :oneMonthAgo
+          ${community ? `AND community_id = :communityId` : ''}
+        UNION ALL
+        SELECT 'numGroupsLastMonth' as label, COUNT(*) FROM "Groups" WHERE "created_at" >= :oneMonthAgo
+          ${community ? `AND community_id = :communityId` : ''}
+      )
+      SELECT json_build_object(
+        'numCommentsLastMonth', (SELECT count FROM MonthlyStats WHERE label = 'numCommentsLastMonth'),
+        'numThreadsLastMonth', (SELECT count FROM MonthlyStats WHERE label = 'numThreadsLastMonth'),
+        'numReactionsLastMonth', (SELECT count FROM MonthlyStats WHERE label = 'numReactionsLastMonth'),
+        'numProposalVotesLastMonth', (SELECT count FROM MonthlyStats WHERE label = 'numProposalVotesLastMonth'),
+        'numPollsLastMonth', (SELECT count FROM MonthlyStats WHERE label = 'numPollsLastMonth'),
+        'numMembersLastMonth', (SELECT count FROM MonthlyStats WHERE label = 'numMembersLastMonth'),
+        'numGroupsLastMonth', (SELECT count FROM MonthlyStats WHERE label = 'numGroupsLastMonth')
+      ) AS "monthlySummary";
+    `,
+      {
+        replacements: monthlyStatsReplacements,
+        type: QueryTypes.SELECT,
+      },
+    ),
     this.models.sequelize.query<{ result: number }>(
       `
       SELECT AVG(address_count) as result
@@ -135,13 +134,7 @@ export async function __getStats(
   return {
     lastMonthNewCommunities: lastMonthNewCommunities.map(({ id }) => id),
     totalStats: {
-      numCommentsLastMonth,
-      numThreadsLastMonth,
-      numReactionsLastMonth,
-      numProposalVotesLastMonth,
-      numPollsLastMonth,
-      numMembersLastMonth,
-      numGroupsLastMonth,
+      ...monthlySummary,
       averageAddressesPerCommunity,
       populatedCommunities,
     },
