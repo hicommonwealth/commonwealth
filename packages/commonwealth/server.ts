@@ -47,17 +47,6 @@ const app = express();
  */
 const start = async () => {
   const { models } = await import('@hicommonwealth/model');
-
-  // TODO: evaluate other options for one-off event processing
-  // exit if we have performed a one-off event
-  if (SEND_EMAILS) {
-    const { sendBatchedNotificationEmails } = await import(
-      './server/scripts/emails'
-    );
-    const rc = await sendBatchedNotificationEmails(models);
-    process.exit(rc);
-  }
-
   const { main } = await import('./main');
   main(app, models, {
     port: +PORT,
