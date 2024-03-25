@@ -121,7 +121,7 @@ const StakeExchangeForm = ({
 
       await createStakeTransaction.mutate({
         id: '1',
-        transaction_hashes: [txReceipt.transactionHash],
+        transaction_hash: txReceipt.transactionHash,
         community_id: app.activeChainId(),
       });
 
@@ -155,7 +155,7 @@ const StakeExchangeForm = ({
 
       await createStakeTransaction.mutate({
         id: '1',
-        transaction_hashes: [txReceipt.transactionHash],
+        transaction_hash: txReceipt.transactionHash,
         community_id: app.activeChainId(),
       });
 

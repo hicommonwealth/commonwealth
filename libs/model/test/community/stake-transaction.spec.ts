@@ -56,25 +56,34 @@ describe('Stake transactions', () => {
 
   it('should create stake transactions and be able to query them', async () => {
     payload = {
-      transaction_hashes: [
+      transaction_hash:
         '0x924f40cfea663b2579816173f048b61ab2b118e0c7c055d7b00dbd9cd15eb7c0',
-        '0xa888cc839e3ba03f689b0c2e88dd4205a82fa8894c2a8098679277b96c24fd4f',
-      ],
       community_id,
     };
 
-    const results = await command(CreateStakeTransaction(), {
+    let results = await command(CreateStakeTransaction(), {
       payload,
     });
     // This address comes from the actual crypto transaction
-    expect(results[0].address).to.equal(
+    expect(results.address).to.equal(
       '0xf6885b5aC5AE36689038dAf30184AeEB266E61f5',
     );
-    expect(results[0].stake_direction).to.equal('buy');
-    expect(results[1].address).to.equal(
+    expect(results.stake_direction).to.equal('buy');
+
+    payload = {
+      transaction_hash:
+        '0x924f40cfea663b2579816173f048b61ab2b118e0c7c055d7b00dbd9cd15eb7c0',
+      community_id,
+    };
+
+    results = await command(CreateStakeTransaction(), {
+      payload,
+    });
+
+    expect(results.address).to.equal(
       '0xf6885b5aC5AE36689038dAf30184AeEB266E61f5',
     );
-    expect(results[1].stake_direction).to.equal('sell');
+    expect(results.stake_direction).to.equal('buy');
 
     const getResult = await command(GetStakeTransaction(), {
       payload: { community_id },
@@ -87,20 +96,12 @@ describe('Stake transactions', () => {
           '0x924f40cfea663b2579816173f048b61ab2b118e0c7c055d7b00dbd9cd15eb7c0',
       ),
     ).to.exist;
-    expect(
-      getResult.find(
-        (t) =>
-          t.transaction_hash ===
-          '0xa888cc839e3ba03f689b0c2e88dd4205a82fa8894c2a8098679277b96c24fd4f',
-      ),
-    ).to.exist;
   }).timeout(10000); // increase timeout because crypto calls take a while
 
   it('should fail if transaction is not related to community', async () => {
     payload = {
-      transaction_hashes: [
+      transaction_hash:
         '0x84939478bc5fbcca178e006dccdfaab6aebed40ef0a7b02684487780c10d8ce8',
-      ],
       community_id,
     };
 

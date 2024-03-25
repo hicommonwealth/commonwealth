@@ -82,10 +82,10 @@ export const SetCommunityStake = {
 
 export const CreateStakeTransaction = {
   input: z.object({
-    transaction_hashes: z.string().length(66).array(),
+    transaction_hash: z.string().length(66),
     community_id: z.string(),
   }),
-  output: StakeTransaction.array(),
+  output: StakeTransaction,
 };
 
 export const UpdateCommunity = {
