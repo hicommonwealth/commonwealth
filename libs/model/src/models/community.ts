@@ -146,6 +146,7 @@ export default (
   Community.associate = (models) => {
     models.Community.belongsTo(models.ChainNode, {
       foreignKey: 'chain_node_id',
+      as: 'ChainNode',
     });
     models.Community.hasMany(models.Address, { foreignKey: 'community_id' });
     models.Community.hasMany(models.Notification, {
