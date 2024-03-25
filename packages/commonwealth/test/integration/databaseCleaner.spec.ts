@@ -4,7 +4,7 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { Sequelize } from 'sequelize';
 import sinon from 'sinon';
-import DatabaseCleaner from '../../server/util/databaseCleaner';
+import { DatabaseCleaner } from '../../server/util/databaseCleaner';
 
 chai.use(chaiHttp);
 const { expect } = chai;
