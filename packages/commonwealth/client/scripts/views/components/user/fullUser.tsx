@@ -3,7 +3,6 @@ import 'components/user/user.scss';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
-import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
 import { Avatar } from 'views/components/Avatar';
 import CWPopover, {
   usePopover,
@@ -15,10 +14,10 @@ import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
 import { CWModal } from '../component_kit/new_designs/CWModal';
 import { UserSkeleton } from './UserSkeleton';
-import type { UserAttrsWithSkeletonProp } from './user.types';
+import { FullUserAttrsWithSkeletonProp } from './user.types';
 
-// TODO: When this is no longer used, this should be removed in favour of fullUser.tsx
-export const User = ({
+// TODO: When we remove all usages of User component (user.tsx). We should rename this file and component to User
+export const FullUser = ({
   shouldLinkProfile,
   shouldShowPopover,
   shouldShowRole,
@@ -32,14 +31,9 @@ export const User = ({
   role,
   showSkeleton,
   popoverPlacement,
-}: UserAttrsWithSkeletonProp) => {
+  profile,
+}: FullUserAttrsWithSkeletonProp) => {
   const popoverProps = usePopover();
-  const { data: users } = useFetchProfilesByAddressesQuery({
-    currentChainId: app.activeChainId(),
-    profileAddresses: [userAddress],
-    profileChainIds: [userCommunityId],
-    apiCallEnabled: !!(userAddress && userCommunityId),
-  });
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   if (showSkeleton) {
@@ -52,8 +46,6 @@ export const User = ({
       />
     );
   }
-
-  const profile = users?.[0] || {};
 
   const fullAddress = formatAddressShort(userAddress, userCommunityId);
   const redactedAddress = formatAddressShort(
@@ -96,7 +88,7 @@ export const User = ({
 
   const userBasisInfo = (
     <>
-      {!profile ? (
+      {!profile?.name ? (
         shouldShowAsDeleted ? (
           'Deleted'
         ) : (
@@ -230,17 +222,13 @@ export const User = ({
       )}
       <CWModal
         size="small"
-        zIndex={10001}
         content={
           <BanUserModal
             address={userAddress}
             onModalClose={() => setIsModalOpen(false)}
           />
         }
-        onClose={(e) => {
-          e.stopPropagation();
-          setIsModalOpen(false);
-        }}
+        onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />
     </>
