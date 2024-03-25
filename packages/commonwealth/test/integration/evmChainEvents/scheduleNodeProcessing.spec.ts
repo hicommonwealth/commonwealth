@@ -1,3 +1,4 @@
+import { dispose } from '@hicommonwealth/core';
 import { tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import sinon from 'sinon';
@@ -18,6 +19,10 @@ describe('scheduleNodeProcessing', () => {
 
   before(async () => {
     await tester.seedDb();
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   beforeEach(() => {

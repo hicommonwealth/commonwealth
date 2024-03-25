@@ -30,7 +30,7 @@ import type { ReactionModelStatic } from './reaction';
 import type { SnapshotProposalModelStatic } from './snapshot_proposal';
 import type { SnapshotSpaceModelStatic } from './snapshot_spaces';
 import type { SsoTokenModelStatic } from './sso_token';
-import { StakeTransactionModelStatic } from './stake_transaction';
+import type { StakeTransactionModelStatic } from './stake_transaction';
 import type { StarredCommunityModelStatic } from './starred_community';
 import type { SubscriptionModelStatic } from './subscription';
 import type { TemplateModelStatic } from './template';
@@ -85,6 +85,72 @@ export type Models = {
 export type DB = Models & {
   sequelize: Sequelize;
   Sequelize: typeof Sequelize;
+};
+
+export const buildDb = (sequelize: Sequelize): DB => {
+  const entities = {
+    Address: AddressFactory(sequelize, DataTypes),
+    Ban: BanFactory(sequelize, DataTypes),
+    Community: CommunityFactory(sequelize, DataTypes),
+    ChainNode: ChainNodeFactory(sequelize, DataTypes),
+    Collaboration: CollaborationFactory(sequelize, DataTypes),
+    Contract: ContractFactory(sequelize, DataTypes),
+    ContractAbi: ContractAbiFactory(sequelize, DataTypes),
+    CommunityContract: CommunityContractFactory(sequelize, DataTypes),
+    CommunityContractTemplate: CommunityContractTemplateFactory(
+      sequelize,
+      DataTypes,
+    ),
+    CommunityContractTemplateMetadata: CommunityContractTemplateMetadataFactory(
+      sequelize,
+      DataTypes,
+    ),
+    Template: TemplateFactory(sequelize, DataTypes),
+    CommunityBanner: CommunityBannerFactory(sequelize, DataTypes),
+    CommunitySnapshotSpaces: CommunitySnapshotSpaceFactory(
+      sequelize,
+      DataTypes,
+    ),
+    DiscordBotConfig: DiscordBotConfigFactory(sequelize, DataTypes),
+    EvmEventSource: EvmEventSourceFactory(sequelize, DataTypes),
+    LastProcessedEvmBlock: LastProcessedEvmBlockFactory(sequelize, DataTypes),
+    LoginToken: LoginTokenFactory(sequelize, DataTypes),
+    Notification: NotificationFactory(sequelize, DataTypes),
+    NotificationCategory: NotificationCategoryFactory(sequelize, DataTypes),
+    NotificationsRead: NotificationsReadFactory(sequelize, DataTypes),
+    Comment: CommentFactory(sequelize, DataTypes),
+    Poll: PollFactory(sequelize, DataTypes),
+    Group: GroupFactory(sequelize, DataTypes),
+    Membership: MembershipFactory(sequelize, DataTypes),
+    Reaction: ReactionFactory(sequelize, DataTypes),
+    Thread: ThreadFactory(sequelize, DataTypes),
+    Topic: TopicFactory(sequelize, DataTypes),
+    Vote: VoteFactory(sequelize, DataTypes),
+    Profile: ProfileFactory(sequelize, DataTypes),
+    SsoToken: SsoTokenFactory(sequelize, DataTypes),
+    StarredCommunity: StarredCommunityFactory(sequelize, DataTypes),
+    SnapshotProposal: SnapshotProposalFactory(sequelize, DataTypes),
+    SnapshotSpace: SnapshotSpaceFactory(sequelize, DataTypes),
+    Subscription: SubscriptionFactory(sequelize, DataTypes),
+    User: UserFactory(sequelize, DataTypes),
+    Webhook: WebhookFactory(sequelize, DataTypes),
+    CommunityStake: CommunityStakeFactory(sequelize, DataTypes),
+    Outbox: OutboxFactory(sequelize, DataTypes),
+  };
+
+  const db = {
+    sequelize,
+    Sequelize,
+    ...entities,
+  };
+
+  // setup associations
+  Object.keys(entities).forEach((key) => {
+    const model = entities[key as keyof Models];
+    'associate' in model && model.associate(db);
+  });
+
+  return db;
 };
 
 export * from './address';

@@ -20,7 +20,7 @@ export const User = z.object({
   isAdmin: z.boolean().default(false).optional(),
   disableRichText: z.boolean().default(false).optional(),
   emailVerified: z.boolean().default(false).optional(),
-  selected_community_id: z.string().max(255).optional(),
+  selected_community_id: z.string().max(255).optional().nullish(),
   emailNotificationInterval: z
     .enum(['weekly', 'never'])
     .default('never')
@@ -300,7 +300,7 @@ export const Community = z.object({
   has_chain_events_listener: z.boolean().optional(),
   default_summary_view: z.boolean().optional(),
   default_page: z.nativeEnum(DefaultPage).optional(),
-  has_homepage: z.boolean().optional(),
+  has_homepage: z.enum(['true', 'false']).optional().default('false').nullish(),
   terms: z.string().optional(),
   admin_only_polling: z.boolean().optional(),
   bech32_prefix: z.string().optional(),
@@ -312,7 +312,8 @@ export const Community = z.object({
     .int()
     .min(MIN_SCHEMA_INT)
     .max(MAX_SCHEMA_INT)
-    .optional(),
+    .optional()
+    .nullish(),
   category: z.unknown().optional(), // Assuming category can be any type
   discord_bot_webhooks_enabled: z.boolean().optional(),
   directory_page_enabled: z.boolean().optional(),
@@ -383,7 +384,7 @@ export const SnapshotProposal = z.object({
   event: z.string().max(255).optional(),
   start: z.string().max(255).optional(),
   expire: z.string().max(255).optional(),
-  is_upstream_deleted: z.string().default('false'),
+  is_upstream_deleted: z.boolean().default(false),
 });
 
 export const Subscription = z.object({
