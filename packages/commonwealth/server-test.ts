@@ -1,9 +1,15 @@
 /* eslint-disable dot-notation */
-import { CacheDecorator, RedisCache } from '@hicommonwealth/adapters';
-import { cache, dispose } from '@hicommonwealth/core';
+import {
+  CacheDecorator,
+  PinoLogger,
+  RedisCache,
+} from '@hicommonwealth/adapters';
+import { cache, dispose, logger } from '@hicommonwealth/core';
 import type { DB, E2E_TestEntities } from '@hicommonwealth/model';
 import express from 'express';
 import { ModelSeeder, modelSeeder } from './test/util/modelUtils';
+
+const TEST_WITH_LOGS = process.env.TEST_WITH_LOGS === 'true';
 
 /**
  * Encapsulates all the infrastructure required for integration testing, including:
@@ -31,6 +37,7 @@ export type TestServer = {
  */
 export const testServer = async (): Promise<TestServer> => {
   // bootstrap test adapters
+  logger(TEST_WITH_LOGS ? PinoLogger() : undefined);
   cache(new RedisCache('redis://localhost:6379'));
 
   const { tester } = await import('@hicommonwealth/model');
@@ -40,6 +47,7 @@ export const testServer = async (): Promise<TestServer> => {
   const app = express();
   const { server, cacheDecorator } = await main(app, db, {
     port: 8081,
+    withLoggingMiddleware: TEST_WITH_LOGS,
   });
   const seeder = modelSeeder(app, db);
   const e2eTestEntities = await tester.e2eTestEntities(db);
