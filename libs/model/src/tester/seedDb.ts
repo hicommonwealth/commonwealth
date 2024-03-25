@@ -5,45 +5,21 @@ import {
   ChainType,
   CosmosGovernanceVersion,
   NotificationCategories,
-  logger,
 } from '@hicommonwealth/core';
-import { QueryTypes, Sequelize } from 'sequelize';
-import { TEST_DB_NAME } from '../database';
+import { bootstrap_testing } from './bootstrap';
 
-export const checkDb = async () => {
-  let sequelize: Sequelize | undefined = undefined;
+/**
+ * Legacy test seeder
+ *
+ * @deprecated Use `seed` from `libs/model/src/tester/seed.ts` instead
+ *
+ * Seeding entities in bulk obscures many specific details required for each test,
+ * such as associated IDs and seed values. Additionally, not all tests require every
+ * entity to be seeded, so focus should be on seeding only what is explicitly needed.
+ */
+export const seedDb = async () => {
   try {
-    // TODO: this is broken -- even without DB name it tries to connect to commonwealth database
-    sequelize = new Sequelize(
-      `postgresql://commonwealth:edgeware@localhost/${TEST_DB_NAME}`,
-      {
-        logging: false,
-      },
-    );
-    const [{ count }] = await sequelize.query<{ count: number }>(
-      `SELECT COUNT(*) FROM pg_database WHERE datname = '${TEST_DB_NAME}'`,
-      { type: QueryTypes.SELECT },
-    );
-    if (!+count) await sequelize.query(`CREATE DATABASE ${TEST_DB_NAME};`);
-  } catch (error) {
-    console.error('Error creating test db:', error);
-  } finally {
-    sequelize && sequelize.close();
-  }
-};
-
-export const seedDb = async (debug = false): Promise<void> => {
-  const log = logger().getLogger(__filename);
-  if (debug) log.info('Seeding test db...');
-  try {
-    await checkDb();
-
-    // connect and seed
-    const { models } = await import('..');
-
-    await models.sequelize.sync({ force: true });
-    log.info('done syncing.');
-    if (debug) log.info('Initializing default models...');
+    const models = await bootstrap_testing(true);
 
     const [drew] = await models.User.bulkCreate([
       {
@@ -537,12 +513,9 @@ export const seedDb = async (debug = false): Promise<void> => {
       ).toString(),
     });
 
-    if (debug) log.info('Database reset!');
+    return models;
   } catch (error) {
-    log.error(
-      'Error seeding test db',
-      error instanceof Error ? error : undefined,
-    );
+    console.error('seedDB', error);
     throw error;
   }
 };

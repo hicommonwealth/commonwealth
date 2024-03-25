@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { models, tester } from '@hicommonwealth/model';
+import { dispose } from '@hicommonwealth/core';
+import { tester, type DB } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 
@@ -7,9 +8,16 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('Thread queries', () => {
+  let models: DB;
+
   before(async () => {
-    await tester.seedDb();
+    models = await tester.seedDb();
   });
+
+  after(async () => {
+    await dispose()();
+  });
+
   it('query_thread_through_collabo', async () => {
     const chain = await models.Community.findOne();
     expect(chain.id).to.not.be.null;

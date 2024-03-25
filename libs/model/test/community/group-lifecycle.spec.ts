@@ -7,7 +7,7 @@ import {
   Errors,
   MAX_GROUPS_PER_COMMUNITY,
 } from '../../src/community/CreateGroup.command';
-import { seed } from '../../src/test';
+import { seed } from '../../src/tester';
 
 chai.use(chaiAsPromised);
 const chance = Chance();
