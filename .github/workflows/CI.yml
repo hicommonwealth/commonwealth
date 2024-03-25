@@ -575,7 +575,12 @@ jobs:
         run: yarn global add node-gyp && yarn --ignore-engines
 
       - name: Build
-        run: yarn --cwd packages/snapshot-listener build
+        run: \
+          yarn workspace @hicommonwealth/core build
+          yarn workspace @hicommonwealth/model build
+          yarn workspace @hicommonwealth/chains build
+          yarn workspace @hicommonwealth/adapters build
+          yarn --cwd packages/snapshot-listener build
 
       - name: Run API tests
         run: yarn --cwd packages/snapshot-listener test --forbid-only
