@@ -77,10 +77,10 @@ export async function __getBulkThreads(
     responseThreads = await this.models.sequelize.query(
       `
       SELECT addr.id AS addr_id, addr.address AS addr_address, last_commented_on,
-        addr.community_id AS addr_chain, threads.thread_id, thread_title,
+        addr.community_id AS addr_community_id, threads.thread_id, thread_title,
         threads.marked_as_spam_at,
         threads.archived_at,
-        thread_chain, thread_created, thread_updated, thread_locked, threads.kind,
+        thread_community_id, thread_created, thread_updated, thread_locked, threads.kind,
         threads.read_only, threads.body, threads.stage, threads.discord_meta,
         threads.has_poll, threads.plaintext,
         threads.url, threads.pinned, COALESCE(threads.number_of_comments,0) as threads_number_of_comments,
@@ -102,7 +102,8 @@ export async function __getBulkThreads(
           t.archived_at,
           t.updated_at AS thread_updated,
           t.locked_at AS thread_locked,
-          t.community_id AS thread_chain, t.read_only, t.body, t.discord_meta, t.comment_count AS number_of_comments,
+          t.community_id AS thread_community_id, t.read_only, t.body, t.discord_meta,
+          t.comment_count AS number_of_comments,
           reactions.reaction_ids, reactions.reaction_timestamps, reactions.reaction_weights, reactions.reaction_type,
           reactions.addresses_reacted, t.reaction_count AS total_likes,
           t.reaction_weights_sum,
@@ -110,7 +111,7 @@ export async function __getBulkThreads(
           t.plaintext,
           t.stage, t.url, t.pinned, t.topic_id, t.kind, t.links, ARRAY_AGG(DISTINCT
             CONCAT(
-              '{ "address": "', editors.address, '", "chain": "', editors.community_id, '" }'
+              '{ "address": "', editors.address, '", "community_id": "', editors.community_id, '" }'
               )
             ) AS collaborators
         FROM "Threads" t
@@ -196,7 +197,7 @@ export async function __getBulkThreads(
       read_only: t.read_only,
       discord_meta: t.discord_meta,
       pinned: t.pinned,
-      chain: t.thread_chain,
+      community_id: t.thread_community_id,
       created_at: t.thread_created,
       updated_at: t.thread_updated,
       locked_at: t.thread_locked,
@@ -208,7 +209,7 @@ export async function __getBulkThreads(
       Address: {
         id: t.addr_id,
         address: t.addr_address,
-        community_id: t.addr_chain,
+        community_id: t.addr_community_id,
       },
       numberOfComments: t.threads_number_of_comments,
       reactionIds: t.reaction_ids ? t.reaction_ids.split(',') : [],
@@ -232,7 +233,7 @@ export async function __getBulkThreads(
         id: t.topic_id,
         name: t.topic_name,
         description: t.topic_description,
-        chainId: t.topic_community_id,
+        communityId: t.topic_community_id,
         telegram: t.telegram,
       };
     }
