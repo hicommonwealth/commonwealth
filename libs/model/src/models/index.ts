@@ -1,44 +1,82 @@
-import type { Sequelize } from 'sequelize';
+import { DataTypes, Sequelize } from 'sequelize';
 
-import type { AddressModelStatic } from './address';
-import type { BanModelStatic } from './ban';
-import type { ChainNodeModelStatic } from './chain_node';
-import type { CollaborationModelStatic } from './collaboration';
-import type { CommentModelStatic } from './comment';
-import type { CommunityModelStatic } from './community';
-import type { CommunityBannerModelStatic } from './community_banner';
-import type { CommunityContractModelStatic } from './community_contract';
-import type { CommunityContractTemplateMetadataStatic } from './community_contract_metadata';
-import type { CommunityContractTemplateStatic } from './community_contract_template';
-import type { CommunitySnapshotSpaceModelStatic } from './community_snapshot_spaces';
-import type { CommunityStakeModelStatic } from './community_stake';
-import type { ContractModelStatic } from './contract';
-import type { ContractAbiModelStatic } from './contract_abi';
-import type { DiscordBotConfigModelStatic } from './discord_bot_config';
-import type { EvmEventSourceModelStatic } from './evmEventSource';
-import type { GroupModelStatic } from './group';
-import type { LastProcessedEvmBlockModelStatic } from './lastProcessedEvmBlock';
-import type { LoginTokenModelStatic } from './login_token';
-import type { MembershipModelStatic } from './membership';
-import type { NotificationModelStatic } from './notification';
-import type { NotificationCategoryModelStatic } from './notification_category';
-import type { NotificationsReadModelStatic } from './notifications_read';
-import type { OutboxModelStatic } from './outbox';
-import type { PollModelStatic } from './poll';
-import type { ProfileModelStatic } from './profile';
-import type { ReactionModelStatic } from './reaction';
-import type { SnapshotProposalModelStatic } from './snapshot_proposal';
-import type { SnapshotSpaceModelStatic } from './snapshot_spaces';
-import type { SsoTokenModelStatic } from './sso_token';
-import type { StakeTransactionModelStatic } from './stake_transaction';
-import type { StarredCommunityModelStatic } from './starred_community';
-import type { SubscriptionModelStatic } from './subscription';
-import type { TemplateModelStatic } from './template';
-import type { ThreadModelStatic } from './thread';
-import type { TopicModelStatic } from './topic';
-import type { UserModelStatic } from './user';
-import type { VoteModelStatic } from './vote';
-import type { WebhookModelStatic } from './webhook';
+import AddressFactory, { type AddressModelStatic } from './address';
+import BanFactory, { type BanModelStatic } from './ban';
+import ChainNodeFactory, { type ChainNodeModelStatic } from './chain_node';
+import CollaborationFactory, {
+  type CollaborationModelStatic,
+} from './collaboration';
+import CommentFactory, { type CommentModelStatic } from './comment';
+import CommunityFactory, { type CommunityModelStatic } from './community';
+import CommunityBannerFactory, {
+  type CommunityBannerModelStatic,
+} from './community_banner';
+import CommunityContractFactory, {
+  type CommunityContractModelStatic,
+} from './community_contract';
+import CommunityContractTemplateMetadataFactory, {
+  type CommunityContractTemplateMetadataStatic,
+} from './community_contract_metadata';
+import CommunityContractTemplateFactory, {
+  type CommunityContractTemplateStatic,
+} from './community_contract_template';
+import CommunitySnapshotSpaceFactory, {
+  type CommunitySnapshotSpaceModelStatic,
+} from './community_snapshot_spaces';
+import CommunityStakeFactory, {
+  type CommunityStakeModelStatic,
+} from './community_stake';
+import ContractFactory, { type ContractModelStatic } from './contract';
+import ContractAbiFactory, {
+  type ContractAbiModelStatic,
+} from './contract_abi';
+import DiscordBotConfigFactory, {
+  type DiscordBotConfigModelStatic,
+} from './discord_bot_config';
+import EvmEventSourceFactory, {
+  type EvmEventSourceModelStatic,
+} from './evmEventSource';
+import GroupFactory, { type GroupModelStatic } from './group';
+import LastProcessedEvmBlockFactory, {
+  type LastProcessedEvmBlockModelStatic,
+} from './lastProcessedEvmBlock';
+import LoginTokenFactory, { type LoginTokenModelStatic } from './login_token';
+import MembershipFactory, { type MembershipModelStatic } from './membership';
+import NotificationFactory, {
+  type NotificationModelStatic,
+} from './notification';
+import NotificationCategoryFactory, {
+  type NotificationCategoryModelStatic,
+} from './notification_category';
+import NotificationsReadFactory, {
+  type NotificationsReadModelStatic,
+} from './notifications_read';
+import OutboxFactory, { type OutboxModelStatic } from './outbox';
+import PollFactory, { type PollModelStatic } from './poll';
+import ProfileFactory, { type ProfileModelStatic } from './profile';
+import ReactionFactory, { type ReactionModelStatic } from './reaction';
+import SnapshotProposalFactory, {
+  type SnapshotProposalModelStatic,
+} from './snapshot_proposal';
+import SnapshotSpaceFactory, {
+  type SnapshotSpaceModelStatic,
+} from './snapshot_spaces';
+import SsoTokenFactory, { type SsoTokenModelStatic } from './sso_token';
+import StakeTransactionFactory, {
+  type StakeTransactionModelStatic,
+} from './stake_transaction';
+import StarredCommunityFactory, {
+  type StarredCommunityModelStatic,
+} from './starred_community';
+import SubscriptionFactory, {
+  type SubscriptionModelStatic,
+} from './subscription';
+import TemplateFactory, { type TemplateModelStatic } from './template';
+import ThreadFactory, { type ThreadModelStatic } from './thread';
+import TopicFactory, { type TopicModelStatic } from './topic';
+import UserFactory, { type UserModelStatic } from './user';
+import VoteFactory, { type VoteModelStatic } from './vote';
+import WebhookFactory, { type WebhookModelStatic } from './webhook';
 
 export type Models = {
   Address: AddressModelStatic;
@@ -51,7 +89,6 @@ export type Models = {
   CommunityContractTemplate: CommunityContractTemplateStatic;
   CommunityContractTemplateMetadata: CommunityContractTemplateMetadataStatic;
   CommunityStake: CommunityStakeModelStatic;
-  StakeTransaction: StakeTransactionModelStatic;
   Template: TemplateModelStatic;
   CommunitySnapshotSpaces: CommunitySnapshotSpaceModelStatic;
   Collaboration: CollaborationModelStatic;
@@ -75,6 +112,7 @@ export type Models = {
   SsoToken: SsoTokenModelStatic;
   StarredCommunity: StarredCommunityModelStatic;
   SnapshotProposal: SnapshotProposalModelStatic;
+  StakeTransaction: StakeTransactionModelStatic;
   Subscription: SubscriptionModelStatic;
   SnapshotSpace: SnapshotSpaceModelStatic;
   User: UserModelStatic;
@@ -128,6 +166,7 @@ export const buildDb = (sequelize: Sequelize): DB => {
     Vote: VoteFactory(sequelize, DataTypes),
     Profile: ProfileFactory(sequelize, DataTypes),
     SsoToken: SsoTokenFactory(sequelize, DataTypes),
+    StakeTransaction: StakeTransactionFactory(sequelize, DataTypes),
     StarredCommunity: StarredCommunityFactory(sequelize, DataTypes),
     SnapshotProposal: SnapshotProposalFactory(sequelize, DataTypes),
     SnapshotSpace: SnapshotSpaceFactory(sequelize, DataTypes),
@@ -186,6 +225,7 @@ export * from './role_assignment';
 export * from './snapshot_proposal';
 export * from './snapshot_spaces';
 export * from './sso_token';
+export * from './stake_transaction';
 export * from './starred_community';
 export * from './subscription';
 export * from './template';

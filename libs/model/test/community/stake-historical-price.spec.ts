@@ -2,7 +2,7 @@ import { BalanceType, dispose, query } from '@hicommonwealth/core';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { GetStakeHistoricalPrice } from '../../src/community/GetStakeHistoricalPrice.query';
-import { seed } from '../../src/test';
+import { seed } from '../../src/tester/index';
 
 chai.use(chaiAsPromised);
 

@@ -3,8 +3,7 @@ import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { CreateStakeTransaction } from '../../src/community/CreateStakeTransaction.command';
 import { GetStakeTransaction } from '../../src/community/GetStakeTransaction.query';
-import { seed } from '../../src/test/index';
-
+import { seed } from '../../src/tester/index';
 chai.use(chaiAsPromised);
 
 describe('Stake transactions', () => {
