@@ -575,7 +575,7 @@ jobs:
         run: yarn global add node-gyp && yarn --ignore-engines
 
       - name: Build
-        run: \
+        run: |
           yarn workspace @hicommonwealth/core build
           yarn workspace @hicommonwealth/model build
           yarn workspace @hicommonwealth/chains build
