@@ -76,10 +76,6 @@
 
         .description {
           color: $neutral-800;
-          font-family: $font-family-neue-haas-unica;
-          font-size: 14px;
-          font-weight: 400;
-          line-height: 20px;
           word-break: break-word;
         }
       }
@@ -90,7 +86,8 @@
       gap: 8px;
       align-items: flex-start;
 
-      .member-data {
+      .member-data,
+      .thread-data {
         display: flex;
         align-items: center;
         gap: 4px;
@@ -98,12 +95,11 @@
         .count,
         .text {
           color: $neutral-500;
-          font-family: $font-family-neue-haas-unica;
-          font-size: 12px;
-          font-style: normal;
-          font-weight: 400;
-          line-height: 16px;
-          letter-spacing: 0.24px;
+        }
+
+        .Icon {
+          width: 16px;
+          height: 16px;
         }
       }
 
@@ -117,28 +113,6 @@
         .Icon {
           width: 4px;
           height: 4px;
-        }
-      }
-
-      .thread-data {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-
-        .count,
-        .text {
-          color: $neutral-500;
-          font-family: $font-family-neue-haas-unica;
-          font-size: 12px;
-          font-style: normal;
-          font-weight: 400;
-          line-height: 16px;
-          letter-spacing: 0.24px;
-        }
-
-        .Icon {
-          width: 16px;
-          height: 16px;
         }
       }
     }

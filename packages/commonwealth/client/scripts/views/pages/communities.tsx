@@ -153,7 +153,7 @@ const CommunitiesPage = () => {
             community={community}
             memberCount={community.addressCount}
             threadCount={community.threadCount}
-            setSelectedCommunity={setSelectedCommunity}
+            onStakeBtnClick={() => setSelectedCommunity(community)}
           />
         );
       });

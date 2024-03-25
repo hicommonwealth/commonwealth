@@ -2,11 +2,12 @@ import { notifyError } from 'client/scripts/controllers/app/notifications';
 import type ChainInfo from 'client/scripts/models/ChainInfo';
 import { useManageCommunityStakeModalStore } from 'client/scripts/state/ui/modals';
 import { CommunityData } from 'client/scripts/views/pages/DirectoryPage/DirectoryPageContent';
+import clsx from 'clsx';
 import { isCommandClick, pluralizeWithoutNumberPrefix } from 'helpers';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useState } from 'react';
-import app from 'state';
+import Permissions from 'utils/Permissions';
 import {
   MixpanelClickthroughEvent,
   MixpanelClickthroughPayload,
@@ -26,9 +27,7 @@ type CWRelatedCommunityCardProps = {
   memberCount: string | number;
   threadCount: string | number;
   stakeChange?: number;
-  setSelectedCommunity?: React.Dispatch<
-    React.SetStateAction<ChainInfo | CommunityData>
-  >;
+  onStakeBtnClick?: () => any;
 };
 
 export const CWRelatedCommunityCard = ({
@@ -36,7 +35,7 @@ export const CWRelatedCommunityCard = ({
   memberCount,
   threadCount,
   stakeChange,
-  setSelectedCommunity,
+  onStakeBtnClick,
 }: CWRelatedCommunityCardProps) => {
   const navigate = useCommonNavigate();
   const { stakeEnabled, stakeValue } = useCommunityStake({
@@ -49,8 +48,7 @@ export const CWRelatedCommunityCard = ({
     onJoin: setHasJoinedCommunity,
   });
 
-  const isCommunityMember =
-    app.roles.getAllRolesInCommunity({ community: community.id }).length > 0;
+  const isCommunityMember = Permissions.isCommunityMember(community.id);
 
   const { setModeOfManageCommunityStakeModal } =
     useManageCommunityStakeModalStore();
@@ -76,7 +74,7 @@ export const CWRelatedCommunityCard = ({
   );
 
   const handleBuyStakeClick = async () => {
-    setSelectedCommunity(community);
+    onStakeBtnClick?.();
     if (!isCommunityMember && !hasJoinedCommunity) {
       const joined = await handleJoinCommunity();
 
@@ -113,38 +111,37 @@ export const CWRelatedCommunityCard = ({
                     <CWText type="h5" className="stake-value">
                       ${stakeValue}
                     </CWText>
-                    <div>
-                      <CWText type="caption" className="stake-change">
-                        <span
-                          className={`percentage ${
-                            stakeChange >= 0 ? 'positive' : 'negative'
-                          }`}
-                        >
-                          {stakeChange}%
-                        </span>
-                        <span className="hours">24h</span>
+                    <CWText type="caption" className="stake-change">
+                      <CWText
+                        className={clsx(
+                          `percentage`,
+                          stakeChange >= 0 ? 'positive' : 'negative',
+                        )}
+                      >
+                        {stakeChange}%
                       </CWText>
-                    </div>
+                      <CWText className="hours">24h</CWText>
+                    </CWText>
                   </div>
                 )}
               </div>
-              <div className="description">
-                {community.description
-                  ? addPeriodToText(community.description)
-                  : null}
-              </div>
+              {community.description && (
+                <CWText className="description" type="b2">
+                  {addPeriodToText(community.description)}
+                </CWText>
+              )}
             </div>
           </div>
           <div className="metadata">
             <div className="member-data">
               <CWIcon iconName="users" iconSize="small" />
-              <span className="count">
+              <CWText className="count" type="caption">
                 {Number(memberCount).toLocaleString('en-US')}
-              </span>
+              </CWText>
 
-              <span className="text">
+              <CWText className="text" type="caption">
                 {pluralizeWithoutNumberPrefix(Number(memberCount), 'member')}
-              </span>
+              </CWText>
             </div>
 
             <div className="divider">
@@ -153,12 +150,12 @@ export const CWRelatedCommunityCard = ({
 
             <div className="thread-data">
               <CWIcon iconName="notepad" />
-              <span className="count">
+              <CWText className="count" type="caption">
                 {threadCount.toLocaleString('en-US')}
-              </span>
-              <span className="text">
+              </CWText>
+              <CWText className="text" type="caption">
                 {pluralizeWithoutNumberPrefix(Number(threadCount), 'thread')}
-              </span>
+              </CWText>
             </div>
           </div>
           <div className="actions">

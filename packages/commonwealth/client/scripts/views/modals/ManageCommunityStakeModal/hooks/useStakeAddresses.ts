@@ -8,13 +8,11 @@ import {
   getInitialAccountValue,
 } from '../utils';
 
-interface useStakeAddressesProps {
+interface UseStakeAddressesProps {
   community?: ChainInfo | CommunityData;
 }
 
-const useStakeAddresses = (props: useStakeAddressesProps = {}) => {
-  const { community } = props;
-
+const useStakeAddresses = ({ community }: UseStakeAddressesProps = {}) => {
   let communityAddressInfo;
 
   if (community) {
