@@ -1,9 +1,8 @@
 /* eslint-disable dot-notation */
-import { CacheDecorator } from '@hicommonwealth/adapters';
-import { dispose } from '@hicommonwealth/core';
+import { CacheDecorator, RedisCache } from '@hicommonwealth/adapters';
+import { cache, dispose } from '@hicommonwealth/core';
 import type { DB, E2E_TestEntities } from '@hicommonwealth/model';
 import express from 'express';
-import { main } from './main';
 import { ModelSeeder, modelSeeder } from './test/util/modelUtils';
 
 /**
@@ -31,16 +30,19 @@ export type TestServer = {
  * @returns test server
  */
 export const testServer = async (): Promise<TestServer> => {
+  // bootstrap test adapters
+  cache(new RedisCache('redis://localhost:6379'));
+
   const { tester } = await import('@hicommonwealth/model');
-  const models = await tester.seedDb();
+  const { main } = await import('./main');
+
+  const db = await tester.seedDb();
   const app = express();
-  const { server, cacheDecorator } = await main(app, models, {
-    testing: true,
+  const { server, cacheDecorator } = await main(app, db, {
     port: 8081,
-    redis_url: 'redis://localhost:6379',
   });
-  const seeder = modelSeeder(app, models);
-  const e2eTestEntities = await tester.e2eTestEntities(models);
+  const seeder = modelSeeder(app, db);
+  const e2eTestEntities = await tester.e2eTestEntities(db);
 
   // auto dispose server
   dispose(async () => {
@@ -50,9 +52,9 @@ export const testServer = async (): Promise<TestServer> => {
   return {
     app,
     cacheDecorator,
-    models,
+    models: db,
     seeder,
     e2eTestEntities,
-    truncate: () => tester.truncate_db(models),
+    truncate: () => tester.truncate_db(db),
   };
 };

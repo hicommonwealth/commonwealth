@@ -1,9 +1,5 @@
-import {
-  CacheDecorator,
-  RedisCache,
-  setupErrorHandlers,
-} from '@hicommonwealth/adapters';
-import { cache, logger } from '@hicommonwealth/core';
+import { CacheDecorator, setupErrorHandlers } from '@hicommonwealth/adapters';
+import { logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
@@ -23,20 +19,13 @@ import prerenderNode from 'prerender-node';
 import favicon from 'serve-favicon';
 import expressStatsInit from 'server/scripts/setupExpressStats';
 import * as v8 from 'v8';
-import {
-  DATABASE_CLEAN_HOUR,
-  PRERENDER_TOKEN,
-  SERVER_URL,
-  SESSION_SECRET,
-} from './server/config';
+import { PRERENDER_TOKEN, SESSION_SECRET } from './server/config';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
 import setupAPI from './server/routing/router';
-import { sendBatchedNotificationEmails } from './server/scripts/emails';
 import setupServer from './server/scripts/setupServer';
 import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
-import { databaseCleaner } from './server/util/databaseCleaner';
 import GlobalActivityCache from './server/util/globalActivityCache';
 import setupIpfsProxy from './server/util/ipfsProxy';
 import ViewCountCache from './server/util/viewCountCache';
@@ -44,20 +33,28 @@ import ViewCountCache from './server/util/viewCountCache';
 // set up express async error handling hack
 require('express-async-errors');
 
+const DEV = process.env.NODE_ENV !== 'production';
+
 /**
  * Bootstraps express app
  */
 export async function main(
   app: express.Express,
-  models: DB,
+  db: DB,
   {
     port,
-    redis_url,
-    testing = false,
+    noGlobalActivityCache = true,
+    withLoggingMiddleware = false,
+    withStatsMiddleware = false,
+    withFrontendBuild = false,
+    withPrerender = false,
   }: {
     port: number;
-    redis_url: string;
-    testing?: boolean;
+    noGlobalActivityCache?: boolean;
+    withLoggingMiddleware?: boolean;
+    withStatsMiddleware?: boolean;
+    withFrontendBuild?: boolean;
+    withPrerender?: boolean;
   },
 ) {
   const log = logger().getLogger(__filename);
@@ -67,37 +64,13 @@ export async function main(
     )} GB`,
   );
 
-  redis_url && cache(new RedisCache(redis_url));
   const cacheDecorator = new CacheDecorator();
-
-  const DEV = process.env.NODE_ENV !== 'production';
-  !DEV && !redis_url && log.error('Missing REDIS_URL in production!');
-
-  // CLI parameters for which task to run
-  const SHOULD_SEND_EMAILS = process.env.SEND_EMAILS === 'true';
-
-  const NO_GLOBAL_ACTIVITY_CACHE =
-    testing || process.env.NO_GLOBAL_ACTIVITY_CACHE === 'true';
-  const NO_CLIENT_SERVER =
-    process.env.NO_CLIENT === 'true' || SHOULD_SEND_EMAILS;
-
-  let rc = null;
-  if (SHOULD_SEND_EMAILS) {
-    rc = await sendBatchedNotificationEmails(models);
-  }
-
-  // exit if we have performed a one-off event
-  if (rc !== null) {
-    process.exit(rc);
-  }
-
-  const NO_PRERENDER = process.env.NO_PRERENDER || NO_CLIENT_SERVER;
 
   const SequelizeStore = SessionSequelizeStore(session.Store);
   const viewCountCache = new ViewCountCache(2 * 60, 10 * 60);
 
   const sessionStore = new SequelizeStore({
-    db: models.sequelize,
+    db: db.sequelize,
     tableName: 'Sessions',
     checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
     expiration: 14 * 24 * 60 * 60 * 1000, // Set session expiration to 7 days
@@ -165,7 +138,7 @@ export async function main(
     app.use(favicon(`${__dirname}/favicon.ico`));
     app.use('/static', express.static('static'));
 
-    if (!testing) {
+    withLoggingMiddleware &&
       app.use(
         pinoHttp({
           quietReqLogger: false,
@@ -181,8 +154,7 @@ export async function main(
           },
         }),
       );
-      app.use(expressStatsInit());
-    }
+    withStatsMiddleware && app.use(expressStatsInit());
 
     app.use(json({ limit: '1mb' }) as RequestHandler);
     app.use(urlencoded({ limit: '1mb', extended: false }) as RequestHandler);
@@ -191,45 +163,40 @@ export async function main(
     app.use(passport.initialize());
     app.use(passport.session());
 
-    if (
-      !testing &&
-      !DEV &&
-      !NO_PRERENDER &&
-      SERVER_URL.includes('commonwealth.im')
-    ) {
+    withPrerender &&
       app.use(prerenderNode.set('prerenderToken', PRERENDER_TOKEN));
-    }
   };
 
   setupMiddleware();
-  setupPassport(models);
+  setupPassport(db);
 
-  const banCache = new BanCache(models);
-  const globalActivityCache = new GlobalActivityCache(models);
+  const banCache = new BanCache(db);
 
+  // TODO: decouple as global singleton
+  const globalActivityCache = new GlobalActivityCache(db);
   // initialize async to avoid blocking startup
-  if (!NO_GLOBAL_ACTIVITY_CACHE) globalActivityCache.start();
+  if (!noGlobalActivityCache) globalActivityCache.start();
 
   // Declare Validation Middleware Service
   // middleware to use for all requests
   const dbValidationService: DatabaseValidationService =
-    new DatabaseValidationService(models);
+    new DatabaseValidationService(db);
 
   setupAPI(
     '/api',
     app,
-    models,
+    db,
     viewCountCache,
     banCache,
     globalActivityCache,
     dbValidationService,
   );
 
-  setupCosmosProxy(app, models, cacheDecorator);
+  setupCosmosProxy(app, db, cacheDecorator);
   setupIpfsProxy(app, cacheDecorator);
 
-  if (!NO_CLIENT_SERVER) {
-    if (!testing && DEV) {
+  if (withFrontendBuild) {
+    if (DEV) {
       // lazy import because we want to keep all of webpacks dependencies in devDependencies
       const setupWebpackDevServer = (
         await import('./server/scripts/setupWebpackDevServer')
@@ -255,9 +222,6 @@ export async function main(
   setupErrorHandlers(app);
 
   const server = setupServer(app, port);
-
-  // database clean-up jobs (should be run after the API so, we don't affect start-up time
-  !testing && databaseCleaner.initLoop(models, Number(DATABASE_CLEAN_HOUR));
 
   return { server, cacheDecorator };
 }
