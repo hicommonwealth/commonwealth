@@ -135,7 +135,7 @@ module.exports = {
               "Avoid importing from 'lib' directories. Import from the main entry point instead.",
           },
           {
-            group: ['../libs/*', '../packages/*'],
+            group: ['../libs/**', '../packages/**'],
             message:
               'Do not import files from outside the root directory of a package',
           },
