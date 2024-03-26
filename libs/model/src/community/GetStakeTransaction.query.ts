@@ -11,7 +11,7 @@ export const GetStakeTransaction: Query<
   body: async ({ payload }) => {
     const { addresses } = payload;
 
-    return await models.sequelize.query(
+    return (await models.sequelize.query(
       `
        SELECT 
          t.transaction_hash,
@@ -38,6 +38,6 @@ export const GetStakeTransaction: Query<
           addresses: addresses ?? null,
         },
       },
-    );
+    )) as any;
   },
 });
