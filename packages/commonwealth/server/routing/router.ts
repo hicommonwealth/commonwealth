@@ -347,6 +347,7 @@ function setupRouter(
     '/communities',
     getCommunitiesHandler.bind(this, serverControllers),
   );
+
   registerRoute(
     router,
     'get',
