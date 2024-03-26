@@ -61,7 +61,7 @@ export default (
       email: { type: dataTypes.STRING, allowNull: true, unique: true },
       emailVerified: {
         type: dataTypes.BOOLEAN,
-        allowNull: false,
+        allowNull: true,
         defaultValue: false,
       },
       emailNotificationInterval: {
@@ -73,7 +73,7 @@ export default (
       disableRichText: {
         type: dataTypes.BOOLEAN,
         defaultValue: false,
-        allowNull: false,
+        allowNull: true,
       },
       selected_community_id: { type: dataTypes.STRING, allowNull: true },
     },

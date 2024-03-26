@@ -91,7 +91,7 @@ export default (
       },
       ghost_address: {
         type: dataTypes.BOOLEAN,
-        allowNull: false,
+        allowNull: true,
         defaultValue: false,
       },
       profile_id: { type: dataTypes.INTEGER, allowNull: true },
@@ -99,7 +99,7 @@ export default (
       wallet_sso_source: { type: dataTypes.STRING, allowNull: true },
       block_info: { type: dataTypes.STRING, allowNull: true },
       hex: {
-        type: dataTypes.STRING,
+        type: dataTypes.STRING(64),
         allowNull: true,
         validate: {
           isRequiredForCosmos() {

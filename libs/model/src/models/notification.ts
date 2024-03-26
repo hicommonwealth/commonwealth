@@ -36,7 +36,7 @@ export default (
     'Notification',
     {
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-      notification_data: { type: dataTypes.TEXT, allowNull: false },
+      notification_data: { type: dataTypes.TEXT, allowNull: true },
       chain_event_id: { type: dataTypes.INTEGER, allowNull: true },
       entity_id: { type: dataTypes.INTEGER, allowNull: true },
       community_id: { type: dataTypes.STRING, allowNull: true },

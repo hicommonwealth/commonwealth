@@ -38,12 +38,10 @@ export default (
     {
       address_id: {
         type: dataTypes.INTEGER,
-        allowNull: false,
         primaryKey: true,
       },
       thread_id: {
         type: dataTypes.INTEGER,
-        allowNull: false,
         primaryKey: true,
       },
       created_at: { type: dataTypes.DATE, allowNull: false },

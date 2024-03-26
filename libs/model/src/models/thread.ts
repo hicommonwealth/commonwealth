@@ -50,7 +50,7 @@ export default (
       title: { type: dataTypes.TEXT, allowNull: false },
       body: { type: dataTypes.TEXT, allowNull: true },
       plaintext: { type: dataTypes.TEXT, allowNull: true },
-      kind: { type: dataTypes.TEXT, allowNull: false },
+      kind: { type: dataTypes.STRING, allowNull: true },
       stage: {
         type: dataTypes.TEXT,
         allowNull: false,

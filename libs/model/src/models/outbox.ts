@@ -20,15 +20,15 @@ export default (
       // Sequelize v6 doesn't support having an id column that isn't a primary key
       // https://github.com/sequelize/sequelize/pull/14386
       // id: { type: dataTypes.BIGINT, autoIncrement: true, primaryKey: false },
-      event_name: { type: dataTypes.STRING, allowNull: false },
+      event_name: { type: dataTypes.TEXT, allowNull: false },
       event_payload: { type: dataTypes.JSONB, allowNull: false },
       relayed: {
         type: dataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
-      created_at: { type: dataTypes.DATE, allowNull: true },
-      updated_at: { type: dataTypes.DATE, allowNull: true },
+      created_at: { type: dataTypes.DATE, allowNull: false },
+      updated_at: { type: dataTypes.DATE, allowNull: false },
     },
     {
       tableName: 'Outbox',

@@ -39,7 +39,7 @@ export default (
     {
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       token: { type: dataTypes.STRING, allowNull: false },
-      email: { type: dataTypes.STRING, allowNull: true },
+      email: { type: dataTypes.STRING, allowNull: false },
       expires: { type: dataTypes.DATE, allowNull: false },
       redirect_path: { type: dataTypes.STRING, allowNull: true },
       domain: { type: dataTypes.STRING, allowNull: true },
