@@ -40,7 +40,6 @@ export const GetCommunityMembers = {
 export const GetStakeTransaction = {
   input: z.object({
     addresses: z.string().optional(),
-    community_id: z.string().optional(),
   }),
   output: z
     .object({

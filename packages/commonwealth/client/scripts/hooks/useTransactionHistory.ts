@@ -5,17 +5,14 @@ import { FilterOptions } from '../views/pages/MyCommunityStake/types';
 export type TransactionHistoryProps = {
   filterOptions: FilterOptions;
   addressFilter: string[];
-  community_id?: string;
 };
 
 const useTransactionHistory = ({
   filterOptions,
   addressFilter,
-  community_id,
 }: TransactionHistoryProps) => {
   const { data } = trpc.community.getStakeTransaction.useQuery({
     addresses: addressFilter.length > 0 ? addressFilter.join(',') : undefined,
-    community_id,
   });
 
   const WEI_PER_ETHER = 1000000000000000000;

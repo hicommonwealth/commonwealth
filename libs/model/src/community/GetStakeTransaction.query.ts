@@ -9,7 +9,7 @@ export const GetStakeTransaction: Query<
   ...schemas.queries.GetStakeTransaction,
   auth: [],
   body: async ({ payload }) => {
-    const { addresses, community_id } = payload;
+    const { addresses } = payload;
 
     return await models.sequelize.query(
       `
@@ -30,15 +30,12 @@ export const GetStakeTransaction: Query<
        FROM "StakeTransactions" AS t
        LEFT JOIN "Communities" AS c ON c.id = t.community_id
        LEFT JOIN "CommunityStakes" AS cs ON cs.community_id = t.community_id
-       WHERE 
-         (:addresses IS NULL OR t.address IN (:addresses))
-         AND (:community_id IS NULL OR t.community_id = :community_id);
+       WHERE :addresses IS NULL OR t.address IN (:addresses);
       `,
       {
         type: QueryTypes.SELECT,
         replacements: {
           addresses: addresses ?? null,
-          community_id: community_id ?? null,
         },
       },
     );

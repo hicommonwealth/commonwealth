@@ -5,7 +5,6 @@ import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip'
 import useTransactionHistory, {
   TransactionHistoryProps,
 } from '../../../../hooks/useTransactionHistory';
-import app from '../../../../state/index';
 import CommunityInfo from '../common/CommunityInfo';
 import './Transactions.scss';
 import { CWIcon } from '/views/components/component_kit/cw_icons/cw_icon';
@@ -72,7 +71,6 @@ const Transactions = ({
   const data = useTransactionHistory({
     filterOptions,
     addressFilter,
-    community_id: app.activeChainId(),
   });
 
   return (
