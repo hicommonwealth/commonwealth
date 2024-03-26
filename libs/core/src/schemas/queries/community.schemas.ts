@@ -1,10 +1,6 @@
 import { z } from 'zod';
 import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../../constants';
-import {
-  CommunityMember,
-  CommunityStake,
-  StakeTransaction,
-} from '../entities.schemas';
+import { CommunityMember, CommunityStake } from '../entities.schemas';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
 export const GetCommunityStake = {
@@ -43,10 +39,25 @@ export const GetCommunityMembers = {
 
 export const GetStakeTransaction = {
   input: z.object({
-    address: z.string().optional(),
+    addresses: z.string().optional(),
     community_id: z.string().optional(),
   }),
-  output: StakeTransaction.and(z.object({ address: z.string() })).array(),
+  output: z
+    .object({
+      transaction_hash: z.string(),
+      address: z.string(),
+      stake_price: z.string(),
+      stake_amount: z.number(),
+      vote_weight: z.number(),
+      timestamp: z.number(),
+      community: z.object({
+        id: z.string(),
+        default_symbol: z.string(),
+        icon_url: z.string(),
+        name: z.string(),
+      }),
+    })
+    .array(),
 };
 
 export const GetStakeHistoricalPrice = {

@@ -1,5 +1,6 @@
 import type { Query } from '@hicommonwealth/core';
 import { schemas } from '@hicommonwealth/core';
+import { QueryTypes } from 'sequelize';
 import { models } from '../database';
 
 export const GetStakeTransaction: Query<
@@ -8,27 +9,37 @@ export const GetStakeTransaction: Query<
   ...schemas.queries.GetStakeTransaction,
   auth: [],
   body: async ({ payload }) => {
-    const { address, community_id } = payload;
+    const { addresses, community_id } = payload;
 
-    let response;
-
-    if (address) {
-      response = await models.StakeTransaction.findAll({
-        where: { address },
-        include: [
-          {
-            model: models.Address,
-            required: true,
-            attributes: ['address'],
-          },
-        ],
-      });
-    } else {
-      response = await models.StakeTransaction.findAll({
-        where: { community_id },
-      });
-    }
-
-    return response;
+    return await models.sequelize.query(
+      `
+       SELECT 
+         t.transaction_hash,
+         t.address,
+         t.stake_price,
+         t.stake_amount,
+         cs.vote_weight,
+         t.timestamp,
+         json_build_object(
+           'id', c.id,
+           'default_symbol', c.default_symbol,
+           'icon_url', c.icon_url,
+           'name', c.name
+         ) AS community
+       FROM "StakeTransactions" AS t
+       LEFT JOIN "Communities" AS c ON c.id = t.community_id
+       LEFT JOIN "CommunityStakes" AS cs ON cs.community_id = t.community_id
+       WHERE 
+         (:addresses IS NULL OR t.address IN (:addresses))
+         AND (:community_id IS NULL OR t.community_id = :community_id);
+      `,
+      {
+        type: QueryTypes.SELECT,
+        replacements: {
+          addresses: addresses ?? null,
+          community_id: community_id ?? null,
+        },
+      },
+    );
   },
 });

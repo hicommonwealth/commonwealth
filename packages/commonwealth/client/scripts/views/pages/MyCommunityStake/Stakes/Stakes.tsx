@@ -1,8 +1,9 @@
 import { formatAddressShort } from 'helpers';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { trpc } from '../../../../utils/trpcClient';
+import { buildEtherscanLink } from '../../../modals/ManageCommunityStakeModal/utils';
 import CommunityInfo from '../common/CommunityInfo';
-import { stakeHistoryData } from '../common/sampleData'; // TODO: get data from API
 import { FilterOptions } from '../types';
 import './Stakes.scss';
 import { CWIcon } from '/views/components/component_kit/cw_icons/cw_icon';
@@ -51,48 +52,51 @@ const columnInfo = [
 
 type StakesProps = {
   filterOptions: FilterOptions;
+  addressFilter: string[];
 };
 
-const Stakes = ({ filterOptions }: StakesProps) => {
-  const [filteredStakeHistoryData, setFilteredStakeHistoryData] =
-    useState(stakeHistoryData);
+const Stakes = ({ filterOptions, addressFilter }: StakesProps) => {
+  const { data } = trpc.community.getStakeTransaction.useQuery({
+    addresses: addressFilter.join(','),
+  });
 
-  useEffect(() => {
-    let tempFilteredData = [...stakeHistoryData];
+  const WEI_PER_ETHER = 1000000000000000000;
+  let filteredData = !data
+    ? []
+    : data.map((t) => ({
+        community: t.community,
+        address: t.address,
+        stake: t.stake_amount,
+        voteWeight: t.stake_amount * t.vote_weight,
+        avgPrice: `${(
+          parseFloat(t.stake_price) /
+          WEI_PER_ETHER /
+          t.stake_amount
+        ).toFixed(5)} ETH`,
+        etherscanLink: buildEtherscanLink(t.transaction_hash),
+      }));
 
-    // filter by community name and symbol
-    if (filterOptions.searchText) {
-      tempFilteredData = tempFilteredData.filter((tx) =>
-        (tx.community.symbol + tx.community.name)
-          .toLowerCase()
-          .includes(filterOptions.searchText.toLowerCase()),
-      );
-    }
-
-    // filter by selected address
-    if (filterOptions?.selectedAddress?.value) {
-      tempFilteredData = tempFilteredData.filter(
-        (tx) =>
-          tx.address.toLowerCase() ===
-          filterOptions.selectedAddress.value.toLowerCase(),
-      );
-    }
-
-    setFilteredStakeHistoryData(tempFilteredData);
-  }, [filterOptions]);
+  // filter by community name and symbol
+  if (filterOptions.searchText) {
+    filteredData = filteredData.filter((tx) =>
+      (tx.community.default_symbol + tx.community.name)
+        .toLowerCase()
+        .includes(filterOptions.searchText.toLowerCase()),
+    );
+  }
 
   return (
     <section className="Stakes">
       <CWTable
         columnInfo={columnInfo}
-        rowData={filteredStakeHistoryData.map((tx) => ({
+        rowData={filteredData.map((tx) => ({
           ...tx,
           community: {
             sortValue: tx.community.name.toLowerCase(),
             customElement: (
               <CommunityInfo
-                symbol={tx.community.symbol}
-                iconUrl={tx.community.iconUrl}
+                symbol={tx.community.default_symbol}
+                iconUrl={tx.community.icon_url}
                 name={tx.community.name}
                 communityId={tx.community.id}
               />
