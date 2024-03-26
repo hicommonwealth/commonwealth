@@ -50,6 +50,7 @@ export const GetStakeTransaction = {
       stake_amount: z.number(),
       vote_weight: z.number(),
       timestamp: z.number(),
+      stake_direction: z.string(),
       community: z.object({
         id: z.string(),
         default_symbol: z.string(),

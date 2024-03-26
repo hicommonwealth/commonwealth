@@ -20,6 +20,7 @@ export const GetStakeTransaction: Query<
          t.stake_amount,
          cs.vote_weight,
          t.timestamp,
+         t.stake_direction,
          json_build_object(
            'id', c.id,
            'default_symbol', c.default_symbol,

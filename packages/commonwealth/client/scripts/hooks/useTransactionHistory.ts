@@ -26,6 +26,11 @@ const useTransactionHistory = ({
         address: t.address,
         stake: t.stake_amount,
         voteWeight: t.stake_amount * t.vote_weight,
+        timestamp: t.timestamp * 1000,
+        action: t.stake_direction === 'buy' ? 'mint' : 'burn',
+        totalPrice: `${(parseFloat(t.stake_price) / WEI_PER_ETHER).toFixed(
+          5,
+        )} ETH`,
         avgPrice: `${(
           parseFloat(t.stake_price) /
           WEI_PER_ETHER /

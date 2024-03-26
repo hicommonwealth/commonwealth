@@ -85,8 +85,8 @@ const Transactions = ({
             sortValue: tx.community.name.toLowerCase(),
             customElement: (
               <CommunityInfo
-                symbol={tx.community.symbol}
-                iconUrl={tx.community.iconUrl}
+                symbol={tx.community.default_symbol}
+                iconUrl={tx.community.icon_url}
                 name={tx.community.name}
                 communityId={tx.community.id}
               />
