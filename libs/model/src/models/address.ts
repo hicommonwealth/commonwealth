@@ -1,7 +1,6 @@
 import { WalletId, WalletSsoSource } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import { models } from '../database';
 import type { CommunityAttributes, CommunityInstance } from './community';
 import { MembershipAttributes } from './membership';
 import type { ProfileAttributes, ProfileInstance } from './profile';
@@ -151,7 +150,7 @@ export default (
           options: Sequelize.CreateOptions<AddressAttributes>,
         ) => {
           // when address created, increment Community.address_count
-          await models.sequelize.query(
+          await sequelize.query(
             `
             UPDATE "Communities"
             SET address_count = address_count + 1
@@ -170,7 +169,7 @@ export default (
           options: Sequelize.InstanceDestroyOptions,
         ) => {
           // when address deleted, decrement Community.address_count
-          await models.sequelize.query(
+          await sequelize.query(
             `
             UPDATE "Communities"
             SET address_count = address_count - 1

@@ -1,4 +1,5 @@
 import { isDeliverTxSuccess } from '@cosmjs/stargate';
+import { dispose } from '@hicommonwealth/core';
 import { tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import { CosmosApiType } from 'controllers/chain/cosmos/chain';
@@ -39,6 +40,10 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-local)', () 
     rpc = await getRPCClient(tm);
     const { signerAddress } = await setupTestSigner(rpcUrlBeta);
     signer = signerAddress;
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   const getActiveVotingProposals = async () => {
@@ -171,6 +176,11 @@ describe('Cosmos Governance v1beta1 util Tests', () => {
   before(async () => {
     await tester.seedDb();
   });
+
+  after(async () => {
+    await dispose()();
+  });
+
   describe('getActiveProposals', () => {
     it('should fetch active proposals (csdk-beta-local)', async () => {
       const id = 'csdk-beta-local'; // CI devnet for v1beta1

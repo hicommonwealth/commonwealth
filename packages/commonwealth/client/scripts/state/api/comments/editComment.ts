@@ -3,10 +3,11 @@ import axios from 'axios';
 import Comment from 'models/Comment';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
+import { UserProfile } from '../../../models/MinimumProfile';
 import useFetchCommentsQuery from './fetchComments';
 
 interface EditCommentProps {
-  address: string;
+  profile: UserProfile;
   communityId: string;
   parentCommentId: number | null;
   threadId: number;
@@ -15,7 +16,7 @@ interface EditCommentProps {
 }
 
 const editComment = async ({
-  address,
+  profile,
   communityId,
   parentCommentId,
   threadId,
@@ -26,7 +27,7 @@ const editComment = async ({
     session = null,
     action = null,
     hash = null,
-  } = await app.sessions.signComment(app.user.activeAccount.address, {
+  } = await app.sessions.signComment(profile.address, {
     thread_id: threadId,
     body: updatedBody,
     parent_comment_id: parentCommentId,
@@ -35,7 +36,7 @@ const editComment = async ({
   const response = await axios.patch(
     `${app.serverUrl()}/comments/${commentId}`,
     {
-      address: address,
+      address: profile.address,
       author_community_id: communityId,
       id: commentId,
       community_id: communityId,
@@ -46,6 +47,10 @@ const editComment = async ({
       canvas_hash: hash,
     },
   );
+
+  response.data.result.Address.User = {
+    Profiles: [profile],
+  };
 
   return new Comment(response.data.result);
 };

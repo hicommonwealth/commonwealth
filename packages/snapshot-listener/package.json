@@ -8,7 +8,7 @@
     "check-types": "tsc --noEmit",
     "lint-all": "eslint './**/*.ts'",
     "start": "ts-node-dev --max-old-space-size=4096 --respawn src/index.ts",
-    "test": "NODE_ENV=test ts-mocha --exit './test/**/*.spec.ts'"
+    "test": "NODE_ENV=test ts-mocha './test/**/*.spec.ts'"
   },
   "engines": {
     "node": "20.x"
