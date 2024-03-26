@@ -1,4 +1,4 @@
-import NodeInfo from 'client/scripts/models/NodeInfo';
+import NodeInfo from 'models/NodeInfo';
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWRelatedCommunityCard } from 'views/components/component_kit/new_designs/CWRelatedCommunityCard';

@@ -13,23 +13,32 @@ interface UseStakeAddressesProps {
 }
 
 const useStakeAddresses = ({ community }: UseStakeAddressesProps = {}) => {
-  let communityAddressInfo;
+  const communityAddresses = (() => {
+    if (community) {
+      // get all the addresses of the user that matches base chain of selected `community`
+      const userAddresses = app.user.addresses
+        .filter(
+          (addr) => addr.community.base === (community as ChainInfo)?.base,
+        )
+        .map((addr) => addr.address);
 
-  if (community) {
-    communityAddressInfo = app.user.addresses.find(
-      (addr) => addr.community.id === community.id,
-    );
-  }
+      // return all the unique addresses
+      return [...new Set(userAddresses)];
+    }
+
+    return null;
+  })();
 
   const activeAccountAddress =
-    communityAddressInfo?.address || app?.user?.activeAccount?.address;
+    communityAddresses?.[0] || app?.user?.activeAccount?.address;
 
-  const availableAddresses = communityAddressInfo
-    ? [communityAddressInfo]
-    : getAvailableAddressesForStakeExchange(
-        app.user.activeAccounts,
-        app.user.addresses,
-      );
+  const availableAddresses =
+    communityAddresses?.length > 0
+      ? communityAddresses.map((addr) => ({ address: addr }))
+      : getAvailableAddressesForStakeExchange(
+          app.user.activeAccounts,
+          app.user.addresses,
+        );
 
   const addressOptions = availableAddresses.map(({ address }) => ({
     label: address,

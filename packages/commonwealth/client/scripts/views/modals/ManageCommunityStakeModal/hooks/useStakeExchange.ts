@@ -1,6 +1,5 @@
 import { commonProtocol } from '@hicommonwealth/core';
-import ChainInfo from 'client/scripts/models/ChainInfo';
-import { CommunityData } from 'client/scripts/views/pages/DirectoryPage/DirectoryPageContent';
+import ChainInfo from 'models/ChainInfo';
 import app from 'state';
 import {
   useFetchEthUsdRateQuery,
@@ -9,6 +8,7 @@ import {
 } from 'state/api/communityStake';
 import useGetUserEthBalanceQuery from 'state/api/communityStake/getUserEthBalance';
 import { ManageCommunityStakeModalMode } from 'views/modals/ManageCommunityStakeModal/types';
+import { CommunityData } from 'views/pages/DirectoryPage/DirectoryPageContent';
 
 interface UseStakeExchangeProps {
   mode: ManageCommunityStakeModalMode;
