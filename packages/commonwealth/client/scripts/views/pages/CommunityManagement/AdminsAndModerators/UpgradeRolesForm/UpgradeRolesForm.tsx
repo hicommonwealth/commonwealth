@@ -1,8 +1,8 @@
 import { AccessLevel } from '@hicommonwealth/core';
+import updateRoles from 'client/scripts/state/api/members/updateRoles';
 import { formatAddressShort } from 'helpers';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import app from 'state';
-import upgradeRoles from 'state/api/members/upgradeRoles';
 import RoleInfo from '../../../../../models/RoleInfo';
 import { CWRadioGroup } from '../../../../components/component_kit/cw_radio_group';
 import { CWButton } from '../../../../components/component_kit/new_designs/cw_button';
@@ -18,6 +18,12 @@ type UpgradeRolesFormProps = {
   searchTerm: string;
   setSearchTerm: (v: string) => void;
   isLoadingProfiles: boolean;
+};
+
+type UpgradeRolesProps = {
+  onRoleUpdate: (oldRole: RoleInfo, newRole: RoleInfo) => any;
+  newRole: string;
+  upgradedUser: any;
 };
 
 export const UpgradeRolesForm = ({
@@ -36,7 +42,15 @@ export const UpgradeRolesForm = ({
     { id: 2, checked: false },
   ]);
 
+  let upgradedUser;
+  let newRole;
   const membersRef = useRef();
+  const { useUpgradeRolesMutation } = updateRoles;
+  const { mutateAsync: upgradeRole } = useUpgradeRolesMutation({
+    onRoleUpdate,
+    newRole,
+    upgradedUser,
+  });
 
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
@@ -65,10 +79,10 @@ export const UpgradeRolesForm = ({
   const handleUpgrade = async () => {
     const indexOfName = nonAdminNames.indexOf(user);
 
-    const upgradedUser = nonAdmins[indexOfName];
-    const newRole =
+    upgradedUser = nonAdmins[indexOfName];
+    newRole =
       role === 'Admin' ? 'admin' : role === 'Moderator' ? 'moderator' : '';
-    await upgradeRoles({ upgradedUser, onRoleUpdate, newRole });
+    await upgradeRole({ upgradedUser, onRoleUpdate, newRole });
     zeroOutRadioButtons();
   };
 

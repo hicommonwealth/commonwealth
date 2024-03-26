@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { notifyError } from 'controllers/app/notifications';
 import app from 'state';
 import RoleInfo from '../../../models/RoleInfo';
 
@@ -27,7 +26,7 @@ const removeRole = async ({ role, onRoleUpdate }: RemoveRoleProps) => {
     onRoleUpdate(role, newRole);
   } catch (err) {
     const errMsg = err.response?.data?.error || 'Failed to alter role.';
-    notifyError(errMsg);
+    throw new Error(errMsg);
   }
 };
 
