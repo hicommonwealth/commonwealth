@@ -14,7 +14,7 @@ import type {
 } from '@hicommonwealth/model';
 import type { Response } from 'express';
 import { Op, QueryTypes } from 'sequelize';
-import { TypedRequest } from 'server/types';
+import { TypedRequest } from '../types';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
 

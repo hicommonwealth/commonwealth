@@ -1,9 +1,9 @@
 import type { DB } from '@hicommonwealth/model';
 import { ProfileAttributes } from '@hicommonwealth/model';
 import type { NextFunction } from 'express';
-import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { failure, success } from '../types';
+import { sanitizeQuillText } from '../util/sanitizeQuillText';
 
 export const Errors = {
   NotAuthorized: 'Not authorized',

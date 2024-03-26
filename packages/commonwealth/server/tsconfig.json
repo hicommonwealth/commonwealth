@@ -1,0 +1,20 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "rootDir": ".",
+    "outDir": "build",
+    "baseUrl": ".",
+    "paths": {
+      "@hicommonwealth/*": ["../../libs/*/src"]
+    }
+  },
+  "include": ["."],
+  "references": [
+    { "path": "../../libs/adapters" },
+    { "path": "../../libs/chains" },
+    { "path": "../../libs/core" },
+    { "path": "../../libs/model" }
+  ]
+}
