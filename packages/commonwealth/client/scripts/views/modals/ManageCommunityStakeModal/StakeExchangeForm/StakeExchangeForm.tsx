@@ -119,7 +119,7 @@ const StakeExchangeForm = ({
         ethChainId,
       });
 
-      await createStakeTransaction.mutate({
+      await createStakeTransaction.mutateAsync({
         id: '1',
         transaction_hash: txReceipt.transactionHash,
         community_id: app.activeChainId(),
@@ -153,7 +153,7 @@ const StakeExchangeForm = ({
         ethChainId,
       });
 
-      await createStakeTransaction.mutate({
+      await createStakeTransaction.mutateAsync({
         id: '1',
         transaction_hash: txReceipt.transactionHash,
         community_id: app.activeChainId(),
