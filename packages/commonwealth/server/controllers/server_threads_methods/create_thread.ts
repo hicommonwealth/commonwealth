@@ -236,7 +236,7 @@ export async function __createThread(
   const excludedAddrs = (mentionedAddresses || []).map((addr) => addr.address);
   excludedAddrs.push(finalThread.Address.address);
 
-  // dispatch notifications to subscribers of the given chain
+  // dispatch notifications to subscribers of the given community
   const allNotificationOptions: EmitOptions[] = [];
 
   allNotificationOptions.push({

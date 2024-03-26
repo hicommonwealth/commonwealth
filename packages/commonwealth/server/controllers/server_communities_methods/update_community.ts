@@ -198,9 +198,9 @@ export async function __updateCommunity(
     community.custom_stages = custom_stages;
   }
   if (typeof terms === 'string') community.terms = terms;
-  if (has_homepage) community.has_homepage = has_homepage;
+  if (has_homepage === 'true') community.has_homepage = has_homepage;
   if (default_page) {
-    if (!has_homepage) {
+    if (has_homepage !== 'true') {
       throw new AppError(Errors.InvalidDefaultPage);
     } else {
       community.default_page = default_page;
@@ -236,17 +236,17 @@ export async function __updateCommunity(
       throw new AppError(Errors.InvalidTransactionHash);
     }
 
-    const ownerOfChain = addresses.find(
+    const ownerOfCommunity = addresses.find(
       (a) => a.community_id === community.id && a.role === 'admin',
     );
-    if (!ownerOfChain) {
+    if (!ownerOfCommunity) {
       throw new AppError(Errors.NotAdmin);
     }
 
     await commonProtocol.newNamespaceValidator.validateNamespace(
       namespace,
       transactionHash,
-      ownerOfChain.address,
+      ownerOfCommunity.address,
       community,
     );
 

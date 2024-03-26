@@ -1,11 +1,8 @@
+import { schemas } from '@hicommonwealth/core';
 import { CommunityInstance } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from '../../types';
-import {
-  PaginationSqlOptions,
-  buildPaginatedResponse,
-  buildPaginationSql,
-} from '../../util/queries';
+import { PaginationSqlOptions, buildPaginationSql } from '../../util/queries';
 import { ServerCommentsController } from '../server_comments_controller';
 
 export type SearchCommentsOptions = {
@@ -132,5 +129,5 @@ export async function __searchComments(
 
   const totalResults = parseInt(count, 10);
 
-  return buildPaginatedResponse(results, totalResults, bind);
+  return schemas.queries.buildPaginatedResponse(results, totalResults, bind);
 }

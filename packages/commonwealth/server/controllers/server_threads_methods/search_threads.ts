@@ -1,10 +1,10 @@
+import { ALL_COMMUNITIES, schemas } from '@hicommonwealth/core';
 import { ThreadAttributes } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from '../../types';
 import {
   PaginationSqlBind,
   PaginationSqlOptions,
-  buildPaginatedResponse,
   buildPaginationSql,
 } from '../../util/queries';
 import { ServerThreadsController } from '../server_threads_controller';
@@ -19,9 +19,7 @@ export type SearchThreadsOptions = {
   orderDirection?: 'ASC' | 'DESC';
 };
 
-type ThreadSearchData = Omit<ThreadAttributes, 'chain'> & {
-  community_id: string;
-};
+type ThreadSearchData = ThreadAttributes;
 
 export type SearchThreadsResult =
   | TypedPaginatedResult<ThreadSearchData[]>
@@ -71,7 +69,7 @@ export async function __searchThreads(
     searchTerm: searchTerm,
     ...paginationBind,
   };
-  if (communityId) {
+  if (communityId && communityId !== ALL_COMMUNITIES) {
     bind.community = communityId;
   }
 
@@ -93,7 +91,7 @@ export async function __searchThreads(
       'thread' as type,
       "Addresses".id as address_id,
       "Addresses".address,
-      "Addresses".community_id as address_chain,
+      "Addresses".community_id as address_community_id,
       "Threads".created_at,
       "Threads".community_id as community_id,
       ts_rank_cd("Threads"._search, query) as rank
@@ -132,5 +130,5 @@ export async function __searchThreads(
 
   const totalResults = parseInt(count, 10);
 
-  return buildPaginatedResponse(results, totalResults, bind);
+  return schemas.queries.buildPaginatedResponse(results, totalResults, bind);
 }

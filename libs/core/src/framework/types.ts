@@ -1,5 +1,5 @@
 import z, { ZodSchema, ZodUndefined } from 'zod';
-import { events } from '../schemas';
+import { Events, events } from '../schemas';
 
 /**
  * Error names as constants
@@ -7,6 +7,15 @@ import { events } from '../schemas';
 export const INVALID_INPUT_ERROR = 'Invalid Input Error';
 export const INVALID_ACTOR_ERROR = 'Invalid Actor Error';
 export const INVALID_STATE_ERROR = 'Invalid State Error';
+
+/**
+ * Deep partial utility
+ */
+export type DeepPartial<T> = T extends Array<infer I>
+  ? Array<DeepPartial<I>>
+  : T extends object
+  ? { [K in keyof T]?: DeepPartial<T[K]> }
+  : T;
 
 /**
  * Represents a user in the system with attributes commonly provided by authentication infrastructure
@@ -99,9 +108,9 @@ export type QueryContext<Input extends ZodSchema> = {
  * - `name`: event name
  * - `payload`: validated event payload
  */
-export type EventContext<Name extends events.Events> = {
+export type EventContext<Name extends Events> = {
   readonly name: Name;
-  readonly payload: z.infer<typeof events.schemas[Name]>;
+  readonly payload: z.infer<typeof events[Name]>;
 };
 
 /**
@@ -135,7 +144,7 @@ export type QueryHandler<Input extends ZodSchema, Output extends ZodSchema> = (
  * @returns may return updated state - side effects
  */
 export type EventHandler<
-  Name extends events.Events,
+  Name extends Events,
   Output extends ZodSchema | ZodUndefined,
 > = (context: EventContext<Name>) => Promise<Partial<z.infer<Output>> | void>;
 
@@ -177,7 +186,7 @@ export type QueryMetadata<Input extends ZodSchema, Output extends ZodSchema> = {
  * Domain event schemas
  */
 export type EventSchemas = {
-  [Name in events.Events]?: typeof events.schemas[Name];
+  [Name in Events]?: typeof events[Name];
 };
 
 /**
@@ -193,7 +202,7 @@ export type EventsHandlerMetadata<
   readonly inputs: Inputs;
   readonly output?: Output;
   readonly body: {
-    readonly [Name in keyof Inputs & events.Events]: EventHandler<Name, Output>;
+    readonly [Name in keyof Inputs & Events]: EventHandler<Name, Output>;
   };
 };
 

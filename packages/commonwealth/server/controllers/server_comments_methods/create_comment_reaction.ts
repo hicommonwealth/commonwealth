@@ -128,16 +128,16 @@ export async function __createCommentReaction(
       const node = await this.models.ChainNode.findByPk(
         community.chain_node_id,
       );
-      const stakeBalance =
+      const stakeBalances =
         await commonProtocolService.contractHelpers.getNamespaceBalance(
           community.namespace,
           stake.stake_id,
           node.eth_chain_id,
-          address.address,
+          [address.address],
           node.url,
         );
       calculatedVotingWeight = commonProtocol.calculateVoteWeight(
-        stakeBalance,
+        stakeBalances[address.address],
         voteWeight,
       );
     }

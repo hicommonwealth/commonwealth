@@ -83,11 +83,9 @@ import type ViewCountCache from '../util/viewCountCache';
 import type { DB } from '@hicommonwealth/model';
 import authCallback from '../routes/authCallback';
 import banAddress from '../routes/banAddress';
-import finishSsoLogin from '../routes/finishSsoLogin';
 import getBannedAddresses from '../routes/getBannedAddresses';
 import setAddressWallet from '../routes/setAddressWallet';
 import { sendMessage } from '../routes/snapshotAPI';
-import startSsoLogin from '../routes/startSsoLogin';
 import updateAddress from '../routes/updateAddress';
 import viewCommunityIcons from '../routes/viewCommunityIcons';
 import type BanCache from '../util/banCheckCache';
@@ -98,6 +96,7 @@ import generateImage from '../routes/generateImage';
 import getDiscordChannels from '../routes/getDiscordChannels';
 import getSnapshotProposal from '../routes/getSnapshotProposal';
 import { getSubscribedCommunities } from '../routes/getSubscribedCommunities';
+import removeDiscordBotConfig from '../routes/removeDiscordBotConfig';
 import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 import type GlobalActivityCache from '../util/globalActivityCache';
 
@@ -349,6 +348,7 @@ function setupRouter(
     '/communities',
     getCommunitiesHandler.bind(this, serverControllers),
   );
+
   registerRoute(
     router,
     'get',
@@ -1093,6 +1093,7 @@ function setupRouter(
     router,
     'post',
     '/setDiscordBotConfig',
+    passport.authenticate('jwt', { session: false }),
     setDiscordBotConfig.bind(this, models),
   );
   registerRoute(
@@ -1102,6 +1103,14 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateCommunity,
     getDiscordChannels.bind(this, models),
+  );
+  registerRoute(
+    router,
+    'post',
+    '/removeDiscordBotConfig',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateCommunity,
+    removeDiscordBotConfig.bind(this, models),
   );
 
   registerRoute(
@@ -1179,15 +1188,6 @@ function setupRouter(
     (req, res) => {
       return res.json({ status: 'Success', result: req.user.toJSON() });
     },
-  );
-
-  registerRoute(router, 'post', '/auth/sso', startSsoLogin.bind(this, models));
-  registerRoute(
-    router,
-    'post',
-    '/auth/sso/callback',
-    // passport.authenticate('jwt', { session: false }),
-    finishSsoLogin.bind(this, models),
   );
 
   registerRoute(

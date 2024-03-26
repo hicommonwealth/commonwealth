@@ -45,7 +45,7 @@ const updateNewProfile = async (
     req.body;
 
   let { bio } = req.body;
-  bio = sanitizeQuillText(bio, true);
+  bio = sanitizeQuillText(bio);
 
   if (profile.user_id !== req.user.id) {
     return next(new Error(Errors.NotAuthorized));

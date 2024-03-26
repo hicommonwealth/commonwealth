@@ -1,10 +1,7 @@
+import { schemas } from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from '../../types';
-import {
-  PaginationSqlOptions,
-  buildPaginatedResponse,
-  buildPaginationSql,
-} from '../../util/queries';
+import { PaginationSqlOptions, buildPaginationSql } from '../../util/queries';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 export type SearchCommunitiesOptions = {
@@ -86,5 +83,5 @@ export async function __searchCommunities(
 
   const totalResults = parseInt(count, 10);
 
-  return buildPaginatedResponse(results, totalResults, bind);
+  return schemas.queries.buildPaginatedResponse(results, totalResults, bind);
 }

@@ -1,0 +1,35 @@
+@import '../../../../../../styles/shared';
+
+.CommunityInfo {
+  padding: 0;
+  margin: 0;
+  text-decoration: none;
+  color: initial;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  cursor: pointer;
+
+  &:focus,
+  &:active,
+  &:hover,
+  &:visited {
+    outline: none;
+    text-decoration: none;
+  }
+
+  .info-container {
+    display: flex;
+    flex-direction: column;
+
+    .symbol {
+      color: $neutral-800 !important;
+    }
+
+    .name {
+      color: $neutral-500 !important;
+    }
+  }
+}

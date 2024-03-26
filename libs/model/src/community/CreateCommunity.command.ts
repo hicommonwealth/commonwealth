@@ -1,12 +1,12 @@
 import type { Command } from '@hicommonwealth/core';
-import { community } from '@hicommonwealth/core';
+import { schemas } from '@hicommonwealth/core';
 import { models } from '../database';
 import { mustNotExist } from '../middleware/guards';
 
 export const CreateCommunity: Command<
-  typeof community.CreateCommunity
+  typeof schemas.commands.CreateCommunity
 > = () => ({
-  ...community.CreateCommunity,
+  ...schemas.commands.CreateCommunity,
   auth: [],
   body: async ({ id, payload }) => {
     console.log(payload); // TODO: remove

@@ -1,5 +1,3 @@
-import { TypedPaginatedResult } from '../types';
-
 /*
 These methods are for generating the sequelize formatting for
 different types of query options. Enumerated methods here
@@ -79,17 +77,3 @@ export const buildPaginationSql = (
   }
   return { sql, bind };
 };
-
-export function buildPaginatedResponse<T>(
-  items: T[],
-  totalResults: number,
-  bind: PaginationSqlBind,
-): TypedPaginatedResult<T> {
-  return {
-    results: items,
-    limit: bind.limit,
-    page: Math.floor(bind.offset / bind.limit) + 1,
-    totalPages: Math.floor(totalResults / bind.limit) + 1,
-    totalResults,
-  };
-}
