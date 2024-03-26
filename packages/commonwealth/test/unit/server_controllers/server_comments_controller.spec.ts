@@ -8,9 +8,9 @@ import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
 
 describe('ServerCommentsController', () => {
   beforeEach(() => {
-    Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves(
-      '0',
-    );
+    Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves({
+      '0x123': '0',
+    });
   });
   afterEach(() => {
     Sinon.restore();

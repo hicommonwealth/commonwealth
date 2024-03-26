@@ -1,3 +1,4 @@
+import { dispose } from '@hicommonwealth/core';
 import { CommentInstance, models, tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { getCommentDepth } from 'server/util/getCommentDepth';
@@ -33,6 +34,10 @@ describe('getCommentDepth', () => {
       comments.push(result);
       comment = result;
     }
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   it('should correctly calculate comment depth (recursion terminated naturally)', async () => {

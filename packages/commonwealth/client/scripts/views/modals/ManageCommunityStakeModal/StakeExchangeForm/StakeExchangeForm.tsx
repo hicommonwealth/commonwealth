@@ -29,6 +29,7 @@ import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelec
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { trpc } from '../../../../utils/trpcClient';
 import { useStakeExchange } from '../hooks';
 import {
   ManageCommunityStakeModalMode,
@@ -87,6 +88,8 @@ const StakeExchangeForm = ({
   const { stakeBalance, stakeValue, currentVoteWeight, stakeData } =
     useCommunityStake({ walletAddress: selectedAddress?.value });
 
+  const createStakeTransaction =
+    trpc.community.createStakeTransaction.useMutation();
   const { mutateAsync: buyStake } = useBuyStakeMutation();
   const { mutateAsync: sellStake } = useSellStakeMutation();
 
@@ -116,6 +119,12 @@ const StakeExchangeForm = ({
         ethChainId,
       });
 
+      await createStakeTransaction.mutate({
+        id: '1',
+        transaction_hash: txReceipt.transactionHash,
+        community_id: app.activeChainId(),
+      });
+
       onSetSuccessTransactionHash(txReceipt?.transactionHash);
       onSetModalState(ManageCommunityStakeModalState.Success);
 
@@ -142,6 +151,12 @@ const StakeExchangeForm = ({
         chainRpc,
         walletAddress: selectedAddress?.value,
         ethChainId,
+      });
+
+      await createStakeTransaction.mutate({
+        id: '1',
+        transaction_hash: txReceipt.transactionHash,
+        community_id: app.activeChainId(),
       });
 
       onSetSuccessTransactionHash(txReceipt?.transactionHash);
