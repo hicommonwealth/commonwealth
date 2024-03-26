@@ -1,6 +1,14 @@
 // An eslint 'canary' that verifies that eslint-diff properly handles errors
 // during the build.  If we don't actually *test* that we fail properly then
 // it's possible we added an eslint rule that doesn't actually do anything
+//
+// The way this works is that this file uses a .ts.disabled suffix when in the
+// repo then we rename it to .ts and run eslint but only in CI.  Then we verify
+// the eslint-diff output is correct vs a snapshot.
+//
+// To update the snapshot just run lint-diff-canary and run
+//
+// cp test/canary/eslint_canary.log test/canary/eslint_canary.snap
 
 // *****************************************************************************
 // no-restricted-imports: import from outside the project root
