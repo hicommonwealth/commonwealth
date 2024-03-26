@@ -43,6 +43,7 @@ export type BulkThreadsRequestQuery = {
   to_date?: string;
   archived?: string;
 };
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type GetThreadsResponse = any;
 
 export const getThreadsHandler = async (
