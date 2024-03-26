@@ -195,7 +195,7 @@ export const CWContentPage = ({
         threadStage={stageLabel}
         archivedAt={thread?.archivedAt}
         isHot={isHot(thread)}
-        profile={thread.profile}
+        profile={thread?.profile}
       />
     </div>
   );
