@@ -2,7 +2,8 @@
 // during the build.  If we don't actually *test* that we fail properly then
 // it's possible we added an eslint rule that doesn't actually do anything
 
-// ***** import from outside the project root
+// *****************************************************************************
+// no-restricted-imports: import from outside the project root
 
 import { ServerError } from '../../../../libs/core/src/errors';
 
@@ -10,3 +11,12 @@ import { ServerError } from '../../../../libs/core/src/errors';
 function doSomething() {
   throw new ServerError('required or prettier will remove');
 }
+
+// *****************************************************************************
+// @typescript-eslint/require-await
+// @typescript-eslint/no-floating-promises
+async function doAsync() {
+  console.log('My async function');
+}
+
+doAsync();
