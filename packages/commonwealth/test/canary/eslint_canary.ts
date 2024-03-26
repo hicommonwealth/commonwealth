@@ -3,3 +3,9 @@
 // it's possible we added an eslint rule that doesn't actually do anything
 
 // ***** import from outside the project root
+
+import { ServerError } from '../../../../libs/core/src/errors';
+
+function doSomething() {
+  throw new ServerError('required or prettier will remove');
+}
