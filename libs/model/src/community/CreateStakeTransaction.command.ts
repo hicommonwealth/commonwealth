@@ -25,7 +25,7 @@ export const CreateStakeTransaction: Command<
     });
 
     if (existingTransactions) {
-      return existingTransactions.toJSON();
+      return existingTransactions?.get({ plain: true });
     }
 
     // newTransactionIds are the remaining transactions that we must query web3 for.
@@ -123,6 +123,6 @@ export const CreateStakeTransaction: Command<
       timestamp: timestamp,
     });
 
-    return stakeAggregate?.toJSON();
+    return stakeAggregate?.get({ plain: true });
   },
 });
