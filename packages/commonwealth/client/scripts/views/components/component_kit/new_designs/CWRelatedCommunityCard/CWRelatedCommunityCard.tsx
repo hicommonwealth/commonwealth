@@ -65,8 +65,8 @@ export const CWRelatedCommunityCard = ({
     [navigate, trackAnalytics, community.id],
   );
 
-  const handleBuyStakeClick = async () => {
-    await onStakeBtnClick?.();
+  const handleBuyStakeClick = () => {
+    onStakeBtnClick?.();
     setModeOfManageCommunityStakeModal('buy');
     setSelectedCommunity(community);
   };
@@ -79,9 +79,9 @@ export const CWRelatedCommunityCard = ({
       buttonHeight="sm"
       buttonWidth="narrow"
       disabled={!isLoggedIn}
-      onClick={async (e) => {
+      onClick={(e) => {
         e.stopPropagation();
-        await handleBuyStakeClick();
+        handleBuyStakeClick();
       }}
     />
   );
