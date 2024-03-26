@@ -368,7 +368,7 @@ const CommunityMembersPage = () => {
           filteredMembers={formattedMembers}
           onLoadMoreMembers={() => {
             if (members?.pages?.[0]?.totalResults > formattedMembers.length) {
-              fetchNextPage?.();
+              fetchNextPage?.().catch(console.error);
             }
           }}
           isLoadingMoreMembers={isLoadingMembers}
