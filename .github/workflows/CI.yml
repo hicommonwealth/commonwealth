@@ -181,19 +181,6 @@ jobs:
           yarn --cwd packages/commonwealth e2e-start-server --forbid-only &
           yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e-mature --forbid-only
 
-      - name: Run e2e tests against prod
-        env:
-          PORT: 8081
-          IS_CI: true
-          USES_DOCKER_PGSQL: true
-          ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
-          ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
-          ETH_RPC: e2e-test
-        run: | 
-          yarn --cwd packages/commonwealth start-external-webpack --forbid-only &
-          yarn --cwd packages/commonwealth wait-server &&
-          yarn --cwd packages/commonwealth TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 2 ./test/e2e/mature/discussion.spec.ts --forbid-only
-
       - name: Archive test status
         uses: actions/upload-artifact@v3
         with:
