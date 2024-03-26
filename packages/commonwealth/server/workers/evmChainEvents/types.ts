@@ -1,4 +1,5 @@
 import { AbiType } from '@hicommonwealth/core';
+import { EvmEventSourceAttributes } from '@hicommonwealth/model';
 import { ethers } from 'ethers';
 
 export type RawEvmEvent = {
@@ -10,8 +11,7 @@ export type RawEvmEvent = {
 
 export type AbiSignatures = {
   abi: AbiType;
-  // TODO: change this to a set when kind is removed
-  sources: { event_signature: string; kind: string }[];
+  sources: EvmEventSourceAttributes[];
 };
 
 export type ContractSources = {

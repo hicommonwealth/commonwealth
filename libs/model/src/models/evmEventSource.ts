@@ -1,6 +1,7 @@
 import Sequelize, { DataTypes } from 'sequelize';
 import { ChainNodeAttributes } from './chain_node';
 import { ContractAttributes } from './contract';
+import { ContractAbiAttributes } from './contract_abi';
 import { ModelInstance, ModelStatic } from './types';
 
 export type EvmEventSourceAttributes = {
@@ -9,7 +10,12 @@ export type EvmEventSourceAttributes = {
   contract_address: string;
   event_signature: string;
   kind: string;
+  created_at_block: number;
+  events_migrate: boolean;
+  active: boolean;
+  abi_id: number;
 
+  ContractAbi: ContractAbiAttributes;
   Contract?: ContractAttributes;
   ChainNode?: ChainNodeAttributes;
 };
@@ -38,6 +44,14 @@ export default (
         contract_address: { type: dataTypes.STRING, allowNull: false },
         event_signature: { type: dataTypes.STRING, allowNull: false },
         kind: { type: dataTypes.STRING, allowNull: false },
+        created_at_block: { type: dataTypes.INTEGER, allowNull: true },
+        events_migrated: { type: dataTypes.BOOLEAN, allowNull: true },
+        active: {
+          type: dataTypes.BOOLEAN,
+          allowNull: true,
+          defaultValue: true,
+        },
+        abi_id: { type: dataTypes.INTEGER, allowNull: false },
       },
       {
         tableName: 'EvmEventSources',
@@ -55,6 +69,10 @@ export default (
   EvmEventSource.associate = (models: any) => {
     models.EvmEventSource.belongsTo(models.ChainNode, {
       foreignKey: 'chain_node_id',
+      targetKey: 'id',
+    });
+    models.EvmEventSource.belongsTo(models.ContractAbi, {
+      foreignKey: 'abi_id',
       targetKey: 'id',
     });
   };
