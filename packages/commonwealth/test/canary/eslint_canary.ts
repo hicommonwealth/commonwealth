@@ -6,6 +6,7 @@
 
 import { ServerError } from '../../../../libs/core/src/errors';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function doSomething() {
   throw new ServerError('required or prettier will remove');
 }
