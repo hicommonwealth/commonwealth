@@ -1,7 +1,6 @@
 import 'Sublayout.scss';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
-import { useFlag } from 'hooks/useFlag';
 import useForceRerender from 'hooks/useForceRerender';
 import useWindowResize from 'hooks/useWindowResize';
 import React, { useEffect, useState } from 'react';
@@ -14,7 +13,6 @@ import { SublayoutBanners } from './SublayoutBanners';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
-import { StakeGrowl } from './components/StakeGrowl';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
 
 type SublayoutProps = {
@@ -34,7 +32,6 @@ const Sublayout = ({
     onResize: () => setResizing(true),
     resizeListenerUpdateDeps: [resizing],
   });
-  const communityStakeEnabled = useFlag('communityStake');
 
   const { toggleMobileView } = useWindowResize({
     setMenu,
@@ -110,7 +107,6 @@ const Sublayout = ({
             {!app.isCustomDomain() && !hideFooter && <Footer />}
           </div>
         </div>
-        {communityStakeEnabled && !isWindowExtraSmall && <StakeGrowl />}
       </div>
       {isWindowExtraSmall && <MobileNavigation />}
     </div>

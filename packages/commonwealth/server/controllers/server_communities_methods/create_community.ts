@@ -379,7 +379,7 @@ export async function __createCommunity(
     token_name,
     has_chain_events_listener: network === 'aave' || network === 'compound',
     default_page: DefaultPage.Homepage,
-    has_homepage: true,
+    has_homepage: 'true',
   });
 
   const nodeJSON = node.toJSON();
