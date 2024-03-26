@@ -1,7 +1,7 @@
 {
   "name": "@hicommonwealth/model",
   "private": "true",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "description": "Core Model - Server Side",
   "files": [
     "build"
@@ -26,6 +26,8 @@
     "web3": "1.8.2",
     "web3-core": "1.8.2",
     "web3-utils": "1.8.2",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "@hicommonwealth/core": "0.0.0",
+    "@hicommonwealth/chains": "0.0.0"
   }
 }
