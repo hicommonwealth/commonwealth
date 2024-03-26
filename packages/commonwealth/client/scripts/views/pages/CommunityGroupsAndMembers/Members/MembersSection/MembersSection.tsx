@@ -35,14 +35,14 @@ const MembersSection = ({
         header: 'Name',
         hasCustomSortValue: true,
         numeric: false,
-        sortable: true,
+        sortable: false,
       },
       {
         key: 'groups',
         header: 'Groups',
         hasCustomSortValue: true,
         numeric: false,
-        sortable: true,
+        sortable: false,
       },
     ];
     if (isStakedCommunity) {
@@ -51,7 +51,7 @@ const MembersSection = ({
         header: 'Stake',
         hasCustomSortValue: true,
         numeric: true,
-        sortable: true,
+        sortable: false,
       });
     }
     return c;
