@@ -97,7 +97,9 @@ const StakeExchangeForm = ({
   const { stakeBalance, stakeValue, currentVoteWeight, stakeData } =
     useCommunityStake({ walletAddress: selectedAddress?.value, community });
 
-  const { mutateAsync: buyStake } = useBuyStakeMutation();
+  const { mutateAsync: buyStake } = useBuyStakeMutation({
+    shouldUpdateActiveAddress: !community, // only update active address if buying stake in an active community
+  });
   const { mutateAsync: sellStake } = useSellStakeMutation();
 
   const expectedVoteWeight = commonProtocol.calculateVoteWeight(
