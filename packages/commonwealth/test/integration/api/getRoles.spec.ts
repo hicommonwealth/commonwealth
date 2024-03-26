@@ -31,8 +31,7 @@ describe('get roles Integration Tests', () => {
     );
   });
 
-  // TODO: investigate why test server not handling error in pipeline
-  it.skip('should return an error response if there is an invalid chain specified', async () => {
+  it('should return an error response if there is an invalid chain specified', async () => {
     const invalidRequest = {
       jwt: jwtToken,
       author_chain: server.e2eTestEntities.testAddresses[0].community_id,
@@ -44,8 +43,7 @@ describe('get roles Integration Tests', () => {
     chai.assert.equal(response.error, 'Community does not exist');
   });
 
-  // TODO: investigate why test server not handling error in pipeline
-  it.skip('should return an error response if an invalid permission is specified', async () => {
+  it('should return an error response if an invalid permission is specified', async () => {
     const invalidRequest = {
       jwt: jwtToken,
       author_chain: server.e2eTestEntities.testAddresses[0].community_id,

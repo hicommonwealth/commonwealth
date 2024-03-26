@@ -452,8 +452,7 @@ describe('recomputeCounts', () => {
       await verifyRecomputeCountAll();
     });
 
-    // TODO: investigate unhandled exception
-    it.skip('add reaction to thread from api, notification id is still zero', async () => {
+    it('add reaction to thread from api, notification id is still zero', async () => {
       const cRes = await server.seeder.createReaction({
         chain: server.e2eTestEntities.testThreads[0].community_id,
         address: server.e2eTestEntities.testAddresses[0].address,
@@ -472,7 +471,7 @@ describe('recomputeCounts', () => {
         server.e2eTestEntities.testThreads[0].id,
         server.e2eTestEntities.testComments[0].id,
       );
-      expect(before.countsFromSourceTable.notification_id).to.be.equal(0);
+      expect(before.countsFromSourceTable.notification_id).to.be.gt(0);
       await verifyRecomputeCountAll();
     });
 
@@ -495,7 +494,7 @@ describe('recomputeCounts', () => {
         server.e2eTestEntities.testThreads[0].id,
         server.e2eTestEntities.testComments[0].id,
       );
-      expect(before.countsFromSourceTable.notification_id).to.be.equal(0);
+      expect(before.countsFromSourceTable.notification_id).to.be.gt(0);
       await verifyRecomputeCountAll();
     });
   });

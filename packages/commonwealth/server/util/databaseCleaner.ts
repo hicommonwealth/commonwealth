@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
  * the cleaning functions to run at a specific hour each day as defined by the `hourToRun` constructor argument. This
  * class uses UTC so that deployments/execution in various timezones does not affect functionality.
  */
-export default class DatabaseCleaner {
+export class DatabaseCleaner {
   private readonly log = logger().getLogger(__filename);
   private _models: DB;
   private _timeToRun: Date;
@@ -331,5 +331,3 @@ export default class DatabaseCleaner {
     return this._timeoutID;
   }
 }
-
-export const databaseCleaner = new DatabaseCleaner();

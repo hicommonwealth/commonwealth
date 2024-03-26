@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../../constants';
 import { ChainBase, ChainType, CommunityCategoryType } from '../../types';
 import { ALL_COMMUNITIES, checkIconSize } from '../../utils';
-import { Community, StakeTransaction } from '../entities.schemas';
+import { Community, Group, StakeTransaction } from '../entities.schemas';
 
 export const CreateCommunity = {
   input: z.object({
@@ -95,4 +95,12 @@ export const UpdateCommunity = {
     address: z.string(),
   }),
   output: Community,
+};
+
+export const GenerateStakeholderGroups = {
+  input: z.object({}),
+  output: z.object({
+    groups: z.array(Group),
+    created: z.boolean(),
+  }),
 };

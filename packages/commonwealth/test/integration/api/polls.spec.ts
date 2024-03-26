@@ -102,8 +102,7 @@ describe('Polls', () => {
     pollId = res.body.result.id;
   });
 
-  // TODO: investigate why test server not handling error in pipeline
-  it.skip('should fail to cast a vote with invalid option', async () => {
+  it('should fail to cast a vote with invalid option', async () => {
     const data = {
       option: 'optionC',
     };

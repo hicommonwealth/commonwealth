@@ -7,6 +7,7 @@ export const trpcRouter = trpc.router({
   getStakeHistoricalPrice: trpc.query(Community.GetStakeHistoricalPrice),
   setStake: trpc.command(Community.SetCommunityStake, trpc.Tag.Community),
   createGroup: trpc.command(Community.CreateGroup, trpc.Tag.Community),
+  getMembers: trpc.query(Community.GetMembers),
   createStakeTransaction: trpc.command(
     Community.CreateStakeTransaction,
     trpc.Tag.Community,
