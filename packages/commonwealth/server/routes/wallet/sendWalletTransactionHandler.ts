@@ -31,7 +31,7 @@ export const sendWalletTransactionHandler = async (
   if (!validChainIds.includes(req.body.chainId)) {
     throw new AppError('Chain not supported for smart accounts');
   }
-
+  // Is there a point of validating via session keys or is passport user validation redundant
   const userWallet = await models.Wallets.findOne({
     where: {
       user_id: req.user?.id,
