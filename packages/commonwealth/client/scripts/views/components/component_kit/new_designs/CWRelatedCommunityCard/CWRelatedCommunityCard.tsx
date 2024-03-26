@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { isCommandClick, pluralizeWithoutNumberPrefix } from 'helpers';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import type ChainInfo from 'models/ChainInfo';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback } from 'react';
@@ -15,6 +16,7 @@ import { CWCommunityAvatar } from '../../cw_community_avatar';
 import { CWIcon } from '../../cw_icons/cw_icon';
 import { CWText } from '../../cw_text';
 import { ComponentType } from '../../types';
+import { CWTooltip } from '../CWTooltip';
 import { CWButton } from '../cw_button';
 import './CWRelatedCommunityCard.scss';
 import { addPeriodToText } from './utils';
@@ -35,6 +37,7 @@ export const CWRelatedCommunityCard = ({
   onStakeBtnClick,
 }: CWRelatedCommunityCardProps) => {
   const navigate = useCommonNavigate();
+  const { isLoggedIn } = useUserLoggedIn();
   const { stakeEnabled, stakeValue } = useCommunityStake({
     community: community,
   });
@@ -67,6 +70,21 @@ export const CWRelatedCommunityCard = ({
     setModeOfManageCommunityStakeModal('buy');
     setSelectedCommunity(community);
   };
+
+  const stakeButton = (
+    <CWButton
+      label="Buy Stake"
+      buttonType="secondary"
+      buttonAlt="green"
+      buttonHeight="sm"
+      buttonWidth="narrow"
+      disabled={!isLoggedIn}
+      onClick={(e) => {
+        e.stopPropagation();
+        handleBuyStakeClick();
+      }}
+    />
+  );
 
   return (
     <div
@@ -141,17 +159,22 @@ export const CWRelatedCommunityCard = ({
         </div>
         {stakeEnabled && (
           <div className="actions">
-            <CWButton
-              label="Buy Stake"
-              buttonType="secondary"
-              buttonAlt="green"
-              buttonHeight="sm"
-              buttonWidth="narrow"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleBuyStakeClick();
-              }}
-            />
+            {!isLoggedIn ? (
+              <CWTooltip
+                placement="right"
+                content="Login to buy stakes"
+                renderTrigger={(handleInteraction) => (
+                  <span
+                    onMouseEnter={handleInteraction}
+                    onMouseLeave={handleInteraction}
+                  >
+                    {stakeButton}
+                  </span>
+                )}
+              />
+            ) : (
+              stakeButton
+            )}
           </div>
         )}
       </div>
