@@ -49,7 +49,7 @@ export const Profile = z.object({
 export const Address = z.object({
   id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),
   address: z.string().max(255),
-  community_id: z.string().max(255),
+  community_id: z.string().max(255).optional(),
   user_id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),
   verification_token: z.string().max(255).optional(),
   verification_token_expires: z.date().nullable().optional(),
@@ -74,6 +74,23 @@ export const Address = z.object({
   hex: z.string().max(64).optional(),
   created_at: z.any(),
   updated_at: z.any(),
+});
+
+export const CommunityMember = z.object({
+  id: z.number().int(),
+  user_id: z.number().int(),
+  profile_name: z.string().optional().nullable(),
+  avatar_url: z.string().optional().nullable(),
+  addresses: z.array(
+    z.object({
+      id: z.number().int(),
+      community_id: z.string(),
+      address: z.string(),
+      stake_balance: z.string().optional(),
+    }),
+  ),
+  roles: z.array(z.string()).optional(),
+  group_ids: z.array(z.number().int()),
 });
 
 const ContractSource = z.object({
@@ -144,6 +161,7 @@ export const Group = z.object({
   community_id: z.string(),
   metadata: GroupMetadata,
   requirements: z.array(Requirement),
+  is_system_managed: z.boolean().optional(),
   created_at: z.date().optional(),
   updated_at: z.date().optional(),
 });
@@ -228,6 +246,17 @@ export const Comment = z.object({
   Address: Address.optional(),
 });
 
+export const StakeTransaction = z.object({
+  transaction_hash: z.string().length(66),
+  community_id: z.string(),
+  stake_id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).default(2),
+  address: z.string(),
+  stake_amount: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
+  stake_price: z.coerce.string(),
+  stake_direction: z.enum(['buy', 'sell']),
+  timestamp: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
+});
+
 export const CommunityStake = z.object({
   id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),
   community_id: z.string(),
@@ -242,6 +271,7 @@ export const CommunityStake = z.object({
   stake_enabled: z.boolean().default(false),
   created_at: z.date().optional(),
   updated_at: z.date().optional(),
+  StakeTransactions: z.array(StakeTransaction).optional(),
 });
 
 export const Topic = z.object({

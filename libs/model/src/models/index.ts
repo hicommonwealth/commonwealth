@@ -62,6 +62,9 @@ import SnapshotSpaceFactory, {
   type SnapshotSpaceModelStatic,
 } from './snapshot_spaces';
 import SsoTokenFactory, { type SsoTokenModelStatic } from './sso_token';
+import StakeTransactionFactory, {
+  type StakeTransactionModelStatic,
+} from './stake_transaction';
 import StarredCommunityFactory, {
   type StarredCommunityModelStatic,
 } from './starred_community';
@@ -109,6 +112,7 @@ export type Models = {
   SsoToken: SsoTokenModelStatic;
   StarredCommunity: StarredCommunityModelStatic;
   SnapshotProposal: SnapshotProposalModelStatic;
+  StakeTransaction: StakeTransactionModelStatic;
   Subscription: SubscriptionModelStatic;
   SnapshotSpace: SnapshotSpaceModelStatic;
   User: UserModelStatic;
@@ -162,6 +166,7 @@ export const buildDb = (sequelize: Sequelize): DB => {
     Vote: VoteFactory(sequelize, DataTypes),
     Profile: ProfileFactory(sequelize, DataTypes),
     SsoToken: SsoTokenFactory(sequelize, DataTypes),
+    StakeTransaction: StakeTransactionFactory(sequelize, DataTypes),
     StarredCommunity: StarredCommunityFactory(sequelize, DataTypes),
     SnapshotProposal: SnapshotProposalFactory(sequelize, DataTypes),
     SnapshotSpace: SnapshotSpaceFactory(sequelize, DataTypes),
@@ -220,6 +225,7 @@ export * from './role_assignment';
 export * from './snapshot_proposal';
 export * from './snapshot_spaces';
 export * from './sso_token';
+export * from './stake_transaction';
 export * from './starred_community';
 export * from './subscription';
 export * from './template';

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import Permissions from 'utils/Permissions';
 import { Avatar } from 'views/components/Avatar';
@@ -12,36 +12,51 @@ type Member = {
   name: string;
   role: 'admin' | 'moderator' | '';
   groups: string[];
+  stakeBalance?: string;
 };
 
 type MembersSectionProps = {
   filteredMembers: Member[];
   onLoadMoreMembers: () => any;
   isLoadingMoreMembers?: boolean;
+  isStakedCommunity?: boolean;
 };
-
-const columns = [
-  {
-    key: 'name',
-    header: 'Name',
-    hasCustomSortValue: true,
-    numeric: false,
-    sortable: true,
-  },
-  {
-    key: 'groups',
-    header: 'Groups',
-    hasCustomSortValue: true,
-    numeric: false,
-    sortable: true,
-  },
-];
 
 const MembersSection = ({
   filteredMembers,
   onLoadMoreMembers,
   isLoadingMoreMembers,
+  isStakedCommunity,
 }: MembersSectionProps) => {
+  const columns = useMemo(() => {
+    const c = [
+      {
+        key: 'name',
+        header: 'Name',
+        hasCustomSortValue: true,
+        numeric: false,
+        sortable: true,
+      },
+      {
+        key: 'groups',
+        header: 'Groups',
+        hasCustomSortValue: true,
+        numeric: false,
+        sortable: true,
+      },
+    ];
+    if (isStakedCommunity) {
+      c.push({
+        key: 'stakeBalance',
+        header: 'Stake',
+        hasCustomSortValue: true,
+        numeric: true,
+        sortable: true,
+      });
+    }
+    return c;
+  }, [isStakedCommunity]);
+
   return (
     <div className="MembersSection">
       <CWTable
@@ -78,6 +93,14 @@ const MembersSection = ({
                 {member.groups.map((group, index) => (
                   <CWTag key={index} label={group} type="referendum" />
                 ))}
+              </div>
+            ),
+          },
+          stakeBalance: {
+            sortValue: parseInt(member.stakeBalance || '0', 10),
+            customElement: (
+              <div className="table-cell last-column">
+                {member.stakeBalance}
               </div>
             ),
           },
