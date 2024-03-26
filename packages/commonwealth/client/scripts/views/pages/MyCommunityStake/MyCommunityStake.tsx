@@ -103,7 +103,10 @@ const MyCommunityStake = () => {
       {activeTabIndex === 0 ? (
         <Stakes filterOptions={filterOptions} addressFilter={addressFilter} />
       ) : (
-        <Transactions filterOptions={filterOptions} />
+        <Transactions
+          filterOptions={filterOptions}
+          addressFilter={addressFilter}
+        />
       )}
     </section>
   );
