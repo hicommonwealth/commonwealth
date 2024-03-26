@@ -9,6 +9,7 @@ import {
 } from './types';
 
 const logger = _logger().getLogger(__filename);
+const MAX_OLD_BLOCKS = 10;
 
 /**
  * Converts a string or integer number into a hexadecimal string that adheres to the following guidelines
@@ -35,21 +36,28 @@ export function getProvider(rpc: string) {
  * block number then shorten the range to 500 blocks. If startingBlockNum is not provided then
  * fetch logs from the last [maxOldBlocks] blocks.
  */
-export async function getLogs(
-  evmSource: EvmSource,
-  startingBlockNum?: number,
-  maxOldBlocks = 10,
-): Promise<{ logs: Log[]; lastBlockNum: number }> {
-  const provider = getProvider(evmSource.rpc);
-  const currentBlockNum = await provider.getBlockNumber();
+export async function getLogs({
+  rpc,
+  contractAddresses,
+  startingBlockNum,
+  endingBlockNum,
+}: {
+  rpc: string;
+  contractAddresses: string[];
+  startingBlockNum?: number;
+  endingBlockNum?: number;
+}): Promise<{ logs: Log[]; lastBlockNum: number }> {
+  const provider = getProvider(rpc);
 
-  if (Object.keys(evmSource.contracts).length === 0) {
+  if (!endingBlockNum) endingBlockNum = await provider.getBlockNumber();
+
+  if (contractAddresses.length === 0) {
     logger.error(`No contracts given`);
-    return { logs: [], lastBlockNum: currentBlockNum };
+    return { logs: [], lastBlockNum: endingBlockNum };
   }
 
   if (!startingBlockNum) {
-    startingBlockNum = currentBlockNum - maxOldBlocks;
+    startingBlockNum = currentBlockNum - MAX_OLD_BLOCKS;
   } else if (currentBlockNum - startingBlockNum > 500) {
     // limit the number of blocks to fetch to 500 to avoid rate limiting on some EVM nodes like Celo
     // this should eventually be configured on the ChainNodes table by rpc since each rpc has different
@@ -61,12 +69,12 @@ export async function getLogs(
   const logs: Log[] = await provider.send('eth_getLogs', [
     {
       fromBlock: decimalToHex(startingBlockNum),
-      toBlock: decimalToHex(currentBlockNum),
-      address: Object.keys(evmSource.contracts),
+      toBlock: decimalToHex(endingBlockNum),
+      address: contractAddresses,
     },
   ]);
 
-  return { logs, lastBlockNum: currentBlockNum };
+  return { logs, lastBlockNum: endingBlockNum };
 }
 
 export async function parseLogs(
@@ -118,13 +126,66 @@ export async function parseLogs(
 export async function getEvents(
   evmSource: EvmSource,
   startingBlockNum?: number,
-  maxOldBlocks?: number,
+  endingBlockNum?: number,
 ): Promise<{ events: RawEvmEvent[]; lastBlockNum: number }> {
-  const { logs, lastBlockNum } = await getLogs(
-    evmSource,
+  const { logs, lastBlockNum } = await getLogs({
+    rpc: evmSource.rpc,
+    contractAddresses: Object.keys(evmSource.contracts),
     startingBlockNum,
-    maxOldBlocks,
-  );
+    endingBlockNum,
+  });
   const events = await parseLogs(evmSource.contracts, logs);
   return { events, lastBlockNum };
+}
+
+/**
+ * This function is used to migrate recently added EvmEventSources to the
+ * indicated end block. This is used when new event sources are added as a
+ * result of other events being processed. Generally, this will be used in a
+ * pattern where we listen for contract creation events that when processed
+ * create new EvmEventSources derived from the created contract.
+ */
+export async function migrateEvents(
+  evmSource: EvmSource,
+  endingBlockNum: number,
+): Promise<{ events: RawEvmEvent[]; lastBlockNum: number } | undefined> {
+  let oldestBlock: number;
+  const contracts: ContractSources = {};
+  for (const [contractAddress, abiSignature] of Object.entries(
+    evmSource.contracts,
+  )) {
+    for (const source of abiSignature.sources) {
+      if (source.created_at_block && source.events_migrated === false) {
+        if (!contracts[contractAddress]) {
+          contracts[contractAddress] = {
+            abi: abiSignature.abi,
+            sources: [],
+          };
+        }
+        contracts[contractAddress].sources.push(source);
+        if (!oldestBlock || oldestBlock > source.created_at_block) {
+          oldestBlock = source.created_at_block;
+        }
+      }
+    }
+  }
+
+  if (Object.keys(contracts).length > 0) {
+    const result = await getEvents(
+      {
+        rpc: evmSource.rpc,
+        contracts,
+      },
+      oldestBlock,
+      endingBlockNum,
+    );
+    log.info('Events migrated', undefined, {
+      startingBlockNum: oldestBlock,
+      endingBlockNum,
+    });
+    return result;
+  } else {
+    log.info('No events to migrate');
+    return;
+  }
 }

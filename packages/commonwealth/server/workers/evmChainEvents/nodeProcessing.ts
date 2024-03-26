@@ -2,8 +2,8 @@ import { logger, stats } from '@hicommonwealth/core';
 import { NotificationInstance, models } from '@hicommonwealth/model';
 import { emitChainEventNotifs } from './emitChainEventNotifs';
 import { getEventSources } from './getEventSources';
-import { getEvents } from './logProcessing';
-import { EvmSource } from './types';
+import { getEvents, migrateEvents } from './logProcessing';
+import { EvmSource, RawEvmEvent } from './types';
 
 const log = logger().getLogger(__filename);
 
@@ -36,8 +36,13 @@ export async function processChainNode(
       ? startBlock.block_number + 1
       : null;
 
+    const allEvents: RawEvmEvent[] = [];
+    const migratedData = await migrateEvents(evmSource, startBlockNum);
+    if (migratedData) allEvents.concat(migratedData.events);
+
     const { events, lastBlockNum } = await getEvents(evmSource, startBlockNum);
-    const promises = await emitChainEventNotifs(chainNodeId, events);
+    allEvents.concat(events);
+    const promises = await emitChainEventNotifs(chainNodeId, allEvents);
 
     if (!startBlock) {
       await models.LastProcessedEvmBlock.create({
@@ -46,7 +51,7 @@ export async function processChainNode(
       });
     } else {
       startBlock.block_number = lastBlockNum;
-      startBlock.save();
+      await startBlock.save();
     }
 
     log.info(

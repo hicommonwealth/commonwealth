@@ -11,7 +11,7 @@ export type EvmEventSourceAttributes = {
   event_signature: string;
   kind: string;
   created_at_block: number;
-  events_migrate: boolean;
+  events_migrated: boolean;
   active: boolean;
   abi_id: number;
 
