@@ -36,8 +36,12 @@
     justify-content: center;
     padding-bottom: 24px;
 
-    @include smallInclusive {
-      grid-template-columns: repeat(auto-fit, 320px);
+    @include mediumSmall {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @include extraSmall {
+      grid-template-columns: 1fr;
     }
   }
 }
