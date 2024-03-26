@@ -198,8 +198,10 @@ export function formatAddressShort(
   if (
     address.length <
     numberOfVisibleCharacters + numberOfVisibleCharactersTail + 1
-  )
+  ) {
     return address;
+  }
+
   return `${address.slice(0, numberOfVisibleCharacters)}…${address.slice(
     -numberOfVisibleCharactersTail,
   )}`;
