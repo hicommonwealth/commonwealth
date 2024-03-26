@@ -7,11 +7,11 @@ import { createStore } from 'zustand/vanilla';
 
 interface ManageCommunityStakeModalStore {
   selectedCommunity?: ChainInfo | CommunityData;
-  setSelectedCommunity: (community: ChainInfo | CommunityData) => any;
+  setSelectedCommunity: (community: ChainInfo | CommunityData) => void;
   modeOfManageCommunityStakeModal: ManageCommunityStakeModalMode;
   setModeOfManageCommunityStakeModal: (
     modalType: ManageCommunityStakeModalMode,
-  ) => any;
+  ) => void;
 }
 
 export const manageCommunityStakeModalStore =

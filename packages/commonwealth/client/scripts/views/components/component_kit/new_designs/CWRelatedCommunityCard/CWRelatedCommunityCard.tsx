@@ -26,7 +26,7 @@ type CWRelatedCommunityCardProps = {
   memberCount: string | number;
   threadCount: string | number;
   stakeChange?: number;
-  onStakeBtnClick?: () => any;
+  onStakeBtnClick?: () => void;
 };
 
 export const CWRelatedCommunityCard = ({
@@ -66,7 +66,7 @@ export const CWRelatedCommunityCard = ({
   );
 
   const handleBuyStakeClick = async () => {
-    onStakeBtnClick?.();
+    await onStakeBtnClick?.();
     setModeOfManageCommunityStakeModal('buy');
     setSelectedCommunity(community);
   };
@@ -79,9 +79,9 @@ export const CWRelatedCommunityCard = ({
       buttonHeight="sm"
       buttonWidth="narrow"
       disabled={!isLoggedIn}
-      onClick={(e) => {
+      onClick={async (e) => {
         e.stopPropagation();
-        handleBuyStakeClick();
+        await handleBuyStakeClick();
       }}
     />
   );
