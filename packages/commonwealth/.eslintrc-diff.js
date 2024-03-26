@@ -12,7 +12,7 @@ const path = require('path');
  * git push origin my_branch
  *
  */
-process.env.ESLINT_PLUGIN_DIFF_COMMIT = 'origin/MASTER_CIRCA_2024_03_21';
+process.env.ESLINT_PLUGIN_DIFF_COMMIT = 'origin/MASTER_CIRCA_2024_03_26';
 
 const ENABLE_ESLINT_DIFF_PLUGIN =
   process.env.ENABLE_ESLINT_DIFF_PLUGIN || 'true';
