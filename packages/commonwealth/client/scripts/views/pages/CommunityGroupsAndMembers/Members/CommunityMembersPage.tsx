@@ -2,9 +2,8 @@ import { trpc } from 'client/scripts/utils/trpcClient';
 import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
-import { throttle } from 'lodash';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router';
 import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
@@ -105,13 +104,6 @@ const CommunityMembersPage = () => {
       getNextPageParam: (lastPage) => lastPage.page + 1,
       enabled: app?.user?.activeAccount?.address ? !!memberships : true,
     },
-  );
-
-  const throttledFetchNextPage = useCallback(
-    throttle(() => {
-      fetchNextPage?.();
-    }, 1_000),
-    [fetchNextPage],
   );
 
   const { data: groups } = useFetchGroupsQuery({
@@ -376,7 +368,7 @@ const CommunityMembersPage = () => {
           filteredMembers={formattedMembers}
           onLoadMoreMembers={() => {
             if (members?.pages?.[0]?.totalResults > formattedMembers.length) {
-              throttledFetchNextPage();
+              fetchNextPage?.();
             }
           }}
           isLoadingMoreMembers={isLoadingMembers}
