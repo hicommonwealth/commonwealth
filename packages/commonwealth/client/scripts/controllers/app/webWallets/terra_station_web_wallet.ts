@@ -81,13 +81,12 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
   }
 
   public async getSessionSigner(): Promise<SessionSigner> {
+    const { toBase64 } = await import('@cosmjs/encoding');
     const CosmosSignerCW = await constructCosmosSignerCWClass();
     return new CosmosSignerCW({
       signer: {
         type: 'bytes',
-        signBytes: async (message) => {
-          return await window.station.signBytes(Buffer.from(message));
-        },
+        signBytes: (message) => window.station.signBytes(toBase64(message)),
         getAddress: async () => this._accounts[0].address,
         getChainId: async () => this.getChainId(),
       },
