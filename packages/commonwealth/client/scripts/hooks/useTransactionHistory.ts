@@ -22,7 +22,7 @@ const useTransactionHistory = ({
         community: t.community,
         address: t.address,
         stake: t.stake_amount,
-        voteWeight: t.stake_amount * t.vote_weight,
+        voteWeight: t.stake_amount * t.vote_weight + 1,
         timestamp: t.timestamp * 1000,
         action: t.stake_direction === 'buy' ? 'mint' : 'burn',
         totalPrice: `${(parseFloat(t.stake_price) / WEI_PER_ETHER).toFixed(
