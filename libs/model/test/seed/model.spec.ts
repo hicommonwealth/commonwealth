@@ -56,6 +56,7 @@ const generateSchemas = async () => {
       CommunityStakes: ['FOREIGN KEY(community_id)'],
       LastProcessedEvmBlocks: ['FOREIGN KEY(chain_node_id)'],
       Memberships: ['FOREIGN KEY(address_id)', 'FOREIGN KEY(group_id)'],
+      StakeTransactions: ['FOREIGN KEY(community_id,stake_id)'],
     },
   });
 
