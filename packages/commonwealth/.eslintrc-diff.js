@@ -42,7 +42,6 @@ module.exports = {
     'import/no-cycle': 'off',
     'import/named': 'off',
     'no-underscore-dangle': 0,
-    'no-param-reassign': 0,
     'no-console': 0,
     camelcase: 0,
     'no-else-return': 0,
@@ -160,6 +159,19 @@ module.exports = {
     // '@typescript-eslint/no-unsafe-call': 'error',
     // '@typescript-eslint/no-unsafe-member-access': 'error',
     // '@typescript-eslint/no-unsafe-return': 'error',
+
+    // ** type immutability
+    'no-param-reassign': 'error',
+    'no-var': 'error',
+    // "prefer-const": "error",
+    // "@typescript-eslint/prefer-readonly": "error",
+    // "@typescript-eslint/prefer-readonly-parameter-types": "error",
+    //
+    // // https://www.npmjs.com/package/eslint-plugin-functional
+    // "functional/immutable-data": "error",
+    // "functional/no-let": "error",
+    // "functional/no-method-signature": "error",
+    // "functional/prefer-readonly-type": "error"
   },
   ignorePatterns: ['server/scripts/setupPrerenderService.ts'],
   extends: [
