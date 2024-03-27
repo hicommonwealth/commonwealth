@@ -67,6 +67,8 @@ export interface Stats extends Disposable {
   // flags
   on(key: string): void;
   off(key: string): void;
+  // gauge
+  gauge(key: string, value: number): void;
   // traces
   timing(key: string, duration: number, tags?: Record<string, string>): void;
 }
