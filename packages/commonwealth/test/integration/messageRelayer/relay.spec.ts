@@ -52,6 +52,7 @@ describe('relay', () => {
     const publishedEvents = [];
     const spyBroker: Broker = {
       ...successfulInMemoryBroker,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/require-await
       publish: async (topic: string, event: any) => {
         publishedEvents.push(event.name);
         return true;
@@ -78,6 +79,7 @@ describe('relay', () => {
     const publishedEvents = [];
     const spyBroker: Broker = {
       ...successfulInMemoryBroker,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/require-await
       publish: async (topic: string, event: any) => {
         if (publishedEvents.length === 1) return false;
         publishedEvents.push(event.name);
