@@ -53,12 +53,17 @@ export default (
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       underscored: true,
-    },
+      noPrimaryKey: true,
+    } as Sequelize.ModelOptions,
   );
 
   Collaboration.associate = (models) => {
-    models.Collaboration.belongsTo(models.Address);
-    models.Collaboration.belongsTo(models.Thread);
+    models.Collaboration.belongsTo(models.Address, {
+      foreignKey: { name: 'thread_id', allowNull: false },
+    });
+    models.Collaboration.belongsTo(models.Thread, {
+      foreignKey: { name: 'thread_id', allowNull: false },
+    });
   };
 
   return Collaboration;

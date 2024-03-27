@@ -36,9 +36,13 @@ export default (
   const Membership = <MembershipModelStatic>sequelize.define(
     'Membership',
     {
-      id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-      group_id: { type: dataTypes.INTEGER, allowNull: false },
-      address_id: { type: dataTypes.INTEGER, allowNull: false },
+      id: { type: dataTypes.INTEGER, allowNull: false },
+      group_id: { type: dataTypes.INTEGER, allowNull: false, primaryKey: true },
+      address_id: {
+        type: dataTypes.INTEGER,
+        allowNull: false,
+        primaryKey: true,
+      },
       reject_reason: { type: dataTypes.JSONB, allowNull: true },
       last_checked: { type: dataTypes.DATE, allowNull: false },
     },
@@ -50,9 +54,10 @@ export default (
       tableName: 'Memberships',
       indexes: [
         { fields: ['group_id'] },
-        { fields: ['address_id', 'group_id'], unique: true },
+        //{ fields: ['address_id', 'group_id'], unique: true },
       ],
-    },
+      noPrimaryKey: true,
+    } as Sequelize.ModelOptions,
   );
 
   Membership.removeAttribute('created_at');

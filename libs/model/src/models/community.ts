@@ -148,7 +148,13 @@ export default (
     models.Community.belongsTo(models.ChainNode, {
       foreignKey: 'chain_node_id',
     });
-    models.Community.hasMany(models.Address, { foreignKey: 'community_id' });
+    models.Community.belongsTo(models.DiscordBotConfig, {
+      foreignKey: 'discord_config_id',
+      targetKey: 'id',
+    });
+    models.Community.hasMany(models.Address, {
+      foreignKey: 'community_id',
+    });
     models.Community.hasMany(models.Notification, {
       foreignKey: 'community_id',
     });

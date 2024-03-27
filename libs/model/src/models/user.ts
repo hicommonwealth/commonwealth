@@ -58,7 +58,7 @@ export default (
     'User',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      email: { type: dataTypes.STRING, allowNull: true, unique: true },
+      email: { type: dataTypes.STRING, allowNull: true },
       emailVerified: {
         type: dataTypes.BOOLEAN,
         allowNull: true,
@@ -121,10 +121,12 @@ export default (
     models.User.belongsTo(models.Community, {
       as: 'selectedCommunity',
       foreignKey: 'selected_community_id',
-      constraints: false,
+      //constraints: false,
     });
     models.User.hasMany(models.Address);
-    models.User.hasMany(models.Profile);
+    models.User.hasMany(models.Profile, {
+      foreignKey: { name: 'user_id', allowNull: false },
+    });
     models.User.hasMany(models.StarredCommunity, {
       foreignKey: 'user_id',
       sourceKey: 'id',

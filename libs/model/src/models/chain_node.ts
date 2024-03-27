@@ -18,7 +18,7 @@ export default (
     'ChainNode',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      url: { type: dataTypes.STRING, allowNull: false },
+      url: { type: dataTypes.STRING, allowNull: false, unique: true },
       eth_chain_id: { type: dataTypes.INTEGER, allowNull: true, unique: true },
       cosmos_chain_id: {
         type: dataTypes.STRING,

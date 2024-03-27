@@ -114,13 +114,13 @@ type COLUMN_INFO = {
 };
 type CONSTRAINT_INFO = {
   table_name: string;
+  constraint: string;
   constraint_name: string;
-  constraint_type: string;
 };
 type TABLE_INFO = {
   table_name: string;
   columns: Record<string, string>;
-  constraints: Record<string, string>;
+  constraints: Set<string>;
 };
 
 /**
@@ -133,6 +133,7 @@ export const get_info_schema = async (
   options?: {
     ignore_tables: string[];
     ignore_columns: Record<string, string[]>;
+    ignore_constraints: Record<string, string[]>;
   },
 ): Promise<Record<string, TABLE_INFO>> => {
   const columns = await db.query<COLUMN_INFO>(
@@ -145,15 +146,22 @@ SELECT
 	|| CASE WHEN is_nullable = 'YES' THEN '-null' ELSE '' END as column_type,
 	column_default
 FROM information_schema.columns
-WHERE table_schema = 'public'`,
+WHERE table_schema = 'public'
+ORDER BY 1, 2;`,
     { type: QueryTypes.SELECT },
   );
-  // TODO: review what constraints to ignore (reconcile names?)
   const constraints = await db.query<CONSTRAINT_INFO>(
     `
-SELECT table_name, constraint_name, constraint_type
-FROM information_schema.table_constraints
-WHERE table_schema = 'public' AND constraint_type NOT IN('CHECK', 'FOREIGN KEY', 'UNIQUE')`,
+SELECT 
+	c.table_name, 
+	c.constraint_type || '(' || STRING_AGG(k.column_name, ',' order by column_name) || ')' as constraint,
+	c.constraint_name
+FROM 
+	information_schema.table_constraints c
+	JOIN information_schema.key_column_usage k on c.constraint_name = k.constraint_name
+WHERE c.table_schema = 'public'
+GROUP BY c.table_name, c.constraint_name, c.constraint_type
+ORDER BY 1, 2;`,
     { type: QueryTypes.SELECT },
   );
   const tables: Record<string, TABLE_INFO> = {};
@@ -163,23 +171,21 @@ WHERE table_schema = 'public' AND constraint_type NOT IN('CHECK', 'FOREIGN KEY',
         !options?.ignore_tables.includes(c.table_name) &&
         !options?.ignore_columns[c.table_name]?.includes(c.column_name),
     )
-    .sort((a, b) => a.column_name.localeCompare(b.column_name))
     .forEach((c) => {
       const t = (tables[c.table_name] = tables[c.table_name] ?? {
         table_name: c.table_name,
         columns: {},
-        constraints: {},
+        constraints: new Set(),
       });
       t.columns[c.column_name] = c.column_type;
     });
   constraints
-    .filter((c) => !options?.ignore_tables.includes(c.table_name))
-    .sort((a, b) => a.constraint_name.localeCompare(b.constraint_name))
-    .forEach(
+    .filter(
       (c) =>
-        (tables[c.table_name].constraints[c.constraint_name] =
-          c.constraint_type),
-    );
+        !options?.ignore_tables.includes(c.table_name) &&
+        !options?.ignore_constraints[c.table_name]?.includes(c.constraint),
+    )
+    .forEach((c) => tables[c.table_name].constraints.add(c.constraint));
   return tables;
 };
 
@@ -190,7 +196,10 @@ let testdb: DB | undefined = undefined;
  * @param truncate when true, truncates all tables in model
  * @returns synchronized sequelize db instance
  */
-export const bootstrap_testing = async (truncate = false): Promise<DB> => {
+export const bootstrap_testing = async (
+  truncate = false,
+  log = false,
+): Promise<DB> => {
   if (!TESTING) throw new Error('Seeds only work when testing!');
   if (!testdb) {
     await verify_db(TEST_DB_NAME);
@@ -204,7 +213,10 @@ export const bootstrap_testing = async (truncate = false): Promise<DB> => {
           logging: false,
         }),
       );
-      await testdb.sequelize.sync({ force: true });
+      await testdb.sequelize.sync({
+        force: true,
+        logging: log ? console.log : false,
+      });
     } catch (error) {
       console.error('Error bootstrapping test db:', error);
       throw error;
