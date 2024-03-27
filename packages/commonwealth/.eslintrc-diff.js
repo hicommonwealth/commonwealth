@@ -148,6 +148,11 @@ module.exports = {
     '@typescript-eslint/no-misused-promises': 'error',
     '@typescript-eslint/await-thenable': 'error',
 
+    'no-warning-comments': [
+      'error',
+      { terms: ['FIXME', 'eslint-disable '], location: 'anywhere' },
+    ],
+
     // ** 'any' issues...
     // '@typescript-eslint/no-explicit-any': 'error',
     // '@typescript-eslint/no-unsafe-argument': 'error',
