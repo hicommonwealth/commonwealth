@@ -1,4 +1,5 @@
 import { ExitCode } from './enums';
+import { successfulInMemoryBroker } from './in-memory-brokers';
 import { getInMemoryLogger } from './in-memory-logger';
 import {
   AdapterFactory,
@@ -123,6 +124,7 @@ export const stats = port(function stats(stats?: Stats) {
       decrementBy: () => {},
       on: () => {},
       off: () => {},
+      gauge: () => {},
       timing: () => {},
     }
   );
@@ -171,13 +173,5 @@ export const analytics = port(function analytics(analytics?: Analytics) {
  * Broker port factory
  */
 export const broker = port(function broker(broker?: Broker) {
-  return (
-    broker || {
-      name: 'in-memory-broker',
-      dispose: () => Promise.resolve(),
-      publish: () => Promise.resolve(true),
-      subscribe: () => Promise.resolve(true),
-      isHealthy: () => Promise.resolve(true),
-    }
-  );
+  return broker || successfulInMemoryBroker;
 });

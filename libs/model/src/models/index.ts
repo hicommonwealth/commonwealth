@@ -51,7 +51,7 @@ import NotificationCategoryFactory, {
 import NotificationsReadFactory, {
   type NotificationsReadModelStatic,
 } from './notifications_read';
-import OutboxFactory, { type OutboxModelStatic } from './outbox';
+// import OutboxFactory, { type OutboxModelStatic } from './outbox';
 import PollFactory, { type PollModelStatic } from './poll';
 import ProfileFactory, { type ProfileModelStatic } from './profile';
 import ReactionFactory, { type ReactionModelStatic } from './reaction';
@@ -117,7 +117,7 @@ export type Models = {
   SnapshotSpace: SnapshotSpaceModelStatic;
   User: UserModelStatic;
   Webhook: WebhookModelStatic;
-  Outbox: OutboxModelStatic;
+  // Outbox: OutboxModelStatic;
 };
 
 export type DB = Models & {
@@ -174,7 +174,7 @@ export const buildDb = (sequelize: Sequelize): DB => {
     User: UserFactory(sequelize, DataTypes),
     Webhook: WebhookFactory(sequelize, DataTypes),
     CommunityStake: CommunityStakeFactory(sequelize, DataTypes),
-    Outbox: OutboxFactory(sequelize, DataTypes),
+    // Outbox: OutboxFactory(sequelize, DataTypes),
   };
 
   const db = {
