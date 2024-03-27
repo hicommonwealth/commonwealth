@@ -15,7 +15,7 @@ import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/view_thread/index.scss';
 import React, { useEffect, useState } from 'react';
-import Helmet from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
 import {
@@ -125,8 +125,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     apiCallEnabled: !!threadId, // only call the api if we have thread id
   });
 
-  const test = app.config.chains.getById(app.activeChainId());
-  console.log('test', test);
+  const communityImage = app.config.chains.getById(app.activeChainId()).iconUrl;
 
   const thread = data?.[0];
 
@@ -410,6 +409,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         <meta name="twitter:title" content={thread.title} />
         <meta name="twitter:site" content="@hicommonwealth" />
         <meta name="twitter:description" content={thread.body} />
+        <meta name="twitter:card" content={communityImage} />
         <meta
           name="twitter:image:src"
           content="https://commonwealth.im/static/img/branding/common.png"
