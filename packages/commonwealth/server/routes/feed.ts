@@ -123,6 +123,11 @@ export const getFeedHandler = async (
         date: toDate(thread),
         content: thread.body,
         description: thread.plaintext,
+        author: thread.collaborators.map((current) => {
+          return {
+            name: current.Profile.profile_name || '',
+          };
+        }),
       });
     });
 
