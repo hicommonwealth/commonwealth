@@ -33,7 +33,16 @@
         }
 
         .stake-value {
+          display: flex;
+          align-items: center;
           color: $neutral-400;
+        }
+
+        .denominationIcon {
+          display: flex;
+          align-items: center;
+          padding: 0 4px;
+          margin-top: 2px;
         }
       }
 

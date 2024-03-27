@@ -1,7 +1,10 @@
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 
+import { CWCustomIcon } from 'views/components/component_kit/cw_icons/cw_custom_icon';
+
 import { CWText } from 'views/components/component_kit/cw_text';
+
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import CWPopover, {
   usePopover,
@@ -45,6 +48,15 @@ export const VoteWeightModule = ({
     }
   };
 
+  const findDenominationIcon = (denomination: string) => {
+    if (!denomination) return;
+    return {
+      BLAST: <CWCustomIcon iconName="blast" iconSize="xs" />,
+      ETH: <CWCustomIcon iconName="eth" iconSize="xs" />,
+      BASE: <CWCustomIcon iconName="base" iconSize="xs" />,
+    }[denomination];
+  };
+
   return (
     <>
       <div className="VoteWeightModule">
@@ -69,7 +81,11 @@ export const VoteWeightModule = ({
                 You have {stakeNumber || 0} stake
               </CWText>
               <CWText type="caption" className="stake-value">
-                valued at {capDecimals(String(stakeValue))} {denomination}
+                valued at
+                <span className="denominationIcon">
+                  {findDenominationIcon(denomination)}
+                </span>
+                {capDecimals(String(stakeValue))} {denomination}
               </CWText>
             </div>
             {stakeNumber >= 1 ? (

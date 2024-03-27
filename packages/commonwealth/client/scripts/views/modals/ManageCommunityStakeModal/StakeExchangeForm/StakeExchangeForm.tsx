@@ -15,6 +15,7 @@ import {
 import { useCommunityStake } from 'views/components/CommunityStake';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
+import { CWCustomIcon } from 'views/components/component_kit/cw_icons/cw_custom_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWCircleButton from 'views/components/component_kit/new_designs/CWCircleButton';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
@@ -57,6 +58,7 @@ interface StakeExchangeFormProps {
   addressOptions: OptionDropdown[];
   numberOfStakeToExchange: number;
   onSetNumberOfStakeToExchange: React.Dispatch<React.SetStateAction<number>>;
+  denomination: string;
 }
 
 const StakeExchangeForm = ({
@@ -68,6 +70,7 @@ const StakeExchangeForm = ({
   addressOptions,
   numberOfStakeToExchange,
   onSetNumberOfStakeToExchange,
+  denomination,
 }: StakeExchangeFormProps) => {
   const chainRpc = app?.chain?.meta?.ChainNode?.url;
   const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
@@ -200,6 +203,15 @@ const StakeExchangeForm = ({
     }
   };
 
+  const findDenominationIcon = (denomination: string) => {
+    if (!denomination) return;
+    return {
+      BLAST: <CWCustomIcon iconName="blast" iconSize="xs" />,
+      ETH: <CWCustomIcon iconName="eth" iconSize="xs" />,
+      BASE: <CWCustomIcon iconName="base" iconSize="xs" />,
+    }[denomination];
+  };
+
   const insufficientFunds = isBuyMode
     ? parseFloat(userEthBalance) < parseFloat(buyPriceData?.totalPrice)
     : numberOfStakeToExchange > stakeBalance;
@@ -289,10 +301,16 @@ const StakeExchangeForm = ({
         <CWDivider />
 
         <div className="stake-valued-row">
-          <CWText type="caption">You have {stakeBalance} stake</CWText>
-          <CWText type="caption" className="valued">
-            valued at {capDecimals(String(stakeValue))} ETH
-          </CWText>
+          <div className="container">
+            <CWText type="caption">You have {stakeBalance} stake</CWText>
+            <CWText type="caption" className="valued">
+              valued at
+              <span className="denominationIcon">
+                {findDenominationIcon(denomination)}
+              </span>
+              {capDecimals(String(stakeValue))} {denomination}
+            </CWText>
+          </div>
           <CWText type="caption" className="vote-weight">
             Current vote weight {currentVoteWeight}
           </CWText>
@@ -337,7 +355,7 @@ const StakeExchangeForm = ({
               <Skeleton className="price-skeleton" />
             ) : (
               <CWText type="caption" fontWeight="medium">
-                {capDecimals(pricePerUnitEth)} ETH • ~$
+                {capDecimals(pricePerUnitEth)} {denomination}• ~$
                 {pricePerUnitUsd} USD
               </CWText>
             )}
@@ -410,7 +428,7 @@ const StakeExchangeForm = ({
             <Skeleton className="price-skeleton" />
           ) : (
             <CWText type="caption" fontWeight="medium">
-              {capDecimals(feesPriceEth)} ETH • ~$
+              {capDecimals(feesPriceEth)} {denomination}• ~$
               {feesPriceUsd} USD
             </CWText>
           )}
@@ -424,7 +442,7 @@ const StakeExchangeForm = ({
             <Skeleton className="price-skeleton" />
           ) : (
             <CWText type="caption" fontWeight="medium">
-              {capDecimals(totalPriceEth)} ETH • ~$
+              {capDecimals(totalPriceEth)} {denomination}• ~$
               {totalPriceUsd} USD
             </CWText>
           )}

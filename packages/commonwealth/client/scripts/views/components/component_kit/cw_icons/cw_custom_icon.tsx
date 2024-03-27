@@ -6,15 +6,13 @@ import { ComponentType } from '../types';
 import { customIconLookup } from './cw_icon_lookup';
 import type { CustomIconProps } from './types';
 
-export const CWCustomIcon = (props: CustomIconProps) => {
-  const {
-    componentType = ComponentType.CustomIcon,
-    iconName,
-    iconSize = 'medium',
-    ...otherProps
-  } = props;
-
-  const CustomIcon = customIconLookup[iconName];
+export const CWCustomIcon = ({
+  componentType = ComponentType.CustomIcon,
+  iconName,
+  iconSize = 'medium',
+  ...otherProps
+}: CustomIconProps) => {
+  const CustomIcon = customIconLookup[iconName] as React.FC<CustomIconProps>;
 
   return (
     <CustomIcon
