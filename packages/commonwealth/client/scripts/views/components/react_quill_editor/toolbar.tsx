@@ -103,10 +103,6 @@ export const useMarkdownToolbarHandlers = ({
         return;
       }
       const text = editor.getText(selection.index, selection.length);
-      const betweenCharacters = editor.getText(
-        selection.index,
-        selection.length / 2,
-      );
 
       editor.deleteText(selection.index, selection.length);
       editor.insertText(
