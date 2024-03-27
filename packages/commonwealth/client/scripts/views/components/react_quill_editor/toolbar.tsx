@@ -103,11 +103,22 @@ export const useMarkdownToolbarHandlers = ({
         return;
       }
       const text = editor.getText(selection.index, selection.length);
+      const betweenCharacters = editor.getText(
+        selection.index,
+        selection.length / 2,
+      );
+
       editor.deleteText(selection.index, selection.length);
       editor.insertText(
         selection.index,
         `${markdownChars}${text.trim()}${markdownChars}`,
       );
+
+      editor.setSelection(
+        selection.index + markdownChars.length,
+        selection.length,
+      );
+
       setContentDelta({
         ...editor.getContents(),
         ___isMarkdown: true,
