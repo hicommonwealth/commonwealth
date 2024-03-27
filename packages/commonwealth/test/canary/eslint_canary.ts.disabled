@@ -11,6 +11,10 @@
 // cp test/canary/eslint_canary.log test/canary/eslint_canary.snap
 
 // *****************************************************************************
+// Do not allow global eslint disabling of rules
+/* eslint-disable react/jsx-key */
+
+// *****************************************************************************
 // no-restricted-imports: import from outside the project root
 
 import { ServerError } from '../../../../libs/core/src/errors';
@@ -28,3 +32,8 @@ async function doAsync() {
 }
 
 doAsync();
+
+// *****************************************************************************
+// no-warning-comments
+//
+// FIXME this should not be accepted
