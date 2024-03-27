@@ -15,6 +15,7 @@ import express, {
   type Request,
   type Response,
 } from 'express';
+import { redirectToHTTPS } from 'express-http-to-https';
 import session from 'express-session';
 import passport from 'passport';
 import pinoHttp from 'pino-http';
@@ -108,17 +109,17 @@ export async function main(app: express.Express) {
     });
 
     // redirect to https:// unless we are using a test domain or using 192.168.1.range (local network range)
-    // app.use(
-    //   redirectToHTTPS(
-    //     [
-    //       /localhost:(\d{4})/,
-    //       /127.0.0.1:(\d{4})/,
-    //       /192.168.1.(\d{1,3}):(\d{4})/,
-    //     ],
-    //     [],
-    //     301,
-    //   ),
-    // );
+    app.use(
+      redirectToHTTPS(
+        [
+          /localhost:(\d{4})/,
+          /127.0.0.1:(\d{4})/,
+          /192.168.1.(\d{1,3}):(\d{4})/,
+        ],
+        [],
+        301,
+      ),
+    );
 
     // dynamic compression settings used
     app.use(compression());
