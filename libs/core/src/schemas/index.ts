@@ -15,6 +15,7 @@ export type Aggregates = Extract<
   | 'Subscription'
   | 'Thread'
   | 'User'
+  | 'StakeTransaction'
 >;
 export { entities };
 

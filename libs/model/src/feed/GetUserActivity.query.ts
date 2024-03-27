@@ -1,33 +1,23 @@
-import type { AddressInstance, DB } from '@hicommonwealth/model';
+import { Query, schemas } from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
+import { models } from '../database';
 
-export type ActivityRow = {
-  category_id: string;
-  comment_count: number;
-  last_activity: string;
-  notification_data: string; // actually object but stringified
-  reaction_count: number;
-  thread_id: number;
-  commenters: {
-    Addresses: AddressInstance[];
-  }[];
-};
+export const GetUserActivity: Query<
+  typeof schemas.queries.ThreadFeed
+> = () => ({
+  ...schemas.queries.ThreadFeed,
+  auth: [],
+  secure: true,
+  body: async ({ actor }) => {
+    /**
+     * Last 50 updated threads
+     */
 
-export type GlobalActivity = Array<ActivityRow>;
+    const filterByCommunityForUsers = actor.user.id
+      ? 'JOIN "Addresses" a on a.community_id=t.community_id and a.user_id = ?'
+      : '';
 
-export async function getActivityFeed(
-  models: DB,
-  id = 0,
-): Promise<GlobalActivity> {
-  /**
-   * Last 50 updated threads
-   */
-
-  const filterByCommunityForUsers = id
-    ? 'JOIN "Addresses" a on a.community_id=t.community_id and a.user_id = ?'
-    : '';
-
-  const query = `
+    const query = `
     WITH ranked_thread_notifs AS (
         SELECT t.id AS thread_id, t.max_notif_id
         FROM "Threads" t
@@ -64,14 +54,12 @@ export async function getActivityFeed(
     ORDER BY nts.created_at DESC;
   `;
 
-  const notifications: any = await models.sequelize.query<GlobalActivity>(
-    query,
-    {
+    const notifications: any = await models.sequelize.query(query, {
       type: QueryTypes.SELECT,
       raw: true,
-      replacements: [id],
-    },
-  );
+      replacements: [actor.user.id],
+    });
 
-  return notifications;
-}
+    return notifications;
+  },
+});

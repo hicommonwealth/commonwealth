@@ -1,23 +1,14 @@
 import { Op, QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from 'server/types';
 
-import { AppError } from '@hicommonwealth/core';
+import { schemas } from '@hicommonwealth/core';
 import { CommunityInstance } from '@hicommonwealth/model';
-import { flatten, uniq } from 'lodash';
-import {
-  PaginationSqlOptions,
-  buildPaginatedResponse,
-  buildPaginationSql,
-} from '../../util/queries';
+import { uniq } from 'lodash';
+import { PaginationSqlOptions, buildPaginationSql } from '../../util/queries';
 import { RoleInstanceWithPermission, findAllRoles } from '../../util/roles';
 import { ServerProfilesController } from '../server_profiles_controller';
 
 export const Errors = {};
-
-export type MembershipFilters =
-  | 'in-group'
-  | `in-group:${number}`
-  | 'not-in-group';
 
 export type SearchProfilesOptions = {
   community: CommunityInstance;
@@ -27,7 +18,6 @@ export type SearchProfilesOptions = {
   page?: number;
   orderBy?: string;
   orderDirection?: 'ASC' | 'DESC';
-  memberships?: MembershipFilters;
   includeGroupIds?: boolean;
 };
 
@@ -56,8 +46,6 @@ export async function __searchProfiles(
     page,
     orderBy,
     orderDirection,
-    memberships,
-    includeGroupIds,
   }: SearchProfilesOptions,
 ): Promise<SearchProfilesResult> {
   let sortOptions: PaginationSqlOptions = {
@@ -101,36 +89,6 @@ export async function __searchProfiles(
     ? `"Addresses".community_id = $community_id AND`
     : '';
 
-  const groupIdFromMemberships = parseInt(
-    ((memberships || '').match(/in-group:(\d+)/) || [`0`, `0`])[1],
-  );
-  let membershipsWhere = memberships
-    ? `SELECT 1 FROM "Memberships"
-    JOIN "Groups" ON "Groups".id = "Memberships".group_id
-    WHERE "Memberships".address_id = "Addresses".id
-    AND "Groups".community_id = $community_id
-    ${
-      groupIdFromMemberships
-        ? `AND "Groups".id = ${groupIdFromMemberships}`
-        : ''
-    }
-    `
-    : '';
-
-  if (memberships) {
-    switch (memberships) {
-      case 'in-group':
-      case `in-group:${groupIdFromMemberships}`:
-        membershipsWhere = `AND EXISTS (${membershipsWhere} AND "Memberships".reject_reason IS NULL)`;
-        break;
-      case 'not-in-group':
-        membershipsWhere = `AND NOT EXISTS (${membershipsWhere} AND "Memberships".reject_reason IS NULL)`;
-        break;
-      default:
-        throw new AppError(`unsupported memberships param: ${memberships}`);
-    }
-  }
-
   const sqlWithoutPagination = `
     SELECT
       "Profiles".id,
@@ -153,7 +111,6 @@ export async function __searchProfiles(
         OR
         "Addresses".address ILIKE '%' || $searchTerm || '%'
       )
-      ${membershipsWhere}
     GROUP BY
       "Profiles".id
   `;
@@ -228,29 +185,9 @@ export async function __searchProfiles(
     }
   }
 
-  if (includeGroupIds) {
-    const addressIds = uniq(
-      flatten(profilesWithAddresses.map((p) => p.addresses)).map((a) => a.id),
-    );
-    const existingMemberships = await this.models.Membership.findAll({
-      where: {
-        address_id: {
-          [Op.in]: addressIds,
-        },
-        reject_reason: null,
-      },
-    });
-    // add group IDs to profiles
-    for (const profile of profilesWithAddresses) {
-      profile.group_ids = uniq(
-        existingMemberships
-          .filter((m) => {
-            return profile.addresses.map((a) => a.id).includes(m.address_id);
-          })
-          .map((m) => m.group_id),
-      );
-    }
-  }
-
-  return buildPaginatedResponse(profilesWithAddresses, totalResults, bind);
+  return schemas.queries.buildPaginatedResponse(
+    profilesWithAddresses,
+    totalResults,
+    bind,
+  );
 }
