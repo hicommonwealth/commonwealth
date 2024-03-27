@@ -164,7 +164,7 @@
     "node-jose": "^2.2.0",
     "node-object-hash": "^3.0.0",
     "numeral": "^2.0.6",
-    "openai": "^3.1.0",
+    "openai": "^4.0.0",
     "os-browserify": "^0.3.0",
     "parchment": "^1.1.4",
     "passport": "^0.4.0",
