@@ -59,6 +59,7 @@ export async function setupListener(): Promise<Client> {
     stats().increment('messageRelayerNotificationReceived');
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   client.on('error', async (err: Error) => {
     log.error(
       'PG subscriber encountered an error. Attempting to reconnect...',
