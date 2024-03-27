@@ -92,7 +92,7 @@ const MyCommunityStake = () => {
       </CWTabsRow>
 
       {activeTabIndex === 0 ? (
-        <Stakes />
+        <Stakes filterOptions={filterOptions} />
       ) : (
         <Transactions filterOptions={filterOptions} />
       )}

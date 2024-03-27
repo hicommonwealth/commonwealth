@@ -1,47 +1,95 @@
 import { CacheNamespaces, cache, logger } from '@hicommonwealth/core';
-import type { DB } from '@hicommonwealth/model';
-import { AddressAttributes } from '@hicommonwealth/model';
+import { QueryTypes } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
-import {
-  ActivityRow,
-  getActivityFeed,
-  type GlobalActivity,
-} from './activityQuery';
+import { DB } from './models/index';
 
-type GlobalActivityJson = Array<
-  Omit<ActivityRow, 'commenters'> & {
-    commenters: Array<{ id: number; Addresses: AddressAttributes[] }>;
-  }
->;
+export async function getActivityFeed(models: DB, id = 0) {
+  /**
+   * Last 50 updated threads
+   */
+
+  const filterByCommunityForUsers = id
+    ? 'JOIN "Addresses" a on a.community_id=t.community_id and a.user_id = ?'
+    : '';
+
+  const query = `
+    WITH ranked_thread_notifs AS (
+        SELECT t.id AS thread_id, t.max_notif_id
+        FROM "Threads" t
+        ${filterByCommunityForUsers}
+        WHERE deleted_at IS NULL
+        ORDER BY t.max_notif_id DESC
+        LIMIT 50
+    ) SELECT
+        nts.thread_id,
+        nts.created_at AS last_activity,
+        nts.notification_data,
+        nts.category_id,
+        thr.comment_count,
+                COALESCE(
+                    json_agg(
+                        json_build_object('Addresses', json_build_array(row_to_json(A)))
+                    ) FILTER (WHERE A.id IS NOT NULL), 
+                    json_build_array()
+                ) as commenters
+    FROM ranked_thread_notifs rtn
+    INNER JOIN "Notifications" nts ON rtn.max_notif_id = nts.id
+    JOIN "Threads" thr ON thr.id = rtn.thread_id
+    LEFT JOIN "Comments" C ON C.id = (nts.notification_data::JSONB ->> 'comment_id')::INTEGER
+    LEFT JOIN LATERAL (
+        SELECT A.id, A.address, A.community_id, A.profile_id
+        FROM "Addresses" A
+        JOIN "Comments" C ON A.id = C.address_id AND C.thread_id = thr.id
+        WHERE C.deleted_at IS NULL
+        ORDER BY A.id
+        LIMIT 4
+    ) A ON TRUE
+    WHERE (category_id = 'new-comment-creation' AND C.deleted_at IS NULL) OR category_id = 'new-thread-creation'
+    GROUP BY nts.notification_data, nts.thread_id, nts.created_at, nts.category_id, thr.comment_count
+    ORDER BY nts.created_at DESC;
+  `;
+
+  const notifications: any = await models.sequelize.query(query, {
+    type: QueryTypes.SELECT,
+    raw: true,
+    replacements: [id],
+  });
+
+  return notifications;
+}
 
 const log = logger().getLogger(__filename);
 
-export default class GlobalActivityCache {
+export class GlobalActivityCache {
   private _cacheKey = 'global_activity';
   private _lockName = 'global_activity_cache_locker';
-  private _initialized = false;
+  private static _instance: GlobalActivityCache;
 
   constructor(
     private _models: DB,
     private _cacheTTL: number = 60 * 5, // cache TTL in seconds
   ) {}
 
+  static getInstance(models: DB, cacheTTL?: number): GlobalActivityCache {
+    if (!GlobalActivityCache._instance) {
+      GlobalActivityCache._instance = new GlobalActivityCache(models, cacheTTL);
+    }
+    return GlobalActivityCache._instance;
+  }
+
   public async start() {
     await this.refreshGlobalActivity();
-    this._initialized = true;
     setInterval(this.refreshGlobalActivity.bind(this), this._cacheTTL * 1000);
   }
 
-  public async getGlobalActivity(): Promise<
-    GlobalActivityJson | GlobalActivity
-  > {
+  public async getGlobalActivity() {
     const activity = await cache().getKey(
       CacheNamespaces.Activity_Cache,
       this._cacheKey,
     );
 
     if (!activity) {
-      if (this._initialized) {
+      if (GlobalActivityCache._instance) {
         const msg = 'Failed to fetch global activity from Redis';
         log.error(msg);
       }
@@ -69,7 +117,7 @@ export default class GlobalActivityCache {
 
       let activity = JSON.parse(res);
       let updated = false;
-      activity = activity.filter((a: GlobalActivityJson[number]) => {
+      activity = activity.filter((a: any) => {
         let shouldKeep: boolean;
         if (commentId) {
           const notifData = JSON.parse(a.notification_data);
@@ -93,7 +141,7 @@ export default class GlobalActivityCache {
       if (!result) {
         log.error(errorMsg);
       }
-    } catch (e) {
+    } catch (e: any) {
       log.error(errorMsg, e);
     }
   }
@@ -121,7 +169,7 @@ export default class GlobalActivityCache {
       }
 
       log.info('Activity cache successfully refreshed');
-    } catch (e) {
+    } catch (e: any) {
       const msg = 'Failed to refresh the global cache';
       log.error(msg, e);
     }
