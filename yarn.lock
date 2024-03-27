@@ -10574,7 +10574,7 @@ dotignore@^0.1.2:
   dependencies:
     minimatch "^3.0.4"
 
-dottie@^2.0.4, dottie@^2.0.6:
+dottie@^2.0.4:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/dottie/-/dottie-2.0.6.tgz#34564ebfc6ec5e5772272d466424ad5b696484d4"
   integrity sha512-iGCHkfUc5kFekGiqhe8B/mdaurD+lakO9txNnTvKtA6PISrw86LgqHvRzWYPyoE2Ph5aMIrCw9/uko6XHTKCwA==
@@ -17901,7 +17901,7 @@ pg-connection-string@^2.6.0:
   resolved "https://registry.yarnpkg.com/pg-connection-string/-/pg-connection-string-2.6.1.tgz#78c23c21a35dd116f48e12e23c0965e8d9e2cbfb"
   integrity sha512-w6ZzNu6oMmIzEAYVw+RLK0+nqHPt8K3ZnknKi+g48Ak2pr3dtljJW3o+D/n2zzCG07Zoe9VOX3aiKpj+BN0pjg==
 
-pg-connection-string@^2.6.1, pg-connection-string@^2.6.2:
+pg-connection-string@^2.6.2:
   version "2.6.2"
   resolved "https://registry.yarnpkg.com/pg-connection-string/-/pg-connection-string-2.6.2.tgz#713d82053de4e2bd166fab70cd4f26ad36aab475"
   integrity sha512-ch6OwaeaPYcova4kKZ15sbJ2hKb/VP48ZD2gE7i1J+L4MspCtBMAx8nMgz7bksc7IojCIIWuEhHibSMFH8m8oA==
@@ -20622,28 +20622,6 @@ sequelize@^6.32.1:
     pg-connection-string "^2.6.0"
     retry-as-promised "^7.0.4"
     semver "^7.5.1"
-    sequelize-pool "^7.1.0"
-    toposort-class "^1.0.1"
-    uuid "^8.3.2"
-    validator "^13.9.0"
-    wkx "^0.5.0"
-
-sequelize@^6.37.1:
-  version "6.37.1"
-  resolved "https://registry.yarnpkg.com/sequelize/-/sequelize-6.37.1.tgz#9380fe0a3b5ff17638d3fce30c3cf3a2396c2343"
-  integrity sha512-vIKKzQ9dGp2aBOxQRD1FmUYViuQiKXSJ8yah8TsaBx4U3BokJt+Y2A0qz2C4pj08uX59qpWxRqSLEfRmVOEgQw==
-  dependencies:
-    "@types/debug" "^4.1.8"
-    "@types/validator" "^13.7.17"
-    debug "^4.3.4"
-    dottie "^2.0.6"
-    inflection "^1.13.4"
-    lodash "^4.17.21"
-    moment "^2.29.4"
-    moment-timezone "^0.5.43"
-    pg-connection-string "^2.6.1"
-    retry-as-promised "^7.0.4"
-    semver "^7.5.4"
     sequelize-pool "^7.1.0"
     toposort-class "^1.0.1"
     uuid "^8.3.2"
