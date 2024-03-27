@@ -69,9 +69,14 @@ export async function setupListener(): Promise<Client> {
       err,
     );
     connected = false;
-    reconnect(client).then(() => {
-      connectListener(client);
-    });
+    reconnect(client)
+      .then(() => {
+        connectListener(client);
+      })
+      .catch((e) => {
+        log.fatal('Failed to reconnect after pg error', e);
+        process.exit(1);
+      });
   });
 
   client.on('end', () => {
