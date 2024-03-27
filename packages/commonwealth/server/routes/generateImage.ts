@@ -8,10 +8,16 @@ import type { DB } from '@hicommonwealth/model';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
-const openai = new OpenAI({
-  organization: 'org-D0ty00TJDApqHYlrn1gge2Ql',
-  apiKey: process.env.OPENAI_API_KEY,
-});
+let openai: OpenAI = undefined;
+
+try {
+  openai = new OpenAI({
+    organization: 'org-D0ty00TJDApqHYlrn1gge2Ql',
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+} catch (e) {
+  console.warn('OpenAI initialization failed.');
+}
 
 type generateImageReq = {
   description: string;
@@ -26,6 +32,10 @@ const generateImage = async (
   res: TypedResponse<generateImageResp>,
 ) => {
   const { description } = req.body;
+
+  if (!openai) {
+    throw new AppError('OpenAI not initialized');
+  }
 
   if (!description) {
     throw new AppError('No description provided');
