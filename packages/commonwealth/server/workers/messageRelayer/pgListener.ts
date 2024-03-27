@@ -38,7 +38,11 @@ async function reconnect(client: Client) {
     }
   } else {
     log.fatal('Max retry attempts reached. Exiting...');
-    await client.end();
+    try {
+      await client.end();
+    } catch (e) {
+      log.error('Failed to close pg client', e);
+    }
     process.exit(1);
   }
 }
@@ -59,14 +63,15 @@ export async function setupListener(): Promise<Client> {
     stats().increment('messageRelayerNotificationReceived');
   });
 
-  client.on('error', async (err: Error) => {
+  client.on('error', (err: Error) => {
     log.error(
       'PG subscriber encountered an error. Attempting to reconnect...',
       err,
     );
     connected = false;
-    await reconnect(client);
-    await connectListener(client);
+    reconnect(client).then(() => {
+      connectListener(client);
+    });
   });
 
   client.on('end', () => {

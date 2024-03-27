@@ -2,11 +2,13 @@ import {
   BrokerTopics,
   delay,
   EventContext,
+  ILogger,
   InvalidInput,
   Policy,
   schemas,
 } from '@hicommonwealth/core';
 import chai from 'chai';
+import { AckOrNack } from 'rascal';
 import { getRabbitMQConfig, RascalConfigServices } from '../../src';
 import { RabbitMQAdapter } from '../../src/rabbitmq/RabbitMQAdapter';
 
@@ -71,6 +73,10 @@ describe('RabbitMQ', () => {
       await rmqAdapter.dispose();
     });
 
+    after(async () => {
+      await rmqAdapter.broker.purge();
+    });
+
     it('should return false if a publication cannot be found', async () => {
       const res = await rmqAdapter.publish(
         'Testing' as BrokerTopics,
@@ -110,6 +116,14 @@ describe('RabbitMQ', () => {
       await rmqAdapter.dispose();
     });
 
+    afterEach(async () => {
+      console.log('After...');
+      await rmqAdapter.broker.unsubscribeAll();
+      console.log('Unsubscribed from all');
+      await rmqAdapter.broker.purge();
+      console.log('Purged all queues');
+    });
+
     it('should return false if the subscription cannot be found', async () => {
       const res = await rmqAdapter.subscribe(
         'Testing' as BrokerTopics,
@@ -139,7 +153,7 @@ describe('RabbitMQ', () => {
         },
       });
       expect(pubRes).to.be.true;
-      await delay(2000);
+      await delay(1000);
 
       expect(idOutput).to.equal(idInput);
     }).timeout(20000);
@@ -159,28 +173,41 @@ describe('RabbitMQ', () => {
         },
       });
 
-      let retryExecuted = false;
+      let retryExecuted;
       const subRes = await rmqAdapter.subscribe(
         BrokerTopics.SnapshotListener,
         FailingSnapshot(),
-        (err: Error | undefined) => {
-          console.log(err);
-          if (err instanceof InvalidInput) {
-            retryExecuted = true;
-          }
+        (
+          err: any,
+          topic: BrokerTopics,
+          content: any,
+          ackOrNackFn: AckOrNack,
+          _log: ILogger,
+        ) => {
+          retryExecuted = err instanceof InvalidInput;
+          ackOrNackFn();
         },
       );
       expect(subRes).to.be.true;
-      const pubRes = await rmqAdapter.publish(BrokerTopics.SnapshotListener, {
+      const pubRes1 = await rmqAdapter.publish(BrokerTopics.SnapshotListener, {
         name: eventName,
         payload: {
           id: 1,
         } as any,
       });
-      expect(pubRes).to.be.true;
-      await delay(2000);
+      expect(pubRes1).to.be.true;
+      await delay(1000);
       expect(retryExecuted).to.be.true;
       expect(shouldNotExecute).to.be.true;
-    });
+      const pubRes = await rmqAdapter.publish(BrokerTopics.SnapshotListener, {
+        name: eventName,
+        payload: {
+          id: '1',
+        } as any,
+      });
+      await delay(1000);
+      expect(pubRes).to.be.true;
+      expect(shouldNotExecute).to.be.false;
+    }).timeout(5000);
   });
 });
