@@ -1,12 +1,12 @@
-#! /bin/bash
+#!/usr/bin/env bash
 
 # Sanity scripts we should run locally before pushing code
-set -e 
+set -e
 
 # lint changes
 yarn lint-branch-warnings
 
-# check types 
+# check types
 # build libs to update types (tsc -b --noEmit is not allowed)
 yarn workspaces run clean
 yarn workspace @hicommonwealth/adapters build
