@@ -74,12 +74,11 @@ class CoinbaseWebWalletController implements IWebWallet<string> {
   public async getSessionSigner() {
     return new SIWESigner({
       // TODO: provider type for ethers 5?
-      // @ts-ignore
       signer: {
         signMessage: async (message) =>
           this._web3.givenProvider.request({
             method: 'personal_sign',
-            params: [this.accounts[0], message],
+            params: [message, this.accounts[0]],
           }),
         getAddress: async () => this.accounts[0],
       },
