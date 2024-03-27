@@ -351,6 +351,12 @@ jobs:
           GITHUB_BASE_REF: ${{ github.base_ref }}
         run: yarn lint-branch
 
+      - name: Run eslint-diff
+        run: yarn workspace commonwealth run lint-diff
+
+      - name: Run eslint-diff-canary to make sure eslint-diff is functioning properly
+        run: yarn workspace commonwealth run lint-diff-canary
+
       - name: Commonwealth Typecheck
         run: yarn --cwd packages/commonwealth check-types
 

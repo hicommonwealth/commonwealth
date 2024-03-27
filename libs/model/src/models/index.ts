@@ -51,7 +51,7 @@ import NotificationCategoryFactory, {
 import NotificationsReadFactory, {
   type NotificationsReadModelStatic,
 } from './notifications_read';
-import OutboxFactory, { type OutboxModelStatic } from './outbox';
+// import OutboxFactory, { type OutboxModelStatic } from './outbox';
 import PollFactory, { type PollModelStatic } from './poll';
 import ProfileFactory, { type ProfileModelStatic } from './profile';
 import ReactionFactory, { type ReactionModelStatic } from './reaction';
@@ -62,6 +62,9 @@ import SnapshotSpaceFactory, {
   type SnapshotSpaceModelStatic,
 } from './snapshot_spaces';
 import SsoTokenFactory, { type SsoTokenModelStatic } from './sso_token';
+import StakeTransactionFactory, {
+  type StakeTransactionModelStatic,
+} from './stake_transaction';
 import StarredCommunityFactory, {
   type StarredCommunityModelStatic,
 } from './starred_community';
@@ -109,11 +112,12 @@ export type Models = {
   SsoToken: SsoTokenModelStatic;
   StarredCommunity: StarredCommunityModelStatic;
   SnapshotProposal: SnapshotProposalModelStatic;
+  StakeTransaction: StakeTransactionModelStatic;
   Subscription: SubscriptionModelStatic;
   SnapshotSpace: SnapshotSpaceModelStatic;
   User: UserModelStatic;
   Webhook: WebhookModelStatic;
-  Outbox: OutboxModelStatic;
+  // Outbox: OutboxModelStatic;
 };
 
 export type DB = Models & {
@@ -162,6 +166,7 @@ export const buildDb = (sequelize: Sequelize): DB => {
     Vote: VoteFactory(sequelize, DataTypes),
     Profile: ProfileFactory(sequelize, DataTypes),
     SsoToken: SsoTokenFactory(sequelize, DataTypes),
+    StakeTransaction: StakeTransactionFactory(sequelize, DataTypes),
     StarredCommunity: StarredCommunityFactory(sequelize, DataTypes),
     SnapshotProposal: SnapshotProposalFactory(sequelize, DataTypes),
     SnapshotSpace: SnapshotSpaceFactory(sequelize, DataTypes),
@@ -169,7 +174,7 @@ export const buildDb = (sequelize: Sequelize): DB => {
     User: UserFactory(sequelize, DataTypes),
     Webhook: WebhookFactory(sequelize, DataTypes),
     CommunityStake: CommunityStakeFactory(sequelize, DataTypes),
-    Outbox: OutboxFactory(sequelize, DataTypes),
+    // Outbox: OutboxFactory(sequelize, DataTypes),
   };
 
   const db = {
@@ -220,6 +225,7 @@ export * from './role_assignment';
 export * from './snapshot_proposal';
 export * from './snapshot_spaces';
 export * from './sso_token';
+export * from './stake_transaction';
 export * from './starred_community';
 export * from './subscription';
 export * from './template';

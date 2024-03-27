@@ -10,4 +10,5 @@ export enum APIOrderBy {
   LastActive = 'last_active',
   Rank = 'rank',
   CreatedAt = 'created_at',
+  ProfileName = 'profile_name',
 }
