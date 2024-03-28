@@ -1,20 +1,23 @@
 import { schemas } from '@hicommonwealth/core';
-import { InsertOutboxEvent } from '@hicommonwealth/model';
+import { OutboxAttributes } from '@hicommonwealth/model';
 
-export const testOutboxEvents: [InsertOutboxEvent, ...InsertOutboxEvent[]] = [
+export const testOutboxEvents: OutboxAttributes[] = [
   {
-    name: 'second' as schemas.Events,
-    payload: {},
+    event_name: 'second' as schemas.EventNames,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    event_payload: {} as any,
     created_at: new Date('2024-01-02T00:00:00.000Z'),
   },
   {
-    name: 'third' as schemas.Events,
-    payload: {},
+    event_name: 'third' as schemas.EventNames,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    event_payload: {} as any,
     created_at: new Date('2024-01-03T00:00:00.000Z'),
   },
   {
-    name: 'first' as schemas.Events,
-    payload: {},
+    event_name: 'first' as schemas.EventNames,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    event_payload: {} as any,
     created_at: new Date('2024-01-01T00:00:00.000Z'),
   },
 ];

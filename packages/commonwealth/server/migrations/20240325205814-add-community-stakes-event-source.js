@@ -256,6 +256,18 @@ const abi_hash = hashInstance.hash(namespaceFactoryAbi);
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (transaction) => {
+      await queryInterface.renameColumn('Outbox', 'id', 'event_id', {
+        transaction,
+      });
+
+      await queryInterface.sequelize.query(
+        `
+        ALTER TABLE "Outbox"
+        ALTER COLUMN event_id SET NOT NULL;
+      `,
+        { transaction },
+      );
+
       // link EvmEventSources to an abi directly (bypass Contracts table)
       await queryInterface.addColumn(
         'EvmEventSources',

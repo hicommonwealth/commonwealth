@@ -462,7 +462,7 @@ export const ChainNode = z.object({
 export const Chain = Community;
 
 export const Outbox = z.object({
-  id: z.number(),
+  event_id: z.number(),
   event_name: z.nativeEnum(EventNames),
   event_payload: z.union([
     events.ThreadCreated.extend({
