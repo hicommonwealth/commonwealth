@@ -4,22 +4,22 @@ import app from 'state';
 
 interface BanProfileByAddressProps {
   address: string;
-  chainId: string;
+  communityId: string;
 }
 
 const banProfileByAddress = async ({
   address,
-  chainId,
+  communityId,
 }: BanProfileByAddressProps) => {
   return await axios.post('/api/banAddress', {
     jwt: app.user.jwt,
     address: address,
-    community_id: chainId,
+    community_id: communityId,
   });
 };
 
 const useBanProfileByAddressMutation = ({
-  chainId,
+  communityId,
   address,
 }: BanProfileByAddressProps) => {
   return useMutation({

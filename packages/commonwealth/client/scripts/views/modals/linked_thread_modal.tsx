@@ -1,21 +1,21 @@
 import React, { useState } from 'react';
 
-import type Thread from '../../models/Thread';
-import app from '../../state';
 import { notifyError } from '../../controllers/app/notifications';
 import { getAddedAndDeleted } from '../../helpers/threads';
+import type Thread from '../../models/Thread';
 import { LinkSource } from '../../models/Thread';
+import app from '../../state';
 import {
   useAddThreadLinksMutation,
   useDeleteThreadLinksMutation,
 } from '../../state/api/threads';
-import { ThreadSelector } from '../components/thread_selector';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
+import { ThreadSelector } from '../components/thread_selector';
 
 type LinkedThreadModalProps = {
   linkedThreads: Thread[];
@@ -34,25 +34,25 @@ export const LinkedThreadModal = ({
     useState<Array<Thread>>(initialLinkedThreads);
 
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: thread.id,
   });
 
   const { mutateAsync: deleteThreadLinks } = useDeleteThreadLinksMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: thread.id,
   });
 
   const handleSaveChanges = async () => {
     const { toAdd, toDelete } = getAddedAndDeleted(
       tempLinkedThreads,
-      initialLinkedThreads
+      initialLinkedThreads,
     );
     let links: Thread['links'];
     try {
       if (toAdd.length) {
         const updatedThread = await addThreadLinks({
-          chainId: app.activeChainId(),
+          communityId: app.activeChainId(),
           threadId: thread.id,
           links: toAdd.map((el) => ({
             source: LinkSource.Thread,
@@ -64,7 +64,7 @@ export const LinkedThreadModal = ({
       }
       if (toDelete.length) {
         const updatedThread = await deleteThreadLinks({
-          chainId: app.activeChainId(),
+          communityId: app.activeChainId(),
           threadId: thread.id,
           links: toDelete.map((el) => ({
             source: LinkSource.Thread,
@@ -86,7 +86,7 @@ export const LinkedThreadModal = ({
 
   const handleSelectThread = (selectedThread: Thread) => {
     const isSelected = tempLinkedThreads.find(
-      ({ id }) => selectedThread.id === id
+      ({ id }) => selectedThread.id === id,
     );
     const updatedLinkedThreads = isSelected
       ? tempLinkedThreads.filter(({ id }) => selectedThread.id !== id)

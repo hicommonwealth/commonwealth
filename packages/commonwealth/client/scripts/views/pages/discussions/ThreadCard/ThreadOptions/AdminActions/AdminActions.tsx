@@ -75,7 +75,7 @@ export const AdminActions = ({
     reset: resetDeleteThreadMutation,
     error: deleteThreadError,
   } = useDeleteThreadMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: thread.id,
     currentStage: thread.stage,
   });
@@ -86,7 +86,7 @@ export const AdminActions = ({
   });
 
   const { mutateAsync: editThread } = useEditThreadMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: thread.id,
     currentStage: thread.stage,
     currentTopicId: thread.topic?.id,
@@ -105,7 +105,7 @@ export const AdminActions = ({
             try {
               await deleteThread({
                 threadId: thread.id,
-                chainId: app.activeChainId(),
+                communityId: app.activeChainId(),
                 address: app.user.activeAccount.address,
               });
               onDelete?.();
@@ -174,7 +174,7 @@ export const AdminActions = ({
             const isSpam = !thread.markedAsSpamAt;
             try {
               await editThread({
-                chainId: app.activeChainId(),
+                communityId: app.activeChainId(),
                 threadId: thread.id,
                 spam: isSpam,
                 address: app.user?.activeAccount?.address,
@@ -199,7 +199,7 @@ export const AdminActions = ({
       address: app.user.activeAccount.address,
       threadId: thread.id,
       readOnly: !thread.readOnly,
-      chainId: app.activeChainId(),
+      communityId: app.activeChainId(),
     })
       .then(() => {
         notifySuccess(thread?.readOnly ? 'Unlocked!' : 'Locked!');
@@ -214,7 +214,7 @@ export const AdminActions = ({
     editThread({
       address: app.user.activeAccount.address,
       threadId: thread.id,
-      chainId: app.activeChainId(),
+      communityId: app.activeChainId(),
       pinned: !thread.pinned,
     })
       .then(() => {
@@ -271,7 +271,7 @@ export const AdminActions = ({
     } else {
       editThread({
         threadId: thread.id,
-        chainId: app.activeChainId(),
+        communityId: app.activeChainId(),
         archived: !thread.archivedAt,
         address: app.user?.activeAccount?.address,
       })

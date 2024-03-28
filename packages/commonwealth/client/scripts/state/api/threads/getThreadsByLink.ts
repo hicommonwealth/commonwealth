@@ -7,7 +7,7 @@ import { ApiEndpoints } from 'state/api/config';
 const THREAD_STALE_TIME = 5000; // 5 seconds
 
 interface GetThreadsByLinkProps {
-  chainId: string;
+  communityId: string;
   link: Link;
   enabled: boolean;
 }
@@ -25,7 +25,7 @@ const getThreadsByLink = async ({
 
 // Gets all threads associated with a link(ie all threads linked to 1 proposal)
 const useGetThreadsByLinkQuery = ({
-  chainId,
+  communityId,
   link,
   enabled,
 }: GetThreadsByLinkProps) => {
@@ -46,12 +46,12 @@ const useGetThreadsByLinkQuery = ({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [
       ApiEndpoints.FETCH_THREADS,
-      chainId,
+      communityId,
       'byLink',
       link.source,
       link.identifier,
     ],
-    queryFn: () => getThreadsByLink({ chainId, link, enabled }),
+    queryFn: () => getThreadsByLink({ communityId, link, enabled }),
     staleTime: THREAD_STALE_TIME,
     enabled: enabled,
   });

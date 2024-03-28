@@ -11,7 +11,7 @@ class AddressInfo extends Account {
   constructor({
     id,
     address,
-    chainId,
+    communityId,
     keytype,
     walletId,
     walletSsoSource,
@@ -21,7 +21,7 @@ class AddressInfo extends Account {
   }: {
     id: number | null | undefined;
     address: string;
-    chainId: string;
+    communityId: string;
     keytype?: string;
     walletId?: WalletId;
     walletSsoSource?: WalletSsoSource;
@@ -29,8 +29,8 @@ class AddressInfo extends Account {
     profileId?: number;
     lastActive?: string | moment.Moment;
   }) {
-    const chain = app.config.chains.getById(chainId);
-    if (!chain) throw new Error(`Failed to locate chain: ${chainId}`);
+    const chain = app.config.chains.getById(communityId);
+    if (!chain) throw new Error(`Failed to locate chain: ${communityId}`);
     super({
       address,
       community: chain,

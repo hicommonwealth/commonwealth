@@ -5,7 +5,7 @@ import app from 'state';
 import { updateThreadInAllCaches } from './helpers/cache';
 
 interface DeleteThreadLinksProps {
-  chainId: string;
+  communityId: string;
   threadId: number;
   links: Link[];
 }
@@ -29,18 +29,18 @@ const deleteThreadLinks = async ({
 };
 
 interface DeleteThreadLinksMutationProps {
-  chainId: string;
+  communityId: string;
   threadId: number;
 }
 
 const useDeleteThreadLinksMutation = ({
-  chainId,
+  communityId,
   threadId,
 }: DeleteThreadLinksMutationProps) => {
   return useMutation({
     mutationFn: deleteThreadLinks,
     onSuccess: async (updatedThread) => {
-      updateThreadInAllCaches(chainId, threadId, updatedThread);
+      updateThreadInAllCaches(communityId, threadId, updatedThread);
       return updatedThread;
     },
   });

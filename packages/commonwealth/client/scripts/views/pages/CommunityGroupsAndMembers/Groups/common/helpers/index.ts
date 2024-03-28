@@ -12,7 +12,7 @@ export const makeGroupDataBaseAPIPayload = (
   formSubmitValues: GroupResponseValuesType,
 ) => {
   const payload = {
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     address: app.user.activeAccount.address,
     groupName: formSubmitValues.groupName.trim(),
     groupDescription: (formSubmitValues.groupDescription || '').trim(),

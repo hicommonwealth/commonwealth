@@ -17,7 +17,7 @@ const CreateCommunityGroupPage = () => {
   const { setShouldShowGroupMutationBannerForCommunity } =
     useGroupMutationBannerStore();
   const { mutateAsync: createGroup } = useCreateGroupMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   useBrowserAnalyticsTrack({

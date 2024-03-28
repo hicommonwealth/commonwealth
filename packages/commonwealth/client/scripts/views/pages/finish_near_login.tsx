@@ -77,7 +77,7 @@ const FinishNearLogin = () => {
       const acct = app.chain.accounts.get(wallet.getAccountId()) as NearAccount;
 
       const community =
-        app.user.selectedChain ||
+        app.user.selectedCommunity ||
         app.config.chains.getById(app.activeChainId());
 
       // create canvas thing

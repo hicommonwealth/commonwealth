@@ -114,7 +114,7 @@ export const ThreadCard = ({
           <div className="content-header">
             <AuthorAndPublishInfo
               authorAddress={thread.author}
-              authorChainId={thread.authorChain}
+              authorCommunityId={thread.authorCommunity}
               publishDate={thread.createdAt}
               isHot={isHot(thread)}
               isLocked={thread.readOnly}

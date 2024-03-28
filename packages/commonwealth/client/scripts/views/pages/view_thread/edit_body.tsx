@@ -45,7 +45,7 @@ export const EditBody = (props: EditBodyProps) => {
     reset: resetEditThreadMutation,
     error: editThreadError,
   } = useEditThreadMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: thread.id,
     currentStage: thread.stage,
     currentTopicId: thread.topic.id,
@@ -104,7 +104,7 @@ export const EditBody = (props: EditBodyProps) => {
         threadId: thread.id,
         authorProfile: app.user.activeAccount.profile,
         address: app.user.activeAccount.address,
-        chainId: app.activeChainId(),
+        communityId: app.activeChainId(),
       });
       clearEditingLocalStorage(thread.id, ContentType.Thread);
       notifySuccess('Thread successfully edited');

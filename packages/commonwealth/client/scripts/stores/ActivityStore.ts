@@ -1,6 +1,6 @@
+import { byAscendingCreationDate } from '../helpers';
 import type AbridgedThread from '../models/AbridgedThread';
 import AddressInfo from '../models/AddressInfo';
-import { byAscendingCreationDate } from '../helpers';
 
 export interface IAddressCountAndInfo {
   postCount: number;
@@ -41,7 +41,7 @@ export class ActiveThreadsStore {
   }
 
   public addThread(thread: AbridgedThread) {
-    const parentEntity = thread.chain;
+    const parentEntity = thread.community;
     if (!this._threadsByCommunity[parentEntity]) {
       this._threadsByCommunity[parentEntity] = [];
     }
@@ -77,14 +77,14 @@ export class ActiveAddressesStore {
   }
 
   public getAddressActivityByCommunity(
-    communityId: string
+    communityId: string,
   ): IIdScopedAddressCountAndInfo {
     return this._addressesByCommunity[communityId] || {};
   }
 
   public getMostActiveUsers(
     communityId: string,
-    count: number
+    count: number,
   ): Array<IAddressCountAndInfo> {
     const communityStore = this._addressesByCommunity[communityId];
     return communityStore
@@ -106,7 +106,7 @@ export class ActiveAddressesStore {
       const addressInfo = new AddressInfo({
         id: null,
         address: address.address,
-        chainId: chain,
+        communityId: chain,
       });
       const postCount = 1;
       communityStore[id] = { addressInfo, postCount };
@@ -118,7 +118,7 @@ export class ActiveAddressesStore {
 
   public removeAddressActivity(
     addressId: number | string,
-    parentEntity: string
+    parentEntity: string,
   ) {
     const communityStore = this._addressesByCommunity[parentEntity];
     if (communityStore[addressId]) {

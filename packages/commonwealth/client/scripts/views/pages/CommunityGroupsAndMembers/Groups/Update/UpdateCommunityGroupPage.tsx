@@ -29,7 +29,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
     useGroupMutationBannerStore();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { mutateAsync: editGroup } = useEditGroupMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
   const { data: groups = [], isLoading } = useFetchGroupsQuery({
     communityId: app.activeChainId(),

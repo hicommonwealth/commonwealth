@@ -91,19 +91,19 @@ export const UpdateProposalStatusModal = ({
       app.chain.network === ChainNetwork.Compound);
 
   const { mutateAsync: editThread } = useEditThreadMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: thread.id,
     currentStage: thread.stage,
     currentTopicId: thread.topic.id,
   });
 
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: thread.id,
   });
 
   const { mutateAsync: deleteThreadLinks } = useDeleteThreadLinksMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: thread.id,
   });
 
@@ -117,7 +117,7 @@ export const UpdateProposalStatusModal = ({
     try {
       await editThread({
         address: app.user.activeAccount.address,
-        chainId: app.activeChainId(),
+        communityId: app.activeChainId(),
         threadId: thread.id,
         stage: tempStage,
       });
@@ -161,7 +161,7 @@ export const UpdateProposalStatusModal = ({
           });
         }
         const updatedThread = await addThreadLinks({
-          chainId: app.activeChainId(),
+          communityId: app.activeChainId(),
           threadId: thread.id,
           links: [
             {
@@ -177,7 +177,7 @@ export const UpdateProposalStatusModal = ({
 
       if (toDelete.length > 0) {
         const updatedThread = await deleteThreadLinks({
-          chainId: app.activeChainId(),
+          communityId: app.activeChainId(),
           threadId: thread.id,
           links: toDelete.map((sn) => ({
             source: LinkSource.Snapshot,
@@ -201,7 +201,7 @@ export const UpdateProposalStatusModal = ({
 
       if (toAdd.length > 0) {
         const updatedThread = await addThreadLinks({
-          chainId: app.activeChainId(),
+          communityId: app.activeChainId(),
           threadId: thread.id,
           links: toAdd.map(({ identifier }) => ({
             source: LinkSource.Proposal,
@@ -214,7 +214,7 @@ export const UpdateProposalStatusModal = ({
 
       if (toDelete.length > 0) {
         const updatedThread = await deleteThreadLinks({
-          chainId: app.activeChainId(),
+          communityId: app.activeChainId(),
           threadId: thread.id,
           links: toDelete.map(({ identifier }) => ({
             source: LinkSource.Proposal,
@@ -237,7 +237,7 @@ export const UpdateProposalStatusModal = ({
       );
       if (toAdd.length > 0) {
         const updatedThread = await addThreadLinks({
-          chainId: app.activeChainId(),
+          communityId: app.activeChainId(),
           threadId: thread.id,
           links: toAdd.map(({ identifier, title }) => ({
             source: LinkSource.Proposal,
@@ -251,7 +251,7 @@ export const UpdateProposalStatusModal = ({
 
       if (toDelete.length > 0) {
         const updatedThread = await deleteThreadLinks({
-          chainId: app.activeChainId(),
+          communityId: app.activeChainId(),
           threadId: thread.id,
           links: toDelete.map(({ identifier }) => ({
             source: LinkSource.Proposal,
