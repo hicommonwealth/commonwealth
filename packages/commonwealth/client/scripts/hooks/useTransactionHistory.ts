@@ -1,3 +1,5 @@
+import { WEI_PER_ETHER } from '../controllers/chain/ethereum/util';
+import app from '../state/index';
 import { trpc } from '../utils/trpcClient';
 import { buildEtherscanLink } from '../views/modals/ManageCommunityStakeModal/utils';
 import { FilterOptions } from '../views/pages/MyCommunityStake/types';
@@ -15,7 +17,6 @@ const useTransactionHistory = ({
     addresses: addressFilter.length > 0 ? addressFilter.join(',') : undefined,
   });
 
-  const WEI_PER_ETHER = 1000000000000000000;
   let filteredData = !data
     ? []
     : data.map((t) => ({
@@ -33,7 +34,10 @@ const useTransactionHistory = ({
           WEI_PER_ETHER /
           t.stake_amount
         ).toFixed(5)} ETH`,
-        etherscanLink: buildEtherscanLink(t.transaction_hash),
+        etherscanLink: buildEtherscanLink(
+          app.config.nodes.getById(t.community.chain_node_id).name,
+          t.transaction_hash,
+        ),
       }));
 
   // filter by community name and symbol

@@ -25,7 +25,8 @@ export const GetStakeTransaction: Query<
            'id', c.id,
            'default_symbol', c.default_symbol,
            'icon_url', c.icon_url,
-           'name', c.name
+           'name', c.name,
+           'chain_node_id', c.chain_node_id
          ) AS community
        FROM "StakeTransactions" AS t
        LEFT JOIN "Communities" AS c ON c.id = t.community_id

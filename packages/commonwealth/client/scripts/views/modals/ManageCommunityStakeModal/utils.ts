@@ -19,8 +19,11 @@ export const convertEthToUsd = (
   return (eth * rate).toFixed(2);
 };
 
-export const buildEtherscanLink = (txHash: string) => {
-  //const prefix = 'Base.';
+export const buildEtherscanLink = (chainNodeName: string, txHash: string) => {
+  if (chainNodeName.toLowerCase() === 'blast') {
+    return `https://blastscan.io/tx/${txHash}`;
+  }
+
   return `https://basescan.org/tx/${txHash}`;
 };
 

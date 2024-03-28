@@ -55,6 +55,7 @@ export const GetStakeTransaction = {
         default_symbol: z.string(),
         icon_url: z.string(),
         name: z.string(),
+        chain_node_id: z.number().nullable(),
       }),
     })
     .array(),
