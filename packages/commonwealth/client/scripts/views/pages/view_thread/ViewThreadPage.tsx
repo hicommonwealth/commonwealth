@@ -15,6 +15,7 @@ import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/view_thread/index.scss';
 import React, { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
 import {
@@ -113,6 +114,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     ids: [+threadId].filter(Boolean),
     apiCallEnabled: !!threadId, // only call the api if we have thread id
   });
+
+  const communityImage = app.config.chains.getById(app.activeChainId()).iconUrl;
 
   const thread = data?.[0];
 
@@ -382,6 +385,27 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   return (
     // TODO: the editing experience can be improved (we can remove a stale code and make it smooth) - create a ticket
     <>
+      <Helmet defaultTitle="Common">
+        {/* Default sharing */}
+        <meta name="title" content={thread.title} />
+        <meta name="description" content={thread.body} />
+        <meta name="author" content={thread.author} />
+
+        {/* Open Graph */}
+        <meta property="og:title" content={thread.title} />
+        <meta property="og:description" content={thread.body} />
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content={thread.title} />
+        <meta name="twitter:site" content="@hicommonwealth" />
+        <meta name="twitter:description" content={thread.body} />
+        <meta name="twitter:card" content={communityImage} />
+        <meta
+          name="twitter:image:src"
+          content="https://commonwealth.im/static/img/branding/common.png"
+        />
+      </Helmet>
+
       <CWContentPage
         showTabs={isCollapsedSize && tabsShouldBePresent}
         contentBodyLabel="Thread"

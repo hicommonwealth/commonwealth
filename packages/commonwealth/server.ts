@@ -13,13 +13,13 @@ import {
   PORT,
   REDIS_URL,
   SERVER_URL,
+  PRERENDER_TOKEN
 } from './server/config';
 import { DatabaseCleaner } from './server/util/databaseCleaner';
 
 const PRODUCTION = process.env.NODE_ENV === 'production';
 const SEND_EMAILS = process.env.SEND_EMAILS === 'true';
 const NO_CLIENT = process.env.NO_CLIENT === 'true' || SEND_EMAILS;
-const NO_PRERENDER = process.env.NO_PRERENDER || NO_CLIENT;
 
 // bootstrap production adapters
 const log = logger(PinoLogger()).getLogger(__filename);
@@ -54,8 +54,7 @@ const start = async () => {
     withLoggingMiddleware: true,
     withStatsMiddleware: true,
     withFrontendBuild: !NO_CLIENT,
-    withPrerender:
-      PRODUCTION && !NO_PRERENDER && SERVER_URL.includes('commonwealth.im'),
+    withPrerender: !!PRERENDER_TOKEN
   })
     .then(() => {
       isServiceHealthy = true;
