@@ -27,13 +27,8 @@ const TransactionSucceeded = ({
   mode,
   successTransactionHash,
 }: TransactionSucceededProps) => {
-  const chainNodeName = app.config.nodes.getById(
-    app.config.chains.getById(app.activeChainId()).id,
-  ).ethChainId;
-  const etherscanLink = buildEtherscanLink(
-    chainNodeName,
-    successTransactionHash,
-  );
+  const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
+  const etherscanLink = buildEtherscanLink(ethChainId, successTransactionHash);
 
   const handleOpenExternalLink = () => {
     window.open(etherscanLink, '_blank');
