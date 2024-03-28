@@ -101,7 +101,7 @@ export const getFeedHandler = async (
       },
     });
     const updated = computeUpdated(bulkThreads);
-    const self = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+    // const self = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
 
     const feed = new Feed({
       title: community.name,
