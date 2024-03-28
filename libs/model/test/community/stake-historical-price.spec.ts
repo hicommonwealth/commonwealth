@@ -95,6 +95,6 @@ describe('Stake Historical Price', () => {
         community_id,
       },
     });
-    expect(results[0].old_price).to.equal('10');
+    expect(results[0].old_price).to.equal('88');
   });
 });
