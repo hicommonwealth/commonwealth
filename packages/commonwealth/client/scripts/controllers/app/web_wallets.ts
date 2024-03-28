@@ -33,7 +33,6 @@ export default class WebWalletController {
     // handle case like injective, axie, where we require a specific wallet
     const specificChain = app.chain?.meta?.id;
     if (app.chain?.meta?.id) {
-      console.log('specific chain', specificChain);
       const specificWallets = this._wallets.filter(
         (w) => !!w.specificChains?.includes(specificChain),
       );
