@@ -2,12 +2,15 @@ import {
   BrokerTopics,
   delay,
   EventContext,
+  ILogger,
+  InvalidInput,
   Policy,
   schemas,
 } from '@hicommonwealth/core';
 import chai from 'chai';
-import { RabbitMQAdapter } from '../../build';
+import { AckOrNack } from 'rascal';
 import { getRabbitMQConfig, RascalConfigServices } from '../../src';
+import { RabbitMQAdapter } from '../../src/rabbitmq/RabbitMQAdapter';
 
 const expect = chai.expect;
 
@@ -32,7 +35,7 @@ const Snapshot: Policy<typeof inputs> = () => ({
 describe('RabbitMQ', () => {
   let rmqAdapter: RabbitMQAdapter;
 
-  before(async () => {
+  before(() => {
     rmqAdapter = new RabbitMQAdapter(
       getRabbitMQConfig(
         'amqp://127.0.0.1',
@@ -59,13 +62,21 @@ describe('RabbitMQ', () => {
       );
       expect(res).to.be.false;
     });
-
-    after(async () => {
-      await rmqAdapter.init();
-    });
   });
 
   describe('Publishing', () => {
+    before(async () => {
+      await rmqAdapter.init();
+    });
+
+    after(async () => {
+      await rmqAdapter.dispose();
+    });
+
+    after(async () => {
+      await rmqAdapter.broker.purge();
+    });
+
     it('should return false if a publication cannot be found', async () => {
       const res = await rmqAdapter.publish(
         'Testing' as BrokerTopics,
@@ -85,16 +96,6 @@ describe('RabbitMQ', () => {
       expect(res).to.be.false;
     });
 
-    it('should return false if the event schema is invalid', async () => {
-      const res = await rmqAdapter.publish(BrokerTopics.SnapshotListener, {
-        name: eventName,
-        payload: {
-          id: 10,
-        },
-      } as unknown as EventContext<typeof eventName>);
-      expect(res).to.be.false;
-    });
-
     it('should publish a valid event and return true', async () => {
       const res = await rmqAdapter.publish(BrokerTopics.SnapshotListener, {
         name: eventName,
@@ -107,6 +108,22 @@ describe('RabbitMQ', () => {
   });
 
   describe('Subscribing', () => {
+    before(async () => {
+      await rmqAdapter.init();
+    });
+
+    after(async () => {
+      await rmqAdapter.dispose();
+    });
+
+    afterEach(async () => {
+      console.log('After...');
+      await rmqAdapter.broker.unsubscribeAll();
+      console.log('Unsubscribed from all');
+      await rmqAdapter.broker.purge();
+      console.log('Purged all queues');
+    });
+
     it('should return false if the subscription cannot be found', async () => {
       const res = await rmqAdapter.subscribe(
         'Testing' as BrokerTopics,
@@ -124,18 +141,73 @@ describe('RabbitMQ', () => {
     });
 
     it('should successfully subscribe, return true, and process a message', async () => {
-      const res = await rmqAdapter.subscribe(
+      const subRes = await rmqAdapter.subscribe(
         BrokerTopics.SnapshotListener,
         Snapshot(),
       );
-      expect(res).to.be.true;
-      await delay(5000);
+      expect(subRes).to.be.true;
+      const pubRes = await rmqAdapter.publish(BrokerTopics.SnapshotListener, {
+        name: eventName,
+        payload: {
+          id: idInput,
+        },
+      });
+      expect(pubRes).to.be.true;
+      await delay(1000);
 
       expect(idOutput).to.equal(idInput);
     }).timeout(20000);
-  });
 
-  after(async () => {
-    await rmqAdapter.dispose();
+    it('should execute a retry strategy if the payload schema is invalid', async () => {
+      let shouldNotExecute = true;
+      const inputs = {
+        SnapshotProposalCreated: schemas.events.SnapshotProposalCreated,
+      };
+
+      const FailingSnapshot: Policy<typeof inputs> = () => ({
+        inputs,
+        body: {
+          SnapshotProposalCreated: async () => {
+            shouldNotExecute = false;
+          },
+        },
+      });
+
+      let retryExecuted;
+      const subRes = await rmqAdapter.subscribe(
+        BrokerTopics.SnapshotListener,
+        FailingSnapshot(),
+        (
+          err: any,
+          topic: BrokerTopics,
+          content: any,
+          ackOrNackFn: AckOrNack,
+          _log: ILogger,
+        ) => {
+          retryExecuted = err instanceof InvalidInput;
+          ackOrNackFn();
+        },
+      );
+      expect(subRes).to.be.true;
+      const pubRes1 = await rmqAdapter.publish(BrokerTopics.SnapshotListener, {
+        name: eventName,
+        payload: {
+          id: 1,
+        } as any,
+      });
+      expect(pubRes1).to.be.true;
+      await delay(1000);
+      expect(retryExecuted).to.be.true;
+      expect(shouldNotExecute).to.be.true;
+      const pubRes = await rmqAdapter.publish(BrokerTopics.SnapshotListener, {
+        name: eventName,
+        payload: {
+          id: '1',
+        } as any,
+      });
+      await delay(1000);
+      expect(pubRes).to.be.true;
+      expect(shouldNotExecute).to.be.false;
+    }).timeout(5000);
   });
 });

@@ -1,9 +1,11 @@
+import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { CWCard } from '../component_kit/cw_card';
 import { CWText } from '../component_kit/cw_text';
 import './NewCommunityCard.scss';
 
 export const NewCommunityCard = () => {
+  const navigate = useCommonNavigate();
   return (
     <CWCard
       elevation="elevation-2"
@@ -11,7 +13,7 @@ export const NewCommunityCard = () => {
       className="new-community-card"
       onClick={(e) => {
         e.preventDefault();
-        document.location = 'https://hicommonwealth.typeform.com/to/cRP27Rp5';
+        navigate('/createCommunity', {}, null);
       }}
     >
       <div className="new-community-card-body">
