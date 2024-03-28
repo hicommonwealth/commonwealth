@@ -62,7 +62,6 @@ export default (
       emailVerified: {
         type: dataTypes.BOOLEAN,
         allowNull: true,
-        defaultValue: false,
       },
       emailNotificationInterval: {
         type: dataTypes.STRING,

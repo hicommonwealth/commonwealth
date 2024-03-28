@@ -53,8 +53,7 @@ export default (
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       underscored: true,
-      noPrimaryKey: true,
-    } as Sequelize.ModelOptions,
+    },
   );
 
   Collaboration.associate = (models) => {

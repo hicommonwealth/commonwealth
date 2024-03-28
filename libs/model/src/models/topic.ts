@@ -59,7 +59,6 @@ export default (
       default_offchain_template: {
         type: dataTypes.TEXT,
         allowNull: true,
-        defaultValue: '',
       },
       channel_id: { type: dataTypes.STRING, allowNull: true },
       group_ids: {

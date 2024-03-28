@@ -12,7 +12,7 @@ const generateSchemas = async () => {
 
   // TODO: resolve remaining conflicts
   const model_schema = await get_info_schema(model.sequelize, {
-    ignore_tables: ['Outbox'],
+    ignore_tables: ['Outbox', 'Sessions'],
     ignore_columns: {},
     ignore_constraints: {
       // TODO: missing in migrations (removed FKs for performance reasons?)
@@ -42,7 +42,7 @@ const generateSchemas = async () => {
     },
   });
   const migration_schema = await get_info_schema(migration, {
-    ignore_tables: ['Outbox'],
+    ignore_tables: ['Outbox', 'Sessions'],
     ignore_columns: {
       // TODO: missing in model
       Comments: ['body_backup', 'text_backup', 'root_id', '_search'],

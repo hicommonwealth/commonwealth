@@ -56,8 +56,7 @@ export default (
         { fields: ['group_id'] },
         //{ fields: ['address_id', 'group_id'], unique: true },
       ],
-      noPrimaryKey: true,
-    } as Sequelize.ModelOptions,
+    },
   );
 
   Membership.removeAttribute('created_at');
