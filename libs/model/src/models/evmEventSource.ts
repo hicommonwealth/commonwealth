@@ -5,17 +5,17 @@ import { ContractAbiAttributes } from './contract_abi';
 import { ModelInstance, ModelStatic } from './types';
 
 export type EvmEventSourceAttributes = {
-  id: number;
+  id?: number;
   chain_node_id: number;
   contract_address: string;
   event_signature: string;
   kind: string;
-  created_at_block: number;
-  events_migrated: boolean;
-  active: boolean;
+  created_at_block?: number;
+  events_migrated?: boolean;
+  active?: boolean;
   abi_id: number;
 
-  ContractAbi: ContractAbiAttributes;
+  ContractAbi?: ContractAbiAttributes;
   Contract?: ContractAttributes;
   ChainNode?: ChainNodeAttributes;
 };

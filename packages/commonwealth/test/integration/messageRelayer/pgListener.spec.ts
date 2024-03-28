@@ -39,7 +39,6 @@ describe('pgListener', () => {
   });
 
   it('should not send a NOTIF when relayed is updated in the Outbox', async () => {
-    numUnrelayedEvents = 0;
     const event = await models.Outbox.create({
       event_name: 'test' as schemas.EventNames,
       event_payload: {
@@ -48,7 +47,7 @@ describe('pgListener', () => {
       } as any,
     });
     await delay(1000);
-    expect(numUnrelayedEvents).to.equal(1);
+    expect(numUnrelayedEvents).to.equal(2);
 
     await models.Outbox.update(
       {
@@ -62,7 +61,7 @@ describe('pgListener', () => {
       },
     );
     await delay(1000);
-    expect(numUnrelayedEvents).to.equal(1);
+    expect(numUnrelayedEvents).to.equal(2);
   });
 
   after('Close client', async () => {

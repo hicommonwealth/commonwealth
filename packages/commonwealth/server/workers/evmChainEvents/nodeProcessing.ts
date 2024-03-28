@@ -1,5 +1,5 @@
 import { logger, stats } from '@hicommonwealth/core';
-import { NotificationInstance, models } from '@hicommonwealth/model';
+import { DB, NotificationInstance } from '@hicommonwealth/model';
 import { emitChainEventNotifs } from './emitChainEventNotifs';
 import { getEventSources } from './getEventSources';
 import { getEvents, migrateEvents } from './logProcessing';
@@ -13,6 +13,7 @@ const log = logger().getLogger(__filename);
  * the last fetched block number. This function will never throw an error.
  */
 export async function processChainNode(
+  models: DB,
   chainNodeId: number,
   evmSource: EvmSource,
 ): Promise<Promise<void | NotificationInstance>[] | void> {
@@ -74,13 +75,15 @@ export async function processChainNode(
  * @param processFn WARNING: must never throw an error. Errors thrown by processFn will not be caught.
  */
 export async function scheduleNodeProcessing(
+  models: DB,
   interval: number,
   processFn: (
+    models: DB,
     chainNodeId: number,
     sources: EvmSource,
   ) => Promise<Promise<void | NotificationInstance>[] | void>,
 ) {
-  const evmSources = await getEventSources();
+  const evmSources = await getEventSources(models);
 
   const numEvmSources = Object.keys(evmSources).length;
   if (!numEvmSources) {
@@ -94,7 +97,11 @@ export async function scheduleNodeProcessing(
     const delay = index * betweenInterval;
 
     setTimeout(async () => {
-      const promises = await processFn(+chainNodeId, evmSources[chainNodeId]);
+      const promises = await processFn(
+        models,
+        +chainNodeId,
+        evmSources[chainNodeId],
+      );
       if (promises) {
         await Promise.allSettled(promises);
       }

@@ -50,33 +50,29 @@ describe('EVM Chain Events Log Processing Tests', () => {
 
   describe('fetching logs', () => {
     it('should not throw if a starting block number is not provided', async () => {
-      const evmSource: EvmSource = {
-        rpc: localRpc,
-        contracts: {
-          '0x1': {
-            abi: [],
-            sources: [],
-          },
-        },
-      };
-      await expect(getLogs(evmSource, null)).to.not.be.rejected;
+      await expect(
+        getLogs({
+          rpc: localRpc,
+          contractAddresses: ['0x1'],
+        }),
+      ).to.not.be.rejected;
     });
 
     it('should not return any logs if no contract addresses are given', async () => {
-      const evmSource: EvmSource = {
+      const { logs } = await getLogs({
         rpc: localRpc,
-        contracts: {},
-      };
-      const { logs } = await getLogs(evmSource);
+        contractAddresses: [],
+      });
       expect(logs).to.be.empty;
     });
 
     it('should throw if the provider cannot be connected to', async () => {
-      const evmSource: EvmSource = {
-        rpc: 'http://fake',
-        contracts: {},
-      };
-      await expect(getLogs(evmSource))
+      await expect(
+        getLogs({
+          rpc: 'http://fake',
+          contractAddresses: [],
+        }),
+      )
         .to.eventually.be.rejected.and.be.an.instanceof(Error)
         .and.have.property(
           'message',
@@ -85,20 +81,15 @@ describe('EVM Chain Events Log Processing Tests', () => {
     });
 
     it('should throw if the starting block number is greater than the current block number', async () => {
-      const evmSource: EvmSource = {
-        rpc: localRpc,
-        contracts: {
-          '0x1': {
-            abi: [],
-            sources: [],
-          },
-        },
-      };
-
-      const provider = getProvider(evmSource.rpc);
+      const provider = getProvider(localRpc);
       const currentBlockNum = await provider.getBlockNumber();
-      await expect(getLogs(evmSource, currentBlockNum + 1000)).to.not.be
-        .rejected;
+      await expect(
+        getLogs({
+          rpc: localRpc,
+          contractAddresses: ['0x1'],
+          startingBlockNum: currentBlockNum + 1000,
+        }),
+      ).to.not.be.rejected;
     });
 
     it('should restrict the maximum block range fetched to 500 blocks', async () => {
@@ -108,24 +99,12 @@ describe('EVM Chain Events Log Processing Tests', () => {
       propCreatedResult = await sdk.createProposal(1);
       await sdk.safeAdvanceTime(propCreatedResult.block + 501);
 
-      // fetch logs
-      const evmSource: EvmSource = {
-        rpc: localRpc,
-        contracts: {
-          [sdk.contractAddrs.compound.governance]: {
-            abi,
-            sources: [
-              {
-                event_signature: compoundPropCreatedSignature,
-                kind: 'proposal-created',
-              },
-            ],
-          },
-        },
-      };
-
       expect(propCreatedResult.block).to.not.be.undefined;
-      const { logs } = await getLogs(evmSource, propCreatedResult.block);
+      const { logs } = await getLogs({
+        rpc: localRpc,
+        contractAddresses: [sdk.contractAddrs.compound.governance],
+        startingBlockNum: propCreatedResult.block,
+      });
       expect(logs).to.be.empty;
     }).timeout(80_000);
 
@@ -134,28 +113,10 @@ describe('EVM Chain Events Log Processing Tests', () => {
       expect(propCreatedResult, 'Must have created a proposal to run this test')
         .to.not.be.undefined;
 
-      // fetch logs
-      const evmSource: EvmSource = {
+      const { logs } = await getLogs({
         rpc: localRpc,
-        contracts: {
-          [sdk.contractAddrs.compound.governance]: {
-            abi,
-            sources: [
-              {
-                event_signature: compoundPropCreatedSignature,
-                kind: 'proposal-created',
-              },
-            ],
-          },
-        },
-      };
-
-      const currentBlockNum = (await sdk.getBlock()).number;
-      const { logs } = await getLogs(
-        evmSource,
-        null,
-        currentBlockNum - propCreatedResult.block + 5,
-      );
+        contractAddresses: [sdk.contractAddrs.compound.governance],
+      });
       expect(logs.length).to.equal(1);
       propCreatedLog = logs[0];
     });
@@ -173,23 +134,11 @@ describe('EVM Chain Events Log Processing Tests', () => {
 
       propQueuedResult = await sdk.queueProposal(propCreatedResult.proposalId);
 
-      // fetch logs
-      const evmSource: EvmSource = {
+      const { logs } = await getLogs({
         rpc: localRpc,
-        contracts: {
-          [sdk.contractAddrs.compound.governance]: {
-            abi,
-            sources: [
-              {
-                event_signature: compoundPropQueuedSignature,
-                kind: 'proposal-queued',
-              },
-            ],
-          },
-        },
-      };
-
-      const { logs } = await getLogs(evmSource, propQueuedResult.block);
+        contractAddresses: [sdk.contractAddrs.compound.governance],
+        startingBlockNum: propQueuedResult.block,
+      });
       expect(logs.length).to.equal(1);
       propQueuedLog = logs[0];
     }).timeout(80_000);
@@ -219,6 +168,9 @@ describe('EVM Chain Events Log Processing Tests', () => {
               {
                 event_signature: compoundPropCreatedSignature,
                 kind: 'proposal-created',
+                abi_id: 1,
+                chain_node_id: 1,
+                contract_address: '0x1',
               },
             ],
           },
@@ -237,6 +189,9 @@ describe('EVM Chain Events Log Processing Tests', () => {
               {
                 event_signature: compoundPropCreatedSignature,
                 kind: 'proposal-created',
+                abi_id: 1,
+                chain_node_id: 1,
+                contract_address: '0x1',
               },
             ],
           },
@@ -255,6 +210,9 @@ describe('EVM Chain Events Log Processing Tests', () => {
               {
                 event_signature: compoundPropCreatedSignature,
                 kind: 'proposal-created',
+                abi_id: 1,
+                chain_node_id: 1,
+                contract_address: '0x1',
               },
             ],
           },
@@ -277,6 +235,9 @@ describe('EVM Chain Events Log Processing Tests', () => {
               {
                 event_signature: compoundPropCreatedSignature,
                 kind: 'proposal-created',
+                abi_id: 1,
+                chain_node_id: 1,
+                contract_address: '0x1',
               },
             ],
           },
@@ -330,6 +291,9 @@ describe('EVM Chain Events Log Processing Tests', () => {
               {
                 event_signature: compoundPropQueuedSignature,
                 kind: 'proposal-queued',
+                abi_id: 1,
+                chain_node_id: 1,
+                contract_address: '0x1',
               },
             ],
           },
@@ -375,10 +339,16 @@ describe('EVM Chain Events Log Processing Tests', () => {
               {
                 event_signature: compoundPropQueuedSignature,
                 kind: 'proposal-queued',
+                abi_id: 1,
+                chain_node_id: 1,
+                contract_address: '0x1',
               },
               {
                 event_signature: compoundPropCreatedSignature,
                 kind: 'proposal-created',
+                abi_id: 1,
+                chain_node_id: 1,
+                contract_address: '0x1',
               },
             ],
           },

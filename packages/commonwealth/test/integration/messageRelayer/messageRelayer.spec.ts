@@ -30,9 +30,9 @@ describe('messageRelayer', () => {
     });
     expect(numUnrelayedEvents).to.equal(0);
     expect(events.length).to.equal(3);
-    await insertOutbox(models, testOutboxEvents);
+    await models.Outbox.create(testOutboxEvents);
     await delay(1000);
-    let events = await models.Outbox.findAll({
+    events = await models.Outbox.findAll({
       where: {
         relayed: true,
       },

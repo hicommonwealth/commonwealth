@@ -462,7 +462,7 @@ export const ChainNode = z.object({
 export const Chain = Community;
 
 export const Outbox = z.object({
-  event_id: z.number(),
+  event_id: z.number().optional(),
   event_name: z.nativeEnum(EventNames),
   event_payload: z.union([
     events.ThreadCreated.extend({
@@ -484,7 +484,7 @@ export const Outbox = z.object({
       event_name: z.literal(EventNames.DiscordMessageCreated),
     }),
   ]),
-  relayed: z.boolean(),
-  created_at: z.date(),
-  updated_at: z.date(),
+  relayed: z.boolean().optional(),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
 });

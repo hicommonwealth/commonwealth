@@ -57,15 +57,15 @@ export async function getLogs({
   }
 
   if (!startingBlockNum) {
-    startingBlockNum = currentBlockNum - MAX_OLD_BLOCKS;
-  } else if (currentBlockNum - startingBlockNum > 500) {
+    startingBlockNum = endingBlockNum - MAX_OLD_BLOCKS;
+  } else if (endingBlockNum - startingBlockNum > 500) {
     // limit the number of blocks to fetch to 500 to avoid rate limiting on some EVM nodes like Celo
     // this should eventually be configured on the ChainNodes table by rpc since each rpc has different
     // rate limits e.g. Alchemy has a limit of 10k logs while Celo public nodes have a limit of 500.
-    startingBlockNum = currentBlockNum - 500;
+    startingBlockNum = endingBlockNum - 500;
   }
 
-  console.log(`Fetching logs from ${startingBlockNum} to ${currentBlockNum}`);
+  console.log(`Fetching logs from ${startingBlockNum} to ${endingBlockNum}`);
   const logs: Log[] = await provider.send('eth_getLogs', [
     {
       fromBlock: decimalToHex(startingBlockNum),
@@ -179,13 +179,13 @@ export async function migrateEvents(
       oldestBlock,
       endingBlockNum,
     );
-    log.info('Events migrated', undefined, {
+    logger.info('Events migrated', undefined, {
       startingBlockNum: oldestBlock,
       endingBlockNum,
     });
     return result;
   } else {
-    log.info('No events to migrate');
+    logger.info('No events to migrate');
     return;
   }
 }
