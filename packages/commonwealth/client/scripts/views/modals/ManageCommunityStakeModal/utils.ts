@@ -19,9 +19,17 @@ export const convertEthToUsd = (
   return (eth * rate).toFixed(2);
 };
 
-export const buildEtherscanLink = (txHash: string) => {
-  //const prefix = 'Base.';
-  return `https://basescan.org/tx/${txHash}`;
+export const buildEtherscanLink = (ethChainId: number, txHash: string) => {
+  switch (ethChainId) {
+    case 81457:
+      return `https://blastscan.io/tx/${txHash}`;
+    case 84532:
+      return `https://sepolia.basescan.org/tx/${txHash}`;
+    case 11155111:
+      return `https://sepolia.etherscan.io/tx/${txHash}`;
+    default:
+      return `https://basescan.org/tx/${txHash}`;
+  }
 };
 
 export const capDecimals = (value: string, capNumber = 8) => {
