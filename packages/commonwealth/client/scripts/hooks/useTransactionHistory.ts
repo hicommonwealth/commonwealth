@@ -1,5 +1,4 @@
 import { WEI_PER_ETHER } from '../controllers/chain/ethereum/util';
-import app from '../state/index';
 import { trpc } from '../utils/trpcClient';
 import { buildEtherscanLink } from '../views/modals/ManageCommunityStakeModal/utils';
 import { FilterOptions } from '../views/pages/MyCommunityStake/types';
@@ -35,8 +34,8 @@ const useTransactionHistory = ({
           t.stake_amount
         ).toFixed(5)} ETH`,
         etherscanLink: buildEtherscanLink(
-          app.config.nodes.getById(t.community.chain_node_id).ethChainId,
           t.transaction_hash,
+          t.community?.chain_node_id,
         ),
       }));
 
