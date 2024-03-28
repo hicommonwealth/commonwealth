@@ -148,6 +148,7 @@ export const NewSnapshotProposalForm = ({
           const communityId = app.activeChainId();
           const threadId = thread.id;
 
+          // eslint-disable-next-line max-len
           const linkText = `\n\nThis conversation was started on Commonwealth. Any attached images have been removed. See more discussion: `;
           const linkUrl = `\n${domain}/${communityId}/discussion/${threadId}`;
 
@@ -185,6 +186,7 @@ export const NewSnapshotProposalForm = ({
     return () => {
       app.snapshot.snapshotEmitter.off('initialized', handleInitialized);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const author = app.user.activeAccount;
