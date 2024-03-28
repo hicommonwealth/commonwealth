@@ -1,6 +1,5 @@
-import { logger, stats } from '@hicommonwealth/core';
-import { DB, NotificationInstance } from '@hicommonwealth/model';
-import { emitChainEventNotifs } from './emitChainEventNotifs';
+import { logger, schemas, stats } from '@hicommonwealth/core';
+import { DB } from '@hicommonwealth/model';
 import { getEventSources } from './getEventSources';
 import { getEvents, migrateEvents } from './logProcessing';
 import { EvmSource, RawEvmEvent } from './types';
@@ -16,7 +15,7 @@ export async function processChainNode(
   models: DB,
   chainNodeId: number,
   evmSource: EvmSource,
-): Promise<Promise<void | NotificationInstance>[] | void> {
+): Promise<void> {
   try {
     log.info(
       'Processing:\n' +
@@ -43,23 +42,34 @@ export async function processChainNode(
 
     const { events, lastBlockNum } = await getEvents(evmSource, startBlockNum);
     allEvents.concat(events);
-    const promises = await emitChainEventNotifs(chainNodeId, allEvents);
 
-    if (!startBlock) {
-      await models.LastProcessedEvmBlock.create({
-        chain_node_id: chainNodeId,
-        block_number: lastBlockNum,
-      });
-    } else {
-      startBlock.block_number = lastBlockNum;
-      await startBlock.save();
-    }
+    await models.sequelize.transaction(async (transaction) => {
+      if (!startBlock) {
+        await models.LastProcessedEvmBlock.create(
+          {
+            chain_node_id: chainNodeId,
+            block_number: lastBlockNum,
+          },
+          { transaction },
+        );
+      } else {
+        startBlock.block_number = lastBlockNum;
+        await startBlock.save({ transaction });
+      }
+
+      const records = allEvents.map((event) => ({
+        event_name: schemas.EventNames.ChainEventCreated,
+        event_payload: {
+          event_name: schemas.EventNames.ChainEventCreated,
+          ...event,
+        },
+      }));
+      await models.Outbox.bulkCreate(records, { transaction });
+    });
 
     log.info(
       `Processed ${events.length} events for chainNodeId ${chainNodeId}`,
     );
-
-    return promises;
   } catch (e) {
     const msg = `Error occurred while processing chainNodeId ${chainNodeId}`;
     log.error(msg, e);
@@ -81,7 +91,7 @@ export async function scheduleNodeProcessing(
     models: DB,
     chainNodeId: number,
     sources: EvmSource,
-  ) => Promise<Promise<void | NotificationInstance>[] | void>,
+  ) => Promise<void>,
 ) {
   const evmSources = await getEventSources(models);
 
@@ -97,14 +107,7 @@ export async function scheduleNodeProcessing(
     const delay = index * betweenInterval;
 
     setTimeout(async () => {
-      const promises = await processFn(
-        models,
-        +chainNodeId,
-        evmSources[chainNodeId],
-      );
-      if (promises) {
-        await Promise.allSettled(promises);
-      }
+      await processFn(models, +chainNodeId, evmSources[chainNodeId]);
     }, delay);
   });
 }

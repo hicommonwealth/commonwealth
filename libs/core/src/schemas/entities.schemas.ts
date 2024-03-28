@@ -483,6 +483,9 @@ export const Outbox = z.object({
     events.DiscordMessageCreated.extend({
       event_name: z.literal(EventNames.DiscordMessageCreated),
     }),
+    events.ChainEventCreated.extend({
+      event_name: z.literal(EventNames.ChainEventCreated),
+    }),
   ]),
   relayed: z.boolean().optional(),
   created_at: z.date().optional(),

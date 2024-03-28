@@ -44,4 +44,5 @@ export enum EventNames {
   CommunityCreated = 'CommunityCreated',
   SnapshotProposalCreated = 'SnapshotProposalCreated',
   DiscordMessageCreated = 'DiscordMessageCreated',
+  ChainEventCreated = 'ChainEventCreated',
 }

@@ -46,3 +46,10 @@ export const DiscordMessageCreated = z.object({
     z.literal('comment-create'),
   ]),
 });
+
+export const ChainEventCreated = z.object({
+  kind: z.string(),
+  contractAddress: z.string(),
+  blockNumber: z.number(),
+  args: z.any(), // ChainEvent args are both an object and an array
+});
