@@ -11,7 +11,7 @@ import {
   MixpanelClickthroughEvent,
   MixpanelClickthroughPayload,
 } from '../../../../../../../shared/analytics/types';
-import { useCommunityStake } from '../../../CommunityStake';
+import { useCommunityCardPrice } from '../../../../../hooks/useCommunityCardPrice';
 import { CWCommunityAvatar } from '../../cw_community_avatar';
 import { CWIcon } from '../../cw_icons/cw_icon';
 import { CWText } from '../../cw_text';
@@ -25,21 +25,27 @@ type CWRelatedCommunityCardProps = {
   community: ChainInfo | CommunityData;
   memberCount: string | number;
   threadCount: string | number;
-  stakeChange?: number;
   onStakeBtnClick?: () => void;
+  ethUsdRate?: string;
+  historicalPrice?: string;
 };
 
 export const CWRelatedCommunityCard = ({
   community,
   memberCount,
   threadCount,
-  stakeChange,
   onStakeBtnClick,
+  ethUsdRate,
+  historicalPrice,
 }: CWRelatedCommunityCardProps) => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
-  const { stakeEnabled, stakeValue } = useCommunityStake({
-    community: community,
+
+  const { stakeEnabled, stakeValue, stakeChange } = useCommunityCardPrice({
+    community: community as ChainInfo,
+    ethUsdRate,
+    stakeId: 2,
+    historicalPrice,
   });
 
   const { setModeOfManageCommunityStakeModal, setSelectedCommunity } =
@@ -105,7 +111,7 @@ export const CWRelatedCommunityCard = ({
                 </CWText>
               </div>
 
-              {!isNaN(stakeValue) && stakeChange && (
+              {!!stakeValue && (
                 <div className="stake-info">
                   <CWText type="h5" className="stake-value">
                     ${stakeValue}
@@ -117,7 +123,7 @@ export const CWRelatedCommunityCard = ({
                         stakeChange >= 0 ? 'positive' : 'negative',
                       )}
                     >
-                      {stakeChange}%
+                      {stakeChange.toFixed(2)}%
                     </CWText>
                     <CWText className="hours">24h</CWText>
                   </CWText>
