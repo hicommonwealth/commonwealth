@@ -24,7 +24,7 @@ const generateSchemas = async () => {
         'FOREIGN KEY(community_id)',
         'FOREIGN KEY(snapshot_space_id)',
       ],
-      Memberships: ['PRIMARY KEY(address_id,group_id)'],
+      Memberships: ['PRIMARY KEY(id)'],
       Notifications: ['FOREIGN KEY(thread_id)'],
       Profiles: ['FOREIGN KEY(user_id)'],
       Reactions: ['FOREIGN KEY(address_id)', 'FOREIGN KEY(community_id)'],
@@ -55,7 +55,7 @@ const generateSchemas = async () => {
       Collaborations: ['FOREIGN KEY(address_id)', 'FOREIGN KEY(thread_id)'],
       CommunityStakes: ['FOREIGN KEY(community_id)'],
       LastProcessedEvmBlocks: ['FOREIGN KEY(chain_node_id)'],
-      Memberships: ['FOREIGN KEY(address_id)', 'FOREIGN KEY(group_id)'],
+      //Memberships: ['FOREIGN KEY(address_id)', 'FOREIGN KEY(group_id)'],
       StakeTransactions: ['FOREIGN KEY(community_id,stake_id)'],
     },
   });
