@@ -19,7 +19,8 @@ export const Breadcrumbs = () => {
     chainId: app.activeChainId(),
     ids: [getThreadId && Number(getThreadId[1])],
     apiCallEnabled:
-      location.pathname.split('/')[1].toLowerCase() === 'discussion', //Only call when in discussion pages prevents unnecessary calls.
+      // Only call when in discussion pages prevents unnecessary calls.
+      location.pathname.split('/')[1].toLowerCase() === 'discussion',
   });
 
   const user = app?.user?.addresses?.[0];

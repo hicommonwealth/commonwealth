@@ -199,7 +199,7 @@ const StatsPage = () => {
           <CWText>{batchedActiveAccounts['month']}</CWText>
         </div>
         <div className="stat-row dark bottom">
-          <CWText fontWeight="medium">{'Total (all time)'}</CWText>
+          <CWText fontWeight="medium">Total &#40;all time&#41;</CWText>
           <CWText fontWeight="medium">{totalData.totalRoles}</CWText>
           <CWText fontWeight="medium">{totalData.totalComments}</CWText>
           <CWText fontWeight="medium">{totalData.totalThreads}</CWText>

@@ -82,11 +82,12 @@ const MultipleSnapshotsPage = (props: MultipleSnapshotsPageProps) => {
     return (
       <CWPageLayout>
         <div className="MultipleSnapshotsPage">
-          <Skeleton count={1} width={'40%'} />
+          <Skeleton count={1} width="40%" />
           <br />
           <CardsCollection
-            content={Array.from({ length: 2 }).map(() => (
+            content={Array.from({ length: 2 }).map((_, index) => (
               <SnapshotSpaceCard
+                key={index}
                 showSkeleton={true}
                 proposal={null}
                 proposals={[]}
@@ -106,8 +107,9 @@ const MultipleSnapshotsPage = (props: MultipleSnapshotsPageProps) => {
         <CWText type="h3">{redirectOptions.headerMessage}</CWText>
         {app.chain && spacesMetadata && (
           <CardsCollection
-            content={spacesMetadata.map((data) => (
+            content={spacesMetadata.map((data, index) => (
               <SnapshotSpaceCard
+                key={index}
                 space={data.space}
                 proposals={data.proposals}
                 redirectAction={redirectOptions.redirectOption}

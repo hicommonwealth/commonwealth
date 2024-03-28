@@ -42,17 +42,15 @@ const ProposalsPage = () => {
   const onSputnik = app.chain?.network === ChainNetwork.Sputnik;
   const onCosmos = app.chain?.base === ChainBase.CosmosSDK;
 
-  const { data: cachedAaveProposals, isError: isAaveError } =
-    useAaveProposalsQuery({
-      moduleReady: app.chain?.network === ChainNetwork.Aave && !isLoading,
-      communityId: app.chain?.id,
-    });
+  const { data: cachedAaveProposals } = useAaveProposalsQuery({
+    moduleReady: app.chain?.network === ChainNetwork.Aave && !isLoading,
+    communityId: app.chain?.id,
+  });
 
-  const { data: cachedCompoundProposals, isError: isCompoundError } =
-    useCompoundProposalsQuery({
-      moduleReady: app.chain?.network === ChainNetwork.Compound && !isLoading,
-      communityId: app.chain?.id,
-    });
+  const { data: cachedCompoundProposals } = useCompoundProposalsQuery({
+    moduleReady: app.chain?.network === ChainNetwork.Compound && !isLoading,
+    communityId: app.chain?.id,
+  });
 
   useEffect(() => {
     app.chainAdapterReady.on('ready', () => setLoading(false));
