@@ -76,7 +76,10 @@ export const getAvailableAddressesForStakeExchange = (
 export const setActiveAccountOnTransactionSuccess = async (
   userAddressUsedInTransaction: string,
 ) => {
-  if (app.user.activeAccount.address !== userAddressUsedInTransaction) {
+  if (
+    app?.user?.activeAccount &&
+    app.user.activeAccount.address !== userAddressUsedInTransaction
+  ) {
     const accountToSet = app.user.activeAccounts.find(
       (account) => account.address === userAddressUsedInTransaction,
     );

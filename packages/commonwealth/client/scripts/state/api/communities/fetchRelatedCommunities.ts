@@ -16,6 +16,8 @@ interface FetchRelatedCommunitiesResponse {
   icon_url: string;
   id: string;
   thread_count: string;
+  namespace: string;
+  chain_node_id: number;
 }
 
 const fetchRelatedCommunities = async ({

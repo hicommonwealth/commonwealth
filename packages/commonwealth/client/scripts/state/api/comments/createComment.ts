@@ -3,11 +3,12 @@ import axios from 'axios';
 import Comment from 'models/Comment';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
+import { UserProfile } from '../../../models/MinimumProfile';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
 
 interface CreateCommentProps {
-  address: string;
+  profile: UserProfile;
   threadId: number;
   communityId: string;
   unescapedText: string;
@@ -17,7 +18,7 @@ interface CreateCommentProps {
 
 const createComment = async ({
   communityId,
-  address,
+  profile,
   threadId,
   unescapedText,
   parentCommentId = null,
@@ -26,7 +27,7 @@ const createComment = async ({
     session = null,
     action = null,
     hash = null,
-  } = await app.sessions.signComment(address, {
+  } = await app.sessions.signComment(profile.address, {
     thread_id: threadId,
     body: unescapedText,
     parent_comment_id: parentCommentId,
@@ -37,7 +38,7 @@ const createComment = async ({
     {
       author_community_id: communityId,
       community_id: communityId,
-      address: address,
+      address: profile.address,
       parent_id: parentCommentId,
       text: encodeURIComponent(unescapedText),
       jwt: app.user.jwt,
@@ -46,6 +47,10 @@ const createComment = async ({
       canvas_hash: hash,
     },
   );
+
+  response.data.result.Address.User = {
+    Profiles: [profile],
+  };
 
   return new Comment(response.data.result);
 };

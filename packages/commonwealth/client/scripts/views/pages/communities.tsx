@@ -3,16 +3,24 @@ import {
   ChainNetwork,
   CommunityCategoryType,
 } from '@hicommonwealth/core';
+import { useManageCommunityStakeModalStore } from 'client/scripts/state/ui/modals';
 import numeral from 'numeral';
 import 'pages/communities.scss';
 import React from 'react';
 import app from 'state';
 import useFetchActiveCommunitiesQuery from 'state/api/communities/fetchActiveCommunities';
-import CommunityInfo from '../../models/ChainInfo';
-import { CommunityCard, NewCommunityCard } from '../components/CommunityCard';
+import {
+  default as ChainInfo,
+  default as CommunityInfo,
+} from '../../models/ChainInfo';
+import { NewCommunityCard } from '../components/CommunityCard';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import CWCircleMultiplySpinner from '../components/component_kit/new_designs/CWCircleMultiplySpinner';
+import { CWModal } from '../components/component_kit/new_designs/CWModal';
+import { CWRelatedCommunityCard } from '../components/component_kit/new_designs/CWRelatedCommunityCard';
+import ManageCommunityStakeModal from '../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
+import { CommunityData } from './DirectoryPage/DirectoryPageContent';
 
 const buildCommunityString = (numCommunities: number) =>
   numCommunities >= 1000
@@ -47,6 +55,14 @@ const CommunitiesPage = () => {
   const [filterMap, setFilterMap] = React.useState<Record<string, unknown>>(
     getInitialFilterMap(),
   );
+  const {
+    setModeOfManageCommunityStakeModal,
+    modeOfManageCommunityStakeModal,
+  } = useManageCommunityStakeModalStore();
+
+  const [selectedCommunity, setSelectedCommunity] = React.useState<
+    ChainInfo | CommunityData
+  >(null);
 
   const handleSetFilterMap = (key: string) => {
     setFilterMap((prevState) => ({ ...prevState, [key]: !filterMap[key] }));
@@ -131,7 +147,15 @@ const CommunitiesPage = () => {
         return threadCountB - threadCountA;
       })
       .map((community: CommunityInfo, i) => {
-        return <CommunityCard key={i} community={community} />;
+        return (
+          <CWRelatedCommunityCard
+            key={i}
+            community={community}
+            memberCount={community.addressCount}
+            threadCount={community.threadCount}
+            onStakeBtnClick={() => setSelectedCommunity(community)}
+          />
+        );
       });
 
     return res;
@@ -212,6 +236,18 @@ const CommunitiesPage = () => {
           <NewCommunityCard />
         </div>
       )}
+      <CWModal
+        size="small"
+        content={
+          <ManageCommunityStakeModal
+            mode={modeOfManageCommunityStakeModal}
+            onModalClose={() => setModeOfManageCommunityStakeModal(null)}
+            community={selectedCommunity}
+          />
+        }
+        onClose={() => setModeOfManageCommunityStakeModal(null)}
+        open={!!modeOfManageCommunityStakeModal}
+      />
     </div>
   );
 };

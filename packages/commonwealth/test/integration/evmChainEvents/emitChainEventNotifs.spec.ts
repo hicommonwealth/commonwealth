@@ -1,4 +1,5 @@
-import { ChainNodeInstance, models, tester } from '@hicommonwealth/model';
+import { dispose } from '@hicommonwealth/core';
+import { type ChainNodeInstance, type DB } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { BigNumber, ethers } from 'ethers';
 import { emitChainEventNotifs } from '../../../server/workers/evmChainEvents/emitChainEventNotifs';
@@ -11,6 +12,8 @@ import {
 } from './util';
 
 describe('emitChainEventNotifs', () => {
+  let models: DB;
+
   let chainNode: ChainNodeInstance;
   let emitSuccess = false;
   const validEvent: RawEvmEvent = {
@@ -21,10 +24,13 @@ describe('emitChainEventNotifs', () => {
   };
 
   before(async () => {
-    await tester.seedDb();
     chainNode = await getTestChainNode();
     await getTestSubscription();
     await getTestCommunityContract();
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   it('should emit a notification for each given proposal event', async () => {

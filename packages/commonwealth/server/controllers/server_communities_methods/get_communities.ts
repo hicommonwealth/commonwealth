@@ -7,6 +7,7 @@ import { ServerCommunitiesController } from '../server_communities_controller';
 
 export type GetCommunitiesOptions = {
   hasGroups?: boolean; // only return communities with associated groups
+  includeStakes?: boolean; // include community stakes
 };
 export type GetCommunitiesResult = {
   community: CommunityInstance;

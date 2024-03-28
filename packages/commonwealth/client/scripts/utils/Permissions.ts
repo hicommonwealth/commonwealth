@@ -11,6 +11,14 @@ const isSiteAdmin = () => {
   return app.user.activeAccount && app.user.isSiteAdmin;
 };
 
+const isCommunityMember = (communityId?: string) => {
+  return (
+    app.roles.getAllRolesInCommunity({
+      community: communityId || app.activeChainId(),
+    }).length > 0
+  );
+};
+
 const isCommunityAdmin = (account?: Account) => {
   return (
     app.user.activeAccount &&
@@ -53,6 +61,7 @@ const isThreadAuthor = (thread: Thread) => {
 
 export default {
   isSiteAdmin,
+  isCommunityMember,
   isCommunityAdmin,
   isCommunityModerator,
   isThreadCollaborator,

@@ -67,6 +67,8 @@ export interface Stats extends Disposable {
   // flags
   on(key: string): void;
   off(key: string): void;
+  // gauge
+  gauge(key: string, value: number): void;
   // traces
   timing(key: string, duration: number, tags?: Record<string, string>): void;
 }
@@ -127,6 +129,14 @@ export interface Analytics extends Disposable {
   track(event: string, payload: AnalyticsOptions): void;
 }
 
+export type RetryStrategyFn = (
+  err: Error | undefined,
+  topic: BrokerTopics,
+  content: any,
+  ackOrNackFn: (...args: any[]) => void,
+  log: ILogger,
+) => void;
+
 /**
  * Broker Port
  */
@@ -139,5 +149,6 @@ export interface Broker extends Disposable {
   subscribe<Inputs extends EventSchemas>(
     topic: BrokerTopics,
     handler: EventsHandlerMetadata<Inputs>,
+    retryStrategy?: RetryStrategyFn,
   ): Promise<boolean>;
 }

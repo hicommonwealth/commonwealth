@@ -1,13 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { NotificationCategories } from '@hicommonwealth/core';
-import { models, tester } from '@hicommonwealth/model';
+import { NotificationCategories, dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import app from '../../../server-test';
+import { TestServer, testServer } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import { Errors as MarkNotifErrors } from '../../../server/routes/markNotificationsRead';
-import * as modelUtils from '../../util/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -21,66 +19,69 @@ describe('Notification Routes Tests', () => {
     newThreadSub,
     chainEventSub;
   const community_id = 'ethereum';
+  let server: TestServer;
 
   before(async () => {
-    await tester.seedDb();
+    server = await testServer();
+
     // get logged in address/user with JWT
-    const result = await modelUtils.createAndVerifyAddress({
-      chain: community_id,
-    });
+    const result = await server.seeder.createAndVerifyAddress(
+      { chain: community_id },
+      'Alice',
+    );
     userId = result.user_id;
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
       JWT_SECRET,
     );
 
-    newThreadSub = await modelUtils.createSubscription({
+    newThreadSub = await server.seeder.createSubscription({
       jwt: jwtToken,
       is_active: true,
       category: NotificationCategories.NewThread,
       community_id,
     });
 
-    chainEventSub = await modelUtils.createSubscription({
+    chainEventSub = await server.seeder.createSubscription({
       jwt: jwtToken,
       is_active: true,
       category: NotificationCategories.NewThread,
       community_id,
     });
 
-    notification = await models.Notification.create({
+    notification = await server.models.Notification.create({
       category_id: NotificationCategories.NewThread,
       community_id,
       notification_data: '',
     });
 
-    notificationTwo = await models.Notification.create({
+    notificationTwo = await server.models.Notification.create({
       category_id: NotificationCategories.NewThread,
       community_id,
       notification_data: '',
     });
 
-    notificationThree = await models.Notification.create({
+    notificationThree = await server.models.Notification.create({
       category_id: NotificationCategories.ChainEvent,
       community_id,
       notification_data: '',
     });
 
-    await models.NotificationsRead.create({
+    await server.models.NotificationsRead.create({
       user_id: userId,
       notification_id: notification.id,
       subscription_id: newThreadSub.id,
       is_read: false,
     });
 
-    await models.NotificationsRead.create({
+    await server.models.NotificationsRead.create({
       user_id: userId,
       notification_id: notificationTwo.id,
       subscription_id: newThreadSub.id,
       is_read: true,
     });
 
-    await models.NotificationsRead.create({
+    await server.models.NotificationsRead.create({
       user_id: userId,
       notification_id: notificationThree.id,
       subscription_id: chainEventSub.id,
@@ -88,10 +89,14 @@ describe('Notification Routes Tests', () => {
     });
   });
 
+  after(async () => {
+    await dispose()();
+  });
+
   describe('/viewNotifications: return notifications to user', () => {
     it('should return a users discussion notifications', async () => {
       const res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/viewDiscussionNotifications')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken });
@@ -125,7 +130,7 @@ describe('Notification Routes Tests', () => {
 
     it('should return only unread notifications', async () => {
       const res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/viewDiscussionNotifications')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, unread_only: true });
@@ -144,7 +149,7 @@ describe('Notification Routes Tests', () => {
     });
 
     it('should return only notifications with active_only turned on', async () => {
-      await modelUtils.createSubscription({
+      await server.seeder.createSubscription({
         jwt: jwtToken,
         is_active: false,
         category: NotificationCategories.NewThread,
@@ -152,7 +157,7 @@ describe('Notification Routes Tests', () => {
       });
 
       const res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/viewDiscussionNotifications')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, active_only: true });
@@ -165,7 +170,7 @@ describe('Notification Routes Tests', () => {
   describe('/markNotificationsRead', async () => {
     it('should mark multiple notifications as read', async () => {
       const res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/markNotificationsRead')
         .set('Accept', 'application/json')
         .send({
@@ -174,24 +179,24 @@ describe('Notification Routes Tests', () => {
         });
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
-      const nrOne = await models.NotificationsRead.findOne({
+      const nrOne = await server.models.NotificationsRead.findOne({
         where: { notification_id: notification.id, user_id: userId },
       });
       expect(nrOne.is_read).to.be.true;
-      const nrTwo = await models.NotificationsRead.findOne({
+      const nrTwo = await server.models.NotificationsRead.findOne({
         where: { notification_id: notificationThree.id, user_id: userId },
       });
       expect(nrTwo.is_read).to.be.true;
     });
 
     it('should pass when notification id is a string instead of an array', async () => {
-      const notif = await models.Notification.create({
+      const notif = await server.models.Notification.create({
         category_id: NotificationCategories.NewThread,
         community_id: community_id,
         notification_data: '',
       });
 
-      await models.NotificationsRead.create({
+      await server.models.NotificationsRead.create({
         user_id: userId,
         notification_id: notif.id,
         subscription_id: newThreadSub.id,
@@ -199,7 +204,7 @@ describe('Notification Routes Tests', () => {
       });
 
       const res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/markNotificationsRead')
         .set('Accept', 'application/json')
         .send({
@@ -208,7 +213,7 @@ describe('Notification Routes Tests', () => {
         });
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
-      const nr = await models.NotificationsRead.findOne({
+      const nr = await server.models.NotificationsRead.findOne({
         where: { notification_id: notif.id, user_id: userId },
       });
       expect(nr.is_read).to.be.true;
@@ -216,7 +221,7 @@ describe('Notification Routes Tests', () => {
 
     it('should fail when no notifications are passed', async () => {
       const res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/markNotificationsRead')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken });
@@ -229,14 +234,14 @@ describe('Notification Routes Tests', () => {
   describe('/clearReadNotifications', async () => {
     it('should pass when query formatted correctly', async () => {
       const res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/clearReadNotifications')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken });
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result).to.equal('Cleared read notifications');
-      const NR = await models.NotificationsRead.findAll({
+      const NR = await server.models.NotificationsRead.findAll({
         where: { user_id: userId },
       });
       expect(NR.length).to.equal(0);

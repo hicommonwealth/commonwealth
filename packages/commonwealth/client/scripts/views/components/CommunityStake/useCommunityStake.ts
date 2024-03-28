@@ -1,4 +1,5 @@
 import { commonProtocol } from '@hicommonwealth/core';
+import ChainInfo from 'client/scripts/models/ChainInfo';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import app from 'state';
 import {
@@ -7,31 +8,31 @@ import {
   useGetUserStakeBalanceQuery,
 } from 'state/api/communityStake';
 import { useFlag } from '../../../hooks/useFlag';
+import { CommunityData } from '../../pages/DirectoryPage/DirectoryPageContent';
 
 interface UseCommunityStakeProps {
-  communityId?: string;
+  community?: ChainInfo | CommunityData;
   stakeId?: number;
   walletAddress?: string;
 }
 
 const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
   const communityStakeEnabled = useFlag('communityStake');
-  const {
-    communityId,
-    stakeId = commonProtocol.STAKE_ID,
-    walletAddress,
-  } = props;
+  const { community, stakeId = commonProtocol.STAKE_ID, walletAddress } = props;
   const { isLoggedIn } = useUserLoggedIn();
 
-  const activeCommunityId = app?.chain?.id;
-  const activeCommunityNamespace = app?.chain?.meta?.namespace;
-  const chainRpc = app?.chain?.meta?.ChainNode?.url;
-  const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
+  const activeCommunityId = community?.id || app?.chain?.id;
+  const activeCommunityNamespace =
+    community?.namespace || app?.chain?.meta?.namespace;
+  const chainRpc =
+    community?.ChainNode?.url || app?.chain?.meta?.ChainNode?.url;
+  const ethChainId =
+    community?.ChainNode?.ethChainId || app?.chain?.meta?.ChainNode?.ethChainId;
   const activeAccountAddress = app?.user?.activeAccount?.address;
 
   const { isInitialLoading: communityStakeLoading, data: stakeResponse } =
     useFetchCommunityStakeQuery({
-      communityId: communityId || activeCommunityId,
+      communityId: activeCommunityId,
       stakeId,
       apiEnabled: communityStakeEnabled && !!activeCommunityId,
     });

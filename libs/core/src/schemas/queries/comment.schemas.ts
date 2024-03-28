@@ -11,5 +11,7 @@ export const SearchComments = {
     orderBy: z.string().optional().default('created_at'),
     orderDirection: z.enum(['ASC', 'DESC']).default('DESC'),
   }),
-  output: PaginatedResultSchema(Comment),
+  output: PaginatedResultSchema.extend({
+    results: Comment.array(),
+  }),
 };
