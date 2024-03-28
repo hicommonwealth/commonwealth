@@ -3,11 +3,6 @@
 const { QueryTypes } = require('sequelize');
 const { hasher } = require('node-object-hash');
 
-// DeployedNamespace event on factory contract
-const event_signature =
-  '0x8870ba2202802ce285ce6bead5ac915b6dc2d35c8a9d6f96fa56de9de12829d5';
-const kind = 'DeployedNamespace';
-
 const namespaceFactoryAbi = [
   { inputs: [], name: 'InvalidInitialization', type: 'error' },
   {
@@ -243,6 +238,507 @@ const namespaceFactoryAbi = [
     type: 'function',
   },
 ];
+const communityStakesAbi = [
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: '_feeDestination',
+        type: 'address',
+      },
+      { internalType: 'address', name: '_factory', type: 'address' },
+      {
+        internalType: 'uint256',
+        name: '_protocolFee',
+        type: 'uint256',
+      },
+      { internalType: 'uint256', name: '_namespaceFee', type: 'uint256' },
+      {
+        internalType: 'address',
+        name: '_curveManager',
+        type: 'address',
+      },
+      { internalType: 'uint256', name: '_supplyCap', type: 'uint256' },
+      {
+        internalType: 'address',
+        name: '_supplyCapGuardian',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'nonpayable',
+    type: 'constructor',
+  },
+  {
+    inputs: [{ internalType: 'address', name: 'target', type: 'address' }],
+    name: 'AddressEmptyCode',
+    type: 'error',
+  },
+  {
+    inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
+    name: 'AddressInsufficientBalance',
+    type: 'error',
+  },
+  { inputs: [], name: 'FailedInnerCall', type: 'error' },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+    ],
+    name: 'OwnableInvalidOwner',
+    type: 'error',
+  },
+  {
+    inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
+    name: 'OwnableUnauthorizedAccount',
+    type: 'error',
+  },
+  {
+    inputs: [{ internalType: 'address', name: 'token', type: 'address' }],
+    name: 'SafeERC20FailedOperation',
+    type: 'error',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'previousOwner',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'newOwner',
+        type: 'address',
+      },
+    ],
+    name: 'OwnershipTransferred',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'trader',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'namespace',
+        type: 'address',
+      },
+      { indexed: false, internalType: 'bool', name: 'isBuy', type: 'bool' },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'communityTokenAmount',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'ethAmount',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'protocolEthAmount',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'nameSpaceEthAmount',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'supply',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'exchangeToken',
+        type: 'address',
+      },
+    ],
+    name: 'Trade',
+    type: 'event',
+  },
+  {
+    inputs: [{ internalType: 'address[]', name: 'tokens', type: 'address[]' }],
+    name: 'blacklistTokens',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'bondingCurveAddress',
+    outputs: [{ internalType: 'address', name: '', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'namespaceAddress',
+        type: 'address',
+      },
+      { internalType: 'uint256', name: 'id', type: 'uint256' },
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'buyStake',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    stateMutability: 'payable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: '', type: 'address' },
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    name: 'curveId',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'factory',
+    outputs: [{ internalType: 'address', name: '', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'namespaceAddress',
+        type: 'address',
+      },
+      { internalType: 'uint256', name: 'id', type: 'uint256' },
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'getBuyPrice',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'namespaceAddress',
+        type: 'address',
+      },
+      { internalType: 'uint256', name: 'id', type: 'uint256' },
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'getBuyPriceAfterFee',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'namespaceAddress',
+        type: 'address',
+      },
+      { internalType: 'uint256', name: 'id', type: 'uint256' },
+    ],
+    name: 'getDecimals',
+    outputs: [{ internalType: 'uint8', name: '', type: 'uint8' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'uint256', name: '_supply', type: 'uint256' },
+      {
+        internalType: 'address',
+        name: 'namespaceAddress',
+        type: 'address',
+      },
+      { internalType: 'uint256', name: 'id', type: 'uint256' },
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'getPrice',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'namespaceAddress',
+        type: 'address',
+      },
+      { internalType: 'uint256', name: 'id', type: 'uint256' },
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'getSellPrice',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'namespaceAddress',
+        type: 'address',
+      },
+      { internalType: 'uint256', name: 'id', type: 'uint256' },
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'getSellPriceAfterFee',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'namespaceFeePercent',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'owner',
+    outputs: [{ internalType: 'address', name: '', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'protocolFeeDestination',
+    outputs: [{ internalType: 'address', name: '', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'protocolFeePercent',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'renounceOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'namespaceAddress',
+        type: 'address',
+      },
+      { internalType: 'uint256', name: 'id', type: 'uint256' },
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'sellStake',
+    outputs: [],
+    stateMutability: 'payable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: '_bondingCurveAddress',
+        type: 'address',
+      },
+    ],
+    name: 'setBondingCurveAddress',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'address', name: '_factory', type: 'address' }],
+    name: 'setFactory',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: '_feeDestination', type: 'address' },
+    ],
+    name: 'setFeeDestination',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'supplyCapGuardian',
+    outputs: [{ internalType: 'address', name: '', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'address', name: '', type: 'address' }],
+    name: 'tokenBlacklist',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'totalSupply',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'totalSupplyCap',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'address', name: 'newGuardian', type: 'address' }],
+    name: 'transferGuardian',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'address', name: 'newOwner', type: 'address' }],
+    name: 'transferOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'uint256', name: 'newCap', type: 'uint256' }],
+    name: 'updateSupplyCap',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: '', type: 'address' },
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    name: 'whitelist',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'namespaceAddress',
+        type: 'address',
+      },
+      { internalType: 'uint256', name: 'id', type: 'uint256' },
+      {
+        internalType: 'address',
+        name: 'exchangeToken',
+        type: 'address',
+      },
+      { internalType: 'uint256', name: 'scalar', type: 'uint256' },
+      {
+        internalType: 'uint256',
+        name: 'curve',
+        type: 'uint256',
+      },
+    ],
+    name: 'whitelistId',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: '', type: 'address' },
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    name: 'whitelistedExchangeToken',
+    outputs: [{ internalType: 'address', name: '', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: '', type: 'address' },
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    name: 'whitelistedScaler',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+];
 
 const hashInstance = hasher({
   coerce: true,
@@ -251,7 +747,200 @@ const hashInstance = hasher({
   alg: 'sha256',
   enc: 'hex',
 });
-const abi_hash = hashInstance.hash(namespaceFactoryAbi);
+
+async function uploadABIs(queryInterface, transaction) {
+  // upload NamespaceFactory contract ABI
+  const namespaceFactoryAbiId = (
+    await queryInterface.sequelize.query(
+      `
+        INSERT INTO "ContractAbis" (abi, verified, created_at, updated_at, nickname, abi_hash)
+        VALUES (
+            :abi,
+            true,
+            CURRENT_TIMESTAMP,
+            CURRENT_TIMESTAMP,
+            :nickname,
+            :abi_hash
+        ) RETURNING id;
+      `,
+      {
+        transaction,
+        raw: true,
+        type: QueryTypes.INSERT,
+        replacements: {
+          abi: JSON.stringify(namespaceFactoryAbi),
+          nickname: 'NamespaceFactory',
+          abi_hash: hashInstance.hash(namespaceFactoryAbi),
+        },
+      },
+    )
+  )[0][0].id;
+
+  const communityStakesAbiId = (
+    await queryInterface.sequelize.query(
+      `
+        INSERT INTO "ContractAbis" (abi, verified, created_at, updated_at, nickname, abi_hash)
+        VALUES (
+            :abi,
+            true,
+            CURRENT_TIMESTAMP,
+            CURRENT_TIMESTAMP,
+            :nickname,
+            :abi_hash
+        ) RETURNING id;
+      `,
+      {
+        transaction,
+        raw: true,
+        type: QueryTypes.INSERT,
+        replacements: {
+          abi: JSON.stringify(communityStakesAbi),
+          nickname: 'CommunityStakes',
+          abi_hash: hashInstance.hash(communityStakesAbi),
+        },
+      },
+    )
+  )[0][0].id;
+
+  return { communityStakesAbiId, namespaceFactoryAbiId };
+}
+
+async function getChainNodeIds(queryInterface, transaction) {
+  const base = await queryInterface.sequelize.query(
+    `
+        SELECT id
+        FROM "ChainNodes"
+        WHERE eth_chain_id = 8453;
+      `,
+    { transaction, raw: true, type: QueryTypes.SELECT },
+  );
+
+  const blast = await queryInterface.sequelize.query(
+    `
+        SELECT id
+        FROM "ChainNodes"
+        WHERE eth_chain_id = 81457;
+      `,
+    { transaction, raw: true, type: QueryTypes.SELECT },
+  );
+
+  const sepoliaBase = await queryInterface.sequelize.query(
+    `
+        SELECT id
+        FROM "ChainNodes"
+        WHERE eth_chain_id = 84532;
+      `,
+    { transaction, raw: true, type: QueryTypes.SELECT },
+  );
+
+  const sepolia = await queryInterface.sequelize.query(
+    `
+        SELECT id
+        FROM "ChainNodes"
+        WHERE eth_chain_id = 11155111;
+      `,
+    { transaction, raw: true, type: QueryTypes.SELECT },
+  );
+
+  return {
+    baseId: base[0]?.id,
+    blastId: blast[0]?.id,
+    sepoliaBaseId: sepoliaBase[0]?.id,
+    sepoliaId: sepolia[0]?.id,
+  };
+}
+
+async function createNewEvmEventSource(queryInterface, transaction) {
+  const { namespaceFactoryAbiId, communityStakesAbiId } = await uploadABIs(
+    queryInterface,
+    transaction,
+  );
+
+  const deployedNamespaceEventSource = {
+    event_signature:
+      '0x8870ba2202802ce285ce6bead5ac915b6dc2d35c8a9d6f96fa56de9de12829d5',
+    kind: 'DeployedNamespace',
+    abi_id: namespaceFactoryAbiId,
+  };
+
+  const communityStakesEventSource = {
+    event_signature:
+      '0xfc13c9a8a9a619ac78b803aecb26abdd009182411d51a986090f82519d88a89e',
+    kind: 'Trade',
+    abi_id: communityStakesAbiId,
+  };
+
+  const { baseId, blastId, sepoliaBaseId, sepoliaId } = await getChainNodeIds(
+    queryInterface,
+    transaction,
+  );
+
+  const records = [];
+
+  if (baseId > 0) {
+    records.push(
+      {
+        chain_node_id: baseId,
+        contract_address: '0xedf43C919f59900C82d963E99d822dA3F95575EA',
+        ...deployedNamespaceEventSource,
+      },
+      {
+        chain_node_id: baseId,
+        contract_address: '0xcc752fd15A7Dd0d5301b6A626316E7211352Cf62',
+        ...communityStakesEventSource,
+      },
+    );
+  }
+
+  if (blastId) {
+    records.push(
+      {
+        chain_node_id: blastId,
+        contract_address: '0xedf43C919f59900C82d963E99d822dA3F95575EA',
+        ...deployedNamespaceEventSource,
+      },
+      {
+        chain_node_id: blastId,
+        contract_address: '0xcc752fd15A7Dd0d5301b6A626316E7211352Cf62',
+        ...communityStakesEventSource,
+      },
+    );
+  }
+
+  if (sepoliaBaseId) {
+    records.push(
+      {
+        chain_node_id: sepoliaBaseId,
+        contract_address: '0xD8a357847cABA76133D5f2cB51317D3C74609710',
+        ...deployedNamespaceEventSource,
+      },
+      {
+        chain_node_id: sepoliaBaseId,
+        contract_address: '0xd097926d8765A7717206559E7d19EECCbBa68c18',
+        ...communityStakesEventSource,
+      },
+    );
+  }
+
+  if (sepoliaId) {
+    records.push(
+      {
+        chain_node_id: sepoliaId,
+        contract_address: '0xEAB6373E6a722EeC8A65Fd38b014d8B81d5Bc1d4',
+        ...deployedNamespaceEventSource,
+      },
+      {
+        chain_node_id: sepoliaId,
+        contract_address: '0xf6C1B02257f0Ac4Af5a1FADd2dA8E37EC5f9E5fd',
+        ...communityStakesEventSource,
+      },
+    );
+  }
+
+  await queryInterface.bulkInsert('EvmEventSources', records, {
+    transaction,
+  });
+}
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
@@ -298,114 +987,7 @@ module.exports = {
         { transaction },
       );
 
-      // upload NamespaceFactory contract ABI
-      const abi_id = (
-        await queryInterface.sequelize.query(
-          `
-        INSERT INTO "ContractAbis" (abi, verified, created_at, updated_at, nickname, abi_hash)
-        VALUES (
-            :abi,
-            true,
-            CURRENT_TIMESTAMP,
-            CURRENT_TIMESTAMP,
-            :nickname,
-            :abi_hash
-        ) RETURNING id;
-      `,
-          {
-            transaction,
-            raw: true,
-            type: QueryTypes.INSERT,
-            replacements: {
-              abi: JSON.stringify(namespaceFactoryAbi),
-              nickname: 'NamespaceFactory',
-              abi_hash,
-            },
-          },
-        )
-      )[0][0].id;
-
-      const base = await queryInterface.sequelize.query(
-        `
-        SELECT id
-        FROM "ChainNodes"
-        WHERE eth_chain_id = 8453;
-      `,
-        { transaction, raw: true, type: QueryTypes.SELECT },
-      );
-
-      const blast = await queryInterface.sequelize.query(
-        `
-        SELECT id
-        FROM "ChainNodes"
-        WHERE eth_chain_id = 81457;
-      `,
-        { transaction, raw: true, type: QueryTypes.SELECT },
-      );
-
-      const sepoliaBase = await queryInterface.sequelize.query(
-        `
-        SELECT id
-        FROM "ChainNodes"
-        WHERE eth_chain_id = 84532;
-      `,
-        { transaction, raw: true, type: QueryTypes.SELECT },
-      );
-
-      const sepolia = await queryInterface.sequelize.query(
-        `
-        SELECT id
-        FROM "ChainNodes"
-        WHERE eth_chain_id = 11155111;
-      `,
-        { transaction, raw: true, type: QueryTypes.SELECT },
-      );
-
-      const records = [];
-
-      if (base.length > 0) {
-        records.push({
-          chain_node_id: base[0].id,
-          contract_address: '0xedf43C919f59900C82d963E99d822dA3F95575EA',
-          event_signature,
-          kind,
-          abi_id,
-        });
-      }
-
-      if (blast.length > 0) {
-        records.push({
-          chain_node_id: blast[0].id,
-          contract_address: '0xedf43C919f59900C82d963E99d822dA3F95575EA',
-          event_signature,
-          kind,
-          abi_id,
-        });
-      }
-
-      if (sepoliaBase.length > 0) {
-        records.push({
-          chain_node_id: sepoliaBase[0].id,
-          contract_address: '0xD8a357847cABA76133D5f2cB51317D3C74609710',
-          event_signature,
-          kind,
-          abi_id,
-        });
-      }
-
-      if (sepolia.length > 0) {
-        records.push({
-          chain_node_id: sepolia[0].id,
-          contract_address: '0xEAB6373E6a722EeC8A65Fd38b014d8B81d5Bc1d4',
-          event_signature,
-          kind,
-          abi_id,
-        });
-      }
-
-      await queryInterface.bulkInsert('EvmEventSources', records, {
-        transaction,
-      });
+      await createNewEvmEventSource(queryInterface, transaction);
 
       await queryInterface.addColumn(
         'EvmEventSources',
@@ -445,7 +1027,7 @@ module.exports = {
       await queryInterface.bulkDelete(
         'EvmEventSources',
         {
-          event_signature,
+          event_signature: deployedNamespaceEventSignature,
           kind,
         },
         { transaction },
