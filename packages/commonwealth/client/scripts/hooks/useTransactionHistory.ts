@@ -35,7 +35,7 @@ const useTransactionHistory = ({
           t.stake_amount
         ).toFixed(5)} ETH`,
         etherscanLink: buildEtherscanLink(
-          app.config.nodes.getById(t.community.chain_node_id).name,
+          app.config.nodes.getById(t.community.chain_node_id).ethChainId,
           t.transaction_hash,
         ),
       }));

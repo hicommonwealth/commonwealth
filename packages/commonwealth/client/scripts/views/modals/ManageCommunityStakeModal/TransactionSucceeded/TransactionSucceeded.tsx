@@ -29,7 +29,7 @@ const TransactionSucceeded = ({
 }: TransactionSucceededProps) => {
   const chainNodeName = app.config.nodes.getById(
     app.config.chains.getById(app.activeChainId()).id,
-  ).name;
+  ).ethChainId;
   const etherscanLink = buildEtherscanLink(
     chainNodeName,
     successTransactionHash,
