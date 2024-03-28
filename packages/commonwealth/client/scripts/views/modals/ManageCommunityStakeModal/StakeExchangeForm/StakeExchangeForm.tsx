@@ -41,6 +41,8 @@ import {
   CustomAddressOptionElement,
 } from './CustomAddressOption';
 
+import ChainInfo from 'client/scripts/models/ChainInfo';
+import { CommunityData } from 'client/scripts/views/pages/DirectoryPage/DirectoryPageContent';
 import './StakeExchangeForm.scss';
 
 type OptionDropdown = {
@@ -57,6 +59,7 @@ interface StakeExchangeFormProps {
   addressOptions: OptionDropdown[];
   numberOfStakeToExchange: number;
   onSetNumberOfStakeToExchange: React.Dispatch<React.SetStateAction<number>>;
+  community?: ChainInfo | CommunityData;
 }
 
 const StakeExchangeForm = ({
@@ -68,10 +71,16 @@ const StakeExchangeForm = ({
   addressOptions,
   numberOfStakeToExchange,
   onSetNumberOfStakeToExchange,
+  community,
 }: StakeExchangeFormProps) => {
-  const chainRpc = app?.chain?.meta?.ChainNode?.url;
-  const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
-  const activeAccountAddress = app?.user?.activeAccount?.address;
+  const chainRpc =
+    community?.ChainNode?.url || app?.chain?.meta?.ChainNode?.url;
+  const ethChainId =
+    community?.ChainNode?.ethChainId || app?.chain?.meta?.ChainNode?.ethChainId;
+  // Use the `selectedAddress.value` if buying stake in a non active community (i.e app.activeChainId() != community.id)
+  const activeAccountAddress = community
+    ? selectedAddress.value
+    : app?.user?.activeAccount?.address;
 
   const {
     buyPriceData,
@@ -83,14 +92,17 @@ const StakeExchangeForm = ({
     mode,
     address: selectedAddress?.value,
     numberOfStakeToExchange: numberOfStakeToExchange ?? 0,
+    community,
   });
 
   const { stakeBalance, stakeValue, currentVoteWeight, stakeData } =
-    useCommunityStake({ walletAddress: selectedAddress?.value });
+    useCommunityStake({ walletAddress: selectedAddress?.value, community });
 
   const createStakeTransaction =
     trpc.community.createStakeTransaction.useMutation();
-  const { mutateAsync: buyStake } = useBuyStakeMutation();
+  const { mutateAsync: buyStake } = useBuyStakeMutation({
+    shouldUpdateActiveAddress: !community, // only update active address if buying stake in an active community
+  });
   const { mutateAsync: sellStake } = useSellStakeMutation();
 
   const expectedVoteWeight = commonProtocol.calculateVoteWeight(
@@ -130,8 +142,8 @@ const StakeExchangeForm = ({
 
       trackAnalytics({
         event: MixpanelCommunityStakeEvent.STAKE_BOUGHT,
-        community: app.activeChainId(),
-        userId: app.user.activeAccount.profile.id,
+        community: community?.id || app.activeChainId(),
+        userId: app?.user?.activeAccount?.profile?.id,
         userAddress: selectedAddress?.value,
       });
     } catch (err) {
@@ -164,8 +176,8 @@ const StakeExchangeForm = ({
 
       trackAnalytics({
         event: MixpanelCommunityStakeEvent.STAKE_SOLD,
-        community: app.activeChainId(),
-        userId: app.user.activeAccount.profile.id,
+        community: community?.id || app.activeChainId(),
+        userId: app?.user?.activeAccount?.profile?.id,
         userAddress: selectedAddress?.value,
       });
     } catch (err) {
