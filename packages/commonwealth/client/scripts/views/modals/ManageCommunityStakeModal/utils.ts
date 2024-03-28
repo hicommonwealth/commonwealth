@@ -21,7 +21,9 @@ export const convertEthToUsd = (
 
 export const buildEtherscanLink = (txHash: string) => {
   //const prefix = 'Base.';
-  return `https://basescan.org/tx/${txHash}`;
+  const url =
+    app.chain.meta.ChainNode.block_explorer ?? 'https://basescan.org/';
+  return `${url}tx/${txHash}`;
 };
 
 export const capDecimals = (value: string, capNumber = 8) => {
