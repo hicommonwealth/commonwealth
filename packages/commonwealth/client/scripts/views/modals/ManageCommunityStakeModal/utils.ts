@@ -57,8 +57,11 @@ export const getAvailableAddressesForStakeExchange = (
   activeAccounts: Account[],
   userAddresses: AddressInfo[],
 ) => {
+  // TODO:
+  // 1- allow user to select address
+  // 2- remove dups
   // only active accounts (from selected community) that are metamask wallets
-  return activeAccounts.reduce((availableAddresses, account) => {
+  return app.user.addresses.reduce((availableAddresses, account) => {
     const foundAddress = userAddresses.find(
       (address) =>
         address.address === account.address &&
@@ -76,7 +79,10 @@ export const getAvailableAddressesForStakeExchange = (
 export const setActiveAccountOnTransactionSuccess = async (
   userAddressUsedInTransaction: string,
 ) => {
-  if (app.user.activeAccount.address !== userAddressUsedInTransaction) {
+  if (
+    app.user.activeAccount &&
+    app.user.activeAccount.address !== userAddressUsedInTransaction
+  ) {
     const accountToSet = app.user.activeAccounts.find(
       (account) => account.address === userAddressUsedInTransaction,
     );
