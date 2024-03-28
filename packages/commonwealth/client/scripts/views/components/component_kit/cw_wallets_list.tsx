@@ -41,8 +41,8 @@ const LinkAccountItem = ({
   const baseName = app.chain?.meta.base || walletChain;
 
   const capitalizedBaseName = `${baseName
-    .charAt(0)
-    .toUpperCase()}${baseName.slice(1)}`;
+    ?.charAt(0)
+    ?.toUpperCase()}${baseName?.slice(1)}`;
 
   const name =
     account.meta?.name ||

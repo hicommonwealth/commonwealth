@@ -11,6 +11,7 @@ import { queryClient } from 'state/api/config';
 import { Splash } from './Splash';
 import { openFeatureProvider } from './helpers/feature-flags';
 import useAppStatus from './hooks/useAppStatus';
+import { trpc, trpcClient } from './utils/trpcClient';
 import { AddToHomeScreenPrompt } from './views/components/AddToHomeScreenPrompt';
 
 OpenFeature.setProvider(openFeatureProvider);
@@ -23,25 +24,27 @@ const App = () => {
   return (
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <OpenFeatureProvider client={undefined}>
-          {isLoading ? (
-            <Splash />
-          ) : (
-            <>
-              <RouterProvider router={router(customDomain)} />
-              {isAddedToHomeScreen || isMarketingPage ? null : (
-                <AddToHomeScreenPrompt
-                  isIOS={isIOS}
-                  isAndroid={isAndroid}
-                  displayDelayMilliseconds={1000}
-                />
-              )}
-            </>
-          )}
+        <trpc.Provider client={trpcClient} queryClient={queryClient}>
+          <OpenFeatureProvider client={undefined}>
+            {isLoading ? (
+              <Splash />
+            ) : (
+              <>
+                <RouterProvider router={router(customDomain)} />
+                {isAddedToHomeScreen || isMarketingPage ? null : (
+                  <AddToHomeScreenPrompt
+                    isIOS={isIOS}
+                    isAndroid={isAndroid}
+                    displayDelayMilliseconds={1000}
+                  />
+                )}
+              </>
+            )}
 
-          <ToastContainer />
-          <ReactQueryDevtools />
-        </OpenFeatureProvider>
+            <ToastContainer />
+            <ReactQueryDevtools />
+          </OpenFeatureProvider>
+        </trpc.Provider>
       </QueryClientProvider>
     </StrictMode>
   );

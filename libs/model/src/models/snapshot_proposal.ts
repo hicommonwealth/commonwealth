@@ -51,7 +51,7 @@ export default (
         allowNull: true,
       },
       is_upstream_deleted: {
-        type: dataTypes.STRING,
+        type: dataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },

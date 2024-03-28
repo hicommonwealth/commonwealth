@@ -1,5 +1,5 @@
-import { NotificationCategories } from '@hicommonwealth/core';
-import { ContractInstance, models } from '@hicommonwealth/model';
+import { NotificationCategories, delay, dispose } from '@hicommonwealth/core';
+import { tester, type ContractInstance, type DB } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import sinon from 'sinon';
 import { startEvmPolling } from '../../../../server/workers/evmChainEvents/startEvmPolling';
@@ -13,48 +13,48 @@ import {
 } from '../../../integration/evmChainEvents/util';
 import { getEvmSecondsAndBlocks, sdk } from './util';
 
-async function verifyNumNotifications(num: number) {
-  const notifications = await models.Notification.findAll();
-  expect(notifications.length).to.equal(num);
-}
-
-async function verifyBlockNumber(
-  chainNodeId: number,
-  blockNumber: null | number,
-) {
-  const lastBlock = await models.LastProcessedEvmBlock.findOne({
-    where: {
-      chain_node_id: chainNodeId,
-    },
-  });
-
-  let lastBlockNum: number;
-  if (!lastBlock && blockNumber === null) {
-    return;
-  } else if (!lastBlock && blockNumber !== null) {
-    throw new Error('Last processed block not found');
-  } else {
-    lastBlockNum = lastBlock.block_number;
-  }
-
-  if (blockNumber === null) {
-    expect(lastBlockNum).to.be.null;
-  } else {
-    expect(lastBlockNum).to.be.gte(blockNumber);
-  }
-}
-
-async function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 describe('EVM Chain Events End to End Tests', () => {
+  let models: DB;
+
   const sandbox = sinon.createSandbox();
   let clock: sinon.SinonFakeTimers;
   let propCreatedResult: { block: number; proposalId: string };
   let contract: ContractInstance;
 
+  async function verifyNumNotifications(num: number) {
+    const notifications = await models.Notification.findAll();
+    expect(notifications.length).to.equal(num);
+  }
+
+  async function verifyBlockNumber(
+    chainNodeId: number,
+    blockNumber: null | number,
+  ) {
+    const lastBlock = await models.LastProcessedEvmBlock.findOne({
+      where: {
+        chain_node_id: chainNodeId,
+      },
+    });
+
+    let lastBlockNum: number;
+    if (!lastBlock && blockNumber === null) {
+      return;
+    } else if (!lastBlock && blockNumber !== null) {
+      throw new Error('Last processed block not found');
+    } else {
+      lastBlockNum = lastBlock.block_number;
+    }
+
+    if (blockNumber === null) {
+      expect(lastBlockNum).to.be.null;
+    } else {
+      expect(lastBlockNum).to.be.gte(blockNumber);
+    }
+  }
+
   before(async () => {
+    models = await tester.seedDb();
+
     const currentBlock = (await sdk.getBlock()).number;
     // advance time to avoid test interaction issues
     await sdk.safeAdvanceTime(currentBlock + 501);
@@ -64,6 +64,10 @@ describe('EVM Chain Events End to End Tests', () => {
     await models.EvmEventSource.destroy({
       where: {},
     });
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   beforeEach(async () => {
@@ -114,7 +118,7 @@ describe('EVM Chain Events End to End Tests', () => {
     clock.restore();
 
     // tickAsync doesn't await callback execution thus sleep is necessary
-    await sleep(5000);
+    await delay(5000);
     await verifyBlockNumber(contract.chain_node_id, propCreatedResult.block);
     const notifications = await models.Notification.findAll();
     expect(notifications.length).to.equal(1);
@@ -164,7 +168,7 @@ describe('EVM Chain Events End to End Tests', () => {
       clock.restore();
       clearInterval(intervalId);
 
-      await sleep(5000);
+      await delay(5000);
       await verifyNumNotifications(0);
     },
   ).timeout(100_000);

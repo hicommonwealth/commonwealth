@@ -67,7 +67,7 @@ Refer to the [Commonwealth README](/packages/commonwealth/README.md)
 In order to configure our RabbitMQ instance we utilize the Rascal package. The following is a description of the Rascal
 configuration.
 
-All the major Rascal configuration component names are defined as enums [here](./types/index.ts).
+All the major Rascal configuration component names are defined as enums [here](types.ts).
 
 We define 4 exchanges:
 

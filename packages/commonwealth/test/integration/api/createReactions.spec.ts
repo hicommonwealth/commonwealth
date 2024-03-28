@@ -1,43 +1,14 @@
-import { models, tester } from '@hicommonwealth/model';
+import { dispose } from '@hicommonwealth/core';
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import Sinon from 'sinon';
-import app from '../../../server-test';
+import { TestServer, testServer } from '../../../server-test';
 import * as Config from '../../../server/config';
-import * as modelUtils from '../../util/modelUtils';
 
 const { JWT_SECRET } = Config;
 
 chai.use(chaiHttp);
-
-const deleteReaction = async (reactionId, jwtToken, userAddress) => {
-  const validRequest = {
-    jwt: jwtToken,
-    address: userAddress,
-    author_chain: 'ethereum',
-    chain: 'ethereum',
-  };
-
-  const res = await chai
-    .request(app)
-    .delete(`/api/reactions/${reactionId}`)
-    .set('Accept', 'application/json')
-    .send(validRequest);
-  assert.equal((res as any).statusCode, 200);
-
-  return JSON.parse(res.text);
-};
-
-const getUniqueCommentText = async () => {
-  const time = new Date().getMilliseconds();
-  const text = `testCommentCreated at ${time}`;
-  const comment = await models.Comment.findOne({
-    where: { text },
-  });
-  chai.assert.isNull(comment);
-  return text;
-};
 
 describe('createReaction Integration Tests', () => {
   const communityId = 'ethereum';
@@ -45,24 +16,56 @@ describe('createReaction Integration Tests', () => {
   let userJWT;
   let userSession;
   let threadId: number;
+  let server: TestServer;
+
+  const deleteReaction = async (reactionId, jwtToken, address) => {
+    const validRequest = {
+      jwt: jwtToken,
+      address,
+      author_chain: 'ethereum',
+      chain: 'ethereum',
+    };
+
+    const res = await chai
+      .request(server.app)
+      .delete(`/api/reactions/${reactionId}`)
+      .set('Accept', 'application/json')
+      .send(validRequest);
+    assert.equal((res as any).statusCode, 200);
+
+    return JSON.parse(res.text);
+  };
+
+  const getUniqueCommentText = async () => {
+    const time = new Date().getMilliseconds();
+    const text = `testCommentCreated at ${time}`;
+    const comment = await server.models.Comment.findOne({
+      where: { text },
+    });
+    chai.assert.isNull(comment);
+    return text;
+  };
 
   before(async () => {
     Sinon.stub(Config, 'REACTION_WEIGHT_OVERRIDE').value('300');
-    await tester.seedDb();
+    server = await testServer();
 
-    const res = await modelUtils.createAndVerifyAddress({ chain: communityId });
+    const res = await server.seeder.createAndVerifyAddress(
+      { chain: communityId },
+      'Alice',
+    );
     userAddress = res.address;
     userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
     userSession = { session: res.session, sign: res.sign };
 
-    const topic = await models.Topic.findOne({
+    const topic = await server.models.Topic.findOne({
       where: {
         community_id: communityId,
         group_ids: [],
       },
     });
 
-    const { result: thread } = await modelUtils.createThread({
+    const { result: thread } = await server.seeder.createThread({
       chainId: communityId,
       address: userAddress,
       jwt: userJWT,
@@ -77,13 +80,14 @@ describe('createReaction Integration Tests', () => {
     threadId = thread.id;
   });
 
-  after(() => {
+  after(async () => {
     Sinon.restore();
+    await dispose()();
   });
 
   it('should create comment reactions and verify comment reaction count', async () => {
     const text = await getUniqueCommentText();
-    const createCommentResponse = await modelUtils.createComment({
+    const createCommentResponse = await server.seeder.createComment({
       chain: 'ethereum',
       address: userAddress,
       jwt: userJWT,
@@ -93,7 +97,7 @@ describe('createReaction Integration Tests', () => {
       sign: userSession.sign,
     });
 
-    const comment = await models.Comment.findOne({
+    const comment = await server.models.Comment.findOne({
       where: { text },
     });
 
@@ -102,7 +106,7 @@ describe('createReaction Integration Tests', () => {
     chai.assert.isNotNull(comment);
     chai.assert.equal(createCommentResponse.status, 'Success');
 
-    const createReactionResponse = await modelUtils.createReaction({
+    const createReactionResponse = await server.seeder.createReaction({
       chain: communityId,
       address: userAddress,
       jwt: userJWT,
@@ -131,13 +135,13 @@ describe('createReaction Integration Tests', () => {
   });
 
   it('should create thread reactions and verify thread reaction count', async () => {
-    const thread = await models.Thread.findOne({
+    const thread = await server.models.Thread.findOne({
       where: { id: threadId },
     });
     chai.assert.isNotNull(thread);
     const beforeReactionCount = thread.reaction_count;
 
-    const createReactionResponse = await modelUtils.createThreadReaction({
+    const createReactionResponse = await server.seeder.createThreadReaction({
       chain: 'ethereum',
       address: userAddress,
       jwt: userJWT,

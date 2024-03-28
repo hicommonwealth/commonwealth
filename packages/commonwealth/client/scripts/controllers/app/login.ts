@@ -6,12 +6,14 @@ import { chainBaseToCanvasChainId } from 'canvas/chainMappings';
 import { notifyError } from 'controllers/app/notifications';
 import { getMagicCosmosSessionSigner } from 'controllers/server/sessions';
 import { isSameAccount } from 'helpers';
-import $ from 'jquery';
+
 import { getSessionSigners } from 'shared/canvas/verify';
 import { initAppState } from 'state';
 
 import { Session } from '@canvas-js/interfaces';
 import { CANVAS_TOPIC } from 'shared/canvas';
+
+import axios from 'axios';
 import app from 'state';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
@@ -23,7 +25,7 @@ export function linkExistingAddressToChainOrCommunity(
   community: string,
   originChain: string,
 ) {
-  return $.post(`${app.serverUrl()}/linkExistingAddressToCommunity`, {
+  return axios.post(`${app.serverUrl()}/linkExistingAddressToCommunity`, {
     address,
     community_id: community,
     originChain, // not used
@@ -64,7 +66,7 @@ export async function setActiveAccount(
   }
 
   try {
-    const response = await $.post(`${app.serverUrl()}/setDefaultRole`, {
+    const response = await axios.post(`${app.serverUrl()}/setDefaultRole`, {
       address: account.address,
       author_community_id: account.community.id,
       community_id: community,
@@ -77,11 +79,11 @@ export async function setActiveAccount(
     });
     role.is_user_default = true;
 
-    if (response.status !== 'Success') {
+    if (response.data.status !== 'Success') {
       throw Error(`Unsuccessful status: ${response.status}`);
     }
   } catch (err) {
-    console.log(err);
+    console.error(err?.response.data.error || err?.message);
     notifyError('Could not set active account');
   }
 
@@ -244,7 +246,6 @@ export function updateActiveUser(data) {
     app.user.setAddresses([]);
 
     app.user.setSiteAdmin(false);
-    app.user.setDisableRichText(false);
     app.user.setUnseenPosts({});
 
     app.user.setActiveAccounts([]);
@@ -272,7 +273,6 @@ export function updateActiveUser(data) {
     );
 
     app.user.setSiteAdmin(data.isAdmin);
-    app.user.setDisableRichText(data.disableRichText);
     app.user.setUnseenPosts(data.unseenPosts);
   }
 }
@@ -289,7 +289,7 @@ export async function createUserWithAddress(
   newlyCreated: boolean;
   joinedCommunity: boolean;
 }> {
-  const response = await $.post(`${app.serverUrl()}/createAddress`, {
+  const response = await axios.post(`${app.serverUrl()}/createAddress`, {
     address,
     community_id: chain,
     jwt: app.user.jwt,
@@ -299,22 +299,23 @@ export async function createUserWithAddress(
       ? JSON.stringify(validationBlockInfo)
       : null,
   });
-  const id = response.result.id;
+
+  const id = response.data.result.id;
   const chainInfo = app.config.chains.getById(chain);
   const account = new Account({
     addressId: id,
     address,
     community: chainInfo,
-    validationToken: response.result.verification_token,
+    validationToken: response.data.result.verification_token,
     walletId,
     sessionPublicAddress: sessionPublicAddress,
-    validationBlockInfo: response.result.block_info,
+    validationBlockInfo: response.data.result.block_info,
     ignoreProfile: false,
   });
   return {
     account,
-    newlyCreated: response.result.newly_created,
-    joinedCommunity: response.result.joined_community,
+    newlyCreated: response.data.result.newly_created,
+    joinedCommunity: response.data.result.joined_community,
   };
 }
 
@@ -510,27 +511,28 @@ export async function handleSocialLoginCallback({
   }
 
   // Otherwise, skip Account.validate(), proceed directly to server login
-  const response = await $.post({
-    url: `${app.serverUrl()}/auth/magic`,
-    headers: {
-      Authorization: `Bearer ${bearer}`,
+  const response = await axios.post(
+    `${app.serverUrl()}/auth/magic`,
+    {
+      data: {
+        community_id: desiredChain?.id,
+        jwt: app.user.jwt,
+        username: profileMetadata?.username,
+        avatarUrl: profileMetadata?.avatarUrl,
+        magicAddress,
+        session: ipldDagJson.stringify(ipldDagJson.encode(session)),
+        walletSsoSource,
+      },
     },
-    xhrFields: {
+    {
       withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${bearer}`,
+      },
     },
-    data: {
-      community_id: desiredChain?.id,
-      jwt: app.user.jwt,
-      username: profileMetadata?.username,
-      avatarUrl: profileMetadata?.avatarUrl,
-      magicAddress,
-      // @ts-ignore
-      session: ipldDagJson.stringify(ipldDagJson.encode(session)),
-      walletSsoSource,
-    },
-  });
+  );
 
-  if (response.status === 'Success') {
+  if (response.data.status === 'Success') {
     await initAppState(false);
     // This is code from before desiredChain was implemented, and
     // may not be necessary anymore:

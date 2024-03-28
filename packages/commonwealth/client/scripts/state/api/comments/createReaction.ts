@@ -62,6 +62,9 @@ const useCreateCommentReactionMutation = ({
       queryClient.setQueryData(key, () => {
         const tempComments = [...comments];
         const commentToUpdate = tempComments.find((x) => x.id === commentId);
+        reaction.Address.User = {
+          Profiles: [commentToUpdate.profile],
+        };
         commentToUpdate.reactions.push(new Reaction(reaction));
         return tempComments;
       });

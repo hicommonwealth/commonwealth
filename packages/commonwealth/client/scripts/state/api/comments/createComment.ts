@@ -5,11 +5,12 @@ import Comment from 'models/Comment';
 import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
+import { UserProfile } from '../../../models/MinimumProfile';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
 
 interface CreateCommentProps {
-  address: string;
+  profile: UserProfile;
   threadId: number;
   communityId: string;
   unescapedText: string;
@@ -19,12 +20,12 @@ interface CreateCommentProps {
 
 const createComment = async ({
   communityId,
-  address,
+  profile,
   threadId,
   unescapedText,
   parentCommentId = null,
 }: CreateCommentProps) => {
-  const canvasSignedData = await signComment(address, {
+  const canvasSignedData = await signComment(profile.address, {
     thread_id: threadId,
     body: unescapedText,
     parent_comment_id: parentCommentId,
@@ -35,13 +36,17 @@ const createComment = async ({
     {
       author_community_id: communityId,
       community_id: communityId,
-      address: address,
+      address: profile.address,
       parent_id: parentCommentId,
       text: encodeURIComponent(unescapedText),
       jwt: app.user.jwt,
       ...(await toCanvasSignedDataApiArgs(canvasSignedData)),
     },
   );
+
+  response.data.result.Address.User = {
+    Profiles: [profile],
+  };
 
   return new Comment(response.data.result);
 };

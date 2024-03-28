@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
  * the cleaning functions to run at a specific hour each day as defined by the `hourToRun` constructor argument. This
  * class uses UTC so that deployments/execution in various timezones does not affect functionality.
  */
-export default class DatabaseCleaner {
+export class DatabaseCleaner {
   private readonly log = logger().getLogger(__filename);
   private _models: DB;
   private _timeToRun: Date;
@@ -93,6 +93,12 @@ export default class DatabaseCleaner {
       await this.cleanSubscriptions(this._oneRunMax);
     } catch (e) {
       this.log.error('Failed to clean subscriptions', e);
+    }
+
+    try {
+      await this.runMaintenance();
+    } catch (e) {
+      this.log.error('Failed to run pg_partman maintenance', e);
     }
 
     this.log.info('Database clean-up finished.');
@@ -264,6 +270,18 @@ export default class DatabaseCleaner {
     this.log.info(`Deleted ${totalSubsDeleted} subscriptions`);
   }
 
+  /**
+   * This function executes the run_maintenance function of the pg_partman
+   * Postgres extension. This creates new child partition tables and drops
+   * any outdated ones according to the retention policy.
+   * See: https://github.com/pgpartman/pg_partman/blob/master/doc/pg_partman.md#maintenance-functions
+   */
+  public async runMaintenance() {
+    await this._models.sequelize.query(`
+      SELECT run_maintenance();
+    `);
+  }
+
   public getTimeout() {
     const now = new Date();
     // if current time is in the given hour
@@ -313,5 +331,3 @@ export default class DatabaseCleaner {
     return this._timeoutID;
   }
 }
-
-export const databaseCleaner = new DatabaseCleaner();

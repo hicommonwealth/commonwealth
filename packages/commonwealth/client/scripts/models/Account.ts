@@ -1,9 +1,9 @@
 import type { WalletId, WalletSsoSource } from '@hicommonwealth/core';
-import $ from 'jquery';
 import app from 'state';
 import NewProfilesController from '../controllers/server/newProfiles';
 
 import { Session } from '@canvas-js/interfaces';
+import axios from 'axios';
 import type momentType from 'moment';
 import moment from 'moment';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
@@ -177,14 +177,9 @@ class Account {
       wallet_sso_source: this.walletSsoSource,
     };
 
-    const result = await fetch(`${app.serverUrl()}/verifyAddress`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(params),
-    });
-    if (result.ok) {
+    const res = await axios.post(`${app.serverUrl()}/verifyAddress`, params);
+
+    if (res.data.result.status === 'Success') {
       // update ghost address for discourse users
       const hasGhostAddress = app.user.addresses.some(
         ({ address, ghostAddress, community }) =>
@@ -194,12 +189,14 @@ class Account {
             (account) => account.address === address,
           ),
       );
+
       if (hasGhostAddress) {
-        const { success, ghostAddressId } = await $.post(
+        const response = await axios.post(
           `${app.serverUrl()}/updateAddress`,
           params,
         );
-        if (success && ghostAddressId) {
+
+        if (response.data.success && response.data.ghostAddressId) {
           // remove ghost address from addresses
           app.user.setAddresses(
             app.user.addresses.filter(({ ghostAddress }) => {

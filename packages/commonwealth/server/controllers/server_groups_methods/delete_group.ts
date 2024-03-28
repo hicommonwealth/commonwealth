@@ -11,6 +11,7 @@ import { ServerCommunitiesController } from '../server_communities_controller';
 const Errors = {
   Unauthorized: 'Unauthorized',
   GroupNotFound: 'Group not found',
+  SystemManaged: 'Cannot update group that is system-managed',
 };
 
 export type DeleteGroupOptions = {
@@ -40,6 +41,10 @@ export async function __deleteGroup(
   });
   if (!isAdmin) {
     throw new AppError(Errors.Unauthorized);
+  }
+
+  if (group.is_system_managed) {
+    throw new AppError(Errors.SystemManaged);
   }
 
   await this.models.sequelize.transaction(async (transaction) => {

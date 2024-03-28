@@ -15,7 +15,7 @@ module.exports = {
       version: 'detect',
     },
   },
-  plugins: ['@tanstack/query'],
+  plugins: ['@tanstack/query', 'prettier'],
   rules: {
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/camelcase': 'off',
@@ -82,7 +82,7 @@ module.exports = {
     'no-shadow': 'off',
     '@typescript-eslint/no-shadow': 'error',
     '@typescript-eslint/explicit-module-boundary-types': 0,
-    'prettier/prettier': 0,
+    'prettier/prettier': 'warn',
     '@typescript-eslint/no-empty-interface': [
       'error',
       {
@@ -122,6 +122,7 @@ module.exports = {
   },
   ignorePatterns: ['server/scripts/setupPrerenderService.ts'],
   extends: [
+    'prettier/prettier',
     'plugin:@tanstack/eslint-plugin-query/recommended',
     'plugin:react-hooks/recommended',
     'plugin:react/recommended',

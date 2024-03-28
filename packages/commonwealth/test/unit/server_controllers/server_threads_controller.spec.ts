@@ -6,9 +6,9 @@ import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
 
 describe('ServerThreadsController', () => {
   beforeEach(() => {
-    Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves(
-      '0',
-    );
+    Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves({
+      '0x123': '0',
+    });
   });
   afterEach(() => {
     Sinon.restore();
@@ -1009,6 +1009,7 @@ describe('ServerThreadsController', () => {
               id: 1,
               address: '0x123',
             },
+            destroy: async () => ({}),
           }),
           destroy: async () => ({}),
         },
@@ -1024,6 +1025,9 @@ describe('ServerThreadsController', () => {
         },
         Address: {
           findAll: async () => [{}], // used in findOneRole
+        },
+        sequelize: {
+          transaction: async (callback) => callback({}),
         },
       };
       const banCache = BAN_CACHE_MOCK_FN('ethereum');

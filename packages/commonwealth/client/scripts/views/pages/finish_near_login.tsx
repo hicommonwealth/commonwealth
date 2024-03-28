@@ -1,4 +1,5 @@
 import { ChainBase, WalletId } from '@hicommonwealth/core';
+import axios from 'axios';
 import BN from 'bn.js';
 import {
   completeClientLogin,
@@ -8,7 +9,6 @@ import {
 } from 'controllers/app/login';
 import type { NearAccount } from 'controllers/chain/near/account';
 import type Near from 'controllers/chain/near/adapter';
-import $ from 'jquery';
 import { useCommonNavigate } from 'navigation/helpers';
 import type { WalletConnection } from 'near-api-js';
 import { WalletAccount } from 'near-api-js';
@@ -202,13 +202,13 @@ const FinishNearLogin = () => {
         // POST object
         const chainCreateArgs = JSON.parse(chainCreateArgString);
 
-        const res = await $.post(
+        const res = await axios.post(
           `${app.serverUrl()}/communities`,
           chainCreateArgs,
         );
 
         await initAppState(false);
-        navigate(`${window.location.origin}/${res.result.chain.id}`);
+        navigate(`${window.location.origin}/${res.data.result.chain.id}`);
       } catch (err) {
         setValidationError(`Failed to initialize chain node: ${err.message}`);
       }

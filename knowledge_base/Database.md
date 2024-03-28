@@ -19,10 +19,7 @@
 heroku pg:info -a commonwealthapp
 
 # provision & marks it master with --follow, using `Add on` property from previous command
-heroku addons:create heroku-postgresql:standard-0 --follow postgresql-clear-46785 -a commonwealth-beta
-
-# confirm new color name of database provisioned in previous command eg - HEROKU_POSTGRESQL_MAROON_URL
-heroku config:set CW_READ_DB $(heroku config:get HEROKU_POSTGRESQL_MAROON_URL -a commonwealth-beta)
+heroku addons:create heroku-postgresql:standard-0 --follow postgresql-clear-46785 --as HEROKU_POSTGRESQL_MAROON -a commonwealth-beta
 
 # check status of follower - `Behind By:` info from the following command output
 heroku pg:info -a commonwealth-beta
