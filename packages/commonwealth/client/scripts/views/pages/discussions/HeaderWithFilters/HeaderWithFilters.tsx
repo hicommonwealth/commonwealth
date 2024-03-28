@@ -28,6 +28,7 @@ import {
   ThreadTimelineFilterTypes,
 } from '../../../../models/types';
 
+import { QuillRenderer } from 'client/scripts/views/components/react_quill_editor/quill_renderer';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import useCommunityStakeStore from 'state/ui/communityStake';
 import './HeaderWithFilters.scss';
@@ -234,7 +235,10 @@ export const HeaderWithFilters = ({
       </div>
 
       {selectedTopic?.description && (
-        <CWText className="subheader-text">{selectedTopic.description}</CWText>
+        <QuillRenderer
+          doc={selectedTopic.description}
+          customClass="subheader-text"
+        />
       )}
 
       {isOnArchivePage && (

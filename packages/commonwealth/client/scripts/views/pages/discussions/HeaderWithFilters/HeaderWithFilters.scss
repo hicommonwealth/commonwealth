@@ -21,7 +21,8 @@
     }
   }
 
-  .subheader-text.Text {
+  .subheader-text {
+    @include b1;
     color: $neutral-600;
   }
 

@@ -53,6 +53,7 @@ marked
 
 type MarkdownFormattedTextProps = Omit<QuillRendererProps, 'doc'> & {
   doc: string;
+  customClass?: string;
 };
 
 // NOTE: Do NOT use this directly. Use QuillRenderer instead.
@@ -61,6 +62,7 @@ export const MarkdownFormattedText = ({
   hideFormatting,
   searchTerm,
   cutoffLines,
+  customClass,
 }: MarkdownFormattedTextProps) => {
   const containerRef = useRef<HTMLDivElement>();
   const [userExpand, setUserExpand] = useState<boolean>(false);
@@ -168,7 +170,7 @@ export const MarkdownFormattedText = ({
     return () => {
       convertTwitterLinks.cancel();
     };
-  }, [finalDoc]);
+  }, [finalDoc, convertTwitterLinks]);
 
   return (
     <>
@@ -176,7 +178,7 @@ export const MarkdownFormattedText = ({
         ref={containerRef}
         className={getClasses<{ collapsed?: boolean }>(
           { collapsed: isTruncated },
-          'MarkdownFormattedText',
+          customClass || 'MarkdownFormattedText',
         )}
       >
         {finalDoc}
