@@ -48,8 +48,6 @@ export const CWRelatedCommunityCard = ({
     historicalPrice,
   });
 
-  console.log(stakeValue, stakeChange);
-
   const { setModeOfManageCommunityStakeModal, setSelectedCommunity } =
     useManageCommunityStakeModalStore();
 

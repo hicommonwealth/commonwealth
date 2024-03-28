@@ -22,15 +22,15 @@ export async function __getActiveCommunities(
   this: ServerCommunitiesController,
   { cacheEnabled }: GetActiveCommunitiesOptions,
 ): Promise<GetActiveCommunitiesResult> {
-  // if (cacheEnabled) {
-  //   const cachedResult = await cache().getKey(
-  //     CacheNamespaces.Function_Response,
-  //     CACHE_KEY,
-  //   );
-  //   if (cachedResult) {
-  //     return JSON.parse(cachedResult);
-  //   }
-  // }
+  if (cacheEnabled) {
+    const cachedResult = await cache().getKey(
+      CacheNamespaces.Function_Response,
+      CACHE_KEY,
+    );
+    if (cachedResult) {
+      return JSON.parse(cachedResult);
+    }
+  }
 
   const query = `
     SELECT
