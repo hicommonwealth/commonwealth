@@ -8,14 +8,18 @@ import type {
   StdFee,
 } from '@cosmjs/stargate';
 import type { Event, Tendermint34Client } from '@cosmjs/tendermint-rpc';
-import { ChainNetwork, WalletId } from '@hicommonwealth/core';
+import {
+  ChainNetwork,
+  CosmosGovernanceVersion,
+  WalletId,
+} from '@hicommonwealth/core';
 import BN from 'bn.js';
 
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 import moment from 'moment';
+import { LCD } from 'shared/chain/types/cosmos';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
-import { LCD } from '../../../../../shared/chain/types/cosmos';
 import ChainInfo from '../../../models/ChainInfo';
 import {
   IChainModule,
@@ -110,7 +114,12 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       console.error('Error starting RPC client: ', e);
     }
 
-    if (chain?.cosmosGovernanceVersion === 'v1') {
+    if (
+      chain?.ChainNode?.cosmosGovernanceVersion ===
+        CosmosGovernanceVersion.v1 ||
+      chain?.ChainNode?.cosmosGovernanceVersion ===
+        CosmosGovernanceVersion.v1beta1Failed
+    ) {
       try {
         const lcdUrl = `${window.location.origin}/cosmosAPI/v1/${chain.id}`;
         console.log(`Starting LCD API at ${lcdUrl}...`);
@@ -237,7 +246,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       );
       console.log(result);
       if (cosm.isDeliverTxFailure(result)) {
-        throw new Error('TX execution failed.');
+        throw new Error(`TX execution failed: ${result?.rawLog}`);
       } else if (cosm.isDeliverTxSuccess(result)) {
         const txHash = result.transactionHash;
         const txResult = await this._tmClient.tx({

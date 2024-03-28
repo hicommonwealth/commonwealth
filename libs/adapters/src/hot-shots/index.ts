@@ -3,7 +3,7 @@ import { StatsD } from 'hot-shots';
 
 export const HotShotsStats = (): Stats => {
   const log = logger().getLogger(__filename);
-  let client = new StatsD({
+  let client: StatsD | undefined = new StatsD({
     globalTags: { env: process.env.NODE_ENV || 'development' },
     errorHandler: (error) => {
       log.error('Caught statsd socket error', error);
@@ -31,6 +31,7 @@ export const HotShotsStats = (): Stats => {
       client && client.decrement(key, value, tags),
     on: (key) => client && client.gauge(key, 1),
     off: (key) => client && client.gauge(key, 0),
+    gauge: (key, value) => client && client.gauge(key, value),
     timing: (key, duration, tags) =>
       client && client.timing(key, duration, tags),
   };

@@ -47,7 +47,8 @@ const useCreateCommunity = () => {
     );
   const showCommunityStakeStep =
     isValidStepToShowCommunityStakeFormStep &&
-    selectedCommunity.type === 'ethereum' &&
+    (selectedCommunity.type === 'ethereum' ||
+      selectedCommunity.type === 'blast') &&
     isEthereumMainnetSelected;
 
   return {

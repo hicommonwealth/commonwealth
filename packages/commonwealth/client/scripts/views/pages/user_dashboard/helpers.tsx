@@ -1,9 +1,9 @@
 import { NotificationCategories } from '@hicommonwealth/core';
 import { notifySuccess } from 'controllers/app/notifications';
 import getFetch from 'helpers/getFetch';
-import $ from 'jquery';
 import type NotificationSubscription from '../../../models/NotificationSubscription';
 
+import axios from 'axios';
 import app from 'state';
 import { DashboardViews } from '.';
 
@@ -50,9 +50,11 @@ export const subscribeToThread = async (
 export const fetchActivity = async (requestType: DashboardViews) => {
   let activity;
   if (requestType === DashboardViews.ForYou) {
-    activity = await $.post(`${app.serverUrl()}/viewUserActivity`, {
+    const response = await axios.post(`${app.serverUrl()}/viewUserActivity`, {
       jwt: app.user.jwt,
     });
+
+    activity = response.data;
   } else if (requestType === DashboardViews.Chain) {
     const events = await getFetch(`${app.serverUrl()}/viewChainActivity`);
 
@@ -65,15 +67,12 @@ export const fetchActivity = async (requestType: DashboardViews) => {
       communities.add(event.chain);
     }
 
-    const res: {
-      result: { id: string; icon_url: string }[];
-      status: boolean;
-    } = await $.post(`${app.serverUrl()}/viewChainIcons`, {
+    const response = await axios.post(`${app.serverUrl()}/viewChainIcons`, {
       communities: JSON.stringify(Array.from(communities)),
     });
 
     const communityIconUrls = {};
-    for (const item of res.result) {
+    for (const item of response.data.result) {
       communityIconUrls[item.id] = item.icon_url;
     }
 
@@ -82,7 +81,8 @@ export const fetchActivity = async (requestType: DashboardViews) => {
       result: events,
     };
   } else if (requestType === DashboardViews.Global) {
-    activity = await $.post(`${app.serverUrl()}/viewGlobalActivity`);
+    const response = await axios.post(`${app.serverUrl()}/viewGlobalActivity`);
+    activity = response.data;
   }
 
   if (activity.result) {
@@ -95,8 +95,4 @@ export const fetchActivity = async (requestType: DashboardViews) => {
   }
 
   return activity;
-};
-
-export const notificationsRemaining = (contentLength, count) => {
-  return contentLength >= 10 && count < contentLength;
 };

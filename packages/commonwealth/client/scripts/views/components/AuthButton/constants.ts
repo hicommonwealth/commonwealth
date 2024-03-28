@@ -88,13 +88,6 @@ export const AUTH_TYPES: AuthTypesList = {
     },
     label: 'Near',
   },
-  ronin: {
-    icon: {
-      name: 'ronin',
-      isCustom: true,
-    },
-    label: 'Ronin',
-  },
   terrastation: {
     icon: {
       name: 'terrastation',

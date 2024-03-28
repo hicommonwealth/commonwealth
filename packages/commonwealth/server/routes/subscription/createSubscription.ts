@@ -36,21 +36,22 @@ export default async (
   }
 
   let obj: WhereOptions<SubscriptionAttributes>,
-    chain: CommunityInstance,
+    community: CommunityInstance,
     thread: ThreadInstance,
     comment: CommentInstance;
 
   switch (category.name) {
     case NotificationCategories.NewThread: {
       // this check avoids a 500 error -> 'WHERE parameter "id" has invalid "undefined" value'
-      if (!req.body.chain_id) return next(new AppError(Errors.InvalidChain));
-      chain = await models.Community.findOne({
+      if (!req.body.community_id)
+        return next(new AppError(Errors.InvalidCommunity));
+      community = await models.Community.findOne({
         where: {
-          id: req.body.chain_id,
+          id: req.body.community_id,
         },
       });
-      if (!chain) return next(new AppError(Errors.InvalidChain));
-      obj = { community_id: req.body.chain_id };
+      if (!community) return next(new AppError(Errors.InvalidCommunity));
+      obj = { community_id: req.body.community_id };
       break;
     }
     case NotificationCategories.SnapshotProposal: {
@@ -101,15 +102,15 @@ export default async (
     case NotificationCategories.NewCollaboration:
       return next(new AppError(Errors.NoCollaborations));
     case NotificationCategories.ChainEvent: {
-      if (!req.body.chain_id) return next(new AppError(Errors.InvalidChain));
-
-      chain = await models.Community.findOne({
+      if (!req.body.community_id)
+        return next(new AppError(Errors.InvalidCommunity));
+      community = await models.Community.findOne({
         where: {
-          id: req.body.chain_id,
+          id: req.body.community_id,
         },
       });
-      if (!chain) return next(new AppError(Errors.InvalidChain));
-      obj = { community_id: req.body.chain_id };
+      if (!community) return next(new AppError(Errors.InvalidCommunity));
+      obj = { community_id: req.body.community_id };
       break;
     }
   }
@@ -125,9 +126,6 @@ export default async (
 
   const subJson = subscription.toJSON();
 
-  if (chain) {
-    subJson.Community = chain.toJSON();
-  }
   if (thread) {
     subJson.Thread = thread.toJSON();
   }

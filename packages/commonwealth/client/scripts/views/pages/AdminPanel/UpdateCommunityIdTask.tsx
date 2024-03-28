@@ -21,9 +21,7 @@ const UpdateCommunityIdTask = () => {
   const openConfirmationModal = () => {
     openConfirmation({
       title: 'Update Community Id',
-      description:
-        `Are you sure you want to update ${originalCommunityValue} to ${newCommunityValue}? WARNING: this ` +
-        'does not set up redirects so this will break external links to the original community.',
+      description: `Are you sure you want to update ${originalCommunityValue} to ${newCommunityValue}?`,
       buttons: [
         {
           label: 'Update',
@@ -85,8 +83,8 @@ const UpdateCommunityIdTask = () => {
       <CWText type="caption">
         Updates a communities url e.g. commonwealth.im/cmn-protocol to
         commonwealth.im/common. This does not update the Community name.
-        WARNING: This does not set up redirects so this will break external
-        links to the original community.
+        WARNING: This will set up a redirect from the old community to the new
+        community. The old id cannot be used by any other community.
       </CWText>
       <div className="TaskRow">
         <CWTextInput
@@ -96,7 +94,7 @@ const UpdateCommunityIdTask = () => {
             if (e.target.value.length === 0) setOriginalValueValidated(false);
           }}
           inputValidationFn={(value) => validateFn(value, false)}
-          placeholder="Enter current community id"
+          placeholder="Current community id"
         />
         <CWTextInput
           value={newCommunityValue}
@@ -105,7 +103,7 @@ const UpdateCommunityIdTask = () => {
             if (e.target.value.length === 0) setNewValueValidated(false);
           }}
           inputValidationFn={(value) => validateFn(value, true)}
-          placeholder="Enter new community id"
+          placeholder="New community id"
         />
         <CWButton
           label="Update"

@@ -35,8 +35,10 @@
 
   .comment-thread-info {
     .noWrap {
-      display: flex;
+      display: inline-flex;
       flex-wrap: wrap;
+      align-items: center;
+      white-space: pre-wrap;
     }
 
     .User {

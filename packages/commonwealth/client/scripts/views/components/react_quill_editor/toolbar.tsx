@@ -103,11 +103,18 @@ export const useMarkdownToolbarHandlers = ({
         return;
       }
       const text = editor.getText(selection.index, selection.length);
+
       editor.deleteText(selection.index, selection.length);
       editor.insertText(
         selection.index,
         `${markdownChars}${text.trim()}${markdownChars}`,
       );
+
+      editor.setSelection(
+        selection.index + markdownChars.length,
+        selection.length,
+      );
+
       setContentDelta({
         ...editor.getContents(),
         ___isMarkdown: true,
@@ -189,34 +196,127 @@ export const useMarkdownToolbarHandlers = ({
     };
   };
 
+  /**
+   * Replaces the selections list item prefixes in the given text with the specified prefix.
+   * @param {string} text - The input text containing list items.
+   * @param {string} prefix - The new prefix to be applied to the list items.
+   * @returns {string} The text with list item prefixes replaced or added.
+   */
+  const handleListText = (text: string, prefix: string) => {
+    let counter = 1;
+    let hasIncremented = false;
+
+    return text
+      .split('\n')
+      .map((line) => {
+        if (line.trim().length === 0) {
+          return line;
+        }
+
+        const startsWithPrefix = Object.values(LIST_ITEM_PREFIX).some((p) =>
+          line.trim().startsWith(p),
+        );
+
+        if (startsWithPrefix) {
+          return Object.keys(LIST_ITEM_PREFIX).reduce((modifiedLine, key) => {
+            if (line.trim().startsWith(LIST_ITEM_PREFIX[key])) {
+              return modifiedLine.replace(
+                new RegExp(`^\\s*(${LIST_ITEM_PREFIX[key]})`),
+                prefix,
+              );
+            }
+            return modifiedLine;
+          }, line);
+        }
+
+        if (/^\s*\d+\./.test(line)) {
+          return line.replace(/^\s*\d+\./, prefix);
+        }
+
+        if (line.startsWith(prefix)) {
+          return line;
+        }
+
+        if (prefix === LIST_ITEM_PREFIX.ordered) {
+          const numberedPrefix = `${counter++}.`;
+          if (line.trim() === '' && !hasIncremented) {
+            hasIncremented = true; // Mark the counter as incremented
+            return `${numberedPrefix} ${line}`;
+          }
+          hasIncremented = false;
+          return `${numberedPrefix} ${line}`;
+        }
+
+        return `${prefix} ${line}`;
+      })
+      .join('\n');
+  };
+
+  /**
+   * Creates a handler for applying list markdown to the text in the editor.
+   * @returns {Function} A function that applies list markdown to the text in line or selected text.
+   */
   const createListHandler = () => {
+    /**
+     * Applies list markdown to the selected text in the editor.
+     * @param {string} value - The value representing the type of list (e.g., 'ordered', 'bullet', 'check').
+     */
     return (value: string) => {
       const editor = editorRef?.current?.getEditor();
-      if (!editor) {
-        return;
-      }
+
+      if (!editor) return;
+
       const selection = editor.getSelection();
-      if (!selection) {
-        return;
-      }
+      if (!selection) return;
+
       const prefix = LIST_ITEM_PREFIX[value];
       if (!prefix) {
         throw new Error(`could not get prefix for value: ${value}`);
       }
-      const text = editor.getText(selection.index, selection.length);
-      const newText = text.split('\n').reduce((acc, line) => {
-        // remove empty lines
-        if (line.trim().length === 0) {
-          return acc;
+
+      const selectedText = editor.getText(selection.index, selection.length);
+      const editorLength = editor.getLength() || 0;
+
+      // If there is a selection, format the selected text
+      if (selectedText.length > 0) {
+        const newText = handleListText(selectedText, prefix);
+        editor.deleteText(selection.index, selection.length);
+        editor.insertText(selection.index, newText);
+      } else {
+        const [currentLine] = editor.getLeaf(selection.index);
+        const currentLineIdx = editor.getIndex(currentLine);
+
+        //if there is no text in the editor, insert the prefix and a space
+        if (currentLineIdx === 0 && prefix !== currentLine.text?.trim()) {
+          editor.setText(`${prefix} `);
+          editor.setSelection(prefix.length + 1, prefix.length + 1);
+          return;
         }
-        // don't add prefix if already has it
-        if (line.startsWith(prefix)) {
-          return acc + `${line.trim()}\n`;
+
+        //if the current line has a prefix and there is text after the prefix, replace the prefix
+        Object.values(LIST_ITEM_PREFIX).forEach((p) => {
+          if (p === prefix) {
+            const currentLineText = currentLine.text.replace(prefix, '');
+            editor.deleteText(currentLineIdx, currentLine.text.length);
+            editor.insertText(currentLineIdx, currentLineText.trim());
+          }
+          if (currentLine.text.startsWith(p)) {
+            const currentLineText = currentLine.text.replace(p, '');
+            editor.deleteText(currentLineIdx, currentLine.text.length);
+            editor.insertText(currentLineIdx, currentLineText.trim());
+            return;
+          }
+        });
+
+        //if the current line has a prefix and there is no text after the prefix, remove the prefix
+        if (currentLine.text && currentLine.text.trim() === prefix) {
+          editor.deleteText(currentLineIdx, editorLength || prefix.length);
+          return;
         }
-        return acc + `${prefix} ${line}\n`;
-      }, '');
-      editor.deleteText(selection.index, selection.length);
-      editor.insertText(selection.index, newText);
+
+        return editor.insertText(currentLineIdx || 0, `${prefix} `);
+      }
+
       setContentDelta({
         ...editor.getContents(),
         ___isMarkdown: true,

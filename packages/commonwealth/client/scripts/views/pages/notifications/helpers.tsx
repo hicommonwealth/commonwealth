@@ -10,43 +10,6 @@ import { getCommunityUrl, getThreadUrl } from 'utils';
 import { User } from 'views/components/user/user';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 
-const jumpHighlightNotification = (
-  commentId,
-  shouldScroll = true,
-  animationDelayTime = 2000,
-) => {
-  const $div =
-    commentId === 'parent' || commentId === 'body'
-      ? $('html, body').find('.ProposalHeader')
-      : $('html, body').find(`.comment-${commentId}`);
-
-  if ($div.length === 0) return; // if the passed comment was invalid, abort
-
-  const divTop = $div.position().top;
-
-  const scrollTime = 500; // time to scroll
-
-  // clear any previous animation
-  $div.removeClass('highlighted highlightAnimationComplete');
-
-  // scroll to comment if necessary, set highlight, wait, then fade out the highlight
-  if (shouldScroll) {
-    $('html, body').animate({ scrollTop: divTop }, scrollTime);
-
-    $div.addClass('highlighted');
-
-    setTimeout(() => {
-      $div.addClass('highlightAnimationComplete');
-    }, animationDelayTime + scrollTime);
-  } else {
-    $div.addClass('highlighted');
-
-    setTimeout(() => {
-      $div.addClass('highlightAnimationComplete');
-    }, animationDelayTime);
-  }
-};
-
 const getNotificationFields = (category, data: IForumNotificationData) => {
   const {
     created_at,
@@ -56,16 +19,16 @@ const getNotificationFields = (category, data: IForumNotificationData) => {
     comment_id,
     comment_text,
     parent_comment_id,
-    chain_id,
+    community_id,
     author_address,
-    author_chain,
+    author_community_id,
   } = data;
 
   let notificationHeader;
   let notificationBody;
 
   const communityName =
-    app.config.chains.getById(chain_id)?.name || 'Unknown chain';
+    app.config.chains.getById(community_id)?.name || 'Unknown chain';
 
   const decodedTitle = decodeURIComponent(root_title).trim();
 
@@ -78,7 +41,7 @@ const getNotificationFields = (category, data: IForumNotificationData) => {
   const actorName = (
     <User
       userAddress={author_address}
-      userCommunityId={author_chain}
+      userCommunityId={author_community_id}
       shouldHideAvatar
     />
   );
@@ -127,22 +90,17 @@ const getNotificationFields = (category, data: IForumNotificationData) => {
   const pseudoProposal = {
     id: thread_id,
     title: root_title,
-    chain: chain_id,
+    chain: community_id,
   };
 
   const path = getThreadUrl(pseudoProposal, comment_id);
 
-  const pageJump = comment_id
-    ? () => jumpHighlightNotification(comment_id)
-    : () => jumpHighlightNotification('parent');
-
   return {
-    authorInfo: [[author_chain, author_address]],
+    authorInfo: [[author_community_id, author_address]],
     createdAt: moment.utc(created_at),
     notificationHeader,
     notificationBody,
     path,
-    pageJump,
   };
 };
 
@@ -162,19 +120,19 @@ export const getBatchNotificationFields = (
     comment_id,
     comment_text,
     parent_comment_id,
-    chain_id,
+    community_id,
     author_address,
-    author_chain,
+    author_community_id,
   } = data[0];
 
   const authorInfo = _.uniq(
-    data.map((d) => `${d.author_chain}#${d.author_address}`),
+    data.map((d) => `${d.author_community_id}#${d.author_address}`),
   ).map((u) => u.split('#'));
 
   const length = authorInfo.length - 1;
 
   const communityName =
-    app.config.chains.getById(chain_id)?.name || 'Unknown chain';
+    app.config.chains.getById(community_id)?.name || 'Unknown chain';
 
   let notificationHeader;
   let notificationBody;
@@ -189,7 +147,7 @@ export const getBatchNotificationFields = (
   const actorName = (
     <User
       userAddress={author_address}
-      userCommunityId={author_chain}
+      userCommunityId={author_community_id}
       shouldHideAvatar
     />
   );
@@ -250,17 +208,13 @@ export const getBatchNotificationFields = (
   const pseudoProposal = {
     id: thread_id,
     title: root_title,
-    chain: chain_id,
+    chain: community_id,
   };
 
   const path =
     category === NotificationCategories.NewThread
-      ? getCommunityUrl(chain_id)
+      ? getCommunityUrl(community_id)
       : getThreadUrl(pseudoProposal, comment_id);
-
-  const pageJump = comment_id
-    ? () => jumpHighlightNotification(comment_id)
-    : () => jumpHighlightNotification('parent');
 
   return {
     authorInfo,
@@ -268,6 +222,5 @@ export const getBatchNotificationFields = (
     notificationHeader,
     notificationBody,
     path,
-    pageJump,
   };
 };

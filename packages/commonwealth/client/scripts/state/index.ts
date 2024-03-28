@@ -88,6 +88,7 @@ export interface IApp {
   // stored on server-side
   config: {
     chains: ChainStore;
+    redirects: Record<string, string>;
     nodes: NodeStore;
     notificationCategories?: NotificationCategory[];
     defaultChain: string;
@@ -168,6 +169,7 @@ const app: IApp = {
 
   config: {
     chains: new ChainStore(),
+    redirects: {},
     nodes: new NodeStore(),
     defaultChain: 'edgeware',
   },
@@ -195,7 +197,7 @@ declare const window: any;
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
 export async function initAppState(
-  updateSelectedChain = true,
+  updateSelectedCommunity = true,
   shouldRedraw = true,
 ): Promise<void> {
   try {
@@ -226,15 +228,17 @@ export async function initAppState(
       .filter((chainsWithSnapshots) => chainsWithSnapshots.community.active)
       .forEach((chainsWithSnapshots) => {
         delete chainsWithSnapshots.community.ChainNode;
-        app.config.chains.add(
-          ChainInfo.fromJSON({
-            ChainNode: app.config.nodes.getById(
-              chainsWithSnapshots.community.chain_node_id,
-            ),
-            snapshot: chainsWithSnapshots.snapshot,
-            ...chainsWithSnapshots.community,
-          }),
-        );
+        const chainInfo = ChainInfo.fromJSON({
+          ChainNode: app.config.nodes.getById(
+            chainsWithSnapshots.community.chain_node_id,
+          ),
+          snapshot: chainsWithSnapshots.snapshot,
+          ...chainsWithSnapshots.community,
+        });
+        app.config.chains.add(chainInfo);
+        if (chainInfo.redirect) {
+          app.config.redirects[chainInfo.redirect] = chainInfo.id;
+        }
       });
 
     app.roles.setRoles(statusRes.result.roles);
@@ -242,12 +246,12 @@ export async function initAppState(
       statusRes.result.notificationCategories.map((json) =>
         NotificationCategory.fromJSON(json),
       );
-    app.config.chainCategoryMap = statusRes.result.chainCategoryMap;
+    app.config.chainCategoryMap = statusRes.result.communityCategoryMap;
 
     // add recentActivity
     const { recentThreads } = statusRes.result;
-    recentThreads.forEach(({ chain, count }) => {
-      app.recentActivity.setCommunityThreadCounts(chain, count);
+    recentThreads.forEach(({ communityId, count }) => {
+      app.recentActivity.setCommunityThreadCounts(communityId, count);
     });
 
     // update the login status
@@ -272,15 +276,15 @@ export async function initAppState(
           )
         : [],
     );
-    // update the selectedChain, unless we explicitly want to avoid
+    // update the selectedCommunity, unless we explicitly want to avoid
     // changing the current state (e.g. when logging in through link_new_address_modal)
     if (
-      updateSelectedChain &&
+      updateSelectedCommunity &&
       statusRes.result.user &&
-      statusRes.result.user.selectedChain
+      statusRes.result.user.selectedCommunity
     ) {
       app.user.setSelectedChain(
-        ChainInfo.fromJSON(statusRes.result.user.selectedChain),
+        ChainInfo.fromJSON(statusRes.result.user.selectedCommunity),
       );
     }
 

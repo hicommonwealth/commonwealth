@@ -15,7 +15,4 @@ yarn workspace @hicommonwealth/model build
 yarn workspaces run check-types
 
 # run unit tests
-# this should be: yarn workspaces run test
-# this should be added to CI: yarn workspace @hicommonwealth/adapters test
-yarn workspace @hicommonwealth/model test
-yarn workspace commonwealth unit-test
+yarn workspaces run test

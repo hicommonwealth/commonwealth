@@ -1,22 +1,9 @@
-import { CommandMetadata, InvalidState } from '@hicommonwealth/core';
+import { InvalidState, schemas, type Command } from '@hicommonwealth/core';
 import { Op } from 'sequelize';
-import { z } from 'zod';
 import { models, sequelize } from '../database';
 import { isCommunityAdminOrModerator } from '../middleware';
 import { mustNotExist } from '../middleware/guards';
-import { CommunityAttributes, GroupAttributes } from '../models';
-import { Requirement } from './Requirements.schema';
-
-const schema = z.object({
-  metadata: z.object({
-    name: z.string(),
-    description: z.string(),
-    required_requirements: z.number().optional(),
-    membership_ttl: z.number().optional(),
-  }),
-  requirements: z.array(Requirement),
-  topics: z.array(z.number()).optional(),
-});
+import { GroupAttributes } from '../models';
 
 export const MAX_GROUPS_PER_COMMUNITY = 20;
 export const Errors = {
@@ -24,11 +11,10 @@ export const Errors = {
   InvalidTopics: 'Invalid topics',
 };
 
-export const CreateGroup = (): CommandMetadata<
-  CommunityAttributes,
-  typeof schema
-> => ({
-  schema,
+export const CreateGroup: Command<
+  typeof schemas.commands.CreateGroup
+> = () => ({
+  ...schemas.commands.CreateGroup,
   auth: [isCommunityAdminOrModerator],
   body: async ({ id, payload }) => {
     const groups = await models.Group.findAll({
@@ -63,6 +49,7 @@ export const CreateGroup = (): CommandMetadata<
           community_id: id!,
           metadata: payload.metadata,
           requirements: payload.requirements,
+          is_system_managed: false,
         } as GroupAttributes,
         { transaction },
       );

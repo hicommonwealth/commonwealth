@@ -88,7 +88,7 @@ export const ThreadCard = ({
 
   const isStageDefault = isDefaultStage(thread.stage);
   const isTagsRowVisible =
-    (thread.stage && !isStageDefault) || linkedProposals.length > 0;
+    (thread.stage && !isStageDefault) || linkedProposals?.length > 0;
   const stageLabel = threadStageToLabel(thread.stage);
 
   return (
@@ -126,6 +126,7 @@ export const ThreadCard = ({
               })}
               discord_meta={thread.discord_meta}
               archivedAt={thread.archivedAt}
+              profile={thread?.profile}
             />
             <div className="content-header-icons">
               {thread.pinned && <CWIcon iconName="pin" />}

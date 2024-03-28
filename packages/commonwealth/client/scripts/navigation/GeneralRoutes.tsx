@@ -8,7 +8,6 @@ const PrivacyPage = lazy(() => import('views/pages/privacy'));
 const ComponentsShowcasePage = lazy(
   () => import('views/pages/ComponentsShowcase'),
 );
-const ComponentsPage = lazy(() => import('views/pages/components'));
 
 const GeneralRoutes = () => [
   <Route
@@ -25,11 +24,6 @@ const GeneralRoutes = () => [
     key="/tos-1-26-2023"
     path="/tos-1-26-2023"
     element={withLayout(OldTermsPage, { type: 'blank' })}
-  />,
-  <Route
-    key="/components-old"
-    path="/components-old"
-    element={withLayout(ComponentsPage, { type: 'common' })}
   />,
   <Route
     key="/components"

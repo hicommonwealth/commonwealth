@@ -1,5 +1,8 @@
 import { models } from '@hicommonwealth/model';
 import { expect, test } from '@playwright/test';
+import chai from 'chai';
+import sleep from 'sleep-promise';
+const chaiExpect = chai.expect;
 
 test.describe.configure({ mode: 'parallel' });
 
@@ -22,7 +25,7 @@ test.describe('Community proposals page', () => {
     const banner = await page.$$('.Growl');
     if (banner?.[0]) {
       const closeButton = await banner[0].$('.closeButton');
-      await closeButton?.click();
+      await closeButton.click();
     }
   };
 
@@ -41,27 +44,22 @@ test.describe('Community proposals page', () => {
         '.ProposalCard',
         (cards) => cards.length,
       );
-      expect(cardCount).toBeGreaterThanOrEqual(expectedMinimumCount);
+      await expect(cardCount).toBeGreaterThanOrEqual(expectedMinimumCount);
     }).toPass();
   };
 
   const waitForCompletedProposals = async ({ page }) => {
     // these are lazy-loaded after page init
-    // await page.waitForSelector('.CardsCollection:nth-of-type(2)');
-    // const collection = await page.locator('.CardsCollection:nth-of-type(2)');
-    // await collection.locator('.cards .LoadingSpinner');
-    // const p = await collection
-    //   .locator('.cards .ProposalCard .proposal-card-metadata')
-    //   .first();
-    // await p.waitFor({ state: 'visible', timeout: 60000 });
-
     await page.waitForSelector('.CardsCollection');
     const collections = await page.$$('.CardsCollection');
     const inactive = collections[1];
-    await inactive?.$('.cards .LoadingSpinner');
-    await inactive?.$$('.cards .ProposalCard .proposal-card-metadata');
     const spinner = await inactive?.$('.LoadingSpinner');
     await spinner?.waitForElementState('hidden');
+    const metadata = await inactive?.$$(
+      '.cards .ProposalCard .proposal-card-metadata',
+    );
+    const firstMetadata = metadata[0];
+    await firstMetadata?.waitForElementState('visible');
   };
 
   const waitForIpfsRequests = async ({ page }) => {
@@ -106,16 +104,19 @@ test.describe('Community proposals page', () => {
     await waitForCompletedProposals({ page });
     const cardsContainers = await page.$$('.CardsCollection .cards');
     const inactiveCardsContainer = await cardsContainers?.[1];
+    const containerSpinner = await inactiveCardsContainer?.$('.LoadingSpinner');
+    await containerSpinner?.waitForElementState('hidden');
 
     const proposals = await inactiveCardsContainer?.$$('.ProposalCard');
 
     const firstProposal = proposals[proposals.length - 1];
     if (isV1) {
       await waitForIpfsRequests({ page });
-      await waitForIpfsRequests({ page });
     }
 
+    await sleep(1000); // a little extra time for title to re-render
     const title = await firstProposal?.$('.Text.b1.semiBold.noWrap');
+    title.waitForElementState('stable');
     const expectedTitle = await title?.innerText();
 
     const navigationPromise = page.waitForNavigation();
@@ -284,6 +285,90 @@ test.describe('Community proposals page', () => {
           );
         });
       });
+    });
+    test('Inactive proposal cards load', async ({ page }) => {
+      await page.goto(proposalsPageUrl);
+      await inactiveProposalCardsTest({ page }, 23); // as of commit, should never be less than 23
+    });
+    test('Inactive proposal page loads from Proposal Card click', async ({
+      page,
+    }) => {
+      await page.goto(proposalsPageUrl);
+      await inactiveProposalPageTest({ page }, true);
+    });
+    test('Inactive proposal page loads on direct URL', async ({ page }) => {
+      await page.goto(`http://localhost:8080/kyve/proposal/5`);
+      await inactiveProposalPageAssertions({ page, isV1: true });
+    });
+    test('All proposal cards have titles', async ({ page }) => {
+      await page.goto(proposalsPageUrl);
+      await allProposalCardsHaveTitles({ page });
+    });
+  });
+
+  test.describe('qwoyn (gov v1beta1 upgraded to v1)', () => {
+    const chain = 'qwoyn-network';
+    const proposalsPageUrl = `http://localhost:8080/${chain}/proposals`;
+
+    test('Proposal fetch fails', async ({ page }) => {
+      await models.ChainNode.update(
+        { alt_wallet_url: null, cosmos_gov_version: null },
+        { where: { cosmos_chain_id: 'qwoyn' } },
+      );
+
+      const communityBeforeUpgrade = await models.Community.findOne({
+        where: { id: chain },
+        include: [models.ChainNode],
+      });
+
+      chaiExpect(communityBeforeUpgrade.ChainNode.cosmos_gov_version).to.equal(
+        null,
+      );
+      chaiExpect(communityBeforeUpgrade.ChainNode.alt_wallet_url).to.equal(
+        null,
+      );
+
+      await page.goto(proposalsPageUrl);
+      await inactiveProposalCardsTest({ page }, 0);
+    });
+    test('After failure: sets db to "v1beta1-attempt-failed" and populates REST endpoint', async () => {
+      const communityAfterFailure = await models.Community.findOne({
+        where: { id: chain },
+        include: [models.ChainNode],
+      });
+      chaiExpect(communityAfterFailure.ChainNode.cosmos_gov_version).to.equal(
+        'v1beta1-attempt-failed',
+      );
+    });
+    test('After refresh: Inactive proposal cards should load with v1 API', async ({
+      page,
+    }) => {
+      await page.goto(proposalsPageUrl);
+      await inactiveProposalCardsTest({ page }, 13);
+
+      const communityAfterRefresh = await models.Community.findOne({
+        where: { id: chain },
+        include: [models.ChainNode],
+      });
+
+      chaiExpect(communityAfterRefresh.ChainNode.cosmos_gov_version).to.equal(
+        'v1',
+      );
+    });
+    test('Inactive proposal page loads from Proposal Card click', async ({
+      page,
+    }) => {
+      await page.goto(proposalsPageUrl);
+      await inactiveProposalPageTest({ page }, true);
+    });
+    test('Inactive proposal page loads on direct URL', async ({ page }) => {
+      await page.goto(`http://localhost:8080/${chain}/proposal/5`);
+      await page.waitForSelector('.LoadingSpinner');
+      await inactiveProposalPageAssertions({ page, isV1: true });
+    });
+    test('All proposal cards have titles', async ({ page }) => {
+      await page.goto(proposalsPageUrl);
+      await allProposalCardsHaveTitles({ page });
     });
   });
 });

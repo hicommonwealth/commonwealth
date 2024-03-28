@@ -2,11 +2,15 @@ import {
   CacheDecorator,
   lookupKeyDurationInReq,
 } from '@hicommonwealth/adapters';
-import { AppError, NodeHealth, logger } from '@hicommonwealth/core';
+import {
+  AppError,
+  CosmosGovernanceVersion,
+  NodeHealth,
+  logger,
+} from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
 import axios from 'axios';
-import bodyParser from 'body-parser';
-import { Express } from 'express';
+import * as express from 'express';
 import _ from 'lodash';
 import {
   calcCosmosLCDCacheKeyDuration,
@@ -19,16 +23,17 @@ const FALLBACK_NODE_DURATION = +process.env.FALLBACK_NODE_DURATION_S || 300; // 
 const Errors = {
   NeedCosmosChainId: 'cosmos_chain_id is required',
 };
+const DEVNET_COSMOS_ID_RE = /^(csdk|evmosdev)/;
 
 function setupCosmosProxy(
-  app: Express,
+  app: express.Express,
   models: DB,
   cacheDecorator: CacheDecorator,
 ) {
   // using bodyParser here because cosmjs generates text/plain type headers
   app.post(
     '/cosmosAPI/:community_id',
-    bodyParser.text(),
+    express.text() as express.RequestHandler,
     calcCosmosRPCCacheKeyDuration,
     cacheDecorator.cacheMiddleware(
       DEFAULT_CACHE_DURATION,
@@ -90,6 +95,8 @@ function setupCosmosProxy(
           response = await queryExternalProxy(req, cosmos_chain_id, 'rpc');
         }
 
+        await upgradeBetaNodeIfNeeded(req, response, community.ChainNode);
+
         log.trace(
           `Got response from endpoint: ${JSON.stringify(
             response.data,
@@ -119,7 +126,7 @@ function setupCosmosProxy(
    */
   app.use(
     '/cosmosAPI/v1/:community_id',
-    bodyParser.text(),
+    express.text() as express.RequestHandler,
     calcCosmosLCDCacheKeyDuration,
     cacheDecorator.cacheMiddleware(
       DEFAULT_CACHE_DURATION,
@@ -188,6 +195,8 @@ function setupCosmosProxy(
           response = await queryExternalProxy(req, cosmos_chain_id, 'rest');
         }
 
+        await updateV1NodeIfNeeded(req, response, community.ChainNode);
+
         log.trace(`Got response: ${JSON.stringify(response.data, null, 2)}`);
         return res.send(response.data);
       } catch (err) {
@@ -214,9 +223,7 @@ function setupCosmosProxy(
     cosmos_chain_id: string,
     web_protocol: 'rpc' | 'rest',
   ) => {
-    if (!cosmos_chain_id) {
-      throw new AppError(Errors.NeedCosmosChainId);
-    }
+    if (!cosmos_chain_id || DEVNET_COSMOS_ID_RE.test(cosmos_chain_id)) return;
     const proxyUrl = `https://${web_protocol}.cosmos.directory/${cosmos_chain_id}`;
     const rewrite = rewriteUrl(req, proxyUrl, web_protocol);
     const body = _.isEmpty(req.body) ? null : req.body;
@@ -247,10 +254,8 @@ function setupCosmosProxy(
     error?: any,
   ) => {
     if (error?.message === Errors.NeedCosmosChainId) return; // not a health issue
-    if (previouslyFailed) return; // no need to hit db again
-    if (!cosmos_chain_id) {
-      throw new AppError(Errors.NeedCosmosChainId);
-    }
+    if (previouslyFailed || !cosmos_chain_id) return; // no need to hit db again
+    if (DEVNET_COSMOS_ID_RE.test(cosmos_chain_id)) return; // skip devnets
 
     const failedChainNode = await models.ChainNode.findOne({
       where: { cosmos_chain_id },
@@ -272,12 +277,10 @@ function setupCosmosProxy(
     cosmos_chain_id: string,
     dbUrl: string,
   ) => {
+    if (!cosmos_chain_id || DEVNET_COSMOS_ID_RE.test(cosmos_chain_id)) return;
     // update if the request was successfully made to the DB URL
     // and the node was previously marked as failed
     if (dbUrl?.includes(response.request.host) && previouslyFailed) {
-      if (!cosmos_chain_id) {
-        throw new AppError(Errors.NeedCosmosChainId);
-      }
       const healthyChainNode = await models.ChainNode.findOne({
         where: { cosmos_chain_id },
       });
@@ -305,7 +308,7 @@ function setupCosmosProxy(
 
   app.use(
     '/magicCosmosAPI/:chain/?(node_info)?',
-    bodyParser.text(),
+    express.text() as express.RequestHandler,
     async (req, res) => {
       log.trace(`Got request: ${JSON.stringify(req.body, null, 2)}`);
       // always use cosmoshub for simplicity
@@ -344,6 +347,36 @@ function setupCosmosProxy(
       }
     },
   );
+
+  const upgradeBetaNodeIfNeeded = async (req, response, chainNode) => {
+    if (!req.body?.params?.path?.includes('/cosmos.gov.v1beta1.Query')) return;
+
+    if (
+      response.data?.result?.response?.log?.includes(
+        `can't convert a gov/v1 Proposal to gov/v1beta1 Proposal`,
+      )
+    ) {
+      await models.ChainNode.update(
+        { cosmos_gov_version: CosmosGovernanceVersion.v1beta1Failed },
+        { where: { id: chainNode.id } },
+      );
+    }
+  };
+
+  const updateV1NodeIfNeeded = async (req, response, chainNode) => {
+    if (!req.originalUrl?.includes('cosmos/gov/v1')) return;
+
+    const dbGovVersion = chainNode.cosmos_gov_version;
+    const shouldUpdate =
+      !dbGovVersion || dbGovVersion === CosmosGovernanceVersion.v1beta1Failed;
+
+    if (shouldUpdate) {
+      await models.ChainNode.update(
+        { cosmos_gov_version: CosmosGovernanceVersion.v1 },
+        { where: { id: chainNode.id } },
+      );
+    }
+  };
 }
 
 export default setupCosmosProxy;
