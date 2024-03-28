@@ -62,7 +62,7 @@ export async function __refreshCommunityMemberships(
 
     const getBalancesOptions = makeGetBalancesOptions(
       groupsToUpdate,
-      addresses,
+      addresses.map((a) => a.address),
     );
     const balances = await Promise.all(
       getBalancesOptions.map(async (options) => {
@@ -168,6 +168,7 @@ async function computeMembership(
     address.address,
     requirements,
     balances,
+    currentGroup.metadata.required_requirements,
   );
   const computedMembership = {
     group_id: currentGroup.id,

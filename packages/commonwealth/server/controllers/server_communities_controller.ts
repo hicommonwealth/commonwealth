@@ -20,6 +20,11 @@ import {
   __deleteCommunity,
 } from './server_communities_methods/delete_community';
 import {
+  GetActiveCommunitiesOptions,
+  GetActiveCommunitiesResult,
+  __getActiveCommunities,
+} from './server_communities_methods/get_active_communities';
+import {
   GetChainNodesOptions,
   GetChainNodesResult,
   __getChainNodes,
@@ -76,6 +81,12 @@ export class ServerCommunitiesController {
     options: GetCommunitiesOptions,
   ): Promise<GetCommunitiesResult> {
     return __getCommunities.call(this, options);
+  }
+
+  async getActiveCommunities(
+    options: GetActiveCommunitiesOptions,
+  ): Promise<GetActiveCommunitiesResult> {
+    return __getActiveCommunities.call(this, options);
   }
 
   async createCommunity(

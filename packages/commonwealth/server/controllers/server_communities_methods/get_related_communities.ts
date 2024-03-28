@@ -43,9 +43,11 @@ export async function __getRelatedCommunities(
         popular_communities.description as description,
         popular_communities.icon_url, 
         popular_communities.thread_count, 
+        popular_communities.namespace,
+        popular_communities.chain_node_id,
         COUNT(a) as address_count 
     FROM 
-        (SELECT c.id, c.icon_url, c.name, c.description, COUNT(t) as thread_count 
+        (SELECT c.id, c.icon_url, c.name, c.description, COUNT(t) as thread_count, c.namespace, c.chain_node_id
         FROM "ChainNodes" as cn 
         JOIN "Communities" as c on c.chain_node_id = cn.id 
         LEFT JOIN "Threads" as t on t.community_id = c.id 
@@ -53,7 +55,8 @@ export async function __getRelatedCommunities(
         GROUP BY c.id) as popular_communities 
     LEFT JOIN "Addresses" as a on a.community_id = popular_communities.id 
     GROUP BY popular_communities.id, popular_communities.icon_url, popular_communities.name,
-     popular_communities.description, popular_communities.thread_count 
+     popular_communities.description, popular_communities.thread_count, popular_communities.namespace, 
+     popular_communities.chain_node_id 
     ORDER BY address_count DESC;
     `,
     {

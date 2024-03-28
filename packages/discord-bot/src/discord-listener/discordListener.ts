@@ -1,13 +1,13 @@
 import {
   HotShotsStats,
-  RabbitMQController,
+  PinoLogger,
+  RabbitMQAdapter,
   RascalConfigServices,
   ServiceKey,
-  TypescriptLoggingLogger,
   getRabbitMQConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { logger, stats } from '@hicommonwealth/core';
+import { Broker, broker, logger, stats } from '@hicommonwealth/core';
 import {
   Client,
   IntentsBitField,
@@ -18,7 +18,7 @@ import {
 import v8 from 'v8';
 import { DISCORD_TOKEN, RABBITMQ_URI } from '../utils/config';
 
-const log = logger(TypescriptLoggingLogger()).getLogger(__filename);
+const log = logger(PinoLogger()).getLogger(__filename);
 stats(HotShotsStats());
 
 let isServiceHealthy = false;
@@ -44,10 +44,18 @@ async function startDiscordListener() {
     '../discord-listener/handlers'
   );
 
-  const controller = new RabbitMQController(
-    getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.DiscobotService),
-  );
-  await controller.init();
+  let controller: Broker;
+  try {
+    const rmqAdapter = new RabbitMQAdapter(
+      getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.DiscobotService),
+    );
+    await rmqAdapter.init();
+    broker(rmqAdapter);
+    controller = rmqAdapter;
+  } catch (e) {
+    log.error('Broker setup failed', e instanceof Error ? e : undefined);
+    throw e;
+  }
 
   const client = new Client({
     intents: [

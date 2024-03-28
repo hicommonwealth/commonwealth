@@ -10,7 +10,7 @@ if [ -n "$GITHUB_BASE_REF" ]; then
 fi
 
 # Get a list of changed .ts files
-LINES=$(git diff origin/$BASE_BRANCH...HEAD --name-only --diff-filter=d | grep '\.ts$' | grep -v 'libs/chains/src/cosmos-ts/')
+LINES=$(git diff origin/$BASE_BRANCH...HEAD --name-only --diff-filter=d | grep -E '\.tsx?$' | grep -v 'libs/chains/src/cosmos-ts/')
 
 if [ -z "$LINES" ]
 then

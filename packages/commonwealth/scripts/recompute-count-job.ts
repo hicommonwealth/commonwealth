@@ -1,11 +1,16 @@
 import { models } from '@hicommonwealth/model';
 
-export async function recomputeCounts() {
+export async function recomputeCounts(
+  logging: boolean | ((sql: string, timing?: number) => void) = false,
+) {
   return models.sequelize.transaction(async (t) => {
-    console.log('Add comment reaction count');
-    console.time('Add comment reaction count');
+    /*
+     *  Comments.reaction_count
+     */
+    logging && console.log('Add comment reaction count');
+    logging && console.time('Add comment reaction count');
     await models.sequelize.query(
-      ` -- SELECT DISTINCT reaction FROM "Reactions" 
+      ` -- SELECT DISTINCT reaction FROM "Reactions"
       ;with reactionCntByComment AS (
         SELECT SUM(CASE WHEN reaction='like' THEN 1 ELSE -1 END) as cnt, comment_id
         FROM "Reactions"
@@ -17,13 +22,15 @@ export async function recomputeCounts() {
       FROM reactionCntByComment rc
       where rc.comment_id="Comments".id
       `,
-      { raw: true, transaction: t, logging: console.log },
+      { raw: true, transaction: t, logging },
     );
-    console.timeEnd('Add comment reaction count');
+    logging && console.timeEnd('Add comment reaction count');
 
-    // TODO: add comments reaction
-    console.log('Add thread reaction count');
-    console.time('Add thread reaction count');
+    /*
+     *  Threads.reaction_count
+     */
+    logging && console.log('Add thread reaction count');
+    logging && console.time('Add thread reaction count');
     await models.sequelize.query(
       `
       ;with reactionCntByThread AS (
@@ -37,12 +44,15 @@ export async function recomputeCounts() {
       FROM reactionCntByThread rc
       where rc.thread_id="Threads".id
       `,
-      { raw: true, transaction: t, logging: console.log },
+      { raw: true, transaction: t, logging },
     );
-    console.timeEnd('Add thread reaction count');
+    logging && console.timeEnd('Add thread reaction count');
 
-    console.log('Add thread comment count');
-    console.time('Add thread comment count');
+    /*
+     *  Threads.comment_count
+     */
+    logging && console.log('Add thread comment count');
+    logging && console.time('Add thread comment count');
     await models.sequelize.query(
       `
       ;with commentCntByThread AS (
@@ -57,12 +67,65 @@ export async function recomputeCounts() {
       FROM commentCntByThread cc
       where cc.thread_id="Threads".id
       `,
-      { raw: true, transaction: t, logging: console.log },
+      { raw: true, transaction: t, logging },
     );
-    console.timeEnd('Add thread comment count');
+    logging && console.timeEnd('Add thread comment count');
 
-    console.log('Add thread max notification id');
-    console.time('Add thread max notification id');
+    /*
+     *  Community.thread_count
+     */
+    logging && console.log('Add community thread count');
+    logging && console.time('Add community thread count');
+    await models.sequelize.query(
+      `
+      ;with threadCntByCommunity AS (
+        SELECT
+          count(id) as cnt,
+          community_id
+        FROM "Threads"
+        WHERE deleted_at IS NULL
+        GROUP BY community_id
+      )
+
+      Update "Communities"
+      SET thread_count=cc.cnt
+      FROM threadCntByCommunity cc
+      where cc.community_id="Communities".id
+      `,
+      { raw: true, transaction: t, logging },
+    );
+    logging && console.timeEnd('Add community thread count');
+
+    /*
+     *  Community.address_count
+     */
+    logging && console.log('Add community address count');
+    logging && console.time('Add community address count');
+    await models.sequelize.query(
+      `
+      ;with addressCntByCommunity AS (
+        SELECT
+          count(id) as cnt,
+          community_id
+        FROM "Addresses"
+        WHERE verified IS NOT NULL
+        GROUP BY community_id
+      )
+
+      Update "Communities"
+      SET address_count=cc.cnt
+      FROM addressCntByCommunity cc
+      where cc.community_id="Communities".id
+      `,
+      { raw: true, transaction: t, logging },
+    );
+    logging && console.timeEnd('Add community address count');
+
+    /*
+     *  Thread.max_notif_id
+     */
+    logging && console.log('Add thread max notification id');
+    logging && console.time('Add thread max notification id');
     await models.sequelize.query(
       `
       ;with maxNotificationIdByThread AS (
@@ -76,17 +139,17 @@ export async function recomputeCounts() {
       SET max_notif_id=mn.max_id
       FROM maxNotificationIdByThread mn
       where mn.thread_id="Threads".id
-      
+
       `,
-      { raw: true, transaction: t, logging: console.log },
+      { raw: true, transaction: t, logging },
     );
-    console.timeEnd('Add thread max notification id');
+    logging && console.timeEnd('Add thread max notification id');
   });
 }
 
 if (!module.parent) {
   console.log('recompute job started');
-  recomputeCounts()
+  recomputeCounts(console.log)
     .then(() => {
       console.log('recompute job completed successfully');
       process.exit(0);

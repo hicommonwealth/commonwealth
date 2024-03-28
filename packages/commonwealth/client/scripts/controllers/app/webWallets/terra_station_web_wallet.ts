@@ -90,7 +90,9 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
 
     try {
       const signBytesResult = await window.station.signBytes(
-        Buffer.from(canvas.serializeSessionPayload(canvasSessionPayload)),
+        Buffer.from(
+          canvas.serializeSessionPayload(canvasSessionPayload),
+        ).toString('base64'),
       );
 
       result = signBytesResult;
