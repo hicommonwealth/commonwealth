@@ -4,6 +4,7 @@ import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
 import useWindowResize from 'hooks/useWindowResize';
 import React, { useEffect, useState } from 'react';
+import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
@@ -33,9 +34,21 @@ const Sublayout = ({
     resizeListenerUpdateDeps: [resizing],
   });
 
-  const { toggleMobileView } = useWindowResize({
+  const location = useLocation();
+
+  useWindowResize({
     setMenu,
   });
+
+  const routesWithoutGenericBreadcrumbs = matchRoutes(
+    [
+      { path: '/discussions/*' },
+      { path: ':scope/discussions/*' },
+      { path: '/archived' },
+      { path: ':scope/archived' },
+    ],
+    location,
+  );
 
   useEffect(() => {
     app.sidebarRedraw.on('redraw', forceRerender);
@@ -97,11 +110,7 @@ const Sublayout = ({
           <SublayoutBanners banner={banner} chain={chain} terms={terms} />
 
           <div className="Body">
-            {!toggleMobileView && (
-              <div className="breadcrumbContainer">
-                <Breadcrumbs />
-              </div>
-            )}
+            {!routesWithoutGenericBreadcrumbs && <Breadcrumbs />}
             {isInsideCommunity && <AdminOnboardingSlider />}
             {children}
             {!app.isCustomDomain() && !hideFooter && <Footer />}

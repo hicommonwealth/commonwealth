@@ -4,9 +4,4 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 24px 72px;
-
-  @include extraSmall {
-    padding: 16px;
-  }
 }

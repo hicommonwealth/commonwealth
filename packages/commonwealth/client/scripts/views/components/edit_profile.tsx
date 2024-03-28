@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import app from 'state';
 import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
 import _ from 'underscore';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { z } from 'zod';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
@@ -214,178 +215,180 @@ const EditProfileComponent = () => {
 
   if (error === EditProfileError.None) {
     return (
-      <div className="EditProfile">
-        <CWForm
-          title="Edit Profile"
-          description="Add or change your general info and customize your profile."
-          actions={
-            <div className="buttons-container">
-              <div className="buttons">
-                <CWButton
-                  label="Cancel"
-                  onClick={() => {
-                    setLoading(true);
-                    setTimeout(() => {
-                      navigate(`/profile/id/${profile.id}`);
-                    }, 1000);
+      <CWPageLayout>
+        <div className="EditProfile">
+          <CWForm
+            title="Edit Profile"
+            description="Add or change your general info and customize your profile."
+            actions={
+              <div className="buttons-container">
+                <div className="buttons">
+                  <CWButton
+                    label="Cancel"
+                    onClick={() => {
+                      setLoading(true);
+                      setTimeout(() => {
+                        navigate(`/profile/id/${profile.id}`);
+                      }, 1000);
+                    }}
+                    className="save-button"
+                    buttonType="secondary-black"
+                  />
+                  <CWButton
+                    label="Save"
+                    onClick={() => handleSaveProfile()}
+                    className="save-button"
+                    buttonType="primary-black"
+                  />
+                </div>
+              </div>
+            }
+          >
+            <CWFormSection
+              title="General Info"
+              description="Let your community and others get to know you by sharing a bit about yourself."
+            >
+              <div className="profile-image-section">
+                <CWText type="caption" fontWeight="medium">
+                  Profile image
+                </CWText>
+                <CWText type="caption" className="description">
+                  Select an image from your files to upload
+                </CWText>
+                <div className="image-upload">
+                  <AvatarUpload
+                    scope="user"
+                    account={account}
+                    uploadCompleteCallback={(files) => {
+                      files.forEach((f) => {
+                        if (!f.uploadURL) return;
+                        const url = f.uploadURL.replace(/\?.*/, '').trim();
+                        setAvatarUrl(url);
+                      });
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="info-section">
+                <CWTextInput
+                  name="name-form-field"
+                  inputValidationFn={(val: string) => {
+                    if (val.match(/[^A-Za-z0-9]/)) {
+                      return ['failure', 'Must enter characters A-Z, 0-9'];
+                    } else {
+                      return ['success', 'Input validated'];
+                    }
                   }}
-                  className="save-button"
-                  buttonType="secondary-black"
+                  label={
+                    <>
+                      <CWText type="caption" className="display-name-label">
+                        Display name
+                      </CWText>
+                      <div className="blue-star">*</div>
+                    </>
+                  }
+                  value={name}
+                  placeholder="display name"
+                  onInput={(e) => {
+                    setDisplayNameValid(true);
+                    setName(e.target.value);
+                  }}
+                  inputClassName={displayNameValid ? '' : 'failure'}
+                  manualStatusMessage={displayNameValid ? '' : 'No input'}
+                  manualValidationStatus={
+                    displayNameValid ? 'success' : 'failure'
+                  }
                 />
-                <CWButton
-                  label="Save"
-                  onClick={() => handleSaveProfile()}
-                  className="save-button"
-                  buttonType="primary-black"
+                <CWTextInput
+                  name="email-form-field"
+                  inputValidationFn={(val: string) => {
+                    try {
+                      z.string().email().parse(val.trim());
+                      return ['success', 'Input validated'];
+                    } catch {
+                      return ['failure', 'Must enter valid email'];
+                    }
+                  }}
+                  label="Email"
+                  value={email}
+                  placeholder="email"
+                  onInput={(e) => {
+                    setEmail(e.target.value);
+                  }}
                 />
               </div>
-            </div>
-          }
-        >
-          <CWFormSection
-            title="General Info"
-            description="Let your community and others get to know you by sharing a bit about yourself."
-          >
-            <div className="profile-image-section">
-              <CWText type="caption" fontWeight="medium">
-                Profile image
-              </CWText>
+              <div className="bio-section">
+                <CWText type="caption">Bio</CWText>
+                <ReactQuillEditor
+                  className="editor"
+                  contentDelta={bio}
+                  setContentDelta={setBio}
+                />
+              </div>
+              <CWDivider />
+              <div className="socials-section">
+                <CWText type="caption">Social links</CWText>
+                <CWSocials
+                  socials={profile?.socials}
+                  handleInputChange={(e) => {
+                    setSocials(e);
+                  }}
+                />
+              </div>
+            </CWFormSection>
+            <CWFormSection
+              title="Personalize Your Profile"
+              description="Express yourself through imagery."
+            >
+              <CWText fontWeight="medium">Image upload</CWText>
               <CWText type="caption" className="description">
-                Select an image from your files to upload
+                Add a background image.
               </CWText>
-              <div className="image-upload">
-                <AvatarUpload
-                  scope="user"
-                  account={account}
-                  uploadCompleteCallback={(files) => {
-                    files.forEach((f) => {
-                      if (!f.uploadURL) return;
-                      const url = f.uploadURL.replace(/\?.*/, '').trim();
-                      setAvatarUrl(url);
-                    });
-                  }}
-                />
-              </div>
-            </div>
-            <div className="info-section">
-              <CWTextInput
-                name="name-form-field"
-                inputValidationFn={(val: string) => {
-                  if (val.match(/[^A-Za-z0-9]/)) {
-                    return ['failure', 'Must enter characters A-Z, 0-9'];
-                  } else {
-                    return ['success', 'Input validated'];
-                  }
+              <CWCoverImageUploader
+                uploadCompleteCallback={(
+                  url: string,
+                  imageBehavior: ImageBehavior,
+                ) => {
+                  backgroundImageRef.current = {
+                    url,
+                    imageBehavior,
+                  };
                 }}
-                label={
-                  <>
-                    <CWText type="caption" className="display-name-label">
-                      Display name
-                    </CWText>
-                    <div className="blue-star">*</div>
-                  </>
-                }
-                value={name}
-                placeholder="display name"
-                onInput={(e) => {
-                  setDisplayNameValid(true);
-                  setName(e.target.value);
+                generatedImageCallback={(
+                  url: string,
+                  imageBehavior: ImageBehavior,
+                ) => {
+                  backgroundImageRef.current = {
+                    url,
+                    imageBehavior,
+                  };
                 }}
-                inputClassName={displayNameValid ? '' : 'failure'}
-                manualStatusMessage={displayNameValid ? '' : 'No input'}
-                manualValidationStatus={
-                  displayNameValid ? 'success' : 'failure'
-                }
+                enableGenerativeAI
+                defaultImageUrl={backgroundImageRef.current?.url}
+                defaultImageBehavior={backgroundImageRef.current?.imageBehavior}
               />
-              <CWTextInput
-                name="email-form-field"
-                inputValidationFn={(val: string) => {
-                  try {
-                    z.string().email().parse(val.trim());
-                    return ['success', 'Input validated'];
-                  } catch {
-                    return ['failure', 'Must enter valid email'];
-                  }
-                }}
-                label="Email"
-                value={email}
-                placeholder="email"
-                onInput={(e) => {
-                  setEmail(e.target.value);
+            </CWFormSection>
+            <CWFormSection
+              title="Linked addresses"
+              description="Manage your addresses."
+            >
+              <LinkedAddresses
+                addresses={addresses}
+                profile={profile}
+                refreshProfiles={(address: string) => {
+                  getProfile();
+                  app.user.removeAddress(
+                    addresses.find((a) => a.address === address),
+                  );
                 }}
               />
-            </div>
-            <div className="bio-section">
-              <CWText type="caption">Bio</CWText>
-              <ReactQuillEditor
-                className="editor"
-                contentDelta={bio}
-                setContentDelta={setBio}
-              />
-            </div>
-            <CWDivider />
-            <div className="socials-section">
-              <CWText type="caption">Social links</CWText>
-              <CWSocials
-                socials={profile?.socials}
-                handleInputChange={(e) => {
-                  setSocials(e);
-                }}
-              />
-            </div>
-          </CWFormSection>
-          <CWFormSection
-            title="Personalize Your Profile"
-            description="Express yourself through imagery."
-          >
-            <CWText fontWeight="medium">Image upload</CWText>
-            <CWText type="caption" className="description">
-              Add a background image.
-            </CWText>
-            <CWCoverImageUploader
-              uploadCompleteCallback={(
-                url: string,
-                imageBehavior: ImageBehavior,
-              ) => {
-                backgroundImageRef.current = {
-                  url,
-                  imageBehavior,
-                };
-              }}
-              generatedImageCallback={(
-                url: string,
-                imageBehavior: ImageBehavior,
-              ) => {
-                backgroundImageRef.current = {
-                  url,
-                  imageBehavior,
-                };
-              }}
-              enableGenerativeAI
-              defaultImageUrl={backgroundImageRef.current?.url}
-              defaultImageBehavior={backgroundImageRef.current?.imageBehavior}
-            />
-          </CWFormSection>
-          <CWFormSection
-            title="Linked addresses"
-            description="Manage your addresses."
-          >
-            <LinkedAddresses
-              addresses={addresses}
-              profile={profile}
-              refreshProfiles={(address: string) => {
-                getProfile();
-                app.user.removeAddress(
-                  addresses.find((a) => a.address === address),
-                );
-              }}
-            />
-            <CWText type="caption" fontWeight="medium">
-              Link new addresses via the profile dropdown menu
-            </CWText>
-          </CWFormSection>
-        </CWForm>
-      </div>
+              <CWText type="caption" fontWeight="medium">
+                Link new addresses via the profile dropdown menu
+              </CWText>
+            </CWFormSection>
+          </CWForm>
+        </div>
+      </CWPageLayout>
     );
   }
 };

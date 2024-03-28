@@ -16,6 +16,7 @@ import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { LinkSource } from 'models/Thread';
 import app from 'state';
 import { useGetThreadsByLinkQuery } from 'state/api/threads';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import AddressInfo from '../../../models/AddressInfo';
 import { CWContentPage } from '../../components/component_kit/CWContentPage';
@@ -124,66 +125,70 @@ export const ViewSnapshotProposalPage = ({
 
   if (!proposal) {
     return (
-      <CWContentPage
-        showSkeleton
-        sidebarComponentsSkeletonCount={isWindowLarge ? 2 : 0}
-      />
+      <CWPageLayout>
+        <CWContentPage
+          showSkeleton
+          sidebarComponentsSkeletonCount={isWindowLarge ? 2 : 0}
+        />
+      </CWPageLayout>
     );
   }
 
   return (
-    <CWContentPage
-      showSidebar
-      title={proposal.title}
-      author={proposalAuthor}
-      createdAt={proposal.created}
-      updatedAt={null}
-      contentBodyLabel="Snapshot"
-      subHeader={
-        proposal.state === 'active' ? (
-          <ActiveProposalPill proposalEnd={proposal.end} />
-        ) : (
-          <ClosedProposalPill proposalState={proposal.state} />
-        )
-      }
-      body={() => <QuillRenderer doc={proposal.body} />}
-      subBody={
-        votes.length > 0 && (
-          <SnapshotVotesTable
-            choices={proposal.choices}
-            symbol={symbol}
-            voters={votes}
-          />
-        )
-      }
-      sidebarComponents={[
-        {
-          label: 'Info',
-          item: (
-            <SnapshotInformationCard proposal={proposal} threads={threads} />
-          ),
-        },
-        {
-          label: 'Poll',
-          item: (
-            <SnapshotPollCardContainer
-              activeUserAddress={activeUserAddress}
-              fetchedPower={!!power}
-              identifier={identifier}
-              proposal={proposal}
-              scores={[]} // unused?
-              space={space}
+    <CWPageLayout>
+      <CWContentPage
+        showSidebar
+        title={proposal.title}
+        author={proposalAuthor}
+        createdAt={proposal.created}
+        updatedAt={null}
+        contentBodyLabel="Snapshot"
+        subHeader={
+          proposal.state === 'active' ? (
+            <ActiveProposalPill proposalEnd={proposal.end} />
+          ) : (
+            <ClosedProposalPill proposalState={proposal.state} />
+          )
+        }
+        body={() => <QuillRenderer doc={proposal.body} />}
+        subBody={
+          votes.length > 0 && (
+            <SnapshotVotesTable
+              choices={proposal.choices}
               symbol={symbol}
-              totals={totals}
-              totalScore={totalScore}
-              validatedAgainstStrategies={validatedAgainstStrategies}
-              votes={votes}
-              loadVotes={async () => loadVotes(snapshotId, identifier)}
+              voters={votes}
             />
-          ),
-        },
-      ]}
-    />
+          )
+        }
+        sidebarComponents={[
+          {
+            label: 'Info',
+            item: (
+              <SnapshotInformationCard proposal={proposal} threads={threads} />
+            ),
+          },
+          {
+            label: 'Poll',
+            item: (
+              <SnapshotPollCardContainer
+                activeUserAddress={activeUserAddress}
+                fetchedPower={!!power}
+                identifier={identifier}
+                proposal={proposal}
+                scores={[]} // unused?
+                space={space}
+                symbol={symbol}
+                totals={totals}
+                totalScore={totalScore}
+                validatedAgainstStrategies={validatedAgainstStrategies}
+                votes={votes}
+                loadVotes={async () => loadVotes(snapshotId, identifier)}
+              />
+            ),
+          },
+        ]}
+      />
+    </CWPageLayout>
   );
 };
 

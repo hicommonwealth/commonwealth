@@ -4,7 +4,6 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  padding: 0 24px;
 
   .header-section {
     align-items: center;
@@ -13,10 +12,24 @@
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-between;
-    padding: 24px;
+    padding-bottom: 24px;
     position: sticky;
-    top: 0;
     z-index: 1;
+    top: 68px;
+
+    &:before {
+      content: '';
+      display: block;
+      width: 100%;
+      position: absolute;
+      height: 20px;
+      top: -17px;
+      background-color: white;
+    }
+
+    @include smallInclusive {
+      top: 0;
+    }
 
     .filter-buttons {
       display: flex;
@@ -31,9 +44,9 @@
 
   .communities-list {
     display: grid;
-    grid-gap: 28px;
+    grid-gap: 24px;
     grid-template-columns: repeat(auto-fit, 506px);
-    justify-content: center;
+    justify-content: left;
     padding-bottom: 24px;
 
     @include mediumSmall {

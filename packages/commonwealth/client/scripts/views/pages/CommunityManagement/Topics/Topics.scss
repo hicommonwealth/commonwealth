@@ -3,10 +3,9 @@
 .TopicsPage {
   display: flex;
   flex-direction: column;
-  padding: 40px;
 
   header {
-    margin-bottom: 8px;
+    margin-bottom: 32px;
 
     .subheader {
       color: $neutral-500;
@@ -32,8 +31,6 @@
   }
 
   @include extraSmall {
-    padding: 16px;
-
     header {
       margin-bottom: 14px;
     }
