@@ -40,7 +40,6 @@ const CardsShowcase = () => {
         community={app.config.chains.getAll()[30]}
         memberCount="123"
         threadCount="456"
-        stakeChange={-3.5}
       />
     </>
   );

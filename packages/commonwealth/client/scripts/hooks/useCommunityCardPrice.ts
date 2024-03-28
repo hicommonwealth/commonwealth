@@ -8,7 +8,7 @@ function fromWei(value: string | null): number | null {
   if (!value) {
     return null;
   }
-  return value / 10 ** 18;
+  return parseFloat(value) / 10 ** 18;
 }
 
 export const useCommunityCardPrice = ({

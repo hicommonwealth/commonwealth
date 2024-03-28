@@ -27,7 +27,7 @@ type CWRelatedCommunityCardProps = {
   threadCount: string | number;
   onStakeBtnClick?: () => void;
   ethUsdRate?: string;
-  historicalPrice: string;
+  historicalPrice?: string;
 };
 
 export const CWRelatedCommunityCard = ({
