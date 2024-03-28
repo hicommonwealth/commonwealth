@@ -29,6 +29,7 @@ import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 
 type DiscussionsPageProps = {
@@ -114,101 +115,103 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   return (
     <CWPageLayout ref={containerRef} className="DiscussionsPageLayout">
-      <div className="DiscussionsPage">
-        <Virtuoso
-          customScrollParent={containerRef?.current}
-          className="thread-list"
-          style={{ height: '100%', width: '100%' }}
-          data={isInitialLoading ? [] : filteredThreads}
-          itemContent={(i, thread) => {
-            const discussionLink = getProposalUrlPath(
-              thread.slug,
-              `${thread.identifier}-${slugify(thread.title)}`,
-            );
+      <DiscussionsFeedDiscovery
+        orderBy={featuredFilter}
+        community={communityId}
+        includePinnedThreads={true}
+      />
+      <Virtuoso
+        className="thread-list"
+        style={{ height: '100%', width: '100%' }}
+        data={isInitialLoading ? [] : filteredThreads}
+        itemContent={(i, thread) => {
+          const discussionLink = getProposalUrlPath(
+            thread.slug,
+            `${thread.identifier}-${slugify(thread.title)}`,
+          );
 
-            const isTopicGated = !!(memberships || []).find((membership) =>
-              membership.topicIds.includes(thread?.topic?.id),
-            );
+          const isTopicGated = !!(memberships || []).find((membership) =>
+            membership.topicIds.includes(thread?.topic?.id),
+          );
 
-            const isActionAllowedInGatedTopic = !!(memberships || []).find(
-              (membership) =>
-                membership.topicIds.includes(thread?.topic?.id) &&
-                membership.isAllowed,
-            );
+          const isActionAllowedInGatedTopic = !!(memberships || []).find(
+            (membership) =>
+              membership.topicIds.includes(thread?.topic?.id) &&
+              membership.isAllowed,
+          );
 
-            const isRestrictedMembership =
-              !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
+          const isRestrictedMembership =
+            !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
-            const disabledActionsTooltipText = getThreadActionTooltipText({
-              isCommunityMember: !!hasJoinedCommunity,
-              isThreadArchived: !!thread?.archivedAt,
-              isThreadLocked: !!thread?.lockedAt,
-              isThreadTopicGated: isRestrictedMembership,
-            });
+          const disabledActionsTooltipText = getThreadActionTooltipText({
+            isCommunityMember: !!hasJoinedCommunity,
+            isThreadArchived: !!thread?.archivedAt,
+            isThreadLocked: !!thread?.lockedAt,
+            isThreadTopicGated: isRestrictedMembership,
+          });
 
-            return (
-              <ThreadCard
-                key={thread?.id + '-' + thread.readOnly}
-                thread={thread}
-                canReact={!disabledActionsTooltipText}
-                canComment={!disabledActionsTooltipText}
-                onEditStart={() => navigate(`${discussionLink}`)}
-                onStageTagClick={() => {
-                  navigate(`/discussions?stage=${thread.stage}`);
-                }}
-                threadHref={`${getScopePrefix()}${discussionLink}`}
-                onBodyClick={() => {
-                  const scrollEle = document.getElementsByClassName('Body')[0];
+          return (
+            <ThreadCard
+              key={thread?.id + '-' + thread.readOnly}
+              thread={thread}
+              canReact={!disabledActionsTooltipText}
+              canComment={!disabledActionsTooltipText}
+              onEditStart={() => navigate(`${discussionLink}`)}
+              onStageTagClick={() => {
+                navigate(`/discussions?stage=${thread.stage}`);
+              }}
+              threadHref={`${getScopePrefix()}${discussionLink}`}
+              onBodyClick={() => {
+                const scrollEle = document.getElementsByClassName('Body')[0];
 
-                  localStorage[`${communityId}-discussions-scrollY`] =
-                    scrollEle.scrollTop;
-                }}
-                onCommentBtnClick={() =>
-                  navigate(`${discussionLink}?focusEditor=true`)
+                localStorage[`${communityId}-discussions-scrollY`] =
+                  scrollEle.scrollTop;
+              }}
+              onCommentBtnClick={() =>
+                navigate(`${discussionLink}?focusEditor=true`)
+              }
+              disabledActionsTooltipText={disabledActionsTooltipText}
+            />
+          );
+        }}
+        endReached={() => {
+          hasNextPage && fetchNextPage();
+        }}
+        overscan={50}
+        components={{
+          // eslint-disable-next-line react/no-multi-comp
+          EmptyPlaceholder: () => (
+            <EmptyThreadsPlaceholder
+              isInitialLoading={isInitialLoading}
+              isOnArchivePage={isOnArchivePage}
+            />
+          ),
+          // eslint-disable-next-line react/no-multi-comp
+          Header: () => (
+            <>
+              <Breadcrumbs />
+              <HeaderWithFilters
+                topic={topicName}
+                stage={stageName}
+                featuredFilter={featuredFilter}
+                dateRange={dateRange}
+                totalThreadCount={
+                  isOnArchivePage
+                    ? filteredThreads.length || 0
+                    : threads
+                    ? totalThreadsInCommunity
+                    : 0
                 }
-                disabledActionsTooltipText={disabledActionsTooltipText}
-              />
-            );
-          }}
-          endReached={() => {
-            hasNextPage && fetchNextPage();
-          }}
-          overscan={50}
-          components={{
-            // eslint-disable-next-line react/no-multi-comp
-            EmptyPlaceholder: () => (
-              <EmptyThreadsPlaceholder
-                isInitialLoading={isInitialLoading}
+                isIncludingSpamThreads={includeSpamThreads}
+                onIncludeSpamThreads={setIncludeSpamThreads}
+                isIncludingArchivedThreads={includeArchivedThreads}
+                onIncludeArchivedThreads={setIncludeArchivedThreads}
                 isOnArchivePage={isOnArchivePage}
               />
-            ),
-            // eslint-disable-next-line react/no-multi-comp
-            Header: () => (
-              <>
-                <Breadcrumbs />
-                <HeaderWithFilters
-                  topic={topicName}
-                  stage={stageName}
-                  featuredFilter={featuredFilter}
-                  dateRange={dateRange}
-                  totalThreadCount={
-                    isOnArchivePage
-                      ? filteredThreads.length || 0
-                      : threads
-                      ? totalThreadsInCommunity
-                      : 0
-                  }
-                  isIncludingSpamThreads={includeSpamThreads}
-                  onIncludeSpamThreads={setIncludeSpamThreads}
-                  isIncludingArchivedThreads={includeArchivedThreads}
-                  onIncludeArchivedThreads={setIncludeArchivedThreads}
-                  isOnArchivePage={isOnArchivePage}
-                />
-              </>
-            ),
-          }}
-        />
-      </div>
+            </>
+          ),
+        }}
+      />
     </CWPageLayout>
   );
 };

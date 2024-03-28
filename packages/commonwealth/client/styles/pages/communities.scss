@@ -45,12 +45,16 @@
   .communities-list {
     display: grid;
     grid-gap: 24px;
-    grid-template-columns: repeat(auto-fit, 240px);
+    grid-template-columns: repeat(auto-fit, 506px);
     justify-content: left;
     padding-bottom: 24px;
 
-    @include smallInclusive {
-      grid-template-columns: repeat(auto-fit, 136px);
+    @include mediumSmall {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @include extraSmall {
+      grid-template-columns: 1fr;
     }
   }
 }

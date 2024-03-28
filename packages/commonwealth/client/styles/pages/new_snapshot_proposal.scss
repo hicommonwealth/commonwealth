@@ -28,6 +28,14 @@
     justify-content: center;
   }
 
+  .error-text {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    letter-spacing: 0.01em;
+    line-height: 24px;
+  }
+
   .add-voting-btn {
     align-self: flex-end;
   }

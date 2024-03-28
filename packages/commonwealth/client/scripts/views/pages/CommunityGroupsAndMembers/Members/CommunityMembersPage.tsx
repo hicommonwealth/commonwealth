@@ -1,3 +1,4 @@
+import { trpc } from 'client/scripts/utils/trpcClient';
 import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
@@ -10,7 +11,6 @@ import {
   useFetchGroupsQuery,
   useRefreshMembershipQuery,
 } from 'state/api/groups';
-import { useSearchProfilesQuery } from 'state/api/profiles';
 import { SearchProfilesResponse } from 'state/api/profiles/searchProfiles';
 import useGroupMutationBannerStore from 'state/ui/group';
 import { useDebounce } from 'usehooks-ts';
@@ -78,23 +78,34 @@ const CommunityMembersPage = () => {
     data: members,
     fetchNextPage,
     isLoading: isLoadingMembers,
-  } = useSearchProfilesQuery({
-    communityId: app.activeChainId(),
-    searchTerm: '',
-    limit: 30,
-    orderBy: APIOrderBy.LastActive,
-    orderDirection: APIOrderDirection.Desc,
-    includeRoles: true,
-    includeGroupIds: true,
-    enabled: app?.user?.activeAccount?.address ? !!memberships : true,
-    ...(searchFilters.groupFilter === 'Ungrouped' && {
-      includeMembershipTypes: 'not-in-group',
-    }),
-    ...(!['All groups', 'Ungrouped'].includes(`${searchFilters.groupFilter}`) &&
-      searchFilters.groupFilter && {
-        includeMembershipTypes: `in-group:${searchFilters.groupFilter}`,
+  } = trpc.community.getMembers.useInfiniteQuery(
+    {
+      limit: 30,
+      order_by: APIOrderBy.LastActive,
+      order_direction: APIOrderDirection.Desc,
+      search: debouncedSearchTerm,
+      community_id: app.activeChainId(),
+      include_roles: true,
+      ...(!['All groups', 'Ungrouped'].includes(
+        `${searchFilters.groupFilter}`,
+      ) &&
+        searchFilters.groupFilter && {
+          memberships: `in-group:${searchFilters.groupFilter}`,
+        }),
+      ...(searchFilters.groupFilter === 'Ungrouped' && {
+        memberships: 'not-in-group',
       }),
-  });
+      include_group_ids: true,
+      // only include stake balances if community has staking enabled
+      include_stake_balances: !!app.config.chains.getById(app.activeChainId())
+        .namespace,
+    },
+    {
+      initialCursor: 1,
+      getNextPageParam: (lastPage) => lastPage.page + 1,
+      enabled: app?.user?.activeAccount?.address ? !!memberships : true,
+    },
+  );
 
   const { data: groups } = useFetchGroupsQuery({
     communityId: app.activeChainId(),
@@ -141,13 +152,7 @@ const CommunityMembersPage = () => {
         id: p.id,
         avatarUrl: p.avatar_url,
         name: p.profile_name || 'Anonymous',
-        role: p.roles.find(
-          (role) =>
-            role.chain_id === app.activeChainId() &&
-            [Permissions.ROLES.ADMIN, Permissions.ROLES.MODERATOR].includes(
-              role.permission,
-            ),
-        )?.permission,
+        role: p.roles[0],
         groups: (p.group_ids || [])
           .map(
             (groupId) =>
@@ -155,6 +160,7 @@ const CommunityMembersPage = () => {
           )
           .filter(Boolean)
           .sort((a, b) => a.localeCompare(b)),
+        stakeBalance: p.addresses[0].stake_balance,
       }))
       .filter((p) =>
         debouncedSearchTerm
@@ -366,10 +372,13 @@ const CommunityMembersPage = () => {
             filteredMembers={formattedMembers}
             onLoadMoreMembers={() => {
               if (members?.pages?.[0]?.totalResults > formattedMembers.length) {
-                fetchNextPage();
+                fetchNextPage?.().catch(console.error);
               }
             }}
             isLoadingMoreMembers={isLoadingMembers}
+            isStakedCommunity={
+              !!app.config.chains.getById(app.activeChainId()).namespace
+            }
           />
         )}
       </section>
