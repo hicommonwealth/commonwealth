@@ -5,6 +5,11 @@ $size: 48px;
 .DiscussionsPageLayout {
   overflow: auto;
   padding-top: 0;
+  height: 100%;
+
+  .layout-container {
+    height: 100%;
+  }
 
   .BreadcrumbsPageLayout {
     padding-inline: 0;
