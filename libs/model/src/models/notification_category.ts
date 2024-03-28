@@ -25,6 +25,8 @@ export default (
       {
         name: { type: dataTypes.STRING, primaryKey: true },
         description: { type: dataTypes.TEXT, allowNull: false },
+        created_at: { type: dataTypes.DATE, allowNull: true },
+        updated_at: { type: dataTypes.DATE, allowNull: true },
       },
       {
         tableName: 'NotificationCategories',

@@ -24,8 +24,16 @@ export default (
       'CommunityContractTemplate',
       {
         id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-        community_contract_id: { type: dataTypes.INTEGER, allowNull: false },
-        cctmd_id: { type: dataTypes.INTEGER, allowNull: false },
+        community_contract_id: {
+          type: dataTypes.INTEGER,
+          allowNull: false,
+          primaryKey: true,
+        },
+        cctmd_id: {
+          type: dataTypes.INTEGER,
+          allowNull: false,
+          primaryKey: true,
+        },
         template_id: {
           type: dataTypes.INTEGER,
           allowNull: false,

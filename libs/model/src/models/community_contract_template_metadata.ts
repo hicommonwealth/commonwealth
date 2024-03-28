@@ -35,10 +35,15 @@ export default (
         primaryKey: true,
       },
       slug: { type: dataTypes.STRING, allowNull: false },
-      nickname: { type: dataTypes.STRING, allowNull: false },
+      nickname: { type: dataTypes.STRING, allowNull: true },
       display_name: { type: dataTypes.STRING, allowNull: false },
-      display_options: { type: dataTypes.STRING, allowNull: false },
+      display_options: {
+        type: dataTypes.ENUM('0', '1', '2', '3'),
+        allowNull: true,
+      },
       enabled_by: { type: dataTypes.STRING, allowNull: true },
+      created_at: { type: dataTypes.DATE, allowNull: true },
+      updated_at: { type: dataTypes.DATE, allowNull: true },
     },
     {
       tableName: 'CommunityContractTemplateMetadata',

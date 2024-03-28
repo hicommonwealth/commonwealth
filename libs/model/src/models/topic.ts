@@ -43,12 +43,12 @@ export default (
       description: { type: dataTypes.TEXT, allowNull: false, defaultValue: '' },
       featured_in_sidebar: {
         type: dataTypes.BOOLEAN,
-        allowNull: true,
+        allowNull: false,
         defaultValue: false,
       },
       featured_in_new_post: {
         type: dataTypes.BOOLEAN,
-        allowNull: true,
+        allowNull: false,
         defaultValue: false,
       },
       community_id: { type: dataTypes.STRING, allowNull: false },
@@ -58,8 +58,7 @@ export default (
       order: { type: dataTypes.INTEGER, allowNull: true },
       default_offchain_template: {
         type: dataTypes.TEXT,
-        allowNull: false,
-        defaultValue: '',
+        allowNull: true,
       },
       channel_id: { type: dataTypes.STRING, allowNull: true },
       group_ids: {

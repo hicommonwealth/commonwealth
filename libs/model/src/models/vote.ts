@@ -29,11 +29,11 @@ export default (
     'Vote',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      poll_id: { type: dataTypes.INTEGER, allowNull: false },
+      poll_id: { type: dataTypes.INTEGER, allowNull: true },
       option: { type: dataTypes.STRING, allowNull: false },
       address: { type: Sequelize.STRING, allowNull: false },
       author_community_id: { type: Sequelize.STRING, allowNull: true },
-      community_id: { type: Sequelize.STRING, allowNull: true },
+      community_id: { type: Sequelize.STRING, allowNull: false },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
     },

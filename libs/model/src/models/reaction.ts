@@ -46,7 +46,7 @@ export default (
       proposal_id: { type: dataTypes.STRING, allowNull: true },
       comment_id: { type: dataTypes.INTEGER, allowNull: true },
       address_id: { type: dataTypes.INTEGER, allowNull: false },
-      reaction: { type: dataTypes.STRING, allowNull: false },
+      reaction: { type: dataTypes.ENUM('like'), allowNull: false },
       calculated_voting_weight: { type: dataTypes.INTEGER, allowNull: true },
       // signed data
       canvas_action: { type: dataTypes.JSONB, allowNull: true },
@@ -172,17 +172,18 @@ export default (
       updatedAt: 'updated_at',
       indexes: [
         { fields: ['address_id'] },
-        {
-          fields: [
-            'community_id',
-            'address_id',
-            'thread_id',
-            'proposal_id',
-            'comment_id',
-            'reaction',
-          ],
-          unique: true,
-        },
+        // to avoid relation "reactions_community_id_address_id_thread_id_proposal_id_comment" already exists
+        // {
+        //   fields: [
+        //     'community_id',
+        //     'address_id',
+        //     'thread_id',
+        //     'proposal_id',
+        //     'comment_id',
+        //     'reaction',
+        //   ],
+        //   unique: true,
+        // },
         { fields: ['community_id', 'thread_id'] },
         { fields: ['community_id', 'comment_id'] },
       ],

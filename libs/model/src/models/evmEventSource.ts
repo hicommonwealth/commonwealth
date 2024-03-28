@@ -34,20 +34,26 @@ export default (
         chain_node_id: {
           type: dataTypes.INTEGER,
           allowNull: false,
+          unique: 'unique_event_source',
         },
-        contract_address: { type: dataTypes.STRING, allowNull: false },
-        event_signature: { type: dataTypes.STRING, allowNull: false },
-        kind: { type: dataTypes.STRING, allowNull: false },
+        contract_address: {
+          type: dataTypes.STRING,
+          allowNull: false,
+          unique: 'unique_event_source',
+        },
+        event_signature: {
+          type: dataTypes.STRING,
+          allowNull: false,
+          unique: 'unique_event_source',
+        },
+        kind: {
+          type: dataTypes.STRING,
+          allowNull: false,
+        },
       },
       {
         tableName: 'EvmEventSources',
         timestamps: false,
-        indexes: [
-          {
-            fields: ['chain_node_id', 'contract_address', 'event_signature'],
-            unique: true,
-          },
-        ],
       },
     )
   );

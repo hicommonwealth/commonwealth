@@ -36,8 +36,12 @@ export default (
     'Notification',
     {
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-      notification_data: { type: dataTypes.TEXT, allowNull: false },
-      chain_event_id: { type: dataTypes.INTEGER, allowNull: true },
+      notification_data: { type: dataTypes.TEXT, allowNull: true },
+      chain_event_id: {
+        type: dataTypes.INTEGER,
+        allowNull: true,
+        unique: true,
+      },
       entity_id: { type: dataTypes.INTEGER, allowNull: true },
       community_id: { type: dataTypes.STRING, allowNull: true },
       category_id: { type: dataTypes.STRING, allowNull: false },
@@ -78,10 +82,7 @@ export default (
       underscored: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-      indexes: [
-        { fields: ['chain_event_id'], unique: true },
-        { fields: ['thread_id'] },
-      ],
+      indexes: [{ fields: ['thread_id'] }],
     },
   );
 

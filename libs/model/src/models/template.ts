@@ -33,6 +33,8 @@ export default (
       created_by: { type: dataTypes.STRING, allowNull: true },
       description: { type: dataTypes.STRING, allowNull: true },
       created_for_community: { type: dataTypes.STRING, allowNull: true },
+      created_at: { type: dataTypes.DATE, allowNull: true },
+      updated_at: { type: dataTypes.DATE, allowNull: true },
     },
     {
       tableName: 'Template',
