@@ -1,6 +1,6 @@
 import AWS from 'aws-sdk';
 import fetch from 'node-fetch';
-import { Configuration, OpenAIApi } from 'openai';
+import { OpenAI } from 'openai';
 import { v4 as uuidv4 } from 'uuid';
 
 import { AppError } from '@hicommonwealth/core';
@@ -8,11 +8,16 @@ import type { DB } from '@hicommonwealth/model';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
-const configuration = new Configuration({
-  organization: 'org-D0ty00TJDApqHYlrn1gge2Ql',
-  apiKey: process.env.OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
+let openai: OpenAI = undefined;
+
+try {
+  openai = new OpenAI({
+    organization: 'org-D0ty00TJDApqHYlrn1gge2Ql',
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+} catch (e) {
+  console.warn('OpenAI initialization failed.');
+}
 
 type generateImageReq = {
   description: string;
@@ -28,19 +33,23 @@ const generateImage = async (
 ) => {
   const { description } = req.body;
 
+  if (!openai) {
+    throw new AppError('OpenAI not initialized');
+  }
+
   if (!description) {
     throw new AppError('No description provided');
   }
 
   let image;
   try {
-    const response = await openai.createImage({
+    const response = await openai.images.generate({
       prompt: description,
       size: '256x256',
       response_format: 'url',
     });
 
-    image = response.data.data[0].url;
+    image = response.data[0].url;
   } catch (e) {
     console.log(e);
     throw new AppError('Problem Generating Image!');
