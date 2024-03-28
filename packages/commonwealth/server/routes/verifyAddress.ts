@@ -1,12 +1,12 @@
 import { Op } from 'sequelize';
 
+import { Session } from '@canvas-js/interfaces';
 import {
   AppError,
   ChainBase,
   DynamicTemplate,
   NotificationCategories,
   WalletId,
-  WalletSsoSource,
   logger,
 } from '@hicommonwealth/core';
 import type {
@@ -42,15 +42,10 @@ export const Errors = {
 const processAddress = async (
   models: DB,
   community: CommunityInstance,
-  chain_id: string | number,
   address: string,
   wallet_id: WalletId,
-  wallet_sso_source: WalletSsoSource,
-  signature: string,
   user: Express.User,
-  sessionAddress: string | null,
-  sessionIssued: string | null,
-  sessionBlockInfo: string | null,
+  session: Session,
 ): Promise<void> => {
   const addressInstance = await models.Address.scope('withPrivateData').findOne(
     {
@@ -76,14 +71,9 @@ const processAddress = async (
   try {
     const valid = await verifySessionSignature(
       models,
-      community,
-      chain_id,
       addressInstance,
       user ? user.id : null,
-      signature,
-      sessionAddress,
-      sessionIssued,
-      sessionBlockInfo,
+      session,
     );
     if (!valid) {
       throw new AppError(Errors.InvalidSignature);
@@ -190,18 +180,18 @@ const verifyAddress = async (
   res: Response,
   next: NextFunction,
 ) => {
-  if (!req.body.community_id || !req.body.chain_id) {
+  if (!req.body.community_id) {
     throw new AppError(Errors.NoChain);
   }
   const community = await models.Community.findOne({
     where: { id: req.body.community_id },
   });
-  const chain_id = req.body.chain_id;
+
   if (!community) {
     return next(new AppError(Errors.InvalidCommunity));
   }
 
-  if (!req.body.address || !req.body.signature) {
+  if (!req.body.address) {
     throw new AppError(Errors.InvalidArguments);
   }
 
@@ -213,18 +203,18 @@ const verifyAddress = async (
         })
       : req.body.address;
 
+  const ipldDagJson = await import('@ipld/dag-json');
+  const decodedSession: Session = ipldDagJson.decode(
+    ipldDagJson.parse(req.body.session),
+  );
+
   await processAddress(
     models,
     community,
-    chain_id,
     address,
     req.body.wallet_id,
-    req.body.wallet_sso_source,
-    req.body.signature,
     req.user,
-    req.body.session_public_address,
-    req.body.session_timestamp || null, // disallow empty strings
-    req.body.session_block_data || null, // disallow empty strings
+    decodedSession,
   );
 
   // assertion check

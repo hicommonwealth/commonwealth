@@ -1,4 +1,3 @@
-import type { SessionPayload } from '@canvas-js/interfaces';
 import type {
   AccountData,
   OfflineDirectSigner,
@@ -7,8 +6,8 @@ import type {
 import type { ChainInfo } from '@keplr-wallet/types';
 
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
+import { constructCosmosSignerCWClass } from 'shared/canvas/sessionSigners';
 import app from 'state';
-import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 
 declare global {
@@ -84,18 +83,16 @@ class KeplrLikeWebWalletController implements IWebWallet<AccountData> {
     };
   }
 
-  public async signCanvasMessage(
-    account: Account,
-    canvasSessionPayload: SessionPayload,
-  ): Promise<string> {
-    const canvas = await import('@canvas-js/interfaces');
-    const chainId = this.getChainId();
-    const stdSignature = await window.wallet.signArbitrary(
-      chainId,
-      account.address,
-      canvas.serializeSessionPayload(canvasSessionPayload),
-    );
-    return JSON.stringify(stdSignature);
+  public async getSessionSigner() {
+    const CosmosSignerCW = await constructCosmosSignerCWClass();
+    return new CosmosSignerCW({
+      signer: {
+        type: 'amino',
+        signAmino: window.wallet.signAmino,
+        getAddress: async () => this.accounts[0].address,
+        getChainId: async () => this.getChainId(),
+      },
+    });
   }
 
   // ACTIONS

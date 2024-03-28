@@ -1,5 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
+import { signThreadReaction } from 'client/scripts/controllers/server/sessions';
+import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { updateThreadInAllCaches } from './helpers/cache';
 
@@ -17,11 +19,7 @@ const createReaction = async ({
   reactionType = 'like',
   threadId,
 }: CreateReactionProps) => {
-  const {
-    session = null,
-    action = null,
-    hash = null,
-  } = await app.sessions.signThreadReaction(address, {
+  const canvasSignedData = await signThreadReaction(address, {
     thread_id: threadId,
     like: reactionType === 'like',
   });
@@ -33,9 +31,7 @@ const createReaction = async ({
     address,
     reaction: reactionType,
     jwt: app.user.jwt,
-    canvas_action: action,
-    canvas_session: session,
-    canvas_hash: hash,
+    ...(await toCanvasSignedDataApiArgs(canvasSignedData)),
   });
 };
 

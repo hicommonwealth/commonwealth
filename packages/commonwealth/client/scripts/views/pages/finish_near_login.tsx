@@ -1,5 +1,3 @@
-import { createCanvasSessionPayload } from 'canvas';
-
 import { ChainBase, WalletId } from '@hicommonwealth/core';
 import axios from 'axios';
 import BN from 'bn.js';
@@ -17,6 +15,7 @@ import { WalletAccount } from 'near-api-js';
 import type { FunctionCallOptions } from 'near-api-js/lib/account';
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { verifySession } from 'shared/canvas/verify';
 import app, { initAppState } from 'state';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
@@ -82,6 +81,7 @@ const FinishNearLogin = () => {
 
       // create canvas thing
       const chainId = 'mainnet';
+      // @ts-ignore
       const sessionPublicAddress = await app.sessions.getOrCreateAddress(
         ChainBase.NEAR,
         chainId,
@@ -98,6 +98,7 @@ const FinishNearLogin = () => {
         null,
       );
 
+      // @ts-ignore
       const canvasSessionPayload = createCanvasSessionPayload(
         'near' as ChainBase,
         chainId,
@@ -117,18 +118,18 @@ const FinishNearLogin = () => {
 
       const canvas = await import('@canvas-js/interfaces');
       const signature = await acct.signMessage(
+        // @ts-ignore
         canvas.serializeSessionPayload(canvasSessionPayload),
       );
 
       await acct.validate(
         signature,
         canvasSessionPayload.sessionIssued,
+        // @ts-ignore
         chainId,
       );
 
-      app.sessions
-        .getSessionController(ChainBase.NEAR)
-        .authSession(chainId, acct.address, canvasSessionPayload, signature);
+      verifySession(canvasSessionPayload);
 
       if (!app.isLoggedIn()) {
         await initAppState();

@@ -1,20 +1,9 @@
-import { OfflineAminoSigner } from '@cosmjs/amino';
-import type { OfflineDirectSigner } from '@cosmjs/proto-signing';
 import { WalletId } from '@hicommonwealth/core';
-import { SecretUtils } from '@keplr-wallet/types/build/secretjs';
+import { constructCosmosSignerCWClass } from 'shared/canvas/sessionSigners';
 import KeplrLikeWebWalletController from './keplr_like_web_wallet';
 
 export interface LeapWindow {
-  leap?: {
-    getOfflineSigner?: (
-      chainId: string,
-    ) => OfflineAminoSigner & OfflineDirectSigner;
-    getOfflineSignerOnlyAmino?: (chainId: string) => OfflineAminoSigner;
-    getOfflineSignerAuto?: (
-      chainId: string,
-    ) => Promise<OfflineAminoSigner | OfflineDirectSigner>;
-    getEnigmaUtils?: (chainId: string) => SecretUtils;
-  };
+  leap?: any;
 }
 
 declare global {
@@ -25,6 +14,23 @@ declare global {
 class LeapWebWalletController extends KeplrLikeWebWalletController {
   constructor() {
     super(WalletId.Leap, 'Leap');
+  }
+
+  public async getSessionSigner() {
+    const CosmosSignerCW = await constructCosmosSignerCWClass();
+    return new CosmosSignerCW({
+      signer: {
+        type: 'arbitrary',
+        signArbitrary: (msg) =>
+          window.leap.signArbitrary(
+            this.getChainId(),
+            this.accounts[0].address,
+            msg,
+          ),
+        getAddress: async () => this.accounts[0].address,
+        getChainId: async () => this.getChainId(),
+      },
+    });
   }
 }
 

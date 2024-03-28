@@ -33,9 +33,8 @@ export type CreateCommentReactionOptions = {
   address: AddressInstance;
   reaction: string;
   commentId: number;
-  canvasAction?: any;
-  canvasSession?: any;
-  canvasHash?: any;
+  canvasSignedData?: string;
+  canvasHash?: string;
 };
 
 export type CreateCommentReactionResult = [
@@ -51,8 +50,7 @@ export async function __createCommentReaction(
     address,
     reaction,
     commentId,
-    canvasAction,
-    canvasSession,
+    canvasSignedData,
     canvasHash,
   }: CreateCommentReactionOptions,
 ): Promise<CreateCommentReactionResult> {
@@ -153,9 +151,8 @@ export async function __createCommentReaction(
   const reactionData: Partial<ReactionAttributes> = {
     ...reactionWhere,
     calculated_voting_weight: calculatedVotingWeight,
-    canvas_action: canvasAction,
-    canvas_session: canvasSession,
     canvas_hash: canvasHash,
+    canvas_signed_data: canvasSignedData,
   };
 
   const [finalReaction] = await this.models.Reaction.findOrCreate({

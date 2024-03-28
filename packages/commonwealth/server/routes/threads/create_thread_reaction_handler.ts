@@ -1,5 +1,7 @@
 import { AppError } from '@hicommonwealth/core';
 import { ReactionAttributes } from '@hicommonwealth/model';
+import { CreateThreadReactionOptions } from 'server/controllers/server_threads_methods/create_thread_reaction';
+import { isCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import { verifyReaction } from '../../../shared/canvas/serverVerify';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
@@ -12,9 +14,6 @@ const Errors = {
 type CreateThreadReactionRequestParams = { id: string };
 type CreateThreadReactionRequestBody = {
   reaction: string;
-  canvas_action?: any;
-  canvas_session?: any;
-  canvas_hash?: any;
 };
 type CreateThreadReactionResponse = ReactionAttributes;
 
@@ -28,12 +27,7 @@ export const createThreadReactionHandler = async (
   res: TypedResponse<CreateThreadReactionResponse>,
 ) => {
   const { user, address } = req;
-  const {
-    reaction,
-    canvas_action: canvasAction,
-    canvas_session: canvasSession,
-    canvas_hash: canvasHash,
-  } = req.body;
+  const { reaction } = req.body;
 
   if (!reaction) {
     throw new AppError(Errors.InvalidReaction);
@@ -44,25 +38,30 @@ export const createThreadReactionHandler = async (
     throw new AppError(Errors.InvalidThreadId);
   }
 
-  if (process.env.ENFORCE_SESSION_KEYS === 'true') {
-    await verifyReaction(canvasAction, canvasSession, canvasHash, {
-      thread_id: threadId,
-      address: address.address,
-      value: reaction,
-    });
+  const reactionFields: CreateThreadReactionOptions = {
+    user,
+    address,
+    reaction,
+    threadId,
+  };
+
+  if (isCanvasSignedDataApiArgs(req.body)) {
+    // Only save the canvas fields if they are given and they are strings
+    reactionFields.canvasSignedData = req.body.canvas_signed_data;
+    reactionFields.canvasHash = req.body.canvas_hash;
+
+    if (process.env.ENFORCE_SESSION_KEYS === 'true') {
+      await verifyReaction(req.body, {
+        thread_id: threadId,
+        address: address.address,
+        value: reaction,
+      });
+    }
   }
 
   // create thread reaction
   const [newReaction, notificationOptions, analyticsOptions] =
-    await controllers.threads.createThreadReaction({
-      user,
-      address,
-      reaction,
-      threadId,
-      canvasAction,
-      canvasSession,
-      canvasHash,
-    });
+    await controllers.threads.createThreadReaction(reactionFields);
 
   // update address last active
   address.last_active = new Date();

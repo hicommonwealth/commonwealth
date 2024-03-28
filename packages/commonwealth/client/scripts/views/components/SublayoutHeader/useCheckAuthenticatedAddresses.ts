@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 
 import { ChainBase } from '@hicommonwealth/core';
-import { chainBaseToCanvasChainId } from 'canvas';
+import { CANVAS_TOPIC, chainBaseToCanvasChainId } from 'canvas';
+import { chainBaseToCaip2 } from 'shared/canvas/chainMappings';
+import { getSessionSigners } from 'shared/canvas/verify';
 import app from 'state';
 
 interface UseCheckAuthenticatedAddressesProps {
@@ -24,20 +26,49 @@ const useCheckAuthenticatedAddresses = ({
   }>({});
 
   useEffect(() => {
-    const promises = userActiveAccounts.map(async (activeAccount) => {
-      const isAuth = await app.sessions
-        .getSessionController(chainBase)
-        ?.hasAuthenticatedSession(canvasChainId, activeAccount.address);
+    const updateAuthenticatedAddresses = async () => {
+      const sessionSigners = await getSessionSigners();
 
-      return {
-        [activeAccount.address]: isAuth,
-      };
-    });
+      const newAuthenticatedAddresses: Record<string, boolean> = {};
 
-    Promise.all(promises).then((response) => {
-      const reduced = response.reduce((acc, curr) => ({ ...acc, ...curr }), {});
-      setAuthenticatedAddresses(reduced);
-    });
+      for (const account of userActiveAccounts) {
+        const communityCaip2Prefix = chainBaseToCaip2(account.community.base);
+
+        const communityIdOrPrefix =
+          account.community.base === ChainBase.CosmosSDK
+            ? account.community.ChainNode?.bech32
+            : account.community.ChainNode?.ethChainId;
+        const communityCanvasChainId = chainBaseToCanvasChainId(
+          account.community.base,
+          communityIdOrPrefix,
+        );
+        const caip2Address = `${communityCaip2Prefix}:${communityCanvasChainId}:${account.address}`;
+
+        // find a session signer that matches
+        const matchedSessionSigner = sessionSigners.find((sessionSigner) =>
+          sessionSigner.match(caip2Address),
+        );
+        if (!matchedSessionSigner) {
+          newAuthenticatedAddresses[caip2Address] = false;
+          continue;
+        }
+        // check if it has an authorised session
+        let hasSession = false;
+        try {
+          await matchedSessionSigner.getCachedSession(
+            CANVAS_TOPIC,
+            caip2Address,
+          );
+          hasSession = true;
+        } catch (e) {
+          // do nothing
+        }
+        newAuthenticatedAddresses[caip2Address] = hasSession;
+      }
+
+      setAuthenticatedAddresses(newAuthenticatedAddresses);
+    };
+    updateAuthenticatedAddresses();
   }, [canvasChainId, chainBase, userActiveAccounts, recheck]);
 
   return { authenticatedAddresses };

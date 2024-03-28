@@ -1,4 +1,3 @@
-import { ActionArgument } from '@canvas-js/interfaces';
 import { dispose } from '@hicommonwealth/core';
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
@@ -75,30 +74,8 @@ describe('createReaction Integration Tests', () => {
       kind: 'discussion',
       stage: 'discussion',
       topicId: topic.id,
-      session: {
-        type: 'session',
-        signature: '',
-        payload: {
-          app: '',
-          chain: '',
-          from: '',
-          sessionAddress: '',
-          sessionDuration: 0,
-          sessionIssued: 0,
-          block: '',
-        },
-      },
-      sign: function (_actionPayload: {
-        app: string;
-        chain: string;
-        from: string;
-        call: string;
-        callArgs: Record<string, ActionArgument>;
-        timestamp: number;
-        block: string;
-      }): string {
-        return '';
-      },
+      session: userSession.session,
+      sign: userSession.sign,
     });
     threadId = thread.id;
   });

@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from 'react';
 import type { Action, Session } from '@canvas-js/interfaces';
-
-import { verify } from 'canvas';
+import React, { useEffect, useState } from 'react';
 
 import 'modals/canvas_verify_data_modal.scss';
 import {
@@ -27,23 +25,23 @@ export const CanvasVerifyDataModal = (props: CanvasVerifyDataModalProps) => {
     // TODO: display obj.canvasHash
     const session = JSON.parse(obj.canvasSession) as Session;
     const action = JSON.parse(obj.canvasAction) as Action;
+    // TODO: implement this using the new canvas fields
+    // import('@canvas-js/interfaces').then((canvas) => {
+    // setSessionPayload(canvas.serializeSessionPayload(session.payload));
+    // setActionPayload(canvas.serializeActionPayload(action.payload));
+    // setSessionSignature(session.signature);
+    // setActionSignature(action.signature);
 
-    import('@canvas-js/interfaces').then((canvas) => {
-      setSessionPayload(canvas.serializeSessionPayload(session.payload));
-      setActionPayload(canvas.serializeActionPayload(action.payload));
-      setSessionSignature(session.signature);
-      setActionSignature(action.signature);
-
-      verify({ session })
-        .then((result) => setVerifiedSession(result))
-        .catch((err) => console.error('Could not verify session:', err));
-      verify({
-        action,
-        actionSignerAddress: session.payload.sessionAddress,
-      })
-        .then((result) => setVerifiedAction(result))
-        .catch((err) => console.error('Could not verify action:', err));
-    });
+    // verify({ session })
+    //   .then((result) => setVerifiedSession(result))
+    //   .catch((err) => console.error('Could not verify session:', err));
+    // verify({
+    //   action,
+    //   actionSignerAddress: session.payload.sessionAddress,
+    // })
+    //   .then((result) => setVerifiedAction(result))
+    //   .catch((err) => console.error('Could not verify action:', err));
+    // });
   }, [obj.canvasAction, obj.canvasSession]);
 
   return (

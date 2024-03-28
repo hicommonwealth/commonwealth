@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import type { SessionPayload } from '@canvas-js/interfaces';
+import type { Session } from '@canvas-js/interfaces';
 import { ChainBase, WalletSsoSource } from '@hicommonwealth/core';
 import axios from 'axios';
 import {
@@ -14,10 +14,15 @@ import WalletConnectWebWalletController from 'controllers/app/webWallets/walletc
 import WebWalletController from 'controllers/app/web_wallets';
 import type Near from 'controllers/chain/near/adapter';
 import type Substrate from 'controllers/chain/substrate/adapter';
-import { signSessionWithAccount } from 'controllers/server/sessions';
+import {
+  getSessionFromWallet,
+  signSessionWithAccount,
+} from 'controllers/server/sessions';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
+import { CANVAS_TOPIC } from 'shared/canvas';
+import { verifySession } from 'shared/canvas/verify';
 import app, { initAppState } from 'state';
 import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
 import { addressSwapper } from 'utils';
@@ -91,11 +96,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
   const [selectedWallet, setSelectedWallet] = useState<IWebWallet<any>>();
   const [selectedLinkingWallet, setSelectedLinkingWallet] =
     useState<IWebWallet<any>>();
-  const [cachedWalletSignature, setCachedWalletSignature] = useState<string>();
-  const [cachedTimestamp, setCachedTimestamp] = useState<number>();
-  const [cachedChainId, setCachedChainId] = useState<string>();
-  const [cachedSessionPayload, setCachedSessionPayload] =
-    useState<SessionPayload>();
+  const [cachedSession, setCachedSession] = useState<Session>();
   const [primaryAccount, setPrimaryAccount] = useState<Account>();
   const [secondaryLinkAccount, setSecondaryLinkAccount] = useState<Account>();
   const [isInCommunityPage, setIsInCommunityPage] = useState<boolean>();
@@ -330,17 +331,8 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
     // Handle Logged in and joining community of different chain base
     if (isInCommunityPage && app.isLoggedIn()) {
-      const timestamp = +new Date();
-      const { signature, chainId, sessionPayload } =
-        await signSessionWithAccount(walletToUse, account, timestamp);
-      await account.validate(signature, timestamp, chainId);
-      app.sessions.authSession(
-        app.chain.base,
-        chainId,
-        account.address,
-        sessionPayload,
-        signature,
-      );
+      await getSessionFromWallet(walletToUse);
+
       await onLogInWithAccount(account, true);
       return;
     }
@@ -369,16 +361,12 @@ const useWallets = (walletProps: IuseWalletProps) => {
     if (!newlyCreated && !linking) {
       try {
         const timestamp = +new Date();
-        const { signature, sessionPayload, chainId } =
-          await signSessionWithAccount(walletToUse, account, timestamp);
-        await account.validate(signature, timestamp, chainId);
-        await app.sessions.authSession(
-          app.chain ? app.chain.base : walletToUse.chain,
-          chainId,
-          account.address,
-          sessionPayload,
-          signature,
-        );
+        const sessionSigner = await walletToUse.getSessionSigner();
+        const session = await sessionSigner.getSession(CANVAS_TOPIC, {
+          timestamp,
+        });
+        await account.validate(session);
+
         await onLogInWithAccount(account, true);
       } catch (e) {
         console.log(e);
@@ -387,27 +375,20 @@ const useWallets = (walletProps: IuseWalletProps) => {
       if (!linking) {
         try {
           const timestamp = +new Date();
-          const { signature, chainId, sessionPayload } =
-            await signSessionWithAccount(walletToUse, account, timestamp);
+          const session = await signSessionWithAccount(
+            walletToUse,
+            account,
+            timestamp,
+          );
           // Can't call authSession now, since chain.base is unknown, so we wait till action
-          setCachedWalletSignature(signature);
-          setCachedTimestamp(timestamp);
-          setCachedChainId(chainId);
-          setCachedSessionPayload(sessionPayload);
+          setCachedSession(session);
           walletProps.onSuccess?.(account.address);
           setSidebarType('newOrReturning');
           setActiveStep('selectAccountType');
 
           if (createAccountWithDefaultValues) {
             // Create the account with default values
-            await onCreateNewAccount(
-              walletToUse,
-              signature,
-              timestamp,
-              chainId,
-              sessionPayload,
-              account,
-            );
+            await onCreateNewAccount(walletToUse, session, account);
             await onSaveProfileInfo(account);
           }
         } catch (e) {
@@ -423,36 +404,17 @@ const useWallets = (walletProps: IuseWalletProps) => {
   // Handle Logic for creating a new account, including validating signature
   const onCreateNewAccount = async (
     currentWallet?: IWebWallet<any>,
-    currentCachedWalletSignature?: string,
-    currentCachedTimestamp?: number,
-    currentCachedChainId?: string,
-    currentCachedSessionPayload?: SessionPayload,
+    currentCachedSession?: Session,
     currentPrimaryAccount?: Account,
   ) => {
     const walletToUse = currentWallet || selectedWallet;
-    const cachedWalletSignatureToUse =
-      currentCachedWalletSignature || cachedWalletSignature;
-    const cachedTimestampToUse = currentCachedTimestamp || cachedTimestamp;
-    const cachedChainIdToUse = currentCachedChainId || cachedChainId;
-    const cachedSessionPayloadToUse =
-      currentCachedSessionPayload || cachedSessionPayload;
+    const cachedSessionToUse = currentCachedSession || cachedSession;
     const primaryAccountToUse = currentPrimaryAccount || primaryAccount;
 
     try {
       if (walletToUse.chain !== 'near') {
-        await primaryAccountToUse.validate(
-          cachedWalletSignatureToUse,
-          cachedTimestampToUse,
-          cachedChainIdToUse,
-          false,
-        );
-        await app.sessions.authSession(
-          walletToUse.chain,
-          cachedChainIdToUse,
-          primaryAccountToUse.address,
-          cachedSessionPayloadToUse,
-          cachedWalletSignatureToUse,
-        );
+        await primaryAccountToUse.validate(cachedSessionToUse, false);
+        verifySession(cachedSessionToUse);
       }
       await onLogInWithAccount(primaryAccountToUse, false, false);
       // Important: when we first create an account and verify it, the user id
@@ -494,22 +456,15 @@ const useWallets = (walletProps: IuseWalletProps) => {
   const onPerformLinking = async () => {
     try {
       const secondaryTimestamp = +new Date();
-      const { signature: secondarySignature, chainId: secondaryChainId } =
-        await signSessionWithAccount(
-          selectedLinkingWallet,
-          secondaryLinkAccount,
-          secondaryTimestamp,
-        );
-      await secondaryLinkAccount.validate(
-        secondarySignature,
+      const secondarySession = await signSessionWithAccount(
+        selectedLinkingWallet,
+        secondaryLinkAccount,
         secondaryTimestamp,
-        secondaryChainId,
       );
-      await primaryAccount.validate(
-        cachedWalletSignature,
-        cachedTimestamp,
-        cachedChainId,
-      );
+
+      await secondaryLinkAccount.validate(secondarySession);
+      await primaryAccount.validate(cachedSession);
+
       // TODO: call authSession here, which requires special handling because of
       // the call to signSessionWithAccount() earlier
       await onLogInWithAccount(primaryAccount, true);
@@ -628,11 +583,8 @@ const useWallets = (walletProps: IuseWalletProps) => {
     }
 
     try {
-      const sessionPublicAddress = await app.sessions.getOrCreateAddress(
-        wallet.chain,
-        wallet.getChainId().toString(),
-        selectedAddress,
-      );
+      const session = await getSessionFromWallet(wallet);
+
       const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
 
       let validationBlockInfo;
@@ -653,7 +605,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
         wallet.name,
         null, // no sso source
         chainIdentifier,
-        sessionPublicAddress,
+        session.publicKey,
         validationBlockInfo,
       );
 
@@ -705,12 +657,8 @@ const useWallets = (walletProps: IuseWalletProps) => {
     wallet: IWebWallet<any>,
     selectedAddress: string,
   ) => {
-    const timestamp = +new Date();
-    const sessionAddress = await app.sessions.getOrCreateAddress(
-      wallet.chain,
-      wallet.getChainId().toString(),
-      selectedAddress,
-    );
+    const session = await getSessionFromWallet(wallet);
+
     const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
     let validationBlockInfo;
     try {
@@ -726,27 +674,17 @@ const useWallets = (walletProps: IuseWalletProps) => {
       wallet.name,
       null, // no sso source?
       chainIdentifier,
-      sessionAddress,
+      // TODO: I don't think we need this field in Account at all
+      session.publicKey,
       validationBlockInfo,
     );
     account.setValidationBlockInfo(
       validationBlockInfo ? JSON.stringify(validationBlockInfo) : null,
     );
 
-    const { chainId, sessionPayload, signature } = await signSessionWithAccount(
-      wallet,
-      account,
-      timestamp,
-    );
-    await account.validate(signature, timestamp, chainId);
-    await app.sessions.authSession(
-      wallet.chain,
-      chainId,
-      account.address,
-      sessionPayload,
-      signature,
-    );
-    console.log('Started new session for', wallet.chain, chainId);
+    await account.validate(session);
+    verifySession(session);
+    console.log('Started new session for', wallet.chain);
 
     // ensure false for newlyCreated / linking vars on revalidate
     if (isMobile) {

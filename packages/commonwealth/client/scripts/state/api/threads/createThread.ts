@@ -1,9 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
+import { signThread } from 'client/scripts/controllers/server/sessions';
 import MinimumProfile from 'models/MinimumProfile';
 import Thread from 'models/Thread';
 import Topic from 'models/Topic';
 import { ThreadStage } from 'models/types';
+import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import { addThreadInAllCaches } from './helpers/cache';
@@ -33,11 +35,7 @@ const createThread = async ({
   readOnly,
   authorProfile,
 }: CreateThreadProps): Promise<Thread> => {
-  const {
-    action = null,
-    session = null,
-    hash = null,
-  } = await app.sessions.signThread(address, {
+  const canvasSignedData = await signThread(address, {
     community: chainId,
     title,
     body,
@@ -59,9 +57,7 @@ const createThread = async ({
     url,
     readOnly,
     jwt: app.user.jwt,
-    canvas_action: action,
-    canvas_session: session,
-    canvas_hash: hash,
+    ...(await toCanvasSignedDataApiArgs(canvasSignedData)),
   });
 
   return new Thread(response.data.result);
