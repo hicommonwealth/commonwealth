@@ -341,6 +341,7 @@ class ChainInfo {
       discords: [],
       githubs: [],
       telegrams: [],
+      twitters: [],
       elements: [],
       remainingLinks: [],
     };
@@ -356,6 +357,8 @@ class ChainInfo {
           categorizedLinks.telegrams.push(link);
         } else if (link.includes('://matrix.to')) {
           categorizedLinks.elements.push(link);
+        } else if (link.includes('://twitter.com')) {
+          categorizedLinks.twitters.push(link);
         } else {
           categorizedLinks.remainingLinks.push(link);
         }
@@ -369,6 +372,7 @@ export type CategorizedSocialLinks = {
   discords: string[];
   githubs: string[];
   telegrams: string[];
+  twitters: string[];
   elements: string[];
   remainingLinks: string[];
 };

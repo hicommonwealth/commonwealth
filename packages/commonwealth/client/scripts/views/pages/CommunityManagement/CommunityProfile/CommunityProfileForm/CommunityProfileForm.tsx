@@ -250,7 +250,7 @@ const CommunityProfileForm = () => {
             <div className="header">
               <CWText type="h4">Links</CWText>
               <CWText type="b1">
-                Add your Discord, Twitter (X), Telegram, Github, Website, etc.
+                Add your Discord, X (Twitter), Telegram, Github, Website, etc.
               </CWText>
             </div>
             <LinksArray
