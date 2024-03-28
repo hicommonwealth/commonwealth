@@ -179,8 +179,7 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.result.type).to.be.equal(type);
     });
 
-    // TODO: investigate why test server not handling error in pipeline
-    it.skip('should fail to update network', async () => {
+    it('should fail to update network', async () => {
       const network = 'ethereum-testnet';
       const res = await chai
         .request(server.app)
@@ -191,8 +190,7 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.error).to.be.equal(ChainError.CantChangeNetwork);
     });
 
-    // TODO: investigate why test server not handling error in pipeline
-    it.skip('should fail if no chain id', async () => {
+    it('should fail if no chain id', async () => {
       const name = 'ethereum-testnet';
       const res = await chai
         .request(server.app)
@@ -203,8 +201,7 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.error).to.be.equal(ChainError.NoCommunityId);
     });
 
-    // TODO: investigate why test server not handling error in pipeline
-    it.skip('should fail if no chain found', async () => {
+    it('should fail if no chain found', async () => {
       const id = 'ethereum-testnet';
       const res = await chai
         .request(server.app)
@@ -215,8 +212,7 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.error).to.be.equal(ChainError.NoCommunityFound);
     });
 
-    // TODO: investigate why test server not handling error in pipeline
-    it.skip('should fail if not admin ', async () => {
+    it('should fail if not admin ', async () => {
       const id = 'ethereum';
       const result = await server.seeder.createAndVerifyAddress(
         { chain },

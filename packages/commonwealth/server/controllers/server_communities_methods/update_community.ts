@@ -236,17 +236,17 @@ export async function __updateCommunity(
       throw new AppError(Errors.InvalidTransactionHash);
     }
 
-    const ownerOfChain = addresses.find(
+    const ownerOfCommunity = addresses.find(
       (a) => a.community_id === community.id && a.role === 'admin',
     );
-    if (!ownerOfChain) {
+    if (!ownerOfCommunity) {
       throw new AppError(Errors.NotAdmin);
     }
 
     await commonProtocol.newNamespaceValidator.validateNamespace(
       namespace,
       transactionHash,
-      ownerOfChain.address,
+      ownerOfCommunity.address,
       community,
     );
 

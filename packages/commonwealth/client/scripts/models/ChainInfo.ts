@@ -6,11 +6,16 @@ import { COSMOS_EVM_CHAINS } from 'controllers/app/webWallets/keplr_ethereum_web
 import app from 'state';
 import type NodeInfo from './NodeInfo';
 import RoleInfo from './RoleInfo';
+import StakeInfo from './StakeInfo';
 
 class ChainInfo {
   public readonly id: string;
+  public readonly chainNodeId: string;
   public readonly ChainNode: NodeInfo;
+  public readonly CommunityStakes: StakeInfo[];
   public readonly tokenName: string;
+  public readonly threadCount: number;
+  public readonly addressCount: number;
   public readonly default_symbol: string;
   public name: string;
   public readonly network: ChainNetwork;
@@ -74,7 +79,9 @@ class ChainInfo {
     type,
     decimals,
     substrateSpec,
+    chain_node_id,
     ChainNode,
+    CommunityStakes,
     tokenName,
     adminOnlyPolling,
     discord_config_id,
@@ -83,6 +90,8 @@ class ChainInfo {
     directoryPageChainNodeId,
     namespace,
     redirect,
+    thread_count,
+    address_count,
   }) {
     this.id = id;
     this.network = network;
@@ -108,7 +117,9 @@ class ChainInfo {
     this.bech32Prefix = bech32_prefix;
     this.decimals = decimals;
     this.substrateSpec = substrateSpec;
+    this.chainNodeId = chain_node_id;
     this.ChainNode = ChainNode;
+    this.CommunityStakes = CommunityStakes;
     this.tokenName = tokenName;
     this.adminOnlyPolling = adminOnlyPolling;
     this.communityBanner = null;
@@ -118,6 +129,8 @@ class ChainInfo {
     this.directoryPageChainNodeId = directoryPageChainNodeId;
     this.namespace = namespace;
     this.redirect = redirect;
+    this.threadCount = thread_count;
+    this.addressCount = address_count;
   }
 
   public static fromJSON({
@@ -146,6 +159,7 @@ class ChainInfo {
     substrate_spec,
     token_name,
     Contracts,
+    chain_node_id,
     ChainNode,
     admin_only_polling,
     discord_config_id,
@@ -154,6 +168,9 @@ class ChainInfo {
     directory_page_chain_node_id,
     namespace,
     redirect,
+    thread_count,
+    address_count,
+    CommunityStakes,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -198,7 +215,9 @@ class ChainInfo {
       decimals: parseInt(decimals, 10),
       substrateSpec: substrate_spec,
       tokenName: token_name,
-      ChainNode,
+      chain_node_id,
+      ChainNode: app.config.nodes.getById(chain_node_id) || ChainNode,
+      CommunityStakes: CommunityStakes?.map((c) => new StakeInfo(c)) ?? [],
       adminOnlyPolling: admin_only_polling,
       discord_config_id,
       discordBotWebhooksEnabled: discord_bot_webhooks_enabled,
@@ -206,6 +225,8 @@ class ChainInfo {
       directoryPageChainNodeId: directory_page_chain_node_id,
       namespace,
       redirect,
+      thread_count,
+      address_count,
     });
   }
 

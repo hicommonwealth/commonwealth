@@ -6,7 +6,6 @@ import {
   NativeSource,
 } from '@hicommonwealth/core';
 import {
-  AddressAttributes,
   GetBalancesOptions,
   GetCosmosBalancesOptions,
   GetCwBalancesOptions,
@@ -18,11 +17,9 @@ import {
 
 export function makeGetBalancesOptions(
   groups: GroupAttributes[],
-  addresses: AddressAttributes[],
+  addresses: string[],
 ): GetBalancesOptions[] {
   const allOptions: GetBalancesOptions[] = [];
-
-  const addressStrings = addresses.map((a) => a.address);
 
   for (const group of groups) {
     for (const requirement of group.requirements) {
@@ -50,7 +47,7 @@ export function makeGetBalancesOptions(
                   contractAddress: castedSource.contract_address,
                   evmChainId: castedSource.evm_chain_id,
                 },
-                addresses: addressStrings,
+                addresses,
               });
             }
             break;
@@ -78,7 +75,7 @@ export function makeGetBalancesOptions(
                   contractAddress: castedSource.contract_address,
                   tokenId: parseInt(castedSource.token_id, 10),
                 },
-                addresses: addressStrings,
+                addresses,
               });
             }
             break;
@@ -99,7 +96,7 @@ export function makeGetBalancesOptions(
                 sourceOptions: {
                   evmChainId: castedSource.evm_chain_id,
                 },
-                addresses: addressStrings,
+                addresses,
               });
             }
             break;
@@ -122,7 +119,7 @@ export function makeGetBalancesOptions(
                 sourceOptions: {
                   cosmosChainId: castedSource.cosmos_chain_id,
                 },
-                addresses: addressStrings,
+                addresses,
               });
             }
             break;
@@ -149,7 +146,7 @@ export function makeGetBalancesOptions(
                   contractAddress: castedSource.contract_address,
                   cosmosChainId: castedSource.cosmos_chain_id,
                 },
-                addresses: addressStrings,
+                addresses,
               });
             }
             break;

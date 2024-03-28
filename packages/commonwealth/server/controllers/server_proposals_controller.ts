@@ -46,10 +46,10 @@ export class ServerProposalsController {
     return __getProposalVotes.call(this, options, provider, contractInfo);
   }
 
-  private async getContractInfo(chainId: string): Promise<ContractInfo> {
+  private async getContractInfo(communityId: string): Promise<ContractInfo> {
     const contract = await this.models.CommunityContract.findOne({
       where: {
-        community_id: chainId,
+        community_id: communityId,
       },
       attributes: [],
       include: [
@@ -62,7 +62,9 @@ export class ServerProposalsController {
     });
 
     if (!contract.Contract.address) {
-      throw new ServerError(`No contract address found for chain ${chainId}`);
+      throw new ServerError(
+        `No contract address found for community ${communityId}`,
+      );
     }
 
     if (
@@ -71,7 +73,7 @@ export class ServerProposalsController {
         contract.Contract.type !== ChainNetwork.Compound)
     ) {
       throw new AppError(
-        `Proposal fetching not supported for chain ${chainId}`,
+        `Proposal fetching not supported for community ${communityId}`,
       );
     }
 
@@ -82,9 +84,9 @@ export class ServerProposalsController {
   }
 
   private async createEvmProvider(
-    chainId: string,
+    communityId: string,
   ): Promise<providers.Web3Provider> {
-    const ethNetworkUrl = await this.getRPCUrl(chainId);
+    const ethNetworkUrl = await this.getRPCUrl(communityId);
 
     if (ethNetworkUrl.slice(0, 4) != 'http')
       throw new ServerError(
@@ -102,10 +104,10 @@ export class ServerProposalsController {
     }
   }
 
-  private async getRPCUrl(chainId: string): Promise<string> {
-    const chain = await this.models.Community.findOne({
+  private async getRPCUrl(communityId: string): Promise<string> {
+    const community = await this.models.Community.findOne({
       where: {
-        id: chainId,
+        id: communityId,
       },
       attributes: ['network', 'base'],
       include: [
@@ -116,8 +118,8 @@ export class ServerProposalsController {
       ],
     });
 
-    if (!chain.ChainNode.private_url && !chain.ChainNode.url) {
-      throw new ServerError(`No RPC URL found for chain ${chainId}`);
+    if (!community.ChainNode.private_url && !community.ChainNode.url) {
+      throw new ServerError(`No RPC URL found for community ${communityId}`);
     }
 
     // only Aave and Compound contracts on Ethereum are supported
@@ -126,16 +128,16 @@ export class ServerProposalsController {
     // a private node, indexing the chain, or using an existing
     // indexer like TheGraph or SubQuery
     if (
-      chain.ChainNode.name !== 'Ethereum (Mainnet)' ||
-      (chain.network !== ChainNetwork.Aave &&
-        chain.network !== ChainNetwork.Compound &&
-        chain.base !== 'ethereum')
+      community.ChainNode.name !== 'Ethereum (Mainnet)' ||
+      (community.network !== ChainNetwork.Aave &&
+        community.network !== ChainNetwork.Compound &&
+        community.base !== 'ethereum')
     ) {
       throw new AppError(
-        `Proposal fetching not supported for chain ${chainId}`,
+        `Proposal fetching not supported for community ${communityId}`,
       );
     }
 
-    return chain.ChainNode.private_url || chain.ChainNode.url;
+    return community.ChainNode.private_url || community.ChainNode.url;
   }
 }

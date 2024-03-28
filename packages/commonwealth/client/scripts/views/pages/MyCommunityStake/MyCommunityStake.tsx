@@ -42,6 +42,15 @@ const MyCommunityStake = () => {
     ),
   ];
 
+  const possibleAddresses = ADDRESS_FILTERS.filter((a) => a.value !== '').map(
+    (a) => a.value,
+  );
+
+  let addressFilter = [filterOptions.selectedAddress.value];
+  if (filterOptions.selectedAddress.value === '') {
+    addressFilter = possibleAddresses;
+  }
+
   return (
     <section className="MyCommunityStake">
       <CWText type="h2" className="header">
@@ -92,9 +101,12 @@ const MyCommunityStake = () => {
       </CWTabsRow>
 
       {activeTabIndex === 0 ? (
-        <Stakes />
+        <Stakes filterOptions={filterOptions} addressFilter={addressFilter} />
       ) : (
-        <Transactions filterOptions={filterOptions} />
+        <Transactions
+          filterOptions={filterOptions}
+          addressFilter={addressFilter}
+        />
       )}
     </section>
   );

@@ -6,6 +6,7 @@ import {
   EventsHandlerMetadata,
   ILogger,
   InvalidInput,
+  RetryStrategyFn,
   eventHandler,
   logger,
   schemas,
@@ -23,6 +24,31 @@ const BrokerTopicPublicationMap = {
 const BrokerTopicSubscriptionMap = {
   [BrokerTopics.DiscordListener]: RascalSubscriptions.DiscordListener,
   [BrokerTopics.SnapshotListener]: RascalSubscriptions.SnapshotListener,
+};
+
+const defaultRetryStrategy: RetryStrategyFn = (
+  err: Error | undefined,
+  topic: BrokerTopics,
+  content: any,
+  ackOrNackFn: AckOrNack,
+  log: ILogger,
+) => {
+  if (err instanceof InvalidInput) {
+    log.error(`Invalid event`, err, {
+      topic,
+      message: content,
+    });
+    ackOrNackFn(err, { strategy: 'nack' });
+  } else {
+    log.error(`Failed to process event`, err, {
+      topic,
+      message: content,
+    });
+    ackOrNackFn(err, [
+      { strategy: 'republish', defer: 2000, attempts: 3 },
+      { strategy: 'nack' },
+    ]);
+  }
 };
 
 export class RabbitMQAdapter implements Broker {
@@ -112,17 +138,6 @@ export class RabbitMQAdapter implements Broker {
       return false;
     }
 
-    const schema = schemas.events[event.name];
-    const validationResult = schema.safeParse(event.payload);
-    if (!validationResult.success) {
-      this._log.error(
-        'Event schema validation failed',
-        validationResult.error,
-        logContext,
-      );
-      return false;
-    }
-
     try {
       const publication = await this.broker!.publish(rascalPubName, event);
 
@@ -160,6 +175,7 @@ export class RabbitMQAdapter implements Broker {
   public async subscribe(
     topic: BrokerTopics,
     handler: EventsHandlerMetadata<EventSchemas>,
+    retryStrategy?: RetryStrategyFn,
   ): Promise<boolean> {
     if (!this.initialized) {
       return false;
@@ -190,7 +206,7 @@ export class RabbitMQAdapter implements Broker {
       subscription.on(
         'message',
         (_message: Message, content: any, ackOrNackFn: AckOrNack) => {
-          eventHandler(handler, content)
+          eventHandler(handler, content, true)
             .then(() => {
               this._log.debug('Message Acked', undefined, {
                 topic,
@@ -199,22 +215,16 @@ export class RabbitMQAdapter implements Broker {
               ackOrNackFn();
             })
             .catch((err: Error | undefined) => {
-              if (err instanceof InvalidInput) {
-                this._log.error(`Invalid event`, err, {
+              if (retryStrategy)
+                retryStrategy(err, topic, content, ackOrNackFn, this._log);
+              else
+                defaultRetryStrategy(
+                  err,
                   topic,
-                  message: content,
-                });
-                ackOrNackFn(err, { strategy: 'nack' });
-              } else {
-                this._log.error(`Failed to process event`, err, {
-                  topic,
-                  message: content,
-                });
-                ackOrNackFn(err, [
-                  { strategy: 'republish', defer: 2000, attempts: 3 },
-                  { strategy: 'nack' },
-                ]);
-              }
+                  content,
+                  ackOrNackFn,
+                  this._log,
+                );
             });
         },
       );

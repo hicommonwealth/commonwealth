@@ -1,3 +1,4 @@
+import NodeInfo from 'models/NodeInfo';
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWRelatedCommunityCard } from 'views/components/component_kit/new_designs/CWRelatedCommunityCard';
@@ -17,7 +18,7 @@ type RowType = {
   id: string;
 };
 
-type CommunityData = {
+export type CommunityData = {
   name: string;
   nameLower: string;
   description: string;
@@ -25,6 +26,8 @@ type CommunityData = {
   threads: string;
   iconUrl: string;
   id: string;
+  namespace: string;
+  ChainNode: NodeInfo;
 };
 
 interface DirectoryPageContentProps {
@@ -111,10 +114,7 @@ const DirectoryPageContent = ({
       {filteredRelatedCommunitiesData.map((community) => (
         <CWRelatedCommunityCard
           key={community.id}
-          id={community.id}
-          communityName={community.name}
-          communityDescription={community.description}
-          communityIconUrl={community.iconUrl}
+          community={community}
           memberCount={community.members}
           threadCount={community.threads}
         />

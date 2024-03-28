@@ -58,7 +58,8 @@ const getCommunityStatus = async (models: DB) => {
   } = {};
   for (const community of communities) {
     if (community.category !== null) {
-      [community.id] = community.category as CommunityCategoryType[];
+      communityCategories[community.id] =
+        community.category as CommunityCategoryType[];
     }
   }
 

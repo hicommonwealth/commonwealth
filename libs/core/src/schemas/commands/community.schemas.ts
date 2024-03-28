@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../../constants';
 import { ChainBase, ChainType, CommunityCategoryType } from '../../types';
 import { ALL_COMMUNITIES, checkIconSize } from '../../utils';
-import { Community } from '../entities.schemas';
+import { Community, Group, StakeTransaction } from '../entities.schemas';
 
 export const CreateCommunity = {
   input: z.object({
@@ -80,6 +80,14 @@ export const SetCommunityStake = {
   output: Community,
 };
 
+export const CreateStakeTransaction = {
+  input: z.object({
+    transaction_hash: z.string().length(66),
+    community_id: z.string(),
+  }),
+  output: StakeTransaction,
+};
+
 export const UpdateCommunity = {
   input: z.object({
     namespace: z.string(),
@@ -87,4 +95,12 @@ export const UpdateCommunity = {
     address: z.string(),
   }),
   output: Community,
+};
+
+export const GenerateStakeholderGroups = {
+  input: z.object({}),
+  output: z.object({
+    groups: z.array(Group),
+    created: z.boolean(),
+  }),
 };

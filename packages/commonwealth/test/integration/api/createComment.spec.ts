@@ -1,15 +1,13 @@
 import { dispose } from '@hicommonwealth/core';
-import chai from 'chai';
+import chai, { expect } from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { TestServer, testServer } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import { Errors } from '../../../server/routes/threads/create_thread_comment_handler';
-import { del, post } from './external/appHook.spec';
 import Chance = require('chance');
 
 chai.use(chaiHttp);
-chai.should();
 const chance = new Chance();
 
 describe('createComment Integration Tests', () => {
@@ -32,15 +30,10 @@ describe('createComment Integration Tests', () => {
       address: server.e2eTestEntities.testAddresses[0].address,
       text,
     };
-
-    const response = await post(
-      `/api/threads/${threadId}/comments`,
-      validRequest,
-      true,
-      server.app,
-    );
-
-    return response;
+    return await chai
+      .request(server.app)
+      .post(`/api/threads/${threadId}/comments`)
+      .send(validRequest);
   };
 
   const getUniqueCommentText = async () => {
@@ -60,20 +53,13 @@ describe('createComment Integration Tests', () => {
       chain: server.e2eTestEntities.testAddresses[0].community_id,
       address: server.e2eTestEntities.testAddresses[0].address,
     };
-
-    const response = await del(
-      `/api/comments/${commentId}`,
-      validRequest,
-      false,
-      server.app,
-    );
-
-    return response;
+    return await chai
+      .request(server.app)
+      .del(`/api/comments/${commentId}`)
+      .send(validRequest);
   };
 
   before(async () => {
-    // TODO: Notification categories and subscriptions are completely out of sync with schemas!!!
-    // FIXME: This test was relying on data created by other tests
     server = await testServer();
   });
 
@@ -91,8 +77,7 @@ describe('createComment Integration Tests', () => {
     );
   });
 
-  // TODO: investigate why test server not handling error in pipeline
-  it.skip('should return an error response if no text is specified', async () => {
+  it('should return an error response if no text is specified', async () => {
     const invalidRequest = {
       jwt: jwtTokenUser1,
       author_chain: server.e2eTestEntities.testAddresses[0].community_id,
@@ -100,20 +85,15 @@ describe('createComment Integration Tests', () => {
       address: server.e2eTestEntities.testAddresses[0].address,
       thread_id: server.e2eTestEntities.testThreads[0].id,
     };
-
-    const response = await post(
-      `/api/threads/${server.e2eTestEntities.testThreads[0].id}/comments`,
-      invalidRequest,
-      true,
-      server.app,
-    );
-
-    response.should.have.status(400);
-    chai.assert.equal(response.error, Errors.MissingText);
+    const response = await chai
+      .request(server.app)
+      .post(`/api/threads/${server.e2eTestEntities.testThreads[0].id}/comments`)
+      .send(invalidRequest);
+    expect(response.status).to.eq(400);
+    expect(response.text).to.include(Errors.MissingText);
   });
 
-  // TODO: investigate why test server not handling error in pipeline
-  it.skip('should return an error response if an invalid parent id is specified', async () => {
+  it('should return an error response if an invalid parent id is specified', async () => {
     const invalidRequest = {
       jwt: jwtTokenUser1,
       author_chain: server.e2eTestEntities.testAddresses[0].community_id,
@@ -123,34 +103,29 @@ describe('createComment Integration Tests', () => {
       parent_id: -10,
       text: 'test',
     };
-
-    const response = await post(
-      `/api/threads/${server.e2eTestEntities.testThreads[0].id}/comments`,
-      invalidRequest,
-      true,
-      server.app,
-    );
-
-    chai.assert.equal(response.error, Errors.InvalidParent);
+    const response = await chai
+      .request(server.app)
+      .post(`/api/threads/${server.e2eTestEntities.testThreads[0].id}/comments`)
+      .send(invalidRequest);
+    expect(response.status).to.eq(400);
+    expect(response.text).to.include(Errors.InvalidParent);
   });
 
-  // TODO: investigate why test server not handling error in pipeline
-  it.skip('should create comment and return a success response', async () => {
+  it('should create comment and return a success response', async () => {
     const text = await getUniqueCommentText();
     const response = await createValidComment(
       server.e2eTestEntities.testThreads[0].id,
       text,
       jwtTokenUser1,
     );
+    chai.assert.equal(response.status, 200);
     const comment = await server.models.Comment.findOne({
       where: { text },
     });
     chai.assert.isNotNull(comment);
-    chai.assert.equal(response.status, 'Success');
   });
 
-  // TODO: investigate why test server not handling error in pipeline
-  it.skip('should create and delete comment and verify thread comment counts', async () => {
+  it('should create and delete comment and verify thread comment counts', async () => {
     const text = await getUniqueCommentText();
     const beforeCommentCount = await getThreadCommentCount(
       server.e2eTestEntities.testThreads[0].id,
@@ -171,7 +146,7 @@ describe('createComment Integration Tests', () => {
 
     chai.assert.equal(afterCommentCount, beforeCommentCount + 1);
     chai.assert.isNotNull(comment);
-    chai.assert.equal(response.status, 'Success');
+    chai.assert.equal(response.status, 200);
 
     const deleteResponse = await deleteComment(comment.id, jwtTokenUser1);
     comment = await server.models.Comment.findOne({
@@ -183,6 +158,6 @@ describe('createComment Integration Tests', () => {
 
     chai.assert.isNull(comment);
     chai.assert.equal(afterCommentCount, beforeCommentCount);
-    chai.assert.equal(deleteResponse.status, 'Success');
+    chai.assert.equal(deleteResponse.status, 200);
   });
 });
