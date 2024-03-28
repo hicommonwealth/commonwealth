@@ -1,5 +1,5 @@
 import { trpc } from 'client/scripts/utils/trpcClient';
-import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
+import { useCWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -52,6 +52,7 @@ const CommunityMembersPage = () => {
     searchText: '',
     groupFilter: GROUP_AND_MEMBER_FILTERS[0],
   });
+
   const {
     shouldShowGroupMutationBannerForCommunities,
     setShouldShowGroupMutationBannerForCommunity,
@@ -73,6 +74,38 @@ const CommunityMembersPage = () => {
     500,
   );
 
+  const isStakedCommunity = !!app.config.chains.getById(app.activeChainId())
+    .namespace;
+
+  const tableState = useCWTableState({
+    columns: [
+      {
+        key: 'profile_name',
+        header: 'Name',
+        hasCustomSortValue: true,
+        numeric: false,
+        sortable: true,
+      },
+      {
+        key: 'groups',
+        header: 'Groups',
+        hasCustomSortValue: true,
+        numeric: false,
+        sortable: false,
+      },
+      {
+        key: 'stakeBalance',
+        header: 'Stake',
+        hasCustomSortValue: true,
+        numeric: true,
+        sortable: false,
+        hidden: !isStakedCommunity,
+      },
+    ],
+    initialSortColumn: 'name',
+    initialSortDirection: 'ASC',
+  });
+
   const {
     data: members,
     fetchNextPage,
@@ -80,8 +113,8 @@ const CommunityMembersPage = () => {
   } = trpc.community.getMembers.useInfiniteQuery(
     {
       limit: 30,
-      order_by: APIOrderBy.LastActive,
-      order_direction: APIOrderDirection.Desc,
+      order_by: tableState.orderBy,
+      order_direction: tableState.orderDirection,
       search: debouncedSearchTerm,
       community_id: app.activeChainId(),
       include_roles: true,
@@ -372,9 +405,7 @@ const CommunityMembersPage = () => {
             }
           }}
           isLoadingMoreMembers={isLoadingMembers}
-          isStakedCommunity={
-            !!app.config.chains.getById(app.activeChainId()).namespace
-          }
+          tableState={tableState}
         />
       )}
     </section>
