@@ -53,15 +53,24 @@ export const getInitialAccountValue = (
   return activeAddressOption || addressOptions[0];
 };
 
+export const getUniqueUserAddressesForChainBase = (chainBase: string) => {
+  const uniqueChainAddresses = [
+    ...new Set(
+      app.user.addresses
+        .filter((x) => x?.community?.base === chainBase)
+        .map((x) => x.address),
+    ),
+  ];
+
+  return uniqueChainAddresses;
+};
+
 export const getAvailableAddressesForStakeExchange = (
   activeAccounts: Account[],
   userAddresses: AddressInfo[],
 ) => {
-  // TODO:
-  // 1- allow user to select address
-  // 2- remove dups
   // only active accounts (from selected community) that are metamask wallets
-  return app.user.addresses.reduce((availableAddresses, account) => {
+  return activeAccounts.reduce((availableAddresses, account) => {
     const foundAddress = userAddresses.find(
       (address) =>
         address.address === account.address &&

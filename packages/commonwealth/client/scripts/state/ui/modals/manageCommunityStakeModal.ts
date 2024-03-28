@@ -4,15 +4,25 @@ import { devtools } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 
 interface ManageCommunityStakeModalStore {
+  selectedAddress?: string;
+  setSelectedAddress: (address: string) => void;
   modeOfManageCommunityStakeModal: ManageCommunityStakeModalMode;
   setModeOfManageCommunityStakeModal: (
     modalType: ManageCommunityStakeModalMode,
-  ) => any;
+  ) => void;
 }
 
 export const manageCommunityStakeModalStore =
   createStore<ManageCommunityStakeModalStore>()(
     devtools((set) => ({
+      setSelectedAddress: (address) => {
+        set((state) => {
+          return {
+            ...state,
+            selectedAddress: address,
+          };
+        });
+      },
       modeOfManageCommunityStakeModal: null,
       setModeOfManageCommunityStakeModal: (modalType) => {
         set((state) => {

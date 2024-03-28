@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { WalletId, WalletSsoSource } from '@hicommonwealth/core';
 import { setActiveAccount } from 'controllers/app/login';
@@ -16,6 +16,9 @@ import {
   toggleDarkMode,
 } from 'views/components/component_kit/cw_toggle';
 
+import { useManageCommunityStakeModalStore } from 'state/ui/modals';
+import { getUniqueUserAddressesForChainBase } from '../../modals/ManageCommunityStakeModal/utils';
+import { useCommunityStake } from '../CommunityStake';
 import UserMenuItem from './UserMenuItem';
 import useCheckAuthenticatedAddresses from './useCheckAuthenticatedAddresses';
 
@@ -73,9 +76,38 @@ const useUserMenuItems = ({
   });
 
   const navigate = useCommonNavigate();
+  const { stakeEnabled } = useCommunityStake();
+  const { selectedAddress, setSelectedAddress } =
+    useManageCommunityStakeModalStore();
 
   const user = app.user?.addresses?.[0];
   const profileId = user?.profileId || user?.profile.id;
+
+  const uniqueChainAddresses = getUniqueUserAddressesForChainBase(
+    app?.chain?.base,
+  );
+  const shouldShowAddressesSwitcherForNonMember =
+    stakeEnabled &&
+    app.activeChainId() &&
+    !app?.user?.activeAccount &&
+    uniqueChainAddresses?.length > 0;
+
+  useEffect(() => {
+    // if a user is in a stake enabled community without membership, set first user address as active that
+    // matches active chain base. This address should show be set to app.user.activeAccount.
+    if (!selectedAddress && shouldShowAddressesSwitcherForNonMember) {
+      setSelectedAddress(uniqueChainAddresses[0]);
+    }
+
+    if (selectedAddress && !shouldShowAddressesSwitcherForNonMember) {
+      setSelectedAddress('');
+    }
+  }, [
+    shouldShowAddressesSwitcherForNonMember,
+    uniqueChainAddresses,
+    selectedAddress,
+    setSelectedAddress,
+  ]);
 
   const addresses: PopoverMenuItem[] = app.user.activeAccounts.map(
     (account) => {
@@ -111,7 +143,38 @@ const useUserMenuItems = ({
     },
   );
 
+  const uniqueChainAddressOptions: PopoverMenuItem[] = uniqueChainAddresses.map(
+    (address) => {
+      const signed = true;
+      const isActive = selectedAddress === address;
+
+      return {
+        type: 'default',
+        label: (
+          <UserMenuItem
+            isSignedIn={signed}
+            hasJoinedCommunity={isActive}
+            address={address}
+          />
+        ),
+        onClick: () => setSelectedAddress(address),
+      };
+    },
+  );
+
   return [
+    // if a user is in a stake enabled community without membership, show user addresses that
+    // match active chain base in the dropdown. This address should show be set to app.user.activeAccount.
+    ...(shouldShowAddressesSwitcherForNonMember
+      ? ([
+          {
+            type: 'header',
+            label: 'Addresses',
+          },
+          ...uniqueChainAddressOptions,
+          { type: 'divider' },
+        ] as PopoverMenuItem[])
+      : []),
     ...(app.user.activeAccounts.length > 0
       ? ([
           {

@@ -39,17 +39,21 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   const { isLoggedIn } = useUserLoggedIn();
   const { activeAccount } = useUserActiveAccount();
   const {
+    selectedAddress,
+    modeOfManageCommunityStakeModal,
+    setModeOfManageCommunityStakeModal,
+  } = useManageCommunityStakeModalStore();
+  const {
     stakeEnabled,
     stakeBalance,
     currentVoteWeight,
     stakeValue,
     isLoading,
-    // TODO: all user to select address
-  } = useCommunityStake({ walletAddress: app.user.addresses[0].address });
-  const {
-    modeOfManageCommunityStakeModal,
-    setModeOfManageCommunityStakeModal,
-  } = useManageCommunityStakeModalStore();
+  } = useCommunityStake({
+    // if user is not a community member but logged in, use an address that matches community chain base
+    ...(selectedAddress &&
+      !app?.user?.activeAccount && { walletAddress: selectedAddress }),
+  });
 
   if (showSkeleton || isLoading) return <CommunitySectionSkeleton />;
 
