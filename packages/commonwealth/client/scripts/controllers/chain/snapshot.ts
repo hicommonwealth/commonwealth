@@ -28,7 +28,7 @@ class SnapshotController {
     this._proposals = newProposals;
   }
 
-  public async init(space: string): Promise<any> {
+  public async init(space: string): Promise<void> {
     if (this._initializing) return;
     this._initializing = true;
     try {
