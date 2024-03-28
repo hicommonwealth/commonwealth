@@ -6,13 +6,15 @@ import {
 import { useManageCommunityStakeModalStore } from 'client/scripts/state/ui/modals';
 import numeral from 'numeral';
 import 'pages/communities.scss';
-import React from 'react';
+import React, { useRef } from 'react';
 import app from 'state';
 import useFetchActiveCommunitiesQuery from 'state/api/communities/fetchActiveCommunities';
 import {
   default as ChainInfo,
   default as CommunityInfo,
 } from '../../models/ChainInfo';
+import { useFetchEthUsdRateQuery } from '../../state/api/communityStake/index';
+import { trpc } from '../../utils/trpcClient';
 import { NewCommunityCard } from '../components/CommunityCard';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
@@ -64,9 +66,19 @@ const CommunitiesPage = () => {
     ChainInfo | CommunityData
   >(null);
 
+  const oneDayAgo = useRef(new Date().getTime() - 24 * 60 * 60 * 1000);
+
+  const { data: historicalPrices, isLoading: historicalPriceLoading } =
+    trpc.community.getStakeHistoricalPrice.useQuery({
+      past_date_epoch: oneDayAgo.current / 1000, // 24 hours ago
+    });
+
   const handleSetFilterMap = (key: string) => {
     setFilterMap((prevState) => ({ ...prevState, [key]: !filterMap[key] }));
   };
+
+  const { data: ethUsdRateData } = useFetchEthUsdRateQuery();
+  const ethUsdRate = ethUsdRateData?.data?.data?.amount;
 
   const chainBaseFilter = (list: CommunityInfo[]) => {
     return list.filter((data) => {
@@ -139,6 +151,18 @@ const CommunitiesPage = () => {
         filteredList = communityCategoryFilter(filteredList);
       }
     }
+
+    const historicalPriceMap: Map<string, string> = historicalPriceLoading
+      ? null
+      : new Map(
+          Object.entries(
+            historicalPrices?.reduce((acc, { community_id, old_price }) => {
+              acc[community_id] = old_price;
+              return acc;
+            }, {}),
+          ),
+        );
+
     // Filter by recent thread activity
     const res = filteredList
       .sort((a, b) => {
@@ -154,6 +178,8 @@ const CommunitiesPage = () => {
             memberCount={community.addressCount}
             threadCount={community.threadCount}
             onStakeBtnClick={() => setSelectedCommunity(community)}
+            ethUsdRate={ethUsdRate}
+            historicalPrice={historicalPriceMap?.get(community.id)}
           />
         );
       });

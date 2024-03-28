@@ -52,7 +52,7 @@ export const GetStakeTransaction = {
 export const GetStakeHistoricalPrice = {
   input: z.object({
     past_date_epoch: z.number().min(1),
-    community_id: z.string(),
+    community_id: z.string().optional(),
     stake_id: z
       .number()
       .int()
@@ -60,7 +60,10 @@ export const GetStakeHistoricalPrice = {
       .max(MAX_SCHEMA_INT)
       .default(2),
   }),
-  output: z.object({
-    old_price: z.number().nullable(),
-  }),
+  output: z
+    .object({
+      community_id: z.string(),
+      old_price: z.string().nullable(),
+    })
+    .array(),
 };

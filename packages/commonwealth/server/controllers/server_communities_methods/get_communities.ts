@@ -18,7 +18,11 @@ export async function __getCommunities(
   this: ServerCommunitiesController,
   { hasGroups }: GetCommunitiesOptions,
 ): Promise<GetCommunitiesResult> {
-  const communitiesInclude = [];
+  const communitiesInclude = [
+    {
+      model: this.models.CommunityStake,
+    },
+  ];
   if (hasGroups) {
     communitiesInclude.push({
       model: this.models.Group,
