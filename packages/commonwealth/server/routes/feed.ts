@@ -101,6 +101,7 @@ export const getFeedHandler = async (
       },
     });
     const updated = computeUpdated(bulkThreads);
+    const self = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
 
     const feed = new Feed({
       title: community.name,
@@ -111,6 +112,9 @@ export const getFeedHandler = async (
       copyright: 'All rights Reserved 2024, common.xyz',
       updated,
       generator: 'common.xyz',
+      feedLinks: {
+        // atom: self
+      },
     });
 
     bulkThreads.threads.forEach((thread) => {
@@ -123,11 +127,11 @@ export const getFeedHandler = async (
         date: toDate(thread),
         content: thread.body,
         description: thread.plaintext,
-        author: thread.collaborators.map((current) => {
-          return {
-            name: current.Profile.profile_name || '',
-          };
-        }),
+        author: [
+          {
+            name: thread.profile_name,
+          },
+        ],
       });
     });
 

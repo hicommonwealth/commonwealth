@@ -208,6 +208,8 @@ export const Thread = z.object({
 
   //notifications
   max_notif_id: z.number(),
+
+  profile_name: z.string(),
 });
 
 export const Comment = z.object({
