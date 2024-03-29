@@ -86,13 +86,13 @@ export class UserController {
     }
   }
 
-  private _selectedChain: ChainInfo;
-  public get selectedChain(): ChainInfo {
-    return this._selectedChain;
+  private _selectedCommunity: ChainInfo;
+  public get selectedCommunity(): ChainInfo {
+    return this._selectedCommunity;
   }
 
-  private _setSelectedChain(selectedChain: ChainInfo): void {
-    this._selectedChain = selectedChain;
+  private _setSelectedCommunity(selectedCommunity: ChainInfo): void {
+    this._selectedCommunity = selectedCommunity;
   }
 
   private _isSiteAdmin: boolean;
@@ -217,14 +217,14 @@ export class UserController {
     );
   }
 
-  public setSelectedChain(selectedChain: ChainInfo): void {
-    this._setSelectedChain(selectedChain);
+  public setSelectedCommunity(selectedCommunity: ChainInfo): void {
+    this._setSelectedCommunity(selectedCommunity);
   }
 
-  public async selectChain(options: { chain: string }): Promise<void> {
+  public async selectCommunity(options: { community: string }): Promise<void> {
     try {
       const res = await axios.post(`${app.serverUrl()}/selectCommunity`, {
-        community_id: options.chain,
+        community_id: options.community,
         auth: true,
         jwt: this._jwt,
       });
@@ -232,11 +232,11 @@ export class UserController {
       if (res.data.status !== 'Success') {
         throw new Error(`got unsuccessful status: ${res.data.status}`);
       } else {
-        const chain = app.config.chains.getById(options.chain);
-        if (!chain) {
-          throw new Error('unexpected chain');
+        const community = app.config.chains.getById(options.community);
+        if (!community) {
+          throw new Error('unexpected community');
         }
-        this.setSelectedChain(chain);
+        this.setSelectedCommunity(community);
       }
     } catch (error) {
       console.error('Failed to select node on server', error);

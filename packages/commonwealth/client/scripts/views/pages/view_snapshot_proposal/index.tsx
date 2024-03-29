@@ -44,7 +44,7 @@ export const ViewSnapshotProposalPage = ({
   const [power, setPower] = useState<Power | null>(null);
 
   const { data, error, isLoading } = useGetThreadsByLinkQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     link: {
       source: LinkSource.Snapshot,
       identifier: proposal?.id,
@@ -74,17 +74,17 @@ export const ViewSnapshotProposalPage = ({
 
   const activeUserAddress =
     app.user?.activeAccount?.address || app.user?.addresses?.[0]?.address;
-  const activeChainId = app.activeChainId();
+  const activeCommunityId = app.activeChainId();
   const proposalAuthor = useMemo(() => {
-    if (!proposal || !activeChainId) {
+    if (!proposal || !activeCommunityId) {
       return null;
     }
     return new AddressInfo({
       id: null,
       address: proposal.author,
-      chainId: activeChainId,
+      communityId: activeCommunityId,
     });
-  }, [proposal, activeChainId]);
+  }, [proposal, activeCommunityId]);
 
   useManageDocumentTitle('View snapshot proposal', proposal?.title);
 
