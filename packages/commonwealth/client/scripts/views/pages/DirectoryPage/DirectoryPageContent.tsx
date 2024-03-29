@@ -104,11 +104,7 @@ const DirectoryPageContent = ({
   }
 
   return selectedViewType === ViewType.Rows ? (
-    <CWTable
-      columnInfo={columnInfo}
-      rowData={tableData}
-      defaultSortColumnKey="members"
-    />
+    <CWTable columnInfo={columnInfo} rowData={tableData} />
   ) : (
     <div className="directory-tiles-container">
       {filteredRelatedCommunitiesData.map((community) => (
