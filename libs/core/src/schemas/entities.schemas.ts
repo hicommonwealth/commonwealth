@@ -208,6 +208,8 @@ export const Thread = z.object({
 
   //notifications
   max_notif_id: z.number(),
+
+  profile_name: z.string(),
 });
 
 export const Comment = z.object({
@@ -457,6 +459,7 @@ export const ChainNode = z.object({
   cosmos_gov_version: z.nativeEnum(CosmosGovernanceVersion).optional(),
   health: z.nativeEnum(NodeHealth).default(NodeHealth.Healthy).optional(),
   contracts: z.array(Contract).optional(),
+  block_explorer: z.string().optional(),
 });
 
 // aliases

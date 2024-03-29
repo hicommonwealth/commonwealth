@@ -125,7 +125,7 @@ const SessionRevalidationModal = ({
           ) : walletSsoSource === WalletSsoSource.Twitter ? (
             <CWAuthButton
               type="twitter"
-              label="Twitter"
+              label="X (Twitter)"
               onClick={() => onSocialLogin(WalletSsoSource.Twitter)}
             />
           ) : connectWithEmail ? (

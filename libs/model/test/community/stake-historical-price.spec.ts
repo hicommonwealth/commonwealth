@@ -53,6 +53,7 @@ describe('Stake Historical Price', () => {
       community_id,
       timestamp: Math.floor(Date.now() / 1000),
       stake_price: 88,
+      stake_direction: 'buy',
       stake_amount: 1,
     });
 
@@ -62,6 +63,7 @@ describe('Stake Historical Price', () => {
       community_id,
       timestamp: 1000,
       stake_price: 10,
+      stake_direction: 'buy',
       stake_amount: 1,
     });
     await seed('StakeTransaction', {
@@ -70,6 +72,7 @@ describe('Stake Historical Price', () => {
       community_id,
       timestamp: 1,
       stake_price: 99,
+      stake_direction: 'buy',
       stake_amount: 1,
     });
   });
@@ -82,7 +85,7 @@ describe('Stake Historical Price', () => {
     const results = await query(GetStakeHistoricalPrice(), {
       payload: { past_date_epoch: 1, community_id: 'non-existing' },
     });
-    expect(results?.old_price).to.equal(null);
+    expect(results).to.deep.equal([]);
   });
 
   it('should return the historical price', async () => {
@@ -92,6 +95,6 @@ describe('Stake Historical Price', () => {
         community_id,
       },
     });
-    expect(results?.old_price).to.equal(10);
+    expect(results[0].old_price).to.equal('88');
   });
 });

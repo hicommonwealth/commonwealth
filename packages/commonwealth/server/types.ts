@@ -99,6 +99,12 @@ declare global {
       // TODO: session is used in logout.ts -> remove?
       session: any;
       sessionID: any;
+      /**
+       * Get a request header
+       */
+      readonly get: (name: string) => string | undefined;
+      readonly protocol: string;
+      readonly originalUrl: string;
     }
   }
 }

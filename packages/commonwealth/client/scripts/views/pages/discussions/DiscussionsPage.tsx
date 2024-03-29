@@ -28,6 +28,7 @@ import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
+import { DiscussionsFeedDiscovery } from 'views/pages/discussions/DiscussionsFeedDiscovery';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 
 type DiscussionsPageProps = {
@@ -60,7 +61,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const topicId = (topics || []).find(({ name }) => name === topicName)?.id;
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
-    chainId: communityId,
+    communityId: communityId,
     address: app?.user?.activeAccount?.address,
     apiEnabled: !!app?.user?.activeAccount?.address,
   });
@@ -111,6 +112,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   return (
     <div className="DiscussionsPage">
+      <DiscussionsFeedDiscovery
+        orderBy={featuredFilter}
+        community={communityId}
+        includePinnedThreads={true}
+      />
       <Virtuoso
         className="thread-list"
         style={{ height: '100%', width: '100%' }}

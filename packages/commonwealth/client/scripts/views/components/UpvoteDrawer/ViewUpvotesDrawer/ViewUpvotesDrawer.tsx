@@ -106,7 +106,7 @@ export const ViewUpvotesDrawer = ({
             <div className="upvoted-content-header">
               <AuthorAndPublishInfo
                 authorAddress={author?.address}
-                authorChainId={getAuthorCommunityId(author)}
+                authorCommunityId={getAuthorCommunityId(author)}
                 publishDate={publishDate}
                 showUserAddressWithInfo={false}
                 profile={profile}
