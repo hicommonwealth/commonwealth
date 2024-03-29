@@ -1,7 +1,6 @@
 import { delay, dispose } from '@hicommonwealth/core';
 import { tester, type ContractInstance, type DB } from '@hicommonwealth/model';
 import { expect } from 'chai';
-import sinon from 'sinon';
 import { startEvmPolling } from '../../../../server/workers/evmChainEvents/startEvmPolling';
 import {
   getTestAbi,
@@ -14,8 +13,6 @@ import { sdk } from './util';
 describe('EVM Chain Events End to End Tests', () => {
   let models: DB;
 
-  const sandbox = sinon.createSandbox();
-  let clock: sinon.SinonFakeTimers;
   let propCreatedResult: { block: number; proposalId: string };
   let contract: ContractInstance;
 
@@ -61,10 +58,6 @@ describe('EVM Chain Events End to End Tests', () => {
 
   after(async () => {
     await dispose()();
-  });
-
-  beforeEach(async () => {
-    clock = sandbox.useFakeTimers();
   });
 
   afterEach(() => {
