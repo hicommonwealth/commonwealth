@@ -1,4 +1,3 @@
-$ NODE_OPTIONS='--max-old-space-size=16384' eslint --cache -c .eslintrc-diff.js client/\**/*.{ts,tsx} server/\**/*.ts scripts/\**/*.ts shared/\**/*.ts test/\**/*.ts
 
 /home/runner/work/commonwealth/commonwealth/packages/commonwealth/test/canary/eslint_canary.ts
   16:1  error  '../../../../libs/core/src/errors' import is restricted from being used by a pattern. Do not import files from outside the root directory of a package              no-restricted-imports
