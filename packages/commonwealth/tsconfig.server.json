@@ -1,6 +1,7 @@
 {
-  "extends": "../tsconfig.json",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "jsx": "react",
     "skipLibCheck": true,
     "sourceMap": true,
     "rootDir": ".",
@@ -10,7 +11,8 @@
       "@hicommonwealth/*": ["../../libs/*/src"]
     }
   },
-  "include": ["."],
+  "include": ["./server", "./server.ts"],
+  "exclude": ["**/client"],
   "references": [
     { "path": "../../libs/adapters" },
     { "path": "../../libs/chains" },

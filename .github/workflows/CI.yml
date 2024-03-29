@@ -357,6 +357,9 @@ jobs:
       - name: Commonwealth Typecheck
         run: yarn --cwd packages/commonwealth check-types
 
+      - name: Commonwealth Server Types
+        run: yarn --cwd packages/commonwealth check-types-server
+
       - name: Discord-Bot Typecheck
         run: yarn --cwd packages/discord-bot check-types
 

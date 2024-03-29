@@ -8,6 +8,7 @@
     "build": "tsc -b",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
+    "check-types-server": "tsc --noEmit -P tsconfig.server.json",
     "bundle": "webpack --config webpack/webpack.prod.config.js --progress",
     "bundle-report": "webpack-bundle-analyzer --port 4200 build/stats.json",
     "clean-db": "ts-node -r tsconfig-paths/register -T server/scripts/cleanDb.ts",
