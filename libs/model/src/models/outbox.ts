@@ -30,7 +30,7 @@ export default (
          * primary key on a partitioned table. Additionally, setting
          * autoIncrement without primaryKey: true is not possible so this
          * ensures that sequelize leaves the generation of the event_id to the
-         * DB.
+         * DB. Issue to track: https://github.com/sequelize/sequelize/issues/12718
          */
         primaryKey: true,
         type: dataTypes.BIGINT,
