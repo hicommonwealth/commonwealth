@@ -58,28 +58,64 @@ export async function setupCommonwealthConsumer(): Promise<void> {
     throw e;
   }
 
+  // snapshot policy
   const { processSnapshotProposalCreated } = await import(
     './messageProcessors/snapshotConsumer'
   );
-
-  const inputs = {
+  const snapshotInputs = {
     SnapshotProposalCreated: schemas.events.SnapshotProposalCreated,
   };
-
-  const Snapshot: Policy<typeof inputs, ZodUndefined> = () => ({
-    inputs,
+  const Snapshot: Policy<typeof snapshotInputs, ZodUndefined> = () => ({
+    inputs: snapshotInputs,
     body: {
       SnapshotProposalCreated: processSnapshotProposalCreated,
     },
   });
-
-  const result = await brokerInstance.subscribe(
+  const snapshotSubRes = await brokerInstance.subscribe(
     BrokerTopics.SnapshotListener,
     Snapshot(),
   );
 
-  if (!result) {
-    throw new Error(`Failed to subscribe to ${BrokerTopics.SnapshotListener}`);
+  const { processChainEventCreated } = await import(
+    './messageProcessors/chainEventConsumer'
+  );
+  const chainEventInputs = {
+    ChainEventCreated: schemas.events.ChainEventCreated,
+  };
+  const ChainEvent: Policy<typeof chainEventInputs, ZodUndefined> = () => ({
+    inputs: chainEventInputs,
+    body: {
+      ChainEventCreated: processChainEventCreated,
+    },
+  });
+  const chainEventSubRes = await brokerInstance.subscribe(
+    BrokerTopics.ChainEvent,
+    ChainEvent(),
+  );
+
+  if (!chainEventSubRes) {
+    log.fatal(
+      'Failed to subscribe to chain-events. Requires restart!',
+      undefined,
+      {
+        topic: BrokerTopics.ChainEvent,
+      },
+    );
+  }
+
+  if (!snapshotSubRes) {
+    log.fatal(
+      'Failed to subscribe to snapshot events. Requires restart!',
+      undefined,
+      {
+        topic: BrokerTopics.SnapshotListener,
+      },
+    );
+  }
+
+  if (!snapshotSubRes && !chainEventSubRes) {
+    log.fatal('All subscriptions failed. Restarting...');
+    process.exit(1);
   }
 }
 
@@ -87,10 +123,10 @@ async function main() {
   try {
     log.info('Starting main consumer');
     await setupCommonwealthConsumer();
+    isServiceHealthy = true;
   } catch (error) {
     log.fatal('Consumer setup failed', error);
   }
-  isServiceHealthy = true;
 }
 
 if (process.argv[2] === 'run-as-script') {

@@ -1,13 +1,18 @@
 import { PinoLogger } from '@hicommonwealth/adapters';
 import {
   EventHandler,
+  NotificationCategories,
+  NotificationDataAndCategory,
+  SupportedNetwork,
   commonProtocol,
   logger,
   schemas,
 } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { CommunityAttributes, models } from '@hicommonwealth/model';
+import { QueryTypes } from 'sequelize';
 import Web3 from 'web3';
 import { ZodUndefined, z } from 'zod';
+import emitNotifications from '../../../util/emitNotifications';
 
 const log = logger(PinoLogger()).getLogger(__filename);
 
@@ -16,7 +21,7 @@ const communityStakeContractAddresses = Object.values(
 ).map((c) => c.communityStake.toLowerCase());
 const namespaceFactoryContractAddresses = Object.values(
   commonProtocol.factoryContracts,
-).map((c) => c.namespaceFactory.toLowerCase());
+).map((c) => c.factory.toLowerCase());
 
 async function handleDeployedNamespace(
   event: z.infer<typeof schemas.events.ChainEventCreated>,
@@ -90,13 +95,63 @@ async function handleCommunityStakeTrades(
     stake_price: event.parsedArgs.ethAmount,
     address: event.parsedArgs.trader,
     stake_direction: event.parsedArgs.isBuy ? 'buy' : 'sell',
-    timestamp: block.timestamp,
+    timestamp: block.timestamp as number,
   });
 }
 
 async function handleProposalEvents(
   event: z.infer<typeof schemas.events.ChainEventCreated>,
-) {}
+) {
+  const community: {
+    id: CommunityAttributes['id'];
+    network: CommunityAttributes['network'];
+  }[] = await models.sequelize.query(
+    `
+    SELECT CH.id, CH.network
+    FROM "Contracts" C
+             JOIN "CommunityContracts" CC on C.id = CC.contract_id
+             JOIN "Communities" CH ON CC.community_id = CH.id
+    WHERE C.address = :contractAddress AND C.chain_node_id = :chainNodeId
+    LIMIT 1;
+  `,
+    {
+      type: QueryTypes.SELECT,
+      raw: true,
+      replacements: {
+        contractAddress: event.rawLog.address,
+        chainNodeId: event.eventSource.chainNodeId,
+      },
+    },
+  );
+
+  if (community.length === 0) {
+    log.error(
+      'No associated community found! Consider deactivating the event source',
+      undefined,
+      { event },
+    );
+    return;
+  }
+
+  try {
+    const notification: NotificationDataAndCategory = {
+      categoryId: NotificationCategories.ChainEvent,
+      data: {
+        community_id: community[0].id,
+        network: community[0].network as unknown as SupportedNetwork,
+        block_number: parseInt(event.rawLog.blockNumber.toString(), 16),
+        event_data: {
+          kind: event.eventSource.kind,
+          id: event.parsedArgs[0].toString(),
+        },
+      },
+    };
+
+    await emitNotifications(models, notification);
+  } catch (e) {
+    log.error('Failed to emit chain-event notification', e, { event });
+  }
+}
 
 export const processChainEventCreated: EventHandler<
   'ChainEventCreated',
@@ -107,7 +162,11 @@ export const processChainEventCreated: EventHandler<
     await handleCommunityStakeTrades(payload);
   } else if (namespaceFactoryContractAddresses.includes(contractAddress)) {
     await handleDeployedNamespace(payload);
-  } else {
+  } else if (payload.eventSource.kind.includes('proposal')) {
     await handleProposalEvents(payload);
+  } else {
+    log.error('Attempted to process an unsupported chain-event', undefined, {
+      event: payload,
+    });
   }
 };
