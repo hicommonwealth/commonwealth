@@ -269,14 +269,14 @@ describe('EVM Chain Events Log Processing Tests', () => {
       }
 
       expect(events.length).to.equal(1);
-      expect(events[0].contractAddress).to.equal(
+      expect(events[0].rawLog.address).to.equal(
         sdk.contractAddrs.compound.governance,
       );
-      expect(events[0].kind).to.equal('proposal-created');
-      expect(events[0].blockNumber).to.equal(
+      expect(events[0].eventSource.kind).to.equal('proposal-created');
+      expect(parseInt(events[0].rawLog.blockNumber.toString(), 16)).to.equal(
         parseInt(propCreatedLog.blockNumber.toString()),
       );
-      expect(events[0].args).to.exist;
+      expect(events[0].parsedArgs).to.exist;
     });
 
     it('should only parse logs with a matching signature', async () => {
@@ -305,14 +305,14 @@ describe('EVM Chain Events Log Processing Tests', () => {
         propQueuedLog,
       ]);
       expect(events.length).to.equal(1);
-      expect(events[0].contractAddress).to.equal(
+      expect(events[0].rawLog.address).to.equal(
         sdk.contractAddrs.compound.governance,
       );
-      expect(events[0].kind).to.equal('proposal-queued');
-      expect(events[0].blockNumber).to.equal(
+      expect(events[0].eventSource.kind).to.equal('proposal-queued');
+      expect(parseInt(events[0].rawLog.blockNumber.toString(), 16)).to.equal(
         parseInt(propQueuedLog.blockNumber.toString(), 16),
       );
-      expect(events[0].args).to.exist;
+      expect(events[0].parsedArgs).to.exist;
     });
   });
 
@@ -364,28 +364,30 @@ describe('EVM Chain Events Log Processing Tests', () => {
       expect(events.length).to.equal(2);
 
       const propCreatedEvent = events.find(
-        (e) => e.kind === 'proposal-created',
+        (e) => e.eventSource.kind === 'proposal-created',
       );
       expect(propCreatedEvent).to.exist;
-      expect(propCreatedEvent.contractAddress).to.equal(
+      expect(propCreatedEvent.rawLog.address).to.equal(
         sdk.contractAddrs.compound.governance,
       );
-      expect(propCreatedEvent.kind).to.equal('proposal-created');
-      expect(propCreatedEvent.blockNumber).to.equal(
-        parseInt(propCreatedLog.blockNumber.toString()),
-      );
-      expect(propCreatedEvent.args).to.exist;
+      expect(propCreatedEvent.eventSource.kind).to.equal('proposal-created');
+      expect(
+        parseInt(propCreatedEvent.rawLog.blockNumber.toString(), 16),
+      ).to.equal(parseInt(propCreatedLog.blockNumber.toString()));
+      expect(propCreatedEvent.parsedArgs).to.exist;
 
-      const propQueuedEvent = events.find((e) => e.kind === 'proposal-queued');
+      const propQueuedEvent = events.find(
+        (e) => e.eventSource.kind === 'proposal-queued',
+      );
       expect(propQueuedEvent).to.exist;
-      expect(propQueuedEvent.contractAddress).to.equal(
+      expect(propQueuedEvent.rawLog.address).to.equal(
         sdk.contractAddrs.compound.governance,
       );
-      expect(propQueuedEvent.kind).to.equal('proposal-queued');
-      expect(propQueuedEvent.blockNumber).to.equal(
-        parseInt(propQueuedLog.blockNumber.toString()),
-      );
-      expect(propQueuedEvent.args).to.exist;
+      expect(propQueuedEvent.eventSource.kind).to.equal('proposal-queued');
+      expect(
+        parseInt(propQueuedEvent.rawLog.blockNumber.toString(), 16),
+      ).to.equal(parseInt(propQueuedLog.blockNumber.toString()));
+      expect(propQueuedEvent.parsedArgs).to.exist;
     });
   });
 

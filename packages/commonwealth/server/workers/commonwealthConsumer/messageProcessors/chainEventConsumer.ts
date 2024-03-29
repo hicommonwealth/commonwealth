@@ -26,7 +26,7 @@ const namespaceFactoryContractAddresses = Object.values(
 async function handleDeployedNamespace(
   event: z.infer<typeof schemas.events.ChainEventCreated>,
 ) {
-  console.log('Do nothing');
+  log.info('Implementation not defined', undefined, { event });
 }
 
 async function handleCommunityStakeTrades(

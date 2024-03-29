@@ -59,7 +59,7 @@ export const ChainEventCreated = z.object({
   rawLog: z.object({
     blockNumber: z.number(),
     blockHash: z.string(),
-    transactionIndex: z.string(),
+    transactionIndex: z.number(),
     removed: z.boolean(),
     address: z.string(),
     data: z.string(),
