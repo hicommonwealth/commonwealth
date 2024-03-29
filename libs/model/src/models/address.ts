@@ -99,7 +99,7 @@ export default (
       wallet_sso_source: { type: dataTypes.STRING, allowNull: true },
       block_info: { type: dataTypes.STRING, allowNull: true },
       hex: {
-        type: dataTypes.STRING,
+        type: dataTypes.STRING(64),
         allowNull: true,
         validate: {
           isRequiredForCosmos() {
@@ -208,8 +208,11 @@ export default (
     models.Address.belongsToMany(models.Thread, {
       through: models.Collaboration,
       as: 'collaboration',
+      foreignKey: { name: 'address_id', allowNull: false },
     });
-    models.Address.hasMany(models.Collaboration);
+    models.Address.hasMany(models.Collaboration, {
+      foreignKey: { name: 'address_id', allowNull: false },
+    });
     models.Address.hasMany(models.Membership, {
       foreignKey: 'address_id',
       as: 'Memberships',
