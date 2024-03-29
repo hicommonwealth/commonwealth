@@ -60,10 +60,6 @@ describe('EVM Chain Events End to End Tests', () => {
     await dispose()();
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
-
   it('should emit a notification for every captured event that has a valid event source', async () => {
     const chainNode = await getTestChainNode();
     const abi = await getTestAbi();
