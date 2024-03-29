@@ -108,19 +108,6 @@ describe('EVM Chain Events Log Processing Tests', () => {
       expect(logs).to.be.empty;
     }).timeout(80_000);
 
-    it('should fetch logs with current block - maxOldBlocks if no starting block number is provided', async () => {
-      expectAbi();
-      expect(propCreatedResult, 'Must have created a proposal to run this test')
-        .to.not.be.undefined;
-
-      const { logs } = await getLogs({
-        rpc: localRpc,
-        contractAddresses: [sdk.contractAddrs.compound.governance],
-      });
-      expect(logs.length).to.equal(1);
-      propCreatedLog = logs[0];
-    });
-
     it('should fetch logs from the starting block number if provided', async () => {
       expectAbi();
       expect(propCreatedResult, 'Must have created a proposal to run this test')
@@ -137,10 +124,11 @@ describe('EVM Chain Events Log Processing Tests', () => {
       const { logs } = await getLogs({
         rpc: localRpc,
         contractAddresses: [sdk.contractAddrs.compound.governance],
-        startingBlockNum: propQueuedResult.block,
+        startingBlockNum: propCreatedResult.block,
       });
-      expect(logs.length).to.equal(1);
-      propQueuedLog = logs[0];
+      expect(logs.length).to.equal(2);
+      propCreatedLog = logs[0];
+      propQueuedLog = logs[1];
     }).timeout(80_000);
 
     // TODO: do we want to fetch only up to currentBlock - 7 blocks to account for micro-reorgs?
@@ -358,7 +346,6 @@ describe('EVM Chain Events Log Processing Tests', () => {
       const currentBlockNum = (await sdk.getBlock()).number;
       const { events } = await getEvents(
         evmSource,
-        null,
         currentBlockNum - propCreatedResult.block + 5,
       );
       expect(events.length).to.equal(2);
