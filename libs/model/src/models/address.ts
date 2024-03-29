@@ -91,7 +91,8 @@ export default (
       },
       ghost_address: {
         type: dataTypes.BOOLEAN,
-        allowNull: true,
+        allowNull: false,
+        defaultValue: false,
       },
       profile_id: { type: dataTypes.INTEGER, allowNull: true },
       wallet_id: { type: dataTypes.STRING, allowNull: true },

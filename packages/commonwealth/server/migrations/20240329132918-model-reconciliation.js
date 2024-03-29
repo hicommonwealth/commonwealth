@@ -98,6 +98,17 @@ module.exports = {
           },
           { transaction },
         ),
+        // ghost_address should never be null
+        queryInterface.changeColumn(
+          'Addresses',
+          'ghost_address',
+          {
+            type: Sequelize.BOOLEAN,
+            allowNull: false,
+            defaultValue: false,
+          },
+          { transaction },
+        ),
       ]);
     });
   },
@@ -182,6 +193,16 @@ module.exports = {
         queryInterface.changeColumn(
           'Users',
           'disableRichText',
+          {
+            type: Sequelize.BOOLEAN,
+            allowNull: true,
+            defaultValue: false,
+          },
+          { transaction },
+        ),
+        queryInterface.changeColumn(
+          'Addresses',
+          'ghost_address',
           {
             type: Sequelize.BOOLEAN,
             allowNull: true,

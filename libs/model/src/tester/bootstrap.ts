@@ -58,7 +58,7 @@ export const migrate_db = async (sequelize: Sequelize) => {
     },
     context: sequelize.getQueryInterface(),
     storage: new SequelizeStorage({ sequelize }),
-    logger: console,
+    logger: undefined,
   });
   await umzug.up();
 };

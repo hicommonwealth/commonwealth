@@ -36,7 +36,6 @@ export default (
   const Collaboration = <CollaborationModelStatic>sequelize.define(
     'Collaboration',
     {
-      id: { type: dataTypes.INTEGER, primaryKey: true },
       address_id: {
         type: dataTypes.INTEGER,
         allowNull: false,
