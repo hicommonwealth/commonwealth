@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { CWTableColumnInfo, CWTableSorting } from './CWTable';
 
-type UseCWTableSortingProps = {
+type UseCWTableStateProps = {
   columns: CWTableColumnInfo[];
   initialSortColumn?: string;
   initialSortDirection: 'ASC' | 'DESC';
@@ -20,7 +20,7 @@ export function useCWTableState({
   columns,
   initialSortColumn,
   initialSortDirection,
-}: UseCWTableSortingProps): CWTableState {
+}: UseCWTableStateProps): CWTableState {
   // used for CWTable sorting
   const [sorting, setSorting] = useState<CWTableSorting>([
     {
