@@ -72,7 +72,7 @@ export default (
       disableRichText: {
         type: dataTypes.BOOLEAN,
         defaultValue: false,
-        allowNull: true,
+        allowNull: false,
       },
       selected_community_id: { type: dataTypes.STRING, allowNull: true },
     },

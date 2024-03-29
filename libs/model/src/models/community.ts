@@ -79,12 +79,12 @@ export default (
       active: { type: dataTypes.BOOLEAN, defaultValue: false },
       stages_enabled: {
         type: dataTypes.BOOLEAN,
-        allowNull: true,
+        allowNull: false,
         defaultValue: true,
       },
       custom_stages: {
         type: dataTypes.ARRAY(dataTypes.TEXT),
-        allowNull: true,
+        allowNull: false,
         defaultValue: [],
       },
       custom_domain: { type: dataTypes.STRING, allowNull: true },

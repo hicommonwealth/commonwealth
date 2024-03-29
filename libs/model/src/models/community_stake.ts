@@ -34,7 +34,7 @@ export default (
         primaryKey: true,
       },
       stake_token: { type: dataTypes.STRING, allowNull: false },
-      vote_weight: { type: dataTypes.INTEGER, allowNull: true },
+      vote_weight: { type: dataTypes.INTEGER, allowNull: false },
       stake_enabled: { type: dataTypes.BOOLEAN, allowNull: false },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },

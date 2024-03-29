@@ -35,6 +35,69 @@ module.exports = {
           },
           { transaction },
         ),
+        // balance_type should never be null
+        queryInterface.changeColumn(
+          'ChainNodes',
+          'balance_type',
+          {
+            type: Sequelize.STRING,
+            allowNull: false,
+          },
+          { transaction },
+        ),
+        // stages_enabled should never be null
+        queryInterface.changeColumn(
+          'Communities',
+          'stages_enabled',
+          {
+            type: Sequelize.BOOLEAN,
+            allowNull: false,
+            defaultValue: true,
+          },
+          { transaction },
+        ),
+        // custom_staged should never be null
+        queryInterface.changeColumn(
+          'Communities',
+          'custom_stages',
+          {
+            type: Sequelize.ARRAY(Sequelize.TEXT),
+            allowNull: false,
+            defaultValue: [],
+          },
+          { transaction },
+        ),
+        // vote_weight should never be null
+        queryInterface.changeColumn(
+          'CommunityStakes',
+          'vote_weight',
+          {
+            type: Sequelize.INTEGER,
+            allowNull: false,
+          },
+          { transaction },
+        ),
+        // kind should never be null
+        queryInterface.changeColumn(
+          'Threads',
+          'kind',
+          {
+            type: Sequelize.STRING,
+            allowNull: false,
+          },
+          { transaction },
+        ),
+        // disableRichText should never be null
+        queryInterface.changeColumn(
+          'Users',
+          'disableRichText',
+          {
+            type: Sequelize.BOOLEAN,
+            allowNull: false,
+            defaultValue: false,
+          },
+          { transaction },
+        ),
       ]);
     });
   },
@@ -66,6 +129,63 @@ module.exports = {
           {
             type: Sequelize.INTEGER,
             allowNull: true,
+          },
+          { transaction },
+        ),
+        queryInterface.changeColumn(
+          'ChainNodes',
+          'balance_type',
+          {
+            type: Sequelize.STRING,
+            allowNull: true,
+          },
+          { transaction },
+        ),
+        queryInterface.changeColumn(
+          'Communities',
+          'stages_enabled',
+          {
+            type: Sequelize.BOOLEAN,
+            allowNull: true,
+            defaultValue: true,
+          },
+          { transaction },
+        ),
+        queryInterface.changeColumn(
+          'Communities',
+          'custom_stages',
+          {
+            type: Sequelize.ARRAY(Sequelize.TEXT),
+            allowNull: true,
+            defaultValue: [],
+          },
+          { transaction },
+        ),
+        queryInterface.changeColumn(
+          'CommunityStakes',
+          'vote_weight',
+          {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+          },
+          { transaction },
+        ),
+        queryInterface.changeColumn(
+          'Threads',
+          'kind',
+          {
+            type: Sequelize.STRING,
+            allowNull: true,
+          },
+          { transaction },
+        ),
+        queryInterface.changeColumn(
+          'Users',
+          'disableRichText',
+          {
+            type: Sequelize.BOOLEAN,
+            allowNull: true,
+            defaultValue: false,
           },
           { transaction },
         ),

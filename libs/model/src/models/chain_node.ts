@@ -27,7 +27,7 @@ export default (
       },
       alt_wallet_url: { type: dataTypes.STRING, allowNull: true },
       private_url: { type: dataTypes.STRING, allowNull: true },
-      balance_type: { type: dataTypes.STRING, allowNull: true },
+      balance_type: { type: dataTypes.STRING, allowNull: false },
       name: { type: dataTypes.STRING, allowNull: false },
       description: { type: dataTypes.STRING, allowNull: true },
       health: { type: dataTypes.STRING, allowNull: true },
