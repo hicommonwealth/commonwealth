@@ -2,6 +2,7 @@ import { express, trpc } from '@hicommonwealth/adapters';
 import { Router } from 'express';
 import swaggerUi from 'swagger-ui-express';
 import * as community from './community';
+import * as feed from './feed';
 import * as integrations from './integrations';
 import * as thread from './threads';
 
@@ -12,6 +13,7 @@ const trpcRouter = trpc.router({
   community: community.trpcRouter,
   thread: thread.trpcRouter,
   integrations: integrations.trpcRouter,
+  feed: feed.trpcRouter,
 });
 
 export type AppRouter = typeof trpcRouter;

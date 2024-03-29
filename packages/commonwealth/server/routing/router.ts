@@ -80,7 +80,7 @@ import getWebhooks from '../routes/webhooks/getWebhooks';
 import updateWebhook from '../routes/webhooks/updateWebhook';
 import type ViewCountCache from '../util/viewCountCache';
 
-import type { DB } from '@hicommonwealth/model';
+import type { DB, GlobalActivityCache } from '@hicommonwealth/model';
 import authCallback from '../routes/authCallback';
 import banAddress from '../routes/banAddress';
 import getBannedAddresses from '../routes/getBannedAddresses';
@@ -98,7 +98,6 @@ import getSnapshotProposal from '../routes/getSnapshotProposal';
 import { getSubscribedCommunities } from '../routes/getSubscribedCommunities';
 import removeDiscordBotConfig from '../routes/removeDiscordBotConfig';
 import setDiscordBotConfig from '../routes/setDiscordBotConfig';
-import type GlobalActivityCache from '../util/globalActivityCache';
 
 import {
   createCommunityContractTemplateAndMetadata,
@@ -155,6 +154,7 @@ import { updateChainNodeHandler } from '../routes/communities/update_chain_node_
 import { updateCommunityHandler } from '../routes/communities/update_community_handler';
 import { updateCommunityIdHandler } from '../routes/communities/update_community_id_handler';
 import exportMembersList from '../routes/exportMembersList';
+import { getFeedHandler } from '../routes/feed';
 import { createGroupHandler } from '../routes/groups/create_group_handler';
 import { deleteGroupHandler } from '../routes/groups/delete_group_handler';
 import { getGroupsHandler } from '../routes/groups/get_groups_handler';
@@ -619,6 +619,15 @@ function setupRouter(
     databaseValidationService.validateCommunity,
     getThreadsHandler.bind(this, serverControllers),
   );
+
+  registerRoute(
+    router,
+    'get',
+    '/feed',
+    databaseValidationService.validateCommunity,
+    getFeedHandler.bind(this, models, serverControllers),
+  );
+
   registerRoute(
     router,
     'get',

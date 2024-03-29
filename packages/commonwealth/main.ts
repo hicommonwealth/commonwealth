@@ -1,6 +1,7 @@
 import { CacheDecorator, setupErrorHandlers } from '@hicommonwealth/adapters';
 import { logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
+import { GlobalActivityCache } from '@hicommonwealth/model';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
@@ -26,7 +27,6 @@ import expressStatsInit from './server/scripts/setupExpressStats';
 import setupServer from './server/scripts/setupServer';
 import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
-import GlobalActivityCache from './server/util/globalActivityCache';
 import setupIpfsProxy from './server/util/ipfsProxy';
 import ViewCountCache from './server/util/viewCountCache';
 
@@ -173,7 +173,7 @@ export async function main(
   const banCache = new BanCache(db);
 
   // TODO: decouple as global singleton
-  const globalActivityCache = new GlobalActivityCache(db);
+  const globalActivityCache = GlobalActivityCache.getInstance(db);
   // initialize async to avoid blocking startup
   if (!noGlobalActivityCache) globalActivityCache.start();
 

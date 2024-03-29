@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 
 import app from 'state';
-import Thread, { Link, LinkDisplay, LinkSource } from '../../models/Thread';
-import { filterLinks, getAddedAndDeleted } from '../../helpers/threads';
-import { TemplateSelector } from '../components/TemplateActionSelector';
 import useAddThreadLinksMutation from 'state/api/threads/addThreadLinks';
 import useDeleteThreadLinksMutation from 'state/api/threads/deleteThreadLinks';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from 'views/components/component_kit/new_designs/CWModal';
+import { filterLinks, getAddedAndDeleted } from '../../helpers/threads';
+import Thread, { Link, LinkDisplay, LinkSource } from '../../models/Thread';
+import { TemplateSelector } from '../components/TemplateActionSelector';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
 
 type TemplateFormModalProps = {
   isOpen: boolean;
@@ -42,12 +42,12 @@ export const TemplateActionModal = ({
   const [contracts, setContracts] = useState<Array<any>>([]);
   const [loading, setLoading] = useState(false);
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: thread.id,
   });
 
   const { mutateAsync: deleteThreadLinks } = useDeleteThreadLinksMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: thread.id,
   });
 
@@ -61,7 +61,7 @@ export const TemplateActionModal = ({
 
   const handleTemplateSelect = (template: any) => {
     const isSelected = !!tempTemplates.find(
-      ({ identifier }) => String(template.id) === identifier
+      ({ identifier }) => String(template.id) === identifier,
     );
 
     setTempTemplates(
@@ -72,7 +72,7 @@ export const TemplateActionModal = ({
               identifier: `${template.id}`,
               title: template.name,
             },
-          ]
+          ],
     );
   };
 
@@ -82,7 +82,7 @@ export const TemplateActionModal = ({
     });
 
     const cct = contract.ccts.find(
-      (_cct) => String(_cct.templateId) === identifier
+      (_cct) => String(_cct.templateId) === identifier,
     );
 
     const newIdentifier = `${identifier}/${
@@ -97,7 +97,7 @@ export const TemplateActionModal = ({
       const { toAdd, toDelete } = getAddedAndDeleted(
         tempTemplates,
         getInitialTemplates(thread),
-        'identifier'
+        'identifier',
       );
 
       if (toAdd.length > 0) {
@@ -114,7 +114,7 @@ export const TemplateActionModal = ({
         });
 
         const updatedThread = await addThreadLinks({
-          chainId: app.activeChainId(),
+          communityId: app.activeChainId(),
           threadId: thread.id,
           links: updatedLinks,
         });
@@ -124,7 +124,7 @@ export const TemplateActionModal = ({
 
       if (toDelete.length > 0) {
         const updatedThread = await deleteThreadLinks({
-          chainId: app.activeChainId(),
+          communityId: app.activeChainId(),
           threadId: thread.id,
           links: toDelete.map(({ identifier }) => {
             const { newIdentifier } = getContractAndCct(identifier);

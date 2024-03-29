@@ -264,7 +264,7 @@ const BasicInformationForm = ({
               </CWText>
             </CWText>
             <CWText type="b1" className="description">
-              Add your Discord, Twitter (X), Telegram, Website, etc.
+              Add your Discord, X (Twitter), Telegram, Website, etc.
             </CWText>
           </section>
 

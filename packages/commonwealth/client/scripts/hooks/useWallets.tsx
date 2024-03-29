@@ -299,7 +299,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
       }
       if (app.chain) {
         const community =
-          app.user.selectedChain ||
+          app.user.selectedCommunity ||
           app.config.chains.getById(app.activeChainId());
         await updateActiveAddresses({
           chain: community,

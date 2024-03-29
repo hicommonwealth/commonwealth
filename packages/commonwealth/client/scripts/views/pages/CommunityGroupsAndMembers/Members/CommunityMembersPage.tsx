@@ -63,7 +63,7 @@ const CommunityMembersPage = () => {
     });
 
   const { data: memberships = null } = useRefreshMembershipQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     address: app?.user?.activeAccount?.address,
     apiEnabled: !!app?.user?.activeAccount?.address,
   });
@@ -82,7 +82,7 @@ const CommunityMembersPage = () => {
       limit: 30,
       order_by: APIOrderBy.LastActive,
       order_direction: APIOrderDirection.Desc,
-      search: '',
+      search: debouncedSearchTerm,
       community_id: app.activeChainId(),
       include_roles: true,
       ...(!['All groups', 'Ungrouped'].includes(
@@ -91,6 +91,9 @@ const CommunityMembersPage = () => {
         searchFilters.groupFilter && {
           memberships: `in-group:${searchFilters.groupFilter}`,
         }),
+      ...(searchFilters.groupFilter === 'Ungrouped' && {
+        memberships: 'not-in-group',
+      }),
       include_group_ids: true,
       // only include stake balances if community has staking enabled
       include_stake_balances: !!app.config.chains.getById(app.activeChainId())
@@ -100,9 +103,6 @@ const CommunityMembersPage = () => {
       initialCursor: 1,
       getNextPageParam: (lastPage) => lastPage.page + 1,
       enabled: app?.user?.activeAccount?.address ? !!memberships : true,
-      ...(searchFilters.groupFilter === 'Ungrouped' && {
-        includeMembershipTypes: 'not-in-group',
-      }),
     },
   );
 
@@ -368,7 +368,7 @@ const CommunityMembersPage = () => {
           filteredMembers={formattedMembers}
           onLoadMoreMembers={() => {
             if (members?.pages?.[0]?.totalResults > formattedMembers.length) {
-              fetchNextPage();
+              fetchNextPage?.().catch(console.error);
             }
           }}
           isLoadingMoreMembers={isLoadingMembers}
