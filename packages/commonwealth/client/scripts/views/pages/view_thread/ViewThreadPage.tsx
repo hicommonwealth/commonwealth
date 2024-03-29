@@ -394,16 +394,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         {/* Open Graph */}
         <meta property="og:title" content={thread.title} />
         <meta property="og:description" content={thread.body} />
+        <meta property="og:image" content={communityImage} />
         {/* Twitter */}
-        <meta name="twitter:card" content="summary" />
         <meta name="twitter:title" content={thread.title} />
         <meta name="twitter:site" content="@hicommonwealth" />
         <meta name="twitter:description" content={thread.body} />
         <meta name="twitter:card" content={communityImage} />
-        <meta
-          name="twitter:image:src"
-          content="https://commonwealth.im/static/img/branding/common.png"
-        />
+        <meta name="twitter:image:src" content={communityImage} />
       </Helmet>
 
       <CWContentPage
