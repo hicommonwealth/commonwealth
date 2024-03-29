@@ -34,6 +34,7 @@ export default (
       ss58: { type: dataTypes.INTEGER, allowNull: true },
       bech32: { type: dataTypes.STRING, allowNull: true },
       cosmos_gov_version: { type: dataTypes.STRING(64), allowNull: true },
+      block_explorer: { type: dataTypes.STRING, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
     },

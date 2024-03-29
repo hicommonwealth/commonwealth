@@ -130,7 +130,7 @@ export const CommentCard = ({
         ) : (
           <AuthorAndPublishInfo
             authorAddress={author.address}
-            authorChainId={author.community?.id || author?.profile?.chain}
+            authorCommunityId={author.community?.id || author?.profile?.chain}
             publishDate={comment.createdAt}
             discord_meta={comment.discord_meta}
             popoverPlacement="top"
