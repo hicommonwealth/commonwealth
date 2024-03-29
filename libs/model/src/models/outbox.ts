@@ -22,8 +22,19 @@ export default (
     'Outbox',
     {
       event_id: {
-        type: 'BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL',
-        // allowNull: false -> prevents `.create()` without defining event_id
+        /**
+         * This column is intentionally not a primary key in the DB. The primary
+         * key is set to true here only so that `sequelize.sync()` works. This
+         * is ok since the Outbox is not partitioned for tests. The primary key
+         * is not enforced on the actual database because you cannot have a
+         * primary key on a partitioned table. Additionally, setting
+         * autoIncrement without primaryKey: true is not possible so this
+         * ensures that sequelize leaves the generation of the event_id to the
+         * DB.
+         */
+        primaryKey: true,
+        type: dataTypes.BIGINT,
+        autoIncrement: true,
         autoIncrementIdentity: true,
         set() {
           throw new Error('event_id is read-only');
