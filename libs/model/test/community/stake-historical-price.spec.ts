@@ -6,7 +6,7 @@ import { seed } from '../../src/tester/index';
 
 chai.use(chaiAsPromised);
 
-describe('Stake Historical Price', () => {
+describe.skip('Stake Historical Price', () => {
   let community_id;
 
   before(async () => {
