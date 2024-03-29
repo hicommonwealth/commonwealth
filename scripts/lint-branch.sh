@@ -18,8 +18,8 @@ then
 else
     echo $LINES
     if [ -n "$FAIL_WARNINGS" ]; then
-        NODE_OPTIONS="--max-old-space-size=8192" eslint --max-warnings=0 $LINES --no-ignore
+        NODE_OPTIONS="--max-old-space-size=8192" eslint --fix --max-warnings=0 $LINES --no-ignore
     else
-        NODE_OPTIONS="--max-old-space-size=8192" eslint $LINES
+        NODE_OPTIONS="--max-old-space-size=8192" eslint --fix $LINES
     fi
 fi
