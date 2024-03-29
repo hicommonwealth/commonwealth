@@ -60,7 +60,8 @@ export async function processChainNode(
       const records = allEvents.map((event) => ({
         event_name: schemas.EventNames.ChainEventCreated,
         event_payload: {
-          event_name: schemas.EventNames.ChainEventCreated,
+          event_name: schemas.EventNames
+            .ChainEventCreated as typeof schemas.EventNames.ChainEventCreated,
           ...event,
         },
       }));
