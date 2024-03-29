@@ -29,7 +29,7 @@ export default (
     'Vote',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      poll_id: { type: dataTypes.INTEGER, allowNull: true },
+      poll_id: { type: dataTypes.INTEGER, allowNull: false },
       option: { type: dataTypes.STRING, allowNull: false },
       address: { type: Sequelize.STRING, allowNull: false },
       author_community_id: { type: Sequelize.STRING, allowNull: true },

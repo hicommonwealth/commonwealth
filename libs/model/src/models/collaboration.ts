@@ -36,13 +36,14 @@ export default (
   const Collaboration = <CollaborationModelStatic>sequelize.define(
     'Collaboration',
     {
+      id: { type: dataTypes.INTEGER, primaryKey: true },
       address_id: {
         type: dataTypes.INTEGER,
-        primaryKey: true,
+        allowNull: false,
       },
       thread_id: {
         type: dataTypes.INTEGER,
-        primaryKey: true,
+        allowNull: false,
       },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
@@ -60,10 +61,11 @@ export default (
     models.Collaboration.belongsTo(models.Address, {
       foreignKey: { name: 'thread_id', allowNull: false },
     });
-    models.Collaboration.belongsTo(models.Thread, {
-      foreignKey: { name: 'thread_id', allowNull: false },
-    });
+    models.Collaboration.belongsTo(models.Thread);
   };
+
+  // sequelize requires a PK on "id" column when defnining a model
+  Collaboration.removeAttribute('id');
 
   return Collaboration;
 };

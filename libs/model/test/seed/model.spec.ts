@@ -17,7 +17,6 @@ const generateSchemas = async () => {
     ignore_constraints: {
       // TODO: missing in migrations (removed FKs for performance reasons?)
       Addresses: ['FOREIGN KEY(profile_id)'],
-      Collaborations: ['PRIMARY KEY(address_id,thread_id)'],
       Comments: ['FOREIGN KEY(community_id)'],
       CommunityContracts: ['UNIQUE(community_id)'],
       CommunitySnapshotSpaces: [
@@ -52,10 +51,8 @@ const generateSchemas = async () => {
     },
     ignore_constraints: {
       // TODO: missing in model
-      Collaborations: ['FOREIGN KEY(address_id)', 'FOREIGN KEY(thread_id)'],
       CommunityStakes: ['FOREIGN KEY(community_id)'],
       LastProcessedEvmBlocks: ['FOREIGN KEY(chain_node_id)'],
-      //Memberships: ['FOREIGN KEY(address_id)', 'FOREIGN KEY(group_id)'],
       StakeTransactions: ['FOREIGN KEY(community_id,stake_id)'],
     },
   });

@@ -141,7 +141,6 @@ export default (
       created_at: { type: dataTypes.DATE, allowNull: true },
       updated_at: { type: dataTypes.DATE, allowNull: true },
       redirect: { type: dataTypes.TEXT, allowNull: true },
-      ce_verbose: { type: dataTypes.BOOLEAN, allowNull: true },
     },
     {
       tableName: 'Communities',
