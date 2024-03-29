@@ -159,8 +159,6 @@ export const GetMembers: Query<
               comparison = nameA.localeCompare(nameB);
             }
             break;
-          case 'groups':
-            break;
           case 'stakeBalance':
             {
               const balanceA = a.stake_balances?.[0] || 0;
