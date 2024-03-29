@@ -3,6 +3,8 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
+export const NODE_ENV = process.env.NODE_ENV || 'development';
+
 export const PORT = process.env.PORT || '8080';
 
 export const SERVER_URL =
@@ -107,3 +109,15 @@ export const ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS = process.env
   .ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS
   ? parseInt(process.env.ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS, 10)
   : 60;
+
+/*
+ * NOTE: (1000 / MESSAGE_RELAYER_TIMEOUT_MS) * MESSAGE_RELAYER_PREFETCH = the upperbound
+ * number of Outbox events (records) that can be processed per second.
+ * Defaults to 1000 events per second.
+ * This calculation does not account for the time it takes for messages to be
+ * fetched + published (hence upperbound assuming fetching + publishing takes 0ms).
+ */
+export const MESSAGE_RELAYER_TIMEOUT_MS =
+  parseInt(process.env.MESSAGE_RELAYER_TIME_MS) || 200;
+export const MESSAGE_RELAYER_PREFETCH =
+  parseInt(process.env.MESSAGE_RELAYER_PREFETCH) || 50;

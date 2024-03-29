@@ -114,7 +114,7 @@ export const ThreadCard = ({
           <div className="content-header">
             <AuthorAndPublishInfo
               authorAddress={thread.author}
-              authorChainId={thread.authorChain}
+              authorCommunityId={thread.authorCommunity}
               publishDate={thread.createdAt}
               isHot={isHot(thread)}
               isLocked={thread.readOnly}
@@ -126,6 +126,7 @@ export const ThreadCard = ({
               })}
               discord_meta={thread.discord_meta}
               archivedAt={thread.archivedAt}
+              profile={thread?.profile}
             />
             <div className="content-header-icons">
               {thread.pinned && <CWIcon iconName="pin" />}

@@ -40,13 +40,26 @@
       gap: 16px;
     }
 
-    .Searchbar {
-      &.container {
-        max-width: 700px;
+    .TextInput {
+      max-width: 700px;
 
-        @include smallInclusive {
-          max-width: 100%;
+      @include smallInclusive {
+        max-width: 100%;
+      }
+
+      .text-input-left-icon {
+        position: absolute;
+
+        .search-icon {
+          position: relative;
+          top: 14px !important;
+          left: 14px !important;
+          color: $neutral-400;
         }
+      }
+
+      .search-input {
+        padding-left: 48px !important;
       }
     }
 

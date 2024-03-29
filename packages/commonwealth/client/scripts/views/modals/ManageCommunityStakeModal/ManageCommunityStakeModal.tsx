@@ -19,6 +19,7 @@ const ManageCommunityStakeModal = ({
   onModalClose,
   mode,
   denomination,
+  community,
 }: ManageCommunityStakeModalProps) => {
   const [modalState, setModalState] = useState(
     ManageCommunityStakeModalState.Exchange,
@@ -27,7 +28,7 @@ const ManageCommunityStakeModal = ({
   const [numberOfStakeToExchange, setNumberOfStakeToExchange] = useState(1);
 
   const { selectedAddress, setSelectedAddress, addressOptions } =
-    useStakeAddresses();
+    useStakeAddresses({ community });
 
   const getModalBody = () => {
     switch (modalState) {
@@ -43,6 +44,7 @@ const ManageCommunityStakeModal = ({
             numberOfStakeToExchange={numberOfStakeToExchange}
             onSetNumberOfStakeToExchange={setNumberOfStakeToExchange}
             denomination={denomination}
+            community={community}
           />
         );
       case ManageCommunityStakeModalState.Loading:
