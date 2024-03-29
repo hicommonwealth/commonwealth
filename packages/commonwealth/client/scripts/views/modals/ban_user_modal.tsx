@@ -20,10 +20,7 @@ type BanUserModalAttrs = {
 };
 
 export const BanUserModal = ({ address, onModalClose }: BanUserModalAttrs) => {
-  const { mutateAsync: banUser } = useBanProfileByAddressMutation({
-    communityId: app.activeChainId(),
-    address: address,
-  });
+  const { mutateAsync: banUser } = useBanProfileByAddressMutation();
 
   const handleModalClose = (e) => {
     e.stopPropagation();

@@ -18,10 +18,7 @@ const banProfileByAddress = async ({
   });
 };
 
-const useBanProfileByAddressMutation = ({
-  communityId,
-  address,
-}: BanProfileByAddressProps) => {
+const useBanProfileByAddressMutation = () => {
   return useMutation({
     mutationFn: banProfileByAddress,
     onSuccess: async (response) => {
