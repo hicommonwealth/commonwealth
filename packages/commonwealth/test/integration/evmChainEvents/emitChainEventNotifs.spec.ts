@@ -3,7 +3,7 @@ import { type ChainNodeInstance, type DB } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { BigNumber, ethers } from 'ethers';
 import { emitChainEventNotifs } from '../../../server/workers/evmChainEvents/emitChainEventNotifs';
-import { RawEvmEvent } from '../../../server/workers/evmChainEvents/types';
+import { EvmEvent } from '../../../server/workers/evmChainEvents/types';
 import { sdk } from '../../devnet/evm/evmChainEvents/util';
 import {
   getTestChainNode,
@@ -16,7 +16,7 @@ describe('emitChainEventNotifs', () => {
 
   let chainNode: ChainNodeInstance;
   let emitSuccess = false;
-  const validEvent: RawEvmEvent = {
+  const validEvent: EvmEvent = {
     kind: 'proposal-created',
     contractAddress: sdk.contractAddrs.compound.governance,
     blockNumber: 1,
@@ -37,7 +37,7 @@ describe('emitChainEventNotifs', () => {
     let notifications = await models.Notification.findAll();
     expect(notifications.length).to.equal(0);
 
-    const events: RawEvmEvent[] = [
+    const events: EvmEvent[] = [
       validEvent,
       {
         kind: 'proposal-created',

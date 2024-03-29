@@ -12,8 +12,8 @@ import {
 } from '../../../../server/workers/evmChainEvents/logProcessing';
 import {
   ContractSources,
+  EvmEvent,
   EvmSource,
-  RawEvmEvent,
 } from '../../../../server/workers/evmChainEvents/types';
 import {
   compoundPropCreatedSignature,
@@ -258,7 +258,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
         logIndex: 1,
       };
 
-      let events: RawEvmEvent[];
+      let events: EvmEvent[];
       try {
         events = await parseLogs(evmSource.contracts, [
           fakeLog,

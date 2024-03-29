@@ -130,6 +130,7 @@ export default (
         defaultValue: 0,
       },
       namespace: { type: dataTypes.STRING, allowNull: true },
+      namespace_address: { type: dataTypes.STRING, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: true },
       updated_at: { type: dataTypes.DATE, allowNull: true },
       redirect: { type: dataTypes.TEXT, allowNull: true },

@@ -748,6 +748,9 @@ const hashInstance = hasher({
   enc: 'hex',
 });
 
+const namespaceFactoryHash = hashInstance.hash(namespaceFactoryAbi);
+const communityStakesHash = hashInstance.hash(communityStakesAbi);
+
 async function uploadABIs(queryInterface, transaction) {
   // upload NamespaceFactory contract ABI
   const namespaceFactoryAbiId = (
@@ -770,7 +773,7 @@ async function uploadABIs(queryInterface, transaction) {
         replacements: {
           abi: JSON.stringify(namespaceFactoryAbi),
           nickname: 'NamespaceFactory',
-          abi_hash: hashInstance.hash(namespaceFactoryAbi),
+          abi_hash: namespaceFactoryHash,
         },
       },
     )
@@ -796,7 +799,7 @@ async function uploadABIs(queryInterface, transaction) {
         replacements: {
           abi: JSON.stringify(communityStakesAbi),
           nickname: 'CommunityStakes',
-          abi_hash: hashInstance.hash(communityStakesAbi),
+          abi_hash: communityStakesHash,
         },
       },
     )
@@ -1019,6 +1022,16 @@ module.exports = {
         },
         { transaction },
       );
+
+      await queryInterface.addColumn(
+        'Communities',
+        'namespace_address',
+        {
+          type: Sequelize.STRING,
+          allowNull: true,
+        },
+        { transaction },
+      );
     });
   },
 
@@ -1027,8 +1040,7 @@ module.exports = {
       await queryInterface.bulkDelete(
         'EvmEventSources',
         {
-          event_signature: deployedNamespaceEventSignature,
-          kind,
+          kind: ['DeployedNamespace', 'Trade'],
         },
         { transaction },
       );
@@ -1045,11 +1057,14 @@ module.exports = {
       await queryInterface.removeColumn('EvmEventSources', 'abi_id', {
         transaction,
       });
+      await queryInterface.removeColumn('Communities', 'namespace_address', {
+        transaction,
+      });
 
       await queryInterface.bulkDelete(
         'ContractAbis',
         {
-          abi_hash,
+          abi_hash: [namespaceFactoryHash, communityStakesHash],
         },
         { transaction },
       );

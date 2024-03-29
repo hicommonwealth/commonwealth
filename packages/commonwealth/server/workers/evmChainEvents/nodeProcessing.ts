@@ -2,7 +2,7 @@ import { logger, schemas, stats } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
 import { getEventSources } from './getEventSources';
 import { getEvents, migrateEvents } from './logProcessing';
-import { EvmSource, RawEvmEvent } from './types';
+import { EvmEvent, EvmSource } from './types';
 
 const log = logger().getLogger(__filename);
 
@@ -36,7 +36,7 @@ export async function processChainNode(
       ? startBlock.block_number + 1
       : null;
 
-    const allEvents: RawEvmEvent[] = [];
+    const allEvents: EvmEvent[] = [];
     const migratedData = await migrateEvents(evmSource, startBlockNum);
     if (migratedData) allEvents.concat(migratedData.events);
 

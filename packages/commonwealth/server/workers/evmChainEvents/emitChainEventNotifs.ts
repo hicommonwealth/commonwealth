@@ -12,13 +12,13 @@ import {
 } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import emitNotifications from '../../util/emitNotifications';
-import { RawEvmEvent } from './types';
+import { EvmEvent } from './types';
 
 const log = logger().getLogger(__filename);
 
 export async function emitChainEventNotifs(
   chainNodeId: number,
-  events: RawEvmEvent[],
+  events: EvmEvent[],
 ): Promise<Promise<void | NotificationInstance>[]> {
   if (!events.length) {
     return [];

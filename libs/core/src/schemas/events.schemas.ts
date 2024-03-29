@@ -47,9 +47,24 @@ export const DiscordMessageCreated = z.object({
   ]),
 });
 
+/**
+ * Zod schema for EvmEvent type defined in workers/evmChainEvents/types.ts
+ */
 export const ChainEventCreated = z.object({
-  kind: z.string(),
-  contractAddress: z.string(),
-  blockNumber: z.number(),
-  args: z.any(), // ChainEvent args are both an object and an array
+  eventSource: z.object({
+    kind: z.string(),
+    chainNodeId: z.number(),
+  }),
+  parsedArgs: z.any(),
+  rawLog: z.object({
+    blockNumber: z.number(),
+    blockHash: z.string(),
+    transactionIndex: z.string(),
+    removed: z.boolean(),
+    address: z.string(),
+    data: z.string(),
+    topics: z.array(z.string()),
+    transactionHash: z.string(),
+    logIndex: z.number(),
+  }),
 });

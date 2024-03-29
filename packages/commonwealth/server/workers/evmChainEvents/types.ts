@@ -1,12 +1,15 @@
+import { Log } from '@ethersproject/providers';
 import { AbiType } from '@hicommonwealth/core';
 import { EvmEventSourceAttributes } from '@hicommonwealth/model';
 import { ethers } from 'ethers';
 
-export type RawEvmEvent = {
-  kind: string;
-  contractAddress: string;
-  blockNumber: number;
-  args: ethers.utils.Result;
+export type EvmEvent = {
+  eventSource: {
+    kind: string;
+    chainNodeId: number;
+  };
+  parsedArgs: ethers.utils.Result;
+  rawLog: Log;
 };
 
 export type AbiSignatures = {

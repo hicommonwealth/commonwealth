@@ -34,7 +34,7 @@ export const CreateStakeTransaction: Command<
       include: [
         {
           model: models.ChainNode,
-          attributes: ['eth_chain_id', 'url'],
+          attributes: ['eth_chain_id', 'url', 'private_url'],
         },
       ],
     });
@@ -51,7 +51,9 @@ export const CreateStakeTransaction: Command<
       throw Error('Chain does not have deployed namespace factory');
     }
 
-    const web3 = new Web3(community!.ChainNode!.url);
+    const web3 = new Web3(
+      community!.ChainNode!.private_url || community!.ChainNode!.url,
+    );
 
     const communityStakeAddress: string =
       commonProtocol.factoryContracts[

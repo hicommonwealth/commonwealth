@@ -1,12 +1,7 @@
 import { Log } from '@ethersproject/providers';
 import { logger as _logger, stats } from '@hicommonwealth/core';
 import { ethers } from 'ethers';
-import {
-  AbiSignatures,
-  ContractSources,
-  EvmSource,
-  RawEvmEvent,
-} from './types';
+import { AbiSignatures, ContractSources, EvmEvent, EvmSource } from './types';
 
 const logger = _logger().getLogger(__filename);
 const MAX_OLD_BLOCKS = 10;
@@ -80,16 +75,16 @@ export async function getLogs({
 export async function parseLogs(
   sources: ContractSources,
   logs: Log[],
-): Promise<RawEvmEvent[]> {
-  const events: RawEvmEvent[] = [];
+): Promise<EvmEvent[]> {
+  const events: EvmEvent[] = [];
   const interfaces = {};
   for (const log of logs) {
     const address = ethers.utils.getAddress(log.address);
     const data: AbiSignatures = sources[address];
-    const signature = data.sources.find(
+    const evmEventSource = data.sources.find(
       (s) => s.event_signature === log.topics[0],
     );
-    if (!signature) continue;
+    if (!evmEventSource) continue;
 
     if (!data.abi || !Array.isArray(data.abi) || data.abi.length === 0) {
       logger.error(`Invalid ABI for contract ${address}`);
@@ -110,13 +105,15 @@ export async function parseLogs(
     }
     stats().increment('ce.evm.event', {
       contractAddress: address,
-      kind: signature.kind,
+      kind: evmEventSource.kind,
     });
     events.push({
-      contractAddress: address,
-      kind: signature.kind,
-      blockNumber: parseInt(log.blockNumber.toString(), 16),
-      args: parsedLog.args,
+      eventSource: {
+        kind: evmEventSource.kind,
+        chainNodeId: evmEventSource.chain_node_id,
+      },
+      parsedArgs: parsedLog.args,
+      rawLog: log,
     });
   }
 
@@ -127,7 +124,7 @@ export async function getEvents(
   evmSource: EvmSource,
   startingBlockNum?: number,
   endingBlockNum?: number,
-): Promise<{ events: RawEvmEvent[]; lastBlockNum: number }> {
+): Promise<{ events: EvmEvent[]; lastBlockNum: number }> {
   const { logs, lastBlockNum } = await getLogs({
     rpc: evmSource.rpc,
     contractAddresses: Object.keys(evmSource.contracts),
@@ -148,7 +145,7 @@ export async function getEvents(
 export async function migrateEvents(
   evmSource: EvmSource,
   endingBlockNum: number,
-): Promise<{ events: RawEvmEvent[]; lastBlockNum: number } | undefined> {
+): Promise<{ events: EvmEvent[]; lastBlockNum: number } | undefined> {
   let oldestBlock: number;
   const contracts: ContractSources = {};
   for (const [contractAddress, abiSignature] of Object.entries(
