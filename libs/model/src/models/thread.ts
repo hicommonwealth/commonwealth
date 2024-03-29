@@ -213,7 +213,7 @@ export default (
       as: 'reactions',
     });
     models.Thread.hasMany(models.Collaboration, {
-      foreignKey: { name: 'thread_id', allowNull: false },
+      foreignKey: { name: 'thread_id' },
     });
     models.Thread.hasMany(models.Poll, {
       foreignKey: 'thread_id',

@@ -59,7 +59,7 @@ export default (
 
   Collaboration.associate = (models) => {
     models.Collaboration.belongsTo(models.Address, {
-      foreignKey: { name: 'thread_id', allowNull: false },
+      foreignKey: { name: 'thread_id' },
     });
     models.Collaboration.belongsTo(models.Thread);
   };

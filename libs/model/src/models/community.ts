@@ -183,7 +183,7 @@ export default (
       foreignKey: 'community_id',
     });
     models.Community.hasMany(models.CommunityStake, {
-      foreignKey: 'community_id',
+      foreignKey: { name: 'community_id' },
     });
   };
 
