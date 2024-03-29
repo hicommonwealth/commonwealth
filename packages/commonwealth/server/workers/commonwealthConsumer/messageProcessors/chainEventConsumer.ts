@@ -23,7 +23,7 @@ const namespaceFactoryContractAddresses = Object.values(
   commonProtocol.factoryContracts,
 ).map((c) => c.factory.toLowerCase());
 
-async function handleDeployedNamespace(
+function handleDeployedNamespace(
   event: z.infer<typeof schemas.events.ChainEventCreated>,
 ) {
   log.info('Implementation not defined', undefined, { event });
@@ -161,7 +161,7 @@ export const processChainEventCreated: EventHandler<
   if (communityStakeContractAddresses.includes(contractAddress)) {
     await handleCommunityStakeTrades(payload);
   } else if (namespaceFactoryContractAddresses.includes(contractAddress)) {
-    await handleDeployedNamespace(payload);
+    handleDeployedNamespace(payload);
   } else if (payload.eventSource.kind.includes('proposal')) {
     await handleProposalEvents(payload);
   } else {
