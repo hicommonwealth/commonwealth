@@ -99,7 +99,7 @@ const CommunityMembersPage = () => {
         header: 'Stake',
         hasCustomSortValue: true,
         numeric: true,
-        sortable: false,
+        sortable: true,
         hidden: !isStakedCommunity,
       },
       {

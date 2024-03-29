@@ -73,11 +73,11 @@ const MembersSection = ({
           stakeBalance: {
             sortValue: parseInt(member.stakeBalance || '0', 10),
             customElement: (
-              <div className="table-cell">{member.stakeBalance}</div>
+              <div className="table-cell text-right">{member.stakeBalance}</div>
             ),
           },
           lastActive: {
-            sortValue: -moment(member.lastActive).unix(),
+            sortValue: moment(member.lastActive).unix(),
             customElement: (
               <div className="table-cell">
                 {moment(member.lastActive).fromNow()}

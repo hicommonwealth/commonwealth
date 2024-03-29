@@ -164,7 +164,7 @@ export const GetMembers: Query<
               const balanceA = a.stake_balances?.[0] || 0;
               const balanceB = b.stake_balances?.[0] || 0;
               comparison =
-                balanceA === balanceB ? 0 : balanceA > balanceB ? 1 : -1;
+                balanceA === balanceB ? 0 : balanceA < balanceB ? 1 : -1;
             }
             break;
           case 'lastActive':
@@ -173,7 +173,7 @@ export const GetMembers: Query<
             const lastActiveB = moment(b.last_active);
             comparison = lastActiveA.isSame(lastActiveB)
               ? 0
-              : lastActiveA.isBefore(lastActiveB)
+              : lastActiveA.isAfter(lastActiveB)
               ? 1
               : -1;
           }
