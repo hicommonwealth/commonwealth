@@ -91,6 +91,7 @@ export const CommunityMember = z.object({
   ),
   roles: z.array(z.string()).optional(),
   group_ids: z.array(z.number().int()),
+  last_active: z.any().optional().nullable().describe('string or date'),
 });
 
 const ContractSource = z.object({

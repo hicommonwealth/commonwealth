@@ -152,16 +152,35 @@ export const GetMembers: Query<
       .sort((a, b) => {
         let comparison = 0;
         switch (payload.order_by) {
-          case 'created_at':
-            comparison = moment(a.created_at).isAfter(b.created_at) ? 1 : -1;
+          case 'name':
+            {
+              const nameA = a.profile_name || '';
+              const nameB = b.profile_name || '';
+              comparison = nameA.localeCompare(nameB);
+            }
             break;
-          case 'profile_name':
-            comparison = a.profile_name.localeCompare(b.profile_name);
+          case 'groups':
             break;
-          default:
-            comparison = moment(a.last_active).isAfter(b.last_active) ? 1 : -1;
+          case 'stakeBalance':
+            {
+              const balanceA = a.stake_balances?.[0] || 0;
+              const balanceB = b.stake_balances?.[0] || 0;
+              comparison =
+                balanceA === balanceB ? 0 : balanceA > balanceB ? 1 : -1;
+            }
+            break;
+          case 'lastActive':
+          default: {
+            const lastActiveA = moment(a.last_active);
+            const lastActiveB = moment(b.last_active);
+            comparison = lastActiveA.isSame(lastActiveB)
+              ? 0
+              : lastActiveA.isBefore(lastActiveB)
+              ? 1
+              : -1;
+          }
         }
-        return payload.order_direction === 'DESC' ? -comparison : comparison;
+        return payload.order_direction === 'ASC' ? -comparison : comparison;
       })
       .slice(
         (payload.cursor - 1) * payload.limit,
@@ -187,6 +206,7 @@ export const GetMembers: Query<
         }),
         roles: [] as string[],
         group_ids: [] as number[],
+        last_active: profile.last_active,
       };
     });
 
@@ -251,7 +271,6 @@ export const GetMembers: Query<
         );
       }
     }
-
     return schemas.queries.buildPaginatedResponse(
       profilesWithAddresses,
       totalResults,

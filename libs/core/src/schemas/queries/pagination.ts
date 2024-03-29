@@ -11,7 +11,7 @@ export const PaginationParamsSchema = z.object({
     .describe(
       'required for tRPC useInfiniteQuery hook, equivalent to page number',
     ),
-  order_by: z.string().optional(),
+  order_by: z.enum(['name', 'groups', 'stakeBalance', 'lastActive']).optional(),
   order_direction: z.enum(['ASC', 'DESC']).optional(),
 });
 

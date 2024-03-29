@@ -1,10 +1,11 @@
-import { useCallback, useMemo, useState } from 'react';
+import { APIOrderDirection } from 'client/scripts/helpers/constants';
+import { useMemo, useState } from 'react';
 import { CWTableColumnInfo, CWTableSorting } from './CWTable';
 
 type UseCWTableStateProps = {
   columns: CWTableColumnInfo[];
   initialSortColumn?: string;
-  initialSortDirection: 'ASC' | 'DESC';
+  initialSortDirection: APIOrderDirection;
 };
 
 export type CWTableState = {
@@ -13,7 +14,6 @@ export type CWTableState = {
   orderDirection: string;
   sorting: CWTableSorting;
   setSorting: (newSorting: CWTableSorting) => void;
-  toggleSortDirection: (column: string) => void;
 };
 
 export function useCWTableState({
@@ -43,24 +43,11 @@ export function useCWTableState({
     };
   }, [sorting, initialSortColumn, initialSortDirection]);
 
-  const toggleSortDirection = useCallback(
-    (column) => {
-      const newSorting = sorting.map((sortState) =>
-        sortState.id === column
-          ? { ...sortState, desc: !sortState.desc }
-          : sortState,
-      );
-      setSorting(newSorting);
-    },
-    [sorting, setSorting],
-  );
-
   return {
     columns,
     orderBy,
     orderDirection,
     sorting,
     setSorting,
-    toggleSortDirection,
   };
 }

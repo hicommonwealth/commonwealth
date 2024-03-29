@@ -1,4 +1,5 @@
 import { CWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
+import moment from 'moment';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Permissions from 'utils/Permissions';
@@ -14,6 +15,7 @@ type Member = {
   role: 'admin' | 'moderator' | '';
   groups: string[];
   stakeBalance?: string;
+  lastActive?: string;
 };
 
 type MembersSectionProps = {
@@ -71,8 +73,14 @@ const MembersSection = ({
           stakeBalance: {
             sortValue: parseInt(member.stakeBalance || '0', 10),
             customElement: (
-              <div className="table-cell last-column">
-                {member.stakeBalance}
+              <div className="table-cell">{member.stakeBalance}</div>
+            ),
+          },
+          lastActive: {
+            sortValue: -moment(member.lastActive).unix(),
+            customElement: (
+              <div className="table-cell">
+                {moment(member.lastActive).fromNow()}
               </div>
             ),
           },

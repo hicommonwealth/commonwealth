@@ -1,3 +1,4 @@
+import { APIOrderDirection } from 'client/scripts/helpers/constants';
 import { trpc } from 'client/scripts/utils/trpcClient';
 import { useCWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
@@ -80,7 +81,7 @@ const CommunityMembersPage = () => {
   const tableState = useCWTableState({
     columns: [
       {
-        key: 'profile_name',
+        key: 'name',
         header: 'Name',
         hasCustomSortValue: true,
         numeric: false,
@@ -101,9 +102,16 @@ const CommunityMembersPage = () => {
         sortable: false,
         hidden: !isStakedCommunity,
       },
+      {
+        key: 'lastActive',
+        header: 'Last Active',
+        hasCustomSortValue: true,
+        numeric: false,
+        sortable: true,
+      },
     ],
-    initialSortColumn: 'name',
-    initialSortDirection: 'ASC',
+    initialSortColumn: 'lastActive',
+    initialSortDirection: APIOrderDirection.Desc,
   });
 
   const {
@@ -193,6 +201,7 @@ const CommunityMembersPage = () => {
           .filter(Boolean)
           .sort((a, b) => a.localeCompare(b)),
         stakeBalance: p.addresses[0].stake_balance,
+        lastActive: p.last_active,
       }))
       .filter((p) =>
         debouncedSearchTerm
