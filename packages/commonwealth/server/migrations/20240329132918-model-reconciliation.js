@@ -125,7 +125,7 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    return queryInterface.sequelize.transaction(async (transaction) => {
+    return queryInterface.sequelize.transaction((transaction) => {
       return Promise.all([
         queryInterface.removeConstraint(
           'Collaborations',
