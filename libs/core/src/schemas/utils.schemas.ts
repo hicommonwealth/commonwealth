@@ -36,3 +36,12 @@ export const linksSchema = {
   identifier: z.string(),
   title: z.string().nullable().optional(),
 };
+
+export enum EventNames {
+  ThreadCreated = 'ThreadCreated',
+  CommentCreated = 'CommentCreated',
+  GroupCreated = 'GroupCreated',
+  CommunityCreated = 'CommunityCreated',
+  SnapshotProposalCreated = 'SnapshotProposalCreated',
+  DiscordMessageCreated = 'DiscordMessageCreated',
+}

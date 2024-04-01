@@ -51,6 +51,7 @@ export const NewSnapshotProposalForm = ({
   const [, setSnapshotScoresFetched] = useState<boolean>(false);
   const [space, setSpace] = useState<SnapshotSpace | null>(null);
   const [userScore, setUserScore] = useState<number>(0);
+  const [errorMessage, setErrorMessage] = useState(false);
 
   const location = useLocation();
   const pathVars = useMemo(() => {
@@ -96,9 +97,11 @@ export const NewSnapshotProposalForm = ({
 
   useEffect(() => {
     const init = async () => {
-      await app.snapshot.init(snapshotId);
+      const snapshotNullResponse = await app.snapshot.init(snapshotId);
+      if (snapshotNullResponse === null) {
+        setErrorMessage(true);
+      }
     };
-
     // Add event listener for SnapshotController
     const handleInitialized = async () => {
       if (!app.snapshot.initialized) {
@@ -145,6 +148,7 @@ export const NewSnapshotProposalForm = ({
           const communityId = app.activeChainId();
           const threadId = thread.id;
 
+          // eslint-disable-next-line max-len
           const linkText = `\n\nThis conversation was started on Commonwealth. Any attached images have been removed. See more discussion: `;
           const linkUrl = `\n${domain}/${communityId}/discussion/${threadId}`;
 
@@ -176,11 +180,13 @@ export const NewSnapshotProposalForm = ({
     };
 
     init();
+
     app.snapshot.snapshotEmitter.on('initialized', handleInitialized);
 
     return () => {
       app.snapshot.snapshotEmitter.off('initialized', handleInitialized);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const author = app.user.activeAccount;
@@ -212,9 +218,16 @@ export const NewSnapshotProposalForm = ({
   return (
     <div className="NewSnapshotProposalForm">
       {loading ? (
-        <div className="proposal-loading">
-          <CWCircleMultiplySpinner />
-        </div>
+        errorMessage ? (
+          <CWText className="error-text">
+            Snapshot space not found. Check your Snapshot space name and try
+            again.
+          </CWText>
+        ) : (
+          <div className="proposal-loading">
+            <CWCircleMultiplySpinner />
+          </div>
+        )
       ) : (
         <>
           {space.filters?.onlyMembers && !isMember && (

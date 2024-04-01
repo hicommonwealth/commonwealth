@@ -21,81 +21,12 @@ import {
   delay,
   dispose,
 } from '@hicommonwealth/core';
-import { models, tester, tokenBalanceCache } from '@hicommonwealth/model';
+import { tester, tokenBalanceCache, type DB } from '@hicommonwealth/model';
 import BN from 'bn.js';
 import { use as chaiUse, expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
 chaiUse(chaiAsPromised);
-
-const resetChainNodes = async (): Promise<void> => {
-  const stargazeChainNode = await models.ChainNode.findOne({
-    where: {
-      cosmos_chain_id: 'stargaze',
-    },
-  });
-  const junoChainNode = await models.ChainNode.findOne({
-    where: {
-      cosmos_chain_id: 'juno',
-    },
-  });
-
-  if (stargazeChainNode) {
-    await models.ChainNode.update(
-      {
-        url: 'https://rpc.cosmos.directory/stargaze',
-      },
-      {
-        where: {
-          cosmos_chain_id: 'stargaze',
-        },
-      },
-    );
-  } else {
-    const stargazeNode = await models.ChainNode.create({
-      url: 'https://rpc.cosmos.directory/stargaze',
-      name: 'Stargaze',
-      balance_type: BalanceType.Cosmos,
-      cosmos_chain_id: 'stargaze',
-      bech32: 'stars',
-      cosmos_gov_version: CosmosGovernanceVersion.v1,
-    });
-    await models.Community.create({
-      id: 'stargaze',
-      network: ChainNetwork.Stargaze,
-      default_symbol: 'STARS',
-      name: 'Stargaze',
-      icon_url: '/static/img/protocols/cosmos.png',
-      active: true,
-      type: ChainType.Chain,
-      base: ChainBase.CosmosSDK,
-      has_chain_events_listener: true,
-      chain_node_id: stargazeNode.id,
-      bech32_prefix: 'stars',
-    });
-  }
-
-  if (junoChainNode) {
-    await models.ChainNode.update(
-      {
-        url: 'https://rpc.cosmos.directory/juno',
-      },
-      {
-        where: {
-          cosmos_chain_id: 'juno',
-        },
-      },
-    );
-  } else {
-    await models.ChainNode.create({
-      url: 'https://rpc.cosmos.directory/juno',
-      name: 'Juno',
-      balance_type: BalanceType.Cosmos,
-      cosmos_chain_id: 'juno',
-      bech32: 'juno',
-    });
-  }
-};
 
 // same mnemonic as defined in cosmos-chain-testing bootstrap files
 const addressOneMnemonic =
@@ -123,8 +54,79 @@ describe('Token Balance Cache Cosmos Tests', function () {
   const addressOneBalance = '50000000000';
   const addressTwoBalance = '30000000000';
 
+  let models: DB;
+
+  const resetChainNodes = async (): Promise<void> => {
+    const stargazeChainNode = await models.ChainNode.findOne({
+      where: {
+        cosmos_chain_id: 'stargaze',
+      },
+    });
+    const junoChainNode = await models.ChainNode.findOne({
+      where: {
+        cosmos_chain_id: 'juno',
+      },
+    });
+
+    if (stargazeChainNode) {
+      await models.ChainNode.update(
+        {
+          url: 'https://rpc.cosmos.directory/stargaze',
+        },
+        {
+          where: {
+            cosmos_chain_id: 'stargaze',
+          },
+        },
+      );
+    } else {
+      const stargazeNode = await models.ChainNode.create({
+        url: 'https://rpc.cosmos.directory/stargaze',
+        name: 'Stargaze',
+        balance_type: BalanceType.Cosmos,
+        cosmos_chain_id: 'stargaze',
+        bech32: 'stars',
+        cosmos_gov_version: CosmosGovernanceVersion.v1,
+      });
+      await models.Community.create({
+        id: 'stargaze',
+        network: ChainNetwork.Stargaze,
+        default_symbol: 'STARS',
+        name: 'Stargaze',
+        icon_url: '/static/img/protocols/cosmos.png',
+        active: true,
+        type: ChainType.Chain,
+        base: ChainBase.CosmosSDK,
+        has_chain_events_listener: true,
+        chain_node_id: stargazeNode.id,
+        bech32_prefix: 'stars',
+      });
+    }
+
+    if (junoChainNode) {
+      await models.ChainNode.update(
+        {
+          url: 'https://rpc.cosmos.directory/juno',
+        },
+        {
+          where: {
+            cosmos_chain_id: 'juno',
+          },
+        },
+      );
+    } else {
+      await models.ChainNode.create({
+        url: 'https://rpc.cosmos.directory/juno',
+        name: 'Juno',
+        balance_type: BalanceType.Cosmos,
+        cosmos_chain_id: 'juno',
+        bech32: 'juno',
+      });
+    }
+  };
+
   before(async () => {
-    await tester.seedDb();
+    models = await tester.seedDb();
     cache(new RedisCache('redis://localhost:6379'));
     await cache().ready();
     await resetChainNodes();

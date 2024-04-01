@@ -1,6 +1,5 @@
 /* eslint-disable no-unused-expressions */
-import { ChainBase } from '@hicommonwealth/core';
-import { tester } from '@hicommonwealth/model';
+import { ChainBase, dispose } from '@hicommonwealth/core';
 import { personalSign } from '@metamask/eth-sig-util';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
@@ -8,27 +7,32 @@ import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
 import { bech32ToHex } from 'shared/utils';
 import * as siwe from 'siwe';
-import app from '../../../server-test';
+import { TestServer, testServer } from '../../../server-test';
 import {
   TEST_BLOCK_INFO_BLOCKHASH,
   TEST_BLOCK_INFO_STRING,
   createSiweMessage,
 } from '../../../shared/adapters/chain/ethereum/keys';
 import { createCanvasSessionPayload } from '../../../shared/canvas';
-import * as modelUtils from '../../util/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('API Tests', () => {
+  let server: TestServer;
+
   before('reset database', async () => {
-    await tester.seedDb();
+    server = await testServer();
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   describe('address tests', () => {
     it('should call the /api/status route', async () => {
       const res = await chai
-        .request(app)
+        .request(server.app)
         .get('/api/status')
         .set('Accept', 'application/json');
       expect(res.body).to.not.be.null;
@@ -40,7 +44,7 @@ describe('API Tests', () => {
       const chain = 'ethereum';
       const wallet_id = 'metamask';
       const res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/createAddress')
         .set('Accept', 'application/json')
         .send({
@@ -63,7 +67,7 @@ describe('API Tests', () => {
       const community_id = 'osmosis';
       const wallet_id = 'keplr';
       const res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/createAddress')
         .set('Accept', 'application/json')
         .send({
@@ -82,11 +86,11 @@ describe('API Tests', () => {
     });
 
     it('should verify an ETH address', async () => {
-      const { keypair, address } = modelUtils.generateEthAddress();
+      const { keypair, address } = server.seeder.generateEthAddress();
       const community_id = 'ethereum';
       const wallet_id = 'metamask';
       let res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/createAddress')
         .set('Accept', 'application/json')
         .send({
@@ -114,7 +118,7 @@ describe('API Tests', () => {
       const signatureData = personalSign({ privateKey, data: siweMessage });
       const signature = `${domain}/${nonce}/${signatureData}`;
       res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/verifyAddress')
         .set('Accept', 'application/json')
         .send({

@@ -65,16 +65,6 @@ import { LinkedThreadsCard } from './linked_threads_card';
 import { LockMessage } from './lock_message';
 import { SnapshotCreationCard } from './snapshot_creation_card';
 
-export type ThreadPrefetch = {
-  [identifier: string]: {
-    pollsStarted?: boolean;
-    profilesFinished: boolean;
-    profilesStarted: boolean;
-    viewCountStarted?: boolean;
-    threadReactionsStarted?: boolean;
-  };
-};
-
 type ViewThreadPageProps = {
   identifier: string;
 };
@@ -119,7 +109,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     error: fetchThreadError,
     isLoading,
   } = useGetThreadsByIdQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     ids: [+threadId].filter(Boolean),
     apiCallEnabled: !!threadId, // only call the api if we have thread id
   });
@@ -135,12 +125,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     });
 
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: parseInt(threadId),
   });
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     address: app?.user?.activeAccount?.address,
     apiEnabled: !!app?.user?.activeAccount?.address,
   });
@@ -338,7 +328,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     if (toAdd.length > 0) {
       try {
         await addThreadLinks({
-          chainId: app.activeChainId(),
+          communityId: app.activeChainId(),
           threadId: thread.id,
           links: toAdd,
         });

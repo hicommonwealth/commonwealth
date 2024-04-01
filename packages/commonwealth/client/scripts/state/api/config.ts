@@ -29,6 +29,7 @@ export const ApiEndpoints = {
   searchComments: (searchTerm: string) => `/comments?search=${searchTerm}`,
   searchProfiles: (searchTerm: string) => `/profiles?search=${searchTerm}`,
   searchChains: (searchTerm: string) => `/communities?search=${searchTerm}`,
+  REMOVE_DISCORD_BOT_CONFIG: '/removeDiscordBotConfig',
 };
 
 export const ContractMethods = {

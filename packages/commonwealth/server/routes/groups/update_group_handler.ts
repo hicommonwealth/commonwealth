@@ -1,12 +1,12 @@
-import { AppError, Requirement } from '@hicommonwealth/core';
-import { GroupAttributes, GroupMetadata, models } from '@hicommonwealth/model';
+import { AppError, Requirement, schemas } from '@hicommonwealth/core';
+import { GroupAttributes, models } from '@hicommonwealth/model';
 import z from 'zod';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
 type UpdateGroupParams = { id: string };
 type UpdateGroupBody = {
-  metadata: GroupMetadata;
+  metadata: z.infer<typeof schemas.entities.GroupMetadata>;
   requirements: Requirement[];
   topics?: number[];
 };

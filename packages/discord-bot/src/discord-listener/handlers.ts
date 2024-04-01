@@ -1,8 +1,10 @@
 import {
-  RabbitMQController,
-  RascalPublications,
-} from '@hicommonwealth/adapters';
-import { DiscordAction, IDiscordMessage, logger } from '@hicommonwealth/core';
+  Broker,
+  BrokerTopics,
+  DiscordAction,
+  EventContext,
+  logger,
+} from '@hicommonwealth/core';
 import { Client, Message, ThreadChannel } from 'discord.js';
 import { getImageUrls } from '../discord-listener/util';
 import { getForumLinkedTopic } from '../utils/util';
@@ -10,7 +12,7 @@ import { getForumLinkedTopic } from '../utils/util';
 const log = logger().getLogger(__filename);
 
 export async function handleMessage(
-  controller: RabbitMQController,
+  controller: Broker,
   client: Client,
   message: Partial<Message>,
   action: DiscordAction,
@@ -18,6 +20,8 @@ export async function handleMessage(
   log.info(
     `Discord message received from channel ID: ${message.channelId} with action: ${action}`,
   );
+  let event: EventContext<'DiscordMessageCreated'>;
+
   try {
     // 1. Filter for designated forum channels
     const channel = client.channels.cache.get(message.channelId);
@@ -31,39 +35,46 @@ export async function handleMessage(
     if (!topicId) return;
 
     // 2. Figure out if message is comment or thread
-    const new_message: IDiscordMessage = {
-      user: {
-        id: message.author?.id ?? null,
-        username: message.author?.username ?? null,
+    event = {
+      name: 'DiscordMessageCreated',
+      payload: {
+        user: {
+          id: message.author?.id ?? null,
+          username: message.author?.username ?? null,
+        },
+        // If title is nothing == comment. channel_id will correspond to the thread channel id.
+        content: message.content ?? null,
+        message_id: message.id ?? null,
+        channel_id: message.channelId ?? null,
+        parent_channel_id: parent_id ?? null,
+        guild_id: message.guildId ?? null,
+        imageUrls: getImageUrls(message),
+        action, // Indicates how the consumer should handle the message
       },
-      // If title is nothing == comment. channel_id will correspond to the thread channel id.
-      content: message.content ?? null,
-      message_id: message.id ?? null,
-      channel_id: message.channelId ?? null,
-      parent_channel_id: parent_id ?? null,
-      guild_id: message.guildId ?? null,
-      imageUrls: getImageUrls(message),
-      action, // Indicates how the consumer should handle the message
     };
 
-    if (!message.nonce) new_message.title = channel.name;
-
-    // 3. Publish the message to RabbitMQ queue
-    try {
-      await controller.publish(new_message, RascalPublications.DiscordListener);
-      log.info(
-        `Message published to RabbitMQ: ${JSON.stringify(message.content)}`,
-      );
-    } catch (error) {
-      log.error(`Error publishing to rabbitMQ`, error);
-    }
+    if (!message.nonce) event.payload.title = channel.name;
   } catch (error) {
     log.error(`Error Processing Discord Message`, error);
+    return;
   }
+
+  // 3. Publish the message to RabbitMQ queue
+  const result = await controller.publish(BrokerTopics.DiscordListener, event);
+
+  if (!result) {
+    log.error(`Failed to publish event`, undefined, {
+      event,
+    });
+  }
+
+  log.info(`Event published`, undefined, {
+    event,
+  });
 }
 
 export async function handleThreadChannel(
-  controller: RabbitMQController,
+  controller: Broker,
   thread: ThreadChannel,
   action: DiscordAction,
   oldThread?: ThreadChannel,
@@ -71,6 +82,7 @@ export async function handleThreadChannel(
   log.info(
     `Discord Thread Channel Event received from channel ID: ${thread.id} with action: ${action}`,
   );
+  let event: EventContext<'DiscordMessageCreated'>;
   try {
     // only handle public channels in the Discord forum
     // https://discord.com/developers/docs/resources/channel#channel-object-channel-types
@@ -81,21 +93,22 @@ export async function handleThreadChannel(
     if (!topicId) return;
 
     if (action === 'thread-delete') {
-      await controller.publish(
-        {
+      event = {
+        name: 'DiscordMessageCreated',
+        payload: {
           message_id: thread.id,
           parent_channel_id: thread.parentId,
           action,
-        } as any,
-        RascalPublications.DiscordListener,
-      );
+        },
+      };
     } else {
       if (!oldThread) return;
 
       if (thread.name !== oldThread.name) {
         const owner = await thread.fetchOwner();
-        await controller.publish(
-          {
+        event = {
+          name: 'DiscordMessageCreated',
+          payload: {
             user: {
               id: owner.user.id,
               username: owner.user.username,
@@ -104,12 +117,28 @@ export async function handleThreadChannel(
             parent_channel_id: thread.parentId,
             title: thread.name,
             action,
-          } as any,
-          RascalPublications.DiscordListener,
-        );
+          },
+        };
       }
     }
   } catch (e) {
     log.error(`Error Processing Discord Message`, e);
+  }
+
+  if (event) {
+    const result = await controller.publish(
+      BrokerTopics.DiscordListener,
+      event,
+    );
+
+    if (!result) {
+      log.error('Failed to publish event', undefined, {
+        event,
+      });
+    }
+
+    log.info(`Event published`, undefined, {
+      event,
+    });
   }
 }

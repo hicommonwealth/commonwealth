@@ -40,6 +40,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   const { activeAccount } = useUserActiveAccount();
   const {
     selectedAddress,
+    selectedCommunity,
     modeOfManageCommunityStakeModal,
     setModeOfManageCommunityStakeModal,
   } = useManageCommunityStakeModalStore();
@@ -133,6 +134,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
           <ManageCommunityStakeModal
             mode={modeOfManageCommunityStakeModal}
             onModalClose={() => setModeOfManageCommunityStakeModal(null)}
+            {...(selectedCommunity && { community: selectedCommunity })}
           />
         }
         onClose={() => setModeOfManageCommunityStakeModal(null)}

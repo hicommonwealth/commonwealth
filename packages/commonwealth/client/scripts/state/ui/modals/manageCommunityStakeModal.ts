@@ -1,3 +1,5 @@
+import ChainInfo from 'client/scripts/models/ChainInfo';
+import { CommunityData } from 'client/scripts/views/pages/DirectoryPage/DirectoryPageContent';
 import { createBoundedUseStore } from 'state/ui/utils';
 import { ManageCommunityStakeModalMode } from 'views/modals/ManageCommunityStakeModal/types';
 import { devtools } from 'zustand/middleware';
@@ -6,6 +8,8 @@ import { createStore } from 'zustand/vanilla';
 interface ManageCommunityStakeModalStore {
   selectedAddress?: string;
   setSelectedAddress: (address: string) => void;
+  selectedCommunity?: ChainInfo | CommunityData;
+  setSelectedCommunity: (community: ChainInfo | CommunityData) => void;
   modeOfManageCommunityStakeModal: ManageCommunityStakeModalMode;
   setModeOfManageCommunityStakeModal: (
     modalType: ManageCommunityStakeModalMode,
@@ -20,6 +24,14 @@ export const manageCommunityStakeModalStore =
           return {
             ...state,
             selectedAddress: address,
+          };
+        });
+      },
+      setSelectedCommunity: (community) => {
+        set((state) => {
+          return {
+            ...state,
+            selectedCommunity: community,
           };
         });
       },

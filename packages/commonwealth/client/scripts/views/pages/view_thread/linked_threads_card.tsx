@@ -35,7 +35,7 @@ export const LinkedThreadsCard = ({
   );
 
   const { data: linkedThreads, isLoading } = useGetThreadsByIdQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     ids: linkedThreadIds.map(Number),
     apiCallEnabled: linkedThreadIds.length > 0, // only call the api if we have thread id
   });

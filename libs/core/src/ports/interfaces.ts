@@ -1,4 +1,10 @@
-import { AnalyticsOptions, CacheNamespaces } from '../types';
+import {
+  EventContext,
+  EventSchemas,
+  EventsHandlerMetadata,
+} from '../framework';
+import { Events } from '../schemas';
+import { AnalyticsOptions, BrokerTopics, CacheNamespaces } from '../types';
 
 /**
  * Resource disposer function
@@ -36,6 +42,7 @@ export interface ILogger {
   error(msg: string, error?: Error, context?: LogContext): void;
   fatal(msg: string, error?: Error, context?: LogContext): void;
 }
+
 /**
  * Logger factory
  * Builds a named logger
@@ -60,6 +67,8 @@ export interface Stats extends Disposable {
   // flags
   on(key: string): void;
   off(key: string): void;
+  // gauge
+  gauge(key: string, value: number): void;
   // traces
   timing(key: string, duration: number, tags?: Record<string, string>): void;
 }
@@ -118,4 +127,28 @@ export interface Cache extends Disposable {
  */
 export interface Analytics extends Disposable {
   track(event: string, payload: AnalyticsOptions): void;
+}
+
+export type RetryStrategyFn = (
+  err: Error | undefined,
+  topic: BrokerTopics,
+  content: any,
+  ackOrNackFn: (...args: any[]) => void,
+  log: ILogger,
+) => void;
+
+/**
+ * Broker Port
+ */
+export interface Broker extends Disposable {
+  publish<Name extends Events>(
+    topic: BrokerTopics,
+    event: EventContext<Name>,
+  ): Promise<boolean>;
+
+  subscribe<Inputs extends EventSchemas>(
+    topic: BrokerTopics,
+    handler: EventsHandlerMetadata<Inputs>,
+    retryStrategy?: RetryStrategyFn,
+  ): Promise<boolean>;
 }

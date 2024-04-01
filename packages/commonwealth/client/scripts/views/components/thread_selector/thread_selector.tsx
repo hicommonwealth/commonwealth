@@ -53,7 +53,7 @@ export const ThreadSelector = ({
           Address: new AddressInfo({
             id: t.address_id,
             address: t.address,
-            chainId: t.address_chain,
+            communityId: t.address_chain,
           }),
         } as ConstructorParameters<typeof Thread>[0]),
     );

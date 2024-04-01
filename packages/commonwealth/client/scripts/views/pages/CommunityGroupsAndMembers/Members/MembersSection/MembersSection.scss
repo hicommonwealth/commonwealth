@@ -36,6 +36,11 @@
           text-decoration: underline;
         }
       }
+
+      &.last-column {
+        display: block;
+        text-align: right;
+      }
     }
   }
 }
