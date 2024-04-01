@@ -56,7 +56,7 @@
       "properties": {
         "source_type": {
           "type": "string",
-          "enum": ["cw721"]
+          "enum": ["cw20", "cw721"]
         },
         "cosmos_chain_id": {
           "type": "string"

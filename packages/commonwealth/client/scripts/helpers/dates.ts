@@ -1,9 +1,9 @@
-import moment from 'moment/moment';
 import { pluralize } from 'helpers/index';
-import { CommentsFeaturedFilterTypes } from 'models/types';
 import type Comment from 'models/Comment';
+import { CommentsFeaturedFilterTypes } from 'models/types';
+import moment from 'moment';
 
-export const getRelativeTimestamp = (date: string | moment.Moment) => {
+export const getRelativeTimestamp = (date: number | string | moment.Moment) => {
   const now = moment();
   const inputDate = moment(date);
 
@@ -35,7 +35,7 @@ export const getRelativeTimestamp = (date: string | moment.Moment) => {
 export const commentsByDate = (
   a: Comment<any>,
   b: Comment<any>,
-  commentSortType: CommentsFeaturedFilterTypes
+  commentSortType: CommentsFeaturedFilterTypes,
 ) => {
   return commentSortType === CommentsFeaturedFilterTypes.Oldest
     ? moment(a.createdAt).diff(moment(b.createdAt))

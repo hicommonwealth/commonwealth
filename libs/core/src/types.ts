@@ -69,7 +69,6 @@ export enum WalletId {
   TerraWalletConnect = 'terra-walletconnect',
   CosmosEvmMetamask = 'cosm-metamask',
   Phantom = 'phantom',
-  Ronin = 'ronin',
   Coinbase = 'coinbase',
 }
 
@@ -119,6 +118,7 @@ export enum ChainNetwork {
   ERC20 = 'erc20',
   ERC721 = 'erc721',
   ERC1155 = 'erc1155',
+  CW20 = 'cw20',
   CW721 = 'cw721',
   Clover = 'clover',
   HydraDX = 'hydradx',
@@ -128,15 +128,14 @@ export enum ChainNetwork {
   SolanaTestnet = 'solana-testnet',
   Solana = 'solana',
   SPL = 'spl', // solana token
-  AxieInfinity = 'axie-infinity',
   Evmos = 'evmos',
   Kava = 'kava',
   Kyve = 'kyve',
   Stargaze = 'stargaze',
+  Cosmos = 'cosmos',
 }
 
 export enum BalanceType {
-  AxieInfinity = 'axie-infinity',
   Terra = 'terra',
   Ethereum = 'ethereum',
   Solana = 'solana',
@@ -256,4 +255,65 @@ export enum CosmosGovernanceVersion {
   v1beta1 = 'v1beta1',
   v1beta1Failed = 'v1beta1-attempt-failed',
   v1Failed = 'v1-attempt-failed',
+}
+
+export type ContractSource = {
+  source_type:
+    | BalanceSourceType.ERC20
+    | BalanceSourceType.ERC721
+    | BalanceSourceType.ERC1155;
+  evm_chain_id: number;
+  contract_address: string;
+  token_id?: string;
+};
+
+export type NativeSource = {
+  source_type: BalanceSourceType.ETHNative;
+  evm_chain_id: number;
+};
+
+export type CosmosSource = {
+  source_type: BalanceSourceType.CosmosNative;
+  cosmos_chain_id: string;
+  token_symbol: string;
+};
+
+export type CosmosContractSource = {
+  source_type: BalanceSourceType.CW20 | BalanceSourceType.CW721;
+  cosmos_chain_id: string;
+  contract_address: string;
+};
+
+export type ThresholdData = {
+  threshold: string;
+  source: ContractSource | NativeSource | CosmosSource | CosmosContractSource;
+};
+
+export type AllowlistData = {
+  allow: string[];
+};
+
+export type Requirement =
+  | {
+      rule: 'threshold';
+      data: ThresholdData;
+    }
+  | {
+      rule: 'allow';
+      data: AllowlistData;
+    };
+
+export enum BalanceSourceType {
+  ETHNative = 'eth_native',
+  ERC20 = 'erc20',
+  ERC721 = 'erc721',
+  ERC1155 = 'erc1155',
+  CosmosNative = 'cosmos_native',
+  CW20 = 'cw20',
+  CW721 = 'cw721',
+}
+
+export enum BrokerTopics {
+  SnapshotListener = 'SnapshotListener',
+  DiscordListener = 'DiscordMessage',
 }

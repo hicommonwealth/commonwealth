@@ -1,8 +1,10 @@
 import { ExitCode } from './enums';
+import { successfulInMemoryBroker } from './in-memory-brokers';
 import { getInMemoryLogger } from './in-memory-logger';
 import {
   AdapterFactory,
   Analytics,
+  Broker,
   Cache,
   Disposable,
   Disposer,
@@ -26,7 +28,7 @@ export function port<T extends Disposable>(factory: AdapterFactory<T>) {
       const instance = factory(adapter);
       adapters.set(factory.name, instance);
       logger()
-        .getLogger('ports')
+        .getLogger(__filename)
         .info(`[binding adapter] ${instance.name || factory.name}`);
       return instance;
     }
@@ -52,7 +54,7 @@ const disposeAndExit = async (code: ExitCode = 'UNIT_TEST'): Promise<void> => {
   await Promise.all(
     [...adapters].reverse().map(async ([key, adapter]) => {
       logger()
-        .getLogger('ports')
+        .getLogger(__filename)
         .info(`[disposing adapter] ${adapter.name || key}`);
       await adapter.dispose();
     }),
@@ -80,22 +82,22 @@ export const dispose = (
  */
 process.once('SIGINT', async (arg?: any) => {
   logger()
-    .getLogger('ports')
+    .getLogger(__filename)
     .info(`SIGINT ${arg !== 'SIGINT' ? arg : ''}`);
   await disposeAndExit('EXIT');
 });
 process.once('SIGTERM', async (arg?: any) => {
   logger()
-    .getLogger('ports')
+    .getLogger(__filename)
     .info(`SIGTERM ${arg !== 'SIGTERM' ? arg : ''}`);
   await disposeAndExit('EXIT');
 });
 process.once('uncaughtException', async (arg?: any) => {
-  logger().getLogger('ports').error('Uncaught Exception', arg);
+  logger().getLogger(__filename).error('Uncaught Exception', arg);
   await disposeAndExit('ERROR');
 });
 process.once('unhandledRejection', async (arg?: any) => {
-  logger().getLogger('ports').error('Unhandled Rejection', arg);
+  logger().getLogger(__filename).error('Unhandled Rejection', arg);
   await disposeAndExit('ERROR');
 });
 
@@ -122,6 +124,7 @@ export const stats = port(function stats(stats?: Stats) {
       decrementBy: () => {},
       on: () => {},
       off: () => {},
+      gauge: () => {},
       timing: () => {},
     }
   );
@@ -135,6 +138,8 @@ export const cache = port(function cache(cache?: Cache) {
     cache || {
       name: 'in-memory-cache',
       dispose: () => Promise.resolve(),
+      ready: () => Promise.resolve(true),
+      isReady: () => true,
       getKey: () => Promise.resolve(''),
       setKey: () => Promise.resolve(false),
       getKeys: () => Promise.resolve(false),
@@ -154,7 +159,6 @@ export const cache = port(function cache(cache?: Cache) {
 /**
  * Analytics port factory
  */
-
 export const analytics = port(function analytics(analytics?: Analytics) {
   return (
     analytics || {
@@ -163,4 +167,11 @@ export const analytics = port(function analytics(analytics?: Analytics) {
       track: () => {},
     }
   );
+});
+
+/**
+ * Broker port factory
+ */
+export const broker = port(function broker(broker?: Broker) {
+  return broker || successfulInMemoryBroker;
 });

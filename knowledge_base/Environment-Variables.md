@@ -13,7 +13,6 @@ If you add a new environment variable, you must add documentation here. Please d
 - [AWS_ACCESS_KEY_ID](#aws_access_key_id)
 - [AWS_REGION](#aws_region)
 - [AWS_SECRET_ACCESS_KEY](#aws_secret_access_key)
-- [AXIE_SHARED_SECRET](#axie_shared_secret)
 - [CHAIN_PORT](#chain_port)
 - [CLOUDAMQP_URL](#cloudamqp_url)
 - [COSMOS_GOV_V1](#cosmos_gov_v1)
@@ -82,6 +81,7 @@ If you add a new environment variable, you must add documentation here. Please d
 - [SUPER_ADMIN_WALLET_ADDRESS](#super_admin_wallet_address)
 - [TELEGRAM_BOT_TOKEN_DEV](#telegram_bot_token_dev)
 - [TEST_ENV](#test_env)
+- [TEST_WITH_LOGS](#test_with_logs)
 - [WITH_PRERENDER](#with_prerender)
 - [ZAPIER_WEBHOOK_URL_DEV](#zapier_webhook_url_dev)
 
@@ -96,10 +96,6 @@ AWS region used primarily for uploading local image files. Common uses `us-east-
 ## AWS_SECRET_ACCESS_KEY
 
 AWS secret used alongside `AWS_ACCESS_KEY_ID`. Read by our `aws4`, `aws-sdk`, and `rollbar` libraries.
-
-## AXIE_SHARED_SECRET
-
-Secret token used for Axie Infinity sign-in integration.
 
 ## CHAIN_PORT
 
@@ -400,6 +396,12 @@ Owner: Timothee Legros.
 Used and defined on-the-fly in Playwright scripts.
 
 Owner: Kurtis Assad.
+
+## TEST_WITH_LOGS
+
+If `true`, enables logs when testing
+
+Owner: Roger Torres, Timothee Legros.
 
 ## WITH_PRERENDER
 

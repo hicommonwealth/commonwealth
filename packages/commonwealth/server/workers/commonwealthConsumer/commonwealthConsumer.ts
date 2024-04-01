@@ -1,20 +1,25 @@
 import {
   HotShotsStats,
-  RabbitMQController,
-  RabbitMQSubscription,
+  PinoLogger,
+  RabbitMQAdapter,
   RascalConfigServices,
-  RascalSubscriptions,
-  ServiceConsumer,
   ServiceKey,
-  TypescriptLoggingLogger,
   getRabbitMQConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { logger, stats } from '@hicommonwealth/core';
-import type { BrokerConfig } from 'rascal';
+import {
+  Broker,
+  BrokerTopics,
+  Policy,
+  broker,
+  logger,
+  schemas,
+  stats,
+} from '@hicommonwealth/core';
+import { ZodUndefined } from 'zod';
 import { RABBITMQ_URI } from '../../config';
 
-const log = logger(TypescriptLoggingLogger()).getLogger(__filename);
+const log = logger(PinoLogger()).getLogger(__filename);
 stats(HotShotsStats());
 
 let isServiceHealthy = false;
@@ -37,54 +42,45 @@ startHealthCheckLoop({
 // properly handling/processing those messages. Using the script is rarely necessary in
 // local development.
 
-export async function setupCommonwealthConsumer(): Promise<ServiceConsumer> {
-  const { models } = await import('@hicommonwealth/model');
-  const { processSnapshotMessage } = await import(
-    './messageProcessors/snapshotConsumer'
-  );
-
-  let rmqController: RabbitMQController;
+export async function setupCommonwealthConsumer(): Promise<void> {
+  let brokerInstance: Broker;
   try {
-    rmqController = new RabbitMQController(
-      <BrokerConfig>(
-        getRabbitMQConfig(
-          RABBITMQ_URI,
-          RascalConfigServices.CommonwealthService,
-        )
-      ),
+    const rmqAdapter = new RabbitMQAdapter(
+      getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.CommonwealthService),
     );
-    await rmqController.init();
+    await rmqAdapter.init();
+    broker(rmqAdapter);
+    brokerInstance = rmqAdapter;
   } catch (e) {
     log.error(
       'Rascal consumer setup failed. Please check the Rascal configuration',
     );
     throw e;
   }
-  const context = {
-    models,
-    log,
-  };
 
-  const snapshotEventProcessorRmqSub: RabbitMQSubscription = {
-    messageProcessor: processSnapshotMessage,
-    subscriptionName: RascalSubscriptions.SnapshotListener,
-    msgProcessorContext: context,
-  };
-
-  const subscriptions: RabbitMQSubscription[] = [snapshotEventProcessorRmqSub];
-
-  const serviceConsumer = new ServiceConsumer(
-    'MainConsumer',
-    rmqController,
-    subscriptions,
-  );
-  await serviceConsumer.init();
-
-  log.info(
-    `Consumer started. Name: ${serviceConsumer.serviceName}, id: ${serviceConsumer.serviceId}`,
+  const { processSnapshotProposalCreated } = await import(
+    './messageProcessors/snapshotConsumer'
   );
 
-  return serviceConsumer;
+  const inputs = {
+    SnapshotProposalCreated: schemas.events.SnapshotProposalCreated,
+  };
+
+  const Snapshot: Policy<typeof inputs, ZodUndefined> = () => ({
+    inputs,
+    body: {
+      SnapshotProposalCreated: processSnapshotProposalCreated,
+    },
+  });
+
+  const result = await brokerInstance.subscribe(
+    BrokerTopics.SnapshotListener,
+    Snapshot(),
+  );
+
+  if (!result) {
+    throw new Error(`Failed to subscribe to ${BrokerTopics.SnapshotListener}`);
+  }
 }
 
 async function main() {

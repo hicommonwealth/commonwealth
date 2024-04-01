@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable global-require */
 /* eslint-disable no-unused-expressions */
-import { tester } from '@hicommonwealth/model';
+import { dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
@@ -14,9 +14,9 @@ import { Errors as CreateCommentErrors } from 'server/routes/threads/create_thre
 import { Errors as EditThreadHandlerErrors } from 'server/routes/threads/update_thread_handler';
 import { Errors as ViewCountErrors } from 'server/routes/viewCount';
 import sleep from 'sleep-promise';
-import * as modelUtils from 'test/util/modelUtils';
-import app from '../../../server-test';
+import { testServer, TestServer } from '../../../server-test';
 import { markdownComment } from '../../util/fixtures/markdownComment';
+import type { CommunityArgs } from '../../util/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -50,14 +50,17 @@ describe.skip('Thread Tests', () => {
 
   let thread;
 
+  let server: TestServer;
+
   before(async () => {
-    await tester.seedDb();
-    topicId = await modelUtils.getTopicId({ chain });
-    let res = await modelUtils.createAndVerifyAddress({ chain });
+    server = await testServer();
+
+    topicId = await server.seeder.getTopicId({ chain });
+    let res = await server.seeder.createAndVerifyAddress({ chain }, 'Alice');
     adminAddress = res.address;
     adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
-    const isAdmin = await modelUtils.updateRole({
-      address_id: res.address_id,
+    const isAdmin = await server.seeder.updateRole({
+      address_id: +res.address_id,
       chainOrCommObj: { chain_id: chain },
       role: 'admin',
     });
@@ -66,14 +69,17 @@ describe.skip('Thread Tests', () => {
     expect(adminJWT).to.not.be.null;
     expect(isAdmin).to.not.be.null;
 
-    res = await modelUtils.createAndVerifyAddress({ chain });
+    res = await server.seeder.createAndVerifyAddress({ chain }, 'Alice');
     userAddress = res.address;
     userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
     userSession = { session: res.session, sign: res.sign };
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;
 
-    res = await modelUtils.createAndVerifyAddress({ chain: chain2 });
+    res = await server.seeder.createAndVerifyAddress(
+      { chain: chain2 },
+      'Alice',
+    );
     userAddress2 = res.address;
     userJWT2 = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
     userSession2 = { session: res.session, sign: res.sign };
@@ -81,11 +87,15 @@ describe.skip('Thread Tests', () => {
     expect(userJWT2).to.not.be.null;
   });
 
+  after(async () => {
+    await dispose()();
+  });
+
   describe('POST /threads', () => {
     const readOnly = true;
 
     it('should fail to create a thread without a kind', async () => {
-      const tRes = await modelUtils.createThread({
+      const tRes = await server.seeder.createThread({
         address: userAddress,
         kind: null,
         stage,
@@ -103,7 +113,7 @@ describe.skip('Thread Tests', () => {
     });
 
     it('should fail to create a forum thread with an empty title', async () => {
-      const tRes = await modelUtils.createThread({
+      const tRes = await server.seeder.createThread({
         address: userAddress,
         kind,
         stage,
@@ -121,7 +131,7 @@ describe.skip('Thread Tests', () => {
     });
 
     it('should fail to create a link thread with an empty title', async () => {
-      const tRes = await modelUtils.createThread({
+      const tRes = await server.seeder.createThread({
         address: userAddress,
         kind: 'link',
         stage,
@@ -140,7 +150,7 @@ describe.skip('Thread Tests', () => {
     });
 
     it('should fail to create a link thread with an empty URL', async () => {
-      const tRes = await modelUtils.createThread({
+      const tRes = await server.seeder.createThread({
         address: userAddress,
         kind: 'link',
         stage,
@@ -159,7 +169,7 @@ describe.skip('Thread Tests', () => {
     });
 
     it('should fail to create a comment on a readOnly thread', async () => {
-      const tRes = await modelUtils.createThread({
+      const tRes = await server.seeder.createThread({
         address: userAddress,
         kind,
         stage,
@@ -176,7 +186,7 @@ describe.skip('Thread Tests', () => {
       expect(tRes).not.to.be.null;
       expect(tRes.status).to.be.equal('Success');
       expect(tRes.result.read_only).to.be.equal(true);
-      const cRes = await modelUtils.createComment({
+      const cRes = await server.seeder.createComment({
         chain,
         address: userAddress,
         jwt: userJWT,
@@ -190,7 +200,7 @@ describe.skip('Thread Tests', () => {
     });
 
     it('should create a discussion thread', async () => {
-      const res = await modelUtils.createThread({
+      const res = await server.seeder.createThread({
         address: userAddress,
         kind,
         stage,
@@ -211,7 +221,7 @@ describe.skip('Thread Tests', () => {
     });
 
     it('should fail to create a thread without a topic name (if the community has topics)', async () => {
-      const tRes = await modelUtils.createThread({
+      const tRes = await server.seeder.createThread({
         address: userAddress,
         kind,
         stage,
@@ -227,7 +237,7 @@ describe.skip('Thread Tests', () => {
     });
 
     it('should create a thread with mentions to non-existent addresses', async () => {
-      const res = await modelUtils.createThread({
+      const res = await server.seeder.createThread({
         address: userAddress,
         kind,
         stage,
@@ -248,7 +258,7 @@ describe.skip('Thread Tests', () => {
     });
 
     it('Thread Create should fail because address does not have permission', async () => {
-      const res2 = await modelUtils.createThread({
+      const res2 = await server.seeder.createThread({
         address: userAddress2,
         kind,
         stage,
@@ -267,7 +277,7 @@ describe.skip('Thread Tests', () => {
   describe('/threads (bulkThreads)', () => {
     it('should return bulk threads for a public chain', async () => {
       const res = await chai.request
-        .agent(app)
+        .agent(server.app)
         .get('/api/threads')
         .set('Accept', 'application/json')
         .query({
@@ -280,7 +290,7 @@ describe.skip('Thread Tests', () => {
       expect(res.body.status).to.be.equal('Success');
     });
     it.skip('should pass as admin of private community', async () => {
-      const communityArgs: modelUtils.CommunityArgs = {
+      const communityArgs: CommunityArgs = {
         jwt: userJWT,
         isAuthenticatedForum: 'false',
         privacyEnabled: 'true',
@@ -292,13 +302,13 @@ describe.skip('Thread Tests', () => {
         default_chain: chain,
       };
 
-      await modelUtils.createCommunity(communityArgs);
+      await server.seeder.createCommunity(communityArgs);
     });
   });
 
   describe('/thread/:id/comments', () => {
     beforeEach(async () => {
-      const res2 = await modelUtils.createThread({
+      const res2 = await server.seeder.createThread({
         address: userAddress,
         kind,
         stage,
@@ -316,7 +326,7 @@ describe.skip('Thread Tests', () => {
     });
 
     it('should create a comment for a thread', async () => {
-      const cRes = await modelUtils.createComment({
+      const cRes = await server.seeder.createComment({
         chain,
         address: userAddress,
         jwt: userJWT,
@@ -335,7 +345,7 @@ describe.skip('Thread Tests', () => {
     });
 
     it('should create a comment for a thread with an non-existent mention', async () => {
-      const cRes = await modelUtils.createComment({
+      const cRes = await server.seeder.createComment({
         chain,
         address: userAddress,
         jwt: userJWT,
@@ -354,7 +364,7 @@ describe.skip('Thread Tests', () => {
     });
 
     it('should create a comment reply for a comment', async () => {
-      let cRes = await modelUtils.createComment({
+      let cRes = await server.seeder.createComment({
         chain,
         address: userAddress,
         jwt: userJWT,
@@ -364,7 +374,7 @@ describe.skip('Thread Tests', () => {
         sign: userSession.sign,
       });
       const parentId = cRes.result.id;
-      cRes = await modelUtils.createComment({
+      cRes = await server.seeder.createComment({
         chain,
         address: userAddress,
         jwt: userJWT,
@@ -385,7 +395,7 @@ describe.skip('Thread Tests', () => {
     });
 
     it('should fail to create a comment without a thread_id', async () => {
-      const cRes = await modelUtils.createComment({
+      const cRes = await server.seeder.createComment({
         chain,
         address: userAddress,
         jwt: userJWT,
@@ -400,7 +410,7 @@ describe.skip('Thread Tests', () => {
     });
 
     it('should fail to create a comment without text', async () => {
-      const cRes = await modelUtils.createComment({
+      const cRes = await server.seeder.createComment({
         chain,
         address: userAddress,
         jwt: userJWT,
@@ -415,7 +425,7 @@ describe.skip('Thread Tests', () => {
     });
 
     it('should fail to create a comment on a non-existent thread', async () => {
-      const cRes = await modelUtils.createComment({
+      const cRes = await server.seeder.createComment({
         chain,
         address: userAddress,
         jwt: userJWT,
@@ -432,7 +442,7 @@ describe.skip('Thread Tests', () => {
 
   describe('/editThread', () => {
     beforeEach(async () => {
-      const res2 = await modelUtils.createThread({
+      const res2 = await server.seeder.createThread({
         address: adminAddress,
         kind,
         stage,
@@ -454,7 +464,7 @@ describe.skip('Thread Tests', () => {
       const thread_stage = thread.stage;
       const readOnly = false;
       const res = await chai
-        .request(app)
+        .request(server.app)
         .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
@@ -476,7 +486,7 @@ describe.skip('Thread Tests', () => {
       const thread_stage = thread.stage;
       const readOnly = false;
       const res = await chai
-        .request(app)
+        .request(server.app)
         .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
@@ -503,7 +513,7 @@ describe.skip('Thread Tests', () => {
       const thread_stage = thread.stage;
       const readOnly = false;
       const res = await chai
-        .request(app)
+        .request(server.app)
         .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
@@ -529,7 +539,7 @@ describe.skip('Thread Tests', () => {
       const newBody = 'new Body';
       const readOnly = false;
       const res = await chai.request
-        .agent(app)
+        .agent(server.app)
         .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
@@ -554,7 +564,7 @@ describe.skip('Thread Tests', () => {
       const newTitle = 'new Title';
       const readOnly = false;
       const res = await chai
-        .request(app)
+        .request(server.app)
         .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
@@ -578,7 +588,7 @@ describe.skip('Thread Tests', () => {
     let tempThread;
 
     it('should turn on readonly', async () => {
-      const res1 = await modelUtils.createThread({
+      const res1 = await server.seeder.createThread({
         address: userAddress,
         kind,
         stage,
@@ -593,7 +603,7 @@ describe.skip('Thread Tests', () => {
       expect(res1.result).to.not.be.null;
       tempThread = res1.result;
       const res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/updateThreadPrivacy')
         .set('Accept', 'application/json')
         .send({
@@ -607,13 +617,16 @@ describe.skip('Thread Tests', () => {
 
     it('should fail to comment on a read_only thread', async () => {
       // create new user + jwt
-      const res = await modelUtils.createAndVerifyAddress({ chain });
+      const res = await server.seeder.createAndVerifyAddress(
+        { chain },
+        'Alice',
+      );
       const newUserJWT = jwt.sign(
         { id: res.user_id, email: res.email },
         JWT_SECRET,
       );
       // try to comment and fail
-      const cRes = await modelUtils.createComment({
+      const cRes = await server.seeder.createComment({
         chain,
         address: res.address,
         jwt: newUserJWT,
@@ -628,7 +641,7 @@ describe.skip('Thread Tests', () => {
 
     it('should turn off readonly as an admin of community', async () => {
       const res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/updateThreadPrivacy')
         .set('Accept', 'application/json')
         .send({
@@ -644,7 +657,7 @@ describe.skip('Thread Tests', () => {
   describe('/comments/:id', () => {
     it('should edit a comment', async () => {
       const text = 'tes text';
-      const tRes = await modelUtils.createThread({
+      const tRes = await server.seeder.createThread({
         chainId: chain,
         address: userAddress,
         jwt: userJWT,
@@ -656,7 +669,7 @@ describe.skip('Thread Tests', () => {
         session: userSession.session,
         sign: userSession.sign,
       });
-      const cRes = await modelUtils.createComment({
+      const cRes = await server.seeder.createComment({
         chain,
         address: userAddress,
         jwt: userJWT,
@@ -665,7 +678,7 @@ describe.skip('Thread Tests', () => {
         session: userSession.session,
         sign: userSession.sign,
       });
-      const eRes = await modelUtils.editComment({
+      const eRes = await server.seeder.editComment({
         text,
         jwt: userJWT,
         comment_id: cRes.result.id,
@@ -682,7 +695,7 @@ describe.skip('Thread Tests', () => {
 
   describe('/viewCount', () => {
     it('should track views on chain', async () => {
-      const threadRes = await modelUtils.createThread({
+      const threadRes = await server.seeder.createThread({
         address: userAddress,
         kind,
         stage,
@@ -698,7 +711,7 @@ describe.skip('Thread Tests', () => {
       expect(object_id).to.not.be.null;
       // should track first view
       let res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/viewCount')
         .set('Accept', 'application/json')
         .send({ chain, object_id });
@@ -710,7 +723,7 @@ describe.skip('Thread Tests', () => {
 
       // should ignore second view, same IP
       res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/viewCount')
         .set('Accept', 'application/json')
         .send({ chain, object_id });
@@ -723,7 +736,7 @@ describe.skip('Thread Tests', () => {
       // sleep a second and verify cache invalidation
       await sleep(1000);
       res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/viewCount')
         .set('Accept', 'application/json')
         .send({ chain, object_id });
@@ -735,7 +748,7 @@ describe.skip('Thread Tests', () => {
     });
 
     it('should track views on community', async () => {
-      const threadRes = await modelUtils.createThread({
+      const threadRes = await server.seeder.createThread({
         address: userAddress,
         kind,
         stage,
@@ -751,7 +764,7 @@ describe.skip('Thread Tests', () => {
 
       // should track first view
       const res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/viewCount')
         .set('Accept', 'application/json')
         .send({ chain, object_id });
@@ -764,7 +777,7 @@ describe.skip('Thread Tests', () => {
 
     it('should not track views without object_id', async () => {
       const res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/viewCount')
         .set('Accept', 'application/json')
         .send({ chain });
@@ -775,7 +788,7 @@ describe.skip('Thread Tests', () => {
 
     it('should not track views without chain or community', async () => {
       const res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/viewCount')
         .set('Accept', 'application/json')
         .send({ object_id: '9999' });
@@ -786,7 +799,7 @@ describe.skip('Thread Tests', () => {
 
     it('should not track views with invalid chain or community', async () => {
       const res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/viewCount')
         .set('Accept', 'application/json')
         .send({ chain: 'adkgjkjgda', object_id: '9999' });
@@ -797,7 +810,7 @@ describe.skip('Thread Tests', () => {
 
     it('should not track views with invalid object_id', async () => {
       const res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/viewCount')
         .set('Accept', 'application/json')
         .send({ chain, object_id: '9999' });
@@ -810,7 +823,7 @@ describe.skip('Thread Tests', () => {
   describe('/updateThreadPinned route tests', () => {
     let pinThread;
     before(async () => {
-      const res = await modelUtils.createThread({
+      const res = await server.seeder.createThread({
         address: userAddress,
         kind,
         stage,
@@ -827,7 +840,7 @@ describe.skip('Thread Tests', () => {
 
     it('admin can toggle thread to pinned', async () => {
       const res2 = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/updateThreadPinned')
         .set('Accept', 'application/json')
         .send({ thread_id: pinThread, jwt: adminJWT });
@@ -837,7 +850,7 @@ describe.skip('Thread Tests', () => {
 
     it('admin can toggle thread to unpinned', async () => {
       const res2 = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/updateThreadPinned')
         .set('Accept', 'application/json')
         .send({ thread_id: pinThread, jwt: adminJWT });

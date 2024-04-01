@@ -1,21 +1,16 @@
-import { User } from '@hicommonwealth/core';
+import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
 import type { CreateOptions, DataTypes } from 'sequelize';
+import { z } from 'zod';
 import type { DB } from '.';
 import type { AddressAttributes, AddressInstance } from './address';
 import type { CommunityAttributes, CommunityInstance } from './community';
 import type { ProfileAttributes, ProfileInstance } from './profile';
 import type { ModelInstance, ModelStatic } from './types';
 
-export type EmailNotificationInterval = 'week' | 'never';
+export type EmailNotificationInterval = 'weekly' | 'never';
 
-export type UserAttributes = User & {
-  disableRichText?: boolean;
-  emailNotificationInterval?: EmailNotificationInterval;
-  selected_community_id?: string | null;
-  created_at?: Date;
-  updated_at?: Date;
-
+export type UserAttributes = z.infer<typeof schemas.entities.User> & {
   // associations (see https://vivacitylabs.com/setup-typescript-sequelize/)
   selectedCommunity?: CommunityAttributes | CommunityAttributes['id'];
   Addresses?: AddressAttributes[] | AddressAttributes['id'][];
@@ -63,11 +58,10 @@ export default (
     'User',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      email: { type: dataTypes.STRING, allowNull: true, unique: true },
+      email: { type: dataTypes.STRING, allowNull: true },
       emailVerified: {
         type: dataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
+        allowNull: true,
       },
       emailNotificationInterval: {
         type: dataTypes.STRING,
@@ -126,10 +120,12 @@ export default (
     models.User.belongsTo(models.Community, {
       as: 'selectedCommunity',
       foreignKey: 'selected_community_id',
-      constraints: false,
+      //constraints: false,
     });
     models.User.hasMany(models.Address);
-    models.User.hasMany(models.Profile);
+    models.User.hasMany(models.Profile, {
+      foreignKey: { name: 'user_id', allowNull: false },
+    });
     // TODO Graham 240125: The above is out of date; as of early 2023,
     // there is a 1:1 relationship between Users and Profiles.
     models.User.hasMany(models.StarredCommunity, {

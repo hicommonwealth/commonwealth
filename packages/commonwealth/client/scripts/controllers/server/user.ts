@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 import { EventEmitter } from 'events';
-import $ from 'jquery';
 
 import app from 'state';
 import Account from '../../models/Account';
@@ -12,6 +11,7 @@ import StarredCommunity from '../../models/StarredCommunity';
 import { notifyError } from '../app/notifications';
 
 // eslint-disable-next-line
+import axios from 'axios';
 import NotificationsController from './notifications';
 
 export class UserController {
@@ -86,13 +86,13 @@ export class UserController {
     }
   }
 
-  private _selectedChain: ChainInfo;
-  public get selectedChain(): ChainInfo {
-    return this._selectedChain;
+  private _selectedCommunity: ChainInfo;
+  public get selectedCommunity(): ChainInfo {
+    return this._selectedCommunity;
   }
 
-  private _setSelectedChain(selectedChain: ChainInfo): void {
-    this._selectedChain = selectedChain;
+  private _setSelectedCommunity(selectedCommunity: ChainInfo): void {
+    this._selectedCommunity = selectedCommunity;
   }
 
   private _isSiteAdmin: boolean;
@@ -102,15 +102,6 @@ export class UserController {
 
   private _setSiteAdmin(isAdmin: boolean): void {
     this._isSiteAdmin = isAdmin;
-  }
-
-  private _disableRichText: boolean;
-  public get disableRichText(): boolean {
-    return this._disableRichText;
-  }
-
-  private _setDisableRichText(disableRichText: boolean): void {
-    this._disableRichText = disableRichText;
   }
 
   private _notifications: NotificationsController =
@@ -153,11 +144,11 @@ export class UserController {
     this._setEmail(email);
   }
 
-  public updateEmail(email: string): void {
+  public async updateEmail(email: string): Promise<void> {
     this._setEmail(email);
 
     try {
-      $.post(`${app.serverUrl()}/updateEmail`, {
+      await axios.post(`${app.serverUrl()}/updateEmail`, {
         email: email,
         jwt: app.user.jwt,
       });
@@ -171,9 +162,9 @@ export class UserController {
     this._setEmailInterval(emailInterval);
   }
 
-  public updateEmailInterval(emailInterval: string): void {
+  public async updateEmailInterval(emailInterval: string): Promise<void> {
     try {
-      $.post(`${app.serverUrl()}/writeUserSetting`, {
+      await axios.post(`${app.serverUrl()}/writeUserSetting`, {
         jwt: app.user.jwt,
         key: 'updateEmailInterval',
         value: emailInterval,
@@ -226,34 +217,34 @@ export class UserController {
     );
   }
 
-  public setSelectedChain(selectedChain: ChainInfo): void {
-    this._setSelectedChain(selectedChain);
+  public setSelectedCommunity(selectedCommunity: ChainInfo): void {
+    this._setSelectedCommunity(selectedCommunity);
   }
 
-  public selectChain(options: { chain: string }): JQueryPromise<void> {
-    return $.post(`${app.serverUrl()}/selectCommunity`, {
-      chain: options.chain,
-      auth: true,
-      jwt: this._jwt,
-    })
-      .then((res) => {
-        if (res.status !== 'Success') {
-          throw new Error(`got unsuccessful status: ${res.status}`);
-        } else {
-          const chain = app.config.chains.getById(options.chain);
-          if (!chain) throw new Error('unexpected chain');
-          this.setSelectedChain(chain);
+  public async selectCommunity(options: { community: string }): Promise<void> {
+    try {
+      const res = await axios.post(`${app.serverUrl()}/selectCommunity`, {
+        community_id: options.community,
+        auth: true,
+        jwt: this._jwt,
+      });
+
+      if (res.data.status !== 'Success') {
+        throw new Error(`got unsuccessful status: ${res.data.status}`);
+      } else {
+        const community = app.config.chains.getById(options.community);
+        if (!community) {
+          throw new Error('unexpected community');
         }
-      })
-      .catch(() => console.error('Failed to select node on server'));
+        this.setSelectedCommunity(community);
+      }
+    } catch (error) {
+      console.error('Failed to select node on server', error);
+    }
   }
 
   public setSiteAdmin(isAdmin: boolean): void {
     this._setSiteAdmin(isAdmin);
-  }
-
-  public setDisableRichText(disableRichText: boolean): void {
-    this._setDisableRichText(disableRichText);
   }
 
   public setNotifications(notifications: NotificationsController): void {
