@@ -79,9 +79,7 @@ See [models/comment.ts](../libs/model/src/models/comment.ts).
 
 ### Community
 
-<!-- TODO: Review & update in light of new permissioning system; blocked pending meeting with Product. -->
-
-A community is a space on Common, joinable by PROFILES, that owns metadata and is defined by a set of ROLES and PERMISSIONS for participation.
+A community a unique namespace, identifying a set of underlying applications. on the Common app. A community contains GROUPS; groups may be joined by PROFILE ADDRESSES.
 
 See [models/community.ts](../libs/model/src/models/community.ts)
 
@@ -95,9 +93,7 @@ The Common forum is Common's flagship first-party app. Its primary organizationa
 
 ### Group
 
-<!-- TODO: Review & update in light of new permissioning system; blocked pending meeting with Product. -->
-
-Groups are used by community admins to handle permissioning across the forum, using associated membership objects that LINK ADDRESSES to Groups.
+ADDRESSES have Memberships to GROUPS.
 
 See [models/group.ts](../libs/model/src/models/group.ts) and the knowledgebase [Groups](./Groups.md) entry.
 
@@ -109,9 +105,7 @@ Some content on Common can be inter-linked, so that the content's UI prominently
 
 <!-- TODO: Review & update in light of new permissioning system; blocked pending meeting with Product. -->
 
-Generically, a member is a PROFILE that holds a (ROLE) within a COMMUNITY.
-
-More specifically, "Member" is the lowest-ranking (ROLE) in COMMUNITIES, below MODERATOR and ADMIN.
+Generically, a member is the default state of a PROFILE ADDRESS that has joined a GROUP contained within a COMMUNITY.
 
 See [models/membership.ts](../libs/model/src/models/membership.ts).
 
@@ -131,7 +125,7 @@ For URI parsing, route setup, and the scope-conditional rendering of page layout
 
 ### Profile
 
-A profile is one or more ADDRESS, grouped together as a single identity, representing a single USER.
+A USER consists of multiple ADDRESSES and a linked profile which specifies social metadata displayed on a profile page.
 
 See [models/profile.ts](../libs/model/src/models/profile.ts).
 
@@ -149,9 +143,7 @@ See [models/poll.ts](../libs/model/src/models/poll.ts).
 
 <!-- TODO: Investigate status of our legacy (e.g. models/role.ts) Roles code. -->
 
-<!-- TODO: Review & update in light of new permissioning system; blocked pending meeting with Product. -->
-
-As of 231215, Roles are considered deprecated ontology at Common. In their place is a GROUPS and PERMISSIONS system.
+As of 231215, Roles are considered deprecated ontology at Common.
 
 ### Sessions
 
@@ -191,7 +183,7 @@ See [models/thread.ts](../libs/model/src/models/thread.ts)
 
 ### Topic
 
-A topic is a sub-section of a COMMUNITY FORUM. It may be GATED or require PERMISSIONS to participate in.
+A topic is a sub-section of a COMMUNITY FORUM. It may be GATED or require permissions to participate in.
 
 See [models/topic.ts](../libs/model/src/models/topic.ts)
 
