@@ -17,11 +17,11 @@ const useStakeAddresses = ({ community }: UseStakeAddressesProps = {}) => {
   const communityAddresses = (() => {
     if (community) {
       // get all the addresses of the user that matches base chain of selected `community`
-      const userAddresses = app.user.addresses
-        .filter(
+      const userAddresses = (app?.user?.addresses || [])
+        ?.filter(
           (addr) => addr.community.base === (community as ChainInfo)?.base,
         )
-        .map((addr) => addr.address);
+        ?.map((addr) => addr.address);
 
       // return all the unique addresses
       return [...new Set(userAddresses)];
