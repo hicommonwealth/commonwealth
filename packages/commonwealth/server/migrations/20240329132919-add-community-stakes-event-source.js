@@ -989,6 +989,13 @@ module.exports = {
       `,
         { transaction },
       );
+      await queryInterface.sequelize.query(
+        `
+        ALTER TABLE "EvmEventSources"
+        ALTER COLUMN abi_id SET NOT NULL;
+        `,
+        { transaction },
+      );
 
       await createNewEvmEventSource(queryInterface, transaction);
 

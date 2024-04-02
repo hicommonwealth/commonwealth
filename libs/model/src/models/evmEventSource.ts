@@ -57,7 +57,7 @@ export default (
         events_migrated: { type: dataTypes.BOOLEAN, allowNull: true },
         active: {
           type: dataTypes.BOOLEAN,
-          allowNull: true,
+          allowNull: false,
           defaultValue: true,
         },
         abi_id: { type: dataTypes.INTEGER, allowNull: false },
