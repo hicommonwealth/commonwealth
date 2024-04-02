@@ -79,7 +79,7 @@ See [models/comment.ts](../libs/model/src/models/comment.ts).
 
 ### Community
 
-A community a unique namespace, identifying a set of underlying applications. on the Common app. A community contains GROUPS; groups may be joined by PROFILE ADDRESSES.
+A community a unique namespace, identifying a set of underlying applications on the Common app. A community contains GROUPS; groups may be joined by PROFILE ADDRESSES.
 
 See [models/community.ts](../libs/model/src/models/community.ts)
 
@@ -89,11 +89,11 @@ A set of features considered central to Common, which interface out with first-p
 
 ### Forum
 
-The Common forum is Common's flagship first-party app. Its primary organizational primitive is the COMMUNITY. The forum app provides UI for off-chain discussions, and for interacting with community-associated chains.
+The Common forum (or "forum app") is Common's flagship first-party app. Its primary organizational primitive is the COMMUNITY. The forum app provides UI for off-chain discussions, and for interacting with community-associated chains.
 
 ### Group
 
-ADDRESSES have Memberships to GROUPS.
+ADDRESSES have Memberships to GROUPS. A group is defined by metadata and a set of on- and off-chain requirement for membership.
 
 See [models/group.ts](../libs/model/src/models/group.ts) and the knowledgebase [Groups](./Groups.md) entry.
 
@@ -141,15 +141,15 @@ See [models/poll.ts](../libs/model/src/models/poll.ts).
 
 ### Role
 
-<!-- TODO: Investigate status of our legacy (e.g. models/role.ts) Roles code. -->
-
 As of 231215, Roles are considered deprecated ontology at Common.
+
+COMMUNITIES remain managed by admins and moderators, but these are defined by their participation in admin and moderator GROUPS, with specific requirements and capacities.
 
 ### Sessions
 
-<!-- TODO: Expand entry. -->
+A session may be active or inactive. A browsing or "analytics" session begins when a USER opens a new Common tab or window, and ends when that window closes.
 
-A session may be active or inactive.
+When a USER SIGNS IN, a session key is created for their active ADDRESS, which is used to sign actions such as COMMENTS and REACTIONS.
 
 ### Sign-In
 
