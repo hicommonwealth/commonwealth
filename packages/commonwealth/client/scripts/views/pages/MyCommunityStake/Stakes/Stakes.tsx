@@ -1,10 +1,8 @@
 import { formatAddressShort } from 'helpers';
 import React from 'react';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import useTransactionHistory, {
-  TransactionHistoryProps,
-} from '../../../../hooks/useTransactionHistory';
 import CommunityInfo from '../common/CommunityInfo';
+import { TransactionsProps } from '../types';
 import './Stakes.scss';
 import { CWIcon } from '/views/components/component_kit/cw_icons/cw_icon';
 import { CWTable } from '/views/components/component_kit/new_designs/CWTable';
@@ -50,14 +48,12 @@ const columnInfo = [
   },
 ];
 
-const Stakes = ({ filterOptions, addressFilter }: TransactionHistoryProps) => {
-  const data = useTransactionHistory({ filterOptions, addressFilter });
-
+const Stakes = ({ transactions }: TransactionsProps) => {
   return (
     <section className="Stakes">
       <CWTable
         columnInfo={columnInfo}
-        rowData={data.map((tx) => ({
+        rowData={transactions.map((tx) => ({
           ...tx,
           community: {
             sortValue: tx.community.name.toLowerCase(),
