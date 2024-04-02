@@ -4,6 +4,7 @@ import { tester } from '@hicommonwealth/model';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { getTestAbi } from 'test/integration/evmChainEvents/util';
+import Web3 from 'web3';
 import {
   getEvents,
   getLogs,
@@ -24,6 +25,8 @@ import {
 } from './util';
 
 chai.use(chaiAsPromised);
+
+const web3 = new Web3();
 
 /*
  * The main objective of these tests is to ensure log processing logic works
@@ -266,7 +269,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
       }
 
       expect(events.length).to.equal(1);
-      expect(events[0].rawLog.address).to.equal(
+      expect(web3.utils.toChecksumAddress(events[0].rawLog.address)).to.equal(
         sdk.contractAddrs.compound.governance,
       );
       expect(events[0].eventSource.kind).to.equal('proposal-created');
@@ -302,7 +305,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
         propQueuedLog,
       ]);
       expect(events.length).to.equal(1);
-      expect(events[0].rawLog.address).to.equal(
+      expect(web3.utils.toChecksumAddress(events[0].rawLog.address)).to.equal(
         sdk.contractAddrs.compound.governance,
       );
       expect(events[0].eventSource.kind).to.equal('proposal-queued');
@@ -363,9 +366,9 @@ describe('EVM Chain Events Log Processing Tests', () => {
         (e) => e.eventSource.kind === 'proposal-created',
       );
       expect(propCreatedEvent).to.exist;
-      expect(propCreatedEvent.rawLog.address).to.equal(
-        sdk.contractAddrs.compound.governance,
-      );
+      expect(
+        web3.utils.toChecksumAddress(propCreatedEvent.rawLog.address),
+      ).to.equal(sdk.contractAddrs.compound.governance);
       expect(propCreatedEvent.eventSource.kind).to.equal('proposal-created');
       expect(
         parseInt(propCreatedEvent.rawLog.blockNumber.toString(), 16),
@@ -376,9 +379,9 @@ describe('EVM Chain Events Log Processing Tests', () => {
         (e) => e.eventSource.kind === 'proposal-queued',
       );
       expect(propQueuedEvent).to.exist;
-      expect(propQueuedEvent.rawLog.address).to.equal(
-        sdk.contractAddrs.compound.governance,
-      );
+      expect(
+        web3.utils.toChecksumAddress(propQueuedEvent.rawLog.address),
+      ).to.equal(sdk.contractAddrs.compound.governance);
       expect(propQueuedEvent.eventSource.kind).to.equal('proposal-queued');
       expect(
         parseInt(propQueuedEvent.rawLog.blockNumber.toString(), 16),

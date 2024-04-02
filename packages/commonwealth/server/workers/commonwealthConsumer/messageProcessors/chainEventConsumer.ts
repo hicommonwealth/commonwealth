@@ -16,12 +16,14 @@ import emitNotifications from '../../../util/emitNotifications';
 
 const log = logger(PinoLogger()).getLogger(__filename);
 
+const genericWeb3 = new Web3();
+
 const communityStakeContractAddresses = Object.values(
   commonProtocol.factoryContracts,
-).map((c) => c.communityStake.toLowerCase());
+).map((c) => c.communityStake);
 const namespaceFactoryContractAddresses = Object.values(
   commonProtocol.factoryContracts,
-).map((c) => c.factory.toLowerCase());
+).map((c) => c.factory);
 
 function handleDeployedNamespace(
   event: z.infer<typeof schemas.events.ChainEventCreated>,
@@ -118,7 +120,9 @@ async function handleProposalEvents(
       type: QueryTypes.SELECT,
       raw: true,
       replacements: {
-        contractAddress: event.rawLog.address,
+        contractAddress: genericWeb3.utils.toChecksumAddress(
+          event.rawLog.address,
+        ),
         chainNodeId: event.eventSource.chainNodeId,
       },
     },
@@ -157,7 +161,9 @@ export const processChainEventCreated: EventHandler<
   'ChainEventCreated',
   ZodUndefined
 > = async ({ payload }) => {
-  const contractAddress = payload.rawLog.address.toLowerCase();
+  const contractAddress = genericWeb3.utils.toChecksumAddress(
+    payload.rawLog.address,
+  );
   if (communityStakeContractAddresses.includes(contractAddress)) {
     await handleCommunityStakeTrades(payload);
   } else if (namespaceFactoryContractAddresses.includes(contractAddress)) {
