@@ -64,6 +64,7 @@ export default (
     models.Poll.hasMany(models.Vote, {
       foreignKey: 'poll_id',
       as: 'votes',
+      onDelete: 'CASCADE',
     });
   };
 

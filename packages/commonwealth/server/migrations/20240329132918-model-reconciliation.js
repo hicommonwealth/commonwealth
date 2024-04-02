@@ -25,6 +25,17 @@ module.exports = {
           },
           { transaction },
         ),
+        // clean votes without polls
+        queryInterface.sequelize.query(
+          `DELETE FROM "Votes" WHERE poll_id IS NULL`,
+          { transaction },
+        ),
+        // ensure cascade deletes
+        queryInterface.sequelize.query(`
+          ALTER TABLE "Votes" DROP CONSTRAINT IF EXISTS "Votes_poll_id_fkey",
+          ADD CONSTRAINT "Votes_poll_id_fkey" FOREIGN KEY (poll_id) REFERENCES "Polls"(id) 
+          ON UPDATE NO ACTION
+          ON DELETE CASCADE;`),
         // poll_id should never be null
         queryInterface.changeColumn(
           'Votes',
@@ -114,7 +125,7 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    return queryInterface.sequelize.transaction(async (transaction) => {
+    return queryInterface.sequelize.transaction((transaction) => {
       return Promise.all([
         queryInterface.removeConstraint(
           'Collaborations',
@@ -134,6 +145,11 @@ module.exports = {
           },
           { transaction },
         ),
+        queryInterface.sequelize.query(`
+          ALTER TABLE "Votes" DROP CONSTRAINT IF EXISTS "Votes_poll_id_fkey",
+          ADD CONSTRAINT "Votes_poll_id_fkey" FOREIGN KEY (poll_id) REFERENCES "Polls"(id) 
+          ON UPDATE NO ACTION
+          ON DELETE NO ACTION;`),
         queryInterface.changeColumn(
           'Votes',
           'poll_id',
