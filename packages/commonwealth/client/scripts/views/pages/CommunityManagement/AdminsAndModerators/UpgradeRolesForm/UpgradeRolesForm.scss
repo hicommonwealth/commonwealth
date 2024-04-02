@@ -9,7 +9,6 @@
 .UpgradeRolesForm {
   display: flex;
   flex-direction: column;
-  gap: 16px;
 
   .members-container {
     border: 1px solid $neutral-300;
@@ -20,7 +19,7 @@
     overflow-y: auto;
     padding: 0 8px;
     width: 100%;
-
+    margin-top: 16px;
     @include visibleScrollbar(light);
   }
 
@@ -28,6 +27,7 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    margin-top: 16px;
   }
 
   .SearchBar {

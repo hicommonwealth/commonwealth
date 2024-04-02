@@ -1,8 +1,8 @@
-import axios from 'axios';
-import { notifyError } from 'controllers/app/notifications';
+import updateRoles from 'client/scripts/state/api/members/updateRoles';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
+import useFetchAdminQuery from 'state/api/members/fetchAdmin';
 import { User } from 'views/components/user/user';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import RoleInfo from '../../../../../models/RoleInfo';
@@ -23,39 +23,21 @@ export const ManageRoles = ({
 }: ManageRoleRowProps) => {
   const navigate = useCommonNavigate();
 
-  const removeRole = async (role: RoleInfo) => {
-    try {
-      const res = await axios.post(`${app.serverUrl()}/upgradeMember`, {
-        community_id: app.activeChainId(),
-        new_role: 'member',
-        address: role.Address.address,
-        jwt: app.user.jwt,
-      });
+  let roleToBeDeleted;
+  const { useRemoveRolesMutation } = updateRoles;
+  const { data: removedRoleData, mutateAsync: removeRole } =
+    useRemoveRolesMutation({
+      onRoleUpdate,
+      roleToBeDeleted,
+    });
 
-      if (res.data.status !== 'Success') {
-        throw new Error(`Got unsuccessful status: ${res.data.status}`);
-      }
-
-      const roleData = res.data.result;
-      const newRole = new RoleInfo({
-        id: roleData.id,
-        address_id: roleData.address_id,
-        address_chain: roleData.community_id,
-        address: roleData.address,
-        community_id: roleData.community_id,
-        permission: roleData.permission,
-        allow: roleData.allow,
-        deny: roleData.deny,
-        is_user_default: roleData.is_user_default,
-      });
-      onRoleUpdate(role, newRole);
-    } catch (err) {
-      const errMsg = err.response?.data?.error || 'Failed to alter role.';
-      notifyError(errMsg);
-    }
-  };
+  const { data: { admins: returnedAdmins, mods: returnedMods } = {} } =
+    useFetchAdminQuery({
+      communityId: app.activeChainId(),
+    });
 
   const handleDeleteRole = async (role: RoleInfo) => {
+    roleToBeDeleted = role;
     const isSelf =
       role.Address.address === app.user.activeAccount?.address &&
       role.community_id === app.user.activeAccount?.community.id;
@@ -64,15 +46,9 @@ export const ManageRoles = ({
       (addr_) => addr_.id === (role.address_id || role.Address.id),
     ).length;
 
-    const res = await axios.get(`${app.serverUrl()}/roles`, {
-      params: {
-        chain_id: app.activeChainId(),
-        permissions: ['moderator', 'admin'],
-      },
-    });
-    const adminsAndMods = res.data.result;
+    const arrayedTestData = [...returnedAdmins, ...returnedMods];
 
-    const userAdminsAndMods = adminsAndMods.filter((role_) => {
+    const userAdminsAndMods = arrayedTestData.filter((role_) => {
       const belongsToUser = !!app.user.addresses.filter(
         (addr_) => addr_.id === role_.address_id,
       ).length;
@@ -116,7 +92,7 @@ export const ManageRoles = ({
           buttonType: 'destructive',
           buttonHeight: 'sm',
           onClick: async () => {
-            await removeRole(role);
+            await removeRole({ roleToBeDeleted, onRoleUpdate });
             if (isLosingAdminPermissions) {
               navigate('/manage/moderators');
             }

@@ -69,10 +69,6 @@ const AdminsAndModerators = () => {
   };
 
   const handleRoleUpdate = (oldRole, newRole) => {
-    // newRole doesn't have the Address property that oldRole has,
-    // Add the missing Address property to the newRole, then splice it into the array.
-    newRole.Address = oldRole.Address;
-
     const predicate = (r) => {
       return r.address_id === oldRole.address_id;
     };

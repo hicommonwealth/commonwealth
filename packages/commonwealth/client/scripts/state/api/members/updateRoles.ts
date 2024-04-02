@@ -1,17 +1,17 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
-import type RoleInfo from '../../../models/RoleInfo';
+import RoleInfo from '../../../models/RoleInfo';
 
 type UpgradeRolesProps = {
-  onRoleUpdate: (oldRole: RoleInfo, newRole: RoleInfo) => any;
+  onRoleUpdate: (oldRole, newRole) => any;
   newRole: string;
   upgradedUser;
 };
 
 type RemoveRoleProps = {
-  role: RoleInfo;
-  onRoleUpdate: (oldRole: RoleInfo, newRole: RoleInfo) => void;
+  roleToBeDeleted;
+  onRoleUpdate: (oldRole, newRole) => void;
 };
 
 const upgradeRoles = async ({ upgradedUser, newRole }: UpgradeRolesProps) => {
@@ -22,44 +22,71 @@ const upgradeRoles = async ({ upgradedUser, newRole }: UpgradeRolesProps) => {
     ...communityObj,
     jwt: app.user.jwt,
   });
-  return { newRole: res.data.result };
+
+  if (res.data.status === 'Success') {
+    const roleData = res.data.result;
+
+    const createdRole = new RoleInfo({
+      id: roleData.id,
+      address_id: roleData.address_id,
+      address_chain: roleData.community_id,
+      address: roleData.address,
+      community_id: roleData.community_id,
+      permission: roleData.permission,
+      allow: roleData.allow,
+      deny: roleData.deny,
+      is_user_default: roleData.is_user_default,
+      Address: upgradedUser.Address,
+    });
+
+    return { newRole: createdRole, upgradedUser: upgradedUser };
+  } else {
+    throw new Error('Unable to upgrade user');
+  }
 };
 
-const useUpgradeRolesMutation = ({
-  onRoleUpdate,
-  upgradedUser,
-}: UpgradeRolesProps) => {
+const useUpgradeRolesMutation = ({ onRoleUpdate }: UpgradeRolesProps) => {
   return useMutation({
     mutationFn: upgradeRoles,
-    onSuccess: async (data) => {
-      onRoleUpdate(upgradedUser, data.newRole);
+    onSuccess: (data) => {
+      onRoleUpdate(data.upgradedUser, data.newRole);
     },
   });
 };
 
-const removeRole = async ({ role }: RemoveRoleProps) => {
+const removeRole = async ({ roleToBeDeleted }: RemoveRoleProps) => {
   const communityObj = { chain: app.activeChainId() };
-
   const res = await axios.post(`${app.serverUrl()}/upgradeMember`, {
     ...communityObj,
     new_role: 'member',
-    address: role.Address.address,
+    address: roleToBeDeleted.Address.address,
     jwt: app.user.jwt,
   });
 
-  if (res.data.status !== 'Success') {
-    throw new Error(`Got unsuccessful status: ${res.data.status}`);
+  if (res.data.status === 'Success') {
+    const roleData = res.data.result;
+    const newRole = new RoleInfo({
+      id: roleData.id,
+      address_id: roleData.address_id,
+      address_chain: roleData.community_id,
+      address: roleData.address,
+      community_id: roleData.community_id,
+      permission: roleData.permission,
+      allow: roleData.allow,
+      deny: roleData.deny,
+      is_user_default: roleData.is_user_default,
+    });
+    return { roleToBeDeleted, newRole };
+  } else {
+    throw new Error('Unable to remove user');
   }
-
-  const newRole = res.data.result;
-  return newRole;
 };
 
 const useRemoveRolesMutation = ({ onRoleUpdate }: RemoveRoleProps) => {
   return useMutation({
     mutationFn: removeRole,
     onSuccess: async (data) => {
-      onRoleUpdate(data.role, data.newRole);
+      onRoleUpdate(data.roleToBeDeleted, data.newRole);
     },
   });
 };

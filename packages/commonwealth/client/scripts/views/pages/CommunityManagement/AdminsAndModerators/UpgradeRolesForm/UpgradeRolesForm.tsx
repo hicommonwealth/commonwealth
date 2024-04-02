@@ -4,6 +4,7 @@ import { formatAddressShort } from 'helpers';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import app from 'state';
 import RoleInfo from '../../../../../models/RoleInfo';
+import { CWLabel } from '../../../../components/component_kit/cw_label';
 import { CWRadioGroup } from '../../../../components/component_kit/cw_radio_group';
 import { CWButton } from '../../../../components/component_kit/new_designs/cw_button';
 import { CWRadioButton } from '../../../../components/component_kit/new_designs/cw_radio_button';
@@ -12,18 +13,12 @@ import './UpgradeRolesForm.scss';
 
 type UpgradeRolesFormProps = {
   label?: string;
-  onRoleUpdate: (oldRole: RoleInfo, newRole: RoleInfo) => void;
+  onRoleUpdate: (oldRole, newRole) => void;
   refetchMembers: () => any;
   roleData: RoleInfo[];
   searchTerm: string;
   setSearchTerm: (v: string) => void;
   isLoadingProfiles: boolean;
-};
-
-type UpgradeRolesProps = {
-  onRoleUpdate: (oldRole: RoleInfo, newRole: RoleInfo) => any;
-  newRole: string;
-  upgradedUser: any;
 };
 
 export const UpgradeRolesForm = ({
@@ -45,12 +40,14 @@ export const UpgradeRolesForm = ({
   let upgradedUser;
   let newRole;
   const membersRef = useRef();
+
   const { useUpgradeRolesMutation } = updateRoles;
-  const { mutateAsync: upgradeRole } = useUpgradeRolesMutation({
-    onRoleUpdate,
-    newRole,
-    upgradedUser,
-  });
+  const { data: upgradeRolesData, mutateAsync: upgradeRole } =
+    useUpgradeRolesMutation({
+      onRoleUpdate,
+      newRole,
+      upgradedUser,
+    });
 
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
@@ -78,7 +75,6 @@ export const UpgradeRolesForm = ({
 
   const handleUpgrade = async () => {
     const indexOfName = nonAdminNames.indexOf(user);
-
     upgradedUser = nonAdmins[indexOfName];
     newRole =
       role === 'Admin' ? 'admin' : role === 'Moderator' ? 'moderator' : '';
@@ -120,6 +116,7 @@ export const UpgradeRolesForm = ({
 
   return (
     <div className="UpgradeRolesForm">
+      <CWLabel label={label} />
       <MembersSearchBar
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
