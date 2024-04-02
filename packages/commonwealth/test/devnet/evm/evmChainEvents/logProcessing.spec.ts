@@ -40,7 +40,9 @@ describe('EVM Chain Events Log Processing Tests', () => {
     propCreatedLog: Log,
     propQueuedLog: Log;
 
-  before(async () => {
+  before(async function () {
+    this.timeout(80_000);
+
     await tester.seedDb();
     abi = (await getTestAbi()).abi;
 
