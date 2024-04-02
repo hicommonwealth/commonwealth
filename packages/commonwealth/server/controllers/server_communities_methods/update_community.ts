@@ -243,14 +243,16 @@ export async function __updateCommunity(
       throw new AppError(Errors.NotAdmin);
     }
 
-    await commonProtocol.newNamespaceValidator.validateNamespace(
-      namespace,
-      transactionHash,
-      ownerOfCommunity.address,
-      community,
-    );
+    const namespaceAddress =
+      await commonProtocol.newNamespaceValidator.validateNamespace(
+        namespace,
+        transactionHash,
+        ownerOfCommunity.address,
+        community,
+      );
 
     community.namespace = namespace;
+    community.namespace_address = namespaceAddress;
   }
 
   // TODO Graham 3/31/22: Will this potentially lead to undesirable effects if toggle
