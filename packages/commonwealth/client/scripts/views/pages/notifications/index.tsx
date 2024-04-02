@@ -36,20 +36,20 @@ const NotificationsPage = () => {
             label="Mark all as read"
             onClick={(e) => {
               e.preventDefault();
-              app.user.notifications.markAsRead(mostRecentFirst);
+              void app.user.notifications.markAsRead(mostRecentFirst);
               setAllRead(true);
             }}
           />
           <CWButton
             label="Clear chain events"
-            onClick={async (e) => {
+            onClick={(e) => {
               e.preventDefault();
 
               if (app.user.notifications.chainEventNotifications.length === 0) {
                 return;
               }
 
-              app.user.notifications.delete(
+              void app.user.notifications.delete(
                 app.user.notifications.chainEventNotifications,
               );
             }}

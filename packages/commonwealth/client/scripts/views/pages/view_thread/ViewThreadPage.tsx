@@ -554,8 +554,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     key={commentSortType}
                     size="compact"
                     selected={commentSortType}
-                    onSelect={(item: any) => {
-                      setCommentSortType(item.value);
+                    onSelect={(item) => {
+                      if (typeof item !== 'string') {
+                        setCommentSortType(item?.value);
+                      }
                     }}
                     options={[
                       {
@@ -646,7 +648,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                           <SnapshotCreationCard
                             thread={thread}
                             allowSnapshotCreation={isAuthor || isAdminOrMod}
-                            onChangeHandler={handleNewSnapshotChange}
+                            onChangeHandler={void handleNewSnapshotChange}
                           />
                         </div>
                       ),

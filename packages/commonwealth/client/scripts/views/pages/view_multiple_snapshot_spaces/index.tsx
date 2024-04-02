@@ -92,7 +92,7 @@ const MultipleSnapshotsPage = (props: MultipleSnapshotsPageProps) => {
                 proposal={null}
                 proposals={[]}
                 redirectAction=""
-                space={{} as any}
+                space={{} as SnapshotSpace}
               />
             ))}
           />

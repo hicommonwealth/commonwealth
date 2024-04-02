@@ -144,7 +144,7 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
                 key={i}
                 snapshotId={snapshotId}
                 showSkeleton
-                proposal={{} as any}
+                proposal={{} as SnapshotProposal}
               />
             ))}
           />
