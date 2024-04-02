@@ -95,22 +95,6 @@ describe('EVM Chain Events Log Processing Tests', () => {
       ).to.not.be.rejected;
     });
 
-    it('should restrict the maximum block range fetched to 500 blocks', async () => {
-      expectAbi();
-
-      await sdk.getVotingPower(1, '400000');
-      propCreatedResult = await sdk.createProposal(1);
-      await sdk.safeAdvanceTime(propCreatedResult.block + 501);
-
-      expect(propCreatedResult.block).to.not.be.undefined;
-      const { logs } = await getLogs({
-        rpc: localRpc,
-        contractAddresses: [sdk.contractAddrs.compound.governance],
-        startingBlockNum: propCreatedResult.block,
-      });
-      expect(logs).to.be.empty;
-    }).timeout(80_000);
-
     it('should fetch logs from the specified range', async () => {
       expectAbi();
       expect(propCreatedResult, 'Must have created a proposal to run this test')
@@ -142,9 +126,6 @@ describe('EVM Chain Events Log Processing Tests', () => {
       expect(propQueuedLogs.logs.length).to.equal(1);
       propQueuedLog = propQueuedLogs.logs[0];
     }).timeout(80_000);
-
-    // TODO: do we want to fetch only up to currentBlock - 7 blocks to account for micro-reorgs?
-    xit('should not fetch the most recent block', async () => {});
   });
 
   describe('parsing logs', () => {
@@ -355,12 +336,21 @@ describe('EVM Chain Events Log Processing Tests', () => {
         },
       };
 
-      const currentBlockNum = (await sdk.getBlock()).number;
-      const { events } = await getEvents(
+      const createdEvent = await getEvents(
         evmSource,
-        currentBlockNum - propCreatedResult.block + 5,
+        propCreatedResult.block - 1,
+        propCreatedResult.block + 5,
       );
-      expect(events.length).to.equal(2);
+      expect(createdEvent.events.length).to.equal(1);
+
+      const queuedEvent = await getEvents(
+        evmSource,
+        propQueuedResult.block - 1,
+        propQueuedResult.block + 5,
+      );
+      expect(queuedEvent.events.length).to.equal(1);
+
+      const events = createdEvent.events.concat(queuedEvent.events);
 
       const propCreatedEvent = events.find(
         (e) => e.eventSource.kind === 'proposal-created',
@@ -389,6 +379,20 @@ describe('EVM Chain Events Log Processing Tests', () => {
       expect(propQueuedEvent.parsedArgs).to.exist;
     });
   });
+
+  it('should restrict the maximum block range fetched to 500 blocks', async () => {
+    expectAbi();
+
+    expect(propQueuedResult.block).to.not.be.undefined;
+    await sdk.safeAdvanceTime(propQueuedResult.block + 501);
+
+    const { logs } = await getLogs({
+      rpc: localRpc,
+      contractAddresses: [sdk.contractAddrs.compound.governance],
+      startingBlockNum: propQueuedResult.block - 1,
+    });
+    expect(logs).to.be.empty;
+  }).timeout(80_000);
 
   // this cleans up the proposal cycle by executing the proposal
   // and advancing the chain 501 blocks past the max EVM CE range
