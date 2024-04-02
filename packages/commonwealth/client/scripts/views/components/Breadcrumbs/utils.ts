@@ -54,7 +54,7 @@ export const generateBreadcrumbs = (
   let isParent: boolean;
 
   if (customDomain) {
-    locationPath = `${customDomain}/${locationPath}`;
+    locationPath = `${customDomain}${locationPath}`;
   }
 
   const pathSegments = locationPath
@@ -73,12 +73,7 @@ export const generateBreadcrumbs = (
         link = `profile/id/${profileId}`;
         break;
       case 'members':
-        if (
-          pathSegments[index] === 'members' &&
-          pathSegments[index + 1] === 'update'
-        ) {
-          link = 'members';
-        }
+        link = 'members';
         break;
       case 'snapshot':
         //Match the header on the snapshots page

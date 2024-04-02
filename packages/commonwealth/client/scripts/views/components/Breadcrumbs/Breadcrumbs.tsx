@@ -1,4 +1,4 @@
-import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
@@ -14,13 +14,12 @@ export const Breadcrumbs = () => {
 
   const getThreadId = location.pathname.match(/\/(\d+)-/);
 
-  console.log(app.chain);
-
   const { data: linkedThreads } = useGetThreadsByIdQuery({
     chainId: app.activeChainId(),
     ids: [getThreadId && Number(getThreadId[1])],
     apiCallEnabled:
-      location.pathname.split('/')[1].toLowerCase() === 'discussion', //Only call when in discussion pages prevents unnecessary calls.
+      // Only call when in discussion pages prevents unnecessary calls.
+      location.pathname.split('/')[1].toLowerCase() === 'discussion',
   });
 
   const user = app?.user?.addresses?.[0];
@@ -57,7 +56,7 @@ export const Breadcrumbs = () => {
     location.pathname,
     profileId,
     navigate,
-    app.isCustomDomain() ? getScopePrefix() : undefined,
+    app.isCustomDomain() ? app.activeChainId() : undefined,
     currentDiscussion,
   );
 
