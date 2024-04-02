@@ -382,23 +382,42 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     action: 'comment',
   });
 
+  const getMetaDescription = (meta: string) => {
+    try {
+      const parsedMeta = JSON.parse(meta);
+      if (getTextFromDelta(parsedMeta)) {
+        return getTextFromDelta(parsedMeta);
+      } else {
+        return meta;
+      }
+    } catch (error) {
+      return;
+    }
+  };
+
   return (
     // TODO: the editing experience can be improved (we can remove a stale code and make it smooth) - create a ticket
     <>
       <Helmet defaultTitle="Common">
         {/* Default sharing */}
         <meta name="title" content={thread.title} />
-        <meta name="description" content={thread.body} />
+        <meta name="description" content={getMetaDescription(thread.body)} />
         <meta name="author" content={thread.author} />
 
         {/* Open Graph */}
         <meta property="og:title" content={thread.title} />
-        <meta property="og:description" content={thread.body} />
+        <meta
+          property="og:description"
+          content={getMetaDescription(thread.body)}
+        />
         <meta property="og:image" content={communityImage} />
         {/* Twitter */}
         <meta name="twitter:title" content={thread.title} />
         <meta name="twitter:site" content="@hicommonwealth" />
-        <meta name="twitter:description" content={thread.body} />
+        <meta
+          name="twitter:description"
+          content={getMetaDescription(thread.body)}
+        />
         <meta name="twitter:card" content={communityImage} />
         <meta name="twitter:image:src" content={communityImage} />
       </Helmet>
