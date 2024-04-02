@@ -60,7 +60,9 @@ async function main() {
     }
 
     log.info(`Namespace address for ${community.id}: ${namespaceAddress}`);
-    community.namespace_address = namespaceAddress;
+
+    if (!community.namespace_address)
+      community.namespace_address = namespaceAddress;
   }
 
   log.info('Namespace retrieval finished. Commencing database update...');
