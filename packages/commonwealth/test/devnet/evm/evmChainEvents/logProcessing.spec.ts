@@ -130,6 +130,20 @@ describe('EVM Chain Events Log Processing Tests', () => {
       expect(propQueuedLogs.logs.length).to.equal(1);
       propQueuedLog = propQueuedLogs.logs[0];
     }).timeout(80_000);
+
+    it('should restrict the maximum block range fetched to 500 blocks', async () => {
+      expectAbi();
+
+      expect(propQueuedResult.block).to.not.be.undefined;
+      await sdk.safeAdvanceTime(propQueuedResult.block + 501);
+
+      const { logs } = await getLogs({
+        rpc: localRpc,
+        contractAddresses: [sdk.contractAddrs.compound.governance],
+        startingBlockNum: propQueuedResult.block - 1,
+      });
+      expect(logs).to.be.empty;
+    }).timeout(80_000);
   });
 
   describe('parsing logs', () => {
@@ -383,20 +397,6 @@ describe('EVM Chain Events Log Processing Tests', () => {
       expect(propQueuedEvent.parsedArgs).to.exist;
     });
   });
-
-  it('should restrict the maximum block range fetched to 500 blocks', async () => {
-    expectAbi();
-
-    expect(propQueuedResult.block).to.not.be.undefined;
-    await sdk.safeAdvanceTime(propQueuedResult.block + 501);
-
-    const { logs } = await getLogs({
-      rpc: localRpc,
-      contractAddresses: [sdk.contractAddrs.compound.governance],
-      startingBlockNum: propQueuedResult.block - 1,
-    });
-    expect(logs).to.be.empty;
-  }).timeout(80_000);
 
   // this cleans up the proposal cycle by executing the proposal
   // and advancing the chain 501 blocks past the max EVM CE range
