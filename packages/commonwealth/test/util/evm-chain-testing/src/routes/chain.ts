@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { Request, Response } from 'express';
 import Web3 from 'web3';
+import { PROVIDER_URL } from '../../config';
 import { chainAdvanceTime, chainGetEth } from '../types';
-import getProvider, { providerUrl } from '../utils/getProvider';
+import getProvider from '../utils/getProvider';
 
 const getBlockInfo = async () => {
   const provider = getProvider();
@@ -51,7 +52,7 @@ export const advanceEvmTime = async (
 ) => {
   const advance_secs = Web3.utils.numberToHex(time).toString();
   await axios.post(
-    providerUrl,
+    PROVIDER_URL,
     // '{"jsonrpc": "2.0", "id": 1, "method": "evm_increaseTime", "params": ["0x15180"] }',
     {
       jsonrpc: '2.0',
@@ -66,7 +67,7 @@ export const advanceEvmTime = async (
     },
   );
   await axios.post(
-    providerUrl,
+    PROVIDER_URL,
     {
       jsonrpc: '2.0',
       id: 1,
@@ -126,7 +127,76 @@ export const getETH = async (req: Request, res: Response) => {
   }
 };
 
-export const takeChainSnapshot = async (req: Request, res: Response) => {
+export const getChainSnapshot = async (req: Request, res: Response) => {
+  let result;
   try {
-  } catch (e) {}
+    result = await axios.post(
+      PROVIDER_URL,
+      {
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'evm_snapshot',
+        params: [],
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    res.status(200).json({
+      data: result.data,
+    });
+  } catch (e) {
+    console.error(e);
+    if (e.response) {
+      res.status(result?.status).json({
+        message: e.response.data,
+      });
+    } else {
+      res.status(result?.status || 500).json({
+        message: 'Internal Server Error',
+      });
+    }
+  }
+};
+
+export const revertChainToSnapshot = async (req: Request, res: Response) => {
+  let result;
+
+  // const snapshotId = Web3.utils.numberToHex(time).toString();
+  const data: { snapshotId: string } = req.body;
+  try {
+    result = await axios.post(
+      PROVIDER_URL,
+      {
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'evm_revert',
+        params: [data.snapshotId],
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    res.status(200).json({
+      data: result.data,
+    });
+  } catch (e) {
+    console.error(e);
+    if (e.response) {
+      res.status(result?.status).json({
+        message: e.response.data,
+      });
+    } else {
+      res.status(result?.status || 500).json({
+        message: 'Internal Server Error',
+        error: e,
+      });
+    }
+  }
 };
