@@ -1,4 +1,7 @@
+import { AppError } from '@hicommonwealth/core';
 import Web3 from 'web3';
+import { AbiItem } from 'web3-utils';
+import { contestABI } from './abi/contestAbi';
 
 export type AddContentResponse = {
   txReceipt: any;
@@ -27,9 +30,27 @@ export const addContent = async (
   creator: string,
   url: string,
 ): Promise<AddContentResponse> => {
+  const contestInstance = new web3.eth.Contract(
+    contestABI as AbiItem[],
+    contest,
+  );
+  let txReceipt;
+  try {
+    txReceipt = await contestInstance.methods
+      .addContent(creator, url, '')
+      .send();
+  } catch (error) {
+    throw new AppError('Failed to push content to chain: ' + error);
+  }
+  const event = txReceipt.events['ContentAdded'];
+
+  if (!event) {
+    throw new AppError('Content not added on-chain');
+  }
+
   return {
-    txReceipt: 'string',
-    contentId: 'string',
+    txReceipt,
+    contentId: event.returnValues.contentId,
   };
 };
 
@@ -46,8 +67,22 @@ export const voteContent = async (
   contest: string,
   voter: string,
   contentId: string,
-): Promise<string> => {
-  return 'txreceipt';
+): Promise<any> => {
+  const contestInstance = new web3.eth.Contract(
+    contestABI as AbiItem[],
+    contest,
+  );
+
+  let txReceipt;
+  try {
+    txReceipt = await contestInstance.methods
+      .voteContent(voter, contentId)
+      .send();
+  } catch (error) {
+    throw new AppError('Failed to push content to chain: ' + error);
+  }
+
+  return txReceipt;
 };
 
 /**
