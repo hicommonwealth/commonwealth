@@ -1,13 +1,13 @@
+import axios from 'axios';
 import { Request, Response } from 'express';
 import Web3 from 'web3';
-import getProvider, { providerUrl } from '../utils/getProvider';
-import axios from 'axios';
 import { chainAdvanceTime, chainGetEth } from '../types';
+import getProvider, { providerUrl } from '../utils/getProvider';
 
 const getBlockInfo = async () => {
   const provider = getProvider();
   const block = await provider.eth.getBlock(
-    await provider.eth.getBlockNumber()
+    await provider.eth.getBlockNumber(),
   );
   return block;
 };
@@ -47,7 +47,7 @@ export const getBlock = async (req: Request, res: Response) => {
 
 export const advanceEvmTime = async (
   time: number | string,
-  blocks: number | string
+  blocks: number | string,
 ) => {
   const advance_secs = Web3.utils.numberToHex(time).toString();
   await axios.post(
@@ -63,7 +63,7 @@ export const advanceEvmTime = async (
       headers: {
         'Content-Type': 'application/json',
       },
-    }
+    },
   );
   await axios.post(
     providerUrl,
@@ -77,7 +77,7 @@ export const advanceEvmTime = async (
       headers: {
         'Content-Type': 'application/json',
       },
-    }
+    },
   );
 };
 
@@ -124,4 +124,9 @@ export const getETH = async (req: Request, res: Response) => {
       })
       .send();
   }
+};
+
+export const takeChainSnapshot = async (req: Request, res: Response) => {
+  try {
+  } catch (e) {}
 };
