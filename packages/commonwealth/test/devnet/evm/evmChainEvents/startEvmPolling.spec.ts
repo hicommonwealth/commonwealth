@@ -1,6 +1,7 @@
-import { delay, dispose } from '@hicommonwealth/core';
+import { delay, dispose, schemas } from '@hicommonwealth/core';
 import { tester, type ContractInstance, type DB } from '@hicommonwealth/model';
 import { expect } from 'chai';
+import { z } from 'zod';
 import { startEvmPolling } from '../../../../server/workers/evmChainEvents/startEvmPolling';
 import {
   getTestAbi,
@@ -85,11 +86,22 @@ describe('EVM Chain Events End to End Tests', () => {
 
     const events = await models.Outbox.findAll();
     expect(events.length).to.equal(1);
-    expect(events[0]).to.have.own.property('eventSource', {
+    expect(events[0]?.event_name).to.equal(
+      schemas.EventNames.ChainEventCreated,
+    );
+    expect(events[0]?.event_payload?.event_name).to.equal(
+      schemas.EventNames.ChainEventCreated,
+    );
+
+    const event = events[0].event_payload as z.infer<
+      typeof schemas.events.ChainEventCreated
+    >;
+
+    expect(event.eventSource).to.deep.equal({
       kind: 'proposal-created',
       chainNodeId: chainNode.id,
     });
-    expect(events[0]).to.have.own.property('parsedArgs');
-    expect(events[0]).to.have.own.property('rawLog');
+    expect(event.parsedArgs).to.exist;
+    expect(event.rawLog).to.exist;
   }).timeout(80_000);
 });
