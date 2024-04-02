@@ -108,7 +108,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
       expect(logs).to.be.empty;
     }).timeout(80_000);
 
-    it('should fetch logs from the starting block number if provided', async () => {
+    it('should fetch logs from the specified range', async () => {
       expectAbi();
       expect(propCreatedResult, 'Must have created a proposal to run this test')
         .to.not.be.undefined;
@@ -121,14 +121,23 @@ describe('EVM Chain Events Log Processing Tests', () => {
 
       propQueuedResult = await sdk.queueProposal(propCreatedResult.proposalId);
 
-      const { logs } = await getLogs({
+      const propCreatedLogs = await getLogs({
         rpc: localRpc,
         contractAddresses: [sdk.contractAddrs.compound.governance],
         startingBlockNum: propCreatedResult.block,
+        endingBlockNum: propCreatedResult.block + 1,
       });
-      expect(logs.length).to.equal(2);
-      propCreatedLog = logs[0];
-      propQueuedLog = logs[1];
+      expect(propCreatedLogs.logs.length).to.equal(1);
+      propCreatedLog = propCreatedLogs.logs[0];
+
+      const propQueuedLogs = await getLogs({
+        rpc: localRpc,
+        contractAddresses: [sdk.contractAddrs.compound.governance],
+        startingBlockNum: propQueuedResult.block,
+        endingBlockNum: propQueuedResult.block + 1,
+      });
+      expect(propQueuedLogs.logs.length).to.equal(1);
+      propQueuedLog = propQueuedLogs.logs[0];
     }).timeout(80_000);
 
     // TODO: do we want to fetch only up to currentBlock - 7 blocks to account for micro-reorgs?
