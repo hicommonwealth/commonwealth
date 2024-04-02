@@ -103,7 +103,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     if (!isOnArchivePage && !includeArchivedThreads && t.archivedAt)
       return null;
 
-    if (isOnArchivePage && t.archivedAt) return null;
+    if (isOnArchivePage && !t.archivedAt) return null;
 
     return t;
   });
