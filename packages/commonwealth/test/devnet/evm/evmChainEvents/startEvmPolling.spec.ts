@@ -60,7 +60,7 @@ describe('EVM Chain Events End to End Tests', () => {
     await dispose()();
   });
 
-  it('should emit a notification for every captured event that has a valid event source', async () => {
+  it('should insert events into the outbox', async () => {
     const chainNode = await getTestChainNode();
     const abi = await getTestAbi();
     contract = await getTestContract();
