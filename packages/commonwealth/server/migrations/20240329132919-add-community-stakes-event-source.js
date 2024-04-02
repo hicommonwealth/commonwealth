@@ -1029,16 +1029,6 @@ module.exports = {
         },
         { transaction },
       );
-
-      await queryInterface.addColumn(
-        'Communities',
-        'namespace_address',
-        {
-          type: Sequelize.STRING,
-          allowNull: true,
-        },
-        { transaction },
-      );
     });
   },
 
