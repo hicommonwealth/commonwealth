@@ -43,6 +43,10 @@ describe('EVM Chain Events Log Processing Tests', () => {
   before(async () => {
     await tester.seedDb();
     abi = (await getTestAbi()).abi;
+
+    await sdk.getVotingPower(1, '400000');
+    propCreatedResult = await sdk.createProposal(1);
+    expect(propCreatedResult.block).to.not.be.undefined;
   });
 
   after(async () => {
