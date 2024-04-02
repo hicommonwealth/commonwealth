@@ -33,7 +33,7 @@ const web3 = new Web3();
  * as expected irrespective of the underlying event type. Most of the tests
  * are interdependent therefore mocha should exit on the first failure.
  */
-describe('EVM Chain Events Log Processing Tests', () => {
+describe.only('EVM Chain Events Log Processing Tests', () => {
   let propCreatedResult: { block: number; proposalId: string },
     propQueuedResult: { block: number },
     abi: AbiType,
@@ -44,10 +44,14 @@ describe('EVM Chain Events Log Processing Tests', () => {
     this.timeout(80_000);
 
     await tester.seedDb();
+    console.log('Test seeded');
     abi = (await getTestAbi()).abi;
+    console.log('ABI created');
 
     await sdk.getVotingPower(1, '400000');
+    console.log('Voting power acquired');
     propCreatedResult = await sdk.createProposal(1);
+    console.log('Proposal created', propCreatedResult);
     expect(propCreatedResult.block).to.not.be.undefined;
   });
 
