@@ -6,7 +6,6 @@ import type ChainInfo from 'models/ChainInfo';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback } from 'react';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
-import { CommunityData } from 'views/pages/DirectoryPage/DirectoryPageContent';
 import {
   MixpanelClickthroughEvent,
   MixpanelClickthroughPayload,
@@ -22,7 +21,7 @@ import './CWRelatedCommunityCard.scss';
 import { addPeriodToText } from './utils';
 
 type CWRelatedCommunityCardProps = {
-  community: ChainInfo | CommunityData;
+  community: ChainInfo;
   memberCount: string | number;
   threadCount: string | number;
   onStakeBtnClick?: () => void;
@@ -42,7 +41,7 @@ export const CWRelatedCommunityCard = ({
   const { isLoggedIn } = useUserLoggedIn();
 
   const { stakeEnabled, stakeValue, stakeChange } = useCommunityCardPrice({
-    community: community as ChainInfo,
+    community: community,
     ethUsdRate,
     stakeId: 2,
     historicalPrice,
@@ -102,10 +101,7 @@ export const CWRelatedCommunityCard = ({
           <div className="community-info">
             <div className="header">
               <div className="community-name">
-                <CWCommunityAvatar
-                  community={community as ChainInfo}
-                  size="large"
-                />
+                <CWCommunityAvatar community={community} size="large" />
                 <CWText type="h5" title={community.name} fontWeight="medium">
                   {community.name}
                 </CWText>

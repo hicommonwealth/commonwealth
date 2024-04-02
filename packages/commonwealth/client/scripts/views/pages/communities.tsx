@@ -22,7 +22,6 @@ import CWCircleMultiplySpinner from '../components/component_kit/new_designs/CWC
 import { CWModal } from '../components/component_kit/new_designs/CWModal';
 import { CWRelatedCommunityCard } from '../components/component_kit/new_designs/CWRelatedCommunityCard';
 import ManageCommunityStakeModal from '../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
-import { CommunityData } from './DirectoryPage/DirectoryPageContent';
 
 const buildCommunityString = (numCommunities: number) =>
   numCommunities >= 1000
@@ -62,9 +61,8 @@ const CommunitiesPage = () => {
     modeOfManageCommunityStakeModal,
   } = useManageCommunityStakeModalStore();
 
-  const [selectedCommunity, setSelectedCommunity] = React.useState<
-    ChainInfo | CommunityData
-  >(null);
+  const [selectedCommunity, setSelectedCommunity] =
+    React.useState<ChainInfo>(null);
 
   const oneDayAgo = useRef(new Date().getTime() - 24 * 60 * 60 * 1000);
 

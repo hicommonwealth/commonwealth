@@ -1,5 +1,6 @@
 import NodeInfo from 'models/NodeInfo';
 import React from 'react';
+import app from 'state';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWRelatedCommunityCard } from 'views/components/component_kit/new_designs/CWRelatedCommunityCard';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
@@ -114,7 +115,7 @@ const DirectoryPageContent = ({
       {filteredRelatedCommunitiesData.map((community) => (
         <CWRelatedCommunityCard
           key={community.id}
-          community={community}
+          community={app.config.chains.getById(community.id)}
           memberCount={community.members}
           threadCount={community.threads}
         />
