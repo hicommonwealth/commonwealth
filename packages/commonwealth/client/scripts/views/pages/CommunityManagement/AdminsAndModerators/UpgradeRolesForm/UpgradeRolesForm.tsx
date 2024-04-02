@@ -38,16 +38,15 @@ export const UpgradeRolesForm = ({
   ]);
 
   let upgradedUser;
-  let newRole;
+  let newRoleToBeUpgraded;
   const membersRef = useRef();
 
   const { useUpgradeRolesMutation } = updateRoles;
-  const { data: upgradeRolesData, mutateAsync: upgradeRole } =
-    useUpgradeRolesMutation({
-      onRoleUpdate,
-      newRole,
-      upgradedUser,
-    });
+  const { mutateAsync: upgradeRole } = useUpgradeRolesMutation({
+    onRoleUpdate,
+    newRoleToBeUpgraded,
+    upgradedUser,
+  });
 
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
@@ -76,9 +75,9 @@ export const UpgradeRolesForm = ({
   const handleUpgrade = async () => {
     const indexOfName = nonAdminNames.indexOf(user);
     upgradedUser = nonAdmins[indexOfName];
-    newRole =
+    newRoleToBeUpgraded =
       role === 'Admin' ? 'admin' : role === 'Moderator' ? 'moderator' : '';
-    await upgradeRole({ upgradedUser, onRoleUpdate, newRole });
+    await upgradeRole({ upgradedUser, onRoleUpdate, newRoleToBeUpgraded });
     zeroOutRadioButtons();
   };
 

@@ -25,11 +25,10 @@ export const ManageRoles = ({
 
   let roleToBeDeleted;
   const { useRemoveRolesMutation } = updateRoles;
-  const { data: removedRoleData, mutateAsync: removeRole } =
-    useRemoveRolesMutation({
-      onRoleUpdate,
-      roleToBeDeleted,
-    });
+  const { mutateAsync: removeRole } = useRemoveRolesMutation({
+    onRoleUpdate,
+    roleToBeDeleted,
+  });
 
   const { data: { admins: returnedAdmins, mods: returnedMods } = {} } =
     useFetchAdminQuery({
@@ -46,9 +45,9 @@ export const ManageRoles = ({
       (addr_) => addr_.id === (role.address_id || role.Address.id),
     ).length;
 
-    const arrayedTestData = [...returnedAdmins, ...returnedMods];
+    const adminsAndModsArray = [...returnedAdmins, ...returnedMods];
 
-    const userAdminsAndMods = arrayedTestData.filter((role_) => {
+    const userAdminsAndMods = adminsAndModsArray.filter((role_) => {
       const belongsToUser = !!app.user.addresses.filter(
         (addr_) => addr_.id === role_.address_id,
       ).length;

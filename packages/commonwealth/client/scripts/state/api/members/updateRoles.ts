@@ -5,7 +5,7 @@ import RoleInfo from '../../../models/RoleInfo';
 
 type UpgradeRolesProps = {
   onRoleUpdate: (oldRole, newRole) => any;
-  newRole: string;
+  newRoleToBeUpgraded: string;
   upgradedUser;
 };
 
@@ -14,10 +14,13 @@ type RemoveRoleProps = {
   onRoleUpdate: (oldRole, newRole) => void;
 };
 
-const upgradeRoles = async ({ upgradedUser, newRole }: UpgradeRolesProps) => {
+const upgradeRoles = async ({
+  upgradedUser,
+  newRoleToBeUpgraded,
+}: UpgradeRolesProps) => {
   const communityObj = { chain: app.activeChainId() };
   const res = await axios.post(`${app.serverUrl()}/upgradeMember`, {
-    new_role: newRole,
+    new_role: newRoleToBeUpgraded,
     address: upgradedUser.Address.address,
     ...communityObj,
     jwt: app.user.jwt,
