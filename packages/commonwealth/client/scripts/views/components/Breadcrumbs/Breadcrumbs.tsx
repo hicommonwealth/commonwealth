@@ -1,4 +1,4 @@
-import { useCommonNavigate } from 'navigation/helpers';
+import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
@@ -13,6 +13,8 @@ export const Breadcrumbs = () => {
   const navigate = useCommonNavigate();
 
   const getThreadId = location.pathname.match(/\/(\d+)-/);
+
+  console.log(app.chain);
 
   const { data: linkedThreads } = useGetThreadsByIdQuery({
     chainId: app.activeChainId(),
@@ -55,6 +57,7 @@ export const Breadcrumbs = () => {
     location.pathname,
     profileId,
     navigate,
+    app.isCustomDomain() ? getScopePrefix() : undefined,
     currentDiscussion,
   );
 

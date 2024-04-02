@@ -46,11 +46,17 @@ export const generateBreadcrumbs = (
   locationPath: string,
   profileId: number,
   navigate: (val: To) => void,
+  customDomain: string,
   currentDiscussion?: currentDiscussion,
 ) => {
   let link: string;
   let label: string;
   let isParent: boolean;
+
+  if (customDomain) {
+    locationPath = `${customDomain}/${locationPath}`;
+  }
+
   const pathSegments = locationPath
     .split('/')
     .filter((segment) => segment.length > 0);
