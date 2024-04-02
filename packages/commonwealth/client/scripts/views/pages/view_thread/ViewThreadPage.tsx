@@ -418,7 +418,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           name="twitter:description"
           content={getMetaDescription(thread.body)}
         />
-        <meta name="twitter:card" content={communityImage} />
+        <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:image:src" content={communityImage} />
       </Helmet>
 
