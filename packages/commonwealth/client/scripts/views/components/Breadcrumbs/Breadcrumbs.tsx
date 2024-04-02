@@ -18,7 +18,8 @@ export const Breadcrumbs = () => {
     chainId: app.activeChainId(),
     ids: [getThreadId && Number(getThreadId[1])],
     apiCallEnabled:
-      location.pathname.split('/')[1].toLowerCase() === 'discussion', //Only call when in discussion pages prevents unnecessary calls.
+      // Only call when in discussion pages prevents unnecessary calls.
+      location.pathname.split('/')[1].toLowerCase() === 'discussion',
   });
 
   const user = app?.user?.addresses?.[0];
@@ -55,6 +56,7 @@ export const Breadcrumbs = () => {
     location.pathname,
     profileId,
     navigate,
+    app.isCustomDomain() ? app.activeChainId() : undefined,
     currentDiscussion,
   );
 
