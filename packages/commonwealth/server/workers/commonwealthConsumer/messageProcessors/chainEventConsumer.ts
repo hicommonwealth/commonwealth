@@ -143,7 +143,7 @@ async function handleProposalEvents(
       data: {
         community_id: community[0].id,
         network: community[0].network as unknown as SupportedNetwork,
-        block_number: parseInt(event.rawLog.blockNumber.toString(), 16),
+        block_number: event.rawLog.blockNumber,
         event_data: {
           kind: event.eventSource.kind,
           id: event.parsedArgs[0].toString(),
