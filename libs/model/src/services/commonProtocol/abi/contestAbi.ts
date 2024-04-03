@@ -70,4 +70,56 @@ export const contestABI = [
     type: 'function',
     name: 'voteContent',
   },
+  {
+    inputs: [],
+    stateMutability: 'view',
+    type: 'function',
+    name: 'endTime',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+  },
+  {
+    inputs: [],
+    stateMutability: 'view',
+    type: 'function',
+    name: 'startTime',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+  },
+  {
+    inputs: [],
+    name: 'contestInterval',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'currentContentId',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
 ];

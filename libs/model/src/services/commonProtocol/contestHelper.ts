@@ -95,12 +95,25 @@ export const getContestStatus = async (
   web3: Web3,
   contest: string,
 ): Promise<ContestStatus> => {
+  const contestInstance = new web3.eth.Contract(
+    contestABI as AbiItem[],
+    contest,
+  );
+
+  const promise = await Promise.all([
+    contestInstance.methods.startTime().call(),
+    contestInstance.methods.endTime().call(),
+    contestInstance.methods.contestInterval().call(),
+    contestInstance.methods.winnerIds().call(),
+    contestInstance.methods.currContentId().call(),
+  ]);
+
   return {
-    startTime: 0,
-    endTime: 0,
-    contestInterval: 0,
-    currWinners: [''],
-    lastContentId: '',
+    startTime: promise[0],
+    endTime: promise[1],
+    contestInterval: promise[2],
+    currWinners: promise[3],
+    lastContentId: promise[4],
   };
 };
 
@@ -110,5 +123,13 @@ export const getContestStatus = async (
  * @returns
  */
 export const createWeb3Provider = async (rpc: string): Promise<Web3> => {
-  return new Web3();
+  const privateKey = process.env.PRIVATE_KEY;
+  if (!privateKey) {
+    throw new AppError('Private Key not set for relayer');
+  }
+  const web3 = new Web3(rpc);
+  const account = web3.eth.accounts.privateKeyToAccount(privateKey);
+  web3.eth.accounts.wallet.add(account);
+  web3.eth.defaultAccount = account.address;
+  return web3;
 };
