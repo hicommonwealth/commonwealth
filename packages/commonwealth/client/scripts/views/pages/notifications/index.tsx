@@ -5,7 +5,7 @@ import { Virtuoso } from 'react-virtuoso';
 import app from 'state';
 import PageError from 'views/pages/error';
 import { CWText } from '../../components/component_kit/cw_text';
-import { CWButton } from '../../components/component_kit/new_designs/cw_button';
+import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { NotificationRow } from './notification_row';
 
 const NotificationsPage = () => {

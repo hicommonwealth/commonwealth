@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import app from 'state';
 import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
 import _ from 'underscore';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { z } from 'zod';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';

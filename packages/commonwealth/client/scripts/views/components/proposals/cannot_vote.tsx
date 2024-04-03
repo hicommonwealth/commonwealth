@@ -1,5 +1,5 @@
 import React from 'react';
-import { CWButton } from '../component_kit/new_designs/cw_button';
+import { CWButton } from '../component_kit/new_designs/CWButton';
 
 type CannotVoteProps = { label: string };
 

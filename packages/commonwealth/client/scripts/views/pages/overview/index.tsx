@@ -8,7 +8,7 @@ import React, { useEffect } from 'react';
 import app from 'state';
 import { useFetchThreadsQuery } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import type Thread from '../../../models/Thread';
 import type Topic from '../../../models/Topic';
 import { CWDivider } from '../../components/component_kit/cw_divider';

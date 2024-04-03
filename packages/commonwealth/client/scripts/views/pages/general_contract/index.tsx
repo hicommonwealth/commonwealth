@@ -15,7 +15,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import app from 'state';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import type { AbiInput, AbiItem, AbiOutput } from 'web3-utils/types';
 import type Contract from '../../../models/Contract';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';

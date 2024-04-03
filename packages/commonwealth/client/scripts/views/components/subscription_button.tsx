@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import { NotificationCategories } from '@hicommonwealth/core';
 import { isNotUndefined } from 'helpers/typeGuards';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 
 import app from 'state';
 

@@ -17,10 +17,10 @@ import { useFetchEthUsdRateQuery } from '../../state/api/communityStake/index';
 import { trpc } from '../../utils/trpcClient';
 import { NewCommunityCard } from '../components/CommunityCard';
 import { CWText } from '../components/component_kit/cw_text';
+import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from '../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWModal } from '../components/component_kit/new_designs/CWModal';
 import { CWRelatedCommunityCard } from '../components/component_kit/new_designs/CWRelatedCommunityCard';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import ManageCommunityStakeModal from '../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import { CommunityData } from './DirectoryPage/DirectoryPageContent';
 

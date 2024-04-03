@@ -7,8 +7,8 @@ import app from 'state';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
+import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
-import { CWButton } from '../../components/component_kit/new_designs/cw_button';
 
 type Stats = {
   numCommentsLastMonth: number;

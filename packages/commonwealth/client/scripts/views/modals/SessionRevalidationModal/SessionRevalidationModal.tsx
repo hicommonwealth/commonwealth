@@ -12,11 +12,11 @@ import { CWAuthButton } from 'views/components/component_kit/CWAuthButtonOld';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWWalletsList } from 'views/components/component_kit/cw_wallets_list';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
   CWModalHeader,
 } from 'views/components/component_kit/new_designs/CWModal';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { formatAddress } from 'views/components/user/user_block';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';

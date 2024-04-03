@@ -9,11 +9,11 @@ import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import useNecessaryEffect from '../../../hooks/useNecessaryEffect';
 import { CardsCollection } from '../../components/cards_collection';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import {
   CWTab,
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
-import { CWButton } from '../../components/component_kit/new_designs/cw_button';
 import { SnapshotProposalCard } from './SnapshotProposalCard';
 
 type SnapshotProposalsPageProps = {

@@ -14,9 +14,9 @@ import app from 'state';
 import type Thread from '../../../models/Thread';
 import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
-import { CWButton } from '../../components/component_kit/new_designs/cw_button';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
 
 type ThreadLinkProps = {

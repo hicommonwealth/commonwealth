@@ -4,10 +4,10 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
 import { Avatar } from 'views/components/Avatar';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { formatAddressShort } from '../../../../../shared/utils';
 import Permissions from '../../../utils/Permissions';
 import { BanUserModal } from '../../modals/ban_user_modal';

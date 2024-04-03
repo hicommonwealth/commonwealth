@@ -12,11 +12,11 @@ import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWTextArea } from '../../components/component_kit/cw_text_area';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import {
   CWTab,
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
-import { CWButton } from '../../components/component_kit/new_designs/cw_button';
 import type { AaveProposalState } from './types';
 import { defaultStateItem } from './types';
 

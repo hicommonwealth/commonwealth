@@ -33,7 +33,7 @@ import app from 'state';
 import { naturalDenomToMinimal } from '../../../../../shared/utils';
 import { CompoundCancelButton } from '../../pages/view_proposal/proposal_components';
 import { CWText } from '../component_kit/cw_text';
-import { CWButton } from '../component_kit/new_designs/cw_button';
+import { CWButton } from '../component_kit/new_designs/CWButton';
 import { CannotVote } from './cannot_vote';
 import { getCanVote, getVotingResults } from './helpers';
 import { ProposalExtensions } from './proposal_extensions';

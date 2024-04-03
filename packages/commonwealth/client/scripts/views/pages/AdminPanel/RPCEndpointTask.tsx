@@ -18,8 +18,8 @@ import {
   CWValidationText,
   ValidationStatus,
 } from '../../components/component_kit/cw_validation_text';
+import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWTypeaheadSelectList } from '../../components/component_kit/new_designs/CWTypeaheadSelectList';
-import { CWButton } from '../../components/component_kit/new_designs/cw_button';
 import { openConfirmation } from '../../modals/confirmation_modal';
 import { createChainNode, updateChainNode } from './utils';
 

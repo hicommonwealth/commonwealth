@@ -16,7 +16,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWToggle } from '../../components/component_kit/cw_toggle';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
-import { CWButton } from '../../components/component_kit/new_designs/cw_button';
+import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { User } from '../../components/user/user';
 import { PageLoading } from '../loading';
 import {

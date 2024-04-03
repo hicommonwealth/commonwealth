@@ -2,8 +2,8 @@ import 'pages/view_thread/poll_cards.scss';
 import React, { useState } from 'react';
 import type Thread from '../../../models/Thread';
 import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
+import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
-import { CWButton } from '../../components/component_kit/new_designs/cw_button';
 import { PollEditorModal } from '../../modals/poll_editor_modal';
 
 type ThreadPollEditorCardProps = {

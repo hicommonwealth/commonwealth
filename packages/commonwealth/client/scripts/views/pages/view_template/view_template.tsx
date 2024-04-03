@@ -17,7 +17,7 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import Web3 from 'web3';
 import isValidJson from '../../../../../shared/validateJson';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
-import { CWButton } from '../../components/component_kit/new_designs/cw_button';
+import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 
 export enum TemplateComponents {
   DIVIDER = 'divider',

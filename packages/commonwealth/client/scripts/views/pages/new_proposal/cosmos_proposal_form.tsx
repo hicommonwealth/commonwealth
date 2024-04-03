@@ -25,7 +25,7 @@ import { Skeleton } from '../../components/Skeleton';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { CWButton } from '../../components/component_kit/new_designs/cw_button';
+import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import {
   ReactQuillEditor,
   createDeltaFromText,

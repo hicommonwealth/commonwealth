@@ -7,7 +7,7 @@ import app from 'state';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { isAddress } from 'web3-utils';
 
 import { useCommonNavigate } from 'navigation/helpers';

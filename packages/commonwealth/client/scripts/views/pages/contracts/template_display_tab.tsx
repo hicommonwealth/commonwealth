@@ -9,8 +9,8 @@ import { CWCommunityAvatar } from '../../components/component_kit/cw_community_a
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
-import { CWButton } from '../../components/component_kit/new_designs/cw_button';
 import { User } from '../../components/user/user';
 import ViewTemplateModal from '../../modals/view_template_modal';
 

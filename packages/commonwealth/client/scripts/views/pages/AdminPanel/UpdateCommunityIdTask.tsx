@@ -4,7 +4,7 @@ import app from 'state';
 import { slugifyPreserveDashes } from 'utils';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { updateCommunityId } from 'views/pages/AdminPanel/utils';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { openConfirmation } from '../../modals/confirmation_modal';

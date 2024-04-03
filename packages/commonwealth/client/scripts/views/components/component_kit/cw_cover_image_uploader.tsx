@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useRef } from 'react';
 import app from 'state';
 import { replaceBucketWithCDN } from '../../../helpers/awsHelpers';
 import { CWIconButton } from './cw_icon_button';
-import { CWButton } from './new_designs/cw_button';
+import { CWButton } from './new_designs/CWButton';
 
 import axios from 'axios';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';

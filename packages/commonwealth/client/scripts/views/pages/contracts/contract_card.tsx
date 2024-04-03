@@ -1,7 +1,7 @@
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import type Contract from '../../../models/Contract';
 import { ContractTemplateCard } from './contract_template_card';

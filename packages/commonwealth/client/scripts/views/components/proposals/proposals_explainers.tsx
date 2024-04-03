@@ -3,7 +3,7 @@ import React from 'react';
 import type Compound from 'controllers/chain/ethereum/compound/adapter';
 import { BigNumber } from 'ethers';
 import { useCommonNavigate } from 'navigation/helpers';
-import { CWButton } from '../component_kit/new_designs/cw_button';
+import { CWButton } from '../component_kit/new_designs/CWButton';
 import { GovExplainer } from '../gov_explainer';
 
 type CompoundProposalStatsProps = { chain: Compound };
