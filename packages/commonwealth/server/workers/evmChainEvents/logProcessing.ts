@@ -4,7 +4,6 @@ import { ethers } from 'ethers';
 import { AbiSignatures, ContractSources, EvmEvent, EvmSource } from './types';
 
 const logger = _logger().getLogger(__filename);
-const MAX_OLD_BLOCKS = 10;
 
 /**
  * Converts a string or integer number into a hexadecimal string that adheres to the following guidelines
@@ -77,7 +76,19 @@ export async function getLogs({
     );
   }
 
-  const logs: Log[] = await provider.send('eth_getLogs', [
+  // TODO: upgrade to ethersJS v6 -> supports getLogs() with multiple contract
+  //  addresses (v5 doesn't). Once upgraded, log formatting will be done for us
+  const logs: Array<{
+    address: string;
+    blockHash: string;
+    blockNumber: string;
+    data: string;
+    logIndex: string;
+    removed: boolean;
+    topics: string[];
+    transactionHash: string;
+    transactionIndex: string;
+  }> = await provider.send('eth_getLogs', [
     {
       fromBlock: decimalToHex(startingBlockNum),
       toBlock: decimalToHex(endingBlockNum),
@@ -85,7 +96,14 @@ export async function getLogs({
     },
   ]);
 
-  return { logs, lastBlockNum: endingBlockNum };
+  const formattedLogs: Log[] = logs.map((log) => ({
+    ...log,
+    blockNumber: parseInt(log.blockNumber, 16),
+    transactionIndex: parseInt(log.transactionIndex, 16),
+    logIndex: parseInt(log.logIndex, 16),
+  }));
+
+  return { logs: formattedLogs, lastBlockNum: endingBlockNum };
 }
 
 export async function parseLogs(
