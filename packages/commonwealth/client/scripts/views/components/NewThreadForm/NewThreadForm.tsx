@@ -74,7 +74,7 @@ export const NewThreadForm = () => {
     includeTopics: true,
   });
   const { data: memberships = [] } = useRefreshMembershipQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     address: app?.user?.activeAccount?.address,
     apiEnabled: !!app?.user?.activeAccount?.address,
   });
@@ -84,7 +84,7 @@ export const NewThreadForm = () => {
     error: createThreadError,
     reset: resetCreateThreadMutation,
   } = useCreateThreadMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const { RevalidationModal } = useSessionRevalidationModal({
@@ -141,7 +141,7 @@ export const NewThreadForm = () => {
         stage: app.chain.meta.customStages
           ? parseCustomStages(app.chain.meta.customStages)[0]
           : ThreadStage.Discussion,
-        chainId: app.activeChainId(),
+        communityId: app.activeChainId(),
         title: threadTitle,
         topic: threadTopic,
         body: serializeDelta(threadContentDelta),

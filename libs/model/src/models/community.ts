@@ -67,12 +67,16 @@ export default (
         allowNull: false,
         defaultValue: [],
       },
-      default_symbol: { type: dataTypes.STRING, allowNull: false },
-      network: { type: dataTypes.STRING, allowNull: false },
+      default_symbol: { type: dataTypes.STRING, allowNull: true },
+      network: {
+        type: dataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'edgeware',
+      },
       base: { type: dataTypes.STRING, allowNull: false, defaultValue: '' },
       ss58_prefix: { type: dataTypes.INTEGER, allowNull: true },
       icon_url: { type: dataTypes.STRING },
-      active: { type: dataTypes.BOOLEAN },
+      active: { type: dataTypes.BOOLEAN, defaultValue: false },
       stages_enabled: {
         type: dataTypes.BOOLEAN,
         allowNull: false,
@@ -88,9 +92,9 @@ export default (
       collapsed_on_homepage: {
         type: dataTypes.BOOLEAN,
         allowNull: false,
-        defaultValue: true,
+        defaultValue: false,
       },
-      type: { type: dataTypes.STRING, allowNull: false },
+      type: { type: dataTypes.STRING, allowNull: false, defaultValue: 'chain' },
       substrate_spec: { type: dataTypes.JSONB, allowNull: true },
       has_chain_events_listener: {
         type: dataTypes.BOOLEAN,
@@ -99,7 +103,11 @@ export default (
       },
       default_summary_view: { type: dataTypes.BOOLEAN, allowNull: true },
       default_page: { type: dataTypes.STRING, allowNull: true },
-      has_homepage: { type: dataTypes.STRING, allowNull: true },
+      has_homepage: {
+        type: dataTypes.STRING,
+        allowNull: true,
+        defaultValue: false,
+      },
       hide_projects: { type: dataTypes.BOOLEAN, allowNull: true },
       terms: { type: dataTypes.STRING, allowNull: true },
       bech32_prefix: { type: dataTypes.STRING, allowNull: true },
@@ -147,7 +155,13 @@ export default (
     models.Community.belongsTo(models.ChainNode, {
       foreignKey: 'chain_node_id',
     });
-    models.Community.hasMany(models.Address, { foreignKey: 'community_id' });
+    models.Community.belongsTo(models.DiscordBotConfig, {
+      foreignKey: 'discord_config_id',
+      targetKey: 'id',
+    });
+    models.Community.hasMany(models.Address, {
+      foreignKey: 'community_id',
+    });
     models.Community.hasMany(models.Notification, {
       foreignKey: 'community_id',
     });
@@ -169,7 +183,7 @@ export default (
       foreignKey: 'community_id',
     });
     models.Community.hasMany(models.CommunityStake, {
-      foreignKey: 'community_id',
+      foreignKey: { name: 'community_id' },
     });
   };
 

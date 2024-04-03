@@ -33,7 +33,7 @@ export type SubUniqueData =
  * This function searches through a list of NotificationSubscriptions and returns the one that matches the given values.
  * If the minimum required values to uniquely identify a NotificationSubscription are not present, the function logs
  * an error and returns void. For example, in order to find a `new-thread-creation` subscription you must provide a
- * chainId.
+ * communityId.
  * @param findOptions The data used to find a matching NotificationSubscription.
  * @param subs The list of NotificationSubscriptions.
  */

@@ -217,6 +217,7 @@ export const iconLookup = {
   twitter: Icons.CWTwitter,
   twitterNew: Icons.CWTwitterNew,
   twitterOutline: withPhosphorIcon(TwitterLogo),
+  twitterX: Icons.CWTwitterX,
   unsubscribe: Icons.CWUnsubscribe,
   upvote: withPhosphorIcon(ArrowFatUp),
   users: withPhosphorIcon(Users),
