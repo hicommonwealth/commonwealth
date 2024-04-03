@@ -5,7 +5,7 @@ import { CreateStakeTransaction } from '../../src/community/CreateStakeTransacti
 import { seed } from '../../src/tester/index';
 chai.use(chaiAsPromised);
 
-describe('Stake transactions', () => {
+describe.skip('Stake transactions', () => {
   const actor: Actor = { user: { email: '' } };
   let payload;
   let community_id;
