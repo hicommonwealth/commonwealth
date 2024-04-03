@@ -131,7 +131,6 @@ type TABLE_INFO = {
 export const get_info_schema = async (
   db: Sequelize,
   options?: {
-    ignore_tables: string[];
     ignore_columns: Record<string, string[]>;
     ignore_constraints: Record<string, string[]>;
   },
@@ -167,9 +166,7 @@ ORDER BY 1, 2;`,
   const tables: Record<string, TABLE_INFO> = {};
   columns
     .filter(
-      (c) =>
-        !options?.ignore_tables.includes(c.table_name) &&
-        !options?.ignore_columns[c.table_name]?.includes(c.column_name),
+      (c) => !options?.ignore_columns[c.table_name]?.includes(c.column_name),
     )
     .forEach((c) => {
       const t = (tables[c.table_name] = tables[c.table_name] ?? {
@@ -181,9 +178,7 @@ ORDER BY 1, 2;`,
     });
   constraints
     .filter(
-      (c) =>
-        !options?.ignore_tables.includes(c.table_name) &&
-        !options?.ignore_constraints[c.table_name]?.includes(c.constraint),
+      (c) => !options?.ignore_constraints[c.table_name]?.includes(c.constraint),
     )
     .forEach((c) => tables[c.table_name].constraints.add(c.constraint));
   return tables;

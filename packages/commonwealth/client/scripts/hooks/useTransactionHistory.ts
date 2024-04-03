@@ -13,7 +13,7 @@ const useTransactionHistory = ({
   addressFilter,
 }: TransactionHistoryProps) => {
   const { data } = trpc.community.getStakeTransaction.useQuery({
-    addresses: addressFilter.length > 0 ? addressFilter.join(',') : undefined,
+    addresses: addressFilter.length === 1 ? addressFilter.join(',') : undefined,
   });
 
   let filteredData = !data
