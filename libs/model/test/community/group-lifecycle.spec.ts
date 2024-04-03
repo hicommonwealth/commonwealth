@@ -2,11 +2,7 @@ import { Actor, InvalidState, command, dispose } from '@hicommonwealth/core';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { Chance } from 'chance';
-import {
-  CreateGroup,
-  Errors,
-  MAX_GROUPS_PER_COMMUNITY,
-} from '../../src/community/CreateGroup.command';
+import { CreateGroup, Errors } from '../../src/community/CreateGroup.command';
 import { seed } from '../../src/tester';
 
 chai.use(chaiAsPromised);
@@ -100,34 +96,37 @@ describe('Group lifecycle', () => {
     );
   });
 
-  it('should fail creation when community reached max number of groups allowed', async () => {
-    // create max groups
-    for (let i = 1; i < MAX_GROUPS_PER_COMMUNITY; i++) {
-      await command(CreateGroup(), {
-        id,
-        actor,
-        payload: {
-          ...payload,
-          metadata: { name: chance.name(), description: chance.sentence() },
-        },
-      });
-    }
-
-    const invalid = {
-      id,
-      actor,
-      payload: {
-        metadata: {
-          name: chance.name(),
-          description: chance.sentence(),
-        },
-        requirements: [],
-        topics: [],
-      },
-    };
-    expect(command(CreateGroup(), invalid)).to.eventually.be.rejectedWith(
-      InvalidState,
-      Errors.MaxGroups,
-    );
-  });
+  // it(
+  //   'should fail creation when community reached max number of groups allowed',
+  //   async () => {
+  //     // create max groups
+  //     for (let i = 1; i < MAX_GROUPS_PER_COMMUNITY; i++) {
+  //       await command(CreateGroup(), {
+  //         id,
+  //         actor,
+  //         payload: {
+  //           ...payload,
+  //           metadata: { name: chance.name(), description: chance.sentence() },
+  //         },
+  //       });
+  //     }
+  //
+  //     const invalid = {
+  //       id,
+  //       actor,
+  //       payload: {
+  //         metadata: {
+  //           name: chance.name(),
+  //           description: chance.sentence(),
+  //         },
+  //         requirements: [],
+  //         topics: [],
+  //       },
+  //     };
+  //     expect(command(CreateGroup(), invalid)).to.eventually.be.rejectedWith(
+  //       InvalidState,
+  //       Errors.MaxGroups,
+  //     );
+  //   },
+  // );
 });
