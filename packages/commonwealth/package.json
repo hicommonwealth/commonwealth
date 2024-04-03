@@ -62,7 +62,7 @@
     "cosmos:stop": "chmod u+x test/util/cosmos-chain-testing/v1/stop.sh && ./test/util/cosmos-chain-testing/v1/stop.sh && chmod u+x test/util/cosmos-chain-testing/v1beta1/stop.sh && ./test/util/cosmos-chain-testing/v1beta1/stop.sh && chmod u+x test/util/cosmos-chain-testing/ethermint/stop.sh && ./test/util/cosmos-chain-testing/ethermint/stop.sh",
     "publish-rmq-msg": "ts-node -r tsconfig-paths/register -T ./scripts/publishRmqMessageScript.ts",
     "build-contracts": "npx hardhat compile",
-    "backfill-namespace-addresses": "ts-node -r tsconfig-paths/register -T ./server/scripts/backfillNamespaceAddresses.ts"
+    "ts-exec": "ts-node -r tsconfig-paths/register -T"
   },
   "engines": {
     "node": "20.x"
