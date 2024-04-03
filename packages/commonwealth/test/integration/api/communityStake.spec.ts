@@ -28,7 +28,7 @@ const expectedCreateResp = {
   stake_enabled: baseRequest.stake_enabled,
 };
 
-describe.only('POST communityStakes Tests', () => {
+describe('POST communityStakes Tests', () => {
   let server: TestServer;
 
   before(async () => {
