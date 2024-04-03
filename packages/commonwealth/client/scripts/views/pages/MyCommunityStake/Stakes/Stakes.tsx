@@ -1,3 +1,4 @@
+import { WEI_PER_ETHER } from 'controllers/chain/ethereum/util';
 import { formatAddressShort } from 'helpers';
 import React from 'react';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
@@ -53,11 +54,40 @@ const columnInfo = [
 const Stakes = ({ filterOptions, addressFilter }: TransactionHistoryProps) => {
   const data = useTransactionHistory({ filterOptions, addressFilter });
 
+  // aggregate transaction per community per address
+  const stakes = (() => {
+    const map = {};
+
+    data.map((x) => {
+      const key = (x.community.id + x.address).toLowerCase();
+      const action = x.action === 'mint' ? 1 : -1;
+
+      map[key] = {
+        ...x,
+        ...(map[key] || {}),
+        stake: (map[key]?.stake || 0) + x?.stake * action,
+        voteWeight: (map[key]?.voteWeight || 0) + x?.voteWeight * action,
+        avgPrice:
+          (map[key]?.avgPrice || 0) +
+          parseFloat(
+            (parseFloat(x.price) / WEI_PER_ETHER / x.stake).toFixed(5),
+          ) *
+            action,
+      };
+    });
+
+    return Object.values(map).map((x: any) => ({
+      ...x,
+      voteWeight: x.voteWeight + 1, // total vote weight is +1 of the stake weight
+      avgPrice: `${x.avgPrice.toFixed(5)} ETH`,
+    }));
+  })();
+
   return (
     <section className="Stakes">
       <CWTable
         columnInfo={columnInfo}
-        rowData={data.map((tx) => ({
+        rowData={stakes.map((tx) => ({
           ...tx,
           community: {
             sortValue: tx.community.name.toLowerCase(),

@@ -22,6 +22,7 @@ const useTransactionHistory = ({
         community: t.community,
         address: t.address,
         stake: t.stake_amount,
+        price: t.stake_price,
         voteWeight: t.stake_amount * t.vote_weight,
         timestamp: t.timestamp * 1000,
         action: t.stake_direction === 'buy' ? 'mint' : 'burn',
