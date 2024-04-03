@@ -33,7 +33,7 @@ export const CreateStakeTransaction: Command<
       where: { id: payload.community_id },
       include: [
         {
-          model: models.ChainNode,
+          model: models.ChainNode.scope('withPrivateData'),
           attributes: ['eth_chain_id', 'url', 'private_url'],
         },
       ],
