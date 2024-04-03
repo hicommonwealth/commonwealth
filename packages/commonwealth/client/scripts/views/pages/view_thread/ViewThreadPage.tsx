@@ -65,6 +65,16 @@ import { LinkedThreadsCard } from './linked_threads_card';
 import { LockMessage } from './lock_message';
 import { SnapshotCreationCard } from './snapshot_creation_card';
 
+export type ThreadPrefetch = {
+  [identifier: string]: {
+    pollsStarted?: boolean;
+    profilesFinished: boolean;
+    profilesStarted: boolean;
+    viewCountStarted?: boolean;
+    threadReactionsStarted?: boolean;
+  };
+};
+
 type ViewThreadPageProps = {
   identifier: string;
 };
