@@ -7,43 +7,41 @@ import * as integrations from './integrations';
 import * as thread from './threads';
 
 /**
- * tRPC router
+ * API v1 - tRPC Router
  */
-const trpcRouter = trpc.router({
+const apiV1 = trpc.router({
   community: community.trpcRouter,
   thread: thread.trpcRouter,
   integrations: integrations.trpcRouter,
   feed: feed.trpcRouter,
 });
+export type ApiV1 = typeof apiV1;
 
-export type AppRouter = typeof trpcRouter;
-
+/**
+ * API v1 - Express Router
+ */
 const router = Router();
+
 /**
  * OpenAPI spec
  */
-router.get('/trpc/openapi.json', (req, res) => {
-  const baseUrl = req.protocol + '://' + req.get('host') + '/ddd/trpc/rest';
+router.get('/v1/openapi.json', (req, res) => {
+  const baseUrl = req.protocol + '://' + req.get('host') + '/api/v1/rest';
   return res.json(
-    trpc.toOpenApiDocument(trpcRouter, {
+    trpc.toOpenApiDocument(apiV1, {
       title: 'Common API',
       version: '1.0.0',
       baseUrl,
     }),
   );
 });
-router.use('/trpc/docs', swaggerUi.serve);
+router.use('/v1/docs', swaggerUi.serve);
 router.get(
-  '/trpc/docs',
+  '/v1/docs',
   swaggerUi.setup(null, { swaggerUrl: '../openapi.json' }),
 );
 
-router.use(
-  '/trpc/rest',
-  express.statsMiddleware,
-  trpc.toOpenApiExpress(trpcRouter),
-);
-
-router.use('/trpc', express.statsMiddleware, trpc.toExpress(trpcRouter));
+router.use('/v1/rest', express.statsMiddleware, trpc.toOpenApiExpress(apiV1));
+router.use('/v1', express.statsMiddleware, trpc.toExpress(apiV1));
 
 export default router;
