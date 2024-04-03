@@ -28,8 +28,7 @@ export function getProvider(rpc: string) {
 /**
  * Fetches logs from the given EVM source. startingBlockNum can be used to start fetching logs
  * from a specific block number. If startingBlockNum is more than 500 blocks behind the current
- * block number then shorten the range to 500 blocks. If startingBlockNum is not provided then
- * fetch logs from the last [maxOldBlocks] blocks.
+ * block number then shorten the range to 500 blocks.
  */
 export async function getLogs({
   rpc,
@@ -39,28 +38,45 @@ export async function getLogs({
 }: {
   rpc: string;
   contractAddresses: string[];
-  startingBlockNum?: number;
+  startingBlockNum: number;
   endingBlockNum?: number;
 }): Promise<{ logs: Log[]; lastBlockNum: number }> {
   const provider = getProvider(rpc);
-
   if (!endingBlockNum) endingBlockNum = await provider.getBlockNumber();
+
+  if (startingBlockNum > endingBlockNum) {
+    logger.error(
+      'Starting block number is greater than the latest/current block number!',
+      undefined,
+      {
+        startingBlockNum,
+        endingBlockNum,
+      },
+    );
+    return { logs: [], lastBlockNum: endingBlockNum };
+  }
 
   if (contractAddresses.length === 0) {
     logger.error(`No contracts given`);
     return { logs: [], lastBlockNum: endingBlockNum };
   }
 
-  if (!startingBlockNum) {
-    startingBlockNum = endingBlockNum - MAX_OLD_BLOCKS;
-  } else if (endingBlockNum - startingBlockNum > 500) {
+  if (endingBlockNum - startingBlockNum > 500) {
     // limit the number of blocks to fetch to 500 to avoid rate limiting on some EVM nodes like Celo
     // this should eventually be configured on the ChainNodes table by rpc since each rpc has different
     // rate limits e.g. Alchemy has a limit of 10k logs while Celo public nodes have a limit of 500.
     startingBlockNum = endingBlockNum - 500;
+    logger.error(
+      'Block span too large. The number of fetch blocked is reduced to 500.',
+      undefined,
+      {
+        contractAddresses,
+        startingBlockNum,
+        endingBlockNum,
+      },
+    );
   }
 
-  console.log(`Fetching logs from ${startingBlockNum} to ${endingBlockNum}`);
   const logs: Log[] = await provider.send('eth_getLogs', [
     {
       fromBlock: decimalToHex(startingBlockNum),
@@ -122,7 +138,7 @@ export async function parseLogs(
 
 export async function getEvents(
   evmSource: EvmSource,
-  startingBlockNum?: number,
+  startingBlockNum: number,
   endingBlockNum?: number,
 ): Promise<{ events: EvmEvent[]; lastBlockNum: number }> {
   const { logs, lastBlockNum } = await getLogs({

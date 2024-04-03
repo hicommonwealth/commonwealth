@@ -58,19 +58,13 @@ describe('EVM Chain Events Log Processing Tests', () => {
   const expectAbi = () => expect(abi, 'ABI must be defined to run this test');
 
   describe('fetching logs', () => {
-    it('should not throw if a starting block number is not provided', async () => {
-      await expect(
-        getLogs({
-          rpc: localRpc,
-          contractAddresses: ['0x1'],
-        }),
-      ).to.not.be.rejected;
-    });
-
     it('should not return any logs if no contract addresses are given', async () => {
+      const provider = getProvider(localRpc);
+      const currentBlockNum = await provider.getBlockNumber();
       const { logs } = await getLogs({
         rpc: localRpc,
         contractAddresses: [],
+        startingBlockNum: currentBlockNum,
       });
       expect(logs).to.be.empty;
     });
@@ -79,7 +73,8 @@ describe('EVM Chain Events Log Processing Tests', () => {
       await expect(
         getLogs({
           rpc: 'http://fake',
-          contractAddresses: [],
+          contractAddresses: ['0x1'],
+          startingBlockNum: 1,
         }),
       )
         .to.eventually.be.rejected.and.be.an.instanceof(Error)
@@ -89,7 +84,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
         );
     });
 
-    it('should throw if the starting block number is greater than the current block number', async () => {
+    it('should not throw if the starting block number is greater than the current block number', async () => {
       const provider = getProvider(localRpc);
       const currentBlockNum = await provider.getBlockNumber();
       await expect(

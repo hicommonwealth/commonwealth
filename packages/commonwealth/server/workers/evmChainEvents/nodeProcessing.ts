@@ -1,7 +1,7 @@
 import { logger, schemas, stats } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
 import { getEventSources } from './getEventSources';
-import { getEvents, migrateEvents } from './logProcessing';
+import { getEvents, getProvider, migrateEvents } from './logProcessing';
 import { EvmEvent, EvmSource } from './types';
 
 const log = logger().getLogger(__filename);
@@ -26,15 +26,25 @@ export async function processChainNode(
       chainNodeId: String(chainNodeId),
     });
 
-    const startBlock = await models.LastProcessedEvmBlock.findOne({
+    const lastProcessedBlock = await models.LastProcessedEvmBlock.findOne({
       where: {
         chain_node_id: chainNodeId,
       },
     });
 
-    const startBlockNum = startBlock?.block_number
-      ? startBlock.block_number + 1
-      : null;
+    const provider = getProvider(evmSource.rpc);
+    const currentBlock = await provider.getBlockNumber();
+
+    let startBlockNum: number;
+    if (lastProcessedBlock?.block_number < currentBlock) {
+      startBlockNum = lastProcessedBlock?.block_number + 1;
+    } else if (lastProcessedBlock?.block_number === undefined) {
+      startBlockNum = currentBlock - 10;
+    } else {
+      // the last processed block is the same as the current block
+      // this occurs if the poll interval is shorter than the block time
+      return;
+    }
 
     const allEvents: EvmEvent[] = [];
     const migratedData = await migrateEvents(evmSource, startBlockNum);
@@ -45,7 +55,7 @@ export async function processChainNode(
     allEvents.push(...events);
 
     await models.sequelize.transaction(async (transaction) => {
-      if (!startBlock) {
+      if (!lastProcessedBlock) {
         await models.LastProcessedEvmBlock.create(
           {
             chain_node_id: chainNodeId,
@@ -53,24 +63,26 @@ export async function processChainNode(
           },
           { transaction },
         );
-      } else {
-        startBlock.block_number = lastBlockNum;
-        await startBlock.save({ transaction });
+      } else if (lastProcessedBlock.block_number !== lastBlockNum) {
+        lastProcessedBlock.block_number = lastBlockNum;
+        await lastProcessedBlock.save({ transaction });
       }
 
-      const records = allEvents.map((event) => ({
-        event_name: schemas.EventNames.ChainEventCreated,
-        event_payload: {
-          event_name: schemas.EventNames
-            .ChainEventCreated as typeof schemas.EventNames.ChainEventCreated,
-          ...event,
-        },
-      }));
-      await models.Outbox.bulkCreate(records, { transaction });
+      if (allEvents.length > 0) {
+        const records = allEvents.map((event) => ({
+          event_name: schemas.EventNames.ChainEventCreated,
+          event_payload: {
+            event_name: schemas.EventNames
+              .ChainEventCreated as typeof schemas.EventNames.ChainEventCreated,
+            ...event,
+          },
+        }));
+        await models.Outbox.bulkCreate(records, { transaction });
+      }
     });
 
     log.info(
-      `Processed ${events.length} events for chainNodeId ${chainNodeId}`,
+      `Processed ${allEvents.length} events for chainNodeId ${chainNodeId}`,
     );
   } catch (e) {
     const msg = `Error occurred while processing chainNodeId ${chainNodeId}`;
