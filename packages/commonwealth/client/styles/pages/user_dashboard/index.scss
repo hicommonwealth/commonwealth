@@ -8,23 +8,23 @@
   .content {
     display: grid;
     width: 100%;
-    grid-template-rows: 1fr;
+    grid-template-columns: 1fr 392px;
 
-    @include mediumSmallInclusive {
+    @include small {
+      grid-template-columns: 1fr 200px;
+    }
+
+    @include extraSmall {
+      grid-template-columns: 1fr;
       gap: 16px;
     }
 
-    @media (min-width: $breakpoint-medium-min-px) {
-      grid-template-columns: 1fr 392px;
-      padding-right: 48px;
-    }
-
     .user-dashboard-activity {
-      order: 2;
+      order: unset;
       min-height: 20px;
 
-      @media (min-width: $breakpoint-medium-min-px) {
-        order: unset;
+      @include extraSmall {
+        order: 2;
       }
 
       display: flex;
