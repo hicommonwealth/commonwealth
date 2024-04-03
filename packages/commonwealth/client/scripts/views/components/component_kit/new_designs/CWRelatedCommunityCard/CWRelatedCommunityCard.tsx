@@ -16,8 +16,8 @@ import { CWCommunityAvatar } from '../../cw_community_avatar';
 import { CWIcon } from '../../cw_icons/cw_icon';
 import { CWText } from '../../cw_text';
 import { ComponentType } from '../../types';
+import { CWButton } from '../CWButton';
 import { CWTooltip } from '../CWTooltip';
-import { CWButton } from '../cw_button';
 import './CWRelatedCommunityCard.scss';
 import { addPeriodToText } from './utils';
 
