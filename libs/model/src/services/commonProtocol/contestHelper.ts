@@ -19,7 +19,7 @@ export type ContestStatus = {
 /**
  * Adds content to an active contest. Includes validation of contest state
  * @param web3 an instance of web3.js with correct RPC and Private Key
- * @param contest an instance of web3.js with correct RPC and Private Key
+ * @param contest the address of the contest
  * @param creator the address of the user to create content on behalf of
  * @param url the common/commonwealth url of the content
  * @returns txReceipt and contentId of new content(NOTE: this should be saved for future voting)
@@ -57,7 +57,7 @@ export const addContent = async (
 /**
  * Adds a vote to content if voting power is available and user hasnt voted
  * @param web3 an instance of web3.js with correct RPC and Private Key
- * @param contest an instance of web3.js with correct RPC and Private Key
+ * @param contest the address of the contest
  * @param voter the address of the voter
  * @param contentId The contentId on the contest to vote
  * @returns a tx receipt
@@ -88,7 +88,7 @@ export const voteContent = async (
 /**
  * Gets relevant contest state information
  * @param web3 an instance of web3.js with correct RPC and Private Key
- * @param contest an instance of web3.js with correct RPC and Private Key
+ * @param contest the address of the contest
  * @returns Contest Status object
  */
 export const getContestStatus = async (
