@@ -34,6 +34,16 @@ function handleDeployedNamespace(
 async function handleCommunityStakeTrades(
   event: z.infer<typeof schemas.events.ChainEventCreated>,
 ) {
+  const {
+    0: trader,
+    1: namespaceAddress,
+    2: isBuy,
+    // 3: communityTokenAmount,
+    4: ethAmount,
+    // 5: protocolEthAmount,
+    // 6: nameSpaceEthAmount,
+  } = event.parsedArgs;
+
   const existingTxn = await models.StakeTransaction.findOne({
     where: {
       transaction_hash: event.rawLog.transactionHash,
@@ -43,7 +53,7 @@ async function handleCommunityStakeTrades(
 
   const community = await models.Community.findOne({
     where: {
-      namespace_address: event.parsedArgs.namespace,
+      namespace_address: namespaceAddress,
     },
   });
   if (!community) {
@@ -94,9 +104,9 @@ async function handleCommunityStakeTrades(
     community_id: community.id,
     stake_id: parseInt(stakeId),
     stake_amount: parseInt(stakeAmount),
-    stake_price: event.parsedArgs.ethAmount,
-    address: event.parsedArgs.trader,
-    stake_direction: event.parsedArgs.isBuy ? 'buy' : 'sell',
+    stake_price: ethAmount,
+    address: trader,
+    stake_direction: isBuy ? 'buy' : 'sell',
     timestamp: block.timestamp as number,
   });
 }
