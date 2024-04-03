@@ -61,7 +61,8 @@
     "cosmos:start": "chmod u+x test/util/cosmos-chain-testing/v1/start.sh && ./test/util/cosmos-chain-testing/v1/start.sh && chmod u+x test/util/cosmos-chain-testing/v1beta1/start.sh && ./test/util/cosmos-chain-testing/v1beta1/start.sh && chmod u+x test/util/cosmos-chain-testing/ethermint/start.sh && ./test/util/cosmos-chain-testing/ethermint/start.sh",
     "cosmos:stop": "chmod u+x test/util/cosmos-chain-testing/v1/stop.sh && ./test/util/cosmos-chain-testing/v1/stop.sh && chmod u+x test/util/cosmos-chain-testing/v1beta1/stop.sh && ./test/util/cosmos-chain-testing/v1beta1/stop.sh && chmod u+x test/util/cosmos-chain-testing/ethermint/stop.sh && ./test/util/cosmos-chain-testing/ethermint/stop.sh",
     "publish-rmq-msg": "ts-node -r tsconfig-paths/register -T ./scripts/publishRmqMessageScript.ts",
-    "build-contracts": "npx hardhat compile"
+    "build-contracts": "npx hardhat compile",
+    "ts-exec": "ts-node -r tsconfig-paths/register -T"
   },
   "engines": {
     "node": "20.x"
