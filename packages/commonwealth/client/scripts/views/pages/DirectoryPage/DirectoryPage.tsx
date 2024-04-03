@@ -86,7 +86,7 @@ const DirectoryPage = () => {
           <div className="community-search">
             <CWTextInput
               value={communitySearch}
-              onInput={(e) => setCommunitySearch(e.target.value)}
+              onInput={(e: any) => setCommunitySearch(e.target.value)}
               fullWidth
               placeholder="Search communities"
               iconLeft={<MagnifyingGlass size={24} weight="regular" />}

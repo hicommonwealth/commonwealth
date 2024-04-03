@@ -1,9 +1,9 @@
-import React from 'react';
 import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
+import React from 'react';
 
 interface JoinCommunityBannerProps {
   onClose: () => void;
-  onJoin: () => Promise<boolean>;
+  onJoin: () => void;
 }
 const JoinCommunityBanner = ({ onClose, onJoin }: JoinCommunityBannerProps) => {
   return (

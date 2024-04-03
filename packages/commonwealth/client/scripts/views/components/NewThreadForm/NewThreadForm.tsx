@@ -254,7 +254,7 @@ export const NewThreadForm = () => {
                 <CWButton
                   label="Create thread"
                   disabled={isDisabled || !hasJoinedCommunity}
-                  onClick={() => void handleNewThreadCreation()}
+                  onClick={handleNewThreadCreation}
                   tabIndex={4}
                   containerClassName="no-pad"
                 />

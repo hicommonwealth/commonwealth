@@ -174,7 +174,7 @@ const NotificationSettingsPage = () => {
                 {
                   label: 'Once a week',
                   onClick: () => {
-                    void app.user.updateEmailInterval('weekly');
+                    app.user.updateEmailInterval('weekly');
                     setCurrentFrequency('weekly');
                     forceRerender();
                   },
@@ -182,7 +182,7 @@ const NotificationSettingsPage = () => {
                 {
                   label: 'Never',
                   onClick: () => {
-                    void app.user.updateEmailInterval('never');
+                    app.user.updateEmailInterval('never');
                     setCurrentFrequency('never');
                     forceRerender();
                   },
@@ -240,7 +240,7 @@ const NotificationSettingsPage = () => {
                       disabled={!emailValidated}
                       onClick={() => {
                         try {
-                          void app.user.updateEmail(email);
+                          app.user.updateEmail(email);
                           setSentEmail(true);
                           // forceRerender();
                         } catch (e) {
@@ -306,7 +306,7 @@ const NotificationSettingsPage = () => {
                     disabled={true}
                     checked={false}
                     onChange={() => {
-                      void handleEmailSubscriptions(false, []);
+                      handleEmailSubscriptions(false, []);
                     }}
                   />
                   <CWToggle
@@ -319,10 +319,7 @@ const NotificationSettingsPage = () => {
                         })
                         .then(() => {
                           forceRerender();
-                        })
-                        .catch((err) =>
-                          console.log('Something went wrong', err),
-                        );
+                        });
                     }}
                   />
                 </div>
@@ -358,13 +355,13 @@ const NotificationSettingsPage = () => {
                     label="Receive Emails"
                     checked={hasSomeEmailSubs}
                     onChange={() => {
-                      void handleEmailSubscriptions(hasSomeEmailSubs, subs);
+                      handleEmailSubscriptions(hasSomeEmailSubs, subs);
                     }}
                   />
                   <CWToggle
                     checked={hasSomeInAppSubs}
                     onChange={() => {
-                      void handleSubscriptions(hasSomeInAppSubs, subs);
+                      handleSubscriptions(hasSomeInAppSubs, subs);
                     }}
                   />
                 </div>
@@ -436,13 +433,13 @@ const NotificationSettingsPage = () => {
                         label="Receive Emails"
                         checked={hasSomeEmailSubs}
                         onChange={() =>
-                          void handleEmailSubscriptions(hasSomeEmailSubs, subs)
+                          handleEmailSubscriptions(hasSomeEmailSubs, subs)
                         }
                       />
                       <CWToggle
                         checked={hasSomeInAppSubs}
                         onChange={() =>
-                          void handleSubscriptions(hasSomeInAppSubs, subs)
+                          handleSubscriptions(hasSomeInAppSubs, subs)
                         }
                       />
                     </div>
@@ -512,7 +509,7 @@ const NotificationSettingsPage = () => {
                               {getUser()}
                               <SubscriptionRowMenu
                                 subscription={sub}
-                                onUnsubscribe={void handleUnsubscribe}
+                                onUnsubscribe={handleUnsubscribe}
                               />
                             </div>
                             <div className="subscription-row-mobile">
@@ -522,7 +519,7 @@ const NotificationSettingsPage = () => {
                                 />
                                 <SubscriptionRowMenu
                                   subscription={sub}
-                                  onUnsubscribe={void handleUnsubscribe}
+                                  onUnsubscribe={handleUnsubscribe}
                                 />
                               </div>
                               <div className="subscription-row-mobile-bottom">
@@ -618,13 +615,13 @@ const NotificationSettingsPage = () => {
                     label="Receive Emails"
                     checked={hasSomeEmailSubs}
                     onChange={() => {
-                      void handleEmailSubscriptions(hasSomeEmailSubs, subs);
+                      handleEmailSubscriptions(hasSomeEmailSubs, subs);
                     }}
                   />
                   <CWToggle
                     checked={hasSomeInAppSubs}
                     onChange={() => {
-                      void handleSubscriptions(hasSomeInAppSubs, subs);
+                      handleSubscriptions(hasSomeInAppSubs, subs);
                     }}
                   />
                 </div>
