@@ -1,5 +1,6 @@
 import { PinoLogger } from '@hicommonwealth/adapters';
 import { logger } from '@hicommonwealth/core';
+import { EVM_CE_POLL_INTERVAL_MS } from '../../config';
 import { processChainNode, scheduleNodeProcessing } from './nodeProcessing';
 
 const log = logger(PinoLogger()).getLogger(__filename);
@@ -20,7 +21,7 @@ export async function startEvmPolling(
   log.info(`Starting EVM poller`);
   if (interval > 500_000) {
     throw new Error(
-      `Interval for EVM polling must be at least 500_000 ms (500 seconds)`,
+      `Interval for EVM polling must be less than 500_000 ms (500 seconds)`,
     );
   }
 
@@ -38,7 +39,7 @@ export async function startEvmPolling(
 }
 
 if (require.main === module) {
-  startEvmPolling(120_000).catch((e) => {
+  startEvmPolling(EVM_CE_POLL_INTERVAL_MS).catch((e) => {
     log.error('Evm poller shutting down due to a critical error:', e);
     process.exit(1);
   });

@@ -121,3 +121,6 @@ export const MESSAGE_RELAYER_TIMEOUT_MS =
   parseInt(process.env.MESSAGE_RELAYER_TIME_MS) || 200;
 export const MESSAGE_RELAYER_PREFETCH =
   parseInt(process.env.MESSAGE_RELAYER_PREFETCH) || 50;
+
+export const EVM_CE_POLL_INTERVAL_MS =
+  parseInt(process.env.EVM_CE_POLL_INTERVAL) || 120_000;

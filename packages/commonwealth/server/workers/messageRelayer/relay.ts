@@ -16,6 +16,7 @@ const log = logger(PinoLogger()).getLogger(__filename);
 const EventNameTopicMap: Partial<Record<schemas.Events, BrokerTopics>> = {
   SnapshotProposalCreated: BrokerTopics.SnapshotListener,
   DiscordMessageCreated: BrokerTopics.DiscordListener,
+  ChainEventCreated: BrokerTopics.ChainEvent,
 } as const;
 
 export async function relay(broker: Broker, models: DB): Promise<number> {
