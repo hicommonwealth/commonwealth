@@ -55,7 +55,7 @@ module.exports = {
       { type: queryInterface.sequelize.QueryTypes.SELECT },
     );
 
-    if (communities.length === 1) {
+    if (communities.length === 0) {
       return;
     }
 
