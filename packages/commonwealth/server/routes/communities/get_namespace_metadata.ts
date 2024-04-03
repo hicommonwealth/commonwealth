@@ -1,6 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
-import { TypedRequestParams } from 'server/types';
+import { TypedRequestParams } from '../../types';
 
 export const getNamespaceMetadata = async (
   models: DB,

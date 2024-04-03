@@ -1,5 +1,5 @@
 import { AppError } from '@hicommonwealth/core';
-import { SearchProfilesResult } from 'server/controllers/server_profiles_methods/search_profiles';
+import { SearchProfilesResult } from '../../controllers/server_profiles_methods/search_profiles';
 import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
 import { ServerControllers } from '../../routing/router';
 import {

@@ -1,7 +1,7 @@
 import { schemas } from '@hicommonwealth/core';
 import { CommunityInstance } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
-import { TypedPaginatedResult } from 'server/types';
+import { TypedPaginatedResult } from '../../types';
 import { PaginationSqlOptions, buildPaginationSql } from '../../util/queries';
 import { ServerCommentsController } from '../server_comments_controller';
 

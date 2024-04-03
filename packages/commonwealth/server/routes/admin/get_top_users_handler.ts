@@ -1,4 +1,4 @@
-import { GetTopUsersResult } from 'server/controllers/server_admin_methods/get_top_users';
+import { GetTopUsersResult } from '../../controllers/server_admin_methods/get_top_users';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 

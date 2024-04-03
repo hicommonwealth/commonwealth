@@ -1,5 +1,5 @@
 import { CommunityAttributes } from '@hicommonwealth/model';
-import { UpdateCommunityResult } from 'server/controllers/server_communities_methods/update_community';
+import { UpdateCommunityResult } from '../../controllers/server_communities_methods/update_community';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 

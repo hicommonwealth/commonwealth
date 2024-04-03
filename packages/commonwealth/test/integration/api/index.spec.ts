@@ -5,7 +5,6 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
-import { bech32ToHex } from 'shared/utils';
 import * as siwe from 'siwe';
 import { TestServer, testServer } from '../../../server-test';
 import {
@@ -14,6 +13,7 @@ import {
   createSiweMessage,
 } from '../../../shared/adapters/chain/ethereum/keys';
 import { createCanvasSessionPayload } from '../../../shared/canvas';
+import { bech32ToHex } from '../../../shared/utils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
