@@ -54,7 +54,7 @@ export const GetBulkThreads = {
         collaborators: z.any().array(),
         has_poll: z.boolean().nullable().optional(),
         last_commented_on: z.date().nullable().optional(),
-        plaintext: z.string().nullable().optional(),
+        plaintext: z.string(),
         Address: z.object({
           id: z.number(),
           address: z.string(),
@@ -66,9 +66,6 @@ export const GetBulkThreads = {
         reactionWeights: z.number().array(),
         reaction_weights_sum: z.number(),
         addressesReacted: z.string().array(),
-        reactedProfileName: z.string().array().optional(),
-        reactedProfileAvatarUrl: z.string().array().optional(),
-        reactedAddressLastActive: z.string().array().optional(),
         reactionType: z.string().array(),
         marked_as_spam_at: z.date().nullable().optional(),
         archived_at: z.date().nullable().optional(),
@@ -81,10 +78,6 @@ export const GetBulkThreads = {
             chainId: z.string(),
           })
           .optional(),
-        profile_id: z.number(),
-        avatar_url: z.string().nullable(),
-        address_last_active: z.date().nullable(),
-        profile_name: z.string().nullable(),
       })
       .array(),
   }),

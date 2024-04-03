@@ -12,10 +12,9 @@ import CWPopover, {
 } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import { UserProfile } from '../../../../../models/MinimumProfile';
+import { User } from 'views/components/user/user';
 import { IThreadCollaborator } from '../../../../../models/Thread';
 import { ThreadStage } from '../../../../../models/types';
-import { FullUser } from '../../../../components/user/fullUser';
 import { NewThreadTag } from '../../NewThreadTag';
 import './AuthorAndPublishInfo.scss';
 import useAuthorMetadataCustomWrap from './useAuthorMetadataCustomWrap';
@@ -44,7 +43,6 @@ export type AuthorAndPublishInfoProps = {
   onThreadStageLabelClick?: (threadStage: ThreadStage) => Promise<any>;
   archivedAt?: moment.Moment;
   popoverPlacement?: PopperPlacementType;
-  profile?: UserProfile;
 };
 
 export const AuthorAndPublishInfo = ({
@@ -67,7 +65,6 @@ export const AuthorAndPublishInfo = ({
   collaboratorsInfo,
   archivedAt,
   popoverPlacement,
-  profile,
 }: AuthorAndPublishInfoProps) => {
   const popoverProps = usePopover();
   const containerRef = useRef(null);
@@ -81,7 +78,7 @@ export const AuthorAndPublishInfo = ({
 
   return (
     <div className="AuthorAndPublishInfo" ref={containerRef}>
-      <FullUser
+      <User
         avatarSize={24}
         userAddress={authorAddress}
         userCommunityId={authorCommunityId}
@@ -91,7 +88,6 @@ export const AuthorAndPublishInfo = ({
           fromDiscordBot ? false : showUserAddressWithInfo
         }
         popoverPlacement={popoverPlacement}
-        profile={profile}
       />
 
       {fromDiscordBot && (
@@ -124,14 +120,13 @@ export const AuthorAndPublishInfo = ({
             <CWPopover
               content={
                 <div className="collaborators">
-                  {collaboratorsInfo.map(({ address, community_id, User }) => {
+                  {collaboratorsInfo.map(({ address, community_id }) => {
                     return (
-                      <FullUser
+                      <User
                         shouldLinkProfile
                         key={address}
                         userAddress={address}
                         userCommunityId={community_id}
-                        profile={User.Profiles[0]}
                       />
                     );
                   })}

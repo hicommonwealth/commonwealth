@@ -17,7 +17,6 @@ import { CWModal } from '../component_kit/new_designs/CWModal';
 import { UserSkeleton } from './UserSkeleton';
 import type { UserAttrsWithSkeletonProp } from './user.types';
 
-// TODO: When this is no longer used, this should be removed in favour of fullUser.tsx
 export const User = ({
   shouldLinkProfile,
   shouldShowPopover,

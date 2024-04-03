@@ -125,7 +125,6 @@ export const EditCollaboratorsModal = ({
                       id: c.Address.id,
                       address: c.Address.address,
                       community_id: c.Address.community_id,
-                      User: null,
                     })
                   }
                 >

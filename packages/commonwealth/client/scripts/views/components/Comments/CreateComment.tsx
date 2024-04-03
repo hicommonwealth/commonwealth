@@ -80,13 +80,7 @@ export const CreateComment = ({
       const newComment: any = await createComment({
         threadId: rootThread.id,
         communityId,
-        profile: {
-          id: app.user.activeAccount.profile.id,
-          address: app.user.activeAccount.address,
-          avatarUrl: app.user.activeAccount.profile.avatarUrl,
-          name: app.user.activeAccount.profile.name,
-          lastActive: app.user.activeAccount.profile.lastActive?.toString(),
-        },
+        address: app.user.activeAccount.address,
         parentCommentId: parentCommentId,
         unescapedText: serializeDelta(contentDelta),
         existingNumberOfComments: rootThread.numberOfComments || 0,

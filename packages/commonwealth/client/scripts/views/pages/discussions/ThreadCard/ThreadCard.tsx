@@ -126,7 +126,6 @@ export const ThreadCard = ({
               })}
               discord_meta={thread.discord_meta}
               archivedAt={thread.archivedAt}
-              profile={thread?.profile}
             />
             <div className="content-header-icons">
               {thread.pinned && <CWIcon iconName="pin" />}
