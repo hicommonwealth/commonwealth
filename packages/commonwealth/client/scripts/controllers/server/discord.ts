@@ -1,11 +1,10 @@
 import axios from 'axios';
-import $ from 'jquery';
 import app from 'state';
 
 class DiscordController {
   public async createConfig(verification_token: string) {
     try {
-      await $.post(`${app.serverUrl()}/createDiscordBotConfig`, {
+      await axios.post(`${app.serverUrl()}/createDiscordBotConfig`, {
         community_id: app.activeChainId(),
         verification_token,
         jwt: app.user.jwt,

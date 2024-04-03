@@ -1,4 +1,4 @@
-import { community } from '@hicommonwealth/core';
+import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
 import { z } from 'zod';
@@ -6,7 +6,7 @@ import { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type CommunityStakeAttributes = z.infer<
-  typeof community.CommunityStake
+  typeof schemas.entities.CommunityStake
 > & {
   // associations
   Chain?: CommunityAttributes;
@@ -28,9 +28,13 @@ export default (
         allowNull: false,
         primaryKey: true,
       },
-      stake_id: { type: dataTypes.INTEGER, allowNull: false, primaryKey: true },
+      stake_id: {
+        type: dataTypes.INTEGER,
+        allowNull: false,
+        primaryKey: true,
+      },
       stake_token: { type: dataTypes.STRING, allowNull: false },
-      vote_weight: { type: dataTypes.REAL, allowNull: false },
+      vote_weight: { type: dataTypes.INTEGER, allowNull: false },
       stake_enabled: { type: dataTypes.BOOLEAN, allowNull: false },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
@@ -47,7 +51,7 @@ export default (
 
   CommunityStake.associate = (models) => {
     models.CommunityStake.belongsTo(models.Community, {
-      foreignKey: 'community_id',
+      foreignKey: { name: 'community_id' },
       targetKey: 'id',
     });
   };

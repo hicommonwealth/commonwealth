@@ -90,7 +90,7 @@ export const CommentCard = ({
     useState<boolean>(false);
   const [verifiedAction, setVerifiedAction] = useState<Action>();
   const [verifiedSession, setVerifiedSession] = useState<Session>();
-  const [onReaction, setOnReaction] = useState<boolean>(false);
+  const [, setOnReaction] = useState<boolean>(false);
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
 
   useEffect(() => {
@@ -130,11 +130,12 @@ export const CommentCard = ({
         ) : (
           <AuthorAndPublishInfo
             authorAddress={author.address}
-            authorChainId={author.community?.id || author?.profile?.chain}
+            authorCommunityId={author.community?.id || author?.profile?.chain}
             publishDate={comment.createdAt}
             discord_meta={comment.discord_meta}
             popoverPlacement="top"
             showUserAddressWithInfo={false}
+            profile={comment.profile}
           />
         )}
       </div>

@@ -1,5 +1,7 @@
 import { BigNumber } from 'ethers';
 
+export const WEI_PER_ETHER = 1000000000000000000;
+
 export function deserializeBigNumbers(obj: Record<string, any>) {
   // Base case: if the object is not an object or is null, return it as-is
   if (typeof obj !== 'object' || obj === null) {

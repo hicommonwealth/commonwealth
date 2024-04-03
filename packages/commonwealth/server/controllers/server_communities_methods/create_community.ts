@@ -7,7 +7,7 @@ import {
   ChainType,
   DefaultPage,
   NotificationCategories,
-  community as community_schemas,
+  schemas,
 } from '@hicommonwealth/core';
 import type {
   AddressInstance,
@@ -69,7 +69,7 @@ export const Errors = {
 
 export type CreateCommunityOptions = {
   user: UserInstance;
-  community: z.infer<typeof community_schemas.CreateCommunity.input>;
+  community: z.infer<typeof schemas.commands.CreateCommunity.input>;
 };
 
 export type CreateCommunityResult = {
@@ -379,7 +379,7 @@ export async function __createCommunity(
     token_name,
     has_chain_events_listener: network === 'aave' || network === 'compound',
     default_page: DefaultPage.Homepage,
-    has_homepage: true,
+    has_homepage: 'true',
   });
 
   const nodeJSON = node.toJSON();

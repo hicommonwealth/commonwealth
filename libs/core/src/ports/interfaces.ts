@@ -1,4 +1,10 @@
-import { AnalyticsOptions, CacheNamespaces } from '../types';
+import {
+  EventContext,
+  EventSchemas,
+  EventsHandlerMetadata,
+} from '../framework';
+import { Events } from '../schemas';
+import { AnalyticsOptions, BrokerTopics, CacheNamespaces } from '../types';
 
 /**
  * Resource disposer function
@@ -18,18 +24,25 @@ export interface Disposable {
  */
 export type AdapterFactory<T extends Disposable> = (adapter?: T) => T;
 
+export type LogContext = {
+  // fingerprint is a Rollbar concept that helps Rollbar group error occurrences together
+  fingerprint?: string;
+  [key: string]: unknown;
+};
+
 /**
  * Logger port
  * Logs messages at different levels
  */
 export interface ILogger {
-  trace(msg: string, error?: Error, context?: Record<string, unknown>): void;
-  debug(msg: string, error?: Error, context?: Record<string, unknown>): void;
-  info(msg: string, error?: Error, context?: Record<string, unknown>): void;
-  warn(msg: string, error?: Error, context?: Record<string, unknown>): void;
-  error(msg: string, error?: Error, context?: Record<string, unknown>): void;
-  fatal(msg: string, error?: Error, context?: Record<string, unknown>): void;
+  trace(msg: string, error?: Error, context?: LogContext): void;
+  debug(msg: string, error?: Error, context?: LogContext): void;
+  info(msg: string, error?: Error, context?: LogContext): void;
+  warn(msg: string, error?: Error, context?: LogContext): void;
+  error(msg: string, error?: Error, context?: LogContext): void;
+  fatal(msg: string, error?: Error, context?: LogContext): void;
 }
+
 /**
  * Logger factory
  * Builds a named logger
@@ -54,6 +67,8 @@ export interface Stats extends Disposable {
   // flags
   on(key: string): void;
   off(key: string): void;
+  // gauge
+  gauge(key: string, value: number): void;
   // traces
   timing(key: string, duration: number, tags?: Record<string, string>): void;
 }
@@ -62,7 +77,9 @@ export interface Stats extends Disposable {
  * Cache port
  */
 export interface Cache extends Disposable {
-  getKey(namespace: CacheNamespaces, key: string): Promise<string | undefined>;
+  ready(): Promise<boolean>;
+  isReady(): boolean;
+  getKey(namespace: CacheNamespaces, key: string): Promise<string | null>;
   setKey(
     namespace: CacheNamespaces,
     key: string,
@@ -73,33 +90,30 @@ export interface Cache extends Disposable {
   getKeys(
     namespace: CacheNamespaces,
     keys: string[],
-  ): Promise<false | Record<string, unknown> | undefined>;
+  ): Promise<false | Record<string, unknown>>;
   setKeys(
     namespace: CacheNamespaces,
     data: { [key: string]: string },
     duration?: number,
     transaction?: boolean,
-  ): Promise<false | Array<'OK' | null> | undefined>;
+  ): Promise<false | Array<'OK' | null>>;
   getNamespaceKeys(
     namespace: CacheNamespaces,
     maxResults?: number,
-  ): Promise<{ [key: string]: string } | boolean | undefined>;
-  deleteKey(
-    namespace: CacheNamespaces,
-    key: string,
-  ): Promise<number | undefined>;
+  ): Promise<{ [key: string]: string } | boolean>;
+  deleteKey(namespace: CacheNamespaces, key: string): Promise<number>;
   deleteNamespaceKeys(namespace: CacheNamespaces): Promise<number | boolean>;
   flushAll(): Promise<void>;
   incrementKey(
     namespace: CacheNamespaces,
     key: string,
     increment?: number,
-  ): Promise<number | null | undefined>;
+  ): Promise<number | null>;
   decrementKey(
     namespace: CacheNamespaces,
     key: string,
     decrement?: number,
-  ): Promise<number | null | undefined>;
+  ): Promise<number | null>;
   getKeyTTL(namespace: CacheNamespaces, key: string): Promise<number>;
   setKeyTTL(
     namespace: CacheNamespaces,
@@ -113,4 +127,28 @@ export interface Cache extends Disposable {
  */
 export interface Analytics extends Disposable {
   track(event: string, payload: AnalyticsOptions): void;
+}
+
+export type RetryStrategyFn = (
+  err: Error | undefined,
+  topic: BrokerTopics,
+  content: any,
+  ackOrNackFn: (...args: any[]) => void,
+  log: ILogger,
+) => void;
+
+/**
+ * Broker Port
+ */
+export interface Broker extends Disposable {
+  publish<Name extends Events>(
+    topic: BrokerTopics,
+    event: EventContext<Name>,
+  ): Promise<boolean>;
+
+  subscribe<Inputs extends EventSchemas>(
+    topic: BrokerTopics,
+    handler: EventsHandlerMetadata<Inputs>,
+    retryStrategy?: RetryStrategyFn,
+  ): Promise<boolean>;
 }

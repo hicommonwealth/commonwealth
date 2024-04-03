@@ -1,4 +1,4 @@
-import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/core';
 import {
   linkExistingAddressToChainOrCommunity,
   setActiveAccount,
@@ -12,8 +12,6 @@ import { AccountSelector } from 'views/components/component_kit/cw_wallets_list'
 import TOSModal from 'views/modals/TOSModal';
 import { AuthModal } from '../../modals/AuthModal';
 import { CWModal } from '../component_kit/new_designs/CWModal';
-
-const NON_INTEROP_NETWORKS = [ChainNetwork.AxieInfinity];
 
 const useJoinCommunity = () => {
   const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] =
@@ -59,14 +57,6 @@ const useJoinCommunity = () => {
       return false;
     }
 
-    // filter additionally by chain network if in list of non-interop, unless we are on that chain
-    // TODO: make this related to wallet.specificChains
-    if (
-      NON_INTEROP_NETWORKS.includes(addressChainInfo?.network) &&
-      activeChainInfo?.network !== addressChainInfo?.network
-    ) {
-      return false;
-    }
     return true;
   });
 
@@ -82,15 +72,9 @@ const useJoinCommunity = () => {
   );
 
   const performJoinCommunityLinking = async () => {
-    if (
-      sameBaseAddressesRemoveDuplicates.length > 1 &&
-      app.activeChainId() !== 'axie-infinity'
-    ) {
+    if (sameBaseAddressesRemoveDuplicates.length > 1) {
       setIsAccountSelectorModalOpen(true);
-    } else if (
-      sameBaseAddressesRemoveDuplicates.length === 1 &&
-      app.activeChainId() !== 'axie-infinity'
-    ) {
+    } else if (sameBaseAddressesRemoveDuplicates.length === 1) {
       await linkToCommunity(0);
       return true;
     } else {
@@ -115,14 +99,15 @@ const useJoinCommunity = () => {
           originAddressInfo.community.id,
         );
 
-        if (res && res.result) {
-          const { verification_token, addresses, encodedAddress } = res.result;
+        if (res && res.data.result) {
+          const { verification_token, addresses, encodedAddress } =
+            res.data.result;
           app.user.setAddresses(
             addresses.map((a) => {
               return new AddressInfo({
                 id: a.id,
                 address: a.address,
-                chainId: a.community_id,
+                communityId: a.community_id,
                 keytype: a.keytype,
                 walletId: a.wallet_id,
               });

@@ -44,7 +44,7 @@ export const EditCollaboratorsModal = ({
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
   const { mutateAsync: editThread } = useEditThreadMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: thread.id,
     currentStage: thread.stage,
     currentTopicId: thread.topic.id,
@@ -125,6 +125,7 @@ export const EditCollaboratorsModal = ({
                       id: c.Address.id,
                       address: c.Address.address,
                       community_id: c.Address.community_id,
+                      User: null,
                     })
                   }
                 >
@@ -198,7 +199,7 @@ export const EditCollaboratorsModal = ({
               try {
                 const updatedThread = await editThread({
                   threadId: thread.id,
-                  chainId: app.activeChainId(),
+                  communityId: app.activeChainId(),
                   address: app.user.activeAccount.address,
                   collaborators: {
                     ...(newCollaborators.length > 0 && {

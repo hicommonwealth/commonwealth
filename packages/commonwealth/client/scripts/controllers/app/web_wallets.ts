@@ -1,5 +1,5 @@
 import type { ChainBase, WalletId } from '@hicommonwealth/core';
-import $ from 'jquery';
+import axios from 'axios';
 import app from 'state';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
@@ -12,7 +12,6 @@ import MetamaskWebWalletController from './webWallets/metamask_web_wallet';
 import NearWebWalletController from './webWallets/near_web_wallet';
 import PhantomWebWalletController from './webWallets/phantom_web_wallet';
 import PolkadotWebWalletController from './webWallets/polkadot_web_wallet';
-import RoninWebWalletController from './webWallets/ronin_web_wallet';
 import TerraStationWebWalletController from './webWallets/terra_station_web_wallet';
 import TerraWalletConnectWebWalletController from './webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from './webWallets/walletconnect_web_wallet';
@@ -30,7 +29,7 @@ export default class WebWalletController {
   }
 
   public availableWallets(chain?: ChainBase): IWebWallet<any>[] {
-    // handle case like injective, axie, where we require a specific wallet
+    // handle case like injective, where we require a specific wallet
     const specificChain = app.chain?.meta?.id;
     if (app.chain?.meta?.id) {
       const specificWallets = this._wallets.filter(
@@ -61,7 +60,7 @@ export default class WebWalletController {
     }
     // do nothing on failure
     try {
-      await $.post(`${app.serverUrl()}/setAddressWallet`, {
+      await axios.post(`${app.serverUrl()}/setAddressWallet`, {
         address: account.address,
         author_community_id: account.community.id,
         wallet_id: wallet,
@@ -122,7 +121,6 @@ export default class WebWalletController {
       new CosmosEvmMetamaskWalletController(),
       new KeplrEthereumWalletController(),
       new PhantomWebWalletController(),
-      new RoninWebWalletController(),
       new TerraWalletConnectWebWalletController(),
       new CoinbaseWebWalletController(),
     ];
