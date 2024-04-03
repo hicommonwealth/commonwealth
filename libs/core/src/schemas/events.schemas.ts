@@ -55,7 +55,7 @@ export const ChainEventCreated = z.object({
     kind: z.string(),
     chainNodeId: z.number(),
   }),
-  parsedArgs: z.array(z.any()),
+  parsedArgs: z.any(),
   rawLog: z.object({
     blockNumber: z.number(),
     blockHash: z.string(),
