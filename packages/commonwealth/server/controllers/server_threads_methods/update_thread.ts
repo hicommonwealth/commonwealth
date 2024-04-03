@@ -269,45 +269,10 @@ export async function __updateThread(
   const finalThread = await this.models.Thread.findOne({
     where: { id: thread.id },
     include: [
-      {
-        model: this.models.Address,
-        as: 'Address',
-        include: [
-          {
-            model: this.models.User,
-            as: 'User',
-            required: true,
-            attributes: ['id'],
-            include: [
-              {
-                model: this.models.Profile,
-                as: 'Profiles',
-                required: true,
-                attributes: ['id', 'avatar_url', 'profile_name'],
-              },
-            ],
-          },
-        ],
-      },
+      { model: this.models.Address, as: 'Address' },
       {
         model: this.models.Address,
         as: 'collaborators',
-        include: [
-          {
-            model: this.models.User,
-            as: 'User',
-            required: true,
-            attributes: ['id'],
-            include: [
-              {
-                model: this.models.Profile,
-                as: 'Profiles',
-                required: true,
-                attributes: ['id', 'avatar_url', 'profile_name'],
-              },
-            ],
-          },
-        ],
       },
       { model: this.models.Topic, as: 'topic' },
     ],
