@@ -28,7 +28,7 @@ const expectedCreateResp = {
   stake_enabled: baseRequest.stake_enabled,
 };
 
-describe('POST communityStakes Tests', () => {
+describe.only('POST communityStakes Tests', () => {
   let server: TestServer;
 
   before(async () => {
@@ -149,7 +149,7 @@ describe('POST communityStakes Tests', () => {
           attributes: ['eth_chain_id', 'url'],
         },
       ],
-      attributes: ['namespace'],
+      attributes: ['namespace', 'namespace_address'],
     });
     await commonProtocol.communityStakeConfigValidator.validateCommunityStakeConfig(
       community,
