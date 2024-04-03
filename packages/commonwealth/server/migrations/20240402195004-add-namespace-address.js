@@ -55,39 +55,39 @@ module.exports = {
       { type: queryInterface.sequelize.QueryTypes.SELECT },
     );
 
-    if (communities.length === 0) {
-      return;
-    }
-
-    const web3Providers = {};
-
     let values = ``;
-    for (const community of communities) {
-      if (!web3Providers[community.eth_chain_id]) {
-        web3Providers[community.eth_chain_id] = new Web3(community.url);
+    if (communities.length !== 0) {
+      const web3Providers = {};
+
+      for (const community of communities) {
+        if (!web3Providers[community.eth_chain_id]) {
+          web3Providers[community.eth_chain_id] = new Web3(community.url);
+        }
+        const web3 = web3Providers[community.eth_chain_id];
+
+        const namespaceAddress = await getNamespace(
+          web3,
+          community.namespace,
+          factoryContracts[community.eth_chain_id],
+        );
+
+        if (!namespaceAddress) {
+          console.error('Namespace address not found', {
+            namespace: community.namespace,
+            eth_chain_id: community.eth_chain_id,
+            community_id: community.id,
+          });
+        }
+
+        console.log(
+          `Namespace address for ${community.id}: ${namespaceAddress}`,
+        );
+
+        values += `('${community.id}', '${namespaceAddress}'),`;
       }
-      const web3 = web3Providers[community.eth_chain_id];
 
-      const namespaceAddress = await getNamespace(
-        web3,
-        community.namespace,
-        factoryContracts[community.eth_chain_id],
-      );
-
-      if (!namespaceAddress) {
-        console.error('Namespace address not found', {
-          namespace: community.namespace,
-          eth_chain_id: community.eth_chain_id,
-          community_id: community.id,
-        });
-      }
-
-      console.log(`Namespace address for ${community.id}: ${namespaceAddress}`);
-
-      values += `('${community.id}', '${namespaceAddress}'),`;
+      values = values.slice(0, -1);
     }
-
-    values = values.slice(0, -1);
 
     await queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.addColumn(
@@ -100,8 +100,9 @@ module.exports = {
         { transaction },
       );
 
-      await queryInterface.sequelize.query(
-        `
+      if (communities.length !== 0) {
+        await queryInterface.sequelize.query(
+          `
         UPDATE "Communities" C
         SET namespace_address = C2.namespace_address
         FROM (VALUES
@@ -109,8 +110,9 @@ module.exports = {
         ) as C2(id, namespace_address)
         WHERE C.id = C2.id;
       `,
-        { transaction, logging: console.log },
-      );
+          { transaction, logging: console.log },
+        );
+      }
     });
   },
 
