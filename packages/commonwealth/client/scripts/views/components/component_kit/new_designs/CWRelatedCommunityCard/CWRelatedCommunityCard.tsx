@@ -28,6 +28,7 @@ type CWRelatedCommunityCardProps = {
   onStakeBtnClick?: () => void;
   ethUsdRate?: string;
   historicalPrice?: string;
+  onlyShowIfStakeEnabled?: boolean;
 };
 
 export const CWRelatedCommunityCard = ({
@@ -37,6 +38,7 @@ export const CWRelatedCommunityCard = ({
   onStakeBtnClick,
   ethUsdRate,
   historicalPrice,
+  onlyShowIfStakeEnabled,
 }: CWRelatedCommunityCardProps) => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
@@ -91,6 +93,8 @@ export const CWRelatedCommunityCard = ({
       }}
     />
   );
+
+  if (onlyShowIfStakeEnabled && !stakeEnabled) return <></>;
 
   return (
     <div
