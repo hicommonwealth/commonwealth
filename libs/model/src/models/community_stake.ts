@@ -23,15 +23,14 @@ export default (
   const CommunityStake = <CommunityStakeModelStatic>sequelize.define(
     'CommunityStakes',
     {
+      id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       community_id: {
         type: dataTypes.STRING,
         allowNull: false,
-        primaryKey: true,
       },
       stake_id: {
         type: dataTypes.INTEGER,
         allowNull: false,
-        primaryKey: true,
       },
       stake_token: { type: dataTypes.STRING, allowNull: false },
       vote_weight: { type: dataTypes.INTEGER, allowNull: false },
