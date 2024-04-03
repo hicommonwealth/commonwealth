@@ -351,6 +351,7 @@ jobs:
           GITHUB_BASE_REF: ${{ github.base_ref }}
         run: yarn lint-branch
 
+      # To disable eslint-diff just comment the following two lines 
       #- name: Run eslint-diff
       #  run: yarn workspace commonwealth run lint-diff
 
