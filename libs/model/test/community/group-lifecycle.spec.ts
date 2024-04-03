@@ -80,7 +80,6 @@ describe('Group lifecycle', () => {
   });
 
   it('should fail creation when sending invalid topics', () => {
-    console.log('testing');
     const invalid = {
       id,
       actor,

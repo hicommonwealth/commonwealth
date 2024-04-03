@@ -1,6 +1,6 @@
 import { trpc } from '@hicommonwealth/adapters';
 import { analytics, schemas, type Policy } from '@hicommonwealth/core';
-import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 
 const inputs = {
   GroupCreated: schemas.events.GroupCreated,

@@ -2,9 +2,9 @@ import type { Express } from 'express';
 import express from 'express';
 import useragent from 'express-useragent';
 import passport from 'passport';
+import apiRouter from '../api';
 import { createCommunityStakeHandler } from '../routes/communities/create_community_stakes_handler';
 import { getCommunityStakeHandler } from '../routes/communities/get_community_stakes_handler';
-import ddd from '../routes/ddd';
 
 import {
   methodNotAllowedMiddleware,
@@ -232,6 +232,9 @@ function setupRouter(
   const router = express.Router();
 
   router.use(useragent.express());
+
+  // Routes API
+  app.use('/api', apiRouter);
 
   // Updating the address
   registerRoute(
@@ -1303,9 +1306,6 @@ function setupRouter(
   );
 
   app.use(endpoint, router);
-
-  // new ddd routes
-  app.use('/ddd', ddd);
 
   app.use(methodNotAllowedMiddleware());
 }
