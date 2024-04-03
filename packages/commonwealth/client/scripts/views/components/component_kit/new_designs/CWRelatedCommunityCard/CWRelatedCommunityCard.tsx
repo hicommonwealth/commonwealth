@@ -1,3 +1,4 @@
+import { disabledStakeButtonTooltipText } from 'client/scripts/helpers/tooltipTexts';
 import clsx from 'clsx';
 import { isCommandClick, pluralizeWithoutNumberPrefix } from 'helpers';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
@@ -24,6 +25,7 @@ type CWRelatedCommunityCardProps = {
   community: ChainInfo;
   memberCount: string | number;
   threadCount: string | number;
+  canBuyStake?: boolean;
   onStakeBtnClick?: () => void;
   ethUsdRate?: string;
   historicalPrice?: string;
@@ -33,6 +35,7 @@ export const CWRelatedCommunityCard = ({
   community,
   memberCount,
   threadCount,
+  canBuyStake,
   onStakeBtnClick,
   ethUsdRate,
   historicalPrice,
@@ -76,6 +79,8 @@ export const CWRelatedCommunityCard = ({
     setSelectedCommunity(community);
   };
 
+  const disableStakeButton = !isLoggedIn || !canBuyStake;
+
   const stakeButton = (
     <CWButton
       label="Buy Stake"
@@ -83,7 +88,7 @@ export const CWRelatedCommunityCard = ({
       buttonAlt="green"
       buttonHeight="sm"
       buttonWidth="narrow"
-      disabled={!isLoggedIn}
+      disabled={disableStakeButton}
       onClick={(e) => {
         e.stopPropagation();
         handleBuyStakeClick();
@@ -161,10 +166,13 @@ export const CWRelatedCommunityCard = ({
         </div>
         {stakeEnabled && (
           <div className="actions">
-            {!isLoggedIn ? (
+            {disableStakeButton ? (
               <CWTooltip
                 placement="right"
-                content="Login to buy stakes"
+                content={disabledStakeButtonTooltipText({
+                  isLoggedIn: isLoggedIn,
+                  connectBaseChainToBuy: community.base,
+                })}
                 renderTrigger={(handleInteraction) => (
                   <span
                     onMouseEnter={handleInteraction}

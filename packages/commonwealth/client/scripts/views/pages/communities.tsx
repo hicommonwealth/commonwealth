@@ -169,12 +169,18 @@ const CommunitiesPage = () => {
         return threadCountB - threadCountA;
       })
       .map((community: CommunityInfo, i) => {
+        // allow user to buy stake if they have a connected address that matches this community's base chain
+        const canBuyStake = !!app?.user?.addresses?.find?.(
+          (address) => address?.community?.base === community?.base,
+        );
+
         return (
           <CWRelatedCommunityCard
             key={i}
             community={community}
             memberCount={community.addressCount}
             threadCount={community.threadCount}
+            canBuyStake={canBuyStake}
             onStakeBtnClick={() => setSelectedCommunity(community)}
             ethUsdRate={ethUsdRate}
             historicalPrice={historicalPriceMap?.get(community.id)}

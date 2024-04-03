@@ -10,6 +10,9 @@ import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { ManageCommunityStakeModalMode } from 'views/modals/ManageCommunityStakeModal/types';
 import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 
+import { disabledStakeButtonTooltipText } from 'client/scripts/helpers/tooltipTexts';
+import app from 'state';
+import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
 import './VoteWeightModule.scss';
 
 type VoteWeightModuleProps = {
@@ -27,11 +30,28 @@ export const VoteWeightModule = ({
   denomination,
   onOpenStakeModal,
 }: VoteWeightModuleProps) => {
+  // allow user to buy stake if they have a connected address that matches active community base chain
+  const canBuyStake = !!app?.user?.addresses?.find?.(
+    (address) => address?.community?.base === app?.chain?.base,
+  );
+
   const popoverProps = usePopover();
 
   const handleBuyStakeClick = async () => {
     onOpenStakeModal('buy');
   };
+
+  const buyButton = (
+    <CWButton
+      label="Buy stake"
+      buttonType="secondary"
+      buttonAlt="green"
+      buttonHeight="sm"
+      buttonWidth="full"
+      disabled={!canBuyStake}
+      onClick={handleBuyStakeClick}
+    />
+  );
 
   return (
     <div className="VoteWeightModule">
@@ -80,14 +100,25 @@ export const VoteWeightModule = ({
             </div>
           ) : (
             <div className="action">
-              <CWButton
-                label="Buy stake"
-                buttonType="secondary"
-                buttonAlt="green"
-                buttonHeight="sm"
-                buttonWidth="full"
-                onClick={handleBuyStakeClick}
-              />
+              {canBuyStake ? (
+                buyButton
+              ) : (
+                <CWTooltip
+                  placement="right"
+                  content={disabledStakeButtonTooltipText({
+                    connectBaseChainToBuy: app?.chain?.base,
+                  })}
+                  renderTrigger={(handleInteraction) => (
+                    <span
+                      className="w-full"
+                      onMouseEnter={handleInteraction}
+                      onMouseLeave={handleInteraction}
+                    >
+                      {buyButton}
+                    </span>
+                  )}
+                />
+              )}
             </div>
           )}
         </div>

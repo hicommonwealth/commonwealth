@@ -79,7 +79,7 @@ const StakeExchangeForm = ({
     community?.ChainNode?.ethChainId || app?.chain?.meta?.ChainNode?.ethChainId;
   // Use the `selectedAddress.value` if buying stake in a non active community (i.e app.activeChainId() != community.id)
   const activeAccountAddress = community
-    ? selectedAddress.value
+    ? selectedAddress?.value
     : app?.user?.activeAccount?.address;
 
   const {
