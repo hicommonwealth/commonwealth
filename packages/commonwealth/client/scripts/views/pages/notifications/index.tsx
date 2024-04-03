@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 import app from 'state';
 import PageError from 'views/pages/error';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWButton } from '../../components/component_kit/new_designs/cw_button';
 import { NotificationRow } from './notification_row';
 
 const NotificationsPage = () => {
@@ -48,7 +48,7 @@ const NotificationsPage = () => {
             }
 
             app.user.notifications.delete(
-              app.user.notifications.chainEventNotifications
+              app.user.notifications.chainEventNotifications,
             );
           }}
         />

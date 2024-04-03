@@ -2,10 +2,10 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import 'pages/AdminPanel.scss';
 import React, { useState } from 'react';
 import { isAddress } from 'web3-utils';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
+import { CWButton } from '../../components/component_kit/new_designs/cw_button';
 import { openConfirmation } from '../../modals/confirmation_modal';
 import { updateSiteAdmin } from './utils';
 
@@ -65,7 +65,7 @@ const MakeSiteAdminTask = () => {
       <CWText type="h4">Make Site Admin</CWText>
       <CWText type="caption">
         Makes a user (corresponding to a specified address) a site-wide admin.
-        Don't do this unless you know what you're doing.
+        Don&apos;t do this unless you know what you&apos;re doing.
       </CWText>
       <div className="TaskRow">
         <CWTextInput

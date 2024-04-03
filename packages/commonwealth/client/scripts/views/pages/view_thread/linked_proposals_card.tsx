@@ -13,10 +13,10 @@ import { Link as ReactRouterLink } from 'react-router-dom';
 import app from 'state';
 import type Thread from '../../../models/Thread';
 import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
+import { CWButton } from '../../components/component_kit/new_designs/cw_button';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
 
 type ThreadLinkProps = {
@@ -145,7 +145,7 @@ export const LinkedProposalsCard = ({
               )}
               {showAddProposalButton && (
                 <CWButton
-                  buttonType="mini-black"
+                  buttonHeight="sm"
                   label="Link proposal"
                   onClick={(e) => {
                     e.preventDefault();

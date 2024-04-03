@@ -16,11 +16,11 @@ import {
 import { useFetchEthUsdRateQuery } from '../../state/api/communityStake/index';
 import { trpc } from '../../utils/trpcClient';
 import { NewCommunityCard } from '../components/CommunityCard';
-import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import CWCircleMultiplySpinner from '../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWModal } from '../components/component_kit/new_designs/CWModal';
 import { CWRelatedCommunityCard } from '../components/component_kit/new_designs/CWRelatedCommunityCard';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import ManageCommunityStakeModal from '../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import { CommunityData } from './DirectoryPage/DirectoryPageContent';
 
@@ -215,9 +215,8 @@ const CommunitiesPage = () => {
               <CWButton
                 key={i}
                 label={cat}
-                buttonType={
-                  filterMap[cat] ? 'primary-black' : 'secondary-black'
-                }
+                buttonHeight="sm"
+                buttonType={filterMap[cat] ? 'primary' : 'secondary'}
                 onClick={() => {
                   handleSetFilterMap(cat);
                 }}
@@ -227,11 +226,10 @@ const CommunitiesPage = () => {
           {communityNetworks.map((network, i) => {
             return (
               <CWButton
+                buttonHeight="sm"
                 key={i}
                 label={network}
-                buttonType={
-                  filterMap[network] ? 'primary-black' : 'secondary-black'
-                }
+                buttonType={filterMap[network] ? 'primary' : 'secondary'}
                 onClick={() => {
                   handleSetFilterMap(network);
                 }}
@@ -241,11 +239,10 @@ const CommunitiesPage = () => {
           {communityBases.map((base, i) => {
             return (
               <CWButton
+                buttonHeight="sm"
                 key={i}
                 label={base}
-                buttonType={
-                  filterMap[base] ? 'primary-black' : 'secondary-black'
-                }
+                buttonType={filterMap[base] ? 'primary' : 'secondary'}
                 onClick={() => {
                   handleSetFilterMap(base);
                 }}

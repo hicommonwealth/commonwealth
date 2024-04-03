@@ -5,9 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import 'components/Profile/ProfileHeader.scss';
 
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { renderQuillDeltaToText } from '../../../../../shared/utils';
 import type NewProfile from '../../../models/NewProfile';
-import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
 import { QuillRenderer } from '../react_quill_editor/quill_renderer';
 import { SocialAccounts } from '../social_accounts';
@@ -39,8 +39,9 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
       <div className="edit">
         {isCurrentUser && (
           <CWButton
+            buttonHeight="sm"
             label="Edit"
-            buttonType="mini-white"
+            buttonType="tertiary"
             iconLeft="write"
             onClick={() => navigate(`/profile/edit`)}
           />

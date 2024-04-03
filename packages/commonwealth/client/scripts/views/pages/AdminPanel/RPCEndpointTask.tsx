@@ -7,7 +7,6 @@ import NodeInfo from 'models/NodeInfo';
 import 'pages/AdminPanel.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
-import { CWButton } from '../../components/component_kit/cw_button';
 import {
   CWDropdown,
   DropdownItemType,
@@ -20,6 +19,7 @@ import {
   ValidationStatus,
 } from '../../components/component_kit/cw_validation_text';
 import { CWTypeaheadSelectList } from '../../components/component_kit/new_designs/CWTypeaheadSelectList';
+import { CWButton } from '../../components/component_kit/new_designs/cw_button';
 import { openConfirmation } from '../../modals/confirmation_modal';
 import { createChainNode, updateChainNode } from './utils';
 

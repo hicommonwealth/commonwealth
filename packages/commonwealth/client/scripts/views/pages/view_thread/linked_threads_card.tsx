@@ -9,10 +9,10 @@ import { slugify } from '../../../../../shared/utils';
 import type Thread from '../../../models/Thread';
 import { LinkSource } from '../../../models/Thread';
 import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
+import { CWButton } from '../../components/component_kit/new_designs/cw_button';
 import { LinkedThreadModal } from '../../modals/linked_thread_modal';
 
 type LinkedThreadsCardProps = {
@@ -74,7 +74,7 @@ export const LinkedThreadsCard = ({
               )}
               {allowLinking && (
                 <CWButton
-                  buttonType="mini-black"
+                  buttonHeight="sm"
                   label="Link discussion"
                   onClick={() => setIsModalOpen(true)}
                 />

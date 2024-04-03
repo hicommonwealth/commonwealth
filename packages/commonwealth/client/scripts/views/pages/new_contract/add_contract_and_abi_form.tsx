@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 
 import 'pages/new_contract/add_contract_and_abi_form.scss';
 
-import { isAddress } from 'web3-utils';
 import { notifyError } from 'controllers/app/notifications';
-import { CWButton } from 'views/components/component_kit/cw_button';
-import { CWDivider } from 'views/components/component_kit/cw_divider';
-import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import app from 'state';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
+import { CWTextArea } from 'views/components/component_kit/cw_text_area';
+import { CWTextInput } from 'views/components/component_kit/cw_text_input';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { isAddress } from 'web3-utils';
 
 import { useCommonNavigate } from 'navigation/helpers';
 
@@ -94,12 +94,11 @@ const AddContractAndAbiForm = () => {
 
       <div className="buttons">
         <CWButton
-          buttonType="secondary-black"
+          buttonType="secondary"
           label="Cancel"
           onClick={handleCancel}
         />
         <CWButton
-          buttonType="primary-black"
           label="Add"
           disabled={isAddingDisabled}
           onClick={handleAddContract}

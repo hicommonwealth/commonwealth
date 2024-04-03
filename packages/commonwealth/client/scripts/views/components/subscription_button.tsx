@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 
 import { NotificationCategories } from '@hicommonwealth/core';
 import { isNotUndefined } from 'helpers/typeGuards';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
 import app from 'state';
-import { CWButton } from './component_kit/cw_button';
 
 export const SubscriptionButton = () => {
   const subscriptions = app.user.notifications;
@@ -18,6 +18,7 @@ export const SubscriptionButton = () => {
 
   return (
     <CWButton
+      buttonHeight="sm"
       onClick={(e) => {
         e.preventDefault();
         if (isNotUndefined(communitySubscription)) {
@@ -36,7 +37,7 @@ export const SubscriptionButton = () => {
         }
       }}
       label={notificationsOn ? 'Notifications on' : 'Notifications off'}
-      buttonType={notificationsOn ? 'primary-blue' : 'secondary-blue'}
+      buttonType={notificationsOn ? 'primary' : 'secondary'}
     />
   );
 };

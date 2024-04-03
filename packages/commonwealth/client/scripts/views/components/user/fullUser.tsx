@@ -7,10 +7,10 @@ import { Avatar } from 'views/components/Avatar';
 import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { formatAddressShort } from '../../../../../shared/utils';
 import Permissions from '../../../utils/Permissions';
 import { BanUserModal } from '../../modals/ban_user_modal';
-import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
 import { CWModal } from '../component_kit/new_designs/CWModal';
 import { UserSkeleton } from './UserSkeleton';
@@ -214,7 +214,7 @@ export const FullUser = ({
                   setIsModalOpen(true);
                 }}
                 label="Ban address"
-                buttonType="primary-red"
+                buttonType="destructive"
               />
             </div>
           )}

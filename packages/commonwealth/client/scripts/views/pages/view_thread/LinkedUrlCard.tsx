@@ -2,13 +2,13 @@ import { filterLinks } from 'helpers/threads';
 import 'pages/view_thread/linked_threads_card.scss';
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import type Thread from '../../../models/Thread';
 import { LinkSource } from '../../../models/Thread';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWButton } from '../../components/component_kit/new_designs/cw_button';
 import { LinkedUrlModal } from '../../modals/linked_url_modal';
-import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 
 type LinkedUrlCardProps = {
   thread: Thread;
@@ -20,7 +20,7 @@ export const LinkedUrlCard = ({ thread, allowLinking }: LinkedUrlCardProps) => {
 
   const linkedUrls = useMemo(
     () => filterLinks(thread.links, LinkSource.Web),
-    [thread.links]
+    [thread.links],
   );
 
   return (
@@ -46,7 +46,7 @@ export const LinkedUrlCard = ({ thread, allowLinking }: LinkedUrlCardProps) => {
             )}
             {allowLinking && (
               <CWButton
-                buttonType="mini-black"
+                buttonHeight="sm"
                 label="Manage Links"
                 onClick={() => setIsModalOpen(true)}
               />

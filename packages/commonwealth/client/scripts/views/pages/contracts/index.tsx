@@ -6,8 +6,8 @@ import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/contracts/contracts_page.scss';
 import React, { useState } from 'react';
 import app from 'state';
-import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import {
   CWTab,
   CWTabsRow,
@@ -124,7 +124,8 @@ const ContractsPage = () => {
       <div className="header-container">
         <CWText type="h3">Contract action templates</CWText>
         <CWButton
-          buttonType="mini-white"
+          buttonHeight="sm"
+          buttonType="tertiary"
           label="Add contract"
           iconLeft="plus"
           onClick={handleAddContract}

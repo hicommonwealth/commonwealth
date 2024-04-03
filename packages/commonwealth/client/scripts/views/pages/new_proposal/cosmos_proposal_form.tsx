@@ -22,10 +22,10 @@ import {
   naturalDenomToMinimal,
 } from '../../../../../shared/utils';
 import { Skeleton } from '../../components/Skeleton';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { CWButton } from '../../components/component_kit/new_designs/cw_button';
 import {
   ReactQuillEditor,
   createDeltaFromText,

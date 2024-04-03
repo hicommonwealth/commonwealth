@@ -8,12 +8,12 @@ import app from 'state';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import useNecessaryEffect from '../../../hooks/useNecessaryEffect';
 import { CardsCollection } from '../../components/cards_collection';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import {
   CWTab,
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
+import { CWButton } from '../../components/component_kit/new_designs/cw_button';
 import { SnapshotProposalCard } from './SnapshotProposalCard';
 
 type SnapshotProposalsPageProps = {
@@ -115,7 +115,7 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
             }
             iconLeft={hasSubscription ? 'mute' : 'bell'}
             onClick={updateSubscription}
-            buttonType="mini-black"
+            buttonHeight="sm"
           />
         </div>
       </div>

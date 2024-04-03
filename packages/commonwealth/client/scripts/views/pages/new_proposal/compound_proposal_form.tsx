@@ -8,7 +8,6 @@ import app from 'state';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { User } from 'views/components/user/user';
 import { MixpanelGovernanceEvents } from '../../../../../shared/analytics/types';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWTextArea } from '../../components/component_kit/cw_text_area';
@@ -17,6 +16,7 @@ import {
   CWTab,
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
+import { CWButton } from '../../components/component_kit/new_designs/cw_button';
 import type { AaveProposalState } from './types';
 import { defaultStateItem } from './types';
 

@@ -8,7 +8,6 @@ import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import NotificationSubscription from '../../../models/NotificationSubscription';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWCollapsible } from '../../components/component_kit/cw_collapsible';
@@ -17,6 +16,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWToggle } from '../../components/component_kit/cw_toggle';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
+import { CWButton } from '../../components/component_kit/new_designs/cw_button';
 import { User } from '../../components/user/user';
 import { PageLoading } from '../loading';
 import {
@@ -162,7 +162,7 @@ const NotificationSettingsPage = () => {
           <PopoverMenu
             renderTrigger={(onclick) => (
               <CWButton
-                buttonType="mini-white"
+                buttonType="secondary"
                 label={emailIntervalFrequencyMap[currentFrequency]}
                 iconRight="chevronDown"
                 onClick={onclick}
@@ -234,7 +234,7 @@ const NotificationSettingsPage = () => {
                   />
                   <CWButton
                     label="Save"
-                    buttonType="primary-black"
+                    buttonHeight="sm"
                     disabled={!emailValidated}
                     onClick={() => {
                       try {

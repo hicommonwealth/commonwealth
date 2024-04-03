@@ -11,9 +11,9 @@ import CWPopover, {
 import { formatAddressShort } from '../../../../../shared/utils';
 import Permissions from '../../../utils/Permissions';
 import { BanUserModal } from '../../modals/ban_user_modal';
-import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
 import { CWModal } from '../component_kit/new_designs/CWModal';
+import { CWButton } from '../component_kit/new_designs/cw_button';
 import { UserSkeleton } from './UserSkeleton';
 import type { UserAttrsWithSkeletonProp } from './user.types';
 
@@ -222,7 +222,7 @@ export const User = ({
                   setIsModalOpen(true);
                 }}
                 label="Ban address"
-                buttonType="primary-red"
+                buttonType="destructive"
               />
             </div>
           )}

@@ -17,11 +17,11 @@ import {
   handleMouseEnter,
   handleMouseLeave,
 } from 'views/menus/utils';
-import { CWButton } from '../components/component_kit/cw_button';
 import { CWDivider } from '../components/component_kit/cw_divider';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { isWindowSmallInclusive } from '../components/component_kit/helpers';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { NotificationRow } from '../pages/notifications/notification_row';
 
 export const NotificationsMenu = () => {
@@ -60,16 +60,18 @@ export const NotificationsMenu = () => {
       </div>
       <div className="footer">
         <CWButton
+          // buttonWidth="full"
           label="See all"
-          buttonType="tertiary-black"
+          buttonType="tertiary"
           onClick={() => {
             navigate('/notifications');
           }}
         />
         <CWDivider isVertical />
         <CWButton
+          // buttonWidth="full"
           label="Mark all read"
-          buttonType="tertiary-black"
+          buttonType="tertiary"
           onClick={(e) => {
             e.preventDefault();
 

@@ -6,9 +6,9 @@ import type NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import type { NearSputnikProposalKind } from 'controllers/chain/near/sputnik/types';
 import app from 'state';
 import { MixpanelGovernanceEvents } from '../../../../../shared/analytics/types';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { CWButton } from '../../components/component_kit/new_designs/cw_button';
 
 const sputnikProposalOptions = [
   {
