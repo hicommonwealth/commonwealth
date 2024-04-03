@@ -75,16 +75,6 @@ export const ViewUpvotesDrawer = ({
     }
   };
 
-  const profile = author['profile']
-    ? {
-        avatarUrl: author['profile'].avatarUrl,
-        lastActive: author['profile'].lastActive,
-        id: author['profile'].id,
-        address: author['profile'].address,
-        name: author['profile'].name,
-      }
-    : null;
-
   return (
     <div className="ViewUpvotesDrawer">
       <CWDrawer
@@ -109,7 +99,6 @@ export const ViewUpvotesDrawer = ({
                 authorChainId={getAuthorCommunityId(author)}
                 publishDate={publishDate}
                 showUserAddressWithInfo={false}
-                profile={profile}
               />
             </div>
             <div className="upvoted-content-body">
