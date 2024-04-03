@@ -323,13 +323,7 @@ export const CommentTree = ({
           threadId: thread.id,
           parentCommentId: comment.parentComment,
           communityId: app.activeChainId(),
-          profile: {
-            id: app.user.activeAccount.profile.id,
-            address: app.user.activeAccount.address,
-            avatarUrl: app.user.activeAccount.profile.avatarUrl,
-            name: app.user.activeAccount.profile.name,
-            lastActive: app.user.activeAccount.profile.lastActive?.toString(),
-          },
+          address: app.user.activeAccount.address,
         });
         setEdits((p) => ({
           ...p,

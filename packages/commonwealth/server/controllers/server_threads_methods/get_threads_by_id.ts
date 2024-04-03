@@ -20,46 +20,10 @@ export async function __getThreadsById(
       {
         model: this.models.Address,
         as: 'Address',
-        include: [
-          {
-            model: this.models.User,
-            as: 'User',
-            required: true,
-            attributes: ['id'],
-            include: [
-              {
-                model: this.models.Profile,
-                as: 'Profiles',
-                required: true,
-                attributes: ['id', 'avatar_url', 'profile_name'],
-              },
-            ],
-          },
-        ],
       },
       {
         model: this.models.Address,
         as: 'collaborators',
-        include: [
-          {
-            model: this.models.User,
-            as: 'User',
-            required: true,
-            attributes: ['id'],
-            include: [
-              {
-                model: this.models.Profile,
-                as: 'Profiles',
-                required: true,
-                attributes: [
-                  'id',
-                  ['avatar_url', 'avatarUrl'],
-                  ['profile_name', 'name'],
-                ],
-              },
-            ],
-          },
-        ],
       },
       {
         model: this.models.Topic,
@@ -73,22 +37,6 @@ export async function __getThreadsById(
             model: this.models.Address,
             as: 'Address',
             required: true,
-            include: [
-              {
-                model: this.models.User,
-                as: 'User',
-                required: true,
-                attributes: ['id'],
-                include: [
-                  {
-                    model: this.models.Profile,
-                    as: 'Profiles',
-                    required: true,
-                    attributes: ['id', 'avatar_url', 'profile_name'],
-                  },
-                ],
-              },
-            ],
           },
         ],
       },
