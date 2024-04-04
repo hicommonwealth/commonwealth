@@ -1,3 +1,4 @@
+import { bech32 } from 'bech32';
 import { addressSwapper } from 'shared/utils';
 import { CanvasSignedDataApiArgs, fromCanvasSignedDataApiArgs } from './types';
 import { verify } from './verify';
@@ -48,6 +49,12 @@ export const verifyComment = async (args: CanvasSignedDataApiArgs, fields) => {
     });
   }
 
+  // if using cosmos, we need to convert the address so that it has the "cosmos" prefix
+  if (actionMessage.payload.address.split(':')[0] == 'cosmos') {
+    const { words } = bech32.decode(address);
+    addressToCompare = bech32.encode('cosmos', words);
+  }
+
   assertMatches(
     addressToCompare,
     actionMessage.payload.address.split(':')[2],
@@ -89,6 +96,12 @@ export const verifyThread = async (args: CanvasSignedDataApiArgs, fields) => {
     });
   }
 
+  // if using cosmos, we need to convert the address so that it has the "cosmos" prefix
+  if (actionMessage.payload.address.split(':')[0] == 'cosmos') {
+    const { words } = bech32.decode(address);
+    addressToCompare = bech32.encode('cosmos', words);
+  }
+
   assertMatches(
     addressToCompare,
     actionMessage.payload.address.split(':')[2],
@@ -124,6 +137,12 @@ export const verifyReaction = async (args: CanvasSignedDataApiArgs, fields) => {
       currentPrefix: 42,
       address: address,
     });
+  }
+
+  // if using cosmos, we need to convert the address so that it has the "cosmos" prefix
+  if (actionMessage.payload.address.split(':')[0] == 'cosmos') {
+    const { words } = bech32.decode(address);
+    addressToCompare = bech32.encode('cosmos', words);
   }
 
   assertMatches(
