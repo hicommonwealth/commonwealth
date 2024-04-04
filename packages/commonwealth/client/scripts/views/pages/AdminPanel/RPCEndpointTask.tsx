@@ -103,8 +103,12 @@ const RPCEndpointTask = () => {
     return [];
   };
 
-  const checkIfCosmosChainNodeExists = (cosmosChainId: string): void => {
-    const cosmosNodeInfo = app.config.nodes.getByCosmosChainId(cosmosChainId);
+  const checkIfCosmosChainNodeExists = (
+    selectedCosmosChainId: string,
+  ): void => {
+    const cosmosNodeInfo = app.config.nodes.getByCosmosChainId(
+      selectedCosmosChainId,
+    );
 
     if (cosmosNodeInfo) {
       setCommunityChainNode(cosmosNodeInfo);
@@ -130,20 +134,20 @@ const RPCEndpointTask = () => {
   };
 
   const idValidationFn = (value: string): [ValidationStatus, string] | [] => {
-    const communityInfo = app.config.chains.getById(value);
-    if (!communityInfo) {
+    const communityInfoData = app.config.chains.getById(value);
+    if (!communityInfoData) {
       setCommunityInfoValueValidated(false);
       const err = 'Community not found';
       setErrorMsg(err);
       return ['failure', err];
     }
-    if (communityInfo.type !== ChainType.Chain) {
+    if (communityInfoData.type !== ChainType.Chain) {
       setCommunityInfoValueValidated(false);
       const err = 'Community is not a chain';
       setErrorMsg(err);
       return ['failure', err];
     }
-    setCommunityInfo(communityInfo);
+    setCommunityInfo(communityInfoData);
     setCommunityInfoValueValidated(true);
     setErrorMsg(null);
     return [];
@@ -220,19 +224,19 @@ const RPCEndpointTask = () => {
   };
 
   const getCosmosChainIds = async (): Promise<DropdownItemType[]> => {
-    let cosmosChainIds = [{ label: '', value: '' }];
+    let chainIds = [{ label: '', value: '' }];
 
     const { data: chains } = await axios.get(
       `${process.env.COSMOS_REGISTRY_API}/api/v1/mainnet`,
     );
 
     if (chains) {
-      cosmosChainIds = chains.map((chain) => {
+      chainIds = chains.map((chain) => {
         return { label: chain, value: chain };
       });
     }
 
-    return cosmosChainIds;
+    return chainIds;
   };
 
   return (

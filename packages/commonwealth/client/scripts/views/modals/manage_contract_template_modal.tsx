@@ -213,7 +213,7 @@ const ManageContractTemplateModal = ({
           )}
           {!isEditMode && (
             <CWText className="create-template-info" type="caption">
-              Don't see a template that fits your needs?
+              Don&apos;t see a template that fits your needs?
               <CWText
                 type="caption"
                 fontWeight="medium"
