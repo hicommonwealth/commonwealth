@@ -1,3 +1,4 @@
+import { useAnimation } from 'hooks/useAnimation';
 import React, { useState } from 'react';
 import { CWCheckbox } from '../../component_kit/cw_checkbox';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
@@ -17,6 +18,7 @@ export const AndroidPrompt = ({
   showPrompt,
   setShowPrompt,
 }: AndroidPromptProps) => {
+  const { animationStyles } = useAnimation();
   let installPromptEvent = null;
   const [checkboxChecked, setCheckboxChecked] = useState(false);
 
@@ -71,7 +73,7 @@ export const AndroidPrompt = ({
   };
 
   return (
-    <div className="AndroidPrompt">
+    <div className="AndroidPrompt" style={animationStyles}>
       <div className="prompt-content">
         <CWText className="title">Install App</CWText>
         <div className="header">

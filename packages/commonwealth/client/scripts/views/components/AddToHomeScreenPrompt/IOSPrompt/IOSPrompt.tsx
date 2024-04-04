@@ -1,3 +1,4 @@
+import { useAnimation } from 'hooks/useAnimation';
 import React from 'react';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
 import { CWText } from '../../component_kit/cw_text';
@@ -15,8 +16,9 @@ export const IOSPrompt = ({
   showPrompt,
   setShowPrompt,
 }: IOSPromptProps) => {
+  const { animationStyles } = useAnimation();
   return (
-    <div className="IOSPrompt">
+    <div className="IOSPrompt" style={animationStyles}>
       <div className="prompt-content">
         <div className="header">
           <div className="icon">
