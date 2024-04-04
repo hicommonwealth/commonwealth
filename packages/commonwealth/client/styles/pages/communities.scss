@@ -4,57 +4,76 @@
   display: flex;
   flex: 1;
   flex-direction: column;
+  padding: 0 24px;
 
   .header-section {
-    align-items: center;
-    background-color: $white;
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    padding-bottom: 24px;
+    flex-direction: column;
+    padding: 36px 24px;
+    padding-top: 40px;
+    @include extraSmall {
+      padding-top: 12px;
+    }
+    gap: 24px;
     position: sticky;
+    top: 0;
     z-index: 1;
-    top: 68px;
+    background-color: $white;
 
-    &:before {
-      content: '';
-      display: block;
-      width: 100%;
-      position: absolute;
-      height: 20px;
-      top: -17px;
-      background-color: white;
-    }
-
-    @include smallInclusive {
-      top: 0;
-    }
-
-    .filter-buttons {
+    .description {
       display: flex;
+      align-items: center;
+      justify-content: space-between;
       flex-wrap: wrap;
-      gap: 8px;
-    }
-  }
+      gap: 12px;
 
-  .communities-count.Text {
-    margin-bottom: 8px;
+      .actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .communities-count {
+          color: $neutral-500;
+          height: fit-content;
+        }
+
+        .CreateCommunityButton {
+          padding: 0 0 0 16px;
+        }
+      }
+    }
+
+    .filters {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+
+      @include extraSmall {
+        gap: 12px;
+      }
+
+      .Divider {
+        max-height: 40px;
+      }
+    }
   }
 
   .communities-list {
     display: grid;
-    grid-gap: 24px;
+    grid-gap: 28px;
     grid-template-columns: repeat(auto-fit, 506px);
-    justify-content: left;
+    justify-content: center;
     padding-bottom: 24px;
 
     @include mediumSmall {
       grid-template-columns: 1fr 1fr;
+      padding: 0 24px;
     }
 
     @include extraSmall {
       grid-template-columns: 1fr;
+      padding: 0 24px;
     }
   }
 }

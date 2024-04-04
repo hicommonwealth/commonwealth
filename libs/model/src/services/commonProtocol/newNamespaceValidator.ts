@@ -26,7 +26,7 @@ export const validateNamespace = async (
   txHash: string,
   address: string,
   community: CommunityAttributes,
-) => {
+): Promise<string> => {
   // const community = await model.Community.findOne({
   //   where: {
   //     id: communityId,
@@ -84,4 +84,6 @@ export const validateNamespace = async (
   if (balance[address] !== '1') {
     throw new AppError('User not admin of namespace');
   }
+
+  return activeNamespace;
 };

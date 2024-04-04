@@ -18,10 +18,13 @@ import { useFetchEthUsdRateQuery } from '../../state/api/communityStake/index';
 import { trpc } from '../../utils/trpcClient';
 import { NewCommunityCard } from '../components/CommunityCard';
 import { CWButton } from '../components/component_kit/cw_button';
+import { CWDivider } from '../components/component_kit/cw_divider';
+import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../components/component_kit/cw_text';
 import CWCircleMultiplySpinner from '../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWModal } from '../components/component_kit/new_designs/CWModal';
 import { CWRelatedCommunityCard } from '../components/component_kit/new_designs/CWRelatedCommunityCard';
+import CreateCommunityButton from '../components/sidebar/CreateCommunityButton';
 import ManageCommunityStakeModal from '../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import { CommunityData } from './DirectoryPage/DirectoryPageContent';
 
@@ -53,6 +56,8 @@ const getInitialFilterMap = (): Record<string, unknown> => {
 
   return Object.assign({}, ...allArrays);
 };
+
+const STAKE_FILTER_KEY = 'Stake';
 
 const CommunitiesPage = () => {
   const [filterMap, setFilterMap] = React.useState<Record<string, unknown>>(
@@ -181,6 +186,7 @@ const CommunitiesPage = () => {
             onStakeBtnClick={() => setSelectedCommunity(community)}
             ethUsdRate={ethUsdRate}
             historicalPrice={historicalPriceMap?.get(community.id)}
+            onlyShowIfStakeEnabled={!!filterMap[STAKE_FILTER_KEY]}
           />
         );
       });
@@ -202,24 +208,33 @@ const CommunitiesPage = () => {
     <CWPageLayout>
       <div className="CommunitiesPage">
         <div className="header-section">
-          <div>
-            <CWText
-              type="h3"
-              fontWeight="semiBold"
-              className="communities-count"
-            >
-              Explore Communities
+          <div className="description">
+            <CWText type="h2" fontWeight="semiBold">
+              Explore communities
             </CWText>
-            <CWText
-              type="h3"
-              fontWeight="semiBold"
-              className="communities-count"
-            >
-              {activeCommunities &&
-                buildCommunityString(activeCommunities.totalCommunitiesCount)}
-            </CWText>
+            <div className="actions">
+              <CWText type="caption" className="communities-count">
+                {activeCommunities &&
+                  buildCommunityString(activeCommunities.totalCommunitiesCount)}
+              </CWText>
+              <CreateCommunityButton />
+            </div>
           </div>
-          <div className="filter-buttons">
+          <div className="filters">
+            <CWIcon iconName="funnelSimple" />
+            <CWButton
+              label={STAKE_FILTER_KEY}
+              buttonType={
+                filterMap[STAKE_FILTER_KEY]
+                  ? 'primary-black'
+                  : 'secondary-black'
+              }
+              onClick={() => {
+                handleSetFilterMap(STAKE_FILTER_KEY);
+              }}
+              iconLeft="coins"
+            />
+            <CWDivider isVertical />
             {communityCategories.map((cat, i) => {
               return (
                 <CWButton
@@ -272,19 +287,19 @@ const CommunitiesPage = () => {
             <NewCommunityCard />
           </div>
         )}
+        <CWModal
+          size="small"
+          content={
+            <ManageCommunityStakeModal
+              mode={modeOfManageCommunityStakeModal}
+              onModalClose={() => setModeOfManageCommunityStakeModal(null)}
+              community={selectedCommunity}
+            />
+          }
+          onClose={() => setModeOfManageCommunityStakeModal(null)}
+          open={!!modeOfManageCommunityStakeModal}
+        />
       </div>
-      <CWModal
-        size="small"
-        content={
-          <ManageCommunityStakeModal
-            mode={modeOfManageCommunityStakeModal}
-            onModalClose={() => setModeOfManageCommunityStakeModal(null)}
-            community={selectedCommunity}
-          />
-        }
-        onClose={() => setModeOfManageCommunityStakeModal(null)}
-        open={!!modeOfManageCommunityStakeModal}
-      />
     </CWPageLayout>
   );
 };
