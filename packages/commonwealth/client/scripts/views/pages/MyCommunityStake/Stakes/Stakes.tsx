@@ -85,11 +85,13 @@ const Stakes = ({ filterOptions, addressFilter }: TransactionHistoryProps) => {
       };
     });
 
-    return Object.values(accumulatedStakes).map((x: any) => ({
-      ...x,
-      voteWeight: x.voteWeight + 1, // total vote weight is +1 of the stake weight
-      avgPrice: `${x.avgPrice.toFixed(5)} ETH`,
-    }));
+    return Object.values(accumulatedStakes)
+      .map((transaction: any) => ({
+        ...transaction,
+        voteWeight: transaction.voteWeight + 1, // total vote weight is +1 of the stake weight
+        avgPrice: `${transaction.avgPrice.toFixed(5)} ETH`,
+      }))
+      .filter((transaction) => transaction.stake);
   })();
 
   return (
