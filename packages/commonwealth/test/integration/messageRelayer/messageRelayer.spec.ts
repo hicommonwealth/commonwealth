@@ -24,21 +24,24 @@ describe('messageRelayer', () => {
         event_name: schemas.EventNames.ChainEventCreated,
         event_payload: {
           event_name: schemas.EventNames.ChainEventCreated,
-        },
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any,
         relayed: true,
       },
       {
         event_name: schemas.EventNames.ChainEventCreated,
         event_payload: {
           event_name: schemas.EventNames.ChainEventCreated,
-        },
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any,
         relayed: false,
       },
       {
         event_name: schemas.EventNames.ChainEventCreated,
         event_payload: {
           event_name: schemas.EventNames.ChainEventCreated,
-        },
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any,
         relayed: false,
       },
     ]);
