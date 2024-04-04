@@ -1,1 +1,2 @@
-export { NoTransactionHistory as default } from './NoTransactionHistory';
+import NoTransactionHistory from './NoTransactionHistory';
+export default NoTransactionHistory;

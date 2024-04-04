@@ -35,4 +35,4 @@ const NoTransactionHistory = () => {
   );
 };
 
-export { NoTransactionHistory };
+export default NoTransactionHistory;
