@@ -269,9 +269,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
         sdk.contractAddrs.compound.governance,
       );
       expect(events[0].eventSource.kind).to.equal('proposal-created');
-      expect(parseInt(events[0].rawLog.blockNumber.toString(), 16)).to.equal(
-        parseInt(propCreatedLog.blockNumber.toString()),
-      );
+      expect(events[0].rawLog.blockNumber).to.equal(propCreatedLog.blockNumber);
       expect(events[0].parsedArgs).to.exist;
     });
 
@@ -305,9 +303,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
         sdk.contractAddrs.compound.governance,
       );
       expect(events[0].eventSource.kind).to.equal('proposal-queued');
-      expect(parseInt(events[0].rawLog.blockNumber.toString(), 16)).to.equal(
-        parseInt(propQueuedLog.blockNumber.toString(), 16),
-      );
+      expect(events[0].rawLog.blockNumber).to.equal(propQueuedLog.blockNumber);
       expect(events[0].parsedArgs).to.exist;
     });
   });
@@ -375,9 +371,9 @@ describe('EVM Chain Events Log Processing Tests', () => {
         web3.utils.toChecksumAddress(propCreatedEvent.rawLog.address),
       ).to.equal(sdk.contractAddrs.compound.governance);
       expect(propCreatedEvent.eventSource.kind).to.equal('proposal-created');
-      expect(
-        parseInt(propCreatedEvent.rawLog.blockNumber.toString(), 16),
-      ).to.equal(parseInt(propCreatedLog.blockNumber.toString()));
+      expect(propCreatedEvent.rawLog.blockNumber).to.equal(
+        propCreatedLog.blockNumber,
+      );
       expect(propCreatedEvent.parsedArgs).to.exist;
 
       const propQueuedEvent = events.find(
@@ -388,9 +384,9 @@ describe('EVM Chain Events Log Processing Tests', () => {
         web3.utils.toChecksumAddress(propQueuedEvent.rawLog.address),
       ).to.equal(sdk.contractAddrs.compound.governance);
       expect(propQueuedEvent.eventSource.kind).to.equal('proposal-queued');
-      expect(
-        parseInt(propQueuedEvent.rawLog.blockNumber.toString(), 16),
-      ).to.equal(parseInt(propQueuedLog.blockNumber.toString()));
+      expect(propQueuedEvent.rawLog.blockNumber).to.equal(
+        propQueuedLog.blockNumber,
+      );
       expect(propQueuedEvent.parsedArgs).to.exist;
     });
   });
