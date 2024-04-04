@@ -18,3 +18,5 @@ yarn workspaces run test
 # run api test
 yarn workspace commonwealth test-api
 
+# we are aiming for a devx without builds
+yarn workspaces run clean

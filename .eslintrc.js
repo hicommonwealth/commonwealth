@@ -36,7 +36,12 @@ module.exports = {
         group: [
           "@hicommonwealth/core/**",
           "@hicommonwealth/adapters/**",
-          "@hicommonwealth/model/**"
+          "@hicommonwealth/model/**",
+          "@hicommonwealth/chains/**",
+          "**/core/**",
+          "**/adapters/**",
+          "**/model/**",
+          "**/chains/**",
         ],
         message: "Avoid importing from 'lib' directories. Import from the main entry point instead.",
       }]
