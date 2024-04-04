@@ -1,6 +1,8 @@
 import { WEI_PER_ETHER } from 'controllers/chain/ethereum/util';
 import { formatAddressShort } from 'helpers';
+import { getCommunityStakeSymbol } from 'helpers/stakes';
 import React from 'react';
+import app from 'state';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import useTransactionHistory, {
   TransactionHistoryProps,
@@ -89,7 +91,10 @@ const Stakes = ({ filterOptions, addressFilter }: TransactionHistoryProps) => {
       .map((transaction: any) => ({
         ...transaction,
         voteWeight: transaction.voteWeight + 1, // total vote weight is +1 of the stake weight
-        avgPrice: `${transaction.avgPrice.toFixed(5)} ETH`,
+        avgPrice: `${transaction.avgPrice.toFixed(5)} ${getCommunityStakeSymbol(
+          app.config.chains.getById(transaction?.community?.id)?.ChainNode
+            ?.name || '',
+        )}`,
       }))
       .filter((transaction) => transaction.stake);
   })();
