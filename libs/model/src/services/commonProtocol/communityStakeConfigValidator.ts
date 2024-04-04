@@ -2,7 +2,6 @@ import { AppError, commonProtocol } from '@hicommonwealth/core';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { CommunityAttributes } from '../../models/community';
-import { getNamespace } from './contractHelpers';
 
 export const validateCommunityStakeConfig = async (
   community: CommunityAttributes,
@@ -20,11 +19,6 @@ export const validateCommunityStakeConfig = async (
   const factoryData =
     commonProtocol.factoryContracts[chain_id as commonProtocol.ValidChains];
   const web3 = new Web3(community.ChainNode.url);
-  const namespaceAddress = await getNamespace(
-    web3,
-    community.namespace,
-    factoryData.factory,
-  );
   const communityStakes = new web3.eth.Contract(
     [
       {
@@ -55,7 +49,7 @@ export const validateCommunityStakeConfig = async (
     factoryData.communityStake,
   );
   const whitelisted = await communityStakes.methods
-    .whitelist(namespaceAddress, id)
+    .whitelist(community.namespace_address, id)
     .call();
   if (!whitelisted) {
     return new AppError('Community Stake not configured');
