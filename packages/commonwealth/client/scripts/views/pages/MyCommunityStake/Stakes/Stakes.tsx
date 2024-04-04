@@ -56,27 +56,36 @@ const Stakes = ({ filterOptions, addressFilter }: TransactionHistoryProps) => {
 
   // aggregate transaction per community per address
   const stakes = (() => {
-    const map = {};
+    const accumulatedStakes = {};
 
-    data.map((x) => {
-      const key = (x.community.id + x.address).toLowerCase();
-      const action = x.action === 'mint' ? 1 : -1;
+    data.map((transaction) => {
+      const key = (
+        transaction.community.id + transaction.address
+      ).toLowerCase();
+      const action = transaction.action === 'mint' ? 1 : -1;
 
-      map[key] = {
-        ...x,
-        ...(map[key] || {}),
-        stake: (map[key]?.stake || 0) + x?.stake * action,
-        voteWeight: (map[key]?.voteWeight || 0) + x?.voteWeight * action,
+      accumulatedStakes[key] = {
+        ...transaction,
+        ...(accumulatedStakes[key] || {}),
+        stake:
+          (accumulatedStakes[key]?.stake || 0) + transaction.stake * action,
+        voteWeight:
+          (accumulatedStakes[key]?.voteWeight || 0) +
+          transaction.voteWeight * action,
         avgPrice:
-          (map[key]?.avgPrice || 0) +
+          (accumulatedStakes[key]?.avgPrice || 0) +
           parseFloat(
-            (parseFloat(x.price) / WEI_PER_ETHER / x.stake).toFixed(5),
+            (
+              parseFloat(transaction.price) /
+              WEI_PER_ETHER /
+              transaction.stake
+            ).toFixed(5),
           ) *
             action,
       };
     });
 
-    return Object.values(map).map((x: any) => ({
+    return Object.values(accumulatedStakes).map((x: any) => ({
       ...x,
       voteWeight: x.voteWeight + 1, // total vote weight is +1 of the stake weight
       avgPrice: `${x.avgPrice.toFixed(5)} ETH`,
