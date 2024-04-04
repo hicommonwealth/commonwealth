@@ -129,6 +129,6 @@ async function main() {
   }
 }
 
-if (process.argv[2] === 'run-as-script') {
+if (require.main === module) {
   main();
 }

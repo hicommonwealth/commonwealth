@@ -9,6 +9,7 @@ import {
   schemas,
 } from '@hicommonwealth/core';
 import { CommunityAttributes, models } from '@hicommonwealth/model';
+import { BigNumber } from 'ethers';
 import { QueryTypes } from 'sequelize';
 import Web3 from 'web3';
 import { ZodUndefined, z } from 'zod';
@@ -104,7 +105,7 @@ async function handleCommunityStakeTrades(
     community_id: community.id,
     stake_id: parseInt(stakeId),
     stake_amount: parseInt(stakeAmount),
-    stake_price: ethAmount,
+    stake_price: BigNumber.from(ethAmount).toString(),
     address: trader,
     stake_direction: isBuy ? 'buy' : 'sell',
     timestamp: block.timestamp as number,
@@ -156,7 +157,7 @@ async function handleProposalEvents(
         block_number: event.rawLog.blockNumber,
         event_data: {
           kind: event.eventSource.kind,
-          id: event.parsedArgs[0].toString(),
+          id: BigNumber.from(event.parsedArgs[0]).toString(),
         },
       },
     };

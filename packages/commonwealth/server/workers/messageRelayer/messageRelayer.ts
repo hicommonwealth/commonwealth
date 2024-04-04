@@ -42,7 +42,11 @@ export async function startMessageRelayer(maxRelayIterations?: number) {
     throw e;
   }
 
-  const count = await models.Outbox.count();
+  const count = await models.Outbox.count({
+    where: {
+      relayed: false,
+    },
+  });
   incrementNumUnrelayedEvents(count);
 
   await setupListener();

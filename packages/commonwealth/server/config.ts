@@ -24,11 +24,7 @@ export const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 
 export const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 
-export const RABBITMQ_URI = (() => {
-  if (!process.env.CLOUDAMQP_URL || process.env.NODE_ENV === 'development') {
-    return 'amqp://127.0.0.1';
-  } else return process.env.CLOUDAMQP_URL;
-})();
+export const RABBITMQ_URI = process.env.CLOUDAMQP_URL ?? 'amqp://127.0.0.1';
 
 // if a tls redis url is provided then that takes priority over everything else
 // then if a normal non-tls url is provided that is the second best option (local/staging)
@@ -118,7 +114,7 @@ export const ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS = process.env
  * fetched + published (hence upperbound assuming fetching + publishing takes 0ms).
  */
 export const MESSAGE_RELAYER_TIMEOUT_MS =
-  parseInt(process.env.MESSAGE_RELAYER_TIME_MS) || 200;
+  parseInt(process.env.MESSAGE_RELAYER_TIMEOUT_MS) || 200;
 export const MESSAGE_RELAYER_PREFETCH =
   parseInt(process.env.MESSAGE_RELAYER_PREFETCH) || 50;
 
