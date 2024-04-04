@@ -50,14 +50,6 @@ interface FetchActiveThreadsProps extends CommonProps {
   topicsPerThread?: number;
 }
 
-export const featuredFilterQueryMap = {
-  newest: 'createdAt:desc',
-  oldest: 'createdAt:asc',
-  mostLikes: 'numberOfLikes:desc',
-  mostComments: 'numberOfComments:desc',
-  latestActivity: 'latestActivity:desc',
-};
-
 const useDateCursor = ({
   dateRange,
 }: {
@@ -145,9 +137,7 @@ const fetchBulkThreads = (props) => {
           }),
           ...(props.fromDate && { from_date: props.fromDate }),
           to_date: props.toDate,
-          orderBy:
-            featuredFilterQueryMap[props.orderBy] ||
-            featuredFilterQueryMap.newest,
+          orderBy: props.orderBy || 'newest',
           ...(props.isOnArchivePage && { archived: true }),
         },
       },

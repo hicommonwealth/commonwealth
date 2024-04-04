@@ -6,7 +6,6 @@ import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import useFetchThreadsQuery, {
-  featuredFilterQueryMap,
   useDateCursor,
 } from 'state/api/threads/fetchThreads';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
@@ -85,8 +84,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       topicId,
       stage: stageName ?? undefined,
       includePinnedThreads: true,
-      ...(featuredFilterQueryMap[featuredFilter] && {
-        orderBy: featuredFilterQueryMap[featuredFilter],
+      ...(featuredFilter && {
+        orderBy: featuredFilter,
       }),
       toDate: dateCursor.toDate,
       fromDate: dateCursor.fromDate,
