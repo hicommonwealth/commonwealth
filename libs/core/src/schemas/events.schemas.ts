@@ -1,13 +1,11 @@
 import { z } from 'zod';
 
-export const ThreadCreated = z.object({
+export const ThreadEvent = z.object({
   threadId: z.string(),
-  creatorAddress: z.string(),
+  userAddress: z.string(),
 });
-export const ThreadUpvoted = z.object({
-  threadId: z.string(),
-  voterAddress: z.string(),
-});
+export const ThreadCreated = ThreadEvent.extend({});
+export const ThreadUpvoted = ThreadEvent.extend({});
 export const CommentCreated = z.object({ comment: z.string() });
 export const GroupCreated = z.object({
   groupId: z.string(),
