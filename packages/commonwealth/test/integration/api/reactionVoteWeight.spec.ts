@@ -5,13 +5,13 @@ import type {
   TopicInstance,
   UserInstance,
 } from '@hicommonwealth/model';
+import { commonProtocol } from '@hicommonwealth/model';
 import chai, { expect } from 'chai';
 import chaiHttp from 'chai-http';
 import { ServerCommentsController } from 'server/controllers/server_comments_controller';
 import { ServerThreadsController } from 'server/controllers/server_threads_controller';
 import BanCache from 'server/util/banCheckCache';
 import Sinon from 'sinon';
-import { contractHelpers } from '../../../../../libs/model/src/services/commonProtocol';
 import { TestServer, testServer } from '../../../server-test';
 
 chai.use(chaiHttp);
@@ -108,7 +108,7 @@ describe('Reaction vote weight', () => {
   });
 
   it('should set thread reaction vote weight and thread vote sum correctly', async () => {
-    Sinon.stub(contractHelpers, 'getNamespaceBalance').resolves({
+    Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves({
       [address.address]: '50',
     });
     const thread = await createThread();
@@ -125,7 +125,7 @@ describe('Reaction vote weight', () => {
   });
 
   it('should set comment reaction vote weight and comment vote sum correctly', async () => {
-    Sinon.stub(contractHelpers, 'getNamespaceBalance').resolves({
+    Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves({
       [address.address]: '50',
     });
     const thread = await createThread();
@@ -143,7 +143,7 @@ describe('Reaction vote weight', () => {
   });
 
   it('should set thread reaction vote weight to min 1', async () => {
-    Sinon.stub(contractHelpers, 'getNamespaceBalance').resolves({
+    Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves({
       [address.address]: '0',
     });
     const thread = await createThread();
@@ -158,7 +158,7 @@ describe('Reaction vote weight', () => {
   });
 
   it('should set comment reaction vote weight to min 1', async () => {
-    Sinon.stub(contractHelpers, 'getNamespaceBalance').resolves({
+    Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves({
       [address.address]: '0',
     });
     const thread = await createThread();
