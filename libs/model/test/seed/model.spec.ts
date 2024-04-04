@@ -12,7 +12,6 @@ const generateSchemas = async () => {
 
   // TODO: resolve remaining conflicts
   const model_schema = await get_info_schema(model.sequelize, {
-    ignore_tables: ['Outbox', 'Sessions'],
     ignore_columns: {},
     ignore_constraints: {
       // TODO: missing in migrations (removed FKs for performance reasons?)
@@ -41,7 +40,6 @@ const generateSchemas = async () => {
     },
   });
   const migration_schema = await get_info_schema(migration, {
-    ignore_tables: ['Outbox', 'Sessions'],
     ignore_columns: {
       // TODO: missing in model
       Comments: ['body_backup', 'text_backup', 'root_id', '_search'],
@@ -63,29 +61,70 @@ const generateSchemas = async () => {
       model: model_schema[table],
       migration: migration_schema[table],
     }))
-    .sort((a, b) => a.model.table_name.localeCompare(b.model.table_name));
+    .reduce((p, c) => ({ ...p, [c.model.table_name]: c }), {});
 };
 
-generateSchemas().then((schemas) => {
-  describe('Model schema', () => {
-    after(async () => {
-      await dispose()();
-    });
+describe('Model schema', () => {
+  let schemas;
 
-    schemas.forEach(({ model, migration }) => {
-      it(`Should match schema of "${model.table_name}"`, () => {
-        //console.log(model.table_name, model.columns, migration.columns);
-        expect(model.columns).deep.equals(migration.columns);
-
-        //TODO: reconcile constraints - too many naming issues found
-        //console.log(model.table_name, model.constraints, migration.constraints);
-        expect([...model.constraints.values()]).deep.equals([
-          ...migration.constraints.values(),
-        ]);
-      });
-    });
+  before(async () => {
+    schemas = await generateSchemas();
   });
 
-  // mocha with --delay option is required to "run" dynamic async tests
-  run();
+  after(async () => {
+    await dispose()();
+  });
+
+  [
+    'Addresses',
+    'Bans',
+    'ChainNodes',
+    'Collaborations',
+    'Comments',
+    'Communities',
+    'CommunityBanners',
+    'CommunityContractTemplate',
+    'CommunityContractTemplateMetadata',
+    'CommunityContracts',
+    'CommunitySnapshotSpaces',
+    'CommunityStakes',
+    'ContractAbis',
+    'Contracts',
+    'DiscordBotConfig',
+    'EvmEventSources',
+    'Groups',
+    'LastProcessedEvmBlocks',
+    'LoginTokens',
+    'Memberships',
+    'NotificationCategories',
+    'Notifications',
+    'NotificationsRead',
+    'Polls',
+    'Profiles',
+    'Reactions',
+    'SnapshotProposals',
+    'SnapshotSpaces',
+    'SsoTokens',
+    'StakeTransactions',
+    'StarredCommunities',
+    'Subscriptions',
+    'Template',
+    'Threads',
+    'Topics',
+    'Users',
+    'Votes',
+    'Webhooks',
+  ].forEach((name) => {
+    it(`Should match ${name}`, async () => {
+      const { model, migration } = schemas[name];
+
+      //console.log(model.columns, migration.columns);
+      expect(model.columns).deep.equals(migration.columns);
+
+      //TODO: reconcile constraints - too many naming issues found
+      expect([...model.constraints.values()]).deep.equals([
+        ...migration.constraints.values(),
+      ]);
+    });
+  });
 });
