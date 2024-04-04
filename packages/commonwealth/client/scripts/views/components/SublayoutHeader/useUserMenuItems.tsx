@@ -16,7 +16,6 @@ import {
   toggleDarkMode,
 } from 'views/components/component_kit/cw_toggle';
 
-import { useFlag } from 'hooks/useFlag';
 import UserMenuItem from './UserMenuItem';
 import useCheckAuthenticatedAddresses from './useCheckAuthenticatedAddresses';
 
@@ -112,8 +111,6 @@ const useUserMenuItems = ({
     },
   );
 
-  const myCommunityStakePageEnabled = useFlag('myCommunityStakePageEnabled');
-
   return [
     ...(app.user.activeAccounts.length > 0
       ? ([
@@ -147,15 +144,11 @@ const useUserMenuItems = ({
       label: 'Edit profile',
       onClick: () => navigate(`/profile/edit`, {}, null),
     },
-    ...(myCommunityStakePageEnabled
-      ? [
-          {
-            type: 'default',
-            label: 'My community stake',
-            onClick: () => navigate(`/myCommunityStake`, {}, null),
-          },
-        ]
-      : []),
+    {
+      type: 'default',
+      label: 'My community stake',
+      onClick: () => navigate(`/myCommunityStake`, {}, null),
+    },
     {
       type: 'default',
       label: 'Notifications',
