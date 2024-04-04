@@ -27,7 +27,8 @@ async function processValidStakeTransaction(chainNodeId) {
         transactionHash,
         blockHash:
           '0xdf3b5cd44ea1a9f22a86f678b2e6d596238fe1d75b638cb5326415f293df32f5',
-      },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any,
       event_name: 'ChainEventCreated',
       parsedArgs: [
         traderAddress,
@@ -93,7 +94,6 @@ describe.only('ChainEventCreated Policy', () => {
         {
           stake_id: stakeId,
           stake_token: '',
-          stake_weight: 1,
           vote_weight: 1,
           stake_enabled: true,
         },
