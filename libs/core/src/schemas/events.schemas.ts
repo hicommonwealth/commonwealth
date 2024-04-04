@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const ThreadEvent = z.object({
-  threadId: z.string(),
+  threadId: z.number(),
   userAddress: z.string(),
 });
 export const ThreadCreated = ThreadEvent.extend({});

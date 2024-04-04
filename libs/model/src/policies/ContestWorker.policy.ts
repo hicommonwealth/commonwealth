@@ -12,10 +12,12 @@ export const ContestWorker: Policy<typeof inputs> = () => ({
     ThreadCreated: async ({ name, payload }) => {
       console.log(name, payload);
       const { threadId, userAddress } = payload;
+      // TODO: something...
     },
     ThreadUpvoted: async ({ name, payload }) => {
       console.log(name, payload);
       const { threadId, userAddress } = payload;
+      // TODO: something...
     },
     CommentCreated: async ({ name, payload }) => {
       console.log(name, payload.comment);
