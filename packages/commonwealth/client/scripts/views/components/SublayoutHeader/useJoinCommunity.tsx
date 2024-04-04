@@ -130,7 +130,6 @@ const useJoinCommunity = () => {
         );
         if (app.chain) {
           account.setValidationToken(verification_token);
-          console.log('setting validation token');
         }
 
         // set active address if in a community
