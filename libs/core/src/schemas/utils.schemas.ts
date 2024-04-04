@@ -39,6 +39,7 @@ export const linksSchema = {
 
 export enum EventNames {
   ThreadCreated = 'ThreadCreated',
+  ThreadUpvoted = 'ThreadUpvoted',
   CommentCreated = 'CommentCreated',
   GroupCreated = 'GroupCreated',
   CommunityCreated = 'CommunityCreated',

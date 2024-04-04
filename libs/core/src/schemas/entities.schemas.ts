@@ -472,6 +472,9 @@ export const Outbox = z.object({
     events.ThreadCreated.extend({
       event_name: z.literal(EventNames.ThreadCreated),
     }),
+    events.ThreadUpvoted.extend({
+      event_name: z.literal(EventNames.ThreadUpvoted),
+    }),
     events.CommentCreated.extend({
       event_name: z.literal(EventNames.CommentCreated),
     }),
