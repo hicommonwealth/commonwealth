@@ -1,6 +1,5 @@
 import { generateMock } from '@anatine/zod-mock';
 import { DeepPartial, schemas } from '@hicommonwealth/core';
-import { Entities } from 'core/src/schemas';
 import { Model, ModelStatic } from 'sequelize';
 import z from 'zod';
 import { bootstrap_testing } from './bootstrap';
@@ -60,9 +59,9 @@ async function _seed(
   records: Record<string, any>[],
   level: number,
 ) {
-  if (options.mock && schemas.entities[model.name as Entities]) {
+  if (options.mock && schemas.entities[model.name as schemas.Entities]) {
     const mocked: Record<string, any> = generateMock(
-      schemas.entities[model.name as Entities],
+      schemas.entities[model.name as schemas.Entities],
       {},
     );
     if (options.skip) for (const key in options.skip) delete mocked[key];
