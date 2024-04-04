@@ -10,14 +10,13 @@ import {
 import {
   Broker,
   BrokerTopics,
-  Policy,
   broker,
   logger,
-  schemas,
   stats,
 } from '@hicommonwealth/core';
-import { ZodUndefined } from 'zod';
 import { RABBITMQ_URI } from '../../config';
+import { ChainEventPolicy } from './policies/chainEventCreated/chainEventCreatedPolicy';
+import { SnapshotPolicy } from './policies/snapshotProposalCreatedPolicy';
 
 const log = logger(PinoLogger()).getLogger(__filename);
 stats(HotShotsStats());
@@ -58,39 +57,14 @@ export async function setupCommonwealthConsumer(): Promise<void> {
     throw e;
   }
 
-  // snapshot policy
-  const { processSnapshotProposalCreated } = await import(
-    './messageProcessors/snapshotConsumer'
-  );
-  const snapshotInputs = {
-    SnapshotProposalCreated: schemas.events.SnapshotProposalCreated,
-  };
-  const Snapshot: Policy<typeof snapshotInputs, ZodUndefined> = () => ({
-    inputs: snapshotInputs,
-    body: {
-      SnapshotProposalCreated: processSnapshotProposalCreated,
-    },
-  });
   const snapshotSubRes = await brokerInstance.subscribe(
     BrokerTopics.SnapshotListener,
-    Snapshot(),
+    SnapshotPolicy(),
   );
 
-  const { processChainEventCreated } = await import(
-    './messageProcessors/chainEventConsumer'
-  );
-  const chainEventInputs = {
-    ChainEventCreated: schemas.events.ChainEventCreated,
-  };
-  const ChainEvent: Policy<typeof chainEventInputs, ZodUndefined> = () => ({
-    inputs: chainEventInputs,
-    body: {
-      ChainEventCreated: processChainEventCreated,
-    },
-  });
   const chainEventSubRes = await brokerInstance.subscribe(
     BrokerTopics.ChainEvent,
-    ChainEvent(),
+    ChainEventPolicy(),
   );
 
   if (!chainEventSubRes) {

@@ -2,11 +2,12 @@ import { PinoLogger } from '@hicommonwealth/adapters';
 import {
   EventHandler,
   NotificationCategories,
+  Policy,
   SnapshotEventType,
   logger,
+  schemas,
   stats,
 } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
 import axios from 'axios';
 import { ZodUndefined } from 'zod';
 import emitNotifications from '../../../util/emitNotifications';
@@ -17,6 +18,8 @@ export const processSnapshotProposalCreated: EventHandler<
   'SnapshotProposalCreated',
   ZodUndefined
 > = async ({ payload }) => {
+  const { models } = await import('@hicommonwealth/model');
+
   const { space, id, title, body, choices, start, expire, event } = payload;
 
   // Sometimes snapshot-listener will receive a webhook event from a
@@ -174,3 +177,16 @@ export const processSnapshotProposalCreated: EventHandler<
     }
   }
 };
+
+const snapshotInputs = {
+  SnapshotProposalCreated: schemas.events.SnapshotProposalCreated,
+};
+export const SnapshotPolicy: Policy<
+  typeof snapshotInputs,
+  ZodUndefined
+> = () => ({
+  inputs: snapshotInputs,
+  body: {
+    SnapshotProposalCreated: processSnapshotProposalCreated,
+  },
+});

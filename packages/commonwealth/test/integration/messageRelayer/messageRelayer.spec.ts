@@ -1,4 +1,4 @@
-import { delay } from '@hicommonwealth/core';
+import { delay, schemas } from '@hicommonwealth/core';
 import { DB, tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { startMessageRelayer } from '../../../server/workers/messageRelayer/messageRelayer';
@@ -16,6 +16,35 @@ describe('messageRelayer', () => {
 
   afterEach('Clean outbox', async () => {
     await models.Outbox.truncate();
+  });
+
+  it('should correctly increment number of unrelayed events on startup', async () => {
+    await models.Outbox.bulkCreate([
+      {
+        event_name: schemas.EventNames.ChainEventCreated,
+        event_payload: {
+          event_name: schemas.EventNames.ChainEventCreated,
+        },
+        relayed: true,
+      },
+      {
+        event_name: schemas.EventNames.ChainEventCreated,
+        event_payload: {
+          event_name: schemas.EventNames.ChainEventCreated,
+        },
+        relayed: false,
+      },
+      {
+        event_name: schemas.EventNames.ChainEventCreated,
+        event_payload: {
+          event_name: schemas.EventNames.ChainEventCreated,
+        },
+        relayed: false,
+      },
+    ]);
+
+    await startMessageRelayer(0);
+    expect(numUnrelayedEvents).to.equal(2);
   });
 
   it('should relay existing events and new events', async () => {
