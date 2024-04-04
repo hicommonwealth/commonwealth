@@ -91,7 +91,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
             message,
             EthSignType.MESSAGE,
           );
-          return Buffer.from(signature).toString('hex');
+          return `0x${Buffer.from(signature).toString('hex')}`;
         },
         getAddress: async () => {
           const { fromBech32 } = await import('@cosmjs/encoding');
