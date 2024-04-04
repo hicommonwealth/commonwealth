@@ -29,7 +29,6 @@ async function processValidStakeTransaction(chainNodeId) {
           '0xdf3b5cd44ea1a9f22a86f678b2e6d596238fe1d75b638cb5326415f293df32f5',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any,
-      event_name: 'ChainEventCreated',
       parsedArgs: [
         traderAddress,
         namespaceAddress,
