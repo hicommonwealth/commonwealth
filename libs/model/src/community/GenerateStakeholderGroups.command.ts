@@ -3,14 +3,11 @@ import {
   ContractSource,
   InvalidState,
   ThresholdData,
-  commonProtocol,
   schemas,
   type Command,
 } from '@hicommonwealth/core';
-import Web3 from 'web3';
 import { models } from '../database';
 import { GroupAttributes } from '../models';
-import { getNamespace } from '../services/commonProtocol/contractHelpers';
 
 const Errors = {
   CommunityNotFound: 'Community not found',
@@ -83,16 +80,8 @@ export const GenerateStakeholderGroups: Command<
     if (!community.ChainNode) {
       throw new InvalidState(Errors.ChainNodeNotFound);
     }
-    const factoryData =
-      commonProtocol.factoryContracts[
-        community.ChainNode.eth_chain_id! as commonProtocol.ValidChains
-      ];
-    const contractAddress = await getNamespace(
-      new Web3(community.ChainNode.url),
-      community.namespace!,
-      factoryData.factory,
-    );
-    if (contractAddress === '0x0000000000000000000000000000000000000000') {
+    const contractAddress = community.namespace_address;
+    if (!contractAddress) {
       throw new InvalidState(Errors.NamespaceNotFound);
     }
 
