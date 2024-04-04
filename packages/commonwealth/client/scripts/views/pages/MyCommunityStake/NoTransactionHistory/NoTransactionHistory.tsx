@@ -21,7 +21,10 @@ const NoTransactionHistory = () => {
           <CWText type="b1">
             <span>
               Purchasing community stake gives you more upvote power within your
-              communities. <a href="#">Learn more</a>
+              communities.{' '}
+              <a href="https://blog.commonwealth.im/community-stake-100-owners-around-any-idea/">
+                Learn more
+              </a>
             </span>
           </CWText>
         </div>
