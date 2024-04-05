@@ -280,7 +280,7 @@ export class Thread implements IUniqueId {
     profile_name: string;
     avatar_url: string;
     address_last_active: string;
-    associatedReactions: AssociatedReaction[];
+    associatedReactions?: AssociatedReaction[];
   }) {
     this.author = Address.address;
     this.title = getDecodedString(title);
