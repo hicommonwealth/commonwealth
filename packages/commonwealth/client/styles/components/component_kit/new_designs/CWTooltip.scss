@@ -1,13 +1,13 @@
 @import '../../../shared';
 
-@mixin tip ($top, $right, $bottom, $left) {
+@mixin tip($top, $right, $bottom, $left) {
   position: absolute;
   transform: rotate(45deg);
   width: 8px;
   height: 8px;
 
   background: $neutral-900;
-  
+
   flex: none;
   order: 1;
   flex-grow: 0;
@@ -41,15 +41,15 @@
   &.top {
     margin-bottom: 8px;
   }
-  
+
   &.right {
     margin-left: 8px;
   }
-  
+
   &.bottom {
     margin-top: 8px;
   }
-  
+
   &.left {
     margin-right: 8px;
   }
@@ -60,19 +60,34 @@
     padding: 0;
 
     &.tipTop {
-      @include tip(auto, auto, -4px, calc(50% - 8px/2));
+      @include tip(auto, auto, -4px, calc(50% - 8px / 2));
     }
-    
+
     &.tipRight {
-      @include tip(calc(50% - 8px/2), auto, auto, -4px);
+      @include tip(calc(50% - 8px / 2), auto, auto, -4px);
     }
-    
+
     &.tipBottom {
-      @include tip(-4px, auto, auto, calc(50% - 8px/2));
+      @include tip(-4px, auto, auto, calc(50% - 8px));
+
+      @include medium {
+        // left: calc(50% - 8px / 2);
+        @include tip(-4px, auto, auto, calc(20% - 8px));
+      }
+
+      // @include mediumAndUp {
+      //   // left: calc(50% - 8px / 2);
+      //   @include tip(-4px, auto, auto, calc(50% - 8px));
+      // }
+
+      // @include large {
+      //   // left: calc(50% - 8px / 2);
+      //   @include tip(-4px, auto, auto, calc(50% - 8px));
+      // }
     }
-    
+
     &.tipLeft {
-      @include tip(calc(50% - 8px/2), -4px, auto, auto);
+      @include tip(calc(50% - 8px / 2), -4px, auto, auto);
     }
   }
 
