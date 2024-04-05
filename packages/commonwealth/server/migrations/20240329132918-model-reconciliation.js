@@ -25,6 +25,20 @@ module.exports = {
           },
           { transaction },
         ),
+        // clean votes without polls
+        queryInterface.sequelize.query(
+          `DELETE FROM "Votes" WHERE poll_id IS NULL`,
+          { transaction },
+        ),
+        // ensure cascade deletes
+        queryInterface.sequelize.query(
+          `
+          ALTER TABLE "Votes" DROP CONSTRAINT IF EXISTS "Votes_poll_id_fkey",
+          ADD CONSTRAINT "Votes_poll_id_fkey" FOREIGN KEY (poll_id) REFERENCES "Polls"(id) 
+          ON UPDATE NO ACTION
+          ON DELETE CASCADE;`,
+          { transaction },
+        ),
         // poll_id should never be null
         queryInterface.changeColumn(
           'Votes',
@@ -114,17 +128,22 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    return queryInterface.sequelize.transaction(async (transaction) => {
+    return queryInterface.sequelize.transaction((transaction) => {
       return Promise.all([
         queryInterface.removeConstraint(
           'Collaborations',
           'Collaborations_address_id_thread_id_key',
           { transaction },
         ),
-        queryInterface.addColumn('Communities', 'ce_verbose', {
-          type: Sequelize.BOOLEAN,
-          allowNull: true,
-        }),
+        queryInterface.addColumn(
+          'Communities',
+          'ce_verbose',
+          {
+            type: Sequelize.BOOLEAN,
+            allowNull: true,
+          },
+          { transaction },
+        ),
         queryInterface.changeColumn(
           'ContractAbis',
           'abi',
@@ -132,6 +151,14 @@ module.exports = {
             type: Sequelize.JSONB,
             allowNull: true,
           },
+          { transaction },
+        ),
+        queryInterface.sequelize.query(
+          `
+          ALTER TABLE "Votes" DROP CONSTRAINT IF EXISTS "Votes_poll_id_fkey",
+          ADD CONSTRAINT "Votes_poll_id_fkey" FOREIGN KEY (poll_id) REFERENCES "Polls"(id) 
+          ON UPDATE NO ACTION
+          ON DELETE NO ACTION;`,
           { transaction },
         ),
         queryInterface.changeColumn(

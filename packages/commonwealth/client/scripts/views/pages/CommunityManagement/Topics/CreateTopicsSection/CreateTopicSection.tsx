@@ -8,9 +8,16 @@ import {
 import { CWCheckbox } from 'client/scripts/views/components/component_kit/cw_checkbox';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { ValidationStatus } from 'client/scripts/views/components/component_kit/cw_validation_text';
+import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import { CWTextInput } from 'client/scripts/views/components/component_kit/new_designs/CWTextInput';
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/cw_button';
-import React, { useState } from 'react';
+import { MessageRow } from 'client/scripts/views/components/component_kit/new_designs/CWTextInput/MessageRow';
+import {
+  ReactQuillEditor,
+  createDeltaFromText,
+  getTextFromDelta,
+} from 'client/scripts/views/components/react_quill_editor';
+import { DeltaStatic } from 'quill';
+import React, { useMemo, useState } from 'react';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import './CreateTopicSection.scss';
 import { FormSubmitValues } from './types';
@@ -24,9 +31,13 @@ export const CreateTopicSection = () => {
   });
 
   const [nameErrorMsg, setNameErrorMsg] = useState<string | null>(null);
+  const [descErrorMsg, setDescErrorMsg] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [featuredInSidebar, setFeaturedInSidebar] = useState<boolean>(false);
   const [name, setName] = useState<string>('');
+  const [descriptionDelta, setDescriptionDelta] = useState<DeltaStatic>(
+    createDeltaFromText(''),
+  );
 
   const { isWindowExtraSmall } = useBrowserWindow({});
 
@@ -59,6 +70,14 @@ export const CreateTopicSection = () => {
     return ['success', 'Valid topic name'];
   };
 
+  useMemo(() => {
+    if (descriptionDelta?.ops[0]?.insert?.length > 250) {
+      setDescErrorMsg('Description must be 250 characters or less');
+    } else {
+      setDescErrorMsg(null);
+    }
+  }, [descriptionDelta]);
+
   return (
     <div className="CreateTopicSection">
       <CWForm
@@ -79,13 +98,17 @@ export const CreateTopicSection = () => {
             customError={nameErrorMsg}
             autoFocus
           />
-          <CWTextInput
-            hookToForm
-            label="Description"
-            placeholder="Enter a description"
-            name="topicDescription"
-            tabIndex={2}
+
+          <ReactQuillEditor
+            placeholder="Enter a description (Limit of 250 characters)"
+            contentDelta={descriptionDelta}
+            setContentDelta={setDescriptionDelta}
           />
+          <div className="description-char-count">
+            <CWText type="caption">
+              {descriptionDelta.ops[0].insert.length} / 250
+            </CWText>
+          </div>
           <CWText type="caption">
             Choose whether topic is featured in sidebar.
           </CWText>
@@ -109,13 +132,24 @@ export const CreateTopicSection = () => {
           />
         </div>
         <div className="actions">
+          <MessageRow
+            statusMessage={descErrorMsg}
+            hasFeedback={!!descErrorMsg}
+            validationStatus={descErrorMsg ? 'failure' : undefined}
+          />
           <CWButton
             label="Create topic"
             buttonType="primary"
             buttonHeight="med"
             buttonWidth={isWindowExtraSmall ? 'full' : 'wide'}
-            disabled={isSaving || !!nameErrorMsg}
+            disabled={isSaving || !!nameErrorMsg || !!descErrorMsg}
             type="submit"
+            onClick={() =>
+              handleCreateTopic({
+                topicName: name,
+                topicDescription: getTextFromDelta(descriptionDelta),
+              })
+            }
           />
         </div>
       </CWForm>

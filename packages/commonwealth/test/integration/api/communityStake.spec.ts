@@ -149,7 +149,7 @@ describe('POST communityStakes Tests', () => {
           attributes: ['eth_chain_id', 'url'],
         },
       ],
-      attributes: ['namespace'],
+      attributes: ['namespace', 'namespace_address'],
     });
     await commonProtocol.communityStakeConfigValidator.validateCommunityStakeConfig(
       community,

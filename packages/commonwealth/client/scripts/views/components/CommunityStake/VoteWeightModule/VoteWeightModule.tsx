@@ -2,11 +2,11 @@ import React from 'react';
 import { isMobile } from 'react-device-detect';
 
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { ManageCommunityStakeModalMode } from 'views/modals/ManageCommunityStakeModal/types';
 import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 
