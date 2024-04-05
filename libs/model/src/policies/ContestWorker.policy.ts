@@ -1,5 +1,5 @@
 import { schemas, type Policy } from '@hicommonwealth/core';
-import { commonProtocol, models } from '@hicommonwealth/model';
+import { commonProtocol } from '@hicommonwealth/model';
 
 const inputs = {
   ThreadCreated: schemas.events.ThreadCreated,
@@ -12,12 +12,15 @@ export const ContestWorker: Policy<typeof inputs> = () => ({
   body: {
     ThreadCreated: async ({ name, payload }) => {
       console.log(name, payload);
-      const { threadId, userAddress } = payload;
+      const { threadId, userAddress, chainNodeUrl } = payload;
 
       const contestAddress = '0x123'; // TODO: get contest address from contest metadata projection
       const contentUrl = `https://`; // TODO: generate content URL programmatically?
 
-      const web3Client = await createWeb3Client(threadId);
+      const web3Client = await commonProtocol.contestHelper.createWeb3Provider(
+        chainNodeUrl,
+        process.env.PRIVATE_KEY!,
+      );
 
       const { contentId } = await commonProtocol.contestHelper.addContent(
         web3Client,
@@ -30,12 +33,15 @@ export const ContestWorker: Policy<typeof inputs> = () => ({
     },
     ThreadUpvoted: async ({ name, payload }) => {
       console.log(name, payload);
-      const { threadId, userAddress } = payload;
+      const { threadId, userAddress, chainNodeUrl } = payload;
 
       const contestAddress = '0x123'; // TODO: get contest address from contest metadata projection
       const contentId = '111'; // TODO: get content ID saved from ThreadCreated
 
-      const web3Client = await createWeb3Client(threadId);
+      const web3Client = await commonProtocol.contestHelper.createWeb3Provider(
+        chainNodeUrl,
+        process.env.PRIVATE_KEY!,
+      );
 
       await commonProtocol.contestHelper.voteContent(
         web3Client,
@@ -49,29 +55,3 @@ export const ContestWorker: Policy<typeof inputs> = () => ({
     },
   },
 });
-
-const createWeb3Client = async (threadId: number) => {
-  const thread = (
-    await models.Thread.findByPk(threadId, {
-      include: [
-        {
-          model: models.Community,
-          as: 'Community',
-          include: [
-            {
-              model: models.ChainNode,
-              attributes: ['eth_chain_id', 'url'],
-            },
-            {
-              model: models.CommunityStake,
-            },
-          ],
-          attributes: ['namespace'],
-        },
-      ],
-    })
-  )?.toJSON();
-  return commonProtocol.contestHelper.createWeb3Provider(
-    thread!.Community!.ChainNode!.url,
-  );
-};

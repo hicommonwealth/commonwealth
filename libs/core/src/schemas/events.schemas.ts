@@ -3,6 +3,7 @@ import { z } from 'zod';
 export const ThreadEvent = z.object({
   threadId: z.number(),
   userAddress: z.string(),
+  chainNodeUrl: z.string(),
 });
 export const ThreadCreated = ThreadEvent.extend({});
 export const ThreadUpvoted = ThreadEvent.extend({});
