@@ -1,6 +1,6 @@
 import { useCommonNavigate } from 'client/scripts/navigation/helpers';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/cw_button';
+import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import React from 'react';
 import './NoTransactionHistory.scss';
 
