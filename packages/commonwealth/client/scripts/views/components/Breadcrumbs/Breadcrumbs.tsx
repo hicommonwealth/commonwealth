@@ -3,6 +3,7 @@ import React from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
 import { useGetThreadsByIdQuery } from 'state/api/threads';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWBreadcrumbs } from '../component_kit/cw_breadcrumbs';
 import './Breadcrumbs.scss';
 import { breadCrumbURLS } from './data';
@@ -18,7 +19,8 @@ export const Breadcrumbs = () => {
     communityId: app.activeChainId(),
     ids: [getThreadId && Number(getThreadId[1])],
     apiCallEnabled:
-      location.pathname.split('/')[1].toLowerCase() === 'discussion', //Only call when in discussion pages prevents unnecessary calls.
+      // Only call when in discussion pages prevents unnecessary calls.
+      location.pathname.split('/')[1].toLowerCase() === 'discussion',
   });
 
   const user = app?.user?.addresses?.[0];
@@ -58,28 +60,6 @@ export const Breadcrumbs = () => {
     currentDiscussion,
   );
 
-  //Determines the style based on the current page.
-  const getStyle = () => {
-    const findStyle = breadCrumbURLS.find((page) => {
-      if (!page.className) return;
-      if (location.pathname.split('/').length > 1) {
-        return location.pathname.includes(page.url);
-      }
-      return location.pathname === page.url;
-    });
-
-    if (findStyle) {
-      return findStyle.className;
-    }
-
-    if (
-      location.pathname.includes(String(profileId)) ||
-      location.pathname.includes('/profile/id')
-    ) {
-      return 'viewProfile';
-    }
-  };
-
   //Gets the tooltip copy based on the current page.
   const getToolTipCopy = () => {
     const lastPathSegment = location.pathname.split('/').pop();
@@ -103,8 +83,8 @@ export const Breadcrumbs = () => {
   };
 
   return (
-    <nav className="Breadcrumbs">
-      <div className={`${getStyle() ?? 'commonPadding'}`}>
+    <CWPageLayout className="BreadcrumbsPageLayout">
+      <nav className="BreadcrumbsComponent">
         {standalone ? (
           <CWBreadcrumbs breadcrumbs={[pathnames[0]]} />
         ) : (
@@ -115,7 +95,7 @@ export const Breadcrumbs = () => {
             }
           />
         )}
-      </div>
-    </nav>
+      </nav>
+    </CWPageLayout>
   );
 };
