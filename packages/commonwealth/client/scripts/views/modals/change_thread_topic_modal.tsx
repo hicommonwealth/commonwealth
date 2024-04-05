@@ -5,12 +5,12 @@ import type Topic from '../../models/Topic';
 import app from '../../state';
 import { useEditThreadMutation } from '../../state/api/threads';
 import { useFetchTopicsQuery } from '../../state/api/topics';
+import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { TopicSelector } from '../components/topic_selector';
 
 type ChangeThreadTopicModalProps = {

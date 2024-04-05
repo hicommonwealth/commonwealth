@@ -29,12 +29,12 @@ import {
 } from '../../../../shared/analytics/types';
 import { CosmosProposalSelector } from '../components/CosmosProposalSelector';
 import { ProposalSelector } from '../components/ProposalSelector';
+import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { SnapshotProposalSelector } from '../components/snapshot_proposal_selector';
 
 const getInitialSnapshots = (thread: Thread) =>

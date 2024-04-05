@@ -1,5 +1,17 @@
 @import '../../../../styles/shared';
 
+.btn-border:has(.Select) {
+  border: none;
+
+  &:hover {
+    border: none;
+  }
+
+  &:focus-within {
+    border: 1px solid transparent;
+  }
+}
+
 .Select {
   display: flex;
   justify-content: space-between;
