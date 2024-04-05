@@ -13,6 +13,7 @@ export type TransactionsProps = {
       chain_node_id?: number;
     };
     address: string;
+    price: string;
     stake: number;
     voteWeight: number;
     timestamp: number;
