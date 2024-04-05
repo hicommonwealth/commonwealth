@@ -144,8 +144,8 @@ export const CreateTopicSection = () => {
             buttonWidth={isWindowExtraSmall ? 'full' : 'wide'}
             disabled={isSaving || !!nameErrorMsg || !!descErrorMsg}
             type="submit"
-            onClick={() =>
-              handleCreateTopic({
+            onClick={async () =>
+              await handleCreateTopic({
                 topicName: name,
                 topicDescription: getTextFromDelta(descriptionDelta),
               })
