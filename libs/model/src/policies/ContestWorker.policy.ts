@@ -18,6 +18,7 @@ export const ContestWorker: Policy<typeof inputs> = () => ({
       const contentUrl = `https://`; // TODO: generate content URL programmatically?
 
       const web3Client = await createWeb3Client(threadId);
+
       const { contentId } = await commonProtocol.contestHelper.addContent(
         web3Client,
         contestAddress,
