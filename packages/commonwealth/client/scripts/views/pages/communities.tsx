@@ -17,10 +17,10 @@ import {
 import { useFetchEthUsdRateQuery } from '../../state/api/communityStake/index';
 import { trpc } from '../../utils/trpcClient';
 import { NewCommunityCard } from '../components/CommunityCard';
-import { CWButton } from '../components/component_kit/cw_button';
 import { CWDivider } from '../components/component_kit/cw_divider';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../components/component_kit/cw_text';
+import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from '../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWModal } from '../components/component_kit/new_designs/CWModal';
 import { CWRelatedCommunityCard } from '../components/component_kit/new_designs/CWRelatedCommunityCard';
@@ -224,11 +224,8 @@ const CommunitiesPage = () => {
             <CWIcon iconName="funnelSimple" />
             <CWButton
               label={STAKE_FILTER_KEY}
-              buttonType={
-                filterMap[STAKE_FILTER_KEY]
-                  ? 'primary-black'
-                  : 'secondary-black'
-              }
+              buttonHeight="sm"
+              buttonType={filterMap[STAKE_FILTER_KEY] ? 'primary' : 'secondary'}
               onClick={() => {
                 handleSetFilterMap(STAKE_FILTER_KEY);
               }}
@@ -240,9 +237,8 @@ const CommunitiesPage = () => {
                 <CWButton
                   key={i}
                   label={cat}
-                  buttonType={
-                    filterMap[cat] ? 'primary-black' : 'secondary-black'
-                  }
+                  buttonHeight="sm"
+                  buttonType={filterMap[cat] ? 'primary' : 'secondary'}
                   onClick={() => {
                     handleSetFilterMap(cat);
                   }}
@@ -254,9 +250,8 @@ const CommunitiesPage = () => {
                 <CWButton
                   key={i}
                   label={network}
-                  buttonType={
-                    filterMap[network] ? 'primary-black' : 'secondary-black'
-                  }
+                  buttonHeight="sm"
+                  buttonType={filterMap[network] ? 'primary' : 'secondary'}
                   onClick={() => {
                     handleSetFilterMap(network);
                   }}
@@ -268,9 +263,8 @@ const CommunitiesPage = () => {
                 <CWButton
                   key={i}
                   label={base}
-                  buttonType={
-                    filterMap[base] ? 'primary-black' : 'secondary-black'
-                  }
+                  buttonHeight="sm"
+                  buttonType={filterMap[base] ? 'primary' : 'secondary'}
                   onClick={() => {
                     handleSetFilterMap(base);
                   }}

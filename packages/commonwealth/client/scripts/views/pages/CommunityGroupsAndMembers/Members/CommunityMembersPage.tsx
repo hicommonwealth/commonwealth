@@ -19,6 +19,7 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
 import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import {
@@ -26,7 +27,6 @@ import {
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import {
   MixpanelPageViewEvent,
   MixpanelPageViewEventPayload,
@@ -253,8 +253,6 @@ const CommunityMembersPage = () => {
   return (
     <CWPageLayout>
       <section className="CommunityMembersPage">
-        {/* TODO: add breadcrums here */}
-
         {/* Header */}
         <CWText type="h2">Members ({totalResults})</CWText>
 

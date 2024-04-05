@@ -7,13 +7,13 @@ import { CWProgressBar } from './component_kit/cw_progress_bar';
 import { CWRadioButton } from './component_kit/cw_radio_button';
 import { CWText } from './component_kit/cw_text';
 import { getClasses } from './component_kit/helpers';
+import { CWButton } from './component_kit/new_designs/CWButton';
 import {
   CWModal,
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from './component_kit/new_designs/CWModal';
-import { CWButton } from './component_kit/new_designs/cw_button';
 
 import 'components/poll_card.scss';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';

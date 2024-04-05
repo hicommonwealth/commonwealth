@@ -2,8 +2,8 @@ import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/why_commonwealth.scss';
 import React from 'react';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
+import { CWButton } from '../components/component_kit/new_designs/CWButton';
 
 const WhyCommonwealthPage = () => {
   const navigate = useCommonNavigate();

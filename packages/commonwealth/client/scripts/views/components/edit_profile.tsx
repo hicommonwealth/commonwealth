@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import app from 'state';
 import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
 import _ from 'underscore';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { z } from 'zod';
 import Account from '../../models/Account';
@@ -15,7 +16,6 @@ import MinimumProfile from '../../models/MinimumProfile';
 import NewProfile from '../../models/NewProfile';
 import { PageNotFound } from '../pages/404';
 import { AvatarUpload } from './Avatar';
-import { CWButton } from './component_kit/cw_button';
 import type { ImageBehavior } from './component_kit/cw_cover_image_uploader';
 import { CWCoverImageUploader } from './component_kit/cw_cover_image_uploader';
 import { CWDivider } from './component_kit/cw_divider';
@@ -232,13 +232,13 @@ const EditProfileComponent = () => {
                       }, 1000);
                     }}
                     className="save-button"
-                    buttonType="secondary-black"
+                    buttonType="secondary"
                   />
                   <CWButton
                     label="Save"
                     onClick={() => handleSaveProfile()}
                     className="save-button"
-                    buttonType="primary-black"
+                    buttonType="primary"
                   />
                 </div>
               </div>

@@ -9,8 +9,8 @@ import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards
 import Permissions from 'utils/Permissions';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWText } from '../component_kit/cw_text';
+import { CWButton } from '../component_kit/new_designs/CWButton';
 import { CWModal } from '../component_kit/new_designs/CWModal';
-import { CWButton } from '../component_kit/new_designs/cw_button';
 import { AdminOnboardingCard } from './AdminOnboardingCard/AdminOnboardingCard';
 import './AdminOnboardingSlider.scss';
 import { DismissModal } from './DismissModal';

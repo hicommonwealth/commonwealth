@@ -8,9 +8,9 @@ import {
 import { CWCheckbox } from 'client/scripts/views/components/component_kit/cw_checkbox';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { ValidationStatus } from 'client/scripts/views/components/component_kit/cw_validation_text';
+import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import { CWTextInput } from 'client/scripts/views/components/component_kit/new_designs/CWTextInput';
 import { MessageRow } from 'client/scripts/views/components/component_kit/new_designs/CWTextInput/MessageRow';
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/cw_button';
 import {
   ReactQuillEditor,
   createDeltaFromText,

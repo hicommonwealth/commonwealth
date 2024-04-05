@@ -9,8 +9,8 @@ import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayou
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import useNecessaryEffect from '../../../hooks/useNecessaryEffect';
 import { CardsCollection } from '../../components/cards_collection';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import {
   CWTab,
   CWTabsRow,
@@ -117,7 +117,7 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
               }
               iconLeft={hasSubscription ? 'mute' : 'bell'}
               onClick={updateSubscription}
-              buttonType="mini-black"
+              buttonHeight="sm"
             />
           </div>
         </div>
