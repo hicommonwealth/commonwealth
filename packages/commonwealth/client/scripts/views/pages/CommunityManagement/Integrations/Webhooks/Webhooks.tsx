@@ -15,9 +15,9 @@ import {
 import _ from 'underscore';
 import { LinksArray, useLinksArray } from 'views/components/LinksArray';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { WebhookSettingsModal } from 'views/modals/webhook_settings_modal';
 import { linkValidationSchema } from '../common/validation';
 import './Webhooks.scss';

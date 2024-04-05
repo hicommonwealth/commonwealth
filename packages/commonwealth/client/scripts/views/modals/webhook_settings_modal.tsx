@@ -10,12 +10,12 @@ import '../../../styles/modals/webhook_settings_modal.scss';
 import type Webhook from '../../models/Webhook';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWText } from '../components/component_kit/cw_text';
+import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
 
 type WebhookSettingsModalProps = {
   onModalClose: () => void;

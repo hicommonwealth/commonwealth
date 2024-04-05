@@ -7,9 +7,10 @@ import { useFetchThreadsQuery } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
 import Permissions from 'utils/Permissions';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWText } from '../component_kit/cw_text';
+import { CWButton } from '../component_kit/new_designs/CWButton';
 import { CWModal } from '../component_kit/new_designs/CWModal';
-import { CWButton } from '../component_kit/new_designs/cw_button';
 import { AdminOnboardingCard } from './AdminOnboardingCard/AdminOnboardingCard';
 import './AdminOnboardingSlider.scss';
 import { DismissModal } from './DismissModal';
@@ -87,43 +88,45 @@ export const AdminOnboardingSlider = () => {
 
   return (
     <>
-      <section className="AdminOnboardingSlider">
-        <div className="header">
-          <CWText type="h4">Finish setting up your community</CWText>
+      <CWPageLayout className="AdminOnboardingSliderPageLayout">
+        <section className="AdminOnboardingSlider">
+          <div className="header">
+            <CWText type="h4">Finish setting up your community</CWText>
 
-          <CWButton
-            containerClassName="dismissBtn"
-            buttonType="tertiary"
-            buttonWidth="narrow"
-            onClick={() => {
-              setIsModalVisible(true);
-            }}
-            label="Dismiss"
-          />
-        </div>
-        <div className="cards">
-          <AdminOnboardingCard
-            cardType="create-topic"
-            isActionCompleted={topics.length > 1} // we have a default 'General' topic which is not counted here
-            onCTAClick={() => redirectToPage('create-topic')}
-          />
-          <AdminOnboardingCard
-            cardType="make-group"
-            isActionCompleted={groups.length > 0}
-            onCTAClick={() => redirectToPage('create-group')}
-          />
-          <AdminOnboardingCard
-            cardType="enable-integrations"
-            isActionCompleted={hasAnyIntegration}
-            onCTAClick={() => redirectToPage('manage-integrations')}
-          />
-          <AdminOnboardingCard
-            cardType="create-thread"
-            isActionCompleted={threads.length > 0}
-            onCTAClick={() => redirectToPage('create-thread')}
-          />
-        </div>
-      </section>
+            <CWButton
+              containerClassName="dismissBtn"
+              buttonType="tertiary"
+              buttonWidth="narrow"
+              onClick={() => {
+                setIsModalVisible(true);
+              }}
+              label="Dismiss"
+            />
+          </div>
+          <div className="cards">
+            <AdminOnboardingCard
+              cardType="create-topic"
+              isActionCompleted={topics.length > 1} // we have a default 'General' topic which is not counted here
+              onCTAClick={() => redirectToPage('create-topic')}
+            />
+            <AdminOnboardingCard
+              cardType="make-group"
+              isActionCompleted={groups.length > 0}
+              onCTAClick={() => redirectToPage('create-group')}
+            />
+            <AdminOnboardingCard
+              cardType="enable-integrations"
+              isActionCompleted={hasAnyIntegration}
+              onCTAClick={() => redirectToPage('manage-integrations')}
+            />
+            <AdminOnboardingCard
+              cardType="create-thread"
+              isActionCompleted={threads.length > 0}
+              onCTAClick={() => redirectToPage('create-thread')}
+            />
+          </div>
+        </section>
+      </CWPageLayout>
       <CWModal
         size="small"
         visibleOverflow

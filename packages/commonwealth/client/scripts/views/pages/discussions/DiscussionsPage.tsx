@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 
@@ -27,7 +27,8 @@ import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
-import { DiscussionsFeedDiscovery } from 'views/pages/discussions/DiscussionsFeedDiscovery';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 
 type DiscussionsPageProps = {
@@ -53,7 +54,9 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     communityId,
   });
 
-  const { isWindowSmallInclusive } = useBrowserWindow({});
+  const containerRef = useRef();
+
+  useBrowserWindow({});
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
@@ -110,7 +113,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   useManageDocumentTitle('Discussions');
 
   return (
-    <div className="DiscussionsPage">
+    <CWPageLayout ref={containerRef} className="DiscussionsPageLayout">
       <DiscussionsFeedDiscovery
         orderBy={featuredFilter}
         community={communityId}
@@ -170,8 +173,10 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             />
           );
         }}
-        endReached={() => hasNextPage && fetchNextPage()}
-        overscan={200}
+        endReached={() => {
+          hasNextPage && fetchNextPage();
+        }}
+        overscan={50}
         components={{
           // eslint-disable-next-line react/no-multi-comp
           EmptyPlaceholder: () => (
@@ -183,11 +188,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           // eslint-disable-next-line react/no-multi-comp
           Header: () => (
             <>
-              {isWindowSmallInclusive && (
-                <div className="mobileBreadcrumbs">
-                  <Breadcrumbs />
-                </div>
-              )}
+              <Breadcrumbs />
               <HeaderWithFilters
                 topic={topicName}
                 stage={stageName}
@@ -210,7 +211,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           ),
         }}
       />
-    </div>
+    </CWPageLayout>
   );
 };
 
