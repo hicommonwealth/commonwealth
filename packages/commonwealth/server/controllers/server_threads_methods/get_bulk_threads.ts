@@ -30,7 +30,6 @@ export async function __getBulkThreads(
     communityId,
     stage,
     topicId,
-    includePinnedThreads,
     page,
     limit,
     orderBy,
@@ -40,21 +39,21 @@ export async function __getBulkThreads(
   }: GetBulkThreadsOptions,
 ): Promise<GetBulkThreadsResult> {
   // query params that bind to sql query
-  const bind = (() => {
-    const _limit = limit ? (limit > 500 ? 500 : limit) : 20;
+  const replacements = (() => {
+    const _limit = limit ? Math.min(limit, 500) : 20;
     const _page = page || 1;
     const _offset = _limit * (_page - 1) || 0;
     const _to_date = toDate || moment().toISOString();
 
     return {
-      from_date: fromDate,
-      to_date: _to_date,
+      fromDate,
+      toDate: _to_date,
       page: _page,
       limit: _limit,
       offset: _offset,
-      ...(communityId && { community_id: communityId }),
-      ...(stage && { stage }),
-      ...(topicId && { topic_id: topicId }),
+      communityId,
+      stage,
+      topicId,
     };
   })();
 
@@ -67,101 +66,101 @@ export async function __getBulkThreads(
     latestActivity: 'updated_at DESC',
   };
 
-  // get response threads from query
   const responseThreadsQuery = this.models.sequelize.query(
     `
-WITH top_threads AS (
-    SELECT id
-    FROM "Threads"
-        WHERE deleted_at IS NULL AND community_id = $community_id
-        ${topicId ? ` AND topic_id = $topic_id ` : ''}
-        ${stage ? ` AND stage = $stage ` : ''}
-         AND archived_at IS ${archived ? 'NOT' : ''} NULL 
-         ${
-           toDate
-             ? (fromDate ? ' AND ' : ' WHERE ') + ' created_at < $to_date '
-             : ''
-         }
-    ORDER BY pinned DESC, ${orderByQueries[orderBy] ?? 'created_at DESC'} 
-    LIMIT $limit OFFSET $offset
-)
-SELECT 
-    jsonb_build_object(
-        'id', t.id,
-        'title', t.title,
-        'body', t.body,
-        'url', t.url,
-        'last_edited', t.last_edited,
-        'kind', t.kind,
-        'stage', t.stage,
-        'read_only', t.read_only,
-        'discord_meta', t.discord_meta,
-        'pinned', t.pinned,
-        'chain', t.community_id,
-        'created_at', t.created_at,
-        'updated_at', t.updated_at,
-        'locked_at', t.locked_at,
-        'links', t.links,
-        'has_poll', t.has_poll,
-        'last_commented_on', t.last_commented_on,
-        'plaintext', t.plaintext,
-        'marked_as_spam_at', t.marked_as_spam_at,
-        'archived_at', t.archived_at,
-        'latest_activity', t.max_notif_id
-    ) AS thread_info,
-    jsonb_strip_nulls(jsonb_build_object(
-        'address', ad.address::text,
-        'name', pr.profile_name::text,
-        'avatar_url', pr.avatar_url::text,
-        'last_active', ad.last_active::text,
-        'profile_id', pr.id::text
-    )) AS address_info,
-    jsonb_agg(json_strip_nulls(json_build_object(
-        'id', editors.id,
-        'address', editors.address,
-        'chain', editors.community_id,
-        'avatar_url', editor_profiles.avatar_url::text,
-        'last_active', editors.last_active::text,
-        'profile_id', editor_profiles.id::text
-    ))) AS collaborators,
-    jsonb_build_object(
-        'topic_id', topics.id,
-        'topic_name', topics.name,
-        'topic_description', topics.description,
-        'topic_community_id', topics.community_id,
-        'topic_telegram', topics.telegram
-    ) AS topic_info,
-    (
-       SELECT json_agg(json_strip_nulls(json_build_object(
-        'address', ad.address::text,
-        'reaction_type', r.reaction::text,
-        'reaction_id', r.id::text,
-        'reaction_timestamp', r.created_at::text,
-        'reaction_weight', r.calculated_voting_weight::text,
-        'name', pr.profile_name::text,
-        'avatar_url', pr.avatar_url::text,
-        'last_active', ad.last_active::text,
-        'profile_id', pr.id::text
-    ))) FROM "Reactions" AS r
-        LEFT JOIN "Addresses" AS ad ON r.address_id = ad.id
-        LEFT JOIN "Profiles" AS pr ON pr.user_id = ad.user_id
-        WHERE r.thread_id = t.id
-) AS reaction_info
-FROM top_threads
-LEFT JOIN "Threads" AS t ON top_threads.id = t.id
-LEFT JOIN "Addresses" AS ad ON ad.id = t.address_id
-LEFT JOIN "Profiles" AS pr ON pr.user_id = ad.user_id
-LEFT JOIN "Collaborations" AS collaborations ON t.id = collaborations.thread_id
-LEFT JOIN "Addresses" AS editors ON collaborations.address_id = editors.id
-LEFT JOIN "Profiles" AS editor_profiles ON editors.user_id = editor_profiles.user_id
-LEFT JOIN "Topics" AS topics ON t.topic_id = topics.id
-GROUP BY t.id, ad.address, ad.last_active, pr.id, topics.id
-LIMIT $limit;          
-    `,
+        WITH top_threads AS (
+        SELECT id, title, url, body, version_history, kind, stage, read_only, discord_meta,
+            pinned, community_id, created_at, updated_at, locked_at as thread_locked, links,
+            has_poll, last_commented_on, plaintext, comment_count as "numberOfComments",
+            marked_as_spam_at, archived_at, topic_id, reaction_weights_sum, canvas_action as "canvasAction",
+            canvas_session as "canvasSession", canvas_hash as "canvasHash", plaintext, last_edited
+        FROM "Threads"
+        WHERE
+            community_id = :communityId AND
+            deleted_at IS NULL AND
+            archived_at IS ${archived ? 'NOT' : ''} NULL 
+            ${topicId ? ' AND topic_id = :topicId' : ''}
+            ${stage ? ' AND stage = :stage' : ''}
+            ${fromDate ? ' AND created_at > :fromDate' : ''}
+            ${toDate ? ' AND created_at < :toDate' : ''}            
+        ORDER BY pinned DESC, ${orderByQueries[orderBy] ?? 'created_at DESC'} 
+        LIMIT :limit OFFSET :offset
+    ), thread_metadata AS (
+    -- get the thread authors and their profiles
+        SELECT
+            TH.id as thread_id,
+            json_build_object(
+                'id', T.id,
+                'name', T.name,
+                'description', T.description,
+                'communityId', T.community_id,
+                'telegram', T.telegram
+            ) as topic,
+            json_build_object(
+                'id', A.id,
+                'address', A.address,
+                'community_id', A.community_id
+            ) as "Address",
+            A.profile_id as profile_id, A.last_active as address_last_active,
+            P.id as profile_id, P.avatar_url as avatar_url, P.profile_name as profile_name
+        FROM top_threads TH
+        JOIN "Topics" T ON TH.topic_id = T.id
+        LEFT JOIN "Addresses" A ON TH.id = A.id
+        LEFT JOIN "Profiles" P ON A.profile_id = P.id
+    ), collaborator_data AS (
+    -- get the thread collaborators and their profiles
+        SELECT
+            TT.id as thread_id,
+            jsonb_agg(json_strip_nulls(json_build_object(
+                'address', A.address,
+                'community_id', A.community_id,
+                'User', json_build_object(
+                    'Profiles', json_build_array(json_build_object(
+                        'id', editor_profiles.id,
+                        'name', editor_profiles.profile_name,
+                        'address', A.address,
+                        'lastActive', A.last_active::text,
+                        'avatarUrl', editor_profiles.avatar_url::text
+                    ))
+                )
+            ))) AS collaborators
+        FROM top_threads TT
+        LEFT JOIN "Collaborations" AS C ON TT.id = C.thread_id
+        LEFT JOIN "Addresses" A ON C.address_id = A.id
+        LEFT JOIN "Profiles" AS editor_profiles ON A.user_id = editor_profiles.user_id
+        GROUP BY TT.id
+    ), reaction_data AS (
+    -- get the thread reactions and the address/profile of the user who reacted
+        SELECT
+            TT.id as thread_id,
+            json_agg(json_strip_nulls(json_build_object(
+            'id', R.id,
+            'type', R.reaction,
+            'address', A.address,
+            'updated_at', R.updated_at::text,
+            'vote_weight', R.calculated_voting_weight,
+            'profile_name', P.profile_name,
+            'avatar_url', P.avatar_url,
+            'last_active', A.last_active::text
+        ))) as "associatedReactions"
+        FROM "Reactions" R
+        JOIN top_threads TT ON TT.id = R.thread_id
+        JOIN "Addresses" A ON A.id = R.address_id
+        JOIN "Profiles" P ON P.id = A.profile_id
+        -- where clause doesn't change query result but forces DB to use the correct indexes
+        WHERE R.community_id = :communityId AND R.thread_id = TT.id
+        GROUP BY TT.id
+    )
+    SELECT
+        TT.*, TM.*, CD.*, RD.*
+    FROM top_threads TT
+    LEFT JOIN thread_metadata TM ON TT.id = TM.thread_id
+    LEFT JOIN collaborator_data CD ON TT.id = CD.thread_id
+    LEFT JOIN reaction_data RD ON TT.id = RD.thread_id;
+  `,
     {
-      bind,
+      replacements,
       type: QueryTypes.SELECT,
-      logging: true,
     },
   );
 
@@ -179,8 +178,8 @@ LIMIT $limit;
     ]);
 
     return {
-      limit: bind.limit,
-      page: bind.page,
+      limit: replacements.limit,
+      page: replacements.page,
       // data params
       threads,
       numVotingThreads,
