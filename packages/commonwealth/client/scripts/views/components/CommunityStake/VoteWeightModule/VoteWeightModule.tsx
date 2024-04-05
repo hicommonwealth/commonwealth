@@ -1,7 +1,7 @@
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 
-import { findDenominationIcon } from 'helpers/findDenominationIcon';
+import { findDenominationIcon } from 'helpers/findDenomination';
 
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
