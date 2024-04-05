@@ -31,7 +31,7 @@ interface FetchBulkThreadsProps extends CommonProps {
   queryType: typeof QueryTypes.BULK; // discriminating union
   page: number;
   limit?: number;
-  toDate: string;
+  toDate?: string;
   fromDate?: string;
   topicId?: number;
   stage?: string;
@@ -87,18 +87,26 @@ const isFetchBulkThreadsProps = (props): props is FetchBulkThreadsProps =>
 
 const getFetchThreadsQueryKey = (props) => {
   if (isFetchBulkThreadsProps(props)) {
-    return [
+    const keys = [
       ApiEndpoints.FETCH_THREADS,
       props.communityId,
       props.queryType,
       props.topicId,
       props.stage,
       props.includePinnedThreads,
-      props.toDate,
       props.fromDate,
       props.limit,
       props.orderBy,
     ];
+
+    // remove milliseconds from cache key
+    if (props.toDate) {
+      const toDate = new Date(props.toDate);
+      toDate.setMilliseconds(0);
+      keys.push(toDate.toISOString());
+      console.log(keys);
+    }
+    return keys;
   }
   if (isFetchActiveThreadsProps(props)) {
     return [
