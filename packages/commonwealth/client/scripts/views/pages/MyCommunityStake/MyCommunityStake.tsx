@@ -3,6 +3,7 @@ import { formatAddressShort } from 'helpers';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import React, { useState } from 'react';
 import app from 'state';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWSelectList } from '../../components/component_kit/new_designs/CWSelectList';
@@ -59,66 +60,68 @@ const MyCommunityStake = () => {
   if (!isLoggedIn) return <PageNotFound />;
 
   return (
-    <section className="MyCommunityStake">
-      <CWText type="h2" className="header">
-        My Community Stake
-      </CWText>
+    <CWPageLayout>
+      <section className="MyCommunityStake">
+        <CWText type="h2" className="header">
+          My Community Stake
+        </CWText>
 
-      {!(data?.length > 0) ? (
-        <NoTransactionHistory />
-      ) : (
-        <>
-          <section className="filters">
-            <CWTextInput
-              size="large"
-              fullWidth
-              placeholder="Search community name or symbol"
-              containerClassName="search-input-container"
-              inputClassName="search-input"
-              iconLeft={<CWIcon iconName="search" className="search-icon" />}
-              onInput={(e) =>
-                setFilterOptions((options) => ({
-                  ...options,
-                  searchText: e.target.value?.trim(),
-                }))
-              }
-            />
-            <div className="select-list-container">
-              <CWText fontWeight="medium">Filter</CWText>
-              <CWSelectList
-                isSearchable={false}
-                isClearable={false}
-                options={ADDRESS_FILTERS}
-                value={filterOptions.selectedAddress}
-                onChange={(option) =>
-                  setFilterOptions((filters) => ({
-                    ...filters,
-                    selectedAddress: option,
+        {!(data?.length > 0) ? (
+          <NoTransactionHistory />
+        ) : (
+          <>
+            <section className="filters">
+              <CWTextInput
+                size="large"
+                fullWidth
+                placeholder="Search community name or symbol"
+                containerClassName="search-input-container"
+                inputClassName="search-input"
+                iconLeft={<CWIcon iconName="search" className="search-icon" />}
+                onInput={(e) =>
+                  setFilterOptions((options) => ({
+                    ...options,
+                    searchText: e.target.value?.trim(),
                   }))
                 }
               />
-            </div>
-          </section>
+              <div className="select-list-container">
+                <CWText fontWeight="medium">Filter</CWText>
+                <CWSelectList
+                  isSearchable={false}
+                  isClearable={false}
+                  options={ADDRESS_FILTERS}
+                  value={filterOptions.selectedAddress}
+                  onChange={(option) =>
+                    setFilterOptions((filters) => ({
+                      ...filters,
+                      selectedAddress: option,
+                    }))
+                  }
+                />
+              </div>
+            </section>
 
-          <CWTabsRow>
-            {TABS.map((tab, index) => (
-              <CWTab
-                key={index}
-                label={tab}
-                isSelected={activeTabIndex === index}
-                onClick={() => setActiveTabIndex(index)}
-              />
-            ))}
-          </CWTabsRow>
+            <CWTabsRow>
+              {TABS.map((tab, index) => (
+                <CWTab
+                  key={index}
+                  label={tab}
+                  isSelected={activeTabIndex === index}
+                  onClick={() => setActiveTabIndex(index)}
+                />
+              ))}
+            </CWTabsRow>
 
-          {activeTabIndex === 0 ? (
-            <Stakes transactions={data} />
-          ) : (
-            <Transactions transactions={data} />
-          )}
-        </>
-      )}
-    </section>
+            {activeTabIndex === 0 ? (
+              <Stakes transactions={data} />
+            ) : (
+              <Transactions transactions={data} />
+            )}
+          </>
+        )}
+      </section>
+    </CWPageLayout>
   );
 };
 

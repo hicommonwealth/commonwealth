@@ -32,8 +32,8 @@ import app from 'state';
 
 import { naturalDenomToMinimal } from '../../../../../shared/utils';
 import { CompoundCancelButton } from '../../pages/view_proposal/proposal_components';
-import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
+import { CWButton } from '../component_kit/new_designs/CWButton';
 import { CannotVote } from './cannot_vote';
 import { getCanVote, getVotingResults } from './helpers';
 import { ProposalExtensions } from './proposal_extensions';
@@ -308,7 +308,7 @@ export const VotingActions = (props: VotingActionsProps) => {
 
   const noButton = (
     <CWButton
-      buttonType="primary-red"
+      buttonType="destructive"
       disabled={!canVote || hasVotedNo || votingModalOpen}
       onClick={voteNo}
       label={hasVotedNo ? 'Voted no' : 'Vote no'}
@@ -326,7 +326,7 @@ export const VotingActions = (props: VotingActionsProps) => {
   // cosmos: abstain
   const abstainButton = (
     <CWButton
-      buttonType="primary-red"
+      buttonType="destructive"
       disabled={!canVote || hasVotedAbstain || votingModalOpen}
       onClick={voteAbstain}
       label={hasVotedAbstain ? 'Abstained' : 'Abstain'}
@@ -336,7 +336,7 @@ export const VotingActions = (props: VotingActionsProps) => {
   // cosmos: veto
   const noWithVetoButton = (
     <CWButton
-      buttonType="primary-red"
+      buttonType="destructive"
       disabled={!canVote || hasVotedVeto || votingModalOpen}
       onClick={voteVeto}
       label={hasVotedVeto ? 'Vetoed' : 'Veto'}

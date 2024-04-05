@@ -6,7 +6,7 @@ import React from 'react';
 import { User } from 'views/components/user/user';
 import { CWText } from '../../component_kit/cw_text';
 import { CWValidationText } from '../../component_kit/cw_validation_text';
-import { CWButton } from '../../component_kit/new_designs/cw_button';
+import { CWButton } from '../../component_kit/new_designs/CWButton';
 import { ReactQuillEditor } from '../../react_quill_editor';
 import './CommentEditor.scss';
 

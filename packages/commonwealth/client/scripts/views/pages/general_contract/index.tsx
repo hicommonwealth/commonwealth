@@ -13,9 +13,9 @@ import {
 import 'pages/general_contract/index.scss';
 import React, { useEffect, useRef, useState } from 'react';
 import app from 'state';
-import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import type { AbiInput, AbiItem, AbiOutput } from 'web3-utils/types';
 import type Contract from '../../../models/Contract';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';

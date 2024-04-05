@@ -1,5 +1,8 @@
+import { WEI_PER_ETHER } from 'controllers/chain/ethereum/util';
 import { formatAddressShort } from 'helpers';
+import { getCommunityStakeSymbol } from 'helpers/stakes';
 import React from 'react';
+import app from 'state';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import CommunityInfo from '../common/CommunityInfo';
 import { TransactionsProps } from '../types';
@@ -49,11 +52,54 @@ const columnInfo = [
 ];
 
 const Stakes = ({ transactions }: TransactionsProps) => {
+  // aggregate transaction per community per address
+  const stakes = (() => {
+    const accumulatedStakes = {};
+
+    transactions.map((transaction) => {
+      const key = (
+        transaction.community.id + transaction.address
+      ).toLowerCase();
+      const action = transaction.action === 'mint' ? 1 : -1;
+
+      accumulatedStakes[key] = {
+        ...transaction,
+        ...(accumulatedStakes[key] || {}),
+        stake:
+          (accumulatedStakes[key]?.stake || 0) + transaction.stake * action,
+        voteWeight:
+          (accumulatedStakes[key]?.voteWeight || 0) +
+          transaction.voteWeight * action,
+        avgPrice:
+          (accumulatedStakes[key]?.avgPrice || 0) +
+          parseFloat(
+            (
+              parseFloat(transaction.price) /
+              WEI_PER_ETHER /
+              transaction.stake
+            ).toFixed(5),
+          ) *
+            action,
+      };
+    });
+
+    return Object.values(accumulatedStakes)
+      .map((transaction: any) => ({
+        ...transaction,
+        voteWeight: transaction.voteWeight + 1, // total vote weight is +1 of the stake weight
+        avgPrice: `${transaction.avgPrice.toFixed(5)} ${getCommunityStakeSymbol(
+          app.config.chains.getById(transaction?.community?.id)?.ChainNode
+            ?.name || '',
+        )}`,
+      }))
+      .filter((transaction) => transaction.stake);
+  })();
+
   return (
     <section className="Stakes">
       <CWTable
         columnInfo={columnInfo}
-        rowData={transactions.map((tx) => ({
+        rowData={stakes.map((tx) => ({
           ...tx,
           community: {
             sortValue: tx.community.name.toLowerCase(),

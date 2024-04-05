@@ -31,11 +31,14 @@ module.exports = {
           { transaction },
         ),
         // ensure cascade deletes
-        queryInterface.sequelize.query(`
+        queryInterface.sequelize.query(
+          `
           ALTER TABLE "Votes" DROP CONSTRAINT IF EXISTS "Votes_poll_id_fkey",
           ADD CONSTRAINT "Votes_poll_id_fkey" FOREIGN KEY (poll_id) REFERENCES "Polls"(id) 
           ON UPDATE NO ACTION
-          ON DELETE CASCADE;`),
+          ON DELETE CASCADE;`,
+          { transaction },
+        ),
         // poll_id should never be null
         queryInterface.changeColumn(
           'Votes',
@@ -132,10 +135,15 @@ module.exports = {
           'Collaborations_address_id_thread_id_key',
           { transaction },
         ),
-        queryInterface.addColumn('Communities', 'ce_verbose', {
-          type: Sequelize.BOOLEAN,
-          allowNull: true,
-        }),
+        queryInterface.addColumn(
+          'Communities',
+          'ce_verbose',
+          {
+            type: Sequelize.BOOLEAN,
+            allowNull: true,
+          },
+          { transaction },
+        ),
         queryInterface.changeColumn(
           'ContractAbis',
           'abi',
@@ -145,11 +153,14 @@ module.exports = {
           },
           { transaction },
         ),
-        queryInterface.sequelize.query(`
+        queryInterface.sequelize.query(
+          `
           ALTER TABLE "Votes" DROP CONSTRAINT IF EXISTS "Votes_poll_id_fkey",
           ADD CONSTRAINT "Votes_poll_id_fkey" FOREIGN KEY (poll_id) REFERENCES "Polls"(id) 
           ON UPDATE NO ACTION
-          ON DELETE NO ACTION;`),
+          ON DELETE NO ACTION;`,
+          { transaction },
+        ),
         queryInterface.changeColumn(
           'Votes',
           'poll_id',
