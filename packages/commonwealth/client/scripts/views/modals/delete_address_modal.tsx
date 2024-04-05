@@ -1,5 +1,4 @@
 import jdenticon from 'jdenticon';
-import $ from 'jquery';
 import React from 'react';
 
 import {
@@ -11,13 +10,14 @@ import NewProfile from '../../models/NewProfile';
 import app from '../../state';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTruncatedAddress } from '../components/component_kit/cw_truncated_address';
+import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
 
+import axios from 'axios';
 import '../../../styles/modals/delete_address_modal.scss';
 
 type DeleteAddressModalAttrs = {
@@ -41,13 +41,10 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
       notifyError(
         'You must have at least one address linked to a profile. Please add another address before removing this one.',
       );
-
-      $(e.target).trigger('modalexit');
-      return;
     }
 
     try {
-      const response: any = await $.post(`${app.serverUrl()}/deleteAddress`, {
+      const response = await axios.post(`${app.serverUrl()}/deleteAddress`, {
         address,
         chain,
         jwt: app.user.jwt,
@@ -59,7 +56,7 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
         community: chain,
       });
 
-      if (response?.status === 'Success') {
+      if (response?.data.status === 'Success') {
         notifySuccess('Address has been successfully removed.');
       }
     } catch (err) {

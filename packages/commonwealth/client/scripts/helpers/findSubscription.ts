@@ -6,7 +6,7 @@ export type SubUniqueData =
       categoryId:
         | NotificationCategories.ChainEvent
         | NotificationCategories.NewThread;
-      options: { chainId: string };
+      options: { communityId: string };
     }
   | {
       categoryId: NotificationCategories.SnapshotProposal;
@@ -33,7 +33,7 @@ export type SubUniqueData =
  * This function searches through a list of NotificationSubscriptions and returns the one that matches the given values.
  * If the minimum required values to uniquely identify a NotificationSubscription are not present, the function logs
  * an error and returns void. For example, in order to find a `new-thread-creation` subscription you must provide a
- * chainId.
+ * communityId.
  * @param findOptions The data used to find a matching NotificationSubscription.
  * @param subs The list of NotificationSubscriptions.
  */
@@ -46,7 +46,7 @@ export function findSubscription(
     categoryId === NotificationCategories.ChainEvent ||
     categoryId === NotificationCategories.NewThread
   ) {
-    if (!findOptions.options.chainId) {
+    if (!findOptions.options.communityId) {
       console.error(
         `Must provide the chain id to find a ${categoryId} subscription`,
       );
@@ -55,7 +55,7 @@ export function findSubscription(
     return subs.find(
       (s) =>
         s.categoryId === categoryId &&
-        s.chainId === findOptions.options.chainId,
+        s.communityId === findOptions.options.communityId,
     );
   } else if (
     categoryId === NotificationCategories.NewCollaboration ||

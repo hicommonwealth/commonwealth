@@ -1,0 +1,9 @@
+/home/runner/work/commonwealth/commonwealth/packages/commonwealth/test/canary/eslint_canary.ts
+  15:1  error  Unexpected 'eslint-disable ' comment: 'eslint-disable react/jsx-key'                                                                                                no-warning-comments
+  20:1  error  '../../../../libs/core/src/errors' import is restricted from being used by a pattern. Do not import files from outside the root directory of a package              no-restricted-imports
+  30:1  error  Async function 'doAsync' has no 'await' expression                                                                                                                  @typescript-eslint/require-await
+  34:1  error  Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+  39:1  error  Unexpected 'FIXME' comment: 'FIXME this should not be accepted'                                                                                                     no-warning-comments
+
+✖ 5 problems (5 errors, 0 warnings)
+

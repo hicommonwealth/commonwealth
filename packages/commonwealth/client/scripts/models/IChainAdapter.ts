@@ -1,7 +1,7 @@
 import type { ChainBase } from '@hicommonwealth/core';
 import type { Coin } from 'adapters/currency';
-import $ from 'jquery';
 
+import axios from 'axios';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
@@ -44,10 +44,12 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     clearLocalStorage();
     console.log(`Starting ${this.meta.name}`);
     const [response] = await Promise.all([
-      $.get(`${this.app.serverUrl()}/bulkOffchain`, {
-        chain: this.id,
-        community: null,
-        jwt: this.app.user.jwt,
+      axios.get(`${this.app.serverUrl()}/bulkOffchain`, {
+        params: {
+          chain: this.id,
+          community: null,
+          jwt: this.app.user.jwt,
+        },
       }),
     ]);
 
@@ -66,7 +68,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       numTotalThreads,
       communityBanner,
       contractsWithTemplatesData,
-    } = response.result;
+    } = response.data.result;
     // Update community level thread counters variables (Store in state instead of react query here is an
     // exception case, view the threadCountersStore code for more details)
     EXCEPTION_CASE_threadCountersStore.setState({

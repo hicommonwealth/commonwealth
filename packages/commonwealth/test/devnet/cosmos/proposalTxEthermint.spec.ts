@@ -2,6 +2,8 @@ import { StdFee } from '@cosmjs/amino';
 import { Slip10RawIndex } from '@cosmjs/crypto';
 import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
 import { Wallet as EthWallet } from '@ethersproject/wallet';
+import { dispose } from '@hicommonwealth/core';
+import { tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import { CosmosToken } from 'client/scripts/controllers/chain/cosmos/types';
 import { CosmosApiType } from 'controllers/chain/cosmos/chain';
@@ -31,7 +33,7 @@ const mnemonic =
   'pony duck remind short find feature tooth steak fix assault vote sad cattle roof';
 
 export const setupTestSigner = async (lcdUrl: string) => {
-  const dbId = 'evmos-dev-ci';
+  const dbId = 'evmos-dev-local';
   const chainId = 'evmos_9000-5';
   const hdPath = [
     Slip10RawIndex.hardened(44),
@@ -78,18 +80,23 @@ export const sendTx = async (lcdUrl, tx) => {
   return result;
 };
 
-describe('Proposal Transaction Tests - ethermint chain (evmos-dev-ci)', () => {
-  const id = 'evmos-dev-ci';
+describe('Proposal Transaction Tests - ethermint chain (evmos-dev-local)', () => {
+  const id = 'evmos-dev-local';
   let rpc: CosmosApiType;
   let signerAddr: string;
   const rpcUrl = `http://localhost:8080/cosmosAPI/${id}`;
   const lcdUrl = `http://localhost:8080/cosmosAPI/v1/${id}`;
 
   before(async () => {
+    await tester.seedDb();
     const tm = await getTMClient(rpcUrl);
     rpc = await getRPCClient(tm);
     const { signerAddress } = await setupTestSigner(lcdUrl);
     signerAddr = signerAddress;
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   const getActiveVotingProposals = async () => {
@@ -166,8 +173,16 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-ci)', () => {
 
 describe('Ethermint Governance v1beta1 util Tests', () => {
   describe('getActiveProposals', () => {
-    it('should fetch active proposals (evmos-dev-ci)', async () => {
-      const id = 'evmos-dev-ci'; // CI devnet
+    before(async () => {
+      await tester.seedDb();
+    });
+
+    after(async () => {
+      await dispose()();
+    });
+
+    it('should fetch active proposals (evmos-dev-local)', async () => {
+      const id = 'evmos-dev-local'; // CI devnet
       const tmClient = await getTMClient(
         `http://localhost:8080/cosmosAPI/${id}`,
       );

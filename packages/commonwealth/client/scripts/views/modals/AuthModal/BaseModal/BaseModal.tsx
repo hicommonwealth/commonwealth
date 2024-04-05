@@ -1,9 +1,4 @@
-import {
-  ChainBase,
-  ChainNetwork,
-  WalletId,
-  WalletSsoSource,
-} from '@hicommonwealth/core';
+import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/core';
 import useWallets from 'client/scripts/hooks/useWallets';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -77,7 +72,6 @@ const BaseModal = ({ onClose, onSuccess, showWalletsFor }: BaseModalProps) => {
   const solanaWallets = filterWalletNames(ChainBase.Solana);
   const substrateWallets = filterWalletNames(ChainBase.Substrate);
   const nearWallet = findWalletById(WalletId.NearWallet)?.name;
-  const roninWallet = findWalletById(WalletId.Ronin)?.name;
 
   const getWalletNames = () => {
     // Wallet Display Logic:
@@ -87,23 +81,14 @@ const BaseModal = ({ onClose, onSuccess, showWalletsFor }: BaseModalProps) => {
     //    - 'Near' is the only community where 'Near' wallet is shown
     // 3. On non-community pages, show 'Ethereum', 'Cosmos', 'Solana', and 'Substrate' based wallets
     // 4. On specific communities, show specific wallets
-    //    a. On 'axie-infinity' community, only show 'Ronin' wallet
-    //    b. On 'terra' community, only show 'terrastation' and 'terra-walletconnect' (wallet connect for terra) wallets
-    //    c. On 'evmos' and 'injective' communities, only show 'cosm-metamask' (metamask for cosmos communities) and
+    //    a. On 'terra' community, only show 'terrastation' and 'terra-walletconnect' (wallet connect for terra) wallets
+    //    b. On 'evmos' and 'injective' communities, only show 'cosm-metamask' (metamask for cosmos communities) and
     //       'keplr-ethereum' (keplr for ethereum communities) wallets
 
     const showWalletsForSpecificChains = showWalletsFor || app?.chain?.base;
     if (showWalletsForSpecificChains) {
       switch (showWalletsForSpecificChains) {
         case ChainBase.Ethereum:
-          if (
-            !showWalletsFor &&
-            app?.chain?.meta?.id === ChainNetwork.AxieInfinity &&
-            roninWallet
-          ) {
-            return [roninWallet];
-          }
-
           return hasWalletConnect ? ['walletconnect'] : [];
         case ChainBase.CosmosSDK:
           return cosmosWallets;

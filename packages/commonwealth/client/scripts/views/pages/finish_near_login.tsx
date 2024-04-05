@@ -1,6 +1,7 @@
 import { createCanvasSessionPayload } from 'canvas';
 
 import { ChainBase, WalletId } from '@hicommonwealth/core';
+import axios from 'axios';
 import BN from 'bn.js';
 import {
   completeClientLogin,
@@ -10,7 +11,6 @@ import {
 } from 'controllers/app/login';
 import type { NearAccount } from 'controllers/chain/near/account';
 import type Near from 'controllers/chain/near/adapter';
-import $ from 'jquery';
 import { useCommonNavigate } from 'navigation/helpers';
 import type { WalletConnection } from 'near-api-js';
 import { WalletAccount } from 'near-api-js';
@@ -20,8 +20,8 @@ import { useSearchParams } from 'react-router-dom';
 import app, { initAppState } from 'state';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
-import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
+import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import { AuthModal } from '../modals/AuthModal';
 
 // TODO:
@@ -77,7 +77,7 @@ const FinishNearLogin = () => {
       const acct = app.chain.accounts.get(wallet.getAccountId()) as NearAccount;
 
       const community =
-        app.user.selectedChain ||
+        app.user.selectedCommunity ||
         app.config.chains.getById(app.activeChainId());
 
       // create canvas thing
@@ -201,13 +201,13 @@ const FinishNearLogin = () => {
         // POST object
         const chainCreateArgs = JSON.parse(chainCreateArgString);
 
-        const res = await $.post(
+        const res = await axios.post(
           `${app.serverUrl()}/communities`,
           chainCreateArgs,
         );
 
         await initAppState(false);
-        navigate(`${window.location.origin}/${res.result.chain.id}`);
+        navigate(`${window.location.origin}/${res.data.result.chain.id}`);
       } catch (err) {
         setValidationError(`Failed to initialize chain node: ${err.message}`);
       }

@@ -16,28 +16,35 @@ const CallbackPage = () => {
       const stateJSON = JSON.parse(decodeURI(state));
 
       try {
-        await axios.post(
+        const res = await axios.post(
           `${app.serverUrl()}/setDiscordBotConfig`,
           {
-            chain_id: stateJSON.cw_chain_id,
+            community_id: stateJSON.cw_chain_id,
             guild_id: guildId,
             verification_token: stateJSON.verification_token,
+            jwt: app.user.jwt,
           },
           {
             headers: { 'Content-Type': 'application/json' },
           },
         );
 
+        const idParam = res?.data?.result?.discordConfigId
+          ? `?discordConfigId=${res?.data?.result?.discordConfigId}`
+          : '';
+
         if (stateJSON.redirect_domain) {
-          window.location.href = `${stateJSON.redirect_domain}/${redirectPath}?returningFromDiscordCallback=true`;
+          window.location.href =
+            `${stateJSON.redirect_domain}/${redirectPath}` + `${idParam}`;
         } else {
           navigate(
-            `/${stateJSON.cw_chain_id}/${redirectPath}?returningFromDiscordCallback=true`,
+            `/${stateJSON.cw_chain_id}/${redirectPath}${idParam}`,
             {},
             null,
           );
         }
       } catch (e) {
+        console.error(e);
         throw new Error(e.response.data.error);
       }
     },
@@ -55,7 +62,7 @@ const CallbackPage = () => {
         setFailureMessage(e.message);
       });
     }
-  }, []);
+  }, [state, guildId, setBotConfig]);
 
   if (!state || !guildId) {
     return <PageNotFound message="No callback data provided." />;

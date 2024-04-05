@@ -1,7 +1,7 @@
-import { AbiType } from '@hicommonwealth/core';
+import type { AbiType } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
-import { hashAbi } from '../utils/abi';
+import { hashAbi } from '../utils';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type ContractAbiAttributes = {
@@ -26,7 +26,7 @@ export default (
     'ContractAbi',
     {
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-      nickname: { type: dataTypes.STRING, allowNull: true },
+      nickname: { type: dataTypes.STRING, allowNull: true, unique: true },
       abi: { type: dataTypes.JSONB, allowNull: false },
       abi_hash: { type: dataTypes.TEXT, allowNull: false, unique: true },
       verified: {

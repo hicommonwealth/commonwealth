@@ -54,12 +54,14 @@
     border-top: 1px solid $neutral-300;
     display: flex;
     gap: 8px;
-    height: 40px;
     padding: 0 8px;
     width: 100%;
+    justify-content: space-between;
 
-    > .Button {
-      flex: 1;
+    .btn-border {
+      &:focus-within {
+        border-color: transparent;
+      }
     }
   }
 }

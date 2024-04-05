@@ -46,5 +46,5 @@ export function startHealthCheckLoop({
     const durationUntilNextCheck = nextCheckAt - Date.now();
     setTimeout(loop, durationUntilNextCheck);
   };
-  loop();
+  setTimeout(loop, PING_INTERVAL);
 }

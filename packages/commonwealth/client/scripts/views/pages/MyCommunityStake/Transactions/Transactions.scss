@@ -1,0 +1,30 @@
+@import '../../../../../styles/shared';
+
+.Transactions {
+  .Table {
+    .data-container {
+      vertical-align: middle;
+
+      .timestamp {
+        display: block;
+        width: 100%;
+        text-align: end;
+        cursor: pointer;
+      }
+
+      .etherscanLink {
+        cursor: pointer;
+        color: $neutral-500;
+        text-decoration: none;
+
+        &:focus,
+        &:active,
+        &:hover,
+        &:visited {
+          outline: none;
+          text-decoration: none;
+        }
+      }
+    }
+  }
+}

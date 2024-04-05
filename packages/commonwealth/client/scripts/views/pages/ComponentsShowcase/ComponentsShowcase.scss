@@ -2,13 +2,12 @@
 
 .ComponentsShowcase {
   display: flex;
-  height: calc(100vh - #{$global-header-height});
+  height: calc(100vh - #{$global-header-height} - 88px);
 
   .page-sidebar {
     width: 224px;
-    padding: 24px;
+    padding-right: 24px;
     overflow-y: auto;
-    box-shadow: 0 0 10px 0 $neutral-200;
 
     @include extraSmall {
       display: none;
@@ -28,7 +27,6 @@
 
   .page-body {
     flex: 1;
-    padding: 24px;
     overflow-y: auto;
     scroll-behavior: smooth;
 
@@ -78,17 +76,26 @@
   }
 
   .BannersAndAlerts {
-    .CWBanner,
-    .MessageBanner,
-    .TermsBanner {
+    .CWBanner {
       width: 100%;
     }
+  }
 
-    .MessageBanner,
-    .TermsBanner {
-      width: 100%;
-      margin-left: unset !important;
-      padding-left: 16px !important;
+  .Breadcrumbs.component-content {
+    position: static;
+    margin-top: unset;
+
+    .Breadcrumbs {
+      position: static;
+      margin-top: unset;
+    }
+  }
+
+  .Cards {
+    .ContentPageCard {
+      .Text.content {
+        padding: 16px;
+      }
     }
   }
 
@@ -96,6 +103,14 @@
     .ColorCard {
       @include extraSmall {
         width: 48%;
+      }
+
+      cursor: pointer;
+      transition: 0.1s ease-in-out;
+
+      &:hover {
+        transform: scale(1.1);
+        transition: 0.1s ease-in-out;
       }
 
       .color-field {
@@ -111,6 +126,52 @@
         border-bottom-left-radius: 8px;
         border-bottom-right-radius: 8px;
       }
+    }
+  }
+
+  .Dividers {
+    .isVertical {
+      height: 24px;
+    }
+  }
+
+  .Drawers {
+    .Drawer {
+      padding: 16px;
+    }
+  }
+
+  .Elevations {
+    .Card {
+      width: max(100px, 19%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      @include extraSmall {
+        width: 100%;
+      }
+    }
+  }
+
+  .Dropdowns {
+    .TypeaheadSelectList,
+    .CWSelectList {
+      width: 100%;
+    }
+  }
+
+  .Tables {
+    width: 100%;
+
+    .Table {
+      width: 100%;
+    }
+  }
+
+  .Tabs {
+    .CWTabsRow {
+      overflow-x: auto;
     }
   }
 }

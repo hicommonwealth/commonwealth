@@ -7,15 +7,16 @@ set -e
 yarn lint-branch-warnings
 
 # check types 
-# build libs to update types (tsc -b --noEmit is not allowed)
+# incrementally builds server/libs (tsc -b --noEmit is not allowed)
 yarn workspaces run clean
-yarn workspace @hicommonwealth/adapters build
-yarn workspace @hicommonwealth/chains build
-yarn workspace @hicommonwealth/model build
+yarn workspace commonwealth build
 yarn workspaces run check-types
 
 # run unit tests
-# this should be: yarn workspaces run test
-# this should be added to CI: yarn workspace @hicommonwealth/adapters test
-yarn workspace @hicommonwealth/model test
-yarn workspace commonwealth unit-test
+yarn workspaces run test
+
+# run api test
+yarn workspace commonwealth test-api
+
+# we are aiming for a devx without builds
+yarn workspaces run clean

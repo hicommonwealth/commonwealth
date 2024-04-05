@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 
 import { NotificationCategories } from '@hicommonwealth/core';
 import { isNotUndefined } from 'helpers/typeGuards';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 
 import app from 'state';
-import { CWButton } from './component_kit/cw_button';
 
 export const SubscriptionButton = () => {
   const subscriptions = app.user.notifications;
   const communitySubscription = subscriptions.findNotificationSubscription({
     categoryId: NotificationCategories.NewThread,
-    options: { chainId: app.activeChainId() },
+    options: { communityId: app.activeChainId() },
   });
   const [notificationsOn, setNotificationsOn] = useState<boolean>(
     isNotUndefined(communitySubscription),
@@ -18,6 +18,7 @@ export const SubscriptionButton = () => {
 
   return (
     <CWButton
+      buttonHeight="sm"
       onClick={(e) => {
         e.preventDefault();
         if (isNotUndefined(communitySubscription)) {
@@ -29,14 +30,14 @@ export const SubscriptionButton = () => {
             .subscribe({
               categoryId: NotificationCategories.NewThread,
               options: {
-                chainId: app.activeChainId(),
+                communityId: app.activeChainId(),
               },
             })
             .then(() => setNotificationsOn(true));
         }
       }}
       label={notificationsOn ? 'Notifications on' : 'Notifications off'}
-      buttonType={notificationsOn ? 'primary-blue' : 'secondary-blue'}
+      buttonType={notificationsOn ? 'primary' : 'secondary'}
     />
   );
 };

@@ -1,0 +1,82 @@
+@import '../../../../../styles/shared';
+
+.CommunityMembersPage {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  .filters {
+    display: grid;
+    height: fit-content;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+
+    &.cols-3 {
+      grid-template-columns: 9fr 3fr;
+
+      @include extraSmall {
+        grid-template-columns: initial;
+        grid-template-rows: 1fr 1fr;
+      }
+    }
+
+    &.cols-4 {
+      grid-template-columns: 7fr 3fr 2fr;
+
+      @include extraSmall {
+        grid-template-columns: initial;
+        grid-template-rows: 1fr 1fr 1fr;
+      }
+    }
+
+    .search-input-container {
+      .text-input-left-icon {
+        position: absolute;
+      }
+    }
+
+    .search-input {
+      padding-left: 48px !important;
+    }
+
+    .search-icon {
+      position: relative;
+      left: 16px !important;
+      color: $neutral-400;
+    }
+
+    .select-dropdown-container {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      width: 100%;
+
+      .filter-text {
+        display: flex;
+        text-align: center;
+        justify-content: center;
+        align-items: center;
+        margin-left: auto;
+        margin-right: 16px;
+        width: fit-content;
+
+        @include extraSmall {
+          margin-left: 0;
+        }
+      }
+
+      .CWSelectList {
+        min-width: 144px;
+
+        .cwsl__menu {
+          min-width: 200px;
+          margin-right: auto;
+          right: 0;
+          left: auto;
+        }
+      }
+    }
+  }
+}

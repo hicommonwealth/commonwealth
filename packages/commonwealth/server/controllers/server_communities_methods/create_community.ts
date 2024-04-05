@@ -7,6 +7,7 @@ import {
   ChainType,
   DefaultPage,
   NotificationCategories,
+  schemas,
 } from '@hicommonwealth/core';
 import type {
   AddressInstance,
@@ -14,13 +15,14 @@ import type {
   CommunityAttributes,
   RoleAttributes,
 } from '@hicommonwealth/model';
-import { Community, UserInstance } from '@hicommonwealth/model';
+import { UserInstance } from '@hicommonwealth/model';
 import type { Cluster } from '@solana/web3.js';
 import * as solw3 from '@solana/web3.js';
 import axios from 'axios';
 import BN from 'bn.js';
 import { Op } from 'sequelize';
 import Web3 from 'web3';
+import { z } from 'zod';
 import { bech32ToHex, urlHasValidHTTPPrefix } from '../../../shared/utils';
 import { COSMOS_REGISTRY_API } from '../../config';
 import { RoleInstanceWithPermission } from '../../util/roles';
@@ -67,7 +69,7 @@ export const Errors = {
 
 export type CreateCommunityOptions = {
   user: UserInstance;
-  community: Community.CreateCommunity;
+  community: z.infer<typeof schemas.commands.CreateCommunity.input>;
 };
 
 export type CreateCommunityResult = {
@@ -377,7 +379,7 @@ export async function __createCommunity(
     token_name,
     has_chain_events_listener: network === 'aave' || network === 'compound',
     default_page: DefaultPage.Homepage,
-    has_homepage: true,
+    has_homepage: 'true',
   });
 
   const nodeJSON = node.toJSON();

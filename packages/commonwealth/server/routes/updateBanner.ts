@@ -6,12 +6,11 @@ import { success } from '../types';
 import { validateOwner } from '../util/validateOwner';
 
 enum UpdateBannerErrors {
-  NoChain = 'Must supply a chain ID',
   NoPermission = `You do not have permission to update banner`,
 }
 
 type UpdateBannerReq = Omit<CommunityBannerInstance, 'id'> & {
-  chain_id: string;
+  community_id: string;
   banner_text: string;
 };
 

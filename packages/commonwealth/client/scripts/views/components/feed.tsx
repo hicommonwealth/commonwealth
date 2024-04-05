@@ -9,6 +9,7 @@ import { PageNotFound } from '../pages/404';
 import { UserDashboardRow } from '../pages/user_dashboard/user_dashboard_row';
 
 import { Label as ChainEventLabel, IEventLabel } from 'chain/labelers/util';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 
 type FeedProps = {
   fetchData: () => Promise<any>;
@@ -36,6 +37,7 @@ export const Feed = ({
   const [currentCount, setCurrentCount] = useState<number>(
     defaultCount || DEFAULT_COUNT,
   );
+  const { isLoggedIn } = useUserLoggedIn();
 
   const loadMore = useCallback(() => {
     return setTimeout(() => {
@@ -133,6 +135,7 @@ export const Feed = ({
               key={i}
               notification={data[i]}
               label={labels[i]}
+              isLoggedIn={isLoggedIn}
             />
           );
         }}

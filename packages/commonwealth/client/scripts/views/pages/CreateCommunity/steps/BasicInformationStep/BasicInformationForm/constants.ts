@@ -7,6 +7,7 @@ export const POLYGON_ETH_CHAIN_ID = 137;
 export const ETHEREUM_MAINNET_ID = '1';
 export const BASE_ID = '8453';
 export const OSMOSIS_ID = 'osmosis';
+export const BLAST_ID = '81457';
 
 export const existingCommunityIds = app.config.chains
   .getAll()

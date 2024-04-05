@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import type { SessionPayload } from '@canvas-js/interfaces';
 import { ChainBase, WalletSsoSource } from '@hicommonwealth/core';
+import axios from 'axios';
 import {
   completeClientLogin,
   createUserWithAddress,
@@ -14,7 +15,6 @@ import WebWalletController from 'controllers/app/web_wallets';
 import type Near from 'controllers/chain/near/adapter';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import { signSessionWithAccount } from 'controllers/server/sessions';
-import $ from 'jquery';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
@@ -29,11 +29,7 @@ import {
 } from '../../../shared/analytics/types';
 import NewProfilesController from '../controllers/server/newProfiles';
 import { setDarkMode } from '../helpers/darkMode';
-import {
-  getAddressFromWallet,
-  loginToAxie,
-  loginToNear,
-} from '../helpers/wallet';
+import { getAddressFromWallet, loginToNear } from '../helpers/wallet';
 import Account from '../models/Account';
 import IWebWallet from '../models/IWebWallet';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from '../state/api/profiles/fetchProfilesByAddress';
@@ -303,7 +299,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
       }
       if (app.chain) {
         const community =
-          app.user.selectedChain ||
+          app.user.selectedCommunity ||
           app.config.chains.getById(app.activeChainId());
         await updateActiveAddresses({
           chain: community,
@@ -570,8 +566,6 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
     if (wallet.chain === 'near') {
       await loginToNear(app.chain as Near, app.isCustomDomain());
-    } else if (wallet.defaultNetwork === 'axie-infinity') {
-      await loginToAxie(`${app.serverUrl()}/auth/sso`);
     } else {
       const selectedAddress = getAddressFromWallet(wallet);
 
@@ -602,28 +596,34 @@ const useWallets = (walletProps: IuseWalletProps) => {
     setSelectedWallet(wallet);
 
     if (app.isLoggedIn()) {
-      const { result } = await $.post(`${app.serverUrl()}/getAddressStatus`, {
-        address:
-          wallet.chain === ChainBase.Substrate
-            ? addressSwapper({
-                address: selectedAddress,
-                currentPrefix: parseInt(
-                  (app.chain as Substrate)?.meta.ss58Prefix,
-                  10,
-                ),
-              })
-            : selectedAddress,
-        community_id: app.activeChainId() ?? wallet.chain,
-        jwt: app.user.jwt,
-      });
-      if (result.exists && result.belongsToUser) {
-        notifyInfo('This address is already linked to your current account.');
-        return;
-      }
-      if (result.exists) {
-        notifyInfo(
-          'This address is already linked to another account. Signing will transfer ownership to your account.',
-        );
+      try {
+        const res = await axios.post(`${app.serverUrl()}/getAddressStatus`, {
+          address:
+            wallet.chain === ChainBase.Substrate
+              ? addressSwapper({
+                  address: selectedAddress,
+                  currentPrefix: parseInt(
+                    (app.chain as Substrate)?.meta.ss58Prefix,
+                    10,
+                  ),
+                })
+              : selectedAddress,
+          community_id: app.activeChainId() ?? wallet.chain,
+          jwt: app.user.jwt,
+        });
+
+        if (res.data.result.exists && res.data.result.belongsToUser) {
+          notifyInfo('This address is already linked to your current account.');
+          return;
+        }
+
+        if (res.data.result.exists) {
+          notifyInfo(
+            'This address is already linked to another account. Signing will transfer ownership to your account.',
+          );
+        }
+      } catch (err) {
+        console.log('Error getting address status');
       }
     }
 
