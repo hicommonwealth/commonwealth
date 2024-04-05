@@ -9,6 +9,9 @@ export * as User from './user';
 // Core Services
 export * from './services';
 
+// Policies
+export * from './policies';
+
 // Test Service
 export * as tester from './tester';
 export type { E2E_TestEntities } from './tester';
@@ -19,5 +22,3 @@ export * from './database';
 export * from './globalActivityCache';
 export * from './models';
 export * from './utils';
-
-export * from './policies';
