@@ -54,9 +54,9 @@ class CommunityStakes extends ContractBase {
         .call(),
     );
     return {
-      price: this.web3.utils.fromWei(feeFreePrice),
-      fees: this.web3.utils.fromWei(totalPrice.sub(feeFreePrice)),
-      totalPrice: this.web3.utils.fromWei(totalPrice),
+      price: this.web3.utils.fromWei(feeFreePrice, 'ether'),
+      fees: this.web3.utils.fromWei(totalPrice - feeFreePrice, 'ether'),
+      totalPrice: this.web3.utils.fromWei(totalPrice, 'ether'),
     };
   }
 
@@ -87,9 +87,9 @@ class CommunityStakes extends ContractBase {
         .call(),
     );
     return {
-      price: this.web3.utils.fromWei(feeFreePrice),
-      fees: this.web3.utils.fromWei(totalPrice.sub(feeFreePrice)),
-      totalPrice: this.web3.utils.fromWei(totalPrice),
+      price: this.web3.utils.fromWei(feeFreePrice, 'ether'),
+      fees: this.web3.utils.fromWei(totalPrice - feeFreePrice, 'ether'),
+      totalPrice: this.web3.utils.fromWei(totalPrice, 'ether'),
     };
   }
 
@@ -126,7 +126,7 @@ class CommunityStakes extends ContractBase {
           maxFeePerGas: null,
         });
       try {
-        await this.web3.givenProvider.request({
+        await this.web3.currentProvider.request({
           method: 'wallet_watchAsset',
           params: {
             type: 'ERC1155',
@@ -255,7 +255,7 @@ class CommunityStakes extends ContractBase {
       await this.initialize();
     }
     const balance = await this.web3.eth.getBalance(walletAddress);
-    return this.web3.utils.fromWei(balance);
+    return this.web3.utils.fromWei(balance, 'ether');
   }
 }
 

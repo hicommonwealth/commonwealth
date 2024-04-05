@@ -38,7 +38,9 @@ export const getNamespace = async (
   );
 
   const hexString = web3.utils.utf8ToHex(namespace);
-  const activeNamespace = await factory.methods.getNamespace(hexString).call();
+  const activeNamespace = await factory.methods
+    .getNamespace(hexString.padEnd(66, '0'))
+    .call();
   return activeNamespace;
 };
 
