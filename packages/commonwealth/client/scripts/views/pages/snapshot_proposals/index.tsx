@@ -5,6 +5,7 @@ import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import moment from 'moment';
 import 'pages/snapshot_proposals.scss';
 import app from 'state';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import useNecessaryEffect from '../../../hooks/useNecessaryEffect';
 import { CardsCollection } from '../../components/cards_collection';
@@ -91,63 +92,65 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
   };
 
   return (
-    <div className="SnapshotProposalsPage">
-      <CWText type="h2" fontWeight="medium" className="header">
-        Snapshots
-      </CWText>
-      <div className="top-bar">
-        <CWTabsRow>
-          {['Active', 'Ended'].map((tabName, index) => (
-            <CWTab
-              key={index}
-              label={tabName}
-              isSelected={activeTab === index + 1}
-              onClick={() => setActiveTab(index + 1)}
+    <CWPageLayout>
+      <div className="SnapshotProposalsPage">
+        <CWText type="h2" fontWeight="medium" className="header">
+          Snapshots
+        </CWText>
+        <div className="top-bar">
+          <CWTabsRow>
+            {['Active', 'Ended'].map((tabName, index) => (
+              <CWTab
+                key={index}
+                label={tabName}
+                isSelected={activeTab === index + 1}
+                onClick={() => setActiveTab(index + 1)}
+              />
+            ))}
+          </CWTabsRow>
+          <div>
+            <CWButton
+              label={
+                hasSubscription
+                  ? 'Remove Subscription'
+                  : 'Subscribe to Notifications'
+              }
+              iconLeft={hasSubscription ? 'mute' : 'bell'}
+              onClick={updateSubscription}
+              buttonType="mini-black"
             />
-          ))}
-        </CWTabsRow>
-        <div>
-          <CWButton
-            label={
-              hasSubscription
-                ? 'Remove Subscription'
-                : 'Subscribe to Notifications'
-            }
-            iconLeft={hasSubscription ? 'mute' : 'bell'}
-            onClick={updateSubscription}
-            buttonType="mini-black"
-          />
+          </div>
         </div>
-      </div>
-      {!isSnapshotProposalsLoading ? (
-        proposalsToDisplay.length > 0 ? (
+        {!isSnapshotProposalsLoading ? (
+          proposalsToDisplay.length > 0 ? (
+            <CardsCollection
+              content={proposalsToDisplay.map((proposal, i) => (
+                <SnapshotProposalCard
+                  key={i}
+                  snapshotId={snapshotId}
+                  proposal={proposal}
+                />
+              ))}
+            />
+          ) : (
+            <CWText className="no-proposals-text">
+              No active proposals found.
+            </CWText>
+          )
+        ) : (
           <CardsCollection
-            content={proposalsToDisplay.map((proposal, i) => (
+            content={Array.from({ length: 10 }).map((x, i) => (
               <SnapshotProposalCard
                 key={i}
                 snapshotId={snapshotId}
-                proposal={proposal}
+                showSkeleton
+                proposal={{} as any}
               />
             ))}
           />
-        ) : (
-          <CWText className="no-proposals-text">
-            No active proposals found.
-          </CWText>
-        )
-      ) : (
-        <CardsCollection
-          content={Array.from({ length: 10 }).map((x, i) => (
-            <SnapshotProposalCard
-              key={i}
-              snapshotId={snapshotId}
-              showSkeleton
-              proposal={{} as any}
-            />
-          ))}
-        />
-      )}
-    </div>
+        )}
+      </div>
+    </CWPageLayout>
   );
 };
 

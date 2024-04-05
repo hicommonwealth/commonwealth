@@ -24,6 +24,7 @@ import {
   useCosmosProposalVotesQuery,
 } from 'state/api/proposals';
 import { slugify } from 'utils';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
@@ -201,59 +202,61 @@ const ViewProposalPage = ({
   };
 
   return (
-    <CWContentPage
-      showSkeleton={!proposal}
-      title={proposalTitle}
-      author={proposal?.author}
-      createdAt={proposal?.createdAt}
-      updatedAt={null}
-      subHeader={
-        <ProposalSubheader
-          proposal={proposal as SubheaderProposalType}
-          toggleVotingModal={toggleVotingModal}
-          votingModalOpen={votingModalOpen}
-        />
-      }
-      body={() =>
-        proposalDescription && (
-          <CollapsibleProposalBody doc={proposalDescription} />
-        )
-      }
-      subBody={
-        <>
-          {proposal instanceof AaveProposal && (
-            <AaveViewProposalDetail proposal={proposal} />
-          )}
-          {isFetchingMetadata ? (
-            <Skeleton height={94.4} />
-          ) : (
-            !_.isEmpty(metadata) && (
-              <JSONDisplay data={metadata} title="Metadata" />
-            )
-          )}
-          {!_.isEmpty(proposal?.data?.messages) && (
-            <JSONDisplay data={proposal.data.messages} title="Messages" />
-          )}
-          {proposal instanceof CosmosProposal &&
-            proposal?.data?.type === 'communitySpend' && (
-              <JSONDisplay
-                data={{
-                  recipient: proposal.data?.spendRecipient,
-                  amount: proposal.data?.spendAmount,
-                }}
-                title="Community Spend Proposal"
-              />
-            )}
-          <VotingResults proposal={proposal} />
-          <VotingActions
-            onModalClose={onModalClose}
-            proposal={proposal}
+    <CWPageLayout>
+      <CWContentPage
+        showSkeleton={!proposal}
+        title={proposalTitle}
+        author={proposal?.author}
+        createdAt={proposal?.createdAt}
+        updatedAt={null}
+        subHeader={
+          <ProposalSubheader
+            proposal={proposal as SubheaderProposalType}
             toggleVotingModal={toggleVotingModal}
             votingModalOpen={votingModalOpen}
           />
-        </>
-      }
-    />
+        }
+        body={() =>
+          proposalDescription && (
+            <CollapsibleProposalBody doc={proposalDescription} />
+          )
+        }
+        subBody={
+          <>
+            {proposal instanceof AaveProposal && (
+              <AaveViewProposalDetail proposal={proposal} />
+            )}
+            {isFetchingMetadata ? (
+              <Skeleton height={94.4} />
+            ) : (
+              !_.isEmpty(metadata) && (
+                <JSONDisplay data={metadata} title="Metadata" />
+              )
+            )}
+            {!_.isEmpty(proposal?.data?.messages) && (
+              <JSONDisplay data={proposal.data.messages} title="Messages" />
+            )}
+            {proposal instanceof CosmosProposal &&
+              proposal?.data?.type === 'communitySpend' && (
+                <JSONDisplay
+                  data={{
+                    recipient: proposal.data?.spendRecipient,
+                    amount: proposal.data?.spendAmount,
+                  }}
+                  title="Community Spend Proposal"
+                />
+              )}
+            <VotingResults proposal={proposal} />
+            <VotingActions
+              onModalClose={onModalClose}
+              proposal={proposal}
+              toggleVotingModal={toggleVotingModal}
+              votingModalOpen={votingModalOpen}
+            />
+          </>
+        }
+      />
+    </CWPageLayout>
   );
 };
 

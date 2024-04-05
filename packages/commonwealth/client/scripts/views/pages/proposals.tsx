@@ -20,8 +20,8 @@ import {
   useCompoundProposalsQuery,
 } from 'state/api/proposals';
 import { ProposalCard } from 'views/components/ProposalCard';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
-import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
 import useManageDocumentTitle from '../../hooks/useManageDocumentTitle';
 import { getStatusText } from '../components/ProposalCard/helpers';
@@ -42,17 +42,15 @@ const ProposalsPage = () => {
   const onSputnik = app.chain?.network === ChainNetwork.Sputnik;
   const onCosmos = app.chain?.base === ChainBase.CosmosSDK;
 
-  const { data: cachedAaveProposals, isError: isAaveError } =
-    useAaveProposalsQuery({
-      moduleReady: app.chain?.network === ChainNetwork.Aave && !isLoading,
-      communityId: app.chain?.id,
-    });
+  const { data: cachedAaveProposals } = useAaveProposalsQuery({
+    moduleReady: app.chain?.network === ChainNetwork.Aave && !isLoading,
+    communityId: app.chain?.id,
+  });
 
-  const { data: cachedCompoundProposals, isError: isCompoundError } =
-    useCompoundProposalsQuery({
-      moduleReady: app.chain?.network === ChainNetwork.Compound && !isLoading,
-      communityId: app.chain?.id,
-    });
+  const { data: cachedCompoundProposals } = useCompoundProposalsQuery({
+    moduleReady: app.chain?.network === ChainNetwork.Compound && !isLoading,
+    communityId: app.chain?.id,
+  });
 
   useEffect(() => {
     app.chainAdapterReady.on('ready', () => setLoading(false));
@@ -103,9 +101,9 @@ const ProposalsPage = () => {
     return <PageLoading message="Connecting to chain" />;
   }
 
-  if (isAaveError || isCompoundError) {
-    return <ErrorPage message="Could not connect to chain" />;
-  }
+  // if (isAaveError || isCompoundError) {
+  //   return <ErrorPage message="Could not connect to chain" />;
+  // }
 
   let aaveProposals: AaveProposal[];
   if (onAave)
@@ -247,16 +245,18 @@ const ProposalsPage = () => {
   );
 
   return (
-    <div className="ProposalsPage">
-      <div className="header">
-        <CWText type="h2" fontWeight="medium">
-          Proposals
-        </CWText>
+    <CWPageLayout>
+      <div className="ProposalsPage">
+        <div className="header">
+          <CWText type="h2" fontWeight="medium">
+            Proposals
+          </CWText>
+        </div>
+        {onCompound && <CompoundProposalStats chain={app.chain as Compound} />}
+        <CardsCollection content={activeProposalContent} header="Active" />
+        <CardsCollection content={inactiveProposalContent} header="Inactive" />
       </div>
-      {onCompound && <CompoundProposalStats chain={app.chain as Compound} />}
-      <CardsCollection content={activeProposalContent} header="Active" />
-      <CardsCollection content={inactiveProposalContent} header="Inactive" />
-    </div>
+    </CWPageLayout>
   );
 };
 
