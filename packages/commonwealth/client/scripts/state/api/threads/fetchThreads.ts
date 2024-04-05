@@ -14,11 +14,13 @@ const THREADS_STALE_TIME = 180000; // 3 minutes
 const QueryTypes = {
   ACTIVE: cacheTypes.ACTIVE_THREADS,
   BULK: cacheTypes.BULK_THREADS,
+  COUNT: cacheTypes.COUNT_THREADS,
 };
 
 const queryTypeToRQMap = {
   bulk: useInfiniteQuery,
   active: useQuery,
+  count: useQuery,
 };
 
 interface CommonProps {
@@ -43,6 +45,11 @@ interface FetchBulkThreadsProps extends CommonProps {
     | 'mostLikes'
     | 'mostComments'
     | 'latestActivity';
+}
+
+interface FetchThreadCountProps extends CommonProps {
+  queryType: typeof QueryTypes.COUNT;
+  limit?: number;
 }
 
 interface FetchActiveThreadsProps extends CommonProps {
@@ -85,6 +92,9 @@ const isFetchActiveThreadsProps = (props): props is FetchActiveThreadsProps =>
 const isFetchBulkThreadsProps = (props): props is FetchBulkThreadsProps =>
   props.queryType === QueryTypes.BULK;
 
+const isFetchThreadCountProps = (props): props is FetchThreadCountProps =>
+  props.queryType === QueryTypes.COUNT;
+
 const getFetchThreadsQueryKey = (props) => {
   if (isFetchBulkThreadsProps(props)) {
     const keys = [
@@ -115,6 +125,9 @@ const getFetchThreadsQueryKey = (props) => {
       props.queryType,
       props.topicsPerThread,
     ];
+  }
+  if (isFetchThreadCountProps(props)) {
+    return [ApiEndpoints.FETCH_THREADS, props.communityId, props.limit];
   }
 };
 
@@ -182,6 +195,23 @@ const fetchActiveThreads = (props) => {
   };
 };
 
+const fetchThreadCount = (props) => {
+  return async (): Promise<number> => {
+    const response = await axios.get(
+      `${app.serverUrl()}${ApiEndpoints.FETCH_THREADS}`,
+      {
+        params: {
+          community_id: props.communityId,
+          limit: props.limit,
+          count: true,
+        },
+      },
+    );
+
+    return response.data.result.count;
+  };
+};
+
 const useFetchThreadsQuery = (
   props: FetchBulkThreadsProps | FetchActiveThreadsProps,
 ) => {
@@ -195,6 +225,7 @@ const useFetchThreadsQuery = (
     queryFn: (() => {
       if (isFetchBulkThreadsProps(props)) return fetchBulkThreads(props);
       if (isFetchActiveThreadsProps(props)) return fetchActiveThreads(props);
+      if (isFetchThreadCountProps(props)) return fetchThreadCount(props);
     })(),
     ...(() => {
       if (isFetchBulkThreadsProps(props)) {
@@ -221,7 +252,8 @@ const useFetchThreadsQuery = (
     };
   }
 
-  if (isFetchActiveThreadsProps(props)) return chosenQueryType;
+  if (isFetchActiveThreadsProps(props) || isFetchThreadCountProps(props))
+    return chosenQueryType;
 };
 
 export default useFetchThreadsQuery;
