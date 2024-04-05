@@ -130,7 +130,7 @@ export async function __createCommentReaction(
       );
       const stakeBalances =
         await commonProtocolService.contractHelpers.getNamespaceBalance(
-          community.namespace,
+          community.namespace_address,
           stake.stake_id,
           node.eth_chain_id,
           [address.address],

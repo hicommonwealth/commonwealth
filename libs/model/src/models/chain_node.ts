@@ -18,7 +18,7 @@ export default (
     'ChainNode',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      url: { type: dataTypes.STRING, allowNull: false },
+      url: { type: dataTypes.STRING, allowNull: false, unique: true },
       eth_chain_id: { type: dataTypes.INTEGER, allowNull: true, unique: true },
       cosmos_chain_id: {
         type: dataTypes.STRING,
@@ -29,11 +29,11 @@ export default (
       private_url: { type: dataTypes.STRING, allowNull: true },
       balance_type: { type: dataTypes.STRING, allowNull: false },
       name: { type: dataTypes.STRING, allowNull: false },
-      description: { type: dataTypes.TEXT, allowNull: true },
+      description: { type: dataTypes.STRING, allowNull: true },
       health: { type: dataTypes.STRING, allowNull: true },
       ss58: { type: dataTypes.INTEGER, allowNull: true },
       bech32: { type: dataTypes.STRING, allowNull: true },
-      cosmos_gov_version: { type: dataTypes.STRING, allowNull: true },
+      cosmos_gov_version: { type: dataTypes.STRING(64), allowNull: true },
       block_explorer: { type: dataTypes.STRING, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },

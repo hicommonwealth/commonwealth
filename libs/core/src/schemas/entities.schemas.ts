@@ -344,6 +344,7 @@ export const Community = z.object({
     .max(MAX_SCHEMA_INT)
     .optional(),
   namespace: z.string().optional(),
+  namespace_address: z.string().optional(),
   redirect: z.string().optional(),
   created_at: z.date().optional(),
   updated_at: z.date().optional(),

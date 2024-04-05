@@ -16,8 +16,8 @@ import { CWCommunityAvatar } from '../../cw_community_avatar';
 import { CWIcon } from '../../cw_icons/cw_icon';
 import { CWText } from '../../cw_text';
 import { ComponentType } from '../../types';
+import { CWButton } from '../CWButton';
 import { CWTooltip } from '../CWTooltip';
-import { CWButton } from '../cw_button';
 import './CWRelatedCommunityCard.scss';
 import { addPeriodToText } from './utils';
 
@@ -28,6 +28,7 @@ type CWRelatedCommunityCardProps = {
   onStakeBtnClick?: () => void;
   ethUsdRate?: string;
   historicalPrice?: string;
+  onlyShowIfStakeEnabled?: boolean;
 };
 
 export const CWRelatedCommunityCard = ({
@@ -37,6 +38,7 @@ export const CWRelatedCommunityCard = ({
   onStakeBtnClick,
   ethUsdRate,
   historicalPrice,
+  onlyShowIfStakeEnabled,
 }: CWRelatedCommunityCardProps) => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
@@ -91,6 +93,8 @@ export const CWRelatedCommunityCard = ({
       }}
     />
   );
+
+  if (onlyShowIfStakeEnabled && !stakeEnabled) return <></>;
 
   return (
     <div

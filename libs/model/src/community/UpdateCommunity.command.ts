@@ -14,14 +14,16 @@ export const UpdateCommunity: Command<
 
     if (!mustExist('Community', community)) return;
 
-    await commonProtocol.newNamespaceValidator.validateNamespace(
-      payload.namespace,
-      payload.txHash,
-      payload.address,
-      community,
-    );
+    const namespaceAddress =
+      await commonProtocol.newNamespaceValidator.validateNamespace(
+        payload.namespace,
+        payload.txHash,
+        payload.address,
+        community,
+      );
 
     community.namespace = payload.namespace;
+    community.namespace_address = namespaceAddress;
     return (await community.save()).get({ plain: true });
   },
 });
