@@ -1,7 +1,7 @@
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 
-import { CWCustomIcon } from 'views/components/component_kit/cw_icons/cw_custom_icon';
+import { findDenominationIcon } from 'helpers/findDenominationIcon';
 
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -45,15 +45,6 @@ export const VoteWeightModule = ({
     } else {
       onOpenStakeModal('buy');
     }
-  };
-
-  const findDenominationIcon = (denomination: string) => {
-    if (!denomination) return;
-    return {
-      BLAST: <CWCustomIcon iconName="blast" iconSize="xs" />,
-      ETH: <CWCustomIcon iconName="eth" iconSize="xs" />,
-      BASE: <CWCustomIcon iconName="base" iconSize="xs" />,
-    }[denomination];
   };
 
   return (

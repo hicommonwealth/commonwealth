@@ -1,4 +1,5 @@
 import 'components/sidebar/CommunitySection/CommunitySection.scss';
+import { findDenominationString } from 'helpers/findDenomination';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -59,15 +60,6 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   const isMod = Permissions.isCommunityModerator();
   const showAdmin = app.user && (isAdmin || isMod);
 
-  const findDenomination = (selectedStakeChain: string) => {
-    if (!selectedStakeChain) return;
-    return {
-      Ethereum: selectedStakeChain.toLowerCase().includes('ethereum') && 'ETH',
-      Base: selectedStakeChain.toLowerCase().includes('base') && 'BASE',
-      Blast: selectedStakeChain.toLowerCase().includes('blast') && 'BLAST',
-    }[selectedStakeChain];
-  };
-
   return (
     <>
       <div className="community-menu">
@@ -83,7 +75,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
                 voteWeight={currentVoteWeight}
                 stakeNumber={stakeBalance}
                 stakeValue={stakeValue}
-                denomination={findDenomination(activeChainId) || 'ETH'}
+                denomination={findDenominationString(activeChainId) || 'ETH'}
                 onOpenStakeModal={setModeOfManageCommunityStakeModal}
               />
             )}
@@ -139,7 +131,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
           <ManageCommunityStakeModal
             mode={modeOfManageCommunityStakeModal}
             onModalClose={() => setModeOfManageCommunityStakeModal(null)}
-            denomination={findDenomination(activeChainId) || 'ETH'}
+            denomination={findDenominationString(activeChainId) || 'ETH'}
             {...(selectedCommunity && { community: selectedCommunity })}
           />
         }

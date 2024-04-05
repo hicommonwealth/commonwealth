@@ -1,5 +1,6 @@
 import { commonProtocol } from '@hicommonwealth/core';
 import clsx from 'clsx';
+import { findDenominationIcon } from 'helpers/findDenomination';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
@@ -15,7 +16,6 @@ import {
 import { useCommunityStake } from 'views/components/CommunityStake';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
-import { CWCustomIcon } from 'views/components/component_kit/cw_icons/cw_custom_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleButton from 'views/components/component_kit/new_designs/CWCircleButton';
@@ -213,15 +213,6 @@ const StakeExchangeForm = ({
     } else if (inputValue === '') {
       onSetNumberOfStakeToExchange(0);
     }
-  };
-
-  const findDenominationIcon = (denomination: string) => {
-    if (!denomination) return;
-    return {
-      BLAST: <CWCustomIcon iconName="blast" iconSize="xs" />,
-      ETH: <CWCustomIcon iconName="eth" iconSize="xs" />,
-      BASE: <CWCustomIcon iconName="base" iconSize="xs" />,
-    }[denomination];
   };
 
   const insufficientFunds = isBuyMode
