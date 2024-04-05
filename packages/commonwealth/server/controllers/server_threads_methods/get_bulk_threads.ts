@@ -1,5 +1,6 @@
 import { ServerError } from '@hicommonwealth/core';
 import { ThreadAttributes } from '@hicommonwealth/model';
+import type { ReactionType } from 'models/Reaction';
 import moment from 'moment';
 import { QueryTypes } from 'sequelize';
 import { ServerThreadsController } from '../server_threads_controller';
@@ -17,9 +18,22 @@ export type GetBulkThreadsOptions = {
   archived: boolean;
 };
 
+export type AssociatedReaction = {
+  id: number | string;
+  type: ReactionType;
+  address: string;
+  updated_at: string;
+  voting_weight: number;
+  profile_name?: string;
+  avatar_url?: string;
+  last_active?: string;
+};
+
+type ThreadsQuery = ThreadAttributes & AssociatedReaction[];
+
 export type GetBulkThreadsResult = {
   numVotingThreads: number;
-  threads: ThreadAttributes[];
+  threads: ThreadsQuery[];
   limit: number;
   page: number;
 };
@@ -66,7 +80,7 @@ export async function __getBulkThreads(
     latestActivity: 'updated_at DESC',
   };
 
-  const responseThreadsQuery = this.models.sequelize.query(
+  const responseThreadsQuery = this.models.sequelize.query<ThreadsQuery>(
     `
         WITH top_threads AS (
         SELECT id, title, url, body, version_history, kind, stage, read_only, discord_meta,
