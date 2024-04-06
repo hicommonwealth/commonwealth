@@ -45,7 +45,7 @@
     "start-external-webpack": "NODE_ENV=production NO_PRERENDER=true NO_SSL=true tsx -r tsconfig-paths/register server.ts",
     "stylelint": "stylelint client/styles/*",
     "test": "yarn unit-test",
-    "test-api": "NODE_OPTIONS='--loader tsx' NODE_ENV=test mocha './test/integration/api/**/*.spec.ts'",
+    "test-api": "NODE_OPTIONS='--import=tsx' NODE_ENV=test mocha './test/integration/api/**/*.spec.ts'",
     "test-devnet": "chmod +x ./scripts/execute-devnet-tests.sh && ./scripts/execute-devnet-tests.sh",
     "test-e2e": "NODE_ENV=test TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 1 ./test/e2e/e2eRegular/*",
     "test-e2e-mature": "NODE_ENV=test TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 1 ./test/e2e/mature/*",
