@@ -126,7 +126,7 @@ export async function __getBulkThreads(
         SELECT
             TT.id as thread_id,
             CASE WHEN max(A.id) IS NOT NULL THEN
-                jsonb_agg(json_strip_nulls(json_build_object(
+                json_agg(json_strip_nulls(json_build_object(
                     'address', A.address,
                     'community_id', A.community_id,
                     'User', json_build_object(
