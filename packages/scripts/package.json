@@ -12,10 +12,13 @@
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
     "test": "NODE_OPTIONS='--import=tsx' NODE_ENV=test mocha '__tests__/**/*.spec.ts'",
-    "generate-stakeholder-groups": "tsx -T src/generate-stakeholder-groups"
+    "generate-stakeholder-groups": "tsx src/generate-stakeholder-groups"
   },
   "dependencies": {
     "sequelize": "^6.32.1"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "mocha": "^10.4.0",
+    "tsx": "^4.7.2"
+  }
 }
