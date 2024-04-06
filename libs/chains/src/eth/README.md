@@ -27,7 +27,7 @@ Note that this will deploy slightly edited versions of the governance contracts 
 To advance blocks and timestamps (default 1 block):
 
 ```bash
-commonwealth/shared/eth$ ts-node scripts/mineBlocks.ts <nBlocks (default 1)>
+commonwealth/shared/eth$ tsx scripts/mineBlocks.ts <nBlocks (default 1)>
 ```
 
 Mining occurs in a loop, so be careful of the argument size as it could take a long time to process.
