@@ -125,19 +125,22 @@ export async function __getBulkThreads(
     -- get the thread collaborators and their profiles
         SELECT
             TT.id as thread_id,
-            jsonb_agg(json_strip_nulls(json_build_object(
-                'address', A.address,
-                'community_id', A.community_id,
-                'User', json_build_object(
-                    'Profiles', json_build_array(json_build_object(
-                        'id', editor_profiles.id,
-                        'name', editor_profiles.profile_name,
-                        'address', A.address,
-                        'lastActive', A.last_active::text,
-                        'avatarUrl', editor_profiles.avatar_url::text
-                    ))
-                )
-            ))) AS collaborators
+            CASE WHEN max(A.id) IS NOT NULL THEN
+                jsonb_agg(json_strip_nulls(json_build_object(
+                    'address', A.address,
+                    'community_id', A.community_id,
+                    'User', json_build_object(
+                        'Profiles', json_build_array(json_build_object(
+                            'id', editor_profiles.id,
+                            'name', editor_profiles.profile_name,
+                            'address', A.address,
+                            'lastActive', A.last_active::text,
+                            'avatarUrl', editor_profiles.avatar_url::text
+                        ))
+                    )
+                ))) 
+            ELSE '[]'::json
+            END AS collaborators
         FROM top_threads TT
         LEFT JOIN "Collaborations" AS C ON TT.id = C.thread_id
         LEFT JOIN "Addresses" A ON C.address_id = A.id
