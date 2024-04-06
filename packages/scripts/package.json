@@ -11,8 +11,8 @@
     "build": "tsc -b",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
-    "test": "NODE_ENV=test ts-mocha '__tests__/**/*.spec.ts'",
-    "generate-stakeholder-groups": "npx ts-node -T src/generate-stakeholder-groups"
+    "test": "NODE_OPTIONS='--import=tsx' NODE_ENV=test mocha '__tests__/**/*.spec.ts'",
+    "generate-stakeholder-groups": "tsx -T src/generate-stakeholder-groups"
   },
   "dependencies": {
     "sequelize": "^6.32.1"
