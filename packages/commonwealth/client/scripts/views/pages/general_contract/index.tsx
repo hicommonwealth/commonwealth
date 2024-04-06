@@ -5,7 +5,7 @@ import { parseFunctionsFromABI } from 'abi_utils';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { callContractFunction } from 'controllers/chain/ethereum/callContractFunction';
 import { ethers } from 'ethers';
-import type { Result } from 'ethers/utils';
+import type { Result } from 'ethers/lib/utils';
 import {
   handleMappingAbiInputs,
   validateAbiInput,
